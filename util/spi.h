@@ -2,13 +2,13 @@
 #define _SPI_H_
 
 ////////////////////////////////////////////////////////////////////////////////
-// Class CSPIPort
-class CSPIPort {
+// Class SPIPort
+class SPIPort {
 public:
-	CSPIPort(const char* SPIDevice);
-	~CSPIPort();
+	SPIPort(const char* spiDevice);
+	~SPIPort();
 	
-	PCRSTATUS init();
+	chaistatus_t init();
 	
 private:
 	const char* iSPIDevice;
