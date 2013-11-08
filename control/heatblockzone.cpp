@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Class HeatBlockZoneController
 HeatBlockZoneController::HeatBlockZoneController(unsigned int adcCSPinNumber) throw():
-	 tempAdc_(NULL) {
+	 tempAdc_(nullptr) {
 		 
 	tempAdc_ = new MCPADC(adcCSPinNumber);
 }

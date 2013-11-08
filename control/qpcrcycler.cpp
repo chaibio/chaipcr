@@ -6,10 +6,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class QPCRCycler
-QPCRCycler* QPCRCycler::qpcrCycler_ = 0;
+QPCRCycler* QPCRCycler::qpcrCycler_ { nullptr };
 
 QPCRCycler::QPCRCycler():
-	heatBlock_(NULL) {
+	heatBlock_(nullptr) {
 	
 	spiPort0_ = new SPIPort(kSPI0DevicePath);
 

@@ -5,13 +5,9 @@
 
 using namespace std;
 
-int main(int argc, char** argv) {
-	chaistatus_t res;
-	
+int main() {
 	QPCRCycler* qpcrCycler = QPCRCycler::instance();
 	
 	while (qpcrCycler->loop()) {}
-	
-	return 0;
 }
 	
