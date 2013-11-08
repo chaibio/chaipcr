@@ -2,6 +2,7 @@
 #define _QPCRCYCLER_H_
 
 class SPIPort;
+class HeatBlock;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class QPCRCycler
@@ -9,17 +10,21 @@ class QPCRCycler {
 public:
 	QPCRCycler();
 	~QPCRCycler();
-	chaistatus_t init();
-	static QPCRCycler* qpcrCycler();
+	static QPCRCycler* instance();
 	
-	chaistatus_t loop();
+	//component accessors
+	inline SPIPort* spiPort0() const { return spiPort0_; };
+	
+	//execution
+	bool loop();
 	
 private:
 	//ports
 	SPIPort* spiPort0_;
 	
 	//components
-	QPCRCycler* qpcrCycler_;
+	static QPCRCycler* qpcrCycler_;
+	HeatBlock* heatBlock_;
 };
 
 #endif

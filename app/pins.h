@@ -1,6 +1,11 @@
 #ifndef _PINS_H_
 #define _PINS_H_
 
-static const char* kSPI0Device = "/dev/spidev1.1";
+//devices
+static const char* kSPI0DevicePath = "/dev/spidev1.1";
+
+//GPIO pins
+static int kHeatBlockADCTherm1CSPin = 66;
+static int kSPI0DataInPin = 67;
 
 #endif

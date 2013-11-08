@@ -1,7 +1,7 @@
 #ifndef _CHAISTATUS_H_
 #define _CHAISTATUS_H_
 
-enum {
+typedef enum {
 	//success
 	kSuccess = 0,
 

@@ -1,30 +1,34 @@
 #include "pcrincludes.h"
 #include "qpcrcycler.h"
 
+#include "spi.h"
+#include "heatblock.h"
+
 ////////////////////////////////////////////////////////////////////////////////
 // Class QPCRCycler
-QPCRCycler::QPCRCycler() {
+QPCRCycler* QPCRCycler::qpcrCycler_ = 0;
+
+QPCRCycler::QPCRCycler():
+	heatBlock_(NULL) {
 	
+	spiPort0_ = new SPIPort(kSPI0DevicePath);
+	heatBlock_ = new HeatBlock();
 }
-// -----------------------------------------------------------------------------
+
 QPCRCycler::~QPCRCycler() {
+	delete heatBlock_;
 	delete spiPort0_;
 }
-// -----------------------------------------------------------------------------
-chaistatus_t QPCRCycler::init() {
-	spiPort0_ = new SPIPort(kSPI0Device);
-	
-	return kSuccess;
-}
-// -----------------------------------------------------------------------------
-QPCRCycler* qpcrCycler() {
+
+QPCRCycler* QPCRCycler::instance() {
 	if (!qpcrCycler_)
 		qpcrCycler_ = new QPCRCycler();
 	
-	return qpcrCycler_;
+	return QPCRCycler::qpcrCycler_;
 }
-// -----------------------------------------------------------------------------
-chaistatus_t QPCRCycler::loop() {
 
-	return kSuccess;
+bool QPCRCycler::loop() {
+	heatBlock_->process();
+	
+	return true;
 }

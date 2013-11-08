@@ -2,16 +2,12 @@
 #include "spi.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-// Class CSPIPort
-CSPIPort::CSPIPort(const char* SPIDevice):
-  iSPIDevice(SPIDevice) {
+// Class SPIPort
+SPIPort::SPIPort(const char* spiDevicePath):
+  spiDevicePath_(spiDevicePath) {
 	
 }
 // -----------------------------------------------------------------------------
-CSPIPort::~CSPIPort() {
+SPIPort::~SPIPort() {
 	
-}
-// -----------------------------------------------------------------------------
-PCRSTATUS CSPIPort::init() {
-	return SUCCESS;
 }

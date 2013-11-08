@@ -5,13 +5,11 @@
 // Class SPIPort
 class SPIPort {
 public:
-	SPIPort(const char* spiDevice);
+	SPIPort(const char* spiDevicePath);
 	~SPIPort();
 	
-	chaistatus_t init();
-	
 private:
-	const char* iSPIDevice;
+	const char* spiDevicePath_;
 	
 };
 

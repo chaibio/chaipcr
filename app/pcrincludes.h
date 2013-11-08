@@ -3,5 +3,6 @@
 
 #include "chaistatus.h"
 #include "pins.h"
+#include "exceptions.h"
 
 #endif
