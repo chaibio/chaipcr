@@ -12,12 +12,14 @@ QPCRCycler::QPCRCycler():
 	heatBlock_(NULL) {
 	
 	spiPort0_ = new SPIPort(kSPI0DevicePath);
+
 	heatBlock_ = new HeatBlock();
 }
 
 QPCRCycler::~QPCRCycler() {
-	delete heatBlock_;
 	delete spiPort0_;
+	
+	delete heatBlock_;
 }
 
 QPCRCycler* QPCRCycler::instance() {
@@ -27,8 +29,9 @@ QPCRCycler* QPCRCycler::instance() {
 	return QPCRCycler::qpcrCycler_;
 }
 
+
 bool QPCRCycler::loop() {
 	heatBlock_->process();
-	
+
 	return true;
 }

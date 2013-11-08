@@ -14,3 +14,7 @@ HeatBlock::HeatBlock() throw():
 HeatBlock::~HeatBlock() {
 	delete zoneController_;
 }
+
+void HeatBlock::process() throw() {
+	zoneController_->process();
+}

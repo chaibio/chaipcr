@@ -14,7 +14,7 @@ public:
 	inline float targetTemp() { return targetTemp_; }
 	void setTargetTemp(float targetTemp);
 	
-	chaistatus_t process();
+	void process() throw();
 
 private:
 	//components

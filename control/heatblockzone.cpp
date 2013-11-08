@@ -19,6 +19,6 @@ void HeatBlockZoneController::setTargetTemp(float targetTemp) {
 	
 }
 
-chaistatus_t HeatBlockZoneController::process() {
+void HeatBlockZoneController::process() throw() {
 	
 }

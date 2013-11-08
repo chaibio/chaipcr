@@ -13,4 +13,9 @@ public:
 	InvalidState(const char* message);
 };
 
+class SPIError: public std::runtime_error {
+public:
+	SPIError(const char* message, int errorNumber);
+};
+
 #endif
