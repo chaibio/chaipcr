@@ -1,6 +1,7 @@
 #include "pcrincludes.h"
 #include "heatblockzone.h"
 
+#include "qpcrcycler.h"
 #include "mcpadc.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -8,7 +9,7 @@
 HeatBlockZoneController::HeatBlockZoneController(unsigned int adcCSPinNumber) throw():
 	 tempAdc_(nullptr) {
 		 
-	tempAdc_ = new MCPADC(adcCSPinNumber);
+	tempAdc_ = new MCPADC(adcCSPinNumber, QPCRCycler::instance()->spiPort0());
 }
 
 HeatBlockZoneController::~HeatBlockZoneController() {

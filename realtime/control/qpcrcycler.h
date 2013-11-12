@@ -1,7 +1,8 @@
 #ifndef _QPCRCYCLER_H_
 #define _QPCRCYCLER_H_
 
-class SPIPort;
+#include "spi.h"
+
 class HeatBlock;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -13,14 +14,14 @@ public:
 	static QPCRCycler* instance();
 	
 	//component accessors
-	inline SPIPort* spiPort0() const { return spiPort0_; };
+	inline SPIPort& spiPort0() { return spiPort0_; };
 	
 	//execution
 	bool loop();
 	
 private:
 	//ports
-	SPIPort* spiPort0_;
+	SPIPort spiPort0_;
 	
 	//components
 	static QPCRCycler* qpcrCycler_;

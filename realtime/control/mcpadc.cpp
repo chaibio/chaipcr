@@ -2,16 +2,12 @@
 #include "mcpadc.h"
 
 #include "pins.h"
-#include "gpiopin.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class MCPADC
-MCPADC::MCPADC(unsigned int csPinNumber) throw():
-	 csPin_(NULL) {
-	
-	csPin_ = new GPIOPin(csPinNumber, GPIOPin::kOutput);
-}
+MCPADC::MCPADC(unsigned int csPinNumber, SPIPort& spiPort) throw():
+	 csPin_(csPinNumber, GPIOPin::kOutput),
+	 spiPort(spiPort) {}
 
 MCPADC::~MCPADC() {
-	delete csPin_;
 }

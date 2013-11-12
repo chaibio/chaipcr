@@ -9,7 +9,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class GPIOPin
-GPIOPin::GPIOPin(unsigned int pinNumber, unsigned int direction) throw():
+GPIOPin::GPIOPin(unsigned int pinNumber, Direction direction) throw():
 	pinNumber_(pinNumber) {
 	
 	exportPin();
@@ -24,7 +24,7 @@ GPIOPin::~GPIOPin() {
 	}
 }
 	
-unsigned int GPIOPin::value() const throw() {
+GPIOPin::Value GPIOPin::value() const throw() {
 	ostringstream filePath;
 	ifstream valueFile;
 	char buf[2];
@@ -46,7 +46,7 @@ unsigned int GPIOPin::value() const throw() {
 	}
 }
 
-void GPIOPin::setValue(unsigned int value) throw() {
+void GPIOPin::setValue(Value value) throw() {
 	if (direction_ != kOutput)
 		throw InvalidState("Attempt to set value of non-output GPIO pin");
 	
@@ -72,7 +72,7 @@ void GPIOPin::setValue(unsigned int value) throw() {
 	valueFile.close();
 }
 
-void GPIOPin::setDirection(unsigned int direction) throw() {
+void GPIOPin::setDirection(Direction direction) throw() {
 	ostringstream filePath;
 	ofstream directionFile;
 	
