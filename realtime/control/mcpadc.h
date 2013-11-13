@@ -8,12 +8,15 @@
 // Class MCPADC
 class MCPADC {
 public:
-	MCPADC(unsigned int csPinNumber, SPIPort& spiPort) throw();
+	MCPADC(unsigned int csPinNumber, SPIPort& spiPort, GPIOPin& spiDataInSensePin) throw();
 	~MCPADC();
+	
+	float readTempBlocking();
 	
 private:
 	GPIOPin csPin_;
-	SPIPort& spiPort;
+	GPIOPin& spiDataInSensePin_;
+	SPIPort& spiPort_;
 };
 
 #endif

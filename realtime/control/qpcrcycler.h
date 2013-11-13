@@ -2,6 +2,7 @@
 #define _QPCRCYCLER_H_
 
 #include "spi.h"
+#include "gpiopin.h"
 
 class HeatBlock;
 
@@ -13,15 +14,18 @@ public:
 	~QPCRCycler();
 	static QPCRCycler* instance();
 	
-	//component accessors
+	//port accessors
 	inline SPIPort& spiPort0() { return spiPort0_; };
+	inline GPIOPin& spiPort0DataInSensePin() { return spiPort0DataInSensePin_; }
 	
 	//execution
+	void init();
 	bool loop();
 	
 private:
 	//ports
 	SPIPort spiPort0_;
+	GPIOPin spiPort0DataInSensePin_;
 	
 	//components
 	static QPCRCycler* qpcrCycler_;

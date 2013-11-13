@@ -93,7 +93,7 @@
             		0x070 0x07      /* P9 11 GPIO0_30 | MODE7 | OUTPUT */
             		0x078 0x07      /* P9 12 GPIO1_28 | MODE7 | OUTPUT */
             		0x090 0x07		/* P8 07 GPIO2_2 | MODE7 | OUTPUT */
-            		0x094 0x0F		/* P8 08 GPIO2_3 | MODE7 | INPUT - no pull */
+            		0x094 0x3F		/* P8 08 GPIO2_3 | MODE7 | INPUT - no pull */
             	>;
            	};
         };
@@ -188,3 +188,4 @@
 			};
 		};
 	};
+};

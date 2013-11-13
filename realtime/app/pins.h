@@ -5,7 +5,7 @@
 static const char* kSPI0DevicePath = "/dev/spidev1.1";
 
 //GPIO pins
-static int kHeatBlockADCTherm1CSPin = 66;
-static int kSPI0DataInPin = 67;
+static const int kHeatBlockADCTherm1CSPinNumber = 66;
+static const int kSPI0DataInSensePinNumber = 67;
 
 #endif

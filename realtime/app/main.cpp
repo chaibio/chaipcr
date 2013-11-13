@@ -7,6 +7,7 @@ using namespace std;
 
 int main() {
 	QPCRCycler* qpcrCycler = QPCRCycler::instance();
+	qpcrCycler->init();
 	
 	while (qpcrCycler->loop()) {}
 }

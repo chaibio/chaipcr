@@ -8,7 +8,7 @@
 HeatBlock::HeatBlock() throw():
 	zoneController_(nullptr) {
 	
-	zoneController_ = new HeatBlockZoneController(kHeatBlockADCTherm1CSPin);
+	zoneController_ = new HeatBlockZoneController(kHeatBlockADCTherm1CSPinNumber);
 }
 
 HeatBlock::~HeatBlock() {
