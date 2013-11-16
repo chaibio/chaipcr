@@ -27,8 +27,8 @@ float MCPADC::readTempBlocking() {
 	}
 	
 	//read conversion value via SPI, convert to little endian
-	uint32_t conversion;
-	spiPort_.readBytes((char*)&conversion, 3, 1000000);
+	uint32_t conversion,data=0;
+	spiPort_.readBytes((char*)&conversion, (char*)&data,3, 1000000);
 	conversion = (conversion & 0x00FF0000) >> 16 | (conversion & 0x0000FF00) | (conversion & 0x000000FF) << 16;
 	
 	std::cout << "Read ADC value " << conversion << std::endl;

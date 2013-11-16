@@ -9,7 +9,7 @@ public:
 	~SPIPort();
 	
 	void setMode(uint8_t mode) throw();
-	void readBytes(char* buffer, unsigned int length, unsigned int speedHz) throw();
+	void readBytes(char* rxbuffer, char* txbuffer,unsigned int length, unsigned int speedHz) throw();
 	
 private:
 	const char* spiDevicePath_;
