@@ -11,8 +11,9 @@ public:
 	LTC2444(unsigned int csPinNumber, SPIPort& spiPort) throw();
 	~LTC2444();
 
-	/*setup the speed and resolution
+	/*Setup the speed and resolution
 	 * mode:
+	 * 0 -> No changes from previous setting
 	 * 1 -> OSR = 0001
 	 * 2 -> OSR = 0010
 	 * ...
@@ -24,7 +25,7 @@ public:
 	 */
 	void setup(char mode, bool TWOx);
 
-	/*readADC
+	/*readADC- Reads result of conversion and convert again using specified channel.
 	 * single ended conversion (SGL= true)
 	 * ch: ADC channel (0-7)
 	 *
@@ -41,6 +42,8 @@ public:
 	 *
 	 */
 	uint32_t readADC(uint8_t ch,bool SGL);
+
+	//read result of conversion and convert again using previous setting.
 	uint32_t repeat();
 
 private:
