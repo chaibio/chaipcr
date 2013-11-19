@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ChaiPCR</title>
+  <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
+  <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+
+<div id="header" class="blue-scheme">
+	<div class="clearfix">
+	<div id="logo">
+		qPCR
+	</div>
+	<ul id="menu">
+		<li><a href="#">My Protocols</a></li>
+		<li><a href="#">About</a></li>
+		<li><a href="#">Help</a></li>
+	</ul>
+	</div>
+</div>
+
+<div id="container">
+	<div class="clearfix">
+		<%= yield %>
+	</div>
+</div>
+
+</body>
+</html>

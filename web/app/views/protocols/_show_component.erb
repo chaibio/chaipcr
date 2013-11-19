@@ -1,0 +1,16 @@
+<% if component.type == "Cycle"%>
+<div class="protocol cycle" id="cycle_<%=component.id%>">
+	<div class="title"><span class='cycle-name'><%=component.name%></span><span class='cycle-repeat'>Repeat: <%=component.repeat%></span><%=link_to "", cycle_path(component.id), :method => :delete, :remote => true, :class =>"icon-del", data: { confirm: cycle_delete_confirm_msg } %></div>
+	<ul>
+		<% component.children.each do |child| %>
+			<li class="draggable droppable" id="step_<%=child.id%>"><span class="step-name"><%=child.name%></span><span class="step-temperature"><%=child.temperature%></span><span class="step-hold-time"><%=child.hold_time%></span><%=link_to "", step_path(child.id), :method => :delete, :remote => true, :class =>"icon-del", data: { confirm: step_delete_confirm_msg } %></li>
+		<% end %>
+	</ul>
+</div>
+<% elsif component.type == "Step"%>
+<div class="protocol">
+	<ul>
+		<li class="draggable" id="step_<%=component.id%>"><span class="step-name"><%=component.name%></span><span class="step-temperature"><%=component.temperature%></span><span class="step-hold-time"><%=component.hold_time%></span><%=link_to "", step_path(component.id), :method => :delete, :remote => true, :class =>"icon-del", data: { confirm: step_delete_confirm_msg } %></li>
+	</ul>
+</div>
+<% end %>

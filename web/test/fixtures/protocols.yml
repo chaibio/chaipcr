@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  run_at: 2013-11-13 11:28:57
+  master_cycle_id: 1
+
+two:
+  name: MyString
+  run_at: 2013-11-13 11:28:57
+  master_cycle_id: 1

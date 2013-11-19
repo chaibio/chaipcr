@@ -1,0 +1,375 @@
+/***********************  Global Initialize Settings ***********************/
+body {
+	font: 12px/18px "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif;
+	color: #333;
+	background-color: #f2f3f4;
+	margin: 0;
+	padding: 0;
+	min-width: 940px
+}
+.clear {
+	clear: both;
+}
+.clearfix:after {  
+    content: ".";  
+    display: block;  
+    clear: both;  
+    visibility: hidden;  
+    line-height: 0;  
+    height: 0;  
+}  
+  
+.clearfix {  
+    display: inline-block;  
+}  
+  
+html[xmlns] .clearfix {  
+    display: block;  
+}  
+  
+* html .clearfix {  
+    height: 1%;  
+}  
+
+img {
+	border: 0;
+	margin: 0;
+}
+strong { 
+	font-weight: bold; 
+	color: #666; 
+}
+ul{
+	margin: 0;
+	padding: 0;
+}
+li {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.blur{
+	color: #aaa;
+	font-size: 0.8em;
+}
+a{
+	color: #2970a6;
+	text-decoration: none;
+}
+a:hover{
+	text-decoration: none;
+}
+/*********************** icons ****************************/
+.icon-del{
+	background: url("icons.png") no-repeat 0px -2px transparent;
+	width: 16px;
+	height: 16px;
+}
+
+/************************ tooltip *************************/
+.ui-tooltip{
+	position:absolute;
+    z-index:999;
+    left:-9999px;
+	color: #333;
+	background-color: #FFCC7F;
+    border:1px solid #FFCC7F;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+    padding:5px;
+    width:200px;
+	text-align: center;
+}
+
+/***********************  Form ***********************/
+.row{
+	margin: 10px;
+}
+label{
+	font-weight: bold;
+	display: block;
+	color: #666;
+	margin-bottom: 5px;
+}
+.textinput, textarea{
+	border: 1px solid #ccc;
+	padding: 6px;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+.textinput{
+	text-align: center;
+	width: 62px;
+}
+
+.button {
+    display: block;
+    height: auto;
+	color: #525252;
+	text-align: center;
+	vertical-align: middle;
+	cursor: pointer;
+    padding: 4px 12px;
+	margin: 0px;
+    border: 1px solid #cfd2d4;
+	background: url(button.gif) repeat-x left top;
+	-webkit-box-shadow: rgba(255,255,255,0.3) 0 0 0 1px inset;
+	-moz-box-shadow: rgba(255,255,255,0.3) 0 0 0 1px inset;
+	box-shadow: rgba(255,255,255,0.3) 0 0 0 1px inset;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+.button:hover{
+	background: -moz-linear-gradient(#fcfcfc,#e0e5e8);
+	background: linear-gradient(#fcfcfc,#e0e5e8);
+}
+.button a{
+	color: #525252;
+}
+/***********************  Color Scheme  ***********************/
+.blue-scheme{
+	background-color: #3c6aa1;
+	background: -webkit-gradient(linear,100% 50%,0% 50%,color-stop(0%,#4d80af),color-stop(100%,#2b5593));
+	background: -webkit-linear-gradient(top,#4d80af 0,#2b5593 100%);
+	background: -moz-linear-gradient(top,#4d80af 0,#2b5593 100%);
+	background: -o-linear-gradient(top,#4d80af 0,#2b5593 100%);
+	background: linear-gradient(top,#4d80af 0,#2b5593 100%);
+	background: -ms-linear-gradient(top,#4d80af 0,#2b5593 100%);
+	color: #ffffff;	
+}
+/***********************  Protocol Panel Settings ***********************/
+#header{
+	width: 100%;
+	margin: 0;
+	padding: 15px;
+	font-size: 1.1em;
+}
+#header a{
+	color: #e7e7e7;
+}
+#header a:hover{
+	color: #ffffff;
+}
+#header #logo{
+	float: left;
+	margin-right: 30px;
+}
+#header #menu{
+	float: left;
+}
+#header ul li{
+	display: inline-block;
+	margin-right: 20px;
+}
+
+#container{
+	background-color: #fff;
+	width: 980px;
+	margin: 0px auto;
+	padding: 0px;
+	box-shadow: 0 0 8px #cbcbcb;
+	-moz-box-shadow: 0 0 8px #cbcbcb;
+	-webkit-box-shadow: 0 0 8px #cbcbcb;
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+}
+#sidemenu{
+	float: left;
+	width: 160px;
+	margin: 0px;
+	padding: 30px 0;
+}
+#sidemenu h5{
+	font-size: 1.0em;
+	margin: 0;
+	padding: 0;
+}
+#sidemenu li{
+	line-height: 2.2em;
+	padding: 2px 30px;
+}
+#sidemenu .button{
+	width: 80px;
+	margin: 20px auto;
+}
+#maincontent{
+	width: 750px;
+	padding: 30px;
+	float: left;
+	border-left: 1px solid #ccc;
+}
+#protocol-header{
+	width: 100%;
+	border-bottom: 1px solid #ccc;
+	padding: 0 0 10px 0;
+	margin: 0 0 10px 0;
+}
+#protocol-header .protocol-info{
+	float: left;
+}
+#protocol-header .protocol-info h1{
+	margin: 0 0 20px 0;
+}
+#protocol-header .protocol-info p{
+	color: #777;
+	line-height: 1.5em;
+	margin: 0;
+}
+#protocol-header .protocol-ctl{
+	float: left;
+	margin-left: 10px;
+}
+#protocol-header .protocol-ctl .button{
+	float: left;
+	margin-right: 15px;
+}
+.main-panel{
+	width: 470px;
+	float: left;
+}
+.ctl-panel{
+	width 200px;
+	float: right;
+	padding: 15px;
+	margin-left: 30px;
+	border: 1px solid #d3d3d3;
+	border-radius: 8px;
+}
+/***********************  Protocol Settings ***********************/
+.protocol{
+	width: 440px;
+	margin: 10px 0;
+	border: 5px solid #d5d5d5;
+	background-color: #d5d5d5;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+.protocol.hide{
+	border: none;
+	background-color: #fff;
+}
+.protocol.highlight{
+	border: 5px solid #FFCC7F !important;
+	background-color: #FFCC7F !important;
+}
+.protocol .title{
+	font-weight: bold;
+	color: #ffffff;
+	background-color: #666666;
+	padding: 10px;
+	margin: 0;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	-moz-border-radius-topleft: 4px;
+	-moz-border-radius-topright: 4px;
+	display: none;
+}
+.protocol.highlight .title{
+	color: #333;
+	background-color: #FFCC7F !important;
+	display: block;
+}
+.protocol.cycle .title{
+	display: block;
+}
+.protocol.cycle.hide .title{
+	display: none;
+}
+.titlebar{
+	width: 410px;
+	font-weight: bold;
+	color: #ffffff;
+	background-color: #666666;
+	padding: 0 20px;
+	margin: 0;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+.protocol li{
+	padding: 0 20px;
+	background-color: #eee;
+	border: 1px solid #ccc;
+	display: block;
+}
+.protocol li.placeholder{
+	padding: 0;
+	border: none;
+}
+.protocol li.placeholder.highlight, .protocol.highlight li.placeholder {
+	border: solid 2px #FFCC7F;
+	background: #FFFFE5;
+	height: 1.5em;
+	padding: 10px 20px;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+.protocol span, .titlebar span{
+	display: inline-block;
+}
+
+span.step-name .textinput{
+	margin-left: -9px;
+	width: 100px;
+	text-align: left;
+}
+span.step-name{
+	width: 120px;
+	padding: 10px 0;
+}
+span.step-temperature{
+	width: 120px;
+	padding: 10px 0;
+	text-align: center;
+}
+span.step-hold-time{
+	width: 120px;
+	padding: 10px 0;
+	text-align: center;
+}
+span.cycle-name{
+	margin-right: 10px;
+}
+span.cycle-repeat{
+	margin-right: 10px;
+}
+.protocol .icon-del{
+	margin: 0 0 0 20px;
+	padding: 0;
+	vertical-align: middle;
+	cursor: pointer;
+	display: none;
+}
+.droppable-highlight-top {
+    border-top: solid 5px #FFCC7F !important;
+}
+.droppable-highlight-bottom {
+    border-bottom: solid 5px #FFCC7F !important;
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	-moz-border-radius-bottomleft: 4px;
+	-moz-border-radius-bottomright: 4px;
+	margin-bottom: 0 !important;
+}
+.protocol li.move{
+	width: 400px;
+	border: 3px solid #ccc;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+.protocol li.move .icon-del{
+	display: none !important;
+}
+.protocol .row-ctl{
+	text-align: right;
+	padding-right: 58px;
+	margin-bottom: 5px;
+}
+
+.cycle{
+	border-bottom: 1px solid #d5d5d5;
+}
+.cycle li{
+	margin-bottom: 5px;
+}
+

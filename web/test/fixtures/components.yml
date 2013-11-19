@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  order_number: 1
+  repeat: 1
+  temperature: 1
+  hold_time: 2013-11-11 15:58:38
+  resource_id: 1
+  resource_type: MyString
+
+two:
+  name: MyString
+  order_number: 1
+  repeat: 1
+  temperature: 1
+  hold_time: 2013-11-11 15:58:38
+  resource_id: 1
+  resource_type: MyString

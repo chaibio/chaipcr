@@ -1,0 +1,1 @@
+Time::DATE_FORMATS[:default] = "%I:%M%P %b %d, %Y"
