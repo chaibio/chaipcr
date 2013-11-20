@@ -3,7 +3,7 @@ class Protocol < ActiveRecord::Base
   has_one :master_cycle, -> {where parent_id: nil}, class_name: "Cycle"
   has_many :components, ->(protocol) {where(parent_id: protocol.master_cycle_id).includes(:children).order("order_number")}, class_name: "Component"
   
-  default_scope { order('run_at DESC') }
+  scope :all_sorted, -> { order('run_at DESC') }
   
   after_create do |protocol|
     #create master cycle

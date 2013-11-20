@@ -58,7 +58,10 @@ Qpcrctl::Application.routes.draw do
   
   resources :protocols, shallow: true do
     resources :cycles, shallow: true do
-      resources :steps
+      resources :steps do
+        post 'move', on: :member
+      end
+      post 'move', on: :member
     end
   end
   

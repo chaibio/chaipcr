@@ -177,7 +177,13 @@ function initDroppable($elements)
 						}
 					});
 				}
-					
+				else{
+					var id = extractID($li.attr("id"));
+					if (id){
+						$.post("/steps/"+id+"/move", {parent_id: extractID($protocol.attr("id")), next_component: nextStepID($li)})
+					}
+				}
+				
 				if ($li.hasClass("draggable"))
 					initDraggable($li);
 				else if ($li.is('.ui-draggable'))
@@ -244,9 +250,15 @@ function initDroppableCycle($elements)
 					newCycle($this);
 				}
 				else{
-					ui.draggable.next(".droppable-cycle").remove();
-					ui.draggable.insertAfter(this);
-					addPlaceHolders(ui.draggable, "after");
+					var $obj = ui.draggable;
+					$obj.next(".droppable-cycle").remove();
+					$obj.insertAfter(this);
+					
+					var id = extractID($obj.attr("id"));
+					if (id){
+						$.post("/cycles/"+id+"/move", {next_component: nextCycleID($obj)})
+					}
+					addPlaceHolders($obj, "after");
 				}
 			}
         }
@@ -358,21 +370,6 @@ function initEditable($elements, elementType)
 	});
 }
 
-function initDeletable($obj){
-	if ($obj == null)
-		$obj = jQuery('.icon-del');
-	$obj
-		  .bind("ajax:beforeSend",  function(evt, xhr, settings) {
-		  })	
-		  .bind('ajax:success', function(evt, data, status, xhr) {
-			jQuery(evt.target).parent("li").remove();
-		  })
-		  .bind('ajax:error', function(evt, xhr, status, error) {
-			errors = jQuery.parseJSON(xhr.responseText);
-			alert(errors);
-		  });
-}
-
 function extractID(id_name)
 {
 	var arr = null;
@@ -385,19 +382,13 @@ function initStep($obj, values){
 	var id = extractID($obj.attr("id"));
 	$obj.html("<span class='step-name'>"+values[0]+"</span><span class='step-temperature'>"+values[1]+"</span><span class='step-hold-time'>"+values[2]+"</span><a class='icon-del' data-confirm='<%=step_delete_confirm_msg%>' data-method='delete' data-remote='true' href='/steps/"+ extractID($obj.attr("id"))+"'></a>");
 	initEditable($obj, "step");
-	initDeletable($obj);
+	initDeletableStep($obj);
 }
 
 function editStep($obj, values, cancelHandler){
 	var id, stepform = null;
 	if (values == null){
-		var parent = $obj.parents(".protocol");
-		id = parent.attr('id');
-		if (id == null){
-			id = $obj.parents(".main-panel").attr('id');
-		}
 		stepform = "<%=escape_javascript(stepform("newstep"))%>";
-		stepform = stepform.replace("URL_PH", "/cycles/"+extractID(id)+"/steps");
 	}
 	else{
 		id = $obj.attr('id');
@@ -447,9 +438,31 @@ function stepform_ajax_register($obj){
 	    var validform=true;
 
 		jQuery(theForm.next_component).val(nextStepID($obj));
-		
+		if (jQuery(theForm).attr("action") == "URL_PH")
+			jQuery(theForm).attr("action", "/cycles/"+curCycleID($obj)+"/steps");
 	    return validform;
 	});	
+}
+
+function initDeletableStep($obj){
+	if ($obj == null)
+		$obj = jQuery('li .icon-del');
+	else
+		$obj = $obj.children(".icon-del");
+	$obj
+		  .bind("ajax:beforeSend",  function(evt, xhr, settings) {
+		  })	
+		  .bind('ajax:success', function(evt, data, status, xhr) {
+			var cycle = jQuery(evt.target).parents(".protocol");
+			var li = jQuery(evt.target).parent("li");
+			li.remove();
+			if (cycle.children("li").length == 0)
+				cycle.remove();
+		  })
+		  .bind('ajax:error', function(evt, xhr, status, error) {
+			errors = jQuery.parseJSON(xhr.responseText);
+			alert(errors);
+		  });
 }
 
 function initCycle($obj, values){
@@ -457,7 +470,7 @@ function initCycle($obj, values){
 	var $cycle = $obj.find(".title");
 	$cycle.html("<span class='cycle-name'>"+values[0]+"</span><span class='cycle-repeat'>"+values[1]+"</span><a class='icon-del' data-confirm='<%=cycle_delete_confirm_msg%>' data-method='delete' data-remote='true' href='/cycles/"+ extractID($obj.attr("id"))+"'></a>");
 	initEditable($cycle, "cycle");
-//	initDeletable($cycle);
+	initDeletableCycle($cycle);
 }
 
 function newCycle($obj){
@@ -502,13 +515,21 @@ function editCycle($obj, values){
 	});
 }
 
+function curCycleID($obj){
+	var parent = $obj.parents(".protocol");
+	id = parent.attr('id');
+	if (id == null){
+		id = $obj.parents(".main-panel").attr('id');
+	}
+	return extractID(id);
+}
 function nextCycleID($obj){
 	var $nextsibling = $obj.next();
 	while ($nextsibling.length > 0){
 		var id = $nextsibling.attr("id");
 		if (id)
 			return extractID(id);
-		else if ($nextsibling.hasClass("hide")){ //placeholder
+		else if ($nextsibling.hasClass("hide") || $nextsibling.hasClass("ui-draggable-dragging move")){ //placeholder
 			$nextsibling = $nextsibling.next();
 		}
 		else{
@@ -558,6 +579,24 @@ function cycleform_ajax_register($obj, action){
 		jQuery(theForm.next_component).val(nextCycleID($obj));
 	    return validform;
 	});	
+}
+
+function initDeletableCycle($obj){
+	if ($obj == null)
+		$obj = jQuery('div.title .icon-del');
+	else
+		$obj = $obj.children(".icon-del");	
+	$obj
+		  .bind("ajax:beforeSend",  function(evt, xhr, settings) {
+		  })	
+		  .bind('ajax:success', function(evt, data, status, xhr) {
+			var cycle = jQuery(evt.target).parents(".protocol");
+			cycle.remove();
+		  })
+		  .bind('ajax:error', function(evt, xhr, status, error) {
+			errors = jQuery.parseJSON(xhr.responseText);
+			alert(errors);
+		  });
 }
 
 function addPlaceHolders($protocol, position){
