@@ -69,8 +69,8 @@ $(document).ready(function() {
 	</div>
 	
 	<div class="main-panel" id="protocol_<%=@protocol.id%>_cycle_<%=@protocol.master_cycle_id%>">
-		<div class="titlebar">
-			<span class="step-name">Step Name</span><span class="step-temperature">Temperature</span><span class="step-hold-time">Hold Time</span>
+		<div class="titlebar blue-scheme">
+			<span class="step-name">Step Name</span><span class="step-temperature">Temperature (&#176C)</span><span class="step-hold-time">Hold Time (secs)</span>
 		</div>
 
 		<% @protocol.components.each do |component| %>
@@ -79,9 +79,12 @@ $(document).ready(function() {
 		<% end %>
 		<%= cycle_placeholder if @editable%>
 	</div>
-
+	
+<% if @editable %>
 	<div class="ctl-panel">
 		<div class="button stepbutton">Add Step</div>
 		<div class="button cyclebutton">Add Cycle</div>
 	</div>
+<% end %>
+
 </div>

@@ -279,8 +279,6 @@ label{
 .titlebar{
 	width: 410px;
 	font-weight: bold;
-	color: #ffffff;
-	background-color: #666666;
 	padding: 0 20px;
 	margin: 0;
 	border-radius: 4px;
@@ -307,25 +305,32 @@ label{
 .protocol span, .titlebar span{
 	display: inline-block;
 }
-
-span.step-name .textinput{
+span.step-name label{
 	margin-left: -9px;
-	width: 100px;
 	text-align: left;
 }
+span.step-name .textinput{
+	margin-left: -9px;
+	text-align: left;
+	width: 100px;
+}
 span.step-name{
-	width: 120px;
+	width: 110px;
 	padding: 10px 0;
 }
 span.step-temperature{
-	width: 120px;
+	width: 125px;
 	padding: 10px 0;
 	text-align: center;
 }
 span.step-hold-time{
-	width: 120px;
+	width: 125px;
 	padding: 10px 0;
 	text-align: center;
+}
+span.cycle-name .textinput {
+	width: 100px;
+	text-align: left;
 }
 span.cycle-name{
 	margin-right: 10px;
@@ -333,13 +338,23 @@ span.cycle-name{
 span.cycle-repeat{
 	margin-right: 10px;
 }
+.protocol .title label{
+	color: white;
+}
 .protocol .icon-del{
-	margin: 0 0 0 20px;
 	padding: 0;
 	vertical-align: middle;
 	cursor: pointer;
 	display: none;
 }
+.protocol .title .icon-del{
+	float: right;
+	margin: 0 10px 0 0;
+}
+.protocol li .icon-del{
+	margin: 0 0 0 20px;
+}
+
 .droppable-highlight-top {
     border-top: solid 5px #FFCC7F !important;
 }

@@ -401,7 +401,7 @@ function editStep($obj, values, cancelHandler){
 
 	$obj.html(stepform);
 	stepform_ajax_register($obj);
-	$obj.find(".textinput").hint();
+//	$obj.find(".textinput").hint();
 	$obj.find(".cancel").click(function(event){
 		cancelHandler();
 	});
@@ -456,7 +456,7 @@ function initDeletableStep($obj){
 			var cycle = jQuery(evt.target).parents(".protocol");
 			var li = jQuery(evt.target).parent("li");
 			li.remove();
-			if (cycle.children("li").length == 0)
+			if (cycle.children("ul").children("li").length == 0)
 				cycle.remove();
 		  })
 		  .bind('ajax:error', function(evt, xhr, status, error) {
@@ -468,7 +468,7 @@ function initDeletableStep($obj){
 function initCycle($obj, values){
 	var id = extractID($obj.attr("id"));
 	var $cycle = $obj.find(".title");
-	$cycle.html("<span class='cycle-name'>"+values[0]+"</span><span class='cycle-repeat'>"+values[1]+"</span><a class='icon-del' data-confirm='<%=cycle_delete_confirm_msg%>' data-method='delete' data-remote='true' href='/cycles/"+ extractID($obj.attr("id"))+"'></a>");
+	$cycle.html("<span class='cycle-name'>"+values[0]+"</span><span class='cycle-repeat'>Repeat "+values[1]+" times</span><a class='icon-del' data-confirm='<%=cycle_delete_confirm_msg%>' data-method='delete' data-remote='true' href='/cycles/"+ extractID($obj.attr("id"))+"'></a>");
 	initEditable($cycle, "cycle");
 	initDeletableCycle($cycle);
 }
@@ -484,7 +484,7 @@ function newCycle($obj){
 	var cycleform = "<%=escape_javascript(newcycleform())%>";
 	cycleform = cycleform.replace("URL_PH", "/protocols/"+id+"/cycles");			
 	$obj.html(cycleform);
-	$obj.find(".textinput").hint();
+//	$obj.find(".textinput").hint();
 	cycleform_ajax_register($obj, "new");
 	
 	$obj.find(".cancel").click(function(event){
@@ -505,9 +505,11 @@ function editCycle($obj, values){
 	var cycleform = "<%=escape_javascript(cycleform("editcycle"))%>";
 	cycleform = cycleform.replace("URL_PH", "/cycles/"+extractID(id));
 	cycleform = cycleform.replace("NAME_PH", values[0]);
+	var strarr = values[1].split(" ");
+	values[1] = parseInt(strarr[1], 10);
 	cycleform = cycleform.replace("REPEAT_PH", values[1]);
 	$obj.html(cycleform);
-	$obj.find(".textinput").hint();
+//	$obj.find(".textinput").hint();
 	
 	cycleform_ajax_register($parent, "edit");
 	$obj.find(".cancel").click(function(event){
