@@ -1,11 +1,9 @@
 #include "pcrincludes.h"
-#include "qpcrcycler.h"
+#include "qpcrserver.h"
 
-#include <iostream>
-
-using namespace std;
-
-int main() {
+int main(int argc, char** argv) {
+	QPCRServer server;
+	return server.run(argc, argv);
 	QPCRCycler* qpcrCycler = QPCRCycler::instance();
 	qpcrCycler->init();
 	
