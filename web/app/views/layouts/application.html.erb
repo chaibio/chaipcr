@@ -8,6 +8,7 @@
 </head>
 <body>
 
+<% if params[:controller] != "main" || params[:action] != "index" %>
 <div id="header" class="blue-scheme">
 	<div class="clearfix">
 	<div id="logo">
@@ -20,6 +21,7 @@
 	</ul>
 	</div>
 </div>
+<% end %>
 
 <div id="container">
 	<div class="clearfix">

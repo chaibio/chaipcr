@@ -54,7 +54,7 @@ Qpcrctl::Application.routes.draw do
   #     resources :products
   #   end
   
-  root 'protocols#index'
+  root 'main#index'
   
   resources :protocols, shallow: true do
     resources :cycles, shallow: true do
@@ -65,4 +65,5 @@ Qpcrctl::Application.routes.draw do
     end
   end
   
+  get ':controller(/:action(/:id))'
 end

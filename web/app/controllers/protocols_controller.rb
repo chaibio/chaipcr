@@ -1,6 +1,6 @@
 class ProtocolsController < ApplicationController
-  def index
-    show
+  def create
+    
   end
   
   def edit
