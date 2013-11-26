@@ -1,48 +1,3 @@
-<% if @editable%>
-<script type="text/javascript" charset="utf-8">
-$(document).ready(function() {
-	initDraggable($(".draggable"));
-	initDraggableCycle($(".cycle"));
-	
-	$(".stepbutton").draggable({
-		cursor: 'pointer',
-    	scope: 'step',
-        helper: "clone",
-    	opacity: 0.9,
-    	zIndex: 10,
-        drag: function(event, ui) {
-            var $droppable = $(this).data("current-droppable");
-            if ($droppable) {
-                updateHighlight(ui, $droppable[0]);
-            }
-        }
-    });
-
-	$(".cyclebutton").draggable({
-		cursor: 'pointer',
-    	scope: 'cycle',
-        helper: "clone",
-    	opacity: 0.9,
-    	zIndex: 10
-    });
-
-    initDroppable($(".droppable"));
-	initDroppableCycle($(".droppable-cycle"));
-	initEditable($(".draggable"), "step");
-	initEditable($(".cycle .title"), "cycle");
-	
-	$(".stepbutton").tooltip({ 
-		items: ".stepbutton",
-		content: "Drag to the left to add step",
-		position: {at: 'bottom+15 center'}
-	});
-	
-	initDeletableStep(null);
-	initDeletableCycle(null);
-});
-</script>
-<% end %>
-
 <div id="sidemenu">
 	<ul>
 		<% @protocols.each do |protocol| %>
@@ -51,7 +6,8 @@ $(document).ready(function() {
 	</ul>
 	<div class="button">Add Protocol</div>
 </div>
-<div id="maincontent">
+
+<div id="protocol-content">
 	<div id="protocol-header" class="clearfix">
 		<div class="protocol-info">
 			<h1><%= @protocol.name %></h1>
@@ -59,32 +15,13 @@ $(document).ready(function() {
 				<p>Last Runned at <%=@protocol.run_at%></p>
 			<% end %>
 			<p>Last Modified at <%=@protocol.updated_at%></p>
-			<p><a href="#">See past results</a></p>
+			<p><a href="#">See past runs</a></p>
 		</div>
 		<div class="protocol-ctl">
-			<div class="button">Run</div>
 			<div class="button"><%=link_to "Edit", edit_protocol_path(@protocol.id)%></div>
 			<div class="button">Copy &amp; Create New</div>
 		</div>
 	</div>
 	
-	<div class="main-panel" id="protocol_<%=@protocol.id%>_cycle_<%=@protocol.master_cycle_id%>">
-		<div class="titlebar blue-scheme">
-			<span class="step-name">Step Name</span><span class="step-temperature">Temperature (&#176C)</span><span class="step-hold-time">Hold Time (secs)</span>
-		</div>
-
-		<% @protocol.components.each do |component| %>
-			<%= cycle_placeholder if @editable%>
-			<%= render(:partial => "show_component", :locals => {:component=>component} )%>
-		<% end %>
-		<%= cycle_placeholder if @editable%>
-	</div>
-	
-<% if @editable %>
-	<div class="ctl-panel">
-		<div class="button stepbutton">Add Step</div>
-		<div class="button cyclebutton">Add Cycle</div>
-	</div>
-<% end %>
-
+	<%= render(:partial => "show_components", :locals => {:editable=>false} )%>
 </div>

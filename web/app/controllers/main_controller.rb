@@ -6,6 +6,5 @@ class MainController < ApplicationController
   end
   
   def qpcrrun
-    
   end
 end

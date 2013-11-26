@@ -147,6 +147,28 @@ label{
 	color: #ffffff;
 }
 
+/***********************  flash Msg Settings ***********************/
+.flashmsg{
+	width: 100%;
+	padding: 20px 0;
+	font-weight: bold;
+	font-size: 1.2em;
+}
+.flashmsg span{
+	display: inline-block;
+	margin-left: 20px;
+}
+.errmsg{
+	color: #f00;
+	background-color: #ffecec;
+	border: 1px solid #f00;
+}
+.noticemsg{
+	background-color: #FFFFE5;
+}
+.infomsg{
+	background-color: #ecffec;
+}
 
 /***********************  Color Scheme  ***********************/
 .blue-scheme{
@@ -159,7 +181,7 @@ label{
 	background: -ms-linear-gradient(top,#4d80af 0,#2b5593 100%);
 	color: #ffffff;	
 }
-/***********************  Protocol Panel Settings ***********************/
+/***********************  General Panel Settings ***********************/
 #header{
 	width: 100%;
 	margin: 0;
@@ -195,6 +217,12 @@ label{
 	border-bottom-left-radius: 8px;
 	border-bottom-right-radius: 8px;
 }
+
+#maincontent{
+	margin: 40px;
+}
+
+/***********************  Protocol Panel Settings ***********************/
 #sidemenu{
 	float: left;
 	width: 160px;
@@ -214,7 +242,7 @@ label{
 	width: 80px;
 	margin: 20px auto;
 }
-#maincontent{
+#protocol-content{
 	width: 750px;
 	padding: 30px;
 	float: left;
@@ -409,6 +437,7 @@ span.cycle-repeat{
 	margin-bottom: 5px;
 }
 
+/***********************  Home Page ***********************/
 #homepage{
 	margin: 20px 300px;
 }
@@ -417,9 +446,7 @@ span.cycle-repeat{
 	margin: 35px 0;
 }
 
-#qpcrrun{
-	margin: 40px;
-}
+/***********************  Run Wizard ***********************/
 #qpcrrun input[type=radio]{
 	margin-right: 5px;
 }

@@ -1,6 +1,8 @@
+<div id="maincontent">
 <%= form_tag "/qpcrrun", :id=>"qpcrrun" do %>
 <h2>Do you want to collect real-time PCR data?</h2>
 <div class="radio-button"><%= radio_button_tag "qPCR", "Yes", true%>Yes</div> <div class="radio-button"><%= radio_button_tag "qPCR", "No"%>No</div>
 <div class="submitctl">
 <%= submit_tag "Continue" %>
 <% end %>
+</div>

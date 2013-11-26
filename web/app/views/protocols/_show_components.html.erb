@@ -1,0 +1,11 @@
+<div class="main-panel" id="protocol_<%=@protocol.id%>_cycle_<%=@protocol.master_cycle_id%>">
+	<div class="titlebar blue-scheme">
+		<span class="step-name">Step Name</span><span class="step-temperature">Temperature (&#176C)</span><span class="step-hold-time">Hold Time (secs)</span>
+	</div>
+
+	<% @protocol.components.each do |component| %>
+		<%= cycle_placeholder if editable%>
+		<%= render(:partial => "show_component", :locals => {:component=>component} )%>
+	<% end %>
+	<%= cycle_placeholder if editable%>
+</div>

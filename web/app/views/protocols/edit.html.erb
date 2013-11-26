@@ -1,0 +1,57 @@
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function() {
+	initDraggable($(".draggable"));
+	initDraggableCycle($(".cycle"));
+	
+	$(".stepbutton").draggable({
+		cursor: 'pointer',
+    	scope: 'step',
+        helper: "clone",
+    	opacity: 0.9,
+    	zIndex: 10,
+        drag: function(event, ui) {
+            var $droppable = $(this).data("current-droppable");
+            if ($droppable) {
+                updateHighlight(ui, $droppable[0]);
+            }
+        }
+    });
+
+	$(".cyclebutton").draggable({
+		cursor: 'pointer',
+    	scope: 'cycle',
+        helper: "clone",
+    	opacity: 0.9,
+    	zIndex: 10
+    });
+
+    initDroppable($(".droppable"));
+	initDroppableCycle($(".droppable-cycle"));
+	initEditable($(".draggable"), "step");
+	initEditable($(".cycle .title"), "cycle");
+	
+	$(".stepbutton").tooltip({ 
+		items: ".stepbutton",
+		content: "Drag to the left to add step",
+		position: {at: 'bottom+15 center'}
+	});
+	
+	initDeletableStep(null);
+	initDeletableCycle(null);
+});
+</script>
+
+<div id="protocol-content">
+	<div id="protocol-header" class="clearfix">
+		<h1>Edit Protocol: <%= @protocol.name %></h1>
+		<p>Last edit was on <%=@protocol.updated_at%></p>
+		<p><%=link_to "Browse all protocols", protocols_path%></p>
+	</div>
+	
+	<%= render(:partial => "show_components", :locals => {:editable=>true} )%>
+	
+	<div class="ctl-panel">
+		<div class="button stepbutton">Add Step</div>
+		<div class="button cyclebutton">Add Cycle</div>
+	</div>
+</div>
