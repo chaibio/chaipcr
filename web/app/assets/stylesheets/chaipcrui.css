@@ -181,6 +181,32 @@ label{
 	background: -ms-linear-gradient(top,#4d80af 0,#2b5593 100%);
 	color: #ffffff;	
 }
+.blue-scheme a{
+	color: #ffffff;
+}
+/***********************  Popup Box ***********************/
+.popupBox {
+	position: absolute;
+	border: 5px solid #666;	
+	top: 0;
+	left: 0;
+	margin: 0;
+	padding: 10px;
+	z-index: 99999;
+	background: #fff;
+	overflow: auto;
+	font-size: 1.1em;
+}
+.popup-handle{
+	padding: 10px;
+	margin: 0px 0px 15px 0px;
+	cursor:	 move;
+}
+.popup-handle h2{
+	margin: 0;
+	padding: 0;
+	font-size: 1.2em;
+}
 /***********************  General Panel Settings ***********************/
 #header{
 	width: 100%;
@@ -447,14 +473,14 @@ span.cycle-repeat{
 }
 
 /***********************  Run Wizard ***********************/
-#qpcrrun input[type=radio]{
+#new_run input[type=radio]{
 	margin-right: 5px;
 }
-#qpcrrun .radio-button{
+#new_run .radio-button{
 	display: inline-block;
 	margin-right: 20px;
 }
-#qpcrrun .submitctl{
+#new_run .submitctl{
 	margin: 20px 0;
 	text-align: right;
 }

@@ -45,7 +45,7 @@ $(document).ready(function() {
 	<div id="protocol-header" class="clearfix">
 		<h1>Edit Protocol: <%= @protocol.name %></h1>
 		<p>Last edit was on <%=@protocol.updated_at%></p>
-		<p><%=link_to "Browse all protocols", protocols_path%></p>
+		<p><%=link_to "Browse all protocols", (@run)? run_protocols_path(@run) : protocols_path%></p>
 	</div>
 	
 	<%= render(:partial => "show_components", :locals => {:editable=>true} )%>

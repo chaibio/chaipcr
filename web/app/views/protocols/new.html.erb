@@ -1,7 +1,3 @@
 <div id="maincontent">
-<%= form_for @protocol do |f| %>
-<%= f.label :name, "Protocol Name" %>
-<%= f.text_field :name %>
-<%= f.submit "Create" %>
-<% end %>
+<%= render(:partial => "new_protocol", :locals => {:cancel=>false} ) %>
 </div>

@@ -65,5 +65,9 @@ Qpcrctl::Application.routes.draw do
     end
   end
   
+  resources :run do
+    resources :protocols
+  end
+  
   get ':controller(/:action(/:id))'
 end

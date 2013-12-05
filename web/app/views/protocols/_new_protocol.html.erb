@@ -1,0 +1,8 @@
+<%= form_for Protocol.new, url: (@run)? run_protocols_path(@run) : protocols_path  do |f| %>
+<%= f.label :name, "Protocol Name" %>
+<%= f.text_field :name %>
+<%= f.submit "Create" %>
+<% if cancel %>
+<%= button_tag "Cancel", type: :button, class: :cancel %>
+<% end %>
+<% end %>

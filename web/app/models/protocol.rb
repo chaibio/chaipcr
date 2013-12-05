@@ -5,6 +5,8 @@ class Protocol < ActiveRecord::Base
   
   scope :all_sorted, -> { order('run_at DESC') }
   
+  validates_presence_of :name
+  
   after_create do |protocol|
     #create master cycle
     cycle = Cycle.create(:name=>"Master Cycle", :protocol_id=>protocol.id, :repeat=>1)

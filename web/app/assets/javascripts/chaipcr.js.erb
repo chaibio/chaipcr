@@ -618,3 +618,120 @@ function removePlaceHolders($protocol){
 	$protocol.next(".droppable-cycle").remove();
 	$protocol.prev(".droppable-cycle").remove();
 }
+
+function getBrowserWindowSize() {
+	var viewportwidth;
+	var viewportheight;
+
+	// the more standards compliant browsers (mozilla/netscape/opera/IE7) use window.innerWidth and window.innerHeight
+
+	if (typeof window.innerWidth != 'undefined'){
+		viewportwidth = window.innerWidth,
+		viewportheight = window.innerHeight
+	}
+
+	// IE6 in standards compliant mode (i.e. with a valid doctype as the first line in the document)
+	else if (typeof document.documentElement != 'undefined'
+	&& typeof document.documentElement.clientWidth != 'undefined' && document.documentElement.clientWidth != 0){
+		viewportwidth = document.documentElement.clientWidth,
+		viewportheight = document.documentElement.clientHeight
+	}
+	// older versions of IE
+	else {
+		viewportwidth = document.getElementsByTagName('body')[0].clientWidth,
+		viewportheight = document.getElementsByTagName('body')[0].clientHeight
+	}
+	var rval = {
+		width: viewportwidth,
+		height: viewportheight
+	};
+
+	return rval;
+}
+
+function getElementPosition(elem){
+	var posX = null;
+	var posY = null;
+	if(elem.offsetParent) {
+		for( posX = 0, posY = 0; elem.offsetParent; elem = elem.offsetParent ) {
+			posX += elem.offsetLeft;
+			posY += elem.offsetTop;
+		}
+		return [ posX, posY ];
+	} else {
+		posX = elem.x;
+		posY = elem.y;
+		return [ posX, posY ];
+	}
+}
+function popupbox(varname, dynbox, width, center, relpos_id){
+    var title = null;
+    var content = null;
+	var js_func = null
+    var elem = null;
+    var opened = false;
+    return{
+     open:function(idstr){ 
+	    var top = 10;
+	    var left = 10;
+	    if (relpos_id){
+			pos = getElementPosition(document.getElementById(relpos_id));
+			left = pos[0]+'px';
+			top = (pos[1]+30)+'px';
+	    }
+	    else if (center){
+			var wDim = getBrowserWindowSize();
+			left = (wDim.width-width)/2;
+			left = (((left < 10)? 10 : left)+jQuery(document).scrollLeft())+'px';
+			top = (jQuery(document).scrollTop()+150)+'px';
+	    }
+	    if (opened == false){
+			if (dynbox){
+				elem = document.createElement('div');
+				jQuery(elem).addClass('popupBox');
+				elem.setAttribute('id',idstr);
+				elem.innerHTML = "";
+				if (title)
+					elem.innerHTML += "<div class='popup-handle clearfix'><h2>"+title+"</h2><a href='javascript:"+varname+".close();' class='close close_black'>[X]</a></div>";
+				elem.innerHTML += content;
+			}
+			else{ /*load existing hidden box*/
+				elem = document.getElementById(idstr);
+			}
+			elem.style.top = top;
+			elem.style.left = left;
+			elem.style.width = width+'px';
+			if (dynbox){
+		    	document.body.appendChild(elem);
+			}
+			else{
+		    	elem.style.display = "block";
+			}
+			opened = true;
+			if (js_func)
+				js_func(this);
+			jQuery("#"+idstr).draggable({ handle: '.popup-handle' });
+	    }
+	    else{ /*reset popupbox position*/
+			elem.style.top = top;
+			elem.style.left = left;
+	    }
+     },
+     close:function(){
+	    if (opened == true){
+			if (dynbox)
+		    	document.body.removeChild(elem);
+			else
+		    	elem.style.display = "none";
+			opened = false;
+	    }
+     },
+     setTitleContent:function(in_title, in_content){
+	    title = in_title
+	    content = in_content;
+     },
+	 setJS:function(in_js_func){
+		js_func = in_js_func;
+	 }
+    }
+}

@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  qpcr: false
+  protocol_id: 1
+  run_at: 2013-12-04 11:54:02
+  running: false
+
+two:
+  qpcr: false
+  protocol_id: 1
+  run_at: 2013-12-04 11:54:02
+  running: false

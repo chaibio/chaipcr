@@ -1,27 +1,42 @@
 <div id="sidemenu">
 	<ul>
 		<% @protocols.each do |protocol| %>
-			<li<%=" class=\"blue-scheme\"".html_safe if protocol.name == @protocol.name%>><%=protocol.name%></li>
+			<li<%=" class=\"blue-scheme\"".html_safe if protocol.name == @protocol.name%>><%=link_to protocol.name, (@run)? run_protocol_path(@run ,protocol) : protocol_path(protocol) %></li>
 		<% end %>
 	</ul>
-	<div class="button">Add Protocol</div>
+	<div class="button" id="addprotocol"><a href="javascript:newProtocolPopup.open('newprotocol');">Add Protocol</a></div>
 </div>
 
 <div id="protocol-content">
 	<div id="protocol-header" class="clearfix">
 		<div class="protocol-info">
 			<h1><%= @protocol.name %></h1>
-			<% if @protocol.run_at %>
-				<p>Last Runned at <%=@protocol.run_at%></p>
-			<% end %>
 			<p>Last Modified at <%=@protocol.updated_at%></p>
-			<p><a href="#">See past runs</a></p>
 		</div>
 		<div class="protocol-ctl">
-			<div class="button"><%=link_to "Edit", edit_protocol_path(@protocol.id)%></div>
+			<% if @run %>
+			<div class="button"><%=link_to "Select", "#"%></div>
+			<% end %>
+			<div class="button"><%=link_to "Edit", (@run)? edit_run_protocol_path(@run, @protocol) : edit_protocol_path(@protocol)%></div>
 			<div class="button">Copy &amp; Create New</div>
 		</div>
 	</div>
 	
 	<%= render(:partial => "show_components", :locals => {:editable=>false} )%>
 </div>
+
+<div class="popupBox" style="display: none;" id='newprotocol'>
+	<div class="popup-handle blue-scheme">
+		<h2>Add Protocol</h2>
+	</div>
+	<%= render(:partial => "new_protocol", :locals => {:cancel=>true} ) %>
+</div>
+
+<script type="text/javascript" language="javascript">
+<!--
+newProtocolPopup = new popupbox(null, false, 300, false, "addprotocol");
+$("#newprotocol").find(".cancel").click(function(event){
+	newProtocolPopup.close();
+});
+//-->
+</script>

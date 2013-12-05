@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131113192857) do
+ActiveRecord::Schema.define(version: 20131204195402) do
 
   create_table "components", force: true do |t|
     t.string   "name"
@@ -31,6 +31,15 @@ ActiveRecord::Schema.define(version: 20131113192857) do
     t.datetime "run_at"
     t.integer  "master_cycle_id"
     t.boolean  "running",         default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "runs", force: true do |t|
+    t.boolean  "qpcr"
+    t.integer  "protocol_id"
+    t.datetime "run_at"
+    t.boolean  "running"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
