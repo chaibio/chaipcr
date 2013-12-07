@@ -1,0 +1,8 @@
+<div id="maincontent">
+<%= form_tag  @run, url: run_index_path(@run) do |f| %>
+	<div class="radio-button"><%= f.radio_button :qpcr, true, :checked => true %>Yes</div> <div class="radio-button"><%= f.radio_button :qpcr, false %>No</div>
+	<div class="submitctl">
+	<%= submit_tag "Continue" %>
+	</div>
+<% end %>
+</div>

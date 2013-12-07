@@ -28,7 +28,6 @@ ActiveRecord::Schema.define(version: 20131204195402) do
 
   create_table "protocols", force: true do |t|
     t.string   "name"
-    t.datetime "run_at"
     t.integer  "master_cycle_id"
     t.boolean  "running",         default: false
     t.datetime "created_at"
@@ -39,7 +38,7 @@ ActiveRecord::Schema.define(version: 20131204195402) do
     t.boolean  "qpcr"
     t.integer  "protocol_id"
     t.datetime "run_at"
-    t.boolean  "running"
+    t.boolean  "running",     default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

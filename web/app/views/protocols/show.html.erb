@@ -4,7 +4,7 @@
 			<li<%=" class=\"blue-scheme\"".html_safe if protocol.name == @protocol.name%>><%=link_to protocol.name, (@run)? run_protocol_path(@run ,protocol) : protocol_path(protocol) %></li>
 		<% end %>
 	</ul>
-	<div class="button" id="addprotocol"><a href="javascript:newProtocolPopup.open('newprotocol');">Add Protocol</a></div>
+	<div class="button" id="addprotocol"><%= link_to "Add Protocol", "#" %></div>
 </div>
 
 <div id="protocol-content">
@@ -15,7 +15,10 @@
 		</div>
 		<div class="protocol-ctl">
 			<% if @run %>
-			<div class="button"><%=link_to "Select", "#"%></div>
+			<%= form_for @run, :html => { :id => "runform" }, :method=>:put do |f| %>
+				<%= f.hidden_field :protocol_id, :value => @protocol.id  %>
+			<% end %>
+			<div class="button" id="runselect"><%=link_to "Select", "#"%></div>
 			<% end %>
 			<div class="button"><%=link_to "Edit", (@run)? edit_run_protocol_path(@run, @protocol) : edit_protocol_path(@protocol)%></div>
 			<div class="button">Copy &amp; Create New</div>
@@ -37,6 +40,12 @@
 newProtocolPopup = new popupbox(null, false, 300, false, "addprotocol");
 $("#newprotocol").find(".cancel").click(function(event){
 	newProtocolPopup.close();
+});
+$("#addprotocol").click(function(event){
+	newProtocolPopup.open('newprotocol');
+});
+$("#runselect").click(function(event){
+	$("#runform").submit();
 });
 //-->
 </script>

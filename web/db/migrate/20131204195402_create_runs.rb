@@ -4,7 +4,7 @@ class CreateRuns < ActiveRecord::Migration
       t.boolean :qpcr
       t.integer :protocol_id
       t.datetime :run_at
-      t.boolean :running
+      t.boolean :running, :default=>false
 
       t.timestamps
     end
