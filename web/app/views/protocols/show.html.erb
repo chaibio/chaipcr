@@ -1,51 +1,69 @@
-<div id="sidemenu">
-	<ul>
-		<% @protocols.each do |protocol| %>
-			<li<%=" class=\"blue-scheme\"".html_safe if protocol.name == @protocol.name%>><%=link_to protocol.name, (@run)? run_protocol_path(@run ,protocol) : protocol_path(protocol) %></li>
-		<% end %>
-	</ul>
-	<div class="button" id="addprotocol"><%= link_to "Add Protocol", "#" %></div>
-</div>
+<% if @experiment.editable? %>
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function() {
+	initDraggable($(".draggable"));
+	initDraggableCycle($(".cycle"));
+	
+	$(".stepbutton").draggable({
+		cursor: 'pointer',
+    	scope: 'step',
+        helper: "clone",
+    	opacity: 0.9,
+    	zIndex: 10,
+        drag: function(event, ui) {
+            var $droppable = $(this).data("current-droppable");
+            if ($droppable) {
+                updateHighlight(ui, $droppable[0]);
+            }
+        }
+    });
 
-<div id="protocol-content">
-	<div id="protocol-header" class="clearfix">
-		<div class="protocol-info">
-			<h1><%= @protocol.name %></h1>
-			<p>Last Modified at <%=@protocol.updated_at%></p>
+	$(".cyclebutton").draggable({
+		cursor: 'pointer',
+    	scope: 'cycle',
+        helper: "clone",
+    	opacity: 0.9,
+    	zIndex: 10
+    });
+
+    initDroppable($(".droppable"));
+	initDroppableCycle($(".droppable-cycle"));
+	initEditable($(".draggable"), "step");
+	initEditable($(".cycle .title"), "cycle");
+	
+	$(".stepbutton").tooltip({ 
+		items: ".stepbutton",
+		content: "Drag to the left to add step",
+		position: {at: 'bottom+15 center'}
+	});
+	
+	initDeletableStep(null);
+	initDeletableCycle(null);
+});
+</script>
+<% end %>
+
+<%= render(:partial => "/experiments/list")%>
+
+<div id="experiment-content">
+	<%= render(:partial => "/experiments/experiment_header")%>
+	
+	<div class="main-panel" id="protocol_<%=@protocol.id%>_cycle_<%=@protocol.master_cycle_id%>">
+		<div class="titlebar blue-scheme">
+			<span class="step-name">Step Name</span><span class="step-temperature">Temperature (&#176C)</span><span class="step-hold-time">Hold Time (secs)</span>
 		</div>
-		<div class="protocol-ctl">
-			<% if @run %>
-			<%= form_for @run, :html => { :id => "runform" }, :method=>:put do |f| %>
-				<%= f.hidden_field :protocol_id, :value => @protocol.id  %>
-			<% end %>
-			<div class="button" id="runselect"><%=link_to "Select", "#"%></div>
-			<% end %>
-			<div class="button"><%=link_to "Edit", (@run)? edit_run_protocol_path(@run, @protocol) : edit_protocol_path(@protocol)%></div>
-			<div class="button">Copy &amp; Create New</div>
-		</div>
+
+		<% @protocol.components.each do |component| %>
+			<%= cycle_placeholder if @experiment.editable? %>
+			<%= render(:partial => "show_component", :locals => {:component=>component} )%>
+		<% end %>
+		<%= cycle_placeholder if @experiment.editable? %>
 	</div>
 	
-	<%= render(:partial => "show_components", :locals => {:editable=>false} )%>
-</div>
-
-<div class="popupBox" style="display: none;" id='newprotocol'>
-	<div class="popup-handle blue-scheme">
-		<h2>Add Protocol</h2>
+<% if @experiment.editable? %>
+	<div class="ctl-panel">
+		<div class="button stepbutton">Add Step</div>
+		<div class="button cyclebutton">Add Cycle</div>
 	</div>
-	<%= render(:partial => "new_protocol", :locals => {:cancel=>true} ) %>
+<% end %>
 </div>
-
-<script type="text/javascript" language="javascript">
-<!--
-newProtocolPopup = new popupbox(null, false, 300, false, "addprotocol");
-$("#newprotocol").find(".cancel").click(function(event){
-	newProtocolPopup.close();
-});
-$("#addprotocol").click(function(event){
-	newProtocolPopup.open('newprotocol');
-});
-$("#runselect").click(function(event){
-	$("#runform").submit();
-});
-//-->
-</script>

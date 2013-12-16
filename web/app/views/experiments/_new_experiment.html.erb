@@ -1,5 +1,5 @@
-<%= form_for Protocol.new, url: (@run)? run_protocols_path(@run) : protocols_path  do |f| %>
-<%= f.label :name, "Protocol Name" %>
+<%= form_for Experiment.new, url: experiments_path  do |f| %>
+<%= f.label :name, "Experiment Name" %>
 <%= f.text_field :name %>
 <%= f.submit "Create" %>
 <% if cancel %>

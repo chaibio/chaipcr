@@ -1,8 +1,8 @@
 module ParamsHelper
   
 private
-  def protocol_params
-     params.require(:protocol).permit(:name)
+  def experiment_params
+     params.require(:experiment).permit(:name, :qpcr)
   end
   
   def cycle_params

@@ -1,0 +1,16 @@
+<div id="experiment-header" class="clearfix">
+	<div class="experiment-info">
+		<h1><%= @experiment.name %></h1>
+		<% if @experiment.running? %>
+			<p>Last run was on <%=@experiment.run_at%></p>
+		<% else %>
+			<p>Last edit was on <%=@experiment.updated_at%></p>
+		<% end %>
+	</div>
+	<div class="experiment-ctl">
+		<% if !@experiment.running? %>
+			<div class="button">Start a run</div>
+		<% end %>
+		<div class="button">Copy &amp; Create New</div>
+	</div>
+</div>

@@ -26,19 +26,19 @@ ActiveRecord::Schema.define(version: 20131204195402) do
     t.datetime "updated_at"
   end
 
-  create_table "protocols", force: true do |t|
+  create_table "experiments", force: true do |t|
     t.string   "name"
-    t.integer  "master_cycle_id"
-    t.boolean  "running",         default: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "runs", force: true do |t|
     t.boolean  "qpcr"
     t.integer  "protocol_id"
     t.datetime "run_at"
     t.boolean  "running",     default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "protocols", force: true do |t|
+    t.integer  "master_cycle_id"
+    t.boolean  "running",         default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

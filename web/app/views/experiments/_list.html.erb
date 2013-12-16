@@ -1,0 +1,28 @@
+<div id="experiments-list">
+	<ul>
+		<% @experiments ||= Experiment.all %>
+		<% @experiments.each do |experment| %>
+			<li<%=" class=\"blue-scheme\"".html_safe if experiment.name == @experiment.name%>><%=link_to experiment.name, experiment_path(experiment)%></li>
+		<% end %>
+	</ul>
+	<div class="button" id="addexperiment"><%= link_to "Add Experiment", "#" %></div>
+</div>
+
+<div class="popupBox" style="display: none;" id='newexperiment'>
+	<div class="popup-handle blue-scheme">
+		<h2>New Experiment</h2>
+	</div>
+	<%= render(:partial => "new_experiment", :locals => {:cancel=>true} ) %>
+</div>
+
+<script type="text/javascript" language="javascript">
+<!--
+newExperimentPopup = new popupbox(null, false, 300, false, "addexperiment");
+$("#newexperiment").find(".cancel").click(function(event){
+	newExperimentPopup.close();
+});
+$("#addexperiment").click(function(event){
+	newExperimentPopup.open('newexperiment');
+});
+//-->
+</script>

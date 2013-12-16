@@ -1,8 +1,0 @@
-<div id="maincontent">
-<h1>Run Summary</h1>
-
-<p>Protocol: <%= link_to @run.protocol.name, run_protocol_path(@run, @run.protocol)%></p>
-
-<div class="button"><%= link_to "Start your run", start_run_path(@run), :method=>:post %></div>
-
-</div>
