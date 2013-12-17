@@ -1,5 +1,5 @@
 class Component < ActiveRecord::Base
-  belongs_to :protocol
+  belongs_to :experiment
   belongs_to :parent, foreign_key: :parent_id, class_name: "Cycle"
   has_many :children, -> {order("order_number")}, foreign_key: :parent_id, class_name: "Component", dependent: :destroy do
     def from(child)
@@ -20,12 +20,18 @@ class Component < ActiveRecord::Base
   before_save do |component|
     component.to_save = true
     if component.parent_id == nil
-      component.parent_id = component.protocol.master_cycle_id
+      component.parent_id = component.experiment.master_cycle_id
     end
     if component.update_order_required
       component.parent.update_children_order!(component, component.next_component_id)
     end
     component.to_save = nil
+  end
+  
+  after_create do |component|
+    if component.experiment.protocol_defined == false
+      Experiment.where(:id=>component.experiment_id).update_all(:protocol_defined => true)
+    end
   end
   
   def update_order!(order_number)

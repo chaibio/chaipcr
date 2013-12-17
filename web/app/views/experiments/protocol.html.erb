@@ -48,12 +48,12 @@ $(document).ready(function() {
 <div id="experiment-content">
 	<%= render(:partial => "/experiments/experiment_header")%>
 	
-	<div class="main-panel" id="protocol_<%=@protocol.id%>_cycle_<%=@protocol.master_cycle_id%>">
+	<div class="main-panel" id="experiment_<%=@experiment.id%>_cycle_<%=@experiment.master_cycle_id%>">
 		<div class="titlebar blue-scheme">
 			<span class="step-name">Step Name</span><span class="step-temperature">Temperature (&#176C)</span><span class="step-hold-time">Hold Time (secs)</span>
 		</div>
 
-		<% @protocol.components.each do |component| %>
+		<% @experiment.components.each do |component| %>
 			<%= cycle_placeholder if @experiment.editable? %>
 			<%= render(:partial => "show_component", :locals => {:component=>component} )%>
 		<% end %>

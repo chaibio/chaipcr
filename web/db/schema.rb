@@ -15,30 +15,25 @@ ActiveRecord::Schema.define(version: 20131204195402) do
 
   create_table "components", force: true do |t|
     t.string   "name"
-    t.integer  "order_number", default: 0, null: false
+    t.integer  "order_number",  default: 0, null: false
     t.integer  "repeat"
     t.integer  "temperature"
     t.integer  "hold_time"
     t.integer  "parent_id"
-    t.integer  "protocol_id",              null: false
-    t.string   "type",                     null: false
+    t.integer  "experiment_id",             null: false
+    t.string   "type",                      null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "experiments", force: true do |t|
     t.string   "name"
-    t.boolean  "qpcr"
-    t.integer  "protocol_id"
-    t.datetime "run_at"
-    t.boolean  "running",     default: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "protocols", force: true do |t|
+    t.boolean  "qpcr",                default: true
     t.integer  "master_cycle_id"
-    t.boolean  "running",         default: false
+    t.datetime "run_at"
+    t.boolean  "running",             default: false
+    t.boolean  "protocol_defined",    default: false
+    t.boolean  "platessetup_defined", default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

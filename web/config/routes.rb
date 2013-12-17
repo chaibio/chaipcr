@@ -57,18 +57,18 @@ Qpcrctl::Application.routes.draw do
   root 'main#index'
   
   resources :experiments do
-    resources :protocols, only: :show, shallow: true do
-      resources :cycles, shallow: true do
-        resources :steps do
-          post 'move', on: :member
-        end
+    resources :cycles, shallow: true do
+      resources :steps do
         post 'move', on: :member
       end
+      post 'move', on: :member
     end
     
     member do
       post 'start'
       post 'stop'
+      get 'protocol'
+      get 'platessetup'
       get 'status'
     end
   end

@@ -1,4 +1,6 @@
-class ExperimentController < ApplicationController
+class ExperimentsController < ApplicationController
+  include ParamsHelper
+  
   def index
     show
   end
@@ -15,7 +17,7 @@ class ExperimentController < ApplicationController
   def update
     @experiment = Experiment.find(params[:id])
     if @experiment.update_attributes(experiment_params)
-      redirect_to protocol_path(@experiment.protocol)
+      redirect_to protocol_experiment_path(@experiment)
       return
     else
       flash.now[:error] = "Please correct the following errors"
@@ -34,6 +36,17 @@ class ExperimentController < ApplicationController
     render "experiments/show"
   end
   
+  def protocol
+    @experiment = Experiment.find(params[:id])
+  end
+  
+  def platessetup
+    @experiment = Experiment.find(params[:id])
+  end
+  
+  def status
+  end
+  
   def start
     @experiment = Experiment.find(params[:id])
     redirect_to status_experiment_path(@experiment)
@@ -41,8 +54,4 @@ class ExperimentController < ApplicationController
   
   def stop
   end
-  
-  def status
-  end
-  
 end

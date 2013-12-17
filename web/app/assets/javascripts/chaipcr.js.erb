@@ -482,7 +482,7 @@ function newCycle($obj){
 	var arr = id.split("_");
 	id = arr[1];
 	var cycleform = "<%=escape_javascript(newcycleform())%>";
-	cycleform = cycleform.replace("URL_PH", "/protocols/"+id+"/cycles");			
+	cycleform = cycleform.replace("URL_PH", "/experiments/"+id+"/cycles");			
 	$obj.html(cycleform);
 //	$obj.find(".textinput").hint();
 	cycleform_ajax_register($obj, "new");
@@ -596,8 +596,8 @@ function initDeletableCycle($obj){
 			cycle.remove();
 		  })
 		  .bind('ajax:error', function(evt, xhr, status, error) {
+			alert(xhr.responseText);
 			errors = jQuery.parseJSON(xhr.responseText);
-			alert(errors);
 		  });
 }
 

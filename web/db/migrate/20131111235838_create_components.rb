@@ -7,7 +7,7 @@ class CreateComponents < ActiveRecord::Migration
       t.integer :temperature
       t.integer :hold_time
       t.integer :parent_id
-      t.integer :protocol_id, :null=>false
+      t.integer :experiment_id, :null=>false
       t.string :type, :null=>false
 
       t.timestamps

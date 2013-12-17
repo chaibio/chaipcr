@@ -3,7 +3,7 @@ class Step < Component
   validates_associated :parent
   
   before_create do |step|
-    step.protocol_id = step.parent.protocol_id
+    step.experiment_id = step.parent.experiment_id
   end
   
   after_save do |component|

@@ -140,7 +140,7 @@ label{
 	font-weight: 200;
 	margin: 20px 0;
 	padding: 15px 40px;
-	width: 190px;
+	width: 200px;
 }
 
 .button-big a{
@@ -207,6 +207,40 @@ label{
 	padding: 0;
 	font-size: 1.2em;
 }
+
+/***********************  Tab menu ***********************/
+.tabmenu {
+    border-bottom: 1px solid #ccc;
+    margin: 10px 0;
+    z-index: 1;
+}
+.tabmenu li {
+    display: inline;
+    overflow: hidden;
+    list-style-type: none; 
+    margin: 0px 5px;
+}
+.tabmenu a:visited, .tabmenu a:active, .tabmenu a:link, .tabmenu span{
+    border:1px solid #e1e1e1;
+	border-bottom: none;
+    padding: 3px 10px;
+    margin: 0 8px 0 0;
+}
+.tabmenu a:visited, .tabmenu a:active, .tabmenu a:link{
+    background: url(titlebg.png) repeat-x bottom left;
+    color: #333;
+    text-decoration: none; 
+}
+.tabmenu a:hover {
+    background: none;
+    background-color: #eee;
+}
+.tabmenu span.active {
+    background: #fff;
+    color: #333;
+    border-bottom: 1px solid #fff;
+}
+
 /***********************  General Panel Settings ***********************/
 #header{
 	width: 100%;
@@ -265,7 +299,7 @@ label{
 	padding: 2px 30px;
 }
 #experiments-list .button{
-	width: 80px;
+	width: 100px;
 	margin: 20px auto;
 }
 #experiment-content{
@@ -276,7 +310,6 @@ label{
 }
 #experiment-header{
 	width: 100%;
-	border-bottom: 1px solid #ccc;
 	padding: 0 0 10px 0;
 	margin: 0 0 10px 0;
 }
@@ -473,14 +506,17 @@ span.cycle-repeat{
 }
 
 /***********************  Run Wizard ***********************/
-#new_run input[type=radio]{
+.edit_experiment{
+	width: 500px;
+}
+.edit_experiment input[type=radio]{
 	margin-right: 5px;
 }
-#new_run .radio-button{
+.edit_experiment .radio-button{
 	display: inline-block;
 	margin-right: 20px;
 }
-#new_run .submitctl{
+.edit_experiment .submitctl{
 	margin: 20px 0;
 	text-align: right;
 }

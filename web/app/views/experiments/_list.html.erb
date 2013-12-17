@@ -1,7 +1,7 @@
 <div id="experiments-list">
 	<ul>
 		<% @experiments ||= Experiment.all %>
-		<% @experiments.each do |experment| %>
+		<% @experiments.each do |experiment| %>
 			<li<%=" class=\"blue-scheme\"".html_safe if experiment.name == @experiment.name%>><%=link_to experiment.name, experiment_path(experiment)%></li>
 		<% end %>
 	</ul>
