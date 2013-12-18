@@ -1,8 +1,8 @@
-<%= form_for Experiment.new, url: experiments_path  do |f| %>
+<%= form_for params[:experiment]? params[:experiment] : Experiment.new, url: params[:submitpath]? params[:submitpath] : experiments_path  do |f| %>
 <%= f.label :name, "Experiment Name" %>
-<%= f.text_field :name %>
+<%= f.text_field :name, :class=>"textinput" %>
 <%= f.submit "Create" %>
-<% if cancel %>
+<% if params[:cancel] == true %>
 <%= button_tag "Cancel", type: :button, class: :cancel %>
 <% end %>
 <% end %>

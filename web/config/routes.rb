@@ -67,6 +67,7 @@ Qpcrctl::Application.routes.draw do
     member do
       post 'start'
       post 'stop'
+      post 'copy'
       get 'protocol'
       get 'platessetup'
       get 'status'

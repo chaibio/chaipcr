@@ -36,9 +36,14 @@ class StepsController < ApplicationController
   
   def destroy
     @step = Step.find(params[:id])
-    ret = @step.destroy
-    respond_to do |format|
-       format.json { render :json => @step,:status => (ret)? :ok : :unprocessable_entity}
+    if @step.destroy
+      respond_to do |format|
+        format.json { render :json => @step,:status => (ret)? :ok : :unprocessable_entity}
+      end
+    else
+      respond_to do |format|
+        format.json { render :json => @step.errors, :status => :unprocessable_entity}
+      end
     end
   end
 end

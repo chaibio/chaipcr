@@ -2,17 +2,17 @@
 	<ul>
 		<% @experiments ||= Experiment.all %>
 		<% @experiments.each do |experiment| %>
-			<li<%=" class=\"blue-scheme\"".html_safe if experiment.name == @experiment.name%>><%=link_to experiment.name, experiment_path(experiment)%></li>
+			<li<%=" class=\"blue-scheme\"".html_safe if experiment.id == @experiment.id%>><%=link_to experiment.name, experiment_path(experiment)%></li>
 		<% end %>
 	</ul>
 	<div class="button" id="addexperiment"><%= link_to "Add Experiment", "#" %></div>
 </div>
 
-<div class="popupBox" style="display: none;" id='newexperiment'>
+<div class="popupBox" style="display: none;" id="newexperiment">
 	<div class="popup-handle blue-scheme">
 		<h2>New Experiment</h2>
 	</div>
-	<%= render(:partial => "new_experiment", :locals => {:cancel=>true} ) %>
+	<%= render(:partial => "new_experiment", :locals => {:params=>{:cancel=>true}} ) %>
 </div>
 
 <script type="text/javascript" language="javascript">

@@ -37,14 +37,13 @@ class CyclesController < ApplicationController
   
   def destroy
     @cycle = Cycle.find(params[:id])
-    if @cycle.experiment.components.count > 1
-      ret = @cycle.destroy
+    if @cycle.destroy
       respond_to do |format|
-        format.json { render :json => @cycle,:status => (ret)? :ok : :unprocessable_entity}
+        format.json { render :json => @cycle, :status => (ret)? :ok : :unprocessable_entity}
       end
     else
       respond_to do |format|
-        format.json { render :json => {:base => "lastnode"},:status => :unprocessable_entity}
+        format.json { render :json => @cycle.errors, :status => :unprocessable_entity}
       end
     end
   end

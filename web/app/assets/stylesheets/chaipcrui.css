@@ -98,10 +98,13 @@ label{
 	-moz-border-radius: 4px;
 }
 .textinput{
-	text-align: center;
-	width: 62px;
+	text-align: left;
+	width: 100px;
 }
-
+.forminput{
+	display: block;
+	margin: 0 0 20px 0;
+}
 .button {
   display: block;
   height: auto;
@@ -311,7 +314,7 @@ label{
 #experiment-header{
 	width: 100%;
 	padding: 0 0 10px 0;
-	margin: 0 0 10px 0;
+	margin: 0;
 }
 #experiment-header .experiment-info{
 	float: left;
@@ -419,8 +422,6 @@ span.step-name label{
 }
 span.step-name .textinput{
 	margin-left: -9px;
-	text-align: left;
-	width: 100px;
 }
 span.step-name{
 	width: 110px;
@@ -436,15 +437,15 @@ span.step-hold-time{
 	padding: 10px 0;
 	text-align: center;
 }
-span.cycle-name .textinput {
-	width: 100px;
-	text-align: left;
-}
 span.cycle-name{
 	margin-right: 10px;
 }
 span.cycle-repeat{
 	margin-right: 10px;
+}
+span.cycle-repeat .textinput, span.step-temperature .textinput, span.step-hold-time .textinput{
+	width: 62px;
+	text-align: center;
 }
 .protocol .title label{
 	color: white;
@@ -516,7 +517,13 @@ span.cycle-repeat{
 	display: inline-block;
 	margin-right: 20px;
 }
+.edit_experiment label{
+	font-size: 1.2em;
+}
+.edit_experiment .textinput{
+	font-size: 1.1em;
+}
 .edit_experiment .submitctl{
 	margin: 20px 0;
-	text-align: right;
+	text-align: left;
 }

@@ -12,6 +12,15 @@ class Experiment < ActiveRecord::Base
     end
   end
   
+  def copy!(params)
+    new_experiment = nil
+    transaction do
+      new_experiment = Experiment.create({:name=>(!params.blank?)? params[:name] : "Copy of #{name}", :qpcr=>qpcr, :protocol_defined=>protocol_defined, :platessetup_defined=>platessetup_defined})
+      component_children_copy(new_experiment.id, new_experiment.master_cycle_id, components)
+    end
+    return new_experiment
+  end
+  
   def editable?
     return run_at.nil?
   end
@@ -20,4 +29,12 @@ class Experiment < ActiveRecord::Base
     !running && protocol_defined && (!qpcr || platessetup_defined)
   end
   
+  private
+  
+  def component_children_copy(experiment_id, component_id, children)
+    children.each do |child|
+      new_child = child.copy!(experiment_id, component_id)
+      component_children_copy(experiment_id, new_child.id, child.children)
+    end
+  end
 end

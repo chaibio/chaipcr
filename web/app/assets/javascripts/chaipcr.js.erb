@@ -461,7 +461,7 @@ function initDeletableStep($obj){
 		  })
 		  .bind('ajax:error', function(evt, xhr, status, error) {
 			errors = jQuery.parseJSON(xhr.responseText);
-			alert(errors);
+			alert(errors.base);
 		  });
 }
 
@@ -596,8 +596,8 @@ function initDeletableCycle($obj){
 			cycle.remove();
 		  })
 		  .bind('ajax:error', function(evt, xhr, status, error) {
-			alert(xhr.responseText);
 			errors = jQuery.parseJSON(xhr.responseText);
+			alert(errors.base);
 		  });
 }
 

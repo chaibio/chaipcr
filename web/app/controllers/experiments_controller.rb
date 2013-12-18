@@ -25,6 +25,16 @@ class ExperimentsController < ApplicationController
     end
   end
   
+  def copy
+    @experiment = Experiment.find(params[:id])
+    if experiment = @experiment.copy!(params[:experiment])
+      redirect_to experiment_path(experiment)
+    else
+      flash[:error] = "Cannot copy the current experiment"
+      redirect_to experiment_path(@experiment)
+    end
+  end
+  
   def show
     @experiments = Experiment.all
     @experiment = (params[:id])? Experiment.find(params[:id]) : @experiments.first
@@ -53,5 +63,12 @@ class ExperimentsController < ApplicationController
   end
   
   def stop
+  end
+  
+  def destroy
+    @experiment = Experiment.find(params[:id])
+    @experiment.destroy
+    flash[:notice] = "Experiment '#{@experiment.name}' is successfully deleted."
+    redirect_to experiments_path
   end
 end

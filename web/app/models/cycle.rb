@@ -1,6 +1,6 @@
 class Cycle < Component  
   validates_presence_of :name, :repeat
-
+  
   def master_cycle?
     parent_id == nil
   end

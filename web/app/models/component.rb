@@ -34,6 +34,17 @@ class Component < ActiveRecord::Base
     end
   end
   
+  before_destroy do |component|
+    if component.parent && component.parent.children.count <= 1
+      errors.add(:base, "At least one node is required")
+      return false
+    end
+  end
+  
+  def copy!(experiment_id, parent_id)
+    self.class.create(attribute_hash(["id", "parent_id", "experiment_id", "created_at", "updated_at"]).merge({:experiment_id=>experiment_id, :parent_id=>parent_id}))
+  end
+  
   def update_order!(order_number)
     if to_save == true
       self.order_number = order_number
@@ -55,4 +66,15 @@ class Component < ActiveRecord::Base
     @update_order_required 
   end
   
+  private
+  
+  def attribute_hash (exclude_names)
+    hash_values = {}
+    attribute_names.each do |name|
+      if !exclude_names.include?(name)
+        hash_values[name]= read_attribute(name)
+      end
+    end
+    hash_values
+  end
 end
