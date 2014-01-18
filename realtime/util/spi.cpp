@@ -8,13 +8,15 @@
 #include <sys/ioctl.h>
 #include <linux/spi/spidev.h>
 
+using namespace std;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Class SPIPort
-SPIPort::SPIPort(const char* spiDevicePath) throw():
+SPIPort::SPIPort(const string& spiDevicePath) throw():
 	spiDevicePath_(spiDevicePath),
 	deviceFile_(0) {
 
-	deviceFile_ = open(spiDevicePath, O_RDWR);
+	deviceFile_ = open(spiDevicePath.c_str(), O_RDWR);
 	if (deviceFile_ < 0)
 		throw SPIError("Unable to open SPI device", errno);
 }

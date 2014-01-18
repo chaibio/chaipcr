@@ -1,6 +1,20 @@
 #ifndef _PWM_H_
 #define _PWM_H_
 
-int start_pwm(const char* path, unsigned long period, unsigned long duty, int polarity);
+////////////////////////////////////////////////////////////////////////////////
+// Class PWMPin
+class PWMPin {
+public:
+	PWMPin(const std::string& pwmDevicePath) throw();
+	~PWMPin();
+	
+	void setPWM(unsigned long duty, unsigned long period, unsigned int polarity) throw();
+
+private:
+	void writePWMFile(const std::string& relativePath, unsigned long value) throw();
+
+private:
+	const std::string& pwmDevicePath_;
+};
 
 #endif

@@ -15,9 +15,12 @@
 		"P9.12",				/* gpio: LED XLAT */
 		"P8.07",				/* gpio: block thermistor 1 CS */
 		"P8.08",				/* gpio: spi0 data in ready sense */
+		//fan
+		"P9.16",				//fan PWM
 		
 		/* the hardware IP uses */
 		"ehrpwm1A",
+		"ehrpwm1B", 			//fan PWM
 		"ehrpwm2B";
                 
 	/* from am3xx_pwm */
@@ -106,6 +109,10 @@
                     pwm_P9_14: pinmux_pwm_P9_14_pins {
                             pinctrl-single,pins = <0x048  0x6>; /* P9_14 (ZCZ ball U14) | MODE 6 */
                     };
+					
+					pwm_P9_16: pinmux_pwm_P9_16_pins {
+							pinctrl-single,pins = <0x004C 0x6>; //ehrpwm1B_mux1
+					};
             };
     };
 
@@ -118,6 +125,17 @@
                             pwm-names       = "PWM_P9_14";
                         pinctrl-names       = "default";
                         pinctrl-0   = <&pwm_P9_14>;
+                            enabled         = <1>;
+                            duty            = <0>;
+                            status          = "okay";
+                    };
+					
+                    pwm_test_P9_16 {
+                            compatible      = "pwm_test";
+                            pwms            = <&ehrpwm1 0 500000 1>;
+                            pwm-names       = "PWM_P9_16";
+                        pinctrl-names       = "default";
+                        pinctrl-0   = <&pwm_P9_16>;
                             enabled         = <1>;
                             duty            = <0>;
                             status          = "okay";

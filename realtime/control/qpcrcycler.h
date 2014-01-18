@@ -5,6 +5,7 @@
 #include "gpiopin.h"
 
 class HeatBlock;
+class HeatSink;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class QPCRCycler
@@ -30,6 +31,7 @@ private:
 	//components
 	static QPCRCycler* qpcrCycler_;
 	HeatBlock* heatBlock_;
+	HeatSink *heatSink_;
 };
 
 #endif

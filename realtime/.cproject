@@ -45,11 +45,13 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.982579515" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
 							<tool command="arm-linux-gnueabi-g++" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1686188139" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.paths.1199569868" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="/usr/arm-linux-gnueabi/lib"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/chaipcr/libraries/lib}&quot;"/>
+									<listOptionValue builtIn="false" value="/usr/arm-linux-gnueabi/lib"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.1462024616" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="PocoNet"/>
+									<listOptionValue builtIn="false" value="PocoFoundation"/>
+									<listOptionValue builtIn="false" value="PocoXML"/>
 									<listOptionValue builtIn="false" value="PocoUtil"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1591489990" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
@@ -145,10 +147,10 @@
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.688735426;cdt.managedbuild.config.gnu.exe.release.688735426.;cdt.managedbuild.tool.gnu.c.compiler.exe.release.423627833;cdt.managedbuild.tool.gnu.c.compiler.input.1852497213">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1301217094">
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1301217094;cdt.managedbuild.config.gnu.exe.debug.1301217094.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1571806035;cdt.managedbuild.tool.gnu.cpp.compiler.input.1715688815">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1301217094;cdt.managedbuild.config.gnu.exe.debug.1301217094.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1571806035;cdt.managedbuild.tool.gnu.cpp.compiler.input.1715688815">
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1301217094">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
 		</scannerConfigBuildInfo>
 	</storageModule>
