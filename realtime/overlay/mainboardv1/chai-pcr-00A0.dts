@@ -83,10 +83,12 @@
 			/* GPIO pins*/
 			qpcr_gpio_pins: pinmux_qpcr_gpio_pins {
 				pinctrl-single,pins = <
-					0x09c 0x07  /* P8.09 PELTIER 1_INA gpio2_5, OUTPUT_PULLUP | MODE7 */
-					0x034 0x07  /* P8.11 PELTIER 1_INB gpio1_13, OUTPUT_PULLUP | MODE7 */
-					0x03c 0x07  /* P8.15 PELTIER 2_INA gpio1_15, OUTPUT_PULLUP | MODE7 */
-					0x024 0x07  /* P8.17 PELTIER 1_INB gpio0_27, OUTPUT_PULLUP | MODE7 */
+					0x09c 0x17  /* P8.09 PELTIER 1_INA gpio2_5, OUTPUT_PULLUP | MODE7 */
+					0x034 0x17  /* P8.11 PELTIER 1_INB gpio1_13, OUTPUT_PULLUP | MODE7 */
+					0x03c 0x17  /* P8.15 PELTIER 2_INA gpio1_15, OUTPUT_PULLUP | MODE7 */
+					0x02c 0x17  /* P8.17 PELTIER 1_INB gpio0_27, OUTPUT_PULLUP | MODE7 */
+					0x074 0x17  /* P9.12 SPI_CS LTC2444 gpio1_28, OUTPUT_PULLUP | MODE7 */
+					
 				>;
 			};
 			/* end GPIO pins*/
@@ -197,7 +199,7 @@
 	};
 
 	/* SPI0 */
-	fragment@10 {
+	fragment@9 {
 		target = <&spi0>;
 		__overlay__ {
 			#address-cells = <1>;
@@ -221,7 +223,7 @@
 	};
 	
 	/* SPI1 */
-	fragment@11 {
+	fragment@10 {
 		target = <&spi0>;
 		__overlay__ {
 			#address-cells = <1>;
@@ -244,7 +246,7 @@
 		};
 	};
 	/* GPIO */
-	fragment@12 {
+	fragment@11 {
 		target = <&ocp>;
 		__overlay__ {
 			test_helper: helper {
