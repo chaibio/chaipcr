@@ -14,7 +14,7 @@ QPCRCycler::QPCRCycler():
 	heatSink_ {nullptr},
 	optics_ {nullptr},
 	spiPort0_(kSPI0DevicePath),
-	spiPort0DataInSensePin_(kSPI0DataInSensePinNumber, GPIOPin::kInput) {
+	spiPort0DataInSensePin_(kSPI0DataInSensePinNumber, GPIO::kInput) {
 		
 }
 

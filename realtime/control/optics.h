@@ -2,7 +2,7 @@
 #define _OPTICS_H_
 
 #include "pwm.h"
-#include "gpiopin.h"
+#include "gpio.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Optics
@@ -18,7 +18,7 @@ public:
 	
 private:
 	bool lidOpen_;
-	GPIOPin lidSensePin_;
+	GPIO lidSensePin_;
 };
 
 #endif

@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Class LTC2444
 LTC2444::LTC2444(unsigned int csPinNumber, SPIPort& spiPort) throw():
-	 csPin_(csPinNumber, GPIOPin::kOutput),
+	 csPin_(csPinNumber, GPIO::kOutput),
 	 spiPort_ (spiPort){}
 
 LTC2444::~LTC2444() {
@@ -41,8 +41,8 @@ uint32_t LTC2444::readADC(uint8_t ch, bool SGL) {
 	data |= OSRTWOx<<19;
 	
 	//set CS low to initiate conversion
-	csPin_.setValue(GPIOPin::kHigh);
-	csPin_.setValue(GPIOPin::kLow);
+	csPin_.setValue(GPIO::kHigh);
+	csPin_.setValue(GPIO::kLow);
 
 	//read conversion value and write the settings for the nex conversion via SPI.
 	uint32_t conversion;
@@ -54,7 +54,7 @@ uint32_t LTC2444::readADC(uint8_t ch, bool SGL) {
 	conversion = ((conversion & 0xFF000000) >> 24 | (conversion & 0x00FF0000) >> 8 | (conversion & 0x0000FF00)<<8 | (conversion & 0x000000FF) << 24)&0x3FFFFFE0;
 	
 	std::cout << "Read ADC value: " << conversion << std::endl;
-	csPin_.setValue(GPIOPin::kHigh);
+	csPin_.setValue(GPIO::kHigh);
 	return conversion;
 
 }
@@ -64,8 +64,8 @@ uint32_t LTC2444::repeat() {
 	uint32_t data=0x80000000;
 
 	//set CS low to initiate conversion
-	csPin_.setValue(GPIOPin::kHigh);
-	csPin_.setValue(GPIOPin::kLow);
+	csPin_.setValue(GPIO::kHigh);
+	csPin_.setValue(GPIO::kLow);
 
 	//read conversion value and write the settings for the nex conversion via SPI.
 	uint32_t conversion;
@@ -77,7 +77,7 @@ uint32_t LTC2444::repeat() {
 	conversion = ((conversion & 0xFF000000) >> 24 | (conversion & 0x00FF0000) >> 8 | (conversion & 0x0000FF00)<<8 | (conversion & 0x000000FF) << 24)&0x3FFFFFE0;
 
 	std::cout << "Read ADC value: " << conversion << std::endl;
-	csPin_.setValue(GPIOPin::kHigh);
+	csPin_.setValue(GPIO::kHigh);
 	return conversion;
 
 }

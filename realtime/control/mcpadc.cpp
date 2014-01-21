@@ -6,8 +6,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class MCPADC
-MCPADC::MCPADC(unsigned int csPinNumber, SPIPort& spiPort, GPIOPin& spiDataInSensePin) throw():
-	 csPin_(csPinNumber, GPIOPin::kOutput),
+MCPADC::MCPADC(unsigned int csPinNumber, SPIPort& spiPort, GPIO& spiDataInSensePin) throw():
+	 csPin_(csPinNumber, GPIO::kOutput),
 	 spiPort_ (spiPort),
 	 spiDataInSensePin_ (spiDataInSensePin) {}
 
@@ -17,12 +17,12 @@ MCPADC::~MCPADC() {
 float MCPADC::readTempBlocking() {
 	std::cout << "Reading block temp" << std::endl;
 	//set CS low to initiate conversion
-	csPin_.setValue(GPIOPin::kHigh);
-	csPin_.setValue(GPIOPin::kLow);
+	csPin_.setValue(GPIO::kHigh);
+	csPin_.setValue(GPIO::kLow);
 	
 	//wait for conversion to complete
 	auto value = spiDataInSensePin_.value();
-	while (value != GPIOPin::kLow) {
+	while (value != GPIO::kLow) {
 		std::cout << "Read pin value " << value << std::endl;
 	}
 	

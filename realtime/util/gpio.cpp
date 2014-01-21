@@ -1,5 +1,5 @@
 #include "pcrincludes.h"
-#include "gpiopin.h"
+#include "gpio.h"
 
 #include <sstream>
 #include <fstream>
@@ -8,15 +8,15 @@
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Class GPIOPin
-GPIOPin::GPIOPin(unsigned int pinNumber, Direction direction) throw():
+// Class GPIO
+GPIO::GPIO(unsigned int pinNumber, Direction direction) throw():
 	pinNumber_(pinNumber) {
 	
 	exportPin();
 	setDirection(direction);
 }
 
-GPIOPin::~GPIOPin() {
+GPIO::~GPIO() {
 	try {
 		unexportPin();
 	} catch (exception& e) {
@@ -24,7 +24,7 @@ GPIOPin::~GPIOPin() {
 	}
 }
 	
-GPIOPin::Value GPIOPin::value() const throw() {
+GPIO::Value GPIO::value() const throw() {
 	ostringstream filePath;
 	ifstream valueFile;
 	char buf[2];
@@ -46,7 +46,7 @@ GPIOPin::Value GPIOPin::value() const throw() {
 	}
 }
 
-void GPIOPin::setValue(Value value) throw() {
+void GPIO::setValue(Value value) throw() {
 	if (direction_ != kOutput)
 		throw InvalidState("Attempt to set value of non-output GPIO pin");
 	
@@ -72,7 +72,7 @@ void GPIOPin::setValue(Value value) throw() {
 	valueFile.close();
 }
 
-void GPIOPin::setDirection(Direction direction) throw() {
+void GPIO::setDirection(Direction direction) throw() {
 	ostringstream filePath;
 	ofstream directionFile;
 	
@@ -97,16 +97,14 @@ void GPIOPin::setDirection(Direction direction) throw() {
 	direction_ = direction;
 }
 
-void GPIOPin::exportPin() throw() {
+void GPIO::exportPin() throw() {
 	ofstream exportFile;
 	exportFile.open("/sys/class/gpio/export");
 	exportFile << pinNumber_;
-	exportFile.close();
 }
 
-void GPIOPin::unexportPin() throw() {
+void GPIO::unexportPin() throw() {
 	ofstream unexportFile;
 	unexportFile.open("/sys/class/gpio/unexport");
 	unexportFile << pinNumber_;
-	unexportFile.close();	
 }

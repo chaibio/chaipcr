@@ -7,7 +7,7 @@
 // Class Optics
 Optics::Optics() throw():
 	lidOpen_ {false},
-	lidSensePin_(kLidSensePinNumber, GPIOPin::kInput) {
+	lidSensePin_(kLidSensePinNumber, GPIO::kInput) {
 }
 
 Optics::~Optics() {

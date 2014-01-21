@@ -1,9 +1,9 @@
-#ifndef _GPIOPIN_H_
-#define _GPIOPIN_H_
+#ifndef _GPIO_H_
+#define _GPIO_H_
 
 ////////////////////////////////////////////////////////////////////////////////
-// Class GPIOPin
-class GPIOPin {
+// Class GPIO
+class GPIO {
 public:
 	enum Direction {
 		kInput = 0,
@@ -15,8 +15,8 @@ public:
 		kHigh = 1
 	};
 	
-	GPIOPin(unsigned int pinNumber, Direction direction) throw();
-	~GPIOPin();
+	GPIO(unsigned int pinNumber, Direction direction) throw();
+	~GPIO();
 	
 	Value value() const throw();
 	void setValue(Value value) throw();

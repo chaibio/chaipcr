@@ -4,7 +4,7 @@
 #include <Poco/Runnable.h>
 
 #include "spi.h"
-#include "gpiopin.h"
+#include "gpio.h"
 
 class HeatBlock;
 class HeatSink;
@@ -20,7 +20,7 @@ public:
 	
 	//port accessors
 	inline SPIPort& spiPort0() { return spiPort0_; };
-	inline GPIOPin& spiPort0DataInSensePin() { return spiPort0DataInSensePin_; }
+	inline GPIO& spiPort0DataInSensePin() { return spiPort0DataInSensePin_; }
 	
 	//component accessors
 	Optics& optics() { return *optics_; }
@@ -32,7 +32,7 @@ public:
 private:
 	//ports
 	SPIPort spiPort0_;
-	GPIOPin spiPort0DataInSensePin_;
+	GPIO spiPort0DataInSensePin_;
 	
 	//components
 	static QPCRCycler* qpcrCycler_;

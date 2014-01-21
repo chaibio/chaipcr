@@ -1,7 +1,7 @@
 #ifndef _LTC2444_H_
 #define _LTC2444_H_
 
-#include "gpiopin.h"
+#include "gpio.h"
 #include "spi.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,7 @@ public:
 	uint32_t repeat();
 
 private:
-	GPIOPin csPin_;
+	GPIO csPin_;
 	SPIPort& spiPort_;
 	uint8_t OSRTWOx;
 };
