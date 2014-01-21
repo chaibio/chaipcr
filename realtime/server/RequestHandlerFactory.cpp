@@ -2,6 +2,7 @@
 #include "RequestHandlerFactory.h"
 
 #include <Poco/Net/HTTPServerRequest.h>
+#include "StatusHandler.h"
 
 using namespace std;
 
@@ -14,5 +15,6 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
 	if (pathSegments[0] == "status")
 		return new StatusHandler();
 	else*/
-		return nullptr;
+//		return nullptr;
+	return new StatusHandler();
 }

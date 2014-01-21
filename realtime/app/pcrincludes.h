@@ -5,4 +5,6 @@
 #include "pins.h"
 #include "exceptions.h"
 
+const int kHttpServerPort = 8000;
+
 #endif

@@ -3,6 +3,7 @@
 
 #include "heatblock.h"
 #include "heatsink.h"
+#include "optics.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class QPCRCycler
@@ -11,11 +12,14 @@ QPCRCycler* QPCRCycler::qpcrCycler_ { nullptr };
 QPCRCycler::QPCRCycler():
 	heatBlock_ {nullptr},
 	heatSink_ {nullptr},
+	optics_ {nullptr},
 	spiPort0_(kSPI0DevicePath),
 	spiPort0DataInSensePin_(kSPI0DataInSensePinNumber, GPIOPin::kInput) {
+		
 }
 
 QPCRCycler::~QPCRCycler() {
+	delete optics_;
 	delete heatBlock_;
 	delete heatSink_;
 }
@@ -29,12 +33,14 @@ QPCRCycler* QPCRCycler::instance() {
 
 void QPCRCycler::init() {
 	heatBlock_ = new HeatBlock();
-	heatSink_ =  new HeatSink();
+	heatSink_ = new HeatSink();
+	optics_ = new Optics();
 }
 
-bool QPCRCycler::loop() {
-	heatBlock_->process();
-	heatSink_->process();
-
-	return true;
+void QPCRCycler::run() {
+	while (true) {
+		heatBlock_->process();
+		heatSink_->process();
+		optics_->process();
+	}
 }

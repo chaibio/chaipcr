@@ -15,6 +15,8 @@
 		"P9.12",				/* gpio: LED XLAT */
 		"P8.07",				/* gpio: block thermistor 1 CS */
 		"P8.08",				/* gpio: spi0 data in ready sense */
+		"P8.26",				//gpio: lid open/close sense
+		
 		//fan
 		"P9.16",				//fan PWM
 		
@@ -97,6 +99,7 @@
             		0x078 0x07      /* P9 12 GPIO1_28 | MODE7 | OUTPUT */
             		0x090 0x07		/* P8 07 GPIO2_2 | MODE7 | OUTPUT */
             		0x094 0x3F		/* P8 08 GPIO2_3 | MODE7 | INPUT - no pull */
+					0x07C 0x3F		/* P8 26 GPIO1_29 | MODE7 | INPUT - no pull */
             	>;
            	};
         };
@@ -111,7 +114,7 @@
                     };
 					
 					pwm_P9_16: pinmux_pwm_P9_16_pins {
-							pinctrl-single,pins = <0x004C 0x6>; //ehrpwm1B_mux1
+							pinctrl-single,pins = <0x04C 0x6>; //ehrpwm1B_mux1
 					};
             };
     };
@@ -132,7 +135,7 @@
 					
                     pwm_test_P9_16 {
                             compatible      = "pwm_test";
-                            pwms            = <&ehrpwm1 0 500000 1>;
+                            pwms            = <&ehrpwm1 1 500000 1>;
                             pwm-names       = "PWM_P9_16";
                         pinctrl-names       = "default";
                         pinctrl-0   = <&pwm_P9_16>;

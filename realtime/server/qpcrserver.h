@@ -6,11 +6,18 @@
 
 using namespace std;
 
+class QPCRServer;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Class QPCRServer
 class QPCRServer: public Poco::Util::ServerApplication {
 protected:
-	int main(const vector<string> &);
+	//from ServerApplication
+	void initialize(Application& self);
+	int main(const vector<string>& args);
+
+private:
+
 };
 
 #endif
