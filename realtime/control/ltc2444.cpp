@@ -1,14 +1,15 @@
 #include "pcrincludes.h"
 #include "ltc2444.h"
-
+#include "gpio.h"
 #include "pins.h"
 #include <iostream>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class LTC2444
-LTC2444::LTC2444(unsigned int csPinNumber, SPIPort& spiPort) throw():
+LTC2444::LTC2444(unsigned int csPinNumber, SPIPort& spiPort, unsigned int busyPinNumber) throw():
 	 csPin_(csPinNumber, GPIO::kOutput),
-	 spiPort_ (spiPort){}
+	 spiPort_ (spiPort),
+	 busyPin_ (busyPinNumber, GPIO::kInput){}
 
 LTC2444::~LTC2444() {
 }
@@ -82,3 +83,9 @@ uint32_t LTC2444::repeat() {
 
 }
 
+bool LTC2444::busy(){
+	if(busyPin_.value()== GPIO::kHigh)
+		return 1;
+	else
+		return 0;
+}

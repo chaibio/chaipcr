@@ -1,2 +1,5 @@
 Debug
 .DS_Store
+.dts~
+.c~
+.cpp~

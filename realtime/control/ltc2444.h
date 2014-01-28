@@ -8,13 +8,13 @@
 // Class LTC2444
 class LTC2444 {
 public:
-	LTC2444(unsigned int csPinNumber, SPIPort& spiPort) throw();
+	LTC2444(unsigned int csPinNumber, SPIPort& spiPort, unsigned int busyPinNumber) throw();
 	~LTC2444();
 
 	/*Setup the speed and resolution
 	 * mode:
 	 * 0 -> No changes from previous setting
-	 * 1 -> OSR = 0001
+	 * 1 -> OSR = 0001dd
 	 * 2 -> OSR = 0010
 	 * ...
 	 * 9 -> OSR = 1001
@@ -46,8 +46,11 @@ public:
 	//read result of conversion and convert again using previous setting.
 	uint32_t repeat();
 
+	bool busy();
+
 private:
 	GPIO csPin_;
+	GPIO busyPin_;
 	SPIPort& spiPort_;
 	uint8_t OSRTWOx;
 };
