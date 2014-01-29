@@ -1,14 +1,12 @@
 #ifndef _HEATBLOCKZONE_H_
 #define _HEATBLOCKZONE_H_
 
-class MCPADC;
-
 ////////////////////////////////////////////////////////////////////////////////
 // Class HeatBlockZoneController
 class HeatBlockZoneController {
 public:
 	HeatBlockZoneController(unsigned int adcCSPinNumber) throw();
-	~HeatBlockZoneController();
+	virtual ~HeatBlockZoneController();
 	
 	inline float currentTemp() { return currentTemp_; }
 	inline float targetTemp() { return targetTemp_; }
@@ -18,7 +16,6 @@ public:
 
 private:
 	//components
-	MCPADC* tempAdc_;
 	
 	//state
 	float currentTemp_;
