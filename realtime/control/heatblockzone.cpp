@@ -5,7 +5,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class HeatBlockZoneController
-HeatBlockZoneController::HeatBlockZoneController(unsigned int adcCSPinNumber) throw() {
+HeatBlockZoneController::HeatBlockZoneController() throw():
+	zoneThermistor_(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
+		kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
+		kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient) {
 		 
 	auto cycler = QPCRCycler::instance();
 }
@@ -13,7 +16,7 @@ HeatBlockZoneController::HeatBlockZoneController(unsigned int adcCSPinNumber) th
 HeatBlockZoneController::~HeatBlockZoneController() {
 }
 
-void HeatBlockZoneController::setTargetTemp(float targetTemp) {
+void HeatBlockZoneController::setTargetTemp(double targetTemp) {
 	
 }
 

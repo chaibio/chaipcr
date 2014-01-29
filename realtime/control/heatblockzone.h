@@ -1,25 +1,27 @@
 #ifndef _HEATBLOCKZONE_H_
 #define _HEATBLOCKZONE_H_
 
+#include "thermistor.h"
+
 ////////////////////////////////////////////////////////////////////////////////
 // Class HeatBlockZoneController
 class HeatBlockZoneController {
 public:
-	HeatBlockZoneController(unsigned int adcCSPinNumber) throw();
+	HeatBlockZoneController() throw();
 	virtual ~HeatBlockZoneController();
 	
-	inline float currentTemp() { return currentTemp_; }
-	inline float targetTemp() { return targetTemp_; }
-	void setTargetTemp(float targetTemp);
+	inline double currentTemp() { return zoneThermistor_.temperature(); }
+	inline double targetTemp() { return targetTemp_; }
+	void setTargetTemp(double targetTemp);
 	
 	void process() throw();
 
 private:
 	//components
+	Thermistor zoneThermistor_;
 	
 	//state
-	float currentTemp_;
-	float targetTemp_;
+	double targetTemp_;
 };
 
 #endif

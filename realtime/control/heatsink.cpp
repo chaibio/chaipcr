@@ -3,7 +3,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class HeatSink
-HeatSink::HeatSink() throw() {
+HeatSink::HeatSink() throw():
+	thermistor_(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
+		kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
+		kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient) {
 }
 
 HeatSink::~HeatSink() {

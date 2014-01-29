@@ -4,6 +4,7 @@
 #include "chaistatus.h"
 #include "pins.h"
 #include "exceptions.h"
+#include "constants.h"
 
 const int kHttpServerPort = 8000;
 
