@@ -4,7 +4,7 @@
 #include <cmath>
 
 ////////////////////////////////////////////////////////////////////////////////
-// Class Fan
+// Class Thermistor
 Thermistor::Thermistor(unsigned int voltageDividerResistance, unsigned int adcBits,
 		double a, double b, double c, double d) throw():
 	temperature_ {0},
