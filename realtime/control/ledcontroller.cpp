@@ -11,7 +11,7 @@ LEDController::LEDController(float dutyCyclePercentage):
 	setIntensity(minLEDCurrent);
 }
 
-LEDController::~LEDControlelr() {
+LEDController::~LEDController() {
 	
 }
 	

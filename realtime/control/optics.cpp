@@ -12,9 +12,8 @@ Optics::Optics() throw():
 
 Optics::~Optics() {
 }
-
+std::cout << "Read lid pin value " << lidOpen_ << std::endl;
 void Optics::process() throw() {
 	//read lid state
 	lidOpen_ = lidSensePin_.value();
-	std::cout << "Read lid pin value " << lidOpen_ << std::endl;
 }

@@ -1,6 +1,7 @@
 #include "pcrincludes.h"
 #include "qpcrcycler.h"
 
+#include "adccontroller.h"
 #include "heatblock.h"
 #include "heatsink.h"
 #include "optics.h"
@@ -22,6 +23,7 @@ QPCRCycler::~QPCRCycler() {
 	delete optics_;
 	delete heatBlock_;
 	delete heatSink_;
+	delete adcController_;
 }
 
 QPCRCycler* QPCRCycler::instance() {
@@ -32,6 +34,7 @@ QPCRCycler* QPCRCycler::instance() {
 }
 
 void QPCRCycler::init() {
+	adcController_ = new ADCController(kLTC2444CSPinNumber, spiPort0_, kSPI0DataInSensePinNumber);
 	heatBlock_ = new HeatBlock();
 	heatSink_ = new HeatSink();
 	optics_ = new Optics();
@@ -39,6 +42,7 @@ void QPCRCycler::init() {
 
 void QPCRCycler::run() {
 	while (true) {
+		adcController_->process();
 		heatBlock_->process();
 		heatSink_->process();
 		optics_->process();

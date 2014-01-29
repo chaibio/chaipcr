@@ -21,7 +21,7 @@
 		"P8.17",                /* gpio: PELTIER 2_INB - Ouput*/
 
 		//LED board
-		"P9.28"			/* pwm: eCAP2_PWM2 LED PWM - Ouput */
+		"P9.28",		/* pwm: eCAP2_PWM2 LED PWM - Ouput */
 		"P8.18",		/* gpio: LED_DIGIPOT_CS - Ouput */
 		"P8.12",		/* gpio: LED XLAT/LED_CONTROL_CS - Ouput */
 		"P8.10",		/* gpio: BLANK - Ouput */
@@ -160,8 +160,9 @@
 			
 		   
 		};
-	}
-	 from am3xx_pwm 
+	};
+	
+	/* from am3xx_pwm */ 
 	fragment@1 {
 	    target = <&epwmss0>;
 	    __overlay__ {

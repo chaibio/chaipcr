@@ -6,6 +6,7 @@
 #include "spi.h"
 #include "gpio.h"
 
+class ADCController;
 class HeatBlock;
 class HeatSink;
 class Optics;
@@ -36,9 +37,10 @@ private:
 	
 	//components
 	static QPCRCycler* qpcrCycler_;
+	ADCController* adcController_;
 	HeatBlock* heatBlock_;
-	HeatSink *heatSink_;
-	Optics *optics_;
+	HeatSink* heatSink_;
+	Optics* optics_;
 };
 
 #endif

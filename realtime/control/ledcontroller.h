@@ -5,8 +5,8 @@
 // Class LEDController
 class LEDController {
 public:
-	LEDController(int dutyCyclePercentage);
-	virtual ~LEDControlelr();
+	LEDController(float dutyCyclePercentage);
+	virtual ~LEDController();
 	
 	void initialize() throw();
 	void setIntensity(double onCurrent) throw();
