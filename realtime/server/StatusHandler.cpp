@@ -1,11 +1,14 @@
 #include "pcrincludes.h"
 #include "StatusHandler.h"
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
 #include "qpcrcycler.h"
 #include "optics.h"
 
 using namespace Poco::Net;
-
+using namespace boost::property_tree;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class StatusHandler
@@ -13,11 +16,10 @@ void StatusHandler::handleRequest(HTTPServerRequest &request, HTTPServerResponse
     response.setStatus(HTTPResponse::HTTP_OK);
     response.setContentType("text/html");
 
+    ptree pt;
+    pt.put("lid_open", QPCRCycler::instance()->optics().lidOpen());
+
     std::ostream& out = response.send();
-    out << "<h1>Hello new world!</h1>"
-        << "<p>Host: "   << request.getHost()   << "</p>"
-        << "<p>Method: " << request.getMethod() << "</p>"
-        << "<p>URI: "    << request.getURI()    << "</p>"
-		<< "<p>Lid open: " << QPCRCycler::instance()->optics().lidOpen() << "</p";
+    write_json(out, pt, false);
     out.flush();
 }

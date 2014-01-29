@@ -30,6 +30,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/chaipcr/util}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/chaipcr/server}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/chaipcr/libraries/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${BOOST_ROOT}/boost&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.optimization.flags.1935734649" name="Other optimization flags" superClass="gnu.cpp.compiler.option.optimization.flags" value="-std=c++11" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1715688815" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
