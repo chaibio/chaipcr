@@ -19,10 +19,15 @@ void LTC2444::setup(char mode, bool TWOx){
 	if(TWOx){
 		x2=1;
 	}
-	if ((mode>0 && mode <=9) || mode==0xff){
+	if (mode>0 && mode <=9){
 		//format so to match table 5(Speed/Resolution Selection of LTC2444 datasheet
 		//format: OSR3_OSR2_OSR1_OSR0_TWOx
 		OSRTWOx =  ((mode&0x0f)<<1) | x2;
+	}
+	else if (mode==10){
+			//format so to match table 5(Speed/Resolution Selection of LTC2444 datasheet
+			//format: OSR3_OSR2_OSR1_OSR0_TWOx
+			OSRTWOx =  (0x0f<<1) | x2;
 	}
 }
 

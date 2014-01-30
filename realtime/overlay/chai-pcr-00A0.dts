@@ -254,7 +254,7 @@
 			    pwms            = <&ehrpwm2 2 500000 1>;
 			    pwm-names       = "PWM_P9_42";
 			pinctrl-names       = "default";
-			pinctrl-0   = <&led_pwm_pin>;
+			pinctrl-0   = <&fan_pwm_pin>;
 			    enabled         = <1>;
 			    duty            = <0>;
 			    status          = "okay";
@@ -265,7 +265,7 @@
 			    pwms            = <&ehrpwm2 2 500000 1>;
 			    pwm-names       = "PWM_P9_16";
 			pinctrl-names       = "default";
-			pinctrl-0   = <&led_pwm_pin>;
+			pinctrl-0   = <&lid_heater_pwm_pin>;
 			    enabled         = <1>;
 			    duty            = <0>;
 			    status          = "okay";
@@ -301,7 +301,7 @@
 	
 	/* SPI1 */
 	fragment@10 {
-		target = <&spi0>;
+		target = <&spi1>;
 		__overlay__ {
 			#address-cells = <1>;
 			#size-cells = <0>;

@@ -14,7 +14,7 @@ public:
 	/*Setup the speed and resolution
 	 * mode:
 	 * 0 -> No changes from previous setting
-	 * 1 -> OSR = 0001dd
+	 * 1 -> OSR = 0001
 	 * 2 -> OSR = 0010
 	 * ...
 	 * 9 -> OSR = 1001
