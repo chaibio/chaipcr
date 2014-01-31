@@ -1,7 +1,7 @@
 #ifndef _LEDCONTROLLER_H_
 #define _LEDCONTROLLER_H_
 
-#import "pwm.h"
+#include "pwm.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class LEDController

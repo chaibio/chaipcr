@@ -220,8 +220,8 @@
 			    compatible      = "pwm_test";
 			    pwms            = <&ehrpwm2 1 500000 1>;
 			    pwm-names       = "PWM_P8_13";
-			pinctrl-names       = "default";
-			pinctrl-0   = <&peltier1_pwm_pin>;
+			    pinctrl-names   = "default";
+			    pinctrl-0       = <&peltier1_pwm_pin>;
 			    enabled         = <1>;
 			    duty            = <0>;
 			    status          = "okay";
@@ -229,10 +229,10 @@
 
 			peltier2_pwm {
 			    compatible      = "pwm_test";
-			    pwms            = <&ehrpwm2 2 500000 1>;
+			    pwms            = <&ehrpwm2 0 500000 1>;
 			    pwm-names       = "PWM_P8_19";
-			pinctrl-names       = "default";
-			pinctrl-0   = <&peltier2_pwm_pin>;
+			    pinctrl-names   = "default";
+			    pinctrl-0       = <&peltier2_pwm_pin>;
 			    enabled         = <1>;
 			    duty            = <0>;
 			    status          = "okay";
@@ -240,10 +240,10 @@
 		
 			led_pwm {
 			    compatible      = "pwm_test";
-			    pwms            = <&ehrpwm2 2 500000 1>;
+			    pwms 	    = <&ecap2 0 500000 1>;
 			    pwm-names       = "PWM_P9_28";
-			pinctrl-names       = "default";
-			pinctrl-0   = <&led_pwm_pin>;
+			    pinctrl-names   = "default";
+			    pinctrl-0       = <&led_pwm_pin>;
 			    enabled         = <1>;
 			    duty            = <0>;
 			    status          = "okay";
@@ -251,10 +251,10 @@
 
 			fan_pwm {
 			    compatible      = "pwm_test";
-			    pwms            = <&ehrpwm2 2 500000 1>;
+			    pwms 	    = <&ecap0 0 500000 1>;
 			    pwm-names       = "PWM_P9_42";
-			pinctrl-names       = "default";
-			pinctrl-0   = <&fan_pwm_pin>;
+			    pinctrl-names   = "default";
+			    pinctrl-0       = <&fan_pwm_pin>;
 			    enabled         = <1>;
 			    duty            = <0>;
 			    status          = "okay";
@@ -262,10 +262,10 @@
 
 			lid_heater_pwm {
 			    compatible      = "pwm_test";
-			    pwms            = <&ehrpwm2 2 500000 1>;
+			    pwms            = <&ehrpwm1 1 500000 1>;
 			    pwm-names       = "PWM_P9_16";
-			pinctrl-names       = "default";
-			pinctrl-0   = <&lid_heater_pwm_pin>;
+			    pinctrl-names   = "default";
+			    pinctrl-0       = <&lid_heater_pwm_pin>;
 			    enabled         = <1>;
 			    duty            = <0>;
 			    status          = "okay";

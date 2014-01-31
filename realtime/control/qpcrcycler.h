@@ -31,16 +31,18 @@ public:
 	virtual void run();
 	
 private:
-	//ports
-	SPIPort spiPort0_;
-	GPIO spiPort0DataInSensePin_;
 	
+
 	//components
 	static QPCRCycler* qpcrCycler_;
 	ADCController* adcController_;
 	HeatBlock* heatBlock_;
 	HeatSink* heatSink_;
 	Optics* optics_;
+
+	//ports
+		SPIPort spiPort0_;
+		GPIO spiPort0DataInSensePin_;
 };
 
 #endif

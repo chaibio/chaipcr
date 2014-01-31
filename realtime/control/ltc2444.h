@@ -50,8 +50,8 @@ public:
 
 private:
 	GPIO csPin_;
-	GPIO busyPin_;
 	SPIPort& spiPort_;
+	GPIO busyPin_;
 	uint8_t OSRTWOx;
 };
 

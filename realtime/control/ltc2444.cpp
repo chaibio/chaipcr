@@ -53,8 +53,10 @@ uint32_t LTC2444::readADC(uint8_t ch, bool SGL) {
 	//read conversion value and write the settings for the nex conversion via SPI.
 	uint32_t conversion;
 	//convert data to big endian
+
 	data = (data & 0xFF000000) >> 24 | (data & 0x00FF0000) >> 8 | (data & 0x0000FF00)<<8 | (data & 0x000000FF) << 24;
 	spiPort_.readBytes((char*)&conversion, (char*)&data, 4, 1000000);
+	std::cout << "Command sent to LTC2444: " << data << std::endl;
 	
 	// convert to little endian and get only ADC result (bit28 down to bit 5)
 	conversion = ((conversion & 0xFF000000) >> 24 | (conversion & 0x00FF0000) >> 8 | (conversion & 0x0000FF00)<<8 | (conversion & 0x000000FF) << 24)&0x3FFFFFE0;
@@ -78,7 +80,7 @@ uint32_t LTC2444::repeat() {
 	//convert data to big endian
 	data = (data & 0xFF000000) >> 24 | (data & 0x00FF0000) >> 8 | (data & 0x0000FF00)<<8 | (data & 0x000000FF) << 24;
 	spiPort_.readBytes((char*)&conversion, (char*)&data, 4, 1000000);
-
+	std::cout << "Command sent to LTC2444: " << data << std::endl;
 	// convert to little endian and get only ADC result (bit28 down to bit 5)
 	conversion = ((conversion & 0xFF000000) >> 24 | (conversion & 0x00FF0000) >> 8 | (conversion & 0x0000FF00)<<8 | (conversion & 0x000000FF) << 24)&0x3FFFFFE0;
 
