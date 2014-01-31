@@ -12,9 +12,8 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
 	vector<string> pathSegments;
 /*	request.getURI().getPathSegments(pathSegments);
 	
-	if (pathSegments[0] == "status")
+	if (pathSegments[0] == "status")*/
 		return new StatusHandler();
-	else*/
-//		return nullptr;
-	return new StatusHandler();
+	//else
+		//return nullptr;
 }

@@ -3,7 +3,7 @@
 
 #include <string>
 
-//devices
+//SPI devices
 extern const std::string kSPI0DevicePath;
 extern const std::string kSPI1DevicePath;
 
@@ -21,6 +21,8 @@ static const int kLidSensePinNumber = 61;
 extern const std::string kHeatSinkFanControlPWMPath;
 static const int kHeatSinkFanTachADCPinNumber = 0;
 
+//LED control
+extern const std::string kLEDGrayscaleClockPWMPath;
 
 
 #endif

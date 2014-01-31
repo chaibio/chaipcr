@@ -17,7 +17,7 @@ void StatusHandler::handleRequest(HTTPServerRequest &request, HTTPServerResponse
     response.setContentType("text/html");
 
     ptree pt;
-    pt.put("lid_open", QPCRCycler::instance()->optics().lidOpen());
+    pt.put("lidOpen", QPCRCycler::instance()->optics().lidOpen());
 
     std::ostream& out = response.send();
     write_json(out, pt, false);

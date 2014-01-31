@@ -5,23 +5,21 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class LEDController
-LEDController::LEDController(float dutyCyclePercentage):
-	dutyCyclePercentage_ {dutyCyclePercentage} {
+LEDController::LEDController(float dutyCyclePercentage) throw():
+	dutyCyclePercentage_ {dutyCyclePercentage},
+	grayscaleClock_(kLEDGrayscaleClockPWMPath) {
 	
-	setIntensity(minLEDCurrent);
+	setIntensity(kMinLEDCurrent);
+	grayscaleClock_.setPWM(kGrayscaleClockPwmDutyNs, kGrayscaleClockPwmPeriodNs, 0);
 }
 
 LEDController::~LEDController() {
 	
 }
 	
-void LEDController::initialize() throw() {
-	
-}
-
 void LEDController::setIntensity(double onCurrent) throw() {
 	//verify current
-	if (onCurrent < minLEDCurrent)
+	if (onCurrent < kMinLEDCurrent)
 		throw InvalidArgument("onCurrent too low");
 	double avgCurrent = onCurrent * dutyCyclePercentage_ / 100;
 	if (avgCurrent > 30 || onCurrent > 100)

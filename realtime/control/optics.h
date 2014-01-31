@@ -4,6 +4,8 @@
 #include "pwm.h"
 #include "gpio.h"
 
+class LEDController;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Class Optics
 class Optics {
@@ -19,6 +21,7 @@ public:
 private:
 	bool lidOpen_;
 	GPIO lidSensePin_;
+	LEDController *ledController_;
 };
 
 #endif
