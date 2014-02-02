@@ -7,13 +7,13 @@
 // Class Thermistor
 Thermistor::Thermistor(unsigned int voltageDividerResistance, unsigned int adcBits,
 		double a, double b, double c, double d) throw():
-	temperature_ {0},
-	maxADCValue_ (1 << (adcBits - 1) - 1),
-	voltageDividerResistance_ {voltageDividerResistance},
+    temperature_ {0},
 	a_ {a},
 	b_ {b},
 	c_ {c},
-	d_ {d} {
+    d_ {d},
+    maxADCValue_ (1 << (adcBits - 1) - 1),
+    voltageDividerResistance_ {voltageDividerResistance} {
 }
 
 Thermistor::~Thermistor() {

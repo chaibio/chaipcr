@@ -34,7 +34,7 @@ void LEDController::setIntensity(double onCurrent) throw() {
 	
 }
 
-void LEDController::activateLED(unsigned int ledNumber) throw() {
+void LEDController::activateLED(unsigned int) throw() {
 	
 }
 

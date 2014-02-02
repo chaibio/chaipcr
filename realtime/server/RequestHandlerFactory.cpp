@@ -8,7 +8,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class QPCRRequestHandlerFactory
-HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPServerRequest &request) {
+HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPServerRequest &) {
 	vector<string> pathSegments;
 /*	request.getURI().getPathSegments(pathSegments);
 	

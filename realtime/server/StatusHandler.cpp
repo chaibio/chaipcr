@@ -12,7 +12,7 @@ using namespace boost::property_tree;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class StatusHandler
-void StatusHandler::handleRequest(HTTPServerRequest &request, HTTPServerResponse &response) {
+void StatusHandler::handleRequest(HTTPServerRequest &, HTTPServerResponse &response) {
     response.setStatus(HTTPResponse::HTTP_OK);
     response.setContentType("text/html");
 

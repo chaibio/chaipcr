@@ -33,7 +33,7 @@ void LTC2444::setup(char mode, bool TWOx){
 
 uint32_t LTC2444::readADC(uint8_t ch, bool SGL) {
 	//0xA000000 the first 3 bits here represents 101, based on the datasheet.
-	uint32_t data=0xA0000000,tmp=ch;
+    uint32_t data=0xA0000000;
 	if (SGL){
 		//SGL=1 , ODD = ch&0x01, A2A1A0=(ch&0x0110>1) 0r SGL_ODD_A
 		data |= 1<<28 |(ch&0x01)<<27  |(ch&0x110)<<23;

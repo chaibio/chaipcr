@@ -20,7 +20,7 @@ public:
 	static QPCRCycler* instance();
 	
 	//port accessors
-	inline SPIPort& spiPort0() { return spiPort0_; };
+    inline SPIPort& spiPort0() { return spiPort0_; }
 	inline GPIO& spiPort0DataInSensePin() { return spiPort0DataInSensePin_; }
 	
 	//component accessors

@@ -11,12 +11,12 @@ using namespace Poco::Util;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class QPCRServer
-void QPCRServer::initialize(Application& self) {
+void QPCRServer::initialize(Application&) {
 	QPCRCycler* qpcrCycler = QPCRCycler::instance();
 	qpcrCycler->init();
 }
 
-int QPCRServer::main(const vector<string>& args) {
+int QPCRServer::main(const vector<string>&) {
 	//start cycler
 	Poco::Thread cyclerThread;
 	cyclerThread.start(*QPCRCycler::instance());
