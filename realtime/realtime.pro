@@ -5,7 +5,6 @@ INCLUDEPATH += ./control/
 INCLUDEPATH += ./server/
 INCLUDEPATH += ./util/
 INCLUDEPATH += ./libraries/include/
-INCLUDEPATH += $(BOOST_INCLUDE_PATH)
 
 LIBS += -L../realtime/libraries/lib/
 
@@ -19,12 +18,24 @@ LIBS += -lPocoXML
 LIBS += -lgtest
 LIBS += -lgmock
 
-unix: {
+unix:!unix_m {
     QMAKE_CC = arm-linux-gnueabihf-gcc
     QMAKE_CXX = arm-linux-gnueabihf-g++
     QMAKE_LINK = arm-linux-gnueabihf-g++
     QMAKE_CXXFLAGS -= -m64
     QMAKE_LFLAGS -= -m64
+
+    INCLUDEPATH += $(BOOST_INCLUDE_PATH)
+}
+
+unix_m: {
+    QMAKE_CC = arm-unknown-linux-gnueabi-gcc
+    QMAKE_CXX = arm-unknown-linux-gnueabi-g++
+    QMAKE_LINK = arm-unknown-linux-gnueabi-g++
+
+    QMAKE_CXXFLAGS += -mfloat-abi=soft
+
+    INCLUDEPATH += /opt/local/include/
 }
 
 QMAKE_CXXFLAGS += -std=c++11
