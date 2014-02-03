@@ -3,13 +3,12 @@
 
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
 
-using namespace Poco::Net;
-
 ////////////////////////////////////////////////////////////////////////////////
 // Class QPCRRequestHandlerFactory
-class QPCRRequestHandlerFactory: public HTTPRequestHandlerFactory {
+class QPCRRequestHandlerFactory: public Poco::Net::HTTPRequestHandlerFactory
+{
 public:
-	virtual HTTPRequestHandler* createRequestHandler(const HTTPServerRequest &request);
+    virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest &request);
 };
 
 #endif
