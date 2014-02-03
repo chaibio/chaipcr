@@ -33,7 +33,7 @@ unix_m: {
     QMAKE_CXX = arm-unknown-linux-gnueabi-g++
     QMAKE_LINK = arm-unknown-linux-gnueabi-g++
 
-    QMAKE_CXXFLAGS += -mfloat-abi=soft
+    QMAKE_CXXFLAGS += -mfloat-abi=hard -Wno-unused-local-typedefs
 
     INCLUDEPATH += /opt/local/include/
 }
