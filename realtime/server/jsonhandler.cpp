@@ -9,34 +9,62 @@ using namespace std;
 
 void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
+    istream &requestStream = request.stream();
+    ptree requestPt, responsePt;
+
     try
     {
-        istream &requestStream = request.stream();
-        ptree requestPt;
-
         read_json(requestStream, requestPt);
-
-        ptree responsePt;
-        createData(requestPt, responsePt);
-
-        if (getStatus() == HTTPResponse::HTTP_OK)
-        {
-            ostream &responseStream = response.send();
-            write_json(responseStream, responsePt, false);
-            responseStream.flush();
-
-            response.setContentType("text/html");
-        }
-    }
-    catch (json_parser_error &ex)
-    {
-        cout << "Reading JSON from request failed: " << ex.what() << '\n';
-
-        setStatus(HTTPResponse::HTTP_BAD_REQUEST);
     }
     catch (exception &ex)
     {
-        cout << "Error occured: " << ex.what() << '\n';
+        cout << "Failed to parse JSON: " << ex.what() << '\n';
+
+        setStatus(HTTPResponse::HTTP_BAD_REQUEST);
+        setErrorString(ex.what());
+
+        JSONHandler::createData(requestPt, responsePt);
+    }
+
+    if (getStatus() == HTTPResponse::HTTP_OK)
+    {
+        try
+        {
+            createData(requestPt, responsePt);
+        }
+        catch (json_parser_error &ex)
+        {
+            cout << "Failed to parse JSON: " << ex.what() << '\n';
+
+            setStatus(HTTPResponse::HTTP_BAD_REQUEST);
+            setErrorString(ex.what());
+
+            responsePt.clear();
+            JSONHandler::createData(requestPt, responsePt);
+        }
+        catch (exception &ex)
+        {
+            cout << "Error occured: " << ex.what() << '\n';
+
+            setStatus(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            setErrorString(ex.what());
+
+            responsePt.clear();
+            JSONHandler::createData(requestPt, responsePt);
+        }
+    }
+
+    try
+    {
+        ostream &responseStream = response.send();
+        write_json(responseStream, responsePt, false);
+        responseStream.flush();
+
+        response.setContentType("text/html");
+    }
+    catch (exception &ex)
+    {
+        cout << "Failed to write JSON: " << ex.what() << '\n';
 
         setStatus(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
@@ -47,7 +75,10 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
 void JSONHandler::createData(const ptree &, ptree &responsePt)
 {
     if (getStatus() == HTTPResponse::HTTP_OK)
+        responsePt.put("status.status", true);
+    else
     {
-        responsePt.put("status", true);
+        responsePt.put("status.status", false);
+        responsePt.put("status.error", getErrorString());
     }
 }
