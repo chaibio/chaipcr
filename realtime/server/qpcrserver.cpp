@@ -19,7 +19,7 @@ void QPCRServer::initialize(Application&) {
 int QPCRServer::main(const vector<string>&) {
 	//start cycler
 	Poco::Thread cyclerThread;
-	cyclerThread.start(*QPCRCycler::instance());
+    cyclerThread.start(*QPCRCycler::instance());
 
 	HTTPServer server(new QPCRRequestHandlerFactory, ServerSocket(kHttpServerPort), new HTTPServerParams);
 

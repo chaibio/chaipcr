@@ -9,7 +9,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 // Class QPCRRequestHandlerFactory
 HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPServerRequest &) {
-	vector<string> pathSegments;
 /*	request.getURI().getPathSegments(pathSegments);
 	
 	if (pathSegments[0] == "status")*/
