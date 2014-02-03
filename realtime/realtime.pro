@@ -19,11 +19,9 @@ LIBS += -lgtest
 LIBS += -lgmock
 
 unix:!unix_m {
-    QMAKE_CC = arm-linux-gnueabihf-gcc
-    QMAKE_CXX = arm-linux-gnueabihf-g++
-    QMAKE_LINK = arm-linux-gnueabihf-g++
-    QMAKE_CXXFLAGS -= -m64
-    QMAKE_LFLAGS -= -m64
+    QMAKE_CC = arm-linux-gnueabi-gcc
+    QMAKE_CXX = arm-linux-gnueabi-g++
+    QMAKE_LINK = arm-linux-gnueabi-g++
 
     INCLUDEPATH += $(BOOST_INCLUDE_PATH)
 }

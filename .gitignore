@@ -1,8 +1,6 @@
 *.pro.user
 debug
 release
-ProxyClientLSP/debug
-ProxyClientLSP/release
 Makefile
 Makefile.*
 *.Debug
@@ -20,7 +18,6 @@ Makefile.*
 cache
 *.pdb
 *build-*
-Installer/iZoneCloud.zip
 *.sys
 *.pdb
 *.inf
@@ -31,3 +28,4 @@ Installer/iZoneCloud.zip
 *.obj
 *.log
 *.tlog
+Debug
