@@ -3,7 +3,7 @@
 
 #include <Poco/Thread.h>
 #include <Poco/Net/HTTPServer.h>
-#include "RequestHandlerFactory.h"
+#include "qpcrrequesthandlerfactory.h"
 #include "qpcrcycler.h"
 
 using namespace Poco::Net;

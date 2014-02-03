@@ -54,12 +54,14 @@ HEADERS += \
     control/heatblock.h \
     control/fan.h \
     control/adccontroller.h \
-    server/StatusHandler.h \
-    server/RequestHandlerFactory.h \
     server/qpcrserver.h \
     util/spi.h \
     util/pwm.h \
-    util/gpio.h
+    util/gpio.h \
+    server/qpcrrequesthandlerfactory.h \
+    server/jsonhandler.h \
+    server/statushandler.h \
+    server/testcontrolhandler.h
 
 SOURCES += \
     app/pins.cpp \
@@ -75,9 +77,11 @@ SOURCES += \
     control/heatblock.cpp \
     control/fan.cpp \
     control/adccontroller.cpp \
-    server/StatusHandler.cpp \
-    server/RequestHandlerFactory.cpp \
     server/qpcrserver.cpp \
     util/spi.cpp \
     util/pwm.cpp \
-    util/gpio.cpp
+    util/gpio.cpp \
+    server/qpcrrequesthandlerfactory.cpp \
+    server/jsonhandler.cpp \
+    server/statushandler.cpp \
+    server/testcontrolhandler.cpp
