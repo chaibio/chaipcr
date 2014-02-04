@@ -15,12 +15,16 @@ public:
 
     void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response);
 
+    inline Poco::Net::HTTPResponse::HTTPStatus getStatus() const {return status;}
+    inline std::string getErrorString() const {return errorString;}
+
 protected:
     inline void setStatus(Poco::Net::HTTPResponse::HTTPStatus status) {this->status = status;}
-    inline Poco::Net::HTTPResponse::HTTPStatus getStatus() const {return status;}
+    inline void setErrorString(const std::string &errorString) {this->errorString = errorString;}
 
 private:
     Poco::Net::HTTPResponse::HTTPStatus status;
+    std::string errorString;
 };
 	
 #endif
