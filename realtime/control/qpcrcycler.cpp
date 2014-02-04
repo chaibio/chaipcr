@@ -24,6 +24,8 @@ QPCRCycler::~QPCRCycler() {
 	delete heatBlock_;
 	delete heatSink_;
 	delete adcController_;
+
+    qpcrCycler_ = nullptr;
 }
 
 QPCRCycler* QPCRCycler::instance() {
