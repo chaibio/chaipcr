@@ -2,6 +2,7 @@
 #include "qpcrrequesthandlerfactory.h"
 
 #include "jsonhandler.h"
+#include "testcontrolhandler.h"
 
 #include <Poco/URI.h>
 
@@ -18,8 +19,16 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
 
     if (!requestPath.empty())
     {
-        if (requestPath.at(0) == "status")
-            return new JSONHandler();
+        if (request.getMethod() == "GET")
+        {
+            if (requestPath.at(0) == "status")
+                return new JSONHandler();
+        }
+        else if (request.getMethod() == "PUT")
+        {
+            if (requestPath.at(0) == "testControl")
+                return new TestControlHandler();
+        }
     }
 
     return new StatusHandler(HTTPResponse::HTTP_NOT_FOUND);

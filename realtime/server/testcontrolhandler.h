@@ -6,7 +6,7 @@
 class TestControlHandler : public JSONHandler
 {
 protected:
-    void createData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt);
+    void createData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt) throw();
 };
 
 #endif // TESTCONTROLHANDLER_H

@@ -15,43 +15,27 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
     try
     {
         read_json(requestStream, requestPt);
+        createData(requestPt, responsePt);
     }
-    catch (exception &ex)
+    catch (json_parser_error &ex)
     {
         cout << "Failed to parse JSON: " << ex.what() << '\n';
 
         setStatus(HTTPResponse::HTTP_BAD_REQUEST);
         setErrorString(ex.what());
 
+        responsePt.clear();
         JSONHandler::createData(requestPt, responsePt);
     }
-
-    if (getStatus() == HTTPResponse::HTTP_OK)
+    catch (exception &ex)
     {
-        try
-        {
-            createData(requestPt, responsePt);
-        }
-        catch (json_parser_error &ex)
-        {
-            cout << "Failed to parse JSON: " << ex.what() << '\n';
+        cout << "Error occured: " << ex.what() << '\n';
 
-            setStatus(HTTPResponse::HTTP_BAD_REQUEST);
-            setErrorString(ex.what());
+        setStatus(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        setErrorString(ex.what());
 
-            responsePt.clear();
-            JSONHandler::createData(requestPt, responsePt);
-        }
-        catch (exception &ex)
-        {
-            cout << "Error occured: " << ex.what() << '\n';
-
-            setStatus(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-            setErrorString(ex.what());
-
-            responsePt.clear();
-            JSONHandler::createData(requestPt, responsePt);
-        }
+        responsePt.clear();
+        JSONHandler::createData(requestPt, responsePt);
     }
 
     try
@@ -72,7 +56,7 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
     StatusHandler::handleRequest(request, response);
 }
 
-void JSONHandler::createData(const ptree &, ptree &responsePt)
+void JSONHandler::createData(const ptree &, ptree &responsePt) throw()
 {
     if (getStatus() == HTTPResponse::HTTP_OK)
         responsePt.put("status.status", true);
