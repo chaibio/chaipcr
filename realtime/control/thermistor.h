@@ -7,7 +7,7 @@
 class Thermistor {
 public:
 	Thermistor(unsigned int voltageDividerResistance, unsigned int adcBits,
-		double a, double b, double c, double d) throw();
+        double a, double b, double c, double d);
 	virtual ~Thermistor();
 	
 	//accessors

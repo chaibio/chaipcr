@@ -7,7 +7,7 @@
 // Class Fan
 class Fan {
 public:
-	Fan() throw();
+    Fan();
 	~Fan();
 	
 	//accessors
@@ -15,7 +15,7 @@ public:
 	inline void setTargetRPM(int targetRPM) { targetRPM_ = targetRPM; }
 	inline int currentRPM() { return currentRPM_; }
 	
-	void process() throw();
+    void process();
 	
 private:
 	int targetRPM_;

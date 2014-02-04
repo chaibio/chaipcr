@@ -15,18 +15,18 @@ public:
 		kHigh = 1
 	};
 	
-	GPIO(unsigned int pinNumber, Direction direction) throw();
+    GPIO(unsigned int pinNumber, Direction direction);
 	~GPIO();
 	
-	Value value() const throw();
-	void setValue(Value value) throw();
+    Value value() const;
+    void setValue(Value value);
 	
 	Direction direction() const { return direction_; }
-	void setDirection(Direction direction) throw();
+    void setDirection(Direction direction);
 	
 private:
-	void exportPin() throw();
-	void unexportPin() throw();
+    void exportPin();
+    void unexportPin();
 	
 private:
 	unsigned int pinNumber_; //BeagleBone GPIO Pin Number

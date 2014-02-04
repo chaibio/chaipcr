@@ -5,13 +5,13 @@
 // Class PWMPin
 class PWMPin {
 public:
-	PWMPin(const std::string& pwmDevicePath) throw();
+    PWMPin(const std::string& pwmDevicePath);
 	~PWMPin();
 	
-	void setPWM(unsigned long duty, unsigned long period, unsigned int polarity) throw();
+    void setPWM(unsigned long duty, unsigned long period, unsigned int polarity);
 
 private:
-	void writePWMFile(const std::string& relativePath, unsigned long value) throw();
+    void writePWMFile(const std::string& relativePath, unsigned long value);
 
 private:
 	const std::string& pwmDevicePath_;

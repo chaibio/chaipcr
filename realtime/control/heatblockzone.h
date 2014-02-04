@@ -7,14 +7,14 @@
 // Class HeatBlockZoneController
 class HeatBlockZoneController {
 public:
-	HeatBlockZoneController() throw();
+    HeatBlockZoneController();
 	virtual ~HeatBlockZoneController();
 	
 	inline double currentTemp() { return zoneThermistor_.temperature(); }
 	inline double targetTemp() { return targetTemp_; }
 	void setTargetTemp(double targetTemp);
 	
-	void process() throw();
+    void process();
 
 private:
 	//components

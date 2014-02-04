@@ -5,7 +5,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class LEDController
-LEDController::LEDController(float dutyCyclePercentage) throw():
+LEDController::LEDController(float dutyCyclePercentage) :
 	dutyCyclePercentage_ {dutyCyclePercentage},
 	grayscaleClock_(kLEDGrayscaleClockPWMPath) {
 	
@@ -17,7 +17,7 @@ LEDController::~LEDController() {
 	
 }
 	
-void LEDController::setIntensity(double onCurrent) throw() {
+void LEDController::setIntensity(double onCurrent) {
 	//verify current
 	if (onCurrent < kMinLEDCurrent)
 		throw InvalidArgument("onCurrent too low");
@@ -34,11 +34,11 @@ void LEDController::setIntensity(double onCurrent) throw() {
 	
 }
 
-void LEDController::activateLED(unsigned int) throw() {
+void LEDController::activateLED(unsigned int) {
 	
 }
 
-void LEDController::disableLEDs() throw() {
+void LEDController::disableLEDs() {
 	
 }
 	

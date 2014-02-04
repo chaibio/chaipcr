@@ -5,7 +5,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class HeatBlock
-HeatBlock::HeatBlock() throw():
+HeatBlock::HeatBlock() :
 	zoneController_(nullptr) {
 	
 	zoneController_ = new HeatBlockZoneController;
@@ -15,6 +15,6 @@ HeatBlock::~HeatBlock() {
 	delete zoneController_;
 }
 
-void HeatBlock::process() throw() {
+void HeatBlock::process() {
 	zoneController_->process();
 }

@@ -8,13 +8,13 @@
 // Class HeatSink
 class HeatSink {
 public:
-	HeatSink() throw();
+    HeatSink();
 	~HeatSink();
 	
 	//accessors
 	inline double temperature() { return thermistor_.temperature(); }
 	
-	void process() throw();
+    void process();
 	
 private:
 	Fan fan_;

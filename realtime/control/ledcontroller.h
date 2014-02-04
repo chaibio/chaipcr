@@ -7,12 +7,12 @@
 // Class LEDController
 class LEDController {
 public:
-	LEDController(float dutyCyclePercentage) throw();
+    LEDController(float dutyCyclePercentage);
 	virtual ~LEDController();
 	
-	void setIntensity(double onCurrent) throw();
-	void activateLED(unsigned int ledNumber) throw();
-	void disableLEDs() throw();
+    void setIntensity(double onCurrent);
+    void activateLED(unsigned int ledNumber);
+    void disableLEDs();
 	
 private:
 	float dutyCyclePercentage_;

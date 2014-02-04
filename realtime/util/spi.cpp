@@ -12,7 +12,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class SPIPort
-SPIPort::SPIPort(const string& spiDevicePath) throw():
+SPIPort::SPIPort(const string& spiDevicePath) :
 	spiDevicePath_(spiDevicePath),
 	deviceFile_(0) {
 
@@ -26,12 +26,12 @@ SPIPort::~SPIPort() {
 		close(deviceFile_);
 }
 
-void SPIPort::setMode(uint8_t mode) throw() {
+void SPIPort::setMode(uint8_t mode) {
 	if (ioctl(deviceFile_, SPI_IOC_WR_MODE, &mode) < 0)
 		throw SPIError("Unable to change SPI mode", errno);
 }
 
-void SPIPort::readBytes(char* rxbuffer, char* txbuffer, unsigned int length, unsigned int speedHz) throw() {
+void SPIPort::readBytes(char* rxbuffer, char* txbuffer, unsigned int length, unsigned int speedHz) {
 	//create transfer descriptor
 	struct spi_ioc_transfer spiTransfer;
 	spiTransfer.tx_buf = (__u64)&txbuffer;

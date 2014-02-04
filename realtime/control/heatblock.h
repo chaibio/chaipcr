@@ -7,10 +7,10 @@ class HeatBlockZoneController;
 // Class HeatBlock
 class HeatBlock {
 public:
-	HeatBlock() throw();
+    HeatBlock();
 	~HeatBlock();
 	
-	void process() throw();
+    void process();
 	
 private:
 	HeatBlockZoneController* zoneController_;

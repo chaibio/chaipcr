@@ -5,11 +5,11 @@
 // Class SPIPort
 class SPIPort {
 public:
-	SPIPort(const std::string& spiDevicePath) throw();
+    SPIPort(const std::string& spiDevicePath);
 	~SPIPort();
 	
-	void setMode(uint8_t mode) throw();
-	void readBytes(char* rxbuffer, char* txbuffer,unsigned int length, unsigned int speedHz) throw();
+    void setMode(uint8_t mode);
+    void readBytes(char* rxbuffer, char* txbuffer,unsigned int length, unsigned int speedHz);
 	
 private:
 	const std::string& spiDevicePath_;

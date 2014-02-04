@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Class Thermistor
 Thermistor::Thermistor(unsigned int voltageDividerResistance, unsigned int adcBits,
-		double a, double b, double c, double d) throw():
+        double a, double b, double c, double d) :
     temperature_ {0},
 	a_ {a},
 	b_ {b},

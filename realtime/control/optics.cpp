@@ -5,7 +5,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Optics
-Optics::Optics() throw():
+Optics::Optics() :
 	lidOpen_ {false},
 	lidSensePin_(kLidSensePinNumber, GPIO::kInput) {
 
@@ -16,7 +16,7 @@ Optics::~Optics() {
 	delete ledController_;
 }
 
-void Optics::process() throw() {
+void Optics::process() {
 	//read lid state
 	lidOpen_ = lidSensePin_.value();
 }

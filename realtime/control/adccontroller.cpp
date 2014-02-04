@@ -5,14 +5,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class ADCController
-ADCController::ADCController(unsigned int csPinNumber, SPIPort& spiPort, unsigned int busyPinNumber) throw():
+ADCController::ADCController(unsigned int csPinNumber, SPIPort& spiPort, unsigned int busyPinNumber) :
 	ltc2444_(csPinNumber, spiPort, busyPinNumber) {
 }
 
 ADCController::~ADCController() {
 }
 
-void ADCController::process() throw() {
+void ADCController::process() {
 	//read channel 1 as test
 	ltc2444_.setup(0x6, false);
 	ltc2444_.readADC(1, true);

@@ -3,7 +3,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Fan
-Fan::Fan() throw():
+Fan::Fan() :
 	targetRPM_ {0},
 	currentRPM_ {0},
 	pwmControl_(kHeatSinkFanControlPWMPath) {
@@ -12,7 +12,7 @@ Fan::Fan() throw():
 Fan::~Fan() {
 }
 
-void Fan::process() throw() {
+void Fan::process() {
 	//test
 	pwmControl_.setPWM(512, 1024, 0);
 }

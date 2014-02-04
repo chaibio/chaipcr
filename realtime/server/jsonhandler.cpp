@@ -56,7 +56,7 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
     StatusHandler::handleRequest(request, response);
 }
 
-void JSONHandler::createData(const ptree &, ptree &responsePt) throw()
+void JSONHandler::createData(const ptree &, ptree &responsePt)
 {
     if (getStatus() == HTTPResponse::HTTP_OK)
         responsePt.put("status.status", true);

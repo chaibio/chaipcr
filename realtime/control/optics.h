@@ -10,13 +10,13 @@ class LEDController;
 // Class Optics
 class Optics {
 public:
-	Optics() throw();
+    Optics();
 	virtual ~Optics();
 	
 	//accessors
 	bool lidOpen() { return lidOpen_; }
 	
-	void process() throw();
+    void process();
 	
 private:
 	bool lidOpen_;

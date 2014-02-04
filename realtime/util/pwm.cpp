@@ -7,21 +7,21 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class PWMPin
-PWMPin::PWMPin(const string& pwmDevicePath) throw():
+PWMPin::PWMPin(const string& pwmDevicePath) :
 	pwmDevicePath_ (pwmDevicePath) {
 }
 
 PWMPin::~PWMPin() {
 }
 
-void PWMPin::setPWM(unsigned long duty, unsigned long period, unsigned int polarity) throw() {
+void PWMPin::setPWM(unsigned long duty, unsigned long period, unsigned int polarity) {
 	//write values
 	writePWMFile("/duty", duty);
 	writePWMFile("/period", period);
 	writePWMFile("/polarity", polarity);
 }
 
-void PWMPin::writePWMFile(const string& relativePath, unsigned long value) throw() {
+void PWMPin::writePWMFile(const string& relativePath, unsigned long value) {
 	ostringstream filePath;
 	filePath << pwmDevicePath_ << relativePath;
 	ofstream file;

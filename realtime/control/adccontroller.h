@@ -7,10 +7,10 @@
 // Class ADCController
 class ADCController {
 public:
-	ADCController(unsigned int csPinNumber, SPIPort& spiPort, unsigned int busyPinNumber) throw();
+    ADCController(unsigned int csPinNumber, SPIPort& spiPort, unsigned int busyPinNumber);
 	~ADCController();
 	
-	void process() throw();
+    void process();
 	
 private:
 	LTC2444 ltc2444_;

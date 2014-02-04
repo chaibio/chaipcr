@@ -5,7 +5,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class HeatBlockZoneController
-HeatBlockZoneController::HeatBlockZoneController() throw():
+HeatBlockZoneController::HeatBlockZoneController() :
 	zoneThermistor_(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
 		kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
 		kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient) {
@@ -18,5 +18,5 @@ void HeatBlockZoneController::setTargetTemp(double) {
 	
 }
 
-void HeatBlockZoneController::process() throw() {
+void HeatBlockZoneController::process() {
 }
