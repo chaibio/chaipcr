@@ -13,6 +13,7 @@ public:
 	
 	//accessors
     inline double temperature() { return _thermistor->temperature(); }
+    inline boost::shared_ptr<Fan> getFan() { return _fan; }
 	
     void process();
 	

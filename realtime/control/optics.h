@@ -16,8 +16,9 @@ public:
 	
 	//accessors
     bool lidOpen() { return _lidOpen.load(); }
-	
     void process();
+
+    inline boost::shared_ptr<LEDController> getLedController() { return _ledController; }
 	
 private:
     boost::atomic<bool> _lidOpen;
