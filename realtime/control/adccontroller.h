@@ -3,9 +3,9 @@
 
 #include "ltc2444.h"
 
-////////////////////////////////////////////////////////////////////////////////
 // Class ADCController
-class ADCController {
+class ADCController : public IControl
+{
 public:
     ADCController(unsigned int csPinNumber, SPIPort& spiPort, unsigned int busyPinNumber);
 	~ADCController();

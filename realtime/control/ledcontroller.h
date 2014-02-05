@@ -3,9 +3,9 @@
 
 #include "pwm.h"
 
-////////////////////////////////////////////////////////////////////////////////
 // Class LEDController
-class LEDController {
+class LEDController
+{
 public:
     LEDController(float dutyCyclePercentage);
 	virtual ~LEDController();
@@ -17,7 +17,7 @@ public:
 private:
 	float dutyCyclePercentage_;
 	
-	//constants
+    //constants
 	const int kMinLEDCurrent = 5; //5mA
 	const int kGrayscaleClockPwmPeriodNs = 240;
 	const int kGrayscaleClockPwmDutyNs = 120;

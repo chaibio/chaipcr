@@ -45,7 +45,6 @@ HEADERS += \
     app/constants.h \
     app/chaistatus.h \
     control/thermistor.h \
-    control/qpcrcycler.h \
     control/optics.h \
     control/ltc2444.h \
     control/ledcontroller.h \
@@ -54,21 +53,23 @@ HEADERS += \
     control/heatblock.h \
     control/fan.h \
     control/adccontroller.h \
-    server/qpcrserver.h \
     util/spi.h \
     util/pwm.h \
     util/gpio.h \
     server/qpcrrequesthandlerfactory.h \
     server/jsonhandler.h \
     server/statushandler.h \
-    server/testcontrolhandler.h
+    server/testcontrolhandler.h \
+    util/instance.h \
+    control/icontrol.h \
+    control/maincontrollers.h \
+    server/qpcrapplication.h
 
 SOURCES += \
     app/pins.cpp \
     app/main.cpp \
     app/exceptions.cpp \
     control/thermistor.cpp \
-    control/qpcrcycler.cpp \
     control/optics.cpp \
     control/ltc2444.cpp \
     control/ledcontroller.cpp \
@@ -77,11 +78,11 @@ SOURCES += \
     control/heatblock.cpp \
     control/fan.cpp \
     control/adccontroller.cpp \
-    server/qpcrserver.cpp \
     util/spi.cpp \
     util/pwm.cpp \
     util/gpio.cpp \
     server/qpcrrequesthandlerfactory.cpp \
     server/jsonhandler.cpp \
     server/statushandler.cpp \
-    server/testcontrolhandler.cpp
+    server/testcontrolhandler.cpp \
+    server/qpcrapplication.cpp

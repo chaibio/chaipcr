@@ -1,10 +1,9 @@
 #ifndef _THERMISTOR_H_
 #define _THERMISTOR_H_
 
-
-////////////////////////////////////////////////////////////////////////////////
 // Class Thermistor
-class Thermistor {
+class Thermistor
+{
 public:
 	Thermistor(unsigned int voltageDividerResistance, unsigned int adcBits,
         double a, double b, double c, double d);

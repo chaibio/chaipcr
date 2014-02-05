@@ -3,9 +3,9 @@
 
 #include "pwm.h"
 
-////////////////////////////////////////////////////////////////////////////////
 // Class Fan
-class Fan {
+class Fan : public IControl
+{
 public:
     Fan();
 	~Fan();
@@ -16,7 +16,7 @@ public:
 	inline int currentRPM() { return currentRPM_; }
 	
     void process();
-	
+
 private:
 	int targetRPM_;
 	int currentRPM_;

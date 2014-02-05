@@ -4,9 +4,9 @@
 #include "fan.h"
 #include "thermistor.h"
 
-////////////////////////////////////////////////////////////////////////////////
 // Class HeatSink
-class HeatSink {
+class HeatSink : public IControl
+{
 public:
     HeatSink();
 	~HeatSink();

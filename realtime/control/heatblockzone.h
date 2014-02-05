@@ -3,9 +3,9 @@
 
 #include "thermistor.h"
 
-////////////////////////////////////////////////////////////////////////////////
 // Class HeatBlockZoneController
-class HeatBlockZoneController {
+class HeatBlockZoneController : public IControl
+{
 public:
     HeatBlockZoneController();
 	virtual ~HeatBlockZoneController();

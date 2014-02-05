@@ -3,9 +3,9 @@
 
 class HeatBlockZoneController;
 
-////////////////////////////////////////////////////////////////////////////////
 // Class HeatBlock
-class HeatBlock {
+class HeatBlock : public IControl
+{
 public:
     HeatBlock();
 	~HeatBlock();

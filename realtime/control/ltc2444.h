@@ -4,9 +4,9 @@
 #include "gpio.h"
 #include "spi.h"
 
-////////////////////////////////////////////////////////////////////////////////
 // Class LTC2444
-class LTC2444 {
+class LTC2444
+{
 public:
     LTC2444(unsigned int csPinNumber, SPIPort& spiPort, unsigned int busyPinNumber);
 	~LTC2444();

@@ -6,6 +6,8 @@
 #include "exceptions.h"
 #include "constants.h"
 
+#include "icontrol.h"
+
 const int kHttpServerPort = 8000;
 
 #endif

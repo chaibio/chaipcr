@@ -1,8 +1,8 @@
 #include "pcrincludes.h"
-#include "qpcrserver.h"
+#include "qpcrapplication.h"
 
 int main(int argc, char** argv) {
-	QPCRServer server;
+    QPCRApplication server;
 	return server.run(argc, argv);
 }
 

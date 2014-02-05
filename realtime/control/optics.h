@@ -8,7 +8,8 @@ class LEDController;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Optics
-class Optics {
+class Optics : public IControl
+{
 public:
     Optics();
 	virtual ~Optics();
