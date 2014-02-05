@@ -5,18 +5,19 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Optics
-Optics::Optics() :
-	lidOpen_ {false},
-	lidSensePin_(kLidSensePinNumber, GPIO::kInput) {
-
-	ledController_ = new LEDController(50);
+Optics::Optics()
+{
+    _lidOpen.store(false);
+    _lidSensePin = boost::make_shared<GPIO>(kLidSensePinNumber, GPIO::kInput);
+    _ledController = boost::make_shared<LEDController>(50);
 }
 
-Optics::~Optics() {
-	delete ledController_;
+Optics::~Optics()
+{
 }
 
-void Optics::process() {
+void Optics::process()
+{
 	//read lid state
-	lidOpen_ = lidSensePin_.value();
+    _lidOpen.store(_lidSensePin->value());
 }

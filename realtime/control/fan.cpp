@@ -3,16 +3,19 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Fan
-Fan::Fan() :
-    targetRPM_ {0},
-    currentRPM_ {0},
-    pwmControl_(kHeatSinkFanControlPWMPath) {
+Fan::Fan()
+{
+    _targetRPM.store(0);
+    _currentRPM.store(0);
+    _pwmControl = boost::make_shared<PWMPin>(kHeatSinkFanControlPWMPath);
 }
 
-Fan::~Fan() {
+Fan::~Fan()
+{
 }
 
-void Fan::process() {
+void Fan::process()
+{
 	//test
-    pwmControl_.setPWM(512, 1024, 0);
+    _pwmControl->setPWM(512, 1024, 0);
 }

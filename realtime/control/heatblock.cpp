@@ -5,16 +5,16 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class HeatBlock
-HeatBlock::HeatBlock() :
-	zoneController_(nullptr) {
-	
-	zoneController_ = new HeatBlockZoneController;
+HeatBlock::HeatBlock()
+{
+    zoneController_ = boost::make_shared<HeatBlockZoneController>();
 }
 
-HeatBlock::~HeatBlock() {
-	delete zoneController_;
+HeatBlock::~HeatBlock()
+{
 }
 
-void HeatBlock::process() {
+void HeatBlock::process()
+{
 	zoneController_->process();
 }

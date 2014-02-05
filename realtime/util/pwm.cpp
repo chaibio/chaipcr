@@ -14,7 +14,7 @@ PWMPin::PWMPin(const string& pwmDevicePath) :
 PWMPin::~PWMPin() {
 }
 
-void PWMPin::setPWM(unsigned long duty, unsigned long period, unsigned int polarity) {
+void PWMPin::setPWM(unsigned long duty, unsigned long period, unsigned int polarity) {  //should add some locks here
 	//write values
 	writePWMFile("/duty", duty);
 	writePWMFile("/period", period);

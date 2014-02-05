@@ -15,7 +15,7 @@ public:
     void disableLEDs();
 	
 private:
-	float dutyCyclePercentage_;
+    boost::atomic<float> _dutyCyclePercentage;
 	
     //constants
 	const int kMinLEDCurrent = 5; //5mA
@@ -23,7 +23,7 @@ private:
 	const int kGrayscaleClockPwmDutyNs = 120;
 	
 	//components
-	PWMPin grayscaleClock_;
+    boost::shared_ptr<PWMPin> _grayscaleClock;
 };
 
 #endif

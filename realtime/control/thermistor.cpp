@@ -7,13 +7,13 @@
 // Class Thermistor
 Thermistor::Thermistor(unsigned int voltageDividerResistance, unsigned int adcBits,
         double a, double b, double c, double d) :
-    temperature_ {0},
-	a_ {a},
-	b_ {b},
-	c_ {c},
-    d_ {d},
-    maxADCValue_ (1 << (adcBits - 1) - 1),
-    voltageDividerResistance_ {voltageDividerResistance} {
+    _temperature {0},
+    _a {a},
+    _b {b},
+    _c {c},
+    _d {d},
+    _maxADCValue (1 << (adcBits - 1) - 1),
+    _voltageDividerResistance {voltageDividerResistance} {
 }
 
 Thermistor::~Thermistor() {
@@ -25,11 +25,11 @@ void Thermistor::setResistance(double resistanceOhms) {
 	double lnRes3 = lnRes2 * lnRes;
 	
 	//steinhart-hart equation
-	double degreesK = 1 / (a_ + b_*lnRes + c_*lnRes2 + d_*lnRes3);
-	temperature_ = degreesK - 273.15;
+    double degreesK = 1 / (_a + _b*lnRes + _c*lnRes2 + _d*lnRes3);
+    _temperature.store(degreesK - 273.15);
 }
 
 void Thermistor::setADCValue(unsigned int adcValue) {
-	double resistance = static_cast<double>(adcValue * voltageDividerResistance_) / (maxADCValue_ - adcValue);
+    double resistance = static_cast<double>(adcValue * _voltageDividerResistance) / (_maxADCValue - adcValue);
 	setResistance(resistance);
 }

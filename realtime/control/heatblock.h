@@ -13,7 +13,7 @@ public:
     void process();
 	
 private:
-	HeatBlockZoneController* zoneController_;
+    boost::shared_ptr<HeatBlockZoneController> zoneController_;
 };
 
 #endif

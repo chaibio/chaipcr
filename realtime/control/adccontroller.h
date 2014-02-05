@@ -3,6 +3,8 @@
 
 #include "ltc2444.h"
 
+#include <boost/shared_ptr.hpp>
+
 // Class ADCController
 class ADCController : public IControl
 {
@@ -13,7 +15,7 @@ public:
     void process();
 	
 private:
-	LTC2444 ltc2444_;
+    boost::shared_ptr<LTC2444> _ltc2444;
 };
 
 #endif

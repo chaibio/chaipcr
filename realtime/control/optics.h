@@ -15,14 +15,14 @@ public:
 	virtual ~Optics();
 	
 	//accessors
-	bool lidOpen() { return lidOpen_; }
+    bool lidOpen() { return _lidOpen.load(); }
 	
     void process();
 	
 private:
-	bool lidOpen_;
-	GPIO lidSensePin_;
-	LEDController *ledController_;
+    boost::atomic<bool> _lidOpen;
+    boost::shared_ptr<GPIO> _lidSensePin;
+    boost::shared_ptr<LEDController> _ledController;
 };
 
 #endif

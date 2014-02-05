@@ -11,16 +11,18 @@ public:
 	~Fan();
 	
 	//accessors
-	inline int targetRPM() { return targetRPM_; }
-	inline void setTargetRPM(int targetRPM) { targetRPM_ = targetRPM; }
-	inline int currentRPM() { return currentRPM_; }
+    inline int targetRPM() { return _targetRPM.load(); }
+    inline void setTargetRPM(int targetRPM) { _targetRPM.store(targetRPM); }
+    inline int currentRPM() { return _currentRPM.load(); }
 	
     void process();
 
 private:
-	int targetRPM_;
-	int currentRPM_;
-	PWMPin pwmControl_;
+    boost::atomic<int> _targetRPM;
+    boost::atomic<int> _currentRPM;
+    boost::shared_ptr<PWMPin> _pwmControl;
+//    PWMPin _pwmControl;
 };
 
 #endif
+

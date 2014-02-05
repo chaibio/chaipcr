@@ -17,7 +17,7 @@ public:
         auto instance = _instance.lock();
         if(instance == nullptr)
         {
-            instance = boost::make_shared<T>(args...);
+            instance.reset(new T(args...)); //can not use = boost::make_shared<T>(args...); because memory will not realised
             _instance = instance;
         }
 

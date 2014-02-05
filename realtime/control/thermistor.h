@@ -10,7 +10,7 @@ public:
 	virtual ~Thermistor();
 	
 	//accessors
-	float temperature() { return temperature_; }
+    float temperature() { return _temperature.load(); }
 	
 private:
 	void setResistance(double resistanceOhms);
@@ -19,12 +19,12 @@ private:
 	void setADCValue(unsigned int adcValue);
 	
 private:
-	double temperature_;
-	const double a_, b_, c_, d_; //steinhart-hart coefficients
-	const unsigned int maxADCValue_;
-	const unsigned int voltageDividerResistance_;
+    boost::atomic<double> _temperature;
+    const double _a, _b, _c, _d; //steinhart-hart coefficients
+    const unsigned int _maxADCValue;
+    const unsigned int _voltageDividerResistance;
 	
-	friend class ADCController;
+//	friend class ADCController;
 };
 
 #endif

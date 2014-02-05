@@ -12,13 +12,13 @@ public:
 	~HeatSink();
 	
 	//accessors
-	inline double temperature() { return thermistor_.temperature(); }
+    inline double temperature() { return _thermistor->temperature(); }
 	
     void process();
 	
 private:
-	Fan fan_;
-	Thermistor thermistor_;
+    boost::shared_ptr<Fan> _fan;
+    boost::shared_ptr<Thermistor> _thermistor;
 };
 
 #endif

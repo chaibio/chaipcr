@@ -3,10 +3,6 @@
 
 #include "instance.h"
 
-//class ADCController;
-//class HeatBlock;
-//class HeatSink;
-//class Optics;
 #include "adccontroller.h"
 #include "heatblock.h"
 #include "heatsink.h"

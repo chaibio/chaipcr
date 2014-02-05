@@ -5,7 +5,7 @@
 #include "spi.h"
 
 // Class LTC2444
-class LTC2444
+class LTC2444  // will work with this class later
 {
 public:
     LTC2444(unsigned int csPinNumber, SPIPort& spiPort, unsigned int busyPinNumber);

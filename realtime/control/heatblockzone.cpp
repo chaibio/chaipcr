@@ -3,18 +3,14 @@
 
 
 // Class HeatBlockZoneController
-HeatBlockZoneController::HeatBlockZoneController() :
-	zoneThermistor_(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
-		kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
-        kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient)
+HeatBlockZoneController::HeatBlockZoneController()
 {
+    _zoneThermistor = boost::make_shared<Thermistor>(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
+                                                     kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
+                                                     kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient);
 }
 
 HeatBlockZoneController::~HeatBlockZoneController()
-{
-}
-
-void HeatBlockZoneController::setTargetTemp(double)
 {
 }
 

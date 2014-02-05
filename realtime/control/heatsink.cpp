@@ -3,15 +3,17 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class HeatSink
-HeatSink::HeatSink() :
-	thermistor_(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
-		kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
-		kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient) {
+HeatSink::HeatSink()
+{
+    _fan = boost::make_shared<Fan>();
+    _thermistor = boost::make_shared<Thermistor>(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
+                                                 kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
+                                                 kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient);
 }
 
 HeatSink::~HeatSink() {
 }
 
 void HeatSink::process() {
-	fan_.process();
+    _fan->process();
 }

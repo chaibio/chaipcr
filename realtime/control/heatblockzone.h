@@ -10,18 +10,18 @@ public:
     HeatBlockZoneController();
 	virtual ~HeatBlockZoneController();
 	
-	inline double currentTemp() { return zoneThermistor_.temperature(); }
-	inline double targetTemp() { return targetTemp_; }
-	void setTargetTemp(double targetTemp);
+    inline double currentTemp() { return _zoneThermistor->temperature(); }
+    inline double targetTemp() { return _targetTemp.load(); }
+    void setTargetTemp(double targetTemp) { _targetTemp.store(targetTemp); }
 	
     void process();
 
 private:
 	//components
-	Thermistor zoneThermistor_;
+    boost::shared_ptr<Thermistor> _zoneThermistor;
 	
 	//state
-	double targetTemp_;
+    boost::atomic<double> _targetTemp;
 };
 
 #endif

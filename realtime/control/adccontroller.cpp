@@ -5,20 +5,23 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class ADCController
-ADCController::ADCController(unsigned int csPinNumber, SPIPort& spiPort, unsigned int busyPinNumber) :
-	ltc2444_(csPinNumber, spiPort, busyPinNumber) {
+ADCController::ADCController(unsigned int csPinNumber, SPIPort& spiPort, unsigned int busyPinNumber)
+{
+    _ltc2444 = boost::make_shared<LTC2444>(csPinNumber, spiPort, busyPinNumber);
 }
 
-ADCController::~ADCController() {
+ADCController::~ADCController()
+{
 }
 
-void ADCController::process() {
+void ADCController::process()
+{
 	//read channel 1 as test
-	ltc2444_.setup(0x6, false);
-	ltc2444_.readADC(1, true);
-	while (ltc2444_.busy()) {
+    _ltc2444->setup(0x6, false);
+    _ltc2444->readADC(1, true);
+    while (_ltc2444->busy()) {
 		std::cout << "Waiting - busy" << std::endl;
 	}
-	uint32_t value = ltc2444_.readADC(1, true);
+    uint32_t value = _ltc2444->readADC(1, true);
 	std::cout << "Read value " << value << std::endl;
 }
