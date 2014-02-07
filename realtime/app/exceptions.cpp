@@ -1,8 +1,4 @@
 #include "pcrincludes.h"
-#include "exceptions.h"
-
-#include <string>
-#include <cstring>
 
 using namespace std;
 

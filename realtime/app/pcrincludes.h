@@ -1,17 +1,31 @@
 #ifndef _PCRINCLUDES_H_
 #define _PCRINCLUDES_H_
 
+//C headers
+#include <cstring>
+#include <cmath>
+#include <cassert>
+#include <cerrno>
+#include <cstdio>
+
+//C++ headers
+#include <string>
+#include <vector>
+#include <iostream>
+#include <memory>
+#include <atomic>
+#include <sstream>
+#include <fstream>
+
+//Linux headers
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/spi/spidev.h>
+
+#include "exceptions.h"
 #include "chaistatus.h"
 #include "pins.h"
-#include "exceptions.h"
 #include "constants.h"
-
-#include "icontrol.h"
-
-#include <boost/atomic/atomic.hpp>
-#include <boost/shared_ptr.hpp>
-#include "boost/make_shared.hpp"
-
-const int kHttpServerPort = 8000;
 
 #endif

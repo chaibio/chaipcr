@@ -1,8 +1,6 @@
 #ifndef _PINS_H_
 #define _PINS_H_
 
-#include <string>
-
 //SPI devices
 extern const std::string kSPI0DevicePath;
 extern const std::string kSPI1DevicePath;

@@ -1,5 +1,9 @@
 #include "pcrincludes.h"
+#include "utilincludes.h"
+
 #include "fan.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Fan
@@ -7,7 +11,7 @@ Fan::Fan()
 {
     _targetRPM.store(0);
     _currentRPM.store(0);
-    _pwmControl = boost::make_shared<PWMPin>(kHeatSinkFanControlPWMPath);
+    _pwmControl = make_shared<PWMPin>(kHeatSinkFanControlPWMPath);
 }
 
 Fan::~Fan()

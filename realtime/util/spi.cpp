@@ -1,12 +1,6 @@
 #include "pcrincludes.h"
-#include "spi.h"
 
-#include <cerrno>
-#include <cstdio>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <linux/spi/spidev.h>
+#include "spi.h"
 
 using namespace std;
 

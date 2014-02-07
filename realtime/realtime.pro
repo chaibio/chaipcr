@@ -19,11 +19,13 @@ LIBS += -lgtest
 LIBS += -lgmock
 
 unix:!unix_m {
-    QMAKE_CC = arm-linux-gnueabi-gcc
-    QMAKE_CXX = arm-linux-gnueabi-g++
-    QMAKE_LINK = arm-linux-gnueabi-g++
+    QMAKE_CC = arm-unknown-linux-gnueabi-gcc
+    QMAKE_CXX = arm-unknown-linux-gnueabi-g++
+    QMAKE_LINK = arm-unknown-linux-gnueabi-g++
 
     INCLUDEPATH += $(BOOST_INCLUDE_PATH)
+
+    QMAKE_CXXFLAGS += -Wno-unused-local-typedefs -Wno-unused-parameter
 }
 
 unix_m: {
@@ -63,7 +65,11 @@ HEADERS += \
     util/instance.h \
     control/icontrol.h \
     control/maincontrollers.h \
-    server/qpcrapplication.h
+    server/qpcrapplication.h \
+    app/boostincludes.h \
+    app/pocoincludes.h \
+    util/utilincludes.h \
+    control/controlincludes.h
 
 SOURCES += \
     app/pins.cpp \

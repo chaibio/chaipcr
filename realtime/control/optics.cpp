@@ -1,15 +1,18 @@
 #include "pcrincludes.h"
-#include "optics.h"
+#include "utilincludes.h"
 
 #include "ledcontroller.h"
+#include "optics.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Optics
 Optics::Optics()
 {
     _lidOpen.store(false);
-    _lidSensePin = boost::make_shared<GPIO>(kLidSensePinNumber, GPIO::kInput);
-    _ledController = boost::make_shared<LEDController>(50);
+    _lidSensePin = make_shared<GPIO>(kLidSensePinNumber, GPIO::kInput);
+    _ledController = make_shared<LEDController>(50);
 }
 
 Optics::~Optics()

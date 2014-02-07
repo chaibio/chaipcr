@@ -3,9 +3,6 @@
 
 #include "statushandler.h"
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-
 class JSONHandler : public StatusHandler
 {
 public:

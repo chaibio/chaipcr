@@ -11,4 +11,7 @@ const double kQTICurveZThermistorDCoefficient = 0.000000099063233;
 const unsigned int kThermistorVoltageDividerResistanceOhms = 6800;
 const int kLTC2444ADCBits = 24;
 
+//HTTP server port
+const int kHttpServerPort = 8000;
+
 #endif

@@ -1,12 +1,14 @@
+#include "pcrincludes.h"
+#include "boostincludes.h"
+#include "pocoincludes.h"
+#include "utilincludes.h"
+#include "controlincludes.h"
+
 #include "testcontrolhandler.h"
 
-#include "icontrol.h"
-#include "maincontrollers.h"
-#include "ledcontroller.h"
-
-using namespace Poco::Net;
-using namespace boost::property_tree;
 using namespace std;
+using namespace boost::property_tree;
+using namespace Poco::Net;
 
 void TestControlHandler::createData(const ptree &requestPt, ptree &)
 {
@@ -15,11 +17,15 @@ void TestControlHandler::createData(const ptree &requestPt, ptree &)
 
     if (ledIntensity != -1)
     {
-        OpticsInstance::getInstance()->getLedController()->setIntensity(50);
+        shared_ptr<Optics> instance = OpticsInstance::getInstance();
+        if (instance)
+            instance->getLedController()->setIntensity(50);
     }
 
     if (fanRPM != -1)
     {
-        HeatSinkInstace::getInstance()->getFan()->setTargetRPM(fanRPM);
+        shared_ptr<HeatSink> instance = HeatSinkInstace::getInstance();
+        if (instance)
+            instance->getFan()->setTargetRPM(fanRPM);
     }
 }

@@ -1,7 +1,8 @@
-#include "jsonhandler.h"
+#include "pcrincludes.h"
+#include "boostincludes.h"
+#include "pocoincludes.h"
 
-#include <iostream>
-#include <exception>
+#include "jsonhandler.h"
 
 using namespace Poco::Net;
 using namespace boost::property_tree;
@@ -40,11 +41,14 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
 
     try
     {
-        ostream &responseStream = response.send();
-        write_json(responseStream, responsePt, false);
-        responseStream.flush();
+        if (!responsePt.empty())
+        {
+            ostream &responseStream = response.send();
+            write_json(responseStream, responsePt, false);
+            responseStream.flush();
 
-        response.setContentType("text/html");
+            response.setContentType("text/html");
+        }
     }
     catch (exception &ex)
     {

@@ -1,8 +1,6 @@
 #ifndef _LEDCONTROLLER_H_
 #define _LEDCONTROLLER_H_
 
-#include "pwm.h"
-
 // Class LEDController
 class LEDController
 {
@@ -15,7 +13,7 @@ public:
     void disableLEDs();
 	
 private:
-    boost::atomic<float> _dutyCyclePercentage;
+    std::atomic<float> _dutyCyclePercentage;
 	
     //constants
 	const int kMinLEDCurrent = 5; //5mA
@@ -23,7 +21,7 @@ private:
 	const int kGrayscaleClockPwmDutyNs = 120;
 	
 	//components
-    boost::shared_ptr<PWMPin> _grayscaleClock;
+    std::shared_ptr<PWMPin> _grayscaleClock;
 };
 
 #endif

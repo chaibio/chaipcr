@@ -1,14 +1,16 @@
 #include "pcrincludes.h"
+#include "utilincludes.h"
+
 #include "ledcontroller.h"
 
-#include <iostream>
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class LEDController
 LEDController::LEDController(float dutyCyclePercentage)
 {
     _dutyCyclePercentage.store(dutyCyclePercentage);
-    _grayscaleClock = boost::make_shared<PWMPin>(kLEDGrayscaleClockPWMPath);
+    _grayscaleClock = make_shared<PWMPin>(kLEDGrayscaleClockPWMPath);
 	setIntensity(kMinLEDCurrent);
     _grayscaleClock->setPWM(kGrayscaleClockPwmDutyNs, kGrayscaleClockPwmPeriodNs, 0);
 }
@@ -30,7 +32,7 @@ void LEDController::setIntensity(double onCurrent)
 	//calculate 
 	double rIref = 1.24 / onCurrent * 31.5; //reference resistance for TLC5940
 	int rN = (rIref - 75) * 256 / 5000;
-	std::cout << "rN = " << rN << std::endl;	
+    cout << "rN = " << rN << endl;
 }
 
 void LEDController::activateLED(unsigned int)

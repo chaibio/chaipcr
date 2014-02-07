@@ -1,7 +1,7 @@
 #ifndef _FAN_H_
 #define _FAN_H_
 
-#include "pwm.h"
+#include "icontrol.h"
 
 // Class Fan
 class Fan : public IControl
@@ -18,9 +18,9 @@ public:
     void process();
 
 private:
-    boost::atomic<int> _targetRPM;
-    boost::atomic<int> _currentRPM;
-    boost::shared_ptr<PWMPin> _pwmControl;
+    std::atomic<int> _targetRPM;
+    std::atomic<int> _currentRPM;
+    std::shared_ptr<PWMPin> _pwmControl;
 //    PWMPin _pwmControl;
 };
 

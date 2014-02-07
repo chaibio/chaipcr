@@ -1,12 +1,12 @@
 #include "pcrincludes.h"
+#include "utilincludes.h"
+#include "pocoincludes.h"
+#include "controlincludes.h"
+
+#include "qpcrrequesthandlerfactory.h"
 #include "qpcrapplication.h"
 
-#include <Poco/Thread.h>
-#include <Poco/Net/HTTPServer.h>
-#include "qpcrrequesthandlerfactory.h"
-
-#include "maincontrollers.h"
-
+using namespace std;
 using namespace Poco::Net;
 using namespace Poco::Util;
 
@@ -16,12 +16,12 @@ void QPCRApplication::initialize(Application&)
     spiPort0_ = new SPIPort(kSPI0DevicePath);
     spiPort0DataInSensePin_ = new GPIO(kSPI0DataInSensePinNumber, GPIO::kInput);
 
-    controlUnits.push_back(boost::static_pointer_cast<IControl>(ADCControllerInstance::getInstance(
+    controlUnits.push_back(static_pointer_cast<IControl>(ADCControllerInstance::createInstance(
                                                                     kLTC2444CSPinNumber, this->spiPort0(), kSPI0DataInSensePinNumber
                                                                     )));
-    controlUnits.push_back(boost::static_pointer_cast<IControl>(HeatBlockInstance::getInstance()));
-    controlUnits.push_back(boost::static_pointer_cast<IControl>(HeatSinkInstace::getInstance()));
-    controlUnits.push_back(boost::static_pointer_cast<IControl>(OpticsInstance::getInstance()));
+    controlUnits.push_back(static_pointer_cast<IControl>(HeatBlockInstance::createInstance()));
+    controlUnits.push_back(static_pointer_cast<IControl>(HeatSinkInstace::createInstance()));
+    controlUnits.push_back(static_pointer_cast<IControl>(OpticsInstance::createInstance()));
 }
 
 int QPCRApplication::main(const vector<string>&)

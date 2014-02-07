@@ -1,7 +1,8 @@
 #include "pcrincludes.h"
+
 #include "thermistor.h"
 
-#include <cmath>
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Thermistor
@@ -12,7 +13,7 @@ Thermistor::Thermistor(unsigned int voltageDividerResistance, unsigned int adcBi
     _b {b},
     _c {c},
     _d {d},
-    _maxADCValue (1 << (adcBits - 1) - 1),
+    _maxADCValue ((1 << (adcBits - 1)) - 1),
     _voltageDividerResistance {voltageDividerResistance} {
 }
 

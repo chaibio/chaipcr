@@ -2,8 +2,6 @@
 #define _STATUSHANDLER_H_
 
 #include <Poco/Net/HTTPRequestHandler.h>
-#include <Poco/Net/HTTPServerRequest.h>
-#include <Poco/Net/HTTPServerResponse.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class StatusHandler

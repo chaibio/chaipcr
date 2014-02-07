@@ -1,9 +1,6 @@
 #ifndef _LTC2444_H_
 #define _LTC2444_H_
 
-#include "gpio.h"
-#include "spi.h"
-
 // Class LTC2444
 class LTC2444  // will work with this class later
 {

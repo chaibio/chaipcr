@@ -1,10 +1,9 @@
-#include "pcrincludes.h"
-#include "qpcrrequesthandlerfactory.h"
+#include "boostincludes.h"
+#include "pocoincludes.h"
 
 #include "jsonhandler.h"
 #include "testcontrolhandler.h"
-
-#include <Poco/URI.h>
+#include "qpcrrequesthandlerfactory.h"
 
 using namespace std;
 using namespace Poco;

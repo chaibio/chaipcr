@@ -1,7 +1,7 @@
 #ifndef _HEATBLOCKZONE_H_
 #define _HEATBLOCKZONE_H_
 
-#include "thermistor.h"
+#include "icontrol.h"
 
 // Class HeatBlockZoneController
 class HeatBlockZoneController : public IControl
@@ -18,10 +18,10 @@ public:
 
 private:
 	//components
-    boost::shared_ptr<Thermistor> _zoneThermistor;
+    std::shared_ptr<Thermistor> _zoneThermistor;
 	
 	//state
-    boost::atomic<double> _targetTemp;
+    std::atomic<double> _targetTemp;
 };
 
 #endif

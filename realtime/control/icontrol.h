@@ -4,8 +4,9 @@
 class IControl
 {
 public:
-    virtual void process() = 0;
     virtual ~IControl() {}
+
+    virtual void process() = 0;
 };
 
 #endif // ICONTROL_H

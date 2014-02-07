@@ -19,7 +19,7 @@ private:
 	void setADCValue(unsigned int adcValue);
 	
 private:
-    boost::atomic<double> _temperature;
+    std::atomic<double> _temperature;
     const double _a, _b, _c, _d; //steinhart-hart coefficients
     const unsigned int _maxADCValue;
     const unsigned int _voltageDividerResistance;

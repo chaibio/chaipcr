@@ -1,9 +1,6 @@
 #include "pcrincludes.h"
-#include "gpio.h"
 
-#include <sstream>
-#include <fstream>
-#include <cassert>
+#include "gpio.h"
 
 using namespace std;
 

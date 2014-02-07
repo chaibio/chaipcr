@@ -1,8 +1,9 @@
 #include "pcrincludes.h"
+#include "utilincludes.h"
+
 #include "ltc2444.h"
-#include "gpio.h"
-#include "pins.h"
-#include <iostream>
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class LTC2444
@@ -37,11 +38,11 @@ uint32_t LTC2444::readADC(uint8_t ch, bool SGL) {
 	if (SGL){
 		//SGL=1 , ODD = ch&0x01, A2A1A0=(ch&0x0110>1) 0r SGL_ODD_A
 		data |= 1<<28 |(ch&0x01)<<27  |(ch&0x110)<<23;
-		std::cout << "Reading Single ended channel:" << ch<<std::endl;
+        cout << "Reading Single ended channel:" << ch<< endl;
 	}
 	else{
 		data |= (ch&0x01)<<27  |(ch&0x110)<<23;
-		std::cout << "Reading differential channel:" << ch<<std::endl;
+        cout << "Reading differential channel:" << ch<< endl;
 	}
 	//data that will be sent is: 101_SGL_ODD_A_OSRTWOx based ifrom the datasheet Table 4. Channel Selection
 	data |= OSRTWOx<<19;
@@ -56,12 +57,12 @@ uint32_t LTC2444::readADC(uint8_t ch, bool SGL) {
 
 	data = (data & 0xFF000000) >> 24 | (data & 0x00FF0000) >> 8 | (data & 0x0000FF00)<<8 | (data & 0x000000FF) << 24;
 	spiPort_.readBytes((char*)&conversion, (char*)&data, 4, 1000000);
-	std::cout << "Command sent to LTC2444: " << data << std::endl;
+    cout << "Command sent to LTC2444: " << data << endl;
 	
 	// convert to little endian and get only ADC result (bit28 down to bit 5)
 	conversion = ((conversion & 0xFF000000) >> 24 | (conversion & 0x00FF0000) >> 8 | (conversion & 0x0000FF00)<<8 | (conversion & 0x000000FF) << 24)&0x3FFFFFE0;
 	
-	std::cout << "Read ADC value: " << conversion << std::endl;
+    cout << "Read ADC value: " << conversion << endl;
 	csPin_.setValue(GPIO::kHigh);
 	return conversion;
 
@@ -80,11 +81,11 @@ uint32_t LTC2444::repeat() {
 	//convert data to big endian
 	data = (data & 0xFF000000) >> 24 | (data & 0x00FF0000) >> 8 | (data & 0x0000FF00)<<8 | (data & 0x000000FF) << 24;
 	spiPort_.readBytes((char*)&conversion, (char*)&data, 4, 1000000);
-	std::cout << "Command sent to LTC2444: " << data << std::endl;
+    cout << "Command sent to LTC2444: " << data << endl;
 	// convert to little endian and get only ADC result (bit28 down to bit 5)
 	conversion = ((conversion & 0xFF000000) >> 24 | (conversion & 0x00FF0000) >> 8 | (conversion & 0x0000FF00)<<8 | (conversion & 0x000000FF) << 24)&0x3FFFFFE0;
 
-	std::cout << "Read ADC value: " << conversion << std::endl;
+    cout << "Read ADC value: " << conversion << endl;
 	csPin_.setValue(GPIO::kHigh);
 	return conversion;
 

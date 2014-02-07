@@ -1,13 +1,16 @@
 #include "pcrincludes.h"
+
+#include "thermistor.h"
+#include "heatblockzone.h"
 #include "heatblock.h"
 
-#include "heatblockzone.h"
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class HeatBlock
 HeatBlock::HeatBlock()
 {
-    zoneController_ = boost::make_shared<HeatBlockZoneController>();
+    zoneController_ = make_shared<HeatBlockZoneController>();
 }
 
 HeatBlock::~HeatBlock()

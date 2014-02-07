@@ -1,9 +1,7 @@
 #ifndef _ADCCONTROLLER_H_
 #define _ADCCONTROLLER_H_
 
-#include "ltc2444.h"
-
-#include <boost/shared_ptr.hpp>
+#include "icontrol.h"
 
 // Class ADCController
 class ADCController : public IControl
@@ -15,7 +13,7 @@ public:
     void process();
 	
 private:
-    boost::shared_ptr<LTC2444> _ltc2444;
+    std::shared_ptr<LTC2444> _ltc2444;
 };
 
 #endif

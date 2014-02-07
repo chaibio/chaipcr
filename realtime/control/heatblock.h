@@ -1,7 +1,7 @@
 #ifndef _HEATBLOCK_H_
 #define _HEATBLOCK_H_
 
-class HeatBlockZoneController;
+#include "icontrol.h"
 
 // Class HeatBlock
 class HeatBlock : public IControl
@@ -13,7 +13,7 @@ public:
     void process();
 	
 private:
-    boost::shared_ptr<HeatBlockZoneController> zoneController_;
+    std::shared_ptr<HeatBlockZoneController> zoneController_;
 };
 
 #endif
