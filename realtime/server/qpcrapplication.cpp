@@ -22,6 +22,7 @@ void QPCRApplication::initialize(Application&)
     controlUnits.push_back(static_pointer_cast<IControl>(HeatBlockInstance::createInstance()));
     controlUnits.push_back(static_pointer_cast<IControl>(HeatSinkInstace::createInstance()));
     controlUnits.push_back(static_pointer_cast<IControl>(OpticsInstance::createInstance()));
+    controlUnits.push_back(static_pointer_cast<IContorl>(LidInstance::createInstance()));
 }
 
 int QPCRApplication::main(const vector<string>&)

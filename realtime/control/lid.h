@@ -1,36 +1,32 @@
-#ifndef _HEATSINK_H_
-#define _HEATSINK_H_
+#ifndef LID_H
+#define LID_H
 
 #include "icontrol.h"
 
-class Fan;
 class Thermistor;
 class CPIDController;
 
 namespace Poco { class Timer; }
 
-// Class HeatSink
-class HeatSink : public IControl
+class Lid : public IControl
 {
 public:
-    HeatSink();
-	~HeatSink();
+    Lid();
+    ~Lid();
 
     void process();
-	
-    //accessors
+
     inline double targetTemperature() const { return _targetTemperature.load(); }
     inline void setTargetTemperature(double temperature) { _targetTemperature.store(temperature); }
 
-    inline int targetRPM() const { return _fan->targetRPM(); }
-    inline void setTargetRPM(int targetRPM) { _fan->setTargetRPM(targetRPM); }
-	
 private:
     void initPID();
     void pidCallback(Poco::Timer &timer);
 
-    Fan *_fan;
     Thermistor *_thermistor;
+
+    PWMPin _heater;
+    std::atomic<unsigned long> _heaterDutyCycle;
 
     std::atomic<double> _targetTemperature;
 
@@ -38,4 +34,4 @@ private:
     Poco::Timer *_pidTimer;
 };
 
-#endif
+#endif // LID_H

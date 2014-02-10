@@ -7,6 +7,7 @@
 #include "heatblock.h"
 #include "heatsink.h"
 #include "optics.h"
+#include "lid.h"
 
 class ADCControllerInstance : public Instance<ADCController>
 {
@@ -24,6 +25,11 @@ class HeatSinkInstace : public Instance<HeatSink>
 };
 
 class OpticsInstance : public Instance<Optics>
+{
+
+};
+
+class LidInstance : public Instance<Lid>
 {
 
 };

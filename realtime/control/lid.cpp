@@ -1,19 +1,16 @@
 #include "pcrincludes.h"
-#include "utilincludes.h"
 #include "pocoincludes.h"
+#include "utilincludes.h"
 
-#include "fan.h"
 #include "thermistor.h"
-#include "heatsink.h"
+#include "lid.h"
 
 using namespace std;
 using namespace Poco;
 
-////////////////////////////////////////////////////////////////////////////////
-// Class HeatSink
-HeatSink::HeatSink()
+Lid::Lid()
+    :_heater(PWMPin(kLidControlPWMPath))
 {
-    _fan = new Fan(kHeatSinkFanControlPWMPath);
     _thermistor = new Thermistor(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                 kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
                                 kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient);
@@ -22,30 +19,29 @@ HeatSink::HeatSink()
     initPID();
 }
 
-HeatSink::~HeatSink()
+Lid::~Lid()
 {
     delete _pidTimer;
     delete _pidController.exchange(0);
     delete _thermistor;
-    delete _fan;
 }
 
-void HeatSink::initPID()
+void Lid::initPID()
 {
     vector<SPIDTuning> pidTuningList; //TODO: Josh, please change it as you want
 
     _pidController.store(new CPIDController(pidTuningList, 0, 0));
 
     _pidTimer = new Timer(0, kPIDInterval);
-    _pidTimer->start(TimerCallback<HeatSink>(*this, &HeatSink::pidCallback));
+    _pidTimer->start(TimerCallback<Lid>(*this, &Lid::pidCallback));
 }
 
-void HeatSink::pidCallback(Timer &)
+void Lid::pidCallback(Timer &)
 {
-    _fan->setPWMDutyCycle(_pidController.load()->compute(targetTemperature(), _thermistor->temperature()));
+    _heaterDutyCycle.store(_pidController.load()->compute(_targetTemperature.load(), _thermistor->temperature()));
 }
 
-void HeatSink::process()
+void Lid::process()
 {
-    _fan->process();
+    _heater.setPWM(_heaterDutyCycle.load(), kLidPWMPeriodNs, 0);
 }

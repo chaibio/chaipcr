@@ -11,13 +11,15 @@ const double kQTICurveZThermistorDCoefficient = 0.000000099063233;
 const unsigned int kThermistorVoltageDividerResistanceOhms = 6800;
 const int kLTC2444ADCBits = 24;
 
-//HTTP server port
+//HTTP server params
 const int kHttpServerPort = 8000;
 
-//Fan PWM Period
+//Fan PWM params
 const unsigned long kFanPWMPeriodNs = 1024;
 
-//Heat Sink params
-const long kHeatSinkPIDInterval = 100;
+//Lid PWM params
+const unsigned long kLidPWMPeriodNs = kFanPWMPeriodNs;
+
+const long kPIDInterval = 100;
 
 #endif

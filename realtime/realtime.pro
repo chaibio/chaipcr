@@ -70,7 +70,8 @@ HEADERS += \
     app/pocoincludes.h \
     util/utilincludes.h \
     control/controlincludes.h \
-    util/pid.h
+    util/pid.h \
+    control/lid.h
 
 SOURCES += \
     app/pins.cpp \
@@ -93,4 +94,5 @@ SOURCES += \
     server/statushandler.cpp \
     server/testcontrolhandler.cpp \
     server/qpcrapplication.cpp \
-    util/pid.cpp
+    util/pid.cpp \
+    control/lid.cpp

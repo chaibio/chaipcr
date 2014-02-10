@@ -7,7 +7,7 @@
 class Fan : public IControl
 {
 public:
-    Fan();
+    Fan(const std::string &pwmPath);
 	~Fan();
 
     void process();

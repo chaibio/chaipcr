@@ -15,12 +15,14 @@ static const int kLEDDigiPotCSPinNumber = 65;
 
 static const int kLidSensePinNumber = 61;
 	
-//fan
+//Heat Sink
 extern const std::string kHeatSinkFanControlPWMPath;
 static const int kHeatSinkFanTachADCPinNumber = 0;
 
 //LED control
 extern const std::string kLEDGrayscaleClockPWMPath;
 
+//Lid
+extern const std::string kLidControlPWMPath;
 
 #endif

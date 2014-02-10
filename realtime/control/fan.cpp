@@ -7,8 +7,8 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Fan
-Fan::Fan()
-    :_pwmControl(PWMPin(kHeatSinkFanControlPWMPath))
+Fan::Fan(const string &pwmPath)
+    :_pwmControl(PWMPin(pwmPath))
 {
     _currentRPM.store(0);
     setTargetRPM(0);
