@@ -3,22 +3,36 @@
 
 #include "icontrol.h"
 
+class Fan;
+class Thermistor;
+
 // Class HeatSink
 class HeatSink : public IControl
 {
 public:
     HeatSink();
 	~HeatSink();
-	
-	//accessors
-    inline double temperature() { return _thermistor->temperature(); }
-    inline std::shared_ptr<Fan> getFan() { return _fan; }
-	
+
     void process();
 	
+    //accessors
+    inline double targetTemperature() const { return _targetTemperature.load(); }
+    inline void setTargetTemperature(double temperature) { _targetTemperature.store(temperature); }
+
+    inline int targetRPM() const { return _fan->targetRPM(); }
+    inline void setTargetRPM(int targetRPM) { _fan->setTargetRPM(targetRPM); }
+	
 private:
-    std::shared_ptr<Fan> _fan;
-    std::shared_ptr<Thermistor> _thermistor;
+    void initPID();
+    void pidCallback(Poco::Timer &timer);
+
+    Fan *_fan;
+    Thermistor *_thermistor;
+
+    std::atomic<double> _targetTemperature;
+
+    std::atomic<CPIDController*> _pidController;
+    Poco::Timer *_pidTimer;
 };
 
 #endif

@@ -10,10 +10,11 @@ class Optics : public IControl
 public:
     Optics();
 	virtual ~Optics();
+
+    void process();
 	
 	//accessors
-    bool lidOpen() { return _lidOpen.load(); }
-    void process();
+    bool lidOpen() const { return _lidOpen.load(); }
 
     inline std::shared_ptr<LEDController> getLedController() { return _ledController; }
 	

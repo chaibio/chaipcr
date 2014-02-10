@@ -10,8 +10,9 @@ public:
     HeatBlockZoneController();
 	virtual ~HeatBlockZoneController();
 	
-    inline double currentTemp() { return _zoneThermistor->temperature(); }
-    inline double targetTemp() { return _targetTemp.load(); }
+    inline double currentTemp() const { return _zoneThermistor->temperature(); }
+
+    inline double targetTemp() const { return _targetTemp.load(); }
     void setTargetTemp(double targetTemp) { _targetTemp.store(targetTemp); }
 	
     void process();

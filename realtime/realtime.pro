@@ -69,7 +69,8 @@ HEADERS += \
     app/boostincludes.h \
     app/pocoincludes.h \
     util/utilincludes.h \
-    control/controlincludes.h
+    control/controlincludes.h \
+    util/pid.h
 
 SOURCES += \
     app/pins.cpp \
@@ -91,4 +92,5 @@ SOURCES += \
     server/jsonhandler.cpp \
     server/statushandler.cpp \
     server/testcontrolhandler.cpp \
-    server/qpcrapplication.cpp
+    server/qpcrapplication.cpp \
+    util/pid.cpp

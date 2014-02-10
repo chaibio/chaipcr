@@ -10,7 +10,7 @@ public:
 	virtual ~Thermistor();
 	
 	//accessors
-    float temperature() { return _temperature.load(); }
+    inline double temperature() const { return _temperature.load(); }
 	
 private:
 	void setResistance(double resistanceOhms);
@@ -20,6 +20,7 @@ private:
 	
 private:
     std::atomic<double> _temperature;
+
     const double _a, _b, _c, _d; //steinhart-hart coefficients
     const unsigned int _maxADCValue;
     const unsigned int _voltageDividerResistance;

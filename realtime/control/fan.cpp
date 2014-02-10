@@ -8,10 +8,11 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 // Class Fan
 Fan::Fan()
+    :_pwmControl(PWMPin(kHeatSinkFanControlPWMPath))
 {
-    _targetRPM.store(0);
     _currentRPM.store(0);
-    _pwmControl = make_shared<PWMPin>(kHeatSinkFanControlPWMPath);
+    setTargetRPM(0);
+    setPWMDutyCycle(kFanPWMPeriodNs * 0.5);
 }
 
 Fan::~Fan()
@@ -21,5 +22,5 @@ Fan::~Fan()
 void Fan::process()
 {
 	//test
-    _pwmControl->setPWM(512, 1024, 0);
+    _pwmControl.setPWM(pwmDutyCycle(), kFanPWMPeriodNs, 0);
 }

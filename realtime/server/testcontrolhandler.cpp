@@ -13,7 +13,8 @@ using namespace Poco::Net;
 void TestControlHandler::createData(const ptree &requestPt, ptree &)
 {
     double ledIntensity = requestPt.get<double>("ledIntensity", -1);
-    double fanRPM = requestPt.get<double>("fanRPM", -1);
+    int fanRPM = requestPt.get<int>("fanRPM", -1);
+    double heatSinkTargetTemp = requestPt.get<double>("setHeatSinkTargetTemp", -1);
 
     if (ledIntensity != -1)
     {
@@ -26,6 +27,13 @@ void TestControlHandler::createData(const ptree &requestPt, ptree &)
     {
         shared_ptr<HeatSink> instance = HeatSinkInstace::getInstance();
         if (instance)
-            instance->getFan()->setTargetRPM(fanRPM);
+            instance->setTargetRPM(fanRPM);
+    }
+
+    if (heatSinkTargetTemp != -1)
+    {
+        shared_ptr<HeatSink> instance = HeatSinkInstace::getInstance();
+        if (instance)
+            instance->setTargetTemperature(heatSinkTargetTemp);
     }
 }

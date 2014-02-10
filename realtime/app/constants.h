@@ -14,4 +14,10 @@ const int kLTC2444ADCBits = 24;
 //HTTP server port
 const int kHttpServerPort = 8000;
 
+//Fan PWM Period
+const unsigned long kFanPWMPeriodNs = 1024;
+
+//Heat Sink params
+const long kHeatSinkPIDInterval = 100;
+
 #endif
