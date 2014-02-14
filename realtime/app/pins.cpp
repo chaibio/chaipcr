@@ -14,3 +14,7 @@ const std::string kLEDGrayscaleClockPWMPath {"/sys/devices/ocp.3/led_pwm.16"};
 
 //Lid
 const std::string kLidControlPWMPath {"I am ugly, change me"};
+
+//Head Block
+const std::string kHeatBlockZone1PWMPath {"I am ugly, change me"};
+const std::string kHeatBlockZone2PWMPath {"I am ugly, change me"};

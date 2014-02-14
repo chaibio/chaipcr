@@ -14,7 +14,7 @@ public:
     void process();
 	
 	//accessors
-    bool lidOpen() const { return _lidOpen.load(); }
+    inline bool lidOpen() const { return _lidOpen; }
 
     inline std::shared_ptr<LEDController> getLedController() { return _ledController; }
 	

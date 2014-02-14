@@ -2,31 +2,26 @@
 #define _FAN_H_
 
 #include "icontrol.h"
+#include "pwm.h"
 
 // Class Fan
-class Fan : public IControl
+class Fan : public IControl, public PWMControl
 {
 public:
-    Fan(const std::string &pwmPath);
+    Fan();
 	~Fan();
 
     void process();
 	
 	//accessors
-    inline int targetRPM() const { return _targetRPM.load(); }
-    inline void setTargetRPM(int targetRPM) { _targetRPM.store(targetRPM); }
+    inline int targetRPM() const { return _targetRPM; }
+    inline void setTargetRPM(int targetRPM) { _targetRPM = targetRPM; }
 
-    inline int currentRPM() const { return _currentRPM.load(); }
-
-    inline unsigned long pwmDutyCycle() const { return _pwmDutyCycle.load(); }
-    inline void setPWMDutyCycle(unsigned long dutyCycle) { dutyCycle <= kFanPWMPeriodNs ? _pwmDutyCycle.store(dutyCycle) : _pwmDutyCycle.store(kFanPWMPeriodNs); }
+    inline int currentRPM() const { return _currentRPM; }
 
 private:
     std::atomic<int> _targetRPM;
     std::atomic<int> _currentRPM;
-
-    PWMPin _pwmControl;
-    std::atomic<unsigned long> _pwmDutyCycle;
 };
 
 #endif

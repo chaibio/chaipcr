@@ -2,13 +2,14 @@
 #define LID_H
 
 #include "icontrol.h"
+#include "pwm.h"
 
 class Thermistor;
 class CPIDController;
 
 namespace Poco { class Timer; }
 
-class Lid : public IControl
+class Lid : public IControl, public PWMControl
 {
 public:
     Lid();
@@ -16,18 +17,14 @@ public:
 
     void process();
 
-    inline double targetTemperature() const { return _targetTemperature.load(); }
-    inline void setTargetTemperature(double temperature) { _targetTemperature.store(temperature); }
+    inline double targetTemperature() const { return _targetTemperature; }
+    inline void setTargetTemperature(double temperature) { _targetTemperature = temperature; }
 
 private:
     void initPID();
     void pidCallback(Poco::Timer &timer);
 
     Thermistor *_thermistor;
-
-    PWMPin _heater;
-    std::atomic<unsigned long> _heaterDutyCycle;
-
     std::atomic<double> _targetTemperature;
 
     std::atomic<CPIDController*> _pidController;

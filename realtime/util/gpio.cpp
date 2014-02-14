@@ -43,7 +43,10 @@ GPIO::Value GPIO::value() const {
 	}
 }
 
-void GPIO::setValue(Value value) {
+void GPIO::setValue(Value value, bool checkValue) {
+    if (checkValue && value == this->value())
+        return;
+
 	if (direction_ != kOutput)
 		throw InvalidState("Attempt to set value of non-output GPIO pin");
 	

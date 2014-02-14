@@ -1,8 +1,4 @@
 #include "pcrincludes.h"
-#include "pocoincludes.h"
-#include "utilincludes.h"
-#include "controlincludes.h"
-
 #include "qpcrapplication.h"
 
 int main(int argc, char** argv) {

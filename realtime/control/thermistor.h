@@ -10,7 +10,7 @@ public:
 	virtual ~Thermistor();
 	
 	//accessors
-    inline double temperature() const { return _temperature.load(); }
+    inline double temperature() const { return _temperature; }
 	
 private:
 	void setResistance(double resistanceOhms);

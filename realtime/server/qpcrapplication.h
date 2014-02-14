@@ -3,6 +3,8 @@
 
 #include <Poco/Util/ServerApplication.h>
 
+class IControl;
+
 // Class QPCRServer
 class QPCRApplication: public Poco::Util::ServerApplication
 {
@@ -12,15 +14,15 @@ protected:
     int main(const std::vector<std::string> &args);
 
     //port accessors
-    inline SPIPort& spiPort0() { return *spiPort0_; }
-    inline GPIO& spiPort0DataInSensePin() { return *spiPort0DataInSensePin_; }
+    //inline SPIPort& spiPort0() { return *spiPort0_; }
+    //inline GPIO& spiPort0DataInSensePin() { return *spiPort0DataInSensePin_; }
 
 private:
     std::vector<std::shared_ptr<IControl>> controlUnits;
 
     //ports
-    SPIPort *spiPort0_;
-    GPIO *spiPort0DataInSensePin_;
+    //SPIPort *spiPort0_;
+    //GPIO *spiPort0DataInSensePin_;
 
 };
 

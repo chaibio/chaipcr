@@ -20,6 +20,13 @@ const unsigned long kFanPWMPeriodNs = 1024;
 //Lid PWM params
 const unsigned long kLidPWMPeriodNs = kFanPWMPeriodNs;
 
+//Heat Block params
+const unsigned long kHeatBlockZone1PWMPeriod = kFanPWMPeriodNs;
+const unsigned long kHeatBlockZone2PWMPeriod = kFanPWMPeriodNs;
+
+const int kHeatBlockZonesPIDMin = -1024;
+const int kHeatBlockZonesPIDMax = 1024;
+
 const long kPIDInterval = 100;
 
 #endif

@@ -19,7 +19,7 @@ public:
 	~GPIO();
 	
     Value value() const;
-    void setValue(Value value);
+    void setValue(Value value, bool checkValue = false);
 	
 	Direction direction() const { return direction_; }
     void setDirection(Direction direction);

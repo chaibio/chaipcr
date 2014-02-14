@@ -25,4 +25,14 @@ extern const std::string kLEDGrayscaleClockPWMPath;
 //Lid
 extern const std::string kLidControlPWMPath;
 
+//Heat Block
+extern const std::string kHeatBlockZone1PWMPath;
+extern const std::string kHeatBlockZone2PWMPath;
+
+static const unsigned int kHeadBlockZone1HeatPin = 69;
+static const unsigned int kHeadBlockZone1CoolPin = 45;
+
+static const unsigned int kHeadBlockZone2HeatPin = 47;
+static const unsigned int kHeadBlockZone2CoolPin = 27;
+
 #endif

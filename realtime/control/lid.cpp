@@ -9,13 +9,13 @@ using namespace std;
 using namespace Poco;
 
 Lid::Lid()
-    :_heater(PWMPin(kLidControlPWMPath))
+    :PWMControl(kLidControlPWMPath, kLidPWMPeriodNs)
 {
     _thermistor = new Thermistor(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                 kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
                                 kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient);
-    _targetTemperature.store(30);
 
+    setTargetTemperature(30);
     initPID();
 }
 
@@ -38,10 +38,10 @@ void Lid::initPID()
 
 void Lid::pidCallback(Timer &)
 {
-    _heaterDutyCycle.store(_pidController.load()->compute(_targetTemperature.load(), _thermistor->temperature()));
+    setPWMDutyCycle(_pidController.load()->compute(_targetTemperature.load(), _thermistor->temperature()));
 }
 
 void Lid::process()
 {
-    _heater.setPWM(_heaterDutyCycle.load(), kLidPWMPeriodNs, 0);
+    processPWM();
 }

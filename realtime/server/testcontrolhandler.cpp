@@ -14,7 +14,8 @@ void TestControlHandler::createData(const ptree &requestPt, ptree &)
 {
     double ledIntensity = requestPt.get<double>("ledIntensity", -1);
     int fanRPM = requestPt.get<int>("fanRPM", -1);
-    double heatSinkTargetTemp = requestPt.get<double>("setHeatSinkTargetTemp", -1);
+    double heatSinkTargetTemp = requestPt.get<double>("heatSinkTargetTemp", -1);
+    double heatBlockTargetTemp = requestPt.get<double>("heatBlockargetTemp", -1);
 
     if (ledIntensity != -1)
     {
@@ -35,5 +36,12 @@ void TestControlHandler::createData(const ptree &requestPt, ptree &)
         shared_ptr<HeatSink> instance = HeatSinkInstace::getInstance();
         if (instance)
             instance->setTargetTemperature(heatSinkTargetTemp);
+    }
+
+    if (heatBlockTargetTemp != -1)
+    {
+        shared_ptr<HeatBlock> instance = HeatBlockInstance::getInstance();
+        if (instance)
+            instance->setTargetTemperature(heatBlockTargetTemp);
     }
 }

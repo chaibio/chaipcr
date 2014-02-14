@@ -13,7 +13,7 @@ using namespace Poco;
 // Class HeatSink
 HeatSink::HeatSink()
 {
-    _fan = new Fan(kHeatSinkFanControlPWMPath);
+    _fan = new Fan();
     _thermistor = new Thermistor(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                 kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
                                 kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient);

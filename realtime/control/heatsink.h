@@ -19,8 +19,8 @@ public:
     void process();
 	
     //accessors
-    inline double targetTemperature() const { return _targetTemperature.load(); }
-    inline void setTargetTemperature(double temperature) { _targetTemperature.store(temperature); }
+    inline double targetTemperature() const { return _targetTemperature; }
+    inline void setTargetTemperature(double temperature) { _targetTemperature = temperature; }
 
     inline int targetRPM() const { return _fan->targetRPM(); }
     inline void setTargetRPM(int targetRPM) { _fan->setTargetRPM(targetRPM); }
@@ -30,8 +30,8 @@ private:
     void pidCallback(Poco::Timer &timer);
 
     Fan *_fan;
-    Thermistor *_thermistor;
 
+    Thermistor *_thermistor;
     std::atomic<double> _targetTemperature;
 
     std::atomic<CPIDController*> _pidController;

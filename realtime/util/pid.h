@@ -21,7 +21,7 @@ public:
     double compute(double target, double currentValue);
 
 private:
-    const SPIDTuning &determineGainSchedule(double target);
+    const SPIDTuning& determineGainSchedule(double target);
     void latchValue(double* pValue, double minValue, double maxValue);
 
 private:

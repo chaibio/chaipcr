@@ -13,16 +13,17 @@ using namespace Poco::Util;
 // Class QPCRApplication
 void QPCRApplication::initialize(Application&)
 {
-    spiPort0_ = new SPIPort(kSPI0DevicePath);
-    spiPort0DataInSensePin_ = new GPIO(kSPI0DataInSensePinNumber, GPIO::kInput);
+    //spiPort0_ = new SPIPort(kSPI0DevicePath);
+    //spiPort0DataInSensePin_ = new GPIO(kSPI0DataInSensePinNumber, GPIO::kInput);
 
     controlUnits.push_back(static_pointer_cast<IControl>(ADCControllerInstance::createInstance(
-                                                                    kLTC2444CSPinNumber, this->spiPort0(), kSPI0DataInSensePinNumber
+                                                                    kLTC2444CSPinNumber, SPIPort(kSPI0DevicePath), kSPI0DataInSensePinNumber
+                                                                    //kLTC2444CSPinNumber, this->spiPort0(), kSPI0DataInSensePinNumber
                                                                     )));
     controlUnits.push_back(static_pointer_cast<IControl>(HeatBlockInstance::createInstance()));
     controlUnits.push_back(static_pointer_cast<IControl>(HeatSinkInstace::createInstance()));
     controlUnits.push_back(static_pointer_cast<IControl>(OpticsInstance::createInstance()));
-    controlUnits.push_back(static_pointer_cast<IContorl>(LidInstance::createInstance()));
+    controlUnits.push_back(static_pointer_cast<IControl>(LidInstance::createInstance()));
 }
 
 int QPCRApplication::main(const vector<string>&)
@@ -37,8 +38,8 @@ int QPCRApplication::main(const vector<string>&)
             controlUnit->process();
     }
 
-    delete spiPort0_;
-    delete spiPort0DataInSensePin_;
+    //delete spiPort0_;
+    //delete spiPort0DataInSensePin_;
 
 	server.stop();
 
