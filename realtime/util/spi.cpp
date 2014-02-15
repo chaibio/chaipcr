@@ -2,6 +2,8 @@
 
 #include "spi.h"
 
+#include <iostream>
+#include <iomanip>
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -35,7 +37,9 @@ void SPIPort::readBytes(char* rxbuffer, char* txbuffer, unsigned int length, uns
 	spiTransfer.speed_hz = speedHz;
 	spiTransfer.bits_per_word = 0;
 	
+
 	//execute transfer
 	if (ioctl(deviceFile_, SPI_IOC_MESSAGE(1), &spiTransfer) < 0)
 		throw SPIError("SPI read bytes failed", errno);
+
 }
