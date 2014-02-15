@@ -28,8 +28,8 @@ void SPIPort::setMode(uint8_t mode) {
 void SPIPort::readBytes(char* rxbuffer, char* txbuffer, unsigned int length, unsigned int speedHz) {
 	//create transfer descriptor
 	struct spi_ioc_transfer spiTransfer;
-	spiTransfer.tx_buf = (unsigned long)&txbuffer;
-	spiTransfer.rx_buf = (unsigned long)&rxbuffer;
+	spiTransfer.tx_buf = (unsigned long)txbuffer;
+	spiTransfer.rx_buf = (unsigned long)rxbuffer;
 	spiTransfer.len = length;
 	spiTransfer.delay_usecs = 0;
 	spiTransfer.speed_hz = speedHz;
