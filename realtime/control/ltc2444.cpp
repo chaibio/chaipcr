@@ -34,15 +34,19 @@ void LTC2444::setup(char mode, bool TWOx){
 
 uint32_t LTC2444::readADC(uint8_t ch, bool SGL) {
 	//0xA000000 the first 3 bits here represents 101, based on the datasheet.
-    uint32_t data=0xA0000000;
+	uint32_t data=0xA0000000,tmp=ch;
+
+	char dataOut[4];
+	char dataIn[4];
+
 	if (SGL){
 		//SGL=1 , ODD = ch&0x01, A2A1A0=(ch&0x0110>1) 0r SGL_ODD_A
 		data |= 1<<28 |(ch&0x01)<<27  |(ch&0x110)<<23;
-        cout << "Reading Single ended channel:" << ch<< endl;
+		std::cout << "Reading Single ended channel:" << ch<<std::endl;
 	}
 	else{
 		data |= (ch&0x01)<<27  |(ch&0x110)<<23;
-        cout << "Reading differential channel:" << ch<< endl;
+		std::cout << "Reading differential channel:" << ch<<std::endl;
 	}
 	//data that will be sent is: 101_SGL_ODD_A_OSRTWOx based ifrom the datasheet Table 4. Channel Selection
 	data |= OSRTWOx<<19;
@@ -54,15 +58,15 @@ uint32_t LTC2444::readADC(uint8_t ch, bool SGL) {
 	//read conversion value and write the settings for the nex conversion via SPI.
 	uint32_t conversion;
 	//convert data to big endian
-
-	data = (data & 0xFF000000) >> 24 | (data & 0x00FF0000) >> 8 | (data & 0x0000FF00)<<8 | (data & 0x000000FF) << 24;
-	spiPort_.readBytes((char*)&conversion, (char*)&data, 4, 1000000);
-    cout << "Command sent to LTC2444: " << data << endl;
-	
+	dataOut[0] = (data>>24);
+	dataOut[1] = (data>>16);
+	dataOut[2] = (data>>8);
+	dataOut[3] = (data);
+	spiPort_.readBytes(dataIn, dataOut, 4, 1000000);
 	// convert to little endian and get only ADC result (bit28 down to bit 5)
-	conversion = ((conversion & 0xFF000000) >> 24 | (conversion & 0x00FF0000) >> 8 | (conversion & 0x0000FF00)<<8 | (conversion & 0x000000FF) << 24)&0x3FFFFFE0;
-	
-    cout << "Read ADC value: " << conversion << endl;
+	//conversion = ((conversion & 0xFF000000) >> 24 | (conversion & 0x00FF0000) >> 8 | (conversion & 0x0000FF00)<<8 | (conversion & 0x000000FF) << 24)&0x1FFFFFE0;
+	conversion = (((uint32_t)dataIn[0])<<24|((uint32_t)dataIn[1])<<16|((uint32_t)dataIn[2])<<8|dataIn[3])&0x1FFFFFE0;
+	std::cout << "Read ADC value: " << conversion << std::endl;
 	csPin_.setValue(GPIO::kHigh);
 	return conversion;
 
@@ -71,7 +75,8 @@ uint32_t LTC2444::readADC(uint8_t ch, bool SGL) {
 uint32_t LTC2444::repeat() {
 	//0xA000000 the first 3 bits here represents 101, based on the datasheet.
 	uint32_t data=0x80000000;
-
+	char dataOut[4];
+	char dataIn[4];
 	//set CS low to initiate conversion
 	csPin_.setValue(GPIO::kHigh);
 	csPin_.setValue(GPIO::kLow);
@@ -79,13 +84,17 @@ uint32_t LTC2444::repeat() {
 	//read conversion value and write the settings for the nex conversion via SPI.
 	uint32_t conversion;
 	//convert data to big endian
-	data = (data & 0xFF000000) >> 24 | (data & 0x00FF0000) >> 8 | (data & 0x0000FF00)<<8 | (data & 0x000000FF) << 24;
-	spiPort_.readBytes((char*)&conversion, (char*)&data, 4, 1000000);
-    cout << "Command sent to LTC2444: " << data << endl;
-	// convert to little endian and get only ADC result (bit28 down to bit 5)
-	conversion = ((conversion & 0xFF000000) >> 24 | (conversion & 0x00FF0000) >> 8 | (conversion & 0x0000FF00)<<8 | (conversion & 0x000000FF) << 24)&0x3FFFFFE0;
+	dataOut[0] = (data>>24);
+	dataOut[1] = (data>>16);
+	dataOut[2] = (data>>8);
+	dataOut[3] = (data);
 
-    cout << "Read ADC value: " << conversion << endl;
+	spiPort_.readBytes(dataIn, dataOut, 4, 1000000);
+
+	// convert to little endian and get only ADC result (bit28 down to bit 5)
+	//conversion = ((conversion & 0xFF000000) >> 24 | (conversion & 0x00FF0000) >> 8 | (conversion & 0x0000FF00)<<8 | (conversion & 0x000000FF) << 24)&0x1FFFFFE0;
+	conversion = (((uint32_t)dataIn[0])<<24|((uint32_t)dataIn[1])<<16|((uint32_t)dataIn[2])<<8|dataIn[3])&0x1FFFFFE0;
+	std::cout << "Read ADC value: " << conversion << std::endl;
 	csPin_.setValue(GPIO::kHigh);
 	return conversion;
 
