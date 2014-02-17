@@ -65,7 +65,7 @@ uint32_t LTC2444::readADC(uint8_t ch, bool SGL) {
 	spiPort_.readBytes(dataIn, dataOut, 4, 1000000);
 	// convert to little endian and get only ADC result (bit28 down to bit 5)
 	//conversion = ((conversion & 0xFF000000) >> 24 | (conversion & 0x00FF0000) >> 8 | (conversion & 0x0000FF00)<<8 | (conversion & 0x000000FF) << 24)&0x1FFFFFE0;
-	conversion = (((uint32_t)dataIn[0])<<24|((uint32_t)dataIn[1])<<16|((uint32_t)dataIn[2])<<8|dataIn[3])&0x1FFFFFE0;
+	conversion = ((((uint32_t)dataIn[0])<<24|((uint32_t)dataIn[1])<<16|((uint32_t)dataIn[2])<<8|dataIn[3])&0x1FFFFFE0)>>5;
 	std::cout << "Read ADC value: " << conversion << std::endl;
 	csPin_.setValue(GPIO::kHigh);
 	return conversion;
@@ -93,7 +93,7 @@ uint32_t LTC2444::repeat() {
 
 	// convert to little endian and get only ADC result (bit28 down to bit 5)
 	//conversion = ((conversion & 0xFF000000) >> 24 | (conversion & 0x00FF0000) >> 8 | (conversion & 0x0000FF00)<<8 | (conversion & 0x000000FF) << 24)&0x1FFFFFE0;
-	conversion = (((uint32_t)dataIn[0])<<24|((uint32_t)dataIn[1])<<16|((uint32_t)dataIn[2])<<8|dataIn[3])&0x1FFFFFE0;
+	conversion = ((((uint32_t)dataIn[0])<<24|((uint32_t)dataIn[1])<<16|((uint32_t)dataIn[2])<<8|dataIn[3])&0x1FFFFFE0)>>5;
 	std::cout << "Read ADC value: " << conversion << std::endl;
 	csPin_.setValue(GPIO::kHigh);
 	return conversion;
