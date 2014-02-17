@@ -10,11 +10,11 @@ const string kSPI1DevicePath {"/dev/spidev2.0"};
 const string kHeatSinkFanControlPWMPath {"/sys/devices/ocp.*/fan_pwm.*"};
 
 //LED control
-const std::string kLEDGrayscaleClockPWMPath {"/sys/devices/ocp.3/led_pwm.16"};
+const std::string kLEDGrayscaleClockPWMPath {"/sys/devices/ocp.*/led_pwm.*"};
 
 //Lid
-const std::string kLidControlPWMPath {"I am ugly, change me"};
+const std::string kLidControlPWMPath {"/sys/devices/ocp.*/lid_heater_pwm.*"};
 
 //Head Block
-const std::string kHeatBlockZone1PWMPath {"I am ugly, change me"};
-const std::string kHeatBlockZone2PWMPath {"I am ugly, change me"};
+const std::string kHeatBlockZone1PWMPath {"/sys/devices/ocp.*/peltier1_pwm.*"};
+const std::string kHeatBlockZone2PWMPath {"/sys/devices/ocp.*/peltier2_pwm.*"};
