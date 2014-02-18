@@ -5,7 +5,7 @@
 class LTC2444  // will work with this class later
 {
 public:
-    LTC2444(unsigned int csPinNumber, SPIPort& spiPort, unsigned int busyPinNumber);
+    LTC2444(unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber);
 	~LTC2444();
 
 	/*Setup the speed and resolution
@@ -47,7 +47,7 @@ public:
 
 private:
 	GPIO csPin_;
-	SPIPort& spiPort_;
+    SPIPort spiPort_;
 	GPIO busyPin_;
 	uint8_t OSRTWOx;
 };

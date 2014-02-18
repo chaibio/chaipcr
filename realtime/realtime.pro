@@ -26,6 +26,9 @@ unix:!unix_m {
     INCLUDEPATH += $(BOOST_INCLUDE_PATH)
 
     QMAKE_CXXFLAGS += -Wno-unused-local-typedefs -Wno-unused-parameter
+
+    target.path = /home/root/tmp
+    INSTALLS += target
 }
 
 unix_m: {

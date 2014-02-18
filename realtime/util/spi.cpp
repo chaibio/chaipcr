@@ -2,8 +2,6 @@
 
 #include "spi.h"
 
-#include <iostream>
-#include <iomanip>
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -17,9 +15,45 @@ SPIPort::SPIPort(const string& spiDevicePath) :
 		throw SPIError("Unable to open SPI device", errno);
 }
 
+SPIPort::SPIPort(const SPIPort &other) :
+    spiDevicePath_(other.spiDevicePath_),
+    deviceFile_(0) {
+
+    deviceFile_ = open(spiDevicePath_.c_str(), O_RDWR);
+    if (deviceFile_ < 0)
+        throw SPIError("Unable to open SPI device", errno);
+}
+
+SPIPort::SPIPort(SPIPort &&other) {
+    spiDevicePath_ = std::move(other.spiDevicePath_);
+    deviceFile_ = other.deviceFile_;
+
+    other.deviceFile_ = 0;
+}
+
 SPIPort::~SPIPort() {
 	if (deviceFile_ > 0)
 		close(deviceFile_);
+}
+
+SPIPort& SPIPort::operator= (const SPIPort &other) {
+    spiDevicePath_ = other.spiDevicePath_;
+    deviceFile_ = 0;
+
+    deviceFile_ = open(spiDevicePath_.c_str(), O_RDWR);
+    if (deviceFile_ < 0)
+        throw SPIError("Unable to open SPI device", errno);
+
+    return *this;
+}
+
+SPIPort& SPIPort::operator= (SPIPort &&other) {
+    spiDevicePath_ = std::move(other.spiDevicePath_);
+    deviceFile_ = other.deviceFile_;
+
+    other.deviceFile_ = 0;
+
+    return *this;
 }
 
 void SPIPort::setMode(uint8_t mode) {

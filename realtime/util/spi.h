@@ -6,13 +6,18 @@
 class SPIPort {
 public:
     SPIPort(const std::string& spiDevicePath);
+    SPIPort(const SPIPort &other);
+    SPIPort(SPIPort &&other);
 	~SPIPort();
+
+    SPIPort& operator= (const SPIPort &other);
+    SPIPort& operator= (SPIPort &&other);
 	
     void setMode(uint8_t mode);
     void readBytes(char* rxbuffer, char* txbuffer,unsigned int length, unsigned int speedHz);
 	
 private:
-	const std::string& spiDevicePath_;
+    std::string spiDevicePath_;
 	int deviceFile_;
 };
 

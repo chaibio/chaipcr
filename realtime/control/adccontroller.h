@@ -7,7 +7,7 @@
 class ADCController : public IControl
 {
 public:
-    ADCController(unsigned int csPinNumber, SPIPort& spiPort, unsigned int busyPinNumber);
+    ADCController(unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber);
 	~ADCController();
 	
     void process();

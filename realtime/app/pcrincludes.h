@@ -16,6 +16,8 @@
 #include <atomic>
 #include <sstream>
 #include <fstream>
+#include <iomanip>
+#include <utility>
 
 //Linux headers
 #include <unistd.h>

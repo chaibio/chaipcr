@@ -17,7 +17,7 @@ void QPCRApplication::initialize(Application&)
     //spiPort0DataInSensePin_ = new GPIO(kSPI0DataInSensePinNumber, GPIO::kInput);
 
     controlUnits.push_back(static_pointer_cast<IControl>(ADCControllerInstance::createInstance(
-                                                                    kLTC2444CSPinNumber, SPIPort(kSPI0DevicePath), kSPI0DataInSensePinNumber
+                                                                    kLTC2444CSPinNumber, std::move(SPIPort(kSPI0DevicePath)), kSPI0DataInSensePinNumber
                                                                     //kLTC2444CSPinNumber, this->spiPort0(), kSPI0DataInSensePinNumber
                                                                     )));
     //controlUnits.push_back(static_pointer_cast<IControl>(HeatBlockInstance::createInstance()));

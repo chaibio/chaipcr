@@ -8,9 +8,9 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class ADCController
-ADCController::ADCController(unsigned int csPinNumber, SPIPort& spiPort, unsigned int busyPinNumber)
+ADCController::ADCController(unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber)
 {
-    _ltc2444 = make_shared<LTC2444>(csPinNumber, spiPort, busyPinNumber);
+    _ltc2444 = make_shared<LTC2444>(csPinNumber, std::move(spiPort), busyPinNumber);
 }
 
 ADCController::~ADCController()
