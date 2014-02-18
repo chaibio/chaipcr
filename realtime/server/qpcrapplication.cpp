@@ -20,10 +20,10 @@ void QPCRApplication::initialize(Application&)
                                                                     kLTC2444CSPinNumber, SPIPort(kSPI0DevicePath), kSPI0DataInSensePinNumber
                                                                     //kLTC2444CSPinNumber, this->spiPort0(), kSPI0DataInSensePinNumber
                                                                     )));
-    controlUnits.push_back(static_pointer_cast<IControl>(HeatBlockInstance::createInstance()));
-    controlUnits.push_back(static_pointer_cast<IControl>(HeatSinkInstace::createInstance()));
-    controlUnits.push_back(static_pointer_cast<IControl>(OpticsInstance::createInstance()));
-    controlUnits.push_back(static_pointer_cast<IControl>(LidInstance::createInstance()));
+    //controlUnits.push_back(static_pointer_cast<IControl>(HeatBlockInstance::createInstance()));
+    //controlUnits.push_back(static_pointer_cast<IControl>(HeatSinkInstace::createInstance()));
+    //controlUnits.push_back(static_pointer_cast<IControl>(OpticsInstance::createInstance()));
+    //controlUnits.push_back(static_pointer_cast<IControl>(LidInstance::createInstance()));
 }
 
 int QPCRApplication::main(const vector<string>&)
