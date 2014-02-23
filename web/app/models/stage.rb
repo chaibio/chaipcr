@@ -4,21 +4,13 @@ class Stage < ActiveRecord::Base
   belongs_to :protocol
   has_many :steps, -> {order("order_number")}, dependent: :destroy
   
-  TYPE_HOLD   = 0
-  TYPE_CYCLE  = 1
+  TYPE_HOLD   = "holding"
+  TYPE_CYCLE  = "cycling"
+  TYPE_MELTCURVE = "meltcurve"
   
   before_create do |stage|
-    if hold_stage? || numcycles.nil?
-      self.numcycles = 1
-    end
-    if name.nil?
-      if hold_stage?
-        self.name = "Holding Stage"
-      elsif cycle_stage?
-        self.name = "Cycling Stage"
-      else
-        self.name = "Stage"
-      end
+    if hold_stage? || num_cycles.nil?
+      self.num_cycles = 1
     end
   end
   
@@ -29,12 +21,30 @@ class Stage < ActiveRecord::Base
     end
   end
   
+  def name
+    if name.nil?
+      if hold_stage?
+        return "Holding Stage"
+      elsif cycle_stage?
+        return "Cycling Stage"
+      elsif meltcurve_stage?
+        return "Melt Curve Stage"
+      end
+    else
+      return name
+    end
+  end
+  
   def hold_stage?
     stage_type == TYPE_HOLD
   end
   
   def cycle_stage?
     stage_type == TYPE_CYCLE
+  end
+  
+  def meltcurve_stage?
+    stage_type == TYPE_MELTCURVE
   end
   
   def copy

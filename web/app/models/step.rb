@@ -23,6 +23,14 @@ class Step < ActiveRecord::Base
     end
   end
   
+  def name
+    if name.nil?
+      return "Step #{order_number+1}"
+    else
+      return name
+    end
+  end
+  
   def infinite_hold?
     hold_time == 0
   end
