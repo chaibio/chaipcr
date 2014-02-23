@@ -57,7 +57,7 @@ Qpcrctl::Application.routes.draw do
   root 'main#index'
   
   resources :experiments do
-    resources :cycles, shallow: true do
+    resources :stages, shallow: true do
       resources :steps do
         post 'move', on: :member
       end

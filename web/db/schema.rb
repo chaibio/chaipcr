@@ -13,27 +13,43 @@
 
 ActiveRecord::Schema.define(version: 20131204195402) do
 
-  create_table "components", force: true do |t|
+  create_table "experiments", force: true do |t|
     t.string   "name"
-    t.integer  "order_number",  default: 0, null: false
-    t.integer  "repeat"
-    t.integer  "temperature"
-    t.integer  "hold_time"
-    t.integer  "parent_id"
-    t.integer  "experiment_id",             null: false
-    t.string   "type",                      null: false
+    t.boolean  "qpcr",       default: true
+    t.datetime "run_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "experiments", force: true do |t|
+  create_table "protocols", force: true do |t|
+    t.integer  "lid_temperature"
+    t.integer  "experiment_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "ramps", force: true do |t|
+    t.integer "rate"
+    t.boolean "max",     default: true
+    t.integer "step_id"
+  end
+
+  create_table "stages", force: true do |t|
     t.string   "name"
-    t.boolean  "qpcr",                default: true
-    t.integer  "master_cycle_id"
-    t.datetime "run_at"
-    t.boolean  "running",             default: false
-    t.boolean  "protocol_defined",    default: false
-    t.boolean  "platessetup_defined", default: false
+    t.integer  "numcycles",                null: false
+    t.integer  "order_number", default: 0, null: false
+    t.integer  "protocol_id"
+    t.integer  "stage_type",               null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "steps", force: true do |t|
+    t.string   "name"
+    t.integer  "temperature"
+    t.integer  "hold_time"
+    t.integer  "order_number", default: 0, null: false
+    t.integer  "stage_id",                 null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

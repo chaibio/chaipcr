@@ -3,8 +3,8 @@ class StepsController < ApplicationController
   
   def create
     @step = Step.new(step_params)
-    @step.parent_id = params[:cycle_id]
-    @step.next_component_id = params[:next_component]
+    @step.stage_id = params[:stage_id]
+    @step.next_id = params[:next_node]
     if @step.save
       respond_to do |format|
         format.json { render :json => @step,:status => :ok }
@@ -26,8 +26,8 @@ class StepsController < ApplicationController
   
   def move
     @step = Step.find(params[:id])
-    @step.parent_id = params[:parent_id]
-    @step.next_component_id = params[:next_component]
+    @step.stage_id = params[:stage_id]
+    @step.next_id = params[:next_node]
     ret = @step.save
     respond_to do |format|
       format.json { render :json => @step,:status => (ret)? :ok : :unprocessable_entity}

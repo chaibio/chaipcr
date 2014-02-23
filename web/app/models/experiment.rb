@@ -1,22 +1,28 @@
 class Experiment < ActiveRecord::Base
-  has_many :all_components, class_name: "Component", dependent: :destroy
-  has_one :master_cycle, -> {where parent_id: nil}, class_name: "Cycle"
-  has_many :components, ->(experiment) {where(parent_id: experiment.master_cycle_id).includes(:children).order("order_number")}, class_name: "Component"
-  has_many :steps, class_name: "Step"
+  has_one :protocol, dependent: :destroy
   
   after_create do |experiment|
-    if experiment.master_cycle_id == nil
-      #create master cycle
-      cycle = Cycle.create(:name=>"Master Cycle", :experiment_id=>experiment.id, :repeat=>1)
-      self.class.where(:id=>experiment.id).update_all(:master_cycle_id=>cycle.id)
-    end
+    #create default protocol
+    protocol = Protocol.new(:lid_temperature=>110, :experiment_id=>experiment.id)
+    stage = Stage.new(:stage_type=>Stage::TYPE_HOLD, :order_number=>0)
+    stage.steps << Step.new(:temperature=>95, :hold_time=>180)
+    protocol.stages << stage
+    stage = Stage.new(:stage_type=>Stage::TYPE_CYCLE, :order_number=>1, :numcycles=>40)
+    stage.steps << Step.new(:temperature=>95, :hold_time=>30, :order_number=>0)
+    stage.steps << Step.new(:temperature=>60, :hold_time=>30, :order_number=>1)
+    protocol.stages << stage
+    stage = Stage.new(:stage_type=>Stage::TYPE_HOLD, :order_number=>2)
+    stage.steps << Step.new(:temperature=>4, :hold_time=>0)
+    protocol.stages << stage
+    protocol.save
   end
   
   def copy!(params)
     new_experiment = nil
     transaction do
-      new_experiment = Experiment.create({:name=>(!params.blank?)? params[:name] : "Copy of #{name}", :qpcr=>qpcr, :protocol_defined=>protocol_defined, :platessetup_defined=>platessetup_defined})
-      component_children_copy(new_experiment.id, new_experiment.master_cycle_id, components)
+      new_experiment = Experiment.new({:name=>(!params.blank?)? params[:name] : "Copy of #{name}", :qpcr=>qpcr})
+      new_experiment.protocol = protocol.copy
+      new_experiment.save
     end
     return new_experiment
   end
@@ -24,17 +30,5 @@ class Experiment < ActiveRecord::Base
   def editable?
     return run_at.nil?
   end
-  
-  def runnable?
-    !running && protocol_defined && (!qpcr || platessetup_defined)
-  end
-  
-  private
-  
-  def component_children_copy(experiment_id, component_id, children)
-    children.each do |child|
-      new_child = child.copy!(experiment_id, component_id)
-      component_children_copy(experiment_id, new_child.id, child.children)
-    end
-  end
+  n
 end

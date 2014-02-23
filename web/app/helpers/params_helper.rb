@@ -5,8 +5,8 @@ private
      params.require(:experiment).permit(:name, :qpcr)
   end
   
-  def cycle_params
-    params.require(:cycle).permit(:name, :repeat)
+  def stage_params
+    params.require(:stage).permit(:name, :numcycles, :stage_type)
   end
   
   def step_params
