@@ -30,5 +30,4 @@ class Experiment < ActiveRecord::Base
   def editable?
     return run_at.nil?
   end
-  n
 end
