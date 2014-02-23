@@ -5,6 +5,7 @@ INCLUDEPATH += ./control/
 INCLUDEPATH += ./server/
 INCLUDEPATH += ./util/
 INCLUDEPATH += ./libraries/include/
+INCLUDEPATH += $(BOOST_INCLUDE_PATH)
 
 LIBS += -L../realtime/libraries/lib/
 
