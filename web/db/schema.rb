@@ -22,34 +22,33 @@ ActiveRecord::Schema.define(version: 20131204195402) do
   end
 
   create_table "protocols", force: true do |t|
-    t.integer  "lid_temperature"
+    t.decimal  "lid_temperature", precision: 4, scale: 1
     t.integer  "experiment_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "ramps", force: true do |t|
-    t.integer "rate"
-    t.boolean "max",     default: true
+    t.decimal "rate",    precision: 11, scale: 8, null: false
     t.integer "step_id"
   end
 
   create_table "stages", force: true do |t|
     t.string   "name"
-    t.integer  "numcycles",                null: false
+    t.integer  "num_cycles",   default: 1, null: false
     t.integer  "order_number", default: 0, null: false
     t.integer  "protocol_id"
-    t.integer  "stage_type",               null: false
+    t.string   "stage_type",               null: false, comment: "holding, cycling, or meltcurve"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "steps", force: true do |t|
     t.string   "name"
-    t.integer  "temperature"
-    t.integer  "hold_time"
-    t.integer  "order_number", default: 0, null: false
-    t.integer  "stage_id",                 null: false
+    t.decimal  "temperature",  precision: 4, scale: 1,             null: false
+    t.integer  "hold_time",                                        null: false, comment: "in seconds, 0 means infinite"
+    t.integer  "order_number",                         default: 0, null: false, comment: "the order of the step in the cycle, starting with 0, and continguous"
+    t.integer  "stage_id",                                         null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

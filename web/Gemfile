@@ -32,6 +32,8 @@ group :doc do
   gem 'sdoc', require: false
 end
 
+gem 'migration_comments'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.1.2'
 
