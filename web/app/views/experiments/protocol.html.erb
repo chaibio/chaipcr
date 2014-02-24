@@ -2,7 +2,7 @@
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() {
 	initDraggable($(".draggable"));
-	initDraggableCycle($(".cycle"));
+	initDraggableStage($(".cycle"));
 	
 	$(".stepbutton").draggable({
 		cursor: 'pointer',
@@ -18,18 +18,18 @@ $(document).ready(function() {
         }
     });
 
-	$(".cyclebutton").draggable({
+	$(".stagebutton").draggable({
 		cursor: 'pointer',
-    	scope: 'cycle',
+    	scope: 'stage',
         helper: "clone",
     	opacity: 0.9,
     	zIndex: 10
     });
 
     initDroppable($(".droppable"));
-	initDroppableCycle($(".droppable-cycle"));
+	initDroppableStage($(".droppable-stage"));
 	initEditable($(".draggable"), "step");
-	initEditable($(".cycle .title"), "cycle");
+	initEditable($(".stage .title"), "stage");
 	
 	$(".stepbutton").tooltip({ 
 		items: ".stepbutton",
@@ -38,7 +38,7 @@ $(document).ready(function() {
 	});
 	
 	initDeletableStep(null);
-	initDeletableCycle(null);
+	initDeletableStage(null);
 });
 </script>
 <% end %>
@@ -48,22 +48,22 @@ $(document).ready(function() {
 <div id="experiment-content">
 	<%= render(:partial => "/experiments/experiment_header")%>
 	
-	<div class="main-panel" id="experiment_<%=@experiment.id%>_cycle_<%=@experiment.master_cycle_id%>">
+	<div class="main-panel" id="experiment_<%=@experiment.id%>_protocol_<%=@experiment.protocol.id%>">
 		<div class="titlebar blue-scheme">
 			<span class="step-name">Step Name</span><span class="step-temperature">Temperature (&#176C)</span><span class="step-hold-time">Hold Time (secs)</span>
 		</div>
 
-		<% @experiment.components.each do |component| %>
-			<%= cycle_placeholder if @experiment.editable? %>
-			<%= render(:partial => "show_component", :locals => {:component=>component} )%>
+		<% @experiment.protocol.stages.each do |stage| %>
+			<%= stage_placeholder if @experiment.editable? %>
+			<%= render(:partial => "show_stage", :locals => {:stage=>stage} )%>
 		<% end %>
-		<%= cycle_placeholder if @experiment.editable? %>
+		<%= stage_placeholder if @experiment.editable? %>
 	</div>
 	
 <% if @experiment.editable? %>
 	<div class="ctl-panel">
 		<div class="button stepbutton">Add Step</div>
-		<div class="button cyclebutton">Add Cycle</div>
+		<div class="button stagebutton">Add Stage</div>
 	</div>
 <% end %>
 </div>

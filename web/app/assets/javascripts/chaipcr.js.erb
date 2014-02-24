@@ -64,11 +64,11 @@ function initDraggable($elements)
     });
 }
 
-function initDraggableCycle($elements)
+function initDraggableStage($elements)
 {
 	$elements.draggable({
 		cursor: 'pointer',
-    	scope:  'cycle',
+    	scope:  'stage',
 		helper: 'clone',
 		revert: 'invalid',
 		zIndex: 10,
@@ -136,7 +136,7 @@ function initDroppable($elements)
 				}
 
 				var $protocol = $this.parents(".protocol");
-				if ($protocol.hasClass("cycle"))
+				if ($protocol.hasClass("stage"))
 					$li.addClass("droppable");
 				else
 					$li.removeClass("droppable");
@@ -144,7 +144,7 @@ function initDroppable($elements)
 				if ($this.hasClass("placeholder")){
 					$li.insertAfter(this);
 					$this.remove();
-					$protocol.removeClass("droppable-cycle hide");
+					$protocol.removeClass("droppable-stage hide");
 					$protocol.droppable('destroy');
 					addPlaceHolders($protocol, "both");
 				}
@@ -156,23 +156,23 @@ function initDroppable($elements)
 				}
 				
 				if ($parent && $parent.hasClass("hide")){
-					$parent.next(".droppable-cycle").remove();
+					$parent.next(".droppable-stage").remove();
 					$parent.remove();
 				}
 				
 				if (newstep){
 					editStep($li, null, function(){
 						var $protocol = $li.parents(".protocol");
-						if ($protocol.hasClass("cycle")){
+						if ($protocol.hasClass("stage")){
 							$li.remove();
 						}
 						else{
 							$li.addClass("placeholder droppable").removeClass("draggable").html("");
-							$protocol.addClass("droppable-cycle hide");
+							$protocol.addClass("droppable-stage hide");
 							if ($li.is('.ui-draggable')) 
 								$li.draggable('destroy');
 							initDroppable($li);
-							initDroppableCycle($protocol);
+							initDroppableStage($protocol);
 							removePlaceHolders($protocol);
 						}
 					});
@@ -198,13 +198,13 @@ function initDroppable($elements)
     });
 }
 
-function initDroppableCycle($elements)
+function initDroppableStage($elements)
 {
     $elements.droppable({
 		tolerance: "touch",
 		scope: "cycle",
 		accept: function(draggable){
-			return !draggable.hasClass("cycle") || draggable.next().get(0) != this;
+			return !draggable.hasClass("stage") || draggable.next().get(0) != this;
 		},
         over: function(event, ui) {
 			var $droppable = ui.draggable.data("current-droppable");
@@ -247,16 +247,16 @@ function initDroppableCycle($elements)
 				ui.draggable.removeData("current-droppable");
 					
 				if (ui.draggable.hasClass("button")){
-					newCycle($this);
+					newStage($this);
 				}
 				else{
 					var $obj = ui.draggable;
-					$obj.next(".droppable-cycle").remove();
+					$obj.next(".droppable-stage").remove();
 					$obj.insertAfter(this);
 					
 					var id = extractID($obj.attr("id"));
 					if (id){
-						$.post("/cycles/"+id+"/move", {next_component: nextCycleID($obj)})
+						$.post("/stages/"+id+"/move", {next_component: nextStageID($obj)})
 					}
 					addPlaceHolders($obj, "after");
 				}
@@ -365,7 +365,7 @@ function initEditable($elements, elementType)
 			});
 		}
 		else{
-			editCycle($parent, $values);
+			editStage($parent, $values);
 		}
 	});
 }
@@ -413,9 +413,9 @@ function nextStepID($obj)
 	if ($nextsibling.length > 0)
 		return extractID($nextsibling.attr("id"));
 	else{
-		var $cycle = $obj.parents(".protocol");
-		if ($cycle.attr("id") == null)
-			return nextCycleID($cycle);
+		var $stage = $obj.parents(".protocol");
+		if ($stage.attr("id") == null)
+			return nextStageID($stage);
 	}
 	return null;
 }
@@ -439,7 +439,7 @@ function stepform_ajax_register($obj){
 
 		jQuery(theForm.next_component).val(nextStepID($obj));
 		if (jQuery(theForm).attr("action") == "URL_PH")
-			jQuery(theForm).attr("action", "/cycles/"+curCycleID($obj)+"/steps");
+			jQuery(theForm).attr("action", "/stages/"+curStageID($obj)+"/steps");
 	    return validform;
 	});	
 }
@@ -453,11 +453,11 @@ function initDeletableStep($obj){
 		  .bind("ajax:beforeSend",  function(evt, xhr, settings) {
 		  })	
 		  .bind('ajax:success', function(evt, data, status, xhr) {
-			var cycle = jQuery(evt.target).parents(".protocol");
+			var stage = jQuery(evt.target).parents(".protocol");
 			var li = jQuery(evt.target).parent("li");
 			li.remove();
-			if (cycle.children("ul").children("li").length == 0)
-				cycle.remove();
+			if (stage.children("ul").children("li").length == 0)
+				stage.remove();
 		  })
 		  .bind('ajax:error', function(evt, xhr, status, error) {
 			errors = jQuery.parseJSON(xhr.responseText);
@@ -465,59 +465,59 @@ function initDeletableStep($obj){
 		  });
 }
 
-function initCycle($obj, values){
+function initStage($obj, values){
 	var id = extractID($obj.attr("id"));
-	var $cycle = $obj.find(".title");
-	$cycle.html("<span class='cycle-name'>"+values[0]+"</span><span class='cycle-repeat'>Repeat "+values[1]+" times</span><a class='icon-del' data-confirm='<%=cycle_delete_confirm_msg%>' data-method='delete' data-remote='true' href='/cycles/"+ extractID($obj.attr("id"))+"'></a>");
-	initEditable($cycle, "cycle");
-	initDeletableCycle($cycle);
+	var $stage = $obj.find(".title");
+	$stage.html("<span class='stage-name'>"+values[0]+"</span><span class='stage-num-cycles'>cycles "+values[1]+" times</span><a class='icon-del' data-confirm='<%=stage_delete_confirm_msg%>' data-method='delete' data-remote='true' href='/stages/"+ extractID($obj.attr("id"))+"'></a>");
+	initEditable($stage, "stage");
+	initDeletableStage($stage);
 }
 
-function newCycle($obj){
-	$obj.removeClass("hide droppable-cycle").addClass("cycle");
+function newStage($obj){
+	$obj.removeClass("hide droppable-stage").addClass("stage");
 	$obj.droppable('destroy');
-	initDraggableCycle($obj);
+	initDraggableStage($obj);
 	
 	var id = $obj.parents(".main-panel").attr('id');
 	var arr = id.split("_");
 	id = arr[1];
-	var cycleform = "<%=escape_javascript(newcycleform())%>";
-	cycleform = cycleform.replace("URL_PH", "/experiments/"+id+"/cycles");			
-	$obj.html(cycleform);
+	var stageform = "<%=escape_javascript(newstageform())%>";
+	stageform = stageform.replace("URL_PH", "/experiments/"+id+"/stages");			
+	$obj.html(stageform);
 //	$obj.find(".textinput").hint();
-	cycleform_ajax_register($obj, "new");
+	stageform_ajax_register($obj, "new");
 	
 	$obj.find(".cancel").click(function(event){
-		$obj.addClass("droppable-cycle hide").removeClass("cycle");
-		$obj.html("<%=escape_javascript(cycle_placeholder_body)%>");
+		$obj.addClass("droppable-stage hide").removeClass("stage");
+		$obj.html("<%=escape_javascript(stage_placeholder_body)%>");
 		$obj.draggable('destroy');						
 		initDroppable($obj.find("li"));
-		initDroppableCycle($obj);
+		initDroppableStage($obj);
 		removePlaceHolders($obj);
 	});
 	
 	addPlaceHolders($obj, "both");
 }
 
-function editCycle($obj, values){
+function editStage($obj, values){
 	var $parent = $obj.parent();
 	var id = $parent.attr('id');
-	var cycleform = "<%=escape_javascript(cycleform("editcycle"))%>";
-	cycleform = cycleform.replace("URL_PH", "/cycles/"+extractID(id));
-	cycleform = cycleform.replace("NAME_PH", values[0]);
+	var stageform = "<%=escape_javascript(stageform("editstage"))%>";
+	stageform = stageform.replace("URL_PH", "/stages/"+extractID(id));
+	stageform = stageform.replace("NAME_PH", values[0]);
 	var strarr = values[1].split(" ");
 	values[1] = parseInt(strarr[1], 10);
-	cycleform = cycleform.replace("REPEAT_PH", values[1]);
-	$obj.html(cycleform);
+	stageform = stageform.replace("NUM_CYCLES_PH", values[1]);
+	$obj.html(stageform);
 //	$obj.find(".textinput").hint();
 	
-	cycleform_ajax_register($parent, "edit");
+	stageform_ajax_register($parent, "edit");
 	$obj.find(".cancel").click(function(event){
-		initCycle($parent, values);
+		initStage($parent, values);
 	});
 }
 
-function curCycleID($obj){
+function curStageID($obj){
 	var parent = $obj.parents(".protocol");
 	id = parent.attr('id');
 	if (id == null){
@@ -525,7 +525,7 @@ function curCycleID($obj){
 	}
 	return extractID(id);
 }
-function nextCycleID($obj){
+function nextStageID($obj){
 	var $nextsibling = $obj.next();
 	while ($nextsibling.length > 0){
 		var id = $nextsibling.attr("id");
@@ -542,8 +542,8 @@ function nextCycleID($obj){
 	return null;
 }
 
-function cycleform_ajax_register($obj, action){
-	$obj.find('.cycleform')
+function stageform_ajax_register($obj, action){
+	$obj.find('.stageform')
 		  .bind("ajax:beforeSend",  function(evt, xhr, settings) {
 		   })	
 		  .bind('ajax:success', function(evt, data, status, xhr) {
@@ -553,7 +553,7 @@ function cycleform_ajax_register($obj, action){
 				cycle = objs.cycle;
 				step = objs.step;
 				jQuery(evt.target).remove();
-				jQuery($obj).html("<%=escape_javascript(cycle_placeholder_body)%>");
+				jQuery($obj).html("<%=escape_javascript(stage_placeholder_body)%>");
 			}
 			else{
 				cycle = jQuery.parseJSON(xhr.responseText);
@@ -574,16 +574,16 @@ function cycleform_ajax_register($obj, action){
 			errors = jQuery.parseJSON(xhr.responseText);
 		  });
 	
-	$obj.find('.cycleform').submit(function(event){
+	$obj.find('.stageform').submit(function(event){
 		var theForm = event.target;
 	    var validform=true;
 	
-		jQuery(theForm.next_component).val(nextCycleID($obj));
+		jQuery(theForm.next_component).val(nextStageID($obj));
 	    return validform;
 	});	
 }
 
-function initDeletableCycle($obj){
+function initDeletableStage($obj){
 	if ($obj == null)
 		$obj = jQuery('div.title .icon-del');
 	else
@@ -603,20 +603,20 @@ function initDeletableCycle($obj){
 
 function addPlaceHolders($protocol, position){
 	if (position == "both" || position == "after"){
-		$protocol.after("<%=escape_javascript(cycle_placeholder)%>");
+		$protocol.after("<%=escape_javascript(stage_placeholder)%>");
 		initDroppable($protocol.next().find(".droppable"));
-		initDroppableCycle($protocol.next());
+		initDroppableStage($protocol.next());
 	}
 	if (position == "both" || position == "before"){
-		$protocol.before("<%=escape_javascript(cycle_placeholder)%>");
+		$protocol.before("<%=escape_javascript(stage_placeholder)%>");
 		initDroppable($protocol.prev().find(".droppable"));
-		initDroppableCycle($protocol.prev());
+		initDroppableStage($protocol.prev());
 	}
 }
 
 function removePlaceHolders($protocol){
-	$protocol.next(".droppable-cycle").remove();
-	$protocol.prev(".droppable-cycle").remove();
+	$protocol.next(".droppable-stage").remove();
+	$protocol.prev(".droppable-stage").remove();
 }
 
 function getBrowserWindowSize() {

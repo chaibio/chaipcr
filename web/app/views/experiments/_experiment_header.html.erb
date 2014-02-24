@@ -2,14 +2,14 @@
 	<div class="clearfix">
 	<div class="experiment-info">
 		<h1><%= @experiment.name %></h1>
-		<% if @experiment.running? %>
-			<p>Last run was on <%=@experiment.run_at%></p>
+		<% if @experiment.ran? %>
+			<p>Run was on <%=@experiment.run_at%></p>
 		<% else %>
 			<p>Last edit was on <%=@experiment.updated_at%></p>
 		<% end %>
 	</div>
 	<div class="experiment-ctl">
-		<% if @experiment.runnable? %>
+		<% if !@experiment.ran? %>
 			<div class="button">Start a run</div>
 		<% end %>
 		<%= link_to "Copy & Create New", copy_experiment_path(@experiment), :class=>"button", :id=>"copyexperiment" %>

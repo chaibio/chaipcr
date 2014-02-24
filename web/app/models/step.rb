@@ -5,11 +5,11 @@ class Step < ActiveRecord::Base
   has_one :ramp, dependent: :destroy
   
   before_create do |step|
-    step.ramp = Ramp.new
+    step.ramp = Ramp.new(:rate=>Ramp::MAX_RATE)
   end
   
   after_save do |step|
-    if step.stage_id_changed?
+    if step.stage_id_changed? && !step.stage_id_was.nil?
       children_count = Step.where("stage_id=?", step.stage_id_was).count
       if children_count == 0
         Stage.find(step.stage_id_was).destroy
@@ -24,10 +24,11 @@ class Step < ActiveRecord::Base
   end
   
   def name
-    if name.nil?
+    name_attr = read_attribute(:name)
+    if name_attr.nil?
       return "Step #{order_number+1}"
     else
-      return name
+      return name_attr
     end
   end
   

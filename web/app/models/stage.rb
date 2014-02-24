@@ -22,7 +22,8 @@ class Stage < ActiveRecord::Base
   end
   
   def name
-    if name.nil?
+    name_attr = read_attribute(:name)
+    if name_attr.nil?
       if hold_stage?
         return "Holding Stage"
       elsif cycle_stage?
@@ -31,7 +32,7 @@ class Stage < ActiveRecord::Base
         return "Melt Curve Stage"
       end
     else
-      return name
+      return name_attr
     end
   end
   

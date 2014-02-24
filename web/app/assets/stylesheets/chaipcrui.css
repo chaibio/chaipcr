@@ -381,10 +381,10 @@ label{
 	background-color: #FFCC7F !important;
 	display: block;
 }
-.protocol.cycle .title{
+.protocol.stage .title{
 	display: block;
 }
-.protocol.cycle.hide .title{
+.protocol.stage.hide .title{
 	display: none;
 }
 .titlebar{
@@ -437,13 +437,13 @@ span.step-hold-time{
 	padding: 10px 0;
 	text-align: center;
 }
-span.cycle-name{
+span.stage-name{
 	margin-right: 10px;
 }
-span.cycle-repeat{
+span.stage-num-cycles{
 	margin-right: 10px;
 }
-span.cycle-repeat .textinput, span.step-temperature .textinput, span.step-hold-time .textinput{
+span.stage-num-cycles .textinput, span.step-temperature .textinput, span.step-hold-time .textinput{
 	width: 62px;
 	text-align: center;
 }
@@ -490,10 +490,10 @@ span.cycle-repeat .textinput, span.step-temperature .textinput, span.step-hold-t
 	margin-bottom: 5px;
 }
 
-.cycle{
+.stage{
 	border-bottom: 1px solid #d5d5d5;
 }
-.cycle li{
+.stage li{
 	margin-bottom: 5px;
 }
 

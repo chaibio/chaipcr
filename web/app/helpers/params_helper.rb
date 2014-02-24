@@ -6,7 +6,7 @@ private
   end
   
   def stage_params
-    params.require(:stage).permit(:name, :numcycles, :stage_type)
+    params.require(:stage).permit(:name, :num_cycles, :stage_type)
   end
   
   def step_params

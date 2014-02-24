@@ -1,11 +1,11 @@
 module AssetHelper
-  def cycle_placeholder
-    "<div class='protocol droppable-cycle hide'>".html_safe+cycle_placeholder_body+"</div>".html_safe
+  def stage_placeholder
+    "<div class='protocol droppable-stage hide'>".html_safe+stage_placeholder_body+"</div>".html_safe
   end
   
-  def cycle_placeholder_body
+  def stage_placeholder_body
         output = <<-placeholder
-<div class='title'>Cycle</div>
+<div class='title'>Stage</div>
 <ul>
     <li class='droppable placeholder'></li>
 </ul>
@@ -13,43 +13,43 @@ placeholder
         output.html_safe
   end
   
-  def cycle_delete_confirm_msg
-    "Are you sure you want to delete this cycle and all its steps?"
+  def stage_delete_confirm_msg
+    "Are you sure you want to delete this stage and all its steps?"
   end
   
   def step_delete_confirm_msg
     "Are you sure you want to delete this step?"
   end
   
-  def newcycleform
+  def newstageform
      str = 
-      form_tag("URL_PH", :remote=>true, :class=>"cycleform", :method=>"post")+
-      "<div class='title'>".html_safe+cycleform("newcycle").html_safe+
-      "</div><ul><li>".html_safe+stepform("newcycle").html_safe+
+      form_tag("URL_PH", :remote=>true, :class=>"stageform", :method=>"post")+
+      "<div class='title'>".html_safe+stageform("newstage").html_safe+
+      "</div><ul><li>".html_safe+stepform("newstage").html_safe+
       "</li></ul></form>".html_safe
       
     return str
   end
   
-  def cycleform(action)
-    newcycle = (action == "newcycle");
+  def stageform(action)
+    newstage = (action == "newstage");
     
     str = ""
-    if action != "newcycle"
-      str = form_tag("URL_PH", :remote=>true, :class=>"cycleform", :method=>"put")
+    if !newstage
+      str = form_tag("URL_PH", :remote=>true, :class=>"stageform", :method=>"put")
     end
     str += 
     hidden_field_tag("next_component", "")+
-    "<span class='cycle-name'>".html_safe+
-    label_tag("Cycle Name", "Cycle Name")+
-    text_field_tag("cycle[name]", (newcycle)? "" : "NAME_PH", :class=>"textinput", :title=>"Cycle Name")+
-    "</span><span class='cycle-repeat'>".html_safe+
-    label_tag("Repeat")+
-    text_field_tag("cycle[repeat]", (newcycle)? "" : "REPEAT_PH", :class=>"textinput", :title=>"Repeat")+
+    "<span class='stage-name'>".html_safe+
+    label_tag("Stage Name", "Stage Name")+
+    text_field_tag("stage[name]", (newstage)? "" : "NAME_PH", :class=>"textinput", :title=>"Stage Name")+
+    "</span><span class='stage-num-cycles'>".html_safe+
+    label_tag("Num of Cycles")+
+    text_field_tag("stage[num_cycles]", (newstage)? "" : "NUM_CYCLES_PH", :class=>"textinput", :title=>"Num of Cycles")+
     "</span>".html_safe
     
-    if action != "newcycle"
-      str += "<span class='cyclebuttons'>".html_safe+
+    if !newstage
+      str += "<span class='stagebuttons'>".html_safe+
              submit_tag('Save')+
              "<input type='button' class='cancel' value='Cancel'/></span></form>".html_safe
     end
@@ -60,7 +60,7 @@ placeholder
   def stepform(action)
     newstep = (action != "updatestep");
     str = ""
-    if (action != "newcycle")
+    if (action != "newstage")
       str = form_tag("URL_PH", :remote=>true, :class=>"stepform", :method=>(newstep)? "post" : "put")
     end
     
@@ -79,7 +79,7 @@ placeholder
     submit_tag('Save')+
     "<input type='button' class='cancel' value='Cancel'/></div>".html_safe
     
-    if (action != "newcycle")
+    if (action != "newstage")
       str += "</form>".html_safe
     end
     

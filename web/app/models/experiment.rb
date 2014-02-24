@@ -7,7 +7,7 @@ class Experiment < ActiveRecord::Base
     stage = Stage.new(:stage_type=>Stage::TYPE_HOLD, :order_number=>0)
     stage.steps << Step.new(:temperature=>95, :hold_time=>180)
     protocol.stages << stage
-    stage = Stage.new(:stage_type=>Stage::TYPE_CYCLE, :order_number=>1, :numcycles=>40)
+    stage = Stage.new(:stage_type=>Stage::TYPE_CYCLE, :order_number=>1, :num_cycles=>40)
     stage.steps << Step.new(:temperature=>95, :hold_time=>30, :order_number=>0)
     stage.steps << Step.new(:temperature=>60, :hold_time=>30, :order_number=>1)
     protocol.stages << stage
@@ -30,4 +30,9 @@ class Experiment < ActiveRecord::Base
   def editable?
     return run_at.nil?
   end
+
+  def ran?
+    return !run_at.nil?
+  end
+
 end
