@@ -3,6 +3,7 @@
 
 #include <Poco/URI.h>
 #include <Poco/Timer.h>
+#include <Poco/Timestamp.h>
 
 #include <Poco/Net/HTTPServer.h>
 #include <Poco/Net/HTTPServerParams.h>

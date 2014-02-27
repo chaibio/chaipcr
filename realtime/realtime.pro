@@ -4,6 +4,7 @@ INCLUDEPATH += ./app/
 INCLUDEPATH += ./control/
 INCLUDEPATH += ./server/
 INCLUDEPATH += ./util/
+INCLUDEPATH += ./db/
 INCLUDEPATH += ./libraries/include/
 INCLUDEPATH += $(BOOST_INCLUDE_PATH)
 
@@ -75,7 +76,8 @@ HEADERS += \
     util/utilincludes.h \
     control/controlincludes.h \
     util/pid.h \
-    control/lid.h
+    control/lid.h \
+    db/experiment.h
 
 SOURCES += \
     app/pins.cpp \
