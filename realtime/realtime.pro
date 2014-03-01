@@ -41,6 +41,9 @@ unix_m: {
     QMAKE_CXXFLAGS += -mfloat-abi=soft -Wno-unused-local-typedefs
 
     INCLUDEPATH += /opt/local/include/
+
+    target.path = /home/root/tmp
+    INSTALLS += target
 }
 
 QMAKE_CXXFLAGS += -std=c++11
