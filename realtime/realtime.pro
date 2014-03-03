@@ -15,6 +15,8 @@ LIBS += -lPocoFoundation
 LIBS += -lPocoNet
 LIBS += -lPocoUtil
 LIBS += -lPocoXML
+LIBS += -lPocoData
+LIBS += -lPocoDataSQLite
 
 #Google Test and Mock
 LIBS += -lgtest
@@ -80,7 +82,8 @@ HEADERS += \
     control/controlincludes.h \
     util/pid.h \
     control/lid.h \
-    db/experiment.h
+    db/experiment.h \
+    db/dbcontrol.h
 
 SOURCES += \
     app/pins.cpp \
@@ -104,4 +107,5 @@ SOURCES += \
     server/testcontrolhandler.cpp \
     server/qpcrapplication.cpp \
     util/pid.cpp \
-    control/lid.cpp
+    control/lid.cpp \
+    db/dbcontrol.cpp

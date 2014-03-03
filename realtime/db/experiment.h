@@ -1,9 +1,6 @@
 #ifndef EXPERIMENT_H
 #define EXPERIMENT_H
 
-#include "pcrincludes.h"
-#include "pocoincludes.h"
-
 class Step;
 
 class Ramp
@@ -12,22 +9,17 @@ public:
     Ramp()
     {
         rate = 0;
-        next_step = 0;
     }
 
     Ramp(const Ramp &other)
     {
         rate = other.rate;
-        next_step = other.next_step;
     }
 
     Ramp(Ramp &&other)
     {
         rate = other.rate;
-        next_step = other.next_step;
-
         other.rate = 0;
-        other.next_step = 0;
     }
 
     ~Ramp()
@@ -38,7 +30,6 @@ public:
     Ramp& operator= (const Ramp &other)
     {
         rate = other.rate;
-        next_step = other.next_step;
 
         return *this;
     }
@@ -46,19 +37,13 @@ public:
     Ramp& operator= (Ramp &&other)
     {
         rate = other.rate;
-        next_step = other.next_step;
-
         other.rate = 0;
-        other.next_step = 0;
 
         return *this;
     }
 
 
     double rate;
-
-    Step *next_step;
-
 };
 
 class Step
@@ -69,6 +54,7 @@ public:
         temperature = 0;
         hold_time = 0;
         order_number = 0;
+        ramp = 0;
     }
 
     Step(const Step &other)
@@ -77,6 +63,11 @@ public:
         temperature = other.temperature;
         hold_time = other.hold_time;
         order_number = other.order_number;
+
+        if (ramp)
+            *ramp = *other.ramp;
+        else
+            ramp = new Ramp(*other.ramp);
     }
 
     Step(Step &&other)
@@ -86,14 +77,20 @@ public:
         hold_time = other.hold_time;
         order_number = other.order_number;
 
+        if (ramp)
+            delete ramp;
+
+        ramp = other.ramp;
+
         other.temperature = 0;
         other.hold_time = 0;
         other.order_number = 0;
+        other.ramp = 0;
     }
 
     ~Step()
     {
-
+        delete ramp;
     }
 
     Step& operator= (const Step &other)
@@ -102,7 +99,11 @@ public:
         temperature = other.temperature;
         hold_time = other.hold_time;
         order_number = other.order_number;
-        ramp = other.ramp;
+
+        if (ramp)
+            *ramp = *other.ramp;
+        else
+            ramp = new Ramp(*other.ramp);
 
         return *this;
     }
@@ -113,11 +114,16 @@ public:
         temperature = other.temperature;
         hold_time = other.hold_time;
         order_number = other.order_number;
-        ramp = std::move(other.ramp);
+
+        if (ramp)
+            delete ramp;
+
+        ramp = other.ramp;
 
         other.temperature = 0;
         other.hold_time = 0;
         other.order_number = 0;
+        other.ramp = 0;
 
         return *this;
     }
@@ -125,10 +131,10 @@ public:
     std::string name;
 
     double temperature;
-    int hold_time;
+    Poco::Timestamp hold_time;
     int order_number;
 
-    Ramp ramp;
+    Ramp *ramp;
 };
 
 class Stage
@@ -268,8 +274,7 @@ public:
     {
         qpcr = true;
         run_at = 0;
-
-        protocol = new Protocol;
+        protocol = 0;
     }
 
     Experiment(const Experiment &other)
@@ -277,7 +282,11 @@ public:
         name = other.name;
         qpcr = other.qpcr;
         run_at = other.run_at;
-        *protocol = *other.protocol;
+
+        if (protocol)
+            *protocol = *other.protocol;
+        else
+            protocol = new Protocol(*other.protocol);
     }
 
     Experiment(Experiment &&other)
@@ -285,11 +294,15 @@ public:
         name = std::move(other.name);
         qpcr = other.qpcr;
         run_at = other.run_at;
+
+        if (protocol)
+            delete protocol;
+
         protocol = other.protocol;
 
         other.qpcr = true;
         other.run_at = 0;
-        other.protocol = new Protocol;
+        other.protocol = 0;
     }
 
     ~Experiment()
@@ -302,7 +315,11 @@ public:
         name = other.name;
         qpcr = other.qpcr;
         run_at = other.run_at;
-        *protocol = *other.protocol;
+
+        if (protocol)
+            *protocol = *other.protocol;
+        else
+            protocol = new Protocol(*other.protocol);
 
         return *this;
     }
@@ -312,11 +329,15 @@ public:
         name = std::move(other.name);
         qpcr = other.qpcr;
         run_at = other.run_at;
+
+        if (protocol)
+            delete protocol;
+
         protocol = other.protocol;
 
         other.qpcr = true;
         other.run_at = 0;
-        other.protocol = new Protocol;
+        other.protocol = 0;
 
         return *this;
     }
@@ -327,6 +348,5 @@ public:
 
     Protocol *protocol;
 };
-
 
 #endif // EXPERIMENT_H

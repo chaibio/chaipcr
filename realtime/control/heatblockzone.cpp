@@ -41,7 +41,7 @@ void HeatBlockZoneController::pidCallback(Timer &)
 {
     double pidResult = _pidController.load()->compute(_targetTemp, _thermistor->temperature());
 
-    if (pidResult != _pidResult)
+    if (pidResult != _pidResult.load())
     {
         setPWMDutyCycle(pidResult >= 0 ? pidResult : (pidResult * -1));
 
