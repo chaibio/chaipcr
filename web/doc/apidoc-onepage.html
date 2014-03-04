@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>API documentation</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <link type='text/css' rel='stylesheet' href='./apidoc/stylesheets/bundled/bootstrap.min.css'/>
+<link type='text/css' rel='stylesheet' href='./apidoc/stylesheets/bundled/prettify.css'/>
+<link type='text/css' rel='stylesheet' href='./apidoc/stylesheets/bundled/bootstrap-responsive.min.css'/>
+  <link type='text/css' rel='stylesheet' href='./apidoc/stylesheets/application.css'/>
+  <!-- IE6-8 support of HTML5 elements -->
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div id='container'>
+          <h4><a href='#experiments'>Experiments</a></h4>
+  <ul>
+      <li><a href='#experiments-index'>index</a></li>
+      <li><a href='#experiments-new'>new</a></li>
+      <li><a href='#experiments-create'>create</a></li>
+      <li><a href='#experiments-update'>update</a></li>
+      <li><a href='#experiments-copy'>copy</a></li>
+      <li><a href='#experiments-show'>show</a></li>
+      <li><a href='#experiments-protocol'>protocol</a></li>
+      <li><a href='#experiments-platessetup'>platessetup</a></li>
+      <li><a href='#experiments-status'>status</a></li>
+      <li><a href='#experiments-start'>start</a></li>
+      <li><a href='#experiments-stop'>stop</a></li>
+      <li><a href='#experiments-destroy'>destroy</a></li>
+  </ul>
+  <h4><a href='#main'>Main</a></h4>
+  <ul>
+      <li><a href='#main-index'>index</a></li>
+  </ul>
+  <h4><a href='#ramps'>Ramps</a></h4>
+  <ul>
+      <li><a href='#ramps-update'>update</a></li>
+  </ul>
+  <h4><a href='#stages'>Stages</a></h4>
+  <ul>
+      <li><a href='#stages-create'>create</a></li>
+      <li><a href='#stages-update'>update</a></li>
+      <li><a href='#stages-move'>move</a></li>
+      <li><a href='#stages-destroy'>destroy</a></li>
+  </ul>
+  <h4><a href='#steps'>Steps</a></h4>
+  <ul>
+      <li><a href='#steps-create'>create</a></li>
+      <li><a href='#steps-update'>update</a></li>
+      <li><a href='#steps-move'>move</a></li>
+      <li><a href='#steps-destroy'>destroy</a></li>
+  </ul>
+
+
+
+<div>Another API description</div>
+
+<hr>
+
+
+  <ul class='breadcrumb'  id='experiments'>
+    <li><a href='#'>qPCR</a><span class='divider'>/</span></li>
+    <li class='active'>Experiments</li>
+  </ul>
+
+  <div class='page-header'>
+    <h1>
+      <a href='#experiments'>Experiments</a><br>
+      <small></small>
+    </h1>
+  </div>
+
+
+  <div class='accordion' id='accordion'>
+
+      <hr>
+
+      <ul class='breadcrumb' id='experiments-index'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#experiments'>Experiments</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>index</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#experiments-index'>
+              GET /experiments
+            </a><br>
+            <small>List experiments and show the first one</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+      <hr>
+
+      <ul class='breadcrumb' id='experiments-new'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#experiments'>Experiments</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>new</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#experiments-new'>
+              GET /experiments/new
+            </a><br>
+            <small>New an experiment</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+      <hr>
+
+      <ul class='breadcrumb' id='experiments-create'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#experiments'>Experiments</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>create</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#experiments-create'>
+              POST /experiments
+            </a><br>
+            <small>Create an experiment</small>
+          </h3>
+      </div>
+
+      <div>
+        
+<p>when experiment is created, default protocol will be created</p>
+
+
+
+          <h2>Params</h2>
+          <table class='table'>
+            <thead>
+              <tr>
+                <th>Param name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr style='background-color:rgb(255,255,255);'>
+    <td>
+      <strong>experiment </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Experiment Info</p>
+
+        <br>
+        Value: Must be a Hash
+
+
+    </td>
+
+  </tr>
+
+    <tr style='background-color:rgb(250,250,250);'>
+    <td>
+      <strong>experiment[name] </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Name of the experiment</p>
+
+        <br>
+        Value: Must be String
+
+
+    </td>
+
+  </tr>
+
+  
+  <tr style='background-color:rgb(250,250,250);'>
+    <td>
+      <strong>experiment[qpcr] </strong><br>
+      <small>
+        optional
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Define whether it is an pcr or qpcr experiment</p>
+
+        <br>
+        Value: Must be &#39;true&#39; or &#39;false&#39;
+
+
+    </td>
+
+  </tr>
+
+  
+
+
+            </tbody>
+          </table>
+      </div>
+      <hr>
+
+      <ul class='breadcrumb' id='experiments-update'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#experiments'>Experiments</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>update</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#experiments-update'>
+              PUT /experiment/:id
+            </a><br>
+            <small>Update an experiment</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+          <h2>Params</h2>
+          <table class='table'>
+            <thead>
+              <tr>
+                <th>Param name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr style='background-color:rgb(255,255,255);'>
+    <td>
+      <strong>experiment </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Experiment Info</p>
+
+        <br>
+        Value: Must be a Hash
+
+
+    </td>
+
+  </tr>
+
+    <tr style='background-color:rgb(250,250,250);'>
+    <td>
+      <strong>experiment[name] </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Name of the experiment</p>
+
+        <br>
+        Value: Must be String
+
+
+    </td>
+
+  </tr>
+
+  
+  <tr style='background-color:rgb(250,250,250);'>
+    <td>
+      <strong>experiment[qpcr] </strong><br>
+      <small>
+        optional
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Define whether it is an pcr or qpcr experiment</p>
+
+        <br>
+        Value: Must be &#39;true&#39; or &#39;false&#39;
+
+
+    </td>
+
+  </tr>
+
+  
+
+
+            </tbody>
+          </table>
+      </div>
+      <hr>
+
+      <ul class='breadcrumb' id='experiments-copy'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#experiments'>Experiments</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>copy</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#experiments-copy'>
+              POST /experiment/:id/copy
+            </a><br>
+            <small>Copy an experiment</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+      <hr>
+
+      <ul class='breadcrumb' id='experiments-show'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#experiments'>Experiments</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>show</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#experiments-show'>
+              GET /experiment/:id
+            </a><br>
+            <small>Show an experiment</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+      <hr>
+
+      <ul class='breadcrumb' id='experiments-protocol'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#experiments'>Experiments</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>protocol</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#experiments-protocol'>
+              GET /experiment/:id/protocol
+            </a><br>
+            <small>Show the protocol of an experiment</small>
+          </h3>
+      </div>
+
+      <div>
+        
+<p>experiment object has one protocol, the protocol has many stages, each
+stage has many steps, each step has one ramp</p>
+
+
+
+      </div>
+      <hr>
+
+      <ul class='breadcrumb' id='experiments-platessetup'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#experiments'>Experiments</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>platessetup</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#experiments-platessetup'>
+              GET /experiment/:id/platessetup
+            </a><br>
+            <small>Show the plate setup of an experiment</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+      <hr>
+
+      <ul class='breadcrumb' id='experiments-status'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#experiments'>Experiments</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>status</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#experiments-status'>
+              GET /experiment/:id/status
+            </a><br>
+            <small>Show an experiment running status</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+      <hr>
+
+      <ul class='breadcrumb' id='experiments-start'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#experiments'>Experiments</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>start</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#experiments-start'>
+              POST /experiment/:id/start
+            </a><br>
+            <small>Start an experiment</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+      <hr>
+
+      <ul class='breadcrumb' id='experiments-stop'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#experiments'>Experiments</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>stop</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#experiments-stop'>
+              POST /experiment/:id/stop
+            </a><br>
+            <small>Stop an experiment</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+      <hr>
+
+      <ul class='breadcrumb' id='experiments-destroy'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#experiments'>Experiments</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>destroy</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#experiments-destroy'>
+              DELETE /experiment/:id
+            </a><br>
+            <small>Destroy an experiment</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+  </div>
+
+  <ul class='breadcrumb'  id='main'>
+    <li><a href='#'>qPCR</a><span class='divider'>/</span></li>
+    <li class='active'>Main</li>
+  </ul>
+
+  <div class='page-header'>
+    <h1>
+      <a href='#main'>Main</a><br>
+      <small></small>
+    </h1>
+  </div>
+
+
+  <div class='accordion' id='accordion'>
+
+      <hr>
+
+      <ul class='breadcrumb' id='main-index'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#main'>Main</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>index</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#main-index'>
+              GET 
+            </a><br>
+            <small>Home page</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+  </div>
+
+  <ul class='breadcrumb'  id='ramps'>
+    <li><a href='#'>qPCR</a><span class='divider'>/</span></li>
+    <li class='active'>Ramps</li>
+  </ul>
+
+  <div class='page-header'>
+    <h1>
+      <a href='#ramps'>Ramps</a><br>
+      <small></small>
+    </h1>
+  </div>
+
+
+  <div class='accordion' id='accordion'>
+
+      <hr>
+
+      <ul class='breadcrumb' id='ramps-update'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#ramps'>Ramps</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>update</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#ramps-update'>
+              PUT /ramps/:id
+            </a><br>
+            <small>Update a ramp</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+          <h2>Params</h2>
+          <table class='table'>
+            <thead>
+              <tr>
+                <th>Param name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr style='background-color:rgb(255,255,255);'>
+    <td>
+      <strong>ramp </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Ramp Info</p>
+
+        <br>
+        Value: Must be a Hash
+
+
+    </td>
+
+  </tr>
+
+    <tr style='background-color:rgb(250,250,250);'>
+    <td>
+      <strong>ramp[rate] </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Rate of the ramp, in degrees C/s, set to 100 for max, precision to 8
+decimal point</p>
+
+        <br>
+        Value: Must be BigDecimal
+
+
+    </td>
+
+  </tr>
+
+  
+
+
+            </tbody>
+          </table>
+      </div>
+  </div>
+
+  <ul class='breadcrumb'  id='stages'>
+    <li><a href='#'>qPCR</a><span class='divider'>/</span></li>
+    <li class='active'>Stages</li>
+  </ul>
+
+  <div class='page-header'>
+    <h1>
+      <a href='#stages'>Stages</a><br>
+      <small></small>
+    </h1>
+  </div>
+
+
+  <div class='accordion' id='accordion'>
+
+      <hr>
+
+      <ul class='breadcrumb' id='stages-create'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#stages'>Stages</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>create</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#stages-create'>
+              POST /protocols/:protocol_id/stages
+            </a><br>
+            <small>Create a stage</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+          <h2>Params</h2>
+          <table class='table'>
+            <thead>
+              <tr>
+                <th>Param name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr style='background-color:rgb(255,255,255);'>
+    <td>
+      <strong>stage </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Stage Info</p>
+
+        <br>
+        Value: Must be a Hash
+
+
+    </td>
+
+  </tr>
+
+    <tr style='background-color:rgb(250,250,250);'>
+    <td>
+      <strong>stage[stage_type] </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Stage type</p>
+
+        <br>
+        Value: Must be one of: holding, cycling, meltcurve.
+
+
+    </td>
+
+  </tr>
+
+  
+  <tr style='background-color:rgb(250,250,250);'>
+    <td>
+      <strong>stage[name] </strong><br>
+      <small>
+        optional
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Name of the stage, if not provided, default name is &#39;&lt;stage type&gt;
+Stage&#39;</p>
+
+        <br>
+        Value: Must be String
+
+
+    </td>
+
+  </tr>
+
+  
+  <tr style='background-color:rgb(250,250,250);'>
+    <td>
+      <strong>stage[num_cycles] </strong><br>
+      <small>
+        optional
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Number of cycles in a stage, must be &gt;= 1, default to 1</p>
+
+        <br>
+        Value: Must be Integer
+
+
+    </td>
+
+  </tr>
+
+  
+
+  <tr style='background-color:rgb(255,255,255);'>
+    <td>
+      <strong>next_id </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>next stage id or null if it is the last node</p>
+
+        <br>
+        Value: Must be Integer
+
+
+    </td>
+
+  </tr>
+
+  
+
+            </tbody>
+          </table>
+      </div>
+      <hr>
+
+      <ul class='breadcrumb' id='stages-update'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#stages'>Stages</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>update</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#stages-update'>
+              PUT /stages/:id
+            </a><br>
+            <small>Update a stage</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+          <h2>Params</h2>
+          <table class='table'>
+            <thead>
+              <tr>
+                <th>Param name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr style='background-color:rgb(255,255,255);'>
+    <td>
+      <strong>stage </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Stage Info</p>
+
+        <br>
+        Value: Must be a Hash
+
+
+    </td>
+
+  </tr>
+
+    <tr style='background-color:rgb(250,250,250);'>
+    <td>
+      <strong>stage[stage_type] </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Stage type</p>
+
+        <br>
+        Value: Must be one of: holding, cycling, meltcurve.
+
+
+    </td>
+
+  </tr>
+
+  
+  <tr style='background-color:rgb(250,250,250);'>
+    <td>
+      <strong>stage[name] </strong><br>
+      <small>
+        optional
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Name of the stage, if not provided, default name is &#39;&lt;stage type&gt;
+Stage&#39;</p>
+
+        <br>
+        Value: Must be String
+
+
+    </td>
+
+  </tr>
+
+  
+  <tr style='background-color:rgb(250,250,250);'>
+    <td>
+      <strong>stage[num_cycles] </strong><br>
+      <small>
+        optional
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Number of cycles in a stage, must be &gt;= 1, default to 1</p>
+
+        <br>
+        Value: Must be Integer
+
+
+    </td>
+
+  </tr>
+
+  
+
+
+            </tbody>
+          </table>
+      </div>
+      <hr>
+
+      <ul class='breadcrumb' id='stages-move'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#stages'>Stages</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>move</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#stages-move'>
+              POST /stages/:id/move
+            </a><br>
+            <small>Move a stage</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+          <h2>Params</h2>
+          <table class='table'>
+            <thead>
+              <tr>
+                <th>Param name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr style='background-color:rgb(255,255,255);'>
+    <td>
+      <strong>next_id </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>next stage id or null if it is the last node</p>
+
+        <br>
+        Value: Must be Integer
+
+
+    </td>
+
+  </tr>
+
+  
+
+            </tbody>
+          </table>
+      </div>
+      <hr>
+
+      <ul class='breadcrumb' id='stages-destroy'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#stages'>Stages</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>destroy</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#stages-destroy'>
+              DELETE /stages/:id
+            </a><br>
+            <small>Destroy a stage</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+  </div>
+
+  <ul class='breadcrumb'  id='steps'>
+    <li><a href='#'>qPCR</a><span class='divider'>/</span></li>
+    <li class='active'>Steps</li>
+  </ul>
+
+  <div class='page-header'>
+    <h1>
+      <a href='#steps'>Steps</a><br>
+      <small></small>
+    </h1>
+  </div>
+
+
+  <div class='accordion' id='accordion'>
+
+      <hr>
+
+      <ul class='breadcrumb' id='steps-create'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#steps'>Steps</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>create</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#steps-create'>
+              POST /stages/:stage_id/steps
+            </a><br>
+            <small>Create a step</small>
+          </h3>
+      </div>
+
+      <div>
+        
+<p>when step is created, default ramp with max rate (100) will be created</p>
+
+
+
+          <h2>Params</h2>
+          <table class='table'>
+            <thead>
+              <tr>
+                <th>Param name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr style='background-color:rgb(255,255,255);'>
+    <td>
+      <strong>step </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Step Info</p>
+
+        <br>
+        Value: Must be a Hash
+
+
+    </td>
+
+  </tr>
+
+    <tr style='background-color:rgb(250,250,250);'>
+    <td>
+      <strong>step[temperature] </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Temperature of the step, in degree C, with precision to one decimal point</p>
+
+        <br>
+        Value: Must be BigDecimal
+
+
+    </td>
+
+  </tr>
+
+  
+  <tr style='background-color:rgb(250,250,250);'>
+    <td>
+      <strong>step[hold_time] </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Hold time of the step, in seconds, 0 means infinite</p>
+
+        <br>
+        Value: Must be Integer
+
+
+    </td>
+
+  </tr>
+
+  
+  <tr style='background-color:rgb(250,250,250);'>
+    <td>
+      <strong>step[name] </strong><br>
+      <small>
+        optional
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Name of the step, if not provided, default name is &#39;Step
+&lt;order_number&gt;&#39;</p>
+
+        <br>
+        Value: Must be String
+
+
+    </td>
+
+  </tr>
+
+  
+
+  <tr style='background-color:rgb(255,255,255);'>
+    <td>
+      <strong>next_id </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>next step id or null if it is the last node</p>
+
+        <br>
+        Value: Must be Integer
+
+
+    </td>
+
+  </tr>
+
+  
+
+            </tbody>
+          </table>
+      </div>
+      <hr>
+
+      <ul class='breadcrumb' id='steps-update'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#steps'>Steps</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>update</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#steps-update'>
+              PUT /steps/:id
+            </a><br>
+            <small>Update a step</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+          <h2>Params</h2>
+          <table class='table'>
+            <thead>
+              <tr>
+                <th>Param name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr style='background-color:rgb(255,255,255);'>
+    <td>
+      <strong>step </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Step Info</p>
+
+        <br>
+        Value: Must be a Hash
+
+
+    </td>
+
+  </tr>
+
+    <tr style='background-color:rgb(250,250,250);'>
+    <td>
+      <strong>step[temperature] </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Temperature of the step, in degree C, with precision to one decimal point</p>
+
+        <br>
+        Value: Must be BigDecimal
+
+
+    </td>
+
+  </tr>
+
+  
+  <tr style='background-color:rgb(250,250,250);'>
+    <td>
+      <strong>step[hold_time] </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Hold time of the step, in seconds, 0 means infinite</p>
+
+        <br>
+        Value: Must be Integer
+
+
+    </td>
+
+  </tr>
+
+  
+  <tr style='background-color:rgb(250,250,250);'>
+    <td>
+      <strong>step[name] </strong><br>
+      <small>
+        optional
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Name of the step, if not provided, default name is &#39;Step
+&lt;order_number&gt;&#39;</p>
+
+        <br>
+        Value: Must be String
+
+
+    </td>
+
+  </tr>
+
+  
+
+
+            </tbody>
+          </table>
+      </div>
+      <hr>
+
+      <ul class='breadcrumb' id='steps-move'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#steps'>Steps</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>move</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#steps-move'>
+              POST /steps/:id/move
+            </a><br>
+            <small>Move a step</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+          <h2>Params</h2>
+          <table class='table'>
+            <thead>
+              <tr>
+                <th>Param name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr style='background-color:rgb(255,255,255);'>
+    <td>
+      <strong>next_id </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>next step id or null if it is the last node</p>
+
+        <br>
+        Value: Must be Integer
+
+
+    </td>
+
+  </tr>
+
+  
+
+            </tbody>
+          </table>
+      </div>
+      <hr>
+
+      <ul class='breadcrumb' id='steps-destroy'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#steps'>Steps</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>destroy</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#steps-destroy'>
+              DELETE /steps/:id
+            </a><br>
+            <small>Destroy a step</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+  </div>
+
+
+        
+      </div>
+    </div>
+    <hr>
+    <footer>
+</footer>
+  </div>
+  <script type='text/javascript' src='./apidoc/javascripts/bundled/jquery-1.7.2.js'></script>
+<script type='text/javascript' src='./apidoc/javascripts/bundled/bootstrap-collapse.js'></script>
+<script type='text/javascript' src='./apidoc/javascripts/bundled/prettify.js'></script>
+<script type='text/javascript' src='./apidoc/javascripts/apipie.js'></script>
+</body>
+</html>

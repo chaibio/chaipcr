@@ -13,4 +13,8 @@ private
     params.require(:step).permit(:name, :temperature, :hold_time)
   end
   
+  def ramp_params
+    params.require(:ramp).permit(:rate)
+  end
+  
 end

@@ -2,7 +2,7 @@ class Step < ActiveRecord::Base
   include ProtocolHelper
   
   belongs_to :stage
-  has_one :ramp, dependent: :destroy
+  has_one :ramp, foreign_key: "next_step_id", dependent: :destroy
   
   before_create do |step|
     step.ramp = Ramp.new(:rate=>Ramp::MAX_RATE)

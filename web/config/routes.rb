@@ -1,4 +1,5 @@
 Qpcrctl::Application.routes.draw do
+  apipie
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
@@ -57,13 +58,6 @@ Qpcrctl::Application.routes.draw do
   root 'main#index'
   
   resources :experiments do
-    resources :stages, shallow: true do
-      resources :steps do
-        post 'move', on: :member
-      end
-      post 'move', on: :member
-    end
-    
     member do
       post 'start'
       post 'stop'
@@ -71,6 +65,16 @@ Qpcrctl::Application.routes.draw do
       get 'protocol'
       get 'platessetup'
       get 'status'
+    end
+  end
+  
+  resources :protocols, only: [] do
+    resources :stages, shallow: true, only: [:create, :update, :destroy] do
+      resources :steps, shallow: true, only: [:create, :update, :destroy] do
+        resources :ramps, only: [:update]
+        post 'move', on: :member
+      end
+      post 'move', on: :member
     end
   end
   
