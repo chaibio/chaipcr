@@ -68,7 +68,7 @@ Qpcrctl::Application.routes.draw do
     end
   end
   
-  resources :protocols, only: [] do
+  resources :protocols, shallow: true, only: [:update] do
     resources :stages, shallow: true, only: [:create, :update, :destroy] do
       resources :steps, shallow: true, only: [:create, :update, :destroy] do
         resources :ramps, only: [:update]

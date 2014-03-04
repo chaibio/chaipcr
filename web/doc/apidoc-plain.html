@@ -17,6 +17,10 @@
   <ul>
       <li><a href='#main-index'>index</a></li>
   </ul>
+  <h4><a href='#protocols'>Protocols</a></h4>
+  <ul>
+      <li><a href='#protocols-update'>update</a></li>
+  </ul>
   <h4><a href='#ramps'>Ramps</a></h4>
   <ul>
       <li><a href='#ramps-update'>update</a></li>
@@ -398,6 +402,70 @@ stage has many steps, each step has one ramp</p>
       <div>
         
 
+
+      </div>
+  </div>
+
+  <hr/>
+
+  <div>
+    <h2 id="protocols">
+      <a href='#protocols'>Protocols</a><br>
+      <small></small>
+    </h2>
+  </div>
+
+
+  <div>
+
+      <hr/>
+
+      <h3 id="protocols-update">
+      <a href='#protocols'>Protocols</a> / <a href='#protocols-update'>update</a>
+      </h3>
+
+      <div>
+          <h4>
+              PUT /protocols/:id
+            <br>
+            <small>Update a protocol</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+          <h4>Params</h4>
+          <ul>
+    <li>
+      <strong>protocol </strong>:
+      <small>
+        required
+        
+          [ Must be a Hash ]
+      </small>
+      
+<p>Protocol Info</p>
+
+    </li>
+    <ul>
+    <li>
+      <strong>lid_temperature </strong>:
+      <small>
+        required
+        
+          [ Must be BigDecimal ]
+      </small>
+      
+<p>lid temperature, in degree C, default is 110, with precision to one decimal
+point</p>
+
+    </li>
+    
+</ul>
+
+</ul>
 
       </div>
   </div>

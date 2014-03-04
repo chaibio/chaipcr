@@ -5,6 +5,10 @@ private
      params.require(:experiment).permit(:name, :qpcr)
   end
   
+  def protocol_params
+    params.require(:protocol).permit(:lid_temperature)
+  end
+  
   def stage_params
     params.require(:stage).permit(:name, :num_cycles, :stage_type)
   end
