@@ -29,8 +29,8 @@ ActiveRecord::Schema.define(version: 20131204195402) do
   end
 
   create_table "ramps", force: true do |t|
-    t.decimal "rate",    precision: 11, scale: 8, null: false
-    t.integer "step_id"
+    t.decimal "rate",         precision: 11, scale: 8, null: false
+    t.integer "next_step_id"
   end
 
   create_table "stages", force: true do |t|

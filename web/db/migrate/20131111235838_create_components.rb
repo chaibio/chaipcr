@@ -26,7 +26,7 @@ class CreateComponents < ActiveRecord::Migration
     
     create_table :ramps do |t|
       t.decimal :rate, :null=>false, :precision => 11, :scale => 8, :comment => 'degrees C/s, set to 100 for max'
-      t.integer :step_id
+      t.integer :next_step_id
     end
     
   end
