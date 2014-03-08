@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>API documentation</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <link type='text/css' rel='stylesheet' href='./apidoc/stylesheets/bundled/bootstrap.min.css'/>
+<link type='text/css' rel='stylesheet' href='./apidoc/stylesheets/bundled/prettify.css'/>
+<link type='text/css' rel='stylesheet' href='./apidoc/stylesheets/bundled/bootstrap-responsive.min.css'/>
+  <link type='text/css' rel='stylesheet' href='./apidoc/stylesheets/application.css'/>
+  <!-- IE6-8 support of HTML5 elements -->
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div id='container'>
+        <ul class='breadcrumb'>
+  <li class='active'><a href='./apidoc.html'>qPCR 1.0</a></li>
+</ul>
+
+<div>Another API description</div>
+
+<h1 class='page-header'>Resources</h1>
+
+  <h2>
+    <a href='./apidoc/experiments.html'>
+      Experiments
+    </a><br>
+    <small></small>
+  </h2>
+  <table class='table'>
+    <thead>
+      <tr>
+        <th>Resource</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+          <tr>
+            <td><a href='./apidoc/experiments/index.html'>GET /experiments</a></td>
+            <td width='60%'>List experiments and show the first one</td>
+          </tr>
+          <tr>
+            <td><a href='./apidoc/experiments/new.html'>GET /experiments/new</a></td>
+            <td width='60%'>New an experiment</td>
+          </tr>
+          <tr>
+            <td><a href='./apidoc/experiments/create.html'>POST /experiments</a></td>
+            <td width='60%'>Create an experiment</td>
+          </tr>
+          <tr>
+            <td><a href='./apidoc/experiments/update.html'>PUT /experiment/:id</a></td>
+            <td width='60%'>Update an experiment</td>
+          </tr>
+          <tr>
+            <td><a href='./apidoc/experiments/copy.html'>POST /experiment/:id/copy</a></td>
+            <td width='60%'>Copy an experiment</td>
+          </tr>
+          <tr>
+            <td><a href='./apidoc/experiments/show.html'>GET /experiment/:id</a></td>
+            <td width='60%'>Show an experiment</td>
+          </tr>
+          <tr>
+            <td><a href='./apidoc/experiments/protocol.html'>GET /experiment/:id/protocol</a></td>
+            <td width='60%'>Show the protocol of an experiment</td>
+          </tr>
+          <tr>
+            <td><a href='./apidoc/experiments/platessetup.html'>GET /experiment/:id/platessetup</a></td>
+            <td width='60%'>Show the plate setup of an experiment</td>
+          </tr>
+          <tr>
+            <td><a href='./apidoc/experiments/status.html'>GET /experiment/:id/status</a></td>
+            <td width='60%'>Show an experiment running status</td>
+          </tr>
+          <tr>
+            <td><a href='./apidoc/experiments/start.html'>POST /experiment/:id/start</a></td>
+            <td width='60%'>Start an experiment</td>
+          </tr>
+          <tr>
+            <td><a href='./apidoc/experiments/stop.html'>POST /experiment/:id/stop</a></td>
+            <td width='60%'>Stop an experiment</td>
+          </tr>
+          <tr>
+            <td><a href='./apidoc/experiments/destroy.html'>DELETE /experiment/:id</a></td>
+            <td width='60%'>Destroy an experiment</td>
+          </tr>
+    </tbody>
+  </table>
+  <h2>
+    <a href='./apidoc/main.html'>
+      Main
+    </a><br>
+    <small></small>
+  </h2>
+  <table class='table'>
+    <thead>
+      <tr>
+        <th>Resource</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+          <tr>
+            <td><a href='./apidoc/main/index.html'>GET </a></td>
+            <td width='60%'>Home page</td>
+          </tr>
+    </tbody>
+  </table>
+  <h2>
+    <a href='./apidoc/protocols.html'>
+      Protocols
+    </a><br>
+    <small></small>
+  </h2>
+  <table class='table'>
+    <thead>
+      <tr>
+        <th>Resource</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+          <tr>
+            <td><a href='./apidoc/protocols/update.html'>PUT /protocols/:id</a></td>
+            <td width='60%'>Update a protocol</td>
+          </tr>
+    </tbody>
+  </table>
+  <h2>
+    <a href='./apidoc/ramps.html'>
+      Ramps
+    </a><br>
+    <small></small>
+  </h2>
+  <table class='table'>
+    <thead>
+      <tr>
+        <th>Resource</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+          <tr>
+            <td><a href='./apidoc/ramps/update.html'>PUT /ramps/:id</a></td>
+            <td width='60%'>Update a ramp</td>
+          </tr>
+    </tbody>
+  </table>
+  <h2>
+    <a href='./apidoc/stages.html'>
+      Stages
+    </a><br>
+    <small></small>
+  </h2>
+  <table class='table'>
+    <thead>
+      <tr>
+        <th>Resource</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+          <tr>
+            <td><a href='./apidoc/stages/create.html'>POST /protocols/:protocol_id/stages</a></td>
+            <td width='60%'>Create a stage</td>
+          </tr>
+          <tr>
+            <td><a href='./apidoc/stages/update.html'>PUT /stages/:id</a></td>
+            <td width='60%'>Update a stage</td>
+          </tr>
+          <tr>
+            <td><a href='./apidoc/stages/move.html'>POST /stages/:id/move</a></td>
+            <td width='60%'>Move a stage</td>
+          </tr>
+          <tr>
+            <td><a href='./apidoc/stages/destroy.html'>DELETE /stages/:id</a></td>
+            <td width='60%'>Destroy a stage</td>
+          </tr>
+    </tbody>
+  </table>
+  <h2>
+    <a href='./apidoc/steps.html'>
+      Steps
+    </a><br>
+    <small></small>
+  </h2>
+  <table class='table'>
+    <thead>
+      <tr>
+        <th>Resource</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+          <tr>
+            <td><a href='./apidoc/steps/create.html'>POST /stages/:stage_id/steps</a></td>
+            <td width='60%'>Create a step</td>
+          </tr>
+          <tr>
+            <td><a href='./apidoc/steps/update.html'>PUT /steps/:id</a></td>
+            <td width='60%'>Update a step</td>
+          </tr>
+          <tr>
+            <td><a href='./apidoc/steps/move.html'>POST /steps/:id/move</a></td>
+            <td width='60%'>Move a step</td>
+          </tr>
+          <tr>
+            <td><a href='./apidoc/steps/destroy.html'>DELETE /steps/:id</a></td>
+            <td width='60%'>Destroy a step</td>
+          </tr>
+    </tbody>
+  </table>
+
+
+        
+      </div>
+    </div>
+    <hr>
+    <footer>
+
+</footer>
+  </div>
+  <script type='text/javascript' src='./apidoc/javascripts/bundled/jquery-1.7.2.js'></script>
+<script type='text/javascript' src='./apidoc/javascripts/bundled/bootstrap-collapse.js'></script>
+<script type='text/javascript' src='./apidoc/javascripts/bundled/prettify.js'></script>
+<script type='text/javascript' src='./apidoc/javascripts/apipie.js'></script>
+</body>
+</html>

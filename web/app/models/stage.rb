@@ -1,5 +1,6 @@
 class Stage < ActiveRecord::Base
   include ProtocolHelper
+  include ProtocolOrderHelper
   
   belongs_to :protocol
   has_many :steps, -> {order("order_number")}, dependent: :destroy
@@ -11,6 +12,30 @@ class Stage < ActiveRecord::Base
   before_create do |stage|
     if hold_stage? || num_cycles.nil?
       self.num_cycles = 1
+    end
+  end
+  
+  after_create do |stage|
+    if steps.count == 0
+      if hold_stage?
+        if !prev_id.nil?
+          reference_stage = Stage.find(prev_id)
+        end
+        if reference_stage.nil?
+          reference_stage = siblings.first
+        end
+        if reference_stage
+          reference_step = reference_stage.steps.last
+        end
+        if reference_step
+          stage.steps << Step.new(:temperature=>reference_step.temperature, :hold_time=>reference_step.hold_time, :order_number=>0)
+        else
+          stage.steps << Step.new(:temperature=>95, :hold_time=>30, :order_number=>0)
+        end
+      elsif cycle_stage?
+        stage.steps << Step.new(:temperature=>95, :hold_time=>30, :order_number=>0)
+        stage.steps << Step.new(:temperature=>60, :hold_time=>30, :order_number=>1)
+      end
     end
   end
   
@@ -57,7 +82,11 @@ class Stage < ActiveRecord::Base
   end
   
   def siblings
-    protocol.stages.where("id != ?", id)
+    if !id.nil?
+      protocol.stages.where("id != ?", id)
+    else
+      protocol.stages
+    end
   end
 end
 

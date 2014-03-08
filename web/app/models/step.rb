@@ -1,10 +1,22 @@
 class Step < ActiveRecord::Base
   include ProtocolHelper
+  include ProtocolOrderHelper
   
   belongs_to :stage
-  has_one :ramp, dependent: :destroy
+  has_one :ramp, foreign_key: "next_step_id", dependent: :destroy
   
   before_create do |step|
+    if step.temperature.nil? || step.hold_time.nil?
+      if !prev_id.nil?
+        reference_step = Step.find(prev_id)
+      end
+      if reference_step.nil?
+        reference_step = siblings.first
+      end
+      step.temperature = (reference_step)? reference_step.temperature : 95 if step.temperature.nil?
+      step.hold_time = (reference_step)? reference_step.hold_time : 30 if step.hold_time.nil?
+    end
+    
     step.ramp = Ramp.new(:rate=>Ramp::MAX_RATE)
   end
   
@@ -18,7 +30,7 @@ class Step < ActiveRecord::Base
   end
   
   after_destroy do |step|
-    if step.stage.steps.length == 0
+    if step.siblings.length == 0
       step.stage.destroy
     end
   end
@@ -43,6 +55,12 @@ class Step < ActiveRecord::Base
   end
   
   def siblings
-    stage.steps.where("id != ?", id)
+    if stage.nil?
+      nil
+    elsif !id.nil?
+      stage.steps.where("id != ?", id)
+    else
+      stage.steps
+    end
   end
 end

@@ -1,0 +1,997 @@
+  <h4><a href='#experiments'>Experiments</a></h4>
+  <ul>
+      <li><a href='#experiments-index'>index</a></li>
+      <li><a href='#experiments-new'>new</a></li>
+      <li><a href='#experiments-create'>create</a></li>
+      <li><a href='#experiments-update'>update</a></li>
+      <li><a href='#experiments-copy'>copy</a></li>
+      <li><a href='#experiments-show'>show</a></li>
+      <li><a href='#experiments-protocol'>protocol</a></li>
+      <li><a href='#experiments-platessetup'>platessetup</a></li>
+      <li><a href='#experiments-status'>status</a></li>
+      <li><a href='#experiments-start'>start</a></li>
+      <li><a href='#experiments-stop'>stop</a></li>
+      <li><a href='#experiments-destroy'>destroy</a></li>
+  </ul>
+  <h4><a href='#main'>Main</a></h4>
+  <ul>
+      <li><a href='#main-index'>index</a></li>
+  </ul>
+  <h4><a href='#protocols'>Protocols</a></h4>
+  <ul>
+      <li><a href='#protocols-update'>update</a></li>
+  </ul>
+  <h4><a href='#ramps'>Ramps</a></h4>
+  <ul>
+      <li><a href='#ramps-update'>update</a></li>
+  </ul>
+  <h4><a href='#stages'>Stages</a></h4>
+  <ul>
+      <li><a href='#stages-create'>create</a></li>
+      <li><a href='#stages-update'>update</a></li>
+      <li><a href='#stages-move'>move</a></li>
+      <li><a href='#stages-destroy'>destroy</a></li>
+  </ul>
+  <h4><a href='#steps'>Steps</a></h4>
+  <ul>
+      <li><a href='#steps-create'>create</a></li>
+      <li><a href='#steps-update'>update</a></li>
+      <li><a href='#steps-move'>move</a></li>
+      <li><a href='#steps-destroy'>destroy</a></li>
+  </ul>
+
+
+
+  <hr/>
+
+  <div>
+    <h2 id="experiments">
+      <a href='#experiments'>Experiments</a><br>
+      <small></small>
+    </h2>
+  </div>
+
+
+  <div>
+
+      <hr/>
+
+      <h3 id="experiments-index">
+      <a href='#experiments'>Experiments</a> / <a href='#experiments-index'>index</a>
+      </h3>
+
+      <div>
+          <h4>
+              GET /experiments
+            <br>
+            <small>List experiments and show the first one</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+      <hr/>
+
+      <h3 id="experiments-new">
+      <a href='#experiments'>Experiments</a> / <a href='#experiments-new'>new</a>
+      </h3>
+
+      <div>
+          <h4>
+              GET /experiments/new
+            <br>
+            <small>New an experiment</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+      <hr/>
+
+      <h3 id="experiments-create">
+      <a href='#experiments'>Experiments</a> / <a href='#experiments-create'>create</a>
+      </h3>
+
+      <div>
+          <h4>
+              POST /experiments
+            <br>
+            <small>Create an experiment</small>
+          </h4>
+      </div>
+
+      <div>
+        
+<p>when experiment is created, default protocol will be created</p>
+
+
+
+          <h4>Params</h4>
+          <ul>
+    <li>
+      <strong>experiment </strong>:
+      <small>
+        required
+        
+          [ Must be a Hash ]
+      </small>
+      
+<p>Experiment Info</p>
+
+    </li>
+    <ul>
+    <li>
+      <strong>name </strong>:
+      <small>
+        required
+        
+          [ Must be String ]
+      </small>
+      
+<p>Name of the experiment</p>
+
+    </li>
+    
+    <li>
+      <strong>qpcr </strong>:
+      <small>
+        optional
+        
+          [ Must be &#39;true&#39; or &#39;false&#39; ]
+      </small>
+      
+<p>Define whether it is an pcr or qpcr experiment</p>
+
+    </li>
+    
+</ul>
+
+</ul>
+
+      </div>
+      <hr/>
+
+      <h3 id="experiments-update">
+      <a href='#experiments'>Experiments</a> / <a href='#experiments-update'>update</a>
+      </h3>
+
+      <div>
+          <h4>
+              PUT /experiment/:id
+            <br>
+            <small>Update an experiment</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+          <h4>Params</h4>
+          <ul>
+    <li>
+      <strong>experiment </strong>:
+      <small>
+        required
+        
+          [ Must be a Hash ]
+      </small>
+      
+<p>Experiment Info</p>
+
+    </li>
+    <ul>
+    <li>
+      <strong>name </strong>:
+      <small>
+        required
+        
+          [ Must be String ]
+      </small>
+      
+<p>Name of the experiment</p>
+
+    </li>
+    
+    <li>
+      <strong>qpcr </strong>:
+      <small>
+        optional
+        
+          [ Must be &#39;true&#39; or &#39;false&#39; ]
+      </small>
+      
+<p>Define whether it is an pcr or qpcr experiment</p>
+
+    </li>
+    
+</ul>
+
+</ul>
+
+      </div>
+      <hr/>
+
+      <h3 id="experiments-copy">
+      <a href='#experiments'>Experiments</a> / <a href='#experiments-copy'>copy</a>
+      </h3>
+
+      <div>
+          <h4>
+              POST /experiment/:id/copy
+            <br>
+            <small>Copy an experiment</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+      <hr/>
+
+      <h3 id="experiments-show">
+      <a href='#experiments'>Experiments</a> / <a href='#experiments-show'>show</a>
+      </h3>
+
+      <div>
+          <h4>
+              GET /experiment/:id
+            <br>
+            <small>Show an experiment</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+      <hr/>
+
+      <h3 id="experiments-protocol">
+      <a href='#experiments'>Experiments</a> / <a href='#experiments-protocol'>protocol</a>
+      </h3>
+
+      <div>
+          <h4>
+              GET /experiment/:id/protocol
+            <br>
+            <small>Show the protocol of an experiment</small>
+          </h4>
+      </div>
+
+      <div>
+        
+<p>experiment object has one protocol, the protocol has many stages, each
+stage has many steps, each step has one ramp</p>
+
+
+
+      </div>
+      <hr/>
+
+      <h3 id="experiments-platessetup">
+      <a href='#experiments'>Experiments</a> / <a href='#experiments-platessetup'>platessetup</a>
+      </h3>
+
+      <div>
+          <h4>
+              GET /experiment/:id/platessetup
+            <br>
+            <small>Show the plate setup of an experiment</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+      <hr/>
+
+      <h3 id="experiments-status">
+      <a href='#experiments'>Experiments</a> / <a href='#experiments-status'>status</a>
+      </h3>
+
+      <div>
+          <h4>
+              GET /experiment/:id/status
+            <br>
+            <small>Show an experiment running status</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+      <hr/>
+
+      <h3 id="experiments-start">
+      <a href='#experiments'>Experiments</a> / <a href='#experiments-start'>start</a>
+      </h3>
+
+      <div>
+          <h4>
+              POST /experiment/:id/start
+            <br>
+            <small>Start an experiment</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+      <hr/>
+
+      <h3 id="experiments-stop">
+      <a href='#experiments'>Experiments</a> / <a href='#experiments-stop'>stop</a>
+      </h3>
+
+      <div>
+          <h4>
+              POST /experiment/:id/stop
+            <br>
+            <small>Stop an experiment</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+      <hr/>
+
+      <h3 id="experiments-destroy">
+      <a href='#experiments'>Experiments</a> / <a href='#experiments-destroy'>destroy</a>
+      </h3>
+
+      <div>
+          <h4>
+              DELETE /experiment/:id
+            <br>
+            <small>Destroy an experiment</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+  </div>
+
+  <hr/>
+
+  <div>
+    <h2 id="main">
+      <a href='#main'>Main</a><br>
+      <small></small>
+    </h2>
+  </div>
+
+
+  <div>
+
+      <hr/>
+
+      <h3 id="main-index">
+      <a href='#main'>Main</a> / <a href='#main-index'>index</a>
+      </h3>
+
+      <div>
+          <h4>
+              GET 
+            <br>
+            <small>Home page</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+  </div>
+
+  <hr/>
+
+  <div>
+    <h2 id="protocols">
+      <a href='#protocols'>Protocols</a><br>
+      <small></small>
+    </h2>
+  </div>
+
+
+  <div>
+
+      <hr/>
+
+      <h3 id="protocols-update">
+      <a href='#protocols'>Protocols</a> / <a href='#protocols-update'>update</a>
+      </h3>
+
+      <div>
+          <h4>
+              PUT /protocols/:id
+            <br>
+            <small>Update a protocol</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+          <h4>Params</h4>
+          <ul>
+    <li>
+      <strong>protocol </strong>:
+      <small>
+        required
+        
+          [ Must be a Hash ]
+      </small>
+      
+<p>Protocol Info</p>
+
+    </li>
+    <ul>
+    <li>
+      <strong>lid_temperature </strong>:
+      <small>
+        required
+        
+          [ Must be BigDecimal ]
+      </small>
+      
+<p>lid temperature, in degree C, default is 110, with precision to one decimal
+point</p>
+
+    </li>
+    
+</ul>
+
+</ul>
+
+      </div>
+  </div>
+
+  <hr/>
+
+  <div>
+    <h2 id="ramps">
+      <a href='#ramps'>Ramps</a><br>
+      <small></small>
+    </h2>
+  </div>
+
+
+  <div>
+
+      <hr/>
+
+      <h3 id="ramps-update">
+      <a href='#ramps'>Ramps</a> / <a href='#ramps-update'>update</a>
+      </h3>
+
+      <div>
+          <h4>
+              PUT /ramps/:id
+            <br>
+            <small>Update a ramp</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+          <h4>Params</h4>
+          <ul>
+    <li>
+      <strong>ramp </strong>:
+      <small>
+        required
+        
+          [ Must be a Hash ]
+      </small>
+      
+<p>Ramp Info</p>
+
+    </li>
+    <ul>
+    <li>
+      <strong>rate </strong>:
+      <small>
+        required
+        
+          [ Must be BigDecimal ]
+      </small>
+      
+<p>Rate of the ramp, in degrees C/s, set to 100 for max, precision to 8
+decimal point</p>
+
+    </li>
+    
+</ul>
+
+</ul>
+
+      </div>
+  </div>
+
+  <hr/>
+
+  <div>
+    <h2 id="stages">
+      <a href='#stages'>Stages</a><br>
+      <small></small>
+    </h2>
+  </div>
+
+
+  <div>
+
+      <hr/>
+
+      <h3 id="stages-create">
+      <a href='#stages'>Stages</a> / <a href='#stages-create'>create</a>
+      </h3>
+
+      <div>
+          <h4>
+              POST /protocols/:protocol_id/stages
+            <br>
+            <small>Create a stage</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+          <h4>Params</h4>
+          <ul>
+    <li>
+      <strong>stage </strong>:
+      <small>
+        required
+        
+          [ Must be a Hash ]
+      </small>
+      
+<p>Stage Info</p>
+
+    </li>
+    <ul>
+    <li>
+      <strong>stage_type </strong>:
+      <small>
+        required
+        
+          [ Must be one of: holding, cycling, meltcurve. ]
+      </small>
+      
+<p>Stage type</p>
+
+    </li>
+    
+    <li>
+      <strong>name </strong>:
+      <small>
+        optional
+        
+          [ Must be String ]
+      </small>
+      
+<p>Name of the stage, if not provided, default name is &#39;&lt;stage type&gt;
+Stage&#39;</p>
+
+    </li>
+    
+    <li>
+      <strong>num_cycles </strong>:
+      <small>
+        optional
+        
+          [ Must be Integer ]
+      </small>
+      
+<p>Number of cycles in a stage, must be &gt;= 1, default to 1</p>
+
+    </li>
+    
+</ul>
+
+    <li>
+      <strong>prev_id </strong>:
+      <small>
+        required
+        
+          [ Must be Integer ]
+      </small>
+      
+<p>prev stage id or null if it is the first node</p>
+
+    </li>
+    
+</ul>
+
+      </div>
+      <hr/>
+
+      <h3 id="stages-update">
+      <a href='#stages'>Stages</a> / <a href='#stages-update'>update</a>
+      </h3>
+
+      <div>
+          <h4>
+              PUT /stages/:id
+            <br>
+            <small>Update a stage</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+          <h4>Params</h4>
+          <ul>
+    <li>
+      <strong>stage </strong>:
+      <small>
+        required
+        
+          [ Must be a Hash ]
+      </small>
+      
+<p>Stage Info</p>
+
+    </li>
+    <ul>
+    <li>
+      <strong>stage_type </strong>:
+      <small>
+        required
+        
+          [ Must be one of: holding, cycling, meltcurve. ]
+      </small>
+      
+<p>Stage type</p>
+
+    </li>
+    
+    <li>
+      <strong>name </strong>:
+      <small>
+        optional
+        
+          [ Must be String ]
+      </small>
+      
+<p>Name of the stage, if not provided, default name is &#39;&lt;stage type&gt;
+Stage&#39;</p>
+
+    </li>
+    
+    <li>
+      <strong>num_cycles </strong>:
+      <small>
+        optional
+        
+          [ Must be Integer ]
+      </small>
+      
+<p>Number of cycles in a stage, must be &gt;= 1, default to 1</p>
+
+    </li>
+    
+</ul>
+
+</ul>
+
+      </div>
+      <hr/>
+
+      <h3 id="stages-move">
+      <a href='#stages'>Stages</a> / <a href='#stages-move'>move</a>
+      </h3>
+
+      <div>
+          <h4>
+              POST /stages/:id/move
+            <br>
+            <small>Move a stage</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+          <h4>Params</h4>
+          <ul>
+    <li>
+      <strong>prev_id </strong>:
+      <small>
+        required
+        
+          [ Must be Integer ]
+      </small>
+      
+<p>prev stage id or null if it is the first node</p>
+
+    </li>
+    
+</ul>
+
+      </div>
+      <hr/>
+
+      <h3 id="stages-destroy">
+      <a href='#stages'>Stages</a> / <a href='#stages-destroy'>destroy</a>
+      </h3>
+
+      <div>
+          <h4>
+              DELETE /stages/:id
+            <br>
+            <small>Destroy a stage</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+  </div>
+
+  <hr/>
+
+  <div>
+    <h2 id="steps">
+      <a href='#steps'>Steps</a><br>
+      <small></small>
+    </h2>
+  </div>
+
+
+  <div>
+
+      <hr/>
+
+      <h3 id="steps-create">
+      <a href='#steps'>Steps</a> / <a href='#steps-create'>create</a>
+      </h3>
+
+      <div>
+          <h4>
+              POST /stages/:stage_id/steps
+            <br>
+            <small>Create a step</small>
+          </h4>
+      </div>
+
+      <div>
+        
+<p>if step is created with no params, it will be the same as previous step;
+when step is created, default ramp with max rate (100) will be created</p>
+
+
+
+          <h4>Params</h4>
+          <ul>
+    <li>
+      <strong>step </strong>:
+      <small>
+        required
+        
+          [ Must be a Hash ]
+      </small>
+      
+<p>Step Info</p>
+
+    </li>
+    <ul>
+    <li>
+      <strong>temperature </strong>:
+      <small>
+        optional
+        
+          [ Must be BigDecimal ]
+      </small>
+      
+<p>Temperature of the step, in degree C, with precision to one decimal point</p>
+
+    </li>
+    
+    <li>
+      <strong>hold_time </strong>:
+      <small>
+        optional
+        
+          [ Must be Integer ]
+      </small>
+      
+<p>Hold time of the step, in seconds, 0 means infinite</p>
+
+    </li>
+    
+    <li>
+      <strong>name </strong>:
+      <small>
+        optional
+        
+          [ Must be String ]
+      </small>
+      
+<p>Name of the step, if not provided, default name is &#39;Step
+&lt;order_number&gt;&#39;</p>
+
+    </li>
+    
+</ul>
+
+    <li>
+      <strong>prev_id </strong>:
+      <small>
+        required
+        
+          [ Must be Integer ]
+      </small>
+      
+<p>prev step id or null if it is the first node</p>
+
+    </li>
+    
+</ul>
+
+      </div>
+      <hr/>
+
+      <h3 id="steps-update">
+      <a href='#steps'>Steps</a> / <a href='#steps-update'>update</a>
+      </h3>
+
+      <div>
+          <h4>
+              PUT /steps/:id
+            <br>
+            <small>Update a step</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+          <h4>Params</h4>
+          <ul>
+    <li>
+      <strong>step </strong>:
+      <small>
+        required
+        
+          [ Must be a Hash ]
+      </small>
+      
+<p>Step Info</p>
+
+    </li>
+    <ul>
+    <li>
+      <strong>temperature </strong>:
+      <small>
+        optional
+        
+          [ Must be BigDecimal ]
+      </small>
+      
+<p>Temperature of the step, in degree C, with precision to one decimal point</p>
+
+    </li>
+    
+    <li>
+      <strong>hold_time </strong>:
+      <small>
+        optional
+        
+          [ Must be Integer ]
+      </small>
+      
+<p>Hold time of the step, in seconds, 0 means infinite</p>
+
+    </li>
+    
+    <li>
+      <strong>name </strong>:
+      <small>
+        optional
+        
+          [ Must be String ]
+      </small>
+      
+<p>Name of the step, if not provided, default name is &#39;Step
+&lt;order_number&gt;&#39;</p>
+
+    </li>
+    
+</ul>
+
+</ul>
+
+      </div>
+      <hr/>
+
+      <h3 id="steps-move">
+      <a href='#steps'>Steps</a> / <a href='#steps-move'>move</a>
+      </h3>
+
+      <div>
+          <h4>
+              POST /steps/:id/move
+            <br>
+            <small>Move a step</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+          <h4>Params</h4>
+          <ul>
+    <li>
+      <strong>prev_id </strong>:
+      <small>
+        required
+        
+          [ Must be Integer ]
+      </small>
+      
+<p>prev step id or null if it is the first node</p>
+
+    </li>
+    
+</ul>
+
+      </div>
+      <hr/>
+
+      <h3 id="steps-destroy">
+      <a href='#steps'>Steps</a> / <a href='#steps-destroy'>destroy</a>
+      </h3>
+
+      <div>
+          <h4>
+              DELETE /steps/:id
+            <br>
+            <small>Destroy a step</small>
+          </h4>
+      </div>
+
+      <div>
+        
+<p>if last step in the asoociated stage is destroyed, the stage will be
+destroyed too.</p>
+
+
+
+      </div>
+  </div>
