@@ -17,7 +17,7 @@ class ProtocolsController < ApplicationController
     @protocol = Protocol.find(params[:id])
     ret  = @protocol.update_attributes(protocol_params)
     respond_to do |format|
-      format.json { render :json => @protocol,:status => (ret)? :ok : :unprocessable_entity}
+      format.json { render show, :status => (ret)? :ok : :unprocessable_entity}
     end
   end
 end

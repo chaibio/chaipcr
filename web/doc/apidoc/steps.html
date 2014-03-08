@@ -61,7 +61,8 @@
 
     <div id='description-create' class='collapse accordion-body'>
       
-<p>when step is created, default ramp with max rate (100) will be created</p>
+<p>if step is created with no params, it will be the same as previous step;
+when step is created, default ramp with max rate (100) will be created</p>
 
 
   <h3>Supported Formats</h3>
@@ -103,7 +104,7 @@
     <td>
       <strong>step[temperature] </strong><br>
       <small>
-        required
+        optional
         
       </small>
     </td>
@@ -124,7 +125,7 @@
     <td>
       <strong>step[hold_time] </strong><br>
       <small>
-        required
+        optional
         
       </small>
     </td>
@@ -166,7 +167,7 @@
 
   <tr style='background-color:rgb(255,255,255);'>
     <td>
-      <strong>next_id </strong><br>
+      <strong>prev_id </strong><br>
       <small>
         required
         
@@ -174,7 +175,7 @@
     </td>
     <td>
       
-<p>next step id or null if it is the last node</p>
+<p>prev step id or null if it is the first node</p>
 
         <br>
         Value: Must be Integer
@@ -249,7 +250,7 @@
     <td>
       <strong>step[temperature] </strong><br>
       <small>
-        required
+        optional
         
       </small>
     </td>
@@ -270,7 +271,7 @@
     <td>
       <strong>step[hold_time] </strong><br>
       <small>
-        required
+        optional
         
       </small>
     </td>
@@ -352,7 +353,7 @@
     <tbody>
         <tr style='background-color:rgb(255,255,255);'>
     <td>
-      <strong>next_id </strong><br>
+      <strong>prev_id </strong><br>
       <small>
         required
         
@@ -360,7 +361,7 @@
     </td>
     <td>
       
-<p>next step id or null if it is the last node</p>
+<p>prev step id or null if it is the first node</p>
 
         <br>
         Value: Must be Integer
@@ -395,6 +396,9 @@
 
     <div id='description-destroy' class='collapse accordion-body'>
       
+<p>if last step in the asoociated stage is destroyed, the stage will be
+destroyed too.</p>
+
 
   <h3>Supported Formats</h3>
   json

@@ -33,8 +33,13 @@ group :doc do
 end
 
 gem 'migration_comments'
+gem "rabl"
 gem 'apipie-rails'
-
+gem 'rspec-rails', :group => [:test, :development]
+group :test do
+  gem "factory_girl_rails"
+  gem "capybara"
+end
 
 
 # Use ActiveModel has_secure_password
