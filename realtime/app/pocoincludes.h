@@ -10,7 +10,7 @@
 #include <Poco/Net/HTTPResponse.h>
 #include <Poco/Net/HTTPServerRequest.h>
 #include <Poco/Net/HTTPServerResponse.h>
-#include <Poco/Net/ServerSocket.h>
+#include <Poco/Net/HTTPClientSession.h>
 
 #include <Poco/Data/Session.h>
 #include <Poco/Data/TypeHandler.h>

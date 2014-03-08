@@ -15,12 +15,14 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
 
     try
     {
-        read_json(requestStream, requestPt);
+        if (request.getContentLength() != -1)
+            read_json(requestStream, requestPt);
+
         createData(requestPt, responsePt);
     }
     catch (json_parser_error &ex)
     {
-        cout << "Failed to parse JSON: " << ex.what() << '\n';
+        cout << "JSONHandler::handleRequest - Failed to parse JSON: " << ex.what() << '\n';
 
         setStatus(HTTPResponse::HTTP_BAD_REQUEST);
         setErrorString(ex.what());
@@ -30,7 +32,7 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
     }
     catch (exception &ex)
     {
-        cout << "Error occured: " << ex.what() << '\n';
+        cout << "JSONHandler::handleRequest - Error occured: " << ex.what() << '\n';
 
         setStatus(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         setErrorString(ex.what());
@@ -52,7 +54,7 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
     }
     catch (exception &ex)
     {
-        cout << "Failed to write JSON: " << ex.what() << '\n';
+        cout << "JSONHandler::handleRequest - Failed to write JSON: " << ex.what() << '\n';
 
         setStatus(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }

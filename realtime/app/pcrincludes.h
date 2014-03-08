@@ -18,6 +18,7 @@
 #include <fstream>
 #include <iomanip>
 #include <utility>
+#include <thread>
 
 //Linux headers
 #include <unistd.h>
