@@ -5,6 +5,7 @@ INCLUDEPATH += ./control/
 INCLUDEPATH += ./server/
 INCLUDEPATH += ./util/
 INCLUDEPATH += ./db/
+INCLUDEPATH += ./test/
 INCLUDEPATH += ./libraries/include/
 INCLUDEPATH += $(BOOST_INCLUDE_PATH)
 
@@ -20,7 +21,9 @@ LIBS += -lPocoDataSQLite
 
 #Google Test and Mock
 LIBS += -lgtest
-LIBS += -lgmock
+#LIBS += -lgmock
+
+DEFINES += TEST_BUILD
 
 unix:!unix_m {
     QMAKE_CC = arm-unknown-linux-gnueabi-gcc
@@ -83,7 +86,14 @@ HEADERS += \
     util/pid.h \
     control/lid.h \
     db/experiment.h \
-    db/dbcontrol.h
+    db/dbcontrol.h \
+    db/protocol.h \
+    db/stage.h \
+    db/step.h \
+    db/ramp.h \
+    db/stagecomponent.h \
+    db/dbincludes.h \
+    test/servertest.h
 
 SOURCES += \
     app/pins.cpp \
@@ -108,4 +118,11 @@ SOURCES += \
     server/qpcrapplication.cpp \
     util/pid.cpp \
     control/lid.cpp \
-    db/dbcontrol.cpp
+    db/dbcontrol.cpp \
+    db/experiment.cpp \
+    db/protocol.cpp \
+    db/stage.cpp \
+    db/step.cpp \
+    db/ramp.cpp \
+    db/stagecomponent.cpp \
+    test/servertest.cpp

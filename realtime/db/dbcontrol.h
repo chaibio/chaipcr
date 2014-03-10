@@ -6,13 +6,13 @@ namespace Poco
 namespace Data
 {
 class Session;
-class Statement;
 }
 }
 
 class Experiment;
 class Protocol;
 class Stage;
+class StageComponent;
 class Step;
 class Ramp;
 
@@ -25,12 +25,13 @@ public:
     Experiment* getExperiment(int id);
 
 private:
-    Protocol* getProtocol(Poco::Data::Statement &statement, int experimentId);
-    std::vector<Stage> getStages(Poco::Data::Statement &statement, int protocolId);
-    std::vector<Step> getSteps(Poco::Data::Statement &statement, int stageId);
-    Ramp* getRamp(Poco::Data::Statement &statement, int stepId);
+    Protocol* getProtocol(int experimentId);
+    std::vector<Stage> getStages(int protocolId);
+    std::vector<StageComponent> getStageComponents(int stageId);
+    std::vector<Step> getSteps(int stageId);
+    Ramp* getRamp(int stepId);
 
-    Poco::Data::Session *session;
+    Poco::Data::Session *_session;
 };
 
 #endif // DBCONTROL_H

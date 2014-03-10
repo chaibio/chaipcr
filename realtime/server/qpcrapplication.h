@@ -8,6 +8,10 @@ class IControl;
 // Class QPCRServer
 class QPCRApplication: public Poco::Util::ServerApplication
 {
+public:
+    inline bool isWorking() const {return workState.load();}
+    inline void close() {workState = false;}
+
 protected:
 	//from ServerApplication
     void initialize(Poco::Util::Application &self);
@@ -19,6 +23,8 @@ protected:
 
 private:
     std::vector<std::shared_ptr<IControl>> controlUnits;
+
+    std::atomic<bool> workState;
 
     //ports
     //SPIPort *spiPort0_;

@@ -1,5 +1,6 @@
 class RampsController < ApplicationController
   include ParamsHelper
+  respond_to :json
   
   resource_description { 
     formats ['json']
@@ -17,7 +18,7 @@ class RampsController < ApplicationController
     @ramp = Ramp.find(params[:id])
     ret  = @ramp.update_attributes(ramp_params)
     respond_to do |format|
-      format.json { render :json => @ramp,:status => (ret)? :ok : :unprocessable_entity}
+      format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
 end
