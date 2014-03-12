@@ -11,6 +11,14 @@
 // about supported directives.
 //= require jquery-1.10.1.min
 //= require jquery-ui.min
+//= require underscore
+//= require backbone
+//= require backbone_datalink
 //= require rails
 //= require chaipcr
+//= require backbone/ChaiBioTech
 
+$(function() {
+    window.router = new ChaiBioTech.Routers.PostsRouter({});
+    Backbone.history.start();
+});
