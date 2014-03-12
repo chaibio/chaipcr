@@ -16,7 +16,6 @@ describe "Experiments API" do
     get "/experiments/#{experiment.id}", { :format => 'json' }
     expect(response).to be_success            # test for the 200 status-code
     json = JSON.parse(response.body)
-    print "**************#{response.body}"
     json["experiment"]["name"].should == "test"
   end
   

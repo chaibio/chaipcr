@@ -1,5 +1,6 @@
 class ProtocolsController < ApplicationController
   include ParamsHelper
+  respond_to :json
   
   resource_description { 
     formats ['json']

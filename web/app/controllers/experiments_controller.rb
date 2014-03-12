@@ -1,5 +1,10 @@
 class ExperimentsController < ApplicationController
   include ParamsHelper
+  respond_to :json
+  
+  resource_description { 
+    formats ['json']
+  }
   
   def_param_group :experiment do
     param :experiment, Hash, :desc => "Experiment Info", :required => true do
@@ -9,6 +14,7 @@ class ExperimentsController < ApplicationController
   end
   
   api :GET, "/experiments", "List all the experiments"
+  example "[{'experiment':{'id':1,'name':'test1','qpcr':true,'run_at':null}},{'experiment':{'id':2,'name':'test2','qpcr':true,'run_at':null}}]"
   def index
     @experiments = Experiment.all
     respond_to do |format|
@@ -40,6 +46,7 @@ class ExperimentsController < ApplicationController
   end
   
   api :POST, "/experiment/:id/copy", "Copy an experiment"
+  see "experiments#create", "json response"
   def copy
     old_experiment = Experiment.find(params[:id])
     @experiment = old_experiment.copy(params[:experiment])
@@ -50,6 +57,7 @@ class ExperimentsController < ApplicationController
   end
   
   api :GET, "/experiment/:id", "Show an experiment"
+  see "experiments#create", "json response"
   def show
     @experiment = Experiment.find(params[:id]) 
     respond_to do |format|
