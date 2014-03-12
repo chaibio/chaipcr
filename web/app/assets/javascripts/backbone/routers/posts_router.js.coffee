@@ -17,7 +17,7 @@ class ChaiBioTech.Routers.PostsRouter extends Backbone.Router
     
   index: ->
     @view = new ChaiBioTech.Views.Posts.IndexView(posts: @posts)
-    $("#container").html(@view.render().el)
+    $(".jumbotron").html(@view.render().el)
 
   show: (id) ->
     post = @posts.get(id)
