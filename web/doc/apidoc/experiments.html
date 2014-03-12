@@ -52,38 +52,12 @@
            data-parent='#accordion'>
             GET /experiments
           </a><br>
-          <small>List experiments and show the first one</small>
+          <small>List all the experiments</small>
         </h2>
     </div>
 
 
     <div id='description-index' class='collapse accordion-body'>
-      
-
-
-
-
-
-
-    </div>
-    <hr>
-    <div class='pull-right small'>
-      <a href='../apidoc/experiments/new.html'> >>> </a>
-    </div>
-    <div>
-        <h2>
-          <a href='#description-new'
-           class='accordion-toggle'
-           data-toggle='collapse'
-           data-parent='#accordion'>
-            GET /experiments/new
-          </a><br>
-          <small>New an experiment</small>
-        </h2>
-    </div>
-
-
-    <div id='description-new' class='collapse accordion-body'>
       
 
 
@@ -117,6 +91,8 @@
 
 
 
+  <h3>Examples</h3>
+    <pre class="prettyprint">{&#39;experiment&#39;:{&#39;id&#39;:1,&#39;name&#39;:&#39;test&#39;,&#39;qpcr&#39;:true,&#39;run_at&#39;:null,&#39;protocol&#39;:{&#39;id&#39;:1,&#39;lid_temperature&#39;:&#39;110.0&#39;,&#39;stages&#39;:[{&#39;stage&#39;:{&#39;id&#39;:1,&#39;stage_type&#39;:&#39;holding&#39;,&#39;name&#39;:&#39;Holding Stage&#39;,&#39;num_cycles&#39;:1,&#39;steps&#39;:[{&#39;step&#39;:{&#39;id&#39;:1,&#39;name&#39;:&#39;Step 1&#39;,&#39;temperature&#39;:&#39;95.0&#39;,&#39;hold_time&#39;:180,&#39;ramp&#39;:{&#39;id&#39;:1,&#39;rate&#39;:&#39;100.0&#39;,&#39;max&#39;:true}}}]}},{&#39;stage&#39;:{&#39;id&#39;:2,&#39;stage_type&#39;:&#39;cycling&#39;,&#39;name&#39;:&#39;Cycling Stage&#39;,&#39;num_cycles&#39;:40,&#39;steps&#39;:[{&#39;step&#39;:{&#39;id&#39;:2,&#39;name&#39;:&#39;Step 2&#39;,&#39;temperature&#39;:&#39;95.0&#39;,&#39;hold_time&#39;:30,&#39;ramp&#39;:{&#39;id&#39;:2,&#39;rate&#39;:&#39;100.0&#39;,&#39;max&#39;:true}}},{&#39;step&#39;:{&#39;id&#39;:3,&#39;name&#39;:&#39;Step 2&#39;,&#39;temperature&#39;:&#39;60.0&#39;,&#39;hold_time&#39;:30,&#39;ramp&#39;:{&#39;id&#39;:3,&#39;rate&#39;:&#39;100.0&#39;,&#39;max&#39;:true}}}]}},{&#39;stage&#39;:{&#39;id&#39;:3,&#39;stage_type&#39;:&#39;holding&#39;,&#39;name&#39;:&#39;Holding Stage&#39;,&#39;num_cycles&#39;:1,&#39;steps&#39;:[{&#39;step&#39;:{&#39;id&#39;:4,&#39;name&#39;:&#39;Step 1&#39;,&#39;temperature&#39;:&#39;4.0&#39;,&#39;hold_time&#39;:0,&#39;ramp&#39;:{&#39;id&#39;:4,&#39;rate&#39;:&#39;100.0&#39;,&#39;max&#39;:true}}}]}}]}}}</pre>
 
   <h3>Params</h3>
   <table class='table'>
@@ -218,6 +194,8 @@
 
 
 
+  <h3>Examples</h3>
+    <pre class="prettyprint">{&#39;experiment&#39;:{&#39;id&#39;:1,&#39;name&#39;:&#39;test&#39;,&#39;qpcr&#39;:true,&#39;run_at&#39;:null}}</pre>
 
   <h3>Params</h3>
   <table class='table'>
@@ -340,63 +318,6 @@
 
 
     <div id='description-show' class='collapse accordion-body'>
-      
-
-
-
-
-
-
-    </div>
-    <hr>
-    <div class='pull-right small'>
-      <a href='../apidoc/experiments/protocol.html'> >>> </a>
-    </div>
-    <div>
-        <h2>
-          <a href='#description-protocol'
-           class='accordion-toggle'
-           data-toggle='collapse'
-           data-parent='#accordion'>
-            GET /experiment/:id/protocol
-          </a><br>
-          <small>Show the protocol of an experiment</small>
-        </h2>
-    </div>
-
-
-    <div id='description-protocol' class='collapse accordion-body'>
-      
-<p>experiment object has one protocol, the protocol has many stages, each
-stage has many steps, each step has one ramp</p>
-
-
-  <h3>Supported Formats</h3>
-  html
-
-
-
-
-
-    </div>
-    <hr>
-    <div class='pull-right small'>
-      <a href='../apidoc/experiments/platessetup.html'> >>> </a>
-    </div>
-    <div>
-        <h2>
-          <a href='#description-platessetup'
-           class='accordion-toggle'
-           data-toggle='collapse'
-           data-parent='#accordion'>
-            GET /experiment/:id/platessetup
-          </a><br>
-          <small>Show the plate setup of an experiment</small>
-        </h2>
-    </div>
-
-
-    <div id='description-platessetup' class='collapse accordion-body'>
       
 
 

@@ -8,70 +8,53 @@ class ExperimentsController < ApplicationController
     end
   end
   
-  api :GET, "/experiments", "List experiments and show the first one"
+  api :GET, "/experiments", "List all the experiments"
   def index
-    show
-  end
-  
-  api :GET, "/experiments/new", "New an experiment"
-  def new
-    @experiment = Experiment.new
+    @experiments = Experiment.all
+    respond_to do |format|
+      format.json { render "index", :status => :ok }
+    end
   end
   
   api :POST, "/experiments", "Create an experiment"
   param_group :experiment
   description "when experiment is created, default protocol will be created"
+  example "{'experiment':{'id':1,'name':'test','qpcr':true,'run_at':null,'protocol':{'id':1,'lid_temperature':'110.0','stages':[{'stage':{'id':1,'stage_type':'holding','name':'Holding Stage','num_cycles':1,'steps':[{'step':{'id':1,'name':'Step 1','temperature':'95.0','hold_time':180,'ramp':{'id':1,'rate':'100.0','max':true}}}]}},{'stage':{'id':2,'stage_type':'cycling','name':'Cycling Stage','num_cycles':40,'steps':[{'step':{'id':2,'name':'Step 2','temperature':'95.0','hold_time':30,'ramp':{'id':2,'rate':'100.0','max':true}}},{'step':{'id':3,'name':'Step 2','temperature':'60.0','hold_time':30,'ramp':{'id':3,'rate':'100.0','max':true}}}]}},{'stage':{'id':3,'stage_type':'holding','name':'Holding Stage','num_cycles':1,'steps':[{'step':{'id':4,'name':'Step 1','temperature':'4.0','hold_time':0,'ramp':{'id':4,'rate':'100.0','max':true}}}]}}]}}}"
   def create
-    @experiment = Experiment.create(experiment_params)
-    redirect_to experiment_path(@experiment)
+    @experiment = Experiment.new(experiment_params)
+    ret = @experiment.save
+    respond_to do |format|
+      format.json { render "fullshow", :status => (ret)? :ok : :unprocessable_entity}
+    end
   end
   
   api :PUT, "/experiment/:id", "Update an experiment"
   param_group :experiment
+  example "{'experiment':{'id':1,'name':'test','qpcr':true,'run_at':null}}"
   def update
     @experiment = Experiment.find(params[:id])
-    if @experiment.update_attributes(experiment_params)
-      redirect_to protocol_experiment_path(@experiment)
-      return
-    else
-      flash.now[:error] = "Please correct the following errors"
-      render "experiments/show"
+    ret = @experiment.update_attributes(experiment_params)
+    respond_to do |format|
+      format.json { render "show", :status => (ret)? :ok :  :unprocessable_entity}
     end
   end
   
   api :POST, "/experiment/:id/copy", "Copy an experiment"
   def copy
-    @experiment = Experiment.find(params[:id])
-    if experiment = @experiment.copy!(params[:experiment])
-      redirect_to experiment_path(experiment)
-    else
-      flash[:error] = "Cannot copy the current experiment"
-      redirect_to experiment_path(@experiment)
+    old_experiment = Experiment.find(params[:id])
+    @experiment = old_experiment.copy(params[:experiment])
+    ret = @experiment.save
+    respond_to do |format|
+      format.json { render "fullshow", :status => (ret)? :ok :  :unprocessable_entity}
     end
   end
   
   api :GET, "/experiment/:id", "Show an experiment"
   def show
-    @experiments = Experiment.all
-    @experiment = (params[:id])? Experiment.find(params[:id]) : @experiments.first
-    if @experiment == nil
-      flash[:notice] = "You don't have any experiment defined.  Please create your first experiment here."
-      redirect_to new_experiment_path
-      return
+    @experiment = Experiment.find(params[:id]) 
+    respond_to do |format|
+      format.json { render "fullshow", :status => (@experiment)? :ok :  :unprocessable_entity}
     end
-    render "experiments/show"
-  end
-  
-  api :GET, "/experiment/:id/protocol", "Show the protocol of an experiment"
-  formats ["html"]
-  description "experiment object has one protocol, the protocol has many stages, each stage has many steps, each step has one ramp"
-  def protocol
-    @experiment = Experiment.find(params[:id])
-  end
-  
-  api :GET, "/experiment/:id/platessetup", "Show the plate setup of an experiment"
-  def platessetup
-    @experiment = Experiment.find(params[:id])
   end
   
   api :GET, "/experiment/:id/status", "Show an experiment running status"
@@ -81,7 +64,9 @@ class ExperimentsController < ApplicationController
   api :POST, "/experiment/:id/start", "Start an experiment"
   def start
     @experiment = Experiment.find(params[:id])
-    redirect_to status_experiment_path(@experiment)
+    respond_to do |format|
+      format.json { render "status", :status => (@experiment)? :ok :  :unprocessable_entity}
+    end
   end
   
   api :POST, "/experiment/:id/stop", "Stop an experiment"
@@ -91,8 +76,9 @@ class ExperimentsController < ApplicationController
   api :DELETE, "/experiment/:id", "Destroy an experiment"
   def destroy
     @experiment = Experiment.find(params[:id])
-    @experiment.destroy
-    flash[:notice] = "Experiment '#{@experiment.name}' is successfully deleted."
-    redirect_to experiments_path
+    ret = @experiment.destroy
+    respond_to do |format|
+      format.json { render "destroy", :status => (ret)? :ok :  :unprocessable_entity}
+    end
   end
 end

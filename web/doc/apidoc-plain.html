@@ -1,13 +1,10 @@
   <h4><a href='#experiments'>Experiments</a></h4>
   <ul>
       <li><a href='#experiments-index'>index</a></li>
-      <li><a href='#experiments-new'>new</a></li>
       <li><a href='#experiments-create'>create</a></li>
       <li><a href='#experiments-update'>update</a></li>
       <li><a href='#experiments-copy'>copy</a></li>
       <li><a href='#experiments-show'>show</a></li>
-      <li><a href='#experiments-protocol'>protocol</a></li>
-      <li><a href='#experiments-platessetup'>platessetup</a></li>
       <li><a href='#experiments-status'>status</a></li>
       <li><a href='#experiments-start'>start</a></li>
       <li><a href='#experiments-stop'>stop</a></li>
@@ -64,26 +61,7 @@
           <h4>
               GET /experiments
             <br>
-            <small>List experiments and show the first one</small>
-          </h4>
-      </div>
-
-      <div>
-        
-
-
-      </div>
-      <hr/>
-
-      <h3 id="experiments-new">
-      <a href='#experiments'>Experiments</a> / <a href='#experiments-new'>new</a>
-      </h3>
-
-      <div>
-          <h4>
-              GET /experiments/new
-            <br>
-            <small>New an experiment</small>
+            <small>List all the experiments</small>
           </h4>
       </div>
 
@@ -110,6 +88,8 @@
         
 <p>when experiment is created, default protocol will be created</p>
 
+          <h4>Examples</h4>
+            <pre class="wiki">{&#39;experiment&#39;:{&#39;id&#39;:1,&#39;name&#39;:&#39;test&#39;,&#39;qpcr&#39;:true,&#39;run_at&#39;:null,&#39;protocol&#39;:{&#39;id&#39;:1,&#39;lid_temperature&#39;:&#39;110.0&#39;,&#39;stages&#39;:[{&#39;stage&#39;:{&#39;id&#39;:1,&#39;stage_type&#39;:&#39;holding&#39;,&#39;name&#39;:&#39;Holding Stage&#39;,&#39;num_cycles&#39;:1,&#39;steps&#39;:[{&#39;step&#39;:{&#39;id&#39;:1,&#39;name&#39;:&#39;Step 1&#39;,&#39;temperature&#39;:&#39;95.0&#39;,&#39;hold_time&#39;:180,&#39;ramp&#39;:{&#39;id&#39;:1,&#39;rate&#39;:&#39;100.0&#39;,&#39;max&#39;:true}}}]}},{&#39;stage&#39;:{&#39;id&#39;:2,&#39;stage_type&#39;:&#39;cycling&#39;,&#39;name&#39;:&#39;Cycling Stage&#39;,&#39;num_cycles&#39;:40,&#39;steps&#39;:[{&#39;step&#39;:{&#39;id&#39;:2,&#39;name&#39;:&#39;Step 2&#39;,&#39;temperature&#39;:&#39;95.0&#39;,&#39;hold_time&#39;:30,&#39;ramp&#39;:{&#39;id&#39;:2,&#39;rate&#39;:&#39;100.0&#39;,&#39;max&#39;:true}}},{&#39;step&#39;:{&#39;id&#39;:3,&#39;name&#39;:&#39;Step 2&#39;,&#39;temperature&#39;:&#39;60.0&#39;,&#39;hold_time&#39;:30,&#39;ramp&#39;:{&#39;id&#39;:3,&#39;rate&#39;:&#39;100.0&#39;,&#39;max&#39;:true}}}]}},{&#39;stage&#39;:{&#39;id&#39;:3,&#39;stage_type&#39;:&#39;holding&#39;,&#39;name&#39;:&#39;Holding Stage&#39;,&#39;num_cycles&#39;:1,&#39;steps&#39;:[{&#39;step&#39;:{&#39;id&#39;:4,&#39;name&#39;:&#39;Step 1&#39;,&#39;temperature&#39;:&#39;4.0&#39;,&#39;hold_time&#39;:0,&#39;ramp&#39;:{&#39;id&#39;:4,&#39;rate&#39;:&#39;100.0&#39;,&#39;max&#39;:true}}}]}}]}}}</pre>
 
 
           <h4>Params</h4>
@@ -171,6 +151,8 @@
 
       <div>
         
+          <h4>Examples</h4>
+            <pre class="wiki">{&#39;experiment&#39;:{&#39;id&#39;:1,&#39;name&#39;:&#39;test&#39;,&#39;qpcr&#39;:true,&#39;run_at&#39;:null}}</pre>
 
 
           <h4>Params</h4>
@@ -246,47 +228,6 @@
               GET /experiment/:id
             <br>
             <small>Show an experiment</small>
-          </h4>
-      </div>
-
-      <div>
-        
-
-
-      </div>
-      <hr/>
-
-      <h3 id="experiments-protocol">
-      <a href='#experiments'>Experiments</a> / <a href='#experiments-protocol'>protocol</a>
-      </h3>
-
-      <div>
-          <h4>
-              GET /experiment/:id/protocol
-            <br>
-            <small>Show the protocol of an experiment</small>
-          </h4>
-      </div>
-
-      <div>
-        
-<p>experiment object has one protocol, the protocol has many stages, each
-stage has many steps, each step has one ramp</p>
-
-
-
-      </div>
-      <hr/>
-
-      <h3 id="experiments-platessetup">
-      <a href='#experiments'>Experiments</a> / <a href='#experiments-platessetup'>platessetup</a>
-      </h3>
-
-      <div>
-          <h4>
-              GET /experiment/:id/platessetup
-            <br>
-            <small>Show the plate setup of an experiment</small>
           </h4>
       </div>
 
@@ -498,6 +439,8 @@ point</p>
 
       <div>
         
+          <h4>Examples</h4>
+            <pre class="wiki">{&#39;ramp&#39;:{&#39;id&#39;:1,&#39;rate&#39;:&#39;100.0&#39;,&#39;max&#39;:true}}</pre>
 
 
           <h4>Params</h4>
@@ -562,6 +505,8 @@ decimal point</p>
 
       <div>
         
+          <h4>Examples</h4>
+            <pre class="wiki">{&#39;stage&#39;:{&#39;id&#39;:1,&#39;stage_type&#39;:&#39;holding&#39;,&#39;name&#39;:&#39;Holding Stage&#39;,&#39;num_cycles&#39;:1,&#39;steps&#39;:[{&#39;step&#39;:{&#39;id&#39;:1,&#39;name&#39;:&#39;Step 1&#39;,&#39;temperature&#39;:&#39;95.0&#39;,&#39;hold_time&#39;:180,&#39;ramp&#39;:{&#39;id&#39;:1,&#39;rate&#39;:&#39;100.0&#39;,&#39;max&#39;:true}}}</pre>
 
 
           <h4>Params</h4>
@@ -648,6 +593,8 @@ Stage&#39;</p>
 
       <div>
         
+          <h4>Examples</h4>
+            <pre class="wiki">{&#39;stage&#39;:{&#39;id&#39;:1,&#39;stage_type&#39;:&#39;holding&#39;,&#39;name&#39;:&#39;Holding Stage&#39;,&#39;num_cycles&#39;:1}}</pre>
 
 
           <h4>Params</h4>
@@ -793,6 +740,8 @@ Stage&#39;</p>
 <p>if step is created with no params, it will be the same as previous step;
 when step is created, default ramp with max rate (100) will be created</p>
 
+          <h4>Examples</h4>
+            <pre class="wiki">{&#39;step&#39;:{&#39;id&#39;:1,&#39;name&#39;:&#39;Step 1&#39;,&#39;temperature&#39;:&#39;95.0&#39;,&#39;hold_time&#39;:180,&#39;ramp&#39;:{&#39;id&#39;:1,&#39;rate&#39;:&#39;100.0&#39;,&#39;max&#39;:true}}}</pre>
 
 
           <h4>Params</h4>
@@ -879,6 +828,8 @@ when step is created, default ramp with max rate (100) will be created</p>
 
       <div>
         
+          <h4>Examples</h4>
+            <pre class="wiki">{&#39;step&#39;:{&#39;id&#39;:1,&#39;name&#39;:&#39;Step 1&#39;,&#39;temperature&#39;:&#39;95.0&#39;,&#39;hold_time&#39;:180}}</pre>
 
 
           <h4>Params</h4>
@@ -989,8 +940,10 @@ when step is created, default ramp with max rate (100) will be created</p>
       <div>
         
 <p>if last step in the asoociated stage is destroyed, the stage will be
-destroyed too.</p>
+destroyed too if it is not the last stage in the protocol.</p>
 
+          <h4>Examples</h4>
+            <pre class="wiki">{&#39;step&#39;:{&#39;destroyed_stage_id&#39;:1}}</pre>
 
 
       </div>

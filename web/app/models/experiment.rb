@@ -17,13 +17,9 @@ class Experiment < ActiveRecord::Base
     protocol.save
   end
   
-  def copy!(params)
-    new_experiment = nil
-    transaction do
-      new_experiment = Experiment.new({:name=>(!params.blank?)? params[:name] : "Copy of #{name}", :qpcr=>qpcr})
-      new_experiment.protocol = protocol.copy
-      new_experiment.save
-    end
+  def copy(params)
+    new_experiment = Experiment.new({:name=>(!params.blank?)? params[:name] : "Copy of #{name}", :qpcr=>qpcr})
+    new_experiment.protocol = protocol.copy
     return new_experiment
   end
   

@@ -21,23 +21,25 @@ class StepsController < ApplicationController
     if step is created with no params, it will be the same as previous step;
     when step is created, default ramp with max rate (100) will be created
   EOS
+  example "{'step':{'id':1,'name':'Step 1','temperature':'95.0','hold_time':180,'ramp':{'id':1,'rate':'100.0','max':true}}}"
   def create
     @step = Step.new(step_params)
     @step.stage_id = params[:stage_id]
     @step.prev_id = params[:prev_id]
     ret = @step.save
     respond_to do |format|
-      format.json { render show, :status => (ret)? :ok :  :unprocessable_entity}
+      format.json { render "fullshow", :status => (ret)? :ok :  :unprocessable_entity}
     end
   end
   
   api :PUT, "/steps/:id", "Update a step"
   param_group :step
+  example "{'step':{'id':1,'name':'Step 1','temperature':'95.0','hold_time':180}}"
   def update
     @step = Step.find(params[:id])
     ret  = @step.update_attributes(step_params)
     respond_to do |format|
-      format.json { render show, :status => (ret)? :ok : :unprocessable_entity}
+      format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
   
@@ -49,17 +51,18 @@ class StepsController < ApplicationController
     @step.prev_id = params[:prev_id]
     ret = @step.save
     respond_to do |format|
-      format.json { render show, :status => (ret)? :ok : :unprocessable_entity}
+      format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
   
   api :DELETE, "/steps/:id", "Destroy a step"
-  description "if last step in the asoociated stage is destroyed, the stage will be destroyed too."
+  description "if last step in the asoociated stage is destroyed, the stage will be destroyed too if it is not the last stage in the protocol."
+  example "{'step':{'destroyed_stage_id':1}}"
   def destroy
     @step = Step.find(params[:id])
     ret = @step.destroy
     respond_to do |format|
-      format.json { render show, :status => (ret)? :ok : :unprocessable_entity}
+      format.json { render "destroy", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
 end

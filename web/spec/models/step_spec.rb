@@ -25,11 +25,20 @@ describe Step do
     end
 
     describe "#destroy" do
-      it "last step" do
+      it "last step in last stage" do
         step = @stage.steps.first
         step.destroy
-        @stage = Stage.find(@stage.id)
-        @stage.should be_nil
+        step.destroyed_stage_id.should be_nil
+        step.should exist_in_database
+        @stage.should exist_in_database
+      end
+      
+      it "last step not in last stage" do
+        new_stage = hold_stage(@stage.protocol)
+        step = @stage.steps.first
+        step.destroy
+        step.destroyed_stage_id.should eq(@stage.id)
+        @stage.should_not exist_in_database
       end
     end
 end

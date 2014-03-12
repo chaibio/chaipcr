@@ -7,6 +7,12 @@ RSpec::Matchers.define :be_same_step_as do |expected|
   end
 end
 
+RSpec::Matchers.define :exist_in_database do
+  match do |actual|
+    actual.class.exists?(actual.id)
+  end
+end
+
 module FactoryHelper
   def hold_stage(protocol)
     Stage.create(:stage_type=>Stage::TYPE_HOLD, :protocol_id=>protocol.id)
