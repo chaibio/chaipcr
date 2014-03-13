@@ -70,6 +70,8 @@ when step is created, default ramp with max rate (100) will be created</p>
 
 
 
+  <h3>Examples</h3>
+    <pre class="prettyprint">{&#39;step&#39;:{&#39;id&#39;:1,&#39;name&#39;:&#39;Step 1&#39;,&#39;temperature&#39;:&#39;95.0&#39;,&#39;hold_time&#39;:180,&#39;ramp&#39;:{&#39;id&#39;:1,&#39;rate&#39;:&#39;100.0&#39;,&#39;max&#39;:true}}}</pre>
 
   <h3>Params</h3>
   <table class='table'>
@@ -216,6 +218,8 @@ when step is created, default ramp with max rate (100) will be created</p>
 
 
 
+  <h3>Examples</h3>
+    <pre class="prettyprint">{&#39;step&#39;:{&#39;id&#39;:1,&#39;name&#39;:&#39;Step 1&#39;,&#39;temperature&#39;:&#39;95.0&#39;,&#39;hold_time&#39;:180}}</pre>
 
   <h3>Params</h3>
   <table class='table'>
@@ -397,7 +401,7 @@ when step is created, default ramp with max rate (100) will be created</p>
     <div id='description-destroy' class='collapse accordion-body'>
       
 <p>if last step in the asoociated stage is destroyed, the stage will be
-destroyed too.</p>
+destroyed too if it is not the last stage in the protocol.</p>
 
 
   <h3>Supported Formats</h3>
@@ -405,6 +409,8 @@ destroyed too.</p>
 
 
 
+  <h3>Examples</h3>
+    <pre class="prettyprint">{&#39;step&#39;:{&#39;destroyed_stage_id&#39;:1}}</pre>
 
 
     </div>

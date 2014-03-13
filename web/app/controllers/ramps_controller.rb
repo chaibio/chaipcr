@@ -14,6 +14,7 @@ class RampsController < ApplicationController
   
   api :PUT, "/ramps/:id", "Update a ramp"
   param_group :ramp
+  example "{'ramp':{'id':1,'rate':'100.0','max':true}}"
   def update
     @ramp = Ramp.find(params[:id])
     ret  = @ramp.update_attributes(ramp_params)

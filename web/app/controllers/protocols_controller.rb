@@ -1,5 +1,6 @@
 class ProtocolsController < ApplicationController
   include ParamsHelper
+  respond_to :json
   
   resource_description { 
     formats ['json']
@@ -17,7 +18,7 @@ class ProtocolsController < ApplicationController
     @protocol = Protocol.find(params[:id])
     ret  = @protocol.update_attributes(protocol_params)
     respond_to do |format|
-      format.json { render show, :status => (ret)? :ok : :unprocessable_entity}
+      format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
 end

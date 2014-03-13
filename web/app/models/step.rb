@@ -5,6 +5,8 @@ class Step < ActiveRecord::Base
   belongs_to :stage
   has_one :ramp, foreign_key: "next_step_id", dependent: :destroy
   
+  attr_accessor :destroyed_stage_id
+  
   before_create do |step|
     if step.temperature.nil? || step.hold_time.nil?
       if !prev_id.nil?
@@ -31,7 +33,12 @@ class Step < ActiveRecord::Base
   
   after_destroy do |step|
     if step.siblings.length == 0
-      step.stage.destroy
+      if step.stage.destroy
+        step.destroyed_stage_id = step.stage.id
+      else
+        stage.errors[:base].each {|e| step.errors[:base] << e }
+        raise ActiveRecord::Rollback and return false
+      end
     end
   end
   
