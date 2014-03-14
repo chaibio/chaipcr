@@ -1,13 +1,14 @@
 ChaiBioTech.Routers.PostsRouter = Backbone.Router.extend({
 
-  
-  //experimentModel: new ChaiBioTech.Models.Experiment(),
   initialize: function() {
     this.experimentCollection = new ChaiBioTech.Collections.Experiment();
-    this.experimentModel = new ChaiBioTech.Models.Experiment();
-    this.experimentCollection.reset(this.experimentModel);
-    //console.log(this.experimentCollection.models)
+    //this.experimentModel = new ChaiBioTech.Models.Experiment();
+    this.experimentCollection.fetch(/*{success: this.gotcha}*/);
   },
+
+  /*gotcha: function(coll, respo) {
+    console.log(coll.at(0), respo);
+  },*/
 
   routes: {
     "index": "index",
@@ -22,15 +23,12 @@ ChaiBioTech.Routers.PostsRouter = Backbone.Router.extend({
   },
 
   designer: function() {
-    //console.log("design");
-    $.get('experiments', function(data) {
-      //console.log('data', data)
-    });
+    console.log(this.experimentCollection)
     var view = new ChaiBioTech.Views.Design.Index_view();
     $("#container").html(view.render().el);
 
     var view = new ChaiBioTech.Views.Design.experiment_properties({
-        model: this.experimentModel 
+        model: new ChaiBioTech.Models.Experiment() 
       });
     $("#play-ground").html(view.render().el);
   }

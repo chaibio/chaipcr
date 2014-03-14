@@ -9,8 +9,14 @@ ChaiBioTech.Views.Design.experiment_properties = Backbone.View.extend({
 	},
 
 	initialize: function() {
+		_.bindAll(this, "SavedHandler")
+		this.model.view = this;	
+		this.model.on("Saved", this.SavedHandler);
 		
-		console.log(this.model);
+	},
+
+	SavedHandler: function() {
+		$(this.el).find(".shadow").fadeIn('fast');
 	},
 
 	render: function() {
@@ -19,6 +25,10 @@ ChaiBioTech.Views.Design.experiment_properties = Backbone.View.extend({
 	},
 
 	addExperiment: function() {
+		var newExperiment = this.model.get("experiment");
+		newExperiment.name = $("#experiment-name").val();
+		newExperiment.qpcr = true;
+		this.model.set({experiment: newExperiment});
 		this.model.saveData();
 	}
 });

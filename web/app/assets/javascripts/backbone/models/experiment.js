@@ -2,19 +2,37 @@ ChaiBioTech.Models.Experiment = ChaiBioTech.Models.Experiment || {};
 
 ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 	
+	url: "/experiments",
+
 	defaults: {
 
-		name: "",
-		qpcr: true
+		experiment: {
+			name: "",
+			qpcr: true,
+			protocol: {
 
+			}
+		}
 	},
 
 	initialize: function(){
-
+		_.bindAll(this ,"afterSave");
 	},
 	saveData: function() {
-		alert("all the way up here");
-		console.log(this.collection);
+		//var data = this.toJSON();
+		/*$.post("/experiments", data)
+			.done(function(dataReturned){
+				console.log(dataReturned);
+				return "Saved";
+			})
+			.fail(function() {
+				console.log("failed");
+			}); */
+		this.save(null, { success: this.afterSave });
+	},
+
+	afterSave: function(response) {
+		this.trigger("Saved");
 	}
 });
 
