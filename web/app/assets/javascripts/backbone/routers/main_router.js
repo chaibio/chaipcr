@@ -1,7 +1,12 @@
 ChaiBioTech.Routers.PostsRouter = Backbone.Router.extend({
 
-  experimentCollection: new ChaiBioTech.Collections.Experiment(),
-  experimentalModel: new ChaiBioTech.Models.Experiment(),
+  
+  //experimentModel: new ChaiBioTech.Models.Experiment(),
+  initialize: function() {
+    this.experimentCollection = new ChaiBioTech.Collections.Experiment();
+    this.experimentCollection.reset({"name": "Jossie", "qpcr": "true"})
+    console.log(this.experimentCollection.models)
+  },
 
   routes: {
     "index": "index",
@@ -24,7 +29,7 @@ ChaiBioTech.Routers.PostsRouter = Backbone.Router.extend({
     $("#container").html(view.render().el);
 
     var view = new ChaiBioTech.Views.Design.experiment_properties({
-        model: this.experimentalModel 
+        model: this.experimentCollection.models[0] 
       });
     $("#play-ground").html(view.render().el);
   }
