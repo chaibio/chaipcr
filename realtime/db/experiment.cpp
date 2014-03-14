@@ -1,5 +1,5 @@
 #include "pcrincludes.h"
-#include "pocoincludes.h"
+#include "boostincludes.h"
 
 #include "protocol.h"
 #include "experiment.h"
@@ -7,7 +7,7 @@
 Experiment::Experiment()
 {
     _qpcr = true;
-    _runAt = 0;
+    _runAt = boost::posix_time::not_a_date_time;
     _protocol = nullptr;
 }
 
@@ -31,7 +31,7 @@ Experiment::Experiment(Experiment &&other)
     _protocol = other._protocol;
 
     other._qpcr = true;
-    other._runAt = 0;
+    other._runAt = boost::posix_time::not_a_date_time;
     other._protocol = nullptr;
 }
 
@@ -62,7 +62,7 @@ Experiment& Experiment::operator= (Experiment &&other)
     _protocol = other._protocol;
 
     other._qpcr = true;
-    other._runAt = 0;
+    other._runAt = boost::posix_time::not_a_date_time;
     other._protocol = nullptr;
 
     return *this;

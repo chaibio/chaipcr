@@ -7,6 +7,7 @@ INCLUDEPATH += ./util/
 INCLUDEPATH += ./db/
 INCLUDEPATH += ./test/
 INCLUDEPATH += ./libraries/include/
+INCLUDEPATH += ./libraries/include/soci #for internal SOCI use
 INCLUDEPATH += $(BOOST_INCLUDE_PATH)
 
 LIBS += -L../realtime/libraries/lib/
@@ -16,12 +17,15 @@ LIBS += -lPocoFoundation
 LIBS += -lPocoNet
 LIBS += -lPocoUtil
 LIBS += -lPocoXML
-LIBS += -lPocoData
-LIBS += -lPocoDataSQLite
 
 #Google Test and Mock
 LIBS += -lgtest
 #LIBS += -lgmock
+
+#SOCI
+LIBS += -lsqlite3
+LIBS += -lsoci_core
+LIBS += -lsoci_sqlite3
 
 DEFINES += TEST_BUILD
 
@@ -93,7 +97,8 @@ HEADERS += \
     db/ramp.h \
     db/stagecomponent.h \
     db/dbincludes.h \
-    test/servertest.h
+    test/servertest.h \
+    db/sociincludes.h
 
 SOURCES += \
     app/pins.cpp \
@@ -118,11 +123,11 @@ SOURCES += \
     server/qpcrapplication.cpp \
     util/pid.cpp \
     control/lid.cpp \
-    db/dbcontrol.cpp \
     db/experiment.cpp \
     db/protocol.cpp \
     db/stage.cpp \
     db/step.cpp \
     db/ramp.cpp \
     db/stagecomponent.cpp \
-    test/servertest.cpp
+    test/servertest.cpp \
+    db/dbcontrol.cpp

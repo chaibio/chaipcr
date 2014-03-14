@@ -17,10 +17,12 @@ public:
 
     void setStep(const Step &step);
     void setStep(Step &&step);
+    void setStep(Step *step);
     inline Step* step() const {return _step;}
 
     void setRamp(const Ramp &ramp);
     void setRamp(Ramp &&ramp);
+    void setRamp(Ramp *ramp);
     inline Ramp* ramp() const {return _ramp;}
 
 private:

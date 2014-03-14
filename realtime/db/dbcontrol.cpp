@@ -1,91 +1,84 @@
 #include "pcrincludes.h"
-#include "pocoincludes.h"
+#include "boostincludes.h"
 
 #include "dbincludes.h"
+#include "sociincludes.h"
 
-using namespace Poco;
-using namespace Poco::Data;
-
-#define DATABASE_FILE "db.db"
+#define DATABASE_FILE "./db.sqlite"
 
 DBControl::DBControl()
 {
-    SQLite::Connector::registerConnector();
-
-    _session = new Session("SQLite", DATABASE_FILE);
+    _session = new soci::session(soci::sqlite3, DATABASE_FILE);
 }
 
 DBControl::~DBControl()
 {
     delete _session;
-
-    SQLite::Connector::unregisterConnector();
 }
 
 Experiment* DBControl::getExperiment(int id)
 {
-    Statement statement(*_session);
-    statement << "SELECT * FROM experiments WHERE id=:id", use(id), now;
+    soci::row result;
+    *_session << "SELECT * FROM experiments WHERE id = :id", soci::use(id), soci::into(result);
 
-    RecordSet records(statement);
-    if (records.rowCount() == 0)
+    if (result.get_indicator("id") == soci::i_null)
         return nullptr;
 
     Experiment *experiment = new Experiment;
-    experiment->setName(std::move(records["name"].extract<std::string>()));
-    experiment->setQpcr(records["qpcr"].extract<bool>());
-    experiment->setRunAt(records["run_at"].extract<Int64>());
-    experiment->setProtocol(getProtocol(id));
+
+    if (result.get_indicator("name") != soci::i_null)
+        experiment->setName(result.get<std::string>("name"));
+    if (result.get_indicator("qpcr") != soci::i_null)
+        experiment->setQpcr(result.get<bool>("qpcr"));
+    if (result.get_indicator("run_at") != soci::i_null)
+        experiment->setRunAt(result.get<boost::posix_time::ptime>("run_at"));
+
+    experiment->setProtocol(getProtocol(result.get<int>("id")));
 
     return experiment;
 }
 
-Protocol *DBControl::getProtocol(int experimentId)
+Protocol* DBControl::getProtocol(int experimentId)
 {
-    Statement statement(*_session);
-    statement << "SELECT * FROM protocols WHERE experiment_id=:experimentId", use(experimentId), now;
+    soci::row result;
+    *_session << "SELECT * FROM protocols WHERE experiment_id = :id", soci::use(experimentId), soci::into(result);
 
-    RecordSet records(statement);
-    if (records.rowCount() == 0)
+    if (result.get_indicator("id") == soci::i_null)
         return nullptr;
 
     Protocol *protocol = new Protocol;
-    protocol->setLidTemperature(records["lid_temperature"].extract<double>());
-    protocol->setStages(std::move(getStages(records["id"].extract<int>())));
+
+    if (result.get_indicator("lid_temperature") != soci::i_null)
+        protocol->setLidTemperature(result.get<double>("lid_temperature"));
+
+    protocol->setStages(getStages(result.get<int>("id")));
 
     return protocol;
 }
 
 std::vector<Stage> DBControl::getStages(int protocolId)
 {
-    Statement statement(*_session);
-    statement << "SELECT * FROM stages WHERE protocol_id=:protocolId ORDER BY order_number", use(protocolId), now;
-
-    RecordSet records(statement);
     std::vector<Stage> stages;
+    soci::rowset<soci::row> result((_session->prepare << "SELECT * FROM protocols WHERE protocol_id = :id ORDER BY order_number", soci::use(protocolId)));
 
-    if (records.rowCount() > 0)
+    Stage stage;
+    for (soci::rowset<soci::row>::const_iterator it = result.begin(); it != result.end(); ++it)
     {
-        Stage stage;
-        std::string stageType;
-        while (records.moveNext())
-        {
-            stage.setName(move(records["name"].extract<std::string>()));
-            stage.setNumCycles(records["num_cycles"].extract<int>());
-            stage.setOrderNumber(records["order_number"].extract<int>());
-            stageType = records["stage_type"].extract<std::string>();
+        if (it->get_indicator("name") != soci::i_null)
+            stage.setName(it->get<std::string>("name"));
 
-            if (stageType == "holding")
-                stage.setType(Stage::Holding);
-            else if (stageType == "cycling")
-                stage.setType(Stage::Cycling);
-            else if (stageType == "meltcurve")
-                stage.setType(Stage::Meltcurve);
+        if (it->get_indicator("num_cycles") != soci::i_null)
+            stage.setNumCycles(it->get<int>("num_cycles"));
 
-            stage.setComponents(std::move(getStageComponents(records["id"].extract<int>())));
+        if (it->get_indicator("order_number") != soci::i_null)
+            stage.setOrderNumber(it->get<int>("order_number"));
 
-            stages.push_back(std::move(stage));
-        }
+        if (it->get_indicator("stage_type") != soci::i_null)
+            stage.setType(it->get<Stage::Type>("stage_type"));
+
+        stage.setComponents(getStageComponents(it->get<int>("id")));
+
+        stages.push_back(std::move(stage));
     }
 
     return stages;
@@ -94,36 +87,41 @@ std::vector<Stage> DBControl::getStages(int protocolId)
 std::vector<StageComponent> DBControl::getStageComponents(int stageId)
 {
     std::vector<StageComponent> components;
-    std::vector<Step> steps(std::move(getSteps(stageId)));
+    std::map<int, Step> steps = getSteps(stageId);
 
-    for (const Step &step: steps)
+    StageComponent component;
+    for (std::map<int, Step>::iterator it = steps.begin(); it != steps.end(); ++it)
     {
+        component.setStep(std::move(it->second));
+        component.setRamp(getRamp(it->first));
 
+        components.push_back(std::move(component));
     }
 
     return components;
 }
 
-std::vector<Step> DBControl::getSteps(int stageId)
+std::map<int, Step> DBControl::getSteps(int stageId)
 {
-    Statement statement(*_session);
-    statement << "SELECT * FROM steps WHERE stage_id=:stageId ORDER BY order_number", use(stageId), now;
+    std::map<int, Step> steps;
+    soci::rowset<soci::row> result((_session->prepare << "SELECT * FROM steps WHERE stage_id = :id ORDER BY order_number", soci::use(stageId)));
 
-    RecordSet records(statement);
-    std::vector<Step> steps;
-
-    if (records.rowCount() > 0)
+    Step step;
+    for (soci::rowset<soci::row>::const_iterator it = result.begin(); it != result.end(); ++it)
     {
-        Step step;
-        while (records.moveNext())
-        {
-            step.setName(std::move(records["name"].extract<std::string>()));
-            step.setTemperature(records["temperature"].extract<double>());
-            step.setHoldTime(records["hold_time"].extract<Int64>());
-            step.setOrderNumber(records["order_number"].extract<int>());
+        if (it->get_indicator("name") != soci::i_null)
+            step.setName(it->get<std::string>("name"));
 
-            steps.push_back(std::move(step));
-        }
+        if (it->get_indicator("temperature") != soci::i_null)
+            step.setTemperature(it->get<double>("temperature"));
+
+        if (it->get_indicator("order_number") != soci::i_null)
+            step.setOrderNumber(it->get<int>("order_number"));
+
+        if (it->get_indicator("hold_time") != soci::i_null)
+            step.setHoldTime(it->get<boost::posix_time::ptime>("hold_time"));
+
+        steps[it->get<int>("id")] = std::move(step);
     }
 
     return steps;
@@ -131,15 +129,16 @@ std::vector<Step> DBControl::getSteps(int stageId)
 
 Ramp* DBControl::getRamp(int stepId)
 {
-    Statement statement(*_session);
-    statement << "SELECT * FROM ramps WHERE next_step_id=:stepId", use(stepId), now;
+    soci::row result;
+    *_session << "SELECT * FROM ramps WHERE next_step_id = :id", soci::use(stepId), soci::into(result);
 
-    RecordSet records(statement);
-    if (records.rowCount() == 0)
+    if (result.get_indicator("id") == soci::i_null)
         return nullptr;
 
     Ramp *ramp = new Ramp;
-    ramp->setRate(records["rate"].extract<double>());
+
+    if (result.get_indicator("rate") != soci::i_null)
+        ramp->setRate(result.get<double>("rate"));
 
     return ramp;
 }

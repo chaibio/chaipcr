@@ -1,5 +1,5 @@
 #include "pcrincludes.h"
-#include "pocoincludes.h"
+#include "boostincludes.h"
 
 #include "step.h"
 #include "ramp.h"
@@ -77,6 +77,14 @@ void StageComponent::setStep(Step &&step)
         _step = new Step(step);
 }
 
+void StageComponent::setStep(Step *step)
+{
+    if (_step)
+        delete _step;
+
+    _step = step;
+}
+
 void StageComponent::setRamp(const Ramp &ramp)
 {
     if (_ramp)
@@ -91,4 +99,12 @@ void StageComponent::setRamp(Ramp &&ramp)
         *_ramp = ramp;
     else
         _ramp = new Ramp(ramp);
+}
+
+void StageComponent::setRamp(Ramp *ramp)
+{
+    if (_ramp)
+        delete _ramp;
+
+    _ramp = ramp;
 }

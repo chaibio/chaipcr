@@ -21,8 +21,8 @@ public:
     inline void setQpcr(bool qpcr) {_qpcr = qpcr;}
     inline bool qpcr() const {return _qpcr;}
 
-    inline void setRunAt(const Poco::Timestamp &runAt) {_runAt = runAt;}
-    inline const Poco::Timestamp runAt() const {return _runAt;}
+    inline void setRunAt(const boost::posix_time::ptime &runAt) {_runAt = runAt;}
+    inline const boost::posix_time::ptime& runAt() const {return _runAt;}
 
     void setProtocol(const Protocol &protocol);
     void setProtocol(Protocol &&protocol);
@@ -32,7 +32,7 @@ public:
 private:
     std::string _name;
     bool _qpcr;
-    Poco::Timestamp _runAt;
+    boost::posix_time::ptime _runAt;
 
     Protocol *_protocol;
 };

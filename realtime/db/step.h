@@ -19,8 +19,8 @@ public:
     inline void setTemperature(int temperature) {_temperature = temperature;}
     inline int temperature() const {return _temperature;}
 
-    inline void setHoldTime(const Poco::Timestamp& holdTime) {_holdTime = holdTime;}
-    inline const Poco::Timestamp& holdTime() const {return _holdTime;}
+    inline void setHoldTime(const boost::posix_time::ptime& holdTime) {_holdTime = holdTime;}
+    inline const boost::posix_time::ptime& holdTime() const {return _holdTime;}
 
     inline void setOrderNumber(int orderNumber) {_orderNumber = orderNumber;}
     inline int orderNumber() const {return _orderNumber;}
@@ -29,7 +29,7 @@ private:
     std::string _name;
 
     double _temperature;
-    Poco::Timestamp _holdTime;
+    boost::posix_time::ptime _holdTime;
     int _orderNumber;
 };
 
