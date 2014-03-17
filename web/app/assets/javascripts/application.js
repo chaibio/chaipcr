@@ -19,6 +19,6 @@
 //= require backbone/ChaiBioTech
 
 $(function() {
-    window.router = new ChaiBioTech.Routers.PostsRouter({});
+    window.router = new ChaiBioTech.Routers.DesignRouter({});
     Backbone.history.start();
 });
