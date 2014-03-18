@@ -22,14 +22,16 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		var that = this;
 		if(action == "update") {
 			var data = this.get("experiment");
-			console.log("Boom", {"experiment":{"id":73,"name":"Bingo jossie","qpcr":true,"run_at":null}});
+			//console.log("Boom", {"experiment":{"id":73,"name":"Bingo jossie","qpcr":true,"run_at":null}});
+			dataToBeSend = {"experiment":{"name": data["name"]}}
 			$.ajax({
-				url: "experiment/"+data["id"],
+				url: "/experiments/"+data["id"],
 				contentType: 'application/json',
-				method: 'PUT',
-				data: JSON.stringify({"experiment":{"id":73,"name":"Bingo jossie","qpcr":true,"run_at":null}}),
+				type: 'PUT',
+				data: JSON.stringify(dataToBeSend)
 			})
 			.done(function(data) {
+				console.log(data);
 				alert("Okay")
 			})
 			.fail(function() {

@@ -34,7 +34,7 @@ class ExperimentsController < ApplicationController
     end
   end
   
-  api :PUT, "/experiment/:id", "Update an experiment"
+  api :PUT, "/experiments/:id", "Update an experiment"
   param_group :experiment
   example "{'experiment':{'id':1,'name':'test','qpcr':true,'run_at':null}}"
   def update
