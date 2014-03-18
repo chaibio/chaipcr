@@ -21,6 +21,10 @@ public:
 
     Experiment* getExperiment(int id);
 
+#ifdef TEST_BUILD
+    std::vector<int> getEperimentIdList();
+#endif
+
 private:
     Protocol* getProtocol(int experimentId);
     std::vector<Stage> getStages(int protocolId);

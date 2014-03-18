@@ -11,6 +11,7 @@ Step::Step()
 }
 
 Step::Step(const Step &other)
+    :Step()
 {
     setName(other.name());
     setTemperature(other.temperature());
@@ -19,6 +20,7 @@ Step::Step(const Step &other)
 }
 
 Step::Step(Step &&other)
+    :Step()
 {
     _name = std::move(other._name);
     _temperature = other._temperature;

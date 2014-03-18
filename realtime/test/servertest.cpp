@@ -46,13 +46,17 @@ void ServerTest::testStatus()
     }
     catch (json_parser_error &ex)
     {
-        std::cout << "JSON error - " << ex.what() << '\n';
-        ASSERT_TRUE(false);
+        //std::cout << "JSON error - " << ex.what() << '\n';
+        //ASSERT_TRUE(false);
+
+        FAIL() << "JSON error - " << ex.what() << '\n';
     }
     catch (std::exception &ex)
     {
-        std::cout << "Server error - " << ex.what() << '\n';
-        ASSERT_TRUE(false);
+        //std::cout << "Server error - " << ex.what() << '\n';
+        //ASSERT_TRUE(false);
+
+        FAIL() << "Server error - " << ex.what() << '\n';
     }
 }
 

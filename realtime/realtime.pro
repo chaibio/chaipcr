@@ -98,7 +98,8 @@ HEADERS += \
     db/stagecomponent.h \
     db/dbincludes.h \
     test/servertest.h \
-    db/sociincludes.h
+    db/sociincludes.h \
+    test/dbtest.h
 
 SOURCES += \
     app/pins.cpp \
@@ -130,4 +131,5 @@ SOURCES += \
     db/ramp.cpp \
     db/stagecomponent.cpp \
     test/servertest.cpp \
-    db/dbcontrol.cpp
+    db/dbcontrol.cpp \
+    test/dbtest.cpp

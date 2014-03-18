@@ -12,22 +12,22 @@ Experiment::Experiment()
 }
 
 Experiment::Experiment(const Experiment &other)
+    :Experiment()
 {
     setName(other.name());
     setQpcr(other.qpcr());
     setRunAt(other.runAt());
-    setProtocol(*other.protocol());
+
+    if (other.protocol())
+        setProtocol(*other.protocol());
 }
 
 Experiment::Experiment(Experiment &&other)
+    :Experiment()
 {
     _name = std::move(other._name);
     _qpcr = other._qpcr;
     _runAt = other._runAt;
-
-    if (_protocol)
-        delete _protocol;
-
     _protocol = other._protocol;
 
     other._qpcr = true;
@@ -45,7 +45,11 @@ Experiment& Experiment::operator= (const Experiment &other)
     setName(other.name());
     setQpcr(other.qpcr());
     setRunAt(other.runAt());
-    setProtocol(*other.protocol());
+
+    if (other.protocol())
+        setProtocol(*other.protocol());
+    else
+        setProtocol(nullptr);
 
     return *this;
 }

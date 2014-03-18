@@ -8,6 +8,7 @@
 #include <cerrno>
 #include <cstdio>
 #include <ctime>
+#include <cstdlib>
 
 //C++ headers
 #include <string>

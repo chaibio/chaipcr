@@ -16,11 +16,11 @@ public:
     inline void setName(std::string &&name) {_name = name;}
     inline const std::string name() const {return _name;}
 
-    inline void setTemperature(int temperature) {_temperature = temperature;}
-    inline int temperature() const {return _temperature;}
+    inline void setTemperature(double temperature) {_temperature = temperature;}
+    inline double temperature() const {return _temperature;}
 
-    inline void setHoldTime(const boost::posix_time::ptime& holdTime) {_holdTime = holdTime;}
-    inline const boost::posix_time::ptime& holdTime() const {return _holdTime;}
+    inline void setHoldTime(const time_t holdTime) {_holdTime = holdTime;}
+    inline time_t holdTime() const {return _holdTime;}
 
     inline void setOrderNumber(int orderNumber) {_orderNumber = orderNumber;}
     inline int orderNumber() const {return _orderNumber;}
@@ -29,7 +29,7 @@ private:
     std::string _name;
 
     double _temperature;
-    boost::posix_time::ptime _holdTime;
+    time_t _holdTime;
     int _orderNumber;
 };
 

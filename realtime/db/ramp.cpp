@@ -9,11 +9,13 @@ Ramp::Ramp()
 }
 
 Ramp::Ramp(const Ramp &other)
+    :Ramp()
 {
     setRate(other.rate());
 }
 
 Ramp::Ramp(Ramp &&other)
+    :Ramp()
 {
     _rate = other._rate;
     other._rate = 0;
