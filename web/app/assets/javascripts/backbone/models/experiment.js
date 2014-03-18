@@ -18,17 +18,27 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 	initialize: function(){
 		_.bindAll(this ,"afterSave");
 	},
-	saveData: function() {
-		//var data = this.toJSON();
-		/*$.post("/experiments", data)
-			.done(function(dataReturned){
-				console.log(dataReturned);
-				return "Saved";
+	saveData: function( action ) {
+		var that = this;
+		if(action == "update") {
+			var data = this.get("experiment");
+			console.log("Boom", {"experiment":{"id":73,"name":"Bingo jossie","qpcr":true,"run_at":null}});
+			$.ajax({
+				url: "experiment/"+data["id"],
+				contentType: 'application/json',
+				method: 'PUT',
+				data: JSON.stringify({"experiment":{"id":73,"name":"Bingo jossie","qpcr":true,"run_at":null}}),
+			})
+			.done(function(data) {
+				alert("Okay")
 			})
 			.fail(function() {
-				console.log("failed");
-			}); */
-		this.save(null, { success: this.afterSave });
+				alert("failed");
+			})
+		}else {
+			alert("save");
+			this.save(null, { success: this.afterSave });
+		}
 	},
 
 	afterSave: function(response) {
