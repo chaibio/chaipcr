@@ -19,10 +19,8 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		_.bindAll(this ,"afterSave");
 	},
 	saveData: function( action ) {
-		var that = this;
 		if(action == "update") {
 			var data = this.get("experiment");
-			//console.log("Boom", {"experiment":{"id":73,"name":"Bingo jossie","qpcr":true,"run_at":null}});
 			dataToBeSend = {"experiment":{"name": data["name"]}}
 			$.ajax({
 				url: "/experiments/"+data["id"],
@@ -32,13 +30,11 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 			})
 			.done(function(data) {
 				console.log(data);
-				alert("Okay")
 			})
 			.fail(function() {
-				alert("failed");
+				console.log("Failed to update");
 			})
 		}else {
-			alert("save");
 			this.save(null, { success: this.afterSave });
 		}
 	},

@@ -13,6 +13,7 @@ ChaiBioTech.Routers.DesignRouter = Backbone.Router.extend({
   routes: {
     "index": "index",
     "design": "designer",
+    "design/run": "runMethod",
     ".*": "index"
   },
 
@@ -31,6 +32,18 @@ ChaiBioTech.Routers.DesignRouter = Backbone.Router.extend({
         model: this.experimentModel
       });
     $("#play-ground").html(view.render().el);
+  },
+
+  runMethod: function() {
+    //if(_.has(this.experimentModel.get("experiment"), "id")) {
+      var view = new ChaiBioTech.Views.Design.runExperiment({
+        model: this.experimentModel
+      });
+      $("#play-ground").html(view.render().el);
+      view.addStages();
+   //}else {
+      //alert("Please create an experiment before run ")
+    //}
   }
 
 });

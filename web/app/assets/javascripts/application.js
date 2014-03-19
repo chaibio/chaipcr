@@ -14,6 +14,7 @@
 //= require underscore
 //= require backbone
 //= require backbone_datalink
+//= require bootstrap.min
 //= require rails
 //= require chaipcr
 //= require backbone/ChaiBioTech
