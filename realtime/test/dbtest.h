@@ -1,3 +1,5 @@
+#ifdef TEST_BUILD
+
 #ifndef DBTEST_H
 #define DBTEST_H
 
@@ -21,3 +23,4 @@ private:
 };
 
 #endif // DBTEST_H
+#endif // TEST_BUILD

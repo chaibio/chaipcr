@@ -1,3 +1,5 @@
+#ifdef TEST_BUILD
+
 #include "pcrincludes.h"
 #include "boostincludes.h"
 #include "dbincludes.h"
@@ -110,3 +112,5 @@ TEST_F(DBTest, experiments)
 {
     testExperiment();
 }
+
+#endif // TEST_BUILD

@@ -1,3 +1,5 @@
+#ifdef TEST_BUILD
+
 #include "pcrincludes.h"
 #include "boostincludes.h"
 #include "pocoincludes.h"
@@ -64,3 +66,5 @@ TEST_F(ServerTest, status_service)
 {
     testStatus();
 }
+
+#endif // TEST_BUILD
