@@ -27,8 +27,6 @@ LIBS += -lsqlite3
 LIBS += -lsoci_core
 LIBS += -lsoci_sqlite3
 
-DEFINES += TEST_BUILD
-
 unix:!unix_m {
     QMAKE_CC = arm-unknown-linux-gnueabi-gcc
     QMAKE_CXX = arm-unknown-linux-gnueabi-g++
