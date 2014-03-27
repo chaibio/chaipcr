@@ -66,6 +66,7 @@
 					height: 18px;
 					float: right;
 					cursor: move;
+					z-index: 100;
 					.label {
 						float: right;
 						width: 44px;
@@ -75,9 +76,9 @@
 				.line {
 					background-color: black;
 					width:50px;
-					height: 1px;
+					height: 2px;
 					position:relative;
-					top:100px;
+					-webkit-transform-origin: 0% 0%;
 				}
 			}
 
