@@ -14,7 +14,7 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 		return this;
 	},
 
-	addSteps: function() {
+	addSteps: function(stageNumber) {
 
 		that = this;
 		allSteps = this.options["stageInfo"]["stage"];
@@ -24,7 +24,8 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 
 			stepView = new ChaiBioTech.Views.Design.steps({
 				model: that.model,
-				stepInfo: step
+				stepInfo: step,
+				stageNumber: stageNumber
 			});
 
 			currentWidth = $(that.el).width();

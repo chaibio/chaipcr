@@ -18,7 +18,7 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		stages = stages["protocol"]["stages"];
 		that = this;
 		
-		_.each(stages, function(stage) {
+		_.each(stages, function(stage, index) {
 			
 			stageView = new ChaiBioTech.Views.Design.stages({
 				model: that.model, //this points to stage within _.each's context
@@ -26,7 +26,7 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 			});
 
 			$("#innertrack").append(stageView.render().el);
-			stageView.addSteps()
+			stageView.addSteps(index);
 		});
 		
 	}

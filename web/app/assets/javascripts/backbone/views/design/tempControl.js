@@ -24,7 +24,11 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 	},
 
 	render:function() {
-		$(this.el).html(this.template());
+		temperature = this.options["stepData"]["step"]["temperature"];
+		console.log(temperature * 1.57)
+		//$(this.el).find(".ui-draggable").css("top", (157 - temperature) +"px");
+		
+		$(this.el).html(this.template(this.options["stepData"]["step"]));
 		return this;
 	}
 });

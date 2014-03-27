@@ -66,11 +66,18 @@
 					height: 18px;
 					float: right;
 					cursor: move;
-
 					.label {
 						float: right;
 						width: 44px;
 					}
+				}
+
+				.line {
+					background-color: black;
+					width:50px;
+					height: 1px;
+					position:relative;
+					top:100px;
 				}
 			}
 

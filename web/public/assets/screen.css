@@ -73,8 +73,16 @@
   float: right;
   cursor: move;
 }
-/* line 70, ../../app/assets/stylesheets/screen.css.scss */
+/* line 69, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run .tempBar .label {
   float: right;
   width: 44px;
+}
+/* line 75, ../../app/assets/stylesheets/screen.css.scss */
+#stadium #track #innertrack .step-run .line {
+  background-color: black;
+  width: 50px;
+  height: 1px;
+  position: relative;
+  top: 100px;
 }
