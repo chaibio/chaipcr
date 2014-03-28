@@ -9,15 +9,12 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 	},
 
 	test: function() {
-		//alert("sfdsd");
-		console.log(ChaiBioTech.Data.selectedStep, this);
 		
 		if(!_.isUndefined(ChaiBioTech.Data.selectedStep) && !_.isNull(ChaiBioTech.Data.selectedStep)) {
 
 			if(this.cid ===  ChaiBioTech.Data.selectedStep.cid) {
 				$(this.el).css("background-color", "yellow");
 				ChaiBioTech.Data.selectedStep = null;
-				console.log("Vooo", ChaiBioTech.Data.selectedStep);
 			} else {
 				$(this.el).css("background-color","orange");
 				oldStepSelected = ChaiBioTech.Data.selectedStep;

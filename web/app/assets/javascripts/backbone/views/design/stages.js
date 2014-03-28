@@ -23,14 +23,25 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 		_.each(allSteps, function(step, index) {
 
 			stepView = new ChaiBioTech.Views.Design.steps({
-				model: that.model,
+				model: step["step"],
 				stepInfo: step,
-				stageNumber: stageNumber
+				parentStage: that
 			});
-
+			//that.dummy = step;
 			currentWidth = $(that.el).width();
 			$(that.el).css("width", currentWidth + (index * 150)+"px");
 			$(that.el).find(".step-holder").append(stepView.render().el);
 		})
+	},
+
+	addStep: function(pole, place) {
+		stepView = new ChaiBioTech.Views.Design.steps({
+			model: that.model,
+			stepInfo: this.dummy,
+			parentStage: this
+		});
+		currentWidth = $(this.el).width();
+		$(this.el).css("width", (currentWidth + 150) +"px");
+		$(pole.el).after(stepView.render().el);
 	}
 });

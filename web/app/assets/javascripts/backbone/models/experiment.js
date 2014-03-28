@@ -41,6 +41,10 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 
 	afterSave: function(response) {
 		this.trigger("Saved");
+	},
+
+	createStep: function() {
+		
 	}
 });
 

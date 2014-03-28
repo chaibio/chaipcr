@@ -10,15 +10,22 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 
 	events: {
 		"click #step-before": "addBefore",
-		"click #step-before": "addAfter"
+		"click #step-after": "addAfter"
 	},
 
-	addBefore: function() {
-		alert("Just so good");
+	addBefore: function(e) {
+		e.preventDefault();
+		console.log(ChaiBioTech.Data.selectedStep);
+		target = ChaiBioTech.Data.selectedStep.options.parentStage;
+		target.addStep(ChaiBioTech.Data.selectedStep);
+		this.model.createStep(target)
+		//make a new step and send it to target
 	},
 
-	addAfter: function() {
-		alert("add after");
+	addAfter: function(e) {
+		//alert("add after");
+		e.preventDefault();
+		console.log(ChaiBioTech.Data.selectedStep);
 	},
 
 	render: function() {
@@ -34,7 +41,7 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		_.each(stages, function(stage, index) {
 			
 			stageView = new ChaiBioTech.Views.Design.stages({
-				model: that.model, //this points to stage within _.each's context
+				model: stage["stage"], //this points to stage within _.each's context
 				stageInfo: stage
 			});
 
