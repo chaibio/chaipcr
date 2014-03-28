@@ -10,6 +10,8 @@
 	display: none;
 }
 
+
+
 #stadium {
 	#play-ground {
 		min-height: 400px;
@@ -54,7 +56,10 @@
 				width: 100%;
 				height:100%;
 			}
-
+			.step-select {
+				background-color: orange;
+			}
+			
 			.step-run {
 				width: 149px;
 				height: 175px;

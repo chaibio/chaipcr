@@ -1,3 +1,4 @@
+ChaiBioTech.Data =  ChaiBioTech.Data || {};
 ChaiBioTech.Routers.DesignRouter = Backbone.Router.extend({
 
   initialize: function() {

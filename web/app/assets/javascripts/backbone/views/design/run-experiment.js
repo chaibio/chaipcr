@@ -8,6 +8,19 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		
 	},
 
+	events: {
+		"click #step-before": "addBefore",
+		"click #step-before": "addAfter"
+	},
+
+	addBefore: function() {
+		alert("Just so good");
+	},
+
+	addAfter: function() {
+		alert("add after");
+	},
+
 	render: function() {
 		$(this.el).html(this.template());
 		return this;
