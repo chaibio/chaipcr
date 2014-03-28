@@ -43,8 +43,23 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		this.trigger("Saved");
 	},
 
-	createStep: function() {
-		
+	createStep: function(step) {
+		//console.log(step);
+		stage = step.options.parentStage.model;
+		dataToBeSend = {"step":{"prev_id": step.model.id}};
+		console.log("Data To Server", dataToBeSend);
+		$.ajax({
+			url: "/stages/"+stage.id+"/steps",
+			contentType: 'application/json',
+			type: 'POST',
+			data: JSON.stringify(dataToBeSend)
+		})
+		.done(function(data) {
+			console.log(data);
+		})
+		.fail(function() {
+			console.log("Failed to update");
+		}); 
 	}
 });
 

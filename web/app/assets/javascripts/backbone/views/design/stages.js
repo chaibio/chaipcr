@@ -27,7 +27,7 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 				stepInfo: step,
 				parentStage: that
 			});
-			//that.dummy = step;
+			that.dummy = step;
 			currentWidth = $(that.el).width();
 			$(that.el).css("width", currentWidth + (index * 150)+"px");
 			$(that.el).find(".step-holder").append(stepView.render().el);

@@ -13,16 +13,18 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		"click #step-after": "addAfter"
 	},
 
-	addBefore: function(e) {
+	addAfter: function(e) {
 		e.preventDefault();
-		console.log(ChaiBioTech.Data.selectedStep);
+		//console.log(ChaiBioTech.Data.selectedStep);
 		target = ChaiBioTech.Data.selectedStep.options.parentStage;
+		$("#innertrack").css("width", ($("#innertrack").width() + 150) + "px");
 		target.addStep(ChaiBioTech.Data.selectedStep);
-		this.model.createStep(target)
+		//console.log(this.model);
+		this.model.createStep(ChaiBioTech.Data.selectedStep);
 		//make a new step and send it to target
 	},
 
-	addAfter: function(e) {
+	addBefore: function(e) {
 		//alert("add after");
 		e.preventDefault();
 		console.log(ChaiBioTech.Data.selectedStep);
