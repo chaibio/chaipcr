@@ -33,5 +33,8 @@
 #include "chaistatus.h"
 #include "pins.h"
 #include "constants.h"
+#include "qpcrapplication.h"
+
+#define QPCRApp() static_cast<QPCRApplication&>(Poco::Util::Application::instance())
 
 #endif

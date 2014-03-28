@@ -8,42 +8,30 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class HeatBlock
-HeatBlock::HeatBlock()
-{
+HeatBlock::HeatBlock() {
     _zones = make_pair(new HeatBlockZoneController(kHeatBlockZone1PWMPath, kHeatBlockZone1PWMPeriod, kHeadBlockZone1HeatPin, kHeadBlockZone1CoolPin),
                        new HeatBlockZoneController(kHeatBlockZone2PWMPath, kHeatBlockZone2PWMPeriod, kHeadBlockZone2HeatPin, kHeadBlockZone2CoolPin));
 }
 
-HeatBlock::~HeatBlock()
-{
+HeatBlock::~HeatBlock() {
     delete _zones.second;
     delete _zones.first;
 }
 
-void HeatBlock::process()
-{
-    _zones.first->process();
-    _zones.second->process();
+void HeatBlock::process() {
+    //_zones.first->process();
+    //_zones.second->process();
 }
 
-void HeatBlock::setTargetTemperature(double targetTemperature)
-{
+void HeatBlock::setTargetTemperature(double targetTemperature) {
     _zones.first->setTargetTemp(targetTemperature);
     _zones.second->setTargetTemp(targetTemperature);
 }
 
-void HeatBlock::setTargetTemperature(double targetTemperatureZone1, double targetTemperatureZone2)
-{
-    _zones.first->setTargetTemp(targetTemperatureZone1);
-    _zones.second->setTargetTemp(targetTemperatureZone2);
+double HeatBlock::zone1Temperature() {
+    return _zones.first->currentTemp();
 }
 
-double HeatBlock::targetTemperature1() const
-{
-    return _zones.first->targetTemp();
-}
-
-double HeatBlock::targetTemperature2() const
-{
-    return _zones.second->targetTemp();
+double HeatBlock::zone2Temperature() {
+    return _zones.second->currentTemp();
 }

@@ -17,7 +17,7 @@ HeatBlockZoneController::HeatBlockZoneController(const std::string &pwmPath, uns
                                 kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient);
 
     setTargetTemp(30);
-    initPID();
+    //initPID();
 }
 
 HeatBlockZoneController::~HeatBlockZoneController()
@@ -65,7 +65,3 @@ void HeatBlockZoneController::process()
     }
 }
 
-double HeatBlockZoneController::currentTemp() const
-{
-    return _thermistor->temperature();
-}
