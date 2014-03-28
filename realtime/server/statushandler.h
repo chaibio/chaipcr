@@ -1,28 +1,12 @@
-#ifndef _STATUSHANDLER_H_
-#define _STATUSHANDLER_H_
+#ifndef STATUSHANDLER_H
+#define STATUSHANDLER_H
 
-#include <Poco/Net/HTTPRequestHandler.h>
+#include "jsonhandler.h"
 
-////////////////////////////////////////////////////////////////////////////////
-// Class StatusHandler
-class StatusHandler: public Poco::Net::HTTPRequestHandler
+class StatusHandler : public JSONHandler
 {
-public:
-    StatusHandler(Poco::Net::HTTPResponse::HTTPStatus status = Poco::Net::HTTPResponse::HTTP_OK);
-    ~StatusHandler();
-
-    void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response);
-
-    inline Poco::Net::HTTPResponse::HTTPStatus getStatus() const {return status;}
-    inline std::string getErrorString() const {return errorString;}
-
 protected:
-    inline void setStatus(Poco::Net::HTTPResponse::HTTPStatus status) {this->status = status;}
-    inline void setErrorString(const std::string &errorString) {this->errorString = errorString;}
-
-private:
-    Poco::Net::HTTPResponse::HTTPStatus status;
-    std::string errorString;
+    virtual void createData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt);
 };
-	
-#endif
+
+#endif // STATUSHANDLER_H

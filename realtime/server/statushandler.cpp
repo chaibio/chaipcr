@@ -1,22 +1,20 @@
+#include "pcrincludes.h"
+#include "boostincludes.h"
 #include "pocoincludes.h"
+#include "utilincludes.h"
+#include "controlincludes.h"
 
 #include "statushandler.h"
 
-using namespace Poco::Net;
-
-////////////////////////////////////////////////////////////////////////////////
-// Class StatusHandler
-StatusHandler::StatusHandler(HTTPResponse::HTTPStatus status)
+void StatusHandler::createData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt)
 {
-    setStatus(status);
-}
+    std::shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();
 
-StatusHandler::~StatusHandler()
-{
+    if (heatBlock)
+    {
+        responsePt.put("heatblock.zone1.temperature", heatBlock->zone1Temperature());
+        responsePt.put("heatblock.zone2.temperature", heatBlock->zone2Temperature());
+    }
 
-}
-
-void StatusHandler::handleRequest(HTTPServerRequest &, HTTPServerResponse &response)
-{
-    response.setStatus(getStatus());
+    JSONHandler::createData(requestPt, responsePt);
 }

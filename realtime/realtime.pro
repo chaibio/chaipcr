@@ -75,7 +75,6 @@ HEADERS += \
     util/gpio.h \
     server/qpcrrequesthandlerfactory.h \
     server/jsonhandler.h \
-    server/statushandler.h \
     server/testcontrolhandler.h \
     util/instance.h \
     control/icontrol.h \
@@ -97,7 +96,9 @@ HEADERS += \
     db/dbincludes.h \
     test/servertest.h \
     db/sociincludes.h \
-    test/dbtest.h
+    test/dbtest.h \
+    server/httpstatushandler.h \
+    server/statushandler.h
 
 SOURCES += \
     app/pins.cpp \
@@ -117,7 +118,6 @@ SOURCES += \
     util/gpio.cpp \
     server/qpcrrequesthandlerfactory.cpp \
     server/jsonhandler.cpp \
-    server/statushandler.cpp \
     server/testcontrolhandler.cpp \
     server/qpcrapplication.cpp \
     util/pid.cpp \
@@ -130,4 +130,6 @@ SOURCES += \
     db/stagecomponent.cpp \
     test/servertest.cpp \
     db/dbcontrol.cpp \
-    test/dbtest.cpp
+    test/dbtest.cpp \
+    server/httpstatushandler.cpp \
+    server/statushandler.cpp

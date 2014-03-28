@@ -13,12 +13,6 @@ using namespace Poco::Util;
 // Class QPCRApplication
 void QPCRApplication::initialize(Application&)
 {
-    //create components
-    _heatBlock = HeatBlockInstance::createInstance();
-
-    //create control units
-    controlUnits.push_back(static_pointer_cast<IControl>(_heatBlock));
-
     //spiPort0_ = new SPIPort(kSPI0DevicePath);
     //spiPort0DataInSensePin_ = new GPIO(kSPI0DataInSensePinNumber, GPIO::kInput);
 
@@ -29,6 +23,7 @@ void QPCRApplication::initialize(Application&)
     //controlUnits.push_back(static_pointer_cast<IControl>(HeatSinkInstace::createInstance()));
     //controlUnits.push_back(static_pointer_cast<IControl>(OpticsInstance::createInstance()));
     //controlUnits.push_back(static_pointer_cast<IControl>(LidInstance::createInstance()));
+    controlUnits.push_back(static_pointer_cast<IControl>(HeatBlockInstance::createInstance()));
 }
 
 int QPCRApplication::main(const vector<string>&)

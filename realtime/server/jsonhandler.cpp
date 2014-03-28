@@ -3,7 +3,6 @@
 #include "pocoincludes.h"
 
 #include "jsonhandler.h"
-#include "heatblock.h"
 
 using namespace Poco::Net;
 using namespace boost::property_tree;
@@ -60,18 +59,13 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
         setStatus(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
 
-    StatusHandler::handleRequest(request, response);
+    HTTPStatusHandler::handleRequest(request, response);
 }
 
 void JSONHandler::createData(const ptree &, ptree &responsePt)
 {
     if (getStatus() == HTTPResponse::HTTP_OK)
-    {
-        QPCRApplication& app = QPCRApp();
         responsePt.put("status.status", true);
-        responsePt.put("heatblock.zone1.temperature", app.heatBlock().zone1Temperature());
-        responsePt.put("heatblock.zone2.temperature", app.heatBlock().zone2Temperature());
-    }
     else
     {
         responsePt.put("status.status", false);

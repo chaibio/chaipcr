@@ -28,10 +28,10 @@ void HeatBlock::setTargetTemperature(double targetTemperature) {
     _zones.second->setTargetTemp(targetTemperature);
 }
 
-double HeatBlock::zone1Temperature() {
+double HeatBlock::zone1Temperature() const {
     return _zones.first->currentTemp();
 }
 
-double HeatBlock::zone2Temperature() {
+double HeatBlock::zone2Temperature() const {
     return _zones.second->currentTemp();
 }
