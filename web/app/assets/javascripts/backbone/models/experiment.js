@@ -46,6 +46,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 	createStep: function(step) {
 		//console.log(step);
 		stage = step.options.parentStage.model;
+		console.log("step", step);
 		dataToBeSend = {"step":{"prev_id": step.model.id}};
 		console.log("Data To Server", dataToBeSend);
 		$.ajax({
