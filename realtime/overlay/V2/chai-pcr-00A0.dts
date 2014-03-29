@@ -38,8 +38,8 @@
 		"P9.12",		/* gpio: SPI_CS or LTC2444 CS - Output*/
 		"P9.41",		/* gpio: SPI_BUSY or LTC2444 busy - Input */
 		"P9.21",		/* SPI0: SPI_SD0 (SDO from LTC2444) - Input */
-		"P9.18",		/* SPI0: SPI_SD1 (SDI to LED LTC2444) - Ouput */
-		"P9.22",		/* SPI0: SPI_CLK (SCLK to LED LTC2444) - Ouput */
+		"P9.18",		/* SPI0: SPI_SD1 (SDI to LTC2444) - Ouput */
+		"P9.22",		/* SPI0: SPI_CLK (SCLK to LTC2444) - Ouput */
 
 		//LIA MUX
 		"P9.11",		/* gpio: MUX_CONTROL_PIN0 - Output*/
