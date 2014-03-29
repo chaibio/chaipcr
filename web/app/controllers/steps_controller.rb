@@ -23,7 +23,7 @@ class StepsController < ApplicationController
   EOS
   example "{'step':{'id':1,'name':'Step 1','temperature':'95.0','hold_time':180,'ramp':{'id':1,'rate':'100.0','max':true}}}"
   def create
-    @step = Step.new(step_params)
+    @step = Step.new((!params[:step].blank?)? step_params : {})
     @step.stage_id = params[:stage_id]
     @step.prev_id = params[:prev_id]
     ret = @step.save
