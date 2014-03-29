@@ -5,6 +5,23 @@ describe "Steps API" do
     @stage = hold_stage(Protocol.create).reload
   end
   
+  describe "#create" do
+    it 'first step' do
+      post "/stages/#{@stage.id}/steps", {}, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      expect(response).to be_success            # test for the 200 status-code
+      json = JSON.parse(response.body)
+      json["step"]["name"].should == "Step 1"
+    end
+    
+    it 'last step' do
+      params = { prev_id: @stage.steps.first.id }
+      post "/stages/#{@stage.id}/steps", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      expect(response).to be_success            # test for the 200 status-code
+      json = JSON.parse(response.body)
+      json["step"]["name"].should == "Step 2"
+    end
+  end
+  
   describe "#destroy" do
     it 'last step in last stage' do
       delete "/steps/#{@stage.steps.first.id}", { :format => 'json' }

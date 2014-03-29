@@ -19,7 +19,7 @@ class Stage < ActiveRecord::Base
     if steps.count == 0
       if hold_stage?
         if !prev_id.nil?
-          reference_stage = Stage.find(prev_id)
+          reference_stage = Stage.find_by_id(prev_id)
         end
         if reference_stage.nil?
           reference_stage = siblings.first

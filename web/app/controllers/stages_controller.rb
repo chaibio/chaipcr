@@ -16,7 +16,7 @@ class StagesController < ApplicationController
    
   api :POST, "/protocols/:protocol_id/stages", "Create a stage"
   param_group :stage
-  param :prev_id, Integer, :desc => "prev stage id or null if it is the first node", :required=>true
+  param :prev_id, Integer, :desc => "prev stage id or null if it is the first node", :required=>false
   example "{'stage':{'id':1,'stage_type':'holding','name':'Holding Stage','num_cycles':1,'steps':[{'step':{'id':1,'name':'Step 1','temperature':'95.0','hold_time':180,'ramp':{'id':1,'rate':'100.0','max':true}}}"
   def create
     @stage = Stage.new(stage_params)
@@ -34,7 +34,7 @@ class StagesController < ApplicationController
   param_group :stage
   example "{'stage':{'id':1,'stage_type':'holding','name':'Holding Stage','num_cycles':1}}"
   def update
-    @stage = Stage.find(params[:id])
+    @stage = Stage.find_by_id(params[:id])
     ret  = @stage.update_attributes(stage_params)
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
@@ -44,7 +44,7 @@ class StagesController < ApplicationController
   api :POST, "/stages/:id/move", "Move a stage"
   param :prev_id, Integer, :desc => "prev stage id or null if it is the first node", :required=>true
   def move
-    @stage = Stage.find(params[:id])
+    @stage = Stage.find_by_id(params[:id])
     @stage.prev_id = params[:prev_id]
     ret = @stage.save
     respond_to do |format|
@@ -54,7 +54,7 @@ class StagesController < ApplicationController
   
   api :DELETE, "/stages/:id", "Destroy a stage"
   def destroy
-    @stage = Stage.find(params[:id])
+    @stage = Stage.find_by_id(params[:id])
     ret = @stage.destroy
     respond_to do |format|
       format.json { render "destroy", :status => (ret)? :ok : :unprocessable_entity}

@@ -38,7 +38,7 @@ class ExperimentsController < ApplicationController
   param_group :experiment
   example "{'experiment':{'id':1,'name':'test','qpcr':true,'run_at':null}}"
   def update
-    @experiment = Experiment.find(params[:id])
+    @experiment = Experiment.find_by_id(params[:id])
     ret = @experiment.update_attributes(experiment_params)
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok :  :unprocessable_entity}
@@ -48,7 +48,7 @@ class ExperimentsController < ApplicationController
   api :POST, "/experiment/:id/copy", "Copy an experiment"
   see "experiments#create", "json response"
   def copy
-    old_experiment = Experiment.find(params[:id])
+    old_experiment = Experiment.find_by_id(params[:id])
     @experiment = old_experiment.copy(params[:experiment])
     ret = @experiment.save
     respond_to do |format|
@@ -59,7 +59,7 @@ class ExperimentsController < ApplicationController
   api :GET, "/experiment/:id", "Show an experiment"
   see "experiments#create", "json response"
   def show
-    @experiment = Experiment.find(params[:id]) 
+    @experiment = Experiment.find_by_id(params[:id]) 
     respond_to do |format|
       format.json { render "fullshow", :status => (@experiment)? :ok :  :unprocessable_entity}
     end
@@ -71,7 +71,7 @@ class ExperimentsController < ApplicationController
   
   api :POST, "/experiment/:id/start", "Start an experiment"
   def start
-    @experiment = Experiment.find(params[:id])
+    @experiment = Experiment.find_by_id(params[:id])
     respond_to do |format|
       format.json { render "status", :status => (@experiment)? :ok :  :unprocessable_entity}
     end
@@ -83,7 +83,7 @@ class ExperimentsController < ApplicationController
   
   api :DELETE, "/experiment/:id", "Destroy an experiment"
   def destroy
-    @experiment = Experiment.find(params[:id])
+    @experiment = Experiment.find_by_id(params[:id])
     ret = @experiment.destroy
     respond_to do |format|
       format.json { render "destroy", :status => (ret)? :ok :  :unprocessable_entity}
