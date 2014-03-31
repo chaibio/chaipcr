@@ -35,6 +35,7 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	},
 
 	addStep: function(pole, place) {
+		console.log(this.dummy, pole, this, "YUMMU");
 		stepView = new ChaiBioTech.Views.Design.steps({
 			model: that.model,
 			stepInfo: this.dummy,
@@ -42,6 +43,7 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 		});
 		currentWidth = $(this.el).width();
 		$(this.el).css("width", (currentWidth + 150) +"px");
+		console.log(stepView)
 		$(pole.el).after(stepView.render().el);
 	}
 });

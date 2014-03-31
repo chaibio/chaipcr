@@ -43,7 +43,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		this.trigger("Saved");
 	},
 
-	createStep: function(step) {
+	createStep: function(step, targetStage) {
 		//console.log(step);
 		stage = step.options.parentStage.model;
 		console.log("step",step);
@@ -59,6 +59,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		})
 		.done(function(data) {
 			console.log(data);
+			targetStage.addStep(data);
 		})
 		.fail(function() {
 			console.log("Failed to update");

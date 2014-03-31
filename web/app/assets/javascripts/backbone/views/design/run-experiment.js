@@ -18,9 +18,9 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		//console.log(ChaiBioTech.Data.selectedStep);
 		target = ChaiBioTech.Data.selectedStep.options.parentStage;
 		$("#innertrack").css("width", ($("#innertrack").width() + 150) + "px");
-		target.addStep(ChaiBioTech.Data.selectedStep);
+		//target.addStep(ChaiBioTech.Data.selectedStep);
 		//console.log(this.model);
-		this.model.createStep(ChaiBioTech.Data.selectedStep);
+		this.model.createStep(ChaiBioTech.Data.selectedStep, target);
 		//make a new step and send it to target
 	},
 
