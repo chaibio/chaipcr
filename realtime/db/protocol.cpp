@@ -10,12 +10,14 @@ Protocol::Protocol()
 }
 
 Protocol::Protocol(const Protocol &other)
+    :Protocol()
 {
     setLidTemperature(other.lidTemperature());
     setStages(other.stages());
 }
 
 Protocol::Protocol(Protocol &&other)
+    :Protocol()
 {
     _lidTemperature = other._lidTemperature;
     _stages = std::move(other._stages);

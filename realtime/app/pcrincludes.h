@@ -7,6 +7,8 @@
 #include <cassert>
 #include <cerrno>
 #include <cstdio>
+#include <ctime>
+#include <cstdlib>
 
 //C++ headers
 #include <string>
@@ -19,6 +21,7 @@
 #include <iomanip>
 #include <utility>
 #include <thread>
+#include <map>
 
 //Linux headers
 #include <unistd.h>

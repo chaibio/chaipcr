@@ -7,6 +7,7 @@ INCLUDEPATH += ./util/
 INCLUDEPATH += ./db/
 INCLUDEPATH += ./test/
 INCLUDEPATH += ./libraries/include/
+INCLUDEPATH += ./libraries/include/soci #for internal SOCI use
 INCLUDEPATH += $(BOOST_INCLUDE_PATH)
 
 LIBS += -L../realtime/libraries/lib/
@@ -16,14 +17,15 @@ LIBS += -lPocoFoundation
 LIBS += -lPocoNet
 LIBS += -lPocoUtil
 LIBS += -lPocoXML
-LIBS += -lPocoData
-LIBS += -lPocoDataSQLite
 
 #Google Test and Mock
 LIBS += -lgtest
 #LIBS += -lgmock
 
-DEFINES += TEST_BUILD
+#SOCI
+LIBS += -lsqlite3
+LIBS += -lsoci_core
+LIBS += -lsoci_sqlite3
 
 unix:!unix_m {
     QMAKE_CC = arm-unknown-linux-gnueabi-gcc
@@ -73,7 +75,6 @@ HEADERS += \
     util/gpio.h \
     server/qpcrrequesthandlerfactory.h \
     server/jsonhandler.h \
-    server/statushandler.h \
     server/testcontrolhandler.h \
     util/instance.h \
     control/icontrol.h \
@@ -93,7 +94,11 @@ HEADERS += \
     db/ramp.h \
     db/stagecomponent.h \
     db/dbincludes.h \
-    test/servertest.h
+    test/servertest.h \
+    db/sociincludes.h \
+    test/dbtest.h \
+    server/httpstatushandler.h \
+    server/statushandler.h
 
 SOURCES += \
     app/pins.cpp \
@@ -113,16 +118,18 @@ SOURCES += \
     util/gpio.cpp \
     server/qpcrrequesthandlerfactory.cpp \
     server/jsonhandler.cpp \
-    server/statushandler.cpp \
     server/testcontrolhandler.cpp \
     server/qpcrapplication.cpp \
     util/pid.cpp \
     control/lid.cpp \
-    db/dbcontrol.cpp \
     db/experiment.cpp \
     db/protocol.cpp \
     db/stage.cpp \
     db/step.cpp \
     db/ramp.cpp \
     db/stagecomponent.cpp \
-    test/servertest.cpp
+    test/servertest.cpp \
+    db/dbcontrol.cpp \
+    test/dbtest.cpp \
+    server/httpstatushandler.cpp \
+    server/statushandler.cpp

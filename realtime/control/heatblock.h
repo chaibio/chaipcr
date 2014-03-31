@@ -15,9 +15,8 @@ public:
     void process();
 
     void setTargetTemperature(double targetTemperature);
-    void setTargetTemperature(double targetTemperatureZone1, double targetTemperatureZone2);
-    double targetTemperature1() const;
-    double targetTemperature2() const;
+    double zone1Temperature() const;
+    double zone2Temperature() const;
 	
 private:
     std::pair<HeatBlockZoneController*, HeatBlockZoneController*> _zones;

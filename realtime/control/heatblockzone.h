@@ -3,8 +3,8 @@
 
 #include "icontrol.h"
 #include "pwm.h"
+#include "thermistor.h"
 
-class Thermistor;
 class CPIDController;
 
 namespace Poco { class Timer; }
@@ -18,7 +18,7 @@ public:
 
     void process();
 	
-    inline double currentTemp() const;
+    inline double currentTemp() const { return _thermistor->temperature(); }
 
     inline double targetTemp() const { return _targetTemp; }
     inline void setTargetTemp(double targetTemp) { _targetTemp = targetTemp; }

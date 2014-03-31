@@ -12,6 +12,7 @@ Stage::Stage()
 }
 
 Stage::Stage(const Stage &other)
+    :Stage()
 {
     setName(other.name());
     setNumCycles(other.numCycles());
@@ -21,12 +22,13 @@ Stage::Stage(const Stage &other)
 }
 
 Stage::Stage(Stage &&other)
+    :Stage()
 {
     _name = std::move(other._name);
     _numCycles = other._numCycles;
     _orderNumber = other._orderNumber;
     _type = other._type;
-    _components = std::move(other.components());
+    _components = std::move(other._components);
 
     other._numCycles = 0;
     other._orderNumber = 0;
@@ -55,7 +57,7 @@ Stage& Stage::operator= (Stage &&other)
     _numCycles = other._numCycles;
     _orderNumber = other._orderNumber;
     _type = other._type;
-    _components = std::move(other.components());
+    _components = std::move(other._components);
 
     other._numCycles = 0;
     other._orderNumber = 0;

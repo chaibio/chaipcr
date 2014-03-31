@@ -59,7 +59,7 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
         setStatus(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
 
-    StatusHandler::handleRequest(request, response);
+    HTTPStatusHandler::handleRequest(request, response);
 }
 
 void JSONHandler::createData(const ptree &, ptree &responsePt)

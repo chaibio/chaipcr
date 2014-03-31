@@ -1,9 +1,9 @@
 #ifndef JSONHANDLER_H
 #define JSONHANDLER_H
 
-#include "statushandler.h"
+#include "httpstatushandler.h"
 
-class JSONHandler : public StatusHandler
+class JSONHandler : public HTTPStatusHandler
 {
 public:
     void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) final;

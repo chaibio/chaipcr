@@ -1,3 +1,5 @@
+#ifdef TEST_BUILD
+
 #ifndef SERVERTEST_H
 #define SERVERTEST_H
 
@@ -28,3 +30,4 @@ private:
 };
 
 #endif // SERVERTEST_H
+#endif // TEST_BUILD

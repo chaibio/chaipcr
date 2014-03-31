@@ -1,5 +1,5 @@
 #include "pcrincludes.h"
-#include "pocoincludes.h"
+#include "boostincludes.h"
 
 #include "step.h"
 #include "ramp.h"
@@ -12,18 +12,18 @@ StageComponent::StageComponent()
 }
 
 StageComponent::StageComponent(const StageComponent &other)
+    :StageComponent()
 {
-    setStep(*other.step());
-    setRamp(*other.ramp());
+    if (other.step())
+        setStep(*other.step());
+
+    if (other.ramp())
+        setRamp(*other.ramp());
 }
 
 StageComponent::StageComponent(StageComponent &&other)
+    :StageComponent()
 {
-    if (_step)
-        delete _step;
-    if (_ramp)
-        delete _ramp;
-
     _step = other._step;
     _ramp = other._ramp;
 
@@ -39,8 +39,15 @@ StageComponent::~StageComponent()
 
 StageComponent& StageComponent::operator= (const StageComponent &other)
 {
-    setStep(*other.step());
-    setRamp(*other.ramp());
+    if (other.step())
+        setStep(*other.step());
+    else
+        setStep(nullptr);
+
+    if (other.ramp())
+        setRamp(*other.ramp());
+    else
+        setStep(nullptr);
 
     return *this;
 }
@@ -77,6 +84,14 @@ void StageComponent::setStep(Step &&step)
         _step = new Step(step);
 }
 
+void StageComponent::setStep(Step *step)
+{
+    if (_step)
+        delete _step;
+
+    _step = step;
+}
+
 void StageComponent::setRamp(const Ramp &ramp)
 {
     if (_ramp)
@@ -91,4 +106,12 @@ void StageComponent::setRamp(Ramp &&ramp)
         *_ramp = ramp;
     else
         _ramp = new Ramp(ramp);
+}
+
+void StageComponent::setRamp(Ramp *ramp)
+{
+    if (_ramp)
+        delete _ramp;
+
+    _ramp = ramp;
 }

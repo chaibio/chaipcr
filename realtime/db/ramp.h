@@ -12,7 +12,7 @@ public:
     Ramp& operator= (const Ramp &other);
     Ramp& operator= (Ramp &&other);
 
-    inline void setRate(int rate) {_rate = rate;}
+    inline void setRate(double rate) {_rate = rate;}
     inline double rate() const {return _rate;}
 
 private:

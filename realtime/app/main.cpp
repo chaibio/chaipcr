@@ -2,7 +2,7 @@
 #include "qpcrapplication.h"
 
 #ifdef TEST_BUILD
-#include "servertest.h"
+#include <gtest/gtest.h>
 #endif
 
 int main(int argc, char** argv) {

@@ -1,8 +1,9 @@
 #include "boostincludes.h"
 #include "pocoincludes.h"
 
-#include "jsonhandler.h"
 #include "testcontrolhandler.h"
+#include "statushandler.h"
+
 #include "qpcrrequesthandlerfactory.h"
 
 using namespace std;
@@ -21,7 +22,7 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
         if (request.getMethod() == "GET")
         {
             if (requestPath.at(0) == "status")
-                return new JSONHandler();
+                return new StatusHandler();
         }
         else if (request.getMethod() == "PUT")
         {
@@ -30,5 +31,5 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
         }
     }
 
-    return new StatusHandler(HTTPResponse::HTTP_NOT_FOUND);
+    return new HTTPStatusHandler(HTTPResponse::HTTP_NOT_FOUND);
 }

@@ -1,12 +1,9 @@
 #ifndef DBCONTROL_H
 #define DBCONTROL_H
 
-namespace Poco
+namespace soci
 {
-namespace Data
-{
-class Session;
-}
+class session;
 }
 
 class Experiment;
@@ -24,14 +21,18 @@ public:
 
     Experiment* getExperiment(int id);
 
+#ifdef TEST_BUILD
+    std::vector<int> getEperimentIdList();
+#endif
+
 private:
     Protocol* getProtocol(int experimentId);
     std::vector<Stage> getStages(int protocolId);
     std::vector<StageComponent> getStageComponents(int stageId);
-    std::vector<Step> getSteps(int stageId);
+    std::map<int, Step> getSteps(int stageId);
     Ramp* getRamp(int stepId);
 
-    Poco::Data::Session *_session;
+    soci::session *_session;
 };
 
 #endif // DBCONTROL_H
