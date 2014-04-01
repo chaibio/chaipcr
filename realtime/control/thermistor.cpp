@@ -13,11 +13,19 @@ Thermistor::Thermistor(unsigned int voltageDividerResistance, unsigned int adcBi
     _b {b},
     _c {c},
     _d {d},
-    _maxADCValue ((1 << (adcBits - 1)) - 1),
+    _maxADCValue ((1 << adcBits) - 1),
     _voltageDividerResistance {voltageDividerResistance} {
 }
 
 Thermistor::~Thermistor() {
+}
+
+void Thermistor::setADCValue(unsigned int adcValue) {
+    double voltage = (double)adcValue / _maxADCValue * 5.0;
+    double resistance = (_voltageDividerResistance * voltage / 3.3) / (1 - (voltage / 3.3));
+    cout << "max = " << _maxADCValue << ", adc = " << adcValue << ", volt = " << voltage << ", res = " << resistance << endl;
+    //double resistance = static_cast<double>(adcValue * _voltageDividerResistance) / (_maxADCValue - adcValue);
+    setResistance(resistance);
 }
 
 void Thermistor::setResistance(double resistanceOhms) {	
@@ -30,7 +38,3 @@ void Thermistor::setResistance(double resistanceOhms) {
     _temperature.store(degreesK - 273.15);
 }
 
-void Thermistor::setADCValue(unsigned int adcValue) {
-    double resistance = static_cast<double>(adcValue * _voltageDividerResistance) / (_maxADCValue - adcValue);
-	setResistance(resistance);
-}

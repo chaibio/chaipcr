@@ -8,7 +8,7 @@ const double kQTICurveZThermistorCCoefficient = -0.000000372283234;
 const double kQTICurveZThermistorDCoefficient = 0.000000099063233;
 
 //thermistor & ADC params
-const unsigned int kThermistorVoltageDividerResistanceOhms = 6800;
+const unsigned int kThermistorVoltageDividerResistanceOhms = 14000;
 const int kLTC2444ADCBits = 24;
 
 //HTTP server params

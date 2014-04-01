@@ -12,7 +12,7 @@ using namespace Poco;
 HeatBlockZoneController::HeatBlockZoneController(const std::string &pwmPath, unsigned long pwmPeriod, unsigned int heatIOPin, unsigned int coolIOPin)
     :PWMControl(pwmPath, pwmPeriod), heatIO(GPIO(heatIOPin, GPIO::kOutput)), coolIO(GPIO(coolIOPin, GPIO::kOutput))
 {
-    _thermistor = new Thermistor(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
+    _thermistor = make_shared<Thermistor>(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                 kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
                                 kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient);
 
@@ -24,7 +24,6 @@ HeatBlockZoneController::~HeatBlockZoneController()
 {
     delete _pidTimer;
     delete _pidController.exchange(0);
-    delete _thermistor;
 }
 
 void HeatBlockZoneController::initPID()

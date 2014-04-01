@@ -23,11 +23,13 @@ public:
     inline double targetTemp() const { return _targetTemp; }
     inline void setTargetTemp(double targetTemp) { _targetTemp = targetTemp; }
 
+    std::shared_ptr<Thermistor> thermistor() { return _thermistor; }
+
 private:
     void initPID();
     void pidCallback(Poco::Timer &timer);
 
-    Thermistor *_thermistor;
+    std::shared_ptr<Thermistor> _thermistor;
     std::atomic<double> _targetTemp;
 
     std::atomic<CPIDController*> _pidController;
