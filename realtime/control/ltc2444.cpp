@@ -3,8 +3,6 @@
 
 #include "ltc2444.h"
 
-using namespace std;
-
 ////////////////////////////////////////////////////////////////////////////////
 // Class LTC2444
 LTC2444::LTC2444(unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber) :
@@ -34,19 +32,17 @@ void LTC2444::setup(char mode, bool TWOx){
 
 uint32_t LTC2444::readADC(uint8_t ch, bool SGL) {
 	//0xA000000 the first 3 bits here represents 101, based on the datasheet.
-	uint32_t data=0xA0000000,tmp=ch;
+    uint32_t data=0xA0000000;
 
 	char dataOut[4];
 	char dataIn[4];
 
 	if (SGL){
 		//SGL=1 , ODD = ch&0x01, A2A1A0=(ch&0x0110>1) 0r SGL_ODD_A
-		data |= ((uint32_t)1)<<28 |((uint32_t)(ch&0x01))<<27  |((uint32_t)(ch&0x110))<<23;
-		std::cout << "Reading Single ended channel:" << ch<<std::endl;
+        data |= ((uint32_t)1)<<28 |((uint32_t)(ch&0x01))<<27  |((uint32_t)(ch&0x110))<<23;
 	}
 	else{
-		data |= ((uint32_t)(ch&0x01))<<27  |((uint32_t)(ch&0x110))<<23;
-		std::cout << "Reading differential channel:" << ch<<std::endl;
+        data |= ((uint32_t)(ch&0x01))<<27  |((uint32_t)(ch&0x110))<<23;
 	}
 	//data that will be sent is: 101_SGL_ODD_A_OSRTWOx based ifrom the datasheet Table 4. Channel Selection
 	data |= ((uint32_t)OSRTWOx)<<19;
@@ -66,7 +62,6 @@ uint32_t LTC2444::readADC(uint8_t ch, bool SGL) {
 	// convert to little endian and get only ADC result (bit28 down to bit 5)
 	//conversion = ((conversion & 0xFF000000) >> 24 | (conversion & 0x00FF0000) >> 8 | (conversion & 0x0000FF00)<<8 | (conversion & 0x000000FF) << 24)&0x1FFFFFE0;
 	conversion = ((((uint32_t)dataIn[0])<<24|((uint32_t)dataIn[1])<<16|((uint32_t)dataIn[2])<<8|dataIn[3])&0x1FFFFFE0)>>5;
-	std::cout << "Read ADC value: " << conversion << std::endl;
 	csPin_.setValue(GPIO::kHigh);
 	return conversion;
 

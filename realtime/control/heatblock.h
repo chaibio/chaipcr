@@ -3,6 +3,7 @@
 
 #include "icontrol.h"
 
+class Thermistor;
 class HeatBlockZoneController;
 
 // Class HeatBlock
@@ -17,6 +18,8 @@ public:
     void setTargetTemperature(double targetTemperature);
     double zone1Temperature() const;
     double zone2Temperature() const;
+    std::shared_ptr<Thermistor> zone1Thermistor();
+    std::shared_ptr<Thermistor> zone2Thermistor();
 	
 private:
     std::pair<HeatBlockZoneController*, HeatBlockZoneController*> _zones;

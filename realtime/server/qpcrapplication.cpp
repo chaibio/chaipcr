@@ -16,14 +16,17 @@ void QPCRApplication::initialize(Application&)
     //spiPort0_ = new SPIPort(kSPI0DevicePath);
     //spiPort0DataInSensePin_ = new GPIO(kSPI0DataInSensePinNumber, GPIO::kInput);
 
-    //controlUnits.push_back(static_pointer_cast<IControl>(ADCControllerInstance::createInstance(
-    //                                                                kLTC2444CSPinNumber, std::move(SPIPort(kSPI0DevicePath)), kSPI0DataInSensePinNumber
-    //                                                                )));
-
     //controlUnits.push_back(static_pointer_cast<IControl>(HeatSinkInstace::createInstance()));
     //controlUnits.push_back(static_pointer_cast<IControl>(OpticsInstance::createInstance()));
     //controlUnits.push_back(static_pointer_cast<IControl>(LidInstance::createInstance()));
-    controlUnits.push_back(static_pointer_cast<IControl>(HeatBlockInstance::createInstance()));
+    auto heatBlock = HeatBlockInstance::createInstance();
+    controlUnits.push_back(static_pointer_cast<IControl>(heatBlock));
+
+    //ADC Controller
+    vector<shared_ptr<ADCConsumer>> consumers = {nullptr, heatBlock->zone1Thermistor(), heatBlock->zone2Thermistor(), nullptr};
+    controlUnits.push_back(static_pointer_cast<IControl>(ADCControllerInstance::createInstance(consumers,
+                                                                    kLTC2444CSPinNumber, std::move(SPIPort(kSPI0DevicePath)), kSPI0DataInSensePinNumber
+                                                                    )));
 }
 
 int QPCRApplication::main(const vector<string>&)
