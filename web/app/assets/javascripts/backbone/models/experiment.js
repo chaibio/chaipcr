@@ -47,9 +47,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		//console.log(step);
 		stage = step.options.parentStage.model;
 		console.log("step",step);
-		dataToBeSend = {"step":{},
-			"prev_id": step.model.id
-		};
+		dataToBeSend = {"prev_id": step.model.id};
 		console.log("Data To Server", dataToBeSend);
 		$.ajax({
 			url: "/stages/"+stage.id+"/steps",
@@ -59,9 +57,10 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		})
 		.done(function(data) {
 			console.log(data);
-			targetStage.addStep(data);
+			targetStage.addStep(step, data);
 		})
 		.fail(function() {
+			alert("Failed to update");
 			console.log("Failed to update");
 		}); 
 	}
