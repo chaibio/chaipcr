@@ -73,6 +73,7 @@ HEADERS += \
     util/spi.h \
     util/pwm.h \
     util/gpio.h \
+    util/mux.h \
     server/qpcrrequesthandlerfactory.h \
     server/jsonhandler.h \
     server/testcontrolhandler.h \
@@ -118,6 +119,7 @@ SOURCES += \
     util/spi.cpp \
     util/pwm.cpp \
     util/gpio.cpp \
+    util/mux.cpp \
     server/qpcrrequesthandlerfactory.cpp \
     server/jsonhandler.cpp \
     server/testcontrolhandler.cpp \
