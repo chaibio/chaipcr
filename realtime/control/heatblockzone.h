@@ -2,9 +2,8 @@
 #define _HEATBLOCKZONE_H_
 
 #include "icontrol.h"
-#include "pwm.h"
-#include "thermistor.h"
 
+class Thermistor;
 class CPIDController;
 
 namespace Poco { class Timer; }
@@ -14,16 +13,16 @@ class HeatBlockZoneController : public IControl, public PWMControl
 {
 public:
     HeatBlockZoneController(const std::string &pwmPath, unsigned long pwmPeriod, unsigned int heatIOPin, unsigned int coolIOPin);
-	virtual ~HeatBlockZoneController();
+    ~HeatBlockZoneController();
 
     void process();
 	
-    inline double currentTemp() const { return _thermistor->temperature(); }
+    double currentTemp() const;
 
     inline double targetTemp() const { return _targetTemp; }
     inline void setTargetTemp(double targetTemp) { _targetTemp = targetTemp; }
 
-    std::shared_ptr<Thermistor> thermistor() { return _thermistor; }
+    std::shared_ptr<Thermistor> thermistor() const;
 
 private:
     void initPID();

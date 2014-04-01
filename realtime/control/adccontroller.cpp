@@ -2,6 +2,7 @@
 #include "utilincludes.h"
 
 #include "ltc2444.h"
+#include "adcconsumer.h"
 #include "adccontroller.h"
 
 using namespace std;
@@ -9,8 +10,8 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 // Class ADCController
 ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> consumers, unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber):
-  _currentChannel {0},
-  _consumers {consumers} {
+    _consumers {consumers},
+    _currentChannel {0} {
 
     _ltc2444 = make_shared<LTC2444>(csPinNumber, std::move(spiPort), busyPinNumber);
     _ltc2444->setup(0x6, false);

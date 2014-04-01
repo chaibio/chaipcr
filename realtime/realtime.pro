@@ -34,7 +34,7 @@ unix:!unix_m {
 
     INCLUDEPATH += $(BOOST_INCLUDE_PATH)
 
-    QMAKE_CXXFLAGS += -Wno-unused-local-typedefs -Wno-unused-parameter
+    #QMAKE_CXXFLAGS += -Wno-unused-local-typedefs -Wno-unused-parameter
 
     target.path = /home/root/tmp
     INSTALLS += target
@@ -98,7 +98,8 @@ HEADERS += \
     db/sociincludes.h \
     test/dbtest.h \
     server/httpstatushandler.h \
-    server/statushandler.h
+    server/statushandler.h \
+    control/adcconsumer.h
 
 SOURCES += \
     app/pins.cpp \

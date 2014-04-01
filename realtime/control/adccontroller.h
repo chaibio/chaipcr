@@ -2,24 +2,9 @@
 #define _ADCCONTROLLER_H_
 
 #include "icontrol.h"
-#include "spi.h"
 
 class LTC2444;
-
-//Interface ADCConsumer
-class ADCConsumer {
-public:
-    virtual ~ADCConsumer() {}
-
-    ADCConsumer(ADCConsumer const&) = delete;
-    ADCConsumer& operator=(ADCConsumer const&) = delete;
-
-    virtual void setADCValue(unsigned int adcValue) = 0;
-
-protected:
-    ADCConsumer() {}
-
-};
+class ADCConsumer;
 
 // Class ADCController
 class ADCController : public IControl

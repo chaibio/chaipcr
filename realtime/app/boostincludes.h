@@ -1,10 +1,16 @@
 #ifndef BOOSTINCLUDES_H
 #define BOOSTINCLUDES_H
 
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
+
+#pragma GCC diagnostic pop
+
 
 inline std::string ptime_to_string(const boost::posix_time::ptime &date_time)
 {

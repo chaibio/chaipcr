@@ -26,6 +26,16 @@ HeatBlockZoneController::~HeatBlockZoneController()
     delete _pidController.exchange(0);
 }
 
+double HeatBlockZoneController::currentTemp() const
+{
+    return _thermistor->temperature();
+}
+
+std::shared_ptr<Thermistor> HeatBlockZoneController::thermistor() const
+{
+    return _thermistor;
+}
+
 void HeatBlockZoneController::initPID()
 {
     vector<SPIDTuning> pidTuningList; //TODO: Josh, please change it as you want

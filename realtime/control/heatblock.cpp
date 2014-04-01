@@ -36,10 +36,10 @@ double HeatBlock::zone2Temperature() const {
     return _zones.second->currentTemp();
 }
 
-shared_ptr<Thermistor> HeatBlock::zone1Thermistor() {
+shared_ptr<Thermistor> HeatBlock::zone1Thermistor() const {
     return _zones.first->thermistor();
 }
 
-shared_ptr<Thermistor> HeatBlock::zone2Thermistor() {
+shared_ptr<Thermistor> HeatBlock::zone2Thermistor() const {
     return _zones.second->thermistor();
 }

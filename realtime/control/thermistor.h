@@ -1,7 +1,7 @@
 #ifndef _THERMISTOR_H_
 #define _THERMISTOR_H_
 
-#include "adccontroller.h"
+#include "adcconsumer.h"
 
 // Class Thermistor
 class Thermistor: public ADCConsumer {
@@ -14,12 +14,11 @@ public:
     inline double temperature() const { return _temperature; }
 
     //ADCConsumer
-    void setADCValue(unsigned int adcValue) override;
+    void setADCValue(unsigned int adcValue);
 	
 private:
 	void setResistance(double resistanceOhms);
-	
-private:
+
     std::atomic<double> _temperature;
 
     const double _a, _b, _c, _d; //steinhart-hart coefficients
