@@ -125,10 +125,10 @@
 					0x1a8 0x37  /* P9.41.2 Pin shared with SPI_BUSY or LTC2444 busy gpio0_20, INPUT_PULLUP | MODE7 */
 
 					/* LIA MUX GPIO*/
-					0x070 0x17  /* P9.11 MUX_CONTROL_PIN0 gpio0_30, OUTPUT_PULLUP | MODE7 */
-					0x074 0x17  /* P9.13 MUX_CONTROL_PIN1 gpio0_31, OUTPUT_PULLUP | MODE7 */
-					0x048 0x17  /* P9.15 MUX_CONTROL_PIN2 gpio1_16, OUTPUT_PULLUP | MODE7 */
-					0x15C 0x17  /* P9.17 MUX_CONTROL_PIN3 gpio0_5, OUTPUT_PULLUP | MODE7 */
+                                        0x070 0x07  /* P9.11 MUX_CONTROL_PIN0 gpio0_30, OUTPUT_PULLUP | MODE7 */
+                                        0x074 0x07  /* P9.13 MUX_CONTROL_PIN1 gpio0_31, OUTPUT_PULLUP | MODE7 */
+                                        0x040 0x07  /* P9.15 MUX_CONTROL_PIN2 gpio1_16, OUTPUT_PULLUP | MODE7 */
+                                        0x15C 0x07  /* P9.17 MUX_CONTROL_PIN3 gpio0_5, OUTPUT_PULLUP | MODE7 */
 
 					
 				>;
