@@ -3,6 +3,8 @@
 
 #include <icontrol.h>
 
+class MUX;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Class Optics
 class Optics : public IControl
@@ -22,6 +24,7 @@ private:
     std::atomic<bool> _lidOpen;
     std::shared_ptr<GPIO> _lidSensePin;
     std::shared_ptr<LEDController> _ledController;
+    std::shared_ptr<MUX> _photoDiodeMux;
 };
 
 #endif

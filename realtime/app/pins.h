@@ -35,4 +35,10 @@ static const unsigned int kHeadBlockZone1CoolPin = 45;
 static const unsigned int kHeadBlockZone2HeatPin = 47;
 static const unsigned int kHeadBlockZone2CoolPin = 27;
 
+//Photodiode Mux Pins
+static const int kMuxControlPin1 = 30;
+static const int kMuxControlPin2 = 31;
+static const int kMuxControlPin3 = 48;
+static const int kMuxControlPin4 = 5;
+
 #endif
