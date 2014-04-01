@@ -86,7 +86,7 @@
 				>;
 			};
 
-			blank_pwm_pin: pinmux_fan_pwm_pin {
+			blank_pwm_pin: pinmux_blank_pwm__pin {
 				pinctrl-single,pins = <
 					0x0164 0x04  /* P9.42.1 eCAP0_PWM0, MODE0 */
 				>;
@@ -254,7 +254,7 @@
 			    pwms 	    = <&ecap0 0 500000 1>;
 			    pwm-names       = "PWM_P9_42";
 			    pinctrl-names   = "default";
-			    pinctrl-0       = <&fan_pwm_pin>;
+			    pinctrl-0       = <&blank_pwm_pin>;
 			    enabled         = <1>;
 			    duty            = <0>;
 			    status          = "okay";
