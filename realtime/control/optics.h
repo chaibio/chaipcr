@@ -10,7 +10,7 @@ class MUX;
 class Optics : public IControl
 {
 public:
-    Optics();
+    Optics(std::shared_ptr<SPIPort> ledSPIPort);
 	virtual ~Optics();
 
     void process();

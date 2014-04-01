@@ -9,7 +9,7 @@ extern const std::string kSPI1DevicePath;
 static const int kLTC2444CSPinNumber = 60;
 static const int kSPI0DataInSensePinNumber = 20;
 
-//GPIO pins
+//LED GPIO pins
 static const int kLEDControlCSPinNumber = 44;
 static const int kLEDDigiPotCSPinNumber = 65;
 

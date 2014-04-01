@@ -10,11 +10,10 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Optics
-Optics::Optics()
+Optics::Optics(shared_ptr<SPIPort>ledSPIPort)
 {
     _lidOpen.store(false);
     _lidSensePin = make_shared<GPIO>(kLidSensePinNumber, GPIO::kInput);
-    _ledController = make_shared<LEDController>(50);
 
     //GPIO pins that are connected to MUX
     auto muxControlPin1 = make_shared<GPIO>(kMuxControlPin1,GPIO::kOutput);
@@ -24,6 +23,7 @@ Optics::Optics()
     vector<shared_ptr<GPIO>> muxControlPins{muxControlPin1,muxControlPin2,muxControlPin3,muxControlPin4};
     //MUX class to control which photodiode is connected to the PLL/ADC
     _photoDiodeMux = make_shared<MUX>(muxControlPins);
+    _ledController = make_shared<LEDController>(ledSPIPort, 50);
 }
 
 Optics::~Optics()

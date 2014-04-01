@@ -23,7 +23,7 @@ Thermistor::~Thermistor() {
 void Thermistor::setADCValue(unsigned int adcValue) {
     double voltage = (double)adcValue / _maxADCValue * 5.0;
     double resistance = (_voltageDividerResistance * voltage / 3.3) / (1 - (voltage / 3.3));
-    cout << "max = " << _maxADCValue << ", adc = " << adcValue << ", volt = " << voltage << ", res = " << resistance << endl;
+    //cout << "max = " << _maxADCValue << ", adc = " << adcValue << ", volt = " << voltage << ", res = " << resistance << endl;
     //double resistance = static_cast<double>(adcValue * _voltageDividerResistance) / (_maxADCValue - adcValue);
     setResistance(resistance);
 }

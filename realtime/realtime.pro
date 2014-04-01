@@ -99,6 +99,7 @@ HEADERS += \
     test/dbtest.h \
     server/httpstatushandler.h \
     server/statushandler.h \
+    control/adcconsumer.h \
     control/adcconsumer.h
 
 SOURCES += \

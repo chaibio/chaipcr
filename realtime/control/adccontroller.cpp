@@ -34,5 +34,4 @@ void ADCController::process() {
 
     if (consumer != nullptr)
         consumer->setADCValue(value);
-    cout << "Read ch " << oldChannel << " got value " << value << endl;
 }

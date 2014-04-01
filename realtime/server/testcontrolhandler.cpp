@@ -17,11 +17,12 @@ void TestControlHandler::createData(const ptree &requestPt, ptree &)
     double heatSinkTargetTemp = requestPt.get<double>("heatSinkTargetTemp", -1);
     double heatBlockTargetTemp = requestPt.get<double>("heatBlockargetTemp", -1);
 
+    cout << "Here" << endl;
     if (ledIntensity != -1)
     {
         shared_ptr<Optics> instance = OpticsInstance::getInstance();
         if (instance)
-            instance->getLedController()->setIntensity(50);
+            instance->getLedController()->setIntensity(ledIntensity);
     }
 
     if (fanRPM != -1)
