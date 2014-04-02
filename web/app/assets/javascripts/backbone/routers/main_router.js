@@ -37,11 +37,11 @@ ChaiBioTech.Routers.DesignRouter = Backbone.Router.extend({
 
   runMethod: function() {
     //if(_.has(this.experimentModel.get("experiment"), "id")) {
-      var view = new ChaiBioTech.Views.Design.runExperiment({
+      this.runView = new ChaiBioTech.Views.Design.runExperiment({
         model: this.experimentModel
       });
-      $("#play-ground").html(view.render().el);
-      view.addStages();
+      $("#play-ground").html(this.runView.render().el);
+      this.runView.addStages();
    //}else {
       //alert("Please create an experiment before run ")
     //}

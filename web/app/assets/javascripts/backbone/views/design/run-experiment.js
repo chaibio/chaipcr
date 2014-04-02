@@ -5,24 +5,41 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 	template: JST["backbone/templates/design/experiment-run"],
 
 	initialize: function() {
-		
+		that = this;
+		_.bindAll(this, "addStages")
+		this.model.on("change:experiment", function() {
+			$("#innertrack").html("");
+			$("#innertrack").css("width", "1000px");
+			//console.log(this, that);
+			window.router.runView.addStages();
+		})
 	},
 
 	events: {
 		"click #step-before": "addBefore",
-		"click #step-after": "addAfter"
+		"click #step-after": "addAfter",
+		"click #delete-selected": "deleteSelected"
 	},
 
 	addAfter: function(e) {
 		e.preventDefault();
 		target = ChaiBioTech.Data.selectedStep.options.parentStage;
-		$("#innertrack").css("width", ($("#innertrack").width() + 150) + "px");
+		//$("#innertrack").css("width", ($("#innertrack").width() + 150) + "px");
 		this.model.createStep(ChaiBioTech.Data.selectedStep, target);
 	},
 
 	addBefore: function(e) {
 		e.preventDefault();
 		console.log(ChaiBioTech.Data.selectedStep);
+	},
+
+	deleteSelected: function(e) {
+		e.preventDefault();
+		console.log(ChaiBioTech.Data.selectedStep);
+		this.model.deleteStep(ChaiBioTech.Data.selectedStep);
+		//ChaiBioTech.Data.selectedStep.remove();
+		ChaiBioTech.Data.selectedStep = null; 
+
 	},
 
 	render: function() {

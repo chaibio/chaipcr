@@ -19,6 +19,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		_.bindAll(this ,"afterSave");
 	},
 	saveData: function( action ) {
+		that = this;
 		if(action == "update") {
 			var data = this.get("experiment");
 			dataToBeSend = {"experiment":{"name": data["name"]}}
@@ -29,7 +30,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 				data: JSON.stringify(dataToBeSend)
 			})
 			.done(function(data) {
-				console.log(data);
+					console.log("Boom", data, that);
 			})
 			.fail(function() {
 				console.log("Failed to update");
@@ -40,13 +41,13 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 	},
 
 	afterSave: function(response) {
+		console.log(response);
 		this.trigger("Saved");
 	},
 
 	createStep: function(step, targetStage) {
-		//console.log(step);
+		that = this;
 		stage = step.options.parentStage.model;
-		console.log("step",step);
 		dataToBeSend = {"prev_id": step.model.id};
 		console.log("Data To Server", dataToBeSend);
 		$.ajax({
@@ -56,8 +57,43 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 			data: JSON.stringify(dataToBeSend)
 		})
 		.done(function(data) {
+			that.getLatestModel();
+		})
+		.fail(function() {
+			alert("Failed to update");
+			console.log("Failed to update");
+		}); 
+	},
+
+	getLatestModel: function(callback) {
+		that = this;
+		var data = this.get("experiment");
+		$.ajax({
+			url: "/experiments/"+data["id"],
+			contentType: 'application/json',
+			type: 'GET'
+		})
+		.done(function(data) {
+				that.set('experiment', data["experiment"]);
+				that.trigger("modelUpdated");	
+		})
+		.fail(function() {
+			console.log("Failed to update");
+		})
+	},
+
+	deleteStep: function(step) {
+		that = this;
+		$.ajax({
+			url: "/steps/"+step.model.id,
+			contentType: 'application/json',
+			type: 'DELETE'
+		})
+		.done(function(data) {
 			console.log(data);
-			targetStage.addStep(step, data);
+			that.getLatestModel(function() {
+				step.deleteView();
+			});
 		})
 		.fail(function() {
 			alert("Failed to update");

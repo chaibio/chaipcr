@@ -27,13 +27,16 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 				stepInfo: step,
 				parentStage: that
 			});
-			//that.dummy = step;
 			currentWidth = $(that.el).width();
-			$(that.el).css("width", currentWidth + (index * 150)+"px");
+			$(that.el).css("width", ((index + 1) * 150)+"px");
+			currentWidth = $("#innertrack").width();
+			$("#innertrack").css("width", (currentWidth + 151) +"px");
 			$(that.el).find(".step-holder").append(stepView.render().el);
 		})
 	},
 
+	//This method could be used if we want to add steps manually , but it comes along with problem of keep tracking diffrence
+	//in stage content..!
 	addStep: function(pole, place) {
 		stepView = new ChaiBioTech.Views.Design.steps({
 			model: that.model,
@@ -41,7 +44,10 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 			parentStage: this
 		});
 		currentWidth = $(this.el).width();
+		console.log("shd be changing", this.model);
 		$(this.el).css("width", (currentWidth + 150) +"px");
+		currentWidth = $("#innertrack").width();
+		$("#innertrack").css("width", (currentWidth+ 151) +"px");
 		$(pole.el).after(stepView.render().el);
 	}
 });

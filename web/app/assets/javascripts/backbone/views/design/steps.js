@@ -5,10 +5,10 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 	className: 'step-run',
 
 	events: {
-		"click": "test"
+		"click": "selectThisStep"
 	},
 
-	test: function() {
+	selectThisStep: function() {
 		
 		if(!_.isUndefined(ChaiBioTech.Data.selectedStep) && !_.isNull(ChaiBioTech.Data.selectedStep)) {
 
@@ -39,6 +39,15 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 		this.line = new ChaiBioTech.Views.Design.line({
 			model: this.model
 		});
+	},
+
+	deleteView: function() {
+		currentWidth = $(this.options.parentStage.el).width()
+		console.log("this is tricky", this.options.parentStage)
+		this.remove();
+		ChaiBioTech.Data.selectedStep = null;
+		$(this.options.parentStage.el).css("width", (currentWidth - 147) +"px");	
+
 	},
 
 	render:function() {
