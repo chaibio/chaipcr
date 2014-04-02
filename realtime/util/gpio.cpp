@@ -33,9 +33,11 @@ GPIO::Value GPIO::value() const {
 	
 	switch (buf[0]) {
 	case '0':
+        savedValue = kLow;
 		return kLow;
 	
 	case '1':
+        savedValue = kHigh;
 		return kHigh;
 		
 	default:
@@ -44,7 +46,7 @@ GPIO::Value GPIO::value() const {
 }
 
 void GPIO::setValue(Value value, bool checkValue) {
-    if (checkValue && value == this->value())
+    if (checkValue && value == savedValue)
         return;
 
 	if (direction_ != kOutput)
@@ -70,6 +72,7 @@ void GPIO::setValue(Value value, bool checkValue) {
 	}
 	
 	valueFile.close();
+    savedValue = value;
 }
 
 void GPIO::setDirection(Direction direction) {

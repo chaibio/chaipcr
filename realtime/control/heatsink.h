@@ -2,15 +2,15 @@
 #define _HEATSINK_H_
 
 #include "icontrol.h"
+#include "thermistor.h"
 
 class Fan;
-class Thermistor;
 class CPIDController;
 
 namespace Poco { class Timer; }
 
 // Class HeatSink
-class HeatSink : public IControl
+class HeatSink : public IControl, public TemperatureControl
 {
 public:
     HeatSink();
@@ -19,9 +19,6 @@ public:
     void process();
 	
     //accessors
-    inline double targetTemperature() const { return _targetTemperature; }
-    inline void setTargetTemperature(double temperature) { _targetTemperature = temperature; }
-
     inline int targetRPM() const { return _fan->targetRPM(); }
     inline void setTargetRPM(int targetRPM) { _fan->setTargetRPM(targetRPM); }
 	
@@ -31,10 +28,7 @@ private:
 
     Fan *_fan;
 
-    Thermistor *_thermistor;
-    std::atomic<double> _targetTemperature;
-
-    std::atomic<CPIDController*> _pidController;
+    CPIDController *_pidController;
     Poco::Timer *_pidTimer;
 };
 

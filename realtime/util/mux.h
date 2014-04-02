@@ -3,12 +3,12 @@
 
 class GPIO;
 
-using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 // Class MUX
 class MUX {
 public:
-    MUX(vector<shared_ptr<GPIO>> muxControlPins);
+    MUX(std::vector<GPIO> muxControlPins);
+    MUX(std::initializer_list<GPIO> muxControlPins);
     ~MUX();
 
     void setChannel(int channel);   //channel is 0 to ....n
@@ -18,7 +18,7 @@ private:
 
 private:
 
-    vector<shared_ptr<GPIO>> _muxControlPins;
+    std::vector<GPIO> _muxControlPins;
     int _channel;
 };
 #endif // MUX_H

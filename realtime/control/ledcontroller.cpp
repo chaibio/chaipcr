@@ -7,8 +7,8 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class LEDController
-LEDController::LEDController(std::shared_ptr<SPIPort> spiPort, float dutyCyclePercentage):
-    _spiPort {spiPort},
+LEDController::LEDController(SPIPort spiPort, float dutyCyclePercentage):
+    _spiPort(move(spiPort)),
     _potCSPin(kLEDDigiPotCSPinNumber, GPIO::kOutput)
 {
     _dutyCyclePercentage.store(dutyCyclePercentage);
@@ -41,8 +41,8 @@ void LEDController::setIntensity(double onCurrentMilliamps)
 
     //send resistance
     _potCSPin.setValue(GPIO::kLow);
-    _spiPort->setMode(0);
-    _spiPort->readBytes(NULL, txBuf, sizeof(txBuf), 1000000);
+    _spiPort.setMode(0);
+    _spiPort.readBytes(NULL, txBuf, sizeof(txBuf), 1000000);
     _potCSPin.setValue(GPIO::kHigh);
 
     _intensity = onCurrentMilliamps;

@@ -31,6 +31,8 @@ private:
 private:
 	unsigned int pinNumber_; //BeagleBone GPIO Pin Number
 	Direction direction_;
+
+    mutable Value savedValue;
 };
 
 #endif

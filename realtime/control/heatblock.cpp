@@ -24,16 +24,16 @@ void HeatBlock::process() {
 }
 
 void HeatBlock::setTargetTemperature(double targetTemperature) {
-    _zones.first->setTargetTemp(targetTemperature);
-    _zones.second->setTargetTemp(targetTemperature);
+    _zones.first->setTargetTemperature(targetTemperature);
+    _zones.second->setTargetTemperature(targetTemperature);
 }
 
 double HeatBlock::zone1Temperature() const {
-    return _zones.first->currentTemp();
+    return _zones.first->currentTemperature();
 }
 
 double HeatBlock::zone2Temperature() const {
-    return _zones.second->currentTemp();
+    return _zones.second->currentTemperature();
 }
 
 shared_ptr<Thermistor> HeatBlock::zone1Thermistor() const {

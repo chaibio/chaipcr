@@ -3,15 +3,16 @@
 
 #include <icontrol.h>
 
-class MUX;
+class GPIO;
+class LEDController;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Optics
 class Optics : public IControl
 {
 public:
-    Optics(std::shared_ptr<SPIPort> ledSPIPort);
-	virtual ~Optics();
+    Optics(SPIPort ledSPIPort);
+    ~Optics();
 
     void process();
 	
@@ -24,7 +25,7 @@ private:
     std::atomic<bool> _lidOpen;
     std::shared_ptr<GPIO> _lidSensePin;
     std::shared_ptr<LEDController> _ledController;
-    std::shared_ptr<MUX> _photoDiodeMux;
+    MUX _photoDiodeMux;
 };
 
 #endif

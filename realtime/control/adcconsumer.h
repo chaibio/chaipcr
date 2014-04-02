@@ -1,19 +1,11 @@
 #ifndef ADCCONSUMER_H
 #define ADCCONSUMER_H
 
-//Interface ADCConsumer
-class ADCConsumer {
+#include <boost/noncopyable.hpp>
+
+class ADCConsumer : public boost::noncopyable {
 public:
-    virtual ~ADCConsumer() {}
-
-    ADCConsumer(ADCConsumer const&) = delete;
-    ADCConsumer& operator=(ADCConsumer const&) = delete;
-
     virtual void setADCValue(unsigned int adcValue) = 0;
-
-protected:
-    ADCConsumer() {}
-
 };
 
 #endif // ADCCONSUMER_H

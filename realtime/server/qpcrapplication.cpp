@@ -13,12 +13,8 @@ using namespace Poco::Util;
 // Class QPCRApplication
 void QPCRApplication::initialize(Application&)
 {
-    auto spiPort1 = make_shared<SPIPort>(kSPI1DevicePath);
-    //spiPort0DataInSensePin_ = new GPIO(kSPI0DataInSensePinNumber, GPIO::kInput);
+    controlUnits.push_back(static_pointer_cast<IControl>(OpticsInstance::createInstance(move(SPIPort(kSPI1DevicePath)))));
 
-    //controlUnits.push_back(static_pointer_cast<IControl>(HeatSinkInstace::createInstance()));
-    controlUnits.push_back(static_pointer_cast<IControl>(OpticsInstance::createInstance(spiPort1)));
-    //controlUnits.push_back(static_pointer_cast<IControl>(LidInstance::createInstance()));
     auto heatBlock = HeatBlockInstance::createInstance();
     controlUnits.push_back(static_pointer_cast<IControl>(heatBlock));
 
@@ -36,14 +32,11 @@ int QPCRApplication::main(const vector<string>&)
     server.start();
 
     workState = true;
-    while (workState)  // true will be changed with "status" variable
+    while (workState)
     {
         for(auto controlUnit : controlUnits)
             controlUnit->process();
     }
-
-    //delete spiPort0_;
-    //delete spiPort0DataInSensePin_;
 
 	server.stop();
 
