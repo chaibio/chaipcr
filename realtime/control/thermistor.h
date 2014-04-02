@@ -31,12 +31,12 @@ public:
     TemperatureControl(unsigned int voltageDividerResistance, unsigned int adcBits,
                        double a, double b, double c, double d)
     {
-        _thermistor = new Thermistor(voltageDividerResistance, adcBits, a, b, c, d);
+        _thermistor = std::make_shared<Thermistor>(voltageDividerResistance, adcBits, a, b, c, d);
 
         setTargetTemperature(0);
     }
 
-    virtual ~TemperatureControl() { delete _thermistor; }
+    virtual ~TemperatureControl() {}
 
     inline double targetTemperature() const { return _targetTemperature.load(); }
     inline void setTargetTemperature(double temperature) { _targetTemperature.store(temperature); }
@@ -44,7 +44,7 @@ public:
     inline double currentTemperature() const { return _thermistor->temperature(); }
 
 protected:
-    Thermistor *_thermistor;
+    std::shared_ptr<Thermistor> _thermistor;
     std::atomic<double> _targetTemperature;
 };
 

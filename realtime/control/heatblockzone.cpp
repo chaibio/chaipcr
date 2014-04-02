@@ -30,7 +30,7 @@ HeatBlockZoneController::~HeatBlockZoneController()
 
 std::shared_ptr<Thermistor> HeatBlockZoneController::thermistor() const
 {
-    return std::shared_ptr<Thermistor>();
+    return _thermistor;
 }
 
 void HeatBlockZoneController::initPID()
