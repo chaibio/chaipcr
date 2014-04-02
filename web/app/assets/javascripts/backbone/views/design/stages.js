@@ -5,8 +5,17 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	template: JST["backbone/templates/design/stage"],
 	className: 'stage-run',
 
+	events: {
+		"click .stage-header": "selectStage"
+	},
+
+	selectStage: function() {
+		alert("U clicked");
+		console.log(this);
+	},
+
 	initialize: function() {
-		console.log("this is optns", this.options)
+		//console.log("this is optns", this.options)
 	},
 
 	render:function() {

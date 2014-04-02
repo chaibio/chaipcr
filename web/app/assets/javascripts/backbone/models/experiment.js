@@ -74,6 +74,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 			type: 'GET'
 		})
 		.done(function(data) {
+				console.log("Big bang", that);
 				that.set('experiment', data["experiment"]);
 				that.trigger("modelUpdated");	
 		})
