@@ -28,14 +28,16 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 		that = this;
 		allSteps = this.options["stageInfo"]["stage"];
 		allSteps = allSteps["steps"];
-		
+		previous_id = null;
 		_.each(allSteps, function(step, index) {
 
 			stepView = new ChaiBioTech.Views.Design.steps({
 				model: step["step"],
 				stepInfo: step,
-				parentStage: that
+				parentStage: that,
+				prev_id:  previous_id
 			});
+			previous_id = step["step"]["id"];
 			currentWidth = $(that.el).width();
 			$(that.el).css("width", ((index + 1) * 150)+"px");
 			currentWidth = $("#innertrack").width();
