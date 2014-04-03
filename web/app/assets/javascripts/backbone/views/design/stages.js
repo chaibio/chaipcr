@@ -10,10 +10,23 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	},
 
 	selectStage: function() {
-		alert("U clicked");
-		//This is the place where you write code 
-		ChaiBioTech.Data.selectedStage = this;
-		console.log(this);
+		if(!_.isUndefined(ChaiBioTech.Data.selectedStage) && !_.isNull(ChaiBioTech.Data.selectedStage)) {
+
+			if(this.cid ===  ChaiBioTech.Data.selectedStage.cid) {
+				$(this.el).css("background-color", "white");
+				ChaiBioTech.Data.selectedStage = null;
+			} else {
+				$(this.el).css("background-color","orange");
+				oldStepSelected = ChaiBioTech.Data.selectedStage;
+				$(oldStepSelected.el).css("background-color", "yellow");
+				ChaiBioTech.Data.selectedStage = this;
+			}
+
+		} else {
+			$(this.el).css("background-color","orange");
+			ChaiBioTech.Data.selectedStage = this;
+		}
+		//ChaiBioTech.Data.selectedStage = this;
 	},
 
 	initialize: function() {

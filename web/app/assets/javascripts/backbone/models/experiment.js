@@ -65,6 +65,33 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		}); 
 	},
 
+	createStage: function(type, stageData) {
+		that = this;
+		console.log("guluguky", stageData);
+		var data = this.get("experiment");
+		dataToBeSend = {
+			"stage": {
+				'stage_type': type,
+				'prev_id ': stageData.model.id
+			}
+		};
+
+		console.log("Data To Server", dataToBeSend);
+		$.ajax({
+			url: "/protocols/"+data.id+"/stages",
+			contentType: 'application/json',
+			type: 'POST',
+			data: JSON.stringify(dataToBeSend)
+		})
+		.done(function(data) {
+			that.getLatestModel();
+		})
+		.fail(function() {
+			alert("Failed to update");
+			console.log("Failed to update");
+		}); 
+	},
+
 	getLatestModel: function(callback) {
 		that = this;
 		var data = this.get("experiment");

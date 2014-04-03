@@ -20,17 +20,36 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		"click #step-after": "addAfter",
 		"click #delete-selected": "deleteSelected",
 		"click #holding": "addHoldingStage",
-		"click #cycling": "addCyclingStage"
+		"click #cycling": "addCyclingStage",
+		"click #melt-curve": "addMeltCurve"
 	},
 
 	addHoldingStage: function(e) {
 		e.preventDefault();
-		alert("holding");
+		if(!_.isNull(ChaiBioTech.Data.selectedStage) && !_.isUndefined(ChaiBioTech.Data.selectedStage)) {
+			this.model.createStage("holding", ChaiBioTech.Data.selectedStage);
+		} else {
+			alert("Plz select a Stage");
+		}
+		
 	},
 
 	addCyclingStage: function(e) {
 		e.preventDefault();
-		alert("cycling");
+		if(!_.isNull(ChaiBioTech.Data.selectedStage) && !_.isUndefined(ChaiBioTech.Data.selectedStage)) {
+			this.model.createStage("cycling", ChaiBioTech.Data.selectedStage);
+		} else {
+			alert("Plz select a Stage");
+		}
+	},
+
+	addMeltCurve: function(e) {
+		e.preventDefault();
+		if(!_.isNull(ChaiBioTech.Data.selectedStage) && !_.isUndefined(ChaiBioTech.Data.selectedStage)) {
+			this.model.createStage("meltcurve", ChaiBioTech.Data.selectedStage);
+		} else {
+			alert("Plz select a Stage");
+		}
 	},
 
 	addAfter: function(e) {
