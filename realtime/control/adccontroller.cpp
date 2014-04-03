@@ -17,7 +17,7 @@ ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> consumers
     _ltc2444->setup(0x6, false);
 
     //start first read
-    _ltc2444->readADC(1, true);
+    _ltc2444->readADC(0, true);
 }
 
 ADCController::~ADCController() {
