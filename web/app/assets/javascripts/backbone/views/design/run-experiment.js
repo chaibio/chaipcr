@@ -36,17 +36,20 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 	addAfter: function(e) {
 		e.preventDefault();
 		if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data.selectedStep)) {
-			target = ChaiBioTech.Data.selectedStep.options.parentStage;
-		//$("#innertrack").css("width", ($("#innertrack").width() + 150) + "px");
-			this.model.createStep(ChaiBioTech.Data.selectedStep, target);
+			this.model.createStep(ChaiBioTech.Data.selectedStep, "after");
 		} else {
-			alert("Plz select a step first");
+			alert("Plz select a step");
 		}
 	},
 
 	addBefore: function(e) {
 		e.preventDefault();
-		console.log(ChaiBioTech.Data.selectedStep);
+		//console.log(ChaiBioTech.Data.selectedStep);
+		if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data.selectedStep)) {
+			this.model.createStep(ChaiBioTech.Data.selectedStep, "before");
+		} else {
+			alert("Plz select a step");
+		}
 	},
 
 	deleteSelected: function(e) {

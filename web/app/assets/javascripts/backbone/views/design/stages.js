@@ -11,6 +11,8 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 
 	selectStage: function() {
 		alert("U clicked");
+		//This is the place where you write code 
+		ChaiBioTech.Data.selectedStage = this;
 		console.log(this);
 	},
 
