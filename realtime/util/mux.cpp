@@ -7,12 +7,8 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class MUX
-MUX::MUX(vector<GPIO> muxControlPins) :
-    _muxControlPins{muxControlPins}{
-}
-
-MUX::MUX(initializer_list<GPIO> muxControlPins) :
-     _muxControlPins{muxControlPins}{
+MUX::MUX(vector<GPIO> &&muxControlPins) :
+    _muxControlPins(move(muxControlPins)) {
 }
 
 MUX::~MUX() {
@@ -20,7 +16,7 @@ MUX::~MUX() {
 }
 
 void MUX::setChannel(int channel) {
-    for(GPIO muxControlPin : this->_muxControlPins) {
+    for(GPIO &muxControlPin : this->_muxControlPins) {
         muxControlPin.setValue(static_cast<GPIO::Value>(channel&0x1), true);
         channel>>=1;
     }

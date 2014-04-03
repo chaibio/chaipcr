@@ -13,6 +13,14 @@ GPIO::GPIO(unsigned int pinNumber, Direction direction) :
 	setDirection(direction);
 }
 
+GPIO::GPIO(GPIO &&other) {
+    pinNumber_ = other.pinNumber_;
+    direction_ = other.direction_;
+    savedValue = other.savedValue;
+
+    other.pinNumber_ = UINT_MAX;
+}
+
 GPIO::~GPIO() {
 	try {
 		unexportPin();
@@ -20,8 +28,21 @@ GPIO::~GPIO() {
 		assert(false);
 	}
 }
+
+GPIO& GPIO::operator= (GPIO &&other) {
+    pinNumber_ = other.pinNumber_;
+    direction_ = other.direction_;
+    savedValue = other.savedValue;
+
+    other.pinNumber_ = UINT_MAX;
+
+    return *this;
+}
 	
 GPIO::Value GPIO::value() const {
+    if (pinNumber_ == UINT_MAX)
+        throw GPIOError("GPIO is moved");
+
 	ostringstream filePath;
 	ifstream valueFile;
 	char buf[2];
@@ -46,6 +67,9 @@ GPIO::Value GPIO::value() const {
 }
 
 void GPIO::setValue(Value value, bool checkValue) {
+    if (pinNumber_ == UINT_MAX)
+        throw GPIOError("GPIO is moved");
+
     if (checkValue && value == savedValue)
         return;
 
@@ -76,6 +100,9 @@ void GPIO::setValue(Value value, bool checkValue) {
 }
 
 void GPIO::setDirection(Direction direction) {
+    if (pinNumber_ == UINT_MAX)
+        throw GPIOError("GPIO is moved");
+
 	ostringstream filePath;
 	ofstream directionFile;
 	
@@ -101,13 +128,17 @@ void GPIO::setDirection(Direction direction) {
 }
 
 void GPIO::exportPin() {
-	ofstream exportFile;
-	exportFile.open("/sys/class/gpio/export");
-	exportFile << pinNumber_;
+    if (pinNumber_ != UINT_MAX) {
+        ofstream exportFile;
+        exportFile.open("/sys/class/gpio/export");
+        exportFile << pinNumber_;
+    }
 }
 
 void GPIO::unexportPin() {
-	ofstream unexportFile;
-	unexportFile.open("/sys/class/gpio/unexport");
-	unexportFile << pinNumber_;
+    if (pinNumber_ != UINT_MAX) {
+        ofstream unexportFile;
+        unexportFile.open("/sys/class/gpio/unexport");
+        unexportFile << pinNumber_;
+    }
 }

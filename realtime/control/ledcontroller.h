@@ -1,8 +1,6 @@
 #ifndef _LEDCONTROLLER_H_
 #define _LEDCONTROLLER_H_
 
-#include "pwm.h"
-
 // Class LEDController
 class LEDController {
 public:

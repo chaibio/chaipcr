@@ -7,8 +7,7 @@ class GPIO;
 // Class MUX
 class MUX {
 public:
-    MUX(std::vector<GPIO> muxControlPins);
-    MUX(std::initializer_list<GPIO> muxControlPins);
+    MUX(std::vector<GPIO> &&muxControlPins);
     ~MUX();
 
     void setChannel(int channel);   //channel is 0 to ....n
