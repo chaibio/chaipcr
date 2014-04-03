@@ -1,4 +1,3 @@
-
 /dts-v1/;
 /plugin/;
 
@@ -24,7 +23,7 @@
 		"P9.28",		/* pwm: eCAP2_PWM2 LED PWM - Ouput */
 		"P8.18",		/* gpio: LED_DIGIPOT_CS - Ouput */
 		"P8.12",		/* gpio: LED XLAT/LED_CONTROL_CS - Ouput */
-		"P9.40",		/* pwm: eCAP0_PWM0 BLANK - Ouput */
+		"P9.42",		/* pwm: eCAP0_PWM0 BLANK - Ouput */
 		"P8.14",		/* gpio: VPRG - Ouput */
 		"P8.08",		/* gpio: XERR - Input */
 		"P9.29",		/* SPI1: SPI1_SD0 (SOUT from LED BOARD) - Input */
