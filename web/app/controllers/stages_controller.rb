@@ -22,8 +22,6 @@ class StagesController < ApplicationController
     @stage = Stage.new(stage_params)
     @stage.protocol_id = params[:protocol_id]
     @stage.prev_id = params[:prev_id]
-    @step = Step.new(step_params)
-    @stage.steps << @step
     ret = @stage.save
     respond_to do |format|
       format.json { render "fullshow", :status => (ret)? :ok :  :unprocessable_entity}
