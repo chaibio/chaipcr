@@ -39,10 +39,10 @@ uint32_t LTC2444::readADC(uint8_t ch, bool SGL) {
 
 	if (SGL){
 		//SGL=1 , ODD = ch&0x01, A2A1A0=(ch&0x0110>1) 0r SGL_ODD_A
-        data |= ((uint32_t)1)<<28 |((uint32_t)(ch&0x01))<<27  |((uint32_t)(ch&0x110))<<23;
+        data |= ((uint32_t)1)<<28 |((uint32_t)(ch&0x01))<<27  |((uint32_t)(ch&0b110))<<23;
 	}
 	else{
-        data |= ((uint32_t)(ch&0x01))<<27  |((uint32_t)(ch&0x110))<<23;
+        data |= ((uint32_t)(ch&0x01))<<27  |((uint32_t)(ch&0b110))<<23;
 	}
 	//data that will be sent is: 101_SGL_ODD_A_OSRTWOx based ifrom the datasheet Table 4. Channel Selection
 	data |= ((uint32_t)OSRTWOx)<<19;
