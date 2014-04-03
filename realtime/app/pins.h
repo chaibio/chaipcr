@@ -10,7 +10,7 @@ static const int kLTC2444CSPinNumber = 60;
 static const int kSPI0DataInSensePinNumber = 20;
 
 //LED GPIO pins
-static const int kLEDControlCSPinNumber = 44;
+static const int kLEDControlXLATPinNumber = 44;
 static const int kLEDDigiPotCSPinNumber = 65;
 
 static const int kLidSensePinNumber = 61;
@@ -21,6 +21,7 @@ static const int kHeatSinkFanTachADCPinNumber = 0;
 
 //LED control
 extern const std::string kLEDGrayscaleClockPWMPath;
+extern const std::string kLEDBlankPWMPath;
 
 //Lid
 extern const std::string kLidControlPWMPath;

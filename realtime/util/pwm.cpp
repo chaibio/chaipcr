@@ -23,7 +23,9 @@ void PWMPin::setPWM(unsigned long duty, unsigned long period, unsigned int polar
 void PWMPin::writePWMFile(const string& relativePath, unsigned long value) {
 	ostringstream filePath;
 	filePath << pwmDevicePath_ << relativePath;
+    cout << "Filepath = " << filePath.str() << endl;
 	ofstream file;
 	file.open(filePath.str());
 	file << value;
+    file.close();
 }

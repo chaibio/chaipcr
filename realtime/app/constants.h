@@ -33,5 +33,7 @@ const long kPIDInterval = 100;
 const int kMinLEDCurrent = 5; //5mA
 const int kGrayscaleClockPwmPeriodNs = 240;
 const int kGrayscaleClockPwmDutyNs = 120;
+const int kLedBlankPwmPeriodNs = 983090;
+const int kLedBlankPwmDutyNs = 50;
 
 #endif

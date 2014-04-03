@@ -1,11 +1,10 @@
 #ifndef _LEDCONTROLLER_H_
 #define _LEDCONTROLLER_H_
 
-class PWMPin;
+#include "pwm.h"
 
 // Class LEDController
-class LEDController
-{
+class LEDController {
 public:
     LEDController(SPIPort spiPort, float dutyCyclePercentage);
 	virtual ~LEDController();
@@ -23,6 +22,8 @@ private:
     std::shared_ptr<PWMPin> _grayscaleClock;
     SPIPort _spiPort;
     GPIO _potCSPin;
+    GPIO _ledXLATPin;
+    PWMPin _ledBlankPWM;
 };
 
 #endif
