@@ -87,7 +87,7 @@
 
 			blank_pwm_pin: pinmux_blank_pwm__pin {
 				pinctrl-single,pins = <
-					0x0164 0x04  /* P9.42.1 eCAP0_PWM0, MODE0 */
+					0x0164 0x00  /* P9.42.1 eCAP0_PWM0, MODE0 */
 				>;
 			};
 			
