@@ -10,7 +10,6 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		this.model.on("change:experiment", function() {
 			$("#innertrack").html("");
 			$("#innertrack").css("width", "1000px");
-			//console.log(this, that);
 			window.router.runView.addStages();
 		})
 	},
@@ -63,7 +62,6 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 
 	addBefore: function(e) {
 		e.preventDefault();
-		//console.log(ChaiBioTech.Data.selectedStep);
 		if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data.selectedStep)) {
 			this.model.createStep(ChaiBioTech.Data.selectedStep, "before");
 		} else {

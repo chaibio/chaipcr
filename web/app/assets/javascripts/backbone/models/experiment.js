@@ -48,7 +48,13 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 	createStep: function(step, place) {
 		that = this;
 		stage = step.options.parentStage.model;
-		dataToBeSend = (place == "before") ? {} : {"prev_id": step.model.id};
+		dataToBeSend = {};
+		if(place == "before" && step.options.prev_id != null) {
+			dataToBeSend = {"prev_id": step.options.prev_id};
+		} else {
+			dataToBeSend = {"prev_id": step.model.id}
+		}
+
 		console.log("Data To Server", dataToBeSend);
 		$.ajax({
 			url: "/stages/"+stage.id+"/steps",
@@ -67,15 +73,15 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 
 	createStage: function(type, stageData) {
 		that = this;
-		console.log("guluguky", stageData);
 		var data = this.get("experiment");
 		dataToBeSend = {
 			"stage": {
-				'stage_type': type,
-				'prev_id ': stageData.model.id
+				'stage_type': type
 			}
 		};
-
+		if(!_.isNull(stageData.options.prev_stage_id)) {
+			dataToBeSend["stage"]["prev_id"] = stageData.model.id
+		}
 		console.log("Data To Server", dataToBeSend);
 		$.ajax({
 			url: "/protocols/"+data.id+"/stages",

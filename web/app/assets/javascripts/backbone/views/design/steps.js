@@ -26,7 +26,7 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 			$(this.el).css("background-color","orange");
 			ChaiBioTech.Data.selectedStep = this;
 		}
-		
+		console.log(this);
 	},
 
 	initialize: function() {

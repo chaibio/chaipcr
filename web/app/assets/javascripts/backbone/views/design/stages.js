@@ -26,11 +26,11 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 			$(this.el).css("background-color","orange");
 			ChaiBioTech.Data.selectedStage = this;
 		}
-		//ChaiBioTech.Data.selectedStage = this;
+		console.log(this);
 	},
 
 	initialize: function() {
-		//console.log("this is optns", this.options)
+		//
 	},
 
 	render:function() {
