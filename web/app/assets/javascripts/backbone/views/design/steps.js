@@ -10,6 +10,10 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 
 	selectThisStep: function() {
 		
+		if(!_.isUndefined(ChaiBioTech.Data.selectedStage) && !_.isNull(ChaiBioTech.Data.selectedStage)) {
+			ChaiBioTech.Data.selectedStage.trigger("unselectStage");
+		}
+		
 		if(!_.isUndefined(ChaiBioTech.Data.selectedStep) && !_.isNull(ChaiBioTech.Data.selectedStep)) {
 
 			if(this.cid ===  ChaiBioTech.Data.selectedStep.cid) {
@@ -39,6 +43,12 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 		this.line = new ChaiBioTech.Views.Design.line({
 			model: this.model
 		});
+
+		this.on("unselectStep", function() {
+			$(this.el).css("background-color", "yellow");
+			ChaiBioTech.Data.selectedStep = null;
+		});
+
 	},
 
 	deleteView: function() {

@@ -10,6 +10,11 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	},
 
 	selectStage: function() {
+		
+		if(!_.isUndefined(ChaiBioTech.Data.selectedStep) && !_.isNull(ChaiBioTech.Data.selectedStep)) {
+			ChaiBioTech.Data.selectedStep.trigger("unselectStep");
+		}
+
 		if(!_.isUndefined(ChaiBioTech.Data.selectedStage) && !_.isNull(ChaiBioTech.Data.selectedStage)) {
 
 			if(this.cid ===  ChaiBioTech.Data.selectedStage.cid) {
@@ -18,7 +23,7 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 			} else {
 				$(this.el).css("background-color","orange");
 				oldStepSelected = ChaiBioTech.Data.selectedStage;
-				$(oldStepSelected.el).css("background-color", "yellow");
+				$(oldStepSelected.el).css("background-color", "white");
 				ChaiBioTech.Data.selectedStage = this;
 			}
 
@@ -30,7 +35,10 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	},
 
 	initialize: function() {
-		//
+		this.on("unselectStage", function() {
+			$(this.el).css("background-color", "white");
+			ChaiBioTech.Data.selectedStage = null;
+		});
 	},
 
 	render:function() {
