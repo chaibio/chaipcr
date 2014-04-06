@@ -87,7 +87,7 @@
 
 			blank_pwm_pin: pinmux_blank_pwm__pin {
 				pinctrl-single,pins = <
-					0x0164 0x04  /* P9.42.1 eCAP0_PWM0, MODE0 */
+					0x0164 0x00  /* P9.42.1 eCAP0_PWM0, MODE0 */
 				>;
 			};
 			
@@ -113,7 +113,6 @@
 					0x030 0x17  /* P8.12 LED XLAT/LED_CONTROL_CS gpio1_12, OUTPUT_PULLUP | MODE7 */
 					0x028 0x17  /* P8.14 VPRG gpio0_26, OUTPUT_PULLUP | MODE7 */
 					0x094 0x37  /* P8.08 XERR gpio2_3, INPUT_PULLUP | MODE7 */
-					0x164 0x37  /* P9.42.2 Shared pin with eCAP0_PWM0 FAN PWM GPIO0_7, INPUT_PULLUP | MODE7 */
 
 					/* MCU */
 					0x098 0x17  /* P8.10 LED_DIGIPOT_CS gpio2_1, OUTPUT_PULLUP | MODE7 */
