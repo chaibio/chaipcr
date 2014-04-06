@@ -14,13 +14,6 @@ public:
 protected:
     void closeEvent(QCloseEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
-
-private slots:
-    void reply(QNetworkReply *reply);
-    void loaded(bool isSuccess);
-
-private:
-    bool repeatState;
 };
 
 #endif // QPCRBROWSER_H
