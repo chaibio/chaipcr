@@ -27,8 +27,9 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		e.preventDefault();
 		if(!_.isNull(ChaiBioTech.Data.selectedStage) && !_.isUndefined(ChaiBioTech.Data.selectedStage)) {
 			this.model.createStage("holding", ChaiBioTech.Data.selectedStage);
+			ChaiBioTech.Data.selectedStage = null;
 		} else {
-			alert("Plz select a Stage");
+			this.model.createStage("holding", ChaiBioTech.Data.lastStage);
 		}
 		
 	},
@@ -37,8 +38,9 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		e.preventDefault();
 		if(!_.isNull(ChaiBioTech.Data.selectedStage) && !_.isUndefined(ChaiBioTech.Data.selectedStage)) {
 			this.model.createStage("cycling", ChaiBioTech.Data.selectedStage);
+			ChaiBioTech.Data.selectedStage = null;
 		} else {
-			alert("Plz select a Stage");
+			this.model.createStage("cycling", ChaiBioTech.Data.lastStage);
 		}
 	},
 
@@ -46,8 +48,9 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		e.preventDefault();
 		if(!_.isNull(ChaiBioTech.Data.selectedStage) && !_.isUndefined(ChaiBioTech.Data.selectedStage)) {
 			this.model.createStage("meltcurve", ChaiBioTech.Data.selectedStage);
+			ChaiBioTech.Data.selectedStage = null;
 		} else {
-			alert("Plz select a Stage");
+			this.model.createStage("meltcurve", ChaiBioTech.Data.lastStage);
 		}
 	},
 
@@ -74,8 +77,11 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data.selectedStep)) {
 			this.model.deleteStep(ChaiBioTech.Data.selectedStep);
 			ChaiBioTech.Data.selectedStep = null; 
+		} else if(!_.isNull(ChaiBioTech.Data.selectedStage) && !_.isUndefined(ChaiBioTech.Data.selectedStage)) {
+			this.model.deleteStage(ChaiBioTech.Data.selectedStage);
+			ChaiBioTech.Data.selectedStage = null; 
 		} else {
-			alert("Plz select a step to delete");
+			alert("Plz select a step or stage");
 		}
 	},
 
@@ -96,7 +102,8 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 				stageInfo: stage,
 				prev_stage_id: previous_stage_id
 			});
-			previous_stage_id = stage["stage"]["id"];		
+			previous_stage_id = stage["stage"]["id"];
+			ChaiBioTech.Data.lastStage = stageView;	
 			$("#innertrack").append(stageView.render().el);
 			stageView.addSteps(index);
 		});
