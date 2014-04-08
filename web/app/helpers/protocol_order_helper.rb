@@ -28,8 +28,13 @@ module ProtocolOrderHelper
     @prev_id
   end
   
+  def order_number=(order_number)
+    write_attribute("order_number", order_number)
+    @update_order_required = false
+  end
+  
   def update_order_required
-    new_record? || @update_order_required
+    (new_record? && @update_order_required != false) || @update_order_required
   end
   
   def update_order!(order_number)
