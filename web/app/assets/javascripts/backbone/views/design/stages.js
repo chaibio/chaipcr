@@ -60,6 +60,7 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 				parentStage: that,
 				prev_id:  previous_id
 			});
+			//you might add a next id too here so that it points both directioins
 			previous_id = step["step"]["id"];
 			currentWidth = $(that.el).width();
 			$(that.el).css("width", ((index + 1) * 150)+"px");

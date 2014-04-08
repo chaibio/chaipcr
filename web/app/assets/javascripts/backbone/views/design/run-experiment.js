@@ -8,6 +8,7 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		that = this;
 		_.bindAll(this, "addStages")
 		this.model.on("change:experiment", function() {
+			alert("Alright");
 			$("#innertrack").html("");
 			$("#innertrack").css("width", "1000px");
 			window.router.runView.addStages();
@@ -73,6 +74,7 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 	},
 
 	deleteSelected: function(e) {
+		// write code to disable delete thr is only one stage left
 		e.preventDefault();
 		if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data.selectedStep)) {
 			this.model.deleteStep(ChaiBioTech.Data.selectedStep);
@@ -102,6 +104,7 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 				stageInfo: stage,
 				prev_stage_id: previous_stage_id
 			});
+			// you could add a parent here so that it points up to the original model itself..
 			previous_stage_id = stage["stage"]["id"];
 			ChaiBioTech.Data.lastStage = stageView;	
 			$("#innertrack").append(stageView.render().el);

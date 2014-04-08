@@ -41,6 +41,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 	},
 
 	afterSave: function(response) {
+		this.getLatestModel();
 		console.log(response);
 		this.trigger("Saved");
 	},
@@ -138,10 +139,14 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 	deleteStage: function(stage) {
 		console.log("stage to be deleted", stage, stage.model.id);
 		that = this;
+		dataToBeSend = {
+			id: stage.model.id
+		};
 		$.ajax({
 			url: "/stages/"+stage.model.id,
 			contentType: 'application/json',
-			type: 'DELETE'
+			type: 'DELETE',
+			data: JSON.stringify(dataToBeSend)
 		})
 		.done(function(data) {
 			console.log(data);
@@ -150,6 +155,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		.fail(function() {
 			alert("Failed to update");
 			console.log("Failed to update");
+			that.getLatestModel();
 		}); 
 	}
 });
