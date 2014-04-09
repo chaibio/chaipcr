@@ -14,6 +14,8 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 			daddyStage = this.options.parentStage;
 			if( _.isUndefined(daddyStage.options.next_stage_id) && _.isNull(daddyStage.options.prev_stage_id) ){
 				$("#delete-selected").prop("disabled", true);
+			} else {
+				$("#delete-selected").prop("disabled", false);
 			}
 		} else {
 			$("#delete-selected").prop("disabled", false);
