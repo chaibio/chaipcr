@@ -101,7 +101,8 @@ HEADERS += \
     server/httpstatushandler.h \
     server/statushandler.h \
     control/adcconsumer.h \
-    control/adcconsumer.h
+    control/adcconsumer.h \
+    server/qpcrfactory.h
 
 SOURCES += \
     app/pins.cpp \
@@ -136,4 +137,5 @@ SOURCES += \
     db/dbcontrol.cpp \
     test/dbtest.cpp \
     server/httpstatushandler.cpp \
-    server/statushandler.cpp
+    server/statushandler.cpp \
+    server/qpcrfactory.cpp

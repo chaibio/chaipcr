@@ -6,7 +6,7 @@
 class IControl;
 class HeatBlock;
 
-// Class QPCRServer
+// Class QPCRApplication
 class QPCRApplication: public Poco::Util::ServerApplication
 {
 public:

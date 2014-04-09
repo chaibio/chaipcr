@@ -5,36 +5,24 @@
 
 #include "qpcrrequesthandlerfactory.h"
 #include "qpcrapplication.h"
+#include "qpcrfactory.h"
 
 using namespace std;
 using namespace Poco::Net;
 using namespace Poco::Util;
 
 // Class QPCRApplication
-void QPCRApplication::initialize(Application&)
-{
-    controlUnits.push_back(static_pointer_cast<IControl>(OpticsInstance::createInstance(move(SPIPort(kSPI1DevicePath)))));
-
-    auto heatBlock = HeatBlockInstance::createInstance();
-    controlUnits.push_back(static_pointer_cast<IControl>(heatBlock));
-
-    //ADC Controller
-    vector<shared_ptr<ADCConsumer>> consumers = {nullptr, heatBlock->zone1Thermistor(), heatBlock->zone2Thermistor(), nullptr};
-    controlUnits.push_back(static_pointer_cast<IControl>(ADCControllerInstance::createInstance(consumers,
-                                                                    kLTC2444CSPinNumber, std::move(SPIPort(kSPI0DevicePath)), kSPI0DataInSensePinNumber
-                                                                    )));
+void QPCRApplication::initialize(Application&) {
+    QPCRFactory::constructMachine(controlUnits);
 }
 
-int QPCRApplication::main(const vector<string>&)
-{
+int QPCRApplication::main(const vector<string>&) {
 	HTTPServer server(new QPCRRequestHandlerFactory, ServerSocket(kHttpServerPort), new HTTPServerParams);
-
     server.start();
 
     workState = true;
-    while (workState)
-    {
-        for(auto controlUnit : controlUnits)
+    while (workState) {
+        for(auto controlUnit: controlUnits)
             controlUnit->process();
     }
 

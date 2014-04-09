@@ -8,9 +8,8 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class HeatBlock
-HeatBlock::HeatBlock() {
-    _zones = make_pair(new HeatBlockZoneController(kHeatBlockZone1PWMPath, kHeatBlockZone1PWMPeriod, kHeadBlockZone1HeatPin, kHeadBlockZone1CoolPin),
-                       new HeatBlockZoneController(kHeatBlockZone2PWMPath, kHeatBlockZone2PWMPeriod, kHeadBlockZone2HeatPin, kHeadBlockZone2CoolPin));
+HeatBlock::HeatBlock(HeatBlockZoneController* zone1, HeatBlockZoneController* zone2) {
+    _zones = make_pair(zone1, zone2);
 }
 
 HeatBlock::~HeatBlock() {

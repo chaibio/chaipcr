@@ -4,6 +4,7 @@
 #include "icontrol.h"
 #include "pwm.h"
 #include "thermistor.h"
+#include "gpio.h"
 
 class CPIDController;
 

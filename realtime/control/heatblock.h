@@ -10,7 +10,7 @@ class HeatBlockZoneController;
 class HeatBlock : public IControl
 {
 public:
-    HeatBlock();
+    HeatBlock(HeatBlockZoneController* zone1, HeatBlockZoneController* zone2);
 	~HeatBlock();
 	
     void process();
