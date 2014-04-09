@@ -53,7 +53,7 @@ void LEDController::setIntensity(double onCurrentMilliamps) {
 }
 
 void LEDController::activateLED(unsigned int ledNumber) {
-    unsigned int pwm = 4096 * _dutyCyclePercentage;
+    unsigned int pwm = 4096 * _dutyCyclePercentage / 100;
 	uint16_t intensities[16];
 	memset(intensities, 0, sizeof(intensities));
 	intensities[15 - (ledNumber - 1)] = pwm;
