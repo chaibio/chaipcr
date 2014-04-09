@@ -16,6 +16,7 @@ void QPCRFactory::constructMachine(std::vector<std::shared_ptr<IControl>>& contr
 
     //construct optics
     //TODO: not yet refactored
+	//test
     controlUnits.push_back(static_pointer_cast<IControl>(OpticsInstance::createInstance(spiPort1)));
 
     //construct heat block
