@@ -5,7 +5,7 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 	template: JST["backbone/templates/design/experiment-run"],
 
 	initialize: function() {
-		that = this;
+		thisObject = this;
 		_.bindAll(this, "addStages")
 		this.model.on("change:experiment", function() {
 			$("#innertrack").html("");
@@ -94,16 +94,21 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 	addStages: function() {
 		stages = this.model.get("experiment");
 		stages = stages["protocol"]["stages"];
-		that = this;
+		thatObject = this;
 		previous_stage_id = null;
+		previous_object = null;
 		_.each(stages, function(stage, index) {
 			
 			stageView = new ChaiBioTech.Views.Design.stages({
 				model: stage["stage"], //this points to stage within _.each's context
 				stageInfo: stage,
-				prev_stage_id: previous_stage_id
+				prev_stage_id: previous_stage_id,
+				grandParent: thatObject.model
 			});
-			// you could add a parent here so that it points up to the original model itself..
+			if(!_.isNull(previous_object)) {
+				previous_object.options.next_stage_id = stage["stage"]["id"];
+			}
+			previous_object = stageView;
 			previous_stage_id = stage["stage"]["id"];
 			ChaiBioTech.Data.lastStage = stageView;	
 			$("#innertrack").append(stageView.render().el);

@@ -10,7 +10,13 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	},
 
 	selectStage: function() {
-		
+		parentObject = this.options.grandParent.get("experiment");
+		if(parentObject["protocol"]["stages"].length == 1) {
+			$("#delete-selected").prop("disabled", true);
+		} else {
+			$("#delete-selected").prop("disabled", false);
+		}
+
 		if(!_.isUndefined(ChaiBioTech.Data.selectedStep) && !_.isNull(ChaiBioTech.Data.selectedStep)) {
 			ChaiBioTech.Data.selectedStep.trigger("unselectStep");
 		}
@@ -48,25 +54,32 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 
 	addSteps: function(stageNumber) {
 
-		that = this;
+		thisObject = this;
 		allSteps = this.options["stageInfo"]["stage"];
 		allSteps = allSteps["steps"];
+		previous_step = null;
 		previous_id = null;
 		_.each(allSteps, function(step, index) {
 
 			stepView = new ChaiBioTech.Views.Design.steps({
 				model: step["step"],
 				stepInfo: step,
-				parentStage: that,
-				prev_id:  previous_id
+				parentStage: thisObject,
+				prev_id:  previous_id,
+				grandParent: thisObject.options.grandParent
 			});
-			//you might add a next id too here so that it points both directioins
+			
+			if(! _.isNull(previous_step)) {
+				previous_step.options.next_id = step["step"]["id"];
+			}
+			previous_step = stepView;
 			previous_id = step["step"]["id"];
-			currentWidth = $(that.el).width();
-			$(that.el).css("width", ((index + 1) * 150)+"px");
+			
+			currentWidth = $(thisObject.el).width();
+			$(thisObject.el).css("width", ((index + 1) * 150)+"px");
 			currentWidth = $("#innertrack").width();
 			$("#innertrack").css("width", (currentWidth + 151) +"px");
-			$(that.el).find(".step-holder").append(stepView.render().el);
+			$(thisObject.el).find(".step-holder").append(stepView.render().el);
 		})
 	},
 

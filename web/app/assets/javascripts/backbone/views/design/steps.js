@@ -9,7 +9,16 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 	},
 
 	selectThisStep: function() {
-		
+
+		if((_.isUndefined(this.options.next_id)) && (_.isNull(this.options.prev_id) )) {
+			daddyStage = this.options.parentStage;
+			if( _.isUndefined(daddyStage.options.next_stage_id) && _.isNull(daddyStage.options.prev_stage_id) ){
+				$("#delete-selected").prop("disabled", true);
+			}
+		} else {
+			$("#delete-selected").prop("disabled", false);
+		}
+
 		if(!_.isUndefined(ChaiBioTech.Data.selectedStage) && !_.isNull(ChaiBioTech.Data.selectedStage)) {
 			ChaiBioTech.Data.selectedStage.trigger("unselectStage");
 		}
