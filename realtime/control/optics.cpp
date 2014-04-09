@@ -36,5 +36,6 @@ void Optics::process()
 {
 	//read lid state
     _lidOpen.store(_lidSensePin.value());
-    _photoDiodeMux.setChannel(11);
+    _photoDiodeMux.setChannel(15);
+
 }
