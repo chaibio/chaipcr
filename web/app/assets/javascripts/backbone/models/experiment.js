@@ -110,7 +110,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		.done(function(data) {
 				console.log("Big bang", that);
 				that.set('experiment', data["experiment"]);
-				that.trigger("modelUpdated");	
+				//that.trigger("modelUpdated");	
 		})
 		.fail(function() {
 			console.log("Failed to update");
@@ -155,7 +155,6 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		.fail(function() {
 			alert("Failed to update");
 			console.log("Failed to update");
-			that.getLatestModel();
 		}); 
 	}
 });
