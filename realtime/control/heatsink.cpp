@@ -11,9 +11,10 @@ using namespace Poco;
 ////////////////////////////////////////////////////////////////////////////////
 // Class HeatSink
 HeatSink::HeatSink()
-    :TemperatureControl(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
-                        kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
-                        kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient)
+    :TemperatureControl(std::make_shared<SteinhartHartThermistor>(kThermistorVoltageDividerResistanceOhms,
+                                                                  kLTC2444ADCBits, kQTICurveZThermistorACoefficient,
+                                                                  kQTICurveZThermistorBCoefficient, kQTICurveZThermistorCCoefficient,
+                                                                  kQTICurveZThermistorDCoefficient))
 {
     _pidController = 0;
     _fan = new Fan();

@@ -15,11 +15,7 @@ Thermistor::Thermistor(unsigned int voltageDividerResistance, unsigned int adcBi
 void Thermistor::setADCValue(unsigned int adcValue) {
     double voltage = (double)adcValue / _maxADCValue * 5.0;
     double resistance = (_voltageDividerResistance * voltage / 3.3) / (1 - (voltage / 3.3));
-    setResistance(resistance);
-}
-
-void Thermistor::setResistance(double resistanceOhms) {	
-    _temperature.store(temperatureForResistance(resistanceOhms));
+    _temperature.store(temperatureForResistance(resistance));
 }
 
 

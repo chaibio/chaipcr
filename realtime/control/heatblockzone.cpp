@@ -10,9 +10,10 @@ using namespace Poco;
 // Class HeatBlockZoneController
 HeatBlockZoneController::HeatBlockZoneController(const std::string &pwmPath, unsigned long pwmPeriod, unsigned int heatIOPin, unsigned int coolIOPin)
     :PWMControl(pwmPath, pwmPeriod),
-     TemperatureControl(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
-                        kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
-                        kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient),
+     TemperatureControl(std::make_shared<SteinhartHartThermistor>(kThermistorVoltageDividerResistanceOhms,
+                                                                  kLTC2444ADCBits, kQTICurveZThermistorACoefficient,
+                                                                  kQTICurveZThermistorBCoefficient, kQTICurveZThermistorCCoefficient,
+                                                                  kQTICurveZThermistorDCoefficient)),
      heatIO(GPIO(heatIOPin, GPIO::kOutput)), coolIO(GPIO(coolIOPin, GPIO::kOutput))
 {
     _pidController = 0;

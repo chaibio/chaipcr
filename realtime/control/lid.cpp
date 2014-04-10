@@ -9,9 +9,8 @@ using namespace Poco;
 
 Lid::Lid()
     :PWMControl(kLidControlPWMPath, kLidPWMPeriodNs),
-     TemperatureControl(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
-                        kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
-                        kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient)
+     TemperatureControl(std::make_shared<BetaThermistor>(kThermistorVoltageDividerResistanceOhms,
+                                                                  kLTC2444ADCBits, 0))
 {
     _pidController = 0;
 

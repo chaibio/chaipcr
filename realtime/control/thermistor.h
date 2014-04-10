@@ -19,8 +19,6 @@ protected:
     virtual double temperatureForResistance(double resistanceOhms) = 0;
 	
 private:
-	void setResistance(double resistanceOhms);
-
     std::atomic<double> _temperature;
 
     const unsigned int _maxADCValue;
@@ -51,11 +49,9 @@ private:
 
 class TemperatureControl {
 public:
-    TemperatureControl(unsigned int voltageDividerResistance, unsigned int adcBits,
-                       double a, double b, double c, double d)
+    TemperatureControl(std::shared_ptr<Thermistor> thermistor):
+        _thermistor {thermistor}
     {
-        _thermistor = std::make_shared<SteinhartHartThermistor>(voltageDividerResistance, adcBits, a, b, c, d);
-
         setTargetTemperature(0);
     }
 
