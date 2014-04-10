@@ -7,19 +7,18 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class LEDController
-LEDController::LEDController(SPIPort spiPort, float dutyCyclePercentage):
-    _spiPort(move(spiPort)),
-    _potCSPin(kLEDDigiPotCSPinNumber, GPIO::kOutput),
-    _ledXLATPin(kLEDControlXLATPinNumber, GPIO::kOutput),
-    _ledBlankPWM(kLEDBlankPWMPath) {
+LEDController::LEDController(PWMPin &&grayscaleClock, std::shared_ptr<SPIPort> spiPort, GPIO &&potCSPin, GPIO &&ledXLATPin, PWMPin &&ledBlankPWM, float dutyCyclePercentage):
+    _grayscaleClock(move(grayscaleClock)),
+    _spiPort(spiPort),
+    _potCSPin(move(potCSPin)),
+    _ledXLATPin(move(ledXLATPin)),
+    _ledBlankPWM(move(ledBlankPWM)) {
 
     _dutyCyclePercentage.store(dutyCyclePercentage);
-
-    _grayscaleClock = make_shared<PWMPin>(kLEDGrayscaleClockPWMPath);
-    _grayscaleClock->setPWM(kGrayscaleClockPwmDutyNs, kGrayscaleClockPwmPeriodNs, 0);
+    _grayscaleClock.setPWM(kGrayscaleClockPwmDutyNs, kGrayscaleClockPwmPeriodNs, 0);
     _ledBlankPWM.setPWM(kLedBlankPwmDutyNs, kLedBlankPwmPeriodNs, 0);
 
-	setIntensity(kMinLEDCurrent);
+    setIntensity(kMinLEDCurrent);
 
     _potCSPin.setValue(GPIO::kHigh);
     _ledXLATPin.setValue(GPIO::kLow);
@@ -45,8 +44,8 @@ void LEDController::setIntensity(double onCurrentMilliamps) {
 
     //send resistance
     _potCSPin.setValue(GPIO::kLow);
-    _spiPort.setMode(0);
-    _spiPort.readBytes(NULL, txBuf, sizeof(txBuf), 1000000);
+    _spiPort->setMode(0);
+    _spiPort->readBytes(NULL, txBuf, sizeof(txBuf), 1000000);
     _potCSPin.setValue(GPIO::kHigh);
 
     _intensity = onCurrentMilliamps;
@@ -71,8 +70,8 @@ void LEDController::activateLED(unsigned int ledNumber) {
 		//cout << "index: " << packIndex << " " << (int)packedIntensities[packIndex] << " " << (int)packedIntensities[packIndex+1] << " " << (int)packedIntensities[packIndex+2] << endl;
 	}
 
-    _spiPort.setMode(3);
-    _spiPort.readBytes(NULL, (char*)packedIntensities, sizeof(packedIntensities), 1000000);
+    _spiPort->setMode(3);
+    _spiPort->readBytes(NULL, (char*)packedIntensities, sizeof(packedIntensities), 1000000);
     _ledXLATPin.setValue(GPIO::kHigh);
     _ledXLATPin.setValue(GPIO::kLow);
 

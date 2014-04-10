@@ -17,6 +17,8 @@ void StatusHandler::createData(const boost::property_tree::ptree &requestPt, boo
 
     if (optics) {
         responsePt.put("optics.intensity", optics->getLedController()->intensity());
+        responsePt.put("optics.collectData", optics->collectData());
+        responsePt.put("optics.lidOpen", optics->lidOpen());
     }
 
     JSONHandler::createData(requestPt, responsePt);

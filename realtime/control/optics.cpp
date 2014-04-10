@@ -1,41 +1,73 @@
 #include "pcrincludes.h"
+#include "pocoincludes.h"
 #include "utilincludes.h"
 
 #include "ledcontroller.h"
 #include "optics.h"
 
 using namespace std;
+using namespace Poco;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Optics
-Optics::Optics(SPIPort ledSPIPort)
-    :_lidSensePin(kLidSensePinNumber, GPIO::kInput),
-     _photoDiodeMux(initMux())
-    //:_photoDiodeMux{GPIO(kMuxControlPin1, GPIO::kOutput), GPIO(kMuxControlPin2, GPIO::kOutput), GPIO(kMuxControlPin3, GPIO::kOutput), GPIO(kMuxControlPin4, GPIO::kOutput)}
+Optics::Optics(GPIO &&lidSensePin, shared_ptr<LEDController> ledController, MUX &&photoDiodeMux)
+    :_lidSensePin(move(lidSensePin)),
+     _ledController(ledController),
+     _photoDiodeMux(move(photoDiodeMux))
 {
     _lidOpen.store(false);
-    _ledController = make_shared<LEDController>(move(ledSPIPort), 50);
+
+    _collectData.store(false);
+    _collectDataTimer = new Timer(0, kCollectDataInterval);
+    _ledNumber = 1;
 }
 
 Optics::~Optics()
 {
-}
-
-vector<GPIO> Optics::initMux() const
-{
-    vector<GPIO> muxGpioList;
-    muxGpioList.emplace_back(kMuxControlPin1, GPIO::kOutput);
-    muxGpioList.emplace_back(kMuxControlPin2, GPIO::kOutput);
-    muxGpioList.emplace_back(kMuxControlPin3, GPIO::kOutput);
-    muxGpioList.emplace_back(kMuxControlPin4, GPIO::kOutput);
-
-    return muxGpioList;
+    delete _collectDataTimer;
 }
 
 void Optics::process()
 {
 	//read lid state
-    _lidOpen.store(_lidSensePin.value());
-    _photoDiodeMux.setChannel(15);
+    bool oldLidState = _lidOpen.exchange(_lidSensePin.value());
 
+    if (oldLidState != _lidOpen.load() && collectData())
+    {
+        if (_lidOpen.load())
+        {
+            _collectDataTimer->stop();
+            _ledController->disableLEDs();
+        }
+        else
+            _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));
+    }
+
+    _photoDiodeMux.setChannel(15);
+}
+
+void Optics::setCollectData(bool state)
+{
+    if (state != _collectData.load())
+    {
+        if (state)
+        {
+            _ledNumber = 1;
+
+            if (!lidOpen())
+                _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));
+        }
+        else
+            _collectDataTimer->stop();
+
+        _collectData.store(state);
+    }
+}
+
+void Optics::collectDataCallback(Poco::Timer&)
+{
+    _ledController->activateLED(_ledNumber++);
+
+    if (_ledNumber >= 16)
+        _ledNumber = 1;
 }

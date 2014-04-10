@@ -36,4 +36,6 @@ const int kGrayscaleClockPwmDutyNs = 120;
 const int kLedBlankPwmPeriodNs = 983090;
 const int kLedBlankPwmDutyNs = 50;
 
+const long kCollectDataInterval = 500;
+
 #endif

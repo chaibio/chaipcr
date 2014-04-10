@@ -13,7 +13,7 @@ using namespace Poco::Util;
 
 // Class QPCRApplication
 void QPCRApplication::initialize(Application&) {
-    QPCRFactory::constructMachine(controlUnits);
+    controlUnits = QPCRFactory::constructMachine();
 }
 
 int QPCRApplication::main(const vector<string>&) {

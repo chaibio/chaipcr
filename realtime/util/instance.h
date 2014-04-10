@@ -13,9 +13,9 @@ public:
     }
 
     template <typename ...Args>
-    static std::shared_ptr<T> createInstance(Args... args)
+    static std::shared_ptr<T> createInstance(Args&&... args)
     {
-        std::shared_ptr<T> ptr(new T(args...));
+        std::shared_ptr<T> ptr(new T(std::forward<Args>(args)...));
 
         _instance = ptr;
 

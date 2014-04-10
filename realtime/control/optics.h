@@ -3,15 +3,16 @@
 
 #include <icontrol.h>
 
-class GPIO;
 class LEDController;
+
+namespace Poco { class Timer; }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Optics
 class Optics : public IControl
 {
 public:
-    Optics(SPIPort ledSPIPort);
+    Optics(GPIO &&lidSensePin, std::shared_ptr<LEDController> ledController, MUX &&photoDiodeMux);
     ~Optics();
 
     void process();
@@ -19,12 +20,21 @@ public:
 	//accessors
     inline bool lidOpen() const { return _lidOpen; }
 
+    inline bool collectData() const { return _collectData; }
+    inline void setCollectData(bool state);
+
     inline std::shared_ptr<LEDController> getLedController() { return _ledController; }
+
+private:
+    void collectDataCallback(Poco::Timer &timer);
 	
 private:
-    std::vector<GPIO> initMux() const;
-
     std::atomic<bool> _lidOpen;
+
+    std::atomic<bool> _collectData;
+    Poco::Timer *_collectDataTimer;
+    unsigned int _ledNumber;
+
     GPIO _lidSensePin;
     std::shared_ptr<LEDController> _ledController;
     MUX _photoDiodeMux;
