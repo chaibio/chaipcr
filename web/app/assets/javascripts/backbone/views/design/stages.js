@@ -7,6 +7,7 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 
 	events: {
 		"click .stage-header": "selectStage"
+		//"click #stage-name": "editStageName"
 	},
 
 	selectStage: function() {
@@ -41,16 +42,34 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	},
 
 	initialize: function() {
+		thisStage = this;
 		this.on("unselectStage", function() {
 			$(this.el).css("background-color", "white");
 			ChaiBioTech.Data.selectedStage = null;
 		});
 
 		_.bindAll(this, "addSteps");
+		//I had to bring next line from render method, because editable works in here...!
+		$(this.el).html(this.template(this.options["stageInfo"]["stage"]));
+		
+		$(this.el).find('#username').editable({
+           type:  'text',
+           title: 'Enter new Name',
+           name:  'username',
+           success:   function(respo, newval) {
+           		thisStage.editStageName(newval);
+           },  
+           
+        });
+	},
+
+	editStageName: function(newName) {
+		//bring grandparent which holds data of original model
+		console.log("new name", newName);
 	},
 
 	render:function() {
-		$(this.el).html(this.template(this.options["stageInfo"]["stage"]));
+
 		return this;
 	},
 
