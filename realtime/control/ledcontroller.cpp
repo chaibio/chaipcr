@@ -15,9 +15,10 @@ LEDController::LEDController(PWMPin &&grayscaleClock, std::shared_ptr<SPIPort> s
     _ledBlankPWM(move(ledBlankPWM)) {
 
     _dutyCyclePercentage.store(dutyCyclePercentage);
+
+    disableLEDs();
     _grayscaleClock.setPWM(kGrayscaleClockPwmDutyNs, kGrayscaleClockPwmPeriodNs, 0);
     _ledBlankPWM.setPWM(kLedBlankPwmDutyNs, kLedBlankPwmPeriodNs, 0);
-
     setIntensity(kMinLEDCurrent);
 
     _potCSPin.setValue(GPIO::kHigh);
@@ -53,8 +54,7 @@ void LEDController::setIntensity(double onCurrentMilliamps) {
 
 void LEDController::activateLED(unsigned int ledNumber) {
     unsigned int pwm = 4096 * _dutyCyclePercentage / 100;
-	uint16_t intensities[16];
-	memset(intensities, 0, sizeof(intensities));
+    uint16_t intensities[16] = {0};
 	intensities[15 - (ledNumber - 1)] = pwm;
 
 	uint8_t packedIntensities[24];
@@ -70,28 +70,18 @@ void LEDController::activateLED(unsigned int ledNumber) {
 		//cout << "index: " << packIndex << " " << (int)packedIntensities[packIndex] << " " << (int)packedIntensities[packIndex+1] << " " << (int)packedIntensities[packIndex+2] << endl;
 	}
 
-    _spiPort->setMode(3);
-    _spiPort->readBytes(NULL, (char*)packedIntensities, sizeof(packedIntensities), 1000000);
-    _ledXLATPin.setValue(GPIO::kHigh);
-    _ledXLATPin.setValue(GPIO::kLow);
-
-    cout << "LED SPI sent" << endl;
+    sendLEDGrayscaleValues(packedIntensities);
 }
 
 void LEDController::disableLEDs() {
-    //unsigned int pwm = 4096 * _dutyCyclePercentage / 100;
-    uint16_t intensities[16];
-    memset(intensities, 0, sizeof(intensities));
-    //intensities[15 - (ledNumber - 1)] = pwm;
-
-    uint8_t packedIntensities[24]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-
-    _spiPort->setMode(3);
-    _spiPort->readBytes(NULL, (char*)packedIntensities, sizeof(packedIntensities), 1000000);
-    _ledXLATPin.setValue(GPIO::kHigh);
-    _ledXLATPin.setValue(GPIO::kLow);
-
-    cout << "LED SPI disable sent" << endl;
+    uint8_t packedIntensities[24] = {0};
+    sendLEDGrayscaleValues(packedIntensities);
 }
 	
 // --- private member functions ------------------------------------------------
+void LEDController::sendLEDGrayscaleValues(const uint8_t (&values)[24]) {
+    _spiPort->setMode(3);
+    _spiPort->readBytes(NULL, (char*)values, sizeof(values), 1000000);
+    _ledXLATPin.setValue(GPIO::kHigh);
+    _ledXLATPin.setValue(GPIO::kLow);
+}

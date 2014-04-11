@@ -13,6 +13,9 @@ public:
     inline double intensity() const { return _intensity; }
     void activateLED(unsigned int ledNumber);
     void disableLEDs();
+
+private:
+    void sendLEDGrayscaleValues(const uint8_t (&values)[24]);
 	
 private:
     std::atomic<float> _dutyCyclePercentage;
