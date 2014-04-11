@@ -21,7 +21,7 @@ public:
     inline bool lidOpen() const { return _lidOpen; }
 
     inline bool collectData() const { return _collectData; }
-    inline void setCollectData(bool state);
+    void setCollectData(bool state);
 
     inline std::shared_ptr<LEDController> getLedController() { return _ledController; }
 

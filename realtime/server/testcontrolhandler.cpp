@@ -19,8 +19,8 @@ void TestControlHandler::createData(const ptree &requestPt, ptree &)
     double lidTargetTemp = requestPt.get<double>("lidTargetTemp", -1);
     int activateLED = requestPt.get<int>("activateLED", -1);
     int disableLEDs = requestPt.get<int>("disableLEDs", -1);
+    bool collectData = requestPt.get<bool>("collectData", false);
 
-    cout << "Here" << endl;
     if (ledIntensity != -1)
     {
         shared_ptr<Optics> instance = OpticsInstance::getInstance();
@@ -62,10 +62,12 @@ void TestControlHandler::createData(const ptree &requestPt, ptree &)
         if (instance)
             instance->getLedController()->activateLED(activateLED);
     }
+
+    shared_ptr<Optics> optics = OpticsInstance::getInstance();
     if (disableLEDs != -1)
     {
-        shared_ptr<Optics> instance = OpticsInstance::getInstance();
-        if (instance)
-            instance->getLedController()->disableLEDs();
+        if (optics)
+            optics->getLedController()->disableLEDs();
     }
+    optics->setCollectData(collectData);
 }

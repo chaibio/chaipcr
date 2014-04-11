@@ -30,7 +30,7 @@ Optics::~Optics()
 void Optics::process()
 {
 	//read lid state
-    bool oldLidState = _lidOpen.exchange(_lidSensePin.value());
+    bool oldLidState = _lidOpen.exchange(!_lidSensePin.value());
 
     if (oldLidState != _lidOpen.load() && collectData())
     {
@@ -40,7 +40,10 @@ void Optics::process()
             _ledController->disableLEDs();
         }
         else
+        {
+            _collectDataTimer->setPeriodicInterval(kCollectDataInterval);
             _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));
+        }
     }
 
     _photoDiodeMux.setChannel(15);
