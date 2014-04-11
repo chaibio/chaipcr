@@ -24,11 +24,11 @@ class Experiment < ActiveRecord::Base
   end
   
   def editable?
-    return run_at.nil?
+    return started_at.nil?
   end
 
   def ran?
-    return !run_at.nil?
+    return !started_at.nil?
   end
 
 end
