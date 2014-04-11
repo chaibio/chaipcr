@@ -19,7 +19,7 @@ Optics::Optics(GPIO &&lidSensePin, shared_ptr<LEDController> ledController, MUX 
 
     _collectData.store(false);
     _collectDataTimer = new Timer(0, kCollectDataInterval);
-    _ledNumber = 1;
+    _ledNumber = 0;
 }
 
 Optics::~Optics()
@@ -52,7 +52,7 @@ void Optics::setCollectData(bool state)
     {
         if (state)
         {
-            _ledNumber = 1;
+            _ledNumber = 0;
 
             if (!lidOpen())
                 _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));
@@ -66,8 +66,8 @@ void Optics::setCollectData(bool state)
 
 void Optics::collectDataCallback(Poco::Timer&)
 {
-    _ledController->activateLED(_ledNumber++);
+    _ledController->activateLED(kWellList.at(_ledNumber++));
 
-    if (_ledNumber >= 16)
-        _ledNumber = 1;
+    if (_ledNumber >= kWellList.size())
+        _ledNumber = 0;
 }

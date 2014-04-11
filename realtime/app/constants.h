@@ -41,6 +41,8 @@ const int kGrayscaleClockPwmDutyNs = 120;
 const int kLedBlankPwmPeriodNs = 983090;
 const int kLedBlankPwmDutyNs = 50;
 
+//Optics
 const long kCollectDataInterval = 500;
+const std::vector<int> kWellList = {5, 8, 7, 6, 11, 10, 9, 12, 4, 3, 2, 1, 16, 15, 14, 13};
 
 #endif
