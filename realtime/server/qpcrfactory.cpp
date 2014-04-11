@@ -6,6 +6,10 @@
 
 using namespace std;
 
+const struct SPIDTuning lowTempLidPIDTuning = {50,1.0,0.0,0.0};
+const struct SPIDTuning highTempLidPIDTuning = {100,1.0,0.0,0.0};
+const vector<SPIDTuning> lidPIDConstants = {lowTempLidPIDTuning,highTempLidPIDTuning};
+
 // Class QPCRFactory
 vector<shared_ptr<IControl> > QPCRFactory::constructMachine() {
     vector<shared_ptr<IControl>> controls;
@@ -33,7 +37,7 @@ vector<shared_ptr<IControl> > QPCRFactory::constructMachine() {
     auto heatBlock = HeatBlockInstance::createInstance(zone1, zone2);
     controls.push_back(static_pointer_cast<IControl>(heatBlock));
 
-    auto lid = LidInstance::createInstance();
+    auto lid = LidInstance::createInstance(lidPIDConstants);
     controls.push_back(static_pointer_cast<IControl>(lid));
 
 

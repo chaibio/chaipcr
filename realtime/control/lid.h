@@ -12,7 +12,7 @@ namespace Poco { class Timer; }
 class Lid : public IControl, public PWMControl, public TemperatureControl
 {
 public:
-    Lid();
+    Lid(std::vector<SPIDTuning> pidTunningList);
     ~Lid();
 
     void process();
@@ -24,6 +24,7 @@ private:
 
     CPIDController *_pidController;
     Poco::Timer *_pidTimer;
+    std::vector<SPIDTuning> _pidTuningList;
 };
 
 #endif // LID_H
