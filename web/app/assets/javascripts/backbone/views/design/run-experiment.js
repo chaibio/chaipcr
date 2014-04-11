@@ -28,6 +28,8 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		if(!_.isNull(ChaiBioTech.Data.selectedStage) && !_.isUndefined(ChaiBioTech.Data.selectedStage)) {
 			this.model.createStage("holding", ChaiBioTech.Data.selectedStage);
 			ChaiBioTech.Data.selectedStage = null;
+		} else if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data.selectedStep)){
+			this.model.createStage("holding", ChaiBioTech.Data.selectedStep.options.parentStage);
 		} else {
 			this.model.createStage("holding", ChaiBioTech.Data.lastStage);
 		}
@@ -39,6 +41,8 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		if(!_.isNull(ChaiBioTech.Data.selectedStage) && !_.isUndefined(ChaiBioTech.Data.selectedStage)) {
 			this.model.createStage("cycling", ChaiBioTech.Data.selectedStage);
 			ChaiBioTech.Data.selectedStage = null;
+		} else if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data.selectedStep)){
+			this.model.createStage("cycling", ChaiBioTech.Data.selectedStep.options.parentStage);
 		} else {
 			this.model.createStage("cycling", ChaiBioTech.Data.lastStage);
 		}
@@ -49,6 +53,8 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		if(!_.isNull(ChaiBioTech.Data.selectedStage) && !_.isUndefined(ChaiBioTech.Data.selectedStage)) {
 			this.model.createStage("meltcurve", ChaiBioTech.Data.selectedStage);
 			ChaiBioTech.Data.selectedStage = null;
+		} else if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data.selectedStep)){
+			this.model.createStage("meltcurve", ChaiBioTech.Data.selectedStep.options.parentStage);
 		} else {
 			this.model.createStage("meltcurve", ChaiBioTech.Data.lastStage);
 		}
