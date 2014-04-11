@@ -45,6 +45,8 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 			$(this.el).css("background-color", "white");
 			ChaiBioTech.Data.selectedStage = null;
 		});
+
+		_.bindAll(this, "addSteps");
 	},
 
 	render:function() {
@@ -52,15 +54,15 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 		return this;
 	},
 
-	addSteps: function(stageNumber) {
+	addSteps: function(thisStage, stageNumber) {
 
 		thisObject = this;
 		allSteps = this.options["stageInfo"]["stage"];
 		allSteps = allSteps["steps"];
 		previous_step = null;
 		previous_id = null;
+		steps = [];
 		_.each(allSteps, function(step, index) {
-
 			stepView = new ChaiBioTech.Views.Design.steps({
 				model: step["step"],
 				stepInfo: step,
@@ -80,7 +82,9 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 			currentWidth = $("#innertrack").width();
 			$("#innertrack").css("width", (currentWidth + 151) +"px");
 			$(thisObject.el).find(".step-holder").append(stepView.render().el);
-		})
+			steps.push(stepView);
+		});
+		this.steps = steps;
 	},
 
 	//This method could be used if we want to add steps manually , but it comes along with problem of keep tracking diffrence

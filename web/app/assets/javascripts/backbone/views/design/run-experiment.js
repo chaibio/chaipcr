@@ -29,7 +29,9 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 			this.model.createStage("holding", ChaiBioTech.Data.selectedStage);
 			ChaiBioTech.Data.selectedStage = null;
 		} else if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data.selectedStep)){
-			this.model.createStage("holding", ChaiBioTech.Data.selectedStep.options.parentStage);
+			ChaiBioTech.Data.selectedStage = ChaiBioTech.Data.selectedStep.options.parentStage;
+			this.model.createStage("holding", ChaiBioTech.Data.selectedStage);
+			ChaiBioTech.Data.selectedStage = null;
 		} else {
 			this.model.createStage("holding", ChaiBioTech.Data.lastStage);
 		}
@@ -42,7 +44,9 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 			this.model.createStage("cycling", ChaiBioTech.Data.selectedStage);
 			ChaiBioTech.Data.selectedStage = null;
 		} else if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data.selectedStep)){
+			ChaiBioTech.Data.selectedStage = ChaiBioTech.Data.selectedStep.options.parentStage;
 			this.model.createStage("cycling", ChaiBioTech.Data.selectedStep.options.parentStage);
+			ChaiBioTech.Data.selectedStep = null;
 		} else {
 			this.model.createStage("cycling", ChaiBioTech.Data.lastStage);
 		}
@@ -54,7 +58,9 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 			this.model.createStage("meltcurve", ChaiBioTech.Data.selectedStage);
 			ChaiBioTech.Data.selectedStage = null;
 		} else if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data.selectedStep)){
+			ChaiBioTech.Data.selectedStage = ChaiBioTech.Data.selectedStep.options.parentStage;
 			this.model.createStage("meltcurve", ChaiBioTech.Data.selectedStep.options.parentStage);
+			ChaiBioTech.Data.selectedStep = null;
 		} else {
 			this.model.createStage("meltcurve", ChaiBioTech.Data.lastStage);
 		}
@@ -64,8 +70,14 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		e.preventDefault();
 		if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data.selectedStep)) {
 			this.model.createStep(ChaiBioTech.Data.selectedStep, "after");
+			ChaiBioTech.Data.selectedStep = null;
+		} else if(!_.isNull(ChaiBioTech.Data.selectedStage) && !_.isUndefined(ChaiBioTech.Data.selectedStage)) {
+			lastDude = ChaiBioTech.Data.selectedStage.steps.length - 1;
+			ChaiBioTech.Data.selectedStep = ChaiBioTech.Data.selectedStage.steps[lastDude];
+			this.model.createStep(ChaiBioTech.Data.selectedStep, "after");
+			ChaiBioTech.Data.selectedStep = ChaiBioTech.Data.selectedStage = null;
 		} else {
-			alert("Plz select a step");
+			alert("Plz select a step or a stage");
 		}
 	},
 
@@ -73,6 +85,11 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		e.preventDefault();
 		if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data.selectedStep)) {
 			this.model.createStep(ChaiBioTech.Data.selectedStep, "before");
+			ChaiBioTech.Data.selectedStep = null;
+		} else if(!_.isNull(ChaiBioTech.Data.selectedStage) && !_.isUndefined(ChaiBioTech.Data.selectedStage)) {
+			ChaiBioTech.Data.selectedStep = ChaiBioTech.Data.selectedStage.steps[0];
+			this.model.createStep(ChaiBioTech.Data.selectedStep, "before");
+			ChaiBioTech.Data.selectedStep = ChaiBioTech.Data.selectedStage = null;
 		} else {
 			alert("Plz select a step");
 		}
@@ -118,7 +135,7 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 			previous_stage_id = stage["stage"]["id"];
 			ChaiBioTech.Data.lastStage = stageView;	
 			$("#innertrack").append(stageView.render().el);
-			stageView.addSteps(index);
+			stageView.addSteps(stageView, index);
 		});
 		
 	}
