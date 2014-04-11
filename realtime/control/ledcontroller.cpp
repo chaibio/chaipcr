@@ -79,7 +79,19 @@ void LEDController::activateLED(unsigned int ledNumber) {
 }
 
 void LEDController::disableLEDs() {
-	
+    //unsigned int pwm = 4096 * _dutyCyclePercentage / 100;
+    uint16_t intensities[16];
+    memset(intensities, 0, sizeof(intensities));
+    //intensities[15 - (ledNumber - 1)] = pwm;
+
+    uint8_t packedIntensities[24]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+    _spiPort->setMode(3);
+    _spiPort->readBytes(NULL, (char*)packedIntensities, sizeof(packedIntensities), 1000000);
+    _ledXLATPin.setValue(GPIO::kHigh);
+    _ledXLATPin.setValue(GPIO::kLow);
+
+    cout << "LED SPI disable sent" << endl;
 }
 	
 // --- private member functions ------------------------------------------------

@@ -7,6 +7,11 @@ const double kQTICurveZThermistorBCoefficient = 0.000237982973213;
 const double kQTICurveZThermistorCCoefficient = -0.000000372283234;
 const double kQTICurveZThermistorDCoefficient = 0.000000099063233;
 
+//lid thermistor constants
+const double kLidThermistorBetaCoefficient = 3970;  //kelvins
+const double kLidThermistorT0Resistance = 10000;    //ohms
+const double kLidThermistorT0 = 298.15;             //kelvins
+
 //thermistor & ADC params
 const unsigned int kThermistorVoltageDividerResistanceOhms = 14000;
 const int kLTC2444ADCBits = 24;

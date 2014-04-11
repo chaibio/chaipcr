@@ -16,6 +16,7 @@ public:
     ~Lid();
 
     void process();
+    std::shared_ptr<Thermistor> thermistor() const {return _thermistor;}
 
 private:
     void initPID();

@@ -39,12 +39,15 @@ private:
 class BetaThermistor: public Thermistor {
 public:
     BetaThermistor(unsigned int voltageDividerResistance, unsigned int adcBits,
-        double beta);
+        double beta, double r0, double t0);
 
     double temperatureForResistance(double resistanceOhms) override;
 
 private:
     const double _beta; //beta coefficients
+    const double _r0;   //resistance at _t0
+    const double _t0;   //in kelvins - usually 298.15K
+    double _rInfinity;  //calculated from _r0 and _beta
 };
 
 class TemperatureControl {

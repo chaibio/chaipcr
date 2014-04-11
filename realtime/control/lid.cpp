@@ -10,12 +10,12 @@ using namespace Poco;
 Lid::Lid()
     :PWMControl(kLidControlPWMPath, kLidPWMPeriodNs),
      TemperatureControl(std::make_shared<BetaThermistor>(kThermistorVoltageDividerResistanceOhms,
-                                                                  kLTC2444ADCBits, 0))
+                                                                  kLTC2444ADCBits, kLidThermistorBetaCoefficient, kLidThermistorT0Resistance, kLidThermistorT0))
 {
     _pidController = 0;
 
     setTargetTemperature(30);
-    initPID();
+    //initPID();
 }
 
 Lid::~Lid()
@@ -41,5 +41,5 @@ void Lid::pidCallback(Timer &)
 
 void Lid::process()
 {
-    processPWM();
+    //processPWM();
 }

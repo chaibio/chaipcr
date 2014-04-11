@@ -9,10 +9,15 @@
 void StatusHandler::createData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt) {
     std::shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();
     std::shared_ptr<Optics> optics = OpticsInstance::getInstance();
+    std::shared_ptr<Lid> lid = LidInstance::getInstance();
 
     if (heatBlock) {
         responsePt.put("heatblock.zone1.temperature", heatBlock->zone1Temperature());
         responsePt.put("heatblock.zone2.temperature", heatBlock->zone2Temperature());
+    }
+
+    if(lid) {
+        responsePt.put("lid.temperature", lid->currentTemperature());
     }
 
     if (optics) {

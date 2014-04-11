@@ -10,19 +10,20 @@ using namespace std;
 vector<shared_ptr<IControl> > QPCRFactory::constructMachine() {
     vector<shared_ptr<IControl>> controls;
 
-    shared_ptr<SPIPort> spiPort0(new SPIPort(kSPI0DevicePath));
+    //shared_ptr<SPIPort> spiPort0(new SPIPort(kSPI0DevicePath));
     shared_ptr<SPIPort> spiPort1(new SPIPort(kSPI1DevicePath));
 
     controls.push_back(QPCRFactory::constructOptics(spiPort1));
 
-    /*//construct SPI devices
+    //construct SPI devices
     SPIPort spiPort0 = SPIPort(kSPI0DevicePath);
-    SPIPort spiPort1 = SPIPort(kSPI1DevicePath);
+    //SPIPort spiPort1 = SPIPort(kSPI1DevicePath);
+
 
     //construct optics
     //TODO: not yet refactored
 	//test
-    controls.push_back(static_pointer_cast<IControl>(OpticsInstance::createInstance(spiPort1)));
+    //controls.push_back(static_pointer_cast<IControl>(OpticsInstance::createInstance(spiPort1)));
 
     //construct heat block
     //zone controllers
@@ -32,11 +33,15 @@ vector<shared_ptr<IControl> > QPCRFactory::constructMachine() {
     auto heatBlock = HeatBlockInstance::createInstance(zone1, zone2);
     controls.push_back(static_pointer_cast<IControl>(heatBlock));
 
+    auto lid = LidInstance::createInstance();
+    controls.push_back(static_pointer_cast<IControl>(lid));
+
+
     //ADC Controller
-    vector<shared_ptr<ADCConsumer>> consumers = {nullptr, heatBlock->zone1Thermistor(), heatBlock->zone2Thermistor(), nullptr};
+    vector<shared_ptr<ADCConsumer>> consumers = {nullptr, heatBlock->zone1Thermistor(), heatBlock->zone2Thermistor(), lid->thermistor()};
     controls.push_back(static_pointer_cast<IControl>(ADCControllerInstance::createInstance(consumers,
                                                                     kLTC2444CSPinNumber, std::move(spiPort0), kSPI0DataInSensePinNumber
-                                                                    )));*/
+                                                                    )));
 
     return controls;
 }

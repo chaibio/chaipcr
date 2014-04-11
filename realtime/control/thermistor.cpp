@@ -43,12 +43,18 @@ double SteinhartHartThermistor::temperatureForResistance(double resistanceOhms) 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class BetaThermistor
-BetaThermistor::BetaThermistor(unsigned int voltageDividerResistance, unsigned int adcBits, double beta):
+BetaThermistor::BetaThermistor(unsigned int voltageDividerResistance, unsigned int adcBits, double beta,
+        double r0, double t0):
     Thermistor(voltageDividerResistance, adcBits),
-    _beta {beta} {
+    _beta {beta},
+    _r0 {r0},
+    _t0 {t0} {
+
+    _rInfinity=_r0*exp(-_beta/_t0); //calculate _rInfnity
+
 }
 
 double BetaThermistor::temperatureForResistance(double resistanceOhms) {
-    //steven todo
-    return 0;
+
+    return _beta/(log(resistanceOhms/_rInfinity))-273.15;
 }
