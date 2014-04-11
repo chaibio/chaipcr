@@ -16,7 +16,7 @@ class RampsController < ApplicationController
   param_group :ramp
   example "{'ramp':{'id':1,'rate':'100.0','max':true}}"
   def update
-    @ramp = Ramp.find(params[:id])
+    @ramp = Ramp.find_by_id(params[:id])
     ret  = @ramp.update_attributes(ramp_params)
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}

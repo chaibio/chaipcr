@@ -14,7 +14,7 @@ class ExperimentsController < ApplicationController
   end
   
   api :GET, "/experiments", "List all the experiments"
-  example "[{'experiment':{'id':1,'name':'test1','qpcr':true,'run_at':null}},{'experiment':{'id':2,'name':'test2','qpcr':true,'run_at':null}}]"
+  example "[{'experiment':{'id':1,'name':'test1','qpcr':true,'started_at':null,'completed_at':null,'completed_status':null}},{'experiment':{'id':2,'name':'test2','qpcr':true,'started_at':null,'completed_at':null,'completed_status':null}}]"
   def index
     @experiments = Experiment.all
     respond_to do |format|
@@ -25,7 +25,7 @@ class ExperimentsController < ApplicationController
   api :POST, "/experiments", "Create an experiment"
   param_group :experiment
   description "when experiment is created, default protocol will be created"
-  example "{'experiment':{'id':1,'name':'test','qpcr':true,'run_at':null,'protocol':{'id':1,'lid_temperature':'110.0','stages':[{'stage':{'id':1,'stage_type':'holding','name':'Holding Stage','num_cycles':1,'steps':[{'step':{'id':1,'name':'Step 1','temperature':'95.0','hold_time':180,'ramp':{'id':1,'rate':'100.0','max':true}}}]}},{'stage':{'id':2,'stage_type':'cycling','name':'Cycling Stage','num_cycles':40,'steps':[{'step':{'id':2,'name':'Step 2','temperature':'95.0','hold_time':30,'ramp':{'id':2,'rate':'100.0','max':true}}},{'step':{'id':3,'name':'Step 2','temperature':'60.0','hold_time':30,'ramp':{'id':3,'rate':'100.0','max':true}}}]}},{'stage':{'id':3,'stage_type':'holding','name':'Holding Stage','num_cycles':1,'steps':[{'step':{'id':4,'name':'Step 1','temperature':'4.0','hold_time':0,'ramp':{'id':4,'rate':'100.0','max':true}}}]}}]}}}"
+  example "{'experiment':{'id':1,'name':'test','qpcr':true,'started_at':null,'completed_at':null,'completed_status':null,'protocol':{'id':1,'lid_temperature':'110.0','stages':[{'stage':{'id':1,'stage_type':'holding','name':'Holding Stage','num_cycles':1,'steps':[{'step':{'id':1,'name':'Step 1','temperature':'95.0','hold_time':180,'ramp':{'id':1,'rate':'100.0','max':true}}}]}},{'stage':{'id':2,'stage_type':'cycling','name':'Cycling Stage','num_cycles':40,'steps':[{'step':{'id':2,'name':'Step 2','temperature':'95.0','hold_time':30,'ramp':{'id':2,'rate':'100.0','max':true}}},{'step':{'id':3,'name':'Step 2','temperature':'60.0','hold_time':30,'ramp':{'id':3,'rate':'100.0','max':true}}}]}},{'stage':{'id':3,'stage_type':'holding','name':'Holding Stage','num_cycles':1,'steps':[{'step':{'id':4,'name':'Step 1','temperature':'4.0','hold_time':0,'ramp':{'id':4,'rate':'100.0','max':true}}}]}}]}}}"
   def create
     @experiment = Experiment.new(experiment_params)
     ret = @experiment.save
@@ -34,11 +34,11 @@ class ExperimentsController < ApplicationController
     end
   end
   
-  api :PUT, "/experiment/:id", "Update an experiment"
+  api :PUT, "/experiments/:id", "Update an experiment"
   param_group :experiment
-  example "{'experiment':{'id':1,'name':'test','qpcr':true,'run_at':null}}"
+  example "{'experiment':{'id':1,'name':'test','qpcr':true,'started_at':null,'completed_at':null,'completed_status':null}}"
   def update
-    @experiment = Experiment.find(params[:id])
+    @experiment = Experiment.find_by_id(params[:id])
     ret = @experiment.update_attributes(experiment_params)
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok :  :unprocessable_entity}
@@ -48,7 +48,7 @@ class ExperimentsController < ApplicationController
   api :POST, "/experiment/:id/copy", "Copy an experiment"
   see "experiments#create", "json response"
   def copy
-    old_experiment = Experiment.find(params[:id])
+    old_experiment = Experiment.find_by_id(params[:id])
     @experiment = old_experiment.copy(params[:experiment])
     ret = @experiment.save
     respond_to do |format|
@@ -59,7 +59,7 @@ class ExperimentsController < ApplicationController
   api :GET, "/experiment/:id", "Show an experiment"
   see "experiments#create", "json response"
   def show
-    @experiment = Experiment.find(params[:id]) 
+    @experiment = Experiment.find_by_id(params[:id]) 
     respond_to do |format|
       format.json { render "fullshow", :status => (@experiment)? :ok :  :unprocessable_entity}
     end
@@ -71,7 +71,7 @@ class ExperimentsController < ApplicationController
   
   api :POST, "/experiment/:id/start", "Start an experiment"
   def start
-    @experiment = Experiment.find(params[:id])
+    @experiment = Experiment.find_by_id(params[:id])
     respond_to do |format|
       format.json { render "status", :status => (@experiment)? :ok :  :unprocessable_entity}
     end
@@ -83,7 +83,7 @@ class ExperimentsController < ApplicationController
   
   api :DELETE, "/experiment/:id", "Destroy an experiment"
   def destroy
-    @experiment = Experiment.find(params[:id])
+    @experiment = Experiment.find_by_id(params[:id])
     ret = @experiment.destroy
     respond_to do |format|
       format.json { render "destroy", :status => (ret)? :ok :  :unprocessable_entity}

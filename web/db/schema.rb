@@ -11,12 +11,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131204195402) do
+ActiveRecord::Schema.define(version: 20140410222809) do
 
   create_table "experiments", force: true do |t|
     t.string   "name"
-    t.boolean  "qpcr",       default: true
-    t.datetime "run_at"
+    t.boolean  "qpcr",              default: true
+    t.datetime "started_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "completed_at"
+    t.string   "completion_status"
+  end
+
+  create_table "posts", force: true do |t|
+    t.string   "title"
+    t.string   "content"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

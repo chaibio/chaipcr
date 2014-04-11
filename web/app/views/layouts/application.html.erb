@@ -23,16 +23,12 @@
 </div>
 <% end %>
 
-<div id="container">
-	<div id="msgholder">
-	<% [:info, :notice, :error].each do |msgtype|  %>
-	<%= display_flashmsg(msgtype, flash[msgtype]) if !flash[msgtype].blank? -%>
-	<% end %>
-	</div>
+<div id="container" class="container-fluid">
 	
-	<div class="clearfix">		
+	
+		
 		<%= yield %>
-	</div>
+	
 </div>
 
 </body>

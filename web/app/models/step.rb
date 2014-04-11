@@ -10,7 +10,7 @@ class Step < ActiveRecord::Base
   before_create do |step|
     if step.temperature.nil? || step.hold_time.nil?
       if !prev_id.nil?
-        reference_step = Step.find(prev_id)
+        reference_step = Step.find_by_id(prev_id)
       end
       if reference_step.nil?
         reference_step = siblings.first
@@ -26,7 +26,7 @@ class Step < ActiveRecord::Base
     if step.stage_id_changed? && !step.stage_id_was.nil?
       children_count = Step.where("stage_id=?", step.stage_id_was).count
       if children_count == 0
-        Stage.find(step.stage_id_was).destroy
+        Stage.find_by_id(step.stage_id_was).destroy
       end
     end
   end

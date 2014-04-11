@@ -19,7 +19,7 @@ class Stage < ActiveRecord::Base
     if steps.count == 0
       if hold_stage?
         if !prev_id.nil?
-          reference_stage = Stage.find(prev_id)
+          reference_stage = Stage.find_by_id(prev_id)
         end
         if reference_stage.nil?
           reference_stage = siblings.first
@@ -40,7 +40,7 @@ class Stage < ActiveRecord::Base
   end
   
   before_destroy do |stage|
-    if stage.protocol.stages.count <= 1
+    if Stage.exists?(stage.id) && stage.protocol.stages.count <= 1
       errors.add(:base, "At least one stage is required")
       return false
     end
