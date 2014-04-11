@@ -91,7 +91,7 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 			this.model.createStep(ChaiBioTech.Data.selectedStep, "before");
 			ChaiBioTech.Data.selectedStep = ChaiBioTech.Data.selectedStage = null;
 		} else {
-			alert("Plz select a step");
+			alert("Plz select a step or stage");
 		}
 	},
 
