@@ -12,7 +12,7 @@ namespace Poco { class Timer; }
 class Optics : public IControl
 {
 public:
-    Optics(GPIO &&lidSensePin, std::shared_ptr<LEDController> ledController, MUX &&photoDiodeMux);
+    Optics(unsigned int lidSensePin, std::shared_ptr<LEDController> ledController, MUX &&photoDiodeMux);
     ~Optics();
 
     void process();

@@ -7,12 +7,13 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class LEDController
-LEDController::LEDController(PWMPin &&grayscaleClock, std::shared_ptr<SPIPort> spiPort, GPIO &&potCSPin, GPIO &&ledXLATPin, PWMPin &&ledBlankPWM, float dutyCyclePercentage):
-    _grayscaleClock(move(grayscaleClock)),
+LEDController::LEDController(const string &grayscaleClockPWMPath, shared_ptr<SPIPort> spiPort,unsigned int potCSPin,
+                             unsigned int ledXLATPin, const string &ledBlankPWMPath, float dutyCyclePercentage):
+    _grayscaleClock(grayscaleClockPWMPath),
     _spiPort(spiPort),
-    _potCSPin(move(potCSPin)),
-    _ledXLATPin(move(ledXLATPin)),
-    _ledBlankPWM(move(ledBlankPWM)) {
+    _potCSPin(potCSPin, GPIO::kOutput),
+    _ledXLATPin(ledXLATPin, GPIO::kOutput),
+    _ledBlankPWM(ledBlankPWMPath) {
 
     _dutyCyclePercentage.store(dutyCyclePercentage);
 

@@ -3,6 +3,7 @@
 
 class IControl;
 class SPIPort;
+class ADCConsumer;
 
 // Class QPCRFactory
 class QPCRFactory {
@@ -11,6 +12,7 @@ public:
 
 private:
     static std::shared_ptr<IControl> constructOptics(std::shared_ptr<SPIPort> ledSPIPort);
+    static std::shared_ptr<IControl> constructHeatBlock(std::vector<std::shared_ptr<ADCConsumer>> &consumers);
 };
 
 

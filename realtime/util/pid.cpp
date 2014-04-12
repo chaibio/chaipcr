@@ -1,4 +1,5 @@
 #include "pcrincludes.h"
+#include "pocoincludes.h"
 
 #include "pid.h"
 
@@ -64,4 +65,42 @@ void CPIDController::latchValue(double* pValue, double minValue, double maxValue
         *pValue = minValue;
     else if (*pValue > maxValue)
         *pValue = maxValue;
+}
+
+/*--------------------------------------------PIDControl--------------------------------------------*/
+PIDControl::PIDControl(CPIDController *pidController, long pidTimerInterval) {
+    _pidController = pidController;
+    _pidResult.store(0);
+    _pidTimerInterval = pidTimerInterval;
+    _pidTimer = new Poco::Timer;
+}
+
+PIDControl::~PIDControl() {
+    delete _pidTimer;
+    delete _pidController;
+}
+
+void PIDControl::startPid() {
+    if (!_targetValue)
+        throw std::logic_error("targetValue is empty");
+    else if (!_currentValue)
+        throw std::logic_error("currentValue is empty");
+
+    _pidTimer->setPeriodicInterval(_pidTimerInterval);
+    _pidTimer->start(Poco::TimerCallback<PIDControl>(*this, &PIDControl::pidCallback));
+}
+
+void PIDControl::stopPid() {
+    _pidTimer->stop();
+}
+
+void PIDControl::pidCallback(Poco::Timer &) {
+    double result = _pidController->compute(_targetValue(), _currentValue());
+
+    if (result != _pidResult.load())
+    {
+        _pidResult.store(result);
+
+        pidCallback(result);
+    }
 }

@@ -10,8 +10,8 @@ using namespace Poco;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Optics
-Optics::Optics(GPIO &&lidSensePin, shared_ptr<LEDController> ledController, MUX &&photoDiodeMux)
-    :_lidSensePin(move(lidSensePin)),
+Optics::Optics(unsigned int lidSensePin, shared_ptr<LEDController> ledController, MUX &&photoDiodeMux)
+    :_lidSensePin(lidSensePin, GPIO::kInput),
      _ledController(ledController),
      _photoDiodeMux(move(photoDiodeMux))
 {

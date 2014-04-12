@@ -102,7 +102,8 @@ HEADERS += \
     server/statushandler.h \
     control/adcconsumer.h \
     control/adcconsumer.h \
-    server/qpcrfactory.h
+    server/qpcrfactory.h \
+    control/temperaturecontroller.h
 
 SOURCES += \
     app/pins.cpp \

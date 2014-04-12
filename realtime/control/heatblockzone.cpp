@@ -71,4 +71,3 @@ void HeatBlockZoneController::process()
         coolIO.setValue(GPIO::kHigh, true);
     }
 }
-
