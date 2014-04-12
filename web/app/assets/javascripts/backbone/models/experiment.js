@@ -156,6 +156,27 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 			alert("Failed to update");
 			console.log("Failed to update");
 		}); 
+	},
+
+	changeStageName: function(stageName, id, stageType) {
+		dataToBeSend = {'stage':
+							{
+								'stage_type': stageType,
+								'name': stageName
+							}
+						}
+		$.ajax({
+				url: "/stages/"+id,
+				contentType: 'application/json',
+				type: 'PUT',
+				data: JSON.stringify(dataToBeSend)
+			})
+			.done(function(data) {
+					console.log("Boom", data, that);
+			})
+			.fail(function() {
+				console.log("Failed to update");
+			})
 	}
 });
 

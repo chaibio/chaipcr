@@ -65,7 +65,8 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 
 	editStageName: function(newName) {
 		//bring grandparent which holds data of original model
-		console.log("new name", newName);
+		this.options.grandParent.changeStageName(newName, this.model.id, this.model["stage_type"]); // Points to the model
+		//console.log("new name", newName, this.options.grandParent);
 	},
 
 	render:function() {
