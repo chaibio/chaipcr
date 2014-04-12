@@ -18,7 +18,7 @@ Optics::Optics(GPIO &&lidSensePin, shared_ptr<LEDController> ledController, MUX 
     _lidOpen.store(false);
 
     _collectData.store(false);
-    _collectDataTimer = new Timer(0, kCollectDataInterval);
+    _collectDataTimer = new Timer;
     _ledNumber = 0;
 }
 
@@ -58,7 +58,10 @@ void Optics::setCollectData(bool state)
             _ledNumber = 0;
 
             if (!lidOpen())
+            {
+                _collectDataTimer->setPeriodicInterval(kCollectDataInterval);
                 _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));
+            }
         }
         else
             _collectDataTimer->stop();
