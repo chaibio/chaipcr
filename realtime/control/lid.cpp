@@ -27,7 +27,7 @@ Lid::~Lid()
 
 void Lid::initPID()
 {
-    _pidController = new CPIDController(_pidTuningList, 0, 0);
+    _pidController = new CPIDController(_pidTuningList, 0, kLidPWMPeriodNs);
 
     _pidTimer = new Timer(0, kPIDInterval);
     _pidTimer->start(TimerCallback<Lid>(*this, &Lid::pidCallback));

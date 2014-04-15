@@ -23,7 +23,7 @@ const int kHttpServerPort = 8000;
 const unsigned long kFanPWMPeriodNs = 1024;
 
 //Lid PWM params
-const unsigned long kLidPWMPeriodNs = kFanPWMPeriodNs;
+const unsigned long kLidPWMPeriodNs = 500000;
 
 //Heat Block params
 const unsigned long kHeatBlockZone1PWMPeriod = kFanPWMPeriodNs;
