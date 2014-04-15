@@ -4,10 +4,30 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	
 	template: JST["backbone/templates/design/stage"],
 	className: 'stage-run',
-
+	editableAdded: false , 
 	events: {
-		"click .stage-header": "selectStage"
+		"click .stage-header": "selectStage",
 		//"click #stage-name": "editStageName"
+		"click .stageName" : "changeStageName"
+	},
+
+	changeStageName: function(evt) {
+		evt.preventDefault();
+		if(! this.editableAdded) {
+			thisPointer = this;
+			$(this.el).find('.stageName').editable({
+	           type:  'text',
+	           title: 'Enter new Name',
+	           name:  'username',
+	           success:   function(respo, newval) {
+	           		console.log(thisPointer);
+	           		thisPointer.editStageName(newval);
+	           }  
+	           
+	        });
+			this.editableAdded = true;
+			$(this.el).find('.stageName').click(); //fires a click so that editable works as normal for a single click ..! 
+		}
 	},
 
 	selectStage: function() {
@@ -38,39 +58,25 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 			$(this.el).css("background-color","orange");
 			ChaiBioTech.Data.selectedStage = this;
 		}
-		console.log(this);
+        console.log(this);
 	},
 
 	initialize: function() {
-		thisStage = this;
+		
 		this.on("unselectStage", function() {
 			$(this.el).css("background-color", "white");
 			ChaiBioTech.Data.selectedStage = null;
 		});
 
-		_.bindAll(this, "addSteps");
-		//I had to bring next line from render method, because editable works in here...!
-		$(this.el).html(this.template(this.options["stageInfo"]["stage"]));
-		
-		$(this.el).find('#username').editable({
-           type:  'text',
-           title: 'Enter new Name',
-           name:  'username',
-           success:   function(respo, newval) {
-           		thisStage.editStageName(newval);
-           },  
-           
-        });
+		_.bindAll(this, "addSteps", "render", "editStageName");
 	},
 
 	editStageName: function(newName) {
-		//bring grandparent which holds data of original model
 		this.options.grandParent.changeStageName(newName, this.model.id, this.model["stage_type"]); // Points to the model
-		//console.log("new name", newName, this.options.grandParent);
 	},
 
 	render:function() {
-
+		$(this.el).html(this.template(this.options["stageInfo"]["stage"]));	
 		return this;
 	},
 
