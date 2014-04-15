@@ -18,12 +18,10 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 			$(this.el).find('.stageName').editable({
 	           type:  'text',
 	           title: 'Enter new Name',
-	           name:  'username',
+	           name:  'stagename',
 	           success:   function(respo, newval) {
-	           		console.log(thisPointer);
 	           		thisPointer.editStageName(newval);
-	           }  
-	           
+	           }        
 	        });
 			this.editableAdded = true;
 			$(this.el).find('.stageName').click(); //fires a click so that editable works as normal for a single click ..! 
