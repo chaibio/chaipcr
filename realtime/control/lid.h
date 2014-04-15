@@ -3,32 +3,28 @@
 
 #include "icontrol.h"
 #include "pwm.h"
+#include "thermistor.h"
 
-class Thermistor;
 class CPIDController;
 
 namespace Poco { class Timer; }
 
-class Lid : public IControl, public PWMControl
+class Lid : public IControl, public PWMControl, public TemperatureControl
 {
 public:
-    Lid();
+    Lid(std::vector<SPIDTuning> pidTunningList);
     ~Lid();
 
     void process();
-
-    inline double targetTemperature() const { return _targetTemperature; }
-    inline void setTargetTemperature(double temperature) { _targetTemperature = temperature; }
+    std::shared_ptr<Thermistor> thermistor() const {return _thermistor;}
 
 private:
     void initPID();
     void pidCallback(Poco::Timer &timer);
 
-    Thermistor *_thermistor;
-    std::atomic<double> _targetTemperature;
-
-    std::atomic<CPIDController*> _pidController;
+    CPIDController *_pidController;
     Poco::Timer *_pidTimer;
+    std::vector<SPIDTuning> _pidTuningList;
 };
 
 #endif // LID_H

@@ -2,12 +2,13 @@
 #define CONTROLINCLUDES_H
 
 #include "icontrol.h"
+#include "temperaturecontroller.h"
 
 #include "fan.h"
 #include "thermistor.h"
 #include "ledcontroller.h"
 #include "ltc2444.h"
-#include "heatblockzone.h"
+//#include "heatblockzone.h"
 
 #include "maincontrollers.h"
 

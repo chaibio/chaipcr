@@ -16,7 +16,12 @@ public:
 	};
 	
     GPIO(unsigned int pinNumber, Direction direction);
+    GPIO(const GPIO &other) = delete;
+    GPIO(GPIO &&other);
 	~GPIO();
+
+    GPIO& operator= (const GPIO &other) = delete;
+    GPIO& operator= (GPIO &&other);
 	
     Value value() const;
     void setValue(Value value, bool checkValue = false);
@@ -31,6 +36,8 @@ private:
 private:
 	unsigned int pinNumber_; //BeagleBone GPIO Pin Number
 	Direction direction_;
+
+    mutable Value savedValue;
 };
 
 #endif

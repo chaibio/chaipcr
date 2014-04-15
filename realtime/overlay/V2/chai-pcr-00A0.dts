@@ -1,4 +1,3 @@
-
 /dts-v1/;
 /plugin/;
 
@@ -24,7 +23,7 @@
 		"P9.28",		/* pwm: eCAP2_PWM2 LED PWM - Ouput */
 		"P8.18",		/* gpio: LED_DIGIPOT_CS - Ouput */
 		"P8.12",		/* gpio: LED XLAT/LED_CONTROL_CS - Ouput */
-		"P9.40",		/* pwm: eCAP0_PWM0 BLANK - Ouput */
+		"P9.42",		/* pwm: eCAP0_PWM0 BLANK - Ouput */
 		"P8.14",		/* gpio: VPRG - Ouput */
 		"P8.08",		/* gpio: XERR - Input */
 		"P9.29",		/* SPI1: SPI1_SD0 (SOUT from LED BOARD) - Input */
@@ -86,9 +85,9 @@
 				>;
 			};
 
-			blank_pwm_pin: pinmux_fan_pwm_pin {
+			blank_pwm_pin: pinmux_blank_pwm__pin {
 				pinctrl-single,pins = <
-					0x0164 0x04  /* P9.42.1 eCAP0_PWM0, MODE0 */
+					0x0164 0x00  /* P9.42.1 eCAP0_PWM0, MODE0 */
 				>;
 			};
 			
@@ -104,17 +103,16 @@
 			qpcr_gpio_pins: pinmux_qpcr_gpio_pins {
 				pinctrl-single,pins = <
 					/* Peltier GPIO*/
-					0x09c 0x17  /* P8.09 PELTIER 1_INA gpio2_5, OUTPUT_PULLUP | MODE7 */
-					0x034 0x17  /* P8.11 PELTIER 1_INB gpio1_13, OUTPUT_PULLUP | MODE7 */
-					0x03c 0x17  /* P8.15 PELTIER 2_INA gpio1_15, OUTPUT_PULLUP | MODE7 */
-					0x02c 0x17  /* P8.17 PELTIER 2_INB gpio0_27, OUTPUT_PULLUP | MODE7 */
+					0x09c 0x0F  /* P8.09 PELTIER 1_INA gpio2_5, OUTPUT_PULLUP | MODE7 */
+					0x034 0x0F  /* P8.11 PELTIER 1_INB gpio1_13, OUTPUT_PULLUP | MODE7 */
+					0x03c 0x0F  /* P8.15 PELTIER 2_INA gpio1_15, OUTPUT_PULLUP | MODE7 */
+					0x02c 0x0F  /* P8.17 PELTIER 2_INB gpio0_27, OUTPUT_PULLUP | MODE7 */
 					
 					/* LED board GPIO */
 					0x08c 0x17  /* P8.18 LED_DIGIPOT_CS gpio2_1, OUTPUT_PULLUP | MODE7 */
 					0x030 0x17  /* P8.12 LED XLAT/LED_CONTROL_CS gpio1_12, OUTPUT_PULLUP | MODE7 */
-					0x028 0x17  /* P8.14 VPRG gpio0_26, OUTPUT_PULLUP | MODE7 */
+					0x028 0x0F  /* P8.14 VPRG gpio0_26, OUTPUT_PULLDOWN | MODE7 */
 					0x094 0x37  /* P8.08 XERR gpio2_3, INPUT_PULLUP | MODE7 */
-					0x164 0x37  /* P9.42.2 Shared pin with eCAP0_PWM0 FAN PWM GPIO0_7, INPUT_PULLUP | MODE7 */
 
 					/* MCU */
 					0x098 0x17  /* P8.10 LED_DIGIPOT_CS gpio2_1, OUTPUT_PULLUP | MODE7 */
@@ -125,10 +123,10 @@
 					0x1a8 0x37  /* P9.41.2 Pin shared with SPI_BUSY or LTC2444 busy gpio0_20, INPUT_PULLUP | MODE7 */
 
 					/* LIA MUX GPIO*/
-					0x070 0x17  /* P9.11 MUX_CONTROL_PIN0 gpio0_30, OUTPUT_PULLUP | MODE7 */
-					0x074 0x17  /* P9.13 MUX_CONTROL_PIN1 gpio0_31, OUTPUT_PULLUP | MODE7 */
-					0x048 0x17  /* P9.15 MUX_CONTROL_PIN2 gpio1_16, OUTPUT_PULLUP | MODE7 */
-					0x15C 0x17  /* P9.17 MUX_CONTROL_PIN3 gpio0_5, OUTPUT_PULLUP | MODE7 */
+                                        0x070 0x07  /* P9.11 MUX_CONTROL_PIN0 gpio0_30, OUTPUT_PULLUP | MODE7 */
+                                        0x074 0x07  /* P9.13 MUX_CONTROL_PIN1 gpio0_31, OUTPUT_PULLUP | MODE7 */
+                                        0x040 0x07  /* P9.15 MUX_CONTROL_PIN2 gpio1_16, OUTPUT_PULLUP | MODE7 */
+                                        0x15C 0x07  /* P9.17 MUX_CONTROL_PIN3 gpio0_5, OUTPUT_PULLUP | MODE7 */
 
 					
 				>;
@@ -254,7 +252,7 @@
 			    pwms 	    = <&ecap0 0 500000 1>;
 			    pwm-names       = "PWM_P9_42";
 			    pinctrl-names   = "default";
-			    pinctrl-0       = <&fan_pwm_pin>;
+			    pinctrl-0       = <&blank_pwm_pin>;
 			    enabled         = <1>;
 			    duty            = <0>;
 			    status          = "okay";

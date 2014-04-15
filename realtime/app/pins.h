@@ -9,8 +9,8 @@ extern const std::string kSPI1DevicePath;
 static const int kLTC2444CSPinNumber = 60;
 static const int kSPI0DataInSensePinNumber = 20;
 
-//GPIO pins
-static const int kLEDControlCSPinNumber = 44;
+//LED GPIO pins
+static const int kLEDControlXLATPinNumber = 44;
 static const int kLEDDigiPotCSPinNumber = 65;
 
 static const int kLidSensePinNumber = 61;
@@ -21,6 +21,7 @@ static const int kHeatSinkFanTachADCPinNumber = 0;
 
 //LED control
 extern const std::string kLEDGrayscaleClockPWMPath;
+extern const std::string kLEDBlankPWMPath;
 
 //Lid
 extern const std::string kLidControlPWMPath;
@@ -34,5 +35,11 @@ static const unsigned int kHeadBlockZone1CoolPin = 45;
 
 static const unsigned int kHeadBlockZone2HeatPin = 47;
 static const unsigned int kHeadBlockZone2CoolPin = 27;
+
+//Photodiode Mux Pins
+static const int kMuxControlPin1 = 30;
+static const int kMuxControlPin2 = 31;
+static const int kMuxControlPin3 = 48;
+static const int kMuxControlPin4 = 5;
 
 #endif

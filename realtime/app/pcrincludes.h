@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <ctime>
 #include <cstdlib>
+#include <climits>
 
 //C++ headers
 #include <string>

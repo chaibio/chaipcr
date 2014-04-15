@@ -1,27 +1,33 @@
 #ifndef _LEDCONTROLLER_H_
 #define _LEDCONTROLLER_H_
 
+class SPIPort;
+
 // Class LEDController
-class LEDController
-{
+class LEDController {
 public:
-    LEDController(float dutyCyclePercentage);
+    LEDController(const std::string &grayscaleClockPWMPath, std::shared_ptr<SPIPort> spiPort, unsigned int potCSPin,
+                  unsigned int ledXLATPin, const std::string &ledBlankPWMPath, float dutyCyclePercentage);
 	virtual ~LEDController();
 	
-    void setIntensity(double onCurrent);
+    void setIntensity(double onCurrentMilliamps);
+    inline double intensity() const { return _intensity; }
     void activateLED(unsigned int ledNumber);
     void disableLEDs();
+
+private:
+    void sendLEDGrayscaleValues(const uint8_t (&values)[24]);
 	
 private:
     std::atomic<float> _dutyCyclePercentage;
-	
-    //constants
-	const int kMinLEDCurrent = 5; //5mA
-	const int kGrayscaleClockPwmPeriodNs = 240;
-	const int kGrayscaleClockPwmDutyNs = 120;
+    double _intensity;
 	
 	//components
-    std::shared_ptr<PWMPin> _grayscaleClock;
+    PWMPin _grayscaleClock;
+    std::shared_ptr<SPIPort> _spiPort;
+    GPIO _potCSPin;
+    GPIO _ledXLATPin;
+    PWMPin _ledBlankPWM;
 };
 
 #endif

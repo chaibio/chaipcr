@@ -2,35 +2,32 @@
 #include "pocoincludes.h"
 #include "utilincludes.h"
 
-#include "thermistor.h"
 #include "lid.h"
 
 using namespace std;
 using namespace Poco;
 
-Lid::Lid()
-    :PWMControl(kLidControlPWMPath, kLidPWMPeriodNs)
+Lid::Lid(std::vector<SPIDTuning> pidTunningList)
+    :PWMControl(kLidControlPWMPath, kLidPWMPeriodNs),
+     TemperatureControl(std::make_shared<BetaThermistor>(kThermistorVoltageDividerResistanceOhms,
+                                                                  kLTC2444ADCBits, kLidThermistorBetaCoefficient, kLidThermistorT0Resistance, kLidThermistorT0)),
+     _pidTuningList(pidTunningList)
 {
-    _thermistor = new Thermistor(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
-                                kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
-                                kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient);
+    _pidController = 0;
 
-    setTargetTemperature(30);
+    setTargetTemperature(50);
     initPID();
 }
 
 Lid::~Lid()
 {
     delete _pidTimer;
-    delete _pidController.exchange(0);
-    delete _thermistor;
+    delete _pidController;
 }
 
 void Lid::initPID()
 {
-    vector<SPIDTuning> pidTuningList; //TODO: Josh, please change it as you want
-
-    _pidController.store(new CPIDController(pidTuningList, 0, 0));
+    _pidController = new CPIDController(_pidTuningList, 0, kLidPWMPeriodNs);
 
     _pidTimer = new Timer(0, kPIDInterval);
     _pidTimer->start(TimerCallback<Lid>(*this, &Lid::pidCallback));
@@ -38,7 +35,7 @@ void Lid::initPID()
 
 void Lid::pidCallback(Timer &)
 {
-    setPWMDutyCycle(_pidController.load()->compute(_targetTemperature.load(), _thermistor->temperature()));
+    setPWMDutyCycle(_pidController->compute(targetTemperature(), currentTemperature()));
 }
 
 void Lid::process()

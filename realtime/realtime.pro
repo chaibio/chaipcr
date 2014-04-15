@@ -34,7 +34,7 @@ unix:!unix_m {
 
     INCLUDEPATH += $(BOOST_INCLUDE_PATH)
 
-    QMAKE_CXXFLAGS += -Wno-unused-local-typedefs -Wno-unused-parameter
+    #QMAKE_CXXFLAGS += -Wno-unused-local-typedefs -Wno-unused-parameter
 
     target.path = /home/root/tmp
     INSTALLS += target
@@ -73,6 +73,7 @@ HEADERS += \
     util/spi.h \
     util/pwm.h \
     util/gpio.h \
+    util/mux.h \
     server/qpcrrequesthandlerfactory.h \
     server/jsonhandler.h \
     server/testcontrolhandler.h \
@@ -98,7 +99,11 @@ HEADERS += \
     db/sociincludes.h \
     test/dbtest.h \
     server/httpstatushandler.h \
-    server/statushandler.h
+    server/statushandler.h \
+    control/adcconsumer.h \
+    control/adcconsumer.h \
+    server/qpcrfactory.h \
+    control/temperaturecontroller.h
 
 SOURCES += \
     app/pins.cpp \
@@ -116,6 +121,7 @@ SOURCES += \
     util/spi.cpp \
     util/pwm.cpp \
     util/gpio.cpp \
+    util/mux.cpp \
     server/qpcrrequesthandlerfactory.cpp \
     server/jsonhandler.cpp \
     server/testcontrolhandler.cpp \
@@ -132,4 +138,5 @@ SOURCES += \
     db/dbcontrol.cpp \
     test/dbtest.cpp \
     server/httpstatushandler.cpp \
-    server/statushandler.cpp
+    server/statushandler.cpp \
+    server/qpcrfactory.cpp

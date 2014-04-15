@@ -26,4 +26,5 @@ void PWMPin::writePWMFile(const string& relativePath, unsigned long value) {
 	ofstream file;
 	file.open(filePath.str());
 	file << value;
+    file.close();
 }

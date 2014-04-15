@@ -27,7 +27,7 @@ void DBTest::testExperiment()
         try
         {
             Experiment *experiment = nullptr;
-            for (int i = 0, id; i < (idList.size() > 10 ? 10 : idList.size()); ++i)
+            for (size_t i = 0, id; i < (idList.size() > 10 ? 10 : idList.size()); ++i)
             {
                 id = idList.at(rand() % idList.size());
 
