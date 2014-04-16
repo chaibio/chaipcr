@@ -194,7 +194,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 				data: JSON.stringify(dataToBeSend)
 			})
 			.done(function(data) {
-					console.log("Data updated from server woohaa" , data, that);
+					console.log("Data updated from server woohaa" , data);
 			})
 			.fail(function() {
 				console.log("Failed to update");
