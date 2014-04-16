@@ -49,6 +49,7 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 		this.tempControlView = new ChaiBioTech.Views.Design.tempControl({
 			model: this.model,
 			stepData: this.options["stepInfo"],
+			parentStep: this,
 			grandParent: thisObject.options.grandParent
 		});
 		
@@ -62,8 +63,14 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 			ChaiBioTech.Data.selectedStep = null;
 		});
 
+		this.on("changeTemperature", function(tempData) {
+			//console.log(tempData);
+			this.options.grandParent.changeTemperature(tempData, this.model);
+		});
+
 	},
 
+	//not being in use, but could be usefull if ever wanted to delete steps individually.
 	deleteView: function() {
 		currentWidth = $(this.options.parentStage.el).width()
 		console.log("this is tricky", this.options.parentStage)
@@ -78,11 +85,10 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 		temperature = this.options["stepInfo"]["step"]["temperature"]
 		$(this.tempControlView.el).css("top", 157 - (temperature * 1.57) +"px");
 		
-		//$(this.tempControlView.el).click();
-		//this.tempControlView.addDrag();
-		//$(this.el).append(this.line.render().el)
+
+		$(this.el).append(this.line.render().el)
 		
-		/*var rad2deg = 180/Math.PI;
+		var rad2deg = 180/Math.PI;
 		if(_.isUndefined(ChaiBioTech.Data.PreviousTemp)) {
 			
 			topper = (157 - (25 * 1.57)) - (157 - (temperature * 1.57));
@@ -100,7 +106,7 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 		} else {
 			$(this.line.el).css("top", ChaiBioTech.Data.PreviousTemp);
 			ChaiBioTech.Data.PreviousTemp = 157 - (temperature * 1.57);
-		}*/
+		}
 		return this;
 	}
 });

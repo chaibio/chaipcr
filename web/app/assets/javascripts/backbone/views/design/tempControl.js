@@ -7,6 +7,14 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 	dragAdded: false,
 	
 	initialize: function() {
+		
+		//bring line component in here, so that as we move this object it moves along;
+		//a line object should reference to the next line object;
+		//when one is dragged along two lines has to update..!
+		//One fixed in the drag object and the one very next to it.. !
+		// all the math is in steps js , move it may be move into line itself, but that might be a problem because we need to place it first 
+		// or may be a seperate function so that i is called after render..!!
+
 		$(this.el).draggable({
 				containment: "parent",
 				axis: "y",
@@ -23,11 +31,10 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 				},
 
 				stop: function() {
-					console.log($(this).data("data-thisObject"));
 					originalObject = $(this).data("data-thisObject");
 					temp = parseFloat($(this).data("data-temperature"));
-					console.log(temp);
-					originalObject.options.grandParent.changeTemperature(temp, originalObject.model.ramp);
+					parentStep = originalObject.options.parentStep;
+					parentStep.trigger("changeTemperature", temp);
 				}
 		});
 	},
@@ -35,7 +42,6 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 	render:function() {
 		temperature = this.options["stepData"]["step"]["temperature"];
 		console.log(temperature * 1.57)
-		//$(this.el).find(".ui-draggable").css("top", (157 - temperature) +"px");
 		$(this.el).html(this.template(this.options["stepData"]["step"]));
 		//This line saves this object within the element so that the wrong reference due to draggable can be tackled
 		$(this.el).data("data-thisObject", this); 

@@ -180,21 +180,18 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 	},
 
 	changeTemperature: function(newTemp, rampObj) {
-		dataToBeSend = {'ramp':
-							{
-								'rate': newTemp,
-								'max': true
-							}
-						}
+		
+		dataToBeSend = {'step':{'temperature':newTemp}}
 		
 		$.ajax({
-				url: "/ramps/"+rampObj.id,
+				url: "/steps/"+rampObj.id,
 				contentType: 'application/json',
 				type: 'PUT',
 				data: JSON.stringify(dataToBeSend)
 			})
 			.done(function(data) {
 					console.log("Data updated from server woohaa" , data);
+					//may be u can call up getLatestModel(), looks like thats not required here.
 			})
 			.fail(function() {
 				console.log("Failed to update");
