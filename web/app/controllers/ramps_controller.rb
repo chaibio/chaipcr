@@ -8,7 +8,7 @@ class RampsController < ApplicationController
   
   def_param_group :ramp do
     param :ramp, Hash, :desc => "Ramp Info", :required => true do
-      param :rate, BigDecimal, :desc => "Rate of the ramp, in degrees C/s, set to 100 for max, precision to 8 decimal point", :required => true
+      param :rate, Float, :desc => "Rate of the ramp, in degrees C/s, set to 100 for max, precision to 8 decimal point", :required => true
     end
   end
   

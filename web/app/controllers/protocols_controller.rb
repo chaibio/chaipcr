@@ -8,7 +8,7 @@ class ProtocolsController < ApplicationController
   
   def_param_group :protocol do
     param :protocol, Hash, :desc => "Protocol Info", :required => true do
-      param :lid_temperature, BigDecimal, :desc => "lid temperature, in degree C, default is 110, with precision to one decimal point", :required => true
+      param :lid_temperature, Float, :desc => "lid temperature, in degree C, default is 110, with precision to one decimal point", :required => true
     end
   end
   
