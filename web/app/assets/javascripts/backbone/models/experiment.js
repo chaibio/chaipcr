@@ -177,6 +177,28 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 			.fail(function() {
 				console.log("Failed to update");
 			})
+	},
+
+	changeTemperature: function(newTemp, rampObj) {
+		dataToBeSend = {'ramp':
+							{
+								'rate': newTemp,
+								'max': true
+							}
+						}
+		
+		$.ajax({
+				url: "/ramps/"+rampObj.id,
+				contentType: 'application/json',
+				type: 'PUT',
+				data: JSON.stringify(dataToBeSend)
+			})
+			.done(function(data) {
+					console.log("Data updated from server woohaa" , data, that);
+			})
+			.fail(function() {
+				console.log("Failed to update");
+			})
 	}
 });
 

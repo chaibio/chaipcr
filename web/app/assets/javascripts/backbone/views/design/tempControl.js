@@ -19,10 +19,15 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 					//1.57 could be changed as we change interface , whatever the number is (tempControl container width)/100;
 					number = (157 - currentPosition) / 1.57; 
 					$(this).find(".label").html(number.toFixed(2));
+					$(this).data("data-temperature", number.toFixed(2));
 				},
 
 				stop: function() {
 					console.log($(this).data("data-thisObject"));
+					originalObject = $(this).data("data-thisObject");
+					temp = parseFloat($(this).data("data-temperature"));
+					console.log(temp);
+					originalObject.options.grandParent.changeTemperature(temp, originalObject.model.ramp);
 				}
 		});
 	},
