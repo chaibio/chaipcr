@@ -65,8 +65,6 @@ HEADERS += \
     control/optics.h \
     control/ltc2444.h \
     control/ledcontroller.h \
-    control/heatsink.h \
-    control/heatblockzone.h \
     control/heatblock.h \
     control/fan.h \
     control/adccontroller.h \
@@ -86,7 +84,6 @@ HEADERS += \
     util/utilincludes.h \
     control/controlincludes.h \
     util/pid.h \
-    control/lid.h \
     db/experiment.h \
     db/dbcontrol.h \
     db/protocol.h \
@@ -113,8 +110,6 @@ SOURCES += \
     control/optics.cpp \
     control/ltc2444.cpp \
     control/ledcontroller.cpp \
-    control/heatsink.cpp \
-    control/heatblockzone.cpp \
     control/heatblock.cpp \
     control/fan.cpp \
     control/adccontroller.cpp \
@@ -127,7 +122,6 @@ SOURCES += \
     server/testcontrolhandler.cpp \
     server/qpcrapplication.cpp \
     util/pid.cpp \
-    control/lid.cpp \
     db/experiment.cpp \
     db/protocol.cpp \
     db/stage.cpp \
@@ -139,4 +133,5 @@ SOURCES += \
     test/dbtest.cpp \
     server/httpstatushandler.cpp \
     server/statushandler.cpp \
-    server/qpcrfactory.cpp
+    server/qpcrfactory.cpp \
+    control/temperaturecontrolleroutputs.cpp

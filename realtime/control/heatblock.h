@@ -4,26 +4,6 @@
 #include "icontrol.h"
 #include "pwm.h"
 
-//class Thermistor;
-//class HeatBlockZoneController;
-
-class HeatBlockZoneControllerOutput : public PWMControl
-{
-protected:
-    HeatBlockZoneControllerOutput(const std::string &pwmPath, unsigned long pwmPeriod, unsigned int heatIOPin, unsigned int coolIOPin);
-
-    void setValue(double pidResult);
-    void process(double pidResult);
-
-private:
-    GPIO _heatIO;
-    GPIO _coolIO;
-};
-
-template <class Output = HeatBlockZoneControllerOutput>
-class TemperatureController;
-typedef TemperatureController<HeatBlockZoneControllerOutput> HeatBlockZoneController;
-
 // Class HeatBlock
 class HeatBlock : public IControl
 {
