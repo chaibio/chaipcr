@@ -9,12 +9,53 @@ CPIDController::CPIDController(const std::vector<SPIDTuning>& pGainSchedule, int
     iMaxOutput(maxOutput),
     iPreviousError(0),
     iIntegrator(0) {
+
+    lock = new Poco::RWLock;
 }
+
+CPIDController::~CPIDController() {
+    delete lock;
+}
+
+double CPIDController::getIntegrator() const {
+    double result = 0;
+
+    lock->readLock();
+    result = iIntegrator;
+    lock->unlock();
+
+    return result;
+}
+
+void CPIDController::setIntegrator(double integrator) {
+    lock->writeLock();
+    iIntegrator = integrator;
+    lock->unlock();
+}
+
+double CPIDController::getPreviousError() const {
+    double result = 0;
+
+    lock->readLock();
+    result = iPreviousError;
+    lock->unlock();
+
+    return result;
+}
+
+void CPIDController::setPreviousError(double error) {
+    lock->writeLock();
+    iPreviousError = error;
+    lock->unlock();
+}
+
 //------------------------------------------------------------------------------
 double CPIDController::compute(double target, double currentValue) {
     //calc values for this computation
     const SPIDTuning& pPIDTuning = determineGainSchedule(target);
     double error = target - currentValue;
+
+    lock->writeLock();
 
     //perform basic PID calculation
     double pTerm = error;
@@ -40,17 +81,12 @@ double CPIDController::compute(double target, double currentValue) {
     //update values for next derivative computation
     iPreviousError = error;
 
+    lock->unlock();
+
     return output;
 }
 //------------------------------------------------------------------------------
-const SPIDTuning& CPIDController::determineGainSchedule(double target) {
-    /*const SPIDTuning* pGainScheduleItem = ipGainSchedule;
-
-    while (target > pGainScheduleItem->maxValueInclusive)
-        pGainScheduleItem++;
-
-    return pGainScheduleItem;*/
-
+const SPIDTuning& CPIDController::determineGainSchedule(double target) const {
     for (const SPIDTuning &item: ipGainSchedule)
     {
         if (target++ != item.maxValueInclusive)

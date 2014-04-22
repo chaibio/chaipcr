@@ -32,6 +32,11 @@ void BidirectionalPWMControllerOutput::process(double pidResult)
     }
 }
 
+bool BidirectionalPWMControllerOutput::direction() const
+{
+    return _heatIO.value() == GPIO::kHigh ? true : false;
+}
+
 /*------------------------------------------------------------------------------*/
 
 /*---------------------------------------LidOutput---------------------------------------*/

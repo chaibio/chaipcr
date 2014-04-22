@@ -11,19 +11,33 @@ template <class Output>
 class TemperatureController : public IControl, public PIDControl, public Output
 {
 public:
+    enum ControlMode
+    {
+        None,
+        PIDMode,
+        BangBangMode
+    };
+
     template <typename ...OutputArgs>
-    TemperatureController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, CPIDController *pidController, long pidTimerInterval, OutputArgs... args)
+    TemperatureController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
+                          CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold,
+                          OutputArgs... args)
         :PIDControl(pidController, pidTimerInterval),
          Output(args...)
     {
+        _mode = None;
+
         _thermistor = thermistor;
         _minTargetTemp = minTargetTemp;
         _maxTargetTemp = maxTargetTemp;
+
+        _pidRangeControlThreshold = pidRangeControlThreshold;
 
         _targetValue = std::bind(&TemperatureController::targetTemperature, this);
         _currentValue = std::bind(&TemperatureController::currentTemperature, this);
 
         setTargetTemperature(30);
+        checkControlMode();
     }
 
     void setTargetTemperature(double temperature)
@@ -42,6 +56,8 @@ public:
     inline double targetTemperature() const { return _targetTemperature.load(); }
     inline double currentTemperature() const { return _thermistor->temperature(); }
 
+    inline ControlMode mode() const { return _mode; }
+
     void pidCallback(double pidResult)
     {
         Output::setValue(pidResult);
@@ -49,21 +65,56 @@ public:
 
     void process()
     {
+        checkControlMode();
         Output::process(_pidResult.load());
+    }
+
+private:
+    void checkControlMode()
+    {
+        if ((currentTemperature() - targetTemperature()) <= _pidRangeControlThreshold)
+        {
+            if (_mode != PIDMode)
+            {
+                _mode = PIDMode;
+
+                _pidController->setIntegrator(Output::direction() ? _pidController->getMaxOutput() : _pidController->getMinOutput());
+                _pidController->setPreviousError(0);
+
+                startPid();
+            }
+        }
+        else
+        {
+            if (_mode != BangBangMode)
+            {
+                _mode = BangBangMode;
+
+                stopPid();
+                Output::setValue(_pidController->getMaxOutput());
+            }
+        }
     }
 
 protected:
     std::shared_ptr<Thermistor> _thermistor;
 
 private:
+    ControlMode _mode;
+
     std::atomic<double> _targetTemperature;
     double _minTargetTemp;
     double _maxTargetTemp;
+
+    double _pidRangeControlThreshold;
 };
 
 /*-----------------------------------------Outputs--------------------------------------*/
 class BidirectionalPWMControllerOutput : public PWMControl
 {
+public:
+    bool direction() const;
+
 protected:
     BidirectionalPWMControllerOutput(const std::string &pwmPath, unsigned long pwmPeriod, unsigned int heatIOPin, unsigned int coolIOPin);
 
@@ -77,6 +128,9 @@ private:
 
 class LidOutput : public PWMControl
 {
+public:
+    inline bool direction() const { return true; }
+
 protected:
     LidOutput(const std::string &pwmPath, unsigned long pwmPeriod);
 
@@ -90,6 +144,8 @@ class HeatSinkOutput
 {
 public:
     virtual ~HeatSinkOutput();
+
+    inline bool direction() const { return false; }
 
     int targetRPM() const;
     void setTargetRPM(int targetRPM);

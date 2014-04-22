@@ -49,7 +49,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
     CPIDController *zone1CPIDController = new CPIDController({}, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax);
 
     HeatBlockZoneController *zone1 = new HeatBlockZoneController(zone1Thermistor, kHeatBlockZonesMinTargetTemp, kHeatBlockZonesMaxTargetTemp,
-                                                                 zone1CPIDController, kPIDInterval, kHeatBlockZone1PWMPath,
+                                                                 zone1CPIDController, kPIDInterval, kHeatBlockZone1PIDThreshold, kHeatBlockZone1PWMPath,
                                                                  kHeatBlockZone1PWMPeriod, kHeadBlockZone1HeatPin, kHeadBlockZone1CoolPin);
 
     shared_ptr<SteinhartHartThermistor> zone2Thermistor(new SteinhartHartThermistor(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
@@ -59,7 +59,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
     CPIDController *zone2CPIDController = new CPIDController({}, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax);
 
     HeatBlockZoneController *zone2 = new HeatBlockZoneController(zone2Thermistor, kHeatBlockZonesMinTargetTemp, kHeatBlockZonesMaxTargetTemp,
-                                                                 zone2CPIDController, kPIDInterval, kHeatBlockZone2PWMPath,
+                                                                 zone2CPIDController, kPIDInterval, kHeatBlockZone2PIDThreshold, kHeatBlockZone2PWMPath,
                                                                  kHeatBlockZone2PWMPeriod, kHeadBlockZone2HeatPin, kHeadBlockZone2CoolPin);
 
     consumers.push_back(zone1Thermistor);
@@ -77,5 +77,5 @@ shared_ptr<IControl> QPCRFactory::constructLid(vector<shared_ptr<ADCConsumer>> &
 
     consumers.push_back(thermistor);
 
-    return LidInstance::createInstance(thermistor, kLidMinTargetTemp, kLidMaxTargetTemp, pidController, kPIDInterval, kLidControlPWMPath, kLidPWMPeriodNs);
+    return LidInstance::createInstance(thermistor, kLidMinTargetTemp, kLidMaxTargetTemp, pidController, kPIDInterval, kLidPIDThreshold, kLidControlPWMPath, kLidPWMPeriodNs);
 }
