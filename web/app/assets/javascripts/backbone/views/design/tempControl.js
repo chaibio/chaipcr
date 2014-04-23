@@ -15,6 +15,10 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 		// all the math is in steps js , move it may be move into line itself, but that might be a problem because we need to place it first 
 		// or may be a seperate function so that i is called after render..!!
 
+		this.line = new ChaiBioTech.Views.Design.line({
+			model: this.model
+		});
+
 		$(this.el).draggable({
 				containment: "parent",
 				axis: "y",
@@ -45,6 +49,7 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 		$(this.el).html(this.template(this.options["stepData"]["step"]));
 		//This line saves this object within the element so that the wrong reference due to draggable can be tackled
 		$(this.el).data("data-thisObject", this); 
+		$(this.el).append(this.line.render().el)
 		return this;
 	}
 });
