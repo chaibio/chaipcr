@@ -49,7 +49,8 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 		$(this.el).html(this.template(this.options["stepData"]["step"]));
 		//This line saves this object within the element so that the wrong reference due to draggable can be tackled
 		$(this.el).data("data-thisObject", this); 
-		$(this.el).append(this.line.render().el)
+		$(this.el).append(this.line.render(temperature).el);
+		
 		return this;
 	}
 });

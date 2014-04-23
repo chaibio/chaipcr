@@ -54,10 +54,6 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 		});
 		
 
-		this.line = new ChaiBioTech.Views.Design.line({
-			model: this.model
-		});
-
 		this.on("unselectStep", function() {
 			$(this.el).css("background-color", "yellow");
 			ChaiBioTech.Data.selectedStep = null;

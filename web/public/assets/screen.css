@@ -89,6 +89,6 @@
   width: 150px;
   height: 2px;
   position: relative;
-  -webkit-transform-origin: 0% 0%;
+  -webkit-transform-origin: 100% 100%;
   right: 105px;
 }
