@@ -46,7 +46,6 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 	initialize: function() {
 		this.tempControlView = new ChaiBioTech.Views.Design.tempControl({
 			model: this.model,
-			stepData: this.options["stepInfo"],
 			parentStep: this,
 			grandParent: thisObject.options.grandParent
 		});
@@ -60,16 +59,6 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 		this.on("changeTemperature", function(tempData) {
 			this.options.grandParent.changeTemperature(tempData, this.model);
 		});
-
-	},
-
-	//not being in use, but could be usefull if ever wanted to delete steps individually.
-	deleteView: function() {
-		currentWidth = $(this.options.parentStage.el).width()
-		console.log("this is tricky", this.options.parentStage)
-		this.remove();
-		ChaiBioTech.Data.selectedStep = null;
-		$(this.options.parentStage.el).css("width", (currentWidth - 147) +"px");	
 
 	},
 

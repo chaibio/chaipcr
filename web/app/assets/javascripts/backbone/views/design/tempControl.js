@@ -41,17 +41,20 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 				},
 
 				stop: function() {
+					// There is an issue when this is dragged really fast .. ! solve it.
+					//may be we need to trigger here too, or may b we shdnt be triggering and call directly. 
 					originalObject = $(this).data("data-thisObject");
 					temp = parseFloat($(this).data("data-temperature"));
 					parentStep = originalObject.options.parentStep;
 					parentStep.trigger("changeTemperature", temp);
+					//$(originalObject).css("top", 157 - (temp * 1.57) +"px");
 				}
 		});
 	},
 	
 	render:function() {
-		temperature = this.options["stepData"]["step"]["temperature"];
-		$(this.el).html(this.template(this.options["stepData"]["step"]));
+		temperature = this.model.temperature;
+		$(this.el).html(this.template(this.model));
 		//This line saves this object within the element so that the wrong reference due to draggable can be tackled
 		$(this.el).data("data-thisObject", this); 
 		$(this.el).append(this.line.render().el);

@@ -94,7 +94,6 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 	},
 
 	deleteSelected: function(e) {
-		// write code to disable delete thr is only one stage left
 		e.preventDefault();
 		if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data.selectedStep)) {
 			this.model.deleteStep(ChaiBioTech.Data.selectedStep);
