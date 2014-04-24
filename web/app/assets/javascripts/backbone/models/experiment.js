@@ -80,10 +80,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 				'stage_type': type
 			}
 		};
-		//if(!_.isNull(stageData.options.prev_stage_id)) {
-			dataToBeSend["prev_id"] = stageData.model.id;
-		//}
-		console.log("Data To Server", dataToBeSend);
+		dataToBeSend["prev_id"] = stageData.model.id;
 		$.ajax({
 			url: "/protocols/"+data.id+"/stages",
 			contentType: 'application/json',
@@ -110,7 +107,6 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		.done(function(data) {
 				console.log("Big bang", that);
 				that.set('experiment', data["experiment"]);
-				//that.trigger("modelUpdated");	
 		})
 		.fail(function() {
 			console.log("Failed to update");
@@ -191,7 +187,6 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 			})
 			.done(function(data) {
 					console.log("Data updated from server woohaa" , data);
-					//may be u can call up getLatestModel(), looks like thats not required here.
 			})
 			.fail(function() {
 				console.log("Failed to update");

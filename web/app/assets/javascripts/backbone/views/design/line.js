@@ -9,22 +9,29 @@ ChaiBioTech.Views.Design.line = Backbone.View.extend({
 			previous = this.options.previousLine;
 			previous.options.nextLine = this;
 		}
+
+		this.on("moveLineRight", function(newData) {
+			this.mathLogic(this.model.temperature, newData.leftSide)
+		});
+
+		this.on("moveThisLine", function(newTempData) {
+			this.dragLine(newTempData.toThisTemp)
+		});
 	},
 
 	positionLine: function() {
 		temperature = parseFloat(this.model.temperature);
-		prev = (!_.isUndefined(ChaiBioTech.Data.PreviousTemp)) ? ChaiBioTech.Data.PreviousTemp : 25;
+		prev = (! _.isUndefined(this.options.previousLine)) ? this.options.previousLine.model.temperature : 25;
 		this.mathLogic(temperature, prev);
 	},
 
-	mathLogic: function(temperature, prev) {
+	mathLogic: function(temperature, prev) { //this part is implemented with Pythagorean theorem.
 		var rad2deg = 180/Math.PI;
 		topper = (157 - (prev * 1.57)) - (157 - (temperature * 1.57));
-		padam = 149, lambam = topper;
+		padam = 150, lambam = topper;
 		widthing = Math.sqrt( (padam * padam) + (lambam * lambam) );
-		ChaiBioTech.Data.PreviousTemp = temperature;
 		ratio = lambam/padam;
-		var degrees = Math.atan( ratio ) * rad2deg * -1;
+		var degrees = Math.atan( ratio ) * rad2deg * -1; //atan is used to get the angle of the lines.
 		$(this.el).css("width", widthing);
 		$(this.el).css("right", 105 + (widthing - 150));
 		$(this.el).css("-webkit-transform", "rotate("+degrees+"deg)");
@@ -32,17 +39,17 @@ ChaiBioTech.Views.Design.line = Backbone.View.extend({
 
 	dragLine: function(dragTemp) {
 		this.model.temperature = dragTemp;
-		if(_.isUndefined(this.options.previousLine)) {
+		if(_.isUndefined(this.options.previousLine)) { //For the very first step
 			fixLeftSide = 25;
 		} else {
 			fixLeftSide = this.options.previousLine.model.temperature;
 		}
 		this.mathLogic(dragTemp, fixLeftSide);
-		this.dragNextLine();
-	},
-
-	dragNextLine: function() {
-
+		
+		if(! _.isUndefined(this.options.nextLine)) { // For the last step
+			nextDude = this.options.nextLine;
+			nextDude.trigger("moveLineRight", {"leftSide": dragTemp});
+		}
 	},
 	
 	render: function(temperature) {

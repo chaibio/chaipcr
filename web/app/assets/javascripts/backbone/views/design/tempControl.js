@@ -21,7 +21,7 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 			});
 		}
 
-		ChaiBioTech.Data.previousLine = this.line;
+		ChaiBioTech.Data.previousLine = this.line; //Saves line object to make a linkedlist
 
 		$(this.el).draggable({
 				containment: "parent",
@@ -37,7 +37,7 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 					$(this).find(".label").html(number.toFixed(2));
 					$(this).data("data-temperature", number.toFixed(2));
 					originalObject = $(this).data("data-thisObject");
-					originalObject.line.dragLine(number.toFixed(2));
+					originalObject.line.trigger("moveThisLine", {"toThisTemp": number.toFixed(2)});
 				},
 
 				stop: function() {
@@ -51,7 +51,6 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 	
 	render:function() {
 		temperature = this.options["stepData"]["step"]["temperature"];
-		console.log(temperature * 1.57)
 		$(this.el).html(this.template(this.options["stepData"]["step"]));
 		//This line saves this object within the element so that the wrong reference due to draggable can be tackled
 		$(this.el).data("data-thisObject", this); 
