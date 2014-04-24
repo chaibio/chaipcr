@@ -32,21 +32,21 @@ ChaiBioTech.Views.Design.line = Backbone.View.extend({
 		widthing = Math.sqrt( (padam * padam) + (lambam * lambam) );
 		ratio = lambam/padam;
 		var degrees = Math.atan( ratio ) * rad2deg * -1; //atan is used to get the angle of the lines.
-		$(this.el).css("width", widthing);
-		$(this.el).css("right", 105 + (widthing - 150));
-		$(this.el).css("-webkit-transform", "rotate("+degrees+"deg)");
+		$(this.el).css("width", widthing)
+		.css("right", 105 + (widthing - 150))
+		.css("-webkit-transform", "rotate("+degrees+"deg)");
 	},
 
 	dragLine: function(dragTemp) {
 		this.model.temperature = dragTemp;
-		if(_.isUndefined(this.options.previousLine)) { //For the very first step
+		if(_.isUndefined(this.options.previousLine)) { //For the very first step.
 			fixLeftSide = 25;
 		} else {
 			fixLeftSide = this.options.previousLine.model.temperature;
 		}
 		this.mathLogic(dragTemp, fixLeftSide);
 		
-		if(! _.isUndefined(this.options.nextLine)) { // For the last step
+		if(! _.isUndefined(this.options.nextLine)) { // excluding last step.
 			nextDude = this.options.nextLine;
 			nextDude.trigger("moveLineRight", {"leftSide": dragTemp});
 		}

@@ -18,6 +18,8 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 	initialize: function(){
 		_.bindAll(this ,"afterSave");
 	},
+	//There is many methods that uses $.ajax, so it con be in a single function 
+	//but once experiment operations are done it can be done.
 	saveData: function( action ) {
 		that = this;
 		if(action == "update") {

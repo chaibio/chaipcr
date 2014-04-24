@@ -7,7 +7,6 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	editableAdded: false , 
 	events: {
 		"click .stage-header": "selectStage",
-		//"click #stage-name": "editStageName"
 		"click .stageName" : "changeStageName"
 	},
 
@@ -24,7 +23,8 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	           }        
 	        });
 			this.editableAdded = true;
-			$(this.el).find('.stageName').click(); //fires a click so that editable works as normal for a single click ..! 
+			//fires a click so that editable works as normal for a single click ..! 
+			$(this.el).find('.stageName').click();
 		}
 	},
 
@@ -85,7 +85,6 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 		allSteps = allSteps["steps"];
 		previous_step = null;
 		previous_id = null;
-		steps = [];
 		_.each(allSteps, function(step, index) {
 			stepView = new ChaiBioTech.Views.Design.steps({
 				model: step["step"],
@@ -106,24 +105,6 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 			currentWidth = $("#innertrack").width();
 			$("#innertrack").css("width", (currentWidth + 151) +"px");
 			$(thisObject.el).find(".step-holder").append(stepView.render().el);
-			steps.push(stepView);
 		});
-		this.steps = steps;
-	},
-
-	//This method could be used if we want to add steps manually , but it comes along with problem of keep tracking diffrence
-	//in stage content..!
-	addStep: function(pole, place) {
-		stepView = new ChaiBioTech.Views.Design.steps({
-			model: that.model,
-			stepInfo: place,
-			parentStage: this
-		});
-		currentWidth = $(this.el).width();
-		console.log("shd be changing", this.model);
-		$(this.el).css("width", (currentWidth + 150) +"px");
-		currentWidth = $("#innertrack").width();
-		$("#innertrack").css("width", (currentWidth+ 151) +"px");
-		$(pole.el).after(stepView.render().el);
 	}
 });

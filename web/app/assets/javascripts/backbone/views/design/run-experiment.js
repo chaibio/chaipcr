@@ -5,8 +5,6 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 	template: JST["backbone/templates/design/experiment-run"],
 
 	initialize: function() {
-		thisObject = this;
-		_.bindAll(this, "addStages")
 		this.model.on("change:experiment", function() {
 			$("#innertrack").html("");
 			$("#innertrack").css("width", "1000px");
