@@ -104,7 +104,7 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 			currentWidth = $(thisObject.el).width();
 			$(thisObject.el).css("width", ((index + 1) * 150)+"px");
 			currentWidth = $("#innertrack").width();
-			$("#innertrack").css("width", (currentWidth + 151) +"px");
+			$("#innertrack").css("width", (currentWidth + 150) +"px");
 			$(thisObject.el).find(".step-holder").append(stepView.render().el);
 			steps.push(stepView);
 		});

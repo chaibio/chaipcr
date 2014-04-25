@@ -3,7 +3,6 @@ ChaiBioTech.Views.Design = ChaiBioTech.Views.Design || {} ;
 ChaiBioTech.Views.Design.line = Backbone.View.extend({
 
 	className: 'line',
-	rad2deg: 180/Math.PI,
 
 	initialize: function() {
 		if(! _.isUndefined(this.options.previousLine)) {
@@ -26,21 +25,21 @@ ChaiBioTech.Views.Design.line = Backbone.View.extend({
 		this.mathLogic(temperature, prev);
 	},
 
-	mathLogic: function(temperature, prev) { //this part is implemented with Pythagorean theorem.
-		topper = (157 - (prev * 1.57)) - (157 - (temperature * 1.57));
-		padam = 105, lambam = topper;
+	mathLogic: function(temperature, prev) { //this part is implemented with Pythagorean theorem or law of cosines.
+		lambam =  (temperature * ChaiBioTech.Constants.stepUnitMovement) - (prev * ChaiBioTech.Constants.stepUnitMovement);
+		padam = ChaiBioTech.Constants.stepWidth - ChaiBioTech.Constants.tempBarWidth;
 		widthing = Math.sqrt( (padam * padam) + (lambam * lambam) );
 		ratio = lambam/padam;
-		var degrees = Math.atan( ratio ) * this.rad2deg * -1; //atan is used to get the angle of the lines.
+		var degrees = Math.atan( ratio ) * ChaiBioTech.Constants.rad2deg * -1; //atan is used to get the angle of the lines.
 		$(this.el).css("width", widthing)
-		.css("right", 149 + (widthing - 150))
+		.css("right", widthing - 1)
 		.css("-webkit-transform", "rotate("+degrees+"deg)");
 	},
 
 	dragLine: function(dragTemp) {
 		this.model.temperature = dragTemp;
 		if(_.isUndefined(this.options.previousLine)) { //For the very first step.
-			fixLeftSide = 25;
+			fixLeftSide = ChaiBioTech.Constants.beginningTemp;
 		} else {
 			fixLeftSide = this.options.previousLine.model.temperature;
 		}

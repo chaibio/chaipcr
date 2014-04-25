@@ -33,18 +33,18 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 					parentStep = originalObject.options.parentStep;
 				},
 				drag: function() {
-					currentPosition = parseInt($(this).css("top").replace("px", ""), 10);
-					//currentPosition = parseInt($(this).css("top").replace("px", ""), 10); this line was in use last time
-					//1.57 could be changed as we change interface , whatever the number is (tempControl container width)/100;
-					number = ((157 - currentPosition) / 1.57).toFixed(2); 
+					currentPosition = parseInt($(this).position().top - ChaiBioTech.Constants.originalStepHeight, 10);
+					
+					number = ((ChaiBioTech.Constants.stepHeight - (currentPosition)) / ChaiBioTech.Constants.stepUnitMovement).toFixed(2); 
+					console.log(currentPosition, number);
 					$(this).find(".label").html(number);
 					$(this).data("data-temperature", number);
 					originalObject.line.trigger("moveThisLine", {"toThisTemp": number});
 				},
 
 				stop: function() {
-					currentPosition = parseInt($(this).css("top").replace("px", ""), 10);
-					number = parseFloat(((157 - currentPosition) / 1.57).toFixed(2)); 
+					currentPosition = parseInt($(this).position().top - ChaiBioTech.Constants.originalStepHeight, 10);
+					number = parseFloat(((ChaiBioTech.Constants.stepHeight - currentPosition) / ChaiBioTech.Constants.stepUnitMovement).toFixed(2)); 
 					$(this).find(".label").html(number);
 					parentStep.trigger("changeTemperature", number);
 					originalObject.line.trigger("moveThisLine", {"toThisTemp": number});
