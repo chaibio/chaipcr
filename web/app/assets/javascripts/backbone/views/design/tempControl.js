@@ -23,30 +23,30 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 
 		ChaiBioTech.Data.previousLine = this.line; //Saves line object to make a linkedlist
 
+		var originalObject;
 		$(this.el).draggable({
 				containment: "parent",
 				axis: "y",
 
 				start: function() {
-					
+					originalObject = $(this).data("data-thisObject");
+					parentStep = originalObject.options.parentStep;
 				},
 				drag: function() {
 					currentPosition = parseInt($(this).css("top").replace("px", ""), 10);
+					//currentPosition = parseInt($(this).css("top").replace("px", ""), 10); this line was in use last time
 					//1.57 could be changed as we change interface , whatever the number is (tempControl container width)/100;
-					number = (157 - currentPosition) / 1.57; 
-					$(this).find(".label").html(number.toFixed(2));
-					$(this).data("data-temperature", number.toFixed(2));
-					originalObject = $(this).data("data-thisObject");
-					originalObject.line.trigger("moveThisLine", {"toThisTemp": number.toFixed(2)});
+					number = ((157 - currentPosition) / 1.57).toFixed(2); 
+					$(this).find(".label").html(number);
+					$(this).data("data-temperature", number);
+					originalObject.line.trigger("moveThisLine", {"toThisTemp": number});
 				},
 
 				stop: function() {
-					originalObject = $(this).data("data-thisObject");
-					temp = parseFloat($(this).css("top").replace("px", "")).toFixed(2);
-					number = ((157 - temp) / 1.57).toFixed(2); 
+					currentPosition = parseInt($(this).css("top").replace("px", ""), 10);
+					number = parseFloat(((157 - currentPosition) / 1.57).toFixed(2)); 
 					$(this).find(".label").html(number);
-					parentStep = originalObject.options.parentStep;
-					parentStep.trigger("changeTemperature", parseFloat(number));
+					parentStep.trigger("changeTemperature", number);
 					originalObject.line.trigger("moveThisLine", {"toThisTemp": number});
 				}
 		});

@@ -179,8 +179,8 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 
 	changeTemperature: function(newTemp, rampObj) {
 		
-		dataToBeSend = {'step':{'temperature':newTemp}}
-		
+		dataToBeSend = {'step':{'temperature': newTemp}}
+		console.log(dataToBeSend)
 		$.ajax({
 				url: "/steps/"+rampObj.id,
 				contentType: 'application/json',
