@@ -90,6 +90,7 @@
   height: 2px;
   position: relative;
   -webkit-transform-origin: 100% 100%;
-  right: 105px;
+  right: 150px;
   z-index: 10;
+  top: 6px;
 }

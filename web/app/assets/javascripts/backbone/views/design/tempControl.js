@@ -41,13 +41,13 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 				},
 
 				stop: function() {
-					// There is an issue when this is dragged really fast .. ! solve it.
-					//may be we need to trigger here too, or may b we shdnt be triggering and call directly. 
 					originalObject = $(this).data("data-thisObject");
-					temp = parseFloat($(this).data("data-temperature"));
+					temp = parseFloat($(this).css("top").replace("px", "")).toFixed(2);
+					number = ((157 - temp) / 1.57).toFixed(2); 
+					$(this).find(".label").html(number);
 					parentStep = originalObject.options.parentStep;
-					parentStep.trigger("changeTemperature", temp);
-					//$(originalObject).css("top", 157 - (temp * 1.57) +"px");
+					parentStep.trigger("changeTemperature", parseFloat(number));
+					originalObject.line.trigger("moveThisLine", {"toThisTemp": number});
 				}
 		});
 	},

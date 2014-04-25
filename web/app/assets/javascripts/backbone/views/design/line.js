@@ -28,12 +28,12 @@ ChaiBioTech.Views.Design.line = Backbone.View.extend({
 
 	mathLogic: function(temperature, prev) { //this part is implemented with Pythagorean theorem.
 		topper = (157 - (prev * 1.57)) - (157 - (temperature * 1.57));
-		padam = 150, lambam = topper;
+		padam = 105, lambam = topper;
 		widthing = Math.sqrt( (padam * padam) + (lambam * lambam) );
 		ratio = lambam/padam;
 		var degrees = Math.atan( ratio ) * this.rad2deg * -1; //atan is used to get the angle of the lines.
 		$(this.el).css("width", widthing)
-		.css("right", 105 + (widthing - 150))
+		.css("right", 149 + (widthing - 150))
 		.css("-webkit-transform", "rotate("+degrees+"deg)");
 	},
 
