@@ -34,9 +34,7 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 				},
 				drag: function() {
 					currentPosition = parseInt($(this).position().top - ChaiBioTech.Constants.originalStepHeight, 10);
-					
 					number = ((ChaiBioTech.Constants.stepHeight - (currentPosition)) / ChaiBioTech.Constants.stepUnitMovement).toFixed(2); 
-					console.log(currentPosition, number);
 					$(this).find(".label").html(number);
 					$(this).data("data-temperature", number);
 					originalObject.line.trigger("moveThisLine", {"toThisTemp": number});
