@@ -1,7 +1,7 @@
 #ifndef PID_H
 #define PID_H
 
-namespace Poco { class Timer; }
+namespace Poco { class Timer; class RWLock; }
 
 struct SPIDTuning {
     int maxValueInclusive;
@@ -15,22 +15,32 @@ struct SPIDTuning {
 class CPIDController {
 public:
     CPIDController(const std::vector<SPIDTuning>& pGainSchedule, int minOutput, int maxOutput);
+    ~CPIDController();
 
     //accessors
-    inline double getIntegrator() { return iIntegrator; }
+    double getIntegrator() const;
+    void setIntegrator(double integrator);
+
+    double getPreviousError() const;
+    void setPreviousError(double error);
+
+    inline int getMinOutput() const { return iMinOutput; }
+    inline int getMaxOutput() const { return iMaxOutput; }
 
     //computation
     double compute(double target, double currentValue);
 
 private:
-    const SPIDTuning& determineGainSchedule(double target);
+    const SPIDTuning& determineGainSchedule(double target) const;
     void latchValue(double* pValue, double minValue, double maxValue);
 
 private:
     std::vector<SPIDTuning> ipGainSchedule;
-    int iMinOutput, iMaxOutput;
+    const int iMinOutput, iMaxOutput;
     double iPreviousError;
     double iIntegrator;
+
+    mutable Poco::RWLock *lock;
 };
 
 class PIDControl {
@@ -38,10 +48,10 @@ public:
     PIDControl(CPIDController *pidController, long pidTimerInterval);
     virtual ~PIDControl();
 
+protected:
     void startPid();
     void stopPid();
 
-protected:
     virtual void pidCallback(double pidResult) = 0;
 
 private:

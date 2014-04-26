@@ -23,6 +23,7 @@
 #include <utility>
 #include <thread>
 #include <map>
+#include <limits>
 
 //Linux headers
 #include <unistd.h>
