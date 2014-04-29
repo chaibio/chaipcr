@@ -2,6 +2,7 @@
 #define STAGE_H
 
 class StageComponent;
+class Step;
 
 class Stage
 {
@@ -41,6 +42,10 @@ public:
     void appendComponent(StageComponent &&component);
     inline const std::vector<StageComponent>& components() const {return _components;}
 
+    void resetCurrentStep();
+    Step* currentStep() const;
+    Step* nextStep();
+
 private:
     std::string _name;
 
@@ -49,6 +54,7 @@ private:
     Type _type;
 
     std::vector<StageComponent> _components;
+    std::vector<StageComponent>::iterator _currentComponent;
 };
 
 #endif // STAGE_H

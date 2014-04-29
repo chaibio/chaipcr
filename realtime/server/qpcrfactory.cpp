@@ -1,4 +1,5 @@
 #include "pcrincludes.h"
+#include "boostincludes.h"
 #include "utilincludes.h"
 #include "controlincludes.h"
 
@@ -65,7 +66,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
     consumers.push_back(zone1Thermistor);
     consumers.push_back(zone2Thermistor);
 
-    return HeatBlockInstance::createInstance(zone1, zone2);
+    return HeatBlockInstance::createInstance(zone1, zone2, kPCRBeginStepTemperatureThreshold );
 }
 
 shared_ptr<IControl> QPCRFactory::constructLid(vector<shared_ptr<ADCConsumer>> &consumers)
@@ -77,5 +78,6 @@ shared_ptr<IControl> QPCRFactory::constructLid(vector<shared_ptr<ADCConsumer>> &
 
     consumers.push_back(thermistor);
 
-    return LidInstance::createInstance(thermistor, kLidMinTargetTemp, kLidMaxTargetTemp, pidController, kPIDInterval, kLidPIDThreshold, kLidControlPWMPath, kLidPWMPeriodNs);
+    return LidInstance::createInstance(thermistor, kLidMinTargetTemp, kLidMaxTargetTemp, pidController, kPIDInterval, kLidPIDThreshold,
+                                       kLidControlPWMPath, kLidPWMPeriodNs, kProgramStartLidTempThreshold);
 }

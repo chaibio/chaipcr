@@ -3,11 +3,15 @@
 
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-but-set-parameter"
 
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
+
+#include <boost/signals2.hpp>
+#include <boost/bind.hpp>
 
 #pragma GCC diagnostic pop
 

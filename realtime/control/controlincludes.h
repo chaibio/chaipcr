@@ -11,6 +11,9 @@
 #include "thermistor.h"
 #include "ledcontroller.h"
 #include "ltc2444.h"
+#include "bidirectionalpwmcontroller.h"
+#include "lid.h"
+#include "heatsink.h"
 
 #include "maincontrollers.h"
 

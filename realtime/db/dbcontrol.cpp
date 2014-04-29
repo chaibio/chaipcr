@@ -24,14 +24,18 @@ Experiment* DBControl::getExperiment(int id)
     if (result.get_indicator("id") == soci::i_null)
         return nullptr;
 
-    Experiment *experiment = new Experiment;
+    Experiment *experiment = new Experiment(id);
 
     if (result.get_indicator("name") != soci::i_null)
         experiment->setName(result.get<std::string>("name"));
     if (result.get_indicator("qpcr") != soci::i_null)
         experiment->setQpcr(result.get<int>("qpcr"));
-    if (result.get_indicator("run_at") != soci::i_null)
-        experiment->setRunAt(result.get<boost::posix_time::ptime>("run_at"));
+    if (result.get_indicator("started_at") != soci::i_null)
+        experiment->setStartedAt(result.get<boost::posix_time::ptime>("started_at"));
+    if (result.get_indicator("completed_at") != soci::i_null)
+        experiment->setCompletedAt(result.get<boost::posix_time::ptime>("completed_at"));
+    if (result.get_indicator("completion_status") != soci::i_null)
+        experiment->setCompletionStatus(result.get<Experiment::CompletionStatus>("completion_status"));
 
     experiment->setProtocol(getProtocol(result.get<int>("id")));
 
@@ -156,6 +160,17 @@ Ramp* DBControl::getRamp(int stepId)
     }
 
     return ramp;
+}
+
+void DBControl::startExperiment(Experiment *experiment)
+{
+    *_session << "UPDATE experiments SET started_at = :started_at WHERE id = " << experiment->id(), soci::use(experiment->startedAt());
+}
+
+void DBControl::completeExperiment(Experiment *experiment)
+{
+    *_session << "UPDATE experiments SET completed_at = :completed_at, completion_status = :completion_status WHERE id = " << experiment->id(),
+            soci::use(experiment->completedAt()), soci::use(experiment->completionStatus());
 }
 
 #ifdef TEST_BUILD

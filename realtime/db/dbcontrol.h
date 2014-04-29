@@ -20,6 +20,8 @@ public:
     ~DBControl();
 
     Experiment* getExperiment(int id);
+    void startExperiment(Experiment *experiment);
+    void completeExperiment(Experiment *experiment);
 
 #ifdef TEST_BUILD
     std::vector<int> getEperimentIdList();

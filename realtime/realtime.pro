@@ -100,7 +100,11 @@ HEADERS += \
     control/adcconsumer.h \
     control/adcconsumer.h \
     server/qpcrfactory.h \
-    control/temperaturecontroller.h
+    control/temperaturecontroller.h \
+    server/controlhandler.h \
+    control/bidirectionalpwmcontroller.h \
+    control/lid.h \
+    control/heatsink.h
 
 SOURCES += \
     app/pins.cpp \
@@ -134,4 +138,8 @@ SOURCES += \
     server/httpstatushandler.cpp \
     server/statushandler.cpp \
     server/qpcrfactory.cpp \
-    control/temperaturecontrolleroutputs.cpp
+    server/controlhandler.cpp \
+    control/temperaturecontroller.cpp \
+    control/bidirectionalpwmcontroller.cpp \
+    control/lid.cpp \
+    control/heatsink.cpp

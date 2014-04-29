@@ -2,6 +2,7 @@
 #define PROTOCOL_H
 
 class Stage;
+class Step;
 
 class Protocol
 {
@@ -23,10 +24,15 @@ public:
     void appendStage(Stage &&stage);
     inline const std::vector<Stage>& stages() const {return _stages;}
 
+    void resetCurrentStep();
+    Step* currentStep() const;
+    Step* nextStep();
+
 private:
     double _lidTemperature;
 
     std::vector<Stage> _stages;
+    std::vector<Stage>::iterator _currentStage;
 };
 
 #endif // PROTOCOL_H

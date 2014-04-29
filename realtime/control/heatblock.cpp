@@ -1,16 +1,24 @@
 #include "pcrincludes.h"
+#include "boostincludes.h"
 #include "utilincludes.h"
+#include "dbincludes.h"
+#include "pocoincludes.h"
+#include "qpcrapplication.h"
 
-//#include "heatblockzone.h"
-#include "temperaturecontroller.h"
+#include "bidirectionalpwmcontroller.h"
 #include "heatblock.h"
 
 using namespace std;
+using namespace Poco;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class HeatBlock
-HeatBlock::HeatBlock(HeatBlockZoneController* zone1, HeatBlockZoneController* zone2) {
+HeatBlock::HeatBlock(HeatBlockZoneController* zone1, HeatBlockZoneController* zone2, double beginStepTemperatureThreshold) {
     _zones = make_pair(zone1, zone2);
+    _beginStepTemperatureThreshold = beginStepTemperatureThreshold;
+    _step = nullptr;
+
+    _holdStepTimer = new Timer();
 }
 
 HeatBlock::~HeatBlock() {
@@ -21,6 +29,18 @@ HeatBlock::~HeatBlock() {
 void HeatBlock::process() {
     //_zones.first->process();
     //_zones.second->process();
+
+    if (_beginStepTemperatureThreshold > maxTemperatureSetpointDelta())
+        stepBegun();
+}
+
+void HeatBlock::setMode(bool mode) {
+    _step = QPCRApplication::getInstance()->currentExperiment()->protocol()->currentStep();
+
+    setTargetTemperature(_step->temperature());
+
+    _zones.first->setMode(mode);
+    _zones.second->setMode(mode);
 }
 
 void HeatBlock::setTargetTemperature(double targetTemperature) {
@@ -36,10 +56,28 @@ double HeatBlock::zone2Temperature() const {
     return _zones.second->currentTemperature();
 }
 
-/*shared_ptr<Thermistor> HeatBlock::zone1Thermistor() const {
-    return _zones.first->thermistor();
+double HeatBlock::maxTemperatureSetpointDelta() const {
+    double zone1Abs = abs(_zones.first->targetTemperature() - zone1Temperature());
+    double zone2Abs = abs(_zones.second->targetTemperature() - zone2Temperature());
+
+    return zone1Abs > zone2Abs ? zone1Abs : zone2Abs;
 }
 
-shared_ptr<Thermistor> HeatBlock::zone2Thermistor() const {
-    return _zones.second->thermistor();
-}*/
+void HeatBlock::stepBegun() {
+    if (_holdStepTimer->getPeriodicInterval() == 0) {
+        _holdStepTimer->setPeriodicInterval(_step->holdTime());
+        _holdStepTimer->start(Poco::TimerCallback<HeatBlock>(*this, &HeatBlock::holdStepCallback));
+    }
+}
+
+void HeatBlock::holdStepCallback(Timer &timer) {
+    _step = QPCRApplication::getInstance()->currentExperiment()->protocol()->nextStep();
+
+    if (_step)
+        setTargetTemperature(_step->temperature());
+    else
+        stagesCompleted();
+
+    timer.restart(0);
+    timer.setPeriodicInterval(0);
+}

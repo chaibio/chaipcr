@@ -8,6 +8,8 @@ const double kQTICurveZThermistorCCoefficient = -0.000000372283234;
 const double kQTICurveZThermistorDCoefficient = 0.000000099063233;
 
 //Lid
+const unsigned long kLidPWMPeriodNs = 500000;
+
 const double kLidThermistorBetaCoefficient = 3970;  //kelvins
 const double kLidThermistorT0Resistance = 10000;    //ohms
 const double kLidThermistorT0 = 298.15;             //kelvins
@@ -16,6 +18,8 @@ const double kLidMinTargetTemp = 0;
 const double kLidMaxTargetTemp = 130;
 
 const double kLidPIDThreshold = 100;
+
+const double kProgramStartLidTempThreshold = 2;
 
 //thermistor & ADC params
 const unsigned int kThermistorVoltageDividerResistanceOhms = 14000;
@@ -26,9 +30,6 @@ const int kHttpServerPort = 8000;
 
 //Fan PWM params
 const unsigned long kFanPWMPeriodNs = 1024;
-
-//Lid PWM params
-const unsigned long kLidPWMPeriodNs = 500000;
 
 //Heat Block params
 const unsigned long kHeatBlockZone1PWMPeriod = kFanPWMPeriodNs;
@@ -55,5 +56,8 @@ const int kLedBlankPwmDutyNs = 50;
 //Optics
 const long kCollectDataInterval = 150;
 const std::vector<int> kWellList = {5, 8, 7, 6, 11, 10, 9, 12, 4, 3, 2, 1, 16, 15, 14, 13};
+
+//Steps
+const double kPCRBeginStepTemperatureThreshold = 1;
 
 #endif
