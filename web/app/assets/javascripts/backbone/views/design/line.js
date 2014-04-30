@@ -21,7 +21,8 @@ ChaiBioTech.Views.Design.line = Backbone.View.extend({
 
 	positionLine: function() {
 		temperature = parseFloat(this.model.temperature);
-		prev = (! _.isUndefined(this.options.previousLine)) ? this.options.previousLine.model.temperature : 25;
+		prev = (! _.isUndefined(this.options.previousLine)) ? this.options.previousLine.model.temperature : ChaiBioTech.Constants.beginningTemp;
+		console.log(prev);
 		this.mathLogic(temperature, prev);
 	},
 

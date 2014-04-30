@@ -8,6 +8,9 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		this.model.on("change:experiment", function() {
 			$("#innertrack").html("");
 			$("#innertrack").css("width", "1000px");
+			if(! _.isUndefined(ChaiBioTech.Data.previousLine)) {
+				ChaiBioTech.Data.previousLine = null;
+			}
 			window.router.runView.addStages();
 		});
 	},

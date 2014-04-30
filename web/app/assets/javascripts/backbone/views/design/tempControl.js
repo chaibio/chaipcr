@@ -8,7 +8,7 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 	
 	initialize: function() {
 
-		if(! _.isUndefined(ChaiBioTech.Data.previousLine)) {
+		if(! _.isNull(ChaiBioTech.Data.previousLine)) {
 
 			this.line = new ChaiBioTech.Views.Design.line({
 				model: this.model,

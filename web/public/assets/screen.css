@@ -31,16 +31,15 @@
 /* line 31, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track {
   width: 700px;
-  height: 250px;
   overflow: scroll;
 }
-/* line 36, ../../app/assets/stylesheets/screen.css.scss */
+/* line 35, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack {
   width: 1000px;
   height: 240px;
   border: 1px solid grey;
 }
-/* line 41, ../../app/assets/stylesheets/screen.css.scss */
+/* line 40, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .stage-run {
   border: 1px solid red;
   border-right: none;
@@ -48,29 +47,29 @@
   float: left;
   height: 230px;
 }
-/* line 49, ../../app/assets/stylesheets/screen.css.scss */
+/* line 48, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .stage-header {
   width: 100%;
   height: 50px;
   text-align: center;
 }
-/* line 55, ../../app/assets/stylesheets/screen.css.scss */
+/* line 54, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-holder {
   width: 100%;
   height: 100%;
 }
-/* line 59, ../../app/assets/stylesheets/screen.css.scss */
+/* line 58, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-select {
   background-color: orange;
 }
-/* line 63, ../../app/assets/stylesheets/screen.css.scss */
+/* line 62, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run {
   width: 149px;
   height: 175px;
   float: left;
   background-color: yellow;
 }
-/* line 69, ../../app/assets/stylesheets/screen.css.scss */
+/* line 68, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run .tempBar {
   width: 45px;
   height: 18px;
@@ -78,12 +77,12 @@
   cursor: move;
   z-index: 100;
 }
-/* line 75, ../../app/assets/stylesheets/screen.css.scss */
+/* line 74, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run .tempBar .label {
   float: right;
   width: 44px;
 }
-/* line 81, ../../app/assets/stylesheets/screen.css.scss */
+/* line 80, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run .line {
   background-color: black;
   width: 150px;
