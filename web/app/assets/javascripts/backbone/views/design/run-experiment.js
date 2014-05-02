@@ -120,6 +120,7 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		thatObject = this;
 		previous_stage_id = null;
 		previous_object = null;
+		numberOfStages = stages.length - 1;
 		_.each(stages, function(stage, index) {
 			
 			stageView = new ChaiBioTech.Views.Design.stages({
@@ -134,6 +135,10 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 			previous_object = stageView;
 			previous_stage_id = stage["stage"]["id"];
 			ChaiBioTech.Data.lastStage = stageView;	
+			if(numberOfStages == index) {
+				//console.log(stageView);
+				$(stageView.el).addClass("stgeRightSide");
+			}
 			$("#innertrack").append(stageView.render().el);
 			stageView.addSteps(stageView, index);
 		});

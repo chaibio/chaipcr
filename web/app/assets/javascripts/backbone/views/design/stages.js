@@ -66,6 +66,7 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 			ChaiBioTech.Data.selectedStage = null;
 		});
 
+
 		_.bindAll(this, "addSteps", "render", "editStageName");
 	},
 
@@ -86,6 +87,8 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 		previous_step = null;
 		previous_id = null;
 		steps = [];
+		numberOfSteps = allSteps.length - 1;
+		$(thisObject.el).css("width", ((numberOfSteps + 1) * 149) + 1 +"px");
 		_.each(allSteps, function(step, index) {
 			stepView = new ChaiBioTech.Views.Design.steps({
 				model: step["step"],
@@ -100,14 +103,16 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 			}
 			previous_step = stepView;
 			previous_id = step["step"]["id"];
-			
-			currentWidth = $(thisObject.el).width();
-			$(thisObject.el).css("width", ((index + 1) * 150)+"px");
 			currentWidth = $("#innertrack").width();
 			$("#innertrack").css("width", (currentWidth + 150) +"px");
+			if(numberOfSteps != index) {
+				$(stepView.el).addClass("stepRightSide")
+			}
 			$(thisObject.el).find(".step-holder").append(stepView.render().el);
 			steps.push(stepView);
 		});
+		//currentWidth = $(thisObject.el).width();
+		//$(thisObject.el).css("width", (currentWidth + (numberOfSteps - 1)) +"px");
 		this.steps = steps;
 	}
 });

@@ -10,7 +10,17 @@
 	display: none;
 }
 
+.stgeRightSide {
+	border-right-color: red;
+	border-right-style: solid;
+	border-right-width: 1px;	
+}
 
+.stepRightSide {
+	border-right-color: orange;
+	border-right-style: solid;
+	border-right-width: 1px;	
+}
 
 #stadium {
 	#play-ground {
@@ -27,7 +37,7 @@
 	#reactionVolume {
 		width: 250px;
 	}
-	
+
 	#track {
 		width: 700px;
 		overflow: scroll;
