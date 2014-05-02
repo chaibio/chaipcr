@@ -75,6 +75,7 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	},
 
 	render:function() {
+		//$(this.el).addClass("stgeRightSide");
 		$(this.el).html(this.template(this.options["stageInfo"]["stage"]));	
 		return this;
 	},
@@ -89,6 +90,8 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 		steps = [];
 		numberOfSteps = allSteps.length - 1;
 		$(thisObject.el).css("width", ((numberOfSteps + 1) * 149) + 1 +"px");
+		currentWidth = $("#innertrack").width();
+		$("#innertrack").css("width", (currentWidth + ((numberOfSteps + 1) * 149) + 1 +"px"));
 		_.each(allSteps, function(step, index) {
 			stepView = new ChaiBioTech.Views.Design.steps({
 				model: step["step"],
@@ -103,16 +106,12 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 			}
 			previous_step = stepView;
 			previous_id = step["step"]["id"];
-			currentWidth = $("#innertrack").width();
-			$("#innertrack").css("width", (currentWidth + 150) +"px");
 			if(numberOfSteps != index) {
 				$(stepView.el).addClass("stepRightSide")
 			}
 			$(thisObject.el).find(".step-holder").append(stepView.render().el);
 			steps.push(stepView);
 		});
-		//currentWidth = $(thisObject.el).width();
-		//$(thisObject.el).css("width", (currentWidth + (numberOfSteps - 1)) +"px");
 		this.steps = steps;
 	}
 });

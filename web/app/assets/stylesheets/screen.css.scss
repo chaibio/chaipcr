@@ -10,10 +10,11 @@
 	display: none;
 }
 
-.stgeRightSide {
-	border-right-color: red;
-	border-right-style: solid;
-	border-right-width: 1px;	
+.boundaryDiv {
+	border-left:1px solid red;
+	float: left;
+	height: 230px;	
+	width: 2px;
 }
 
 .stepRightSide {
