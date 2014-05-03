@@ -9,6 +9,7 @@ ChaiBioTech.Views.touchScreen.homePage = Backbone.View.extend({
 
 	initialize: function() {
 		//alert("i am born");
+		console.log(this);
 	},
 
 	runExp: function() {
