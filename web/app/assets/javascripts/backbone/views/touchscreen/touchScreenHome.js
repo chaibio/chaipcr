@@ -3,9 +3,16 @@ ChaiBioTech.Views.touchScreen = ChaiBioTech.Views.touchScreen || {} ;
 ChaiBioTech.Views.touchScreen.homePage = Backbone.View.extend({
 	
 	template: JST["backbone/templates/touchscreen/main"],
+	events: {
+		"click #goButton": "runExp"
+	},
 
-	initialize: function(){
+	initialize: function() {
 		//alert("i am born");
+	},
+
+	runExp: function() {
+		//alert("bingo");
 	},
 
 	render: function() {
