@@ -1,6 +1,7 @@
+ChaiBioTech.Data =  ChaiBioTech.Data || {};
 ChaiBioTech.Constants =  ChaiBioTech.Constants || {};
 
-var originalStepHeight = 175, tempBarHeight = 17;  //actual height is 18
+var originalStepHeight = 175, tempBarHeight = 18;  //actual height is 18
 ChaiBioTech.Constants = {
 	"stepHeight": originalStepHeight - tempBarHeight,
 	"stepUnitMovement": (originalStepHeight - tempBarHeight) /100,

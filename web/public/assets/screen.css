@@ -108,3 +108,9 @@
   z-index: 10;
   top: 6px;
 }
+
+/* line 107, ../../app/assets/stylesheets/screen.css.scss */
+#touchScreenContainer {
+  width: 800px;
+  height: 480px;
+}
