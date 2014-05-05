@@ -8,12 +8,22 @@ ChaiBioTech.Views.touchScreen.homePage = Backbone.View.extend({
 	},
 
 	initialize: function() {
-		//alert("i am born");
 		console.log(this);
 	},
 
 	runExp: function() {
-		//alert("bingo");
+		
+	},
+
+	populateList: function() {
+		that = this;
+		list_group = $(that.el).find(".list-group");
+		_.each(this.collection.models, function(experiment, index) {
+			listItem = new ChaiBioTech.Views.touchScreen.listItem({
+				model: experiment
+			});
+			list_group.append(listItem.render().el);
+		});
 	},
 
 	render: function() {
