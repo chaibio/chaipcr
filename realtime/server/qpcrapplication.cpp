@@ -79,12 +79,18 @@ bool QPCRApplication::startExperiment(int experimentId) {
 }
 
 void QPCRApplication::runExperiment() {
+    if (_machineState != LidHeating)
+        return;
+
     _machineState = Running;
 
     HeatBlockInstance::getInstance()->setMode(true);
 }
 
 void QPCRApplication::completeExperiment() {
+    if (_machineState != Running)
+        return;
+
     _machineState = Complete;
 
     LidInstance::getInstance()->setMode(false);
