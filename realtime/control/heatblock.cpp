@@ -27,8 +27,8 @@ HeatBlock::~HeatBlock() {
 }
 
 void HeatBlock::process() {
-    //_zones.first->process();
-    //_zones.second->process();
+    _zones.first->process();
+    _zones.second->process();
 
     if (qpcrApp->machineState() == QPCRApplication::Running && _beginStepTemperatureThreshold > maxTemperatureSetpointDelta())
         stepBegun();

@@ -8,7 +8,7 @@ TemperatureController::TemperatureController(std::shared_ptr<Thermistor> thermis
     :PIDControl(pidController, pidTimerInterval)
 {
     _controlMode = None;
-    _mode = true;
+    _enabledMode = false;
 
     _thermistor = thermistor;
     _minTargetTemp = minTargetTemp;
@@ -24,11 +24,11 @@ TemperatureController::TemperatureController(std::shared_ptr<Thermistor> thermis
 
 void TemperatureController::setMode(bool mode)
 {
-    if (mode != _mode)
+    if (mode != _enabledMode)
     {
-        _mode = mode;
+        _enabledMode = mode;
 
-        if (_mode)
+        if (_enabledMode)
             checkControlMode();
         else
         {
@@ -60,7 +60,7 @@ double TemperatureController::currentTemperature() const
 
 void TemperatureController::process()
 {
-    if (_mode)
+    if (_enabledMode)
     {
         checkControlMode();
         processOutput();
@@ -74,7 +74,7 @@ void TemperatureController::pidCallback(double pidResult)
 
 void TemperatureController::checkControlMode()
 {
-    if ((currentTemperature() - targetTemperature()) <= _pidRangeControlThreshold)
+    if (abs(currentTemperature() - targetTemperature()) <= _pidRangeControlThreshold)
     {
         if (_controlMode != PIDMode)
         {
@@ -93,7 +93,11 @@ void TemperatureController::checkControlMode()
             _controlMode = BangBangMode;
 
             stopPid();
-            setOutput(_pidController->getMaxOutput());
         }
+
+        if (currentTemperature() > targetTemperature())
+            setOutput(_pidController->getMinOutput());
+        else
+            setOutput(_pidController->getMaxOutput());
     }
 }

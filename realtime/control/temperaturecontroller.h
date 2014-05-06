@@ -47,7 +47,7 @@ protected:
 
 private:
     std::atomic<ControlMode> _controlMode;
-    std::atomic<bool> _mode;
+    std::atomic<bool> _enabledMode;
 
     std::atomic<double> _targetTemperature;
     double _minTargetTemp;
