@@ -6,19 +6,27 @@ ChaiBioTech.Routers.touchScreen = Backbone.Router.extend({
 
   gotcha: function(coll, respo) {
     indexPage = new ChaiBioTech.Views.touchScreen.homePage({
-      collection: coll
+      collection: coll,
     });
-    $("body").append(indexPage.render().el);
+    $("body").html(indexPage.render().el);
     indexPage.populateList();
   },
 
   routes: {
-    "touchscreen": "touchScreenIndex"
+    "touchscreen": "touchScreenIndex",
+    "touchscreen/run/:id": "fireExperiment"
   },
 
   touchScreenIndex: function() {
     this.experimentCollection = new ChaiBioTech.Collections.Experiment();
-    this.experimentModel = new ChaiBioTech.Models.Experiment();
     this.experimentCollection.fetch({success: this.gotcha});
+  },
+
+  fireExperiment: function(id) {
+    run = new ChaiBioTech.Views.touchScreen.runExperiment({
+      model: new ChaiBioTech.Models.touchScreenModel,
+      id: id
+    });
+    $("#touchScreenContainer").html(run.render().el);
   }
 });
