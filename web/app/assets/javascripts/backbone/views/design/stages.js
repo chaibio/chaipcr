@@ -75,7 +75,6 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	},
 
 	render:function() {
-		//$(this.el).addClass("stgeRightSide");
 		$(this.el).html(this.template(this.options["stageInfo"]["stage"]));	
 		return this;
 	},

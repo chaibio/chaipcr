@@ -17,10 +17,12 @@ ChaiBioTech.Views.touchScreen.homePage = Backbone.View.extend({
 
 	populateList: function() {
 		that = this;
+		classes = ["success", "info", "warning", "danger"];
 		list_group = $(that.el).find(".list-group");
 		_.each(this.collection.models, function(experiment, index) {
 			listItem = new ChaiBioTech.Views.touchScreen.listItem({
-				model: experiment
+				model: experiment,
+				myClass: classes[index % 4]
 			});
 			list_group.append(listItem.render().el);
 		});
