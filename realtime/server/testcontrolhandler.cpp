@@ -46,7 +46,10 @@ void TestControlHandler::createData(const ptree &requestPt, ptree &)
     {
         shared_ptr<HeatBlock> instance = HeatBlockInstance::getInstance();
         if (instance)
+        {
             instance->setTargetTemperature(heatBlockTargetTemp);
+            instance->setEnableMode(true);
+        }
     }
 
     if (lidTargetTemp != -1)

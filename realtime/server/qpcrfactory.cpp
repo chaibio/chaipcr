@@ -47,7 +47,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
                                                                                     kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
                                                                                     kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient));
 
-    CPIDController *zone1CPIDController = new CPIDController({}, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax);
+    CPIDController *zone1CPIDController = new CPIDController({{50,75000.0,0.05,0.0}, {100,75000.0,0.05,0.0}}, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax);
 
     HeatBlockZoneController *zone1 = new HeatBlockZoneController(zone1Thermistor, kHeatBlockZonesMinTargetTemp, kHeatBlockZonesMaxTargetTemp,
                                                                  zone1CPIDController, kPIDInterval, kHeatBlockZone1PIDThreshold, kHeatBlockZone1PWMPath,
@@ -57,7 +57,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
                                                                                     kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
                                                                                     kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient));
 
-    CPIDController *zone2CPIDController = new CPIDController({}, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax);
+    CPIDController *zone2CPIDController = new CPIDController({{50,75000.0,0.05,0.0}, {100,75000.0,0.05,0.0}}, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax);
 
     HeatBlockZoneController *zone2 = new HeatBlockZoneController(zone2Thermistor, kHeatBlockZonesMinTargetTemp, kHeatBlockZonesMaxTargetTemp,
                                                                  zone2CPIDController, kPIDInterval, kHeatBlockZone2PIDThreshold, kHeatBlockZone2PWMPath,

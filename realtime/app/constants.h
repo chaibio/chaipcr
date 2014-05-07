@@ -32,17 +32,17 @@ const int kHttpServerPort = 8000;
 const unsigned long kFanPWMPeriodNs = 1024;
 
 //Heat Block params
-const unsigned long kHeatBlockZone1PWMPeriod = kFanPWMPeriodNs;
-const unsigned long kHeatBlockZone2PWMPeriod = kFanPWMPeriodNs;
+const unsigned long kHeatBlockZone1PWMPeriod = 500000;      //in ns
+const unsigned long kHeatBlockZone2PWMPeriod = 500000;      //in ns
 
-const int kHeatBlockZonesPIDMin = -1024;
-const int kHeatBlockZonesPIDMax = 1024;
+const int kHeatBlockZonesPIDMin = -500000;
+const int kHeatBlockZonesPIDMax = 500000;
 
 const double kHeatBlockZonesMinTargetTemp = -10;
 const double kHeatBlockZonesMaxTargetTemp = 105;
 
-const double kHeatBlockZone1PIDThreshold = 100;
-const double kHeatBlockZone2PIDThreshold = 100;
+const double kHeatBlockZone1PIDThreshold = 5;
+const double kHeatBlockZone2PIDThreshold = 5;
 
 const long kPIDInterval = 100;
 

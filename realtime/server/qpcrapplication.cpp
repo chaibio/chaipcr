@@ -73,7 +73,7 @@ bool QPCRApplication::startExperiment(int experimentId) {
     _dbControl->startExperiment(_experiment);
 
     LidInstance::getInstance()->setTargetTemperature(_experiment->protocol()->lidTemperature());
-    LidInstance::getInstance()->setMode(true);
+    LidInstance::getInstance()->setEnableMode(true);
 
     return true;
 }
@@ -84,7 +84,7 @@ void QPCRApplication::runExperiment() {
 
     _machineState = Running;
 
-    HeatBlockInstance::getInstance()->setMode(true);
+    HeatBlockInstance::getInstance()->setEnableMode(true);
 }
 
 void QPCRApplication::completeExperiment() {
@@ -93,8 +93,8 @@ void QPCRApplication::completeExperiment() {
 
     _machineState = Complete;
 
-    LidInstance::getInstance()->setMode(false);
-    HeatBlockInstance::getInstance()->setMode(false);
+    LidInstance::getInstance()->setEnableMode(false);
+    HeatBlockInstance::getInstance()->setEnableMode(false);
 
     _experiment->setCompletionStatus(Experiment::Success);
     _experiment->setCompletedAt(boost::posix_time::microsec_clock::local_time());
@@ -106,8 +106,8 @@ void QPCRApplication::stopExperiment() {
     if (_machineState == Idle)
         return;
 
-    LidInstance::getInstance()->setMode(false);
-    HeatBlockInstance::getInstance()->setMode(false);
+    LidInstance::getInstance()->setEnableMode(false);
+    HeatBlockInstance::getInstance()->setEnableMode(false);
 
     if (_machineState != Complete) {
         _experiment->setCompletionStatus(Experiment::Aborted);

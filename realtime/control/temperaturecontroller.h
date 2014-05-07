@@ -21,8 +21,8 @@ public:
 
     inline ControlMode controlMode() const { return _controlMode; }
 
-    inline bool mode() const { return _mode; }
-    void setMode(bool mode);
+    inline bool enableMode() const { return _enableMode; }
+    void setEnableMode(bool enableMode);
 
     void setTargetTemperature(double temperature);
     inline double targetTemperature() const { return _targetTemperature.load(); }
@@ -47,7 +47,7 @@ protected:
 
 private:
     std::atomic<ControlMode> _controlMode;
-    std::atomic<bool> _enabledMode;
+    std::atomic<bool> _enableMode;
 
     std::atomic<double> _targetTemperature;
     double _minTargetTemp;

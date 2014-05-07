@@ -17,7 +17,7 @@ public:
 	~HeatBlock();
 	
     void process();
-    void setMode(bool mode);
+    void setEnableMode(bool enableMode);
 
     void setTargetTemperature(double targetTemperature);
     double zone1Temperature() const;

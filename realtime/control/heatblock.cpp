@@ -34,13 +34,13 @@ void HeatBlock::process() {
         stepBegun();
 }
 
-void HeatBlock::setMode(bool mode) {
+void HeatBlock::setEnableMode(bool enableMode) {
     _step = QPCRApplication::getInstance()->currentExperiment()->protocol()->currentStep();
 
     setTargetTemperature(_step->temperature());
 
-    _zones.first->setMode(mode);
-    _zones.second->setMode(mode);
+    _zones.first->setEnableMode(enableMode);
+    _zones.second->setEnableMode(enableMode);
 }
 
 void HeatBlock::setTargetTemperature(double targetTemperature) {
@@ -57,8 +57,8 @@ double HeatBlock::zone2Temperature() const {
 }
 
 double HeatBlock::maxTemperatureSetpointDelta() const {
-    double zone1Abs = abs(_zones.first->targetTemperature() - zone1Temperature());
-    double zone2Abs = abs(_zones.second->targetTemperature() - zone2Temperature());
+    double zone1Abs = std::abs(_zones.first->targetTemperature() - zone1Temperature());
+    double zone2Abs = std::abs(_zones.second->targetTemperature() - zone2Temperature());
 
     return zone1Abs > zone2Abs ? zone1Abs : zone2Abs;
 }
