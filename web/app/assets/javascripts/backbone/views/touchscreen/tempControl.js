@@ -10,13 +10,13 @@ ChaiBioTech.Views.touchScreen.tempControl = Backbone.View.extend({
 
 		if(! _.isNull(ChaiBioTech.Data.previousLine)) {
 
-			this.line = new ChaiBioTech.Views.Design.line({
+			this.line = new ChaiBioTech.Views.touchScreen.line({
 				model: this.model,
 				previousLine: ChaiBioTech.Data.previousLine
 			});
 		} else {
 
-			this.line = new ChaiBioTech.Views.Design.line({
+			this.line = new ChaiBioTech.Views.touchScreen.line({
 				model: this.model
 			});
 		}
