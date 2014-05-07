@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140410222809) do
+ActiveRecord::Schema.define(version: 20140507064000) do
 
   create_table "experiments", force: true do |t|
     t.string   "name"
@@ -61,5 +61,15 @@ ActiveRecord::Schema.define(version: 20140410222809) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "temperature_logs", id: false, force: true do |t|
+    t.integer "experiment_id"
+    t.integer "elapsed_time",                                   comment: "in seconds"
+    t.decimal "lid_temp",               precision: 5, scale: 2
+    t.decimal "heat_block_zone_1_temp", precision: 5, scale: 2
+    t.decimal "heat_block_zone_2_temp", precision: 5, scale: 2
+  end
+
+  add_index "temperature_logs", ["experiment_id", "elapsed_time"], name: "index_temperature_logs_on_experiment_id_and_elapsed_time", unique: true
 
 end
