@@ -1,6 +1,6 @@
-ChaiBioTech.Views.Design = ChaiBioTech.Views.Design || {} ;
+ChaiBioTech.Views.touchScreen = ChaiBioTech.Views.touchScreen || {} ;
 
-ChaiBioTech.Views.Design.steps = Backbone.View.extend({
+ChaiBioTech.Views.touchScreen.steps = Backbone.View.extend({
 	
 	className: 'step-run',
 

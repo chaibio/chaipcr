@@ -1,8 +1,8 @@
-ChaiBioTech.Views.Design = ChaiBioTech.Views.Design || {} ;
+ChaiBioTech.Views.touchScreen = ChaiBioTech.Views.touchScreen || {} ;
 
-ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
+ChaiBioTech.Views.touchScreen.tempControl = Backbone.View.extend({
 	
-	template: JST["backbone/templates/design/step"],
+	template: JST["backbone/templates/touchscreen/step"],
 	className: 'tempBar',
 	dragAdded: false,
 	

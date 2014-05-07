@@ -8,7 +8,7 @@ class StepsController < ApplicationController
   
   def_param_group :step do
     param :step, Hash, :desc => "Step Info", :required => true do
-      param :temperature, BigDecimal, :desc => "Temperature of the step, in degree C, with precision to one decimal point", :required => false
+      param :temperature, Float, :desc => "Temperature of the step, in degree C, with precision to one decimal point", :required => false
       param :hold_time, Integer, :desc => "Hold time of the step, in seconds, 0 means infinite", :required=>false
       param :name, String, :desc => "Name of the step, if not provided, default name is 'Step <order_number>'", :required => false
     end

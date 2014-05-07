@@ -1,6 +1,6 @@
-ChaiBioTech.Views.Design = ChaiBioTech.Views.Design || {} ;
+ChaiBioTech.Views.touchScreen = ChaiBioTech.Views.touchScreen || {} ;
 
-ChaiBioTech.Views.Design.line = Backbone.View.extend({
+ChaiBioTech.Views.touchScreen.line = Backbone.View.extend({
 
 	className: 'line',
 

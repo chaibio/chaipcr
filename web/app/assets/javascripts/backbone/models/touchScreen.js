@@ -1,6 +1,6 @@
 ChaiBioTech.Models.Experiment = ChaiBioTech.Models.Experiment || {};
 
-ChaiBioTech.Models.Experiment = Backbone.Model.extend({
+ChaiBioTech.Models.touchScreenModel = Backbone.Model.extend({
 	
 	url: "/experiments",
 
@@ -16,7 +16,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 	},
 
 	initialize: function(){
-		_.bindAll(this ,"afterSave");
+		//_.bindAll(this ,"afterSave");
 	},
 	//There is many methods that uses $.ajax, so it can be in a single function 
 	//but once experiment operations are done it can be done.
@@ -40,12 +40,6 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		}else {
 			this.save(null, { success: this.afterSave });
 		}
-	},
-
-	afterSave: function(response) {
-		this.getLatestModel();
-		console.log(response);
-		this.trigger("Saved");
 	},
 
 	createStep: function(step, place) {
@@ -98,11 +92,10 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		}); 
 	},
 
-	getLatestModel: function(callback) {
+	getLatestModel: function(id) {
 		that = this;
-		var data = this.get("experiment");
 		$.ajax({
-			url: "/experiments/"+data["id"],
+			url: "/experiments/"+id,
 			contentType: 'application/json',
 			type: 'GET'
 		})
@@ -195,12 +188,3 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 			})
 	}
 });
-
-ChaiBioTech.Collections.Experiment = ChaiBioTech.Collections.Experiment || {};
-
-ChaiBioTech.Collections.Experiment = Backbone.Collection.extend({
-
-	model: ChaiBioTech.Models.Experiment,
-	
-	url: "/experiments"	
-})

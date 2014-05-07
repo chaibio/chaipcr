@@ -15,11 +15,15 @@
 //= require backbone
 //= require backbone_datalink
 //= require bootstrap.min
+//= require bootstrap-editable.min
 //= require rails
 //= require chaipcr
 //= require backbone/ChaiBioTech
+//= require backbone/Constants
+
 
 $(function() {
     window.router = new ChaiBioTech.Routers.DesignRouter({});
+    window.touchScreenRouter = new ChaiBioTech.Routers.touchScreen({});
     Backbone.history.start();
 });

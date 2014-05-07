@@ -12,35 +12,49 @@
   display: none;
 }
 
-/* line 16, ../../app/assets/stylesheets/screen.css.scss */
+/* line 13, ../../app/assets/stylesheets/screen.css.scss */
+.boundaryDiv {
+  border-left: 1px solid red;
+  float: left;
+  height: 230px;
+  width: 2px;
+}
+
+/* line 20, ../../app/assets/stylesheets/screen.css.scss */
+.stepRightSide {
+  border-right-color: orange;
+  border-right-style: solid;
+  border-right-width: 1px;
+}
+
+/* line 27, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #play-ground {
   min-height: 400px;
   min-width: 600px;
   margin: 30px 0 0 0;
 }
-/* line 22, ../../app/assets/stylesheets/screen.css.scss */
+/* line 33, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #run-experiment {
   border-left: solid 1px gray;
   height: 400px;
   width: 700px;
 }
-/* line 27, ../../app/assets/stylesheets/screen.css.scss */
+/* line 38, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #reactionVolume {
   width: 250px;
 }
-/* line 31, ../../app/assets/stylesheets/screen.css.scss */
+/* line 42, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track {
   width: 700px;
-  height: 250px;
   overflow: scroll;
 }
-/* line 36, ../../app/assets/stylesheets/screen.css.scss */
+/* line 46, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack {
   width: 1000px;
   height: 240px;
   border: 1px solid grey;
 }
-/* line 41, ../../app/assets/stylesheets/screen.css.scss */
+/* line 51, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .stage-run {
   border: 1px solid red;
   border-right: none;
@@ -48,29 +62,29 @@
   float: left;
   height: 230px;
 }
-/* line 49, ../../app/assets/stylesheets/screen.css.scss */
+/* line 59, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .stage-header {
   width: 100%;
   height: 50px;
   text-align: center;
 }
-/* line 55, ../../app/assets/stylesheets/screen.css.scss */
+/* line 65, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-holder {
   width: 100%;
   height: 100%;
 }
-/* line 59, ../../app/assets/stylesheets/screen.css.scss */
+/* line 69, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-select {
   background-color: orange;
 }
-/* line 63, ../../app/assets/stylesheets/screen.css.scss */
+/* line 73, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run {
   width: 149px;
   height: 175px;
   float: left;
   background-color: yellow;
 }
-/* line 69, ../../app/assets/stylesheets/screen.css.scss */
+/* line 79, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run .tempBar {
   width: 45px;
   height: 18px;
@@ -78,16 +92,101 @@
   cursor: move;
   z-index: 100;
 }
-/* line 75, ../../app/assets/stylesheets/screen.css.scss */
+/* line 85, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run .tempBar .label {
   float: right;
   width: 44px;
 }
-/* line 81, ../../app/assets/stylesheets/screen.css.scss */
+/* line 91, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run .line {
   background-color: black;
-  width: 50px;
+  width: 150px;
   height: 2px;
   position: relative;
-  -webkit-transform-origin: 0% 0%;
+  -webkit-transform-origin: 100% 100%;
+  right: 150px;
+  z-index: 10;
+  top: 6px;
+}
+
+/* line 107, ../../app/assets/stylesheets/screen.css.scss */
+#touchScreenContainer {
+  width: 800px;
+  height: 480px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+/* line 117, ../../app/assets/stylesheets/screen.css.scss */
+#touchScreenContainer .experiment-list {
+  max-height: 300px;
+  overflow: scroll;
+}
+/* line 121, ../../app/assets/stylesheets/screen.css.scss */
+#touchScreenContainer #track {
+  width: 700px;
+  overflow: scroll;
+}
+/* line 125, ../../app/assets/stylesheets/screen.css.scss */
+#touchScreenContainer #track #innertrack {
+  width: 1000px;
+  height: 240px;
+  border: 1px solid grey;
+}
+/* line 130, ../../app/assets/stylesheets/screen.css.scss */
+#touchScreenContainer #track #innertrack .stage-run {
+  border: 1px solid red;
+  border-right: none;
+  width: 151px;
+  float: left;
+  height: 230px;
+}
+/* line 138, ../../app/assets/stylesheets/screen.css.scss */
+#touchScreenContainer #track #innertrack .stage-header {
+  width: 100%;
+  height: 50px;
+  text-align: center;
+}
+/* line 144, ../../app/assets/stylesheets/screen.css.scss */
+#touchScreenContainer #track #innertrack .step-holder {
+  width: 100%;
+  height: 100%;
+}
+/* line 148, ../../app/assets/stylesheets/screen.css.scss */
+#touchScreenContainer #track #innertrack .step-select {
+  background-color: orange;
+}
+/* line 152, ../../app/assets/stylesheets/screen.css.scss */
+#touchScreenContainer #track #innertrack .step-run {
+  width: 149px;
+  height: 175px;
+  float: left;
+  background-color: yellow;
+}
+/* line 158, ../../app/assets/stylesheets/screen.css.scss */
+#touchScreenContainer #track #innertrack .step-run .tempBar {
+  width: 45px;
+  height: 18px;
+  float: right;
+  cursor: move;
+  z-index: 100;
+}
+/* line 164, ../../app/assets/stylesheets/screen.css.scss */
+#touchScreenContainer #track #innertrack .step-run .tempBar .label {
+  float: right;
+  width: 44px;
+}
+/* line 170, ../../app/assets/stylesheets/screen.css.scss */
+#touchScreenContainer #track #innertrack .step-run .line {
+  background-color: black;
+  width: 150px;
+  height: 2px;
+  position: relative;
+  -webkit-transform-origin: 100% 100%;
+  right: 150px;
+  z-index: 10;
+  top: 6px;
 }

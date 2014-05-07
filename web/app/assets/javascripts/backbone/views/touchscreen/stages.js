@@ -1,8 +1,8 @@
-ChaiBioTech.Views.Design = ChaiBioTech.Views.Design || {} ;
+ChaiBioTech.Views.touchScreen = ChaiBioTech.Views.touchScreen || {} ;
 
-ChaiBioTech.Views.Design.stages = Backbone.View.extend({
+ChaiBioTech.Views.touchScreen.stages = Backbone.View.extend({
 	
-	template: JST["backbone/templates/design/stage"],
+	template: JST["backbone/templates/touchscreen/stage"],
 	className: 'stage-run',
 	editableAdded: false , 
 	events: {
