@@ -3,8 +3,9 @@
 #include "fan.h"
 #include "heatsink.h"
 
-HeatSink::HeatSink(TEMPERATURE_CONTROLLER_ARGS)
-    :TEMPERATURE_CONTROLLER_INIT
+HeatSink::HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
+                   CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold)
+    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController, pidTimerInterval, pidRangeControlThreshold)
 {
     _fan = new Fan();
 

@@ -7,6 +7,7 @@
 Stage::Stage()
 {
     _numCycles = 1;
+    _cycleIteration = 0;
     _orderNumber = 0;
     _type = None;
     _currentComponent = _components.end();
@@ -27,12 +28,14 @@ Stage::Stage(Stage &&other)
 {
     _name = std::move(other._name);
     _numCycles = other._numCycles;
+    _cycleIteration = other._cycleIteration;
     _orderNumber = other._orderNumber;
     _type = other._type;
     _components = std::move(other._components);
     _currentComponent = other._currentComponent;
 
     other._numCycles = 0;
+    other._cycleIteration = 0;
     other._orderNumber = 0;
     other._type = None;
     other._currentComponent = other._components.end();
@@ -58,12 +61,14 @@ Stage& Stage::operator= (Stage &&other)
 {
     _name = std::move(other._name);
     _numCycles = other._numCycles;
+    _cycleIteration = other._cycleIteration;
     _orderNumber = other._orderNumber;
     _type = other._type;
     _components = std::move(other._components);
     _currentComponent = other._currentComponent;
 
     other._numCycles = 0;
+    other._cycleIteration = 0;
     other._orderNumber = 0;
     other._type = None;
     other._currentComponent = other._components.end();
@@ -98,6 +103,8 @@ void Stage::appendComponent(StageComponent &&component)
 void Stage::resetCurrentStep()
 {
     _currentComponent = _components.begin();
+
+    _cycleIteration = 0;
 }
 
 Step* Stage::currentStep() const
@@ -115,5 +122,19 @@ Step* Stage::nextStep()
 
     ++_currentComponent;
 
-    return currentStep();
+    Step *step = currentStep();
+
+    if (!step)
+    {
+        ++_cycleIteration;
+
+        if (_cycleIteration < _numCycles)
+        {
+            _currentComponent = _components.begin();
+
+            step = _currentComponent->step();
+        }
+    }
+
+    return step;
 }

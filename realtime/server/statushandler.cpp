@@ -6,7 +6,7 @@
 
 #include "statushandler.h"
 
-void StatusHandler::createData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt) {
+void StatusHandler::processData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt) {
     std::shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();
     std::shared_ptr<Optics> optics = OpticsInstance::getInstance();
     std::shared_ptr<Lid> lid = LidInstance::getInstance();
@@ -26,5 +26,5 @@ void StatusHandler::createData(const boost::property_tree::ptree &requestPt, boo
         responsePt.put("optics.lidOpen", optics->lidOpen());
     }
 
-    JSONHandler::createData(requestPt, responsePt);
+    JSONHandler::processData(requestPt, responsePt);
 }

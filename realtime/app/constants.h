@@ -8,6 +8,8 @@ const double kQTICurveZThermistorCCoefficient = -0.000000372283234;
 const double kQTICurveZThermistorDCoefficient = 0.000000099063233;
 
 //Lid
+const unsigned long kLidPIDMin = 0;
+const unsigned long kLidPIDMax = 1;
 const unsigned long kLidPWMPeriodNs = 500000;
 
 const double kLidThermistorBetaCoefficient = 3970;  //kelvins
@@ -35,8 +37,8 @@ const unsigned long kFanPWMPeriodNs = 1024;
 const unsigned long kHeatBlockZone1PWMPeriodNs = 500000;
 const unsigned long kHeatBlockZone2PWMPeriodNs = 500000;
 
-const int kHeatBlockZonesPIDMin = -500000;
-const int kHeatBlockZonesPIDMax = 500000;
+const int kHeatBlockZonesPIDMin = -1;
+const int kHeatBlockZonesPIDMax = 1;
 
 const double kHeatBlockZonesMinTargetTemp = -10;
 const double kHeatBlockZonesMaxTargetTemp = 105;

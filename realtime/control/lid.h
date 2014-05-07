@@ -7,7 +7,9 @@
 class Lid : public TemperatureController, public PWMControl
 {
 public:
-    Lid(TEMPERATURE_CONTROLLER_ARGS, const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold);
+    Lid(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
+        CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold,
+        const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold);
 
     boost::signals2::signal<void()> startThresholdReached;
 

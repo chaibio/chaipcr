@@ -4,8 +4,10 @@
 
 #include "lid.h"
 
-Lid::Lid(TEMPERATURE_CONTROLLER_ARGS, const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold)
-    :TEMPERATURE_CONTROLLER_INIT,
+Lid::Lid(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
+         CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold,
+         const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold)
+    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController, pidTimerInterval, pidRangeControlThreshold),
      PWMControl(pwmPath, pwmPeriod)
 {
     _startTempThreshold = startTempThreshold;

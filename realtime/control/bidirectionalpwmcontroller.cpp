@@ -3,8 +3,10 @@
 
 #include "bidirectionalpwmcontroller.h"
 
-BidirectionalPWMController::BidirectionalPWMController(TEMPERATURE_CONTROLLER_ARGS, const std::string &pwmPath, unsigned long pwmPeriod, unsigned int heatIOPin, unsigned int coolIOPin)
-    :TEMPERATURE_CONTROLLER_INIT,
+BidirectionalPWMController::BidirectionalPWMController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
+                                                       CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold,
+                                                       const std::string &pwmPath, unsigned long pwmPeriod, unsigned int heatIOPin, unsigned int coolIOPin)
+    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController, pidTimerInterval, pidRangeControlThreshold),
      PWMControl(pwmPath, pwmPeriod),
      _heatIO(heatIOPin, GPIO::kOutput), _coolIO(coolIOPin, GPIO::kOutput)
 {

@@ -74,7 +74,7 @@ shared_ptr<IControl> QPCRFactory::constructLid(vector<shared_ptr<ADCConsumer>> &
     shared_ptr<BetaThermistor> thermistor(new BetaThermistor(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                                              kLidThermistorBetaCoefficient, kLidThermistorT0Resistance, kLidThermistorT0));
 
-    CPIDController *pidController = new CPIDController({{50,1.0,0.0,0.0}, {100,1.0,0.0,0.0}}, 0, kLidPWMPeriodNs);
+    CPIDController *pidController = new CPIDController({{50,1.0,0.0,0.0}, {100,1.0,0.0,0.0}}, kLidPIDMin, kLidPIDMax);
 
     consumers.push_back(thermistor);
 

@@ -10,7 +10,7 @@ ControlHandler::ControlHandler(OperationType operation)
     _operation = operation;
 }
 
-void ControlHandler::createData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt)
+void ControlHandler::processData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt)
 {
     switch (_operation)
     {
@@ -45,5 +45,5 @@ void ControlHandler::createData(const boost::property_tree::ptree &requestPt, bo
         break;
     }
 
-    JSONHandler::createData(requestPt, responsePt);
+    JSONHandler::processData(requestPt, responsePt);
 }

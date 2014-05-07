@@ -56,7 +56,4 @@ private:
     double _pidRangeControlThreshold;
 };
 
-#define TEMPERATURE_CONTROLLER_ARGS std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold
-#define TEMPERATURE_CONTROLLER_INIT TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController, pidTimerInterval, pidRangeControlThreshold)
-
 #endif // TEMPERATURECONTROLLER_H

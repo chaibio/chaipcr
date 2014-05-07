@@ -25,8 +25,8 @@ public:
     inline int id() const { return _id; }
 
     inline void setName(const std::string &name) {_name = name;}
-    inline void setName(std::string &&name) {_name = name;}
-    inline const std::string name() const {return _name;}
+    inline void setName(std::string &&name) {_name = std::move(name);}
+    inline const std::string& name() const {return _name;}
 
     inline void setQpcr(bool qpcr) {_qpcr = qpcr;}
     inline bool qpcr() const {return _qpcr;}

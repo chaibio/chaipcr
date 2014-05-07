@@ -24,8 +24,8 @@ public:
     Stage& operator= (Stage &&other);
 
     inline void setName(const std::string &name) {_name = name;}
-    inline void setName(std::string &&name) {_name = name;}
-    inline const std::string name() const {return _name;}
+    inline void setName(std::string &&name) {_name = std::move(name);}
+    inline const std::string& name() const {return _name;}
 
     inline void setNumCycles(int numCycles) {_numCycles = numCycles;}
     inline int numCycles() const {return _numCycles;}
@@ -50,6 +50,8 @@ private:
     std::string _name;
 
     int _numCycles;
+    int _cycleIteration;
+
     int _orderNumber;
     Type _type;
 
