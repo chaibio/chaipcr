@@ -77,6 +77,8 @@ void ExperimentController::complete()
 
     _experiment->setCompletionStatus(Experiment::Success);
     _experiment->setCompletedAt(boost::posix_time::microsec_clock::local_time());
+
+    _dbControl->completeExperiment(_experiment);
 }
 
 void ExperimentController::stop()
