@@ -78,7 +78,7 @@ HEADERS += \
     util/instance.h \
     control/icontrol.h \
     control/maincontrollers.h \
-    server/qpcrapplication.h \
+    app/qpcrapplication.h \
     app/boostincludes.h \
     app/pocoincludes.h \
     util/utilincludes.h \
@@ -98,13 +98,13 @@ HEADERS += \
     server/httpstatushandler.h \
     server/statushandler.h \
     control/adcconsumer.h \
-    control/adcconsumer.h \
-    server/qpcrfactory.h \
+    app/qpcrfactory.h \
     control/temperaturecontroller.h \
     server/controlhandler.h \
     control/bidirectionalpwmcontroller.h \
     control/lid.h \
-    control/heatsink.h
+    control/heatsink.h \
+    app/experimentcontroller.h
 
 SOURCES += \
     app/pins.cpp \
@@ -124,7 +124,7 @@ SOURCES += \
     server/qpcrrequesthandlerfactory.cpp \
     server/jsonhandler.cpp \
     server/testcontrolhandler.cpp \
-    server/qpcrapplication.cpp \
+    app/qpcrapplication.cpp \
     util/pid.cpp \
     db/experiment.cpp \
     db/protocol.cpp \
@@ -137,9 +137,10 @@ SOURCES += \
     test/dbtest.cpp \
     server/httpstatushandler.cpp \
     server/statushandler.cpp \
-    server/qpcrfactory.cpp \
+    app/qpcrfactory.cpp \
     server/controlhandler.cpp \
     control/temperaturecontroller.cpp \
     control/bidirectionalpwmcontroller.cpp \
     control/lid.cpp \
-    control/heatsink.cpp
+    control/heatsink.cpp \
+    app/experimentcontroller.cpp

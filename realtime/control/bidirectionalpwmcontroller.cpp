@@ -31,7 +31,7 @@ void BidirectionalPWMController::setOutput(double value)
 
 void BidirectionalPWMController::resetOutput()
 {
-    setPWMDutyCycle(0);
+    setPWMDutyCycle(0.0);
 
     _heatIO.setValue(GPIO::kLow, true);
     _coolIO.setValue(GPIO::kLow, true);

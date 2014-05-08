@@ -1,7 +1,7 @@
 #include "pcrincludes.h"
 #include "boostincludes.h"
 #include "pocoincludes.h"
-#include "qpcrapplication.h"
+#include "experimentcontroller.h"
 
 #include "controlhandler.h"
 
@@ -15,11 +15,11 @@ void ControlHandler::processData(const boost::property_tree::ptree &requestPt, b
     switch (_operation)
     {
     case StartExperiment:
-        if (qpcrApp->machineState() == QPCRApplication::Idle)
+        if (ExperimentController::getInstance()->machineState() == ExperimentController::Idle)
         {
             int experimentId = requestPt.get<int>("experimentId");
 
-            if (!qpcrApp->startExperiment(experimentId))
+            if (!ExperimentController::getInstance()->start(experimentId))
             {
                 setErrorString("Experiment not found or have been used before");
                 setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
@@ -34,7 +34,7 @@ void ControlHandler::processData(const boost::property_tree::ptree &requestPt, b
         break;
 
     case StopExperiment:
-        qpcrApp->stopExperiment();
+        ExperimentController::getInstance()->stop();
 
         break;
 

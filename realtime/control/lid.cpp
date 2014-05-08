@@ -1,6 +1,6 @@
 #include "pcrincludes.h"
 #include "boostincludes.h"
-#include "qpcrapplication.h"
+#include "experimentcontroller.h"
 
 #include "lid.h"
 
@@ -34,6 +34,6 @@ void Lid::processOutput()
 {
     processPWM();
 
-    if (qpcrApp->machineState() == QPCRApplication::LidHeating && currentTemperature() >= (targetTemperature() - _startTempThreshold))
+    if (ExperimentController::getInstance()->machineState() == ExperimentController::LidHeating && currentTemperature() >= (targetTemperature() - _startTempThreshold))
         startThresholdReached();
 }
