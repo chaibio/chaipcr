@@ -1,6 +1,27 @@
 class Experiment < ActiveRecord::Base
   has_one :protocol, dependent: :destroy
-  
+  has_many :temperature_logs, -> {order("elapsed_time")}, dependent: :destroy do
+    def with_range(starttime, endtime, resolution)
+      results = where("elapsed_time >= ?", starttime)
+      if !endtime.blank?
+        results = results.where("elapsed_time <= ?", endtime)
+      end
+      outputs = []
+      counter = 0
+      gap = (resolution.blank?)? 1 : resolution.to_i/1000
+      results.each do |row|
+        if counter == 0
+          outputs << row
+        end
+        counter += 1
+        if counter == gap
+          counter = 0
+        end
+      end
+      outputs
+    end
+  end
+
   after_create do |experiment|
     #create default protocol
     protocol = Protocol.new(:lid_temperature=>110, :experiment_id=>experiment.id)
@@ -15,6 +36,9 @@ class Experiment < ActiveRecord::Base
     stage.steps << Step.new(:temperature=>4, :hold_time=>0)
     protocol.stages << stage
     protocol.save
+    
+    #testdata
+    TemperatureLog.testdata(experiment.id)
   end
   
   def copy(params)
