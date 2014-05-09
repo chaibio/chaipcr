@@ -47,7 +47,8 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
                                                                                     kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
                                                                                     kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient));
 
-    CPIDController *zone1CPIDController = new CPIDController({{50,75000.0,0.05,0.0}, {100,75000.0,0.05,0.0}}, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax);
+    std::vector<SPIDTuning> heatBlockPIDSchedule = {{50, 0.2, 0.01, 0.0}, {100, 0.2, 0.01, 0.0}};
+    CPIDController *zone1CPIDController = new CPIDController(heatBlockPIDSchedule, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax);
 
     HeatBlockZoneController *zone1 = new HeatBlockZoneController(zone1Thermistor, kHeatBlockZonesMinTargetTemp, kHeatBlockZonesMaxTargetTemp,
                                                                  zone1CPIDController, kPIDIntervalMs, kHeatBlockZone1PIDThreshold, kHeatBlockZone1PWMPath,
@@ -57,7 +58,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
                                                                                     kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
                                                                                     kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient));
 
-    CPIDController *zone2CPIDController = new CPIDController({{50,75000.0,0.05,0.0}, {100,75000.0,0.05,0.0}}, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax);
+    CPIDController *zone2CPIDController = new CPIDController(heatBlockPIDSchedule, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax);
 
     HeatBlockZoneController *zone2 = new HeatBlockZoneController(zone2Thermistor, kHeatBlockZonesMinTargetTemp, kHeatBlockZonesMaxTargetTemp,
                                                                  zone2CPIDController, kPIDIntervalMs, kHeatBlockZone2PIDThreshold, kHeatBlockZone2PWMPath,
