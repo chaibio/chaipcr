@@ -22,19 +22,19 @@ ChaiBioTech.Views.touchScreen.runExperiment = Backbone.View.extend({
 		} else if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data.selectedStep)){
 			ChaiBioTech.Data.selectedStage = ChaiBioTech.Data.selectedStep.options.parentStage;
 			this.model.createStage("holding", ChaiBioTech.Data.selectedStage, this.expId);
-			ChaiBioTech.Data.selectedStage = null;
 		} else {
 			this.model.createStage("holding", ChaiBioTech.Data.lastStage, this.expId);
 		}
 		
+			ChaiBioTech.Data.selectedStage = null;
 	},
 
 	addCyclingStage: function(e) {
-		e.preventDefault();
 		if(!_.isNull(ChaiBioTech.Data.selectedStage) && !_.isUndefined(ChaiBioTech.Data.selectedStage)) {
 			this.model.createStage("cycling", ChaiBioTech.Data.selectedStage, this.expId);
 			ChaiBioTech.Data.selectedStage = null;
-		} else if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data.selectedStep)){
+		} else if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data
+		e.preventDefault();.selectedStep)){
 			ChaiBioTech.Data.selectedStage = ChaiBioTech.Data.selectedStep.options.parentStage;
 			this.model.createStage("cycling", ChaiBioTech.Data.selectedStep.options.parentStage, this.expId);
 			ChaiBioTech.Data.selectedStep = null;
