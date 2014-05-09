@@ -33,6 +33,7 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 					parentStep = originalObject.options.parentStep;
 				},
 				drag: function() {
+					console.log(parseInt($(this).position().top));
 					currentPosition = parseInt($(this).position().top - ChaiBioTech.Constants.originalStepHeight, 10);
 					number = ((ChaiBioTech.Constants.stepHeight - (currentPosition)) / ChaiBioTech.Constants.stepUnitMovement).toFixed(2); 
 					$(this).find(".label").html(number);
