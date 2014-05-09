@@ -41,10 +41,11 @@ ChaiBioTech.Views.touchScreen.steps = Backbone.View.extend({
 			$(this.el).css("background-color","orange");
 			ChaiBioTech.Data.selectedStep = this;
 		}
+		//console.log(ChaiBioTech.Data.selectedStep);
 	},
 
 	initialize: function() {
-		this.tempControlView = new ChaiBioTech.Views.Design.tempControl({
+		this.tempControlView = new ChaiBioTech.Views.touchScreen.tempControl({
 			model: this.model,
 			parentStep: this,
 			grandParent: thisObject.options.grandParent

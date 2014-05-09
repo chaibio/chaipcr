@@ -42,7 +42,7 @@ ChaiBioTech.Models.touchScreenModel = Backbone.Model.extend({
 		}
 	},
 
-	createStep: function(step, place) {
+	createStep: function(step, place, id) {
 		that = this;
 		stage = step.options.parentStage.model;
 		dataToBeSend = {};
@@ -60,7 +60,7 @@ ChaiBioTech.Models.touchScreenModel = Backbone.Model.extend({
 			data: JSON.stringify(dataToBeSend)
 		})
 		.done(function(data) {
-			that.getLatestModel();
+			that.getLatestModel(id);
 		})
 		.fail(function() {
 			alert("Failed to update");
@@ -68,7 +68,7 @@ ChaiBioTech.Models.touchScreenModel = Backbone.Model.extend({
 		}); 
 	},
 
-	createStage: function(type, stageData) {
+	createStage: function(type, stageData, id) {
 		that = this;
 		var data = this.get("experiment");
 		dataToBeSend = {
@@ -84,7 +84,7 @@ ChaiBioTech.Models.touchScreenModel = Backbone.Model.extend({
 			data: JSON.stringify(dataToBeSend)
 		})
 		.done(function(data) {
-			that.getLatestModel();
+			that.getLatestModel(id);
 		})
 		.fail(function() {
 			alert("Failed to update");
@@ -108,7 +108,8 @@ ChaiBioTech.Models.touchScreenModel = Backbone.Model.extend({
 		})
 	},
 
-	deleteStep: function(step) {
+	deleteStep: function(step, id) {
+		console.log(step)
 		that = this;
 		$.ajax({
 			url: "/steps/"+step.model.id,
@@ -117,9 +118,7 @@ ChaiBioTech.Models.touchScreenModel = Backbone.Model.extend({
 		})
 		.done(function(data) {
 			console.log(data);
-			that.getLatestModel(function() {
-				step.deleteView();
-			});
+			that.getLatestModel(id);
 		})
 		.fail(function() {
 			alert("Failed to update");
@@ -127,7 +126,7 @@ ChaiBioTech.Models.touchScreenModel = Backbone.Model.extend({
 		}); 
 	},
 
-	deleteStage: function(stage) {
+	deleteStage: function(stage, id) {
 		console.log("stage to be deleted", stage, stage.model.id);
 		that = this;
 		dataToBeSend = {
@@ -141,7 +140,7 @@ ChaiBioTech.Models.touchScreenModel = Backbone.Model.extend({
 		})
 		.done(function(data) {
 			console.log(data);
-			that.getLatestModel();
+			that.getLatestModel(id);
 		})
 		.fail(function() {
 			alert("Failed to update");

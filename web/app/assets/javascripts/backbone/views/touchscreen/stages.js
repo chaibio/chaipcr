@@ -60,7 +60,7 @@ ChaiBioTech.Views.touchScreen.stages = Backbone.View.extend({
 	},
 
 	initialize: function() {
-		
+	
 		this.on("unselectStage", function() {
 			$(this.el).css("background-color", "white");
 			ChaiBioTech.Data.selectedStage = null;
@@ -92,7 +92,7 @@ ChaiBioTech.Views.touchScreen.stages = Backbone.View.extend({
 		currentWidth = $("#innertrack").width();
 		$("#innertrack").css("width", (currentWidth + ((numberOfSteps + 1) * 149) + 1 +"px"));
 		_.each(allSteps, function(step, index) {
-			stepView = new ChaiBioTech.Views.Design.steps({
+			stepView = new ChaiBioTech.Views.touchScreen.steps({
 				model: step["step"],
 				stepInfo: step,
 				parentStage: thisObject,
