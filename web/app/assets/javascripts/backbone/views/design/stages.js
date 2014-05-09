@@ -4,7 +4,7 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	
 	template: JST["backbone/templates/design/stage"],
 	className: 'stage-run',
-	editableAdded: false , 
+	editableAdded: false ,
 	events: {
 		"click .stage-header": "selectStage",
 		"click .stageName" : "changeStageName"
@@ -66,7 +66,6 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 			ChaiBioTech.Data.selectedStage = null;
 		});
 
-
 		_.bindAll(this, "addSteps", "render", "editStageName");
 	},
 
@@ -75,7 +74,15 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	},
 
 	render:function() {
-		$(this.el).html(this.template(this.options["stageInfo"]["stage"]));	
+
+		$(this.el).html(this.template(this.options["stageInfo"]["stage"]));
+		if(this.model.stage_type == "cycling") {
+			cyclingOptions = new ChaiBioTech.Views.Design.cyclingStageOptions({
+				
+			});
+			console.log(cyclingOptions.render().el)
+			$(this.el).find(".stage-header").append(cyclingOptions.render().el);
+		}	
 		return this;
 	},
 

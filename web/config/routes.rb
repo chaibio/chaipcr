@@ -67,6 +67,7 @@ Qpcrctl::Application.routes.draw do
       get 'protocol'
       get 'platessetup'
       get 'status'
+      get 'temperature_data'
     end
   end
   

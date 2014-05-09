@@ -34,4 +34,31 @@ describe "Experiments API" do
     json = JSON.parse(response.body)
     json.length.should eq(2)
   end
+  
+  it "list all temperature data" do
+    experiment = Experiment.create(:name=>"test1")
+    totallength = experiment.temperature_logs.length
+    get "/experiments/#{experiment.id}/temperature_data?starttime=0&resolution=1000", { :format => 'json' }
+    expect(response).to be_success
+    json = JSON.parse(response.body)
+    json.length.should eq(totallength)
+  end
+  
+  it "list temperature data every 2 second" do
+    experiment = Experiment.create(:name=>"test1")
+    totallength = experiment.temperature_logs.length
+    get "/experiments/#{experiment.id}/temperature_data?starttime=0&resolution=2000", { :format => 'json' }
+    expect(response).to be_success
+    json = JSON.parse(response.body)
+    json.length.should eq((totallength+1)/2)
+  end
+  
+  it "list temperature data every 3 second" do
+    experiment = Experiment.create(:name=>"test1")
+    totallength = experiment.temperature_logs.length
+    get "/experiments/#{experiment.id}/temperature_data?starttime=0&resolution=3000", { :format => 'json' }
+    expect(response).to be_success
+    json = JSON.parse(response.body)
+    json.length.should eq((totallength+2)/3)
+  end
 end
