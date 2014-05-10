@@ -13,6 +13,8 @@ ExperimentController::ExperimentController()
     _dbControl = new DBControl();
     _experiment = nullptr;
     _holdStepTimer = new Poco::Timer();
+    _logTimer = new Poco::Timer();
+    _lastLogTime = 0;
 
     LidInstance::getInstance()->startThresholdReached.connect(boost::bind(&ExperimentController::run, this));
     HeatBlockInstance::getInstance()->stepBegun.connect(boost::bind(&ExperimentController::stepBegun, this));
@@ -22,6 +24,7 @@ ExperimentController::~ExperimentController()
 {
     stop();
 
+    delete _logTimer;
     delete _holdStepTimer;
     delete _dbControl;
 }
@@ -45,6 +48,8 @@ bool ExperimentController::start(int experimentId)
 
     _experiment->setStartedAt(boost::posix_time::microsec_clock::local_time());
     _dbControl->startExperiment(_experiment);
+
+    startLogging();
 
     LidInstance::getInstance()->setTargetTemperature(_experiment->protocol()->lidTemperature());
     LidInstance::getInstance()->setEnableMode(true);
@@ -85,6 +90,8 @@ void ExperimentController::stop()
 {
     if (_machineState == Idle)
         return;
+
+    stopLogging();
 
     LidInstance::getInstance()->setEnableMode(false);
     HeatBlockInstance::getInstance()->setEnableMode(false);
@@ -129,4 +136,32 @@ void ExperimentController::holdStepCallback(Poco::Timer &timer)
     HeatBlockInstance::getInstance()->enableStepProcessing();
 
     timer.restart(0);
+}
+
+void ExperimentController::startLogging()
+{
+    _lastLogTime = time(nullptr);
+
+    addLogCallback(*_logTimer);
+
+    _logTimer->setPeriodicInterval(kTemperatureLogerInterval);
+    _logTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::addLogCallback));
+}
+
+void ExperimentController::stopLogging()
+{
+    _logTimer->stop();
+    _lastLogTime = 0;
+}
+
+void ExperimentController::addLogCallback(Poco::Timer &)
+{
+    TemperatureLog log(_experiment->id());
+    log.setElapsedTime(time(nullptr) - _lastLogTime);
+    log.setLidTemperature(LidInstance::getInstance()->currentTemperature());
+    log.setHeatBlockZone1Temperature(HeatBlockInstance::getInstance()->zone1Temperature());
+    log.setHeatBlockZone2Temperature(HeatBlockInstance::getInstance()->zone2Temperature());
+
+    _dbControl->addTemperatureLog(log);
+    _lastLogTime = time(nullptr);
 }

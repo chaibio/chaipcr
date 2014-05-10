@@ -173,6 +173,12 @@ void DBControl::completeExperiment(Experiment *experiment)
             soci::use(experiment->completedAt()), soci::use(experiment->completionStatus());
 }
 
+void DBControl::addTemperatureLog(const TemperatureLog &log)
+{
+    *_session << "INSERT INTO temperature_logs VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_temp, :heat_block_zone_2_temp)",
+            soci::use(log.experimentId()), soci::use(log.elapsedTime()), soci::use(log.lidTemperature()), soci::use(log.heatBlockZone1Temperature()), soci::use(log.heatBlockZone2Temperature());
+}
+
 #ifdef TEST_BUILD
 std::vector<int> DBControl::getEperimentIdList()
 {

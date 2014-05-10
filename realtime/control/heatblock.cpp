@@ -58,3 +58,11 @@ double HeatBlock::maxTemperatureSetpointDelta() const {
 
     return zone1Abs > zone2Abs ? zone1Abs : zone2Abs;
 }
+
+double HeatBlock::zone1DriveValue() const {
+    return (double)_zones.first->pwmDutyCycle() / _zones.first->pwmPeriod();
+}
+
+double HeatBlock::zone2DriveValue() const {
+    return (double)_zones.second->pwmDutyCycle() / _zones.second->pwmPeriod();
+}

@@ -13,11 +13,15 @@ void StatusHandler::processData(const boost::property_tree::ptree &requestPt, bo
 
     if (heatBlock) {
         responsePt.put("heatblock.zone1.temperature", heatBlock->zone1Temperature());
+        responsePt.put("heatblock.zone1.drive", (double)heatBlock->zone1DriveValue());
+
         responsePt.put("heatblock.zone2.temperature", heatBlock->zone2Temperature());
+        responsePt.put("heatblock.zone2.drive", (double)heatBlock->zone2DriveValue());
     }
 
     if(lid) {
         responsePt.put("lid.temperature", lid->currentTemperature());
+        responsePt.put("lid.drive", (double)lid->pwmDutyCycle() / lid->pwmPeriod());
     }
 
     if (optics) {

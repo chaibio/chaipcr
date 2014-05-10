@@ -10,7 +10,7 @@ INCLUDEPATH += ./libraries/include/
 INCLUDEPATH += ./libraries/include/soci #for internal SOCI use
 INCLUDEPATH += $(BOOST_INCLUDE_PATH)
 
-LIBS += -L../realtime/libraries/lib/
+LIBS += -L$$_PRO_FILE_PWD_/libraries/lib/
 
 #Poco
 LIBS += -lPocoFoundation
@@ -104,7 +104,8 @@ HEADERS += \
     control/bidirectionalpwmcontroller.h \
     control/lid.h \
     control/heatsink.h \
-    app/experimentcontroller.h
+    app/experimentcontroller.h \
+    db/temperaturelog.h
 
 SOURCES += \
     app/pins.cpp \

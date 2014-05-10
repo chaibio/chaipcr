@@ -62,4 +62,7 @@ const std::vector<int> kWellList = {5, 8, 7, 6, 11, 10, 9, 12, 4, 3, 2, 1, 16, 1
 //Steps
 const double kPCRBeginStepTemperatureThreshold = 1;
 
+//Experiment Controller
+const long kTemperatureLogerInterval = 1000;
+
 #endif

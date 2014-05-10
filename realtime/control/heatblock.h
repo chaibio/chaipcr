@@ -23,6 +23,9 @@ public:
 
     double maxTemperatureSetpointDelta () const;
 
+    double zone1DriveValue() const;
+    double zone2DriveValue() const;
+
     boost::signals2::signal<void()> stepBegun;
 
 private:

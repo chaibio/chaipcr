@@ -35,6 +35,10 @@ private:
 
     void holdStepCallback(Poco::Timer &timer);
 
+    void startLogging();
+    void stopLogging();
+    void addLogCallback(Poco::Timer &timer);
+
 private:
     std::atomic<MachineState> _machineState;
 
@@ -42,6 +46,9 @@ private:
     Experiment *_experiment;
 
     Poco::Timer *_holdStepTimer;
+
+    Poco::Timer *_logTimer;
+    time_t _lastLogTime;
 };
 
 #endif // EXPERIMENTCONTROLLER_H
