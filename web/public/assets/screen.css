@@ -16,7 +16,7 @@
 .boundaryDiv {
   border-left: 1px solid red;
   float: left;
-  height: 230px;
+  height: 352px;
   width: 2px;
 }
 
@@ -29,14 +29,14 @@
 
 /* line 27, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #play-ground {
-  min-height: 400px;
+  min-height: 600px;
   min-width: 600px;
   margin: 30px 0 0 0;
 }
 /* line 33, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #run-experiment {
   border-left: solid 1px gray;
-  height: 400px;
+  height: 600px;
   width: 700px;
 }
 /* line 38, ../../app/assets/stylesheets/screen.css.scss */
@@ -51,7 +51,7 @@
 /* line 46, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack {
   width: 1000px;
-  height: 240px;
+  height: 353px;
   border: 1px solid grey;
 }
 /* line 51, ../../app/assets/stylesheets/screen.css.scss */
@@ -60,31 +60,30 @@
   border-right: none;
   width: 151px;
   float: left;
-  height: 230px;
 }
-/* line 59, ../../app/assets/stylesheets/screen.css.scss */
+/* line 58, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .stage-header {
   width: 100%;
-  height: 50px;
+  height: 150px;
   text-align: center;
 }
-/* line 65, ../../app/assets/stylesheets/screen.css.scss */
+/* line 64, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-holder {
   width: 100%;
   height: 100%;
 }
-/* line 69, ../../app/assets/stylesheets/screen.css.scss */
+/* line 68, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-select {
   background-color: orange;
 }
-/* line 73, ../../app/assets/stylesheets/screen.css.scss */
+/* line 72, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run {
   width: 149px;
-  height: 175px;
+  height: 200px;
   float: left;
   background-color: yellow;
 }
-/* line 79, ../../app/assets/stylesheets/screen.css.scss */
+/* line 78, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run .tempBar {
   width: 45px;
   height: 18px;
@@ -92,12 +91,12 @@
   cursor: move;
   z-index: 100;
 }
-/* line 85, ../../app/assets/stylesheets/screen.css.scss */
+/* line 84, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run .tempBar .label {
   float: right;
   width: 44px;
 }
-/* line 91, ../../app/assets/stylesheets/screen.css.scss */
+/* line 90, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run .line {
   background-color: black;
   width: 150px;
@@ -109,7 +108,7 @@
   top: 6px;
 }
 
-/* line 107, ../../app/assets/stylesheets/screen.css.scss */
+/* line 106, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer {
   width: 800px;
   height: 480px;
@@ -120,23 +119,23 @@
   -ms-user-select: none;
   user-select: none;
 }
-/* line 117, ../../app/assets/stylesheets/screen.css.scss */
+/* line 116, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer .experiment-list {
   max-height: 300px;
   overflow: scroll;
 }
-/* line 121, ../../app/assets/stylesheets/screen.css.scss */
+/* line 120, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track {
   width: 700px;
   overflow: scroll;
 }
-/* line 125, ../../app/assets/stylesheets/screen.css.scss */
+/* line 124, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track #innertrack {
   width: 1000px;
   height: 240px;
   border: 1px solid grey;
 }
-/* line 130, ../../app/assets/stylesheets/screen.css.scss */
+/* line 129, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track #innertrack .stage-run {
   border: 1px solid red;
   border-right: none;
@@ -144,29 +143,29 @@
   float: left;
   height: 230px;
 }
-/* line 138, ../../app/assets/stylesheets/screen.css.scss */
+/* line 137, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track #innertrack .stage-header {
   width: 100%;
   height: 50px;
   text-align: center;
 }
-/* line 144, ../../app/assets/stylesheets/screen.css.scss */
+/* line 143, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track #innertrack .step-holder {
   width: 100%;
   height: 100%;
 }
-/* line 148, ../../app/assets/stylesheets/screen.css.scss */
+/* line 147, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track #innertrack .step-select {
   background-color: orange;
 }
-/* line 152, ../../app/assets/stylesheets/screen.css.scss */
+/* line 151, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track #innertrack .step-run {
   width: 149px;
   height: 175px;
   float: left;
   background-color: yellow;
 }
-/* line 158, ../../app/assets/stylesheets/screen.css.scss */
+/* line 157, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track #innertrack .step-run .tempBar {
   width: 45px;
   height: 18px;
@@ -174,12 +173,12 @@
   cursor: move;
   z-index: 100;
 }
-/* line 164, ../../app/assets/stylesheets/screen.css.scss */
+/* line 163, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track #innertrack .step-run .tempBar .label {
   float: right;
   width: 44px;
 }
-/* line 170, ../../app/assets/stylesheets/screen.css.scss */
+/* line 169, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track #innertrack .step-run .line {
   background-color: black;
   width: 150px;

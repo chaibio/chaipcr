@@ -12,6 +12,7 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 
 	changeStageName: function(evt) {
 		evt.preventDefault();
+		evt.stopPropagation();
 		if(! this.editableAdded) {
 			thisPointer = this;
 			$(this.el).find('.stageName').editable({
