@@ -45,13 +45,13 @@ ChaiBioTech.Views.Design.line = Backbone.View.extend({
 			fixLeftSide = this.options.previousLine.model.temperature;
 		}
 		this.mathLogic(dragTemp, fixLeftSide);
-		
+
 		if(! _.isUndefined(this.options.nextLine)) { // excluding last step.
 			nextDude = this.options.nextLine;
 			nextDude.trigger("moveLineRight", {"leftSide": dragTemp});
 		}
 	},
-	
+
 	render: function(temperature) {
 		this.positionLine(temperature);
 		return this;

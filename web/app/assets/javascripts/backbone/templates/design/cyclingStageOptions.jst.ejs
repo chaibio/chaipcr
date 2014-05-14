@@ -1,17 +1,10 @@
 <p>
 	<div>
-		Number of cycles: <select id="cycleNumber"></select>
-	</div>
-</p>
-
-<p>
-	<div>
-		<input type="checkbox" id="autoDelta">:Enable auto delta
-	</div>
-</p>
-
-<p>
-	<div>
-		 Starting cycle: <select id="startingCycle"><option>1</option><option>1</option><option>1</option></select>
+		Number of cycles:
+		<div class="input-group noof-cycles">
+		  <input id="cycleCount" type="number" class="form-control" value="<%=cycleNo %>" min="1" max="999">
+		  <span class="input-group-addon save-cycle">Save</span>
+		</div>
+		<div style="display:none" class="alert alert-warning noof-cycle-warning">Please enter a valid number between 0-1000.</div>
 	</div>
 </p>
