@@ -3,7 +3,6 @@ ChaiBioTech.Views.Design = ChaiBioTech.Views.Design || {} ;
 ChaiBioTech.Views.Design.cyclingStageOptions = Backbone.View.extend({
 	numCycles: 0,
 	template: JST["backbone/templates/design/cyclingStageOptions"],
-	optionTemplate: JST["backbone/templates/design/options"],
 	events: {
 		"click .save-cycle": "saveCycle",
 		"click .form-control": "stopPropagation",
@@ -43,10 +42,6 @@ ChaiBioTech.Views.Design.cyclingStageOptions = Backbone.View.extend({
 			cycleNo: this.numCycles
 		}
 		$(this.el).html(this.template(cycleConfig));
-		keeper = "";
-		for(var i = 0; i<40; i++) {
-			keeper = this.optionTemplate({"value": i + 1}) + keeper;
-		}
 		return this;
 	}
 });
