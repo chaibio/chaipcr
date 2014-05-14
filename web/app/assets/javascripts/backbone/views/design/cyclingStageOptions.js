@@ -6,7 +6,8 @@ ChaiBioTech.Views.Design.cyclingStageOptions = Backbone.View.extend({
 	optionTemplate: JST["backbone/templates/design/options"],
 	events: {
 		"click .save-cycle": "saveCycle",
-		"click .form-control": "stopPropagation"
+		"click .form-control": "stopPropagation",
+		"keypress .form-control": "checkForEnter"
 	},
 
 	saveCycle: function(evt) {
@@ -20,6 +21,12 @@ ChaiBioTech.Views.Design.cyclingStageOptions = Backbone.View.extend({
 		} else {
 			$(this.el).find(".noof-cycle-warning").show();
 			$(this.el).find(".noof-cycle-success").hide();
+		}
+	},
+
+	checkForEnter: function(evt) {
+		if(evt.keyCode === 13) {
+			this.saveCycle(evt);
 		}
 	},
 
