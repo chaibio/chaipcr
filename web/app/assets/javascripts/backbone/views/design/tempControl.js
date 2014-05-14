@@ -5,6 +5,14 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 	template: JST["backbone/templates/design/step"],
 	className: 'tempBar',
 	dragAdded: false,
+
+	events: {
+		"click": "disablePropagation"
+	},
+
+	disablePropagation: function(evt) {
+		evt.stopPropagation();
+	},
 	
 	initialize: function() {
 
