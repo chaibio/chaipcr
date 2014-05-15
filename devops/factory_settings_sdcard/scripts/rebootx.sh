@@ -17,9 +17,13 @@ else
 	timeout=$1
 	echo "waiting for $timeout seconds before forcing reboot"
 fi
-sleep $timeout
 
-echo "Reboot timeoutted!"
-reboot -n -f
+reboot_after_timeout () {
+	sleep $timeout
+	echo "Reboot timeoutted!"
+	reboot -n -f
+}
+
+reboot_after_timeout &
 
 exit 0

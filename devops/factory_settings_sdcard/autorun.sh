@@ -272,7 +272,7 @@ then
 
 		sync
 		rebootx
-		exit
+		exit 0
 	fi
 else
 	echo "Device is partitioned"
