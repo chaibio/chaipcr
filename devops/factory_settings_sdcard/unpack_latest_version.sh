@@ -273,10 +273,18 @@ upgrade_autorun_flag_up () {
 }
 
 upgrade_autorun_flag_down () {
-	if [ -e ${sdcard_p1}/upgrade_autorun.flag ] 
+	if [ -e ${sdcard_p1}/upgrade_autorun.flag ]
 	then
 		rm ${sdcard_p1}/upgrade_autorun.flag || true
 	fi
 }
+
+if [ "$1" = "factorysettings" ]
+then
+    	echo "No migrate autorun for factory settings!"
+else
+	echo "Adding migrate autorun flag"
+	upgrade_autorun_flag_up
+fi
 
 exit 0
