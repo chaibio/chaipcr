@@ -226,33 +226,40 @@
 #logScreen .graphOutLine .content-area {
   height: 94%;
 }
-/* line 220, ../../app/assets/stylesheets/screen.css.scss */
+/* line 219, ../../app/assets/stylesheets/screen.css.scss */
+#logScreen .graphOutLine .black-heading {
+  width: 180px;
+  font-weight: bold;
+  font-size: 18px;
+  margin: 30px auto;
+}
+/* line 226, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .currentTemperatures {
   width: 24%;
   height: 100%;
   margin-left: 7px;
   float: left;
 }
-/* line 226, ../../app/assets/stylesheets/screen.css.scss */
+/* line 232, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .zones {
   width: 100%;
   height: 76%;
 }
-/* line 230, ../../app/assets/stylesheets/screen.css.scss */
+/* line 236, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .zones .content-area {
   height: 92%;
 }
-/* line 234, ../../app/assets/stylesheets/screen.css.scss */
+/* line 240, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .plots {
   margin-top: 2px;
   width: 100%;
   height: 24%;
 }
-/* line 239, ../../app/assets/stylesheets/screen.css.scss */
+/* line 245, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .plots .content-area {
   height: 74%;
 }
-/* line 243, ../../app/assets/stylesheets/screen.css.scss */
+/* line 249, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .blue-heading {
   width: 100%;
   height: 35px;
@@ -263,7 +270,7 @@
   line-height: 3em;
   padding-left: 10px;
 }
-/* line 253, ../../app/assets/stylesheets/screen.css.scss */
+/* line 259, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .content-area {
   margin: 0px 2px 1px 2px;
   border: solid 1px #02408F;
