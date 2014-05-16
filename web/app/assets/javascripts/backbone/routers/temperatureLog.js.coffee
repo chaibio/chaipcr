@@ -7,7 +7,9 @@ class ChaiBioTech.Routers.temperatureLog extends Backbone.Router
 		"temperatureLog": "initiateLogScreen"
 
 	initiateLogScreen: () ->
-		console.log "okay jackpot"
+		mainView = new ChaiBioTech.Views.temperatureLog.main
+		#console.log mainView.render().el
+		$("#container").append mainView.render().el
 
 
 		
