@@ -89,4 +89,16 @@ class ExperimentsController < ApplicationController
       format.json { render "destroy", :status => (ret)? :ok :  :unprocessable_entity}
     end
   end
+  
+  api :GET, "/experiment/:id/temperature_data?starttime=xx&endtime=xx&resolution=xx", "Retrieve temperature data"
+  param :starttime, Integer, :desc => "0 means start of the experiment, in ms", :required => true
+  param :endtime, Integer, :desc => "if not specified, it returns everything to the end of the experiment, in ms"
+  param :resolution, Integer, :desc => "Include data points for every x milliseconds. Must be a multiple of 1000 ms"
+  def temperature_data
+    @experiment = Experiment.find_by_id(params[:id]) 
+    @temperatures =  @experiment.temperature_logs.with_range(params[:starttime], params[:endtime], params[:resolution])
+    respond_to do |format|
+      format.json { render "temperature_data", :status => :ok}
+    end
+  end
 end

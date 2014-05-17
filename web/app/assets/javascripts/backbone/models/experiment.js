@@ -176,6 +176,27 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 				console.log("Failed to update");
 			})
 	},
+	//these two functions can be combined, because they change basic stage settings
+	changeStageCycle: function(cycleCount, id, stageType) {
+		dataToBeSend = {'stage':
+							{
+								'stage_type': stageType,
+								'num_cycles': cycleCount
+							}
+						}
+		$.ajax({
+				url: "/stages/"+id,
+				contentType: 'application/json',
+				type: 'PUT',
+				data: JSON.stringify(dataToBeSend)
+			})
+			.done(function(data) {
+					console.log("Data updated from server", data, that);
+			})
+			.fail(function() {
+				console.log("Failed to update");
+			})
+	},
 
 	changeTemperature: function(newTemp, rampObj) {
 		

@@ -9,6 +9,7 @@
       <li><a href='#experiments-start'>start</a></li>
       <li><a href='#experiments-stop'>stop</a></li>
       <li><a href='#experiments-destroy'>destroy</a></li>
+      <li><a href='#experiments-temperature_data'>temperature_data</a></li>
   </ul>
   <h4><a href='#main'>Main</a></h4>
   <ul>
@@ -314,6 +315,65 @@
 
 
       </div>
+      <hr/>
+
+      <h3 id="experiments-temperature_data">
+      <a href='#experiments'>Experiments</a> / <a href='#experiments-temperature_data'>temperature_data</a>
+      </h3>
+
+      <div>
+          <h4>
+              GET /experiment/:id/temperature_data?starttime=xx&amp;endtime=xx&amp;resolution=xx
+            <br>
+            <small>Retrieve temperature data</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+          <h4>Params</h4>
+          <ul>
+    <li>
+      <strong>starttime </strong>:
+      <small>
+        required
+        
+          [ Must be Integer ]
+      </small>
+      
+<p>0 means start of the experiment, in ms</p>
+
+    </li>
+    
+    <li>
+      <strong>endtime </strong>:
+      <small>
+        optional
+        
+          [ Must be Integer ]
+      </small>
+      
+<p>if not specified, it returns everything to the end of the experiment, in ms</p>
+
+    </li>
+    
+    <li>
+      <strong>resolution </strong>:
+      <small>
+        optional
+        
+          [ Must be Integer ]
+      </small>
+      
+<p>Include data points for every x milliseconds. Must be a multiple of 1000 ms</p>
+
+    </li>
+    
+</ul>
+
+      </div>
   </div>
 
   <hr/>
@@ -398,7 +458,7 @@
       <small>
         required
         
-          [ Must be BigDecimal ]
+          [ Must be Float ]
       </small>
       
 <p>lid temperature, in degree C, default is 110, with precision to one decimal
@@ -464,7 +524,7 @@ point</p>
       <small>
         required
         
-          [ Must be BigDecimal ]
+          [ Must be Float ]
       </small>
       
 <p>Rate of the ramp, in degrees C/s, set to 100 for max, precision to 8
@@ -765,7 +825,7 @@ when step is created, default ramp with max rate (100) will be created</p>
       <small>
         optional
         
-          [ Must be BigDecimal ]
+          [ Must be Float ]
       </small>
       
 <p>Temperature of the step, in degree C, with precision to one decimal point</p>
@@ -853,7 +913,7 @@ when step is created, default ramp with max rate (100) will be created</p>
       <small>
         optional
         
-          [ Must be BigDecimal ]
+          [ Must be Float ]
       </small>
       
 <p>Temperature of the step, in degree C, with precision to one decimal point</p>

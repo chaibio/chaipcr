@@ -1,10 +1,10 @@
 ChaiBioTech.Views.Design = ChaiBioTech.Views.Design || {} ;
 
 ChaiBioTech.Views.Design.stages = Backbone.View.extend({
-	
+
 	template: JST["backbone/templates/design/stage"],
 	className: 'stage-run',
-	editableAdded: false , 
+	editableAdded: false ,
 	events: {
 		"click .stage-header": "selectStage",
 		"click .stageName" : "changeStageName"
@@ -12,6 +12,7 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 
 	changeStageName: function(evt) {
 		evt.preventDefault();
+		evt.stopPropagation();
 		if(! this.editableAdded) {
 			thisPointer = this;
 			$(this.el).find('.stageName').editable({
@@ -20,10 +21,10 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	           name:  'stagename',
 	           success:   function(respo, newval) {
 	           		thisPointer.editStageName(newval);
-	           }        
+	           }
 	        });
 			this.editableAdded = true;
-			//fires a click so that editable works as normal for a single click ..! 
+			//fires a click so that editable works as normal for a single click ..!
 			$(this.el).find('.stageName').click();
 		}
 	},
@@ -60,12 +61,11 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	},
 
 	initialize: function() {
-		
+
 		this.on("unselectStage", function() {
 			$(this.el).css("background-color", "white");
 			ChaiBioTech.Data.selectedStage = null;
 		});
-
 
 		_.bindAll(this, "addSteps", "render", "editStageName");
 	},
@@ -75,7 +75,16 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	},
 
 	render:function() {
-		$(this.el).html(this.template(this.options["stageInfo"]["stage"]));	
+
+		$(this.el).html(this.template(this.options["stageInfo"]["stage"]));
+		if(this.model.stage_type == "cycling") {
+			cyclingOptions = new ChaiBioTech.Views.Design.cyclingStageOptions({
+				model: this.model,
+				grandParent: thisObject.options.grandParent
+			});
+			console.log(cyclingOptions.render().el)
+			$(this.el).find(".stage-header").append(cyclingOptions.render().el);
+		}
 		return this;
 	},
 
@@ -99,7 +108,7 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 				prev_id:  previous_id,
 				grandParent: thisObject.options.grandParent
 			});
-			
+
 			if(! _.isNull(previous_step)) {
 				previous_step.options.next_id = step["step"]["id"];
 			}

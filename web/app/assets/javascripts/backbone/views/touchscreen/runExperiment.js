@@ -22,11 +22,11 @@ ChaiBioTech.Views.touchScreen.runExperiment = Backbone.View.extend({
 		} else if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data.selectedStep)){
 			ChaiBioTech.Data.selectedStage = ChaiBioTech.Data.selectedStep.options.parentStage;
 			this.model.createStage("holding", ChaiBioTech.Data.selectedStage, this.expId);
-			ChaiBioTech.Data.selectedStage = null;
 		} else {
 			this.model.createStage("holding", ChaiBioTech.Data.lastStage, this.expId);
 		}
 		
+			ChaiBioTech.Data.selectedStage = null;
 	},
 
 	addCyclingStage: function(e) {
