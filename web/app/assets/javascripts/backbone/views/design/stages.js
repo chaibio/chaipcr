@@ -97,9 +97,9 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 		previous_id = null;
 		steps = [];
 		numberOfSteps = allSteps.length - 1;
-		$(thisObject.el).css("width", ((numberOfSteps + 1) * 149) + 1 +"px");
+		$(thisObject.el).css("width", ((numberOfSteps + 1) * ChaiBioTech.Constants.stepWidth) + 2 +"px");
 		currentWidth = $("#innertrack").width();
-		$("#innertrack").css("width", (currentWidth + ((numberOfSteps + 1) * 149) + 1 +"px"));
+		$("#innertrack").css("width", (currentWidth + ((numberOfSteps + 1) * ChaiBioTech.Constants.stepWidth) + 2 +"px"));
 		_.each(allSteps, function(step, index) {
 			stepView = new ChaiBioTech.Views.Design.steps({
 				model: step["step"],
