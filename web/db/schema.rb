@@ -63,6 +63,6 @@ ActiveRecord::Schema.define(version: 20140507064000) do
     t.decimal "heat_block_zone_2_temp", precision: 5, scale: 2
   end
 
-  add_index "temperature_logs", ["experiment_id", "elapsed_time"], name: "index_temperature_logs_on_experiment_id_and_elapsed_time", unique: true
+  add_index "temperature_logs", ["experiment_id", "elapsed_time"], name: "index_temperature_logs_on_experiment_id_and_elapsed_time"
 
 end
