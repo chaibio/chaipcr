@@ -8,6 +8,6 @@ class CreateTemperatureLogTable < ActiveRecord::Migration
       t.decimal :heat_block_zone_2_temp, :precision => 5, :scale => 2, :comment => "degrees C"
     end
     
-    add_index :temperature_logs, [:experiment_id, :elapsed_time]
+    add_index :temperature_logs, [:experiment_id, :elapsed_time], :unique => true
   end
 end
