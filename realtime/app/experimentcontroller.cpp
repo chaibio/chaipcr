@@ -118,7 +118,7 @@ void ExperimentController::stepBegun()
 
     if (nextStep)
     {
-        _holdStepTimer->setPeriodicInterval(currentStep->holdTime());
+        _holdStepTimer->setPeriodicInterval(currentStep->holdTime() * 1000);
         _holdStepTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::holdStepCallback));
     }
     else
