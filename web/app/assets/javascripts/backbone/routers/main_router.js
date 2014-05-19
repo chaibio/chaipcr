@@ -3,7 +3,7 @@ ChaiBioTech.Routers.DesignRouter = Backbone.Router.extend({
   initialize: function() {
     this.experimentCollection = new ChaiBioTech.Collections.Experiment();
     this.experimentModel = new ChaiBioTech.Models.Experiment();
-    this.experimentCollection.fetch(/*{success: this.gotcha}*/);
+    //this.experimentCollection.fetch(/*{success: this.gotcha}*/);
   },
 
   /*gotcha: function(coll, respo) {
