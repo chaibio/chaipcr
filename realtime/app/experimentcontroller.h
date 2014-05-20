@@ -23,6 +23,7 @@ public:
     ~ExperimentController();
 
     inline MachineState machineState() const { return _machineState; }
+    inline const Experiment* experiment() const { return _experiment; }
 
     bool start(int experimentId);
     void stop();
@@ -46,9 +47,7 @@ private:
     Experiment *_experiment;
 
     Poco::Timer *_holdStepTimer;
-
     Poco::Timer *_logTimer;
-    time_t _lastLogTime;
 };
 
 #endif // EXPERIMENTCONTROLLER_H

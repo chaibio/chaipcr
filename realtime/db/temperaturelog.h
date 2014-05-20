@@ -15,8 +15,8 @@ public:
 
     inline int experimentId() const { return _experimentId; }
 
-    inline time_t elapsedTime() const { return _elapsedTime; }
-    inline void setElapsedTime(time_t time) { _elapsedTime = time; }
+    inline long elapsedTime() const { return _elapsedTime; }
+    inline void setElapsedTime(long time) { _elapsedTime = time; }
 
     inline double lidTemperature() const { return _lidTemperature; }
     inline void setLidTemperature(double temperature) { _lidTemperature = temperature; }
@@ -29,7 +29,7 @@ public:
 
 private:
     int _experimentId;
-    time_t _elapsedTime;
+    long _elapsedTime;
     double _lidTemperature;
     double _heatBlockZone1Temperature;
     double _heatBlockZone2Temperature;

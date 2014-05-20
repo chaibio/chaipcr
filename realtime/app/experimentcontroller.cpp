@@ -14,7 +14,6 @@ ExperimentController::ExperimentController()
     _experiment = nullptr;
     _holdStepTimer = new Poco::Timer();
     _logTimer = new Poco::Timer();
-    _lastLogTime = 0;
 
     LidInstance::getInstance()->startThresholdReached.connect(boost::bind(&ExperimentController::run, this));
     HeatBlockInstance::getInstance()->stepBegun.connect(boost::bind(&ExperimentController::stepBegun, this));
@@ -140,8 +139,6 @@ void ExperimentController::holdStepCallback(Poco::Timer &timer)
 
 void ExperimentController::startLogging()
 {
-    _lastLogTime = time(nullptr);
-
     addLogCallback(*_logTimer);
 
     _logTimer->setPeriodicInterval(kTemperatureLogerInterval);
@@ -151,17 +148,15 @@ void ExperimentController::startLogging()
 void ExperimentController::stopLogging()
 {
     _logTimer->stop();
-    _lastLogTime = 0;
 }
 
 void ExperimentController::addLogCallback(Poco::Timer &)
 {
     TemperatureLog log(_experiment->id());
-    log.setElapsedTime(time(nullptr) - _lastLogTime);
+    log.setElapsedTime((boost::posix_time::microsec_clock::local_time() - _experiment->startedAt()).total_milliseconds());
     log.setLidTemperature(LidInstance::getInstance()->currentTemperature());
     log.setHeatBlockZone1Temperature(HeatBlockInstance::getInstance()->zone1Temperature());
     log.setHeatBlockZone2Temperature(HeatBlockInstance::getInstance()->zone2Temperature());
 
     _dbControl->addTemperatureLog(log);
-    _lastLogTime = time(nullptr);
 }

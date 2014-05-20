@@ -3,6 +3,8 @@
 #include "pocoincludes.h"
 #include "utilincludes.h"
 #include "controlincludes.h"
+#include "dbincludes.h"
+#include "experimentcontroller.h"
 
 #include "statushandler.h"
 
@@ -10,6 +12,8 @@ void StatusHandler::processData(const boost::property_tree::ptree &requestPt, bo
     std::shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();
     std::shared_ptr<Optics> optics = OpticsInstance::getInstance();
     std::shared_ptr<Lid> lid = LidInstance::getInstance();
+    std::shared_ptr<HeatSink> heatSink = HeatSinkInstace::getInstance();
+    std::shared_ptr<ExperimentController> experimentController = ExperimentController::getInstance();
 
     if (heatBlock) {
         responsePt.put("heatblock.zone1.temperature", heatBlock->zone1Temperature());
@@ -28,6 +32,37 @@ void StatusHandler::processData(const boost::property_tree::ptree &requestPt, bo
         responsePt.put("optics.intensity", optics->getLedController()->intensity());
         responsePt.put("optics.collectData", optics->collectData());
         responsePt.put("optics.lidOpen", optics->lidOpen());
+    }
+
+    if (heatSink) {
+        responsePt.put("heatSink.temperature", heatSink->currentTemperature());
+    }
+
+    if (experimentController) {
+        switch (experimentController->machineState()) {
+        case ExperimentController::Idle:
+            responsePt.put("experimentController.machine.state", "Idle");
+            break;
+
+        case ExperimentController::LidHeating:
+            responsePt.put("experimentController.machine.state", "LidHeating");
+            break;
+
+        case ExperimentController::Running:
+            responsePt.put("experimentController.machine.state", "Running");
+            break;
+
+        case ExperimentController::Complete:
+            responsePt.put("experimentController.machine.state", "Complete");
+            break;
+
+        default:
+            responsePt.put("experimentController.machine.state", "Unknown");
+            break;
+        }
+
+        responsePt.put("experimentController.expriment.started_at", experimentController->experiment()->startedAt());
+        responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experimentController->experiment()->startedAt()).total_seconds());
     }
 
     JSONHandler::processData(requestPt, responsePt);
