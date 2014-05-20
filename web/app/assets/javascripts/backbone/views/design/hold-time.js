@@ -34,6 +34,25 @@ ChaiBioTech.Views.Design.holdTime = Backbone.View.extend({
 			seconds: seconds
 		}
 		$(this.el).html(this.template(time));
+		$(this.el).find(".seconds").editable({
+           type:  'number',
+           title: 'Seconds',
+           name:  'seconds',
+           success:   function(respo, newval) {
+           		//thisPointer.editStageName(newval);
+           		alert("okay");
+           }
+	    });
+
+	    $(this.el).find(".minutes").editable({
+           type:  'number',
+           title: 'Minutes',
+           name:  'minutes',
+           success:   function(respo, newval) {
+           		//thisPointer.editStageName(newval);
+           		alert("okay");
+           }
+	    });
 		return this
 	}
 

@@ -120,19 +120,8 @@
   z-index: 10;
   top: 6px;
 }
-/* line 113, ../../app/assets/stylesheets/screen.css.scss */
-#stadium #track #innertrack .step-run .time {
-  width: 16px;
-  float: left;
-  cursor: pointer;
-}
-/* line 119, ../../app/assets/stylesheets/screen.css.scss */
-#stadium #track #innertrack .step-run .seperate {
-  width: 5px;
-  float: left;
-}
 
-/* line 130, ../../app/assets/stylesheets/screen.css.scss */
+/* line 118, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer {
   width: 800px;
   height: 480px;
@@ -143,23 +132,23 @@
   -ms-user-select: none;
   user-select: none;
 }
-/* line 140, ../../app/assets/stylesheets/screen.css.scss */
+/* line 128, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer .experiment-list {
   max-height: 300px;
   overflow: scroll;
 }
-/* line 144, ../../app/assets/stylesheets/screen.css.scss */
+/* line 132, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track {
   width: 700px;
   overflow: scroll;
 }
-/* line 148, ../../app/assets/stylesheets/screen.css.scss */
+/* line 136, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track #innertrack {
   width: 1000px;
   height: 240px;
   border: 1px solid grey;
 }
-/* line 153, ../../app/assets/stylesheets/screen.css.scss */
+/* line 141, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track #innertrack .stage-run {
   border: 1px solid red;
   border-right: none;
@@ -167,29 +156,29 @@
   float: left;
   height: 230px;
 }
-/* line 161, ../../app/assets/stylesheets/screen.css.scss */
+/* line 149, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track #innertrack .stage-header {
   width: 100%;
   height: 50px;
   text-align: center;
 }
-/* line 167, ../../app/assets/stylesheets/screen.css.scss */
+/* line 155, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track #innertrack .step-holder {
   width: 100%;
   height: 100%;
 }
-/* line 171, ../../app/assets/stylesheets/screen.css.scss */
+/* line 159, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track #innertrack .step-select {
   background-color: orange;
 }
-/* line 175, ../../app/assets/stylesheets/screen.css.scss */
+/* line 163, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track #innertrack .step-run {
   width: 149px;
   height: 175px;
   float: left;
   background-color: yellow;
 }
-/* line 181, ../../app/assets/stylesheets/screen.css.scss */
+/* line 169, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track #innertrack .step-run .tempBar {
   width: 45px;
   height: 18px;
@@ -197,12 +186,12 @@
   cursor: move;
   z-index: 100;
 }
-/* line 187, ../../app/assets/stylesheets/screen.css.scss */
+/* line 175, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track #innertrack .step-run .tempBar .label {
   float: right;
   width: 44px;
 }
-/* line 193, ../../app/assets/stylesheets/screen.css.scss */
+/* line 181, ../../app/assets/stylesheets/screen.css.scss */
 #touchScreenContainer #track #innertrack .step-run .line {
   background-color: black;
   width: 150px;
@@ -214,67 +203,67 @@
   top: 6px;
 }
 
-/* line 209, ../../app/assets/stylesheets/screen.css.scss */
+/* line 197, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen {
   width: 980px;
   height: 600px;
   padding: 5px;
   margin: auto;
 }
-/* line 218, ../../app/assets/stylesheets/screen.css.scss */
+/* line 206, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .blue-border {
   border: solid 1px #02408F;
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
 }
-/* line 223, ../../app/assets/stylesheets/screen.css.scss */
+/* line 211, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .graphOutLine {
   width: 100%;
   height: 100%;
   float: left;
 }
-/* line 228, ../../app/assets/stylesheets/screen.css.scss */
+/* line 216, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .graphOutLine .content-area {
   height: 93.7%;
 }
-/* line 231, ../../app/assets/stylesheets/screen.css.scss */
+/* line 219, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .graphOutLine .black-heading {
   width: 180px;
   font-weight: bold;
   font-size: 18px;
   margin: 30px auto;
 }
-/* line 237, ../../app/assets/stylesheets/screen.css.scss */
+/* line 225, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .graphOutLine #graph {
   height: 80%;
 }
-/* line 241, ../../app/assets/stylesheets/screen.css.scss */
+/* line 229, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .currentTemperatures {
   width: 24%;
   height: 100%;
   margin-left: 7px;
   float: left;
 }
-/* line 247, ../../app/assets/stylesheets/screen.css.scss */
+/* line 235, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .zones {
   width: 100%;
   height: 76%;
 }
-/* line 251, ../../app/assets/stylesheets/screen.css.scss */
+/* line 239, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .zones .content-area {
   height: 92%;
 }
-/* line 255, ../../app/assets/stylesheets/screen.css.scss */
+/* line 243, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .plots {
   margin-top: 2px;
   width: 100%;
   height: 24%;
 }
-/* line 260, ../../app/assets/stylesheets/screen.css.scss */
+/* line 248, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .plots .content-area {
   height: 74%;
 }
-/* line 264, ../../app/assets/stylesheets/screen.css.scss */
+/* line 252, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .blue-heading {
   width: 100%;
   height: 35px;
@@ -285,7 +274,7 @@
   line-height: 3em;
   padding-left: 10px;
 }
-/* line 274, ../../app/assets/stylesheets/screen.css.scss */
+/* line 262, ../../app/assets/stylesheets/screen.css.scss */
 #logScreen .content-area {
   margin: 0px 2px 1px 2px;
   border: solid 1px #02408F;
