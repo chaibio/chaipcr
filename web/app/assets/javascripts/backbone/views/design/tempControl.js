@@ -42,7 +42,7 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 				},
 				drag: function() {
 					number = 100 - ((parseInt($(originalObject.el).css("top")) * 100 )/ ChaiBioTech.Constants.stepHeight);
-					number = number.toFixed(2);
+					number = number.toFixed(1);
 					$(this).find(".label").html(number);
 					$(this).data("data-temperature", number);
 					originalObject.line.trigger("moveThisLine", {"toThisTemp": number});
@@ -50,7 +50,7 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 
 				stop: function() {
 					number = 100 - ((parseInt($(originalObject.el).css("top")) * 100 )/ ChaiBioTech.Constants.stepHeight);
-					number = number.toFixed(2);
+					number = number.toFixed(1);
 					$(this).find(".label").html(number);
 					parentStep.trigger("changeTemperature", number);
 					originalObject.line.trigger("moveThisLine", {"toThisTemp": number});

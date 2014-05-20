@@ -9,7 +9,7 @@ class ChaiBioTech.Views.temperatureLog.main extends Backbone.View
 	
 	render: () ->
 		$(@el).html(@template())
-		return this
+		return @
 
 	plotGraph: (canvas) ->
 		@canvas = canvas;
