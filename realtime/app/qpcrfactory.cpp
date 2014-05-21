@@ -82,3 +82,15 @@ shared_ptr<IControl> QPCRFactory::constructLid(vector<shared_ptr<ADCConsumer>> &
     return LidInstance::createInstance(thermistor, kLidMinTargetTemp, kLidMaxTargetTemp, pidController, kPIDIntervalMs, kLidPIDThreshold,
                                        kLidControlPWMPath, kLidPWMPeriodNs, kProgramStartLidTempThreshold);
 }
+
+shared_ptr<IControl> QPCRFactory::constructHeatSink(vector<shared_ptr<ADCConsumer>> &consumers)
+{
+    shared_ptr<BetaThermistor> thermistor(new BetaThermistor(kThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
+                                                             kHeatSinkThermistorBetaCoefficient, kHeatSinkThermistorT0Resistance, kHeatSinkThermistorT0));
+
+    CPIDController *pidController = new CPIDController({{50,1.0,0.0,0.0}, {100,1.0,0.0,0.0}}, kHeatSinkPIDMin, kHeatSinkPIDMax);
+
+    consumers.push_back(thermistor);
+
+    return HeatSinkInstace::createInstance(thermistor, kHeatSinkMinTargetTemp, kHeatSinkMaxTargetTemp, pidController, kPIDIntervalMs, kHeatSinkPIDThreshold);
+}

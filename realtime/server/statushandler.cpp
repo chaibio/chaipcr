@@ -61,8 +61,10 @@ void StatusHandler::processData(const boost::property_tree::ptree &requestPt, bo
             break;
         }
 
-        responsePt.put("experimentController.expriment.started_at", experimentController->experiment()->startedAt());
-        responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experimentController->experiment()->startedAt()).total_seconds());
+        if (experimentController->machineState() != ExperimentController::Idle) {
+            responsePt.put("experimentController.expriment.started_at", experimentController->experiment()->startedAt());
+            responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experimentController->experiment()->startedAt()).total_seconds());
+        }
     }
 
     JSONHandler::processData(requestPt, responsePt);

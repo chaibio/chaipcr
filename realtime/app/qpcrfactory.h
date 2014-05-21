@@ -14,6 +14,7 @@ private:
     static std::shared_ptr<IControl> constructOptics(std::shared_ptr<SPIPort> ledSPIPort);
     static std::shared_ptr<IControl> constructHeatBlock(std::vector<std::shared_ptr<ADCConsumer>> &consumers);
     static std::shared_ptr<IControl> constructLid(std::vector<std::shared_ptr<ADCConsumer>> &consumers);
+    static std::shared_ptr<IControl> constructHeatSink(std::vector<std::shared_ptr<ADCConsumer>> &consumers);
 };
 
 

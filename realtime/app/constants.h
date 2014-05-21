@@ -65,4 +65,17 @@ const double kPCRBeginStepTemperatureThreshold = 1;
 //Experiment Controller
 const long kTemperatureLogerInterval = 1000;
 
+//Heat Sink
+const double kHeatSinkThermistorBetaCoefficient = 3970;  //kelvins
+const double kHeatSinkThermistorT0Resistance = 10000;    //ohms
+const double kHeatSinkThermistorT0 = 298.15;             //kelvins
+
+const double kHeatSinkMinTargetTemp = -130;
+const double kHeatSinkMaxTargetTemp = 0;
+
+const unsigned long kHeatSinkPIDMin = -1;
+const unsigned long kHeatSinkPIDMax = 0;
+
+const double kHeatSinkPIDThreshold = 100;
+
 #endif
