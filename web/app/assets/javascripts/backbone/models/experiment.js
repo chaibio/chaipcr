@@ -214,6 +214,23 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 			.fail(function() {
 				console.log("Failed to update");
 			})
+	},
+
+	chngeHoldTime: function(newTime, stepObj) {
+		dataToBeSend = {'step':{'hold_time': newTime}}
+		console.log(dataToBeSend)
+		$.ajax({
+				url: "/steps/"+stepObj.id,
+				contentType: 'application/json',
+				type: 'PUT',
+				data: JSON.stringify(dataToBeSend)
+			})
+			.done(function(data) {
+					console.log("Data updated from server woohaa" , data);
+			})
+			.fail(function() {
+				console.log("Failed to update");
+			})
 	}
 });
 
