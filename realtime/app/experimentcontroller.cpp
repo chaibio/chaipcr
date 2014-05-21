@@ -53,7 +53,7 @@ bool ExperimentController::start(int experimentId)
     LidInstance::getInstance()->setTargetTemperature(_experiment->protocol()->lidTemperature());
     LidInstance::getInstance()->setEnableMode(true);
 
-    HeatSinkInstace::getInstance()->setEnableMode(true);
+    //HeatSinkInstace::getInstance()->setEnableMode(true);
 
     return true;
 }
@@ -94,7 +94,7 @@ void ExperimentController::stop()
 
     LidInstance::getInstance()->setEnableMode(false);
     HeatBlockInstance::getInstance()->setEnableMode(false);
-    HeatSinkInstace::getInstance()->setEnableMode(false);
+    //HeatSinkInstace::getInstance()->setEnableMode(false);
 
     if (_machineState != Complete)
     {

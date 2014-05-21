@@ -20,7 +20,7 @@ vector<shared_ptr<IControl> > QPCRFactory::constructMachine() {
     controls.push_back(QPCRFactory::constructOptics(spiPort1));
     controls.push_back(QPCRFactory::constructHeatBlock(consumers));
     controls.push_back(QPCRFactory::constructLid(consumers));
-    controls.push_back(QPCRFactory::constructHeatSink(consumers));
+    //controls.push_back(QPCRFactory::constructHeatSink(consumers));
 
     controls.push_back(ADCControllerInstance::createInstance(consumers, kLTC2444CSPinNumber, std::move(SPIPort(kSPI0DevicePath)), kSPI0DataInSensePinNumber)); //Not refactored yet
 
