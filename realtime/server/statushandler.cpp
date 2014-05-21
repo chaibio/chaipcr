@@ -8,7 +8,7 @@
 
 #include "statushandler.h"
 
-void StatusHandler::processData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt) {
+void StatusHandler::processData(const boost::property_tree::ptree &, boost::property_tree::ptree &responsePt) {
     std::shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();
     std::shared_ptr<Optics> optics = OpticsInstance::getInstance();
     std::shared_ptr<Lid> lid = LidInstance::getInstance();
@@ -66,6 +66,4 @@ void StatusHandler::processData(const boost::property_tree::ptree &requestPt, bo
             responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experimentController->experiment()->startedAt()).total_seconds());
         }
     }
-
-    JSONHandler::processData(requestPt, responsePt);
 }
