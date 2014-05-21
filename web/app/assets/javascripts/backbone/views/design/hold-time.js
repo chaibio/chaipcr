@@ -6,6 +6,7 @@ ChaiBioTech.Views.Design.holdTime = Backbone.View.extend({
 	disablePropagationMinutes: false,
 	disablePropagationSeconds: false,
 	holdTimeInSeconds: 0,
+	className: "hold-time",
 	events: {
 		"click .minutes": "editMinute",
 		"click .seconds": "editSeconds"
@@ -17,12 +18,12 @@ ChaiBioTech.Views.Design.holdTime = Backbone.View.extend({
 		$(".editable-popup").find(".input-mini"). //Injecting attr s to number, editable doen't support number type
 		attr("min", 0).
 		attr("max", 59);
-		if(! this.disablePropagationMinutes) { // Tells click on the editable shd stay thr itself
+		//if(! this.disablePropagationMinutes) { // Tells click on the editable shd stay thr itself
 			$(".editable-popup").on("click", function(evt) {
 				evt.stopPropagation();
 			});
-			this.disablePropagationMinutes = true;
-		}
+			//this.disablePropagationMinutes = true;
+		//}
 	},
 
 	editSeconds: function(evt) {
@@ -31,29 +32,33 @@ ChaiBioTech.Views.Design.holdTime = Backbone.View.extend({
 		$(".editable-popup").find(".input-mini"). //Injecting attr s to number, editable doen't support number type
 		attr("min", 0).
 		attr("max", 59);
-		if(! this.disablePropagationSeconds) { // Tells click on the editable shd stay thr itself
+		//if(! this.disablePropagationSeconds) { // Tells click on the editable shd stay thr itself
 			$(".editable-popup").on("click", function(evt) {
 				evt.stopPropagation();
 			});
-			this.disablePropagationSeconds = true;
-		}
+			//this.disablePropagationSeconds = true;
+		//}
 	},
 
 	changeHoldTime: function() {
-
 		console.log(this, this.minutes, this.seconds);
+		this.holdTimeInSeconds = (this.minutes * 60) + this.seconds;
+		$(this.el).html("");
+		this.render();
+
 	},
 
 	initialize: function() {
 		this.holdTimeInSeconds = parseInt(this.model["hold_time"]);
-		this.minutes = this.holdTimeInSeconds/60;
+		this.minutes = (this.holdTimeInSeconds/60).toFixed();
 		this.seconds = this.holdTimeInSeconds%60;
 	},
 
 	render: function() {
 		holdTimeObject = this;
 		timeInSeconds = this.holdTimeInSeconds;
-		minutes = (timeInSeconds >= 60) ? timeInSeconds / 60 : "0";
+		console.log("Lolax", timeInSeconds);
+		minutes = (timeInSeconds >= 60) ? (timeInSeconds / 60).toFixed() : "0";
 		seconds = timeInSeconds % 60;
 		minutes = (minutes < 10) ? "0"+minutes.toString() : minutes;
 		seconds = (seconds < 10) ? "0"+seconds.toString() : seconds;
@@ -62,9 +67,6 @@ ChaiBioTech.Views.Design.holdTime = Backbone.View.extend({
 			seconds: seconds
 		}
 		$(this.el).html(this.template(time));
-		$(this.el).find(".seconds").on("init", function(e, editable) {
-			
-		});
 		//Two handlers can be combined below but it will take some 
 		//complex code to figure out right function call. So this way, less complex
 		$(this.el).find(".seconds ").editable({
@@ -72,8 +74,9 @@ ChaiBioTech.Views.Design.holdTime = Backbone.View.extend({
            title: 'Seconds',
            name:  'seconds',
            success:   function(respo, newval) {
-           		holdTimeObject.seconds = parseInt(newval);
-           		holdTimeObject.changeHoldTime();
+           		thisPointer = $(this).data("data-thisObject");//Correcting the reference
+           		thisPointer.seconds = parseInt(newval);
+           		thisPointer.changeHoldTime();
            }
 	    });
 
@@ -82,11 +85,13 @@ ChaiBioTech.Views.Design.holdTime = Backbone.View.extend({
            title: 'Minutes',
            name:  'minutes',
            success:   function(respo, newval) {
-           		console.log(newval);
-           		holdTimeObject.minutes = parseInt(newval);
-           		holdTimeObject.changeHoldTime();
+           		thisPointer = $(this).data("data-thisObject");//Correcting the reference
+           		thisPointer.minutes = parseInt(newval);
+           		thisPointer.changeHoldTime();
            }
 	    });
+	    $(this.el).find(".minutes").data("data-thisObject", this);
+	    $(this.el).find(".seconds").data("data-thisObject", this);
 		return this
 	}
 
