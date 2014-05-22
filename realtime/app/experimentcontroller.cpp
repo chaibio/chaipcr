@@ -117,6 +117,7 @@ void ExperimentController::stepBegun()
 
     if (nextStep)
     {
+        _holdStepTimer->stop();
         _holdStepTimer->setStartInterval(currentStep->holdTime() * 1000);
         _holdStepTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::holdStepCallback));
     }
@@ -133,8 +134,6 @@ void ExperimentController::holdStepCallback(Poco::Timer &timer)
 {
     HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->currentStep()->temperature());
     HeatBlockInstance::getInstance()->enableStepProcessing();
-
-    timer.restart(0);
 }
 
 void ExperimentController::startLogging()
