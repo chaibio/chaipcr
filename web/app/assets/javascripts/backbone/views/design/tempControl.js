@@ -53,6 +53,7 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 					number = number.toFixed(1);
 					$(this).find(".label").html(number);
 					parentStep.trigger("changeTemperature", number);
+					parentStep.holdTime.trigger("tempChanged", number);
 					originalObject.line.trigger("moveThisLine", {"toThisTemp": number});
 				}
 		});

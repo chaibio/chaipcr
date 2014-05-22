@@ -44,6 +44,12 @@ ChaiBioTech.Views.Design.holdTime = Backbone.View.extend({
 		this.holdTimeInSeconds = parseInt(this.model["hold_time"]);
 		this.minutes = Math.floor(this.holdTimeInSeconds/60);
 		this.seconds = this.holdTimeInSeconds%60;
+
+		this.on("tempChanged", function(change) {
+			$(this.el).animate({
+				"top": ((100 - change) * ChaiBioTech.Constants.stepHeight)/100
+			}, "fast");
+		});
 	},
 
 	render: function() {
