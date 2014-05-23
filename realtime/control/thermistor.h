@@ -50,24 +50,4 @@ private:
     double _rInfinity;  //calculated from _r0 and _beta
 };
 
-class TemperatureControl {
-public:
-    TemperatureControl(std::shared_ptr<Thermistor> thermistor):
-        _thermistor {thermistor}
-    {
-        setTargetTemperature(0);
-    }
-
-    virtual ~TemperatureControl() {}
-
-    inline double targetTemperature() const { return _targetTemperature.load(); }
-    inline void setTargetTemperature(double temperature) { _targetTemperature.store(temperature); }
-
-    inline double currentTemperature() const { return _thermistor->temperature(); }
-
-protected:
-    std::shared_ptr<Thermistor> _thermistor;
-    std::atomic<double> _targetTemperature;
-};
-
 #endif

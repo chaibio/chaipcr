@@ -11,6 +11,8 @@ GPIO::GPIO(unsigned int pinNumber, Direction direction) :
 	
 	exportPin();
 	setDirection(direction);
+
+    savedValue = value();
 }
 
 GPIO::GPIO(GPIO &&other) {

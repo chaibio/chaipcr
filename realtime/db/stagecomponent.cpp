@@ -79,9 +79,9 @@ void StageComponent::setStep(const Step &step)
 void StageComponent::setStep(Step &&step)
 {
     if (_step)
-        *_step = step;
+        *_step = std::move(step);
     else
-        _step = new Step(step);
+        _step = new Step(std::move(step));
 }
 
 void StageComponent::setStep(Step *step)
@@ -103,9 +103,9 @@ void StageComponent::setRamp(const Ramp &ramp)
 void StageComponent::setRamp(Ramp &&ramp)
 {
     if (_ramp)
-        *_ramp = ramp;
+        *_ramp = std::move(ramp);
     else
-        _ramp = new Ramp(ramp);
+        _ramp = new Ramp(std::move(ramp));
 }
 
 void StageComponent::setRamp(Ramp *ramp)

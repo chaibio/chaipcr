@@ -2,46 +2,37 @@
 #define _HEATBLOCK_H_
 
 #include "icontrol.h"
-#include "pwm.h"
 
-//class Thermistor;
-//class HeatBlockZoneController;
-
-class HeatBlockZoneControllerOutput : public PWMControl
-{
-protected:
-    HeatBlockZoneControllerOutput(const std::string &pwmPath, unsigned long pwmPeriod, unsigned int heatIOPin, unsigned int coolIOPin);
-
-    void setValue(double pidResult);
-    void process(double pidResult);
-
-private:
-    GPIO _heatIO;
-    GPIO _coolIO;
-};
-
-template <class Output = HeatBlockZoneControllerOutput>
-class TemperatureController;
-typedef TemperatureController<HeatBlockZoneControllerOutput> HeatBlockZoneController;
+class BidirectionalPWMController;
+typedef BidirectionalPWMController HeatBlockZoneController;
 
 // Class HeatBlock
 class HeatBlock : public IControl
 {
 public:
-    HeatBlock(HeatBlockZoneController* zone1, HeatBlockZoneController* zone2);
+    HeatBlock(HeatBlockZoneController* zone1, HeatBlockZoneController* zone2, double beginStepTemperatureThreshold);
 	~HeatBlock();
 	
     void process();
+    void setEnableMode(bool enableMode);
+    inline void enableStepProcessing() { _stepProcessingState = true; }
 
     void setTargetTemperature(double targetTemperature);
     double zone1Temperature() const;
     double zone2Temperature() const;
 
-    std::shared_ptr<Thermistor> zone1Thermistor() const;
-    std::shared_ptr<Thermistor> zone2Thermistor() const;
-	
+    double maxTemperatureSetpointDelta () const;
+
+    double zone1DriveValue() const;
+    double zone2DriveValue() const;
+
+    boost::signals2::signal<void()> stepBegun;
+
 private:
     std::pair<HeatBlockZoneController*, HeatBlockZoneController*> _zones;
+
+    double _beginStepTemperatureThreshold;
+    std::atomic<bool> _stepProcessingState;
 };
 
 #endif

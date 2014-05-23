@@ -1,30 +1,26 @@
 #ifndef LID_H
 #define LID_H
 
-#include "icontrol.h"
+#include "temperaturecontroller.h"
 #include "pwm.h"
-#include "thermistor.h"
 
-class CPIDController;
-
-namespace Poco { class Timer; }
-
-class Lid : public IControl, public PWMControl, public TemperatureControl
+class Lid : public TemperatureController, public PWMControl
 {
 public:
-    Lid(std::vector<SPIDTuning> pidTunningList);
-    ~Lid();
+    Lid(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
+        CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold,
+        const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold);
 
-    void process();
-    std::shared_ptr<Thermistor> thermistor() const {return _thermistor;}
+    boost::signals2::signal<void()> startThresholdReached;
+
+protected:
+    void setOutput(double value);
+    void resetOutput();
+    bool outputDirection() const;
+    void processOutput();
 
 private:
-    void initPID();
-    void pidCallback(Poco::Timer &timer);
-
-    CPIDController *_pidController;
-    Poco::Timer *_pidTimer;
-    std::vector<SPIDTuning> _pidTuningList;
+    double _startTempThreshold;
 };
 
 #endif // LID_H

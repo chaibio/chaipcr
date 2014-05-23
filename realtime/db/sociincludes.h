@@ -78,6 +78,57 @@ struct type_conversion<Stage::Type>
     }
 };
 
+template<>
+struct type_conversion<Experiment::CompletionStatus>
+{
+    typedef std::string base_type;
+
+    static void from_base(base_type const &in, soci::indicator indicator, Experiment::CompletionStatus &out)
+    {
+        if (indicator != soci::i_null)
+        {
+            if (in == "success")
+                out = Experiment::Success;
+            else if (in == "failed")
+                out = Experiment::Failed;
+            else if (in == "aborted")
+                out = Experiment::Aborted;
+            else
+                out = Experiment::None;
+        }
+        else
+            out = Experiment::None;
+    }
+
+    static void to_base(Experiment::CompletionStatus const &in, base_type &out, soci::indicator &indicator)
+    {
+        switch (in)
+        {
+        case Experiment::Success:
+            out = "success";
+            indicator = soci::i_ok;
+
+            break;
+
+        case Experiment::Failed:
+            out = "failed";
+            indicator = soci::i_ok;
+
+            break;
+
+        case Experiment::Aborted:
+            out = "aborted";
+            indicator = soci::i_ok;
+
+            break;
+
+        default:
+            indicator = soci::i_null;
+            break;
+        }
+    }
+};
+
 }
 
 #endif // SOCIINCLUDES_H

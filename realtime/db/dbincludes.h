@@ -7,6 +7,7 @@
 #include "stage.h"
 #include "protocol.h"
 #include "experiment.h"
+#include "temperaturelog.h"
 
 #include "dbcontrol.h"
 

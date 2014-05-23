@@ -3,6 +3,7 @@
 
 #include "testcontrolhandler.h"
 #include "statushandler.h"
+#include "controlhandler.h"
 
 #include "qpcrrequesthandlerfactory.h"
 
@@ -28,6 +29,16 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
         {
             if (requestPath.at(0) == "testControl")
                 return new TestControlHandler();
+        }
+        else if (request.getMethod() == "POST")
+        {
+            if (requestPath.at(0) == "control")
+            {
+                if (requestPath.at(1) == "start")
+                    return new ControlHandler(ControlHandler::StartExperiment);
+                else if (requestPath.at(1) == "stop")
+                    return new ControlHandler(ControlHandler::StopExperiment);
+            }
         }
     }
 

@@ -3,47 +3,57 @@
 
 #include "icontrol.h"
 #include "pid.h"
-#include "thermistor.h"
 
-template <class Output>
-class TemperatureController : public IControl, public PIDControl, public Output
+class Thermistor;
+
+class TemperatureController : public IControl, public PIDControl
 {
 public:
-    template <typename ...OutputArgs>
-    TemperatureController(std::shared_ptr<Thermistor> thermistor, CPIDController *pidController, long pidTimerInterval, OutputArgs... args)
-        :PIDControl(pidController, pidTimerInterval),
-         Output(args...)
+    enum ControlMode
     {
-        _thermistor = thermistor;
+        None,
+        PIDMode,
+        BangBangMode
+    };
 
-        _targetValue = std::bind(&TemperatureController::targetTemperature, this);
-        _currentValue = std::bind(&TemperatureController::currentTemperature, this);
+    TemperatureController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
+                          CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold);
 
-        setTargetTemperature(30);
-    }
+    inline ControlMode controlMode() const { return _controlMode; }
 
-    ~TemperatureController()
-    {
-    }
+    inline bool enableMode() const { return _enableMode; }
+    void setEnableMode(bool enableMode);
 
+    void setTargetTemperature(double temperature);
     inline double targetTemperature() const { return _targetTemperature.load(); }
-    inline void setTargetTemperature(double temperature) { _targetTemperature.store(temperature); }
 
-    inline double currentTemperature() const { return _thermistor->temperature(); }
+    double currentTemperature() const;
 
-    void pidCallback(double pidResult)
-    {
-        Output::setValue(pidResult);
-    }
+    void process() final;
 
-    void process()
-    {
-        Output::process(_pidResult.load());
-    }
+protected:
+    void pidCallback(double pidResult);
+
+    virtual void setOutput(double value) = 0;
+    virtual void resetOutput() = 0;
+    virtual bool outputDirection() const = 0;
+    virtual void processOutput() = 0;
+
+private:
+    void checkControlMode();
 
 protected:
     std::shared_ptr<Thermistor> _thermistor;
+
+private:
+    std::atomic<ControlMode> _controlMode;
+    std::atomic<bool> _enableMode;
+
     std::atomic<double> _targetTemperature;
+    double _minTargetTemp;
+    double _maxTargetTemp;
+
+    double _pidRangeControlThreshold;
 };
 
 #endif // TEMPERATURECONTROLLER_H

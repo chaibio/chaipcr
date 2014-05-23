@@ -55,7 +55,9 @@ void DBTest::printExperiment(Experiment *experiment)
     std::cout << "Experiment:\n";
     std::cout << "name - " << experiment->name() << '\n';
     std::cout << "qpcr - " << experiment->qpcr() << '\n';
-    std::cout << "run_at - " << ptime_to_string(experiment->runAt()) << "\n\n";
+    std::cout << "started_at - " << ptime_to_string(experiment->startedAt()) << '\n';
+    std::cout << "completed_at - " << ptime_to_string(experiment->completedAt()) << '\n';
+    std::cout << "completion_status - " << experiment->completionStatus() << "\n\n";
 
     std::cout << "Protocol:\n";
     if (experiment->protocol())

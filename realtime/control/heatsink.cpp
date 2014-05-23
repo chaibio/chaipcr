@@ -1,51 +1,48 @@
 #include "pcrincludes.h"
-#include "utilincludes.h"
-#include "pocoincludes.h"
 
 #include "fan.h"
 #include "heatsink.h"
 
-using namespace std;
-using namespace Poco;
-
-////////////////////////////////////////////////////////////////////////////////
-// Class HeatSink
-HeatSink::HeatSink()
-    :TemperatureControl(std::make_shared<SteinhartHartThermistor>(kThermistorVoltageDividerResistanceOhms,
-                                                                  kLTC2444ADCBits, kQTICurveZThermistorACoefficient,
-                                                                  kQTICurveZThermistorBCoefficient, kQTICurveZThermistorCCoefficient,
-                                                                  kQTICurveZThermistorDCoefficient))
+HeatSink::HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
+                   CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold)
+    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController, pidTimerInterval, pidRangeControlThreshold)
 {
-    _pidController = 0;
     _fan = new Fan();
 
-    setTargetTemperature(30);
-    initPID();
+    resetOutput();
 }
 
 HeatSink::~HeatSink()
 {
-    delete _pidTimer;
-    delete _pidController;
     delete _fan;
 }
 
-void HeatSink::initPID()
+void HeatSink::setOutput(double value)
 {
-    vector<SPIDTuning> pidTuningList; //TODO: Josh, please change it as you want
-
-    _pidController = new CPIDController(pidTuningList, 0, 0);
-
-    _pidTimer = new Timer(0, kPIDInterval);
-    _pidTimer->start(TimerCallback<HeatSink>(*this, &HeatSink::pidCallback));
+    _fan->setPWMDutyCycle(value);
 }
 
-void HeatSink::pidCallback(Timer &)
+void HeatSink::resetOutput()
 {
-    _fan->setPWMDutyCycle(_pidController->compute(targetTemperature(), currentTemperature()));
+    setOutput(0);
 }
 
-void HeatSink::process()
+bool HeatSink::outputDirection() const
+{
+    return false;
+}
+
+void HeatSink::processOutput()
 {
     _fan->process();
+}
+
+int HeatSink::targetRPM() const
+{
+    return _fan->targetRPM();
+}
+
+void HeatSink::setTargetRPM(int targetRPM)
+{
+    _fan->setTargetRPM(targetRPM);
 }

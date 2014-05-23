@@ -1,44 +1,39 @@
 #include "pcrincludes.h"
-#include "pocoincludes.h"
-#include "utilincludes.h"
+#include "boostincludes.h"
+#include "experimentcontroller.h"
 
 #include "lid.h"
 
-using namespace std;
-using namespace Poco;
-
-Lid::Lid(std::vector<SPIDTuning> pidTunningList)
-    :PWMControl(kLidControlPWMPath, kLidPWMPeriodNs),
-     TemperatureControl(std::make_shared<BetaThermistor>(kThermistorVoltageDividerResistanceOhms,
-                                                                  kLTC2444ADCBits, kLidThermistorBetaCoefficient, kLidThermistorT0Resistance, kLidThermistorT0)),
-     _pidTuningList(pidTunningList)
+Lid::Lid(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
+         CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold,
+         const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold)
+    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController, pidTimerInterval, pidRangeControlThreshold),
+     PWMControl(pwmPath, pwmPeriod)
 {
-    _pidController = 0;
+    _startTempThreshold = startTempThreshold;
 
-    setTargetTemperature(50);
-    initPID();
+    resetOutput();
 }
 
-Lid::~Lid()
+void Lid::setOutput(double value)
 {
-    delete _pidTimer;
-    delete _pidController;
+    setPWMDutyCycle(value);
 }
 
-void Lid::initPID()
+void Lid::resetOutput()
 {
-    _pidController = new CPIDController(_pidTuningList, 0, kLidPWMPeriodNs);
-
-    _pidTimer = new Timer(0, kPIDInterval);
-    _pidTimer->start(TimerCallback<Lid>(*this, &Lid::pidCallback));
+    setOutput(0);
 }
 
-void Lid::pidCallback(Timer &)
+bool Lid::outputDirection() const
 {
-    setPWMDutyCycle(_pidController->compute(targetTemperature(), currentTemperature()));
+    return true;
 }
 
-void Lid::process()
+void Lid::processOutput()
 {
     processPWM();
+
+    if (ExperimentController::getInstance()->machineState() == ExperimentController::LidHeating && currentTemperature() >= (targetTemperature() - _startTempThreshold))
+        startThresholdReached();
 }

@@ -1,35 +1,28 @@
-#ifndef _HEATSINK_H_
-#define _HEATSINK_H_
+#ifndef HEATSINK_H
+#define HEATSINK_H
 
-#include "icontrol.h"
-#include "thermistor.h"
+#include "temperaturecontroller.h"
 
 class Fan;
-class CPIDController;
 
-namespace Poco { class Timer; }
-
-// Class HeatSink
-class HeatSink : public IControl, public TemperatureControl
+class HeatSink : public TemperatureController
 {
 public:
-    HeatSink();
-	~HeatSink();
+    HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
+             CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold);
+    ~HeatSink();
 
-    void process();
-	
-    //accessors
-    inline int targetRPM() const { return _fan->targetRPM(); }
-    inline void setTargetRPM(int targetRPM) { _fan->setTargetRPM(targetRPM); }
-	
+    int targetRPM() const;
+    void setTargetRPM(int targetRPM);
+
+protected:
+    void setOutput(double value);
+    void resetOutput();
+    bool outputDirection() const;
+    void processOutput();
+
 private:
-    void initPID();
-    void pidCallback(Poco::Timer &timer);
-
     Fan *_fan;
-
-    CPIDController *_pidController;
-    Poco::Timer *_pidTimer;
 };
 
-#endif
+#endif // HEATSINK_H
