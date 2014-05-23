@@ -27,6 +27,7 @@
       <li><a href='#experiments-start'>start</a></li>
       <li><a href='#experiments-stop'>stop</a></li>
       <li><a href='#experiments-destroy'>destroy</a></li>
+      <li><a href='#experiments-temperature_data'>temperature_data</a></li>
   </ul>
   <h4><a href='#main'>Main</a></h4>
   <ul>
@@ -487,6 +488,109 @@
 
 
       </div>
+      <hr>
+
+      <ul class='breadcrumb' id='experiments-temperature_data'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#experiments'>Experiments</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>temperature_data</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#experiments-temperature_data'>
+              GET /experiment/:id/temperature_data?starttime=xx&amp;endtime=xx&amp;resolution=xx
+            </a><br>
+            <small>Retrieve temperature data</small>
+          </h3>
+      </div>
+
+      <div>
+        
+
+
+          <h2>Params</h2>
+          <table class='table'>
+            <thead>
+              <tr>
+                <th>Param name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr style='background-color:rgb(255,255,255);'>
+    <td>
+      <strong>starttime </strong><br>
+      <small>
+        required
+        
+      </small>
+    </td>
+    <td>
+      
+<p>0 means start of the experiment, in ms</p>
+
+        <br>
+        Value: Must be Integer
+
+
+    </td>
+
+  </tr>
+
+  
+  <tr style='background-color:rgb(255,255,255);'>
+    <td>
+      <strong>endtime </strong><br>
+      <small>
+        optional
+        
+      </small>
+    </td>
+    <td>
+      
+<p>if not specified, it returns everything to the end of the experiment, in ms</p>
+
+        <br>
+        Value: Must be Integer
+
+
+    </td>
+
+  </tr>
+
+  
+  <tr style='background-color:rgb(255,255,255);'>
+    <td>
+      <strong>resolution </strong><br>
+      <small>
+        optional
+        
+      </small>
+    </td>
+    <td>
+      
+<p>Include data points for every x milliseconds. Must be a multiple of 1000 ms</p>
+
+        <br>
+        Value: Must be Integer
+
+
+    </td>
+
+  </tr>
+
+  
+
+            </tbody>
+          </table>
+      </div>
   </div>
 
   <ul class='breadcrumb'  id='main'>
@@ -619,7 +723,7 @@
 point</p>
 
         <br>
-        Value: Must be BigDecimal
+        Value: Must be Float
 
 
     </td>
@@ -721,7 +825,7 @@ point</p>
 decimal point</p>
 
         <br>
-        Value: Must be BigDecimal
+        Value: Must be Float
 
 
     </td>
@@ -1206,7 +1310,7 @@ when step is created, default ramp with max rate (100) will be created</p>
 <p>Temperature of the step, in degree C, with precision to one decimal point</p>
 
         <br>
-        Value: Must be BigDecimal
+        Value: Must be Float
 
 
     </td>
@@ -1354,7 +1458,7 @@ when step is created, default ramp with max rate (100) will be created</p>
 <p>Temperature of the step, in degree C, with precision to one decimal point</p>
 
         <br>
-        Value: Must be BigDecimal
+        Value: Must be Float
 
 
     </td>

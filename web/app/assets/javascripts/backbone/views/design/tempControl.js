@@ -5,46 +5,66 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 	template: JST["backbone/templates/design/step"],
 	className: 'tempBar',
 	dragAdded: false,
+
+	events: {
+		"click": "disablePropagation"
+	},
+
+	disablePropagation: function(evt) {
+		evt.stopPropagation();
+	},
 	
 	initialize: function() {
-		
-		//bring line component in here, so that as we move this object it moves along;
-		//a line object should reference to the next line object;
-		//when one is dragged along two lines has to update..!
-		//One fixed in the drag object and the one very next to it.. !
-		// all the math is in steps js , move it may be move into line itself, but that might be a problem because we need to place it first 
-		// or may be a seperate function so that i is called after render..!!
 
+		if(! _.isNull(ChaiBioTech.Data.previousLine)) {
+
+			this.line = new ChaiBioTech.Views.Design.line({
+				model: this.model,
+				previousLine: ChaiBioTech.Data.previousLine
+			});
+		} else {
+
+			this.line = new ChaiBioTech.Views.Design.line({
+				model: this.model
+			});
+		}
+
+		ChaiBioTech.Data.previousLine = this.line; //Saves line object to make a linkedlist
+
+		var originalObject;
 		$(this.el).draggable({
 				containment: "parent",
 				axis: "y",
 
 				start: function() {
-					
+					originalObject = $(this).data("data-thisObject");
+					parentStep = originalObject.options.parentStep;
 				},
 				drag: function() {
-					currentPosition = parseInt($(this).css("top").replace("px", ""), 10);
-					//1.57 could be changed as we change interface , whatever the number is (tempControl container width)/100;
-					number = (157 - currentPosition) / 1.57; 
-					$(this).find(".label").html(number.toFixed(2));
-					$(this).data("data-temperature", number.toFixed(2));
+					number = 100 - ((parseInt($(originalObject.el).css("top")) * 100 )/ ChaiBioTech.Constants.stepHeight);
+					number = number.toFixed(2);
+					$(this).find(".label").html(number);
+					$(this).data("data-temperature", number);
+					originalObject.line.trigger("moveThisLine", {"toThisTemp": number});
 				},
 
 				stop: function() {
-					originalObject = $(this).data("data-thisObject");
-					temp = parseFloat($(this).data("data-temperature"));
-					parentStep = originalObject.options.parentStep;
-					parentStep.trigger("changeTemperature", temp);
+					number = 100 - ((parseInt($(originalObject.el).css("top")) * 100 )/ ChaiBioTech.Constants.stepHeight);
+					number = number.toFixed(2);
+					$(this).find(".label").html(number);
+					parentStep.trigger("changeTemperature", number);
+					originalObject.line.trigger("moveThisLine", {"toThisTemp": number});
 				}
 		});
 	},
 	
 	render:function() {
-		temperature = this.options["stepData"]["step"]["temperature"];
-		console.log(temperature * 1.57)
-		$(this.el).html(this.template(this.options["stepData"]["step"]));
+		temperature = this.model.temperature;
+		$(this.el).html(this.template(this.model));
 		//This line saves this object within the element so that the wrong reference due to draggable can be tackled
 		$(this.el).data("data-thisObject", this); 
+		$(this.el).append(this.line.render().el);
+		
 		return this;
 	}
 });

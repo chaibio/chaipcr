@@ -5,11 +5,12 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 	template: JST["backbone/templates/design/experiment-run"],
 
 	initialize: function() {
-		thisObject = this;
-		_.bindAll(this, "addStages")
 		this.model.on("change:experiment", function() {
 			$("#innertrack").html("");
 			$("#innertrack").css("width", "1000px");
+			if(! _.isUndefined(ChaiBioTech.Data.previousLine)) {
+				ChaiBioTech.Data.previousLine = null;
+			}
 			window.router.runView.addStages();
 		});
 	},
@@ -96,7 +97,6 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 	},
 
 	deleteSelected: function(e) {
-		// write code to disable delete thr is only one stage left
 		e.preventDefault();
 		if(!_.isNull(ChaiBioTech.Data.selectedStep) && !_.isUndefined(ChaiBioTech.Data.selectedStep)) {
 			this.model.deleteStep(ChaiBioTech.Data.selectedStep);
@@ -120,6 +120,7 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 		thatObject = this;
 		previous_stage_id = null;
 		previous_object = null;
+		numberOfStages = stages.length - 1;
 		_.each(stages, function(stage, index) {
 			
 			stageView = new ChaiBioTech.Views.Design.stages({
@@ -135,6 +136,9 @@ ChaiBioTech.Views.Design.runExperiment = Backbone.View.extend({
 			previous_stage_id = stage["stage"]["id"];
 			ChaiBioTech.Data.lastStage = stageView;	
 			$("#innertrack").append(stageView.render().el);
+			if(numberOfStages == index) {
+				$("#innertrack").append($("<DIV>").addClass("boundaryDiv"));
+			}
 			stageView.addSteps(stageView, index);
 		});
 		

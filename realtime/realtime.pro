@@ -10,7 +10,7 @@ INCLUDEPATH += ./libraries/include/
 INCLUDEPATH += ./libraries/include/soci #for internal SOCI use
 INCLUDEPATH += $(BOOST_INCLUDE_PATH)
 
-LIBS += -L../realtime/libraries/lib/
+LIBS += -L$$_PRO_FILE_PWD_/libraries/lib/
 
 #Poco
 LIBS += -lPocoFoundation
@@ -78,7 +78,7 @@ HEADERS += \
     util/instance.h \
     control/icontrol.h \
     control/maincontrollers.h \
-    server/qpcrapplication.h \
+    app/qpcrapplication.h \
     app/boostincludes.h \
     app/pocoincludes.h \
     util/utilincludes.h \
@@ -98,9 +98,14 @@ HEADERS += \
     server/httpstatushandler.h \
     server/statushandler.h \
     control/adcconsumer.h \
-    control/adcconsumer.h \
-    server/qpcrfactory.h \
-    control/temperaturecontroller.h
+    app/qpcrfactory.h \
+    control/temperaturecontroller.h \
+    server/controlhandler.h \
+    control/bidirectionalpwmcontroller.h \
+    control/lid.h \
+    control/heatsink.h \
+    app/experimentcontroller.h \
+    db/temperaturelog.h
 
 SOURCES += \
     app/pins.cpp \
@@ -120,7 +125,7 @@ SOURCES += \
     server/qpcrrequesthandlerfactory.cpp \
     server/jsonhandler.cpp \
     server/testcontrolhandler.cpp \
-    server/qpcrapplication.cpp \
+    app/qpcrapplication.cpp \
     util/pid.cpp \
     db/experiment.cpp \
     db/protocol.cpp \
@@ -133,5 +138,10 @@ SOURCES += \
     test/dbtest.cpp \
     server/httpstatushandler.cpp \
     server/statushandler.cpp \
-    server/qpcrfactory.cpp \
-    control/temperaturecontrolleroutputs.cpp
+    app/qpcrfactory.cpp \
+    server/controlhandler.cpp \
+    control/temperaturecontroller.cpp \
+    control/bidirectionalpwmcontroller.cpp \
+    control/lid.cpp \
+    control/heatsink.cpp \
+    app/experimentcontroller.cpp

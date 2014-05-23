@@ -1,10 +1,10 @@
-class ChaiBioTech.Models.Post extends Backbone.Model
-  paramRoot: 'post'
+class jordan
+	constructor: (name) ->
+		@name = name
 
-  defaults:
-    title: null
-    content: null
-
-class ChaiBioTech.Collections.PostsCollection extends Backbone.Collection
-  model: ChaiBioTech.Models.Post
-  url: '/posts'
+	catchMe: () ->
+		console.log @name
+		
+trying = new jordan "jossie"
+console.log trying.name
+	

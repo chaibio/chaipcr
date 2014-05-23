@@ -12,6 +12,7 @@ class Stage;
 class StageComponent;
 class Step;
 class Ramp;
+class TemperatureLog;
 
 class DBControl
 {
@@ -20,6 +21,10 @@ public:
     ~DBControl();
 
     Experiment* getExperiment(int id);
+    void startExperiment(Experiment *experiment);
+    void completeExperiment(Experiment *experiment);
+
+    void addTemperatureLog(const TemperatureLog &log);
 
 #ifdef TEST_BUILD
     std::vector<int> getEperimentIdList();

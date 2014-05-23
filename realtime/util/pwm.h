@@ -33,6 +33,7 @@ public:
 
     inline unsigned long pwmDutyCycle() const { return _dutyCycle; }
     inline void setPWMDutyCycle(unsigned long dutyCycle) { dutyCycle <= _period ? _dutyCycle = dutyCycle : _dutyCycle = _period.load(); }
+    inline void setPWMDutyCycle(double dutyCycle) { dutyCycle *= _period.load(); dutyCycle <= _period ? _dutyCycle = dutyCycle : _dutyCycle = _period.load(); }
 
     inline unsigned int pwmPolarity() const { return _polarity; }
     inline void setPWMPolarity(unsigned int polarity) { _polarity = polarity; }

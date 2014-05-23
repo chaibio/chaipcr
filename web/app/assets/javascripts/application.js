@@ -19,8 +19,12 @@
 //= require rails
 //= require chaipcr
 //= require backbone/ChaiBioTech
+//= require backbone/Constants
+
 
 $(function() {
     window.router = new ChaiBioTech.Routers.DesignRouter({});
+    window.touchScreenRouter = new ChaiBioTech.Routers.touchScreen({});
+    window.logScreenRouter = new ChaiBioTech.Routers.temperatureLog({});
     Backbone.history.start();
 });

@@ -4,33 +4,133 @@
  * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
 
 #index-page {
-	margin: 0 0 20px 20px;	
+	margin: 0 0 20px 20px;
 }
 .shadow {
 	display: none;
 }
 
+.boundaryDiv {
+	border-left:1px solid red;
+	float: left;
+	height: 352px;
+	width: 2px;
+}
 
+.stepRightSide {
+	border-right-color: orange;
+	border-right-style: solid;
+	border-right-width: 1px;
+}
 
 #stadium {
 	#play-ground {
-		min-height: 400px;
+		min-height: 600px;
 		min-width: 600px;
 		margin: 30px 0 0 0;
 	}
-	
+
 	#run-experiment {
 		border-left: solid 1px gray;
-		height: 400px;
+		height: 600px;
 		width: 700px
 	}
 	#reactionVolume {
 		width: 250px;
 	}
-	
+
 	#track {
 		width: 700px;
-		height: 250px;
+		overflow: scroll;
+
+		#innertrack {
+			width: 1000px;
+			height:353px;
+			border: 1px solid grey;
+
+			.stage-run {
+				border:1px solid red;
+				border-right: none;
+				width: 151px;
+				float: left;
+			}
+
+			.stage-header {
+				width: 100%;
+				height:150px;
+				text-align: center;
+
+		        .noof-cycles {
+		          width:50%;
+		          margin: 0 auto;
+		        }
+		        .noof-cycles span {
+		        	cursor: pointer;
+		        }
+		        .noof-cycles input {
+		        	text-align: center;
+
+		        }
+			}
+
+			.step-holder {
+				width: 100%;
+				height:100%;
+			}
+			.step-select {
+				background-color: orange;
+			}
+
+			.step-run {
+				width: 149px;
+				height: 200px;
+				float: left;
+				background-color: yellow;
+
+				.tempBar {
+					width: 45px;
+					height: 18px;
+					float: right;
+					cursor: move;
+					z-index: 100;
+					.label {
+						float: right;
+						width: 44px;
+					}
+				}
+
+				.line {
+					background-color: black;
+					width:150px;
+					height: 2px;
+					position:relative;
+					-webkit-transform-origin: 100% 100%;
+					right:150px;
+					z-index: 10;
+					top:6px;
+				}
+			}
+
+		}
+	}
+}
+
+#touchScreenContainer {
+	width: 800px;
+	height: 480px;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+
+	.experiment-list {
+		max-height: 300px;
+		overflow: scroll;
+	}
+	#track {
+		width: 700px;
 		overflow: scroll;
 
 		#innertrack {
@@ -59,7 +159,7 @@
 			.step-select {
 				background-color: orange;
 			}
-			
+
 			.step-run {
 				width: 149px;
 				height: 175px;
@@ -80,16 +180,79 @@
 
 				.line {
 					background-color: black;
-					width:50px;
+					width:150px;
 					height: 2px;
 					position:relative;
-					-webkit-transform-origin: 0% 0%;
+					-webkit-transform-origin: 100% 100%;
+					right:150px;
+					z-index: 10;
+					top:6px;
 				}
 			}
 
 		}
 	}
-
 }
 
+#logScreen {
+	width: 980px;
+	height: 600px;
+	padding: 5px;
+	margin: auto;
+
+	.container: {
+		
+	}
+	.blue-border {
+		border: solid 1px #02408F;
+		border-top-left-radius: 4px;
+		border-top-right-radius: 4px;
+	}
+	.graphOutLine {
+		width: 100%;
+		height:100%;
+		float: left;
+
+		.content-area {
+			height:94%;
+		}
+	}
+	.currentTemperatures {
+		width: 24%;
+		height: 100%;
+		margin-left: 7px;
+		float: left;
+	}
+	.zones {
+		width: 100%;
+		height: 76%;
+		
+		.content-area {
+			height:92%;
+		}
+	}
+	.plots {
+		margin-top: 2px;
+		width: 100%;
+		height: 24%;
+
+		.content-area {
+			height:74%;
+		}
+	}
+	.blue-heading {
+		width: 100%;
+		height: 35px;
+		background-color: #02408F;
+		color: white;
+		text-color: white;
+		font-weight: bold;
+		line-height: 3em;
+		padding-left: 10px;
+	}
+	.content-area {
+		margin: 0px 2px 1px 2px;
+		border: solid 1px #02408F;
+	}
+}
 

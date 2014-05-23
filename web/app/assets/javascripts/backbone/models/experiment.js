@@ -18,6 +18,8 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 	initialize: function(){
 		_.bindAll(this ,"afterSave");
 	},
+	//There is many methods that uses $.ajax, so it can be in a single function 
+	//but once experiment operations are done it can be done.
 	saveData: function( action ) {
 		that = this;
 		if(action == "update") {
@@ -80,10 +82,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 				'stage_type': type
 			}
 		};
-		//if(!_.isNull(stageData.options.prev_stage_id)) {
-			dataToBeSend["prev_id"] = stageData.model.id;
-		//}
-		console.log("Data To Server", dataToBeSend);
+		dataToBeSend["prev_id"] = stageData.model.id;
 		$.ajax({
 			url: "/protocols/"+data.id+"/stages",
 			contentType: 'application/json',
@@ -110,7 +109,6 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		.done(function(data) {
 				console.log("Big bang", that);
 				that.set('experiment', data["experiment"]);
-				//that.trigger("modelUpdated");	
 		})
 		.fail(function() {
 			console.log("Failed to update");
@@ -178,11 +176,32 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 				console.log("Failed to update");
 			})
 	},
+	//these two functions can be combined, because they change basic stage settings
+	changeStageCycle: function(cycleCount, id, stageType) {
+		dataToBeSend = {'stage':
+							{
+								'stage_type': stageType,
+								'num_cycles': cycleCount
+							}
+						}
+		$.ajax({
+				url: "/stages/"+id,
+				contentType: 'application/json',
+				type: 'PUT',
+				data: JSON.stringify(dataToBeSend)
+			})
+			.done(function(data) {
+					console.log("Data updated from server", data, that);
+			})
+			.fail(function() {
+				console.log("Failed to update");
+			})
+	},
 
 	changeTemperature: function(newTemp, rampObj) {
 		
-		dataToBeSend = {'step':{'temperature':newTemp}}
-		
+		dataToBeSend = {'step':{'temperature': newTemp}}
+		console.log(dataToBeSend)
 		$.ajax({
 				url: "/steps/"+rampObj.id,
 				contentType: 'application/json',
@@ -191,7 +210,6 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 			})
 			.done(function(data) {
 					console.log("Data updated from server woohaa" , data);
-					//may be u can call up getLatestModel(), looks like thats not required here.
 			})
 			.fail(function() {
 				console.log("Failed to update");

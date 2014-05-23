@@ -6,7 +6,15 @@ class Protocol;
 class Experiment
 {
 public:
-    Experiment();
+    enum CompletionStatus
+    {
+        None,
+        Success,
+        Failed,
+        Aborted
+    };
+
+    Experiment(int id);
     Experiment(const Experiment &other);
     Experiment(Experiment &&other);
     ~Experiment();
@@ -14,15 +22,23 @@ public:
     Experiment& operator= (const Experiment &other);
     Experiment& operator= (Experiment &&other);
 
+    inline int id() const { return _id; }
+
     inline void setName(const std::string &name) {_name = name;}
-    inline void setName(std::string &&name) {_name = name;}
-    inline const std::string name() const {return _name;}
+    inline void setName(std::string &&name) {_name = std::move(name);}
+    inline const std::string& name() const {return _name;}
 
     inline void setQpcr(bool qpcr) {_qpcr = qpcr;}
     inline bool qpcr() const {return _qpcr;}
 
-    inline void setRunAt(const boost::posix_time::ptime &runAt) {_runAt = runAt;}
-    inline const boost::posix_time::ptime& runAt() const {return _runAt;}
+    inline void setStartedAt(const boost::posix_time::ptime &startedAt) {_startedAt = startedAt;}
+    inline const boost::posix_time::ptime& startedAt() const {return _startedAt;}
+
+    inline void setCompletedAt(const boost::posix_time::ptime &completedAt) {_completedAt = completedAt;}
+    inline const boost::posix_time::ptime& completedAt() const {return _completedAt;}
+
+    inline void setCompletionStatus(CompletionStatus status) {_completionStatus = status;}
+    inline CompletionStatus completionStatus() const {return _completionStatus;}
 
     void setProtocol(const Protocol &protocol);
     void setProtocol(Protocol &&protocol);
@@ -30,9 +46,13 @@ public:
     inline Protocol* protocol() const {return _protocol;}
 
 private:
+    int _id;
+
     std::string _name;
     bool _qpcr;
-    boost::posix_time::ptime _runAt;
+    boost::posix_time::ptime _startedAt;
+    boost::posix_time::ptime _completedAt;
+    CompletionStatus _completionStatus;
 
     Protocol *_protocol;
 };

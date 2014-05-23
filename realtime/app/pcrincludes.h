@@ -24,6 +24,7 @@
 #include <thread>
 #include <map>
 #include <limits>
+#include <chrono>
 
 //Linux headers
 #include <unistd.h>

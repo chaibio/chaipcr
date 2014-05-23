@@ -6,7 +6,7 @@
 class StatusHandler : public JSONHandler
 {
 protected:
-    virtual void createData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt);
+    virtual void processData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt);
 };
 
 #endif // STATUSHANDLER_H

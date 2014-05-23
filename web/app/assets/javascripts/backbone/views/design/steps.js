@@ -41,22 +41,15 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 			$(this.el).css("background-color","orange");
 			ChaiBioTech.Data.selectedStep = this;
 		}
-		//console.log(this);
 	},
 
 	initialize: function() {
-		//console.log("step", this.options["stepInfo"])
 		this.tempControlView = new ChaiBioTech.Views.Design.tempControl({
 			model: this.model,
-			stepData: this.options["stepInfo"],
 			parentStep: this,
 			grandParent: thisObject.options.grandParent
 		});
 		
-
-		this.line = new ChaiBioTech.Views.Design.line({
-			model: this.model
-		});
 
 		this.on("unselectStep", function() {
 			$(this.el).css("background-color", "yellow");
@@ -64,49 +57,15 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 		});
 
 		this.on("changeTemperature", function(tempData) {
-			//console.log(tempData);
 			this.options.grandParent.changeTemperature(tempData, this.model);
 		});
-
-	},
-
-	//not being in use, but could be usefull if ever wanted to delete steps individually.
-	deleteView: function() {
-		currentWidth = $(this.options.parentStage.el).width()
-		console.log("this is tricky", this.options.parentStage)
-		this.remove();
-		ChaiBioTech.Data.selectedStep = null;
-		$(this.options.parentStage.el).css("width", (currentWidth - 147) +"px");	
 
 	},
 
 	render:function() {
 		$(this.el).append(this.tempControlView.render().el);
 		temperature = this.options["stepInfo"]["step"]["temperature"]
-		$(this.tempControlView.el).css("top", 157 - (temperature * 1.57) +"px");
-		
-
-		$(this.el).append(this.line.render().el)
-		
-		var rad2deg = 180/Math.PI;
-		if(_.isUndefined(ChaiBioTech.Data.PreviousTemp)) {
-			
-			topper = (157 - (25 * 1.57)) - (157 - (temperature * 1.57));
-			$(this.line.el).css("top", (157 - (25 * 1.57)) +"px");
-			padam = 149, lambam = topper;
-			widthing = Math.sqrt( (padam * padam) + (lambam * lambam) );
-			$(this.line.el).css("width", widthing);
-
-			ChaiBioTech.Data.PreviousTemp = 157 - (temperature * 1.57);
-
-			ratio = lambam/padam;
-			var degrees = Math.atan( ratio ) * rad2deg * -1;
-			$(this.line.el).css("-webkit-transform", "rotate("+degrees+"deg)");
-			
-		} else {
-			$(this.line.el).css("top", ChaiBioTech.Data.PreviousTemp);
-			ChaiBioTech.Data.PreviousTemp = 157 - (temperature * 1.57);
-		}
+		$(this.tempControlView.el).css("top", ChaiBioTech.Constants.stepHeight - (temperature * ChaiBioTech.Constants.stepUnitMovement) +"px");
 		return this;
 	}
 });

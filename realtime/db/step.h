@@ -13,13 +13,13 @@ public:
     Step& operator= (Step &&other);
 
     inline void setName(const std::string &name) {_name = name;}
-    inline void setName(std::string &&name) {_name = name;}
-    inline const std::string name() const {return _name;}
+    inline void setName(std::string &&name) {_name = std::move(name);}
+    inline const std::string& name() const {return _name;}
 
     inline void setTemperature(double temperature) {_temperature = temperature;}
     inline double temperature() const {return _temperature;}
 
-    inline void setHoldTime(const time_t holdTime) {_holdTime = holdTime;}
+    inline void setHoldTime(time_t holdTime) {_holdTime = holdTime;}
     inline time_t holdTime() const {return _holdTime;}
 
     inline void setOrderNumber(int orderNumber) {_orderNumber = orderNumber;}

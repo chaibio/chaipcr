@@ -7,7 +7,7 @@ template <class T>
 class Instance : public boost::noncopyable
 {
 public:
-    static std::shared_ptr<T> getInstance()
+    inline static std::shared_ptr<T> getInstance()
     {
         return _instance.lock();
     }
