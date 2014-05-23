@@ -16,7 +16,6 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 	},
 	
 	changeTempManually: function(evt) {
-		//alert("hola");
 		evt.preventDefault();
 		evt.stopPropagation();
 		if( !this.dragged ) {
@@ -35,13 +34,11 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 	initialize: function() {
 		this.myTemperature = this.model.temperature;
 		if(! _.isNull(ChaiBioTech.Data.previousLine)) {
-
 			this.line = new ChaiBioTech.Views.Design.line({
 				model: this.model,
 				previousLine: ChaiBioTech.Data.previousLine
 			});
 		} else {
-
 			this.line = new ChaiBioTech.Views.Design.line({
 				model: this.model
 			});
@@ -56,7 +53,7 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 				axis: "y",
 
 				start: function() {
-					originalObject = $(this).data("data-thisObject");
+					originalObject = $(this).find(".editTemp").data("data-thisObject");
 					parentStep = originalObject.options.parentStep;
 				},
 				drag: function() {
@@ -77,7 +74,6 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 					parentStep.trigger("changeTemperature", number);
 					parentStep.holdTime.trigger("tempChanged", number);
 					originalObject.line.trigger("moveThisLine", {"toThisTemp": number});
-					console.log(this);
 				}
 		});
 
@@ -87,7 +83,7 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 		temperature = this.model.temperature;
 		$(this.el).html(this.template(this.model));
 		//This line saves this object within the element so that the wrong reference due to draggable can be tackled
-		$(this.el).data("data-thisObject", this); 
+		$(this.el).find(".editTemp").data("data-thisObject", this); 
 		$(this.el).append(this.line.render().el);
 		// Editable event handler
 		$(this.el).find(".editTemp").editable({
@@ -95,12 +91,12 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 	       	title: 'Temperature',
 	       	name:  'Temp',
            	success:   function(respo, newval) {
-           		
+           		//Correcting reference.
+           		pointMe = $(this).data("data-thisObject");
+           		//I dont think this is a real good method because we redraw.
+           		//May b in the new UI we may have better way to implement this.
+           		pointMe.options.grandParent.changeTemperature(newval, pointMe.model, true);
            	}
-		});
-
-		$(this.el).find(".editTemp").on('init', function(e, editable) {
-		    alert("bingo");
 		});
 		return this;
 	}

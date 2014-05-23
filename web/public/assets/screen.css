@@ -102,7 +102,7 @@
   height: 18px;
   float: right;
   cursor: move;
-  z-index: 100;
+  z-index: 2;
 }
 /* line 96, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run .tempBar .label {
@@ -121,7 +121,7 @@
   position: relative;
   -webkit-transform-origin: 100% 100%;
   right: 150px;
-  z-index: 10;
+  z-index: 1;
   top: 6px;
 }
 

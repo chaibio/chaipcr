@@ -198,10 +198,10 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 			})
 	},
 
-	changeTemperature: function(newTemp, rampObj) {
-		
+	changeTemperature: function(newTemp, rampObj, screenUpdate) {
+		that = this;
 		dataToBeSend = {'step':{'temperature': newTemp}}
-		console.log(dataToBeSend)
+		console.log(dataToBeSend);
 		$.ajax({
 				url: "/steps/"+rampObj.id,
 				contentType: 'application/json',
@@ -210,6 +210,9 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 			})
 			.done(function(data) {
 					console.log("Data updated from server woohaa" , data);
+					if(screenUpdate) {
+						that.getLatestModel();
+					}
 			})
 			.fail(function() {
 				console.log("Failed to update");
@@ -218,7 +221,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 
 	chngeHoldTime: function(newTime, stepObj) {
 		dataToBeSend = {'step':{'hold_time': newTime}}
-		console.log(dataToBeSend)
+		console.log(dataToBeSend);
 		$.ajax({
 				url: "/steps/"+stepObj.id,
 				contentType: 'application/json',
