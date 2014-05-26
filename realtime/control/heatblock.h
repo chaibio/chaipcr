@@ -16,7 +16,7 @@ class HeatBlock : public IControl
 
         void set(double targetTemperature, double rate);
         inline void clear() { _rate.store(0.0); }
-        inline bool isEmpty() const { return _rate.load() != 0.0; }
+        inline bool isEmpty() const { return _rate.load() == 0.0; }
 
         double computeTemperature(double currentTargetTemperature);
 
