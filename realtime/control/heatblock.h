@@ -9,6 +9,23 @@ typedef BidirectionalPWMController HeatBlockZoneController;
 // Class HeatBlock
 class HeatBlock : public IControl
 {
+    class Ramp
+    {
+    public:
+        Ramp();
+
+        void set(double targetTemperature, double rate);
+        inline void clear() { _rate.store(0.0); }
+        inline bool isEmpty() const { return _rate.load() != 0.0; }
+
+        double computeTemperature(double currentTargetTemperature);
+
+    private:
+        double _targetTemperature;
+        std::atomic<double> _rate;
+        boost::posix_time::ptime _lastChangesTime;
+    };
+
 public:
     HeatBlock(HeatBlockZoneController* zone1, HeatBlockZoneController* zone2, double beginStepTemperatureThreshold);
 	~HeatBlock();
@@ -17,7 +34,7 @@ public:
     void setEnableMode(bool enableMode);
     inline void enableStepProcessing() { _stepProcessingState = true; }
 
-    void setTargetTemperature(double targetTemperature);
+    void setTargetTemperature(double targetTemperature, double rampRate = 0);
     double zone1Temperature() const;
     double zone2Temperature() const;
 
@@ -33,6 +50,8 @@ private:
 
     double _beginStepTemperatureThreshold;
     std::atomic<bool> _stepProcessingState;
+
+    HeatBlock::Ramp ramp;
 };
 
 #endif

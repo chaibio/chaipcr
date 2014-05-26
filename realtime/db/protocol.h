@@ -3,6 +3,7 @@
 
 class Stage;
 class Step;
+class Ramp;
 
 class Protocol
 {
@@ -26,6 +27,7 @@ public:
 
     void resetCurrentStep();
     Step* currentStep() const;
+    Ramp* currentRamp() const;
     Step* nextStep();
 
 private:

@@ -115,6 +115,14 @@ Step* Stage::currentStep() const
         return nullptr;
 }
 
+Ramp* Stage::currentRamp() const
+{
+    if (_currentComponent != _components.end())
+        return _currentComponent->ramp();
+    else
+        return nullptr;
+}
+
 Step* Stage::nextStep()
 {
     if (_currentComponent == _components.end())

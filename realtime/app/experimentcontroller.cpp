@@ -130,9 +130,9 @@ void ExperimentController::stepBegun()
     }
 }
 
-void ExperimentController::holdStepCallback(Poco::Timer &timer)
+void ExperimentController::holdStepCallback(Poco::Timer &)
 {
-    HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->currentStep()->temperature());
+    HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->currentStep()->temperature(), _experiment->protocol()->currentRamp()->rate());
     HeatBlockInstance::getInstance()->enableStepProcessing();
 }
 

@@ -3,6 +3,7 @@
 
 class StageComponent;
 class Step;
+class Ramp;
 
 class Stage
 {
@@ -44,6 +45,7 @@ public:
 
     void resetCurrentStep();
     Step* currentStep() const;
+    Ramp* currentRamp() const;
     Step* nextStep();
 
 private:
