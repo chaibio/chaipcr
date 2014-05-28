@@ -20,7 +20,7 @@ vector<shared_ptr<IControl> > QPCRFactory::constructMachine() {
     controls.push_back(QPCRFactory::constructOptics(spiPort1));
     controls.push_back(QPCRFactory::constructHeatBlock(consumers));
     controls.push_back(QPCRFactory::constructLid(consumers));
-    //controls.push_back(QPCRFactory::constructHeatSink(consumers));
+    controls.push_back(QPCRFactory::constructHeatSink(consumers));
 
     controls.push_back(ADCControllerInstance::createInstance(consumers, kLTC2444CSPinNumber, std::move(SPIPort(kSPI0DevicePath)), kSPI0DataInSensePinNumber)); //Not refactored yet
 
@@ -91,7 +91,8 @@ shared_ptr<IControl> QPCRFactory::constructHeatSink(vector<shared_ptr<ADCConsume
 
     CPIDController *pidController = new CPIDController({{50,1.0,0.0,0.0}, {100,1.0,0.0,0.0}}, kHeatSinkPIDMin, kHeatSinkPIDMax);
 
-    consumers.push_back(thermistor);
+    //need code to control microcontroller ADC
+    //consumers.push_back(thermistor);
 
     return HeatSinkInstance::createInstance(thermistor, kHeatSinkMinTargetTemp, kHeatSinkMaxTargetTemp, pidController, kPIDIntervalMs, kHeatSinkPIDThreshold);
 }

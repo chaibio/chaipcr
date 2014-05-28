@@ -18,8 +18,6 @@ TemperatureController::TemperatureController(std::shared_ptr<Thermistor> thermis
 
     _targetValue = std::bind(&TemperatureController::targetTemperature, this);
     _currentValue = std::bind(&TemperatureController::currentTemperature, this);
-
-    setTargetTemperature(30);
 }
 
 void TemperatureController::setEnableMode(bool enableMode)
