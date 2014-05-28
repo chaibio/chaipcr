@@ -216,7 +216,7 @@
 		__overlay__ {
 			peltier1_pwm {
 			    compatible      = "pwm_test";
-			    pwms            = <&ehrpwm2 1 500000 1>;
+			    pwms            = <&ehrpwm2 1 500000 0>;
 			    pwm-names       = "PWM_P8_13";
 			    pinctrl-names   = "default";
 			    pinctrl-0       = <&peltier1_pwm_pin>;
@@ -227,7 +227,7 @@
 
 			peltier2_pwm {
 			    compatible      = "pwm_test";
-			    pwms            = <&ehrpwm2 0 500000 1>;
+			    pwms            = <&ehrpwm2 0 500000 0>;
 			    pwm-names       = "PWM_P8_19";
 			    pinctrl-names   = "default";
 			    pinctrl-0       = <&peltier2_pwm_pin>;
@@ -238,7 +238,7 @@
 		
 			led_pwm {
 			    compatible      = "pwm_test";
-			    pwms 	    = <&ecap2 0 500000 1>;
+			    pwms 	    = <&ecap2 0 500000 0>;
 			    pwm-names       = "PWM_P9_28";
 			    pinctrl-names   = "default";
 			    pinctrl-0       = <&led_pwm_pin>;
@@ -249,7 +249,7 @@
 
 			blank_pwm {
 			    compatible      = "pwm_test";
-			    pwms 	    = <&ecap0 0 500000 1>;
+			    pwms 	    = <&ecap0 0 500000 0>;
 			    pwm-names       = "PWM_P9_42";
 			    pinctrl-names   = "default";
 			    pinctrl-0       = <&blank_pwm_pin>;
@@ -260,7 +260,7 @@
 
 			lid_heater_pwm {
 			    compatible      = "pwm_test";
-			    pwms            = <&ehrpwm1 1 500000 1>;
+			    pwms            = <&ehrpwm1 1 500000 0>;
 			    pwm-names       = "PWM_P9_16";
 			    pinctrl-names   = "default";
 			    pinctrl-0       = <&lid_heater_pwm_pin>;
