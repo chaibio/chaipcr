@@ -3,7 +3,7 @@
 #ifndef SERVERTEST_H
 #define SERVERTEST_H
 
-#include <gtest/gtest.h>
+#include "apptest.h"
 
 namespace Poco
 {
@@ -13,7 +13,7 @@ class HTTPClientSession;
 }
 }
 
-class ServerTest : public testing::Test
+class ServerTest : public AppTest
 {
 protected:
     ServerTest();
@@ -22,9 +22,6 @@ protected:
     void testStatus();
 
 private:
-    QPCRApplication _app;
-    std::thread _appThread;
-
     Poco::Net::HTTPClientSession *_clientSession;
 
 };

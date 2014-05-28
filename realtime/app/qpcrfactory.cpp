@@ -93,5 +93,5 @@ shared_ptr<IControl> QPCRFactory::constructHeatSink(vector<shared_ptr<ADCConsume
 
     consumers.push_back(thermistor);
 
-    return HeatSinkInstace::createInstance(thermistor, kHeatSinkMinTargetTemp, kHeatSinkMaxTargetTemp, pidController, kPIDIntervalMs, kHeatSinkPIDThreshold);
+    return HeatSinkInstance::createInstance(thermistor, kHeatSinkMinTargetTemp, kHeatSinkMaxTargetTemp, pidController, kPIDIntervalMs, kHeatSinkPIDThreshold);
 }

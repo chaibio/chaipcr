@@ -105,7 +105,9 @@ HEADERS += \
     control/lid.h \
     control/heatsink.h \
     app/experimentcontroller.h \
-    db/temperaturelog.h
+    db/temperaturelog.h \
+    test/apptest.h \
+    test/controltest.h
 
 SOURCES += \
     app/pins.cpp \
@@ -144,4 +146,6 @@ SOURCES += \
     control/bidirectionalpwmcontroller.cpp \
     control/lid.cpp \
     control/heatsink.cpp \
-    app/experimentcontroller.cpp
+    app/experimentcontroller.cpp \
+    test/apptest.cpp \
+    test/controltest.cpp

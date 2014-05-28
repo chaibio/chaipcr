@@ -12,7 +12,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
     std::shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();
     std::shared_ptr<Optics> optics = OpticsInstance::getInstance();
     std::shared_ptr<Lid> lid = LidInstance::getInstance();
-    std::shared_ptr<HeatSink> heatSink = HeatSinkInstace::getInstance();
+    std::shared_ptr<HeatSink> heatSink = HeatSinkInstance::getInstance();
     std::shared_ptr<ExperimentController> experimentController = ExperimentController::getInstance();
 
     if (heatBlock) {

@@ -57,7 +57,7 @@ void TestControlHandler::processLid(const ptree &requestPt, ptree &)
 
 void TestControlHandler::processHeatSink(const ptree &requestPt, ptree &)
 {
-    shared_ptr<HeatSink> heatSink = HeatSinkInstace::getInstance();
+    shared_ptr<HeatSink> heatSink = HeatSinkInstance::getInstance();
 
     if (heatSink)
     {

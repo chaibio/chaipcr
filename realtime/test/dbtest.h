@@ -19,6 +19,7 @@ public:
 private:
     void printExperiment(Experiment *experiment);
 
+private:
     DBControl *_db;
 };
 
