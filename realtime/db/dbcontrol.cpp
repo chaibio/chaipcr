@@ -176,7 +176,9 @@ void DBControl::completeExperiment(Experiment *experiment)
 void DBControl::addTemperatureLog(const TemperatureLog &log)
 {
     *_session << "INSERT INTO temperature_logs VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_temp, :heat_block_zone_2_temp)",
-            soci::use(log.experimentId()), soci::use(log.elapsedTime()), soci::use(log.lidTemperature()), soci::use(log.heatBlockZone1Temperature()), soci::use(log.heatBlockZone2Temperature());
+            soci::use(log.experimentId()), soci::use(log.elapsedTime()),
+            soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
+            soci::use(std::round(log.heatBlockZone1Temperature() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Temperature() * 100.0) / 100.0);
 }
 
 #ifdef TEST_BUILD

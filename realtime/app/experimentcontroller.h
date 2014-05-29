@@ -19,13 +19,22 @@ public:
         Complete
     };
 
+    enum StartingResult
+    {
+        Started,
+        ExperimentNotFound,
+        ExperimentUsed,
+        LidRunning,
+        MachineRunning
+    };
+
     ExperimentController();
     ~ExperimentController();
 
     inline MachineState machineState() const { return _machineState; }
     inline const Experiment* experiment() const { return _experiment; }
 
-    bool start(int experimentId);
+    StartingResult start(int experimentId);
     void stop();
 
     void stepBegun();

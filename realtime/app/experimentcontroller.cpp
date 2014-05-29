@@ -28,19 +28,33 @@ ExperimentController::~ExperimentController()
     delete _dbControl;
 }
 
-bool ExperimentController::start(int experimentId)
+ExperimentController::StartingResult ExperimentController::start(int experimentId)
 {
     if (_machineState != Idle)
-        return false;
+        return MachineRunning;
 
     _experiment = _dbControl->getExperiment(experimentId);
 
-    if (!_experiment || !_experiment->protocol() || _experiment->startedAt() != boost::posix_time::not_a_date_time)
+    if (!_experiment || !_experiment->protocol())
     {
         delete _experiment;
         _experiment = nullptr;
 
-        return false;
+        return ExperimentNotFound;
+    }
+    else if (_experiment->startedAt() != boost::posix_time::not_a_date_time)
+    {
+        delete _experiment;
+        _experiment = nullptr;
+
+        return ExperimentUsed;
+    }
+    else if (LidInstance::getInstance()->enableMode())
+    {
+        delete _experiment;
+        _experiment = nullptr;
+
+        return LidRunning;
     }
 
     _machineState = LidHeating;
@@ -55,7 +69,7 @@ bool ExperimentController::start(int experimentId)
 
     HeatSinkInstance::getInstance()->setEnableMode(true);
 
-    return true;
+    return Started;
 }
 
 void ExperimentController::run()
@@ -77,6 +91,10 @@ void ExperimentController::complete()
 
     _machineState = Complete;
 
+    stopLogging();
+
+    _holdStepTimer->stop();
+
     LidInstance::getInstance()->setEnableMode(false);
 
     _experiment->setCompletionStatus(Experiment::Success);
@@ -90,14 +108,16 @@ void ExperimentController::stop()
     if (_machineState == Idle)
         return;
 
-    stopLogging();
-
     LidInstance::getInstance()->setEnableMode(false);
     HeatBlockInstance::getInstance()->setEnableMode(false);
     HeatSinkInstance::getInstance()->setEnableMode(false);
 
     if (_machineState != Complete)
     {
+        stopLogging();
+
+        _holdStepTimer->stop();
+
         _experiment->setCompletionStatus(Experiment::Aborted);
         _experiment->setCompletedAt(boost::posix_time::microsec_clock::local_time());
 
