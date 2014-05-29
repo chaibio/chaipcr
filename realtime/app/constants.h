@@ -24,7 +24,8 @@ const double kLidPIDThreshold = 100;
 const double kProgramStartLidTempThreshold = 2;
 
 //thermistor & ADC params
-const unsigned int kThermistorVoltageDividerResistanceOhms = 14000;
+const unsigned int kHeatBlockThermistorVoltageDividerResistanceOhms = 14000;
+const unsigned int kLidThermistorVoltageDividerResistanceOhms = 14000;
 const int kLTC2444ADCBits = 24;
 
 //HTTP server params
@@ -60,7 +61,7 @@ const long kCollectDataInterval = 150;
 const std::vector<int> kWellList = {5, 8, 7, 6, 11, 10, 9, 12, 4, 3, 2, 1, 16, 15, 14, 13};
 
 //Steps
-const double kPCRBeginStepTemperatureThreshold = 1;
+const double kPCRBeginStepTemperatureThreshold = 3;
 
 //Experiment Controller
 const long kTemperatureLogerInterval = 1000;

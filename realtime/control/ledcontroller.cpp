@@ -42,7 +42,6 @@ void LEDController::setIntensity(double onCurrentMilliamps) {
     double rIref = 1.24 / (onCurrentMilliamps / 1000) * 31.5; //reference resistance for TLC5940
     int rN = (rIref - 75) * 256 / 5000;
     char txBuf[] = {0, static_cast<uint8_t>(rN)};
-    cout << "onCurrent = " << onCurrentMilliamps << ", rIref " << rIref << ", rN = " << rN << endl;
 
     //send resistance
     _potCSPin.setValue(GPIO::kLow);
@@ -68,7 +67,6 @@ void LEDController::activateLED(unsigned int ledNumber) {
 		packedIntensities[packIndex] = val1 >> 4;
 		packedIntensities[packIndex + 1] = (val1 & 0x000F) << 4 | (val2 & 0x0F00) >> 8;
 		packedIntensities[packIndex + 2] = val2 & 0x00FF;
-		//cout << "index: " << packIndex << " " << (int)packedIntensities[packIndex] << " " << (int)packedIntensities[packIndex+1] << " " << (int)packedIntensities[packIndex+2] << endl;
 	}
 
     sendLEDGrayscaleValues(packedIntensities);
