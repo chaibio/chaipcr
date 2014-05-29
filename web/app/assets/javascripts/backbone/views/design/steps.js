@@ -50,6 +50,12 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 			grandParent: thisObject.options.grandParent
 		});
 		
+		//define new hold time
+		this.holdTime = new ChaiBioTech.Views.Design.holdTime({
+			model: this.model,
+			parentStep: this,
+			grandParent: thisObject.options.grandParent
+		});
 
 		this.on("unselectStep", function() {
 			$(this.el).css("background-color", "yellow");
@@ -64,8 +70,11 @@ ChaiBioTech.Views.Design.steps = Backbone.View.extend({
 
 	render:function() {
 		$(this.el).append(this.tempControlView.render().el);
-		temperature = this.options["stepInfo"]["step"]["temperature"]
-		$(this.tempControlView.el).css("top", ChaiBioTech.Constants.stepHeight - (temperature * ChaiBioTech.Constants.stepUnitMovement) +"px");
+		$(this.el).append(this.holdTime.render().el);
+		temperature = this.options["stepInfo"]["step"]["temperature"];
+		move = ChaiBioTech.Constants.stepHeight - (temperature * ChaiBioTech.Constants.stepUnitMovement);
+		$(this.tempControlView.el).css("top", move+"px");
+		$(this.holdTime.el).css("top", move+"px");
 		return this;
 	}
 });

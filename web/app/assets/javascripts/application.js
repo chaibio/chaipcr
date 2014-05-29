@@ -16,6 +16,9 @@
 //= require backbone_datalink
 //= require bootstrap.min
 //= require bootstrap-editable.min
+//= require raphael
+//= require g.raphael
+//= require g.line
 //= require rails
 //= require chaipcr
 //= require backbone/ChaiBioTech

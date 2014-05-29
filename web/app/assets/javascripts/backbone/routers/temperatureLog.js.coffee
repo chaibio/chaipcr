@@ -8,8 +8,9 @@ class ChaiBioTech.Routers.temperatureLog extends Backbone.Router
 
 	initiateLogScreen: () ->
 		mainView = new ChaiBioTech.Views.temperatureLog.main
-		#console.log mainView.render().el
 		$("#container").append mainView.render().el
+		@r =  Raphael("graph")
+		mainView.plotGraph(@r);
 
 
 		
