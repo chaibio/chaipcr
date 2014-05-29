@@ -23,10 +23,10 @@ ActiveRecord::Schema.define(version: 20140529064810) do
     t.string   "completion_status"
   end
 
-  create_table "fluorescent_data", force: true do |t|
+  create_table "fluorescence_data", force: true do |t|
     t.integer "step_id"
-    t.integer "fluorescent_value"
-    t.integer "well_num",          comment: "0-15"
+    t.integer "fluorescence_value"
+    t.integer "well_num",           comment: "0-15"
   end
 
   create_table "protocols", force: true do |t|
