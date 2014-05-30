@@ -13,7 +13,7 @@ using namespace Poco;
 Optics::Optics(unsigned int lidSensePin, shared_ptr<LEDController> ledController, MUX &&photoDiodeMux)
     :_lidSensePin(lidSensePin, GPIO::kInput),
      _ledController(ledController),
-     _photoDiodeMux(move(photoDiodeMux))
+     _photodiodeMux(move(photoDiodeMux))
 {
     _lidOpen.store(false);
 
@@ -45,8 +45,6 @@ void Optics::process()
             _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));
         }
     }
-
-    _photoDiodeMux.setChannel(15);
 }
 
 void Optics::setCollectData(bool state)

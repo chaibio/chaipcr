@@ -28,6 +28,7 @@ void TestControlHandler::processOptics(const ptree &requestPt, ptree &)
         int activateLED = requestPt.get<int>("activateLED", -1);
         bool disableLEDs = requestPt.get<bool>("disableLEDs", false);
         bool collectData = requestPt.get<bool>("collectData", false);
+        int photodiodeMuxChannel = requestPt.get<int>("photodiodeMuxChannel", -1);
 
         if (ledIntensity != -1)
             optics->getLedController()->setIntensity(ledIntensity);
@@ -37,6 +38,9 @@ void TestControlHandler::processOptics(const ptree &requestPt, ptree &)
 
         if (disableLEDs)
             optics->getLedController()->disableLEDs();
+
+        if (photodiodeMuxChannel != -1)
+            optics->getPhotodiodeMux().setChannel(photodiodeMuxChannel);
 
         optics->setCollectData(collectData);
     }

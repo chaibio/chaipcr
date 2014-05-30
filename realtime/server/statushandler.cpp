@@ -23,7 +23,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
         responsePt.put("heatblock.zone2.drive", (double)heatBlock->zone2DriveValue());
     }
 
-    if(lid) {
+    if (lid) {
         responsePt.put("lid.temperature", lid->currentTemperature());
         responsePt.put("lid.drive", (double)lid->pwmDutyCycle() / lid->pwmPeriod());
     }

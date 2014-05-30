@@ -28,10 +28,11 @@ void ADCController::process() {
         return;
 
     auto consumer = _consumers.at(_currentChannel);
-    //int oldChannel = _currentChannel;
     _currentChannel = (_currentChannel + 1) % _consumers.size();
     uint32_t value = _ltc2444->readADC(_currentChannel, true);
 
     if (consumer != nullptr)
         consumer->setADCValue(value);
+    else
+        cout << "ADC value: " << value << endl;
 }
