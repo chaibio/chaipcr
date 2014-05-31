@@ -30,6 +30,7 @@ class ChaiBioTech.Views.temperatureLog.main extends Backbone.View
 		.transform "r-90 20 200"
 		@timeText = @canvas.text 450, 431, "Time"
 		.attr data
+		@line = @canvas.path "M10 10L100 10"
 
 
 
