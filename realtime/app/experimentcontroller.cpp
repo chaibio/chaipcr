@@ -49,12 +49,12 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
 
         return ExperimentUsed;
     }
-    else if (LidInstance::getInstance()->enableMode())
+    else if (OpticsInstance::getInstance()->lidOpen())
     {
         delete _experiment;
         _experiment = nullptr;
 
-        return LidRunning;
+        return LidIsOpen;
     }
 
     _machineState = LidHeating;
@@ -92,8 +92,6 @@ void ExperimentController::complete()
     _machineState = Complete;
 
     stopLogging();
-
-    _holdStepTimer->stop();
 
     LidInstance::getInstance()->setEnableMode(false);
 

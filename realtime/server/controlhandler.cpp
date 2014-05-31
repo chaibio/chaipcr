@@ -33,8 +33,8 @@ void ControlHandler::processData(const boost::property_tree::ptree &requestPt, b
             setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
             break;
 
-        case ExperimentController::LidRunning:
-            setErrorString("Lid controller is running");
+        case ExperimentController::LidIsOpen:
+            setErrorString("Lid is currently open");
             setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
             break;
 

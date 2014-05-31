@@ -24,7 +24,7 @@ public:
         Started,
         ExperimentNotFound,
         ExperimentUsed,
-        LidRunning,
+        LidIsOpen,
         MachineRunning
     };
 
