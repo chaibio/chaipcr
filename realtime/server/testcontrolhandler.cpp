@@ -34,7 +34,7 @@ void TestControlHandler::processOptics(const ptree &requestPt, ptree &)
             optics->getLedController()->setIntensity(ledIntensity);
 
         if (activateLED != -1)
-            optics->getLedController()->activateLED(activateLED);
+            optics->getLedController()->activateLED(kWellList.at(activateLED));
 
         if (disableLEDs)
             optics->getLedController()->disableLEDs();
