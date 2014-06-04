@@ -53,8 +53,8 @@ const long kPIDIntervalMs = 100;
 const int kMinLEDCurrent = 5; //5mA
 const int kGrayscaleClockPwmPeriodNs = 240;
 const int kGrayscaleClockPwmDutyNs = 120;
-const int kLedBlankPwmPeriodNs = 983090;
-const int kLedBlankPwmDutyNs = 50;
+const int kLedBlankPwmPeriodNs = 4096 * kGrayscaleClockPwmPeriodNs; //983040
+const int kLedBlankPwmDutyNs = 4 * kGrayscaleClockPwmPeriodNs; //960
 
 //Optics
 const long kCollectDataInterval = 150;
