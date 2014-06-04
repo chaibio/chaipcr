@@ -14,6 +14,8 @@ HeatSink::HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp,
 
 HeatSink::~HeatSink()
 {
+    resetOutput();
+
     delete _fan;
 }
 

@@ -10,6 +10,7 @@ public:
     Lid(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
         CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold,
         const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold);
+    ~Lid();
 
     boost::signals2::signal<void()> startThresholdReached;
 

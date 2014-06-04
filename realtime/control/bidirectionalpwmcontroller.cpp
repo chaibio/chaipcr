@@ -13,6 +13,11 @@ BidirectionalPWMController::BidirectionalPWMController(std::shared_ptr<Thermisto
     resetOutput();
 }
 
+BidirectionalPWMController::~BidirectionalPWMController()
+{
+    resetOutput();
+}
+
 void BidirectionalPWMController::setOutput(double value)
 {
     setPWMDutyCycle(value >= 0 ? value : (value * -1));
@@ -44,5 +49,5 @@ bool BidirectionalPWMController::outputDirection() const
 
 void BidirectionalPWMController::processOutput()
 {
-    processPWM();
+
 }

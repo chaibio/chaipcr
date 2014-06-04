@@ -21,5 +21,5 @@ Fan::~Fan()
 
 void Fan::process()
 {
-    processPWM();
+
 }

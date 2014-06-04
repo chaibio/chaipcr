@@ -15,6 +15,11 @@ Lid::Lid(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double ma
     resetOutput();
 }
 
+Lid::~Lid()
+{
+    resetOutput();
+}
+
 void Lid::setOutput(double value)
 {
     setPWMDutyCycle(value);
@@ -32,8 +37,6 @@ bool Lid::outputDirection() const
 
 void Lid::processOutput()
 {
-    processPWM();
-
     if (ExperimentController::getInstance()->machineState() == ExperimentController::LidHeating && currentTemperature() >= (targetTemperature() - _startTempThreshold))
         startThresholdReached();
 }
