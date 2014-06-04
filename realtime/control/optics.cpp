@@ -47,6 +47,11 @@ void Optics::process()
     }
 }
 
+void Optics::setADCValue(unsigned int adcValue)
+{
+    _adcValue = adcValue;
+}
+
 void Optics::setCollectData(bool state)
 {
     if (state != _collectData.load())

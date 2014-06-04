@@ -2,6 +2,7 @@
 #define _OPTICS_H_
 
 #include <icontrol.h>
+#include <adcconsumer.h>
 
 class LEDController;
 
@@ -9,13 +10,16 @@ namespace Poco { class Timer; }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Optics
-class Optics : public IControl
+class Optics : public IControl, public ADCConsumer
 {
 public:
     Optics(unsigned int lidSensePin, std::shared_ptr<LEDController> ledController, MUX &&photoDiodeMux);
     ~Optics();
 
     void process();
+
+    void setADCValue(unsigned int adcValue);
+    inline unsigned int adcValue() const { return _adcValue; }
 	
 	//accessors
     inline bool lidOpen() const { return _lidOpen; }
@@ -30,6 +34,8 @@ private:
     void collectDataCallback(Poco::Timer &timer);
 	
 private:
+    std::atomic<unsigned int> _adcValue;
+
     std::atomic<bool> _lidOpen;
 
     std::atomic<bool> _collectData;

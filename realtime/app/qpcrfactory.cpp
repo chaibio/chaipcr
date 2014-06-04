@@ -15,9 +15,7 @@ vector<shared_ptr<IControl> > QPCRFactory::constructMachine() {
     //shared_ptr<SPIPort> spiPort0(new SPIPort(kSPI0DevicePath));
     shared_ptr<SPIPort> spiPort1(new SPIPort(kSPI1DevicePath));
 
-    consumers.push_back(nullptr); //Not refactored yet
-
-    controls.push_back(QPCRFactory::constructOptics(spiPort1));
+    controls.push_back(QPCRFactory::constructOptics(spiPort1, consumers));
     controls.push_back(QPCRFactory::constructHeatBlock(consumers));
     controls.push_back(QPCRFactory::constructLid(consumers));
     controls.push_back(QPCRFactory::constructHeatSink(consumers));
@@ -27,7 +25,7 @@ vector<shared_ptr<IControl> > QPCRFactory::constructMachine() {
     return controls;
 }
 
-shared_ptr<IControl> QPCRFactory::constructOptics(shared_ptr<SPIPort> ledSPIPort)
+shared_ptr<IControl> QPCRFactory::constructOptics(shared_ptr<SPIPort> ledSPIPort, vector<shared_ptr<ADCConsumer>> &consumers)
 {
     shared_ptr<LEDController> ledControl(new LEDController(kLEDGrayscaleClockPWMPath, ledSPIPort,
                                                            kLEDDigiPotCSPinNumber, kLEDControlXLATPinNumber,
@@ -39,7 +37,11 @@ shared_ptr<IControl> QPCRFactory::constructOptics(shared_ptr<SPIPort> ledSPIPort
     photoDiodeMux.emplace_back(kMuxControlPin3, GPIO::kOutput);
     photoDiodeMux.emplace_back(kMuxControlPin4, GPIO::kOutput);
 
-    return OpticsInstance::createInstance(kLidSensePinNumber, ledControl, MUX(move(photoDiodeMux)));
+    std::shared_ptr<Optics> optics = OpticsInstance::createInstance(kLidSensePinNumber, ledControl, MUX(move(photoDiodeMux)));
+
+    consumers.push_back(optics);
+
+    return optics;
 }
 
 shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsumer>> &consumers)
