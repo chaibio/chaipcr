@@ -47,14 +47,17 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
 
         case ExperimentController::LidHeating:
             responsePt.put("experimentController.machine.state", "LidHeating");
+            responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experimentController->experiment()->startedAt()).total_seconds());
             break;
 
         case ExperimentController::Running:
             responsePt.put("experimentController.machine.state", "Running");
+            responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experimentController->experiment()->startedAt()).total_seconds());
             break;
 
         case ExperimentController::Complete:
             responsePt.put("experimentController.machine.state", "Complete");
+            responsePt.put("experimentController.expriment.run_duration", (experimentController->experiment()->completedAt() - experimentController->experiment()->startedAt()).total_seconds());
             break;
 
         default:
@@ -62,9 +65,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
             break;
         }
 
-        if (experimentController->machineState() != ExperimentController::Idle) {
+        if (experimentController->machineState() != ExperimentController::Idle)
             responsePt.put("experimentController.expriment.started_at", experimentController->experiment()->startedAt());
-            responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experimentController->experiment()->startedAt()).total_seconds());
-        }
     }
 }
