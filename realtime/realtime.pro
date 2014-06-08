@@ -75,7 +75,7 @@ HEADERS += \
     server/qpcrrequesthandlerfactory.h \
     server/jsonhandler.h \
     server/testcontrolhandler.h \
-    util/instance.h \
+    control/instance.h \
     control/icontrol.h \
     control/maincontrollers.h \
     app/qpcrapplication.h \
@@ -148,4 +148,5 @@ SOURCES += \
     control/heatsink.cpp \
     app/experimentcontroller.cpp \
     test/apptest.cpp \
-    test/controltest.cpp
+    test/controltest.cpp \
+    control/adcconsumer.cpp

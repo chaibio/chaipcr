@@ -116,3 +116,13 @@ Step* Protocol::nextStep()
 
     return step;
 }
+
+bool Protocol::hasNextStep() const
+{
+    return _currentStage != _stages.end() && (_currentStage->hasNextStep() || (_currentStage +1 ) != _stages.end());
+}
+
+int Protocol::currentStageCycle() const
+{
+    return _currentStage->currentCycle();
+}

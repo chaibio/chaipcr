@@ -29,6 +29,9 @@ public:
     Step* currentStep() const;
     Ramp* currentRamp() const;
     Step* nextStep();
+    bool hasNextStep() const;
+
+    int currentStageCycle() const;
 
 private:
     double _lidTemperature;

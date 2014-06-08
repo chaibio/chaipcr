@@ -28,8 +28,9 @@ public:
     inline void setName(std::string &&name) {_name = std::move(name);}
     inline const std::string& name() const {return _name;}
 
-    inline void setNumCycles(int numCycles) {_numCycles = numCycles;}
+    void setNumCycles(int numCycles);
     inline int numCycles() const {return _numCycles;}
+    inline int currentCycle() const {return _cycleIteration;}
 
     inline void setOrderNumber(int orderNumber) {_orderNumber = orderNumber;}
     inline int orderNumber() const {return _orderNumber;}
@@ -47,12 +48,13 @@ public:
     Step* currentStep() const;
     Ramp* currentRamp() const;
     Step* nextStep();
+    bool hasNextStep() const;
 
 private:
     std::string _name;
 
     int _numCycles;
-    int _cycleIteration;
+    std::atomic<int> _cycleIteration;
 
     int _orderNumber;
     Type _type;

@@ -30,6 +30,8 @@ public:
     inline std::shared_ptr<LEDController> getLedController() { return _ledController; }
     inline MUX& getPhotodiodeMux() { return _photodiodeMux; }
 
+    std::vector<int> restartCollection();
+
 private:
     void collectDataCallback(Poco::Timer &timer);
 	
@@ -45,6 +47,8 @@ private:
     GPIO _lidSensePin;
     std::shared_ptr<LEDController> _ledController;
     MUX _photodiodeMux;
+
+    std::vector<std::vector<int>> _fluorescenceData;
 };
 
 #endif

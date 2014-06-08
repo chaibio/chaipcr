@@ -1,7 +1,7 @@
 #ifndef EXPERIMENTCONTROLLER_H
 #define EXPERIMENTCONTROLLER_H
 
-#include <instance.h>
+#include "instance.h"
 
 class DBControl;
 class Experiment;

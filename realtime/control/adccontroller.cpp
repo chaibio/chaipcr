@@ -33,3 +33,12 @@ void ADCController::process() {
 
     consumer->setADCValue(value);
 }
+
+int ADCController::consumerChannel(const ADCConsumer *consumer) const {
+    for (size_t i = 0; i < _consumers.size(); ++i) {
+        if (_consumers.at(0).get() == consumer)
+            return i;
+    }
+
+    return -1;
+}

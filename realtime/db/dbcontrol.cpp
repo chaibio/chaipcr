@@ -1,5 +1,6 @@
 #include "pcrincludes.h"
 #include "boostincludes.h"
+#include "pocoincludes.h"
 
 #include "dbincludes.h"
 #include "sociincludes.h"
@@ -9,10 +10,13 @@
 DBControl::DBControl()
 {
     _session = new soci::session(soci::sqlite3, DATABASE_FILE);
+
+    _writeMutex = new Poco::Mutex;
 }
 
 DBControl::~DBControl()
 {
+    delete _writeMutex;
     delete _session;
 }
 
@@ -96,13 +100,13 @@ std::vector<Stage> DBControl::getStages(int protocolId)
 std::vector<StageComponent> DBControl::getStageComponents(int stageId)
 {
     std::vector<StageComponent> components;
-    std::map<int, Step> steps = getSteps(stageId);
+    std::vector<Step> steps = getSteps(stageId);
 
     StageComponent component;
-    for (std::map<int, Step>::iterator it = steps.begin(); it != steps.end(); ++it)
+    for (Step &step: steps)
     {
-        component.setStep(std::move(it->second));
-        component.setRamp(getRamp(it->first));
+        component.setRamp(getRamp(step.id()));
+        component.setStep(std::move(step));
 
         components.push_back(std::move(component));
     }
@@ -110,32 +114,31 @@ std::vector<StageComponent> DBControl::getStageComponents(int stageId)
     return components;
 }
 
-std::map<int, Step> DBControl::getSteps(int stageId)
+std::vector<Step> DBControl::getSteps(int stageId)
 {
-    std::map<int, Step> steps;
+    std::vector<Step> steps;
     soci::rowset<soci::row> result((_session->prepare << "SELECT * FROM steps WHERE stage_id = " << stageId << " ORDER BY order_number"));
 
-    Step step;
     for (soci::rowset<soci::row>::const_iterator it = result.begin(); it != result.end(); ++it)
     {
+        steps.emplace_back(it->get<int>("id"));
+
         if (it->get_indicator("name") != soci::i_null)
-            step.setName(it->get<std::string>("name"));
+            steps.back().setName(it->get<std::string>("name"));
 
         if (it->get_indicator("temperature") != soci::i_null)
         {
             if (it->get_properties("temperature").get_data_type() == soci::dt_double)
-                step.setTemperature(it->get<double>("temperature"));
+                steps.back().setTemperature(it->get<double>("temperature"));
             else
-                step.setTemperature(it->get<int>("temperature"));
+                steps.back().setTemperature(it->get<int>("temperature"));
         }
 
         if (it->get_indicator("order_number") != soci::i_null)
-            step.setOrderNumber(it->get<int>("order_number"));
+            steps.back().setOrderNumber(it->get<int>("order_number"));
 
         if (it->get_indicator("hold_time") != soci::i_null)
-            step.setHoldTime(it->get<int>("hold_time"));
-
-        steps[it->get<int>("id")] = std::move(step);
+            steps.back().setHoldTime(it->get<int>("hold_time"));
     }
 
     return steps;
@@ -164,21 +167,44 @@ Ramp* DBControl::getRamp(int stepId)
 
 void DBControl::startExperiment(Experiment *experiment)
 {
+    _writeMutex->lock();
     *_session << "UPDATE experiments SET started_at = :started_at WHERE id = " << experiment->id(), soci::use(experiment->startedAt());
+    _writeMutex->unlock();
 }
 
 void DBControl::completeExperiment(Experiment *experiment)
 {
-    *_session << "UPDATE experiments SET completed_at = :completed_at, completion_status = :completion_status WHERE id = " << experiment->id(),
-            soci::use(experiment->completedAt()), soci::use(experiment->completionStatus());
+    _writeMutex->lock();
+    {
+        *_session << "UPDATE experiments SET completed_at = :completed_at, completion_status = :completion_status WHERE id = " << experiment->id(),
+                soci::use(experiment->completedAt()), soci::use(experiment->completionStatus());
+    }
+    _writeMutex->unlock();
 }
 
 void DBControl::addTemperatureLog(const TemperatureLog &log)
 {
-    *_session << "INSERT INTO temperature_logs VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_temp, :heat_block_zone_2_temp)",
-            soci::use(log.experimentId()), soci::use(log.elapsedTime()),
-            soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
-            soci::use(std::round(log.heatBlockZone1Temperature() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Temperature() * 100.0) / 100.0);
+    _writeMutex->lock();
+    {
+        *_session << "INSERT INTO temperature_logs VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_temp, :heat_block_zone_2_temp)",
+                soci::use(log.experimentId()), soci::use(log.elapsedTime()),
+                soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
+                soci::use(std::round(log.heatBlockZone1Temperature() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Temperature() * 100.0) / 100.0);
+    }
+    _writeMutex->unlock();
+}
+
+void DBControl::addFluorescenceData(const Step *step, int cycle, const std::vector<int> &fluorescenceData)
+{
+    _writeMutex->lock();
+    {
+        for (size_t i = 0; i < fluorescenceData.size(); ++i)
+        {
+            *_session << "INSERT INTO fluorescence_data VALUES(:step_id, :fluorescence_value, :well_num, :cycle_num)",
+                    soci::use(step->id()), soci::use(fluorescenceData.at(i)), soci::use(i), soci::use(cycle);
+        }
+    }
+    _writeMutex->unlock();
 }
 
 #ifdef TEST_BUILD

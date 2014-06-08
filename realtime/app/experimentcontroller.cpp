@@ -81,7 +81,9 @@ void ExperimentController::run()
 
     HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->currentStep()->temperature());
     HeatBlockInstance::getInstance()->enableStepProcessing();
+
     HeatBlockInstance::getInstance()->setEnableMode(true);
+    OpticsInstance::getInstance()->setCollectData(true);
 }
 
 void ExperimentController::complete()
@@ -94,6 +96,7 @@ void ExperimentController::complete()
     stopLogging();
 
     LidInstance::getInstance()->setEnableMode(false);
+    OpticsInstance::getInstance()->setCollectData(false);
 
     _experiment->setCompletionStatus(Experiment::Success);
     _experiment->setCompletedAt(boost::posix_time::microsec_clock::local_time());
@@ -109,6 +112,7 @@ void ExperimentController::stop()
     LidInstance::getInstance()->setEnableMode(false);
     HeatBlockInstance::getInstance()->setEnableMode(false);
     HeatSinkInstance::getInstance()->setEnableMode(false);
+    OpticsInstance::getInstance()->setCollectData(false);
 
     if (_machineState != Complete)
     {
@@ -130,27 +134,26 @@ void ExperimentController::stop()
 
 void ExperimentController::stepBegun()
 {
-    Step *currentStep = _experiment->protocol()->currentStep();
-    Step *nextStep = _experiment->protocol()->nextStep();
-
-    if (nextStep)
+    if (_experiment->protocol()->hasNextStep())
     {
         _holdStepTimer->stop();
-        _holdStepTimer->setStartInterval(currentStep->holdTime() * 1000);
+        _holdStepTimer->setStartInterval(_experiment->protocol()->currentStep()->holdTime() * 1000);
         _holdStepTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::holdStepCallback));
     }
     else
     {
         complete();
 
-        if (currentStep->holdTime() > 0)
+        if (_experiment->protocol()->currentStep()->holdTime() > 0)
             stop();
     }
 }
 
 void ExperimentController::holdStepCallback(Poco::Timer &)
 {
-    HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->currentStep()->temperature(), _experiment->protocol()->currentRamp()->rate());
+    _dbControl->addFluorescenceData(_experiment->protocol()->currentStep(), _experiment->protocol()->currentStageCycle(), OpticsInstance::getInstance()->restartCollection());
+
+    HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->nextStep()->temperature(), _experiment->protocol()->currentRamp()->rate());
     HeatBlockInstance::getInstance()->enableStepProcessing();
 }
 

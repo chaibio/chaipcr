@@ -4,6 +4,12 @@
 namespace soci
 {
 class session;
+class statement;
+}
+
+namespace Poco
+{
+class Mutex;
 }
 
 class Experiment;
@@ -26,6 +32,8 @@ public:
 
     void addTemperatureLog(const TemperatureLog &log);
 
+    void addFluorescenceData(const Step *step, int cycle, const std::vector<int> &fluorescenceData);
+
 #ifdef TEST_BUILD
     std::vector<int> getEperimentIdList();
 #endif
@@ -34,10 +42,13 @@ private:
     Protocol* getProtocol(int experimentId);
     std::vector<Stage> getStages(int protocolId);
     std::vector<StageComponent> getStageComponents(int stageId);
-    std::map<int, Step> getSteps(int stageId);
+    std::vector<Step> getSteps(int stageId);
     Ramp* getRamp(int stepId);
 
     soci::session *_session;
+
+    std::vector<soci::statement> _writeQueue;
+    Poco::Mutex *_writeMutex;
 };
 
 #endif // DBCONTROL_H

@@ -14,6 +14,8 @@ public:
 	~ADCController();
 	
     void process();
+
+    int consumerChannel(const ADCConsumer *consumer) const;
 	
 private:
     std::shared_ptr<LTC2444> _ltc2444;
