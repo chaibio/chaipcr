@@ -64,7 +64,7 @@ ActiveRecord::Schema.define(version: 20140531071625) do
 
   create_table "temperature_logs", id: false, force: true do |t|
     t.integer "experiment_id"
-    t.integer "elapsed_time",                                   comment: "in milliseconds"
+    t.integer "elapsed_time",                                   comment: "in seconds"
     t.decimal "lid_temp",               precision: 5, scale: 2
     t.decimal "heat_block_zone_1_temp", precision: 5, scale: 2
     t.decimal "heat_block_zone_2_temp", precision: 5, scale: 2
