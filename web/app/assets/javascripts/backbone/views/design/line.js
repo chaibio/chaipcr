@@ -11,11 +11,11 @@ ChaiBioTech.Views.Design.line = Backbone.View.extend({
 		}
 
 		this.on("moveLineRight", function(newData) {
-			this.mathLogic(this.model.temperature, newData.leftSide)
+			this.mathLogic(this.model.temperature, newData.leftSide);
 		});
 
 		this.on("moveThisLine", function(newTempData) {
-			this.dragLine(newTempData.toThisTemp)
+			this.dragLine(newTempData.toThisTemp);
 		});
 	},
 

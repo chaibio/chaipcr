@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140603195229) do
+ActiveRecord::Schema.define(version: 20140627063958) do
 
   create_table "experiments", force: true do |t|
     t.string   "name"
@@ -42,6 +42,10 @@ ActiveRecord::Schema.define(version: 20140603195229) do
     t.integer "next_step_id"
   end
 
+  create_table "settings", id: false, force: true do |t|
+    t.boolean "debug", default: false
+  end
+
   create_table "stages", force: true do |t|
     t.string   "name"
     t.integer  "num_cycles",   default: 1, null: false
@@ -61,6 +65,16 @@ ActiveRecord::Schema.define(version: 20140603195229) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "temperature_debug_logs", id: false, force: true do |t|
+    t.integer "experiment_id"
+    t.integer "elapsed_time",                                    comment: "in milliseconds"
+    t.decimal "lid_drive",               precision: 6, scale: 1
+    t.decimal "heat_block_zone_1_drive", precision: 6, scale: 1
+    t.decimal "heat_block_zone_2_drive", precision: 6, scale: 1
+  end
+
+  add_index "temperature_debug_logs", ["experiment_id", "elapsed_time"], name: "index_temperature_debug_logs_on_experiment_id_and_elapsed_time", unique: true
 
   create_table "temperature_logs", id: false, force: true do |t|
     t.integer "experiment_id"
