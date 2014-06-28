@@ -50,7 +50,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
                                                                                     kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
                                                                                     kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient));
 
-    std::vector<SPIDTuning> heatBlockPIDSchedule = {{50, 0.2, 0.01, 0.0}, {100, 0.2, 0.01, 0.0}};
+    std::vector<SPIDTuning> heatBlockPIDSchedule = {{150, 0.15, 8, 0.0}}; //, {100, 0.0, 0.00, 0.0}};
     CPIDController *zone1CPIDController = new CPIDController(heatBlockPIDSchedule, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax);
 
     HeatBlockZoneController *zone1 = new HeatBlockZoneController(zone1Thermistor, kHeatBlockZonesMinTargetTemp, kHeatBlockZonesMaxTargetTemp,

@@ -3,6 +3,8 @@
 
 #include "pid.h"
 
+using namespace boost::posix_time;
+
 CPIDController::CPIDController(const std::vector<SPIDTuning>& pGainSchedule, int minOutput, int maxOutput):
     ipGainSchedule(pGainSchedule),
     iMinOutput(minOutput),
@@ -54,16 +56,31 @@ double CPIDController::compute(double target, double currentValue) {
     //calc values for this computation
     const SPIDTuning& pPIDTuning = determineGainSchedule(target);
     double error = target - currentValue;
-
     lock->writeLock();
 
+    //calculate time since last execution
+    ptime currentExecutionTime = microsec_clock::universal_time();
+    time_duration executionDuration = currentExecutionTime - _previousExecutionTime;
+    _previousExecutionTime = currentExecutionTime;
+    unsigned long executionDurationUs = executionDuration.total_microseconds();
+
+    //interactive PID algorithm
+    double controllerGain = error * pPIDTuning.kProportionalGain;
+    if (controllerGain > iMinOutput && controllerGain < iMaxOutput)
+        iIntegrator += controllerGain * executionDurationUs / (pPIDTuning.kIntegralTimeS * 1000000);
+    else
+        iIntegrator = 0;
+    double output = controllerGain + iIntegrator;
+
     //perform basic PID calculation
+    /*
     double pTerm = error;
     double iTerm = iIntegrator + error;
     double dTerm = error - iPreviousError;
     double output = (pPIDTuning.kP * pTerm) + (pPIDTuning.kI * iTerm) + (pPIDTuning.kD * dTerm);
+    */
 
-    //reset integrator if pTerm maxed out in drivable direction
+/*    //reset integrator if pTerm maxed out in drivable direction
     if ((iMaxOutput && pTerm * pPIDTuning.kP > iMaxOutput) ||
         (iMinOutput && pTerm * pPIDTuning.kP < iMinOutput)) {
         iIntegrator = 0;
@@ -72,7 +89,7 @@ double CPIDController::compute(double target, double currentValue) {
     } else if ((iMinOutput == 0 || output > iMinOutput) &&
               (iMaxOutput == 0 || output < iMaxOutput)) {
         iIntegrator += error;
-    }
+    }*/
 
     //latch integrator and output value to controllable range
     latchValue(&iIntegrator, iMinOutput, iMaxOutput);

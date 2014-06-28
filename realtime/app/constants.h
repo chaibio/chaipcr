@@ -44,10 +44,10 @@ const int kHeatBlockZonesPIDMax = 1;
 const double kHeatBlockZonesMinTargetTemp = -10;
 const double kHeatBlockZonesMaxTargetTemp = 105;
 
-const double kHeatBlockZone1PIDThreshold = 5;
-const double kHeatBlockZone2PIDThreshold = 5;
+const double kHeatBlockZone1PIDThreshold = 500;
+const double kHeatBlockZone2PIDThreshold = 500;
 
-const long kPIDIntervalMs = 100;
+const long kPIDIntervalMs = 25;
 
 //LED constants
 const int kMinLEDCurrent = 5; //5mA

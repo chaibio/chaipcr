@@ -1,13 +1,15 @@
 #ifndef PID_H
 #define PID_H
 
+#include "boostincludes.h"
+
 namespace Poco { class Timer; class RWLock; }
 
 struct SPIDTuning {
     int maxValueInclusive;
-    double kP;
-    double kI;
-    double kD;
+    double kProportionalGain;
+    double kIntegralTimeS;
+    double kDerivativeTimeMs;
 };
 
 ////////////////////////////////////////////////////////////////////
@@ -39,6 +41,7 @@ private:
     const int iMinOutput, iMaxOutput;
     double iPreviousError;
     double iIntegrator;
+    boost::posix_time::ptime _previousExecutionTime;
 
     mutable Poco::RWLock *lock;
 };
