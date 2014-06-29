@@ -5,123 +5,77 @@
 
 using namespace boost::posix_time;
 
-CPIDController::CPIDController(const std::vector<SPIDTuning>& pGainSchedule, int minOutput, int maxOutput):
-    ipGainSchedule(pGainSchedule),
-    iMinOutput(minOutput),
-    iMaxOutput(maxOutput),
-    iPreviousError(0),
-    iIntegrator(0) {
+////////////////////////////////////////////////////////////////////
+// Class PIDController
+PIDController::PIDController(const std::vector<SPIDTuning>& pGainSchedule, int minOutput, int maxOutput, const SinglePoleRecursiveFilter& processValueFilter):
+    _gainSchedule {pGainSchedule},
+    _processValueFilter {processValueFilter},
+    _minOutput {minOutput},
+    _maxOutput {maxOutput},
+    _previousProcessValue {0},
+    _integratorS {0} {
 
     lock = new Poco::RWLock;
 }
-
-CPIDController::~CPIDController() {
+//------------------------------------------------------------------------------
+PIDController::~PIDController() {
     delete lock;
 }
-
-double CPIDController::getIntegrator() const {
-    double result = 0;
-
-    lock->readLock();
-    result = iIntegrator;
-    lock->unlock();
-
-    return result;
-}
-
-void CPIDController::setIntegrator(double integrator) {
-    lock->writeLock();
-    iIntegrator = integrator;
-    lock->unlock();
-}
-
-double CPIDController::getPreviousError() const {
-    double result = 0;
-
-    lock->readLock();
-    result = iPreviousError;
-    lock->unlock();
-
-    return result;
-}
-
-void CPIDController::setPreviousError(double error) {
-    lock->writeLock();
-    iPreviousError = error;
-    lock->unlock();
-}
-
 //------------------------------------------------------------------------------
-double CPIDController::compute(double target, double currentValue) {
+double PIDController::compute(double setpoint, double processValue) {
     //calc values for this computation
-    const SPIDTuning& pPIDTuning = determineGainSchedule(target);
-    double error = target - currentValue;
-    lock->writeLock();
+    const SPIDTuning& PIDTuning = determineGainSchedule(setpoint);
+    double error = setpoint - processValue;
 
     //calculate time since last execution
     ptime currentExecutionTime = microsec_clock::universal_time();
     time_duration executionDuration = currentExecutionTime - _previousExecutionTime;
+    double executionDurationS = executionDuration.total_microseconds() / 1000000;
+
+    lock->writeLock();
+
+    //non-interactive PID algorithm
+    double filteredProcessValue = _processValueFilter.processSample(processValue);
+    _integratorS += error * executionDurationS;
+    double derivativeValueS = (filteredProcessValue - _previousProcessValue) / executionDurationS;
+    double output = PIDTuning.kControllerGain * (error + _integratorS / PIDTuning.kIntegralTimeS + PIDTuning.kDerivativeTimeS * derivativeValueS);
+
+    //limit drive to system limits, clear integrator when output is maxed to prevent windup
+    if (latchValue(&output, _minOutput, _maxOutput))
+        _integratorS = 0;
+
+    //set values for next computation
+    _previousProcessValue = filteredProcessValue;
     _previousExecutionTime = currentExecutionTime;
-    unsigned long executionDurationUs = executionDuration.total_microseconds();
-
-    //interactive PID algorithm
-    double controllerGain = error * pPIDTuning.kProportionalGain;
-    if (controllerGain > iMinOutput && controllerGain < iMaxOutput)
-        iIntegrator += controllerGain * executionDurationUs / (pPIDTuning.kIntegralTimeS * 1000000);
-    else
-        iIntegrator = 0;
-    double output = controllerGain + iIntegrator;
-
-    //perform basic PID calculation
-    /*
-    double pTerm = error;
-    double iTerm = iIntegrator + error;
-    double dTerm = error - iPreviousError;
-    double output = (pPIDTuning.kP * pTerm) + (pPIDTuning.kI * iTerm) + (pPIDTuning.kD * dTerm);
-    */
-
-/*    //reset integrator if pTerm maxed out in drivable direction
-    if ((iMaxOutput && pTerm * pPIDTuning.kP > iMaxOutput) ||
-        (iMinOutput && pTerm * pPIDTuning.kP < iMinOutput)) {
-        iIntegrator = 0;
-
-    //accumulate integrator if output not maxed out in drivable direction
-    } else if ((iMinOutput == 0 || output > iMinOutput) &&
-              (iMaxOutput == 0 || output < iMaxOutput)) {
-        iIntegrator += error;
-    }*/
-
-    //latch integrator and output value to controllable range
-    latchValue(&iIntegrator, iMinOutput, iMaxOutput);
-    latchValue(&output, iMinOutput, iMaxOutput);
-
-    //update values for next derivative computation
-    iPreviousError = error;
 
     lock->unlock();
 
     return output;
 }
 //------------------------------------------------------------------------------
-const SPIDTuning& CPIDController::determineGainSchedule(double target) const {
-    for (const SPIDTuning &item: ipGainSchedule)
+const SPIDTuning& PIDController::determineGainSchedule(double setpoint) const {
+    for (const SPIDTuning &item: _gainSchedule)
     {
-        if (target++ != item.maxValueInclusive)
+        if (setpoint++ != item.maxValueInclusive)
             return item;
     }
 
-    return ipGainSchedule.front();
+    return _gainSchedule.front();
 }
 //------------------------------------------------------------------------------
-void CPIDController::latchValue(double* pValue, double minValue, double maxValue) {
-    if (*pValue < minValue)
-        *pValue = minValue;
-    else if (*pValue > maxValue)
-        *pValue = maxValue;
+bool PIDController::latchValue(double* value, double minValue, double maxValue) {
+    if (*value < minValue)
+        *value = minValue;
+    else if (*value > maxValue)
+        *value = maxValue;
+    else
+        return false;
+
+    return true;
 }
 
 /*--------------------------------------------PIDControl--------------------------------------------*/
-PIDControl::PIDControl(CPIDController *pidController, long pidTimerInterval) {
+PIDControl::PIDControl(PIDController *pidController, long pidTimerInterval) {
     _pidController = pidController;
     _pidResult.store(0);
     _pidTimerInterval = pidTimerInterval;

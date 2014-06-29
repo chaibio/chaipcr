@@ -4,7 +4,7 @@
 #include "heatsink.h"
 
 HeatSink::HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-                   CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold)
+                   PIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold)
     :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController, pidTimerInterval, pidRangeControlThreshold)
 {
     _fan = new Fan();

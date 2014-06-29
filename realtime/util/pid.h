@@ -2,45 +2,41 @@
 #define PID_H
 
 #include "boostincludes.h"
+#include "filters.h"
 
 namespace Poco { class Timer; class RWLock; }
 
 struct SPIDTuning {
     int maxValueInclusive;
-    double kProportionalGain;
+    double kControllerGain;
     double kIntegralTimeS;
-    double kDerivativeTimeMs;
+    double kDerivativeTimeS;
 };
 
 ////////////////////////////////////////////////////////////////////
-// Class CPIDController
-class CPIDController {
+// Class PIDController
+class PIDController {
 public:
-    CPIDController(const std::vector<SPIDTuning>& pGainSchedule, int minOutput, int maxOutput);
-    ~CPIDController();
+    PIDController(const std::vector<SPIDTuning>& pGainSchedule, int minOutput, int maxOutput, const SinglePoleRecursiveFilter& processValueFilter);
+    ~PIDController();
 
-    //accessors
-    double getIntegrator() const;
-    void setIntegrator(double integrator);
-
-    double getPreviousError() const;
-    void setPreviousError(double error);
-
-    inline int getMinOutput() const { return iMinOutput; }
-    inline int getMaxOutput() const { return iMaxOutput; }
+    inline int getMinOutput() const { return _minOutput; }
+    inline int getMaxOutput() const { return _maxOutput; }
 
     //computation
-    double compute(double target, double currentValue);
+    double compute(double setpoint, double processValue);
 
 private:
-    const SPIDTuning& determineGainSchedule(double target) const;
-    void latchValue(double* pValue, double minValue, double maxValue);
+    const SPIDTuning& determineGainSchedule(double setpoint) const;
+    bool latchValue(double* value, double minValue, double maxValue);
 
 private:
-    std::vector<SPIDTuning> ipGainSchedule;
-    const int iMinOutput, iMaxOutput;
-    double iPreviousError;
-    double iIntegrator;
+    std::vector<SPIDTuning> _gainSchedule;
+    SinglePoleRecursiveFilter _processValueFilter;
+    const int _minOutput, _maxOutput;
+
+    double _previousProcessValue;
+    double _integratorS;
     boost::posix_time::ptime _previousExecutionTime;
 
     mutable Poco::RWLock *lock;
@@ -48,7 +44,7 @@ private:
 
 class PIDControl {
 public:
-    PIDControl(CPIDController *pidController, long pidTimerInterval);
+    PIDControl(PIDController *pidController, long pidTimerInterval);
     virtual ~PIDControl();
 
 protected:
@@ -61,7 +57,7 @@ private:
     void pidCallback(Poco::Timer &timer);
 
 protected:
-    CPIDController *_pidController;
+    PIDController *_pidController;
     std::atomic<double> _pidResult;
 
     Poco::Timer *_pidTimer;

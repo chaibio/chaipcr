@@ -17,7 +17,7 @@ public:
     };
 
     TemperatureController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-                          CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold);
+                          PIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold);
 
     inline ControlMode controlMode() const { return _controlMode; }
 

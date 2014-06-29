@@ -5,7 +5,7 @@
 #include "lid.h"
 
 Lid::Lid(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-         CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold,
+         PIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold,
          const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold)
     :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController, pidTimerInterval, pidRangeControlThreshold),
      PWMControl(pwmPath, pwmPeriod)

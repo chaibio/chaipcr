@@ -4,7 +4,7 @@
 #include "temperaturecontroller.h"
 
 TemperatureController::TemperatureController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-                                             CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold)
+                                             PIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold)
     :PIDControl(pidController, pidTimerInterval)
 {
     _controlMode = None;
@@ -78,8 +78,8 @@ void TemperatureController::checkControlMode()
         {
             _controlMode = PIDMode;
 
-            _pidController->setIntegrator(outputDirection() ? _pidController->getMaxOutput() : _pidController->getMinOutput());
-            _pidController->setPreviousError(0);
+            //_pidController->setIntegrator(outputDirection() ? _pidController->getMaxOutput() : _pidController->getMinOutput());
+            //_pidController->setPreviousError(0);
 
             startPid();
         }

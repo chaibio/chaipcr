@@ -107,7 +107,8 @@ HEADERS += \
     app/experimentcontroller.h \
     db/temperaturelog.h \
     test/apptest.h \
-    test/controltest.h
+    test/controltest.h \
+    util/filters.h
 
 SOURCES += \
     app/pins.cpp \
@@ -149,4 +150,5 @@ SOURCES += \
     app/experimentcontroller.cpp \
     test/apptest.cpp \
     test/controltest.cpp \
-    control/adcconsumer.cpp
+    control/adcconsumer.cpp \
+    util/filters.cpp
