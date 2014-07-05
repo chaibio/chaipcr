@@ -9,7 +9,7 @@ class HeatSink : public TemperatureController
 {
 public:
     HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-             PIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold);
+             PIDController *pidController, long pidTimerInterval);
     ~HeatSink();
 
     int targetRPM() const;

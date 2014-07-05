@@ -1,4 +1,4 @@
-QT -= core gui
+QT -= core gui network
 
 INCLUDEPATH += ./app/
 INCLUDEPATH += ./control/
@@ -108,7 +108,9 @@ HEADERS += \
     db/temperaturelog.h \
     test/apptest.h \
     test/controltest.h \
-    util/filters.h
+    util/filters.h \
+    db/settings.h \
+    server/settingshandler.h
 
 SOURCES += \
     app/pins.cpp \
@@ -151,4 +153,6 @@ SOURCES += \
     test/apptest.cpp \
     test/controltest.cpp \
     control/adcconsumer.cpp \
-    util/filters.cpp
+    util/filters.cpp \
+    db/settings.cpp \
+    server/settingshandler.cpp

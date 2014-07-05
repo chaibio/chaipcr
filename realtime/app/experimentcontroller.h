@@ -5,6 +5,7 @@
 
 class DBControl;
 class Experiment;
+class Settings;
 
 namespace Poco { class Timer; }
 
@@ -33,6 +34,7 @@ public:
 
     inline MachineState machineState() const { return _machineState; }
     inline const Experiment* experiment() const { return _experiment; }
+    inline Settings* settings() const { return _settings; }
 
     StartingResult start(int experimentId);
     void stop();
@@ -54,6 +56,7 @@ private:
 
     DBControl *_dbControl;
     Experiment *_experiment;
+    Settings *_settings;
 
     Poco::Timer *_holdStepTimer;
     Poco::Timer *_logTimer;

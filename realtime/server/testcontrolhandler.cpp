@@ -21,7 +21,6 @@ void TestControlHandler::processData(const ptree &requestPt, ptree &responsePt)
 void TestControlHandler::processOptics(const ptree &requestPt, ptree &)
 {
     shared_ptr<Optics> optics = OpticsInstance::getInstance();
-    shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();
 
     if (optics)
     {
@@ -30,7 +29,6 @@ void TestControlHandler::processOptics(const ptree &requestPt, ptree &)
         bool disableLEDs = requestPt.get<bool>("disableLEDs", false);
         bool collectData = requestPt.get<bool>("collectData", false);
         int photodiodeMuxChannel = requestPt.get<int>("photodiodeMuxChannel", -1);
-        double heatBlockTemp = requestPt.get<double>("heatBlockTemp", -20);
 
         if (ledIntensity != -1)
             optics->getLedController()->setIntensity(ledIntensity);
@@ -43,11 +41,6 @@ void TestControlHandler::processOptics(const ptree &requestPt, ptree &)
 
         if (photodiodeMuxChannel != -1)
             optics->getPhotodiodeMux().setChannel(photodiodeMuxChannel);
-
-        if (heatBlockTemp != -20) {
-            heatBlock->setEnableMode(true);
-            heatBlock->setTargetTemperature(heatBlockTemp);
-        }
 
         optics->setCollectData(collectData);
     }
@@ -89,9 +82,9 @@ void TestControlHandler::processHeatBlock(const ptree &requestPt, ptree &)
 
     if (heatBlock)
     {
-        double heatBlockTargetTemp = requestPt.get<double>("heatBlockTargetTemp", -1);
+        double heatBlockTargetTemp = requestPt.get<double>("heatBlockTargetTemp", -20);
 
-        if (heatBlockTargetTemp != -1)
+        if (heatBlockTargetTemp != -20)
         {
             heatBlock->setTargetTemperature(heatBlockTargetTemp);
             heatBlock->setEnableMode(true);

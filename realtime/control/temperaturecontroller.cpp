@@ -4,17 +4,14 @@
 #include "temperaturecontroller.h"
 
 TemperatureController::TemperatureController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-                                             PIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold)
+                                             PIDController *pidController, long pidTimerInterval)
     :PIDControl(pidController, pidTimerInterval)
 {
-    _controlMode = None;
     _enableMode = false;
 
     _thermistor = thermistor;
     _minTargetTemp = minTargetTemp;
     _maxTargetTemp = maxTargetTemp;
-
-    _pidRangeControlThreshold = pidRangeControlThreshold;
 
     _targetValue = std::bind(&TemperatureController::targetTemperature, this);
     _currentValue = std::bind(&TemperatureController::currentTemperature, this);
@@ -27,13 +24,11 @@ void TemperatureController::setEnableMode(bool enableMode)
         _enableMode = enableMode;
 
         if (_enableMode)
-            checkControlMode();
+            startPid();
         else
         {
             stopPid();
             resetOutput();
-
-            _controlMode = None;
         }
     }
 }
@@ -60,7 +55,6 @@ void TemperatureController::process()
 {
     if (_enableMode)
     {
-        checkControlMode();
         processOutput();
     }
 }
@@ -68,34 +62,4 @@ void TemperatureController::process()
 void TemperatureController::pidCallback(double pidResult)
 {
     setOutput(pidResult);
-}
-
-void TemperatureController::checkControlMode()
-{
-    if (std::abs(currentTemperature() - targetTemperature()) < _pidRangeControlThreshold)
-    {
-        if (_controlMode != PIDMode)
-        {
-            _controlMode = PIDMode;
-
-            //_pidController->setIntegrator(outputDirection() ? _pidController->getMaxOutput() : _pidController->getMinOutput());
-            //_pidController->setPreviousError(0);
-
-            startPid();
-        }
-    }
-    else
-    {
-        if (_controlMode != BangBangMode)
-        {
-            _controlMode = BangBangMode;
-
-            stopPid();
-        }
-
-        if (currentTemperature() > targetTemperature())
-            setOutput(_pidController->getMinOutput());
-        else
-            setOutput(_pidController->getMaxOutput());
-    }
 }

@@ -14,6 +14,7 @@ ExperimentController::ExperimentController()
     _experiment = nullptr;
     _holdStepTimer = new Poco::Timer();
     _logTimer = new Poco::Timer();
+    _settings = _dbControl->getSettings();
 
     LidInstance::getInstance()->startThresholdReached.connect(boost::bind(&ExperimentController::run, this));
     HeatBlockInstance::getInstance()->stepBegun.connect(boost::bind(&ExperimentController::stepBegun, this));
@@ -26,6 +27,7 @@ ExperimentController::~ExperimentController()
     delete _logTimer;
     delete _holdStepTimer;
     delete _dbControl;
+    delete _settings;
 }
 
 ExperimentController::StartingResult ExperimentController::start(int experimentId)

@@ -4,7 +4,6 @@
 namespace soci
 {
 class session;
-class statement;
 }
 
 namespace Poco
@@ -19,6 +18,7 @@ class StageComponent;
 class Step;
 class Ramp;
 class TemperatureLog;
+class Settings;
 
 class DBControl
 {
@@ -34,6 +34,9 @@ public:
 
     void addFluorescenceData(const Step *step, int cycle, const std::vector<int> &fluorescenceData);
 
+    Settings* getSettings();
+    void updateSettings(const Settings &settings);
+
 #ifdef TEST_BUILD
     std::vector<int> getEperimentIdList();
 #endif
@@ -47,8 +50,7 @@ private:
 
     soci::session *_session;
 
-    std::vector<soci::statement> _writeQueue;
-    Poco::Mutex *_writeMutex;
+    Poco::Mutex *_dbMutex;
 };
 
 #endif // DBCONTROL_H

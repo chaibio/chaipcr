@@ -55,7 +55,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
     PIDController *zone1CPIDController = new PIDController(heatBlockPIDSchedule, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax, processValueFilter);
 
     HeatBlockZoneController *zone1 = new HeatBlockZoneController(zone1Thermistor, kHeatBlockZonesMinTargetTemp, kHeatBlockZonesMaxTargetTemp,
-                                                                 zone1CPIDController, kPIDIntervalMs, kHeatBlockZone1PIDThreshold, kHeatBlockZone1PWMPath,
+                                                                 zone1CPIDController, kPIDIntervalMs, kHeatBlockZone1PWMPath,
                                                                  kHeatBlockZone1PWMPeriodNs, kHeadBlockZone1HeatPin, kHeadBlockZone1CoolPin);
 
     shared_ptr<SteinhartHartThermistor> zone2Thermistor(new SteinhartHartThermistor(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
@@ -65,7 +65,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
     PIDController *zone2CPIDController = new PIDController(heatBlockPIDSchedule, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax, processValueFilter);
 
     HeatBlockZoneController *zone2 = new HeatBlockZoneController(zone2Thermistor, kHeatBlockZonesMinTargetTemp, kHeatBlockZonesMaxTargetTemp,
-                                                                 zone2CPIDController, kPIDIntervalMs, kHeatBlockZone2PIDThreshold, kHeatBlockZone2PWMPath,
+                                                                 zone2CPIDController, kPIDIntervalMs, kHeatBlockZone2PWMPath,
                                                                  kHeatBlockZone2PWMPeriodNs, kHeadBlockZone2HeatPin, kHeadBlockZone2CoolPin);
 
     consumers.push_back(zone1Thermistor);
@@ -84,7 +84,7 @@ shared_ptr<IControl> QPCRFactory::constructLid(vector<shared_ptr<ADCConsumer>> &
 
     consumers.push_back(thermistor);
 
-    return LidInstance::createInstance(thermistor, kLidMinTargetTemp, kLidMaxTargetTemp, pidController, kPIDIntervalMs, kLidPIDThreshold,
+    return LidInstance::createInstance(thermistor, kLidMinTargetTemp, kLidMaxTargetTemp, pidController, kPIDIntervalMs,
                                        kLidControlPWMPath, kLidPWMPeriodNs, kProgramStartLidTempThreshold);
 }
 
@@ -99,5 +99,5 @@ shared_ptr<IControl> QPCRFactory::constructHeatSink(vector<shared_ptr<ADCConsume
     //need code to control microcontroller ADC
     //consumers.push_back(thermistor);
 
-    return HeatSinkInstance::createInstance(thermistor, kHeatSinkMinTargetTemp, kHeatSinkMaxTargetTemp, pidController, kPIDIntervalMs, kHeatSinkPIDThreshold);
+    return HeatSinkInstance::createInstance(thermistor, kHeatSinkMinTargetTemp, kHeatSinkMaxTargetTemp, pidController, kPIDIntervalMs);
 }

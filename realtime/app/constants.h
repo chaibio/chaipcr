@@ -19,8 +19,6 @@ const double kLidThermistorT0 = 298.15;             //kelvins
 const double kLidMinTargetTemp = 0;
 const double kLidMaxTargetTemp = 130;
 
-const double kLidPIDThreshold = 100;
-
 const double kProgramStartLidTempThreshold = 2;
 
 //thermistor & ADC params
@@ -43,9 +41,6 @@ const int kHeatBlockZonesPIDMax = 1;
 
 const double kHeatBlockZonesMinTargetTemp = -10;
 const double kHeatBlockZonesMaxTargetTemp = 105;
-
-const double kHeatBlockZone1PIDThreshold = 500;
-const double kHeatBlockZone2PIDThreshold = 500;
 
 const long kPIDIntervalMs = 25;
 
@@ -76,7 +71,5 @@ const double kHeatSinkMaxTargetTemp = 80;
 
 const unsigned long kHeatSinkPIDMin = -1;
 const unsigned long kHeatSinkPIDMax = 0;
-
-const double kHeatSinkPIDThreshold = 100;
 
 #endif

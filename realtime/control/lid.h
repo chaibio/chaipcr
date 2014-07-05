@@ -8,7 +8,7 @@ class Lid : public TemperatureController, public PWMControl
 {
 public:
     Lid(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-        PIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold,
+        PIDController *pidController, long pidTimerInterval,
         const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold);
     ~Lid();
 
