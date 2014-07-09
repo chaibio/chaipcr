@@ -1,7 +1,7 @@
 ChaiBioTech.Views.Design = ChaiBioTech.Views.Design || {} ;
 
 ChaiBioTech.Views.Design.holdTime = Backbone.View.extend({
-	
+
 	template: JST["backbone/templates/design/hold-time"],
 	holdTimeInSeconds: 0,
 	className: "hold-time",
@@ -26,7 +26,7 @@ ChaiBioTech.Views.Design.holdTime = Backbone.View.extend({
 		evt.preventDefault();
 		evt.stopPropagation();
 		//Injecting attrs to number, editable doen't support input typt=number
-		$(".editable-popup").find(".input-mini"). 
+		$(".editable-popup").find(".input-mini").
 		attr("min", 0).
 		attr("max", 59);
 		$(".editable-popup").on("click", function(evt) {
@@ -64,7 +64,7 @@ ChaiBioTech.Views.Design.holdTime = Backbone.View.extend({
 			seconds: seconds
 		}
 		$(this.el).html(this.template(time));
-		//Two handlers can be combined below but it will take some 
+		//Two handlers can be combined below but it will take some
 		//complex code to figure out right function call. So this way, less complex
 		$(this.el).find(".seconds ").editable({
            type:  'number',

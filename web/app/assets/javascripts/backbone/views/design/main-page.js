@@ -7,7 +7,7 @@ ChaiBioTech.Views.Design.Index_view = Backbone.View.extend({
 	events: {
 		"click li": "sideBarHandler"
 	},
-	
+
 	intialize: function() {
 
 	},
