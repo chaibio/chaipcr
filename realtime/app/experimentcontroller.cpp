@@ -182,3 +182,8 @@ void ExperimentController::addLogCallback(Poco::Timer &)
 
     _dbControl->addTemperatureLog(log);
 }
+
+void ExperimentController::settingsUpdated()
+{
+    _dbControl->updateSettings(*_settings);
+}

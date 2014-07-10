@@ -39,12 +39,13 @@ public:
     StartingResult start(int experimentId);
     void stop();
 
-    void stepBegun();
+    void settingsUpdated();
 
 private:
     void run();
     void complete();
 
+    void stepBegun();
     void holdStepCallback(Poco::Timer &timer);
 
     void startLogging();
