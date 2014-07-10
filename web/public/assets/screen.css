@@ -297,7 +297,7 @@
 }
 /* line 281, ../../app/assets/stylesheets/screen.css.scss */
 .loginWrapper .loginBox {
-  height: 350px;
+  height: 250px;
   width: 300px;
   background-color: white;
   margin-left: auto;
@@ -315,4 +315,21 @@
   text-align: center;
   font-weight: bold;
   padding-top: 10px;
+}
+/* line 301, ../../app/assets/stylesheets/screen.css.scss */
+.loginWrapper .loginBox .login-credentials {
+  width: 300px;
+}
+/* line 304, ../../app/assets/stylesheets/screen.css.scss */
+.loginWrapper .loginBox .login-credentials input {
+  margin: 30px 0 0 65px;
+  text-align: center;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+/* line 311, ../../app/assets/stylesheets/screen.css.scss */
+.loginWrapper .loginBox .login-credentials button {
+  margin: 30px 0 0 72px;
+  width: 150px;
 }

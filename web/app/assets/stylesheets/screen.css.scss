@@ -279,7 +279,7 @@
 	padding-top: 5%;
 
 	.loginBox {
-		height: 350px;
+		height: 250px;
 		width: 300px;
 		background-color: white;
 		margin-left: auto;
@@ -296,6 +296,22 @@
 			text-align: center;
 			font-weight: bold;
 			padding-top: 10px;
+		}
+
+		.login-credentials {
+			width: 300px;
+
+			input {
+				margin: 30px 0 0 65px;
+				text-align: center;
+				-webkit-border-radius: 4px;
+				-moz-border-radius: 4px;
+				border-radius: 4px;
+			}
+			button {
+				margin: 30px 0 0 72px;
+				width: 150px;
+			}
 		}
 	}
 }
