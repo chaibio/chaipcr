@@ -28,15 +28,19 @@ void TestControlHandler::processOptics(const ptree &requestPt, ptree &)
         int activateLED = requestPt.get<int>("activateLED", -1);
         bool disableLEDs = requestPt.get<bool>("disableLEDs", false);
         bool collectData = requestPt.get<bool>("collectData", false);
+        int photodiodeMuxChannel = requestPt.get<int>("photodiodeMuxChannel", -1);
 
         if (ledIntensity != -1)
             optics->getLedController()->setIntensity(ledIntensity);
 
         if (activateLED != -1)
-            optics->getLedController()->activateLED(activateLED);
+            optics->getLedController()->activateLED(kWellList.at(activateLED));
 
         if (disableLEDs)
             optics->getLedController()->disableLEDs();
+
+        if (photodiodeMuxChannel != -1)
+            optics->getPhotodiodeMux().setChannel(photodiodeMuxChannel);
 
         optics->setCollectData(collectData);
     }
@@ -57,7 +61,7 @@ void TestControlHandler::processLid(const ptree &requestPt, ptree &)
 
 void TestControlHandler::processHeatSink(const ptree &requestPt, ptree &)
 {
-    shared_ptr<HeatSink> heatSink = HeatSinkInstace::getInstance();
+    shared_ptr<HeatSink> heatSink = HeatSinkInstance::getInstance();
 
     if (heatSink)
     {
@@ -78,9 +82,9 @@ void TestControlHandler::processHeatBlock(const ptree &requestPt, ptree &)
 
     if (heatBlock)
     {
-        double heatBlockTargetTemp = requestPt.get<double>("heatBlockTargetTemp", -1);
+        double heatBlockTargetTemp = requestPt.get<double>("heatBlockTargetTemp", -20);
 
-        if (heatBlockTargetTemp != -1)
+        if (heatBlockTargetTemp != -20)
         {
             heatBlock->setTargetTemperature(heatBlockTargetTemp);
             heatBlock->setEnableMode(true);

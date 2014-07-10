@@ -93,6 +93,14 @@ Step* Protocol::currentStep() const
         return nullptr;
 }
 
+Ramp* Protocol::currentRamp() const
+{
+    if (_currentStage != _stages.end())
+        return _currentStage->currentRamp();
+    else
+        return nullptr;
+}
+
 Step* Protocol::nextStep()
 {
     if (_currentStage == _stages.end())
@@ -107,4 +115,14 @@ Step* Protocol::nextStep()
     }
 
     return step;
+}
+
+bool Protocol::hasNextStep() const
+{
+    return _currentStage != _stages.end() && (_currentStage->hasNextStep() || (_currentStage +1 ) != _stages.end());
+}
+
+int Protocol::currentStageCycle() const
+{
+    return _currentStage->currentCycle();
 }

@@ -4,13 +4,15 @@
 class Step
 {
 public:
-    Step();
+    Step(int id);
     Step(const Step &other);
     Step(Step &&other);
     ~Step();
 
     Step& operator= (const Step &other);
     Step& operator= (Step &&other);
+
+    inline int id() const { return _id; }
 
     inline void setName(const std::string &name) {_name = name;}
     inline void setName(std::string &&name) {_name = std::move(name);}
@@ -26,6 +28,8 @@ public:
     inline int orderNumber() const {return _orderNumber;}
 
 private:
+    int _id;
+
     std::string _name;
 
     double _temperature;

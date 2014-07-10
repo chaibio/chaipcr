@@ -28,7 +28,7 @@ Stage::Stage(Stage &&other)
 {
     _name = std::move(other._name);
     _numCycles = other._numCycles;
-    _cycleIteration = other._cycleIteration;
+    _cycleIteration = other._cycleIteration.load();
     _orderNumber = other._orderNumber;
     _type = other._type;
     _components = std::move(other._components);
@@ -61,7 +61,7 @@ Stage& Stage::operator= (Stage &&other)
 {
     _name = std::move(other._name);
     _numCycles = other._numCycles;
-    _cycleIteration = other._cycleIteration;
+    _cycleIteration = other._cycleIteration.load();
     _orderNumber = other._orderNumber;
     _type = other._type;
     _components = std::move(other._components);
@@ -74,6 +74,12 @@ Stage& Stage::operator= (Stage &&other)
     other._currentComponent = other._components.end();
 
     return *this;
+}
+
+void Stage::setNumCycles(int numCycles)
+{
+     _numCycles = numCycles;
+     _cycleIteration = 0;
 }
 
 void Stage::setComponents(const std::vector<StageComponent> &components)
@@ -115,6 +121,14 @@ Step* Stage::currentStep() const
         return nullptr;
 }
 
+Ramp* Stage::currentRamp() const
+{
+    if (_currentComponent != _components.end())
+        return _currentComponent->ramp();
+    else
+        return nullptr;
+}
+
 Step* Stage::nextStep()
 {
     if (_currentComponent == _components.end())
@@ -137,4 +151,9 @@ Step* Stage::nextStep()
     }
 
     return step;
+}
+
+bool Stage::hasNextStep() const
+{
+    return (_currentComponent != _components.end() && (_currentComponent + 1) != _components.end()) || (_cycleIteration + 1) < _numCycles;
 }

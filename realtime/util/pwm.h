@@ -29,14 +29,14 @@ public:
     virtual ~PWMControl() {}
 
     inline unsigned long pwmPeriod() const { return _period; }
-    inline void setPWMPeriod(unsigned long period) { _period = period; }
+    inline void setPWMPeriod(unsigned long period) { _period = period; processPWM(); }
 
     inline unsigned long pwmDutyCycle() const { return _dutyCycle; }
-    inline void setPWMDutyCycle(unsigned long dutyCycle) { dutyCycle <= _period ? _dutyCycle = dutyCycle : _dutyCycle = _period.load(); }
-    inline void setPWMDutyCycle(double dutyCycle) { dutyCycle *= _period.load(); dutyCycle <= _period ? _dutyCycle = dutyCycle : _dutyCycle = _period.load(); }
+    inline void setPWMDutyCycle(unsigned long dutyCycle) { dutyCycle <= _period ? _dutyCycle = dutyCycle : _dutyCycle = _period.load(); processPWM(); }
+    inline void setPWMDutyCycle(double dutyCycle) { dutyCycle *= _period.load(); dutyCycle <= _period ? _dutyCycle = dutyCycle : _dutyCycle = _period.load(); processPWM(); }
 
     inline unsigned int pwmPolarity() const { return _polarity; }
-    inline void setPWMPolarity(unsigned int polarity) { _polarity = polarity; }
+    inline void setPWMPolarity(unsigned int polarity) { _polarity = polarity; processPWM(); }
 
 protected:
     inline void processPWM() {

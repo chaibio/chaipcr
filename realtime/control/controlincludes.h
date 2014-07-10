@@ -3,6 +3,7 @@
 
 #include "icontrol.h"
 #include "temperaturecontroller.h"
+#include "adcconsumer.h"
 
 #include "adccontroller.h"
 #include "heatblock.h"

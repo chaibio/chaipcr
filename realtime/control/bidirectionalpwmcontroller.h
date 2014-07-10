@@ -8,8 +8,9 @@ class BidirectionalPWMController : public TemperatureController, public PWMContr
 {
 public:
     BidirectionalPWMController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-                               CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold,
+                               PIDController *pidController, long pidTimerInterval,
                                const std::string &pwmPath, unsigned long pwmPeriod, unsigned int heatIOPin, unsigned int coolIOPin);
+    ~BidirectionalPWMController();
 
 protected:
     void setOutput(double value);

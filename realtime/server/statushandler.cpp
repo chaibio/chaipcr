@@ -12,7 +12,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
     std::shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();
     std::shared_ptr<Optics> optics = OpticsInstance::getInstance();
     std::shared_ptr<Lid> lid = LidInstance::getInstance();
-    std::shared_ptr<HeatSink> heatSink = HeatSinkInstace::getInstance();
+    std::shared_ptr<HeatSink> heatSink = HeatSinkInstance::getInstance();
     std::shared_ptr<ExperimentController> experimentController = ExperimentController::getInstance();
 
     if (heatBlock) {
@@ -23,7 +23,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
         responsePt.put("heatblock.zone2.drive", (double)heatBlock->zone2DriveValue());
     }
 
-    if(lid) {
+    if (lid) {
         responsePt.put("lid.temperature", lid->currentTemperature());
         responsePt.put("lid.drive", (double)lid->pwmDutyCycle() / lid->pwmPeriod());
     }
@@ -32,6 +32,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
         responsePt.put("optics.intensity", optics->getLedController()->intensity());
         responsePt.put("optics.collectData", optics->collectData());
         responsePt.put("optics.lidOpen", optics->lidOpen());
+        responsePt.put("optics.photodiodeValue", (optics->adcValue() >> 8));
     }
 
     if (heatSink) {
@@ -46,14 +47,17 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
 
         case ExperimentController::LidHeating:
             responsePt.put("experimentController.machine.state", "LidHeating");
+            responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experimentController->experiment()->startedAt()).total_seconds());
             break;
 
         case ExperimentController::Running:
             responsePt.put("experimentController.machine.state", "Running");
+            responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experimentController->experiment()->startedAt()).total_seconds());
             break;
 
         case ExperimentController::Complete:
             responsePt.put("experimentController.machine.state", "Complete");
+            responsePt.put("experimentController.expriment.run_duration", (experimentController->experiment()->completedAt() - experimentController->experiment()->startedAt()).total_seconds());
             break;
 
         default:
@@ -61,9 +65,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
             break;
         }
 
-        if (experimentController->machineState() != ExperimentController::Idle) {
+        if (experimentController->machineState() != ExperimentController::Idle)
             responsePt.put("experimentController.expriment.started_at", experimentController->experiment()->startedAt());
-            responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experimentController->experiment()->startedAt()).total_seconds());
-        }
     }
 }

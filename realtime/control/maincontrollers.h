@@ -13,7 +13,7 @@ class HeatBlockInstance : public Instance<HeatBlock>
 
 };
 
-class HeatSinkInstace : public Instance<HeatSink>
+class HeatSinkInstance : public Instance<HeatSink>
 {
 
 };

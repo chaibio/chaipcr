@@ -1,4 +1,4 @@
-QT -= core gui
+QT -= core gui network
 
 INCLUDEPATH += ./app/
 INCLUDEPATH += ./control/
@@ -75,7 +75,7 @@ HEADERS += \
     server/qpcrrequesthandlerfactory.h \
     server/jsonhandler.h \
     server/testcontrolhandler.h \
-    util/instance.h \
+    control/instance.h \
     control/icontrol.h \
     control/maincontrollers.h \
     app/qpcrapplication.h \
@@ -105,7 +105,12 @@ HEADERS += \
     control/lid.h \
     control/heatsink.h \
     app/experimentcontroller.h \
-    db/temperaturelog.h
+    db/temperaturelog.h \
+    test/apptest.h \
+    test/controltest.h \
+    util/filters.h \
+    db/settings.h \
+    server/settingshandler.h
 
 SOURCES += \
     app/pins.cpp \
@@ -144,4 +149,10 @@ SOURCES += \
     control/bidirectionalpwmcontroller.cpp \
     control/lid.cpp \
     control/heatsink.cpp \
-    app/experimentcontroller.cpp
+    app/experimentcontroller.cpp \
+    test/apptest.cpp \
+    test/controltest.cpp \
+    control/adcconsumer.cpp \
+    util/filters.cpp \
+    db/settings.cpp \
+    server/settingshandler.cpp

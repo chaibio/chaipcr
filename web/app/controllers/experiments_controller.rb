@@ -1,3 +1,5 @@
+require 'zip'
+
 class ExperimentsController < ApplicationController
   include ParamsHelper
   respond_to :json
@@ -99,6 +101,20 @@ class ExperimentsController < ApplicationController
     @temperatures =  @experiment.temperature_logs.with_range(params[:starttime], params[:endtime], params[:resolution])
     respond_to do |format|
       format.json { render "temperature_data", :status => :ok}
+    end
+  end
+
+  def export
+    experiment = Experiment.find_by_id(params[:id])
+    respond_to do |format|
+      format.zip {
+        buffer = Zip::OutputStream.write_buffer do |out|
+          out.put_next_entry("qpcr_experiment_#{(experiment)? experiment.name : "null"}/temperature_log.csv")
+          out.write TemperatureLog.as_csv(params[:id])
+        end
+        buffer.rewind
+        send_data buffer.sysread
+      }
     end
   end
 end

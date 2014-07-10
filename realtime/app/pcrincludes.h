@@ -25,6 +25,7 @@
 #include <map>
 #include <limits>
 #include <chrono>
+#include <iterator>
 
 //Linux headers
 #include <unistd.h>

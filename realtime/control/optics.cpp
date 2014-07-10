@@ -13,13 +13,16 @@ using namespace Poco;
 Optics::Optics(unsigned int lidSensePin, shared_ptr<LEDController> ledController, MUX &&photoDiodeMux)
     :_lidSensePin(lidSensePin, GPIO::kInput),
      _ledController(ledController),
-     _photoDiodeMux(move(photoDiodeMux))
+     _photodiodeMux(move(photoDiodeMux))
 {
     _lidOpen.store(false);
 
     _collectData.store(false);
     _collectDataTimer = new Timer;
     _ledNumber = 0;
+
+    for (size_t i = 0; i < kWellList.size(); ++i)
+        _fluorescenceData.emplace_back();
 }
 
 Optics::~Optics()
@@ -45,8 +48,11 @@ void Optics::process()
             _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));
         }
     }
+}
 
-    _photoDiodeMux.setChannel(15);
+void Optics::setADCValue(unsigned int adcValue)
+{
+    _adcValue = adcValue;
 }
 
 void Optics::setCollectData(bool state)
@@ -56,6 +62,8 @@ void Optics::setCollectData(bool state)
         if (state)
         {
             _ledNumber = 0;
+
+            _photodiodeMux.setChannel(channel());
 
             if (!lidOpen())
             {
@@ -72,8 +80,34 @@ void Optics::setCollectData(bool state)
 
 void Optics::collectDataCallback(Poco::Timer&)
 {
-    _ledController->activateLED(kWellList.at(_ledNumber++));
+    _ledController->activateLED(kWellList.at(_ledNumber));
+    _fluorescenceData[_ledNumber].push_back(_adcValue);
+
+    ++_ledNumber;
 
     if (_ledNumber >= kWellList.size())
         _ledNumber = 0;
+}
+
+std::vector<int> Optics::restartCollection()
+{
+    _collectDataTimer->stop();
+
+    _ledNumber = 0;
+
+    std::vector<int> collectedData;
+    for (std::vector<int> &data: _fluorescenceData)
+    {
+        collectedData.push_back(std::accumulate(data.begin(), data.end(), 0) / data.size());
+
+        data.clear();
+    }
+
+    if (!lidOpen())
+    {
+        _collectDataTimer->setPeriodicInterval(kCollectDataInterval);
+        _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));
+    }
+
+    return collectedData;
 }

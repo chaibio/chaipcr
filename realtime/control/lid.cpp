@@ -5,13 +5,18 @@
 #include "lid.h"
 
 Lid::Lid(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-         CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold,
+         PIDController *pidController, long pidTimerInterval,
          const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold)
-    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController, pidTimerInterval, pidRangeControlThreshold),
+    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController, pidTimerInterval),
      PWMControl(pwmPath, pwmPeriod)
 {
     _startTempThreshold = startTempThreshold;
 
+    resetOutput();
+}
+
+Lid::~Lid()
+{
     resetOutput();
 }
 
@@ -32,8 +37,6 @@ bool Lid::outputDirection() const
 
 void Lid::processOutput()
 {
-    processPWM();
-
     if (ExperimentController::getInstance()->machineState() == ExperimentController::LidHeating && currentTemperature() >= (targetTemperature() - _startTempThreshold))
         startThresholdReached();
 }

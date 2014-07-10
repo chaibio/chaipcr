@@ -4,11 +4,16 @@
 #include "bidirectionalpwmcontroller.h"
 
 BidirectionalPWMController::BidirectionalPWMController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-                                                       CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold,
+                                                       PIDController *pidController, long pidTimerInterval,
                                                        const std::string &pwmPath, unsigned long pwmPeriod, unsigned int heatIOPin, unsigned int coolIOPin)
-    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController, pidTimerInterval, pidRangeControlThreshold),
+    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController, pidTimerInterval),
      PWMControl(pwmPath, pwmPeriod),
      _heatIO(heatIOPin, GPIO::kOutput), _coolIO(coolIOPin, GPIO::kOutput)
+{
+    resetOutput();
+}
+
+BidirectionalPWMController::~BidirectionalPWMController()
 {
     resetOutput();
 }
@@ -44,5 +49,5 @@ bool BidirectionalPWMController::outputDirection() const
 
 void BidirectionalPWMController::processOutput()
 {
-    processPWM();
+
 }

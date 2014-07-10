@@ -68,6 +68,7 @@ Qpcrctl::Application.routes.draw do
       get 'platessetup'
       get 'status'
       get 'temperature_data'
+      get 'export'
     end
   end
   

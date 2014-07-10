@@ -4,7 +4,6 @@
 #include "boostincludes.h"
 #include "pocoincludes.h"
 
-#include "qpcrapplication.h"
 #include "servertest.h"
 
 using namespace boost::property_tree;
@@ -13,19 +12,12 @@ using namespace Poco::Net;
 
 ServerTest::ServerTest()
 {
-    _appThread = std::thread( [this](){ this->_app.run(std::vector<std::string>({"realtime"}));} );
-
-    while (!_app.isWorking());
-
     _clientSession = new HTTPClientSession("localhost", kHttpServerPort);
 }
 
 ServerTest::~ServerTest()
 {
     delete _clientSession;
-
-    _app.close();
-    _appThread.join();
 }
 
 void ServerTest::testStatus()

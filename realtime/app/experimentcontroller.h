@@ -1,10 +1,11 @@
 #ifndef EXPERIMENTCONTROLLER_H
 #define EXPERIMENTCONTROLLER_H
 
-#include <instance.h>
+#include "instance.h"
 
 class DBControl;
 class Experiment;
+class Settings;
 
 namespace Poco { class Timer; }
 
@@ -19,13 +20,23 @@ public:
         Complete
     };
 
+    enum StartingResult
+    {
+        Started,
+        ExperimentNotFound,
+        ExperimentUsed,
+        LidIsOpen,
+        MachineRunning
+    };
+
     ExperimentController();
     ~ExperimentController();
 
     inline MachineState machineState() const { return _machineState; }
     inline const Experiment* experiment() const { return _experiment; }
+    inline Settings* settings() const { return _settings; }
 
-    bool start(int experimentId);
+    StartingResult start(int experimentId);
     void stop();
 
     void stepBegun();
@@ -45,6 +56,7 @@ private:
 
     DBControl *_dbControl;
     Experiment *_experiment;
+    Settings *_settings;
 
     Poco::Timer *_holdStepTimer;
     Poco::Timer *_logTimer;

@@ -7,6 +7,7 @@
 #include <Poco/Timer.h>
 #include <Poco/Timestamp.h>
 #include <Poco/RWLock.h>
+#include <Poco/Mutex.h>
 
 #include <Poco/Net/HTTPServer.h>
 #include <Poco/Net/HTTPServerParams.h>

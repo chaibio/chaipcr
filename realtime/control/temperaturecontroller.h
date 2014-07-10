@@ -9,17 +9,8 @@ class Thermistor;
 class TemperatureController : public IControl, public PIDControl
 {
 public:
-    enum ControlMode
-    {
-        None,
-        PIDMode,
-        BangBangMode
-    };
-
     TemperatureController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-                          CPIDController *pidController, long pidTimerInterval, double pidRangeControlThreshold);
-
-    inline ControlMode controlMode() const { return _controlMode; }
+                          PIDController *pidController, long pidTimerInterval);
 
     inline bool enableMode() const { return _enableMode; }
     void setEnableMode(bool enableMode);
@@ -39,21 +30,15 @@ protected:
     virtual bool outputDirection() const = 0;
     virtual void processOutput() = 0;
 
-private:
-    void checkControlMode();
-
 protected:
     std::shared_ptr<Thermistor> _thermistor;
 
 private:
-    std::atomic<ControlMode> _controlMode;
     std::atomic<bool> _enableMode;
 
     std::atomic<double> _targetTemperature;
     double _minTargetTemp;
     double _maxTargetTemp;
-
-    double _pidRangeControlThreshold;
 };
 
 #endif // TEMPERATURECONTROLLER_H

@@ -19,12 +19,11 @@ const double kLidThermistorT0 = 298.15;             //kelvins
 const double kLidMinTargetTemp = 0;
 const double kLidMaxTargetTemp = 130;
 
-const double kLidPIDThreshold = 100;
-
 const double kProgramStartLidTempThreshold = 2;
 
 //thermistor & ADC params
-const unsigned int kThermistorVoltageDividerResistanceOhms = 14000;
+const unsigned int kHeatBlockThermistorVoltageDividerResistanceOhms = 14000;
+const unsigned int kLidThermistorVoltageDividerResistanceOhms = 14000;
 const int kLTC2444ADCBits = 24;
 
 //HTTP server params
@@ -43,24 +42,21 @@ const int kHeatBlockZonesPIDMax = 1;
 const double kHeatBlockZonesMinTargetTemp = -10;
 const double kHeatBlockZonesMaxTargetTemp = 105;
 
-const double kHeatBlockZone1PIDThreshold = 5;
-const double kHeatBlockZone2PIDThreshold = 5;
-
-const long kPIDIntervalMs = 100;
+const long kPIDIntervalMs = 25;
 
 //LED constants
 const int kMinLEDCurrent = 5; //5mA
 const int kGrayscaleClockPwmPeriodNs = 240;
 const int kGrayscaleClockPwmDutyNs = 120;
-const int kLedBlankPwmPeriodNs = 983090;
-const int kLedBlankPwmDutyNs = 50;
+const int kLedBlankPwmPeriodNs = 4096 * kGrayscaleClockPwmPeriodNs; //983040
+const int kLedBlankPwmDutyNs = 4 * kGrayscaleClockPwmPeriodNs; //960
 
 //Optics
-const long kCollectDataInterval = 150;
-const std::vector<int> kWellList = {5, 8, 7, 6, 11, 10, 9, 12, 4, 3, 2, 1, 16, 15, 14, 13};
+const long kCollectDataInterval = 500;
+const std::vector<int> kWellList = {4, 3, 2, 1, 16, 15, 14, 13, 5, 8, 7, 6, 11, 10, 9, 12};
 
 //Steps
-const double kPCRBeginStepTemperatureThreshold = 1;
+const double kPCRBeginStepTemperatureThreshold = 3;
 
 //Experiment Controller
 const long kTemperatureLogerInterval = 1000;
@@ -70,12 +66,10 @@ const double kHeatSinkThermistorBetaCoefficient = 3970;  //kelvins
 const double kHeatSinkThermistorT0Resistance = 10000;    //ohms
 const double kHeatSinkThermistorT0 = 298.15;             //kelvins
 
-const double kHeatSinkMinTargetTemp = -130;
-const double kHeatSinkMaxTargetTemp = 0;
+const double kHeatSinkMinTargetTemp = 0;
+const double kHeatSinkMaxTargetTemp = 80;
 
 const unsigned long kHeatSinkPIDMin = -1;
 const unsigned long kHeatSinkPIDMax = 0;
-
-const double kHeatSinkPIDThreshold = 100;
 
 #endif

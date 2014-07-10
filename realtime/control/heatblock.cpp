@@ -24,10 +24,20 @@ void HeatBlock::process() {
     _zones.first->process();
     _zones.second->process();
 
-    if (_stepProcessingState && _beginStepTemperatureThreshold > maxTemperatureSetpointDelta())
+    if (_stepProcessingState)
     {
-        _stepProcessingState = false;
-        stepBegun();
+        if (ramp.isEmpty()) {
+            if (_beginStepTemperatureThreshold > maxTemperatureSetpointDelta()) {
+                _stepProcessingState = false;
+                stepBegun();
+            }
+        }
+        else {
+            double temp = ramp.computeTemperature(_zones.first->targetTemperature());
+
+            _zones.first->setTargetTemperature(temp);
+            _zones.second->setTargetTemperature(temp);
+        }
     }
 }
 
@@ -39,9 +49,15 @@ void HeatBlock::setEnableMode(bool enableMode) {
         _stepProcessingState = false;
 }
 
-void HeatBlock::setTargetTemperature(double targetTemperature) {
-    _zones.first->setTargetTemperature(targetTemperature);
-    _zones.second->setTargetTemperature(targetTemperature);
+void HeatBlock::setTargetTemperature(double targetTemperature, double rampRate) {
+    ramp.clear();
+
+    if (rampRate == 0) {
+        _zones.first->setTargetTemperature(targetTemperature);
+        _zones.second->setTargetTemperature(targetTemperature);
+    }
+    else
+        ramp.set(targetTemperature, rampRate);
 }
 
 double HeatBlock::zone1Temperature() const {
@@ -65,4 +81,37 @@ double HeatBlock::zone1DriveValue() const {
 
 double HeatBlock::zone2DriveValue() const {
     return (double)_zones.second->pwmDutyCycle() / _zones.second->pwmPeriod();
+}
+
+// Class HeatBlock::Ramp
+HeatBlock::Ramp::Ramp() {
+    clear();
+}
+
+void HeatBlock::Ramp::set(double targetTemperature, double rate) {
+    _targetTemperature = targetTemperature;
+    _lastChangesTime = boost::posix_time::microsec_clock::local_time();
+    _rate.store(rate);
+}
+
+double HeatBlock::Ramp::computeTemperature(double currentTargetTemperature) {
+    if (isEmpty())
+        return 0.0;
+
+    boost::posix_time::time_duration pastTime = boost::posix_time::microsec_clock::local_time() - _lastChangesTime;
+    _lastChangesTime = boost::posix_time::microsec_clock::local_time();
+
+    if (pastTime.total_milliseconds() > 0) {
+        double temp = currentTargetTemperature + (_rate * (pastTime.total_milliseconds() / (double)1000 * 100) / 100);
+
+        if (temp < _targetTemperature)
+            return temp;
+        else {
+            clear();
+
+            return _targetTemperature;
+        }
+    }
+    else
+        return currentTargetTemperature;
 }
