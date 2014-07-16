@@ -355,6 +355,7 @@
 				.menu-content {
 					border-bottom: solid 1px black;
 					height: 22px;
+					// HEading part
 					.menu-heading {
 						height: 100%;
 
@@ -366,11 +367,101 @@
 						.logout-text {
 							width:150px;
 							float: right;
-							color: #00aeef;
 							text-align: right;
 							height: 100%;
+
+							a {
+								color: #00aeef;
+								text-decoration: none;
+							}
+							a:hover {
+								background-color: white;
+							}
 						}
 					}
+					// Menu Items
+					.menu-items {
+						padding-top: 20px;
+
+						.menu-item {
+							height:58px;
+
+							.first-row {
+								height: 30px;
+								
+								.menu-item-image {
+									width: 30px;
+									height: 30px;
+									float: left;
+									background-image: url("smallO.png");
+									margin-left: 24px;
+								}
+								.menu-item-text {
+									width: 300px;
+									float: left;
+									margin-left: 12px;
+									margin-top: 8px;
+									font-size: 22px;
+								}
+							}
+							
+							.second-row {
+								height: 28px;
+
+								.hand-container {
+									width: 100%;
+
+									.hand {
+										width: 6px;
+										background-color: black;
+										height: 22px;
+										margin-left: 37px;
+										margin-top: 2px;									}
+								}
+							}
+						}
+						// When it bounce
+						.menu-item-bounce {
+							height:107px;
+
+							.first-row {
+								height: 60px;
+								
+								.menu-item-image {
+									width: 60px;
+									height: 60px;
+									float: left;
+									background-image: url("bigO.png");
+									margin-left: 12px;
+								}
+								.menu-item-text {
+									width: 300px;
+									float: left;
+									margin-left: 12px;
+									margin-top: 22px;
+									font-size: 30px;
+								}
+							}
+							
+							.second-row {
+								height: 28px;
+
+								.hand-container {
+									width: 100%;
+
+									.hand {
+										width: 6px;
+										background-color: black;
+										height: 32px;
+										margin-left: 37px;
+										margin-top: 5px;
+									}
+								}
+							}
+						}
+					}
+
+
 				}
 			}
 

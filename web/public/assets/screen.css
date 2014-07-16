@@ -383,29 +383,121 @@
   border-bottom: solid 1px black;
   height: 22px;
 }
-/* line 358, ../../app/assets/stylesheets/screen.css.scss */
+/* line 359, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading {
   height: 100%;
 }
-/* line 361, ../../app/assets/stylesheets/screen.css.scss */
+/* line 362, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .welcome-text {
   width: 200px;
   float: left;
   height: 100%;
 }
-/* line 366, ../../app/assets/stylesheets/screen.css.scss */
+/* line 367, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text {
   width: 150px;
   float: right;
-  color: #00aeef;
   text-align: right;
   height: 100%;
 }
+/* line 373, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text a {
+  color: #00aeef;
+  text-decoration: none;
+}
 /* line 377, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text a:hover {
+  background-color: white;
+}
+/* line 383, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items {
+  padding-top: 20px;
+}
+/* line 386, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item {
+  height: 58px;
+}
+/* line 389, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .first-row {
+  height: 30px;
+}
+/* line 392, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .first-row .menu-item-image {
+  width: 30px;
+  height: 30px;
+  float: left;
+  background-image: url("smallO.png");
+  margin-left: 24px;
+}
+/* line 399, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .first-row .menu-item-text {
+  width: 300px;
+  float: left;
+  margin-left: 12px;
+  margin-top: 8px;
+  font-size: 22px;
+}
+/* line 408, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .second-row {
+  height: 28px;
+}
+/* line 411, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .second-row .hand-container {
+  width: 100%;
+}
+/* line 414, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .second-row .hand-container .hand {
+  width: 6px;
+  background-color: black;
+  height: 22px;
+  margin-left: 37px;
+  margin-top: 2px;
+}
+/* line 424, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce {
+  height: 107px;
+}
+/* line 427, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row {
+  height: 60px;
+}
+/* line 430, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row .menu-item-image {
+  width: 60px;
+  height: 60px;
+  float: left;
+  background-image: url("bigO.png");
+  margin-left: 12px;
+}
+/* line 437, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row .menu-item-text {
+  width: 300px;
+  float: left;
+  margin-left: 12px;
+  margin-top: 22px;
+  font-size: 30px;
+}
+/* line 446, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row {
+  height: 28px;
+}
+/* line 449, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row .hand-container {
+  width: 100%;
+}
+/* line 452, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row .hand-container .hand {
+  width: 6px;
+  background-color: black;
+  height: 32px;
+  margin-left: 37px;
+  margin-top: 5px;
+}
+/* line 468, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress {
   height: 110px;
 }
-/* line 383, ../../app/assets/stylesheets/screen.css.scss */
+/* line 474, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing {
   float: left;
   width: 392px;

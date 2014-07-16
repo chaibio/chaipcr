@@ -4,14 +4,14 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 	homePage: {}
 
 	iniitialize: () ->
-		console.log "wow";
+		#console.log "wow";
 
 	routes:
 		"login": "logMeIn"
 		"home": "loadHome"
 
 	logMeIn: () ->
-		@loginScreen = new ChaiBioTech.Views.app.login
+		@loginScreen = new ChaiBioTech.app.Views.login
 		$("#container").html(@loginScreen.render().el)
 
 	loadHome: () ->
@@ -19,7 +19,7 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 			data = 
 			"user": @loginScreen.user
 
-			@homePage = new ChaiBioTech.Views.app.homePage data
+			@homePage = new ChaiBioTech.app.Views.homePage data
 			$("#container").html(@homePage.render().el)
 		else
 			location.href = "#/login"

@@ -1,6 +1,6 @@
-ChaiBioTech.Views.app = ChaiBioTech.Views.app || {}
+ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
 
-class ChaiBioTech.Views.app.homePage extends Backbone.View
+class ChaiBioTech.app.Views.homePage extends Backbone.View
 
 	template: JST["backbone/templates/app/home-page"]
 	
@@ -11,7 +11,7 @@ class ChaiBioTech.Views.app.homePage extends Backbone.View
 		data = 
 			user: @options.user
 
-		@menuBLOCK = new ChaiBioTech.Views.app.homePageMenu data
+		@menuBLOCK = new ChaiBioTech.app.Views.homePageMenu data
 
 	render: () ->
 		$(@el).html @template()
