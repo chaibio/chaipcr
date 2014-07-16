@@ -290,13 +290,30 @@
 }
 
 /* line 276, ../../app/assets/stylesheets/screen.css.scss */
-.loginWrapper {
+.simplifica {
+  font-family: "simplifica";
+  font-size: 30px;
+}
+
+/* line 280, ../../app/assets/stylesheets/screen.css.scss */
+.sansa {
+  font-family: "Open Sans";
+  font-size: 12px;
+}
+
+/* line 286, ../../app/assets/stylesheets/screen.css.scss */
+#container {
+  width: 1024px;
+}
+
+/* line 289, ../../app/assets/stylesheets/screen.css.scss */
+.login-wrapper {
   min-height: 500px;
   background-color: wheat;
   padding-top: 5%;
 }
-/* line 281, ../../app/assets/stylesheets/screen.css.scss */
-.loginWrapper .loginBox {
+/* line 294, ../../app/assets/stylesheets/screen.css.scss */
+.login-wrapper .login-box {
   height: 250px;
   width: 300px;
   background-color: white;
@@ -309,27 +326,88 @@
   -moz-border-radius: 4px;
   border-radius: 4px;
 }
-/* line 294, ../../app/assets/stylesheets/screen.css.scss */
-.loginWrapper .loginBox .login-heading {
+/* line 307, ../../app/assets/stylesheets/screen.css.scss */
+.login-wrapper .login-box .login-heading {
   width: 100%;
   text-align: center;
   font-weight: bold;
   padding-top: 10px;
 }
-/* line 301, ../../app/assets/stylesheets/screen.css.scss */
-.loginWrapper .loginBox .login-credentials {
+/* line 314, ../../app/assets/stylesheets/screen.css.scss */
+.login-wrapper .login-box .login-credentials {
   width: 300px;
 }
-/* line 304, ../../app/assets/stylesheets/screen.css.scss */
-.loginWrapper .loginBox .login-credentials input {
+/* line 317, ../../app/assets/stylesheets/screen.css.scss */
+.login-wrapper .login-box .login-credentials input {
   margin: 30px 0 0 65px;
   text-align: center;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
 }
-/* line 311, ../../app/assets/stylesheets/screen.css.scss */
-.loginWrapper .loginBox .login-credentials button {
+/* line 324, ../../app/assets/stylesheets/screen.css.scss */
+.login-wrapper .login-box .login-credentials button {
   margin: 30px 0 0 72px;
   width: 150px;
+}
+
+/* line 332, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper {
+  width: 1024px;
+  height: 768px;
+}
+/* line 336, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing {
+  float: left;
+  width: 632px;
+  height: 400px;
+}
+/* line 341, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content {
+  width: 442px;
+  margin-top: 61px;
+  margin-left: 75px;
+}
+/* line 346, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-logo {
+  width: 437px;
+  height: 74px;
+}
+/* line 351, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu {
+  margin-top: 65px;
+  height: 402px;
+}
+/* line 355, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content {
+  border-bottom: solid 1px black;
+  height: 22px;
+}
+/* line 358, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading {
+  height: 100%;
+}
+/* line 361, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .welcome-text {
+  width: 200px;
+  float: left;
+  height: 100%;
+}
+/* line 366, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text {
+  width: 150px;
+  float: right;
+  color: #00aeef;
+  text-align: right;
+  height: 100%;
+}
+/* line 377, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress {
+  height: 110px;
+}
+/* line 383, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing {
+  float: left;
+  width: 392px;
+  padding-top: 54px;
 }

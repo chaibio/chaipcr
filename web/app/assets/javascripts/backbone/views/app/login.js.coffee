@@ -12,21 +12,21 @@ class ChaiBioTech.Views.app.login extends Backbone.View
 
 	render: () ->
 		$(@el).html(@template())
-		return @
+		return this
 
 	loginCheck: () ->
-		/// here check for login details ///
-		/// Just for now ///
+		# Here check for login details
+		# Just for now
 		@loggedIn = true 
 		if @loggedIn
-			/// Show experiments ///
-			@loadExperiments();
+			# Show experiments
+			location.href = "#/home"
+			@user = ($ "#user").val().replace(/[^a-zA-Z ]/g, "")
 		else
-			///Show Error message for wrong credentialas ///
+			# Show Error message for wrong credentialas
 			console.log "wrong creds"
 
-	loadExperiments: () ->
-		$("#container").html("Loading .... !")
+		
 
 
 

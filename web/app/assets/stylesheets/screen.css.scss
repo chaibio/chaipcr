@@ -273,12 +273,25 @@
 		font-family: "simplifica";
 		src: local('simplifica'), url("assets/SIMPLIFICA Typeface.ttf") format('ttf');
 }
-.loginWrapper {
+.simplifica {
+	font-family: "simplifica";
+	font-size: 30px;
+}
+.sansa {
+	font-family: "Open Sans";
+	font-size: 12px;
+}
+
+// Login page styles start here
+#container {
+	width: 1024px;
+}
+.login-wrapper {
 	min-height: 500px;
 	background-color: wheat;
 	padding-top: 5%;
 
-	.loginBox {
+	.login-box {
 		height: 250px;
 		width: 300px;
 		background-color: white;
@@ -313,6 +326,64 @@
 				width: 150px;
 			}
 		}
+	}
+}
+//Home page styles start here
+.home-page-wrapper {
+	width: 1024px;
+	height: 768px;
+
+	.home-page-left-wing {
+		float: left;
+		width: 632px;
+		height: 400px; //Just for now;
+
+		.left-wing-content {
+			width: 442px;
+			margin-top: 61px;
+			margin-left: 75px;
+
+			.home-page-logo {
+				width: 437px;
+				height: 74px;
+			}
+
+			.home-page-menu {
+				margin-top: 65px;
+				height: 402px;
+
+				.menu-content {
+					border-bottom: solid 1px black;
+					height: 22px;
+					.menu-heading {
+						height: 100%;
+
+						.welcome-text {
+							width: 200px;
+							float: left;
+							height: 100%;
+						}
+						.logout-text {
+							width:150px;
+							float: right;
+							color: #00aeef;
+							text-align: right;
+							height: 100%;
+						}
+					}
+				}
+			}
+
+			.experiment-in-progress {
+				height: 110px;
+			}
+		}
+	}
+
+	.home-page-right-wing {
+		float: left;
+		width: 392px;
+		padding-top: 54px;
 	}
 }
 
