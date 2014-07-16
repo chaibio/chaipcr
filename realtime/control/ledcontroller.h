@@ -27,6 +27,7 @@ private:
     std::shared_ptr<SPIPort> _spiPort;
     GPIO _potCSPin;
     GPIO _ledXLATPin;
+    GPIO _ledGSPin;
     PWMPin _ledBlankPWM;
 };
 

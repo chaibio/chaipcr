@@ -13,6 +13,7 @@ LEDController::LEDController(const string &grayscaleClockPWMPath, shared_ptr<SPI
     _spiPort(spiPort),
     _potCSPin(potCSPin, GPIO::kOutput),
     _ledXLATPin(ledXLATPin, GPIO::kOutput),
+    _ledGSPin(26, GPIO::kOutput),
     _ledBlankPWM(ledBlankPWMPath) {
 
     _dutyCyclePercentage.store(dutyCyclePercentage);
@@ -24,6 +25,7 @@ LEDController::LEDController(const string &grayscaleClockPWMPath, shared_ptr<SPI
 
     _potCSPin.setValue(GPIO::kHigh);
     _ledXLATPin.setValue(GPIO::kLow);
+    _ledGSPin.setValue(GPIO::kLow);
 }
 
 LEDController::~LEDController() {
@@ -53,9 +55,10 @@ void LEDController::setIntensity(double onCurrentMilliamps) {
 }
 
 void LEDController::activateLED(unsigned int ledNumber) {
+
     unsigned int pwm = 4096 * _dutyCyclePercentage / 100;
     uint16_t intensities[16] = {0};
-	intensities[15 - (ledNumber - 1)] = pwm;
+    intensities[15 - (ledNumber - 1)] = 0xFFF;
 
 	uint8_t packedIntensities[24];
 
@@ -65,10 +68,9 @@ void LEDController::activateLED(unsigned int ledNumber) {
 
 		int packIndex = i * 3 / 2;
 		packedIntensities[packIndex] = val1 >> 4;
-		packedIntensities[packIndex + 1] = (val1 & 0x000F) << 4 | (val2 & 0x0F00) >> 8;
+        packedIntensities[packIndex + 1] = (val1 & 0x000F) << 4 | (val2 & 0x0F00) >> 8;
 		packedIntensities[packIndex + 2] = val2 & 0x00FF;
-	}
-
+	}    
     sendLEDGrayscaleValues(packedIntensities);
 }
 
@@ -79,7 +81,7 @@ void LEDController::disableLEDs() {
 	
 // --- private member functions ------------------------------------------------
 void LEDController::sendLEDGrayscaleValues(const uint8_t (&values)[24]) {
-    _spiPort->setMode(3);
+    _spiPort->setMode(0);
     _spiPort->readBytes(NULL, (char*)values, sizeof(values), 1000000);
     _ledXLATPin.setValue(GPIO::kHigh);
     _ledXLATPin.setValue(GPIO::kLow);
