@@ -268,4 +268,253 @@
 		border: solid 1px #02408F;
 	}
 }
+// New APP //
+@font-face {
+		font-family: "simplifica";
+		src: local('simplifica'), url("assets/SIMPLIFICA Typeface.ttf") format('ttf');
+}
+.simplifica {
+	font-family: "simplifica";
+	font-size: 30px;
+}
+.sansa {
+	font-family: "Open Sans";
+	font-size: 12px;
+}
+
+// Login page styles start here
+#container {
+	width: 1024px;
+}
+.login-wrapper {
+	min-height: 500px;
+	background-color: wheat;
+	padding-top: 5%;
+
+	.login-box {
+		height: 250px;
+		width: 300px;
+		background-color: white;
+		margin-left: auto;
+		margin-right: auto;
+		-webkit-box-shadow: 1px 1px 82px 3px rgba(0,0,0,0.75);
+		-moz-box-shadow: 1px 1px 82px 3px rgba(0,0,0,0.75);
+		box-shadow: 1px 1px 82px 3px rgba(0,0,0,0.75);
+		-webkit-border-radius: 4px;
+		-moz-border-radius: 4px;
+		border-radius: 4px;
+
+		.login-heading {
+			width: 100%;
+			text-align: center;
+			font-weight: bold;
+			padding-top: 10px;
+		}
+
+		.login-credentials {
+			width: 300px;
+
+			input {
+				margin: 30px 0 0 65px;
+				text-align: center;
+				-webkit-border-radius: 4px;
+				-moz-border-radius: 4px;
+				border-radius: 4px;
+			}
+			button {
+				margin: 30px 0 0 72px;
+				width: 150px;
+			}
+		}
+	}
+}
+//Home page styles start here
+.home-page-wrapper {
+	width: 1024px;
+	height: 768px;
+
+	.home-page-left-wing {
+		float: left;
+		width: 632px;
+		height: 400px; //Just for now;
+
+		.left-wing-content {
+			width: 442px;
+			margin-top: 61px;
+			margin-left: 75px;
+
+			.home-page-logo {
+				width: 437px;
+				height: 74px;
+			}
+
+			.home-page-menu {
+				margin-top: 65px;
+				height: 402px;
+
+				.menu-content {
+					border-bottom: solid 1px black;
+					height: 22px;
+					// HEading part
+					.menu-heading {
+						height: 100%;
+
+						.welcome-text {
+							width: 200px;
+							float: left;
+							height: 100%;
+						}
+						.logout-text {
+							width:150px;
+							float: right;
+							text-align: right;
+							height: 100%;
+
+							a {
+								color: #00aeef;
+								text-decoration: none;
+							}
+							a:hover {
+								background-color: white;
+							}
+						}
+					}
+					// Menu Items
+					.menu-items {
+						padding-top: 20px;
+
+						.menu-item {
+							height:58px;
+
+							.first-row {
+								height: 30px;
+								
+								.menu-item-image {
+									width: 30px;
+									height: 30px;
+									float: left;
+									background-image: url("smallO.png");
+									margin-left: 24px;
+								}
+								.menu-item-text {
+									width: 300px;
+									float: left;
+									margin-left: 12px;
+									margin-top: 8px;
+									font-size: 22px;
+								}
+							}
+							
+							.second-row {
+								height: 28px;
+
+								.hand-container {
+									width: 100%;
+
+									.hand {
+										width: 6px;
+										background-color: black;
+										height: 22px;
+										margin-left: 37px;
+										margin-top: 2px;									}
+								}
+							}
+						}
+						// when biunce this takes care of the previous item
+						.menu-item-previous-bounce {
+							height:62px;
+
+							.first-row {
+								height: 30px;
+								
+								.menu-item-image {
+									width: 30px;
+									height: 30px;
+									float: left;
+									background-image: url("smallO.png");
+									margin-left: 24px;
+								}
+								.menu-item-text {
+									width: 300px;
+									float: left;
+									margin-left: 12px;
+									margin-top: 8px;
+									font-size: 22px;
+								}
+							}
+							
+							.second-row {
+								height: 32px;
+
+								.hand-container {
+									width: 100%;
+
+									.hand {
+										width: 6px;
+										background-color: black;
+										height: 32px;
+										margin-left: 37px;
+										margin-top: 2px;									}
+								}
+							}
+						}
+						// When it bounce
+						.menu-item-bounce {
+							height:107px;
+							margin-top: 14px;
+							.first-row {
+								height: 60px;
+								
+								.menu-item-image {
+									width: 60px;
+									height: 60px;
+									float: left;
+									background-image: url("bigO.png");
+									margin-left: 11px;
+								}
+								.menu-item-text {
+									width: 300px;
+									float: left;
+									margin-left: 12px;
+									margin-top: 22px;
+									font-size: 30px;
+								}
+							}
+							
+							.second-row {
+								height: 32px;
+
+								.hand-container {
+									width: 100%;
+
+									.hand {
+										width: 6px;
+										background-color: black;
+										height: 32px;
+										margin-left: 37px;
+										margin-top: 5px;
+									}
+								}
+							}
+						}
+					}
+
+
+				}
+			}
+
+			.experiment-in-progress {
+				height: 110px;
+			}
+		}
+	}
+
+	.home-page-right-wing {
+		float: left;
+		width: 392px;
+		padding-top: 54px;
+	}
+}
+
+
 

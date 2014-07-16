@@ -8,5 +8,6 @@ window.ChaiBioTech = {
 	Models: {},
 	Collections: {},
 	Routers: {},
-	Views: {}
+	Views: {},
+	app: {}
 };

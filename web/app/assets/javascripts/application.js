@@ -25,9 +25,10 @@
 //= require backbone/Constants
 
 
-$(function() {
-    window.router = new ChaiBioTech.Routers.DesignRouter({});
-    window.touchScreenRouter = new ChaiBioTech.Routers.touchScreen({});
-    window.logScreenRouter = new ChaiBioTech.Routers.temperatureLog({});
-    Backbone.history.start();
+$(function () {
+	window.router = new ChaiBioTech.Routers.DesignRouter({});
+   	window.touchScreenRouter = new ChaiBioTech.Routers.touchScreen({});
+   	window.logScreenRouter = new ChaiBioTech.Routers.temperatureLog({});
+   	window.appRouter = new ChaiBioTech.Routers.appRouter({});
+   	Backbone.history.start();
 });
