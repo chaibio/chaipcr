@@ -7,23 +7,24 @@ class ChaiBioTech.app.Views.homePageMenu extends Backbone.View
 	menuItems: ["NEW EXPERIMENT", "RUN A KIT", "SETTINGS"]
 
 	initialize: () ->
-		#console.log("u r awesome .. !", @options)
+		#Initialize
 
 	render: () ->
 		data = 
 			"user": @options.user.toUpperCase()
 
 		$(@el).html(@template(data))
-		menuItems = ""
+		menuItems = null
 
 		for textToBePrinted in @menuItems
 			data = 
-				"menuValue":textToBePrinted
+				"menuValue": textToBePrinted
+				"previousItem": menuItem
 
 			menuItem = new ChaiBioTech.app.Views.homePageMenuItem(data)
 			$(@el).find(".menu-items").append(menuItem.render().el)
 
-		# Hide the last hand
+		# Hide the last hand :) I mean the last item in the menu and the black Line is the hand
 		$(menuItem.el).find(".hand").hide()
 		return this
 

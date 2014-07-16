@@ -454,22 +454,63 @@
   margin-top: 2px;
 }
 /* line 424, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce {
-  height: 107px;
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce {
+  height: 62px;
 }
 /* line 427, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce .first-row {
+  height: 30px;
+}
+/* line 430, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce .first-row .menu-item-image {
+  width: 30px;
+  height: 30px;
+  float: left;
+  background-image: url("smallO.png");
+  margin-left: 24px;
+}
+/* line 437, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce .first-row .menu-item-text {
+  width: 300px;
+  float: left;
+  margin-left: 12px;
+  margin-top: 8px;
+  font-size: 22px;
+}
+/* line 446, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce .second-row {
+  height: 32px;
+}
+/* line 449, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce .second-row .hand-container {
+  width: 100%;
+}
+/* line 452, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce .second-row .hand-container .hand {
+  width: 6px;
+  background-color: black;
+  height: 32px;
+  margin-left: 37px;
+  margin-top: 2px;
+}
+/* line 462, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce {
+  height: 107px;
+  margin-top: 14px;
+}
+/* line 465, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row {
   height: 60px;
 }
-/* line 430, ../../app/assets/stylesheets/screen.css.scss */
+/* line 468, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row .menu-item-image {
   width: 60px;
   height: 60px;
   float: left;
   background-image: url("bigO.png");
-  margin-left: 12px;
+  margin-left: 11px;
 }
-/* line 437, ../../app/assets/stylesheets/screen.css.scss */
+/* line 475, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row .menu-item-text {
   width: 300px;
   float: left;
@@ -477,15 +518,15 @@
   margin-top: 22px;
   font-size: 30px;
 }
-/* line 446, ../../app/assets/stylesheets/screen.css.scss */
+/* line 484, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row {
-  height: 28px;
+  height: 32px;
 }
-/* line 449, ../../app/assets/stylesheets/screen.css.scss */
+/* line 487, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row .hand-container {
   width: 100%;
 }
-/* line 452, ../../app/assets/stylesheets/screen.css.scss */
+/* line 490, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row .hand-container .hand {
   width: 6px;
   background-color: black;
@@ -493,11 +534,11 @@
   margin-left: 37px;
   margin-top: 5px;
 }
-/* line 468, ../../app/assets/stylesheets/screen.css.scss */
+/* line 506, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress {
   height: 110px;
 }
-/* line 474, ../../app/assets/stylesheets/screen.css.scss */
+/* line 512, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing {
   float: left;
   width: 392px;
