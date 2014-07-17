@@ -5,8 +5,8 @@ class ChaiBioTech.app.Views.homePageMenuItem extends Backbone.View
 	template: JST["backbone/templates/app/home-page-menu-item"]
 	className: "menu-item"
 	events :
-		"mouseenter .menu-item": "bounce" # When mouse enter
-		"mouseleave .menu-item": "bounceBack" # When mouse leaves
+		"mouseenter .first-row": "bounce" # When mouse enter
+		"mouseleave .first-row": "bounceBack" # When mouse leaves
 	initialize: () ->
 		#Menu Item comes alive here
 

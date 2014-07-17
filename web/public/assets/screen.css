@@ -517,16 +517,17 @@
   margin-left: 12px;
   margin-top: 22px;
   font-size: 30px;
+  cursor: pointer;
 }
-/* line 484, ../../app/assets/stylesheets/screen.css.scss */
+/* line 485, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row {
   height: 32px;
 }
-/* line 487, ../../app/assets/stylesheets/screen.css.scss */
+/* line 488, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row .hand-container {
   width: 100%;
 }
-/* line 490, ../../app/assets/stylesheets/screen.css.scss */
+/* line 491, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row .hand-container .hand {
   width: 6px;
   background-color: black;
@@ -534,11 +535,46 @@
   margin-left: 37px;
   margin-top: 5px;
 }
-/* line 506, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress {
+/* line 507, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container {
+  width: 442px;
   height: 110px;
+  font-size: 14px;
 }
-/* line 512, ../../app/assets/stylesheets/screen.css.scss */
+/* line 514, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-in-progress-heading {
+  border-bottom: solid 2px #001827;
+}
+/* line 517, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info {
+  height: 80px;
+  padding-top: 25px;
+}
+/* line 521, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info div {
+  float: left;
+}
+/* line 525, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info .caption {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+/* line 529, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info .experiment-info-test {
+  width: 280px;
+}
+/* line 534, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-progress-bar {
+  height: 5px;
+  background-color: black;
+}
+/* line 538, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-progress-bar .progress-bar {
+  background-color: #00aeef;
+  height: 5px;
+  width: 0px;
+}
+/* line 549, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing {
   float: left;
   width: 392px;

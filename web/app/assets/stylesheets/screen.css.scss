@@ -478,6 +478,7 @@
 									margin-left: 12px;
 									margin-top: 22px;
 									font-size: 30px;
+									cursor: pointer;
 								}
 							}
 							
@@ -502,9 +503,45 @@
 
 				}
 			}
-
-			.experiment-in-progress {
+			// Experiment in progress starts here
+			.experiment-in-progress-container {
+				width: 442px;
 				height: 110px;
+				font-size: 14px;
+
+				.experiment-in-progress {
+					
+					.experiment-in-progress-heading {
+						border-bottom: solid 2px #001827;
+					}
+					.experiment-info {
+						height: 80px;
+						padding-top: 25px;
+
+						div {
+							float: left;
+						}
+
+						.caption {
+							font-weight: bold;
+							margin-bottom: 5px;
+						}
+						.experiment-info-test {
+							width: 280px;
+						}
+
+					}
+					.experiment-progress-bar {
+						height: 5px;
+						background-color: black;
+
+						.progress-bar {
+							background-color: #00aeef;
+							height: 5px;
+							width: 0px;
+						}
+					}
+				}
 			}
 		}
 	}
