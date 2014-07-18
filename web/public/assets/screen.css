@@ -575,6 +575,10 @@
   width: 0px;
 }
 /* line 549, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .previous-experiment-container .previous-experiment-heading {
+  border-bottom: solid 2px #001827;
+}
+/* line 556, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing {
   float: left;
   width: 392px;
