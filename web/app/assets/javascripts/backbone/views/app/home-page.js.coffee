@@ -27,8 +27,10 @@ class ChaiBioTech.app.Views.homePage extends Backbone.View
 		$(@el).find(".home-page-menu").html(@menuBLOCK.render().el)
 		# Placing Experiment in progress
 		$(@el).find(".experiment-in-progress-container").html(@experimentInProgress.render().el)
-		# Placing previous experiments
+		# Placing previous experiments template
 		$(@el).find(".home-page-right-wing").html(@previousExperiments.render().el)
+		# Now we load all the previous experiments
+		@previousExperiments.loadPreviousExperiments()
 		return this
 
 

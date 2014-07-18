@@ -543,20 +543,85 @@
 					}
 				}
 			}
-			// Previous Experiment List Starts Here
-			.previous-experiment-container {
-				
-				.previous-experiment-heading {
-					border-bottom: solid 2px #001827;
+		}
+	}
+	// Right Side of the home page
+	.home-page-right-wing {
+		float: left;
+		width: 341px;
+		padding-top: 54px;
+
+		// Previous Experiment List Starts Here
+		.previous-experiment-container {
+			
+			.previous-experiment-heading {
+				border-bottom: solid 1px #001827;
+				height: 20px;
+
+				.text {
+					float: left;
+					width: 200px;
+					font-size: 14px;
+				}
+				.dots {
+					float: right;
+					color: orange;
+					font-weight: bold;
+					font-size: 14px;
+					cursor: pointer;
+				}
+			}
+			.all-experiments {
+				height: 680px;
+				overflow: scroll;
+				padding-top: 21px;
+
+				.individual-experiment {
+					height: 72px;
+
+					.first-row {
+						height: 30px;
+
+						div {
+							float: left;
+						}
+						.image {
+							background-image: url("smallblackO.png");
+							width: 30px;
+							height: 30px;
+						}
+						.text {
+							margin-left: 15px;
+							margin-top: 8px;
+							cursor: pointer;
+						}
+					}
+					.second-row {
+						height: 42px;
+
+						div {
+							float: left;
+						}
+						.hand-container {
+							width: 45px;
+							height: 42px;
+
+							.hand {
+								width: 6px;
+								min-height: 32px;
+								background-color: #00aeef;
+								margin-left: 12px;
+								margin-top: 5px;
+								cursor: pointer;
+							}
+						}
+						.more-info {
+							font-size: 14px;
+						}
+					}
 				}
 			}
 		}
-	}
-
-	.home-page-right-wing {
-		float: left;
-		width: 392px;
-		padding-top: 54px;
 	}
 }
 

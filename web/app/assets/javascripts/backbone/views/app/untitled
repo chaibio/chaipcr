@@ -1,4 +1,0 @@
-ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
-
-class ChaiBioTech.app.Views.homePageMenuItem extends Backbone.View
-	

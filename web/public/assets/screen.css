@@ -575,12 +575,83 @@
   width: 0px;
 }
 /* line 549, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .previous-experiment-container .previous-experiment-heading {
-  border-bottom: solid 2px #001827;
-}
-/* line 556, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing {
   float: left;
-  width: 392px;
+  width: 341px;
   padding-top: 54px;
+}
+/* line 557, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading {
+  border-bottom: solid 1px #001827;
+  height: 20px;
+}
+/* line 561, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading .text {
+  float: left;
+  width: 200px;
+  font-size: 14px;
+}
+/* line 566, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading .dots {
+  float: right;
+  color: orange;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+}
+/* line 574, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments {
+  height: 680px;
+  overflow: scroll;
+  padding-top: 21px;
+}
+/* line 579, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment {
+  height: 72px;
+}
+/* line 582, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row {
+  height: 30px;
+}
+/* line 585, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row div {
+  float: left;
+}
+/* line 588, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .image {
+  background-image: url("smallblackO.png");
+  width: 30px;
+  height: 30px;
+}
+/* line 593, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .text {
+  margin-left: 15px;
+  margin-top: 8px;
+  cursor: pointer;
+}
+/* line 599, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row {
+  height: 42px;
+}
+/* line 602, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row div {
+  float: left;
+}
+/* line 605, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .hand-container {
+  width: 45px;
+  height: 42px;
+}
+/* line 609, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .hand-container .hand {
+  width: 6px;
+  min-height: 32px;
+  background-color: #00aeef;
+  margin-left: 12px;
+  margin-top: 5px;
+  cursor: pointer;
+}
+/* line 618, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .more-info {
+  font-size: 14px;
 }
