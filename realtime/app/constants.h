@@ -23,7 +23,7 @@ const double kProgramStartLidTempThreshold = 2;
 
 //thermistor & ADC params
 const unsigned int kHeatBlockThermistorVoltageDividerResistanceOhms = 14000;
-const unsigned int kLidThermistorVoltageDividerResistanceOhms = 14000;
+const unsigned int kLidThermistorVoltageDividerResistanceOhms = 15000;
 const int kLTC2444ADCBits = 24;
 
 //HTTP server params

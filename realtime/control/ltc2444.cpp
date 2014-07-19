@@ -30,20 +30,27 @@ void LTC2444::setup(char mode, bool TWOx){
 	}
 }
 
-uint32_t LTC2444::readADC(uint8_t ch, bool SGL) {
+uint32_t LTC2444::readSingleEndedChannel(uint8_t channel) {
+    return readADC(channel, true);
+}
+
+uint32_t LTC2444::readDifferentialChannels(uint8_t lowerChannel, bool lowerChannelPositive) {
+    return readADC(lowerChannel / 2, false, lowerChannelPositive);
+}
+
+uint32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive) {
 	//0xA000000 the first 3 bits here represents 101, based on the datasheet.
     uint32_t data=0xA0000000;
 
 	char dataOut[4];
 	char dataIn[4];
 
-	if (SGL){
+    if (SGL)
 		//SGL=1 , ODD = ch&0x01, A2A1A0=(ch&0x0110>1) 0r SGL_ODD_A
-        data |= ((uint32_t)1)<<28 |((uint32_t)(ch&0x01))<<27  |((uint32_t)(ch&0b110))<<23;
-	}
-	else{
-        data |= ((uint32_t)(ch&0x01))<<27  |((uint32_t)(ch&0b110))<<23;
-	}
+        data |= ((uint32_t)1) << 28 | ((ch & 0x01)) << 27 | ((uint32_t)(ch & 0b110)) << 23;
+    else
+        data |= ((uint32_t)!lowerChannelPositive) << 27 | ((uint32_t)(ch & 0b110)) << 23;
+
 	//data that will be sent is: 101_SGL_ODD_A_OSRTWOx based ifrom the datasheet Table 4. Channel Selection
 	data |= ((uint32_t)OSRTWOx)<<19;
 	

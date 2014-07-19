@@ -13,7 +13,7 @@ public:
     inline double temperature() const { return _temperature; }
 
     //ADCConsumer
-    void setADCValue(unsigned int adcValue) override;
+    void setADCValues(unsigned int differentialADCValue, unsigned int singularADCValue) override;
 
 protected:
     virtual double temperatureForResistance(double resistanceOhms) = 0;

@@ -10,17 +10,33 @@ class ADCConsumer;
 class ADCController : public IControl
 {
 public:
-    ADCController(std::vector<std::shared_ptr<ADCConsumer>> consumers, unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber);
+    enum ADCState {
+        EReadZone1Differential = 0,
+        EReadZone1Singular,
+        EReadZone2Differential,
+        EReadZone2Singular,
+        EReadLIA,
+        EReadLid,
+        EFinal
+    };
+
+    ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsumers, std::shared_ptr<ADCConsumer> liaConsumer, std::shared_ptr<ADCConsumer> lidConsumer,
+                  unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber);
 	~ADCController();
 	
     void process();
 
-    int consumerChannel(const ADCConsumer *consumer) const;
+private:
+    ADCState nextState() const;
 	
 private:
     std::shared_ptr<LTC2444> _ltc2444;
-    std::vector<std::shared_ptr<ADCConsumer>> _consumers;
-    int _currentChannel;
+    ADCState _currentConversionState;
+    uint32_t _differentialValue;
+
+    std::vector<std::shared_ptr<ADCConsumer>> _zoneConsumers;
+    std::shared_ptr<ADCConsumer> _liaConsumer;
+    std::shared_ptr<ADCConsumer> _lidConsumer;
 };
 
 #endif

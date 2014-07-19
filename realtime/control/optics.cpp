@@ -50,7 +50,7 @@ void Optics::process()
     }
 }
 
-void Optics::setADCValue(unsigned int adcValue)
+void Optics::setADCValues(unsigned int adcValue, unsigned int unusedValue)
 {
     _adcValue = adcValue;
 }
@@ -63,7 +63,8 @@ void Optics::setCollectData(bool state)
         {
             _ledNumber = 0;
 
-            _photodiodeMux.setChannel(channel());
+            //Ruslan: I don't understand why this was using ADC Channel - Josh
+            //_photodiodeMux.setChannel(channel());
 
             if (!lidOpen())
             {

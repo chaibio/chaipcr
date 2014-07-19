@@ -10,22 +10,23 @@ using namespace std;
 // Class QPCRFactory
 vector<shared_ptr<IControl> > QPCRFactory::constructMachine() {
     vector<shared_ptr<IControl>> controls;
-    vector<shared_ptr<ADCConsumer>> consumers;
+    vector<shared_ptr<ADCConsumer>> zoneConsumers;
+    shared_ptr<ADCConsumer> lidADCConsumer;
 
     //shared_ptr<SPIPort> spiPort0(new SPIPort(kSPI0DevicePath));
     shared_ptr<SPIPort> spiPort1(new SPIPort(kSPI1DevicePath));
 
-    controls.push_back(QPCRFactory::constructOptics(spiPort1, consumers));
-    controls.push_back(QPCRFactory::constructHeatBlock(consumers));
-    controls.push_back(QPCRFactory::constructLid(consumers));
-    controls.push_back(QPCRFactory::constructHeatSink(consumers));
+    controls.push_back(QPCRFactory::constructOptics(spiPort1));
+    controls.push_back(QPCRFactory::constructHeatBlock(zoneConsumers));
+    controls.push_back(QPCRFactory::constructLid(lidADCConsumer));
+    controls.push_back(QPCRFactory::constructHeatSink());
 
-    controls.push_back(ADCControllerInstance::createInstance(consumers, kLTC2444CSPinNumber, std::move(SPIPort(kSPI0DevicePath)), kSPI0DataInSensePinNumber)); //Not refactored yet
+    controls.push_back(ADCControllerInstance::createInstance(zoneConsumers, OpticsInstance::getInstance(), lidADCConsumer, kLTC2444CSPinNumber, std::move(SPIPort(kSPI0DevicePath)), kSPI0DataInSensePinNumber)); //Not refactored yet
 
     return controls;
 }
 
-shared_ptr<IControl> QPCRFactory::constructOptics(shared_ptr<SPIPort> ledSPIPort, vector<shared_ptr<ADCConsumer>> &consumers)
+shared_ptr<IControl> QPCRFactory::constructOptics(shared_ptr<SPIPort> ledSPIPort)
 {
     shared_ptr<LEDController> ledControl(new LEDController(kLEDGrayscaleClockPWMPath, ledSPIPort,
                                                            kLEDDigiPotCSPinNumber, kLEDControlXLATPinNumber,
@@ -38,8 +39,6 @@ shared_ptr<IControl> QPCRFactory::constructOptics(shared_ptr<SPIPort> ledSPIPort
     photoDiodeMux.emplace_back(kMuxControlPin4, GPIO::kOutput);
 
     std::shared_ptr<Optics> optics = OpticsInstance::createInstance(kLidSensePinNumber, ledControl, MUX(move(photoDiodeMux)));
-
-    consumers.push_back(optics);
 
     return optics;
 }
@@ -74,7 +73,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
     return HeatBlockInstance::createInstance(zone1, zone2, kPCRBeginStepTemperatureThreshold );
 }
 
-shared_ptr<IControl> QPCRFactory::constructLid(vector<shared_ptr<ADCConsumer>> &consumers)
+shared_ptr<IControl> QPCRFactory::constructLid(shared_ptr<ADCConsumer> &adcConsumer)
 {
     shared_ptr<BetaThermistor> thermistor(new BetaThermistor(kLidThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                                              kLidThermistorBetaCoefficient, kLidThermistorT0Resistance, kLidThermistorT0));
@@ -82,22 +81,19 @@ shared_ptr<IControl> QPCRFactory::constructLid(vector<shared_ptr<ADCConsumer>> &
     SinglePoleRecursiveFilter processValueFilter(5);
     PIDController *pidController = new PIDController({{50,1.0,0.0,0.0}, {100,1.0,0.0,0.0}}, kLidPIDMin, kLidPIDMax, processValueFilter);
 
-    consumers.push_back(thermistor);
+    adcConsumer = thermistor;
 
     return LidInstance::createInstance(thermistor, kLidMinTargetTemp, kLidMaxTargetTemp, pidController, kPIDIntervalMs,
                                        kLidControlPWMPath, kLidPWMPeriodNs, kProgramStartLidTempThreshold);
 }
 
-shared_ptr<IControl> QPCRFactory::constructHeatSink(vector<shared_ptr<ADCConsumer>> &consumers)
+shared_ptr<IControl> QPCRFactory::constructHeatSink()
 {
     shared_ptr<BetaThermistor> thermistor(new BetaThermistor(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                                              kHeatSinkThermistorBetaCoefficient, kHeatSinkThermistorT0Resistance, kHeatSinkThermistorT0));
 
     SinglePoleRecursiveFilter processValueFilter(5);
     PIDController *pidController = new PIDController({{50,1.0,0.0,0.0}, {100,1.0,0.0,0.0}}, kHeatSinkPIDMin, kHeatSinkPIDMax, processValueFilter);
-
-    //need code to control microcontroller ADC
-    //consumers.push_back(thermistor);
 
     return HeatSinkInstance::createInstance(thermistor, kHeatSinkMinTargetTemp, kHeatSinkMaxTargetTemp, pidController, kPIDIntervalMs);
 }

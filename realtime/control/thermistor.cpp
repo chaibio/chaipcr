@@ -12,9 +12,17 @@ Thermistor::Thermistor(unsigned int voltageDividerResistance, unsigned int adcBi
     _voltageDividerResistance {voltageDividerResistance} {
 }
 
-void Thermistor::setADCValue(unsigned int adcValue) {
-    double voltage = (double)adcValue / _maxADCValue * 5.0;
-    double resistance = (_voltageDividerResistance * voltage / 3.313) / (1 - (voltage / 3.318));
+void Thermistor::setADCValues(unsigned int differentialADCValue, unsigned int singularADCValue) {
+    double resistance;
+    std::cout << "Conversion = " << differentialADCValue << std::endl;
+    if (singularADCValue == 0) {
+        //differentialADCValue is really singular, need to clean up
+        double voltage = (double)differentialADCValue / _maxADCValue * 3.3;
+        resistance = (_voltageDividerResistance * voltage / 3.3) / (1 - (voltage / 3.3));
+    } else {
+        resistance = 400 * (double)singularADCValue / differentialADCValue;
+    }
+
     _temperature.store(temperatureForResistance(resistance));
 }
 

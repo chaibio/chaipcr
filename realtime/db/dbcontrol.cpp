@@ -227,7 +227,7 @@ Settings* DBControl::getSettings()
     soci::row result;
 
     _dbMutex->lock();
-    *_session << "SELECT * FROM settings WHERE", soci::into(result);
+    *_session << "SELECT * FROM settings", soci::into(result);
     _dbMutex->unlock();
 
     Settings *settings = new Settings();

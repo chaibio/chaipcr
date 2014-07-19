@@ -10,15 +10,18 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class ADCController
-ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> consumers, unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber):
-    _consumers {consumers},
-    _currentChannel {0} {
+ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsumers, std::shared_ptr<ADCConsumer> liaConsumer, std::shared_ptr<ADCConsumer> lidConsumer,
+                             unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber):
+    _zoneConsumers {zoneConsumers},
+    _liaConsumer {liaConsumer},
+    _lidConsumer {lidConsumer},
+    _currentConversionState {EReadZone1Differential} {
 
     _ltc2444 = make_shared<LTC2444>(csPinNumber, std::move(spiPort), busyPinNumber);
     _ltc2444->setup(0x4, false);
 
     //start first read
-    _ltc2444->readADC(0, true);
+    _ltc2444->readSingleEndedChannel(0);
 }
 
 ADCController::~ADCController() {
@@ -28,21 +31,56 @@ void ADCController::process() {
     if (_ltc2444->busy())
         return;
 
-    //used for testing ADC speed
-    //cout << boost::posix_time::microsec_clock::local_time() << endl;
+    uint32_t value;
+    /*switch (nextState()) {
+    case EReadZone1Differential:
+        value = _ltc2444->readDifferentialChannels(0, true);
+        break;
+    case EReadZone1Singular:
+        value = _ltc2444->readSingleEndedChannel(4);
+        break;
+    case EReadZone2Differential:
+        value = _ltc2444->readDifferentialChannels(2, true);
+        break;
+    case EReadZone2Singular:
+        value = _ltc2444->readSingleEndedChannel(5);
+        break;
+    case EReadLIA:
+        value = _ltc2444->readSingleEndedChannel(6);
+        break;
+    case EReadLid:*/
+        value = _ltc2444->readSingleEndedChannel(7);
+        /*break;
+    default:
+        assert(false);
+    }*/
 
-    auto consumer = _consumers.at(_currentChannel);
-    _currentChannel = (_currentChannel + 1) % _consumers.size();
-    uint32_t value = _ltc2444->readADC(_currentChannel, true);
+ /*   switch (_currentConversionState) {
+    case EReadZone1Differential:
+    case EReadZone2Differential:
+        _differentialValue = value;
+        break;
+    case EReadZone1Singular:
+        _zoneConsumers.at(0)->setADCValues(_differentialValue, value);
+        break;
+    case EReadZone2Singular:
+        _zoneConsumers.at(1)->setADCValues(_differentialValue, value);
+        break;
+    case EReadLIA:
+        _liaConsumer->setADCValues(value);
+        break;
+    case EReadLid:*/
+        _lidConsumer->setADCValues(value);
+        /*break;
+    default:
+        assert(false);
+    }*/
 
-    consumer->setADCValue(value);
+    _currentConversionState = nextState();
 }
 
-int ADCController::consumerChannel(const ADCConsumer *consumer) const {
-    for (size_t i = 0; i < _consumers.size(); ++i) {
-        if (_consumers.at(0).get() == consumer)
-            return i;
-    }
 
-    return -1;
+ADCController::ADCState ADCController::nextState() const {
+    ADCController::ADCState nextState = static_cast<ADCController::ADCState>(static_cast<int>(_currentConversionState) + 1);
+    return nextState == EFinal ? static_cast<ADCController::ADCState>(0) : nextState;
 }
