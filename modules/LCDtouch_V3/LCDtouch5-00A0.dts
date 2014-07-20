@@ -48,7 +48,9 @@
 		__overlay__ {
 
 			pwm_bl_pins: pinmux_pwm_bl_pins {
-				0x0164 0x00  /* P9.42.1 eCAP0_PWM0, MODE0 */
+				pinctrl-single,pins = <
+					0x0164 0x00  /* P9.42.1 eCAP0_PWM0, MODE0 */
+				>;
 			};
 
                         chai_pcr_touch5_lcd_pins: 
