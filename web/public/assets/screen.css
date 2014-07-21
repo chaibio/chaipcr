@@ -624,25 +624,31 @@
   height: 30px;
 }
 /* line 593, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .image-red {
+  background-image: url("smallredO.png");
+  width: 30px;
+  height: 30px;
+}
+/* line 598, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .text {
   margin-left: 15px;
   margin-top: 8px;
   cursor: pointer;
 }
-/* line 599, ../../app/assets/stylesheets/screen.css.scss */
+/* line 604, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row {
   height: 42px;
 }
-/* line 602, ../../app/assets/stylesheets/screen.css.scss */
+/* line 607, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row div {
   float: left;
 }
-/* line 605, ../../app/assets/stylesheets/screen.css.scss */
+/* line 610, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .hand-container {
   width: 45px;
   height: 42px;
 }
-/* line 609, ../../app/assets/stylesheets/screen.css.scss */
+/* line 614, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .hand-container .hand {
   width: 6px;
   min-height: 32px;
@@ -651,7 +657,7 @@
   margin-top: 5px;
   cursor: pointer;
 }
-/* line 618, ../../app/assets/stylesheets/screen.css.scss */
+/* line 623, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .more-info {
   font-size: 14px;
 }
