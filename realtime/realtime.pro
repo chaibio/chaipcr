@@ -10,7 +10,7 @@ INCLUDEPATH += ./libraries/include/
 INCLUDEPATH += ./libraries/include/soci #for internal SOCI use
 INCLUDEPATH += $(BOOST_INCLUDE_PATH)
 
-LIBS += -L$$_PRO_FILE_PWD_/libraries/lib/
+LIBS += -L$$_PRO_FILE_PWD_/libraries/libhf/
 
 #Poco
 LIBS += -lPocoFoundation
@@ -36,7 +36,7 @@ unix:!unix_m {
 
     #QMAKE_CXXFLAGS += -Wno-unused-local-typedefs -Wno-unused-parameter
 
-    target.path = /home/root/tmp
+    target.path = /root/Dev/
     INSTALLS += target
 }
 
