@@ -50,7 +50,7 @@
 		"P9.28",		/* pwm: eCAP2_PWM2 LIA reference PWM - Ouput */
 		
 		//Heatsink
-		"P9.14",		/* pwm: EHRPWM1A Fan PWM - Output */
+		//"P9.14",		/* pwm: EHRPWM1A Fan PWM - Output */
 	
 		/* the hardware IP uses */
 		"spi0",			//SPI for LEDboard and MCU
@@ -79,13 +79,13 @@
 				>;
 			};
 
-			lia_ref_pwm_pin: pinmux_lid_heater_pwm_pin {
+			lia_ref_pwm_pin: pinmux_lia_ref_pwm_pin {
 				pinctrl-single,pins = <
 					0x19c 0x04  /* P9.28 eCAP2_PWM2, MODE4 */
 				>;
 			};
 
-			lid_heater_pwm_pin: pinmux_blank_pwm_pin {
+			lid_heater_pwm_pin: pinmux_lid_heater_pwm_pin {
 				pinctrl-single,pins = <
 					0x04c 0x06  /* P9.16 ehrpwm1b, MODE6 */
 				>;
@@ -148,9 +148,6 @@
 			};
 
 			/* end SPI1 pins */
-
-			
-		   
 		};
 	};
 	
@@ -168,9 +165,6 @@
 		    status = "okay";
 	    };
 	};
-
-
-	
 
 	fragment@3 {
 	    target = <&epwmss2>;
@@ -218,7 +212,7 @@
 			    duty            = <0>;
 			    status          = "okay";
 			};
-		
+	
 			lid_heater_pwm {
 			    compatible      = "pwm_test";
 			    pwms            = <&ehrpwm1 1 500000 0>;
@@ -235,7 +229,7 @@
 			    pwms 	    = <&ehrpwm1 0 0 500000 0>;
 			    pwm-names       = "PWM_P9_14";				    
 			    pinctrl-names   = "default";
-			    pinctrl-0       = <&blank_pwm_pin>;
+			    pinctrl-0       = <&fan_pwm_pin>;
 			    enabled         = <1>;
 			    duty            = <0>;
 			    status          = "okay";
@@ -246,7 +240,7 @@
 			    pwms 	    = <&ecap2 0 500000 0>;
 			    pwm-names       = "PWM_P9_28";			    
 			    pinctrl-names   = "default";
-			    pinctrl-0       = <&blank_pwm_pin>;
+			    pinctrl-0       = <&lia_ref_pwm_pin>;
 			    enabled         = <1>;
 			    duty            = <0>;
 			    status          = "okay";
