@@ -55,8 +55,9 @@
 		/* the hardware IP uses */
 		"spi0",			//SPI for LEDboard and MCU
 		"spi1",			//SPI for LTC2444
-		"eCAP2_in_PWM2_out",	//LID heater PWM
-		"ehrpwm1B", 		//Blank PWM
+		"eCAP2_in_PWM2_out",
+		"ehrpwm1A",
+		"ehrpwm1B", 		
 		"ehrpwm2A",		//Peltier 2 PWM
 		"ehrpwm2B";		//Peltier 1 PWM
 
@@ -88,6 +89,12 @@
 			lid_heater_pwm_pin: pinmux_lid_heater_pwm_pin {
 				pinctrl-single,pins = <
 					0x04c 0x06  /* P9.16 ehrpwm1b, MODE6 */
+				>;
+			};
+			
+			fan_pwm_pin: pinmux_fan_pwm_pin {
+				pinctrl-single,pins = <
+					0x048 0x06  /* P9.14 ehrpwm1a, MODE6 */
 				>;
 			};
 
@@ -226,7 +233,7 @@
 
 			fan_pwm {
 			    compatible      = "pwm_test";
-			    pwms 	    = <&ehrpwm1 0 0 500000 0>;
+			    pwms 	    = <&ehrpwm1 0 500000 0>;
 			    pwm-names       = "PWM_P9_14";				    
 			    pinctrl-names   = "default";
 			    pinctrl-0       = <&fan_pwm_pin>;
@@ -237,7 +244,7 @@
 			
 			lia_ref_pwm {
 			    compatible      = "pwm_test";
-			    pwms 	    = <&ecap2 0 500000 0>;
+			    pwms 	    = <&ecap2 0 500000 1>;
 			    pwm-names       = "PWM_P9_28";			    
 			    pinctrl-names   = "default";
 			    pinctrl-0       = <&lia_ref_pwm_pin>;
