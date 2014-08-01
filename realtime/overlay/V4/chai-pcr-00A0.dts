@@ -50,7 +50,7 @@
 		"P9.28",		/* pwm: eCAP2_PWM2 LIA reference PWM - Ouput */
 		
 		//Heatsink
-		//"P9.14",		/* pwm: EHRPWM1A Fan PWM - Output */
+		"P9.14",		/* pwm: EHRPWM1A Fan PWM - Output */
 	
 		/* the hardware IP uses */
 		"spi0",			//SPI for LEDboard and MCU
@@ -244,7 +244,7 @@
 			
 			lia_ref_pwm {
 			    compatible      = "pwm_test";
-			    pwms 	    = <&ecap2 0 500000 1>;
+			    pwms 	    = <&ecap2 0 500000 0>;
 			    pwm-names       = "PWM_P9_28";			    
 			    pinctrl-names   = "default";
 			    pinctrl-0       = <&lia_ref_pwm_pin>;
