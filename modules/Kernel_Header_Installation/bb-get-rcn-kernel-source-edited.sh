@@ -43,7 +43,7 @@ if [ -z "$1" ]
     TEMPDIR=$(mktemp -d)
 fi
 
-if [ ! -d TEMPDIR ]; then
+if [ ! -d ${TEMPDIR} ]; then
 	echo "temp directory does not exist. exiting"
 	exit 0;
 fi
