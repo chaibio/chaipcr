@@ -3,6 +3,7 @@ ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
 class ChaiBioTech.app.Views.experimentInProgress extends Backbone.View
 
 	template: JST["backbone/templates/app/experiment-in-progress"]
+	
 	className: "experiment-in-progress"
 
 	initialize: () ->

@@ -661,3 +661,36 @@
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .more-info {
   font-size: 14px;
 }
+/* line 627, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box {
+  position: relative;
+  height: 45px;
+  width: 250px;
+  z-index: 100;
+  top: -70px;
+  left: 43px;
+  background-color: white;
+  text-align: center;
+  display: none;
+  font-size: 14px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  border: solid 1px #a61300;
+  font-size: 14px;
+}
+/* line 644, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box button {
+  font-size: 12px;
+  width: 40px;
+  height: 22px;
+  margin-top: 2px;
+}
+/* line 651, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box .no-delete {
+  color: #00aeef;
+}
+/* line 654, ../../app/assets/stylesheets/screen.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box .yes-delete {
+  color: #a61300;
+}

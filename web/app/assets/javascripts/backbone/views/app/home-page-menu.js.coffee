@@ -3,7 +3,9 @@ ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
 class ChaiBioTech.app.Views.homePageMenu extends Backbone.View
 
 	template: JST["backbone/templates/app/home-page-menu"]
+
 	className: "menu-content"
+		
 	menuItems: ["NEW EXPERIMENT", "RUN A KIT", "SETTINGS"]
 
 	initialize: () ->
