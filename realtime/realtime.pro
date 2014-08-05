@@ -110,7 +110,8 @@ HEADERS += \
     test/controltest.h \
     util/filters.h \
     db/settings.h \
-    server/settingshandler.h
+    server/settingshandler.h \
+    db/debugtemperaturelog.h
 
 SOURCES += \
     app/pins.cpp \

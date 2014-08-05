@@ -181,6 +181,17 @@ void ExperimentController::addLogCallback(Poco::Timer &)
     log.setHeatBlockZone2Temperature(HeatBlockInstance::getInstance()->zone2Temperature());
 
     _dbControl->addTemperatureLog(log);
+
+    if (_settings->debugMode())
+    {
+        DebugTemperatureLog debugLog(_experiment->id());
+        debugLog.setElapsedTime(log.elapsedTime());
+        debugLog.setLidTemperature(log.lidTemperature());
+        debugLog.setHeatBlockZone1Drive(HeatBlockInstance::getInstance()->zone1DriveValue());
+        debugLog.setHeatBlockZone2Drive(HeatBlockInstance::getInstance()->zone2DriveValue());
+
+        _dbControl->addDebugTemperatureLog(debugLog);
+    }
 }
 
 void ExperimentController::settingsUpdated()

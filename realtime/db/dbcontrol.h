@@ -18,6 +18,7 @@ class StageComponent;
 class Step;
 class Ramp;
 class TemperatureLog;
+class DebugTemperatureLog;
 class Settings;
 
 class DBControl
@@ -31,6 +32,7 @@ public:
     void completeExperiment(Experiment *experiment);
 
     void addTemperatureLog(const TemperatureLog &log);
+    void addDebugTemperatureLog(const DebugTemperatureLog &log);
 
     void addFluorescenceData(const Step *step, int cycle, const std::vector<int> &fluorescenceData);
 

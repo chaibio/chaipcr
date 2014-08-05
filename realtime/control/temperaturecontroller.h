@@ -18,6 +18,7 @@ public:
     void setTargetTemperature(double temperature);
     inline double targetTemperature() const { return _targetTemperature.load(); }
 
+    virtual bool outputDirection() const = 0;
     double currentTemperature() const;
 
     void process() final;
@@ -27,7 +28,6 @@ protected:
 
     virtual void setOutput(double value) = 0;
     virtual void resetOutput() = 0;
-    virtual bool outputDirection() const = 0;
     virtual void processOutput() = 0;
 
 protected:

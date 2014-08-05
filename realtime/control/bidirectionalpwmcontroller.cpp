@@ -18,6 +18,11 @@ BidirectionalPWMController::~BidirectionalPWMController()
     resetOutput();
 }
 
+bool BidirectionalPWMController::outputDirection() const
+{
+    return _heatIO.value() == GPIO::kHigh ? true : false;
+}
+
 void BidirectionalPWMController::setOutput(double value)
 {
     setPWMDutyCycle(value >= 0 ? value : (value * -1));
@@ -40,11 +45,6 @@ void BidirectionalPWMController::resetOutput()
 
     _heatIO.setValue(GPIO::kLow, true);
     _coolIO.setValue(GPIO::kLow, true);
-}
-
-bool BidirectionalPWMController::outputDirection() const
-{
-    return _heatIO.value() == GPIO::kHigh ? true : false;
 }
 
 void BidirectionalPWMController::processOutput()

@@ -209,6 +209,18 @@ void DBControl::addTemperatureLog(const TemperatureLog &log)
     _dbMutex->unlock();
 }
 
+void DBControl::addDebugTemperatureLog(const DebugTemperatureLog &log)
+{
+    _dbMutex->lock();
+    {
+        *_session << "INSERT INTO temperature_debug_logs VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_drive, :heat_block_zone_2_drive)",
+                soci::use(log.experimentId()), soci::use(log.elapsedTime()),
+                soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
+                soci::use(std::round(log.heatBlockZone1Drive() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Drive() * 100.0) / 100.0);
+    }
+    _dbMutex->unlock();
+}
+
 void DBControl::addFluorescenceData(const Step *step, int cycle, const std::vector<int> &fluorescenceData)
 {
     _dbMutex->lock();
