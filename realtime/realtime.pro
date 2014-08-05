@@ -49,7 +49,7 @@ unix_m: {
 
     INCLUDEPATH += /opt/local/include/
 
-    target.path = /home/root/tmp
+    target.path = /root/tmp
     INSTALLS += target
 }
 
