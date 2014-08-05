@@ -5,7 +5,7 @@
 #include "dbincludes.h"
 #include "sociincludes.h"
 
-#define DATABASE_FILE "/home/root/chaipcr/web/db/development.sqlite3"
+#define DATABASE_FILE "/root/chaipcr/web/db/development.sqlite3"
 
 DBControl::DBControl()
 {
