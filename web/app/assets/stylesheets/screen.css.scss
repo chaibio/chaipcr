@@ -478,6 +478,7 @@
 									margin-left: 12px;
 									margin-top: 22px;
 									font-size: 30px;
+									cursor: pointer;
 								}
 							}
 							
@@ -502,17 +503,130 @@
 
 				}
 			}
-
-			.experiment-in-progress {
+			// Experiment in progress starts here
+			.experiment-in-progress-container {
+				width: 442px;
 				height: 110px;
+				font-size: 14px;
+
+				.experiment-in-progress {
+					
+					.experiment-in-progress-heading {
+						border-bottom: solid 2px #001827;
+					}
+					.experiment-info {
+						height: 80px;
+						padding-top: 25px;
+
+						div {
+							float: left;
+						}
+
+						.caption {
+							font-weight: bold;
+							margin-bottom: 5px;
+						}
+						.experiment-info-test {
+							width: 280px;
+						}
+
+					}
+					.experiment-progress-bar {
+						height: 5px;
+						background-color: black;
+
+						.progress-bar {
+							background-color: #00aeef;
+							height: 5px;
+							width: 0px;
+						}
+					}
+				}
 			}
 		}
 	}
-
+	// Right Side of the home page
 	.home-page-right-wing {
 		float: left;
-		width: 392px;
+		width: 341px;
 		padding-top: 54px;
+
+		// Previous Experiment List Starts Here
+		.previous-experiment-container {
+			
+			.previous-experiment-heading {
+				border-bottom: solid 1px #001827;
+				height: 20px;
+
+				.text {
+					float: left;
+					width: 200px;
+					font-size: 14px;
+				}
+				.dots {
+					float: right;
+					color: orange;
+					font-weight: bold;
+					font-size: 14px;
+					cursor: pointer;
+				}
+			}
+			.all-experiments {
+				height: 680px;
+				overflow: scroll;
+				padding-top: 21px;
+
+				.individual-experiment {
+					height: 72px;
+
+					.first-row {
+						height: 30px;
+
+						div {
+							float: left;
+						}
+						.image {
+							background-image: url("smallblackO.png");
+							width: 30px;
+							height: 30px;
+						}
+						.image-red {
+							background-image: url("smallredO.png");
+							width: 30px;
+							height: 30px;
+						}
+						.text {
+							margin-left: 15px;
+							margin-top: 8px;
+							cursor: pointer;
+						}
+					}
+					.second-row {
+						height: 42px;
+
+						div {
+							float: left;
+						}
+						.hand-container {
+							width: 45px;
+							height: 42px;
+
+							.hand {
+								width: 6px;
+								min-height: 32px;
+								background-color: #00aeef;
+								margin-left: 12px;
+								margin-top: 5px;
+								cursor: pointer;
+							}
+						}
+						.more-info {
+							font-size: 14px;
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
