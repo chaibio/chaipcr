@@ -244,7 +244,7 @@
 			
 			lia_ref_pwm {
 			    compatible      = "pwm_test";
-			    pwms 	    = <&ecap2 0 500000 0>;
+			    pwms 	    = <&ecap2 0 500000 1>;
 			    pwm-names       = "PWM_P9_28";			    
 			    pinctrl-names   = "default";
 			    pinctrl-0       = <&lia_ref_pwm_pin>;

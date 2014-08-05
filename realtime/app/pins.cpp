@@ -11,7 +11,7 @@ const string kHeatSinkFanControlPWMPath {"/sys/devices/ocp.3/fan_pwm.*"};
 
 //LED control
 const std::string kLEDGrayscaleClockPWMPath {"/sys/devices/ocp.3/led_pwm.16"};
-const std::string kLEDBlankPWMPath { "/sys/devices/ocp.3/blank_pwm.17" };
+const std::string kLEDBlankPWMPath { "/sys/devices/ocp.3/lia_ref_pwm.16" };
 
 //Lid
 const std::string kLidControlPWMPath {"/sys/devices/ocp.3/lid_heater_pwm.18"};
