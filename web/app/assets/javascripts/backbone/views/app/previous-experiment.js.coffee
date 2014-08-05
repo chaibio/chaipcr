@@ -12,6 +12,7 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 
 	readyToDeleteTrueImage:
 		backgroundImage: "url('assets/smallredO.png')"
+		cursor: "pointer"
 
 	readyToDeleteFalseImage: 
 		backgroundImage: "url('assets/smallblackO.png')"
@@ -24,6 +25,11 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 
 	readyToDelete: false
 
+	events: 
+		"click .image": "deleteExperimentConfirm"
+		"click .no-delete": "dontDelete"
+		"click .yes-delete": "yesDelete"
+
 	initialize: () ->
 		@experimentClass = @options.parent
 		@listenTo(@experimentClass ,"readyToDelete", @enableDelete)
@@ -33,10 +39,11 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 		
 		if @readyToDelete is true
 			@image.css(@readyToDeleteTrueImage)
-			@hand.css("background-color", "#a61300")
+			@hand.css(@readyToDeleteTrueHand)
 		else
 			@image.css(@readyToDeleteFalseImage)
-			@hand.css("background-color", "#00aeef")
+			@hand.css(@readyToDeleteFalseHand)
+			$(@el).find(".confirm-box").hide("slow");
 
 	render: () ->
 		data =
@@ -46,6 +53,28 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 		@image = $(@el).find(".image")
 		@hand = $(@el).find(".hand")
 		return this
+
+	deleteExperimentConfirm: () ->
+		# Shows a confirm box to delete
+		if @readyToDelete is true
+			$(@el).find(".confirm-box").show("fast")
+
+	dontDelete: () ->
+		$(@el).find(".confirm-box").hide("slow")
+
+	yesDelete: () ->
+		#@console.log @
+		@model.destroy()
+		callBack = () -> # Defining a local call back to pass to animate
+			@.remove()
+
+		action = 
+			height: "0px"
+
+		$(@.el).animate(action, 500, callBack)
+		
+
+
 
 
 

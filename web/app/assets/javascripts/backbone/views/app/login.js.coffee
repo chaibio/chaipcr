@@ -3,7 +3,9 @@ ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
 class ChaiBioTech.app.Views.login extends Backbone.View
 
 	template: JST["backbone/templates/app/login-page"]
+
 	loggedIn: false
+	
 	events:
 		"click #login-button": "loginCheck"
 

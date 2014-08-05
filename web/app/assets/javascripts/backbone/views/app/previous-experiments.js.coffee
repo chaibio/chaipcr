@@ -48,6 +48,7 @@ class ChaiBioTech.app.Views.previousExperiments extends Backbone.View
 
 			experiment = new ChaiBioTech.app.Views.experiment(data)
 			@allExpDiv.prepend(experiment.render().el)
+		@allExpDiv.find(".loading").remove()
 
 	loadPreviousExperiments: () ->
 		# Bring All the experiments from database
@@ -56,7 +57,7 @@ class ChaiBioTech.app.Views.previousExperiments extends Backbone.View
 	render: () ->
 		$(@el).html(@template())
 		@dots = $(@el).find(".dots")
-		@allExpDiv = $(@el).find(".all-experiments").html("")
+		@allExpDiv = $(@el).find(".all-experiments")
 		return this
 
 

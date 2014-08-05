@@ -1,6 +1,7 @@
 class ChaiBioTech.Routers.appRouter extends Backbone.Router
 
 	loginScreen: {}
+	
 	homePage: {}
 
 	iniitialize: () ->
@@ -15,7 +16,7 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 		$("#container").html(@loginScreen.render().el)
 
 	loadHome: () ->
-		if @loggedIn()
+		if @loggedIn() is true
 			data = 
 			"user": @loginScreen.user
 
@@ -26,9 +27,9 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 
 	loggedIn: () ->
 		if @loginScreen.loggedIn
-			return true
+			return yes
 
-		return false
+		return no
 
 
 

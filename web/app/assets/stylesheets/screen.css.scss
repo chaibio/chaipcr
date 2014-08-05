@@ -624,6 +624,37 @@
 							font-size: 14px;
 						}
 					}
+					.confirm-box {
+						position: relative;
+						height: 45px;
+						width: 250px;
+						z-index: 100;
+						top: -70px;
+						left: 43px;
+						background-color: white;
+						text-align: center;
+						display: none;
+						font-size: 14px;
+						-webkit-border-radius: 5px;
+						-moz-border-radius: 5px;
+						border-radius: 5px;
+						border: solid 1px #a61300;
+						font-size: 14px;
+
+						button {
+							font-size: 12px;
+							width: 40px;
+							height: 22px;
+							margin-top: 2px;
+						}
+
+						.no-delete {
+							color: #00aeef;
+						}
+						.yes-delete {
+							color: #a61300;
+						}
+					}
 				}
 			}
 		}
