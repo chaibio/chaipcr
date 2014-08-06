@@ -63,9 +63,6 @@ void Optics::setCollectData(bool state)
         {
             _ledNumber = 0;
 
-            //Ruslan: I don't understand why this was using ADC Channel - Josh
-            //_photodiodeMux.setChannel(channel());
-
             if (!lidOpen())
             {
                 _collectDataTimer->setPeriodicInterval(kCollectDataInterval);
@@ -82,6 +79,8 @@ void Optics::setCollectData(bool state)
 void Optics::collectDataCallback(Poco::Timer&)
 {
     _ledController->activateLED(kWellList.at(_ledNumber));
+    _photodiodeMux.setChannel(_ledNumber);
+
     _fluorescenceData[_ledNumber].push_back(_adcValue);
 
     ++_ledNumber;
