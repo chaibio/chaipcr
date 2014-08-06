@@ -1,6 +1,10 @@
 #ifndef STAGE_H
 #define STAGE_H
 
+#include <string>
+#include <vector>
+#include <atomic>
+
 class StageComponent;
 class Step;
 class Ramp;

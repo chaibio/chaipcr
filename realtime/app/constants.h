@@ -1,6 +1,8 @@
 #ifndef _CONSTANTS_H_
 #define _CONSTANTS_H_
 
+#include <vector>
+
 //Steinhart-Hart coefficients for heat block thermistor (QTI Z Curve)
 const double kQTICurveZThermistorACoefficient = 0.001116401465500;
 const double kQTICurveZThermistorBCoefficient = 0.000237982973213;

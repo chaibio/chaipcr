@@ -1,9 +1,12 @@
 #ifdef TEST_BUILD
 
-#include "pcrincludes.h"
-#include "boostincludes.h"
-#include "pocoincludes.h"
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <Poco/Net/HTTPRequest.h>
+#include <Poco/Net/HTTPResponse.h>
+#include <Poco/Net/HTTPClientSession.h>
 
+#include "pcrincludes.h"
 #include "servertest.h"
 
 using namespace boost::property_tree;

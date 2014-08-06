@@ -1,10 +1,11 @@
 #ifndef PID_H
 #define PID_H
 
-#include "boostincludes.h"
 #include "filters.h"
 
-namespace Poco { class Timer; class RWLock; }
+#include <vector>
+#include <boost/date_time/posix_time/ptime.hpp>
+#include <Poco/RWLock.h>
 
 struct SPIDTuning {
     int maxValueInclusive;
@@ -39,10 +40,10 @@ private:
     double _integratorS;
     boost::posix_time::ptime _previousExecutionTime;
 
-    mutable Poco::RWLock *lock;
+    mutable Poco::RWLock lock;
 };
 
-class PIDControl {
+/*class PIDControl {
 public:
     PIDControl(PIDController *pidController, long pidTimerInterval);
     virtual ~PIDControl();
@@ -65,6 +66,6 @@ protected:
 
     std::function<double()> _targetValue;
     std::function<double()> _currentValue;
-};
+};*/
 
 #endif // PID_H

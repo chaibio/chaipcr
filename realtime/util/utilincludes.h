@@ -6,5 +6,6 @@
 #include "spi.h"
 #include "pid.h"
 #include "mux.h"
+#include "filters.h"
 
 #endif // UTILINCLUDES_H

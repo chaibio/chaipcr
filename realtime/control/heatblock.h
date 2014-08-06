@@ -3,6 +3,11 @@
 
 #include "icontrol.h"
 
+#include <atomic>
+#include <utility>
+#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/signals2.hpp>
+
 class BidirectionalPWMController;
 typedef BidirectionalPWMController HeatBlockZoneController;
 

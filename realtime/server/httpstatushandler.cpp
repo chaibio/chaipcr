@@ -1,5 +1,3 @@
-#include "pocoincludes.h"
-
 #include "httpstatushandler.h"
 
 using namespace Poco::Net;

@@ -1,4 +1,3 @@
-#include "pcrincludes.h"
 #include "settings.h"
 
 Settings::Settings()

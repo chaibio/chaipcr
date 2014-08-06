@@ -1,6 +1,11 @@
 #ifndef _LEDCONTROLLER_H_
 #define _LEDCONTROLLER_H_
 
+#include "pwm.h"
+#include "gpio.h"
+
+#include <memory>
+
 class SPIPort;
 
 // Class LEDController

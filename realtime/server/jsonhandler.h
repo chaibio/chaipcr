@@ -3,6 +3,8 @@
 
 #include "httpstatushandler.h"
 
+#include <boost/property_tree/ptree.hpp>
+
 class JSONHandler : public HTTPStatusHandler
 {
 public:

@@ -3,7 +3,9 @@
 #ifndef APPTEST_H
 #define APPTEST_H
 
+#include <thread>
 #include <gtest/gtest.h>
+
 #include "qpcrapplication.h"
 
 class AppTest : public testing::Test

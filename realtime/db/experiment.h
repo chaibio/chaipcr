@@ -1,6 +1,9 @@
 #ifndef EXPERIMENT_H
 #define EXPERIMENT_H
 
+#include <string>
+#include <boost/date_time/posix_time/ptime.hpp>
+
 class Protocol;
 
 class Experiment

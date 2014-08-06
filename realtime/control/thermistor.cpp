@@ -1,5 +1,3 @@
-#include "pcrincludes.h"
-
 #include "thermistor.h"
 
 using namespace std;
@@ -24,6 +22,8 @@ void Thermistor::setADCValues(unsigned int differentialADCValue, unsigned int si
     }
 
     _temperature.store(temperatureForResistance(resistance));
+
+    adcValueChanged();
 }
 
 

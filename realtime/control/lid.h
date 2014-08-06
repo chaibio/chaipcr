@@ -4,11 +4,12 @@
 #include "temperaturecontroller.h"
 #include "pwm.h"
 
+#include <boost/signals2.hpp>
+
 class Lid : public TemperatureController, public PWMControl
 {
 public:
-    Lid(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-        PIDController *pidController, long pidTimerInterval,
+    Lid(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController,
         const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold);
     ~Lid();
 

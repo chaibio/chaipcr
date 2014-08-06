@@ -1,20 +1,20 @@
-#include "pcrincludes.h"
+#include <sstream>
 
 #include "thermistor.h"
+#include "pid.h"
 #include "temperaturecontroller.h"
 
-TemperatureController::TemperatureController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-                                             PIDController *pidController, long pidTimerInterval)
-    :PIDControl(pidController, pidTimerInterval)
+TemperatureController::TemperatureController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController)
 {
     _enableMode = false;
 
     _thermistor = thermistor;
+    _pidController = pidController;
+    _pidResult = 0;
     _minTargetTemp = minTargetTemp;
     _maxTargetTemp = maxTargetTemp;
 
-    _targetValue = std::bind(&TemperatureController::targetTemperature, this);
-    _currentValue = std::bind(&TemperatureController::currentTemperature, this);
+    _thermistor->adcValueChanged.connect(boost::bind(&TemperatureController::computePid, this));
 }
 
 void TemperatureController::setEnableMode(bool enableMode)
@@ -24,10 +24,17 @@ void TemperatureController::setEnableMode(bool enableMode)
         _enableMode = enableMode;
 
         if (_enableMode)
-            startPid();
+        {
+            _pidMutex.lock();
+            _pidState = true;
+            _pidMutex.unlock();
+        }
         else
         {
-            stopPid();
+            _pidMutex.lock();
+            _pidState = false;
+            _pidMutex.unlock();
+
             resetOutput();
         }
     }
@@ -59,7 +66,20 @@ void TemperatureController::process()
     }
 }
 
-void TemperatureController::pidCallback(double pidResult)
+void TemperatureController::computePid()
 {
-    setOutput(pidResult);
+    _pidMutex.lock();
+    {
+        if (_pidState)
+        {
+            double result = _pidController->compute(targetTemperature(), currentTemperature());
+
+            if (result != _pidResult)
+            {
+                _pidResult = result;
+                setOutput(result);
+            }
+        }
+    }
+    _pidMutex.unlock();
 }

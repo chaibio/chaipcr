@@ -1,11 +1,8 @@
-#include "pcrincludes.h"
-
 #include "fan.h"
 #include "heatsink.h"
 
-HeatSink::HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-                   PIDController *pidController, long pidTimerInterval)
-    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController, pidTimerInterval)
+HeatSink::HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController)
+    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController)
 {
     _fan = new Fan();
 

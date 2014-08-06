@@ -1,6 +1,3 @@
-#include "pcrincludes.h"
-#include "pocoincludes.h"
-
 #include "stagecomponent.h"
 #include "stage.h"
 

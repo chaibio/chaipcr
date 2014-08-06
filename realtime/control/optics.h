@@ -1,8 +1,14 @@
 #ifndef _OPTICS_H_
 #define _OPTICS_H_
 
-#include <icontrol.h>
-#include <adcconsumer.h>
+#include "icontrol.h"
+#include "adcconsumer.h"
+
+#include "gpio.h"
+#include "mux.h"
+
+#include <memory>
+#include <atomic>
 
 class LEDController;
 

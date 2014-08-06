@@ -5,6 +5,9 @@ class IControl;
 class SPIPort;
 class ADCConsumer;
 
+#include <memory>
+#include <vector>
+
 // Class QPCRFactory
 class QPCRFactory {
 public:

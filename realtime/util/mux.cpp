@@ -1,7 +1,5 @@
-#include "pcrincludes.h"
-
-#include "mux.h"
 #include "gpio.h"
+#include "mux.h"
 
 using namespace std;
 

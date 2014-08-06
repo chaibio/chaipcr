@@ -3,6 +3,8 @@
 
 #include "instance.h"
 
+#include <atomic>
+
 class DBControl;
 class Experiment;
 class Settings;

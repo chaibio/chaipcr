@@ -4,6 +4,8 @@
 #include "icontrol.h"
 #include "pwm.h"
 
+#include <atomic>
+
 // Class Fan
 class Fan : public IControl, public PWMControl
 {

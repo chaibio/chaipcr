@@ -1,8 +1,4 @@
-#include "pcrincludes.h"
-#include "boostincludes.h"
-#include "pocoincludes.h"
 #include "experimentcontroller.h"
-
 #include "controlhandler.h"
 
 ControlHandler::ControlHandler(OperationType operation)

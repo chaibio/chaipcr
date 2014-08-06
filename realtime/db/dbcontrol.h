@@ -1,14 +1,12 @@
 #ifndef DBCONTROL_H
 #define DBCONTROL_H
 
+#include <vector>
+#include <mutex>
+
 namespace soci
 {
 class session;
-}
-
-namespace Poco
-{
-class Mutex;
 }
 
 class Experiment;
@@ -52,7 +50,7 @@ private:
 
     soci::session *_session;
 
-    Poco::Mutex *_dbMutex;
+    std::mutex _dbMutex;
 };
 
 #endif // DBCONTROL_H

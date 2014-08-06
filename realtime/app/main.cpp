@@ -1,4 +1,3 @@
-#include "pcrincludes.h"
 #include "qpcrapplication.h"
 
 #ifdef TEST_BUILD

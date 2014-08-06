@@ -1,5 +1,5 @@
-#include "boostincludes.h"
-#include "pocoincludes.h"
+#include <Poco/Net/HTTPServerRequest.h>
+#include <Poco/URI.h>
 
 #include "testcontrolhandler.h"
 #include "statushandler.h"

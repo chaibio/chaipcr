@@ -1,5 +1,11 @@
-#include "pcrincludes.h"
+#include <climits>
+#include <cassert>
 
+#include <exception>
+#include <sstream>
+#include <fstream>
+
+#include "pcrincludes.h"
 #include "gpio.h"
 
 using namespace std;

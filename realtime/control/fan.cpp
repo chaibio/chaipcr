@@ -1,5 +1,4 @@
 #include "pcrincludes.h"
-
 #include "fan.h"
 
 using namespace std;

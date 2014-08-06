@@ -2,15 +2,18 @@
 #define TEMPERATURECONTROLLER_H
 
 #include "icontrol.h"
-#include "pid.h"
+
+#include <memory>
+#include <atomic>
+#include <mutex>
 
 class Thermistor;
+class PIDController;
 
-class TemperatureController : public IControl, public PIDControl
+class TemperatureController : public IControl//, public PIDControl
 {
 public:
-    TemperatureController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-                          PIDController *pidController, long pidTimerInterval);
+    TemperatureController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController);
 
     inline bool enableMode() const { return _enableMode; }
     void setEnableMode(bool enableMode);
@@ -24,16 +27,22 @@ public:
     void process() final;
 
 protected:
-    void pidCallback(double pidResult);
-
     virtual void setOutput(double value) = 0;
     virtual void resetOutput() = 0;
     virtual void processOutput() = 0;
+
+private:
+    void computePid();
 
 protected:
     std::shared_ptr<Thermistor> _thermistor;
 
 private:
+    PIDController *_pidController;
+    bool _pidState;
+    double _pidResult;
+    std::mutex _pidMutex;
+
     std::atomic<bool> _enableMode;
 
     std::atomic<double> _targetTemperature;

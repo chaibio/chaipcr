@@ -1,6 +1,8 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 
+#include <vector>
+
 class Stage;
 class Step;
 class Ramp;

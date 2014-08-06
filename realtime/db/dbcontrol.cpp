@@ -1,7 +1,3 @@
-#include "pcrincludes.h"
-#include "boostincludes.h"
-#include "pocoincludes.h"
-
 #include "dbincludes.h"
 #include "sociincludes.h"
 
@@ -10,23 +6,20 @@
 DBControl::DBControl()
 {
     _session = new soci::session(soci::sqlite3, DATABASE_FILE);
-
-    _dbMutex = new Poco::Mutex;
 }
 
 DBControl::~DBControl()
 {
     delete _session;
-    delete _dbMutex;
 }
 
 Experiment* DBControl::getExperiment(int id)
 {
     soci::row result;
 
-    _dbMutex->lock();
+    _dbMutex.lock();
     *_session << "SELECT * FROM experiments WHERE id = " << id, soci::into(result);
-    _dbMutex->unlock();
+    _dbMutex.unlock();
 
     if (result.get_indicator("id") == soci::i_null)
         return nullptr;
@@ -53,9 +46,9 @@ Protocol* DBControl::getProtocol(int experimentId)
 {
     soci::row result;
 
-    _dbMutex->lock();
+    _dbMutex.lock();
     *_session << "SELECT * FROM protocols WHERE experiment_id = " << experimentId, soci::into(result);
-    _dbMutex->unlock();
+    _dbMutex.unlock();
 
     if (result.get_indicator("id") == soci::i_null)
         return nullptr;
@@ -79,9 +72,9 @@ std::vector<Stage> DBControl::getStages(int protocolId)
 {
     std::vector<Stage> stages;
 
-    _dbMutex->lock();
+    _dbMutex.lock();
     soci::rowset<soci::row> result((_session->prepare << "SELECT * FROM stages WHERE protocol_id = " << protocolId << " ORDER BY order_number"));
-    _dbMutex->unlock();
+    _dbMutex.unlock();
 
     Stage stage;
     for (soci::rowset<soci::row>::const_iterator it = result.begin(); it != result.end(); ++it)
@@ -127,9 +120,9 @@ std::vector<Step> DBControl::getSteps(int stageId)
 {
     std::vector<Step> steps;
 
-    _dbMutex->lock();
+    _dbMutex.lock();
     soci::rowset<soci::row> result((_session->prepare << "SELECT * FROM steps WHERE stage_id = " << stageId << " ORDER BY order_number"));
-    _dbMutex->unlock();
+    _dbMutex.unlock();
 
     for (soci::rowset<soci::row>::const_iterator it = result.begin(); it != result.end(); ++it)
     {
@@ -160,9 +153,9 @@ Ramp* DBControl::getRamp(int stepId)
 {
     soci::row result;
 
-    _dbMutex->lock();
+    _dbMutex.lock();
     *_session << "SELECT * FROM ramps WHERE next_step_id = " << stepId, soci::into(result);
-    _dbMutex->unlock();
+    _dbMutex.unlock();
 
     if (result.get_indicator("id") == soci::i_null)
         return nullptr;
@@ -182,48 +175,48 @@ Ramp* DBControl::getRamp(int stepId)
 
 void DBControl::startExperiment(Experiment *experiment)
 {
-    _dbMutex->lock();
+    _dbMutex.lock();
     *_session << "UPDATE experiments SET started_at = :started_at WHERE id = " << experiment->id(), soci::use(experiment->startedAt());
-    _dbMutex->unlock();
+    _dbMutex.unlock();
 }
 
 void DBControl::completeExperiment(Experiment *experiment)
 {
-    _dbMutex->lock();
+    _dbMutex.lock();
     {
         *_session << "UPDATE experiments SET completed_at = :completed_at, completion_status = :completion_status WHERE id = " << experiment->id(),
                 soci::use(experiment->completedAt()), soci::use(experiment->completionStatus());
     }
-    _dbMutex->unlock();
+    _dbMutex.unlock();
 }
 
 void DBControl::addTemperatureLog(const TemperatureLog &log)
 {
-    _dbMutex->lock();
+    _dbMutex.lock();
     {
         *_session << "INSERT INTO temperature_logs VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_temp, :heat_block_zone_2_temp)",
                 soci::use(log.experimentId()), soci::use(log.elapsedTime()),
                 soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
                 soci::use(std::round(log.heatBlockZone1Temperature() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Temperature() * 100.0) / 100.0);
     }
-    _dbMutex->unlock();
+    _dbMutex.unlock();
 }
 
 void DBControl::addDebugTemperatureLog(const DebugTemperatureLog &log)
 {
-    _dbMutex->lock();
+    _dbMutex.lock();
     {
         *_session << "INSERT INTO temperature_debug_logs VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_drive, :heat_block_zone_2_drive)",
                 soci::use(log.experimentId()), soci::use(log.elapsedTime()),
                 soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
                 soci::use(std::round(log.heatBlockZone1Drive() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Drive() * 100.0) / 100.0);
     }
-    _dbMutex->unlock();
+    _dbMutex.unlock();
 }
 
 void DBControl::addFluorescenceData(const Step *step, int cycle, const std::vector<int> &fluorescenceData)
 {
-    _dbMutex->lock();
+    _dbMutex.lock();
     {
         for (size_t i = 0; i < fluorescenceData.size(); ++i)
         {
@@ -231,16 +224,16 @@ void DBControl::addFluorescenceData(const Step *step, int cycle, const std::vect
                     soci::use(step->id()), soci::use(fluorescenceData.at(i)), soci::use(i), soci::use(cycle);
         }
     }
-    _dbMutex->unlock();
+    _dbMutex.unlock();
 }
 
 Settings* DBControl::getSettings()
 {
     soci::row result;
 
-    _dbMutex->lock();
+    _dbMutex.lock();
     *_session << "SELECT * FROM settings", soci::into(result);
-    _dbMutex->unlock();
+    _dbMutex.unlock();
 
     Settings *settings = new Settings();
 
@@ -252,9 +245,9 @@ Settings* DBControl::getSettings()
 
 void DBControl::updateSettings(const Settings &settings)
 {
-    _dbMutex->lock();
+    _dbMutex.lock();
     *_session << "UPDATE settings SET debug = :debug", soci::use(settings.debugMode() ? 1 : 0);
-    _dbMutex->unlock();
+    _dbMutex.unlock();
 }
 
 #ifdef TEST_BUILD
@@ -262,9 +255,9 @@ std::vector<int> DBControl::getEperimentIdList()
 {
     std::vector<int> idList(100);
 
-    _dbMutex->lock();
+    _dbMutex.lock();
     *_session << "SELECT id FROM experiments", soci::into(idList);
-    _dbMutex->unlock();
+    _dbMutex.unlock();
 
     return idList;
 }

@@ -1,5 +1,7 @@
 #include "pcrincludes.h"
 
+#include <cstring>
+
 using namespace std;
 
 GPIOError::GPIOError(const char* message):

@@ -1,14 +1,10 @@
+#include <Poco/Net/HTTPServer.h>
+
 #include "pcrincludes.h"
-#include "boostincludes.h"
-#include "utilincludes.h"
-#include "pocoincludes.h"
-#include "controlincludes.h"
-
-#include "qpcrrequesthandlerfactory.h"
-
-#include "qpcrfactory.h"
+#include "icontrol.h"
 #include "experimentcontroller.h"
-
+#include "qpcrrequesthandlerfactory.h"
+#include "qpcrfactory.h"
 #include "qpcrapplication.h"
 
 using namespace std;

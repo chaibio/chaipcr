@@ -1,7 +1,3 @@
-#include "pcrincludes.h"
-#include "pocoincludes.h"
-#include "boostincludes.h"
-
 #include "settings.h"
 #include "experimentcontroller.h"
 

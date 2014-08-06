@@ -1,6 +1,6 @@
-#include "pcrincludes.h"
-#include "boostincludes.h"
-#include "pocoincludes.h"
+#include <boost/property_tree/json_parser.hpp>
+#include <Poco/Net/HTTPServerRequest.h>
+#include <Poco/Net/HTTPServerResponse.h>
 
 #include "jsonhandler.h"
 

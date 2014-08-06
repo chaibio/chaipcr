@@ -1,10 +1,19 @@
 #ifdef TEST_BUILD
 
-#include "pcrincludes.h"
-#include "boostincludes.h"
 #include "dbincludes.h"
-
 #include "dbtest.h"
+
+inline std::string ptime_to_string(const boost::posix_time::ptime &date_time)
+{
+    if (date_time.is_not_a_date_time())
+        return std::string();
+
+    std::stringstream stream;
+    stream << date_time.date().year() << "-" << date_time.date().month() << "-" << date_time.date().day() << " "
+           << date_time.time_of_day().hours() << ":" << date_time.time_of_day().minutes() << ":" << date_time.time_of_day().seconds();
+
+    return stream.str();
+}
 
 DBTest::DBTest()
 {

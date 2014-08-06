@@ -1,7 +1,7 @@
-#include "pcrincludes.h"
-#include "pocoincludes.h"
-#include "utilincludes.h"
+#include <Poco/Timer.h>
 
+#include "pcrincludes.h"
+#include "pid.h"
 #include "ledcontroller.h"
 #include "optics.h"
 
@@ -50,7 +50,7 @@ void Optics::process()
     }
 }
 
-void Optics::setADCValues(unsigned int adcValue, unsigned int unusedValue)
+void Optics::setADCValues(unsigned int adcValue, unsigned int)
 {
     _adcValue = adcValue;
 }

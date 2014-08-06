@@ -1,10 +1,7 @@
 #ifdef TEST_BUILD
 
 #include "pcrincludes.h"
-#include "boostincludes.h"
-#include "utilincludes.h"
-#include "controlincludes.h"
-
+#include "maincontrollers.h"
 #include "controltest.h"
 
 #define RAND(min, max) ((max - min) * ( (double)rand() / (double)RAND_MAX ) + min)

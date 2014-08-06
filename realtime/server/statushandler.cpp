@@ -1,7 +1,5 @@
-#include "pcrincludes.h"
-#include "boostincludes.h"
-#include "pocoincludes.h"
-#include "utilincludes.h"
+#include <boost/date_time.hpp>
+
 #include "controlincludes.h"
 #include "dbincludes.h"
 #include "experimentcontroller.h"

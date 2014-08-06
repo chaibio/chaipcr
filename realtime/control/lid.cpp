@@ -1,13 +1,9 @@
-#include "pcrincludes.h"
-#include "boostincludes.h"
 #include "experimentcontroller.h"
-
 #include "lid.h"
 
-Lid::Lid(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-         PIDController *pidController, long pidTimerInterval,
+Lid::Lid(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController,
          const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold)
-    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController, pidTimerInterval),
+    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController),
      PWMControl(pwmPath, pwmPeriod)
 {
     _startTempThreshold = startTempThreshold;

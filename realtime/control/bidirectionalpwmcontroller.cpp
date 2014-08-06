@@ -1,12 +1,8 @@
-#include "pcrincludes.h"
-#include "utilincludes.h"
-
 #include "bidirectionalpwmcontroller.h"
 
-BidirectionalPWMController::BidirectionalPWMController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-                                                       PIDController *pidController, long pidTimerInterval,
+BidirectionalPWMController::BidirectionalPWMController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController,
                                                        const std::string &pwmPath, unsigned long pwmPeriod, unsigned int heatIOPin, unsigned int coolIOPin)
-    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController, pidTimerInterval),
+    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController),
      PWMControl(pwmPath, pwmPeriod),
      _heatIO(heatIOPin, GPIO::kOutput), _coolIO(coolIOPin, GPIO::kOutput)
 {

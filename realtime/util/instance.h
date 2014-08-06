@@ -3,6 +3,8 @@
 
 #include <boost/noncopyable.hpp>
 
+#include <memory>
+
 template <class T>
 class Instance : public boost::noncopyable
 {

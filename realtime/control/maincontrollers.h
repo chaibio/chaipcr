@@ -3,6 +3,12 @@
 
 #include "instance.h"
 
+#include "adccontroller.h"
+#include "heatblock.h"
+#include "heatsink.h"
+#include "optics.h"
+#include "lid.h"
+
 class ADCControllerInstance : public Instance<ADCController>
 {
 

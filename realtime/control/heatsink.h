@@ -8,8 +8,7 @@ class Fan;
 class HeatSink : public TemperatureController
 {
 public:
-    HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-             PIDController *pidController, long pidTimerInterval);
+    HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController);
     ~HeatSink();
 
     int targetRPM() const;

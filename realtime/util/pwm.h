@@ -1,6 +1,9 @@
 #ifndef _PWM_H_
 #define _PWM_H_
 
+#include <string>
+#include <atomic>
+
 ////////////////////////////////////////////////////////////////////////////////
 // Class PWMPin
 class PWMPin {
@@ -39,9 +42,7 @@ public:
     inline void setPWMPolarity(unsigned int polarity) { _polarity = polarity; processPWM(); }
 
 protected:
-    inline void processPWM() {
-        _pwm.setPWM(pwmDutyCycle(), pwmPeriod(), pwmPolarity());
-    }
+    inline void processPWM() { _pwm.setPWM(pwmDutyCycle(), pwmPeriod(), pwmPolarity()); }
 
 private:
     PWMPin _pwm;

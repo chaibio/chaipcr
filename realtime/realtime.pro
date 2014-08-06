@@ -27,6 +27,9 @@ LIBS += -lsqlite3
 LIBS += -lsoci_core
 LIBS += -lsoci_sqlite3
 
+#Ignore Boost warnings
+QMAKE_CXXFLAGS += -Wno-unused-local-typedefs -Wno-unused-parameter -Wno-unused-but-set-parameter
+
 unix:!unix_m {
     QMAKE_CC = arm-unknown-linux-gnueabi-gcc
     QMAKE_CXX = arm-unknown-linux-gnueabi-g++
@@ -45,7 +48,7 @@ unix_m: {
     QMAKE_CXX = arm-unknown-linux-gnueabi-g++
     QMAKE_LINK = arm-unknown-linux-gnueabi-g++
 
-    QMAKE_CXXFLAGS += -mfloat-abi=hard -Wno-unused-local-typedefs
+    QMAKE_CXXFLAGS += -mfloat-abi=hard
 
     INCLUDEPATH += /opt/local/include/
 
@@ -79,8 +82,6 @@ HEADERS += \
     control/icontrol.h \
     control/maincontrollers.h \
     app/qpcrapplication.h \
-    app/boostincludes.h \
-    app/pocoincludes.h \
     util/utilincludes.h \
     control/controlincludes.h \
     util/pid.h \
@@ -153,7 +154,6 @@ SOURCES += \
     app/experimentcontroller.cpp \
     test/apptest.cpp \
     test/controltest.cpp \
-    control/adcconsumer.cpp \
     util/filters.cpp \
     db/settings.cpp \
     server/settingshandler.cpp

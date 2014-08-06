@@ -3,6 +3,9 @@
 
 #include "adcconsumer.h"
 
+#include <atomic>
+#include <boost/signals2.hpp>
+
 // Class Thermistor
 class Thermistor: public ADCConsumer {
 public:
@@ -14,6 +17,7 @@ public:
 
     //ADCConsumer
     void setADCValues(unsigned int differentialADCValue, unsigned int singularADCValue) override;
+    boost::signals2::signal<void()> adcValueChanged;
 
 protected:
     virtual double temperatureForResistance(double resistanceOhms) = 0;

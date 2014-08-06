@@ -1,5 +1,4 @@
-#include "pcrincludes.h"
-#include "pocoincludes.h"
+#include <boost/date_time.hpp>
 
 #include "pid.h"
 
@@ -14,12 +13,9 @@ PIDController::PIDController(const std::vector<SPIDTuning>& pGainSchedule, int m
     _maxOutput {maxOutput},
     _previousProcessValue {0},
     _integratorS {0} {
-
-    lock = new Poco::RWLock;
 }
 //------------------------------------------------------------------------------
 PIDController::~PIDController() {
-    delete lock;
 }
 //------------------------------------------------------------------------------
 double PIDController::compute(double setpoint, double processValue) {
@@ -32,7 +28,7 @@ double PIDController::compute(double setpoint, double processValue) {
     time_duration executionDuration = currentExecutionTime - _previousExecutionTime;
     double executionDurationS = executionDuration.total_microseconds() / 1000000;
 
-    lock->writeLock();
+    lock.writeLock();
 
     //non-interactive PID algorithm
     double filteredProcessValue = _processValueFilter.processSample(processValue);
@@ -48,7 +44,7 @@ double PIDController::compute(double setpoint, double processValue) {
     _previousProcessValue = filteredProcessValue;
     _previousExecutionTime = currentExecutionTime;
 
-    lock->unlock();
+    lock.unlock();
 
     return output;
 }
@@ -75,7 +71,7 @@ bool PIDController::latchValue(double* value, double minValue, double maxValue) 
 }
 
 /*--------------------------------------------PIDControl--------------------------------------------*/
-PIDControl::PIDControl(PIDController *pidController, long pidTimerInterval) {
+/*PIDControl::PIDControl(PIDController *pidController, long pidTimerInterval) {
     _pidController = pidController;
     _pidResult.store(0);
     _pidTimerInterval = pidTimerInterval;
@@ -110,4 +106,4 @@ void PIDControl::pidCallback(Poco::Timer &) {
 
         pidCallback(result);
     }
-}
+}*/

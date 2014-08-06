@@ -3,6 +3,11 @@
 
 #include "icontrol.h"
 
+#include "spi.h"
+
+#include <vector>
+#include <memory>
+
 class LTC2444;
 class ADCConsumer;
 

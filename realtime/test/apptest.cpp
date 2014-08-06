@@ -1,7 +1,5 @@
 #ifdef TEST_BUILD
 
-#include "pcrincludes.h"
-
 #include "apptest.h"
 
 AppTest::AppTest()

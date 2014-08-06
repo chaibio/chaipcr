@@ -1,3 +1,5 @@
+#include <string>
+
 #include "pcrincludes.h"
 
 using namespace std;

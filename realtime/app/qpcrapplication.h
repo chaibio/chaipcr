@@ -3,6 +3,9 @@
 
 #include <Poco/Util/ServerApplication.h>
 
+#include <atomic>
+#include <memory>
+
 class IControl;
 class ExperimentController;
 
@@ -25,10 +28,10 @@ protected:
 private:
     static QPCRApplication *_instance;
 
+    std::atomic<bool> _workState;
+
     std::vector<std::shared_ptr<IControl>> _controlUnits;
     std::shared_ptr<ExperimentController> _experimentController;
-
-    std::atomic<bool> _workState;
 };
 
 #define qpcrApp QPCRApplication::getInstance()

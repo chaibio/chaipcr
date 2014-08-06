@@ -1,7 +1,3 @@
-#include "pcrincludes.h"
-#include "utilincludes.h"
-#include "boostincludes.h"
-
 #include "ltc2444.h"
 #include "adcconsumer.h"
 #include "adccontroller.h"
@@ -12,10 +8,10 @@ using namespace std;
 // Class ADCController
 ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsumers, std::shared_ptr<ADCConsumer> liaConsumer, std::shared_ptr<ADCConsumer> lidConsumer,
                              unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber):
+    _currentConversionState {EReadZone1Differential},
     _zoneConsumers {zoneConsumers},
     _liaConsumer {liaConsumer},
-    _lidConsumer {lidConsumer},
-    _currentConversionState {EReadZone1Differential} {
+    _lidConsumer {lidConsumer} {
 
     _ltc2444 = make_shared<LTC2444>(csPinNumber, std::move(spiPort), busyPinNumber);
     _ltc2444->setup(0x4, false);

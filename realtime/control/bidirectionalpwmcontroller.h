@@ -4,11 +4,12 @@
 #include "temperaturecontroller.h"
 #include "pwm.h"
 
+#include "gpio.h"
+
 class BidirectionalPWMController : public TemperatureController, public PWMControl
 {
 public:
-    BidirectionalPWMController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp,
-                               PIDController *pidController, long pidTimerInterval,
+    BidirectionalPWMController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController,
                                const std::string &pwmPath, unsigned long pwmPeriod, unsigned int heatIOPin, unsigned int coolIOPin);
     ~BidirectionalPWMController();
 
