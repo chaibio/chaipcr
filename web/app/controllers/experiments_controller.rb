@@ -47,7 +47,7 @@ class ExperimentsController < ApplicationController
     end
   end
   
-  api :POST, "/experiment/:id/copy", "Copy an experiment"
+  api :POST, "/experiments/:id/copy", "Copy an experiment"
   see "experiments#create", "json response"
   def copy
     old_experiment = Experiment.find_by_id(params[:id])
@@ -58,7 +58,7 @@ class ExperimentsController < ApplicationController
     end
   end
   
-  api :GET, "/experiment/:id", "Show an experiment"
+  api :GET, "/experiments/:id", "Show an experiment"
   see "experiments#create", "json response"
   def show
     @experiment = Experiment.find_by_id(params[:id]) 
@@ -67,11 +67,11 @@ class ExperimentsController < ApplicationController
     end
   end
   
-  api :GET, "/experiment/:id/status", "Show an experiment running status"
+  api :GET, "/experiments/:id/status", "Show an experiment running status"
   def status
   end
   
-  api :POST, "/experiment/:id/start", "Start an experiment"
+  api :POST, "/experiments/:id/start", "Start an experiment"
   def start
     @experiment = Experiment.find_by_id(params[:id])
     respond_to do |format|
@@ -79,11 +79,11 @@ class ExperimentsController < ApplicationController
     end
   end
   
-  api :POST, "/experiment/:id/stop", "Stop an experiment"
+  api :POST, "/experiments/:id/stop", "Stop an experiment"
   def stop
   end
   
-  api :DELETE, "/experiment/:id", "Destroy an experiment"
+  api :DELETE, "/experiments/:id", "Destroy an experiment"
   def destroy
     @experiment = Experiment.find_by_id(params[:id])
     ret = @experiment.destroy
@@ -92,7 +92,7 @@ class ExperimentsController < ApplicationController
     end
   end
   
-  api :GET, "/experiment/:id/temperature_data?starttime=xx&endtime=xx&resolution=xx", "Retrieve temperature data"
+  api :GET, "/experiments/:id/temperature_data?starttime=xx&endtime=xx&resolution=xx", "Retrieve temperature data"
   param :starttime, Integer, :desc => "0 means start of the experiment, in ms", :required => true
   param :endtime, Integer, :desc => "if not specified, it returns everything to the end of the experiment, in ms"
   param :resolution, Integer, :desc => "Include data points for every x milliseconds. Must be a multiple of 1000 ms"
