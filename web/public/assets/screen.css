@@ -286,7 +286,7 @@
 
 @font-face {
   font-family: "simplifica";
-  src: local("simplifica"), url("assets/SIMPLIFICA Typeface.ttf") format("ttf");
+  src: local("simplifica"), url("simplifica.woff") format("woff");
 }
 
 /* line 276, ../../app/assets/stylesheets/screen.css.scss */
