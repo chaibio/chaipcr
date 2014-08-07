@@ -2,6 +2,7 @@
  * In this file you should write your main styles. (or centralize your imports)
  * Import this file using the following HTML or equivalent:
  * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
+@import url(http://fonts.googleapis.com/css?family=Open+Sans);
 /* line 6, ../../app/assets/stylesheets/screen.css.scss */
 #index-page {
   margin: 0 0 20px 20px;
@@ -289,30 +290,30 @@
   src: local("simplifica"), url("simplifica.woff") format("woff");
 }
 
-/* line 276, ../../app/assets/stylesheets/screen.css.scss */
+/* line 278, ../../app/assets/stylesheets/screen.css.scss */
 .simplifica {
   font-family: "simplifica";
   font-size: 30px;
 }
 
-/* line 280, ../../app/assets/stylesheets/screen.css.scss */
+/* line 282, ../../app/assets/stylesheets/screen.css.scss */
 .sansa {
-  font-family: "Open Sans";
+  font-family: 'Open Sans', sans-serif;
   font-size: 12px;
 }
 
-/* line 286, ../../app/assets/stylesheets/screen.css.scss */
+/* line 288, ../../app/assets/stylesheets/screen.css.scss */
 #container {
   width: 1024px;
 }
 
-/* line 289, ../../app/assets/stylesheets/screen.css.scss */
+/* line 291, ../../app/assets/stylesheets/screen.css.scss */
 .login-wrapper {
   min-height: 500px;
   background-color: wheat;
   padding-top: 5%;
 }
-/* line 294, ../../app/assets/stylesheets/screen.css.scss */
+/* line 296, ../../app/assets/stylesheets/screen.css.scss */
 .login-wrapper .login-box {
   height: 250px;
   width: 300px;
@@ -326,18 +327,18 @@
   -moz-border-radius: 4px;
   border-radius: 4px;
 }
-/* line 307, ../../app/assets/stylesheets/screen.css.scss */
+/* line 309, ../../app/assets/stylesheets/screen.css.scss */
 .login-wrapper .login-box .login-heading {
   width: 100%;
   text-align: center;
   font-weight: bold;
   padding-top: 10px;
 }
-/* line 314, ../../app/assets/stylesheets/screen.css.scss */
+/* line 316, ../../app/assets/stylesheets/screen.css.scss */
 .login-wrapper .login-box .login-credentials {
   width: 300px;
 }
-/* line 317, ../../app/assets/stylesheets/screen.css.scss */
+/* line 319, ../../app/assets/stylesheets/screen.css.scss */
 .login-wrapper .login-box .login-credentials input {
   margin: 30px 0 0 65px;
   text-align: center;
@@ -345,83 +346,83 @@
   -moz-border-radius: 4px;
   border-radius: 4px;
 }
-/* line 324, ../../app/assets/stylesheets/screen.css.scss */
+/* line 326, ../../app/assets/stylesheets/screen.css.scss */
 .login-wrapper .login-box .login-credentials button {
   margin: 30px 0 0 72px;
   width: 150px;
 }
 
-/* line 332, ../../app/assets/stylesheets/screen.css.scss */
+/* line 334, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper {
   width: 1024px;
   height: 768px;
 }
-/* line 336, ../../app/assets/stylesheets/screen.css.scss */
+/* line 338, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing {
   float: left;
   width: 632px;
   height: 400px;
 }
-/* line 341, ../../app/assets/stylesheets/screen.css.scss */
+/* line 343, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content {
   width: 442px;
   margin-top: 61px;
   margin-left: 75px;
 }
-/* line 346, ../../app/assets/stylesheets/screen.css.scss */
+/* line 348, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-logo {
   width: 437px;
   height: 74px;
 }
-/* line 351, ../../app/assets/stylesheets/screen.css.scss */
+/* line 353, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu {
   margin-top: 65px;
   height: 402px;
 }
-/* line 355, ../../app/assets/stylesheets/screen.css.scss */
+/* line 357, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content {
   border-bottom: solid 1px black;
   height: 22px;
 }
-/* line 359, ../../app/assets/stylesheets/screen.css.scss */
+/* line 361, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading {
   height: 100%;
 }
-/* line 362, ../../app/assets/stylesheets/screen.css.scss */
+/* line 364, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .welcome-text {
   width: 200px;
   float: left;
   height: 100%;
 }
-/* line 367, ../../app/assets/stylesheets/screen.css.scss */
+/* line 369, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text {
   width: 150px;
   float: right;
   text-align: right;
   height: 100%;
 }
-/* line 373, ../../app/assets/stylesheets/screen.css.scss */
+/* line 375, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text a {
   color: #00aeef;
   text-decoration: none;
 }
-/* line 377, ../../app/assets/stylesheets/screen.css.scss */
+/* line 379, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text a:hover {
   background-color: white;
 }
-/* line 383, ../../app/assets/stylesheets/screen.css.scss */
+/* line 385, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items {
   padding-top: 20px;
 }
-/* line 386, ../../app/assets/stylesheets/screen.css.scss */
+/* line 388, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item {
   height: 58px;
 }
-/* line 389, ../../app/assets/stylesheets/screen.css.scss */
+/* line 391, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .first-row {
   height: 30px;
 }
-/* line 392, ../../app/assets/stylesheets/screen.css.scss */
+/* line 394, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .first-row .menu-item-image {
   width: 30px;
   height: 30px;
@@ -429,7 +430,7 @@
   background-image: url("smallO.png");
   margin-left: 24px;
 }
-/* line 399, ../../app/assets/stylesheets/screen.css.scss */
+/* line 401, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .first-row .menu-item-text {
   width: 300px;
   float: left;
@@ -437,15 +438,15 @@
   margin-top: 8px;
   font-size: 22px;
 }
-/* line 408, ../../app/assets/stylesheets/screen.css.scss */
+/* line 410, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .second-row {
   height: 28px;
 }
-/* line 411, ../../app/assets/stylesheets/screen.css.scss */
+/* line 413, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .second-row .hand-container {
   width: 100%;
 }
-/* line 414, ../../app/assets/stylesheets/screen.css.scss */
+/* line 416, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .second-row .hand-container .hand {
   width: 6px;
   background-color: black;
@@ -453,15 +454,15 @@
   margin-left: 37px;
   margin-top: 2px;
 }
-/* line 424, ../../app/assets/stylesheets/screen.css.scss */
+/* line 426, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce {
   height: 62px;
 }
-/* line 427, ../../app/assets/stylesheets/screen.css.scss */
+/* line 429, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce .first-row {
   height: 30px;
 }
-/* line 430, ../../app/assets/stylesheets/screen.css.scss */
+/* line 432, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce .first-row .menu-item-image {
   width: 30px;
   height: 30px;
@@ -469,7 +470,7 @@
   background-image: url("smallO.png");
   margin-left: 24px;
 }
-/* line 437, ../../app/assets/stylesheets/screen.css.scss */
+/* line 439, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce .first-row .menu-item-text {
   width: 300px;
   float: left;
@@ -477,15 +478,15 @@
   margin-top: 8px;
   font-size: 22px;
 }
-/* line 446, ../../app/assets/stylesheets/screen.css.scss */
+/* line 448, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce .second-row {
   height: 32px;
 }
-/* line 449, ../../app/assets/stylesheets/screen.css.scss */
+/* line 451, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce .second-row .hand-container {
   width: 100%;
 }
-/* line 452, ../../app/assets/stylesheets/screen.css.scss */
+/* line 454, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce .second-row .hand-container .hand {
   width: 6px;
   background-color: black;
@@ -493,16 +494,16 @@
   margin-left: 37px;
   margin-top: 2px;
 }
-/* line 462, ../../app/assets/stylesheets/screen.css.scss */
+/* line 464, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce {
   height: 107px;
   margin-top: 14px;
 }
-/* line 465, ../../app/assets/stylesheets/screen.css.scss */
+/* line 467, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row {
   height: 60px;
 }
-/* line 468, ../../app/assets/stylesheets/screen.css.scss */
+/* line 470, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row .menu-item-image {
   width: 60px;
   height: 60px;
@@ -510,7 +511,7 @@
   background-image: url("bigO.png");
   margin-left: 11px;
 }
-/* line 475, ../../app/assets/stylesheets/screen.css.scss */
+/* line 477, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row .menu-item-text {
   width: 300px;
   float: left;
@@ -519,15 +520,15 @@
   font-size: 30px;
   cursor: pointer;
 }
-/* line 485, ../../app/assets/stylesheets/screen.css.scss */
+/* line 487, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row {
   height: 32px;
 }
-/* line 488, ../../app/assets/stylesheets/screen.css.scss */
+/* line 490, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row .hand-container {
   width: 100%;
 }
-/* line 491, ../../app/assets/stylesheets/screen.css.scss */
+/* line 493, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row .hand-container .hand {
   width: 6px;
   background-color: black;
@@ -535,63 +536,63 @@
   margin-left: 37px;
   margin-top: 5px;
 }
-/* line 507, ../../app/assets/stylesheets/screen.css.scss */
+/* line 509, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container {
   width: 442px;
   height: 110px;
   font-size: 14px;
 }
-/* line 514, ../../app/assets/stylesheets/screen.css.scss */
+/* line 516, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-in-progress-heading {
   border-bottom: solid 2px #001827;
 }
-/* line 517, ../../app/assets/stylesheets/screen.css.scss */
+/* line 519, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info {
   height: 80px;
   padding-top: 25px;
 }
-/* line 521, ../../app/assets/stylesheets/screen.css.scss */
+/* line 523, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info div {
   float: left;
 }
-/* line 525, ../../app/assets/stylesheets/screen.css.scss */
+/* line 527, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info .caption {
   font-weight: bold;
   margin-bottom: 5px;
 }
-/* line 529, ../../app/assets/stylesheets/screen.css.scss */
+/* line 531, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info .experiment-info-test {
   width: 280px;
 }
-/* line 534, ../../app/assets/stylesheets/screen.css.scss */
+/* line 536, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-progress-bar {
   height: 5px;
   background-color: black;
 }
-/* line 538, ../../app/assets/stylesheets/screen.css.scss */
+/* line 540, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-progress-bar .progress-bar {
   background-color: #00aeef;
   height: 5px;
   width: 0px;
 }
-/* line 549, ../../app/assets/stylesheets/screen.css.scss */
+/* line 551, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing {
   float: left;
   width: 341px;
   padding-top: 54px;
 }
-/* line 557, ../../app/assets/stylesheets/screen.css.scss */
+/* line 559, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading {
   border-bottom: solid 1px #001827;
   height: 20px;
 }
-/* line 561, ../../app/assets/stylesheets/screen.css.scss */
+/* line 563, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading .text {
   float: left;
   width: 200px;
   font-size: 14px;
 }
-/* line 566, ../../app/assets/stylesheets/screen.css.scss */
+/* line 568, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading .dots {
   float: right;
   color: orange;
@@ -599,56 +600,56 @@
   font-size: 14px;
   cursor: pointer;
 }
-/* line 574, ../../app/assets/stylesheets/screen.css.scss */
+/* line 576, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments {
   height: 680px;
   overflow: scroll;
   padding-top: 21px;
 }
-/* line 579, ../../app/assets/stylesheets/screen.css.scss */
+/* line 581, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment {
   height: 72px;
 }
-/* line 582, ../../app/assets/stylesheets/screen.css.scss */
+/* line 584, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row {
   height: 30px;
 }
-/* line 585, ../../app/assets/stylesheets/screen.css.scss */
+/* line 587, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row div {
   float: left;
 }
-/* line 588, ../../app/assets/stylesheets/screen.css.scss */
+/* line 590, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .image {
   background-image: url("smallblackO.png");
   width: 30px;
   height: 30px;
 }
-/* line 593, ../../app/assets/stylesheets/screen.css.scss */
+/* line 595, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .image-red {
   background-image: url("smallredO.png");
   width: 30px;
   height: 30px;
 }
-/* line 598, ../../app/assets/stylesheets/screen.css.scss */
+/* line 600, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .text {
   margin-left: 15px;
   margin-top: 8px;
   cursor: pointer;
 }
-/* line 604, ../../app/assets/stylesheets/screen.css.scss */
+/* line 606, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row {
   height: 42px;
 }
-/* line 607, ../../app/assets/stylesheets/screen.css.scss */
+/* line 609, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row div {
   float: left;
 }
-/* line 610, ../../app/assets/stylesheets/screen.css.scss */
+/* line 612, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .hand-container {
   width: 45px;
   height: 42px;
 }
-/* line 614, ../../app/assets/stylesheets/screen.css.scss */
+/* line 616, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .hand-container .hand {
   width: 6px;
   min-height: 32px;
@@ -657,11 +658,11 @@
   margin-top: 5px;
   cursor: pointer;
 }
-/* line 623, ../../app/assets/stylesheets/screen.css.scss */
+/* line 625, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .more-info {
   font-size: 14px;
 }
-/* line 627, ../../app/assets/stylesheets/screen.css.scss */
+/* line 629, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box {
   position: relative;
   height: 45px;
@@ -679,18 +680,18 @@
   border: solid 1px #a61300;
   font-size: 14px;
 }
-/* line 644, ../../app/assets/stylesheets/screen.css.scss */
+/* line 646, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box button {
   font-size: 12px;
   width: 40px;
   height: 22px;
   margin-top: 2px;
 }
-/* line 651, ../../app/assets/stylesheets/screen.css.scss */
+/* line 653, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box .no-delete {
   color: #00aeef;
 }
-/* line 654, ../../app/assets/stylesheets/screen.css.scss */
+/* line 656, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box .yes-delete {
   color: #a61300;
 }

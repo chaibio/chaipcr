@@ -273,12 +273,14 @@
 		font-family: "simplifica";
 		src: local('simplifica'), url("simplifica.woff") format('woff');
 }
+@import url(http://fonts.googleapis.com/css?family=Open+Sans);
+
 .simplifica {
 	font-family: "simplifica";
 	font-size: 30px;
 }
 .sansa {
-	font-family: "Open Sans";
+	font-family: 'Open Sans', sans-serif;
 	font-size: 12px;
 }
 
