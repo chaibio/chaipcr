@@ -64,7 +64,7 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 
 	yesDelete: () ->
 		#@console.log @
-		@model.destroy()
+		@model.perish()
 		callBack = () -> # Defining a local call back to pass to animate
 			@.remove()
 

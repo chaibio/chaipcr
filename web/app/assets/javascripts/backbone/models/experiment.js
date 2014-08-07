@@ -42,7 +42,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		}
 	},
 
-	destroy: function() {
+	perish: function() {
 		var data = this.get("experiment");
 		$.ajax({
 			url: "/experiment/"+data["id"],
