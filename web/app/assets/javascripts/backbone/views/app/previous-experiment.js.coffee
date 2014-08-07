@@ -67,6 +67,7 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 		@model.perish()
 		callBack = () -> # Defining a local call back to pass to animate
 			@.remove()
+			$(".hand:last").hide("slow")
 
 		action = 
 			height: "0px"

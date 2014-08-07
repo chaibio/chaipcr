@@ -46,10 +46,11 @@ class ChaiBioTech.app.Views.previousExperiments extends Backbone.View
 				parent: this
 				model: exp
 
-			experiment = new ChaiBioTech.app.Views.experiment(data)
-			@allExpDiv.prepend(experiment.render().el)
-		@allExpDiv.find(".loading").remove()
+			@experiment = new ChaiBioTech.app.Views.experiment(data)
+			@allExpDiv.prepend(@experiment.render().el)
 
+		@allExpDiv.find(".loading").remove()
+		$(".hand:last").hide()
 	loadPreviousExperiments: () ->
 		# Bring All the experiments from database
 		@experimentCollection.fetch({success: @getPreviousExperiment})
