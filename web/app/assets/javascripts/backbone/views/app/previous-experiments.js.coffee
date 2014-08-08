@@ -41,13 +41,14 @@ class ChaiBioTech.app.Views.previousExperiments extends Backbone.View
 	getPreviousExperiment: (coll, respo) ->
 		# Invoked when we successfully fetch all the experiment data
 		# Creates single experiments and added to the Dom
+		coll.models = coll.models.reverse()
 		for exp in coll.models
 			data = 
 				parent: this
 				model: exp
 
 			@experiment = new ChaiBioTech.app.Views.experiment(data)
-			@allExpDiv.prepend(@experiment.render().el)
+			@allExpDiv.append(@experiment.render().el)
 
 		@allExpDiv.find(".loading").remove()
 		$(".hand:last").hide()
