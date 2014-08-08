@@ -1,6 +1,6 @@
 class Experiment < ActiveRecord::Base
   has_one :protocol, dependent: :destroy
-  has_many :temperature_logs, -> {order("elapsed_time")}, dependent: :destroy do
+  has_many :temperature_logs, -> {order("elapsed_time")} do
     def with_range(starttime, endtime, resolution)
       results = where("elapsed_time >= ?", starttime)
       if !endtime.blank?
@@ -39,6 +39,11 @@ class Experiment < ActiveRecord::Base
     
     #testdata
     TemperatureLog.testdata(experiment.id)
+  end
+  
+  after_destroy do |experiment|
+    TemperatureLog.delete_all(:experiment_id => experiment.id)
+    TemperatureDebugLog.delete_all(:experiment_id => experiment.id)
   end
   
   def copy(params)
