@@ -46,6 +46,7 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 			$(@el).find(".confirm-box").hide("slow");
 
 	render: () ->
+		console.log @model.get("experiment")
 		data =
 			"name": @model.get("experiment").name
 
