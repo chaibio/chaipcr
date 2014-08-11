@@ -76,23 +76,25 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 		return "#{hours}:#{minutes}#{ampm}"
 
 	formatDate: () ->
+		val = @model.get("experiment").completed_at || @model.get("experiment").created_at
+		timeVar = val.split("T")
+		date = timeVar[0]
+		time = timeVar[1].substr(0,5)
+		@year = @getYear(date)
+		@month = @getMonth(date)
+		@date = @getDate(date)
+		experimentTimeStamp = Date.parse("#{@year}/#{@month}/#{@date}")
+		
 		if @model.get("experiment").completed_at
-			val = @model.get("experiment").completed_at
-			timeVar = val.split("T")
-			date = timeVar[0]
-			time = timeVar[1].substr(0,5)
-			experimentTimeStamp = Date.parse("#{@getYear(date)}/#{@getMonth(date)}/#{@getDate(date)}")
+
 			if experimentTimeStamp is @todayTimeStamp
 				return "RUN TODAY, #{@formatTime(time)}"
 			else if @todayTimeStamp - experimentTimeStamp is 86400000 #86400000 no of seconds in a day
 				return "RUN YESTERDAY, #{@formatTime(time)}"
 			return "RUN #{@getMonth(date, "text")} #{@getDate(date)}, #{@formatTime(time)}"
+
 		else if @model.get("experiment").created_at
-			val = @model.get("experiment").created_at
-			timeVar = val.split("T")
-			date = timeVar[0]
-			time = timeVar[1].substr(0,5)
-			experimentTimeStamp = Date.parse("#{@getYear(date)}/#{@getMonth(date)}/#{@getDate(date)}")
+
 			if experimentTimeStamp is @todayTimeStamp
 				return "CREATED TODAY, #{@formatTime(time)}"
 			else if @todayTimeStamp - experimentTimeStamp is 86400000 #86400000 no of seconds in a day

@@ -8,6 +8,10 @@ class ChaiBioTech.app.Views.previousExperiments extends Backbone.View
 
 	allExpDiv: ""
 
+	tempYear: ""
+
+	tempMonth: ""
+
 	deleteSwitch: false
 
 	deleteSwitchOn:
@@ -49,9 +53,16 @@ class ChaiBioTech.app.Views.previousExperiments extends Backbone.View
 
 			@experiment = new ChaiBioTech.app.Views.experiment(data)
 			@allExpDiv.append(@experiment.render().el)
+			
+			if @tempMonth isnt @experiment.month || @tempYear isnt @experiment.year
+				$(@experiment.el).find('.dotordate').html("#{@experiment.Months[@experiment.month]} #{@experiment.year}")
+				.css("width", "70px")
+				@tempMonth = @experiment.month
+				@tempYear = @experiment.year
 
 		@allExpDiv.find(".loading").remove()
 		$(".hand:last").hide()
+	
 	loadPreviousExperiments: () ->
 		# Bring All the experiments from database
 		@experimentCollection.fetch({success: @getPreviousExperiment})
