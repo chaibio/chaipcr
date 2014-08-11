@@ -105,7 +105,7 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 		if text then return @Months[month - 1] else return month - 1
 
 	getDate: (date) ->
-		return parseInt(date.substr(9,2))
+		return parseInt(date.substr(8,2))
 
 	getYear: (date) ->
 		return parseInt(date.substr(0,4))
