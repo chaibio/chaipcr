@@ -274,11 +274,6 @@ label{
 	width: 980px;
 	margin: 0px auto;
 	padding: 0px;
-	box-shadow: 0 0 8px #cbcbcb;
-	-moz-box-shadow: 0 0 8px #cbcbcb;
-	-webkit-box-shadow: 0 0 8px #cbcbcb;
-	border-bottom-left-radius: 8px;
-	border-bottom-right-radius: 8px;
 }
 
 #maincontent{
