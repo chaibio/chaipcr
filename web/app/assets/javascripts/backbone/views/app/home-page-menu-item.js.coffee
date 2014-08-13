@@ -8,12 +8,15 @@ class ChaiBioTech.app.Views.homePageMenuItem extends Backbone.View
 
 	bounced: false
 
+	originalHeight: 50
+
 	events :
 		"mouseenter .first-row": "bounce" # When mouse enter
 		"mouseleave .first-row": "bounceBack" # When mouse leaves
 	
 	initialize: () ->
 		#Menu Item comes alive here
+		console.log "Menu Item", @
 
 	render: () -> 
 		data = 
@@ -22,26 +25,35 @@ class ChaiBioTech.app.Views.homePageMenuItem extends Backbone.View
 		$(@el).html(@template(data))
 		return this;
 
+	bounceWithValue: (value) ->
+		$(@el).css("height", "#{@originalHeight + value}px");
+		@goNext(this, value / 2)
+		@goPrevious(this, value / 2)
+
+	goNext: (tempThis, value) ->
+		if tempThis.next
+			tempVal = tempThis.next
+			$(tempVal.el).css("height", "#{@originalHeight + value}px")
+			tempVal.goNext(tempVal, value / 2)
+
+	goPrevious: (tempThis, value) ->
+		if tempThis.previous
+			tempVal = tempThis.previous
+			$(tempVal.el).css("height", "#{@originalHeight + value}px")
+			tempVal.goPrevious(tempVal, value / 2)
+
+	bounceBackWithValue: (@value) ->
+		height = $(@el).height()
+		$(@el).css("height", "#{@originalHeight - value}px")
+		if @.previous
+			@.previous.bounceWithValue(value / 2)
+	
 	bounce: () ->
-		if not @bounced
-			$(@el).switchClass("menu-item", "menu-item-bounce", 5)
-			@bounced = true
-			# We change classes so that all within changes
-			# If not the first entry in the menu list we have to adjust for the entry above too
-			if @options.previousItem?
-				previousMenuItem = @options.previousItem
-				$(previousMenuItem.el).switchClass("menu-item", "menu-item-previous-bounce", 5)
+		@bounceWithValue(50)
 			
 
 	bounceBack: () ->
-		if @bounced
-			$(@el).switchClass("menu-item-bounce", "menu-item", 5)
-			@bounced = false
-			# Revert the class to original
-			# If not the first entry in the menu list we have to adjust for the entry above too
-			if @options.previousItem?
-				previousMenuItem = @options.previousItem
-				$(previousMenuItem.el).switchClass("menu-item-previous-bounce", "menu-item", 5)
+		#@bounceBackWithValue(50)
 
 		
 		
