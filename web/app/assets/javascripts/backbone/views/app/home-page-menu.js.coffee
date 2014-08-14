@@ -8,9 +8,6 @@ class ChaiBioTech.app.Views.homePageMenu extends Backbone.View
 		
 	menuItems: ["NEW EXPERIMENT", "RUN A KIT", "SETTINGS"]
 
-	events :
-		"mouseleave": "render"
-
 	initialize: () ->
 		#Initialize
 

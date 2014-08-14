@@ -8,7 +8,7 @@ class ChaiBioTech.app.Views.homePageMenuItem extends Backbone.View
 
 	bounced: false
 
-	originalHeight: 50
+	originalHeight: 58
 
 	events :
 		"mouseenter .first-row": "bounce" # When mouse enter
@@ -16,7 +16,7 @@ class ChaiBioTech.app.Views.homePageMenuItem extends Backbone.View
 	
 	initialize: () ->
 		#Menu Item comes alive here
-		console.log "Menu Item", @
+		#console.log "Menu Item", @
 
 	render: () -> 
 		data = 
@@ -25,22 +25,26 @@ class ChaiBioTech.app.Views.homePageMenuItem extends Backbone.View
 		$(@el).html(@template(data))
 		return this;
 
-	bounceWithValue: (value) ->
-		$(@el).css("height", "#{@originalHeight + value}px");
-		@goNext(this, value / 2)
-		@goPrevious(this, value / 2)
+	bounceWithValue: (value, valueOfHand) ->
+		$(@el).css("height", "#{@originalHeight + value}px")
+		$(@el).find(".hand").css("height", "#{22 + valueOfHand}px")
+		console.log $(@el).find(".hand").css("height")
+		@goNext(this, value / 2, valueOfHand / 2)
+		@goPrevious(this, value / 2, valueOfHand / 2)
 
-	goNext: (tempThis, value) ->
+	goNext: (tempThis, value, valueOfHand) ->
 		if tempThis.next
 			tempVal = tempThis.next
 			$(tempVal.el).css("height", "#{@originalHeight + value}px")
-			tempVal.goNext(tempVal, value / 2)
+			$(tempVal.el).find(".hand").css("height", "#{22 + valueOfHand}px")
+			tempVal.goNext(tempVal, value / 2, valueOfHand / 2)
 
-	goPrevious: (tempThis, value) ->
+	goPrevious: (tempThis, value, valueOfHand) ->
 		if tempThis.previous
 			tempVal = tempThis.previous
 			$(tempVal.el).css("height", "#{@originalHeight + value}px")
-			tempVal.goPrevious(tempVal, value / 2)
+			$(tempVal.el).find(".hand").css("height", "#{22 + valueOfHand}px")
+			tempVal.goPrevious(tempVal, value / 2, valueOfHand / 2)
 
 	bounceBackWithValue: (@value) ->
 		height = $(@el).height()
@@ -48,12 +52,11 @@ class ChaiBioTech.app.Views.homePageMenuItem extends Backbone.View
 		if @.previous
 			@.previous.bounceWithValue(value / 2)
 	
-	bounce: () ->
-		@bounceWithValue(50)
-			
+	bounce: (e) ->
+		$(@el).find(".menu-item-text").css("font-weight", "bold")
 
 	bounceBack: () ->
-		#@bounceBackWithValue(50)
+		$(@el).find(".menu-item-text").css("font-weight", "normal")
 
 		
 		
