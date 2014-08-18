@@ -456,55 +456,14 @@
   margin-top: 2px;
 }
 /* line 427, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce {
-  height: 62px;
-}
-/* line 430, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce .first-row {
-  height: 30px;
-}
-/* line 433, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce .first-row .menu-item-image {
-  width: 30px;
-  height: 30px;
-  float: left;
-  background-image: url("smallO.png");
-  margin-left: 24px;
-}
-/* line 440, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce .first-row .menu-item-text {
-  width: 300px;
-  float: left;
-  margin-left: 12px;
-  margin-top: 8px;
-  font-size: 22px;
-}
-/* line 449, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce .second-row {
-  height: 32px;
-}
-/* line 452, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce .second-row .hand-container {
-  width: 100%;
-}
-/* line 455, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-previous-bounce .second-row .hand-container .hand {
-  width: 6px;
-  background-color: black;
-  height: 32px;
-  margin-left: 37px;
-  margin-top: 2px;
-}
-/* line 465, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce {
   height: 107px;
-  margin-top: 14px;
 }
-/* line 468, ../../app/assets/stylesheets/screen.css.scss */
+/* line 430, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row {
   height: 60px;
 }
-/* line 471, ../../app/assets/stylesheets/screen.css.scss */
+/* line 433, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row .menu-item-image {
   width: 60px;
   height: 60px;
@@ -512,7 +471,7 @@
   background-image: url("bigO.png");
   margin-left: 11px;
 }
-/* line 478, ../../app/assets/stylesheets/screen.css.scss */
+/* line 440, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row .menu-item-text {
   width: 300px;
   float: left;
@@ -521,15 +480,15 @@
   font-size: 30px;
   cursor: pointer;
 }
-/* line 488, ../../app/assets/stylesheets/screen.css.scss */
+/* line 450, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row {
   height: 32px;
 }
-/* line 491, ../../app/assets/stylesheets/screen.css.scss */
+/* line 453, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row .hand-container {
   width: 100%;
 }
-/* line 494, ../../app/assets/stylesheets/screen.css.scss */
+/* line 456, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row .hand-container .hand {
   width: 6px;
   background-color: black;
@@ -537,63 +496,63 @@
   margin-left: 37px;
   margin-top: 5px;
 }
-/* line 510, ../../app/assets/stylesheets/screen.css.scss */
+/* line 472, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container {
   width: 442px;
   height: 110px;
   font-size: 14px;
 }
-/* line 517, ../../app/assets/stylesheets/screen.css.scss */
+/* line 479, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-in-progress-heading {
   border-bottom: solid 2px #001827;
 }
-/* line 520, ../../app/assets/stylesheets/screen.css.scss */
+/* line 482, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info {
   height: 80px;
   padding-top: 25px;
 }
-/* line 524, ../../app/assets/stylesheets/screen.css.scss */
+/* line 486, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info div {
   float: left;
 }
-/* line 528, ../../app/assets/stylesheets/screen.css.scss */
+/* line 490, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info .caption {
   font-weight: bold;
   margin-bottom: 5px;
 }
-/* line 532, ../../app/assets/stylesheets/screen.css.scss */
+/* line 494, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info .experiment-info-test {
   width: 280px;
 }
-/* line 537, ../../app/assets/stylesheets/screen.css.scss */
+/* line 499, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-progress-bar {
   height: 5px;
   background-color: black;
 }
-/* line 541, ../../app/assets/stylesheets/screen.css.scss */
+/* line 503, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-progress-bar .progress-bar {
   background-color: #00aeef;
   height: 5px;
   width: 0px;
 }
-/* line 552, ../../app/assets/stylesheets/screen.css.scss */
+/* line 514, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing {
   float: left;
   width: 341px;
   padding-top: 54px;
 }
-/* line 560, ../../app/assets/stylesheets/screen.css.scss */
+/* line 522, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading {
   border-bottom: solid 1px #001827;
   height: 20px;
 }
-/* line 564, ../../app/assets/stylesheets/screen.css.scss */
+/* line 526, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading .text {
   float: left;
   width: 200px;
   font-size: 14px;
 }
-/* line 569, ../../app/assets/stylesheets/screen.css.scss */
+/* line 531, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading .dots {
   float: right;
   color: orange;
@@ -601,31 +560,31 @@
   font-size: 14px;
   cursor: pointer;
 }
-/* line 577, ../../app/assets/stylesheets/screen.css.scss */
+/* line 539, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments {
   height: 680px;
   overflow: scroll;
   padding-top: 21px;
 }
-/* line 582, ../../app/assets/stylesheets/screen.css.scss */
+/* line 544, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment {
   height: 72px;
 }
-/* line 585, ../../app/assets/stylesheets/screen.css.scss */
+/* line 547, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row {
   height: 30px;
 }
-/* line 588, ../../app/assets/stylesheets/screen.css.scss */
+/* line 550, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row div {
   float: left;
 }
-/* line 591, ../../app/assets/stylesheets/screen.css.scss */
+/* line 553, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .image {
   background-image: url("smallblackO.png");
   width: 30px;
   height: 30px;
 }
-/* line 596, ../../app/assets/stylesheets/screen.css.scss */
+/* line 558, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .dotordate {
   float: right;
   height: 30px;
@@ -634,7 +593,7 @@
   text-align: center;
   color: #00aeef;
 }
-/* line 604, ../../app/assets/stylesheets/screen.css.scss */
+/* line 566, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .ball {
   width: 8px;
   height: 8px;
@@ -645,32 +604,32 @@
   margin-top: 8px;
   margin-left: 10px;
 }
-/* line 614, ../../app/assets/stylesheets/screen.css.scss */
+/* line 576, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .image-red {
   background-image: url("smallredO.png");
   width: 30px;
   height: 30px;
 }
-/* line 619, ../../app/assets/stylesheets/screen.css.scss */
+/* line 581, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .text {
   margin-left: 15px;
   margin-top: 8px;
   cursor: pointer;
 }
-/* line 625, ../../app/assets/stylesheets/screen.css.scss */
+/* line 587, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row {
   height: 42px;
 }
-/* line 628, ../../app/assets/stylesheets/screen.css.scss */
+/* line 590, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row div {
   float: left;
 }
-/* line 631, ../../app/assets/stylesheets/screen.css.scss */
+/* line 593, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .hand-container {
   width: 45px;
   height: 42px;
 }
-/* line 635, ../../app/assets/stylesheets/screen.css.scss */
+/* line 597, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .hand-container .hand {
   width: 6px;
   min-height: 32px;
@@ -679,13 +638,13 @@
   margin-top: 5px;
   cursor: pointer;
 }
-/* line 644, ../../app/assets/stylesheets/screen.css.scss */
+/* line 606, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .dotor {
   float: right;
   height: 30px;
   width: 50px;
 }
-/* line 649, ../../app/assets/stylesheets/screen.css.scss */
+/* line 611, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .ball {
   width: 8px;
   height: 8px;
@@ -696,11 +655,11 @@
   margin-top: 5px;
   margin-left: 10px;
 }
-/* line 659, ../../app/assets/stylesheets/screen.css.scss */
+/* line 621, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .more-info {
   font-size: 14px;
 }
-/* line 663, ../../app/assets/stylesheets/screen.css.scss */
+/* line 625, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box {
   position: relative;
   height: 45px;
@@ -718,18 +677,18 @@
   border: solid 1px #a61300;
   font-size: 14px;
 }
-/* line 680, ../../app/assets/stylesheets/screen.css.scss */
+/* line 642, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box button {
   font-size: 12px;
   width: 40px;
   height: 22px;
   margin-top: 2px;
 }
-/* line 687, ../../app/assets/stylesheets/screen.css.scss */
+/* line 649, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box .no-delete {
   color: #00aeef;
 }
-/* line 690, ../../app/assets/stylesheets/screen.css.scss */
+/* line 652, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box .yes-delete {
   color: #a61300;
 }
