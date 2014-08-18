@@ -27,6 +27,12 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 	readyToDeleteFalseHand:
 		backgroundColor: "#00aeef"
 
+	goBlue:
+		color: "#00aeef"
+
+	goBlack:
+		color:  "#000"
+
 	readyToDelete: false
 
 	events: 
@@ -46,9 +52,11 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 		if @readyToDelete is true
 			@image.css(@readyToDeleteTrueImage)
 			@hand.css(@readyToDeleteTrueHand)
+			@create.css(@goBlue)
 		else
 			@image.css(@readyToDeleteFalseImage)
 			@hand.css(@readyToDeleteFalseHand)
+			@create.css(@goBlack)
 			$(@el).find(".confirm-box").hide("slow");
 
 	render: () ->
@@ -60,6 +68,7 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 		$(@el).html(@template(data))
 		@image = $(@el).find(".image")
 		@hand = $(@el).find(".hand")
+		@create =  $(@el).find(".created-text")
 		return this
 
 	formatTime: (time) ->
@@ -96,10 +105,10 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 		else if @model.get("experiment").created_at
 
 			if experimentTimeStamp is @todayTimeStamp
-				return "CREATED TODAY, #{@formatTime(time)}"
+				return "<span class='created-text'>CREATED</span> TODAY, #{@formatTime(time)}"
 			else if @todayTimeStamp - experimentTimeStamp is 86400000 #86400000 no of seconds in a day
-				return "CREATED YESTERDAY, #{@formatTime(time)}"
-			return "CREATED #{@getMonth(date, "text")} #{@getDate(date)}, #{@formatTime(time)}"
+				return "<span class='created-text'>CREATED</span> YESTERDAY, #{@formatTime(time)}"
+			return "<span class='created-text'>CREATED</span> #{@getMonth(date, "text")} #{@getDate(date)}, #{@formatTime(time)}"
 
 
 	getMonth: (date, text) ->
