@@ -2,6 +2,7 @@
 #define QPCRFACTORY_H
 
 class IControl;
+class IThreadControl;
 class SPIPort;
 class ADCConsumer;
 
@@ -11,7 +12,7 @@ class ADCConsumer;
 // Class QPCRFactory
 class QPCRFactory {
 public:
-    static std::vector<std::shared_ptr<IControl>> constructMachine();
+    static void constructMachine(std::vector<std::shared_ptr<IControl>> &controls, std::vector<std::shared_ptr<IThreadControl>> &threadControls);
 
 private:
     static std::shared_ptr<IControl> constructOptics(std::shared_ptr<SPIPort> ledSPIPort);

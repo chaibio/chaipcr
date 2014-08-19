@@ -12,8 +12,9 @@ ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsu
     _zoneConsumers {zoneConsumers},
     _liaConsumer {liaConsumer},
     _lidConsumer {lidConsumer} {
+    _workState = false;
 
-    _ltc2444 = make_shared<LTC2444>(csPinNumber, std::move(spiPort), busyPinNumber);
+    _ltc2444 = new LTC2444(csPinNumber, std::move(spiPort), busyPinNumber);
     _ltc2444->setup(0x4, false);
 
     //start first read
@@ -21,60 +22,74 @@ ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsu
 }
 
 ADCController::~ADCController() {
+    stop();
+    join();
+
+    delete _ltc2444;
 }
 
 void ADCController::process() {
-    if (_ltc2444->busy())
-        return;
+    _workState = true;
+    while (_workState) {
+        if (_ltc2444->waitBusy())
+            continue;
 
-    uint32_t value;
-    /*switch (nextState()) {
-    case EReadZone1Differential:
-        value = _ltc2444->readDifferentialChannels(0, true);
-        break;
-    case EReadZone1Singular:
-        value = _ltc2444->readSingleEndedChannel(4);
-        break;
-    case EReadZone2Differential:
-        value = _ltc2444->readDifferentialChannels(2, true);
-        break;
-    case EReadZone2Singular:
-        value = _ltc2444->readSingleEndedChannel(5);
-        break;
-    case EReadLIA:
-        value = _ltc2444->readSingleEndedChannel(6);
-        break;
-    case EReadLid:*/
-        value = _ltc2444->readSingleEndedChannel(7);
-        /*break;
-    default:
-        assert(false);
-    }*/
+        //if (_ltc2444->busy())
+        //    return;
 
- /*   switch (_currentConversionState) {
-    case EReadZone1Differential:
-    case EReadZone2Differential:
-        _differentialValue = value;
-        break;
-    case EReadZone1Singular:
-        _zoneConsumers.at(0)->setADCValues(_differentialValue, value);
-        break;
-    case EReadZone2Singular:
-        _zoneConsumers.at(1)->setADCValues(_differentialValue, value);
-        break;
-    case EReadLIA:
-        _liaConsumer->setADCValues(value);
-        break;
-    case EReadLid:*/
-        _lidConsumer->setADCValues(value);
-        /*break;
-    default:
-        assert(false);
-    }*/
+        uint32_t value;
+        /*switch (nextState()) {
+        case EReadZone1Differential:
+            value = _ltc2444->readDifferentialChannels(0, true);
+            break;
+        case EReadZone1Singular:
+            value = _ltc2444->readSingleEndedChannel(4);
+            break;
+        case EReadZone2Differential:
+            value = _ltc2444->readDifferentialChannels(2, true);
+            break;
+        case EReadZone2Singular:
+            value = _ltc2444->readSingleEndedChannel(5);
+            break;
+        case EReadLIA:
+            value = _ltc2444->readSingleEndedChannel(6);
+            break;
+        case EReadLid:*/
+            value = _ltc2444->readSingleEndedChannel(7);
+            /*break;
+        default:
+            assert(false);
+        }*/
 
-    _currentConversionState = nextState();
+     /*   switch (_currentConversionState) {
+        case EReadZone1Differential:
+        case EReadZone2Differential:
+            _differentialValue = value;
+            break;
+        case EReadZone1Singular:
+            _zoneConsumers.at(0)->setADCValues(_differentialValue, value);
+            break;
+        case EReadZone2Singular:
+            _zoneConsumers.at(1)->setADCValues(_differentialValue, value);
+            break;
+        case EReadLIA:
+            _liaConsumer->setADCValues(value);
+            break;
+        case EReadLid:*/
+            _lidConsumer->setADCValues(value);
+            /*break;
+        default:
+            assert(false);
+        }*/
+
+        _currentConversionState = nextState();
+    }
 }
 
+void ADCController::stop() {
+    _workState = false;
+    _ltc2444->stopWaitinigBusy();
+}
 
 ADCController::ADCState ADCController::nextState() const {
     ADCController::ADCState nextState = static_cast<ADCController::ADCState>(static_cast<int>(_currentConversionState) + 1);

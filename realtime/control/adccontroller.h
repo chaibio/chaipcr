@@ -7,12 +7,13 @@
 
 #include <vector>
 #include <memory>
+#include <atomic>
 
 class LTC2444;
 class ADCConsumer;
 
 // Class ADCController
-class ADCController : public IControl
+class ADCController : public IThreadControl
 {
 public:
     enum ADCState {
@@ -30,12 +31,15 @@ public:
 	~ADCController();
 	
     void process();
+    void stop();
 
 private:
     ADCState nextState() const;
 	
 private:
-    std::shared_ptr<LTC2444> _ltc2444;
+    std::atomic<bool> _workState;
+
+    LTC2444 *_ltc2444;
     ADCState _currentConversionState;
     uint32_t _differentialValue;
 

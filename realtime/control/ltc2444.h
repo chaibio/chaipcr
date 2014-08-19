@@ -50,6 +50,8 @@ public:
 	uint32_t repeat();
 
 	bool busy();
+    bool waitBusy();
+    void stopWaitinigBusy();
 
 private:
 	GPIO csPin_;

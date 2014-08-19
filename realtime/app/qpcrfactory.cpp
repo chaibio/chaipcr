@@ -6,8 +6,7 @@
 using namespace std;
 
 // Class QPCRFactory
-vector<shared_ptr<IControl> > QPCRFactory::constructMachine() {
-    vector<shared_ptr<IControl>> controls;
+void QPCRFactory::constructMachine(std::vector<std::shared_ptr<IControl> > &controls, std::vector<std::shared_ptr<IThreadControl> > &threadControls) {
     vector<shared_ptr<ADCConsumer>> zoneConsumers;
     shared_ptr<ADCConsumer> lidADCConsumer;
 
@@ -19,13 +18,10 @@ vector<shared_ptr<IControl> > QPCRFactory::constructMachine() {
     controls.push_back(QPCRFactory::constructLid(lidADCConsumer));
     controls.push_back(QPCRFactory::constructHeatSink());
 
-    controls.push_back(ADCControllerInstance::createInstance(zoneConsumers, OpticsInstance::getInstance(), lidADCConsumer, kLTC2444CSPinNumber, std::move(SPIPort(kSPI0DevicePath)), kSPI0DataInSensePinNumber)); //Not refactored yet
-
-    return controls;
+    threadControls.push_back(ADCControllerInstance::createInstance(zoneConsumers, OpticsInstance::getInstance(), lidADCConsumer, kLTC2444CSPinNumber, std::move(SPIPort(kSPI0DevicePath)), kSPI0DataInSensePinNumber)); //Not refactored yet
 }
 
-shared_ptr<IControl> QPCRFactory::constructOptics(shared_ptr<SPIPort> ledSPIPort)
-{
+shared_ptr<IControl> QPCRFactory::constructOptics(shared_ptr<SPIPort> ledSPIPort) {
     shared_ptr<LEDController> ledControl(new LEDController(kLEDGrayscaleClockPWMPath, ledSPIPort,
                                                            kLEDDigiPotCSPinNumber, kLEDControlXLATPinNumber,
                                                            kLEDBlankPWMPath, 50));
@@ -41,8 +37,7 @@ shared_ptr<IControl> QPCRFactory::constructOptics(shared_ptr<SPIPort> ledSPIPort
     return optics;
 }
 
-shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsumer>> &consumers)
-{
+shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsumer>> &consumers) {
     shared_ptr<SteinhartHartThermistor> zone1Thermistor(new SteinhartHartThermistor(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                                                                     kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
                                                                                     kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient));
@@ -69,8 +64,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
     return HeatBlockInstance::createInstance(zone1, zone2, kPCRBeginStepTemperatureThreshold );
 }
 
-shared_ptr<IControl> QPCRFactory::constructLid(shared_ptr<ADCConsumer> &adcConsumer)
-{
+shared_ptr<IControl> QPCRFactory::constructLid(shared_ptr<ADCConsumer> &adcConsumer) {
     shared_ptr<BetaThermistor> thermistor(new BetaThermistor(kLidThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                                              kLidThermistorBetaCoefficient, kLidThermistorT0Resistance, kLidThermistorT0));
 
@@ -83,8 +77,7 @@ shared_ptr<IControl> QPCRFactory::constructLid(shared_ptr<ADCConsumer> &adcConsu
                                        kLidControlPWMPath, kLidPWMPeriodNs, kProgramStartLidTempThreshold);
 }
 
-shared_ptr<IControl> QPCRFactory::constructHeatSink()
-{
+shared_ptr<IControl> QPCRFactory::constructHeatSink() {
     shared_ptr<BetaThermistor> thermistor(new BetaThermistor(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                                              kHeatSinkThermistorBetaCoefficient, kHeatSinkThermistorT0Resistance, kHeatSinkThermistorT0));
 
