@@ -16,22 +16,17 @@ class ChaiBioTech.app.Views.homePageMenu extends Backbone.View
 			"user": @options.user.toUpperCase()
 
 		$(@el).html(@template(data))
-		menuItems = null
-		previousMenuItem = null
 		for textToBePrinted in @menuItems
 			data = 
 				"menuValue": textToBePrinted
-				"previousItem": menuItem
 
 			menuItem = new ChaiBioTech.app.Views.homePageMenuItem(data)
-			if previousMenuItem
-				previousMenuItem.next = menuItem
-				menuItem.previous = previousMenuItem
-			
-			previousMenuItem = menuItem
 			$(@el).find(".menu-items").append(menuItem.render().el)
 
 		# Hide the last hand :) I mean the last item in the menu and the black Line is the hand
 		$(menuItem.el).find(".hand").hide()
+		firstMenuItem = $(@el).find(".menu-item")[0]
+		# So the first item in the menu is gone bigger
+		$(firstMenuItem).switchClass("menu-item", "menu-item-bounce")
 		return this
 
