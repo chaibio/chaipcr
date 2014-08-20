@@ -25,6 +25,9 @@ public:
 	
     Value value() const;
     void setValue(Value value, bool checkValue = false);
+
+    Value waitValue(Value value);
+    void stopWaitinigValue();
 	
 	Direction direction() const { return direction_; }
     void setDirection(Direction direction);
@@ -37,7 +40,9 @@ private:
 	unsigned int pinNumber_; //BeagleBone GPIO Pin Number
 	Direction direction_;
 
-    mutable Value savedValue;
+    int stopWaitinigFd_;
+
+    mutable Value savedValue_;
 };
 
 #endif

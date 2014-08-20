@@ -102,8 +102,13 @@ uint32_t LTC2444::repeat() {
 }
 
 bool LTC2444::busy(){
-	if(busyPin_.value()== GPIO::kHigh)
-		return 1;
-	else
-		return 0;
+    return busyPin_.value() == GPIO::kHigh;
+}
+
+bool LTC2444::waitBusy() {
+    return busyPin_.waitValue(GPIO::kLow) == GPIO::kHigh;
+}
+
+void LTC2444::stopWaitinigBusy() {
+    busyPin_.stopWaitinigValue();
 }

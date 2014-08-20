@@ -7,6 +7,7 @@
 #include <memory>
 
 class IControl;
+class IThreadControl;
 class ExperimentController;
 
 // Class QPCRApplication
@@ -31,6 +32,7 @@ private:
     std::atomic<bool> _workState;
 
     std::vector<std::shared_ptr<IControl>> _controlUnits;
+    std::vector<std::shared_ptr<IThreadControl>> _threadControlUnits;
     std::shared_ptr<ExperimentController> _experimentController;
 };
 

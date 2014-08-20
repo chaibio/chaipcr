@@ -22,7 +22,7 @@ void QPCRApplication::initialize(Application&) {
     _instance = this;
     _workState = false;
 
-    _controlUnits = QPCRFactory::constructMachine();
+    QPCRFactory::constructMachine(_controlUnits, _threadControlUnits);
     _experimentController = ExperimentController::createInstance();
 }
 
@@ -30,11 +30,17 @@ int QPCRApplication::main(const vector<string>&) {
 	HTTPServer server(new QPCRRequestHandlerFactory, ServerSocket(kHttpServerPort), new HTTPServerParams);
     server.start();
 
+    for (auto threadControlUnit: _threadControlUnits)
+        threadControlUnit->start();
+
     _workState = true;
     while (_workState) {
         for(auto controlUnit: _controlUnits)
             controlUnit->process();
     }
+
+    for (auto threadControlUnit: _threadControlUnits)
+        threadControlUnit->stop();
 
 	server.stop();
 
