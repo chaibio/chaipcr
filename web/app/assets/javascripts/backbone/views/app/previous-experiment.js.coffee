@@ -63,6 +63,7 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 		#console.log @model
 		data =
 			"name": @model.get("experiment").name
+			"id": @model.get("experiment").id
 			"time": @formatDate()
 
 		$(@el).html(@template(data))

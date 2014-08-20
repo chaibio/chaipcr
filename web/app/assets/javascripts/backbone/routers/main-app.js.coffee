@@ -10,7 +10,7 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 	routes:
 		"login": "logMeIn"
 		"home": "loadHome"
-		"edit-exp": "editExp"
+		"edit-exp/:id": "editExp"
 
 	logMeIn: () ->
 		@loginScreen = new ChaiBioTech.app.Views.login
@@ -31,8 +31,9 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 			return yes
 		return no
 
-	editExp: () ->
-		$("#container").html("Wow")
+	editExp: (id) ->
+		@menuOverLay = new ChaiBioTech.app.Views.menuOverLay
+		$("#container").html(@menuOverLay.render().el)
 
 
 

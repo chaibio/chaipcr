@@ -4,16 +4,16 @@ class ChaiBioTech.app.Views.experimentInProgress extends Backbone.View
 
 	template: JST["backbone/templates/app/experiment-in-progress"]
 	
-	className: "experiment-in-progress"
+	className: "experiment-in-progress sansa"
 
 	initialize: () ->
 		@getExperimentInProgress()
 
 	render: () ->
 		$(@el).html(@template(@experimentData))
-		wholeWidth = 442 #its set in the css we may move it to constants
+		wholeWidth = this.options.wholeWidth || 442 #its set in the css we may move it to constants
 		propgressWidth = wholeWidth * (@experimentData.experiment_percentage / 100)
-		$(@el).find(".progress-bar").css("width", "#{propgressWidth}px")
+		$(@el).find(".pro-bar").css("width", "#{propgressWidth}px")
 		return this
 
 	getExperimentInProgress: ()->
