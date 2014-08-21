@@ -552,78 +552,111 @@
   margin-left: 3px;
   cursor: pointer;
 }
+/* line 528, ../../app/assets/stylesheets/screen.css.scss */
+.menu-overlay-container .right-side .menu-overlay-options {
+  height: 723px;
+  width: 591px;
+  background-color: black;
+  opacity: 0.2;
+  z-index: 100;
+}
+/* line 536, ../../app/assets/stylesheets/screen.css.scss */
+.menu-overlay-container .right-side .menu-overlay-options-content {
+  width: 280px;
+  height: 190px;
+  position: relative;
+  left: 62px;
+  top: -690px;
+  z-index: 200;
+}
+/* line 544, ../../app/assets/stylesheets/screen.css.scss */
+.menu-overlay-container .right-side .menu-overlay-options-content .title {
+  width: 280px;
+  color: white;
+  text-align: center;
+  border-bottom: solid 1px white;
+  font-size: 10px;
+}
+/* line 551, ../../app/assets/stylesheets/screen.css.scss */
+.menu-overlay-container .right-side .menu-overlay-options-content .exp-option-buttons {
+  width: 280px;
+  height: 38px;
+  margin-top: 16px;
+  font-weight: bold;
+  font-size: 11px;
+}
 
-/* line 530, ../../app/assets/stylesheets/screen.css.scss */
+/* line 562, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper {
   width: 1024px;
   height: 768px;
 }
-/* line 534, ../../app/assets/stylesheets/screen.css.scss */
+/* line 566, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing {
   float: left;
   width: 632px;
   height: 400px;
 }
-/* line 539, ../../app/assets/stylesheets/screen.css.scss */
+/* line 571, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content {
   width: 442px;
   margin-top: 61px;
   margin-left: 75px;
 }
-/* line 544, ../../app/assets/stylesheets/screen.css.scss */
+/* line 576, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-logo {
   width: 437px;
   height: 74px;
 }
-/* line 549, ../../app/assets/stylesheets/screen.css.scss */
+/* line 581, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu {
   margin-top: 65px;
   height: 402px;
 }
-/* line 553, ../../app/assets/stylesheets/screen.css.scss */
+/* line 585, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content {
   border-bottom: solid 1px black;
   height: 22px;
 }
-/* line 557, ../../app/assets/stylesheets/screen.css.scss */
+/* line 589, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading {
   height: 100%;
 }
-/* line 560, ../../app/assets/stylesheets/screen.css.scss */
+/* line 592, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .welcome-text {
   width: 200px;
   float: left;
   height: 100%;
 }
-/* line 565, ../../app/assets/stylesheets/screen.css.scss */
+/* line 597, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text {
   width: 150px;
   float: right;
   text-align: right;
   height: 100%;
 }
-/* line 571, ../../app/assets/stylesheets/screen.css.scss */
+/* line 603, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text a {
   color: #00aeef;
   text-decoration: none;
 }
-/* line 575, ../../app/assets/stylesheets/screen.css.scss */
+/* line 607, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text a:hover {
   background-color: white;
 }
-/* line 581, ../../app/assets/stylesheets/screen.css.scss */
+/* line 613, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items {
   padding-top: 20px;
 }
-/* line 584, ../../app/assets/stylesheets/screen.css.scss */
+/* line 616, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item {
   height: 58px;
 }
-/* line 587, ../../app/assets/stylesheets/screen.css.scss */
+/* line 619, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .first-row {
   height: 30px;
 }
-/* line 590, ../../app/assets/stylesheets/screen.css.scss */
+/* line 622, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .first-row .menu-item-image {
   width: 30px;
   height: 30px;
@@ -631,7 +664,7 @@
   background-image: url("smallO.png");
   margin-left: 24px;
 }
-/* line 597, ../../app/assets/stylesheets/screen.css.scss */
+/* line 629, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .first-row .menu-item-text {
   width: 300px;
   float: left;
@@ -640,15 +673,15 @@
   font-size: 22px;
   cursor: pointer;
 }
-/* line 607, ../../app/assets/stylesheets/screen.css.scss */
+/* line 639, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .second-row {
   height: 28px;
 }
-/* line 610, ../../app/assets/stylesheets/screen.css.scss */
+/* line 642, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .second-row .hand-container {
   width: 100%;
 }
-/* line 613, ../../app/assets/stylesheets/screen.css.scss */
+/* line 645, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .second-row .hand-container .hand {
   width: 6px;
   background-color: black;
@@ -656,15 +689,15 @@
   margin-left: 37px;
   margin-top: 2px;
 }
-/* line 623, ../../app/assets/stylesheets/screen.css.scss */
+/* line 655, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce {
   height: 107px;
 }
-/* line 626, ../../app/assets/stylesheets/screen.css.scss */
+/* line 658, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row {
   height: 60px;
 }
-/* line 629, ../../app/assets/stylesheets/screen.css.scss */
+/* line 661, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row .menu-item-image {
   width: 60px;
   height: 60px;
@@ -672,7 +705,7 @@
   background-image: url("bigO.png");
   margin-left: 11px;
 }
-/* line 636, ../../app/assets/stylesheets/screen.css.scss */
+/* line 668, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row .menu-item-text {
   width: 300px;
   float: left;
@@ -681,15 +714,15 @@
   font-size: 30px;
   cursor: pointer;
 }
-/* line 646, ../../app/assets/stylesheets/screen.css.scss */
+/* line 678, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row {
   height: 32px;
 }
-/* line 649, ../../app/assets/stylesheets/screen.css.scss */
+/* line 681, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row .hand-container {
   width: 100%;
 }
-/* line 652, ../../app/assets/stylesheets/screen.css.scss */
+/* line 684, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row .hand-container .hand {
   width: 6px;
   background-color: black;
@@ -697,63 +730,63 @@
   margin-left: 37px;
   margin-top: 5px;
 }
-/* line 668, ../../app/assets/stylesheets/screen.css.scss */
+/* line 700, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container {
   width: 442px;
   height: 110px;
   font-size: 14px;
 }
-/* line 675, ../../app/assets/stylesheets/screen.css.scss */
+/* line 707, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-in-progress-heading {
   border-bottom: solid 2px #001827;
 }
-/* line 678, ../../app/assets/stylesheets/screen.css.scss */
+/* line 710, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info {
   height: 80px;
   padding-top: 25px;
 }
-/* line 682, ../../app/assets/stylesheets/screen.css.scss */
+/* line 714, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info div {
   float: left;
 }
-/* line 686, ../../app/assets/stylesheets/screen.css.scss */
+/* line 718, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info .caption {
   font-weight: bold;
   margin-bottom: 5px;
 }
-/* line 690, ../../app/assets/stylesheets/screen.css.scss */
+/* line 722, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info .experiment-info-test {
   width: 280px;
 }
-/* line 695, ../../app/assets/stylesheets/screen.css.scss */
+/* line 727, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-progress-bar {
   height: 5px;
   background-color: black;
 }
-/* line 699, ../../app/assets/stylesheets/screen.css.scss */
+/* line 731, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-progress-bar .pro-bar {
   background-color: #00aeef;
   height: 5px;
   width: 0px;
 }
-/* line 710, ../../app/assets/stylesheets/screen.css.scss */
+/* line 742, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing {
   float: left;
   width: 341px;
   padding-top: 54px;
 }
-/* line 718, ../../app/assets/stylesheets/screen.css.scss */
+/* line 750, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading {
   border-bottom: solid 1px #001827;
   height: 20px;
 }
-/* line 722, ../../app/assets/stylesheets/screen.css.scss */
+/* line 754, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading .text {
   float: left;
   width: 200px;
   font-size: 14px;
 }
-/* line 727, ../../app/assets/stylesheets/screen.css.scss */
+/* line 759, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading .dots {
   float: right;
   color: orange;
@@ -761,36 +794,36 @@
   font-size: 14px;
   cursor: pointer;
 }
-/* line 735, ../../app/assets/stylesheets/screen.css.scss */
+/* line 767, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments {
   height: 680px;
   overflow: scroll;
   padding-top: 21px;
 }
-/* line 740, ../../app/assets/stylesheets/screen.css.scss */
+/* line 772, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment {
   height: 72px;
 }
-/* line 743, ../../app/assets/stylesheets/screen.css.scss */
+/* line 775, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row {
   height: 30px;
 }
-/* line 746, ../../app/assets/stylesheets/screen.css.scss */
+/* line 778, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row a:hover {
   color: #000;
   background-color: white;
 }
-/* line 750, ../../app/assets/stylesheets/screen.css.scss */
+/* line 782, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row div {
   float: left;
 }
-/* line 753, ../../app/assets/stylesheets/screen.css.scss */
+/* line 785, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .image {
   background-image: url("smallblackO.png");
   width: 30px;
   height: 30px;
 }
-/* line 758, ../../app/assets/stylesheets/screen.css.scss */
+/* line 790, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .dotordate {
   float: right;
   height: 30px;
@@ -799,7 +832,7 @@
   text-align: center;
   color: #00aeef;
 }
-/* line 766, ../../app/assets/stylesheets/screen.css.scss */
+/* line 798, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .ball {
   width: 8px;
   height: 8px;
@@ -810,32 +843,32 @@
   margin-top: 8px;
   margin-left: 10px;
 }
-/* line 776, ../../app/assets/stylesheets/screen.css.scss */
+/* line 808, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .image-red {
   background-image: url("smallredO.png");
   width: 30px;
   height: 30px;
 }
-/* line 781, ../../app/assets/stylesheets/screen.css.scss */
+/* line 813, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .text {
   margin-left: 15px;
   margin-top: 8px;
   cursor: pointer;
 }
-/* line 787, ../../app/assets/stylesheets/screen.css.scss */
+/* line 819, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row {
   height: 42px;
 }
-/* line 790, ../../app/assets/stylesheets/screen.css.scss */
+/* line 822, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row div {
   float: left;
 }
-/* line 793, ../../app/assets/stylesheets/screen.css.scss */
+/* line 825, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .hand-container {
   width: 45px;
   height: 42px;
 }
-/* line 797, ../../app/assets/stylesheets/screen.css.scss */
+/* line 829, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .hand-container .hand {
   width: 6px;
   min-height: 32px;
@@ -844,13 +877,13 @@
   margin-top: 5px;
   cursor: pointer;
 }
-/* line 806, ../../app/assets/stylesheets/screen.css.scss */
+/* line 838, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .dotor {
   float: right;
   height: 30px;
   width: 50px;
 }
-/* line 811, ../../app/assets/stylesheets/screen.css.scss */
+/* line 843, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .ball {
   width: 8px;
   height: 8px;
@@ -861,11 +894,11 @@
   margin-top: 5px;
   margin-left: 10px;
 }
-/* line 821, ../../app/assets/stylesheets/screen.css.scss */
+/* line 853, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .more-info {
   font-size: 14px;
 }
-/* line 825, ../../app/assets/stylesheets/screen.css.scss */
+/* line 857, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box {
   position: relative;
   height: 45px;
@@ -883,18 +916,18 @@
   border: solid 1px #a61300;
   font-size: 14px;
 }
-/* line 842, ../../app/assets/stylesheets/screen.css.scss */
+/* line 874, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box button {
   font-size: 12px;
   width: 40px;
   height: 22px;
   margin-top: 2px;
 }
-/* line 849, ../../app/assets/stylesheets/screen.css.scss */
+/* line 881, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box .no-delete {
   color: #00aeef;
 }
-/* line 852, ../../app/assets/stylesheets/screen.css.scss */
+/* line 884, ../../app/assets/stylesheets/screen.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box .yes-delete {
   color: #a61300;
 }

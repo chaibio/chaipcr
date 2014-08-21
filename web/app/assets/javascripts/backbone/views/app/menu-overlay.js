@@ -11,6 +11,7 @@ ChaiBioTech.app.Views.menuOverLay = Backbone.View.extend({
 		this.expInProgress();
 		this.addExpNameSection();
 		this.addExpOptions();
+		this.addExpOptionsContent();
 	},
 
 	fixMenu: function() {
@@ -31,11 +32,17 @@ ChaiBioTech.app.Views.menuOverLay = Backbone.View.extend({
 		this.menuOverlayOptions = new ChaiBioTech.app.Views.menuOverlayOptions();
 	},
 
+	addExpOptionsContent: function() {
+		this.menuOverlayOptionsContent = new ChaiBioTech.app.Views.menuOverlayOptionsContent();
+	},
+
 	render: function() {
 		$(this.el).html(this.template());
 		$(this.el).find(".left-side").prepend(this.menu.render().el);
 		$(this.el).find(".experiment-in-progress-container").append(this.experimentInProgress.render().el);
 		$(this.el).find(".right-side").append(this.menuOverlayTitle.render().el);
+		$(this.el).find(".right-side").append(this.menuOverlayOptions.render().el);
+		$(this.el).find(".right-side").append(this.menuOverlayOptionsContent.render().el);
 		return this;
 	}
 });

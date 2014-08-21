@@ -524,6 +524,38 @@
 				}
 			}
 		}
+
+		.menu-overlay-options {
+			height: 723px;
+			width: 591px;
+			background-color: black;
+			opacity: 0.2;
+			z-index: 100;
+		}
+
+		.menu-overlay-options-content {
+			width: 280px;
+			height: 190px;
+			position: relative;
+			left: 62px;
+			top: -690px;
+			z-index: 200;
+
+			.title {
+				width: 280px;
+				color: white;
+				text-align: center;
+				border-bottom: solid 1px white;
+				font-size: 10px;
+			}
+			.exp-option-buttons {
+				width: 280px;
+				height: 38px;
+				margin-top: 16px;
+				font-weight: bold;
+				font-size: 11px;
+			}
+		}
 	}
 }
 //Home page styles start here
