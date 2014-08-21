@@ -47,7 +47,7 @@ ChaiBioTech.app.Views.menuOverlayMenu = Backbone.View.extend({
 			$(this.el).append(thisMenuItem.render().el);
 
 			if(i > this.NoOfSpecialDude) {
-				// after we pot the big menu item, We should leave blue tail to rest of the menu items. 
+				// after we post the big menu item, We should leave blue tail to rest of the menu items. 
 				$(thisMenuItem.el).find(".tail").css("background-color", "#00aeef");
 			}
 		}
