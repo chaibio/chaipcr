@@ -1,0 +1,71 @@
+// Log Screen
+#logScreen {
+	width: 980px;
+	height: 600px;
+	padding: 5px;
+	margin: auto;
+
+	.container: {
+		
+	}
+	.blue-border {
+		border: solid 1px #02408F;
+		border-top-left-radius: 4px;
+		border-top-right-radius: 4px;
+	}
+	.graphOutLine {
+		width: 100%;
+		height:100%;
+		float: left;
+
+		.content-area {
+			height:93.7%;
+		}
+		.black-heading {
+			width: 180px;
+			font-weight: bold;
+			font-size:18px;
+			margin: 30px auto;
+		}
+		#graph {
+			height: 80%;
+		}
+	}
+	.currentTemperatures {
+		width: 24%;
+		height: 100%;
+		margin-left: 7px;
+		float: left;
+	}
+	.zones {
+		width: 100%;
+		height: 76%;
+		
+		.content-area {
+			height:92%;
+		}
+	}
+	.plots {
+		margin-top: 2px;
+		width: 100%;
+		height: 24%;
+
+		.content-area {
+			height:74%;
+		}
+	}
+	.blue-heading {
+		width: 100%;
+		height: 35px;
+		background-color: #02408F;
+		color: white;
+		text-color: white;
+		font-weight: bold;
+		line-height: 3em;
+		padding-left: 10px;
+	}
+	.content-area {
+		margin: 0px 2px 1px 2px;
+		border: solid 1px #02408F;
+	}
+}

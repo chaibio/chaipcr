@@ -1,0 +1,76 @@
+/* line 2, ../../app/assets/stylesheets/log=screen.css.scss */
+#logScreen {
+  width: 980px;
+  height: 600px;
+  padding: 5px;
+  margin: auto;
+}
+/* line 11, ../../app/assets/stylesheets/log=screen.css.scss */
+#logScreen .blue-border {
+  border: solid 1px #02408F;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+/* line 16, ../../app/assets/stylesheets/log=screen.css.scss */
+#logScreen .graphOutLine {
+  width: 100%;
+  height: 100%;
+  float: left;
+}
+/* line 21, ../../app/assets/stylesheets/log=screen.css.scss */
+#logScreen .graphOutLine .content-area {
+  height: 93.7%;
+}
+/* line 24, ../../app/assets/stylesheets/log=screen.css.scss */
+#logScreen .graphOutLine .black-heading {
+  width: 180px;
+  font-weight: bold;
+  font-size: 18px;
+  margin: 30px auto;
+}
+/* line 30, ../../app/assets/stylesheets/log=screen.css.scss */
+#logScreen .graphOutLine #graph {
+  height: 80%;
+}
+/* line 34, ../../app/assets/stylesheets/log=screen.css.scss */
+#logScreen .currentTemperatures {
+  width: 24%;
+  height: 100%;
+  margin-left: 7px;
+  float: left;
+}
+/* line 40, ../../app/assets/stylesheets/log=screen.css.scss */
+#logScreen .zones {
+  width: 100%;
+  height: 76%;
+}
+/* line 44, ../../app/assets/stylesheets/log=screen.css.scss */
+#logScreen .zones .content-area {
+  height: 92%;
+}
+/* line 48, ../../app/assets/stylesheets/log=screen.css.scss */
+#logScreen .plots {
+  margin-top: 2px;
+  width: 100%;
+  height: 24%;
+}
+/* line 53, ../../app/assets/stylesheets/log=screen.css.scss */
+#logScreen .plots .content-area {
+  height: 74%;
+}
+/* line 57, ../../app/assets/stylesheets/log=screen.css.scss */
+#logScreen .blue-heading {
+  width: 100%;
+  height: 35px;
+  background-color: #02408F;
+  color: white;
+  text-color: white;
+  font-weight: bold;
+  line-height: 3em;
+  padding-left: 10px;
+}
+/* line 67, ../../app/assets/stylesheets/log=screen.css.scss */
+#logScreen .content-area {
+  margin: 0px 2px 1px 2px;
+  border: solid 1px #02408F;
+}

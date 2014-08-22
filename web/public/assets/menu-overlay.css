@@ -1,0 +1,235 @@
+/* line 2, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container {
+  width: 1024px;
+  height: 768px;
+  position: absolute;
+  top: 0px;
+}
+/* line 8, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side {
+  float: left;
+  width: 433px;
+  height: 768px;
+  background-color: #001827;
+}
+/* line 14, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu {
+  height: 485px;
+}
+/* line 17, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item {
+  height: 60px;
+  width: 350px;
+  margin-left: 40px;
+}
+/* line 22, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item .tail-container {
+  height: 25px;
+  width: 350px;
+}
+/* line 26, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item .tail-container .tail {
+  width: 6px;
+  height: 22px;
+  background-color: white;
+  margin-left: 30px;
+}
+/* line 33, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item .ball {
+  width: 30px;
+  height: 30px;
+  background-image: url("white-ball.png");
+  margin-left: 17px;
+  float: left;
+}
+/* line 40, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item .menu-text {
+  float: left;
+  color: white;
+  margin-top: 10px;
+  margin-left: 14px;
+  cursor: pointer;
+}
+/* line 49, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special {
+  height: 128px;
+  width: 350px;
+  margin-left: 40px;
+}
+/* line 54, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .tail-container {
+  height: 43px;
+  width: 350px;
+}
+/* line 58, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .tail-container .tail {
+  width: 6px;
+  height: 40px;
+  background-color: white;
+  margin-left: 30px;
+}
+/* line 65, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .ball-text-container {
+  height: 60px;
+  width: 350px;
+}
+/* line 69, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .ball-text-container .ball {
+  width: 60px;
+  height: 60px;
+  background-image: url("big-white-ball.png");
+  margin-left: 3px;
+  float: left;
+  margin-top: 1px;
+}
+/* line 77, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .ball-text-container .menu-text {
+  float: left;
+  color: white;
+  margin-top: 24px;
+  margin-left: 14px;
+  cursor: pointer;
+}
+/* line 86, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .back-tail-container {
+  height: 20px;
+  width: 350px;
+  margin-top: 5px;
+}
+/* line 91, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .back-tail-container .back-tail {
+  width: 6px;
+  height: 20px;
+  background-color: #00aeef;
+  margin-left: 30px;
+}
+/* line 100, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .experiment-in-progress-container {
+  width: 350px;
+  height: 110px;
+  font-size: 14px;
+  color: white;
+  margin-top: 130px;
+  margin-left: 42px;
+}
+/* line 110, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-in-progress-heading {
+  text-align: center;
+  border-bottom: solid 2px white;
+}
+/* line 114, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-info {
+  height: 80px;
+  padding-top: 25px;
+}
+/* line 118, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-info div {
+  float: left;
+}
+/* line 122, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-info .caption {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+/* line 126, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-info .experiment-info-test {
+  width: 220px;
+}
+/* line 131, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-progress-bar {
+  height: 5px;
+  background-color: #106aa9;
+}
+/* line 135, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-progress-bar .pro-bar {
+  background-color: white;
+  height: 5px;
+  width: 0px;
+}
+/* line 145, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side {
+  float: left;
+  width: 591px;
+  height: 768px;
+}
+/* line 150, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side .menu-overlay-title {
+  width: 591px;
+  height: 45px;
+  background-color: #020100;
+}
+/* line 155, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side .menu-overlay-title .bar {
+  height: 45px;
+  width: 22px;
+  padding-top: 10px;
+  margin-left: 32px;
+  margin-right: 13px;
+  float: left;
+}
+/* line 163, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side .menu-overlay-title .bar .horizontal-bar {
+  width: 22px;
+  height: 3px;
+  background-color: #838382;
+  margin-top: 4px;
+}
+/* line 171, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side .menu-overlay-title .title-text {
+  float: left;
+  color: white;
+  width: 315px;
+  height: 45px;
+  padding-top: 15px;
+  margin-right: 13px;
+}
+/* line 180, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side .menu-overlay-title .dots {
+  float: left;
+  height: 45px;
+  width: 22px;
+  padding-top: 19px;
+}
+/* line 186, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side .menu-overlay-title .dots .white-ball {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: white;
+  float: left;
+  margin-left: 3px;
+  cursor: pointer;
+}
+/* line 198, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side .menu-overlay-options {
+  height: 723px;
+  width: 591px;
+  background-color: black;
+  opacity: 0.6;
+  z-index: 100;
+}
+/* line 206, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side .menu-overlay-options-content {
+  width: 280px;
+  height: 190px;
+  position: relative;
+  left: 62px;
+  top: -690px;
+  z-index: 200;
+}
+/* line 214, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side .menu-overlay-options-content .title {
+  width: 280px;
+  color: white;
+  text-align: center;
+  border-bottom: solid 1px white;
+  font-size: 10px;
+}
+/* line 221, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side .menu-overlay-options-content .exp-option-buttons {
+  width: 280px;
+  height: 38px;
+  margin-top: 16px;
+  font-weight: bold;
+  font-size: 11px;
+}

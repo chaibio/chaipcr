@@ -44,7 +44,6 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 		@todayTimeStamp = Date.parse("#{@today.getFullYear()}/#{@today.getMonth()}/#{@today.getDate()}")
 		@experimentClass = @options.parent
 		@listenTo(@experimentClass ,"readyToDelete", @enableDelete)
-		#console.log "Today ", @todayTimeStamp, @today.getFullYear(), @today.getMonth(), @today.getDate()
 
 	enableDelete: () ->
 		@readyToDelete = ! @readyToDelete
@@ -60,7 +59,6 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 			$(@el).find(".confirm-box").hide("slow");
 
 	render: () ->
-		#console.log @model
 		data =
 			"name": @model.get("experiment").name
 			"id": @model.get("experiment").id

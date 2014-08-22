@@ -33,7 +33,7 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 
 	editExp: (id) ->
 		@menuOverLay = new ChaiBioTech.app.Views.menuOverLay
-		$("#container").html(@menuOverLay.render().el)
+		$("#container").append(@menuOverLay.render().el)
 
 
 

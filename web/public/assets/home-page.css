@@ -1,0 +1,345 @@
+/* line 2, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper {
+  width: 1024px;
+  height: 768px;
+}
+/* line 6, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing {
+  float: left;
+  width: 632px;
+  height: 400px;
+}
+/* line 11, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content {
+  width: 442px;
+  margin-top: 61px;
+  margin-left: 75px;
+}
+/* line 16, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-logo {
+  width: 437px;
+  height: 74px;
+}
+/* line 21, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu {
+  margin-top: 65px;
+  height: 402px;
+}
+/* line 25, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content {
+  border-bottom: solid 1px black;
+  height: 22px;
+}
+/* line 29, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading {
+  height: 100%;
+}
+/* line 32, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .welcome-text {
+  width: 200px;
+  float: left;
+  height: 100%;
+}
+/* line 37, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text {
+  width: 150px;
+  float: right;
+  text-align: right;
+  height: 100%;
+}
+/* line 43, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text a {
+  color: #00aeef;
+  text-decoration: none;
+}
+/* line 47, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text a:hover {
+  background-color: white;
+}
+/* line 53, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items {
+  padding-top: 20px;
+}
+/* line 56, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item {
+  height: 58px;
+}
+/* line 59, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .first-row {
+  height: 30px;
+}
+/* line 62, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .first-row .menu-item-image {
+  width: 30px;
+  height: 30px;
+  float: left;
+  background-image: url("smallO.png");
+  margin-left: 24px;
+}
+/* line 69, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .first-row .menu-item-text {
+  width: 300px;
+  float: left;
+  margin-left: 12px;
+  margin-top: 8px;
+  font-size: 22px;
+  cursor: pointer;
+}
+/* line 79, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .second-row {
+  height: 28px;
+}
+/* line 82, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .second-row .hand-container {
+  width: 100%;
+}
+/* line 85, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .second-row .hand-container .hand {
+  width: 6px;
+  background-color: black;
+  height: 22px;
+  margin-left: 37px;
+  margin-top: 2px;
+}
+/* line 95, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce {
+  height: 107px;
+}
+/* line 98, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row {
+  height: 60px;
+}
+/* line 101, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row .menu-item-image {
+  width: 60px;
+  height: 60px;
+  float: left;
+  background-image: url("bigO.png");
+  margin-left: 11px;
+}
+/* line 108, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row .menu-item-text {
+  width: 300px;
+  float: left;
+  margin-left: 12px;
+  margin-top: 22px;
+  font-size: 30px;
+  cursor: pointer;
+}
+/* line 118, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row {
+  height: 32px;
+}
+/* line 121, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row .hand-container {
+  width: 100%;
+}
+/* line 124, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row .hand-container .hand {
+  width: 6px;
+  background-color: black;
+  height: 32px;
+  margin-left: 37px;
+  margin-top: 5px;
+}
+/* line 140, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container {
+  width: 442px;
+  height: 110px;
+  font-size: 14px;
+}
+/* line 147, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-in-progress-heading {
+  border-bottom: solid 2px #001827;
+}
+/* line 150, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info {
+  height: 80px;
+  padding-top: 25px;
+}
+/* line 154, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info div {
+  float: left;
+}
+/* line 158, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info .caption {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+/* line 162, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info .experiment-info-test {
+  width: 280px;
+}
+/* line 167, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-progress-bar {
+  height: 5px;
+  background-color: black;
+}
+/* line 171, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-progress-bar .pro-bar {
+  background-color: #00aeef;
+  height: 5px;
+  width: 0px;
+}
+/* line 182, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing {
+  float: left;
+  width: 341px;
+  padding-top: 54px;
+}
+/* line 190, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading {
+  border-bottom: solid 1px #001827;
+  height: 20px;
+}
+/* line 194, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading .text {
+  float: left;
+  width: 200px;
+  font-size: 14px;
+}
+/* line 199, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading .dots {
+  float: right;
+  color: orange;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+}
+/* line 207, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments {
+  height: 680px;
+  overflow: scroll;
+  padding-top: 21px;
+}
+/* line 212, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment {
+  height: 72px;
+}
+/* line 215, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row {
+  height: 30px;
+}
+/* line 218, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row a:hover {
+  color: #000;
+  background-color: white;
+}
+/* line 222, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row div {
+  float: left;
+}
+/* line 225, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .image {
+  background-image: url("smallblackO.png");
+  width: 30px;
+  height: 30px;
+}
+/* line 230, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .dotordate {
+  float: right;
+  height: 30px;
+  width: 50px;
+  font-size: 9px;
+  text-align: center;
+  color: #00aeef;
+}
+/* line 238, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .ball {
+  width: 8px;
+  height: 8px;
+  background-color: #898989;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  margin-top: 8px;
+  margin-left: 10px;
+}
+/* line 248, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .image-red {
+  background-image: url("smallredO.png");
+  width: 30px;
+  height: 30px;
+}
+/* line 253, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .text {
+  margin-left: 15px;
+  margin-top: 8px;
+  cursor: pointer;
+}
+/* line 259, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row {
+  height: 42px;
+}
+/* line 262, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row div {
+  float: left;
+}
+/* line 265, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .hand-container {
+  width: 45px;
+  height: 42px;
+}
+/* line 269, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .hand-container .hand {
+  width: 6px;
+  min-height: 32px;
+  background-color: #00aeef;
+  margin-left: 12px;
+  margin-top: 5px;
+  cursor: pointer;
+}
+/* line 278, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .dotor {
+  float: right;
+  height: 30px;
+  width: 50px;
+}
+/* line 283, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .ball {
+  width: 8px;
+  height: 8px;
+  background-color: #898989;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  margin-top: 5px;
+  margin-left: 10px;
+}
+/* line 293, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .more-info {
+  font-size: 14px;
+}
+/* line 297, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box {
+  position: relative;
+  height: 45px;
+  width: 250px;
+  z-index: 100;
+  top: -70px;
+  left: 43px;
+  background-color: white;
+  text-align: center;
+  display: none;
+  font-size: 14px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  border: solid 1px #a61300;
+  font-size: 14px;
+}
+/* line 314, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box button {
+  font-size: 12px;
+  width: 40px;
+  height: 22px;
+  margin-top: 2px;
+}
+/* line 321, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box .no-delete {
+  color: #00aeef;
+}
+/* line 324, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box .yes-delete {
+  color: #a61300;
+}

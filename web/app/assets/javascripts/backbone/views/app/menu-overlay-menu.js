@@ -19,7 +19,7 @@ ChaiBioTech.app.Views.menuOverlayMenu = Backbone.View.extend({
 	NoOfSpecialDude: 3,
 
 	initialize: function() {
-		console.log(this.menuItems);
+		
 	},
 
 	render: function() {

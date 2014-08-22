@@ -28,76 +28,76 @@
   border-right-width: 1px;
 }
 
-/* line 27, ../../app/assets/stylesheets/screen.css.scss */
+/* line 28, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #play-ground {
   min-height: 600px;
   min-width: 600px;
   margin: 30px 0 0 0;
 }
-/* line 33, ../../app/assets/stylesheets/screen.css.scss */
+/* line 34, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #run-experiment {
   border-left: solid 1px gray;
   height: 600px;
   width: 700px;
 }
-/* line 38, ../../app/assets/stylesheets/screen.css.scss */
+/* line 39, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #reactionVolume {
   width: 250px;
 }
-/* line 42, ../../app/assets/stylesheets/screen.css.scss */
+/* line 43, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track {
   width: 700px;
   overflow: scroll;
 }
-/* line 46, ../../app/assets/stylesheets/screen.css.scss */
+/* line 47, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack {
   width: 1000px;
   height: 353px;
   border: 1px solid grey;
 }
-/* line 51, ../../app/assets/stylesheets/screen.css.scss */
+/* line 52, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .stage-run {
   border: 1px solid red;
   border-right: none;
   width: 151px;
   float: left;
 }
-/* line 58, ../../app/assets/stylesheets/screen.css.scss */
+/* line 59, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .stage-header {
   width: 100%;
   height: 150px;
   text-align: center;
 }
-/* line 63, ../../app/assets/stylesheets/screen.css.scss */
+/* line 64, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .stage-header .noof-cycles {
   width: 50%;
   margin: 0 auto;
 }
-/* line 67, ../../app/assets/stylesheets/screen.css.scss */
+/* line 68, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .stage-header .noof-cycles span {
   cursor: pointer;
 }
-/* line 70, ../../app/assets/stylesheets/screen.css.scss */
+/* line 71, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .stage-header .noof-cycles input {
   text-align: center;
 }
-/* line 76, ../../app/assets/stylesheets/screen.css.scss */
+/* line 77, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-holder {
   width: 100%;
   height: 100%;
 }
-/* line 80, ../../app/assets/stylesheets/screen.css.scss */
+/* line 81, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-select {
   background-color: orange;
 }
-/* line 84, ../../app/assets/stylesheets/screen.css.scss */
+/* line 85, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run {
   width: 150px;
   height: 200px;
   float: left;
   background-color: yellow;
 }
-/* line 90, ../../app/assets/stylesheets/screen.css.scss */
+/* line 91, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run .tempBar {
   width: 45px;
   height: 18px;
@@ -105,16 +105,16 @@
   cursor: move;
   z-index: 2;
 }
-/* line 96, ../../app/assets/stylesheets/screen.css.scss */
+/* line 97, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run .tempBar .label {
   float: right;
   width: 44px;
 }
-/* line 102, ../../app/assets/stylesheets/screen.css.scss */
+/* line 103, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run .hold-time {
   position: relative;
 }
-/* line 106, ../../app/assets/stylesheets/screen.css.scss */
+/* line 107, ../../app/assets/stylesheets/screen.css.scss */
 #stadium #track #innertrack .step-run .line {
   background-color: black;
   width: 150px;
@@ -126,808 +126,24 @@
   top: 6px;
 }
 
-/* line 122, ../../app/assets/stylesheets/screen.css.scss */
-#touchScreenContainer {
-  width: 800px;
-  height: 480px;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-/* line 132, ../../app/assets/stylesheets/screen.css.scss */
-#touchScreenContainer .experiment-list {
-  max-height: 300px;
-  overflow: scroll;
-}
-/* line 136, ../../app/assets/stylesheets/screen.css.scss */
-#touchScreenContainer #track {
-  width: 700px;
-  overflow: scroll;
-}
-/* line 140, ../../app/assets/stylesheets/screen.css.scss */
-#touchScreenContainer #track #innertrack {
-  width: 1000px;
-  height: 240px;
-  border: 1px solid grey;
-}
-/* line 145, ../../app/assets/stylesheets/screen.css.scss */
-#touchScreenContainer #track #innertrack .stage-run {
-  border: 1px solid red;
-  border-right: none;
-  width: 151px;
-  float: left;
-  height: 230px;
-}
-/* line 153, ../../app/assets/stylesheets/screen.css.scss */
-#touchScreenContainer #track #innertrack .stage-header {
-  width: 100%;
-  height: 50px;
-  text-align: center;
-}
-/* line 159, ../../app/assets/stylesheets/screen.css.scss */
-#touchScreenContainer #track #innertrack .step-holder {
-  width: 100%;
-  height: 100%;
-}
-/* line 163, ../../app/assets/stylesheets/screen.css.scss */
-#touchScreenContainer #track #innertrack .step-select {
-  background-color: orange;
-}
-/* line 167, ../../app/assets/stylesheets/screen.css.scss */
-#touchScreenContainer #track #innertrack .step-run {
-  width: 149px;
-  height: 175px;
-  float: left;
-  background-color: yellow;
-}
-/* line 173, ../../app/assets/stylesheets/screen.css.scss */
-#touchScreenContainer #track #innertrack .step-run .tempBar {
-  width: 45px;
-  height: 18px;
-  float: right;
-  cursor: move;
-  z-index: 100;
-}
-/* line 179, ../../app/assets/stylesheets/screen.css.scss */
-#touchScreenContainer #track #innertrack .step-run .tempBar .label {
-  float: right;
-  width: 44px;
-}
-/* line 185, ../../app/assets/stylesheets/screen.css.scss */
-#touchScreenContainer #track #innertrack .step-run .line {
-  background-color: black;
-  width: 150px;
-  height: 2px;
-  position: relative;
-  -webkit-transform-origin: 100% 100%;
-  right: 150px;
-  z-index: 10;
-  top: 6px;
-}
-
-/* line 201, ../../app/assets/stylesheets/screen.css.scss */
-#logScreen {
-  width: 980px;
-  height: 600px;
-  padding: 5px;
-  margin: auto;
-}
-/* line 210, ../../app/assets/stylesheets/screen.css.scss */
-#logScreen .blue-border {
-  border: solid 1px #02408F;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-}
-/* line 215, ../../app/assets/stylesheets/screen.css.scss */
-#logScreen .graphOutLine {
-  width: 100%;
-  height: 100%;
-  float: left;
-}
-/* line 220, ../../app/assets/stylesheets/screen.css.scss */
-#logScreen .graphOutLine .content-area {
-  height: 93.7%;
-}
-/* line 223, ../../app/assets/stylesheets/screen.css.scss */
-#logScreen .graphOutLine .black-heading {
-  width: 180px;
-  font-weight: bold;
-  font-size: 18px;
-  margin: 30px auto;
-}
-/* line 229, ../../app/assets/stylesheets/screen.css.scss */
-#logScreen .graphOutLine #graph {
-  height: 80%;
-}
-/* line 233, ../../app/assets/stylesheets/screen.css.scss */
-#logScreen .currentTemperatures {
-  width: 24%;
-  height: 100%;
-  margin-left: 7px;
-  float: left;
-}
-/* line 239, ../../app/assets/stylesheets/screen.css.scss */
-#logScreen .zones {
-  width: 100%;
-  height: 76%;
-}
-/* line 243, ../../app/assets/stylesheets/screen.css.scss */
-#logScreen .zones .content-area {
-  height: 92%;
-}
-/* line 247, ../../app/assets/stylesheets/screen.css.scss */
-#logScreen .plots {
-  margin-top: 2px;
-  width: 100%;
-  height: 24%;
-}
-/* line 252, ../../app/assets/stylesheets/screen.css.scss */
-#logScreen .plots .content-area {
-  height: 74%;
-}
-/* line 256, ../../app/assets/stylesheets/screen.css.scss */
-#logScreen .blue-heading {
-  width: 100%;
-  height: 35px;
-  background-color: #02408F;
-  color: white;
-  text-color: white;
-  font-weight: bold;
-  line-height: 3em;
-  padding-left: 10px;
-}
-/* line 266, ../../app/assets/stylesheets/screen.css.scss */
-#logScreen .content-area {
-  margin: 0px 2px 1px 2px;
-  border: solid 1px #02408F;
-}
-
 @font-face {
   font-family: "simplifica";
   src: local("simplifica"), url("simplifica.woff") format("woff");
 }
 
-/* line 278, ../../app/assets/stylesheets/screen.css.scss */
+/* line 130, ../../app/assets/stylesheets/screen.css.scss */
 .simplifica {
   font-family: "simplifica";
   font-size: 30px;
 }
 
-/* line 282, ../../app/assets/stylesheets/screen.css.scss */
+/* line 134, ../../app/assets/stylesheets/screen.css.scss */
 .sansa {
   font-family: 'Open Sans', sans-serif;
   font-size: 12px;
 }
 
-/* line 288, ../../app/assets/stylesheets/screen.css.scss */
+/* line 139, ../../app/assets/stylesheets/screen.css.scss */
 #container {
   width: 1024px;
-}
-
-/* line 291, ../../app/assets/stylesheets/screen.css.scss */
-.login-wrapper {
-  min-height: 500px;
-  background-color: wheat;
-  padding-top: 5%;
-}
-/* line 296, ../../app/assets/stylesheets/screen.css.scss */
-.login-wrapper .login-box {
-  height: 250px;
-  width: 300px;
-  background-color: white;
-  margin-left: auto;
-  margin-right: auto;
-  -webkit-box-shadow: 1px 1px 82px 3px rgba(0, 0, 0, 0.75);
-  -moz-box-shadow: 1px 1px 82px 3px rgba(0, 0, 0, 0.75);
-  box-shadow: 1px 1px 82px 3px rgba(0, 0, 0, 0.75);
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
-}
-/* line 309, ../../app/assets/stylesheets/screen.css.scss */
-.login-wrapper .login-box .login-heading {
-  width: 100%;
-  text-align: center;
-  font-weight: bold;
-  padding-top: 10px;
-}
-/* line 316, ../../app/assets/stylesheets/screen.css.scss */
-.login-wrapper .login-box .login-credentials {
-  width: 300px;
-}
-/* line 319, ../../app/assets/stylesheets/screen.css.scss */
-.login-wrapper .login-box .login-credentials input {
-  margin: 30px 0 0 65px;
-  text-align: center;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
-}
-/* line 326, ../../app/assets/stylesheets/screen.css.scss */
-.login-wrapper .login-box .login-credentials button {
-  margin: 30px 0 0 72px;
-  width: 150px;
-}
-
-/* line 334, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container {
-  width: 1024px;
-  height: 768px;
-}
-/* line 338, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side {
-  float: left;
-  width: 433px;
-  height: 768px;
-  background-color: #001827;
-}
-/* line 344, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .menu-overlay-menu {
-  height: 485px;
-}
-/* line 347, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item {
-  height: 60px;
-  width: 350px;
-  margin-left: 40px;
-}
-/* line 352, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item .tail-container {
-  height: 25px;
-  width: 350px;
-}
-/* line 356, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item .tail-container .tail {
-  width: 6px;
-  height: 22px;
-  background-color: white;
-  margin-left: 30px;
-}
-/* line 363, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item .ball {
-  width: 30px;
-  height: 30px;
-  background-image: url("white-ball.png");
-  margin-left: 17px;
-  float: left;
-}
-/* line 370, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item .menu-text {
-  float: left;
-  color: white;
-  margin-top: 10px;
-  margin-left: 14px;
-  cursor: pointer;
-}
-/* line 379, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special {
-  height: 128px;
-  width: 350px;
-  margin-left: 40px;
-}
-/* line 384, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .tail-container {
-  height: 43px;
-  width: 350px;
-}
-/* line 388, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .tail-container .tail {
-  width: 6px;
-  height: 40px;
-  background-color: white;
-  margin-left: 30px;
-}
-/* line 395, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .ball-text-container {
-  height: 60px;
-  width: 350px;
-}
-/* line 399, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .ball-text-container .ball {
-  width: 60px;
-  height: 60px;
-  background-image: url("big-white-ball.png");
-  margin-left: 3px;
-  float: left;
-  margin-top: 1px;
-}
-/* line 407, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .ball-text-container .menu-text {
-  float: left;
-  color: white;
-  margin-top: 24px;
-  margin-left: 14px;
-  cursor: pointer;
-}
-/* line 416, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .back-tail-container {
-  height: 20px;
-  width: 350px;
-  margin-top: 5px;
-}
-/* line 421, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .back-tail-container .back-tail {
-  width: 6px;
-  height: 20px;
-  background-color: #00aeef;
-  margin-left: 30px;
-}
-/* line 430, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .experiment-in-progress-container {
-  width: 350px;
-  height: 110px;
-  font-size: 14px;
-  color: white;
-  margin-top: 130px;
-  margin-left: 42px;
-}
-/* line 440, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-in-progress-heading {
-  text-align: center;
-  border-bottom: solid 2px white;
-}
-/* line 444, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-info {
-  height: 80px;
-  padding-top: 25px;
-}
-/* line 448, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-info div {
-  float: left;
-}
-/* line 452, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-info .caption {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-/* line 456, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-info .experiment-info-test {
-  width: 220px;
-}
-/* line 461, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-progress-bar {
-  height: 5px;
-  background-color: #106aa9;
-}
-/* line 465, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-progress-bar .pro-bar {
-  background-color: white;
-  height: 5px;
-  width: 0px;
-}
-/* line 475, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .right-side {
-  float: left;
-  width: 591px;
-  height: 768px;
-}
-/* line 480, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .right-side .menu-overlay-title {
-  width: 591px;
-  height: 45px;
-  background-color: #020100;
-}
-/* line 485, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .right-side .menu-overlay-title .bar {
-  height: 45px;
-  width: 22px;
-  padding-top: 10px;
-  margin-left: 32px;
-  margin-right: 13px;
-  float: left;
-}
-/* line 493, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .right-side .menu-overlay-title .bar .horizontal-bar {
-  width: 22px;
-  height: 3px;
-  background-color: #838382;
-  margin-top: 4px;
-}
-/* line 501, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .right-side .menu-overlay-title .title-text {
-  float: left;
-  color: white;
-  width: 315px;
-  height: 45px;
-  padding-top: 15px;
-  margin-right: 13px;
-}
-/* line 510, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .right-side .menu-overlay-title .dots {
-  float: left;
-  height: 45px;
-  width: 22px;
-  padding-top: 19px;
-}
-/* line 516, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .right-side .menu-overlay-title .dots .white-ball {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background-color: white;
-  float: left;
-  margin-left: 3px;
-  cursor: pointer;
-}
-/* line 528, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .right-side .menu-overlay-options {
-  height: 723px;
-  width: 591px;
-  background-color: black;
-  opacity: 0.2;
-  z-index: 100;
-}
-/* line 536, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .right-side .menu-overlay-options-content {
-  width: 280px;
-  height: 190px;
-  position: relative;
-  left: 62px;
-  top: -690px;
-  z-index: 200;
-}
-/* line 544, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .right-side .menu-overlay-options-content .title {
-  width: 280px;
-  color: white;
-  text-align: center;
-  border-bottom: solid 1px white;
-  font-size: 10px;
-}
-/* line 551, ../../app/assets/stylesheets/screen.css.scss */
-.menu-overlay-container .right-side .menu-overlay-options-content .exp-option-buttons {
-  width: 280px;
-  height: 38px;
-  margin-top: 16px;
-  font-weight: bold;
-  font-size: 11px;
-}
-
-/* line 562, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper {
-  width: 1024px;
-  height: 768px;
-}
-/* line 566, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing {
-  float: left;
-  width: 632px;
-  height: 400px;
-}
-/* line 571, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content {
-  width: 442px;
-  margin-top: 61px;
-  margin-left: 75px;
-}
-/* line 576, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-logo {
-  width: 437px;
-  height: 74px;
-}
-/* line 581, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu {
-  margin-top: 65px;
-  height: 402px;
-}
-/* line 585, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content {
-  border-bottom: solid 1px black;
-  height: 22px;
-}
-/* line 589, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading {
-  height: 100%;
-}
-/* line 592, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .welcome-text {
-  width: 200px;
-  float: left;
-  height: 100%;
-}
-/* line 597, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text {
-  width: 150px;
-  float: right;
-  text-align: right;
-  height: 100%;
-}
-/* line 603, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text a {
-  color: #00aeef;
-  text-decoration: none;
-}
-/* line 607, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text a:hover {
-  background-color: white;
-}
-/* line 613, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items {
-  padding-top: 20px;
-}
-/* line 616, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item {
-  height: 58px;
-}
-/* line 619, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .first-row {
-  height: 30px;
-}
-/* line 622, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .first-row .menu-item-image {
-  width: 30px;
-  height: 30px;
-  float: left;
-  background-image: url("smallO.png");
-  margin-left: 24px;
-}
-/* line 629, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .first-row .menu-item-text {
-  width: 300px;
-  float: left;
-  margin-left: 12px;
-  margin-top: 8px;
-  font-size: 22px;
-  cursor: pointer;
-}
-/* line 639, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .second-row {
-  height: 28px;
-}
-/* line 642, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .second-row .hand-container {
-  width: 100%;
-}
-/* line 645, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .second-row .hand-container .hand {
-  width: 6px;
-  background-color: black;
-  height: 22px;
-  margin-left: 37px;
-  margin-top: 2px;
-}
-/* line 655, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce {
-  height: 107px;
-}
-/* line 658, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row {
-  height: 60px;
-}
-/* line 661, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row .menu-item-image {
-  width: 60px;
-  height: 60px;
-  float: left;
-  background-image: url("bigO.png");
-  margin-left: 11px;
-}
-/* line 668, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row .menu-item-text {
-  width: 300px;
-  float: left;
-  margin-left: 12px;
-  margin-top: 22px;
-  font-size: 30px;
-  cursor: pointer;
-}
-/* line 678, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row {
-  height: 32px;
-}
-/* line 681, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row .hand-container {
-  width: 100%;
-}
-/* line 684, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row .hand-container .hand {
-  width: 6px;
-  background-color: black;
-  height: 32px;
-  margin-left: 37px;
-  margin-top: 5px;
-}
-/* line 700, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container {
-  width: 442px;
-  height: 110px;
-  font-size: 14px;
-}
-/* line 707, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-in-progress-heading {
-  border-bottom: solid 2px #001827;
-}
-/* line 710, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info {
-  height: 80px;
-  padding-top: 25px;
-}
-/* line 714, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info div {
-  float: left;
-}
-/* line 718, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info .caption {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-/* line 722, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-info .experiment-info-test {
-  width: 280px;
-}
-/* line 727, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-progress-bar {
-  height: 5px;
-  background-color: black;
-}
-/* line 731, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-left-wing .left-wing-content .experiment-in-progress-container .experiment-in-progress .experiment-progress-bar .pro-bar {
-  background-color: #00aeef;
-  height: 5px;
-  width: 0px;
-}
-/* line 742, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing {
-  float: left;
-  width: 341px;
-  padding-top: 54px;
-}
-/* line 750, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading {
-  border-bottom: solid 1px #001827;
-  height: 20px;
-}
-/* line 754, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading .text {
-  float: left;
-  width: 200px;
-  font-size: 14px;
-}
-/* line 759, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading .dots {
-  float: right;
-  color: orange;
-  font-weight: bold;
-  font-size: 14px;
-  cursor: pointer;
-}
-/* line 767, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments {
-  height: 680px;
-  overflow: scroll;
-  padding-top: 21px;
-}
-/* line 772, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment {
-  height: 72px;
-}
-/* line 775, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row {
-  height: 30px;
-}
-/* line 778, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row a:hover {
-  color: #000;
-  background-color: white;
-}
-/* line 782, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row div {
-  float: left;
-}
-/* line 785, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .image {
-  background-image: url("smallblackO.png");
-  width: 30px;
-  height: 30px;
-}
-/* line 790, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .dotordate {
-  float: right;
-  height: 30px;
-  width: 50px;
-  font-size: 9px;
-  text-align: center;
-  color: #00aeef;
-}
-/* line 798, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .ball {
-  width: 8px;
-  height: 8px;
-  background-color: #898989;
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  border-radius: 50%;
-  margin-top: 8px;
-  margin-left: 10px;
-}
-/* line 808, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .image-red {
-  background-image: url("smallredO.png");
-  width: 30px;
-  height: 30px;
-}
-/* line 813, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .text {
-  margin-left: 15px;
-  margin-top: 8px;
-  cursor: pointer;
-}
-/* line 819, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row {
-  height: 42px;
-}
-/* line 822, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row div {
-  float: left;
-}
-/* line 825, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .hand-container {
-  width: 45px;
-  height: 42px;
-}
-/* line 829, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .hand-container .hand {
-  width: 6px;
-  min-height: 32px;
-  background-color: #00aeef;
-  margin-left: 12px;
-  margin-top: 5px;
-  cursor: pointer;
-}
-/* line 838, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .dotor {
-  float: right;
-  height: 30px;
-  width: 50px;
-}
-/* line 843, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .ball {
-  width: 8px;
-  height: 8px;
-  background-color: #898989;
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  border-radius: 50%;
-  margin-top: 5px;
-  margin-left: 10px;
-}
-/* line 853, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .more-info {
-  font-size: 14px;
-}
-/* line 857, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box {
-  position: relative;
-  height: 45px;
-  width: 250px;
-  z-index: 100;
-  top: -70px;
-  left: 43px;
-  background-color: white;
-  text-align: center;
-  display: none;
-  font-size: 14px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-  border: solid 1px #a61300;
-  font-size: 14px;
-}
-/* line 874, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box button {
-  font-size: 12px;
-  width: 40px;
-  height: 22px;
-  margin-top: 2px;
-}
-/* line 881, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box .no-delete {
-  color: #00aeef;
-}
-/* line 884, ../../app/assets/stylesheets/screen.css.scss */
-.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box .yes-delete {
-  color: #a61300;
 }
