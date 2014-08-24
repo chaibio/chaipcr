@@ -173,6 +173,8 @@ void ExperimentController::stopLogging()
 
 void ExperimentController::addLogCallback(Poco::Timer &)
 {
+    _dbControl->beginTransaction();
+
     TemperatureLog log(_experiment->id());
     log.setElapsedTime((boost::posix_time::microsec_clock::local_time() - _experiment->startedAt()).total_milliseconds());
     log.setLidTemperature(LidInstance::getInstance()->currentTemperature());
@@ -191,6 +193,8 @@ void ExperimentController::addLogCallback(Poco::Timer &)
 
         _dbControl->addDebugTemperatureLog(debugLog);
     }
+
+    _dbControl->endTransaction();
 }
 
 void ExperimentController::settingsUpdated()

@@ -25,6 +25,9 @@ public:
     DBControl();
     ~DBControl();
 
+    void beginTransaction();
+    void endTransaction();
+
     Experiment* getExperiment(int id);
     void startExperiment(Experiment *experiment);
     void completeExperiment(Experiment *experiment);

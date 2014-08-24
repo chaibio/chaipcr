@@ -5,12 +5,25 @@
 
 DBControl::DBControl()
 {
+    sqlite_api::sqlite3_enable_shared_cache(1);
+
     _session = new soci::session(soci::sqlite3, DATABASE_FILE);
+    *_session << "PRAGMA temp_store = MEMORY";
 }
 
 DBControl::~DBControl()
 {
     delete _session;
+}
+
+void DBControl::beginTransaction()
+{
+    _session->begin();
+}
+
+void DBControl::endTransaction()
+{
+    _session->commit();
 }
 
 Experiment* DBControl::getExperiment(int id)
