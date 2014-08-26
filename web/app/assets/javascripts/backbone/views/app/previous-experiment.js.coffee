@@ -44,7 +44,11 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 		@todayTimeStamp = Date.parse("#{@today.getFullYear()}/#{@today.getMonth()}/#{@today.getDate()}")
 		@experimentClass = @options.parent
 		@listenTo(@experimentClass ,"readyToDelete", @enableDelete)
+		@listenTo(@experimentClass ,"killAll", @kill)
 
+	kill: () ->
+		this.remove()
+	
 	enableDelete: () ->
 		@readyToDelete = ! @readyToDelete
 		

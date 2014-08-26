@@ -60,7 +60,7 @@ class ChaiBioTech.app.Views.previousExperiments extends Backbone.View
 				@tempMonth = @experiment.month
 				@tempYear = @experiment.year
 
-		@allExpDiv.find(".loading").remove()
+		@allExpDiv.find(".loading").hide()
 		$(".hand:last").hide()
 	
 	loadPreviousExperiments: () ->

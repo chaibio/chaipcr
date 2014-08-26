@@ -20,6 +20,7 @@ class ChaiBioTech.app.Views.homePage extends Backbone.View
 
 	loadPreviousExperiments: () ->
 		@previousExperiments = new ChaiBioTech.app.Views.previousExperiments
+		ChaiBioTech.app.previousExperiments = @previousExperiments
 
 	render: () ->
 		$(@el).html @template()
