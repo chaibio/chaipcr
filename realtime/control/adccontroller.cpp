@@ -31,11 +31,11 @@ ADCController::~ADCController() {
 void ADCController::process() {
     _workState = true;
     while (_workState) {
-        if (_ltc2444->waitBusy())
-            continue;
+        //if (_ltc2444->waitBusy())
+        //    continue;
 
-        //if (_ltc2444->busy())
-        //    return;
+        if (_ltc2444->busy())
+           continue;
 
         uint32_t value;
         /*switch (nextState()) {
