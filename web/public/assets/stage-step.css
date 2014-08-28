@@ -1,0 +1,49 @@
+/* line 2, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container {
+  width: 1024px;
+  height: 768px;
+}
+/* line 6, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .top-half {
+  height: 465px;
+  width: 1024px;
+  background-color: #ffb400;
+}
+/* line 11, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .top-half .name-on-top {
+  width: 1024px;
+  height: 45px;
+  background-color: #332400;
+}
+/* line 16, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .top-half .name-on-top .stripes-and-name {
+  width: 300px;
+  height: 20px;
+  margin-left: 32px;
+  padding-top: 13px;
+}
+/* line 22, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .top-half .name-on-top .stripes-and-name .stripes {
+  width: 21px;
+  height: 19px;
+  float: left;
+}
+/* line 27, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .top-half .name-on-top .stripes-and-name .stripes .stripe {
+  height: 3px;
+  width: 21px;
+  margin-bottom: 3px;
+  background-color: #999280;
+}
+/* line 35, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .top-half .name-on-top .stripes-and-name .name-container {
+  float: left;
+  color: white;
+  margin-left: 13px;
+  font-size: 20px;
+}
+/* line 44, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half {
+  width: 1024px;
+  height: 303px;
+}
