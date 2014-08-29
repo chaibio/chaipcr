@@ -1,5 +1,5 @@
 ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
 
-ChaiBioTech.app.Views.canvas = function() {
-  
+ChaiBioTech.app.Views.fabricCanvas = function() {
+
 }

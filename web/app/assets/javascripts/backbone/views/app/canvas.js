@@ -1,3 +1,4 @@
+ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
 
 ChaiBioTech.app.Views.canvas = Backbone.View.extend({
 
