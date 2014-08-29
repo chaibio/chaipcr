@@ -37,5 +37,9 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 		$("#container").append(@menuOverLay.render().el)
 
 	loadStepStage: (id) ->
-		@editStageStep = new ChaiBioTech.app.Views.editStageStep();
+		ExpModel = new ChaiBioTech.Models.Experiment({"id": id});
+		@editStageStep = new ChaiBioTech.app.Views.editStageStep({
+				model: ExpModel
+			});
 		$("#container").html(@editStageStep.render().el);
+		this.canvas = new ChaiBioTech.app.Views.canvas();

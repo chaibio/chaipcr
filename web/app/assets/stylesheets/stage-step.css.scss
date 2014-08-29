@@ -23,6 +23,7 @@
 					width: 21px;
 					height: 19px;
 					float: left;
+					cursor: pointer;
 
 					.stripe {
 						height: 3px;
@@ -38,6 +39,16 @@
 					margin-left: 13px;
 					font-size: 20px;
 				}
+			}
+		}
+
+		.canvas-container {
+			height: 420px;
+			width: 1024px;
+
+			.canvasClass {
+				width: 300px;
+				height: 300px;
 			}
 		}
 	}

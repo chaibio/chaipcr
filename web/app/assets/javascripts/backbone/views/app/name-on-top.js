@@ -7,11 +7,16 @@ ChaiBioTech.app.Views.nameOnTop = Backbone.View.extend({
   template: JST["backbone/templates/app/name-on-top"],
 
   initialize: function() {
-
+    this.model.on("change:experiment", this.render, this);
   },
 
   render: function() {
-    $(this.el).html(this.template());
+    var data = this.model.get("experiment"),
+    dataToTemplate = {
+      "name": data.name
+    };
+
+    $(this.el).html(this.template(dataToTemplate));
     return this;
   }
-})
+});

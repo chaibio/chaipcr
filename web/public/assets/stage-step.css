@@ -27,22 +27,33 @@
   width: 21px;
   height: 19px;
   float: left;
+  cursor: pointer;
 }
-/* line 27, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 28, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .top-half .name-on-top .stripes-and-name .stripes .stripe {
   height: 3px;
   width: 21px;
   margin-bottom: 3px;
   background-color: #999280;
 }
-/* line 35, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 36, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .top-half .name-on-top .stripes-and-name .name-container {
   float: left;
   color: white;
   margin-left: 13px;
   font-size: 20px;
 }
-/* line 44, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 45, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .top-half .canvas-container {
+  height: 420px;
+  width: 1024px;
+}
+/* line 49, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .top-half .canvas-container .canvasClass {
+  width: 300px;
+  height: 300px;
+}
+/* line 55, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half {
   width: 1024px;
   height: 303px;

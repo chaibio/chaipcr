@@ -1,7 +1,7 @@
 ChaiBioTech.Models.Experiment = ChaiBioTech.Models.Experiment || {};
-
+/*
 ChaiBioTech.Models.Experiment = Backbone.Model.extend({
-	
+
 	url: "/experiments",
 
 	defaults: {
@@ -18,7 +18,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 	initialize: function(){
 		_.bindAll(this ,"afterSave");
 	},
-	//There is many methods that uses $.ajax, so it can be in a single function 
+	//There is many methods that uses $.ajax, so it can be in a single function
 	//but once experiment operations are done it can be done.
 	saveData: function( action ) {
 		that = this;
@@ -83,7 +83,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		.fail(function() {
 			alert("Failed to update");
 			console.log("Failed to update");
-		}); 
+		});
 	},
 
 	createStage: function(type, stageData) {
@@ -107,7 +107,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		.fail(function() {
 			alert("Failed to update");
 			console.log("Failed to update");
-		}); 
+		});
 	},
 
 	getLatestModel: function(callback) {
@@ -143,7 +143,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		.fail(function() {
 			alert("Failed to update");
 			console.log("Failed to update");
-		}); 
+		});
 	},
 
 	deleteStage: function(stage) {
@@ -165,7 +165,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		.fail(function() {
 			alert("Failed to update");
 			console.log("Failed to update");
-		}); 
+		});
 	},
 
 	changeStageName: function(stageName, id, stageType) {
@@ -248,12 +248,59 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 			})
 	}
 });
+*/
+ChaiBioTech.Models.Experiment = Backbone.Model.extend({
+
+	url: "/experiments",
+
+	defaults: {
+		experiment: {
+			name: "",
+			qpcr: true,
+			protocol: {
+			}
+		}
+	},
+
+	initialize: function(id) {
+		if(this.id) {
+			this.getLatestModel();
+		}
+	},
+
+	getLatestModel: function() {
+		that = this;
+		$.ajax({
+			url: "/experiments/"+that.id,
+			contentType: 'application/json',
+			type: 'GET'
+		})
+		.done(function(data) {
+				that.set('experiment', data["experiment"]);
+		})
+		.fail(function() {
+			console.log("Failed to update");
+		})
+	},
+
+	perish: function() {
+		var data = this.get("experiment");
+		$.ajax({
+			url: "/experiments/"+data["id"],
+			contentType: 'application/json',
+			type: 'DELETE'
+		})
+		.done(function() {
+			console.log("deleted");
+		})
+	}
+});
 
 ChaiBioTech.Collections.Experiment = ChaiBioTech.Collections.Experiment || {};
 
 ChaiBioTech.Collections.Experiment = Backbone.Collection.extend({
 
 	model: ChaiBioTech.Models.Experiment,
-	
-	url: "/experiments"	
+
+	url: "/experiments"
 })
