@@ -42,4 +42,4 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 				model: ExpModel
 			});
 		$("#container").html(@editStageStep.render().el);
-		this.canvas = new ChaiBioTech.app.Views.fabricCanvas();
+		this.canvas = new ChaiBioTech.app.Views.fabricCanvas(ExpModel);
