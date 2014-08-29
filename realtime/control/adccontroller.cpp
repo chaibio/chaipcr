@@ -1,3 +1,5 @@
+#include <cassert>
+
 #include "ltc2444.h"
 #include "adcconsumer.h"
 #include "adccontroller.h"
@@ -31,14 +33,11 @@ ADCController::~ADCController() {
 void ADCController::process() {
     _workState = true;
     while (_workState) {
-        if (_ltc2444->waitBusy())
+        if (_ltc2444->busy()) //waitBusy()
             continue;
 
-        //if (_ltc2444->busy())
-        //    return;
-
         uint32_t value;
-        /*switch (nextState()) {
+        switch (nextState()) {
         case EReadZone1Differential:
             value = _ltc2444->readDifferentialChannels(0, true);
             break;
@@ -54,14 +53,14 @@ void ADCController::process() {
         case EReadLIA:
             value = _ltc2444->readSingleEndedChannel(6);
             break;
-        case EReadLid:*/
+        case EReadLid:
             value = _ltc2444->readSingleEndedChannel(7);
-            /*break;
+            break;
         default:
             assert(false);
-        }*/
+        }
 
-     /*   switch (_currentConversionState) {
+        switch (_currentConversionState) {
         case EReadZone1Differential:
         case EReadZone2Differential:
             _differentialValue = value;
@@ -75,12 +74,12 @@ void ADCController::process() {
         case EReadLIA:
             _liaConsumer->setADCValues(value);
             break;
-        case EReadLid:*/
+        case EReadLid:
             _lidConsumer->setADCValues(value);
-            /*break;
+            break;
         default:
             assert(false);
-        }*/
+        }
 
         _currentConversionState = nextState();
     }
