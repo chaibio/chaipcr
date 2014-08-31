@@ -219,6 +219,9 @@ void DBControl::addTemperatureLog(const TemperatureLog &log)
 
 void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
 {
+    if (logs.empty())
+        return;
+
     _dbMutex.lock();
     {
         _session->begin();

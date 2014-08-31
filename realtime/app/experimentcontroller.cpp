@@ -169,6 +169,9 @@ void ExperimentController::startLogging()
 void ExperimentController::stopLogging()
 {
     _logTimer->stop();
+
+    _dbControl->addTemperatureLog(_logs);
+    _logs.clear();
 }
 
 void ExperimentController::addLogCallback(Poco::Timer &)
