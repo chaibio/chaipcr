@@ -1,7 +1,7 @@
 class ChaiBioTech.Routers.appRouter extends Backbone.Router
 
 	loginScreen: {}
-	
+
 	homePage: {}
 
 	iniitialize: () ->
@@ -10,7 +10,8 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 	routes:
 		"login": "logMeIn"
 		"home": "loadHome"
-		"edit-exp/:id": "editExp"
+		"edit-exp/:id": "editExp" # Remember this is the one for bringing up menu overlay
+		"edit-stage-step/:id": "loadStepStage"
 
 	logMeIn: () ->
 		@loginScreen = new ChaiBioTech.app.Views.login
@@ -18,7 +19,7 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 
 	loadHome: () ->
 		if @loggedIn() is true
-			data = 
+			data =
 			"user": @loginScreen.user
 
 			@homePage = new ChaiBioTech.app.Views.homePage data
@@ -35,14 +36,10 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 		@menuOverLay = new ChaiBioTech.app.Views.menuOverLay
 		$("#container").append(@menuOverLay.render().el)
 
-
-
-
-
-
-
-
-
-
-
-
+	loadStepStage: (id) ->
+		ExpModel = new ChaiBioTech.Models.Experiment({"id": id});
+		@editStageStep = new ChaiBioTech.app.Views.editStageStep({
+				model: ExpModel
+			});
+		$("#container").html(@editStageStep.render().el);
+		this.canvas = new ChaiBioTech.app.Views.fabricCanvas(ExpModel);

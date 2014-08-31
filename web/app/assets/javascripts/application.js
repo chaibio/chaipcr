@@ -21,6 +21,7 @@
 //= require g.line
 //= require rails
 //= require chaipcr
+//= require fabric
 //= require backbone/ChaiBioTech
 //= require backbone/Constants
 

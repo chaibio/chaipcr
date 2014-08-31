@@ -16,7 +16,7 @@ public:
     inline double temperature() const { return _temperature; }
 
     //ADCConsumer
-    void setADCValues(unsigned int differentialADCValue, unsigned int singularADCValue) override;
+    void setADCValues(unsigned int firstADCValue, unsigned int secondADCValue) override;
     boost::signals2::signal<void()> adcValueChanged;
 
 protected:
