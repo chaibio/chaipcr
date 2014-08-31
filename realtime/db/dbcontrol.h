@@ -25,15 +25,12 @@ public:
     DBControl();
     ~DBControl();
 
-    void beginTransaction();
-    void endTransaction();
-
     Experiment* getExperiment(int id);
     void startExperiment(Experiment *experiment);
     void completeExperiment(Experiment *experiment);
 
     void addTemperatureLog(const TemperatureLog &log);
-    void addDebugTemperatureLog(const DebugTemperatureLog &log);
+    void addTemperatureLog(const std::vector<TemperatureLog> &logs);
 
     void addFluorescenceData(const Step *step, int cycle, const std::vector<int> &fluorescenceData);
 

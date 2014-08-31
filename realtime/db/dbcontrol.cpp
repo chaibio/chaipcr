@@ -16,16 +16,6 @@ DBControl::~DBControl()
     delete _session;
 }
 
-void DBControl::beginTransaction()
-{
-    _session->begin();
-}
-
-void DBControl::endTransaction()
-{
-    _session->commit();
-}
-
 Experiment* DBControl::getExperiment(int id)
 {
     soci::row result;
@@ -207,22 +197,49 @@ void DBControl::addTemperatureLog(const TemperatureLog &log)
 {
     _dbMutex.lock();
     {
+        _session->begin();
+
         *_session << "INSERT INTO temperature_logs VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_temp, :heat_block_zone_2_temp)",
                 soci::use(log.experimentId()), soci::use(log.elapsedTime()),
                 soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
                 soci::use(std::round(log.heatBlockZone1Temperature() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Temperature() * 100.0) / 100.0);
+
+        if (log.hasDebugInfo())
+        {
+            *_session << "INSERT INTO temperature_debug_logs VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_drive, :heat_block_zone_2_drive)",
+                    soci::use(log.experimentId()), soci::use(log.elapsedTime()),
+                    soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
+                    soci::use(std::round(log.heatBlockZone1Drive() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Drive() * 100.0) / 100.0);
+        }
+
+        _session->commit();
     }
     _dbMutex.unlock();
 }
 
-void DBControl::addDebugTemperatureLog(const DebugTemperatureLog &log)
+void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
 {
     _dbMutex.lock();
     {
-        *_session << "INSERT INTO temperature_debug_logs VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_drive, :heat_block_zone_2_drive)",
-                soci::use(log.experimentId()), soci::use(log.elapsedTime()),
-                soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
-                soci::use(std::round(log.heatBlockZone1Drive() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Drive() * 100.0) / 100.0);
+        _session->begin();
+
+        for (const TemperatureLog &log: logs)
+        {
+            *_session << "INSERT INTO temperature_logs VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_temp, :heat_block_zone_2_temp)",
+                    soci::use(log.experimentId()), soci::use(log.elapsedTime()),
+                    soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
+                    soci::use(std::round(log.heatBlockZone1Temperature() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Temperature() * 100.0) / 100.0);
+
+            if (log.hasDebugInfo())
+            {
+                *_session << "INSERT INTO temperature_debug_logs VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_drive, :heat_block_zone_2_drive)",
+                        soci::use(log.experimentId()), soci::use(log.elapsedTime()),
+                        soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
+                        soci::use(std::round(log.heatBlockZone1Drive() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Drive() * 100.0) / 100.0);
+            }
+        }
+
+        _session->commit();
     }
     _dbMutex.unlock();
 }

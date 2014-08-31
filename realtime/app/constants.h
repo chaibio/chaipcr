@@ -62,6 +62,7 @@ const double kPCRBeginStepTemperatureThreshold = 3;
 
 //Experiment Controller
 const long kTemperatureLogerInterval = 1000;
+const long kTemperatureLogerFlushInterval = 60 * 1000;
 
 //Heat Sink
 const double kHeatSinkThermistorBetaCoefficient = 3970;  //kelvins
