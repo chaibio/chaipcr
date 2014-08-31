@@ -124,6 +124,7 @@ GPIO::Value GPIO::waitValue(Value value) {
         char buffer[sizeof(int64_t)];
         memset(buffer, 0, sizeof(buffer));
         read(gpioFd, buffer, sizeof(buffer)-1);
+        lseek(gpioFd, 0, SEEK_SET);
 
         if ((buffer[0] == '0' && value == kLow) || (buffer[0] == '1' && value == kHigh)) {
             savedValue_ = value;
