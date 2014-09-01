@@ -22,10 +22,21 @@ ChaiBioTech.app.Views.fabricCanvas = function(model) {
   var addStages = function() {
     var allStages = model.get("experiment").protocol.stages;
     var stage = {};
-    for (stage in allStages) {
-      stageModel = new ChaiBioTech.Models.Stage({"stage": allStages[stage].stage});
-      stageView = new ChaiBioTech.app.Views.fabricStage(stageModel, canvas);
+    var previousStage = null;
+
+    for (stageIndex in allStages) {
+      stageModel = new ChaiBioTech.Models.Stage({"stage": allStages[stageIndex].stage});
+      stageView = new ChaiBioTech.app.Views.fabricStage(stageModel, canvas, stageIndex);
+
+      if(previousStage){
+        previousStage.nextStage = stageView;
+        stageView.previousStage = previousStage;
+      }
+
+      previousStage = stageView;
+      stageView.render();
     }
+
   };
 
   return {
