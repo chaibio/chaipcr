@@ -36,7 +36,10 @@ ChaiBioTech.app.Views.fabricCanvas = function(model) {
       previousStage = stageView;
       stageView.render();
     }
-
+    // Only for the last stage
+    stageView.borderRight();
+    canvas.add(stageView.borderRight);
+    canvas.renderAll();
   };
 
   return {
