@@ -2,6 +2,7 @@ ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
 
 ChaiBioTech.app.Views.fabricStage = function(model, stage, index) {
   this.model = model;
+  this.index = index;
   this.canvas = stage;
   this.myWidth = this.model.get("stage").steps.length * 122;
 
@@ -41,10 +42,39 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, index) {
     })
   }
 
+  this.writeMyNo= function() {
+    var temp = parseInt(this.index) + 1;
+    if(temp < 10) {
+      temp = "0" + temp;
+    }
+    this.stageNo = new fabric.Text(temp, {
+      fill: 'white',
+      fontSize: 32,
+      top : 5,
+      left: this.left + 2 || 32,
+      fontFamily: "Ostrich Sans",
+      selectable: false
+    });
+  }
+
+  this.writeMyName = function() {
+    var stageName = (this.model.get("stage").name).toUpperCase();
+    this.stageName = new fabric.Text(stageName, {
+      fill: 'white',
+      fontSize: 10,
+      top : 28,
+      left: this.left + 25 || 55,
+      fontFamily: "Open Sans",
+      selectable: false
+    })
+  }
+
   this.render = function() {
       this.getLeft();
       this.addRoof();
       this.borderLeft();
+      this.writeMyNo();
+      this.writeMyName();
       this.StageRect = new fabric.Rect({
         left: this.left || 30,
         top: 16,
@@ -56,7 +86,9 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, index) {
       this.canvas.add(this.StageRect);
       this.canvas.add(this.roof);
       this.canvas.add(this.border);
+      this.canvas.add(this.stageNo);
+      this.canvas.add(this.stageName);
+      this.canvas.renderAll();
   }
-
   return this;
 }

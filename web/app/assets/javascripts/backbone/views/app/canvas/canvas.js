@@ -39,7 +39,15 @@ ChaiBioTech.app.Views.fabricCanvas = function(model) {
     // Only for the last stage
     stageView.borderRight();
     canvas.add(stageView.borderRight);
-    canvas.renderAll();
+
+    // This is a bad way to trigger a click in the canvas so that Ostrich Sans is
+    // placed correctly. Interestingly if open sans is used , it works fine.
+    var options = {};
+    options.e = {};
+    options.e.clientX = 0;
+    options.e.clientY = 0;
+    canvas.trigger('mouse:down', options);
+    canvas.trigger('mouse:up', options);
   };
 
   return {
