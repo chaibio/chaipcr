@@ -169,32 +169,32 @@ void ExperimentController::startLogging()
 void ExperimentController::stopLogging()
 {
     _logTimer->stop();
+
+    _dbControl->addTemperatureLog(_logs);
+    _logs.clear();
 }
 
 void ExperimentController::addLogCallback(Poco::Timer &)
 {
-    _dbControl->beginTransaction();
-
-    TemperatureLog log(_experiment->id());
+    TemperatureLog log(_experiment->id(), _settings->debugMode());
     log.setElapsedTime((boost::posix_time::microsec_clock::local_time() - _experiment->startedAt()).total_milliseconds());
     log.setLidTemperature(LidInstance::getInstance()->currentTemperature());
     log.setHeatBlockZone1Temperature(HeatBlockInstance::getInstance()->zone1Temperature());
     log.setHeatBlockZone2Temperature(HeatBlockInstance::getInstance()->zone2Temperature());
 
-    _dbControl->addTemperatureLog(log);
-
-    if (_settings->debugMode())
+    if (log.hasDebugInfo())
     {
-        DebugTemperatureLog debugLog(_experiment->id());
-        debugLog.setElapsedTime(log.elapsedTime());
-        debugLog.setLidTemperature(log.lidTemperature());
-        debugLog.setHeatBlockZone1Drive(HeatBlockInstance::getInstance()->zone1DriveValue());
-        debugLog.setHeatBlockZone2Drive(HeatBlockInstance::getInstance()->zone2DriveValue());
-
-        _dbControl->addDebugTemperatureLog(debugLog);
+        log.setHeatBlockZone1Drive(HeatBlockInstance::getInstance()->zone1DriveValue());
+        log.setHeatBlockZone2Drive(HeatBlockInstance::getInstance()->zone2DriveValue());
     }
 
-    _dbControl->endTransaction();
+    _logs.push_back(std::move(log));
+
+    if ((_logs.back().elapsedTime() - _logs.front().elapsedTime()) >= kTemperatureLogerFlushInterval)
+    {
+        _dbControl->addTemperatureLog(_logs);
+        _logs.clear();
+    }
 }
 
 void ExperimentController::settingsUpdated()

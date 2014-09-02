@@ -8,7 +8,6 @@
 #include "protocol.h"
 #include "experiment.h"
 #include "temperaturelog.h"
-#include "debugtemperaturelog.h"
 #include "settings.h"
 
 #include "dbcontrol.h"

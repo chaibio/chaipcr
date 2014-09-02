@@ -4,10 +4,12 @@
 #include "instance.h"
 
 #include <atomic>
+#include <vector>
 
 class DBControl;
 class Experiment;
 class Settings;
+class TemperatureLog;
 
 namespace Poco { class Timer; }
 
@@ -63,6 +65,8 @@ private:
 
     Poco::Timer *_holdStepTimer;
     Poco::Timer *_logTimer;
+
+    std::vector<TemperatureLog> _logs;
 };
 
 #endif // EXPERIMENTCONTROLLER_H
