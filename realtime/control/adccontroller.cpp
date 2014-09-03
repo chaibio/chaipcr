@@ -33,7 +33,7 @@ ADCController::~ADCController() {
 void ADCController::process() {
     _workState = true;
     while (_workState) {
-        if (_ltc2444->busy()) //waitBusy()
+        if (_ltc2444->waitBusy())
             continue;
 
         uint32_t value;
