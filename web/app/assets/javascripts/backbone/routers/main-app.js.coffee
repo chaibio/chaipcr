@@ -37,9 +37,16 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 		$("#container").append(@menuOverLay.render().el)
 
 	loadStepStage: (id) ->
-		ExpModel = new ChaiBioTech.Models.Experiment({"id": id});
+		that = this;
+		# Sending it as a callback, So that the canvas is created just after model is complete;
+		callback = () ->
+			that.canvas = new ChaiBioTech.app.Views.fabricCanvas(ExpModel);
+			##console.log(this.canvas);
+			that.canvas.setDefaultWidthHeight();
+			that.canvas.addStages();
+
+		ExpModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});
 		@editStageStep = new ChaiBioTech.app.Views.editStageStep({
 				model: ExpModel
 			});
 		$("#container").html(@editStageStep.render().el);
-		this.canvas = new ChaiBioTech.app.Views.fabricCanvas(ExpModel);

@@ -131,19 +131,24 @@
   src: local("simplifica"), url("simplifica.woff") format("woff");
 }
 
-/* line 130, ../../app/assets/stylesheets/screen.css.scss */
+@font-face {
+  font-family: "Ostrich Sans";
+  src: local("Ostrich Sans"), url("ostrich-sans.woff") format("woff");
+}
+
+/* line 135, ../../app/assets/stylesheets/screen.css.scss */
 .simplifica {
   font-family: "simplifica";
   font-size: 30px;
 }
 
-/* line 134, ../../app/assets/stylesheets/screen.css.scss */
+/* line 139, ../../app/assets/stylesheets/screen.css.scss */
 .sansa {
   font-family: 'Open Sans', sans-serif;
   font-size: 12px;
 }
 
-/* line 139, ../../app/assets/stylesheets/screen.css.scss */
+/* line 144, ../../app/assets/stylesheets/screen.css.scss */
 #container {
   width: 1024px;
 }

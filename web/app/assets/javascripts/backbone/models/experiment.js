@@ -262,7 +262,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		}
 	},
 
-	initialize: function(id) {
+	initialize: function(id, callback) {
 		if(this.id) {
 			this.getLatestModel();
 		}
@@ -277,6 +277,10 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		})
 		.done(function(data) {
 				that.set('experiment', data["experiment"]);
+				if(that.get("callback")) {
+					callback = that.get("callback");
+					callback();
+				}
 		})
 		.fail(function() {
 			console.log("Failed to update");
