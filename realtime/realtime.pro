@@ -39,7 +39,7 @@ unix:!unix_m {
 
     #QMAKE_CXXFLAGS += -Wno-unused-local-typedefs -Wno-unused-parameter
 
-    target.path = /root/Dev/
+    target.path = /root/tmp/
     INSTALLS += target
 }
 

@@ -35,6 +35,8 @@ public:
 private:
     void exportPin();
     void unexportPin();
+
+    void changeEdge();
 	
 private:
 	unsigned int pinNumber_; //BeagleBone GPIO Pin Number

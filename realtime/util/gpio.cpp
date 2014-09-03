@@ -22,6 +22,7 @@ GPIO::GPIO(unsigned int pinNumber, Direction direction) :
 	pinNumber_(pinNumber) {
 	
 	exportPin();
+    changeEdge();
 	setDirection(direction);
 
     stopWaitinigFd_ = eventfd(0, EFD_NONBLOCK);
@@ -222,5 +223,16 @@ void GPIO::unexportPin() {
         ofstream unexportFile;
         unexportFile.open("/sys/class/gpio/unexport");
         unexportFile << pinNumber_;
+    }
+}
+
+void GPIO::changeEdge() {
+    if (pinNumber_ != UINT_MAX) {
+        ostringstream filePath;
+        filePath << "/sys/class/gpio/gpio" << pinNumber_ << "/edge";
+
+        ofstream edgeFile(filePath.str().c_str());
+        if (edgeFile.is_open())
+            edgeFile << "both";
     }
 }

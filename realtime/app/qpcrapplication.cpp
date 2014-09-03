@@ -24,6 +24,8 @@ void QPCRApplication::initialize(Application&) {
 
     QPCRFactory::constructMachine(_controlUnits, _threadControlUnits);
     _experimentController = ExperimentController::createInstance();
+
+    initSignals();
 }
 
 int QPCRApplication::main(const vector<string>&) {
@@ -34,7 +36,7 @@ int QPCRApplication::main(const vector<string>&) {
         threadControlUnit->start();
 
     _workState = true;
-    while (_workState) {
+    while (_workState && !hasSignal()) {
         for(auto controlUnit: _controlUnits)
             controlUnit->process();
     }
@@ -45,4 +47,22 @@ int QPCRApplication::main(const vector<string>&) {
 	server.stop();
 
 	return Application::EXIT_OK;
+}
+
+void QPCRApplication::initSignals() {
+    sigemptyset(&_signalsSet);
+    sigaddset(&_signalsSet, SIGQUIT);
+    sigaddset(&_signalsSet, SIGINT);
+    sigaddset(&_signalsSet, SIGTERM);
+    sigprocmask(SIG_BLOCK, &_signalsSet, nullptr);
+}
+
+bool QPCRApplication::hasSignal() const {
+    siginfo_t signalInfo;
+    timespec time;
+
+    time.tv_nsec = 0;
+    time.tv_sec = 0;
+
+    return sigtimedwait(&_signalsSet, &signalInfo, &time) > 0;
 }

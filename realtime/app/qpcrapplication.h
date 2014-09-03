@@ -3,6 +3,7 @@
 
 #include <Poco/Util/ServerApplication.h>
 
+#include <signal.h>
 #include <atomic>
 #include <memory>
 
@@ -27,7 +28,13 @@ protected:
     int main(const std::vector<std::string> &args);
 
 private:
+    void initSignals();
+    bool hasSignal() const;
+
+private:
     static QPCRApplication *_instance;
+
+    sigset_t _signalsSet;
 
     std::atomic<bool> _workState;
 
