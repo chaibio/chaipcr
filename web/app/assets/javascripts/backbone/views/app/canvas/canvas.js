@@ -2,6 +2,7 @@ ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
 
 ChaiBioTech.app.Views.fabricCanvas = function(model) {
 
+  // Re write this part like other files
   var model = model;
 
   var canvas = new fabric.Canvas('canvas', {
