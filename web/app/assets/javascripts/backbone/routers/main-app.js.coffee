@@ -40,10 +40,11 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 		that = this;
 		# Sending it as a callback, So that the canvas is created just after model is complete;
 		callback = () ->
-			that.canvas = new ChaiBioTech.app.Views.fabricCanvas(ExpModel);
+			that.fabricCanvas = new ChaiBioTech.app.Views.fabricCanvas(ExpModel);
 			##console.log(this.canvas);
-			that.canvas.setDefaultWidthHeight();
-			that.canvas.addStages();
+			that.fabricCanvas.setDefaultWidthHeight();
+			that.fabricCanvas.addStages();
+			that.fabricCanvas.addTemperatureLines();
 
 		ExpModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});
 		@editStageStep = new ChaiBioTech.app.Views.editStageStep({

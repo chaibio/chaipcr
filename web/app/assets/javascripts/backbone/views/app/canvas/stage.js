@@ -1,11 +1,10 @@
 ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
 
-ChaiBioTech.app.Views.fabricStage = function(model, stage, index) {
+ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
   this.model = model;
   this.index = index;
   this.canvas = stage;
   this.myWidth = this.model.get("stage").steps.length * 120;
-  this.stepViews = [];
 
   this.getLeft = function() {
     if(this.previousStage) {
@@ -14,7 +13,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, index) {
       this.left = 32;
     }
   }
-
+  
   this.addRoof = function() {
     this.roof = new fabric.Line([0, 0, (this.myWidth - 4), 0], {
         stroke: 'white',
@@ -85,7 +84,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, index) {
       }
 
       tempStep = stepView;
-      this.stepViews.push(stepView);
+      allSteps.push(stepView);
       stepView.render();
     }
     stepView.borderRight.visible = false;
