@@ -4,6 +4,9 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   this.model = model;
   this.parent = parentStep;
   this.canvas = parentStep.canvas;
+  this.spot = 16
+  // This is original radius of the circle , never mind its 13 in code.
+  // there comes some stroke;
   var that = this;
   this.getLeft = function() {
     this.left = this.parent.left + 40;
@@ -18,21 +21,44 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
 
   this.getLines = function(circleIndex) {
     if(this.next) {
-      var x1 = this.circle.left + 13, y1 = this.circle.top + 13,
-      x2 = this.next.circle.left + 13, y2 = this.next.circle.top + 13,
-      curvatureY = this.parent.left + 120,
-      pathString = 'M '+x1+' '+y1+' Q '+70 +', '+ curvatureY+', '+x2 +', '+y2;
-      console.log(x1,y1,x2,y2);
-      this.rightLine = new fabric.Line([x1, y1 , x2, y2], {
+      var x1 = this.circle.left - this.spot, y1 = this.circle.top + this.spot,
+      x2 = this.next.circle.left - this.spot, y2 = this.next.circle.top + this.spot;
+
+    /*  this.rightLine = new fabric.Line([x1, y1, x2, y2], {
         left: x1,
         top: (y1 > y2) ? y2 : y1,
         strokeWidth: 5,
         fill: '#ffd100',
-        stroke: '#ffd100'
+        stroke: '#ffd100',
+        selectable: false
+      }); */
+
+      this.path = new fabric.Path('m 65 0 Q 100, 100, 200, 0', {
+        strokeWidth: 5,
+        fill: '',
+        stroke: '#ffd100',
+        selectable: false
       });
-     this.canvas.add(this.rightLine);
-    //this.canvas.add(this.point);
+
+      // Starting point;
+      this.path.path[0][1] = x1;
+      this.path.path[0][2] = y1;
+
+      // Controlling point right now I take mid point
+      this.path.path[1][1] = (x1 + x2) / 2;
+      this.path.path[1][2] = ((y1 + y2) / 2) + 20;
+
+      // End Point
+      this.path.path[1][3] = x2;
+      this.path.path[1][4] = y2;
+
+     //this.canvas.add(this.rightLine);
+     this.canvas.add(this.path);
+     console.log("look", this.path.getBoundingRect());
     }
+    this.canvas.add(this.circle);
+    // This is moved to here because we want to place circle over the line.
+    // So first we add the line then circle is placed over it.
   }
 
   this.render = function() {
@@ -51,7 +77,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       selectable: true,
       name: "temperatureControllers"
     });
-    this.canvas.add(this.circle);
+
   }
 
   this.canvas.on('object:moving', function(evt) {
