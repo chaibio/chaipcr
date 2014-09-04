@@ -1,4 +1,4 @@
-ChaiBioTech.Models.stage = ChaiBioTech.Models.stage || {};
+ChaiBioTech.Models.Stage = ChaiBioTech.Models.Stage || {};
 
 ChaiBioTech.Models.Stage = Backbone.Model.extend({
 
