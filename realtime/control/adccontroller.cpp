@@ -25,7 +25,9 @@ ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsu
 
 ADCController::~ADCController() {
     stop();
-    join();
+
+    if (joinable())
+        join();
 
     delete _ltc2444;
 }
