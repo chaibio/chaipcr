@@ -19,7 +19,6 @@ void Thermistor::setADCValues(unsigned int firstADCValue, unsigned int secondADC
     } else {
         unsigned int singularADCValue = secondADCValue;
         unsigned int differentialADCValue = firstADCValue;
-        std::cout << "Singular = " << singularADCValue << ", Differential = " << differentialADCValue << std::endl;
         resistance = 27000 /*400*/ * (double)singularADCValue / differentialADCValue;
     }
 

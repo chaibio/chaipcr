@@ -51,8 +51,10 @@ void TestControlHandler::processLid(const ptree &requestPt, ptree &)
     {
         double lidTargetTemp = requestPt.get<double>("lidTargetTemp", -1);
 
-        if (lidTargetTemp != -1)
+        if (lidTargetTemp != -1) {
             lid->setTargetTemperature(lidTargetTemp);
+            lid->setEnableMode(true);
+        }
     }
 }
 
