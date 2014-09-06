@@ -16,14 +16,14 @@ public:
     void process();
 	
 	//accessors
-    inline int targetRPM() const { return _targetRPM; }
+    /*inline int targetRPM() const { return _targetRPM; }
     inline void setTargetRPM(int targetRPM) { _targetRPM = targetRPM; }
 
     inline int currentRPM() const { return _currentRPM; }
 
 private:
     std::atomic<int> _targetRPM;
-    std::atomic<int> _currentRPM;
+    std::atomic<int> _currentRPM;*/
 };
 
 #endif

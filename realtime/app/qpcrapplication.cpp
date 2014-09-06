@@ -44,7 +44,7 @@ int QPCRApplication::main(const vector<string>&) {
     for (auto threadControlUnit: _threadControlUnits)
         threadControlUnit->stop();
 
-    server.stopAll();
+    server.stopAll(true);
 
 	return Application::EXIT_OK;
 }

@@ -42,4 +42,8 @@ static const int kMuxControlPin2 = 31;
 static const int kMuxControlPin3 = 48;
 static const int kMuxControlPin4 = 5;
 
+//ADC
+extern const std::string kADCPinPath;
+static const unsigned int kADCPinChannel = 5;
+
 #endif

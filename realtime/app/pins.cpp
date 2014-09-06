@@ -21,3 +21,6 @@ const std::string kLidControlPWMPath {"/sys/devices/ocp.3/lid_heater_pwm.18"};
 //Head Block
 const std::string kHeatBlockZone1PWMPath {"/sys/devices/ocp.3/peltier1_pwm.14"};
 const std::string kHeatBlockZone2PWMPath {"/sys/devices/ocp.3/peltier2_pwm.15"};
+
+//ADC
+const std::string kADCPinPath {"/sys/bus/iio/devices/iio:device0"};

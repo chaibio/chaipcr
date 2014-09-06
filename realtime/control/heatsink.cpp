@@ -18,7 +18,10 @@ HeatSink::~HeatSink()
 
 void HeatSink::setOutput(double value)
 {
-    _fan->setPWMDutyCycle(value);
+    if (currentTemperature() >= targetTemperature())
+        _fan->setPWMDutyCycle(value);
+    else
+        _fan->setPWMDutyCycle(0.0);
 }
 
 void HeatSink::resetOutput()
@@ -36,7 +39,7 @@ void HeatSink::processOutput()
     _fan->process();
 }
 
-int HeatSink::targetRPM() const
+/*int HeatSink::targetRPM() const
 {
     return _fan->targetRPM();
 }
@@ -44,4 +47,4 @@ int HeatSink::targetRPM() const
 void HeatSink::setTargetRPM(int targetRPM)
 {
     _fan->setTargetRPM(targetRPM);
-}
+}*/

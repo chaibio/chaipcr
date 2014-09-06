@@ -8,9 +8,9 @@ using namespace std;
 Fan::Fan()
     :PWMControl(kHeatSinkFanControlPWMPath, kFanPWMPeriodNs)
 {
-    _currentRPM.store(0);
+    //_currentRPM.store(0);
 
-    setTargetRPM(0);
+    //setTargetRPM(0);
     setPWMDutyCycle(kFanPWMPeriodNs * 0.5);
 }
 
