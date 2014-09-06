@@ -1,10 +1,11 @@
-#include "fan.h"
 #include "heatsink.h"
+#include "pwm.h"
 
-HeatSink::HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController)
+HeatSink::HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController, const std::string &fanPWMPath, unsigned long fanPWMPeriod)
     :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController)
 {
-    _fan = new Fan();
+    _fan = new PWMControl(fanPWMPath, fanPWMPeriod);
+    _fan->setPWMDutyCycle(fanPWMPeriod * 0.5);
 
     resetOutput();
 }
@@ -36,15 +37,4 @@ bool HeatSink::outputDirection() const
 
 void HeatSink::processOutput()
 {
-    _fan->process();
 }
-
-/*int HeatSink::targetRPM() const
-{
-    return _fan->targetRPM();
-}
-
-void HeatSink::setTargetRPM(int targetRPM)
-{
-    _fan->setTargetRPM(targetRPM);
-}*/

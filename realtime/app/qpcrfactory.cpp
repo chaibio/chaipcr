@@ -86,5 +86,5 @@ shared_ptr<IControl> QPCRFactory::constructHeatSink(std::shared_ptr<ADCConsumer>
 
     consumer = thermistor;
 
-    return HeatSinkInstance::createInstance(thermistor, kHeatSinkMinTargetTemp, kHeatSinkMaxTargetTemp, pidController);
+    return HeatSinkInstance::createInstance(thermistor, kHeatSinkMinTargetTemp, kHeatSinkMaxTargetTemp, pidController, kHeatSinkFanControlPWMPath, kFanPWMPeriodNs);
 }

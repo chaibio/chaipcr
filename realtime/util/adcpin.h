@@ -17,7 +17,6 @@ public:
     inline void setChannel(unsigned int channel) { _channel = channel; }
 
     double readVoltage() const;
-    double resistance() const;
 
 private:
     void changeMode();

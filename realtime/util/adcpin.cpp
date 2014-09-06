@@ -40,13 +40,6 @@ double ADCPin::readVoltage() const
     return REF_VOLTAGE * value / MAX_VALUE;
 }
 
-double ADCPin::resistance() const
-{
-    double voltage = readVoltage();
-
-    return (6.8 * voltage) / (REF_VOLTAGE - voltage);
-}
-
 void ADCPin::changeMode()
 {
     std::ofstream modeFile(std::string(path() + "/mode").c_str());

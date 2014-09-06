@@ -62,11 +62,7 @@ void TestControlHandler::processHeatSink(const ptree &requestPt, ptree &)
 
     if (heatSink)
     {
-        //int fanRPM = requestPt.get<int>("fanRPM", -1);
         double heatSinkTargetTemp = requestPt.get<double>("heatSinkTargetTemp", -1);
-
-        //if (fanRPM != -1)
-        //    heatSink->setTargetRPM(fanRPM);
 
         if (heatSinkTargetTemp != -1)
             heatSink->setTargetTemperature(heatSinkTargetTemp);

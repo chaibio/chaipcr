@@ -69,7 +69,6 @@ HEADERS += \
     control/ltc2444.h \
     control/ledcontroller.h \
     control/heatblock.h \
-    control/fan.h \
     control/adccontroller.h \
     util/spi.h \
     util/pwm.h \
@@ -123,7 +122,6 @@ SOURCES += \
     control/ltc2444.cpp \
     control/ledcontroller.cpp \
     control/heatblock.cpp \
-    control/fan.cpp \
     control/adccontroller.cpp \
     util/spi.cpp \
     util/pwm.cpp \
