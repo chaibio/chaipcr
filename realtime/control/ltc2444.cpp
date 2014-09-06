@@ -98,6 +98,7 @@ uint32_t LTC2444::repeat() {
 	std::cout << "Read ADC value: " << conversion << std::endl;
 	csPin_.setValue(GPIO::kHigh);
 	return conversion;
+
 }
 
 bool LTC2444::busy(){

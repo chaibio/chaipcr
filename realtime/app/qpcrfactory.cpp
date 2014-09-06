@@ -69,7 +69,7 @@ shared_ptr<IControl> QPCRFactory::constructLid(shared_ptr<ADCConsumer> &consumer
                                                              kLidThermistorBetaCoefficient, kLidThermistorT0Resistance, kLidThermistorT0));
 
     SinglePoleRecursiveFilter processValueFilter(5);
-    PIDController *pidController = new PIDController({{50,1.0,0.0,0.0}, {100,1.0,0.0,0.0}}, kLidPIDMin, kLidPIDMax, processValueFilter);
+    PIDController *pidController = new PIDController({{100, 1.0, 10000, 0}}, kLidPIDMin, kLidPIDMax, processValueFilter);
 
     consumer = thermistor;
 

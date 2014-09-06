@@ -44,8 +44,6 @@ const int kHeatBlockZonesPIDMax = 1;
 const double kHeatBlockZonesMinTargetTemp = -10;
 const double kHeatBlockZonesMaxTargetTemp = 105;
 
-const long kPIDIntervalMs = 25;
-
 //LED constants
 const int kMinLEDCurrent = 5; //5mA
 const int kGrayscaleClockPwmPeriodNs = 240;

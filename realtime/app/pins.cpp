@@ -16,11 +16,11 @@ const std::string kLEDGrayscaleClockPWMPath {"/sys/devices/ocp.3/led_pwm.16"};
 const std::string kLEDBlankPWMPath { "/sys/devices/ocp.3/lia_ref_pwm.16" };
 
 //Lid
-const std::string kLidControlPWMPath {"/sys/devices/ocp.3/lid_heater_pwm.18"};
+const std::string kLidControlPWMPath {"/sys/devices/ocp.3/lid_heater_pwm.14"};
 
 //Head Block
-const std::string kHeatBlockZone1PWMPath {"/sys/devices/ocp.3/peltier1_pwm.14"};
-const std::string kHeatBlockZone2PWMPath {"/sys/devices/ocp.3/peltier2_pwm.15"};
+const std::string kHeatBlockZone1PWMPath {"/sys/devices/ocp.3/peltier1_pwm.12"};
+const std::string kHeatBlockZone2PWMPath {"/sys/devices/ocp.3/peltier2_pwm.13"};
 
 //ADC
 const std::string kADCPinPath {"/sys/bus/iio/devices/iio:device0"};
