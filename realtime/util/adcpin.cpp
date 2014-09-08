@@ -1,9 +1,9 @@
+#include "pcrincludes.h"
 #include "adcpin.h"
 
 #include <fstream>
 #include <sstream>
 
-#define REF_VOLTAGE 1.8
 #define MAX_VALUE 4095
 
 ADCPin::ADCPin(const std::string &path, unsigned int channel)
@@ -29,6 +29,10 @@ ADCPin& ADCPin::operator= (const ADCPin &other)
 
 double ADCPin::readVoltage() const
 {
+    return kBeagleboneADCReverenceVoltage * readValue() / MAX_VALUE;
+}
+
+double ADCPin::readValue() const {
     std::stringstream channelPath;
     channelPath << path() << "/in_voltage" << channel() << "_raw";
 
@@ -36,8 +40,7 @@ double ADCPin::readVoltage() const
 
     int value = 0;
     channelFile >> value;
-
-    return REF_VOLTAGE * value / MAX_VALUE;
+    return value;
 }
 
 void ADCPin::changeMode()

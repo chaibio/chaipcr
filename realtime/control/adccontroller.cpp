@@ -108,5 +108,5 @@ ADCController::ADCState ADCController::nextState() const {
 }
 
 void ADCController::readADCPin(Poco::Timer &/*timer*/) {
-    _heatSinkConsumer->setADCValues(_adcPin.readVoltage());
+    _heatSinkConsumer->setADCValues(_adcPin.readValue());
 }

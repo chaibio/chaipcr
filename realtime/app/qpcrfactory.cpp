@@ -38,7 +38,7 @@ shared_ptr<IControl> QPCRFactory::constructOptics(shared_ptr<SPIPort> ledSPIPort
 }
 
 shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsumer>> &consumers) {
-    shared_ptr<SteinhartHartThermistor> zone1Thermistor(new SteinhartHartThermistor(0 /* dummy */, kLTC2444ADCBits,
+    shared_ptr<SteinhartHartThermistor> zone1Thermistor(new SteinhartHartThermistor(0 /* dummy */, kLTC2444ADCBits, kPrecisionADCReferenceVoltage,
                                                                                     kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
                                                                                     kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient));
 
@@ -49,7 +49,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
     HeatBlockZoneController *zone1 = new HeatBlockZoneController(zone1Thermistor, kHeatBlockZonesMinTargetTemp, kHeatBlockZonesMaxTargetTemp, zone1CPIDController,
                                                                  kHeatBlockZone1PWMPath, kHeatBlockZone1PWMPeriodNs, kHeadBlockZone1HeatPin, kHeadBlockZone1CoolPin);
 
-    shared_ptr<SteinhartHartThermistor> zone2Thermistor(new SteinhartHartThermistor(0 /* dummy */, kLTC2444ADCBits,
+    shared_ptr<SteinhartHartThermistor> zone2Thermistor(new SteinhartHartThermistor(0 /* dummy */, kLTC2444ADCBits, kPrecisionADCReferenceVoltage,
                                                                                     kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
                                                                                     kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient));
 
@@ -65,7 +65,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
 }
 
 shared_ptr<IControl> QPCRFactory::constructLid(shared_ptr<ADCConsumer> &consumer) {
-    shared_ptr<BetaThermistor> thermistor(new BetaThermistor(kLidThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
+    shared_ptr<BetaThermistor> thermistor(new BetaThermistor(kLidThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits, kPrecisionADCReferenceVoltage,
                                                              kLidThermistorBetaCoefficient, kLidThermistorT0Resistance, kLidThermistorT0));
 
     SinglePoleRecursiveFilter processValueFilter(5);
@@ -78,7 +78,7 @@ shared_ptr<IControl> QPCRFactory::constructLid(shared_ptr<ADCConsumer> &consumer
 }
 
 shared_ptr<IControl> QPCRFactory::constructHeatSink(std::shared_ptr<ADCConsumer> &consumer) {
-    shared_ptr<BetaThermistor> thermistor(new BetaThermistor(1 /* temp */, kLTC2444ADCBits,
+    shared_ptr<BetaThermistor> thermistor(new BetaThermistor(kHeatSinkThermistorVoltageDividerResistanceOhms, kBeagleboneADCBits, kBeagleboneADCReverenceVoltage,
                                                              kHeatSinkThermistorBetaCoefficient, kHeatSinkThermistorT0Resistance, kHeatSinkThermistorT0));
 
     SinglePoleRecursiveFilter processValueFilter(5);

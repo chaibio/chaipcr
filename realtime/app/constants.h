@@ -3,6 +3,9 @@
 
 #include <vector>
 
+//ADC
+const double kPrecisionADCReferenceVoltage = 3.3;
+
 //Steinhart-Hart coefficients for heat block thermistor (QTI Z Curve)
 const double kQTICurveZThermistorACoefficient = 0.001116401465500;
 const double kQTICurveZThermistorBCoefficient = 0.000237982973213;
@@ -67,11 +70,16 @@ const long kTemperatureLogerFlushInterval = 60 * 1000;
 const double kHeatSinkThermistorBetaCoefficient = 3970;  //kelvins
 const double kHeatSinkThermistorT0Resistance = 10000;    //ohms
 const double kHeatSinkThermistorT0 = 298.15;             //kelvins
+const unsigned int kHeatSinkThermistorVoltageDividerResistanceOhms = 6800;
 
 const double kHeatSinkMinTargetTemp = 0;
 const double kHeatSinkMaxTargetTemp = 80;
 
 const unsigned long kHeatSinkPIDMin = -1;
 const unsigned long kHeatSinkPIDMax = 0;
+
+//beaglebone
+const unsigned int kBeagleboneADCBits = 12;
+const double kBeagleboneADCReverenceVoltage = 1.8;
 
 #endif
