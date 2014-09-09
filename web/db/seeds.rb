@@ -8,3 +8,5 @@
 
 # Switch to WAL journaling mode since this is not preserved in schema.rb
 Experiment.connection.execute "PRAGMA journal_mode = WAL"
+
+User.create(:email=>"admin@pcr.com", :password=>"changeme", :password_confirmation=>"changeme", :role=>User::ROLE_ADMIN)
