@@ -17,12 +17,14 @@ HeatSink::~HeatSink()
     delete _fan;
 }
 
+double HeatSink::fanDrive() const
+{
+    return (double)_fan->pwmDutyCycle() / _fan->pwmPeriod();
+}
+
 void HeatSink::setOutput(double value)
 {
-    if (currentTemperature() >= targetTemperature())
-        _fan->setPWMDutyCycle(value);
-    else
-        _fan->setPWMDutyCycle(0.0);
+    _fan->setPWMDutyCycle(value * -1);
 }
 
 void HeatSink::resetOutput()

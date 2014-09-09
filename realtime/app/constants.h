@@ -35,7 +35,7 @@ const long kHeatSinkADCInterval = 1000;
 const int kHttpServerPort = 8000;
 
 //Fan PWM params
-const unsigned long kFanPWMPeriodNs = 1024;
+const unsigned long kFanPWMPeriodNs = 500000;
 
 //Heat Block params
 const unsigned long kHeatBlockZone1PWMPeriodNs = 500000;

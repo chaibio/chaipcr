@@ -61,7 +61,7 @@ double PIDController::compute(double setpoint, double processValue) {
     //non-interactive PID algorithm
     double filteredProcessValue = _processValueFilter.processSample(processValue);
     _integratorS += error * executionDurationS;
-    double derivativeValueS = (filteredProcessValue - _previousProcessValue) / executionDurationS;
+    double derivativeValueS = 0; //(filteredProcessValue - _previousProcessValue) / executionDurationS;
     double output = PIDTuning.kControllerGain * (error + _integratorS / PIDTuning.kIntegralTimeS + PIDTuning.kDerivativeTimeS * derivativeValueS);
 
     //limit drive to system limits, clear integrator when output is maxed to prevent windup

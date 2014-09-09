@@ -9,7 +9,7 @@ const string kSPI0DevicePath {"/dev/spidev1.0"};
 const string kSPI1DevicePath {"/dev/spidev2.0"};
 
 //Heat Sink
-const string kHeatSinkFanControlPWMPath {"/sys/devices/ocp.3/fan_pwm.*"};
+const string kHeatSinkFanControlPWMPath {"/sys/devices/ocp.3/fan_pwm.15"};
 
 //LED control
 const std::string kLEDGrayscaleClockPWMPath {"/sys/devices/ocp.3/led_pwm.16"};

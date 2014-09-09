@@ -36,6 +36,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
 
     if (heatSink) {
         responsePt.put("heatSink.temperature", heatSink->currentTemperature());
+        responsePt.put("heatSink.fanDrive", heatSink->fanDrive());
     }
 
     if (experimentController) {

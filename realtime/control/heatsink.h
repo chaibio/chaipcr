@@ -12,8 +12,7 @@ public:
              const std::string &fanPWMPath, unsigned long fanPWMPeriod);
     ~HeatSink();
 
-    int targetRPM() const;
-    void setTargetRPM(int targetRPM);
+    double fanDrive() const;
 
 protected:
     void setOutput(double value);

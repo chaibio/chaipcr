@@ -68,8 +68,6 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
     LidInstance::getInstance()->setTargetTemperature(_experiment->protocol()->lidTemperature());
     LidInstance::getInstance()->setEnableMode(true);
 
-    HeatSinkInstance::getInstance()->setEnableMode(true);
-
     return Started;
 }
 
@@ -112,7 +110,6 @@ void ExperimentController::stop()
 
     LidInstance::getInstance()->setEnableMode(false);
     HeatBlockInstance::getInstance()->setEnableMode(false);
-    HeatSinkInstance::getInstance()->setEnableMode(false);
     OpticsInstance::getInstance()->setCollectData(false);
 
     if (_machineState != Complete)

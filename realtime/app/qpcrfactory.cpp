@@ -19,6 +19,10 @@ void QPCRFactory::constructMachine(std::vector<std::shared_ptr<IControl> > &cont
     controls.push_back(QPCRFactory::constructHeatSink(heatSinkADCConsumer));
 
     threadControls.push_back(ADCControllerInstance::createInstance(zoneConsumers, OpticsInstance::getInstance(), lidADCConsumer, heatSinkADCConsumer, kLTC2444CSPinNumber, std::move(SPIPort(kSPI0DevicePath)), kSPI0DataInSensePinNumber, ADCPin(kADCPinPath, kADCPinChannel))); //Not refactored yet
+
+    shared_ptr<HeatSink> heatSink = HeatSinkInstance::getInstance();
+    heatSink->setTargetTemperature(30);
+    heatSink->setEnableMode(true);
 }
 
 shared_ptr<IControl> QPCRFactory::constructOptics(shared_ptr<SPIPort> ledSPIPort) {
@@ -61,7 +65,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
     consumers.push_back(zone1Thermistor);
     consumers.push_back(zone2Thermistor);
 
-    return HeatBlockInstance::createInstance(zone1, zone2, kPCRBeginStepTemperatureThreshold );
+    return HeatBlockInstance::createInstance(zone1, zone2, kPCRBeginStepTemperatureThreshold);
 }
 
 shared_ptr<IControl> QPCRFactory::constructLid(shared_ptr<ADCConsumer> &consumer) {
@@ -82,7 +86,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatSink(std::shared_ptr<ADCConsumer>
                                                              kHeatSinkThermistorBetaCoefficient, kHeatSinkThermistorT0Resistance, kHeatSinkThermistorT0));
 
     SinglePoleRecursiveFilter processValueFilter(5);
-    PIDController *pidController = new PIDController({{50,1.0,0.0,0.0}, {100,1.0,0.0,0.0}}, kHeatSinkPIDMin, kHeatSinkPIDMax, processValueFilter);
+    PIDController *pidController = new PIDController({{100,1.0,10000,0.0}}, kHeatSinkPIDMin, kHeatSinkPIDMax, processValueFilter);
 
     consumer = thermistor;
 
