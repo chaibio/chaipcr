@@ -23,6 +23,11 @@
   <ul>
       <li><a href='#ramps-update'>update</a></li>
   </ul>
+  <h4><a href='#sessions'>Sessions</a></h4>
+  <ul>
+      <li><a href='#sessions-create'>create</a></li>
+      <li><a href='#sessions-destroy'>destroy</a></li>
+  </ul>
   <h4><a href='#stages'>Stages</a></h4>
   <ul>
       <li><a href='#stages-create'>create</a></li>
@@ -36,6 +41,13 @@
       <li><a href='#steps-update'>update</a></li>
       <li><a href='#steps-move'>move</a></li>
       <li><a href='#steps-destroy'>destroy</a></li>
+  </ul>
+  <h4><a href='#users'>Users</a></h4>
+  <ul>
+      <li><a href='#users-index'>index</a></li>
+      <li><a href='#users-create'>create</a></li>
+      <li><a href='#users-update'>update</a></li>
+      <li><a href='#users-destroy'>destroy</a></li>
   </ul>
 
 
@@ -542,6 +554,99 @@ decimal point</p>
   <hr/>
 
   <div>
+    <h2 id="sessions">
+      <a href='#sessions'>Sessions</a><br>
+      <small></small>
+    </h2>
+  </div>
+
+
+  <div>
+
+      <hr/>
+
+      <h3 id="sessions-create">
+      <a href='#sessions'>Sessions</a> / <a href='#sessions-create'>create</a>
+      </h3>
+
+      <div>
+          <h4>
+              POST /login
+            <br>
+            <small>Login</small>
+          </h4>
+      </div>
+
+      <div>
+        
+<p>cookie will be set with the authentication token, the token will expire in
+a day</p>
+
+          <h4>Examples</h4>
+            <pre class="wiki">{&#39;authentication_token&#39;:&#39;adfadfdfadf&#39;}</pre>
+
+          <h4>Errors</h4>
+            401
+            {&#39;errors&#39;:&#39;The email and password entered do not match&#39;}
+            <pre class="prettyprint lang-yaml">--- 
+...
+</pre>
+
+            <br>
+
+          <h4>Params</h4>
+          <ul>
+    <li>
+      <strong>email </strong>:
+      <small>
+        required
+        
+          [ Must be String ]
+      </small>
+      
+<p>Email</p>
+
+    </li>
+    
+    <li>
+      <strong>password </strong>:
+      <small>
+        required
+        
+          [ Must be String ]
+      </small>
+      
+<p>Password</p>
+
+    </li>
+    
+</ul>
+
+      </div>
+      <hr/>
+
+      <h3 id="sessions-destroy">
+      <a href='#sessions'>Sessions</a> / <a href='#sessions-destroy'>destroy</a>
+      </h3>
+
+      <div>
+          <h4>
+              POST /logout
+            <br>
+            <small>Logout</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+      </div>
+  </div>
+
+  <hr/>
+
+  <div>
     <h2 id="stages">
       <a href='#stages'>Stages</a><br>
       <small></small>
@@ -1006,6 +1111,238 @@ destroyed too if it is not the last stage in the protocol.</p>
 
           <h4>Examples</h4>
             <pre class="wiki">{&#39;step&#39;:{&#39;destroyed_stage_id&#39;:1}}</pre>
+
+
+      </div>
+  </div>
+
+  <hr/>
+
+  <div>
+    <h2 id="users">
+      <a href='#users'>Users</a><br>
+      <small></small>
+    </h2>
+  </div>
+
+    <div>
+<p>all the actions only allowed if admin user logged in, otherwise response
+code 401 will be returned</p>
+</div>
+
+  <div>
+
+      <hr/>
+
+      <h3 id="users-index">
+      <a href='#users'>Users</a> / <a href='#users-index'>index</a>
+      </h3>
+
+      <div>
+          <h4>
+              GET /users
+            <br>
+            <small>List all the users</small>
+          </h4>
+      </div>
+
+      <div>
+        
+          <h4>Examples</h4>
+            <pre class="wiki">[{&#39;user&#39;:{&#39;id&#39;:1,&#39;email&#39;:&#39;admin@admin.com&#39;,&#39;role&#39;:&#39;admin&#39;}}]</pre>
+
+
+      </div>
+      <hr/>
+
+      <h3 id="users-create">
+      <a href='#users'>Users</a> / <a href='#users-create'>create</a>
+      </h3>
+
+      <div>
+          <h4>
+              POST /users
+            <br>
+            <small>Create an user</small>
+          </h4>
+      </div>
+
+      <div>
+        
+          <h4>Examples</h4>
+            <pre class="wiki">[{&#39;user&#39;:{&#39;id&#39;:1,&#39;email&#39;:&#39;test@test.com&#39;,&#39;role&#39;:&#39;default&#39;}}]</pre>
+
+
+          <h4>Params</h4>
+          <ul>
+    <li>
+      <strong>user </strong>:
+      <small>
+        required
+        
+          [ Must be a Hash ]
+      </small>
+      
+<p>User Info</p>
+
+    </li>
+    <ul>
+    <li>
+      <strong>email </strong>:
+      <small>
+        required
+        
+          [ Must be String ]
+      </small>
+      
+<p>User Email</p>
+
+    </li>
+    
+    <li>
+      <strong>password </strong>:
+      <small>
+        required
+        
+          [ Must be String ]
+      </small>
+      
+<p>User Password</p>
+
+    </li>
+    
+    <li>
+      <strong>password_confirmation </strong>:
+      <small>
+        required
+        
+          [ Must be String ]
+      </small>
+      
+<p>User Password Confirmation</p>
+
+    </li>
+    
+    <li>
+      <strong>role </strong>:
+      <small>
+        optional
+        
+          [ Must be one of: admin, default. ]
+      </small>
+      
+<p>User Role</p>
+
+    </li>
+    
+</ul>
+
+</ul>
+
+      </div>
+      <hr/>
+
+      <h3 id="users-update">
+      <a href='#users'>Users</a> / <a href='#users-update'>update</a>
+      </h3>
+
+      <div>
+          <h4>
+              PUT /users/:id
+            <br>
+            <small>Update an user</small>
+          </h4>
+      </div>
+
+      <div>
+        
+          <h4>Examples</h4>
+            <pre class="wiki">[{&#39;user&#39;:{&#39;id&#39;:1,&#39;email&#39;:&#39;test@test.com&#39;,&#39;role&#39;:&#39;default&#39;}}]</pre>
+
+
+          <h4>Params</h4>
+          <ul>
+    <li>
+      <strong>user </strong>:
+      <small>
+        required
+        
+          [ Must be a Hash ]
+      </small>
+      
+<p>User Info</p>
+
+    </li>
+    <ul>
+    <li>
+      <strong>email </strong>:
+      <small>
+        required
+        
+          [ Must be String ]
+      </small>
+      
+<p>User Email</p>
+
+    </li>
+    
+    <li>
+      <strong>password </strong>:
+      <small>
+        optional
+        
+          [ Must be String ]
+      </small>
+      
+<p>User Password</p>
+
+    </li>
+    
+    <li>
+      <strong>password_confirmation </strong>:
+      <small>
+        optional
+        
+          [ Must be String ]
+      </small>
+      
+<p>User Password Confirmation</p>
+
+    </li>
+    
+    <li>
+      <strong>role </strong>:
+      <small>
+        optional
+        
+          [ Must be one of: admin, default. ]
+      </small>
+      
+<p>User Role</p>
+
+    </li>
+    
+</ul>
+
+</ul>
+
+      </div>
+      <hr/>
+
+      <h3 id="users-destroy">
+      <a href='#users'>Users</a> / <a href='#users-destroy'>destroy</a>
+      </h3>
+
+      <div>
+          <h4>
+              DELETE /users/:id
+            <br>
+            <small>Destroy an user</small>
+          </h4>
+      </div>
+
+      <div>
+        
 
 
       </div>

@@ -7,11 +7,20 @@ class UserToken < ActiveRecord::Base
   scope :active,  -> { where('expired_at >= ?', Time.now) }
   
   def self.digest(token)
-     Digest::SHA1.hexdigest(token)
+     (!token.blank?)? Digest::SHA1.hexdigest(token) : nil
   end
   
   def token
     return @token
+  end
+  
+  def about_to_expire
+    expired_at <= 4.hours.from_now
+  end
+  
+  def reset_expiry_date!
+    set_expiry_date
+    save
   end
   
   private

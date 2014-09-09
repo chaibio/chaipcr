@@ -11,7 +11,14 @@ class ApplicationController < ActionController::Base
   
   # Renders a 401 status code if the current user is not authorized
   def ensure_authenticated_user
-    head :unauthorized unless logged_in? && authorized?
+    if logged_in? && authorized?
+      return true
+    else
+      respond_to do |format|
+        format.json { render json: {errors: (logged_in?)? "unauthorized" : (User.empty?)? "sign up" : "login in"}, status: :unauthorized }
+      end
+      return false
+    end
   end
 
   def authorized?
@@ -24,6 +31,9 @@ class ApplicationController < ActionController::Base
       user_token = UserToken.active.where(access_token: UserToken.digest(token)).first
       if user_token
         @current_user = user_token.user
+        if user_token.about_to_expire
+          user_token.reset_expiry_date!
+        end
       end
     end
     return @current_user

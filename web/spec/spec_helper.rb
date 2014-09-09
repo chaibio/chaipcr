@@ -39,10 +39,6 @@ RSpec.configure do |config|
   # the seed, which is printed after each run.
   #     --seed 1234
   config.order = "random"
-  
-  config.before(:each) do
-    load Rails.root + "db/seeds_test.rb" 
-  end
    
   config.include(FactoryHelper)
 end

@@ -8,8 +8,30 @@ class User < ActiveRecord::Base
   ROLE_DEFAULT  = 0
   ROLE_ADMIN    = 1
 
+  def self.empty?
+    self.count == 0
+  end
+  
   def admin?
-    role == ROLE_ADMIN
+    read_attribute(:role) == ROLE_ADMIN
+  end
+  
+  def role
+    value = read_attribute(:role)
+    if value == ROLE_ADMIN
+      "admin"
+    else
+      "default"
+    end
+  end
+  
+  def role=(value)
+    value = (!value.blank?)? value.strip.downcase : nil
+    if value == "admin"
+      write_attribute(:role, ROLE_ADMIN)
+    else
+      write_attribute(:role, ROLE_DEFAULT)
+    end
   end
   
   def email=(value)

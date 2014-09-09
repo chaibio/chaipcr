@@ -21,4 +21,12 @@ module FactoryHelper
   def cycle_stage(protocol)
     Stage.create(:stage_type=>Stage::TYPE_CYCLE, :protocol_id=>protocol.id)
   end
+  
+  def create_admin_user
+    User.create(:email=>"admin@pcr.com", :password=>"changeme", :password_confirmation=>"changeme", :role=>"admin")
+  end
+  
+  def create_test_user
+    User.create(:email=>"test@test.com", :password=>"changeme", :password_confirmation=>"changeme")
+  end
 end
