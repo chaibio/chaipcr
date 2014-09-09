@@ -4,8 +4,8 @@
 #include "filters.h"
 
 #include <vector>
+#include <mutex>
 #include <boost/date_time/posix_time/ptime.hpp>
-#include <Poco/RWLock.h>
 
 struct SPIDTuning {
     int maxValueInclusive;
@@ -26,10 +26,11 @@ public:
 
     //computation
     double compute(double setpoint, double processValue);
+    void reset();
 
 private:
     const SPIDTuning& determineGainSchedule(double setpoint) const;
-    bool latchValue(double* value, double minValue, double maxValue);
+    bool latchValue(double& value, double minValue, double maxValue);
 
 private:
     std::vector<SPIDTuning> _gainSchedule;
@@ -40,32 +41,7 @@ private:
     double _integratorS;
     boost::posix_time::ptime _previousExecutionTime;
 
-    mutable Poco::RWLock lock;
+    mutable std::mutex _lock;
 };
-
-/*class PIDControl {
-public:
-    PIDControl(PIDController *pidController, long pidTimerInterval);
-    virtual ~PIDControl();
-
-protected:
-    void startPid();
-    void stopPid();
-
-    virtual void pidCallback(double pidResult) = 0;
-
-private:
-    void pidCallback(Poco::Timer &timer);
-
-protected:
-    PIDController *_pidController;
-    std::atomic<double> _pidResult;
-
-    Poco::Timer *_pidTimer;
-    long _pidTimerInterval;
-
-    std::function<double()> _targetValue;
-    std::function<double()> _currentValue;
-};*/
 
 #endif // PID_H

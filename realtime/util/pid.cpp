@@ -19,7 +19,35 @@ PIDController::~PIDController() {
 }
 //------------------------------------------------------------------------------
 double PIDController::compute(double setpoint, double processValue) {
-    //calc values for this computation
+    const SPIDTuning& pidTuning = determineGainSchedule(setpoint);
+    ptime currentExecutionTime = microsec_clock::universal_time();
+    double error = setpoint - processValue;
+    double output = 0;
+
+    _lock.lock(); {
+        double filteredProcessValue = _processValueFilter.processSample(processValue);
+
+        if (!_previousExecutionTime.is_not_a_date_time()) {
+            double executionDurationS = (currentExecutionTime - _previousExecutionTime).total_microseconds() / 1000000;
+            double derivativeValueS = (filteredProcessValue - _previousProcessValue) / executionDurationS;
+
+            _integratorS += error * executionDurationS;
+            output = pidTuning.kControllerGain * (error + _integratorS / pidTuning.kIntegralTimeS + pidTuning.kDerivativeTimeS * derivativeValueS);
+
+            if (latchValue(output, _minOutput, _maxOutput))
+                _integratorS = 0;
+        }
+        else
+            _integratorS = 0;
+
+        _previousExecutionTime = currentExecutionTime;
+        _previousProcessValue = filteredProcessValue;
+    }
+    _lock.unlock();
+
+    return output;
+
+    /*//calc values for this computation
     const SPIDTuning& PIDTuning = determineGainSchedule(setpoint);
     double error = setpoint - processValue;
 
@@ -46,8 +74,15 @@ double PIDController::compute(double setpoint, double processValue) {
 
     lock.unlock();
 
-    return output;
+    return output;*/
 }
+//------------------------------------------------------------------------------
+void PIDController::reset() {
+    _lock.lock();
+    _previousExecutionTime = not_a_date_time;
+    _lock.unlock();
+}
+
 //------------------------------------------------------------------------------
 const SPIDTuning& PIDController::determineGainSchedule(double setpoint) const {
     for (const SPIDTuning &item: _gainSchedule)
@@ -59,51 +94,13 @@ const SPIDTuning& PIDController::determineGainSchedule(double setpoint) const {
     return _gainSchedule.front();
 }
 //------------------------------------------------------------------------------
-bool PIDController::latchValue(double* value, double minValue, double maxValue) {
-    if (*value < minValue)
-        *value = minValue;
-    else if (*value > maxValue)
-        *value = maxValue;
+bool PIDController::latchValue(double &value, double minValue, double maxValue) {
+    if (value < minValue)
+        value = minValue;
+    else if (value > maxValue)
+        value = maxValue;
     else
         return false;
 
     return true;
 }
-
-/*--------------------------------------------PIDControl--------------------------------------------*/
-/*PIDControl::PIDControl(PIDController *pidController, long pidTimerInterval) {
-    _pidController = pidController;
-    _pidResult.store(0);
-    _pidTimerInterval = pidTimerInterval;
-    _pidTimer = new Poco::Timer;
-}
-
-PIDControl::~PIDControl() {
-    delete _pidTimer;
-    delete _pidController;
-}
-
-void PIDControl::startPid() {
-    if (!_targetValue)
-        throw std::logic_error("targetValue is empty");
-    else if (!_currentValue)
-        throw std::logic_error("currentValue is empty");
-
-    _pidTimer->setPeriodicInterval(_pidTimerInterval);
-    _pidTimer->start(Poco::TimerCallback<PIDControl>(*this, &PIDControl::pidCallback));
-}
-
-void PIDControl::stopPid() {
-    _pidTimer->stop();
-}
-
-void PIDControl::pidCallback(Poco::Timer &) {
-    double result = _pidController->compute(_targetValue(), _currentValue());
-
-    if (result != _pidResult.load())
-    {
-        _pidResult.store(result);
-
-        pidCallback(result);
-    }
-}*/

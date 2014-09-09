@@ -25,6 +25,8 @@ void TemperatureController::setEnableMode(bool enableMode)
 
         if (_enableMode)
         {
+            _pidController->reset();
+
             _pidMutex.lock();
             _pidState = true;
             _pidMutex.unlock();
