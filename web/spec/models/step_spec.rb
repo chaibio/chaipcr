@@ -22,8 +22,43 @@ describe Step do
         step.reload.name.should eq("Step 1")
         last_step.reload.name.should eq("Step 2")
       end
+      
+      it "not allowed after infinite hold step" do
+        last_step = @stage.steps.last
+        last_step.hold_time = 0
+        last_step.save
+        step = Step.new(:stage_id=>@stage.id)
+        step.prev_id = last_step.id
+        step.save.should be_false
+        step.errors.should have(1).item
+      end
     end
 
+    describe "#update" do
+      it "not allowed to update to infinite hold if it is not the last step in the same stage" do
+        @stage.steps << Step.new(:temperature=>95, :hold_time=>30, :order_number=>1)
+        step = @stage.steps.first
+        step.hold_time = 0
+        step.save.should be_false
+        step.errors.should have(1).item
+      end
+      
+      it "not allowed to update to infinite hold if it is not the last stage" do
+        new_stage = hold_stage(@stage.protocol).reload
+        step = new_stage.steps.last
+        step.hold_time = 0
+        step.save.should be_false
+        step.errors.should have(1).item
+      end
+      
+      it "allowed to update to infinite hold if it is the last step in the last stage" do
+        new_stage = hold_stage(@stage.protocol).reload
+        step = @stage.steps.last
+        step.hold_time = 0
+        step.save.should be_true
+      end
+    end
+    
     describe "#destroy" do
       it "last step in last stage" do
         step = @stage.steps.first

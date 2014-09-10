@@ -7,6 +7,8 @@ class Step < ActiveRecord::Base
   
   attr_accessor :destroyed_stage_id
   
+  validate :validate
+  
   before_create do |step|
     if step.temperature.nil? || step.hold_time.nil?
       if !prev_id.nil?
@@ -68,6 +70,29 @@ class Step < ActiveRecord::Base
       stage.steps.where("id != ?", id)
     else
       stage.steps
+    end
+  end
+  
+  def last_step?
+    !self.class.where("stage_id = ? and order_number > ?", stage_id, order_number).exists?
+  end
+  
+  protected
+
+  def validate
+    if new_record?
+      if !prev_id.nil?
+        step = Step.find(prev_id)
+        if step && step.infinite_hold?
+          errors.add(:base, "Cannot add step after infinite hold step")
+        end
+      end
+    else
+      if hold_time_changed? && infinite_hold? #make sure it is the last step
+          if !last_step? || !stage.last_stage?
+            errors.add(:base, "Cannot update step in the middle to infinite hold")
+          end
+      end
     end
   end
 end

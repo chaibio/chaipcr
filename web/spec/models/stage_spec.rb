@@ -43,6 +43,17 @@ describe Stage do
       new_stage.steps.should have(1).items
       new_stage.steps.first.should be_same_step_as(stage.steps.last)
     end
+    
+    it "not allowed after a stage with infinite step" do
+      stage = hold_stage(@protocol).reload
+      step = stage.steps.last
+      step.hold_time = 0
+      step.save
+      new_stage = Stage.new(:stage_type=>Stage::TYPE_HOLD, :protocol_id=>@protocol.id)
+      new_stage.prev_id = stage.id
+      new_stage.save.should be_false
+      new_stage.errors.should have(1).item
+    end
   end
   
   describe "#destroy" do
