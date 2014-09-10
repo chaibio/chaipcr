@@ -76,7 +76,7 @@ void TemperatureController::computePid()
         {
             double result = _pidController->compute(targetTemperature(), currentTemperature());
 
-            if (result != _pidResult)
+            if (_enableMode && result != _pidResult)
             {
                 _pidResult = result;
                 setOutput(result);
