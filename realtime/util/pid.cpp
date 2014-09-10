@@ -28,7 +28,7 @@ double PIDController::compute(double setpoint, double processValue) {
         double filteredProcessValue = _processValueFilter.processSample(processValue);
 
         if (!_previousExecutionTime.is_not_a_date_time()) {
-            double executionDurationS = (currentExecutionTime - _previousExecutionTime).total_microseconds() / 1000000;
+            double executionDurationS = (double)(currentExecutionTime - _previousExecutionTime).total_microseconds() / 1000000;
             double derivativeValueS = (filteredProcessValue - _previousProcessValue) / executionDurationS;
 
             _integratorS += error * executionDurationS;

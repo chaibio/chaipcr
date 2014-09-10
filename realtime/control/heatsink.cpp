@@ -5,7 +5,7 @@ HeatSink::HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp,
     :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController)
 {
     _fan = new PWMControl(fanPWMPath, fanPWMPeriod);
-    _fan->setPWMDutyCycle(fanPWMPeriod * 0.5);
+    _fan->setPWMDutyCycle((unsigned long)0);
 
     resetOutput();
 }
