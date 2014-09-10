@@ -38,11 +38,11 @@ const int kHttpServerPort = 8000;
 const unsigned long kFanPWMPeriodNs = 500000;
 
 //Heat Block params
-const unsigned long kHeatBlockZone1PWMPeriodNs = 500000;
-const unsigned long kHeatBlockZone2PWMPeriodNs = 500000;
+const unsigned long kHeatBlockZone1PWMPeriodNs = 100000;
+const unsigned long kHeatBlockZone2PWMPeriodNs = 100000;
 
-const int kHeatBlockZonesPIDMin = -1;
-const int kHeatBlockZonesPIDMax = 1;
+const double kHeatBlockZonesPIDMin = -1;
+const double kHeatBlockZonesPIDMax = 1;
 
 const double kHeatBlockZonesMinTargetTemp = -10;
 const double kHeatBlockZonesMaxTargetTemp = 105;
@@ -75,8 +75,8 @@ const unsigned int kHeatSinkThermistorVoltageDividerResistanceOhms = 6800;
 const double kHeatSinkMinTargetTemp = 0;
 const double kHeatSinkMaxTargetTemp = 80;
 
-const unsigned long kHeatSinkPIDMin = -1;
-const unsigned long kHeatSinkPIDMax = 0;
+const double kHeatSinkPIDMin = -1;
+const double kHeatSinkPIDMax = 0;
 
 //beaglebone
 const unsigned int kBeagleboneADCBits = 12;

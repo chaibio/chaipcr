@@ -6,7 +6,7 @@ using namespace boost::posix_time;
 
 ////////////////////////////////////////////////////////////////////
 // Class PIDController
-PIDController::PIDController(const std::vector<SPIDTuning>& pGainSchedule, int minOutput, int maxOutput, const SinglePoleRecursiveFilter& processValueFilter):
+PIDController::PIDController(const std::vector<SPIDTuning>& pGainSchedule, double minOutput, double maxOutput, const SinglePoleRecursiveFilter& processValueFilter):
     _gainSchedule {pGainSchedule},
     _processValueFilter {processValueFilter},
     _minOutput {minOutput},

@@ -209,7 +209,7 @@
 		__overlay__ {
 			peltier1_pwm {
 			    compatible      = "pwm_test";
-			    pwms            = <&ehrpwm2 1 500000 0>;
+			    pwms            = <&ehrpwm2 1 100000 0>;
 			    pwm-names       = "PWM_P8_13";
 			    pinctrl-names   = "default";
 			    pinctrl-0       = <&peltier1_pwm_pin>;
@@ -220,7 +220,7 @@
 
 			peltier2_pwm {
 			    compatible      = "pwm_test";
-			    pwms            = <&ehrpwm2 0 500000 0>;
+			    pwms            = <&ehrpwm2 0 100000 0>;
 			    pwm-names       = "PWM_P8_19";
 			    pinctrl-names   = "default";
 			    pinctrl-0       = <&peltier2_pwm_pin>;

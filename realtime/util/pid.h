@@ -18,11 +18,11 @@ struct SPIDTuning {
 // Class PIDController
 class PIDController {
 public:
-    PIDController(const std::vector<SPIDTuning>& pGainSchedule, int minOutput, int maxOutput, const SinglePoleRecursiveFilter& processValueFilter);
+    PIDController(const std::vector<SPIDTuning>& pGainSchedule, double minOutput, double maxOutput, const SinglePoleRecursiveFilter& processValueFilter);
     ~PIDController();
 
-    inline int getMinOutput() const { return _minOutput; }
-    inline int getMaxOutput() const { return _maxOutput; }
+    inline double getMinOutput() const { return _minOutput; }
+    inline double getMaxOutput() const { return _maxOutput; }
 
     //computation
     double compute(double setpoint, double processValue);
@@ -35,7 +35,7 @@ private:
 private:
     std::vector<SPIDTuning> _gainSchedule;
     SinglePoleRecursiveFilter _processValueFilter;
-    const int _minOutput, _maxOutput;
+    const double _minOutput, _maxOutput;
 
     double _previousProcessValue;
     double _integratorS;
