@@ -30,13 +30,6 @@ ActiveRecord::Schema.define(version: 20140814182908) do
     t.integer "cycle_num"
   end
 
-  create_table "posts", force: true do |t|
-    t.string   "title"
-    t.string   "content"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "protocols", force: true do |t|
     t.decimal  "lid_temperature", precision: 4, scale: 1
     t.integer  "experiment_id"
