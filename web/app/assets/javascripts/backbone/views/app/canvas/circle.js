@@ -22,6 +22,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     }
     // This is moved to here because we want to place circle over the line.
     // So first we add the line then circle is placed over it.
+    this.canvas.add(this.outerCircle);
     this.canvas.add(this.circle);
   }
 
@@ -42,21 +43,39 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       name: "temperatureControllers",
       parent: this // We may need it when it fires some event
     });
+    this.getOuterCircle();
   }
 
   this.calculateControllingPoints = function(targetedCircle) {
     //targetedCircle.curve.path[1][1] =
   }
 
+  this.getOuterCircle = function() {
+    this.outerCircle = new fabric.Circle({
+      radius: 25,
+      left: this.left - 7,
+      lockMovementX: true,
+      hasControls: false,
+      hasBorders: false,
+      top: this.top - 7,
+      fill: '#ffb400',
+      selectable: true,
+      name: "temperatureControllerOuterCircle",
+      parent: this // We may need it when it fires some event
+    })
+  }
+
   this.canvas.on('object:moving', function(evt) {
     if(evt.target.name === "temperatureControllers") {
-      var targetedCircle = evt.target, left = evt.target.left, top = evt.target.top;
+      var targetedCircle = evt.target, left = evt.target.left, top = evt.target.top,
+      outerCircle = targetedCircle.parent.outerCircle;
 
       if(top < 60) {
         targetedCircle.top = 60;
       } else if(top > 360) {
         targetedCircle.top = 360;
       }
+      outerCircle.top = targetedCircle.top - 7;
 
       left = left - 16;
       top = top + 16;
