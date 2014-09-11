@@ -13,6 +13,12 @@ class PIDController;
 class TemperatureController : public IControl//, public PIDControl
 {
 public:
+    enum Direction
+    {
+        EHeat,
+        ECool
+    };
+
     TemperatureController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController);
 
     inline bool enableMode() const { return _enableMode; }
@@ -20,9 +26,9 @@ public:
 
     void setTargetTemperature(double temperature);
     inline double targetTemperature() const { return _targetTemperature.load(); }
-
-    virtual bool outputDirection() const = 0;
     double currentTemperature() const;
+
+    virtual Direction outputDirection() const = 0;
 
     void process() final;
 

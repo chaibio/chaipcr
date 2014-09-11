@@ -4,7 +4,6 @@
 #include "icontrol.h"
 
 #include "spi.h"
-#include "adcpin.h"
 
 #include <vector>
 #include <memory>
@@ -12,8 +11,6 @@
 
 class LTC2444;
 class ADCConsumer;
-
-namespace Poco { class Timer; }
 
 // Class ADCController
 class ADCController : public IThreadControl
@@ -29,8 +26,8 @@ public:
         EFinal
     };
 
-    ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsumers, std::shared_ptr<ADCConsumer> liaConsumer, std::shared_ptr<ADCConsumer> lidConsumer, std::shared_ptr<ADCConsumer> heatSinkConsumer,
-                  unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber, const ADCPin &adcPin);
+    ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsumers, std::shared_ptr<ADCConsumer> liaConsumer, std::shared_ptr<ADCConsumer> lidConsumer,
+                  unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber);
 	~ADCController();
 	
     void process();
@@ -38,8 +35,6 @@ public:
 
 private:
     ADCState nextState() const;
-
-    void readADCPin(Poco::Timer &timer);
 	
 private:
     std::atomic<bool> _workState;
@@ -51,10 +46,6 @@ private:
     std::vector<std::shared_ptr<ADCConsumer>> _zoneConsumers;
     std::shared_ptr<ADCConsumer> _liaConsumer;
     std::shared_ptr<ADCConsumer> _lidConsumer;
-    std::shared_ptr<ADCConsumer> _heatSinkConsumer;
-
-    ADCPin _adcPin;
-    Poco::Timer *_heatSinkTimer;
 };
 
 #endif

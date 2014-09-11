@@ -82,4 +82,7 @@ const double kHeatSinkPIDMax = 0;
 const unsigned int kBeagleboneADCBits = 12;
 const double kBeagleboneADCReverenceVoltage = 1.8;
 
+//App
+const long kAppSignalInterval = 5 * 1000 * 1000; //Nanosec
+
 #endif

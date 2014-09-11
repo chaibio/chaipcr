@@ -1,7 +1,5 @@
 #include <cassert>
 
-#include <Poco/Timer.h>
-
 #include "pcrincludes.h"
 #include "ltc2444.h"
 #include "adcconsumer.h"
@@ -11,18 +9,15 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class ADCController
-ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsumers, std::shared_ptr<ADCConsumer> liaConsumer, std::shared_ptr<ADCConsumer> lidConsumer, std::shared_ptr<ADCConsumer> heatSinkConsumer,
-                             unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber, const ADCPin &adcPin):
+ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsumers, std::shared_ptr<ADCConsumer> liaConsumer, std::shared_ptr<ADCConsumer> lidConsumer,
+                             unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber):
     _currentConversionState {EReadZone1Differential},
     _zoneConsumers {zoneConsumers},
     _liaConsumer {liaConsumer},
-    _lidConsumer {lidConsumer},
-    _heatSinkConsumer {heatSinkConsumer},
-    _adcPin(adcPin) {
+    _lidConsumer {lidConsumer} {
     _workState = false;
 
     _ltc2444 = new LTC2444(csPinNumber, std::move(spiPort), busyPinNumber);
-    _heatSinkTimer = new Poco::Timer;
 
     _ltc2444->setup(0x4, false);
     _ltc2444->readSingleEndedChannel(0); //start first read
@@ -35,13 +30,9 @@ ADCController::~ADCController() {
         join();
 
     delete _ltc2444;
-    delete _heatSinkTimer;
 }
 
 void ADCController::process() {
-    _heatSinkTimer->setPeriodicInterval(kHeatSinkADCInterval);
-    _heatSinkTimer->start(Poco::TimerCallback<ADCController>(*this, &ADCController::readADCPin));
-
     _workState = true;
     while (_workState) {
         if (_ltc2444->waitBusy())
@@ -98,15 +89,10 @@ void ADCController::process() {
 
 void ADCController::stop() {
     _workState = false;
-    _heatSinkTimer->stop();
     _ltc2444->stopWaitinigBusy();
 }
 
 ADCController::ADCState ADCController::nextState() const {
     ADCController::ADCState nextState = static_cast<ADCController::ADCState>(static_cast<int>(_currentConversionState) + 1);
     return nextState == EFinal ? static_cast<ADCController::ADCState>(0) : nextState;
-}
-
-void ADCController::readADCPin(Poco::Timer &/*timer*/) {
-    _heatSinkConsumer->setADCValues(_adcPin.readValue());
 }

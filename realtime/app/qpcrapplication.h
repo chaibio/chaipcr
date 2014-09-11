@@ -29,7 +29,7 @@ protected:
 
 private:
     void initSignals();
-    bool hasSignal() const;
+    bool waitSignal() const;
 
 private:
     static QPCRApplication *_instance;
