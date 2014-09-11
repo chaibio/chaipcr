@@ -1,5 +1,6 @@
 #include <sstream>
 #include <fstream>
+#include <stdexcept>
 
 #include "pwm.h"
 
@@ -22,10 +23,14 @@ void PWMPin::setPWM(unsigned long duty, unsigned long period, unsigned int polar
 }
 
 void PWMPin::writePWMFile(const string& relativePath, unsigned long value) {
-	ostringstream filePath;
-	filePath << pwmDevicePath_ << relativePath;
+    ostringstream filePath;
+    filePath << pwmDevicePath_ << relativePath;
+
 	ofstream file;
-	file.open(filePath.str());
+    file.open(filePath.str());
 	file << value;
-    file.close();
+    file.flush();
+
+    if (file.fail())
+        throw std::invalid_argument("PWMPin::writePWMFile - invalid argument passed to " + filePath.str());
 }
