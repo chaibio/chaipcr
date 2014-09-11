@@ -24,8 +24,7 @@ void QPCRFactory::constructMachine(std::vector<std::shared_ptr<IControl> > &cont
 }
 
 shared_ptr<IControl> QPCRFactory::constructOptics(shared_ptr<SPIPort> ledSPIPort) {
-    shared_ptr<LEDController> ledControl(new LEDController(kLEDGrayscaleClockPWMPath, ledSPIPort,
-                                                           kLEDDigiPotCSPinNumber, kLEDControlXLATPinNumber,
+    shared_ptr<LEDController> ledControl(new LEDController(ledSPIPort, kLEDDigiPotCSPinNumber, kLEDControlXLATPinNumber,
                                                            kLEDBlankPWMPath, 50));
 
     vector<GPIO> photoDiodeMux;

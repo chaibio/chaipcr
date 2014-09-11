@@ -11,7 +11,7 @@ class SPIPort;
 // Class LEDController
 class LEDController {
 public:
-    LEDController(const std::string &grayscaleClockPWMPath, std::shared_ptr<SPIPort> spiPort, unsigned int potCSPin,
+    LEDController(std::shared_ptr<SPIPort> spiPort, unsigned int potCSPin,
                   unsigned int ledXLATPin, const std::string &ledBlankPWMPath, float dutyCyclePercentage);
 	virtual ~LEDController();
 	
@@ -28,7 +28,6 @@ private:
     double _intensity;
 	
 	//components
-    PWMPin _grayscaleClock;
     std::shared_ptr<SPIPort> _spiPort;
     GPIO _potCSPin;
     GPIO _ledXLATPin;
