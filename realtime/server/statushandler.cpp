@@ -22,6 +22,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
     }
 
     if (lid) {
+        double drive = (double)lid->pwmDutyCycle() / lid->pwmPeriod();
         responsePt.put("lid.temperature", lid->currentTemperature());
         responsePt.put("lid.drive", (double)lid->pwmDutyCycle() / lid->pwmPeriod());
     }
@@ -35,6 +36,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
 
     if (heatSink) {
         responsePt.put("heatSink.temperature", heatSink->currentTemperature());
+        responsePt.put("heatSink.fanDrive", heatSink->fanDrive());
     }
 
     if (experimentController) {

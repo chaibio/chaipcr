@@ -3,16 +3,16 @@
 
 #include "temperaturecontroller.h"
 
-class Fan;
+class PWMControl;
 
 class HeatSink : public TemperatureController
 {
 public:
-    HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController);
+    HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController,
+             const std::string &fanPWMPath, unsigned long fanPWMPeriod);
     ~HeatSink();
 
-    int targetRPM() const;
-    void setTargetRPM(int targetRPM);
+    double fanDrive() const;
 
 protected:
     void setOutput(double value);
@@ -21,7 +21,7 @@ protected:
     void processOutput();
 
 private:
-    Fan *_fan;
+    PWMControl *_fan;
 };
 
 #endif // HEATSINK_H

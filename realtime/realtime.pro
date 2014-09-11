@@ -69,7 +69,6 @@ HEADERS += \
     control/ltc2444.h \
     control/ledcontroller.h \
     control/heatblock.h \
-    control/fan.h \
     control/adccontroller.h \
     util/spi.h \
     util/pwm.h \
@@ -111,7 +110,8 @@ HEADERS += \
     test/controltest.h \
     util/filters.h \
     db/settings.h \
-    server/settingshandler.h
+    server/settingshandler.h \
+    util/adcpin.h
 
 SOURCES += \
     app/pins.cpp \
@@ -122,7 +122,6 @@ SOURCES += \
     control/ltc2444.cpp \
     control/ledcontroller.cpp \
     control/heatblock.cpp \
-    control/fan.cpp \
     control/adccontroller.cpp \
     util/spi.cpp \
     util/pwm.cpp \
@@ -155,4 +154,5 @@ SOURCES += \
     test/controltest.cpp \
     util/filters.cpp \
     db/settings.cpp \
-    server/settingshandler.cpp
+    server/settingshandler.cpp \
+    util/adcpin.cpp

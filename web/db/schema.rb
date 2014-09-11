@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140627063958) do
+ActiveRecord::Schema.define(version: 20140814182908) do
 
   create_table "experiments", force: true do |t|
     t.string   "name"
@@ -85,5 +85,24 @@ ActiveRecord::Schema.define(version: 20140627063958) do
   end
 
   add_index "temperature_logs", ["experiment_id", "elapsed_time"], name: "index_temperature_logs_on_experiment_id_and_elapsed_time", unique: true
+
+  create_table "user_tokens", force: true do |t|
+    t.integer  "user_id"
+    t.string   "access_token"
+    t.datetime "expired_at"
+    t.datetime "created_at"
+  end
+
+  add_index "user_tokens", ["access_token"], name: "index_user_tokens_on_access_token", unique: true
+
+  create_table "users", force: true do |t|
+    t.string   "email",                       null: false
+    t.string   "password_digest",             null: false
+    t.integer  "role",            default: 0, null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "users", ["email"], name: "index_users_on_email", unique: true
 
 end

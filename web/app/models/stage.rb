@@ -5,6 +5,8 @@ class Stage < ActiveRecord::Base
   belongs_to :protocol
   has_many :steps, -> {order("order_number")}, dependent: :destroy
   
+  validate :validate
+  
   TYPE_HOLD   = "holding"
   TYPE_CYCLE  = "cycling"
   TYPE_MELTCURVE = "meltcurve"
@@ -86,6 +88,23 @@ class Stage < ActiveRecord::Base
       protocol.stages.where("id != ?", id)
     else
       protocol.stages
+    end
+  end
+  
+  def last_stage?
+    !self.class.where("protocol_id = ? and order_number > ?", protocol_id, order_number).exists?
+  end
+  
+  protected
+
+  def validate
+    if new_record?
+      if !prev_id.nil?
+        step = Step.where(:stage_id=>prev_id).order(order_number: :desc).first
+        if step && step.infinite_hold?
+          errors.add(:base, "Cannot add stage after infinite hold step")
+        end
+      end
     end
   end
 end

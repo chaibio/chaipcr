@@ -7,5 +7,6 @@
 #include "pid.h"
 #include "mux.h"
 #include "filters.h"
+#include "adcpin.h"
 
 #endif // UTILINCLUDES_H

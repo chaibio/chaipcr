@@ -29,7 +29,8 @@ void QPCRApplication::initialize(Application&) {
 }
 
 int QPCRApplication::main(const vector<string>&) {
-    HTTPServer server(new QPCRRequestHandlerFactory, ServerSocket(kHttpServerPort), new HTTPServerParams);
+    HTTPServerParams *params = new HTTPServerParams;
+    HTTPServer server(new QPCRRequestHandlerFactory, ServerSocket(kHttpServerPort), params);
     server.start();
 
     for (auto threadControlUnit: _threadControlUnits)
@@ -41,10 +42,13 @@ int QPCRApplication::main(const vector<string>&) {
             controlUnit->process();
     }
 
+    params->setKeepAlive(false);
+    server.stopAll(true);
+
     for (auto threadControlUnit: _threadControlUnits)
         threadControlUnit->stop();
 
-    server.stopAll();
+    _experimentController->stop();
 
 	return Application::EXIT_OK;
 }

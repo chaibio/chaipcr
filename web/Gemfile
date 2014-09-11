@@ -35,6 +35,7 @@ end
 gem 'migration_comments'
 gem "rabl"
 gem 'apipie-rails'
+#gem 'bcrypt'
 
 gem 'rspec-rails', :group => [:test, :development]
 group :test do
@@ -51,7 +52,7 @@ end
 gem 'rubyzip'
 
 # Use ActiveModel has_secure_password
-# gem 'bcrypt-ruby', '~> 3.1.2'
+gem 'bcrypt-ruby', '~> 3.1.2'
 
 # Use unicorn as the app server
 # gem 'unicorn'

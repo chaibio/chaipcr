@@ -25,6 +25,8 @@ void TemperatureController::setEnableMode(bool enableMode)
 
         if (_enableMode)
         {
+            _pidController->reset();
+
             _pidMutex.lock();
             _pidState = true;
             _pidMutex.unlock();
@@ -74,7 +76,7 @@ void TemperatureController::computePid()
         {
             double result = _pidController->compute(targetTemperature(), currentTemperature());
 
-            if (result != _pidResult)
+            if (_enableMode && result != _pidResult)
             {
                 _pidResult = result;
                 setOutput(result);

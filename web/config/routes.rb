@@ -59,6 +59,11 @@ Qpcrctl::Application.routes.draw do
   
   root 'main#index'
   
+  post '/login', :to => 'sessions#create', :as => 'login'
+  post '/logout', :to => 'sessions#destroy', :as => 'logout'
+  
+  resources :users
+  
   resources :experiments do
     member do
       post 'start'

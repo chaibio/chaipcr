@@ -8,7 +8,6 @@
 #include "adccontroller.h"
 #include "heatblock.h"
 #include "optics.h"
-#include "fan.h"
 #include "thermistor.h"
 #include "ledcontroller.h"
 #include "ltc2444.h"
