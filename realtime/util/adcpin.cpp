@@ -36,7 +36,7 @@ double ADCPin::readValue() const {
     std::stringstream channelPath;
     channelPath << path() << "/in_voltage" << channel() << "_raw";
 
-    std::ifstream channelFile(channelPath.str().c_str());
+    std::ifstream channelFile(channelPath.str());
 
     int value = 0;
     channelFile >> value;
@@ -45,6 +45,6 @@ double ADCPin::readValue() const {
 
 void ADCPin::changeMode()
 {
-    std::ofstream modeFile(std::string(path() + "/mode").c_str());
+    std::ofstream modeFile(path() + "/mode");
     modeFile << "oneshot";
 }

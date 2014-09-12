@@ -15,10 +15,11 @@ public:
 
     boost::signals2::signal<void()> startThresholdReached;
 
+    Direction outputDirection() const;
+
 protected:
     void setOutput(double value);
     void resetOutput();
-    bool outputDirection() const;
     void processOutput();
 
 private:

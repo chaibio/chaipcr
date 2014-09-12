@@ -16,6 +16,11 @@ Lid::~Lid()
     resetOutput();
 }
 
+Lid::Direction Lid::outputDirection() const
+{
+    return EHeat;
+}
+
 void Lid::setOutput(double value)
 {
     setPWMDutyCycle(value);
@@ -24,11 +29,6 @@ void Lid::setOutput(double value)
 void Lid::resetOutput()
 {
     setOutput(0);
-}
-
-bool Lid::outputDirection() const
-{
-    return true;
 }
 
 void Lid::processOutput()

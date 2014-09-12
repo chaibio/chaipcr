@@ -6,9 +6,8 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class LEDController
-LEDController::LEDController(const string &grayscaleClockPWMPath, shared_ptr<SPIPort> spiPort,unsigned int potCSPin,
+LEDController::LEDController(shared_ptr<SPIPort> spiPort,unsigned int potCSPin,
                              unsigned int ledXLATPin, const string &ledBlankPWMPath, float dutyCyclePercentage):
-    _grayscaleClock(grayscaleClockPWMPath),
     _spiPort(spiPort),
     _potCSPin(potCSPin, GPIO::kOutput),
     _ledXLATPin(ledXLATPin, GPIO::kOutput),
@@ -18,7 +17,6 @@ LEDController::LEDController(const string &grayscaleClockPWMPath, shared_ptr<SPI
     _dutyCyclePercentage.store(dutyCyclePercentage);
 
     disableLEDs();
-    _grayscaleClock.setPWM(kGrayscaleClockPwmDutyNs, kGrayscaleClockPwmPeriodNs, 0);
     _ledBlankPWM.setPWM(kLedBlankPwmDutyNs, kLedBlankPwmPeriodNs, 0);
     setIntensity(kMinLEDCurrent);
 

@@ -46,35 +46,6 @@ double PIDController::compute(double setpoint, double processValue) {
     _lock.unlock();
 
     return output;
-
-    /*//calc values for this computation
-    const SPIDTuning& PIDTuning = determineGainSchedule(setpoint);
-    double error = setpoint - processValue;
-
-    //calculate time since last execution
-    ptime currentExecutionTime = microsec_clock::universal_time();
-    time_duration executionDuration = currentExecutionTime - _previousExecutionTime;
-    double executionDurationS = executionDuration.total_microseconds() / 1000000;
-
-    lock.writeLock();
-
-    //non-interactive PID algorithm
-    double filteredProcessValue = _processValueFilter.processSample(processValue);
-    _integratorS += error * executionDurationS;
-    double derivativeValueS = 0; //(filteredProcessValue - _previousProcessValue) / executionDurationS;
-    double output = PIDTuning.kControllerGain * (error + _integratorS / PIDTuning.kIntegralTimeS + PIDTuning.kDerivativeTimeS * derivativeValueS);
-
-    //limit drive to system limits, clear integrator when output is maxed to prevent windup
-    if (latchValue(&output, _minOutput, _maxOutput))
-        _integratorS = 0;
-
-    //set values for next computation
-    _previousProcessValue = filteredProcessValue;
-    _previousExecutionTime = currentExecutionTime;
-
-    lock.unlock();
-
-    return output;*/
 }
 //------------------------------------------------------------------------------
 void PIDController::reset() {

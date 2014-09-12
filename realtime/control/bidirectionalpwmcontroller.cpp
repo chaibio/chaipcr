@@ -14,9 +14,9 @@ BidirectionalPWMController::~BidirectionalPWMController()
     resetOutput();
 }
 
-bool BidirectionalPWMController::outputDirection() const
+BidirectionalPWMController::Direction BidirectionalPWMController::outputDirection() const
 {
-    return _heatIO.value() == GPIO::kHigh ? true : false;
+    return _heatIO.value() == GPIO::kHigh ? EHeat : ECool;
 }
 
 void BidirectionalPWMController::setOutput(double value)

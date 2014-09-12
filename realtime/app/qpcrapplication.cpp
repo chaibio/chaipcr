@@ -37,7 +37,7 @@ int QPCRApplication::main(const vector<string>&) {
         threadControlUnit->start();
 
     _workState = true;
-    while (_workState && !hasSignal()) {
+    while (!waitSignal() && _workState) {
         for(auto controlUnit: _controlUnits)
             controlUnit->process();
     }
@@ -61,11 +61,11 @@ void QPCRApplication::initSignals() {
     sigprocmask(SIG_BLOCK, &_signalsSet, nullptr);
 }
 
-bool QPCRApplication::hasSignal() const {
+bool QPCRApplication::waitSignal() const {
     siginfo_t signalInfo;
     timespec time;
 
-    time.tv_nsec = 0;
+    time.tv_nsec = kAppSignalInterval;
     time.tv_sec = 0;
 
     return sigtimedwait(&_signalsSet, &signalInfo, &time) > 0;

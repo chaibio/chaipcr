@@ -13,7 +13,7 @@ public:
                                const std::string &pwmPath, unsigned long pwmPeriod, unsigned int heatIOPin, unsigned int coolIOPin);
     ~BidirectionalPWMController();
 
-    bool outputDirection() const;
+    Direction outputDirection() const;
 
 protected:
     void setOutput(double value);

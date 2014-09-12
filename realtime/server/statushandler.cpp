@@ -1,3 +1,4 @@
+#include <cmath>
 #include <boost/date_time.hpp>
 
 #include "controlincludes.h"
@@ -5,6 +6,8 @@
 #include "experimentcontroller.h"
 
 #include "statushandler.h"
+
+#define ROUND(x) (std::round(x * 1000.0) / 1000.0)
 
 void StatusHandler::processData(const boost::property_tree::ptree &, boost::property_tree::ptree &responsePt) {
     std::shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();
@@ -14,17 +17,16 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
     std::shared_ptr<ExperimentController> experimentController = ExperimentController::getInstance();
 
     if (heatBlock) {
-        responsePt.put("heatblock.zone1.temperature", heatBlock->zone1Temperature());
-        responsePt.put("heatblock.zone1.drive", (double)heatBlock->zone1DriveValue());
+        responsePt.put("heatblock.zone1.temperature", ROUND(heatBlock->zone1Temperature()));
+        responsePt.put("heatblock.zone1.drive", ROUND(heatBlock->zone1DriveValue()));
 
-        responsePt.put("heatblock.zone2.temperature", heatBlock->zone2Temperature());
-        responsePt.put("heatblock.zone2.drive", (double)heatBlock->zone2DriveValue());
+        responsePt.put("heatblock.zone2.temperature", ROUND(heatBlock->zone2Temperature()));
+        responsePt.put("heatblock.zone2.drive", ROUND(heatBlock->zone2DriveValue()));
     }
 
     if (lid) {
-        double drive = (double)lid->pwmDutyCycle() / lid->pwmPeriod();
-        responsePt.put("lid.temperature", lid->currentTemperature());
-        responsePt.put("lid.drive", (double)lid->pwmDutyCycle() / lid->pwmPeriod());
+        responsePt.put("lid.temperature", ROUND(lid->currentTemperature()));
+        responsePt.put("lid.drive", ROUND((double)lid->pwmDutyCycle() / lid->pwmPeriod()));
     }
 
     if (optics) {
@@ -35,8 +37,8 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
     }
 
     if (heatSink) {
-        responsePt.put("heatSink.temperature", heatSink->currentTemperature());
-        responsePt.put("heatSink.fanDrive", heatSink->fanDrive());
+        responsePt.put("heatSink.temperature", ROUND(heatSink->currentTemperature()));
+        responsePt.put("heatSink.fanDrive", ROUND(heatSink->fanDrive()));
     }
 
     if (experimentController) {

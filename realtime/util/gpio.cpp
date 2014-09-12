@@ -231,7 +231,7 @@ void GPIO::changeEdge() {
         ostringstream filePath;
         filePath << "/sys/class/gpio/gpio" << pinNumber_ << "/edge";
 
-        ofstream edgeFile(filePath.str().c_str());
+        ofstream edgeFile(filePath.str());
         if (edgeFile.is_open())
             edgeFile << "both";
     }

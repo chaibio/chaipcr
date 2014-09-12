@@ -20,7 +20,6 @@ extern const std::string kHeatSinkFanControlPWMPath;
 static const int kHeatSinkFanTachADCPinNumber = 0;
 
 //LED control
-extern const std::string kLEDGrayscaleClockPWMPath;
 extern const std::string kLEDBlankPWMPath;
 
 //Lid
