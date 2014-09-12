@@ -39,7 +39,6 @@ GPIO::GPIO(GPIO &&other) {
 }
 
 GPIO::~GPIO() {
-    unexportPin();
     close(stopWaitinigFd_);
 }
 
