@@ -22,7 +22,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       left: this.left + 3,
       fontFamily: "Open Sans",
       selectable: false
-    })
+    });
   }
 
   this.addBorderRight = function() {
