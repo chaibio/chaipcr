@@ -32,7 +32,7 @@ public:
     void addTemperatureLog(const TemperatureLog &log);
     void addTemperatureLog(const std::vector<TemperatureLog> &logs);
 
-    void addFluorescenceData(const Step *step, int cycle, const std::vector<int> &fluorescenceData);
+    void addFluorescenceData(const Experiment *experiment, const std::vector<int> &fluorescenceData);
 
     Settings* getSettings();
     void updateSettings(const Settings &settings);
