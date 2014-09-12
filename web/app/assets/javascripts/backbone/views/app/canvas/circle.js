@@ -24,6 +24,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     // So first we add the line then circle is placed over it.
     this.canvas.add(this.outerCircle);
     this.canvas.add(this.circle);
+    this.canvas.add(this.stepDataGroup);
   }
 
   this.render = function() {
@@ -44,10 +45,22 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       parent: this // We may need it when it fires some event
     });
     this.getOuterCircle();
+    this.placeStepData();
   }
 
   this.calculateControllingPoints = function(targetedCircle) {
     //targetedCircle.curve.path[1][1] =
+  }
+
+  this.placeStepData = function() {
+    this.temperature = new ChaiBioTech.app.Views.stepTemperature(this.model, this);
+    this.holdTime = new ChaiBioTech.app.Views.holdTime(this.model, this);
+
+    this.stepDataGroup = new fabric.Group([this.temperature.text, this.holdTime.text], {
+      top: this.top + 30,
+      left: this.left -10
+    });
+    console.log(this.temperature);
   }
 
   this.getOuterCircle = function() {
@@ -68,14 +81,18 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   this.canvas.on('object:moving', function(evt) {
     if(evt.target.name === "temperatureControllers") {
       var targetedCircle = evt.target, left = evt.target.left, top = evt.target.top,
-      outerCircle = targetedCircle.parent.outerCircle;
-
+      outerCircle = targetedCircle.parent.outerCircle,
+      dataGroup = targetedCircle.parent.stepDataGroup,
+      dataTemperature = targetedCircle.parent.temperature;
+      console.log(dataTemperature.text.text);
       if(top < 60) {
         targetedCircle.top = 60;
       } else if(top > 360) {
         targetedCircle.top = 360;
       }
       outerCircle.top = targetedCircle.top - 7;
+      dataGroup.top = targetedCircle.top + 30;
+      //dataTemperature.text.set({"text": targetedCircle.top});
 
       left = left - 16;
       top = top + 16;
