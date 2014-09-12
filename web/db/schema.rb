@@ -31,7 +31,7 @@ ActiveRecord::Schema.define(version: 20140912200833) do
     t.integer "experiment_id"
   end
 
-  add_index "fluorescence_data", ["experiment_id", "step_id", "cycle_num"], name: "index_fluorescence_data_by_exp_step_cycle", unique: true
+  add_index "fluorescence_data", ["experiment_id", "step_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_step_cycle_well", unique: true
 
   create_table "protocols", force: true do |t|
     t.decimal  "lid_temperature", precision: 4, scale: 1
