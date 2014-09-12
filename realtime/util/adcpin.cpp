@@ -27,11 +27,6 @@ ADCPin& ADCPin::operator= (const ADCPin &other)
     return *this;
 }
 
-double ADCPin::readVoltage() const
-{
-    return kBeagleboneADCReverenceVoltage * readValue() / MAX_VALUE;
-}
-
 double ADCPin::readValue() const {
     std::stringstream channelPath;
     channelPath << path() << "/in_voltage" << channel() << "_raw";

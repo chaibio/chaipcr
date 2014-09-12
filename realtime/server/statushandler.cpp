@@ -7,7 +7,7 @@
 
 #include "statushandler.h"
 
-#define ROUND(x) (std::round(x * 1000.0) / 1000.0)
+#define ROUND(x) ((float)(std::round(x * 1000.0) / 1000.0))
 
 void StatusHandler::processData(const boost::property_tree::ptree &, boost::property_tree::ptree &responsePt) {
     std::shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();

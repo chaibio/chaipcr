@@ -16,7 +16,6 @@ public:
     inline unsigned int channel() const { return _channel; }
     inline void setChannel(unsigned int channel) { _channel = channel; }
 
-    double readVoltage() const;
     double readValue() const;
 
 private:
