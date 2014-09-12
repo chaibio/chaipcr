@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140814182908) do
+ActiveRecord::Schema.define(version: 20140912200833) do
 
   create_table "experiments", force: true do |t|
     t.string   "name"
@@ -23,7 +23,7 @@ ActiveRecord::Schema.define(version: 20140814182908) do
     t.string   "completion_status"
   end
 
-  create_table "fluorescence_data", force: true do |t|
+  create_table "fluorescence_data", id: false, force: true do |t|
     t.integer "step_id"
     t.integer "fluorescence_value"
     t.integer "well_num",           comment: "0-15"
