@@ -8,11 +8,11 @@ ChaiBioTech.app.Views.stepTemperature = function(model, parent) {
   this.stepData = this.model.get("step");
 
   this.render = function() {
-    this.text = new fabric.IText(this.stepData['temperature'], {
+    this.text = new fabric.Text(this.stepData['temperature']+"º", {
       fill: 'black',
       fontSize: 30,
       top : this.parent.top + 30,
-      left: this.parent.left - 10,
+      left: this.parent.left - 15,
       fontFamily: "Ostrich Sans",
       selectable: false,
       fontWeight: "800"

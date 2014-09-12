@@ -58,7 +58,8 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
 
     this.stepDataGroup = new fabric.Group([this.temperature.text, this.holdTime.text], {
       top: this.top + 30,
-      left: this.left -10
+      left: this.left -15,
+      selectable: false
     });
     console.log(this.temperature);
   }
@@ -83,8 +84,9 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       var targetedCircle = evt.target, left = evt.target.left, top = evt.target.top,
       outerCircle = targetedCircle.parent.outerCircle,
       dataGroup = targetedCircle.parent.stepDataGroup,
-      dataTemperature = targetedCircle.parent.temperature;
-      console.log(dataTemperature.text.text);
+      dataTemperature = targetedCircle.parent.temperature,
+      dynamicTemp;
+      //console.log(dataTemperature.text.text);
       if(top < 60) {
         targetedCircle.top = 60;
       } else if(top > 360) {
@@ -92,7 +94,9 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       }
       outerCircle.top = targetedCircle.top - 7;
       dataGroup.top = targetedCircle.top + 30;
-      //dataTemperature.text.set({"text": targetedCircle.top});
+      dynamicTemp = (100 - ((targetedCircle.top - 60) / 3)).toFixed(1);
+      dataTemperature.text.text = ""+dynamicTemp+"º";
+      //targetedCircle.parent.canvas.renderAll();
 
       left = left - 16;
       top = top + 16;
