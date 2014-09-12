@@ -20,7 +20,7 @@ void Thermistor::setADCValues(unsigned int firstADCValue, unsigned int secondADC
     } else {
         unsigned int singularADCValue = secondADCValue;
         unsigned int differentialADCValue = firstADCValue;
-        resistance = 27000 /*400*/ * (double)singularADCValue / differentialADCValue;
+        resistance = 2050 * (double)singularADCValue / differentialADCValue;
     }
 
     _temperature.store(temperatureForResistance(resistance));
