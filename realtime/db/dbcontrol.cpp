@@ -79,9 +79,10 @@ std::vector<Stage> DBControl::getStages(int protocolId)
     soci::rowset<soci::row> result((_session->prepare << "SELECT * FROM stages WHERE protocol_id = " << protocolId << " ORDER BY order_number"));
     _dbMutex.unlock();
 
-    Stage stage;
     for (soci::rowset<soci::row>::const_iterator it = result.begin(); it != result.end(); ++it)
     {
+        Stage stage(it->get<int>("id"));
+
         if (it->get_indicator("name") != soci::i_null)
             stage.setName(it->get<std::string>("name"));
 
@@ -94,7 +95,7 @@ std::vector<Stage> DBControl::getStages(int protocolId)
         if (it->get_indicator("stage_type") != soci::i_null)
             stage.setType(it->get<Stage::Type>("stage_type"));
 
-        stage.setComponents(getStageComponents(it->get<int>("id")));
+        stage.setComponents(getStageComponents(stage.id()));
 
         stages.push_back(std::move(stage));
     }
@@ -256,7 +257,7 @@ void DBControl::addFluorescenceData(const Experiment *experiment, const std::vec
         for (size_t i = 0; i < fluorescenceData.size(); ++i)
         {
             *_session << "INSERT INTO fluorescence_data(experiment_id, step_id, fluorescence_value, well_num, cycle_num) VALUES(:experiment_id, :step_id, :fluorescence_value, :well_num, :cycle_num)",
-                    soci::use(experiment->id()), soci::use(experiment->protocol()->currentStep()->id()), soci::use(fluorescenceData.at(i)), soci::use(i), soci::use(experiment->protocol()->currentStageCycle());
+                    soci::use(experiment->id()), soci::use(experiment->protocol()->currentStep()->id()), soci::use(fluorescenceData.at(i)), soci::use(i), soci::use(experiment->protocol()->currentStage()->currentCycle());
         }
 
         _session->commit();

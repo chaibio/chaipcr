@@ -28,12 +28,11 @@ public:
     inline const std::vector<Stage>& stages() const {return _stages;}
 
     void resetCurrentStep();
+    inline Stage* currentStage() const {return &*_currentStage;}
     Step* currentStep() const;
     Ramp* currentRamp() const;
-    Step* nextStep();
+    Step* advanceNextStep();
     bool hasNextStep() const;
-
-    int currentStageCycle() const;
 
 private:
     double _lidTemperature;

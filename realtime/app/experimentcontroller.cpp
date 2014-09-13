@@ -149,7 +149,7 @@ void ExperimentController::holdStepCallback(Poco::Timer &)
 {
     _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->restartCollection());
 
-    HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->nextStep()->temperature(), _experiment->protocol()->currentRamp()->rate());
+    HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->advanceNextStep()->temperature(), _experiment->protocol()->currentRamp()->rate());
     HeatBlockInstance::getInstance()->enableStepProcessing();
 }
 

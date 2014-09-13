@@ -1,8 +1,9 @@
 #include "stagecomponent.h"
 #include "stage.h"
 
-Stage::Stage()
+Stage::Stage(int id)
 {
+    _id = id;
     _numCycles = 1;
     _cycleIteration = 0;
     _orderNumber = 0;
@@ -11,7 +12,7 @@ Stage::Stage()
 }
 
 Stage::Stage(const Stage &other)
-    :Stage()
+    :Stage(other.id())
 {
     setName(other.name());
     setNumCycles(other.numCycles());
@@ -21,7 +22,7 @@ Stage::Stage(const Stage &other)
 }
 
 Stage::Stage(Stage &&other)
-    :Stage()
+    :Stage(other.id())
 {
     _name = std::move(other._name);
     _numCycles = other._numCycles;
@@ -31,6 +32,7 @@ Stage::Stage(Stage &&other)
     _components = std::move(other._components);
     _currentComponent = other._currentComponent;
 
+    other._id = 0;
     other._numCycles = 0;
     other._cycleIteration = 0;
     other._orderNumber = 0;
@@ -45,6 +47,7 @@ Stage::~Stage()
 
 Stage& Stage::operator= (const Stage &other)
 {
+    _id = other.id();
     setName(other.name());
     setNumCycles(other.numCycles());
     setOrderNumber(other.orderNumber());
@@ -56,6 +59,7 @@ Stage& Stage::operator= (const Stage &other)
 
 Stage& Stage::operator= (Stage &&other)
 {
+    _id = other._id;
     _name = std::move(other._name);
     _numCycles = other._numCycles;
     _cycleIteration = other._cycleIteration.load();
@@ -64,6 +68,7 @@ Stage& Stage::operator= (Stage &&other)
     _components = std::move(other._components);
     _currentComponent = other._currentComponent;
 
+    other._id = 0;
     other._numCycles = 0;
     other._cycleIteration = 0;
     other._orderNumber = 0;
@@ -126,7 +131,7 @@ Ramp* Stage::currentRamp() const
         return nullptr;
 }
 
-Step* Stage::nextStep()
+Step* Stage::advanceNextStep()
 {
     if (_currentComponent == _components.end())
         return nullptr;

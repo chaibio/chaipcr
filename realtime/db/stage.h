@@ -20,13 +20,15 @@ public:
         Meltcurve
     };
 
-    Stage();
+    Stage(int id);
     Stage(const Stage &other);
     Stage(Stage &&other);
     ~Stage();
 
     Stage& operator= (const Stage &other);
     Stage& operator= (Stage &&other);
+
+    inline int id() const { return _id; }
 
     inline void setName(const std::string &name) {_name = name;}
     inline void setName(std::string &&name) {_name = std::move(name);}
@@ -51,10 +53,11 @@ public:
     void resetCurrentStep();
     Step* currentStep() const;
     Ramp* currentRamp() const;
-    Step* nextStep();
+    Step* advanceNextStep();
     bool hasNextStep() const;
 
 private:
+    int _id;
     std::string _name;
 
     int _numCycles;
