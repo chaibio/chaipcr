@@ -11,16 +11,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140912200833) do
+ActiveRecord::Schema.define(version: 20140913061456) do
 
   create_table "experiments", force: true do |t|
     t.string   "name"
-    t.boolean  "qpcr",              default: true
+    t.boolean  "qpcr",               default: true
     t.datetime "started_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "completed_at"
     t.string   "completion_status"
+    t.string   "completion_message"
   end
 
   create_table "fluorescence_data", id: false, force: true do |t|
