@@ -6,6 +6,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
   this.index = index;
   this.canvas = stage;
   this.myWidth = this.model.get("stage").steps.length * 120;
+  this.childSteps = [];
 
   this.getLeft = function() {
     if(this.previousStage) {
@@ -85,6 +86,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
       }
 
       tempStep = stepView;
+      this.childSteps.push(stepView);
       allSteps.push(stepView);
       stepView.render();
     }
@@ -128,6 +130,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
     me.roof.stroke = "black";
     me.stageNo.fill = "black";
     me.stageName.fill = "black";
+    //console.log(me.childSteps);
   });
   return this;
 }

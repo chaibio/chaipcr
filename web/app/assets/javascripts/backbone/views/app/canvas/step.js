@@ -2,7 +2,7 @@ ChaiBioTech.app.Views = ChaiBioTech.app.Views || {};
 ChaiBioTech.app.selectedStep = null;
 
 ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
-  
+
   this.model = model;
   this.parentStage = parentStage;
   this.index = index;
@@ -11,7 +11,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
 
   this.setLeft = function() {
     this.left = this.parentStage.left + 1 + (parseInt(this.index) * this.myWidth);
-    console.log(this.left, this.index);
+    //console.log(this.left, this.index);
   }
 
   this.addName = function() {
@@ -60,6 +60,12 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     this.canvas.add(this.stepName);
     this.canvas.add(this.borderRight);
     this.addCircle();
+    this.addSelectionImages();
+  }
+
+  this.addSelectionImages = function() {
+    this.selectionImage = new ChaiBioTech.app.Views.fabricSelectionImage("assets/selected-step-01.png", this, this.canvas);
+
   }
 
   this.canvas.on('mouse:down', function(evt) {
@@ -77,6 +83,11 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       me.stepName.fill = "black";
     }
   });
+
+  this.canvas.on("image:loaded", function(me) {
+    console.log("okay Image Loaded", me);
+    me.parent.canvas.add(me.parent.selectionImage);
+  })
 
   return this;
 }

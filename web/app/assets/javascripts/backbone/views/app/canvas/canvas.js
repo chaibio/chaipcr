@@ -77,6 +77,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model) {
     }
     return circles;
   }
-
+  // May be move the placing image into this place .. Simply using all the available steps.
+  // May be a recursive function will do it.
   return this;
 }
