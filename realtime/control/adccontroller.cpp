@@ -7,6 +7,9 @@
 
 using namespace std;
 
+const LTC2444::OversamplingRatio kThermistorOversamplingRate = LTC2444::kOversamplingRatio2048;
+const LTC2444::OversamplingRatio kLIAOversamplingRate = LTC2444::kOversamplingRatio256;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Class ADCController
 ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsumers, std::shared_ptr<ADCConsumer> liaConsumer, std::shared_ptr<ADCConsumer> lidConsumer,
@@ -18,9 +21,7 @@ ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsu
     _workState = false;
 
     _ltc2444 = new LTC2444(csPinNumber, std::move(spiPort), busyPinNumber);
-
-    _ltc2444->setup(0x4, false);
-    _ltc2444->readSingleEndedChannel(0); //start first read
+    _ltc2444->readSingleEndedChannel(0, kThermistorOversamplingRate); //start first read
 }
 
 ADCController::~ADCController() {
@@ -41,22 +42,22 @@ void ADCController::process() {
         uint32_t value;
         switch (nextState()) {
         case EReadZone1Differential:
-            value = _ltc2444->readDifferentialChannels(0, true);
+            value = _ltc2444->readDifferentialChannels(0, true, kThermistorOversamplingRate);
             break;
         case EReadZone1Singular:
-            value = _ltc2444->readSingleEndedChannel(4);
+            value = _ltc2444->readSingleEndedChannel(4, kThermistorOversamplingRate);
             break;
         case EReadZone2Differential:
-            value = _ltc2444->readDifferentialChannels(2, true);
+            value = _ltc2444->readDifferentialChannels(2, true, kThermistorOversamplingRate);
             break;
         case EReadZone2Singular:
-            value = _ltc2444->readSingleEndedChannel(5);
+            value = _ltc2444->readSingleEndedChannel(5, kThermistorOversamplingRate);
             break;
         case EReadLIA:
-            value = _ltc2444->readSingleEndedChannel(6);
+            value = _ltc2444->readSingleEndedChannel(6, kLIAOversamplingRate);
             break;
         case EReadLid:
-            value = _ltc2444->readSingleEndedChannel(7);
+            value = _ltc2444->readSingleEndedChannel(7, kThermistorOversamplingRate);
             break;
         default:
             assert(false);
