@@ -7,7 +7,7 @@
 
 #include "statushandler.h"
 
-#define ROUND(x) (std::round(x * 1000.0) / 1000.0)
+#define ROUND(x) ((float)(std::round(x * 1000.0) / 1000.0))
 
 void StatusHandler::processData(const boost::property_tree::ptree &, boost::property_tree::ptree &responsePt) {
     std::shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();
@@ -42,6 +42,8 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
     }
 
     if (experimentController) {
+        const Experiment *experiment = experimentController->experiment();
+
         switch (experimentController->machineState()) {
         case ExperimentController::Idle:
             responsePt.put("experimentController.machine.state", "Idle");
@@ -49,17 +51,17 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
 
         case ExperimentController::LidHeating:
             responsePt.put("experimentController.machine.state", "LidHeating");
-            responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experimentController->experiment()->startedAt()).total_seconds());
+            responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment->startedAt()).total_seconds());
             break;
 
         case ExperimentController::Running:
             responsePt.put("experimentController.machine.state", "Running");
-            responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experimentController->experiment()->startedAt()).total_seconds());
+            responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment->startedAt()).total_seconds());
             break;
 
         case ExperimentController::Complete:
             responsePt.put("experimentController.machine.state", "Complete");
-            responsePt.put("experimentController.expriment.run_duration", (experimentController->experiment()->completedAt() - experimentController->experiment()->startedAt()).total_seconds());
+            responsePt.put("experimentController.expriment.run_duration", (experiment->completedAt() - experiment->startedAt()).total_seconds());
             break;
 
         default:
@@ -67,7 +69,17 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
             break;
         }
 
-        if (experimentController->machineState() != ExperimentController::Idle)
-            responsePt.put("experimentController.expriment.started_at", experimentController->experiment()->startedAt());
+        if (experimentController->machineState() != ExperimentController::Idle) {
+            responsePt.put("experimentController.expriment.started_at", experiment->startedAt());
+
+            responsePt.put("experimentController.expriment.stage.id", experiment->protocol()->currentStage()->id());
+            responsePt.put("experimentController.expriment.stage.name", experiment->protocol()->currentStage()->name());
+            responsePt.put("experimentController.expriment.stage.number", experiment->protocol()->currentStage()->orderNumber());
+            responsePt.put("experimentController.expriment.stage.cycle", experiment->protocol()->currentStage()->currentCycle());
+
+            responsePt.put("experimentController.expriment.step.id", experiment->protocol()->currentStep()->id());
+            responsePt.put("experimentController.expriment.step.name", experiment->protocol()->currentStep()->name());
+            responsePt.put("experimentController.expriment.step.number", experiment->protocol()->currentStep()->orderNumber());
+        }
     }
 }

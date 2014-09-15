@@ -54,23 +54,22 @@ uint32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive) {
 	data |= ((uint32_t)OSRTWOx)<<19;
 	
 	//set CS low to initiate conversion
-	csPin_.setValue(GPIO::kHigh);
+    csPin_.setValue(GPIO::kHigh);
 	csPin_.setValue(GPIO::kLow);
 
 	//read conversion value and write the settings for the nex conversion via SPI.
-	uint32_t conversion;
+    uint32_t conversion;
 	//convert data to big endian
 	dataOut[0] = (data>>24);
 	dataOut[1] = (data>>16);
 	dataOut[2] = (data>>8);
 	dataOut[3] = (data);
-	spiPort_.readBytes(dataIn, dataOut, 4, 1000000);
+    spiPort_.readBytes(dataIn, dataOut, 4, 1000000);
 	// convert to little endian and get only ADC result (bit28 down to bit 5)
 	//conversion = ((conversion & 0xFF000000) >> 24 | (conversion & 0x00FF0000) >> 8 | (conversion & 0x0000FF00)<<8 | (conversion & 0x000000FF) << 24)&0x1FFFFFE0;
 	conversion = ((((uint32_t)dataIn[0])<<24|((uint32_t)dataIn[1])<<16|((uint32_t)dataIn[2])<<8|dataIn[3])&0x1FFFFFE0)>>5;
 	csPin_.setValue(GPIO::kHigh);
-	return conversion;
-
+    return conversion;
 }
 
 uint32_t LTC2444::repeat() {

@@ -38,7 +38,7 @@ int QPCRApplication::main(const vector<string>&) {
 
     _workState = true;
     while (!waitSignal() && _workState) {
-        for(auto controlUnit: _controlUnits)
+        for (auto controlUnit: _controlUnits)
             controlUnit->process();
     }
 

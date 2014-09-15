@@ -79,9 +79,10 @@ std::vector<Stage> DBControl::getStages(int protocolId)
     soci::rowset<soci::row> result((_session->prepare << "SELECT * FROM stages WHERE protocol_id = " << protocolId << " ORDER BY order_number"));
     _dbMutex.unlock();
 
-    Stage stage;
     for (soci::rowset<soci::row>::const_iterator it = result.begin(); it != result.end(); ++it)
     {
+        Stage stage(it->get<int>("id"));
+
         if (it->get_indicator("name") != soci::i_null)
             stage.setName(it->get<std::string>("name"));
 
@@ -94,7 +95,7 @@ std::vector<Stage> DBControl::getStages(int protocolId)
         if (it->get_indicator("stage_type") != soci::i_null)
             stage.setType(it->get<Stage::Type>("stage_type"));
 
-        stage.setComponents(getStageComponents(it->get<int>("id")));
+        stage.setComponents(getStageComponents(stage.id()));
 
         stages.push_back(std::move(stage));
     }
@@ -199,7 +200,7 @@ void DBControl::addTemperatureLog(const TemperatureLog &log)
     {
         _session->begin();
 
-        *_session << "INSERT INTO temperature_logs VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_temp, :heat_block_zone_2_temp)",
+        *_session << "INSERT INTO temperature_logs(experiment_id, elapsed_time, lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp) VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_temp, :heat_block_zone_2_temp)",
                 soci::use(log.experimentId()), soci::use(log.elapsedTime()),
                 soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
                 soci::use(std::round(log.heatBlockZone1Temperature() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Temperature() * 100.0) / 100.0);
@@ -228,7 +229,7 @@ void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
 
         for (const TemperatureLog &log: logs)
         {
-            *_session << "INSERT INTO temperature_logs VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_temp, :heat_block_zone_2_temp)",
+            *_session << "INSERT INTO temperature_logs(experiment_id, elapsed_time, lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp) VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_temp, :heat_block_zone_2_temp)",
                     soci::use(log.experimentId()), soci::use(log.elapsedTime()),
                     soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
                     soci::use(std::round(log.heatBlockZone1Temperature() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Temperature() * 100.0) / 100.0);
@@ -247,15 +248,19 @@ void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
     _dbMutex.unlock();
 }
 
-void DBControl::addFluorescenceData(const Step *step, int cycle, const std::vector<int> &fluorescenceData)
+void DBControl::addFluorescenceData(const Experiment *experiment, const std::vector<int> &fluorescenceData)
 {
     _dbMutex.lock();
     {
+        _session->begin();
+
         for (size_t i = 0; i < fluorescenceData.size(); ++i)
         {
-            *_session << "INSERT INTO fluorescence_data VALUES(:step_id, :fluorescence_value, :well_num, :cycle_num)",
-                    soci::use(step->id()), soci::use(fluorescenceData.at(i)), soci::use(i), soci::use(cycle);
+            *_session << "INSERT INTO fluorescence_data(experiment_id, step_id, fluorescence_value, well_num, cycle_num) VALUES(:experiment_id, :step_id, :fluorescence_value, :well_num, :cycle_num)",
+                    soci::use(experiment->id()), soci::use(experiment->protocol()->currentStep()->id()), soci::use(fluorescenceData.at(i)), soci::use(i), soci::use(experiment->protocol()->currentStage()->currentCycle());
         }
+
+        _session->commit();
     }
     _dbMutex.unlock();
 }

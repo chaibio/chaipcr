@@ -10,7 +10,7 @@
 class Thermistor;
 class PIDController;
 
-class TemperatureController : public IControl//, public PIDControl
+class TemperatureController : public IControl
 {
 public:
     enum Direction

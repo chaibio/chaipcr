@@ -73,10 +73,9 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
 
 void ExperimentController::run()
 {
-    if (_machineState != LidHeating)
+    MachineState state = LidHeating;
+    if (!_machineState.compare_exchange_strong(state, Running))
         return;
-
-    _machineState = Running;
 
     HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->currentStep()->temperature());
     HeatBlockInstance::getInstance()->enableStepProcessing();
@@ -87,10 +86,9 @@ void ExperimentController::run()
 
 void ExperimentController::complete()
 {
-    if (_machineState != Running)
+    MachineState state = Running;
+    if (!_machineState.compare_exchange_strong(state, Complete))
         return;
-
-    _machineState = Complete;
 
     stopLogging();
 
@@ -105,14 +103,16 @@ void ExperimentController::complete()
 
 void ExperimentController::stop()
 {
-    if (_machineState == Idle)
+    MachineState state = _machineState.exchange(Idle);
+
+    if (state == Idle)
         return;
 
     LidInstance::getInstance()->setEnableMode(false);
     HeatBlockInstance::getInstance()->setEnableMode(false);
     OpticsInstance::getInstance()->setCollectData(false);
 
-    if (_machineState != Complete)
+    if (state != Complete)
     {
         stopLogging();
 
@@ -123,8 +123,6 @@ void ExperimentController::stop()
 
         _dbControl->completeExperiment(_experiment);
     }
-
-    _machineState = Idle;
 
     delete _experiment;
     _experiment = nullptr;
@@ -149,9 +147,9 @@ void ExperimentController::stepBegun()
 
 void ExperimentController::holdStepCallback(Poco::Timer &)
 {
-    _dbControl->addFluorescenceData(_experiment->protocol()->currentStep(), _experiment->protocol()->currentStageCycle(), OpticsInstance::getInstance()->restartCollection());
+    _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->restartCollection());
 
-    HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->nextStep()->temperature(), _experiment->protocol()->currentRamp()->rate());
+    HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->advanceNextStep()->temperature(), _experiment->protocol()->currentRamp()->rate());
     HeatBlockInstance::getInstance()->enableStepProcessing();
 }
 
