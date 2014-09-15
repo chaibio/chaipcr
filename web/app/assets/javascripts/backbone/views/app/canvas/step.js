@@ -1,7 +1,8 @@
-ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
+ChaiBioTech.app.Views = ChaiBioTech.app.Views || {};
+ChaiBioTech.app.selectedStep = null;
 
 ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
-
+  
   this.model = model;
   this.parentStage = parentStage;
   this.index = index;
@@ -50,7 +51,9 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       fill: '#ffb400',
       width: this.myWidth,
       height: 340,
-      selectable: false
+      selectable: false,
+      name: "step",
+      me: this
     });
 
     this.canvas.add(this.stepRect);
@@ -58,5 +61,22 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     this.canvas.add(this.borderRight);
     this.addCircle();
   }
+
+  this.canvas.on('mouse:down', function(evt) {
+    if(evt.target && evt.target.name === "step") {
+      var me = evt.target.me;
+      if(ChaiBioTech.app.selectedStep) {
+        var previouslySelected = ChaiBioTech.app.selectedStep;
+        previouslySelected.stepName.fill = "white";
+        ChaiBioTech.app.selectedStep = me;
+      } else {
+        ChaiBioTech.app.selectedStep = me;
+      }
+      me.canvas.fire("step:selected", evt);
+      //Firing this so that parent stage can do the changes
+      me.stepName.fill = "black";
+    }
+  });
+
   return this;
 }
