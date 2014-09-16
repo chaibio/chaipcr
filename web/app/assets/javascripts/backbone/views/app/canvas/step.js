@@ -64,7 +64,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
   }
 
   this.addSelectionImages = function() {
-    this.selectionImage = new ChaiBioTech.app.Views.fabricSelectionImage("assets/selected-step-01.png", this, this.canvas);
+  //  this.selectionImage = new ChaiBioTech.app.Views.fabricSelectionImage("assets/selected-step-01.png", this, this.canvas);
 
   }
 
