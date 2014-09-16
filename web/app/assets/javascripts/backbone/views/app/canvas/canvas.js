@@ -48,8 +48,8 @@ ChaiBioTech.app.Views.fabricCanvas = function(model) {
     options.e = {};
     options.e.clientX = 0;
     options.e.clientY = 0;
-    this.canvas.trigger('mouse:down', options);
-    this.canvas.trigger('mouse:up', options);
+    //this.canvas.trigger('mouse:down', options);
+    //this.canvas.trigger('mouse:up', options);
   };
 
   this.addTemperatureLines = function() {
@@ -71,14 +71,14 @@ ChaiBioTech.app.Views.fabricCanvas = function(model) {
       fabric.Image.fromURL(url, function(img) {
         console.log("Inside", image);
         img.left = that.allStepViews[count].left;
-        img.top = 380;
+        img.top = 383;
         img.selectable = false;
         img.visible = false;
 
         if(image == "darkFooter") {
           that.allStepViews[count].darkFooterImage = img;
         } else if(image == "whiteFooter") {
-          img.top = 360;
+          img.top = 363;
           that.allStepViews[count].whiteFooterImage = img;
         } else if(image == "commonFooter") {
           that.allStepViews[count].commonFooterImage = img;

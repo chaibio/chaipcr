@@ -60,12 +60,6 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     this.canvas.add(this.stepName);
     this.canvas.add(this.borderRight);
     this.addCircle();
-    this.addSelectionImages();
-  }
-
-  this.addSelectionImages = function() {
-  //  this.selectionImage = new ChaiBioTech.app.Views.fabricSelectionImage("assets/selected-step-01.png", this, this.canvas);
-
   }
 
   this.canvas.on('mouse:down', function(evt) {
@@ -73,7 +67,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       var me = evt.target.me;
       //Using function instead of event, so that everything works synchronous.
       me.parentStage.selectStage(evt);
-
+      
       if(ChaiBioTech.app.selectedStep) {
         var previouslySelected = ChaiBioTech.app.selectedStep;
         previouslySelected.stepName.fill = "white";
