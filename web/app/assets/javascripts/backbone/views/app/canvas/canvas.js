@@ -11,15 +11,15 @@ ChaiBioTech.app.Views.fabricCanvas = function(model) {
     //selectionColor: 'green'
   });
 
-  this.canvas.on("mouse:down", function(options) {
-    console.log(options.e.clientX, options.e.clientY);
-  });
-
   this.setDefaultWidthHeight = function() {
     this.canvas.setHeight(420);
     this.canvas.setWidth(1024);
     this.canvas.renderAll();
   };
+
+  this.canvas.on("mouse:down", function(evt) {
+    console.log(evt);
+  });
 
   this.addStages = function() {
     var allStages = this.model.get("experiment").protocol.stages;
@@ -69,7 +69,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model) {
 
     addImage = function(count, that, url, image) {
       fabric.Image.fromURL(url, function(img) {
-        console.log("Inside", image);
+        //console.log("Inside", image);
         img.left = that.allStepViews[count].left;
         img.top = 383;
         img.selectable = false;

@@ -41,10 +41,17 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     this.circle.render();
   }
 
+  this.getUniqueName = function() {
+    var name = this.stepName.text + this.parentStage.stageNo.text + "step";
+    this.uniqueName = name;
+    console.log(this.uniqueName);
+  }
+
   this.render = function() {
     this.setLeft();
     this.addName();
     this.addBorderRight();
+    this.getUniqueName();
     this.stepRect = new fabric.Rect({
       left: this.left || 30,
       top: 64,
@@ -62,25 +69,29 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     this.addCircle();
   }
 
+  this.selectStep = function(evt) {
+    var me = (evt.target) ? evt.target.me : this;
+    if(ChaiBioTech.app.selectedStep) {
+      var previouslySelected = ChaiBioTech.app.selectedStep;
+      previouslySelected.stepName.fill = "white";
+      previouslySelected.darkFooterImage.visible = false;
+      previouslySelected.whiteFooterImage.visible = false;
+      ChaiBioTech.app.selectedStep = me;
+    } else {
+      ChaiBioTech.app.selectedStep = me;
+    }
+    //Firing this so that parent stage can do the changes
+    me.stepName.fill = "black";
+    me.darkFooterImage.visible = true;
+    me.whiteFooterImage.visible = true;
+  }
+
   this.canvas.on('mouse:down', function(evt) {
     if(evt.target && evt.target.name === "step") {
       var me = evt.target.me;
       //Using function instead of event, so that everything works synchronous.
       me.parentStage.selectStage(evt);
-      
-      if(ChaiBioTech.app.selectedStep) {
-        var previouslySelected = ChaiBioTech.app.selectedStep;
-        previouslySelected.stepName.fill = "white";
-        previouslySelected.darkFooterImage.visible = false;
-        previouslySelected.whiteFooterImage.visible = false;
-        ChaiBioTech.app.selectedStep = me;
-      } else {
-        ChaiBioTech.app.selectedStep = me;
-      }
-      //Firing this so that parent stage can do the changes
-      me.stepName.fill = "black";
-      me.darkFooterImage.visible = true;
-      me.whiteFooterImage.visible = true;
+      me.selectStep(evt);
     }
   });
   return this;

@@ -117,7 +117,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
   }
 
   this.selectStage =  function(evt) {
-    var me = evt.target.me.parentStage,
+    var me = (evt.target) ? evt.target.me.parentStage : this,
     length = me.childSteps.length;
 
     if(ChaiBioTech.app.selectedStage) {
@@ -125,7 +125,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
       previousLength = previouslySelected.childSteps.length;
       // Fabric sends more than one event so we filter,
       // if the previous and current stages are same.
-      if(previouslySelected.stageNo != me.stageNo) {
+      if(previouslySelected.stageNo.text != me.stageNo.text) {
         //Previus stage is changed back to original stage
         previouslySelected.roof.stroke = "white";
         previouslySelected.stageNo.fill = "white";
@@ -150,6 +150,6 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
       ChaiBioTech.app.selectedStage = me;
     }
   }
-  
+
   return this;
 }

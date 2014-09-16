@@ -1,4 +1,5 @@
 ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
+ChaiBioTech.app.selectedCircle = null;
 
 ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   this.model = model;
@@ -22,14 +23,23 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     }
     // This is moved to here because we want to place circle over the line.
     // So first we add the line then circle is placed over it.
+    this.canvas.add(this.outerMostCircle);
     this.canvas.add(this.outerCircle);
     this.canvas.add(this.circle);
     this.canvas.add(this.stepDataGroup);
   }
 
+  this.getUniqueId = function() {
+    var name = this.parent.stepName.text;
+    name = name + this.parent.parentStage.stageNo.text + "circle";
+    this.uniqueName = name;
+    //console.log("my name", this.name);
+  }
+
   this.render = function() {
     this.getLeft();
     this.getTop();
+    this.getUniqueId();
     this.circle = new fabric.Circle({
       radius: 13,
       stroke: 'white',
@@ -45,6 +55,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       parent: this // We may need it when it fires some event
     });
     this.getOuterCircle();
+    this.getOuterMostCircle();
     this.placeStepData();
   }
 
@@ -61,7 +72,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       left: this.left -15,
       selectable: false
     });
-    console.log(this.temperature);
+    //console.log(this.temperature);
   }
 
   this.getOuterCircle = function() {
@@ -73,16 +84,52 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       hasBorders: false,
       top: this.top - 7,
       fill: '#ffb400',
-      selectable: true,
+      selectable: false,
       name: "temperatureControllerOuterCircle",
       parent: this // We may need it when it fires some event
     })
+  }
+
+  this.getOuterMostCircle = function() {
+    this.outerMostCircle = new fabric.Circle({
+      radius: 35,
+      left: this.left - 16,
+      lockMovementX: true,
+      hasControls: false,
+      hasBorders: false,
+      top: this.top - 16,
+      fill: '#ffb400',
+      selectable: false,
+      visible: false,
+      name: "temperatureControllerOuterMostCircle",
+      parent: this // We may need it when it fires some event
+    });
+  }
+
+  this.makeItBig = function(evt) {
+    this.circle.stroke = "#ffb400";
+    this.outerCircle.stroke = "black";
+    this.outerCircle.strokeWidth = 7;
+    this.stepDataGroup.visible = false;
+    this.outerMostCircle.visible = true;
+    // Calling the parent stage so that it looks for all the changes
+    this.parent.parentStage.selectStage(this);
+    //Calling the parent step class to add footer image to step
+    this.parent.selectStep(this)
+  }
+
+  this.makeItSmall = function(evt) {
+    this.circle.stroke = "white";
+    this.outerCircle.stroke = null;
+    this.stepDataGroup.visible = true;
+    this.outerMostCircle.visible = false;
   }
 
   this.canvas.on('object:moving', function(evt) {
     if(evt.target.name === "temperatureControllers") {
       var targetedCircle = evt.target, left = evt.target.left, top = evt.target.top,
       outerCircle = targetedCircle.parent.outerCircle,
+      outerMostCircle = targetedCircle.parent.outerMostCircle,
       dataGroup = targetedCircle.parent.stepDataGroup,
       dataTemperature = targetedCircle.parent.temperature,
       dynamicTemp;
@@ -93,6 +140,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
         targetedCircle.top = 300;
       }
       outerCircle.top = targetedCircle.top - 7;
+      outerMostCircle.top = targetedCircle.top - 16;
       dataGroup.top = targetedCircle.top + 30;
       dynamicTemp = (100 - ((targetedCircle.top - 60) / 2.4)).toFixed(1);
       dataTemperature.text.text = ""+dynamicTemp+"º";
@@ -135,10 +183,23 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   });
 
   this.canvas.on("mouse:down", function(evt) {
-    if(evt.target.name === "temperatureControllers") {
-        console.log("u clicked");
+    if(evt.target && evt.target.name === "temperatureControllers") {
+        var targetedCircle = evt.target,
+        thisCircle = evt.target.parent;
+        //thisCircle.mekeItBig(evt);
+        evt.target.parent.makeItBig(evt);
+
+        if(ChaiBioTech.app.selectedCircle) {
+          var previousSelected = ChaiBioTech.app.selectedCircle;
+          if(previousSelected.uniqueName != evt.target.parent.uniqueName) {
+            previousSelected.makeItSmall(evt);
+            ChaiBioTech.app.selectedCircle = evt.target.parent;
+          }
+        } else {
+          ChaiBioTech.app.selectedCircle = evt.target.parent;
+        }
     }
-  })
+  });
 
   return this;
 }
