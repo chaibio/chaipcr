@@ -120,6 +120,11 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
     var me = (evt.target) ? evt.target.me.parentStage : this,
     length = me.childSteps.length;
 
+    //Change current stage
+    me.roof.stroke = "black";
+    me.stageNo.fill = "black";
+    me.stageName.fill = "black";
+    
     if(ChaiBioTech.app.selectedStage) {
       var previouslySelected = ChaiBioTech.app.selectedStage,
       previousLength = previouslySelected.childSteps.length;
@@ -133,15 +138,13 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
         // the step which was selected is being cleared
         for(var i = 0; i< previousLength; i++) {
           previouslySelected.childSteps[i].commonFooterImage.visible = false;
+          previouslySelected.childSteps[i].stepName.fill = "white";
         }
         // showing footer for the stage which is selected.
         for(var i = 0; i< length; i++) {
             me.childSteps[i].commonFooterImage.visible = true;
+            me.childSteps[i].stepName.fill = "black";
         }
-        //Change current stage
-        me.roof.stroke = "black";
-        me.stageNo.fill = "black";
-        me.stageName.fill = "black";
 
         ChaiBioTech.app.selectedStage = me;
       }

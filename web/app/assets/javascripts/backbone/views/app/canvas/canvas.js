@@ -17,9 +17,9 @@ ChaiBioTech.app.Views.fabricCanvas = function(model) {
     this.canvas.renderAll();
   };
 
-  this.canvas.on("mouse:down", function(evt) {
+  /*this.canvas.on("object:selected", function(evt) {
     console.log(evt);
-  });
+  });*/
 
   this.addStages = function() {
     var allStages = this.model.get("experiment").protocol.stages;

@@ -73,7 +73,6 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     var me = (evt.target) ? evt.target.me : this;
     if(ChaiBioTech.app.selectedStep) {
       var previouslySelected = ChaiBioTech.app.selectedStep;
-      previouslySelected.stepName.fill = "white";
       previouslySelected.darkFooterImage.visible = false;
       previouslySelected.whiteFooterImage.visible = false;
       ChaiBioTech.app.selectedStep = me;
@@ -81,7 +80,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       ChaiBioTech.app.selectedStep = me;
     }
     //Firing this so that parent stage can do the changes
-    me.stepName.fill = "black";
+    //me.stepName.fill = "black";
     me.darkFooterImage.visible = true;
     me.whiteFooterImage.visible = true;
   }
