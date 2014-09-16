@@ -116,21 +116,40 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
       this.canvas.renderAll();
   }
 
-  this.canvas.on("step:selected", function(evt) {
-    var me = evt.target.me.parentStage;
+  this.selectStage =  function(evt) {
+    var me = evt.target.me.parentStage,
+    length = me.childSteps.length;
+
     if(ChaiBioTech.app.selectedStage) {
-      var previouslySelected = ChaiBioTech.app.selectedStage;
-      previouslySelected.roof.stroke = "white";
-      previouslySelected.stageNo.fill = "white";
-      previouslySelected.stageName.fill = "white";
-      ChaiBioTech.app.selectedStage = me;
+      var previouslySelected = ChaiBioTech.app.selectedStage,
+      previousLength = previouslySelected.childSteps.length;
+      // Fabric sends more than one event so we filter,
+      // if the previous and current stages are same.
+      if(previouslySelected.stageNo != me.stageNo) {
+        //Previus stage is changed back to original stage
+        previouslySelected.roof.stroke = "white";
+        previouslySelected.stageNo.fill = "white";
+        previouslySelected.stageName.fill = "white";
+        // the step which was selected is being cleared
+        for(var i = 0; i< previousLength; i++) {
+          previouslySelected.childSteps[i].commonFooterImage.visible = false;
+        }
+        // showing footer for the stage which is selected.
+        for(var i = 0; i< length; i++) {
+            me.childSteps[i].commonFooterImage.visible = true;
+        }
+        //Change current stage
+        me.roof.stroke = "black";
+        me.stageNo.fill = "black";
+        me.stageName.fill = "black";
+
+        ChaiBioTech.app.selectedStage = me;
+      }
+
     } else {
       ChaiBioTech.app.selectedStage = me;
     }
-    me.roof.stroke = "black";
-    me.stageNo.fill = "black";
-    me.stageName.fill = "black";
-    //console.log(me.childSteps);
-  });
+  }
+  
   return this;
 }

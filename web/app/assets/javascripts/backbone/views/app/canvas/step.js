@@ -71,23 +71,23 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
   this.canvas.on('mouse:down', function(evt) {
     if(evt.target && evt.target.name === "step") {
       var me = evt.target.me;
+      //Using function instead of event, so that everything works synchronous.
+      me.parentStage.selectStage(evt);
+
       if(ChaiBioTech.app.selectedStep) {
         var previouslySelected = ChaiBioTech.app.selectedStep;
         previouslySelected.stepName.fill = "white";
+        previouslySelected.darkFooterImage.visible = false;
+        previouslySelected.whiteFooterImage.visible = false;
         ChaiBioTech.app.selectedStep = me;
       } else {
         ChaiBioTech.app.selectedStep = me;
       }
-      me.canvas.fire("step:selected", evt);
       //Firing this so that parent stage can do the changes
       me.stepName.fill = "black";
+      me.darkFooterImage.visible = true;
+      me.whiteFooterImage.visible = true;
     }
   });
-
-  this.canvas.on("image:loaded", function(me) {
-    console.log("okay Image Loaded", me);
-    me.parent.canvas.add(me.parent.selectionImage);
-  })
-
   return this;
 }

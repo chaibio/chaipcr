@@ -44,6 +44,7 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 			##console.log(this.canvas);
 			that.fabricCanvas.setDefaultWidthHeight();
 			that.fabricCanvas.addStages();
+			that.fabricCanvas.addinvisibleFooterToStep();
 			that.fabricCanvas.addTemperatureLines();
 
 		ExpModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});

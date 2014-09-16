@@ -7,7 +7,8 @@ ChaiBioTech.app.Views.fabricCanvas = function(model) {
   this.allStepViews = [];
   this.canvas = new fabric.Canvas('canvas', {
     backgroundColor: '#ffb400',
-    selectionColor: 'green'
+    selection: false
+    //selectionColor: 'green'
   });
 
   this.canvas.on("mouse:down", function(options) {
@@ -58,10 +59,45 @@ ChaiBioTech.app.Views.fabricCanvas = function(model) {
     for(i = 0; i < limit; i++) {
       this.allCircles[i].getLines(i);
     }
-
-    //console.log("wooooo", this.AllCircles);
-
   }
+
+  this.addinvisibleFooterToStep = function() {
+    var count = 0, limit = this.allStepViews.length,
+    stepDark = "assets/selected-step-01.png",
+    stepWhite = "assets/selected-step-02.png",
+    stepCommon = "assets/common-step.png";
+
+    addImage = function(count, that, url, image) {
+      fabric.Image.fromURL(url, function(img) {
+        console.log("Inside", image);
+        img.left = that.allStepViews[count].left;
+        img.top = 380;
+        img.selectable = false;
+        img.visible = false;
+
+        if(image == "darkFooter") {
+          that.allStepViews[count].darkFooterImage = img;
+        } else if(image == "whiteFooter") {
+          img.top = 360;
+          that.allStepViews[count].whiteFooterImage = img;
+        } else if(image == "commonFooter") {
+          that.allStepViews[count].commonFooterImage = img;
+        }
+
+        that.canvas.add(img);
+        count = count + 1;
+
+        if(count < limit) {
+          addImage(count, that, url, image);
+        }
+      });
+    }
+
+    addImage(0, this, stepCommon, "commonFooter");
+    addImage(0, this, stepDark, "darkFooter");
+    addImage(0, this, stepWhite, "whiteFooter");
+  }
+
 
   this.findAllCircles = function() {
     var i = 0, limit = this.allStepViews.length, circles = [], tempCirc = null;
@@ -77,7 +113,6 @@ ChaiBioTech.app.Views.fabricCanvas = function(model) {
     }
     return circles;
   }
-  // May be move the placing image into this place .. Simply using all the available steps.
-  // May be a recursive function will do it.
+
   return this;
 }
