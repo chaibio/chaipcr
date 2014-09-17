@@ -45,6 +45,8 @@ public:
 
     void settingsUpdated();
 
+    void toggleTempLogs();
+
 private:
     void run();
     void complete();
@@ -55,6 +57,8 @@ private:
     void startLogging();
     void stopLogging();
     void addLogCallback(Poco::Timer &timer);
+
+    void addTempLogCallback(Poco::Timer &timer);
 
 private:
     std::atomic<MachineState> _machineState;

@@ -1,6 +1,7 @@
 #include "pcrincludes.h"
 #include "controlincludes.h"
 #include "experimentcontroller.h"
+#include "settings.h"
 
 #include "testcontrolhandler.h"
 
@@ -101,5 +102,17 @@ void TestControlHandler::processHeatBlock(const ptree &requestPt)
 
 void TestControlHandler::processExperiment(const ptree &requestPt)
 {
+    std::shared_ptr<ExperimentController> experimentController = ExperimentController::getInstance();
 
+    if (experimentController)
+    {
+        ptree::const_assoc_iterator temperatureData = requestPt.find("temperatureData");
+        ptree::const_assoc_iterator temperatureDebugData = requestPt.find("temperatureDebugData");
+
+        if (temperatureData != requestPt.not_found())
+            experimentController->settings()->temperatureLogs.setTemperatureLogs(temperatureData->second.get_value<bool>());
+
+        if (temperatureDebugData != requestPt.not_found())
+            experimentController->settings()->temperatureLogs.setDebugTemperatureLogs(temperatureDebugData->second.get_value<bool>());
+    }
 }
