@@ -3,13 +3,10 @@ ChaiBioTech.app.Views = ChaiBioTech.app.Views || {};
 ChaiBioTech.app.Views.fabricPath = function(model, parent, canvas) {
   this.model = model;
   this.parent = parent // parent is the circle
-  // This is original radius of the circle , never mind its 13 in code.
-  // there comes some stroke;
-  this.spot = 16;
   this.canvas = canvas;
 
-  var x1 = this.parent.circle.left - this.spot, y1 = this.parent.circle.top + this.spot,
-  x2 = this.parent.next.circle.left - this.spot, y2 = this.parent.next.circle.top + this.spot;
+  var x1 = this.parent.circleGroup.left - 6, y1 = this.parent.circleGroup.top + 32,
+  x2 = this.parent.next.circleGroup.left - 6, y2 = this.parent.next.circleGroup.top + 32;
 
   this.curve = new fabric.Path('m 65 0 Q 100, 100, 200, 0', {
     strokeWidth: 5,
