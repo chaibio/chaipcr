@@ -61,8 +61,8 @@ const std::vector<int> kWellList = {4, 3, 2, 1, 16, 15, 14, 13, 5, 8, 7, 6, 11, 
 const double kPCRBeginStepTemperatureThreshold = 3;
 
 //Experiment Controller
-const long kTemperatureLogerInterval = 1000;
-const long kTemperatureLogerFlushInterval = 60 * 1000;
+const long kTemperatureLoggerInterval = 1000;
+const long kTemperatureLoggerFlushInterval = 10000; //ms
 
 //Heat Sink
 const double kHeatSinkThermistorBetaCoefficient = 3970;  //kelvins
