@@ -36,9 +36,6 @@ class Experiment < ActiveRecord::Base
     stage.steps << Step.new(:temperature=>4, :hold_time=>0)
     protocol.stages << stage
     protocol.save
-    
-    #testdata
-    TemperatureLog.testdata(experiment.id)
   end
   
   after_destroy do |experiment|
