@@ -20,5 +20,5 @@ ChaiBioTech.app.Views.stepTemperature = function(model, parent) {
     //this.canvas.add(this.text);
   }
   this.render();
-  return this;
+  return this.text;
 }

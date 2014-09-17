@@ -26,24 +26,9 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     if(this.next) {
       this.curve = new ChaiBioTech.app.Views.fabricPath(model, this, this.canvas);
     }
-    //this.canvas.add(this.outerMostCircle);
-    //this.canvas.add(this.outerCircle);
-
+    // Here too this order is important
     this.canvas.add(this.stepDataGroup);
     this.canvas.add(this.circleGroup);
-  }
-
-  this.placeCircles = function() {
-    this.circleGroup = new fabric.Group([this.outerMostCircle, this.outerCircle, this.circle], {
-      left: this.left,
-      top: this.top,
-      me: this,
-      selectable: true,
-      name: "controlCircleGroup",
-      lockMovementX: true,
-      hasControls: false,
-      hasBorders: false,
-    });
   }
 
   this.getUniqueId = function() {
@@ -56,55 +41,27 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     this.getLeft();
     this.getTop();
     this.getUniqueId();
-    this.circle = new fabric.Circle({
-      radius: 13,
-      stroke: 'white',
-      originX: "center",
-      originY: "center",
-      fill: '#ffb400',
-      strokeWidth: 10,
-      selectable: false,
-      name: "temperatureControllers"
-    });
-    this.getOuterCircle();
-    this.getOuterMostCircle();
-    this.placeCircles();
-    this.placeStepData();
-  }
 
-  this.placeStepData = function() {
-    this.temperature = new ChaiBioTech.app.Views.stepTemperature(this.model, this);
-    this.holdTime = new ChaiBioTech.app.Views.holdTime(this.model, this);
+    // place the circle Group Note this order is important
+    this.circleGroup = new ChaiBioTech.app.Views.circleGroup(
+      [
+        this.outerMostCircle = new ChaiBioTech.app.Views.outerMostCircle(),
+        this.outerCircle = new ChaiBioTech.app.Views.outerCircle(),
+        this.circle = new ChaiBioTech.app.Views.centerCircle(),
+        this.littleCircleGroup = new ChaiBioTech.app.Views.littleCircleGroup(
+          [
+            this.littleCircle1 = new ChaiBioTech.app.Views.circleMaker(-10),
+            this.littleCircle2 = new ChaiBioTech.app.Views.circleMaker(-2),
+            this.littleCircle3 = new ChaiBioTech.app.Views.circleMaker(6)
+          ]
+        )
+      ], this);
 
-    this.stepDataGroup = new fabric.Group([this.temperature.text, this.holdTime.text], {
-      top: this.top + 55,
-      left: this.left - 15,
-      selectable: false
-    });
-  }
-
-  this.getOuterCircle = function() {
-    this.outerCircle = new fabric.Circle({
-      radius: 23,
-      originX: "center",
-      originY: "center",
-      hasBorders: false,
-      fill: '#ffb400',
-      selectable: false,
-      name: "temperatureControllerOuterCircle"
-    })
-  }
-
-  this.getOuterMostCircle = function() {
-    this.outerMostCircle = new fabric.Circle({
-      radius: 32,
-      fill: '#ffb400',
-      originX: "center",
-      originY: "center",
-      selectable: false,
-      visible: false,
-      name: "temperatureControllerOuterMostCircle"
-    });
+    // Place temperature and hold time data
+    this.stepDataGroup = new ChaiBioTech.app.Views.stepDataGroup([
+        this.temperature = new ChaiBioTech.app.Views.stepTemperature(this.model, this),
+        this.holdTime = new ChaiBioTech.app.Views.holdTime(this.model, this)
+      ], this);
   }
 
   this.makeItBig = function(evt) {
@@ -113,6 +70,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     this.outerCircle.strokeWidth = 7;
     this.stepDataGroup.visible = false;
     this.outerMostCircle.visible = true;
+    this.littleCircleGroup.visible = true;
     // Calling the parent stage so that it looks for all the changes
     this.parent.parentStage.selectStage(this);
     //Calling the parent step class to add footer image to step
@@ -123,6 +81,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   this.makeItSmall = function(evt) {
     this.circle.stroke = "white";
     this.outerCircle.stroke = null;
+    this.littleCircleGroup.visible = false;
     this.stepDataGroup.visible = true;
     this.outerMostCircle.visible = false;
   }
@@ -147,7 +106,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
 
       // Change temperature display as it circle is moved
       var dynamicTemp = Math.abs((100 - ((targetCircleGroup.top - me.scrollTop) / me.scrollRatio)).toFixed(1));
-      me.temperature.text.text = ""+dynamicTemp+"º";
+      me.temperature.text = ""+dynamicTemp+"º";
 
       // Now positioning the ramp lines
       left = left - 6;
@@ -177,59 +136,6 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
           previous.curve.path[1][1] = (left + leftOfLineLeft) / 2;
           previous.curve.path[1][2] = ((top + topOfLineLeft) / 2) + 20;
       }
-
-      /*var targetedCircle = evt.target, left = evt.target.left, top = evt.target.top,
-      outerCircle = targetedCircle.parent.outerCircle,
-      outerMostCircle = targetedCircle.parent.outerMostCircle,
-      dataGroup = targetedCircle.parent.stepDataGroup,
-      dataTemperature = targetedCircle.parent.temperature,
-      dynamicTemp;
-      //console.log(dataTemperature.text.text);
-      if(top < 60) {
-        targetedCircle.top = 60;
-      } else if(top > 300) {
-        targetedCircle.top = 300;
-      }
-      outerCircle.top = targetedCircle.top - 7;
-      outerMostCircle.top = targetedCircle.top - 16;
-      dataGroup.top = targetedCircle.top + 30;
-      dynamicTemp = (100 - ((targetedCircle.top - 60) / 2.4)).toFixed(1);
-      dataTemperature.text.text = ""+dynamicTemp+"º";
-      // 2.4 = (300 - 60)/ 100
-      // 300 is the scroll length
-      // 60 is the top of the step
-      // Later move these values to constants
-      //targetedCircle.parent.canvas.renderAll();
-
-      left = left - 16;
-      top = top + 16;
-
-      if(targetedCircle.parent.next) {
-          targetedCircle.curve.path[0][1] = left;
-          targetedCircle.curve.path[0][2] = top;
-
-          // Calculating the mid point of the line at the right side of the circle
-          // Remeber take the point which is static at the other side
-          var leftOfLineRight = targetedCircle.curve.path[1][3],
-          topOfLineRight = targetedCircle.curve.path[1][4];
-
-          targetedCircle.curve.path[1][1] = (left + leftOfLineRight) / 2;
-          targetedCircle.curve.path[1][2] = ((top + topOfLineRight) / 2) + 20;
-      }
-
-      if(targetedCircle.parent.previous) {
-          previous = targetedCircle.parent.previous;
-          previous.circle.curve.path[1][3] = left;
-          previous.circle.curve.path[1][4] = top;
-
-          // Calculating the mid point of the line at the left side of the cycle
-          // Remeber take the point which is static at the other side
-          var leftOfLineLeft = previous.circle.curve.path[0][1],
-          topOfLineLeft = previous.circle.curve.path[0][2];
-
-          previous.circle.curve.path[1][1] = (left + leftOfLineLeft) / 2;
-          previous.circle.curve.path[1][2] = ((top + topOfLineLeft) / 2) + 20;
-      }*/
     }
   });
 
@@ -237,8 +143,6 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     if(evt.target && evt.target.name === "controlCircleGroup") {
         var targetedCircleGroup = evt.target,
         me = evt.target.me;
-        thisCircle = evt.target.parent;
-        //thisCircle.mekeItBig(evt);
         me.makeItBig(evt);
 
         if(ChaiBioTech.app.selectedCircle) {

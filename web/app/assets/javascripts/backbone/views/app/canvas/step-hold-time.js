@@ -16,14 +16,13 @@ ChaiBioTech.app.Views.holdTime = function(model, parent) {
       fontFamily: "Ostrich Sans",
       selectable: false
     })
-    //ßåœ∑´®†¥¨ˆøπ“‘≠–ºª•¶§∞¢£™™¡`ºººººº’”.add(this.text);
   }
+  
   this.formatHoldTime = function() {
     var holdTimeHour = Math.floor(this.holdTime / 60);
     var holdTimeMinute = (this.holdTime % 60);
-    //console.log(holdTime, holdTimeHour, holdTimeMinute)
     return holdTimeHour+":"+holdTimeMinute;
   }
   this.render();
-  return this;
+  return this.text;
 }

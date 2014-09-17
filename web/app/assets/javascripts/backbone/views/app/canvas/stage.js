@@ -124,7 +124,8 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
     me.roof.stroke = "black";
     me.stageNo.fill = "black";
     me.stageName.fill = "black";
-    
+    me.border.stroke = "#cc6c00";
+
     if(ChaiBioTech.app.selectedStage) {
       var previouslySelected = ChaiBioTech.app.selectedStage,
       previousLength = previouslySelected.childSteps.length;
@@ -135,6 +136,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
         previouslySelected.roof.stroke = "white";
         previouslySelected.stageNo.fill = "white";
         previouslySelected.stageName.fill = "white";
+        previouslySelected.border.stroke = '#ff9f00';
         // the step which was selected is being cleared
         for(var i = 0; i< previousLength; i++) {
           previouslySelected.childSteps[i].commonFooterImage.visible = false;

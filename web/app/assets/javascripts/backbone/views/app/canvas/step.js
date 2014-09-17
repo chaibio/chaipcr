@@ -44,7 +44,6 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
   this.getUniqueName = function() {
     var name = this.stepName.text + this.parentStage.stageNo.text + "step";
     this.uniqueName = name;
-    console.log(this.uniqueName);
   }
 
   this.render = function() {
@@ -68,19 +67,20 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     this.canvas.add(this.borderRight);
     this.addCircle();
   }
-
+// Okay find some logic to show the border
   this.selectStep = function(evt) {
     var me = (evt.target) ? evt.target.me : this;
     if(ChaiBioTech.app.selectedStep) {
       var previouslySelected = ChaiBioTech.app.selectedStep;
       previouslySelected.darkFooterImage.visible = false;
       previouslySelected.whiteFooterImage.visible = false;
+      previouslySelected.borderRight.stroke = '#ff9f00';
       ChaiBioTech.app.selectedStep = me;
     } else {
       ChaiBioTech.app.selectedStep = me;
     }
-    //Firing this so that parent stage can do the changes
-    //me.stepName.fill = "black";
+    console.log("clicked", me.borderRight.visible);
+    me.borderRight.stroke = "black";
     me.darkFooterImage.visible = true;
     me.whiteFooterImage.visible = true;
   }
