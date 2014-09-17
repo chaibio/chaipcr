@@ -157,7 +157,7 @@ void ExperimentController::startLogging()
 {
     addLogCallback(*_logTimer);
 
-    _logTimer->setPeriodicInterval(kTemperatureLogerInterval);
+    _logTimer->setPeriodicInterval(kTemperatureLoggerInterval);
     _logTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::addLogCallback));
 }
 
@@ -185,7 +185,7 @@ void ExperimentController::addLogCallback(Poco::Timer &)
 
     _logs.push_back(std::move(log));
 
-    if ((_logs.back().elapsedTime() - _logs.front().elapsedTime()) >= kTemperatureLogerFlushInterval)
+    if ((_logs.back().elapsedTime() - _logs.front().elapsedTime()) >= kTemperatureLoggerFlushInterval)
     {
         _dbControl->addTemperatureLog(_logs);
         _logs.clear();
