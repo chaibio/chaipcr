@@ -153,6 +153,5 @@ SOURCES += \
     test/apptest.cpp \
     test/controltest.cpp \
     util/filters.cpp \
-    db/settings.cpp \
     server/settingshandler.cpp \
     util/adcpin.cpp

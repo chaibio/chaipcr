@@ -7,7 +7,7 @@ void SettingsHandler::processData(const boost::property_tree::ptree &requestPt, 
 {
     Settings *settings = ExperimentController::getInstance()->settings();
 
-    settings->setDebuMode(requestPt.get("debugMode", false));
+    settings->setDebugMode(requestPt.get("debugMode", false));
 
     ExperimentController::getInstance()->settingsUpdated();
 }

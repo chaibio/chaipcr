@@ -12,14 +12,7 @@ using namespace Poco::Net;
 using namespace Poco::Util;
 
 // Class QPCRApplication
-QPCRApplication* QPCRApplication::_instance = nullptr;
-
-QPCRApplication::~QPCRApplication() {
-    _instance = nullptr;
-}
-
 void QPCRApplication::initialize(Application&) {
-    _instance = this;
     _workState = false;
 
     QPCRFactory::constructMachine(_controlUnits, _threadControlUnits);

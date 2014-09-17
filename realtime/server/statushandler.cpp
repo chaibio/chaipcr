@@ -26,7 +26,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
 
     if (lid) {
         responsePt.put("lid.temperature", ROUND(lid->currentTemperature()));
-        responsePt.put("lid.drive", ROUND((double)lid->pwmDutyCycle() / lid->pwmPeriod()));
+        responsePt.put("lid.drive", ROUND(lid->drive()));
     }
 
     if (optics) {
@@ -75,7 +75,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
             responsePt.put("experimentController.expriment.stage.id", experiment->protocol()->currentStage()->id());
             responsePt.put("experimentController.expriment.stage.name", experiment->protocol()->currentStage()->name());
             responsePt.put("experimentController.expriment.stage.number", experiment->protocol()->currentStage()->orderNumber() + 1);
-            responsePt.put("experimentController.expriment.stage.cycle", experiment->protocol()->currentStage()->currentCycle() + 1);
+            responsePt.put("experimentController.expriment.stage.cycle", experiment->protocol()->currentStage()->currentCycle());
 
             responsePt.put("experimentController.expriment.step.id", experiment->protocol()->currentStep()->id());
             responsePt.put("experimentController.expriment.step.name", experiment->protocol()->currentStep()->name());

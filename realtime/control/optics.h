@@ -24,7 +24,7 @@ public:
 
     void process();
 
-    void setADCValues(unsigned int adcValue, unsigned int unusedValue = 0) override;
+    void setADCValue(unsigned int adcValue);
     inline unsigned int adcValue() const { return _adcValue; }
 	
 	//accessors

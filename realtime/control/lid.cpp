@@ -7,6 +7,7 @@ Lid::Lid(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double ma
      PWMControl(pwmPath, pwmPeriod)
 {
     _startTempThreshold = startTempThreshold;
+    targetTemperatureChanged.connect(boost::bind(&Lid::resetDrive, this));
 
     resetOutput();
 }

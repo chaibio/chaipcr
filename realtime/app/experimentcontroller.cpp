@@ -179,6 +179,7 @@ void ExperimentController::addLogCallback(Poco::Timer &)
 
     if (log.hasDebugInfo())
     {
+        log.setLidDrive(LidInstance::getInstance()->drive());
         log.setHeatBlockZone1Drive(HeatBlockInstance::getInstance()->zone1DriveValue());
         log.setHeatBlockZone2Drive(HeatBlockInstance::getInstance()->zone2DriveValue());
     }

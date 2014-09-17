@@ -73,12 +73,17 @@ double HeatBlock::maxTemperatureSetpointDelta() const {
     return zone1Abs > zone2Abs ? zone1Abs : zone2Abs;
 }
 
+void HeatBlock::setDrive(double drive) {
+    _zones.first->setDrive(drive);
+    _zones.second->setDrive(drive);
+}
+
 double HeatBlock::zone1DriveValue() const {
-    return (double)_zones.first->pwmDutyCycle() / _zones.first->pwmPeriod() * (_zones.first->outputDirection() == TemperatureController::EHeat ? 1 : -1);
+    return _zones.first->drive() * (_zones.first->outputDirection() == TemperatureController::EHeat ? 1 : -1);
 }
 
 double HeatBlock::zone2DriveValue() const {
-    return (double)_zones.second->pwmDutyCycle() / _zones.second->pwmPeriod() * (_zones.second->outputDirection() == TemperatureController::EHeat ? 1 : -1);
+    return _zones.second->drive() * (_zones.second->outputDirection() == TemperatureController::EHeat ? 1 : -1);
 }
 
 // Class HeatBlock::Ramp

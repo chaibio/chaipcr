@@ -6,9 +6,12 @@
 class Settings
 {
 public:
-    Settings();
+    Settings()
+    {
+        _debugMode = false;
+    }
 
-    inline void setDebuMode(bool mode) { _debugMode = mode; }
+    inline void setDebugMode(bool mode) { _debugMode = mode; }
     inline bool debugMode() const { return _debugMode; }
 
 private:

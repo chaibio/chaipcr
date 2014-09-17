@@ -75,10 +75,10 @@ void ADCController::process() {
             _zoneConsumers.at(1)->setADCValues(_differentialValue, value);
             break;
         case EReadLIA:
-            _liaConsumer->setADCValues(value);
+            _liaConsumer->setADCValue(value);
             break;
         case EReadLid:
-            _lidConsumer->setADCValues(value);
+            _lidConsumer->setADCValue(value);
             break;
         default:
             assert(false);

@@ -11,23 +11,20 @@ Thermistor::Thermistor(unsigned int voltageDividerResistance, unsigned int adcBi
     _referenceVoltage {referenceVoltage} {
 }
 
-void Thermistor::setADCValues(unsigned int firstADCValue, unsigned int secondADCValue) {
-    double resistance;
+void Thermistor::setADCValue(unsigned int adcValue) {
+    double voltage = (double)adcValue / _maxADCValue * _referenceVoltage;
+    double temp = temperatureForResistance((_voltageDividerResistance * voltage / _referenceVoltage) / (1 - (voltage / _referenceVoltage)));
 
-    if (secondADCValue == 0) {
-        double voltage = (double)firstADCValue / _maxADCValue * _referenceVoltage;
-        resistance = (_voltageDividerResistance * voltage / _referenceVoltage) / (1 - (voltage / _referenceVoltage));
-    } else {
-        unsigned int singularADCValue = secondADCValue;
-        unsigned int differentialADCValue = firstADCValue;
-        resistance = 2050 * (double)singularADCValue / differentialADCValue;
-    }
-
-    _temperature.store(temperatureForResistance(resistance));
-
-    adcValueChanged();
+    _temperature.store(temp);
+    temperatureChanged(temp);
 }
 
+void Thermistor::setADCValues(unsigned int differentialADCValue, unsigned int singularADCValue) {
+    double temp = temperatureForResistance(2050 * (double)singularADCValue / differentialADCValue);
+
+    _temperature.store(temp);
+    temperatureChanged(temp);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class SteinhartHartThermistor

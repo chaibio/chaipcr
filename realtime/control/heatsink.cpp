@@ -39,7 +39,7 @@ HeatSink::Direction HeatSink::outputDirection() const
 
 double HeatSink::fanDrive() const
 {
-    return (double)_fan->pwmDutyCycle() / _fan->pwmPeriod();
+    return _fan->drive();
 }
 
 void HeatSink::setOutput(double value)
@@ -57,5 +57,5 @@ void HeatSink::processOutput()
 }
 
 void HeatSink::readADCPin(Poco::Timer &/*timer*/) {
-    _thermistor->setADCValues(_adcPin.readValue());
+    _thermistor->setADCValue(_adcPin.readValue());
 }

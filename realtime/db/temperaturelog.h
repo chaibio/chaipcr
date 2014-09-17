@@ -13,6 +13,7 @@ public:
         _heatBlockZone2Temperature = 0;
 
         _debugState = debugState;
+        _lidDrive = 0;
         _heatBlockZone1Drive = 0;
         _heatBlockZone2Drive = 0;
     }
@@ -34,6 +35,9 @@ public:
     inline bool hasDebugInfo() const { return _debugState; }
     inline void setDebugState(bool state) { _debugState = state; }
 
+    inline double lidDrive() const { return _lidDrive; }
+    inline void setLidDrive(double drive) { _lidDrive = drive; }
+
     inline double heatBlockZone1Drive() const { return _heatBlockZone1Drive; }
     inline void setHeatBlockZone1Drive(double drive) { _heatBlockZone1Drive = drive; }
 
@@ -48,6 +52,7 @@ private:
     double _heatBlockZone2Temperature;
 
     bool _debugState;
+    double _lidDrive;
     double _heatBlockZone1Drive;
     double _heatBlockZone2Drive;
 };

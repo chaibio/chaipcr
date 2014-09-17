@@ -44,15 +44,15 @@ void Optics::process()
         }
         else
         {
-            _collectDataTimer->setPeriodicInterval(kCollectDataInterval);
+            _collectDataTimer->setPeriodicInterval(kFluorescenceDataCollectionDelayTimeMs);
             _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));
         }
     }
 }
 
-void Optics::setADCValues(unsigned int adcValue, unsigned int)
+void Optics::setADCValue(unsigned int adcValue)
 {
-    _adcValue = adcValue;
+    _adcValue = (adcValue >> 8);
 }
 
 void Optics::setCollectData(bool state)
@@ -65,12 +65,15 @@ void Optics::setCollectData(bool state)
 
             if (!lidOpen())
             {
-                _collectDataTimer->setPeriodicInterval(kCollectDataInterval);
+                _collectDataTimer->setPeriodicInterval(kFluorescenceDataCollectionDelayTimeMs);
                 _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));
             }
         }
         else
+        {
             _collectDataTimer->stop();
+            _ledController->disableLEDs();
+        }
 
         _collectData.store(state);
     }
@@ -105,7 +108,7 @@ std::vector<int> Optics::restartCollection()
 
     if (!lidOpen())
     {
-        _collectDataTimer->setPeriodicInterval(kCollectDataInterval);
+        _collectDataTimer->setPeriodicInterval(kFluorescenceDataCollectionDelayTimeMs);
         _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));
     }
 
