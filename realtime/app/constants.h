@@ -41,7 +41,7 @@ const unsigned long kFanPWMPeriodNs = 500000;
 const unsigned long kHeatBlockZone1PWMPeriodNs = 100000;
 const unsigned long kHeatBlockZone2PWMPeriodNs = 100000;
 
-const double kHeatBlockZonesPIDMin = -0.95;
+const double kHeatBlockZonesPIDMin = -1;
 const double kHeatBlockZonesPIDMax = 1;
 
 const double kHeatBlockZonesMinTargetTemp = -10;
