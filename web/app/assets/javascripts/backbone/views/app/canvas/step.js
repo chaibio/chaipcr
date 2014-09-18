@@ -8,6 +8,8 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
   this.index = index;
   this.canvas = parentStage.canvas;
   this.myWidth = 120;
+  this.nextStep = null;
+  this.previousStep = null;
 
   this.setLeft = function() {
     this.left = this.parentStage.left + 1 + (parseInt(this.index) * this.myWidth);
@@ -46,6 +48,36 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     this.uniqueName = name;
   }
 
+  this.manageBorder = function(color) {
+    if(this.borderRight.visible === false) { // Means this is the last step in the stage
+      if(this.previousStep) {
+        this.previousStep.borderRight.stroke = color;
+      } else {
+        console.log("color", color);
+        this.parentStage.border.stroke = color;
+      }
+
+      if(this.parentStage.nextStage) {
+        this.parentStage.nextStage.border.stroke = color;
+      } else {
+        this.parentStage.borderRight.stroke = color;
+      }
+    } else {
+      this.borderRight.stroke = color;
+      if(this.previousStep) {
+        this.previousStep.borderRight.stroke = color;
+      } else {
+        this.parentStage.border.stroke = color;
+      }
+
+      /*if(this.parentStage.nextStage) {
+        this.parentStage.nextStage.border.stroke = color;
+      } else {
+        this.parentStage.borderRight.stroke = color;
+      }*/
+    }
+  }
+
   this.render = function() {
     this.setLeft();
     this.addName();
@@ -67,29 +99,30 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     this.canvas.add(this.borderRight);
     this.addCircle();
   }
-// Okay find some logic to show the border
+
   this.selectStep = function(evt) {
     var me = (evt.target) ? evt.target.me : this;
     if(ChaiBioTech.app.selectedStep) {
       var previouslySelected = ChaiBioTech.app.selectedStep;
       previouslySelected.darkFooterImage.visible = false;
       previouslySelected.whiteFooterImage.visible = false;
-      previouslySelected.borderRight.stroke = '#ff9f00';
+      previouslySelected.manageBorder('#ff9f00');
+      //
       ChaiBioTech.app.selectedStep = me;
     } else {
       ChaiBioTech.app.selectedStep = me;
     }
-    console.log("clicked", me.borderRight.visible);
-    me.borderRight.stroke = "black";
-    me.darkFooterImage.visible = true;
-    me.whiteFooterImage.visible = true;
+    // Change the border
+    me.manageBorder("black");
+    me.darkFooterImage.visible = me.whiteFooterImage.visible = true;
+    me.commonFooterImage.visible = false;
   }
 
   this.canvas.on('mouse:down', function(evt) {
     if(evt.target && evt.target.name === "step") {
       var me = evt.target.me;
       //Using function instead of event, so that everything works synchronous.
-      me.parentStage.selectStage(evt);
+      me.parentStage.selectStage(evt, me);
       me.selectStep(evt);
     }
   });

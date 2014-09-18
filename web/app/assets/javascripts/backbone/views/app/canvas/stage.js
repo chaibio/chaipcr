@@ -116,21 +116,25 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
       this.canvas.renderAll();
   }
 
+  this.manageBordersOnSelection = function(color) {
+    this.border.stroke = color;
+    if(this.nextStage) {
+      this.nextStage.border.stroke = color;
+    } else {
+      this.borderRight.stroke = color;
+    }
+  }
+
+  this.manageFooter = function(visible, color, length) {
+    for(var i = 0; i< length; i++) {
+        this.childSteps[i].commonFooterImage.visible = visible;
+        this.childSteps[i].stepName.fill = color;
+    }
+  }
+
   this.selectStage =  function(evt) {
     var me = (evt.target) ? evt.target.me.parentStage : this,
     length = me.childSteps.length;
-
-    //Change current stage
-    me.roof.stroke = "black";
-    me.stageNo.fill = "black";
-    me.stageName.fill = "black";
-    // We change the border
-    me.border.stroke = "#cc6c00";
-    if(me.nextStage) {
-      me.nextStage.border.stroke = "#cc6c00";
-    } else {
-      me.borderRight.stroke = "#cc6c00";
-    }
 
     if(ChaiBioTech.app.selectedStage) {
       var previouslySelected = ChaiBioTech.app.selectedStage;
@@ -143,29 +147,24 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
         previouslySelected.stageNo.fill = "white";
         previouslySelected.stageName.fill = "white";
         // Now we put the border back to normal
-        previouslySelected.border.stroke = '#ff9f00';
-        if(previouslySelected.nextStage) {
-          previouslySelected.nextStage.border.stroke = "#ff9f00";
-        } else {
-          previouslySelected.borderRight.stroke = "#ff9f00";
-        }
+        previouslySelected.manageBordersOnSelection("#ff9f00");
         // the step which was selected is being cleared
-        for(var i = 0; i< previousLength; i++) {
-          previouslySelected.childSteps[i].commonFooterImage.visible = false;
-          previouslySelected.childSteps[i].stepName.fill = "white";
-        }
-        // showing footer for the stage which is selected.
-        for(var i = 0; i< length; i++) {
-            me.childSteps[i].commonFooterImage.visible = true;
-            me.childSteps[i].stepName.fill = "black";
-        }
-
+        previouslySelected.manageFooter(false, "white", previousLength);
         ChaiBioTech.app.selectedStage = me;
       }
 
     } else {
       ChaiBioTech.app.selectedStage = me;
     }
+
+    // We change the border
+    me.manageBordersOnSelection("#cc6c00");
+    // showing footer for the stage which is selected.
+    me.manageFooter(true, "black", length);
+    //Change current stage
+    me.roof.stroke = "black";
+    me.stageNo.fill = "black";
+    me.stageName.fill = "black";
   }
 
   return this;
