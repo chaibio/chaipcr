@@ -5,9 +5,9 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 	template: JST["backbone/templates/app/previous-experiment"]
 
 	today: new Date()
-	
+
 	Months: ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"]
-	
+
 	className: "individual-experiment"
 
 	image: ""
@@ -18,7 +18,7 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 		backgroundImage: "url('assets/smallredO.png')"
 		cursor: "pointer"
 
-	readyToDeleteFalseImage: 
+	readyToDeleteFalseImage:
 		backgroundImage: "url('assets/smallblackO.png')"
 
 	readyToDeleteTrueHand:
@@ -35,7 +35,7 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 
 	readyToDelete: false
 
-	events: 
+	events:
 		"click .image": "deleteExperimentConfirm"
 		"click .no-delete": "dontDelete"
 		"click .yes-delete": "yesDelete"
@@ -48,10 +48,10 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 
 	kill: () ->
 		this.remove()
-	
+
 	enableDelete: () ->
 		@readyToDelete = ! @readyToDelete
-		
+
 		if @readyToDelete is true
 			@image.css(@readyToDeleteTrueImage)
 			@hand.css(@readyToDeleteTrueHand)
@@ -79,7 +79,7 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 		ampm = ""
 		hours = parseInt(time.split(":")[0])
 		minutes = parseInt(time.split(":")[1])
-		aggregateToMinutes = ((hours * 60) + minutes) - timeZoneDiff
+		aggregateToMinutes = Math.abs(((hours * 60) + minutes) - timeZoneDiff)
 		hours = parseInt(aggregateToMinutes / 60)
 		minutes = aggregateToMinutes % 60
 		if hours >= 12 then ampm = "PM" else ampm = "AM"
@@ -96,7 +96,7 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 		@month = @getMonth(date)
 		@date = @getDate(date)
 		experimentTimeStamp = Date.parse("#{@year}/#{@month}/#{@date}")
-		
+
 		if @model.get("experiment").completed_at
 
 			if experimentTimeStamp is @todayTimeStamp
@@ -139,13 +139,7 @@ class ChaiBioTech.app.Views.experiment extends Backbone.View
 			@.remove()
 			$(".hand:last").hide("slow")
 
-		action = 
+		action =
 			height: "0px"
 
 		$(@.el).animate(action, 500, callBack)
-		
-
-
-
-
-
