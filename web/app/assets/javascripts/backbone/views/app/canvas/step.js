@@ -113,8 +113,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     }
     // Change the border
     me.manageBorder("black");
-    me.darkFooterImage.setVisible(true);
-    me.whiteFooterImage.setVisible(true);
+    me.darkFooterImage.visible = me.whiteFooterImage.visible = true;
     me.commonFooterImage.visible = false;
     $(".middle-ground").html(me.parentStage.stageNo.text + " " + me.stepName.text + " " + me.parentStage.stageName.text);
   }

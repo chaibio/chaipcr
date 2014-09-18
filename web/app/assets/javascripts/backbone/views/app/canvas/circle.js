@@ -65,12 +65,12 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   }
 
   this.makeItBig = function(evt) {
-    this.circle.setStroke("#ffb400");
-    this.outerCircle.setStroke("black");
+    this.circle.stroke = "#ffb400";
+    this.outerCircle.stroke = "black";
     this.outerCircle.strokeWidth = 7;
-    this.stepDataGroup.setVisible(false);
-    this.outerMostCircle.setVisible(true);
-    this.littleCircleGroup.setVisible(true);
+    this.stepDataGroup.visible = false;
+    this.outerMostCircle.visible = true;
+    this.littleCircleGroup.visible = true;
     // Calling the parent stage so that it looks for all the changes
     this.parent.parentStage.selectStage(this);
     //Calling the parent step class to add footer image to step
@@ -78,11 +78,11 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   }
 
   this.makeItSmall = function(evt) {
-    this.circle.setStroke("white");
+    this.circle.stroke = "white";
     this.outerCircle.stroke = null;
-    this.littleCircleGroup.setVisible(false);
-    this.stepDataGroup.setVisible(true);
-    this.outerMostCircle.setVisible(false);
+    this.littleCircleGroup.visible = false;
+    this.stepDataGroup.visible = true;
+    this.outerMostCircle.visible = false;
   }
 
   this.canvas.on('object:moving', function(evt) {
@@ -98,9 +98,9 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       left = targetCircleGroup.left;
 
       if(top < 60) {
-        targetCircleGroup.setTop(60);
+        targetCircleGroup.top = 60;
       } else if(top > 290) {
-        targetCircleGroup.setTop(290);
+        targetCircleGroup.top = 290;
       }
 
       // Change temperature display as it circle is moved
@@ -135,7 +135,6 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
           previous.curve.path[1][1] = (left + leftOfLineLeft) / 2;
           previous.curve.path[1][2] = ((top + topOfLineLeft) / 2) + 20;
       }
-      me.setCoords();
     }
   });
 
