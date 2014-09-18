@@ -53,7 +53,6 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       if(this.previousStep) {
         this.previousStep.borderRight.stroke = color;
       } else {
-        console.log("color", color);
         this.parentStage.border.stroke = color;
       }
 
@@ -116,6 +115,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     me.manageBorder("black");
     me.darkFooterImage.visible = me.whiteFooterImage.visible = true;
     me.commonFooterImage.visible = false;
+    $(".middle-ground").html(me.parentStage.stageNo.text + " " + me.stepName.text + " " + me.parentStage.stageName.text);
   }
 
   this.canvas.on('mouse:down', function(evt) {

@@ -6,11 +6,11 @@ ChaiBioTech.app.Views.canvasContainer = Backbone.View.extend({
 
   initialize: function() {
     this.canvas = new ChaiBioTech.app.Views.canvas();
-    this.render();
   },
 
   render: function() {
     $(this.el).html(this.canvas.el);
+    return this;
   }
 
 });

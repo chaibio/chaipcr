@@ -9,6 +9,9 @@ ChaiBioTech.app.Views.editStageStep = Backbone.View.extend({
   initialize: function() {
     this.pasteName();
     this.pasteCanvasContainer();
+    this.pastePrevious();
+    this.pasteMiddleContainer();
+    this.pasteNext();
   },
 
   pasteName: function() {
@@ -21,11 +24,27 @@ ChaiBioTech.app.Views.editStageStep = Backbone.View.extend({
     this.canvasContainer = new ChaiBioTech.app.Views.canvasContainer();
   },
 
+  pastePrevious: function() {
+    this.previousStep = new ChaiBioTech.app.Views.previousStep();
+  },
+
+  pasteMiddleContainer: function() {
+    this.middleContainer = new ChaiBioTech.app.Views.bottomMiddleContainer();
+  },
+
+  pasteNext: function() {
+    this.nextStep = new ChaiBioTech.app.Views.nextStep();
+  },
+
   render: function() {
     $(this.el).html(this.template());
-    var topHalf = $(this.el).find(".top-half");
+    var topHalf = $(this.el).find(".top-half"),
+    bottomHalf = $(this.el).find(".bottom-half");
     topHalf.append(this.nameOnTop.render().el);
-    topHalf.append(this.canvasContainer.el);
+    topHalf.append(this.canvasContainer.render().el);
+    bottomHalf.append(this.previousStep.render().el);
+    bottomHalf.append(this.middleContainer.render().el);
+    bottomHalf.append(this.nextStep.render().el);
     return this;
   }
 });

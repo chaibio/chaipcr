@@ -55,5 +55,38 @@
 	.bottom-half {
 		width: 1024px;
 		height: 303px;
+
+		.previous {
+			width: 71px;
+			height: 60px;
+			float:left;
+
+			img {
+				padding-left: 41px;
+				padding-top: 31px;
+				cursor: pointer;
+			}
+		}
+		.middle-ground {
+			width: 882px;
+			height: 272px;
+			float: left;
+		}
+
+		.next {
+			width: 71px;
+			height: 60px;
+			float:left;
+
+			img {
+				// We rotate the image so just inverse the left and top too..
+				padding-right: 30px; // 41 - image width
+				padding-bottom: 31px;
+				cursor: pointer;
+				 -ms-transform: rotate(180deg); /* IE 9 */
+         -webkit-transform: rotate(180deg); /* Chrome, Safari, Opera */
+        	transform: rotate(180deg);
+			}
+		}
 	}
 }
