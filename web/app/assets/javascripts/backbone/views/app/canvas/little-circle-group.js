@@ -5,7 +5,7 @@ ChaiBioTech.app.Views.littleCircleGroup = function(littleCircles, parent) {
   return new fabric.Group(littleCircles, {
     originX:'center',
     originY: 'center',
-    top: -1,
+    top: 0,
     visible: false
   });
 }

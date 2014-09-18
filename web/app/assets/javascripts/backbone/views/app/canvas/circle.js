@@ -75,7 +75,6 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     this.parent.parentStage.selectStage(this);
     //Calling the parent step class to add footer image to step
     this.parent.selectStep(this);
-    this.canvas.renderAll();
   }
 
   this.makeItSmall = function(evt) {
