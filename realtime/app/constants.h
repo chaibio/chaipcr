@@ -54,7 +54,7 @@ const int kLedBlankPwmPeriodNs = 1000000;
 const int kLedBlankPwmDutyNs = 500000;
 
 //Optics
-const long kCollectDataInterval = 500;
+const long kFluorescenceDataCollectionDelayTimeMs = 500;
 const std::vector<int> kWellList = {4, 3, 2, 1, 16, 15, 14, 13, 5, 8, 7, 6, 11, 10, 9, 12};
 
 //Steps

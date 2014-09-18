@@ -15,9 +15,7 @@ class ExperimentController;
 class QPCRApplication: public Poco::Util::ServerApplication
 {
 public:
-    ~QPCRApplication();
-
-    inline static QPCRApplication* getInstance() { return _instance; }
+    inline static QPCRApplication& getInstance() { return static_cast<QPCRApplication&>(instance()); }
 
     inline bool isWorking() const { return _workState.load(); }
     inline void close() { _workState = false; }
@@ -32,8 +30,6 @@ private:
     bool waitSignal() const;
 
 private:
-    static QPCRApplication *_instance;
-
     sigset_t _signalsSet;
 
     std::atomic<bool> _workState;

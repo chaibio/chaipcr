@@ -5,7 +5,8 @@
 
 class ADCConsumer : public boost::noncopyable {
 public:
-    virtual void setADCValues(unsigned int firstADCValue, unsigned int secondADCValue = 0) = 0;
+    virtual void setADCValue(unsigned int /*adcValue*/) {}
+    virtual void setADCValues(unsigned int /*differentialADCValue*/, unsigned int /*singularADCValue*/) {}
 };
 
 #endif // ADCCONSUMER_H

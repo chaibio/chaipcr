@@ -14,7 +14,7 @@ TemperatureController::TemperatureController(std::shared_ptr<Thermistor> thermis
     _minTargetTemp = minTargetTemp;
     _maxTargetTemp = maxTargetTemp;
 
-    _thermistor->adcValueChanged.connect(boost::bind(&TemperatureController::computePid, this));
+    _thermistor->temperatureChanged.connect(boost::bind(&TemperatureController::computePid, this, _1));
 }
 
 void TemperatureController::setEnableMode(bool enableMode)
@@ -53,6 +53,7 @@ void TemperatureController::setTargetTemperature(double temperature)
     }
 
     _targetTemperature.store(temperature);
+    targetTemperatureChanged();
 }
 
 double TemperatureController::currentTemperature() const
@@ -68,13 +69,13 @@ void TemperatureController::process()
     }
 }
 
-void TemperatureController::computePid()
+void TemperatureController::computePid(double currentTemperature)
 {
     _pidMutex.lock();
     {
         if (_pidState)
         {
-            double result = _pidController->compute(targetTemperature(), currentTemperature());
+            double result = _pidController->compute(targetTemperature(), currentTemperature);
 
             if (_enableMode && result != _pidResult)
             {

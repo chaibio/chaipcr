@@ -45,6 +45,7 @@ public:
 
     double maxTemperatureSetpointDelta () const;
 
+    void setDrive(double drive);
     double zone1DriveValue() const;
     double zone2DriveValue() const;
 

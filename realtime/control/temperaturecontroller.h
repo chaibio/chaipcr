@@ -6,6 +6,7 @@
 #include <memory>
 #include <atomic>
 #include <mutex>
+#include <boost/signals2.hpp>
 
 class Thermistor;
 class PIDController;
@@ -27,6 +28,7 @@ public:
     void setTargetTemperature(double temperature);
     inline double targetTemperature() const { return _targetTemperature.load(); }
     double currentTemperature() const;
+    boost::signals2::signal<void()> targetTemperatureChanged;
 
     virtual Direction outputDirection() const = 0;
 
@@ -38,7 +40,7 @@ protected:
     virtual void processOutput() = 0;
 
 private:
-    void computePid();
+    void computePid(double currentTemperature);
 
 protected:
     std::shared_ptr<Thermistor> _thermistor;

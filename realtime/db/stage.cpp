@@ -5,7 +5,7 @@ Stage::Stage(int id)
 {
     _id = id;
     _numCycles = 1;
-    _cycleIteration = 0;
+    _cycleIteration = 1;
     _orderNumber = 0;
     _type = None;
     _currentComponent = _components.end();
@@ -33,8 +33,8 @@ Stage::Stage(Stage &&other)
     _currentComponent = other._currentComponent;
 
     other._id = 0;
-    other._numCycles = 0;
-    other._cycleIteration = 0;
+    other._numCycles = 1;
+    other._cycleIteration = 1;
     other._orderNumber = 0;
     other._type = None;
     other._currentComponent = other._components.end();
@@ -69,8 +69,8 @@ Stage& Stage::operator= (Stage &&other)
     _currentComponent = other._currentComponent;
 
     other._id = 0;
-    other._numCycles = 0;
-    other._cycleIteration = 0;
+    other._numCycles = 1;
+    other._cycleIteration = 1;
     other._orderNumber = 0;
     other._type = None;
     other._currentComponent = other._components.end();
@@ -81,7 +81,7 @@ Stage& Stage::operator= (Stage &&other)
 void Stage::setNumCycles(int numCycles)
 {
      _numCycles = numCycles;
-     _cycleIteration = 0;
+     _cycleIteration = 1;
 }
 
 void Stage::setComponents(const std::vector<StageComponent> &components)
@@ -112,7 +112,7 @@ void Stage::resetCurrentStep()
 {
     _currentComponent = _components.begin();
 
-    _cycleIteration = 0;
+    _cycleIteration = 1;
 }
 
 Step* Stage::currentStep() const
@@ -144,7 +144,7 @@ Step* Stage::advanceNextStep()
     {
         ++_cycleIteration;
 
-        if (_cycleIteration < _numCycles)
+        if (_cycleIteration <= _numCycles)
         {
             _currentComponent = _components.begin();
 
@@ -157,5 +157,5 @@ Step* Stage::advanceNextStep()
 
 bool Stage::hasNextStep() const
 {
-    return (_currentComponent != _components.end() && (_currentComponent + 1) != _components.end()) || (_cycleIteration + 1) < _numCycles;
+    return (_currentComponent != _components.end() && (_currentComponent + 1) != _components.end()) || (_cycleIteration + 1) <= _numCycles;
 }

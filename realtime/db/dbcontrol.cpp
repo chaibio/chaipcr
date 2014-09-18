@@ -200,10 +200,13 @@ void DBControl::addTemperatureLog(const TemperatureLog &log)
     {
         _session->begin();
 
-        *_session << "INSERT INTO temperature_logs(experiment_id, elapsed_time, lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp) VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_temp, :heat_block_zone_2_temp)",
-                soci::use(log.experimentId()), soci::use(log.elapsedTime()),
-                soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
-                soci::use(std::round(log.heatBlockZone1Temperature() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Temperature() * 100.0) / 100.0);
+        if (log.hasTemperatureInfo())
+        {
+            *_session << "INSERT INTO temperature_logs(experiment_id, elapsed_time, lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp) VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_temp, :heat_block_zone_2_temp)",
+                    soci::use(log.experimentId()), soci::use(log.elapsedTime()),
+                    soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
+                    soci::use(std::round(log.heatBlockZone1Temperature() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Temperature() * 100.0) / 100.0);
+        }
 
         if (log.hasDebugInfo())
         {
@@ -229,16 +232,19 @@ void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
 
         for (const TemperatureLog &log: logs)
         {
-            *_session << "INSERT INTO temperature_logs(experiment_id, elapsed_time, lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp) VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_temp, :heat_block_zone_2_temp)",
-                    soci::use(log.experimentId()), soci::use(log.elapsedTime()),
-                    soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
-                    soci::use(std::round(log.heatBlockZone1Temperature() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Temperature() * 100.0) / 100.0);
+            if (log.hasTemperatureInfo())
+            {
+                *_session << "INSERT INTO temperature_logs(experiment_id, elapsed_time, lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp) VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_temp, :heat_block_zone_2_temp)",
+                        soci::use(log.experimentId()), soci::use(log.elapsedTime()),
+                        soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
+                        soci::use(std::round(log.heatBlockZone1Temperature() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Temperature() * 100.0) / 100.0);
+            }
 
             if (log.hasDebugInfo())
             {
-                *_session << "INSERT INTO temperature_debug_logs VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_drive, :heat_block_zone_2_drive)",
+                *_session << "INSERT INTO temperature_debug_logs VALUES(:experiment_id, :elapsed_time, :lid_drive, :heat_block_zone_1_drive, :heat_block_zone_2_drive)",
                         soci::use(log.experimentId()), soci::use(log.elapsedTime()),
-                        soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
+                        soci::use(std::round(log.lidDrive() * 100.0) / 100.0),
                         soci::use(std::round(log.heatBlockZone1Drive() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Drive() * 100.0) / 100.0);
             }
         }
@@ -276,7 +282,7 @@ Settings* DBControl::getSettings()
     Settings *settings = new Settings();
 
     if (result.get_indicator("debug") != soci::i_null)
-        settings->setDebuMode(result.get<int>("debug"));
+        settings->setDebugMode(result.get<int>("debug"));
 
     return settings;
 }

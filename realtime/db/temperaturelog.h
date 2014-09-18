@@ -4,15 +4,18 @@
 class TemperatureLog
 {
 public:
-    TemperatureLog(int experimentId, bool debugState = false)
+    TemperatureLog(int experimentId, bool temperatureInfo = true, bool debugInfo = false)
     {
         _experimentId = experimentId;
         _elapsedTime = 0;
+
+        _temperatureState = temperatureInfo;
         _lidTemperature = 0;
         _heatBlockZone1Temperature = 0;
         _heatBlockZone2Temperature = 0;
 
-        _debugState = debugState;
+        _debugState = debugInfo;
+        _lidDrive = 0;
         _heatBlockZone1Drive = 0;
         _heatBlockZone2Drive = 0;
     }
@@ -21,6 +24,9 @@ public:
 
     inline long elapsedTime() const { return _elapsedTime; }
     inline void setElapsedTime(long time) { _elapsedTime = time; }
+
+    inline bool hasTemperatureInfo() const { return _temperatureState; }
+    inline void setTemperatureState(bool state) { _temperatureState = state; }
 
     inline double lidTemperature() const { return _lidTemperature; }
     inline void setLidTemperature(double temperature) { _lidTemperature = temperature; }
@@ -34,6 +40,9 @@ public:
     inline bool hasDebugInfo() const { return _debugState; }
     inline void setDebugState(bool state) { _debugState = state; }
 
+    inline double lidDrive() const { return _lidDrive; }
+    inline void setLidDrive(double drive) { _lidDrive = drive; }
+
     inline double heatBlockZone1Drive() const { return _heatBlockZone1Drive; }
     inline void setHeatBlockZone1Drive(double drive) { _heatBlockZone1Drive = drive; }
 
@@ -43,11 +52,14 @@ public:
 private:
     int _experimentId;
     long _elapsedTime;
+
+    bool _temperatureState;
     double _lidTemperature;
     double _heatBlockZone1Temperature;
     double _heatBlockZone2Temperature;
 
     bool _debugState;
+    double _lidDrive;
     double _heatBlockZone1Drive;
     double _heatBlockZone2Drive;
 };

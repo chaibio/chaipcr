@@ -3,6 +3,7 @@
 
 #include <string>
 #include <atomic>
+#include <memory>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class PWMPin
@@ -41,6 +42,10 @@ public:
     inline unsigned int pwmPolarity() const { return _polarity; }
     inline void setPWMPolarity(unsigned int polarity) { _polarity = polarity; processPWM(); }
 
+    inline double drive() const { return !_drive ? ((double)pwmDutyCycle() / pwmPeriod()) : *_drive; }
+    inline void setDrive(double drive) { _drive.reset(new double(drive)); }
+    inline void resetDrive() { _drive.reset(); }
+
 protected:
     inline void processPWM() { _pwm.setPWM(pwmDutyCycle(), pwmPeriod(), pwmPolarity()); }
 
@@ -49,6 +54,8 @@ private:
     std::atomic<unsigned long> _period;
     std::atomic<unsigned long> _dutyCycle;
     std::atomic<unsigned int> _polarity;
+
+    std::shared_ptr<double> _drive;
 };
 
 #endif

@@ -29,11 +29,11 @@ extern const std::string kLidControlPWMPath;
 extern const std::string kHeatBlockZone1PWMPath;
 extern const std::string kHeatBlockZone2PWMPath;
 
-static const unsigned int kHeadBlockZone1HeatPin = 27;
-static const unsigned int kHeadBlockZone1CoolPin = 47;
+static const unsigned int kHeadBlockZone1HeatPin = 45;
+static const unsigned int kHeadBlockZone1CoolPin = 69;
 
-static const unsigned int kHeadBlockZone2HeatPin = 45;
-static const unsigned int kHeadBlockZone2CoolPin = 69;
+static const unsigned int kHeadBlockZone2HeatPin = 27;
+static const unsigned int kHeadBlockZone2CoolPin = 47;
 
 //Photodiode Mux Pins
 static const int kMuxControlPin1 = 30;

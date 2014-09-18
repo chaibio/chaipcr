@@ -14,10 +14,11 @@ public:
 	
 	//accessors
     inline double temperature() const { return _temperature; }
+    boost::signals2::signal<void(double)> temperatureChanged;
 
     //ADCConsumer
-    void setADCValues(unsigned int firstADCValue, unsigned int secondADCValue = 0) override;
-    boost::signals2::signal<void()> adcValueChanged;
+    void setADCValue(unsigned int adcValue);
+    void setADCValues(unsigned int differentialADCValue, unsigned int singularADCValue);
 
 protected:
     virtual double temperatureForResistance(double resistanceOhms) = 0;
