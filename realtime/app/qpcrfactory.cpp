@@ -43,7 +43,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
                                                                                     kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
                                                                                     kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient));
 
-    std::vector<SPIDTuning> heatBlockPIDSchedule = {{150, 0.15, 8, 0.0}}; //, {100, 0.0, 0.00, 0.0}};
+    std::vector<SPIDTuning> heatBlockPIDSchedule = {{150, 0.05, 10, 0.0}}; //, {100, 0.0, 0.00, 0.0}};
     SinglePoleRecursiveFilter processValueFilter(5);
     PIDController *zone1CPIDController = new PIDController(heatBlockPIDSchedule, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax, processValueFilter);
 
