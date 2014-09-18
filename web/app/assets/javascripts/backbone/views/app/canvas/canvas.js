@@ -9,7 +9,8 @@ ChaiBioTech.app.Views.fabricCanvas = function(model) {
   this.allStepViews = [];
   ChaiBioTech.app.Views.mainCanvas = this.canvas = new fabric.Canvas('canvas', {
     backgroundColor: '#ffb400',
-    selection: false
+    selection: false,
+    stateful: false
     //selectionColor: 'green'
   });
 

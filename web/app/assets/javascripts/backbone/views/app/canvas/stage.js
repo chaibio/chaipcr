@@ -117,18 +117,18 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
   }
 
   this.manageBordersOnSelection = function(color) {
-    this.border.stroke = color;
+    this.border.setStroke(color);
     if(this.nextStage) {
-      this.nextStage.border.stroke = color;
+      this.nextStage.border.setStroke(color);
     } else {
-      this.borderRight.stroke = color;
+      this.borderRight.setStroke(color);
     }
   }
 
   this.manageFooter = function(visible, color, length) {
     for(var i = 0; i< length; i++) {
-        this.childSteps[i].commonFooterImage.visible = visible;
-        this.childSteps[i].stepName.fill = color;
+        this.childSteps[i].commonFooterImage.setVisible(visible);
+        this.childSteps[i].stepName.setFill(color);
     }
   }
 
@@ -143,9 +143,9 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
       if(previouslySelected.stageNo.text != me.stageNo.text) {
         var previousLength = previouslySelected.childSteps.length;
         //Previus stage is changed back to original stage
-        previouslySelected.roof.stroke = "white";
-        previouslySelected.stageNo.fill = "white";
-        previouslySelected.stageName.fill = "white";
+        previouslySelected.roof.setStroke("white");
+        previouslySelected.stageNo.setFill("white");
+        previouslySelected.stageName.setFill("white");
         // Now we put the border back to normal
         previouslySelected.manageBordersOnSelection("#ff9f00");
         // the step which was selected is being cleared
@@ -162,9 +162,9 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
     // showing footer for the stage which is selected.
     me.manageFooter(true, "black", length);
     //Change current stage
-    me.roof.stroke = "black";
-    me.stageNo.fill = "black";
-    me.stageName.fill = "black";
+    me.roof.setStroke("black");
+    me.stageNo.setFill("black");
+    me.stageName.setFill("black");
   }
 
   return this;
