@@ -67,10 +67,74 @@
 				cursor: pointer;
 			}
 		}
+		// The middle section of the bottom part of the screen
 		.middle-ground {
 			width: 882px;
 			height: 272px;
 			float: left;
+
+			.first-data-row {
+				width: 882px;
+				height: 62px;
+				border-bottom-style: solid;
+				border-bottom-width: 2px;
+				border-bottom-color: black;
+			}
+
+			.data-boxes {
+				width: 243px;
+				height: 212px;
+				float: left;
+
+				.name-board {
+					height: 34px;
+					color: #737373;
+					font-size: 10px;
+					line-height: 5;
+					border-bottom-style: solid;
+					border-bottom-width: 1px;
+					border-bottom-color: black;
+				}
+			}
+			.auto-delta {
+				margin-left: 76px;
+			}
+
+			.edit-stage-step {
+				margin-left: 77px;
+			}
+
+			.bottom-common-item {
+				height: 53px;
+				width: 243px;
+				border-bottom-style: solid;
+				border-bottom-width: 2px;
+				border-bottom-color: black;
+
+				.caption-part {
+					height: 53px;
+					width: 125px;
+					float: left;
+					line-height: 2.5;
+				}
+
+				.data-part {
+					height: 53px;
+					width: 95px;
+					float: left;
+					line-height: 1.4;
+					font-weight: bold;
+					font-size: 48px;
+					text-align: right;
+				}
+				.dots {
+					float: left;
+					width:23px;
+					height: 53px;
+					padding-top: 28px;
+					padding-left: 5px;
+				}
+			}
 		}
 
 		.next {
