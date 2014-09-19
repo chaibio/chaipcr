@@ -7,6 +7,12 @@ ChaiBioTech.app.Views.editStageStep = Backbone.View.extend({
   template: JST["backbone/templates/app/edit-stage-step"],
 
   initialize: function() {
+    // This is an event originated from canvas. Now Listen to this class to get all the update
+    // We will b triggering all the events to this class from fabric.
+    this.on("wow", function(data) {
+      //console.log("Yes", data);
+    });
+
     this.pasteName();
     this.pasteCanvasContainer();
     this.pastePrevious();

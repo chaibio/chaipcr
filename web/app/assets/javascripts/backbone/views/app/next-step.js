@@ -15,7 +15,7 @@ ChaiBioTech.app.Views.nextStep = Backbone.View.extend({
   },
 
   initialize: function() {
-    console.log("hola Jossie");
+    
   },
 
   render: function() {
