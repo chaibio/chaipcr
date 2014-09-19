@@ -6,6 +6,7 @@ ChaiBioTech.app.Views.circleMaker = function(left) {
     radius: 3,
     fill: 'white',
     left: left,
+    selectable: false,
     name: "temperatureControllerLittleDude"
   });
 }

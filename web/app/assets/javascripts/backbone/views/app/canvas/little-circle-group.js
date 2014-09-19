@@ -6,6 +6,7 @@ ChaiBioTech.app.Views.littleCircleGroup = function(littleCircles, parent) {
     originX:'center',
     originY: 'center',
     top: 0,
-    visible: false
+    visible: false,
+    selectable: false
   });
 }

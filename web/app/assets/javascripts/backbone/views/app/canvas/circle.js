@@ -98,9 +98,9 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       left = targetCircleGroup.left;
 
       if(top < 60) {
-        targetCircleGroup.top = 60;
+        targetCircleGroup.setTop(60);
       } else if(top > 290) {
-        targetCircleGroup.top = 290;
+        targetCircleGroup.setTop(290);
       }
 
       // Change temperature display as it circle is moved
