@@ -18,13 +18,17 @@ DBControl::~DBControl()
 
 Experiment* DBControl::getExperiment(int id)
 {
+    bool gotData = false;
     soci::row result;
 
     _dbMutex.lock();
-    *_session << "SELECT * FROM experiments WHERE id = " << id, soci::into(result);
+    {
+        *_session << "SELECT * FROM experiments WHERE id = " << id, soci::into(result);
+        gotData = _session->got_data();
+    }
     _dbMutex.unlock();
 
-    if (result.get_indicator("id") == soci::i_null)
+    if (!gotData || result.get_indicator("id") == soci::i_null)
         return nullptr;
 
     Experiment *experiment = new Experiment(id);
@@ -47,13 +51,17 @@ Experiment* DBControl::getExperiment(int id)
 
 Protocol* DBControl::getProtocol(int experimentId)
 {
+    bool gotData = false;
     soci::row result;
 
     _dbMutex.lock();
-    *_session << "SELECT * FROM protocols WHERE experiment_id = " << experimentId, soci::into(result);
+    {
+        *_session << "SELECT * FROM protocols WHERE experiment_id = " << experimentId, soci::into(result);
+        gotData = _session->got_data();
+    }
     _dbMutex.unlock();
 
-    if (result.get_indicator("id") == soci::i_null)
+    if (!gotData || result.get_indicator("id") == soci::i_null)
         return nullptr;
 
     Protocol *protocol = new Protocol;
@@ -155,13 +163,17 @@ std::vector<Step> DBControl::getSteps(int stageId)
 
 Ramp* DBControl::getRamp(int stepId)
 {
+    bool gotData = false;
     soci::row result;
 
     _dbMutex.lock();
-    *_session << "SELECT * FROM ramps WHERE next_step_id = " << stepId, soci::into(result);
+    {
+        *_session << "SELECT * FROM ramps WHERE next_step_id = " << stepId, soci::into(result);
+        gotData = _session->got_data();
+    }
     _dbMutex.unlock();
 
-    if (result.get_indicator("id") == soci::i_null)
+    if (!gotData || result.get_indicator("id") == soci::i_null)
         return nullptr;
 
     Ramp *ramp = new Ramp;
