@@ -115,7 +115,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     me.manageBorder("black");
     me.darkFooterImage.visible = me.whiteFooterImage.visible = true;
     me.commonFooterImage.visible = false;
-    $(".middle-ground").html(me.parentStage.stageNo.text + " " + me.stepName.text + " " + me.parentStage.stageName.text);
+    //$(".middle-ground").html(me.parentStage.stageNo.text + " " + me.stepName.text + " " + me.parentStage.stageName.text);
   }
 
   this.canvas.on('mouse:down', function(evt) {

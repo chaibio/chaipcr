@@ -67,10 +67,100 @@
 				cursor: pointer;
 			}
 		}
+		// The middle section of the bottom part of the screen
 		.middle-ground {
 			width: 882px;
 			height: 272px;
 			float: left;
+
+			.first-data-row {
+				width: 882px;
+				height: 62px;
+				border-bottom-style: solid;
+				border-bottom-width: 2px;
+				border-bottom-color: black;
+			}
+
+			.data-boxes {
+				width: 243px;
+				height: 212px;
+				float: left;
+
+				.name-board {
+					height: 34px;
+					color: #737373;
+					font-size: 10px;
+					line-height: 5;
+					border-bottom-style: solid;
+					border-bottom-width: 1px;
+					border-bottom-color: black;
+				}
+			}
+			.auto-delta {
+				margin-left: 76px;
+			}
+
+			.edit-stage-step {
+				margin-left: 77px;
+
+				.action-container {
+					padding-top: 20px;
+
+					.big-button {
+						width: 243px;
+						background-color: white;
+						height: 30px;
+						border: 1px solid black;
+						margin-bottom: 12px;
+						font-size: 9px;
+						font-weight: bold;
+					}
+
+					.small-button {
+						width: 115px;
+						background-color: white;
+						height: 30px;
+						border: 1px solid black;
+						font-size: 9px;
+						font-weight: bold;
+					}
+					.go-right {
+						float: right;
+					}
+				}
+			}
+
+			.bottom-common-item {
+				height: 58px;
+				width: 243px;
+				border-bottom-style: solid;
+				border-bottom-width: 2px;
+				border-bottom-color: black;
+
+				.caption-part {
+					height: 53px;
+					width: 135px;
+					float: left;
+					line-height: 2.5;
+				}
+
+				.data-part {
+					height: 53px;
+					width: 85px;
+					float: left;
+					line-height: 1.4;
+					font-weight: bold;
+					font-size: 48px;
+					text-align: right;
+				}
+				.dots {
+					float: left;
+					width:23px;
+					height: 53px;
+					padding-top: 28px;
+					padding-left: 5px;
+				}
+			}
 		}
 
 		.next {

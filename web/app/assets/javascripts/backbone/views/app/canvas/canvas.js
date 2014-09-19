@@ -1,8 +1,9 @@
 ChaiBioTech.app.Views = ChaiBioTech.app.Views || {};
+
 ChaiBioTech.app.Views.mainCanvas = null; // This could be used across application to fire
 // Events mon canvas
 
-ChaiBioTech.app.Views.fabricCanvas = function(model) {
+ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
 
   // Re write this part like other files
   this.model = model;
@@ -18,6 +19,8 @@ ChaiBioTech.app.Views.fabricCanvas = function(model) {
     this.canvas.setHeight(420);
     this.canvas.setWidth(1024);
     this.canvas.renderAll();
+    // Trying to connect to backbone system
+    appRouter.editStageStep.trigger("wow", {"cool": "Really cool"});
   };
 
   /*ChaiBioTech.app.Views.mainCanvas.on("object:selected", function(evt) {
