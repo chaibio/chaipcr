@@ -52,7 +52,8 @@ void Optics::process()
 
 void Optics::setADCValue(unsigned int adcValue)
 {
-    _adcValue = (adcValue >> 8);
+    //convert positive range of signed 24 bit ADC value to 16 bit unsigned value
+    _adcValue = (adcValue >> 7);
 }
 
 void Optics::setCollectData(bool state)
