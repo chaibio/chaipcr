@@ -33,7 +33,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
         responsePt.put("optics.intensity", optics->getLedController()->intensity());
         responsePt.put("optics.collectData", optics->collectData());
         responsePt.put("optics.lidOpen", optics->lidOpen());
-        responsePt.put("optics.photodiodeValue", (optics->adcValue() >> 8));
+        responsePt.put("optics.photodiodeValue", optics->adcValue());
     }
 
     if (heatSink) {
