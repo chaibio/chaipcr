@@ -9,6 +9,8 @@
 
 #include <memory>
 #include <atomic>
+#include <mutex>
+#include <condition_variable>
 
 class LEDController;
 
@@ -30,7 +32,7 @@ public:
 	//accessors
     inline bool lidOpen() const { return _lidOpen; }
 
-    inline bool collectData() const { return _collectData; }
+    bool collectData() const;
     void setCollectData(bool state);
 
     inline std::shared_ptr<LEDController> getLedController() { return _ledController; }
@@ -39,22 +41,26 @@ public:
     std::vector<int> restartCollection();
 
 private:
+    void toggleCollectData();
     void collectDataCallback(Poco::Timer &timer);
 	
 private:
-    std::atomic<unsigned int> _adcValue;
+    std::shared_ptr<LEDController> _ledController;
 
     std::atomic<bool> _lidOpen;
-
-    std::atomic<bool> _collectData;
-    Poco::Timer *_collectDataTimer;
-    unsigned int _ledNumber;
-
     GPIO _lidSensePin;
-    std::shared_ptr<LEDController> _ledController;
-    MUX _photodiodeMux;
 
+    std::atomic<unsigned int> _adcValue;
+    mutable std::condition_variable _adcCondition;
+
+    bool _collectData;
+    Poco::Timer *_collectDataTimer;
+    mutable std::recursive_mutex _collectDataMutex;
+
+    unsigned int _ledNumber;
     std::vector<std::vector<int>> _fluorescenceData;
+
+    MUX _photodiodeMux;
 };
 
 #endif

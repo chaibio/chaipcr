@@ -153,7 +153,7 @@ void ExperimentController::holdStepCallback(Poco::Timer &)
 {
     _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->restartCollection());
 
-    HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->advanceNextStep()->temperature(), _experiment->protocol()->currentRamp()->rate());
+    HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->advanceNextStep()->temperature(), _experiment->protocol()->currentRamp() ? _experiment->protocol()->currentRamp()->rate() : 0);
     HeatBlockInstance::getInstance()->enableStepProcessing();
 }
 
@@ -206,27 +206,37 @@ void ExperimentController::settingsUpdated()
 
 void ExperimentController::toggleTempLogs()
 {
-    if (machineState() == Idle)
+    try
     {
-        if (_settings->temperatureLogs.hasTemperatureLogs() || _settings->temperatureLogs.hasDebugTemperatureLogs())
+        if (machineState() == Idle)
         {
-            if (_settings->temperatureLogs.startTime() == boost::posix_time::not_a_date_time)
+            if (_settings->temperatureLogs.hasTemperatureLogs() || _settings->temperatureLogs.hasDebugTemperatureLogs())
             {
-                addTempLogCallback(*_logTimer);
+                if (_settings->temperatureLogs.startTime() == boost::posix_time::not_a_date_time)
+                {
+                    _settings->temperatureLogs.setStartTime(boost::posix_time::microsec_clock::universal_time());
 
-                _logTimer->setPeriodicInterval(kTemperatureLoggerInterval);
-                _logTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::addTempLogCallback));
+                    addTempLogCallback(*_logTimer);
+
+                    _logTimer->setPeriodicInterval(kTemperatureLoggerInterval);
+                    _logTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::addTempLogCallback));
+                }
             }
+            else
+                stopLogging();
         }
-        else
-            stopLogging();
+    }
+    catch (...)
+    {
+        stopLogging();
+        throw;
     }
 }
 
 void ExperimentController::addTempLogCallback(Poco::Timer &)
 {
     TemperatureLog log(0, _settings->temperatureLogs.hasTemperatureLogs(), _settings->temperatureLogs.hasDebugTemperatureLogs());
-    log.setElapsedTime((boost::posix_time::microsec_clock::local_time() - _settings->temperatureLogs.startTime()).total_milliseconds());
+    log.setElapsedTime((boost::posix_time::microsec_clock::universal_time() - _settings->temperatureLogs.startTime()).total_milliseconds());
 
     if (log.hasTemperatureInfo())
     {

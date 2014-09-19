@@ -14,9 +14,9 @@ public:
     ~BidirectionalPWMController();
 
     Direction outputDirection() const;
+    void setOutput(double value);
 
 protected:
-    void setOutput(double value);
     void resetOutput();
     void processOutput();
 

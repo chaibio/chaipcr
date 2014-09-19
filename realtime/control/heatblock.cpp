@@ -74,8 +74,8 @@ double HeatBlock::maxTemperatureSetpointDelta() const {
 }
 
 void HeatBlock::setDrive(double drive) {
-    _zones.first->setDrive(drive);
-    _zones.second->setDrive(drive);
+    _zones.first->setOutput(drive);
+    _zones.second->setOutput(drive);
 }
 
 double HeatBlock::zone1DriveValue() const {

@@ -1,7 +1,5 @@
 #include "pcrincludes.h"
 #include "controlincludes.h"
-#include "experimentcontroller.h"
-#include "settings.h"
 
 #include "testcontrolhandler.h"
 
@@ -9,13 +7,12 @@ using namespace std;
 using namespace boost::property_tree;
 using namespace Poco::Net;
 
-void TestControlHandler::processData(const ptree &requestPt, ptree &responsePt)
+void TestControlHandler::processData(const ptree &requestPt, ptree &)
 {
     processOptics(requestPt);
     processLid(requestPt);
     processHeatSink(requestPt);
     processHeatBlock(requestPt);
-    processExperiment(requestPt);
 }
 
 void TestControlHandler::processOptics(const ptree &requestPt)
@@ -27,7 +24,6 @@ void TestControlHandler::processOptics(const ptree &requestPt)
         ptree::const_assoc_iterator ledIntensity = requestPt.find("ledIntensity");
         ptree::const_assoc_iterator activateLED = requestPt.find("activateLED");
         ptree::const_assoc_iterator disableLEDs = requestPt.find("disableLEDs");
-        ptree::const_assoc_iterator opticalData = requestPt.find("opticalData");
         ptree::const_assoc_iterator photodiodeMuxChannel = requestPt.find("photodiodeMuxChannel");
 
         if (ledIntensity != requestPt.not_found())
@@ -41,9 +37,6 @@ void TestControlHandler::processOptics(const ptree &requestPt)
 
         if (photodiodeMuxChannel != requestPt.not_found())
             optics->getPhotodiodeMux().setChannel(photodiodeMuxChannel->second.get_value<int>());
-
-        if (opticalData != requestPt.not_found())
-            optics->setCollectData(opticalData->second.get_value<bool>());
     }
 }
 
@@ -63,7 +56,7 @@ void TestControlHandler::processLid(const ptree &requestPt)
         }
 
         if (lidDrive != requestPt.not_found())
-            lid->setDrive(lidDrive->second.get_value<double>());
+            lid->setOutput(lidDrive->second.get_value<double>());
     }
 }
 
@@ -97,22 +90,5 @@ void TestControlHandler::processHeatBlock(const ptree &requestPt)
 
         if (heatBlockDrive != requestPt.not_found())
             heatBlock->setDrive(heatBlockDrive->second.get_value<double>());
-    }
-}
-
-void TestControlHandler::processExperiment(const ptree &requestPt)
-{
-    std::shared_ptr<ExperimentController> experimentController = ExperimentController::getInstance();
-
-    if (experimentController)
-    {
-        ptree::const_assoc_iterator temperatureData = requestPt.find("temperatureData");
-        ptree::const_assoc_iterator temperatureDebugData = requestPt.find("temperatureDebugData");
-
-        if (temperatureData != requestPt.not_found())
-            experimentController->settings()->temperatureLogs.setTemperatureLogs(temperatureData->second.get_value<bool>());
-
-        if (temperatureDebugData != requestPt.not_found())
-            experimentController->settings()->temperatureLogs.setDebugTemperatureLogs(temperatureDebugData->second.get_value<bool>());
     }
 }

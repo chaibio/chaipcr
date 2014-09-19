@@ -5,8 +5,7 @@ BidirectionalPWMController::BidirectionalPWMController(std::shared_ptr<Thermisto
     :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController),
      PWMControl(pwmPath, pwmPeriod),
      _heatIO(heatIOPin, GPIO::kOutput), _coolIO(coolIOPin, GPIO::kOutput)
-{    
-    targetTemperatureChanged.connect(boost::bind(&BidirectionalPWMController::resetDrive, this));
+{
 
     resetOutput();
 }

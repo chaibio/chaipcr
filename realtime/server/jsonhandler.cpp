@@ -51,6 +51,8 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
 
             response.setContentType("text/html");
         }
+        else
+            response.send().flush();
     }
     catch (exception &ex)
     {

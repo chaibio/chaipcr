@@ -5,6 +5,7 @@
 #include "statushandler.h"
 #include "controlhandler.h"
 #include "settingshandler.h"
+#include "logdatahandler.h"
 
 #include "qpcrrequesthandlerfactory.h"
 
@@ -30,8 +31,10 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
         {
             if (requestPath.at(0) == "testControl")
                 return new TestControlHandler();
-            if (requestPath.at(0) == "settings")
+            else if (requestPath.at(0) == "settings")
                 return new SettingsHandler();
+            else if (requestPath.at(0) == "logData")
+                return new LogDataHandler();
         }
         else if (request.getMethod() == "POST")
         {
