@@ -1,6 +1,6 @@
 ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
 
-ChaiBioTech.app.Views.bottomTemperature = Backbone.View.extend({
+ChaiBioTech.app.Views.bottomStartOnCycle = Backbone.View.extend({
 
   className: "bottom-common-item",
 
@@ -12,8 +12,8 @@ ChaiBioTech.app.Views.bottomTemperature = Backbone.View.extend({
 
   render: function() {
     var data = {
-      caption: "TEMPERATURE",
-      data: "100.0º"
+      caption: "START ON CYCLE:",
+      data: "1"
     }
     $(this.el).html(this.template(data));
     return this;

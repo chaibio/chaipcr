@@ -102,10 +102,36 @@
 
 			.edit-stage-step {
 				margin-left: 77px;
+
+				.action-container {
+					padding-top: 20px;
+
+					.big-button {
+						width: 243px;
+						background-color: white;
+						height: 30px;
+						border: 1px solid black;
+						margin-bottom: 12px;
+						font-size: 9px;
+						font-weight: bold;
+					}
+
+					.small-button {
+						width: 115px;
+						background-color: white;
+						height: 30px;
+						border: 1px solid black;
+						font-size: 9px;
+						font-weight: bold;
+					}
+					.go-right {
+						float: right;
+					}
+				}
 			}
 
 			.bottom-common-item {
-				height: 53px;
+				height: 58px;
 				width: 243px;
 				border-bottom-style: solid;
 				border-bottom-width: 2px;
@@ -113,14 +139,14 @@
 
 				.caption-part {
 					height: 53px;
-					width: 125px;
+					width: 135px;
 					float: left;
 					line-height: 2.5;
 				}
 
 				.data-part {
 					height: 53px;
-					width: 95px;
+					width: 85px;
 					float: left;
 					line-height: 1.4;
 					font-weight: bold;
