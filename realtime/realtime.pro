@@ -111,7 +111,8 @@ HEADERS += \
     util/filters.h \
     db/settings.h \
     server/settingshandler.h \
-    util/adcpin.h
+    util/adcpin.h \
+    server/logdatahandler.h
 
 SOURCES += \
     app/pins.cpp \
@@ -154,4 +155,5 @@ SOURCES += \
     test/controltest.cpp \
     util/filters.cpp \
     server/settingshandler.cpp \
-    util/adcpin.cpp
+    util/adcpin.cpp \
+    server/logdatahandler.cpp

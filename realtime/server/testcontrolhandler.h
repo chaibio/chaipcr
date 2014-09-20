@@ -13,7 +13,6 @@ private:
     void processLid(const boost::property_tree::ptree &requestPt);
     void processHeatSink(const boost::property_tree::ptree &requestPt);
     void processHeatBlock(const boost::property_tree::ptree &requestPt);
-    void processExperiment(const boost::property_tree::ptree &requestPt);
 };
 
 #endif // TESTCONTROLHANDLER_H

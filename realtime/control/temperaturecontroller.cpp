@@ -53,7 +53,6 @@ void TemperatureController::setTargetTemperature(double temperature)
     }
 
     _targetTemperature.store(temperature);
-    targetTemperatureChanged();
 }
 
 double TemperatureController::currentTemperature() const

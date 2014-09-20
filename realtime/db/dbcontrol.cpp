@@ -138,24 +138,26 @@ std::vector<Step> DBControl::getSteps(int stageId)
 
     for (soci::rowset<soci::row>::const_iterator it = result.begin(); it != result.end(); ++it)
     {
-        steps.emplace_back(it->get<int>("id"));
+        Step step(it->get<int>("id"));
 
         if (it->get_indicator("name") != soci::i_null)
-            steps.back().setName(it->get<std::string>("name"));
+            step.setName(it->get<std::string>("name"));
 
         if (it->get_indicator("temperature") != soci::i_null)
         {
             if (it->get_properties("temperature").get_data_type() == soci::dt_double)
-                steps.back().setTemperature(it->get<double>("temperature"));
+                step.setTemperature(it->get<double>("temperature"));
             else
-                steps.back().setTemperature(it->get<int>("temperature"));
+                step.setTemperature(it->get<int>("temperature"));
         }
 
         if (it->get_indicator("order_number") != soci::i_null)
-            steps.back().setOrderNumber(it->get<int>("order_number"));
+            step.setOrderNumber(it->get<int>("order_number"));
 
         if (it->get_indicator("hold_time") != soci::i_null)
-            steps.back().setHoldTime(it->get<int>("hold_time"));
+            step.setHoldTime(it->get<int>("hold_time"));
+
+        steps.push_back(std::move(step));
     }
 
     return steps;
