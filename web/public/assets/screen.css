@@ -148,7 +148,12 @@
   font-size: 12px;
 }
 
-/* line 144, ../../app/assets/stylesheets/screen.css.scss */
+/* line 143, ../../app/assets/stylesheets/screen.css.scss */
+.ostrich {
+  font-family: "Ostrich Sans";
+}
+
+/* line 147, ../../app/assets/stylesheets/screen.css.scss */
 #container {
   width: 1024px;
 }
