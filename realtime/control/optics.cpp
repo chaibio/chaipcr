@@ -20,6 +20,9 @@ Optics::Optics(unsigned int lidSensePin, shared_ptr<LEDController> ledController
     _collectData = false;
     _collectDataTimer = new Timer;
     _ledNumber = 0;
+    _adcValue =  0;
+
+    _collectDataTimer->setPeriodicInterval(0);
 }
 
 Optics::~Optics()
@@ -127,7 +130,7 @@ void Optics::toggleCollectData()
     {
         if (_collectData && !lidOpen())
         {
-            if (_collectDataTimer->getPeriodicInterval() != 0)
+            if (_collectDataTimer->getPeriodicInterval() == 0)
             {
                 _collectDataTimer->setPeriodicInterval(kFluorescenceDataCollectionDelayTimeMs);
                 _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));

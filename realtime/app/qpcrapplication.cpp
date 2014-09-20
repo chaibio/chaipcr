@@ -38,10 +38,10 @@ int QPCRApplication::main(const vector<string>&) {
     params->setKeepAlive(false);
     server.stopAll(true);
 
+    _experimentController->stop();
+
     for (auto threadControlUnit: _threadControlUnits)
         threadControlUnit->stop();
-
-    _experimentController->stop();
 
 	return Application::EXIT_OK;
 }
