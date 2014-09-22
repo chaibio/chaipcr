@@ -79,6 +79,94 @@
 				border-bottom-style: solid;
 				border-bottom-width: 2px;
 				border-bottom-color: black;
+
+				.bottom-step-no {
+					height: 35px;
+					padding-top: 5px;
+					margin-top: 24px;
+					font-size: 48px;
+					font-weight: bold;
+					width: 35px;
+					float: left;
+					margin-left:2px;
+					text-align: right;
+				}
+				.bottom-no-of-stages {
+					float: left;
+					font-size: 26px;
+					height: 20px;
+					margin-top: 37px;
+				}
+				.bottom-name-of-step-stage {
+					width: 258px;
+					height: 35px;
+					font-size: 41px;
+					float: left;
+					margin-top: 26px;
+					padding-top: 7px;
+					margin-left: 20px;
+				}
+				.bottom-stage-name {
+					width: 90px;
+					font-size: 10px;
+					height: 15px;
+					margin-top: 42px;
+					margin-left: 12px;
+					float: left;
+				}
+				.bottom-step-no-cycle {
+					height: 35px;
+					padding-top: 5px;
+					margin-top: 24px;
+					font-size: 48px;
+					font-weight: bold;
+					width: 45px;
+					float: left;
+					margin-left:2px;
+					text-align: right;
+				}
+				.bottom-step-x {
+					float: left;
+					font-size: 26px;
+					font-weight: bold;
+					height: 20px;
+					margin-top: 37px;
+				}
+				.bottom-cycles-and-dots {
+					font-size: 10px;
+					height: 15px;
+					margin-top: 42px;
+					margin-left: 5px;
+					float: left;
+					width: 35px;
+				}
+				.bottom-cycle-dots {
+					width: 18px;
+					height: 15px;
+					margin-top: 42px;
+					float: left;
+					margin-left: 5px;
+					margin-right: 11px;
+				}
+				.bottom-button-container {
+					float: left;
+					width: 147px;
+					height: 41px;
+					margin-left: 6px;
+					margin-top: 25px;
+
+					button {
+						width: 142px;
+						height: 31px;
+						background-color: white;
+						font-size: 9px;
+						font-weight: bold;
+						border: 1px solid black;
+						margin-left: 5px;
+					}
+
+				}
+
 			}
 
 			.data-boxes {

@@ -7,6 +7,7 @@ ChaiBioTech.app.Views.bottomMiddleContainer = Backbone.View.extend({
   template: JST["backbone/templates/app/middle-container"],
 
   initialize: function() {
+    this.generalInfo = new ChaiBioTech.app.Views.generalInfo();
     this.temperatureSection = new ChaiBioTech.app.Views.bottomTemperature();
     this.rampSpeedSection = new ChaiBioTech.app.Views.bottomRampSpeed();
     this.holdDurationSection = new ChaiBioTech.app.Views.bottomHoldDuration();
@@ -18,11 +19,13 @@ ChaiBioTech.app.Views.bottomMiddleContainer = Backbone.View.extend({
 
   render: function() {
     $(this.el).html(this.template());
-    
+
     var firstBox = $(this.el).find(".temperature-change"),
     secondBox = $(this.el).find(".auto-delta"),
-    thirdBox = $(this.el).find(".edit-stage-step");
+    thirdBox = $(this.el).find(".edit-stage-step"),
+    firstRow = $(this.el).find(".first-data-row");
 
+    firstRow.append(this.generalInfo.render().el);
     firstBox.append(this.temperatureSection.render().el);
     firstBox.append(this.rampSpeedSection.render().el);
     firstBox.append(this.holdDurationSection.render().el);

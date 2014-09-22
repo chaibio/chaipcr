@@ -13,7 +13,6 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
 
   this.setLeft = function() {
     this.left = this.parentStage.left + 1 + (parseInt(this.index) * this.myWidth);
-    //console.log(this.left, this.index);
   }
 
   this.addName = function() {
