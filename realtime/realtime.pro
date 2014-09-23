@@ -27,8 +27,13 @@ LIBS += -lsqlite3
 LIBS += -lsoci_core
 LIBS += -lsoci_sqlite3
 
+LIBS += -ldl
+
 #Ignore Boost warnings
 QMAKE_CXXFLAGS += -Wno-unused-local-typedefs -Wno-unused-parameter -Wno-unused-but-set-parameter
+
+QMAKE_CXXFLAGS += -std=c++11
+QMAKE_LFLAGS += -rdynamic
 
 unix:!unix_m {
     QMAKE_CC = arm-unknown-linux-gnueabi-gcc
@@ -55,8 +60,6 @@ unix_m: {
     target.path = /root/tmp
     INSTALLS += target
 }
-
-QMAKE_CXXFLAGS += -std=c++11
 
 HEADERS += \
     app/pins.h \
@@ -112,7 +115,8 @@ HEADERS += \
     db/settings.h \
     server/settingshandler.h \
     util/adcpin.h \
-    server/logdatahandler.h
+    server/logdatahandler.h \
+    util/exceptionhandler.h
 
 SOURCES += \
     app/pins.cpp \

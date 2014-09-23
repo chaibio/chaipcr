@@ -4,6 +4,7 @@
 #include "pid.h"
 #include "ledcontroller.h"
 #include "optics.h"
+#include "qpcrapplication.h"
 
 using namespace std;
 using namespace Poco;
@@ -149,22 +150,29 @@ void Optics::toggleCollectData()
 
 void Optics::collectDataCallback(Poco::Timer &timer)
 {
+    try
     {
-        std::mutex waitMutex;
-        std::unique_lock<std::mutex> waitLock(waitMutex);
-        _adcCondition.wait(waitLock);
+        {
+            std::mutex waitMutex;
+            std::unique_lock<std::mutex> waitLock(waitMutex);
+            _adcCondition.wait(waitLock);
+        }
+
+        _fluorescenceData[_ledNumber].push_back(_adcValue);
+
+        ++_ledNumber;
+        if (_ledNumber >= kWellList.size())
+            _ledNumber = 0;
+
+        _ledController->activateLED(kWellList.at(_ledNumber));
+        _photodiodeMux.setChannel(_ledNumber);
+
+        timer.restart(timer.getPeriodicInterval());
     }
-
-    _fluorescenceData[_ledNumber].push_back(_adcValue);
-
-    ++_ledNumber;
-    if (_ledNumber >= kWellList.size())
-        _ledNumber = 0;
-
-    _ledController->activateLED(kWellList.at(_ledNumber));
-    _photodiodeMux.setChannel(_ledNumber);
-
-    timer.restart(timer.getPeriodicInterval());
+    catch (...)
+    {
+        qpcrApp.setException(std::current_exception());
+    }
 }
 
 std::vector<int> Optics::restartCollection()

@@ -4,6 +4,7 @@
 #include "ltc2444.h"
 #include "adcconsumer.h"
 #include "adccontroller.h"
+#include "qpcrapplication.h"
 
 using namespace std;
 
@@ -34,57 +35,66 @@ ADCController::~ADCController() {
 }
 
 void ADCController::process() {
-    _workState = true;
-    while (_workState) {
-        if (_ltc2444->waitBusy())
-            continue;
+    try
+    {
+        _workState = true;
+        while (_workState) {
+            if (_ltc2444->waitBusy())
+                continue;
 
-        uint32_t value;
-        switch (nextState()) {
-        case EReadZone1Differential:
-            value = _ltc2444->readDifferentialChannels(0, true, kThermistorOversamplingRate);
-            break;
-        case EReadZone1Singular:
-            value = _ltc2444->readSingleEndedChannel(4, kThermistorOversamplingRate);
-            break;
-        case EReadZone2Differential:
-            value = _ltc2444->readDifferentialChannels(2, true, kThermistorOversamplingRate);
-            break;
-        case EReadZone2Singular:
-            value = _ltc2444->readSingleEndedChannel(5, kThermistorOversamplingRate);
-            break;
-        case EReadLIA:
-            value = _ltc2444->readSingleEndedChannel(6, kLIAOversamplingRate);
-            break;
-        case EReadLid:
-            value = _ltc2444->readSingleEndedChannel(7, kThermistorOversamplingRate);
-            break;
-        default:
-            assert(false);
+            uint32_t value;
+            switch (nextState()) {
+            case EReadZone1Differential:
+                value = _ltc2444->readDifferentialChannels(0, true, kThermistorOversamplingRate);
+                break;
+            case EReadZone1Singular:
+                value = _ltc2444->readSingleEndedChannel(4, kThermistorOversamplingRate);
+                break;
+            case EReadZone2Differential:
+                value = _ltc2444->readDifferentialChannels(2, true, kThermistorOversamplingRate);
+                break;
+            case EReadZone2Singular:
+                value = _ltc2444->readSingleEndedChannel(5, kThermistorOversamplingRate);
+                break;
+            case EReadLIA:
+                value = _ltc2444->readSingleEndedChannel(6, kLIAOversamplingRate);
+                break;
+            case EReadLid:
+                value = _ltc2444->readSingleEndedChannel(7, kThermistorOversamplingRate);
+                break;
+            default:
+                assert(false);
+            }
+
+            switch (_currentConversionState) {
+            case EReadZone1Differential:
+            case EReadZone2Differential:
+                _differentialValue = value;
+                break;
+            case EReadZone1Singular:
+                _zoneConsumers.at(0)->setADCValues(_differentialValue, value);
+
+                break;
+            case EReadZone2Singular:
+                _zoneConsumers.at(1)->setADCValues(_differentialValue, value);
+
+                break;
+            case EReadLIA:
+                _liaConsumer->setADCValue(value);
+                break;
+            case EReadLid:
+                _lidConsumer->setADCValue(value);
+                break;
+            default:
+                assert(false);
+            }
+
+            _currentConversionState = nextState();
         }
-
-        switch (_currentConversionState) {
-        case EReadZone1Differential:
-        case EReadZone2Differential:
-            _differentialValue = value;
-            break;
-        case EReadZone1Singular:
-            _zoneConsumers.at(0)->setADCValues(_differentialValue, value);
-            break;
-        case EReadZone2Singular:
-            _zoneConsumers.at(1)->setADCValues(_differentialValue, value);
-            break;
-        case EReadLIA:
-            _liaConsumer->setADCValue(value);
-            break;
-        case EReadLid:
-            _lidConsumer->setADCValue(value);
-            break;
-        default:
-            assert(false);
-        }
-
-        _currentConversionState = nextState();
+    }
+    catch (...)
+    {
+        qpcrApp.setException(std::current_exception());
     }
 }
 

@@ -5,6 +5,7 @@
 
 #include <atomic>
 #include <vector>
+#include <memory>
 
 class DBControl;
 class Experiment;
@@ -37,11 +38,12 @@ public:
     ~ExperimentController();
 
     inline MachineState machineState() const { return _machineState; }
-    inline const Experiment* experiment() const { return _experiment; }
+    inline const std::shared_ptr<Experiment> experiment() const { return _experiment; }
     inline Settings* settings() const { return _settings; }
 
     StartingResult start(int experimentId);
     void stop();
+    void stop(const std::string &errorMessage);
 
     void settingsUpdated();
 
@@ -64,7 +66,7 @@ private:
     std::atomic<MachineState> _machineState;
 
     DBControl *_dbControl;
-    Experiment *_experiment;
+    std::shared_ptr<Experiment> _experiment;
     Settings *_settings;
 
     Poco::Timer *_holdStepTimer;
