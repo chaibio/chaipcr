@@ -8,6 +8,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
   // Re write this part like other files
   this.model = model;
   this.allStepViews = [];
+  var that = this;
   ChaiBioTech.app.Views.mainCanvas = this.canvas = new fabric.Canvas('canvas', {
     backgroundColor: '#ffb400',
     selection: false,
@@ -15,20 +16,45 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     //selectionColor: 'green'
   });
 
+  // We add this handler so that canvas works when scrolled
+  $(".canvas-containing").scroll(function(){
+    that.canvas.calcOffset();
+  });
+
   this.setDefaultWidthHeight = function() {
     this.canvas.setHeight(420);
-    this.canvas.setWidth(1024);
+    var width = (this.allStepViews.length * 122 > 1024) ? this.allStepViews.length * 120 : 1024
+    this.canvas.setWidth(width + 50);
     this.canvas.renderAll();
-    // Trying to connect to backbone system
-    appRouter.editStageStep.trigger("wow", {"cool": "Really cool"});
   };
 
-  /*ChaiBioTech.app.Views.mainCanvas.on("object:selected", function(evt) {
-    console.log(evt);
-  });*/
+  this.canvas.on("modelChanged", function(evt) {
+
+    that.model.getLatestModel(that.canvas);
+    //that.canvas.clear();
+    //that.canvas.renderAll();
+  });
+
+  this.canvas.on("latestData", function() {
+    console.log("Latest data", that.model);
+    //that.allStepViews = [];
+    while(that.allStepViews.length > 0) {
+      that.allStepViews.pop();
+    }
+    ChaiBioTech.app.selectedStage = null;
+    ChaiBioTech.app.selectedStep = null;
+    that.addStages();
+    that.addinvisibleFooterToStep();
+    that.setDefaultWidthHeight();
+    that.addTemperatureLines();
+    that.setDefaultWidthHeight();
+    that.canvas.calcOffset();
+
+  })
 
   this.addStages = function() {
     var allStages = this.model.get("experiment").protocol.stages;
+    console.log(allStages);
     var stage = {};
     var previousStage = null;
 
@@ -46,20 +72,24 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     }
     // Only for the last stage
     stageView.borderRight();
-    this.canvas.add(stageView.borderRight);
+    this.canvas.add(stageView.borderRight).calcOffset();;
+
+    //this.canvas.calcOffset();
 
     // This is a bad way to trigger a click in the canvas so that Ostrich Sans is
     // placed correctly. Interestingly if open sans is used , it works fine.
-    var options = {};
+    /*var options = {};
     options.e = {};
     options.e.clientX = 0;
     options.e.clientY = 0;
     //this.canvas.trigger('mouse:down', options);
-    //this.canvas.trigger('mouse:up', options);
+    //this.canvas.trigger('mouse:up', options); */
   };
 
   this.addTemperatureLines = function() {
+    this.allCircles = null;
     this.allCircles = this.findAllCircles();
+    console.log(this.allCircles);
     var i = 0, limit = this.allCircles.length;
 
     for(i = 0; i < limit; i++) {

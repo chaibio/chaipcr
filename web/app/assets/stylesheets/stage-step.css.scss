@@ -42,9 +42,11 @@
 			}
 		}
 
-		.canvas-container {
+		.canvas-containing {
 			height: 420px;
 			width: 1024px;
+			overflow-x: scroll;
+			overflow-y: hidden;
 
 			.canvasClass {
 				width: 300px;

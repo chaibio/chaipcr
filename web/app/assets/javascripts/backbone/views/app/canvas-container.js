@@ -2,7 +2,7 @@ ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
 
 ChaiBioTech.app.Views.canvasContainer = Backbone.View.extend({
 
-  className: "canvas-container",
+  className: "canvas-containing",
 
   initialize: function() {
     this.canvas = new ChaiBioTech.app.Views.canvas();

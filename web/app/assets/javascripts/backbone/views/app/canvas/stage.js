@@ -76,6 +76,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
   this.addSteps = function() {
     var steps = this.model.get("stage").steps;
     var tempStep = null;
+    
     for(stepIndex in steps) {
       stepModel = new ChaiBioTech.Models.Step({"step": steps[stepIndex].step});
       stepView = new ChaiBioTech.app.Views.fabricStep(stepModel, this, stepIndex);
