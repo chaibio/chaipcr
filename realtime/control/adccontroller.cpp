@@ -15,7 +15,7 @@ const LTC2444::OversamplingRatio kLIAOversamplingRate = LTC2444::kOversamplingRa
 // Class ADCController
 ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsumers, std::shared_ptr<ADCConsumer> liaConsumer, std::shared_ptr<ADCConsumer> lidConsumer,
                              unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber):
-    _currentConversionState {EReadZone1Differential},
+    _currentConversionState {static_cast<ADCController::ADCState>(0)},
     _zoneConsumers {zoneConsumers},
     _liaConsumer {liaConsumer},
     _lidConsumer {lidConsumer} {
