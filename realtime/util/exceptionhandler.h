@@ -1,6 +1,10 @@
 #ifndef EXCEPTIONHANDLER_H
 #define EXCEPTIONHANDLER_H
 
+#ifndef RTLD_NEXT
+#define RTLD_NEXT ((void *) -1l)
+#endif
+
 #include <iostream>
 #include <cstdio>
 #include <dlfcn.h>
