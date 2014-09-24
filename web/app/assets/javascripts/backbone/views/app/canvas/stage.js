@@ -75,7 +75,8 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
       lockScalingX: true,
       lockScalingY: true,
       lockMovementX: true,
-      lockMovementY: true
+      lockMovementY: true,
+      hasControls: false
     })
   }
 

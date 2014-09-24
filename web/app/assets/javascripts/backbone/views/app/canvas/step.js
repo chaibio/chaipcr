@@ -28,7 +28,8 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       lockScalingX: true,
       lockScalingY: true,
       lockMovementX: true,
-      lockMovementY: true
+      lockMovementY: true,
+      hasControls: false
     });
   }
 
