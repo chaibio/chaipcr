@@ -64,13 +64,18 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
 
   this.writeMyName = function() {
     var stageName = (this.model.get("stage").name).toUpperCase();
-    this.stageName = new fabric.Text(stageName, {
+    this.stageName = new fabric.IText(stageName, {
       fill: 'white',
       fontSize: 10,
       top : 28,
       left: this.left + 25 || 55,
       fontFamily: "Open Sans",
-      selectable: false
+      selectable: true,
+      lockRotation: true,
+      lockScalingX: true,
+      lockScalingY: true,
+      lockMovementX: true,
+      lockMovementY: true
     })
   }
 
