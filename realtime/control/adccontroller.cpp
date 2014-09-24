@@ -9,7 +9,7 @@
 using namespace std;
 
 const LTC2444::OversamplingRatio kThermistorOversamplingRate = LTC2444::kOversamplingRatio2048;
-const LTC2444::OversamplingRatio kLIAOversamplingRate = LTC2444::kOversamplingRatio256;
+const LTC2444::OversamplingRatio kLIAOversamplingRate = LTC2444::kOversamplingRatio2048; //kOversamplingRatio256;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class ADCController
@@ -73,11 +73,9 @@ void ADCController::process() {
                 break;
             case EReadZone1Singular:
                 _zoneConsumers.at(0)->setADCValues(_differentialValue, value);
-
                 break;
             case EReadZone2Singular:
                 _zoneConsumers.at(1)->setADCValues(_differentialValue, value);
-
                 break;
             case EReadLIA:
                 _liaConsumer->setADCValue(value);

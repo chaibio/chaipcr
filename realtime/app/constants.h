@@ -3,9 +3,6 @@
 
 #include <vector>
 
-//ADC
-const double kPrecisionADCReferenceVoltage = 3.3;
-
 //Steinhart-Hart coefficients for heat block thermistor (QTI Z Curve)
 const double kQTICurveZThermistorACoefficient = 0.001116401465500;
 const double kQTICurveZThermistorBCoefficient = 0.000237982973213;
@@ -78,7 +75,6 @@ const double kHeatSinkPIDMax = 0;
 
 //beaglebone
 const unsigned int kBeagleboneADCBits = 12;
-const double kBeagleboneADCReverenceVoltage = 1.8;
 
 //App
 const long kAppSignalInterval = 5 * 1000 * 1000; //Nanosec
