@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <atomic>
 #include <memory>
+#include <exception>
 
 class IControl;
 class IThreadControl;
@@ -19,6 +20,8 @@ public:
 
     inline bool isWorking() const { return _workState.load(); }
     inline void close() { _workState = false; }
+
+    inline void setException(std::exception_ptr exception) { _exception = exception; }
 
 protected:
 	//from ServerApplication
@@ -37,6 +40,8 @@ private:
     std::vector<std::shared_ptr<IControl>> _controlUnits;
     std::vector<std::shared_ptr<IThreadControl>> _threadControlUnits;
     std::shared_ptr<ExperimentController> _experimentController;
+
+    std::exception_ptr _exception;
 };
 
 #define qpcrApp QPCRApplication::getInstance()

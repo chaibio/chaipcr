@@ -4,6 +4,18 @@
 
 using namespace boost::posix_time;
 
+/*
+ * The PID Controller implements a non-interactive PID control algorithm, which provides
+ * true controller gain control. Control is proportional on error and derivative on process
+ * value (using process value eliminates derivative spikes). The process value is filtered
+ * by an externally provided DSP filter (processValueFilter in constructor) for use in
+ * derivative control; proportional control is based on the unfiltered process value.
+ *
+ * For best results compute() should be called at a regular interval, though the algorithm
+ * is time-aware for integral and derivative calculations. Integrator wind-up is prevented
+ * beyond the allowable control output range.
+ */
+
 ////////////////////////////////////////////////////////////////////
 // Class PIDController
 PIDController::PIDController(const std::vector<SPIDTuning>& pGainSchedule, double minOutput, double maxOutput, const SinglePoleRecursiveFilter& processValueFilter):

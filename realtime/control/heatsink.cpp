@@ -2,6 +2,7 @@
 #include "heatsink.h"
 #include "pwm.h"
 #include "thermistor.h"
+#include "qpcrapplication.h"
 
 #include <Poco/Timer.h>
 
@@ -57,5 +58,12 @@ void HeatSink::processOutput()
 }
 
 void HeatSink::readADCPin(Poco::Timer &/*timer*/) {
-    _thermistor->setADCValue(_adcPin.readValue());
+    try
+    {
+        _thermistor->setADCValue(_adcPin.readValue());
+    }
+    catch (...)
+    {
+        qpcrApp.setException(std::current_exception());
+    }
 }

@@ -6,6 +6,7 @@
 #include "qpcrrequesthandlerfactory.h"
 #include "qpcrfactory.h"
 #include "qpcrapplication.h"
+#include "exceptionhandler.h"
 
 using namespace std;
 using namespace Poco::Net;
@@ -24,26 +25,61 @@ void QPCRApplication::initialize(Application&) {
 int QPCRApplication::main(const vector<string>&) {
     HTTPServerParams *params = new HTTPServerParams;
     HTTPServer server(new QPCRRequestHandlerFactory, ServerSocket(kHttpServerPort), params);
-    server.start();
 
-    for (auto threadControlUnit: _threadControlUnits)
-        threadControlUnit->start();
+    try
+    {
+        server.start();
 
-    _workState = true;
-    while (!waitSignal() && _workState) {
-        for (auto controlUnit: _controlUnits)
-            controlUnit->process();
+        for (auto threadControlUnit: _threadControlUnits)
+            threadControlUnit->start();
+
+        _workState = true;
+        while (!waitSignal() && _workState) {
+            for (auto controlUnit: _controlUnits)
+                controlUnit->process();
+
+            if (_exception)
+                rethrow_exception(_exception);
+        }
+
+        params->setKeepAlive(false);
+        server.stopAll(true);
+
+        _experimentController->stop();
+
+        for (auto threadControlUnit: _threadControlUnits)
+            threadControlUnit->stop();
+
+        return EXIT_OK;
     }
+    catch (const exception &ex)
+    {
+        cout << "Exception occured: " << ex.what() << '\n';
 
-    params->setKeepAlive(false);
-    server.stopAll(true);
+        params->setKeepAlive(false);
+        server.stopAll(true);
 
-    _experimentController->stop();
+        _experimentController->stop(ex.what());
 
-    for (auto threadControlUnit: _threadControlUnits)
-        threadControlUnit->stop();
+        for (auto threadControlUnit: _threadControlUnits)
+            threadControlUnit->stop();
 
-	return Application::EXIT_OK;
+        return EXIT_SOFTWARE;
+    }
+    catch (...)
+    {
+        cout << "Unknown exception occured\n";
+
+        params->setKeepAlive(false);
+        server.stopAll(true);
+
+        _experimentController->stop("Unknown exception occured");
+
+        for (auto threadControlUnit: _threadControlUnits)
+            threadControlUnit->stop();
+
+        return EXIT_SOFTWARE;
+    }
 }
 
 void QPCRApplication::initSignals() {

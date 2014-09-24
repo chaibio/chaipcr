@@ -43,6 +43,10 @@ public:
     inline void setCompletionStatus(CompletionStatus status) {_completionStatus = status;}
     inline CompletionStatus completionStatus() const {return _completionStatus;}
 
+    inline void setCompletionMessage(const std::string &message) {_completionMessage = message;}
+    inline void setCompletionMessage(std::string &&message) {_completionMessage = std::move(message);}
+    inline const std::string& completionMessage() const {return _completionMessage;}
+
     void setProtocol(const Protocol &protocol);
     void setProtocol(Protocol &&protocol);
     void setProtocol(Protocol *protocol);
@@ -56,6 +60,7 @@ private:
     boost::posix_time::ptime _startedAt;
     boost::posix_time::ptime _completedAt;
     CompletionStatus _completionStatus;
+    std::string _completionMessage;
 
     Protocol *_protocol;
 };

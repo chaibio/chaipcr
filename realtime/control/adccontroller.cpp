@@ -4,17 +4,18 @@
 #include "ltc2444.h"
 #include "adcconsumer.h"
 #include "adccontroller.h"
+#include "qpcrapplication.h"
 
 using namespace std;
 
 const LTC2444::OversamplingRatio kThermistorOversamplingRate = LTC2444::kOversamplingRatio2048;
-const LTC2444::OversamplingRatio kLIAOversamplingRate = LTC2444::kOversamplingRatio256;
+const LTC2444::OversamplingRatio kLIAOversamplingRate = LTC2444::kOversamplingRatio2048; //kOversamplingRatio256;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class ADCController
 ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsumers, std::shared_ptr<ADCConsumer> liaConsumer, std::shared_ptr<ADCConsumer> lidConsumer,
                              unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber):
-    _currentConversionState {EReadZone1Differential},
+    _currentConversionState {static_cast<ADCController::ADCState>(0)},
     _zoneConsumers {zoneConsumers},
     _liaConsumer {liaConsumer},
     _lidConsumer {lidConsumer} {
@@ -34,57 +35,64 @@ ADCController::~ADCController() {
 }
 
 void ADCController::process() {
-    _workState = true;
-    while (_workState) {
-        if (_ltc2444->waitBusy())
-            continue;
+    try
+    {
+        _workState = true;
+        while (_workState) {
+            if (_ltc2444->waitBusy())
+                continue;
 
-        uint32_t value;
-        switch (nextState()) {
-        case EReadZone1Differential:
-            value = _ltc2444->readDifferentialChannels(0, true, kThermistorOversamplingRate);
-            break;
-        case EReadZone1Singular:
-            value = _ltc2444->readSingleEndedChannel(4, kThermistorOversamplingRate);
-            break;
-        case EReadZone2Differential:
-            value = _ltc2444->readDifferentialChannels(2, true, kThermistorOversamplingRate);
-            break;
-        case EReadZone2Singular:
-            value = _ltc2444->readSingleEndedChannel(5, kThermistorOversamplingRate);
-            break;
-        case EReadLIA:
-            value = _ltc2444->readSingleEndedChannel(6, kLIAOversamplingRate);
-            break;
-        case EReadLid:
-            value = _ltc2444->readSingleEndedChannel(7, kThermistorOversamplingRate);
-            break;
-        default:
-            assert(false);
+            uint32_t value;
+            switch (nextState()) {
+            case EReadZone1Differential:
+                value = _ltc2444->readDifferentialChannels(0, true, kThermistorOversamplingRate);
+                break;
+            case EReadZone1Singular:
+                value = _ltc2444->readSingleEndedChannel(4, kThermistorOversamplingRate);
+                break;
+            case EReadZone2Differential:
+                value = _ltc2444->readDifferentialChannels(2, true, kThermistorOversamplingRate);
+                break;
+            case EReadZone2Singular:
+                value = _ltc2444->readSingleEndedChannel(5, kThermistorOversamplingRate);
+                break;
+            case EReadLIA:
+                value = _ltc2444->readSingleEndedChannel(6, kLIAOversamplingRate);
+                break;
+            case EReadLid:
+                value = _ltc2444->readSingleEndedChannel(7, kThermistorOversamplingRate);
+                break;
+            default:
+                assert(false);
+            }
+
+            switch (_currentConversionState) {
+            case EReadZone1Differential:
+            case EReadZone2Differential:
+                _differentialValue = value;
+                break;
+            case EReadZone1Singular:
+                _zoneConsumers.at(0)->setADCValues(_differentialValue, value);
+                break;
+            case EReadZone2Singular:
+                _zoneConsumers.at(1)->setADCValues(_differentialValue, value);
+                break;
+            case EReadLIA:
+                _liaConsumer->setADCValue(value);
+                break;
+            case EReadLid:
+                _lidConsumer->setADCValue(value);
+                break;
+            default:
+                assert(false);
+            }
+
+            _currentConversionState = nextState();
         }
-
-        switch (_currentConversionState) {
-        case EReadZone1Differential:
-        case EReadZone2Differential:
-            _differentialValue = value;
-            break;
-        case EReadZone1Singular:
-            _zoneConsumers.at(0)->setADCValues(_differentialValue, value);
-            break;
-        case EReadZone2Singular:
-            _zoneConsumers.at(1)->setADCValues(_differentialValue, value);
-            break;
-        case EReadLIA:
-            _liaConsumer->setADCValue(value);
-            break;
-        case EReadLid:
-            _lidConsumer->setADCValue(value);
-            break;
-        default:
-            assert(false);
-        }
-
-        _currentConversionState = nextState();
+    }
+    catch (...)
+    {
+        qpcrApp.setException(std::current_exception());
     }
 }
 

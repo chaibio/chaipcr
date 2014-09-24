@@ -42,7 +42,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
     }
 
     if (experimentController) {
-        const Experiment *experiment = experimentController->experiment();
+        const std::shared_ptr<Experiment> experiment = experimentController->experiment();
 
         switch (experimentController->machineState()) {
         case ExperimentController::Idle:

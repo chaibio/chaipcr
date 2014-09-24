@@ -202,8 +202,8 @@ void DBControl::completeExperiment(Experiment *experiment)
 {
     _dbMutex.lock();
     {
-        *_session << "UPDATE experiments SET completed_at = :completed_at, completion_status = :completion_status WHERE id = " << experiment->id(),
-                soci::use(experiment->completedAt()), soci::use(experiment->completionStatus());
+        *_session << "UPDATE experiments SET completed_at = :completed_at, completion_status = :completion_status, completion_message = :completion_message WHERE id = " << experiment->id(),
+                soci::use(experiment->completedAt()), soci::use(experiment->completionStatus()), soci::use(experiment->completionMessage());
     }
     _dbMutex.unlock();
 }

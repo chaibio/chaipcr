@@ -9,7 +9,7 @@
 // Class Thermistor
 class Thermistor: public ADCConsumer {
 public:
-    Thermistor(unsigned int voltageDividerResistance, unsigned int adcBits, double referenceVoltage);
+    Thermistor(unsigned int voltageDividerResistance, unsigned int adcBits);
     virtual ~Thermistor() {}
 	
 	//accessors
@@ -28,13 +28,12 @@ private:
 
     const unsigned int _maxADCValue;
     const unsigned int _voltageDividerResistance;
-    const double _referenceVoltage;
 };
 
 class SteinhartHartThermistor: public Thermistor {
 public:
     SteinhartHartThermistor(unsigned int voltageDividerResistance, unsigned int adcBits,
-        double referenceVoltage, double a, double b, double c, double d);
+        double a, double b, double c, double d);
 
     double temperatureForResistance(double resistanceOhms) override;
 
@@ -45,7 +44,7 @@ private:
 class BetaThermistor: public Thermistor {
 public:
     BetaThermistor(unsigned int voltageDividerResistance, unsigned int adcBits,
-        double referenceVoltage, double beta, double r0, double t0);
+        double beta, double r0, double t0);
 
     double temperatureForResistance(double resistanceOhms) override;
 
