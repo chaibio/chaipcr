@@ -9,9 +9,9 @@ ChaiBioTech.app.Views.editStageStep = Backbone.View.extend({
   initialize: function() {
     // This is an event originated from canvas. Now Listen to this class to get all the update
     // We will b triggering all the events to this class from fabric.
-    this.on("wow", function(data) {
-      //console.log("Yes", data);
-    });
+    /*this.on("stepSelected", function(data) {
+      console.log("Yes", data);
+    });*/
 
     this.pasteName();
     this.pasteCanvasContainer();
@@ -35,7 +35,9 @@ ChaiBioTech.app.Views.editStageStep = Backbone.View.extend({
   },
 
   pasteMiddleContainer: function() {
-    this.middleContainer = new ChaiBioTech.app.Views.bottomMiddleContainer();
+    this.middleContainer = new ChaiBioTech.app.Views.bottomMiddleContainer({
+      editStepStageClass: this
+    });
   },
 
   pasteNext: function() {

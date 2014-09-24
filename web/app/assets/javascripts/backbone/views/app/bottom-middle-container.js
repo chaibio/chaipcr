@@ -7,10 +7,21 @@ ChaiBioTech.app.Views.bottomMiddleContainer = Backbone.View.extend({
   template: JST["backbone/templates/app/middle-container"],
 
   initialize: function() {
-    this.generalInfo = new ChaiBioTech.app.Views.generalInfo();
-    this.temperatureSection = new ChaiBioTech.app.Views.bottomTemperature();
-    this.rampSpeedSection = new ChaiBioTech.app.Views.bottomRampSpeed();
-    this.holdDurationSection = new ChaiBioTech.app.Views.bottomHoldDuration();
+    // Keeping this object so that other classes can listen to it
+    // for changes in fabric canvas
+    var parentViewClass = this.options.editStepStageClass;
+    this.generalInfo = new ChaiBioTech.app.Views.generalInfo({
+      editStepStageClass: parentViewClass
+    });
+    this.temperatureSection = new ChaiBioTech.app.Views.bottomTemperature({
+      editStepStageClass: parentViewClass
+    });
+    this.rampSpeedSection = new ChaiBioTech.app.Views.bottomRampSpeed({
+      editStepStageClass: parentViewClass
+    });
+    this.holdDurationSection = new ChaiBioTech.app.Views.bottomHoldDuration({
+      editStepStageClass: parentViewClass
+    });
     this.startOnCycleSection = new ChaiBioTech.app.Views.bottomStartOnCycle();
     this.tempSection = new ChaiBioTech.app.Views.bottomTemp();
     this.timeSection = new ChaiBioTech.app.Views.bottomTime();

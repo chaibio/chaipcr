@@ -1,11 +1,12 @@
 ChaiBioTech.app.Views = ChaiBioTech.app.Views || {};
 ChaiBioTech.app.selectedStage = null;
 
-ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
+ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabricStage) {
   this.model = model;
   this.index = index;
   this.canvas = stage;
   this.myWidth = this.model.get("stage").steps.length * 120;
+  this.parent = fabricStage;
   this.childSteps = [];
 
   this.getLeft = function() {
@@ -89,6 +90,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
       tempStep = stepView;
       this.childSteps.push(stepView);
       allSteps.push(stepView);
+      stepView.ordealStatus = allSteps.length;
       stepView.render();
     }
     stepView.borderRight.visible = false;
@@ -118,12 +120,14 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
   }
 
   this.manageBordersOnSelection = function(color) {
+    console.log("m here");
     this.border.stroke = color;
     if(this.nextStage) {
-      this.nextStage.border.stroke = color;
+      this.nextStage.border.setStroke(color);
     } else {
-      this.borderRight.stroke = color;
+      this.borderRight.setStroke(color);
     }
+    this.canvas.renderAll();
   }
 
   this.manageFooter = function(visible, color, length) {
@@ -139,9 +143,8 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
 
     if(ChaiBioTech.app.selectedStage) {
       var previouslySelected = ChaiBioTech.app.selectedStage;
-      // Fabric sends more than one event so we filter,
       // if the previous and current stages are same.
-      if(previouslySelected.stageNo.text != me.stageNo.text) {
+      //if(previouslySelected.stageNo.text != me.stageNo.text) {
         var previousLength = previouslySelected.childSteps.length;
         //Previus stage is changed back to original stage
         previouslySelected.roof.stroke = "white";
@@ -152,7 +155,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index) {
         // the step which was selected is being cleared
         previouslySelected.manageFooter(false, "white", previousLength);
         ChaiBioTech.app.selectedStage = me;
-      }
+    //  }
 
     } else {
       ChaiBioTech.app.selectedStage = me;

@@ -7,7 +7,16 @@ ChaiBioTech.app.Views.bottomHoldDuration = Backbone.View.extend({
   template: JST["backbone/templates/app/bottom-common-item"],
 
   initialize: function() {
+    var that  = this;
+    this.listenTo(this.options.editStepStageClass, "stepSelected", function(data) {
+      that.changeInfo(data)
+    });
+  },
 
+  changeInfo: function(step) {
+    var temp = step.model.get("step").hold_time;
+    temp = Math.floor(temp/60) + ":" + temp % 60;
+    this.dataPart.html(temp);
   },
 
   render: function() {
@@ -16,6 +25,7 @@ ChaiBioTech.app.Views.bottomHoldDuration = Backbone.View.extend({
       data: "0:30"
     }
     $(this.el).html(this.template(data));
+    this.dataPart =   $(this.el).find(".data-part");
     return this;
   }
 });

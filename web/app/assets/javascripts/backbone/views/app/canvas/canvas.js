@@ -22,12 +22,15 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
       case "step":
         var me = evt.target.me;
         me.parentStage.selectStage();
-        me.selectStep();
+        //me.selectStep();
+        // Sending data to backbone
+        appRouter.editStageStep.trigger("stepSelected", me);
       break;
 
       case "controlCircleGroup":
         var me = evt.target.me;
         me.manageClick();
+        appRouter.editStageStep.trigger("stepSelected", me.parent);
       break;
       }
     }
@@ -40,6 +43,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
           var targetCircleGroup = evt.target,
           me = evt.target.me;
           me.manageDrag(targetCircleGroup);
+          appRouter.editStageStep.trigger("stepDrag", me);
         break;
       }
     }
@@ -82,7 +86,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
 
     for (stageIndex in allStages) {
       stageModel = new ChaiBioTech.Models.Stage({"stage": allStages[stageIndex].stage});
-      stageView = new ChaiBioTech.app.Views.fabricStage(stageModel, this.canvas, this.allStepViews, stageIndex);
+      stageView = new ChaiBioTech.app.Views.fabricStage(stageModel, this.canvas, this.allStepViews, stageIndex, this);
 
       if(previousStage){
         previousStage.nextStage = stageView;
@@ -94,7 +98,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     }
     // Only for the last stage
     stageView.borderRight();
-    this.canvas.add(stageView.borderRight).calcOffset();;
+    this.canvas.add(stageView.borderRight);
   };
 
   this.addTemperatureLines = function() {

@@ -111,7 +111,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       ChaiBioTech.app.selectedStep = this;
     }
     // Change the border
-    this.manageBorder("black");
+    //this.manageBorder("black");
     this.darkFooterImage.visible = this.whiteFooterImage.visible = true;
     this.commonFooterImage.visible = false;
     // Directly pushing values to backbone views.
