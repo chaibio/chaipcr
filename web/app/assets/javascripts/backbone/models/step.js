@@ -28,6 +28,24 @@ ChaiBioTech.Models.Step = Backbone.Model.extend({
       alert("Failed to update");
       console.log("Failed to update");
     });
-  }
+  },
+
+  deleteStep: function(stepId, fabricStepView) {
+    var that = this;
+    $.ajax({
+      url: "/steps/"+this.get("step").id,
+      contentType: 'application/json',
+      type: 'DELETE'
+    })
+    .done(function(data) {
+      console.log(data);
+      fabricStepView.canvas.fire("modelChanged");
+    })
+    .fail(function() {
+      alert("Failed to update");
+      console.log("Failed to update");
+    });
+  },
+
 
 });

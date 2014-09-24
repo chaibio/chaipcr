@@ -64,7 +64,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       ], this);
   }
 
-  this.makeItBig = function(evt) {
+  this.makeItBig = function() {
     this.circle.stroke = "#ffb400";
     this.outerCircle.stroke = "black";
     this.outerCircle.strokeWidth = 7;
@@ -77,7 +77,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     this.parent.selectStep(this);
   }
 
-  this.makeItSmall = function(evt) {
+  this.makeItSmall = function() {
     this.circle.stroke = "white";
     this.outerCircle.stroke = null;
     this.littleCircleGroup.visible = false;
@@ -85,46 +85,36 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     this.outerMostCircle.visible = false;
   }
 
-  this.canvas.on('object:moving', function(evt) {
-    if(evt.target.name === "controlCircleGroup") {
-      var targetCircleGroup = evt.target,
-      me = evt.target.me;
+  this.manageDrag = function(targetCircleGroup) {
+    // Limit the movement of the circle
+    var top = targetCircleGroup.top,
+    left = targetCircleGroup.left;
 
+    if(top < 60) {
+      targetCircleGroup.setTop(60);
+    } else if(top > 290) {
+      targetCircleGroup.setTop(290);
+    } else {
       // Move temperature display along with circle
-      me.stepDataGroup.top = targetCircleGroup.top + 55;
-
-      // Limit the movement of the circle
-      var top = targetCircleGroup.top,
-      left = targetCircleGroup.left;
-
-      if(top < 60) {
-        targetCircleGroup.setTop(60);
-      } else if(top > 290) {
-        targetCircleGroup.setTop(290);
-      }
-
-      // Change temperature display as it circle is moved
-      var dynamicTemp = Math.abs((100 - ((targetCircleGroup.top - me.scrollTop) / me.scrollRatio)).toFixed(1));
-      me.temperature.text = ""+dynamicTemp+"º";
-
+      this.stepDataGroup.setTop(targetCircleGroup.top + 55);
       // Now positioning the ramp lines
       left = left - 6;
       top = top + 32;
 
-      if(me.next) {
-          me.curve.path[0][1] = left;
-          me.curve.path[0][2] = top;
+      if(this.next) {
+          this.curve.path[0][1] = left;
+          this.curve.path[0][2] = top;
           // Calculating the mid point of the line at the right side of the circle
           // Remeber take the point which is static at the other side
-          var leftOfLineRight = me.curve.path[1][3],
-          topOfLineRight = me.curve.path[1][4];
+          var leftOfLineRight = this.curve.path[1][3],
+          topOfLineRight = this.curve.path[1][4];
 
-          me.curve.path[1][1] = (left + leftOfLineRight) / 2;
-          me.curve.path[1][2] = ((top + topOfLineRight) / 2) + 20;
+          this.curve.path[1][1] = (left + leftOfLineRight) / 2;
+          this.curve.path[1][2] = ((top + topOfLineRight) / 2) + 20;
       }
 
-      if(me.previous) {
-          previous = me.previous;
+      if(this.previous) {
+          previous = this.previous;
           previous.curve.path[1][3] = left;
           previous.curve.path[1][4] = top;
           // Calculating the mid point of the line at the left side of the cycle
@@ -135,26 +125,25 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
           previous.curve.path[1][1] = (left + leftOfLineLeft) / 2;
           previous.curve.path[1][2] = ((top + topOfLineLeft) / 2) + 20;
       }
+
+      // Change temperature display as its circle is moved
+      var dynamicTemp = Math.abs((100 - ((targetCircleGroup.top - this.scrollTop) / this.scrollRatio)).toFixed(1));
+      this.temperature.text = ""+dynamicTemp+"º";
     }
-  });
+  }
 
-  this.canvas.on("mouse:down", function(evt) {
-    if(evt.target && evt.target.name === "controlCircleGroup") {
-        var targetedCircleGroup = evt.target,
-        me = evt.target.me;
-        me.makeItBig(evt);
-
-        if(ChaiBioTech.app.selectedCircle) {
-          var previousSelected = ChaiBioTech.app.selectedCircle;
-          if(previousSelected.uniqueName != evt.target.me.uniqueName) {
-            previousSelected.makeItSmall(evt);
-            ChaiBioTech.app.selectedCircle = evt.target.me;
-          }
-        } else {
-          ChaiBioTech.app.selectedCircle = evt.target.me;
-        }
+  this.manageClick = function() {
+    this.makeItBig();
+    if(ChaiBioTech.app.selectedCircle) {
+      var previousSelected = ChaiBioTech.app.selectedCircle;
+      if(previousSelected.uniqueName != this.uniqueName) {
+        previousSelected.makeItSmall();
+        ChaiBioTech.app.selectedCircle = this;
+      }
+    } else {
+      ChaiBioTech.app.selectedCircle = this;
     }
-  });
-
+  }
+  
   return this;
 }

@@ -1,11 +1,9 @@
 ChaiBioTech.app.Views = ChaiBioTech.app.Views || {};
 
 ChaiBioTech.app.Views.mainCanvas = null; // This could be used across application to fire
-// Events mon canvas
 
 ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
 
-  // Re write this part like other files
   this.model = model;
   this.allStepViews = [];
   var that = this;
@@ -13,9 +11,39 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     backgroundColor: '#ffb400',
     selection: false,
     stateful: false
-    //selectionColor: 'green'
   });
+  // Moving event handlers into canvas object
+  // For better performance and in accordance with fabric js specific
+  // For mouse down
+  this.canvas.on("mouse:down", function(evt) {
+    if(evt.target) {
+      switch(evt.target.name)  {
 
+      case "step":
+        var me = evt.target.me;
+        me.parentStage.selectStage();
+        me.selectStep();
+      break;
+
+      case "controlCircleGroup":
+        var me = evt.target.me;
+        me.manageClick();
+      break;
+      }
+    }
+  });
+  // For dragging
+  this.canvas.on('object:moving', function(evt) {
+    if(evt.target) {
+      switch(evt.target.name) {
+        case "controlCircleGroup":
+          var targetCircleGroup = evt.target,
+          me = evt.target.me;
+          me.manageDrag(targetCircleGroup);
+        break;
+      }
+    }
+  });
   // We add this handler so that canvas works when scrolled
   $(".canvas-containing").scroll(function(){
     that.canvas.calcOffset();
@@ -29,32 +57,26 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
   };
 
   this.canvas.on("modelChanged", function(evt) {
-
     that.model.getLatestModel(that.canvas);
-    //that.canvas.clear();
-    //that.canvas.renderAll();
+    that.canvas.clear();
+    that.canvas.renderAll();
   });
 
   this.canvas.on("latestData", function() {
-    console.log("Latest data", that.model);
-    //that.allStepViews = [];
     while(that.allStepViews.length > 0) {
       that.allStepViews.pop();
     }
     ChaiBioTech.app.selectedStage = null;
     ChaiBioTech.app.selectedStep = null;
+    ChaiBioTech.app.selectedCircle = null;
     that.addStages();
+    that.setDefaultWidthHeight();
     that.addinvisibleFooterToStep();
-    that.setDefaultWidthHeight();
     that.addTemperatureLines();
-    that.setDefaultWidthHeight();
-    that.canvas.calcOffset();
-
   })
 
   this.addStages = function() {
     var allStages = this.model.get("experiment").protocol.stages;
-    console.log(allStages);
     var stage = {};
     var previousStage = null;
 
@@ -73,23 +95,11 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     // Only for the last stage
     stageView.borderRight();
     this.canvas.add(stageView.borderRight).calcOffset();;
-
-    //this.canvas.calcOffset();
-
-    // This is a bad way to trigger a click in the canvas so that Ostrich Sans is
-    // placed correctly. Interestingly if open sans is used , it works fine.
-    /*var options = {};
-    options.e = {};
-    options.e.clientX = 0;
-    options.e.clientY = 0;
-    //this.canvas.trigger('mouse:down', options);
-    //this.canvas.trigger('mouse:up', options); */
   };
 
   this.addTemperatureLines = function() {
     this.allCircles = null;
     this.allCircles = this.findAllCircles();
-    console.log(this.allCircles);
     var i = 0, limit = this.allCircles.length;
 
     for(i = 0; i < limit; i++) {
@@ -105,7 +115,6 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
 
     addImage = function(count, that, url, image) {
       fabric.Image.fromURL(url, function(img) {
-        //console.log("Inside", image);
         img.left = that.allStepViews[count].left - 1;
         img.top = 383;
         img.selectable = false;
