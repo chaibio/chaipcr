@@ -22,7 +22,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
       case "step":
         var me = evt.target.me;
         me.parentStage.selectStage();
-        //me.selectStep();
+        me.selectStep();
         // Sending data to backbone
         appRouter.editStageStep.trigger("stepSelected", me);
       break;
