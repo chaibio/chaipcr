@@ -53,6 +53,9 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     that.canvas.calcOffset();
   });
 
+  this.canvas.on("footerImagesLoaded", function() {
+    that.selectStep();
+  })
   this.setDefaultWidthHeight = function() {
     this.canvas.setHeight(420);
     var width = (this.allStepViews.length * 122 > 1024) ? this.allStepViews.length * 120 : 1024
@@ -79,6 +82,11 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     that.addTemperatureLines();
   })
 
+  this.selectStep = function() {
+    this.allStepViews[0].parentStage.selectStage();
+    this.allStepViews[0].selectStep();
+    this.canvas.renderAll();
+  }
   this.addStages = function() {
     var allStages = this.model.get("experiment").protocol.stages;
     var stage = {};
@@ -117,7 +125,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     stepWhite = "assets/selected-step-02.png",
     stepCommon = "assets/common-step.png";
 
-    addImage = function(count, that, url, image) {
+    addImage = function(count, that, url, image, callBack) {
       fabric.Image.fromURL(url, function(img) {
         img.left = that.allStepViews[count].left - 1;
         img.top = 383;
@@ -141,14 +149,19 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
         count = count + 1;
 
         if(count < limit) {
-          addImage(count, that, url, image);
+          addImage(count, that, url, image, callBack);
+        } else if(callBack) {
+          callBack();
         }
       });
     }
 
     addImage(0, this, stepCommon, "commonFooter");
     addImage(0, this, stepDark, "darkFooter");
-    addImage(0, this, stepWhite, "whiteFooter");
+    addImage(0, this, stepWhite, "whiteFooter", function() {
+      that.canvas.fire("footerImagesLoaded");
+    });
+
   }
 
 

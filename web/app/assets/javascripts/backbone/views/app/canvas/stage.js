@@ -126,14 +126,12 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
   }
 
   this.manageBordersOnSelection = function(color) {
-    console.log("m here");
     this.border.stroke = color;
     if(this.nextStage) {
       this.nextStage.border.setStroke(color);
     } else {
       this.borderRight.setStroke(color);
     }
-    this.canvas.renderAll();
   }
 
   this.manageFooter = function(visible, color, length) {

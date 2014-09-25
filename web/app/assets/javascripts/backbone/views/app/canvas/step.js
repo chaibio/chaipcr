@@ -73,12 +73,13 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       } else {
         this.parentStage.border.stroke = color;
       }
+    }
+  }
 
-      if(this.parentStage.nextStage) {
-        this.parentStage.nextStage.border.stroke = color;
-      } else {
-        this.parentStage.borderRight.stroke = color;
-      }
+  this.manageBorderPrevious = function(color) {
+    this.borderRight.stroke = color;
+    if(this.previousStep) {
+      this.previousStep.borderRight.stroke = color;
     }
   }
 
@@ -110,8 +111,8 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       var previouslySelected = ChaiBioTech.app.selectedStep;
       previouslySelected.darkFooterImage.visible = false;
       previouslySelected.whiteFooterImage.visible = false;
-      previouslySelected.manageBorder('#ff9f00');
-      //
+      // Change the border
+      previouslySelected.manageBorderPrevious('#ff9f00');
       ChaiBioTech.app.selectedStep = this;
     } else {
       ChaiBioTech.app.selectedStep = this;
@@ -120,10 +121,6 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     this.manageBorder("black");
     this.darkFooterImage.visible = this.whiteFooterImage.visible = true;
     this.commonFooterImage.visible = false;
-    // Directly pushing values to backbone views.
-    // This could be done in bacbone views itself by events but there could be little
-    // performance issue, but may be after testing I may go that way. Anyway that is more elagant.
-    //$(".middle-ground").html(me.parentStage.stageNo.text + " " + me.stepName.text + " " + me.parentStage.stageName.text);
   }
 
   return this;

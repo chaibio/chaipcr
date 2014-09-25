@@ -11,13 +11,45 @@ ChaiBioTech.app.Views.bottomActions = Backbone.View.extend({
   events: {
     "click #add-step": "addStep",
     "click #delete-step": "deleteStep",
-    "click #add-stage": "addStage"
+    "click #add-stage": "addStage",
+    "click #add-holding": "addHoldingStage",
+    "click #add-cycling": "addCyclingStage",
+    "click #add-melt-curve": "addMeltCurveStage"
   },
 
   addStage: function(e) {
     e.preventDefault();
     e.stopPropagation();
     this.popUp.show();
+  },
+
+  commonAddStage: function(type) {
+    if(ChaiBioTech.app.selectedStage) {
+      var protocolId = null;
+      this.fixCurrentStepStage();
+      protocolId = this.currentSelectedStage.parent.model.get("experiment").protocol.id;
+      console.log("this id", this.currentSelectedStage.model.get("stage").id)
+      //if(this.currentSelectedStage.previousStage) {
+      //  var previousStage = this.currentSelectedStage.previousStage;
+        //console.log("previous id", previousStage.model.get("stage").id)
+        //previousStage.model.addStage("holding", protocolId, this.currentSelectedStage)
+      //}
+      this.selectedStageModel.addStage(type, protocolId, this.currentSelectedStage);
+    } else {
+      alert("Please select a stage/step");
+    }
+  },
+
+  addHoldingStage: function() {
+    this.commonAddStage("holding")
+  },
+
+  addCyclingStage: function() {
+    this.commonAddStage("cycling")
+  },
+
+  addMeltCurveStage: function() {
+    this.commonAddStage("melt_curve")
   },
 
   addStep: function() {
