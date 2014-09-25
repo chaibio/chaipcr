@@ -8,6 +8,8 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
   this.myWidth = this.model.get("stage").steps.length * 120;
   this.parent = fabricStage;
   this.childSteps = [];
+  this.previousStage = null;
+  this.nextStage = null;
 
   this.getLeft = function() {
     if(this.previousStage) {

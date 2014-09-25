@@ -11,11 +11,21 @@ ChaiBioTech.app.Views.nextStep = Backbone.View.extend({
   },
 
   selectNext: function() {
-    console.log(ChaiBioTech.app.selectedStep);
+    var selectStep = ChaiBioTech.app.selectedStep;
+    if(selectStep.nextStep) {
+      selectStep.nextStep.parentStage.selectStage();
+      selectStep.nextStep.selectStep();
+      ChaiBioTech.app.Views.mainCanvas.renderAll();
+    } else if(selectStep.parentStage.nextStage) {
+      var stage = selectStep.parentStage.nextStage;
+      stage.selectStage();
+      stage.childSteps[0].selectStep();
+      ChaiBioTech.app.Views.mainCanvas.renderAll();
+    }
   },
 
   initialize: function() {
-    
+
   },
 
   render: function() {

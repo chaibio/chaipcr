@@ -86,6 +86,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     this.allStepViews[0].parentStage.selectStage();
     this.allStepViews[0].selectStep();
     this.canvas.renderAll();
+    appRouter.editStageStep.trigger("stepSelected", this.allStepViews[0]);
   }
   this.addStages = function() {
     var allStages = this.model.get("experiment").protocol.stages;
@@ -159,6 +160,8 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     addImage(0, this, stepCommon, "commonFooter");
     addImage(0, this, stepDark, "darkFooter");
     addImage(0, this, stepWhite, "whiteFooter", function() {
+      // This is sent as callback, we need this to be executed after all
+      // images are loaded.
       that.canvas.fire("footerImagesLoaded");
     });
 
