@@ -6,9 +6,18 @@ ChaiBioTech.app.Views.bottomActions = Backbone.View.extend({
 
   template: JST["backbone/templates/app/bottom-actions"],
 
+  popUpTemplate: JST["backbone/templates/app/add-stage-popup"],
+
   events: {
     "click #add-step": "addStep",
-    "click #delete-step": "deleteStep"
+    "click #delete-step": "deleteStep",
+    "click #add-stage": "addStage"
+  },
+
+  addStage: function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.popUp.show();
   },
 
   addStep: function() {
@@ -41,11 +50,17 @@ ChaiBioTech.app.Views.bottomActions = Backbone.View.extend({
   },
 
   initialize: function() {
-
+    var that = this;
+    $("body").click(function() {
+      if(that.popUp.is(":visible")) {
+        that.popUp.hide();
+      }
+    })
   },
 
   render: function() {
     $(this.el).html(this.template());
+    this.popUp = $(this.el).find(".lol-pop");
     return this;
   }
 });
