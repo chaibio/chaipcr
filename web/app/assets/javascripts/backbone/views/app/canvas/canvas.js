@@ -36,7 +36,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     }
   });
   // For dragging
-  /*this.canvas.on('object:moving', function(evt) {
+  this.canvas.on('object:moving', function(evt) {
     if(evt.target) {
       switch(evt.target.name) {
         case "controlCircleGroup":
@@ -47,7 +47,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
         break;
       }
     }
-  });*/
+  });
   // when scrolling is finished
   this.canvas.on('object:modified', function(evt) {
     if(evt.target) {

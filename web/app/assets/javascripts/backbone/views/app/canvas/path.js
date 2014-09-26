@@ -5,14 +5,16 @@ ChaiBioTech.app.Views.fabricPath = function(model, parent, canvas) {
   this.parent = parent // parent is the circle
   this.canvas = canvas;
 
-  var x1 = this.parent.circleGroup.left + 16, y1 = this.parent.circleGroup.top + 32,
-  x2 = this.parent.next.circleGroup.left + 16, y2 = this.parent.next.circleGroup.top + 32;
+  var x1 = this.parent.circleGroup.left , y1 = this.parent.circleGroup.top,
+  x2 = this.parent.next.circleGroup.left , y2 = this.parent.next.circleGroup.top;
 
   this.curve = new fabric.Path('m 0 10 Q 10, 20, 20, 10 Q 30, 0, 40, 10', {
     strokeWidth: 5,
     fill: '',
     stroke: '#ffd100',
-    selectable: false
+    selectable: false,
+    originX: "center",
+    originY: "center"
   });
 
   // Starting point;
@@ -29,13 +31,12 @@ ChaiBioTech.app.Views.fabricPath = function(model, parent, canvas) {
   this.curve.path[1][3] = midPointX;
   this.curve.path[1][4] = midPointY;
   // Controlling point for the next bent
-  this.curve.path[2][1] = (midPointX + x2)/2;
-  this.curve.path[2][2] = ((midPointY + y2)/2) - 15;
+  this.curve.path[2][1] = (midPointX + x2) / 2;
+  this.curve.path[2][2] = ((midPointY + y2) / 2) - 15;
   // End Point
   this.curve.path[2][3] = x2;
   this.curve.path[2][4] = y2;
-
-  console.log(this.curve.left);
+  
   this.canvas.add(this.curve);
 
   // We have nothing else to return , No member functions;

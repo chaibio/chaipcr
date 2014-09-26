@@ -10,7 +10,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   this.scrollRatio = (this.scrollLength - this.scrollTop) / 100;
 
   this.getLeft = function() {
-    this.left = this.parent.left + 28;
+    this.left = this.parent.left;
   }
 
   this.getTop = function() {
@@ -96,34 +96,57 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       targetCircleGroup.setTop(290);
     } else {
       // Move temperature display along with circle
-      this.stepDataGroup.setTop(targetCircleGroup.top + 55);
+      this.stepDataGroup.setTop(top + 55);
       // Now positioning the ramp lines
-      left = left - 6;
-      top = top + 32;
+      left = left;
+      top = top;
 
       if(this.next) {
           this.curve.path[0][1] = left;
           this.curve.path[0][2] = top;
           // Calculating the mid point of the line at the right side of the circle
           // Remeber take the point which is static at the other side
-          var leftOfLineRight = this.curve.path[1][3],
-          topOfLineRight = this.curve.path[1][4];
+          var endPointX = this.curve.path[2][3],
+          endPointY = this.curve.path[2][4];
 
-          this.curve.path[1][1] = (left + leftOfLineRight) / 2;
-          this.curve.path[1][2] = ((top + topOfLineRight) / 2) + 20;
+
+          var midPointX = (left + endPointX) / 2,
+          midPointY = (top + endPointY) / 2;
+
+          this.curve.path[1][1] = (left + midPointX) / 2;
+          this.curve.path[1][2] = ((top + midPointY) / 2) + 10;
+
+          // Mid point
+          this.curve.path[1][3] = midPointX;
+          this.curve.path[1][4] = midPointY;
+
+          // Controlling point for the next bent
+          this.curve.path[2][1] = (midPointX + endPointX) / 2;
+          this.curve.path[2][2] = ((midPointY + endPointY) / 2) - 15;
       }
 
       if(this.previous) {
           previous = this.previous;
-          previous.curve.path[1][3] = left;
-          previous.curve.path[1][4] = top;
+          previous.curve.path[2][3] = left;
+          previous.curve.path[2][4] = top;
           // Calculating the mid point of the line at the left side of the cycle
           // Remeber take the point which is static at the other side
-          var leftOfLineLeft = previous.curve.path[0][1],
-          topOfLineLeft = previous.curve.path[0][2];
+          var endPointX = previous.curve.path[0][1],
+          endPointY = previous.curve.path[0][2];
 
-          previous.curve.path[1][1] = (left + leftOfLineLeft) / 2;
-          previous.curve.path[1][2] = ((top + topOfLineLeft) / 2) + 20;
+          var midPointX = (left + endPointX) / 2,
+          midPointY = (top + endPointY) / 2;
+
+          previous.curve.path[2][1] = (left + midPointX) / 2;
+          previous.curve.path[2][2] = ((top + midPointY) / 2 ) - 15;
+
+          // Mid point
+          previous.curve.path[1][3] = midPointX;
+          previous.curve.path[1][4] = midPointY;
+
+          previous.curve.path[1][1] = (midPointX + endPointX) / 2;
+          previous.curve.path[1][2] = ((midPointY + endPointY) / 2) + 10;
+
       }
 
       // Change temperature display as its circle is moved
@@ -144,6 +167,6 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       ChaiBioTech.app.selectedCircle = this;
     }
   }
-  
+
   return this;
 }
