@@ -41,4 +41,8 @@ RSpec.configure do |config|
   config.order = "random"
    
   config.include(FactoryHelper)
+  
+  config.before(:all) do
+    load Rails.root + "db/seeds.rb" 
+  end
 end

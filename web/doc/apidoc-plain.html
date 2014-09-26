@@ -28,6 +28,11 @@
       <li><a href='#sessions-create'>create</a></li>
       <li><a href='#sessions-destroy'>destroy</a></li>
   </ul>
+  <h4><a href='#settings'>Settings</a></h4>
+  <ul>
+      <li><a href='#settings-show'>show</a></li>
+      <li><a href='#settings-update'>update</a></li>
+  </ul>
   <h4><a href='#stages'>Stages</a></h4>
   <ul>
       <li><a href='#stages-create'>create</a></li>
@@ -544,6 +549,18 @@ decimal point</p>
 
     </li>
     
+    <li>
+      <strong>collect_data </strong>:
+      <small>
+        optional
+        
+          [ Must be &#39;true&#39; or &#39;false&#39; ]
+      </small>
+      
+<p>Collect data, if not provided, default is false</p>
+
+    </li>
+    
 </ul>
 
 </ul>
@@ -640,6 +657,221 @@ a day</p>
       <div>
         
 
+
+      </div>
+  </div>
+
+  <hr/>
+
+  <div>
+    <h2 id="settings">
+      <a href='#settings'>Settings</a><br>
+      <small></small>
+    </h2>
+  </div>
+
+
+  <div>
+
+      <hr/>
+
+      <h3 id="settings-show">
+      <a href='#settings'>Settings</a> / <a href='#settings-show'>show</a>
+      </h3>
+
+      <div>
+          <h4>
+              GET /settings
+            <br>
+            <small>Show Settings</small>
+          </h4>
+      </div>
+
+      <div>
+        
+<p>time_zone_offset is in seconds</p>
+
+          <h4>Examples</h4>
+            <pre class="wiki">{&#39;settings&#39;:{&#39;time_zone&#39;:&#39;Pacific Time (US &amp; Canada)&#39;,&#39;debug&#39;:false,&#39;time_zone_offset&#39;:-28800}</pre>
+
+
+      </div>
+      <hr/>
+
+      <h3 id="settings-update">
+      <a href='#settings'>Settings</a> / <a href='#settings-update'>update</a>
+      </h3>
+
+      <div>
+          <h4>
+              PUT /settings
+            <br>
+            <small>Update Settings</small>
+          </h4>
+      </div>
+
+      <div>
+        
+
+
+          <h4>Params</h4>
+          <ul>
+    <li>
+      <strong>settings </strong>:
+      <small>
+        required
+        
+          [ Must be a Hash ]
+      </small>
+      
+<p>Global Settings</p>
+
+    </li>
+    <ul>
+    <li>
+      <strong>time_zone </strong>:
+      <small>
+        required
+        
+          [ Must be String ]
+      </small>
+      
+<p>{ &#39;International Date Line West&#39; =&gt; &#39;Pacific/Midway&#39;,
+&#39;Midway Island&#39; =&gt; &#39;Pacific/Midway&#39;, &#39;American
+Samoa&#39; =&gt; &#39;Pacific/Pago_Pago&#39;, &#39;Hawaii&#39; =&gt;
+&#39;Pacific/Honolulu&#39;, &#39;Alaska&#39; =&gt;
+&#39;America/Juneau&#39;, &#39;Pacific Time (US &amp; Canada)&#39; =&gt;
+&#39;America/Los_Angeles&#39;, &#39;Tijuana&#39; =&gt;
+&#39;America/Tijuana&#39;, &#39;Mountain Time (US &amp; Canada)&#39; =&gt;
+&#39;America/Denver&#39;, &#39;Arizona&#39; =&gt;
+&#39;America/Phoenix&#39;, &#39;Chihuahua&#39; =&gt;
+&#39;America/Chihuahua&#39;, &#39;Mazatlan&#39; =&gt;
+&#39;America/Mazatlan&#39;, &#39;Central Time (US &amp; Canada)&#39; =&gt;
+&#39;America/Chicago&#39;, &#39;Saskatchewan&#39; =&gt;
+&#39;America/Regina&#39;, &#39;Guadalajara&#39; =&gt;
+&#39;America/Mexico_City&#39;, &#39;Mexico City&#39; =&gt;
+&#39;America/Mexico_City&#39;, &#39;Monterrey&#39; =&gt;
+&#39;America/Monterrey&#39;, &#39;Central America&#39; =&gt;
+&#39;America/Guatemala&#39;, &#39;Eastern Time (US &amp; Canada)&#39; =&gt;
+&#39;America/New_York&#39;, &#39;Indiana (East)&#39; =&gt;
+&#39;America/Indiana/Indianapolis&#39;, &#39;Bogota&#39; =&gt;
+&#39;America/Bogota&#39;, &#39;Lima&#39; =&gt; &#39;America/Lima&#39;,
+&#39;Quito&#39; =&gt; &#39;America/Lima&#39;, &#39;Atlantic Time
+(Canada)&#39; =&gt; &#39;America/Halifax&#39;, &#39;Caracas&#39; =&gt;
+&#39;America/Caracas&#39;, &#39;La Paz&#39; =&gt; &#39;America/La_Paz&#39;,
+&#39;Santiago&#39; =&gt; &#39;America/Santiago&#39;, &#39;Newfoundland&#39;
+=&gt; &#39;America/St_Johns&#39;, &#39;Brasilia&#39; =&gt;
+&#39;America/Sao_Paulo&#39;, &#39;Buenos Aires&#39; =&gt;
+&#39;America/Argentina/Buenos_Aires&#39;, &#39;Montevideo&#39; =&gt;
+&#39;America/Montevideo&#39;, &#39;Georgetown&#39; =&gt;
+&#39;America/Guyana&#39;, &#39;Greenland&#39; =&gt;
+&#39;America/Godthab&#39;, &#39;Mid-Atlantic&#39; =&gt;
+&#39;Atlantic/South_Georgia&#39;, &#39;Azores&#39; =&gt;
+&#39;Atlantic/Azores&#39;, &#39;Cape Verde Is.&#39; =&gt;
+&#39;Atlantic/Cape_Verde&#39;, &#39;Dublin&#39; =&gt;
+&#39;Europe/Dublin&#39;, &#39;Edinburgh&#39; =&gt; &#39;Europe/London&#39;,
+&#39;Lisbon&#39; =&gt; &#39;Europe/Lisbon&#39;, &#39;London&#39; =&gt;
+&#39;Europe/London&#39;, &#39;Casablanca&#39; =&gt;
+&#39;Africa/Casablanca&#39;, &#39;Monrovia&#39; =&gt;
+&#39;Africa/Monrovia&#39;, &#39;UTC&#39; =&gt; &#39;Etc/UTC&#39;,
+&#39;Belgrade&#39; =&gt; &#39;Europe/Belgrade&#39;, &#39;Bratislava&#39;
+=&gt; &#39;Europe/Bratislava&#39;, &#39;Budapest&#39; =&gt;
+&#39;Europe/Budapest&#39;, &#39;Ljubljana&#39; =&gt;
+&#39;Europe/Ljubljana&#39;, &#39;Prague&#39; =&gt; &#39;Europe/Prague&#39;,
+&#39;Sarajevo&#39; =&gt; &#39;Europe/Sarajevo&#39;, &#39;Skopje&#39; =&gt;
+&#39;Europe/Skopje&#39;, &#39;Warsaw&#39; =&gt; &#39;Europe/Warsaw&#39;,
+&#39;Zagreb&#39; =&gt; &#39;Europe/Zagreb&#39;, &#39;Brussels&#39; =&gt;
+&#39;Europe/Brussels&#39;, &#39;Copenhagen&#39; =&gt;
+&#39;Europe/Copenhagen&#39;, &#39;Madrid&#39; =&gt;
+&#39;Europe/Madrid&#39;, &#39;Paris&#39; =&gt; &#39;Europe/Paris&#39;,
+&#39;Amsterdam&#39; =&gt; &#39;Europe/Amsterdam&#39;, &#39;Berlin&#39;
+=&gt; &#39;Europe/Berlin&#39;, &#39;Bern&#39; =&gt;
+&#39;Europe/Berlin&#39;, &#39;Rome&#39; =&gt; &#39;Europe/Rome&#39;,
+&#39;Stockholm&#39; =&gt; &#39;Europe/Stockholm&#39;, &#39;Vienna&#39;
+=&gt; &#39;Europe/Vienna&#39;, &#39;West Central Africa&#39; =&gt;
+&#39;Africa/Algiers&#39;, &#39;Bucharest&#39; =&gt;
+&#39;Europe/Bucharest&#39;, &#39;Cairo&#39; =&gt; &#39;Africa/Cairo&#39;,
+&#39;Helsinki&#39; =&gt; &#39;Europe/Helsinki&#39;, &#39;Kyiv&#39; =&gt;
+&#39;Europe/Kiev&#39;, &#39;Riga&#39; =&gt; &#39;Europe/Riga&#39;,
+&#39;Sofia&#39; =&gt; &#39;Europe/Sofia&#39;, &#39;Tallinn&#39; =&gt;
+&#39;Europe/Tallinn&#39;, &#39;Vilnius&#39; =&gt; &#39;Europe/Vilnius&#39;,
+&#39;Athens&#39; =&gt; &#39;Europe/Athens&#39;, &#39;Istanbul&#39; =&gt;
+&#39;Europe/Istanbul&#39;, &#39;Minsk&#39; =&gt; &#39;Europe/Minsk&#39;,
+&#39;Jerusalem&#39; =&gt; &#39;Asia/Jerusalem&#39;, &#39;Harare&#39; =&gt;
+&#39;Africa/Harare&#39;, &#39;Pretoria&#39; =&gt;
+&#39;Africa/Johannesburg&#39;, &#39;Moscow&#39; =&gt;
+&#39;Europe/Moscow&#39;, &#39;St. Petersburg&#39; =&gt;
+&#39;Europe/Moscow&#39;, &#39;Volgograd&#39; =&gt; &#39;Europe/Moscow&#39;,
+&#39;Kuwait&#39; =&gt; &#39;Asia/Kuwait&#39;, &#39;Riyadh&#39; =&gt;
+&#39;Asia/Riyadh&#39;, &#39;Nairobi&#39; =&gt; &#39;Africa/Nairobi&#39;,
+&#39;Baghdad&#39; =&gt; &#39;Asia/Baghdad&#39;, &#39;Tehran&#39; =&gt;
+&#39;Asia/Tehran&#39;, &#39;Abu Dhabi&#39; =&gt; &#39;Asia/Muscat&#39;,
+&#39;Muscat&#39; =&gt; &#39;Asia/Muscat&#39;, &#39;Baku&#39; =&gt;
+&#39;Asia/Baku&#39;, &#39;Tbilisi&#39; =&gt; &#39;Asia/Tbilisi&#39;,
+&#39;Yerevan&#39; =&gt; &#39;Asia/Yerevan&#39;, &#39;Kabul&#39; =&gt;
+&#39;Asia/Kabul&#39;, &#39;Ekaterinburg&#39; =&gt;
+&#39;Asia/Yekaterinburg&#39;, &#39;Islamabad&#39; =&gt;
+&#39;Asia/Karachi&#39;, &#39;Karachi&#39; =&gt; &#39;Asia/Karachi&#39;,
+&#39;Tashkent&#39; =&gt; &#39;Asia/Tashkent&#39;, &#39;Chennai&#39; =&gt;
+&#39;Asia/Kolkata&#39;, &#39;Kolkata&#39; =&gt; &#39;Asia/Kolkata&#39;,
+&#39;Mumbai&#39; =&gt; &#39;Asia/Kolkata&#39;, &#39;New Delhi&#39; =&gt;
+&#39;Asia/Kolkata&#39;, &#39;Kathmandu&#39; =&gt; &#39;Asia/Kathmandu&#39;,
+&#39;Astana&#39; =&gt; &#39;Asia/Dhaka&#39;, &#39;Dhaka&#39; =&gt;
+&#39;Asia/Dhaka&#39;, &#39;Sri Jayawardenepura&#39; =&gt;
+&#39;Asia/Colombo&#39;, &#39;Almaty&#39; =&gt; &#39;Asia/Almaty&#39;,
+&#39;Novosibirsk&#39; =&gt; &#39;Asia/Novosibirsk&#39;, &#39;Rangoon&#39;
+=&gt; &#39;Asia/Rangoon&#39;, &#39;Bangkok&#39; =&gt;
+&#39;Asia/Bangkok&#39;, &#39;Hanoi&#39; =&gt; &#39;Asia/Bangkok&#39;,
+&#39;Jakarta&#39; =&gt; &#39;Asia/Jakarta&#39;, &#39;Krasnoyarsk&#39; =&gt;
+&#39;Asia/Krasnoyarsk&#39;, &#39;Beijing&#39; =&gt;
+&#39;Asia/Shanghai&#39;, &#39;Chongqing&#39; =&gt;
+&#39;Asia/Chongqing&#39;, &#39;Hong Kong&#39; =&gt;
+&#39;Asia/Hong_Kong&#39;, &#39;Urumqi&#39; =&gt; &#39;Asia/Urumqi&#39;,
+&#39;Kuala Lumpur&#39; =&gt; &#39;Asia/Kuala_Lumpur&#39;,
+&#39;Singapore&#39; =&gt; &#39;Asia/Singapore&#39;, &#39;Taipei&#39; =&gt;
+&#39;Asia/Taipei&#39;, &#39;Perth&#39; =&gt; &#39;Australia/Perth&#39;,
+&#39;Irkutsk&#39; =&gt; &#39;Asia/Irkutsk&#39;, &#39;Ulaanbaatar&#39; =&gt;
+&#39;Asia/Ulaanbaatar&#39;, &#39;Seoul&#39; =&gt; &#39;Asia/Seoul&#39;,
+&#39;Osaka&#39; =&gt; &#39;Asia/Tokyo&#39;, &#39;Sapporo&#39; =&gt;
+&#39;Asia/Tokyo&#39;, &#39;Tokyo&#39; =&gt; &#39;Asia/Tokyo&#39;,
+&#39;Yakutsk&#39; =&gt; &#39;Asia/Yakutsk&#39;, &#39;Darwin&#39; =&gt;
+&#39;Australia/Darwin&#39;, &#39;Adelaide&#39; =&gt;
+&#39;Australia/Adelaide&#39;, &#39;Canberra&#39; =&gt;
+&#39;Australia/Melbourne&#39;, &#39;Melbourne&#39; =&gt;
+&#39;Australia/Melbourne&#39;, &#39;Sydney&#39; =&gt;
+&#39;Australia/Sydney&#39;, &#39;Brisbane&#39; =&gt;
+&#39;Australia/Brisbane&#39;, &#39;Hobart&#39; =&gt;
+&#39;Australia/Hobart&#39;, &#39;Vladivostok&#39; =&gt;
+&#39;Asia/Vladivostok&#39;, &#39;Guam&#39; =&gt; &#39;Pacific/Guam&#39;,
+&#39;Port Moresby&#39; =&gt; &#39;Pacific/Port_Moresby&#39;,
+&#39;Magadan&#39; =&gt; &#39;Asia/Magadan&#39;, &#39;Solomon Is.&#39; =&gt;
+&#39;Pacific/Guadalcanal&#39;, &#39;New Caledonia&#39; =&gt;
+&#39;Pacific/Noumea&#39;, &#39;Fiji&#39; =&gt; &#39;Pacific/Fiji&#39;,
+&#39;Kamchatka&#39; =&gt; &#39;Asia/Kamchatka&#39;, &#39;Marshall Is.&#39;
+=&gt; &#39;Pacific/Majuro&#39;, &#39;Auckland&#39; =&gt;
+&#39;Pacific/Auckland&#39;, &#39;Wellington&#39; =&gt;
+&#39;Pacific/Auckland&#39;, &#39;Nuku&#39;alofa&#39; =&gt;
+&#39;Pacific/Tongatapu&#39;, &#39;Tokelau Is.&#39; =&gt;
+&#39;Pacific/Fakaofo&#39;, &#39;Chatham Is.&#39; =&gt;
+&#39;Pacific/Chatham&#39;, &#39;Samoa&#39; =&gt; &#39;Pacific/Apia&#39; }</p>
+
+    </li>
+    
+    <li>
+      <strong>debug </strong>:
+      <small>
+        optional
+        
+          [ Must be &#39;true&#39; or &#39;false&#39; ]
+      </small>
+      
+<p>machine is in debug mode</p>
+
+    </li>
+    
+</ul>
+
+</ul>
 
       </div>
   </div>
@@ -962,6 +1194,18 @@ when step is created, default ramp with max rate (100) will be created</p>
 
     </li>
     
+    <li>
+      <strong>collect_data </strong>:
+      <small>
+        optional
+        
+          [ Must be &#39;true&#39; or &#39;false&#39; ]
+      </small>
+      
+<p>Collect data, if not provided, default is false</p>
+
+    </li>
+    
 </ul>
 
     <li>
@@ -1047,6 +1291,18 @@ when step is created, default ramp with max rate (100) will be created</p>
       
 <p>Name of the step, if not provided, default name is &#39;Step
 &lt;order_number&gt;&#39;</p>
+
+    </li>
+    
+    <li>
+      <strong>collect_data </strong>:
+      <small>
+        optional
+        
+          [ Must be &#39;true&#39; or &#39;false&#39; ]
+      </small>
+      
+<p>Collect data, if not provided, default is false</p>
 
     </li>
     

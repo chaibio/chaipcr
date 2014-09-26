@@ -62,6 +62,7 @@ Qpcrctl::Application.routes.draw do
   post '/login', :to => 'sessions#create', :as => 'login'
   post '/logout', :to => 'sessions#destroy', :as => 'logout'
   
+  resource :settings, only: [:update, :show]
   resources :users
   
   resources :experiments do

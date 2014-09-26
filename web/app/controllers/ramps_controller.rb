@@ -9,6 +9,7 @@ class RampsController < ApplicationController
   def_param_group :ramp do
     param :ramp, Hash, :desc => "Ramp Info", :required => true do
       param :rate, Float, :desc => "Rate of the ramp, in degrees C/s, set to 100 for max, precision to 8 decimal point", :required => true
+      param :collect_data, :bool, :desc => "Collect data, if not provided, default is false", :required => false
     end
   end
   
