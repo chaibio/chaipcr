@@ -10,7 +10,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
   ChaiBioTech.app.Views.mainCanvas = this.canvas = new fabric.Canvas('canvas', {
     backgroundColor: '#ffb400',
     selection: false,
-    stateful: false
+    stateful: true
   });
   // Moving event handlers into canvas object
   // For better performance and in accordance with fabric js specific
@@ -45,6 +45,17 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
           me.manageDrag(targetCircleGroup);
           appRouter.editStageStep.trigger("stepDrag", me);
         break;
+      }
+    }
+  });
+  // when scrolling is finished
+  this.canvas.on('object:modified', function(evt) {
+    if(evt.target) {
+      if(evt.target.name === "controlCircleGroup") {// Right now we have only one item here otherwise switch case
+
+        var me = evt.target.me,
+        temp = evt.target.me.temperature.text;
+        me.model.changeTemperature(parseInt(temp.substr(0, temp.length - 1)));
       }
     }
   });
@@ -151,7 +162,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
 
         if(count < limit) {
           addImage(count, that, url, image, callBack);
-        } else if(callBack) {
+        } else if(callBack) { // I want it to be called at the end of all the functioin Calls
           callBack();
         }
       });

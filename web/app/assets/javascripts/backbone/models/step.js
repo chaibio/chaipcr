@@ -47,5 +47,22 @@ ChaiBioTech.Models.Step = Backbone.Model.extend({
     });
   },
 
+  changeTemperature: function(newTemp) {
+    that = this;
+    dataToBeSend = {'step':{'temperature': newTemp}}
+    $.ajax({
+        url: "/steps/"+this.get("step").id,
+        contentType: 'application/json',
+        type: 'PUT',
+        data: JSON.stringify(dataToBeSend)
+      })
+      .done(function(data) {
+          console.log("Data updated from server woohaa" , data);
+      })
+      .fail(function() {
+        console.log("Failed to update");
+      })
+  }
+
 
 });
