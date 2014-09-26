@@ -11,6 +11,7 @@ class StepsController < ApplicationController
       param :temperature, Float, :desc => "Temperature of the step, in degree C, with precision to one decimal point", :required => false
       param :hold_time, Integer, :desc => "Hold time of the step, in seconds, 0 means infinite", :required=>false
       param :name, String, :desc => "Name of the step, if not provided, default name is 'Step <order_number>'", :required => false
+      param :collect_data, :bool, :desc => "Collect data, if not provided, default is false", :required => false
     end
   end
   

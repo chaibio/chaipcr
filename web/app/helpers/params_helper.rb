@@ -14,11 +14,14 @@ private
   end
   
   def step_params
-    params.require(:step).permit(:name, :temperature, :hold_time)
+    params.require(:step).permit(:name, :temperature, :hold_time, :collect_data)
   end
   
   def ramp_params
-    params.require(:ramp).permit(:rate)
+    params.require(:ramp).permit(:rate, :collect_data)
   end
   
+  def settings_params
+    params.require(:settings).permit(:time_zone, :debug)
+  end
 end

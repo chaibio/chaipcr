@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140913061456) do
+ActiveRecord::Schema.define(version: 20140926070407) do
 
   create_table "experiments", force: true do |t|
     t.string   "name"
@@ -42,12 +42,14 @@ ActiveRecord::Schema.define(version: 20140913061456) do
   end
 
   create_table "ramps", force: true do |t|
-    t.decimal "rate",         precision: 11, scale: 8, null: false
+    t.decimal "rate",         precision: 11, scale: 8,                 null: false
     t.integer "next_step_id"
+    t.boolean "collect_data",                          default: false
   end
 
-  create_table "settings", id: false, force: true do |t|
-    t.boolean "debug", default: false
+  create_table "settings", force: true do |t|
+    t.boolean "debug",     default: false
+    t.string  "time_zone"
   end
 
   create_table "stages", force: true do |t|
@@ -62,12 +64,13 @@ ActiveRecord::Schema.define(version: 20140913061456) do
 
   create_table "steps", force: true do |t|
     t.string   "name"
-    t.decimal  "temperature",  precision: 4, scale: 1,             null: false
-    t.integer  "hold_time",                                        null: false, comment: "in seconds, 0 means infinite"
-    t.integer  "order_number",                         default: 0, null: false, comment: "the order of the step in the cycle, starting with 0, and continguous"
-    t.integer  "stage_id",                                         null: false
+    t.decimal  "temperature",  precision: 4, scale: 1,                 null: false
+    t.integer  "hold_time",                                            null: false, comment: "in seconds, 0 means infinite"
+    t.integer  "order_number",                         default: 0,     null: false, comment: "the order of the step in the cycle, starting with 0, and continguous"
+    t.integer  "stage_id",                                             null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "collect_data",                         default: false
   end
 
   create_table "temperature_debug_logs", id: false, force: true do |t|
@@ -82,7 +85,7 @@ ActiveRecord::Schema.define(version: 20140913061456) do
 
   create_table "temperature_logs", id: false, force: true do |t|
     t.integer "experiment_id"
-    t.integer "elapsed_time",                                   comment: "in seconds"
+    t.integer "elapsed_time",                                   comment: "in milliseconds"
     t.decimal "lid_temp",               precision: 5, scale: 2
     t.decimal "heat_block_zone_1_temp", precision: 5, scale: 2
     t.decimal "heat_block_zone_2_temp", precision: 5, scale: 2
