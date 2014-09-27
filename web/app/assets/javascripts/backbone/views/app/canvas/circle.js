@@ -8,7 +8,9 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   this.scrollTop = 60;
   this.scrollLength = 290;
   this.scrollRatio = (this.scrollLength - this.scrollTop) / 100;
-
+  this.gatherDataImage = null;
+  this.next = null;
+  this.previous = null;
   this.getLeft = function() {
     this.left = this.parent.left;
   }
@@ -20,7 +22,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     // to constants later;
   }
 
-  this.getLines = function() {
+  this.getLinesAndCircles = function() {
     // This is moved to here because we want to place circle over the line.
     // So first we add the line then circle is placed over it.
     if(this.next) {
@@ -29,6 +31,13 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     // Here too this order is important
     this.canvas.add(this.stepDataGroup);
     this.canvas.add(this.circleGroup);
+    // gather data circle in the right side
+    this.gatherDataGroup = new ChaiBioTech.app.Views.gatherDataGroup(
+      [
+        this.gatherDataCircle = new ChaiBioTech.app.Views.gatherDataCircle(),
+        this.gatherDataImage
+      ], this);
+    this.canvas.add(this.gatherDataGroup);
   }
 
   this.getUniqueId = function() {
@@ -62,6 +71,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
         this.temperature = new ChaiBioTech.app.Views.stepTemperature(this.model, this),
         this.holdTime = new ChaiBioTech.app.Views.holdTime(this.model, this)
       ], this);
+
   }
 
   this.makeItBig = function() {
@@ -120,6 +130,9 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
           this.curve.path[1][3] = midPointX;
           this.curve.path[1][4] = midPointY;
 
+          // We move the gather data Circle along with it
+          this.gatherDataGroup.setTop(midPointY);
+
           // Controlling point for the next bent
           this.curve.path[2][1] = (midPointX + endPointX) / 2;
           this.curve.path[2][2] = ((midPointY + endPointY) / 2) - 15;
@@ -143,6 +156,8 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
           // Mid point
           previous.curve.path[1][3] = midPointX;
           previous.curve.path[1][4] = midPointY;
+          // We move the gather data Circle along with it
+          previous.gatherDataGroup.setTop(midPointY);
 
           previous.curve.path[1][1] = (midPointX + endPointX) / 2;
           previous.curve.path[1][2] = ((midPointY + endPointY) / 2) + 10;

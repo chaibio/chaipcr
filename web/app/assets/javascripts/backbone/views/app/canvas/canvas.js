@@ -65,7 +65,9 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
   });
 
   this.canvas.on("footerImagesLoaded", function() {
+    that.addTemperatureLines();
     that.selectStep();
+    that.canvas.renderAll();
   })
   this.setDefaultWidthHeight = function() {
     this.canvas.setHeight(420);
@@ -90,7 +92,6 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     that.addStages();
     that.setDefaultWidthHeight();
     that.addinvisibleFooterToStep();
-    that.addTemperatureLines();
   })
 
   this.selectStep = function() {
@@ -127,7 +128,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     var i = 0, limit = this.allCircles.length;
 
     for(i = 0; i < limit; i++) {
-      this.allCircles[i].getLines(i);
+      this.allCircles[i].getLinesAndCircles();
     }
   }
 
@@ -135,8 +136,8 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     var count = 0, limit = this.allStepViews.length,
     stepDark = "assets/selected-step-01.png",
     stepWhite = "assets/selected-step-02.png",
-    stepCommon = "assets/common-step.png";
-
+    stepCommon = "assets/common-step.png",
+    gatherData = "assets/gather-data.png";
     addImage = function(count, that, url, image, callBack) {
       fabric.Image.fromURL(url, function(img) {
         img.left = that.allStepViews[count].left - 1;
@@ -168,6 +169,18 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
       });
     }
 
+    addGatheDataImage = function(that, url, count) {
+        fabric.Image.fromURL(url, function(img) {
+          img.originX = "center";
+          img.originY = "center";
+          that.allStepViews[count].circle.gatherDataImage = img;
+          count = count + 1;
+          if(count < limit) {
+            addGatheDataImage(that, url, count);
+          }
+        });
+    }
+    addGatheDataImage(this, gatherData, 0);
     addImage(0, this, stepCommon, "commonFooter");
     addImage(0, this, stepDark, "darkFooter");
     addImage(0, this, stepWhite, "whiteFooter", function() {

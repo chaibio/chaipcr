@@ -46,7 +46,6 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 			that.fabricCanvas.addStages();
 			that.fabricCanvas.setDefaultWidthHeight();
 			that.fabricCanvas.addinvisibleFooterToStep();
-			that.fabricCanvas.addTemperatureLines();
 
 		ExpModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});
 		@editStageStep = new ChaiBioTech.app.Views.editStageStep({
