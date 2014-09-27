@@ -130,7 +130,12 @@
 		font-family: "Ostrich Sans";
 		src: local('Ostrich Sans'), url("ostrich-sans.woff") format('woff');
 }
-@import url(http://fonts.googleapis.com/css?family=Open+Sans);
+@import url("http://fonts.googleapis.com/css?family=Open+Sans");
+
+@font-face {
+	font-family: "fun city";
+	src: local('fun city'), url("FUNCITY LEVEL 1 BASIC.woff") format('woff');
+}
 
 .simplifica {
 	font-family: "simplifica";
@@ -147,6 +152,3 @@
 #container {
 	width: 1024px;
 }
-
-
-

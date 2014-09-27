@@ -2,6 +2,8 @@ ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
 ChaiBioTech.app.selectedCircle = null;
 
 ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
+  // U should declare all the class variables in here;
+  // may be in the clean up
   this.model = model;
   this.parent = parentStep;
   this.canvas = parentStep.canvas;
@@ -11,6 +13,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   this.gatherDataImage = null;
   this.next = null;
   this.previous = null;
+
   this.getLeft = function() {
     this.left = this.parent.left;
   }
@@ -161,7 +164,6 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
 
           previous.curve.path[1][1] = (midPointX + endPointX) / 2;
           previous.curve.path[1][2] = ((midPointY + endPointY) / 2) + 10;
-
       }
 
       // Change temperature display as its circle is moved

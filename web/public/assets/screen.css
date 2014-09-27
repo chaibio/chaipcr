@@ -2,7 +2,7 @@
  * In this file you should write your main styles. (or centralize your imports)
  * Import this file using the following HTML or equivalent:
  * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
-@import url(http://fonts.googleapis.com/css?family=Open+Sans);
+@import url("http://fonts.googleapis.com/css?family=Open+Sans");
 /* line 6, ../../app/assets/stylesheets/screen.css.scss */
 #index-page {
   margin: 0 0 20px 20px;
@@ -136,24 +136,29 @@
   src: local("Ostrich Sans"), url("ostrich-sans.woff") format("woff");
 }
 
-/* line 135, ../../app/assets/stylesheets/screen.css.scss */
+@font-face {
+  font-family: "fun city";
+  src: local("fun city"), url("FUNCITY LEVEL 1 BASIC.woff") format("woff");
+}
+
+/* line 140, ../../app/assets/stylesheets/screen.css.scss */
 .simplifica {
   font-family: "simplifica";
   font-size: 30px;
 }
 
-/* line 139, ../../app/assets/stylesheets/screen.css.scss */
+/* line 144, ../../app/assets/stylesheets/screen.css.scss */
 .sansa {
   font-family: 'Open Sans', sans-serif;
   font-size: 12px;
 }
 
-/* line 143, ../../app/assets/stylesheets/screen.css.scss */
+/* line 148, ../../app/assets/stylesheets/screen.css.scss */
 .ostrich {
   font-family: "Ostrich Sans";
 }
 
-/* line 147, ../../app/assets/stylesheets/screen.css.scss */
+/* line 152, ../../app/assets/stylesheets/screen.css.scss */
 #container {
   width: 1024px;
 }

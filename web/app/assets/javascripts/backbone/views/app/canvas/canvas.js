@@ -64,8 +64,8 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     that.canvas.calcOffset();
   });
 
-  this.canvas.on("footerImagesLoaded", function() {
-    that.addTemperatureLines();
+  this.canvas.on("imagesLoaded", function() {
+    that.addRampLinesAndCircles();
     that.selectStep();
     that.canvas.renderAll();
   })
@@ -122,7 +122,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     this.canvas.add(stageView.borderRight);
   };
 
-  this.addTemperatureLines = function() {
+  this.addRampLinesAndCircles = function() {
     this.allCircles = null;
     this.allCircles = this.findAllCircles();
     var i = 0, limit = this.allCircles.length;
@@ -158,7 +158,6 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
           that.canvas.add(that.allStepViews[count].commonFooterImage);
         }
 
-        //that.canvas.add(img);
         count = count + 1;
 
         if(count < limit) {
@@ -186,9 +185,10 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     addImage(0, this, stepWhite, "whiteFooter", function() {
       // This is sent as callback, we need this to be executed after all
       // images are loaded.
-      that.canvas.fire("footerImagesLoaded");
+      that.canvas.fire("imagesLoaded");
     });
-
+    // Y we have to do like this ?. We should load few small images and images take more time to load
+    // So we load all images using recursive function calls, then fire an event to show .
   }
 
 
