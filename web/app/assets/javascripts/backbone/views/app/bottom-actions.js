@@ -21,6 +21,7 @@ ChaiBioTech.app.Views.bottomActions = Backbone.View.extend({
     e.preventDefault();
     e.stopPropagation();
     this.popUp.show();
+    $("body").on("click",this.handleClcikOn);
   },
 
   commonAddStage: function(type) {
@@ -34,16 +35,24 @@ ChaiBioTech.app.Views.bottomActions = Backbone.View.extend({
     }
   },
 
+  handleClcikOn: function() {
+    if(this.popUp.is(":visible")) {
+      this.popUp.hide();
+      // Now we turn this off, So that it wont bothr on any other click.
+      $("body").off("click", this.handleClcikOn);
+    }
+  },
+
   addHoldingStage: function() {
-    this.commonAddStage("holding")
+    this.commonAddStage("holding");
   },
 
   addCyclingStage: function() {
-    this.commonAddStage("cycling")
+    this.commonAddStage("cycling");
   },
 
   addMeltCurveStage: function() {
-    this.commonAddStage("melt_curve")
+    this.commonAddStage("melt_curve");
   },
 
   addStep: function() {
@@ -76,12 +85,8 @@ ChaiBioTech.app.Views.bottomActions = Backbone.View.extend({
   },
 
   initialize: function() {
-    var that = this;
-    $("body").click(function() {
-      if(that.popUp.is(":visible")) {
-        that.popUp.hide();
-      }
-    })
+    // Bind it to this object. handleClcikOn has html scope because its called from jquery event.
+    _.bindAll(this, "handleClcikOn");
   },
 
   render: function() {
