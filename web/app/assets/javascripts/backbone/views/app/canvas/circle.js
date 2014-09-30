@@ -83,7 +83,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   this.makeItBig = function() {
     // See I am confused here may be we will have to interchange during and after
     this.big = true;
-    if(this.parent.gatherDataAfterRamp) {
+    if(this.parent.gatherDataDuringStep) {
       this.circle.setFill("#ffb400;");
       this.gatherDataImageMiddle.visible = false;
     }
@@ -106,11 +106,8 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     this.littleCircleGroup.visible = false;
     this.stepDataGroup.visible = true;
     this.outerMostCircle.visible = false;
-    console.log(this.parent)
-    if(this.parent.gatherDataAfterRamp) {
+    if(this.parent.gatherDataDuringStep) {
       this.circle.setFill("white");
-      console.log("wooo")
-      //this.circle.stroke = "white";
       this.gatherDataImageMiddle.visible = true;
     }
   }

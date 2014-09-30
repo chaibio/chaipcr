@@ -46,18 +46,18 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
   }
 
   this.gatherDuringStep = function() {
-    if(this.parentStage.previousStage || this.previousStep) {
-        this.gatherDataDuringStep = !(this.gatherDataDuringStep);
-        this.circle.gatherDataGroup.visible = this.gatherDataDuringStep;
-        this.canvas.renderAll();
-    }
+    this.gatherDataDuringStep = !(this.gatherDataDuringStep);
+    //this.circle.gatherDataImageMiddle.visible = this.gatherDataAfterRamp;
+    this.circle.showHideGatherData(this.gatherDataDuringStep);
+    this.canvas.renderAll();
   }
 
   this.gatherAfterStep = function() {
-      this.gatherDataAfterRamp = !(this.gatherDataAfterRamp);
-      //this.circle.gatherDataImageMiddle.visible = this.gatherDataAfterRamp;
-      this.circle.showHideGatherData(this.gatherDataAfterRamp);
-      this.canvas.renderAll();
+      if(this.parentStage.previousStage || this.previousStep) {
+          this.gatherDataAfterRamp = !(this.gatherDataAfterRamp);
+          this.circle.gatherDataGroup.visible = this.gatherDataAfterRamp;
+          this.canvas.renderAll();
+      }
   }
 
   this.addCircle = function() {
