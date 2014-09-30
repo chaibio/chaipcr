@@ -10,6 +10,8 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
   this.myWidth = 120;
   this.nextStep = null;
   this.previousStep = null;
+  this.gatherDataDuringStep = false;
+  this.gatherDataAfterRamp = false;
 
   this.setLeft = function() {
     this.left = this.parentStage.left + 1 + (parseInt(this.index) * this.myWidth);
@@ -41,6 +43,21 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       strokeWidth: 1,
       selectable: false
     });
+  }
+
+  this.gatherDuringStep = function() {
+    if(this.parentStage.previousStage || this.previousStep) {
+        this.gatherDataDuringStep = !(this.gatherDataDuringStep);
+        this.circle.gatherDataGroup.visible = this.gatherDataDuringStep;
+        this.canvas.renderAll();
+    }
+  }
+
+  this.gatherAfterStep = function() {
+      this.gatherDataAfterRamp = !(this.gatherDataAfterRamp);
+      //this.circle.gatherDataImageMiddle.visible = this.gatherDataAfterRamp;
+      this.circle.showHideGatherData(this.gatherDataAfterRamp);
+      this.canvas.renderAll();
   }
 
   this.addCircle = function() {

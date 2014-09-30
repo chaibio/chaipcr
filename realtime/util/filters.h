@@ -1,6 +1,14 @@
 #ifndef _FILTERS_H
 #define _FILTERS_H
 
+#include <cmath>
+
+////////////////////////////////////////////////////////////////////
+// Namespace Filters
+namespace Filters {
+    double CutoffFrequencyForTimeConstant(double timeConstant);
+};
+
 ////////////////////////////////////////////////////////////////////
 // Class SinglePoleRecursiveFilter
 class SinglePoleRecursiveFilter {

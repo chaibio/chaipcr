@@ -13,6 +13,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   this.gatherDataImage = null;
   this.next = null;
   this.previous = null;
+  this.big = false;
 
   this.getLeft = function() {
     this.left = this.parent.left;
@@ -33,6 +34,8 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     }
     // Here too this order is important
     this.canvas.add(this.stepDataGroup);
+    //this.gatherDataImageMiddle = this.gatherDataImage.clone();
+    this.circleGroup.add(this.gatherDataImageMiddle);
     this.canvas.add(this.circleGroup);
     // gather data circle in the right side
     this.gatherDataGroup = new ChaiBioTech.app.Views.gatherDataGroup(
@@ -78,6 +81,12 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   }
 
   this.makeItBig = function() {
+    // See I am confused here may be we will have to interchange during and after
+    this.big = true;
+    if(this.parent.gatherDataAfterRamp) {
+      this.circle.setFill("#ffb400;");
+      this.gatherDataImageMiddle.visible = false;
+    }
     this.circle.stroke = "#ffb400";
     this.outerCircle.stroke = "black";
     this.outerCircle.strokeWidth = 7;
@@ -91,18 +100,35 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   }
 
   this.makeItSmall = function() {
+    this.big = false;
     this.circle.stroke = "white";
     this.outerCircle.stroke = null;
     this.littleCircleGroup.visible = false;
     this.stepDataGroup.visible = true;
     this.outerMostCircle.visible = false;
+    console.log(this.parent)
+    if(this.parent.gatherDataAfterRamp) {
+      this.circle.setFill("white");
+      console.log("wooo")
+      //this.circle.stroke = "white";
+      this.gatherDataImageMiddle.visible = true;
+    }
+  }
+
+  this.showHideGatherData = function(state) {
+    this.gatherDataImageMiddle.visible = state;
+    if(state && ! this.big) {
+        this.circle.setFill("white");
+    } else {
+      this.circle.setFill("#ffb400");
+    }
   }
 
   this.manageDrag = function(targetCircleGroup) {
     // Limit the movement of the circle
     var top = targetCircleGroup.top,
     left = targetCircleGroup.left;
-
+    var previousTop = 0;
     if(top < 60) {
       targetCircleGroup.setTop(60);
     } else if(top > 290) {
@@ -125,6 +151,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
 
           var midPointX = (left + endPointX) / 2,
           midPointY = (top + endPointY) / 2;
+          previousTop  = midPointY;
 
           this.curve.path[1][1] = (left + midPointX) / 2;
           this.curve.path[1][2] = ((top + midPointY) / 2) + 10;
@@ -133,8 +160,8 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
           this.curve.path[1][3] = midPointX;
           this.curve.path[1][4] = midPointY;
 
-          // We move the gather data Circle along with it
-          this.gatherDataGroup.setTop(midPointY);
+          // We move the gather data Circle along with it [its next object's]
+          this.next.gatherDataGroup.setTop(midPointY);
 
           // Controlling point for the next bent
           this.curve.path[2][1] = (midPointX + endPointX) / 2;
@@ -160,7 +187,8 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
           previous.curve.path[1][3] = midPointX;
           previous.curve.path[1][4] = midPointY;
           // We move the gather data Circle along with it
-          previous.gatherDataGroup.setTop(midPointY);
+          // Please pay attention here we move gatherdta of this
+          this.gatherDataGroup.setTop(midPointY);
 
           previous.curve.path[1][1] = (midPointX + endPointX) / 2;
           previous.curve.path[1][2] = ((midPointY + endPointY) / 2) + 10;

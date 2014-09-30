@@ -8,8 +8,8 @@
 
 using namespace std;
 
-const LTC2444::OversamplingRatio kThermistorOversamplingRate = LTC2444::kOversamplingRatio2048;
-const LTC2444::OversamplingRatio kLIAOversamplingRate = LTC2444::kOversamplingRatio2048; //kOversamplingRatio256;
+const LTC2444::OversamplingRatio kThermistorOversamplingRate = LTC2444::kOversamplingRatio512;
+const LTC2444::OversamplingRatio kLIAOversamplingRate = LTC2444::kOversamplingRatio512;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class ADCController

@@ -18,7 +18,21 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
   },
 
   events: {
-    "click #gather-data-button": "sowGatherDataPopUp"
+    "click #gather-data-button": "sowGatherDataPopUp",
+    "click #during-step": "enableDuringStep",
+    "click #after-step": "enableAfterStep"
+  },
+  
+  enableDuringStep: function() {
+    if(ChaiBioTech.app.selectedStep) {
+      ChaiBioTech.app.selectedStep.gatherDuringStep();
+    }
+  },
+
+  enableAfterStep: function() {
+    if(ChaiBioTech.app.selectedStep) {
+      ChaiBioTech.app.selectedStep.gatherAfterStep();
+    }
   },
 
   sowGatherDataPopUp: function(e) {

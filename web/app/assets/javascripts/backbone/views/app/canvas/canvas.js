@@ -81,8 +81,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
 
   this.canvas.on("modelChanged", function(evt) {
     that.model.getLatestModel(that.canvas);
-    that.canvas.clear();
-    that.canvas.renderAll();
+    that.canvas.clear().renderAll;
   });
 
   this.canvas.on("latestData", function() {
@@ -141,6 +140,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     stepWhite = "assets/selected-step-02.png",
     stepCommon = "assets/common-step.png",
     gatherData = "assets/gather-data.png";
+    // Rewrite this part with clone, So that loading is faster
     addImage = function(count, that, url, image, callBack) {
       fabric.Image.fromURL(url, function(img) {
         img.left = that.allStepViews[count].left - 1;
@@ -175,11 +175,16 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
         fabric.Image.fromURL(url, function(img) {
           img.originX = "center";
           img.originY = "center";
-          that.allStepViews[count].circle.gatherDataImage = img;
-          count = count + 1;
-          if(count < limit) {
-            addGatheDataImage(that, url, count);
+          cloneImgObject = function(that, url, count) {
+            that.allStepViews[count].circle.gatherDataImage = $.extend({},img);;
+            that.allStepViews[count].circle.gatherDataImageMiddle = $.extend({},img);
+            that.allStepViews[count].circle.gatherDataImageMiddle.setVisible(false);
+            count = count + 1;
+            if(count < limit) {
+              cloneImgObject(that, url, count);
+            }
           }
+          cloneImgObject(that, url, 0);
         });
     }
     addGatheDataImage(this, gatherData, 0);
