@@ -23,6 +23,12 @@ const double kLidMaxTargetTemp = 130;
 
 const double kProgramStartLidTempThreshold = 2;
 
+//PID
+const int kPIDDerivativeGainLimiter = 15;
+
+//ADC
+const int kADCRepeatFrequency = 50;
+
 //thermistor & ADC params
 const unsigned int kLidThermistorVoltageDividerResistanceOhms = 33000;
 const int kLTC2444ADCBits = 24;

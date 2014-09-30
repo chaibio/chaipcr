@@ -21,7 +21,7 @@ public:
         kOversamplingRatio4096,
         kOversamplingRatio8192,
         kOversamplingRatio16384,
-        kOversamplingRatio32768
+        kOversamplingRatio32768 = 15
     } OversamplingRatio;
 
     uint32_t readSingleEndedChannel(uint8_t channel, OversamplingRatio oversamplingRate);
@@ -39,8 +39,5 @@ private:
 	GPIO busyPin_;
 	uint8_t OSRTWOx;
 };
-
-
-
 
 #endif

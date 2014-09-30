@@ -3,6 +3,12 @@
 #include "filters.h"
 
 ////////////////////////////////////////////////////////////////////
+// Namespace Filters
+double Filters::CutoffFrequencyForTimeConstant(double timeConstant) {
+    return (1.0 / (2 * M_PI * timeConstant));
+}
+
+////////////////////////////////////////////////////////////////////
 // Class SinglePoleRecursiveFilter
 SinglePoleRecursiveFilter::SinglePoleRecursiveFilter(double a0, double b1):
     _a0 {a0},
