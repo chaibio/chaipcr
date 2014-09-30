@@ -168,7 +168,55 @@
 						border: 1px solid black;
 						margin-left: 5px;
 					}
+
+					.lol-pop {
+						width: 180px;
+						height: 111px;
+						position: relative;
+						top: -156px;
+						left: -20px;
+						display: none;
+
+						.gather-data-popup {
+							width: 180px;
+							height: 111px;
+							background-color: black;
+							position: absolute;
+							opacity: .8;
+
+							.tail {
+								width: 20px;
+								height: 20px;
+								position: absolute;
+								background-color: black;
+								-ms-transform: rotate(45deg); /* IE 9 */
+								-webkit-transform: rotate(45deg); /* Chrome, Safari, Opera */
+								transform: rotate(45deg);
+								top: 100px;
+								left: 80px;
+							}
+						}
+
+						.gather-data-popup-content {
+							width: 150px;
+							height: 111px;
+							position: absolute;
+							left: 15px;
+							top: 12px;
+
+							.first {
+								margin-top: 12px;
+							}
+							button {
+								margin-bottom: 5px;
+								width: 140px;
+							}
+						}
+					}
 				}
+
+
+
 			}
 
 			.data-boxes {
@@ -260,8 +308,6 @@
 							}
 						}
 					}
-
-
 				}
 			}
 

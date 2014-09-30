@@ -6,8 +6,6 @@ ChaiBioTech.app.Views.bottomActions = Backbone.View.extend({
 
   template: JST["backbone/templates/app/bottom-actions"],
 
-  popUpTemplate: JST["backbone/templates/app/add-stage-popup"],
-
   events: {
     "click #add-step": "addStep",
     "click #delete-step": "deleteStep",
@@ -21,7 +19,7 @@ ChaiBioTech.app.Views.bottomActions = Backbone.View.extend({
     e.preventDefault();
     e.stopPropagation();
     this.popUp.show();
-    $("body").on("click",this.handleClcikOn);
+    $("body").on("click",this.handleClickOn);
   },
 
   commonAddStage: function(type) {
@@ -35,7 +33,7 @@ ChaiBioTech.app.Views.bottomActions = Backbone.View.extend({
     }
   },
 
-  handleClcikOn: function() {
+  handleClickOn: function() {
     if(this.popUp.is(":visible")) {
       this.popUp.hide();
       // Now we turn this off, So that it wont bothr on any other click.
@@ -85,8 +83,8 @@ ChaiBioTech.app.Views.bottomActions = Backbone.View.extend({
   },
 
   initialize: function() {
-    // Bind it to this object. handleClcikOn has html scope because its called from jquery event.
-    _.bindAll(this, "handleClcikOn");
+    // Bind it to 'this' object. handleClcikOn has html scope because its called from jquery event.
+    _.bindAll(this, "handleClickOn");
   },
 
   render: function() {

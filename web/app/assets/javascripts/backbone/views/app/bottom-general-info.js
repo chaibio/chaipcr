@@ -13,6 +13,27 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
     this.listenTo(this.options.editStepStageClass, "stepSelected", function(data) {
       that.changeInfo(data)
     });
+
+    _.bindAll(this, 'handleClcik');
+  },
+
+  events: {
+    "click #gather-data-button": "sowGatherDataPopUp"
+  },
+
+  sowGatherDataPopUp: function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.popUp.show();
+    $('body').on("click", this.handleClcik);
+  },
+
+  handleClcik: function() {
+    if(this.popUp.is(":visible")) {
+      this.popUp.hide();
+      // Now we turn this off, So that it wont bothr on any other click.
+      $("body").off("click", this.handleClcik);
+    }
   },
 
   changeInfo: function(step) {
@@ -33,6 +54,7 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
     this.nameOfStepStage = $(this.el).find(".bottom-name-of-step-stage");
     this.smallStageName = $(this.el).find(".bottom-stage-name");
     this.numOfCycles = $(this.el).find(".bottom-step-no-cycle");
+    this.popUp = $(this.el).find('.lol-pop');
     return this;
   }
 });
