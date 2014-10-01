@@ -201,12 +201,37 @@
 							width: 150px;
 							height: 111px;
 							position: absolute;
-							left: 15px;
+							left: 18px;
 							top: 12px;
 
-							.first {
-								margin-top: 12px;
+							.small-button {
+								width: 142px;
+								background-color: white;
+								height: 31px;
+								border: 1px solid black;
+								font-size: 9px;
+								font-weight: bold;
+								cursor: pointer;
+
+								.tik-image-container {
+									height: 31px;
+									width: 34px;
+									float: left;
+									padding-top: 5px;
+									padding-left: 8px;
+								}
+								.tik-text-container {
+									height: 31px;
+									width: 100px;
+									float: left;
+									padding-top: 7px;
+								}
 							}
+							.first {
+								margin-top: 8px;
+								margin-bottom: 10px;
+							}
+
 							button {
 								margin-bottom: 5px;
 								width: 140px;

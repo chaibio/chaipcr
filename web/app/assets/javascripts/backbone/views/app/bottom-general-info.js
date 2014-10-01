@@ -18,27 +18,39 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
   },
 
   events: {
-    "click #gather-data-button": "sowGatherDataPopUp",
+    "click #gather-data-button": "showGatherDataPopUp",
     "click #during-step": "enableDuringStep",
-    "click #after-step": "enableAfterStep"
+    "click #after-step": "enableDuringRamp"
   },
-  
+
   enableDuringStep: function() {
     if(ChaiBioTech.app.selectedStep) {
       ChaiBioTech.app.selectedStep.gatherDuringStep();
     }
   },
 
-  enableAfterStep: function() {
+  enableDuringRamp: function() {
     if(ChaiBioTech.app.selectedStep) {
-      ChaiBioTech.app.selectedStep.gatherAfterStep();
+      ChaiBioTech.app.selectedStep.gatherDuringRamp();
     }
   },
 
-  sowGatherDataPopUp: function(e) {
+  showGatherDataPopUp: function(e) {
     e.preventDefault();
     e.stopPropagation();
     this.popUp.show();
+    // Takes care of image on the gather data
+    if(ChaiBioTech.app.selectedStep.gatherDataDuringStep) {
+      this.tikImageDuringStep.hide();
+    } else {
+      this.tikImageDuringStep.show();
+    }
+
+    if(ChaiBioTech.app.selectedStep.gatherDataDuringRamp) {
+      this.tikImageDuringRamp.hide();
+    } else {
+      this.tikImageDuringRamp.show();
+    }
     $('body').on("click", this.handleClcik);
   },
 
@@ -58,7 +70,19 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
     this.noOfStages.html("/" + temp);
     this.nameOfStepStage.html(step.stepName.text + "/"+ step.parentStage.stageName.text);
     this.smallStageName.html(step.parentStage.stageName.text);
-    this.numOfCycles.html(step.parentStage.model.get("stage").num_cycles)
+    this.numOfCycles.html(step.parentStage.model.get("stage").num_cycles);
+    // Takes care of image on the gather data
+    if(step.gatherDataDuringStep) {
+      this.tikImageDuringStep.hide();
+    } else {
+      this.tikImageDuringStep.show();
+    }
+
+    if(step.gatherDataDuringRamp) {
+      this.tikImageDuringRamp.hide();
+    } else {
+      this.tikImageDuringRamp.show();
+    }
   },
 
   render: function() {
@@ -69,6 +93,8 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
     this.smallStageName = $(this.el).find(".bottom-stage-name");
     this.numOfCycles = $(this.el).find(".bottom-step-no-cycle");
     this.popUp = $(this.el).find('.lol-pop');
+    this.tikImageDuringStep = $(this.el).find('.tik-image-during-step');
+    this.tikImageDuringRamp = $(this.el).find('.tik-image-during-ramp');
     return this;
   }
 });

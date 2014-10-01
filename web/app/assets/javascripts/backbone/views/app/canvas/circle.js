@@ -44,6 +44,8 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
         this.gatherDataImage
       ], this);
     this.canvas.add(this.gatherDataGroup);
+    this.showHideGatherData(this.parent.gatherDataDuringStep);
+    this.gatherDataGroup.visible = this.parent.gatherDataDuringRamp;
   }
 
   this.getUniqueId = function() {

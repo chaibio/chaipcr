@@ -10,9 +10,9 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
   this.myWidth = 120;
   this.nextStep = null;
   this.previousStep = null;
-  this.gatherDataDuringStep = false;
-  this.gatherDataAfterRamp = false;
-
+  this.gatherDataDuringStep = this.model.get("step")["collect_data"];
+  this.gatherDataDuringRamp = this.model.get("step").ramp["collect_data"];
+  
   this.setLeft = function() {
     this.left = this.parentStage.left + 1 + (parseInt(this.index) * this.myWidth);
   }
@@ -47,14 +47,16 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
 
   this.gatherDuringStep = function() {
     this.gatherDataDuringStep = !(this.gatherDataDuringStep);
+    this.model.gatherDuringStep(this.gatherDataDuringStep);
     this.circle.showHideGatherData(this.gatherDataDuringStep);
     this.canvas.renderAll();
   }
 
-  this.gatherAfterStep = function() {
+  this.gatherDuringRamp = function() {
     if(this.parentStage.previousStage || this.previousStep) {
-      this.gatherDataAfterRamp = !(this.gatherDataAfterRamp);
-      this.circle.gatherDataGroup.visible = this.gatherDataAfterRamp;
+      this.gatherDataDuringRamp = !(this.gatherDataDuringRamp);
+      this.model.gatherDataDuringRamp(this.gatherDataDuringRamp);
+      this.circle.gatherDataGroup.visible = this.gatherDataDuringRamp;
       this.canvas.renderAll();
     }
   }
@@ -71,7 +73,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
 
   this.rampSpeed = function() {
     this.rampSpeedNumber = parseFloat(this.model.get("step").ramp.rate);
-
+    // Move this to different files
     this.rampSpeedText = new fabric.Text(String(this.rampSpeedNumber)+ "º C/s", {
       fill: 'black',
       fontSize: 16,
