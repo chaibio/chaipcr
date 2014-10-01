@@ -43,12 +43,12 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
       this.gatherDataButtonImage.hide();
       this.gatherDataButton.css("background-color", "white");
       this.gatherDataButton.css("color", "black");
-      this.gatherDataButtonText.html("GATHER DATA ON");
+      this.gatherDataButtonText.html("GATHER DATA OFF");
     } else {
       this.gatherDataButtonImage.show();
       this.gatherDataButton.css("background-color", "black");
       this.gatherDataButton.css("color", "white");
-      this.gatherDataButtonText.html("GATHER DATA OFF");
+      this.gatherDataButtonText.html("GATHER DATA ON");
     }
   },
 
