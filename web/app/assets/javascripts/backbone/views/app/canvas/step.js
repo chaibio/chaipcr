@@ -47,17 +47,16 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
 
   this.gatherDuringStep = function() {
     this.gatherDataDuringStep = !(this.gatherDataDuringStep);
-    //this.circle.gatherDataImageMiddle.visible = this.gatherDataAfterRamp;
     this.circle.showHideGatherData(this.gatherDataDuringStep);
     this.canvas.renderAll();
   }
 
   this.gatherAfterStep = function() {
-      if(this.parentStage.previousStage || this.previousStep) {
-          this.gatherDataAfterRamp = !(this.gatherDataAfterRamp);
-          this.circle.gatherDataGroup.visible = this.gatherDataAfterRamp;
-          this.canvas.renderAll();
-      }
+    if(this.parentStage.previousStage || this.previousStep) {
+      this.gatherDataAfterRamp = !(this.gatherDataAfterRamp);
+      this.circle.gatherDataGroup.visible = this.gatherDataAfterRamp;
+      this.canvas.renderAll();
+    }
   }
 
   this.addCircle = function() {
@@ -68,6 +67,45 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
   this.getUniqueName = function() {
     var name = this.stepName.text + this.parentStage.stageNo.text + "step";
     this.uniqueName = name;
+  }
+
+  this.rampSpeed = function() {
+    this.rampSpeedNumber = parseFloat(this.model.get("step").ramp.rate);
+
+    this.rampSpeedText = new fabric.Text(String(this.rampSpeedNumber)+ "º C/s", {
+      fill: 'black',
+      fontSize: 16,
+      fontWeight: "bold",
+      fontFamily: "Open Sans"
+    });
+
+    this.underLine = new fabric.Line([0, 0, this.rampSpeedText.width, 0], {
+      stroke: "#ffde00",
+      strokeWidth: 2,
+      originX: 'center',
+      originY: 'center',
+      top: 20
+    });
+
+    this.rampSpeedGroup = new fabric.Group([this.rampSpeedText, this.underLine], {
+      originX: 'center',
+      originY: 'center',
+      selectable: true,
+      lockRotation: true,
+      lockScalingX: true,
+      lockScalingY: true,
+      lockMovementX: true,
+      lockMovementY: true,
+      hasControls: false,
+      originX: 'center',
+      originY: 'center',
+      top : 100,
+      left: this.left + 50
+    });
+
+    if(this.rampSpeedNumber <= 0) {
+      this.rampSpeedGroup.setVisible(false);
+    }
   }
 
   this.manageBorder = function(color) {
@@ -105,6 +143,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     this.addName();
     this.addBorderRight();
     this.getUniqueName();
+    this.rampSpeed();
     this.stepRect = new fabric.Rect({
       left: this.left || 30,
       top: 64,
@@ -118,6 +157,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
 
     this.canvas.add(this.stepRect);
     this.canvas.add(this.stepName);
+    this.canvas.add(this.rampSpeedGroup);
     this.canvas.add(this.borderRight);
     this.addCircle();
   }
