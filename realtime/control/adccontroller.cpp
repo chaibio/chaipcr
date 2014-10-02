@@ -48,9 +48,8 @@ void ADCController::process() {
             if (_ltc2444->waitBusy())
                 continue;
 
-            uint32_t value;
-            switch (nextState()) {
-            case EReadZone1Differential: {
+            //ensure ADC loop runs at regular interval without jitter
+            if (nextState()) {
                 boost::posix_time::ptime previousTime = repeatFrequencyLastTime;
                 repeatFrequencyLastTime = boost::posix_time::microsec_clock::local_time();
 
@@ -66,10 +65,14 @@ void ADCController::process() {
                     else
                         std::cout << "ADCController::process - ADC measurements could not be completed in scheduled time\n";
                 }
+            }
 
+            //schedule conversion for next state, retrieve previous conversion value
+            uint32_t value;
+            switch (nextState()) {
+            case EReadZone1Differential:
                 value = _ltc2444->readDifferentialChannels(0, true, kThermistorOversamplingRate);
                 break;
-            }
             case EReadZone1Singular:
                 value = _ltc2444->readSingleEndedChannel(4, kThermistorOversamplingRate);
                 break;
@@ -89,6 +92,7 @@ void ADCController::process() {
                 assert(false);
             }
 
+            //process previous conversion value
             switch (_currentConversionState) {
             case EReadZone1Differential:
             case EReadZone2Differential:
