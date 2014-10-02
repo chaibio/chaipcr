@@ -92,7 +92,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatSink() {
 void QPCRFactory::setupMachine() {
     shared_ptr<HeatSink> heatSink = HeatSinkInstance::getInstance();
     if (heatSink) {
-        heatSink->setTargetTemperature(26);
+        heatSink->setTargetTemperature(kHeatSinkTargetTemperature);
         heatSink->setEnableMode(true);
     }
 }
