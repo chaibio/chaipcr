@@ -21,8 +21,9 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
 
       case "step":
         var me = evt.target.me;
-        me.parentStage.selectStage();
-        me.selectStep();
+        me.circle.manageClick();
+        //me.parentStage.selectStage();
+        //me.selectStep();
         // Sending data to backbone
         appRouter.editStageStep.trigger("stepSelected", me);
       break;
@@ -97,8 +98,9 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
   })
 
   this.selectStep = function() {
-    this.allStepViews[0].parentStage.selectStage();
-    this.allStepViews[0].selectStep();
+    this.allStepViews[0].circle.manageClick(true);
+    //this.allStepViews[0].parentStage.selectStage();
+    //this.allStepViews[0].selectStep();
     this.canvas.renderAll();
     appRouter.editStageStep.trigger("stepSelected", this.allStepViews[0]);
   }
