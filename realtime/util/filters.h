@@ -17,7 +17,7 @@ public:
     SinglePoleRecursiveFilter(double cutoffFrequency);
 
     double filterValue() const { return _z1; }
-    double processSample(double sampleValue);
+    inline double processSample(double sampleValue) { return _z1 = sampleValue * _a0 + _z1 * _b1; }
 
 private:
     double _a0, _b1, _z1;

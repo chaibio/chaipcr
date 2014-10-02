@@ -27,7 +27,7 @@ const double kProgramStartLidTempThreshold = 2;
 const int kPIDDerivativeGainLimiter = 15;
 
 //ADC
-const int kADCRepeatFrequency = 50;
+const int kADCRepeatFrequency = 50; // Hz
 
 //thermistor & ADC params
 const unsigned int kLidThermistorVoltageDividerResistanceOhms = 33000;
