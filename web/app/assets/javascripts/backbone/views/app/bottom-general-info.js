@@ -39,16 +39,16 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
 
   fixGatherDataButtonStatus: function(step) {
     // Looks after how gather data button is working as we change during step/ramp
-    if(step.gatherDataDuringStep && step.gatherDataDuringRamp) {
-      this.gatherDataButtonImage.hide();
-      this.gatherDataButton.css("background-color", "white");
-      this.gatherDataButton.css("color", "black");
-      this.gatherDataButtonText.html("GATHER DATA OFF");
-    } else {
+    if(step.gatherDataDuringStep || step.gatherDataDuringRamp) {
       this.gatherDataButtonImage.show();
       this.gatherDataButton.css("background-color", "black");
       this.gatherDataButton.css("color", "white");
       this.gatherDataButtonText.html("GATHER DATA ON");
+    } else {
+      this.gatherDataButtonImage.hide();
+      this.gatherDataButton.css("background-color", "white");
+      this.gatherDataButton.css("color", "black");
+      this.gatherDataButtonText.html("GATHER DATA OFF");
     }
   },
 
@@ -63,15 +63,15 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
   manageTikImage: function() {
     // Takes care of image on the gather data pop up
     if(ChaiBioTech.app.selectedStep.gatherDataDuringStep) {
-      this.tikImageDuringStep.hide();
-    } else {
       this.tikImageDuringStep.show();
+    } else {
+      this.tikImageDuringStep.hide();
     }
 
     if(ChaiBioTech.app.selectedStep.gatherDataDuringRamp) {
-      this.tikImageDuringRamp.hide();
-    } else {
       this.tikImageDuringRamp.show();
+    } else {
+      this.tikImageDuringRamp.hide();
     }
   },
 
