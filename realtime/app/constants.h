@@ -51,7 +51,8 @@ const double kHeatBlockZonesMinTargetTemp = -10;
 const double kHeatBlockZonesMaxTargetTemp = 105;
 
 //LED constants
-const int kMinLEDCurrent = 5; //5mA
+const int kMinLEDCurrent = 5; //mA
+const int kDefaultLEDCurrent = 60; //mA
 
 const int kLedBlankPwmPeriodNs = 1000000;
 const int kLedBlankPwmDutyNs = 500000;

@@ -30,7 +30,6 @@ PIDController::PIDController(const std::vector<SPIDTuning>& pGainSchedule, doubl
 PIDController::~PIDController() {
 }
 //------------------------------------------------------------------------------
-#include <iostream>
 double PIDController::compute(double setpoint, double processValue) {
     const SPIDTuning& pidTuning = determineGainSchedule(setpoint);
     ptime currentExecutionTime = microsec_clock::universal_time();
@@ -48,7 +47,7 @@ double PIDController::compute(double setpoint, double processValue) {
             output = pidTuning.kControllerGain * (error + _integratorS / pidTuning.kIntegralTimeS + pidTuning.kDerivativeTimeS * derivativeValueS);
 
             if (latchValue(output, _minOutput, _maxOutput))
-                _integratorS -= error * executionDurationS; //integrator anti-windup
+                _integratorS = 0; //-= error * executionDurationS; //integrator anti-windup
         }
         else
             _integratorS = 0;

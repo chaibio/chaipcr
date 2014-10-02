@@ -18,7 +18,7 @@ LEDController::LEDController(shared_ptr<SPIPort> spiPort,unsigned int potCSPin,
 
     disableLEDs();
     _ledBlankPWM.setPWM(kLedBlankPwmDutyNs, kLedBlankPwmPeriodNs, 0);
-    setIntensity(kMinLEDCurrent);
+    setIntensity(kDefaultLEDCurrent);
 
     _potCSPin.setValue(GPIO::kHigh);
     _ledXLATPin.setValue(GPIO::kLow);
