@@ -36,7 +36,7 @@ ADCController::~ADCController() {
 }
 
 void ADCController::process() {
-    static const unsigned long repeatFrequencyInteral = round(1.0 / kADCRepeatFrequency * 1000 * 1000); //Microsec
+    static const unsigned long repeatFrequencyInterval = round(1.0 / kADCRepeatFrequency * 1000 * 1000); //Microsec
     boost::posix_time::ptime repeatFrequencyLastTime;
 
     setRealtimePriority();
@@ -50,15 +50,19 @@ void ADCController::process() {
 
             uint32_t value;
             switch (nextState()) {
-            case EReadZone1Differential:
-            {
+            case EReadZone1Differential: {
                 boost::posix_time::ptime previousTime = repeatFrequencyLastTime;
                 repeatFrequencyLastTime = boost::posix_time::microsec_clock::local_time();
 
                 if (!previousTime.is_not_a_date_time())
                 {
-                    if ((repeatFrequencyLastTime - previousTime).total_microseconds() < repeatFrequencyInteral)
-                        usleep(repeatFrequencyInteral);
+                    unsigned long executionTime = (repeatFrequencyLastTime - previousTime).total_microseconds();
+
+                    if (executionTime < repeatFrequencyInterval) {
+                        usleep(repeatFrequencyInterval - executionTime);
+
+                        repeatFrequencyLastTime = boost::posix_time::microsec_clock::local_time();
+                    }
                     else
                         std::cout << "ADCController::process - ADC measurements could not be completed in scheduled time\n";
                 }
