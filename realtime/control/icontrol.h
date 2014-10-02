@@ -3,6 +3,7 @@
 
 #include <thread>
 #include <functional>
+#include <thread>
 
 class IControl
 {
@@ -22,6 +23,14 @@ public:
     }
 
     virtual void stop() = 0;
+
+    void setRealtimePriority()
+    {
+        sched_param params;
+        params.__sched_priority = sched_get_priority_max(SCHED_FIFO);
+
+        pthread_setschedparam(native_handle(), SCHED_FIFO, &params);
+    }
 
 protected:
     void process() = 0;

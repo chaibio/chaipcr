@@ -1,4 +1,5 @@
 #include <cassert>
+#include <boost/date_time.hpp>
 
 #include "pcrincludes.h"
 #include "ltc2444.h"
@@ -35,6 +36,11 @@ ADCController::~ADCController() {
 }
 
 void ADCController::process() {
+    static const unsigned long repeatFrequencyInteral = round(1.0 / kADCRepeatFrequency * 1000 * 1000); //Microsec
+    boost::posix_time::ptime repeatFrequencyLastTime;
+
+    setRealtimePriority();
+
     try
     {
         _workState = true;
@@ -45,8 +51,21 @@ void ADCController::process() {
             uint32_t value;
             switch (nextState()) {
             case EReadZone1Differential:
+            {
+                boost::posix_time::ptime previousTime = repeatFrequencyLastTime;
+                repeatFrequencyLastTime = boost::posix_time::microsec_clock::local_time();
+
+                if (!previousTime.is_not_a_date_time())
+                {
+                    if ((repeatFrequencyLastTime - previousTime).total_microseconds() < repeatFrequencyInteral)
+                        usleep(repeatFrequencyInteral);
+                    else
+                        std::cout << "ADCController::process - ADC measurements could not be completed in scheduled time\n";
+                }
+
                 value = _ltc2444->readDifferentialChannels(0, true, kThermistorOversamplingRate);
                 break;
+            }
             case EReadZone1Singular:
                 value = _ltc2444->readSingleEndedChannel(4, kThermistorOversamplingRate);
                 break;
