@@ -3,7 +3,6 @@ ChaiBioTech.app.Views = ChaiBioTech.app.Views || {};
 ChaiBioTech.app.Views.mainCanvas = null; // This could be used across application to fire
 
 ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
-  console.log(model);
   this.model = model;
   this.allStepViews = [];
   var that = this;

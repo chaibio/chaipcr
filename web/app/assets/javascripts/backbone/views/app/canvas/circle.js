@@ -203,7 +203,6 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     ChaiBioTech.app.selectedCircle = (starting) ? null : ChaiBioTech.app.selectedCircle;
     this.makeItBig();
     if(ChaiBioTech.app.selectedCircle) {
-      console.log("Wooooo", ChaiBioTech.app.selectedCircle);
       var previousSelected = ChaiBioTech.app.selectedCircle;
       if(previousSelected.uniqueName != this.uniqueName) {
         previousSelected.makeItSmall();
@@ -212,6 +211,8 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     } else {
       ChaiBioTech.app.selectedCircle = this;
     }
+    // When someting doesn't show up, check if u should renderAll(); -:)
+    this.canvas.renderAll();
   }
 
   return this;
