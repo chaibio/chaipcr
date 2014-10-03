@@ -24,10 +24,10 @@ const double kLidMaxTargetTemp = 130;
 const double kProgramStartLidTempThreshold = 2;
 
 //PID
-const int kPIDDerivativeGainLimiter = 15;
+const int kPIDDerivativeGainLimiter = 12;
 
 //ADC
-const int kADCRepeatFrequency = 35; // Hz
+const int kADCRepeatFrequency = 45; // Hz
 
 //thermistor & ADC params
 const unsigned int kLidThermistorVoltageDividerResistanceOhms = 33000;
@@ -58,11 +58,11 @@ const int kLedBlankPwmPeriodNs = 1000000;
 const int kLedBlankPwmDutyNs = 500000;
 
 //Optics
-const long kFluorescenceDataCollectionDelayTimeMs = 100;
+const long kFluorescenceDataCollectionDelayTimeMs = 70;
 const std::vector<int> kWellList = {4, 3, 2, 1, 16, 15, 14, 13, 5, 8, 7, 6, 11, 10, 9, 12};
 
 //Steps
-const double kPCRBeginStepTemperatureThreshold = 3;
+const double kPCRBeginStepTemperatureThreshold = 0.5;
 
 //Experiment Controller
 const long kTemperatureLoggerInterval = 1000;
