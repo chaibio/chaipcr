@@ -395,13 +395,25 @@
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part {
   height: 53px;
   width: 85px;
-  float: left;
+  float: right;
   line-height: 1.4;
   font-weight: bold;
   font-size: 48px;
   text-align: right;
 }
 /* line 384, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part .data-part-edit-value {
+  width: 85px;
+  height: 53px;
+  position: relative;
+  top: -65px;
+  display: none;
+  background-color: black;
+  color: white;
+  font-weight: bold;
+  border: none;
+}
+/* line 396, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .dots {
   float: left;
   width: 23px;
@@ -409,13 +421,13 @@
   padding-top: 28px;
   padding-left: 5px;
 }
-/* line 394, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 406, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .next {
   width: 71px;
   height: 60px;
   float: left;
 }
-/* line 399, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 411, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .next img {
   padding-right: 30px;
   padding-bottom: 31px;

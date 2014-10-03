@@ -20,8 +20,9 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   }
 
   this.getTop = function() {
-    var temperature = this.model.get("step").temperature;
+    var temperature = this.temperatureValue || this.model.get("step").temperature;
     this.top = this.scrollLength - (temperature * this.scrollRatio);
+    console.log("this is cool", this.top, temperature);
     // 300 is 240 + 60 that is height of step + padding from top, May be move this
     // to constants later;
   }
@@ -122,7 +123,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       this.circle.setFill("#ffb400");
     }
   }
-
+  // This could be moved to targetCircleGroup.
   this.manageDrag = function(targetCircleGroup) {
     // Limit the movement of the circle
     var top = targetCircleGroup.top,
@@ -199,6 +200,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     // Change temperature display as its circle is moved
     var dynamicTemp = Math.abs((100 - ((targetCircleGroup.top - this.scrollTop) / this.scrollRatio)).toFixed(1));
     this.temperature.text = ""+dynamicTemp+"º";
+    this.canvas.renderAll();
   }
 
   this.manageClick = function(starting) {

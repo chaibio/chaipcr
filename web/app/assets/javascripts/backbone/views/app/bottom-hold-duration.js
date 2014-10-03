@@ -17,6 +17,7 @@ ChaiBioTech.app.Views.bottomHoldDuration = Backbone.View.extend({
     var temp = step.model.get("step").hold_time;
     temp = Math.floor(temp/60) + ":" + temp % 60;
     this.dataPart.html(temp);
+    this.dataPartEdit.val(temp);
   },
 
   render: function() {
@@ -25,7 +26,8 @@ ChaiBioTech.app.Views.bottomHoldDuration = Backbone.View.extend({
       data: "0:30"
     }
     $(this.el).html(this.template(data));
-    this.dataPart =   $(this.el).find(".data-part");
+    this.dataPart =   $(this.el).find(".data-part-span");
+    this.dataPartEdit = $(this.el).find(".data-part-edit-value");
     return this;
   }
 });

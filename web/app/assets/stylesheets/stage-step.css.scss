@@ -375,11 +375,23 @@
 				.data-part {
 					height: 53px;
 					width: 85px;
-					float: left;
+					float: right;
 					line-height: 1.4;
 					font-weight: bold;
 					font-size: 48px;
 					text-align: right;
+
+					.data-part-edit-value {
+						width: 85px;
+						height: 53px;
+						position: relative;
+						top: -65px;
+						display: none;
+						background-color: black;
+						color: white;
+						font-weight: bold;
+						border: none;
+					}
 				}
 				.dots {
 					float: left;

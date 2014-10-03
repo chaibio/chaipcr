@@ -58,6 +58,8 @@ ChaiBioTech.Models.Step = Backbone.Model.extend({
       })
       .done(function(data) {
           console.log("Data updated from server woohaa" , data);
+          // Note -: we dont directly update step here, because the returned data doesn't have
+          // ramp object, so mostly we change fabric step object.
       })
       .fail(function() {
         console.log("Failed to update");

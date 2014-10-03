@@ -57,7 +57,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
         var temp;
         appRouter.editStageStep.trigger("stepDrag", me);
         temp = evt.target.me.temperature.text;
-        me.model.changeTemperature(parseInt(temp.substr(0, temp.length - 1)));
+        me.model.changeTemperature(parseFloat(temp.substr(0, temp.length - 1)));
       }
     }
   });
@@ -70,7 +70,16 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     that.addRampLinesAndCircles();
     that.selectStep();
     that.canvas.renderAll();
-  })
+  });
+  this.canvas.on("temperatureChangedFromBottom", function(changedStep) {
+    //Here is the change from bottom edit part with temperature change
+    changedStep.circle.getTop();
+    changedStep.circle.circleGroup.top = changedStep.circle.top;
+    changedStep.circle.manageDrag(changedStep.circle.circleGroup);
+    changedStep.circle.circleGroup.setCoords();
+    that.canvas.renderAll();
+  });
+
   this.setDefaultWidthHeight = function() {
     this.canvas.setHeight(420);
     var width = (this.allStepViews.length * 122 > 1024) ? this.allStepViews.length * 120 : 1024
