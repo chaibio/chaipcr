@@ -21,7 +21,3 @@ SinglePoleRecursiveFilter::SinglePoleRecursiveFilter(double cutoffFrequency):
     _b1 = exp(-2.0 * M_PI * cutoffFrequency);
     _a0 = 1.0 - _b1;
 }
-//------------------------------------------------------------------------------
-double SinglePoleRecursiveFilter::processSample(double sampleValue) {
-    return _z1 = sampleValue * _a0 + _z1 * _b1;
-}

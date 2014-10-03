@@ -1,4 +1,5 @@
 #include <cassert>
+#include <boost/date_time.hpp>
 
 #include "pcrincludes.h"
 #include "ltc2444.h"
@@ -35,6 +36,11 @@ ADCController::~ADCController() {
 }
 
 void ADCController::process() {
+    static const unsigned long repeatFrequencyInterval = round(1.0 / kADCRepeatFrequency * 1000 * 1000); //Microsec
+    boost::posix_time::ptime repeatFrequencyLastTime;
+
+    setRealtimePriority();
+
     try
     {
         _workState = true;
@@ -42,6 +48,26 @@ void ADCController::process() {
             if (_ltc2444->waitBusy())
                 continue;
 
+            //ensure ADC loop runs at regular interval without jitter
+            if (nextState()) {
+                boost::posix_time::ptime previousTime = repeatFrequencyLastTime;
+                repeatFrequencyLastTime = boost::posix_time::microsec_clock::local_time();
+
+                if (!previousTime.is_not_a_date_time())
+                {
+                    unsigned long executionTime = (repeatFrequencyLastTime - previousTime).total_microseconds();
+
+                    if (executionTime < repeatFrequencyInterval) {
+                        usleep(repeatFrequencyInterval - executionTime);
+
+                        repeatFrequencyLastTime = boost::posix_time::microsec_clock::local_time();
+                    }
+                    else
+                        std::cout << "ADCController::process - ADC measurements could not be completed in scheduled time\n";
+                }
+            }
+
+            //schedule conversion for next state, retrieve previous conversion value
             uint32_t value;
             switch (nextState()) {
             case EReadZone1Differential:
@@ -66,6 +92,7 @@ void ADCController::process() {
                 assert(false);
             }
 
+            //process previous conversion value
             switch (_currentConversionState) {
             case EReadZone1Differential:
             case EReadZone2Differential:

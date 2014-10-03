@@ -65,7 +65,6 @@ void PIDController::reset() {
     _previousExecutionTime = not_a_date_time;
     _lock.unlock();
 }
-
 //------------------------------------------------------------------------------
 const SPIDTuning& PIDController::determineGainSchedule(double setpoint) const {
     for (const SPIDTuning &item: _gainSchedule)

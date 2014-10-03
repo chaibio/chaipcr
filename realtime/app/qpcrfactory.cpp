@@ -43,7 +43,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
                                                                                     kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
                                                                                     kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient));
 
-    std::vector<SPIDTuning> heatBlockPIDSchedule = {{150, 0.12, 4.0, 0.1}};
+    std::vector<SPIDTuning> heatBlockPIDSchedule = {{150, 0.0374, 2.54, 0.381}};
     double derivativeFilterTimeConstant = heatBlockPIDSchedule.at(0).kDerivativeTimeS * kADCRepeatFrequency / kPIDDerivativeGainLimiter;
     SinglePoleRecursiveFilter processValueFilter(Filters::CutoffFrequencyForTimeConstant(derivativeFilterTimeConstant));
     PIDController *zone1CPIDController = new PIDController(heatBlockPIDSchedule, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax, processValueFilter);
@@ -92,7 +92,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatSink() {
 void QPCRFactory::setupMachine() {
     shared_ptr<HeatSink> heatSink = HeatSinkInstance::getInstance();
     if (heatSink) {
-        heatSink->setTargetTemperature(26);
+        heatSink->setTargetTemperature(kHeatSinkTargetTemperature);
         heatSink->setEnableMode(true);
     }
 }

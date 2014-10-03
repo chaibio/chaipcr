@@ -101,18 +101,35 @@ double HeatBlock::Ramp::computeTemperature(double currentTargetTemperature) {
     if (isEmpty())
         return 0.0;
 
-    boost::posix_time::time_duration pastTime = boost::posix_time::microsec_clock::local_time() - _lastChangesTime;
+    boost::posix_time::ptime previousTime = _lastChangesTime;
     _lastChangesTime = boost::posix_time::microsec_clock::local_time();
 
+    boost::posix_time::time_duration pastTime = _lastChangesTime - previousTime;
+
     if (pastTime.total_milliseconds() > 0) {
-        double temp = currentTargetTemperature + (_rate * (pastTime.total_milliseconds() / (double)1000 * 100) / 100);
+        if (currentTargetTemperature > _targetTemperature)
+        {
+            double temp = currentTargetTemperature - (_rate * (pastTime.total_milliseconds() / (double)1000 * 100) / 100);
 
-        if (temp < _targetTemperature)
-            return temp;
-        else {
-            clear();
+            if (temp <= _targetTemperature)
+            {
+                clear();
+                return _targetTemperature;
+            }
+            else
+                return temp;
+        }
+        else
+        {
+            double temp = currentTargetTemperature + (_rate * (pastTime.total_milliseconds() / (double)1000 * 100) / 100);
 
-            return _targetTemperature;
+            if (temp >= _targetTemperature)
+            {
+                clear();
+                return _targetTemperature;
+            }
+            else
+                return temp;
         }
     }
     else
