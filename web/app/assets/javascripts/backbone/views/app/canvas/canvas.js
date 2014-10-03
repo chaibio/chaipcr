@@ -55,7 +55,6 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
         var me = evt.target.me;
         var targetCircleGroup = evt.target;
         var temp;
-        me.manageDrag(targetCircleGroup);
         appRouter.editStageStep.trigger("stepDrag", me);
         temp = evt.target.me.temperature.text;
         me.model.changeTemperature(parseInt(temp.substr(0, temp.length - 1)));
