@@ -77,7 +77,6 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     changedStep.circle.circleGroup.top = changedStep.circle.top;
     changedStep.circle.manageDrag(changedStep.circle.circleGroup);
     changedStep.circle.circleGroup.setCoords();
-    that.canvas.renderAll();
   });
 
   this.setDefaultWidthHeight = function() {
@@ -106,11 +105,10 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
 
   this.selectStep = function() {
     this.allStepViews[0].circle.manageClick(true);
-    //this.allStepViews[0].parentStage.selectStage();
-    //this.allStepViews[0].selectStep();
     this.canvas.renderAll();
     appRouter.editStageStep.trigger("stepSelected", this.allStepViews[0]);
   }
+
   this.addStages = function() {
     var allStages = this.model.get("experiment").protocol.stages;
     var stage = {};

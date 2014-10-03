@@ -31,7 +31,9 @@ ChaiBioTech.app.Views.editStageStep = Backbone.View.extend({
   },
 
   pastePrevious: function() {
-    this.previousStep = new ChaiBioTech.app.Views.previousStep();
+    this.previousStep = new ChaiBioTech.app.Views.previousStep({
+      editStepStageClass: this
+    });
   },
 
   pasteMiddleContainer: function() {
@@ -41,7 +43,9 @@ ChaiBioTech.app.Views.editStageStep = Backbone.View.extend({
   },
 
   pasteNext: function() {
-    this.nextStep = new ChaiBioTech.app.Views.nextStep();
+    this.nextStep = new ChaiBioTech.app.Views.nextStep({
+      editStepStageClass: this
+    });
   },
 
   render: function() {

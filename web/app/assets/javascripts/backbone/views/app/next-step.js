@@ -13,15 +13,12 @@ ChaiBioTech.app.Views.nextStep = Backbone.View.extend({
   selectNext: function() {
     var selectStep = ChaiBioTech.app.selectedStep;
     if(selectStep.nextStep) {
-      selectStep.nextStep.parentStage.selectStage();
-      selectStep.nextStep.selectStep();
-      ChaiBioTech.app.Views.mainCanvas.renderAll();
+      selectStep.nextStep.circle.manageClick();
     } else if(selectStep.parentStage.nextStage) {
       var stage = selectStep.parentStage.nextStage;
-      stage.selectStage();
-      stage.childSteps[0].selectStep();
-      ChaiBioTech.app.Views.mainCanvas.renderAll();
+      stage.childSteps[0].circle.manageClick();
     }
+    this.options.editStepStageClass.trigger("stepSelected", ChaiBioTech.app.selectedStep);
   },
 
   initialize: function() {
