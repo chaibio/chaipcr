@@ -34,25 +34,26 @@ ChaiBioTech.app.Views.bottomTemperature = Backbone.View.extend({
   seeIfEnter: function(e) {
     if(e.keyCode === 13) {
       // Hiding this inturn fires blur event
+      this.dataPartEdit.blur();
       this.dataPartEdit.hide();
     }
   },
 
   saveDataAndHide: function(e) {
-      var newTemp = this.dataPartEdit.val();
-      this.dataPartEdit.hide();
-      if(isNaN(newTemp) || !newTemp || newTemp < 0 || newTemp > 100) {
-        var tempVal = this.dataPart.html()
-        this.dataPartEdit.val(parseFloat(tempVal.substr(0, tempVal.length - 1)));
-        alert("Please enter a valid value");
-      } else {
-        newTemp = parseFloat(newTemp).toFixed(1);
-        this.currentStep.model.changeTemperature(newTemp);
-        this.dataPart.html(newTemp + "º");
-        // Now fire it back to canvas
-        this.currentStep.circle.temperatureValue = newTemp;
-        ChaiBioTech.app.Views.mainCanvas.fire("temperatureChangedFromBottom", this.currentStep);
-      }
+    var newTemp = this.dataPartEdit.val();
+    this.dataPartEdit.hide();
+    if(isNaN(newTemp) || !newTemp || newTemp < 0 || newTemp > 100) {
+      var tempVal = this.dataPart.html()
+      this.dataPartEdit.val(parseFloat(tempVal.substr(0, tempVal.length - 1)));
+      alert("Please enter a valid value");
+    } else {
+      newTemp = parseFloat(newTemp).toFixed(1);
+      this.currentStep.model.changeTemperature(newTemp);
+      this.dataPart.html(newTemp + "º");
+      // Now fire it back to canvas
+      this.currentStep.circle.temperatureValue = newTemp;
+      ChaiBioTech.app.Views.mainCanvas.fire("temperatureChangedFromBottom", this.currentStep);
+    }
   },
 
   changeTemperature: function(temperature) {
