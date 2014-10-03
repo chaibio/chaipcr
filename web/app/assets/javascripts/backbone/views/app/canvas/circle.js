@@ -130,73 +130,77 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     var previousTop = 0;
     if(top < 60) {
       targetCircleGroup.setTop(60);
+      this.manageRampLineMovement(left, 60);
     } else if(top > 290) {
       targetCircleGroup.setTop(290);
+      this.manageRampLineMovement(left, 290);
     } else {
       // Move temperature display along with circle
       this.stepDataGroup.setTop(top + 55);
       // Now positioning the ramp lines
-      left = left;
-      top = top;
-
-      if(this.next) {
-          this.curve.path[0][1] = left;
-          this.curve.path[0][2] = top;
-          // Calculating the mid point of the line at the right side of the circle
-          // Remeber take the point which is static at the other side
-          var endPointX = this.curve.path[2][3],
-          endPointY = this.curve.path[2][4];
-
-
-          var midPointX = (left + endPointX) / 2,
-          midPointY = (top + endPointY) / 2;
-          previousTop  = midPointY;
-
-          this.curve.path[1][1] = (left + midPointX) / 2;
-          this.curve.path[1][2] = ((top + midPointY) / 2) + 10;
-
-          // Mid point
-          this.curve.path[1][3] = midPointX;
-          this.curve.path[1][4] = midPointY;
-
-          // We move the gather data Circle along with it [its next object's]
-          this.next.gatherDataGroup.setTop(midPointY);
-
-          // Controlling point for the next bent
-          this.curve.path[2][1] = (midPointX + endPointX) / 2;
-          this.curve.path[2][2] = ((midPointY + endPointY) / 2) - 15;
-      }
-
-      if(this.previous) {
-          previous = this.previous;
-          previous.curve.path[2][3] = left;
-          previous.curve.path[2][4] = top;
-          // Calculating the mid point of the line at the left side of the cycle
-          // Remeber take the point which is static at the other side
-          var endPointX = previous.curve.path[0][1],
-          endPointY = previous.curve.path[0][2];
-
-          var midPointX = (left + endPointX) / 2,
-          midPointY = (top + endPointY) / 2;
-
-          previous.curve.path[2][1] = (left + midPointX) / 2;
-          previous.curve.path[2][2] = ((top + midPointY) / 2 ) - 15;
-
-          // Mid point
-          previous.curve.path[1][3] = midPointX;
-          previous.curve.path[1][4] = midPointY;
-          // We move the gather data Circle along with it
-          // Please pay attention here we move gatherdta of this
-          this.gatherDataGroup.setTop(midPointY);
-
-          previous.curve.path[1][1] = (midPointX + endPointX) / 2;
-          previous.curve.path[1][2] = ((midPointY + endPointY) / 2) + 10;
-      }
-
-      // Change temperature display as its circle is moved
-      var dynamicTemp = Math.abs((100 - ((targetCircleGroup.top - this.scrollTop) / this.scrollRatio)).toFixed(1));
-      this.temperature.text = ""+dynamicTemp+"º";
+      //left = left;
+      //top = top;
+      this.manageRampLineMovement(left, top, targetCircleGroup);
     }
+  }
+  
+  this.manageRampLineMovement = function(left, top, targetCircleGroup) {
+    if(this.next) {
+        this.curve.path[0][1] = left;
+        this.curve.path[0][2] = top;
+        // Calculating the mid point of the line at the right side of the circle
+        // Remeber take the point which is static at the other side
+        var endPointX = this.curve.path[2][3],
+        endPointY = this.curve.path[2][4];
+
+
+        var midPointX = (left + endPointX) / 2,
+        midPointY = (top + endPointY) / 2;
+        previousTop  = midPointY;
+
+        this.curve.path[1][1] = (left + midPointX) / 2;
+        this.curve.path[1][2] = ((top + midPointY) / 2) + 10;
+
+        // Mid point
+        this.curve.path[1][3] = midPointX;
+        this.curve.path[1][4] = midPointY;
+
+        // We move the gather data Circle along with it [its next object's]
+        this.next.gatherDataGroup.setTop(midPointY);
+
+        // Controlling point for the next bent
+        this.curve.path[2][1] = (midPointX + endPointX) / 2;
+        this.curve.path[2][2] = ((midPointY + endPointY) / 2) - 15;
+    }
+
+    if(this.previous) {
+        previous = this.previous;
+        previous.curve.path[2][3] = left;
+        previous.curve.path[2][4] = top;
+        // Calculating the mid point of the line at the left side of the cycle
+        // Remeber take the point which is static at the other side
+        var endPointX = previous.curve.path[0][1],
+        endPointY = previous.curve.path[0][2];
+
+        var midPointX = (left + endPointX) / 2,
+        midPointY = (top + endPointY) / 2;
+
+        previous.curve.path[2][1] = (left + midPointX) / 2;
+        previous.curve.path[2][2] = ((top + midPointY) / 2 ) - 15;
+
+        // Mid point
+        previous.curve.path[1][3] = midPointX;
+        previous.curve.path[1][4] = midPointY;
+        // We move the gather data Circle along with it
+        // Please pay attention here we move gatherdta of this
+        this.gatherDataGroup.setTop(midPointY);
+
+        previous.curve.path[1][1] = (midPointX + endPointX) / 2;
+        previous.curve.path[1][2] = ((midPointY + endPointY) / 2) + 10;
+    }
+    // Change temperature display as its circle is moved
+    var dynamicTemp = Math.abs((100 - ((targetCircleGroup.top - this.scrollTop) / this.scrollRatio)).toFixed(1));
+    this.temperature.text = ""+dynamicTemp+"º";
   }
 
   this.manageClick = function(starting) {
