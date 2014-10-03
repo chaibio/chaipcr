@@ -130,20 +130,18 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     var previousTop = 0;
     if(top < 60) {
       targetCircleGroup.setTop(60);
-      this.manageRampLineMovement(left, 60);
+      this.manageRampLineMovement(left, 60, targetCircleGroup);
     } else if(top > 290) {
       targetCircleGroup.setTop(290);
-      this.manageRampLineMovement(left, 290);
+      this.manageRampLineMovement(left, 290, targetCircleGroup);
     } else {
       // Move temperature display along with circle
       this.stepDataGroup.setTop(top + 55);
       // Now positioning the ramp lines
-      //left = left;
-      //top = top;
       this.manageRampLineMovement(left, top, targetCircleGroup);
     }
   }
-  
+
   this.manageRampLineMovement = function(left, top, targetCircleGroup) {
     if(this.next) {
         this.curve.path[0][1] = left;
