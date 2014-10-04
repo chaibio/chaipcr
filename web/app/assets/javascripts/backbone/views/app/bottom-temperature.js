@@ -10,12 +10,12 @@ ChaiBioTech.app.Views.bottomTemperature = Backbone.View.extend({
     var that = this;
     // Works when step is clicked
     this.listenTo(this.options.editStepStageClass, "stepSelected", function(data) {
-      this.currentStep = data;
-      that.changeTemperature(data.circle.temperature.text)
+      that.currentStep = data;
+      that.changeTemperature(data.circle.temperature.text);
     });
     // Works when circle is dragged
     this.listenTo(this.options.editStepStageClass, "stepDrag", function(data) {
-      this.currentStep = data;
+      that.currentStep = data;
       that.changeTemperature(data.temperature.text);
     });
   },
@@ -35,7 +35,6 @@ ChaiBioTech.app.Views.bottomTemperature = Backbone.View.extend({
     if(e.keyCode === 13) {
       // Hiding this inturn fires blur event
       this.dataPartEdit.blur();
-      this.dataPartEdit.hide();
     }
   },
 

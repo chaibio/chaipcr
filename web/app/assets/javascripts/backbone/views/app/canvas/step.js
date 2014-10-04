@@ -12,7 +12,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
   this.previousStep = null;
   this.gatherDataDuringStep = this.model.get("step")["collect_data"];
   this.gatherDataDuringRamp = this.model.get("step").ramp["collect_data"];
-  
+
   this.setLeft = function() {
     this.left = this.parentStage.left + 1 + (parseInt(this.index) * this.myWidth);
   }
@@ -71,8 +71,18 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     this.uniqueName = name;
   }
 
+  this.showHideRamp = function() {
+    this.rampSpeedText.text = String(this.rampSpeedNumber + "º C/s");
+    if(this.rampSpeedNumber <= 0) {
+      this.rampSpeedGroup.setVisible(false);
+    } else {
+      this.rampSpeedGroup.setVisible(true);
+    }
+    this.canvas.renderAll();
+  }
+
   this.rampSpeed = function() {
-    this.rampSpeedNumber = parseFloat(this.model.get("step").ramp.rate);
+    this.rampSpeedNumber = this.rampSpeedNumber || parseFloat(this.model.get("step").ramp.rate);
     // Move this to different files
     this.rampSpeedText = new fabric.Text(String(this.rampSpeedNumber)+ "º C/s", {
       fill: 'black',
@@ -92,7 +102,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     this.rampSpeedGroup = new fabric.Group([this.rampSpeedText, this.underLine], {
       originX: 'center',
       originY: 'center',
-      selectable: true,
+      selectable: false,
       lockRotation: true,
       lockScalingX: true,
       lockScalingY: true,
