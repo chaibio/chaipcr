@@ -1,32 +1,28 @@
 #ifndef EXCEPTIONHANDLER_H
 #define EXCEPTIONHANDLER_H
 
-#ifndef RTLD_NEXT
-#define RTLD_NEXT ((void *) -1l)
-#endif
-
-#include <iostream>
 #include <cstdio>
 #include <dlfcn.h>
 #include <execinfo.h>
+
+#ifndef RTLD_NEXT
+#define RTLD_NEXT ((void *) -1l)
+#endif
 
 #define BACKTRACE_SIZE 16
 
 extern "C" {
 
-typedef void (*throwHandler)(void*,void*,void(*)(void*));
+typedef void (*ThrowHandler)(void*,void*,void(*)(void*));
 
 void __cxa_throw(void *exception, void *info, void (*destination)(void *)) {
     void *trace[BACKTRACE_SIZE];
     int size = backtrace(trace, BACKTRACE_SIZE);
 
-    std::cout << "Catched an exception. Backtrace:\n";
+    printf("Catched an exception. Backtrace:\n");
     backtrace_symbols_fd(trace, size, STDOUT_FILENO);
 
-    static throwHandler handler __attribute__ ((noreturn)) = nullptr;
-    if (!handler)
-        handler = (throwHandler)dlsym(RTLD_NEXT, "__cxa_throw");
-
+    static ThrowHandler handler __attribute__ ((noreturn)) = (ThrowHandler)dlsym(RTLD_NEXT, "__cxa_throw");
     handler(exception, info, destination);
 }
 

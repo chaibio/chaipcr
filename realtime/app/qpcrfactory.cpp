@@ -91,8 +91,14 @@ shared_ptr<IControl> QPCRFactory::constructHeatSink() {
 
 void QPCRFactory::setupMachine() {
     shared_ptr<HeatSink> heatSink = HeatSinkInstance::getInstance();
+    shared_ptr<ADCController> adcController = ADCControllerInstance::getInstance();
+    shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();
+
     if (heatSink) {
         heatSink->setTargetTemperature(kHeatSinkTargetTemperature);
         heatSink->setEnableMode(true);
     }
+
+    if (adcController && heatBlock)
+        adcController->loopStarted.connect(boost::bind(&HeatBlock::calculateTargetTemperature, heatBlock.get()));
 }

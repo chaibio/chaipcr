@@ -3,7 +3,7 @@
 
 #include "icontrol.h"
 
-#include <atomic>
+#include <mutex>
 #include <utility>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/signals2.hpp>
@@ -20,14 +20,14 @@ class HeatBlock : public IControl
         Ramp();
 
         void set(double targetTemperature, double rate);
-        inline void clear() { _rate.store(0.0); }
-        inline bool isEmpty() const { return _rate.load() == 0.0; }
+        inline void clear() { _rate = 0.0; }
+        inline bool isEmpty() const { return _rate == 0.0; }
 
         double computeTemperature(double currentTargetTemperature);
 
     private:
         double _targetTemperature;
-        std::atomic<double> _rate;
+        double _rate;
         boost::posix_time::ptime _lastChangesTime;
     };
 
@@ -36,10 +36,12 @@ public:
 	~HeatBlock();
 	
     void process();
+
     void setEnableMode(bool enableMode);
-    inline void enableStepProcessing() { _stepProcessingState = true; }
+    void enableStepProcessing();
 
     void setTargetTemperature(double targetTemperature, double rampRate = 0);
+    void calculateTargetTemperature();
     double zone1Temperature() const;
     double zone2Temperature() const;
 
@@ -55,9 +57,11 @@ private:
     std::pair<HeatBlockZoneController*, HeatBlockZoneController*> _zones;
 
     double _beginStepTemperatureThreshold;
-    std::atomic<bool> _stepProcessingState;
 
-    HeatBlock::Ramp ramp;
+    bool _stepProcessingState;
+    std::mutex _stepProcessingMutex;
+
+    HeatBlock::Ramp _ramp;
 };
 
 #endif

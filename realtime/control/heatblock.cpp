@@ -19,43 +19,64 @@ HeatBlock::~HeatBlock() {
 }
 
 void HeatBlock::process() {
+    bool begunStep = false;
+
     _zones.first->process();
     _zones.second->process();
 
-    if (_stepProcessingState)
-    {
-        if (ramp.isEmpty()) {
+    _stepProcessingMutex.lock(); {
+        if (_stepProcessingState && _ramp.isEmpty()) {
             if (_beginStepTemperatureThreshold > maxTemperatureSetpointDelta()) {
                 _stepProcessingState = false;
-                stepBegun();
+                begunStep = true;
             }
         }
-        else {
-            double temp = ramp.computeTemperature(_zones.first->targetTemperature());
+    }
+    _stepProcessingMutex.unlock();
+
+    if (begunStep)
+        stepBegun();
+}
+
+void HeatBlock::setEnableMode(bool enableMode) {
+    if (!enableMode) {
+        _stepProcessingMutex.lock();
+        _stepProcessingState = false;
+        _stepProcessingMutex.unlock();
+    }
+
+    _zones.first->setEnableMode(enableMode);
+    _zones.second->setEnableMode(enableMode);
+}
+
+void HeatBlock::enableStepProcessing() {
+    _stepProcessingMutex.lock();
+    _stepProcessingState = true;
+    _stepProcessingMutex.unlock();
+}
+
+void HeatBlock::setTargetTemperature(double targetTemperature, double rampRate) {
+    _stepProcessingMutex.lock(); {
+        if (rampRate == 0) {
+            _zones.first->setTargetTemperature(targetTemperature);
+            _zones.second->setTargetTemperature(targetTemperature);
+        }
+        else
+            _ramp.set(targetTemperature, rampRate);
+    }
+    _stepProcessingMutex.unlock();
+}
+
+void HeatBlock::calculateTargetTemperature() {
+    _stepProcessingMutex.lock(); {
+        if (_stepProcessingState && !_ramp.isEmpty()) {
+            double temp = _ramp.computeTemperature(_zones.first->targetTemperature());
 
             _zones.first->setTargetTemperature(temp);
             _zones.second->setTargetTemperature(temp);
         }
     }
-}
-
-void HeatBlock::setEnableMode(bool enableMode) {
-    _zones.first->setEnableMode(enableMode);
-    _zones.second->setEnableMode(enableMode);
-
-    if (!enableMode)
-        _stepProcessingState = false;
-}
-
-void HeatBlock::setTargetTemperature(double targetTemperature, double rampRate) {
-    ramp.clear();
-
-    if (rampRate == 0) {
-        _zones.first->setTargetTemperature(targetTemperature);
-        _zones.second->setTargetTemperature(targetTemperature);
-    }
-    else
-        ramp.set(targetTemperature, rampRate);
+    _stepProcessingMutex.unlock();
 }
 
 double HeatBlock::zone1Temperature() const {
@@ -92,9 +113,11 @@ HeatBlock::Ramp::Ramp() {
 }
 
 void HeatBlock::Ramp::set(double targetTemperature, double rate) {
+    clear();
+
     _targetTemperature = targetTemperature;
+    _rate = rate;
     _lastChangesTime = boost::posix_time::microsec_clock::local_time();
-    _rate.store(rate);
 }
 
 double HeatBlock::Ramp::computeTemperature(double currentTargetTemperature) {
@@ -107,24 +130,20 @@ double HeatBlock::Ramp::computeTemperature(double currentTargetTemperature) {
     boost::posix_time::time_duration pastTime = _lastChangesTime - previousTime;
 
     if (pastTime.total_milliseconds() > 0) {
-        if (currentTargetTemperature > _targetTemperature)
-        {
+        if (currentTargetTemperature > _targetTemperature) {
             double temp = currentTargetTemperature - (_rate * (pastTime.total_milliseconds() / (double)1000 * 100) / 100);
 
-            if (temp <= _targetTemperature)
-            {
+            if (temp <= _targetTemperature) {
                 clear();
                 return _targetTemperature;
             }
             else
                 return temp;
         }
-        else
-        {
+        else {
             double temp = currentTargetTemperature + (_rate * (pastTime.total_milliseconds() / (double)1000 * 100) / 100);
 
-            if (temp >= _targetTemperature)
-            {
+            if (temp >= _targetTemperature) {
                 clear();
                 return _targetTemperature;
             }
