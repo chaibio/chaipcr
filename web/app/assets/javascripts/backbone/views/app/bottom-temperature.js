@@ -42,7 +42,7 @@ ChaiBioTech.app.Views.bottomTemperature = Backbone.View.extend({
     var newTemp = this.dataPartEdit.val();
     this.dataPartEdit.hide();
     if(isNaN(newTemp) || !newTemp || newTemp < 0 || newTemp > 100) {
-      var tempVal = this.dataPart.html()
+      var tempVal = this.dataPart.html();
       this.dataPartEdit.val(parseFloat(tempVal.substr(0, tempVal.length - 1)));
       alert("Please enter a valid value");
     } else {

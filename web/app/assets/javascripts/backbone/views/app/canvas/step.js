@@ -12,6 +12,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
   this.previousStep = null;
   this.gatherDataDuringStep = this.model.get("step")["collect_data"];
   this.gatherDataDuringRamp = this.model.get("step").ramp["collect_data"];
+  this.holdDuration = null;
 
   this.setLeft = function() {
     this.left = this.parentStage.left + 1 + (parseInt(this.index) * this.myWidth);

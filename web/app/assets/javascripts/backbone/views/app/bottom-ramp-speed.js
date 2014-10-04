@@ -13,10 +13,6 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
       that.currentStep = data;
       that.changeRampSpeed();
     });
-    // Works when circle is dragged
-    this.listenTo(this.options.editStepStageClass, "stepDrag", function(data) {
-      that.currentStep = data;
-    });
   },
 
   events: {
@@ -34,7 +30,7 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
     var newRampSpeed = this.dataPartEdit.val();
     this.dataPartEdit.hide();
     if(isNaN(newRampSpeed) || !newRampSpeed || newRampSpeed < 0 || newRampSpeed > 100) {
-      var tempVal = this.dataPart.html()
+      var tempVal = this.dataPart.html();
       this.dataPartEdit.val(tempVal);
       alert("Please enter a valid value");
     } else {
@@ -42,7 +38,7 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
       this.currentStep.model.changeRampSpeed(newRampSpeed);
       var display = (newRampSpeed === 0) ? "MAX" : newRampSpeed;
       this.dataPart.html(display);
-      // Now fire it back to canvas
+      // Now fires it back to canvas
       this.currentStep.rampSpeedNumber = newRampSpeed;
       ChaiBioTech.app.Views.mainCanvas.fire("rampSpeedChangedFromBottom", this.currentStep);
     }

@@ -22,7 +22,6 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   this.getTop = function() {
     var temperature = this.temperatureValue || this.model.get("step").temperature;
     this.top = this.scrollLength - (temperature * this.scrollRatio);
-    console.log("this is cool", this.top, temperature);
     // 300 is 240 + 60 that is height of step + padding from top, May be move this
     // to constants later;
   }
