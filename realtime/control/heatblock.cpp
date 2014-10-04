@@ -7,9 +7,10 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class HeatBlock
-HeatBlock::HeatBlock(HeatBlockZoneController* zone1, HeatBlockZoneController* zone2, double beginStepTemperatureThreshold) {
+HeatBlock::HeatBlock(HeatBlockZoneController* zone1, HeatBlockZoneController* zone2, double beginStepTemperatureThreshold, double maxRampSpeed) {
     _zones = make_pair(zone1, zone2);
     _beginStepTemperatureThreshold = beginStepTemperatureThreshold;
+    _maxRampSpeed = maxRampSpeed;
     _stepProcessingState = false;
 }
 
@@ -56,14 +57,11 @@ void HeatBlock::enableStepProcessing() {
 }
 
 void HeatBlock::setTargetTemperature(double targetTemperature, double rampRate) {
-    _stepProcessingMutex.lock(); {
-        if (rampRate == 0) {
-            _zones.first->setTargetTemperature(targetTemperature);
-            _zones.second->setTargetTemperature(targetTemperature);
-        }
-        else
-            _ramp.set(targetTemperature, rampRate);
-    }
+    if (rampRate <= 0 || rampRate > _maxRampSpeed)
+        rampRate = _maxRampSpeed;
+
+    _stepProcessingMutex.lock();
+    _ramp.set(targetTemperature, rampRate);
     _stepProcessingMutex.unlock();
 }
 
@@ -122,7 +120,7 @@ void HeatBlock::Ramp::set(double targetTemperature, double rate) {
 
 double HeatBlock::Ramp::computeTemperature(double currentTargetTemperature) {
     if (isEmpty())
-        return 0.0;
+        return _targetTemperature;
 
     boost::posix_time::ptime previousTime = _lastChangesTime;
     _lastChangesTime = boost::posix_time::microsec_clock::local_time();

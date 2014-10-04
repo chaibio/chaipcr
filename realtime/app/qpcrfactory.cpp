@@ -63,7 +63,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
     consumers.push_back(zone1Thermistor);
     consumers.push_back(zone2Thermistor);
 
-    return HeatBlockInstance::createInstance(zone1, zone2, kPCRBeginStepTemperatureThreshold);
+    return HeatBlockInstance::createInstance(zone1, zone2, kPCRBeginStepTemperatureThreshold, kMaxHeatBlockRampSpeed);
 }
 
 shared_ptr<IControl> QPCRFactory::constructLid(shared_ptr<ADCConsumer> &consumer) {

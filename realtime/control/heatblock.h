@@ -32,7 +32,7 @@ class HeatBlock : public IControl
     };
 
 public:
-    HeatBlock(HeatBlockZoneController* zone1, HeatBlockZoneController* zone2, double beginStepTemperatureThreshold);
+    HeatBlock(HeatBlockZoneController* zone1, HeatBlockZoneController* zone2, double beginStepTemperatureThreshold, double maxRampSpeed);
 	~HeatBlock();
 	
     void process();
@@ -57,6 +57,7 @@ private:
     std::pair<HeatBlockZoneController*, HeatBlockZoneController*> _zones;
 
     double _beginStepTemperatureThreshold;
+    double _maxRampSpeed;
 
     bool _stepProcessingState;
     std::mutex _stepProcessingMutex;
