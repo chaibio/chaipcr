@@ -47,11 +47,12 @@ ChaiBioTech.app.Views.bottomHoldDuration = Backbone.View.extend({
       this.currentStep.model.changeHoldDuration(newHoldDuration);
       var display = Math.floor(newHoldDuration/60) + ":" + newHoldDuration % 60;;
       this.dataPart.html(display);
-      // Now fire it back to canvas
+      // Now fire it back to canvas :) not here though we just update step variables
+      // May be move these things to step.js
       this.lastDuration = newHoldDuration;
       this.currentStep.holdDuration = newHoldDuration;
       // Fire this if you want something to do in canvas.
-      //ChaiBioTech.app.Views.mainCanvas.fire("holdTimeChangedFromBottom", this.currentStep);
+      // ChaiBioTech.app.Views.mainCanvas.fire("holdTimeChangedFromBottom", this.currentStep);
     }
   },
 

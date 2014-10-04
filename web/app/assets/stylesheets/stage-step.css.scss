@@ -109,6 +109,16 @@
 					margin-top: 26px;
 					padding-top: 7px;
 					margin-left: 10px;
+
+					.edit-step-name {
+						width: 267px;
+						position: relative;
+						top: -46px;
+						border: none;
+						background-color: black;
+						color: white;
+						display: none;
+					}
 				}
 				.bottom-stage-name {
 					width: 90px;

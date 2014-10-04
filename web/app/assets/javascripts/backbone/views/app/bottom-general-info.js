@@ -6,11 +6,14 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
 
   gatherData: false,
 
+  currentStep: null,
+
   template: JST["backbone/templates/app/bottom-general-info"],
 
   initialize: function() {
     var that  = this;
     this.listenTo(this.options.editStepStageClass, "stepSelected", function(data) {
+      that.currentStep = data;
       that.changeInfo(data)
     });
 
@@ -20,7 +23,34 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
   events: {
     "click #gather-data-button": "showGatherDataPopUp",
     "click #during-step": "enableDuringStep",
-    "click #after-step": "enableDuringRamp"
+    "click #after-step": "enableDuringRamp",
+    "click .bottom-name-of-step-stage": "showStepNameEdit",
+    "keydown .bottom-name-of-step-stage": "editStepNameEnter",
+    "blur .bottom-name-of-step-stage": "saveAndHideStepName"
+  },
+
+  showStepNameEdit: function() {
+    this.editStepName.show();
+    this.editStepName.focus();
+  },
+
+  editStepNameEnter: function(e) {
+    if(e.keyCode === 13) {
+      this.editStepName.blur();
+    }
+  },
+
+  saveAndHideStepName: function() {
+    var newStepName = this.editStepName.val();
+    this.editStepName.hide();
+    if(newStepName) {
+      console.log(this.currentStep);
+      this.currentStep.model.saveName(newStepName);
+      this.nameOfStepStage.html(newStepName);
+    } else {
+      this.editStepName.val(this.nameOfStepStage.html());
+      alert("Please input some value");
+    }
   },
 
   enableDuringStep: function() {
@@ -89,7 +119,8 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
     temp = step.parentStage.parent.allStepViews.length;
     temp = (temp < 10)? "0" + temp : temp;
     this.noOfStages.html("/" + temp);
-    this.nameOfStepStage.html(step.stepName.text + "/"+ step.parentStage.stageName.text);
+    this.nameOfStepStage.html(step.stepName.text);
+    this.editStepName.val(step.stepName.text);
     this.smallStageName.html(step.parentStage.stageName.text);
     this.numOfCycles.html(step.parentStage.model.get("stage").num_cycles);
     this.manageTikImage();
@@ -100,7 +131,7 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
     $(this.el).html(this.template());
     this.StepNo = $(this.el).find(".bottom-step-no");
     this.noOfStages = $(this.el).find(".bottom-no-of-stages");
-    this.nameOfStepStage = $(this.el).find(".bottom-name-of-step-stage");
+    this.nameOfStepStage = $(this.el).find(".bottom-name-of-step-span");
     this.smallStageName = $(this.el).find(".bottom-stage-name");
     this.numOfCycles = $(this.el).find(".bottom-step-no-cycle");
     this.popUp = $(this.el).find('.lol-pop');
@@ -109,6 +140,7 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
     this.gatherDataButton = $(this.el).find('#gather-data-button');
     this.gatherDataButtonImage = $(this.el).find('.gather-data-button-image');
     this.gatherDataButtonText = $(this.el).find('.gather-data-button-text');
+    this.editStepName = $(this.el).find('.edit-step-name');
     return this;
   }
 });
