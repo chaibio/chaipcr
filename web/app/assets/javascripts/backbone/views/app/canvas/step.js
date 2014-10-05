@@ -36,6 +36,11 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     });
   }
 
+  this.updateStepName = function() {
+    this.stepName.text = (this.updatedStepName).toUpperCase();
+    this.canvas.renderAll();
+  }
+
   this.addBorderRight = function() {
     this.borderRight = new fabric.Line([0, 0, 0, 342], {
       stroke: '#ff9f00',

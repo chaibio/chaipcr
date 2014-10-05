@@ -150,4 +150,5 @@ ChaiBioTech.Models.Step = Backbone.Model.extend({
         console.log("Failed to update");
       });
   }
+
 });

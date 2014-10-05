@@ -109,6 +109,7 @@
 					margin-top: 26px;
 					padding-top: 7px;
 					margin-left: 10px;
+					text-align: center;
 
 					.edit-step-name {
 						width: 267px;
@@ -118,6 +119,7 @@
 						background-color: black;
 						color: white;
 						display: none;
+						text-align: center;
 					}
 				}
 				.bottom-stage-name {
@@ -138,6 +140,17 @@
 					float: left;
 					margin-left:2px;
 					text-align: right;
+					.bottom-step-no-cycle-edit {
+						width: 44px;
+						position: relative;
+						background-color: black;
+						color: white;
+						text-align: right;
+						top: -46px;
+						height: 58px;
+						border: none;
+						display: none;
+					}
 				}
 				.bottom-step-x {
 					float: left;
