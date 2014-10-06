@@ -29,7 +29,12 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
     "blur .bottom-name-of-step-stage": "saveAndHideStepName",
     "click .bottom-step-no-cycle": "editNoOfCycle",
     "keydown .bottom-step-no-cycle": "editNoOfCyclesEnter",
-    "blur .bottom-step-no-cycle": "saveAndHideCycle"
+    "blur .bottom-step-no-cycle": "saveAndHideCycle",
+    "click #delta-button": "autoDelta"
+  },
+
+  autoDelta: function() {
+    alert("sa")
   },
 
   showStepNameEdit: function() {
