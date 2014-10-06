@@ -50,7 +50,7 @@ void ADCController::process() {
             ADCState state = nextState();
 
             //ensure ADC loop runs at regular interval without jitter
-            if (state) {
+            if (state == 0) {
                 boost::posix_time::ptime previousTime = repeatFrequencyLastTime;
                 repeatFrequencyLastTime = boost::posix_time::microsec_clock::local_time();
 
