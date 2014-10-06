@@ -67,7 +67,7 @@ void HeatBlock::setTargetTemperature(double targetTemperature, double rampRate) 
 
 void HeatBlock::calculateTargetTemperature() {
     _stepProcessingMutex.lock(); {
-        if (_stepProcessingState && !_ramp.isEmpty()) {
+        if (!_ramp.isEmpty()) {
             double temp = _ramp.computeTemperature(_zones.first->targetTemperature());
 
             _zones.first->setTargetTemperature(temp);

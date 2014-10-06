@@ -23,7 +23,7 @@ ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsu
     _workState = false;
 
     _ltc2444 = new LTC2444(csPinNumber, std::move(spiPort), busyPinNumber);
-    _ltc2444->readSingleEndedChannel(0, kThermistorOversamplingRate); //start first read
+    _ltc2444->readDifferentialChannels(0, true, kThermistorOversamplingRate); //start first read
 }
 
 ADCController::~ADCController() {
