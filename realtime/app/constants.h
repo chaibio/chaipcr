@@ -50,6 +50,8 @@ const double kHeatBlockZonesPIDMax = 1;
 const double kHeatBlockZonesMinTargetTemp = -10;
 const double kHeatBlockZonesMaxTargetTemp = 105;
 
+const double kMaxHeatBlockRampSpeed = 5.0;
+
 //LED constants
 const int kMinLEDCurrent = 5; //mA
 const int kDefaultLEDCurrent = 60; //mA

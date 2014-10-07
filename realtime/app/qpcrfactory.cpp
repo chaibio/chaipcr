@@ -63,7 +63,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
     consumers.push_back(zone1Thermistor);
     consumers.push_back(zone2Thermistor);
 
-    return HeatBlockInstance::createInstance(zone1, zone2, kPCRBeginStepTemperatureThreshold);
+    return HeatBlockInstance::createInstance(zone1, zone2, kPCRBeginStepTemperatureThreshold, kMaxHeatBlockRampSpeed);
 }
 
 shared_ptr<IControl> QPCRFactory::constructLid(shared_ptr<ADCConsumer> &consumer) {
@@ -91,8 +91,14 @@ shared_ptr<IControl> QPCRFactory::constructHeatSink() {
 
 void QPCRFactory::setupMachine() {
     shared_ptr<HeatSink> heatSink = HeatSinkInstance::getInstance();
+    shared_ptr<ADCController> adcController = ADCControllerInstance::getInstance();
+    shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();
+
     if (heatSink) {
         heatSink->setTargetTemperature(kHeatSinkTargetTemperature);
         heatSink->setEnableMode(true);
     }
+
+    if (adcController && heatBlock)
+        adcController->loopStarted.connect(boost::bind(&HeatBlock::calculateTargetTemperature, heatBlock.get()));
 }

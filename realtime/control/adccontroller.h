@@ -8,6 +8,7 @@
 #include <vector>
 #include <memory>
 #include <atomic>
+#include <boost/signals2.hpp>
 
 class LTC2444;
 class ADCConsumer;
@@ -32,6 +33,8 @@ public:
 	
     void process();
     void stop();
+
+    boost::signals2::signal<void()> loopStarted;
 
 private:
     ADCState nextState() const;

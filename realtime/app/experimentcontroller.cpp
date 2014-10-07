@@ -78,7 +78,7 @@ void ExperimentController::run()
     if (!_machineState.compare_exchange_strong(state, Running))
         return;
 
-    HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->currentStep()->temperature());
+    HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->currentStep()->temperature(), _experiment->protocol()->currentRamp() ? _experiment->protocol()->currentRamp()->rate() : 0);
     HeatBlockInstance::getInstance()->enableStepProcessing();
 
     HeatBlockInstance::getInstance()->setEnableMode(true);

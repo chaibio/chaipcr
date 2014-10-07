@@ -13,6 +13,7 @@ TemperatureController::TemperatureController(std::shared_ptr<Thermistor> thermis
     _pidResult = 0;
     _minTargetTemp = minTargetTemp;
     _maxTargetTemp = maxTargetTemp;
+    _targetTemperature = _minTargetTemp - 1;
 
     _thermistor->temperatureChanged.connect(boost::bind(&TemperatureController::computePid, this, _1));
 }
@@ -70,6 +71,9 @@ void TemperatureController::process()
 
 void TemperatureController::computePid(double currentTemperature)
 {
+    if (_targetTemperature < _minTargetTemp)
+        _targetTemperature = currentTemperature;
+
     _pidMutex.lock();
     {
         if (_pidState)
