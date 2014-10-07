@@ -34,7 +34,7 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
       this.dataPartEdit.val(tempVal);
       alert("Please enter a valid value");
     } else {
-      newRampSpeed = parseInt(newRampSpeed);
+      newRampSpeed = parseFloat(newRampSpeed);
       this.currentStep.model.changeRampSpeed(newRampSpeed);
       var display = (newRampSpeed === 0) ? "MAX" : newRampSpeed;
       this.dataPart.html(display);
@@ -56,7 +56,7 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
       this.dataPartEdit.val(0)
     } else {
       this.dataPart.html(this.currentStep.rampSpeedNumber);
-      this.dataPartEdit.val(parseInt(this.currentStep.rampSpeedNumber));
+      this.dataPartEdit.val(parseFloat(this.currentStep.rampSpeedNumber));
     }
   },
 
