@@ -34,7 +34,7 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
   },
 
   autoDelta: function() {
-    alert("sa")
+    console.log("Coming Soon .. !");
   },
 
   showStepNameEdit: function() {

@@ -18,12 +18,13 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
       data: "2.0º"
     }
     $(this.el).html(this.template(data));
+    // Disabling for now
     $(this.el).addClass("disabled");
     $(this.el).find(".caption-part").append(this.capsuleTemplate());
-    $(this.el).find(".ball-cover").draggable({
-      containment: "parent",
-      axis: "x",
+    this.draggable = new ChaiBioTech.app.Views.draggable({
+      element: $(this.el).find(".ball-cover")
     });
+
     return this;
   }
 });
