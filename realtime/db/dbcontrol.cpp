@@ -9,11 +9,61 @@ DBControl::DBControl()
 
     _session = new soci::session(soci::sqlite3, DATABASE_FILE);
     *_session << "PRAGMA temp_store = MEMORY";
+    *_session << "PRAGMA synchronous = NORMAL";
+
+    start();
 }
 
 DBControl::~DBControl()
 {
+    stop();
+
+    if (joinable())
+        join();
+
     delete _session;
+}
+
+void DBControl::process()
+{
+    soci::session session(soci::sqlite3, DATABASE_FILE);
+    session << "PRAGMA temp_store = MEMORY";
+    session << "PRAGMA synchronous = NORMAL";
+
+    std::vector<std::string> queries;
+
+    _writeThreadState = true;
+    while (_writeThreadState)
+    {
+        try
+        {
+            {
+                std::unique_lock<std::mutex> lock(_writeMutex);
+                _writeCondition.wait(lock);
+
+                queries = std::move(_writeQueriesQueue);
+            }
+
+            session.begin();
+            {
+                for (const std::string &query: queries)
+                    session << query;
+            }
+            session.commit();
+
+            queries.clear();
+        }
+        catch (const std::exception &ex)
+        {
+            std::cout << "DBControl::process::exception - " << ex.what() << '\n';
+        }
+    }
+}
+
+void DBControl::stop()
+{
+    _writeThreadState = false;
+    _writeCondition.notify_all();
 }
 
 Experiment* DBControl::getExperiment(int id)
@@ -208,81 +258,53 @@ void DBControl::completeExperiment(Experiment *experiment)
     _dbMutex.unlock();
 }
 
-void DBControl::addTemperatureLog(const TemperatureLog &log)
+void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
 {
-    _dbMutex.lock();
-    {
-        _session->begin();
+    std::vector<std::string> queries;
+    std::stringstream stream;
 
+    for (const TemperatureLog &log: logs)
+    {
         if (log.hasTemperatureInfo())
         {
-            *_session << "INSERT INTO temperature_logs(experiment_id, elapsed_time, lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp) VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_temp, :heat_block_zone_2_temp)",
-                    soci::use(log.experimentId()), soci::use(log.elapsedTime()),
-                    soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
-                    soci::use(std::round(log.heatBlockZone1Temperature() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Temperature() * 100.0) / 100.0);
+            stream << "INSERT INTO temperature_logs(experiment_id, elapsed_time, lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp) VALUES("
+                      << log.experimentId() << ", " << log.elapsedTime() << ", " << (std::round(log.lidTemperature() * 100.0) / 100.0) << ", "
+                      << (std::round(log.heatBlockZone1Temperature() * 100.0) / 100.0) << ", " << (std::round(log.heatBlockZone2Temperature() * 100.0) / 100.0) << ")";
+
+            queries.emplace_back(std::move(stream.str()));
+            stream.str("");
         }
 
         if (log.hasDebugInfo())
         {
-            *_session << "INSERT INTO temperature_debug_logs VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_drive, :heat_block_zone_2_drive)",
-                    soci::use(log.experimentId()), soci::use(log.elapsedTime()),
-                    soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
-                    soci::use(std::round(log.heatBlockZone1Drive() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Drive() * 100.0) / 100.0);
+            stream << "INSERT INTO temperature_debug_logs(experiment_id, elapsed_time, lid_drive, heat_block_zone_1_drive, heat_block_zone_2_drive) VALUES("
+                   << log.experimentId() << ", " << log.elapsedTime() << ", " << (std::round(log.lidTemperature() * 100.0) / 100.0) << ", "
+                   << (std::round(log.heatBlockZone1Drive() * 100.0) / 100.0) << ", " << (std::round(log.heatBlockZone2Drive() * 100.0) / 100.0) << ")";
+
+            queries.emplace_back(std::move(stream.str()));
+            stream.str("");
         }
-
-        _session->commit();
     }
-    _dbMutex.unlock();
-}
 
-void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
-{
-    if (logs.empty())
-        return;
-
-    _dbMutex.lock();
-    {
-        _session->begin();
-
-        for (const TemperatureLog &log: logs)
-        {
-            if (log.hasTemperatureInfo())
-            {
-                *_session << "INSERT INTO temperature_logs(experiment_id, elapsed_time, lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp) VALUES(:experiment_id, :elapsed_time, :lid_temp, :heat_block_zone_1_temp, :heat_block_zone_2_temp)",
-                        soci::use(log.experimentId()), soci::use(log.elapsedTime()),
-                        soci::use(std::round(log.lidTemperature() * 100.0) / 100.0),
-                        soci::use(std::round(log.heatBlockZone1Temperature() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Temperature() * 100.0) / 100.0);
-            }
-
-            if (log.hasDebugInfo())
-            {
-                *_session << "INSERT INTO temperature_debug_logs VALUES(:experiment_id, :elapsed_time, :lid_drive, :heat_block_zone_1_drive, :heat_block_zone_2_drive)",
-                        soci::use(log.experimentId()), soci::use(log.elapsedTime()),
-                        soci::use(std::round(log.lidDrive() * 100.0) / 100.0),
-                        soci::use(std::round(log.heatBlockZone1Drive() * 100.0) / 100.0), soci::use(std::round(log.heatBlockZone2Drive() * 100.0) / 100.0);
-            }
-        }
-
-        _session->commit();
-    }
-    _dbMutex.unlock();
+    addWriteQueries(queries);
 }
 
 void DBControl::addFluorescenceData(const Experiment *experiment, const std::vector<int> &fluorescenceData)
 {
-    _dbMutex.lock();
+    std::vector<std::string> queries;
+    std::stringstream stream;
+
+
+    for (size_t i = 0; i < fluorescenceData.size(); ++i)
     {
-        _session->begin();
+        stream << "INSERT INTO fluorescence_data(experiment_id, step_id, fluorescence_value, well_num, cycle_num) VALUES(" << experiment->id() << ", "
+               << experiment->protocol()->currentStep()->id() << ", " << fluorescenceData.at(i) << ", " << i << ", " << experiment->protocol()->currentStage()->currentCycle() << ")";
 
-        for (size_t i = 0; i < fluorescenceData.size(); ++i)
-        {
-            *_session << "INSERT INTO fluorescence_data(experiment_id, step_id, fluorescence_value, well_num, cycle_num) VALUES(:experiment_id, :step_id, :fluorescence_value, :well_num, :cycle_num)",
-                    soci::use(experiment->id()), soci::use(experiment->protocol()->currentStep()->id()), soci::use(fluorescenceData.at(i)), soci::use(i), soci::use(experiment->protocol()->currentStage()->currentCycle());
-        }
-
-        _session->commit();
+        queries.emplace_back(std::move(stream.str()));
+        stream.str("");
     }
-    _dbMutex.unlock();
+
+    addWriteQueries(queries);
 }
 
 Settings* DBControl::getSettings()
@@ -320,3 +342,15 @@ std::vector<int> DBControl::getEperimentIdList()
     return idList;
 }
 #endif
+
+void DBControl::addWriteQueries(std::vector<std::string> &queries)
+{
+    if (!queries.empty())
+    {
+        _writeMutex.lock();
+        _writeQueriesQueue.insert(_writeQueriesQueue.end(), std::make_move_iterator(queries.begin()), std::make_move_iterator(queries.end()));
+        _writeMutex.unlock();
+
+        _writeCondition.notify_all();
+    }
+}

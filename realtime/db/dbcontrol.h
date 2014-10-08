@@ -1,12 +1,17 @@
 #ifndef DBCONTROL_H
 #define DBCONTROL_H
 
+#include "icontrol.h"
+
 #include <vector>
 #include <mutex>
+#include <condition_variable>
+#include <atomic>
 
 namespace soci
 {
 class session;
+class statement;
 }
 
 class Experiment;
@@ -19,7 +24,7 @@ class TemperatureLog;
 class DebugTemperatureLog;
 class Settings;
 
-class DBControl
+class DBControl : private IThreadControl
 {
 public:
     DBControl();
@@ -29,9 +34,7 @@ public:
     void startExperiment(Experiment *experiment);
     void completeExperiment(Experiment *experiment);
 
-    void addTemperatureLog(const TemperatureLog &log);
     void addTemperatureLog(const std::vector<TemperatureLog> &logs);
-
     void addFluorescenceData(const Experiment *experiment, const std::vector<int> &fluorescenceData);
 
     Settings* getSettings();
@@ -42,15 +45,25 @@ public:
 #endif
 
 private:
+    void process();
+    void stop();
+
     Protocol* getProtocol(int experimentId);
     std::vector<Stage> getStages(int protocolId);
     std::vector<StageComponent> getStageComponents(int stageId);
     std::vector<Step> getSteps(int stageId);
     Ramp* getRamp(int stepId);
 
-    soci::session *_session;
+    void addWriteQueries(std::vector<std::string> &queries);
 
+private:
+    soci::session *_session;
     std::mutex _dbMutex;
+
+    std::atomic<bool> _writeThreadState;
+    std::vector<std::string> _writeQueriesQueue;
+    std::mutex _writeMutex;
+    std::condition_variable _writeCondition;
 };
 
 #endif // DBCONTROL_H

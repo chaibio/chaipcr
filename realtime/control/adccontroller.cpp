@@ -39,7 +39,7 @@ void ADCController::process() {
     static const unsigned long repeatFrequencyInterval = round(1.0 / kADCRepeatFrequency * 1000 * 1000); //Microsec
     boost::posix_time::ptime repeatFrequencyLastTime;
 
-    setRealtimePriority();
+    setMaxRealtimePriority();
 
     try {
         _workState = true;

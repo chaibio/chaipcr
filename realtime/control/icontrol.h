@@ -24,7 +24,7 @@ public:
 
     virtual void stop() = 0;
 
-    void setRealtimePriority()
+    void setMaxRealtimePriority()
     {
         sched_param params;
         params.__sched_priority = sched_get_priority_max(SCHED_FIFO);
