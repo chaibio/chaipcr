@@ -497,7 +497,7 @@
 /* line 477, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part {
   height: 53px;
-  width: 85px;
+  width: 95px;
   float: right;
   line-height: 1.4;
   font-weight: bold;
@@ -506,7 +506,7 @@
 }
 /* line 486, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part .data-part-edit-value {
-  width: 85px;
+  width: 95px;
   height: 53px;
   position: relative;
   top: -65px;

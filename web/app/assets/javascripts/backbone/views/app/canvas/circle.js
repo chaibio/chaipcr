@@ -197,8 +197,9 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
         previous.curve.path[1][2] = ((midPointY + endPointY) / 2) + 10;
     }
     // Change temperature display as its circle is moved
-    var dynamicTemp = Math.abs((100 - ((targetCircleGroup.top - this.scrollTop) / this.scrollRatio)).toFixed(1));
-    this.temperature.text = ""+dynamicTemp+"º";
+    var dynamicTemp = Math.abs((100 - ((targetCircleGroup.top - this.scrollTop) / this.scrollRatio)));
+    dynamicTemp = (dynamicTemp < 100) ? dynamicTemp.toFixed(1) : dynamicTemp;
+    this.temperature.text = String(dynamicTemp + "º");
     this.canvas.renderAll();
   }
 
