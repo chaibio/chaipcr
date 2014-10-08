@@ -18,11 +18,14 @@ ChaiBioTech.app.Views.bottomTime = Backbone.View.extend({
       data: "0:05"
     }
     $(this.el).html(this.template(data));
+    // Disabiling for now.
+    $(this.el).addClass("disabled");
     $(this.el).find(".caption-part").append(this.capsuleTemplate());
-    $(this.el).find(".ball-cover").draggable({
-      containment: "parent",
-      axis: "x",
+    $(this.el).find(".ball-cover").data("me", this);
+    this.draggable = new ChaiBioTech.app.Views.draggable({
+      element: $(this.el).find(".ball-cover")
     });
+
     return this;
   }
 });

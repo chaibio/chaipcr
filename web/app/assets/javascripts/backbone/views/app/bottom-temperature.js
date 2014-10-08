@@ -48,7 +48,7 @@ ChaiBioTech.app.Views.bottomTemperature = Backbone.View.extend({
     } else {
       newTemp = parseFloat(newTemp).toFixed(1);
       this.currentStep.model.changeTemperature(newTemp);
-      this.dataPart.html(newTemp + "º");
+      this.dataPart.html(newTemp + "ºc");
       // Now fire it back to canvas
       this.currentStep.circle.temperatureValue = newTemp;
       ChaiBioTech.app.Views.mainCanvas.fire("temperatureChangedFromBottom", this.currentStep);
@@ -56,7 +56,7 @@ ChaiBioTech.app.Views.bottomTemperature = Backbone.View.extend({
   },
 
   changeTemperature: function(temperature) {
-    this.dataPart.html(temperature);
+    this.dataPart.html(temperature + "c");
     this.dataPartEdit.val(parseFloat(temperature.substr(0, temperature.length - 1)));
   },
 
