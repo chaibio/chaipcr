@@ -50,13 +50,13 @@ void DBControl::process()
                     session << query;
             }
             session.commit();
-
-            queries.clear();
         }
         catch (const std::exception &ex)
         {
             std::cout << "DBControl::process::exception - " << ex.what() << '\n';
         }
+
+        queries.clear();
     }
 }
 
