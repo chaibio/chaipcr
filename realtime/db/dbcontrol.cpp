@@ -1,5 +1,6 @@
 #include "dbincludes.h"
 #include "sociincludes.h"
+#include "qpcrapplication.h"
 
 #define DATABASE_FILE "/root/chaipcr/web/db/development.sqlite3"
 
@@ -50,13 +51,14 @@ void DBControl::process()
                     session << query;
             }
             session.commit();
-        }
-        catch (const std::exception &ex)
-        {
-            std::cout << "DBControl::process::exception - " << ex.what() << '\n';
-        }
 
-        queries.clear();
+            queries.clear();
+        }
+        catch (...)
+        {
+            queries.clear();
+            qpcrApp.setException(std::current_exception());
+        }
     }
 }
 

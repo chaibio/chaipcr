@@ -60,8 +60,6 @@ private:
     void stopLogging();
     void addLogCallback(Poco::Timer &timer);
 
-    void addTempLogCallback(Poco::Timer &timer);
-
 private:
     std::atomic<MachineState> _machineState;
 
