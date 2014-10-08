@@ -1,4 +1,13 @@
 // Edit stage step actions come here
+.noselect {
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		-khtml-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+}
+
 .edit-stage-step-container {
 	width: 1024px;
 	height: 768px;
@@ -381,6 +390,11 @@
 				}
 			}
 
+			// For disabling the field
+			.disabled {
+				color: #cdcdcd;
+			}
+
 			.bottom-common-item {
 				height: 58px;
 				width: 243px;
@@ -397,14 +411,14 @@
 					.capsule {
 						width: 62px;
 						height: 26px;
-						background-color: grey;
+						background-color: #cdcdcd;
 						position: relative;
 						float: right;
 						top: 20px;
 						-webkit-border-radius: 15px;
 						-moz-border-radius: 15px;
 						border-radius: 15px;
-						border-color: grey;
+						border-color: #cdcdcd;
 						border-width:1px;
 						border-style: solid;
 
@@ -415,6 +429,7 @@
 							font-size: 20px;
 							font-weight: 800;
 							z-index: 100;
+							color: grey;
 						}
 
 						.ball-cover {
@@ -435,7 +450,7 @@
 								.center-circle {
 									width: 12px;
 									height: 12px;
-									background-color: grey;
+									background-color: #cdcdcd;
 									border-radius: 50%;
 									-webkit-border-radius: 50%;
 									-moz-border-radius: 50%;
@@ -448,10 +463,12 @@
 
 						.minus {
 							position: absolute;
-							top: -13px;
-							font-size: 20px;
-							font-weight: 800;
-							left: 50px;
+							top: -26px;
+							font-size: 28px;
+							/* font-weight: 800; */
+							left: 44px;
+							z-index: 100;
+							color: grey;
 							z-index: 100;
 						}
 					}
