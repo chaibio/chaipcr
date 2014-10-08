@@ -393,6 +393,68 @@
 					width: 135px;
 					float: left;
 					line-height: 2.5;
+
+					.capsule {
+						width: 62px;
+						height: 26px;
+						background-color: grey;
+						position: relative;
+						float: right;
+						top: 20px;
+						-webkit-border-radius: 15px;
+						-moz-border-radius: 15px;
+						border-radius: 15px;
+						border-color: grey;
+						border-width:1px;
+						border-style: solid;
+
+						.plus {
+							position: absolute;
+							top: -12px;
+							left: 8px;
+							font-size: 20px;
+							font-weight: 800;
+							z-index: 100;
+						}
+
+						.ball-cover {
+							width: 24px;
+							height: 24px;
+							cursor: move;
+
+							.white-ball {
+								z-index: 1000;
+								width: 24px;
+								height: 24px;
+								-webkit-border-radius: 50%;
+								-moz-border-radius: 50%;
+								border-radius: 50%;
+								background-color: white;
+								position: absolute;
+
+								.center-circle {
+									width: 12px;
+									height: 12px;
+									background-color: grey;
+									border-radius: 50%;
+									-webkit-border-radius: 50%;
+									-moz-border-radius: 50%;
+									position: absolute;
+									top: 6px;
+									left: 6px;
+								}
+							}
+						}
+
+						.minus {
+							position: absolute;
+							top: -13px;
+							font-size: 20px;
+							font-weight: 800;
+							left: 50px;
+							z-index: 100;
+						}
+					}
 				}
 
 				.data-part {

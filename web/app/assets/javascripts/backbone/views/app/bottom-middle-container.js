@@ -22,9 +22,15 @@ ChaiBioTech.app.Views.bottomMiddleContainer = Backbone.View.extend({
     this.holdDurationSection = new ChaiBioTech.app.Views.bottomHoldDuration({
       editStepStageClass: parentViewClass
     });
-    this.startOnCycleSection = new ChaiBioTech.app.Views.bottomStartOnCycle();
-    this.tempSection = new ChaiBioTech.app.Views.bottomTemp();
-    this.timeSection = new ChaiBioTech.app.Views.bottomTime();
+    this.startOnCycleSection = new ChaiBioTech.app.Views.bottomStartOnCycle({
+      editStepStageClass: parentViewClass
+    });
+    this.tempSection = new ChaiBioTech.app.Views.bottomTemp({
+      editStepStageClass: parentViewClass
+    });
+    this.timeSection = new ChaiBioTech.app.Views.bottomTime({
+      editStepStageClass: parentViewClass
+    });
     this.actions = new ChaiBioTech.app.Views.bottomActions();
   },
 

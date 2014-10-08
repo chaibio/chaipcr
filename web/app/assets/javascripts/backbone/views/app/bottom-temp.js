@@ -6,6 +6,8 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
 
   template: JST["backbone/templates/app/bottom-common-item"],
 
+  capsuleTemplate: JST["backbone/templates/app/capsule"],
+
   initialize: function() {
 
   },
@@ -16,6 +18,11 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
       data: "2.0º"
     }
     $(this.el).html(this.template(data));
+    $(this.el).find(".caption-part").append(this.capsuleTemplate());
+    $(this.el).find(".ball-cover").draggable({
+      containment: "parent",
+      axis: "x",
+    });
     return this;
   }
 });

@@ -1,7 +1,7 @@
 ChaiBioTech.Views.Design = ChaiBioTech.Views.Design || {} ;
 
 ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
-	
+
 	template: JST["backbone/templates/design/step"],
 	className: 'tempBar',
 	dragged: false,
@@ -14,13 +14,13 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 	disablePropagation: function(evt) {
 		evt.stopPropagation();
 	},
-	
+
 	changeTempManually: function(evt) {
 		evt.preventDefault();
 		evt.stopPropagation();
 		if( !this.dragged ) {
 			$(this.el).find(".editTemp").editable('show');
-			$(".editable-popup").find(".input-mini"). 
+			$(".editable-popup").find(".input-mini").
 			attr("min", 0).
 			attr("max", 100).
 			attr("step", .1);
@@ -78,12 +78,12 @@ ChaiBioTech.Views.Design.tempControl = Backbone.View.extend({
 		});
 
 	},
-	
+
 	render:function() {
 		temperature = this.model.temperature;
 		$(this.el).html(this.template(this.model));
 		//This line saves this object within the element so that the wrong reference due to draggable can be tackled
-		$(this.el).find(".editTemp").data("data-thisObject", this); 
+		$(this.el).find(".editTemp").data("data-thisObject", this);
 		$(this.el).append(this.line.render().el);
 		// Editable event handler
 		$(this.el).find(".editTemp").editable({
