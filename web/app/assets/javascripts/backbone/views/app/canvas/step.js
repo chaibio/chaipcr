@@ -83,6 +83,9 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       this.rampSpeedGroup.setVisible(false);
     } else {
       this.rampSpeedGroup.setVisible(true);
+      this.canvas.renderAll();
+      this.underLine.width = this.rampSpeedText.width;
+      this.rampSpeedGroup.left = this.left + ((120 - this.rampSpeedText.width) / 2)
     }
     this.canvas.renderAll();
   }
@@ -92,33 +95,36 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     // Move this to different files
     this.rampSpeedText = new fabric.Text(String(this.rampSpeedNumber)+ "º C/s", {
       fill: 'black',
-      fontSize: 16,
+      fontSize: 12,
       fontWeight: "bold",
-      fontFamily: "Open Sans"
+      fontFamily: "Open Sans",
+      originX: 'left',
+      originY: 'top'
     });
-
+    
     this.underLine = new fabric.Line([0, 0, this.rampSpeedText.width, 0], {
       stroke: "#ffde00",
       strokeWidth: 2,
-      originX: 'center',
-      originY: 'center',
-      top: 20
+      originX: 'left',
+      originY: 'top',
+      top: 14,
+      left: 0
     });
 
     this.rampSpeedGroup = new fabric.Group([this.rampSpeedText, this.underLine], {
       originX: 'center',
       originY: 'center',
-      selectable: false,
+      selectable: true,
       lockRotation: true,
       lockScalingX: true,
       lockScalingY: true,
       lockMovementX: true,
       lockMovementY: true,
       hasControls: false,
-      originX: 'center',
-      originY: 'center',
+      originX: 'left',
+      originY: 'top',
       top : 100,
-      left: this.left + 50
+      left: this.left + ((120 - this.rampSpeedText.width) / 2)
     });
 
     if(this.rampSpeedNumber <= 0) {

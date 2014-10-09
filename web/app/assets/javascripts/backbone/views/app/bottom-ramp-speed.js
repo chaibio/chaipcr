@@ -23,6 +23,7 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
 
   startEdit: function() {
     this.dataPartEdit.show();
+    //this.dataPart.css("visibility", "hidden");
     this.dataPartEdit.focus();
   },
 
@@ -35,6 +36,13 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
       alert("Please enter a valid value");
     } else {
       newRampSpeed = parseFloat(newRampSpeed);
+      var tempNumberString = String(newRampSpeed);
+      var numberArray = tempNumberString.split(".");
+      if(numberArray.length === 2) {
+        if(numberArray[1].length > 6) {
+          newRampSpeed = newRampSpeed.toFixed(6);
+        }
+      }
       this.currentStep.model.changeRampSpeed(newRampSpeed);
       var display = (newRampSpeed === 0) ? "MAX" : newRampSpeed;
       this.dataPart.html(display);
