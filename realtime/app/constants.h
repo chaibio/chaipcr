@@ -41,6 +41,7 @@ const int kHttpServerPort = 8000;
 const unsigned long kFanPWMPeriodNs = 500000;
 
 //Heat Block params
+const unsigned int kHeatBlockThermistorVoltageDividerResistanceOhms = 33000;
 const unsigned long kHeatBlockZone1PWMPeriodNs = 100000;
 const unsigned long kHeatBlockZone2PWMPeriodNs = 100000;
 

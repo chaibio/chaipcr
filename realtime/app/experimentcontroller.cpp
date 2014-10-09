@@ -55,6 +55,8 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
         return LidIsOpen;
     }
 
+    stopLogging();
+
     _machineState = LidHeating;
 
     _experiment->setStartedAt(boost::posix_time::microsec_clock::local_time());
@@ -63,7 +65,6 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
     _settings->temperatureLogs.setTemperatureLogs(false);
     _settings->temperatureLogs.setDebugTemperatureLogs(false);
 
-    stopLogging();
     startLogging();
 
     LidInstance::getInstance()->setTargetTemperature(_experiment->protocol()->lidTemperature());
@@ -169,17 +170,10 @@ void ExperimentController::stepBegun()
 
 void ExperimentController::holdStepCallback(Poco::Timer &)
 {
-    try
-    {
-        _dbControl->addFluorescenceData(_experiment.get(), OpticsInstance::getInstance()->restartCollection());
+    _dbControl->addFluorescenceData(_experiment.get(), OpticsInstance::getInstance()->restartCollection());
 
-        HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->advanceNextStep()->temperature(), _experiment->protocol()->currentRamp() ? _experiment->protocol()->currentRamp()->rate() : 0);
-        HeatBlockInstance::getInstance()->enableStepProcessing();
-    }
-    catch (...)
-    {
-        qpcrApp.setException(std::current_exception());
-    }
+    HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->advanceNextStep()->temperature(), _experiment->protocol()->currentRamp() ? _experiment->protocol()->currentRamp()->rate() : 0);
+    HeatBlockInstance::getInstance()->enableStepProcessing();
 }
 
 void ExperimentController::startLogging()
@@ -200,75 +194,38 @@ void ExperimentController::stopLogging()
     _logs.clear();
 }
 
-void ExperimentController::addLogCallback(Poco::Timer &)
-{
-    try
-    {
-        TemperatureLog log(_experiment->id(), true, _settings->debugMode());
-        log.setElapsedTime((boost::posix_time::microsec_clock::local_time() - _experiment->startedAt()).total_milliseconds());
-        log.setLidTemperature(LidInstance::getInstance()->currentTemperature());
-        log.setHeatBlockZone1Temperature(HeatBlockInstance::getInstance()->zone1Temperature());
-        log.setHeatBlockZone2Temperature(HeatBlockInstance::getInstance()->zone2Temperature());
-
-        if (log.hasDebugInfo())
-        {
-            log.setLidDrive(LidInstance::getInstance()->drive());
-            log.setHeatBlockZone1Drive(HeatBlockInstance::getInstance()->zone1DriveValue());
-            log.setHeatBlockZone2Drive(HeatBlockInstance::getInstance()->zone2DriveValue());
-        }
-
-        _logs.push_back(std::move(log));
-
-        if ((_logs.back().elapsedTime() - _logs.front().elapsedTime()) >= kTemperatureLoggerFlushInterval)
-        {
-            _dbControl->addTemperatureLog(_logs);
-            _logs.clear();
-        }
-    }
-    catch (...)
-    {
-        qpcrApp.setException(std::current_exception());
-    }
-}
-
-void ExperimentController::settingsUpdated()
-{
-    _dbControl->updateSettings(*_settings);
-}
-
 void ExperimentController::toggleTempLogs()
 {
-    try
+    if (machineState() == Idle)
     {
-        if (machineState() == Idle)
+        if (_settings->temperatureLogs.hasTemperatureLogs() || _settings->temperatureLogs.hasDebugTemperatureLogs())
         {
-            if (_settings->temperatureLogs.hasTemperatureLogs() || _settings->temperatureLogs.hasDebugTemperatureLogs())
+            if (_settings->temperatureLogs.startTime() == boost::posix_time::not_a_date_time)
             {
-                if (_settings->temperatureLogs.startTime() == boost::posix_time::not_a_date_time)
-                {
-                    _settings->temperatureLogs.setStartTime(boost::posix_time::microsec_clock::universal_time());
+                _settings->temperatureLogs.setStartTime(boost::posix_time::microsec_clock::universal_time());
 
-                    addTempLogCallback(*_logTimer);
-
-                    _logTimer->setPeriodicInterval(kTemperatureLoggerInterval);
-                    _logTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::addTempLogCallback));
-                }
+                startLogging();
             }
-            else
-                stopLogging();
         }
-    }
-    catch (...)
-    {
-        stopLogging();
-        throw;
+        else
+            stopLogging();
     }
 }
 
-void ExperimentController::addTempLogCallback(Poco::Timer &)
+void ExperimentController::addLogCallback(Poco::Timer &)
 {
-    TemperatureLog log(0, _settings->temperatureLogs.hasTemperatureLogs(), _settings->temperatureLogs.hasDebugTemperatureLogs());
-    log.setElapsedTime((boost::posix_time::microsec_clock::universal_time() - _settings->temperatureLogs.startTime()).total_milliseconds());
+    TemperatureLog log;
+
+    if (machineState() != Idle)
+    {
+        log = TemperatureLog(_experiment->id(), true, _settings->debugMode());
+        log.setElapsedTime((boost::posix_time::microsec_clock::local_time() - _experiment->startedAt()).total_milliseconds());
+    }
+    else
+    {
+        log = TemperatureLog(0, _settings->temperatureLogs.hasTemperatureLogs(), _settings->temperatureLogs.hasDebugTemperatureLogs());
+        log.setElapsedTime((boost::posix_time::microsec_clock::universal_time() - _settings->temperatureLogs.startTime()).total_milliseconds());
+    }
 
     if (log.hasTemperatureInfo())
     {
@@ -291,4 +248,9 @@ void ExperimentController::addTempLogCallback(Poco::Timer &)
         _dbControl->addTemperatureLog(_logs);
         _logs.clear();
     }
+}
+
+void ExperimentController::settingsUpdated()
+{
+    _dbControl->updateSettings(*_settings);
 }

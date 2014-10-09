@@ -18,9 +18,7 @@ class ADCController : public IThreadControl
 {
 public:
     enum ADCState {
-        EReadZone1Differential = 0,
-        EReadZone1Singular,
-        EReadZone2Differential,
+        EReadZone1Singular = 0,
         EReadZone2Singular,
         EReadLIA,
         EReadLid,

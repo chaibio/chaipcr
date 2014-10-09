@@ -4,7 +4,7 @@
 class TemperatureLog
 {
 public:
-    TemperatureLog(int experimentId, bool temperatureInfo = true, bool debugInfo = false)
+    TemperatureLog(int experimentId = 0, bool temperatureInfo = true, bool debugInfo = false)
     {
         _experimentId = experimentId;
         _elapsedTime = 0;
