@@ -10,6 +10,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
   this.childSteps = [];
   this.previousStage = null;
   this.nextStage = null;
+  this.noOfCycles = null;
 
   this.getLeft = function() {
     if(this.previousStage) {
@@ -79,7 +80,47 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
       lockMovementX: true,
       lockMovementY: true,
       hasControls: false
-    })
+    });
+  }
+
+  this.changeCycle = function() {
+    this.cycleNo.text = this.updatedNoOfCycle;
+    this.canvas.renderAll();
+    this.cycleX.left = this.cycleNo.left + this.cycleNo.width + 3;
+    this.cycles.left = this.cycleX.left + this.cycleX.width;
+    this.canvas.renderAll();
+  }
+
+  this.writeNoOfCycles = function() {
+    this.noOfCycles = this.noOfCycles || this.model.get("stage").num_cycles;
+    this.cycleNo = new fabric.Text(String(this.noOfCycles), {
+      fill: 'white',
+      fontSize: 32,
+      top : 5,
+      fontWeight: "bold",
+      left: this.left + 120 || 120,
+      fontFamily: "Ostrich Sans",
+      selectable: false,
+      hasControls: false
+    });
+    this.cycleX = new fabric.Text("x", {
+      fill: 'white',
+      fontSize: 22,
+      top : 16,
+      left: this.left + this.cycleNo.width + 120 || 140 + this.cycleNo.width + 120,
+      fontFamily: "Ostrich Sans",
+      selectable: false,
+      hasControls: false
+    });
+    this.cycles = new fabric.IText("CYCLES", {
+      fill: 'white',
+      fontSize: 10,
+      top : 28,
+      left: this.left + this.cycleX.width + this.cycleNo.width + 125 || 140 + this.cycleX.width + this.cycleNo.width + 125,
+      fontFamily: "Open Sans",
+      selectable: false,
+      hasControls: false
+    });
   }
 
   this.addSteps = function() {
@@ -110,6 +151,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
       this.borderLeft();
       this.writeMyNo();
       this.writeMyName();
+      this.writeNoOfCycles();
       this.stageRect = new fabric.Rect({
         left: this.left || 30,
         top: 16,
@@ -123,6 +165,11 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
       this.canvas.add(this.border);
       this.canvas.add(this.stageNo);
       this.canvas.add(this.stageName);
+      if(this.model.get("stage").stage_type === "cycling" && this.model.get("stage").steps.length > 1) {
+        this.canvas.add(this.cycleNo);
+        this.canvas.add(this.cycleX);
+        this.canvas.add(this.cycles);
+      }
       this.addSteps();
       this.canvas.renderAll();
   }
@@ -156,6 +203,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
         previouslySelected.roof.stroke = "white";
         previouslySelected.stageNo.fill = "white";
         previouslySelected.stageName.fill = "white";
+        previouslySelected.cycleNo.fill = previouslySelected.cycleX.fill = previouslySelected.cycles.fill = "white";
         // Now we put the border back to normal
         previouslySelected.manageBordersOnSelection("#ff9f00");
         // the step which was selected is being cleared
@@ -175,6 +223,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
     me.roof.stroke = "black";
     me.stageNo.fill = "black";
     me.stageName.fill = "black";
+    me.cycleNo.fill = me.cycleX.fill = me.cycles.fill = "black";
   }
 
   return this;

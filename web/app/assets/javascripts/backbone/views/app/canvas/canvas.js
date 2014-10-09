@@ -88,6 +88,10 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     changedStep.updateStepName();
   });
 
+  this.canvas.on("cycleChangedFromBottom", function(changedStep) {
+    changedStep.parentStage.changeCycle();
+  });
+
   this.setDefaultWidthHeight = function() {
     this.canvas.setHeight(420);
     var width = (this.allStepViews.length * 122 > 1024) ? this.allStepViews.length * 120 : 1024
