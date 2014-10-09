@@ -23,7 +23,7 @@ ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsu
     _workState = false;
 
     _ltc2444 = new LTC2444(csPinNumber, std::move(spiPort), busyPinNumber);
-    _ltc2444->readDifferentialChannels(0, true, kThermistorOversamplingRate); //start first read
+    _ltc2444->readSingleEndedChannel(4, kThermistorOversamplingRate); //start first read
 }
 
 ADCController::~ADCController() {
@@ -92,10 +92,10 @@ void ADCController::process() {
             //process previous conversion value
             switch (_currentConversionState) {
             case EReadZone1Singular:
-                _zoneConsumers.at(0)->setADCValues(_differentialValue, value);
+                _zoneConsumers.at(0)->setADCValue(value);
                 break;
             case EReadZone2Singular:
-                _zoneConsumers.at(1)->setADCValues(_differentialValue, value);
+                _zoneConsumers.at(1)->setADCValue(value);
                 break;
             case EReadLIA:
                 _liaConsumer->setADCValue(value);
