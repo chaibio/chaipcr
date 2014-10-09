@@ -492,6 +492,44 @@
 					font-size: 48px;
 					text-align: right;
 
+					.hour-part {
+						width: 40px;
+						float: left;
+
+						.hour-part-edit {
+							width: 40px;
+							position: relative;
+							background-color: black;
+							color: white;
+							height: 58px;
+							top: -67px;
+							border: none;
+							display: none;
+						}
+					}
+
+					.seperator {
+						width:10px;
+						float: left;
+						padding-left: 6px;
+					}
+
+					.minute-part {
+						width: 40px;
+						float: left;
+
+						.minute-part-edit {
+							width: 40px;
+							position: relative;
+							background-color: black;
+							color: white;
+							height: 58px;
+							top: -67px;
+							border: none;
+							display: none;
+						}
+					}
+
 					.data-part-edit-value {
 						width: 95px;
 						height: 53px;

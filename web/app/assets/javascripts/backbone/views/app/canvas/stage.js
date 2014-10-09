@@ -106,13 +106,13 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
     this.cycleX = new fabric.Text("x", {
       fill: 'white',
       fontSize: 22,
-      top : 16,
+      top : 15,
       left: this.left + this.cycleNo.width + 120 || 140 + this.cycleNo.width + 120,
       fontFamily: "Ostrich Sans",
       selectable: false,
       hasControls: false
     });
-    this.cycles = new fabric.IText("CYCLES", {
+    this.cycles = new fabric.Text("CYCLES", {
       fill: 'white',
       fontSize: 10,
       top : 28,

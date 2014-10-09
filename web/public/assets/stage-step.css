@@ -512,6 +512,44 @@
   text-align: right;
 }
 /* line 495, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part .hour-part {
+  width: 40px;
+  float: left;
+}
+/* line 499, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part .hour-part .hour-part-edit {
+  width: 40px;
+  position: relative;
+  background-color: black;
+  color: white;
+  height: 58px;
+  top: -67px;
+  border: none;
+  display: none;
+}
+/* line 511, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part .seperator {
+  width: 10px;
+  float: left;
+  padding-left: 6px;
+}
+/* line 517, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part .minute-part {
+  width: 40px;
+  float: left;
+}
+/* line 521, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part .minute-part .minute-part-edit {
+  width: 40px;
+  position: relative;
+  background-color: black;
+  color: white;
+  height: 58px;
+  top: -67px;
+  border: none;
+  display: none;
+}
+/* line 533, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part .data-part-edit-value {
   width: 95px;
   height: 53px;
@@ -523,7 +561,7 @@
   font-weight: bold;
   border: none;
 }
-/* line 507, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 545, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .dots {
   float: left;
   width: 23px;
@@ -531,13 +569,13 @@
   padding-top: 28px;
   padding-left: 5px;
 }
-/* line 517, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 555, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .next {
   width: 71px;
   height: 60px;
   float: left;
 }
-/* line 522, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 560, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .next img {
   padding-right: 30px;
   padding-bottom: 31px;
