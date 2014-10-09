@@ -158,6 +158,11 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
     this.nameOfStepStage.html(step.stepName.text);
     this.editStepName.val(step.stepName.text);
     this.smallStageName.html(step.parentStage.stageName.text);
+    if(step.parentStage.model.get("stage").stage_type === "cycling") {
+      this.cycleConatainer.css("visibility", "visible");
+    } else {
+      this.cycleConatainer.css("visibility", "hidden");
+    }
     this.numOfCycles.html(step.parentStage.updatedNoOfCycle || step.parentStage.model.get("stage").num_cycles);
     this.numOfCyclesEdit.val(step.parentStage.updatedNoOfCycle || step.parentStage.model.get("stage").num_cycles);
     this.manageTikImage();
@@ -179,6 +184,7 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
     this.gatherDataButtonImage = $(this.el).find('.gather-data-button-image');
     this.gatherDataButtonText = $(this.el).find('.gather-data-button-text');
     this.editStepName = $(this.el).find('.edit-step-name');
+    this.cycleConatainer = $(this.el).find(".bottom-step-no-cycle-container");
     return this;
   }
 });

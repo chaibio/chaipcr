@@ -139,28 +139,37 @@
 					margin-left: 12px;
 					float: left;
 				}
-				.bottom-step-no-cycle {
+
+				.bottom-step-no-cycle-container {
+					width: 133px;
 					height: 35px;
-					padding-top: 5px;
-					margin-top: 24px;
-					font-size: 48px;
-					font-weight: bold;
-					width: 44px;
+					visibility: visible;
 					float: left;
-					margin-left:2px;
-					text-align: right;
-					.bottom-step-no-cycle-edit {
+
+					.bottom-step-no-cycle {
+						height: 35px;
+						padding-top: 5px;
+						margin-top: 24px;
+						font-size: 48px;
+						font-weight: bold;
 						width: 44px;
-						position: relative;
-						background-color: black;
-						color: white;
+						float: left;
+						margin-left:2px;
 						text-align: right;
-						top: -46px;
-						height: 58px;
-						border: none;
-						display: none;
+						.bottom-step-no-cycle-edit {
+							width: 44px;
+							position: relative;
+							background-color: black;
+							color: white;
+							text-align: right;
+							top: -46px;
+							height: 58px;
+							border: none;
+							display: none;
+						}
 					}
 				}
+
 				.bottom-step-x {
 					float: left;
 					font-size: 26px;
