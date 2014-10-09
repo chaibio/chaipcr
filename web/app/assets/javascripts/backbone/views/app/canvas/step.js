@@ -101,7 +101,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       originX: 'left',
       originY: 'top'
     });
-    
+
     this.underLine = new fabric.Line([0, 0, this.rampSpeedText.width, 0], {
       stroke: "#ffde00",
       strokeWidth: 2,
@@ -114,7 +114,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     this.rampSpeedGroup = new fabric.Group([this.rampSpeedText, this.underLine], {
       originX: 'center',
       originY: 'center',
-      selectable: true,
+      selectable: false,
       lockRotation: true,
       lockScalingX: true,
       lockScalingY: true,
