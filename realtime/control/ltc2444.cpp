@@ -4,8 +4,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class LTC2444
-LTC2444::LTC2444(unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber) :
-	 csPin_(csPinNumber, GPIO::kOutput),
+LTC2444::LTC2444(SPIPort spiPort, unsigned int busyPinNumber) :
 	 spiPort_ (spiPort),
 	 busyPin_ (busyPinNumber, GPIO::kInput){}
 

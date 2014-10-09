@@ -26,13 +26,13 @@ public:
     };
 
     ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsumers, std::shared_ptr<ADCConsumer> liaConsumer, std::shared_ptr<ADCConsumer> lidConsumer,
-                  unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber);
+                  SPIPort spiPort, unsigned int busyPinNumber);
 	~ADCController();
 	
     void process();
     void stop();
 
-    boost::signals2::signal<void()> loopStarted;
+    boost::signals2::signal_type<void(), boost::signals2::keywords::mutex_type<boost::signals2::dummy_mutex>>::type loopStarted;
 
 private:
     ADCState nextState() const;

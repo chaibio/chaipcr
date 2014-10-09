@@ -1,9 +1,4 @@
-#include <boost/date_time.hpp>
-
 #include "pid.h"
-
-using namespace boost::posix_time;
-
 /*
  * The PID Controller implements a non-interactive PID control algorithm, which provides
  * true controller gain control. Control is proportional on error and derivative on process
@@ -32,15 +27,15 @@ PIDController::~PIDController() {
 //------------------------------------------------------------------------------
 double PIDController::compute(double setpoint, double processValue) {
     const SPIDTuning& pidTuning = determineGainSchedule(setpoint);
-    ptime currentExecutionTime = microsec_clock::universal_time();
+    boost::chrono::high_resolution_clock::time_point currentExecutionTime = boost::chrono::high_resolution_clock::now();
     double error = setpoint - processValue;
     double output = 0;
 
     _lock.lock(); {
         double filteredProcessValue = _processValueFilter.processSample(processValue);
 
-        if (!_previousExecutionTime.is_not_a_date_time()) {
-            double executionDurationS = (double)(currentExecutionTime - _previousExecutionTime).total_microseconds() / 1000000;
+        if (_previousExecutionTime.time_since_epoch().count() > 0) {
+            double executionDurationS = (double)boost::chrono::duration_cast<boost::chrono::microseconds>(currentExecutionTime - _previousExecutionTime).count() / 1000000;
             double derivativeValueS = (filteredProcessValue - _previousProcessValue) / executionDurationS;
 
             _integratorS += error * executionDurationS;
@@ -62,7 +57,8 @@ double PIDController::compute(double setpoint, double processValue) {
 //------------------------------------------------------------------------------
 void PIDController::reset() {
     _lock.lock();
-    _previousExecutionTime = not_a_date_time;
+    _previousExecutionTime = boost::chrono::high_resolution_clock::time_point();
+    //_previousExecutionTime = not_a_date_time;
     _lock.unlock();
 }
 //------------------------------------------------------------------------------
