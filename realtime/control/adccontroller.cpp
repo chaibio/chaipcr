@@ -51,6 +51,8 @@ void ADCController::process() {
 
             //ensure ADC loop runs at regular interval without jitter
             if (state == 0) {
+                loopStarted();
+
                 boost::posix_time::ptime previousTime = repeatFrequencyLastTime;
                 repeatFrequencyLastTime = boost::posix_time::microsec_clock::local_time();
 
@@ -71,16 +73,8 @@ void ADCController::process() {
             //schedule conversion for next state, retrieve previous conversion value
             uint32_t value;
             switch (state) {
-            case EReadZone1Differential:
-                value = _ltc2444->readDifferentialChannels(0, true, kThermistorOversamplingRate);
-                loopStarted();
-
-                break;
             case EReadZone1Singular:
                 value = _ltc2444->readSingleEndedChannel(4, kThermistorOversamplingRate);
-                break;
-            case EReadZone2Differential:
-                value = _ltc2444->readDifferentialChannels(2, true, kThermistorOversamplingRate);
                 break;
             case EReadZone2Singular:
                 value = _ltc2444->readSingleEndedChannel(5, kThermistorOversamplingRate);
@@ -97,10 +91,6 @@ void ADCController::process() {
 
             //process previous conversion value
             switch (_currentConversionState) {
-            case EReadZone1Differential:
-            case EReadZone2Differential:
-                _differentialValue = value;
-                break;
             case EReadZone1Singular:
                 _zoneConsumers.at(0)->setADCValues(_differentialValue, value);
                 break;
