@@ -6,6 +6,14 @@ ChaiBioTech.app.Views.nameOnTop = Backbone.View.extend({
 
   template: JST["backbone/templates/app/name-on-top"],
 
+  events: {
+    "click .stripes": "bringMenuOverlay"
+  },
+
+  bringMenuOverlay: function() {
+
+  },
+
   initialize: function() {
     this.model.on("change:experiment", this.render, this);
   },
@@ -13,7 +21,8 @@ ChaiBioTech.app.Views.nameOnTop = Backbone.View.extend({
   render: function() {
     var data = this.model.get("experiment"),
     dataToTemplate = {
-      "name": data.name
+      "name": data.name,
+      "id": data.id
     };
 
     $(this.el).html(this.template(dataToTemplate));
