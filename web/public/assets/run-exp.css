@@ -45,3 +45,53 @@
   height: 430px;
   border-bottom: solid 1px #c6c6c6;
 }
+/* line 48, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .bottom-container {
+  height: 295px;
+  width: 1024px;
+}
+/* line 53, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .palette-container {
+  width: 643px;
+  height: 295px;
+  float: left;
+}
+/* line 59, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container {
+  height: 295px;
+  float: left;
+  width: 381px;
+}
+/* line 66, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .experiment-in-progress .experiment-in-progress-heading {
+  border-bottom: solid 2px #001827;
+}
+/* line 69, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .experiment-in-progress .experiment-info {
+  height: 80px;
+  padding-top: 25px;
+}
+/* line 73, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .experiment-in-progress .experiment-info div {
+  float: left;
+}
+/* line 77, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .experiment-in-progress .experiment-info .caption {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+/* line 81, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .experiment-in-progress .experiment-info .experiment-info-test {
+  width: 280px;
+}
+/* line 86, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .experiment-in-progress .experiment-progress-bar {
+  height: 5px;
+  background-color: black;
+}
+/* line 90, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .experiment-in-progress .experiment-progress-bar .pro-bar {
+  background-color: #00aeef;
+  height: 5px;
+  width: 0px;
+}

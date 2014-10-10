@@ -44,4 +44,55 @@
     height: 430px;
     border-bottom: solid 1px #c6c6c6;
   }
+
+  .bottom-container {
+    height: 295px;
+    width: 1024px;
+  }
+
+  .palette-container {
+    width: 643px;
+    height:295px;
+    float: left;
+  }
+
+  .test-in-progress-container {
+    height: 295px;
+    float: left;
+    width: 381px;
+
+    .experiment-in-progress {
+
+      .experiment-in-progress-heading {
+        border-bottom: solid 2px #001827;
+      }
+      .experiment-info {
+        height: 80px;
+        padding-top: 25px;
+
+        div {
+          float: left;
+        }
+
+        .caption {
+          font-weight: bold;
+          margin-bottom: 5px;
+        }
+        .experiment-info-test {
+          width: 280px;
+        }
+
+      }
+      .experiment-progress-bar {
+        height: 5px;
+        background-color: black;
+
+        .pro-bar {
+          background-color: #00aeef;
+          height: 5px;
+          width: 0px;
+        }
+      }
+    }
+  }
 }
