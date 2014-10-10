@@ -36,22 +36,6 @@ void Optics::process()
     bool lidState = _lidSensePin.value() == GPIO::kHigh ? true : false;
     if (_lidOpen.compare_exchange_strong(lidState, !lidState))
         toggleCollectData();
-
-    /*bool oldLidState = _lidOpen.exchange(!_lidSensePin.value()); //read lid state
-
-    if (oldLidState != _lidOpen.load() && collectData())
-    {
-        if (_lidOpen.load())
-        {
-            _collectDataTimer->stop();
-            _ledController->disableLEDs();
-        }
-        else
-        {
-            _collectDataTimer->setPeriodicInterval(kFluorescenceDataCollectionDelayTimeMs);
-            _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));
-        }
-    }*/
 }
 
 void Optics::setADCValue(unsigned int adcValue)
@@ -102,27 +86,6 @@ void Optics::setCollectData(bool state)
         }
     }
     _collectDataMutex.unlock();
-
-    /*if (state != _collectData.load())
-    {
-        if (state)
-        {
-            _ledNumber = 0;
-
-            if (!lidOpen())
-            {
-                _collectDataTimer->setPeriodicInterval(kFluorescenceDataCollectionDelayTimeMs);
-                _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));
-            }
-        }
-        else
-        {
-            _collectDataTimer->stop();
-            _ledController->disableLEDs();
-        }
-
-        _collectData.store(state);
-    }*/
 }
 
 void Optics::toggleCollectData()
@@ -204,30 +167,4 @@ std::vector<int> Optics::restartCollection()
     _collectDataMutex.unlock();
 
     return collectedData;
-
-    /*_collectDataTimer->stop();
-
-    std::vector<int> collectedData;
-    for (std::vector<int> &data: _fluorescenceData)
-    {
-        if (!data.empty())
-        {
-            collectedData.emplace_back(std::accumulate(data.begin(), data.end(), 0) / data.size());
-
-            data.clear();
-        }
-        else
-            collectedData.emplace_back(0);
-    }
-
-    _ledNumber = 0;
-    _fluorescenceData.clear();
-
-    if (!lidOpen())
-    {
-        _collectDataTimer->setPeriodicInterval(kFluorescenceDataCollectionDelayTimeMs);
-        _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));
-    }
-
-    return collectedData;*/
 }

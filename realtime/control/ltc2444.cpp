@@ -1,11 +1,11 @@
 #include <iostream>
 
+#include "pcrincludes.h"
 #include "ltc2444.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class LTC2444
-LTC2444::LTC2444(unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber) :
-	 csPin_(csPinNumber, GPIO::kOutput),
+LTC2444::LTC2444(SPIPort spiPort, unsigned int busyPinNumber) :
 	 spiPort_ (spiPort),
 	 busyPin_ (busyPinNumber, GPIO::kInput){}
 
@@ -38,10 +38,6 @@ uint32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, Overs
 	//data that will be sent is: 101_SGL_ODD_A_OSRTWOx based ifrom the datasheet Table 4. Channel Selection
     data |= modeBits << 19;
 	
-	//set CS low to initiate conversion
-    csPin_.setValue(GPIO::kHigh);
-	csPin_.setValue(GPIO::kLow);
-
 	//read conversion value and write the settings for the nex conversion via SPI.
     uint32_t conversion;
 	//convert data to big endian
@@ -49,8 +45,7 @@ uint32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, Overs
 	dataOut[1] = (data>>16);
 	dataOut[2] = (data>>8);
 	dataOut[3] = (data);
-    spiPort_.readBytes(dataIn, dataOut, 4, 1000000);
-    csPin_.setValue(GPIO::kHigh);
+    spiPort_.readBytes(dataIn, dataOut, 4, kADCSPIFrequencyHz);
 
     if ((dataIn[0] >> 4) & 1)
         conversion = 0; //undervoltage

@@ -1,5 +1,5 @@
 #include <cassert>
-#include <boost/date_time.hpp>
+#include <boost/chrono.hpp>
 
 #include "pcrincludes.h"
 #include "ltc2444.h"
@@ -15,15 +15,15 @@ const LTC2444::OversamplingRatio kLIAOversamplingRate = LTC2444::kOversamplingRa
 ////////////////////////////////////////////////////////////////////////////////
 // Class ADCController
 ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsumers, std::shared_ptr<ADCConsumer> liaConsumer, std::shared_ptr<ADCConsumer> lidConsumer,
-                             unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber):
+                             SPIPort spiPort, unsigned int busyPinNumber):
     _currentConversionState {static_cast<ADCController::ADCState>(0)},
     _zoneConsumers {zoneConsumers},
     _liaConsumer {liaConsumer},
     _lidConsumer {lidConsumer} {
     _workState = false;
 
-    _ltc2444 = new LTC2444(csPinNumber, std::move(spiPort), busyPinNumber);
-    _ltc2444->readDifferentialChannels(0, true, kThermistorOversamplingRate); //start first read
+    _ltc2444 = new LTC2444(std::move(spiPort), busyPinNumber);
+    _ltc2444->readSingleEndedChannel(4, kThermistorOversamplingRate); //start first read
 }
 
 ADCController::~ADCController() {
@@ -37,7 +37,7 @@ ADCController::~ADCController() {
 
 void ADCController::process() {
     static const unsigned long repeatFrequencyInterval = round(1.0 / kADCRepeatFrequency * 1000 * 1000); //Microsec
-    boost::posix_time::ptime repeatFrequencyLastTime;
+    boost::chrono::high_resolution_clock::time_point repeatFrequencyLastTime;
 
     setMaxRealtimePriority();
 
@@ -53,21 +53,23 @@ void ADCController::process() {
             if (state == 0) {
                 loopStarted();
 
-                boost::posix_time::ptime previousTime = repeatFrequencyLastTime;
-                repeatFrequencyLastTime = boost::posix_time::microsec_clock::local_time();
-
-                if (!previousTime.is_not_a_date_time())
+                if (repeatFrequencyLastTime.time_since_epoch().count() > 0)
                 {
-                    unsigned long executionTime = (repeatFrequencyLastTime - previousTime).total_microseconds();
+                    boost::chrono::high_resolution_clock::time_point previousTime = repeatFrequencyLastTime;
+                    repeatFrequencyLastTime = boost::chrono::high_resolution_clock::now();
+
+                    unsigned long executionTime = boost::chrono::duration_cast<boost::chrono::microseconds>(repeatFrequencyLastTime - previousTime).count();
 
                     if (executionTime < repeatFrequencyInterval) {
                         usleep(repeatFrequencyInterval - executionTime);
 
-                        repeatFrequencyLastTime = boost::posix_time::microsec_clock::local_time();
+                        repeatFrequencyLastTime = boost::chrono::high_resolution_clock::now();
                     }
                     else
                         std::cout << "ADCController::process - ADC measurements could not be completed in scheduled time\n";
                 }
+                else
+                    repeatFrequencyLastTime = boost::chrono::high_resolution_clock::now();
             }
 
             //schedule conversion for next state, retrieve previous conversion value
@@ -92,10 +94,10 @@ void ADCController::process() {
             //process previous conversion value
             switch (_currentConversionState) {
             case EReadZone1Singular:
-                _zoneConsumers.at(0)->setADCValues(_differentialValue, value);
+                _zoneConsumers.at(0)->setADCValue(value);
                 break;
             case EReadZone2Singular:
-                _zoneConsumers.at(1)->setADCValues(_differentialValue, value);
+                _zoneConsumers.at(1)->setADCValue(value);
                 break;
             case EReadLIA:
                 _liaConsumer->setADCValue(value);

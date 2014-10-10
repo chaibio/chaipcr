@@ -8,7 +8,7 @@
 class LTC2444  // will work with this class later
 {
 public:
-    LTC2444(unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber);
+    LTC2444(SPIPort spiPort, unsigned int busyPinNumber);
 	~LTC2444();
 
     typedef enum {
@@ -34,7 +34,6 @@ public:
     void stopWaitinigBusy();
 
 private:
-	GPIO csPin_;
     SPIPort spiPort_;
 	GPIO busyPin_;
 	uint8_t OSRTWOx;

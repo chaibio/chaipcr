@@ -3,6 +3,7 @@
 #include "qpcrapplication.h"
 
 #define DATABASE_FILE "/root/chaipcr/web/db/development.sqlite3"
+#define ROUND(x) ((int)(x * 100.0 + 0.5) / 100.0)
 
 DBControl::DBControl()
 {
@@ -38,21 +39,22 @@ void DBControl::process()
     {
         try
         {
+            std::unique_lock<std::mutex> lock(_writeMutex);
+            _writeCondition.wait(lock);
+
+            queries = std::move(_writeQueriesQueue);
+
+            if (!queries.empty())
             {
-                std::unique_lock<std::mutex> lock(_writeMutex);
-                _writeCondition.wait(lock);
+                session.begin();
+                {
+                    for (const std::string &query: queries)
+                        session << query;
+                }
+                session.commit();
 
-                queries = std::move(_writeQueriesQueue);
+                queries.clear();
             }
-
-            session.begin();
-            {
-                for (const std::string &query: queries)
-                    session << query;
-            }
-            session.commit();
-
-            queries.clear();
         }
         catch (...)
         {
@@ -246,7 +248,9 @@ Ramp* DBControl::getRamp(int stepId)
 void DBControl::startExperiment(Experiment *experiment)
 {
     _dbMutex.lock();
+    _writeMutex.lock();
     *_session << "UPDATE experiments SET started_at = :started_at WHERE id = " << experiment->id(), soci::use(experiment->startedAt());
+    _writeMutex.unlock();
     _dbMutex.unlock();
 }
 
@@ -254,8 +258,10 @@ void DBControl::completeExperiment(Experiment *experiment)
 {
     _dbMutex.lock();
     {
+        _writeMutex.lock();
         *_session << "UPDATE experiments SET completed_at = :completed_at, completion_status = :completion_status, completion_message = :completion_message WHERE id = " << experiment->id(),
                 soci::use(experiment->completedAt()), soci::use(experiment->completionStatus()), soci::use(experiment->completionMessage());
+        _writeMutex.unlock();
     }
     _dbMutex.unlock();
 }
@@ -270,8 +276,8 @@ void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
         if (log.hasTemperatureInfo())
         {
             stream << "INSERT INTO temperature_logs(experiment_id, elapsed_time, lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp) VALUES("
-                      << log.experimentId() << ", " << log.elapsedTime() << ", " << (std::round(log.lidTemperature() * 100.0) / 100.0) << ", "
-                      << (std::round(log.heatBlockZone1Temperature() * 100.0) / 100.0) << ", " << (std::round(log.heatBlockZone2Temperature() * 100.0) / 100.0) << ")";
+                      << log.experimentId() << ", " << log.elapsedTime() << ", " << ROUND(log.lidTemperature()) << ", "
+                      << ROUND(log.heatBlockZone1Temperature()) << ", " << ROUND(log.heatBlockZone2Temperature()) << ")";
 
             queries.emplace_back(std::move(stream.str()));
             stream.str("");
@@ -280,8 +286,8 @@ void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
         if (log.hasDebugInfo())
         {
             stream << "INSERT INTO temperature_debug_logs(experiment_id, elapsed_time, lid_drive, heat_block_zone_1_drive, heat_block_zone_2_drive) VALUES("
-                   << log.experimentId() << ", " << log.elapsedTime() << ", " << (std::round(log.lidTemperature() * 100.0) / 100.0) << ", "
-                   << (std::round(log.heatBlockZone1Drive() * 100.0) / 100.0) << ", " << (std::round(log.heatBlockZone2Drive() * 100.0) / 100.0) << ")";
+                   << log.experimentId() << ", " << log.elapsedTime() << ", " << ROUND(log.lidTemperature()) << ", "
+                   << ROUND(log.heatBlockZone1Drive()) << ", " << ROUND(log.heatBlockZone2Drive()) << ")";
 
             queries.emplace_back(std::move(stream.str()));
             stream.str("");
@@ -328,7 +334,9 @@ Settings* DBControl::getSettings()
 void DBControl::updateSettings(const Settings &settings)
 {
     _dbMutex.lock();
+    _writeMutex.lock();
     *_session << "UPDATE settings SET debug = :debug", soci::use(settings.debugMode() ? 1 : 0);
+    _writeMutex.unlock();
     _dbMutex.unlock();
 }
 

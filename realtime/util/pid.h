@@ -5,7 +5,7 @@
 
 #include <vector>
 #include <mutex>
-#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/chrono.hpp>
 
 struct SPIDTuning {
     int maxValueInclusive;
@@ -39,7 +39,7 @@ private:
 
     double _previousProcessValue;
     double _integratorS;
-    boost::posix_time::ptime _previousExecutionTime;
+    boost::chrono::high_resolution_clock::time_point _previousExecutionTime;
 
     mutable std::mutex _lock;
 };

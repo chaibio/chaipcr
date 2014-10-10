@@ -27,7 +27,12 @@ LIBS += -lsqlite3
 LIBS += -lsoci_core
 LIBS += -lsoci_sqlite3
 
+#Boost
+LIBS += -lboost_system
+LIBS += -lboost_chrono
+
 LIBS += -ldl
+LIBS += -lrt
 
 #Ignore Boost warnings
 QMAKE_CXXFLAGS += -Wno-unused-local-typedefs -Wno-unused-parameter -Wno-unused-but-set-parameter
