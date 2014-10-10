@@ -10,7 +10,7 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 	routes:
 		"login": "logMeIn"
 		"home": "loadHome"
-		"edit-exp/:id": "editExp" # Remember this is the one for bringing up menu overlay
+		"edit-exp-menu/:id": "editExp" # Remember this is the one for bringing up menu overlay
 		"edit-stage-step/:id": "loadStepStage"
 
 	logMeIn: () ->
