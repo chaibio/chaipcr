@@ -4,9 +4,10 @@ ChaiBioTech.app.Views.menuOverLay = Backbone.View.extend({
 
 	className: "menu-overlay-container",
 
-	template: JST["backbone/templates/app/menu-overlay"],	
-	
+	template: JST["backbone/templates/app/menu-overlay"],
+
 	initialize: function() {
+		console.log(this.model);
 		this.fixMenu();
 		this.expInProgress();
 		this.addExpNameSection();
@@ -25,7 +26,9 @@ ChaiBioTech.app.Views.menuOverLay = Backbone.View.extend({
 	},
 
 	addExpNameSection: function() {
-		this.menuOverlayTitle = new ChaiBioTech.app.Views.menuOverlayTitle();
+		this.menuOverlayTitle = new ChaiBioTech.app.Views.menuOverlayTitle({
+			model: this.model
+		});
 	},
 
 	addExpOptions: function() {

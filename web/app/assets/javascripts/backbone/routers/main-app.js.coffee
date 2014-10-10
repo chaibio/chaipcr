@@ -33,8 +33,14 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 		return no
 
 	editExp: (id) ->
-		@menuOverLay = new ChaiBioTech.app.Views.menuOverLay
-		$("#container").append(@menuOverLay.render().el)
+		that = this;
+		callback = () ->
+			that.menuOverLay = new ChaiBioTech.app.Views.menuOverLay({
+				model: ExpModel
+			});
+			$("#container").append(that.menuOverLay.render().el)
+
+		ExpModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});
 
 	loadStepStage: (id) ->
 		that = this;

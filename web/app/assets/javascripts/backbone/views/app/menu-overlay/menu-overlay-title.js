@@ -7,11 +7,14 @@ ChaiBioTech.app.Views.menuOverlayTitle = Backbone.View.extend({
 	template: JST["backbone/templates/app/menu-overlay-title"],
 
 	initialize: function() {
-
+		
 	},
 
 	render: function() {
-		$(this.el).html(this.template());
+		var data = {
+			"name": this.model.get("experiment").name
+		}
+		$(this.el).html(this.template(data));
 		return this;
 	}
 });
