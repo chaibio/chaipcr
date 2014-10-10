@@ -45,7 +45,13 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 
 	runExp: (id) ->
 		that = this;
-		console.log "yes dude"
+		callback = () ->
+			that.runExpView = new ChaiBioTech.app.Views.runExperiment({
+					model: ExpModel
+			});
+			$("#container").html(that.runExpView.render().el);
+
+		ExpModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});
 
 	loadStepStage: (id) ->
 		that = this;

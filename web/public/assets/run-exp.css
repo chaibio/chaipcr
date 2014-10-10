@@ -1,0 +1,47 @@
+/* line 2, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout {
+  width: 1024px;
+  height: 768px;
+}
+/* line 6, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .name-on-top {
+  width: 1024px;
+  height: 45px;
+  background-color: #333333;
+}
+/* line 11, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .name-on-top .stripes-and-name {
+  width: 300px;
+  height: 30px;
+  margin-left: 32px;
+  padding-top: 13px;
+}
+/* line 17, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .name-on-top .stripes-and-name .stripes {
+  width: 21px;
+  height: 19px;
+  float: left;
+  cursor: pointer;
+}
+/* line 23, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .name-on-top .stripes-and-name .stripes .stripe {
+  height: 3px;
+  width: 21px;
+  margin-bottom: 3px;
+  background-color: #999280;
+}
+/* line 31, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .name-on-top .stripes-and-name .name-container {
+  float: left;
+  color: #d6d4d1;
+  margin-left: 13px;
+  font-size: 18px;
+  margin-top: 2px;
+  font-family: "fun city";
+}
+/* line 42, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .graph-container {
+  width: 1024px;
+  height: 430px;
+  border-bottom: solid 1px #c6c6c6;
+}
