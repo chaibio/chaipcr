@@ -4,7 +4,7 @@ ChaiBioTech.app.Views.menuOverlayMenuItem = Backbone.View.extend({
 
 	className: "menu-overlay-menu-item",
 
-	template: JST["backbone/templates/app/menu-overlay-menu-item"],
+	template: JST["backbone/templates/app/menu-overlay/menu-overlay-menu-item"],
 
 	events: {
 		"mouseenter .menu-text": "mouseCame",

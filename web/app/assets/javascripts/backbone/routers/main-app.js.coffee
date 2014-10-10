@@ -12,6 +12,7 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 		"home": "loadHome"
 		"edit-exp-menu/:id": "editExp" # Remember this is the one for bringing up menu overlay
 		"edit-stage-step/:id": "loadStepStage"
+		"run-exp/:id": "runExp"
 
 	logMeIn: () ->
 		@loginScreen = new ChaiBioTech.app.Views.login
@@ -41,6 +42,10 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 			$("#container").append(that.menuOverLay.render().el)
 
 		ExpModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});
+
+	runExp: (id) ->
+		that = this;
+		console.log "yes dude"
 
 	loadStepStage: (id) ->
 		that = this;

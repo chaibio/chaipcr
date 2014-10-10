@@ -4,19 +4,24 @@ ChaiBioTech.app.Views.menuOverlayMenuItemSpecial = Backbone.View.extend({
 
 	className: "menu-overlay-menu-item-special",
 
-	template: JST["backbone/templates/app/menu-overlay-menu-item-special"],
+	template: JST["backbone/templates/app/menu-overlay/menu-overlay-menu-item-special"],
 
 	events: {
 		"mouseenter .menu-text": "mouseCame",
 		"mouseleave .menu-text": "mouseGone"
 	},
-	
+
 	initialize: function() {
-		this.myNmane = this.options.menuData;
+		this.myName = this.options.menuData;
 	},
 
 	render: function() {
-		$(this.el).html(this.template(this.myNmane))
+		var data = {
+			"menuItem": this.myName.menuItem,
+			"id": this.model.get("experiment").id
+		};
+		
+		$(this.el).html(this.template(data));
 		return this;
 	},
 
