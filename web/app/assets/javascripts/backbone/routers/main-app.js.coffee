@@ -10,8 +10,9 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 	routes:
 		"login": "logMeIn"
 		"home": "loadHome"
-		"edit-exp/:id": "editExp" # Remember this is the one for bringing up menu overlay
+		"edit-exp-menu/:id": "editExp" # Remember this is the one for bringing up menu overlay
 		"edit-stage-step/:id": "loadStepStage"
+		"run-exp/:id": "runExp"
 
 	logMeIn: () ->
 		@loginScreen = new ChaiBioTech.app.Views.login
@@ -33,8 +34,24 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 		return no
 
 	editExp: (id) ->
-		@menuOverLay = new ChaiBioTech.app.Views.menuOverLay
-		$("#container").append(@menuOverLay.render().el)
+		that = this;
+		callback = () ->
+			that.menuOverLay = new ChaiBioTech.app.Views.menuOverLay({
+				model: ExpModel
+			});
+			$("#container").append(that.menuOverLay.render().el)
+
+		ExpModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});
+
+	runExp: (id) ->
+		that = this;
+		callback = () ->
+			that.runExpView = new ChaiBioTech.app.Views.runExperiment({
+					model: ExpModel
+			});
+			$("#container").html(that.runExpView.render().el);
+
+		ExpModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});
 
 	loadStepStage: (id) ->
 		that = this;

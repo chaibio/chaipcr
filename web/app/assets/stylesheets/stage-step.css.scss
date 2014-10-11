@@ -437,7 +437,6 @@
 							left: 8px;
 							font-size: 20px;
 							font-weight: 800;
-							z-index: 100;
 							color: grey;
 						}
 
@@ -447,7 +446,6 @@
 							cursor: move;
 
 							.white-ball {
-								z-index: 1000;
 								width: 24px;
 								height: 24px;
 								-webkit-border-radius: 50%;
@@ -476,9 +474,7 @@
 							font-size: 28px;
 							/* font-weight: 800; */
 							left: 44px;
-							z-index: 100;
 							color: grey;
-							z-index: 100;
 						}
 					}
 				}
