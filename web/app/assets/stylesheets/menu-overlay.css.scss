@@ -81,8 +81,14 @@
 						margin-left: 14px;
 						cursor: pointer;
 
+						a {
+							color: white;
+						}
 						a:visited {
 							color: white;
+						}
+						a:hover {
+							background-color: #001827;
 						}
 					}
 				}
