@@ -9,7 +9,9 @@
 <script type="text/javascript" language="javascript">
 <!--
 $(document).ready(function(){
-    $('#splash').center();
+	setTimeout(function() {
+		$('#splash').center()
+	}, 1);
     $(window).bind('resize', function() {
         $('#splash').center({transition:300});
     });
