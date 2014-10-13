@@ -7,8 +7,7 @@ QPCRBrowser::QPCRBrowser()
 {
     setPage(new QPCRPage(this));
     setCursor(Qt::BlankCursor);
-    showSplashScreen();
-    load(QPCR_ROOT_URL);
+    loadRoot();
 }
 
 QPCRBrowser::~QPCRBrowser()
@@ -16,17 +15,14 @@ QPCRBrowser::~QPCRBrowser()
 
 }
 
-void QPCRBrowser::showSplashScreen()
+void QPCRBrowser::loadSplashScreen()
 {
-    QFile file("./resources/splash.html");
-    if (file.open(QFile::ReadOnly))
-    {
-        setHtml(file.readAll());
+    load(QUrl("file:///" + QDir::currentPath() + "/resources/splash.html"));
+}
 
-        file.close();
-    }
-    else
-        setHtml("QPCRBrowser::showSplashScreen - unable to open splash.html");
+void QPCRBrowser::loadRoot()
+{
+    load(QPCR_ROOT_URL);
 }
 
 void QPCRBrowser::closeEvent(QCloseEvent *event)

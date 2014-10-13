@@ -25,13 +25,15 @@ void QPCRPage::reply(QNetworkReply *reply)
 
     if (reply->error() != QNetworkReply::NoError)
     {
+        qDebug() << "QPCRPage::reply::error -" << reply->error() << reply->errorString();
+
         browser->stop();
 
         if (reply->url() == QPCR_ROOT_URL)
         {
-            browser->showSplashScreen();
+            browser->loadSplashScreen();
 
-            QTimer::singleShot(ROOT_RETRY_INTERVAL, this, SLOT(reload()));
+            QTimer::singleShot(ROOT_RETRY_INTERVAL, browser, SLOT(loadRoot()));
         }
         else
         {
@@ -44,10 +46,7 @@ void QPCRPage::reply(QNetworkReply *reply)
                 repeatState = false;
             }
             else
-            {
-                browser->setHtml(QString());
-                browser->load(QPCR_ROOT_URL);
-            }
+                browser->loadRoot();
         }
     }
 }

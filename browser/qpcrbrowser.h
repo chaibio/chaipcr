@@ -10,7 +10,8 @@ public:
     ~QPCRBrowser();
 
 public slots:
-    void showSplashScreen();
+    void loadSplashScreen();
+    void loadRoot();
 
 protected:
     void closeEvent(QCloseEvent *event);
