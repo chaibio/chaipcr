@@ -1,13 +1,13 @@
 #include "qpcrpage.h"
+#include "qpcrbrowser.h"
 
 #include <QtCore>
 #include <QtWebKit>
 
-#define VIEW ((QWebView*)view())
-
-QPCRPage::QPCRPage(QObject *parent)
-    :QWebPage(parent)
+QPCRPage::QPCRPage(QPCRBrowser *browser)
+    :QWebPage(browser)
 {
+    this->browser = browser;
     repeatState = true;
 
     connect(networkAccessManager(), SIGNAL(finished(QNetworkReply*)), SLOT(reply(QNetworkReply*)));
@@ -25,11 +25,11 @@ void QPCRPage::reply(QNetworkReply *reply)
 
     if (reply->error() != QNetworkReply::NoError)
     {
-        VIEW->stop();
+        browser->stop();
 
         if (reply->url() == QPCR_ROOT_URL)
         {
-            VIEW->setHtml(QString());
+            browser->showSplashScreen();
 
             QTimer::singleShot(ROOT_RETRY_INTERVAL, this, SLOT(reload()));
         }
@@ -37,16 +37,16 @@ void QPCRPage::reply(QNetworkReply *reply)
         {
             if (repeatState)
             {
-                VIEW->setHtml(QString("Error occured: %1 (%2)").arg(reply->error()).arg(reply->errorString()));
+                browser->setHtml(QString("Error occured: %1 (%2)").arg(reply->error()).arg(reply->errorString()));
 
-                QTimer::singleShot(RETRY_INTERVAL, view(), SLOT(reload()));
+                QTimer::singleShot(RETRY_INTERVAL, browser, SLOT(reload()));
 
                 repeatState = false;
             }
             else
             {
-                VIEW->setHtml(QString());
-                VIEW->load(QPCR_ROOT_URL);
+                browser->setHtml(QString());
+                browser->load(QPCR_ROOT_URL);
             }
         }
     }

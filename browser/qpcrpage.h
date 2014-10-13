@@ -3,10 +3,12 @@
 
 #include <QWebPage>
 
+class QPCRBrowser;
+
 class QPCRPage : public QWebPage
 {Q_OBJECT
 public:
-    QPCRPage(QObject *parent = 0);
+    QPCRPage(QPCRBrowser *browser);
     ~QPCRPage();
 
 protected:
@@ -17,6 +19,8 @@ private slots:
     void loaded(bool isSuccess);
 
 private:
+    QPCRBrowser *browser;
+
     bool repeatState;
 };
 
