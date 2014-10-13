@@ -44,25 +44,12 @@ void Optics::setADCValue(unsigned int adcValue)
     _adcCondition.notify_all();
 }
 
-bool Optics::collectData() const
-{
-    bool result;
-
-    _collectDataMutex.lock();
-    result = _collectData;
-    _collectDataMutex.unlock();
-
-    return result;
-}
-
 void Optics::setCollectData(bool state)
 {
     _collectDataMutex.lock();
     {
-        if (_collectData != state)
+        if (_collectData.exchange(state) != state)
         {
-            _collectData = state;
-
             if (_collectData)
             {
                 _ledNumber = 0;
@@ -115,13 +102,17 @@ void Optics::collectDataCallback(Poco::Timer &timer)
 {
     try
     {
-        {
-            std::mutex waitMutex;
-            std::unique_lock<std::mutex> waitLock(waitMutex);
-            _adcCondition.wait(waitLock);
-        }
+        std::mutex waitMutex;
+        std::unique_lock<std::mutex> waitLock(waitMutex);
 
-        _fluorescenceData[_ledNumber].push_back(_adcValue);
+        for (int i = 0; i < kADCReadsPerOpticalMeasurement; ++i)
+        {
+            _adcCondition.wait(waitLock);
+            _fluorescenceData[_ledNumber].push_back(_adcValue);
+
+            if (!_collectData)
+                break;
+        }
 
         ++_ledNumber;
         if (_ledNumber >= kWellList.size())
