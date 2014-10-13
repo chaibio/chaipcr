@@ -7,7 +7,9 @@ QPCRBrowser::QPCRBrowser()
 {
     setPage(new QPCRPage(this));
     setCursor(Qt::BlankCursor);
-    loadRoot();
+    loadSplashScreen();
+
+    QTimer::singleShot(1000, this, SLOT(loadRoot()));
 }
 
 QPCRBrowser::~QPCRBrowser()
