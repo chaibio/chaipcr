@@ -1,0 +1,13 @@
+[Unit]
+Description=QPCRBrowser
+
+[Service]
+WorkingDirectory=/root/tmp/
+#ExecStart=/root/tmp/qpcrbrowser -qws -display VNC:0 #It will start browser with VNC server. Usually on 5900 port
+ExecStart=/root/tmp/qpcrbrowser -qws #It will start browser for LCD display
+SyslogIdentifier=QPCRBrowser
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
