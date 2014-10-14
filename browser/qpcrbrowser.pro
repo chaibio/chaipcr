@@ -1,6 +1,6 @@
 QT += network webkit
 
-target.path = /home/root/tmp
+target.path = /root/tmp
 INSTALLS += target
 
 DEFINES += "QPCR_ROOT_URL=\"QUrl(\\\"http://localhost:8000/status\\\")\""
