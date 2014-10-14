@@ -15,14 +15,14 @@ const LTC2444::OversamplingRatio kLIAOversamplingRate = LTC2444::kOversamplingRa
 ////////////////////////////////////////////////////////////////////////////////
 // Class ADCController
 ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsumers, std::shared_ptr<ADCConsumer> liaConsumer, std::shared_ptr<ADCConsumer> lidConsumer,
-                             SPIPort spiPort, unsigned int busyPinNumber):
+                             unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber):
     _currentConversionState {static_cast<ADCController::ADCState>(0)},
     _zoneConsumers {zoneConsumers},
     _liaConsumer {liaConsumer},
     _lidConsumer {lidConsumer} {
     _workState = false;
 
-    _ltc2444 = new LTC2444(std::move(spiPort), busyPinNumber);
+    _ltc2444 = new LTC2444(csPinNumber, std::move(spiPort), busyPinNumber);
     _ltc2444->readSingleEndedChannel(4, kThermistorOversamplingRate); //start first read
 }
 

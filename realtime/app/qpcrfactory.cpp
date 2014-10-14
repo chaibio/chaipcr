@@ -18,7 +18,7 @@ void QPCRFactory::constructMachine(std::vector<std::shared_ptr<IControl> > &cont
     controls.push_back(QPCRFactory::constructLid(lidADCConsumer));
     controls.push_back(QPCRFactory::constructHeatSink());
 
-    threadControls.push_back(ADCControllerInstance::createInstance(zoneConsumers, OpticsInstance::getInstance(), lidADCConsumer, std::move(SPIPort(kSPI0DevicePath)), kSPI0DataInSensePinNumber)); //Not refactored yet
+    threadControls.push_back(ADCControllerInstance::createInstance(zoneConsumers, OpticsInstance::getInstance(), lidADCConsumer, kLTC2444CSPinNumber, std::move(SPIPort(kSPI0DevicePath)), kSPI0DataInSensePinNumber)); //Not refactored yet
 
     setupMachine();
 }

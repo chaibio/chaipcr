@@ -32,7 +32,7 @@ public:
 	//accessors
     inline bool lidOpen() const { return _lidOpen; }
 
-    bool collectData() const;
+    inline bool collectData() const { return _collectData; }
     void setCollectData(bool state);
 
     inline std::shared_ptr<LEDController> getLedController() { return _ledController; }
@@ -51,9 +51,9 @@ private:
     GPIO _lidSensePin;
 
     std::atomic<unsigned int> _adcValue;
-    mutable std::condition_variable _adcCondition;
+    std::condition_variable _adcCondition;
 
-    bool _collectData;
+    std::atomic<bool> _collectData;
     Poco::Timer *_collectDataTimer;
     mutable std::recursive_mutex _collectDataMutex;
 

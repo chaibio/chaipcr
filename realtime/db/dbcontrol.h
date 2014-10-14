@@ -57,12 +57,14 @@ private:
     void addWriteQueries(std::vector<std::string> &queries);
 
 private:
-    soci::session *_session;
-    std::mutex _dbMutex;
+    soci::session *_readSession;
+    soci::session *_writeSession;
+
+    std::mutex _readMutex;
+    std::mutex _writeMutex;
 
     std::atomic<bool> _writeThreadState;
     std::vector<std::string> _writeQueriesQueue;
-    std::mutex _writeMutex;
     std::condition_variable _writeCondition;
 };
 

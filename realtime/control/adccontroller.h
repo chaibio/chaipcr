@@ -25,7 +25,7 @@ public:
         EFinal
     };
 
-    ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsumers, std::shared_ptr<ADCConsumer> liaConsumer, std::shared_ptr<ADCConsumer> lidConsumer,
+    ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsumers, std::shared_ptr<ADCConsumer> liaConsumer, std::shared_ptr<ADCConsumer> lidConsumer, unsigned int csPinNumber,
                   SPIPort spiPort, unsigned int busyPinNumber);
 	~ADCController();
 	

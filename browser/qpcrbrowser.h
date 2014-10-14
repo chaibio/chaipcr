@@ -3,13 +3,15 @@
 
 #include <QWebView>
 
-class QNetworkReply;
-
 class QPCRBrowser : public QWebView
 {Q_OBJECT
 public:
     QPCRBrowser();
     ~QPCRBrowser();
+
+public slots:
+    void loadSplashScreen();
+    void loadRoot();
 
 protected:
     void closeEvent(QCloseEvent *event);
