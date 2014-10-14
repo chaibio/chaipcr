@@ -15,7 +15,7 @@ public:
 		kHigh = 1
 	};
 	
-    GPIO(unsigned int pinNumber, Direction direction);
+    GPIO(unsigned int pinNumber, Direction direction, bool waitinigAvailable = false);
     GPIO(const GPIO &other) = delete;
     GPIO(GPIO &&other);
 	~GPIO();
@@ -31,6 +31,8 @@ public:
 	
 	Direction direction() const { return direction_; }
     void setDirection(Direction direction);
+
+    void setupWaiting();
 	
 private:
     void exportPin();
@@ -42,6 +44,7 @@ private:
 	unsigned int pinNumber_; //BeagleBone GPIO Pin Number
 	Direction direction_;
 
+    int waitingFd_;
     int stopWaitinigFd_;
 
     mutable Value savedValue_;

@@ -44,6 +44,7 @@ void ADCController::process() {
 
     try {
         _workState = true;
+
         while (_workState) {
             if (_ltc2444->waitBusy())
                 continue;

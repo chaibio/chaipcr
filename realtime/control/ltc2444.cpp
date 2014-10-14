@@ -8,7 +8,7 @@
 LTC2444::LTC2444(unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber) :
      csPin_(csPinNumber, GPIO::kOutput),
 	 spiPort_ (spiPort),
-	 busyPin_ (busyPinNumber, GPIO::kInput){}
+     busyPin_ (busyPinNumber, GPIO::kInput, true){}
 
 LTC2444::~LTC2444() {
 }
