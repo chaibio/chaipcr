@@ -1,5 +1,3 @@
-#include <boost/date_time.hpp>
-
 #include "bidirectionalpwmcontroller.h"
 #include "heatblock.h"
 
@@ -115,21 +113,21 @@ void HeatBlock::Ramp::set(double targetTemperature, double rate) {
 
     _targetTemperature = targetTemperature;
     _rate = rate;
-    _lastChangesTime = boost::posix_time::microsec_clock::local_time();
+    _lastChangesTime = boost::chrono::high_resolution_clock::now();
 }
 
 double HeatBlock::Ramp::computeTemperature(double currentTargetTemperature) {
     if (isEmpty())
         return _targetTemperature;
 
-    boost::posix_time::ptime previousTime = _lastChangesTime;
-    _lastChangesTime = boost::posix_time::microsec_clock::local_time();
+    boost::chrono::high_resolution_clock::time_point previousTime = _lastChangesTime;
+    _lastChangesTime = boost::chrono::high_resolution_clock::now();
 
-    boost::posix_time::time_duration pastTime = _lastChangesTime - previousTime;
+    boost::chrono::milliseconds pastTime(boost::chrono::duration_cast<boost::chrono::milliseconds>(_lastChangesTime - previousTime));
 
-    if (pastTime.total_milliseconds() > 0) {
+    if (pastTime.count() > 0) {
         if (currentTargetTemperature > _targetTemperature) {
-            double temp = currentTargetTemperature - (_rate * (pastTime.total_milliseconds() / (double)1000 * 100) / 100);
+            double temp = currentTargetTemperature - (_rate * (pastTime.count() / (double)1000 * 100) / 100);
 
             if (temp <= _targetTemperature) {
                 clear();
@@ -139,7 +137,7 @@ double HeatBlock::Ramp::computeTemperature(double currentTargetTemperature) {
                 return temp;
         }
         else {
-            double temp = currentTargetTemperature + (_rate * (pastTime.total_milliseconds() / (double)1000 * 100) / 100);
+            double temp = currentTargetTemperature + (_rate * (pastTime.count() / (double)1000 * 100) / 100);
 
             if (temp >= _targetTemperature) {
                 clear();
@@ -148,6 +146,7 @@ double HeatBlock::Ramp::computeTemperature(double currentTargetTemperature) {
             else
                 return temp;
         }
+
     }
     else
         return currentTargetTemperature;
