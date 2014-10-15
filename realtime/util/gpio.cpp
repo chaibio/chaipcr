@@ -18,14 +18,20 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class GPIO
-GPIO::GPIO(unsigned int pinNumber, Direction direction) :
+GPIO::GPIO(unsigned int pinNumber, Direction direction, bool waitinigAvailable) :
 	pinNumber_(pinNumber) {
 	
 	exportPin();
     changeEdge();
 	setDirection(direction);
 
-    stopWaitinigFd_ = eventfd(0, EFD_NONBLOCK);
+    if (waitinigAvailable)
+        setupWaiting();
+    else
+    {
+        waitingFd_ = 0;
+        stopWaitinigFd_ = 0;
+    }
 
     savedValue_ = value();
 }
@@ -34,20 +40,29 @@ GPIO::GPIO(GPIO &&other) {
     pinNumber_ = other.pinNumber_;
     direction_ = other.direction_;
     savedValue_ = other.savedValue_;
+    waitingFd_ = other.waitingFd_;
+    stopWaitinigFd_ = other.stopWaitinigFd_;
 
     other.pinNumber_ = UINT_MAX;
+    other.waitingFd_ = 0;
+    other.stopWaitinigFd_ = 0;
 }
 
 GPIO::~GPIO() {
     close(stopWaitinigFd_);
+    close(waitingFd_);
 }
 
 GPIO& GPIO::operator= (GPIO &&other) {
     pinNumber_ = other.pinNumber_;
     direction_ = other.direction_;
     savedValue_ = other.savedValue_;
+    waitingFd_ = other.waitingFd_;
+    stopWaitinigFd_ = other.stopWaitinigFd_;
 
     other.pinNumber_ = UINT_MAX;
+    other.waitingFd_ = 0;
+    other.stopWaitinigFd_ = 0;
 
     return *this;
 }
@@ -113,28 +128,18 @@ void GPIO::setValue(Value value, bool checkValue) {
 }
 
 GPIO::Value GPIO::waitValue(Value value) {
-    if (pinNumber_ == UINT_MAX)
-        throw GPIOError("GPIO is moved");
-
-    ostringstream filePath;
-    filePath << "/sys/class/gpio/gpio" << pinNumber_ << "/value";
-
-    int gpioFd = open(filePath.str().c_str(), O_RDONLY | O_NONBLOCK);
-    if (gpioFd > 0) {
+    if (waitingFd_ > 0) {
         char buffer[sizeof(int64_t)];
-        memset(buffer, 0, sizeof(buffer));
-        read(gpioFd, buffer, sizeof(buffer)-1);
-        lseek(gpioFd, 0, SEEK_SET);
+        read(waitingFd_, buffer, sizeof(buffer)-1);
+        lseek(waitingFd_, 0, SEEK_SET);
 
         if ((buffer[0] == '0' && value == kLow) || (buffer[0] == '1' && value == kHigh)) {
             savedValue_ = value;
-            close(gpioFd);
-
             return value;
         }
 
         pollfd fdArray[2];
-        fdArray[0].fd = gpioFd;
+        fdArray[0].fd = waitingFd_;
         fdArray[0].events = POLLPRI;
         fdArray[0].revents = 0;
 
@@ -144,7 +149,8 @@ GPIO::Value GPIO::waitValue(Value value) {
 
         if (poll(fdArray, 2, -1) > 0) {
             if (fdArray[0].revents > 0) { //If was some operation on GPIO
-                read(gpioFd, buffer, sizeof(buffer)-1);
+                read(waitingFd_, buffer, sizeof(buffer)-1);
+                lseek(waitingFd_, 0, SEEK_SET);
 
                 switch (buffer[0]) {
                 case '0':
@@ -156,7 +162,6 @@ GPIO::Value GPIO::waitValue(Value value) {
                     break;
 
                 default:
-                    close(gpioFd);
                     throw GPIOError("Unexpected GPIO value");
                 }
             }
@@ -167,18 +172,18 @@ GPIO::Value GPIO::waitValue(Value value) {
         }
         else
             value = value == kHigh ? kLow : kHigh;
-
-        close(gpioFd);
     }
     else
-        throw std::logic_error("Unable to open gpio");
+        throw std::logic_error("GPIO is not setup for waiting");
 
     return value;
 }
 
 void GPIO::stopWaitinigValue() {
-    int64_t i = 1;
-    write(stopWaitinigFd_, &i, sizeof(i));
+    if (stopWaitinigFd_ > 0) {
+        int64_t i = 1;
+        write(stopWaitinigFd_, &i, sizeof(i));
+    }
 }
 
 void GPIO::setDirection(Direction direction) {
@@ -207,6 +212,14 @@ void GPIO::setDirection(Direction direction) {
 	directionFile.close();
 	
 	direction_ = direction;
+}
+
+void GPIO::setupWaiting() {
+    ostringstream filePath;
+    filePath << "/sys/class/gpio/gpio" << pinNumber_ << "/value";
+
+    waitingFd_ = open(filePath.str().c_str(), O_RDONLY | O_NONBLOCK);
+    stopWaitinigFd_ = eventfd(0, EFD_NONBLOCK);
 }
 
 void GPIO::exportPin() {

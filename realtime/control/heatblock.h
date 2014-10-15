@@ -5,7 +5,7 @@
 
 #include <mutex>
 #include <utility>
-#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/chrono.hpp>
 #include <boost/signals2.hpp>
 
 class BidirectionalPWMController;
@@ -28,7 +28,7 @@ class HeatBlock : public IControl
     private:
         double _targetTemperature;
         double _rate;
-        boost::posix_time::ptime _lastChangesTime;
+        boost::chrono::high_resolution_clock::time_point _lastChangesTime;
     };
 
 public:

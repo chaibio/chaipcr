@@ -23,14 +23,10 @@ void PWMPin::setPWM(unsigned long duty, unsigned long period, unsigned int polar
 }
 
 void PWMPin::writePWMFile(const string& relativePath, unsigned long value) {
-    ostringstream filePath;
-    filePath << pwmDevicePath_ << relativePath;
-
-	ofstream file;
-    file.open(filePath.str());
+    ofstream file(pwmDevicePath_ + relativePath);
 	file << value;
     file.flush();
 
     if (file.fail())
-        throw std::invalid_argument("PWMPin::writePWMFile - invalid argument passed to " + filePath.str());
+        throw std::invalid_argument("PWMPin::writePWMFile - invalid argument passed to " + pwmDevicePath_ + relativePath);
 }

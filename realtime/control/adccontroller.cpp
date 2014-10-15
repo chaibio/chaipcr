@@ -1,4 +1,5 @@
 #include <cassert>
+#include <ctime>
 #include <boost/chrono.hpp>
 
 #include "pcrincludes.h"
@@ -36,13 +37,14 @@ ADCController::~ADCController() {
 }
 
 void ADCController::process() {
-    static const unsigned long repeatFrequencyInterval = round(1.0 / kADCRepeatFrequency * 1000 * 1000); //Microsec
+    static const boost::chrono::nanoseconds repeatFrequencyInterval((boost::chrono::nanoseconds::rep)round(1.0 / kADCRepeatFrequency * 1000 * 1000 * 1000));
     boost::chrono::high_resolution_clock::time_point repeatFrequencyLastTime;
 
     setMaxRealtimePriority();
 
     try {
         _workState = true;
+
         while (_workState) {
             if (_ltc2444->waitBusy())
                 continue;
@@ -58,10 +60,14 @@ void ADCController::process() {
                     boost::chrono::high_resolution_clock::time_point previousTime = repeatFrequencyLastTime;
                     repeatFrequencyLastTime = boost::chrono::high_resolution_clock::now();
 
-                    unsigned long executionTime = boost::chrono::duration_cast<boost::chrono::microseconds>(repeatFrequencyLastTime - previousTime).count();
+                    boost::chrono::nanoseconds executionTime = repeatFrequencyLastTime - previousTime;
 
-                    if (executionTime < repeatFrequencyInterval) {
-                        usleep(repeatFrequencyInterval - executionTime);
+                    if (executionTime < repeatFrequencyInterval)
+                    {
+                        static timespec time;
+                        time.tv_nsec = (repeatFrequencyInterval - executionTime).count();
+
+                        nanosleep(&time, nullptr);
 
                         repeatFrequencyLastTime = boost::chrono::high_resolution_clock::now();
                     }

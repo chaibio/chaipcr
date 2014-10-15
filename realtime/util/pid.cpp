@@ -58,7 +58,6 @@ double PIDController::compute(double setpoint, double processValue) {
 void PIDController::reset() {
     _lock.lock();
     _previousExecutionTime = boost::chrono::high_resolution_clock::time_point();
-    //_previousExecutionTime = not_a_date_time;
     _lock.unlock();
 }
 //------------------------------------------------------------------------------
