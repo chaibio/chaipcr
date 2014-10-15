@@ -11,86 +11,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     selection: false,
     stateful: true
   });
-  // Moving event handlers into canvas object
-  // For better performance and in accordance with fabric js specific
-  // For mouse down
-  this.canvas.on("mouse:down", function(evt) {
-    if(evt.target) {
-      switch(evt.target.name)  {
-
-      case "step":
-        var me = evt.target.me;
-        me.circle.manageClick();
-        //me.parentStage.selectStage();
-        //me.selectStep();
-        // Sending data to backbone
-        appRouter.editStageStep.trigger("stepSelected", me);
-      break;
-
-      case "controlCircleGroup":
-        var me = evt.target.me;
-        me.manageClick();
-        appRouter.editStageStep.trigger("stepSelected", me.parent);
-      break;
-      }
-    }
-  });
-  // For dragging
-  this.canvas.on('object:moving', function(evt) {
-    if(evt.target) {
-      switch(evt.target.name) {
-        case "controlCircleGroup":
-          var targetCircleGroup = evt.target,
-          me = evt.target.me;
-          me.manageDrag(targetCircleGroup);
-          appRouter.editStageStep.trigger("stepDrag", me);
-        break;
-      }
-    }
-  });
-  // when scrolling is finished
-  this.canvas.on('object:modified', function(evt) {
-    if(evt.target) {
-      if(evt.target.name === "controlCircleGroup") {// Right now we have only one item here otherwise switch case
-        var me = evt.target.me;
-        var targetCircleGroup = evt.target;
-        var temp;
-        appRouter.editStageStep.trigger("stepDrag", me);
-        temp = evt.target.me.temperature.text;
-        me.model.changeTemperature(parseFloat(temp.substr(0, temp.length - 1)));
-      }
-    }
-  });
-  // We add this handler so that canvas works when scrolled
-  $(".canvas-containing").scroll(function(){
-    that.canvas.calcOffset();
-  });
-
-  this.canvas.on("imagesLoaded", function() {
-    that.addRampLinesAndCircles();
-    that.selectStep();
-    that.canvas.renderAll();
-  });
-
-  this.canvas.on("temperatureChangedFromBottom", function(changedStep) {
-    //Here is the change from bottom edit part with temperature change
-    changedStep.circle.getTop();
-    changedStep.circle.circleGroup.top = changedStep.circle.top;
-    changedStep.circle.manageDrag(changedStep.circle.circleGroup);
-    changedStep.circle.circleGroup.setCoords();
-  });
-
-  this.canvas.on("rampSpeedChangedFromBottom", function(changedStep) {
-    changedStep.showHideRamp();
-  });
-
-  this.canvas.on("stepNameChangedFromBottom", function(changedStep) {
-    changedStep.updateStepName();
-  });
-
-  this.canvas.on("cycleChangedFromBottom", function(changedStep) {
-    changedStep.parentStage.changeCycle();
-  });
+  this.fireUpEvents = new ChaiBioTech.app.Views.fabricEvents(this);
 
   this.setDefaultWidthHeight = function() {
     this.canvas.setHeight(420);
@@ -99,6 +20,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     this.canvas.renderAll();
   };
 
+  // 2 events stay back in canvas itself
   this.canvas.on("modelChanged", function(evt) {
     that.model.getLatestModel(that.canvas);
     that.canvas.clear().renderAll;
@@ -114,7 +36,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     that.addStages();
     that.setDefaultWidthHeight();
     that.addinvisibleFooterToStep();
-  })
+  });
 
   this.selectStep = function() {
     this.allStepViews[0].circle.manageClick(true);
@@ -234,6 +156,5 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     }
     return circles;
   }
-
   return this;
 }
