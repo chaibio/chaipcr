@@ -5,9 +5,7 @@ ChaiBioTech.app.Views.testInProgress = Backbone.View.extend({
   className: "test-in-progress-container",
 
   initialize: function() {
-    // Okay bring the already done experiment in progress
-    // Remove this , because it has different look and feel
-    this.exp = new ChaiBioTech.app.Views.experimentInProgress();
+    this.exp = new ChaiBioTech.app.Views.experimentInProgressBar();
   },
 
   render: function() {
