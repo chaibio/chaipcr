@@ -3,14 +3,17 @@ ChaiBioTech.app.Views = ChaiBioTech.app.Views || {};
 ChaiBioTech.app.Views.mainCanvas = null; // This could be used across application to fire
 
 ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
+
   this.model = model;
   this.allStepViews = [];
   var that = this;
+
   ChaiBioTech.app.Views.mainCanvas = this.canvas = new fabric.Canvas('canvas', {
     backgroundColor: '#ffb400',
     selection: false,
     stateful: true
   });
+
   this.fireUpEvents = new ChaiBioTech.app.Views.fabricEvents(this);
 
   this.setDefaultWidthHeight = function() {
@@ -18,25 +21,9 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     var width = (this.allStepViews.length * 122 > 1024) ? this.allStepViews.length * 120 : 1024
     this.canvas.setWidth(width + 50);
     this.canvas.renderAll();
+    return this;
   };
 
-  // 2 events stay back in canvas itself
-  this.canvas.on("modelChanged", function(evt) {
-    that.model.getLatestModel(that.canvas);
-    that.canvas.clear().renderAll;
-  });
-
-  this.canvas.on("latestData", function() {
-    while(that.allStepViews.length > 0) {
-      that.allStepViews.pop();
-    }
-    ChaiBioTech.app.selectedStage = null;
-    ChaiBioTech.app.selectedStep = null;
-    ChaiBioTech.app.selectedCircle = null;
-    that.addStages();
-    that.setDefaultWidthHeight();
-    that.addinvisibleFooterToStep();
-  });
 
   this.selectStep = function() {
     this.allStepViews[0].circle.manageClick(true);
@@ -64,6 +51,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     // Only for the last stage
     stageView.borderRight();
     this.canvas.add(stageView.borderRight);
+    return this;
   };
 
   this.addRampLinesAndCircles = function() {

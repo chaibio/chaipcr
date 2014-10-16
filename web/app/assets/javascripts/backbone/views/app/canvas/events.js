@@ -1,8 +1,7 @@
 ChaiBioTech.app.Views = ChaiBioTech.app.Views || {};
-// Moving event handlers into canvas object
-// For better performance and in accordance with fabric js specific
-// For mouse down
+
 ChaiBioTech.app.Views.fabricEvents = function(C) {
+  // C is canvas object and C.canvas is the fabric canvas object
   this.canvas = C.canvas;
 
   this.canvas.on("mouse:down", function(evt) {
@@ -12,8 +11,6 @@ ChaiBioTech.app.Views.fabricEvents = function(C) {
       case "step":
         var me = evt.target.me;
         me.circle.manageClick();
-        //me.parentStage.selectStage();
-        //me.selectStep();
         // Sending data to backbone
         appRouter.editStageStep.trigger("stepSelected", me);
       break;
@@ -57,14 +54,21 @@ ChaiBioTech.app.Views.fabricEvents = function(C) {
     C.canvas.calcOffset();
   });
 
+  // When all the images are loaded up
+  // We fire this event
+  // Note that it takes some more time to load images, better avaoid images
+  // or wait for images to complete
+
   this.canvas.on("imagesLoaded", function() {
     C.addRampLinesAndCircles();
     C.selectStep();
     C.canvas.renderAll();
   });
 
+ // Changed from bottom means , those values were changed from bottom
+ // of the screen where we can type in those values
+
  this.canvas.on("temperatureChangedFromBottom", function(changedStep) {
-    //Here is the change from bottom edit part with temperature change
     changedStep.circle.getTop();
     changedStep.circle.circleGroup.top = changedStep.circle.top;
     changedStep.circle.manageDrag(changedStep.circle.circleGroup);
@@ -81,5 +85,23 @@ ChaiBioTech.app.Views.fabricEvents = function(C) {
 
   this.canvas.on("cycleChangedFromBottom", function(changedStep) {
     changedStep.parentStage.changeCycle();
+  });
+
+  // When a model in the server changed
+  // changes like add step/stage or delete step/stage
+
+  this.canvas.on("modelChanged", function(evt) {
+    C.model.getLatestModel(C.canvas);
+    C.canvas.clear();
+  });
+
+  this.canvas.on("latestData", function() {
+    while(C.allStepViews.length > 0) {
+      C.allStepViews.pop();
+    }
+    ChaiBioTech.app.selectedStage = null;
+    ChaiBioTech.app.selectedStep = null;
+    ChaiBioTech.app.selectedCircle = null;
+    C.addStages().setDefaultWidthHeight().addinvisibleFooterToStep();
   });
 }
