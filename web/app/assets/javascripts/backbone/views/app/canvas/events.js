@@ -1,4 +1,7 @@
 ChaiBioTech.app.Views = ChaiBioTech.app.Views || {};
+// These are the main fabric events happening
+// Remeber all the events are happening on the canvas, so we can't write
+// handler for individual object. So the approch is different from DOM
 
 ChaiBioTech.app.Views.fabricEvents = function(C) {
   // C is canvas object and C.canvas is the fabric canvas object
@@ -96,12 +99,17 @@ ChaiBioTech.app.Views.fabricEvents = function(C) {
   });
 
   this.canvas.on("latestData", function() {
+
     while(C.allStepViews.length > 0) {
       C.allStepViews.pop();
     }
-    ChaiBioTech.app.selectedStage = null;
-    ChaiBioTech.app.selectedStep = null;
-    ChaiBioTech.app.selectedCircle = null;
+
+    ChaiBioTech.app = {
+      selectedStage: null,
+      selectedStep: null,
+      selectedCircle: null
+    };
+
     C.addStages().setDefaultWidthHeight().addinvisibleFooterToStep();
   });
-}
+};
