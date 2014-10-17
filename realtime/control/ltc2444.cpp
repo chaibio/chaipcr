@@ -47,9 +47,7 @@ uint32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, Overs
 	dataOut[2] = (data>>8);
 	dataOut[3] = (data);
 
-    csPin_.setValue(GPIO::kLow);
     spiPort_.readBytes(dataIn, dataOut, 4, kADCSPIFrequencyHz);
-    csPin_.setValue(GPIO::kHigh);
 
     if ((dataIn[0] >> 4) & 1)
         conversion = 0; //undervoltage
