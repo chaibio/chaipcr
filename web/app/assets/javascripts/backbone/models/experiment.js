@@ -276,11 +276,9 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 			type: 'GET'
 		})
 		.done(function(data) {
-				console.log("updated");
 				that.set('experiment', data["experiment"]);
 				if(that.get("callback")) {
-					callback = that.get("callback");
-					callback();
+					that.get("callback")();
 					that.set("callback", null);
 				} else if(canvas) {
 					canvas.fire("latestData");

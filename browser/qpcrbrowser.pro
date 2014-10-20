@@ -16,3 +16,7 @@ SOURCES += \
 HEADERS += \
     qpcrbrowser.h \
     qpcrpage.h
+
+QMAKE_CC = arm-unknown-linux-gnueabi-gcc
+QMAKE_CXX = arm-unknown-linux-gnueabi-g++
+QMAKE_LINK = arm-unknown-linux-gnueabi-g++

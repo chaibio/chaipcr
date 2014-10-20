@@ -59,7 +59,7 @@
 /* line 58, ../../app/assets/stylesheets/run-exp.css.scss */
 .run-exp-layout .palette-container img {
   margin-left: 30px;
-  margin-top: 20px;
+  margin-top: 17px;
 }
 /* line 64, ../../app/assets/stylesheets/run-exp.css.scss */
 .run-exp-layout .test-in-progress-container {
@@ -67,36 +67,67 @@
   float: left;
   width: 381px;
 }
-/* line 71, ../../app/assets/stylesheets/run-exp.css.scss */
-.run-exp-layout .test-in-progress-container .experiment-in-progress .experiment-in-progress-heading {
-  border-bottom: solid 2px #001827;
+/* line 69, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container {
+  width: 350px;
+  height: 150px;
 }
-/* line 74, ../../app/assets/stylesheets/run-exp.css.scss */
-.run-exp-layout .test-in-progress-container .experiment-in-progress .experiment-info {
-  height: 80px;
+/* line 73, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .exp-in-progress-bar-heading {
+  height: 45px;
+  width: 350px;
+  font-size: 14px;
+  font-weight: bold;
   padding-top: 25px;
-}
-/* line 78, ../../app/assets/stylesheets/run-exp.css.scss */
-.run-exp-layout .test-in-progress-container .experiment-in-progress .experiment-info div {
-  float: left;
+  border-bottom: solid 2px black;
 }
 /* line 82, ../../app/assets/stylesheets/run-exp.css.scss */
-.run-exp-layout .test-in-progress-container .experiment-in-progress .experiment-info .caption {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-/* line 86, ../../app/assets/stylesheets/run-exp.css.scss */
-.run-exp-layout .test-in-progress-container .experiment-in-progress .experiment-info .experiment-info-test {
-  width: 280px;
-}
-/* line 91, ../../app/assets/stylesheets/run-exp.css.scss */
-.run-exp-layout .test-in-progress-container .experiment-in-progress .experiment-progress-bar {
-  height: 5px;
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .black-bar {
+  position: relative;
+  width: 350px;
+  height: 4px;
   background-color: black;
 }
-/* line 95, ../../app/assets/stylesheets/run-exp.css.scss */
-.run-exp-layout .test-in-progress-container .experiment-in-progress .experiment-progress-bar .pro-bar {
+/* line 88, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .black-bar .blue-bar {
+  position: relative;
+  width: 150px;
+  height: 4px;
   background-color: #00aeef;
-  height: 5px;
-  width: 0px;
+}
+/* line 96, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .exp-in-progress-bar-info-container {
+  width: 350px;
+  height: 95px;
+}
+/* line 100, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .exp-in-progress-bar-info-container .column1 {
+  height: 30px;
+  width: 212px;
+  float: left;
+}
+/* line 105, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .exp-in-progress-bar-info-container .adjustmentsForR1 {
+  font-size: 14px;
+  font-weight: bold;
+  padding-top: 14px;
+}
+/* line 110, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .exp-in-progress-bar-info-container .adjustmentsForR2 {
+  padding-top: 10px;
+}
+/* line 113, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .exp-in-progress-bar-info-container .adjustmentsForR3 {
+  padding-top: 12px;
+}
+/* line 115, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .exp-in-progress-bar-info-container .adjustmentsForR3 span {
+  font-weight: bold;
+  font-size: 13px;
+}
+/* line 120, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .exp-in-progress-bar-info-container .column2 {
+  height: 30px;
+  width: 138px;
+  float: left;
 }

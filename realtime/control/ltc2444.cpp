@@ -46,6 +46,7 @@ uint32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, Overs
 	dataOut[1] = (data>>16);
 	dataOut[2] = (data>>8);
 	dataOut[3] = (data);
+
     spiPort_.readBytes(dataIn, dataOut, 4, kADCSPIFrequencyHz);
 
     if ((dataIn[0] >> 4) & 1)
