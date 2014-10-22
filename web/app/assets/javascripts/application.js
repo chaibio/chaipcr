@@ -27,10 +27,10 @@
 
 
 $(function () {
-	window.router = new ChaiBioTech.Routers.DesignRouter({});
-   	window.touchScreenRouter = new ChaiBioTech.Routers.touchScreen({});
-   	window.logScreenRouter = new ChaiBioTech.Routers.temperatureLog({});
-   	window.appRouter = new ChaiBioTech.Routers.appRouter({});
-   	Backbone.history.start();
-   	window.location = "#/login"; //Temporary to bypass. Disable this to test add new experiments.
+	//window.router = new ChaiBioTech.Routers.DesignRouter({});
+	//window.touchScreenRouter = new ChaiBioTech.Routers.touchScreen({});
+	//window.logScreenRouter = new ChaiBioTech.Routers.temperatureLog({});
+	//window.appRouter = new ChaiBioTech.Routers.appRouter({});
+	Backbone.history.start();
+	window.location = "#/login"; //Temporary to bypass. Disable this to test add new experiments.
 });

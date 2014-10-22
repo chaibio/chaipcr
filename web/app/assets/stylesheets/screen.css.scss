@@ -157,3 +157,14 @@
 #container {
 	width: 1024px;
 }
+
+@media (max-width: 800px) {
+
+	body {
+		min-width: 800px;
+	}
+
+	#container {
+		width: 800px;
+	}
+}
