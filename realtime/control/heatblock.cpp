@@ -83,6 +83,10 @@ double HeatBlock::zone2Temperature() const {
     return _zones.second->currentTemperature();
 }
 
+double HeatBlock::temperature() const {
+    return (zone1Temperature() + zone2Temperature()) / 2;
+}
+
 double HeatBlock::maxTemperatureSetpointDelta() const {
     double zone1Abs = std::abs(_zones.first->targetTemperature() - zone1Temperature());
     double zone2Abs = std::abs(_zones.second->targetTemperature() - zone2Temperature());

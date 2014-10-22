@@ -22,6 +22,8 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
 
         responsePt.put("heatblock.zone2.temperature", ROUND(heatBlock->zone2Temperature()));
         responsePt.put("heatblock.zone2.drive", ROUND(heatBlock->zone2DriveValue()));
+
+        responsePt.put("heatblock.temperature", ROUND(heatBlock->temperature()));
     }
 
     if (lid) {
