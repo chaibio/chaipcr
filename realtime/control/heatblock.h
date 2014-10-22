@@ -44,6 +44,7 @@ public:
     void calculateTargetTemperature();
     double zone1Temperature() const;
     double zone2Temperature() const;
+    double temperature() const;
 
     double maxTemperatureSetpointDelta () const;
 
