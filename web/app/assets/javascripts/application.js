@@ -31,6 +31,8 @@ $(function () {
 	//window.touchScreenRouter = new ChaiBioTech.Routers.touchScreen({});
 	//window.logScreenRouter = new ChaiBioTech.Routers.temperatureLog({});
 	//window.appRouter = new ChaiBioTech.Routers.appRouter({});
+	window.deviceRouter = new ChaiBioTech.Routers.deviceRouter({});
 	Backbone.history.start();
-	window.location = "#/login"; //Temporary to bypass. Disable this to test add new experiments.
+	window.location = "#/800x480-home"
+	//window.location = "#/login"; //Temporary to bypass. Disable this to test add new experiments.
 });
