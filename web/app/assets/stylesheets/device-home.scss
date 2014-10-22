@@ -1,0 +1,16 @@
+.device-home-container {
+  width: 800px;
+  height: 480px;
+
+  .device-all-exp-container {
+    width: 400px;
+    height: 300px;
+    overflow: scroll;
+
+    .device-exp-container {
+      width: 400px;
+      height: 50px;
+      padding-left: 30px;
+    }
+  }
+}
