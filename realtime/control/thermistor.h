@@ -19,6 +19,7 @@ public:
     //ADCConsumer
     void setADCValue(unsigned int adcValue);
     void setADCValues(unsigned int differentialADCValue, unsigned int singularADCValue);
+    void setADCValueMock(double adcValue);
 
 protected:
     virtual double temperatureForResistance(double resistanceOhms) = 0;

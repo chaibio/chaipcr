@@ -14,16 +14,14 @@ const LTC2444::OversamplingRatio kLIAOversamplingRate = LTC2444::kOversamplingRa
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class ADCController
-ADCController::ADCController(std::vector<std::shared_ptr<ADCConsumer>> zoneConsumers, std::shared_ptr<ADCConsumer> liaConsumer, std::shared_ptr<ADCConsumer> lidConsumer,
-                             unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber):
-    _currentConversionState {static_cast<ADCController::ADCState>(0)},
-    _zoneConsumers {zoneConsumers},
-    _liaConsumer {liaConsumer},
-    _lidConsumer {lidConsumer} {
+ADCController::ADCController(ConsumersList &&consumers, unsigned int csPinNumber, SPIPort &&spiPort, unsigned int busyPinNumber):
+    _consumers(std::move(consumers)) {
+    _currentConversionState = static_cast<ADCState>(0);
     _workState = false;
 
     _ltc2444 = new LTC2444(csPinNumber, std::move(spiPort), busyPinNumber);
     _ltc2444->readSingleEndedChannel(4, kThermistorOversamplingRate); //start first read
+
 }
 
 ADCController::~ADCController() {
@@ -58,7 +56,6 @@ void ADCController::process() {
                 repeatFrequencyLastTime = boost::chrono::high_resolution_clock::now();
 
                 boost::chrono::nanoseconds executionTime = repeatFrequencyLastTime - previousTime;
-                std::cout << executionTime.count() << '\n';
 
                 if (executionTime < repeatFrequencyInterval) {
                     timespec time;
@@ -93,22 +90,7 @@ void ADCController::process() {
             }
 
             //process previous conversion value
-            switch (_currentConversionState) {
-            case EReadZone1Singular:
-                _zoneConsumers.at(0)->setADCValue(value);
-                break;
-            case EReadZone2Singular:
-                _zoneConsumers.at(1)->setADCValue(value);
-                break;
-            case EReadLIA:
-                _liaConsumer->setADCValue(value);
-                break;
-            case EReadLid:
-                _lidConsumer->setADCValue(value);
-                break;
-            default:
-                assert(false);
-            }
+            _consumers[_currentConversionState]->setADCValue(value);
 
             _currentConversionState = state;
         }
