@@ -39,10 +39,10 @@ static const unsigned int kHeadBlockZone2CoolPin = 47;
 static const int kMuxControlPin1 = 30;
 static const int kMuxControlPin2 = 31;
 static const int kMuxControlPin3 = 48;
-static const int kMuxControlPin4 = 5;
+static const int kMuxControlPin4 = 60;
 
 //ADC
 extern const std::string kADCPinPath;
-static const unsigned int kADCPinChannel = 5;
+static const unsigned int kHeatSinkThermistorADCPinChannel = 5;
 
 #endif
