@@ -12,7 +12,7 @@ const string kSPI1DevicePath {"/dev/spidev2.0"};
 const string kHeatSinkFanControlPWMPath {"/sys/devices/ocp.3/fan_pwm.17"};
 
 //LED control
-const std::string kLEDBlankPWMPath { "/sys/devices/ocp.3/lia_ref_pwm.18" };
+const std::string kLEDBlankPWMPath {"/sys/devices/ocp.3/lia_ref_pwm.18"};
 
 //Lid
 const std::string kLidControlPWMPath {"/sys/devices/ocp.3/lid_heater_pwm.16"};

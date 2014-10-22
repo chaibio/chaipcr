@@ -166,3 +166,15 @@
 #container {
   width: 1024px;
 }
+
+@media (max-width: 800px) {
+  /* line 163, ../../app/assets/stylesheets/screen.css.scss */
+  body {
+    min-width: 800px;
+  }
+
+  /* line 167, ../../app/assets/stylesheets/screen.css.scss */
+  #container {
+    width: 800px;
+  }
+}
