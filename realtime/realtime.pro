@@ -121,7 +121,8 @@ HEADERS += \
     server/settingshandler.h \
     util/adcpin.h \
     server/logdatahandler.h \
-    util/exceptionhandler.h
+    util/exceptionhandler.h \
+    control/test/adccontrollermock.h
 
 SOURCES += \
     app/pins.cpp \
@@ -165,4 +166,5 @@ SOURCES += \
     util/filters.cpp \
     server/settingshandler.cpp \
     util/adcpin.cpp \
-    server/logdatahandler.cpp
+    server/logdatahandler.cpp \
+    control/test/adccontrollermock.cpp

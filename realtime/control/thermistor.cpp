@@ -24,6 +24,11 @@ void Thermistor::setADCValues(unsigned int differentialADCValue, unsigned int si
     temperatureChanged(temp);
 }
 
+void Thermistor::setADCValueMock(double adcValue) {
+    _temperature.store(adcValue);
+    temperatureChanged(adcValue);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Class SteinhartHartThermistor
 SteinhartHartThermistor::SteinhartHartThermistor(unsigned int voltageDividerResistance, unsigned int adcBits,

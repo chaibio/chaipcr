@@ -9,6 +9,8 @@
 #include "optics.h"
 #include "lid.h"
 
+#include "test/adccontrollermock.h"
+
 class ADCControllerInstance : public Instance<ADCController>
 {
 
@@ -30,6 +32,11 @@ class OpticsInstance : public Instance<Optics>
 };
 
 class LidInstance : public Instance<Lid>
+{
+
+};
+
+class ADCControllerMockInstance : public Instance<ADCControllerMock>
 {
 
 };

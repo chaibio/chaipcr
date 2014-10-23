@@ -63,7 +63,7 @@ void HeatBlock::setTargetTemperature(double targetTemperature, double rampRate) 
     _stepProcessingMutex.unlock();
 }
 
-void HeatBlock::calculateTargetTemperature() {
+void HeatBlock::calculateTemperature() {
     _stepProcessingMutex.lock(); {
         if (!_ramp.isEmpty()) {
             double temp = _ramp.computeTemperature(_zones.first->targetTemperature());
@@ -79,8 +79,16 @@ double HeatBlock::zone1Temperature() const {
     return _zones.first->currentTemperature();
 }
 
+double HeatBlock::zone1TargetTemperature() const {
+    return _zones.first->targetTemperature();
+}
+
 double HeatBlock::zone2Temperature() const {
     return _zones.second->currentTemperature();
+}
+
+double HeatBlock::zone2TargetTemperature() const {
+    return _zones.second->targetTemperature();
 }
 
 double HeatBlock::temperature() const {
@@ -150,7 +158,6 @@ double HeatBlock::Ramp::computeTemperature(double currentTargetTemperature) {
             else
                 return temp;
         }
-
     }
     else
         return currentTargetTemperature;

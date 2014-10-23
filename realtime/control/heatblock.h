@@ -23,6 +23,8 @@ class HeatBlock : public IControl
         inline void clear() { _rate = 0.0; }
         inline bool isEmpty() const { return _rate == 0.0; }
 
+        inline double targetTemperature() const { return _targetTemperature; }
+
         double computeTemperature(double currentTargetTemperature);
 
     private:
@@ -41,9 +43,11 @@ public:
     void enableStepProcessing();
 
     void setTargetTemperature(double targetTemperature, double rampRate = 0);
-    void calculateTargetTemperature();
+    void calculateTemperature();
     double zone1Temperature() const;
+    double zone1TargetTemperature() const;
     double zone2Temperature() const;
+    double zone2TargetTemperature() const;
     double temperature() const;
 
     double maxTemperatureSetpointDelta () const;
@@ -61,7 +65,7 @@ private:
     double _maxRampSpeed;
 
     bool _stepProcessingState;
-    std::mutex _stepProcessingMutex;
+    mutable std::mutex _stepProcessingMutex;
 
     HeatBlock::Ramp _ramp;
 };

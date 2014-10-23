@@ -7,23 +7,22 @@ using namespace std;
 
 // Class QPCRFactory
 void QPCRFactory::constructMachine(std::vector<std::shared_ptr<IControl> > &controls, std::vector<std::shared_ptr<IThreadControl> > &threadControls) {
-    vector<shared_ptr<ADCConsumer>> zoneConsumers;
-    shared_ptr<ADCConsumer> lidADCConsumer;
+    ADCController::ConsumersList adcConsumers;
 
     //shared_ptr<SPIPort> spiPort0(new SPIPort(kSPI0DevicePath));
     shared_ptr<SPIPort> spiPort1(new SPIPort(kSPI1DevicePath));
 
-    controls.push_back(QPCRFactory::constructOptics(spiPort1));
-    controls.push_back(QPCRFactory::constructHeatBlock(zoneConsumers));
-    controls.push_back(QPCRFactory::constructLid(lidADCConsumer));
+    controls.push_back(QPCRFactory::constructOptics(spiPort1, adcConsumers));
+    controls.push_back(QPCRFactory::constructHeatBlock(adcConsumers));
+    controls.push_back(QPCRFactory::constructLid(adcConsumers));
     controls.push_back(QPCRFactory::constructHeatSink());
 
-    threadControls.push_back(ADCControllerInstance::createInstance(zoneConsumers, OpticsInstance::getInstance(), lidADCConsumer, kLTC2444CSPinNumber, std::move(SPIPort(kSPI0DevicePath)), kSPI0DataInSensePinNumber)); //Not refactored yet
+    threadControls.push_back(ADCControllerInstance::createInstance(std::move(adcConsumers), kLTC2444CSPinNumber, std::move(SPIPort(kSPI0DevicePath)), kSPI0DataInSensePinNumber));
 
     setupMachine();
 }
 
-shared_ptr<IControl> QPCRFactory::constructOptics(shared_ptr<SPIPort> ledSPIPort) {
+shared_ptr<IControl> QPCRFactory::constructOptics(shared_ptr<SPIPort> ledSPIPort, ADCController::ConsumersList &consumers) {
     shared_ptr<LEDController> ledControl(new LEDController(ledSPIPort, kLEDDigiPotCSPinNumber, kLEDControlXLATPinNumber,
                                                            kLEDBlankPWMPath, 50));
 
@@ -34,11 +33,12 @@ shared_ptr<IControl> QPCRFactory::constructOptics(shared_ptr<SPIPort> ledSPIPort
     photoDiodeMux.emplace_back(kMuxControlPin4, GPIO::kOutput);
 
     std::shared_ptr<Optics> optics = OpticsInstance::createInstance(kLidSensePinNumber, ledControl, MUX(move(photoDiodeMux)));
+    consumers[ADCController::EReadLIA] = optics;
 
     return optics;
 }
 
-shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsumer>> &consumers) {
+shared_ptr<IControl> QPCRFactory::constructHeatBlock(ADCController::ConsumersList &consumers) {
     shared_ptr<SteinhartHartThermistor> zone1Thermistor(new SteinhartHartThermistor(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                                                                     kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
                                                                                     kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient));
@@ -60,20 +60,20 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(vector<shared_ptr<ADCConsum
     HeatBlockZoneController *zone2 = new HeatBlockZoneController(zone2Thermistor, kHeatBlockZonesMinTargetTemp, kHeatBlockZonesMaxTargetTemp, zone2CPIDController,
                                                                  kHeatBlockZone2PWMPath, kHeatBlockZone2PWMPeriodNs, kHeadBlockZone2HeatPin, kHeadBlockZone2CoolPin);
 
-    consumers.push_back(zone1Thermistor);
-    consumers.push_back(zone2Thermistor);
+    consumers[ADCController::EReadZone1Singular] = zone1Thermistor;
+    consumers[ADCController::EReadZone2Singular] = zone2Thermistor;
 
     return HeatBlockInstance::createInstance(zone1, zone2, kPCRBeginStepTemperatureThreshold, kMaxHeatBlockRampSpeed);
 }
 
-shared_ptr<IControl> QPCRFactory::constructLid(shared_ptr<ADCConsumer> &consumer) {
+shared_ptr<IControl> QPCRFactory::constructLid(ADCController::ConsumersList &consumer) {
     shared_ptr<BetaThermistor> thermistor(new BetaThermistor(kLidThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                                              kLidThermistorBetaCoefficient, kLidThermistorT0Resistance, kLidThermistorT0));
 
     SinglePoleRecursiveFilter processValueFilter(5);
     PIDController *pidController = new PIDController({{100, 1.0, 10000, 0}}, kLidPIDMin, kLidPIDMax, processValueFilter);
 
-    consumer = thermistor;
+    consumer[ADCController::EReadLid] = thermistor;
 
     return LidInstance::createInstance(thermistor, kLidMinTargetTemp, kLidMaxTargetTemp, pidController,
                                        kLidControlPWMPath, kLidPWMPeriodNs, kProgramStartLidTempThreshold);
@@ -100,5 +100,5 @@ void QPCRFactory::setupMachine() {
     }
 
     if (adcController && heatBlock)
-        adcController->loopStarted.connect(boost::bind(&HeatBlock::calculateTargetTemperature, heatBlock.get()));
+        adcController->loopStarted.connect(ADCController::LoopSignalType::slot_type(&HeatBlock::calculateTemperature, heatBlock.get()).track_foreign(heatBlock));
 }
