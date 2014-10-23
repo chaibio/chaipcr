@@ -20,25 +20,88 @@
   height: 60px;
   padding-left: 20px;
   padding-top: 20px;
+  float: left;
 }
-/* line 21, ../../app/assets/stylesheets/device-run.scss */
+/* line 22, ../../app/assets/stylesheets/device-run.scss */
 .device-run-exp-container .device-run-top .device-run-stripe-container .device-run-all-stripes {
   width: 30px;
   width: 25px;
+  cursor: pointer;
 }
-/* line 25, ../../app/assets/stylesheets/device-run.scss */
+/* line 27, ../../app/assets/stylesheets/device-run.scss */
 .device-run-exp-container .device-run-top .device-run-stripe-container .device-run-all-stripes .device-run-stripe {
   width: 30px;
   height: 5px;
   background-color: white;
 }
-/* line 34, ../../app/assets/stylesheets/device-run.scss */
+/* line 35, ../../app/assets/stylesheets/device-run.scss */
+.device-run-exp-container .device-run-top .device-run-exp-name-container {
+  width: 390px;
+  height: 60px;
+  float: left;
+}
+/* line 40, ../../app/assets/stylesheets/device-run.scss */
+.device-run-exp-container .device-run-top .device-run-exp-name-container .device-run-exp-in-progress {
+  height: 25px;
+  width: 390px;
+  color: white;
+  font-size: 12px;
+  padding-top: 7px;
+}
+/* line 48, ../../app/assets/stylesheets/device-run.scss */
+.device-run-exp-container .device-run-top .device-run-exp-name-container .device-run-exp-in-progress-name {
+  height: 35px;
+  width: 390px;
+  color: white;
+  padding-top: 5px;
+  padding-left: 1px;
+  font-size: 30px;
+}
+/* line 58, ../../app/assets/stylesheets/device-run.scss */
+.device-run-exp-container .device-run-top .device-run-buttons-container {
+  float: left;
+  width: 340px;
+  height: 60px;
+}
+/* line 63, ../../app/assets/stylesheets/device-run.scss */
+.device-run-exp-container .device-run-top .device-run-buttons-container button {
+  width: 150px;
+  height: 40px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+/* line 70, ../../app/assets/stylesheets/device-run.scss */
+.device-run-exp-container .device-run-top .device-run-buttons-container .device-run-button-container {
+  width: 170px;
+  height: 60px;
+  float: left;
+  padding-top: 10px;
+}
+/* line 76, ../../app/assets/stylesheets/device-run.scss */
+.device-run-exp-container .device-run-top .device-run-buttons-container .device-run-button-container .device-run-first-button {
+  background-color: #333333;
+  border: solid white 1px;
+  color: white;
+  font-size: 20px;
+}
+/* line 83, ../../app/assets/stylesheets/device-run.scss */
+.device-run-exp-container .device-run-top .device-run-buttons-container .device-run-button-container .device-run-second-button {
+  background-color: white;
+  border: solid white 1px;
+  color: black;
+  font-size: 20px;
+}
+/* line 93, ../../app/assets/stylesheets/device-run.scss */
 .device-run-exp-container .device-run-middle {
   width: 800px;
   height: 380px;
 }
-/* line 39, ../../app/assets/stylesheets/device-run.scss */
+/* line 98, ../../app/assets/stylesheets/device-run.scss */
 .device-run-exp-container .device-run-bottom {
   width: 800px;
   height: 40px;
+  -webkit-box-shadow: 0px -1px 8px 0px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 0px -1px 8px 0px rgba(0, 0, 0, 0.75);
+  box-shadow: 0px -1px 8px 0px rgba(0, 0, 0, 0.75);
 }

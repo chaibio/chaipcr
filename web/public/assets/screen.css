@@ -163,17 +163,22 @@
 }
 
 /* line 157, ../../app/assets/stylesheets/screen.css.scss */
+.fun-city {
+  font-family: "fun city";
+}
+
+/* line 161, ../../app/assets/stylesheets/screen.css.scss */
 #container {
   width: 1024px;
 }
 
 @media (max-width: 800px) {
-  /* line 163, ../../app/assets/stylesheets/screen.css.scss */
+  /* line 167, ../../app/assets/stylesheets/screen.css.scss */
   body {
     min-width: 800px;
   }
 
-  /* line 167, ../../app/assets/stylesheets/screen.css.scss */
+  /* line 171, ../../app/assets/stylesheets/screen.css.scss */
   #container {
     width: 800px;
   }
