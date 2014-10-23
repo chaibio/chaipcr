@@ -15,8 +15,14 @@ ChaiBioTech.Routers.deviceRouter = Backbone.Router.extend({
   },
 
   deviceRunExp: function(id) {
-    console.log(id);
-    $("#container").html("Under Construction");
+    var that = this;
+    callback = function() {
+      that.deviceRunExp = new ChaiBioTech.app.Views.deviceRunExp({
+        model: expModel
+      });
+      $("#container").html(that.deviceRunExp.render().el);
+    };
+    expModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});
   }
 
 });

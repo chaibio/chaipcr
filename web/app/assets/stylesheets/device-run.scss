@@ -1,0 +1,44 @@
+.device-run-exp-container {
+  width: 800px;
+  height: 480px;
+
+  .second-dude {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+  .device-run-top {
+    width: 800px;
+    height: 60px;
+    background-color: #333333;
+
+    .device-run-stripe-container {
+      width: 70px;
+      height: 60px;
+      padding-left: 20px;
+      padding-top: 20px;
+
+      .device-run-all-stripes {
+        width: 30px;
+        width: 25px;
+
+        .device-run-stripe {
+          width: 30px;
+          height: 5px;
+          background-color: white;
+        }
+      }
+    }
+  }
+
+  .device-run-middle {
+    width: 800px;
+    height: 380px;
+  }
+
+  .device-run-bottom {
+    width: 800px;
+    height: 40px;
+  }
+
+}
