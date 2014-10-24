@@ -31,14 +31,14 @@ ChaiBioTech.app.Views.deviceExpInProgress = Backbone.View.extend({
         "time": "01:13:"
       }
       time = time - 1;
-      time = (time < 10) ? "0" + String(time) : time;
+      var tempTime = (time < 10) ? "0" + String(time) : time;
 
-      data.time = data.time + String(time);
+      data.time = data.time + String(tempTime);
       that.render(data);
-      
       if (time === 0) {
         window.clearInterval(that.timeMachine);
       }
+
     }, 1000);
   },
 
