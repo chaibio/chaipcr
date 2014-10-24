@@ -11,6 +11,13 @@ ChaiBioTech.app.Views.deviceRunExp = Backbone.View.extend({
     this.addExpName();
     this.addButtons();
     this.manageMiddle();
+    this.addManageExpInProgress();
+  },
+
+  addManageExpInProgress: function() {
+    this.expInProgress = new ChaiBioTech.app.Views.deviceExpInProgress({
+      model: this
+    });
   },
 
   manageMiddle: function() {
@@ -43,6 +50,7 @@ ChaiBioTech.app.Views.deviceRunExp = Backbone.View.extend({
     $(this.el).find(".device-run-top").append(this.expName.render().el);
     $(this.el).find(".device-run-top").append(this.buttons.render().el);
     $(this.el).find(".device-run-middle").append(this.middleSection.render().el);
+    $(this.el).find(".device-run-bottom").append(this.expInProgress.render().el);
     return this;
   }
 });

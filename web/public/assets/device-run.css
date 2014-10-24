@@ -105,3 +105,69 @@
   -moz-box-shadow: 0px -1px 8px 0px rgba(0, 0, 0, 0.75);
   box-shadow: 0px -1px 8px 0px rgba(0, 0, 0, 0.75);
 }
+/* line 105, ../../app/assets/stylesheets/device-run.scss */
+.device-run-exp-container .device-run-bottom div {
+  float: left;
+}
+/* line 109, ../../app/assets/stylesheets/device-run.scss */
+.device-run-exp-container .device-run-bottom .device-run-exp-stage-step {
+  width: 200px;
+  height: 40px;
+}
+/* line 113, ../../app/assets/stylesheets/device-run.scss */
+.device-run-exp-container .device-run-bottom .device-run-exp-stage-step .device-run-exp-stage-step-style {
+  font-weight: bold;
+  font-size: 11px;
+  padding-left: 20px;
+  padding-top: 12px;
+}
+/* line 120, ../../app/assets/stylesheets/device-run.scss */
+.device-run-exp-container .device-run-bottom .device-run-exp-stage-step .device-run-exp-status-style {
+  font-size: 11px;
+  padding-left: 2px;
+  padding-top: 11px;
+}
+/* line 127, ../../app/assets/stylesheets/device-run.scss */
+.device-run-exp-container .device-run-bottom .device-run-time-remaining {
+  width: 260px;
+  height: 40px;
+}
+/* line 131, ../../app/assets/stylesheets/device-run.scss */
+.device-run-exp-container .device-run-bottom .device-run-time-remaining .device-run-exp-time-style {
+  font-weight: bold;
+  font-size: 11px;
+  padding-left: 20px;
+  padding-top: 12px;
+}
+/* line 138, ../../app/assets/stylesheets/device-run.scss */
+.device-run-exp-container .device-run-bottom .device-run-time-remaining .device-run-exp-time {
+  font-size: 11px;
+  padding-left: 2px;
+  padding-top: 11px;
+}
+/* line 145, ../../app/assets/stylesheets/device-run.scss */
+.device-run-exp-container .device-run-bottom .device-run-progress-bar-container {
+  width: 340px;
+  height: 40px;
+}
+/* line 149, ../../app/assets/stylesheets/device-run.scss */
+.device-run-exp-container .device-run-bottom .device-run-progress-bar-container .device-run-progress-bar {
+  width: 320px;
+  height: 10px;
+  position: relative;
+  background-color: #00aeef;
+  top: 15px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+/* line 159, ../../app/assets/stylesheets/device-run.scss */
+.device-run-exp-container .device-run-bottom .device-run-progress-bar-container .device-run-progress-bar .device-run-progress-bar-inner {
+  width: 220px;
+  height: 10px;
+  position: relative;
+  background-color: black;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
