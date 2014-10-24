@@ -163,7 +163,7 @@
 }
 /* line 159, ../../app/assets/stylesheets/device-run.scss */
 .device-run-exp-container .device-run-bottom .device-run-progress-bar-container .device-run-progress-bar .device-run-progress-bar-inner {
-  width: 220px;
+  width: 0px;
   height: 10px;
   position: relative;
   background-color: black;
