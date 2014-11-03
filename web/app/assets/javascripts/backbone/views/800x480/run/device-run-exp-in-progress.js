@@ -19,10 +19,12 @@ ChaiBioTech.app.Views.deviceExpInProgress = Backbone.View.extend({
   },
 
   timer: function() {
+
     var that = this;
     var time = 60;
     var exp = this.runningModel.get("statusData").heatblock.experimentController.machine.experiment;
     var expStatus = this.runningModel.get("statusData").heatblock.experimentController.machine.status;
+
     this.timeMachine = window.setInterval(function() {
       var data = {
         "stepNo": exp.step.number,
@@ -38,8 +40,8 @@ ChaiBioTech.app.Views.deviceExpInProgress = Backbone.View.extend({
       if (time === 0) {
         window.clearInterval(that.timeMachine);
       }
-
     }, 1000);
+
   },
 
   render: function(data) {
