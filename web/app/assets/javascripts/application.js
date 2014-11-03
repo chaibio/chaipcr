@@ -33,6 +33,6 @@ $(function () {
 	window.appRouter = new ChaiBioTech.Routers.appRouter({});
 	window.deviceRouter = new ChaiBioTech.Routers.deviceRouter({});
 	Backbone.history.start();
-	//window.location = "#/800x480-home"
+	//window.location = "#/800x480-home" // Enable this to get into device mode
 	//window.location = "#/login"; //Temporary to bypass. Disable this to test add new experiments.
 });
