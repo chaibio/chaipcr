@@ -51,6 +51,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     // Only for the last stage
     stageView.borderRight();
     this.canvas.add(stageView.borderRight);
+    stageView.findLastStep();
     return this;
   };
 

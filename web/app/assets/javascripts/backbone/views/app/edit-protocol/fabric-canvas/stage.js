@@ -145,6 +145,10 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
     stepView.borderRight.visible = false;
   }
 
+  this.findLastStep = function() {
+    this.childSteps[0].circle.doThingsForLast();
+  }
+
   this.render = function() {
       this.getLeft();
       this.addRoof();
