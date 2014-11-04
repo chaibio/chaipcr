@@ -104,11 +104,9 @@ ChaiBioTech.app.Views.fabricEvents = function(C) {
       C.allStepViews.pop();
     }
 
-    ChaiBioTech.app = {
-      selectedStage: null,
-      selectedStep: null,
-      selectedCircle: null
-    };
+    ChaiBioTech.app.selectedStage = null;
+    ChaiBioTech.app.selectedStep = null;
+    ChaiBioTech.app.selectedCircle = null;
 
     C.addStages().setDefaultWidthHeight().addinvisibleFooterToStep();
   });
