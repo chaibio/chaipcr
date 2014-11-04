@@ -17,11 +17,12 @@ ChaiBioTech.app.Views.holdTime = function(model, parent) {
       selectable: false
     })
   }
-  
+
   this.formatHoldTime = function() {
     var holdTimeHour = Math.floor(this.holdTime / 60);
     var holdTimeMinute = (this.holdTime % 60);
-    return holdTimeHour+":"+holdTimeMinute;
+    holdTimeMinute = (holdTimeMinute === 0) ? "00" : holdTimeMinute;
+    return holdTimeHour + ":" + holdTimeMinute;
   }
   this.render();
   return this.text;
