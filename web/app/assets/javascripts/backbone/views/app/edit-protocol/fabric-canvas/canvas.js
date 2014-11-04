@@ -66,52 +66,51 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
   }
 
   this.addinvisibleFooterToStep = function() {
-    var count = 0, limit = this.allStepViews.length,
-    stepDark = "assets/selected-step-01.png",
-    stepWhite = "assets/selected-step-02.png",
-    stepCommon = "assets/common-step.png",
-    gatherData = "assets/gather-data.png";
-    // Rewrite this part with clone, So that loading is faster
-    addImage = function(count, that, url, image, callBack) {
-      fabric.Image.fromURL(url, function(img) {
-        img.left = that.allStepViews[count].left - 1;
-        img.top = 383;
-        img.selectable = false;
-        img.visible = false;
+    var count = 0;
+    var limit = this.allStepViews.length;
+    var imageSourceArray = [ // common, dark, white
+      "assets/common-step.png",
+      "assets/selected-step-01.png",
+      "assets/selected-step-02.png"
+     ];
+    var that = this;
 
-        if(image == "darkFooter") {
-          that.allStepViews[count].darkFooterImage = img;
-          that.canvas.add(that.allStepViews[count].darkFooterImage);
-        } else if(image == "whiteFooter") {
-          img.top = 363;
-          img.left = that.allStepViews[count].left;
-          that.allStepViews[count].whiteFooterImage = img;
-          that.canvas.add(that.allStepViews[count].whiteFooterImage);
-        } else if(image == "commonFooter") {
-          that.allStepViews[count].commonFooterImage = img;
-          that.canvas.add(that.allStepViews[count].commonFooterImage);
+    mainWrapper = function(index, callback) {
+
+      fabric.Image.fromURL(imageSourceArray[index], function(img) {
+        for(var count = 0; count < limit; count ++) {
+
+          var imaging = $.extend({}, img);
+          imaging.left = that.allStepViews[count].left - 1;
+          imaging.top = 383;
+          imaging.selectable = imaging.visible = false;
+
+          if(index === 0) {
+            that.allStepViews[count].commonFooterImage = imaging;
+            that.canvas.add(that.allStepViews[count].commonFooterImage);
+          } else if(index === 1) {
+            that.allStepViews[count].darkFooterImage = imaging;
+            that.canvas.add(that.allStepViews[count].darkFooterImage);
+          } else if(index === 2) {
+            imaging.top = 363;
+            imaging.left = that.allStepViews[count].left;
+            that.allStepViews[count].whiteFooterImage = imaging;
+            that.canvas.add(that.allStepViews[count].whiteFooterImage);
+          }
         }
 
-        count = count + 1;
-
-        if(count < limit) {
-          addImage(count, that, url, image, callBack);
-        } else if(callBack) { // I want it to be called at the end of all the functioin Calls
-          callBack();
+        index = index + 1;
+        if(index < 3) {
+          mainWrapper(index);
+        } else {
+          that.canvas.fire("imagesLoaded");
         }
       });
     }
-    
-    this.addGatheDataImage(this, gatherData, 0, limit);
-    addImage(0, this, stepCommon, "commonFooter");
-    addImage(0, this, stepDark, "darkFooter");
-    addImage(0, this, stepWhite, "whiteFooter", function() {
-      // This is sent as callback, we need this to be executed after all
-      // images are loaded.
-      that.canvas.fire("imagesLoaded");
-    });
-    // Y we have to do like this ?. We should load few small images and images take more time to load
-    // So we load all images using recursive function calls, then fire an event to show .
+
+    this.addGatheDataImage(this, "assets/gather-data.png", 0, limit)
+    mainWrapper(0);
+
   }
 
   this.addGatheDataImage = function(that, url, count, limit) {
