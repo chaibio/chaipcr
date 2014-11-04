@@ -56,10 +56,17 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
 
   this.doThingsForLast = function() {
     //this.holdTime.checkIfLast();
-    var holdTimeText = this.model.get("step")["hold_time"];
+    var holdTimeText = this.parent.holdDuration || this.model.get("step")["hold_time"];
     if(holdTimeText === 0) {
       this.holdTime.text = "∞";
     }
+  }
+
+  this.changeHoldTime = function() {
+    var holdTimeHour = Math.floor(this.parent.holdDuration / 60);
+    var holdTimeMinute = (this.parent.holdDuration % 60);
+    holdTimeMinute = (holdTimeMinute === 0) ? "00" : holdTimeMinute;
+    this.holdTime.text = holdTimeHour + ":" + holdTimeMinute;
   }
 
   this.render = function() {

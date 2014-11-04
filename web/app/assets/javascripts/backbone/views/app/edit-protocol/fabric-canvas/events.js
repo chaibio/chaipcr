@@ -90,6 +90,11 @@ ChaiBioTech.app.Views.fabricEvents = function(C) {
     changedStep.parentStage.changeCycle();
   });
 
+  this.canvas.on("holdTimeChangedFromBottom", function(changedStep) {
+    changedStep.circle.changeHoldTime();
+    //Check the last step
+    C.allStepViews[C.allStepViews.length - 1].circle.doThingsForLast();
+  });
   // When a model in the server changed
   // changes like add step/stage or delete step/stage
 

@@ -14,6 +14,7 @@ ChaiBioTech.app.Views.holdTime = function(model, parent) {
       top : this.parent.top + 30,
       left: this.parent.left + 40,
       fontFamily: "Ostrich Sans",
+      fontWeight: 'normal',
       selectable: false
     })
   }
