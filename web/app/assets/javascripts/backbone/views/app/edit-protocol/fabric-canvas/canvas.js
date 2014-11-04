@@ -101,24 +101,8 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
         }
       });
     }
-
-    addGatheDataImage = function(that, url, count) {
-        fabric.Image.fromURL(url, function(img) {
-          img.originX = "center";
-          img.originY = "center";
-          cloneImgObject = function(that, url, count) {
-            that.allStepViews[count].circle.gatherDataImage = $.extend({},img);;
-            that.allStepViews[count].circle.gatherDataImageMiddle = $.extend({},img);
-            that.allStepViews[count].circle.gatherDataImageMiddle.setVisible(false);
-            count = count + 1;
-            if(count < limit) {
-              cloneImgObject(that, url, count);
-            }
-          }
-          cloneImgObject(that, url, 0);
-        });
-    }
-    addGatheDataImage(this, gatherData, 0);
+    
+    this.addGatheDataImage(this, gatherData, 0, limit);
     addImage(0, this, stepCommon, "commonFooter");
     addImage(0, this, stepDark, "darkFooter");
     addImage(0, this, stepWhite, "whiteFooter", function() {
@@ -130,6 +114,24 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     // So we load all images using recursive function calls, then fire an event to show .
   }
 
+  this.addGatheDataImage = function(that, url, count, limit) {
+
+      fabric.Image.fromURL(url, function(img) {
+        img.originX = "center";
+        img.originY = "center";
+        cloneImgObject = function(that, url, count) {
+          that.allStepViews[count].circle.gatherDataImage = $.extend({},img);
+          that.allStepViews[count].circle.gatherDataImageMiddle = $.extend({},img);
+          that.allStepViews[count].circle.gatherDataImageMiddle.setVisible(false);
+          count = count + 1;
+          if(count < limit) {
+            cloneImgObject(that, url, count);
+          }
+        }
+        cloneImgObject(that, url, 0);
+      });
+
+  }
 
   this.findAllCircles = function() {
     var i = 0, limit = this.allStepViews.length, circles = [], tempCirc = null;
