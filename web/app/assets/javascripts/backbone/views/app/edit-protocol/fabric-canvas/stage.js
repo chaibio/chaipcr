@@ -215,7 +215,6 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
         this.childSteps[i].commonFooterImage.setVisible(visible);
         this.childSteps[i].stepName.setFill(color);
     }
-
   };
 
   this.changeFillsAndStrokes = function(color)  {
