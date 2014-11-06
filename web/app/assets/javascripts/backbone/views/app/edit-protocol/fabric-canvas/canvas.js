@@ -5,7 +5,7 @@ ChaiBioTech.app.Views.mainCanvas = null;
 ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
 
   this.model = model;
-  this.allStepViews = [];
+  this.allStepViews = new Array();
   this.canvas = null;
   this.allCircles = null;
 
@@ -189,7 +189,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
   /*******************************************************/
     // We fire up all the events initializing fabricEvents
   /*******************************************************/
-  this.fireUpEvents = new ChaiBioTech.app.Views.fabricEvents(this);
+  this.fireUpEvents = new ChaiBioTech.app.Views.fabricEvents(this, appRouter);
 
   return this;
 }
