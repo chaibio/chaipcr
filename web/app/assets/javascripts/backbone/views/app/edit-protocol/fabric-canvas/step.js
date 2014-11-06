@@ -88,7 +88,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
   this.getUniqueName = function() {
 
     var name = this.stepName.text + this.parentStage.stageNo.text + "step";
-    
+
     this.uniqueName = name;
     return this;
   };
@@ -211,7 +211,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     this.whiteFooterImage.setVisible(visibility);
   };
 
-  this.selectStep = function(evt) {
+  this.selectStep = function() {
 
     if(ChaiBioTech.app.selectedStep) {
       var previouslySelected = ChaiBioTech.app.selectedStep;
