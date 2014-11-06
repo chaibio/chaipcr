@@ -89,6 +89,7 @@ ChaiBioTech.app.Views.bottomHoldDuration = Backbone.View.extend({
       this.hourSpan.html(display);
       this.hourEdit.val(display);
       this.lastHourValue = display;
+      ChaiBioTech.app.Views.mainCanvas.fire("holdTimeChangedFromBottom", this.currentStep);
     }
   },
 
