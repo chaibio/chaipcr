@@ -28,24 +28,26 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     return this;
   };
 
+  /*******************************************
+    This method shows circles and gather data. Pease note
+    this method is invoked from canvas.js once all the stage/step are loaded.
+  ********************************************/
   this.getLinesAndCircles = function() {
 
-    // This is moved to here because we want to place circle over the line.
-    // So first we add the line then circle is placed over it.
     if(this.next) {
       this.curve = new ChaiBioTech.app.Views.fabricPath(model, this, this.canvas);
     }
-    // Here too this order is important
+
     this.canvas.add(this.stepDataGroup);
-    //this.gatherDataImageMiddle = this.gatherDataImage.clone();
     this.circleGroup.add(this.gatherDataImageMiddle);
     this.canvas.add(this.circleGroup);
-    // gather data circle in the right side
+
     this.gatherDataGroup = new ChaiBioTech.app.Views.gatherDataGroup(
       [
         this.gatherDataCircle = new ChaiBioTech.app.Views.gatherDataCircle(),
         this.gatherDataImage
       ], this);
+
     this.canvas.add(this.gatherDataGroup);
     this.showHideGatherData(this.parent.gatherDataDuringStep);
     this.gatherDataGroup.visible = this.parent.gatherDataDuringRamp;
@@ -110,7 +112,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   };
 
   this.makeItBig = function() {
-    // See I am confused here may be we will have to interchange during and after
+    
     this.big = true;
 
     if(this.parent.gatherDataDuringStep) {
@@ -128,15 +130,16 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   this.makeItSmall = function() {
 
     this.big = false;
-    this.circle.setStroke("white");
-    this.outerCircle.setStroke(null);
-    this.stepDataGroup.setVisible(true);
-    this.littleCircleGroup.visible = this.outerMostCircle.visible = false;
 
     if(this.parent.gatherDataDuringStep) {
       this.circle.setFill("white");
       this.gatherDataImageMiddle.setVisible(true);
     }
+
+    this.circle.setStroke("white");
+    this.outerCircle.setStroke(null);
+    this.stepDataGroup.setVisible(true);
+    this.littleCircleGroup.visible = this.outerMostCircle.visible = false;
   };
 
   this.showHideGatherData = function(state) {
