@@ -6,8 +6,8 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   this.model = model;
   this.parent = parentStep;
   this.canvas = parentStep.canvas;
-  this.scrollTop = 60;
-  this.scrollLength = 290;
+  this.scrollTop = 80;
+  this.scrollLength = 330;
   this.scrollRatio = (this.scrollLength - this.scrollTop) / 100;
   this.gatherDataImage = null;
   this.next = null;
@@ -155,16 +155,16 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
 
   this.manageDrag = function(targetCircleGroup) {
 
-    var top = targetCircleGroup.top,
-    left = targetCircleGroup.left;
+    var top = targetCircleGroup.top;
+    var left = targetCircleGroup.left;
     var previousTop = 0;
 
-    if(top < 60) {
-      targetCircleGroup.setTop(60);
-      this.manageRampLineMovement(left, 60, targetCircleGroup);
-    } else if(top > 290) {
-      targetCircleGroup.setTop(290);
-      this.manageRampLineMovement(left, 290, targetCircleGroup);
+    if(top < this.scrollTop) {
+      targetCircleGroup.setTop(this.scrollTop);
+      this.manageRampLineMovement(left, this.scrollTop, targetCircleGroup);
+    } else if(top > this.scrollLength) {
+      targetCircleGroup.setTop(this.scrollLength);
+      this.manageRampLineMovement(left, this.scrollLength, targetCircleGroup);
     } else {
       this.stepDataGroup.setTop(top + 55);
       this.manageRampLineMovement(left, top, targetCircleGroup);
@@ -240,7 +240,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
 
     if(ChaiBioTech.app.selectedCircle) {
       var previousSelected = ChaiBioTech.app.selectedCircle;
-      
+
       if(previousSelected.uniqueName != this.uniqueName) {
         previousSelected.makeItSmall();
       }
