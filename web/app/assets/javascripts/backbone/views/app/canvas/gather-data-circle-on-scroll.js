@@ -1,15 +1,15 @@
 ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
 
-ChaiBioTech.app.Views.gatherDataCircle = function() {
+ChaiBioTech.app.Views.gatherDataCircleOnScroll = function() {
 
   return new fabric.Circle({
-    radius: 16,
-    stroke: '#ffde00',
+    radius: 14,
+    stroke: 'black',
     originX: "center",
     originY: "center",
-    fill: '#ffb400',
+    fill: 'black',
     strokeWidth: 3,
     selectable: false,
-    name: "gatherDataCircle"
+    name: "gatherDataCircleOnScroll"
   });
 };
