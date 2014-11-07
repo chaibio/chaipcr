@@ -3,9 +3,11 @@ ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
 ChaiBioTech.app.Views.gatherDataGroup = function(objs, parent) {
 
   var midPointY = null;
+
   if(parent.previous) {
     midPointY = (parent.top + parent.previous.top) / 2;
   }
+
   return new fabric.Group(objs, {
     left: parent.left,
     top: midPointY || 230,
@@ -18,5 +20,4 @@ ChaiBioTech.app.Views.gatherDataGroup = function(objs, parent) {
     originY: "center",
     visible: false
   });
-
 }

@@ -1,6 +1,7 @@
 ChaiBioTech.app.Views = ChaiBioTech.app.Views || {};
 
 ChaiBioTech.app.Views.fabricPath = function(model, parent, canvas) {
+
   this.model = model;
   this.parent = parent // parent is the circle
   this.canvas = canvas;
@@ -26,7 +27,6 @@ ChaiBioTech.app.Views.fabricPath = function(model, parent, canvas) {
   // Controlling point right now I take mid point
   this.curve.path[1][1] = (x1 + midPointX) / 2;
   this.curve.path[1][2] = ((y1 + midPointY) / 2) + 10;
-
   // Mid point
   this.curve.path[1][3] = midPointX;
   this.curve.path[1][4] = midPointY;
@@ -36,9 +36,8 @@ ChaiBioTech.app.Views.fabricPath = function(model, parent, canvas) {
   // End Point
   this.curve.path[2][3] = x2;
   this.curve.path[2][4] = y2;
-  
-  this.canvas.add(this.curve);
 
+  this.canvas.add(this.curve);
   // We have nothing else to return , No member functions;
   return this.curve;
 }
