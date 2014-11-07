@@ -11,11 +11,14 @@ ChaiBioTech.app.Views.nextStep = Backbone.View.extend({
   },
 
   selectNext: function() {
+
     var selectStep = ChaiBioTech.app.selectedStep;
+
     if(selectStep.nextStep) {
       selectStep.nextStep.circle.manageClick();
     } else if(selectStep.parentStage.nextStage) {
       var stage = selectStep.parentStage.nextStage;
+
       stage.childSteps[0].circle.manageClick();
     }
     this.options.editStepStageClass.trigger("stepSelected", ChaiBioTech.app.selectedStep);
@@ -26,7 +29,9 @@ ChaiBioTech.app.Views.nextStep = Backbone.View.extend({
   },
 
   render: function() {
+
     $(this.el).html(this.template());
+    
     return this;
   }
 });

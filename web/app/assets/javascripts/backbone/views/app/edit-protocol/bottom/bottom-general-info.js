@@ -11,7 +11,9 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
   template: JST["backbone/templates/app/bottom-general-info"],
 
   initialize: function() {
+
     var that  = this;
+
     this.listenTo(this.options.editStepStageClass, "stepSelected", function(data) {
       that.currentStep = data;
       that.changeInfo(data);
@@ -34,21 +36,25 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
   },
 
   autoDelta: function() {
+
     console.log("Coming Soon .. !");
   },
 
   showStepNameEdit: function() {
+
     this.editStepName.show();
     this.editStepName.focus();
   },
 
   editStepNameEnter: function(e) {
+
     if(e.keyCode === 13) {
       this.editStepName.blur();
     }
   },
 
   editNoOfCycle: function(e) {
+
     if(this.currentStep.parentStage.model.get("stage").stage_type === "cycling") {
       this.numOfCyclesEdit.show();
       this.numOfCyclesEdit.focus();
@@ -56,14 +62,18 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
   },
 
   editNoOfCyclesEnter: function(e) {
+
     if(e.keyCode === 13) {
       this.numOfCyclesEdit.blur();
     }
   },
 
   saveAndHideCycle: function() {
+
     var newCycle = this.numOfCyclesEdit.val();
+
     this.numOfCyclesEdit.hide();
+
     if(!isNaN(newCycle)) {
       this.currentStep.parentStage.model.saveCycle(newCycle);
       this.numOfCycles.html(newCycle);
@@ -76,8 +86,11 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
   },
 
   saveAndHideStepName: function() {
+
     var newStepName = this.editStepName.val();
+
     this.editStepName.hide();
+
     if(newStepName) {
       this.currentStep.model.saveName(newStepName);
       this.nameOfStepStage.html(newStepName);
@@ -90,16 +103,20 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
   },
 
   enableDuringStep: function() {
+
     if(ChaiBioTech.app.selectedStep) {
       ChaiBioTech.app.selectedStep.gatherDuringStep();
     }
+
     this.fixGatherDataButtonStatus(ChaiBioTech.app.selectedStep);
   },
 
   enableDuringRamp: function() {
+
     if(ChaiBioTech.app.selectedStep) {
       ChaiBioTech.app.selectedStep.gatherDuringRamp();
     }
+
     this.fixGatherDataButtonStatus(ChaiBioTech.app.selectedStep);
   },
 
@@ -119,6 +136,7 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
   },
 
   showGatherDataPopUp: function(e) {
+
     e.preventDefault();
     e.stopPropagation();
     this.popUp.show();
@@ -142,6 +160,7 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
   },
 
   handleClcik: function() {
+
     if(this.popUp.is(":visible")) {
       this.popUp.hide();
       // Now we turn this off, So that it wont bothr on any other click.
@@ -150,7 +169,9 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
   },
 
   changeInfo: function(step) {
+
     var temp = (step.ordealStatus < 10) ? "0" + step.ordealStatus : step.ordealStatus;
+
     this.StepNo.html(temp);
     temp = step.parentStage.parent.allStepViews.length;
     temp = (temp < 10) ? "0" + temp : temp;
@@ -158,11 +179,13 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
     this.nameOfStepStage.html(step.stepName.text);
     this.editStepName.val(step.stepName.text);
     this.smallStageName.html(step.parentStage.stageName.text);
+
     if(step.parentStage.model.get("stage").stage_type === "cycling") {
       this.cycleConatainer.css("visibility", "visible");
     } else {
       this.cycleConatainer.css("visibility", "hidden");
     }
+
     this.numOfCycles.html(step.parentStage.updatedNoOfCycle || step.parentStage.model.get("stage").num_cycles);
     this.numOfCyclesEdit.val(step.parentStage.updatedNoOfCycle || step.parentStage.model.get("stage").num_cycles);
     this.manageTikImage();
@@ -170,6 +193,7 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
   },
 
   render: function() {
+    
     $(this.el).html(this.template());
     this.StepNo = $(this.el).find(".bottom-step-no");
     this.noOfStages = $(this.el).find(".bottom-no-of-stages");

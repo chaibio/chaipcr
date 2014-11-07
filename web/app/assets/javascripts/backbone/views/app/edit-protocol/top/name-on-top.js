@@ -19,13 +19,15 @@ ChaiBioTech.app.Views.nameOnTop = Backbone.View.extend({
   },
 
   render: function() {
-    var data = this.model.get("experiment"),
-    dataToTemplate = {
+
+    var data = this.model.get("experiment");
+    var dataToTemplate = {
       "name": data.name,
       "id": data.id
     };
 
     $(this.el).html(this.template(dataToTemplate));
+    
     return this;
   }
 });

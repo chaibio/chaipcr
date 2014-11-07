@@ -7,11 +7,6 @@ ChaiBioTech.app.Views.editStageStep = Backbone.View.extend({
   template: JST["backbone/templates/app/edit-stage-step"],
 
   initialize: function() {
-    // This is an event originated from canvas. Now Listen to this class to get all the update
-    // We will b triggering all the events to this class from fabric.
-    /*this.on("stepSelected", function(data) {
-      console.log("Yes", data);
-    });*/
 
     this.pasteName();
     this.pasteCanvasContainer();
@@ -21,42 +16,61 @@ ChaiBioTech.app.Views.editStageStep = Backbone.View.extend({
   },
 
   pasteName: function() {
+
     this.nameOnTop = new ChaiBioTech.app.Views.nameOnTop({
       model: this.model
     });
+
+    return this;
   },
 
   pasteCanvasContainer: function() {
+
     this.canvasContainer = new ChaiBioTech.app.Views.canvasContainer();
+
+    return this;
   },
 
   pastePrevious: function() {
+
     this.previousStep = new ChaiBioTech.app.Views.previousStep({
       editStepStageClass: this
     });
+
+    return this;
   },
 
   pasteMiddleContainer: function() {
+
     this.middleContainer = new ChaiBioTech.app.Views.bottomMiddleContainer({
       editStepStageClass: this
     });
+
+    return this;
   },
 
   pasteNext: function() {
+
     this.nextStep = new ChaiBioTech.app.Views.nextStep({
       editStepStageClass: this
     });
+
+    return this;
   },
 
   render: function() {
+
     $(this.el).html(this.template());
-    var topHalf = $(this.el).find(".top-half"),
-    bottomHalf = $(this.el).find(".bottom-half");
+
+    var topHalf = $(this.el).find(".top-half");
+    var bottomHalf = $(this.el).find(".bottom-half");
+
     topHalf.append(this.nameOnTop.render().el);
     topHalf.append(this.canvasContainer.render().el);
     bottomHalf.append(this.previousStep.render().el);
     bottomHalf.append(this.middleContainer.render().el);
     bottomHalf.append(this.nextStep.render().el);
+
     return this;
   }
 });

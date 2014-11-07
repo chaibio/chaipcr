@@ -11,13 +11,15 @@ ChaiBioTech.app.Views.bottomStartOnCycle = Backbone.View.extend({
   },
 
   render: function() {
+
     var data = {
       caption: "START ON CYCLE:",
       data: "1"
-    }
+    };
     $(this.el).html(this.template(data));
     //Disabling for now;
     $(this.el).addClass("disabled");
+    
     return this;
   }
 });

@@ -18,6 +18,7 @@ ChaiBioTech.app.Views.draggable = Backbone.View.extend({
         }
       }
     });
+    
     return this.options.element;
   }
 });

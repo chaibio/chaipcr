@@ -7,6 +7,7 @@ ChaiBioTech.app.Views.bottomTemperature = Backbone.View.extend({
   template: JST["backbone/templates/app/bottom-common-item"],
 
   initialize: function() {
+
     var that = this;
     // Works when step is clicked
     this.listenTo(this.options.editStepStageClass, "stepSelected", function(data) {
@@ -27,22 +28,27 @@ ChaiBioTech.app.Views.bottomTemperature = Backbone.View.extend({
   },
 
   startEdit: function() {
+
     this.dataPartEdit.show();
     this.dataPartEdit.focus();
   },
 
   seeIfEnter: function(e) {
+
     if(e.keyCode === 13) {
-      // Hiding this inturn fires blur event
       this.dataPartEdit.blur();
     }
   },
 
   saveDataAndHide: function(e) {
+
     var newTemp = this.dataPartEdit.val();
+
     this.dataPartEdit.hide();
+
     if(isNaN(newTemp) || !newTemp || newTemp < 0 || newTemp > 100) {
       var tempVal = this.dataPart.html();
+
       this.dataPartEdit.val(parseFloat(tempVal.substr(0, tempVal.length - 1)));
       alert("Please enter a valid value");
     } else {
@@ -56,18 +62,22 @@ ChaiBioTech.app.Views.bottomTemperature = Backbone.View.extend({
   },
 
   changeTemperature: function(temperature) {
+
     this.dataPart.html(temperature + "c");
     this.dataPartEdit.val(parseFloat(temperature.substr(0, temperature.length - 1)));
   },
 
   render: function() {
+
     var data = {
       caption: "TEMPERATURE",
       data: "100.0º"
-    }
+    };
+
     $(this.el).html(this.template(data));
     this.dataPart =   $(this.el).find(".data-part-span");
     this.dataPartEdit = $(this.el).find(".data-part-edit-value");
+    
     return this;
   }
 });
