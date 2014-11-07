@@ -112,7 +112,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   };
 
   this.makeItBig = function() {
-    
+
     this.big = true;
 
     if(this.parent.gatherDataDuringStep) {
@@ -240,7 +240,10 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
 
     if(ChaiBioTech.app.selectedCircle) {
       var previousSelected = ChaiBioTech.app.selectedCircle;
-      previousSelected.makeItSmall();
+      
+      if(previousSelected.uniqueName != this.uniqueName) {
+        previousSelected.makeItSmall();
+      }
     }
 
     ChaiBioTech.app.selectedCircle = this;
