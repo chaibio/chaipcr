@@ -4,7 +4,7 @@ ChaiBioTech.app.Views.gatherDataGroupOnScroll = function(objs, parent) {
 
   return new fabric.Group(objs, {
     left: parent.left + 86,
-    top: 120,
+    top: parent.top - 26,
     width: 32,
     height: 32,
     me: this,

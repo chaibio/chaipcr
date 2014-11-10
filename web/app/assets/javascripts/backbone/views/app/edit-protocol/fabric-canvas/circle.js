@@ -59,7 +59,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     this.canvas.add(this.gatherDataGroup);
     this.showHideGatherData(this.parent.gatherDataDuringStep);
     this.gatherDataGroup.visible = this.parent.gatherDataDuringRamp;
-  }
+  };
 
   this.getUniqueId = function() {
 
@@ -68,7 +68,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     name = name + this.parent.parentStage.stageNo.text + "circle";
     this.uniqueName = name;
     return this;
-  }
+  };
 
   this.doThingsForLast = function() {
 
@@ -77,7 +77,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     if(parseInt(holdTimeText) === 0) {
       this.holdTime.text = "∞";
     }
-  }
+  };
 
   this.changeHoldTime = function() {
 
@@ -93,7 +93,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     }
 
     this.holdTime.text = holdTimeHour + ":" + holdTimeMinute;
-  }
+  };
 
   this.render = function() {
 
@@ -134,7 +134,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     this.outerCircle.strokeWidth = 7;
     this.stepDataGroup.setVisible(false);
     this.outerMostCircle.visible = this.littleCircleGroup.visible = true;
-  }
+  };
 
   this.makeItSmall = function() {
 
@@ -154,12 +154,13 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
 
   this.showHideGatherData = function(state) {
 
-    this.gatherDataImageMiddle.setVisible(state);
-
     if(state && ! this.big) {
+        this.gatherDataImageMiddle.setVisible(state);
         this.circle.setFill("white");
+
     } else {
       this.circle.setFill("#ffb400");
+      this.gatherDataOnScroll.setVisible(state);
     }
   };
 
@@ -262,4 +263,4 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   };
 
   return this;
-}
+};
