@@ -22,6 +22,7 @@
 //= require rails
 //= require chaipcr
 //= require fabric
+//= require plate-layout
 //= require backbone/ChaiBioTech
 //= require backbone/Constants
 

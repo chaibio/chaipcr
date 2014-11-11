@@ -12,12 +12,16 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 		"home": "loadHome"
 		"edit-exp-menu/:id": "editExp" # Remember this is the one for bringing up menu overlay
 		"edit-stage-step/:id": "loadStepStage"
-		"run-exp/:id": "runExp"
+		"run-exp/:id": "runExp",
+		"plate-setup/:id": "plateSetup"
 
 	logMeIn: () ->
 		@loginScreen = new ChaiBioTech.app.Views.login
 		$("#container").html(@loginScreen.render().el)
 
+	plateSetup: (id) ->
+		console.log "wooo", id
+	
 	loadHome: () ->
 		if @loggedIn() is true
 			data =

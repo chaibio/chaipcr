@@ -18,16 +18,28 @@ ChaiBioTech.app.Views.menuOverlayMenu = Backbone.View.extend({
 
 	initialize: function() {
 
+		var id = this.model.get("experiment").id;
+		this.menuLinks = [
+				"#",
+				"#/edit-stage-step/" + id,
+				"#/plate-setup/" + id,
+				"#",
+				"#",
+				"#",
+				"#"
+			]
 	},
 
 	render: function() {
+
 		var length = this.menuItems.length, tempCarrier = {};
 
 		for (var i = 0; i < length; i++) {
 
 			tempCarrier = {
-				"menuItem": this.menuItems[i]
-			}
+				"menuItem": this.menuItems[i],
+				"link": this.menuLinks[i]
+			};
 
 			if(i === this.NoOfSpecialDude) {
 				// Big menu item
