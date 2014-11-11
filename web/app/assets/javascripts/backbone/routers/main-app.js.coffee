@@ -20,7 +20,11 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 		$("#container").html(@loginScreen.render().el)
 
 	plateSetup: (id) ->
-		console.log "wooo", id
+		@plateSetup = new ChaiBioTech.app.Views.plateSetup
+		$("#container").html(@plateSetup.render().el);
+		$("#container").find(".plate-setup-container").plateLayOut({
+					value: 10
+				});
 
 	loadHome: () ->
 		if @loggedIn() is true
