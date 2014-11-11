@@ -4,6 +4,7 @@
 #include <string>
 #include <atomic>
 #include <memory>
+#include <fstream>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class PWMPin
@@ -15,10 +16,12 @@ public:
     void setPWM(unsigned long duty, unsigned long period, unsigned int polarity);
 
 private:
-    void writePWMFile(const std::string& relativePath, unsigned long value);
+    void writePWMFile(std::ostream &stream, unsigned long value);
 
 private:
-	const std::string& pwmDevicePath_;
+    std::ofstream dutyFile;
+    std::ofstream periodFile;
+    std::ofstream polarityFile;
 };
 
 class PWMControl {
