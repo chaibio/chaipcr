@@ -21,7 +21,7 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 
 	plateSetup: (id) ->
 		console.log "wooo", id
-	
+
 	loadHome: () ->
 		if @loggedIn() is true
 			data =

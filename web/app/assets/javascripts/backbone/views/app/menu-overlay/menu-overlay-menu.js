@@ -67,5 +67,4 @@ ChaiBioTech.app.Views.menuOverlayMenu = Backbone.View.extend({
 		return this;
 	},
 
-
 });
