@@ -141,6 +141,11 @@
 	src: local("Open Sans"), url("OpenSans-Regular.woff") format("woff");
 }
 
+@font-face {
+	font-family: "roboto";
+	src: local("roboto"), url("Roboto-Regular.woff") format("woff");
+}
+
 .simplifica {
 	font-family: "simplifica";
 	font-size: 30px;
