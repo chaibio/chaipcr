@@ -40,8 +40,8 @@ shared_ptr<IControl> QPCRFactory::constructOptics(shared_ptr<SPIPort> ledSPIPort
 
 shared_ptr<IControl> QPCRFactory::constructHeatBlock(ADCController::ConsumersList &consumers) {
     shared_ptr<SteinhartHartThermistor> zone1Thermistor(new SteinhartHartThermistor(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
-                                                                                    kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
-                                                                                    kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient));
+                                                                                    kUSSensorJThermistorACoefficient, kUSSensorJThermistorBCoefficient,
+                                                                                    kUSSensorJThermistorCCoefficient, kUSSensorJThermistorDCoefficient));
 
     std::vector<SPIDTuning> heatBlockPIDSchedule = {{150, 0.0374, 2.54, 0.381}};
     double derivativeFilterTimeConstant = heatBlockPIDSchedule.at(0).kDerivativeTimeS * kADCRepeatFrequency / kPIDDerivativeGainLimiter;
@@ -52,8 +52,8 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(ADCController::ConsumersLis
                                                                  kHeatBlockZone1PWMPath, kHeatBlockZone1PWMPeriodNs, kHeadBlockZone1HeatPin, kHeadBlockZone1CoolPin);
 
     shared_ptr<SteinhartHartThermistor> zone2Thermistor(new SteinhartHartThermistor(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
-                                                                                    kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
-                                                                                    kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient));
+                                                                                    kUSSensorJThermistorACoefficient, kUSSensorJThermistorBCoefficient,
+                                                                                    kUSSensorJThermistorCCoefficient, kUSSensorJThermistorDCoefficient));
 
     PIDController *zone2CPIDController = new PIDController(heatBlockPIDSchedule, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax, processValueFilter);
 
@@ -80,8 +80,9 @@ shared_ptr<IControl> QPCRFactory::constructLid(ADCController::ConsumersList &con
 }
 
 shared_ptr<IControl> QPCRFactory::constructHeatSink() {
-    shared_ptr<BetaThermistor> thermistor(new BetaThermistor(kHeatSinkThermistorVoltageDividerResistanceOhms, kBeagleboneADCBits,
-                                                             kHeatSinkThermistorBetaCoefficient, kHeatSinkThermistorT0Resistance, kHeatSinkThermistorT0));
+    shared_ptr<SteinhartHartThermistor> thermistor(new SteinhartHartThermistor(kHeatSinkThermistorVoltageDividerResistanceOhms, kBeagleboneADCBits,
+                                                                               kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
+                                                                               kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient));
 
     SinglePoleRecursiveFilter processValueFilter(5);
     PIDController *pidController = new PIDController({{100,0.05,10000,0.0}}, kHeatSinkPIDMin, kHeatSinkPIDMax, processValueFilter);
