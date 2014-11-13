@@ -1,5 +1,5 @@
 // Plete Layout source code.
-(function($){
+(function($, fabric){
 
   $.widget("DNA.plateLayOut", {
 
@@ -36,10 +36,13 @@
 
       this._createMenu();
       $(this.topLeft).append(this.menuContainer);
+
       this._createOverLay();
       $(this.topLeft).append(this.overLayContainer);
+
       this._createCanvas();
       $(this.topLeft).append(this.canvasContainer);
+
 
       $(this.topSection).append(this.topLeft);
       $(this.topSection).append(this.topRight);
@@ -47,10 +50,12 @@
       $(this.container).append(this.topSection);
       $(this.element).html(this.container);
 
+      this._initiateFabricCanvas();
     },
 
     _createCanvas: function() {
-      this.normalCanvas = this._createElement("<canvas></canvas>").attr("id", "canvas");
+
+      this.normalCanvas = this._createElement("<canvas>").attr("id", "DNAcanvas");
       $(this.canvasContainer).append(this.normalCanvas);
     },
 
@@ -71,6 +76,17 @@
       this.pasteCrieteriaButton = this._createElement("<button />").addClass("plate-setup-button");
       $(this.pasteCrieteriaButton).text("Paste Criteria");
       $(this.overLayButtonContainer).append(this.pasteCrieteriaButton);
+    },
+
+    _initiateFabricCanvas: function() {
+
+      this.mainFabricCanvas = new fabric.Canvas('DNAcanvas', {
+        backgroundColor: '#f5f5f5',
+        selection: true,
+        stateful: true
+      })
+      .setWidth(632)
+      .setHeight(482);
     },
 
     _createMenu: function() {
@@ -100,4 +116,4 @@
     }
 
   });
-})(jQuery);
+})(jQuery, fabric);
