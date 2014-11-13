@@ -30,6 +30,17 @@
 .plate-setup-menu-container {
   width: 674px;
   height: 32px;
+  margin-left: 32px;
+}
+
+.plate-setup-menu-item {
+  width: 60px;
+  height:32px;
+  float: left;
+  font-family: "roboto";
+  font-size: 12px;
+  padding-top: 8px;
+  cursor: pointer;
 }
 
 .plate-setup-overlay-container {
@@ -40,4 +51,51 @@
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px;
+}
+
+.plate-setup-overlay-radio-container {
+  width: 32px;
+  height: 32px;
+  float: left;
+}
+
+.plate-setup-overlay-text-container {
+  width: 380px;
+  height: 32px;
+  float: left;
+  color: white;
+  font-size: 12px;
+  font-family: "roboto";
+  padding-top: 7px;
+}
+
+.plate-setup-overlay-button-container {
+  width: 220px;
+  height: 32px;
+  float: left;
+  padding-top: 4px;
+}
+
+.plate-setup-button {
+  width: 103px;
+  height: 23px;
+  font-family: "roboto";
+  font-size: 10px;
+  border: none;
+  background-color: white;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  margin-left: 4px;
+}
+
+.plate-setup-canvas-container {
+  height: 482px;
+  width: 632px;
+  margin-left: 16px;
+}
+
+#canvas {
+  height: 482px;
+  width: 632px;
 }

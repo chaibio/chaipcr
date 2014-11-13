@@ -147,7 +147,7 @@
 
 @font-face {
   font-family: "roboto";
-  src: local("roboto"), url("Roboto-Regular.woff") format("woff");
+  src: local("roboto"), url("RobotoRegular.woff") format("woff");
 }
 
 /* line 149, ../../app/assets/stylesheets/screen.css.scss */
