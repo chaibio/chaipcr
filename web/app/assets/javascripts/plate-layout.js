@@ -51,12 +51,19 @@
       $(this.element).html(this.container);
 
       this._initiateFabricCanvas();
+
+      this._createTabAtRight();
     },
 
     _createCanvas: function() {
 
       this.normalCanvas = this._createElement("<canvas>").attr("id", "DNAcanvas");
       $(this.canvasContainer).append(this.normalCanvas);
+    },
+
+    _createTabAtRight: function() {
+      this.tabContainer = this._createElement("<div></div>").addClass("plate-setup-tab-container");
+      $(this.topRight).append(this.tabContainer);
     },
 
     _createOverLay: function() {
