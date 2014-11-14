@@ -44,9 +44,10 @@ double SteinhartHartThermistor::temperatureForResistance(double resistanceOhms) 
     double lnRes = log(resistanceOhms);
     double lnRes2 = lnRes * lnRes;
     double lnRes3 = lnRes2 * lnRes;
+    double lnRes5 = lnRes2 * lnRes3;
 
     //steinhart-hart equation
-    double degreesK = 1 / (_a + _b*lnRes + _c*lnRes2 + _d*lnRes3);
+    double degreesK = 1 / (_a + _b*lnRes + _c*lnRes3 + _d*lnRes5);
     return degreesK - 273.15;
 }
 

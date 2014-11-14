@@ -74,10 +74,10 @@ void ADCController::process() {
             uint32_t value;
             switch (state) {
             case EReadZone1Singular:
-                value = _ltc2444->readSingleEndedChannel(4, kThermistorOversamplingRate);
+                value = _ltc2444->readSingleEndedChannel(1, kThermistorOversamplingRate);
                 break;
             case EReadZone2Singular:
-                value = _ltc2444->readSingleEndedChannel(5, kThermistorOversamplingRate);
+                value = _ltc2444->readSingleEndedChannel(3, kThermistorOversamplingRate);
                 break;
             case EReadLIA:
                 value = _ltc2444->readSingleEndedChannel(6, kLIAOversamplingRate);

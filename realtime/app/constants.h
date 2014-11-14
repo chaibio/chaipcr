@@ -3,11 +3,21 @@
 
 #include <vector>
 
-//Steinhart-Hart coefficients for heat block thermistor (QTI Z Curve)
+//Steinhart-Hart coefficients
+const double kUSSensorJThermistorACoefficient = 0.00112502978660426;
+const double kUSSensorJThermistorBCoefficient = 0.000235057162160341;
+const double kUSSensorJThermistorCCoefficient = 0.0000000785661432368816;
+const double kUSSensorJThermistorDCoefficient = 0.0000000000395309964792414;
+
 const double kQTICurveZThermistorACoefficient = 0.001116401465500;
 const double kQTICurveZThermistorBCoefficient = 0.000237982973213;
 const double kQTICurveZThermistorCCoefficient = -0.000000372283234;
 const double kQTICurveZThermistorDCoefficient = 0.000000099063233;
+
+const double kQTICurveDThermistorACoefficient = 0.001119828875495430;
+const double kQTICurveDThermistorBCoefficient = 0.0002360897740308300;
+const double kQTICurveDThermistorCCoefficient = 0.00000007508299550946710;
+const double kQTICurveDThermistorDCoefficient = 0;
 
 //Lid
 const unsigned long kLidPIDMin = 0;
@@ -42,7 +52,7 @@ const int kHttpServerPort = 8000;
 const unsigned long kFanPWMPeriodNs = 500000;
 
 //Heat Block params
-const unsigned int kHeatBlockThermistorVoltageDividerResistanceOhms = 33000;
+const unsigned int kHeatBlockThermistorVoltageDividerResistanceOhms = 43000;
 const unsigned long kHeatBlockZone1PWMPeriodNs = 100000;
 const unsigned long kHeatBlockZone2PWMPeriodNs = 100000;
 
@@ -52,7 +62,7 @@ const double kHeatBlockZonesPIDMax = 1;
 const double kHeatBlockZonesMinTargetTemp = -10;
 const double kHeatBlockZonesMaxTargetTemp = 105;
 
-const double kMaxHeatBlockRampSpeed = 5.0;
+const double kMaxHeatBlockRampSpeed = 3.0;
 
 //LED constants
 const int kMinLEDCurrent = 5; //mA
@@ -75,9 +85,6 @@ const long kTemperatureLoggerFlushInterval = 10000; //ms
 
 //Heat Sink
 const double kHeatSinkTargetTemperature = 38; //C
-const double kHeatSinkThermistorBetaCoefficient = 3970;  //kelvins
-const double kHeatSinkThermistorT0Resistance = 10000;    //ohms
-const double kHeatSinkThermistorT0 = 298.15;             //kelvins
 const unsigned int kHeatSinkThermistorVoltageDividerResistanceOhms = 6800;
 
 const double kHeatSinkMinTargetTemp = 0;
