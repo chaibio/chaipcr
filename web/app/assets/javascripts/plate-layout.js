@@ -13,7 +13,9 @@
 
     _init: function() {
 
-      //console.log("2 okay", this);
+      // This is invoked when the user use the plugin after _create is callsed.
+      // The point is _create is invoked for the very first time and for all other
+      // times _init is used.
     },
 
     _createElement: function(element) {
@@ -53,6 +55,7 @@
       this._initiateFabricCanvas();
 
       this._createTabAtRight();
+      this._createTabs();
     },
 
     _createCanvas: function() {
@@ -114,12 +117,17 @@
 
         $(menuContent).on("click", function() {
           console.log("okay menu");
-          //Code for click event may be will have to implement poping menu here.
+          //Code for click event. May be will have to implement poping menu here.
         });
 
         $(this.menuContainer).append(menuContent);
       }
 
+    },
+
+    _createTabs: function() {
+      // this could be done using z-index. just imagine few cards stacked up.
+      // Check if options has tab data.
     }
 
   });
