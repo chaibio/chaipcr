@@ -122,3 +122,10 @@
   border: solid 1px #e1e1e1;
   border-top: none;
 }
+
+/* line 111, ../../app/assets/stylesheets/plate-layout.css.scss */
+.plate-setup-tab-head {
+  width: 335px;
+  height: 23px;
+  margin-top: 33px;
+}

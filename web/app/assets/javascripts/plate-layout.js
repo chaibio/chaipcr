@@ -128,6 +128,27 @@
     _createTabs: function() {
       // this could be done using z-index. just imagine few cards stacked up.
       // Check if options has tab data.
+      // Originally we will be pulling tab data from developer.
+      // Now we are building upon dummy data.
+      this.tabHead = this._createElement("<div></div>").addClass("plate-setup-tab-head");
+      
+      var tabData = {
+        "Tab 1": {
+
+        },
+
+        "Tab 2": {
+
+        },
+
+        "Tab 3": {
+
+        }
+      };
+
+      for(var tab in tabData) {
+        console.log(tab);
+      }
     }
 
   });
