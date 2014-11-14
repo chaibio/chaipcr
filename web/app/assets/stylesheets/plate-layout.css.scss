@@ -124,4 +124,31 @@
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
   cursor: pointer;
+  font-family: "roboto";
+  font-size: 10px;
+  text-align: -webkit-center;
+  padding-top: 2px;
+}
+
+.plate-setup-tab-selected {
+  width: 83px;
+  height:23px;
+  float: left;
+  background-color: white;
+  border: none;
+  cursor: pointer;
+  -webkit-box-shadow: 0px -2px 3px 0px rgba(217,217,217,1);
+  -moz-box-shadow: 0px -2px 3px 0px rgba(217,217,217,1);
+  box-shadow: 0px -2px 3px 0px rgba(217,217,217,1);
+  font-family: "roboto";
+  font-size: 10px;
+  text-align: -webkit-center;
+  padding-top: 2px;
+  color: #00506e;
+}
+
+.plate-setup-tab-data-container {
+  width: 335px;
+  height: 432px;
+  border-bottom: solid 1px #e1e1e1;
 }

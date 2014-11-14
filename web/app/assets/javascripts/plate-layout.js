@@ -144,6 +144,10 @@
 
         "Tab 3": {
 
+        },
+
+        "Tab 4": {
+
         }
       };
 
@@ -152,9 +156,33 @@
 
       for(var tab in tabData) {
         this.allTabs[tabIndex ++] = this._createElement("<div></div>").addClass("plate-setup-tab");
+        $(this.allTabs[tabIndex - 1]).data("index", tabIndex - 1)
+        .html(tab);
+
+        var that = this;
+
+        $(this.allTabs[tabIndex - 1]).click(function() {
+          that._tabClickHandler(this);
+        });
+
         $(this.tabHead).append(this.allTabs[tabIndex - 1]);
-        
-    }
+
+      }
+
+      this.tabDataContainer = this._createElement("<div></div>").addClass("plate-setup-tab-data-container");
+      $(this.tabContainer).append(this.tabDataContainer);
+  },
+
+    _tabClickHandler: function(clickedTab) {
+
+      if(this.selectedTab) {
+        $(this.selectedTab).removeClass("plate-setup-tab-selected")
+        .addClass("plate-setup-tab");
+      }
+
+      $(clickedTab).addClass("plate-setup-tab-selected");
+
+      this.selectedTab = clickedTab;
     }
 
   });
