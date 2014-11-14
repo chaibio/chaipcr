@@ -131,7 +131,8 @@
       // Originally we will be pulling tab data from developer.
       // Now we are building upon dummy data.
       this.tabHead = this._createElement("<div></div>").addClass("plate-setup-tab-head");
-      
+      $(this.tabContainer).append(this.tabHead);
+
       var tabData = {
         "Tab 1": {
 
@@ -146,9 +147,14 @@
         }
       };
 
+      this.allTabs = [];
+      var tabIndex = 0;
+
       for(var tab in tabData) {
-        console.log(tab);
-      }
+        this.allTabs[tabIndex ++] = this._createElement("<div></div>").addClass("plate-setup-tab");
+        $(this.tabHead).append(this.allTabs[tabIndex - 1]);
+        
+    }
     }
 
   });

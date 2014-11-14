@@ -106,10 +106,22 @@
   background-color: white;
   border: solid 1px #e1e1e1;
   border-top: none;
+  padding-top: 32px;
 }
 
 .plate-setup-tab-head {
   width: 335px;
   height: 23px;
-  margin-top: 33px;
+}
+
+.plate-setup-tab {
+  width: 83px;
+  height:23px;
+  float: left;
+  background-color: #ebebeb;
+  border: solid 1px #e1e1e1;
+  border-top: none;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  cursor: pointer;
 }

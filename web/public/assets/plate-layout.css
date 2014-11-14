@@ -121,11 +121,24 @@
   background-color: white;
   border: solid 1px #e1e1e1;
   border-top: none;
+  padding-top: 32px;
 }
 
-/* line 111, ../../app/assets/stylesheets/plate-layout.css.scss */
+/* line 112, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-tab-head {
   width: 335px;
   height: 23px;
-  margin-top: 33px;
+}
+
+/* line 117, ../../app/assets/stylesheets/plate-layout.css.scss */
+.plate-setup-tab {
+  width: 83px;
+  height: 23px;
+  float: left;
+  background-color: #ebebeb;
+  border: solid 1px #e1e1e1;
+  border-top: none;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  cursor: pointer;
 }
