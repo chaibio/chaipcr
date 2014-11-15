@@ -56,6 +56,9 @@
 
       this._createTabAtRight();
       this._createTabs();
+
+      this._placeWellAttr();
+      this._placeWellAttrTabs();
     },
 
     _createCanvas: function() {
@@ -110,7 +113,7 @@
 
       var menuContent = null;
 
-      for(menuItem in menuItems) {
+      for(var menuItem in menuItems) {
         menuContent = this._createElement("<div></div>")
         .html(menuItem)
         .addClass("plate-setup-menu-item");
@@ -200,12 +203,68 @@
       this.allDataTabs = []; // To hold all the tab contents
       var tabIndex = 0;
 
-      for(tabData in tabs) {
+      for(var tabData in tabs) {
         this.allDataTabs[tabIndex ++] = this._createElement("<div></div>").addClass("plate-setup-data-div")
         .css("z-index", 0)
         .html(tabData);
         $(this.tabDataContainer).append(this.allDataTabs[tabIndex - 1]);
       }
+    },
+
+    _placeWellAttr: function() {
+
+      this.wellAttrContainer = this._createElement("<div></div>").addClass("plate-setup-well-attr-container")
+      .html("Well Attribute Tabs");
+      $(this.tabContainer).append(this.wellAttrContainer);
+    },
+
+    _placeWellAttrTabs: function() {
+
+      this.presetTabContainer = this._createElement("<div></div>").addClass("plate-setup-preset-container");
+      $(this.tabContainer).append(this.presetTabContainer);
+
+      var wellAttrData = {
+        "Preset 1": {
+
+        },
+
+        "Preset 2": {
+
+        },
+
+        "Preset 3": {
+
+        },
+
+        "Preset 4": {
+
+        },
+      }
+
+      var presetArray = [];
+      var counter = 0;
+      for(var preset in wellAttrData) {
+        presetArray[counter ++] = this._createElement("<div></div>").addClass("plate-setup-prest-tab")
+        .html(preset);
+        $(this.presetTabContainer).append(presetArray[counter - 1]);
+
+        var that = this;
+
+        $(presetArray[counter - 1]).click(function() {
+          that._presetClickHandler(this);
+        });
+      }
+    },
+
+      _presetClickHandler: function(clickedPreset) {
+
+        if(this.previouslyClickedPreset) {
+          $(this.previouslyClickedPreset).removeClass("plate-setup-prest-tab-selected")
+          .addClass("plate-setup-prest-tab");
+        }
+
+        $(clickedPreset).addClass("plate-setup-prest-tab-selected");
+        this.previouslyClickedPreset = clickedPreset;
     }
 
   });

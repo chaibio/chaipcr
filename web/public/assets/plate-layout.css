@@ -182,3 +182,55 @@
   left: 0px;
   background-color: white;
 }
+
+/* line 166, ../../app/assets/stylesheets/plate-layout.css.scss */
+.plate-setup-well-attr-container {
+  width: 335px;
+  height: 28px;
+  color: #00506e;
+  text-align: center;
+  position: absolute;
+  top: 486px;
+  font-size: 10px;
+  font-family: "roboto";
+  padding-top: 2px;
+}
+
+/* line 178, ../../app/assets/stylesheets/plate-layout.css.scss */
+.plate-setup-preset-container {
+  width: 272px;
+  height: 22px;
+  position: absolute;
+  top: 512px;
+  margin-left: 32px;
+}
+
+/* line 186, ../../app/assets/stylesheets/plate-layout.css.scss */
+.plate-setup-prest-tab {
+  width: 68px;
+  height: 22px;
+  float: left;
+  background-color: white;
+  border: solid 1px #e1e1e1;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  cursor: pointer;
+  font-family: "roboto";
+  font-size: 10px;
+  text-align: -webkit-center;
+  padding-top: 2px;
+}
+
+/* line 201, ../../app/assets/stylesheets/plate-layout.css.scss */
+.plate-setup-prest-tab-selected {
+  width: 68px;
+  height: 22px;
+  float: left;
+  background-color: #e1e1e1;
+  cursor: pointer;
+  font-family: "roboto";
+  font-size: 11px;
+  text-align: -webkit-center;
+  padding-top: 2px;
+  color: #00506e;
+}
