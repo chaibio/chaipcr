@@ -171,18 +171,41 @@
 
       this.tabDataContainer = this._createElement("<div></div>").addClass("plate-setup-tab-data-container");
       $(this.tabContainer).append(this.tabDataContainer);
-  },
+
+      this._addDataTabs(tabData);
+
+      $(this.allTabs[0]).click();
+    },
 
     _tabClickHandler: function(clickedTab) {
 
       if(this.selectedTab) {
         $(this.selectedTab).removeClass("plate-setup-tab-selected")
         .addClass("plate-setup-tab");
+
+        var previouslyClickedTabIndex = $(this.selectedTab).data("index");
+        $(this.allDataTabs[previouslyClickedTabIndex]).css("z-index", 0);
       }
 
       $(clickedTab).addClass("plate-setup-tab-selected");
 
       this.selectedTab = clickedTab;
+
+      var clickedTabIndex = $(clickedTab).data("index");
+      $(this.allDataTabs[clickedTabIndex]).css("z-index", 1000);
+    },
+
+    _addDataTabs: function(tabs) {
+
+      this.allDataTabs = []; // To hold all the tab contents
+      var tabIndex = 0;
+
+      for(tabData in tabs) {
+        this.allDataTabs[tabIndex ++] = this._createElement("<div></div>").addClass("plate-setup-data-div")
+        .css("z-index", 0)
+        .html(tabData);
+        $(this.tabDataContainer).append(this.allDataTabs[tabIndex - 1]);
+      }
     }
 
   });
