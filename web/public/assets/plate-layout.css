@@ -144,10 +144,11 @@
   font-family: "roboto";
   font-size: 10px;
   text-align: -webkit-center;
+  text-align: center;
   padding-top: 2px;
 }
 
-/* line 133, ../../app/assets/stylesheets/plate-layout.css.scss */
+/* line 134, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-tab-selected {
   width: 83px;
   height: 23px;
@@ -161,11 +162,12 @@
   font-family: "roboto";
   font-size: 10px;
   text-align: -webkit-center;
+  text-align: center;
   padding-top: 2px;
   color: #00506e;
 }
 
-/* line 150, ../../app/assets/stylesheets/plate-layout.css.scss */
+/* line 152, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-tab-data-container {
   width: 335px;
   height: 432px;
@@ -173,7 +175,7 @@
   position: absolute;
 }
 
-/* line 157, ../../app/assets/stylesheets/plate-layout.css.scss */
+/* line 159, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-data-div {
   width: 333px;
   height: 423px;
@@ -183,7 +185,7 @@
   background-color: white;
 }
 
-/* line 166, ../../app/assets/stylesheets/plate-layout.css.scss */
+/* line 168, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-well-attr-container {
   width: 335px;
   height: 28px;
@@ -196,7 +198,7 @@
   padding-top: 2px;
 }
 
-/* line 178, ../../app/assets/stylesheets/plate-layout.css.scss */
+/* line 180, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-preset-container {
   width: 272px;
   height: 22px;
@@ -205,7 +207,7 @@
   margin-left: 32px;
 }
 
-/* line 186, ../../app/assets/stylesheets/plate-layout.css.scss */
+/* line 188, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-prest-tab {
   width: 68px;
   height: 22px;
@@ -218,10 +220,11 @@
   font-family: "roboto";
   font-size: 10px;
   text-align: -webkit-center;
+  text-align: center;
   padding-top: 2px;
 }
 
-/* line 201, ../../app/assets/stylesheets/plate-layout.css.scss */
+/* line 204, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-prest-tab-selected {
   width: 68px;
   height: 22px;
@@ -231,6 +234,7 @@
   font-family: "roboto";
   font-size: 11px;
   text-align: -webkit-center;
+  text-align: center;
   padding-top: 2px;
   color: #00506e;
 }

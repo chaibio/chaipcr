@@ -222,7 +222,7 @@
 
       this.presetTabContainer = this._createElement("<div></div>").addClass("plate-setup-preset-container");
       $(this.tabContainer).append(this.presetTabContainer);
-
+      // From where I am going to get this data ??
       var wellAttrData = {
         "Preset 1": {
 
@@ -265,6 +265,7 @@
 
         $(clickedPreset).addClass("plate-setup-prest-tab-selected");
         this.previouslyClickedPreset = clickedPreset;
+        // What does preset tabs do ??
     }
 
   });
