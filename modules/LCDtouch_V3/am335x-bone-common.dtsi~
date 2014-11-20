@@ -233,7 +233,7 @@
 				part-number = "LCDtouch5";
 			};
 /*
-			// Beaglebone black has it soldered on 
+			/* Beaglebone black has it soldered on */
 			slot@102 {
 				ti,cape-override;
 				priority = <1>;
@@ -244,7 +244,7 @@
 				part-number = "BB-BONELT-HDMI";
 			};
 
-			// Beaglebone black has it soldered on (but no audio) 
+			/* Beaglebone black has it soldered on (but no audio) */
 			slot@103 {
 				ti,cape-override;
 				priority = <2>;
