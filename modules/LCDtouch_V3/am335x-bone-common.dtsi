@@ -59,7 +59,7 @@
 		uart1: serial@44e09000 {
 			status = "okay";
 		};
-        
+
 		gpio-leds {
 			compatible = "gpio-leds";
 			pinctrl-names = "default";
@@ -97,7 +97,6 @@
 		rtc@44e3e000 {
 			ti,system-power-controller;
 		};
-        
 	};
 
 	bone_capemgr {
@@ -212,31 +211,52 @@
 				part-number = "BB-BONE-GPS-01";
 			};
 
+
 			/* Beaglebone black has it soldered on */
 			 slot@100 {
-			 	ti,cape-override;
-				priority = <1>;
-			 	compatible = "ti,beaglebone-black";
-			 	board-name = "Bone-LT-eMMC-2G";
-			 	version = "00A0";
-			 	manufacturer = "Texas Instruments";
-			 	part-number = "BB-BONE-EMMC-2G";
-			 };
-             
-                        /* 5" LCD Touch Screen*/
-                        slot@101 {
 				ti,cape-override;
 				priority = <1>;
+				compatible = "ti,beaglebone-black";
+				board-name = "Bone-LT-eMMC-2G";
+				version = "00A0";
+				manufacturer = "Texas Instruments";
+				part-number = "BB-BONE-EMMC-2G";
+			 };
+
+			/* 5" LCD Touch Screen*/
+                        slot@101 {
+				ti,cape-override;
 				compatible = "ti,beaglebone-black";
 				board-name = "LCDtouch5";
 				version = "00A0";
 				manufacturer = "Texas Instruments";
 				part-number = "LCDtouch5";
 			};
+/*
+			/* Beaglebone black has it soldered on */
+			slot@102 {
+				ti,cape-override;
+				priority = <1>;
+				compatible = "ti,beaglebone-black";
+				board-name = "Bone-Black-HDMI";
+				version = "00A0";
+				manufacturer = "Texas Instruments";
+				part-number = "BB-BONELT-HDMI";
+			};
 
+			/* Beaglebone black has it soldered on (but no audio) */
+			slot@103 {
+				ti,cape-override;
+				priority = <2>;
+				compatible = "ti,beaglebone-black";
+				board-name = "Bone-Black-HDMIN";
+				version = "00A0";
+				manufacturer = "Texas Instruments";
+				part-number = "BB-BONELT-HDMIN";
+			};*/
 
 		};
-									  
+
 		/* mapping between board names and dtb objects */
 		capemaps {
 			/* DVI cape */
@@ -300,6 +320,10 @@
 					version = "00A0";
 					dtbo = "cape-bone-weather-00A0.dtbo";
 				};
+				version@00B0 {
+					version = "00B0";
+					dtbo = "cape-bone-weather-00B0.dtbo";
+				};
 			};
 
 			/* beaglebone black hdmi on board */
@@ -358,7 +382,7 @@
 					dtbo = "cape-bone-exptest-00A0.dtbo";
 				};
 			};
- 			cape@12 {
+			cape@12 {
 				part-number = "BB-BONE-RS232-01";
 				version@00A0 {
 					version = "00A0";
@@ -390,6 +414,24 @@
 				version@R2 {
 					version = "R2";
 					dtbo = "cape-bebopr-R2.dtbo";
+				};
+			};
+
+			/* LOGIBONE cape */
+			cape@16 {
+				part-number = "BB-BONE-LOGIBONE";
+				version@00R1 {
+					version = "00R1";
+					dtbo = "BB-BONE-LOGIBONE-00R1.dtbo";
+				};
+			};
+
+			/* beaglebone black hdmi on board (No audio) */
+			cape@17 {
+				part-number = "LCDtouch5";
+				version@00A0 {
+					version = "00A0";
+					dtbo = "LCDtouch5-00A0.dtbo";
 				};
 			};
 
