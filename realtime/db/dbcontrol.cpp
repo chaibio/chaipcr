@@ -246,19 +246,19 @@ Ramp* DBControl::getRamp(int stepId)
     return ramp;
 }
 
-void DBControl::startExperiment(Experiment *experiment)
+void DBControl::startExperiment(const Experiment &experiment)
 {
     _writeMutex.lock();
-    *_writeSession << "UPDATE experiments SET started_at = :started_at WHERE id = " << experiment->id(), soci::use(experiment->startedAt());
+    *_writeSession << "UPDATE experiments SET started_at = :started_at WHERE id = " << experiment.id(), soci::use(experiment.startedAt());
     _writeMutex.unlock();
 }
 
-void DBControl::completeExperiment(Experiment *experiment)
+void DBControl::completeExperiment(const Experiment &experiment)
 {
     _writeMutex.lock();
     {
-        *_writeSession << "UPDATE experiments SET completed_at = :completed_at, completion_status = :completion_status, completion_message = :completion_message WHERE id = " << experiment->id(),
-                soci::use(experiment->completedAt()), soci::use(experiment->completionStatus()), soci::use(experiment->completionMessage());
+        *_writeSession << "UPDATE experiments SET completed_at = :completed_at, completion_status = :completion_status, completion_message = :completion_message WHERE id = " << experiment.id(),
+                soci::use(experiment.completedAt()), soci::use(experiment.completionStatus()), soci::use(experiment.completionMessage());
     }
     _writeMutex.unlock();
 }
@@ -294,7 +294,7 @@ void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
     addWriteQueries(queries);
 }
 
-void DBControl::addFluorescenceData(const Experiment *experiment, const std::vector<int> &fluorescenceData)
+void DBControl::addFluorescenceData(const Experiment &experiment, const std::vector<int> &fluorescenceData)
 {
     std::vector<std::string> queries;
     std::stringstream stream;
@@ -302,8 +302,8 @@ void DBControl::addFluorescenceData(const Experiment *experiment, const std::vec
 
     for (size_t i = 0; i < fluorescenceData.size(); ++i)
     {
-        stream << "INSERT INTO fluorescence_data(experiment_id, step_id, fluorescence_value, well_num, cycle_num) VALUES(" << experiment->id() << ", "
-               << experiment->protocol()->currentStep()->id() << ", " << fluorescenceData.at(i) << ", " << i << ", " << experiment->protocol()->currentStage()->currentCycle() << ")";
+        stream << "INSERT INTO fluorescence_data(experiment_id, step_id, fluorescence_value, well_num, cycle_num) VALUES(" << experiment.id() << ", "
+               << experiment.protocol()->currentStep()->id() << ", " << fluorescenceData.at(i) << ", " << i << ", " << experiment.protocol()->currentStage()->currentCycle() << ")";
 
         queries.emplace_back(std::move(stream.str()));
         stream.str("");

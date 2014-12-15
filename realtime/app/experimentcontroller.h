@@ -12,7 +12,7 @@ class Experiment;
 class Settings;
 class TemperatureLog;
 
-namespace Poco { class Timer; }
+namespace Poco { class Timer; class RWLock; }
 
 class ExperimentController : public Instance<ExperimentController>
 {
@@ -38,7 +38,7 @@ public:
     ~ExperimentController();
 
     inline MachineState machineState() const { return _machineState; }
-    inline const std::shared_ptr<Experiment> experiment() const { return _experiment; }
+    Experiment experiment() const;
     inline Settings* settings() const { return _settings; }
 
     StartingResult start(int experimentId);
@@ -64,8 +64,10 @@ private:
     std::atomic<MachineState> _machineState;
 
     DBControl *_dbControl;
-    std::shared_ptr<Experiment> _experiment;
+    Experiment *_experiment;
     Settings *_settings;
+
+    mutable Poco::RWLock *_experimentLock;
 
     Poco::Timer *_holdStepTimer;
     Poco::Timer *_logTimer;

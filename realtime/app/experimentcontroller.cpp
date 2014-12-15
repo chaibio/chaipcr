@@ -1,5 +1,6 @@
 #include <boost/date_time.hpp>
 #include <Poco/Timer.h>
+#include <Poco/RWLock.h>
 
 #include "pcrincludes.h"
 #include "dbincludes.h"
@@ -14,6 +15,8 @@ ExperimentController::ExperimentController()
     _holdStepTimer = new Poco::Timer();
     _logTimer = new Poco::Timer();
     _settings = _dbControl->getSettings();
+    _experiment = nullptr;
+    _experimentLock = new Poco::RWLock();
 
     LidInstance::getInstance()->startThresholdReached.connect(boost::bind(&ExperimentController::run, this));
     HeatBlockInstance::getInstance()->stepBegun.connect(boost::bind(&ExperimentController::stepBegun, this));
@@ -23,10 +26,19 @@ ExperimentController::~ExperimentController()
 {
     stop();
 
+    delete _experiment;
+    delete _experimentLock;
     delete _logTimer;
     delete _holdStepTimer;
     delete _dbControl;
     delete _settings;
+}
+
+Experiment ExperimentController::experiment() const
+{
+    Poco::ScopedRWLock lock(*_experimentLock);
+
+    return _experiment ? *_experiment : Experiment();
 }
 
 ExperimentController::StartingResult ExperimentController::start(int experimentId)
@@ -34,40 +46,50 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
     if (_machineState != Idle)
         return MachineRunning;
 
-    _experiment.reset(_dbControl->getExperiment(experimentId));
+    Experiment *experiment = _dbControl->getExperiment(experimentId);
 
-    if (!_experiment || !_experiment->protocol())
+    if (!experiment || !experiment->protocol())
     {
-        _experiment.reset();
+        delete experiment;
 
         return ExperimentNotFound;
     }
-    else if (_experiment->startedAt() != boost::posix_time::not_a_date_time)
+    else if (experiment->startedAt() != boost::posix_time::not_a_date_time)
     {
-        _experiment.reset();
+        delete experiment;
 
         return ExperimentUsed;
     }
     else if (OpticsInstance::getInstance()->lidOpen())
     {
-        _experiment.reset();
+        delete experiment;
 
         return LidIsOpen;
     }
 
+    experiment->setStartedAt(boost::posix_time::microsec_clock::local_time());
+    _dbControl->startExperiment(*experiment);
+
     stopLogging();
 
-    _machineState = LidHeating;
+    _experimentLock->writeLock();
+    {
+        delete _experiment;
+        _experiment = experiment;
+    }
+    _experimentLock->unlock();
 
-    _experiment->setStartedAt(boost::posix_time::microsec_clock::local_time());
-    _dbControl->startExperiment(_experiment.get());
+    _machineState = LidHeating;
 
     _settings->temperatureLogs.setTemperatureLogs(false);
     _settings->temperatureLogs.setDebugTemperatureLogs(false);
 
     startLogging();
 
+    _experimentLock->readLock();
     LidInstance::getInstance()->setTargetTemperature(_experiment->protocol()->lidTemperature());
+    _experimentLock->unlock();
+
     LidInstance::getInstance()->setEnableMode(true);
 
     return Started;
@@ -79,7 +101,10 @@ void ExperimentController::run()
     if (!_machineState.compare_exchange_strong(state, Running))
         return;
 
+    _experimentLock->readLock();
     HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->currentStep()->temperature(), _experiment->protocol()->currentRamp() ? _experiment->protocol()->currentRamp()->rate() : 0);
+    _experimentLock->unlock();
+
     HeatBlockInstance::getInstance()->enableStepProcessing();
 
     HeatBlockInstance::getInstance()->setEnableMode(true);
@@ -97,10 +122,16 @@ void ExperimentController::complete()
     LidInstance::getInstance()->setEnableMode(false);
     OpticsInstance::getInstance()->setCollectData(false);
 
-    _experiment->setCompletionStatus(Experiment::Success);
-    _experiment->setCompletedAt(boost::posix_time::microsec_clock::local_time());
+    _experimentLock->writeLock();
+    {
+        _experiment->setCompletionStatus(Experiment::Success);
+        _experiment->setCompletedAt(boost::posix_time::microsec_clock::local_time());
+    }
+    _experimentLock->unlock();
 
-    _dbControl->completeExperiment(_experiment.get());
+    _experimentLock->readLock();
+    _dbControl->completeExperiment(*_experiment);
+    _experimentLock->unlock();
 }
 
 void ExperimentController::stop()
@@ -120,13 +151,24 @@ void ExperimentController::stop()
 
         _holdStepTimer->stop();
 
-        _experiment->setCompletionStatus(Experiment::Aborted);
-        _experiment->setCompletedAt(boost::posix_time::microsec_clock::local_time());
+        _experimentLock->writeLock();
+        {
+            _experiment->setCompletionStatus(Experiment::Aborted);
+            _experiment->setCompletedAt(boost::posix_time::microsec_clock::local_time());
+        }
+        _experimentLock->unlock();
 
-        _dbControl->completeExperiment(_experiment.get());
+        _experimentLock->readLock();
+        _dbControl->completeExperiment(*_experiment);
+        _experimentLock->unlock();
     }
 
-    _experiment.reset();
+    _experimentLock->writeLock();
+    {
+        delete _experiment;
+        _experiment = nullptr;
+    }
+    _experimentLock->unlock();
 }
 
 void ExperimentController::stop(const std::string &errorMessage)
@@ -142,37 +184,58 @@ void ExperimentController::stop(const std::string &errorMessage)
 
     _holdStepTimer->stop();
 
-    _experiment->setCompletionStatus(Experiment::Failed);
-    _experiment->setCompletionMessage(errorMessage);
-    _experiment->setCompletedAt(boost::posix_time::microsec_clock::local_time());
+    _experimentLock->writeLock();
+    {
+        _experiment->setCompletionStatus(Experiment::Failed);
+        _experiment->setCompletionMessage(errorMessage);
+        _experiment->setCompletedAt(boost::posix_time::microsec_clock::local_time());
+    }
+    _experimentLock->unlock();
 
-    _dbControl->completeExperiment(_experiment.get());
+    _experimentLock->readLock();
+    _dbControl->completeExperiment(*_experiment);
+    _experimentLock->unlock();
 
-    _experiment.reset();
+    _experimentLock->writeLock();
+    {
+        delete _experiment;
+        _experiment = nullptr;
+    }
+    _experimentLock->unlock();
 }
 
 void ExperimentController::stepBegun()
 {
-    if (_experiment->protocol()->hasNextStep())
+    _experimentLock->readLock();
+    bool hasNextStep = _experiment->protocol()->hasNextStep();
+    std::time_t  holdTime = _experiment->protocol()->currentStep()->holdTime();
+    _experimentLock->unlock();
+
+    if (hasNextStep)
     {
         _holdStepTimer->stop();
-        _holdStepTimer->setStartInterval(_experiment->protocol()->currentStep()->holdTime() * 1000);
+        _holdStepTimer->setStartInterval(holdTime * 1000);
         _holdStepTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::holdStepCallback));
     }
     else
     {
         complete();
 
-        if (_experiment->protocol()->currentStep()->holdTime() > 0)
+        if (holdTime > 0)
             stop();
     }
 }
 
 void ExperimentController::holdStepCallback(Poco::Timer &)
 {
-    _dbControl->addFluorescenceData(_experiment.get(), OpticsInstance::getInstance()->restartCollection());
+    _experimentLock->readLock();
+    {
+        _dbControl->addFluorescenceData(*_experiment, OpticsInstance::getInstance()->restartCollection());
 
-    HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->advanceNextStep()->temperature(), _experiment->protocol()->currentRamp() ? _experiment->protocol()->currentRamp()->rate() : 0);
+        HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->advanceNextStep()->temperature(), _experiment->protocol()->currentRamp() ? _experiment->protocol()->currentRamp()->rate() : 0);
+    }
+    _experimentLock->unlock();
+
     HeatBlockInstance::getInstance()->enableStepProcessing();
 }
 
@@ -218,8 +281,12 @@ void ExperimentController::addLogCallback(Poco::Timer &)
 
     if (machineState() != Idle)
     {
-        log = TemperatureLog(_experiment->id(), true, _settings->debugMode());
-        log.setElapsedTime((boost::posix_time::microsec_clock::local_time() - _experiment->startedAt()).total_milliseconds());
+        _experimentLock->readLock();
+        {
+            log = TemperatureLog(_experiment->id(), true, _settings->debugMode());
+            log.setElapsedTime((boost::posix_time::microsec_clock::local_time() - _experiment->startedAt()).total_milliseconds());
+        }
+        _experimentLock->unlock();
     }
     else
     {
