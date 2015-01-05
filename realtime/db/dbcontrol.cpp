@@ -3,6 +3,7 @@
 #include "qpcrapplication.h"
 
 #define DATABASE_FILE "/root/chaipcr/web/db/development.sqlite3"
+#define DATABASE_LOCKED_TRY_COUNT 3
 #define ROUND(x) ((int)(x * 100.0 + 0.5) / 100.0)
 
 DBControl::DBControl()
@@ -40,26 +41,26 @@ void DBControl::process()
     {
         try
         {
-            std::unique_lock<std::mutex> lock(_writeMutex);
-            _writeCondition.wait(lock);
+            {
+                std::unique_lock<std::mutex> lock(_writeQueueMutex);
+                _writeCondition.wait(lock);
 
-            queries = std::move(_writeQueriesQueue);
+                queries = std::move(_writeQueriesQueue);
+            }
 
             if (!queries.empty())
             {
-                _writeSession->begin();
-                {
-                    for (const std::string &query: queries)
-                        *_writeSession << query;
-                }
-                _writeSession->commit();
+                std::vector<soci::statement> statements;
+                std::unique_lock<std::mutex> lock(_writeMutex);
 
-                queries.clear();
+                for (const std::string &query: queries)
+                    statements.emplace_back((_writeSession->prepare << query));
+
+                write(statements);
             }
         }
         catch (...)
         {
-            queries.clear();
             qpcrApp.setException(std::current_exception());
         }
     }
@@ -248,19 +249,23 @@ Ramp* DBControl::getRamp(int stepId)
 
 void DBControl::startExperiment(const Experiment &experiment)
 {
-    _writeMutex.lock();
-    *_writeSession << "UPDATE experiments SET started_at = :started_at WHERE id = " << experiment.id(), soci::use(experiment.startedAt());
-    _writeMutex.unlock();
+    std::vector<soci::statement> statements;
+    std::unique_lock<std::mutex> lock(_writeMutex);
+
+    statements.emplace_back((_writeSession->prepare << "UPDATE experiments SET started_at = :started_at WHERE id = " << experiment.id(), soci::use(experiment.startedAt())));
+
+    write(statements);
 }
 
 void DBControl::completeExperiment(const Experiment &experiment)
 {
-    _writeMutex.lock();
-    {
-        *_writeSession << "UPDATE experiments SET completed_at = :completed_at, completion_status = :completion_status, completion_message = :completion_message WHERE id = " << experiment.id(),
-                soci::use(experiment.completedAt()), soci::use(experiment.completionStatus()), soci::use(experiment.completionMessage());
-    }
-    _writeMutex.unlock();
+    std::vector<soci::statement> statements;
+    std::unique_lock<std::mutex> lock(_writeMutex);
+
+    statements.emplace_back((_writeSession->prepare << "UPDATE experiments SET completed_at = :completed_at, completion_status = :completion_status, completion_message = :completion_message WHERE id = "
+                             << experiment.id(), soci::use(experiment.completedAt()), soci::use(experiment.completionStatus()), soci::use(experiment.completionMessage())));
+
+    write(statements);
 }
 
 void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
@@ -330,9 +335,12 @@ Settings* DBControl::getSettings()
 
 void DBControl::updateSettings(const Settings &settings)
 {
-    _writeMutex.lock();
-    *_writeSession << "UPDATE settings SET debug = :debug", soci::use(settings.debugMode() ? 1 : 0);
-    _writeMutex.unlock();
+    std::vector<soci::statement> statements;
+    std::unique_lock<std::mutex> lock(_writeMutex);
+
+    statements.emplace_back((_writeSession->prepare << "UPDATE settings SET debug = :debug", soci::use(settings.debugMode() ? 1 : 0)));
+
+    write(statements);
 }
 
 #ifdef TEST_BUILD
@@ -352,10 +360,48 @@ void DBControl::addWriteQueries(std::vector<std::string> &queries)
 {
     if (!queries.empty())
     {
-        _writeMutex.lock();
+        _writeQueueMutex.lock();
         _writeQueriesQueue.insert(_writeQueriesQueue.end(), std::make_move_iterator(queries.begin()), std::make_move_iterator(queries.end()));
-        _writeMutex.unlock();
+        _writeQueueMutex.unlock();
 
         _writeCondition.notify_all();
+    }
+}
+
+void DBControl::write(std::vector<soci::statement> &statements)
+{
+    if (!statements.empty())
+    {
+        bool success = false;
+        int tryCount = 0;
+
+        while (!success)
+        {
+            try
+            {
+                soci::transaction transaction(*_writeSession);
+
+                for (soci::statement &statement: statements)
+                    statement.execute(true);
+
+                transaction.commit();
+
+                success = true;
+            }
+            catch (const soci::soci_error&)
+            {
+                int error = sqlite_api::sqlite3_errcode(static_cast<soci::sqlite3_session_backend*>(_writeSession->get_backend())->conn_);
+
+                if (error == SQLITE_BUSY || error == SQLITE_LOCKED)
+                {
+                    ++tryCount;
+
+                    if (tryCount > DATABASE_LOCKED_TRY_COUNT)
+                        throw;
+                }
+                else
+                    throw;
+            }
+        }
     }
 }

@@ -56,12 +56,15 @@ private:
 
     void addWriteQueries(std::vector<std::string> &queries);
 
+    void write(std::vector<soci::statement> &statements);
+
 private:
     soci::session *_readSession;
     soci::session *_writeSession;
 
     std::mutex _readMutex;
     std::mutex _writeMutex;
+    std::mutex _writeQueueMutex;
 
     std::atomic<bool> _writeThreadState;
     std::vector<std::string> _writeQueriesQueue;
