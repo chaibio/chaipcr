@@ -48,8 +48,8 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(ADCController::ConsumersLis
     SinglePoleRecursiveFilter processValueFilter(Filters::CutoffFrequencyForTimeConstant(derivativeFilterTimeConstant));
     PIDController *zone1CPIDController = new PIDController(heatBlockPIDSchedule, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax, processValueFilter);
 
-    HeatBlockZoneController *zone1 = new HeatBlockZoneController(zone1Thermistor, kHeatBlockZonesMinTargetTemp, kHeatBlockZonesMaxTargetTemp, zone1CPIDController,
-                                                                 kHeatBlockZone1PWMPath, kHeatBlockZone1PWMPeriodNs, kHeadBlockZone1HeatPin, kHeadBlockZone1CoolPin);
+    HeatBlockZoneController *zone1 = new HeatBlockZoneController(zone1Thermistor, kHeatBlockZonesMinTargetTemp, kHeatBlockZonesMaxTargetTemp, kHeatBlockLowTempShutdownThreshold, kHeatBlockHighTempShutdownThreshold,
+                                                                 zone1CPIDController, kHeatBlockZone1PWMPath, kHeatBlockZone1PWMPeriodNs, kHeadBlockZone1HeatPin, kHeadBlockZone1CoolPin);
 
     shared_ptr<SteinhartHartThermistor> zone2Thermistor(new SteinhartHartThermistor(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                                                                     kUSSensorJThermistorACoefficient, kUSSensorJThermistorBCoefficient,
@@ -57,8 +57,8 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(ADCController::ConsumersLis
 
     PIDController *zone2CPIDController = new PIDController(heatBlockPIDSchedule, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax, processValueFilter);
 
-    HeatBlockZoneController *zone2 = new HeatBlockZoneController(zone2Thermistor, kHeatBlockZonesMinTargetTemp, kHeatBlockZonesMaxTargetTemp, zone2CPIDController,
-                                                                 kHeatBlockZone2PWMPath, kHeatBlockZone2PWMPeriodNs, kHeadBlockZone2HeatPin, kHeadBlockZone2CoolPin);
+    HeatBlockZoneController *zone2 = new HeatBlockZoneController(zone2Thermistor, kHeatBlockZonesMinTargetTemp, kHeatBlockZonesMaxTargetTemp, kHeatBlockLowTempShutdownThreshold, kHeatBlockHighTempShutdownThreshold,
+                                                                 zone2CPIDController, kHeatBlockZone2PWMPath, kHeatBlockZone2PWMPeriodNs, kHeadBlockZone2HeatPin, kHeadBlockZone2CoolPin);
 
     consumers[ADCController::EReadZone1Singular] = zone1Thermistor;
     consumers[ADCController::EReadZone2Singular] = zone2Thermistor;
@@ -75,7 +75,7 @@ shared_ptr<IControl> QPCRFactory::constructLid(ADCController::ConsumersList &con
 
     consumer[ADCController::EReadLid] = thermistor;
 
-    return LidInstance::createInstance(thermistor, kLidMinTargetTemp, kLidMaxTargetTemp, pidController,
+    return LidInstance::createInstance(thermistor, kLidMinTargetTemp, kLidMaxTargetTemp, kLidLowTempShutdownThreshold, kLidHighTempShutdownThreshold, pidController,
                                        kLidControlPWMPath, kLidPWMPeriodNs, kProgramStartLidTempThreshold);
 }
 
@@ -87,7 +87,8 @@ shared_ptr<IControl> QPCRFactory::constructHeatSink() {
     SinglePoleRecursiveFilter processValueFilter(5);
     PIDController *pidController = new PIDController({{100,0.05,10000,0.0}}, kHeatSinkPIDMin, kHeatSinkPIDMax, processValueFilter);
 
-    return HeatSinkInstance::createInstance(thermistor, kHeatSinkMinTargetTemp, kHeatSinkMaxTargetTemp, pidController, kHeatSinkFanControlPWMPath, kFanPWMPeriodNs, ADCPin(kADCPinPath, kHeatSinkThermistorADCPinChannel));
+    return HeatSinkInstance::createInstance(thermistor, kHeatSinkMinTargetTemp, kHeatSinkMaxTargetTemp, kHeatSinkLowTempShutdownThreshold, kHeatSinkHighTempShutdownThreshold, pidController,
+                                            kHeatSinkFanControlPWMPath, kFanPWMPeriodNs, ADCPin(kADCPinPath, kHeatSinkThermistorADCPinChannel));
 }
 
 void QPCRFactory::setupMachine() {

@@ -4,7 +4,8 @@
 #include "pid.h"
 #include "temperaturecontroller.h"
 
-TemperatureController::TemperatureController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController)
+TemperatureController::TemperatureController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, double minTempThreshold, double maxTempThreshold,
+                                             PIDController *pidController)
 {
     _enableMode = false;
 
@@ -13,6 +14,8 @@ TemperatureController::TemperatureController(std::shared_ptr<Thermistor> thermis
     _pidResult = 0;
     _minTargetTemp = minTargetTemp;
     _maxTargetTemp = maxTargetTemp;
+    _minTempThreshold = minTempThreshold;
+    _maxTempThreshold = maxTempThreshold;
     _targetTemperature = _minTargetTemp - 1;
 
     _thermistor->temperatureChanged.connect(boost::bind(&TemperatureController::computePid, this, _1));
@@ -48,7 +51,7 @@ void TemperatureController::setTargetTemperature(double temperature)
     if (temperature < _minTargetTemp || temperature > _maxTargetTemp)
     {
         std::stringstream string;
-        string << "Target temperature should be in range from " << _minTargetTemp << " to " << _maxTargetTemp;
+        string << "TemperatureController::setTargetTemperature - target temperature should be in range from " << _minTargetTemp << " to " << _maxTargetTemp;
 
         throw std::out_of_range(string.str());
     }
@@ -71,6 +74,14 @@ void TemperatureController::process()
 
 void TemperatureController::computePid(double currentTemperature)
 {
+    if (currentTemperature < _minTempThreshold || currentTemperature > _maxTempThreshold)
+    {
+        std::stringstream stream;
+        stream << "TemperatureController::computePid - current temperature (" << currentTemperature << ") exceeds limits (" << _minTempThreshold << '/' << _maxTempThreshold << ')';
+
+        throw std::runtime_error(stream.str());
+    }
+
     if (_targetTemperature < _minTargetTemp)
         _targetTemperature = currentTemperature;
 

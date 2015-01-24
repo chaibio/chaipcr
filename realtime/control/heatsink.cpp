@@ -6,9 +6,9 @@
 
 #include <Poco/Timer.h>
 
-HeatSink::HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController,
-                   const std::string &fanPWMPath, unsigned long fanPWMPeriod, const ADCPin &adcPin)
-    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController),
+HeatSink::HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, double minTempThreshold, double maxTempThreshold,
+                   PIDController *pidController, const std::string &fanPWMPath, unsigned long fanPWMPeriod, const ADCPin &adcPin)
+    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, minTempThreshold, maxTempThreshold, pidController),
       _adcPin(adcPin)
 {
     _fan = new PWMControl(fanPWMPath, fanPWMPeriod);

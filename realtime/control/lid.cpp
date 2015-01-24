@@ -1,9 +1,9 @@
 #include "experimentcontroller.h"
 #include "lid.h"
 
-Lid::Lid(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController,
-         const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold)
-    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController),
+Lid::Lid(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, double minTempThreshold, double maxTempThreshold,
+         PIDController *pidController, const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold)
+    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, minTempThreshold, maxTempThreshold, pidController),
      PWMControl(pwmPath, pwmPeriod)
 {
     _startTempThreshold = startTempThreshold;

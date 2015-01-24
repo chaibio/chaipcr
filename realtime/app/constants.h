@@ -31,6 +31,9 @@ const double kLidThermistorT0 = 298.15;             //kelvins
 const double kLidMinTargetTemp = 0;
 const double kLidMaxTargetTemp = 130;
 
+const double kLidLowTempShutdownThreshold = -20;
+const double kLidHighTempShutdownThreshold = 140;
+
 const double kProgramStartLidTempThreshold = 2;
 
 //PID
@@ -62,6 +65,9 @@ const double kHeatBlockZonesPIDMax = 1;
 const double kHeatBlockZonesMinTargetTemp = -10;
 const double kHeatBlockZonesMaxTargetTemp = 105;
 
+const double kHeatBlockLowTempShutdownThreshold = -20;
+const double kHeatBlockHighTempShutdownThreshold = 120;
+
 const double kMaxHeatBlockRampSpeed = 3.0;
 
 //LED constants
@@ -89,6 +95,9 @@ const unsigned int kHeatSinkThermistorVoltageDividerResistanceOhms = 6800;
 
 const double kHeatSinkMinTargetTemp = 0;
 const double kHeatSinkMaxTargetTemp = 80;
+
+const double kHeatSinkLowTempShutdownThreshold = -20;
+const double kHeatSinkHighTempShutdownThreshold = 90;
 
 const double kHeatSinkPIDMin = -1;
 const double kHeatSinkPIDMax = 0;
