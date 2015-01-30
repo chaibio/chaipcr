@@ -15,3 +15,6 @@ InvalidArgument::InvalidArgument(const char* message):
 	
 SPIError::SPIError(const char* message, int errorNumber):
 	runtime_error(string(message) + ": " + strerror(errorNumber)) {}
+
+TemperatureLimitError::TemperatureLimitError(const string &message):
+    runtime_error(message) {}

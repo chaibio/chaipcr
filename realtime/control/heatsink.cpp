@@ -6,10 +6,8 @@
 
 #include <Poco/Timer.h>
 
-HeatSink::HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, double minTempThreshold, double maxTempThreshold,
-                   PIDController *pidController, const std::string &fanPWMPath, unsigned long fanPWMPeriod, const ADCPin &adcPin)
-    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, minTempThreshold, maxTempThreshold, pidController),
-      _adcPin(adcPin)
+HeatSink::HeatSink(Settings settings, const std::string &fanPWMPath, unsigned long fanPWMPeriod, const ADCPin &adcPin)
+    :TemperatureController(settings), _adcPin(adcPin)
 {
     _fan = new PWMControl(fanPWMPath, fanPWMPeriod);
     _adcTimer = new Poco::Timer;
@@ -61,6 +59,10 @@ void HeatSink::readADCPin(Poco::Timer &/*timer*/) {
     try
     {
         _thermistor->setADCValue(_adcPin.readValue());
+    }
+    catch (const TemperatureLimitError &ex)
+    {
+        qpcrApp.stopExperiment(ex.what());
     }
     catch (...)
     {

@@ -1,6 +1,5 @@
 #include <boost/date_time.hpp>
 #include <Poco/Timer.h>
-#include <Poco/RWLock.h>
 
 #include "pcrincludes.h"
 #include "dbincludes.h"
@@ -15,8 +14,6 @@ ExperimentController::ExperimentController()
     _holdStepTimer = new Poco::Timer();
     _logTimer = new Poco::Timer();
     _settings = _dbControl->getSettings();
-    _experiment = nullptr;
-    _experimentLock = new Poco::RWLock();
 
     LidInstance::getInstance()->startThresholdReached.connect(boost::bind(&ExperimentController::run, this));
     HeatBlockInstance::getInstance()->stepBegun.connect(boost::bind(&ExperimentController::stepBegun, this));
@@ -26,190 +23,182 @@ ExperimentController::~ExperimentController()
 {
     stop();
 
-    delete _experiment;
-    delete _experimentLock;
     delete _logTimer;
     delete _holdStepTimer;
     delete _dbControl;
     delete _settings;
 }
 
+ExperimentController::MachineState ExperimentController::machineState() const
+{
+    std::unique_lock<std::mutex> lock(_machineMutex);
+    return _machineState;
+}
+
 Experiment ExperimentController::experiment() const
 {
-    Poco::ScopedRWLock lock(*_experimentLock);
-
-    return _experiment ? *_experiment : Experiment();
+    std::unique_lock<std::mutex> lock(_machineMutex);
+    return _experiment;
 }
 
 ExperimentController::StartingResult ExperimentController::start(int experimentId)
 {
+    if (OpticsInstance::getInstance()->lidOpen())
+        return LidIsOpen;
+
+    Experiment experiment = _dbControl->getExperiment(experimentId);
+
+    if (experiment.id() == -1 || !experiment.protocol())
+        return ExperimentNotFound;
+    else if (experiment.startedAt() != boost::posix_time::not_a_date_time)
+        return ExperimentUsed;
+
+    experiment.setStartedAt(boost::posix_time::microsec_clock::local_time());
+
+    std::unique_lock<std::mutex> lock(_machineMutex);
+
     if (_machineState != Idle)
         return MachineRunning;
 
-    Experiment *experiment = _dbControl->getExperiment(experimentId);
-
-    if (!experiment || !experiment->protocol())
-    {
-        delete experiment;
-
-        return ExperimentNotFound;
-    }
-    else if (experiment->startedAt() != boost::posix_time::not_a_date_time)
-    {
-        delete experiment;
-
-        return ExperimentUsed;
-    }
-    else if (OpticsInstance::getInstance()->lidOpen())
-    {
-        delete experiment;
-
-        return LidIsOpen;
-    }
-
-    experiment->setStartedAt(boost::posix_time::microsec_clock::local_time());
-    _dbControl->startExperiment(*experiment);
-
+    lock.unlock();
     stopLogging();
-
-    _experimentLock->writeLock();
-    {
-        delete _experiment;
-        _experiment = experiment;
-    }
-    _experimentLock->unlock();
-
-    _machineState = LidHeating;
+    lock.lock();
 
     _settings->temperatureLogs.setTemperatureLogs(false);
     _settings->temperatureLogs.setDebugTemperatureLogs(false);
 
-    startLogging();
+    LidInstance::getInstance()->setTargetTemperature(experiment.protocol()->lidTemperature());
 
-    _experimentLock->readLock();
-    LidInstance::getInstance()->setTargetTemperature(_experiment->protocol()->lidTemperature());
-    _experimentLock->unlock();
+    _dbControl->startExperiment(experiment);
+
+    _machineState = LidHeating;
+    _experiment = std::move(experiment);
 
     LidInstance::getInstance()->setEnableMode(true);
+
+    lock.unlock();
+    startLogging();
 
     return Started;
 }
 
 void ExperimentController::run()
 {
-    MachineState state = LidHeating;
-    if (!_machineState.compare_exchange_strong(state, Running))
-        return;
+    std::unique_lock<std::mutex> lock(_machineMutex);
 
-    _experimentLock->readLock();
-    HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->currentStep()->temperature(), _experiment->protocol()->currentRamp() ? _experiment->protocol()->currentRamp()->rate() : 0);
-    _experimentLock->unlock();
+    if (_machineState == LidHeating)
+    {
+        _machineState = Running;
 
-    HeatBlockInstance::getInstance()->enableStepProcessing();
+        HeatBlockInstance::getInstance()->setTargetTemperature(_experiment.protocol()->currentStep()->temperature(),
+                                                               _experiment.protocol()->currentRamp() ? _experiment.protocol()->currentRamp()->rate() : 0);
 
-    HeatBlockInstance::getInstance()->setEnableMode(true);
-    OpticsInstance::getInstance()->setCollectData(true);
+        HeatBlockInstance::getInstance()->enableStepProcessing();
+        HeatBlockInstance::getInstance()->setEnableMode(true);
+        OpticsInstance::getInstance()->setCollectData(true);
+    }
 }
 
 void ExperimentController::complete()
 {
-    MachineState state = Running;
-    if (!_machineState.compare_exchange_strong(state, Complete))
-        return;
+    std::unique_lock<std::mutex> lock(_machineMutex);
 
-    stopLogging();
-
-    LidInstance::getInstance()->setEnableMode(false);
-    OpticsInstance::getInstance()->setCollectData(false);
-
-    _experimentLock->writeLock();
+    if (_machineState == Running)
     {
-        _experiment->setCompletionStatus(Experiment::Success);
-        _experiment->setCompletedAt(boost::posix_time::microsec_clock::local_time());
-    }
-    _experimentLock->unlock();
+        _machineState = Complete;
 
-    _experimentLock->readLock();
-    _dbControl->completeExperiment(*_experiment);
-    _experimentLock->unlock();
+        LidInstance::getInstance()->setEnableMode(false);
+        OpticsInstance::getInstance()->setCollectData(false);
+
+        _experiment.setCompletionStatus(Experiment::Success);
+        _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
+
+        _dbControl->completeExperiment(_experiment);
+
+        lock.unlock();
+        stopLogging();
+    }
 }
 
 void ExperimentController::stop()
 {
-    MachineState state = _machineState.exchange(Idle);
+    std::unique_lock<std::mutex> lock(_machineMutex);
 
-    if (state == Idle)
-        return;
-
-    LidInstance::getInstance()->setEnableMode(false);
-    HeatBlockInstance::getInstance()->setEnableMode(false);
-    OpticsInstance::getInstance()->setCollectData(false);
-
-    if (state != Complete)
+    if (_machineState != Idle)
     {
-        stopLogging();
+        _machineState = Idle;
 
-        _holdStepTimer->stop();
+        LidInstance::getInstance()->setEnableMode(false);
+        HeatBlockInstance::getInstance()->setEnableMode(false);
+        OpticsInstance::getInstance()->setCollectData(false);
 
-        _experimentLock->writeLock();
+        bool stopTimers = false;
+
+        if (_machineState != Complete)
         {
-            _experiment->setCompletionStatus(Experiment::Aborted);
-            _experiment->setCompletedAt(boost::posix_time::microsec_clock::local_time());
+            stopTimers = true;
+
+            _experiment.setCompletionStatus(Experiment::Aborted);
+            _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
+
+            _dbControl->completeExperiment(_experiment);
         }
-        _experimentLock->unlock();
 
-        _experimentLock->readLock();
-        _dbControl->completeExperiment(*_experiment);
-        _experimentLock->unlock();
-    }
+        _experiment = Experiment();
 
-    _experimentLock->writeLock();
-    {
-        delete _experiment;
-        _experiment = nullptr;
+        lock.unlock();
+
+        if (stopTimers)
+        {
+            stopLogging();
+            _holdStepTimer->stop();
+        }
     }
-    _experimentLock->unlock();
 }
 
 void ExperimentController::stop(const std::string &errorMessage)
 {
-    if (_machineState.exchange(Idle) == Idle)
-        return;
+    std::unique_lock<std::mutex> lock(_machineMutex);
+
+    _machineState = Idle;
 
     LidInstance::getInstance()->setEnableMode(false);
     HeatBlockInstance::getInstance()->setEnableMode(false);
     OpticsInstance::getInstance()->setCollectData(false);
 
-    stopLogging();
+    bool stopTimers = false;
 
-    _holdStepTimer->stop();
-
-    _experimentLock->writeLock();
+    if (_experiment.id() != -1)
     {
-        _experiment->setCompletionStatus(Experiment::Failed);
-        _experiment->setCompletionMessage(errorMessage);
-        _experiment->setCompletedAt(boost::posix_time::microsec_clock::local_time());
+        stopTimers = true;
+
+        _experiment.setCompletionStatus(Experiment::Failed);
+        _experiment.setCompletionMessage(errorMessage);
+        _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
+
+        _dbControl->completeExperiment(_experiment);
     }
-    _experimentLock->unlock();
 
-    _experimentLock->readLock();
-    _dbControl->completeExperiment(*_experiment);
-    _experimentLock->unlock();
+    _experiment = Experiment();
 
-    _experimentLock->writeLock();
+    lock.unlock();
+
+    if (stopTimers)
     {
-        delete _experiment;
-        _experiment = nullptr;
+        stopLogging();
+        _holdStepTimer->stop();
     }
-    _experimentLock->unlock();
 }
 
 void ExperimentController::stepBegun()
 {
-    _experimentLock->readLock();
-    bool hasNextStep = _experiment->protocol()->hasNextStep();
-    std::time_t  holdTime = _experiment->protocol()->currentStep()->holdTime();
-    _experimentLock->unlock();
+    std::unique_lock<std::mutex> lock(_machineMutex);
+
+    if (_machineState != Running)
+        return;
+
+    bool hasNextStep = _experiment.protocol()->hasNextStep();
+    std::time_t holdTime = _experiment.protocol()->currentStep()->holdTime();
 
     if (hasNextStep)
     {
@@ -219,6 +208,8 @@ void ExperimentController::stepBegun()
     }
     else
     {
+        lock.unlock();
+
         complete();
 
         if (holdTime > 0)
@@ -228,15 +219,17 @@ void ExperimentController::stepBegun()
 
 void ExperimentController::holdStepCallback(Poco::Timer &)
 {
-    _experimentLock->readLock();
+    std::unique_lock<std::mutex> lock(_machineMutex);
+
+    if (_machineState == Running)
     {
-        _dbControl->addFluorescenceData(*_experiment, OpticsInstance::getInstance()->restartCollection());
+        _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->restartCollection());
 
-        HeatBlockInstance::getInstance()->setTargetTemperature(_experiment->protocol()->advanceNextStep()->temperature(), _experiment->protocol()->currentRamp() ? _experiment->protocol()->currentRamp()->rate() : 0);
+        HeatBlockInstance::getInstance()->setTargetTemperature(_experiment.protocol()->advanceNextStep()->temperature(),
+                                                               _experiment.protocol()->currentRamp() ? _experiment.protocol()->currentRamp()->rate() : 0);
+
+        HeatBlockInstance::getInstance()->enableStepProcessing();
     }
-    _experimentLock->unlock();
-
-    HeatBlockInstance::getInstance()->enableStepProcessing();
 }
 
 void ExperimentController::startLogging()
@@ -279,17 +272,19 @@ void ExperimentController::addLogCallback(Poco::Timer &)
 {
     TemperatureLog log;
 
-    if (machineState() != Idle)
+    _machineMutex.lock();
+
+    if (_machineState != Idle)
     {
-        _experimentLock->readLock();
-        {
-            log = TemperatureLog(_experiment->id(), true, _settings->debugMode());
-            log.setElapsedTime((boost::posix_time::microsec_clock::local_time() - _experiment->startedAt()).total_milliseconds());
-        }
-        _experimentLock->unlock();
+        log = TemperatureLog(_experiment.id(), true, _settings->debugMode());
+        log.setElapsedTime((boost::posix_time::microsec_clock::local_time() - _experiment.startedAt()).total_milliseconds());
+
+        _machineMutex.unlock();
     }
     else
     {
+        _machineMutex.unlock();
+
         log = TemperatureLog(0, _settings->temperatureLogs.hasTemperatureLogs(), _settings->temperatureLogs.hasDebugTemperatureLogs());
         log.setElapsedTime((boost::posix_time::microsec_clock::universal_time() - _settings->temperatureLogs.startTime()).total_milliseconds());
     }

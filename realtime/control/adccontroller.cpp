@@ -86,11 +86,16 @@ void ADCController::process() {
                 value = _ltc2444->readSingleEndedChannel(7, kThermistorOversamplingRate);
                 break;
             default:
-                assert(false);
+                throw std::logic_error("ADCController::process - unknown adc state");
             }
 
-            //process previous conversion value
-            _consumers[_currentConversionState]->setADCValue(value);
+            try {
+                //process previous conversion value
+                _consumers[_currentConversionState]->setADCValue(value);
+            }
+            catch (const TemperatureLimitError &ex) {
+                qpcrApp.stopExperiment(ex.what());
+            }
 
             _currentConversionState = state;
         }

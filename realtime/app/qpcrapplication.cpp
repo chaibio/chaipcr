@@ -99,3 +99,7 @@ bool QPCRApplication::waitSignal() const {
 
     return sigtimedwait(&_signalsSet, &signalInfo, &time) > 0;
 }
+
+void QPCRApplication::stopExperiment(const string &message) {
+    _experimentController->stop(message);
+}

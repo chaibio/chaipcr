@@ -2,6 +2,7 @@
 #define DBCONTROL_H
 
 #include "icontrol.h"
+#include "experiment.h"
 
 #include <vector>
 #include <mutex>
@@ -14,7 +15,6 @@ class session;
 class statement;
 }
 
-class Experiment;
 class Protocol;
 class Stage;
 class StageComponent;
@@ -30,7 +30,7 @@ public:
     DBControl();
     ~DBControl();
 
-    Experiment* getExperiment(int id);
+    Experiment getExperiment(int id);
     void startExperiment(const Experiment &experiment);
     void completeExperiment(const Experiment &experiment);
 

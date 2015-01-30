@@ -72,7 +72,7 @@ void DBControl::stop()
     _writeCondition.notify_all();
 }
 
-Experiment* DBControl::getExperiment(int id)
+Experiment DBControl::getExperiment(int id)
 {
     bool gotData = false;
     soci::row result;
@@ -85,22 +85,22 @@ Experiment* DBControl::getExperiment(int id)
     _readMutex.unlock();
 
     if (!gotData || result.get_indicator("id") == soci::i_null)
-        return nullptr;
+        return Experiment();
 
-    Experiment *experiment = new Experiment(id);
+    Experiment experiment(id);
 
     if (result.get_indicator("name") != soci::i_null)
-        experiment->setName(result.get<std::string>("name"));
+        experiment.setName(result.get<std::string>("name"));
     if (result.get_indicator("qpcr") != soci::i_null)
-        experiment->setQpcr(result.get<int>("qpcr"));
+        experiment.setQpcr(result.get<int>("qpcr"));
     if (result.get_indicator("started_at") != soci::i_null)
-        experiment->setStartedAt(result.get<boost::posix_time::ptime>("started_at"));
+        experiment.setStartedAt(result.get<boost::posix_time::ptime>("started_at"));
     if (result.get_indicator("completed_at") != soci::i_null)
-        experiment->setCompletedAt(result.get<boost::posix_time::ptime>("completed_at"));
+        experiment.setCompletedAt(result.get<boost::posix_time::ptime>("completed_at"));
     if (result.get_indicator("completion_status") != soci::i_null)
-        experiment->setCompletionStatus(result.get<Experiment::CompletionStatus>("completion_status"));
+        experiment.setCompletionStatus(result.get<Experiment::CompletionStatus>("completion_status"));
 
-    experiment->setProtocol(getProtocol(result.get<int>("id")));
+    experiment.setProtocol(getProtocol(result.get<int>("id")));
 
     return experiment;
 }

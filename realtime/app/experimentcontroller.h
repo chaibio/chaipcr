@@ -2,17 +2,18 @@
 #define EXPERIMENTCONTROLLER_H
 
 #include "instance.h"
+#include "experiment.h"
 
 #include <atomic>
 #include <vector>
 #include <memory>
+#include <mutex>
 
 class DBControl;
-class Experiment;
 class Settings;
 class TemperatureLog;
 
-namespace Poco { class Timer; class RWLock; }
+namespace Poco { class Timer; }
 
 class ExperimentController : public Instance<ExperimentController>
 {
@@ -37,7 +38,7 @@ public:
     ExperimentController();
     ~ExperimentController();
 
-    inline MachineState machineState() const { return _machineState; }
+    MachineState machineState() const;
     Experiment experiment() const;
     inline Settings* settings() const { return _settings; }
 
@@ -61,13 +62,12 @@ private:
     void addLogCallback(Poco::Timer &timer);
 
 private:
-    std::atomic<MachineState> _machineState;
+    mutable std::mutex _machineMutex;
+    MachineState _machineState;
 
     DBControl *_dbControl;
-    Experiment *_experiment;
+    Experiment _experiment;
     Settings *_settings;
-
-    mutable Poco::RWLock *_experimentLock;
 
     Poco::Timer *_holdStepTimer;
     Poco::Timer *_logTimer;

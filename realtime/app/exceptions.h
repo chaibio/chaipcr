@@ -24,4 +24,9 @@ public:
 	SPIError(const char* message, int errorNumber);
 };
 
+class TemperatureLimitError : public std::runtime_error {
+public:
+    TemperatureLimitError(const std::string &message);
+};
+
 #endif
