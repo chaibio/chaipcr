@@ -50,17 +50,17 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(ADCController::ConsumersLis
     settings.maxTempThreshold = kHeatBlockHighTempShutdownThreshold;
 
     settings.pidController = new PIDController(heatBlockPIDSchedule, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax, SinglePoleRecursiveFilter(cutoffFrequency));
-    settings.thermistor.reset(new SteinhartHartThermistor(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
-                                                          kUSSensorJThermistorACoefficient, kUSSensorJThermistorBCoefficient,
-                                                          kUSSensorJThermistorCCoefficient, kUSSensorJThermistorDCoefficient));
+    settings.thermistor.reset(new SteinhartHartThermistorC0135(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
+                                                          kUSSensorJThermistorC0Coefficient, kUSSensorJThermistorC1Coefficient,
+                                                          kUSSensorJThermistorC3Coefficient, kUSSensorJThermistorC5Coefficient));
 
     HeatBlockZoneController *zone1 = new HeatBlockZoneController(settings, kHeatBlockZone1PWMPath, kHeatBlockZone1PWMPeriodNs, kHeadBlockZone1HeatPin, kHeadBlockZone1CoolPin);
     consumers[ADCController::EReadZone1Singular] = settings.thermistor;
 
     settings.pidController = new PIDController(heatBlockPIDSchedule, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax, SinglePoleRecursiveFilter(cutoffFrequency));
-    settings.thermistor.reset(new SteinhartHartThermistor(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
-                                                          kUSSensorJThermistorACoefficient, kUSSensorJThermistorBCoefficient,
-                                                          kUSSensorJThermistorCCoefficient, kUSSensorJThermistorDCoefficient));
+    settings.thermistor.reset(new SteinhartHartThermistorC0135(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
+                                                          kUSSensorJThermistorC0Coefficient, kUSSensorJThermistorC1Coefficient,
+                                                          kUSSensorJThermistorC3Coefficient, kUSSensorJThermistorC5Coefficient));
 
     HeatBlockZoneController *zone2 = new HeatBlockZoneController(settings, kHeatBlockZone2PWMPath, kHeatBlockZone2PWMPeriodNs, kHeadBlockZone2HeatPin, kHeadBlockZone2CoolPin);
     consumers[ADCController::EReadZone2Singular] = settings.thermistor;
@@ -86,9 +86,9 @@ shared_ptr<IControl> QPCRFactory::constructLid(ADCController::ConsumersList &con
 shared_ptr<IControl> QPCRFactory::constructHeatSink() {
     TemperatureController::Settings settings;
 
-    settings.thermistor.reset(new SteinhartHartThermistor(kHeatSinkThermistorVoltageDividerResistanceOhms, kBeagleboneADCBits,
-                                                          kQTICurveZThermistorACoefficient, kQTICurveZThermistorBCoefficient,
-                                                          kQTICurveZThermistorCCoefficient, kQTICurveZThermistorDCoefficient));
+    settings.thermistor.reset(new SteinhartHartThermistorC0123(kHeatSinkThermistorVoltageDividerResistanceOhms, kBeagleboneADCBits,
+                                                          kQTICurveZThermistorC0Coefficient, kQTICurveZThermistorC1Coefficient,
+                                                          kQTICurveZThermistorC2Coefficient, kQTICurveZThermistorC3Coefficient));
 
     settings.minTargetTemp = kHeatSinkMinTargetTemp;
     settings.maxTargetTemp = kHeatSinkMaxTargetTemp;
