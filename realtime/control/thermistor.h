@@ -2,9 +2,9 @@
 #define _THERMISTOR_H_
 
 #include "adcconsumer.h"
+#include "lockfreesignal.h"
 
 #include <atomic>
-#include <boost/signals2.hpp>
 
 // Class Thermistor
 class Thermistor: public ADCConsumer {
@@ -14,7 +14,7 @@ public:
 	
 	//accessors
     inline double temperature() const { return _temperature; }
-    boost::signals2::signal<void(double)> temperatureChanged;
+    boost::signals2::lockfree_signal<void(double)> temperatureChanged;
 
     //ADCConsumer
     void setADCValue(unsigned int adcValue);

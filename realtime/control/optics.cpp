@@ -4,6 +4,7 @@
 #include "pid.h"
 #include "ledcontroller.h"
 #include "optics.h"
+#include "maincontrollers.h"
 #include "qpcrapplication.h"
 
 using namespace std;
@@ -19,6 +20,7 @@ Optics::Optics(unsigned int lidSensePin, shared_ptr<LEDController> ledController
 {
     _lidOpen = false;
     _collectData = false;
+    _meltCurveCollection = false;
     _collectDataTimer = new Timer;
     _ledNumber = 0;
     _adcValue =  0;
@@ -44,7 +46,7 @@ void Optics::setADCValue(unsigned int adcValue)
     _adcCondition.notify_all();
 }
 
-void Optics::setCollectData(bool state)
+void Optics::setCollectData(bool state, bool isMeltCurve)
 {
     _collectDataMutex.lock();
     {
@@ -52,10 +54,13 @@ void Optics::setCollectData(bool state)
         {
             if (_collectData)
             {
+                _meltCurveCollection = isMeltCurve;
                 _ledNumber = 0;
 
                 _fluorescenceData.clear();
                 _fluorescenceData.resize(kWellList.size());
+
+                _meltCurveData.clear();
 
                 _ledController->activateLED(kWellList.at(_ledNumber));
                 _photodiodeMux.setChannel(_ledNumber);
@@ -65,10 +70,13 @@ void Optics::setCollectData(bool state)
 
             if (!_collectData)
             {
+                _meltCurveCollection = false;
                 _ledNumber = 0;
 
                 _fluorescenceData.clear();
                 _fluorescenceData.resize(kWellList.size());
+
+                _meltCurveData.clear();
             }
         }
     }
@@ -105,13 +113,32 @@ void Optics::collectDataCallback(Poco::Timer &timer)
         std::mutex waitMutex;
         std::unique_lock<std::mutex> waitLock(waitMutex);
 
-        for (int i = 0; i < kADCReadsPerOpticalMeasurement; ++i)
+        if (!_meltCurveCollection)
         {
-            _adcCondition.wait(waitLock);
-            _fluorescenceData[_ledNumber].push_back(_adcValue);
+            for (int i = 0; i < kADCReadsPerOpticalMeasurement; ++i)
+            {
+                _adcCondition.wait(waitLock);
+                _fluorescenceData[_ledNumber].emplace_back(_adcValue);
 
-            if (!_collectData)
-                break;
+                if (!_collectData)
+                    break;
+            }
+        }
+        else
+        {
+            double temperature = HeatBlockInstance::getInstance()->temperature();
+            unsigned int adc = 0;
+
+            for (int i = 0; i < kADCReadsPerOpticalMeasurement; ++i)
+            {
+                _adcCondition.wait(waitLock);
+                adc += _adcValue;
+
+                if (!_collectData)
+                    break;
+            }
+
+            _meltCurveData.emplace_back(adc / kADCReadsPerOpticalMeasurement, temperature, kWellList.at(_ledNumber));
         }
 
         ++_ledNumber;
@@ -129,7 +156,7 @@ void Optics::collectDataCallback(Poco::Timer &timer)
     }
 }
 
-std::vector<int> Optics::restartCollection()
+std::vector<int> Optics::getFluorescenceData(bool stopCollection, bool startMeltCurveCollection)
 {
     std::vector<int> collectedData;
 
@@ -152,10 +179,28 @@ std::vector<int> Optics::restartCollection()
                     collectedData.emplace_back(0);
             }
 
-            setCollectData(true);
+            setCollectData(!stopCollection, startMeltCurveCollection);
         }
     }
     _collectDataMutex.unlock();
 
     return collectedData;
+}
+
+std::vector<Optics::MeltCurveData> Optics::getMeltCurveData()
+{
+    std::vector<MeltCurveData> meltCurveData;
+
+    _collectDataMutex.lock();
+    {
+        if (_collectData && _meltCurveCollection)
+        {
+            _collectData = _meltCurveCollection = false;
+            toggleCollectData();
+
+            meltCurveData = std::move(_meltCurveData);
+        }
+    }
+
+    return meltCurveData;
 }

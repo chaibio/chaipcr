@@ -110,5 +110,5 @@ void QPCRFactory::setupMachine() {
     }
 
     if (adcController && heatBlock)
-        adcController->loopStarted.connect(ADCController::LoopSignalType::slot_type(&HeatBlock::calculateTemperature, heatBlock.get()).track_foreign(heatBlock));
+        adcController->loopStarted.connect(boost::signals2::lockfree_signal<void()>::slot_type(&HeatBlock::calculateTemperature, heatBlock.get()).track_foreign(heatBlock));
 }

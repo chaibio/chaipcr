@@ -2,11 +2,11 @@
 #define _HEATBLOCK_H_
 
 #include "icontrol.h"
+#include "lockfreesignal.h"
 
 #include <mutex>
 #include <utility>
 #include <boost/chrono.hpp>
-#include <boost/signals2.hpp>
 
 class BidirectionalPWMController;
 typedef BidirectionalPWMController HeatBlockZoneController;
@@ -56,7 +56,8 @@ public:
     double zone1DriveValue() const;
     double zone2DriveValue() const;
 
-    boost::signals2::signal<void()> stepBegun;
+    boost::signals2::lockfree_signal<void()> rampFinished;
+    boost::signals2::lockfree_signal<void()> stepBegun;
 
 private:
     std::pair<HeatBlockZoneController*, HeatBlockZoneController*> _zones;

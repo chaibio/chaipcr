@@ -3,6 +3,7 @@
 
 #include "pcrincludes.h"
 #include "dbincludes.h"
+#include "csvcontrol.h"
 #include "maincontrollers.h"
 #include "experimentcontroller.h"
 #include "qpcrapplication.h"
@@ -11,11 +12,14 @@ ExperimentController::ExperimentController()
 {
     _machineState = Idle;
     _dbControl = new DBControl();
+    _csvControl = new CSVControl();
     _holdStepTimer = new Poco::Timer();
     _logTimer = new Poco::Timer();
     _settings = _dbControl->getSettings();
 
     LidInstance::getInstance()->startThresholdReached.connect(boost::bind(&ExperimentController::run, this));
+
+    HeatBlockInstance::getInstance()->rampFinished.connect(boost::bind(&ExperimentController::rampFinished, this));
     HeatBlockInstance::getInstance()->stepBegun.connect(boost::bind(&ExperimentController::stepBegun, this));
 }
 
@@ -26,6 +30,7 @@ ExperimentController::~ExperimentController()
     delete _logTimer;
     delete _holdStepTimer;
     delete _dbControl;
+    delete _csvControl;
     delete _settings;
 }
 
@@ -95,7 +100,7 @@ void ExperimentController::run()
 
         HeatBlockInstance::getInstance()->enableStepProcessing();
         HeatBlockInstance::getInstance()->setEnableMode(true);
-        OpticsInstance::getInstance()->setCollectData(true);
+        OpticsInstance::getInstance()->setCollectData(true, _experiment.protocol()->currentStage()->type() == Stage::Meltcurve);
     }
 }
 
@@ -190,6 +195,17 @@ void ExperimentController::stop(const std::string &errorMessage)
     }
 }
 
+void ExperimentController::rampFinished()
+{
+    std::unique_lock<std::mutex> lock(_machineMutex);
+
+    if (_machineState == Running)
+    {
+        if (_experiment.protocol()->currentStage()->type() == Stage::Meltcurve)
+            _csvControl->writeMeltCurveData(_experiment, OpticsInstance::getInstance()->getMeltCurveData());
+    }
+}
+
 void ExperimentController::stepBegun()
 {
     std::unique_lock<std::mutex> lock(_machineMutex);
@@ -197,10 +213,9 @@ void ExperimentController::stepBegun()
     if (_machineState != Running)
         return;
 
-    bool hasNextStep = _experiment.protocol()->hasNextStep();
     std::time_t holdTime = _experiment.protocol()->currentStep()->holdTime();
 
-    if (hasNextStep)
+    if (_experiment.protocol()->hasNextStep())
     {
         _holdStepTimer->stop();
         _holdStepTimer->setStartInterval(holdTime * 1000);
@@ -223,9 +238,16 @@ void ExperimentController::holdStepCallback(Poco::Timer &)
 
     if (_machineState == Running)
     {
-        _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->restartCollection());
+        Stage::Type oldStageType = _experiment.protocol()->currentStage()->type();
 
-        HeatBlockInstance::getInstance()->setTargetTemperature(_experiment.protocol()->advanceNextStep()->temperature(),
+        _experiment.protocol()->advanceNextStep();
+
+        if (oldStageType != Stage::Meltcurve)
+            _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->getFluorescenceData(false, _experiment.protocol()->currentStage()->type() == Stage::Meltcurve));
+        else
+            OpticsInstance::getInstance()->setCollectData(true, _experiment.protocol()->currentStage()->type() == Stage::Meltcurve);
+
+        HeatBlockInstance::getInstance()->setTargetTemperature(_experiment.protocol()->currentStep()->temperature(),
                                                                _experiment.protocol()->currentRamp() ? _experiment.protocol()->currentRamp()->rate() : 0);
 
         HeatBlockInstance::getInstance()->enableStepProcessing();

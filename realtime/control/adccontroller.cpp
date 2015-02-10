@@ -20,7 +20,6 @@ ADCController::ADCController(ConsumersList &&consumers, unsigned int csPinNumber
     _workState = false;
 
     _ltc2444 = new LTC2444(csPinNumber, std::move(spiPort), busyPinNumber);
-    _ltc2444->readSingleEndedChannel(4, kThermistorOversamplingRate); //start first read
 
 }
 
@@ -35,6 +34,8 @@ ADCController::~ADCController() {
 
 void ADCController::process() {
     setMaxRealtimePriority();
+
+    _ltc2444->readSingleEndedChannel(4, kThermistorOversamplingRate); //start first read
 
     static const boost::chrono::nanoseconds repeatFrequencyInterval((boost::chrono::nanoseconds::rep)round(1.0 / kADCRepeatFrequency * 1000 * 1000 * 1000));
     boost::chrono::high_resolution_clock::time_point repeatFrequencyLastTime = boost::chrono::high_resolution_clock::now();
