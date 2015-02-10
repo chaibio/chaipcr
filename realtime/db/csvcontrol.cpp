@@ -7,6 +7,8 @@
 #include <sstream>
 #include <fstream>
 
+#define STORAGE_PATH "/root/tmp/csv_data/"
+
 inline std::string ptime_to_string(const boost::posix_time::ptime &date_time)
 {
     if (date_time.is_not_a_date_time())
@@ -47,7 +49,7 @@ void CSVControl::process()
 
             for (const std::pair<std::string, std::vector<Optics::MeltCurveData>> &data: _meltCurveData)
             {
-                std::ofstream fileStream(data.first);
+                std::ofstream fileStream(STORAGE_PATH + data.first);
 
                 if (fileStream.is_open())
                 {
