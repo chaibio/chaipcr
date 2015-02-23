@@ -53,6 +53,8 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
         if(numberArray[1].length > 6) {
           newRampSpeed = newRampSpeed.toFixed(6);
         }
+      } else if (numberArray.length === 1) {
+        newRampSpeed = newRampSpeed.toFixed(1);
       }
       this.currentStep.model.changeRampSpeed(newRampSpeed);
 
