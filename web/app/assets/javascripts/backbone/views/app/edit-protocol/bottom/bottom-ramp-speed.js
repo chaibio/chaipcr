@@ -40,6 +40,10 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
       this.dataPartEdit.val(tempVal);
       alert("Please enter a valid value");
     } else {
+      if (newRampSpeed >= 5) {
+        newRampSpeed = 5;
+      }
+
       newRampSpeed = parseFloat(newRampSpeed);
 
       var tempNumberString = String(newRampSpeed);
@@ -52,12 +56,21 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
       }
       this.currentStep.model.changeRampSpeed(newRampSpeed);
 
-      var display = (newRampSpeed === 0) ? "MAX" : newRampSpeed;
+      var display = (newRampSpeed === 0 || newRampSpeed >= 5) ? "MAX" : newRampSpeed;
 
       this.dataPart.html(display);
       // Now fires it back to canvas
       this.currentStep.rampSpeedNumber = newRampSpeed;
       ChaiBioTech.app.Views.mainCanvas.fire("rampSpeedChangedFromBottom", this.currentStep);
+
+      // Detecting RampSpeed new width
+      var newRampSpeedWidth = this.dataPart.width();
+      if (newRampSpeedWidth > 95) {
+        this.dataPart.addClass('minified-font');
+      } else {
+        this.dataPart.removeClass('minified-font')
+      }
+
     }
   },
 
@@ -73,9 +86,20 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
     if(this.currentStep.rampSpeedNumber === 0) {
       this.dataPart.html("MAX");
       this.dataPartEdit.val(0)
+    } else if (this.currentStep.rampSpeedNumber >= 5) {
+      this.dataPart.html("MAX");
+      this.dataPartEdit.val(5)
     } else {
       this.dataPart.html(this.currentStep.rampSpeedNumber);
       this.dataPartEdit.val(parseFloat(this.currentStep.rampSpeedNumber));
+    };
+
+    // Detecting RampSpeed new width
+    var newRampSpeedWidth = this.dataPart.width();
+    if (newRampSpeedWidth > 95) {
+      this.dataPart.addClass('minified-font');
+    } else {
+      this.dataPart.removeClass('minified-font')
     }
   },
 
