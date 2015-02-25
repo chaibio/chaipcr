@@ -59,9 +59,12 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
 
       if (newRampSpeed > 5) {
         newRampSpeed = 5;
+        this.dataPart.html(display);
+      } else {
+        this.dataPart.html(display + '<span class="speedCaption">C/s</span>');
       }
 
-      this.dataPart.html(display);
+
       // Now fires it back to canvas
       this.currentStep.rampSpeedNumber = newRampSpeed;
       ChaiBioTech.app.Views.mainCanvas.fire("rampSpeedChangedFromBottom", this.currentStep);
@@ -69,9 +72,9 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
       // Detecting RampSpeed new width
       var newRampSpeedWidth = this.dataPart.width();
       if (newRampSpeedWidth > 95) {
-        this.dataPart.addClass('minified-font');
+        this.dataPart.parent().addClass('minified-font');
       } else {
-        this.dataPart.removeClass('minified-font')
+        this.dataPart.parent().removeClass('minified-font')
       }
 
     }
@@ -93,16 +96,16 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
       this.dataPart.html("MAX");
       this.dataPartEdit.val(5)
     } else {
-      this.dataPart.html(this.currentStep.rampSpeedNumber);
+      this.dataPart.html(this.currentStep.rampSpeedNumber + '<span class="speedCaption">C/s</span>');
       this.dataPartEdit.val(parseFloat(this.currentStep.rampSpeedNumber));
     };
 
     // Detecting RampSpeed new width
     var newRampSpeedWidth = this.dataPart.width();
     if (newRampSpeedWidth > 95) {
-      this.dataPart.addClass('minified-font');
+      this.dataPart.parent().addClass('minified-font');
     } else {
-      this.dataPart.removeClass('minified-font')
+      this.dataPart.parent().removeClass('minified-font')
     }
   },
 
