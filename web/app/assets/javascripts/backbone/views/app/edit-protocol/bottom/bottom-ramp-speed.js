@@ -40,9 +40,6 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
       this.dataPartEdit.val(tempVal);
       alert("Please enter a valid value");
     } else {
-      if (newRampSpeed >= 5) {
-        newRampSpeed = 5;
-      }
 
       newRampSpeed = parseFloat(newRampSpeed);
 
@@ -58,7 +55,11 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
       }
       this.currentStep.model.changeRampSpeed(newRampSpeed);
 
-      var display = (newRampSpeed === 0 || newRampSpeed >= 5) ? "MAX" : newRampSpeed;
+      var display = (newRampSpeed === 0 || newRampSpeed > 5) ? "MAX" : newRampSpeed;
+
+      if (newRampSpeed > 5) {
+        newRampSpeed = 5;
+      }
 
       this.dataPart.html(display);
       // Now fires it back to canvas
