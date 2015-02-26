@@ -595,3 +595,7 @@
 .edit-stage-step-container .bottom-half .speedCaption {
   padding-left: 7px;
 }
+/* line 578, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half .speedCaption span {
+  font-size: 37px;
+}

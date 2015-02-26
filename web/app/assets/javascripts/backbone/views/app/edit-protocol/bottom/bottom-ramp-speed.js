@@ -61,7 +61,7 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
         newRampSpeed = 5;
         this.dataPart.html(display);
       } else {
-        this.dataPart.html(display + '<span class="speedCaption">C/s</span>');
+        this.dataPart.html(display + '<span class="speedCaption">C/<span>s</span></span>');
       }
 
 
@@ -96,7 +96,7 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
       this.dataPart.html("MAX");
       this.dataPartEdit.val(5)
     } else {
-      this.dataPart.html(this.currentStep.rampSpeedNumber + '<span class="speedCaption">C/s</span>');
+      this.dataPart.html(this.currentStep.rampSpeedNumber + '<span class="speedCaption">C/<span>s</span></span>');
       this.dataPartEdit.val(parseFloat(this.currentStep.rampSpeedNumber));
     };
 
