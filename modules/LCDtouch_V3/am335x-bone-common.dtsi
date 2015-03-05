@@ -222,7 +222,7 @@
 				manufacturer = "Texas Instruments";
 				part-number = "BB-BONE-EMMC-2G";
 			 };
-
+/*
 			/* 5" LCD Touch Screen*/
                         slot@101 {
 				ti,cape-override;
@@ -232,9 +232,9 @@
 				manufacturer = "Texas Instruments";
 				part-number = "LCDtouch5";
 			};
-/*
+*/
 			// Beaglebone black has it soldered on 
-			slot@102 {
+			slot@101 {
 				ti,cape-override;
 				priority = <1>;
 				compatible = "ti,beaglebone-black";
@@ -245,7 +245,7 @@
 			};
 
 			// Beaglebone black has it soldered on (but no audio) 
-			slot@103 {
+			slot@102 {
 				ti,cape-override;
 				priority = <2>;
 				compatible = "ti,beaglebone-black";
@@ -253,7 +253,7 @@
 				version = "00A0";
 				manufacturer = "Texas Instruments";
 				part-number = "BB-BONELT-HDMIN";
-			};*/
+			};
 
 		};
 
