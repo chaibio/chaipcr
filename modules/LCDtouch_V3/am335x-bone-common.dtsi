@@ -223,7 +223,7 @@
 				part-number = "BB-BONE-EMMC-2G";
 			 };
 /*
-			/* 5" LCD Touch Screen*/
+			// 5" LCD Touch Screen
                         slot@101 {
 				ti,cape-override;
 				compatible = "ti,beaglebone-black";
