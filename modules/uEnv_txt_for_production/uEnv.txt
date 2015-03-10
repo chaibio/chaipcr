@@ -12,7 +12,8 @@ systemd=quiet init=/lib/systemd/systemd
 #cape_disable=capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN,BB-BONE-EMMC-2G
 
 ##Disable HDMI
-#cape_disable=capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN
+cape_disable=capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN
+#cape_disable=capemgr.disable_partno=BB-BONELT-HDMIN
 
 ##Audio Cape (needs HDMI Audio disabled)
 #cape_disable=capemgr.disable_partno=BB-BONELT-HDMI
