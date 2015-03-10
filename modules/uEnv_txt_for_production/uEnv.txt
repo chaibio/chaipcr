@@ -52,8 +52,8 @@ mmcargs=setenv bootargs console=tty0 console=${console} ${optargs} ${cape_disabl
 
 uenvcmdmmc=run loadfiles; run mmcargs; bootz ${loadaddr} ${initrd_addr}:${initrd_size} ${fdtaddr}
 
-kernel_file=vmlinuz
-loadusbkernel=load usb 0:1 ${loadaddr} /boot/${kernel_file}
+usb_kernel_file=vmlinuz
+loadusbkernel=load usb 0:1 ${loadaddr} /boot/${usb_kernel_file}
 loadusbinitrd=load usb 0:1 ${initrd_addr} /boot/${initrd_file}; setenv initrd_size ${filesize}
 loadusbfdt=load usb 0:1 ${fdtaddr} /boot/dtbs/3.8.13-bone69/${fdtfile}
 
@@ -62,7 +62,7 @@ usbroot=UUID=d424040e-11c6-4bb0-a290-1fad50ad1521 ro
 usbargs=setenv bootargs console=tty0 console=${console} ${optargs} ${cape_disable} ${cape_enable} ${kms_force_mode} root=${usbroot} rootfstype=${mmcrootfstype} ${systemd}
 uenvcmdusb=run loadusbfiles; run usbargs; bootz ${loadaddr} ${initrd_addr}:${initrd_size} ${fdtaddr}
 
-uenvcmd=usb start; if test -e usb 0:1 /boot/${kernel_file}; then run uenvcmdusb; else run uenvcmdmmc; fi
+uenvcmd=usb start; if test -e usb 0:1 /boot/${usb_kernel_file}; then run uenvcmdusb; else run uenvcmdmmc; fi
 
 
 #
