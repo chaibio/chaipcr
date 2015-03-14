@@ -1,5 +1,7 @@
 #include "pwm.h"
 
+#include <system_error>
+
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -9,9 +11,26 @@ PWMPin::PWMPin(const string& pwmDevicePath) {
     periodFile.exceptions(ofstream::failbit | ofstream::badbit);
     polarityFile.exceptions(ofstream::failbit | ofstream::badbit);
 
-    dutyFile.open(pwmDevicePath + "/duty", ofstream::out);
-    periodFile.open(pwmDevicePath + "/period", ofstream::out);
-    polarityFile.open(pwmDevicePath + "/polarity", ofstream::out);
+    try {
+        dutyFile.open(pwmDevicePath + "/duty", ofstream::out);
+    }
+    catch (const exception&) {
+        throw system_error(errno, generic_category(), "PWMPin::PWMPin - open file (" + pwmDevicePath + "/duty)");
+    }
+
+    try {
+        periodFile.open(pwmDevicePath + "/period", ofstream::out);
+    }
+    catch (const exception&) {
+        throw system_error(errno, generic_category(), "PWMPin::PWMPin - open file (" + pwmDevicePath + "/period)");
+    }
+
+    try {
+        polarityFile.open(pwmDevicePath + "/polarity", ofstream::out);
+    }
+    catch (const exception&) {
+        throw system_error(errno, generic_category(), "PWMPin::PWMPin - open file (" + pwmDevicePath + "/polarity)");
+    }
 }
 
 PWMPin::~PWMPin() {

@@ -16,10 +16,20 @@ using namespace Poco::Util;
 void QPCRApplication::initialize(Application&) {
     _workState = false;
 
-    QPCRFactory::constructMachine(_controlUnits, _threadControlUnits);
-    _experimentController = ExperimentController::createInstance();
+    try {
+        QPCRFactory::constructMachine(_controlUnits, _threadControlUnits);
+        _experimentController = ExperimentController::createInstance();
 
-    initSignals();
+        initSignals();
+    }
+    catch (const std::exception &ex) {
+        cout << "Initialize - exception occured: " << ex.what() << '\n';
+        throw;
+    }
+    catch (...) {
+        cout << "Initialize - unknown exception occured\n";
+        throw;
+    }
 }
 
 int QPCRApplication::main(const vector<string>&) {
