@@ -1,7 +1,7 @@
 ##Video: Uncomment to override:
 ##see: https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/fb/modedb.txt
 #kms_force_mode=video=HDMI-A-1:1024x768@60e
-
+optargs=consoleblank=0
 ##Enable systemd
 systemd=quiet init=/lib/systemd/systemd
 
