@@ -213,6 +213,9 @@ std::vector<Step> DBControl::getSteps(int stageId)
         if (it->get_indicator("hold_time") != soci::i_null)
             step.setHoldTime(it->get<int>("hold_time"));
 
+        if (it->get_indicator("collect_data") != soci::i_null)
+            step.setCollectData(it->get<int>("collect_data"));
+
         steps.push_back(std::move(step));
     }
 
@@ -234,7 +237,7 @@ Ramp* DBControl::getRamp(int stepId)
     if (!gotData || result.get_indicator("id") == soci::i_null)
         return nullptr;
 
-    Ramp *ramp = new Ramp;
+    Ramp *ramp = new Ramp(result.get<int>("id"));
 
     if (result.get_indicator("rate") != soci::i_null)
     {
@@ -243,6 +246,9 @@ Ramp* DBControl::getRamp(int stepId)
         else
             ramp->setRate(result.get<int>("rate"));
     }
+
+    if (result.get_indicator("collect_data") != soci::i_null)
+        ramp->setCollectData(result.get<int>("collect_data"));
 
     return ramp;
 }
@@ -299,16 +305,16 @@ void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
     addWriteQueries(queries);
 }
 
-void DBControl::addFluorescenceData(const Experiment &experiment, const std::vector<int> &fluorescenceData)
+void DBControl::addFluorescenceData(const Experiment &experiment, const std::vector<int> &fluorescenceData, bool isRamp)
 {
     std::vector<std::string> queries;
     std::stringstream stream;
 
-
     for (size_t i = 0; i < fluorescenceData.size(); ++i)
     {
-        stream << "INSERT INTO fluorescence_data(experiment_id, step_id, fluorescence_value, well_num, cycle_num) VALUES(" << experiment.id() << ", "
-               << experiment.protocol()->currentStep()->id() << ", " << fluorescenceData.at(i) << ", " << i << ", " << experiment.protocol()->currentStage()->currentCycle() << ")";
+        stream << "INSERT INTO fluorescence_data(experiment_id, step_id, ramp_id, fluorescence_value, well_num, cycle_num) VALUES(" << experiment.id() << ", "
+               << (!isRamp ? experiment.protocol()->currentStep()->id() : -1) << ", " << (isRamp ? experiment.protocol()->currentRamp()->id() : -1) << ", "
+               << fluorescenceData.at(i) << ", " << i << ", " << experiment.protocol()->currentStage()->currentCycle() << ")";
 
         queries.emplace_back(std::move(stream.str()));
         stream.str("");

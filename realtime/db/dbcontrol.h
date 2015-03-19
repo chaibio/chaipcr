@@ -35,7 +35,7 @@ public:
     void completeExperiment(const Experiment &experiment);
 
     void addTemperatureLog(const std::vector<TemperatureLog> &logs);
-    void addFluorescenceData(const Experiment &experiment, const std::vector<int> &fluorescenceData);
+    void addFluorescenceData(const Experiment &experiment, const std::vector<int> &fluorescenceData, bool isRamp = false);
 
     Settings* getSettings();
     void updateSettings(const Settings &settings);

@@ -71,6 +71,9 @@ void CSVControl::stop()
 
 void CSVControl::writeMeltCurveData(const Experiment &experiment, std::vector<Optics::MeltCurveData> &&data)
 {
+    if (data.empty())
+        return;
+
     std::stringstream stream;
     stream << ptime_to_string(experiment.startedAt()) << '_' << experiment.id() << '_' << experiment.protocol()->currentStage()->id();
 

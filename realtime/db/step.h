@@ -30,6 +30,9 @@ public:
     inline void setOrderNumber(int orderNumber) {_orderNumber = orderNumber;}
     inline int orderNumber() const {return _orderNumber;}
 
+    inline void setCollectData(bool collectData) {_collectData = collectData;}
+    inline int collectData() const {return _collectData;}
+
 private:
     int _id;
 
@@ -38,6 +41,8 @@ private:
     double _temperature;
     time_t _holdTime;
     int _orderNumber;
+
+    bool _collectData;
 };
 
 #endif // STEP_H

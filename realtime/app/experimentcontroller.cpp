@@ -95,11 +95,10 @@ void ExperimentController::run()
     {
         _machineState = Running;
 
-        HeatBlockInstance::getInstance()->setTargetTemperature(_experiment.protocol()->currentStep()->temperature(),
-                                                               _experiment.protocol()->currentRamp() ? _experiment.protocol()->currentRamp()->rate() : 0);
-
+        HeatBlockInstance::getInstance()->setTargetTemperature(_experiment.protocol()->currentStep()->temperature(), _experiment.protocol()->currentRamp()->rate());
         HeatBlockInstance::getInstance()->enableStepProcessing();
         HeatBlockInstance::getInstance()->setEnableMode(true);
+
         OpticsInstance::getInstance()->setCollectData(true, _experiment.protocol()->currentStage()->type() == Stage::Meltcurve);
     }
 }
@@ -203,6 +202,8 @@ void ExperimentController::rampFinished()
     {
         if (_experiment.protocol()->currentStage()->type() == Stage::Meltcurve)
             _csvControl->writeMeltCurveData(_experiment, OpticsInstance::getInstance()->getMeltCurveData());
+        else
+            _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->getFluorescenceData(!_experiment.protocol()->currentStep()->collectData(), false), true);
     }
 }
 
@@ -243,13 +244,14 @@ void ExperimentController::holdStepCallback(Poco::Timer &)
         _experiment.protocol()->advanceNextStep();
 
         if (oldStageType != Stage::Meltcurve)
-            _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->getFluorescenceData(false, _experiment.protocol()->currentStage()->type() == Stage::Meltcurve));
+        {
+            _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->getFluorescenceData(!_experiment.protocol()->currentRamp()->collectData(),
+                                                                                                            _experiment.protocol()->currentStage()->type() == Stage::Meltcurve));
+        }
         else
-            OpticsInstance::getInstance()->setCollectData(true, _experiment.protocol()->currentStage()->type() == Stage::Meltcurve);
+            OpticsInstance::getInstance()->setCollectData(_experiment.protocol()->currentRamp()->collectData(), _experiment.protocol()->currentStage()->type() == Stage::Meltcurve);
 
-        HeatBlockInstance::getInstance()->setTargetTemperature(_experiment.protocol()->currentStep()->temperature(),
-                                                               _experiment.protocol()->currentRamp() ? _experiment.protocol()->currentRamp()->rate() : 0);
-
+        HeatBlockInstance::getInstance()->setTargetTemperature(_experiment.protocol()->currentStep()->temperature(), _experiment.protocol()->currentRamp()->rate());
         HeatBlockInstance::getInstance()->enableStepProcessing();
     }
 }
