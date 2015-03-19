@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140926070407) do
+ActiveRecord::Schema.define(version: 20150319072446) do
 
   create_table "experiments", force: true do |t|
     t.string   "name"
@@ -30,8 +30,10 @@ ActiveRecord::Schema.define(version: 20140926070407) do
     t.integer "well_num",           comment: "0-15"
     t.integer "cycle_num"
     t.integer "experiment_id"
+    t.integer "ramp_id"
   end
 
+  add_index "fluorescence_data", ["experiment_id", "ramp_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_ramp_cycle_well", unique: true
   add_index "fluorescence_data", ["experiment_id", "step_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_step_cycle_well", unique: true
 
   create_table "protocols", force: true do |t|
