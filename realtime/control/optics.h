@@ -48,7 +48,7 @@ public:
     inline std::shared_ptr<LEDController> getLedController() noexcept { return _ledController; }
     inline MUX& getPhotodiodeMux() { return _photodiodeMux; }
 
-    std::vector<int> getFluorescenceData(bool startCollection = true, bool startMeltCurveCollection = false);
+    std::vector<int> getFluorescenceData();
     std::vector<MeltCurveData> getMeltCurveData();
 
 private:
