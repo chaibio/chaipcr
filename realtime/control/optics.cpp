@@ -152,30 +152,27 @@ void Optics::collectDataCallback(Poco::Timer &timer)
     }
 }
 
-std::vector<int> Optics::getFluorescenceData(bool stopCollection, bool startMeltCurveCollection)
+std::vector<int> Optics::getFluorescenceData(bool startCollection, bool startMeltCurveCollection)
 {
     std::vector<int> collectedData;
     std::unique_lock<std::recursive_mutex> lock(_collectDataMutex);
 
-    if (_collectData)
+    _collectData = false;
+    toggleCollectData();
+
+    for (std::vector<int> &data: _fluorescenceData)
     {
-        _collectData = false;
-        toggleCollectData();
-
-        for (std::vector<int> &data: _fluorescenceData)
+        if (!data.empty())
         {
-            if (!data.empty())
-            {
-                collectedData.emplace_back(std::accumulate(data.begin(), data.end(), 0) / data.size());
+            collectedData.emplace_back(std::accumulate(data.begin(), data.end(), 0) / data.size());
 
-                data.clear();
-            }
-            else
-                collectedData.emplace_back(0);
+            data.clear();
         }
-
-        setCollectData(!stopCollection, startMeltCurveCollection);
+        else
+            collectedData.emplace_back(0);
     }
+
+    setCollectData(startCollection, startMeltCurveCollection);
 
     return collectedData;
 }

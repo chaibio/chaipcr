@@ -203,7 +203,7 @@ void ExperimentController::rampFinished()
         if (_experiment.protocol()->currentStage()->type() == Stage::Meltcurve)
             _csvControl->writeMeltCurveData(_experiment, OpticsInstance::getInstance()->getMeltCurveData());
         else
-            _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->getFluorescenceData(!_experiment.protocol()->currentStep()->collectData(), false), true);
+            _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->getFluorescenceData(_experiment.protocol()->currentStep()->collectData(), false), true);
     }
 }
 
@@ -245,7 +245,7 @@ void ExperimentController::holdStepCallback(Poco::Timer &)
 
         if (oldStageType != Stage::Meltcurve)
         {
-            _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->getFluorescenceData(!_experiment.protocol()->currentRamp()->collectData(),
+            _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->getFluorescenceData(_experiment.protocol()->currentRamp()->collectData(),
                                                                                                             _experiment.protocol()->currentStage()->type() == Stage::Meltcurve));
         }
         else
