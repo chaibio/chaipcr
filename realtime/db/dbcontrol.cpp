@@ -312,9 +312,19 @@ void DBControl::addFluorescenceData(const Experiment &experiment, const std::vec
 
     for (size_t i = 0; i < fluorescenceData.size(); ++i)
     {
-        stream << "INSERT INTO fluorescence_data(experiment_id, step_id, ramp_id, fluorescence_value, well_num, cycle_num) VALUES(" << experiment.id() << ", "
-               << (!isRamp ? experiment.protocol()->currentStep()->id() : -1) << ", " << (isRamp ? experiment.protocol()->currentRamp()->id() : -1) << ", "
-               << fluorescenceData.at(i) << ", " << i << ", " << experiment.protocol()->currentStage()->currentCycle() << ")";
+        stream << "INSERT INTO fluorescence_data(experiment_id, step_id, ramp_id, fluorescence_value, well_num, cycle_num) VALUES(" << experiment.id() << ", ";
+
+        if (!isRamp)
+            stream << experiment.protocol()->currentStep()->id() << ", ";
+        else
+            stream << "NULL, ";
+
+        if (isRamp)
+            stream << experiment.protocol()->currentRamp()->id() << ", ";
+        else
+            stream << "NULL, ";
+
+        stream << fluorescenceData.at(i) << ", " << i << ", " << experiment.protocol()->currentStage()->currentCycle() << ")";
 
         queries.emplace_back(std::move(stream.str()));
         stream.str("");
