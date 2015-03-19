@@ -124,7 +124,8 @@ HEADERS += \
     util/exceptionhandler.h \
     control/test/adccontrollermock.h \
     util/lockfreesignal.h \
-    db/csvcontrol.h
+    db/csvcontrol.h \
+    util/instance.h
 
 SOURCES += \
     app/pins.cpp \

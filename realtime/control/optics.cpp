@@ -157,19 +157,22 @@ std::vector<int> Optics::getFluorescenceData(bool startCollection, bool startMel
     std::vector<int> collectedData;
     std::unique_lock<std::recursive_mutex> lock(_collectDataMutex);
 
-    _collectData = false;
-    toggleCollectData();
-
-    for (std::vector<int> &data: _fluorescenceData)
+    if (_collectData)
     {
-        if (!data.empty())
-        {
-            collectedData.emplace_back(std::accumulate(data.begin(), data.end(), 0) / data.size());
+        _collectData = false;
+        toggleCollectData();
 
-            data.clear();
+        for (std::vector<int> &data: _fluorescenceData)
+        {
+            if (!data.empty())
+            {
+                collectedData.emplace_back(std::accumulate(data.begin(), data.end(), 0) / data.size());
+
+                data.clear();
+            }
+            else
+                collectedData.emplace_back(0);
         }
-        else
-            collectedData.emplace_back(0);
     }
 
     setCollectData(startCollection, startMeltCurveCollection);
