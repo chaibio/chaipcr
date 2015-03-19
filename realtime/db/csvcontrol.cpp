@@ -30,6 +30,8 @@ CSVControl::CSVControl()
 
 CSVControl::~CSVControl()
 {
+    stop();
+
     if (joinable())
         join();
 }

@@ -19,7 +19,7 @@ LIBS += -lPocoUtil
 LIBS += -lPocoXML
 
 #Google Test and Mock
-LIBS += -lgtest
+#LIBS += -lgtest
 #LIBS += -lgmock
 
 #SOCI

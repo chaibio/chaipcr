@@ -99,7 +99,7 @@ void ExperimentController::run()
         HeatBlockInstance::getInstance()->enableStepProcessing();
         HeatBlockInstance::getInstance()->setEnableMode(true);
 
-        OpticsInstance::getInstance()->setCollectData(true, _experiment.protocol()->currentStage()->type() == Stage::Meltcurve);
+        OpticsInstance::getInstance()->setCollectData(_experiment.protocol()->currentRamp()->collectData(), _experiment.protocol()->currentStage()->type() == Stage::Meltcurve);
     }
 }
 

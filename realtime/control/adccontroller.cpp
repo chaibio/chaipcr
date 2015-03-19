@@ -20,7 +20,6 @@ ADCController::ADCController(ConsumersList &&consumers, unsigned int csPinNumber
     _workState = false;
 
     _ltc2444 = new LTC2444(csPinNumber, std::move(spiPort), busyPinNumber);
-
 }
 
 ADCController::~ADCController() {
@@ -95,6 +94,8 @@ void ADCController::process() {
                 _consumers[_currentConversionState]->setADCValue(value);
             }
             catch (const TemperatureLimitError &ex) {
+                std::cout << "ADCController::process - consumer exception: " << ex.what() << '\n';
+
                 qpcrApp.stopExperiment(ex.what());
             }
 
