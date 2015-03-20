@@ -29,8 +29,8 @@ GPIO::GPIO(unsigned int pinNumber, Direction direction, bool waitinigAvailable) 
         setupWaiting();
     else
     {
-        waitingFd_ = 0;
-        stopWaitinigFd_ = 0;
+        waitingFd_ = -1;
+        stopWaitinigFd_ = -1;
     }
 
     savedValue_ = value();
@@ -44,8 +44,8 @@ GPIO::GPIO(GPIO &&other) {
     stopWaitinigFd_ = other.stopWaitinigFd_;
 
     other.pinNumber_ = UINT_MAX;
-    other.waitingFd_ = 0;
-    other.stopWaitinigFd_ = 0;
+    other.waitingFd_ = -1;
+    other.stopWaitinigFd_ = -1;
 }
 
 GPIO::~GPIO() {
@@ -61,8 +61,8 @@ GPIO& GPIO::operator= (GPIO &&other) {
     stopWaitinigFd_ = other.stopWaitinigFd_;
 
     other.pinNumber_ = UINT_MAX;
-    other.waitingFd_ = 0;
-    other.stopWaitinigFd_ = 0;
+    other.waitingFd_ = -1;
+    other.stopWaitinigFd_ = -1;
 
     return *this;
 }
@@ -128,7 +128,7 @@ void GPIO::setValue(Value value, bool checkValue) {
 }
 
 GPIO::Value GPIO::waitValue(Value value) {
-    if (waitingFd_ > 0) {
+    if (waitingFd_ >= 0) {
         char buffer[sizeof(int64_t)];
         read(waitingFd_, buffer, sizeof(buffer)-1);
         lseek(waitingFd_, 0, SEEK_SET);
@@ -180,7 +180,7 @@ GPIO::Value GPIO::waitValue(Value value) {
 }
 
 void GPIO::stopWaitinigValue() {
-    if (stopWaitinigFd_ > 0) {
+    if (stopWaitinigFd_ >= 0) {
         int64_t i = 1;
         write(stopWaitinigFd_, &i, sizeof(i));
     }

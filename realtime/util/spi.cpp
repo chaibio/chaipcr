@@ -12,7 +12,7 @@ using namespace std;
 // Class SPIPort
 SPIPort::SPIPort(const string& spiDevicePath) :
 	spiDevicePath_(spiDevicePath),
-	deviceFile_(0) {
+    deviceFile_(-1) {
 
 	deviceFile_ = open(spiDevicePath.c_str(), O_RDWR);
 	if (deviceFile_ < 0)
@@ -21,7 +21,7 @@ SPIPort::SPIPort(const string& spiDevicePath) :
 
 SPIPort::SPIPort(const SPIPort &other) :
     spiDevicePath_(other.spiDevicePath_),
-    deviceFile_(0) {
+    deviceFile_(-1) {
 
     deviceFile_ = open(spiDevicePath_.c_str(), O_RDWR);
     if (deviceFile_ < 0)
@@ -32,17 +32,17 @@ SPIPort::SPIPort(SPIPort &&other) {
     spiDevicePath_ = std::move(other.spiDevicePath_);
     deviceFile_ = other.deviceFile_;
 
-    other.deviceFile_ = 0;
+    other.deviceFile_ = -1;
 }
 
 SPIPort::~SPIPort() {
-	if (deviceFile_ > 0)
+    if (deviceFile_ >= 0)
 		close(deviceFile_);
 }
 
 SPIPort& SPIPort::operator= (const SPIPort &other) {
     spiDevicePath_ = other.spiDevicePath_;
-    deviceFile_ = 0;
+    deviceFile_ = -1;
 
     deviceFile_ = open(spiDevicePath_.c_str(), O_RDWR);
     if (deviceFile_ < 0)
@@ -55,7 +55,7 @@ SPIPort& SPIPort::operator= (SPIPort &&other) {
     spiDevicePath_ = std::move(other.spiDevicePath_);
     deviceFile_ = other.deviceFile_;
 
-    other.deviceFile_ = 0;
+    other.deviceFile_ = -1;
 
     return *this;
 }
