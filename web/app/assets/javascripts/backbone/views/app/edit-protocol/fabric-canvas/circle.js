@@ -2,12 +2,13 @@ ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
 ChaiBioTech.app.selectedCircle = null;
 
 ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
-
+  // U should declare all the class variables in here;
+  // may be in the clean up
   this.model = model;
   this.parent = parentStep;
   this.canvas = parentStep.canvas;
-  this.scrollTop = 80;
-  this.scrollLength = 317;
+  this.scrollTop = 60;
+  this.scrollLength = 290;
   this.scrollRatio = (this.scrollLength - this.scrollTop) / 100;
   this.gatherDataImage = null;
   this.next = null;
@@ -15,90 +16,50 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   this.big = false;
 
   this.getLeft = function() {
-
     this.left = this.parent.left;
-    return this;
-  };
+  }
 
   this.getTop = function() {
-
     var temperature = this.temperatureValue || this.model.get("step").temperature;
-
     this.top = this.scrollLength - (temperature * this.scrollRatio);
-    return this;
-  };
+    // 300 is 240 + 60 that is height of step + padding from top, May be move this
+    // to constants later;
+  }
 
-  /*******************************************
-    This method shows circles and gather data. Pease note
-    this method is invoked from canvas.js once all the stage/step are loaded.
-  ********************************************/
   this.getLinesAndCircles = function() {
-
+    // This is moved to here because we want to place circle over the line.
+    // So first we add the line then circle is placed over it.
     if(this.next) {
       this.curve = new ChaiBioTech.app.Views.fabricPath(model, this, this.canvas);
     }
-
+    // Here too this order is important
     this.canvas.add(this.stepDataGroup);
+    //this.gatherDataImageMiddle = this.gatherDataImage.clone();
     this.circleGroup.add(this.gatherDataImageMiddle);
-
-    this.gatherDataOnScroll = new ChaiBioTech.app.Views.gatherDataGroupOnScroll(
-      [
-        this.gatherDataCircleOnScroll = new ChaiBioTech.app.Views.gatherDataCircleOnScroll(),
-        this.gatherDataImageMiddle
-      ], this);
-
     this.canvas.add(this.circleGroup);
-    this.canvas.add(this.gatherDataOnScroll);
-
+    // gather data circle in the right side
     this.gatherDataGroup = new ChaiBioTech.app.Views.gatherDataGroup(
       [
         this.gatherDataCircle = new ChaiBioTech.app.Views.gatherDataCircle(),
         this.gatherDataImage
       ], this);
-
     this.canvas.add(this.gatherDataGroup);
     this.showHideGatherData(this.parent.gatherDataDuringStep);
     this.gatherDataGroup.visible = this.parent.gatherDataDuringRamp;
-  };
+  }
 
   this.getUniqueId = function() {
-
     var name = this.parent.stepName.text;
-
     name = name + this.parent.parentStage.stageNo.text + "circle";
     this.uniqueName = name;
-    return this;
-  };
-
-  this.doThingsForLast = function() {
-
-    var holdTimeText = this.parent.holdDuration || this.model.get("step")["hold_time"];
-
-    if(parseInt(holdTimeText) === 0) {
-      this.holdTime.text = "∞";
-    }
-  };
-
-  this.changeHoldTime = function() {
-
-    var holdTimeHour = Math.floor(this.parent.holdDuration / 60);
-    var holdTimeMinute = (this.parent.holdDuration % 60);
-
-    if(holdTimeMinute < 10) {
-      holdTimeMinute = "0" + holdTimeMinute;
-    }
-
-    if(holdTimeHour < 10) {
-      holdTimeHour = "0" + holdTimeHour;
-    }
-
-    this.holdTime.text = holdTimeHour + ":" + holdTimeMinute;
-  };
+  }
 
   this.render = function() {
+    this.getLeft();
+    this.getTop();
+    this.getUniqueId();
 
-    this.getLeft().getTop().getUniqueId();
-
+    // place the circle Group Note this order is important
     this.circleGroup = new ChaiBioTech.app.Views.circleGroup(
       [
         this.outerMostCircle = new ChaiBioTech.app.Views.outerMostCircle(),
@@ -113,78 +74,75 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
         )
       ], this);
 
+    // Place temperature and hold time data
     this.stepDataGroup = new ChaiBioTech.app.Views.stepDataGroup([
         this.temperature = new ChaiBioTech.app.Views.stepTemperature(this.model, this),
         this.holdTime = new ChaiBioTech.app.Views.holdTime(this.model, this)
       ], this);
-  };
+
+  }
 
   this.makeItBig = function() {
-
+    // See I am confused here may be we will have to interchange during and after
     this.big = true;
-
     if(this.parent.gatherDataDuringStep) {
       this.circle.setFill("#ffb400;");
-      this.gatherDataImageMiddle.setVisible(false);
-      this.gatherDataOnScroll.setVisible(true);
+      this.gatherDataImageMiddle.visible = false;
     }
-
-    this.circle.setStroke("#ffb400");
-    this.outerCircle.setStroke("black");
+    this.circle.stroke = "#ffb400";
+    this.outerCircle.stroke = "black";
     this.outerCircle.strokeWidth = 7;
-    this.stepDataGroup.setVisible(false);
-    this.outerMostCircle.visible = this.littleCircleGroup.visible = true;
-  };
+    this.stepDataGroup.visible = false;
+    this.outerMostCircle.visible = true;
+    this.littleCircleGroup.visible = true;
+    // Calling the parent stage so that it looks for all the changes
+    this.parent.parentStage.selectStage(this);
+    //Calling the parent step class to add footer image to step
+    this.parent.selectStep(this);
+  }
 
   this.makeItSmall = function() {
-
     this.big = false;
-
+    this.circle.stroke = "white";
+    this.outerCircle.stroke = null;
+    this.littleCircleGroup.visible = false;
+    this.stepDataGroup.visible = true;
+    this.outerMostCircle.visible = false;
     if(this.parent.gatherDataDuringStep) {
       this.circle.setFill("white");
-      this.gatherDataImageMiddle.setVisible(true);
-      this.gatherDataOnScroll.setVisible(false);
+      this.gatherDataImageMiddle.visible = true;
     }
-
-    this.circle.setStroke("white");
-    this.outerCircle.setStroke(null);
-    this.stepDataGroup.setVisible(true);
-    this.littleCircleGroup.visible = this.outerMostCircle.visible = false;
-  };
+  }
 
   this.showHideGatherData = function(state) {
-
+    this.gatherDataImageMiddle.visible = state;
     if(state && ! this.big) {
-        this.gatherDataImageMiddle.setVisible(state);
         this.circle.setFill("white");
-
     } else {
       this.circle.setFill("#ffb400");
-      this.gatherDataOnScroll.setVisible(state);
     }
-  };
-
+  }
+  // This could be moved to targetCircleGroup.
   this.manageDrag = function(targetCircleGroup) {
-
-    var top = targetCircleGroup.top;
-    var left = targetCircleGroup.left;
+    // Limit the movement of the circle
+    var top = targetCircleGroup.top,
+    left = targetCircleGroup.left;
     var previousTop = 0;
-
-    if(top < this.scrollTop) {
-      targetCircleGroup.setTop(this.scrollTop);
-      this.manageRampLineMovement(left, this.scrollTop, targetCircleGroup);
-    } else if(top > this.scrollLength) {
-      targetCircleGroup.setTop(this.scrollLength);
-      this.manageRampLineMovement(left, this.scrollLength, targetCircleGroup);
+    if(top < 60) {
+      targetCircleGroup.setTop(60);
+      this.manageRampLineMovement(left, 60, targetCircleGroup);
+    } else if(top > 290) {
+      targetCircleGroup.setTop(290);
+      this.manageRampLineMovement(left, 290, targetCircleGroup);
     } else {
+      // Move temperature display along with circle
       this.stepDataGroup.setTop(top + 55);
-      this.gatherDataOnScroll.setTop(top - 26);
+      // Now positioning the ramp lines
       this.manageRampLineMovement(left, top, targetCircleGroup);
     }
-  };
+  }
 
   this.manageRampLineMovement = function(left, top, targetCircleGroup) {
-
     if(this.next) {
         this.curve.path[0][1] = left;
         this.curve.path[0][2] = top;
@@ -192,6 +150,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
         // Remeber take the point which is static at the other side
         var endPointX = this.curve.path[2][3],
         endPointY = this.curve.path[2][4];
+
 
         var midPointX = (left + endPointX) / 2,
         midPointY = (top + endPointY) / 2;
@@ -210,7 +169,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
         // Controlling point for the next bent
         this.curve.path[2][1] = (midPointX + endPointX) / 2;
         this.curve.path[2][2] = ((midPointY + endPointY) / 2) - 15;
-    };
+    }
 
     if(this.previous) {
         previous = this.previous;
@@ -239,28 +198,26 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     }
     // Change temperature display as its circle is moved
     var dynamicTemp = Math.abs((100 - ((targetCircleGroup.top - this.scrollTop) / this.scrollRatio)));
-
     dynamicTemp = (dynamicTemp < 100) ? dynamicTemp.toFixed(1) : dynamicTemp;
     this.temperature.text = String(dynamicTemp + "º");
-  };
+    this.canvas.renderAll();
+  }
 
   this.manageClick = function(starting) {
-
+    ChaiBioTech.app.selectedCircle = (starting) ? null : ChaiBioTech.app.selectedCircle;
     this.makeItBig();
-    this.parent.parentStage.selectStage();
-    this.parent.selectStep();
-
     if(ChaiBioTech.app.selectedCircle) {
       var previousSelected = ChaiBioTech.app.selectedCircle;
-
       if(previousSelected.uniqueName != this.uniqueName) {
         previousSelected.makeItSmall();
+        ChaiBioTech.app.selectedCircle = this;
       }
+    } else {
+      ChaiBioTech.app.selectedCircle = this;
     }
-
-    ChaiBioTech.app.selectedCircle = this;
+    // When someting doesn't show up, check if u should renderAll(); -:)
     this.canvas.renderAll();
-  };
+  }
 
   return this;
-};
+}

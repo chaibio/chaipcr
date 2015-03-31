@@ -1,11 +1,13 @@
 ChaiBioTech.app.Views = ChaiBioTech.app.Views || {}
 
-ChaiBioTech.app.Views.gatherDataGroup = function(objs, parent) {
+ChaiBioTech.app.Views.gatherDataGroupMiddle = function(objs, parent) {
 
   var midPointY = null;
+
   if(parent.previous) {
-    midPointY = (parent.top + parent.previous.top) / 2;
+    midPointY = (parent.top) - 20;
   }
+
   return new fabric.Group(objs, {
     left: parent.left,
     top: midPointY || 230,
@@ -13,10 +15,9 @@ ChaiBioTech.app.Views.gatherDataGroup = function(objs, parent) {
     height: 32,
     me: this,
     selectable: false,
-    name: "gatherDataGroup",
+    name: "gatherDataGroupMiddle",
     originX: "center",
     originY: "center",
     visible: false
   });
-
 }

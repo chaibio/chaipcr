@@ -15,15 +15,11 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
   this.holdDuration = null;
 
   this.setLeft = function() {
-
     this.left = this.parentStage.left + 1 + (parseInt(this.index) * this.myWidth);
-    return this;
-  };
+  }
 
   this.addName = function() {
-
     var stepName = (this.model.get("step").name).toUpperCase();
-
     this.stepName = new fabric.IText(stepName, {
       fill: 'white',
       fontSize: 9,
@@ -38,18 +34,14 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       lockMovementY: true,
       hasControls: false
     });
-
-    return this;
-  };
+  }
 
   this.updateStepName = function() {
-
     this.stepName.text = (this.updatedStepName).toUpperCase();
     this.canvas.renderAll();
-  };
+  }
 
   this.addBorderRight = function() {
-
     this.borderRight = new fabric.Line([0, 0, 0, 342], {
       stroke: '#ff9f00',
       left: this.left + (this.myWidth - 2),
@@ -57,45 +49,36 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       strokeWidth: 1,
       selectable: false
     });
-
-    return this;
-  };
+  }
 
   this.gatherDuringStep = function() {
-
     this.gatherDataDuringStep = !(this.gatherDataDuringStep);
     this.model.gatherDuringStep(this.gatherDataDuringStep);
     this.circle.showHideGatherData(this.gatherDataDuringStep);
     this.canvas.renderAll();
-  };
+  }
 
   this.gatherDuringRamp = function() {
-
     if(this.parentStage.previousStage || this.previousStep) {
       this.gatherDataDuringRamp = !(this.gatherDataDuringRamp);
       this.model.gatherDataDuringRamp(this.gatherDataDuringRamp);
       this.circle.gatherDataGroup.visible = this.gatherDataDuringRamp;
       this.canvas.renderAll();
     }
-  };
+  }
 
   this.addCircle = function() {
-
     this.circle = new ChaiBioTech.app.Views.fabricCircle(this.model, this);
     this.circle.render();
-  };
+  }
 
   this.getUniqueName = function() {
-
     var name = this.stepName.text + this.parentStage.stageNo.text + "step";
-
     this.uniqueName = name;
-    return this;
-  };
+  }
 
   this.showHideRamp = function() {
     this.rampSpeedText.text = String(this.rampSpeedNumber + "º C/s");
-
     if(this.rampSpeedNumber <= 0) {
       this.rampSpeedGroup.setVisible(false);
     } else {
@@ -104,14 +87,12 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       this.underLine.width = this.rampSpeedText.width;
       this.rampSpeedGroup.left = this.left + ((120 - this.rampSpeedText.width) / 2)
     }
-
     this.canvas.renderAll();
-  };
+  }
 
   this.rampSpeed = function() {
-
     this.rampSpeedNumber = this.rampSpeedNumber || parseFloat(this.model.get("step").ramp.rate);
-
+    // Move this to different files
     this.rampSpeedText = new fabric.Text(String(this.rampSpeedNumber)+ "º C/s", {
       fill: 'black',
       fontSize: 12,
@@ -134,6 +115,11 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       originX: 'center',
       originY: 'center',
       selectable: false,
+      lockRotation: true,
+      lockScalingX: true,
+      lockScalingY: true,
+      lockMovementX: true,
+      lockMovementY: true,
       hasControls: false,
       originX: 'left',
       originY: 'top',
@@ -144,14 +130,10 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     if(this.rampSpeedNumber <= 0) {
       this.rampSpeedGroup.setVisible(false);
     }
-
-    return this;
-  };
+  }
 
   this.manageBorder = function(color) {
-
     if(this.borderRight.visible === false) { // Means this is the last step in the stage
-
       if(this.previousStep) {
         this.previousStep.borderRight.stroke = color;
       } else {
@@ -163,33 +145,29 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       } else {
         this.parentStage.borderRight.stroke = color;
       }
-
     } else {
-
       this.borderRight.stroke = color;
-
       if(this.previousStep) {
         this.previousStep.borderRight.stroke = color;
       } else {
         this.parentStage.border.stroke = color;
       }
-
     }
-  };
+  }
 
   this.manageBorderPrevious = function(color) {
-
-    this.borderRight.setStroke(color);
-
+    this.borderRight.stroke = color;
     if(this.previousStep) {
-      this.previousStep.borderRight.setStroke(color);
+      this.previousStep.borderRight.stroke = color;
     }
-  };
+  }
 
   this.render = function() {
-
-    this.setLeft().addName().addBorderRight().getUniqueName().rampSpeed();
-
+    this.setLeft();
+    this.addName();
+    this.addBorderRight();
+    this.getUniqueName();
+    this.rampSpeed();
     this.stepRect = new fabric.Rect({
       left: this.left || 30,
       top: 64,
@@ -201,28 +179,29 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       me: this
     });
 
-    this.canvas.add(this.stepRect, this.stepName, this.rampSpeedGroup, this.borderRight);
+    this.canvas.add(this.stepRect);
+    this.canvas.add(this.stepName);
+    this.canvas.add(this.rampSpeedGroup);
+    this.canvas.add(this.borderRight);
     this.addCircle();
-  };
+  }
 
-  this.showHideFooter = function(visibility) {
-
-    this.darkFooterImage.setVisible(visibility);
-    this.whiteFooterImage.setVisible(visibility);
-  };
-
-  this.selectStep = function() {
-
+  this.selectStep = function(evt) {
+    var me = this;
     if(ChaiBioTech.app.selectedStep) {
       var previouslySelected = ChaiBioTech.app.selectedStep;
-
-      previouslySelected.showHideFooter(false);
+      previouslySelected.darkFooterImage.visible = false;
+      previouslySelected.whiteFooterImage.visible = false;
+      // Change the border
       previouslySelected.manageBorderPrevious('#ff9f00');
+      ChaiBioTech.app.selectedStep = this;
+    } else {
+      ChaiBioTech.app.selectedStep = this;
     }
-
-    ChaiBioTech.app.selectedStep = this;
+    // Change the border
     this.manageBorder("black");
-    this.showHideFooter(true);
+    this.darkFooterImage.visible = this.whiteFooterImage.visible = true;
+    this.commonFooterImage.visible = false;
   }
 
   return this;
