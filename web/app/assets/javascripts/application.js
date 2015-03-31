@@ -19,6 +19,7 @@
 //= require raphael
 //= require g.raphael
 //= require g.line
+//= require select2
 //= require rails
 //= require chaipcr
 //= require fabric

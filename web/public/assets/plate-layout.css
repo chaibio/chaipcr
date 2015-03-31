@@ -1,14 +1,19 @@
+@import url(http://fonts.googleapis.com/css?family=Roboto);
+
+
 /* line 1, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-container {
   width: 1024px;
   height: 768px;
-  background-color: black;
+
 }
 
 /* line 7, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-wrapper {
   width: 1024px;
   height: 768px;
+  position: absolute;
+  background-color: black;
 }
 
 /* line 12, ../../app/assets/stylesheets/plate-layout.css.scss */
@@ -16,6 +21,7 @@
   width: 1024px;
   height: 560px;
   background-color: #f5f5f5;
+  border-bottom: #cfcfcf 2px solid;
 }
 
 /* line 18, ../../app/assets/stylesheets/plate-layout.css.scss */
@@ -34,17 +40,16 @@
 
 /* line 30, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-menu-container {
-  width: 674px;
+  width: 650px;
   height: 32px;
-  margin-left: 32px;
 }
 
 /* line 36, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-menu-item {
   width: 60px;
   height: 32px;
-  float: left;
-  font-family: "roboto";
+  float: right;
+  font-family: 'Roboto', sans-serif;
   font-size: 12px;
   padding-top: 8px;
   cursor: pointer;
@@ -59,24 +64,25 @@
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px;
+  position: relative;
 }
 
 /* line 56, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-overlay-radio-container {
   width: 32px;
   height: 32px;
-  float: left;
 }
 
 /* line 62, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-overlay-text-container {
   width: 380px;
   height: 32px;
-  float: left;
+  left: 11px;
+  top: 6px;
   color: white;
   font-size: 12px;
-  font-family: "roboto";
-  padding-top: 7px;
+  font-family: 'Roboto', sans-serif;
+  position: absolute;
 }
 
 /* line 72, ../../app/assets/stylesheets/plate-layout.css.scss */
@@ -84,14 +90,16 @@
   width: 220px;
   height: 32px;
   float: left;
-  padding-top: 4px;
+  left: 412px;
+  top: 4px;
+  position: absolute;
 }
 
 /* line 79, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-button {
   width: 103px;
   height: 23px;
-  font-family: "roboto";
+  font-family: 'Roboto', sans-serif;
   font-size: 10px;
   border: none;
   background-color: white;
@@ -117,7 +125,7 @@
 /* line 103, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-tab-container {
   width: 335px;
-  height: 548px;
+  height: 516px;
   background-color: white;
   border: solid 1px #e1e1e1;
   border-top: none;
@@ -132,7 +140,7 @@
 
 /* line 117, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-tab {
-  width: 83px;
+  width: 81px;
   height: 23px;
   float: left;
   background-color: #ebebeb;
@@ -141,16 +149,16 @@
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
   cursor: pointer;
-  font-family: "roboto";
+  font-family: 'Roboto', sans-serif;
   font-size: 10px;
   text-align: -webkit-center;
   text-align: center;
-  padding-top: 2px;
+  padding-top: 5px;
 }
 
 /* line 134, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-tab-selected {
-  width: 83px;
+  width: 81px;
   height: 23px;
   float: left;
   background-color: white;
@@ -159,11 +167,11 @@
   -webkit-box-shadow: 0px -2px 3px 0px #d9d9d9;
   -moz-box-shadow: 0px -2px 3px 0px #d9d9d9;
   box-shadow: 0px -2px 3px 0px #d9d9d9;
-  font-family: "roboto";
+  font-family: 'Roboto', sans-serif;
   font-size: 10px;
   text-align: -webkit-center;
   text-align: center;
-  padding-top: 2px;
+  padding-top: 5px;
   color: #00506e;
 }
 
@@ -173,6 +181,7 @@
   height: 432px;
   border-bottom: solid 1px #e1e1e1;
   position: absolute;
+  font-family: 'Roboto', sans-serif;
 }
 
 /* line 159, ../../app/assets/stylesheets/plate-layout.css.scss */
@@ -194,8 +203,8 @@
   position: absolute;
   top: 486px;
   font-size: 10px;
-  font-family: "roboto";
-  padding-top: 2px;
+  font-family: 'Roboto', sans-serif;
+  padding-top: 6px;
 }
 
 /* line 180, ../../app/assets/stylesheets/plate-layout.css.scss */
@@ -209,32 +218,92 @@
 
 /* line 188, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-prest-tab {
-  width: 68px;
-  height: 22px;
+  width: 66px;
+  height: 20px;
   float: left;
   background-color: white;
   border: solid 1px #e1e1e1;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
   cursor: pointer;
-  font-family: "roboto";
+  font-family: 'Roboto', sans-serif;
   font-size: 10px;
   text-align: -webkit-center;
   text-align: center;
-  padding-top: 2px;
 }
 
 /* line 204, ../../app/assets/stylesheets/plate-layout.css.scss */
 .plate-setup-prest-tab-selected {
-  width: 68px;
-  height: 22px;
+  width: 66px;
+  height: 20px;
   float: left;
   background-color: #e1e1e1;
   cursor: pointer;
-  font-family: "roboto";
+  font-family: 'Roboto', sans-serif;
   font-size: 11px;
   text-align: -webkit-center;
   text-align: center;
-  padding-top: 2px;
   color: #00506e;
+}
+
+.plate-setup-prest-tab-div {
+  padding-top: 3px;
+}
+
+.plate-setup-bottom-container {
+  width: 1024px;
+  height: 208px;
+  background-color: #e1e1e1;
+}
+
+.plate-setup-tab-default-field {
+  width: 303px;
+  height: 50px;
+  margin-left: 16px;
+  margin-top: 16px;
+}
+
+.plate-setup-tab-field-left-side {
+  width: 32px;
+  height: 50px;
+  float: left;
+}
+
+.plate-setup-tab-field-right-side {
+  width: 271px;
+  height: 50px;
+  float: left;
+}
+
+.plate-setup-tab-name {
+  width: 271px;
+  height: 20px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+}
+
+.plate-setup-tab-field-container {
+  width: 271px;
+  height: 30px;
+}
+
+.plate-setup-tab-input {
+  width: 272px;
+  height: 31px;
+}
+
+.plate-setup-tab-select-field {
+  width: 272px;
+  height: 31px;
+}
+
+.plate-setup-tab-label-select-field {
+  width: 90px;
+  height: 22px;
+  top: -30px;
+  left: 180px;
+}
+
+.plate-setup-tab-check-box {
+  margin-top: 26px;
 }
