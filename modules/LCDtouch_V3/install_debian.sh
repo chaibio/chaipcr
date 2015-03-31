@@ -6,7 +6,7 @@ cp am335x-boneblack.dtb /boot/uboot/dtbs/
 
 echo "Compiling the LCD overlay from .dts to .dtbo"
 dtc -O dtb -o LCDtouch5-00A0.dtbo -b 0 -@ LCDtouch5-00A0.dts
-cp LCDtouch5-00A0.dtbo /lib/firmware/
+cp LCDtouch5-00A0.dtbo /lib/firmware/LCDtouch5-00A0.dtbo
 
 cd ft5x0x
 make

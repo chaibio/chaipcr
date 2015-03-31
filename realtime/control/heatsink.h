@@ -11,8 +11,7 @@ namespace Poco { class Timer; }
 class HeatSink : public TemperatureController
 {
 public:
-    HeatSink(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController,
-             const std::string &fanPWMPath, unsigned long fanPWMPeriod, const ADCPin &adcPin);
+    HeatSink(Settings settings, const std::string &fanPWMPath, unsigned long fanPWMPeriod, const ADCPin &adcPin);
     ~HeatSink();
 
     Direction outputDirection() const;

@@ -3,17 +3,15 @@
 
 #include "temperaturecontroller.h"
 #include "pwm.h"
-
-#include <boost/signals2.hpp>
+#include "lockfreesignal.h"
 
 class Lid : public TemperatureController, public PWMControl
 {
 public:
-    Lid(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController,
-        const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold);
+    Lid(Settings settings, const std::string &pwmPath, unsigned long pwmPeriod, double startTempThreshold);
     ~Lid();
 
-    boost::signals2::signal<void()> startThresholdReached;
+    boost::signals2::lockfree_signal<void()> startThresholdReached;
 
     Direction outputDirection() const;
     void setOutput(double value);

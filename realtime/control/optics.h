@@ -21,24 +21,35 @@ namespace Poco { class Timer; }
 class Optics : public IControl, public ADCConsumer
 {
 public:
+    struct MeltCurveData
+    {
+        MeltCurveData(int data, double temperature, int wellId): data(data), temperature(temperature), wellId(wellId) {}
+
+        int data;
+        double temperature;
+        int wellId;
+    };
+
     Optics(unsigned int lidSensePin, std::shared_ptr<LEDController> ledController, MUX &&photoDiodeMux);
     ~Optics();
 
     void process();
 
     void setADCValue(unsigned int adcValue);
-    inline unsigned int adcValue() const { return _adcValue; }
+    inline unsigned int adcValue() const noexcept { return _adcValue; }
 	
 	//accessors
-    inline bool lidOpen() const { return _lidOpen; }
+    inline bool lidOpen() const noexcept { return _lidOpen; }
 
-    inline bool collectData() const { return _collectData; }
-    void setCollectData(bool state);
+    inline bool collectData() const noexcept { return _collectData; }
+    inline bool isMeltCurveCollection() const noexcept { return _meltCurveCollection; }
+    void setCollectData(bool state, bool isMeltCurve = false);
 
-    inline std::shared_ptr<LEDController> getLedController() { return _ledController; }
+    inline std::shared_ptr<LEDController> getLedController() noexcept { return _ledController; }
     inline MUX& getPhotodiodeMux() { return _photodiodeMux; }
 
-    std::vector<int> restartCollection();
+    std::vector<int> getFluorescenceData();
+    std::vector<MeltCurveData> getMeltCurveData();
 
 private:
     void toggleCollectData();
@@ -59,6 +70,9 @@ private:
 
     unsigned int _ledNumber;
     std::vector<std::vector<int>> _fluorescenceData;
+
+    std::atomic<bool> _meltCurveCollection;
+    std::vector<MeltCurveData> _meltCurveData;
 
     MUX _photodiodeMux;
 };

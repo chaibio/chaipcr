@@ -20,8 +20,6 @@ ADCController::ADCController(ConsumersList &&consumers, unsigned int csPinNumber
     _workState = false;
 
     _ltc2444 = new LTC2444(csPinNumber, std::move(spiPort), busyPinNumber);
-    _ltc2444->readSingleEndedChannel(4, kThermistorOversamplingRate); //start first read
-
 }
 
 ADCController::~ADCController() {
@@ -35,6 +33,8 @@ ADCController::~ADCController() {
 
 void ADCController::process() {
     setMaxRealtimePriority();
+
+    _ltc2444->readSingleEndedChannel(4, kThermistorOversamplingRate); //start first read
 
     static const boost::chrono::nanoseconds repeatFrequencyInterval((boost::chrono::nanoseconds::rep)round(1.0 / kADCRepeatFrequency * 1000 * 1000 * 1000));
     boost::chrono::high_resolution_clock::time_point repeatFrequencyLastTime = boost::chrono::high_resolution_clock::now();
@@ -74,10 +74,10 @@ void ADCController::process() {
             uint32_t value;
             switch (state) {
             case EReadZone1Singular:
-                value = _ltc2444->readSingleEndedChannel(1, kThermistorOversamplingRate);
+                value = _ltc2444->readSingleEndedChannel(0, kThermistorOversamplingRate);
                 break;
             case EReadZone2Singular:
-                value = _ltc2444->readSingleEndedChannel(3, kThermistorOversamplingRate);
+                value = _ltc2444->readSingleEndedChannel(1, kThermistorOversamplingRate);
                 break;
             case EReadLIA:
                 value = _ltc2444->readSingleEndedChannel(6, kLIAOversamplingRate);
@@ -86,11 +86,18 @@ void ADCController::process() {
                 value = _ltc2444->readSingleEndedChannel(7, kThermistorOversamplingRate);
                 break;
             default:
-                assert(false);
+                throw std::logic_error("ADCController::process - unknown adc state");
             }
 
-            //process previous conversion value
-            _consumers[_currentConversionState]->setADCValue(value);
+            try {
+                //process previous conversion value
+                _consumers[_currentConversionState]->setADCValue(value);
+            }
+            catch (const TemperatureLimitError &ex) {
+                std::cout << "ADCController::process - consumer exception: " << ex.what() << '\n';
+
+                qpcrApp.stopExperiment(ex.what());
+            }
 
             _currentConversionState = state;
         }

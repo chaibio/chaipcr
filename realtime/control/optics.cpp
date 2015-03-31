@@ -4,6 +4,7 @@
 #include "pid.h"
 #include "ledcontroller.h"
 #include "optics.h"
+#include "maincontrollers.h"
 #include "qpcrapplication.h"
 
 using namespace std;
@@ -19,6 +20,7 @@ Optics::Optics(unsigned int lidSensePin, shared_ptr<LEDController> ledController
 {
     _lidOpen = false;
     _collectData = false;
+    _meltCurveCollection = false;
     _collectDataTimer = new Timer;
     _ledNumber = 0;
     _adcValue =  0;
@@ -44,58 +46,60 @@ void Optics::setADCValue(unsigned int adcValue)
     _adcCondition.notify_all();
 }
 
-void Optics::setCollectData(bool state)
+void Optics::setCollectData(bool state, bool isMeltCurve)
 {
-    _collectDataMutex.lock();
+    std::unique_lock<std::recursive_mutex> lock(_collectDataMutex);
+
+    if (_collectData.exchange(state) != state)
     {
-        if (_collectData.exchange(state) != state)
+        if (_collectData)
         {
-            if (_collectData)
-            {
-                _ledNumber = 0;
+            _meltCurveCollection = isMeltCurve;
+            _ledNumber = 0;
 
-                _fluorescenceData.clear();
-                _fluorescenceData.resize(kWellList.size());
+            _fluorescenceData.clear();
+            _fluorescenceData.resize(kWellList.size());
 
-                _ledController->activateLED(kWellList.at(_ledNumber));
-                _photodiodeMux.setChannel(_ledNumber);
-            }
+            _meltCurveData.clear();
 
-            toggleCollectData();
+            _ledController->activateLED(kWellList.at(_ledNumber));
+            _photodiodeMux.setChannel(_ledNumber);
+        }
 
-            if (!_collectData)
-            {
-                _ledNumber = 0;
+        toggleCollectData();
 
-                _fluorescenceData.clear();
-                _fluorescenceData.resize(kWellList.size());
-            }
+        if (!_collectData)
+        {
+            _meltCurveCollection = false;
+            _ledNumber = 0;
+
+            _fluorescenceData.clear();
+            _fluorescenceData.resize(kWellList.size());
+
+            _meltCurveData.clear();
         }
     }
-    _collectDataMutex.unlock();
 }
 
 void Optics::toggleCollectData()
 {
-    _collectDataMutex.lock();
+    std::unique_lock<std::recursive_mutex> lock(_collectDataMutex);
+
+    if (_collectData && !lidOpen())
     {
-        if (_collectData && !lidOpen())
+        if (_collectDataTimer->getPeriodicInterval() == 0)
         {
-            if (_collectDataTimer->getPeriodicInterval() == 0)
-            {
-                _collectDataTimer->setPeriodicInterval(kFluorescenceDataCollectionDelayTimeMs);
-                _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));
-            }
-        }
-        else
-        {
-            _adcCondition.notify_all();
-            _collectDataTimer->stop();
-            _collectDataTimer->setPeriodicInterval(0);
-            _ledController->disableLEDs();
+            _collectDataTimer->setPeriodicInterval(kFluorescenceDataCollectionDelayTimeMs);
+            _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));
         }
     }
-    _collectDataMutex.unlock();
+    else
+    {
+        _adcCondition.notify_all();
+        _collectDataTimer->stop();
+        _collectDataTimer->setPeriodicInterval(0);
+        _ledController->disableLEDs();
+    }
 }
 
 void Optics::collectDataCallback(Poco::Timer &timer)
@@ -105,13 +109,32 @@ void Optics::collectDataCallback(Poco::Timer &timer)
         std::mutex waitMutex;
         std::unique_lock<std::mutex> waitLock(waitMutex);
 
-        for (int i = 0; i < kADCReadsPerOpticalMeasurement; ++i)
+        if (!_meltCurveCollection)
         {
-            _adcCondition.wait(waitLock);
-            _fluorescenceData[_ledNumber].push_back(_adcValue);
+            for (int i = 0; i < kADCReadsPerOpticalMeasurement; ++i)
+            {
+                _adcCondition.wait(waitLock);
+                _fluorescenceData[_ledNumber].emplace_back(_adcValue);
 
-            if (!_collectData)
-                break;
+                if (!_collectData)
+                    break;
+            }
+        }
+        else
+        {
+            double temperature = HeatBlockInstance::getInstance()->temperature();
+            unsigned int adc = 0;
+
+            for (int i = 0; i < kADCReadsPerOpticalMeasurement; ++i)
+            {
+                _adcCondition.wait(waitLock);
+                adc += _adcValue;
+
+                if (!_collectData)
+                    break;
+            }
+
+            _meltCurveData.emplace_back(adc / kADCReadsPerOpticalMeasurement, temperature, kWellList.at(_ledNumber));
         }
 
         ++_ledNumber;
@@ -129,33 +152,44 @@ void Optics::collectDataCallback(Poco::Timer &timer)
     }
 }
 
-std::vector<int> Optics::restartCollection()
+std::vector<int> Optics::getFluorescenceData()
 {
     std::vector<int> collectedData;
+    std::unique_lock<std::recursive_mutex> lock(_collectDataMutex);
 
-    _collectDataMutex.lock();
+    if (_collectData)
     {
-        if (_collectData)
+        _collectData = false;
+        toggleCollectData();
+
+        for (std::vector<int> &data: _fluorescenceData)
         {
-            _collectData = false;
-            toggleCollectData();
-
-            for (std::vector<int> &data: _fluorescenceData)
+            if (!data.empty())
             {
-                if (!data.empty())
-                {
-                    collectedData.emplace_back(std::accumulate(data.begin(), data.end(), 0) / data.size());
+                collectedData.emplace_back(std::accumulate(data.begin(), data.end(), 0) / data.size());
 
-                    data.clear();
-                }
-                else
-                    collectedData.emplace_back(0);
+                data.clear();
             }
-
-            setCollectData(true);
+            else
+                collectedData.emplace_back(0);
         }
     }
-    _collectDataMutex.unlock();
 
     return collectedData;
+}
+
+std::vector<Optics::MeltCurveData> Optics::getMeltCurveData()
+{
+    std::vector<MeltCurveData> meltCurveData;
+    std::unique_lock<std::recursive_mutex> lock(_collectDataMutex);
+
+    if (_collectData && _meltCurveCollection)
+    {
+        _collectData = _meltCurveCollection = false;
+        toggleCollectData();
+
+        meltCurveData = std::move(_meltCurveData);
+    }
+
+    return meltCurveData;
 }

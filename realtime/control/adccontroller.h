@@ -3,12 +3,12 @@
 
 #include "icontrol.h"
 #include "spi.h"
+#include "lockfreesignal.h"
 
 #include <vector>
 #include <memory>
 #include <atomic>
 #include <map>
-#include <boost/signals2.hpp>
 
 class LTC2444;
 class ADCConsumer;
@@ -26,7 +26,6 @@ public:
     };
 
     typedef std::map<ADCState, std::shared_ptr<ADCConsumer>> ConsumersList;
-    typedef boost::signals2::signal_type<void(), boost::signals2::keywords::mutex_type<boost::signals2::dummy_mutex>>::type LoopSignalType;
 
     ADCController(ConsumersList &&consumers, unsigned int csPinNumber, SPIPort &&spiPort, unsigned int busyPinNumber);
 	~ADCController();
@@ -34,7 +33,7 @@ public:
     void process();
     void stop();
 
-    LoopSignalType loopStarted;
+    boost::signals2::lockfree_signal<void()> loopStarted;
 
 protected:
     ADCState nextState() const;

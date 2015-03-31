@@ -13,13 +13,28 @@ class PIDController;
 class TemperatureController : public IControl
 {
 public:
+    struct Settings
+    {
+        Settings(): minTargetTemp(0), maxTargetTemp(0), minTempThreshold(0), maxTempThreshold(0), pidController(nullptr) {}
+
+        std::shared_ptr<Thermistor> thermistor;
+
+        double minTargetTemp;
+        double maxTargetTemp;
+        double minTempThreshold;
+        double maxTempThreshold;
+
+        PIDController *pidController;
+    };
+
     enum Direction
     {
         EHeat,
         ECool
     };
 
-    TemperatureController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController);
+    TemperatureController(Settings settings);
+    ~TemperatureController();
 
     inline bool enableMode() const { return _enableMode; }
     void setEnableMode(bool enableMode);
@@ -54,6 +69,9 @@ private:
     std::atomic<double> _targetTemperature;
     double _minTargetTemp;
     double _maxTargetTemp;
+
+    double _minTempThreshold;
+    double _maxTempThreshold;
 };
 
 #endif // TEMPERATURECONTROLLER_H

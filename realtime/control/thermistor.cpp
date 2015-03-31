@@ -30,24 +30,45 @@ void Thermistor::setADCValueMock(double adcValue) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Class SteinhartHartThermistor
-SteinhartHartThermistor::SteinhartHartThermistor(unsigned int voltageDividerResistance, unsigned int adcBits,
-        double a, double b, double c, double d):
+// Class SteinhartHartThermistor for C0123
+SteinhartHartThermistorC0123::SteinhartHartThermistorC0123(unsigned int voltageDividerResistance, unsigned int adcBits,
+        double c0, double c1, double c2, double c3):
     Thermistor(voltageDividerResistance, adcBits),
-    _a {a},
-    _b {b},
-    _c {c},
-    _d {d} {
+    _c0 {c0},
+    _c1 {c1},
+    _c2 {c2},
+    _c3 {c3} {
 }
 
-double SteinhartHartThermistor::temperatureForResistance(double resistanceOhms) {
+double SteinhartHartThermistorC0123::temperatureForResistance(double resistanceOhms) {
+    double lnRes = log(resistanceOhms);
+    double lnRes2 = lnRes * lnRes;
+    double lnRes3 = lnRes2 * lnRes;
+
+    //steinhart-hart equation
+    double degreesK = 1 / (_c0 + _c1*lnRes + _c2*lnRes2 + _c3*lnRes3);
+    return degreesK - 273.15;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Class SteinhartHartThermistor for C0135
+SteinhartHartThermistorC0135::SteinhartHartThermistorC0135(unsigned int voltageDividerResistance, unsigned int adcBits,
+        double c0, double c1, double c3, double c5):
+    Thermistor(voltageDividerResistance, adcBits),
+    _c0 {c0},
+    _c1 {c1},
+    _c3 {c3},
+    _c5 {c5} {
+}
+
+double SteinhartHartThermistorC0135::temperatureForResistance(double resistanceOhms) {
     double lnRes = log(resistanceOhms);
     double lnRes2 = lnRes * lnRes;
     double lnRes3 = lnRes2 * lnRes;
     double lnRes5 = lnRes2 * lnRes3;
 
     //steinhart-hart equation
-    double degreesK = 1 / (_a + _b*lnRes + _c*lnRes3 + _d*lnRes5);
+    double degreesK = 1 / (_c0 + _c1*lnRes + _c3*lnRes3 + _c5*lnRes5);
     return degreesK - 273.15;
 }
 

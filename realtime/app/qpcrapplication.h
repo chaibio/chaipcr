@@ -23,6 +23,8 @@ public:
 
     inline void setException(std::exception_ptr exception) { _exception = exception; }
 
+    void stopExperiment(const std::string &message);
+
 protected:
 	//from ServerApplication
     void initialize(Poco::Util::Application &self);

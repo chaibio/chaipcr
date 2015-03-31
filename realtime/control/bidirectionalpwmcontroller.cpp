@@ -1,12 +1,8 @@
 #include "bidirectionalpwmcontroller.h"
 
-BidirectionalPWMController::BidirectionalPWMController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController,
-                                                       const std::string &pwmPath, unsigned long pwmPeriod, unsigned int heatIOPin, unsigned int coolIOPin)
-    :TemperatureController(thermistor, minTargetTemp, maxTargetTemp, pidController),
-     PWMControl(pwmPath, pwmPeriod),
-     _heatIO(heatIOPin, GPIO::kOutput), _coolIO(coolIOPin, GPIO::kOutput)
+BidirectionalPWMController::BidirectionalPWMController(Settings settings, const std::string &pwmPath, unsigned long pwmPeriod, unsigned int heatIOPin, unsigned int coolIOPin)
+    :TemperatureController(settings), PWMControl(pwmPath, pwmPeriod), _heatIO(heatIOPin, GPIO::kOutput), _coolIO(coolIOPin, GPIO::kOutput)
 {
-
     resetOutput();
 }
 

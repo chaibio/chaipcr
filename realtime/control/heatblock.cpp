@@ -70,6 +70,9 @@ void HeatBlock::calculateTemperature() {
 
             _zones.first->setTargetTemperature(temp);
             _zones.second->setTargetTemperature(temp);
+
+            if (_ramp.isEmpty())
+                rampFinished();
         }
     }
     _stepProcessingMutex.unlock();

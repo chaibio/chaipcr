@@ -1,6 +1,16 @@
 #include "protocol.h"
 #include "experiment.h"
 
+Experiment::Experiment()
+{
+    _id = -1;
+    _qpcr = true;
+    _startedAt = boost::posix_time::not_a_date_time;
+    _completedAt = boost::posix_time::not_a_date_time;
+    _completionStatus = None;
+    _protocol = nullptr;
+}
+
 Experiment::Experiment(int id)
 {
     _id = id;

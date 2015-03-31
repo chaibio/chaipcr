@@ -32,7 +32,7 @@ Stage::Stage(Stage &&other)
     _components = std::move(other._components);
     _currentComponent = other._currentComponent;
 
-    other._id = 0;
+    other._id = -1;
     other._numCycles = 1;
     other._cycleIteration = 1;
     other._orderNumber = 0;
@@ -68,7 +68,7 @@ Stage& Stage::operator= (Stage &&other)
     _components = std::move(other._components);
     _currentComponent = other._currentComponent;
 
-    other._id = 0;
+    other._id = -1;
     other._numCycles = 1;
     other._cycleIteration = 1;
     other._orderNumber = 0;

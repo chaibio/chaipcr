@@ -2,13 +2,15 @@
 #define EXPERIMENTCONTROLLER_H
 
 #include "instance.h"
+#include "experiment.h"
 
 #include <atomic>
 #include <vector>
 #include <memory>
+#include <mutex>
 
 class DBControl;
-class Experiment;
+class CSVControl;
 class Settings;
 class TemperatureLog;
 
@@ -37,8 +39,8 @@ public:
     ExperimentController();
     ~ExperimentController();
 
-    inline MachineState machineState() const { return _machineState; }
-    inline const std::shared_ptr<Experiment> experiment() const { return _experiment; }
+    MachineState machineState() const;
+    Experiment experiment() const;
     inline Settings* settings() const { return _settings; }
 
     StartingResult start(int experimentId);
@@ -53,6 +55,8 @@ private:
     void run();
     void complete();
 
+    void rampFinished();
+
     void stepBegun();
     void holdStepCallback(Poco::Timer &timer);
 
@@ -61,10 +65,12 @@ private:
     void addLogCallback(Poco::Timer &timer);
 
 private:
-    std::atomic<MachineState> _machineState;
+    mutable std::mutex _machineMutex;
+    MachineState _machineState;
 
     DBControl *_dbControl;
-    std::shared_ptr<Experiment> _experiment;
+    CSVControl *_csvControl;
+    Experiment _experiment;
     Settings *_settings;
 
     Poco::Timer *_holdStepTimer;

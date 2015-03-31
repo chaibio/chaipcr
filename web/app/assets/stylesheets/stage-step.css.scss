@@ -538,6 +538,15 @@
 						border: none;
 					}
 				}
+
+        .minified-font {
+          width: 105px;
+          span {
+            font-size: 30px;
+            vertical-align: middle;
+          }
+        }
+
 				.dots {
 					float: left;
 					width:23px;
@@ -563,5 +572,12 @@
         	transform: rotate(180deg);
 			}
 		}
+
+    .speedCaption {
+      padding-left: 7px;
+      span {
+        font-size: 37px;
+      }
+    }
 	}
 }

@@ -2,6 +2,7 @@
 #define DBCONTROL_H
 
 #include "icontrol.h"
+#include "experiment.h"
 
 #include <vector>
 #include <mutex>
@@ -14,7 +15,6 @@ class session;
 class statement;
 }
 
-class Experiment;
 class Protocol;
 class Stage;
 class StageComponent;
@@ -30,12 +30,12 @@ public:
     DBControl();
     ~DBControl();
 
-    Experiment* getExperiment(int id);
-    void startExperiment(Experiment *experiment);
-    void completeExperiment(Experiment *experiment);
+    Experiment getExperiment(int id);
+    void startExperiment(const Experiment &experiment);
+    void completeExperiment(const Experiment &experiment);
 
     void addTemperatureLog(const std::vector<TemperatureLog> &logs);
-    void addFluorescenceData(const Experiment *experiment, const std::vector<int> &fluorescenceData);
+    void addFluorescenceData(const Experiment &experiment, const std::vector<int> &fluorescenceData, bool isRamp = false);
 
     Settings* getSettings();
     void updateSettings(const Settings &settings);
@@ -56,12 +56,15 @@ private:
 
     void addWriteQueries(std::vector<std::string> &queries);
 
+    void write(std::vector<soci::statement> &statements);
+
 private:
     soci::session *_readSession;
     soci::session *_writeSession;
 
     std::mutex _readMutex;
     std::mutex _writeMutex;
+    std::mutex _writeQueueMutex;
 
     std::atomic<bool> _writeThreadState;
     std::vector<std::string> _writeQueriesQueue;

@@ -7,7 +7,7 @@
 // Namespace Filters
 namespace Filters {
     double CutoffFrequencyForTimeConstant(double timeConstant);
-};
+}
 
 ////////////////////////////////////////////////////////////////////
 // Class SinglePoleRecursiveFilter

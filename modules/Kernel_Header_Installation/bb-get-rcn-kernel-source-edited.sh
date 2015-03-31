@@ -195,8 +195,8 @@ prepare_kernel_source () {
 	cd "${CURPWD}"
 }
 
-if [ ! -z ${1} ]; then
-	KVER="${1}"
+if [ ! -z ${2} ]; then
+	KVER="${2}"
 fi
 
 notif "installing kernel sources for ${KVER}..."

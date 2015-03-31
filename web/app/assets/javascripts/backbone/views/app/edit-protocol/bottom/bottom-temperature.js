@@ -52,7 +52,11 @@ ChaiBioTech.app.Views.bottomTemperature = Backbone.View.extend({
       this.dataPartEdit.val(parseFloat(tempVal.substr(0, tempVal.length - 1)));
       alert("Please enter a valid value");
     } else {
-      newTemp = parseFloat(newTemp).toFixed(1);
+      if (newTemp == 100) {
+        newTemp = parseFloat(newTemp);
+      } else {
+        newTemp = parseFloat(newTemp).toFixed(1);
+      }
       this.currentStep.model.changeTemperature(newTemp);
       this.dataPart.html(newTemp + "ºc");
       // Now fire it back to canvas

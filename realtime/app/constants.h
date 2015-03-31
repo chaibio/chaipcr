@@ -4,20 +4,15 @@
 #include <vector>
 
 //Steinhart-Hart coefficients
-const double kUSSensorJThermistorACoefficient = 0.00112502978660426;
-const double kUSSensorJThermistorBCoefficient = 0.000235057162160341;
-const double kUSSensorJThermistorCCoefficient = 0.0000000785661432368816;
-const double kUSSensorJThermistorDCoefficient = 0.0000000000395309964792414;
+const double kUSSensorJThermistorC0Coefficient = 0.00112502978660426;
+const double kUSSensorJThermistorC1Coefficient = 0.000235057162160341;
+const double kUSSensorJThermistorC3Coefficient = 0.0000000785661432368816;
+const double kUSSensorJThermistorC5Coefficient = 0.0000000000395309964792414;
 
-const double kQTICurveZThermistorACoefficient = 0.001116401465500;
-const double kQTICurveZThermistorBCoefficient = 0.000237982973213;
-const double kQTICurveZThermistorCCoefficient = -0.000000372283234;
-const double kQTICurveZThermistorDCoefficient = 0.000000099063233;
-
-const double kQTICurveDThermistorACoefficient = 0.001119828875495430;
-const double kQTICurveDThermistorBCoefficient = 0.0002360897740308300;
-const double kQTICurveDThermistorCCoefficient = 0.00000007508299550946710;
-const double kQTICurveDThermistorDCoefficient = 0;
+const double kQTICurveZThermistorC0Coefficient = 0.001116401465500;
+const double kQTICurveZThermistorC1Coefficient = 0.000237982973213;
+const double kQTICurveZThermistorC2Coefficient = -0.000000372283234;
+const double kQTICurveZThermistorC3Coefficient = 0.000000099063233;
 
 //Lid
 const unsigned long kLidPIDMin = 0;
@@ -30,6 +25,9 @@ const double kLidThermistorT0 = 298.15;             //kelvins
 
 const double kLidMinTargetTemp = 0;
 const double kLidMaxTargetTemp = 130;
+
+const double kLidLowTempShutdownThreshold = -20;
+const double kLidHighTempShutdownThreshold = 140;
 
 const double kProgramStartLidTempThreshold = 2;
 
@@ -53,14 +51,17 @@ const unsigned long kFanPWMPeriodNs = 500000;
 
 //Heat Block params
 const unsigned int kHeatBlockThermistorVoltageDividerResistanceOhms = 43000;
-const unsigned long kHeatBlockZone1PWMPeriodNs = 100000;
-const unsigned long kHeatBlockZone2PWMPeriodNs = 100000;
+const unsigned long kHeatBlockZone1PWMPeriodNs = 50000;
+const unsigned long kHeatBlockZone2PWMPeriodNs = 50000;
 
 const double kHeatBlockZonesPIDMin = -1;
 const double kHeatBlockZonesPIDMax = 1;
 
 const double kHeatBlockZonesMinTargetTemp = -10;
 const double kHeatBlockZonesMaxTargetTemp = 105;
+
+const double kHeatBlockLowTempShutdownThreshold = -20;
+const double kHeatBlockHighTempShutdownThreshold = 120;
 
 const double kMaxHeatBlockRampSpeed = 3.0;
 
@@ -89,6 +90,9 @@ const unsigned int kHeatSinkThermistorVoltageDividerResistanceOhms = 6800;
 
 const double kHeatSinkMinTargetTemp = 0;
 const double kHeatSinkMaxTargetTemp = 80;
+
+const double kHeatSinkLowTempShutdownThreshold = -20;
+const double kHeatSinkHighTempShutdownThreshold = 90;
 
 const double kHeatSinkPIDMin = -1;
 const double kHeatSinkPIDMax = 0;

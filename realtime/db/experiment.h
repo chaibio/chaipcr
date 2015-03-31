@@ -17,6 +17,7 @@ public:
         Aborted
     };
 
+    Experiment();
     Experiment(int id);
     Experiment(const Experiment &other);
     Experiment(Experiment &&other);
@@ -24,6 +25,8 @@ public:
 
     Experiment& operator= (const Experiment &other);
     Experiment& operator= (Experiment &&other);
+
+    inline bool empty() const { return _id == -1; }
 
     inline int id() const { return _id; }
 

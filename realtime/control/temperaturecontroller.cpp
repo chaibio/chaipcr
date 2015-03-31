@@ -1,21 +1,29 @@
 #include <sstream>
 
+#include "exceptions.h"
 #include "thermistor.h"
 #include "pid.h"
 #include "temperaturecontroller.h"
 
-TemperatureController::TemperatureController(std::shared_ptr<Thermistor> thermistor, double minTargetTemp, double maxTargetTemp, PIDController *pidController)
+TemperatureController::TemperatureController(Settings settings)
 {
     _enableMode = false;
 
-    _thermistor = thermistor;
-    _pidController = pidController;
+    _thermistor = settings.thermistor;
+    _pidController = settings.pidController;
     _pidResult = 0;
-    _minTargetTemp = minTargetTemp;
-    _maxTargetTemp = maxTargetTemp;
+    _minTargetTemp = settings.minTargetTemp;
+    _maxTargetTemp = settings.maxTargetTemp;
+    _minTempThreshold = settings.minTempThreshold;
+    _maxTempThreshold = settings.maxTempThreshold;
     _targetTemperature = _minTargetTemp - 1;
 
     _thermistor->temperatureChanged.connect(boost::bind(&TemperatureController::computePid, this, _1));
+}
+
+TemperatureController::~TemperatureController()
+{
+    delete _pidController;
 }
 
 void TemperatureController::setEnableMode(bool enableMode)
@@ -48,7 +56,7 @@ void TemperatureController::setTargetTemperature(double temperature)
     if (temperature < _minTargetTemp || temperature > _maxTargetTemp)
     {
         std::stringstream string;
-        string << "Target temperature should be in range from " << _minTargetTemp << " to " << _maxTargetTemp;
+        string << "TemperatureController::setTargetTemperature - target temperature should be in range from " << _minTargetTemp << " to " << _maxTargetTemp;
 
         throw std::out_of_range(string.str());
     }
@@ -71,6 +79,14 @@ void TemperatureController::process()
 
 void TemperatureController::computePid(double currentTemperature)
 {
+    if (currentTemperature < _minTempThreshold || currentTemperature > _maxTempThreshold)
+    {
+        std::stringstream stream;
+        stream << "TemperatureController::computePid - current temperature (" << currentTemperature << ") exceeds limits (" << _minTempThreshold << '/' << _maxTempThreshold << ')';
+
+        throw TemperatureLimitError(stream.str());
+    }
+
     if (_targetTemperature < _minTargetTemp)
         _targetTemperature = currentTemperature;
 
