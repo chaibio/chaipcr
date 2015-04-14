@@ -223,20 +223,21 @@
 				part-number = "BB-BONE-EMMC-2G";
 			 };
 
-			// 5" LCD Touch Screen
+			// 5" LCD Screen
                         slot@101 {
 				ti,cape-override;
+				priority = <1>;
 				compatible = "ti,beaglebone-black";
-				board-name = "LCDtouch5";
+				board-name = "CHAI-LCD5";
 				version = "00A0";
 				manufacturer = "Chaibio";
-				part-number = "LCDtouch5";
+				part-number = "CHAI-LCD5";
 			};
 
 			// Beaglebone black has it soldered on 
 			slot@102 {
 				ti,cape-override;
-				priority = <1>;
+				priority = <2>;
 				compatible = "ti,beaglebone-black";
 				board-name = "Bone-Black-HDMI";
 				version = "00A0";
@@ -428,10 +429,10 @@
 
 			/* beaglebone black LCD and touch for Chaibio */
 			cape@17 {
-				part-number = "LCDtouch5";
+				part-number = "CHAI-LCD5";
 				version@00A0 {
 					version = "00A0";
-					dtbo = "LCDtouch5-00A0.dtbo";
+					dtbo = "CHAI-LCD5-00A0.dtbo";
 				};
 			};
 

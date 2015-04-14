@@ -1,0 +1,52 @@
+/* 
+ * CHAI PCR PROJECT 5" Capacitive touchscreen LCD for
+ */
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "ti,beaglebone", "ti,beaglebone-black";
+
+	/* identification */
+	part-number = "CHAI-TOUCH5";
+	version = "00A0";
+
+	/* state the resources this cape uses */
+	exclusive-use =
+		/* the pin header uses */
+                "P9.23",	/* lcd: gpio1_17 */
+		/* the hardware IP uses */
+                "gpio1_17";
+
+	fragment@0 {
+		target = <&am33xx_pinmux>;
+		__overlay__ {
+
+                        CHAI_TOUCH5_pins: 
+pinmux_CHAI_TOUCH5_pins {
+				pinctrl-single,pins = <
+					0x044 0x2f	/* TSC_INTn gpmc_a1.gpio1_17, INPUT | PULLDIS | MODE7 */
+				>;
+			};
+
+		};
+	};
+
+        fragment@1 {
+               target = <&i2c2>;
+               __overlay__ {
+
+		       /* needed to avoid gripping by DTC */
+		       #address-cells = <1>;
+		       #size-cells = <0>;
+
+			ft5x06@38 {
+				compatible = "ft5x0x_ts";
+				reg = <0x38>;
+				interrupt-parent = <&gpio2>;
+				interrupts = <17 0x0>;
+				irq-gpio = <&gpio2 17 0>;
+			};
+               };
+       };
+};
