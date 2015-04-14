@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+. /usr/share/initramfs-tools/hook-functions
+
+# Copy Device Tree fragments
+mkdir -p "${DESTDIR}/lib/firmware"
+cp -p /lib/firmware/*.dtbo "${DESTDIR}/lib/firmware/"
+

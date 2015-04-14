@@ -11,6 +11,13 @@ cp CHAI-LCD5-00A0.dtbo /lib/firmware/CHAI-LCD5-00A0.dtbo
 dtc -O dtb -o CHAI-TOUCH5-00A0.dtbo -b 0 -@ CHAI-TOUCH5-00A0.dts
 cp CHAI-TOUCH5-00A0.dtbo /lib/firmware/CHAI-TOUCH5-00A0.dtbo
 
+cp capemgr /etc/default/
+
+cp dtbo /etc/initramfs-tools/hooks/
+
+cp /boot/uboot/initrd.img /boot/uboot/initrd.img.bak
+
+/opt/scripts/tools/update_initrd.sh
 
 cd ft5x0x
 make
