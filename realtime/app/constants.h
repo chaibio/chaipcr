@@ -19,7 +19,7 @@ const unsigned long kLidPIDMin = 0;
 const unsigned long kLidPIDMax = 1;
 const unsigned long kLidPWMPeriodNs = 500000;
 
-const double kLidThermistorBetaCoefficient = 3970;  //kelvins
+const double kLidThermistorBetaCoefficient = 3500;  //kelvins
 const double kLidThermistorT0Resistance = 10000;    //ohms
 const double kLidThermistorT0 = 298.15;             //kelvins
 
@@ -75,7 +75,7 @@ const int kLedBlankPwmDutyNs = 500000;
 //Optics
 const long kFluorescenceDataCollectionDelayTimeMs = 70;
 const int kADCReadsPerOpticalMeasurement = 3;
-const std::vector<int> kWellList = {4, 3, 2, 1, 16, 15, 14, 13, 5, 8, 7, 6, 11, 10, 9, 12};
+const std::vector<int> kWellList = {4, 3, 2, 1, 16, 15, 14, 13, 5, 6, 7, 8, 9, 10, 11, 12};
 
 //Steps
 const double kPCRBeginStepTemperatureThreshold = 0.5;
