@@ -34,6 +34,7 @@ void MUX::setChannel(int channel) {
         muxControlPin.setValue(static_cast<GPIO::Value>(channel&0x1), true);
         channel>>=1;
     }
+    _channel=channel;
 
 }
 
