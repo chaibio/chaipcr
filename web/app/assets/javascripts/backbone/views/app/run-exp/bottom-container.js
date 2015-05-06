@@ -5,13 +5,11 @@ ChaiBioTech.app.Views.bottomContainer = Backbone.View.extend({
   className: "bottom-container",
 
   initialize: function() {
-
     this.pastePalette();
     this.pasteTestInProgress();
   },
 
   pastePalette: function() {
-    
     this.palette = new ChaiBioTech.app.Views.palette({
       model: this.model
     });

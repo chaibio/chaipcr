@@ -11,5 +11,4 @@ ChaiBioTech.app.Views.outerMostCircle = function() {
     visible: false,
     name: "temperatureControllerOuterMostCircle"
   });
-
 }
