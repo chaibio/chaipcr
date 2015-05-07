@@ -13,6 +13,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   this.next = null;
   this.previous = null;
   this.big = false;
+  this.controlDistance = ChaiBioTech.Constants.controlDistance;
 
   this.getLeft = function() {
 
@@ -197,8 +198,8 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
         midPointY = (top + endPointY) / 2;
         previousTop  = midPointY;
 
-        this.curve.path[1][1] = (left + midPointX) / 2;
-        this.curve.path[1][2] = ((top + midPointY) / 2) + 10;
+        this.curve.path[1][1] = left + this.controlDistance;
+        this.curve.path[1][2] = top;
 
         // Mid point
         this.curve.path[1][3] = midPointX;
@@ -208,8 +209,8 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
         this.next.gatherDataGroup.setTop(midPointY);
 
         // Controlling point for the next bent
-        this.curve.path[2][1] = (midPointX + endPointX) / 2;
-        this.curve.path[2][2] = ((midPointY + endPointY) / 2) - 15;
+        this.curve.path[2][1] = endPointX - this.controlDistance;
+        this.curve.path[2][2] = endPointY;
     };
 
     if(this.previous) {
@@ -224,8 +225,8 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
         var midPointX = (left + endPointX) / 2,
         midPointY = (top + endPointY) / 2;
 
-        previous.curve.path[2][1] = (left + midPointX) / 2;
-        previous.curve.path[2][2] = ((top + midPointY) / 2 ) - 15;
+        previous.curve.path[2][1] = left - this.controlDistance;
+        previous.curve.path[2][2] = top;
 
         // Mid point
         previous.curve.path[1][3] = midPointX;
@@ -234,8 +235,8 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
         // Please pay attention here we move gatherdta of this
         this.gatherDataGroup.setTop(midPointY);
 
-        previous.curve.path[1][1] = (midPointX + endPointX) / 2;
-        previous.curve.path[1][2] = ((midPointY + endPointY) / 2) + 10;
+        previous.curve.path[1][1] = endPointX + this.controlDistance;
+        previous.curve.path[1][2] = endPointY;
     }
     // Change temperature display as its circle is moved
     var dynamicTemp = Math.abs((100 - ((targetCircleGroup.top - this.scrollTop) / this.scrollRatio)));
