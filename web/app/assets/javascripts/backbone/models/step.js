@@ -22,7 +22,6 @@ ChaiBioTech.Models.Step = Backbone.Model.extend({
     })
     .done(function(data) {
       //fabricStepView.canvas.clear();
-      console.log(data)
       fabricStepView.canvas.fire("modelChanged", data);
     })
     .fail(function() {
@@ -39,7 +38,6 @@ ChaiBioTech.Models.Step = Backbone.Model.extend({
       type: 'DELETE'
     })
     .done(function(data) {
-      console.log(data);
       fabricStepView.canvas.fire("modelChanged");
     })
     .fail(function() {

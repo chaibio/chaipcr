@@ -164,7 +164,6 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
       if(ChaiBioTech.app.newStepId && steps[stepIndex].step.id === ChaiBioTech.app.newStepId) {
         ChaiBioTech.app.newlyCreatedStep = stepView;
         ChaiBioTech.app.newStepId = null;
-        console.log(ChaiBioTech.app.newlyCreatedStep);
       }
 
       tempStep = stepView;

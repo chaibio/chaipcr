@@ -47,9 +47,6 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
       this.allStepViews[0].circle.manageClick(true);
       appRouter.editStageStep.trigger("stepSelected", this.allStepViews[0]);
     }
-
-    //this.canvas.renderAll();
-
   };
 
   /*******************************************************/

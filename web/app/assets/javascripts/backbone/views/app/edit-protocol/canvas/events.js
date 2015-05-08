@@ -129,7 +129,16 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
     if(keyVal == "step") {
       ChaiBioTech.app.newStepId = evtData[keyVal].id;
     } else if(keyVal == "stage") {
-
+      ChaiBioTech.app.newStepId = evtData[keyVal].steps[0].step.id;
+    } else {
+      // Incase we delete a step..!!
+      if(ChaiBioTech.app.selectedStep.previousStep) {
+        var prevStep = ChaiBioTech.app.selectedStep.previousStep;
+        ChaiBioTech.app.newStepId = prevStep.model.get("step").id;
+      } else if(ChaiBioTech.app.selectedStep.nextStep) {
+        var nxtStep = ChaiBioTech.app.selectedStep.nextStep;
+        ChaiBioTech.app.newStepId = nxtStep.model.get("step").id;
+      }
     }
 
     C.model.getLatestModel(C.canvas);
