@@ -269,6 +269,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 	},
 
 	getLatestModel: function(canvas) {
+
 		that = this;
 		$.ajax({
 			url: "/experiments/"+that.id,
@@ -277,6 +278,7 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 		})
 		.done(function(data) {
 				that.set('experiment', data["experiment"]);
+
 				if(that.get("callback")) {
 					that.get("callback")();
 					that.set("callback", null);

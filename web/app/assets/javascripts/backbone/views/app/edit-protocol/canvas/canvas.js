@@ -24,6 +24,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
   /*******************************************************/
 
   this.setDefaultWidthHeight = function() {
+
     this.canvas.setHeight(420);
     var width = (this.allStepViews.length * 122 > 1024) ? this.allStepViews.length * 120 : 1024
     this.canvas.setWidth(width + 50);
@@ -37,9 +38,18 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
        This could be changed later to reflext add/delete change*/
   /*******************************************************/
   this.selectStep = function() {
-    this.allStepViews[0].circle.manageClick(true);
-    this.canvas.renderAll();
-    appRouter.editStageStep.trigger("stepSelected", this.allStepViews[0]);
+
+    if(ChaiBioTech.app.newlyCreatedStep) {
+      ChaiBioTech.app.newlyCreatedStep.circle.manageClick(true);
+      appRouter.editStageStep.trigger("stepSelected", ChaiBioTech.app.newlyCreatedStep);
+      ChaiBioTech.app.newlyCreatedStep = null;
+    } else {
+      this.allStepViews[0].circle.manageClick(true);
+      appRouter.editStageStep.trigger("stepSelected", this.allStepViews[0]);
+    }
+
+    //this.canvas.renderAll();
+
   };
 
   /*******************************************************/

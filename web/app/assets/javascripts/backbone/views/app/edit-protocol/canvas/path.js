@@ -19,7 +19,6 @@ ChaiBioTech.app.Views.fabricPath = function(model, parent, canvas) {
     originY: "center"
   });
 
-  console.log("This is the new code");
   // Starting point;
   this.curve.path[0][1] = x1;
   this.curve.path[0][2] = y1;

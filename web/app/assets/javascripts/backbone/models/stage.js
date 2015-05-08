@@ -24,8 +24,8 @@ ChaiBioTech.Models.Stage = Backbone.Model.extend({
       data: JSON.stringify(dataToBeSend)
     })
     .done(function(data) {
-      console.log("done added");
-      fabricStageView.canvas.fire("modelChanged");
+      console.log("done added", data);
+      fabricStageView.canvas.fire("modelChanged", data);
     })
     .fail(function() {
       console.log("Failed to update");

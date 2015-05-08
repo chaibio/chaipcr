@@ -22,7 +22,8 @@ ChaiBioTech.Models.Step = Backbone.Model.extend({
     })
     .done(function(data) {
       //fabricStepView.canvas.clear();
-      fabricStepView.canvas.fire("modelChanged");
+      console.log(data)
+      fabricStepView.canvas.fire("modelChanged", data);
     })
     .fail(function() {
       alert("Failed to update");

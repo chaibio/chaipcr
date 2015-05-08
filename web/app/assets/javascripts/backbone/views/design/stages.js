@@ -11,6 +11,7 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	},
 
 	changeStageName: function(evt) {
+
 		evt.preventDefault();
 		evt.stopPropagation();
 		if(! this.editableAdded) {
@@ -30,6 +31,7 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	},
 
 	selectStage: function() {
+
 		parentObject = this.options.grandParent.get("experiment");
 		if(parentObject["protocol"]["stages"].length == 1) {
 			$("#delete-selected").prop("disabled", true);
@@ -71,6 +73,7 @@ ChaiBioTech.Views.Design.stages = Backbone.View.extend({
 	},
 
 	editStageName: function(newName) {
+		
 		this.options.grandParent.changeStageName(newName, this.model.id, this.model["stage_type"]); // Points to the model
 	},
 

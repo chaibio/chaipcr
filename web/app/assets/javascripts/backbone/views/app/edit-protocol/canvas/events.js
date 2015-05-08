@@ -122,7 +122,16 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
        When a model in the server changed
        changes like add step/stage or delete step/stage.
   ***************************************/
-  this.canvas.on("modelChanged", function(evt) {
+  this.canvas.on("modelChanged", function(evtData) {
+
+    var keyVal = Object.keys(evtData)[0];
+
+    if(keyVal == "step") {
+      ChaiBioTech.app.newStepId = evtData[keyVal].id;
+    } else if(keyVal == "stage") {
+
+    }
+
     C.model.getLatestModel(C.canvas);
     C.canvas.clear();
   });
