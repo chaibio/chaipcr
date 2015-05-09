@@ -73,4 +73,21 @@ describe Stage do
       stage.errors.should have(1).item
     end
   end
+  
+  describe "#autodelta" do
+    it "not allowed for hold stage" do
+     stage = hold_stage(@protocol)
+     stage.auto_delta = 1
+     stage.save
+     stage.errors.should have(1).item
+    end
+    
+    it "start cycle cannot be greater than number of cycle" do
+     stage = cycle_stage(@protocol)
+     stage.auto_delta = 1
+     stage.auto_delta_start_cycle = stage.num_cycles + 1
+     stage.save
+     stage.errors.should have(1).item
+    end
+  end
 end

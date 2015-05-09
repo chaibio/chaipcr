@@ -10,11 +10,11 @@ private
   end
   
   def stage_params
-    params.require(:stage).permit(:name, :num_cycles, :stage_type)
+    params.require(:stage).permit(:name, :num_cycles, :stage_type, :auto_delta, :auto_delta_start_cycle)
   end
   
   def step_params
-    params.require(:step).permit(:name, :temperature, :hold_time, :collect_data)
+    params.require(:step).permit(:name, :temperature, :hold_time, :collect_data, :delta_temperature, :delta_duration_s)
   end
   
   def ramp_params
