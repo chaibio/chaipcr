@@ -26,101 +26,59 @@ ChaiBioTech.app.Views.bottomHoldDuration = Backbone.View.extend({
     this.hours = Math.floor(temp/60);
 
     var hour = (Math.floor(temp/60) < 10) ? "0" + Math.floor(temp/60) : Math.floor(temp/60);
-
-    this.hourSpan.html(hour);
-    this.hourEdit.val(hour);
-    this.minute = temp % 60;
-
     var minute = (temp % 60 < 10) ? "0" + temp % 60 : temp % 60;
 
-    this.minuteSpan.html(minute);
-    this.minuteEdit.val(minute);
+    this.timeSpan.html(hour + ":" + minute);
+    this.timeEdit.val(temp);
+    this.minute = temp % 60;
   },
 
   events: {
-      "click .hour-part": "startHourEdit",
-      "blur .hour-part-edit": "saveHourAndHide",
-      "keydown .hour-part-edit": "seeIfEnterOnHour",
-      "click .minute-part": "startMinuteEdit",
-      "blur .minute-part-edit": "saveMinuteAndHide",
-      "keydown .minute-part-edit": "seeIfEnterOnMinute"
+      "click .time-part": "startHourEdit",
+      "blur .time-part-edit": "saveTimeAndHide",
+      "keydown .time-part-edit": "seeIfEnterOnHour",
   },
 
   seeIfEnterOnHour: function(e) {
 
     if(e.keyCode === 13) {
-      this.hourEdit.blur();
+      this.timeEdit.blur();
     }
   },
 
-  startMinuteEdit: function() {
+  saveTimeAndHide: function() {
 
-    this.minuteEdit.show();
-    this.minuteEdit.focus();
-  },
+    this.timeEdit.hide();
 
-  saveMinuteAndHide: function() {
+    var holdTime = this.timeEdit.val();
 
-    this.minuteEdit.hide();
-
-    var holdMinute= this.minuteEdit.val();
-
-    if(isNaN(holdMinute) || !holdMinute) {
-      this.minuteEdit.val(this.lastMinuteValue);
+    if(isNaN(holdTime) || !holdTime) {
+      this.timeEdit.val(this.lastHourValue);
       alert("Please enter a valid value");
     } else {
-      holdMinute = parseInt(holdMinute);
+      holdTime = parseInt(holdTime);
 
-      var duration = holdMinute + (this.hours * 60);
+      var duration = holdTime;
 
-      this.currentStep.model.changeHoldDuration(duration);
-      this.currentStep.holdDuration = duration;
+      this.currentStep.model.changeHoldDuration(holdTime);
+      this.currentStep.holdDuration = holdTime;
 
-      var display = (holdMinute < 10) ? "0" + holdMinute : holdMinute;
+      var hour = (Math.floor(holdTime/60) < 10) ? "0" + Math.floor(holdTime/60) : Math.floor(holdTime/60);
+      var minute = (holdTime % 60 < 10) ? "0" + holdTime % 60 : holdTime % 60;
 
-      this.minuteSpan.html(display);
-      this.minuteEdit.val(display);
-      ChaiBioTech.app.Views.mainCanvas.fire("holdTimeChangedFromBottom", this.currentStep);
-    }
-  },
+      var display = hour + ":" + minute;
 
-  seeIfEnterOnMinute: function(e) {
-
-    if(e.keyCode === 13) {
-      this.minuteEdit.blur();
-    }
-  },
-
-  saveHourAndHide: function() {
-
-    this.hourEdit.hide();
-
-    var holdHour = this.hourEdit.val();
-
-    if(isNaN(holdHour) || !holdHour) {
-      this.hourEdit.val(this.lastHourValue);
-      alert("Please enter a valid value");
-    } else {
-      holdHour = parseInt(holdHour);
-
-      var duration = (holdHour * 60) + this.minute;
-
-      this.currentStep.model.changeHoldDuration(duration);
-      this.currentStep.holdDuration = duration;
-
-      var display = (holdHour < 10) ? "0" + holdHour : holdHour;
-
-      this.hourSpan.html(display);
-      this.hourEdit.val(display);
-      this.lastHourValue = display;
+      this.timeSpan.html(display);
+      this.timeEdit.val(holdTime);
+      this.lastHourValue = holdTime;
       ChaiBioTech.app.Views.mainCanvas.fire("holdTimeChangedFromBottom", this.currentStep);
     }
   },
 
   startHourEdit: function() {
 
-    this.hourEdit.show();
-    this.hourEdit.focus();
+    this.timeEdit.show();
+    this.timeEdit.focus();
   },
 
   render: function() {
@@ -131,11 +89,11 @@ ChaiBioTech.app.Views.bottomHoldDuration = Backbone.View.extend({
     };
 
     $(this.el).html(this.template(data));
-    this.hourSpan =   $(this.el).find(".hour-part-span");
-    this.minuteSpan = $(this.el).find(".minute-part-span");
-    this.hourEdit = $(this.el).find(".hour-part-edit");
-    this.minuteEdit = $(this.el).find(".minute-part-edit");
-    
+    this.timeSpan =   $(this.el).find(".time-part-span");
+    //this.minuteSpan = $(this.el).find(".minute-part-span");
+    this.timeEdit = $(this.el).find(".time-part-edit");
+    //this.minuteEdit = $(this.el).find(".minute-part-edit");
+
     return this;
   }
 });

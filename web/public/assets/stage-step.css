@@ -508,13 +508,13 @@
   text-align: right;
 }
 /* line 491, ../../app/assets/stylesheets/stage-step.css.scss */
-.edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part .hour-part {
-  width: 40px;
+.edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part .time-part {
+  width: 95px;
   float: left;
 }
 /* line 495, ../../app/assets/stylesheets/stage-step.css.scss */
-.edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part .hour-part .hour-part-edit {
-  width: 40px;
+.edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part .time-part .time-part-edit {
+  width: 95px;
   position: relative;
   background-color: black;
   color: white;
