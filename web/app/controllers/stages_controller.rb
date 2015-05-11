@@ -11,6 +11,8 @@ class StagesController < ApplicationController
       param :stage_type, ["holding", "cycling", "meltcurve"], :desc => "Stage type", :required => true
       param :name, String, :desc => "Name of the stage, if not provided, default name is '<stage type> Stage'", :required => false
       param :num_cycles, Integer, :desc => "Number of cycles in a stage, must be >= 1, default to 1", :required=>false
+      param :auto_delta, :bool, :desc => "Auto Delta, default is false", :required=>false
+      param :auto_delta_start_cycle, Integer, :desc => "Cycle to start delta temperature", :required=>false
     end
   end
    

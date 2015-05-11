@@ -74,7 +74,7 @@ class Stage < ActiveRecord::Base
   def meltcurve_stage?
     stage_type == TYPE_MELTCURVE
   end
-  
+
   def copy
     new_stage = ProtocolHelper::copy
     steps.each do |step|
@@ -98,6 +98,14 @@ class Stage < ActiveRecord::Base
   protected
 
   def validate
+    if auto_delta
+      if !cycle_stage?
+        errors.add(:auto_delta, "only allowed for cycling stage")
+      elsif auto_delta_start_cycle == 0 || auto_delta_start_cycle > num_cycles
+        errors.add(:auto_delta_start_cycle, "Cannot be greater than the total number of cycles")
+      end
+    end
+    
     if new_record?
       if !prev_id.nil?
         step = Step.where(:stage_id=>prev_id).order(order_number: :desc).first
