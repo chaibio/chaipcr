@@ -60,9 +60,9 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
         // Right now we have only one item here otherwise switch case
         var me = evt.target.me;
         var targetCircleGroup = evt.target;
-        var temp;
+        me.changeRampSpeedPlacing(targetCircleGroup);
         appRouter.editStageStep.trigger("stepDrag", me);
-        temp = evt.target.me.temperature.text;
+        var temp = evt.target.me.temperature.text;
         me.model.changeTemperature(parseFloat(temp.substr(0, temp.length - 1)));
       }
     }

@@ -60,6 +60,8 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     this.canvas.add(this.gatherDataGroup);
     this.showHideGatherData(this.parent.gatherDataDuringStep);
     this.gatherDataGroup.visible = this.parent.gatherDataDuringRamp;
+
+    this.canvas.bringToFront(this.parent.rampSpeedGroup);
   };
 
   this.getUniqueId = function() {
@@ -243,6 +245,24 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
 
     dynamicTemp = (dynamicTemp < 100) ? dynamicTemp.toFixed(1) : dynamicTemp;
     this.temperature.text = String(dynamicTemp + "º");
+  };
+
+  this.changeRampSpeedPlacing = function(targetCircleGroup) {
+
+    var parentStep = this.parent;
+    var distance = Math.abs(targetCircleGroup.top - parentStep.rampSpeedGroup.top);
+
+    if(distance < 50) {
+      console.log("Closer", targetCircleGroup.top);
+      if((parentStep.rampSpeedGroup.top + 70) > this.scrollLength) {
+        parentStep.rampSpeedGroup.top = parentStep.rampSpeedGroup.top - 70;
+      } else if((parentStep.rampSpeedGroup.top - 70) < this.scrollTop) {
+        parentStep.rampSpeedGroup.top = parentStep.rampSpeedGroup.top + 70;
+      } else {
+        parentStep.rampSpeedGroup.top = parentStep.rampSpeedGroup.top + 70;
+      }
+
+    }
   };
 
   this.manageClick = function(starting) {

@@ -62,7 +62,6 @@ ActiveRecord::Schema.define(version: 20150509072011) do
     t.string   "stage_type",                             null: false, comment: "holding, cycling, or meltcurve"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "start_cycle",            default: 1
     t.boolean  "auto_delta",             default: false
     t.integer  "auto_delta_start_cycle", default: 1
   end

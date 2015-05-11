@@ -102,7 +102,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       this.rampSpeedGroup.setVisible(true);
       this.canvas.renderAll();
       this.underLine.width = this.rampSpeedText.width;
-      this.rampSpeedGroup.left = this.left + ((120 - this.rampSpeedText.width) / 2)
+      this.rampSpeedGroup.left = this.left + ((60 - this.rampSpeedText.width) / 2)
     }
 
     this.canvas.renderAll();
@@ -114,7 +114,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
 
     this.rampSpeedText = new fabric.Text(String(this.rampSpeedNumber)+ "º C/s", {
       fill: 'black',
-      fontSize: 12,
+      fontSize: 14,
       fontWeight: "bold",
       fontFamily: "Open Sans",
       originX: 'left',
@@ -126,7 +126,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       strokeWidth: 2,
       originX: 'left',
       originY: 'top',
-      top: 14,
+      top: 16,
       left: 0
     });
 
@@ -138,7 +138,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       originX: 'left',
       originY: 'top',
       top : 100,
-      left: this.left + ((120 - this.rampSpeedText.width) / 2)
+      left: this.left + ((50 - this.rampSpeedText.width) / 2)
     });
 
     if(this.rampSpeedNumber <= 0) {
