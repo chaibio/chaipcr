@@ -24,13 +24,14 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
 
     var stepName = (this.model.get("step").name).toUpperCase();
 
-    this.stepName = new fabric.IText(stepName, {
+    this.stepName = new fabric.Text(stepName, {
       fill: 'white',
       fontSize: 9,
       top : 45,
       left: this.left + 3,
       fontFamily: "Open Sans",
-      selectable: true,
+      selectable: false,
+      editable: false,
       lockRotation: true,
       lockScalingX: true,
       lockScalingY: true,
