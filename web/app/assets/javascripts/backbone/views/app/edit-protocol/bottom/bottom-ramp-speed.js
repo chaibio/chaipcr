@@ -89,7 +89,7 @@ ChaiBioTech.app.Views.bottomRampSpeed = Backbone.View.extend({
     $(this.el).html(this.template(data));
     this.dataPart = $(this.el).find(".data-part-span");
     this.dataPartEdit = $(this.el).find(".data-part-edit-value");
-    
+
     return this;
   }
 });

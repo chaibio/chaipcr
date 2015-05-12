@@ -52,6 +52,18 @@ ChaiBioTech.app.Views.bottomHoldDuration = Backbone.View.extend({
 
     var holdTime = this.timeEdit.val();
 
+    var value = holdTime.indexOf(":");
+    if(value != -1) {
+      var hr = holdTime.substr(0, value);
+      var min = holdTime.substr(value + 1);
+
+      if(isNaN(hr) || isNaN(min)) {
+        holdTime = null;
+      } else {
+        holdTime = (hr * 60) + (min * 1);
+      }
+    }
+
     if(isNaN(holdTime) || !holdTime) {
       this.timeEdit.val(this.lastHourValue);
       alert("Please enter a valid value");
@@ -69,7 +81,7 @@ ChaiBioTech.app.Views.bottomHoldDuration = Backbone.View.extend({
       var display = hour + ":" + minute;
 
       this.timeSpan.html(display);
-      this.timeEdit.val(holdTime);
+      this.timeEdit.val(display);
       this.lastHourValue = holdTime;
       ChaiBioTech.app.Views.mainCanvas.fire("holdTimeChangedFromBottom", this.currentStep);
     }
