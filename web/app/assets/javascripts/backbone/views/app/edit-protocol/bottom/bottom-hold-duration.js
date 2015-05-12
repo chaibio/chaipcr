@@ -29,7 +29,7 @@ ChaiBioTech.app.Views.bottomHoldDuration = Backbone.View.extend({
     var minute = (temp % 60 < 10) ? "0" + temp % 60 : temp % 60;
 
     this.timeSpan.html(hour + ":" + minute);
-    this.timeEdit.val(temp);
+    this.timeEdit.val(hour + ":" + minute);
     this.minute = temp % 60;
   },
 
