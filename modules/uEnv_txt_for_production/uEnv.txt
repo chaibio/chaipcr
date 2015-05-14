@@ -63,7 +63,7 @@ usbroot=/dev/sda1 ro rootwait
 usbargs=setenv bootargs console=tty0 console=${console} ${optargs} ${cape_disable} ${cape_enable} ${kms_force_mode} root=${usbroot} rootfstype=${mmcrootfstype} 
 uenvcmdusb=run loadusbfiles; run usbargs; bootz ${loadaddr} ${initrd_addr}:${initrd_size} ${fdtaddr}
 
-uenvcmd=usb start; if test -e usb 0:1 /boot/${usb_kernel_file}; then run uenvcmdusb; else run uenvcmdmmc; fi
-
+#uenvcmd=usb start; if test -e usb 0:1 /boot/${usb_kernel_file}; then run uenvcmdusb; else run uenvcmdmmc; fi
+uenvcmd= if gpio input 72; then usb start; if test -e usb 0:1 /boot/${usb_kernel_file}; then echo "USB loaded";  run uenvcmdusb; else echo "MMC loaded"; run uenvcmdmmc; fi; else echo "MMC loaded"; run uenvcmdmmc; fi
 
 #
