@@ -8,7 +8,11 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   this.canvas = parentStep.canvas;
   this.scrollTop = 80;
   this.scrollLength = 317;
-  this.scrollRatio = (this.scrollLength - this.scrollTop) / 100;
+  //this.scrollRatio = (this.scrollLength - this.scrollTop) / 100;
+  this.scrollRatio1 = ((this.scrollLength - this.scrollTop) * .25) / 50; // 1.2;//(this.scrollLength - this.scrollTop) / 200;
+  this.scrollRatio2 = ((this.scrollLength - this.scrollTop) * .75) / 50;//3.54;//(this.scrollLength - this.scrollTop) / 50;
+  this.middlePoint = this.scrollLength - ((this.scrollLength - this.scrollTop) * .25); // This is the point where it reads 50
+  // Not the mid point of steps length;
   this.gatherDataImage = null;
   this.next = null;
   this.previous = null;
@@ -25,7 +29,12 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
 
     var temperature = this.temperatureValue || this.model.get("step").temperature;
 
-    this.top = this.scrollLength - (temperature * this.scrollRatio);
+    if(temperature <= 50) {
+      this.top = this.scrollLength - (temperature * this.scrollRatio1);
+      return this;
+    }
+
+    this.top = ((this.scrollRatio2 * 100) + this.scrollTop) - (temperature * this.scrollRatio2);
     return this;
   };
 
@@ -242,11 +251,18 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
         previous.curve.path[1][1] = endPointX + this.controlDistance;
         previous.curve.path[1][2] = endPointY;
     }
-    // Change temperature display as its circle is moved
-    var dynamicTemp = Math.abs((100 - ((targetCircleGroup.top - this.scrollTop) / this.scrollRatio)));
 
-    dynamicTemp = (dynamicTemp < 100) ? dynamicTemp.toFixed(1) : dynamicTemp;
+    if(targetCircleGroup.top >= this.middlePoint) {
+      var dynamicTemp = 50 - ((targetCircleGroup.top - this.middlePoint) / this.scrollRatio1);
+    } else {
+      var dynamicTemp = 100 - ((targetCircleGroup.top - this.scrollTop) / this.scrollRatio2);
+    }
+    // Change temperature display as its circle is moved
+    //var dynamicTemp = Math.abs((100 - ((targetCircleGroup.top - this.scrollTop) / this.scrollRatio)));
+
+    dynamicTemp = Math.abs(dynamicTemp).toFixed(1);//(dynamicTemp < 100) ? dynamicTemp.toFixed(1) : dynamicTemp;
     this.temperature.text = String(dynamicTemp + "º");
+
     this.parent.rampSpeedGroup.top = targetCircleGroup.top + 15;
   };
 
