@@ -199,6 +199,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
         selectable: false
       });
 
+
       this.canvas.add(this.stageRect, this.roof, this.border, this.stageNo, this.stageName);
 
       if(this.model.get("stage").stage_type === "cycling" && this.model.get("stage").steps.length > 1) {

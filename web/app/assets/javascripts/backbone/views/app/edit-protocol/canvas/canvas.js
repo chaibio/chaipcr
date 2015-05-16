@@ -99,6 +99,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     */
   /*******************************************************/
   this.addinvisibleFooterToStep = function() {
+
     var count = 0;
     var limit = this.allStepViews.length;
     var imageSourceArray = [ // common, dark, white
@@ -135,8 +136,8 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
         if(++ index < 3) {
           mainWrapper(index);
         } else {
-          // Tells the canvas that all the images are loaded.
-          that.canvas.fire("imagesLoaded");
+          // Calls the moveImage function which loads moveImage for stages and steps.
+          that.addMoveImage();
         }
       });
     }
@@ -144,6 +145,18 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     this.addGatherDataImage(this, "assets/gather-data.png", 0, limit)
     mainWrapper(0);
 
+  };
+
+  this.addMoveImage = function() {
+
+    var src = "assets/move.png";
+    var that = this;
+
+    fabric.Image.fromURL(src, function(img) {
+      that.moveImage = $.extend({}, img);
+      // As we have loaded all the Images Now we fire "imagesLoaded";
+      that.canvas.fire("imagesLoaded");
+    });
   };
 
   /*******************************************************/

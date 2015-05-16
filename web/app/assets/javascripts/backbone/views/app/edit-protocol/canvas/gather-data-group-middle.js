@@ -11,8 +11,6 @@ ChaiBioTech.app.Views.gatherDataGroupMiddle = function(objs, parent) {
   return new fabric.Group(objs, {
     left: parent.left,
     top: midPointY || 230,
-    width: 32,
-    height: 32,
     me: this,
     selectable: false,
     name: "gatherDataGroupMiddle",
