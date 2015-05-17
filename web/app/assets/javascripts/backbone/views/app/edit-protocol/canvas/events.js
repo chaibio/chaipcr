@@ -83,6 +83,7 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
   ***************************************/
   this.canvas.on("imagesLoaded", function() {
     C.addRampLinesAndCircles();
+    C.addMoveImageForStages();
     C.selectStep();
     C.canvas.renderAll();
   });

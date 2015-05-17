@@ -6,6 +6,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
 
   this.model = model;
   this.allStepViews = new Array();
+  this.allStageViews = new Array();
   this.canvas = null;
   this.allCircles = null;
 
@@ -55,6 +56,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
        a stage model which is a backbone model and fuse it together to fabric. */
   /*******************************************************/
   this.addStages = function() {
+
     var allStages = this.model.get("experiment").protocol.stages;
     var stage = {};
     var previousStage = null;
@@ -70,6 +72,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
 
       previousStage = stageView;
       stageView.render();
+      this.allStageViews.push(stageView);
     }
     // Only for the last stage
     stageView.borderRight();
@@ -79,6 +82,26 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     return this;
   };
 
+  this.addMoveImageForStages = function() {
+
+    var noOfStages = this.allStageViews.length;
+
+    for(var i = 0; i < noOfStages; i++) {
+      var currentStage = this.allStageViews[i];
+      //console.log(currentStage);
+      var moveImg = $.extend({}, that.moveImage);
+      moveImg.left = currentStage.left + (currentStage.myWidth - 20);
+      moveImg.top = 18;
+      moveImg.setVisible(false);
+      moveImg.lockMovementY = true;
+      moveImg.hasControls = false;
+      moveImg.hasBorders = false;
+      moveImg.stage = currentStage;
+      currentStage.moveImg = moveImg;
+      this.canvas.add(moveImg);
+    }
+
+  }
   /*******************************************************/
     /* This method adds ramp lines and circles. look at findAllCircles() method */
   /*******************************************************/
@@ -153,7 +176,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     var that = this;
 
     fabric.Image.fromURL(src, function(img) {
-      that.moveImage = $.extend({}, img);
+      that.moveImage = img;
       // As we have loaded all the Images Now we fire "imagesLoaded";
       that.canvas.fire("imagesLoaded");
     });
@@ -190,6 +213,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     */
   /*******************************************************/
   this.findAllCircles = function() {
+
     var i = 0;
     var limit = this.allStepViews.length;
     var circles = [];

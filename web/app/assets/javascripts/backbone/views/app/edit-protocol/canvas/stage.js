@@ -89,7 +89,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
 
     this.stageName = new fabric.Text(stageName, {
       fill: 'white',
-      fontSize: 10,
+      fontSize: 9,
       top : 28,
       left: this.left + 25 || 55,
       fontFamily: "Open Sans",
@@ -199,7 +199,6 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
         selectable: false
       });
 
-
       this.canvas.add(this.stageRect, this.roof, this.border, this.stageNo, this.stageName);
 
       if(this.model.get("stage").stage_type === "cycling" && this.model.get("stage").steps.length > 1) {
@@ -247,12 +246,14 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
       previouslySelected.changeFillsAndStrokes("white");
       previouslySelected.manageBordersOnSelection("#ff9f00");
       previouslySelected.manageFooter(false, "white", previousLength);
+      previouslySelected.moveImg.setVisible(false);
     }
 
     ChaiBioTech.app.selectedStage = this;
     this.changeFillsAndStrokes("black");
     this.manageBordersOnSelection("#cc6c00");
     this.manageFooter(true, "black", length);
+    this.moveImg.setVisible(true);
   };
 
   return this;
