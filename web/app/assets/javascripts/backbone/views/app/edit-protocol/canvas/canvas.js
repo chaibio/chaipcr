@@ -88,19 +88,41 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
 
     for(var i = 0; i < noOfStages; i++) {
       var currentStage = this.allStageViews[i];
-      //console.log(currentStage);
       var moveImg = $.extend({}, that.moveImage);
-      moveImg.left = currentStage.left + (currentStage.myWidth - 20);
+
+      moveImg.left = currentStage.left + (currentStage.myWidth - 24);
       moveImg.top = 18;
       moveImg.setVisible(false);
       moveImg.lockMovementY = true;
       moveImg.hasControls = false;
       moveImg.hasBorders = false;
+
       moveImg.stage = currentStage;
       currentStage.moveImg = moveImg;
       this.canvas.add(moveImg);
     }
 
+  }
+
+  this.addMoveImageForSteps = function() {
+
+    var noOfSteps = this.allStepViews.length;
+
+    for(var i = 0; i < noOfSteps; i++) {
+      var currentStep = this.allStepViews[i];
+      var moveImg = $.extend({}, that.moveImage);
+
+      moveImg.left = currentStep.left + (currentStep.myWidth - 24);
+      moveImg.top = 52;
+      moveImg.setVisible(false);
+      moveImg.lockMovementY = true;
+      moveImg.hasControls = false;
+      moveImg.hasBorders = false;
+
+      moveImg.step = currentStep;
+      currentStep.moveImg = moveImg;
+      this.canvas.add(moveImg);
+    }
   }
   /*******************************************************/
     /* This method adds ramp lines and circles. look at findAllCircles() method */

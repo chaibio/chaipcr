@@ -219,11 +219,13 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
 
       previouslySelected.showHideFooter(false);
       previouslySelected.manageBorderPrevious('#ff9f00');
+      previouslySelected.moveImg.setVisible(false);
     }
 
     ChaiBioTech.app.selectedStep = this;
     this.manageBorder("black");
     this.showHideFooter(true);
+    this.moveImg.setVisible(true);
   }
 
   return this;
