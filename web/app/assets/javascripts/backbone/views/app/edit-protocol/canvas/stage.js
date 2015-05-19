@@ -246,14 +246,12 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
       previouslySelected.changeFillsAndStrokes("white");
       previouslySelected.manageBordersOnSelection("#ff9f00");
       previouslySelected.manageFooter(false, "white", previousLength);
-      previouslySelected.moveImg.setVisible(false);
     }
 
     ChaiBioTech.app.selectedStage = this;
     this.changeFillsAndStrokes("black");
     this.manageBordersOnSelection("#cc6c00");
     this.manageFooter(true, "black", length);
-    this.moveImg.setVisible(true);
   };
 
   return this;
