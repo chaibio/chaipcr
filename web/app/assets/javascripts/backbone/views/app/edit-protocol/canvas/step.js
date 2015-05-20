@@ -16,7 +16,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
 
   this.setLeft = function() {
 
-    this.left = this.parentStage.left + 1 + (parseInt(this.index) * this.myWidth);
+    this.left = this.parentStage.left + 2 + (parseInt(this.index) * this.myWidth);
     return this;
   };
 
@@ -27,8 +27,8 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     this.stepName = new fabric.Text(stepName, {
       fill: 'white',
       fontSize: 9,
-      top : 45,
-      left: this.left + 3,
+      top : 4,
+      left: 3,
       fontFamily: "Open Sans",
       selectable: false,
       editable: false,
@@ -53,8 +53,8 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
 
     this.borderRight = new fabric.Line([0, 0, 0, 342], {
       stroke: '#ff9f00',
-      left: this.left + (this.myWidth - 2),
-      top: 60,
+      left: (this.myWidth - 2),
+      top: 15,
       strokeWidth: 1,
       selectable: false
     });
@@ -139,7 +139,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       originX: 'left',
       originY: 'top',
       top : 100,
-      left: this.left + ((50 - this.rampSpeedText.width) / 2)
+      left:((50 - this.rampSpeedText.width) / 2)
     });
 
     if(this.rampSpeedNumber <= 0) {
@@ -192,8 +192,8 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     this.setLeft().addName().addBorderRight().getUniqueName().rampSpeed();
 
     this.stepRect = new fabric.Rect({
-      left: this.left || 30,
-      top: 64,
+
+
       fill: '#ffb400',
       width: this.myWidth,
       height: 340,
@@ -202,7 +202,14 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       me: this
     });
 
-    this.canvas.add(this.stepRect, this.stepName, this.rampSpeedGroup, this.borderRight);
+    this.stepGroup = new fabric.Group([this.stepRect, this.stepName, this.rampSpeedGroup, this.borderRight], {
+      left: this.left || 32,
+      top: 44,
+      selectable: false,
+      hasControls: false,
+    });
+
+    this.canvas.add(this.stepGroup);
     this.addCircle();
   };
 
