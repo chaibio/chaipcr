@@ -39,7 +39,7 @@ shared_ptr<IControl> QPCRFactory::constructOptics(shared_ptr<SPIPort> ledSPIPort
 }
 
 shared_ptr<IControl> QPCRFactory::constructHeatBlock(ADCController::ConsumersList &consumers) {
-    static const std::vector<SPIDTuning> heatBlockPIDSchedule = {{150, 0.0374, 2.54, 0.381}};
+    static const std::vector<SPIDTuning> heatBlockPIDSchedule = {{150, 0.16, 32.0, 0.20}};
     double cutoffFrequency = Filters::CutoffFrequencyForTimeConstant(heatBlockPIDSchedule.at(0).kDerivativeTimeS * kADCRepeatFrequency / kPIDDerivativeGainLimiter);
 
     TemperatureController::Settings settings;
@@ -76,7 +76,7 @@ shared_ptr<IControl> QPCRFactory::constructLid(ADCController::ConsumersList &con
     settings.maxTargetTemp = kLidMaxTargetTemp;
     settings.minTempThreshold = kLidLowTempShutdownThreshold;
     settings.maxTempThreshold = kLidHighTempShutdownThreshold;
-    settings.pidController = new PIDController({{100, 1.0, 10000, 0}}, kLidPIDMin, kLidPIDMax, SinglePoleRecursiveFilter(5));
+    settings.pidController = new PIDController({{150, 0.1, 100, 0}}, kLidPIDMin, kLidPIDMax, SinglePoleRecursiveFilter(0.01));
 
     consumer[ADCController::EReadLid] = settings.thermistor;
 
