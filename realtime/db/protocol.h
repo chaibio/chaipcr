@@ -28,7 +28,7 @@ public:
     inline const std::vector<Stage>& stages() const {return _stages;}
 
     void resetCurrentStep();
-    inline Stage* currentStage() const {return &*_currentStage;}
+    inline Stage* currentStage() const {return _currentStage != _stages.end() ? &*_currentStage : nullptr;}
     Step* currentStep() const;
     Ramp* currentRamp() const;
     Step* advanceNextStep();

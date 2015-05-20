@@ -42,6 +42,9 @@ public:
     void setEnableMode(bool enableMode);
     void enableStepProcessing();
 
+    double minTargetTemperature() const;
+    double maxTargetTemperature() const;
+
     void setTargetTemperature(double targetTemperature, double rampRate = 0);
     void calculateTemperature();
     double zone1Temperature() const;

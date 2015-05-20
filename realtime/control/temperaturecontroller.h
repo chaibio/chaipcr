@@ -39,6 +39,9 @@ public:
     inline bool enableMode() const { return _enableMode; }
     void setEnableMode(bool enableMode);
 
+    inline double minTargetTemperature() const { return _minTargetTemp; }
+    inline double maxTargetTemperature() const { return _maxTargetTemp; }
+
     void setTargetTemperature(double temperature);
     inline double targetTemperature() const { return _targetTemperature.load(); }
     double currentTemperature() const;

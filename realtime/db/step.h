@@ -33,6 +33,12 @@ public:
     inline void setCollectData(bool collectData) {_collectData = collectData;}
     inline int collectData() const {return _collectData;}
 
+    inline void setDeltaTemperature(double temperature) {_deltaTemperature = temperature;}
+    inline double deltaTemperature() const {return _deltaTemperature;}
+
+    inline void setDeltaDuration(time_t duration) {_deltaDuration = duration;}
+    inline time_t deltaDuration() const {return _deltaDuration;}
+
 private:
     int _id;
 
@@ -43,6 +49,9 @@ private:
     int _orderNumber;
 
     bool _collectData;
+
+    double _deltaTemperature;
+    time_t _deltaDuration;
 };
 
 #endif // STEP_H

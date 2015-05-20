@@ -44,6 +44,12 @@ public:
     inline void setType(Type type) {_type = type;}
     inline Type type() const {return _type;}
 
+    inline void setAutoDelta(bool state) {_autoDelta = state;}
+    inline bool autoDelta() const {return _autoDelta;}
+
+    inline void setAutoDeltaStartCycle(int cycle) {_autoDeltaStartCycle = cycle;}
+    inline int autoDeltaStartCycle() const {return _autoDeltaStartCycle;}
+
     void setComponents(const std::vector<StageComponent> &components);
     void setComponents(std::vector<StageComponent> &&components);
     void appendComponent(const StageComponent &component);
@@ -65,6 +71,9 @@ private:
 
     int _orderNumber;
     Type _type;
+
+    bool _autoDelta;
+    int _autoDeltaStartCycle;
 
     std::vector<StageComponent> _components;
     std::vector<StageComponent>::iterator _currentComponent;
