@@ -1,5 +1,6 @@
 class Experiment < ActiveRecord::Base
   has_one :protocol, dependent: :destroy
+  has_many :fluorescence_data
   has_many :temperature_logs, -> {order("elapsed_time")} do
     def with_range(starttime, endtime, resolution)
       results = where("elapsed_time >= ?", starttime)
