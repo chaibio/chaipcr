@@ -221,9 +221,9 @@ void ExperimentController::stepBegun()
     Stage *stage = _experiment.protocol()->currentStage();
     std::time_t holdTime = stage->currentStep()->holdTime();
 
-    if (stage->autoDelta() && stage->currentCycle() >= stage->autoDeltaStartCycle())
+    if (stage->autoDelta() && stage->currentCycle() > stage->autoDeltaStartCycle())
     {
-        holdTime += stage->currentStep()->deltaDuration();
+        holdTime += stage->currentStep()->deltaDuration() * (stage->currentCycle() - stage->autoDeltaStartCycle());
 
         if (holdTime < 0)
             holdTime = 0;
@@ -260,9 +260,9 @@ void ExperimentController::holdStepCallback(Poco::Timer &)
         Stage *stage = _experiment.protocol()->currentStage();
         double temperature = stage->currentStep()->temperature();
 
-        if (stage->autoDelta() && stage->currentCycle() >= stage->autoDeltaStartCycle())
+        if (stage->autoDelta() && stage->currentCycle() > stage->autoDeltaStartCycle())
         {
-            temperature += stage->currentStep()->deltaTemperature();
+            temperature += stage->currentStep()->deltaTemperature() * (stage->currentCycle() - stage->autoDeltaStartCycle());
 
             if (temperature < HeatBlockInstance::getInstance()->minTargetTemperature())
                 temperature = HeatBlockInstance::getInstance()->minTargetTemperature();
