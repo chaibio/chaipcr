@@ -101,12 +101,15 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       this.rampSpeedGroup.setVisible(false);
     } else {
       this.rampSpeedGroup.setVisible(true);
-      this.canvas.renderAll();
       this.underLine.width = this.rampSpeedText.width;
-      this.rampSpeedGroup.left = this.left + ((60 - this.rampSpeedText.width) / 2)
     }
 
     this.canvas.renderAll();
+  };
+
+  this.adjustRampSpeedPlacing = function() {
+
+    this.rampSpeedGroup.setTop(this.circle.circleGroup.top - this.circle.scrollTop - this.circle.halfway);
   };
 
   this.rampSpeed = function() {
