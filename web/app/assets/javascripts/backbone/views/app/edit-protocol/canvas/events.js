@@ -19,7 +19,7 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
     if(evt.target) {
       switch(evt.target.name)  {
 
-      case "step":
+      case "stepGroup":
         var me = evt.target.me;
         me.circle.manageClick();
         appRouter.editStageStep.trigger("stepSelected", me);
@@ -30,6 +30,7 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
         me.manageClick();
         appRouter.editStageStep.trigger("stepSelected", me.parent);
       break;
+
       }
     }
   });
