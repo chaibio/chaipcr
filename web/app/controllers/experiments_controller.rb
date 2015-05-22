@@ -3,7 +3,7 @@ require 'zip'
 class ExperimentsController < ApplicationController
   include ParamsHelper
   respond_to :json
-  
+
   resource_description { 
     formats ['json']
   }
@@ -104,6 +104,16 @@ class ExperimentsController < ApplicationController
     end
   end
 
+  api :GET, "/experiments/:id/fluorescence_data", "Retrieve fluorescence data"
+  example "{'fluorescence_datum':{'fluorescence_value':75,'well_num':1,'cycle_num':1}, 'fluorescence_datum':{'fluorescence_value':50,'well_num':2,'cycle_num':1}}"
+  def fluorescence_data
+    @experiment = Experiment.find_by_id(params[:id]) 
+    @fluorescence_data = @experiment.fluorescence_data.select("cycle_num, well_num, AVG(fluorescence_value) as fluorescence_value").group("cycle_num, well_num").order("cycle_num, well_num")
+    respond_to do |format|
+      format.json { render "fluorescence_data", :status => :ok}
+    end
+  end
+  
   def export
     experiment = Experiment.find_by_id(params[:id])
     respond_to do |format|

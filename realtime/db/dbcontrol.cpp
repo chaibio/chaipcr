@@ -159,6 +159,12 @@ std::vector<Stage> DBControl::getStages(int protocolId)
         if (it->get_indicator("stage_type") != soci::i_null)
             stage.setType(it->get<Stage::Type>("stage_type"));
 
+        if (it->get_indicator("auto_delta") != soci::i_null)
+            stage.setAutoDelta(it->get<int>("auto_delta"));
+
+        if (it->get_indicator("auto_delta_start_cycle") != soci::i_null)
+            stage.setAutoDeltaStartCycle(it->get<int>("auto_delta_start_cycle"));
+
         stage.setComponents(getStageComponents(stage.id()));
 
         stages.push_back(std::move(stage));
@@ -215,6 +221,17 @@ std::vector<Step> DBControl::getSteps(int stageId)
 
         if (it->get_indicator("collect_data") != soci::i_null)
             step.setCollectData(it->get<int>("collect_data"));
+
+        if (it->get_indicator("delta_temperature") != soci::i_null)
+        {
+            if (it->get_properties("delta_temperature").get_data_type() == soci::dt_double)
+                step.setDeltaTemperature(it->get<double>("delta_temperature"));
+            else
+                step.setDeltaTemperature(it->get<int>("delta_temperature"));
+        }
+
+        if (it->get_indicator("delta_duration_s") != soci::i_null)
+            step.setDeltaDuration(it->get<int>("delta_duration_s"));
 
         steps.push_back(std::move(step));
     }

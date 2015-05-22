@@ -218,7 +218,16 @@ void ExperimentController::stepBegun()
     if (_machineState != Running)
         return;
 
-    std::time_t holdTime = _experiment.protocol()->currentStep()->holdTime();
+    Stage *stage = _experiment.protocol()->currentStage();
+    std::time_t holdTime = stage->currentStep()->holdTime();
+
+    if (stage->autoDelta() && stage->currentCycle() > stage->autoDeltaStartCycle())
+    {
+        holdTime += stage->currentStep()->deltaDuration() * (stage->currentCycle() - stage->autoDeltaStartCycle());
+
+        if (holdTime < 0)
+            holdTime = 0;
+    }
 
     if (_experiment.protocol()->hasNextStep())
     {
@@ -248,9 +257,22 @@ void ExperimentController::holdStepCallback(Poco::Timer &)
 
         _experiment.protocol()->advanceNextStep();
 
-        OpticsInstance::getInstance()->setCollectData(_experiment.protocol()->currentRamp()->collectData(), _experiment.protocol()->currentStage()->type() == Stage::Meltcurve);
+        Stage *stage = _experiment.protocol()->currentStage();
+        double temperature = stage->currentStep()->temperature();
 
-        HeatBlockInstance::getInstance()->setTargetTemperature(_experiment.protocol()->currentStep()->temperature(), _experiment.protocol()->currentRamp()->rate());
+        if (stage->autoDelta() && stage->currentCycle() > stage->autoDeltaStartCycle())
+        {
+            temperature += stage->currentStep()->deltaTemperature() * (stage->currentCycle() - stage->autoDeltaStartCycle());
+
+            if (temperature < HeatBlockInstance::getInstance()->minTargetTemperature())
+                temperature = HeatBlockInstance::getInstance()->minTargetTemperature();
+            else if (temperature > HeatBlockInstance::getInstance()->maxTargetTemperature())
+                temperature = HeatBlockInstance::getInstance()->maxTargetTemperature();
+        }
+
+        OpticsInstance::getInstance()->setCollectData(stage->currentRamp()->collectData(), stage->type() == Stage::Meltcurve);
+
+        HeatBlockInstance::getInstance()->setTargetTemperature(temperature, stage->currentRamp()->rate());
         HeatBlockInstance::getInstance()->enableStepProcessing();
     }
 }

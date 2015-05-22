@@ -54,6 +54,14 @@ void HeatBlock::enableStepProcessing() {
     _stepProcessingMutex.unlock();
 }
 
+double HeatBlock::minTargetTemperature() const {
+    return _zones.first->minTargetTemperature();
+}
+
+double HeatBlock::maxTargetTemperature() const {
+    return _zones.first->maxTargetTemperature();
+}
+
 void HeatBlock::setTargetTemperature(double targetTemperature, double rampRate) {
     if (rampRate <= 0 || rampRate > _maxRampSpeed)
         rampRate = _maxRampSpeed;

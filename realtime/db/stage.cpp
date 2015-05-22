@@ -8,6 +8,8 @@ Stage::Stage(int id)
     _cycleIteration = 1;
     _orderNumber = 0;
     _type = None;
+    _autoDelta = false;
+    _autoDeltaStartCycle = 0;
     _currentComponent = _components.end();
 }
 
@@ -18,6 +20,8 @@ Stage::Stage(const Stage &other)
     setNumCycles(other.numCycles());
     setOrderNumber(other.orderNumber());
     setType(other.type());
+    setAutoDelta(other.autoDelta());
+    setAutoDeltaStartCycle(other.autoDeltaStartCycle());
     setComponents(other.components());
 }
 
@@ -29,6 +33,8 @@ Stage::Stage(Stage &&other)
     _cycleIteration = other._cycleIteration.load();
     _orderNumber = other._orderNumber;
     _type = other._type;
+    _autoDelta = other._autoDelta;
+    _autoDeltaStartCycle = other._autoDeltaStartCycle;
     _components = std::move(other._components);
     _currentComponent = other._currentComponent;
 
@@ -37,6 +43,8 @@ Stage::Stage(Stage &&other)
     other._cycleIteration = 1;
     other._orderNumber = 0;
     other._type = None;
+    other._autoDelta = false;
+    other._autoDeltaStartCycle = 0;
     other._currentComponent = other._components.end();
 }
 
@@ -52,6 +60,8 @@ Stage& Stage::operator= (const Stage &other)
     setNumCycles(other.numCycles());
     setOrderNumber(other.orderNumber());
     setType(other.type());
+    setAutoDelta(other.autoDelta());
+    setAutoDeltaStartCycle(other.autoDeltaStartCycle());
     setComponents(other.components());
 
     return *this;
@@ -65,6 +75,8 @@ Stage& Stage::operator= (Stage &&other)
     _cycleIteration = other._cycleIteration.load();
     _orderNumber = other._orderNumber;
     _type = other._type;
+    _autoDelta = other._autoDelta;
+    _autoDeltaStartCycle = other._autoDeltaStartCycle;
     _components = std::move(other._components);
     _currentComponent = other._currentComponent;
 
@@ -73,6 +85,8 @@ Stage& Stage::operator= (Stage &&other)
     other._cycleIteration = 1;
     other._orderNumber = 0;
     other._type = None;
+    other._autoDelta = false;
+    other._autoDeltaStartCycle = 0;
     other._currentComponent = other._components.end();
 
     return *this;
