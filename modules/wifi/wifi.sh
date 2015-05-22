@@ -19,6 +19,11 @@ case "$1" in
         ;;
         disconnect)
         dhclient -r $wlan
+        killall wpa_supplicant;
+        ifconfig $wlan down
+        sleep 1s;
+        ifconfig $wlan up
+        echo "{'status': 'done'}"
         ;;
         scan)
         command="iwlist $wlan scan | ./lswifi.sh"
@@ -26,9 +31,11 @@ case "$1" in
         ;;
         up)
         ifconfig $wlan up
+        echo "{'status': 'done'}"
         ;;
         down)
         ifconfig $wlan down
+        echo "{'status': 'done'}"
         ;;
 esac
 
