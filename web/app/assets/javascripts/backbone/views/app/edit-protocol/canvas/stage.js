@@ -53,7 +53,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
 
     this.borderRight = new fabric.Line([0, 0, 0, 342], {
       stroke: '#ff9f00',
-      left: (this.myWidth + this.left) || 122,
+      left: (this.myWidth + this.left + 2) || 122,
       top: 60,
       strokeWidth: 2,
       selectable: false

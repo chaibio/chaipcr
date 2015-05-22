@@ -8,6 +8,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
   this.canvas = parentStep.canvas;
   this.scrollTop = 80;
   this.scrollLength = 317;
+  this.halfway = (this.scrollLength - this.scrollTop) / 2;
   //this.scrollRatio = (this.scrollLength - this.scrollTop) / 100;
   this.scrollRatio1 = ((this.scrollLength - this.scrollTop) * .25) / 50; // 1.2;//(this.scrollLength - this.scrollTop) / 200;
   this.scrollRatio2 = ((this.scrollLength - this.scrollTop) * .75) / 50;//3.54;//(this.scrollLength - this.scrollTop) / 50;
@@ -111,7 +112,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
 
     this.getLeft().getTop().getUniqueId();
 
-    this.parent.rampSpeedGroup.top = this.top + 15;
+    this.parent.rampSpeedGroup.top = (this.top - this.scrollTop) - this.halfway;
 
     this.circleGroup = new ChaiBioTech.app.Views.circleGroup(
       [
@@ -126,6 +127,9 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
           ]
         )
       ], this);
+
+      //console.log(this.top, this.circleGroup.top, (80 - this.top) + 15);
+      //this.parent.rampSpeedGroup.top = -100;
 
     this.stepDataGroup = new ChaiBioTech.app.Views.stepDataGroup([
         this.temperature = new ChaiBioTech.app.Views.stepTemperature(this.model, this),
@@ -199,6 +203,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
 
   this.manageRampLineMovement = function(left, top, targetCircleGroup) {
 
+    console.log(targetCircleGroup);
     if(this.next) {
         this.curve.path[0][1] = left;
         this.curve.path[0][2] = top;
@@ -263,7 +268,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     dynamicTemp = Math.abs(dynamicTemp).toFixed(1);//(dynamicTemp < 100) ? dynamicTemp.toFixed(1) : dynamicTemp;
     this.temperature.text = String(dynamicTemp + "º");
 
-    this.parent.rampSpeedGroup.top = targetCircleGroup.top + 15;
+    this.parent.rampSpeedGroup.top = (targetCircleGroup.top - 80) - 118;
   };
 
   this.manageClick = function(starting) {

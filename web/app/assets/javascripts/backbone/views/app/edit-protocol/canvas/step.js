@@ -16,7 +16,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
 
   this.setLeft = function() {
 
-    this.left = this.parentStage.left + 2 + (parseInt(this.index) * this.myWidth);
+    this.left = this.parentStage.left + 3 + (parseInt(this.index) * this.myWidth);
     return this;
   };
 
@@ -134,11 +134,11 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     this.rampSpeedGroup = new fabric.Group([this.rampSpeedText, this.underLine], {
       originX: 'center',
       originY: 'center',
-      selectable: false,
-      hasControls: false,
+      selectable: true,
+      hasControls: true,
       originX: 'left',
       originY: 'top',
-      top : 100,
+      top : 0,
       left:((50 - this.rampSpeedText.width) / 2)
     });
 
