@@ -40,12 +40,11 @@ if [[ $1 == "-a" ]]; then
   	  echo "\"essid\":\"$ssid\","
 	  echo "\"macAddress\":\"$mac\","
 	  echo "\"signalQuality\":\"$qual\","
-	  echo "\"signalLevel\":\"$lvl\","
 	  echo "\"RXBytes\":\"$RXbytes\","
 	  echo "\"RXPackets\":\"$RXpackets\","
 	  echo "\"TXBytes\":\"$TXbytes\","
 	  echo "\"TXPackets\":\"$TXpackets\","
-	  echo "\"frequency\":\"$wfreq\","
+	  echo "\"frequency\":\"$wfreq\""
 	  printf "}\n"
   fi
 
