@@ -120,7 +120,10 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
           var imaging = $.extend({}, img);
           imaging.left = that.allStepViews[count].left - 1;
           imaging.top = 383;
-          imaging.selectable = imaging.visible = false;
+          imaging.selectable = true;
+          imaging.hasControls = false;
+          imaging.lockMovementY = true;
+          imaging.visible = false;
 
           if(index === 0) {
             that.allStepViews[count].commonFooterImage = imaging;
@@ -131,6 +134,8 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
           } else if(index === 2) {
             imaging.top = 363;
             imaging.left = that.allStepViews[count].left;
+            imaging.name = "moveStepImage";
+            imaging.moveStep = that.allStepViews[count];
             that.allStepViews[count].whiteFooterImage = imaging;
             that.canvas.add(that.allStepViews[count].whiteFooterImage);
           }

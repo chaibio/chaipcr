@@ -17,6 +17,7 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
   ***************************************/
   this.canvas.on("mouse:down", function(evt) {
     if(evt.target) {
+      console.log(evt.target);
       switch(evt.target.name)  {
 
       case "stepGroup":
@@ -31,6 +32,25 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
         appRouter.editStageStep.trigger("stepSelected", me.parent);
       break;
 
+      case "moveStepImage":
+        var moveStep = evt.target.moveStep;
+        moveStep.stepRect.setFill("yellow");
+        C.canvas.setActiveGroup(moveStep.stepGroup);
+      break;
+
+      }
+    }
+  });
+
+  this.canvas.on("mouse:up", function(evt) {
+    if(evt.target) {
+      switch(evt.target.name)  {
+
+      case "moveStepImage":
+          var moveStep = evt.target.moveStep;
+          //C.canvas.bringToFront(moveStep.stepGroup);
+          C.canvas.renderAll();
+        break;
       }
     }
   });
@@ -40,6 +60,7 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
       here too we look for the target in the event and do the action.
   ***************************************/
   this.canvas.on('object:moving', function(evt) {
+    console.log(evt)
     if(evt.target) {
       switch(evt.target.name) {
         case "controlCircleGroup":
@@ -47,6 +68,11 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
           me = evt.target.me;
           me.manageDrag(targetCircleGroup);
           appRouter.editStageStep.trigger("stepDrag", me);
+        break;
+
+        case "moveStepImage":
+          var moveStep = evt.target.moveStep;
+          moveStep.stepGroup.left = evt.target.left;
         break;
       }
     }

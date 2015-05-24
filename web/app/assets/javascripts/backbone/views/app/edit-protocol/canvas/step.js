@@ -210,6 +210,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       top: 44,
       selectable: false,
       hasControls: false,
+      hasBoarders: false,
       name: "stepGroup",
       me: this
     });
