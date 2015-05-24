@@ -44,7 +44,7 @@ if [[ $1 == "-a" ]]; then
 	  echo "\"RXPackets\":\"$RXpackets\","
 	  echo "\"TXBytes\":\"$TXbytes\","
 	  echo "\"TXPackets\":\"$TXpackets\","
-	  echo "\"frequency\":\"$wfreq\","
+	  echo "\"frequency\":\"$wfreq\""
 	  printf "}\n"
   fi
 
