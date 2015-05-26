@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150509072011) do
+ActiveRecord::Schema.define(version: 20150526060717) do
 
   create_table "experiments", force: true do |t|
     t.string   "name"
@@ -35,6 +35,15 @@ ActiveRecord::Schema.define(version: 20150509072011) do
 
   add_index "fluorescence_data", ["experiment_id", "ramp_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_ramp_cycle_well", unique: true
   add_index "fluorescence_data", ["experiment_id", "step_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_step_cycle_well", unique: true
+
+  create_table "melt_curve_data", force: true do |t|
+    t.integer "stage_id",                                   null: false
+    t.integer "well_num",                                   null: false, comment: "0-15"
+    t.decimal "temperature",        precision: 5, scale: 2
+    t.integer "fluorescence_value"
+  end
+
+  add_index "melt_curve_data", ["stage_id", "well_num", "temperature"], name: "index_melt_curve_data_on_stage_id_and_well_num_and_temperature"
 
   create_table "protocols", force: true do |t|
     t.decimal  "lid_temperature", precision: 4, scale: 1
@@ -62,6 +71,7 @@ ActiveRecord::Schema.define(version: 20150509072011) do
     t.string   "stage_type",                             null: false, comment: "holding, cycling, or meltcurve"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "start_cycle",            default: 1
     t.boolean  "auto_delta",             default: false
     t.integer  "auto_delta_start_cycle", default: 1
   end
