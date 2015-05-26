@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150509072011) do
+ActiveRecord::Schema.define(version: 20150526060717) do
 
   create_table "experiments", force: true do |t|
     t.string   "name"
@@ -33,18 +33,27 @@ ActiveRecord::Schema.define(version: 20150509072011) do
     t.integer "ramp_id"
   end
 
-  add_index "fluorescence_data", ["experiment_id", "ramp_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_ramp_cycle_well", unique: true
-  add_index "fluorescence_data", ["experiment_id", "step_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_step_cycle_well", unique: true
+  add_index "fluorescence_data", ["experiment_id", "ramp_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_ramp_cycle_well", unique: true, using: :btree
+  add_index "fluorescence_data", ["experiment_id", "step_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_step_cycle_well", unique: true, using: :btree
+
+  create_table "melt_curve_data", force: true do |t|
+    t.integer "stage_id",                                   null: false
+    t.integer "well_num",                                   null: false, comment: "0-15"
+    t.decimal "temperature",        precision: 5, scale: 2
+    t.integer "fluorescence_value"
+  end
+
+  add_index "melt_curve_data", ["stage_id", "well_num", "temperature"], name: "index_melt_curve_data_on_stage_id_and_well_num_and_temperature"
 
   create_table "protocols", force: true do |t|
-    t.decimal  "lid_temperature", precision: 4, scale: 1
+    t.decimal  "lid_temperature", precision: 4, scale: 1, comment: "degrees C"
     t.integer  "experiment_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "ramps", force: true do |t|
-    t.decimal "rate",         precision: 11, scale: 8,                 null: false
+    t.decimal "rate",         precision: 11, scale: 8,                 null: false, comment: "degrees C/s, set to 100 for max"
     t.integer "next_step_id"
     t.boolean "collect_data",                          default: false
   end
@@ -62,13 +71,14 @@ ActiveRecord::Schema.define(version: 20150509072011) do
     t.string   "stage_type",                             null: false, comment: "holding, cycling, or meltcurve"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "start_cycle",            default: 1
     t.boolean  "auto_delta",             default: false
     t.integer  "auto_delta_start_cycle", default: 1
   end
 
   create_table "steps", force: true do |t|
     t.string   "name"
-    t.decimal  "temperature",       precision: 4, scale: 1,                 null: false
+    t.decimal  "temperature",       precision: 4, scale: 1,                 null: false, comment: "degrees C"
     t.integer  "hold_time",                                                 null: false, comment: "in seconds, 0 means infinite"
     t.integer  "order_number",                              default: 0,     null: false, comment: "the order of the step in the cycle, starting with 0, and continguous"
     t.integer  "stage_id",                                                  null: false
@@ -87,17 +97,17 @@ ActiveRecord::Schema.define(version: 20150509072011) do
     t.decimal "heat_block_zone_2_drive", precision: 6, scale: 1
   end
 
-  add_index "temperature_debug_logs", ["experiment_id", "elapsed_time"], name: "index_temperature_debug_logs_on_experiment_id_and_elapsed_time", unique: true
+  add_index "temperature_debug_logs", ["experiment_id", "elapsed_time"], name: "index_temperature_debug_logs_on_experiment_id_and_elapsed_time", unique: true, using: :btree
 
   create_table "temperature_logs", id: false, force: true do |t|
     t.integer "experiment_id"
     t.integer "elapsed_time",                                   comment: "in milliseconds"
-    t.decimal "lid_temp",               precision: 5, scale: 2
-    t.decimal "heat_block_zone_1_temp", precision: 5, scale: 2
-    t.decimal "heat_block_zone_2_temp", precision: 5, scale: 2
+    t.decimal "lid_temp",               precision: 5, scale: 2, comment: "degrees C"
+    t.decimal "heat_block_zone_1_temp", precision: 5, scale: 2, comment: "degrees C"
+    t.decimal "heat_block_zone_2_temp", precision: 5, scale: 2, comment: "degrees C"
   end
 
-  add_index "temperature_logs", ["experiment_id", "elapsed_time"], name: "index_temperature_logs_on_experiment_id_and_elapsed_time", unique: true
+  add_index "temperature_logs", ["experiment_id", "elapsed_time"], name: "index_temperature_logs_on_experiment_id_and_elapsed_time", unique: true, using: :btree
 
   create_table "user_tokens", force: true do |t|
     t.integer  "user_id"
@@ -106,7 +116,7 @@ ActiveRecord::Schema.define(version: 20150509072011) do
     t.datetime "created_at"
   end
 
-  add_index "user_tokens", ["access_token"], name: "index_user_tokens_on_access_token", unique: true
+  add_index "user_tokens", ["access_token"], name: "index_user_tokens_on_access_token", unique: true, using: :btree
 
   create_table "users", force: true do |t|
     t.string   "email",                       null: false
@@ -116,6 +126,6 @@ ActiveRecord::Schema.define(version: 20150509072011) do
     t.datetime "updated_at"
   end
 
-  add_index "users", ["email"], name: "index_users_on_email", unique: true
+  add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
 
 end
