@@ -17,7 +17,7 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
   ***************************************/
   this.canvas.on("mouse:down", function(evt) {
     if(evt.target) {
-      console.log(evt.target);
+
       switch(evt.target.name)  {
 
       case "stepGroup":
@@ -49,7 +49,9 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
       case "moveStepImage":
           var moveStep = evt.target.moveStep;
           //C.canvas.bringToFront(moveStep.stepGroup);
-          C.canvas.renderAll();
+          //moveStep.stepRect.setFill("red");
+          //C.canvas.setActiveGroup(moveStep.stepGroup);
+          //C.canvas.renderAll();
         break;
       }
     }
@@ -60,7 +62,7 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
       here too we look for the target in the event and do the action.
   ***************************************/
   this.canvas.on('object:moving', function(evt) {
-    console.log(evt)
+
     if(evt.target) {
       switch(evt.target.name) {
         case "controlCircleGroup":
@@ -72,7 +74,7 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
 
         case "moveStepImage":
           var moveStep = evt.target.moveStep;
-          moveStep.stepGroup.left = evt.target.left;
+          //moveStep.stepGroup.setLeft(evt.target.left);
         break;
       }
     }
