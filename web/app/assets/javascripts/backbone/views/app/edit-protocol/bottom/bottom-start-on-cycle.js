@@ -5,7 +5,7 @@ ChaiBioTech.app.Views.bottomStartOnCycle = Backbone.View.extend({
   className: "bottom-common-item",
 
   on: false,
-  
+
   template: JST["backbone/templates/app/bottom-common-item"],
 
   initialize: function() {
@@ -14,7 +14,6 @@ ChaiBioTech.app.Views.bottomStartOnCycle = Backbone.View.extend({
     this.options.editStepStageClass.on("delta_clicked", function() {
 
       if(that.on) {
-        console.log(that.on)
         $(that.el).addClass("disabled");
       } else {
         $(that.el).removeClass("disabled");

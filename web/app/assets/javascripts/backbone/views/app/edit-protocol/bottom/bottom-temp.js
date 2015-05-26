@@ -16,7 +16,6 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
     this.options.editStepStageClass.on("delta_clicked", function() {
 
       if(that.on) {
-        console.log(that.on)
         $(that.el).addClass("disabled");
       } else {
         $(that.el).removeClass("disabled");
@@ -40,7 +39,8 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
     $(this.el).find(".caption-part").append(this.capsuleTemplate());
 
     this.draggable = new ChaiBioTech.app.Views.draggable({
-      element: $(this.el).find(".ball-cover")
+      element: $(this.el).find(".ball-cover"),
+      editStepStageClass: this.options.editStepStageClass
     });
 
     return this;

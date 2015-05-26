@@ -39,11 +39,11 @@ ActiveRecord::Schema.define(version: 20150526060717) do
   create_table "melt_curve_data", force: true do |t|
     t.integer "stage_id",                                   null: false
     t.integer "well_num",                                   null: false, comment: "0-15"
-    t.decimal "temperature",        precision: 5, scale: 2
+    t.decimal "temperature",        precision: 5, scale: 2,              comment: "degrees C"
     t.integer "fluorescence_value"
   end
 
-  add_index "melt_curve_data", ["stage_id", "well_num", "temperature"], name: "index_melt_curve_data_on_stage_id_and_well_num_and_temperature"
+  add_index "melt_curve_data", ["stage_id", "well_num", "temperature"], name: "index_melt_curve_data_on_stage_id_and_well_num_and_temperature", using: :btree
 
   create_table "protocols", force: true do |t|
     t.decimal  "lid_temperature", precision: 4, scale: 1, comment: "degrees C"
@@ -71,7 +71,6 @@ ActiveRecord::Schema.define(version: 20150526060717) do
     t.string   "stage_type",                             null: false, comment: "holding, cycling, or meltcurve"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "start_cycle",            default: 1
     t.boolean  "auto_delta",             default: false
     t.integer  "auto_delta_start_cycle", default: 1
   end

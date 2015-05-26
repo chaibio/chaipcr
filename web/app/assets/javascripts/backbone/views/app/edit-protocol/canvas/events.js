@@ -51,7 +51,7 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
           //C.canvas.bringToFront(moveStep.stepGroup);
           //moveStep.stepRect.setFill("red");
           //C.canvas.setActiveGroup(moveStep.stepGroup);
-          C.canvas.renderAll();
+          //C.canvas.renderAll();
         break;
       }
     }
@@ -74,7 +74,7 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
 
         case "moveStepImage":
           var moveStep = evt.target.moveStep;
-          moveStep.stepGroup.setLeft(evt.target.left);
+          //moveStep.stepGroup.setLeft(evt.target.left);
         break;
       }
     }
