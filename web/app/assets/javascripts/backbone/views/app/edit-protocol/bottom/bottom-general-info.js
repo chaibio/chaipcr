@@ -37,7 +37,8 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
 
   autoDelta: function() {
 
-    console.log("Coming Soon .. !");
+    this.options.editStepStageClass.trigger("delta_clicked");
+    console.log("Under Construction .. !");
   },
 
   showStepNameEdit: function() {
@@ -193,7 +194,7 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
   },
 
   render: function() {
-    
+
     $(this.el).html(this.template());
     this.StepNo = $(this.el).find(".bottom-step-no");
     this.noOfStages = $(this.el).find(".bottom-no-of-stages");
