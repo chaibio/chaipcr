@@ -38,7 +38,7 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
   autoDelta: function() {
 
     var stageModel = this.currentStep.parentStage.model.get("stage");
-    console.log(stageModel)
+
     if(stageModel["stage_type"] == "cycling") {
       this.autoDelta = ! this.autoDelta;
       var data = {
@@ -48,6 +48,7 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
       console.log("Under Construction .. !");
       // here send data to server or trigger it back to canvas using
       ChaiBioTech.app.Views.mainCanvas.fire("deltaChanged", this.currentStep.parentStage);
+      this.fixDeltaButton(data);
     } else {
       alert("Please select a Cycling Stage");
     }
@@ -210,12 +211,29 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
     var stageModel = step.parentStage.model.get("stage");
     this.autoDelta = stageModel["auto_delta"];
 
-    //if(this.autoDelta) {
-      var data = {
-        "autoDelta": this.autoDelta
-      }
-      this.options.editStepStageClass.trigger("delta_clicked", data);
-    //}
+
+    var data = {
+      "autoDelta": this.autoDelta
+    }
+    this.options.editStepStageClass.trigger("delta_clicked", data);
+
+    this.fixDeltaButton(data);
+
+  },
+
+  fixDeltaButton: function(data) {
+
+    if(data["autoDelta"]) {
+      this.deltaImage.show();
+      this.deltaButton.css("background-color", "black");
+      this.deltaButton.css("color", "white");
+      this.deltaButtonText.html("AUTODELTA ON");
+    } else {
+      this.deltaImage.hide();
+      this.deltaButton.css("background-color", "white");
+      this.deltaButton.css("color", "black");
+      this.deltaButtonText.html("AUTODELTA OFF");
+    }
   },
 
   render: function() {
@@ -230,9 +248,15 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
     this.popUp = $(this.el).find('.lol-pop');
     this.tikImageDuringStep = $(this.el).find('.tik-image-during-step');
     this.tikImageDuringRamp = $(this.el).find('.tik-image-during-ramp');
+
+    this.deltaButton = $(this.el).find("#delta-button");
+    this.deltaImage = $(this.el).find(".delta-button-image");
+    this.deltaButtonText = $(this.el).find(".delta-button-text");
+
     this.gatherDataButton = $(this.el).find('#gather-data-button');
     this.gatherDataButtonImage = $(this.el).find('.gather-data-button-image');
     this.gatherDataButtonText = $(this.el).find('.gather-data-button-text');
+
     this.editStepName = $(this.el).find('.edit-step-name');
     this.cycleConatainer = $(this.el).find(".bottom-step-no-cycle-container");
     return this;
