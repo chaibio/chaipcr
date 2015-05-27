@@ -6,6 +6,4 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
-# Switch to WAL journaling mode since this is not preserved in schema.rb
-Experiment.connection.execute "PRAGMA journal_mode = WAL"
 Setting.create(:time_zone=>"Pacific Time (US & Canada)")
