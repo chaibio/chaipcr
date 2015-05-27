@@ -21,6 +21,7 @@ ChaiBioTech.app.Views.bottomStartOnCycle = Backbone.View.extend({
     this.options.editStepStageClass.on("delta_clicked", function(data) {
 
       that.on = data.autoDelta;
+      that.currentStep = data.currentStep;
 
       if(that.on) {
         $(that.el).removeClass("disabled");
@@ -34,7 +35,6 @@ ChaiBioTech.app.Views.bottomStartOnCycle = Backbone.View.extend({
     this.options.editStepStageClass.on("stepSelected", function(data) {
       if(that.on) {
         that.currentStep = data;
-        that.currentStartOnCycle = data.parentStage.model.get("stage")["auto_delta_start_cycle"];
         that.changeStartOnCycle();
       }
     });
@@ -87,6 +87,7 @@ ChaiBioTech.app.Views.bottomStartOnCycle = Backbone.View.extend({
 
   changeStartOnCycle: function() {
 
+      this.currentStartOnCycle = this.currentStep.parentStage.model.get("stage")["auto_delta_start_cycle"];
       this.dataPart.html(this.currentStartOnCycle);
       this.dataPartEdit.val(this.currentStartOnCycle);
   },

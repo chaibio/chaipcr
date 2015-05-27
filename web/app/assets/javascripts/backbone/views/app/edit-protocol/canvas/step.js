@@ -237,6 +237,13 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     ChaiBioTech.app.selectedStep = this;
     this.manageBorder("black");
     this.showHideFooter(true);
+  };
+
+  this.changeDeltaTemp = function() {
+
+    var step = this.model.get("step");
+    step["delta_temperature"] = this.updatedDeltaTemp;
+    this.model.set("step", step);
   }
 
   return this;

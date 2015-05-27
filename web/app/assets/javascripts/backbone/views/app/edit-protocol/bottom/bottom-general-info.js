@@ -42,7 +42,8 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
     if(stageModel["stage_type"] == "cycling") {
       this.autoDelta = ! this.autoDelta;
       var data = {
-        "autoDelta": this.autoDelta
+        "autoDelta": this.autoDelta,
+        "currentStep": this.currentStep
       }
       this.options.editStepStageClass.trigger("delta_clicked", data);
       console.log("Under Construction .. !");
@@ -213,7 +214,8 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
 
 
     var data = {
-      "autoDelta": this.autoDelta
+      "autoDelta": this.autoDelta,
+      "currentStep": this.currentStep
     }
     this.options.editStepStageClass.trigger("delta_clicked", data);
 
