@@ -13,15 +13,15 @@ ChaiBioTech.app.Views.bottomTime = Backbone.View.extend({
   initialize: function() {
 
     var that = this;
-    this.options.editStepStageClass.on("delta_clicked", function() {
+    this.options.editStepStageClass.on("delta_clicked", function(data) {
+
+      that.on = data.autoDelta;
 
       if(that.on) {
-        $(that.el).addClass("disabled");
-      } else {
         $(that.el).removeClass("disabled");
+      } else {
+        $(that.el).addClass("disabled");
       }
-
-      that.on = ! that.on;
 
     });
   },

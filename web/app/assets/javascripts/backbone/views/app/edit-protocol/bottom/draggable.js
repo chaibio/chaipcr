@@ -12,9 +12,9 @@ ChaiBioTech.app.Views.draggable = Backbone.View.extend({
 
     var that = this;
 
-    this.options.editStepStageClass.on("delta_clicked", function() {
+    this.options.editStepStageClass.on("delta_clicked", function(data) {
 
-      that.on = ! that.on;
+      that.on = data.autoDelta;
       that.onOffDrag(that.on, that.options.element);
     });
     // Here we are writing the behaviour of scroll
@@ -80,7 +80,7 @@ ChaiBioTech.app.Views.draggable = Backbone.View.extend({
         $(elem).parent().find(".sansa").css("color", "#ffffff");
         this.setBlue = true;
       }
-      
+
     }
   }
 });

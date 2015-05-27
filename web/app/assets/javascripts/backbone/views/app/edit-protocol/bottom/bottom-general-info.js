@@ -209,6 +209,13 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
     //console.log(step.parentStage.model.get("stage"));
     var stageModel = step.parentStage.model.get("stage");
     this.autoDelta = stageModel["auto_delta"];
+
+    //if(this.autoDelta) {
+      var data = {
+        "autoDelta": this.autoDelta
+      }
+      this.options.editStepStageClass.trigger("delta_clicked", data);
+    //}
   },
 
   render: function() {
