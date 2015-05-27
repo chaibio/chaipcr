@@ -8,6 +8,7 @@ INCLUDEPATH += ./db/
 INCLUDEPATH += ./test/
 INCLUDEPATH += ./libraries/include/
 INCLUDEPATH += ./libraries/include/soci #for internal SOCI use
+INCLUDEPATH += ./libraries/include/mysql
 INCLUDEPATH += $(BOOST_INCLUDE_PATH)
 
 LIBS += -L$$_PRO_FILE_PWD_/libraries/libhf/
@@ -23,9 +24,12 @@ LIBS += -lPocoXML
 #LIBS += -lgmock
 
 #SOCI
-LIBS += -lsqlite3
 LIBS += -lsoci_core
-LIBS += -lsoci_sqlite3
+
+#LIBS += -lsqlite3
+#LIBS += -lsoci_sqlite3
+LIBS += -lmysqlclient
+LIBS += -lsoci_mysql
 
 #Boost
 LIBS += -lboost_system
