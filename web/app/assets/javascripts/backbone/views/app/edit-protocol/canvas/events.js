@@ -149,7 +149,12 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
 
   this.canvas.on("deltaChanged", function(changedStage) {
     //console.log(changedStage);
-    changedStage.updateAutoDelata();
+    changedStage.updateAutoDelta();
+  });
+
+  this.canvas.on("startOnCycleChangedFromBottom", function(data) {
+    //console.log(changedStage);
+    data.stage.updateSOC(data.soc);
   });
 
   /**************************************
