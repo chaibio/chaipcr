@@ -3,7 +3,7 @@
 #include "qpcrapplication.h"
 
 //#define DATABASE_FILE "/root/chaipcr/web/db/development.sqlite3"
-#define DATABASE_ADDRESS "127.0.0.1"
+#define DATABASE_ADDRESS "host=localhost db=chaipcr user=root"
 #define DATABASE_LOCKED_TRY_COUNT 3
 #define ROUND(x) ((int)(x * 100.0 + 0.5) / 100.0)
 
