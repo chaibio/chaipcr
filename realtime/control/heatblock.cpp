@@ -72,18 +72,17 @@ void HeatBlock::setTargetTemperature(double targetTemperature, double rampRate) 
 }
 
 void HeatBlock::calculateTemperature() {
-    _stepProcessingMutex.lock(); {
-        if (!_ramp.isEmpty()) {
-            double temp = _ramp.computeTemperature(_zones.first->targetTemperature());
+    std::unique_lock<std::mutex> lock(_stepProcessingMutex);
 
-            _zones.first->setTargetTemperature(temp);
-            _zones.second->setTargetTemperature(temp);
+    if (!_ramp.isEmpty()) {
+        double temp = _ramp.computeTemperature(_zones.first->targetTemperature());
 
-            if (_ramp.isEmpty())
-                rampFinished();
-        }
+        _zones.first->setTargetTemperature(temp);
+        _zones.second->setTargetTemperature(temp);
+
+        if (_ramp.isEmpty())
+            rampFinished();
     }
-    _stepProcessingMutex.unlock();
 }
 
 double HeatBlock::zone1Temperature() const {
