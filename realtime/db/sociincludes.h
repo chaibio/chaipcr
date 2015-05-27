@@ -2,7 +2,8 @@
 #define SOCIINCLUDES_H
 
 #include <soci/soci.h>
-#include <soci/sqlite3/soci-sqlite3.h>
+//#include <soci/sqlite3/soci-sqlite3.h>
+#include <soci/mysql/soci-mysql.h>
 
 #include <boost/date_time.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
