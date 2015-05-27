@@ -354,6 +354,23 @@ void DBControl::addFluorescenceData(const Experiment &experiment, const std::vec
     addWriteQueries(queries);
 }
 
+void DBControl::addMeltCurveData(const Experiment &experiment, const std::vector<Optics::MeltCurveData> &meltCurveData)
+{
+    std::vector<std::string> queries;
+    std::stringstream stream;
+
+    for (const Optics::MeltCurveData &data: meltCurveData)
+    {
+        stream << "INSERT INTO melt_curve_data(stage_id, well_num, temperature, fluorescence_value) VALUES(" <<
+                  experiment.protocol()->currentStage()->id() << ", " << data.wellId << ", " << data.temperature << ", " << data.fluorescenceValue << ")";
+
+        queries.emplace_back(std::move(stream.str()));
+        stream.str("");
+    }
+
+    addWriteQueries(queries);
+}
+
 Settings* DBControl::getSettings()
 {
     soci::row result;

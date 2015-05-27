@@ -201,7 +201,8 @@ void ExperimentController::rampFinished()
     if (_machineState == Running)
     {
         if (_experiment.protocol()->currentStage()->type() == Stage::Meltcurve)
-            _csvControl->writeMeltCurveData(_experiment, OpticsInstance::getInstance()->getMeltCurveData());
+            _dbControl->addMeltCurveData(_experiment, OpticsInstance::getInstance()->getMeltCurveData());
+            //_csvControl->writeMeltCurveData(_experiment, OpticsInstance::getInstance()->getMeltCurveData());
         else
         {
             _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->getFluorescenceData(), true);
