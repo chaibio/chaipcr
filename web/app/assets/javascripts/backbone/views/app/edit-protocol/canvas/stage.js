@@ -273,5 +273,14 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
     this.manageFooter(true, "black", length);
   };
 
+  this.updateAutoDelata = function() {
+
+    var stage = this.model.get("stage");
+    stage["auto_delta"] = ! stage["auto_delta"];
+    this.model.set("stage", stage);
+
+    this.model.updateAutoDelata(stage["auto_delta"]);
+  };
+
   return this;
 };

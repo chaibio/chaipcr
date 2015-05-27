@@ -37,8 +37,14 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
 
   autoDelta: function() {
 
-    this.options.editStepStageClass.trigger("delta_clicked");
+    this.autoDelta = ! this.autoDelta;
+    var data = {
+      "autoDelta": this.autoDelta
+    }
+    this.options.editStepStageClass.trigger("delta_clicked", data);
     console.log("Under Construction .. !");
+    // here send data to server or trigger it back to canvas using
+    ChaiBioTech.app.Views.mainCanvas.fire("deltaChanged", this.currentStep.parentStage);
   },
 
   showStepNameEdit: function() {
@@ -191,6 +197,11 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
     this.numOfCyclesEdit.val(step.parentStage.updatedNoOfCycle || step.parentStage.model.get("stage").num_cycles);
     this.manageTikImage();
     this.fixGatherDataButtonStatus(step);
+
+    // Here we change the status of auto delta button ...!!
+    console.log(step.parentStage.model.get("stage"));
+    var stageModel = step.parentStage.model.get("stage");
+    this.autoDelta = stageModel["auto_delta"];
   },
 
   render: function() {

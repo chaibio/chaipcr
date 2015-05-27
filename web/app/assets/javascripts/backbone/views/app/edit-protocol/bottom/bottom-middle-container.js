@@ -12,7 +12,8 @@ ChaiBioTech.app.Views.bottomMiddleContainer = Backbone.View.extend({
     var parentViewClass = this.options.editStepStageClass;
 
     this.generalInfo = new ChaiBioTech.app.Views.generalInfo({
-      editStepStageClass: parentViewClass
+      editStepStageClass: parentViewClass,
+      model: this.model
     });
 
     this.temperatureSection = new ChaiBioTech.app.Views.bottomTemperature({
@@ -59,7 +60,7 @@ ChaiBioTech.app.Views.bottomMiddleContainer = Backbone.View.extend({
     secondBox.append(this.tempSection.render().el);
     secondBox.append(this.timeSection.render().el);
     thirdBox.append(this.actions.render().el);
-    
+
     return this;
   }
 });

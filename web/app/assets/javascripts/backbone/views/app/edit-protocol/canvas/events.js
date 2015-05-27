@@ -147,12 +147,17 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
     C.allStepViews[C.allStepViews.length - 1].circle.doThingsForLast();
   });
 
+  this.canvas.on("deltaChanged", function(changedStage) {
+    //console.log(changedStage);
+    changedStage.updateAutoDelata();
+  });
+
   /**************************************
        When a model in the server changed
        changes like add step/stage or delete step/stage.
   ***************************************/
   this.canvas.on("modelChanged", function(evtData) {
-
+    console.log(evtData);
     var keyVal = Object.keys(evtData)[0];
 
     if(keyVal == "step") {
