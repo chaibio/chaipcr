@@ -23,9 +23,9 @@ class Optics : public IControl, public ADCConsumer
 public:
     struct MeltCurveData
     {
-        MeltCurveData(int data, double temperature, int wellId): data(data), temperature(temperature), wellId(wellId) {}
+        MeltCurveData(int fluorescenceValue, double temperature, int wellId): fluorescenceValue(fluorescenceValue), temperature(temperature), wellId(wellId) {}
 
-        int data;
+        int fluorescenceValue;
         double temperature;
         int wellId;
     };

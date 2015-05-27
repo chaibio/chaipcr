@@ -3,6 +3,7 @@
 
 #include "icontrol.h"
 #include "experiment.h"
+#include "optics.h"
 
 #include <vector>
 #include <mutex>
@@ -36,6 +37,7 @@ public:
 
     void addTemperatureLog(const std::vector<TemperatureLog> &logs);
     void addFluorescenceData(const Experiment &experiment, const std::vector<int> &fluorescenceData, bool isRamp = false);
+    void addMeltCurveData(const Experiment &experiment, const std::vector<Optics::MeltCurveData> &meltCurveData);
 
     Settings* getSettings();
     void updateSettings(const Settings &settings);

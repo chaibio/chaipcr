@@ -56,7 +56,7 @@ void CSVControl::process()
                 if (fileStream.is_open())
                 {
                     for (const Optics::MeltCurveData &meltCurveData: data.second)
-                        fileStream << meltCurveData.wellId << ',' << meltCurveData.temperature << ',' << meltCurveData.data << '\n';
+                        fileStream << meltCurveData.wellId << ',' << meltCurveData.temperature << ',' << meltCurveData.fluorescenceValue << '\n';
                 }
             }
 
