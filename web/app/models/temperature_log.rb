@@ -12,7 +12,7 @@ class TemperatureLog < ActiveRecord::Base
     end
     CSV.generate do |csv|
       csv << columns
-      temperatures.select(columns).all.each do |item|
+      temperatures.select(columns).each do |item|
         csv << item.attributes.values_at(*column_names)
       end
     end

@@ -29,6 +29,7 @@
       <li><a href='#experiments-destroy'>destroy</a></li>
       <li><a href='#experiments-temperature_data'>temperature_data</a></li>
       <li><a href='#experiments-fluorescence_data'>fluorescence_data</a></li>
+      <li><a href='#experiments-export'>export</a></li>
   </ul>
   <h4><a href='#main'>Main</a></h4>
   <ul>
@@ -636,6 +637,34 @@
         
           <h2>Examples</h2>
             <pre>{&#39;fluorescence_datum&#39;:{&#39;fluorescence_value&#39;:75,&#39;well_num&#39;:1,&#39;cycle_num&#39;:1}, &#39;fluorescence_datum&#39;:{&#39;fluorescence_value&#39;:50,&#39;well_num&#39;:2,&#39;cycle_num&#39;:1}}</pre>
+
+
+      </div>
+      <hr>
+
+      <ul class='breadcrumb' id='experiments-export'>
+        <li>
+          <a href='#'>qPCR</a>
+          <span class='divider'>/</span>
+        </li>
+        <li>
+          <a href='#experiments'>Experiments</a>
+          <span class='divider'>/</span>
+        </li>
+        <li class='active'>export</li>
+      </ul>
+
+      <div>
+          <h3>
+            <a href='#experiments-export'>
+              GET /experiments/:id/export.zip
+            </a><br>
+            <small>zip temperature, fluorescence and meltcurv csv files</small>
+          </h3>
+      </div>
+
+      <div>
+        
 
 
       </div>

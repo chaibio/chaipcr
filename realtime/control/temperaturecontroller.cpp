@@ -90,18 +90,16 @@ void TemperatureController::computePid(double currentTemperature)
     if (_targetTemperature < _minTargetTemp)
         _targetTemperature = currentTemperature;
 
-    _pidMutex.lock();
-    {
-        if (_pidState)
-        {
-            double result = _pidController->compute(targetTemperature(), currentTemperature);
+    std::unique_lock<std::mutex> lock(_pidMutex);
 
-            if (_enableMode && result != _pidResult)
-            {
-                _pidResult = result;
-                setOutput(result);
-            }
+    if (_pidState)
+    {
+        double result = _pidController->compute(targetTemperature(), currentTemperature);
+
+        if (_enableMode && result != _pidResult)
+        {
+            _pidResult = result;
+            setOutput(result);
         }
     }
-    _pidMutex.unlock();
 }

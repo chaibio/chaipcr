@@ -64,15 +64,7 @@ describe "Experiments API" do
   
   it "list fluorescence data" do    
     experiment = Experiment.create(:name=>"test1")
-    FluorescenceDatum.create(:step_id=>1, :well_num=>0, :cycle_num=>1, :experiment_id=>experiment.id, :fluorescence_value=>50)
-    FluorescenceDatum.create(:step_id=>2, :well_num=>0, :cycle_num=>1, :experiment_id=>experiment.id, :fluorescence_value=>100)
-    FluorescenceDatum.create(:step_id=>1, :well_num=>1, :cycle_num=>2, :experiment_id=>experiment.id, :fluorescence_value=>10)
-    FluorescenceDatum.create(:step_id=>2, :well_num=>1, :cycle_num=>2, :experiment_id=>experiment.id, :fluorescence_value=>20)
-    FluorescenceDatum.create(:step_id=>1, :well_num=>1, :cycle_num=>1, :experiment_id=>experiment.id, :fluorescence_value=>30)
-    FluorescenceDatum.create(:step_id=>1, :well_num=>0, :cycle_num=>2, :experiment_id=>experiment.id, :fluorescence_value=>20)
-    FluorescenceDatum.create(:step_id=>2, :well_num=>0, :cycle_num=>2, :experiment_id=>experiment.id, :fluorescence_value=>40)
-    FluorescenceDatum.create(:step_id=>2, :well_num=>1, :cycle_num=>1, :experiment_id=>experiment.id, :fluorescence_value=>70)
-    
+    create_fluorescence_data(experiment)
     get "/experiments/#{experiment.id}/fluorescence_data", { :format => 'json' }
     expect(response).to be_success
     json = JSON.parse(response.body)
@@ -80,5 +72,12 @@ describe "Experiments API" do
     json[1]["fluorescence_datum"]["fluorescence_value"].should == 50
     json[2]["fluorescence_datum"]["fluorescence_value"].should == 30
     json[3]["fluorescence_datum"]["fluorescence_value"].should == 15
+  end
+  
+  it "export" do
+    experiment = Experiment.create(:name=>"test1")
+    create_fluorescence_data(experiment)
+    get "/experiments/#{experiment.id}/export.zip", { :format => 'zip' }
+    expect(response).to be_success
   end
 end
