@@ -9,7 +9,7 @@ class FluorescenceDatum < ActiveRecord::Base
       query.select("fluorescence_data.*, steps.name AS step_name, steps.order_number AS step_order_number, stages.name AS stage_name, stages.stage_type AS stage_type").each do |item|
         step = Step.new(:name=>item.step_name, :order_number=>item.step_order_number)
         stage = Stage.new(:name=>item.stage_name, :stage_type=>item.stage_type)
-        csv << [step.name, stage.name] + item.attributes.values_at(*columns)
+        csv << [(item.step_id.nil?)? "Ramp to #{step.name}" : step.name, stage.name] + item.attributes.values_at(*columns)
       end
     end
   end
