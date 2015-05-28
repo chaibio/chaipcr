@@ -244,6 +244,13 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     var step = this.model.get("step");
     step["delta_temperature"] = this.updatedDeltaTemp;
     this.model.set("step", step);
+  },
+
+  this.changeDeltaTime = function() {
+
+    var step = this.model.get("step");
+    step["delta_duration_s"] = this.deltaTime;
+    this.model.set("step", step);
   }
 
   return this;

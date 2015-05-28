@@ -165,6 +165,23 @@ ChaiBioTech.Models.Step = Backbone.Model.extend({
       .fail(function() {
         console.log("Failed to update");
       });
+  },
+
+  changeDeltaTime:function(deltaTime) {
+    var that = this;
+    var dataToBeSend = {'step': {'delta_duration_s': deltaTime}};
+    $.ajax({
+        url: "/steps/"+this.get("step").id,
+        contentType: 'application/json',
+        type: 'PUT',
+        data: JSON.stringify(dataToBeSend)
+      })
+      .done(function(data) {
+          console.log("Data updated from server woohaa" , data);
+      })
+      .fail(function() {
+        console.log("Failed to update");
+      });
   }
 
 });

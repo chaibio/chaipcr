@@ -70,8 +70,6 @@ ChaiBioTech.app.Views.bottomHoldDuration = Backbone.View.extend({
     } else {
       holdTime = parseInt(holdTime);
 
-      var duration = holdTime;
-
       this.currentStep.model.changeHoldDuration(holdTime);
       this.currentStep.holdDuration = holdTime;
 

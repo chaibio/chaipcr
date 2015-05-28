@@ -159,6 +159,10 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
     changedStep.changeDeltaTemp();
   });
 
+  this.canvas.on("deltaTimeChangedFromBottom", function(changedStep) {
+    changedStep.changeDeltaTime();
+  });
+
   /**************************************
        When a model in the server changed
        changes like add step/stage or delete step/stage.

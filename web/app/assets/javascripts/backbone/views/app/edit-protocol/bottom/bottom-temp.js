@@ -45,7 +45,7 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
 
     this.on("signChanged", function(data) {
       that.changeSignForValues();
-    })
+    });
   },
 
   startEdit: function() {
@@ -106,11 +106,11 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
   },
 
   changeSignForValues: function() {
-    console.log(this.currentTemp)
+
     this.currentTemp = this.currentTemp * -1;
     this.dataPart.html(this.currentTemp + "ºc");
     this.dataPartEdit.val(this.currentTemp);
-    console.log(this.currentTemp)
+
     this.currentStep.model.changeDeltaTemperature(this.currentTemp);
     // Now fire it back to canvas
     this.currentStep.updatedDeltaTemp = this.currentTemp;
