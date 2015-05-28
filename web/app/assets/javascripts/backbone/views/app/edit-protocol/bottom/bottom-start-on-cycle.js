@@ -4,7 +4,7 @@ ChaiBioTech.app.Views.bottomStartOnCycle = Backbone.View.extend({
 
   className: "bottom-common-item",
 
-  on: false,
+  onState: false,
 
   template: JST["backbone/templates/app/bottom-common-item"],
 
@@ -20,10 +20,10 @@ ChaiBioTech.app.Views.bottomStartOnCycle = Backbone.View.extend({
 
     this.options.editStepStageClass.on("delta_clicked", function(data) {
 
-      that.on = data.autoDelta;
+      that.onState = data.autoDelta;
       that.currentStep = data.currentStep;
 
-      if(that.on) {
+      if(that.onState) {
         $(that.el).removeClass("disabled");
         if(! data["systemGenerated"]) {
           that.changeStartOnCycle();
@@ -35,7 +35,7 @@ ChaiBioTech.app.Views.bottomStartOnCycle = Backbone.View.extend({
     });
 
     this.options.editStepStageClass.on("stepSelected", function(data) {
-      if(that.on) {
+      if(that.onState) {
         that.currentStep = data;
         that.changeStartOnCycle();
       }
@@ -44,7 +44,7 @@ ChaiBioTech.app.Views.bottomStartOnCycle = Backbone.View.extend({
 
   startEdit: function() {
 
-    if(this.on) {
+    if(this.onState) {
       this.dataPartEdit.show();
       this.dataPartEdit.focus();
     }

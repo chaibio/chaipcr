@@ -33,7 +33,7 @@ ChaiBioTech.app.Views.bottomTime = Backbone.View.extend({
       }
     });
 
-    this.options.editStepStageClass.on("stepSelected", function(data) {
+    this.listenTo(this.options.editStepStageClass, "stepSelected", function(data) {
       if(that.onState) {
         that.currentStep = data;
         that.changeTime();

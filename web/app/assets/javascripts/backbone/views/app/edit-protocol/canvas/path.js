@@ -6,7 +6,7 @@ ChaiBioTech.app.Views.fabricPath = function(model, parent, canvas) {
   this.parent = parent // parent is the circle
   this.canvas = canvas;
   this.controlDistance = ChaiBioTech.Constants.controlDistance;
-
+  console.log("I am here");
   var x1 = this.parent.circleGroup.left , y1 = this.parent.circleGroup.top,
   x2 = this.parent.next.circleGroup.left , y2 = this.parent.next.circleGroup.top;
 
