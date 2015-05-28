@@ -22,7 +22,8 @@ ChaiBioTech.app.Views.bottomTime = Backbone.View.extend({
     this.options.editStepStageClass.on("delta_clicked", function(data) {
 
       that.onState = data.autoDelta;
-
+      that.currentStep = data.currentStep;
+      
       if(that.onState) {
         $(that.el).removeClass("disabled");
         if(! data["systemGenerated"]) {
