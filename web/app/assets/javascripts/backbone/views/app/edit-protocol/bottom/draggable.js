@@ -11,13 +11,6 @@ ChaiBioTech.app.Views.draggable = Backbone.View.extend({
   initialize: function() {
 
     var that = this;
-
-    this.options.editStepStageClass.on("delta_clicked", function(data) {
-
-      that.onState = data.autoDelta;
-      that.onOffDrag(that.onState, that.options.element);
-    });
-
     // Here we are writing the behaviour of scroll
     this.drag = this.options.element.draggable({
       containment: "parent",
@@ -30,12 +23,14 @@ ChaiBioTech.app.Views.draggable = Backbone.View.extend({
       },
 
       stop: function() {
-        alert("coool")
+
         var pos = $(this).position().left;
         if(pos < 18) {
           $(this).css("left", "0px");
+          that.options.parent.trigger("signChanged", -1);
         } else {
           $(this).css("left", "36px");
+          that.options.parent.trigger("signChanged", 1)
         }
       },
 
@@ -43,6 +38,12 @@ ChaiBioTech.app.Views.draggable = Backbone.View.extend({
         var pos = $(this).position().left;
         that.changeColor(pos, this);
       }
+    });
+
+    this.options.editStepStageClass.on("delta_clicked", function(data) {
+
+      that.onState = data.autoDelta;
+      that.onOffDrag(that.onState, that.options.element);
     });
 
     this.on("positive", function() {
@@ -76,13 +77,20 @@ ChaiBioTech.app.Views.draggable = Backbone.View.extend({
   onOffDrag: function(status, elem) {
 
     if(status == false) {
-      $(this.drag).draggable("disable");
+
+      if(this.drag) {
+        $(this.drag).draggable("disable");
+      }
+
       $(elem).parent().css("background-color", "#cdcdcd");
       $(elem).find(".center-circle").css("background-color", "#cdcdcd");
       $(elem).parent().find(".sansa").css("color", "grey");
     } else {
 
-      $(this.drag).draggable("enable");
+      if(this.drag) {
+        $(this.drag).draggable("enable");
+      }
+
       if(this.setBlue) {
         $(elem).parent().css("background-color", "#00aeef");
         $(elem).find(".center-circle").css("background-color", "#00aeef");

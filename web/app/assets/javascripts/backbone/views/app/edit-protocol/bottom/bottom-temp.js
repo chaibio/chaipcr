@@ -6,7 +6,7 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
 
   template: JST["backbone/templates/app/bottom-common-item"],
 
-  on: false,
+  onState: false,
 
   capsuleTemplate: JST["backbone/templates/app/capsule"],
 
@@ -19,12 +19,13 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
   initialize: function() {
 
     var that = this;
+
     this.options.editStepStageClass.on("delta_clicked", function(data) {
 
-      that.on = data.autoDelta;
+      that.onState = data.autoDelta;
       that.currentStep = data.currentStep;
 
-      if(that.on) {
+      if(that.onState) {
         $(that.el).removeClass("disabled");
         if(! data["systemGenerated"]) {
           that.changeTemp();
@@ -36,17 +37,20 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
     });
 
     this.options.editStepStageClass.on("stepSelected", function(data) {
-      if(that.on) {
+      if(that.onState) {
         that.currentStep = data;
-        //that.currentTemp = data.model.get("step")["delta_temperature"];
         that.changeTemp();
       }
     });
+
+    this.on("signChanged", function(data) {
+      that.changeSignForValues();
+    })
   },
 
   startEdit: function() {
 
-    if(this.on) {
+    if(this.onState) {
       this.dataPartEdit.show();
       this.dataPartEdit.focus();
     }
@@ -60,7 +64,7 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
     }
   },
 
-  saveDataAndHide: function(e) {
+  saveDataAndHide: function() {
 
     var newTemp = this.dataPartEdit.val();
     this.dataPartEdit.hide();
@@ -98,6 +102,19 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
     } else {
       this.draggable.trigger("negative");
     }
+  },
+
+  changeSignForValues: function() {
+
+    this.currentTemp = this.currentTemp * -1;
+    this.dataPart.html(this.currentTemp + "ºc");
+    this.dataPartEdit.val(this.currentTemp);
+
+    this.currentStep.model.changeDeltaTemperature(this.currentTemp);
+    // Now fire it back to canvas
+    this.currentStep.updatedDeltaTemp = this.currentTemp;
+    this.changeSign(this.currentTemp);
+    ChaiBioTech.app.Views.mainCanvas.fire("deltaTemperatureChangedFromBottom", this.currentStep);
   },
 
   render: function() {
