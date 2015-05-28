@@ -114,6 +114,7 @@ class ExperimentsController < ApplicationController
     end
   end
   
+  api :GET, "/experiments/:id/export.zip", "zip temperature, fluorescence and meltcurv csv files"
   def export
     experiment = Experiment.find_by_id(params[:id])
     respond_to do |format|
@@ -121,10 +122,15 @@ class ExperimentsController < ApplicationController
         buffer = Zip::OutputStream.write_buffer do |out|
           out.put_next_entry("qpcr_experiment_#{(experiment)? experiment.name : "null"}/temperature_log.csv")
           out.write TemperatureLog.as_csv(params[:id])
+          out.put_next_entry("qpcr_experiment_#{(experiment)? experiment.name : "null"}/fluorescence.csv")
+          out.write FluorescenceDatum.as_csv(params[:id])
+          out.put_next_entry("qpcr_experiment_#{(experiment)? experiment.name : "null"}/melt_curve.csv")
+          out.write MeltCurveDatum.as_csv(params[:id])
         end
         buffer.rewind
         send_data buffer.sysread
       }
     end
   end
+    
 end

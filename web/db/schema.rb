@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150526060717) do
+ActiveRecord::Schema.define(version: 20150527061026) do
 
   create_table "experiments", force: true do |t|
     t.string   "name"
@@ -59,8 +59,11 @@ ActiveRecord::Schema.define(version: 20150526060717) do
   end
 
   create_table "settings", force: true do |t|
-    t.boolean "debug",     default: false
+    t.boolean "debug",         default: false
     t.string  "time_zone"
+    t.string  "wifi_ssid"
+    t.string  "wifi_password"
+    t.boolean "wifi_enabled",  default: true
   end
 
   create_table "stages", force: true do |t|
