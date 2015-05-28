@@ -77,6 +77,7 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
       alert("Please enter a valid value");
     } else {
       var newTemp = parseFloat(newTemp).toFixed(1);
+      this.currentTemp = newTemp;
       this.currentStep.model.changeDeltaTemperature(newTemp);
       this.dataPart.html(newTemp + "ºc");
       // Now fire it back to canvas
@@ -105,11 +106,11 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
   },
 
   changeSignForValues: function() {
-
+    console.log(this.currentTemp)
     this.currentTemp = this.currentTemp * -1;
     this.dataPart.html(this.currentTemp + "ºc");
     this.dataPartEdit.val(this.currentTemp);
-
+    console.log(this.currentTemp)
     this.currentStep.model.changeDeltaTemperature(this.currentTemp);
     // Now fire it back to canvas
     this.currentStep.updatedDeltaTemp = this.currentTemp;

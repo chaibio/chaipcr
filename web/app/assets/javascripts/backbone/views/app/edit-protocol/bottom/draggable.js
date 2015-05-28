@@ -78,8 +78,10 @@ ChaiBioTech.app.Views.draggable = Backbone.View.extend({
 
     if(status == false) {
 
-      if(this.drag) {
+      try {
         $(this.drag).draggable("disable");
+      } catch(err) {
+        console.log("Happens for the init")
       }
 
       $(elem).parent().css("background-color", "#cdcdcd");
@@ -87,8 +89,10 @@ ChaiBioTech.app.Views.draggable = Backbone.View.extend({
       $(elem).parent().find(".sansa").css("color", "grey");
     } else {
 
-      if(this.drag) {
+      try {
         $(this.drag).draggable("enable");
+      } catch(err) {
+        console.log("Happens for the init")
       }
 
       if(this.setBlue) {
