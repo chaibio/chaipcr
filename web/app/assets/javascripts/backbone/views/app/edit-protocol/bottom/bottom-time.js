@@ -98,7 +98,7 @@ ChaiBioTech.app.Views.bottomTime = Backbone.View.extend({
   },
 
   changeTime: function() {
-
+    console.log("time", this.currentStep);
     var deltaTime = this.currentStep.model.get("step")["delta_duration_s"];
 
     this.currentStep.deltaTime = deltaTime;

@@ -90,7 +90,7 @@ ChaiBioTech.app.Views.bottomStartOnCycle = Backbone.View.extend({
   },
 
   changeStartOnCycle: function() {
-
+      console.log("start On", this.currentStep)
       this.currentStartOnCycle = this.currentStep.parentStage.model.get("stage")["auto_delta_start_cycle"];
       this.dataPart.html(this.currentStartOnCycle);
       this.dataPartEdit.val(this.currentStartOnCycle);

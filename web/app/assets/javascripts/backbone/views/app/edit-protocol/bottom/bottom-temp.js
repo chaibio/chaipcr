@@ -89,6 +89,7 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
 
   changeTemp: function() {
 
+      console.log("temp", this.currentStep);
       this.currentTemp = this.currentStep.model.get("step")["delta_temperature"];
       this.dataPart.html(this.currentTemp + "ºc");
       this.dataPartEdit.val(this.currentTemp);
