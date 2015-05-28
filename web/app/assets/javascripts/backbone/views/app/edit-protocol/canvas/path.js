@@ -12,8 +12,8 @@ ChaiBioTech.app.Views.fabricPath = function(model, parent, canvas) {
 
   this.curve = new fabric.Path('m 0 50 Q 10, 50, 25, 25 Q 40, 0, 50, 0', {
     strokeWidth: 5,
-    fill: '#ffd100',
-    stroke: 'green',
+    fill: '',
+    stroke: '#ffd100',
     selectable: false,
     originX: "center",
     originY: "center"
