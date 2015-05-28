@@ -25,7 +25,9 @@ ChaiBioTech.app.Views.bottomStartOnCycle = Backbone.View.extend({
 
       if(that.on) {
         $(that.el).removeClass("disabled");
-        that.changeStartOnCycle();
+        if(! data["systemGenerated"]) {
+          that.changeStartOnCycle();
+        }
       } else {
         $(that.el).addClass("disabled");
       }
@@ -42,8 +44,10 @@ ChaiBioTech.app.Views.bottomStartOnCycle = Backbone.View.extend({
 
   startEdit: function() {
 
-    this.dataPartEdit.show();
-    this.dataPartEdit.focus();
+    if(this.on) {
+      this.dataPartEdit.show();
+      this.dataPartEdit.focus();
+    }
   },
 
   seeIfEnter: function(e) {

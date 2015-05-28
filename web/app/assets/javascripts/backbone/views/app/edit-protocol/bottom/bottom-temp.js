@@ -26,7 +26,9 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
 
       if(that.on) {
         $(that.el).removeClass("disabled");
-        that.changeTemp();
+        if(! data["systemGenerated"]) {
+          that.changeTemp();
+        }
       } else {
         $(that.el).addClass("disabled");
       }
@@ -44,8 +46,11 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
 
   startEdit: function() {
 
-    this.dataPartEdit.show();
-    this.dataPartEdit.focus();
+    if(this.on) {
+      this.dataPartEdit.show();
+      this.dataPartEdit.focus();
+    }
+
   },
 
   seeIfEnter: function(e) {
@@ -61,7 +66,7 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
     this.dataPartEdit.hide();
 
 
-    if(isNaN(newTemp) || !newTemp || newTemp < 1 || newTemp > 100) {
+    if(isNaN(newTemp) || !newTemp) {
       var tempVal = this.dataPart.html();
 
       this.dataPartEdit.val(parseFloat(tempVal.substr(0, tempVal.length - 1)));
@@ -72,13 +77,27 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
       this.dataPart.html(newTemp + "ºc");
       // Now fire it back to canvas
       this.currentStep.updatedDeltaTemp = newTemp;
+      this.changeSign(newTemp);
       ChaiBioTech.app.Views.mainCanvas.fire("deltaTemperatureChangedFromBottom", this.currentStep);
     }
   },
+
   changeTemp: function() {
+
       this.currentTemp = this.currentStep.model.get("step")["delta_temperature"];
-      this.dataPart.html(this.currentTemp);
+      this.dataPart.html(this.currentTemp + "ºc");
       this.dataPartEdit.val(this.currentTemp);
+
+      this.changeSign(this.currentTemp);
+  },
+
+  changeSign: function(val) {
+
+    if(parseFloat(val) > 0) {
+      this.draggable.trigger("positive");
+    } else {
+      this.draggable.trigger("negative");
+    }
   },
 
   render: function() {
@@ -95,7 +114,8 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
 
     this.draggable = new ChaiBioTech.app.Views.draggable({
       element: $(this.el).find(".ball-cover"),
-      editStepStageClass: this.options.editStepStageClass
+      editStepStageClass: this.options.editStepStageClass,
+      parent: this
     });
 
     this.dataPart =   $(this.el).find(".data-part-span");
