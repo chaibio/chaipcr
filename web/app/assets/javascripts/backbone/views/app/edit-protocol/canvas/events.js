@@ -111,9 +111,8 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
        or wait for images to complete
   ***************************************/
   this.canvas.on("imagesLoaded", function() {
-    C.addStages().setDefaultWidthHeight().addinvisibleFooterToStep();
-    C.addRampLinesAndCircles();
-    //C.selectStep();
+    C.addStages().setDefaultWidthHeight().addinvisibleFooterToStep().addRampLinesAndCircles();
+    C.selectStep();
     C.canvas.renderAll();
   });
 
@@ -203,6 +202,8 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
     ChaiBioTech.app.selectedStep = null;
     ChaiBioTech.app.selectedCircle = null;
     // Then we chain the actions so that it adds all the UI stuffs
-    C.addStages().setDefaultWidthHeight().addinvisibleFooterToStep();
+    C.addStages().setDefaultWidthHeight().addinvisibleFooterToStep().addRampLinesAndCircles();
+    C.selectStep();
+    C.canvas.renderAll();
   });
 };

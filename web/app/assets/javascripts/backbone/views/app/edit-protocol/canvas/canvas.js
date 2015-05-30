@@ -104,6 +104,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
   };
 
   this.loadImages = function() {
+
     console.log("Loading Images ....... !");
     var noOfImages = this.images.length - 1;
     var that = this;
@@ -146,11 +147,18 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
       this.allStepViews[count].whiteFooterImage.left = this.allStepViews[count].left;
       this.canvas.add(this.allStepViews[count].whiteFooterImage);
 
+      this.allStepViews[count].circle.gatherDataImage = $.extend({}, this.imageobjects["gather-data.png"]);
+      this.allStepViews[count].circle.gatherDataImage.originX = "center";
+      this.allStepViews[count].circle.gatherDataImage.originY = "center";
+
+      this.allStepViews[count].circle.gatherDataImageMiddle = $.extend({}, this.imageobjects["gather-data.png"]);
+      this.allStepViews[count].circle.gatherDataImageMiddle.originX = "center";
+      this.allStepViews[count].circle.gatherDataImageMiddle.originY = "center";
+      this.allStepViews[count].circle.gatherDataImageMiddle.setVisible(false);
+
     }
 
     return this;
-    // This calls to add images of gather data.
-    this.addGatherDataImage(this, "assets/gather-data.png", 0, limit)
   };
 
   this.applyPropertyToImages = function(imgObj, stepObj) {

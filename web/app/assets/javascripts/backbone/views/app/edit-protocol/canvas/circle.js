@@ -49,10 +49,10 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       this.curve = new ChaiBioTech.app.Views.fabricPath(model, this, this.canvas);
     }
 
-    /*this.canvas.add(this.stepDataGroup);
+    this.canvas.add(this.stepDataGroup);
     this.circleGroup.add(this.gatherDataImageMiddle);
 
-    /*this.gatherDataOnScroll = new ChaiBioTech.app.Views.gatherDataGroupOnScroll(
+    this.gatherDataOnScroll = new ChaiBioTech.app.Views.gatherDataGroupOnScroll(
       [
         this.gatherDataCircleOnScroll = new ChaiBioTech.app.Views.gatherDataCircleOnScroll(),
         this.gatherDataImageMiddle
@@ -71,7 +71,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     this.showHideGatherData(this.parent.gatherDataDuringStep);
     this.gatherDataGroup.visible = this.parent.gatherDataDuringRamp;
 
-    this.canvas.bringToFront(this.parent.rampSpeedGroup);*/
+    this.canvas.bringToFront(this.parent.rampSpeedGroup);
   };
 
   this.getUniqueId = function() {
