@@ -63,6 +63,14 @@ double HeatBlock::maxTargetTemperature() const {
 }
 
 void HeatBlock::setTargetTemperature(double targetTemperature, double rampRate) {
+    if (targetTemperature < minTargetTemperature() || targetTemperature > maxTargetTemperature())
+    {
+        std::stringstream string;
+        string << "HeatBlock::setTargetTemperature - target temperature should be in range from " << minTargetTemperature() << " to " << maxTargetTemperature();
+
+        throw std::out_of_range(string.str());
+    }
+
     if (rampRate <= 0 || rampRate > _maxRampSpeed)
         rampRate = _maxRampSpeed;
 
