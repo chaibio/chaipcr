@@ -50,16 +50,16 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     }
 
     this.canvas.add(this.stepDataGroup);
-    this.circleGroup.add(this.gatherDataImageMiddle);
 
     this.gatherDataOnScroll = new ChaiBioTech.app.Views.gatherDataGroupOnScroll(
       [
         this.gatherDataCircleOnScroll = new ChaiBioTech.app.Views.gatherDataCircleOnScroll(),
-        this.gatherDataImageMiddle
+        this.gatherDataImageOnMoving
       ], this);
 
+    this.circleGroup.add(this.gatherDataImageMiddle);
+    this.circleGroup.add(this.gatherDataOnScroll);
     this.canvas.add(this.circleGroup);
-    this.canvas.add(this.gatherDataOnScroll);
 
     this.gatherDataGroup = new ChaiBioTech.app.Views.gatherDataGroup(
       [
@@ -194,7 +194,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       this.manageRampLineMovement(left, this.scrollLength, targetCircleGroup);
     } else {
       this.stepDataGroup.setTop(top + 55);
-      this.gatherDataOnScroll.setTop(top - 26);
+      //this.gatherDataOnScroll.setTop(top - 26);
       this.manageRampLineMovement(left, top, targetCircleGroup);
     }
   };

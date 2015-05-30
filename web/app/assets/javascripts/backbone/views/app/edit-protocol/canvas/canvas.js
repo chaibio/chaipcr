@@ -151,6 +151,10 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
       this.allStepViews[count].circle.gatherDataImage.originX = "center";
       this.allStepViews[count].circle.gatherDataImage.originY = "center";
 
+      this.allStepViews[count].circle.gatherDataImageOnMoving = $.extend({}, this.imageobjects["gather-data.png"]);
+      this.allStepViews[count].circle.gatherDataImageOnMoving.originX = "center";
+      this.allStepViews[count].circle.gatherDataImageOnMoving.originY = "center";
+
       this.allStepViews[count].circle.gatherDataImageMiddle = $.extend({}, this.imageobjects["gather-data.png"]);
       this.allStepViews[count].circle.gatherDataImageMiddle.originX = "center";
       this.allStepViews[count].circle.gatherDataImageMiddle.originY = "center";
