@@ -194,7 +194,6 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       this.manageRampLineMovement(left, this.scrollLength, targetCircleGroup);
     } else {
       this.stepDataGroup.setTop(top + 55);
-      //this.gatherDataOnScroll.setTop(top - 26);
       this.manageRampLineMovement(left, top, targetCircleGroup);
     }
   };

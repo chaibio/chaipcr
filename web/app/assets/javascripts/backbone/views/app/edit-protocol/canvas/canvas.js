@@ -87,6 +87,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     this.canvas.add(stageView.borderRight);
     // We should put an infinity symbol if the last step has infinite hold time.
     stageView.findLastStep();
+    console.log("Stages added ... !")
     return this;
   };
 
@@ -176,42 +177,6 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
 
     return imgObj;
   },
-
-  this.addMoveImage = function() {
-
-    var src = "assets/move.png";
-    var that = this;
-
-    fabric.Image.fromURL(src, function(img) {
-      that.moveImage = img;
-      // As we have loaded all the Images Now we fire "imagesLoaded";
-      that.canvas.fire("imagesLoaded");
-    });
-  };
-
-  /*******************************************************/
-    /* This method adds all the Gather Data Images. Here too we
-      clone the image in the image load function callback.
-    */
-  /*******************************************************/
-  this.addGatherDataImage = function(that, url, count, limit) {
-
-      fabric.Image.fromURL(url, function(img) {
-        img.originX = "center";
-        img.originY = "center";
-        cloneImgObject = function(that, url, count) {
-          that.allStepViews[count].circle.gatherDataImage = $.extend({},img);
-          that.allStepViews[count].circle.gatherDataImageMiddle = $.extend({},img);
-          that.allStepViews[count].circle.gatherDataImageMiddle.setVisible(false);
-
-          if(++ count < limit) {
-            cloneImgObject(that, url, count);
-          }
-        }
-        cloneImgObject(that, url, 0);
-      });
-
-  };
 
   /*******************************************************/
     /* This method collects all the circles in each and every step,
