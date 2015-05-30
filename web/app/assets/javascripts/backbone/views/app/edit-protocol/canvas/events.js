@@ -111,8 +111,9 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
        or wait for images to complete
   ***************************************/
   this.canvas.on("imagesLoaded", function() {
+    C.addStages().setDefaultWidthHeight().addinvisibleFooterToStep();
     C.addRampLinesAndCircles();
-    C.selectStep();
+    //C.selectStep();
     C.canvas.renderAll();
   });
 

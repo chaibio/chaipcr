@@ -9,6 +9,14 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
   this.allStageViews = new Array();
   this.canvas = null;
   this.allCircles = null;
+  this.images = [
+    "common-step.png",
+    "black-footer.png",
+    "orange-footer.png",
+    "gather-data.png"
+  ];
+
+  this.imageobjects = {};
 
   this.canvas = ChaiBioTech.app.Views.mainCanvas = new fabric.Canvas('canvas', {
     backgroundColor: '#ffb400',
@@ -95,6 +103,25 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     }
   };
 
+  this.loadImages = function() {
+    console.log("Loading Images ....... !");
+    var noOfImages = this.images.length - 1;
+    var that = this;
+    loadImageRecursion = function(index) {
+      fabric.Image.fromURL("assets/" + that.images[index], function(img) {
+
+        that.imageobjects[that.images[index]] = $.extend(true, {}, img);
+        if(index < noOfImages) {
+          loadImageRecursion(++index);
+        } else {
+          console.log("All images loaded .... !", that.imageobjects);
+          that.canvas.fire("imagesLoaded");
+        }
+      });
+    }
+
+    loadImageRecursion(0);
+  };
   /*******************************************************/
     /* This method adds those footer images on the step. Its a tricky one beacuse images
        are taking longer time to load. So we load it once and clone it to all the steps.
@@ -105,55 +132,38 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
 
     var count = 0;
     var limit = this.allStepViews.length;
-    var imageSourceArray = [ // common, dark, white
-      "assets/common-step.png",
-      "assets/selected-step-01.png",
-      "assets/selected-step-02.png"
-     ];
-    var that = this;
 
-    mainWrapper = function(index, callback) {
+    for(var count = 0; count < limit; count ++) {
 
-      fabric.Image.fromURL(imageSourceArray[index], function(img) {
-        for(var count = 0; count < limit; count ++) {
+      this.allStepViews[count].commonFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["common-step.png"]), this.allStepViews[count]);
+      this.canvas.add(this.allStepViews[count].commonFooterImage);
 
-          var imaging = $.extend({}, img);
-          imaging.left = that.allStepViews[count].left - 1;
-          imaging.top = 383;
-          imaging.selectable = true;
-          imaging.hasControls = false;
-          imaging.lockMovementY = true;
-          imaging.visible = false;
+      this.allStepViews[count].darkFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["black-footer.png"]), this.allStepViews[count]);
+      this.canvas.add(this.allStepViews[count].darkFooterImage);
 
-          if(index === 0) {
-            that.allStepViews[count].commonFooterImage = imaging;
-            that.canvas.add(that.allStepViews[count].commonFooterImage);
-          } else if(index === 1) {
-            that.allStepViews[count].darkFooterImage = imaging;
-            that.canvas.add(that.allStepViews[count].darkFooterImage);
-          } else if(index === 2) {
-            imaging.top = 363;
-            imaging.left = that.allStepViews[count].left;
-            imaging.name = "moveStepImage";
-            imaging.moveStep = that.allStepViews[count];
-            that.allStepViews[count].whiteFooterImage = imaging;
-            that.canvas.add(that.allStepViews[count].whiteFooterImage);
-          }
-        }
+      this.allStepViews[count].whiteFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["orange-footer.png"]), this.allStepViews[count]);
+      this.allStepViews[count].whiteFooterImage.top = 363;
+      this.allStepViews[count].whiteFooterImage.left = this.allStepViews[count].left;
+      this.canvas.add(this.allStepViews[count].whiteFooterImage);
 
-        if(++ index < 3) {
-          mainWrapper(index);
-        } else {
-          // Calls the moveImage function which loads moveImage for stages and steps.
-          that.addMoveImage();
-        }
-      });
     }
+
+    return this;
     // This calls to add images of gather data.
     this.addGatherDataImage(this, "assets/gather-data.png", 0, limit)
-    mainWrapper(0);
-
   };
+
+  this.applyPropertyToImages = function(imgObj, stepObj) {
+
+    imgObj.left = stepObj.left - 1;
+    imgObj.top = 383;
+    imgObj.selectable = true;
+    imgObj.hasControls = false;
+    imgObj.lockMovementY = true;
+    imgObj.visible = false;
+
+    return imgObj;
+  },
 
   this.addMoveImage = function() {
 
