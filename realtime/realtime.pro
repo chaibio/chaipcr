@@ -128,7 +128,6 @@ HEADERS += \
     util/exceptionhandler.h \
     control/test/adccontrollermock.h \
     util/lockfreesignal.h \
-    db/csvcontrol.h \
     util/instance.h
 
 SOURCES += \
@@ -174,5 +173,4 @@ SOURCES += \
     server/settingshandler.cpp \
     util/adcpin.cpp \
     server/logdatahandler.cpp \
-    control/test/adccontrollermock.cpp \
-    db/csvcontrol.cpp
+    control/test/adccontrollermock.cpp
