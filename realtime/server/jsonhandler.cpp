@@ -8,6 +8,11 @@ using namespace Poco::Net;
 using namespace boost::property_tree;
 using namespace std;
 
+JSONHandler::JSONHandler()
+{
+    setStatus(HTTPResponse::HTTP_OK);
+}
+
 void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
     istream &requestStream = request.stream();
@@ -43,13 +48,15 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
 
     try
     {
+        response.setStatus(getStatus());
+
         if (!responsePt.empty())
         {
+            response.setContentType("text/html");
+
             ostream &responseStream = response.send();
             write_json(responseStream, responsePt);
             responseStream.flush();
-
-            response.setContentType("text/html");
         }
         else
             response.send().flush();
@@ -57,11 +64,7 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
     catch (exception &ex)
     {
         cout << "JSONHandler::handleRequest - Failed to write JSON: " << ex.what() << '\n';
-
-        setStatus(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
-
-    HTTPStatusHandler::handleRequest(request, response);
 }
 
 void JSONHandler::processData(const ptree &, ptree &responsePt)

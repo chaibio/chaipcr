@@ -107,7 +107,6 @@ HEADERS += \
     test/servertest.h \
     db/sociincludes.h \
     test/dbtest.h \
-    server/httpstatushandler.h \
     server/statushandler.h \
     control/adcconsumer.h \
     app/qpcrfactory.h \
@@ -128,7 +127,8 @@ HEADERS += \
     util/exceptionhandler.h \
     control/test/adccontrollermock.h \
     util/lockfreesignal.h \
-    util/instance.h
+    util/instance.h \
+    server/httpcodehandler.h
 
 SOURCES += \
     app/pins.cpp \
@@ -158,7 +158,6 @@ SOURCES += \
     test/servertest.cpp \
     db/dbcontrol.cpp \
     test/dbtest.cpp \
-    server/httpstatushandler.cpp \
     server/statushandler.cpp \
     app/qpcrfactory.cpp \
     server/controlhandler.cpp \
@@ -173,4 +172,5 @@ SOURCES += \
     server/settingshandler.cpp \
     util/adcpin.cpp \
     server/logdatahandler.cpp \
-    control/test/adccontrollermock.cpp
+    control/test/adccontrollermock.cpp \
+    server/httpcodehandler.cpp

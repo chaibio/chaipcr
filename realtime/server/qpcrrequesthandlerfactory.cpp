@@ -1,6 +1,7 @@
 #include <Poco/Net/HTTPServerRequest.h>
 #include <Poco/URI.h>
 
+#include "httpcodehandler.h"
 #include "testcontrolhandler.h"
 #include "statushandler.h"
 #include "controlhandler.h"
@@ -48,5 +49,5 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
         }
     }
 
-    return new HTTPStatusHandler(HTTPResponse::HTTP_NOT_FOUND);
+    return new HTTPCodeHandler(HTTPResponse::HTTP_NOT_FOUND);
 }
