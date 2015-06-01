@@ -17,7 +17,7 @@ Stage::Stage(const Stage &other)
     :Stage(other.id())
 {
     setName(other.name());
-    setNumCycles(other.numCycles());
+    setNumCycles(other.numCycles(), other.currentCycle());
     setOrderNumber(other.orderNumber());
     setType(other.type());
     setAutoDelta(other.autoDelta());
@@ -57,7 +57,7 @@ Stage& Stage::operator= (const Stage &other)
 {
     _id = other.id();
     setName(other.name());
-    setNumCycles(other.numCycles());
+    setNumCycles(other.numCycles(), other.currentCycle());
     setOrderNumber(other.orderNumber());
     setType(other.type());
     setAutoDelta(other.autoDelta());
@@ -92,10 +92,10 @@ Stage& Stage::operator= (Stage &&other)
     return *this;
 }
 
-void Stage::setNumCycles(int numCycles)
+void Stage::setNumCycles(unsigned numCycles, unsigned currentCycle)
 {
      _numCycles = numCycles;
-     _cycleIteration = 1;
+     _cycleIteration = currentCycle;
 }
 
 void Stage::setComponents(const std::vector<StageComponent> &components)

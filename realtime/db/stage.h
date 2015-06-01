@@ -34,9 +34,9 @@ public:
     inline void setName(std::string &&name) {_name = std::move(name);}
     inline const std::string& name() const {return _name;}
 
-    void setNumCycles(int numCycles);
-    inline int numCycles() const {return _numCycles;}
-    inline int currentCycle() const {return _cycleIteration;}
+    void setNumCycles(unsigned numCycles, unsigned currentCycle = 1);
+    inline unsigned numCycles() const {return _numCycles;}
+    inline unsigned currentCycle() const {return _cycleIteration;}
 
     inline void setOrderNumber(int orderNumber) {_orderNumber = orderNumber;}
     inline int orderNumber() const {return _orderNumber;}
@@ -47,8 +47,8 @@ public:
     inline void setAutoDelta(bool state) {_autoDelta = state;}
     inline bool autoDelta() const {return _autoDelta;}
 
-    inline void setAutoDeltaStartCycle(int cycle) {_autoDeltaStartCycle = cycle;}
-    inline int autoDeltaStartCycle() const {return _autoDeltaStartCycle;}
+    inline void setAutoDeltaStartCycle(unsigned cycle) {_autoDeltaStartCycle = cycle;}
+    inline unsigned autoDeltaStartCycle() const {return _autoDeltaStartCycle;}
 
     void setComponents(const std::vector<StageComponent> &components);
     void setComponents(std::vector<StageComponent> &&components);
@@ -66,14 +66,14 @@ private:
     int _id;
     std::string _name;
 
-    int _numCycles;
-    std::atomic<int> _cycleIteration;
+    unsigned _numCycles;
+    std::atomic<unsigned> _cycleIteration;
 
     int _orderNumber;
     Type _type;
 
     bool _autoDelta;
-    int _autoDeltaStartCycle;
+    unsigned _autoDeltaStartCycle;
 
     std::vector<StageComponent> _components;
     std::vector<StageComponent>::iterator _currentComponent;
