@@ -17,12 +17,15 @@ Stage::Stage(const Stage &other)
     :Stage(other.id())
 {
     setName(other.name());
-    setNumCycles(other.numCycles(), other.currentCycle());
+    setNumCycles(other.numCycles());
     setOrderNumber(other.orderNumber());
     setType(other.type());
     setAutoDelta(other.autoDelta());
     setAutoDeltaStartCycle(other.autoDeltaStartCycle());
     setComponents(other.components());
+
+    _cycleIteration = other.currentCycle();
+    _currentComponent = _components.begin() + std::distance(other._components.begin(), std::vector<StageComponent>::const_iterator(other._currentComponent));
 }
 
 Stage::Stage(Stage &&other)
@@ -57,12 +60,15 @@ Stage& Stage::operator= (const Stage &other)
 {
     _id = other.id();
     setName(other.name());
-    setNumCycles(other.numCycles(), other.currentCycle());
+    setNumCycles(other.numCycles());
     setOrderNumber(other.orderNumber());
     setType(other.type());
     setAutoDelta(other.autoDelta());
     setAutoDeltaStartCycle(other.autoDeltaStartCycle());
     setComponents(other.components());
+
+    _cycleIteration = other.currentCycle();
+    _currentComponent = _components.begin() + std::distance(other._components.begin(), std::vector<StageComponent>::const_iterator(other._currentComponent));
 
     return *this;
 }
@@ -92,10 +98,10 @@ Stage& Stage::operator= (Stage &&other)
     return *this;
 }
 
-void Stage::setNumCycles(unsigned numCycles, unsigned currentCycle)
+void Stage::setNumCycles(unsigned numCycles)
 {
      _numCycles = numCycles;
-     _cycleIteration = currentCycle;
+     _cycleIteration = 1;
 }
 
 void Stage::setComponents(const std::vector<StageComponent> &components)

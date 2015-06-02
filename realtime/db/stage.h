@@ -34,7 +34,7 @@ public:
     inline void setName(std::string &&name) {_name = std::move(name);}
     inline const std::string& name() const {return _name;}
 
-    void setNumCycles(unsigned numCycles, unsigned currentCycle = 1);
+    void setNumCycles(unsigned numCycles);
     inline unsigned numCycles() const {return _numCycles;}
     inline unsigned currentCycle() const {return _cycleIteration;}
 
