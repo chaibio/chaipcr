@@ -52,7 +52,7 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
 
         if (!responsePt.empty())
         {
-            response.setContentType("text/html");
+            response.setContentType("text/json");
 
             ostream &responseStream = response.send();
             write_json(responseStream, responsePt);
