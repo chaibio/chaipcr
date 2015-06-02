@@ -25,7 +25,7 @@ Stage::Stage(const Stage &other)
     setComponents(other.components());
 
     _cycleIteration = other.currentCycle();
-    _currentComponent = _components.begin() + std::distance(other._components.begin(), std::vector<StageComponent>::const_iterator(other._currentComponent));
+    _currentComponent = _components.begin() + std::distance(other.components().begin(), std::vector<StageComponent>::const_iterator(other._currentComponent));
 }
 
 Stage::Stage(Stage &&other)
@@ -68,7 +68,7 @@ Stage& Stage::operator= (const Stage &other)
     setComponents(other.components());
 
     _cycleIteration = other.currentCycle();
-    _currentComponent = _components.begin() + std::distance(other._components.begin(), std::vector<StageComponent>::const_iterator(other._currentComponent));
+    _currentComponent = _components.begin() + std::distance(other.components().begin(), std::vector<StageComponent>::const_iterator(other._currentComponent));
 
     return *this;
 }
