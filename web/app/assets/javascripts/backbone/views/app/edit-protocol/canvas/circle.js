@@ -88,7 +88,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     var holdTimeText = this.parent.holdDuration || this.model.get("step")["hold_time"];
 
     if(parseInt(holdTimeText) === 0) {
-      this.holdTime.text = "∞";
+      //this.holdTime.text = "∞";
     }
   };
 

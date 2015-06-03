@@ -97,10 +97,15 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
   this.addRampLinesAndCircles = function() {
     this.allCircles = null;
     this.allCircles = this.findAllCircles();
-    var i = 0, limit = this.allCircles.length;
+    /*var i = 0, limit = this.allCircles.length;
 
     for(i = 0; i < limit; i++) {
       this.allCircles[i].getLinesAndCircles();
+    }*/
+    var i = 0, limit = this.allStepViews.length;
+
+    for(i = 0; i < limit; i++) {
+      this.allStepViews[i].addPath();
     }
   };
 

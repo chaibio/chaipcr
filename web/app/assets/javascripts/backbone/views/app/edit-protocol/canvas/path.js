@@ -7,8 +7,8 @@ ChaiBioTech.app.Views.fabricPath = function(model, parent, canvas) {
   this.canvas = canvas;
   this.controlDistance = ChaiBioTech.Constants.controlDistance;
   console.log("Path created ... !");
-  var x1 = this.parent.circleGroup.left , y1 = this.parent.circleGroup.top,
-  x2 = this.parent.next.circleGroup.left , y2 = this.parent.next.circleGroup.top;
+  var x1 = this.parent.left , y1 = this.parent.top,
+  x2 = this.parent.next.left , y2 = this.parent.next.top;
 
   this.curve = new fabric.Path('m 0 50 Q 10, 50, 25, 25 Q 40, 0, 50, 0', {
     strokeWidth: 5,
