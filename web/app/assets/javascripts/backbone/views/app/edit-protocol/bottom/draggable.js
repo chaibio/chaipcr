@@ -8,11 +8,19 @@ ChaiBioTech.app.Views.draggable = Backbone.View.extend({
 
   setBlue: false,
 
-  initialize: function() {
+  template: JST["backbone/templates/app/capsule"],
 
+  className: "capsule",
+
+  events: {
+    "click .plus": "plusClicked"
+  },
+
+  initialize: function() {
+    //this.render();
     var that = this;
     // Here we are writing the behaviour of scroll
-    this.drag = this.options.element.draggable({
+    /*this.drag = this.options.element.draggable({
       containment: "parent",
       axis: "x",
       // If the user has not dragged the switch to the end..!
@@ -38,12 +46,12 @@ ChaiBioTech.app.Views.draggable = Backbone.View.extend({
         var pos = $(this).position().left;
         that.changeColor(pos, this);
       }
-    });
+    });*/
 
     this.options.editStepStageClass.on("delta_clicked", function(data) {
 
       that.onState = data.autoDelta;
-      that.onOffDrag(that.onState, that.options.element);
+      that.onOffDrag(that.onState, $(this).find(".ball-cover"));
     });
 
     this.on("positive", function() {
@@ -55,6 +63,10 @@ ChaiBioTech.app.Views.draggable = Backbone.View.extend({
       $(that.dragDude).css("left", "0px");
       this.changeColor(0, this.dragDude)
     });
+  },
+
+  plusClicked: function() {
+    console.log("plus")
   },
 
   changeColor: function(pos, elem) {
@@ -111,5 +123,43 @@ ChaiBioTech.app.Views.draggable = Backbone.View.extend({
       }
 
     }
+  },
+
+  render: function() {
+
+    $(this.el).html(this.template());
+
+    var that = this;
+    // Here we are writing the behaviour of scroll
+    this.drag = $(this.el).find(".ball-cover").draggable({
+      containment: "parent",
+      axis: "x",
+      // If the user has not dragged the switch to the end..!
+      // We auto adjust the position of the switch
+      create: function() {
+        //create a reference to dragable
+        that.dragDude = this;
+      },
+
+      stop: function() {
+        
+        var pos = $(this).position().left;
+        if(pos < 18) {
+          $(this).css("left", "0px");
+          that.options.parent.trigger("signChanged", -1);
+        } else {
+          $(this).css("left", "36px");
+          that.options.parent.trigger("signChanged", 1)
+        }
+      },
+
+      drag: function() {
+        var pos = $(this).position().left;
+        that.changeColor(pos, this);
+      }
+    });
+
+
+    return this;
   }
 });

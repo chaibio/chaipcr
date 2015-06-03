@@ -13,7 +13,8 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
   events: {
       "click .data-part": "startEdit",
       "blur .data-part-edit-value": "saveDataAndHide",
-      "keydown .data-part-edit-value": "seeIfEnter"
+      "keydown .data-part-edit-value": "seeIfEnter",
+      "click .plus": "plusClicked"
   },
 
   initialize: function() {
@@ -55,6 +56,10 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
       this.dataPartEdit.focus();
     }
 
+  },
+
+  plusClicked: function() {
+    console.log("Plus Clicked");
   },
 
   seeIfEnter: function(e) {
@@ -129,13 +134,16 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
     $(this.el).html(this.template(data));
     // Disabling for now
     $(this.el).addClass("disabled");
-    $(this.el).find(".caption-part").append(this.capsuleTemplate());
+    //$(this.el).find(".caption-part").append(this.capsuleTemplate());
 
     this.draggable = new ChaiBioTech.app.Views.draggable({
       element: $(this.el).find(".ball-cover"),
       editStepStageClass: this.options.editStepStageClass,
       parent: this
     });
+
+    $(this.el).find(".caption-part").append(this.draggable.render().el);
+
 
     this.dataPart =   $(this.el).find(".data-part-span");
     this.dataPartEdit = $(this.el).find(".data-part-edit-value");
