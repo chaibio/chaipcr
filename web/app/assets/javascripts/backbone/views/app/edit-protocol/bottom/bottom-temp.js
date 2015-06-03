@@ -14,7 +14,6 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
       "click .data-part": "startEdit",
       "blur .data-part-edit-value": "saveDataAndHide",
       "keydown .data-part-edit-value": "seeIfEnter",
-      "click .plus": "plusClicked"
   },
 
   initialize: function() {
@@ -56,10 +55,6 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
       this.dataPartEdit.focus();
     }
 
-  },
-
-  plusClicked: function() {
-    console.log("Plus Clicked");
   },
 
   seeIfEnter: function(e) {

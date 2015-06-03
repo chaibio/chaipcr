@@ -102,6 +102,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
 
     for(i = 0; i < limit; i++) {
       this.allStepViews[i].addPath();
+      alert("try 0");
     }
 
     console.log("All paths are drawn ....!!");
