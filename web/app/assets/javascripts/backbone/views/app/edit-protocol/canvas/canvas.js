@@ -103,13 +103,14 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     for(i = 0; i < limit; i++) {
       this.allStepViews[i].addPath();
     }
-    console.log("All paths are drawn ....!!")
 
-    var i = 0, limit = this.allCircles.length;
+    console.log("All paths are drawn ....!!");
 
     for(i = 0; i < limit; i++) {
       this.allCircles[i].getCircles();
     }
+
+    console.log("All circles are drawn ....!!");
   };
 
   this.loadImages = function() {
