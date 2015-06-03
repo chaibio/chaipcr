@@ -38,7 +38,7 @@ ChaiBioTech.app.Views.fabricPath = function(model, parent, canvas) {
   this.curve.path[2][3] = x2;
   this.curve.path[2][4] = y2;
 
-  this.canvas.add(this.curve);
+  //this.canvas.add(this.curve);
   // We have nothing else to return , No member functions;
   return this.curve;
 }
