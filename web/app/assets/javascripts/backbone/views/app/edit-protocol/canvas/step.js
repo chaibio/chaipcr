@@ -83,7 +83,13 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
   this.addCircle = function() {
 
     this.circle = new ChaiBioTech.app.Views.fabricCircle(this.model, this);
-    this.circle.render();
+    this.circle.getLeft().getTop().getUniqueId();
+  };
+
+  this.addPath = function() {
+    if(this.circle.next) {
+      this.circle.curve = new ChaiBioTech.app.Views.fabricPath(this.model, this.circle, this.canvas);
+    }
   };
 
   this.getUniqueName = function() {
