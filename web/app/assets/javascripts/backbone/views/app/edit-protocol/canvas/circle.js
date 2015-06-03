@@ -43,12 +43,12 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     This method shows circles and gather data. Pease note
     this method is invoked from canvas.js once all the stage/step are loaded.
   ********************************************/
-  this.getLinesAndCircles = function() {
+  this.getCircles = function() {
 
-    if(this.next) {
+    /*if(this.next) {
       this.curve = new ChaiBioTech.app.Views.fabricPath(model, this, this.canvas);
-    }
-
+    }*/
+    this.render();
     this.canvas.add(this.stepDataGroup);
 
     this.gatherDataOnScroll = new ChaiBioTech.app.Views.gatherDataGroupOnScroll(
@@ -110,7 +110,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
 
   this.render = function() {
 
-    this.getLeft().getTop().getUniqueId();
+    //this.getLeft().getTop().getUniqueId();
 
     this.circleGroup = new ChaiBioTech.app.Views.circleGroup(
       [

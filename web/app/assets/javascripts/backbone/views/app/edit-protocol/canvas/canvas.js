@@ -95,17 +95,20 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     /* This method adds ramp lines and circles. look at findAllCircles() method */
   /*******************************************************/
   this.addRampLinesAndCircles = function() {
+
     this.allCircles = null;
     this.allCircles = this.findAllCircles();
-    /*var i = 0, limit = this.allCircles.length;
-
-    for(i = 0; i < limit; i++) {
-      this.allCircles[i].getLinesAndCircles();
-    }*/
     var i = 0, limit = this.allStepViews.length;
 
     for(i = 0; i < limit; i++) {
       this.allStepViews[i].addPath();
+    }
+    console.log("All paths are drawn ....!!")
+
+    var i = 0, limit = this.allCircles.length;
+
+    for(i = 0; i < limit; i++) {
+      this.allCircles[i].getCircles();
     }
   };
 
