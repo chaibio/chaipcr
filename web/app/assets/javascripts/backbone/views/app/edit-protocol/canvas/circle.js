@@ -43,12 +43,8 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     This method shows circles and gather data. Pease note
     this method is invoked from canvas.js once all the stage/step are loaded.
   ********************************************/
-  this.getCircles = function() {
+  this.getCircle = function() {
 
-    /*if(this.next) {
-      this.curve = new ChaiBioTech.app.Views.fabricPath(model, this, this.canvas);
-    }*/
-    this.render();
     this.canvas.add(this.stepDataGroup);
 
     this.gatherDataOnScroll = new ChaiBioTech.app.Views.gatherDataGroupOnScroll(
@@ -71,7 +67,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     this.showHideGatherData(this.parent.gatherDataDuringStep);
     this.gatherDataGroup.visible = this.parent.gatherDataDuringRamp;
 
-    this.canvas.bringToFront(this.parent.rampSpeedGroup);
+    
   };
 
   this.getUniqueId = function() {
@@ -88,7 +84,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     var holdTimeText = this.parent.holdDuration || this.model.get("step")["hold_time"];
 
     if(parseInt(holdTimeText) === 0) {
-      //this.holdTime.text = "∞";
+      this.holdTime.text = "∞";
     }
   };
 
@@ -193,7 +189,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       targetCircleGroup.setTop(this.scrollLength);
       this.manageRampLineMovement(left, this.scrollLength, targetCircleGroup);
     } else {
-      this.stepDataGroup.setTop(top + 55);
+      this.stepDataGroup.setTop(top + 58);
       this.manageRampLineMovement(left, top, targetCircleGroup);
     }
   };

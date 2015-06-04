@@ -98,35 +98,21 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
 
     this.allCircles = null;
     this.allCircles = this.findAllCircles();
-    var i = 0, limit = this.allStepViews.length;
-
-    for(i = 0; i < limit - 1; i++) {
-
-      var x1 = this.allStepViews[i].circle.left + 60, y1 = this.allStepViews[i].circle.top,
-      x2 = this.allStepViews[i].circle.next.left + 60, y2 = this.allStepViews[i].circle.next.top;
-      var midPointX = (x1 + x2) / 2,
-      midPointY = (y1 + y2) / 2;
-      this.controlDistance = ChaiBioTech.Constants.controlDistance;
-
-      var pathText = 'm '+ x1 +' ' + y1 +' Q '+ (x1 + this.controlDistance) +', '+ y1 +', ' + midPointX +', '+ midPointY +' Q '+ (x2 - this.controlDistance) +', '+ y2 +', '+ x2 +', '+ y2 +'';
-
-      this.allStepViews[i].circle.curve = new fabric.Path(pathText, {
-        strokeWidth: 5,
-        fill: '',
-        stroke: '#ffd100',
-        selectable: false,
-        originX: "center",
-        originY: "center"
-      });
-
-      this.canvas.add(this.allStepViews[i].circle.curve);
-      console.log("Path created ... !");
-    }
-
-    console.log("All paths are drawn ....!!");
+    var limit = this.allCircles.length;
 
     for(i = 0; i < limit; i++) {
-      this.allCircles[i].getCircles();
+      var thisCircle = this.allCircles[i];
+
+      if(i < (limit - 1)) {
+        thisCircle.curve = new ChaiBioTech.app.Views.fabricPath(thisCircle);
+        this.canvas.add(thisCircle.curve);
+        //this.canvas.bringToFront(thisCircle.parent.rampSpeedGroup);
+        if(thisCircle.previous) {
+          this.canvas.bringToFront(thisCircle.previous.parent.rampSpeedGroup);
+        }
+      }
+
+      thisCircle.getCircle();
     }
 
     console.log("All circles are drawn ....!!");
