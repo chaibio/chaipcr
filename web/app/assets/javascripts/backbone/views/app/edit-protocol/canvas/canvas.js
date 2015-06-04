@@ -9,6 +9,14 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
   this.allStageViews = new Array();
   this.canvas = null;
   this.allCircles = null;
+  this.images = [
+    "common-step.png",
+    "black-footer.png",
+    "orange-footer.png",
+    "gather-data.png"
+  ];
+
+  this.imageobjects = {};
 
   this.canvas = ChaiBioTech.app.Views.mainCanvas = new fabric.Canvas('canvas', {
     backgroundColor: '#ffb400',
@@ -79,6 +87,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     this.canvas.add(stageView.borderRight);
     // We should put an infinity symbol if the last step has infinite hold time.
     stageView.findLastStep();
+    console.log("Stages added ... !")
     return this;
   };
 
@@ -86,15 +95,49 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     /* This method adds ramp lines and circles. look at findAllCircles() method */
   /*******************************************************/
   this.addRampLinesAndCircles = function() {
+
     this.allCircles = null;
     this.allCircles = this.findAllCircles();
-    var i = 0, limit = this.allCircles.length;
+    var limit = this.allCircles.length;
 
     for(i = 0; i < limit; i++) {
-      this.allCircles[i].getLinesAndCircles();
+      var thisCircle = this.allCircles[i];
+
+      if(i < (limit - 1)) {
+        thisCircle.curve = new ChaiBioTech.app.Views.fabricPath(thisCircle);
+        this.canvas.add(thisCircle.curve);
+        //this.canvas.bringToFront(thisCircle.parent.rampSpeedGroup);
+        if(thisCircle.previous) {
+          this.canvas.bringToFront(thisCircle.previous.parent.rampSpeedGroup);
+        }
+      }
+
+      thisCircle.getCircle();
     }
+
+    console.log("All circles are drawn ....!!");
   };
 
+  this.loadImages = function() {
+
+    console.log("Loading Images ....... !");
+    var noOfImages = this.images.length - 1;
+    var that = this;
+    loadImageRecursion = function(index) {
+      fabric.Image.fromURL("assets/" + that.images[index], function(img) {
+
+        that.imageobjects[that.images[index]] = $.extend(true, {}, img);
+        if(index < noOfImages) {
+          loadImageRecursion(++index);
+        } else {
+          console.log("All images loaded .... !", that.imageobjects);
+          that.canvas.fire("imagesLoaded");
+        }
+      });
+    }
+
+    loadImageRecursion(0);
+  };
   /*******************************************************/
     /* This method adds those footer images on the step. Its a tricky one beacuse images
        are taking longer time to load. So we load it once and clone it to all the steps.
@@ -105,86 +148,49 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
 
     var count = 0;
     var limit = this.allStepViews.length;
-    var imageSourceArray = [ // common, dark, white
-      "assets/common-step.png",
-      "assets/selected-step-01.png",
-      "assets/selected-step-02.png"
-     ];
-    var that = this;
 
-    mainWrapper = function(index, callback) {
+    for(var count = 0; count < limit; count ++) {
 
-      fabric.Image.fromURL(imageSourceArray[index], function(img) {
-        for(var count = 0; count < limit; count ++) {
+      this.allStepViews[count].commonFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["common-step.png"]), this.allStepViews[count]);
+      this.canvas.add(this.allStepViews[count].commonFooterImage);
 
-          var imaging = $.extend({}, img);
-          imaging.left = that.allStepViews[count].left - 1;
-          imaging.top = 383;
-          imaging.selectable = imaging.visible = false;
+      this.allStepViews[count].darkFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["black-footer.png"]), this.allStepViews[count]);
+      this.canvas.add(this.allStepViews[count].darkFooterImage);
 
-          if(index === 0) {
-            that.allStepViews[count].commonFooterImage = imaging;
-            that.canvas.add(that.allStepViews[count].commonFooterImage);
-          } else if(index === 1) {
-            that.allStepViews[count].darkFooterImage = imaging;
-            that.canvas.add(that.allStepViews[count].darkFooterImage);
-          } else if(index === 2) {
-            imaging.top = 363;
-            imaging.left = that.allStepViews[count].left;
-            that.allStepViews[count].whiteFooterImage = imaging;
-            that.canvas.add(that.allStepViews[count].whiteFooterImage);
-          }
-        }
+      this.allStepViews[count].whiteFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["orange-footer.png"]), this.allStepViews[count]);
+      this.allStepViews[count].whiteFooterImage.top = 363;
+      this.allStepViews[count].whiteFooterImage.left = this.allStepViews[count].left;
+      this.canvas.add(this.allStepViews[count].whiteFooterImage);
 
-        if(++ index < 3) {
-          mainWrapper(index);
-        } else {
-          // Calls the moveImage function which loads moveImage for stages and steps.
-          that.addMoveImage();
-        }
-      });
+      this.allStepViews[count].circle.gatherDataImage = $.extend({}, this.imageobjects["gather-data.png"]);
+      this.allStepViews[count].circle.gatherDataImage.originX = "center";
+      this.allStepViews[count].circle.gatherDataImage.originY = "center";
+
+      this.allStepViews[count].circle.gatherDataImageOnMoving = $.extend({}, this.imageobjects["gather-data.png"]);
+      this.allStepViews[count].circle.gatherDataImageOnMoving.originX = "center";
+      this.allStepViews[count].circle.gatherDataImageOnMoving.originY = "center";
+
+      this.allStepViews[count].circle.gatherDataImageMiddle = $.extend({}, this.imageobjects["gather-data.png"]);
+      this.allStepViews[count].circle.gatherDataImageMiddle.originX = "center";
+      this.allStepViews[count].circle.gatherDataImageMiddle.originY = "center";
+      this.allStepViews[count].circle.gatherDataImageMiddle.setVisible(false);
+
     }
-    // This calls to add images of gather data.
-    this.addGatherDataImage(this, "assets/gather-data.png", 0, limit)
-    mainWrapper(0);
 
+    return this;
   };
 
-  this.addMoveImage = function() {
+  this.applyPropertyToImages = function(imgObj, stepObj) {
 
-    var src = "assets/move.png";
-    var that = this;
+    imgObj.left = stepObj.left - 1;
+    imgObj.top = 383;
+    imgObj.selectable = true;
+    imgObj.hasControls = false;
+    imgObj.lockMovementY = true;
+    imgObj.visible = false;
 
-    fabric.Image.fromURL(src, function(img) {
-      that.moveImage = img;
-      // As we have loaded all the Images Now we fire "imagesLoaded";
-      that.canvas.fire("imagesLoaded");
-    });
-  };
-
-  /*******************************************************/
-    /* This method adds all the Gather Data Images. Here too we
-      clone the image in the image load function callback.
-    */
-  /*******************************************************/
-  this.addGatherDataImage = function(that, url, count, limit) {
-
-      fabric.Image.fromURL(url, function(img) {
-        img.originX = "center";
-        img.originY = "center";
-        cloneImgObject = function(that, url, count) {
-          that.allStepViews[count].circle.gatherDataImage = $.extend({},img);
-          that.allStepViews[count].circle.gatherDataImageMiddle = $.extend({},img);
-          that.allStepViews[count].circle.gatherDataImageMiddle.setVisible(false);
-
-          if(++ count < limit) {
-            cloneImgObject(that, url, count);
-          }
-        }
-        cloneImgObject(that, url, 0);
-      });
-
-  };
+    return imgObj;
+  },
 
   /*******************************************************/
     /* This method collects all the circles in each and every step,

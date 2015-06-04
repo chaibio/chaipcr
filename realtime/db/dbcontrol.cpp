@@ -2,13 +2,14 @@
 #include "sociincludes.h"
 #include "qpcrapplication.h"
 
-#define DATABASE_FILE "/root/chaipcr/web/db/development.sqlite3"
+//#define DATABASE_FILE "/root/chaipcr/web/db/development.sqlite3"
+#define DATABASE_ADDRESS "host=localhost db=chaipcr user=root"
 #define DATABASE_LOCKED_TRY_COUNT 3
 #define ROUND(x) ((int)(x * 100.0 + 0.5) / 100.0)
 
 DBControl::DBControl()
 {
-    sqlite_api::sqlite3_enable_shared_cache(1);
+    /*sqlite_api::sqlite3_enable_shared_cache(1);
 
     _readSession = new soci::session(soci::sqlite3, DATABASE_FILE);
     _writeSession = new soci::session(soci::sqlite3, DATABASE_FILE);
@@ -16,7 +17,10 @@ DBControl::DBControl()
     *_readSession << "PRAGMA temp_store = MEMORY";
     *_readSession << "PRAGMA synchronous = NORMAL";
     *_writeSession << "PRAGMA temp_store = MEMORY";
-    *_writeSession << "PRAGMA synchronous = NORMAL";
+    *_writeSession << "PRAGMA synchronous = NORMAL";*/
+
+    _readSession = new soci::session(soci::mysql, DATABASE_ADDRESS);
+    _writeSession = new soci::session(soci::mysql, DATABASE_ADDRESS);
 
     start();
 }
@@ -350,6 +354,23 @@ void DBControl::addFluorescenceData(const Experiment &experiment, const std::vec
     addWriteQueries(queries);
 }
 
+void DBControl::addMeltCurveData(const Experiment &experiment, const std::vector<Optics::MeltCurveData> &meltCurveData)
+{
+    std::vector<std::string> queries;
+    std::stringstream stream;
+
+    for (const Optics::MeltCurveData &data: meltCurveData)
+    {
+        stream << "INSERT INTO melt_curve_data(stage_id, well_num, temperature, fluorescence_value) VALUES(" <<
+                  experiment.protocol()->currentStage()->id() << ", " << data.wellId << ", " << data.temperature << ", " << data.fluorescenceValue << ")";
+
+        queries.emplace_back(std::move(stream.str()));
+        stream.str("");
+    }
+
+    addWriteQueries(queries);
+}
+
 Settings* DBControl::getSettings()
 {
     soci::row result;
@@ -406,7 +427,7 @@ void DBControl::write(std::vector<soci::statement> &statements)
     if (!statements.empty())
     {
         bool success = false;
-        int tryCount = 0;
+        //int tryCount = 0;
 
         while (!success)
         {
@@ -423,7 +444,7 @@ void DBControl::write(std::vector<soci::statement> &statements)
             }
             catch (const soci::soci_error&)
             {
-                int error = sqlite_api::sqlite3_errcode(static_cast<soci::sqlite3_session_backend*>(_writeSession->get_backend())->conn_);
+                /*int error = sqlite_api::sqlite3_errcode(static_cast<soci::sqlite3_session_backend*>(_writeSession->get_backend())->conn_);
 
                 if (error == SQLITE_BUSY || error == SQLITE_LOCKED)
                 {
@@ -433,7 +454,9 @@ void DBControl::write(std::vector<soci::statement> &statements)
                         throw;
                 }
                 else
-                    throw;
+                    throw;*/
+
+                throw;
             }
         }
     }

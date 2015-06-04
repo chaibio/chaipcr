@@ -37,7 +37,24 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
 
   autoDelta: function() {
 
-    console.log("Coming Soon .. !");
+    var stageModel = this.currentStep.parentStage.model.get("stage");
+
+    if(stageModel["stage_type"] == "cycling") {
+      this.autoDelta = ! this.autoDelta;
+      var data = {
+        "autoDelta": this.autoDelta,
+        "currentStep": this.currentStep,
+        "systemGenerated": false,
+      }
+      this.options.editStepStageClass.trigger("delta_clicked", data);
+      console.log("Under Construction .. !");
+      // here send data to server or trigger it back to canvas using
+      ChaiBioTech.app.Views.mainCanvas.fire("deltaChanged", this.currentStep.parentStage);
+      this.fixDeltaButton(data);
+    } else {
+      alert("Please select a Cycling Stage");
+    }
+
   },
 
   showStepNameEdit: function() {
@@ -190,10 +207,41 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
     this.numOfCyclesEdit.val(step.parentStage.updatedNoOfCycle || step.parentStage.model.get("stage").num_cycles);
     this.manageTikImage();
     this.fixGatherDataButtonStatus(step);
+
+    // Here we change the status of auto delta button ...!!
+    //console.log(step.parentStage.model.get("stage"));
+    var stageModel = step.parentStage.model.get("stage");
+    this.autoDelta = stageModel["auto_delta"];
+
+
+    var data = {
+      "autoDelta": this.autoDelta,
+      "currentStep": this.currentStep,
+      "systemGenerated": true,
+    }
+    this.options.editStepStageClass.trigger("delta_clicked", data);
+
+    this.fixDeltaButton(data);
+
+  },
+
+  fixDeltaButton: function(data) {
+
+    if(data["autoDelta"]) {
+      this.deltaImage.show();
+      this.deltaButton.css("background-color", "black");
+      this.deltaButton.css("color", "white");
+      this.deltaButtonText.html("AUTODELTA ON");
+    } else {
+      this.deltaImage.hide();
+      this.deltaButton.css("background-color", "white");
+      this.deltaButton.css("color", "black");
+      this.deltaButtonText.html("AUTODELTA OFF");
+    }
   },
 
   render: function() {
-    
+
     $(this.el).html(this.template());
     this.StepNo = $(this.el).find(".bottom-step-no");
     this.noOfStages = $(this.el).find(".bottom-no-of-stages");
@@ -204,9 +252,15 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
     this.popUp = $(this.el).find('.lol-pop');
     this.tikImageDuringStep = $(this.el).find('.tik-image-during-step');
     this.tikImageDuringRamp = $(this.el).find('.tik-image-during-ramp');
+
+    this.deltaButton = $(this.el).find("#delta-button");
+    this.deltaImage = $(this.el).find(".delta-button-image");
+    this.deltaButtonText = $(this.el).find(".delta-button-text");
+
     this.gatherDataButton = $(this.el).find('#gather-data-button');
     this.gatherDataButtonImage = $(this.el).find('.gather-data-button-image');
     this.gatherDataButtonText = $(this.el).find('.gather-data-button-text');
+
     this.editStepName = $(this.el).find('.edit-step-name');
     this.cycleConatainer = $(this.el).find(".bottom-step-no-cycle-container");
     return this;

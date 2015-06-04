@@ -43,23 +43,19 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     This method shows circles and gather data. Pease note
     this method is invoked from canvas.js once all the stage/step are loaded.
   ********************************************/
-  this.getLinesAndCircles = function() {
-
-    if(this.next) {
-      this.curve = new ChaiBioTech.app.Views.fabricPath(model, this, this.canvas);
-    }
+  this.getCircle = function() {
 
     this.canvas.add(this.stepDataGroup);
-    this.circleGroup.add(this.gatherDataImageMiddle);
 
     this.gatherDataOnScroll = new ChaiBioTech.app.Views.gatherDataGroupOnScroll(
       [
         this.gatherDataCircleOnScroll = new ChaiBioTech.app.Views.gatherDataCircleOnScroll(),
-        this.gatherDataImageMiddle
+        this.gatherDataImageOnMoving
       ], this);
 
+    this.circleGroup.add(this.gatherDataImageMiddle);
+    this.circleGroup.add(this.gatherDataOnScroll);
     this.canvas.add(this.circleGroup);
-    this.canvas.add(this.gatherDataOnScroll);
 
     this.gatherDataGroup = new ChaiBioTech.app.Views.gatherDataGroup(
       [
@@ -71,7 +67,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
     this.showHideGatherData(this.parent.gatherDataDuringStep);
     this.gatherDataGroup.visible = this.parent.gatherDataDuringRamp;
 
-    this.canvas.bringToFront(this.parent.rampSpeedGroup);
+    
   };
 
   this.getUniqueId = function() {
@@ -110,7 +106,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
 
   this.render = function() {
 
-    this.getLeft().getTop().getUniqueId();
+    //this.getLeft().getTop().getUniqueId();
 
     this.circleGroup = new ChaiBioTech.app.Views.circleGroup(
       [
@@ -193,8 +189,7 @@ ChaiBioTech.app.Views.fabricCircle = function(model, parentStep) {
       targetCircleGroup.setTop(this.scrollLength);
       this.manageRampLineMovement(left, this.scrollLength, targetCircleGroup);
     } else {
-      this.stepDataGroup.setTop(top + 55);
-      this.gatherDataOnScroll.setTop(top - 26);
+      this.stepDataGroup.setTop(top + 58);
       this.manageRampLineMovement(left, top, targetCircleGroup);
     }
   };

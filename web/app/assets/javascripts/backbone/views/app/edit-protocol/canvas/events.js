@@ -17,6 +17,7 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
   ***************************************/
   this.canvas.on("mouse:down", function(evt) {
     if(evt.target) {
+
       switch(evt.target.name)  {
 
       case "stepGroup":
@@ -31,6 +32,27 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
         appRouter.editStageStep.trigger("stepSelected", me.parent);
       break;
 
+      case "moveStepImage":
+        var moveStep = evt.target.moveStep;
+        moveStep.stepRect.setFill("yellow");
+        C.canvas.setActiveGroup(moveStep.stepGroup);
+      break;
+
+      }
+    }
+  });
+
+  this.canvas.on("mouse:up", function(evt) {
+    if(evt.target) {
+      switch(evt.target.name)  {
+
+      case "moveStepImage":
+          var moveStep = evt.target.moveStep;
+          //C.canvas.bringToFront(moveStep.stepGroup);
+          //moveStep.stepRect.setFill("red");
+          //C.canvas.setActiveGroup(moveStep.stepGroup);
+          //C.canvas.renderAll();
+        break;
       }
     }
   });
@@ -40,6 +62,7 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
       here too we look for the target in the event and do the action.
   ***************************************/
   this.canvas.on('object:moving', function(evt) {
+
     if(evt.target) {
       switch(evt.target.name) {
         case "controlCircleGroup":
@@ -47,6 +70,11 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
           me = evt.target.me;
           me.manageDrag(targetCircleGroup);
           appRouter.editStageStep.trigger("stepDrag", me);
+        break;
+
+        case "moveStepImage":
+          var moveStep = evt.target.moveStep;
+          //moveStep.stepGroup.setLeft(evt.target.left);
         break;
       }
     }
@@ -83,7 +111,7 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
        or wait for images to complete
   ***************************************/
   this.canvas.on("imagesLoaded", function() {
-    C.addRampLinesAndCircles();
+    C.addStages().setDefaultWidthHeight().addinvisibleFooterToStep().addRampLinesAndCircles();
     C.selectStep();
     C.canvas.renderAll();
   });
@@ -119,12 +147,28 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
     C.allStepViews[C.allStepViews.length - 1].circle.doThingsForLast();
   });
 
+  this.canvas.on("deltaChanged", function(changedStage) {
+    changedStage.updateAutoDelta();
+  });
+
+  this.canvas.on("startOnCycleChangedFromBottom", function(data) {
+    data.stage.updateSOC(data.soc);
+  });
+
+  this.canvas.on("deltaTemperatureChangedFromBottom", function(changedStep) {
+    changedStep.changeDeltaTemp();
+  });
+
+  this.canvas.on("deltaTimeChangedFromBottom", function(changedStep) {
+    changedStep.changeDeltaTime();
+  });
+
   /**************************************
        When a model in the server changed
        changes like add step/stage or delete step/stage.
   ***************************************/
   this.canvas.on("modelChanged", function(evtData) {
-
+    console.log(evtData);
     var keyVal = Object.keys(evtData)[0];
 
     if(keyVal == "step") {
@@ -158,6 +202,8 @@ ChaiBioTech.app.Views.fabricEvents = function(C, appRouter) {
     ChaiBioTech.app.selectedStep = null;
     ChaiBioTech.app.selectedCircle = null;
     // Then we chain the actions so that it adds all the UI stuffs
-    C.addStages().setDefaultWidthHeight().addinvisibleFooterToStep();
+    C.addStages().setDefaultWidthHeight().addinvisibleFooterToStep().addRampLinesAndCircles();
+    C.selectStep();
+    C.canvas.renderAll();
   });
 };

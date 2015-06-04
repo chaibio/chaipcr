@@ -10,7 +10,6 @@
 #include <mutex>
 
 class DBControl;
-class CSVControl;
 class Settings;
 class TemperatureLog;
 
@@ -55,6 +54,8 @@ private:
     void run();
     void complete();
 
+    void meltCurveCallback(Poco::Timer &timer);
+
     void rampFinished();
 
     void stepBegun();
@@ -69,10 +70,10 @@ private:
     MachineState _machineState;
 
     DBControl *_dbControl;
-    CSVControl *_csvControl;
     Experiment _experiment;
     Settings *_settings;
 
+    Poco::Timer *_meltCurveTimer;
     Poco::Timer *_holdStepTimer;
     Poco::Timer *_logTimer;
 

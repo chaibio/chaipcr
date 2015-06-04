@@ -200,6 +200,29 @@
 					margin-left: 6px;
 					margin-top: 25px;
 
+					#delta-button {
+						width: 142px;
+						height: 31px;
+						background-color: black;
+						font-size: 9px;
+						border: 1px solid black;
+						margin-left: 5px;
+						color: white;
+						cursor: pointer;
+
+						.delta-button-image-container {
+							width: 41px;
+							height: 30px;
+							float: left;
+						}
+						.delta-button-text {
+							float: left;
+							width:95px;
+							height: 31px;
+							padding-top: 7px;
+						}
+					}
+
 					#gather-data-button {
 						width: 142px;
 						height: 31px;
@@ -221,15 +244,6 @@
 							height: 31px;
 							padding-top: 7px;
 						}
-					}
-					button {
-						width: 142px;
-						height: 31px;
-						background-color: white;
-						font-size: 9px;
-						font-weight: bold;
-						border: 1px solid black;
-						margin-left: 5px;
 					}
 
 					.lol-pop {

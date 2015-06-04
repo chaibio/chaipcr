@@ -8,6 +8,7 @@ INCLUDEPATH += ./db/
 INCLUDEPATH += ./test/
 INCLUDEPATH += ./libraries/include/
 INCLUDEPATH += ./libraries/include/soci #for internal SOCI use
+INCLUDEPATH += ./libraries/include/mysql
 INCLUDEPATH += $(BOOST_INCLUDE_PATH)
 
 LIBS += -L$$_PRO_FILE_PWD_/libraries/libhf/
@@ -23,9 +24,12 @@ LIBS += -lPocoXML
 #LIBS += -lgmock
 
 #SOCI
-LIBS += -lsqlite3
 LIBS += -lsoci_core
-LIBS += -lsoci_sqlite3
+
+#LIBS += -lsqlite3
+#LIBS += -lsoci_sqlite3
+LIBS += -lmysqlclient
+LIBS += -lsoci_mysql
 
 #Boost
 LIBS += -lboost_system
@@ -103,7 +107,6 @@ HEADERS += \
     test/servertest.h \
     db/sociincludes.h \
     test/dbtest.h \
-    server/httpstatushandler.h \
     server/statushandler.h \
     control/adcconsumer.h \
     app/qpcrfactory.h \
@@ -124,8 +127,8 @@ HEADERS += \
     util/exceptionhandler.h \
     control/test/adccontrollermock.h \
     util/lockfreesignal.h \
-    db/csvcontrol.h \
-    util/instance.h
+    util/instance.h \
+    server/httpcodehandler.h
 
 SOURCES += \
     app/pins.cpp \
@@ -155,7 +158,6 @@ SOURCES += \
     test/servertest.cpp \
     db/dbcontrol.cpp \
     test/dbtest.cpp \
-    server/httpstatushandler.cpp \
     server/statushandler.cpp \
     app/qpcrfactory.cpp \
     server/controlhandler.cpp \
@@ -171,4 +173,4 @@ SOURCES += \
     util/adcpin.cpp \
     server/logdatahandler.cpp \
     control/test/adccontrollermock.cpp \
-    db/csvcontrol.cpp
+    server/httpcodehandler.cpp

@@ -110,6 +110,10 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
     this.cycleNo.text = this.updatedNoOfCycle;
     this.cycleX.left = this.cycleNo.left + this.cycleNo.width + 3;
     this.cycles.left = this.cycleX.left + this.cycleX.width;
+
+    var curModel = this.model.get("stage");
+    curModel["num_cycles"] = this.updatedNoOfCycle;
+    this.model.set("stage", curModel);
     this.canvas.renderAll();
   };
 
@@ -182,7 +186,7 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
 
   this.findLastStep = function() {
 
-    //this.childSteps[this.childSteps.length -1].circle.doThingsForLast();
+    this.childSteps[this.childSteps.length -1].circle.doThingsForLast();
   };
 
   this.render = function() {
@@ -271,6 +275,22 @@ ChaiBioTech.app.Views.fabricStage = function(model, stage, allSteps, index, fabr
     this.changeFillsAndStrokes("black");
     this.manageBordersOnSelection("#cc6c00");
     this.manageFooter(true, "black", length);
+  };
+
+  this.updateAutoDelta = function() {
+
+    var stage = this.model.get("stage");
+    stage["auto_delta"] = ! stage["auto_delta"];
+    this.model.set("stage", stage);
+
+    this.model.updateAutoDelata(stage["auto_delta"]);
+  };
+
+  this.updateSOC = function(soc) {
+
+    var stage = this.model.get("stage");
+    stage["auto_delta_start_cycle"] = soc
+    this.model.set("stage", stage);
   };
 
   return this;

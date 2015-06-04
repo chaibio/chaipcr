@@ -34,7 +34,7 @@ ADCController::~ADCController() {
 void ADCController::process() {
     setMaxRealtimePriority();
 
-    _ltc2444->readSingleEndedChannel(4, kThermistorOversamplingRate); //start first read
+    _ltc2444->readSingleEndedChannel(0, kThermistorOversamplingRate); //start first read
 
     static const boost::chrono::nanoseconds repeatFrequencyInterval((boost::chrono::nanoseconds::rep)round(1.0 / kADCRepeatFrequency * 1000 * 1000 * 1000));
     boost::chrono::high_resolution_clock::time_point repeatFrequencyLastTime = boost::chrono::high_resolution_clock::now();
@@ -50,7 +50,14 @@ void ADCController::process() {
 
             //ensure ADC loop runs at regular interval without jitter
             if (state == 0) {
-                loopStarted();
+                try {
+                    loopStarted();
+                }
+                catch (const TemperatureLimitError &ex) {
+                    std::cout << "ADCController::process - loop start exception: " << ex.what() << '\n';
+
+                    qpcrApp.stopExperiment(ex.what());
+                }
 
                 boost::chrono::high_resolution_clock::time_point previousTime = repeatFrequencyLastTime;
                 repeatFrequencyLastTime = boost::chrono::high_resolution_clock::now();

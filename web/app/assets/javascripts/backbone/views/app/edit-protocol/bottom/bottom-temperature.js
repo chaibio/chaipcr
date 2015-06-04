@@ -52,7 +52,7 @@ ChaiBioTech.app.Views.bottomTemperature = Backbone.View.extend({
       this.dataPartEdit.val(parseFloat(tempVal.substr(0, tempVal.length - 1)));
       alert("Please enter a valid value");
     } else {
-      newTemp = parseFloat(newTemp).toFixed(1);
+      var newTemp = parseFloat(newTemp).toFixed(1);
       this.currentStep.model.changeTemperature(newTemp);
       this.dataPart.html(newTemp + "ºc");
       // Now fire it back to canvas
@@ -77,7 +77,7 @@ ChaiBioTech.app.Views.bottomTemperature = Backbone.View.extend({
     $(this.el).html(this.template(data));
     this.dataPart =   $(this.el).find(".data-part-span");
     this.dataPartEdit = $(this.el).find(".data-part-edit-value");
-    
+
     return this;
   }
 });

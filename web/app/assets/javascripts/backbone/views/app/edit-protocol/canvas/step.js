@@ -83,7 +83,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
   this.addCircle = function() {
 
     this.circle = new ChaiBioTech.app.Views.fabricCircle(this.model, this);
-    this.circle.render();
+    this.circle.getLeft().getTop().getUniqueId().render();
   };
 
   this.getUniqueName = function() {
@@ -210,6 +210,7 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
       top: 44,
       selectable: false,
       hasControls: false,
+      hasBoarders: false,
       name: "stepGroup",
       me: this
     });
@@ -236,6 +237,20 @@ ChaiBioTech.app.Views.fabricStep = function(model, parentStage, index) {
     ChaiBioTech.app.selectedStep = this;
     this.manageBorder("black");
     this.showHideFooter(true);
+  };
+
+  this.changeDeltaTemp = function() {
+
+    var step = this.model.get("step");
+    step["delta_temperature"] = this.updatedDeltaTemp;
+    this.model.set("step", step);
+  },
+
+  this.changeDeltaTime = function() {
+
+    var step = this.model.get("step");
+    step["delta_duration_s"] = this.deltaTime;
+    this.model.set("step", step);
   }
 
   return this;

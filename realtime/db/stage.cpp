@@ -23,6 +23,9 @@ Stage::Stage(const Stage &other)
     setAutoDelta(other.autoDelta());
     setAutoDeltaStartCycle(other.autoDeltaStartCycle());
     setComponents(other.components());
+
+    _cycleIteration = other.currentCycle();
+    _currentComponent = _components.begin() + std::distance(other.components().begin(), std::vector<StageComponent>::const_iterator(other._currentComponent));
 }
 
 Stage::Stage(Stage &&other)
@@ -64,6 +67,9 @@ Stage& Stage::operator= (const Stage &other)
     setAutoDeltaStartCycle(other.autoDeltaStartCycle());
     setComponents(other.components());
 
+    _cycleIteration = other.currentCycle();
+    _currentComponent = _components.begin() + std::distance(other.components().begin(), std::vector<StageComponent>::const_iterator(other._currentComponent));
+
     return *this;
 }
 
@@ -92,7 +98,7 @@ Stage& Stage::operator= (Stage &&other)
     return *this;
 }
 
-void Stage::setNumCycles(int numCycles)
+void Stage::setNumCycles(unsigned numCycles)
 {
      _numCycles = numCycles;
      _cycleIteration = 1;

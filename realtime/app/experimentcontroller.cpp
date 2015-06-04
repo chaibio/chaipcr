@@ -3,16 +3,17 @@
 
 #include "pcrincludes.h"
 #include "dbincludes.h"
-#include "csvcontrol.h"
 #include "maincontrollers.h"
 #include "experimentcontroller.h"
 #include "qpcrapplication.h"
+
+#define STORE_MELT_CURVE_DATA_INTERVAL 10 * 1000
 
 ExperimentController::ExperimentController()
 {
     _machineState = Idle;
     _dbControl = new DBControl();
-    _csvControl = new CSVControl();
+    _meltCurveTimer = new Poco::Timer();
     _holdStepTimer = new Poco::Timer();
     _logTimer = new Poco::Timer();
     _settings = _dbControl->getSettings();
@@ -28,9 +29,9 @@ ExperimentController::~ExperimentController()
     stop();
 
     delete _logTimer;
+    delete _meltCurveTimer;
     delete _holdStepTimer;
     delete _dbControl;
-    delete _csvControl;
     delete _settings;
 }
 
@@ -99,7 +100,16 @@ void ExperimentController::run()
         HeatBlockInstance::getInstance()->enableStepProcessing();
         HeatBlockInstance::getInstance()->setEnableMode(true);
 
-        OpticsInstance::getInstance()->setCollectData(_experiment.protocol()->currentRamp()->collectData(), _experiment.protocol()->currentStage()->type() == Stage::Meltcurve);
+        if (_experiment.protocol()->currentRamp()->collectData())
+        {
+            OpticsInstance::getInstance()->setCollectData(true, _experiment.protocol()->currentStage()->type() == Stage::Meltcurve);
+
+            if (_experiment.protocol()->currentStage()->type() == Stage::Meltcurve)
+            {
+                _meltCurveTimer->setPeriodicInterval(STORE_MELT_CURVE_DATA_INTERVAL);
+                _meltCurveTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::meltCurveCallback));
+            }
+        }
     }
 }
 
@@ -156,6 +166,7 @@ void ExperimentController::stop()
         {
             stopLogging();
             _holdStepTimer->stop();
+            _meltCurveTimer->stop();
         }
     }
 }
@@ -191,17 +202,32 @@ void ExperimentController::stop(const std::string &errorMessage)
     {
         stopLogging();
         _holdStepTimer->stop();
+        _meltCurveTimer->stop();
     }
 }
 
-void ExperimentController::rampFinished()
+void ExperimentController::meltCurveCallback(Poco::Timer &)
 {
     std::unique_lock<std::mutex> lock(_machineMutex);
 
     if (_machineState == Running)
     {
+        _dbControl->addMeltCurveData(_experiment, OpticsInstance::getInstance()->getMeltCurveData());
+
+        OpticsInstance::getInstance()->setCollectData(true, true);
+    }
+}
+
+void ExperimentController::rampFinished()
+{
+    _meltCurveTimer->stop();
+
+    std::unique_lock<std::mutex> lock(_machineMutex);
+
+    if (_machineState == Running)
+    {
         if (_experiment.protocol()->currentStage()->type() == Stage::Meltcurve)
-            _csvControl->writeMeltCurveData(_experiment, OpticsInstance::getInstance()->getMeltCurveData());
+            _dbControl->addMeltCurveData(_experiment, OpticsInstance::getInstance()->getMeltCurveData());
         else
         {
             _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->getFluorescenceData(), true);
@@ -270,7 +296,16 @@ void ExperimentController::holdStepCallback(Poco::Timer &)
                 temperature = HeatBlockInstance::getInstance()->maxTargetTemperature();
         }
 
-        OpticsInstance::getInstance()->setCollectData(stage->currentRamp()->collectData(), stage->type() == Stage::Meltcurve);
+        if (stage->currentRamp()->collectData())
+        {
+            OpticsInstance::getInstance()->setCollectData(true, stage->type() == Stage::Meltcurve);
+
+            if (stage->type() == Stage::Meltcurve)
+            {
+                _meltCurveTimer->setPeriodicInterval(STORE_MELT_CURVE_DATA_INTERVAL);
+                _meltCurveTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::meltCurveCallback));
+            }
+        }
 
         HeatBlockInstance::getInstance()->setTargetTemperature(temperature, stage->currentRamp()->rate());
         HeatBlockInstance::getInstance()->enableStepProcessing();

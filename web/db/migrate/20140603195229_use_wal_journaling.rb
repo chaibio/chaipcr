@@ -4,11 +4,11 @@ class UseWalJournaling < ActiveRecord::Migration
   def change
     reversible do |dir|
       dir.up do
-        execute "PRAGMA journal_mode = WAL"
+        #execute "PRAGMA journal_mode = WAL"
       end
       
       dir.down do
-        execute "PRAGMA journal_mode = DELETE"
+        #execute "PRAGMA journal_mode = DELETE"
       end
     end
   end
