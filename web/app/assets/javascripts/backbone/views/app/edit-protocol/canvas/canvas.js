@@ -102,9 +102,19 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
 
     for(i = 0; i < limit - 1; i++) {
       var x = this.allStepViews[i].addPath();
-
-      this.canvas.add(x);
+      console.log(x);
+      this.canvas.add(x.curve);
+      x.fixPosition();
       //alert("try 0");
+      curve = new fabric.Path('m 0 50 Q 100, 200, 50, 250 Q 400, 0, 500, 0', {
+        strokeWidth: 5,
+        fill: '',
+        stroke: '#ffd100',
+        selectable: false,
+        originX: "center",
+        originY: "center"
+      });
+      this.canvas.add(curve);
     }
 
     console.log("All paths are drawn ....!!");

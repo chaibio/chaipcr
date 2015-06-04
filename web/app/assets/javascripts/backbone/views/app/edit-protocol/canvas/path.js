@@ -19,26 +19,30 @@ ChaiBioTech.app.Views.fabricPath = function(model, parent, canvas) {
     originY: "center"
   });
 
-  // Starting point;
-  this.curve.path[0][1] = x1;
-  this.curve.path[0][2] = y1;
 
-  var midPointX = (x1 + x2) / 2,
-  midPointY = (y1 + y2) / 2;
-  // Controlling point right now I take mid point
-  this.curve.path[1][1] = x1 + this.controlDistance;
-  this.curve.path[1][2] = y1;
-  // Mid point
-  this.curve.path[1][3] = midPointX;
-  this.curve.path[1][4] = midPointY;
-  // Controlling point for the next bent
-  this.curve.path[2][1] = x2 - this.controlDistance;
-  this.curve.path[2][2] = y2;
-  // End Point
-  this.curve.path[2][3] = x2;
-  this.curve.path[2][4] = y2;
+  this.fixPosition = function() {
+      // Starting point;
+      this.curve.path[0][1] = x1;
+      this.curve.path[0][2] = y1;
+
+      var midPointX = (x1 + x2) / 2,
+      midPointY = (y1 + y2) / 2;
+      // Controlling point right now I take mid point
+      this.curve.path[1][1] = x1 + this.controlDistance;
+      this.curve.path[1][2] = y1;
+      // Mid point
+      this.curve.path[1][3] = midPointX;
+      this.curve.path[1][4] = midPointY;
+      // Controlling point for the next bent
+      this.curve.path[2][1] = x2 - this.controlDistance;
+      this.curve.path[2][2] = y2;
+      // End Point
+      this.curve.path[2][3] = x2;
+      this.curve.path[2][4] = y2;
+  }
+
 
   //this.canvas.add(this.curve);
   // We have nothing else to return , No member functions;
-  return this.curve;
+  return this;
 }
