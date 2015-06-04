@@ -103,7 +103,7 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
     for(i = 0; i < limit - 1; i++) {
       var x = this.allStepViews[i].addPath();
       console.log(x);
-      this.canvas.add(x.curve);
+      //this.canvas.add(x.curve);
       x.fixPosition();
       //alert("try 0");
       curve = new fabric.Path('m 0 50 Q 100, 200, 50, 250 Q 400, 0, 500, 0', {
@@ -114,6 +114,30 @@ ChaiBioTech.app.Views.fabricCanvas = function(model, appRouter) {
         originX: "center",
         originY: "center"
       });
+
+      this.controlDistance = ChaiBioTech.Constants.controlDistance;
+      console.log("Path created ... !");
+      var x1 = this.allStepViews[i].circle.left + 60, y1 = this.allStepViews[i].circle.top,
+      x2 = this.allStepViews[i].circle.next.left + 60, y2 = this.allStepViews[i].circle.next.top;
+
+      curve.path[0][1] = x1;
+      curve.path[0][2] = y1;
+
+      var midPointX = (x1 + x2) / 2,
+      midPointY = (y1 + y2) / 2;
+      // Controlling point right now I take mid point
+      curve.path[1][1] = x1 + this.controlDistance;
+      curve.path[1][2] = y1;
+      // Mid point
+      curve.path[1][3] = midPointX;
+      curve.path[1][4] = midPointY;
+      // Controlling point for the next bent
+      curve.path[2][1] = x2 - this.controlDistance;
+      curve.path[2][2] = y2;
+      // End Point
+      curve.path[2][3] = x2;
+      curve.path[2][4] = y2;
+
       this.canvas.add(curve);
     }
 
