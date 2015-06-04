@@ -18,3 +18,10 @@ cp dtbo /etc/initramfs-tools/hooks/
 cp /boot/uboot/initrd.img /boot/uboot/initrd.img.bak
 
 /opt/scripts/tools/update_initrd.sh
+
+cd ili2139c
+make
+cp ili210x.ko /lib/modules/$(uname -r)/kernel/drivers/input/touchscreen
+depmod -a
+echo ili210x > /etc/modules-load.d/ili210x.conf
+
