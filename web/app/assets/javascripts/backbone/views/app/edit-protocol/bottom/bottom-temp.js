@@ -101,7 +101,7 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
 
   changeSign: function(val) {
 
-    if(parseFloat(val) > 0) {
+    if(parseFloat(val) >= 0) {
       this.draggable.trigger("positive");
     } else {
       this.draggable.trigger("negative");
@@ -131,7 +131,7 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
     $(this.el).html(this.template(data));
     // Disabling for now
     $(this.el).addClass("disabled");
-    
+
     this.draggable = new ChaiBioTech.app.Views.draggable({
       editStepStageClass: this.options.editStepStageClass,
       parent: this

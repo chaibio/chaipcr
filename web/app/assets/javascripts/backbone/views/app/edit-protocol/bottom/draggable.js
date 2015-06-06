@@ -14,7 +14,8 @@ ChaiBioTech.app.Views.draggable = Backbone.View.extend({
 
   events: {
     "click .plus": "plusClicked",
-    "click .minus": "minusClicked"
+    "click .minus": "minusClicked",
+    "click": "toggle"
   },
 
   initialize: function() {
@@ -51,14 +52,37 @@ ChaiBioTech.app.Views.draggable = Backbone.View.extend({
 
   },
 
-  plusClicked: function() {
-    this.trigger("negative");
-    this.options.parent.trigger("signChanged", -1);
+  plusClicked: function(evt) {
+
+    evt.preventDefault();
+    if(this.onState) {
+      this.trigger("negative");
+      this.options.parent.trigger("signChanged", -1);
+
+    }
   },
 
-  minusClicked: function() {
-    this.trigger("positive");
-    this.options.parent.trigger("signChanged", +1);
+  minusClicked: function(evt) {
+
+    evt.preventDefault();
+    if(this.onState) {
+      this.trigger("positive");
+      this.options.parent.trigger("signChanged", +1);
+    }
+  },
+
+  toggle: function() {
+
+    if(this.onState) {
+      var pos = $(this.el).find(".ball-cover").position().left;
+      if(pos < 18) {
+        this.trigger("positive");
+        this.options.parent.trigger("signChanged", 1);
+      } else {
+        this.trigger("negative");
+        this.options.parent.trigger("signChanged", -1)
+      }
+    }
   },
 
   changeColor: function(pos, elem) {

@@ -79,7 +79,7 @@ ChaiBioTech.app.Views.bottomTime = Backbone.View.extend({
       this.dataPartEdit.val(this.dataPart.html());
       alert("Please enter a valid value");
     } else {
-      deltaTime = parseInt(deltaTime);
+      deltaTime = parseInt(Math.abs(deltaTime));
 
       this.currentStep.model.changeDeltaTime(deltaTime);
       this.currentStep.deltaTime = deltaTime;
@@ -115,7 +115,7 @@ ChaiBioTech.app.Views.bottomTime = Backbone.View.extend({
 
   changeSign: function(val) {
 
-    if(parseFloat(val) > 0) {
+    if(parseFloat(val) >= 0) {
       this.draggable.trigger("positive");
     } else {
       this.draggable.trigger("negative");
@@ -143,7 +143,7 @@ ChaiBioTech.app.Views.bottomTime = Backbone.View.extend({
     $(this.el).html(this.template(data));
     // Disabiling for now.
     $(this.el).addClass("disabled");
-    
+
     this.draggable = new ChaiBioTech.app.Views.draggable({
       editStepStageClass: this.options.editStepStageClass,
       parent: this
