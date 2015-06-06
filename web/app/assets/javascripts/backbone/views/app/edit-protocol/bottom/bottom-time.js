@@ -8,8 +8,6 @@ ChaiBioTech.app.Views.bottomTime = Backbone.View.extend({
 
   onState: false,
 
-  capsuleTemplate: JST["backbone/templates/app/capsule"],
-
   events: {
       "click .data-part": "startEdit",
       "blur .data-part-edit-value": "saveDataAndHide",
@@ -23,7 +21,7 @@ ChaiBioTech.app.Views.bottomTime = Backbone.View.extend({
 
       that.onState = data.autoDelta;
       that.currentStep = data.currentStep;
-      
+
       if(that.onState) {
         $(that.el).removeClass("disabled");
         if(! data["systemGenerated"]) {
@@ -99,7 +97,7 @@ ChaiBioTech.app.Views.bottomTime = Backbone.View.extend({
   },
 
   changeTime: function() {
-    console.log("time", this.currentStep);
+
     var deltaTime = this.currentStep.model.get("step")["delta_duration_s"];
 
     this.currentStep.deltaTime = deltaTime;
@@ -145,14 +143,14 @@ ChaiBioTech.app.Views.bottomTime = Backbone.View.extend({
     $(this.el).html(this.template(data));
     // Disabiling for now.
     $(this.el).addClass("disabled");
-    $(this.el).find(".caption-part").append(this.capsuleTemplate());
-    $(this.el).find(".ball-cover").data("me", this);
-
+    
     this.draggable = new ChaiBioTech.app.Views.draggable({
-      element: $(this.el).find(".ball-cover"),
       editStepStageClass: this.options.editStepStageClass,
       parent: this
     });
+
+    $(this.el).find(".caption-part").append(this.draggable.render().el);
+
 
     this.dataPart =   $(this.el).find(".data-part-span");
     this.dataPartEdit = $(this.el).find(".data-part-edit-value");

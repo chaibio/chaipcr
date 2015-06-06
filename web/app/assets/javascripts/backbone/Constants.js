@@ -11,6 +11,5 @@ ChaiBioTech.Constants = {
   "beginningTemp": 25,
   "originalStepHeight": originalStepHeight,
   "rad2deg": 180 / Math.PI,
-  
   "controlDistance": 50
 };

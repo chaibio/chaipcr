@@ -47,7 +47,6 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
         "systemGenerated": false,
       }
       this.options.editStepStageClass.trigger("delta_clicked", data);
-      console.log("Under Construction .. !");
       // here send data to server or trigger it back to canvas using
       ChaiBioTech.app.Views.mainCanvas.fire("deltaChanged", this.currentStep.parentStage);
       this.fixDeltaButton(data);
@@ -219,6 +218,7 @@ ChaiBioTech.app.Views.generalInfo = Backbone.View.extend({
       "currentStep": this.currentStep,
       "systemGenerated": true,
     }
+    // This is a fake call, just reusing code for actual delta clicked .. !!
     this.options.editStepStageClass.trigger("delta_clicked", data);
 
     this.fixDeltaButton(data);

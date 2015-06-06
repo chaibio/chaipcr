@@ -13,60 +13,52 @@ ChaiBioTech.app.Views.draggable = Backbone.View.extend({
   className: "capsule",
 
   events: {
-    "click .plus": "plusClicked"
+    "click .plus": "plusClicked",
+    "click .minus": "minusClicked"
   },
 
   initialize: function() {
-    //this.render();
+
     var that = this;
-    // Here we are writing the behaviour of scroll
-    /*this.drag = this.options.element.draggable({
-      containment: "parent",
-      axis: "x",
-      // If the user has not dragged the switch to the end..!
-      // We auto adjust the position of the switch
-      create: function() {
-        //create a reference to dragable
-        that.dragDude = this;
-      },
-
-      stop: function() {
-
-        var pos = $(this).position().left;
-        if(pos < 18) {
-          $(this).css("left", "0px");
-          that.options.parent.trigger("signChanged", -1);
-        } else {
-          $(this).css("left", "36px");
-          that.options.parent.trigger("signChanged", 1)
-        }
-      },
-
-      drag: function() {
-        var pos = $(this).position().left;
-        that.changeColor(pos, this);
-      }
-    });*/
 
     this.options.editStepStageClass.on("delta_clicked", function(data) {
 
       that.onState = data.autoDelta;
-      that.onOffDrag(that.onState, $(this).find(".ball-cover"));
+      if(! data["systemGenerated"]) {
+        that.onOffDrag(that.onState);
+      }
+
+    });
+
+    this.options.editStepStageClass.on("stepSelected", function(data) {
+
+      that.onState = data.parentStage.model.get("stage")["auto_delta"];
+
+      that.onOffDrag(that.onState);
     });
 
     this.on("positive", function() {
-      $(this.dragDude).css("left", "36px");
-      this.changeColor(36, this.dragDude);
+
+      $(this.drag).css("left", "36px");
+      this.changeColor(36, $(this.drag));
     });
 
     this.on("negative", function(){
-      $(that.dragDude).css("left", "0px");
-      this.changeColor(0, this.dragDude)
+
+      $(this.drag).css("left", "0px");
+      this.changeColor(0, $(this.drag));
     });
+
   },
 
   plusClicked: function() {
-    console.log("plus")
+    this.trigger("negative");
+    this.options.parent.trigger("signChanged", -1);
+  },
+
+  minusClicked: function() {
+    this.trigger("positive");
+    this.options.parent.trigger("signChanged", +1);
   },
 
   changeColor: function(pos, elem) {
@@ -86,8 +78,9 @@ ChaiBioTech.app.Views.draggable = Backbone.View.extend({
     }
   },
 
-  onOffDrag: function(status, elem) {
+  onOffDrag: function(status) {
 
+    var elem = $(this.el).find(".ball-cover");
     if(status == false) {
 
       try {
@@ -142,7 +135,7 @@ ChaiBioTech.app.Views.draggable = Backbone.View.extend({
       },
 
       stop: function() {
-        
+
         var pos = $(this).position().left;
         if(pos < 18) {
           $(this).css("left", "0px");
