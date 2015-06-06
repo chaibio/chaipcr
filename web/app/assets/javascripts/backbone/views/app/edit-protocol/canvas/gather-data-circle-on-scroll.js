@@ -4,10 +4,10 @@ ChaiBioTech.app.Views.gatherDataCircleOnScroll = function() {
 
   return new fabric.Circle({
     radius: 14,
-    stroke: 'white',
+    stroke: 'black',
     originX: "center",
     originY: "center",
-    fill: 'white',
+    fill: 'black',
     strokeWidth: 3,
     selectable: false,
     name: "gatherDataCircleOnScroll"
