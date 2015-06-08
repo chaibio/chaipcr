@@ -1,0 +1,11 @@
+[Unit]
+Description=QPCR Realtime app
+
+[Service]
+WorkingDirectory=/root/tmp/
+ExecStart=/root/tmp/realtime
+SyslogIdentifier=QPCRRealtime
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
