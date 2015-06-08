@@ -1,0 +1,95 @@
+.user-settings {
+
+  .row {
+    margin: 0;
+    margin-right: -15px;
+    margin-left: -15px;
+  }
+
+  .underlined {
+    border-bottom-style: solid;
+    border-bottom-width: 2px;
+    border-bottom-color: #333333;
+  }
+
+  .header{
+    width: 1024px;
+    height: 45px;
+    background-color: #333333;
+
+    .name-container {
+      float: left;
+      color: #d6d4d1;
+      margin-left: 13px;
+      font-size: 18px;
+      margin-top: 2px;
+      font-family: "fun city";
+    }
+
+    .stripes-and-name {
+      width: 300px;
+      height: 30px;
+      margin-left: 32px;
+      padding-top: 13px;
+    }
+    .stripes {
+      width: 21px;
+      height: 19px;
+      float: left;
+      cursor: pointer;
+
+      .stripe {
+        height: 3px;
+        width: 21px;
+        margin-bottom: 3px;
+        background-color: #fff;
+      }
+    }
+
+    .btn-support-legal {
+      border: 2px solid #fff;
+      margin-right: 32px;
+      margin-top: 9px;
+      color: #fff;
+      padding: 3px 20px;
+      font-weight: 700;
+    }
+  }
+
+  .content {
+    padding-top: 20px;
+    .col-md-6:first-of-type {
+      padding-left: 45px;
+    }
+    .col-md-6:last-of-type {
+      padding-right: 45px;
+    }
+
+    .info-container {
+      height: 200px;
+      overflow-y: scroll;
+      margin-top: 20px;
+    }
+
+    .btn-large-green {
+      border: 2px solid #8FC742;
+      background-color: #fff;
+      color: #8FC742;
+      display: block;
+      text-align: center;
+      padding: 20px 0px;
+      font-weight: 700;
+      font-size: 20px;
+    }
+
+    .lead.info {
+      margin-top: 20px;
+      color: gray;
+      span {
+        font-weight: 700;
+        color: #000;
+      }
+    }
+  }
+
+}

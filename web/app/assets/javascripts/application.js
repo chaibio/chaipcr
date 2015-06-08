@@ -27,14 +27,20 @@
 //= require backbone/ChaiBioTech
 //= require backbone/Constants
 
+// angularjs assets ==============
+//= require angular
+//= require angular-rails-templates
+//= require angular/app
+//= require_tree ./angular/controllers
+//= require_tree ./angular/views
 
 $(function () {
-	//window.router = new ChaiBioTech.Routers.DesignRouter({});
-	//window.touchScreenRouter = new ChaiBioTech.Routers.touchScreen({});
-	//window.logScreenRouter = new ChaiBioTech.Routers.temperatureLog({});
-	window.appRouter = new ChaiBioTech.Routers.appRouter({});
-	window.deviceRouter = new ChaiBioTech.Routers.deviceRouter({});
-	Backbone.history.start();
-	//window.location = "#/800x480-home" // Enable this to get into device mode
-	window.location = "#/login"; //Temporary to bypass. Disable this to test add new experiments.
+  //window.router = new ChaiBioTech.Routers.DesignRouter({});
+  //window.touchScreenRouter = new ChaiBioTech.Routers.touchScreen({});
+  //window.logScreenRouter = new ChaiBioTech.Routers.temperatureLog({});
+  window.appRouter = new ChaiBioTech.Routers.appRouter({});
+  window.deviceRouter = new ChaiBioTech.Routers.deviceRouter({});
+  Backbone.history.start();
+  //window.location = "#/800x480-home" // Enable this to get into device mode
+  //window.location = "#/login"; //Temporary to bypass. Disable this to test add new experiments.
 });

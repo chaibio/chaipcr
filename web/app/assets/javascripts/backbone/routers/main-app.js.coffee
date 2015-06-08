@@ -1,22 +1,23 @@
 class ChaiBioTech.Routers.appRouter extends Backbone.Router
 
-	loginScreen: {}
+  loginScreen: {}
 
-	homePage: {}
+  homePage: {}
 
-	iniitialize: () ->
-		#console.log "wow";
+  iniitialize: () ->
+    #console.log "wow";
 
-	routes:
-		"login": "logMeIn"
-		"home": "loadHome"
-		"edit-exp-menu/:id": "editExp" # Remember this is the one for bringing up menu overlay
-		"edit-stage-step/:id": "loadStepStage"
-		"run-exp/:id": "runExp",
-		"plate-setup/:id": "plateSetup"
+  routes:
+    "login": "logMeIn"
+    "home": "loadHome"
+    "edit-exp-menu/:id": "editExp" # Remember this is the one for bringing up menu overlay
+    "edit-stage-step/:id": "loadStepStage"
+    "run-exp/:id": "runExp",
+    "plate-setup/:id": "plateSetup"
+    "user/settings": "userSettings"
 
 
-	attributes = {
+  attributes = {
       "tab 1": {
         fields: {
           Volume: {
@@ -171,62 +172,68 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
     }
 
 
-	logMeIn: () ->
-		@loginScreen = new ChaiBioTech.app.Views.login
-		$("#container").html(@loginScreen.render().el)
+  logMeIn: () ->
+    @loginScreen = new ChaiBioTech.app.Views.login
+    $("#container").html(@loginScreen.render().el)
 
-	plateSetup: (id) ->
-		@plateSetup = new ChaiBioTech.app.Views.plateSetup
-		$("#container").html(@plateSetup.render().el);
-		$("#container").find(".plate-setup-container").plateLayOut({
-			value: 10
-			attributes: attributes
-		});
+  plateSetup: (id) ->
+    @plateSetup = new ChaiBioTech.app.Views.plateSetup
+    $("#container").html(@plateSetup.render().el);
+    $("#container").find(".plate-setup-container").plateLayOut({
+      value: 10
+      attributes: attributes
+    });
 
-	loadHome: () ->
-		if @loggedIn() is true
-			data =
-			"user": @loginScreen.user
+  loadHome: () ->
+    if @loggedIn() is true
+      data =
+      "user": @loginScreen.user
 
-			@homePage = new ChaiBioTech.app.Views.homePage data
-			$("#container").html(@homePage.render().el)
-		else
-			location.href = "#/login"
+      @homePage = new ChaiBioTech.app.Views.homePage data
+      $("#container").html(@homePage.render().el)
+    else
+      location.href = "#/login"
 
-	loggedIn: () ->
-		if @loginScreen.loggedIn
-			return yes
-		return no
+  loggedIn: () ->
+    if @loginScreen.loggedIn
+      return yes
+    return no
 
-	editExp: (id) ->
-		that = this;
-		callback = () ->
-			that.menuOverLay = new ChaiBioTech.app.Views.menuOverLay({
-				model: ExpModel
-			});
-			$("#container").append(that.menuOverLay.render().el)
+  editExp: (id) ->
+    that = this;
+    callback = () ->
+      that.menuOverLay = new ChaiBioTech.app.Views.menuOverLay({
+        model: ExpModel
+      });
+      $("#container").append(that.menuOverLay.render().el)
 
-		ExpModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});
+    ExpModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});
 
-	runExp: (id) ->
-		that = this;
-		callback = () ->
-			that.runExpView = new ChaiBioTech.app.Views.runExperiment({
-					model: ExpModel
-			});
-			$("#container").html(that.runExpView.render().el);
+  runExp: (id) ->
+    that = this;
+    callback = () ->
+      that.runExpView = new ChaiBioTech.app.Views.runExperiment({
+          model: ExpModel
+      });
+      $("#container").html(that.runExpView.render().el);
 
-		ExpModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});
+    ExpModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});
 
-	loadStepStage: (id) ->
-		that = this;
-		# Sending it as a callback, So that the canvas is created just after model is complete;
-		callback = () ->
-			that.fabricCanvas = new ChaiBioTech.app.Views.fabricCanvas(ExpModel, that);
-			that.fabricCanvas.loadImages();
+  loadStepStage: (id) ->
+    that = this;
+    # Sending it as a callback, So that the canvas is created just after model is complete;
+    callback = () ->
+      that.fabricCanvas = new ChaiBioTech.app.Views.fabricCanvas(ExpModel, that);
+      that.fabricCanvas.loadImages();
 
-		ExpModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});
-		@editStageStep = new ChaiBioTech.app.Views.editStageStep({
-				model: ExpModel
-			});
-		$("#container").html(@editStageStep.render().el);
+    ExpModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});
+    @editStageStep = new ChaiBioTech.app.Views.editStageStep({
+        model: ExpModel
+      });
+    $("#container").html(@editStageStep.render().el);
+
+  userSettings: ->
+    tpl = '<div id="ng-app"><div ng-controller="UserSettingsCtrl" ng-include src="\'angular/views/user/settings.html\'"></div></div>'
+    $("#container").html tpl
+    $(document).ready ->
+      angular.bootstrap $('#container #ng-app'), ['ChaiBioTech']
