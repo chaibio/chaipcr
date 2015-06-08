@@ -31,6 +31,8 @@
 //= require angular
 //= require angular-rails-templates
 //= require angular/app
+//= require angular/libs/perfect-scrollbar.jquery.min
+//= require angular/libs/angular-perfect-scrollbar
 //= require_tree ./angular/controllers
 //= require_tree ./angular/views
 

@@ -65,12 +65,6 @@
       padding-right: 45px;
     }
 
-    .info-container {
-      height: 200px;
-      overflow-y: scroll;
-      margin-top: 20px;
-    }
-
     .btn-large-green {
       border: 2px solid #8FC742;
       background-color: #fff;
@@ -82,12 +76,39 @@
       font-size: 20px;
     }
 
+    .btn-blue {
+      border: 2px solid #37BFF1;
+      background-color: #fff;
+      color: #37BFF1;
+      display: inline-block;
+      text-align: center;
+      padding: 5px 40px;
+      font-weight: 700;
+      font-size: 20px;
+    }
+
+    .scroller {
+      height: 500px;
+      overflow-y: hidden;
+      position: relative;
+      margin-top: 20px;
+      padding-right: 20px;
+    }
+
     .lead.info {
       margin-top: 20px;
       color: gray;
-      span {
+      span.text {
         font-weight: 700;
         color: #000;
+      }
+      span.elipsis {
+        display: inline-block;
+        vertical-align: top;
+        margin-top: -24px;
+        color: #3DC1F2;
+        font-size: 40px;
+        cursor: pointer;
       }
     }
   }
