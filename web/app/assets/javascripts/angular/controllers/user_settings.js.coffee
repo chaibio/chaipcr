@@ -4,6 +4,8 @@ window.ChaiBioTech.ngApp
   '$window'
   ($scope, $window) ->
 
+    $scope.settings = {}
+
     $scope.goHome = ->
       $window.location = '#home'
 

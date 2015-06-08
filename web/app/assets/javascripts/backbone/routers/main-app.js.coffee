@@ -233,7 +233,7 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
     $("#container").html(@editStageStep.render().el);
 
   userSettings: ->
-    tpl = '<div id="ng-app"><div ng-controller="UserSettingsCtrl" ng-include src="\'angular/views/user/settings.html\'"></div></div>'
+    tpl = '<div ng-include src="\'angular/views/user/settings.html\'"></div>'
     $("#container").html tpl
     $(document).ready ->
-      angular.bootstrap $('#container #ng-app'), ['ChaiBioTech']
+      angular.bootstrap $('#container>div'), ['ChaiBioTech']

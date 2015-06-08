@@ -57,7 +57,8 @@
   }
 
   .content {
-    padding-top: 20px;
+    padding-top: 50px;
+
     .col-md-6:first-of-type {
       padding-left: 45px;
     }
@@ -95,22 +96,40 @@
       padding-right: 20px;
     }
 
-    .lead.info {
-      margin-top: 20px;
-      color: gray;
-      span.text {
-        font-weight: 700;
-        color: #000;
-      }
-      span.elipsis {
-        display: inline-block;
-        vertical-align: top;
-        margin-top: -24px;
-        color: #3DC1F2;
-        font-size: 40px;
-        cursor: pointer;
+    .lead {
+      .info {
+        margin-top: 20px;
+        color: gray;
+        span.text {
+          font-weight: 700;
+          color: #000;
+        }
+        span.elipsis {
+          display: inline-block;
+          vertical-align: top;
+          margin-top: -24px;
+          color: #3DC1F2;
+          font-size: 40px;
+          cursor: pointer;
+        }
       }
     }
+
+    .ui-slider {
+      background: #333;
+    }
+
+    .ui-slider-handle {
+      width: 50px;
+      height: 50px;
+      margin-top: -15px;
+      border-radius: 100px;
+      outline: 0 !important;
+      border-color: #00AEEF;
+      background: #fff;
+      border-width: 12px;
+    }
+
   }
 
 }

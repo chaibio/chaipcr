@@ -1,4 +1,4 @@
-<div class="user-settings">
+<div class="user-settings" ng-controller="UserSettingsCtrl">
   <div class="header">
     <div class="row">
       <div class="col-md-6">
@@ -92,7 +92,25 @@
         </perfect-scrollbar>
 
       </div>
-      <div class="col-md-6"></div>
+      <div class="col-md-6">
+
+        <p class="lead underlined">
+          MACHINE SETTINGS
+        </p>
+
+        <p class="lead info">
+          BRIGHTNESS
+          <P class="vertical-container">
+            <div ui-slider="{orientation: 'horizontal'}"  min="0" max="100" step="5" ng-model="settings.brightness"></div>
+          </P>
+        </p>
+
+        <p class="lead info">
+          CHOOSE ONE
+
+        </p>
+
+      </div>
     </div>
   </div>
 </div>

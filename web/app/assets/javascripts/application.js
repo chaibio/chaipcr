@@ -33,6 +33,7 @@
 //= require angular/app
 //= require angular/libs/perfect-scrollbar.jquery.min
 //= require angular/libs/angular-perfect-scrollbar
+//= require angular/libs/slider
 //= require_tree ./angular/controllers
 //= require_tree ./angular/views
 
