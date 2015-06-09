@@ -256,7 +256,6 @@ ChaiBioTech.Models.Experiment = Backbone.Model.extend({
 	defaults: {
 		experiment: {
 			name: "",
-			qpcr: true,
 			protocol: {
 			}
 		}

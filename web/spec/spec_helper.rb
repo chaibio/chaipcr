@@ -42,7 +42,7 @@ RSpec.configure do |config|
    
   config.include(FactoryHelper)
   
-  config.before(:all) do
-    load Rails.root + "db/seeds.rb" 
+  config.before(:suite) do
+    SeedFu.seed 
   end
 end

@@ -11,6 +11,8 @@ class Stage < ActiveRecord::Base
   TYPE_CYCLE  = "cycling"
   TYPE_MELTCURVE = "meltcurve"
   
+  ACCESSIBLE_ATTRS = [:name, :num_cycles, :stage_type, :auto_delta, :auto_delta_start_cycle]
+  
   before_create do |stage|
     if hold_stage? || num_cycles.nil?
       self.num_cycles = 1

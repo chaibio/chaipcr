@@ -9,7 +9,11 @@ class Setting < ActiveRecord::Base
   def self.debug
     instance.debug
   end
-  
+
+  def self.calibration_id
+    instance.calibration_id
+  end
+    
   def time_zone_offset
     (time_zone.nil?)? nil : ActiveSupport::TimeZone.new(time_zone).utc_offset
   end

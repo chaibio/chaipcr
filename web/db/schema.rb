@@ -11,17 +11,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150527061026) do
+ActiveRecord::Schema.define(version: 20150608065026) do
+
+  create_table "experiment_definitions", force: true do |t|
+    t.string "name",            null: false
+    t.string "guid"
+    t.string "experiment_type", null: false
+  end
+
+  add_index "experiment_definitions", ["guid"], name: "index_experiment_definitions_on_guid", using: :btree
 
   create_table "experiments", force: true do |t|
-    t.string   "name"
-    t.boolean  "qpcr",               default: true
     t.datetime "started_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "completed_at"
     t.string   "completion_status"
     t.string   "completion_message"
+    t.integer  "experiment_definition_id"
+    t.integer  "calibration_id"
   end
 
   create_table "fluorescence_data", id: false, force: true do |t|
@@ -41,13 +49,14 @@ ActiveRecord::Schema.define(version: 20150527061026) do
     t.integer "well_num",                                   null: false, comment: "0-15"
     t.decimal "temperature",        precision: 5, scale: 2,              comment: "degrees C"
     t.integer "fluorescence_value"
+    t.integer "experiment_id"
   end
 
-  add_index "melt_curve_data", ["stage_id", "well_num", "temperature"], name: "index_melt_curve_data_on_stage_id_and_well_num_and_temperature", using: :btree
+  add_index "melt_curve_data", ["experiment_id", "stage_id", "well_num", "temperature"], name: "melt_curve_data_index", using: :btree
 
   create_table "protocols", force: true do |t|
-    t.decimal  "lid_temperature", precision: 4, scale: 1, comment: "degrees C"
-    t.integer  "experiment_id"
+    t.decimal  "lid_temperature",          precision: 4, scale: 1, comment: "degrees C"
+    t.integer  "experiment_definition_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -59,11 +68,12 @@ ActiveRecord::Schema.define(version: 20150527061026) do
   end
 
   create_table "settings", force: true do |t|
-    t.boolean "debug",         default: false
+    t.boolean "debug",          default: false
     t.string  "time_zone"
     t.string  "wifi_ssid"
     t.string  "wifi_password"
-    t.boolean "wifi_enabled",  default: true
+    t.boolean "wifi_enabled",   default: true
+    t.integer "calibration_id"
   end
 
   create_table "stages", force: true do |t|
