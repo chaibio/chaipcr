@@ -43,10 +43,11 @@ ChaiBioTech.app.Views.menuOverLay = Backbone.View.extend({
 	render: function() {
 		$(this.el).html(this.template());
 		$(this.el).find(".left-side").prepend(this.menu.render().el);
+		$(this.el).find(".menu-overlay-all-options").append(this.menuOverlayOptionsContent.render().el);
 		$(this.el).find(".experiment-in-progress-container").append(this.experimentInProgress.render().el);
 		$(this.el).find(".right-side").append(this.menuOverlayTitle.render().el);
 		$(this.el).find(".right-side").append(this.menuOverlayOptions.render().el);
-		$(this.el).find(".right-side").append(this.menuOverlayOptionsContent.render().el);
+
 		return this;
 	}
 });

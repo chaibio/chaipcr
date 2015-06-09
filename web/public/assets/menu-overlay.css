@@ -171,18 +171,47 @@
   width: 0px;
 }
 /* line 167, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-all-options {
+  margin-top: 52px;
+  width: 280px;
+}
+/* line 171, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-all-options .menu-overlay-options-content {
+  width: 280px;
+  position: relative;
+  left: 62px;
+}
+/* line 176, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-all-options .menu-overlay-options-content .title {
+  width: 280px;
+  color: white;
+  text-align: center;
+  border-bottom: solid 1px white;
+  font-size: 14px;
+}
+/* line 183, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-all-options .menu-overlay-options-content .exp-option-buttons {
+  width: 280px;
+  text-align: center;
+  cursor: pointer;
+  margin-top: 16px;
+  font-weight: bold;
+  font-size: 12px;
+  color: #106aa9;
+}
+/* line 196, ../../app/assets/stylesheets/menu-overlay.css.scss */
 .menu-overlay-container .right-side {
   float: left;
   width: 591px;
   height: 768px;
 }
-/* line 172, ../../app/assets/stylesheets/menu-overlay.css.scss */
+/* line 201, ../../app/assets/stylesheets/menu-overlay.css.scss */
 .menu-overlay-container .right-side .menu-overlay-title {
   width: 591px;
   height: 45px;
   background-color: #020100;
 }
-/* line 177, ../../app/assets/stylesheets/menu-overlay.css.scss */
+/* line 206, ../../app/assets/stylesheets/menu-overlay.css.scss */
 .menu-overlay-container .right-side .menu-overlay-title .bar {
   height: 45px;
   width: 22px;
@@ -191,14 +220,14 @@
   margin-right: 13px;
   float: left;
 }
-/* line 185, ../../app/assets/stylesheets/menu-overlay.css.scss */
+/* line 214, ../../app/assets/stylesheets/menu-overlay.css.scss */
 .menu-overlay-container .right-side .menu-overlay-title .bar .horizontal-bar {
   width: 22px;
   height: 3px;
   background-color: #838382;
   margin-top: 4px;
 }
-/* line 193, ../../app/assets/stylesheets/menu-overlay.css.scss */
+/* line 222, ../../app/assets/stylesheets/menu-overlay.css.scss */
 .menu-overlay-container .right-side .menu-overlay-title .title-text {
   float: left;
   color: white;
@@ -209,14 +238,14 @@
   font-family: "fun city";
   font-size: 15px;
 }
-/* line 204, ../../app/assets/stylesheets/menu-overlay.css.scss */
+/* line 233, ../../app/assets/stylesheets/menu-overlay.css.scss */
 .menu-overlay-container .right-side .menu-overlay-title .dots {
   float: left;
   height: 45px;
   width: 22px;
   padding-top: 19px;
 }
-/* line 210, ../../app/assets/stylesheets/menu-overlay.css.scss */
+/* line 239, ../../app/assets/stylesheets/menu-overlay.css.scss */
 .menu-overlay-container .right-side .menu-overlay-title .dots .white-ball {
   width: 4px;
   height: 4px;
@@ -226,36 +255,11 @@
   margin-left: 3px;
   cursor: pointer;
 }
-/* line 222, ../../app/assets/stylesheets/menu-overlay.css.scss */
+/* line 251, ../../app/assets/stylesheets/menu-overlay.css.scss */
 .menu-overlay-container .right-side .menu-overlay-options {
   height: 723px;
   width: 591px;
   background-color: black;
-  opacity: 0.6;
+  opacity: 0.8;
   z-index: 100;
-}
-/* line 230, ../../app/assets/stylesheets/menu-overlay.css.scss */
-.menu-overlay-container .right-side .menu-overlay-options-content {
-  width: 280px;
-  height: 190px;
-  position: relative;
-  left: 62px;
-  top: -690px;
-  z-index: 200;
-}
-/* line 238, ../../app/assets/stylesheets/menu-overlay.css.scss */
-.menu-overlay-container .right-side .menu-overlay-options-content .title {
-  width: 280px;
-  color: white;
-  text-align: center;
-  border-bottom: solid 1px white;
-  font-size: 10px;
-}
-/* line 245, ../../app/assets/stylesheets/menu-overlay.css.scss */
-.menu-overlay-container .right-side .menu-overlay-options-content .exp-option-buttons {
-  width: 280px;
-  height: 38px;
-  margin-top: 16px;
-  font-weight: bold;
-  font-size: 11px;
 }
