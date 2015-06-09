@@ -1,0 +1,21 @@
+.error-model-container {
+
+  min-width: 100%;
+  min-height: 100%;
+  background-color: black;
+  opacity: .5;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: 10;
+}
+.error-model-content {
+  width: 441px;
+  height: 303px;
+  background-color: white;
+  z-index: 100;
+  margin:0 auto;
+  position: absolute;
+  top: 30%;
+  left: 40%;
+}
