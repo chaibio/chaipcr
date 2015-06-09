@@ -27,7 +27,6 @@ ChaiBioTech.Views.Design.experiment_properties = Backbone.View.extend({
 	addExperiment: function() {
 		var newExperiment = this.model.get("experiment");
 		newExperiment.name = $("#experiment-name").val();
-		newExperiment.qpcr = true;
 		this.model.set({experiment: newExperiment});
 		(newExperiment["id"] ) ? this.model.saveData("update") : this.model.saveData("save");
 		console.log(this.model)
