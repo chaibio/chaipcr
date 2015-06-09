@@ -17,8 +17,20 @@
 		height: 768px;
 		background-color: #001827;
 
+		.long-tail-container {
+			height: 40px;
+			width: 350px;
+
+			.long-tail {
+				width:6px;
+				height: 40px;
+				background-color: white;
+				margin-left: 70px;
+			}
+		}
+
 		.menu-overlay-menu {
-			height: 485px;
+			height: 315px;
 
 			.menu-overlay-menu-item {
 				height: 60px;
@@ -61,7 +73,6 @@
 			}
 
 			.menu-overlay-menu-item-special {
-				height: 128px;
 				width: 350px;
 				margin-left: 40px;
 
@@ -104,19 +115,6 @@
 						a:hover {
 							background-color: #001827;
 						}
-					}
-				}
-
-				.back-tail-container {
-					height: 20px;
-					width: 350px;
-					margin-top: 5px;
-
-					.back-tail {
-						width:6px;
-						height: 20px;
-						background-color: #00aeef;
-						margin-left: 30px;
 					}
 				}
 			}
