@@ -5,6 +5,12 @@
 	position: absolute;
 	top: 0px;
 
+	.home-image {
+			position:absolute;
+			top: 15px;
+			left: 20px;
+	}
+
 	.left-side {
 		float: left;
 		width: 433px;
@@ -47,7 +53,7 @@
 					a {
 						color: white;
 					}
-					
+
 					a:visited {
 						color: white;
 					}
