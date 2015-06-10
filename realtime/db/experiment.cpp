@@ -3,18 +3,18 @@
 
 Experiment::Experiment()
 {
+    _definationId = -1;
     _id = -1;
-    _qpcr = true;
     _startedAt = boost::posix_time::not_a_date_time;
     _completedAt = boost::posix_time::not_a_date_time;
     _completionStatus = None;
     _protocol = nullptr;
 }
 
-Experiment::Experiment(int id)
+Experiment::Experiment(int definationId)
 {
-    _id = id;
-    _qpcr = true;
+    _definationId = definationId;
+    _id = -1;
     _startedAt = boost::posix_time::not_a_date_time;
     _completedAt = boost::posix_time::not_a_date_time;
     _completionStatus = None;
@@ -22,10 +22,10 @@ Experiment::Experiment(int id)
 }
 
 Experiment::Experiment(const Experiment &other)
-    :Experiment(other.id())
+    :Experiment(other.definationId())
 {
+    setId(other.id());
     setName(other.name());
-    setQpcr(other.qpcr());
     setStartedAt(other.startedAt());
     setCompletedAt(other.completedAt());
     setCompletionStatus(other.completionStatus());
@@ -35,17 +35,17 @@ Experiment::Experiment(const Experiment &other)
 }
 
 Experiment::Experiment(Experiment &&other)
-    :Experiment(other._id)
+    :Experiment(other._definationId)
 {
+    _id = other._id;
     _name = std::move(other._name);
-    _qpcr = other._qpcr;
     _startedAt = other._startedAt;
     _completedAt = other._completedAt;
     _completionStatus = other._completionStatus;
     _protocol = other._protocol;
 
+    other._definationId = -1;
     other._id = -1;
-    other._qpcr = true;
     other._startedAt = boost::posix_time::not_a_date_time;
     other._completedAt = boost::posix_time::not_a_date_time;
     other._completionStatus = None;
@@ -59,9 +59,9 @@ Experiment::~Experiment()
 
 Experiment& Experiment::operator= (const Experiment &other)
 {
-    _id = other.id();
+    _definationId = other.definationId();
+    setId(other.id());
     setName(other.name());
-    setQpcr(other.qpcr());
     setStartedAt(other.startedAt());
     setCompletedAt(other.completedAt());
     setCompletionStatus(other.completionStatus());
@@ -76,9 +76,9 @@ Experiment& Experiment::operator= (const Experiment &other)
 
 Experiment& Experiment::operator= (Experiment &&other)
 {
+    _definationId = other._definationId;
     _id = other._id;
     _name = std::move(other._name);
-    _qpcr = other._qpcr;
     _startedAt = other._startedAt;
     _completedAt = other._completedAt;
     _completionStatus = other._completionStatus;
@@ -88,8 +88,8 @@ Experiment& Experiment::operator= (Experiment &&other)
 
     _protocol = other._protocol;
 
+    other._definationId = -1;
     other._id = -1;
-    other._qpcr = true;
     other._startedAt = boost::posix_time::not_a_date_time;
     other._completedAt = boost::posix_time::not_a_date_time;
     other._completionStatus = None;
