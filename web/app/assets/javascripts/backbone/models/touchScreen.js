@@ -8,7 +8,6 @@ ChaiBioTech.Models.touchScreenModel = Backbone.Model.extend({
 
 		experiment: {
 			name: "",
-			qpcr: true,
 			protocol: {
 
 			}

@@ -8,10 +8,7 @@ ChaiBioTech.app.Views.menuOverlayMenu = Backbone.View.extend({
 				"EXPERIMENT PROPERTIES",
 				"EDIT PROTOCOL",
 				"PLATE SETUP",
-				"RUN EXPERIMENT",
-				"RESULTS 1",
-				"RESULTS 2",
-				"RESULTS 3"
+				"RUN EXPERIMENT"
 				],
 
 	NoOfSpecialDude: 3,
@@ -33,6 +30,9 @@ ChaiBioTech.app.Views.menuOverlayMenu = Backbone.View.extend({
 	render: function() {
 
 		var length = this.menuItems.length, tempCarrier = {};
+
+		var longTail = new ChaiBioTech.app.Views.menuOverlayLongTail();
+		$(this.el).append(longTail.render().el);
 
 		for (var i = 0; i < length; i++) {
 
@@ -58,10 +58,10 @@ ChaiBioTech.app.Views.menuOverlayMenu = Backbone.View.extend({
 
 			$(this.el).append(thisMenuItem.render().el);
 
-			if(i > this.NoOfSpecialDude) {
+			/*if(i > this.NoOfSpecialDude) {
 				// after we post the big menu item, We should leave blue tail to rest of the menu items.
 				$(thisMenuItem.el).find(".tail").css("background-color", "#00aeef");
-			}
+			}*/
 		}
 
 		return this;

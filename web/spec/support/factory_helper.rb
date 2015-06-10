@@ -22,6 +22,13 @@ module FactoryHelper
     Stage.create(:stage_type=>Stage::TYPE_CYCLE, :protocol_id=>protocol.id)
   end
   
+  def create_experiment(name)
+    experiment = Experiment.new
+    experiment.experiment_definition = ExperimentDefinition.new(:name=>name, :experiment_type=>ExperimentDefinition::TYPE_USER_DEFINED)
+    experiment.save
+    experiment
+  end
+  
   def create_admin_user
     User.create(:email=>"admin@pcr.com", :password=>"changeme", :password_confirmation=>"changeme", :role=>"admin")
   end

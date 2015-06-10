@@ -8,8 +8,6 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
 
   onState: false,
 
-  capsuleTemplate: JST["backbone/templates/app/capsule"],
-
   events: {
       "click .data-part": "startEdit",
       "blur .data-part-edit-value": "saveDataAndHide",
@@ -37,9 +35,14 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
     });
 
     this.options.editStepStageClass.on("stepSelected", function(data) {
+
+      that.onState = data.parentStage.model.get("stage")["auto_delta"];
+
       if(that.onState) {
         that.currentStep = data;
         that.changeTemp();
+      } else {
+        that.draggable.onOffDrag(false);
       }
     });
 
@@ -89,7 +92,6 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
 
   changeTemp: function() {
 
-      console.log("temp", this.currentStep);
       this.currentTemp = this.currentStep.model.get("step")["delta_temperature"];
       this.dataPart.html(this.currentTemp + "ºc");
       this.dataPartEdit.val(this.currentTemp);
@@ -101,7 +103,7 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
 
     if(parseFloat(val) > 0) {
       this.draggable.trigger("positive");
-    } else {
+    } else if(parseFloat(val) < 0){
       this.draggable.trigger("negative");
     }
   },
@@ -129,10 +131,8 @@ ChaiBioTech.app.Views.bottomTemp = Backbone.View.extend({
     $(this.el).html(this.template(data));
     // Disabling for now
     $(this.el).addClass("disabled");
-    //$(this.el).find(".caption-part").append(this.capsuleTemplate());
 
     this.draggable = new ChaiBioTech.app.Views.draggable({
-      element: $(this.el).find(".ball-cover"),
       editStepStageClass: this.options.editStepStageClass,
       parent: this
     });

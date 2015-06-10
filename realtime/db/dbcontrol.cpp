@@ -81,6 +81,33 @@ Experiment DBControl::getExperiment(int id)
     bool gotData = false;
     soci::row result;
 
+    std::unique_lock<std::mutex> lock(_readMutex);
+    {
+        *_readSession << "SELECT * FROM experiment_definitions WHERE id = " << id, soci::into(result);
+        gotData = _readSession->got_data();
+    }
+    lock.unlock();
+
+    if (!gotData || result.get_indicator("id") == soci::i_null)
+        return Experiment();
+
+    Experiment experiment(id);
+
+    if (result.get_indicator("name") != soci::i_null)
+        experiment.setName(result.get<std::string>("name"));
+
+    createExperiment(experiment);
+
+    experiment.setProtocol(getProtocol(id));
+
+    return experiment;
+}
+
+/*Experiment DBControl::getExperiment(int id)
+{
+    bool gotData = false;
+    soci::row result;
+
     _readMutex.lock();
     {
         *_readSession << "SELECT * FROM experiments WHERE id = " << id, soci::into(result);
@@ -107,6 +134,22 @@ Experiment DBControl::getExperiment(int id)
     experiment.setProtocol(getProtocol(result.get<int>("id")));
 
     return experiment;
+}*/
+
+void DBControl::createExperiment(Experiment &experiment)
+{
+    int id = 0;
+
+    std::unique_lock<std::mutex> lock(_writeMutex);
+    {
+        *_writeSession << "INSERT INTO experiments(created_at, experiment_definition_id) VALUES(:created_at, :experiment_definition_id)",
+                soci::use(boost::posix_time::second_clock::local_time()), soci::use(experiment.definationId());
+
+        *_writeSession << "SELECT LAST_INSERT_ID()", soci::into(id); //LAST_INSERT_ID is MySQL function
+    }
+    lock.unlock();
+
+    experiment.setId(id);
 }
 
 Protocol* DBControl::getProtocol(int experimentId)
@@ -114,12 +157,12 @@ Protocol* DBControl::getProtocol(int experimentId)
     bool gotData = false;
     soci::row result;
 
-    _readMutex.lock();
+    std::unique_lock<std::mutex> lock(_readMutex);
     {
-        *_readSession << "SELECT * FROM protocols WHERE experiment_id = " << experimentId, soci::into(result);
+        *_readSession << "SELECT * FROM protocols WHERE experiment_definition_id = " << experimentId, soci::into(result);
         gotData = _readSession->got_data();
     }
-    _readMutex.unlock();
+    lock.unlock();
 
     if (!gotData || result.get_indicator("id") == soci::i_null)
         return nullptr;
@@ -142,10 +185,11 @@ Protocol* DBControl::getProtocol(int experimentId)
 std::vector<Stage> DBControl::getStages(int protocolId)
 {
     std::vector<Stage> stages;
+    std::unique_lock<std::mutex> lock(_readMutex);
 
-    _readMutex.lock();
     soci::rowset<soci::row> result((_readSession->prepare << "SELECT * FROM stages WHERE protocol_id = " << protocolId << " ORDER BY order_number"));
-    _readMutex.unlock();
+
+    lock.unlock();
 
     for (soci::rowset<soci::row>::const_iterator it = result.begin(); it != result.end(); ++it)
     {
@@ -196,11 +240,12 @@ std::vector<StageComponent> DBControl::getStageComponents(int stageId)
 
 std::vector<Step> DBControl::getSteps(int stageId)
 {
-    std::vector<Step> steps;
+    std::vector<Step> steps;    
+    std::unique_lock<std::mutex> lock(_readMutex);
 
-    _readMutex.lock();
     soci::rowset<soci::row> result((_readSession->prepare << "SELECT * FROM steps WHERE stage_id = " << stageId << " ORDER BY order_number"));
-    _readMutex.unlock();
+
+    lock.unlock();
 
     for (soci::rowset<soci::row>::const_iterator it = result.begin(); it != result.end(); ++it)
     {
@@ -248,12 +293,12 @@ Ramp* DBControl::getRamp(int stepId)
     bool gotData = false;
     soci::row result;
 
-    _readMutex.lock();
+    std::unique_lock<std::mutex> lock(_readMutex);
     {
         *_readSession << "SELECT * FROM ramps WHERE next_step_id = " << stepId, soci::into(result);
         gotData = _readSession->got_data();
     }
-    _readMutex.unlock();
+    lock.unlock();
 
     if (!gotData || result.get_indicator("id") == soci::i_null)
         return nullptr;
@@ -374,10 +419,11 @@ void DBControl::addMeltCurveData(const Experiment &experiment, const std::vector
 Settings* DBControl::getSettings()
 {
     soci::row result;
+    std::unique_lock<std::mutex> lock(_readMutex);
 
-    _readMutex.lock();
     *_readSession << "SELECT * FROM settings", soci::into(result);
-    _readMutex.unlock();
+
+    lock.unlock();
 
     Settings *settings = new Settings();
 
@@ -401,10 +447,11 @@ void DBControl::updateSettings(const Settings &settings)
 std::vector<int> DBControl::getEperimentIdList()
 {
     std::vector<int> idList(100);
+    std::unique_lock<std::mutex> lock(_readMutex);
 
-    _readMutex.lock();
-    *_readSession << "SELECT id FROM experiments", soci::into(idList);
-    _readMutex.unlock();
+    *_readSession << "SELECT id FROM experiment_definition", soci::into(idList);
+
+    lock.unlock();
 
     return idList;
 }

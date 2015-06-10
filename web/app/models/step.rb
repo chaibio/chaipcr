@@ -5,6 +5,8 @@ class Step < ActiveRecord::Base
   belongs_to :stage
   has_one :ramp, foreign_key: "next_step_id", dependent: :destroy
   
+  ACCESSIBLE_ATTRS = [:name, :temperature, :hold_time, :collect_data, :delta_temperature, :delta_duration_s]
+  
   attr_accessor :destroyed_stage_id
   
   validate :validate

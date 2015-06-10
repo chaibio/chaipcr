@@ -2,23 +2,23 @@ module ParamsHelper
   
 private
   def experiment_params
-     params.require(:experiment).permit(:name, :qpcr)
+     params.require(:experiment).permit(:name)
   end
   
   def protocol_params
-    params.require(:protocol).permit(:lid_temperature)
+    params.require(:protocol).permit(*Protocol::ACCESSIBLE_ATTRS)
   end
   
   def stage_params
-    params.require(:stage).permit(:name, :num_cycles, :stage_type, :auto_delta, :auto_delta_start_cycle)
+    params.require(:stage).permit(*Stage::ACCESSIBLE_ATTRS)
   end
   
   def step_params
-    params.require(:step).permit(:name, :temperature, :hold_time, :collect_data, :delta_temperature, :delta_duration_s)
+    params.require(:step).permit(*Step::ACCESSIBLE_ATTRS)
   end
   
   def ramp_params
-    params.require(:ramp).permit(:rate, :collect_data)
+    params.require(:ramp).permit(*Ramp::ACCESSIBLE_ATTRS)
   end
   
   def settings_params

@@ -5,14 +5,32 @@
 	position: absolute;
 	top: 0px;
 
+	.home-image {
+			position:absolute;
+			top: 15px;
+			left: 20px;
+	}
+
 	.left-side {
 		float: left;
 		width: 433px;
 		height: 768px;
 		background-color: #001827;
 
+		.long-tail-container {
+			height: 40px;
+			width: 350px;
+
+			.long-tail {
+				width:6px;
+				height: 40px;
+				background-color: white;
+				margin-left: 70px;
+			}
+		}
+
 		.menu-overlay-menu {
-			height: 485px;
+			height: 315px;
 
 			.menu-overlay-menu-item {
 				height: 60px;
@@ -47,7 +65,7 @@
 					a {
 						color: white;
 					}
-					
+
 					a:visited {
 						color: white;
 					}
@@ -55,7 +73,6 @@
 			}
 
 			.menu-overlay-menu-item-special {
-				height: 128px;
 				width: 350px;
 				margin-left: 40px;
 
@@ -88,7 +105,8 @@
 						margin-top: 24px;
 						margin-left: 14px;
 						cursor: pointer;
-
+						font-size: 40px;
+						
 						a {
 							color: white;
 						}
@@ -98,19 +116,6 @@
 						a:hover {
 							background-color: #001827;
 						}
-					}
-				}
-
-				.back-tail-container {
-					height: 20px;
-					width: 350px;
-					margin-top: 5px;
-
-					.back-tail {
-						width:6px;
-						height: 20px;
-						background-color: #00aeef;
-						margin-left: 30px;
 					}
 				}
 			}
@@ -155,6 +160,35 @@
 						height: 5px;
 						width: 0px;
 					}
+				}
+			}
+		}
+
+
+		.menu-overlay-all-options {
+			margin-top: 52px;
+			width: 280px;
+
+			.menu-overlay-options-content {
+				width: 280px;
+				position: relative;
+				left: 62px;
+
+				.title {
+					width: 280px;
+					color: white;
+					text-align: center;
+					border-bottom: solid 1px white;
+					font-size: 14px;
+				}
+				.exp-option-buttons {
+					width: 280px;
+					text-align: center;
+					cursor: pointer;
+					margin-top: 16px;
+					font-weight: bold;
+					font-size: 12px;
+					color: #106aa9;
 				}
 			}
 		}
@@ -219,32 +253,10 @@
 			height: 723px;
 			width: 591px;
 			background-color: black;
-			opacity: 0.6;
+			opacity: 0.8;
 			z-index: 100;
 		}
 
-		.menu-overlay-options-content {
-			width: 280px;
-			height: 190px;
-			position: relative;
-			left: 62px;
-			top: -690px;
-			z-index: 200;
 
-			.title {
-				width: 280px;
-				color: white;
-				text-align: center;
-				border-bottom: solid 1px white;
-				font-size: 10px;
-			}
-			.exp-option-buttons {
-				width: 280px;
-				height: 38px;
-				margin-top: 16px;
-				font-weight: bold;
-				font-size: 11px;
-			}
-		}
 	}
 }

@@ -1,5 +1,7 @@
 class Experiment < ActiveRecord::Base
-  has_one :protocol, dependent: :destroy
+  belongs_to :experiment_definition
+  has_one :protocol, through: :experiment_definition
+  
   has_many :fluorescence_data
   has_many :temperature_logs, -> {order("elapsed_time")} do
     def with_range(starttime, endtime, resolution)
@@ -22,40 +24,34 @@ class Experiment < ActiveRecord::Base
       outputs
     end
   end
-
-  after_create do |experiment|
-    #create default protocol
-    protocol = Protocol.new(:lid_temperature=>110, :experiment_id=>experiment.id)
-    stage = Stage.new(:stage_type=>Stage::TYPE_HOLD, :order_number=>0)
-    stage.steps << Step.new(:temperature=>95, :hold_time=>180)
-    protocol.stages << stage
-    stage = Stage.new(:stage_type=>Stage::TYPE_CYCLE, :order_number=>1, :num_cycles=>40)
-    stage.steps << Step.new(:temperature=>95, :hold_time=>30, :order_number=>0)
-    stage.steps << Step.new(:temperature=>60, :hold_time=>30, :order_number=>1)
-    protocol.stages << stage
-    stage = Stage.new(:stage_type=>Stage::TYPE_HOLD, :order_number=>2)
-    stage.steps << Step.new(:temperature=>4, :hold_time=>0)
-    protocol.stages << stage
-    protocol.save
+  
+  before_create do |experiment|
+    if experiment.calibration_id == nil
+      experiment.calibration_id = Setting.calibration_id
+    end
   end
   
   after_destroy do |experiment|
+    if experiment_definition.experiment_type ==  ExperimentDefinition.TYPE_USER_DEFINED
+      experiment_definition.destroy
+    end
+    
     TemperatureLog.delete_all(:experiment_id => experiment.id)
     TemperatureDebugLog.delete_all(:experiment_id => experiment.id)
-  end
-  
-  def copy(params)
-    new_experiment = Experiment.new({:name=>(!params.blank?)? params[:name] : "Copy of #{name}", :qpcr=>qpcr})
-    new_experiment.protocol = protocol.copy
-    return new_experiment
+    FluorescenceDatum.delete_all(:experiment_id => experiment.id)
+    MeltCurveDatum.delete_all(:experiment_id => experiment.id)
   end
   
   def editable?
-    return started_at.nil?
+    return started_at.nil? && experiment_definition.editable?
   end
 
   def ran?
     return !started_at.nil?
+  end
+  
+  def name
+    experiment_definition.name
   end
 
 end
