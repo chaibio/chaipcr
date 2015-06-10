@@ -1,3 +1,8 @@
+$blue: #00AEEF;
+$green: #8FC742;
+$gray: #333;
+$lightgray: #C5C5C5;
+
 .user-settings {
 
   .row {
@@ -9,13 +14,13 @@
   .underlined {
     border-bottom-style: solid;
     border-bottom-width: 2px;
-    border-bottom-color: #333333;
+    border-bottom-color: $gray;
   }
 
   .header{
     width: 1024px;
     height: 45px;
-    background-color: #333333;
+    background-color: $gray;
 
     .name-container {
       float: left;
@@ -67,9 +72,9 @@
     }
 
     .btn-large-green {
-      border: 2px solid #8FC742;
+      border: 2px solid $green;
       background-color: #fff;
-      color: #8FC742;
+      color: $green;
       display: block;
       text-align: center;
       padding: 20px 0px;
@@ -78,9 +83,9 @@
     }
 
     .btn-blue {
-      border: 2px solid #37BFF1;
+      border: 2px solid $blue;
       background-color: #fff;
-      color: #37BFF1;
+      color: $blue;
       display: inline-block;
       text-align: center;
       padding: 5px 40px;
@@ -108,11 +113,20 @@
           display: inline-block;
           vertical-align: top;
           margin-top: -24px;
-          color: #3DC1F2;
+          color: $blue;
           font-size: 40px;
           cursor: pointer;
         }
       }
+    }
+
+    .radio-button {
+      border-width: 12px;
+      border-style: solid;
+      background: #fff;
+      border-radius: 100px;
+      width: 50px;
+      height: 50px;
     }
 
     .ui-slider {
@@ -120,14 +134,27 @@
     }
 
     .ui-slider-handle {
-      width: 50px;
-      height: 50px;
+      @extend .radio-button;
+      border-color: $blue;
       margin-top: -15px;
-      border-radius: 100px;
       outline: 0 !important;
-      border-color: #00AEEF;
-      background: #fff;
-      border-width: 12px;
+    }
+
+    .radio-options-container {
+      .radio-button {
+        display: inline-block;
+        vertical-align: middle;
+        margin-top: -7px;
+        border-color: $lightgray;
+        &.selected {
+          border-color: $blue;
+        }
+      }
+      .option-text {
+        display: inline;
+        color: $lightgray;
+        font-size: 18px;
+      }
     }
 
   }

@@ -105,10 +105,25 @@
           </P>
         </p>
 
-        <p class="lead info">
-          CHOOSE ONE
-          
-        </p>
+        <div>
+          <p class="lead info">
+            CHOOSE ONE
+          </p>
+          <div class="row radio-options-container">
+            <div class="col-md-6">
+              <div ng-click="settings.option = 'A'">
+                <div class="radio-button" ng-class="{selected: settings.option ==='A'}"></div>
+                <span class="option-text">OPTION A</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div ng-click="settings.option = 'B'">
+                <div class="radio-button" ng-class="{selected: settings.option ==='B'}"></div>
+                <span class="option-text">OPTION B</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
       </div>
     </div>
