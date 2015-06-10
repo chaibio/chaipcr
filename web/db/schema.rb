@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150608065026) do
+ActiveRecord::Schema.define(version: 20150610070810) do
 
   create_table "experiment_definitions", force: true do |t|
     t.string "name",            null: false
@@ -99,6 +99,7 @@ ActiveRecord::Schema.define(version: 20150608065026) do
     t.boolean  "collect_data",                              default: false
     t.decimal  "delta_temperature", precision: 4, scale: 2, default: 0.0
     t.integer  "delta_duration_s",                          default: 0
+    t.boolean  "pause",                                     default: false
   end
 
   create_table "temperature_debug_logs", id: false, force: true do |t|
