@@ -30,7 +30,6 @@ window.ChaiBioTech.ngApp
       if $window.confirm 'Are you sure?'
         User.remove(id).then fetchUsers
 
-
     $scope.openAddUserModal = ->
       $scope.modal = $modal.open
         scope: $scope
