@@ -12,5 +12,4 @@ ChaiBioTech.app.Views.graphContainer = Backbone.View.extend({
     return this;
   }
 
-
 });
