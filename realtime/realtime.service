@@ -1,0 +1,12 @@
+[Unit]
+Description=QPCR Realtime app
+
+[Service]
+WorkingDirectory=/root/tmp/
+ExecStartPre=/bin/sh -c 'echo chai-pcr > $SLOTS'
+ExecStart=/root/tmp/realtime
+SyslogIdentifier=QPCRRealtime
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

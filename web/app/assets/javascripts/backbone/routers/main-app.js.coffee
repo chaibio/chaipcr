@@ -210,14 +210,19 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
     ExpModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});
 
   runExp: (id) ->
-    that = this;
-    callback = () ->
-      that.runExpView = new ChaiBioTech.app.Views.runExperiment({
-          model: ExpModel
-      });
-      $("#container").html(that.runExpView.render().el);
 
-    ExpModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});
+    if @loggedIn() is true
+      that = this;
+      callback = () ->
+        that.runExpView = new ChaiBioTech.app.Views.runExperiment({
+            model: ExpModel
+        });
+        $("#container").html(that.runExpView.render().el);
+
+      ExpModel = new ChaiBioTech.Models.Experiment({"id": id, "callback": callback});
+    else
+      location.href = "#/login"
+
 
   loadStepStage: (id) ->
     that = this;
@@ -231,6 +236,7 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
         model: ExpModel
       });
     $("#container").html(@editStageStep.render().el);
+
 
   userSettings: ->
     tpl = '<div ng-include src="\'angular/views/user/settings.html\'"></div>'

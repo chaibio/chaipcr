@@ -1,8 +1,8 @@
 class MeltCurveDatum < ActiveRecord::Base
-  belongs_to :stage
+  belongs_to :experiment
   
   def self.as_csv(experiment_id)
-    query = self.where("protocols.experiment_id=?", experiment_id).joins("INNER JOIN stages ON stages.id = melt_curve_data.stage_id INNER JOIN protocols ON protocols.id = stages.protocol_id")
+    query = self.where("melt_curve_data.experiment_id=?", experiment_id).joins("INNER JOIN stages ON stages.id = melt_curve_data.stage_id")
     columns = column_names-["id", "stage_id"]
     CSV.generate do |csv|
       csv << ["stage_name"]+columns

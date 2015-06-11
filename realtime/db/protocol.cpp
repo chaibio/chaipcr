@@ -11,8 +11,8 @@ Protocol::Protocol(const Protocol &other)
     :Protocol()
 {
     setLidTemperature(other.lidTemperature());
-    setStages(other.stages());
 
+    _stages = other.stages();
     _currentStage = _stages.begin() + std::distance(other.stages().begin(), std::vector<Stage>::const_iterator(other._currentStage));
 }
 
@@ -35,8 +35,8 @@ Protocol::~Protocol()
 Protocol& Protocol::operator= (const Protocol &other)
 {
     setLidTemperature(other.lidTemperature());
-    setStages(other.stages());
 
+    _stages = other.stages();
     _currentStage = _stages.begin() + std::distance(other.stages().begin(), std::vector<Stage>::const_iterator(other._currentStage));
 
     return *this;

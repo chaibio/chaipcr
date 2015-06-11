@@ -18,7 +18,7 @@ public:
     };
 
     Experiment();
-    Experiment(int id);
+    Experiment(int definationId);
     Experiment(const Experiment &other);
     Experiment(Experiment &&other);
     ~Experiment();
@@ -26,16 +26,16 @@ public:
     Experiment& operator= (const Experiment &other);
     Experiment& operator= (Experiment &&other);
 
-    inline bool empty() const { return _id == -1; }
+    inline bool empty() const { return _definationId == -1; }
 
+    inline int definationId() const { return _definationId; }
+
+    inline void setId(int id) { _id = id; }
     inline int id() const { return _id; }
 
     inline void setName(const std::string &name) {_name = name;}
     inline void setName(std::string &&name) {_name = std::move(name);}
     inline const std::string& name() const {return _name;}
-
-    inline void setQpcr(bool qpcr) {_qpcr = qpcr;}
-    inline bool qpcr() const {return _qpcr;}
 
     inline void setStartedAt(const boost::posix_time::ptime &startedAt) {_startedAt = startedAt;}
     inline const boost::posix_time::ptime& startedAt() const {return _startedAt;}
@@ -56,10 +56,10 @@ public:
     inline Protocol* protocol() const {return _protocol;}
 
 private:
-    int _id;
-
+    int _definationId;
     std::string _name;
-    bool _qpcr;
+
+    int _id;
     boost::posix_time::ptime _startedAt;
     boost::posix_time::ptime _completedAt;
     CompletionStatus _completionStatus;

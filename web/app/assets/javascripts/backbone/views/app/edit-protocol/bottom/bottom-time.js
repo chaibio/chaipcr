@@ -115,9 +115,9 @@ ChaiBioTech.app.Views.bottomTime = Backbone.View.extend({
 
   changeSign: function(val) {
 
-    if(parseFloat(val) >= 0) {
+    if(parseFloat(val) > 0) {
       this.draggable.trigger("positive");
-    } else {
+    } else if(parseFloat(val) < 0) {
       this.draggable.trigger("negative");
     }
   },
