@@ -68,3 +68,7 @@ gem 'seed-fu'
 # angular-js dependencies
 gem "angularjs-rails"
 gem 'angular-rails-templates'
+
+group :test, :development do
+  gem 'jasmine-rails'
+end

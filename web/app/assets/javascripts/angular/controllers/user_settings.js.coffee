@@ -10,14 +10,14 @@ window.ChaiBioTech.ngApp
       option: 'A'
       checkbox: true
 
+    $scope.goHome = ->
+      $window.location = '#home'
+
     fetchUsers = ->
       User.fetch().then (users) ->
         $scope.users = users
 
     fetchUsers()
-
-    $scope.goHome = ->
-      $window.location = '#home'
 
     $scope.user = {}
 
