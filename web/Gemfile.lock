@@ -29,7 +29,6 @@ GEM
       railties (>= 3.1)
       sprockets
       tilt
-    angularjs-rails (1.2.20)
     apipie-rails (0.2.0)
       json
       rails (>= 3.0.10)
@@ -168,7 +167,6 @@ PLATFORMS
 
 DEPENDENCIES
   angular-rails-templates
-  angularjs-rails
   apipie-rails
   bcrypt-ruby (~> 3.1.2)
   capybara

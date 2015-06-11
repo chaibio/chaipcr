@@ -2,7 +2,8 @@ window.ChaiBioTech.ngApp
 .controller 'UserSettingsCtrl', [
   '$scope'
   '$window'
-  ($scope, $window) ->
+  '$modal'
+  ($scope, $window, $modal) ->
 
     $scope.settings =
       option: 'A'
@@ -10,5 +11,10 @@ window.ChaiBioTech.ngApp
 
     $scope.goHome = ->
       $window.location = '#home'
+
+    $scope.openAddUserModal = ->
+      $modal.open
+        scope: $scope
+        templateUrl: 'angular/views/user/modal-add-user.html'
 
 ]
