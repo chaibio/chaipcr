@@ -2,6 +2,9 @@ require 'zip'
 
 class ExperimentsController < ApplicationController
   include ParamsHelper
+  before_filter :get_experiment, :except => [:index, :create, :copy]
+  before_filter :experiment_definition_editable_check, :only => :update
+  
   respond_to :json
 
   resource_description { 
@@ -47,10 +50,9 @@ class ExperimentsController < ApplicationController
   param_group :experiment
   example "{'experiment':{'id':1,'name':'test','type':'user','started_at':null,'completed_at':null,'completed_status':null}}"
   def update
-    @experiment = Experiment.find_by_id(params[:id])
-    ret = @experiment.update_attributes(experiment_params)
+    ret = @experiment.experiment_definition.update_attributes(experiment_params)
     respond_to do |format|
-      format.json { renderd "show", :status => (ret)? :ok :  :unprocessable_entity}
+      format.json { render "show", :status => (ret)? :ok :  :unprocessable_entity}
     end
   end
   
@@ -70,7 +72,6 @@ class ExperimentsController < ApplicationController
   api :GET, "/experiments/:id", "Show an experiment"
   see "experiments#create", "json response"
   def show
-    @experiment = Experiment.find_by_id(params[:id]) 
     respond_to do |format|
       format.json { render "fullshow", :status => (@experiment)? :ok :  :unprocessable_entity}
     end
@@ -78,7 +79,6 @@ class ExperimentsController < ApplicationController
   
   api :DELETE, "/experiments/:id", "Destroy an experiment"
   def destroy
-    @experiment = Experiment.find_by_id(params[:id])
     ret = @experiment.destroy
     respond_to do |format|
       format.json { render "destroy", :status => (ret)? :ok :  :unprocessable_entity}
@@ -90,7 +90,6 @@ class ExperimentsController < ApplicationController
   param :endtime, Integer, :desc => "if not specified, it returns everything to the end of the experiment, in ms"
   param :resolution, Integer, :desc => "Include data points for every x milliseconds. Must be a multiple of 1000 ms"
   def temperature_data
-    @experiment = Experiment.find_by_id(params[:id]) 
     @temperatures =  @experiment.temperature_logs.with_range(params[:starttime], params[:endtime], params[:resolution])
     respond_to do |format|
       format.json { render "temperature_data", :status => :ok}
@@ -100,7 +99,6 @@ class ExperimentsController < ApplicationController
   api :GET, "/experiments/:id/fluorescence_data", "Retrieve fluorescence data"
   example "{'fluorescence_datum':{'fluorescence_value':75,'well_num':1,'cycle_num':1}, 'fluorescence_datum':{'fluorescence_value':50,'well_num':2,'cycle_num':1}}"
   def fluorescence_data
-    @experiment = Experiment.find_by_id(params[:id]) 
     @fluorescence_data = @experiment.fluorescence_data.select("cycle_num, well_num, AVG(fluorescence_value) as fluorescence_value").group("cycle_num, well_num").order("cycle_num, well_num")
     respond_to do |format|
       format.json { render "fluorescence_data", :status => :ok}
@@ -109,15 +107,14 @@ class ExperimentsController < ApplicationController
   
   api :GET, "/experiments/:id/export.zip", "zip temperature, fluorescence and meltcurv csv files"
   def export
-    experiment = Experiment.find_by_id(params[:id])
     respond_to do |format|
       format.zip {
         buffer = Zip::OutputStream.write_buffer do |out|
-          out.put_next_entry("qpcr_experiment_#{(experiment)? experiment.name : "null"}/temperature_log.csv")
+          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/temperature_log.csv")
           out.write TemperatureLog.as_csv(params[:id])
-          out.put_next_entry("qpcr_experiment_#{(experiment)? experiment.name : "null"}/fluorescence.csv")
+          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/fluorescence.csv")
           out.write FluorescenceDatum.as_csv(params[:id])
-          out.put_next_entry("qpcr_experiment_#{(experiment)? experiment.name : "null"}/melt_curve.csv")
+          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve.csv")
           out.write MeltCurveDatum.as_csv(params[:id])
         end
         buffer.rewind
@@ -126,4 +123,10 @@ class ExperimentsController < ApplicationController
     end
   end
     
+  protected
+  
+  def get_experiment
+    @experiment = Experiment.find_by_id(params[:id]) if @experiment.nil?
+  end
+  
 end

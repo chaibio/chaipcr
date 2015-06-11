@@ -29,6 +29,16 @@ module FactoryHelper
     experiment
   end
   
+  def create_experiment_with_one_stage(name)
+    params = { experiment: {name: name, protocol: {lid_temperature:110, stages:[
+                      {stage:{stage_type:"holding",steps:[{step:{temperature:95,hold_time:180}}]}}, 
+                      ]}} }
+    post "/experiments", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+    expect(response).to be_success            # test for the 200 status-code
+    json = JSON.parse(response.body)
+    return Experiment.find_by_id(json["experiment"]["id"])
+  end
+  
   def create_admin_user
     User.create(:email=>"admin@pcr.com", :password=>"changeme", :password_confirmation=>"changeme", :role=>"admin")
   end

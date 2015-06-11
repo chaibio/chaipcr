@@ -38,6 +38,15 @@ describe "Experiments API" do
     json["experiment"]["name"].should == "test"
   end
   
+  it  'edit experiment name' do
+    experiment = create_experiment("test")
+    params = {experiment: {name: "test1"}}
+    put "/experiments/#{experiment.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+    expect(response).to be_success 
+    json = JSON.parse(response.body)
+    json["experiment"]["name"].should == "test1"
+  end
+  
   it "list experiments with no experiment" do
     get "/experiments", { :format => 'json' }
     expect(response).to be_success            # test for the 200 status-code
@@ -98,5 +107,16 @@ describe "Experiments API" do
     create_fluorescence_data(experiment)
     get "/experiments/#{experiment.id}/export.zip", { :format => 'zip' }
     expect(response).to be_success
+  end
+  
+  describe "check editable" do
+    it "not editable if experiment definition is not editable" do
+      experiment = Experiment.new
+      experiment.experiment_definition = ExperimentDefinition.new(:name=>"diagnostic", :experiment_type=>ExperimentDefinition::TYPE_DIAGONOSTIC)
+      experiment.save
+      params = {experiment: {name: "test1"}}
+      put "/experiments/#{experiment.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      response.response_code.should == 422
+    end
   end
 end
