@@ -174,6 +174,7 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
 	logMeIn: () ->
 		@loginScreen = new ChaiBioTech.app.Views.login
 		$("#container").html(@loginScreen.render().el)
+		$("#container").find("#login-user").attr("placeholder", "Enter value");
 
 	plateSetup: (id) ->
 		@plateSetup = new ChaiBioTech.app.Views.plateSetup
