@@ -37,6 +37,7 @@
 //= require angular/libs/ui-bootstrap-custom-0.13.0
 //= require angular/libs/ui-bootstrap-custom-tpls-0.13.0
 //= require_tree ./angular/controllers
+//= require_tree ./angular/services
 //= require_tree ./angular/views
 
 $(function () {

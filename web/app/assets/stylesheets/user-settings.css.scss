@@ -1,8 +1,4 @@
-$blue: #00AEEF;
-$green: #8FC742;
-$gray: #333;
-$lightgray: #C5C5C5;
-$red: #EE3017;
+@import './colors';
 
 .user-settings {
 
@@ -66,6 +62,29 @@ $red: #EE3017;
     }
   }
 
+  .btn-large-green {
+    border: 2px solid $green;
+    background-color: #fff;
+    color: $green;
+    display: block;
+    text-align: center;
+    padding: 20px 0px;
+    font-weight: 700;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .btn-blue {
+    border: 2px solid $blue;
+    background-color: #fff;
+    color: $blue;
+    display: inline-block;
+    text-align: center;
+    padding: 5px 40px;
+    font-weight: 700;
+    font-size: 20px;
+  }
+
   .content {
     padding-top: 50px;
 
@@ -74,28 +93,6 @@ $red: #EE3017;
     }
     .col-md-6:last-of-type {
       padding-right: 45px;
-    }
-
-    .btn-large-green {
-      border: 2px solid $green;
-      background-color: #fff;
-      color: $green;
-      display: block;
-      text-align: center;
-      padding: 20px 0px;
-      font-weight: 700;
-      font-size: 20px;
-    }
-
-    .btn-blue {
-      border: 2px solid $blue;
-      background-color: #fff;
-      color: $blue;
-      display: inline-block;
-      text-align: center;
-      padding: 5px 40px;
-      font-weight: 700;
-      font-size: 20px;
     }
 
     .scroller {

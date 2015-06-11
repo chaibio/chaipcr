@@ -1,1 +1,52 @@
-<div>modal here</div>
+<div class="user-settings">
+  <div class="modal-add-user">
+    <p class="lead underlined">
+      ADD A USER
+      <a class="pull-right close" ng-click="modal.close()">&times;</a>
+    </p>
+    <form role="form" class="form-horizontal" ng-submit="addUser()">
+      <div class="underlined">
+        <div class="form-group">
+          <label for="name" class="col-sm-1 control-label">NAME</label>
+          <div class="col-sm-11">
+            <input type="text" class="form-control" ng-model="user.name">
+          </div>
+        </div>
+      </div>
+      <div class="underlined">
+        <div class="form-group">
+          <label for="email" class="col-sm-1 control-label">EMAIL</label>
+          <div class="col-sm-11">
+            <input type="text" class="form-control" ng-model="user.email">
+          </div>
+        </div>
+      </div>
+      <div class="underlined">
+        <div class="form-group">
+          <div class="checkbox">
+            <label for="email" class="col-sm-offset-1 col-sm-11 control-label">
+              <input type="checkbox" ng-model="user.role" ng-true-value="'admin'" ng-false-value="'default'"> is admin
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="underlined">
+        <div class="form-group">
+          <label for="" class="col-sm-3 control-label">PASSWORD</label>
+          <div class="col-sm-9">
+            <input type="text" class="form-control" ng-model="user.password">
+          </div>
+        </div>
+      </div>
+      <div class="underlined">
+        <div class="form-group">
+          <label for="" class="col-sm-3 control-label">CONFIRM PASSWORD</label>
+          <div class="col-sm-9">
+            <input type="text" class="form-control" ng-model="user.password_confirmation">
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn-large-green">ADD USER</button>
+    </form>
+  </div>
+</div>

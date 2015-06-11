@@ -3,7 +3,8 @@ window.ChaiBioTech.ngApp
   '$scope'
   '$window'
   '$modal'
-  ($scope, $window, $modal) ->
+  'User'
+  ($scope, $window, $modal, User) ->
 
     $scope.settings =
       option: 'A'
@@ -12,8 +13,14 @@ window.ChaiBioTech.ngApp
     $scope.goHome = ->
       $window.location = '#home'
 
+    $scope.user = {}
+
+    $scope.addUser = ->
+      User.save($scope.user).then (resp) ->
+        console.log resp
+
     $scope.openAddUserModal = ->
-      $modal.open
+      $scope.modal = $modal.open
         scope: $scope
         templateUrl: 'angular/views/user/modal-add-user.html'
 
