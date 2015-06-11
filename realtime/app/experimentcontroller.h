@@ -23,6 +23,7 @@ public:
         Idle,
         LidHeating,
         Running,
+        Paused,
         Complete
     };
 
@@ -43,6 +44,7 @@ public:
     inline Settings* settings() const { return _settings; }
 
     StartingResult start(int experimentId);
+    void resume();
     void stop();
     void stop(const std::string &errorMessage);
 

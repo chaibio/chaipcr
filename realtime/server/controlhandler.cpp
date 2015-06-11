@@ -48,9 +48,21 @@ void ControlHandler::processData(const boost::property_tree::ptree &requestPt, b
         break;
     }
 
+    case ResumeExperiment:
+    {
+        if (ExperimentController::getInstance()->machineState() == ExperimentController::Paused)
+            ExperimentController::getInstance()->resume();
+        else
+        {
+            setErrorString("Machine is not paused");
+            setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+        }
+
+        break;
+    }
+
     case StopExperiment:
         ExperimentController::getInstance()->stop();
-
         break;
 
     default:
