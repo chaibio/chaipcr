@@ -66,4 +66,5 @@ gem 'seed-fu'
 # gem 'debugger', group: [:development, :test]
 
 # angular-js dependencies
+gem "angularjs-rails"
 gem 'angular-rails-templates'

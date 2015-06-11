@@ -10,14 +10,26 @@ window.ChaiBioTech.ngApp
       option: 'A'
       checkbox: true
 
+    fetchUsers = ->
+      User.fetch().then (users) ->
+        $scope.users = users
+
+    fetchUsers()
+
     $scope.goHome = ->
       $window.location = '#home'
 
     $scope.user = {}
 
     $scope.addUser = ->
-      User.save($scope.user).then (resp) ->
-        console.log resp
+      User.save($scope.user).then ->
+        fetchUsers()
+        $scope.modal.close()
+
+    $scope.removeUser = (id) ->
+      if $window.confirm 'Are you sure?'
+        User.remove(id).then fetchUsers
+
 
     $scope.openAddUserModal = ->
       $scope.modal = $modal.open

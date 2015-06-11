@@ -28,7 +28,7 @@
 //= require backbone/Constants
 
 // angularjs assets ==============
-//= require angular/libs/angular.min
+//= require angular
 //= require angular-rails-templates
 //= require angular/app
 //= require angular/libs/perfect-scrollbar.jquery.min
