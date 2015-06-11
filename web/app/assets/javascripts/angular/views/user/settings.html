@@ -125,8 +125,8 @@
 
         <div class="padd-top">
           <div class="checkbox-container">
-            <div>
-              <div class="check-box" ng-class="{'checked': settings.checkbox}" ng-click="settings.checkbox = !settings.checkbox">
+            <div class="checkbox-wrapper" ng-click="settings.checkbox = !settings.checkbox">
+              <div class="check-box" ng-class="{'checked': settings.checkbox}">
               </div>
               <div class="check-box-label">
                 <p>Save expirement results as text document</p>
@@ -140,6 +140,29 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <div class="padd-top"></div>
+        <div class="padd-top"></div>
+        <div class="padd-top user-management">
+          <p class="lead info">
+            ADMIN: USER MANAGEMENT
+            <span class="text"></span>
+            <span class="elipsis red">...</span>
+          </p>
+
+          <perfect-scrollbar class="scroller">
+            <p class="lead info">
+              <span class="text">NICK NOTARO</span>
+              <span class="elipsis">...</span>
+              <a href="#" class="btn-remove"></a>
+            </p>
+
+            <a href="#" class="btn-large-green">
+              ADD NEW USER
+            </a>
+
+          </perfect-scrollbar>
         </div>
 
       </div>

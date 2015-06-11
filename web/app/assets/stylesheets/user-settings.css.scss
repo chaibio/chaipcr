@@ -2,6 +2,7 @@ $blue: #00AEEF;
 $green: #8FC742;
 $gray: #333;
 $lightgray: #C5C5C5;
+$red: #EE3017;
 
 .user-settings {
 
@@ -174,6 +175,9 @@ $lightgray: #C5C5C5;
     }
 
     .checkbox-container {
+      .checkbox-wrapper {
+        cursor: pointer;
+      }
       .check-box {
         background-image: image-url("checkbox-unchecked.png");
         background-size: 100% 100%;
@@ -199,8 +203,25 @@ $lightgray: #C5C5C5;
           }
         }
       }
-      .prefix-doc {
+    }
 
+    .user-management {
+      .elipsis{
+        &.red {
+          margin-top: -17px !important;
+          float: right;
+          color: $red !important;
+          margin-right: 20px;
+        }
+      }
+      .btn-remove {
+        display: inline-block;
+        height: 30px;
+        width: 30px;
+        background-color: #fff !important;
+        background-image: image-url('btn-remove-user.png');
+        background-size: 100% 100%;
+        float: right;
       }
     }
 
