@@ -5,6 +5,10 @@ $lightgray: #C5C5C5;
 
 .user-settings {
 
+  .padd-top {
+    padding-top: 20px;
+  }
+
   .row {
     margin: 0;
     margin-right: -15px;
@@ -141,19 +145,62 @@ $lightgray: #C5C5C5;
     }
 
     .radio-options-container {
+      .col-md-6:first-of-type {
+        padding-left: 15px;
+      }
+      .selected {
+        .radio-button {
+          border-color: $blue;
+        }
+        .option-text {
+          color: gray;
+        }
+      }
+      .radio-option {
+        cursor: pointer;
+      }
       .radio-button {
         display: inline-block;
         vertical-align: middle;
         margin-top: -7px;
         border-color: $lightgray;
-        &.selected {
-          border-color: $blue;
-        }
       }
       .option-text {
         display: inline;
         color: $lightgray;
         font-size: 18px;
+        padding-left: 10px;
+      }
+    }
+
+    .checkbox-container {
+      .check-box {
+        background-image: image-url("checkbox-unchecked.png");
+        background-size: 100% 100%;
+        width: 50px;
+        height: 50px;
+        display: inline-block;
+        vertical-align: middle;
+        &.checked {
+          background-image: image-url("checkbox-checked.png");
+        }
+        &.placeholder {
+          background: transparent;
+        }
+      }
+      .check-box-label {
+        display: inline-block;
+        color: gray;
+        p {
+          font-size: 16px;
+          padding-left: 10px;
+          &.prefix-doc {
+            color: $gray;
+          }
+        }
+      }
+      .prefix-doc {
+
       }
     }
 

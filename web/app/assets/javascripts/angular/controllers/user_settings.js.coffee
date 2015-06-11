@@ -4,9 +4,9 @@ window.ChaiBioTech.ngApp
   '$window'
   ($scope, $window) ->
 
-    $scope.settings = {
+    $scope.settings =
       option: 'A'
-    }
+      checkbox: true
 
     $scope.goHome = ->
       $window.location = '#home'

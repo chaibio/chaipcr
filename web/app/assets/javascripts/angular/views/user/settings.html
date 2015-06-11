@@ -105,21 +105,38 @@
           </P>
         </p>
 
-        <div>
-          <p class="lead info">
-            CHOOSE ONE
-          </p>
-          <div class="row radio-options-container">
-            <div class="col-md-6">
-              <div ng-click="settings.option = 'A'">
-                <div class="radio-button" ng-class="{selected: settings.option ==='A'}"></div>
-                <span class="option-text">OPTION A</span>
+        <p class="lead info padd-top">
+          CHOOSE ONE
+        </p>
+        <div class="row radio-options-container">
+          <div class="col-md-6">
+            <div class="radio-option" ng-click="settings.option = 'A'" ng-class="{selected: settings.option ==='A'}">
+              <div class="radio-button"></div>
+              <span class="option-text">OPTION A</span>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="radio-option" ng-click="settings.option = 'B'" ng-class="{selected: settings.option ==='B'}">
+              <div class="radio-button"></div>
+              <span class="option-text">OPTION B</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="padd-top">
+          <div class="checkbox-container">
+            <div>
+              <div class="check-box" ng-class="{'checked': settings.checkbox}" ng-click="settings.checkbox = !settings.checkbox">
+              </div>
+              <div class="check-box-label">
+                <p>Save expirement results as text document</p>
               </div>
             </div>
-            <div class="col-md-6">
-              <div ng-click="settings.option = 'B'">
-                <div class="radio-button" ng-class="{selected: settings.option ==='B'}"></div>
-                <span class="option-text">OPTION B</span>
+            <div>
+              <div class="check-box placeholder"></div>
+              <div class="check-box-label">
+                <p class="prefix-doc">ADD PREFIX TO DOCUMENT FILE NAME</p>
+                <p>Malaria_070214</p>
               </div>
             </div>
           </div>
