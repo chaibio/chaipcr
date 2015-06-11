@@ -171,10 +171,10 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
       }
     }
 
-
   logMeIn: () ->
     @loginScreen = new ChaiBioTech.app.Views.login
     $("#container").html(@loginScreen.render().el)
+    $("#container").find("#login-user").attr("placeholder", "Enter value");
 
   plateSetup: (id) ->
     @plateSetup = new ChaiBioTech.app.Views.plateSetup
@@ -236,7 +236,6 @@ class ChaiBioTech.Routers.appRouter extends Backbone.Router
         model: ExpModel
       });
     $("#container").html(@editStageStep.render().el);
-
 
   userSettings: ->
     tpl = '<div ng-include src="\'angular/views/user/settings.html\'"></div>'

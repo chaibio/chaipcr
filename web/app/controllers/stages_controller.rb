@@ -1,5 +1,7 @@
 class StagesController < ApplicationController
   include ParamsHelper
+  before_filter :experiment_definition_editable_check
+  
   respond_to :json  
  
   resource_description { 
@@ -21,8 +23,6 @@ class StagesController < ApplicationController
   param :prev_id, Integer, :desc => "prev stage id or null if it is the first node", :required=>false
   example "{'stage':{'id':1,'stage_type':'holding','name':'Holding Stage','num_cycles':1,'steps':[{'step':{'id':1,'name':'Step 1','temperature':'95.0','hold_time':180,'ramp':{'id':1,'rate':'100.0','max':true}}}"
   def create
-    @stage = Stage.new(stage_params)
-    @stage.protocol_id = params[:protocol_id]
     @stage.prev_id = params[:prev_id]
     ret = @stage.save
     respond_to do |format|
@@ -34,7 +34,6 @@ class StagesController < ApplicationController
   param_group :stage
   example "{'stage':{'id':1,'stage_type':'holding','name':'Holding Stage','num_cycles':1}}"
   def update
-    @stage = Stage.find_by_id(params[:id])
     ret  = @stage.update_attributes(stage_params)
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
@@ -44,7 +43,6 @@ class StagesController < ApplicationController
   api :POST, "/stages/:id/move", "Move a stage"
   param :prev_id, Integer, :desc => "prev stage id or null if it is the first node", :required=>true
   def move
-    @stage = Stage.find_by_id(params[:id])
     @stage.prev_id = params[:prev_id]
     ret = @stage.save
     respond_to do |format|
@@ -54,11 +52,22 @@ class StagesController < ApplicationController
   
   api :DELETE, "/stages/:id", "Destroy a stage"
   def destroy
-    @stage = Stage.find_by_id(params[:id])
     ret = @stage.destroy
     respond_to do |format|
       format.json { render "destroy", :status => (ret)? :ok : :unprocessable_entity}
     end
+  end
+  
+  protected
+  
+  def get_experiment
+    if params[:action] == "create"
+      @stage = Stage.new(stage_params)
+      @stage.protocol_id = params[:protocol_id]
+    else
+      @stage = Stage.find_by_id(params[:id])
+    end
+    @experiment = Experiment.where("experiment_definition_id=?", @stage.protocol.experiment_definition_id).first if !@stage.nil?
   end
   
 end

@@ -1,43 +1,76 @@
 // Login page
 .login-wrapper {
-	min-height: 500px;
-	background-color: wheat;
-	padding-top: 5%;
+	min-height: 768px;
+	background-color: #ff8102;
+
 
 	.login-box {
-		height: 250px;
-		width: 300px;
+		height: 364px;
+		width: 500px;
 		background-color: white;
-		margin-left: auto;
-		margin-right: auto;
-		-webkit-box-shadow: 1px 1px 82px 3px rgba(0,0,0,0.75);
-		-moz-box-shadow: 1px 1px 82px 3px rgba(0,0,0,0.75);
-		box-shadow: 1px 1px 82px 3px rgba(0,0,0,0.75);
-		-webkit-border-radius: 4px;
-		-moz-border-radius: 4px;
-		border-radius: 4px;
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		margin: auto;
 
-		.login-heading {
-			width: 100%;
+		.title-field {
+			padding-top: 26px;
+		}
+		.login-section {
+			width: 430px;
+			height: 108px;
+			margin: 0 auto;
 			text-align: center;
-			font-weight: bold;
-			padding-top: 10px;
-		}
 
-		.login-credentials {
-			width: 300px;
+			.login-field {
+				width: 430px;
+				height: 52px;
+				border-bottom: 1px solid #cbcbcb;
+			}
 
-			input {
-				margin: 30px 0 0 65px;
+			.login-field-text {
+				float: left;
+				margin-top: 31px;
+				color: #585858;
+				font-size: 18px;
+				width: 60px;
+			}
+
+			.login-text-field {
+
+				float: left;
+				margin-left: 10px;
+
+				margin-top: 25px;
+				border: solid 1px white;
+				width: 350px;
+
+				font-size: 16px;
+				outline: none;
+			}
+
+			.login-button {
+
+				width: 240px;
+				height: 40px;
+				margin: 0 auto;
+				background-color: black;
+				border: none;
+				color: white;
+				font-weight: 400;
+				margin-top: 33px;
+			}
+			.login-trouble {
+
+				color: #00aeef;
+				font-size: 9px;
+				margin-top: 20px;
 				text-align: center;
-				-webkit-border-radius: 4px;
-				-moz-border-radius: 4px;
-				border-radius: 4px;
-			}
-			button {
-				margin: 30px 0 0 72px;
-				width: 150px;
+				cursor: pointer;
 			}
 		}
+
 	}
 }

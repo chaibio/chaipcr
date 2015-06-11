@@ -1,5 +1,7 @@
 class ProtocolsController < ApplicationController
   include ParamsHelper
+  before_filter :experiment_definition_editable_check
+    
   respond_to :json
   
   resource_description { 
@@ -15,10 +17,17 @@ class ProtocolsController < ApplicationController
   api :PUT, "/protocols/:id", "Update a protocol"
   param_group :protocol
   def update
-    @protocol = Protocol.find_by_id(params[:id])
     ret  = @protocol.update_attributes(protocol_params)
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
+  
+  protected
+  
+  def get_experiment
+    @protocol = Protocol.find_by_id(params[:id])
+    @experiment = Experiment.where("experiment_definition_id=?", @protocol.experiment_definition_id).first if !@protocol.nil?
+  end
+  
 end

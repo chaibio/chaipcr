@@ -2,7 +2,8 @@ require 'spec_helper'
 
 describe "Steps API" do
   before(:each) do
-    @stage = hold_stage(Protocol.create).reload
+    @experiment = create_experiment_with_one_stage("test")
+    @stage = @experiment.experiment_definition.protocol.stages.first
   end
   
   describe "#create" do
@@ -47,4 +48,40 @@ describe "Steps API" do
       json["step"]["destroyed_stage_id"].should be_nil
     end
   end
+  
+  describe "#move" do
+    it "step from one stage to another stage" do
+      new_stage = cycle_stage(@stage.protocol)
+      steps_count = new_stage.steps.count
+      params = { stage_id: new_stage.id }
+      post "/steps/#{@stage.steps.first.id}/move", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      expect(response).to be_success
+      @experiment.experiment_definition.protocol.stages.count.should == 1
+      @experiment.experiment_definition.protocol.stages.first.id.should == new_stage.id
+      new_stage.steps.count.should == steps_count + 1
+    end
+    
+    it "step to non-existent stage not allowed" do
+      params = { stage_id: 212 }
+      post "/steps/#{@stage.steps.first.id}/move", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      response.response_code.should == 422
+    end
+  end
+
+  describe "check editable" do
+    it "- not editable if experiment definition is not editable" do
+      @experiment.experiment_definition = ExperimentDefinition.new(:name=>"diagnostic", :experiment_type=>ExperimentDefinition::TYPE_DIAGONOSTIC)
+      @experiment.save
+      post "/stages/#{@stage.id}/steps", {}, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      response.response_code.should == 422
+    end
+    
+    it "not editable if experiment is runned" do
+      @experiment.update_attributes(:started_at=>Time.now)
+      @experiment.save
+      post "/stages/#{@stage.id}/steps", {}, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      response.response_code.should == 422
+    end
+  end
+  
 end
