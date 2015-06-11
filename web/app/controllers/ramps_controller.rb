@@ -1,5 +1,7 @@
 class RampsController < ApplicationController
   include ParamsHelper
+  before_filter :experiment_definition_editable_check
+    
   respond_to :json
   
   resource_description { 
@@ -17,10 +19,17 @@ class RampsController < ApplicationController
   param_group :ramp
   example "{'ramp':{'id':1,'rate':'100.0','max':true}}"
   def update
-    @ramp = Ramp.find_by_id(params[:id])
     ret  = @ramp.update_attributes(ramp_params)
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
+  
+  protected
+  
+  def get_experiment
+    @ramp = Ramp.find_by_id(params[:id])
+    @experiment = Experiment.where("experiment_definition_id=?", @ramp.step.stage.protocol.experiment_definition_id).first if !@ramp.nil?
+  end
+  
 end
