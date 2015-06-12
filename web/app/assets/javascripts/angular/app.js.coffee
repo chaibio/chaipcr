@@ -5,4 +5,5 @@ window.ChaiBioTech.ngApp = angular.module 'ChaiBioTech', [
   'perfect_scrollbar'
   'ui.slider'
   'ui.bootstrap'
+  'uiSwitch'
 ]

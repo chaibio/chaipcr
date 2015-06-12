@@ -3,7 +3,7 @@
 
 app = window.ChaiBioTech.ngApp
 
-app.service 'httpRequestInterceptor', [
+app.service 'CSRFToken', [
   '$window'
   ($window) ->
     request: (config) ->
@@ -16,5 +16,5 @@ app.service 'httpRequestInterceptor', [
 app.config [
   '$httpProvider'
   ($httpProvider) ->
-    $httpProvider.interceptors.push('httpRequestInterceptor')
+    $httpProvider.interceptors.push('CSRFToken')
 ]

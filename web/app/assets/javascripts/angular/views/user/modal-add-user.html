@@ -22,13 +22,14 @@
         </div>
       </div>
       <div class="underlined">
-        <div class="form-group">
+        <!-- <div class="form-group">
           <div class="checkbox">
             <label for="email" class="col-sm-offset-1 col-sm-11 control-label">
               <input type="checkbox" ng-model="user.role" ng-true-value="'admin'" ng-false-value="'default'"> is admin
             </label>
           </div>
-        </div>
+        </div> -->
+        <switch id="enabled" name="enabled" ng-model="user.role" ng-true-value="'admin'" ng-false-value="'default'" class="green" on="Y" off="N"></switch>
       </div>
       <div class="underlined">
         <div class="form-group">

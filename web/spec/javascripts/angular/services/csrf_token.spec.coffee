@@ -1,4 +1,4 @@
-describe 'httpRequestInterceptor Service', ->
+describe 'CSRFToken Service', ->
 
   csrf ='test-csrf-string'
 
@@ -16,9 +16,9 @@ describe 'httpRequestInterceptor Service', ->
     inject ($injector) ->
 
       @httpBackend = $injector.get '$httpBackend'
-      @httpRequestInterceptor = $injector.get 'httpRequestInterceptor'
+      @CSRFToken = $injector.get 'CSRFToken'
 
   it 'should append csrf meta to header', ->
     config = headers: {}
-    config = @httpRequestInterceptor.request(config)
+    config = @CSRFToken.request(config)
     expect(config.headers['X-CSRF-Token']).toBe csrf

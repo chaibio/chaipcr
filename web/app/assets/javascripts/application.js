@@ -34,6 +34,7 @@
 //= require angular/libs/perfect-scrollbar.jquery.min
 //= require angular/libs/angular-perfect-scrollbar
 //= require angular/libs/slider
+//= require angular/libs/angular-ui-switch
 //= require angular/libs/ui-bootstrap-custom-0.13.0
 //= require angular/libs/ui-bootstrap-custom-tpls-0.13.0
 //= require_tree ./angular/controllers
