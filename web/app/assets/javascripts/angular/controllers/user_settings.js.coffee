@@ -24,6 +24,7 @@ window.ChaiBioTech.ngApp
     $scope.addUser = ->
       $scope.user.role = if $scope.user.role then 'admin' else 'default'
       User.save($scope.user).then ->
+        $scope.user = {}
         fetchUsers()
         $scope.modal.close()
 

@@ -52,6 +52,7 @@ describe 'UserSettingsCtrl', ->
     @httpBackend.flush()
     expect(closeSpy).toHaveBeenCalled()
     expect(@scope.users).toEqual [@userMock]
+    expect(@scope.user).toEqual {}
 
   it 'should remove user', ->
     @scope.users = [@userMock]
