@@ -27,5 +27,7 @@ describe 'User Service', ->
 
   it 'should delete user', ->
     @httpBackend.expectDELETE("/users/#{@userMock.id}").respond 200
-    @User.remove(@userMock.id)
+    spy = jasmine.createSpy()
+    @User.remove(@userMock.id).then spy
     @httpBackend.flush()
+    expect(spy).toHaveBeenCalled()
