@@ -1,3 +1,5 @@
+@import './colors';
+
 .switch {
   background: #fff;
   border: 1px solid #dfdfdf;
@@ -21,7 +23,7 @@
   width:80px;
 }
 .switch small {
-  background: #63BD62;
+  background: $green;
   border-radius: 100%;
   box-shadow: 0 1px 3px rgba(0,0,0,0.4);
   width: 30px;
@@ -34,8 +36,8 @@
   border: 7px solid #fff;
 }
 .switch.checked {
-  background: rgb(100, 189, 99);
-  border-color: rgb(100, 189, 99);
+  background: $green;
+  border-color: $green;
 }
 .switch.checked small {
   left: 22px;

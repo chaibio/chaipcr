@@ -19,20 +19,52 @@
   .modal-add-user {
     padding: 15px 25px;
 
+    .modal-title {
+      font-size: 15px;
+    }
+
     a.close {
       color: $lightgray;
       opacity: 1;
     }
 
+    .form-group {
+      margin-bottom: 0px;
+      margin-top: 15px;
+    }
+
+    .switch {
+      vertical-align: middle;
+    }
+
+    .switch-container {
+      padding-bottom: 5px;
+    }
+
     label {
       font-weight: normal;
       text-align: left;
+      padding-top: 12px;
     }
 
     input {
       border: none;
       webkit-box-shadow: inset 0 0 0 #000;
       box-shadow: inset 0 0 0 #000;
+      font-size: 21px;
+      display: inline-block;
+      vertical-align: top;
+      font-weight: normal;
+      margin-top: -4px;
+    }
+
+    .submit-btn-container {
+      padding: 70px;
+      padding-bottom: 20px;
+    }
+
+    .btn-large-green {
+      width: 100%;
     }
 
   }

@@ -1,6 +1,6 @@
 <div class="user-settings">
   <div class="modal-add-user">
-    <p class="lead underlined">
+    <p class="modal-title underlined">
       ADD A USER
       <a class="pull-right close" ng-click="modal.close()">&times;</a>
     </p>
@@ -22,32 +22,34 @@
         </div>
       </div>
       <div class="underlined">
-        <!-- <div class="form-group">
-          <div class="checkbox">
-            <label for="email" class="col-sm-offset-1 col-sm-11 control-label">
-              <input type="checkbox" ng-model="user.role" ng-true-value="'admin'" ng-false-value="'default'"> is admin
-            </label>
+        <div class="form-group">
+          <label for="" class="col-sm-2 control-label">ADMIN</label>
+          <div class="col-sm-10 switch-container">
+            <switch id="enabled" name="enabled" ng-model="user.role" ng-true-value="'admin'" ng-false-value="'default'" class="green" on="Y" off="N"></switch>
+            <span>USER HAS ADMIN PRIVILEDGES</span>
           </div>
-        </div> -->
-        <switch id="enabled" name="enabled" ng-model="user.role" ng-true-value="'admin'" ng-false-value="'default'" class="green" on="Y" off="N"></switch>
+          <div class="padd-top"></div>
+        </div>
       </div>
       <div class="underlined">
         <div class="form-group">
-          <label for="" class="col-sm-3 control-label">PASSWORD</label>
-          <div class="col-sm-9">
-            <input type="text" class="form-control" ng-model="user.password">
+          <label for="" class="col-sm-2 control-label">PASSWORD</label>
+          <div class="col-sm-10">
+            <input type="password" class="form-control" ng-model="user.password">
           </div>
         </div>
       </div>
       <div class="underlined">
         <div class="form-group">
-          <label for="" class="col-sm-3 control-label">CONFIRM PASSWORD</label>
-          <div class="col-sm-9">
-            <input type="text" class="form-control" ng-model="user.password_confirmation">
+          <label for="" class="col-sm-4 control-label">CONFIRM PASSWORD</label>
+          <div class="col-sm-8">
+            <input type="password" class="form-control" ng-model="user.password_confirmation">
           </div>
         </div>
       </div>
-      <button type="submit" class="btn-large-green">ADD USER</button>
+      <div class="submit-btn-container">
+        <button type="submit" class="btn-large-green">ADD USER</button>
+      </div>
     </form>
   </div>
 </div>
