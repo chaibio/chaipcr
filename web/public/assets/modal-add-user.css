@@ -1,76 +1,71 @@
-/*
-Syntax error: File to import not found or unreadable: ./colors.
-              Load paths:
-                /Users/jossie/chaipcr/web/app/assets/stylesheets
-                /Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/frameworks/blueprint/stylesheets
-                /Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/frameworks/compass/stylesheets
-                Compass::SpriteImporter
-        on line 1 of /Users/jossie/chaipcr/web/app/assets/stylesheets/modal-add-user.css.scss
+/* line 3, ../../app/assets/stylesheets/modal-add-user.css.scss */
+.modal-dialog {
+  margin-top: 100px;
+}
+/* line 5, ../../app/assets/stylesheets/modal-add-user.css.scss */
+.modal-dialog .modal-content {
+  border-radius: 0px;
+  webkit-box-shadow: 0 0px 0px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0px 0px rgba(0, 0, 0, 0.5);
+}
 
-1: /Users/jossie/chaipcr/web/app/assets/stylesheets/modal-add-user.css.scss
-
-Backtrace:
-/Users/jossie/chaipcr/web/app/assets/stylesheets/modal-add-user.css.scss:1
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/import_node.rb:67:in `rescue in import'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/import_node.rb:45:in `import'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/import_node.rb:28:in `imported_file'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/import_node.rb:37:in `css_import?'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/visitors/perform.rb:217:in `visit_import'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/visitors/base.rb:37:in `visit'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/visitors/perform.rb:100:in `visit'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/visitors/base.rb:53:in `block in visit_children'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/visitors/base.rb:53:in `map'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/visitors/base.rb:53:in `visit_children'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/visitors/perform.rb:109:in `block in visit_children'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/visitors/perform.rb:121:in `with_environment'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/visitors/perform.rb:108:in `visit_children'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/visitors/base.rb:37:in `block in visit'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/visitors/perform.rb:128:in `visit_root'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/visitors/base.rb:37:in `visit'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/visitors/perform.rb:100:in `visit'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/visitors/perform.rb:7:in `visit'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/tree/root_node.rb:20:in `render'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/engine.rb:315:in `_render'
-/Library/Ruby/Gems/2.0.0/gems/sass-3.2.19/lib/sass/engine.rb:262:in `render'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/lib/compass/compiler.rb:139:in `block (2 levels) in compile'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/lib/compass/compiler.rb:126:in `timed'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/lib/compass/compiler.rb:138:in `block in compile'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/lib/compass/logger.rb:45:in `red'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/lib/compass/compiler.rb:137:in `compile'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/lib/compass/compiler.rb:118:in `compile_if_required'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/lib/compass/compiler.rb:103:in `block (2 levels) in run'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/lib/compass/compiler.rb:101:in `each'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/lib/compass/compiler.rb:101:in `block in run'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/lib/compass/compiler.rb:126:in `timed'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/lib/compass/compiler.rb:100:in `run'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/lib/compass/commands/watch_project.rb:147:in `recompile'
-/Library/Ruby/Gems/2.0.0/gems/fssm-0.2.10/lib/fssm/path.rb:73:in `call'
-/Library/Ruby/Gems/2.0.0/gems/fssm-0.2.10/lib/fssm/path.rb:73:in `run_callback'
-/Library/Ruby/Gems/2.0.0/gems/fssm-0.2.10/lib/fssm/path.rb:55:in `callback_action'
-/Library/Ruby/Gems/2.0.0/gems/fssm-0.2.10/lib/fssm/path.rb:31:in `create'
-/Library/Ruby/Gems/2.0.0/gems/fssm-0.2.10/lib/fssm/state/directory.rb:26:in `block in created'
-/Library/Ruby/Gems/2.0.0/gems/fssm-0.2.10/lib/fssm/state/directory.rb:25:in `each'
-/Library/Ruby/Gems/2.0.0/gems/fssm-0.2.10/lib/fssm/state/directory.rb:25:in `created'
-/Library/Ruby/Gems/2.0.0/gems/fssm-0.2.10/lib/fssm/state/directory.rb:17:in `refresh'
-/Library/Ruby/Gems/2.0.0/gems/fssm-0.2.10/lib/fssm/backends/polling.rb:17:in `block (2 levels) in run'
-/Library/Ruby/Gems/2.0.0/gems/fssm-0.2.10/lib/fssm/backends/polling.rb:17:in `each'
-/Library/Ruby/Gems/2.0.0/gems/fssm-0.2.10/lib/fssm/backends/polling.rb:17:in `block in run'
-/Library/Ruby/Gems/2.0.0/gems/fssm-0.2.10/lib/fssm/backends/polling.rb:15:in `loop'
-/Library/Ruby/Gems/2.0.0/gems/fssm-0.2.10/lib/fssm/backends/polling.rb:15:in `run'
-/Library/Ruby/Gems/2.0.0/gems/fssm-0.2.10/lib/fssm/monitor.rb:26:in `run'
-/Library/Ruby/Gems/2.0.0/gems/fssm-0.2.10/lib/fssm.rb:70:in `monitor'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/lib/compass/commands/watch_project.rb:87:in `perform'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/lib/compass/commands/base.rb:18:in `execute'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/lib/compass/commands/project_base.rb:19:in `execute'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/lib/compass/exec/sub_command_ui.rb:43:in `perform!'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/lib/compass/exec/sub_command_ui.rb:15:in `run!'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/bin/compass:30:in `block in <top (required)>'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/bin/compass:44:in `call'
-/Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/bin/compass:44:in `<top (required)>'
-/usr/bin/compass:23:in `load'
-/usr/bin/compass:23:in `<main>'
-*/
-body:before {
-  white-space: pre;
-  font-family: monospace;
-  content: "Syntax error: File to import not found or unreadable: ./colors.\A               Load paths:\A                 /Users/jossie/chaipcr/web/app/assets/stylesheets\A                 /Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/frameworks/blueprint/stylesheets\A                 /Library/Ruby/Gems/2.0.0/gems/compass-0.12.6/frameworks/compass/stylesheets\A                 Compass::SpriteImporter\A         on line 1 of /Users/jossie/chaipcr/web/app/assets/stylesheets/modal-add-user.css.scss\A \A 1: /Users/jossie/chaipcr/web/app/assets/stylesheets/modal-add-user.css.scss"; }
+/* line 13, ../../app/assets/stylesheets/modal-add-user.css.scss */
+.user-settings a {
+  cursor: pointer;
+}
+/* line 15, ../../app/assets/stylesheets/modal-add-user.css.scss */
+.user-settings a:hover {
+  background-color: transparent;
+}
+/* line 19, ../../app/assets/stylesheets/modal-add-user.css.scss */
+.user-settings .modal-add-user {
+  padding: 15px 25px;
+}
+/* line 22, ../../app/assets/stylesheets/modal-add-user.css.scss */
+.user-settings .modal-add-user .modal-title {
+  font-size: 15px;
+}
+/* line 26, ../../app/assets/stylesheets/modal-add-user.css.scss */
+.user-settings .modal-add-user a.close {
+  color: #c5c5c5;
+  opacity: 1;
+}
+/* line 31, ../../app/assets/stylesheets/modal-add-user.css.scss */
+.user-settings .modal-add-user .form-group {
+  margin-bottom: 0px;
+  margin-top: 15px;
+}
+/* line 36, ../../app/assets/stylesheets/modal-add-user.css.scss */
+.user-settings .modal-add-user .switch {
+  vertical-align: middle;
+}
+/* line 40, ../../app/assets/stylesheets/modal-add-user.css.scss */
+.user-settings .modal-add-user .switch-container {
+  padding-bottom: 5px;
+}
+/* line 44, ../../app/assets/stylesheets/modal-add-user.css.scss */
+.user-settings .modal-add-user label {
+  font-weight: normal;
+  text-align: left;
+  padding-top: 12px;
+}
+/* line 50, ../../app/assets/stylesheets/modal-add-user.css.scss */
+.user-settings .modal-add-user input {
+  border: none;
+  webkit-box-shadow: inset 0 0 0 #000;
+  box-shadow: inset 0 0 0 #000;
+  font-size: 21px;
+  display: inline-block;
+  vertical-align: top;
+  font-weight: normal;
+  margin-top: -4px;
+}
+/* line 61, ../../app/assets/stylesheets/modal-add-user.css.scss */
+.user-settings .modal-add-user .submit-btn-container {
+  padding: 70px;
+  padding-bottom: 20px;
+}
+/* line 66, ../../app/assets/stylesheets/modal-add-user.css.scss */
+.user-settings .modal-add-user .btn-large-green {
+  width: 100%;
+}
