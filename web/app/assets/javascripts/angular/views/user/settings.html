@@ -1,0 +1,171 @@
+<div class="user-settings" ng-controller="UserSettingsCtrl">
+  <div class="header">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="stripes-and-name">
+          <a ng-click="goHome()">
+            <div class="stripes">
+              <div class="stripe"></div>
+              <div class="stripe"></div>
+              <div class="stripe"></div>
+            </div>
+          </a>
+          <div class="name-container">USER SETTINGS</div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <a href="#" class="btn-support-legal pull-right">
+          SUPPORT & LEGAL
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="row">
+      <div class="col-md-6">
+
+        <p class="lead underlined">
+          MACHINE INFORMATION
+        </p>
+
+        <perfect-scrollbar class="scroller">
+
+          <a href="#" class="btn-large-green">
+            RUN CALIBRATION
+          </a>
+
+          <p class="lead info">
+            SOFTWARE VERSION <br>
+            <span class="text">OPCR V2.0</span>
+          </p>
+
+          <p class="lead info">
+            HARDWARE VERSION <br>
+            <span class="text">888-888-8888</span>
+          </p>
+
+          <p class="lead info">
+            SERIAL VERSION <br>
+            <span class="text">888-888-8888</span>
+          </p>
+
+          <p class="lead info">
+            ETHERNET MAC & IP ADDRESS <br>
+            <span class="text">888-888-8888</span>
+            <span class="elipsis">...</span>
+          </p>
+
+          <p class="lead info">
+            WIFI MAC & IP ADDRESS <br>
+            <span class="text">888-888-8888</span>
+            <span class="elipsis">...</span>
+          </p>
+
+          <p class="lead info">
+            WIFI NETWORK <br>
+            <span class="text">888-888-8888</span> <br>
+            <a href="#" class="btn-blue">
+              INITIALIZE SETUP
+            </a>
+          </p>
+
+          <p class="lead info">
+            CUMULATIVE HOURS OF OPERATION <br>
+            <span class="text">888-888-8888</span>
+          </p>
+
+          <p class="lead info">
+            SOFTWARE VERSION <br>
+            <span class="text">OPCR V2.0</span>
+          </p>
+
+          <p class="lead info">
+            HARDWARE VERSION <br>
+            <span class="text">888-888-8888</span>
+          </p>
+
+          <p class="lead info">
+            SERIAL VERSION <br>
+            <span class="text">888-888-8888</span>
+          </p>
+
+        </perfect-scrollbar>
+
+      </div>
+      <div class="col-md-6">
+
+        <p class="lead underlined">
+          MACHINE SETTINGS
+        </p>
+
+        <p class="lead info">
+          BRIGHTNESS
+          <P class="vertical-container">
+            <div ui-slider="{orientation: 'horizontal'}"  min="0" max="100" step="5" ng-model="settings.brightness"></div>
+          </P>
+        </p>
+
+        <p class="lead info padd-top">
+          CHOOSE ONE
+        </p>
+        <div class="row radio-options-container">
+          <div class="col-md-6">
+            <div class="radio-option" ng-click="settings.option = 'A'" ng-class="{selected: settings.option ==='A'}">
+              <div class="radio-button"></div>
+              <span class="option-text">OPTION A</span>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="radio-option" ng-click="settings.option = 'B'" ng-class="{selected: settings.option ==='B'}">
+              <div class="radio-button"></div>
+              <span class="option-text">OPTION B</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="padd-top">
+          <div class="checkbox-container">
+            <div class="checkbox-wrapper" ng-click="settings.checkbox = !settings.checkbox">
+              <div class="check-box" ng-class="{'checked': settings.checkbox}">
+              </div>
+              <div class="check-box-label">
+                <p>Save expirement results as text document</p>
+              </div>
+            </div>
+            <div>
+              <div class="check-box placeholder"></div>
+              <div class="check-box-label">
+                <p class="prefix-doc">ADD PREFIX TO DOCUMENT FILE NAME</p>
+                <p>Malaria_070214</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="padd-top"></div>
+        <div class="padd-top"></div>
+        <div class="padd-top user-management">
+          <p class="lead info">
+            ADMIN: USER MANAGEMENT
+            <span class="text"></span>
+            <span class="elipsis red">...</span>
+          </p>
+
+          <perfect-scrollbar class="scroller">
+            <p class="lead info" ng-repeat="user in users">
+              <span class="text">{{user.user.email}}</span>
+              <span class="elipsis">...</span>
+              <a ng-click="removeUser(user.user.id)" class="btn-remove"></a>
+            </p>
+
+            <a ng-click="openAddUserModal()" class="btn-large-green">
+              ADD NEW USER
+            </a>
+
+          </perfect-scrollbar>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
