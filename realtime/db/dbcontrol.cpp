@@ -282,6 +282,9 @@ std::vector<Step> DBControl::getSteps(int stageId)
         if (it->get_indicator("delta_duration_s") != soci::i_null)
             step.setDeltaDuration(it->get<int>("delta_duration_s"));
 
+        if (it->get_indicator("pause") != soci::i_null)
+            step.setPauseState(it->get<int>("pause"));
+
         steps.push_back(std::move(step));
     }
 

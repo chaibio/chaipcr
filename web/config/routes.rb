@@ -1,4 +1,5 @@
 Qpcrctl::Application.routes.draw do
+  mount JasmineRails::Engine => '/specs' if defined?(JasmineRails)
   resources :posts
 
   apipie
@@ -63,7 +64,7 @@ Qpcrctl::Application.routes.draw do
   post '/logout', :to => 'sessions#destroy', :as => 'logout'
   
   resource :settings, only: [:update, :show]
-  resources :users
+  resources :users, defaults: { format: 'json' }
   
   resources :experiments do
     member do

@@ -9,6 +9,7 @@ public:
     enum OperationType
     {
         StartExperiment,
+        ResumeExperiment,
         StopExperiment
     };
 

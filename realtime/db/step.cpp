@@ -9,6 +9,7 @@ Step::Step(int id)
     _collectData = true;
     _deltaTemperature = 0;
     _deltaDuration = 0;
+    _pauseState = false;
 }
 
 Step::Step(const Step &other)
@@ -21,6 +22,7 @@ Step::Step(const Step &other)
     setCollectData(other.collectData());
     setDeltaTemperature(other.deltaTemperature());
     setDeltaDuration(other.deltaDuration());
+    setPauseState(other.pauseState());
 }
 
 Step::Step(Step &&other)
@@ -33,6 +35,7 @@ Step::Step(Step &&other)
     _collectData = other._collectData;
     _deltaTemperature = other._deltaTemperature;
     _deltaDuration = other._deltaDuration;
+    _pauseState = other._pauseState;
 
     other._id = -1;
     other._temperature = 0;
@@ -41,6 +44,7 @@ Step::Step(Step &&other)
     other._collectData = true;
     other._deltaTemperature = 0;
     other._deltaDuration = 0;
+    other._pauseState = false;
 }
 
 Step::~Step()
@@ -58,6 +62,7 @@ Step& Step::operator= (const Step &other)
     setCollectData(other.collectData());
     setDeltaTemperature(other.deltaTemperature());
     setDeltaDuration(other.deltaDuration());
+    setPauseState(other.pauseState());
 
     return *this;
 }
@@ -72,6 +77,7 @@ Step& Step::operator= (Step &&other)
     _collectData = other._collectData;
     _deltaTemperature = other._deltaTemperature;
     _deltaDuration = other._deltaDuration;
+    _pauseState = other._pauseState;
 
     other._id = -1;
     other._temperature = 0;
@@ -80,6 +86,7 @@ Step& Step::operator= (Step &&other)
     other._collectData = true;
     other._deltaTemperature = 0;
     other._deltaDuration = 0;
+    other._pauseState = false;
 
     return *this;
 }

@@ -113,6 +113,43 @@ void ExperimentController::run()
     }
 }
 
+void ExperimentController::resume()
+{
+    std::unique_lock<std::mutex> lock(_machineMutex);
+
+    if (_machineState == Paused)
+    {
+        _machineState = Running;
+
+        if (_experiment.protocol()->hasNextStep())
+        {
+            _holdStepTimer->stop();
+            _holdStepTimer->setStartInterval(0);
+            _holdStepTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::holdStepCallback));
+        }
+        else
+        {
+            Stage *stage = _experiment.protocol()->currentStage();
+            std::time_t holdTime = stage->currentStep()->holdTime();
+
+            if (stage->autoDelta() && stage->currentCycle() > stage->autoDeltaStartCycle())
+            {
+                holdTime += stage->currentStep()->deltaDuration() * (stage->currentCycle() - stage->autoDeltaStartCycle());
+
+                if (holdTime < 0)
+                    holdTime = 0;
+            }
+
+            lock.unlock();
+
+            complete();
+
+            if (holdTime > 0)
+                stop();
+        }
+    }
+}
+
 void ExperimentController::complete()
 {
     std::unique_lock<std::mutex> lock(_machineMutex);
@@ -245,31 +282,37 @@ void ExperimentController::stepBegun()
         return;
 
     Stage *stage = _experiment.protocol()->currentStage();
-    std::time_t holdTime = stage->currentStep()->holdTime();
 
-    if (stage->autoDelta() && stage->currentCycle() > stage->autoDeltaStartCycle())
+    if (!stage->currentStep()->pauseState())
     {
-        holdTime += stage->currentStep()->deltaDuration() * (stage->currentCycle() - stage->autoDeltaStartCycle());
+        std::time_t holdTime = stage->currentStep()->holdTime();
 
-        if (holdTime < 0)
-            holdTime = 0;
-    }
+        if (stage->autoDelta() && stage->currentCycle() > stage->autoDeltaStartCycle())
+        {
+            holdTime += stage->currentStep()->deltaDuration() * (stage->currentCycle() - stage->autoDeltaStartCycle());
 
-    if (_experiment.protocol()->hasNextStep())
-    {
-        _holdStepTimer->stop();
-        _holdStepTimer->setStartInterval(holdTime * 1000);
-        _holdStepTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::holdStepCallback));
+            if (holdTime < 0)
+                holdTime = 0;
+        }
+
+        if (_experiment.protocol()->hasNextStep())
+        {
+            _holdStepTimer->stop();
+            _holdStepTimer->setStartInterval(holdTime * 1000);
+            _holdStepTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::holdStepCallback));
+        }
+        else
+        {
+            lock.unlock();
+
+            complete();
+
+            if (holdTime > 0)
+                stop();
+        }
     }
     else
-    {
-        lock.unlock();
-
-        complete();
-
-        if (holdTime > 0)
-            stop();
-    }
+        _machineState = Paused;
 }
 
 void ExperimentController::holdStepCallback(Poco::Timer &)

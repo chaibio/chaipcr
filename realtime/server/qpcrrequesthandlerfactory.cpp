@@ -43,6 +43,8 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
             {
                 if (requestPath.at(1) == "start")
                     return new ControlHandler(ControlHandler::StartExperiment);
+                else if (requestPath.at(1) == "resume")
+                    return new ControlHandler(ControlHandler::ResumeExperiment);
                 else if (requestPath.at(1) == "stop")
                     return new ControlHandler(ControlHandler::StopExperiment);
             }

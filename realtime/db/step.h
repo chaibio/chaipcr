@@ -39,6 +39,9 @@ public:
     inline void setDeltaDuration(time_t duration) {_deltaDuration = duration;}
     inline time_t deltaDuration() const {return _deltaDuration;}
 
+    inline void setPauseState(bool state) {_pauseState = state;}
+    inline bool pauseState() const {return _pauseState;}
+
 private:
     int _id;
 
@@ -52,6 +55,8 @@ private:
 
     double _deltaTemperature;
     time_t _deltaDuration;
+
+    bool _pauseState;
 };
 
 #endif // STEP_H

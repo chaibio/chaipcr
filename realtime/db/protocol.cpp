@@ -120,5 +120,5 @@ Step* Protocol::advanceNextStep()
 
 bool Protocol::hasNextStep() const
 {
-    return _currentStage != _stages.end() && (_currentStage->hasNextStep() || (_currentStage +1 ) != _stages.end());
+    return _currentStage != _stages.end() && (_currentStage->hasNextStep() || (_currentStage + 1 ) != _stages.end());
 }
