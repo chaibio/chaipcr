@@ -67,4 +67,4 @@ describe 'UserSettings Controller', ->
     @scope.openAddUserModal()
     expect(modalOpenSpy).toHaveBeenCalledWith
       scope: @scope
-      templateUrl: 'angular/views/user/modal-add-user.html'
+      templateUrl: 'views/user/modal-add-user.html'

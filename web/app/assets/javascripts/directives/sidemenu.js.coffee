@@ -1,6 +1,6 @@
 window.ChaiBioTech.ngApp
 
-.directive 'sideMenu', [
+.directive 'sidemenu', [
   '$rootScope'
   ($rootScope) ->
 
@@ -8,7 +8,7 @@ window.ChaiBioTech.ngApp
     replace: true
     scope: {}
     templateUrl: 'views/directives/sidemenu.html'
-    link: ($scope, elem, attrs) ->
+    link: ($scope) ->
 
       $scope.open = false
 
