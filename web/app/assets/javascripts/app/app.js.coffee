@@ -8,4 +8,5 @@ window.ChaiBioTech.ngApp = angular.module 'ChaiBioTech', [
   'ui.router'
   'uiSwitch'
   'ngResource'
+  'angularMoment'
 ]
