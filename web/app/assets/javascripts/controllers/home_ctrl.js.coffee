@@ -2,9 +2,28 @@ window.ChaiBioTech.ngApp
 
 .controller 'HomeCtrl', [
   '$scope'
-  '$rootScope'
-  ($scope, $rootScope) ->
+  'Experiment'
+  ($scope, Experiment) ->
 
-    $scope.toggleMenu = ->
-      $rootScope.$broadcast 'sidemenu:toggle'
+    $scope.experiments = []
+
+    @fetchExperiments = ->
+      Experiment.query (experiments) ->
+        $scope.experiments = experiments
+
+    @fetchExperiments()
+
+    @newExperiment = ->
+      $scope.experiments = []
+      exp = new Experiment
+        experiment:
+          name: 'New Experiment'
+          protocol: {}
+
+      exp.$save (data) =>
+        @fetchExperiments()
+
+
+    return
+
 ]

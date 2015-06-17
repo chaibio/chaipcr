@@ -13,7 +13,7 @@ window.ChaiBioTech.ngApp
       .state 'home',
         url: '/home'
         templateUrl: 'views/home.html'
-        controller: 'HomeCtrl'
+        controller: 'HomeCtrl as HomeCtrl'
 
       .state 'settings',
         url: '/user/settings'

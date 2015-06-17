@@ -4,7 +4,7 @@ window.ChaiBioTech.ngApp
   '$resource'
   ($resource) ->
 
-    $resource('/experiments', {id: '@id'}, {
+    $resource('/experiments/:id', {id: '@id'}, {
       update:
         method: 'PUT'
     })

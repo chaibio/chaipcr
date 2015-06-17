@@ -21,7 +21,7 @@
                         <div class="first-row">
                            <div class="menu-item-image">
                            </div>
-                           <div class="menu-item-text">
+                           <div class="menu-item-text" ng-click="HomeCtrl.newExperiment()">
                               NEW EXPERIMENT
                            </div>
                         </div>
@@ -94,8 +94,8 @@
                <div class="dots"> ... </div>
             </div>
             <div class="all-experiments">
-               <div class="loading" style="display: none;">Loading ......! <img src="assets/loading.gif"></div>
-               <div class="individual-experiment">
+               <div class="loading" ng-show="experiments.length == 0">Loading ......! <img src="assets/loading.gif"></div>
+               <div class="individual-experiment" ng-repeat="exp in experiments">
                   <div class="first-row">
                      <div class="image"></div>
                      <div class="text simplifica"><a href="#/edit-stage-step/1"> New Experiment </a></div>
