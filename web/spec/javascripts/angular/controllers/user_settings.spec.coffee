@@ -1,5 +1,5 @@
 
-describe 'UserSettingsCtrl', ->
+describe 'UserSettings Controller', ->
 
   beforeEach ->
 
