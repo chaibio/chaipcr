@@ -15,4 +15,9 @@ window.ChaiBioTech.ngApp
         templateUrl: 'views/home.html'
         controller: 'HomeCtrl'
 
+      .state 'settings',
+        url: '/user/settings'
+        templateUrl: 'views/user/settings.html'
+        controller: 'UserSettingsCtrl'
+
 ]
