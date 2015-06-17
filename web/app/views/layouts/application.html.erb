@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="ChaiBioTech">
 <head>
   <title>ChaiPCR</title>
   <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
@@ -8,27 +8,8 @@
 </head>
 <body>
 
-<% if params[:controller] != "main" || params[:action] != "index" %>
-<div id="header" class="blue-scheme">
-	<div class="clearfix">
-	<div id="logo">
-		qPCR
-	</div>
-	<ul id="menu">
-		<li><a href="#">Load Diagnostic Kit</a></li>
-		<li><a href="#">Self-Test</a></li>
-		<li><a href="#">Help</a></li>
-	</ul>
-	</div>
-</div>
-<% end %>
-
 <div id="container" class="container-fluid">
-	
-	
-		
-		<%= yield %>
-	
+  <%= yield %>
 </div>
 
 </body>

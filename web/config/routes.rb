@@ -59,8 +59,6 @@ Qpcrctl::Application.routes.draw do
   #   end
   
   root 'main#index'
-
-  get 'ng', :to => 'main#angular'
   
   post '/login', :to => 'sessions#create', :as => 'login'
   post '/logout', :to => 'sessions#destroy', :as => 'logout'
