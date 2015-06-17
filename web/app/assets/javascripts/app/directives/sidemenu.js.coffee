@@ -7,7 +7,7 @@ window.ChaiBioTech.ngApp
     restrict: 'EA'
     replace: true
     scope: {}
-    templateUrl: 'views/directives/sidemenu.html'
+    templateUrl: 'app/views/directives/sidemenu.html'
     link: ($scope) ->
 
       $scope.open = false
