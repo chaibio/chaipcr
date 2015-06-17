@@ -65,8 +65,6 @@ gem 'seed-fu'
 # Use debugger
 # gem 'debugger', group: [:development, :test]
 
-gem 'bootstrap-sass', '~> 3.3.5'
-
 # angular-js dependencies
 gem "angularjs-rails"
 gem 'angular-rails-templates'
