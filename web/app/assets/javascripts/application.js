@@ -12,7 +12,8 @@
 
 //  libs ======================
 //
-//= require jquery
+//= require app/libs/jquery-1.10.1.min
+//= require app/libs/jquery-ui.min
 //= require angular
 //= require angular-resource
 //= require angular-rails-templates
