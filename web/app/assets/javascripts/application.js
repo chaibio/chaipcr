@@ -27,20 +27,6 @@
 //= require backbone/ChaiBioTech
 //= require backbone/Constants
 
-// angularjs assets ==============
-//= require angular
-//= require angular-rails-templates
-//= require angular/app
-//= require angular/libs/perfect-scrollbar.jquery.min
-//= require angular/libs/angular-perfect-scrollbar
-//= require angular/libs/slider
-//= require angular/libs/angular-ui-switch
-//= require angular/libs/ui-bootstrap-custom-0.13.0
-//= require angular/libs/ui-bootstrap-custom-tpls-0.13.0
-//= require_tree ./angular/controllers
-//= require_tree ./angular/services
-//= require_tree ./angular/views
-
 $(function () {
   //window.router = new ChaiBioTech.Routers.DesignRouter({});
   //window.touchScreenRouter = new ChaiBioTech.Routers.touchScreen({});
