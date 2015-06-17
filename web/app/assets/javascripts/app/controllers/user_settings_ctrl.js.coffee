@@ -35,6 +35,6 @@ window.ChaiBioTech.ngApp
     $scope.openAddUserModal = ->
       $scope.modal = $modal.open
         scope: $scope
-        templateUrl: 'views/user/modal-add-user.html'
+        templateUrl: 'app/views/user/modal-add-user.html'
 
 ]

@@ -12,22 +12,26 @@
 
 //  libs ======================
 //
-//= require jquery
+//= require app/libs/jquery-1.10.1.min
+//= require app/libs/jquery-ui.min
 //= require angular
+//= require angular-resource
 //= require angular-rails-templates
-//= require libs/perfect-scrollbar.jquery.min
-//= require libs/angular-perfect-scrollbar
-//= require libs/slider
-//= require libs/angular-ui-switch
-//= require libs/ui-bootstrap-custom-0.13.0
-//= require libs/ui-bootstrap-custom-tpls-0.13.0
-//= require libs/angular-ui-router
+//= require app/libs/perfect-scrollbar.jquery.min
+//= require app/libs/angular-perfect-scrollbar
+//= require app/libs/slider
+//= require app/libs/angular-ui-switch
+//= require app/libs/ui-bootstrap-custom-0.13.0
+//= require app/libs/ui-bootstrap-custom-tpls-0.13.0
+//= require app/libs/angular-ui-router
+//= require app/libs/moment
+//= require app/libs/angular-moment.min
 //
 //  angular app ===============
 //
-//= require app
-//= require routes
-//= require_tree ./controllers
-//= require_tree ./services
-//= require_tree ./directives
-//= require_tree ./views
+//= require app/app
+//= require app/routes
+//= require_tree ./app/controllers
+//= require_tree ./app/services
+//= require_tree ./app/directives
+//= require_tree ./app/views

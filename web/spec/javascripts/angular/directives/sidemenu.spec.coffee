@@ -9,7 +9,7 @@ describe 'Sidemenu Directive', ->
       @rootScope = $injector.get '$rootScope'
       @scope = @rootScope.$new();
       @compile = $injector.get '$compile'
-      @template = angular.element '<side-menu></side-menu>'
+      @template = angular.element '<sidemenu></sidemenu>'
       @compiled = @compile(@template)(@scope)
       @scope.$digest()
       @isolatedScope = @compiled.isolateScope()
