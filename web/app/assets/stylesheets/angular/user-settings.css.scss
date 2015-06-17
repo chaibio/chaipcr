@@ -1,0 +1,227 @@
+@import 'colors.css.scss';
+
+.user-settings {
+
+  .padd-top {
+    padding-top: 20px;
+  }
+
+  .row {
+    margin: 0;
+    margin-right: -15px;
+    margin-left: -15px;
+  }
+
+  .underlined {
+    border-bottom-style: solid;
+    border-bottom-width: 2px;
+    border-bottom-color: $gray;
+  }
+
+  .header{
+    width: 1024px;
+    height: 45px;
+    background-color: $gray;
+
+    .name-container {
+      float: left;
+      color: #d6d4d1;
+      margin-left: 13px;
+      font-size: 18px;
+      margin-top: 2px;
+      font-family: "fun city";
+    }
+
+    .stripes-and-name {
+      width: 300px;
+      height: 30px;
+      margin-left: 32px;
+      padding-top: 13px;
+    }
+    .stripes {
+      width: 21px;
+      height: 19px;
+      float: left;
+      cursor: pointer;
+
+      .stripe {
+        height: 3px;
+        width: 21px;
+        margin-bottom: 3px;
+        background-color: #fff;
+      }
+    }
+
+    .btn-support-legal {
+      border: 2px solid #fff;
+      margin-right: 32px;
+      margin-top: 9px;
+      color: #fff;
+      padding: 3px 20px;
+      font-weight: 700;
+    }
+  }
+
+  .btn-large-green {
+    border: 2px solid $green;
+    background-color: #fff;
+    color: $green;
+    display: block;
+    text-align: center;
+    padding: 20px 0px;
+    font-weight: 700;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .btn-blue {
+    border: 2px solid $blue;
+    background-color: #fff;
+    color: $blue;
+    display: inline-block;
+    text-align: center;
+    padding: 5px 40px;
+    font-weight: 700;
+    font-size: 20px;
+  }
+
+  .content {
+    padding-top: 50px;
+
+    .col-md-6:first-of-type {
+      padding-left: 45px;
+    }
+    .col-md-6:last-of-type {
+      padding-right: 45px;
+    }
+
+    .scroller {
+      height: 500px;
+      overflow-y: hidden;
+      position: relative;
+      margin-top: 20px;
+      padding-right: 20px;
+    }
+
+    .lead {
+      &.info {
+        margin-top: 20px;
+        color: gray;
+        span.text {
+          font-weight: 700;
+          color: #000;
+        }
+        span.elipsis {
+          display: inline-block;
+          vertical-align: top;
+          margin-top: -24px;
+          color: $blue;
+          font-size: 40px;
+          cursor: pointer;
+        }
+      }
+    }
+
+    .radio-button {
+      border-width: 12px;
+      border-style: solid;
+      background: #fff;
+      border-radius: 100px;
+      width: 50px;
+      height: 50px;
+    }
+
+    .ui-slider {
+      background: #333;
+    }
+
+    .ui-slider-handle {
+      @extend .radio-button;
+      border-color: $blue;
+      margin-top: -15px;
+      outline: 0 !important;
+    }
+
+    .radio-options-container {
+      .col-md-6:first-of-type {
+        padding-left: 15px;
+      }
+      .selected {
+        .radio-button {
+          border-color: $blue;
+        }
+        .option-text {
+          color: gray;
+        }
+      }
+      .radio-option {
+        cursor: pointer;
+      }
+      .radio-button {
+        display: inline-block;
+        vertical-align: middle;
+        margin-top: -7px;
+        border-color: $lightgray;
+      }
+      .option-text {
+        display: inline;
+        color: $lightgray;
+        font-size: 18px;
+        padding-left: 10px;
+      }
+    }
+
+    .checkbox-container {
+      .checkbox-wrapper {
+        cursor: pointer;
+      }
+      .check-box {
+        background-image: image-url("checkbox-unchecked.png");
+        background-size: 100% 100%;
+        width: 50px;
+        height: 50px;
+        display: inline-block;
+        vertical-align: middle;
+        &.checked {
+          background-image: image-url("checkbox-checked.png");
+        }
+        &.placeholder {
+          background: transparent;
+        }
+      }
+      .check-box-label {
+        display: inline-block;
+        color: gray;
+        p {
+          font-size: 16px;
+          padding-left: 10px;
+          &.prefix-doc {
+            color: $gray;
+          }
+        }
+      }
+    }
+
+    .user-management {
+      .elipsis{
+        &.red {
+          margin-top: -17px !important;
+          float: right;
+          color: $red !important;
+          margin-right: 20px;
+        }
+      }
+      .btn-remove {
+        display: inline-block;
+        height: 30px;
+        width: 30px;
+        background-color: #fff !important;
+        background-image: image-url('btn-remove-user.png');
+        background-size: 100% 100%;
+        float: right;
+      }
+    }
+
+  }
+
+}
