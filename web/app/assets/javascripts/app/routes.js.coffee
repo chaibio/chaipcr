@@ -6,9 +6,14 @@ window.ChaiBioTech.ngApp
   '$locationProvider'
   ($stateProvider, $urlRouterProvider) ->
 
-      $urlRouterProvider.otherwise("/home");
+      $urlRouterProvider.otherwise("/login");
 
       $stateProvider
+
+      .state 'login',
+        url: '/login'
+        templateUrl: 'app/views/login.html'
+        controller: 'LoginCtrl as LoginCtrl'
 
       .state 'home',
         url: '/home'
