@@ -30,6 +30,7 @@
 //  angular app ===============
 //
 //= require app/app
+//= require app/config
 //= require app/routes
 //= require_tree ./app/controllers
 //= require_tree ./app/services
