@@ -4,6 +4,15 @@ describe 'Sidemenu Directive', ->
 
     module 'ChaiBioTech'
 
+    module ($provide) ->
+      statusMock =
+        fetch: (cb) ->
+          cb {}
+
+      $provide.value 'Status', statusMock
+
+      return
+
     inject ($injector) ->
 
       @rootScope = $injector.get '$rootScope'
