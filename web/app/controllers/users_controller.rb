@@ -10,15 +10,16 @@ class UsersController < ApplicationController
   
   def_param_group :user do
     param :user, Hash, :desc => "User Info", :required => true do
+      param :name, String, :desc => "User Name", :required => true
       param :email, String, :desc => "User Email", :required => true
       param :password, String, :desc => "User Password", :required => true, :action_aware => true
       param :password_confirmation, String, :desc => "User Password Confirmation", :required => true, :action_aware => true
-      param :role, ["admin", "default"], :desc => "User Role", :required => false
+      param :role, ["admin", "user"], :desc => "User Role", :required => false
      end
   end
   
   api :GET, "/users", "List all the users"
-  example "[{'user':{'id':1,'email':'admin@admin.com','role':'admin'}}]"
+  example "[{'user':{'id':1,'name':'admin','email':'admin@admin.com','role':'admin'}}]"
   def index
     @users = User.all
     respond_to do |format|
@@ -28,7 +29,7 @@ class UsersController < ApplicationController
   
   api :POST, "/users", "Create an user"
   param_group :user
-  example "[{'user':{'id':1,'email':'test@test.com','role':'default'}}]"
+  example "[{'user':{'id':1,'name':'test','email':'test@test.com','role':'user'}}]"
   def create
     if (User.empty? && params[:user][:role] == "admin") || ensure_authenticated_user
       @user = User.new(user_params)
@@ -41,7 +42,7 @@ class UsersController < ApplicationController
 
   api :PUT, "/users/:id", "Update an user"
   param_group :user
-  example "[{'user':{'id':1,'email':'test@test.com','role':'default'}}]"
+  example "[{'user':{'id':1,'name':'test','email':'test@test.com','role':'user'}}]"
   def update
     @user = User.find_by_id(params[:id])
     ret  = @user.update_attributes(user_params)
@@ -62,7 +63,7 @@ class UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:email, :password, :password_confirmation, :role)
+    params.require(:user).permit(:name, :email, :password, :password_confirmation, :role)
   end
   
   def authorized?

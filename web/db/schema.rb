@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150610070810) do
+ActiveRecord::Schema.define(version: 20150618061656) do
 
   create_table "experiment_definitions", force: true do |t|
     t.string "name",            null: false
@@ -132,11 +132,12 @@ ActiveRecord::Schema.define(version: 20150610070810) do
   add_index "user_tokens", ["access_token"], name: "index_user_tokens_on_access_token", unique: true, using: :btree
 
   create_table "users", force: true do |t|
-    t.string   "email",                       null: false
-    t.string   "password_digest",             null: false
-    t.integer  "role",            default: 0, null: false
+    t.string   "email",           null: false
+    t.string   "password_digest", null: false
+    t.string   "role",            null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "name",            null: false
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
