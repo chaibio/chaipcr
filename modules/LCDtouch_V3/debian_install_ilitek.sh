@@ -8,8 +8,8 @@ echo "Compiling the LCD overlay from .dts to .dtbo"
 dtc -O dtb -o CHAI-LCD5-00A0.dtbo -b 0 -@ CHAI-LCD5-00A0.dts
 cp CHAI-LCD5-00A0.dtbo /lib/firmware/CHAI-LCD5-00A0.dtbo
 
-dtc -O dtb -o CHAI-ILITEKTOUCH5-00A0.dtbo -b 0 -@ CHAI-ILITEKTOUCH5-00A0.dts
-cp CHAI-ILITEKTOUCH5-00A0.dtbo /lib/firmware/CHAI-ILITEKTOUCH5-00A0.dtbo
+dtc -O dtb -o CHAI-ILITEKTOUCH5-00A0.dtbo -b 0 -@ CHAI-TOUCH5-00A0.dts
+cp CHAI-TOUCH5-00A0.dtbo /lib/firmware/CHAI-TOUCH5-00A0.dtbo
 
 cp capemgr /etc/default/
 
