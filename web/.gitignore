@@ -13,6 +13,9 @@
 /db/*.sqlite3-shm
 /db/*.sqlite3-wal
 
+# Ignore database.yml
+/config/database.yml
+
 # Ignore all logfiles and tempfiles.
 /log/*.log
 /tmp

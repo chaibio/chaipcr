@@ -66,7 +66,7 @@ Qpcrctl::Application.routes.draw do
   resource :settings, only: [:update, :show]
   resources :users, defaults: { format: 'json' }
   
-  resources :experiments do
+  resources :experiments, defaults: { format: 'json' } do
     member do
       post 'start'
       post 'stop'

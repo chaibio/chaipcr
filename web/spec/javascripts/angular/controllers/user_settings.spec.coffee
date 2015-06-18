@@ -1,5 +1,5 @@
 
-describe 'UserSettingsCtrl', ->
+describe 'UserSettings Controller', ->
 
   beforeEach ->
 
@@ -67,4 +67,4 @@ describe 'UserSettingsCtrl', ->
     @scope.openAddUserModal()
     expect(modalOpenSpy).toHaveBeenCalledWith
       scope: @scope
-      templateUrl: 'angular/views/user/modal-add-user.html'
+      templateUrl: 'app/views/user/modal-add-user.html'
