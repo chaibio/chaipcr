@@ -664,8 +664,8 @@ static int ft5x0x_read_data(void)
 	}
 #else
     if (event->touch_point == 1) {
-    	event->x1 = (s16)(buf[3] & 0x0F)<<8 | (s16)buf[4];
-		event->y1 = (s16)(buf[5] & 0x0F)<<8 | (s16)buf[6];
+    	event->y1 = (s16)(buf[3] & 0x0F)<<8 | (s16)buf[4];
+		event->x1 = (s16)(buf[5] & 0x0F)<<8 | (s16)buf[6];
     }
 #endif
     event->pressure = 200;
