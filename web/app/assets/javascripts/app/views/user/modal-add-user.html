@@ -13,6 +13,9 @@
           </div>
         </div>
       </div>
+      <span class="help-block" ng-repeat="err in user.errors.name">
+        <span class="text text-error">Name {{err}}</span>
+      </span>
       <div class="underlined">
         <div class="form-group">
           <label for="email" class="col-sm-1 control-label">EMAIL</label>
@@ -21,6 +24,9 @@
           </div>
         </div>
       </div>
+      <span class="help-block" ng-repeat="err in user.errors.email">
+        <span class="text text-danger">Email {{err}}</span>
+      </span>
       <div class="underlined">
         <div class="form-group">
           <label for="" class="col-sm-2 control-label">ADMIN</label>
@@ -39,6 +45,9 @@
           </div>
         </div>
       </div>
+      <span class="help-block" ng-repeat="err in user.errors.password">
+        <span class="text text-danger">Password {{err}}</span>
+      </span>
       <div class="underlined">
         <div class="form-group">
           <label for="" class="col-sm-4 control-label">CONFIRM PASSWORD</label>
@@ -47,6 +56,9 @@
           </div>
         </div>
       </div>
+      <span class="help-block" ng-repeat="errror in user.errors.password_confirmation track by $index">
+        <span class="text text-danger">Password confirmation {{errror}}</span>
+      </span>
       <div class="submit-btn-container">
         <button type="submit" class="btn-large-green">ADD USER</button>
       </div>

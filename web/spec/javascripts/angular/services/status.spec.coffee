@@ -10,7 +10,7 @@ describe 'Status Service', ->
       @Status = $injector.get 'Status'
 
   it 'should fetch experiment progress status', ->
-    @httpBackend.expect('GET', '/status').respond {}
+    @httpBackend.expect('GET', 'http://localhost:8000/status').respond {}
     spy = jasmine.createSpy()
     @Status.fetch(spy);
     @httpBackend.flush()

@@ -10,6 +10,9 @@ window.ChaiBioTech.ngApp.service 'User', [
       .then (resp) ->
         deferred.resolve resp.data.user
 
+      .catch (resp) ->
+        deferred.reject resp.data
+
       deferred.promise
 
     @fetch = ->
