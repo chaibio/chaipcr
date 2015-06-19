@@ -16,7 +16,7 @@ window.ChaiBioTech.ngApp
         controller: 'LoginCtrl as LoginCtrl'
 
       .state 'home',
-        url: '/home/12'
+        url: '/home'
         templateUrl: 'app/views/home.html'
         controller: 'HomeCtrl as HomeCtrl'
 
