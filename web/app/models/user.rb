@@ -5,33 +5,24 @@ class User < ActiveRecord::Base
   validates :email, presence: true, uniqueness: true, format: { with: /\A(|(([A-Za-z0-9]+_+)|([A-Za-z0-9]+\-+)|([A-Za-z0-9]+\.+)|([A-Za-z0-9]+\++))*[A-Za-z0-9]+@((\w+\-+)|(\w+\.))*\w{1,63}\.[a-zA-Z]{2,6})\z/i }
   validates :password, length:{minimum:4}, confirmation: true, on: :create
   
-  ROLE_DEFAULT  = 0
-  ROLE_ADMIN    = 1
+  ROLE_ADMIN    = "admin"
+  ROLE_USER     = "user"
 
+  before_create do |user|
+    user.role = ROLE_USER if user.role.nil?
+  end
+        
   def self.empty?
     self.count == 0
   end
   
   def admin?
-    read_attribute(:role) == ROLE_ADMIN
-  end
-  
-  def role
-    value = read_attribute(:role)
-    if value == ROLE_ADMIN
-      "admin"
-    else
-      "default"
-    end
+    self.role == ROLE_ADMIN
   end
   
   def role=(value)
     value = (!value.blank?)? value.strip.downcase : nil
-    if value == "admin"
-      write_attribute(:role, ROLE_ADMIN)
-    else
-      write_attribute(:role, ROLE_DEFAULT)
-    end
+    write_attribute(:role, value)
   end
   
   def email=(value)

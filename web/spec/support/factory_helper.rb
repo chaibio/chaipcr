@@ -40,11 +40,11 @@ module FactoryHelper
   end
   
   def create_admin_user
-    User.create(:email=>"admin@pcr.com", :password=>"changeme", :password_confirmation=>"changeme", :role=>"admin")
+    User.create(:name=>"admin", :email=>"admin@pcr.com", :password=>"changeme", :password_confirmation=>"changeme", :role=>"admin")
   end
   
   def create_test_user
-    User.create(:email=>"test@test.com", :password=>"changeme", :password_confirmation=>"changeme")
+    User.create(:name=>"test", :email=>"test@test.com", :password=>"changeme", :password_confirmation=>"changeme")
   end
   
   def create_fluorescence_data(experiment)
