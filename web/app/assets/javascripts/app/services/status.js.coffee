@@ -4,7 +4,7 @@ window.ChaiBioTech.ngApp
   '$resource'
   ($resource) ->
 
-    self = $resource('/status/:id', {id: '@id'}, {
+    self = $resource('http://localhost\\:8000/status/:id', {id: '@id'}, {
       fetch:
         method: 'GET'
         isArray: false
