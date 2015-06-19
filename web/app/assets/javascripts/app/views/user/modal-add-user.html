@@ -56,8 +56,8 @@
           </div>
         </div>
       </div>
-      <span class="help-block" ng-repeat="err in user.errors.password_confirmation">
-        <span class="text text-danger">Password confirmation {{err}}</span>
+      <span class="help-block" ng-repeat="errror in user.errors.password_confirmation track by $index">
+        <span class="text text-danger">Password confirmation {{errror}}</span>
       </span>
       <div class="submit-btn-container">
         <button type="submit" class="btn-large-green">ADD USER</button>

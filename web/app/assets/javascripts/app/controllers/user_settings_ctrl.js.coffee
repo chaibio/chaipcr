@@ -22,12 +22,14 @@ window.ChaiBioTech.ngApp
     $scope.user = {}
 
     $scope.addUser = ->
-      $scope.user.role = if $scope.user.role then 'admin' else 'default'
-      User.save($scope.user).then ->
+      user = angular.copy $scope.user
+      user.role = if $scope.user.role then 'admin' else 'default'
+      User.save(user)
+      .then ->
         $scope.user = {}
         fetchUsers()
         $scope.modal.close()
-      , (data) ->
+      .catch (data) ->
         data.user.role = if data.user.role is 'default' then false else true
         $scope.user.errors = data.user.errors
 

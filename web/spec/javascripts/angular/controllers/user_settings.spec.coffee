@@ -48,7 +48,6 @@ describe 'UserSettings Controller', ->
     closeSpy = spyOn @scope.modal, 'close'
     @scope.user.role = true
     @scope.addUser()
-    expect(@scope.user.role).toBe 'admin'
     @httpBackend.flush()
     expect(closeSpy).toHaveBeenCalled()
     expect(@scope.users).toEqual [@userMock]
@@ -66,7 +65,6 @@ describe 'UserSettings Controller', ->
     @scope.modal = close: ->
     @scope.user.role = true
     @scope.addUser()
-    expect(@scope.user.role).toBe 'admin'
     @httpBackend.flush()
     expect(@scope.user.errors).toEqual resp.user.errors
 
