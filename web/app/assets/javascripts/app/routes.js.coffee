@@ -25,4 +25,8 @@ window.ChaiBioTech.ngApp
         templateUrl: 'app/views/user/settings.html'
         controller: 'UserSettingsCtrl'
 
+      .state 'edit-protocol',
+        url: '/edit-protocol/:id'
+        templateUrl: 'app/views/skelton.html'
+
 ]

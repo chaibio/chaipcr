@@ -85,7 +85,7 @@
                <div class="individual-experiment" ng-repeat="exp in experiments">
                   <div class="first-row">
                      <div class="image"></div>
-                     <div class="text simplifica"><a href="#">{{exp.experiment.name}}</a></div>
+                     <div class="text simplifica"><a ui-sref="edit-protocol({id: exp.experiment.id})">{{exp.experiment.name}}</a></div>
                      <div class="dotordate sansa" style="width: 70px;">
                         {{exp.experiment.created_at | date: 'MMMM yyyy' | uppercase}}
                      </div>
