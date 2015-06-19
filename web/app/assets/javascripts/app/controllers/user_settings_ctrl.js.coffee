@@ -27,6 +27,9 @@ window.ChaiBioTech.ngApp
         $scope.user = {}
         fetchUsers()
         $scope.modal.close()
+      , (data) ->
+        data.user.role = if data.user.role is 'default' then false else true
+        $scope.user.errors = data.user.errors
 
     $scope.removeUser = (id) ->
       if $window.confirm 'Are you sure?'

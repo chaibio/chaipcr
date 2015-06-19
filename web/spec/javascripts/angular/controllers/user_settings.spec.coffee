@@ -54,6 +54,22 @@ describe 'UserSettings Controller', ->
     expect(@scope.users).toEqual [@userMock]
     expect(@scope.user).toEqual {}
 
+  it 'should reject invalid user', ->
+    resp =
+      user:
+        error:
+          email: ['can\'t be blank']
+    @httpBackend.expectPOST('/users').respond => [
+      422, resp
+    ]
+
+    @scope.modal = close: ->
+    @scope.user.role = true
+    @scope.addUser()
+    expect(@scope.user.role).toBe 'admin'
+    @httpBackend.flush()
+    expect(@scope.user.errors).toEqual resp.user.errors
+
   it 'should remove user', ->
     @scope.users = [@userMock]
     @httpBackend.expectDELETE("/users/#{@userMock.id}").respond 200
