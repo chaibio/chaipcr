@@ -16,7 +16,7 @@ window.ChaiBioTech.ngApp
         controller: 'LoginCtrl as LoginCtrl'
 
       .state 'home',
-        url: '/home'
+        url: '/home/12'
         templateUrl: 'app/views/home.html'
         controller: 'HomeCtrl as HomeCtrl'
 
@@ -28,5 +28,7 @@ window.ChaiBioTech.ngApp
       .state 'edit-protocol',
         url: '/edit-protocol/:id'
         templateUrl: 'app/views/skelton.html'
+        controller: 'ProtocolCtrl'
+
 
 ]
