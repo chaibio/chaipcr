@@ -9,4 +9,5 @@ window.ChaiBioTech.ngApp = angular.module 'ChaiBioTech', [
   'uiSwitch'
   'ngResource'
   'angularMoment'
+  'chart.js'
 ]

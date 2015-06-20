@@ -26,6 +26,9 @@
 //= require app/libs/angular-ui-router
 //= require app/libs/moment
 //= require app/libs/angular-moment.min
+//= require app/libs/Chart
+//= require app/libs/angular-chart
+//= require app/libs/lodash.min
 //
 //  angular app ===============
 //
