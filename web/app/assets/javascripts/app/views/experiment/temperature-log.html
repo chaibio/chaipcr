@@ -1,10 +1,35 @@
-<canvas
-  id="line"
-  class="chart chart-line"
-  data="data"
-  labels="labels"
-  series="series"
-  options="options"
-  click="onClick"
-  >
-</canvas>
+<h3 class="text-center">Temperature Plot</h3>
+<div class="row">
+  <div class="col-md-10">
+    <div class="panel panel-primary">
+      <div class="panel-heading">Temperature Plot</div>
+      <div class="panel-body">
+        <div class="vertical-text">Temperature</div>
+        <div style="padding-left: 30px;">
+          <canvas
+            id="line"
+            class="chart chart-line"
+            data="data"
+            labels="labels"
+            series="series"
+            options="options"
+            >
+          </canvas>
+        </div>
+        <div class="text-center">Time</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Temperature Plot
+      </div>
+      <div class="panel-body">
+        <select ng-change="elapsedChanged()" ng-model="elapsed" ng-options="s as ((s/60)+' Minutes') for s in elapsedChoices">
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+

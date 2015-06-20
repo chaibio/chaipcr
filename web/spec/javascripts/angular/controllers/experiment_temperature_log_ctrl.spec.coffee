@@ -24,6 +24,8 @@ describe 'ExperimentTemperatureLog Controller', ->
             heat_block_zone_2_temp: 'heat_block_zone_2_temp'
             lid_temp: 'lid_temp'
 
+      @state = go: jasmine.createSpy()
+
       @stateParams =
         expId: 1
         resolution: 1000
@@ -35,19 +37,16 @@ describe 'ExperimentTemperatureLog Controller', ->
         'Experiment' : @Experiment
         '$stateParams': @stateParams
         'ChartData': @ChartData
+        '$state'  : @state
 
   it 'should have angular-chart options', ->
     expect(@scope.options).toEqual
       pointDot: false
       datasetFill: false
 
-  it 'should have default starttime and endtime', ->
-    expect(@stateParams.starttime).toBe 0
-    expect(@stateParams.endtime).toBe (60 * 200)
-
   it 'should fetch experiment temperature data', ->
     data = @ChartData.temperatureLogs.toAngularCharts()
-    expect(@fetchSpy).toHaveBeenCalledWith @stateParams.expId, jasmine.any Object
+    expect(@fetchSpy).toHaveBeenCalledWith @stateParams.expId, @stateParams
     expect(@scope.labels).toEqual data.elapsed_time;
     expect(@scope.series).toEqual ['Heat block zone 1', 'Heat block zone 2', 'Lid']
     expect(@scope.data).toEqual [
@@ -55,3 +54,13 @@ describe 'ExperimentTemperatureLog Controller', ->
       data.heat_block_zone_2_temp
       data.lid_temp
     ]
+
+  it 'should update chart when time elapsed changed', ->
+    @scope.elapsed = 200
+    @scope.elapsedChanged()
+    expect(@state.go).toHaveBeenCalledWith 'expTemperatureLog', {
+      expId: @stateParams.expId
+      endtime: @scope.elapsed
+    }, notify: false
+
+    expect(@fetchSpy).toHaveBeenCalledWith @stateParams.expId, @stateParams

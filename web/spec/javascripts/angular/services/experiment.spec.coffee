@@ -32,7 +32,7 @@ describe 'Experiment Service', ->
     expId = 3
 
     @httpBackend
-    .expect('GET', "/experiments/#{expId}/temperature_data?resolution=#{opts.resolution}&starttime=#{opts.starttime}")
+    .expect('GET', "/experiments/#{expId}/temperature_data?endtime=#{60*200}&resolution=#{opts.resolution}&starttime=#{opts.starttime}")
     .respond []
 
     spy = jasmine.createSpy()
