@@ -22,3 +22,21 @@ describe 'Experiment Service', ->
     @httpBackend.expect('PUT', "/experiments/#{exp.id}").respond 200
     @Experiment.update(exp)
     @httpBackend.flush()
+
+  it 'should get experiment\'s temperature data', ->
+    opts =
+      starttime: 0
+      endtime: null
+      resolution: 1000
+
+    expId = 3
+
+    @httpBackend
+    .expect('GET', "/experiments/#{expId}/temperature_data?resolution=#{opts.resolution}&starttime=#{opts.starttime}")
+    .respond []
+
+    spy = jasmine.createSpy()
+
+    @Experiment.getTemperatureData(expId, opts).success spy
+    @httpBackend.flush()
+    expect(spy).toHaveBeenCalled()
