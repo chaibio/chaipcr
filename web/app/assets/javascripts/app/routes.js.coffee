@@ -30,4 +30,10 @@ window.ChaiBioTech.ngApp
         templateUrl: 'app/views/experiment/temperature-log.html'
         controller: 'ExperimentTemperatureLogCtrl as TemperatureCtrl'
 
+      .state 'edit-protocol',
+        url: '/edit-protocol/:id'
+        templateUrl: 'app/views/skelton.html'
+        controller: 'ProtocolCtrl'
+
+
 ]
