@@ -3,9 +3,11 @@
 
 window.ChaiBioTech.ngApp
 
-.factory 'ChartData', [
-  ->
-    temperatureLogs:
+.service 'ChartData', [
+  'SecondsDisplay'
+  (SecondsDisplay) ->
+
+    @temperatureLogs =
       # formats temperature logs for angular-charts
       toAngularCharts: (temperature_logs) ->
 
@@ -13,7 +15,7 @@ window.ChaiBioTech.ngApp
 
         elapsed_time = _.map (_.pluck data, 'elapsed_time'), (et) ->
           time = parseInt(et)
-          moment().startOf('day').add(time, 'seconds').format('HH:mm:ss')
+          SecondsDisplay.display2 time
 
         heat_block_zone_1_temp = _.map (_.pluck data, 'heat_block_zone_1_temp'), (hb1) ->
           parseFloat(hb1)
@@ -30,5 +32,6 @@ window.ChaiBioTech.ngApp
         lid_temp: lid_temp
 
 
+    return
 
 ]

@@ -28,7 +28,7 @@ window.ChaiBioTech.ngApp
       .state 'expTemperatureLog',
         url: '/experiments/:expId/temperature-log?starttime&endtime&resolution'
         templateUrl: 'app/views/experiment/temperature-log.html'
-        controller: 'ExperimentTemperatureLogCtrl as TemperatureCtrl'
+        controller: 'ExperimentTemperatureLogCtrl as TemperatureLogCtrl'
 
       .state 'edit-protocol',
         url: '/edit-protocol/:id'

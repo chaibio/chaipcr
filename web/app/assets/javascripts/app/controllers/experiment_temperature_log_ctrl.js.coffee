@@ -5,73 +5,79 @@ window.ChaiBioTech.ngApp
   'Experiment'
   '$stateParams'
   'ChartData'
+  'SecondsDisplay'
   '$state'
-  ($scope, Experiment, $stateParams, ChartData, $state) ->
+  ($scope, Experiment, $stateParams, ChartData, SecondsDisplay, $state) ->
+
+    @temperatureLogs = []
 
     $scope.options =
       pointDot: false
       datasetFill: false
+      scaleShowHorizontalLines: false
+      scaleShowVerticalLines: false
 
-    updateChart = (opts) ->
+    $scope.series = ['Heat block zone 1', 'Heat block zone 2', 'Lid']
 
-      minsRangeToShow = 200
-      opts = angular.copy $stateParams
-      opts.starttime = opts.starttime || 0
-      opts.endtime = opts.endtime || (60 * minsRangeToShow)
-
-      if opts.endtime > (60 * minsRangeToShow)
-        opts.starttime = opts.endtime - (60 * minsRangeToShow)
-
+    @init = ->
       Experiment
-      .getTemperatureData($stateParams.expId, opts)
-      .success (data) ->
-        data = ChartData.temperatureLogs.toAngularCharts(data)
-        $scope.labels = data.elapsed_time
-        $scope.series = ['Heat block zone 1', 'Heat block zone 2', 'Lid']
-        $scope.data = [
-          data.heat_block_zone_1_temp
-          data.heat_block_zone_2_temp
-          data.lid_temp
-        ]
+      .getTemperatureData($stateParams.expId)
+      .success (data) =>
+        @temperatureLogs = data
+        @setStarttimeEndtimeChoices data
+        @updateChartData $scope.starttime, $scope.endtime
 
-    updateChart($stateParams)
+    @navigate = (starttime, endtime) ->
+      $state.go 'expTemperatureLog',
+        starttime: starttime
+        endtime: endtime
+      , notify: false
 
-    getElapsedChoices = ->
-      $scope.elapsedChoices = []
+    @validateTimeRange = (starttime, endtime) ->
+      if starttime > endtime
+        endIndex = _.indexOf $scope.endtimeChoices, endtime
+        starttime = $scope.starttimeChoices[endIndex]
 
-      Experiment
-      .getTemperatureData($stateParams.expId, {starttime: 0})
-      .success (data) ->
-        elapsedArr = _.map data, (datum) ->
-          datum.temperature_log.elapsed_time
-        # get the greatest elapsed time
-        greatest = Math.max.apply(Math, elapsedArr)
-        # get the nth hundreth
-        end = Math.ceil(greatest/60)*60
-        numMins = end/60
+      starttime: starttime
+      endtime: endtime
 
-        dividend = Math.ceil(numMins/5)
+    @updateChartData = (starttime, endtime) =>
 
-        end = Math.ceil(numMins/dividend)*dividend
+      validated = @validateTimeRange starttime, endtime
+      starttime = $scope.starttime = validated.starttime
+      endtime = $scope.endtime = validated.endtime
 
-        for i in [dividend..end] by dividend
-          $scope.elapsedChoices.push i * 60
+      @navigate starttime, endtime # udpate url
 
-        $scope.elapsed = $stateParams.endtime
+      data = _.select @temperatureLogs, (n) ->
+        n.temperature_log.elapsed_time >= starttime and if endtime then n.temperature_log.elapsed_time <= endtime else true
 
-    getElapsedChoices()
+      data = ChartData.temperatureLogs.toAngularCharts(data)
+      $scope.labels = data.elapsed_time
+      $scope.data = [
+        data.heat_block_zone_1_temp
+        data.heat_block_zone_2_temp
+        data.lid_temp
+      ]
 
-    $scope.elapsedChoices = []
-    for i in [200..1000] by 200
-      $scope.elapsedChoices.push i * 60
+    @optionText = SecondsDisplay.display1
 
-    $scope.elapsedChanged = ->
-      $state.go 'expTemperatureLog', {
-        expId: $stateParams.expId,
-        endtime: $scope.elapsed
-      }, notify: false
+    @setStarttimeEndtimeChoices = (data) ->
+      $scope.starttimeChoices = []
+      $scope.endtimeChoices = []
 
-      $stateParams.endtime = $scope.elapsed
+      chunks = _.chunk data, 12
 
-      updateChart()
+      for chunk in chunks
+        endtime = chunk[chunk.length - 1].temperature_log.elapsed_time
+        starttime = chunk[0].temperature_log.elapsed_time
+
+        $scope.starttimeChoices.push starttime
+        $scope.endtimeChoices.push endtime
+
+      $scope.starttime = parseInt $stateParams.starttime ||  $scope.starttimeChoices[0]
+      $scope.endtime = parseInt $stateParams.endtime ||  $scope.endtimeChoices[0]
+
+    return
+
 ]
