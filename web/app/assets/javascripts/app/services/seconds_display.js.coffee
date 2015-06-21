@@ -65,5 +65,23 @@ window.ChaiBioTech.ngApp
 
       "#{if (parseInt sec.days) > 0 then sec.days+':' else ''}#{sec.hours}:#{sec.mins}:#{sec.seconds}"
 
+    @display3 = (seconds) =>
+      seconds = @getSecondsComponents seconds
+      text = ''
+
+      if seconds.days > 0
+        text = "#{text} #{seconds.days}d"
+
+      if seconds.hours > 0
+        text = "#{text} #{seconds.hours}hr"
+
+      if seconds.days is 0 and seconds.mins > 0
+        text = "#{text} #{seconds.mins}m"
+
+      if seconds.days is 0 and seconds.hours is 0
+        text = "#{text} #{seconds.seconds}s"
+
+      text
+
     return
 ]

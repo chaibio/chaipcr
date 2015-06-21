@@ -14,8 +14,7 @@ window.ChaiBioTech.ngApp
         data = _.pluck temperature_logs, 'temperature_log'
 
         elapsed_time = _.map (_.pluck data, 'elapsed_time'), (et) ->
-          time = parseInt(et)
-          SecondsDisplay.display2 time
+          SecondsDisplay.display3 et
 
         heat_block_zone_1_temp = _.map (_.pluck data, 'heat_block_zone_1_temp'), (hb1) ->
           parseFloat(hb1)

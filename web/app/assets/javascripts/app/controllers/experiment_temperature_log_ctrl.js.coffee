@@ -17,6 +17,7 @@ window.ChaiBioTech.ngApp
       datasetFill: false
       scaleShowHorizontalLines: false
       scaleShowVerticalLines: false
+      showTooltips: false
 
     $scope.series = ['Heat block zone 1', 'Heat block zone 2', 'Lid']
 
@@ -56,11 +57,7 @@ window.ChaiBioTech.ngApp
 
       data = ChartData.temperatureLogs.toAngularCharts(data)
 
-      if data.elapsed_time.length > 50
-        $scope.labels = _.map data.elapsed_time, -> ''
-      else
-        $scope.labels = data.elapsed_time
-
+      $scope.labels = data.elapsed_time
       $scope.data = [
         data.heat_block_zone_1_temp
         data.heat_block_zone_2_temp
