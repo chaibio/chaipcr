@@ -31,7 +31,8 @@ window.ChaiBioTech.ngApp
       $state.go 'expTemperatureLog',
         starttime: starttime
         endtime: endtime
-      , notify: false
+      ,
+        notify: false
 
     @validateTimeRange = (starttime, endtime) ->
       if starttime > endtime
