@@ -33,7 +33,7 @@ window.ChaiBioTech.ngApp
       text = ''
 
       if sec.days > 0
-        text = "#{text} #{sec.days} #{if sec.days > 1 then 'days' else 'day'}"
+        text = "#{text} #{sec.days} d"
 
       if sec.hours > 0
         text = "#{text} #{sec.hours} hr"

@@ -10,6 +10,7 @@ window.ChaiBioTech.ngApp
   ($scope, Experiment, $stateParams, ChartData, SecondsDisplay, $state) ->
 
     @temperatureLogs = []
+    chunkLength = 12
 
     $scope.options =
       pointDot: false
@@ -54,7 +55,12 @@ window.ChaiBioTech.ngApp
         n.temperature_log.elapsed_time >= starttime and if endtime then n.temperature_log.elapsed_time <= endtime else true
 
       data = ChartData.temperatureLogs.toAngularCharts(data)
-      $scope.labels = data.elapsed_time
+
+      if data.elapsed_time.length > 50
+        $scope.labels = _.map data.elapsed_time, -> ''
+      else
+        $scope.labels = data.elapsed_time
+
       $scope.data = [
         data.heat_block_zone_1_temp
         data.heat_block_zone_2_temp
@@ -67,7 +73,7 @@ window.ChaiBioTech.ngApp
       $scope.starttimeChoices = []
       $scope.endtimeChoices = []
 
-      chunks = _.chunk data, 12
+      chunks = _.chunk data, chunkLength
 
       for chunk in chunks
         endtime = chunk[chunk.length - 1].temperature_log.elapsed_time
