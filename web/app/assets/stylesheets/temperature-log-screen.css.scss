@@ -1,0 +1,11 @@
+$marginTop: 25%;
+
+.vertical-text {
+
+  transform: rotate(-90deg);
+  transform-origin: 20% 40%;
+  float: left;
+  margin-left: -5px;
+  margin-top: $marginTop;
+  margin-bottom: -$marginTop;
+}

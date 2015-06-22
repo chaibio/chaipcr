@@ -1,0 +1,50 @@
+<div ng-init="TemperatureLogCtrl.init()">
+  <div class="row">
+    <div class="col-md-10">
+      <h3 class="text-center">Temperature Plot</h3>
+      <div class="panel panel-primary">
+        <div class="panel-heading">Temperature Plot</div>
+        <div class="panel-body">
+          <div class="vertical-text">Temperature</div>
+          <div style="padding-left: 30px;">
+            <canvas
+              id="line"
+              class="chart chart-line"
+              data="data"
+              labels="labels"
+              series="series"
+              options="options"
+              >
+            </canvas>
+          </div>
+          <div class="text-center">Time</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <h3>&nbsp;</h3>
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          Temperature Plot
+        </div>
+        <div class="panel-body">
+          <form>
+            <div class="input-group">
+            </div>
+            <div class="input-group">
+              <label>Start Time</label>
+              <select ng-change="TemperatureLogCtrl.updateChartData(starttime, endtime)" ng-model="starttime" ng-options="s as TemperatureLogCtrl.optionText(s) for s in starttimeChoices" class="form-control">
+              </select>
+            </div>
+            <div class="input-group">
+              <label>End time</label>
+              <select ng-change="TemperatureLogCtrl.updateChartData(starttime, endtime)" ng-model="endtime" ng-options="s as TemperatureLogCtrl.optionText(s) for s in endtimeChoices" class="form-control">
+              </select>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
