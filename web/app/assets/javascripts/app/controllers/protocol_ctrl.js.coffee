@@ -3,17 +3,16 @@ window.ChaiBioTech.ngApp
 .controller 'ProtocolCtrl', [
   '$scope'
   '$state'
-  'Experiment'
+  'ExperimentLoader'
   '$stateParams'
 
-  ($scope, $state, Experiment, $stateParams) ->
+  ($scope, $state, ExperimentLoader, $stateParams) ->
 
-    $scope.protocol = {}
+    @ExperimentLoader = ->
+      ExperimentLoader.getExperiment().then (data) ->
+        $scope.protocol = data.experiment
+        ## Load canvas here
 
-    $scope.protocol = Experiment.get {'id': $stateParams.id}, (data) ->
-      $scope.protocol = data.experiment
+    @ExperimentLoader()
 
-    , (err) ->
-          console.log "No Data from server", err
-        
 ]
