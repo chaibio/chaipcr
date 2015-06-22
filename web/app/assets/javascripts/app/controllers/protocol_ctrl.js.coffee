@@ -2,11 +2,10 @@ window.ChaiBioTech.ngApp
 
 .controller 'ProtocolCtrl', [
   '$scope'
-  '$state'
   'ExperimentLoader'
   '$stateParams'
 
-  ($scope, $state, ExperimentLoader, $stateParams) ->
+  ($scope, ExperimentLoader, $stateParams) ->
 
     @ExperimentLoader = ->
       ExperimentLoader.getExperiment().then (data) ->
