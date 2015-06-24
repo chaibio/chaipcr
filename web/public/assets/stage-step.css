@@ -177,7 +177,7 @@
   height: 58px;
   border: none;
 }
-/* line 171, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 172, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-step-x {
   float: left;
   font-size: 26px;
@@ -185,7 +185,7 @@
   height: 20px;
   margin-top: 37px;
 }
-/* line 178, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 179, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-cycles-and-dots {
   font-size: 10px;
   height: 15px;
@@ -194,7 +194,7 @@
   float: left;
   width: 35px;
 }
-/* line 186, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 187, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-cycle-dots {
   width: 18px;
   height: 15px;
@@ -203,7 +203,7 @@
   margin-left: 5px;
   margin-right: 10px;
 }
-/* line 194, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 195, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container {
   float: left;
   width: 147px;
@@ -211,8 +211,8 @@
   margin-left: 6px;
   margin-top: 25px;
 }
-/* line 201, ../../app/assets/stylesheets/stage-step.css.scss */
-.edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container #delta-button {
+/* line 202, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .delta-button-true {
   width: 142px;
   height: 31px;
   background-color: black;
@@ -222,54 +222,102 @@
   color: white;
   cursor: pointer;
 }
-/* line 211, ../../app/assets/stylesheets/stage-step.css.scss */
-.edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container #delta-button .delta-button-image-container {
+/* line 212, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .delta-button-true .delta-button-image-container {
   width: 41px;
   height: 30px;
   float: left;
 }
-/* line 216, ../../app/assets/stylesheets/stage-step.css.scss */
-.edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container #delta-button .delta-button-text {
+/* line 217, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .delta-button-true .delta-button-text {
   float: left;
   width: 95px;
   height: 31px;
   padding-top: 7px;
 }
-/* line 224, ../../app/assets/stylesheets/stage-step.css.scss */
-.edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container #gather-data-button {
+/* line 225, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .delta-button-false {
   width: 142px;
   height: 31px;
-  background-color: black;
+  background-color: white;
   font-size: 9px;
   border: 1px solid black;
   margin-left: 5px;
-  color: white;
+  color: black;
   cursor: pointer;
 }
-/* line 234, ../../app/assets/stylesheets/stage-step.css.scss */
-.edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container #gather-data-button .gather-data-button-image-container {
+/* line 235, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .delta-button-false .delta-button-image-container {
   width: 41px;
   height: 30px;
   float: left;
-  padding-top: 5px;
 }
 /* line 240, ../../app/assets/stylesheets/stage-step.css.scss */
-.edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container #gather-data-button .gather-data-button-text {
+.edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .delta-button-false .delta-button-text {
   float: left;
   width: 95px;
   height: 31px;
   padding-top: 7px;
 }
 /* line 248, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .gather-data-button-true {
+  width: 142px;
+  height: 31px;
+  background-color: black;
+  font-size: 9px;
+  border: 1px solid black;
+  margin-left: 5px;
+  color: white;
+  cursor: pointer;
+}
+/* line 258, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .gather-data-button-true .gather-data-button-image-container {
+  width: 41px;
+  height: 30px;
+  float: left;
+  padding-top: 5px;
+}
+/* line 264, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .gather-data-button-true .gather-data-button-text {
+  float: left;
+  width: 95px;
+  height: 31px;
+  padding-top: 7px;
+}
+/* line 272, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .gather-data-button-false {
+  width: 142px;
+  height: 31px;
+  background-color: white;
+  font-size: 9px;
+  border: 1px solid black;
+  margin-left: 5px;
+  color: black;
+  cursor: pointer;
+}
+/* line 282, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .gather-data-button-false .gather-data-button-image-container {
+  width: 41px;
+  height: 30px;
+  float: left;
+  padding-top: 5px;
+}
+/* line 288, ../../app/assets/stylesheets/stage-step.css.scss */
+.edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .gather-data-button-false .gather-data-button-text {
+  float: left;
+  width: 95px;
+  height: 31px;
+  padding-top: 7px;
+}
+/* line 296, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .lol-pop {
   width: 180px;
   height: 111px;
   position: relative;
   top: -156px;
   left: -20px;
-  display: none;
 }
-/* line 256, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 303, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .lol-pop .gather-data-popup {
   width: 180px;
   height: 111px;
@@ -277,7 +325,7 @@
   position: absolute;
   opacity: .8;
 }
-/* line 263, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 310, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .lol-pop .gather-data-popup .tail {
   width: 20px;
   height: 20px;
@@ -291,7 +339,7 @@
   top: 100px;
   left: 80px;
 }
-/* line 276, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 323, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .lol-pop .gather-data-popup-content {
   width: 150px;
   height: 111px;
@@ -299,7 +347,7 @@
   left: 18px;
   top: 12px;
 }
-/* line 283, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 330, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .lol-pop .gather-data-popup-content .small-button {
   width: 142px;
   background-color: white;
@@ -309,7 +357,7 @@
   font-weight: bold;
   cursor: pointer;
 }
-/* line 292, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 339, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .lol-pop .gather-data-popup-content .small-button .tik-image-container {
   height: 31px;
   width: 34px;
@@ -317,30 +365,30 @@
   padding-top: 5px;
   padding-left: 8px;
 }
-/* line 299, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 346, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .lol-pop .gather-data-popup-content .small-button .tik-text-container {
   height: 31px;
   width: 100px;
   float: left;
   padding-top: 7px;
 }
-/* line 306, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 353, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .lol-pop .gather-data-popup-content .first {
   margin-top: 8px;
   margin-bottom: 10px;
 }
-/* line 311, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 358, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .first-data-row .bottom-button-container .lol-pop .gather-data-popup-content button {
   margin-bottom: 5px;
   width: 140px;
 }
-/* line 323, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 370, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .data-boxes {
   width: 243px;
   height: 212px;
   float: left;
 }
-/* line 328, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 375, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .data-boxes .name-board {
   height: 34px;
   color: #737373;
@@ -350,20 +398,20 @@
   border-bottom-width: 1px;
   border-bottom-color: black;
 }
-/* line 338, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 385, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .auto-delta {
   margin-left: 76px;
 }
-/* line 342, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 389, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .edit-stage-step {
   margin-left: 77px;
 }
-/* line 345, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 392, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .edit-stage-step .action-container {
   padding-top: 20px;
   height: 200px;
 }
-/* line 349, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 396, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .edit-stage-step .action-container .big-button {
   width: 243px;
   background-color: white;
@@ -373,7 +421,7 @@
   font-size: 9px;
   font-weight: bold;
 }
-/* line 359, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 406, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .edit-stage-step .action-container .small-button {
   width: 115px;
   background-color: white;
@@ -382,11 +430,11 @@
   font-size: 9px;
   font-weight: bold;
 }
-/* line 367, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 414, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .edit-stage-step .action-container .go-right {
   float: right;
 }
-/* line 371, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 418, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .edit-stage-step .action-container .lol-pop {
   width: 180px;
   height: 120px;
@@ -395,7 +443,7 @@
   left: 15px;
   display: none;
 }
-/* line 379, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 426, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .edit-stage-step .action-container .lol-pop .add-stage-popup {
   width: 180px;
   height: 120px;
@@ -403,7 +451,7 @@
   position: absolute;
   opacity: .8;
 }
-/* line 386, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 433, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .edit-stage-step .action-container .lol-pop .add-stage-popup .tail {
   width: 20px;
   height: 20px;
@@ -417,7 +465,7 @@
   top: 110px;
   left: 80px;
 }
-/* line 399, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 446, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .edit-stage-step .action-container .lol-pop .add-stage-popup-content {
   width: 150px;
   height: 111px;
@@ -425,16 +473,16 @@
   left: 15px;
   top: 12px;
 }
-/* line 406, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 453, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .edit-stage-step .action-container .lol-pop .add-stage-popup-content button {
   margin-bottom: 3px;
   width: 150px;
 }
-/* line 416, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 463, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .disabled {
   color: #cdcdcd;
 }
-/* line 420, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 467, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item {
   height: 58px;
   width: 243px;
@@ -442,14 +490,14 @@
   border-bottom-width: 2px;
   border-bottom-color: black;
 }
-/* line 427, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 474, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .caption-part {
   height: 53px;
   width: 135px;
   float: left;
   line-height: 2.5;
 }
-/* line 433, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 480, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .caption-part .capsule {
   width: 62px;
   height: 26px;
@@ -464,7 +512,7 @@
   border-width: 1px;
   border-style: solid;
 }
-/* line 447, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 494, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .caption-part .capsule .plus {
   position: absolute;
   top: -12px;
@@ -474,13 +522,13 @@
   color: grey;
   cursor: pointer;
 }
-/* line 457, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 504, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .caption-part .capsule .ball-cover {
   width: 24px;
   height: 24px;
   cursor: move;
 }
-/* line 462, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 509, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .caption-part .capsule .ball-cover .white-ball {
   width: 24px;
   height: 24px;
@@ -490,7 +538,7 @@
   background-color: white;
   position: absolute;
 }
-/* line 471, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 518, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .caption-part .capsule .ball-cover .white-ball .center-circle {
   width: 12px;
   height: 12px;
@@ -502,7 +550,7 @@
   top: 6px;
   left: 6px;
 }
-/* line 485, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 532, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .caption-part .capsule .minus {
   position: absolute;
   top: -26px;
@@ -512,7 +560,7 @@
   color: grey;
   cursor: pointer;
 }
-/* line 497, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 544, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part {
   height: 53px;
   width: 95px;
@@ -522,12 +570,12 @@
   font-size: 48px;
   text-align: right;
 }
-/* line 506, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 553, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part .time-part {
   width: 95px;
   float: left;
 }
-/* line 510, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 557, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part .time-part .time-part-edit {
   width: 95px;
   position: relative;
@@ -538,18 +586,18 @@
   border: none;
   display: none;
 }
-/* line 522, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 569, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part .seperator {
   width: 10px;
   float: left;
   padding-left: 6px;
 }
-/* line 528, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 575, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part .minute-part {
   width: 40px;
   float: left;
 }
-/* line 532, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 579, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part .minute-part .minute-part-edit {
   width: 40px;
   position: relative;
@@ -560,7 +608,7 @@
   border: none;
   display: none;
 }
-/* line 544, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 591, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .data-part .data-part-edit-value {
   width: 95px;
   height: 53px;
@@ -572,16 +620,16 @@
   font-weight: bold;
   border: none;
 }
-/* line 557, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 604, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .minified-font {
   width: 105px;
 }
-/* line 559, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 606, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .minified-font span {
   font-size: 30px;
   vertical-align: middle;
 }
-/* line 565, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 612, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .middle-ground .bottom-common-item .dots {
   float: left;
   width: 23px;
@@ -589,13 +637,13 @@
   padding-top: 28px;
   padding-left: 5px;
 }
-/* line 575, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 622, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .next {
   width: 71px;
   height: 60px;
   float: left;
 }
-/* line 580, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 627, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .next img {
   padding-right: 30px;
   padding-bottom: 31px;
@@ -606,11 +654,11 @@
   /* Chrome, Safari, Opera */
   transform: rotate(180deg);
 }
-/* line 591, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 638, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .speedCaption {
   padding-left: 7px;
 }
-/* line 593, ../../app/assets/stylesheets/stage-step.css.scss */
+/* line 640, ../../app/assets/stylesheets/stage-step.css.scss */
 .edit-stage-step-container .bottom-half .speedCaption span {
   font-size: 37px;
 }

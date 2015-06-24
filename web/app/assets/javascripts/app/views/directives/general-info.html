@@ -2,15 +2,15 @@
     <div class="bottom-step-no ostrich">02</div>
 <div class="bottom-no-of-stages ostrich">/08</div>
 <div class="bottom-name-of-step-stage ostrich">
-<span class="bottom-name-of-step-span" ng-click="stepNameShow = true">{{step.name}}</span>
-<input type="text" class="edit-step-name" ng-blur="stepNameShow = false" ng-model="step.name" ng-show="stepNameShow">
+<span class="bottom-name-of-step-span" ng-click="clickOnField('stepNameShow', 'edit-step-name')">{{step.name}}</span>
+<input type="text" class="edit-step-name" ng-keypress="checkIfEnter($event,'stepNameShow')" ng-blur="stepNameShow = false" ng-model="step.name" ng-show="stepNameShow">
 </div>
 <div class="bottom-stage-name sansa">{{stage.name | uppercase}}</div>
 
 <div class="bottom-step-no-cycle-container">
 <div class="bottom-step-no-cycle ostrich">
-<span class="bottom-step-no-cycle-span" ng-click="stageNoCycleShow = true">{{stage.num_cycles}}</span>
-<input type="number" class="bottom-step-no-cycle-edit" ng-blur="stageNoCycleShow = false" ng-show="stageNoCycleShow" ng-model="stage.num_cycles">
+<span class="bottom-step-no-cycle-span" ng-click="clickOnField('stageNoCycleShow', 'bottom-step-no-cycle-edit')">{{stage.num_cycles}}</span>
+<input type="number" class="bottom-step-no-cycle-edit" ng-blur="stageNoCycleShow = false" ng-keypress="checkIfEnter($event,'stageNoCycleShow')" ng-show="stageNoCycleShow" ng-model="stage.num_cycles">
 </div>
 <div class="bottom-step-x ostrich">x</div>
 <div class="bottom-cycles-and-dots sansa">CYCLES</div>
@@ -18,25 +18,25 @@
 </div>
 
 <div class="bottom-button-container">
-<div id="delta-button" class="bottom-button-class">
+<div id="delta-button" class="delta-button-{{off}}" ng-click="changeDelta()">
 <div class="delta-button-image-container">
-  <img class="delta-button-image" src="assets/delta-image.png">
+  <img class="delta-button-image" ng-show="off" ng-src="assets/delta-image.png">
 </div>
 <div class="delta-button-text">
-  AUTODELTA OFF
+  AUTODELTA {{delta_state}}
 </div>
 </div>
 </div>
 <div class="bottom-button-container">
-<div id="gather-data-button" class="bottom-button-class">
+<div id="gather-data-button" class="gather-data-button-{{gatherDataState}}" ng-click="showPopUp()">
 <div class="gather-data-button-image-container">
-  <img class="gather-data-button-image" src="assets/gather-data-image.png">
+  <img class="gather-data-button-image" ng-show="gatherDataState" ng-src="assets/gather-data-image.png">
 </div>
 <div class="gather-data-button-text">
-  GATHER DATA ON
+  GATHER DATA {{gather_data_state}}
 </div>
 </div>
-<div class="lol-pop">
+<div class="lol-pop" ng-show="popUp">
 <div class="gather-data-popup">
   <div class="tail"></div>
 </div>
