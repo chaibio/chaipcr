@@ -41,17 +41,17 @@
   <div class="tail"></div>
 </div>
 <div class="gather-data-popup-content">
-  <div class="small-button first sansa" id="during-step">
+  <div class="small-button first sansa" id="during-step" ng-click="changeDuringStep()">
     <div class="tik-image-container">
-      <img class="tik-image-during-step" src="assets/tik.png">
+      <img ng-show="duringStep" class="tik-image-during-step" src="assets/tik.png">
     </div>
     <div class="tik-text-container">
       <span>DURING STEP</span>
     </div>
   </div>
-  <div class="small-button sansa" id="after-step">
+  <div class="small-button sansa" id="after-step" ng-click="changeDuringRamp()">
     <div class="tik-image-container">
-      <img class="tik-image-during-ramp" src="assets/tik.png">
+      <img ng-show="duringRamp" class="tik-image-during-ramp" src="assets/tik.png">
     </div>
     <div class="tik-text-container">
       <span>DURING RAMP</span>

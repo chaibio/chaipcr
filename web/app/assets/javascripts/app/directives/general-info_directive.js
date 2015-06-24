@@ -40,7 +40,7 @@ window.ChaiBioTech.ngApp.directive('general', [
         scope.clickOnField = function(field, focusElement) {
 
           scope[field] = true;
-
+          // It takes while after render to focus, thats y we have a $timeout
           $timeout(function() {
             $('.' + focusElement).focus();
           });
@@ -48,13 +48,27 @@ window.ChaiBioTech.ngApp.directive('general', [
 
         scope.changeDelta = function() {
 
-          scope.stage.auto_delta = ! scope.stage.auto_delta;
-          scope.off = ! scope.off;
+          scope.stage.auto_delta = scope.off = ! scope.stage.auto_delta;
           scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
         }
 
         scope.showPopUp = function() {
+
           scope.popUp = ! scope.popUp;
+        }
+
+        scope.changeDuringStep = function() {
+
+          scope.popUp = ! scope.popUp;
+          scope.duringStep = scope.step.collect_data = ! scope.step.collect_data;
+          scope.gatherDataState = (!scope.duringStep && !scope.duringRamp) ? false : true ;
+        }
+
+        scope.changeDuringRamp = function() {
+
+          scope.popUp = ! scope.popUp;
+          scope.duringRamp = scope.step.ramp.collect_data = ! scope.step.ramp.collect_data;
+          scope.gatherDataState = (!scope.duringStep && !scope.duringRamp) ? false : true ;
         }
 
       }
