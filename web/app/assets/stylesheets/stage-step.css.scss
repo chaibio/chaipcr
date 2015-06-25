@@ -127,7 +127,6 @@
 						border: none;
 						background-color: black;
 						color: white;
-						display: none;
 						text-align: center;
 					}
 				}
@@ -165,7 +164,7 @@
 							top: -46px;
 							height: 58px;
 							border: none;
-							display: none;
+
 						}
 					}
 				}
@@ -200,7 +199,7 @@
 					margin-left: 6px;
 					margin-top: 25px;
 
-					#delta-button {
+					.delta-button-true {
 						width: 142px;
 						height: 31px;
 						background-color: black;
@@ -223,7 +222,30 @@
 						}
 					}
 
-					#gather-data-button {
+					.delta-button-false {
+						width: 142px;
+						height: 31px;
+						background-color: white;
+						font-size: 9px;
+						border: 1px solid black;
+						margin-left: 5px;
+						color: black;
+						cursor: pointer;
+
+						.delta-button-image-container {
+							width: 41px;
+							height: 30px;
+							float: left;
+						}
+						.delta-button-text {
+							float: left;
+							width:95px;
+							height: 31px;
+							padding-top: 7px;
+						}
+					}
+
+					.gather-data-button-true {
 						width: 142px;
 						height: 31px;
 						background-color: black;
@@ -247,13 +269,36 @@
 						}
 					}
 
+					.gather-data-button-false {
+						width: 142px;
+						height: 31px;
+						background-color: white;
+						font-size: 9px;
+						border: 1px solid black;
+						margin-left: 5px;
+						color: black;
+						cursor: pointer;
+
+						.gather-data-button-image-container {
+							width: 41px;
+							height: 30px;
+							float: left;
+							padding-top: 5px;
+						}
+						.gather-data-button-text {
+							float: left;
+							width:95px;
+							height: 31px;
+							padding-top: 7px;
+						}
+					}
+
 					.lol-pop {
 						width: 180px;
 						height: 111px;
 						position: relative;
 						top: -156px;
 						left: -20px;
-						display: none;
 
 						.gather-data-popup {
 							width: 180px;

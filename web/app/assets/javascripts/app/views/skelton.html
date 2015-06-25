@@ -1,5 +1,4 @@
 <div class="edit-stage-step-container">
-
   <div class="top-half noselect">
     <div class="name-on-top">
       <div class="stripes-and-name">
@@ -13,9 +12,27 @@
         <div class="name-container">{{protocol.name}}</div>
       </div>
     </div>
-  </div>
-  <div class="bottom-half noselect">
-  K
-  </div>
 
+    <div class="canvas-containing">
+        <canvas class="canvasClass" id="canvas"></canvas>
+    </div>
+  </div>
+  <!-- bottom-half-->
+  <div class="bottom-half noselect" ng-controller="StageStepCtrl">
+    <arrow class="previous" action="previous"></arrow>
+    <div class="middle-ground">
+      <general></general>
+
+      <div class="data-boxes temperature-change">
+        <div class="name-board sansa">TEMPERATURE CHANGE SPEED</div>
+      </div>
+      <div class="data-boxes auto-delta">
+        <div class="name-board sansa">AUTO DELTA</div>
+      </div>
+      <div class="data-boxes edit-stage-step">
+        <div class="name-board sansa">EDIT STEP & STAGE</div>
+      </div>
+    </div>
+    <arrow class="next" action="next"></arrow>
+  </div>
 </div>

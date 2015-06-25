@@ -1,0 +1,94 @@
+/* line 3, ../../../app/assets/stylesheets/libs/angular-ui-switch.css.scss */
+.switch {
+  background: #fff;
+  border: 1px solid #dfdfdf;
+  position: relative;
+  display: inline-block;
+  box-sizing: content-box;
+  overflow: visible;
+  width: 52px;
+  height: 30px;
+  padding: 0px;
+  margin: 0px;
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: #dfdfdf 0px 0px 0px 0px inset;
+  transition: 0.3s ease-out all;
+  -webkit-transition: 0.3s ease-out all;
+  top: -1px;
+}
+
+/*adding a wide width for larger switch text*/
+/* line 22, ../../../app/assets/stylesheets/libs/angular-ui-switch.css.scss */
+.switch.wide {
+  width: 80px;
+}
+
+/* line 25, ../../../app/assets/stylesheets/libs/angular-ui-switch.css.scss */
+.switch small {
+  background: #8fc742;
+  border-radius: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  transition: 0.3s ease-out all;
+  -webkit-transition: 0.3s ease-out all;
+  border: 7px solid #fff;
+}
+
+/* line 38, ../../../app/assets/stylesheets/libs/angular-ui-switch.css.scss */
+.switch.checked {
+  background: #8fc742;
+  border-color: #8fc742;
+}
+
+/* line 42, ../../../app/assets/stylesheets/libs/angular-ui-switch.css.scss */
+.switch.checked small {
+  left: 22px;
+}
+
+/*wider switch text moves small further to the right*/
+/* line 46, ../../../app/assets/stylesheets/libs/angular-ui-switch.css.scss */
+.switch.wide.checked small {
+  left: 52px;
+}
+
+/*styles for switch-text*/
+/* line 50, ../../../app/assets/stylesheets/libs/angular-ui-switch.css.scss */
+.switch .switch-text {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+}
+
+/* line 55, ../../../app/assets/stylesheets/libs/angular-ui-switch.css.scss */
+.switch .off {
+  display: block;
+  position: absolute;
+  right: 10%;
+  top: 25%;
+  z-index: 0;
+  color: #A9A9A9;
+}
+
+/* line 64, ../../../app/assets/stylesheets/libs/angular-ui-switch.css.scss */
+.switch .on {
+  display: none;
+  z-index: 0;
+  color: #fff;
+  position: absolute;
+  top: 25%;
+  left: 9%;
+}
+
+/* line 73, ../../../app/assets/stylesheets/libs/angular-ui-switch.css.scss */
+.switch.checked .off {
+  display: none;
+}
+
+/* line 77, ../../../app/assets/stylesheets/libs/angular-ui-switch.css.scss */
+.switch.checked .on {
+  display: block;
+}
