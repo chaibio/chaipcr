@@ -1,0 +1,6 @@
+<div class="bottom-common-item">
+  <div class="caption-part simplifica">{{caption | uppercase}}</div>
+  <div class="data-part ostrich"><span class="data-part-span" ng-show="!edit" ng-click="editAndFocus('data-part-edit-value')">{{reading}}{{unit}}</span>
+    <input ng-show="edit" ng-blur="edit = !edit" ng-model="reading" class="data-part-edit-value" min="0" max="100"  type="text" value="{{reading}}">
+  </div>
+</div>

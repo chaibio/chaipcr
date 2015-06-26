@@ -10,8 +10,11 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
 
       $scope.stage = ExperimentLoader.loadFirstStages();
       $scope.step = ExperimentLoader.loadFirstStep();
-      
+
     });
 
+    $scope.WOWaction = function(cool) {
+      console.log(cool);
+    }
   }
 ]);
