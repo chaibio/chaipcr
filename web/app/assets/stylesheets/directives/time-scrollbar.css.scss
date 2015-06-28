@@ -1,0 +1,13 @@
+.time-scrollbar {
+  width: 100%;
+  height: 10px;
+
+  .scrollbar {
+    width: 20%;
+    height: 100%;
+    background-color: gray;
+    display: inline-block;
+    vertical-align: middle;
+    cursor: pointer;
+  }
+}

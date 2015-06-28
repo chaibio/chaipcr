@@ -6,56 +6,92 @@ window.ChaiBioTech.ngApp
   '$stateParams'
   'ChartData'
   'SecondsDisplay'
-  '$state'
-  ($scope, Experiment, $stateParams, ChartData, SecondsDisplay, $state) ->
+  ($scope, Experiment, $stateParams, ChartData, SecondsDisplay) ->
 
     @temperatureLogs = []
-    chunkLength = 12
+    @calibration = 10
+    @scrollState = 0
+    $scope.scrollEnabled = true
+    $scope.resolution = 10 * 1000
 
     $scope.options =
+      animation: false
+      responsive: true
       pointDot: false
       datasetFill: false
-      scaleShowHorizontalLines: false
-      scaleShowVerticalLines: false
-      showTooltips: false
+      showTooltips: true
+      scaleOverride : true
+      scaleSteps: 10
+      scaleStartValue : 0
 
-    $scope.series = ['Heat block zone 1', 'Heat block zone 2', 'Lid']
 
-    @init = ->
-      Experiment
-      .getTemperatureData($stateParams.expId)
-      .success (data) =>
-        @temperatureLogs = data
-        @setStarttimeEndtimeChoices data
-        @updateChartData $scope.starttime, $scope.endtime
+    $scope.series = ['Heat block zone 1 Temp', 'Heat block zone 2 Temp', 'Lid Temp']
 
-    @navigate = (starttime, endtime) ->
-      $state.go 'expTemperatureLog',
-        starttime: starttime
-        endtime: endtime
-      ,
-        notify: false
+    @init = =>
+      @updateResolution()
 
-    @validateTimeRange = (starttime, endtime) ->
-      if starttime > endtime
-        endIndex = _.indexOf $scope.endtimeChoices, endtime
-        starttime = $scope.starttimeChoices[endIndex]
+    @updateScale = =>
+      if not $scope.options.scaleStepWidth
+        scales = _.map @temperatureLogs, (temp_log) ->
+          temp_log = temp_log.temperature_log
+          greatest = Math.max.apply Math, [
+            parseFloat temp_log.lid_temp
+            parseFloat temp_log.heat_block_zone_1_temp
+            parseFloat temp_log.heat_block_zone_2_temp
+          ]
+          greatest
 
-      starttime: starttime
-      endtime: endtime
+        max_scale = Math.max.apply Math, scales
 
-    @updateChartData = (starttime, endtime) =>
+        $scope.options.scaleStepWidth = Math.ceil max_scale/10
 
-      validated = @validateTimeRange starttime, endtime
-      starttime = $scope.starttime = validated.starttime
-      endtime = $scope.endtime = validated.endtime
+    @updateResolution = =>
+      @scrollState = 0
 
-      @navigate starttime, endtime # udpate url
+      if ($scope.resolution)
+        Experiment
+        .getTemperatureData($stateParams.expId, {resolution: $scope.resolution/@calibration})
+        .success (data) =>
+          @temperatureLogs = data
+          data = angular.copy @temperatureLogs
+          data = _.select data, (d) ->
+            d.temperature_log.elapsed_time <= $scope.resolution
 
-      data = _.select @temperatureLogs, (n) ->
-        n.temperature_log.elapsed_time >= starttime and if endtime then n.temperature_log.elapsed_time <= endtime else true
+          @updateScale()
+          $scope.scrollState = 0
+          @updateChartData data
+          $scope.scrollEnabled = true
 
-      data = ChartData.temperatureLogs.toAngularCharts(data)
+      else #view all
+        Experiment
+        .getTemperatureData($stateParams.expId)
+        .success (data) =>
+          @temperatureLogs = []
+          dataArr = _.chunk data, Math.ceil data.length/15
+
+          for arr, i in dataArr
+            @temperatureLogs.push arr[0]
+            if i is dataArr.length-1
+              @temperatureLogs.push arr[arr.length-1]
+
+          @updateScale()
+          @updateChartData @temperatureLogs
+          $scope.scrollEnabled = false
+
+    $scope.$watch 'scrollState', =>
+      if $scope.scrollEnabled
+
+        scrollState = $scope.scrollState
+
+        if $scope.scrollState > @temperatureLogs.length - @calibration
+          scrollState = @temperatureLogs.length - @calibration
+
+        data = angular.copy @temperatureLogs
+        data = data.splice scrollState, @calibration
+        @updateChartData data
+
+    @updateChartData = (temperature_logs) =>
+      data = ChartData.temperatureLogs.toAngularCharts temperature_logs
 
       $scope.labels = data.elapsed_time
       $scope.data = [
@@ -64,23 +100,16 @@ window.ChaiBioTech.ngApp
         data.lid_temp
       ]
 
+    $scope.resolutionOptions = [
+      10 * 1000
+      20 * 1000
+      30 * 1000 # 30 sec
+      60 * 1000 # 1 min
+      60 * 1000 * 60  # 1 hour
+      60 * 1000 * 60 * 24 # 1 day
+    ]
+
     @optionText = SecondsDisplay.display1
-
-    @setStarttimeEndtimeChoices = (data) ->
-      $scope.starttimeChoices = []
-      $scope.endtimeChoices = []
-
-      chunks = _.chunk data, chunkLength
-
-      for chunk in chunks
-        endtime = chunk[chunk.length - 1].temperature_log.elapsed_time
-        starttime = chunk[0].temperature_log.elapsed_time
-
-        $scope.starttimeChoices.push starttime
-        $scope.endtimeChoices.push endtime
-
-      $scope.starttime = parseInt $stateParams.starttime ||  $scope.starttimeChoices[0]
-      $scope.endtime = parseInt $stateParams.endtime ||  $scope.endtimeChoices[0]
 
     return
 

@@ -16,6 +16,9 @@
               options="options"
               >
             </canvas>
+            <div style="padding: 0px 30px;">
+              <time-scrollbar ng-model="scrollState" max="TemperatureLogCtrl.temperatureLogs.length" ng-show="scrollEnabled"></time-scrollbar>
+            </div>
           </div>
           <div class="text-center">Time</div>
         </div>
@@ -32,13 +35,9 @@
             <div class="input-group">
             </div>
             <div class="input-group">
-              <label>Start Time</label>
-              <select ng-change="TemperatureLogCtrl.updateChartData(starttime, endtime)" ng-model="starttime" ng-options="s as TemperatureLogCtrl.optionText(s) for s in starttimeChoices" class="form-control">
-              </select>
-            </div>
-            <div class="input-group">
-              <label>End time</label>
-              <select ng-change="TemperatureLogCtrl.updateChartData(starttime, endtime)" ng-model="endtime" ng-options="s as TemperatureLogCtrl.optionText(s) for s in endtimeChoices" class="form-control">
+              <label>View</label>
+              <select ng-change="TemperatureLogCtrl.updateResolution()" ng-model="resolution" class="form-control" ng-options="ms as TemperatureLogCtrl.optionText(ms/1000) for ms in resolutionOptions">
+                <option value=''>- View All -</option>
               </select>
             </div>
           </form>

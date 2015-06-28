@@ -12,7 +12,8 @@ window.ChaiBioTech.ngApp
 
     self.getTemperatureData = (expId, opts = {}) ->
 
-      opts.starttime =opts.starttime || 0
+      opts.starttime = opts.starttime || 0
+      opts.resolution = opts.resolution || 1000
 
       $http.get "/experiments/#{expId}/temperature_data",
         params:
