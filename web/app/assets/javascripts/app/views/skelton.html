@@ -25,12 +25,16 @@
 
       <div class="data-boxes temperature-change">
         <div class="name-board sansa">TEMPERATURE CHANGE SPEED</div>
+          <temperature caption="temperature" unit="ºC" reading="step.temperature"></temperature>
+          <ramp-speed caption="ramp speed" reading="step.ramp.rate"></ramp-speed>
+          <hold-duration caption="hold duration" reading="step.hold_time"></hold-duration>
       </div>
       <div class="data-boxes auto-delta">
         <div class="name-board sansa">AUTO DELTA</div>
       </div>
       <div class="data-boxes edit-stage-step">
         <div class="name-board sansa">EDIT STEP & STAGE</div>
+          <actions></actions>
       </div>
     </div>
     <arrow class="next" action="next"></arrow>

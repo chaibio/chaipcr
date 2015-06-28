@@ -5,7 +5,7 @@ window.ChaiBioTech.ngApp.directive('general', [
 
     return {
       restric: 'EA',
-      replace: true,
+      replace: false,
       scope: false,
       templateUrl: 'app/views/directives/general-info.html',
 
