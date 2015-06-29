@@ -25,12 +25,15 @@
 
       <div class="data-boxes temperature-change">
         <div class="name-board sansa">TEMPERATURE CHANGE SPEED</div>
-          <temperature caption="temperature" unit="ºC" reading="step.temperature"></temperature>
+          <temperature caption="temperature" unit="ºC" reading="step.temperature" action="WOWaction(edit)"></temperature>
           <ramp-speed caption="ramp speed" reading="step.ramp.rate"></ramp-speed>
           <hold-duration caption="hold duration" reading="step.hold_time"></hold-duration>
       </div>
       <div class="data-boxes auto-delta">
         <div class="name-board sansa">AUTO DELTA</div>
+        <start-on-cycle caption="start on cycle" reading="stage.auto_delta_start_cycle"></start-on-cycle>
+        <temp caption="temp" unit="ºC" reading="step.delta_temperature"><capsule value="step.delta_temperature"></capsule></temp>
+        <time caption="time" reading="step.delta_duration_s"><capsule value="step.delta_duration_s"></capsule></time>
       </div>
       <div class="data-boxes edit-stage-step">
         <div class="name-board sansa">EDIT STEP & STAGE</div>
