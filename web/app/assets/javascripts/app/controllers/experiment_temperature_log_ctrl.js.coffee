@@ -82,8 +82,8 @@ window.ChaiBioTech.ngApp
               @temperatureLogs.push arr[arr.length-1]
 
           @updateScale()
-          @updateChartData @temperatureLogs
           $scope.scrollEnabled = false
+          @updateChartData @temperatureLogs
 
     $scope.$watch 'scrollState', =>
       if $scope.scrollEnabled
