@@ -35,5 +35,11 @@ window.ChaiBioTech.ngApp
         templateUrl: 'app/views/skelton.html'
         controller: 'ProtocolCtrl'
 
+      .state 'runExperiment',
+        url: '/run-experiment/:id'
+        templateUrl: 'app/views/experiment/run-experiment.html'
+        controller: 'RunExperimentCtrl'
+
+
 
 ]
