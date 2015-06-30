@@ -11,9 +11,16 @@ window.ChaiBioTech.ngApp.directive('time', [
         reading: '=',
         action: '&' // Learn how to pass value in this scenario
       },
+
+      controller: function() {
+
+      },
+
       transclude: true,
 
       templateUrl: 'app/views/directives/temp-time.html',
+
+      //bindToController: true,
 
       link: function(scope, elem, attr) {
 
