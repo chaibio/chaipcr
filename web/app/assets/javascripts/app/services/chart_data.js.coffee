@@ -11,23 +11,23 @@ window.ChaiBioTech.ngApp
       # formats temperature logs for angular-charts
       toAngularCharts: (temperature_logs) ->
 
-        data = _.pluck temperature_logs, 'temperature_log'
+        elapsed_time = []
+        heat_block_zone_temp = []
+        lid_temp = []
 
-        elapsed_time = _.map (_.pluck data, 'elapsed_time'), (et) ->
-          SecondsDisplay.display2 Math.round(et/1000)
+        for temp_log in temperature_logs
+          elapsed_time.push SecondsDisplay.display2 Math.round(temp_log.temperature_log.elapsed_time/1000)
 
-        heat_block_zone_1_temp = _.map (_.pluck data, 'heat_block_zone_1_temp'), (hb1) ->
-          parseFloat(hb1)
+          # get heat_block_zone_temp average
+          hbz = (parseFloat(temp_log.temperature_log.heat_block_zone_1_temp)+ parseFloat(temp_log.temperature_log.heat_block_zone_2_temp))/2
+          # round to nearest hundreth
+          hbz = Math.ceil(hbz*100)/100
 
-        heat_block_zone_2_temp = _.map (_.pluck data, 'heat_block_zone_2_temp'), (hb2) ->
-          parseFloat(hb2)
-
-        lid_temp = _.map (_.pluck data, 'lid_temp'), (lt) ->
-          parseFloat(lt)
+          heat_block_zone_temp.push hbz
+          lid_temp.push parseFloat temp_log.temperature_log.lid_temp
 
         elapsed_time: elapsed_time
-        heat_block_zone_1_temp: heat_block_zone_1_temp
-        heat_block_zone_2_temp: heat_block_zone_2_temp
+        heat_block_zone_temp: heat_block_zone_temp
         lid_temp: lid_temp
 
 

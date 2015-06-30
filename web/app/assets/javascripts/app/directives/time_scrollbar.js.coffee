@@ -9,7 +9,6 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
     require: 'ngModel'
     link: ($scope, elem, attr, ngModel) ->
 
-
       held = false
       oldMargin = 0;
       newMargin = 0;
@@ -19,6 +18,10 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
       scaleSize = 0
 
       scrollbar = elem.find('.scrollbar')
+
+      $scope.$watch 'max', (max) ->
+        modelVal = (newMargin/spaceWidth) * $scope.max
+        ngModel.$setViewValue Math.round modelVal
 
       disableSelect = ->
         $window.$(document.body).css

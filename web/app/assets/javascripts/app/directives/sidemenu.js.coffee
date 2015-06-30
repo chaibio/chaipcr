@@ -2,11 +2,14 @@ window.ChaiBioTech.ngApp
 
 .directive 'sidemenu', [
   '$rootScope'
-  ($rootScope) ->
+  '$templateCache'
+  ($rootScope, $templateCache) ->
 
     restrict: 'EA'
     replace: true
-    scope: {}
+    scope:
+      leftMenuTemplate: '='
+      data: '='
     templateUrl: 'app/views/directives/sidemenu.html'
     link: ($scope) ->
 
