@@ -6,13 +6,24 @@ window.ChaiBioTech.ngApp
   '$stateParams'
   'ChartData'
   'SecondsDisplay'
-  ($scope, Experiment, $stateParams, ChartData, SecondsDisplay) ->
+  '$interval'
+  ($scope, Experiment, $stateParams, ChartData, SecondsDisplay, $interval) ->
+
+    RESOLUTIONS =
+      tenMins: 10 * 1000
+      twentyMins: 20 * 1000
+      thirtyMins: 30 * 1000
+      oneHour: 60 * 1000 * 60
+      oneDay: 60 * 1000 * 60 * 24
+
+    $scope.resolution = RESOLUTIONS.tenMins
 
     @temperatureLogs = []
     @calibration = 10
     @scrollState = 0
     $scope.scrollEnabled = true
     $scope.resolution = 10 * 1000
+    @updateInterval = null
 
     $scope.options =
       animation: false
@@ -23,7 +34,6 @@ window.ChaiBioTech.ngApp
       scaleOverride : true
       scaleSteps: 10
       scaleStartValue : 0
-
 
     $scope.series = ['Heat block zone 1 Temp', 'Heat block zone 2 Temp', 'Lid Temp']
 
@@ -46,21 +56,18 @@ window.ChaiBioTech.ngApp
         $scope.options.scaleStepWidth = Math.ceil max_scale/10
 
     @updateResolution = =>
-      @scrollState = 0
 
       if ($scope.resolution)
         Experiment
         .getTemperatureData($stateParams.expId, {resolution: $scope.resolution/@calibration})
         .success (data) =>
-          @temperatureLogs = data
-          data = angular.copy @temperatureLogs
-          data = _.select data, (d) ->
-            d.temperature_log.elapsed_time <= $scope.resolution
+          @temperatureLogs = angular.copy data
+          data = data.splice 0, @calibration
 
           @updateScale()
-          $scope.scrollState = 0
           @updateChartData data
           $scope.scrollEnabled = true
+          @updateResolutionOptions()
 
       else #view all
         Experiment
@@ -81,10 +88,13 @@ window.ChaiBioTech.ngApp
     $scope.$watch 'scrollState', =>
       if $scope.scrollEnabled
 
-        scrollState = $scope.scrollState
+        scrollState = angular.copy $scope.scrollState
 
         if $scope.scrollState > @temperatureLogs.length - @calibration
           scrollState = @temperatureLogs.length - @calibration
+          @autoUpdateTemperatureLogs()
+        else
+          @stopInterval()
 
         data = angular.copy @temperatureLogs
         data = data.splice scrollState, @calibration
@@ -100,14 +110,50 @@ window.ChaiBioTech.ngApp
         data.lid_temp
       ]
 
-    $scope.resolutionOptions = [
-      10 * 1000
-      20 * 1000
-      30 * 1000 # 30 sec
-      60 * 1000 # 1 min
-      60 * 1000 * 60  # 1 hour
-      60 * 1000 * 60 * 24 # 1 day
-    ]
+    @autoUpdateTemperatureLogs = =>
+       if not @updateInterval
+        @updateInterval = $interval () =>
+          Experiment
+          .getTemperatureData($stateParams.expId, {resolution: $scope.resolution/@calibration})
+          .success (data) =>
+            @temperatureLogs = data
+            data = angular.copy @temperatureLogs
+            data = data.splice data.length-@calibration, @calibration
+
+            @updateScale()
+            @updateChartData data
+
+        , 1000
+
+    @stopInterval = =>
+      $interval.cancel @updateInterval if @updateInterval
+      @updateInterval = null
+
+    @updateResolutionOptions = =>
+      if not $scope.resolutionOptions
+
+        $scope.resolutionOptions = []
+
+        greatest_elapsed_time = 0
+
+        _.each @temperatureLogs, (temp_log) ->
+          if temp_log.temperature_log.elapsed_time > greatest_elapsed_time
+            greatest_elapsed_time = temp_log.temperature_log.elapsed_time
+
+        if greatest_elapsed_time/RESOLUTIONS.tenMins > @calibration
+          $scope.resolutionOptions.push RESOLUTIONS.tenMins
+
+        if greatest_elapsed_time/RESOLUTIONS.twentyMins > @calibration
+          $scope.resolutionOptions.push RESOLUTIONS.twentyMins
+
+        if greatest_elapsed_time/RESOLUTIONS.thirtyMins > @calibration
+          $scope.resolutionOptions.push RESOLUTIONS.thirtyMins
+
+        if greatest_elapsed_time/RESOLUTIONS.oneHour > @calibration
+          $scope.resolutionOptions.push RESOLUTIONS.oneHour
+
+        if greatest_elapsed_time/RESOLUTIONS.oneDay > @calibration
+          $scope.resolutionOptions.push RESOLUTIONS.oneDay
 
     @optionText = SecondsDisplay.display1
 
