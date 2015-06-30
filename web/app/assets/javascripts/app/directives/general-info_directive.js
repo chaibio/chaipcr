@@ -48,8 +48,13 @@ window.ChaiBioTech.ngApp.directive('general', [
 
         scope.changeDelta = function() {
 
-          scope.stage.auto_delta = scope.off = ! scope.stage.auto_delta;
-          scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
+          if(scope.stage.stage_type == "cycling") {
+
+            scope.stage.auto_delta = scope.off = ! scope.stage.auto_delta;
+            scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
+          } else {
+            alert("Plese select a yclin stage");
+          }
         }
 
         scope.showPopUp = function() {
