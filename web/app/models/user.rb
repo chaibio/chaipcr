@@ -2,8 +2,9 @@ class User < ActiveRecord::Base
   has_secure_password
   has_many :user_tokens
   
+  validates :name, presence: true
   validates :email, presence: true, uniqueness: true, format: { with: /\A(|(([A-Za-z0-9]+_+)|([A-Za-z0-9]+\-+)|([A-Za-z0-9]+\.+)|([A-Za-z0-9]+\++))*[A-Za-z0-9]+@((\w+\-+)|(\w+\.))*\w{1,63}\.[a-zA-Z]{2,6})\z/i }
-  validates :password, length:{minimum:4}, confirmation: true, on: :create
+  validates :password, length:{minimum:4}, on: :create, if: '!password.blank?'
   
   ROLE_ADMIN    = "admin"
   ROLE_USER     = "user"
