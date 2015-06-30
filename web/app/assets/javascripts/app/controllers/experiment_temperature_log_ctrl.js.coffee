@@ -35,7 +35,10 @@ window.ChaiBioTech.ngApp
       scaleSteps: 10
       scaleStartValue : 0
 
-    $scope.series = ['Heat block zone 1 Temp', 'Heat block zone 2 Temp', 'Lid Temp']
+    $scope.series = [
+      'Lid Temp'
+      'Heat Block Temp'
+    ]
 
     @init = =>
       @updateResolution()
@@ -74,7 +77,7 @@ window.ChaiBioTech.ngApp
         .getTemperatureData($stateParams.expId)
         .success (data) =>
           @temperatureLogs = []
-          dataArr = _.chunk data, Math.ceil data.length/15
+          dataArr = _.chunk data, Math.ceil data.length/@calibration
 
           for arr, i in dataArr
             @temperatureLogs.push arr[0]
@@ -105,9 +108,8 @@ window.ChaiBioTech.ngApp
 
       $scope.labels = data.elapsed_time
       $scope.data = [
-        data.heat_block_zone_1_temp
-        data.heat_block_zone_2_temp
         data.lid_temp
+        data.heat_block_zone_temp
       ]
 
     @autoUpdateTemperatureLogs = =>
