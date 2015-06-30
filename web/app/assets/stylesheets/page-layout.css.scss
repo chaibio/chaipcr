@@ -1,0 +1,51 @@
+@import './colors.css.scss';
+
+.page-layout {
+
+  .row {
+    margin: 0;
+    margin-right: -15px;
+    margin-left: -15px;
+  }
+
+  .header{
+    width: 1024px;
+    height: 45px;
+    background-color: $gray;
+
+    .name-container {
+      float: left;
+      color: #d6d4d1;
+      margin-left: 13px;
+      font-size: 18px;
+      margin-top: 2px;
+      font-family: "fun city";
+    }
+
+    .stripes-and-name {
+      width: 300px;
+      height: 30px;
+      margin-left: 32px;
+      padding-top: 13px;
+    }
+    .stripes {
+      width: 21px;
+      height: 19px;
+      float: left;
+      cursor: pointer;
+
+      .stripe {
+        height: 3px;
+        width: 21px;
+        margin-bottom: 3px;
+        background-color: #fff;
+      }
+    }
+  }
+
+  .content {
+    padding-top: 20px;
+
+  }
+
+}

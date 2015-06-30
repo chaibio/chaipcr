@@ -1,1 +1,20 @@
-<temperature-log-chart experiment="experiment"></temperature-log-chart>
+<sidemenu left-menu-template="'app/views/experiment/left-menu.html'" data="experiment"></sidemenu>
+<div class="page-layout">
+  <!-- header -->
+  <div class="header">
+    <div class="stripes-and-name">
+      <a toggle-sidemenu>
+        <div class="stripes">
+          <div class="stripe"></div>
+          <div class="stripe"></div>
+          <div class="stripe"></div>
+        </div>
+      </a>
+      <div class="name-container">{{experiment.name}}</div>
+    </div>
+  </div>
+  <!-- content -->
+  <div class="content">
+    <temperature-log-chart experiment="experiment"></temperature-log-chart>
+  </div>
+</div>
