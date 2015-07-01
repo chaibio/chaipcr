@@ -213,6 +213,14 @@ std::vector<Stage> DBControl::getStages(int protocolId)
         if (it->get_indicator("auto_delta_start_cycle") != soci::i_null)
             stage.setAutoDeltaStartCycle(it->get<int>("auto_delta_start_cycle"));
 
+        if (stage.name().empty())
+        {
+            std::stringstream stream;
+            stream << "Stage " << stage.orderNumber();
+
+            stage.setName(stream.str());
+        }
+
         stage.setComponents(getStageComponents(stage.id()));
 
         stages.push_back(std::move(stage));
@@ -284,6 +292,14 @@ std::vector<Step> DBControl::getSteps(int stageId)
 
         if (it->get_indicator("pause") != soci::i_null)
             step.setPauseState(it->get<int>("pause"));
+
+        if (step.name().empty())
+        {
+            std::stringstream stream;
+            stream << "Step " << step.orderNumber();
+
+            step.setName(stream.str());
+        }
 
         steps.push_back(std::move(step));
     }
