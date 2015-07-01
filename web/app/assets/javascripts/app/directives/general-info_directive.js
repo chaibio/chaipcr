@@ -11,7 +11,7 @@ window.ChaiBioTech.ngApp.directive('general', [
 
       link: function(scope, elem, attr) {
 
-        console.log(scope, "sdfgsfgss");
+        //console.log(scope, "sdfgsfgss");
 
         scope.stepNameShow = false;
         scope.stageNoCycleShow = false;

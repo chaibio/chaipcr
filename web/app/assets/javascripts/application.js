@@ -29,6 +29,7 @@
 //= require app/libs/Chart
 //= require app/libs/angular-chart
 //= require app/libs/lodash.min
+//= require app/libs/fabric
 //
 //  angular app ===============
 //
@@ -39,3 +40,4 @@
 //= require_tree ./app/services
 //= require_tree ./app/directives
 //= require_tree ./app/views
+//= require_tree ./app/canvas

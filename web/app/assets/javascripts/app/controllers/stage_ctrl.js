@@ -1,7 +1,8 @@
 window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
   '$scope',
   'ExperimentLoader',
-  function($scope, ExperimentLoader) {
+  'stage',
+  function($scope, ExperimentLoader, stage) {
 
     var that = this;
     $scope.stage = {};
@@ -10,7 +11,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
 
       $scope.stage = ExperimentLoader.loadFirstStages();
       $scope.step = ExperimentLoader.loadFirstStep();
-
+      stage.scope = $scope;
     });
 
     $scope.WOWaction = function(cool) {

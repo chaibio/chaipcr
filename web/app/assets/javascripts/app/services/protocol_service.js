@@ -7,6 +7,7 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
 
     this.protocol = {};
     this.index = 0;
+
     this.getExperiment = function() {
 
       var delay, that = this;
