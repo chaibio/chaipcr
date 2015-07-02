@@ -67,7 +67,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
             responsePt.put("experimentController.machine.state", "Paused");
             responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
             responsePt.put("experimentController.expriment.estimated_duration", experiment.estimatedDuration());
-            responsePt.put("experimentController.expriment.paused_duration", experiment.pausedDuration() -
+            responsePt.put("experimentController.expriment.paused_duration", experiment.pausedDuration() +
                            (boost::posix_time::microsec_clock::local_time() - experiment.lastPauseTime()).total_seconds());
             break;
 
