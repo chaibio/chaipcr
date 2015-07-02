@@ -48,7 +48,7 @@ void Optics::setADCValue(unsigned int adcValue)
 
 void Optics::setCollectData(bool state, bool isMeltCurve)
 {
-    std::unique_lock<std::recursive_mutex> lock(_collectDataMutex);
+    std::lock_guard<std::recursive_mutex> lock(_collectDataMutex);
 
     if (_collectData.exchange(state) != state)
     {
@@ -83,7 +83,7 @@ void Optics::setCollectData(bool state, bool isMeltCurve)
 
 void Optics::toggleCollectData()
 {
-    std::unique_lock<std::recursive_mutex> lock(_collectDataMutex);
+    std::lock_guard<std::recursive_mutex> lock(_collectDataMutex);
 
     if (_collectData && !lidOpen())
     {
@@ -155,7 +155,7 @@ void Optics::collectDataCallback(Poco::Timer &timer)
 std::vector<int> Optics::getFluorescenceData()
 {
     std::vector<int> collectedData;
-    std::unique_lock<std::recursive_mutex> lock(_collectDataMutex);
+    std::lock_guard<std::recursive_mutex> lock(_collectDataMutex);
 
     if (_collectData)
     {
@@ -181,7 +181,7 @@ std::vector<int> Optics::getFluorescenceData()
 std::vector<Optics::MeltCurveData> Optics::getMeltCurveData()
 {
     std::vector<MeltCurveData> meltCurveData;
-    std::unique_lock<std::recursive_mutex> lock(_collectDataMutex);
+    std::lock_guard<std::recursive_mutex> lock(_collectDataMutex);
 
     if (_collectData && _meltCurveCollection)
     {

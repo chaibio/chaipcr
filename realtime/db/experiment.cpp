@@ -8,6 +8,9 @@ Experiment::Experiment()
     _startedAt = boost::posix_time::not_a_date_time;
     _completedAt = boost::posix_time::not_a_date_time;
     _completionStatus = None;
+    _estimatedDuration = 0;
+    _pausedDuration = 0;
+    _lastPauseTime = boost::posix_time::not_a_date_time;
     _protocol = nullptr;
 }
 
@@ -18,6 +21,9 @@ Experiment::Experiment(int definationId)
     _startedAt = boost::posix_time::not_a_date_time;
     _completedAt = boost::posix_time::not_a_date_time;
     _completionStatus = None;
+    _estimatedDuration = 0;
+    _pausedDuration = 0;
+    _lastPauseTime = boost::posix_time::not_a_date_time;
     _protocol = nullptr;
 }
 
@@ -29,6 +35,9 @@ Experiment::Experiment(const Experiment &other)
     setStartedAt(other.startedAt());
     setCompletedAt(other.completedAt());
     setCompletionStatus(other.completionStatus());
+    setEstimatedDuration(other.estimatedDuration());
+    setPausedDuration(other.pausedDuration());
+    setPauseTime(other.lastPauseTime());
 
     if (other.protocol())
         setProtocol(*other.protocol());
@@ -42,6 +51,9 @@ Experiment::Experiment(Experiment &&other)
     _startedAt = other._startedAt;
     _completedAt = other._completedAt;
     _completionStatus = other._completionStatus;
+    _estimatedDuration = other._estimatedDuration;
+    _pausedDuration = other._pausedDuration;
+    _lastPauseTime = other._lastPauseTime;
     _protocol = other._protocol;
 
     other._definationId = -1;
@@ -49,6 +61,9 @@ Experiment::Experiment(Experiment &&other)
     other._startedAt = boost::posix_time::not_a_date_time;
     other._completedAt = boost::posix_time::not_a_date_time;
     other._completionStatus = None;
+    other._estimatedDuration = 0;
+    other._pausedDuration = 0;
+    other._lastPauseTime = boost::posix_time::not_a_date_time;
     other._protocol = nullptr;
 }
 
@@ -65,6 +80,9 @@ Experiment& Experiment::operator= (const Experiment &other)
     setStartedAt(other.startedAt());
     setCompletedAt(other.completedAt());
     setCompletionStatus(other.completionStatus());
+    setEstimatedDuration(other.estimatedDuration());
+    setPausedDuration(other.pausedDuration());
+    setPauseTime(other.lastPauseTime());
 
     if (other.protocol())
         setProtocol(*other.protocol());
@@ -81,6 +99,9 @@ Experiment& Experiment::operator= (Experiment &&other)
     _name = std::move(other._name);
     _startedAt = other._startedAt;
     _completedAt = other._completedAt;
+    _estimatedDuration = other._estimatedDuration;
+    _pausedDuration = other._pausedDuration;
+    _lastPauseTime = other._lastPauseTime;
     _completionStatus = other._completionStatus;
 
     if (_protocol)
@@ -93,6 +114,9 @@ Experiment& Experiment::operator= (Experiment &&other)
     other._startedAt = boost::posix_time::not_a_date_time;
     other._completedAt = boost::posix_time::not_a_date_time;
     other._completionStatus = None;
+    other._estimatedDuration = 0;
+    other._pausedDuration = 0;
+    other._lastPauseTime = boost::posix_time::not_a_date_time;
     other._protocol = nullptr;
 
     return *this;
