@@ -44,6 +44,6 @@ window.ChaiBioTech.ngApp.directive('capsule', [
         });
 
       }
-    }
+    };
   }
 ]);

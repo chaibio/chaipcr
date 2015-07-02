@@ -19,9 +19,9 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
           scope.edit = ! scope.edit;
           $timeout(function() {
             $('.' + className).focus();
-          })
-        }
+          });
+        };
       }
-    }
+    };
   }
 ]);

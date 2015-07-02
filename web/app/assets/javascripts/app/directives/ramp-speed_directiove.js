@@ -19,9 +19,9 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
           scope.edit = ! scope.edit;
           $timeout(function() {
             $('.' + className).focus();
-          })
-        }
+          });
+        };
       }
-    }
+    };
   }
 ]);

@@ -11,7 +11,7 @@ window.ChaiBioTech.ngApp.directive('temperature', [
         reading: '=',
         action: '&' // Learn how to pass value in this scenario
       },
-      
+
       templateUrl: 'app/views/directives/edit-value.html',
 
       link: function(scope, elem, attr) {
@@ -22,9 +22,9 @@ window.ChaiBioTech.ngApp.directive('temperature', [
           scope.edit = ! scope.edit;
           $timeout(function() {
             $('.' + className).focus();
-          })
-        }
+          });
+        };
       }
-    }
+    };
   }
 ]);

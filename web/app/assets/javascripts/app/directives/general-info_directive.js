@@ -44,7 +44,7 @@ window.ChaiBioTech.ngApp.directive('general', [
           $timeout(function() {
             $('.' + focusElement).focus();
           });
-        }
+        };
 
         scope.changeDelta = function() {
 
@@ -55,28 +55,28 @@ window.ChaiBioTech.ngApp.directive('general', [
           } else {
             alert("Plese select a yclin stage");
           }
-        }
+        };
 
         scope.showPopUp = function() {
 
           scope.popUp = ! scope.popUp;
-        }
+        };
 
         scope.changeDuringStep = function() {
 
           scope.popUp = ! scope.popUp;
           scope.duringStep = scope.step.collect_data = ! scope.step.collect_data;
           scope.gatherDataState = (!scope.duringStep && !scope.duringRamp) ? false : true ;
-        }
+        };
 
         scope.changeDuringRamp = function() {
 
           scope.popUp = ! scope.popUp;
           scope.duringRamp = scope.step.ramp.collect_data = ! scope.step.ramp.collect_data;
           scope.gatherDataState = (!scope.duringStep && !scope.duringRamp) ? false : true ;
-        }
+        };
 
       }
-    }
+    };
   }
 ]);

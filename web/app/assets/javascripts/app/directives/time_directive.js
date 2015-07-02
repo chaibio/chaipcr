@@ -30,9 +30,9 @@ window.ChaiBioTech.ngApp.directive('time', [
           scope.edit = ! scope.edit;
           $timeout(function() {
             $('.' + className).focus();
-          })
-        }
+          });
+        };
       }
-    }
+    };
   }
 ]);
