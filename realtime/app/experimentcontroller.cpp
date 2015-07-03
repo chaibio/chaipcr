@@ -504,7 +504,7 @@ void ExperimentController::calculateEstimatedDuration()
 
         previousTargetTemp = temperature;
     }
-    while (experiment.protocol()->hasNextStep());
+    while (experiment.protocol()->advanceNextStep());
 
     {
         Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
