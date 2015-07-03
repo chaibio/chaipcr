@@ -44,7 +44,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     this.setDefaultWidthHeight = function() {
 
       this.canvas.setHeight(420);
-      var width = (/*this.allStepViews.length*/ 3 * 122 > 1024) ? /*this.allStepViews.length*/ 3 * 120 : 1024;
+      var width = (this.allStepViews.length * 122 > 1024) ? this.allStepViews.length * 120 : 1024;
       this.canvas.setWidth(width + 50);
 
       $timeout(function(context) {
@@ -74,7 +74,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       }
       // Only for the last stage
       stageView.borderRight();
-      this.canvas.add(stageView.borderRight);
+      //this.canvas.add(stageView.borderRight);
       // We should put an infinity symbol if the last step has infinite hold time.
       //stageView.findLastStep();
       console.log("Stages added ... !");
