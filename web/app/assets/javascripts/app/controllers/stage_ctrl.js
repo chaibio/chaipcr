@@ -12,6 +12,6 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
       $scope.step = ExperimentLoader.loadFirstStep();
       $scope.$emit('general-data-ready');
     });
-    
+
   }
 ]);

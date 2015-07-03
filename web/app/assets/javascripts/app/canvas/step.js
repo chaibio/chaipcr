@@ -1,7 +1,8 @@
 window.ChaiBioTech.ngApp.factory('step', [
   'ExperimentLoader',
   '$rootScope',
-  function(ExperimentLoader, $rootScope) {
+  'circle',
+  function(ExperimentLoader, $rootScope, circle) {
 
     return function(model, parentStage, index) {
 
@@ -71,7 +72,10 @@ window.ChaiBioTech.ngApp.factory('step', [
       this.addCircle = function() {
 
         this.circle = new circle(this.model, this);
-        this.circle.getLeft().getTop().getUniqueId().render();
+        this.circle.getLeft()
+          .getTop()
+          .getUniqueId()
+          .render();
       };
 
       this.getUniqueName = function() {
@@ -184,7 +188,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         });
 
         this.canvas.add(this.stepGroup);
-        //this.addCircle();
+        this.addCircle();
       };
 
       this.showHideFooter = function(visibility) {
