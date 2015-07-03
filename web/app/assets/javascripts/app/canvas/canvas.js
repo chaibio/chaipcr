@@ -38,6 +38,14 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         backgroundColor: '#ffb400', selection: false, stateful: true
       });
 
+      // Move it to events
+      this.canvas.on("mouse:down", function(evt) {
+        that.$scope.$apply(function() {
+          that.$scope.step = evt.target.me.model;
+          that.$scope.stage = evt.target.me.parentStage.model;
+        });
+      });
+
       this.addStages().setDefaultWidthHeight();
     };
 
