@@ -50,6 +50,15 @@ public:
     inline void setCompletionMessage(std::string &&message) {_completionMessage = std::move(message);}
     inline const std::string& completionMessage() const {return _completionMessage;}
 
+    inline std::time_t estimatedDuration() const { return _estimatedDuration; }
+    inline void setEstimatedDuration(std::time_t duration) { _estimatedDuration = duration; }
+
+    inline std::time_t pausedDuration() const { return _pausedDuration; }
+    inline void setPausedDuration(std::time_t duration) { _pausedDuration = duration; }
+
+    inline const boost::posix_time::ptime& lastPauseTime() const { return _lastPauseTime; }
+    void setPauseTime(const boost::posix_time::ptime &time) { _lastPauseTime = time; }
+
     void setProtocol(const Protocol &protocol);
     void setProtocol(Protocol &&protocol);
     void setProtocol(Protocol *protocol);
@@ -64,6 +73,10 @@ private:
     boost::posix_time::ptime _completedAt;
     CompletionStatus _completionStatus;
     std::string _completionMessage;
+
+    std::time_t _estimatedDuration;
+    std::time_t _pausedDuration;
+    boost::posix_time::ptime _lastPauseTime;
 
     Protocol *_protocol;
 };

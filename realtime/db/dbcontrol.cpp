@@ -55,7 +55,7 @@ void DBControl::process()
             if (!queries.empty())
             {
                 std::vector<soci::statement> statements;
-                std::unique_lock<std::mutex> lock(_writeMutex);
+                std::lock_guard<std::mutex> lock(_writeMutex);
 
                 for (const std::string &query: queries)
                     statements.emplace_back((_writeSession->prepare << query));
