@@ -7,13 +7,12 @@
 #include <atomic>
 #include <vector>
 #include <memory>
-#include <mutex>
 
 class DBControl;
 class Settings;
 class TemperatureLog;
 
-namespace Poco { class Timer; }
+namespace Poco { class Timer; class RWLock; }
 
 class ExperimentController : public Instance<ExperimentController>
 {
@@ -67,8 +66,10 @@ private:
     void stopLogging();
     void addLogCallback(Poco::Timer &timer);
 
+    void calculateEstimatedDuration();
+
 private:
-    mutable std::mutex _machineMutex;
+    mutable Poco::RWLock *_machineMutex;
     MachineState _machineState;
 
     DBControl *_dbControl;

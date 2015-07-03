@@ -21,9 +21,9 @@ window.ChaiBioTech.ngApp.directive('startOnCycle', [
           scope.edit = ! scope.edit;
           $timeout(function() {
             $('.' + className).focus();
-          })
-        }
+          });
+        };
       }
-    }
+    };
   }
 ]);

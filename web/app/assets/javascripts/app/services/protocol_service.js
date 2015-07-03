@@ -7,6 +7,7 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
 
     this.protocol = {};
     this.index = 0;
+
     this.getExperiment = function() {
 
       var delay, that = this;
@@ -14,12 +15,12 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
       Experiment.get({'id': $stateParams.id}, function(data) {
         that.protocol = data.experiment;
         $rootScope.$broadcast("dataLoaded");
-        delay.resolve(data)
+        delay.resolve(data);
       }, function() {
         delay.reject('Cant bring the data');
       });
 
-      return delay.promise
+      return delay.promise;
     };
 
     this.loadFirstStages = function() {
@@ -28,13 +29,11 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
 
     this.loadFirstStep = function() {
       return this.protocol.protocol.stages[0].stage.steps[0].step;
-    }
+    };
 
     this.getNew = function() {
       console.log(this.protocol);
-      return this.protocol.protocol.stages[1].stage
-    }
-
-
+      return this.protocol.protocol.stages[1].stage;
+    };
   }
 ]);

@@ -1,5 +1,6 @@
 #include <boost/date_time.hpp>
 #include <Poco/Timer.h>
+#include <Poco/RWLock.h>
 
 #include "pcrincludes.h"
 #include "dbincludes.h"
@@ -11,6 +12,7 @@
 
 ExperimentController::ExperimentController()
 {
+    _machineMutex = new Poco::RWLock;
     _machineState = Idle;
     _dbControl = new DBControl();
     _meltCurveTimer = new Poco::Timer();
@@ -33,17 +35,18 @@ ExperimentController::~ExperimentController()
     delete _holdStepTimer;
     delete _dbControl;
     delete _settings;
+    delete _machineMutex;
 }
 
 ExperimentController::MachineState ExperimentController::machineState() const
 {
-    std::unique_lock<std::mutex> lock(_machineMutex);
+    Poco::RWLock::ScopedReadLock lock(*_machineMutex);
     return _machineState;
 }
 
 Experiment ExperimentController::experiment() const
 {
-    std::unique_lock<std::mutex> lock(_machineMutex);
+    Poco::RWLock::ScopedReadLock lock(*_machineMutex);
     return _experiment;
 }
 
@@ -61,28 +64,27 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
 
     experiment.setStartedAt(boost::posix_time::microsec_clock::local_time());
 
-    std::unique_lock<std::mutex> lock(_machineMutex);
-
-    if (_machineState != Idle)
+    if (machineState() != Idle)
         return MachineRunning;
 
-    lock.unlock();
     stopLogging();
-    lock.lock();
 
-    _settings->temperatureLogs.setTemperatureLogs(false);
-    _settings->temperatureLogs.setDebugTemperatureLogs(false);
+    {
+        Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
 
-    LidInstance::getInstance()->setTargetTemperature(experiment.protocol()->lidTemperature());
+        _settings->temperatureLogs.setTemperatureLogs(false);
+        _settings->temperatureLogs.setDebugTemperatureLogs(false);
 
-    _dbControl->startExperiment(experiment);
+        LidInstance::getInstance()->setTargetTemperature(experiment.protocol()->lidTemperature());
 
-    _machineState = LidHeating;
-    _experiment = std::move(experiment);
+        _dbControl->startExperiment(experiment);
 
-    LidInstance::getInstance()->setEnableMode(true);
+        _machineState = LidHeating;
+        _experiment = std::move(experiment);
 
-    lock.unlock();
+        LidInstance::getInstance()->setEnableMode(true);
+    }
+
     startLogging();
 
     return Started;
@@ -90,10 +92,12 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
 
 void ExperimentController::run()
 {
-    std::unique_lock<std::mutex> lock(_machineMutex);
-
-    if (_machineState == LidHeating)
     {
+        Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
+
+        if (_machineState != LidHeating)
+            return;
+
         _machineState = Running;
 
         HeatBlockInstance::getInstance()->setTargetTemperature(_experiment.protocol()->currentStep()->temperature(), _experiment.protocol()->currentRamp()->rate());
@@ -111,26 +115,37 @@ void ExperimentController::run()
             }
         }
     }
+
+    calculateEstimatedDuration();
 }
 
 void ExperimentController::resume()
 {
-    std::unique_lock<std::mutex> lock(_machineMutex);
+    std::time_t holdTime = 0;
 
-    if (_machineState == Paused)
     {
+        Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
+
+        if (_machineState != Paused)
+            return;
+
         _machineState = Running;
 
         if (_experiment.protocol()->hasNextStep())
         {
+            _experiment.setPausedDuration(_experiment.pausedDuration() + (boost::posix_time::microsec_clock::local_time() - _experiment.lastPauseTime()).total_seconds());
+
             _holdStepTimer->stop();
             _holdStepTimer->setStartInterval(0);
             _holdStepTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::holdStepCallback));
+
+            return;
         }
         else
         {
             Stage *stage = _experiment.protocol()->currentStage();
-            std::time_t holdTime = stage->currentStep()->holdTime();
+
+            holdTime = stage->currentStep()->holdTime();
 
             if (stage->autoDelta() && stage->currentCycle() > stage->autoDeltaStartCycle())
             {
@@ -139,23 +154,23 @@ void ExperimentController::resume()
                 if (holdTime < 0)
                     holdTime = 0;
             }
-
-            lock.unlock();
-
-            complete();
-
-            if (holdTime > 0)
-                stop();
         }
     }
+
+    complete();
+
+    if (holdTime > 0)
+        stop();
 }
 
 void ExperimentController::complete()
 {
-    std::unique_lock<std::mutex> lock(_machineMutex);
-
-    if (_machineState == Running)
     {
+        Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
+
+        if (_machineState != Running)
+            return;
+
         _machineState = Complete;
 
         LidInstance::getInstance()->setEnableMode(false);
@@ -165,75 +180,72 @@ void ExperimentController::complete()
         _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
 
         _dbControl->completeExperiment(_experiment);
-
-        lock.unlock();
-        stopLogging();
     }
+
+    stopLogging();
 }
 
 void ExperimentController::stop()
 {
-    std::unique_lock<std::mutex> lock(_machineMutex);
+    MachineState state = Idle;
 
-    if (_machineState != Idle)
     {
-        _machineState = Idle;
+        Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
+
+        if (_machineState == Idle)
+            return;
 
         LidInstance::getInstance()->setEnableMode(false);
         HeatBlockInstance::getInstance()->setEnableMode(false);
         OpticsInstance::getInstance()->setCollectData(false);
 
-        bool stopTimers = false;
-
         if (_machineState != Complete)
         {
-            stopTimers = true;
-
             _experiment.setCompletionStatus(Experiment::Aborted);
             _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
 
             _dbControl->completeExperiment(_experiment);
         }
 
+        state = _machineState;
+
+        _machineState = Idle;
         _experiment = Experiment();
+    }
 
-        lock.unlock();
-
-        if (stopTimers)
-        {
-            stopLogging();
-            _holdStepTimer->stop();
-            _meltCurveTimer->stop();
-        }
+    if (state != Complete)
+    {
+        stopLogging();
+        _holdStepTimer->stop();
+        _meltCurveTimer->stop();
     }
 }
 
 void ExperimentController::stop(const std::string &errorMessage)
 {
-    std::unique_lock<std::mutex> lock(_machineMutex);
-
-    _machineState = Idle;
-
-    LidInstance::getInstance()->setEnableMode(false);
-    HeatBlockInstance::getInstance()->setEnableMode(false);
-    OpticsInstance::getInstance()->setCollectData(false);
-
     bool stopTimers = false;
 
-    if (_experiment.id() != -1)
     {
-        stopTimers = true;
+        Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
 
-        _experiment.setCompletionStatus(Experiment::Failed);
-        _experiment.setCompletionMessage(errorMessage);
-        _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
+        LidInstance::getInstance()->setEnableMode(false);
+        HeatBlockInstance::getInstance()->setEnableMode(false);
+        OpticsInstance::getInstance()->setCollectData(false);
 
-        _dbControl->completeExperiment(_experiment);
+        if (_experiment.id() != -1)
+        {
+            stopTimers = true;
+
+            _experiment.setCompletionStatus(Experiment::Failed);
+            _experiment.setCompletionMessage(errorMessage);
+            _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
+
+            _dbControl->completeExperiment(_experiment);
+        }
+
+        _machineState = Idle;
+        _experiment = Experiment();
     }
-
-    _experiment = Experiment();
-
-    lock.unlock();
 
     if (stopTimers)
     {
@@ -245,7 +257,7 @@ void ExperimentController::stop(const std::string &errorMessage)
 
 void ExperimentController::meltCurveCallback(Poco::Timer &)
 {
-    std::unique_lock<std::mutex> lock(_machineMutex);
+    Poco::RWLock::ScopedReadLock lock(*_machineMutex);
 
     if (_machineState == Running)
     {
@@ -259,7 +271,7 @@ void ExperimentController::rampFinished()
 {
     _meltCurveTimer->stop();
 
-    std::unique_lock<std::mutex> lock(_machineMutex);
+    Poco::RWLock::ScopedReadLock lock(*_machineMutex);
 
     if (_machineState == Running)
     {
@@ -276,51 +288,66 @@ void ExperimentController::rampFinished()
 
 void ExperimentController::stepBegun()
 {
-    std::unique_lock<std::mutex> lock(_machineMutex);
+    std::time_t holdTime = 0;
+    bool onPause = false;
 
-    if (_machineState != Running)
-        return;
-
-    Stage *stage = _experiment.protocol()->currentStage();
-
-    if (!stage->currentStep()->pauseState())
     {
-        std::time_t holdTime = stage->currentStep()->holdTime();
+        Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
 
-        if (stage->autoDelta() && stage->currentCycle() > stage->autoDeltaStartCycle())
+        if (_machineState != Running)
+            return;
+
+        Stage *stage = _experiment.protocol()->currentStage();
+
+        if (!stage->currentStep()->pauseState())
         {
-            holdTime += stage->currentStep()->deltaDuration() * (stage->currentCycle() - stage->autoDeltaStartCycle());
+            holdTime = stage->currentStep()->holdTime();
 
-            if (holdTime < 0)
-                holdTime = 0;
-        }
+            if (stage->autoDelta() && stage->currentCycle() > stage->autoDeltaStartCycle())
+            {
+                holdTime += stage->currentStep()->deltaDuration() * (stage->currentCycle() - stage->autoDeltaStartCycle());
 
-        if (_experiment.protocol()->hasNextStep())
-        {
-            _holdStepTimer->stop();
-            _holdStepTimer->setStartInterval(holdTime * 1000);
-            _holdStepTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::holdStepCallback));
+                if (holdTime < 0)
+                    holdTime = 0;
+            }
+
+            if (_experiment.protocol()->hasNextStep())
+            {
+                _holdStepTimer->stop();
+                _holdStepTimer->setStartInterval(holdTime * 1000);
+                _holdStepTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::holdStepCallback));
+
+                return;
+            }
         }
         else
         {
-            lock.unlock();
+            _experiment.setPauseTime(boost::posix_time::microsec_clock::local_time());
+            _machineState = Paused;
 
-            complete();
-
-            if (holdTime > 0)
-                stop();
+            onPause = true;
         }
     }
+
+    if (!onPause)
+    {
+        complete();
+
+        if (holdTime > 0)
+            stop();
+    }
     else
-        _machineState = Paused;
+        calculateEstimatedDuration();
 }
 
 void ExperimentController::holdStepCallback(Poco::Timer &)
 {
-    std::unique_lock<std::mutex> lock(_machineMutex);
-
-    if (_machineState == Running)
     {
+        Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
+
+        if (_machineState != Running)
+            return;
+
         if (_experiment.protocol()->currentStage()->type() != Stage::Meltcurve)
             _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->getFluorescenceData());
 
@@ -353,6 +380,8 @@ void ExperimentController::holdStepCallback(Poco::Timer &)
         HeatBlockInstance::getInstance()->setTargetTemperature(temperature, stage->currentRamp()->rate());
         HeatBlockInstance::getInstance()->enableStepProcessing();
     }
+
+    calculateEstimatedDuration();
 }
 
 void ExperimentController::startLogging()
@@ -395,18 +424,18 @@ void ExperimentController::addLogCallback(Poco::Timer &)
 {
     TemperatureLog log;
 
-    _machineMutex.lock();
+    _machineMutex->readLock();
 
     if (_machineState != Idle)
     {
         log = TemperatureLog(_experiment.id(), true, _settings->debugMode());
         log.setElapsedTime((boost::posix_time::microsec_clock::local_time() - _experiment.startedAt()).total_milliseconds());
 
-        _machineMutex.unlock();
+        _machineMutex->unlock();
     }
     else
     {
-        _machineMutex.unlock();
+        _machineMutex->unlock();
 
         log = TemperatureLog(0, _settings->temperatureLogs.hasTemperatureLogs(), _settings->temperatureLogs.hasDebugTemperatureLogs());
         log.setElapsedTime((boost::posix_time::microsec_clock::universal_time() - _settings->temperatureLogs.startTime()).total_milliseconds());
@@ -438,4 +467,47 @@ void ExperimentController::addLogCallback(Poco::Timer &)
 void ExperimentController::settingsUpdated()
 {
     _dbControl->updateSettings(*_settings);
+}
+
+void ExperimentController::calculateEstimatedDuration()
+{
+    Experiment experiment = this->experiment();
+    std::time_t duration = (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds() - experiment.pausedDuration();
+    double previousTargetTemp = HeatBlockInstance::getInstance()->temperature();
+
+    do
+    {
+        Stage *stage = experiment.protocol()->currentStage();
+
+        if (!stage->currentStep()->pauseState())
+            duration += stage->currentStep()->holdTime();
+
+        double temperature = stage->currentStep()->temperature();
+
+        if (stage->autoDelta() && stage->currentCycle() > stage->autoDeltaStartCycle())
+        {
+            temperature += stage->currentStep()->deltaTemperature() * (stage->currentCycle() - stage->autoDeltaStartCycle());
+
+            if (temperature < HeatBlockInstance::getInstance()->minTargetTemperature())
+                temperature = HeatBlockInstance::getInstance()->minTargetTemperature();
+            else if (temperature > HeatBlockInstance::getInstance()->maxTargetTemperature())
+                temperature = HeatBlockInstance::getInstance()->maxTargetTemperature();
+        }
+
+        double rate = stage->currentRamp()->rate();
+        rate = rate > 0 || rate <= kDurationCalcHeatBlockRampSpeed ? rate : kDurationCalcHeatBlockRampSpeed;
+
+        if (previousTargetTemp < temperature)
+            duration += std::ceil((temperature - previousTargetTemp) / rate);
+        else
+            duration += std::ceil((previousTargetTemp - temperature) / rate);
+
+        previousTargetTemp = temperature;
+    }
+    while (experiment.protocol()->hasNextStep());
+
+    {
+        Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
+        _experiment.setEstimatedDuration(duration);
+    }
 }
