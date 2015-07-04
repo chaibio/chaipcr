@@ -5,7 +5,9 @@ window.ChaiBioTech.ngApp.factory('canvas', [
   '$rootScope',
   'stage',
   '$timeout',
-  function(ExperimentLoader, $rootScope, stage, $timeout) {
+  'events',
+  'path',
+  function(ExperimentLoader, $rootScope, stage, $timeout, events, path) {
 
     var that = this;
     $rootScope.$on('general-data-ready', function(evt) {
@@ -26,27 +28,14 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         "gather-data.png",
         "gather-data-image.png"
       ];
-      /*
-      this.$scope.$watch(function(scope) {
-        return scope.step.name
-      }, function(newVal, oldVal) {
-        console.log(newVal);
-      });
-      */
+
       this.imageobjects = {};
       this.canvas = new fabric.Canvas('canvas', {
         backgroundColor: '#ffb400', selection: false, stateful: true
       });
 
-      // Move it to events
-      this.canvas.on("mouse:down", function(evt) {
-        that.$scope.$apply(function() {
-          that.$scope.step = evt.target.me.model;
-          that.$scope.stage = evt.target.me.parentStage.model;
-        });
-      });
-
-      this.addStages().setDefaultWidthHeight();
+      new events(this, this.$scope); // Fire the events;
+      this.loadImages();
     };
 
     this.setDefaultWidthHeight = function() {
@@ -84,13 +73,143 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       stageView.borderRight();
       //this.canvas.add(stageView.borderRight);
       // We should put an infinity symbol if the last step has infinite hold time.
-      //stageView.findLastStep();
+      stageView.findLastStep();
       console.log("Stages added ... !");
       return this;
 
     };
 
-    return this;
+    /*******************************************************/
+      /* This method does the default selection of the step when
+         the graph is loaded. obviously allStepViews[0] is the very first step
+         This could be changed later to reflext add/delete change*/
+    /*******************************************************/
+    this.selectStep = function() {
 
+      if(ChaiBioTech.app.newlyCreatedStep) {
+        ChaiBioTech.app.newlyCreatedStep.circle.manageClick(true);
+        appRouter.editStageStep.trigger("stepSelected", ChaiBioTech.app.newlyCreatedStep);
+        ChaiBioTech.app.newlyCreatedStep = null;
+      } else {
+        this.allStepViews[0].circle.manageClick(true);
+      }
+    };
+
+    this.loadImages = function() {
+
+      console.log("Loading Images ....... !");
+      var noOfImages = this.images.length - 1;
+      var that = this;
+      loadImageRecursion = function(index) {
+        fabric.Image.fromURL("assets/" + that.images[index], function(img) {
+
+          that.imageobjects[that.images[index]] = $.extend(true, {}, img);
+          if(index < noOfImages) {
+            loadImageRecursion(++index);
+          } else {
+            console.log("All images loaded .... !");
+            that.canvas.fire("imagesLoaded");
+          }
+        });
+      };
+
+      loadImageRecursion(0);
+    };
+
+    /*******************************************************/
+      /* This method adds those footer images on the step. Its a tricky one beacuse images
+         are taking longer time to load. So we load it once and clone it to all the steps.
+         It uses recursive function to do the job. See the inner function mainWrapper()
+      */
+    /*******************************************************/
+    this.addinvisibleFooterToStep = function() {
+
+      var count = 0;
+      var limit = this.allStepViews.length;
+
+      for(count = 0; count < limit; count ++) {
+
+        this.allStepViews[count].commonFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["common-step.png"]), this.allStepViews[count]);
+        this.canvas.add(this.allStepViews[count].commonFooterImage);
+
+        this.allStepViews[count].darkFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["black-footer.png"]), this.allStepViews[count]);
+        this.canvas.add(this.allStepViews[count].darkFooterImage);
+
+        this.allStepViews[count].whiteFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["orange-footer.png"]), this.allStepViews[count]);
+        this.allStepViews[count].whiteFooterImage.top = 363;
+        this.allStepViews[count].whiteFooterImage.left = this.allStepViews[count].left;
+        this.canvas.add(this.allStepViews[count].whiteFooterImage);
+
+        this.allStepViews[count].circle.gatherDataImage = $.extend({}, this.imageobjects["gather-data.png"]);
+        this.allStepViews[count].circle.gatherDataImage.originX = "center";
+        this.allStepViews[count].circle.gatherDataImage.originY = "center";
+
+        this.allStepViews[count].circle.gatherDataImageOnMoving = $.extend({}, this.imageobjects["gather-data-image.png"]);
+        this.allStepViews[count].circle.gatherDataImageOnMoving.originX = "center";
+        this.allStepViews[count].circle.gatherDataImageOnMoving.originY = "center";
+
+        this.allStepViews[count].circle.gatherDataImageMiddle = $.extend({}, this.imageobjects["gather-data.png"]);
+        this.allStepViews[count].circle.gatherDataImageMiddle.originX = "center";
+        this.allStepViews[count].circle.gatherDataImageMiddle.originY = "center";
+        this.allStepViews[count].circle.gatherDataImageMiddle.setVisible(false);
+
+      }
+
+      return this;
+    };
+
+    this.applyPropertyToImages = function(imgObj, stepObj) {
+
+      imgObj.left = stepObj.left - 1;
+      imgObj.top = 383;
+      imgObj.selectable = true;
+      imgObj.hasControls = false;
+      imgObj.lockMovementY = true;
+      imgObj.visible = false;
+
+      return imgObj;
+    };
+
+    this.addRampLinesAndCircles = function() {
+
+      this.allCircles = null;
+      this.allCircles = this.findAllCircles();
+      var limit = this.allCircles.length;
+
+      for(i = 0; i < limit; i++) {
+        var thisCircle = this.allCircles[i];
+
+        if(i < (limit - 1)) {
+          thisCircle.curve = new path(thisCircle);
+          this.canvas.add(thisCircle.curve);
+          this.canvas.bringToFront(thisCircle.parent.rampSpeedGroup);
+          if(thisCircle.previous) {
+            this.canvas.bringToFront(thisCircle.previous.parent.rampSpeedGroup);
+          }
+        }
+
+        thisCircle.getCircle();
+      }
+
+      console.log("All circles are added ....!!");
+      return this;
+    };
+
+    this.findAllCircles = function() {
+
+      var i = 0, limit = this.allStepViews.length, circles = [], tempCirc = null;
+
+      for(i = 0; i < limit; i++) {
+        if(tempCirc) {
+          this.allStepViews[i].circle.previous = tempCirc;
+          tempCirc.next = this.allStepViews[i].circle;
+        }
+        tempCirc = this.allStepViews[i].circle;
+        circles.push(this.allStepViews[i].circle);
+      }
+      return circles;
+    };
+
+    return this;
   }
 ]);

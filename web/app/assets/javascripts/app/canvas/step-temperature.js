@@ -20,8 +20,7 @@ window.ChaiBioTech.ngApp.factory('stepTemperature', [
           selectable: false,
           fontWeight: "800"
         });
-
-        //return this.text;
+        
       };
 
       this.render();

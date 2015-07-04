@@ -11,8 +11,13 @@ window.ChaiBioTech.ngApp.factory('circle', [
   'stepDataGroup',
   'stepTemperature',
   'stepHoldTime',
+  'gatherDataGroupOnScroll',
+  'gatherDataCircleOnScroll',
+  'gatherDataGroup',
+  'gatherDataCircle',
   function(ExperimentLoader, $rootScope, Constants, circleGroup, outerMostCircle, outerCircle,
-    centerCircle, littleCircleGroup, circleMaker, stepDataGroup, stepTemperature, stepHoldTime) {
+    centerCircle, littleCircleGroup, circleMaker, stepDataGroup, stepTemperature, stepHoldTime,
+    gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle) {
     return function(model, parentStep) {
 
       this.model = model;
@@ -57,26 +62,25 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         this.canvas.add(this.stepDataGroup);
 
-        this.gatherDataOnScroll = new ChaiBioTech.app.Views.gatherDataGroupOnScroll(
+        this.gatherDataOnScroll = new gatherDataGroupOnScroll(
           [
-            this.gatherDataCircleOnScroll = new ChaiBioTech.app.Views.gatherDataCircleOnScroll(),
+            this.gatherDataCircleOnScroll = new gatherDataCircleOnScroll(),
             this.gatherDataImageOnMoving
           ], this);
 
-        this.circleGroup.add(this.gatherDataImageMiddle);
+        //this.circleGroup.add(this.gatherDataImageMiddle);
         this.circleGroup.add(this.gatherDataOnScroll);
         this.canvas.add(this.circleGroup);
 
-        this.gatherDataGroup = new ChaiBioTech.app.Views.gatherDataGroup(
+        this.gatherDataGroup = new gatherDataGroup(
           [
-            this.gatherDataCircle = new ChaiBioTech.app.Views.gatherDataCircle(),
+            this.gatherDataCircle = new gatherDataCircle(),
             this.gatherDataImage
           ], this);
 
         this.canvas.add(this.gatherDataGroup);
         this.showHideGatherData(this.parent.gatherDataDuringStep);
         this.gatherDataGroup.visible = this.parent.gatherDataDuringRamp;
-
 
       };
 
@@ -131,8 +135,6 @@ window.ChaiBioTech.ngApp.factory('circle', [
               ]
             )
           ], this);
-
-          this.canvas.add(this.circleGroup);
         // adjust the placing of ramp speed, this method calculates the top
         this.parent.adjustRampSpeedPlacing();
 
@@ -141,7 +143,6 @@ window.ChaiBioTech.ngApp.factory('circle', [
             this.holdTime = new stepHoldTime(this.model, this)
           ], this);
 
-        this.canvas.add(this.stepDataGroup);
       };
 
       this.makeItBig = function() {
