@@ -41,11 +41,16 @@ window.ChaiBioTech.ngApp
     ]
 
     @init = =>
-      @updateResolution()
+      Experiment
+      .getTemperatureData($stateParams.expId, resolution: 1000)
+      .success (data) =>
+        @temperatureLogs = data
+        @updateScale()
+        @updateResolution()
 
     @updateScale = =>
       if not $scope.options.scaleStepWidth
-        scales = _.map @temperatureLogs, (temp_log) ->
+        scales = _.map angular.copy(@temperatureLogs), (temp_log) ->
           temp_log = temp_log.temperature_log
           greatest = Math.max.apply Math, [
             parseFloat temp_log.lid_temp
@@ -61,6 +66,7 @@ window.ChaiBioTech.ngApp
     @updateResolution = =>
 
       if ($scope.resolution)
+
         Experiment
         .getTemperatureData($stateParams.expId, {resolution: $scope.resolution/@calibration})
         .success (data) =>

@@ -15,8 +15,8 @@
             options="options"
             >
           </canvas>
-          <div style="padding: 0px 30px;">
-            <time-scrollbar ng-model="scrollState" max="temperatureLogs.length" ng-show="scrollEnabled"></time-scrollbar>
+          <div style="padding-left: 30px;">
+            <time-scrollbar ng-model="scrollState"></time-scrollbar>
           </div>
         </div>
         <div class="text-center">Time</div>
@@ -35,8 +35,8 @@
           </div>
           <div class="input-group">
             <label>View</label>
-            <select ng-change="updateResolution()" ng-model="resolution" class="form-control" ng-options="ms as optionText(ms/1000) for ms in resolutionOptions">
-              <option value=''>- View All -</option>
+            <select ng-change="updateResolution()" ng-model="resolution" class="form-control" ng-options="sec as optionText(sec) for sec in resolutionOptions">
+              <option value=''>View All</option>
             </select>
           </div>
         </form>
