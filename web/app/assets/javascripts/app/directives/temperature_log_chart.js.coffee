@@ -159,7 +159,7 @@ window.ChaiBioTech.ngApp
 
 
       $scope.updateChart = (temperature_logs) =>
-        data = ChartData.temperatureLogs.toAngularCharts temperature_logs
+        data = ChartData.temperatureLogs(temperature_logs).toAngularCharts()
 
         $scope.labels = data.elapsed_time
         $scope.data = [

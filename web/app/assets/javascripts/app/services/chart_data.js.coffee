@@ -7,15 +7,17 @@ window.ChaiBioTech.ngApp
   'SecondsDisplay'
   (SecondsDisplay) ->
 
-    @temperatureLogs =
+    @temperatureLogs = (temperature_logs) ->
       # formats temperature logs for angular-charts
-      toAngularCharts: (temperature_logs) ->
+      toAngularCharts: ->
+
+        temp_logs = angular.copy temperature_logs
 
         elapsed_time = []
         heat_block_zone_temp = []
         lid_temp = []
 
-        for temp_log in temperature_logs
+        for temp_log in temp_logs
           elapsed_time.push SecondsDisplay.display2 Math.round(temp_log.temperature_log.elapsed_time/1000)
 
           # get heat_block_zone_temp average
