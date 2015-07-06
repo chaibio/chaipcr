@@ -20,6 +20,9 @@ window.ChaiBioTech.ngApp.service('stageEvents',[
         canvas.renderAll();
       });
 
+      $scope.$watch('step.ramp.rate', function(newVal, oldVal) {
+        $scope.fabricStep.showHideRamp();
+      });
 
     };
   }

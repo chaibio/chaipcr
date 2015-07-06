@@ -35,12 +35,6 @@ window.ChaiBioTech.ngApp.factory('step', [
         return this;
       };
 
-      this.updateStepName = function() {
-
-        this.stepName.text = (this.updatedStepName).toUpperCase();
-        this.canvas.renderAll();
-      };
-
       this.addBorderRight = function() {
 
         this.borderRight = new fabric.Line([0, 0, 0, 342], {
@@ -87,9 +81,9 @@ window.ChaiBioTech.ngApp.factory('step', [
 
       this.showHideRamp = function() {
 
-        this.rampSpeedText.text = String(this.rampSpeedNumber + "º C/s");
-
-        if(this.rampSpeedNumber <= 0) {
+        this.rampSpeedText.text = String(this.model.ramp.rate + "º C/s");
+        var rampRate = parseInt(this.model.ramp.rate);
+        if(rampRate <= 0 || ! rampRate) {
           this.rampSpeedGroup.setVisible(false);
         } else {
           this.rampSpeedGroup.setVisible(true);
@@ -106,7 +100,7 @@ window.ChaiBioTech.ngApp.factory('step', [
 
       this.rampSpeed = function() {
 
-        this.rampSpeedNumber = this.rampSpeedNumber || parseFloat(this.model.ramp.rate);
+        this.rampSpeedNumber = parseFloat(this.model.ramp.rate);
 
         this.rampSpeedText = new fabric.Text(String(this.rampSpeedNumber)+ "º C/s", {
             fill: 'black',  fontSize: 14, fontWeight: "bold", fontFamily: "Open Sans",  originX: 'left',  originY: 'top'
