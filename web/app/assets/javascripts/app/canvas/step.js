@@ -203,14 +203,8 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.manageBorder("black");
         this.showHideFooter(true);
       };
+
       
-
-      this.changeDeltaTime = function() {
-
-        var step = this.model;
-        step.delta_duration_s = this.deltaTime;
-        this.model.set("step", step);
-      };
     };
   }
 ]);

@@ -46,7 +46,11 @@ window.ChaiBioTech.ngApp.service('stageEvents',[
       });
 
       $scope.$watch('step.collect_data', function(newVal, oldVal) {
-        
+        // things to happen wen step.collect_data changes;
+      });
+
+      $scope.$watch('step.ramp.collect_data', function(newVal, oldVal) {
+        // things to happen wen step.collect_data changes;
       });
     };
   }
