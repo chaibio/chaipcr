@@ -150,7 +150,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         this.big = true;
 
-        if(this.parent.gatherDataDuringStep) {
+        if(this.model.collect_data) {
           this.circle.setFill("#ffb400;");
           this.gatherDataImageMiddle.setVisible(false);
           this.gatherDataOnScroll.setVisible(true);
@@ -167,7 +167,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         this.big = false;
 
-        if(this.parent.gatherDataDuringStep) {
+        if(this.model.collect_data) {
           this.circle.setFill("white");
           this.gatherDataImageMiddle.setVisible(true);
           this.gatherDataOnScroll.setVisible(false);

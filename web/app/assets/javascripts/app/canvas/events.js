@@ -128,54 +128,7 @@ window.ChaiBioTech.ngApp.factory('events', [
         C.selectStep();
         C.canvas.renderAll();
       });
-
-     /**************************************
-          Changed from bottom means , those values were changed from bottom
-          of the screen where we can type in those values. This is how we
-          bridge backbone views and fabric canvas.
-     ***************************************/
-     this.canvas.on("temperatureChangedFromBottom", function(changedStep) {
-        changedStep.circle.getTop();
-        changedStep.circle.circleGroup.top = changedStep.circle.top;
-        changedStep.circle.manageDrag(changedStep.circle.circleGroup);
-        changedStep.circle.circleGroup.setCoords();
-        C.canvas.renderAll();
-      });
-
-      this.canvas.on("rampSpeedChangedFromBottom", function(changedStep) {
-        changedStep.showHideRamp();
-      });
-
-      this.canvas.on("stepNameChangedFromBottom", function(changedStep) {
-        changedStep.updateStepName();
-      });
-
-      this.canvas.on("cycleChangedFromBottom", function(changedStep) {
-        changedStep.parentStage.changeCycle();
-      });
-
-      this.canvas.on("holdTimeChangedFromBottom", function(changedStep) {
-        changedStep.circle.changeHoldTime();
-        //Check the last step. See if the last step has zero and put infinity in that case.
-        C.allStepViews[C.allStepViews.length - 1].circle.doThingsForLast();
-      });
-
-      this.canvas.on("deltaChanged", function(changedStage) {
-        changedStage.updateAutoDelta();
-      });
-
-      this.canvas.on("startOnCycleChangedFromBottom", function(data) {
-        data.stage.updateSOC(data.soc);
-      });
-
-      this.canvas.on("deltaTemperatureChangedFromBottom", function(changedStep) {
-        changedStep.changeDeltaTemp();
-      });
-
-      this.canvas.on("deltaTimeChangedFromBottom", function(changedStep) {
-        changedStep.changeDeltaTime();
-      });
-
+      
       /**************************************
            When a model in the server changed
            changes like add step/stage or delete step/stage.

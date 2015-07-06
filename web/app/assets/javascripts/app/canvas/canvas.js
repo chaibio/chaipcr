@@ -8,7 +8,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
   'events',
   'path',
   'stageEvents',
-  function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents) {
+  'stepEvents',
+  function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents) {
 
     var that = this;
     $rootScope.$on('general-data-ready', function(evt) {
@@ -95,7 +96,9 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       } else {
         this.allStepViews[0].circle.manageClick(true);
         this.$scope.fabricStep = this.allStepViews[0];
+        // here we initite stage/step events service.. So now we can listen for changes from the bottom.
         stageEvents.init(this.$scope, this.canvas, this);
+        stepEvents.init(this.$scope, this.canvas, this);
       }
     };
 
