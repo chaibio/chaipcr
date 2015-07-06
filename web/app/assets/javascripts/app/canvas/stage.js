@@ -222,13 +222,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         this.manageBordersOnSelection("#cc6c00");
         this.manageFooter(true, "black", length);
       };
-
-      this.updateSOC = function(soc) {
-
-        var stage = this.model;
-        stage.auto_delta_start_cycle = soc;
-        this.model.set("stage", stage);
-      };
+      
 
     };
 

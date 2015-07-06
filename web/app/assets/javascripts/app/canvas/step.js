@@ -203,13 +203,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.manageBorder("black");
         this.showHideFooter(true);
       };
-
-      this.changeDeltaTemp = function() {
-
-        var step = this.model;
-        step.delta_temperature = this.updatedDeltaTemp;
-        this.model.set("step", step);
-      };
+      
 
       this.changeDeltaTime = function() {
 
