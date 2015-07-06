@@ -223,15 +223,6 @@ window.ChaiBioTech.ngApp.factory('stage', [
         this.manageFooter(true, "black", length);
       };
 
-      this.updateAutoDelta = function() {
-
-        var stage = this.model;
-        stage.auto_delta = ! stage.auto_delta;
-        this.model.set("stage", stage);
-
-        this.model.updateAutoDelata(stage.auto_delta);
-      };
-
       this.updateSOC = function(soc) {
 
         var stage = this.model;

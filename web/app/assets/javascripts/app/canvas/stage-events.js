@@ -11,6 +11,12 @@ window.ChaiBioTech.ngApp.service('stageEvents',[
         canvas.renderAll();
       });
 
+      $scope.$watch('stage.auto_delta', function(newVal, oldVal) {
+        // Actually we dont have to do anything in here
+      });
+
+      $scope.$watch
+
       $scope.$watch('step.temperature', function(newVal, oldVal) {
 
         var circle = $scope.fabricStep.circle;
