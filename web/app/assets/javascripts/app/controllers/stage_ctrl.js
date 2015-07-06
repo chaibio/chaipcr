@@ -13,8 +13,5 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
       $scope.$emit('general-data-ready');
     });
 
-    $scope.WOWaction = function(cool) {
-      console.log(cool);
-    };
   }
 ]);

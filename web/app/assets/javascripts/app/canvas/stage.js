@@ -1,7 +1,8 @@
 window.ChaiBioTech.ngApp.factory('stage', [
   'ExperimentLoader',
   '$rootScope',
-  function(ExperimentLoader, $rootScope) {
+  'step',
+  function(ExperimentLoader, $rootScope, step) {
 
     return function(model, stage, allSteps, index, fabricStage) {
       this.model = model;
@@ -50,6 +51,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
           }
         );
 
+        this.canvas.add(this.borderRight);
         return this;
       };
 
@@ -116,13 +118,12 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
       this.addSteps = function() {
 
-        var steps = this.model.steps;
-        var tempStep = null;
+        var steps = this.model.steps, stepView, tempStep = null, noOfSteps = steps.length;
         this.childSteps = [];
 
-        for(var stepIndex in steps) {
-          stepModel = steps[stepIndex].step;
-          stepView = new ChaiBioTech.app.Views.fabricStep(stepModel, this, stepIndex);
+        for(var stepIndex = 0; stepIndex < noOfSteps; stepIndex ++) {
+
+          stepView = new step(steps[stepIndex].step, this, stepIndex);
 
           if(tempStep) {
             tempStep.nextStep = stepView;
@@ -166,9 +167,9 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
             this.stageGroup = new fabric.Group([
                 this.stageRect, this.roof,  this.border,  this.stageNo, this.stageName, this.cycleNo, this.cycleX,  this.cycles
-              ],{
-                originX: "left", originY: "top", left: this.left,top: 0, selectable: false, hasControls: false
-              }
+              ], {
+                  originX: "left", originY: "top", left: this.left,top: 0, selectable: false, hasControls: false
+                }
             );
 
           } else {
@@ -181,9 +182,9 @@ window.ChaiBioTech.ngApp.factory('stage', [
             );
 
           }
-          
+
           this.canvas.add(this.stageGroup);
-          //this.addSteps();
+          this.addSteps();
           //this.canvas.renderAll();
       };
 
