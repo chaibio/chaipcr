@@ -15,7 +15,9 @@ window.ChaiBioTech.ngApp.service('stageEvents',[
         // Actually we dont have to do anything in here
       });
 
-      $scope.$watch
+      $scope.$watch('stage.auto_delta_start_cycle', function(newVal, oldVal) {
+        // here too model is automatically updated
+      });
 
       $scope.$watch('step.temperature', function(newVal, oldVal) {
 
