@@ -2,8 +2,6 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
   '$window'
   ($window) ->
     restrict: 'EA'
-    scope:
-      max: '='
     replace: true
     templateUrl: 'app/views/directives/time-scrollbar.html'
     require: 'ngModel'
@@ -19,10 +17,17 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
 
       scrollbar = elem.find('.scrollbar')
 
-      $scope.$watch 'max', (max) ->
-        modelVal = (newMargin/spaceWidth) * $scope.max
-        ngModel.$setViewValue Math.round modelVal
+      # respond to change in scrollbar width
+      $scope.$watch ->
+        scrollbar.css 'width'
+      , (newVal, oldVal) ->
+        if newVal != oldVal
+          oldMargin = getMarginLeft()
+          spaceWidth = getSpaceWidth()
+          pageX = 0
+          updateState 0
 
+      # avoid text selection when dragging the scrollbar
       disableSelect = ->
         $window.$(document.body).css
           'userSelect': 'none'
@@ -48,10 +53,11 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
           newMargin = oldMargin + xDiff
           if newMargin < 0 then newMargin = 0
           if newMargin > spaceWidth then newMargin = spaceWidth
-          scrollbar.css marginLeft: newMargin + 'px'
+          scrollbar.css marginLeft: "#{newMargin}px"
 
-          modelVal = (newMargin/spaceWidth) * $scope.max
-          ngModel.$setViewValue Math.round modelVal
+          # avoid dividing with spaceWidth = 0, else result is NaN
+          val = if spaceWidth > 0 then Math.round((oldMargin + xDiff)/spaceWidth*1000)/1000 else 0
+          ngModel.$setViewValue val
 
       elem.on 'mousedown', (e) ->
         held = true

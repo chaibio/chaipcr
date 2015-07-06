@@ -10,4 +10,5 @@ window.ChaiBioTech.ngApp = angular.module 'ChaiBioTech', [
   'ngResource'
   'angularMoment'
   'chart.js'
+  'nvd3ChartDirectives'
 ]

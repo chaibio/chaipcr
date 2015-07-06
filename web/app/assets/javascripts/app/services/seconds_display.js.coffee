@@ -3,6 +3,7 @@ window.ChaiBioTech.ngApp
 .service 'SecondsDisplay', [
   ->
     @getSecondsComponents = (secs) ->
+      secs = Math.round secs
       days = 0
       hours = 0
       mins = 0

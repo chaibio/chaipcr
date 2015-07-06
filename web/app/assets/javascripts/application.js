@@ -30,6 +30,9 @@
 //= require app/libs/angular-chart
 //= require app/libs/lodash.min
 //= require app/libs/fabric
+//= require app/libs/angularjs-nvd3-directives/d3
+//= require app/libs/angularjs-nvd3-directives/nv.d3
+//= require app/libs/angularjs-nvd3-directives/angularjs-nvd3-directives
 //
 //  angular app ===============
 //
