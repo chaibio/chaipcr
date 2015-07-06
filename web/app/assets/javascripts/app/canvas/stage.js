@@ -79,18 +79,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         );
 
         return this;
-      };
 
-      this.changeCycle = function() {
-
-        this.cycleNo.text = this.updatedNoOfCycle;
-        this.cycleX.left = this.cycleNo.left + this.cycleNo.width + 3;
-        this.cycles.left = this.cycleX.left + this.cycleX.width;
-
-        var curModel = this.model;
-        curModel.num_cycles = this.updatedNoOfCycle;
-        this.model.set("stage", curModel);
-        this.canvas.renderAll();
       };
 
       this.writeNoOfCycles = function() {

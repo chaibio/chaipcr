@@ -43,7 +43,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
       this.getTop = function() {
 
-        var temperature = this.temperatureValue || this.model.temperature;
+        var temperature = this.model.temperature;
 
         if(temperature <= 50) {
           this.top = this.scrollLength - (temperature * this.scrollRatio1);
