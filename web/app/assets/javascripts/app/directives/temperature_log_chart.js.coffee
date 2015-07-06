@@ -18,57 +18,40 @@ window.ChaiBioTech.ngApp
       $scope.$watch 'experimentId', (id) =>
         $scope.init() if id
 
-      $scope.resolutionOptions = [
-        10 * 60
-        20 * 60
-        30 * 60
-        60 * 60
-        60 * 60 * 24
-      ]
+      $scope.init = ->
 
-      $scope.resolution = $scope.resolutionOptions[1]
+        $scope.resolutionOptions = [
+          10 * 60
+          20 * 60
+          30 * 60
+          60 * 60
+          60 * 60 * 24
+        ]
 
-      $scope.temperatureLogs = []
-      $scope.calibration = 10
-      $scope.calibrationSize = 100
-      $scope.scrollState = 0
-      $scope.scrollEnabled = true
-      $scope.updateInterval = null
-      $scope.viewRange = 600
+        $scope.resolution = $scope.resolutionOptions[0]
 
-      $scope.options =
-        animation: false
-        responsive: true
-        pointDot: false
-        scaleShowHorizontalLines: false
-        scaleShowVerticalLines: false
-        datasetFill: false
-        showTooltips: true
-        scaleOverride : true
-        scaleSteps: 10
-        scaleStartValue : 0
+        $scope.temperatureLogs = []
+        $scope.temperatureLogsCache = []
+        $scope.calibration = 100
+        $scope.calibrationSize = 100
+        $scope.scrollState = 0
+        $scope.updateInterval = null
 
-      $scope.series = [
-        'Lid Temp'
-        'Heat Block Temp'
-      ]
-
-      $scope.init = =>
         Experiment
         .getTemperatureData($scope.experimentId, resolution: 1000)
         .success (data) =>
-          $scope.temperatureLogs = data
+          $scope.temperatureLogsCache = angular.copy data
+          $scope.temperatureLogs = angular.copy data
           $scope.updateScale()
-          $scope.resolveTemperatureLogs()
+          $scope.resizeTemperatureLogs()
           $scope.updateScrollWidth()
           $scope.updateData()
 
       $scope.updateData = ->
-        temperature_logs = angular.copy $scope.temperatureLogs
-        left_et_limit = temperature_logs[temperature_logs.length-1].temperature_log.elapsed_time - ($scope.resolution*1000)
+        left_et_limit = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length-1].temperature_log.elapsed_time - ($scope.resolution*1000)
 
         maxScroll = 0
-        for temp_log in temperature_logs
+        for temp_log in $scope.temperatureLogs
           if temp_log.temperature_log.elapsed_time <= left_et_limit
             ++ maxScroll
           else
@@ -77,18 +60,18 @@ window.ChaiBioTech.ngApp
         scrollState = Math.round $scope.scrollState * maxScroll
         if $scope.scrollState < 0 then scrollState = 0
         if $scope.scrollState > 1 then scrollState = maxScroll
-        left_et = temperature_logs[scrollState].temperature_log.elapsed_time
+        left_et = $scope.temperatureLogs[scrollState].temperature_log.elapsed_time
 
         right_et = left_et + ($scope.resolution*1000)
 
-        data = _.select temperature_logs, (temp_log) ->
+        data = _.select $scope.temperatureLogs, (temp_log) ->
           et = temp_log.temperature_log.elapsed_time
           et >= left_et and et <= right_et
 
         $scope.updateChart data
 
-      $scope.updateScale = =>
-        scales = _.map $scope.temperatureLogs, (temp_log) ->
+      $scope.updateScale = ->
+        scales = _.map $scope.temperatureLogsCache, (temp_log) ->
           temp_log = temp_log.temperature_log
           greatest = Math.max.apply Math, [
             parseFloat temp_log.lid_temp
@@ -98,13 +81,14 @@ window.ChaiBioTech.ngApp
           greatest
 
         max_scale = Math.max.apply Math, scales
+        $scope.maxY = [0, Math.ceil(max_scale/10)*10]
 
-        $scope.options.scaleStepWidth = Math.ceil max_scale/10
-
-      $scope.resolveTemperatureLogs = ->
-        chunkSize = Math.round $scope.temperatureLogs.length/$scope.viewRange
-        temperature_logs = angular.copy $scope.temperatureLogs
-        chunked = _.chunk (angular.copy temperature_logs), chunkSize
+      $scope.resizeTemperatureLogs = ->
+        resolution = $scope.resolution
+        if $scope.resolution> $scope.greatest_elapsed_time/1000 then resolution = $scope.greatest_elapsed_time/1000
+        chunkSize = Math.round resolution / $scope.calibration
+        temperature_logs = angular.copy $scope.temperatureLogsCache
+        chunked = _.chunk temperature_logs, chunkSize
         averagedLogs = _.map chunked, (chunk) ->
           elapsed_time_sum = 0
           lid_temp_sum = 0
@@ -128,7 +112,7 @@ window.ChaiBioTech.ngApp
 
       $scope.updateScrollWidth = ->
 
-        $scope.greatest_elapsed_time = $scope.temperatureLogs[$scope.temperatureLogs.length - 1].temperature_log.elapsed_time
+        $scope.greatest_elapsed_time = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length - 1].temperature_log.elapsed_time
 
         widthPercent = $scope.resolution*1000/$scope.greatest_elapsed_time
         if widthPercent > 1
@@ -139,11 +123,13 @@ window.ChaiBioTech.ngApp
       $scope.updateResolution = =>
 
         if ($scope.resolution)
+          $scope.resizeTemperatureLogs()
           $scope.updateScrollWidth()
           $scope.updateData()
 
         else #view all
           $scope.resolution = $scope.greatest_elapsed_time/1000
+          $scope.resizeTemperatureLogs()
           $scope.updateScrollWidth()
           $scope.updateChart angular.copy $scope.temperatureLogs
 
@@ -158,13 +144,18 @@ window.ChaiBioTech.ngApp
 
 
 
-      $scope.updateChart = (temperature_logs) =>
-        data = ChartData.temperatureLogs(temperature_logs).toAngularCharts()
+      $scope.updateChart = (temperature_logs) ->
+        data = ChartData.temperatureLogs(temperature_logs).toNVD3()
 
-        $scope.labels = data.elapsed_time
-        $scope.data = [
-          data.lid_temp
-          data.heat_block_zone_temp
+        $scope.chartData = [
+          {
+            key: 'Lid Temp'
+            values: data.lid_temps
+          }
+          {
+            key: 'Heat Block Zone Temp'
+            values: data.heat_block_zone_temps
+          }
         ]
 
       $scope.autoUpdateTemperatureLogs = =>
@@ -173,9 +164,10 @@ window.ChaiBioTech.ngApp
             Experiment
             .getTemperatureData($scope.experimentId, resolution: 1000)
             .success (data) ->
-              $scope.temperatureLogs = data
+              $scope.temperatureLogsCache = angular.copy data
+              $scope.temperatureLogs = angular.copy data
               $scope.updateScale()
-              $scope.resolveTemperatureLogs()
+              $scope.resizeTemperatureLogs()
               $scope.updateScrollWidth()
               $scope.updateData()
 
@@ -186,6 +178,9 @@ window.ChaiBioTech.ngApp
         $scope.updateInterval = null
 
       $scope.optionText = SecondsDisplay.display1
+
+      $scope.xTick = (x) ->
+        SecondsDisplay.display2 x/1000
 
       return
 

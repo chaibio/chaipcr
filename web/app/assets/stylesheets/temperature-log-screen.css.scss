@@ -1,15 +1,27 @@
 $marginTop: 25%;
 
-.vertical-text {
+.temperature-log-chart {
 
-  transform: rotate(-90deg);
-  transform-origin: 20% 40%;
-  float: left;
-  margin-left: -5px;
-  margin-top: $marginTop;
-  margin-bottom: -$marginTop;
-}
+  .vertical-text {
 
-.time-scrollbar {
-  margin-bottom: 10px;
+    transform: rotate(-90deg);
+    transform-origin: 20% 40%;
+    float: left;
+    margin-left: -5px;
+    margin-top: $marginTop;
+    margin-bottom: -$marginTop;
+  }
+
+
+
+  .time-scrollbar {
+    margin-bottom: 10px;
+  }
+
+  .scrollbar-container {
+    padding-left: 75px;
+    padding-right:50px;
+    margin-top: -50px;
+  }
+
 }
