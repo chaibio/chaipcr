@@ -95,7 +95,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       } else {
         this.allStepViews[0].circle.manageClick(true);
         this.$scope.fabricStep = this.allStepViews[0];
-        stageEvents.init(this.$scope, this.canvas);
+        stageEvents.init(this.$scope, this.canvas, this);
       }
     };
 

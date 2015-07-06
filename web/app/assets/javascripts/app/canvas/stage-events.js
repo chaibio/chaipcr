@@ -1,6 +1,6 @@
 window.ChaiBioTech.ngApp.service('stageEvents',[
   function() {
-    this.init = function($scope, canvas) {
+    this.init = function($scope, canvas, C) {
 
       $scope.$watch('stage.num_cycles', function(newVal, oldVal) {
 
@@ -28,6 +28,13 @@ window.ChaiBioTech.ngApp.service('stageEvents',[
         var step = $scope.fabricStep;
         step.stepName.text = (step.model.name).toUpperCase();
         canvas.renderAll();
+      });
+
+      $scope.$watch('step.hold_time', function(newVal, oldVal) {
+        var circle = $scope.fabricStep.circle;
+        circle.changeHoldTime();
+        //Check the last step. See if the last step has zero and put infinity in that case.
+        C.allCircles[C.allCircles.length - 1].doThingsForLast();
       });
     };
   }

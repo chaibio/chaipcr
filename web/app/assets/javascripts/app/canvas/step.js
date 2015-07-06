@@ -15,7 +15,6 @@ window.ChaiBioTech.ngApp.factory('step', [
       this.previousStep = null;
       this.gatherDataDuringStep = this.model.collect_data;
       this.gatherDataDuringRamp = this.model.ramp.collect_data;
-      this.holdDuration = null;
 
       this.setLeft = function() {
 
