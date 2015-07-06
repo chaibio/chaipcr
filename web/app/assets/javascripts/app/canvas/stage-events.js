@@ -24,6 +24,11 @@ window.ChaiBioTech.ngApp.service('stageEvents',[
         $scope.fabricStep.showHideRamp();
       });
 
+      $scope.$watch('step.name', function(newVal, oldVal) {
+        var step = $scope.fabricStep;
+        step.stepName.text = (step.model.name).toUpperCase();
+        canvas.renderAll();
+      });
     };
   }
 ]);
