@@ -7,11 +7,13 @@ window.ChaiBioTech.ngApp.factory('canvas', [
   '$timeout',
   'events',
   'path',
-  function(ExperimentLoader, $rootScope, stage, $timeout, events, path) {
+  'stageEvents',
+  function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents) {
 
     var that = this;
     $rootScope.$on('general-data-ready', function(evt) {
       that.$scope = evt.targetScope;
+      console.log(that.$scope);
     });
 
     this.init = function(model) {
@@ -58,7 +60,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
       for (var stageIndex = 0; stageIndex < noOfStages; stageIndex ++) {
 
-        stageView = new stage(allStages[stageIndex].stage, this.canvas, this.allStepViews, stageIndex, this);
+        stageView = new stage(allStages[stageIndex].stage, this.canvas, this.allStepViews, stageIndex, this, this.$scope);
         // We connect the stages like a linked list so that we can go up and down.
         if(previousStage){
           previousStage.nextStage = stageView;
@@ -92,6 +94,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         ChaiBioTech.app.newlyCreatedStep = null;
       } else {
         this.allStepViews[0].circle.manageClick(true);
+        this.$scope.fabricStep = this.allStepViews[0];
+        stageEvents.init(this.$scope, this.canvas);
       }
     };
 

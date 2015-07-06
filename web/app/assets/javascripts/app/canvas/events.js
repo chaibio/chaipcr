@@ -5,11 +5,12 @@
     all the events are send from canvas and we check if the event has particular target.
   ***************************************/
 window.ChaiBioTech.ngApp.factory('events', [
-  function() {
+  'ExperimentLoader',
+  function(ExperimentLoader) {
     return function(C, $scope) {
 
       this.canvas = C.canvas;
-      console.log("wow m loaded", C);
+      console.log("wow m loaded", ExperimentLoader);
       /**************************************
           what happens when click is happening in canvas.
           what we do is check if the click is up on some particular events.
@@ -27,6 +28,7 @@ window.ChaiBioTech.ngApp.factory('events', [
             $scope.$apply(function() {
               $scope.step = me.model;
               $scope.stage = me.parentStage.model;
+              $scope.fabricStep = me;
             });
           break;
 
@@ -37,6 +39,7 @@ window.ChaiBioTech.ngApp.factory('events', [
             $scope.$apply(function() {
               $scope.step = me.parent.model;
               $scope.stage = me.parent.parentStage.model;
+              $scope.fabricStep = me.parent;
             });
           break;
 
@@ -77,7 +80,9 @@ window.ChaiBioTech.ngApp.factory('events', [
               var targetCircleGroup = evt.target,
               me = evt.target.me;
               me.manageDrag(targetCircleGroup);
-              appRouter.editStageStep.trigger("stepDrag", me);
+              $scope.$apply(function() {
+                $scope.step.temperature = me.model.temperature;
+              });
             break;
 
             case "moveStepImage":
@@ -97,9 +102,9 @@ window.ChaiBioTech.ngApp.factory('events', [
             // Right now we have only one item here otherwise switch case
             var me = evt.target.me;
             var targetCircleGroup = evt.target;
-            appRouter.editStageStep.trigger("stepDrag", me);
+            //appRouter.editStageStep.trigger("stepDrag", me);
             var temp = evt.target.me.temperature.text;
-            me.model.changeTemperature(parseFloat(temp.substr(0, temp.length - 1)));
+            //me.model.changeTemperature(parseFloat(temp.substr(0, temp.length - 1)));
           }
         }
       });

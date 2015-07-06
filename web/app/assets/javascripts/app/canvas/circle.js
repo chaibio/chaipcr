@@ -68,7 +68,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
             this.gatherDataImageOnMoving
           ], this);
 
-        //this.circleGroup.add(this.gatherDataImageMiddle);
+        this.circleGroup.add(this.gatherDataImageMiddle);
         this.circleGroup.add(this.gatherDataOnScroll);
         this.canvas.add(this.circleGroup);
 
@@ -274,7 +274,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         dynamicTemp = Math.abs(dynamicTemp).toFixed(1);//(dynamicTemp < 100) ? dynamicTemp.toFixed(1) : dynamicTemp;
         this.temperature.text = String(dynamicTemp + "º");
-
+        this.model.temperature = String(dynamicTemp);
         this.parent.adjustRampSpeedPlacing();
       };
 

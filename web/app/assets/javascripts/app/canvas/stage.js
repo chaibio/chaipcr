@@ -4,7 +4,8 @@ window.ChaiBioTech.ngApp.factory('stage', [
   'step',
   function(ExperimentLoader, $rootScope, step) {
 
-    return function(model, stage, allSteps, index, fabricStage) {
+    return function(model, stage, allSteps, index, fabricStage, $scope) {
+
       this.model = model;
       this.index = index;
       this.canvas = stage;
