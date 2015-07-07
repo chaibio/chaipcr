@@ -1,6 +1,6 @@
 <div class="first-data-row">
-  <div class="bottom-step-no ostrich">02</div>
-  <div class="bottom-no-of-stages ostrich">/08</div>
+  <div class="bottom-step-no ostrich">{{fabricStep.ordealStatus | preZero}}</div>
+  <div class="bottom-no-of-stages ostrich">{{fabricStep.parentStage.parent.allStepViews.length | preZero: '/'}}</div>
   <div class="bottom-name-of-step-stage ostrich">
     <span class="bottom-name-of-step-span" ng-click="clickOnField('stepNameShow', 'edit-step-name')">{{step.name}}</span>
     <input type="text" class="edit-step-name" on-enter="stepNameShow = false" ng-blur="stepNameShow = false" ng-model="step.name" ng-show="stepNameShow">

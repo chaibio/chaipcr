@@ -44,3 +44,4 @@
 //= require_tree ./app/directives
 //= require_tree ./app/views
 //= require_tree ./app/canvas
+//= require_tree ./app/filters
