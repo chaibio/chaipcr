@@ -20,7 +20,7 @@
   </div>
   <!-- bottom-half-->
   <div class="bottom-half noselect" ng-controller="StageStepCtrl">
-    <arrow class="previous" action="previous"></arrow>
+    <arrow class="previous" action="previous" ng-click="arrowClicked()"></arrow>
     <div class="middle-ground">
       <general></general>
 
@@ -41,6 +41,6 @@
           <actions></actions>
       </div>
     </div>
-    <arrow class="next" action="next"></arrow>
+    <arrow class="next" action="next" ng-click="arrowClicked()"></arrow>
   </div>
 </div>

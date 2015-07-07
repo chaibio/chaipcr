@@ -25,22 +25,14 @@ window.ChaiBioTech.ngApp.factory('events', [
             me = evt.target.me;
             me.circle.manageClick();
             //appRouter.editStageStep.trigger("stepSelected", me);
-            $scope.$apply(function() {
-              $scope.step = me.model;
-              $scope.stage = me.parentStage.model;
-              $scope.fabricStep = me;
-            });
+            $scope.applyValues(me.circle);
           break;
 
           case "controlCircleGroup":
             me = evt.target.me;
             me.manageClick();
             //appRouter.editStageStep.trigger("stepSelected", me.parent);
-            $scope.$apply(function() {
-              $scope.step = me.parent.model;
-              $scope.stage = me.parent.parentStage.model;
-              $scope.fabricStep = me.parent;
-            });
+            $scope.applyValues(me);
           break;
 
           case "moveStepImage":
@@ -128,7 +120,7 @@ window.ChaiBioTech.ngApp.factory('events', [
         C.selectStep();
         C.canvas.renderAll();
       });
-      
+
       /**************************************
            When a model in the server changed
            changes like add step/stage or delete step/stage.
