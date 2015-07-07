@@ -3,7 +3,7 @@
     EXPERIMENT IN PROGRESS
   </div>
   <div class="experiment-info">
-    <div class="experiment-info-test caption">{{data.experiment.stage.name}}</div>
+    <div class="experiment-info-test caption">{{data.experiment.name}}</div>
     <div class="experiment-info-time caption">TIME REMAINING</div>
     <div class="experiment-info-test">
       STAGE {{data.experiment.stage.number}},
@@ -12,6 +12,6 @@
     <div class="experiment-info-time">{{data.experiment.run_duration}} secs past</div>
   </div>
   <div class="experiment-progress-bar">
-    <div class="pro-bar" style="width: 265.2px;"></div>
+    <div class="pro-bar" style="width: {{data.experiment.run_duration/data.experiment.estimated_duration*100}}%;"></div>
   </div>
 </div>
