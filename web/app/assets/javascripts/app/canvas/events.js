@@ -96,7 +96,10 @@ window.ChaiBioTech.ngApp.factory('events', [
             var targetCircleGroup = evt.target;
             //appRouter.editStageStep.trigger("stepDrag", me);
             var temp = evt.target.me.temperature.text;
-            //me.model.changeTemperature(parseFloat(temp.substr(0, temp.length - 1)));
+            ExperimentLoader.changeTemperature($scope)
+              .then(function(data) {
+                console.log(data);
+              });
           }
         }
       });
