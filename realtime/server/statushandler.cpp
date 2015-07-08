@@ -82,6 +82,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
         }
 
         if (experimentController->machineState() != ExperimentController::Idle) {
+            responsePt.put("experimentController.expriment.name", experiment.name());
             responsePt.put("experimentController.expriment.started_at", experiment.startedAt());
 
             responsePt.put("experimentController.expriment.stage.id", experiment.protocol()->currentStage()->id());

@@ -2,23 +2,12 @@
 #include "sociincludes.h"
 #include "qpcrapplication.h"
 
-//#define DATABASE_FILE "/root/chaipcr/web/db/development.sqlite3"
 #define DATABASE_ADDRESS "host=localhost db=chaipcr user=root"
 #define DATABASE_LOCKED_TRY_COUNT 3
 #define ROUND(x) ((int)(x * 100.0 + 0.5) / 100.0)
 
 DBControl::DBControl()
 {
-    /*sqlite_api::sqlite3_enable_shared_cache(1);
-
-    _readSession = new soci::session(soci::sqlite3, DATABASE_FILE);
-    _writeSession = new soci::session(soci::sqlite3, DATABASE_FILE);
-
-    *_readSession << "PRAGMA temp_store = MEMORY";
-    *_readSession << "PRAGMA synchronous = NORMAL";
-    *_writeSession << "PRAGMA temp_store = MEMORY";
-    *_writeSession << "PRAGMA synchronous = NORMAL";*/
-
     _readSession = new soci::session(soci::mysql, DATABASE_ADDRESS);
     _writeSession = new soci::session(soci::mysql, DATABASE_ADDRESS);
 
@@ -102,39 +91,6 @@ Experiment DBControl::getExperiment(int id)
 
     return experiment;
 }
-
-/*Experiment DBControl::getExperiment(int id)
-{
-    bool gotData = false;
-    soci::row result;
-
-    _readMutex.lock();
-    {
-        *_readSession << "SELECT * FROM experiments WHERE id = " << id, soci::into(result);
-        gotData = _readSession->got_data();
-    }
-    _readMutex.unlock();
-
-    if (!gotData || result.get_indicator("id") == soci::i_null)
-        return Experiment();
-
-    Experiment experiment(id);
-
-    if (result.get_indicator("name") != soci::i_null)
-        experiment.setName(result.get<std::string>("name"));
-    if (result.get_indicator("qpcr") != soci::i_null)
-        experiment.setQpcr(result.get<int>("qpcr"));
-    if (result.get_indicator("started_at") != soci::i_null)
-        experiment.setStartedAt(result.get<boost::posix_time::ptime>("started_at"));
-    if (result.get_indicator("completed_at") != soci::i_null)
-        experiment.setCompletedAt(result.get<boost::posix_time::ptime>("completed_at"));
-    if (result.get_indicator("completion_status") != soci::i_null)
-        experiment.setCompletionStatus(result.get<Experiment::CompletionStatus>("completion_status"));
-
-    experiment.setProtocol(getProtocol(result.get<int>("id")));
-
-    return experiment;
-}*/
 
 void DBControl::createExperiment(Experiment &experiment)
 {
