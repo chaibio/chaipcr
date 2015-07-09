@@ -15,10 +15,6 @@ window.ChaiBioTech.ngApp.directive('temp', [
       //bindToController: true,
       transclude: true,
 
-      controller: function() {
-        this.wow = "hiya";
-      },
-
       link: function(scope, elem, attr) {
 
         scope.edit = false;
@@ -28,6 +24,12 @@ window.ChaiBioTech.ngApp.directive('temp', [
           $timeout(function() {
             $('.' + className).focus();
           });
+        };
+
+        scope.save = function() {
+
+          scope.edit = false;
+          ExperimentLoader.changeDeltaTemperature(scope.$parent);
         };
       }
     };

@@ -3,7 +3,7 @@
   <div class="bottom-no-of-stages ostrich">{{fabricStep.parentStage.parent.allStepViews.length | preZero: '/'}}</div>
   <div class="bottom-name-of-step-stage ostrich">
     <span class="bottom-name-of-step-span" ng-click="clickOnField('stepNameShow', 'edit-step-name')">{{step.name}}</span>
-    <input type="text" class="edit-step-name" on-enter="stepNameShow = false" ng-blur="stepNameShow = false" ng-model="step.name" ng-show="stepNameShow">
+    <input type="text" class="edit-step-name" on-enter="saveStepName()" ng-blur="stepNameShow = false" ng-model="step.name" ng-show="stepNameShow">
   </div>
   <div class="bottom-stage-name sansa">{{stage.name | uppercase}}</div>
 
@@ -28,9 +28,9 @@
     </div>
   </div>
   <div class="bottom-button-container">
-    <div id="gather-data-button" class="gather-data-button-{{gatherDataState}}" ng-click="showPopUp()">
+    <div id="gather-data-button" class="gather-data-button-{{step.collect_data || step.ramp.collect_data}}" ng-click="popUp = true">
       <div class="gather-data-button-image-container">
-        <img class="gather-data-button-image" ng-show="gatherDataState" ng-src="assets/gather-data-image.png">
+        <img class="gather-data-button-image" ng-show="step.collect_data || step.ramp.collect_data" ng-src="assets/gather-data-image.png">
       </div>
       <div class="gather-data-button-text">
         GATHER DATA {{gather_data_state}}
@@ -43,7 +43,7 @@
       <div class="gather-data-popup-content">
         <div class="small-button first sansa" id="during-step" ng-click="changeDuringStep()">
           <div class="tik-image-container">
-            <img ng-show="duringStep" class="tik-image-during-step" src="assets/tik.png">
+            <img ng-show="step.collect_data" class="tik-image-during-step" src="assets/tik.png">
           </div>
           <div class="tik-text-container">
             <span>DURING STEP</span>
@@ -51,7 +51,7 @@
         </div>
         <div class="small-button sansa" id="after-step" ng-click="changeDuringRamp()">
           <div class="tik-image-container">
-            <img ng-show="duringRamp" class="tik-image-during-ramp" src="assets/tik.png">
+            <img ng-show="step.ramp.collect_data" class="tik-image-during-ramp" src="assets/tik.png">
           </div>
           <div class="tik-text-container">
             <span>DURING RAMP</span>

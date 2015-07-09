@@ -21,20 +21,16 @@ window.ChaiBioTech.ngApp.directive('general', [
           scope.off = scope.stage.auto_delta;
           scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
 
-          scope.gather_data_state = (scope.step.collect_data || scope.step.ramp.collect_data) ? "ON" : "OFF";
+          scope.$watch('step.collect_data', function(newVal, oldVal) {
+            scope.gather_data_state = (scope.step.collect_data || scope.step.ramp.collect_data) ? "ON" : "OFF";
+          });
 
-          scope.duringStep = scope.step.collect_data;
-          scope.duringRamp = scope.step.ramp.collect_data;
-
-          scope.gatherDataState = (!scope.duringStep && !scope.duringRamp) ? false : true ;
+          scope.$watch('step.ramp.collect_data', function(newVal, oldVal) {
+            scope.gather_data_state = (scope.step.collect_data || scope.step.ramp.collect_data) ? "ON" : "OFF";
+          });
 
         });
-        // Field is controller members
-        scope.checkIfEnter = function(evt, field){
-          if(evt.which === 13) {
-            scope[field] = false;
-          }
-        };
+
         // focusElement is the classname of the desired input box to be shown
         scope.clickOnField = function(field, focusElement) {
 
@@ -52,27 +48,28 @@ window.ChaiBioTech.ngApp.directive('general', [
             scope.stage.auto_delta = scope.off = ! scope.stage.auto_delta;
             scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
           } else {
-            alert("Plese select a yclin stage");
+            alert("Plese select a cycling stage");
           }
         };
 
-        scope.showPopUp = function() {
+        scope.saveStepName = function() {
 
-          scope.popUp = ! scope.popUp;
+          scope.stepNameShow = false;
+          ExperimentLoader.saveName(scope);
         };
 
         scope.changeDuringStep = function() {
 
           scope.popUp = ! scope.popUp;
-          scope.duringStep = scope.step.collect_data = ! scope.step.collect_data;
-          scope.gatherDataState = (!scope.duringStep && !scope.duringRamp) ? false : true ;
+          scope.step.collect_data = ! scope.step.collect_data;
+          ExperimentLoader.gatherDuringStep(scope);
         };
 
         scope.changeDuringRamp = function() {
 
           scope.popUp = ! scope.popUp;
-          scope.duringRamp = scope.step.ramp.collect_data = ! scope.step.ramp.collect_data;
-          scope.gatherDataState = (!scope.duringStep && !scope.duringRamp) ? false : true ;
+          scope.step.ramp.collect_data = ! scope.step.ramp.collect_data;
+          ExperimentLoader.gatherDataDuringRamp(scope);
         };
 
       }

@@ -21,6 +21,11 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
             $('.' + className).focus();
           });
         };
+
+        scope.save = function() {
+          scope.edit = false;
+          ExperimentLoader.changeRampSpeed(scope.$parent);
+        };
       }
     };
   }

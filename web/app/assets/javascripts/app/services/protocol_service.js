@@ -33,15 +33,11 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
     };
 
     this.getNew = function() {
-      console.log(this.protocol);
+      
       return this.protocol.protocol.stages[1].stage;
     };
 
-    this.changeTemperature = function($scope) {
-
-      var dataToBeSend = {'step':{'temperature': $scope.step.temperature}},
-      url = "/steps/" + $scope.step.id,
-      delay = $q.defer();
+    this.update = function(url, dataToBeSend, delay) {
 
       $http.put(url, dataToBeSend)
         .success(function(data) {
@@ -51,7 +47,16 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
           delay.reject(data);
         });
 
-        return delay.promise;
+      return delay.promise;
+    };
+
+    this.changeTemperature = function($scope) {
+
+      var dataToBeSend = {'step':{'temperature': $scope.step.temperature}},
+      url = "/steps/" + $scope.step.id,
+      delay = $q.defer();
+      return this.update(url, dataToBeSend, delay);
+
     };
 
     this.addStep = function($scope) {
@@ -91,19 +96,10 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
     this.gatherDuringStep = function($scope) {
 
       var that = this,
-      dataToBeSend = {'step': {'collect_data': $scope.model.collect_data}},
+      dataToBeSend = {'step': {'collect_data': $scope.step.collect_data}},
       url = "/steps/" + $scope.step.id,
       delay = $q.defer();
-
-      $http.put(url, dataToB)
-        .success(function(data) {
-          delay.resolve(data);
-        })
-        .error(function(data) {
-          delay.reject(data);
-        }
-      );
-      return delay.promise;
+      return this.update(url, dataToBeSend, delay);
 
     };
 
@@ -112,16 +108,8 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
       var dataToBeSend = {'ramp': {'collect_data': $scope.step.ramp.collect_data}},
       url = "/ramps/" + $scope.step.id,
       delay = $q.defer();
+      return this.update(url, dataToBeSend, delay);
 
-        $http.delete(url, dataToBeSend)
-          .success(function(data) {
-            delay.resolve(data);
-          })
-          .error(function(data) {
-            delay.reject(data);
-          }
-        );
-        return delay.promise;
     };
 
     this.changeRampSpeed = function($scope) {
@@ -129,16 +117,8 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
       var dataToBeSend = {'ramp': {'rate': $scope.step.ramp.rate}},
       url = "/ramps/" + $scope.step.id,
       delay = $q.defer();
+      return this.update(url, dataToBeSend, delay);
 
-      $http.put(url, dataToBeSend)
-        .success(function(data) {
-          delay.resolve(data);
-        })
-        .error(function(data) {
-          delay.reject(data);
-        }
-      );
-      return delay.promise;
     };
 
     this.changeHoldDuration = function($scope) {
@@ -146,16 +126,8 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
       var dataToBeSend = {'step': {'hold_time': $scope.step.hold_time}},
       url = "/steps/" + $scope.step.id,
       delay = $q.defer();
+      return this.update(url, dataToBeSend, delay);
 
-      $http.put(url, dataToBeSend)
-        .success(function(data) {
-          delay.resolve(data);
-        })
-        .error(function(data) {
-          delay.reject(data);
-        }
-      );
-      return delay.promise;
     };
 
     this.saveName = function($scope) {
@@ -163,16 +135,7 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
       var dataToBeSend = {'step': {'name': $scope.step.name}},
       url = "/steps/" + $scope.step.id,
       delay = $q.defer();
-
-      $http.put(url, dataToBeSend)
-        .success(function(data) {
-          delay.resolve(data);
-        })
-        .error(function(data) {
-          delay.reject(data);
-        }
-      );
-      return delay.promise;
+      return this.update(url, dataToBeSend, delay);
     };
 
     this.changeDeltaTemperature = function($scope) {
@@ -180,16 +143,7 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
       var dataToBeSend = {'step': {'delta_temperature': $scope.step.delta_temperature}},
       url = "/steps/" + $scope.step.id,
       delay = $q.defer();
-
-      $http.put(url, dataToBeSend)
-        .success(function(data) {
-          delay.resolve(data);
-        })
-        .error(function(data) {
-          delay.reject(data);
-        }
-      );
-      return delay.promise;
+      return this.update(url, dataToBeSend, delay);
     };
 
     this.changeDeltaTime = function($scope) {
@@ -197,16 +151,7 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
       var dataToBeSend = {'step': {'delta_duration_s': $scope.step.delta_duration_s}},
       url = "/steps/" + $scope.step.id,
       delay = $q.defer();
-
-      $http.put(url, dataToBeSend)
-        .success(function(data) {
-          delay.resolve(data);
-        })
-        .error(function(data) {
-          delay.reject(data);
-        }
-      );
-      return delay.promise;
+      return this.update(url, dataToBeSend, delay);
     };
 
   }

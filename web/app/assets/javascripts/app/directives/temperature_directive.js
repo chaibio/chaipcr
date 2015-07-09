@@ -19,10 +19,17 @@ window.ChaiBioTech.ngApp.directive('temperature', [
         scope.edit = false;
 
         scope.editAndFocus = function(className) {
+
           scope.edit = ! scope.edit;
           $timeout(function() {
             $('.' + className).focus();
           });
+        };
+
+        scope.save = function() {
+
+          scope.edit = false;
+          ExperimentLoader.changeTemperature(scope.$parent);
         };
       }
     };

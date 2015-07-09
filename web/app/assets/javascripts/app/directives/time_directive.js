@@ -32,6 +32,12 @@ window.ChaiBioTech.ngApp.directive('time', [
             $('.' + className).focus();
           });
         };
+
+        scope.save = function() {
+          
+          scope.edit = false;
+          ExperimentLoader.changeDeltaTime(scope.$parent);
+        }
       }
     };
   }

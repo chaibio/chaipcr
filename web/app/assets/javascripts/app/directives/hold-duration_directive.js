@@ -21,6 +21,12 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
             $('.' + className).focus();
           });
         };
+
+        scope.save = function() {
+
+          scope.edit = false;
+          ExperimentLoader.changeHoldDuration(scope.$parent);
+        }
       }
     };
   }
