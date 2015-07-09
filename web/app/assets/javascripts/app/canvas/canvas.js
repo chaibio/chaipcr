@@ -33,6 +33,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       ];
 
       this.imageobjects = {};
+      if(this.canvas) this.canvas.clear();
       this.canvas = new fabric.Canvas('canvas', {
         backgroundColor: '#ffb400', selection: false, stateful: true
       });

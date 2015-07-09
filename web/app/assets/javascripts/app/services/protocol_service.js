@@ -33,7 +33,7 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
     };
 
     this.getNew = function() {
-      
+
       return this.protocol.protocol.stages[1].stage;
     };
 
@@ -50,6 +50,59 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
       return delay.promise;
     };
 
+    /********************Stage API Methods************************/
+
+    this.addStage = function($scope, type) {
+
+      var id = $scope.stage.id;
+      var dataToBeSend = {
+        "prev_id": id,
+        "stage": {
+          'stage_type': type
+        }
+      };
+      $.ajax({
+        url: "/protocols/"+protocolId+"/stages",
+        contentType: 'application/json',
+        type: 'POST',
+        data: JSON.stringify(dataToBeSend)
+      })
+      .done(function(data) {
+        fabricStageView.canvas.fire("modelChanged", data);
+      })
+      .fail(function() {
+        console.log("Failed to update");
+      });
+    };
+
+    this.saveCycle = function($scope) {
+
+      var dataToBeSend = {'stage': {'num_cycles': $scope.stage.num_cycles}},
+      url = "/stages/"+ $scope.stage.id,
+      delay = $q.defer();
+      return this.update(url, dataToBeSend, delay);
+
+    };
+
+    this.changeStartOnCycle = function($scope) {
+
+      var dataToBeSend = {'stage': {'auto_delta_start_cycle': $scope.stage.auto_delta_start_cycle}},
+      url = "/stages/"+ $scope.stage.id,
+      delay = $q.defer();
+      return this.update(url, dataToBeSend, delay);
+
+    };
+
+    this.updateAutoDelata = function($scope) {
+
+      var dataToBeSend = {'stage': {'auto_delta': $scope.stage.auto_delta}},
+      url = "/stages/"+ $scope.stage.id,
+      delay = $q.defer();
+      return this.update(url, dataToBeSend, delay);
+
+    };
+    /********************Step API Methods************************/
+
     this.changeTemperature = function($scope) {
 
       var dataToBeSend = {'step':{'temperature': $scope.step.temperature}},
@@ -61,8 +114,8 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
 
     this.addStep = function($scope) {
 
-      var thisId = $scope.stage.id,
-      dataToBeSend = {"prev_id": thisId},
+      var stageId = $scope.stage.id,
+      dataToBeSend = {"prev_id": $scope.step.id},
       delay = $q.defer(),
       url = "/stages/"+ stageId +"/steps";
 
@@ -73,6 +126,7 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
         .error(function(data) {
           delay.reject(data);
         });
+
       return delay.promise;
     };
 

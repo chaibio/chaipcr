@@ -1,0 +1,19 @@
+/* line 5, ../../app/assets/stylesheets/temperature-log-screen.css.scss */
+.temperature-log-chart .vertical-text {
+  transform: rotate(-90deg);
+  transform-origin: 20% 40%;
+  float: left;
+  margin-left: -5px;
+  margin-top: 25%;
+  margin-bottom: -25%;
+}
+/* line 17, ../../app/assets/stylesheets/temperature-log-screen.css.scss */
+.temperature-log-chart .time-scrollbar {
+  margin-bottom: 10px;
+}
+/* line 21, ../../app/assets/stylesheets/temperature-log-screen.css.scss */
+.temperature-log-chart .scrollbar-container {
+  padding-left: 75px;
+  padding-right: 50px;
+  margin-top: -50px;
+}

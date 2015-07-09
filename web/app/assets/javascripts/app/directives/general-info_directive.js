@@ -18,8 +18,11 @@ window.ChaiBioTech.ngApp.directive('general', [
 
         scope.$on("dataLoaded", function() {
           // there is a slight delay for the controller to catch up so wait for it and load
-          scope.off = scope.stage.auto_delta;
           scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
+
+          scope.$watch('stage.auto_delta', function(newVal, oldVal) {
+            scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
+          });
 
           scope.$watch('step.collect_data', function(newVal, oldVal) {
             scope.gather_data_state = (scope.step.collect_data || scope.step.ramp.collect_data) ? "ON" : "OFF";
@@ -42,15 +45,24 @@ window.ChaiBioTech.ngApp.directive('general', [
         };
 
         scope.saveCycle = function() {
+
           scope.stageNoCycleShow = false;
+          if(scope.stage.num_cycles >= scope.stage.auto_delta_start_cycle) {
+            ExperimentLoader.saveCycle(scope);
+          } else {
+            alert("Entar a value greater than" + scope.stage.auto_delta_start_cycle);
+          }
         };
 
         scope.changeDelta = function() {
 
-          if(scope.stage.stage_type == "cycling") {
+          if(scope.stage.stage_type === "cycling") {
 
-            scope.stage.auto_delta = scope.off = ! scope.stage.auto_delta;
+            scope.stage.auto_delta = ! scope.stage.auto_delta;
             scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
+            ExperimentLoader.updateAutoDelata(scope).then(function() {
+              console.log("Happy happy ---- Just testing ____-------______");
+            });
           } else {
             alert("Plese select a cycling stage");
           }

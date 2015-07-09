@@ -1,0 +1,266 @@
+/* line 2, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container {
+  width: 1024px;
+  height: 768px;
+  position: absolute;
+  top: 0px;
+}
+/* line 8, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .home-image {
+  position: absolute;
+  top: 15px;
+  left: 20px;
+}
+/* line 14, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side {
+  float: left;
+  width: 433px;
+  height: 768px;
+  background-color: #001827;
+}
+/* line 20, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .long-tail-container {
+  height: 40px;
+  width: 350px;
+}
+/* line 24, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .long-tail-container .long-tail {
+  width: 6px;
+  height: 40px;
+  background-color: white;
+  margin-left: 70px;
+}
+/* line 32, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu {
+  height: 315px;
+}
+/* line 35, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item {
+  height: 60px;
+  width: 350px;
+  margin-left: 40px;
+}
+/* line 40, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item .tail-container {
+  height: 25px;
+  width: 350px;
+}
+/* line 44, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item .tail-container .tail {
+  width: 6px;
+  height: 22px;
+  background-color: white;
+  margin-left: 30px;
+}
+/* line 51, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item .ball {
+  width: 30px;
+  height: 30px;
+  background-image: url("white-ball.png");
+  margin-left: 17px;
+  float: left;
+}
+/* line 58, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item .menu-text {
+  float: left;
+  color: white;
+  margin-top: 10px;
+  margin-left: 14px;
+  cursor: pointer;
+}
+/* line 65, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item .menu-text a {
+  color: white;
+}
+/* line 69, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item .menu-text a:visited {
+  color: white;
+}
+/* line 75, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special {
+  width: 350px;
+  margin-left: 40px;
+}
+/* line 79, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .tail-container {
+  height: 43px;
+  width: 350px;
+}
+/* line 83, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .tail-container .tail {
+  width: 6px;
+  height: 40px;
+  background-color: white;
+  margin-left: 30px;
+}
+/* line 90, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .ball-text-container {
+  height: 60px;
+  width: 350px;
+}
+/* line 94, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .ball-text-container .ball {
+  width: 60px;
+  height: 60px;
+  background-image: url("big-white-ball.png");
+  margin-left: 3px;
+  float: left;
+  margin-top: 1px;
+}
+/* line 102, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .ball-text-container .menu-text {
+  float: left;
+  color: white;
+  margin-top: 24px;
+  margin-left: 14px;
+  cursor: pointer;
+  font-size: 40px;
+}
+/* line 110, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .ball-text-container .menu-text a {
+  color: white;
+}
+/* line 113, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .ball-text-container .menu-text a:visited {
+  color: white;
+}
+/* line 116, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-menu .menu-overlay-menu-item-special .ball-text-container .menu-text a:hover {
+  background-color: #001827;
+}
+/* line 123, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .experiment-in-progress-container {
+  width: 350px;
+  height: 110px;
+  font-size: 14px;
+  color: white;
+  margin-top: 130px;
+  margin-left: 42px;
+}
+/* line 133, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-in-progress-heading {
+  text-align: center;
+  border-bottom: solid 2px white;
+}
+/* line 137, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-info {
+  height: 80px;
+  padding-top: 25px;
+}
+/* line 141, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-info div {
+  float: left;
+}
+/* line 145, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-info .caption {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+/* line 149, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-info .experiment-info-test {
+  width: 220px;
+}
+/* line 154, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-progress-bar {
+  height: 5px;
+  background-color: #106aa9;
+}
+/* line 158, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .experiment-in-progress-container .experiment-in-progress .experiment-progress-bar .pro-bar {
+  background-color: white;
+  height: 5px;
+  width: 0px;
+}
+/* line 168, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-all-options {
+  margin-top: 52px;
+  width: 280px;
+}
+/* line 172, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-all-options .menu-overlay-options-content {
+  width: 280px;
+  position: relative;
+  left: 62px;
+}
+/* line 177, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-all-options .menu-overlay-options-content .title {
+  width: 280px;
+  color: white;
+  text-align: center;
+  border-bottom: solid 1px white;
+  font-size: 14px;
+}
+/* line 184, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .left-side .menu-overlay-all-options .menu-overlay-options-content .exp-option-buttons {
+  width: 280px;
+  text-align: center;
+  cursor: pointer;
+  margin-top: 16px;
+  font-weight: bold;
+  font-size: 12px;
+  color: #106aa9;
+}
+/* line 197, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side {
+  float: left;
+  width: 591px;
+  height: 768px;
+}
+/* line 202, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side .menu-overlay-title {
+  width: 591px;
+  height: 45px;
+  background-color: #020100;
+}
+/* line 207, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side .menu-overlay-title .bar {
+  height: 45px;
+  width: 22px;
+  padding-top: 10px;
+  margin-left: 32px;
+  margin-right: 13px;
+  float: left;
+}
+/* line 215, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side .menu-overlay-title .bar .horizontal-bar {
+  width: 22px;
+  height: 3px;
+  background-color: #838382;
+  margin-top: 4px;
+}
+/* line 223, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side .menu-overlay-title .title-text {
+  float: left;
+  color: white;
+  width: 315px;
+  height: 45px;
+  padding-top: 15px;
+  margin-right: 13px;
+  font-family: "fun city";
+  font-size: 15px;
+}
+/* line 234, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side .menu-overlay-title .dots {
+  float: left;
+  height: 45px;
+  width: 22px;
+  padding-top: 19px;
+}
+/* line 240, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side .menu-overlay-title .dots .white-ball {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: white;
+  float: left;
+  margin-left: 3px;
+  cursor: pointer;
+}
+/* line 252, ../../app/assets/stylesheets/menu-overlay.css.scss */
+.menu-overlay-container .right-side .menu-overlay-options {
+  height: 723px;
+  width: 591px;
+  background-color: black;
+  opacity: 0.8;
+  z-index: 100;
+}

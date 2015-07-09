@@ -1,18 +1,18 @@
 <div class="action-container">
-  <button class="big-button" id="add-step">ADD STEP</button>
-  <button class="big-button" id="add-stage">ADD STAGE</button>
-  <button class="big-button" id="delete-step">DELETE STEP</button>
+  <button class="big-button" id="add-step" ng-click="addStep()">ADD STEP</button>
+  <button class="big-button" id="add-stage" ng-click="actionPopup = !actionPopup">ADD STAGE</button>
+  <button class="big-button" id="delete-step" ng-click="deleteStep()">DELETE STEP</button>
 
   <button class="small-button" id="add-step">MOVE STEP</button>
   <button class="small-button go-right" id="add-step">MOVE STAGE</button>
 
-  <div class="lol-pop">
+  <div class="lol-pop" ng-show="actionPopup">
     <div class="add-stage-popup">
       <div class="tail"></div>
     </div>
     <div class="add-stage-popup-content">
-      <button class="small-button" id="add-holding">HOLDING</button>
-      <button class="small-button" id="add-cycling">CYCLING</button>
+      <button class="small-button" id="add-holding" ng-click="addStage('holding')">HOLDING</button>
+      <button class="small-button" id="add-cycling" ng-click="addStage('cycling')">CYCLING</button>
       <button class="small-button" id="add-melt-curve">MELT CURVE</button>
     </div>
   </div>

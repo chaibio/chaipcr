@@ -31,7 +31,10 @@ window.ChaiBioTech.ngApp.directive('startOnCycle', [
         scope.save = function() {
 
           scope.edit = false;
-          //ExperimentLoader.changeDeltaTemperature(scope.$parent);
+          if(scope.reading <= scope.$parent.stage.num_cycles) {
+            ExperimentLoader.changeStartOnCycle(scope.$parent);
+          }
+
         };
       }
     };
