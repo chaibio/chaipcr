@@ -11,15 +11,10 @@ window.ChaiBioTech.ngApp.factory('canvas', [
   'stepEvents',
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents) {
 
-    var that = this;
-    $rootScope.$on('general-data-ready', function(evt) {
-      that.$scope = evt.targetScope;
-      console.log(that.$scope);
-    });
-
     this.init = function(model) {
-
-      this.model = model;
+      console.log(model);
+      this.model = model.protocol;
+      this.$scope = model;
       this.allStepViews = [];
       this.allStageViews = [];
       this.canvas = null;
@@ -57,7 +52,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     this.addStages = function() {
 
-      var allStages = this.model.protocol.protocol.stages;
+      var allStages = this.model.protocol.stages;
       var previousStage = null, noOfStages = allStages.length, stageView;
 
       for (var stageIndex = 0; stageIndex < noOfStages; stageIndex ++) {

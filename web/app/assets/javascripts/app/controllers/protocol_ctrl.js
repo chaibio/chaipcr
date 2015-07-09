@@ -12,6 +12,6 @@ window.ChaiBioTech.ngApp.controller('ProtocolCtrl', [
       });
     };
 
-    this.ExperimentLoader();
+    //this.ExperimentLoader();
   }
 ]);

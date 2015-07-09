@@ -12,9 +12,12 @@ window.ChaiBioTech.ngApp.directive('actions', [
         scope.actionPopup = false;
 
         scope.addStep = function() {
-          ExperimentLoader.addStep(scope).then(function() {
-            scope.reloadAll();
-          });
+          ExperimentLoader.addStep(scope)
+            .then(function(data) {
+              console.log(data);
+              //scope.reloadAll();
+              //Now create a new step and insert it...!
+            });
         };
 
         scope.deleteStep = function() {
@@ -27,8 +30,11 @@ window.ChaiBioTech.ngApp.directive('actions', [
 
         scope.reloadAll = function() {
           ExperimentLoader.getExperiment().then(function(data) {
-            $scope.protocol = data.experiment;
-            canvas.init($scope);
+            scope.protocol = data.experiment;
+            scope.stage = ExperimentLoader.loadFirstStages();
+            scope.step = ExperimentLoader.loadFirstStep();
+            scope.$emit('general-data-ready');
+            canvas.init(scope);
           });
         };
       }

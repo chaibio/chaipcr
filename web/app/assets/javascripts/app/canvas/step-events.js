@@ -49,6 +49,6 @@ window.ChaiBioTech.ngApp.service('stepEvents',[
         }
       });
 
-    }
+    };
   }
 ]);
