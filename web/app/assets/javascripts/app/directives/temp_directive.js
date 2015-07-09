@@ -9,10 +9,10 @@ window.ChaiBioTech.ngApp.directive('temp', [
         caption: "@",
         unit: "@",
         reading: '=',
+        delta: '=',
         action: '&' // Learn how to pass value in this scenario
       },
       templateUrl: 'app/views/directives/temp-time.html',
-      //bindToController: true,
       transclude: true,
 
       link: function(scope, elem, attr) {
@@ -20,10 +20,13 @@ window.ChaiBioTech.ngApp.directive('temp', [
         scope.edit = false;
 
         scope.editAndFocus = function(className) {
-          scope.edit = ! scope.edit;
-          $timeout(function() {
-            $('.' + className).focus();
-          });
+
+          if(scope.delta) {
+            scope.edit = ! scope.edit;
+            $timeout(function() {
+              $('.' + className).focus();
+            });
+          }
         };
 
         scope.save = function() {
@@ -31,6 +34,7 @@ window.ChaiBioTech.ngApp.directive('temp', [
           scope.edit = false;
           ExperimentLoader.changeDeltaTemperature(scope.$parent);
         };
+
       }
     };
   }

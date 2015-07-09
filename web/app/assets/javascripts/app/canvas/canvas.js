@@ -49,7 +49,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
       $timeout(function(context) {
         context.canvas.renderAll();
-      },100 , true, this);
+      },0 , true, this);
 
       return this;
     };

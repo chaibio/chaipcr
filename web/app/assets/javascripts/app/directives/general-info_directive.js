@@ -41,6 +41,10 @@ window.ChaiBioTech.ngApp.directive('general', [
           });
         };
 
+        scope.saveCycle = function() {
+          scope.stageNoCycleShow = false;
+        };
+
         scope.changeDelta = function() {
 
           if(scope.stage.stage_type == "cycling") {

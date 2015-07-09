@@ -9,35 +9,32 @@ window.ChaiBioTech.ngApp.directive('time', [
         caption: "@",
         unit: "@",
         reading: '=',
+        delta: '=',
         action: '&' // Learn how to pass value in this scenario
       },
 
-      controller: function() {
-
-      },
-
       transclude: true,
-
       templateUrl: 'app/views/directives/temp-time.html',
-
-      //bindToController: true,
 
       link: function(scope, elem, attr) {
 
         scope.edit = false;
 
         scope.editAndFocus = function(className) {
-          scope.edit = ! scope.edit;
-          $timeout(function() {
-            $('.' + className).focus();
-          });
+          
+          if(scope.delta) {
+            scope.edit = ! scope.edit;
+            $timeout(function() {
+              $('.' + className).focus();
+            });
+          }
         };
 
         scope.save = function() {
-          
+
           scope.edit = false;
           ExperimentLoader.changeDeltaTime(scope.$parent);
-        }
+        };
       }
     };
   }

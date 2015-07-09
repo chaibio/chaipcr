@@ -9,6 +9,7 @@ window.ChaiBioTech.ngApp.directive('startOnCycle', [
         caption: "@",
         unit: "@",
         reading: '=',
+        delta: '=',
         action: '&' // Learn how to pass value in this scenario
       },
       templateUrl: 'app/views/directives/edit-value.html',
@@ -18,10 +19,19 @@ window.ChaiBioTech.ngApp.directive('startOnCycle', [
         scope.edit = false;
 
         scope.editAndFocus = function(className) {
-          scope.edit = ! scope.edit;
-          $timeout(function() {
-            $('.' + className).focus();
-          });
+
+          if(scope.delta) {
+            scope.edit = ! scope.edit;
+            $timeout(function() {
+              $('.' + className).focus();
+            });
+          }
+        };
+
+        scope.save = function() {
+
+          scope.edit = false;
+          //ExperimentLoader.changeDeltaTemperature(scope.$parent);
         };
       }
     };
