@@ -12,7 +12,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents) {
 
     this.init = function(model) {
-      console.log(model);
+
+      console.log("controller", model);
       this.model = model.protocol;
       this.$scope = model;
       this.allStepViews = [];

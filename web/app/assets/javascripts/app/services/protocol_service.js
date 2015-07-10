@@ -54,25 +54,25 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
 
     this.addStage = function($scope, type) {
 
-      var id = $scope.stage.id;
-      var dataToBeSend = {
+      var id = $scope.stage.id,
+      dataToBeSend = {
         "prev_id": id,
         "stage": {
           'stage_type': type
         }
-      };
-      $.ajax({
-        url: "/protocols/"+protocolId+"/stages",
-        contentType: 'application/json',
-        type: 'POST',
-        data: JSON.stringify(dataToBeSend)
+      },
+      url = "/protocols/" + $scope.protocol.id + "/stages",
+      delay = $q.defer();
+
+      $http.post(url, dataToBeSend)
+      .success(function(data) {
+        delay.resolve(data);
       })
-      .done(function(data) {
-        fabricStageView.canvas.fire("modelChanged", data);
-      })
-      .fail(function() {
-        console.log("Failed to update");
+      .error(function(data) {
+        delay.reject(data);
       });
+
+      return delay.promise;
     };
 
     this.saveCycle = function($scope) {

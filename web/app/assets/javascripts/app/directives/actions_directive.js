@@ -21,22 +21,19 @@ window.ChaiBioTech.ngApp.directive('actions', [
         };
 
         scope.deleteStep = function() {
-          ExperimentLoader.deteStp(scope);
+          ExperimentLoader.deleteStep(scope)
+            .then(function(data) {
+              console.log("deleted");
+            });
         };
 
         scope.addStage = function(type) {
-          ExperimentLoader.addStage(scope, type);
+          ExperimentLoader.addStage(scope, type)
+            .then(function(data) {
+              console.log("stage added", data);
+            });
         };
 
-        scope.reloadAll = function() {
-          ExperimentLoader.getExperiment().then(function(data) {
-            scope.protocol = data.experiment;
-            scope.stage = ExperimentLoader.loadFirstStages();
-            scope.step = ExperimentLoader.loadFirstStep();
-            scope.$emit('general-data-ready');
-            canvas.init(scope);
-          });
-        };
       }
     };
   }
