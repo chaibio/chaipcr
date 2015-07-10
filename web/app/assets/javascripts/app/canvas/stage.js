@@ -14,6 +14,10 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.childSteps = [];
       this.previousStage = this.nextStagenull = this.noOfCycles = null;
 
+      this.addNewStep = function(data) {
+        console.log("On the way");
+      };
+
       this.getLeft = function() {
 
         if(this.previousStage) {
@@ -222,7 +226,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         this.manageBordersOnSelection("#cc6c00");
         this.manageFooter(true, "black", length);
       };
-      
+
 
     };
 
