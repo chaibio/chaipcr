@@ -5,6 +5,7 @@ window.ChaiBioTech.ngApp
   '$stateParams'
   'Experiment'
   ($scope, $stateParams, Experiment) ->
+
     Experiment.get {id: $stateParams.id}, (data) ->
       $scope.experiment = data.experiment
 ]
