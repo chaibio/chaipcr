@@ -1,0 +1,37 @@
+<div class="test-in-progress sansa">
+  <div class="test-in-progress-heading">
+    TEST IN PROGRESS: <span class="text-blue">RUNNIG MELT CURVE</span>
+  </div>
+  <div class="test-info">
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="caption">{{data.experiment.name}}</div>
+        <div>
+          STAGE {{data.experiment.stage.number}},
+          STEP {{data.experiment.step.number}}
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="caption">TIME REMAINING</div>
+        <div>
+          {{data.experiment.estimated_duration - data.experiment.run_duration | secondsDisplay:'display2'}}
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="caption">
+          Block Temp: <span class="normal-text">57.2 &deg;C</span>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="caption">
+          LId Temp: <span class="normal-text">57.2 &deg;C</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="test-progress-bar">
+    <div class="pro-bar" style="width: {{data.experiment.run_duration/data.experiment.estimated_duration*100}}%;"></div>
+  </div>
+</div>

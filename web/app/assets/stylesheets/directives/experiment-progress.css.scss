@@ -1,0 +1,32 @@
+
+// Experiment in progress starts here
+.experiment-in-progress-container {
+  width: 100%;
+  height: 110px;
+  font-size: 14px;
+
+  .experiment-in-progress {
+
+    .experiment-in-progress-heading {
+      border-bottom: solid 2px #001827;
+    }
+    .experiment-info {
+      .caption {
+        margin-top: 15px;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+    }
+    .experiment-progress-bar {
+      height: 5px;
+      background-color: black;
+
+      .pro-bar {
+        background-color: #00aeef;
+        height: 5px;
+        width: 0px;
+      }
+    }
+  }
+}

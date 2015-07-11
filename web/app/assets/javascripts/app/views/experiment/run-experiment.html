@@ -1,5 +1,5 @@
 <sidemenu left-menu-template="'app/views/experiment/left-menu.html'" data="experiment"></sidemenu>
-<div class="page-layout">
+<div class="page-layout run-experiment">
   <!-- header -->
   <div class="header">
     <div class="stripes-and-name">
@@ -15,6 +15,18 @@
   </div>
   <!-- content -->
   <div class="content">
-    <temperature-log-chart experiment-id="experiment.id"></temperature-log-chart>
+    <temperature-log-chart experiment-id="experiment.id" ng-show="chartTypeData.chartType === 'Thermal Profile'"></temperature-log-chart>
+    <div ng-show="chartTypeData.chartType === 'Amplification Chart'">
+      <h3>Show Amplification Chart here!</h3>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-md-8">
+        <choose-chart ng-model="chartTypeData"></choose-chart>
+      </div>
+      <div class="col-md-4 test-in-progress-container">
+        <test-in-progress experiment-id="experiment.id"></test-in-progress>
+      </div>
+    </div>
   </div>
 </div>
