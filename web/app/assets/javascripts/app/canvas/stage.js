@@ -15,7 +15,27 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.previousStage = this.nextStagenull = this.noOfCycles = null;
 
       this.addNewStep = function(data) {
-        console.log("On the way");
+
+        console.log("On the way", data);
+        this.myWidth = this.myWidth + 120;
+        this.stageRect.width = this.myWidth;
+
+        var currentStage = this;
+
+        while(currentStage.nextStage) {
+          currentStage.nextStage.getLeft();
+          currentStage.nextStage.stageGroup.set({left: currentStage.nextStage.left }).setCoords();
+
+          var thisStageSteps = currentStage.nextStage.childSteps, stepCount = thisStageSteps.length;
+
+          for(var i = 0; i < stepCount; i++ ) {
+            thisStageSteps[i].moveStep();
+          }
+
+          currentStage = currentStage.nextStage;
+        }
+        currentStage.borderRight.set({left: currentStage.myWidth + currentStage.left + 2 });
+        this.canvas.renderAll();
       };
 
       this.getLeft = function() {

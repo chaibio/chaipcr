@@ -15,11 +15,22 @@ window.ChaiBioTech.ngApp.factory('step', [
       this.previousStep = null;
       this.gatherDataDuringStep = this.model.collect_data;
       this.gatherDataDuringRamp = this.model.ramp.collect_data;
-      
+
       this.setLeft = function() {
 
         this.left = this.parentStage.left + 3 + (parseInt(this.index) * this.myWidth);
         return this;
+      };
+
+      this.moveStep = function() {
+
+        this.setLeft();
+        var leftVal = {left: this.left};
+        this.commonFooterImage.set(leftVal).setCoords();
+        this.darkFooterImage.set(leftVal).setCoords();
+        this.whiteFooterImage.set(leftVal).setCoords();
+
+        this.stepGroup.set({left: this.left }).setCoords();
       };
 
       this.addName = function() {
