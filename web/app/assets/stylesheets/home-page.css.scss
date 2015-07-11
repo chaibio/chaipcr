@@ -1,332 +1,292 @@
 //Home page styles start here
 .home-page-wrapper {
-	width: 1024px;
-	height: 768px;
+  width: 1024px;
+  height: 768px;
 
-	.home-page-left-wing {
-		float: left;
-		width: 632px;
-		height: 400px; //Just for now;
+  .home-page-left-wing {
+    float: left;
+    width: 632px;
+    height: 400px; //Just for now;
 
-		.left-wing-content {
-			width: 442px;
-			margin-top: 61px;
-			margin-left: 75px;
+    .left-wing-content {
+      width: 442px;
+      margin-top: 61px;
+      margin-left: 75px;
 
-			.home-page-logo {
-				width: 437px;
-				height: 74px;
-			}
+      .home-page-logo {
+        width: 437px;
+        height: 74px;
+      }
 
-			.home-page-menu {
-				margin-top: 65px;
-				height: 402px;
+      .home-page-menu {
+        margin-top: 65px;
+        height: 402px;
 
-				.menu-content {
-					border-bottom: solid 1px black;
-					height: 22px;
-					// HEading part
-					.menu-heading {
-						height: 100%;
+        .menu-content {
+          border-bottom: solid 1px black;
+          height: 22px;
+          // HEading part
+          .menu-heading {
+            height: 100%;
 
-						.welcome-text {
-							width: 200px;
-							float: left;
-							height: 100%;
-						}
-						.logout-text {
-							width:150px;
-							float: right;
-							text-align: right;
-							height: 100%;
+            .welcome-text {
+              width: 200px;
+              float: left;
+              height: 100%;
+            }
+            .logout-text {
+              width:150px;
+              float: right;
+              text-align: right;
+              height: 100%;
 
-							a {
-								color: #00aeef;
-								text-decoration: none;
-							}
-							a:hover {
-								background-color: white;
-							}
-						}
-					}
-					// Menu Items
-					.menu-items {
-						padding-top: 20px;
+              a {
+                color: #00aeef;
+                text-decoration: none;
+              }
+              a:hover {
+                background-color: white;
+              }
+            }
+          }
+          // Menu Items
+          .menu-items {
+            padding-top: 20px;
 
-						.menu-item {
-							height:58px;
+            .menu-item {
+              height:58px;
 
-							.first-row {
-								height: 30px;
+              .first-row {
+                height: 30px;
 
-								.menu-item-image {
-									width: 30px;
-									height: 30px;
-									float: left;
-									background-image: url("smallO.png");
-									margin-left: 24px;
-								}
-								.menu-item-text {
-									width: 300px;
-									float: left;
-									margin-left: 12px;
-									margin-top: 8px;
-									font-size: 22px;
-									cursor: pointer;
-								}
-							}
+                .menu-item-image {
+                  width: 30px;
+                  height: 30px;
+                  float: left;
+                  background-image: url("smallO.png");
+                  margin-left: 24px;
+                }
+                .menu-item-text {
+                  width: 300px;
+                  float: left;
+                  margin-left: 12px;
+                  margin-top: 8px;
+                  font-size: 22px;
+                  cursor: pointer;
+                }
+              }
 
-							.second-row {
-								height: 28px;
+              .second-row {
+                height: 28px;
 
-								.hand-container {
-									width: 100%;
+                .hand-container {
+                  width: 100%;
 
-									.hand {
-										width: 6px;
-										background-color: black;
-										height: 22px;
-										margin-left: 37px;
-										margin-top: 2px;									}
-								}
-							}
-						}
-						// When it bounce
-						.menu-item-bounce {
-							height:107px;
+                  .hand {
+                    width: 6px;
+                    background-color: black;
+                    height: 22px;
+                    margin-left: 37px;
+                    margin-top: 2px;                  }
+                }
+              }
+            }
+            // When it bounce
+            .menu-item-bounce {
+              height:107px;
 
-							.first-row {
-								height: 60px;
+              .first-row {
+                height: 60px;
 
-								.menu-item-image {
-									width: 60px;
-									height: 60px;
-									float: left;
-									background-image: url("bigO.png");
-									margin-left: 11px;
-								}
-								.menu-item-text {
-									width: 300px;
-									float: left;
-									margin-left: 12px;
-									margin-top: 22px;
-									font-size: 30px;
-									cursor: pointer;
-								}
-							}
+                .menu-item-image {
+                  width: 60px;
+                  height: 60px;
+                  float: left;
+                  background-image: url("bigO.png");
+                  margin-left: 11px;
+                }
+                .menu-item-text {
+                  width: 300px;
+                  float: left;
+                  margin-left: 12px;
+                  margin-top: 22px;
+                  font-size: 30px;
+                  cursor: pointer;
+                }
+              }
 
-							.second-row {
-								height: 32px;
+              .second-row {
+                height: 32px;
 
-								.hand-container {
-									width: 100%;
+                .hand-container {
+                  width: 100%;
 
-									.hand {
-										width: 6px;
-										background-color: black;
-										height: 32px;
-										margin-left: 37px;
-										margin-top: 5px;
-									}
-								}
-							}
-						}
-					}
+                  .hand {
+                    width: 6px;
+                    background-color: black;
+                    height: 32px;
+                    margin-left: 37px;
+                    margin-top: 5px;
+                  }
+                }
+              }
+            }
+          }
 
 
-				}
-			}
-			// Experiment in progress starts here
-			.experiment-in-progress-container {
-				width: 442px;
-				height: 110px;
-				font-size: 14px;
+        }
+      }
+    }
+  }
+  // Right Side of the home page
+  .home-page-right-wing {
+    float: left;
+    width: 341px;
+    padding-top: 54px;
 
-				.experiment-in-progress {
+    // Previous Experiment List Starts Here
+    .previous-experiment-container {
 
-					.experiment-in-progress-heading {
-						border-bottom: solid 2px #001827;
-					}
-					.experiment-info {
-						height: 80px;
-						padding-top: 25px;
+      .previous-experiment-heading {
+        border-bottom: solid 1px #001827;
+        height: 20px;
 
-						div {
-							float: left;
-						}
+        .text {
+          float: left;
+          width: 200px;
+          font-size: 14px;
+        }
+        .dots {
+          float: right;
+          color: orange;
+          font-weight: bold;
+          font-size: 14px;
+          cursor: pointer;
+        }
+      }
+      .all-experiments {
+        height: 680px;
+        overflow: scroll;
+        padding-top: 21px;
 
-						.caption {
-							font-weight: bold;
-							margin-bottom: 5px;
-						}
-						.experiment-info-test {
-							width: 280px;
-						}
+        .individual-experiment {
+          height: 72px;
 
-					}
-					.experiment-progress-bar {
-						height: 5px;
-						background-color: black;
+          .first-row {
+            height: 30px;
 
-						.pro-bar {
-							background-color: #00aeef;
-							height: 5px;
-							width: 0px;
-						}
-					}
-				}
-			}
-		}
-	}
-	// Right Side of the home page
-	.home-page-right-wing {
-		float: left;
-		width: 341px;
-		padding-top: 54px;
+            a:hover {
+              color: #000;
+              background-color: white;
+            }
+            div {
+              float: left;
+            }
+            .image {
+              background-image: url("smallblackO.png");
+              width: 30px;
+              height: 30px;
+            }
+            .dotordate {
+              float: right;
+              height: 30px;
+              width: 50px;
+              font-size: 9px;
+              text-align: center;
+              color: #00aeef;
+            }
+            .ball {
+              width: 8px;
+              height: 8px;
+              background-color: #898989;
+              -webkit-border-radius: 50%;
+              -moz-border-radius: 50%;
+              border-radius: 50%;
+              margin-top: 8px;
+              margin-left: 10px;
+            }
+            .image-red {
+              background-image: url("smallredO.png");
+              width: 30px;
+              height: 30px;
+            }
+            .text {
+              margin-left: 15px;
+              margin-top: 8px;
+              cursor: pointer;
+            }
+          }
+          .second-row {
+            height: 42px;
 
-		// Previous Experiment List Starts Here
-		.previous-experiment-container {
+            div {
+              float: left;
+            }
+            .hand-container {
+              width: 45px;
+              height: 42px;
 
-			.previous-experiment-heading {
-				border-bottom: solid 1px #001827;
-				height: 20px;
+              .hand {
+                width: 6px;
+                min-height: 32px;
+                background-color: #00aeef;
+                margin-left: 12px;
+                margin-top: 5px;
+                cursor: pointer;
+              }
+            }
+            .dotor {
+              float: right;
+              height: 30px;
+              width: 50px;
+            }
+            .ball {
+              width: 8px;
+              height: 8px;
+              background-color: #898989;
+              -webkit-border-radius: 50%;
+              -moz-border-radius: 50%;
+              border-radius: 50%;
+              margin-top: 5px;
+              margin-left: 10px;
+            }
+            .more-info {
+              font-size: 14px;
+            }
+          }
+          .confirm-box {
+            position: relative;
+            height: 45px;
+            width: 250px;
+            z-index: 100;
+            top: -70px;
+            left: 43px;
+            background-color: white;
+            text-align: center;
+            display: none;
+            font-size: 14px;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            border: solid 1px #a61300;
+            font-size: 14px;
 
-				.text {
-					float: left;
-					width: 200px;
-					font-size: 14px;
-				}
-				.dots {
-					float: right;
-					color: orange;
-					font-weight: bold;
-					font-size: 14px;
-					cursor: pointer;
-				}
-			}
-			.all-experiments {
-				height: 680px;
-				overflow: scroll;
-				padding-top: 21px;
+            button {
+              font-size: 12px;
+              width: 40px;
+              height: 22px;
+              margin-top: 2px;
+            }
 
-				.individual-experiment {
-					height: 72px;
-
-					.first-row {
-						height: 30px;
-
-						a:hover {
-							color: #000;
-							background-color: white;
-						}
-						div {
-							float: left;
-						}
-						.image {
-							background-image: url("smallblackO.png");
-							width: 30px;
-							height: 30px;
-						}
-						.dotordate {
-							float: right;
-							height: 30px;
-							width: 50px;
-							font-size: 9px;
-							text-align: center;
-							color: #00aeef;
-						}
-						.ball {
-							width: 8px;
-							height: 8px;
-							background-color: #898989;
-							-webkit-border-radius: 50%;
-							-moz-border-radius: 50%;
-							border-radius: 50%;
-							margin-top: 8px;
-							margin-left: 10px;
-						}
-						.image-red {
-							background-image: url("smallredO.png");
-							width: 30px;
-							height: 30px;
-						}
-						.text {
-							margin-left: 15px;
-							margin-top: 8px;
-							cursor: pointer;
-						}
-					}
-					.second-row {
-						height: 42px;
-
-						div {
-							float: left;
-						}
-						.hand-container {
-							width: 45px;
-							height: 42px;
-
-							.hand {
-								width: 6px;
-								min-height: 32px;
-								background-color: #00aeef;
-								margin-left: 12px;
-								margin-top: 5px;
-								cursor: pointer;
-							}
-						}
-						.dotor {
-							float: right;
-							height: 30px;
-							width: 50px;
-						}
-						.ball {
-							width: 8px;
-							height: 8px;
-							background-color: #898989;
-							-webkit-border-radius: 50%;
-							-moz-border-radius: 50%;
-							border-radius: 50%;
-							margin-top: 5px;
-							margin-left: 10px;
-						}
-						.more-info {
-							font-size: 14px;
-						}
-					}
-					.confirm-box {
-						position: relative;
-						height: 45px;
-						width: 250px;
-						z-index: 100;
-						top: -70px;
-						left: 43px;
-						background-color: white;
-						text-align: center;
-						display: none;
-						font-size: 14px;
-						-webkit-border-radius: 5px;
-						-moz-border-radius: 5px;
-						border-radius: 5px;
-						border: solid 1px #a61300;
-						font-size: 14px;
-
-						button {
-							font-size: 12px;
-							width: 40px;
-							height: 22px;
-							margin-top: 2px;
-						}
-
-						.no-delete {
-							color: #00aeef;
-						}
-						.yes-delete {
-							color: #a61300;
-						}
-					}
-				}
-			}
-		}
-	}
+            .no-delete {
+              color: #00aeef;
+            }
+            .yes-delete {
+              color: #a61300;
+            }
+          }
+        }
+      }
+    }
+  }
 }
