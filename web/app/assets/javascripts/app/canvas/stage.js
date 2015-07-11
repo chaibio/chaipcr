@@ -18,14 +18,16 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
         console.log("On the way", data);
         this.myWidth = this.myWidth + 120;
-        this.stageRect.width = this.myWidth;
+        this.stageRect.setWidth(this.myWidth);
+        this.stageRect.setCoords();
+        this.roof.setWidth(this.myWidth - 4);
 
         var currentStage = this;
 
         while(currentStage.nextStage) {
+
           currentStage.nextStage.getLeft();
           currentStage.nextStage.stageGroup.set({left: currentStage.nextStage.left }).setCoords();
-
           var thisStageSteps = currentStage.nextStage.childSteps, stepCount = thisStageSteps.length;
 
           for(var i = 0; i < stepCount; i++ ) {
@@ -50,8 +52,8 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
       this.addRoof = function() {
 
-        this.roof = new fabric.Line([0, 0, (this.myWidth - 4), 0], {
-            stroke: 'white',  left: 0,  top: 40,  strokeWidth: 2, selectable: false
+        this.roof = new fabric.Line([0, 40, (this.myWidth - 4), 40], {
+            stroke: 'white', strokeWidth: 2, selectable: false
           }
         );
 
