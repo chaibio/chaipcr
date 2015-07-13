@@ -50,7 +50,7 @@ private:
     void process();
     void stop();
 
-    void createExperiment(Experiment &experiment);
+    bool getExperimentDefination(Experiment &experiment);
     Protocol* getProtocol(int experimentId);
     std::vector<Stage> getStages(int protocolId);
     std::vector<StageComponent> getStageComponents(int stageId);
