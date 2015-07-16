@@ -14,9 +14,10 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.childSteps = [];
       this.previousStage = this.nextStagenull = this.noOfCycles = null;
 
-      this.addNewStep = function(data) {
+      this.addNewStep = function(data, currentStep) {
 
         console.log("On the way", data);
+
         this.myWidth = this.myWidth + 120;
         this.stageRect.setWidth(this.myWidth);
         this.stageRect.setCoords();
@@ -36,8 +37,68 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
           currentStage = currentStage.nextStage;
         }
-        currentStage.borderRight.set({left: currentStage.myWidth + currentStage.left + 2 });
+
+        currentStage.borderRight.set({left: currentStage.myWidth + currentStage.left + 2 }).setCoords();
+        // Now insert new step;
+        var start = currentStep.index;
+
+        var newStep = new step(data.step, this, start);
+        newStep.name = "I am created";
+        newStep.render();
+        newStep.addImages();
+        newStep.ordealStatus = currentStep.ordealStatus;
+
+        this.childSteps.splice(start + 1, 0, newStep);
+
+        //console.log(this.childSteps);
+
+        for(var j = start + 1; j < this.childSteps.length; j++) {
+
+          var thisStep = this.childSteps[j];
+          thisStep.index = thisStep.index + 1;
+          thisStep.model.name = "STEP " + (thisStep.index + 1);
+          thisStep.stepName.text = thisStep.model.name;
+          thisStep.moveStep();
+        }
+        //console.log(this.childSteps);
+        //newStep.circle.manageClick(true);
+        //console.log(this.childSteps, "b");
+        /*var newStep = new step(data.step, this, start);
+        newStep.ordealStatus = start + 1;
+        this.childSteps.splice(start, 0, newStep);*/
+
+        if(this.childSteps[newStep.index + 1]) {
+          newStep.nextStep = this.childSteps[newStep.index + 1];
+          newStep.nextStep.previousStep = newStep;
+        }
+
+        if(this.childSteps[newStep.index - 1]) {
+          newStep.previousStep = this.childSteps[newStep.index - 1];
+          newStep.previousStep.nextStep = newStep;
+        }
+
+        //console.log(this.childSteps, "a");
+
+        //var indexInallSteps = this.getIndexFromAllSteps(newStep.uniqueName);
+        this.parent.allStepViews.splice(currentStep.ordealStatus, 0, newStep);
+        //console.log(indexInallSteps, "Wpppppp", this.parent.allStepViews, newStep.ordealStatus);
+
+
+
+        // insert it to all steps , add next and previous , rerender circles;
+        //console.log(newStep);
+        this.parent.addRampLinesAndCircles();
         this.canvas.renderAll();
+      };
+
+      this.getIndexFromAllSteps = function(name) {
+        var length = this.parent.allStepViews.length;
+
+        for(var i = 0; i < length; i++) {
+          if(name === this.parent.allStepViews[i].uniqueName) {
+            return i;
+          }
+        }
       };
 
       this.getLeft = function() {
@@ -218,6 +279,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.manageFooter = function(visible, color, length) {
 
         for(var i = 0; i< length; i++) {
+          //console.log(i, this.childSteps[i]);
             this.childSteps[i].commonFooterImage.setVisible(visible);
             this.childSteps[i].stepName.setFill(color);
         }
@@ -248,7 +310,6 @@ window.ChaiBioTech.ngApp.factory('stage', [
         this.manageBordersOnSelection("#cc6c00");
         this.manageFooter(true, "black", length);
       };
-
 
     };
 

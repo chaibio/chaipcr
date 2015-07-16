@@ -22,15 +22,48 @@ window.ChaiBioTech.ngApp.factory('step', [
         return this;
       };
 
+      this.addImages = function(count) {
+        var can = this.parentStage.parent;
+
+        this.commonFooterImage = can.applyPropertyToImages($.extend({}, can.imageobjects["common-step.png"]), this);
+        can.canvas.add(this.commonFooterImage);
+
+        this.darkFooterImage = can.applyPropertyToImages($.extend({}, can.imageobjects["black-footer.png"]), this);
+        can.canvas.add(this.darkFooterImage);
+
+        this.whiteFooterImage = can.applyPropertyToImages($.extend({}, can.imageobjects["orange-footer.png"]), this);
+        this.whiteFooterImage.top = 363;
+        this.whiteFooterImage.left = this.left;
+        can.canvas.add(this.whiteFooterImage);
+
+        this.circle.gatherDataImage = $.extend({}, can.imageobjects["gather-data.png"]);
+        this.circle.gatherDataImage.originX = "center";
+        this.circle.gatherDataImage.originY = "center";
+
+        this.circle.gatherDataImageOnMoving = $.extend({}, can.imageobjects["gather-data-image.png"]);
+        this.circle.gatherDataImageOnMoving.originX = "center";
+        this.circle.gatherDataImageOnMoving.originY = "center";
+
+        this.circle.gatherDataImageMiddle = $.extend({}, can.imageobjects["gather-data.png"]);
+        this.circle.gatherDataImageMiddle.originX = "center";
+        this.circle.gatherDataImageMiddle.originY = "center";
+        this.circle.gatherDataImageMiddle.setVisible(false);
+
+      };
+
       this.moveStep = function() {
 
         this.setLeft();
+        this.getUniqueName();
         var leftVal = {left: this.left};
         this.commonFooterImage.set(leftVal).setCoords();
         this.darkFooterImage.set(leftVal).setCoords();
         this.whiteFooterImage.set(leftVal).setCoords();
-
         this.stepGroup.set({left: this.left }).setCoords();
+
+        this.ordealStatus = this.ordealStatus + 1;
+
+        this.circle.moveCircle();
       };
 
       this.addName = function() {

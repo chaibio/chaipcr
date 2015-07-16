@@ -2,6 +2,7 @@ window.ChaiBioTech.ngApp.factory('path', [
   'constants',
   function(constants) {
     return function(parent) {
+
       var x1 = parent.left + 60, y1 = parent.top,
       x2 = parent.next.left + 60, y2 = parent.next.top;
 

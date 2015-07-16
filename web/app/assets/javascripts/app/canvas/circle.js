@@ -54,12 +54,17 @@ window.ChaiBioTech.ngApp.factory('circle', [
         return this;
       };
 
+      this.moveCircle = function() {
+        this.getLeft();
+        this.getTop();
+      };
       /*******************************************
         This method shows circles and gather data. Pease note
         this method is invoked from canvas.js once all the stage/step are loaded.
       ********************************************/
       this.getCircle = function() {
 
+        this.stepDataGroup.set({"left": this.left + 60}).setCoords();
         this.canvas.add(this.stepDataGroup);
 
         this.gatherDataOnScroll = new gatherDataGroupOnScroll(
@@ -67,6 +72,8 @@ window.ChaiBioTech.ngApp.factory('circle', [
             this.gatherDataCircleOnScroll = new gatherDataCircleOnScroll(),
             this.gatherDataImageOnMoving
           ], this);
+
+        this.circleGroup.set({"left": this.left + 60}).setCoords();
 
         this.circleGroup.add(this.gatherDataImageMiddle);
         this.circleGroup.add(this.gatherDataOnScroll);
@@ -78,6 +85,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
             this.gatherDataImage
           ], this);
 
+        this.gatherDataGroup.set({"left": this.left + 60}).setCoords();
         this.canvas.add(this.gatherDataGroup);
         this.showHideGatherData(this.parent.gatherDataDuringStep);
         this.gatherDataGroup.visible = this.parent.gatherDataDuringRamp;

@@ -17,7 +17,7 @@ window.ChaiBioTech.ngApp.directive('actions', [
               console.log(data);
               //scope.reloadAll();
               //Now create a new step and insert it...!
-              scope.fabricStep.parentStage.addNewStep(data);
+              scope.fabricStep.parentStage.addNewStep(data, scope.fabricStep);
             });
         };
 
