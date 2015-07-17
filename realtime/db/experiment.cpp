@@ -37,8 +37,8 @@ Experiment::Experiment(const Experiment &other)
 }
 
 Experiment::Experiment(Experiment &&other)
-    :Experiment(other._definationId)
 {
+    _definationId = other._definationId;
     _id = other._id;
     _name = std::move(other._name);
     _startedAt = other._startedAt;
