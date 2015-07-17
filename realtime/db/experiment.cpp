@@ -14,10 +14,10 @@ Experiment::Experiment()
     _protocol = nullptr;
 }
 
-Experiment::Experiment(int definationId)
+Experiment::Experiment(int id, int definationId)
 {
     _definationId = definationId;
-    _id = -1;
+    _id = id;
     _startedAt = boost::posix_time::not_a_date_time;
     _completedAt = boost::posix_time::not_a_date_time;
     _completionStatus = None;

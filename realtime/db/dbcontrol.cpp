@@ -72,40 +72,56 @@ Experiment DBControl::getExperiment(int id)
 
     std::unique_lock<std::mutex> lock(_readMutex);
     {
-        *_readSession << "SELECT * FROM experiment_definitions WHERE id = " << id, soci::into(result);
+        *_readSession << "SELECT * FROM experiments WHERE id = " << id, soci::into(result);
         gotData = _readSession->got_data();
     }
     lock.unlock();
 
-    if (!gotData || result.get_indicator("id") == soci::i_null)
+    if (!gotData || result.get_indicator("id") == soci::i_null || result.get_indicator("experiment_definition_id") == soci::i_null)
         return Experiment();
 
-    Experiment experiment(id);
+    Experiment experiment(id, result.get<int>("experiment_definition_id"));
 
-    if (result.get_indicator("name") != soci::i_null)
-        experiment.setName(result.get<std::string>("name"));
+    if (getExperimentDefination(experiment))
+    {
+        experiment.setProtocol(getProtocol(id));
 
-    createExperiment(experiment);
-
-    experiment.setProtocol(getProtocol(id));
-
-    return experiment;
+        return experiment;
+    }
+    else
+        return Experiment();
 }
 
-void DBControl::createExperiment(Experiment &experiment)
+bool DBControl::getExperimentDefination(Experiment &experiment)
 {
-    int id = 0;
-
-    std::unique_lock<std::mutex> lock(_writeMutex);
+    if (experiment.definationId() != -1)
     {
-        *_writeSession << "INSERT INTO experiments(created_at, experiment_definition_id) VALUES(:created_at, :experiment_definition_id)",
-                soci::use(boost::posix_time::second_clock::local_time()), soci::use(experiment.definationId());
+        bool gotData = false;
+        soci::row result;
 
-        *_writeSession << "SELECT LAST_INSERT_ID()", soci::into(id); //LAST_INSERT_ID is MySQL function
+        std::unique_lock<std::mutex> lock(_readMutex);
+        {
+            *_readSession << "SELECT * FROM experiment_definitions WHERE id = " << experiment.definationId(), soci::into(result);
+            gotData = _readSession->got_data();
+        }
+        lock.unlock();
+
+        if (!gotData || result.get_indicator("id") == soci::i_null)
+        {
+            std::cout << "DBControl::getExperimentDefination - unable to find experiment with definationId " << experiment.definationId() << '\n';
+
+            experiment.setDefinationId(-1);
+
+            return false;
+        }
+
+        if (result.get_indicator("name") != soci::i_null)
+            experiment.setName(result.get<std::string>("name"));
+
+        return true;
     }
-    lock.unlock();
 
-    experiment.setId(id);
+    return false;
 }
 
 Protocol* DBControl::getProtocol(int experimentId)
