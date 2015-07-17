@@ -28,9 +28,8 @@ Experiment::Experiment(int id, int definationId)
 }
 
 Experiment::Experiment(const Experiment &other)
-    :Experiment(other.definationId())
+    :Experiment(other.id(), other.definationId())
 {
-    setId(other.id());
     setName(other.name());
     setStartedAt(other.startedAt());
     setCompletedAt(other.completedAt());
@@ -74,7 +73,7 @@ Experiment::~Experiment()
 
 Experiment& Experiment::operator= (const Experiment &other)
 {
-    _definationId = other.definationId();
+    setDefinationId(other.definationId());
     setId(other.id());
     setName(other.name());
     setStartedAt(other.startedAt());
