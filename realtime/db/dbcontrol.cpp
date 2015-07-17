@@ -84,7 +84,7 @@ Experiment DBControl::getExperiment(int id)
 
     if (getExperimentDefination(experiment))
     {
-        experiment.setProtocol(getProtocol(id));
+        experiment.setProtocol(getProtocol(experiment.definationId()));
 
         return experiment;
     }

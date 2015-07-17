@@ -15,16 +15,10 @@ Experiment::Experiment()
 }
 
 Experiment::Experiment(int id, int definationId)
+    :Experiment()
 {
     _definationId = definationId;
     _id = id;
-    _startedAt = boost::posix_time::not_a_date_time;
-    _completedAt = boost::posix_time::not_a_date_time;
-    _completionStatus = None;
-    _estimatedDuration = 0;
-    _pausedDuration = 0;
-    _lastPauseTime = boost::posix_time::not_a_date_time;
-    _protocol = nullptr;
 }
 
 Experiment::Experiment(const Experiment &other)

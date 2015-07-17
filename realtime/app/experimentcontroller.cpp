@@ -57,7 +57,7 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
 
     Experiment experiment = _dbControl->getExperiment(experimentId);
 
-    if (experiment.id() == -1 || !experiment.protocol())
+    if (experiment.empty() || !experiment.protocol())
         return ExperimentNotFound;
     else if (experiment.startedAt() != boost::posix_time::not_a_date_time)
         return ExperimentUsed;
