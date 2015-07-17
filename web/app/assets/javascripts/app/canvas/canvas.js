@@ -186,10 +186,17 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         if(i < (limit - 1)) {
           if(thisCircle.curve) {
             this.canvas.remove(thisCircle.curve);
-            delete(thisCircle.curve);
+            //thisCircle.realign();
+            //this.canvas.bringToFront(thisCircle.previous.curve);
+            //delete(thisCircle.curve);
           }
             thisCircle.curve = new path(thisCircle);
             this.canvas.add(thisCircle.curve);
+            /*if(thisCircle.previous) {
+              this.canvas.remove(thisCircle.previous.curve);
+              thisCircle.previous.curve = new path(thisCircle.previous);
+              this.canvas.add(thisCircle.previous.curve);
+            }*/
 
           this.canvas.bringToFront(thisCircle.parent.rampSpeedGroup);
           if(thisCircle.previous) {

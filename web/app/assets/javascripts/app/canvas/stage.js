@@ -60,6 +60,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
           thisStep.stepName.text = thisStep.model.name;
           thisStep.moveStep();
         }
+
         //console.log(this.childSteps);
         //newStep.circle.manageClick(true);
         //console.log(this.childSteps, "b");
@@ -77,6 +78,11 @@ window.ChaiBioTech.ngApp.factory('stage', [
           newStep.previousStep.nextStep = newStep;
         }
 
+        if(newStep.index === this.childSteps.length - 1) {
+          console.log("got inside");
+          newStep.borderRight.setVisible(false);
+          newStep.previousStep.borderRight.setVisible(true);
+        }
         //console.log(this.childSteps, "a");
 
         //var indexInallSteps = this.getIndexFromAllSteps(newStep.uniqueName);
@@ -88,6 +94,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         // insert it to all steps , add next and previous , rerender circles;
         //console.log(newStep);
         this.parent.addRampLinesAndCircles();
+        newStep.circle.manageClick(true);
         this.canvas.renderAll();
       };
 

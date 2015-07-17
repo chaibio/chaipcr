@@ -287,7 +287,31 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.parent.adjustRampSpeedPlacing();
       };
 
-      this.manageClick = function(starting) {
+      this.realign = function() {
+
+        var x1 = this.left + 60, y1 = this.top,
+        x2 = this.next.left + 60, y2 = this.next.top;
+
+        var midPointX = (x1 + x2) / 2,
+        midPointY = (y1 + y2) / 2;
+
+        this.curve.path[0][1] = x1;
+        this.curve.path[0][2] = y1;
+
+        this.curve.path[1][1] = x1 + this.controlDistance;
+        this.curve.path[1][2] = y1;
+
+        this.curve.path[1][3] = midPointX;
+        this.curve.path[1][4] = midPointY;
+
+        this.curve.path[2][1] = x2 - this.controlDistance;
+        this.curve.path[2][2] = y2;
+
+        this.curve.path[2][3] = x2;
+        this.curve.path[2][4] = y2;
+      };
+
+      this.manageClick = function() {
 
         this.makeItBig();
         this.parent.parentStage.selectStage();
