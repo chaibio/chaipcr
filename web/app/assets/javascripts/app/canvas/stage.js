@@ -16,7 +16,8 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
       this.addNewStep = function(data, currentStep) {
 
-        this.myWidth = this.myWidth + 121;
+        var width = (currentStep.index === this.childSteps.length - 1) ? 121 : 120;
+        this.myWidth = this.myWidth + width;
         this.stageRect.setWidth(this.myWidth);
 
         this.roof.setWidth(this.myWidth - 4);
@@ -78,6 +79,8 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
         if(newStep.index === this.childSteps.length - 1) {
           console.log("got inside");
+
+
           newStep.borderRight.setVisible(false);
           newStep.previousStep.borderRight.setVisible(true);
         }
