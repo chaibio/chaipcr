@@ -9,18 +9,16 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.model = model;
       this.index = index;
       this.canvas = stage;
-      this.myWidth = this.model.steps.length * 120;
+      this.myWidth = (this.model.steps.length * 120);
       this.parent = fabricStage;
       this.childSteps = [];
       this.previousStage = this.nextStagenull = this.noOfCycles = null;
 
       this.addNewStep = function(data, currentStep) {
 
-        console.log("On the way", data);
-
-        this.myWidth = this.myWidth + 120;
+        this.myWidth = this.myWidth + 121;
         this.stageRect.setWidth(this.myWidth);
-        this.stageRect.setCoords();
+
         this.roof.setWidth(this.myWidth - 4);
 
         var currentStage = this;
