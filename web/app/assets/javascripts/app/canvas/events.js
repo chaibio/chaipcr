@@ -24,15 +24,13 @@ window.ChaiBioTech.ngApp.factory('events', [
           case "stepGroup":
             me = evt.target.me;
             me.circle.manageClick();
-            //appRouter.editStageStep.trigger("stepSelected", me);
-            $scope.applyValues(me.circle);
+            $scope.applyValuesFromOutSide(me.circle);
           break;
 
           case "controlCircleGroup":
             me = evt.target.me;
             me.manageClick();
-            //appRouter.editStageStep.trigger("stepSelected", me.parent);
-            $scope.applyValues(me);
+            $scope.applyValuesFromOutSide(me);
           break;
 
           case "moveStepImage":

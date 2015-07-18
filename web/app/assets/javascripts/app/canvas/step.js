@@ -170,7 +170,7 @@ window.ChaiBioTech.ngApp.factory('step', [
       };
 
       this.manageBorder = function(color) {
-        console.log(this.parentStage.childSteps.length -1 , this.index);
+        //console.log(this.parentStage.childSteps.length -1 , this.index, this.uniqueName);
         //if(this.borderRight.visible === false) { // Means this is the last step in the stage
         if(this.parentStage.childSteps.length - 1 === this.index) {
 

@@ -60,12 +60,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
           thisStep.moveStep();
         }
 
-        //console.log(this.childSteps);
-        //newStep.circle.manageClick(true);
-        //console.log(this.childSteps, "b");
-        /*var newStep = new step(data.step, this, start);
-        newStep.ordealStatus = start + 1;
-        this.childSteps.splice(start, 0, newStep);*/
+        
 
         if(this.childSteps[newStep.index + 1]) {
           newStep.nextStep = this.childSteps[newStep.index + 1];
@@ -95,7 +90,11 @@ window.ChaiBioTech.ngApp.factory('stage', [
         // insert it to all steps , add next and previous , rerender circles;
         //console.log(newStep);
         this.parent.addRampLinesAndCircles();
+
+        $scope.applyValues(newStep.circle);
+
         newStep.circle.manageClick(true);
+
         this.canvas.renderAll();
       };
 
