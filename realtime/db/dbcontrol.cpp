@@ -84,7 +84,7 @@ Experiment DBControl::getExperiment(int id)
 
     if (getExperimentDefination(experiment))
     {
-        experiment.setProtocol(getProtocol(id));
+        experiment.setProtocol(getProtocol(experiment.definationId()));
 
         return experiment;
     }
@@ -188,7 +188,7 @@ std::vector<Stage> DBControl::getStages(int protocolId)
         if (stage.name().empty())
         {
             std::stringstream stream;
-            stream << "Stage " << stage.orderNumber();
+            stream << "Stage " << (stage.orderNumber() + 1);
 
             stage.setName(stream.str());
         }
@@ -268,7 +268,7 @@ std::vector<Step> DBControl::getSteps(int stageId)
         if (step.name().empty())
         {
             std::stringstream stream;
-            stream << "Step " << step.orderNumber();
+            stream << "Step " << (step.orderNumber() + 1);
 
             step.setName(stream.str());
         }

@@ -49,14 +49,7 @@ window.ChaiBioTech.ngApp.directive('arrow', [
             scope.applyValues(circle);
           }
         };
-
-        scope.applyValues = function(circle) {
-          scope.$apply(function() {
-            scope.step = circle.parent.model;
-            scope.stage = circle.parent.parentStage.model;
-            scope.fabricStep = circle.parent;
-          });
-        };
+        
       }
     };
   }

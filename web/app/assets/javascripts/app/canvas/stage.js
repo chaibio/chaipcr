@@ -9,18 +9,17 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.model = model;
       this.index = index;
       this.canvas = stage;
-      this.myWidth = this.model.steps.length * 120;
+      this.myWidth = (this.model.steps.length * 120);
       this.parent = fabricStage;
       this.childSteps = [];
       this.previousStage = this.nextStagenull = this.noOfCycles = null;
 
       this.addNewStep = function(data, currentStep) {
 
-        console.log("On the way", data);
-
-        this.myWidth = this.myWidth + 120;
+        var width = (currentStep.index === this.childSteps.length - 1) ? 121 : 120;
+        this.myWidth = this.myWidth + width;
         this.stageRect.setWidth(this.myWidth);
-        this.stageRect.setCoords();
+
         this.roof.setWidth(this.myWidth - 4);
 
         var currentStage = this;
@@ -61,12 +60,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
           thisStep.moveStep();
         }
 
-        //console.log(this.childSteps);
-        //newStep.circle.manageClick(true);
-        //console.log(this.childSteps, "b");
-        /*var newStep = new step(data.step, this, start);
-        newStep.ordealStatus = start + 1;
-        this.childSteps.splice(start, 0, newStep);*/
+        
 
         if(this.childSteps[newStep.index + 1]) {
           newStep.nextStep = this.childSteps[newStep.index + 1];
@@ -80,6 +74,8 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
         if(newStep.index === this.childSteps.length - 1) {
           console.log("got inside");
+
+
           newStep.borderRight.setVisible(false);
           newStep.previousStep.borderRight.setVisible(true);
         }
@@ -94,7 +90,11 @@ window.ChaiBioTech.ngApp.factory('stage', [
         // insert it to all steps , add next and previous , rerender circles;
         //console.log(newStep);
         this.parent.addRampLinesAndCircles();
+
+        $scope.applyValues(newStep.circle);
+
         newStep.circle.manageClick(true);
+
         this.canvas.renderAll();
       };
 

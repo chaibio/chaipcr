@@ -9,6 +9,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
     $scope.step = {};
 
     $scope.initiate = function() {
+
       ExperimentLoader.getExperiment()
         .then(function(data) {
           $scope.protocol = data.experiment;
@@ -20,6 +21,22 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
     };
 
     $scope.initiate();
+
+    $scope.applyValuesFromOutSide = function(circle) {
+      // when the event or function call is initiated from non anular part of the app ... !!
+      $scope.$apply(function() {
+        $scope.step = circle.parent.model;
+        $scope.stage = circle.parent.parentStage.model;
+        $scope.fabricStep = circle.parent;
+      });
+    };
+
+    $scope.applyValues = function(circle) {
+
+      $scope.step = circle.parent.model;
+      $scope.stage = circle.parent.parentStage.model;
+      $scope.fabricStep = circle.parent;
+    };
 
   }
 ]);
