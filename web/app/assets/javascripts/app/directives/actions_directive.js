@@ -24,7 +24,8 @@ window.ChaiBioTech.ngApp.directive('actions', [
         scope.deleteStep = function() {
           ExperimentLoader.deleteStep(scope)
             .then(function(data) {
-              console.log("deleted");
+              console.log("deleted", data);
+              scope.fabricStep.parentStage.deleteStep(data, scope.fabricStep);
             });
         };
 
