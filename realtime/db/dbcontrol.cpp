@@ -1,6 +1,7 @@
 #include "dbincludes.h"
 #include "sociincludes.h"
 #include "qpcrapplication.h"
+#include "experimentcontroller.h"
 
 #define DATABASE_ADDRESS "host=localhost db=chaipcr user=root"
 #define DATABASE_LOCKED_TRY_COUNT 3
@@ -52,9 +53,13 @@ void DBControl::process()
                 write(statements);
             }
         }
+        catch (const std::exception &ex)
+        {
+            qpcrApp.stopExperiment(ex.what());
+        }
         catch (...)
         {
-            qpcrApp.setException(std::current_exception());
+            qpcrApp.stopExperiment("DBControl::process - unknown error upon writing to the database");
         }
     }
 }
