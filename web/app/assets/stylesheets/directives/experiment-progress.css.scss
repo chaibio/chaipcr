@@ -5,29 +5,29 @@
   height: 110px;
   font-size: 14px;
 
-  // .experiment-in-progress {
-  // }
-
-  .experiment-in-progress-heading {
-    border-bottom: solid 2px #001827;
-  }
-
-  .experiment-info {
-    .caption {
-      margin-top: 15px;
-      font-weight: bold;
-      margin-bottom: 5px;
+  .experiment-in-progress {
+    .experiment-in-progress-heading {
+      border-bottom: solid 2px #001827;
     }
 
-  }
-  .experiment-progress-bar {
-    height: 5px;
-    background-color: black;
+    .experiment-info {
+      .caption {
+        margin-top: 15px;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
 
-    .pro-bar {
-      background-color: #00aeef;
+    }
+    .experiment-progress-bar {
       height: 5px;
-      width: 0px;
+      background-color: black;
+
+      .pro-bar {
+        background-color: #00aeef;
+        height: 5px;
+        width: 0px;
+      }
     }
   }
+
 }

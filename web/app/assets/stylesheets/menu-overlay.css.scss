@@ -127,41 +127,6 @@
       color: white;
       margin-top: 130px;
       margin-left: 42px;
-
-      .experiment-in-progress {
-
-        .experiment-in-progress-heading {
-          text-align: center;
-          border-bottom: solid 2px white;
-        }
-        .experiment-info {
-          height: 80px;
-          padding-top: 25px;
-
-          div {
-            float: left;
-          }
-
-          .caption {
-            font-weight: bold;
-            margin-bottom: 5px;
-          }
-          .experiment-info-test {
-            width: 220px;
-          }
-
-        }
-        .experiment-progress-bar {
-          height: 5px;
-          background-color: #106aa9;
-
-          .pro-bar {
-            background-color: white;
-            height: 5px;
-            width: 0px;
-          }
-        }
-      }
     }
 
 
