@@ -4,24 +4,13 @@ window.ChaiBioTech.ngApp
   ->
     @getSecondsComponents = (secs) ->
       secs = Math.round secs
-      days = 0
-      hours = 0
-      mins = 0
-      seconds = 0
-      for sec in [0...secs] by 1
-        ++ seconds
 
-        if seconds is 60
-          ++ mins
-          seconds = 0
-
-        if mins is 60
-          ++ hours
-          mins = 0
-
-        if hours is 24
-          ++ days
-          hours = 0
+      mins = Math.floor(secs / 60);
+      seconds = secs - mins * 60;
+      hours = Math.floor(mins/60);
+      mins = mins - hours * 60
+      days = Math.floor hours/24
+      hours = hours - days * 24
 
       days: days
       hours: hours
