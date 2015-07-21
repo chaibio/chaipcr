@@ -1,8 +1,9 @@
 <div class="experiment-in-progress sansa">
   <div class="experiment-in-progress-heading">
-    EXPERIMENT IN PROGRESS
+    <span ng-show="expController.expriment">EXPERIMENT IN PROGRESS</span>
+    <span ng-show="!expController.expriment">No experiment running</span>
   </div>
-  <div class="experiment-info">
+  <div class="experiment-info" ng-show="expController.expriment">
     <div class="row">
       <div class="col-sm-8">
         <div class="caption">{{expController.expriment.name}}</div>
