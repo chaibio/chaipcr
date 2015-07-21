@@ -386,8 +386,6 @@ void ExperimentController::holdStepCallback(Poco::Timer &)
 
 void ExperimentController::startLogging()
 {
-    addLogCallback(*_logTimer);
-
     _logTimer->setPeriodicInterval(kTemperatureLoggerInterval);
     _logTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::addLogCallback));
 }
