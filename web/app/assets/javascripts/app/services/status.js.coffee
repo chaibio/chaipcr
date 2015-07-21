@@ -5,9 +5,11 @@ window.ChaiBioTech.ngApp
   '$q'
   ($http, $q) ->
 
+    hostname = window.location.hostname
+
     @fetch = ->
       deferred = $q.defer()
-      $http.get('http://localhost\:8000/status')
+      $http.get("http://#{hostname}\:8000/status")
       .success (data) ->
         deferred.resolve data
 
