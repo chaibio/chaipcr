@@ -1,3 +1,4 @@
+window.ChaiBioTech.app.selectedCircle = null;
 window.ChaiBioTech.ngApp.factory('circle', [
   'ExperimentLoader',
   '$rootScope',
@@ -319,8 +320,9 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         if(ChaiBioTech.app.selectedCircle) {
           var previousSelected = ChaiBioTech.app.selectedCircle;
-
+          console.log("at this place", previousSelected.uniqueName, this.uniqueName);
           if(previousSelected.uniqueName != this.uniqueName) {
+
             previousSelected.makeItSmall();
           }
         }

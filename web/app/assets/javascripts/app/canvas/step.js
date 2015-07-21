@@ -62,7 +62,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.stepGroup.set({left: this.left }).setCoords();
 
         this.ordealStatus = this.ordealStatus + 1;
-
+        this.circle.getUniqueId();
         this.circle.moveCircle();
       };
 

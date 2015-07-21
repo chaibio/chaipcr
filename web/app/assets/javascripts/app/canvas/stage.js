@@ -36,6 +36,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         this.parent.addRampLinesAndCircles();
 
         $scope.applyValues(newStep.circle);
+        //ChaiBioTech.app.selectedCircle = newStep.circle;
         newStep.circle.manageClick(true);
         this.canvas.renderAll();
       };
@@ -50,11 +51,27 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
         this.deleteAllStepContents(currentStep);
 
+        if(currentStep.previousStep) {
+          currentStep.previousStep.nextStep = (currentStep.nextStep) ? currentStep.nextStep : null;
+        }
+
+        if(currentStep.nextStep) {
+          currentStep.nextStep.previousStep = (currentStep.previousStep) ? currentStep.previousStep: null;
+        }
+
         var start = currentStep.index;
         var ordealStatus = currentStep.ordealStatus;
         this.childSteps.splice(start, 1);
         this.parent.allStepViews.splice(ordealStatus, 1);
 
+        if(this.childSteps.length > 0) {
+
+          this.configureStepForDelete(currentStep, start);
+          console.log("still there", this.childSteps);
+        } else {
+          console.log("I am empty");
+          // delete the stage
+        }
         // configure next and previous
         // move steps backwards first..
         // move next stages and steps backwards
@@ -97,6 +114,19 @@ window.ChaiBioTech.ngApp.factory('stage', [
         }
 
         currentStage.borderRight.set({left: currentStage.myWidth + currentStage.left + 2 }).setCoords();
+      };
+
+      this.configureStepForDelete = function(newStep, start) {
+
+        for(var j = start; j < this.childSteps.length; j++) {
+
+          var thisStep = this.childSteps[j];
+          console.log(thisStep.index);
+          thisStep.index = thisStep.index - 1;
+          thisStep.model.name = "STEP " + (thisStep.index + 1);
+          thisStep.stepName.text = thisStep.model.name;
+          //thisStep.moveStepForDelete();
+        }
       };
 
       this.configureStep = function(newStep, start) {
