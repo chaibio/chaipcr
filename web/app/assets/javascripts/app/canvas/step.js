@@ -112,6 +112,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.circle.getLeft()
           .getTop()
           .getUniqueId()
+          .addImages()
           .render();
       };
 
