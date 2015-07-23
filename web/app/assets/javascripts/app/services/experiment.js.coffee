@@ -21,6 +21,9 @@ window.ChaiBioTech.ngApp
           endtime: opts.endtime
           resolution: opts.resolution
 
-    self
+    self.duplicate = (expId, data) ->
+      $http.post "/experiments/#{expId}/copy", data
+
+    return self
 
 ]
