@@ -1,7 +1,6 @@
 <div class="test-in-progress sansa">
   <div class="test-in-progress-heading">
     TEST IN PROGRESS: <span class="text-blue">RUNNIG MELT CURVE</span>
-    <button class="button" ng-class="{'run': !running, 'stop': running}" ng-click="running = !running" ng-bind="running? 'Stop': 'Start'"></button>
   </div>
   <div class="test-info">
     <div class="row">
@@ -34,5 +33,8 @@
   </div>
   <div class="test-progress-bar">
     <div class="pro-bar" style="width: {{data.experiment.run_duration/data.experiment.estimated_duration*100}}%;"></div>
+  </div>
+  <div class="button-wrapper">
+    <div class="button" ng-class="{'run': !running, 'stop': running}" ng-click="running = !running" ng-bind="running? 'STOP EXPERIMENT': 'START EXPERIMENT'"></div>
   </div>
 </div>
