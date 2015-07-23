@@ -39,12 +39,13 @@ window.ChaiBioTech.ngApp
         Experiment
         .getTemperatureData($scope.experimentId, resolution: 1000)
         .success (data) =>
-          $scope.temperatureLogsCache = angular.copy data
-          $scope.temperatureLogs = angular.copy data
-          $scope.updateScale()
-          $scope.resizeTemperatureLogs()
-          $scope.updateScrollWidth()
-          $scope.updateData()
+          if data.length > 0
+            $scope.temperatureLogsCache = angular.copy data
+            $scope.temperatureLogs = angular.copy data
+            $scope.updateScale()
+            $scope.resizeTemperatureLogs()
+            $scope.updateScrollWidth()
+            $scope.updateData()
 
       $scope.updateData = ->
         left_et_limit = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length-1].temperature_log.elapsed_time - ($scope.resolution*1000)
@@ -107,16 +108,17 @@ window.ChaiBioTech.ngApp
         $scope.temperatureLogs = averagedLogs
 
       $scope.updateResolution = =>
+        if $scope.temperatureLogsCache.length > 0
 
-        if ($scope.resolution)
-          $scope.resizeTemperatureLogs()
-          $scope.updateScrollWidth()
-          $scope.updateData()
+          if ($scope.resolution)
+            $scope.resizeTemperatureLogs()
+            $scope.updateScrollWidth()
+            $scope.updateData()
 
-        else #view all
-          $scope.resolution = $scope.greatest_elapsed_time/1000
-          $scope.updateScrollWidth()
-          $scope.updateChart angular.copy $scope.temperatureLogs
+          else #view all
+            $scope.resolution = $scope.greatest_elapsed_time/1000
+            $scope.updateScrollWidth()
+            $scope.updateChart angular.copy $scope.temperatureLogs
 
       $scope.$watch 'scrollState', ->
         if $scope.scrollState and $scope.temperatureLogs && $scope.data

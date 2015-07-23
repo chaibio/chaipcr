@@ -41,7 +41,7 @@
       <div class="ball">
       </div>
       <div class="menu-text simplifica">
-        <a ui-sref="runExperiment({id: data.id})">RUN EXPERIMENT</a>
+        <a ui-sref="runExperiment({id: $data.id})">RUN EXPERIMENT</a>
       </div>
     </div>
     <div class="back-tail-container">
@@ -57,7 +57,7 @@
       EXPERIMENT OPTIONS
     </div>
     <div id="export-exp" class="exp-option-buttons">EXPORT...</div>
-    <div class="exp-option-buttons" duplicate-experiment experiment-id="data.id">DUPLICATE EXPERIMENT</div>
+    <div class="exp-option-buttons" duplicate-experiment experiment-id="$data.id">DUPLICATE EXPERIMENT</div>
     <div id="delete-exp" class="exp-option-buttons">DELETE EXPERIMENT</div>
   </div>
 </div>
