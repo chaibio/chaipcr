@@ -14,7 +14,7 @@
       <div class="col-sm-6">
         <div class="caption">TIME REMAINING</div>
         <div>
-          {{data.experiment.estimated_duration - data.experiment.run_duration | secondsDisplay:'display2'}}
+          {{(data.experimentController.expriment.estimated_duration+data.experimentController.expriment.paused_duration)-data.experimentController.expriment.run_duration | secondsDisplay:'display2'}}
         </div>
       </div>
     </div>
