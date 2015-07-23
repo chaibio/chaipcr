@@ -90,10 +90,10 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.canvas.remove(this.littleCircleGroup);
         this.canvas.remove(this.gatherDataImage);
         this.canvas.remove(this.gatherDataCircleOnScroll);
-        //this.canvas.remove(this.gatherDataImageOnMoving);
+        this.canvas.remove(this.gatherDataImageOnMoving);
         this.canvas.remove(this.gatherDataCircle);
         this.canvas.remove(this.gatherDataImage);
-        //this.canvas.remove(this.)
+        //this.canvas.remove(this.);
         this.canvas.remove(this.gatherDataImageMiddle);
       };
       /*******************************************
@@ -365,7 +365,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         if(ChaiBioTech.app.selectedCircle) {
           var previousSelected = ChaiBioTech.app.selectedCircle;
-          console.log("at this place", previousSelected.uniqueName, this.uniqueName);
+          
           if(previousSelected.uniqueName != this.uniqueName) {
 
             previousSelected.makeItSmall();

@@ -33,12 +33,11 @@ window.ChaiBioTech.ngApp.factory('stage', [
         this.childSteps.splice(start + 1, 0, newStep);
         this.configureStep(newStep, start);
         this.parent.allStepViews.splice(currentStep.ordealStatus, 0, newStep);
-        //this.parent.addRampLinesAndCircles();
+
         var circles = this.parent.reDrawCircles();
         this.parent.addRampLinesAndCircles(circles);
 
         $scope.applyValues(newStep.circle);
-        //ChaiBioTech.app.selectedCircle = newStep.circle;
         newStep.circle.manageClick(true);
         this.canvas.renderAll();
       };
@@ -64,28 +63,26 @@ window.ChaiBioTech.ngApp.factory('stage', [
         }
 
         var start = currentStep.index;
-        //var ordealStatus = currentStep.ordealStatus;
+        var ordealStatus = currentStep.ordealStatus;
         this.childSteps.splice(start, 1);
-        this.parent.allStepViews.splice(start, 1);
+        this.parent.allStepViews.splice(ordealStatus - 1, 1);
 
         if(this.childSteps.length > 0) {
 
           this.configureStepForDelete(currentStep, start);
-          this.moveAllStepsAndStages();
+          this.moveAllStepsAndStages(true); // true implie call is from delete section;
+
           var circles = this.parent.reDrawCircles();
-          console.log(circles.length);
-          //this.parent.addRampLinesAndCircles(circles);
-          //console.log("hey", selected);
-          //$scope.applyValues(selected.circle);
-          console.log("still there", this.childSteps);
+          this.parent.addRampLinesAndCircles(circles);
+
+          $scope.applyValues(selected.circle);
+          selected.circle.manageClick();
+
         } else {
           console.log("I am empty");
           // delete the stage
         }
-        // configure next and previous
-        // move steps backwards first..
-        // move next stages and steps backwards
-        // re align circles ..
+
         this.canvas.renderAll();
       };
 
@@ -96,18 +93,18 @@ window.ChaiBioTech.ngApp.factory('stage', [
         this.canvas.remove(currentStep.commonFooterImage);
         this.canvas.remove(currentStep.darkFooterImage);
         this.canvas.remove(currentStep.whiteFooterImage);
-
-        this.canvas.remove(currentStep.circle.stepDataGroup);
+        currentStep.circle.removeContents();
+        /*this.canvas.remove(currentStep.circle.stepDataGroup);
         this.canvas.remove(currentStep.circle.littleCircleGroup);
         this.canvas.remove(currentStep.circle.gatherDataOnScroll);
         this.canvas.remove(currentStep.circle.circleGroup);
         this.canvas.remove(currentStep.circle.curve);
         this.canvas.remove(currentStep.circle.gatherDataImage);
         this.canvas.remove(currentStep.circle.gatherDataImageOnMoving);
-        this.canvas.remove(currentStep.circle.gatherDataImageMiddle);
+        this.canvas.remove(currentStep.circle.gatherDataImageMiddle);*/
       };
 
-      this.moveAllStepsAndStages = function() {
+      this.moveAllStepsAndStages = function(del) {
 
         var currentStage = this;
 
@@ -118,7 +115,12 @@ window.ChaiBioTech.ngApp.factory('stage', [
           var thisStageSteps = currentStage.nextStage.childSteps, stepCount = thisStageSteps.length;
 
           for(var i = 0; i < stepCount; i++ ) {
-            thisStageSteps[i].moveStep();
+            if(del === true) {
+              thisStageSteps[i].moveStepForDelete();
+            } else {
+              thisStageSteps[i].moveStep();
+            }
+
           }
 
           currentStage = currentStage.nextStage;
