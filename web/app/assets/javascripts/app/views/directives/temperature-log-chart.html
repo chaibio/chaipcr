@@ -27,7 +27,7 @@
           </div>
           <div class="input-group">
             <label>View</label>
-            <select ng-change="updateResolution()" ng-model="resolution" class="form-control" ng-options="sec as optionText(sec) for sec in resolutionOptions">
+            <select ng-change="updateResolution()" ng-model="resolution" class="form-control" ng-options="sec as sec | secondsDisplay: 'display1' for sec in resolutionOptions">
               <option value=''>View All</option>
             </select>
           </div>
