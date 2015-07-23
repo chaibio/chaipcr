@@ -82,7 +82,7 @@
             </div>
             <div class="all-experiments">
                <div class="loading" ng-show="experiments.length == 0">Loading ......! <img src="assets/loading.gif"></div>
-               <div class="individual-experiment" ng-repeat="exp in experiments | orderBy:'experiment.id':true">
+               <div class="individual-experiment" ng-repeat="exp in experiments | orderBy:'experiment.created_at':true">
                   <div class="first-row">
                      <div class="image"></div>
                      <div class="text simplifica"><a ui-sref="edit-protocol({id: exp.experiment.id})">{{exp.experiment.name}}</a></div>
