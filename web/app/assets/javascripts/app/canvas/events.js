@@ -24,6 +24,7 @@ window.ChaiBioTech.ngApp.factory('events', [
           case "stepGroup":
             me = evt.target.me;
             me.circle.manageClick();
+            console.log(me.circle.parent.uniqueName);
             $scope.applyValuesFromOutSide(me.circle);
           break;
 

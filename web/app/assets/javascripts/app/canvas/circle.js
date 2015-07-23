@@ -1,3 +1,4 @@
+window.ChaiBioTech.app.selectedCircle = null;
 window.ChaiBioTech.ngApp.factory('circle', [
   'ExperimentLoader',
   '$rootScope',
@@ -58,6 +59,43 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.getLeft();
         this.getTop();
       };
+
+      this.addImages = function() {
+
+        var fabricStage = this.parent.parentStage.parent;
+
+        this.gatherDataImage = $.extend({}, fabricStage.imageobjects["gather-data.png"]);
+        this.gatherDataImage.originX = "center";
+        this.gatherDataImage.originY = "center";
+
+        this.gatherDataImageOnMoving = $.extend({}, fabricStage.imageobjects["gather-data-image.png"]);
+        this.gatherDataImageOnMoving.originX = "center";
+        this.gatherDataImageOnMoving.originY = "center";
+
+        this.gatherDataImageMiddle = $.extend({}, fabricStage.imageobjects["gather-data.png"]);
+        this.gatherDataImageMiddle.originX = "center";
+        this.gatherDataImageMiddle.originY = "center";
+        this.gatherDataImageMiddle.setVisible(false);
+
+        return this;
+      };
+
+      this.removeContents = function() {
+
+        this.canvas.remove(this.stepDataGroup);
+        this.canvas.remove(this.curve);
+        this.canvas.remove(this.gatherDataOnScroll);
+        this.canvas.remove(this.circleGroup);
+        this.canvas.remove(this.gatherDataGroup);
+        this.canvas.remove(this.littleCircleGroup);
+        this.canvas.remove(this.gatherDataImage);
+        this.canvas.remove(this.gatherDataCircleOnScroll);
+        //this.canvas.remove(this.gatherDataImageOnMoving);
+        this.canvas.remove(this.gatherDataCircle);
+        this.canvas.remove(this.gatherDataImage);
+        //this.canvas.remove(this.)
+        this.canvas.remove(this.gatherDataImageMiddle);
+      };
       /*******************************************
         This method shows circles and gather data. Pease note
         this method is invoked from canvas.js once all the stage/step are loaded.
@@ -67,23 +105,31 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.stepDataGroup.set({"left": this.left + 60}).setCoords();
         this.canvas.add(this.stepDataGroup);
 
+        this.gatherDataCircleOnScroll = new gatherDataCircleOnScroll();
         this.gatherDataOnScroll = new gatherDataGroupOnScroll(
           [
-            this.gatherDataCircleOnScroll = new gatherDataCircleOnScroll(),
-            this.gatherDataImageOnMoving
+            //this.gatherDataCircleOnScroll,
+            //this.gatherDataImageOnMoving
           ], this);
 
+        this.gatherDataOnScroll.add(this.gatherDataCircleOnScroll);
+        this.gatherDataOnScroll.add(this.gatherDataImageOnMoving);
+        // enable this when image is added on creating new circle ..
         this.circleGroup.set({"left": this.left + 60}).setCoords();
 
         this.circleGroup.add(this.gatherDataImageMiddle);
         this.circleGroup.add(this.gatherDataOnScroll);
         this.canvas.add(this.circleGroup);
 
+        this.gatherDataCircle = new gatherDataCircle();
         this.gatherDataGroup = new gatherDataGroup(
           [
-            this.gatherDataCircle = new gatherDataCircle(),
-            this.gatherDataImage
+            //this.gatherDataCircle = new gatherDataCircle(),
+            //this.gatherDataImage
           ], this);
+
+        this.gatherDataGroup.add(this.gatherDataCircle);
+        this.gatherDataGroup.add(this.gatherDataImage);
 
         this.gatherDataGroup.set({"left": this.left + 60}).setCoords();
         this.canvas.add(this.gatherDataGroup);
@@ -319,8 +365,9 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         if(ChaiBioTech.app.selectedCircle) {
           var previousSelected = ChaiBioTech.app.selectedCircle;
-
+          console.log("at this place", previousSelected.uniqueName, this.uniqueName);
           if(previousSelected.uniqueName != this.uniqueName) {
+
             previousSelected.makeItSmall();
           }
         }

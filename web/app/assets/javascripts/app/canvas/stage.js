@@ -19,8 +19,95 @@ window.ChaiBioTech.ngApp.factory('stage', [
         var width = (currentStep.index === this.childSteps.length - 1) ? 121 : 120;
         this.myWidth = this.myWidth + width;
         this.stageRect.setWidth(this.myWidth);
-
         this.roof.setWidth(this.myWidth - 4);
+
+        this.moveAllStepsAndStages();
+        // Now insert new step;
+        var start = currentStep.index;
+        var newStep = new step(data.step, this, start);
+        newStep.name = "I am created";
+        newStep.render();
+        newStep.addImages();
+        newStep.ordealStatus = currentStep.ordealStatus;
+
+        this.childSteps.splice(start + 1, 0, newStep);
+        this.configureStep(newStep, start);
+        this.parent.allStepViews.splice(currentStep.ordealStatus, 0, newStep);
+        //this.parent.addRampLinesAndCircles();
+        var circles = this.parent.reDrawCircles();
+        this.parent.addRampLinesAndCircles(circles);
+
+        $scope.applyValues(newStep.circle);
+        //ChaiBioTech.app.selectedCircle = newStep.circle;
+        newStep.circle.manageClick(true);
+        this.canvas.renderAll();
+      };
+
+      this.deleteStep = function(data, currentStep) {
+
+        // This methode says what happens in the canvas when a step is deleted
+        var width = (currentStep.index === this.childSteps.length - 1) ? 121 : 120, selected = null;
+        this.myWidth = this.myWidth - width;
+        this.stageRect.setWidth(this.myWidth);
+        this.roof.setWidth(this.myWidth - 4);
+
+        this.deleteAllStepContents(currentStep);
+
+        if(currentStep.previousStep) {
+          currentStep.previousStep.nextStep = (currentStep.nextStep) ? currentStep.nextStep : null;
+          selected = currentStep.previousStep;
+        }
+
+        if(currentStep.nextStep) {
+          currentStep.nextStep.previousStep = (currentStep.previousStep) ? currentStep.previousStep: null;
+          selected = currentStep.nextStep;
+        }
+
+        var start = currentStep.index;
+        //var ordealStatus = currentStep.ordealStatus;
+        this.childSteps.splice(start, 1);
+        this.parent.allStepViews.splice(start, 1);
+
+        if(this.childSteps.length > 0) {
+
+          this.configureStepForDelete(currentStep, start);
+          this.moveAllStepsAndStages();
+          var circles = this.parent.reDrawCircles();
+          console.log(circles.length);
+          //this.parent.addRampLinesAndCircles(circles);
+          //console.log("hey", selected);
+          //$scope.applyValues(selected.circle);
+          console.log("still there", this.childSteps);
+        } else {
+          console.log("I am empty");
+          // delete the stage
+        }
+        // configure next and previous
+        // move steps backwards first..
+        // move next stages and steps backwards
+        // re align circles ..
+        this.canvas.renderAll();
+      };
+
+      this.deleteAllStepContents = function(currentStep) {
+
+        this.canvas.remove(currentStep.stepGroup);
+        this.canvas.remove(currentStep.rampSpeedGroup);
+        this.canvas.remove(currentStep.commonFooterImage);
+        this.canvas.remove(currentStep.darkFooterImage);
+        this.canvas.remove(currentStep.whiteFooterImage);
+
+        this.canvas.remove(currentStep.circle.stepDataGroup);
+        this.canvas.remove(currentStep.circle.littleCircleGroup);
+        this.canvas.remove(currentStep.circle.gatherDataOnScroll);
+        this.canvas.remove(currentStep.circle.circleGroup);
+        this.canvas.remove(currentStep.circle.curve);
+        this.canvas.remove(currentStep.circle.gatherDataImage);
+        this.canvas.remove(currentStep.circle.gatherDataImageOnMoving);
+        this.canvas.remove(currentStep.circle.gatherDataImageMiddle);
+      };
+
+      this.moveAllStepsAndStages = function() {
 
         var currentStage = this;
 
@@ -38,19 +125,23 @@ window.ChaiBioTech.ngApp.factory('stage', [
         }
 
         currentStage.borderRight.set({left: currentStage.myWidth + currentStage.left + 2 }).setCoords();
-        // Now insert new step;
-        var start = currentStep.index;
+      };
 
-        var newStep = new step(data.step, this, start);
-        newStep.name = "I am created";
-        newStep.render();
-        newStep.addImages();
-        newStep.ordealStatus = currentStep.ordealStatus;
+      this.configureStepForDelete = function(newStep, start) {
 
-        this.childSteps.splice(start + 1, 0, newStep);
+        for(var j = start; j < this.childSteps.length; j++) {
 
-        //console.log(this.childSteps);
+          var thisStep = this.childSteps[j];
+          console.log(thisStep.index);
+          thisStep.index = thisStep.index - 1;
+          thisStep.model.name = "STEP " + (thisStep.index + 1);
+          thisStep.stepName.text = thisStep.model.name;
+          thisStep.moveStepForDelete();
+        }
+      };
 
+      this.configureStep = function(newStep, start) {
+        // insert it to all steps , add next and previous , rerender circles;
         for(var j = start + 1; j < this.childSteps.length; j++) {
 
           var thisStep = this.childSteps[j];
@@ -59,8 +150,6 @@ window.ChaiBioTech.ngApp.factory('stage', [
           thisStep.stepName.text = thisStep.model.name;
           thisStep.moveStep();
         }
-
-        
 
         if(this.childSteps[newStep.index + 1]) {
           newStep.nextStep = this.childSteps[newStep.index + 1];
@@ -73,29 +162,10 @@ window.ChaiBioTech.ngApp.factory('stage', [
         }
 
         if(newStep.index === this.childSteps.length - 1) {
-          console.log("got inside");
-
 
           newStep.borderRight.setVisible(false);
           newStep.previousStep.borderRight.setVisible(true);
         }
-        //console.log(this.childSteps, "a");
-
-        //var indexInallSteps = this.getIndexFromAllSteps(newStep.uniqueName);
-        this.parent.allStepViews.splice(currentStep.ordealStatus, 0, newStep);
-        //console.log(indexInallSteps, "Wpppppp", this.parent.allStepViews, newStep.ordealStatus);
-
-
-
-        // insert it to all steps , add next and previous , rerender circles;
-        //console.log(newStep);
-        this.parent.addRampLinesAndCircles();
-
-        $scope.applyValues(newStep.circle);
-
-        newStep.circle.manageClick(true);
-
-        this.canvas.renderAll();
       };
 
       this.getIndexFromAllSteps = function(name) {
