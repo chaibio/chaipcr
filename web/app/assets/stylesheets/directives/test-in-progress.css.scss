@@ -13,6 +13,20 @@
       .text-blue {
         color: #00AEEF;
       }
+      .button {
+        padding: 3px;
+        display: inline-block;
+        margin: 3px;
+        color: #fff;
+        &.stop {
+          background: red;
+          border-color: lighten(red, 25%);
+        }
+        &.run {
+          background: green;
+          border-color: lighten(green, 25%);
+        }
+      }
     }
     .test-info {
       .caption {
