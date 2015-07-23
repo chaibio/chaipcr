@@ -5,7 +5,7 @@
 
 using namespace boost::property_tree;
 
-void LogDataHandler::processData(const ptree &requestPt, ptree &)
+void LogDataHandler::processData(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &, const ptree &requestPt, ptree &)
 {
     std::shared_ptr<Optics> optics = OpticsInstance::getInstance();
     std::shared_ptr<ExperimentController> experimentController = ExperimentController::getInstance();

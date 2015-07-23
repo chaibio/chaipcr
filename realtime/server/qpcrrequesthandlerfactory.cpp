@@ -23,12 +23,17 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
 
     if (!requestPath.empty())
     {
-        if (request.getMethod() == "GET")
+        string method = request.getMethod();
+
+        if (method == "OPTIONS" && request.has("Access-Control-Request-Method"))
+            method = request.get("Access-Control-Request-Method");
+
+        if (method == "GET")
         {
             if (requestPath.at(0) == "status")
                 return new StatusHandler();
         }
-        else if (request.getMethod() == "PUT")
+        else if (method == "PUT")
         {
             if (requestPath.at(0) == "testControl")
                 return new TestControlHandler();
@@ -37,7 +42,7 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
             else if (requestPath.at(0) == "logData")
                 return new LogDataHandler();
         }
-        else if (request.getMethod() == "POST")
+        else if (method == "POST")
         {
             if (requestPath.at(0) == "control")
             {
