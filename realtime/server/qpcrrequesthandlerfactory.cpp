@@ -7,6 +7,7 @@
 #include "controlhandler.h"
 #include "settingshandler.h"
 #include "logdatahandler.h"
+#include "wirelessmanagerhandler.h"
 
 #include "qpcrrequesthandlerfactory.h"
 
@@ -32,6 +33,13 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
         {
             if (requestPath.at(0) == "status")
                 return new StatusHandler();
+            else if (requestPath.at(0) == "wifi")
+            {
+                if (requestPath.at(1) == "scan")
+                    return new WirelessManagerHandler(WirelessManagerHandler::Scan);
+                else if (requestPath.at(1) == "status")
+                    return new WirelessManagerHandler(WirelessManagerHandler::Status);
+            }
         }
         else if (method == "PUT")
         {
@@ -52,6 +60,13 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
                     return new ControlHandler(ControlHandler::ResumeExperiment);
                 else if (requestPath.at(1) == "stop")
                     return new ControlHandler(ControlHandler::StopExperiment);
+            }
+            else if (requestPath.at(0) == "wifi")
+            {
+                if (requestPath.at(1) == "connect")
+                    return new WirelessManagerHandler(WirelessManagerHandler::Connect);
+                else if (requestPath.at(1) == "shutdown")
+                    return new WirelessManagerHandler(WirelessManagerHandler::Shutdown);
             }
         }
     }

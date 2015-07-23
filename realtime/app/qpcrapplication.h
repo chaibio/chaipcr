@@ -11,6 +11,7 @@
 class IControl;
 class IThreadControl;
 class ExperimentController;
+class WirelessManager;
 
 // Class QPCRApplication
 class QPCRApplication: public Poco::Util::ServerApplication
@@ -20,6 +21,8 @@ public:
 
     inline bool isWorking() const { return _workState.load(); }
     inline void close() { _workState = false; }
+
+    inline std::shared_ptr<WirelessManager> wirelessManager() const { return _wirelessManager; }
 
     inline void setException(std::exception_ptr exception) { _exception = exception; }
 
@@ -42,6 +45,7 @@ private:
     std::vector<std::shared_ptr<IControl>> _controlUnits;
     std::vector<std::shared_ptr<IThreadControl>> _threadControlUnits;
     std::shared_ptr<ExperimentController> _experimentController;
+    std::shared_ptr<WirelessManager> _wirelessManager;
 
     std::exception_ptr _exception;
 };
