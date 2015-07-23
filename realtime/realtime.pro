@@ -35,6 +35,7 @@ LIBS += -lsoci_mysql
 LIBS += -lboost_system
 LIBS += -lboost_chrono
 
+LIBS += -liw
 LIBS += -ldl
 LIBS += -lrt
 
@@ -128,7 +129,9 @@ HEADERS += \
     control/test/adccontrollermock.h \
     util/lockfreesignal.h \
     util/instance.h \
-    server/httpcodehandler.h
+    server/httpcodehandler.h \
+    util/wirelessmanager.h \
+    server/wirelessmanagerhandler.h
 
 SOURCES += \
     app/pins.cpp \
@@ -173,4 +176,6 @@ SOURCES += \
     util/adcpin.cpp \
     server/logdatahandler.cpp \
     control/test/adccontrollermock.cpp \
-    server/httpcodehandler.cpp
+    server/httpcodehandler.cpp \
+    util/wirelessmanager.cpp \
+    server/wirelessmanagerhandler.cpp
