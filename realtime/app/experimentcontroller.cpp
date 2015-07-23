@@ -86,6 +86,7 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
     }
 
     startLogging();
+    calculateEstimatedDuration();
 
     return Started;
 }
@@ -386,8 +387,6 @@ void ExperimentController::holdStepCallback(Poco::Timer &)
 
 void ExperimentController::startLogging()
 {
-    addLogCallback(*_logTimer);
-
     _logTimer->setPeriodicInterval(kTemperatureLoggerInterval);
     _logTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::addLogCallback));
 }
@@ -472,7 +471,7 @@ void ExperimentController::settingsUpdated()
 void ExperimentController::calculateEstimatedDuration()
 {
     Experiment experiment = this->experiment();
-    std::time_t duration = (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds() - experiment.pausedDuration();
+    double duration = (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_milliseconds() - (experiment.pausedDuration() * 1000);
     double previousTargetTemp = HeatBlockInstance::getInstance()->temperature();
 
     do
@@ -480,7 +479,7 @@ void ExperimentController::calculateEstimatedDuration()
         Stage *stage = experiment.protocol()->currentStage();
 
         if (!stage->currentStep()->pauseState())
-            duration += stage->currentStep()->holdTime();
+            duration += stage->currentStep()->holdTime() * 1000;
 
         double temperature = stage->currentStep()->temperature();
 
@@ -495,12 +494,12 @@ void ExperimentController::calculateEstimatedDuration()
         }
 
         double rate = stage->currentRamp()->rate();
-        rate = rate > 0 || rate <= kDurationCalcHeatBlockRampSpeed ? rate : kDurationCalcHeatBlockRampSpeed;
+        rate = rate > 0 && rate <= kDurationCalcHeatBlockRampSpeed ? rate : kDurationCalcHeatBlockRampSpeed;
 
         if (previousTargetTemp < temperature)
-            duration += std::ceil((temperature - previousTargetTemp) / rate);
+            duration += ((temperature - previousTargetTemp) / rate) * 1000;
         else
-            duration += std::ceil((previousTargetTemp - temperature) / rate);
+            duration += ((previousTargetTemp - temperature) / rate) * 1000;
 
         previousTargetTemp = temperature;
     }
@@ -508,6 +507,6 @@ void ExperimentController::calculateEstimatedDuration()
 
     {
         Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
-        _experiment.setEstimatedDuration(duration);
+        _experiment.setEstimatedDuration(std::round(duration / 1000));
     }
 }

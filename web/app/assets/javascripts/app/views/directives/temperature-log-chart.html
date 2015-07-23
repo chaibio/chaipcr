@@ -6,19 +6,7 @@
       <div class="panel-body">
         <div class="vertical-text">Temperature</div>
         <div style="padding: 10px 0px;">
-          <nvd3-line-chart
-            data="chartData"
-            id="tempLogs"
-            width="550"
-            height="350"
-            showXAxis="true"
-            showYAxis="true"
-            interactive="true"
-            tooltips="true"
-            forcey="{{maxY}}"
-            xAxisTickFormat="xTick"
-            interpolate="cardinal">
-          </nvd3-line-chart>
+        <linechart data="data" options="options" width="700" height="300"></linechart>
         </div>
         <div class="scrollbar-container">
           <time-scrollbar ng-model="scrollState"></time-scrollbar>
@@ -39,7 +27,7 @@
           </div>
           <div class="input-group">
             <label>View</label>
-            <select ng-change="updateResolution()" ng-model="resolution" class="form-control" ng-options="sec as optionText(sec) for sec in resolutionOptions">
+            <select ng-change="updateResolution()" ng-model="resolution" class="form-control" ng-options="sec as sec | secondsDisplay: 'display1' for sec in resolutionOptions">
               <option value=''>View All</option>
             </select>
           </div>

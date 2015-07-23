@@ -1,23 +1,24 @@
 <div class="experiment-in-progress sansa">
   <div class="experiment-in-progress-heading">
-    EXPERIMENT IN PROGRESS
+    <span ng-show="expController.expriment">EXPERIMENT IN PROGRESS</span>
+    <span ng-show="!expController.expriment">No experiment running</span>
   </div>
-  <div class="experiment-info">
+  <div class="experiment-info" ng-show="expController.expriment">
     <div class="row">
       <div class="col-sm-8">
-        <div class="caption">{{data.experiment.name}}</div>
+        <div class="caption">{{expController.expriment.name}}</div>
         <div>
-          STAGE {{data.experiment.stage.number}},
-          STEP {{data.experiment.step.number}}
+          STAGE {{expController.expriment.stage.number}},
+          STEP {{expController.expriment.step.number}}
         </div>
       </div>
       <div class="col-sm-4">
         <div class="caption">TIME REMAINING</div>
-        <div>{{data.experiment.estimated_duration-data.experiment.run_duration | secondsDisplay:'display2'}}</div>
+        <div>{{(expController.expriment.estimated_duration+expController.expriment.paused_duration)-expController.expriment.run_duration | secondsDisplay:'display2'}}</div>
       </div>
     </div>
   </div>
   <div class="experiment-progress-bar">
-    <div class="pro-bar" style="width: {{data.experiment.run_duration/data.experiment.estimated_duration*100}}%;"></div>
+    <div class="pro-bar" style="width: {{progressBarWidth}}%;"></div>
   </div>
 </div>

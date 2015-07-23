@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////
 // Class PIDController
+
 PIDController::PIDController(const std::vector<SPIDTuning>& pGainSchedule, double minOutput, double maxOutput, const SinglePoleRecursiveFilter& processValueFilter):
     _gainSchedule {pGainSchedule},
     _processValueFilter {processValueFilter},
@@ -39,10 +40,13 @@ double PIDController::compute(double setpoint, double processValue) {
             double derivativeValueS = (filteredProcessValue - _previousProcessValue) / executionDurationS;
 
             _integratorS += error * executionDurationS;
-            output = pidTuning.kControllerGain * (error + _integratorS / pidTuning.kIntegralTimeS + pidTuning.kDerivativeTimeS * derivativeValueS);
+
+            output = pidTuning.kControllerGain * (error + _integratorS / pidTuning.kIntegralTimeS - pidTuning.kDerivativeTimeS * derivativeValueS);
 
             if (latchValue(output, _minOutput, _maxOutput))
-                _integratorS = 0; //-= error * executionDurationS; //integrator anti-windup
+            {
+                _integratorS -= error * executionDurationS; //integrator anti-windup
+            }
         }
         else
             _integratorS = 0;

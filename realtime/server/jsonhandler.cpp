@@ -23,7 +23,7 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
         if (request.getContentLength() != -1)
             read_json(requestStream, requestPt);
 
-        processData(requestPt, responsePt);
+        processData(request, response, requestPt, responsePt);
     }
     catch (json_parser_error &ex)
     {
@@ -33,7 +33,7 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
         setErrorString(ex.what());
 
         responsePt.clear();
-        JSONHandler::processData(requestPt, responsePt);
+        JSONHandler::processData(request, response, requestPt, responsePt);
     }
     catch (exception &ex)
     {
@@ -43,7 +43,7 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
         setErrorString(ex.what());
 
         responsePt.clear();
-        JSONHandler::processData(requestPt, responsePt);
+        JSONHandler::processData(request, response, requestPt, responsePt);
     }
 
     try
@@ -67,7 +67,7 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
     }
 }
 
-void JSONHandler::processData(const ptree &, ptree &responsePt)
+void JSONHandler::processData(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &, const ptree &, ptree &responsePt)
 {
     if (getStatus() == HTTPResponse::HTTP_OK)
         responsePt.put("status.status", true);

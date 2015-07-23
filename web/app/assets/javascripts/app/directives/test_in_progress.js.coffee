@@ -11,6 +11,6 @@ window.ChaiBioTech.ngApp
     templateUrl: 'app/views/directives/test-in-progress.html'
     link: ($scope) ->
 
-      Status.fetch (data) ->
+      Status.fetch().then (data) ->
         $scope.data = data
 ]
