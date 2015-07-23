@@ -60,7 +60,7 @@ class Step < ActiveRecord::Base
   end
   
   def copy
-    new_step = ProtocolHelper::copy
+    new_step = copy_helper
     new_step.ramp = ramp.copy
     new_step
   end

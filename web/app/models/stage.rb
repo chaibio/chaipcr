@@ -78,7 +78,7 @@ class Stage < ActiveRecord::Base
   end
 
   def copy
-    new_stage = ProtocolHelper::copy
+    new_stage = copy_helper
     steps.each do |step|
       new_stage.steps << step.copy
     end
