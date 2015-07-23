@@ -1,6 +1,7 @@
 <div class="test-in-progress sansa">
   <div class="test-in-progress-heading">
     TEST IN PROGRESS: <span class="text-blue">RUNNIG MELT CURVE</span>
+    <button class="button" ng-class="{'run': !running, 'stop': running}" ng-click="running = !running" ng-bind="running? 'Stop': 'Start'"></button>
   </div>
   <div class="test-info">
     <div class="row">

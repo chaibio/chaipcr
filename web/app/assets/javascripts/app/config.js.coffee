@@ -3,4 +3,10 @@ window.ChaiBioTech.ngApp
   '$rootScope'
   ($rootScope) ->
     $rootScope.title = "ChaiBioTech"
+    $rootScope.$on '$stateChangeSuccess', (e, toState) ->
+      if toState.name is 'login'
+        angular.element('body').addClass('login-page-active')
+      else
+        angular.element('body').removeClass('login-page-active')
+
 ]
