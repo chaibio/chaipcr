@@ -176,9 +176,9 @@ window.ChaiBioTech.ngApp
           mode: 'scrubber',
           formatter: (x, y, series) ->
             if series.y is 'lid_temp'
-              return "Time: #{SecondsDisplay.display2(x)} | Lid Temp: #{y}"
+              return "#{SecondsDisplay.display2(x)} | Lid Temp: #{y}"
             else if series.y is 'heat_block_zone_temp'
-              return "Time: #{SecondsDisplay.display2(x)} | Heat Block Zone Temp: #{y}"
+              return "#{SecondsDisplay.display2(x)} | Heat Block Zone Temp: #{y}"
             else
               return ''
         },
