@@ -144,7 +144,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         this.allStepViews[count].whiteFooterImage.left = this.allStepViews[count].left;
         this.canvas.add(this.allStepViews[count].whiteFooterImage);
 
-        
+
 
       }
 
@@ -179,6 +179,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
             //this.canvas.bringToFront(thisCircle.previous.curve);
             //delete(thisCircle.curve);
           //}
+            thisCircle.moveCircle();
             thisCircle.curve = new path(thisCircle);
             this.canvas.add(thisCircle.curve);
             /*if(thisCircle.previous) {
@@ -220,11 +221,11 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       var i = 0, limit = this.allStepViews.length, circles = [], tempCirc = null;
 
       for(i = 0; i < limit; i++) {
-        if(this.allStepViews[i].circle) {
+        //if(this.allStepViews[i].circle) {
           this.allStepViews[i].circle.removeContents();
           //this.allStepViews[i].circle.remove();
           delete this.allStepViews[i].circle;
-        }
+        //}
         this.allStepViews[i].addCircle();
         if(tempCirc) {
           this.allStepViews[i].circle.previous = tempCirc;

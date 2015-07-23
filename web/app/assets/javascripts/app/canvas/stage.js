@@ -46,7 +46,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.deleteStep = function(data, currentStep) {
 
         // This methode says what happens in the canvas when a step is deleted
-        var width = (currentStep.index === this.childSteps.length - 1) ? 121 : 120;
+        var width = (currentStep.index === this.childSteps.length - 1) ? 121 : 120, selected = null;
         this.myWidth = this.myWidth - width;
         this.stageRect.setWidth(this.myWidth);
         this.roof.setWidth(this.myWidth - 4);
@@ -55,10 +55,12 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
         if(currentStep.previousStep) {
           currentStep.previousStep.nextStep = (currentStep.nextStep) ? currentStep.nextStep : null;
+          selected = currentStep.previousStep;
         }
 
         if(currentStep.nextStep) {
           currentStep.nextStep.previousStep = (currentStep.previousStep) ? currentStep.previousStep: null;
+          selected = currentStep.nextStep;
         }
 
         var start = currentStep.index;
@@ -69,6 +71,12 @@ window.ChaiBioTech.ngApp.factory('stage', [
         if(this.childSteps.length > 0) {
 
           this.configureStepForDelete(currentStep, start);
+          this.moveAllStepsAndStages();
+          var circles = this.parent.reDrawCircles();
+          console.log(circles.length);
+          //this.parent.addRampLinesAndCircles(circles);
+          //console.log("hey", selected);
+          //$scope.applyValues(selected.circle);
           console.log("still there", this.childSteps);
         } else {
           console.log("I am empty");
@@ -78,6 +86,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         // move steps backwards first..
         // move next stages and steps backwards
         // re align circles ..
+        this.canvas.renderAll();
       };
 
       this.deleteAllStepContents = function(currentStep) {
@@ -127,7 +136,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
           thisStep.index = thisStep.index - 1;
           thisStep.model.name = "STEP " + (thisStep.index + 1);
           thisStep.stepName.text = thisStep.model.name;
-          //thisStep.moveStepForDelete();
+          thisStep.moveStepForDelete();
         }
       };
 

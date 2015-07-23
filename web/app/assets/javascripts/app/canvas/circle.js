@@ -133,7 +133,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         this.gatherDataGroup.set({"left": this.left + 60}).setCoords();
         this.canvas.add(this.gatherDataGroup);
-        //this.showHideGatherData(this.parent.gatherDataDuringStep);
+        this.showHideGatherData(this.parent.gatherDataDuringStep);
         this.gatherDataGroup.visible = this.parent.gatherDataDuringRamp;
 
       };
