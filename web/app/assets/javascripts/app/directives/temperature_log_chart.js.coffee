@@ -32,8 +32,7 @@ window.ChaiBioTech.ngApp
 
         $scope.temperatureLogs = []
         $scope.temperatureLogsCache = []
-        $scope.calibration = 100
-        $scope.calibrationSize = 100
+        $scope.calibration = 800
         $scope.scrollState = 0
         $scope.updateInterval = null
 
@@ -46,7 +45,6 @@ window.ChaiBioTech.ngApp
           $scope.resizeTemperatureLogs()
           $scope.updateScrollWidth()
           $scope.updateData()
-          $scope.show = true
 
       $scope.updateData = ->
         left_et_limit = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length-1].temperature_log.elapsed_time - ($scope.resolution*1000)
@@ -82,34 +80,7 @@ window.ChaiBioTech.ngApp
           greatest
 
         max_scale = Math.max.apply Math, scales
-        $scope.maxY = [0, Math.ceil(max_scale/10)*10]
-
-      $scope.resizeTemperatureLogs = ->
-        resolution = $scope.resolution
-        if $scope.resolution> $scope.greatest_elapsed_time/1000 then resolution = $scope.greatest_elapsed_time/1000
-        chunkSize = Math.round resolution / $scope.calibration
-        temperature_logs = angular.copy $scope.temperatureLogsCache
-        chunked = _.chunk temperature_logs, chunkSize
-        averagedLogs = _.map chunked, (chunk) ->
-          elapsed_time_sum = 0
-          lid_temp_sum = 0
-          heat_block_zone_1_temp_sum = 0
-          heat_block_zone_2_temp_sum = 0
-          for item in chunk
-            elapsed_time_sum += item.temperature_log.elapsed_time
-            lid_temp_sum += parseFloat item.temperature_log.lid_temp
-            heat_block_zone_1_temp_sum += parseFloat item.temperature_log.heat_block_zone_1_temp
-            heat_block_zone_2_temp_sum += parseFloat item.temperature_log.heat_block_zone_2_temp
-
-          temperature_log:
-            elapsed_time: Math.round(elapsed_time_sum/chunk.length)
-            lid_temp: Math.round(lid_temp_sum/chunk.length*100)/100
-            heat_block_zone_1_temp: Math.round(heat_block_zone_1_temp_sum/chunk.length*100)/100
-            heat_block_zone_2_temp: Math.round(heat_block_zone_2_temp_sum/chunk.length*100)/100
-
-        averagedLogs.unshift temperature_logs[0]
-        averagedLogs.push temperature_logs[temperature_logs.length-1]
-        $scope.temperatureLogs = averagedLogs
+        $scope.options.axes.y.max = Math.ceil(max_scale/10)*10
 
       $scope.updateScrollWidth = ->
 
@@ -121,6 +92,20 @@ window.ChaiBioTech.ngApp
 
         elem.find('.scrollbar').css width: "#{widthPercent*100}%"
 
+      $scope.resizeTemperatureLogs = ->
+        resolution = $scope.resolution
+        if $scope.resolution> $scope.greatest_elapsed_time/1000 then resolution = $scope.greatest_elapsed_time/1000
+        chunkSize = Math.round resolution / $scope.calibration
+        temperature_logs = angular.copy $scope.temperatureLogsCache
+        chunked = _.chunk temperature_logs, chunkSize
+        averagedLogs = _.map chunked, (chunk) ->
+          i = Math.floor(chunk.length/2)
+          return chunk[i]
+
+        averagedLogs.unshift temperature_logs[0]
+        averagedLogs.push temperature_logs[temperature_logs.length-1]
+        $scope.temperatureLogs = averagedLogs
+
       $scope.updateResolution = =>
 
         if ($scope.resolution)
@@ -130,12 +115,11 @@ window.ChaiBioTech.ngApp
 
         else #view all
           $scope.resolution = $scope.greatest_elapsed_time/1000
-          $scope.resizeTemperatureLogs()
           $scope.updateScrollWidth()
           $scope.updateChart angular.copy $scope.temperatureLogs
 
       $scope.$watch 'scrollState', ->
-        if $scope.scrollState and $scope.temperatureLogs
+        if $scope.scrollState and $scope.temperatureLogs && $scope.data
           $scope.updateData()
 
           if $scope.scrollState >= 1
@@ -143,21 +127,8 @@ window.ChaiBioTech.ngApp
           else
             $scope.stopInterval()
 
-
-
       $scope.updateChart = (temperature_logs) ->
-        data = ChartData.temperatureLogs(temperature_logs).toNVD3()
-
-        $scope.chartData = [
-          {
-            key: 'Lid Temp'
-            values: data.lid_temps
-          }
-          {
-            key: 'Heat Block Zone Temp'
-            values: data.heat_block_zone_temps
-          }
-        ]
+        $scope.data = ChartData.temperatureLogs(temperature_logs).toN3LineChart()
 
       $scope.autoUpdateTemperatureLogs = =>
          if not $scope.updateInterval
@@ -178,10 +149,44 @@ window.ChaiBioTech.ngApp
         $interval.cancel $scope.updateInterval if $scope.updateInterval
         $scope.updateInterval = null
 
-      $scope.optionText = SecondsDisplay.display1
-
-      $scope.xTick = (x) ->
-        SecondsDisplay.display2 x/1000
+      $scope.options = {
+        axes: {
+          x: {
+            key: 'elapsed_time',
+            ticksFormatter: (t) -> SecondsDisplay.display2(t)
+            ticks: 8
+          },
+          y: {
+            key: 'heat_block_zone_temp'
+            type: 'linear'
+            min: 0
+            max: 0
+          }
+        },
+        margin: {
+          left: 30
+        },
+        series: [
+          {y: 'heat_block_zone_temp', color: 'steelblue'},
+          {y: 'lid_temp', color: 'lightsteelblue'}
+        ],
+        lineMode: 'linear',
+        tension: 0.7,
+        tooltip: {
+          mode: 'scrubber',
+          formatter: (x, y, series) ->
+            if series.y is 'lid_temp'
+              return "Time: #{SecondsDisplay.display2(x)} | Lid Temp: #{y}"
+            else if series.y is 'heat_block_zone_temp'
+              return "Time: #{SecondsDisplay.display2(x)} | Heat Block Zone Temp: #{y}"
+            else
+              return ''
+        },
+        drawLegend: false,
+        drawDots: false,
+        hideOverflow: false,
+        columnsHGap: 5
+      }
 
       return
 
