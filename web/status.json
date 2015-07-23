@@ -38,8 +38,8 @@
         },
         "expriment":
         {
-            "run_duration": "415",
-            "estimated_duration": "2147483647",
+            "run_duration": "159",
+            "estimated_duration": "508",
             "paused_duration": "0",
             "name": "New Experiment",
             "started_at": "2015-Jul-17 22:08:29.530621",
