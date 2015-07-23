@@ -90,10 +90,10 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.canvas.remove(this.littleCircleGroup);
         this.canvas.remove(this.gatherDataImage);
         this.canvas.remove(this.gatherDataCircleOnScroll);
-        //this.canvas.remove(this.gatherDataImageOnMoving);
+        this.canvas.remove(this.gatherDataImageOnMoving);
         this.canvas.remove(this.gatherDataCircle);
         this.canvas.remove(this.gatherDataImage);
-        //this.canvas.remove(this.)
+        //this.canvas.remove(this.);
         this.canvas.remove(this.gatherDataImageMiddle);
       };
       /*******************************************

@@ -63,7 +63,7 @@ window.ChaiBioTech.ngApp.factory('step', [
 
         this.ordealStatus = this.ordealStatus + 1;
         this.circle.getUniqueId();
-        this.circle.moveCircle();
+        //this.circle.moveCircle();
       };
 
       this.moveStepForDelete = function() {
@@ -78,7 +78,7 @@ window.ChaiBioTech.ngApp.factory('step', [
 
         this.ordealStatus = this.ordealStatus - 1;
         this.circle.getUniqueId();
-        this.circle.moveCircle();
+        //this.circle.moveCircle();
       };
 
       this.addName = function() {
