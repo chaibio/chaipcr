@@ -87,14 +87,14 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.canvas.remove(this.gatherDataOnScroll);
         this.canvas.remove(this.circleGroup);
         this.canvas.remove(this.gatherDataGroup);
-        this.canvas.remove(this.littleCircleGroup);
-        this.canvas.remove(this.gatherDataImage);
-        this.canvas.remove(this.gatherDataCircleOnScroll);
-        this.canvas.remove(this.gatherDataImageOnMoving);
-        this.canvas.remove(this.gatherDataCircle);
-        this.canvas.remove(this.gatherDataImage);
+        //this.canvas.remove(this.littleCircleGroup);
+        //this.canvas.remove(this.gatherDataImage);
+        //this.canvas.remove(this.gatherDataCircleOnScroll);
+        //this.canvas.remove(this.gatherDataImageOnMoving);
+        //this.canvas.remove(this.gatherDataCircle);
+        //this.canvas.remove(this.gatherDataImage);
         //this.canvas.remove(this.);
-        this.canvas.remove(this.gatherDataImageMiddle);
+        //this.canvas.remove(this.gatherDataImageMiddle);
       };
       /*******************************************
         This method shows circles and gather data. Pease note
@@ -365,7 +365,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         if(ChaiBioTech.app.selectedCircle) {
           var previousSelected = ChaiBioTech.app.selectedCircle;
-          
+
           if(previousSelected.uniqueName != this.uniqueName) {
 
             previousSelected.makeItSmall();
