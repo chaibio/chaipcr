@@ -11,4 +11,8 @@ class Ramp < ActiveRecord::Base
     rate == 0
   end
   
+  def copy
+    copy_helper
+  end
+  
 end

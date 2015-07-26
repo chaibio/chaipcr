@@ -7,6 +7,7 @@
 #include "qpcrfactory.h"
 #include "qpcrapplication.h"
 #include "exceptionhandler.h"
+#include "wirelessmanager.h"
 
 using namespace std;
 using namespace Poco::Net;
@@ -19,6 +20,7 @@ void QPCRApplication::initialize(Application&) {
     try {
         QPCRFactory::constructMachine(_controlUnits, _threadControlUnits);
         _experimentController = ExperimentController::createInstance();
+        _wirelessManager.reset(new WirelessManager("wlan0"));
 
         initSignals();
     }

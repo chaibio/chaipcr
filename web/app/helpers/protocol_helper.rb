@@ -1,5 +1,5 @@
 module ProtocolHelper  
-  def copy
+  def copy_helper
     self.class.new(attribute_hash(["id", "protocol_id", "stage_id", "step_id", "created_at", "updated_at"]))
   end
   

@@ -13,20 +13,6 @@
       .text-blue {
         color: #00AEEF;
       }
-      .button {
-        padding: 3px;
-        display: inline-block;
-        margin: 3px;
-        color: #fff;
-        &.stop {
-          background: red;
-          border-color: lighten(red, 25%);
-        }
-        &.run {
-          background: green;
-          border-color: lighten(green, 25%);
-        }
-      }
     }
     .test-info {
       .caption {
@@ -49,6 +35,27 @@
         background-color: #00aeef;
         height: 5px;
         width: 0px;
+      }
+    }
+    .button-wrapper {
+      padding: 15px;
+    }
+    .button {
+      border-radius: 0px;
+      display: block;
+      font-weight: bold;
+      padding: 3px;
+      width: 100%;
+      &.stop {
+        background: #fff;
+        border: 3px solid red;
+        color: red;
+      }
+      &.run {
+        background: #6ACC0A;
+        border: none;
+        color: #fff;
+        padding: 6px;
       }
     }
   }

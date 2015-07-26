@@ -9,7 +9,7 @@ window.ChaiBioTech.ngApp
     replace: true
     scope:
       leftMenuTemplate: '='
-      data: '='
+      $data: '=data'
     templateUrl: 'app/views/directives/sidemenu.html'
     link: ($scope) ->
 

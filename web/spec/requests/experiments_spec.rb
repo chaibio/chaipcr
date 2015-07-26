@@ -38,6 +38,14 @@ describe "Experiments API" do
     json["experiment"]["name"].should == "test"
   end
   
+  it 'copy experiment' do
+    experiment = create_experiment("test")
+    post "/experiments/#{experiment.id}/copy", { :format => 'json' }
+    expect(response).to be_success            # test for the 200 status-code
+    json = JSON.parse(response.body)
+    json["experiment"]["name"].should == "Copy of test"
+  end
+  
   it  'edit experiment name' do
     experiment = create_experiment("test")
     params = {experiment: {name: "test1"}}

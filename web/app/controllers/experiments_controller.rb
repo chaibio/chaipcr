@@ -60,7 +60,7 @@ class ExperimentsController < ApplicationController
   see "experiments#create", "json response"
   def copy
     old_experiment = Experiment.includes(:experiment_definition).find_by_id(params[:id])
-    experiment_definition = old_experiment.experiment_definition.copy(experiment_params)
+    experiment_definition = old_experiment.experiment_definition.copy(params[:experiment]? experiment_params : nil)
     @experiment = Experiment.new
     @experiment.experiment_definition = experiment_definition
     ret = @experiment.save

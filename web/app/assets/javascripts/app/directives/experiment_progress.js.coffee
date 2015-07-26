@@ -12,9 +12,8 @@ window.ChaiBioTech.ngApp
 
       update = ->
         Status.fetch().then (data) ->
-          $scope.expController = angular.copy data.experimentController
-          $scope.progressBarWidth = ($scope.expController.expriment.run_duration)/($scope.expController.expriment.estimated_duration+$scope.expController.expriment.paused_duration) * 100
-          $scope.progressBarWidth =  if $scope.progressBarWidth < 1 then 1
+          $scope.data = data
+          $scope.progressBarWidth = parseFloat(data.experimentController.expriment.run_duration)/parseFloat(data.experimentController.expriment.estimated_duration+parseFloat data.experimentController.expriment.paused_duration) * 100
 
       update()
 

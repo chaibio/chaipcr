@@ -7,7 +7,7 @@ class Protocol < ActiveRecord::Base
   def copy
     new_protocol = Protocol.new(:lid_temperature=>lid_temperature)
     stages.each do |stage|
-      new_protocol.stages << Stage.copy
+      new_protocol.stages << stage.copy
     end
     new_protocol
   end
