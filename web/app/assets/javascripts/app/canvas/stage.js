@@ -187,7 +187,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       };
 
       this.configureStep = function(newStep, start) {
-        // insert it to all steps , add next and previous , rerender circles;
+        // insert it to all steps, add next and previous , rerender circles;
         for(var j = start + 1; j < this.childSteps.length; j++) {
 
           var thisStep = this.childSteps[j];

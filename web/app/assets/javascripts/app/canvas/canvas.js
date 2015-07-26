@@ -238,6 +238,16 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     };
 
+    this.addNewStage = function(data, currentStage) {
+      console.log(data);
+      
+      // Make space.
+      // Create stage
+      // add step and stage into arrays ..
+      // Render it
+
+    };
+
     return this;
   }
 ]);
