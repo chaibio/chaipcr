@@ -283,13 +283,16 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
       stageView.childSteps[stageView.childSteps.length - 1].borderRight.setVisible(false);
       if(stageView.nextStage === null) {
-        alert("I am");
+        //alert("I am");
         stageView.borderRight();
         //this.canvas.remove(stageView.previousStage.borderRight);
       }
 
       var circles = this.reDrawCircles();
       this.addRampLinesAndCircles(circles);
+
+      this.$scope.applyValues(stageView.childSteps[0].circle);
+      stageView.childSteps[0].circle.manageClick(true);
       // Get unique id
       //this.moveStages(currentStage);
       // Make space. [read number of steps and create space]
