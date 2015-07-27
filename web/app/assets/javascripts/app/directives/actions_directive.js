@@ -33,7 +33,7 @@ window.ChaiBioTech.ngApp.directive('actions', [
           ExperimentLoader.addStage(scope, type)
             .then(function(data) {
               //console.log("stage added", data);
-              scope.fabricStep.parentStage.parent.addNewStage(data, scope.fabricStage);
+              scope.fabricStep.parentStage.parent.addNewStage(data, scope.fabricStep.parentStage);
             });
         };
 

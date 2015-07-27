@@ -58,7 +58,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
       for (var stageIndex = 0; stageIndex < noOfStages; stageIndex ++) {
 
-        stageView = new stage(allStages[stageIndex].stage, this.canvas, this.allStepViews, stageIndex, this, this.$scope);
+        stageView = new stage(allStages[stageIndex].stage, this.canvas, this.allStepViews, stageIndex, this, this.$scope, false);
         // We connect the stages like a linked list so that we can go up and down.
         if(previousStage){
           previousStage.nextStage = stageView;
@@ -143,8 +143,6 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         this.allStepViews[count].whiteFooterImage.top = 363;
         this.allStepViews[count].whiteFooterImage.left = this.allStepViews[count].left;
         this.canvas.add(this.allStepViews[count].whiteFooterImage);
-
-
 
       }
 
@@ -239,13 +237,66 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     };
 
     this.addNewStage = function(data, currentStage) {
-      console.log(data);
-      
-      // Make space.
-      // Create stage
-      // add step and stage into arrays ..
-      // Render it
 
+      //move the stages, make space.
+      var noOfsteps = data.stage.steps.length, k = 0,
+      ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus;
+
+      for(k = 0; k < noOfsteps; k++) {
+        currentStage.myWidth = currentStage.myWidth + 121;
+        currentStage.moveAllStepsAndStages(false);
+      }
+
+      currentStage.myWidth = currentStage.myWidth - (121 * noOfsteps);
+
+      // now create a stage;
+      var stageIndex = currentStage.index + 1;
+      var stageView = new stage(data.stage, this.canvas, this.allStepViews, stageIndex, this, this.$scope, true);
+
+      if(currentStage.nextStage) {
+        stageView.nextStage = currentStage.nextStage;
+        stageView.nextStage.previousStage = stageView;
+        currentStage.nextStage = stageView;
+      }
+      stageView.previousStage = currentStage;
+
+
+      stageView.updateStageData(1);
+      //stageView.previousStage = currentStage;
+      //stageView.nextStage = currentStage.nextStage;
+      currentStage.nextStage = stageView;
+      this.allStageViews.splice(stageIndex, 0, stageView);
+      stageView.render();
+
+
+      // configure steps;
+      var length = stageView.childSteps.length, l = 0;
+
+      for(l = 0; l < length; l++) {
+        stageView.childSteps[l].ordealStatus = ordealStatus + 1;
+        stageView.childSteps[l].render();
+        stageView.childSteps[l].addImages();
+
+        this.allStepViews.splice(ordealStatus, 0, stageView.childSteps[l]);
+        ordealStatus = ordealStatus + 1;
+      }
+
+      stageView.childSteps[stageView.childSteps.length - 1].borderRight.setVisible(false);
+      if(stageView.nextStage === null) {
+        alert("I am");
+        stageView.borderRight();
+        //this.canvas.remove(stageView.previousStage.borderRight);
+      }
+
+      var circles = this.reDrawCircles();
+      this.addRampLinesAndCircles(circles);
+      // Get unique id
+      //this.moveStages(currentStage);
+      // Make space. [read number of steps and create space]
+      // Create stage
+      // add step and stage into arrays .[look for previously clicke d steps and its parent stage]
+      // Render it.[Make sure all align well]
+      this.canvas.renderAll();
     };
 
     return this;
