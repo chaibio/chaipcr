@@ -70,7 +70,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         this.allStageViews.push(stageView);
       }
       // Only for the last stage
-      stageView.borderRight();
+      stageView.addBorderRight();
       //this.canvas.add(stageView.borderRight);
       // We should put an infinity symbol if the last step has infinite hold time.
       stageView.findLastStep();
@@ -256,18 +256,13 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       if(currentStage.nextStage) {
         stageView.nextStage = currentStage.nextStage;
         stageView.nextStage.previousStage = stageView;
-        currentStage.nextStage = stageView;
       }
+      currentStage.nextStage = stageView;
       stageView.previousStage = currentStage;
 
-
       stageView.updateStageData(1);
-      //stageView.previousStage = currentStage;
-      //stageView.nextStage = currentStage.nextStage;
-      currentStage.nextStage = stageView;
       this.allStageViews.splice(stageIndex, 0, stageView);
       stageView.render();
-
 
       // configure steps;
       var length = stageView.childSteps.length, l = 0;
@@ -282,10 +277,9 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       }
 
       stageView.childSteps[stageView.childSteps.length - 1].borderRight.setVisible(false);
-      if(stageView.nextStage === null) {
-        //alert("I am");
-        stageView.borderRight();
-        //this.canvas.remove(stageView.previousStage.borderRight);
+      if(stageView.nextStage === null) { // if its the last stage
+        stageView.addBorderRight();
+        this.canvas.remove(stageView.previousStage.borderRight);
       }
 
       var circles = this.reDrawCircles();
@@ -293,12 +287,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
       this.$scope.applyValues(stageView.childSteps[0].circle);
       stageView.childSteps[0].circle.manageClick(true);
-      // Get unique id
-      //this.moveStages(currentStage);
-      // Make space. [read number of steps and create space]
-      // Create stage
-      // add step and stage into arrays .[look for previously clicke d steps and its parent stage]
-      // Render it.[Make sure all align well]
+
       this.canvas.renderAll();
     };
 

@@ -99,8 +99,8 @@ window.ChaiBioTech.ngApp.factory('stage', [
           this.parent.allStageViews.splice(this.index, 1);
           this.updateStageData(-1);
 
-          if(selected.parentStage.index === this.parent.allStageViews.length - 1) {
-            selected.parentStage.borderRight();
+          if(! selected.parentStage.nextStage) {
+            selected.parentStage.addBorderRight();
             selected.borderRight.setVisible(false);
           }
         }
@@ -150,7 +150,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
           currentStage.nextStage.getLeft();
           currentStage.nextStage.stageGroup.set({left: currentStage.nextStage.left }).setCoords();
           var thisStageSteps = currentStage.nextStage.childSteps, stepCount = thisStageSteps.length;
-          
+
           for(var i = 0; i < stepCount; i++ ) {
             if(del === true) {
               thisStageSteps[i].moveStepForDelete();
@@ -252,7 +252,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       };
 
       //This is a special case only for the last stage
-      this.borderRight = function() {
+      this.addBorderRight = function() {
 
         this.borderRight = new fabric.Line([0, 0, 0, 342], {
             stroke: '#ff9f00',  left: (this.myWidth + this.left + 2) || 122,  top: 60,  strokeWidth: 2, selectable: false
