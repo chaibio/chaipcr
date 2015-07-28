@@ -23,6 +23,7 @@ window.ChaiBioTech.ngApp.factory('step', [
       };
 
       this.addImages = function() {
+        
         var can = this.parentStage.parent;
 
         this.commonFooterImage = can.applyPropertyToImages($.extend({}, can.imageobjects["common-step.png"]), this);
@@ -51,7 +52,7 @@ window.ChaiBioTech.ngApp.factory('step', [
 
       };
 
-      this.moveStep = function() {
+      this.moveStep = function(action) {
 
         this.setLeft();
         this.getUniqueName();
@@ -61,22 +62,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.whiteFooterImage.set(leftVal).setCoords();
         this.stepGroup.set(leftVal).setCoords();
 
-        this.ordealStatus = this.ordealStatus + 1;
-        this.circle.getUniqueId();
-        //this.circle.moveCircle();
-      };
-      // Combine these methods;
-      this.moveStepForDelete = function() {
-
-        this.setLeft();
-        this.getUniqueName();
-        var leftVal = {left: this.left};
-        this.commonFooterImage.set(leftVal).setCoords();
-        this.darkFooterImage.set(leftVal).setCoords();
-        this.whiteFooterImage.set(leftVal).setCoords();
-        this.stepGroup.set(leftVal).setCoords();
-
-        this.ordealStatus = this.ordealStatus - 1;
+        this.ordealStatus = this.ordealStatus + action;
         this.circle.getUniqueId();
         //this.circle.moveCircle();
       };

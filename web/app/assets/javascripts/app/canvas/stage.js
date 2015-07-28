@@ -151,9 +151,9 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
           for(var i = 0; i < stepCount; i++ ) {
             if(del === true) {
-              thisStageSteps[i].moveStepForDelete();
+              thisStageSteps[i].moveStep(-1);
             } else {
-              thisStageSteps[i].moveStep();
+              thisStageSteps[i].moveStep(1);
             }
 
           }
@@ -167,16 +167,16 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.updateStageData = function(action) {
 
         var currentStage = this;
-        //if(action === "insertion") {
-          while(currentStage.nextStage) {
-            currentStage.nextStage.index = currentStage.nextStage.index + action;
-            //this.stageNo.text = "''"
-            var indexNumber = currentStage.nextStage.index + 1;
-            var number = (indexNumber < 10) ? "0" + indexNumber : indexNumber;
-            currentStage.nextStage.stageNo.text = number.toString();
-            currentStage = currentStage.nextStage;
-          }
-        //}
+
+        while(currentStage.nextStage) {
+          currentStage.nextStage.index = currentStage.nextStage.index + action;
+          //this.stageNo.text = "''"
+          var indexNumber = currentStage.nextStage.index + 1;
+          var number = (indexNumber < 10) ? "0" + indexNumber : indexNumber;
+          currentStage.nextStage.stageNo.text = number.toString();
+          currentStage = currentStage.nextStage;
+        }
+        
       };
       this.configureStepForDelete = function(newStep, start) {
 
@@ -187,7 +187,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
           thisStep.index = thisStep.index - 1;
           thisStep.model.name = "STEP " + (thisStep.index + 1);
           thisStep.stepName.text = thisStep.model.name;
-          thisStep.moveStepForDelete();
+          thisStep.moveStep(-1);
         }
       };
 
@@ -199,7 +199,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
           thisStep.index = thisStep.index + 1;
           thisStep.model.name = "STEP " + (thisStep.index + 1);
           thisStep.stepName.text = thisStep.model.name;
-          thisStep.moveStep();
+          thisStep.moveStep(1);
         }
 
         if(this.childSteps[newStep.index + 1]) {
