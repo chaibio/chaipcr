@@ -166,7 +166,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
       this.allCircles = circles || this.findAllCircles();
       var limit = this.allCircles.length;
-      console.log("boom", limit);
+      
       for(i = 0; i < limit; i++) {
         var thisCircle = this.allCircles[i];
 

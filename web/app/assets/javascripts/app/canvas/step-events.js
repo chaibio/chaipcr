@@ -44,7 +44,7 @@ window.ChaiBioTech.ngApp.service('stepEvents',[
         if( $scope.fabricStep.index !== 0 || $scope.fabricStep.parentStage.index !== 0) {
           //if its not the very first step
           var circle = $scope.fabricStep.circle;
-          circle.gatherDataGroup.visible = newVal;
+          circle.gatherDataGroup.setVisible(newVal);
           canvas.renderAll();
         }
       });
