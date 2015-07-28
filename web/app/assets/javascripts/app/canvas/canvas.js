@@ -44,9 +44,10 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       var width = (this.allStepViews.length * 122 > 1024) ? this.allStepViews.length * 120 : 1024;
       this.canvas.setWidth(width + 50);
 
-      $timeout(function(context) {
-        context.canvas.renderAll();
-      },0 , true, this);
+      //$timeout(function(context) {
+        //context.canvas.renderAll();
+        this.canvas.renderAll();
+      //},0 , true, this);
 
       return this;
     };
@@ -163,7 +164,6 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     this.addRampLinesAndCircles = function(circles) {
 
-      //this.allCircles = null;
       this.allCircles = circles || this.findAllCircles();
       var limit = this.allCircles.length;
       console.log("boom", limit);
@@ -171,20 +171,10 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         var thisCircle = this.allCircles[i];
 
         if(i < (limit - 1)) {
-          //if(thisCircle.curve) {
-            //this.canvas.remove(thisCircle.curve);
-            //thisCircle.realign();
-            //this.canvas.bringToFront(thisCircle.previous.curve);
-            //delete(thisCircle.curve);
-          //}
-            thisCircle.moveCircle();
-            thisCircle.curve = new path(thisCircle);
-            this.canvas.add(thisCircle.curve);
-            /*if(thisCircle.previous) {
-              this.canvas.remove(thisCircle.previous.curve);
-              thisCircle.previous.curve = new path(thisCircle.previous);
-              this.canvas.add(thisCircle.previous.curve);
-            }*/
+
+          thisCircle.moveCircle();
+          thisCircle.curve = new path(thisCircle);
+          this.canvas.add(thisCircle.curve);
 
           this.canvas.bringToFront(thisCircle.parent.rampSpeedGroup);
           if(thisCircle.previous) {
@@ -287,8 +277,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
       this.$scope.applyValues(stageView.childSteps[0].circle);
       stageView.childSteps[0].circle.manageClick(true);
-
-      this.canvas.renderAll();
+      this.setDefaultWidthHeight();
+      //this.canvas.renderAll();
     };
 
     return this;

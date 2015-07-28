@@ -46,7 +46,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
         $scope.applyValues(newStep.circle);
         newStep.circle.manageClick(true);
-        this.canvas.renderAll();
+        this.parent.setDefaultWidthHeight();
       };
 
       this.deleteStep = function(data, currentStep) {
@@ -118,7 +118,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
         $scope.applyValues(selected.circle);
         selected.circle.manageClick();
-        this.canvas.renderAll();
+        this.parent.setDefaultWidthHeight();
       };
 
       this.deleteStageContents = function() {
@@ -176,7 +176,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
           currentStage.nextStage.stageNo.text = number.toString();
           currentStage = currentStage.nextStage;
         }
-        
+
       };
       this.configureStepForDelete = function(newStep, start) {
 
