@@ -25,7 +25,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
         };
 
         scope.save = function() {
-
+          console.log("i am coming here");
           scope.edit = false;
           ExperimentLoader.changeHoldDuration(scope.$parent);
         };

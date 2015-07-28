@@ -201,7 +201,7 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
     };
 
     this.changeDeltaTime = function($scope) {
-
+      //console.log("I am here", $scope);
       var dataToBeSend = {'step': {'delta_duration_s': $scope.step.delta_duration_s}},
       url = "/steps/" + $scope.step.id,
       delay = $q.defer();
