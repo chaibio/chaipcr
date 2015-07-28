@@ -36,6 +36,7 @@ window.ChaiBioTech.ngApp.service('stepEvents',[
         // things to happen wen step.collect_data changes;
         var circle = $scope.fabricStep.circle;
         circle.showHideGatherData(newVal);
+        circle.parent.gatherDataDuringStep = newVal;
         canvas.renderAll();
       });
 
@@ -45,6 +46,7 @@ window.ChaiBioTech.ngApp.service('stepEvents',[
           //if its not the very first step
           var circle = $scope.fabricStep.circle;
           circle.gatherDataGroup.setVisible(newVal);
+          circle.parent.gatherDataDuringRamp = newVal;
           canvas.renderAll();
         }
       });
