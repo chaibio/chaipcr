@@ -1,6 +1,6 @@
 <div class="bottom-common-item" ng-class="{disabled: !delta}">
   <div class="caption-part simplifica">{{caption | uppercase}}</div>
   <div class="data-part ostrich"><span class="data-part-span" ng-show="!edit" ng-click="editAndFocus('data-part-edit-value')">{{shown}}{{unit}}</span>
-    <input on-enter="save()" ng-show="edit" ng-blur="save()" ng-model="hidden" class="data-part-edit-value" min="0" max="100"  type="text" value="{{hidden}}">
+    <input on-enter="edit = false" ng-show="edit" ng-blur="save()" ng-model="hidden" class="data-part-edit-value" min="0" max="100"  type="text" value="{{hidden}}">
   </div>
 </div>

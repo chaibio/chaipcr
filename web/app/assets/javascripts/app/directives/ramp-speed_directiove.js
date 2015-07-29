@@ -35,12 +35,17 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
         };
 
         scope.save = function() {
+          
           scope.edit = false;
           if(! isNaN(scope.hidden)) {
+
             scope.reading = scope.hidden;
-            ExperimentLoader.changeRampSpeed(scope.$parent).then(function(data) {
-              console.log(data);
+            $timeout(function() {
+              ExperimentLoader.changeRampSpeed(scope.$parent).then(function(data) {
+                console.log(data);
+              });
             });
+
           } else {
             scope.shown = "AUTO";
             scope.hidden = 0;
