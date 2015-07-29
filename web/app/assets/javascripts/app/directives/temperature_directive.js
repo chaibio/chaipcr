@@ -18,6 +18,16 @@ window.ChaiBioTech.ngApp.directive('temperature', [
 
         scope.edit = false;
         scope.delta = true; // This is to prevent the directive become disabled, check delta in template, this is used for auto delta field
+
+        scope.$watch("reading", function(val) {
+
+          if(angular.isDefined(scope.reading)) {
+
+            scope.shown = Number(scope.reading);
+            scope.hidden = Number(scope.reading);
+          }
+        });
+
         scope.editAndFocus = function(className) {
 
           scope.edit = ! scope.edit;
@@ -29,7 +39,18 @@ window.ChaiBioTech.ngApp.directive('temperature', [
         scope.save = function() {
 
           scope.edit = false;
-          ExperimentLoader.changeTemperature(scope.$parent);
+          if(! isNaN(scope.hidden)) {
+
+            scope.reading = scope.hidden;
+            $timeout(function() {
+              ExperimentLoader.changeTemperature(scope.$parent).then(function(data) {
+                console.log(data);
+              });
+            });
+
+          } else {
+            scope.shown = scope.hidden = scope.reading;
+          }
         };
       }
     };
