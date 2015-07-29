@@ -16,6 +16,17 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
 
         scope.edit = false;
         scope.delta = true; // This is to prevent the directive become disabled, check delta in template, this is used for auto delta field
+
+        scope.$watch("reading", function(val) {
+
+          if(angular.isDefined(scope.reading)) {
+            console.log(Number(scope.reading));
+            scope.shown = (Number(scope.reading) === 0) ? "AUTO" : scope.reading;
+            scope.hidden = Number(scope.reading);
+          }
+        });
+
+
         scope.editAndFocus = function(className) {
           scope.edit = ! scope.edit;
           $timeout(function() {
@@ -24,8 +35,22 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
         };
 
         scope.save = function() {
+          
           scope.edit = false;
-          ExperimentLoader.changeRampSpeed(scope.$parent);
+          if(! isNaN(scope.hidden)) {
+
+            scope.reading = scope.hidden;
+            $timeout(function() {
+              ExperimentLoader.changeRampSpeed(scope.$parent).then(function(data) {
+                console.log(data);
+              });
+            });
+
+          } else {
+            scope.shown = "AUTO";
+            scope.hidden = 0;
+          }
+
         };
       }
     };

@@ -19,6 +19,15 @@ window.ChaiBioTech.ngApp.directive('temp', [
 
         scope.edit = false;
 
+        scope.$watch("reading", function(val) {
+
+          if(angular.isDefined(scope.reading)) {
+
+            scope.shown = Number(scope.reading);
+            scope.hidden = Number(scope.reading);
+          }
+        });
+
         scope.editAndFocus = function(className) {
 
           if(scope.delta) {
@@ -32,7 +41,18 @@ window.ChaiBioTech.ngApp.directive('temp', [
         scope.save = function() {
 
           scope.edit = false;
-          ExperimentLoader.changeDeltaTemperature(scope.$parent);
+          if(! isNaN(scope.hidden)) {
+
+            scope.reading = scope.hidden;
+            $timeout(function() {
+              ExperimentLoader.changeDeltaTemperature(scope.$parent).then(function(data) {
+                console.log(data);
+              });
+            });
+
+          } else {
+            scope.shown = scope.hidden = scope.reading;
+          }
         };
 
       }

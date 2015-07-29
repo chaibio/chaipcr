@@ -44,9 +44,10 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       var width = (this.allStepViews.length * 122 > 1024) ? this.allStepViews.length * 120 : 1024;
       this.canvas.setWidth(width + 50);
 
-      $timeout(function(context) {
-        context.canvas.renderAll();
-      },0 , true, this);
+      //$timeout(function(context) {
+        //context.canvas.renderAll();
+        this.canvas.renderAll();
+      //},0 , true, this);
 
       return this;
     };
@@ -58,7 +59,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
       for (var stageIndex = 0; stageIndex < noOfStages; stageIndex ++) {
 
-        stageView = new stage(allStages[stageIndex].stage, this.canvas, this.allStepViews, stageIndex, this, this.$scope);
+        stageView = new stage(allStages[stageIndex].stage, this.canvas, this.allStepViews, stageIndex, this, this.$scope, false);
         // We connect the stages like a linked list so that we can go up and down.
         if(previousStage){
           previousStage.nextStage = stageView;
@@ -70,7 +71,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         this.allStageViews.push(stageView);
       }
       // Only for the last stage
-      stageView.borderRight();
+      stageView.addBorderRight();
       //this.canvas.add(stageView.borderRight);
       // We should put an infinity symbol if the last step has infinite hold time.
       stageView.findLastStep();
@@ -144,8 +145,6 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         this.allStepViews[count].whiteFooterImage.left = this.allStepViews[count].left;
         this.canvas.add(this.allStepViews[count].whiteFooterImage);
 
-
-
       }
 
       return this;
@@ -165,28 +164,17 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     this.addRampLinesAndCircles = function(circles) {
 
-      //this.allCircles = null;
       this.allCircles = circles || this.findAllCircles();
       var limit = this.allCircles.length;
-      console.log("boom", limit);
+      
       for(i = 0; i < limit; i++) {
         var thisCircle = this.allCircles[i];
 
         if(i < (limit - 1)) {
-          //if(thisCircle.curve) {
-            //this.canvas.remove(thisCircle.curve);
-            //thisCircle.realign();
-            //this.canvas.bringToFront(thisCircle.previous.curve);
-            //delete(thisCircle.curve);
-          //}
-            thisCircle.moveCircle();
-            thisCircle.curve = new path(thisCircle);
-            this.canvas.add(thisCircle.curve);
-            /*if(thisCircle.previous) {
-              this.canvas.remove(thisCircle.previous.curve);
-              thisCircle.previous.curve = new path(thisCircle.previous);
-              this.canvas.add(thisCircle.previous.curve);
-            }*/
+
+          thisCircle.moveCircle();
+          thisCircle.curve = new path(thisCircle);
+          this.canvas.add(thisCircle.curve);
 
           this.canvas.bringToFront(thisCircle.parent.rampSpeedGroup);
           if(thisCircle.previous) {
@@ -236,6 +224,61 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       }
       return circles;
 
+    };
+
+    this.addNewStage = function(data, currentStage) {
+
+      //move the stages, make space.
+      var noOfsteps = data.stage.steps.length, k = 0,
+      ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus;
+
+      for(k = 0; k < noOfsteps; k++) {
+        currentStage.myWidth = currentStage.myWidth + 121;
+        currentStage.moveAllStepsAndStages(false);
+      }
+
+      currentStage.myWidth = currentStage.myWidth - (121 * noOfsteps);
+
+      // now create a stage;
+      var stageIndex = currentStage.index + 1;
+      var stageView = new stage(data.stage, this.canvas, this.allStepViews, stageIndex, this, this.$scope, true);
+
+      if(currentStage.nextStage) {
+        stageView.nextStage = currentStage.nextStage;
+        stageView.nextStage.previousStage = stageView;
+      }
+      currentStage.nextStage = stageView;
+      stageView.previousStage = currentStage;
+
+      stageView.updateStageData(1);
+      this.allStageViews.splice(stageIndex, 0, stageView);
+      stageView.render();
+
+      // configure steps;
+      var length = stageView.childSteps.length, l = 0;
+
+      for(l = 0; l < length; l++) {
+        stageView.childSteps[l].ordealStatus = ordealStatus + 1;
+        stageView.childSteps[l].render();
+        stageView.childSteps[l].addImages();
+
+        this.allStepViews.splice(ordealStatus, 0, stageView.childSteps[l]);
+        ordealStatus = ordealStatus + 1;
+      }
+
+      stageView.childSteps[stageView.childSteps.length - 1].borderRight.setVisible(false);
+      if(stageView.nextStage === null) { // if its the last stage
+        stageView.addBorderRight();
+        this.canvas.remove(stageView.previousStage.borderRight);
+      }
+
+      var circles = this.reDrawCircles();
+      this.addRampLinesAndCircles(circles);
+
+      this.$scope.applyValues(stageView.childSteps[0].circle);
+      stageView.childSteps[0].circle.manageClick(true);
+      this.setDefaultWidthHeight();
+      //this.canvas.renderAll();
     };
 
     return this;
