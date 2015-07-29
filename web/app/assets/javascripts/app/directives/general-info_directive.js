@@ -15,7 +15,8 @@ window.ChaiBioTech.ngApp.directive('general', [
         scope.stepNameShow = false;
         scope.stageNoCycleShow = false;
         scope.popUp = false;
-
+        scope.showCycling = false;
+        
         scope.$on("dataLoaded", function() {
           // there is a slight delay for the controller to catch up so wait for it and load
           scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
@@ -30,6 +31,14 @@ window.ChaiBioTech.ngApp.directive('general', [
 
           scope.$watch('step.ramp.collect_data', function(newVal, oldVal) {
             scope.gather_data_state = (scope.step.collect_data || scope.step.ramp.collect_data) ? "ON" : "OFF";
+          });
+
+          scope.$watch('stage.stage_type', function(newVal, oldVal) {
+            if(newVal === "cycling") {
+              scope.showCycling = true;
+            } else {
+              scope.showCycling = false;
+            }
           });
 
         });

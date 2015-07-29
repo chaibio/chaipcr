@@ -8,13 +8,13 @@
   <div class="bottom-stage-name sansa">{{stage.name | uppercase}}</div>
 
   <div class="bottom-step-no-cycle-container">
-    <div class="bottom-step-no-cycle ostrich">
+    <div class="bottom-step-no-cycle ostrich" ng-show="showCycling">
     <span class="bottom-step-no-cycle-span" ng-click="clickOnField('stageNoCycleShow', 'bottom-step-no-cycle-edit')">{{stage.num_cycles}}</span>
     <input type="text" class="bottom-step-no-cycle-edit" ng-blur="saveCycle()" on-enter="saveCycle()" numbers-only="numbers-only" ng-show="stageNoCycleShow" ng-model="stage.num_cycles">
     </div>
-    <div class="bottom-step-x ostrich">x</div>
-    <div class="bottom-cycles-and-dots sansa">CYCLES</div>
-    <div class="bottom-cycle-dots"></div>
+    <div class="bottom-step-x ostrich" ng-show="showCycling">x</div>
+    <div class="bottom-cycles-and-dots sansa" ng-show="showCycling">CYCLES</div>
+    <div class="bottom-cycle-dots" ng-show="showCycling"></div>
   </div>
 
   <div class="bottom-button-container">

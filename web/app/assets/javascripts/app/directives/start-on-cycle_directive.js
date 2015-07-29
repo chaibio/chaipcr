@@ -18,6 +18,15 @@ window.ChaiBioTech.ngApp.directive('startOnCycle', [
 
         scope.edit = false;
 
+        scope.$watch("reading", function(val) {
+
+          if(angular.isDefined(scope.reading)) {
+
+            scope.shown = Number(scope.reading);
+            scope.hidden = Number(scope.reading);
+          }
+        });
+
         scope.editAndFocus = function(className) {
 
           if(scope.delta) {
@@ -31,9 +40,24 @@ window.ChaiBioTech.ngApp.directive('startOnCycle', [
         scope.save = function() {
 
           scope.edit = false;
+          if(! isNaN(scope.hidden)) {
+
+            scope.reading = scope.hidden;
+            $timeout(function() {
+              ExperimentLoader.changeStartOnCycle(scope.$parent).then(function(data) {
+                console.log(data);
+              });
+            });
+
+          } else {
+            scope.shown = "AUTO";
+            scope.hidden = 0;
+          }
+
+          /*scope.edit = false;
           if(scope.reading <= scope.$parent.stage.num_cycles) {
             ExperimentLoader.changeStartOnCycle(scope.$parent);
-          }
+          }*/
 
         };
       }
