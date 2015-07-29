@@ -16,7 +16,7 @@ window.ChaiBioTech.ngApp.directive('general', [
         scope.stageNoCycleShow = false;
         scope.popUp = false;
         scope.showCycling = false;
-        
+
         scope.$on("dataLoaded", function() {
           // there is a slight delay for the controller to catch up so wait for it and load
           scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";

@@ -42,16 +42,20 @@ window.ChaiBioTech.ngApp.directive('startOnCycle', [
           scope.edit = false;
           if(! isNaN(scope.hidden)) {
 
-            scope.reading = scope.hidden;
-            $timeout(function() {
-              ExperimentLoader.changeStartOnCycle(scope.$parent).then(function(data) {
-                console.log(data);
-              });
-            });
+            if(scope.hidden <= Number(scope.$parent.stage.num_cycles)) {
 
+              scope.reading = scope.hidden;
+              $timeout(function() {
+                ExperimentLoader.changeStartOnCycle(scope.$parent).then(function(data) {
+                  console.log(data);
+                });
+              });
+            } else {
+              scope.hidden = scope.shown;
+              alert("Please enter a value less than number of cycles");
+            }
           } else {
-            scope.shown = "AUTO";
-            scope.hidden = 0;
+            scope.hidden = scope.shown;
           }
 
           /*scope.edit = false;

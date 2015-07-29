@@ -21,7 +21,7 @@ window.ChaiBioTech.ngApp.directive('time', [
         scope.edit = false;
 
         scope.editAndFocus = function(className) {
-          
+
           if(scope.delta) {
             scope.edit = ! scope.edit;
             $timeout(function() {
