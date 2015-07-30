@@ -10,3 +10,5 @@ window.ChaiBioTech.ngApp
         angular.element('body').removeClass('login-page-active')
 
 ]
+
+.value 'host', "http://#{window.location.hostname}"

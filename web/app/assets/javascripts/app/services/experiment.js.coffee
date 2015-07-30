@@ -3,7 +3,8 @@ window.ChaiBioTech.ngApp
 .service 'Experiment', [
   '$resource'
   '$http'
-  ($resource, $http) ->
+  'host'
+  ($resource, $http, host) ->
 
     self = $resource('/experiments/:id', {id: '@id'}, {
       update:
@@ -23,6 +24,12 @@ window.ChaiBioTech.ngApp
 
     self.duplicate = (expId, data) ->
       $http.post "/experiments/#{expId}/copy", data
+
+    self.startExperiment = (expId) ->
+      $http.post "#{host}:8000/control/start", {experimentId: expId}
+
+    self.stopExperiment = ->
+      $http.post "#{host}:8000/control/stop"
 
     return self
 
