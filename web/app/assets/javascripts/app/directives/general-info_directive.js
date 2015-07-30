@@ -21,6 +21,8 @@ window.ChaiBioTech.ngApp.directive('general', [
           // there is a slight delay for the controller to catch up so wait for it and load
           scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
 
+
+
           scope.$watch('stage.auto_delta', function(newVal, oldVal) {
             scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
           });
@@ -36,11 +38,11 @@ window.ChaiBioTech.ngApp.directive('general', [
           scope.$watch('stage.stage_type', function(newVal, oldVal) {
             if(newVal === "cycling") {
               scope.showCycling = true;
+              scope.cycleNoBackup = scope.stage.num_cycles;
             } else {
               scope.showCycling = false;
             }
           });
-
         });
 
         // focusElement is the classname of the desired input box to be shown
@@ -58,8 +60,11 @@ window.ChaiBioTech.ngApp.directive('general', [
           scope.stageNoCycleShow = false;
           if(scope.stage.num_cycles >= scope.stage.auto_delta_start_cycle) {
             ExperimentLoader.saveCycle(scope);
+            scope.cycleNoBackup = scope.stage.num_cycles;
           } else {
             alert("Entar a value greater than" + scope.stage.auto_delta_start_cycle);
+            console.log(scope.cycleNoBackup);
+            scope.stage.num_cycles = scope.cycleNoBackup;
           }
         };
 
