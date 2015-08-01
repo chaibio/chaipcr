@@ -1,3 +1,4 @@
+
 <div class="menu-overlay-menu">
   <div class="long-tail-container">
     <div class="long-tail"></div>
@@ -9,7 +10,7 @@
     </div>
     <div class="ball"></div>
     <div class="menu-text simplifica">
-      <a href="#">EXPERIMENT PROPERTIES</a>
+      <a>EXPERIMENT PROPERTIES</a>
     </div>
   </div>
   <div class="menu-overlay-menu-item">
@@ -32,33 +33,31 @@
       <a href="#/plate-setup/1">PLATE SETUP</a>
     </div>
   </div>
-  <div class="menu-overlay-menu-item-special">
+  <div class="menu-overlay-menu-item special">
     <div class="tail-container">
       <div class="tail">
       </div>
     </div>
-    <div class="ball-text-container">
-      <div class="ball">
-      </div>
-      <div class="menu-text simplifica">
-        <a ui-sref="runExperiment({id: $data.id})">RUN EXPERIMENT</a>
-      </div>
+    <div class="ball">
     </div>
-    <div class="back-tail-container">
-      <div class="back-tail">
-      </div>
+    <div class="menu-text simplifica">
+      <a ui-sref="runExperiment({id: params.id})">RUN EXPERIMENT</a>
     </div>
   </div>
 </div>
-<a href="#/home"><img class="home-image" src="assets/home.png"></a>
+
+<a ui-sref="home" class="home-link">
+  <img src="/assets/home.png" alt="">
+</a>
+
 <div class="menu-overlay-all-options">
   <div class="menu-overlay-options-content">
     <div class="title sansa">
       EXPERIMENT OPTIONS
     </div>
-    <div id="export-exp" class="exp-option-buttons">EXPORT...</div>
-    <div class="exp-option-buttons" duplicate-experiment experiment-id="$data.id">DUPLICATE EXPERIMENT</div>
-    <div id="delete-exp" class="exp-option-buttons">DELETE EXPERIMENT</div>
+    <div id="export-exp" class="exp-option">EXPORT...</div>
+    <div class="exp-option" duplicate-experiment experiment-id="params.id">DUPLICATE EXPERIMENT</div>
+    <div id="delete-exp" class="exp-option">DELETE EXPERIMENT</div>
   </div>
 </div>
 <div class="experiment-in-progress-container">

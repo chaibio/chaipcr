@@ -1,0 +1,154 @@
+$sidemenu_width: 450px;
+
+.menu-overlay-layout {
+  overflow-x: scroll;
+  width: 1024px;
+  float: left;
+  overflow-x: hidden;
+
+  .sidemenu {
+    background-color: #001827;
+    float: left;
+    min-height: 768px;
+    position: relative;
+    width: $sidemenu_width;
+
+    .sidemenu-content {
+      height: 100%;
+    }
+
+    .menu-overlay-menu {
+      .long-tail-container {
+        height: 40px;
+        width: 350px;
+
+        .long-tail {
+          width: 6px;
+          height: 40px;
+          background-color: white;
+          margin-left: 70px;
+        }
+      }
+    }
+    .menu-overlay-menu-item {
+      height: 60px;
+      width: 100%;
+      padding-left: 40px;
+
+      .tail-container {
+        height: 25px;
+        width: 350px;
+        .tail {
+          width: 6px;
+          height: 22px;
+          background-color: white;
+          margin-left: 30px;
+        }
+      }
+      .ball {
+        width: 30px;
+        height: 30px;
+        background-image: image-url("white-ball.png");
+        margin-left: 17px;
+        float: left;
+      }
+      .menu-text {
+        float: left;
+        margin-top: 10px;
+        margin-left: 14px;
+        cursor: pointer;
+        * {
+          color: #fff;
+        }
+      }
+
+      &.special {
+        height: 110px;
+
+        .tail-container {
+          height: 43px;
+          width: 350px;
+          .tail {
+            width: 6px;
+            height: 40px;
+            background-color: white;
+            margin-left: 30px;
+          }
+        }
+        .ball {
+          width: 60px;
+          height: 60px;
+          background-image: image-url("big-white-ball.png");
+          margin-left: 3px;
+          float: left;
+          margin-top: 1px;
+        }
+        .menu-text{
+          float: left;
+          color: white;
+          margin-top: 24px;
+          margin-left: 14px;
+          cursor: pointer;
+          font-size: 40px;
+        }
+      }
+    }
+    .home-link {
+      position: absolute;
+      top: 15px;
+      left: 20px;
+    }
+
+    .menu-overlay-all-options {
+      margin-top: 52px;
+      padding: 0 50px;
+
+      .title {
+        border-bottom: solid 1px #fff;
+        color: #fff;
+        font-size: 14px;
+        text-align: center;
+      }
+      .exp-option {
+        color: #106aa9;
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 16px;
+        text-align: center;
+      }
+    }
+  }
+  .outer-menu {
+    background-color: gray;
+    float: left;
+    min-height: 768px;
+    width: $sidemenu_width;
+  }
+  .page-content {
+    position: relative;
+    top: 0;
+    left: 0;
+    background-color: #efefef;
+    float: left;
+    margin-right: -($sidemenu_width * 2);
+    min-height: 500px;
+    width: 1024px;
+    white-space: normal;
+
+    .content {
+      top: 0;
+      left: 0;
+    }
+
+    .content-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      z-index: 999999;
+      opacity: 0.3;
+    }
+  }
+}
