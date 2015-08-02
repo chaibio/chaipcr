@@ -20,6 +20,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       this.allStageViews = [];
       this.canvas = null;
       this.allCircles = null;
+      this.drawCirclesArray = [];
+      this.findAllCirclesArray = [];
       this.images = [
         "common-step.png",
         "black-footer.png",
@@ -87,17 +89,12 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     /*******************************************************/
     this.selectStep = function() {
 
-      /*if(ChaiBioTech.app.newlyCreatedStep) {
-        ChaiBioTech.app.newlyCreatedStep.circle.manageClick(true);
-        appRouter.editStageStep.trigger("stepSelected", ChaiBioTech.app.newlyCreatedStep);
-        ChaiBioTech.app.newlyCreatedStep = null;
-      } else {*/
         this.allStepViews[0].circle.manageClick(true);
         this.$scope.fabricStep = this.allStepViews[0];
         // here we initite stage/step events service.. So now we can listen for changes from the bottom.
         stageEvents.init(this.$scope, this.canvas, this);
         stepEvents.init(this.$scope, this.canvas, this);
-      //}
+
     };
 
     this.loadImages = function() {
@@ -191,7 +188,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     this.findAllCircles = function() {
 
-      var i = 0, limit = this.allStepViews.length, circles = [], tempCirc = null;
+      var i = 0, limit = this.allStepViews.length, tempCirc = null;
+      this.findAllCirclesArray.length = 0;
 
       for(i = 0; i < limit; i++) {
         if(tempCirc) {
@@ -199,19 +197,20 @@ window.ChaiBioTech.ngApp.factory('canvas', [
           tempCirc.next = this.allStepViews[i].circle;
         }
         tempCirc = this.allStepViews[i].circle;
-        circles.push(this.allStepViews[i].circle);
+        this.findAllCirclesArray.push(this.allStepViews[i].circle);
       }
-      return circles;
+      return this.findAllCirclesArray;
     };
 
     this.reDrawCircles = function() {
 
-      var i = 0, limit = this.allStepViews.length, circles = [], tempCirc = null;
+      var i = 0, limit = this.allStepViews.length, tempCirc = null;
+      this.drawCirclesArray.length = 0;
 
       for(i = 0; i < limit; i++) {
 
         this.allStepViews[i].circle.removeContents();
-        this.allStepViews[i].circle = null;
+        delete this.allStepViews[i].circle;
         this.allStepViews[i].addCircle();
 
         if(tempCirc) {
@@ -219,9 +218,9 @@ window.ChaiBioTech.ngApp.factory('canvas', [
           tempCirc.next = this.allStepViews[i].circle;
         }
         tempCirc = this.allStepViews[i].circle;
-        circles.push(this.allStepViews[i].circle);
+        this.drawCirclesArray.push(this.allStepViews[i].circle);
       }
-      return circles;
+      return this.drawCirclesArray;
     };
 
     this.addNewStage = function(data, currentStage) {

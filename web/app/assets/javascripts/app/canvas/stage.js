@@ -118,7 +118,9 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
         $scope.applyValues(selected.circle);
         selected.circle.manageClick();
+        currentStep = null; // we force it to be collected by garbage collector
         this.parent.setDefaultWidthHeight();
+        //if(this.childSteps.length === 0) { delete(this); }
       };
 
       this.deleteStageContents = function() {
