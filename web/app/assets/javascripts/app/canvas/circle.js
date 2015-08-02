@@ -87,14 +87,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.canvas.remove(this.gatherDataOnScroll);
         this.canvas.remove(this.circleGroup);
         this.canvas.remove(this.gatherDataGroup);
-        //this.canvas.remove(this.littleCircleGroup);
-        //this.canvas.remove(this.gatherDataImage);
-        //this.canvas.remove(this.gatherDataCircleOnScroll);
-        //this.canvas.remove(this.gatherDataImageOnMoving);
-        //this.canvas.remove(this.gatherDataCircle);
-        //this.canvas.remove(this.gatherDataImage);
-        //this.canvas.remove(this.);
-        //this.canvas.remove(this.gatherDataImageMiddle);
+
       };
       /*******************************************
         This method shows circles and gather data. Pease note
@@ -112,8 +105,6 @@ window.ChaiBioTech.ngApp.factory('circle', [
             this.gatherDataImageOnMoving
           ], this);
 
-        //this.gatherDataOnScroll.add(this.gatherDataCircleOnScroll);
-        //this.gatherDataOnScroll.add(this.gatherDataImageOnMoving);
         // enable this when image is added on creating new circle ..
         this.circleGroup.set({"left": this.left + 60}).setCoords();
 
@@ -127,9 +118,6 @@ window.ChaiBioTech.ngApp.factory('circle', [
             this.gatherDataCircle = new gatherDataCircle(),
             this.gatherDataImage
           ], this);
-
-        //this.gatherDataGroup.add(this.gatherDataCircle);
-        //this.gatherDataGroup.add(this.gatherDataImage);
 
         this.gatherDataGroup.set({"left": this.left}).setCoords();
         this.canvas.add(this.gatherDataGroup);
@@ -334,30 +322,6 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.temperature.text = String(dynamicTemp + "º");
         this.model.temperature = String(dynamicTemp);
         this.parent.adjustRampSpeedPlacing();
-      };
-
-      this.realign = function() {
-
-        var x1 = this.left + 60, y1 = this.top,
-        x2 = this.next.left + 60, y2 = this.next.top;
-
-        var midPointX = (x1 + x2) / 2,
-        midPointY = (y1 + y2) / 2;
-
-        this.curve.path[0][1] = x1;
-        this.curve.path[0][2] = y1;
-
-        this.curve.path[1][1] = x1 + this.controlDistance;
-        this.curve.path[1][2] = y1;
-
-        this.curve.path[1][3] = midPointX;
-        this.curve.path[1][4] = midPointY;
-
-        this.curve.path[2][1] = x2 - this.controlDistance;
-        this.curve.path[2][2] = y2;
-
-        this.curve.path[2][3] = x2;
-        this.curve.path[2][4] = y2;
       };
 
       this.manageClick = function() {

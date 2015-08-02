@@ -87,17 +87,17 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     /*******************************************************/
     this.selectStep = function() {
 
-      if(ChaiBioTech.app.newlyCreatedStep) {
+      /*if(ChaiBioTech.app.newlyCreatedStep) {
         ChaiBioTech.app.newlyCreatedStep.circle.manageClick(true);
         appRouter.editStageStep.trigger("stepSelected", ChaiBioTech.app.newlyCreatedStep);
         ChaiBioTech.app.newlyCreatedStep = null;
-      } else {
+      } else {*/
         this.allStepViews[0].circle.manageClick(true);
         this.$scope.fabricStep = this.allStepViews[0];
         // here we initite stage/step events service.. So now we can listen for changes from the bottom.
         stageEvents.init(this.$scope, this.canvas, this);
         stepEvents.init(this.$scope, this.canvas, this);
-      }
+      //}
     };
 
     this.loadImages = function() {
@@ -166,7 +166,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
       this.allCircles = circles || this.findAllCircles();
       var limit = this.allCircles.length;
-      
+
       for(i = 0; i < limit; i++) {
         var thisCircle = this.allCircles[i];
 
@@ -209,12 +209,11 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       var i = 0, limit = this.allStepViews.length, circles = [], tempCirc = null;
 
       for(i = 0; i < limit; i++) {
-        //if(this.allStepViews[i].circle) {
-          this.allStepViews[i].circle.removeContents();
-          //this.allStepViews[i].circle.remove();
-          delete this.allStepViews[i].circle;
-        //}
+
+        this.allStepViews[i].circle.removeContents();
+        this.allStepViews[i].circle = null;
         this.allStepViews[i].addCircle();
+
         if(tempCirc) {
           this.allStepViews[i].circle.previous = tempCirc;
           tempCirc.next = this.allStepViews[i].circle;
@@ -223,7 +222,6 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         circles.push(this.allStepViews[i].circle);
       }
       return circles;
-
     };
 
     this.addNewStage = function(data, currentStage) {
@@ -278,7 +276,6 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       this.$scope.applyValues(stageView.childSteps[0].circle);
       stageView.childSteps[0].circle.manageClick(true);
       this.setDefaultWidthHeight();
-      //this.canvas.renderAll();
     };
 
     return this;

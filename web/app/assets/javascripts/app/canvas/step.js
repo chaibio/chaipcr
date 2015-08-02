@@ -23,7 +23,7 @@ window.ChaiBioTech.ngApp.factory('step', [
       };
 
       this.addImages = function() {
-        
+
         var can = this.parentStage.parent;
 
         this.commonFooterImage = can.applyPropertyToImages($.extend({}, can.imageobjects["common-step.png"]), this);
@@ -64,7 +64,7 @@ window.ChaiBioTech.ngApp.factory('step', [
 
         this.ordealStatus = this.ordealStatus + action;
         this.circle.getUniqueId();
-        //this.circle.moveCircle();
+
       };
 
       this.addName = function() {

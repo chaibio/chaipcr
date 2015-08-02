@@ -183,7 +183,6 @@ window.ChaiBioTech.ngApp.factory('stage', [
         for(var j = start; j < this.childSteps.length; j++) {
 
           var thisStep = this.childSteps[j];
-          console.log(thisStep.index);
           thisStep.index = thisStep.index - 1;
           thisStep.model.name = "STEP " + (thisStep.index + 1);
           thisStep.stepName.text = thisStep.model.name;
