@@ -27,5 +27,14 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
       focus('editExpNameMode')
 
     $scope.saveExperiment = ->
-      Experiment.update $scope.experiment
+      promise = Experiment.update({id: $scope.experiment.id}, experiment: $scope.experiment).$promise
+
+      promise.then ->
+        $scope.success = "Experiment updated successfully"
+
+      promise.catch (resp) ->
+        $scope.errors = resp.data.errors
+
+      promise.finally ->
+        $scope.editExpNameMode = false
 ]

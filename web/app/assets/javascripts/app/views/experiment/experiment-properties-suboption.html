@@ -8,6 +8,12 @@
     </span>
     <input type="text" class="exp-name simplifica" ng-model="experiment.name" ng-show="editExpNameMode" ng-blur="saveExperiment()" focus-on="editExpNameMode">
     <span class="action" ng-click="focusExpName()" ng-show="!editExpNameMode">EDIT</span>
+    <span class="help-block" ng-show="errors">
+      <span class="text-danger">{{errors}}</span>
+    </span>
+    <span class="help-block" ng-show="success">
+      <span class="text-success">{{success}}</span>
+    </span>
   </div>
 
  <!--   <div class="heading">

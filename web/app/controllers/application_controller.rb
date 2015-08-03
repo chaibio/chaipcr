@@ -61,7 +61,7 @@ class ApplicationController < ActionController::Base
   def experiment_definition_editable_check
     get_experiment
     if @experiment == nil || !@experiment.editable?
-      render json: {errors: "the experiment is not editable"}, status: :unprocessable_entity
+      render json: {errors: "The experiment is not editable"}, status: :unprocessable_entity
       return false
     else
       return true
