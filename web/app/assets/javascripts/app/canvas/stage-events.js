@@ -5,9 +5,9 @@ window.ChaiBioTech.ngApp.service('stageEvents',[
       $scope.$watch('stage.num_cycles', function(newVal, oldVal) {
 
         var stage = $scope.fabricStep.parentStage;
-        stage.cycleNo.text = String(newVal);
-        $scope.fabricStep.parentStage.cycleX.left = stage.cycleNo.left + stage.cycleNo.width + 3;
-        stage.cycles.left = stage.cycleX.left + stage.cycleX.width;
+        stage.cycleNo.setText(String(newVal));
+        stage.cycleX.setLeft(stage.cycleNo.left + stage.cycleNo.width + 3);
+        stage.cycles.setLeft(stage.cycleX.left + stage.cycleX.width);
         canvas.renderAll();
       });
 
