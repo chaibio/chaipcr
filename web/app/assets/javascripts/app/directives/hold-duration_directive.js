@@ -20,61 +20,25 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
         scope.$watch("reading", function(val) {
 
           if(angular.isDefined(scope.reading)) {
-            scope.shown = scope.hidden = scope.timeFormating();
+            scope.shown = scope.hidden = scope.$parent.timeFormating(scope.reading);
           }
         });
 
-        scope.timeFormating = function() {
-          var hour = Math.floor(scope.reading / 60);
-          hour = (hour < 10) ? "0" + hour : hour;
-
-          var min = scope.reading % 60;
-          min = (min < 10) ? "0" + min : min;
-
-          return hour + ":" + min;
-        };
-
         scope.editAndFocus = function(className) {
+
           scope.edit = ! scope.edit;
           $timeout(function() {
             $('.' + className).focus();
           });
         };
 
-        scope.convertToMinute = function() {
-
-          var deltaTime = scope.hidden;
-
-          var value = deltaTime.indexOf(":");
-          if(value != -1) {
-            var hr = deltaTime.substr(0, value);
-            var min = deltaTime.substr(value + 1);
-
-            if(isNaN(hr) || isNaN(min)) {
-              deltaTime = null;
-              alert("Please enter a valid value");
-              return false;
-            } else {
-              deltaTime = (hr * 60) + (min * 1);
-              return deltaTime;
-            }
-          }
-
-          if(isNaN(deltaTime) || !deltaTime) {
-            alert("Please enter a valid value");
-            return false;
-          } else {
-            return parseInt(Math.abs(deltaTime));
-          }
-        };
-
         scope.save = function() {
 
           scope.edit = false;
+          var newHoldTime = scope.$parent.convertToMinute(scope.hidden);
 
-          if(scope.convertToMinute(scope.hidden)) {
-
-            scope.reading = scope.convertToMinute(scope.hidden);
+          if(newHoldTime || newHoldTime === 0) {
+            scope.reading = newHoldTime;
             $timeout(function() {
               ExperimentLoader.changeHoldDuration(scope.$parent).then(function(data) {
                 console.log(data);
