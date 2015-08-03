@@ -1,0 +1,10 @@
+<div class="menu-overlay-layout">
+  <div id="sidemenu" class="sidemenu" ng-show="sideMenuOpen">
+  </div>
+  <div id="submenu" class="outer-menu" ng-show="sideMenuOptionsOpen">
+  </div>
+  <div class="page-content" >
+    <div class="content" ng-transclude></div>
+    <div class="content-overlay" toggle-sidemenu ng-show="sideMenuOpen"></div>
+  </div>
+</div>
