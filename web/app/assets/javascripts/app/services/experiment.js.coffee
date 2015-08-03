@@ -7,7 +7,7 @@ window.ChaiBioTech.ngApp
   ($resource, $http, host) ->
 
     self = $resource('/experiments/:id', {id: '@id'}, {
-      update:
+      'update':
         method: 'PUT'
     })
 
