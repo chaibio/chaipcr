@@ -75,8 +75,6 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       // Only for the last stage
       stageView.addBorderRight();
       //this.canvas.add(stageView.borderRight);
-      // We should put an infinity symbol if the last step has infinite hold time.
-      stageView.findLastStep();
       console.log("Stages added ... !");
       return this;
 
@@ -91,7 +89,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
         this.allStepViews[0].circle.manageClick(true);
         this.$scope.fabricStep = this.allStepViews[0];
-        // here we initite stage/step events service.. So now we can listen for changes from the bottom.
+        // here we initiate stage/step events service.. So now we can listen for changes from the bottom.
         stageEvents.init(this.$scope, this.canvas, this);
         stepEvents.init(this.$scope, this.canvas, this);
 
@@ -131,16 +129,18 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
       for(count = 0; count < limit; count ++) {
 
-        this.allStepViews[count].commonFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["common-step.png"]), this.allStepViews[count]);
-        this.canvas.add(this.allStepViews[count].commonFooterImage);
+        var step = this.allStepViews[count];
 
-        this.allStepViews[count].darkFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["black-footer.png"]), this.allStepViews[count]);
-        this.canvas.add(this.allStepViews[count].darkFooterImage);
+        step.commonFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["common-step.png"]), step);
+        this.canvas.add(step.commonFooterImage);
 
-        this.allStepViews[count].whiteFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["orange-footer.png"]), this.allStepViews[count]);
-        this.allStepViews[count].whiteFooterImage.top = 363;
-        this.allStepViews[count].whiteFooterImage.left = this.allStepViews[count].left;
-        this.canvas.add(this.allStepViews[count].whiteFooterImage);
+        step.darkFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["black-footer.png"]), step);
+        this.canvas.add(step.darkFooterImage);
+
+        step.whiteFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["orange-footer.png"]), step);
+        step.whiteFooterImage.top = 363;
+        step.whiteFooterImage.left = step.left;
+        this.canvas.add(step.whiteFooterImage);
 
       }
 
@@ -162,10 +162,10 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     this.addRampLinesAndCircles = function(circles) {
 
       this.allCircles = circles || this.findAllCircles();
-      var limit = this.allCircles.length;
+      var limit = this.allCircles.length, thisCircle;
 
       for(i = 0; i < limit; i++) {
-        var thisCircle = this.allCircles[i];
+        thisCircle = this.allCircles[i];
 
         if(i < (limit - 1)) {
 
@@ -181,7 +181,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
         thisCircle.getCircle();
       }
-
+      // We should put an infinity symbol if the last step has infinite hold time.
+      thisCircle.doThingsForLast();
       console.log("All circles are added ....!!");
       return this;
     };

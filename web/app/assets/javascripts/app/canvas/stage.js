@@ -333,6 +333,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
           tempStep = stepView;
           this.childSteps.push(stepView);
+
           if(! this.insertMode) {
             allSteps.push(stepView);
             stepView.ordealStatus = allSteps.length;
@@ -343,11 +344,6 @@ window.ChaiBioTech.ngApp.factory('stage', [
         if(! this.insertMode) {
           stepView.borderRight.setVisible(false);
         }
-      };
-
-      this.findLastStep = function() {
-
-        this.childSteps[this.childSteps.length - 1].circle.doThingsForLast();
       };
 
       this.render = function() {
