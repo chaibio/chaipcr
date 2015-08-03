@@ -11,4 +11,5 @@ window.ChaiBioTech.ngApp = angular.module 'ChaiBioTech', [
   'angularMoment'
   'chart.js'
   'n3-line-chart'
+  'focusOn'
 ]

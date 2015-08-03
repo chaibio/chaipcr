@@ -32,6 +32,7 @@
 //= require app/libs/fabric
 //= require app/libs/d3
 //= require app/libs/n3-line-chart
+//= require app/libs/ng-focus-on
 //
 //  angular app ===============
 //
