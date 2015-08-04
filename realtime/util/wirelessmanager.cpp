@@ -125,7 +125,7 @@ void WirelessManager::_connect(std::string ssid, std::string passkey)
     try
     {
         if (if_nametoindex(_interfaceName.c_str()) == 0)
-            throw std::system_error(errno, std::generic_category(), "WirelessManager::WirelessManager - unable to get interface index (" + _interfaceName + "):");
+            throw std::system_error(errno, std::generic_category(), "WirelessManager::_connect - unable to get interface index (" + _interfaceName + "):");
 
         if (_connectionThreadState != Working)
         {
