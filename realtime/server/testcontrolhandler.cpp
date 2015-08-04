@@ -7,7 +7,7 @@ using namespace std;
 using namespace boost::property_tree;
 using namespace Poco::Net;
 
-void TestControlHandler::processData(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &, const ptree &requestPt, ptree &)
+void TestControlHandler::processData(const ptree &requestPt, ptree &)
 {
     processOptics(requestPt);
     processLid(requestPt);

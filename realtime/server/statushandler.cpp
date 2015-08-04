@@ -9,7 +9,7 @@
 
 #define ROUND(x) ((float)(std::round(x * 1000.0) / 1000.0))
 
-void StatusHandler::processData(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &response, const boost::property_tree::ptree &, boost::property_tree::ptree &responsePt) {
+void StatusHandler::processData(const boost::property_tree::ptree &, boost::property_tree::ptree &responsePt) {
     std::shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();
     std::shared_ptr<Optics> optics = OpticsInstance::getInstance();
     std::shared_ptr<Lid> lid = LidInstance::getInstance();
@@ -118,7 +118,4 @@ void StatusHandler::processData(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPS
             responsePt.put("experimentController.expriment.step.number", experiment.protocol()->currentStep()->orderNumber() + 1);
         }
     }
-
-    response.add("Access-Control-Allow-Origin", "*");
-    response.add("Access-Control-Allow-Headers", "X-Requested-With, X-Prototype-Version, X-CSRF-Token");
 }
