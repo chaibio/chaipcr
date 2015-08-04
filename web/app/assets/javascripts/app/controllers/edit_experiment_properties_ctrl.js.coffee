@@ -9,6 +9,7 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
 
     Experiment.get {id: $stateParams.id}, (data) ->
       $scope.experiment = data.experiment
+      $scope.experimentOrig = angular.copy $scope.experiment
 
     $scope.editExpNameMode = false
 
@@ -34,6 +35,7 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
 
       promise.catch (resp) ->
         $scope.errors = resp.data.errors
+        $scope.experiment = angular.copy $scope.experimentOrig
 
       promise.finally ->
         $scope.editExpNameMode = false
