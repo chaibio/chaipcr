@@ -19,11 +19,11 @@ class ExperimentController : public Instance<ExperimentController>
 public:
     enum MachineState
     {
-        Idle,
-        LidHeating,
-        Running,
-        Paused,
-        Complete
+        IdleMachineState,
+        LidHeatingMachineState,
+        RunningMachineState,
+        PausedMachineState,
+        CompleteMachineState
     };
 
     enum StartingResult
@@ -35,10 +35,19 @@ public:
         MachineRunning
     };
 
+    enum ThermalState
+    {
+        IdleThermalState,
+        HoldingThermalState,
+        HeatingThermalState,
+        CoolingThermalState
+    };
+
     ExperimentController();
     ~ExperimentController();
 
     MachineState machineState() const;
+    ThermalState thermalState() const;
     Experiment experiment() const;
     inline Settings* settings() const { return _settings; }
 
@@ -71,6 +80,7 @@ private:
 private:
     mutable Poco::RWLock *_machineMutex;
     MachineState _machineState;
+    ThermalState _thermalState;
 
     DBControl *_dbControl;
     Experiment _experiment;

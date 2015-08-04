@@ -31,6 +31,6 @@ void Lid::resetOutput()
 
 void Lid::processOutput()
 {
-    if (ExperimentController::getInstance()->machineState() == ExperimentController::LidHeating && currentTemperature() >= (targetTemperature() - _startTempThreshold))
+    if (ExperimentController::getInstance()->machineState() == ExperimentController::LidHeatingMachineState && currentTemperature() >= (targetTemperature() - _startTempThreshold))
         startThresholdReached();
 }
