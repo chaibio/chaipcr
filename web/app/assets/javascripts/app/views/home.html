@@ -78,24 +78,28 @@
          <div class="previous-experiment-container">
             <div class="previous-experiment-heading">
                <div class="text sansa">PREVIOUS EXPERIMENTS</div>
-               <div class="dots"> ... </div>
+               <div class="dots" ng-click="deleteMode = !deleteMode"> ... </div>
             </div>
-            <div class="all-experiments">
+            <div class="all-experiments" ng-class="{'delete-mode': deleteMode}">
                <div class="loading" ng-show="experiments.length == 0">Loading ......! <img src="assets/loading.gif"></div>
-               <div class="individual-experiment" ng-repeat="exp in experiments | orderBy:'experiment.created_at':true">
+               <div class="individual-experiment" ng-class="{'del': exp.del}" ng-repeat="exp in experiments | orderBy:'experiment.created_at':true">
                   <div class="first-row">
-                     <div class="image"></div>
-                     <div class="text simplifica"><a ui-sref="edit-protocol({id: exp.experiment.id})">{{exp.experiment.name}}</a></div>
+                     <div class="image" ng-click="HomeCtrl.confirmDelete(exp)">&times;</div>
+                     <div class="text simplifica">
+                        <a ui-sref="edit-protocol({id: exp.experiment.id})">
+                           {{exp.experiment.name}}
+                        </a>
+                     </div>
                      <div class="dotordate sansa" style="width: 70px;">
                         {{exp.experiment.created_at | date: 'MMMM yyyy' | uppercase}}
                      </div>
                   </div>
                   <div class="second-row">
                      <div class="hand-container">
-                        <div class="hand" style="display: none;"></div>
+                        <div class="hand"></div>
                      </div>
                      <div class="more-info sansa">
-                        <span class="created-text">CREATED
+                        <span class="created-text"><span class="text-blue">CREATED</span>
                         </span>{{exp.experiment.created_at | amCalendar | uppercase}}</div>
                      <div class="dotor">
                         <div class="ball"></div>
@@ -104,8 +108,8 @@
                   <div class="confirm-box sansa">
                      <div>Are you sure ?.</div>
                      <div>
-                        <button class="no-delete">No</button>
-                        <button class="yes-delete">Yes</button>
+                        <button class="no-delete" ng-click="exp.del = false">No</button>
+                        <button class="yes-delete" ng-click="HomeCtrl.deleteExperiment(exp.experiment.id)">Yes</button>
                      </div>
                   </div>
                </div>

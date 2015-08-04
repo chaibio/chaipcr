@@ -7,6 +7,8 @@ window.ChaiBioTech.ngApp
 
     $scope.experiments = []
 
+    $scope.deleteMode = false
+
     @fetchExperiments = ->
       Experiment.query (experiments) ->
         $scope.experiments = experiments
@@ -23,6 +25,14 @@ window.ChaiBioTech.ngApp
       exp.$save (data) =>
         @fetchExperiments()
 
+    @confirmDelete = (exp) ->
+      if $scope.deleteMode
+        exp.del = true
+
+    @deleteExperiment = (expId) =>
+      exp = new Experiment id: expId
+      exp.$remove =>
+        @fetchExperiments()
 
     return
 
