@@ -132,37 +132,41 @@
 					}
 				}
 				.bottom-stage-name {
-					width: 90px;
+					width: 80px;
 					font-size: 10px;
 					height: 15px;
 					margin-top: 42px;
-					margin-left: 12px;
+					margin-left: 7px;
 					float: left;
 				}
 
 				.bottom-step-no-cycle-container {
-					width: 131px;
+					width: 145px;
 					height: 35px;
 					visibility: visible;
 					float: left;
+					position: relative;
 
 					.bottom-step-no-cycle {
 						height: 35px;
-						padding-top: 5px;
+						padding-top: 8px;
 						margin-top: 24px;
-						font-size: 48px;
+						font-size: 44px;
 						font-weight: bold;
-						width: 44px;
+						width: 90px;
 						float: left;
-						margin-left:2px;
+						margin-left: 2px;
 						text-align: right;
+
 						.bottom-step-no-cycle-edit {
-							width: 44px;
-							position: relative;
+
+							width: 90px;
+							position: absolute;
 							background-color: black;
 							color: white;
 							text-align: right;
-							top: -46px;
+							top: 0px;
+							left: 0px;
 							height: 58px;
 							border: none;
 
@@ -193,11 +197,14 @@
 					margin-left: 5px;
 					margin-right: 10px;
 				}
+
+				.bottom-autodelta-button {
+					margin-left: 15px;
+				}
 				.bottom-button-container {
 					float: left;
 					width: 147px;
 					height: 41px;
-					margin-left: 6px;
 					margin-top: 25px;
 
 					.delta-button-true {

@@ -31,7 +31,7 @@
             <hold-duration caption="hold duration" reading="step.hold_time"></hold-duration>
         </div>
         <div class="data-boxes auto-delta">
-          <div class="name-board sansa">AUTO DELTA</div>
+          <div class="name-board sansa">AUTODELTA</div>
           <start-on-cycle caption="start on cycle" delta="stage.auto_delta" reading="stage.auto_delta_start_cycle"></start-on-cycle>
           <temp caption="temp" unit="ºC" delta="stage.auto_delta" reading="step.delta_temperature"><capsule func="changeDeltaTemperature" delta="{{stage.auto_delta}}" data="step.delta_temperature"></capsule></temp>
           <time caption="time" delta="stage.auto_delta" reading="step.delta_duration_s"><capsule func="changeDeltaTime" delta="{{stage.auto_delta}}" data="step.delta_duration_s"></capsule></time>
