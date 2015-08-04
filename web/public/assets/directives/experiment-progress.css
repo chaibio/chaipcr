@@ -29,7 +29,7 @@
 /* line 36, ../../../app/assets/stylesheets/directives/experiment-progress.css.scss */
 .sidemenu .experiment-in-progress {
   color: #fff;
-  padding: 50px;
+  margin: 50px;
 }
 /* line 40, ../../../app/assets/stylesheets/directives/experiment-progress.css.scss */
 .sidemenu .experiment-in-progress .experiment-in-progress-heading {

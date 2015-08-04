@@ -51,7 +51,7 @@ void ControlHandler::processData(Poco::Net::HTTPServerRequest &request, Poco::Ne
 
     case ResumeExperiment:
     {
-        if (ExperimentController::getInstance()->machineState() == ExperimentController::Paused)
+        if (ExperimentController::getInstance()->machineState() == ExperimentController::PausedMachineState)
             ExperimentController::getInstance()->resume();
         else
         {

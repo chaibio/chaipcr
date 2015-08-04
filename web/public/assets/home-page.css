@@ -1,74 +1,74 @@
-/* line 2, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 4, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper {
   width: 1024px;
   height: 768px;
 }
-/* line 6, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 8, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing {
   float: left;
   width: 632px;
   height: 400px;
 }
-/* line 11, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 13, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content {
   width: 442px;
   margin-top: 61px;
   margin-left: 75px;
 }
-/* line 16, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 18, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-logo {
   width: 437px;
   height: 74px;
 }
-/* line 21, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 23, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu {
   margin-top: 65px;
   height: 402px;
 }
-/* line 25, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 27, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content {
   border-bottom: solid 1px black;
   height: 22px;
 }
-/* line 29, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 31, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading {
   height: 100%;
 }
-/* line 32, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 34, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .welcome-text {
   width: 200px;
   float: left;
   height: 100%;
 }
-/* line 37, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 39, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text {
   width: 150px;
   float: right;
   text-align: right;
   height: 100%;
 }
-/* line 43, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 45, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text a {
   color: #00aeef;
   text-decoration: none;
 }
-/* line 47, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 49, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-heading .logout-text a:hover {
   background-color: white;
 }
-/* line 53, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 55, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items {
   padding-top: 20px;
 }
-/* line 56, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 58, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item {
   height: 58px;
 }
-/* line 59, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 61, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .first-row {
   height: 30px;
 }
-/* line 62, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 64, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .first-row .menu-item-image {
   width: 30px;
   height: 30px;
@@ -76,7 +76,7 @@
   background-image: url("smallO.png");
   margin-left: 24px;
 }
-/* line 69, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 71, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .first-row .menu-item-text {
   width: 300px;
   float: left;
@@ -85,15 +85,15 @@
   font-size: 22px;
   cursor: pointer;
 }
-/* line 79, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 81, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .second-row {
   height: 28px;
 }
-/* line 82, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 84, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .second-row .hand-container {
   width: 100%;
 }
-/* line 85, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 87, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item .second-row .hand-container .hand {
   width: 6px;
   background-color: black;
@@ -101,15 +101,15 @@
   margin-left: 37px;
   margin-top: 2px;
 }
-/* line 95, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 97, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce {
   height: 107px;
 }
-/* line 98, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 100, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row {
   height: 60px;
 }
-/* line 101, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 103, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row .menu-item-image {
   width: 60px;
   height: 60px;
@@ -117,7 +117,7 @@
   background-image: url("bigO.png");
   margin-left: 11px;
 }
-/* line 108, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 110, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .first-row .menu-item-text {
   width: 300px;
   float: left;
@@ -126,15 +126,15 @@
   font-size: 30px;
   cursor: pointer;
 }
-/* line 118, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 120, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row {
   height: 32px;
 }
-/* line 121, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 123, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row .hand-container {
   width: 100%;
 }
-/* line 124, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 126, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-left-wing .left-wing-content .home-page-menu .menu-content .menu-items .menu-item-bounce .second-row .hand-container .hand {
   width: 6px;
   background-color: black;
@@ -142,61 +142,67 @@
   margin-left: 37px;
   margin-top: 5px;
 }
-/* line 142, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 144, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing {
   float: left;
   width: 341px;
   padding-top: 54px;
 }
-/* line 150, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 152, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading {
   border-bottom: solid 1px #001827;
   height: 20px;
 }
-/* line 154, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 156, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading .text {
   float: left;
   width: 200px;
   font-size: 14px;
 }
-/* line 159, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 161, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .previous-experiment-heading .dots {
   float: right;
-  color: orange;
+  color: #ee3017;
   font-weight: bold;
   font-size: 14px;
   cursor: pointer;
 }
-/* line 167, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 169, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments {
   height: 680px;
   overflow: scroll;
   padding-top: 21px;
 }
-/* line 172, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 174, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment {
   height: 72px;
 }
-/* line 175, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 177, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row {
   height: 30px;
 }
-/* line 178, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 180, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row a:hover {
   color: #000;
   background-color: white;
 }
-/* line 182, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 184, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row div {
   float: left;
 }
-/* line 185, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 187, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .image {
-  background-image: url("smallblackO.png");
+  border: 7px solid #333333;
+  border-radius: 100%;
+  color: #fff;
   width: 30px;
   height: 30px;
 }
-/* line 190, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 194, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .cross-image {
+  display: none;
+}
+/* line 197, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .dotordate {
   float: right;
   height: 30px;
@@ -205,7 +211,7 @@
   text-align: center;
   color: #00aeef;
 }
-/* line 198, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 205, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .ball {
   width: 8px;
   height: 8px;
@@ -216,32 +222,32 @@
   margin-top: 8px;
   margin-left: 10px;
 }
-/* line 208, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 215, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .image-red {
   background-image: url("smallredO.png");
   width: 30px;
   height: 30px;
 }
-/* line 213, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 220, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .first-row .text {
   margin-left: 15px;
   margin-top: 8px;
   cursor: pointer;
 }
-/* line 219, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 226, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row {
   height: 42px;
 }
-/* line 222, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 229, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row div {
   float: left;
 }
-/* line 225, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 232, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .hand-container {
   width: 45px;
   height: 42px;
 }
-/* line 229, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 236, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .hand-container .hand {
   width: 6px;
   min-height: 32px;
@@ -250,13 +256,13 @@
   margin-top: 5px;
   cursor: pointer;
 }
-/* line 238, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 245, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .dotor {
   float: right;
   height: 30px;
   width: 50px;
 }
-/* line 243, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 250, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .ball {
   width: 8px;
   height: 8px;
@@ -267,13 +273,14 @@
   margin-top: 5px;
   margin-left: 10px;
 }
-/* line 253, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 260, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .second-row .more-info {
   font-size: 14px;
 }
-/* line 257, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 264, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box {
   position: relative;
+  display: none;
   height: 45px;
   width: 250px;
   z-index: 100;
@@ -281,7 +288,6 @@
   left: 43px;
   background-color: white;
   text-align: center;
-  display: none;
   font-size: 14px;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
@@ -289,18 +295,40 @@
   border: solid 1px #a61300;
   font-size: 14px;
 }
-/* line 274, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 281, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box button {
   font-size: 12px;
   width: 40px;
   height: 22px;
   margin-top: 2px;
 }
-/* line 281, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 288, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box .no-delete {
   color: #00aeef;
 }
-/* line 284, ../../app/assets/stylesheets/home-page.css.scss */
+/* line 291, ../../app/assets/stylesheets/home-page.css.scss */
 .home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment .confirm-box .yes-delete {
   color: #a61300;
+}
+/* line 298, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment.del .first-row,
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment.del .second-row {
+  visibility: hidden;
+}
+/* line 301, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments .individual-experiment.del .confirm-box {
+  display: block;
+}
+/* line 311, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments.delete-mode .individual-experiment .first-row .image {
+  border: 2px solid red;
+  color: red;
+  cursor: pointer;
+  text-align: center;
+  padding-top: 4px;
+  font-size: 25px;
+}
+/* line 321, ../../app/assets/stylesheets/home-page.css.scss */
+.home-page-wrapper .home-page-right-wing .previous-experiment-container .all-experiments.delete-mode .individual-experiment .second-row .hand {
+  background-color: #a61300;
 }

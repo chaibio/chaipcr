@@ -1,4 +1,6 @@
 //Home page styles start here
+@import "./colors.css.scss";
+
 .home-page-wrapper {
   width: 1024px;
   height: 768px;
@@ -158,7 +160,7 @@
         }
         .dots {
           float: right;
-          color: orange;
+          color: $red;
           font-weight: bold;
           font-size: 14px;
           cursor: pointer;
@@ -183,9 +185,14 @@
               float: left;
             }
             .image {
-              background-image: url("smallblackO.png");
+              border: 7px solid $gray;
+              border-radius: 100%;
+              color: #fff;
               width: 30px;
               height: 30px;
+            }
+            .cross-image {
+              display: none;
             }
             .dotordate {
               float: right;
@@ -256,6 +263,7 @@
           }
           .confirm-box {
             position: relative;
+            display: none;
             height: 45px;
             width: 250px;
             z-index: 100;
@@ -263,7 +271,6 @@
             left: 43px;
             background-color: white;
             text-align: center;
-            display: none;
             font-size: 14px;
             -webkit-border-radius: 5px;
             -moz-border-radius: 5px;
@@ -285,7 +292,39 @@
               color: #a61300;
             }
           }
+
+          &.del {
+            .first-row,
+            .second-row {
+              visibility: hidden;
+            }
+            .confirm-box {
+              display: block;
+            }
+          }
+
         }
+
+        &.delete-mode {
+          .individual-experiment {
+            .first-row {
+              .image {
+                border: 2px solid red;
+                color: red;
+                cursor: pointer;
+                text-align: center;
+                padding-top: 4px;
+                font-size: 25px;
+              }
+            }
+            .second-row {
+              .hand {
+                background-color: $darkred;
+              }
+            }
+          }
+        }
+
       }
     }
   }

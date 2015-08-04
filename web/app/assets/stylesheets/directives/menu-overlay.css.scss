@@ -3,10 +3,7 @@
 $sidemenu_width: 450px;
 
 .menu-overlay-layout {
-  overflow-x: scroll;
   width: 1024px;
-  float: left;
-  overflow-x: hidden;
 
   .sidemenu {
     background-color: #001827;
@@ -149,18 +146,15 @@ $sidemenu_width: 450px;
     min-height: 768px;
     width: $sidemenu_width;
   }
-  .page-content {
-    position: relative;
+  .page-wrapper {
     top: 0;
     left: 0;
-    background-color: #efefef;
     float: left;
-    margin-right: -($sidemenu_width * 2);
     min-height: 500px;
     width: 1024px;
     white-space: normal;
 
-    .content {
+    .page-container {
       top: 0;
       left: 0;
     }
@@ -174,6 +168,18 @@ $sidemenu_width: 450px;
       background-color: black;
       z-index: 999999;
       opacity: 0.3;
+    }
+  }
+
+  &.sidemenu-open {
+
+    float: left;
+    height: auto;
+    overflow: hidden;
+
+    .page-wrapper {
+      margin-right: -($sidemenu_width * 3);
+      position: relative;
     }
   }
 }
