@@ -6,6 +6,7 @@ window.ChaiBioTech.ngApp.directive 'menuOverlay', [
 
     restrict: 'EA'
     transclude: true
+    replace: true
     scope:
       sidemenuTemplate: '@'
     templateUrl: 'app/views/directives/menu-overlay.html'
