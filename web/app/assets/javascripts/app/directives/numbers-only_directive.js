@@ -14,7 +14,6 @@ window.ChaiBioTech.ngApp.directive('numbersOnly', [
              // condition to limit transformed value below 1 million
              transformedInput = (String(transformedInput).length >= 7) ? transformedInput.substr(0, 6) : transformedInput;
              if (transformedInput != inputValue) {
-                console.log(String(transformedInput).length, inputValue);
                 modelCtrl.$setViewValue(transformedInput);
                 modelCtrl.$render();
              }

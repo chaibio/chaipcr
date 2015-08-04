@@ -120,11 +120,18 @@
 					padding-top: 7px;
 					margin-left: 10px;
 					text-align: center;
+					position: relative;
 
+					.bottom-name-of-step-span {
+						width: 267px;
+						height: 35px;
+						font-size: 41px;
+					}
 					.edit-step-name {
 						width: 267px;
-						position: relative;
-						top: -46px;
+						position: absolute;
+						top: -18px;
+						left: 0px;
 						border: none;
 						background-color: black;
 						color: white;
