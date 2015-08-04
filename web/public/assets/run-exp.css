@@ -1,0 +1,133 @@
+/* line 2, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout {
+  width: 1024px;
+  height: 768px;
+}
+/* line 6, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .name-on-top {
+  width: 1024px;
+  height: 45px;
+  background-color: #333333;
+}
+/* line 11, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .name-on-top .stripes-and-name {
+  width: 300px;
+  height: 30px;
+  margin-left: 32px;
+  padding-top: 13px;
+}
+/* line 17, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .name-on-top .stripes-and-name .stripes {
+  width: 21px;
+  height: 19px;
+  float: left;
+  cursor: pointer;
+}
+/* line 23, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .name-on-top .stripes-and-name .stripes .stripe {
+  height: 3px;
+  width: 21px;
+  margin-bottom: 3px;
+  background-color: #999280;
+}
+/* line 31, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .name-on-top .stripes-and-name .name-container {
+  float: left;
+  color: #d6d4d1;
+  margin-left: 13px;
+  font-size: 18px;
+  margin-top: 2px;
+  font-family: "fun city";
+}
+/* line 42, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .graph-container {
+  width: 1024px;
+  height: 430px;
+  border-bottom: solid 1px #c6c6c6;
+}
+/* line 48, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .bottom-container {
+  height: 295px;
+  width: 1024px;
+}
+/* line 53, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .palette-container {
+  width: 643px;
+  height: 295px;
+  float: left;
+}
+/* line 58, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .palette-container img {
+  margin-left: 30px;
+  margin-top: 17px;
+}
+/* line 64, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container {
+  height: 295px;
+  float: left;
+  width: 381px;
+}
+/* line 69, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container {
+  width: 350px;
+  height: 150px;
+}
+/* line 73, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .exp-in-progress-bar-heading {
+  height: 45px;
+  width: 350px;
+  font-size: 14px;
+  font-weight: bold;
+  padding-top: 25px;
+  border-bottom: solid 2px black;
+}
+/* line 82, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .black-bar {
+  position: relative;
+  width: 350px;
+  height: 4px;
+  background-color: black;
+}
+/* line 88, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .black-bar .blue-bar {
+  position: relative;
+  width: 150px;
+  height: 4px;
+  background-color: #00aeef;
+}
+/* line 96, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .exp-in-progress-bar-info-container {
+  width: 350px;
+  height: 95px;
+}
+/* line 100, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .exp-in-progress-bar-info-container .column1 {
+  height: 30px;
+  width: 212px;
+  float: left;
+}
+/* line 105, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .exp-in-progress-bar-info-container .adjustmentsForR1 {
+  font-size: 14px;
+  font-weight: bold;
+  padding-top: 14px;
+}
+/* line 110, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .exp-in-progress-bar-info-container .adjustmentsForR2 {
+  padding-top: 10px;
+}
+/* line 113, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .exp-in-progress-bar-info-container .adjustmentsForR3 {
+  padding-top: 12px;
+}
+/* line 115, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .exp-in-progress-bar-info-container .adjustmentsForR3 span {
+  font-weight: bold;
+  font-size: 13px;
+}
+/* line 120, ../../app/assets/stylesheets/run-exp.css.scss */
+.run-exp-layout .test-in-progress-container .test-in-progress-bar-container .exp-in-progress-bar-info-container .column2 {
+  height: 30px;
+  width: 138px;
+  float: left;
+}

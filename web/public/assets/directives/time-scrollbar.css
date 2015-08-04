@@ -1,0 +1,14 @@
+/* line 1, ../../../app/assets/stylesheets/directives/time-scrollbar.css.scss */
+.time-scrollbar {
+  width: 100%;
+  height: 10px;
+}
+/* line 5, ../../../app/assets/stylesheets/directives/time-scrollbar.css.scss */
+.time-scrollbar .scrollbar {
+  min-width: 20px;
+  height: 100%;
+  background-color: gray;
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+}

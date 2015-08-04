@@ -38,5 +38,41 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
       $scope.fabricStep = circle.parent;
     };
 
+    $scope.convertToMinute = function(deltaTime) {
+
+      var value = deltaTime.indexOf(":");
+      if(value != -1) {
+        var hr = deltaTime.substr(0, value);
+        var min = deltaTime.substr(value + 1);
+
+        if(isNaN(hr) || isNaN(min)) {
+          deltaTime = null;
+          alert("Please enter a valid value");
+          return false;
+        } else {
+          deltaTime = (hr * 60) + (min * 1);
+          return deltaTime;
+        }
+      }
+
+      if(isNaN(deltaTime) || !deltaTime) {
+        alert("Please enter a valid value");
+        return false;
+      } else {
+        return parseInt(Math.abs(deltaTime));
+      }
+    };
+
+    $scope.timeFormating = function(reading) {
+
+      var hour = Math.floor(reading / 60);
+      hour = (hour < 10) ? "0" + hour : hour;
+
+      var min = reading % 60;
+      min = (min < 10) ? "0" + min : min;
+
+      return hour + ":" + min;
+    };
+
   }
 ]);

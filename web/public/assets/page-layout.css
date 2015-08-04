@@ -1,0 +1,46 @@
+/* line 5, ../../app/assets/stylesheets/page-layout.css.scss */
+.page-layout .row {
+  margin: 0;
+  margin-right: -15px;
+  margin-left: -15px;
+}
+/* line 11, ../../app/assets/stylesheets/page-layout.css.scss */
+.page-layout .header {
+  width: 1024px;
+  height: 45px;
+  background-color: #333333;
+}
+/* line 16, ../../app/assets/stylesheets/page-layout.css.scss */
+.page-layout .header .name-container {
+  float: left;
+  color: #d6d4d1;
+  margin-left: 13px;
+  font-size: 18px;
+  margin-top: 2px;
+  font-family: "fun city";
+}
+/* line 25, ../../app/assets/stylesheets/page-layout.css.scss */
+.page-layout .header .stripes-and-name {
+  width: 100%;
+  height: 30px;
+  padding-left: 32px;
+  padding-top: 13px;
+}
+/* line 31, ../../app/assets/stylesheets/page-layout.css.scss */
+.page-layout .header .stripes {
+  width: 21px;
+  height: 19px;
+  float: left;
+  cursor: pointer;
+}
+/* line 37, ../../app/assets/stylesheets/page-layout.css.scss */
+.page-layout .header .stripes .stripe {
+  height: 3px;
+  width: 21px;
+  margin-bottom: 3px;
+  background-color: #fff;
+}
+/* line 46, ../../app/assets/stylesheets/page-layout.css.scss */
+.page-layout .content {
+  padding-top: 20px;
+}

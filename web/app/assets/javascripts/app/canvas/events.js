@@ -10,7 +10,7 @@ window.ChaiBioTech.ngApp.factory('events', [
     return function(C, $scope) {
 
       this.canvas = C.canvas;
-      console.log("wow m loaded", ExperimentLoader);
+      console.log("Events loaded .... !", ExperimentLoader);
       /**************************************
           what happens when click is happening in canvas.
           what we do is check if the click is up on some particular events.

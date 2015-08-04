@@ -268,7 +268,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         temp = (temp < 10) ? "0" + temp : temp;
 
         this.stageNo = new fabric.Text(temp, {
-            fill: 'white',  fontSize: 32, top : 5,  left: 2,  fontFamily: "Ostrich Sans", selectable: false
+            fill: 'white',  fontSize: 32, top : 7,  left: 2,  fontFamily: "Ostrich Sans", selectable: false
           }
         );
 
@@ -293,22 +293,26 @@ window.ChaiBioTech.ngApp.factory('stage', [
         this.noOfCycles = this.noOfCycles || this.model.num_cycles;
 
         this.cycleNo = new fabric.Text(String(this.noOfCycles), {
-          fill: 'white',  fontSize: 32, top : 5,  fontWeight: "bold", left: 120,  fontFamily: "Ostrich Sans", selectable: false
+          fill: 'white',  fontSize: 32, top : 7,  fontWeight: "bold",  left: 0, fontFamily: "Ostrich Sans", selectable: false
         });
-
+        console.log(this.cycleNo.width, "cool");
         this.cycleX = new fabric.Text("x", {
-            fill: 'white',  fontSize: 22, top : 15, left: this.cycleNo.width + 120 || 140 + this.cycleNo.width + 120,
+            fill: 'white',  fontSize: 22, top : 16, left: this.cycleNo.width + 5,
             fontFamily: "Ostrich Sans", selectable: false
           }
         );
 
         this.cycles = new fabric.Text("CYCLES", {
             fill: 'white',  fontSize: 10, top : 28,
-            left: this.cycleX.width + this.cycleNo.width + 125 || 140 + this.cycleX.width + this.cycleNo.width + 125,
+            left: this.cycleX.width + this.cycleNo.width + 10 ,
             fontFamily: "Open Sans",  selectable: false
           }
         );
 
+        this.cycleGroup = new fabric.Group([this.cycleNo, this.cycleX, this.cycles], {
+          originX: "left",  originY: "top",
+          left: 120
+        });
         return this;
       };
 
@@ -363,7 +367,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
           if(this.model.stage_type === "cycling" && this.model.steps.length > 1) {
 
             this.stageGroup = new fabric.Group([
-                this.stageRect, this.roof,  this.border,  this.stageNo, this.stageName, this.cycleNo, this.cycleX,  this.cycles
+                this.stageRect, this.roof,  this.border,  this.stageNo, this.stageName, this.cycleGroup
               ], {
                   originX: "left", originY: "top", left: this.left,top: 0, selectable: false, hasControls: false
                 }
