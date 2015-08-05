@@ -22,9 +22,6 @@
 
 WirelessManager::WirelessManager(const std::string &interfaceName)
 {
-    if (if_nametoindex(interfaceName.c_str()) == 0)
-        throw std::system_error(errno, std::generic_category(), "WirelessManager::WirelessManager - unable to get interface index (" + interfaceName + "):");
-
     _connectionEventFd = eventfd(0, EFD_NONBLOCK);
 
     if (_connectionEventFd == -1)
@@ -127,6 +124,9 @@ void WirelessManager::_connect(std::string ssid, std::string passkey)
 {
     try
     {
+        if (if_nametoindex(_interfaceName.c_str()) == 0)
+            throw std::system_error(errno, std::generic_category(), "WirelessManager::_connect - unable to get interface index (" + _interfaceName + "):");
+
         if (_connectionThreadState != Working)
         {
             _connectionThreadState = Idle;
@@ -150,6 +150,8 @@ void WirelessManager::_connect(std::string ssid, std::string passkey)
         }
 
         ifup();
+
+        _connectionThreadState = Idle;
     }
     catch (const std::exception &ex)
     {
@@ -157,8 +159,6 @@ void WirelessManager::_connect(std::string ssid, std::string passkey)
 
         _connectionStatus = ConnectionError;
     }
-
-    _connectionThreadState = Idle;
 }
 
 void WirelessManager::generateWpaFile(const std::string &ssid, const std::string &passkey)

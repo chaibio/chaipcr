@@ -3,7 +3,7 @@
 
 #include "settingshandler.h"
 
-void SettingsHandler::processData(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &, const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &)
+void SettingsHandler::processData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &)
 {
     Settings *settings = ExperimentController::getInstance()->settings();
 

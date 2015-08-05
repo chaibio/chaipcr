@@ -6,8 +6,7 @@ ControlHandler::ControlHandler(OperationType operation)
     _operation = operation;
 }
 
-void ControlHandler::processData(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response,
-                                 const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt)
+void ControlHandler::processData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt)
 {
     switch (_operation)
     {
@@ -51,7 +50,7 @@ void ControlHandler::processData(Poco::Net::HTTPServerRequest &request, Poco::Ne
 
     case ResumeExperiment:
     {
-        if (ExperimentController::getInstance()->machineState() == ExperimentController::Paused)
+        if (ExperimentController::getInstance()->machineState() == ExperimentController::PausedMachineState)
             ExperimentController::getInstance()->resume();
         else
         {
@@ -73,5 +72,5 @@ void ControlHandler::processData(Poco::Net::HTTPServerRequest &request, Poco::Ne
         break;
     }
 
-    JSONHandler::processData(request, response, requestPt, responsePt);
+    JSONHandler::processData(requestPt, responsePt);
 }

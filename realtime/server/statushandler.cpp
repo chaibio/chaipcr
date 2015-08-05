@@ -9,7 +9,7 @@
 
 #define ROUND(x) ((float)(std::round(x * 1000.0) / 1000.0))
 
-void StatusHandler::processData(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &response, const boost::property_tree::ptree &, boost::property_tree::ptree &responsePt) {
+void StatusHandler::processData(const boost::property_tree::ptree &, boost::property_tree::ptree &responsePt) {
     std::shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();
     std::shared_ptr<Optics> optics = OpticsInstance::getInstance();
     std::shared_ptr<Lid> lid = LidInstance::getInstance();
@@ -47,23 +47,23 @@ void StatusHandler::processData(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPS
         Experiment experiment = experimentController->experiment();
 
         switch (experimentController->machineState()) {
-        case ExperimentController::Idle:
+        case ExperimentController::IdleMachineState:
             responsePt.put("experimentController.machine.state", "Idle");
             break;
 
-        case ExperimentController::LidHeating:
+        case ExperimentController::LidHeatingMachineState:
             responsePt.put("experimentController.machine.state", "LidHeating");
             responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
             break;
 
-        case ExperimentController::Running:
+        case ExperimentController::RunningMachineState:
             responsePt.put("experimentController.machine.state", "Running");
             responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
             responsePt.put("experimentController.expriment.estimated_duration", experiment.estimatedDuration());
             responsePt.put("experimentController.expriment.paused_duration", experiment.pausedDuration());
             break;
 
-        case ExperimentController::Paused:
+        case ExperimentController::PausedMachineState:
             responsePt.put("experimentController.machine.state", "Paused");
             responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
             responsePt.put("experimentController.expriment.estimated_duration", experiment.estimatedDuration());
@@ -71,7 +71,7 @@ void StatusHandler::processData(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPS
                            (boost::posix_time::microsec_clock::local_time() - experiment.lastPauseTime()).total_seconds());
             break;
 
-        case ExperimentController::Complete:
+        case ExperimentController::CompleteMachineState:
             responsePt.put("experimentController.machine.state", "Complete");
             responsePt.put("experimentController.expriment.run_duration", (experiment.completedAt() - experiment.startedAt()).total_seconds());
             break;
@@ -81,7 +81,30 @@ void StatusHandler::processData(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPS
             break;
         }
 
-        if (experimentController->machineState() != ExperimentController::Idle) {
+        switch (experimentController->thermalState())
+        {
+        case ExperimentController::IdleThermalState:
+            responsePt.put("experimentController.machine.thermal_state", "Idle");
+            break;
+
+        case ExperimentController::HoldingThermalState:
+            responsePt.put("experimentController.machine.thermal_state", "Holding");
+            break;
+
+        case ExperimentController::HeatingThermalState:
+            responsePt.put("experimentController.machine.thermal_state", "Heating");
+            break;
+
+        case ExperimentController::CoolingThermalState:
+            responsePt.put("experimentController.machine.thermal_state", "Cooling");
+            break;
+
+        default:
+            responsePt.put("experimentController.machine.thermal_state", "Unknown");
+            break;
+        }
+
+        if (experimentController->machineState() != ExperimentController::IdleMachineState) {
             responsePt.put("experimentController.expriment.name", experiment.name());
             responsePt.put("experimentController.expriment.started_at", experiment.startedAt());
 
@@ -95,7 +118,4 @@ void StatusHandler::processData(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPS
             responsePt.put("experimentController.expriment.step.number", experiment.protocol()->currentStep()->orderNumber() + 1);
         }
     }
-
-    response.add("Access-Control-Allow-Origin", "*");
-    response.add("Access-Control-Allow-Headers", "X-Requested-With, X-Prototype-Version, X-CSRF-Token");
 }

@@ -7,8 +7,7 @@ WirelessManagerHandler::WirelessManagerHandler(OperationType operation)
     _operation = operation;
 }
 
-void WirelessManagerHandler::processData(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response,
-                                         const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt)
+void WirelessManagerHandler::processData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt)
 {
     switch (_operation)
     {
@@ -34,7 +33,7 @@ void WirelessManagerHandler::processData(Poco::Net::HTTPServerRequest &request, 
     {
         qpcrApp.wirelessManager()->connect(requestPt.get<std::string>("ssid"), requestPt.get<std::string>("password"));
 
-        JSONHandler::processData(request, response, requestPt, responsePt);
+        JSONHandler::processData(requestPt, responsePt);
 
         break;
     }
@@ -43,7 +42,7 @@ void WirelessManagerHandler::processData(Poco::Net::HTTPServerRequest &request, 
     {
         qpcrApp.wirelessManager()->shutdown();
 
-        JSONHandler::processData(request, response, requestPt, responsePt);
+        JSONHandler::processData(requestPt, responsePt);
 
         break;
     }

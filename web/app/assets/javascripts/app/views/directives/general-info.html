@@ -1,8 +1,8 @@
 <div class="first-data-row">
   <div class="bottom-step-no ostrich">{{fabricStep.ordealStatus | preZero}}</div>
   <div class="bottom-no-of-stages ostrich">{{fabricStep.parentStage.parent.allStepViews.length | preZero: '/'}}</div>
-  <div class="bottom-name-of-step-stage ostrich">
-    <span class="bottom-name-of-step-span" ng-click="clickOnField('stepNameShow', 'edit-step-name')">{{step.name}}</span>
+  <div class="bottom-name-of-step-stage ostrich" ng-click="clickOnField('stepNameShow', 'edit-step-name')">
+    <span class="bottom-name-of-step-span" >{{step.name}}</span>
     <input type="text" class="edit-step-name" on-enter="saveStepName()" ng-blur="saveStepName()" ng-model="step.name" ng-show="stepNameShow">
   </div>
   <div class="bottom-stage-name sansa">{{stage.name | uppercase}}</div>
@@ -14,10 +14,9 @@
     </div>
     <div class="bottom-step-x ostrich" ng-show="showCycling">x</div>
     <div class="bottom-cycles-and-dots sansa" ng-show="showCycling">CYCLES</div>
-    <div class="bottom-cycle-dots" ng-show="showCycling"></div>
   </div>
 
-  <div class="bottom-button-container">
+  <div class="bottom-button-container bottom-autodelta-button">
     <div id="delta-button" class="delta-button-{{stage.auto_delta}}" ng-click="changeDelta()">
       <div class="delta-button-image-container">
         <img class="delta-button-image" ng-show="stage.auto_delta" ng-src="assets/delta-image.png">
