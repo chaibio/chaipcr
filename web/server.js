@@ -3,9 +3,17 @@ var statuses = ['Idle', 'LidHeating', 'Running', 'Paused', 'Complete'];
 
 var http = require('http');
 
-var app = http.createServer(function(req,res){
+var i = 0;
 
-    var i = Math.round((statuses.length-1) * Math.random());
+var update = function () {
+  i ++;
+  if (i === statuses.length) i = 0;
+  setTimeout(update, 5000);
+};
+
+update();
+
+var app = http.createServer(function(req,res){
 
     status.experimentController.machine.state = statuses[i];
 

@@ -21,7 +21,7 @@ window.ChaiBioTech.ngApp.directive 'menuOverlay', [
       sidemenuContainer.html compiled
 
       $rootScope.$on 'sidemenu:toggle', ->
-        sidemenuContainer.css minHeight: sidemenuContainer.parent().height()
+        sidemenuContainer.css minHeight: elem.find('.page-wrapper').height()
 
         $scope.sideMenuOpen = !$scope.sideMenuOpen
 

@@ -34,7 +34,8 @@
     {
         "machine":
         {
-            "state": "Running"
+            "state": "Running",
+            "thermal_state": "Heating"
         },
         "expriment":
         {
