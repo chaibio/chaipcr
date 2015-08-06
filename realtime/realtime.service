@@ -3,7 +3,7 @@ Description=QPCR Realtime app
 
 [Service]
 WorkingDirectory=/root/tmp/
-ExecStartPre=/bin/sh -c 'echo chai-pcr > /sys/devices/bone_capemgr.9/slots'
+ExecStartPre=-/bin/sh -c 'echo chai-pcr > /sys/devices/bone_capemgr.9/slots'
 ExecStart=/root/tmp/realtime
 SyslogIdentifier=QPCRRealtime
 Restart=on-failure
