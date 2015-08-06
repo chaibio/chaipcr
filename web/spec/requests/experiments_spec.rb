@@ -55,6 +55,12 @@ describe "Experiments API" do
     json["experiment"]["name"].should == "test1"
   end
   
+  it  'delete experiment' do
+    experiment = create_experiment("test")
+    delete "/experiments/#{experiment.id}", {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+    expect(response).to be_success 
+  end
+  
   it "list experiments with no experiment" do
     get "/experiments", { :format => 'json' }
     expect(response).to be_success            # test for the 200 status-code
