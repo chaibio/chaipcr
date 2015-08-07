@@ -1,6 +1,11 @@
 require 'spec_helper'
 
 describe "Experiments API" do
+  before(:each) do
+    admin_user = create_admin_user
+    post '/login', { email: admin_user.email, password: admin_user.password }
+  end
+  
   it 'create experiment' do
     params = { experiment: {name: "test"} }
     post "/experiments", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }

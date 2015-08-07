@@ -2,6 +2,8 @@ require 'zip'
 
 class ExperimentsController < ApplicationController
   include ParamsHelper
+  
+  before_filter :ensure_authenticated_user
   before_filter :get_experiment, :except => [:index, :create, :copy]
   before_filter :experiment_definition_editable_check, :only => :update
   

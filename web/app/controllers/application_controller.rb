@@ -11,7 +11,6 @@ class ApplicationController < ActionController::Base
   
   # Renders a 401 status code if the current user is not authorized
   def ensure_authenticated_user
-    return true
     if logged_in? && authorized?
       return true
     else
