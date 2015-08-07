@@ -1,5 +1,5 @@
 <div class="test-in-progress-container">
-  <div class="test-in-progress sansa">
+  <div class="test-in-progress">
     <div class="test-in-progress-heading">
       <div>
         <span ng-show="data.experimentController.machine.state === 'LidHeating' || data.experimentController.machine.state === 'Running'">
@@ -15,7 +15,7 @@
     </div>
     <div class="test-info">
       <div class="row">
-        <div class="col-sm-8">
+        <div class="col-sm-6">
           <div class="caption">
             <span ng-show="data.experimentController.machine.state == 'Running'">
               STAGE {{data.experimentController.expriment.stage.number}},
@@ -38,7 +38,7 @@
             {{data.experimentController.machine.thermal_state}}
           </div>
         </div>
-        <div class="col-sm-4" ng-hide="data.experimentController.machine.state == 'LidHeating' || data.experimentController.machine.state == 'Complete' || data.experimentController.machine.state == 'Idle'">
+        <div class="col-sm-6" ng-hide="data.experimentController.machine.state == 'LidHeating' || data.experimentController.machine.state == 'Complete' || data.experimentController.machine.state == 'Idle'">
           <div class="caption">TIME REMAINING</div>
           <div>{{(data.experimentController.expriment.estimated_duration*1+data.experimentController.expriment.paused_duration*1)-data.experimentController.expriment.run_duration*1 | secondsDisplay:'display2'}}</div>
         </div>
