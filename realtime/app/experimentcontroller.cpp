@@ -182,6 +182,9 @@ void ExperimentController::complete()
         _machineState = CompleteMachineState;
         _thermalState = IdleThermalState;
 
+        if (_experiment.protocol()->currentStage()->type() != Stage::Meltcurve)
+            _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->getFluorescenceData());
+
         LidInstance::getInstance()->setEnableMode(false);
         OpticsInstance::getInstance()->setCollectData(false);
 
@@ -189,9 +192,6 @@ void ExperimentController::complete()
         _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
 
         _dbControl->completeExperiment(_experiment);
-
-        if (_experiment.protocol()->currentStage()->type() != Stage::Meltcurve)
-            _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->getFluorescenceData());
     }
 
     stopLogging();
