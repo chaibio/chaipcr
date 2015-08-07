@@ -17,7 +17,7 @@ cp dtbo /etc/initramfs-tools/hooks/
 
 cp /boot/uboot/initrd.img /boot/uboot/initrd.img.bak
 
-/opt/scripts/tools/update_initrd.sh
+/opt/scripts/tools/developers/update_initrd.sh
 
 cd ft5x0x
 make

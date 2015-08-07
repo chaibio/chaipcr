@@ -228,10 +228,10 @@
 				ti,cape-override;
 				priority = <1>;
 				compatible = "ti,beaglebone-black";
-				board-name = "CHAI-LCD5";
+				board-name = "CHAI-LCDtouch5";
 				version = "00A0";
 				manufacturer = "Chaibio";
-				part-number = "CHAI-LCD5";
+				part-number = "CHAI-LCDtouch5";
 			};
 
 			// Beaglebone black has it soldered on 
@@ -429,10 +429,10 @@
 
 			/* beaglebone black LCD and touch for Chaibio */
 			cape@17 {
-				part-number = "CHAI-LCD5";
+				part-number = "CHAI-LCDtouch5";
 				version@00A0 {
 					version = "00A0";
-					dtbo = "CHAI-LCD5-00A0.dtbo";
+					dtbo = "CHAI-LCDtouch5-00A0.dtbo";
 				};
 			};
 

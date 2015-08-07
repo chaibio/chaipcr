@@ -48,7 +48,7 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
 
     try
     {
-        response.setStatus(getStatus());
+        response.setStatusAndReason(getStatus(), Poco::Net::HTTPServerResponse::getReasonForStatus(getStatus()));
 
         //CORS
         response.add("Access-Control-Allow-Origin", "*");

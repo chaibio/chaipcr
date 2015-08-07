@@ -1,6 +1,11 @@
 require 'spec_helper'
 
 describe "Settings" do
+  before(:each) do
+    admin_user = create_admin_user
+    post '/login', { email: admin_user.email, password: admin_user.password }
+  end
+  
   it 'show' do
     get "/settings", { :format => 'json' }
     expect(response).to be_success            # test for the 200 status-code

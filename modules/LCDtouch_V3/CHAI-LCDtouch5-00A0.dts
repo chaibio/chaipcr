@@ -8,7 +8,7 @@
 	compatible = "ti,beaglebone", "ti,beaglebone-black";
 
 	/* identification */
-	part-number = "LCDtouch5";
+	part-number = "CHAI-LCDtouch5";
 	version = "00A0";
 
 	/* state the resources this cape uses */
