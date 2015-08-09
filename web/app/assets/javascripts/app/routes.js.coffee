@@ -10,6 +10,11 @@ window.ChaiBioTech.ngApp
 
       $stateProvider
 
+      .state 'signup',
+        url: '/signup'
+        templateUrl: 'app/views/signup.html'
+        controller: 'SignUpCtrl'
+
       .state 'login',
         url: '/login'
         templateUrl: 'app/views/login.html'
