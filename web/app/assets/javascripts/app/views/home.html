@@ -96,9 +96,18 @@
                      <div class="hand-container">
                         <div class="hand"></div>
                      </div>
-                     <div class="more-info sansa">
-                        <span class="created-text"><span class="text-blue">CREATED</span>
-                        </span>{{exp.experiment.created_at | amCalendar | uppercase}}</div>
+                     <div class="more-info sansa"  ng-show="!exp.experiment.started_at">
+                        <span class="created-text">
+                           CREATED
+                        </span>
+                        {{exp.experiment.created_at | amCalendar | uppercase}}
+                     </div>
+                     <div class="more-info sansa"  ng-show="exp.experiment.started_at">
+                        <span class="created-text">
+                           RUN
+                        </span>
+                        {{exp.experiment.started_at | amCalendar | uppercase}}
+                     </div>
                      <div class="dotor">
                         <div class="ball"></div>
                      </div>
