@@ -35,7 +35,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         can.canvas.add(this.darkFooterImage);
 
         this.whiteFooterImage = can.applyPropertyToImages($.extend({}, can.imageobjects["orange-footer.png"]), this);
-        this.whiteFooterImage.top = 363;
+        this.whiteFooterImage.top = 365;
         this.whiteFooterImage.left = this.left;
         can.canvas.add(this.whiteFooterImage);
 

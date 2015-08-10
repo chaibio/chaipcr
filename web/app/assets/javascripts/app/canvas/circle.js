@@ -17,7 +17,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
   'gatherDataGroup',
   'gatherDataCircle',
   'previouslySelected',
-  
+
   function(ExperimentLoader, $rootScope, Constants, circleGroup, outerMostCircle, outerCircle,
     centerCircle, littleCircleGroup, circleMaker, stepDataGroup, stepTemperature, stepHoldTime,
     gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle, previouslySelected) {
@@ -329,13 +329,14 @@ window.ChaiBioTech.ngApp.factory('circle', [
       this.manageClick = function() {
 
         this.makeItBig();
-
+        this.parent.parentStage.selectStage();
+        this.parent.selectStep();
+        
         if(previouslySelected.circle) {
           var previousSelected = previouslySelected.circle;
 
           if(previousSelected.uniqueName != this.uniqueName) {
-            this.parent.parentStage.selectStage();
-            this.parent.selectStep();
+
             previousSelected.makeItSmall();
           }
         }

@@ -137,7 +137,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         this.canvas.add(step.darkFooterImage);
 
         step.whiteFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["orange-footer.png"]), step);
-        step.whiteFooterImage.top = 363;
+        step.whiteFooterImage.top = 365;
         step.whiteFooterImage.left = step.left;
         this.canvas.add(step.whiteFooterImage);
 
@@ -149,7 +149,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     this.applyPropertyToImages = function(imgObj, stepObj) {
 
       imgObj.left = stepObj.left - 1;
-      imgObj.top = 383;
+      imgObj.top = 384;
       imgObj.selectable = true;
       imgObj.hasControls = false;
       imgObj.lockMovementY = true;
@@ -227,14 +227,15 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
       //move the stages, make space.
       var noOfsteps = data.stage.steps.length, k = 0,
-      ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus;
-
+      ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus,
+      originalWidth = currentStage.myWidth,
+      add = (data.stage.steps.length > 1) ? 121.5 : 122.5;
       for(k = 0; k < noOfsteps; k++) {
-        currentStage.myWidth = currentStage.myWidth + 121;
+        currentStage.myWidth = currentStage.myWidth + add;
         currentStage.moveAllStepsAndStages(false);
       }
 
-      currentStage.myWidth = currentStage.myWidth - (121 * noOfsteps);
+      currentStage.myWidth = originalWidth;
 
       // now create a stage;
       var stageIndex = currentStage.index + 1;

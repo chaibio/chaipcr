@@ -19,7 +19,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
       this.addNewStep = function(data, currentStep) {
 
-        var width = (currentStep.index === this.childSteps.length - 1) ? 121 : 120;
+        var width = 120;//(currentStep.index === this.childSteps.length - 1) ? 121 : 120;
         this.myWidth = this.myWidth + width;
         this.stageRect.setWidth(this.myWidth);
         this.roof.setWidth(this.myWidth - 4);
@@ -48,13 +48,14 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
         $scope.applyValues(newStep.circle);
         newStep.circle.manageClick(true);
+
         this.parent.setDefaultWidthHeight();
       };
 
       this.deleteStep = function(data, currentStep) {
 
         // This methode says what happens in the canvas when a step is deleted
-        var width = (currentStep.index === this.childSteps.length - 1) ? 121 : 120, selected = null;
+        var width = 120;//(currentStep.index === this.childSteps.length - 1) ? 121 : 120, selected = null;
         this.myWidth = this.myWidth - width;
         this.stageRect.setWidth(this.myWidth);
         this.roof.setWidth(this.myWidth - 4);
@@ -86,7 +87,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
             this.cycles.setVisible(false);
           }
 
-        } else { // if all the steps in the stages are deleted;
+        } else { // if all the steps in the stages are deleted, We delete the stage itself.
 
           this.deleteStageContents();
 
@@ -118,9 +119,13 @@ window.ChaiBioTech.ngApp.factory('stage', [
         var circles = this.parent.reDrawCircles();
         this.parent.addRampLinesAndCircles(circles);
 
+        if(selected.index === this.childSteps.length - 1) {
+          // if selected step is the last one in the stage;
+          selected.borderRight.setVisible(false);
+        }
         $scope.applyValues(selected.circle);
         selected.circle.manageClick();
-        currentStep = null; // we force it to be collected by garbage collector
+        //currentStep = null; // we force it to be collected by garbage collector
         this.parent.setDefaultWidthHeight();
         //if(this.childSteps.length === 0) { delete(this); }
       };
@@ -165,7 +170,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
           currentStage = currentStage.nextStage;
         }
 
-        currentStage.borderRight.set({left: currentStage.myWidth + currentStage.left + 2 }).setCoords();
+        currentStage.borderRight.set({left: currentStage.myWidth + currentStage.left + 4 }).setCoords();
       };
 
       this.updateStageData = function(action) {
@@ -195,7 +200,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       };
 
       this.configureStep = function(newStep, start) {
-        // insert it to all steps, add next and previous , rerender circles;
+        // insert it to all steps, add next and previous , re-render circles;
         for(var j = start + 1; j < this.childSteps.length; j++) {
 
           var thisStep = this.childSteps[j];
@@ -216,8 +221,8 @@ window.ChaiBioTech.ngApp.factory('stage', [
         }
 
         if(newStep.index === this.childSteps.length - 1) {
-
           newStep.borderRight.setVisible(false);
+          //newStep.borderRight.setFill('#ffb400');
           newStep.previousStep.borderRight.setVisible(true);
         }
       };
@@ -225,7 +230,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.getLeft = function() {
 
         if(this.previousStage) {
-          this.left = this.previousStage.left + this.previousStage.myWidth + 2;
+          this.left = this.previousStage.left + this.previousStage.myWidth + 4;
         } else {
           this.left = 32;
         }
