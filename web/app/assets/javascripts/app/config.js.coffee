@@ -5,7 +5,6 @@ window.ChaiBioTech.ngApp
   '$window'
   ($rootScope, $state, $window) ->
     $rootScope.title = "ChaiBioTech"
-    $rootScope.authToken = $window.authToken
 
 
     $rootScope.$on '$stateChangeSuccess', (e, toState, params, fromState) ->
@@ -13,7 +12,7 @@ window.ChaiBioTech.ngApp
       angular.element('body').removeClass "#{fromState.name}-state-active"
 
     $rootScope.$on 'event:auth-loginRequired', (e, rejection)->
-      $rootScope.authToken = null
+      $window.authToken = null
 
       if (rejection.data.errors is 'sign up')
         $state.go 'signup'
@@ -22,7 +21,7 @@ window.ChaiBioTech.ngApp
         $state.go 'login'
 
     $rootScope.$on '$stateChangeStart', (e, toState, params, fromState) ->
-      if (toState.name is 'login') and $rootScope.authToken
+      if (toState.name is 'login') and $window.authToken
         e.preventDefault()
         $state.go fromState.name
 
