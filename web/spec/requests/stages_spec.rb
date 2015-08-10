@@ -2,6 +2,9 @@ require 'spec_helper'
 
 describe "Stages API" do
   before(:each) do
+    admin_user = create_admin_user
+    post '/login', { email: admin_user.email, password: admin_user.password }
+    
     @experiment = create_experiment_with_one_stage("test")
   end
 

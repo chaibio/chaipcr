@@ -10,6 +10,7 @@ class JSONHandler : public Poco::Net::HTTPRequestHandler
 {
 public:
     JSONHandler();
+    JSONHandler(Poco::Net::HTTPResponse::HTTPStatus code, const std::string &errorMessage);
 
     void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) final;
 

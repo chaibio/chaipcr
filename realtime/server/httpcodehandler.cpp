@@ -9,7 +9,7 @@ HTTPCodeHandler::HTTPCodeHandler(Poco::Net::HTTPResponse::HTTPStatus status, con
 void HTTPCodeHandler::handleRequest(Poco::Net::HTTPServerRequest &/*request*/, Poco::Net::HTTPServerResponse &response)
 {
     if (reason().empty())
-        response.setStatus(status());
+        response.setStatusAndReason(status(), Poco::Net::HTTPServerResponse::getReasonForStatus(status()));
     else
         response.setStatusAndReason(status(), reason());
 

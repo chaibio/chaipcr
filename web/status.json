@@ -3,15 +3,15 @@
     {
         "zone1":
         {
-            "temperature": "94.762",
+            "temperature": "95",
             "drive": "0.212"
         },
         "zone2":
         {
-            "temperature": "94.692",
+            "temperature": "95",
             "drive": "0.222"
         },
-        "temperature": "94.727"
+        "temperature": "95.0001"
     },
     "lid":
     {

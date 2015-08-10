@@ -32,7 +32,7 @@ class Experiment < ActiveRecord::Base
   end
   
   after_destroy do |experiment|
-    if experiment_definition.experiment_type ==  ExperimentDefinition.TYPE_USER_DEFINED
+    if experiment_definition.experiment_type ==  ExperimentDefinition::TYPE_USER_DEFINED
       experiment_definition.destroy
     end
     

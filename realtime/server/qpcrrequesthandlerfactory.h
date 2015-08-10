@@ -9,6 +9,9 @@ class QPCRRequestHandlerFactory: public Poco::Net::HTTPRequestHandlerFactory
 {
 public:
     virtual Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest &request);
+
+private:
+    bool checkUserAuthorization(const Poco::Net::HTTPServerRequest &request);
 };
 
 #endif

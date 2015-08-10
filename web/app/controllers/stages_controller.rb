@@ -1,5 +1,6 @@
 class StagesController < ApplicationController
   include ParamsHelper
+  before_filter :ensure_authenticated_user
   before_filter :experiment_definition_editable_check
   
   respond_to :json  

@@ -1,6 +1,11 @@
 require 'spec_helper'
 
 describe "Experiments API" do
+  before(:each) do
+    admin_user = create_admin_user
+    post '/login', { email: admin_user.email, password: admin_user.password }
+  end
+  
   it 'create experiment' do
     params = { experiment: {name: "test"} }
     post "/experiments", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
@@ -53,6 +58,12 @@ describe "Experiments API" do
     expect(response).to be_success 
     json = JSON.parse(response.body)
     json["experiment"]["name"].should == "test1"
+  end
+  
+  it  'delete experiment' do
+    experiment = create_experiment("test")
+    delete "/experiments/#{experiment.id}", {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+    expect(response).to be_success 
   end
   
   it "list experiments with no experiment" do
