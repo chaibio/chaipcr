@@ -13,7 +13,11 @@ app.factory 'Auth', [
       loginPromise
 
     isLoggedIn: ->
-      $http.get('/loggedin', null, ignoreAuthModule: true)
+      promise = $http.get('/loggedin', null, ignoreAuthModule: true)
+      promise.then (resp) ->
+        $rootScope.authToken = resp.data.authentication_token
+
+      promise
 
     logout: ->
       $http.post('/logout').then ->

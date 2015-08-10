@@ -1,4 +1,7 @@
 class SessionsController < ApplicationController
+
+  before_filter :ensure_authenticated_user, :only => [:is_loggedin]
+
   respond_to :json
 
   resource_description {
@@ -22,7 +25,7 @@ class SessionsController < ApplicationController
   end
 
   def is_loggedin
-    ensure_authenticated_user
+    render json: {authentication_token: current_user.token}
   end
 
   api :POST, "/logout", "Logout"

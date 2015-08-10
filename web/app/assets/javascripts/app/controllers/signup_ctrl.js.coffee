@@ -11,7 +11,7 @@ window.ChaiBioTech.ngApp.controller 'SignUpCtrl', [
     .then ->
       $state.go 'home'
     .catch (resp) ->
-      if resp.data.errors is 'log in'
+      if resp.data.errors is 'login in'
         $state.go 'login'
 
     $scope.submit = ->
