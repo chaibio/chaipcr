@@ -16,9 +16,11 @@ window.ChaiBioTech.ngApp.factory('circle', [
   'gatherDataCircleOnScroll',
   'gatherDataGroup',
   'gatherDataCircle',
+  'previouslySelected',
+  
   function(ExperimentLoader, $rootScope, Constants, circleGroup, outerMostCircle, outerCircle,
     centerCircle, littleCircleGroup, circleMaker, stepDataGroup, stepTemperature, stepHoldTime,
-    gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle) {
+    gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle, previouslySelected) {
     return function(model, parentStep) {
 
       this.model = model;
@@ -31,7 +33,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
       this.scrollRatio1 = ((this.scrollLength - this.scrollTop) * 0.25) / 50; // 1.2;//(this.scrollLength - this.scrollTop) / 200;
       this.scrollRatio2 = ((this.scrollLength - this.scrollTop) * 0.75) / 50;//3.54;//(this.scrollLength - this.scrollTop) / 50;
       this.middlePoint = this.scrollLength - ((this.scrollLength - this.scrollTop) * 0.25); // This is the point where it reads 50
-      // Not the mid point of steps length;
+
       this.gatherDataImage = this.next = this.previous = null;
       this.big = false;
       this.controlDistance = Constants.controlDistance;
@@ -327,19 +329,18 @@ window.ChaiBioTech.ngApp.factory('circle', [
       this.manageClick = function() {
 
         this.makeItBig();
-        this.parent.parentStage.selectStage();
-        this.parent.selectStep();
 
-        if(ChaiBioTech.app.selectedCircle) {
-          var previousSelected = ChaiBioTech.app.selectedCircle;
+        if(previouslySelected.circle) {
+          var previousSelected = previouslySelected.circle;
 
           if(previousSelected.uniqueName != this.uniqueName) {
-
+            this.parent.parentStage.selectStage();
+            this.parent.selectStep();
             previousSelected.makeItSmall();
           }
         }
-
         ChaiBioTech.app.selectedCircle = this;
+        previouslySelected.circle = this;
         this.canvas.renderAll();
       };
 

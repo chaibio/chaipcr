@@ -60,6 +60,8 @@ public:
 
     void toggleTempLogs();
 
+    int getUserId(const std::string &token) const;
+
 private:
     void run();
     void complete();

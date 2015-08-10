@@ -19,6 +19,7 @@ window.ChaiBioTech.ngApp.directive('capsule', [
         // data is not readily available as its an inner directive
         scope.$watch("data", function(val) {
           if(angular.isDefined(scope.data)) {
+            console.log("okay right place");
             scope.originalValue = Number(scope.data);
               if(scope.delta === "true") {
                 scope.configure();

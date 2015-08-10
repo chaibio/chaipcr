@@ -2,7 +2,9 @@ window.ChaiBioTech.ngApp.factory('step', [
   'ExperimentLoader',
   '$rootScope',
   'circle',
-  function(ExperimentLoader, $rootScope, circle) {
+  'previouslySelected',
+
+  function(ExperimentLoader, $rootScope, circle, previouslySelected) {
 
     return function(model, parentStage, index) {
 
@@ -239,18 +241,16 @@ window.ChaiBioTech.ngApp.factory('step', [
 
       this.selectStep = function() {
 
-        if(ChaiBioTech.app.selectedStep) {
-          var previouslySelected = ChaiBioTech.app.selectedStep;
+        if(previouslySelected.circle) {
+          var previouslySelectedStep = previouslySelected.circle.parent;
 
-          previouslySelected.showHideFooter(false);
-          previouslySelected.manageBorderPrevious('#ff9f00');
+          previouslySelectedStep.showHideFooter(false);
+          previouslySelectedStep.manageBorderPrevious('#ff9f00');
         }
 
-        ChaiBioTech.app.selectedStep = this;
         this.manageBorder("black");
         this.showHideFooter(true);
       };
-
 
     };
   }

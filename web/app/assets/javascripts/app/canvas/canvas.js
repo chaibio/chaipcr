@@ -74,7 +74,6 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       }
       // Only for the last stage
       stageView.addBorderRight();
-      //this.canvas.add(stageView.borderRight);
       console.log("Stages added ... !");
       return this;
 

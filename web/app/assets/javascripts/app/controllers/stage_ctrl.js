@@ -65,13 +65,18 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
 
     $scope.timeFormating = function(reading) {
 
+      var mins = Number(reading);
+      var negative = (mins < 0) ? "-" : "";
+
+      reading = Math.abs(reading);
+
       var hour = Math.floor(reading / 60);
       hour = (hour < 10) ? "0" + hour : hour;
 
       var min = reading % 60;
       min = (min < 10) ? "0" + min : min;
 
-      return hour + ":" + min;
+      return negative + hour + ":" + min;
     };
 
   }

@@ -42,6 +42,8 @@ public:
     Settings* getSettings();
     void updateSettings(const Settings &settings);
 
+    int getUserId(const std::string &token);
+
 #ifdef TEST_BUILD
     std::vector<int> getEperimentIdList();
 #endif

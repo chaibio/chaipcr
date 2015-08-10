@@ -13,6 +13,12 @@ JSONHandler::JSONHandler()
     setStatus(HTTPResponse::HTTP_OK);
 }
 
+JSONHandler::JSONHandler(HTTPResponse::HTTPStatus code, const string &errorMessage)
+{
+    setStatus(code);
+    setErrorString(errorMessage);
+}
+
 void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
     istream &requestStream = request.stream();
