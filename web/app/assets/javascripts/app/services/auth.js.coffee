@@ -25,15 +25,16 @@ app.factory 'Auth', [
 
 ]
 
-app.service 'AuthToken', [
+app.factory 'AuthToken', [
   '$window'
   ($window) ->
     request: (config) ->
       corsCheck = /8000/
-      if $window.authToken && corsCheck.test(config.url)
+      if $window.authToken and corsCheck.test(config.url)
         config.headers = config.headers || {}
-        config.headers['Authorization'] = "Token #{$window.authToken}"
+        config.headers.Authorization = "Token #{$window.authToken}"
 
+      console.log config
       config
 
 ]
