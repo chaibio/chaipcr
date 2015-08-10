@@ -2,7 +2,9 @@ window.ChaiBioTech.ngApp.factory('stage', [
   'ExperimentLoader',
   '$rootScope',
   'step',
-  function(ExperimentLoader, $rootScope, step) {
+  'previouslySelected',
+
+  function(ExperimentLoader, $rootScope, step, previouslySelected) {
 
     return function(model, stage, allSteps, index, fabricStage, $scope, insert) {
 
@@ -403,9 +405,9 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.manageFooter = function(visible, color, length) {
 
         for(var i = 0; i< length; i++) {
-          //console.log(i, this.childSteps[i]);
-            this.childSteps[i].commonFooterImage.setVisible(visible);
-            this.childSteps[i].stepName.setFill(color);
+
+          this.childSteps[i].commonFooterImage.setVisible(visible);
+          this.childSteps[i].stepName.setFill(color);
         }
       };
 
@@ -420,16 +422,15 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
         var length = this.childSteps.length;
 
-        if(ChaiBioTech.app.selectedStage) {
-          var previouslySelected = ChaiBioTech.app.selectedStage;
-          var previousLength = previouslySelected.childSteps.length;
+        if(previouslySelected.circle) {
+          var previousSelectedStage = previouslySelected.circle.parent.parentStage;
+          var previousLength = previousSelectedStage.childSteps.length;
 
-          previouslySelected.changeFillsAndStrokes("white");
-          previouslySelected.manageBordersOnSelection("#ff9f00");
-          previouslySelected.manageFooter(false, "white", previousLength);
+          previousSelectedStage.changeFillsAndStrokes("white");
+          previousSelectedStage.manageBordersOnSelection("#ff9f00");
+          previousSelectedStage.manageFooter(false, "white", previousLength);
         }
 
-        ChaiBioTech.app.selectedStage = this;
         this.changeFillsAndStrokes("black");
         this.manageBordersOnSelection("#cc6c00");
         this.manageFooter(true, "black", length);

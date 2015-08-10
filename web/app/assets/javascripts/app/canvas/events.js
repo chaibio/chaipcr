@@ -21,24 +21,23 @@ window.ChaiBioTech.ngApp.factory('events', [
           var me;
           switch(evt.target.name)  {
 
-          case "stepGroup":
-            me = evt.target.me;
-            me.circle.manageClick();
-            console.log(me.circle.parent.uniqueName);
-            $scope.applyValuesFromOutSide(me.circle);
-          break;
+            case "stepGroup":
+              me = evt.target.me;
+              me.circle.manageClick();
+              $scope.applyValuesFromOutSide(me.circle);
+            break;
 
-          case "controlCircleGroup":
-            me = evt.target.me;
-            me.manageClick();
-            $scope.applyValuesFromOutSide(me);
-          break;
+            case "controlCircleGroup":
+              me = evt.target.me;
+              me.manageClick();
+              $scope.applyValuesFromOutSide(me);
+            break;
 
-          case "moveStepImage":
-            var moveStep = evt.target.moveStep;
-            moveStep.stepRect.setFill("yellow");
-            C.canvas.setActiveGroup(moveStep.stepGroup);
-          break;
+            case "moveStepImage":
+              var moveStep = evt.target.moveStep;
+              moveStep.stepRect.setFill("yellow");
+              C.canvas.setActiveGroup(moveStep.stepGroup);
+            break;
 
           }
         }
@@ -127,7 +126,7 @@ window.ChaiBioTech.ngApp.factory('events', [
            When a model in the server changed
            changes like add step/stage or delete step/stage.
       ***************************************/
-      this.canvas.on("modelChanged", function(evtData) {
+      /*this.canvas.on("modelChanged", function(evtData) {
         console.log(evtData);
         var keyVal = Object.keys(evtData)[0];
 
