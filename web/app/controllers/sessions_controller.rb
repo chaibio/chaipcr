@@ -1,10 +1,10 @@
 class SessionsController < ApplicationController
   respond_to :json
-  
-  resource_description { 
+
+  resource_description {
     formats ['json']
   }
-  
+
   api :POST, "/login", "Login"
   param :email, String, :desc => "Email", :required => true
   param :password, String, :desc => "Password", :required => true
@@ -20,7 +20,11 @@ class SessionsController < ApplicationController
       render json: {errors: "The email and password entered do not match"}, status: 401
     end
   end
-  
+
+  def is_loggedin
+    ensure_authenticated_user
+  end
+
   api :POST, "/logout", "Logout"
   def destroy
     user_token = UserToken.where(access_token: UserToken.digest(token)).first

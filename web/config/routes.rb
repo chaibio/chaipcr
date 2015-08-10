@@ -57,15 +57,16 @@ Qpcrctl::Application.routes.draw do
   #     # (app/controllers/admin/products_controller.rb)
   #     resources :products
   #   end
-  
+
   root 'main#index'
-  
+
   post '/login', :to => 'sessions#create', :as => 'login'
   post '/logout', :to => 'sessions#destroy', :as => 'logout'
-  
+  get '/loggedin', :to => 'sessions#is_loggedin'
+
   resource :settings, only: [:update, :show]
   resources :users, defaults: { format: 'json' }
-  
+
   resources :experiments, defaults: { format: 'json' } do
     member do
       post 'start'
@@ -79,7 +80,7 @@ Qpcrctl::Application.routes.draw do
       get 'export'
     end
   end
-  
+
   resources :protocols, shallow: true, only: [:update] do
     resources :stages, shallow: true, only: [:create, :update, :destroy] do
       resources :steps, shallow: true, only: [:create, :update, :destroy] do
@@ -89,6 +90,6 @@ Qpcrctl::Application.routes.draw do
       post 'move', on: :member
     end
   end
-  
+
   get ':controller(/:action(/:id))'
 end
