@@ -8,6 +8,7 @@
 #include "qpcrapplication.h"
 #include "exceptionhandler.h"
 #include "wirelessmanager.h"
+#include "maincontrollers.h"
 
 using namespace std;
 using namespace Poco::Net;
@@ -44,6 +45,8 @@ int QPCRApplication::main(const vector<string>&) {
 
         for (auto threadControlUnit: _threadControlUnits)
             threadControlUnit->start();
+
+        HeatSinkInstance::getInstance()->startADCReading();
 
         _workState = true;
         while (!waitSignal() && _workState) {
