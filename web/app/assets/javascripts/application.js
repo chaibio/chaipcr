@@ -37,6 +37,7 @@
 //
 //  angular app ===============
 //
+//= require app/init
 //= require app/app
 //= require app/config
 //= require app/routes

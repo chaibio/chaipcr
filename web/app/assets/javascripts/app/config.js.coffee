@@ -2,8 +2,12 @@ window.ChaiBioTech.ngApp
 .run [
   '$rootScope'
   '$state'
-  ($rootScope, $state) ->
+  '$window'
+  ($rootScope, $state, $window) ->
     $rootScope.title = "ChaiBioTech"
+    $rootScope.authToken = $window.authToken
+
+
     $rootScope.$on '$stateChangeSuccess', (e, toState, params, fromState) ->
       angular.element('body').addClass "#{toState.name}-state-active"
       angular.element('body').removeClass "#{fromState.name}-state-active"
