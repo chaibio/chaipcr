@@ -7,6 +7,13 @@ window.ChaiBioTech.ngApp.controller 'SignUpCtrl', [
     $scope.user =
       role: 'admin'
 
+    Auth.isLoggedIn()
+    .then ->
+      $state.go 'home'
+    .catch (resp) ->
+      if resp.data.errors is 'log in'
+        $state.go 'login'
+
     $scope.submit = ->
       User.save($scope.user)
       .then ->

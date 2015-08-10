@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  # before_filter :ensure_authenticated_user, :except => :create
+  before_filter :ensure_authenticated_user, :except => :create
 
   respond_to :json
   

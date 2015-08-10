@@ -16,7 +16,8 @@ app.factory 'Auth', [
       $http.get('/loggedin', null, ignoreAuthModule: true)
 
     logout: ->
-      $http.post('/logout')
+      $http.post('/logout').then ->
+        $rootScope.authToken = null
 
 ]
 

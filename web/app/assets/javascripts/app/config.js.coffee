@@ -9,6 +9,7 @@ window.ChaiBioTech.ngApp
       angular.element('body').removeClass "#{fromState.name}-state-active"
 
     $rootScope.$on 'event:auth-loginRequired', (e, rejection)->
+      console.log rejection
       $rootScope.authToken = null
 
       if (rejection.data.errors is 'sign up')

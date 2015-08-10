@@ -8,7 +8,10 @@ window.ChaiBioTech.ngApp
 
     $scope.user = {}
 
-    Auth.isLoggedIn().catch (resp) ->
+    Auth.isLoggedIn()
+    .then ->
+      $state.go 'home'
+    .catch (resp) ->
       if resp.data.errors is 'sign up'
         $state.go 'signup'
 
