@@ -1,4 +1,4 @@
-<div class="login-wrapper">
+<form class="login-wrapper">
   <div class="login-box">
     <div class="login-section title-field">
       <img src="assets/logo-qpcr.png">
@@ -13,11 +13,14 @@
         <input type="password" id="pass" placeholder="Enter Password" class="login-text-field" ng-model="user.password">
       </div>
     </div>
+    <p class="text-danger text-center" ng-show="error">
+      {{error}}
+    </p>
     <div class="login-section">
       <div class="login-bitton-container">
-        <button class="login-button" id="login-button" ng-click="LoginCtrl.login()">SIGN IN</button>
+        <button type="submit" class="login-button" id="login-button" ng-click="LoginCtrl.login()">SIGN IN</button>
       </div>
 <!--       <div class="login-trouble">Trouble signing in?</div> -->
     </div>
   </div>
-</div>
+</form>

@@ -6,16 +6,17 @@ app.factory 'Auth', [
   ($http, $rootScope) ->
 
     login: (email, password) ->
-      loginPromise = $http.post('/login', email: email, password: password)
+      loginPromise = $http.post('/login', {email: email, password: password}, ignoreAuthModule: true)
       loginPromise.then (resp) ->
         $rootScope.authToken = resp.data.authentication_token
 
       loginPromise
 
+    isLoggedIn: ->
+      $http.get('/loggedin', null, ignoreAuthModule: true)
+
     logout: ->
       $http.post('/logout')
-
-
 
 ]
 
@@ -25,7 +26,7 @@ app.service 'AuthToken', [
   ($rootScope, $window) ->
     request: (config) ->
       corsCheck = /8000/
-      if $rootScope.authToken && !corsCheck.test(config.url)
+      if $rootScope.authToken && corsCheck.test(config.url)
         config.headers = config.headers || {}
         config.headers['Authorization'] = "Token #{$rootScope.authToken}"
 

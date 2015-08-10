@@ -1,9 +1,12 @@
 window.ChaiBioTech.ngApp.directive 'logout', [
   '$state'
   'Auth'
-  ($state, Auth) ->
+  '$rootScope'
+  ($state, Auth, $rootScope) ->
     restrict: 'EA'
-    link: ->
-      Auth.logout().then ->
-        $state.go 'login'
+    link: ($scope, elem)->
+      elem.click ->
+        Auth.logout().then ->
+          $state.go 'login'
+
 ]
