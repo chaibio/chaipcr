@@ -2,7 +2,9 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
   '$scope',
   'ExperimentLoader',
   'canvas',
-  function($scope, ExperimentLoader, canvas) {
+  '$modal',
+
+  function($scope, ExperimentLoader, canvas, $modal) {
 
     var that = this;
     $scope.stage = {};
@@ -47,7 +49,8 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
 
         if(isNaN(hr) || isNaN(min)) {
           deltaTime = null;
-          alert("Please enter a valid value");
+          var warningMessage1 = "You have entered a wrong value. Please make sure you enter digits.";
+          $scope.showMessage(warningMessage1);
           return false;
         } else {
           deltaTime = (hr * 60) + (min * 1);
@@ -56,7 +59,8 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
       }
 
       if(isNaN(deltaTime) || !deltaTime) {
-        alert("Please enter a valid value");
+        var warningMessage2 = "You have entered a wrong value. Please make sure you enter digits.";
+        $scope.showMessage(warningMessage2);
         return false;
       } else {
         return parseInt(Math.abs(deltaTime));
@@ -79,5 +83,16 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
       return negative + hour + ":" + min;
     };
 
+    $scope.showMessage = function(message) {
+
+      $scope.warningMessage = message;
+      $scope.modal = $modal.open({
+        scope: $scope,
+        templateUrl: 'app/views/modal-warning.html',
+        windowClass: 'small-modal'
+        // This is tricky , we used it here so that,
+        //Custom size of this modal doesn't change any other modal in use
+      });
+    };
   }
 ]);

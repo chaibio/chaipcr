@@ -52,7 +52,8 @@ window.ChaiBioTech.ngApp.directive('startOnCycle', [
               });
             } else {
               scope.hidden = scope.shown;
-              alert("Please enter a value less than number of cycles");
+              var warningMessage = "The value you have entered is greater than NO OF CYCLES set for this stage. Please enetr a value lower than "+ scope.$parent.stage.num_cycles +", or Increase NO OF CYCLES for this stage.";
+              scope.$parent.showMessage(warningMessage);
             }
           } else {
             scope.hidden = scope.shown;
