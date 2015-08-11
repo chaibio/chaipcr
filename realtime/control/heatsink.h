@@ -17,6 +17,8 @@ public:
     Direction outputDirection() const;
     double fanDrive() const;
 
+    void startADCReading();
+
 protected:
     void setOutput(double value);
     void resetOutput();

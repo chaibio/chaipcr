@@ -58,7 +58,7 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
 
         //CORS
         response.add("Access-Control-Allow-Origin", "*");
-        response.add("Access-Control-Allow-Headers", "X-Requested-With, X-Prototype-Version, X-CSRF-Token");
+        response.add("Access-Control-Allow-Headers", "X-Requested-With, X-Prototype-Version, X-CSRF-Token, Authorization");
 
         if (!responsePt.empty())
         {

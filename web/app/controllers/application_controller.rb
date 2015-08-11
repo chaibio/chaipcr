@@ -2,16 +2,15 @@ class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
-  
+
   protected
-  
+
   def logged_in?
     current_user != nil
   end
-  
+
   # Renders a 401 status code if the current user is not authorized
   def ensure_authenticated_user
-    return true
     if logged_in? && authorized?
       return true
     else
@@ -25,7 +24,7 @@ class ApplicationController < ActionController::Base
   def authorized?
     return true
   end
-  
+
   # Returns the active user associated with the access token if available
   def current_user
     if @current_user == nil
@@ -57,7 +56,7 @@ class ApplicationController < ActionController::Base
       end
     end
   end
-  
+
   def experiment_definition_editable_check
     get_experiment
     if @experiment == nil || !@experiment.editable?
@@ -67,5 +66,5 @@ class ApplicationController < ActionController::Base
       return true
     end
   end
-  
+
 end

@@ -1,6 +1,8 @@
 #include <Poco/Net/HTTPServerRequest.h>
 #include <Poco/URI.h>
 
+#include <boost/tokenizer.hpp>
+
 #include "httpcodehandler.h"
 #include "testcontrolhandler.h"
 #include "statushandler.h"
@@ -82,13 +84,30 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
 
 bool QPCRRequestHandlerFactory::checkUserAuthorization(const HTTPServerRequest &request)
 {
+    std::string token;
+
     if (request.has("Authorization"))
     {
-        std::string authString = request.get("Authorization");
-        authString.erase(0, 6); //Remove "Token "
-
-        return ExperimentController::getInstance()->getUserId(authString) != -1;
+        token = request.get("Authorization");
+        token.erase(0, 6); //Remove "Token "
     }
+    else if (request.getMethod() == "GET")
+    {
+        std::string query = URI(request.getURI()).getQuery();
+        boost::tokenizer<boost::char_separator<char>> tokens(query, boost::char_separator<char>("&"));
+
+        for (const std::string &argument: tokens)
+        {
+            if (argument.find("access_token=") == 0)
+            {
+                token = argument.substr(std::string("access_token=").size());
+                break;
+            }
+        }
+    }
+
+    if (!token.empty())
+        return ExperimentController::getInstance()->getUserId(token) != -1;
 
     return false;
 }

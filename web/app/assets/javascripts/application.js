@@ -33,9 +33,11 @@
 //= require app/libs/d3
 //= require app/libs/n3-line-chart
 //= require app/libs/ng-focus-on
+//= require app/libs/http-auth-interceptor
 //
 //  angular app ===============
 //
+//= require app/init
 //= require app/app
 //= require app/config
 //= require app/routes

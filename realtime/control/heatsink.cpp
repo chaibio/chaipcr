@@ -15,9 +15,6 @@ HeatSink::HeatSink(Settings settings, const std::string &fanPWMPath, unsigned lo
     _fan->setPWMDutyCycle((unsigned long)0);
 
     resetOutput();
-
-    _adcTimer->setPeriodicInterval(kHeatSinkADCInterval);
-    _adcTimer->start(Poco::TimerCallback<HeatSink>(*this, &HeatSink::readADCPin));
 }
 
 HeatSink::~HeatSink()
@@ -39,6 +36,12 @@ HeatSink::Direction HeatSink::outputDirection() const
 double HeatSink::fanDrive() const
 {
     return _fan->drive();
+}
+
+void HeatSink::startADCReading()
+{
+    _adcTimer->setPeriodicInterval(kHeatSinkADCInterval);
+    _adcTimer->start(Poco::TimerCallback<HeatSink>(*this, &HeatSink::readADCPin));
 }
 
 void HeatSink::setOutput(double value)

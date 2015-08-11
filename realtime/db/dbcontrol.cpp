@@ -441,17 +441,11 @@ void DBControl::updateSettings(const Settings &settings)
 
 int DBControl::getUserId(const std::string &token)
 {
-    soci::row result;
-    std::unique_lock<std::mutex> lock(_readMutex);
-
-    *_readSession << "SELECT * FROM user_tokens WHERE access_token = " << token, soci::into(result);
-
-    lock.unlock();
-
     int id = -1;
 
-    if (result.get_indicator("user_id") != soci::i_null)
-        id = result.get<int>("user_id");
+    std::lock_guard<std::mutex> lock(_readMutex);
+
+    *_readSession << "SELECT user_id FROM user_tokens WHERE access_token = \'" << token << '\'', soci::into(id);
 
     return id;
 }
