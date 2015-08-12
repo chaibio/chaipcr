@@ -86,7 +86,7 @@ const long kTemperatureLoggerInterval = 1000;
 const long kTemperatureLoggerFlushInterval = 10000; //ms
 
 //Heat Sink
-const double kHeatSinkTargetTemperature = 38; //C
+const double kHeatSinkTargetTemperature = 50; //C
 const unsigned int kHeatSinkThermistorVoltageDividerResistanceOhms = 6800;
 
 const double kHeatSinkMinTargetTemp = 0;
