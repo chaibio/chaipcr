@@ -34,7 +34,6 @@ app.factory 'AuthToken', [
         config.url = "#{config.url}#{ if config.url.indexOf('&') < 0 then '?' else '&' }access_token=#{$window.authToken}"
         config.headers['Content-Type'] = 'text/plain'
 
-      console.log config
       config
 
 ]
