@@ -25,7 +25,7 @@ class SessionsController < ApplicationController
   end
 
   def is_loggedin
-    render json: {authentication_token: current_user.token}
+    render json: {authentication_token: current_user.user_tokens.first.access_token}
   end
 
   api :POST, "/logout", "Logout"
