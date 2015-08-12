@@ -18,7 +18,7 @@ class SessionsController < ApplicationController
     user = User.where("email=?", params[:email]).first
     if user && user.authenticate(params[:password])
       cookies.permanent[:authentication_token] = user.token
-      render json: {authentication_token: user.token}, status: 201
+      render json: {authentication_token: user.user_tokens.first.access_token}, status: 201
     else
       render json: {errors: "The email and password entered do not match"}, status: 401
     end
