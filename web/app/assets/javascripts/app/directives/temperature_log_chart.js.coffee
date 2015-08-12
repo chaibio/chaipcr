@@ -21,6 +21,7 @@ window.ChaiBioTech.ngApp
       $scope.init = ->
 
         $scope.resolutionOptions = [
+          60
           10 * 60
           20 * 60
           30 * 60
@@ -46,6 +47,8 @@ window.ChaiBioTech.ngApp
             $scope.resizeTemperatureLogs()
             $scope.updateScrollWidth()
             $scope.updateData()
+          else
+            $scope.init()
 
       $scope.updateData = ->
         left_et_limit = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length-1].temperature_log.elapsed_time - ($scope.resolution*1000)
