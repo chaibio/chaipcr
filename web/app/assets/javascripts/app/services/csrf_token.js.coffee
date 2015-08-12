@@ -7,9 +7,11 @@ app.service 'CSRFToken', [
   '$window'
   ($window) ->
     request: (config) ->
-      config.headers = config.headers || {}
-      config.headers['X-CSRF-Token'] = $window.$('meta[name=csrf-token]').attr('content')
-      config.headers['X-Requested-With'] = 'XMLHttpRequest'
+
+      if config.url.indexOf('8000') < 0
+        config.headers['X-CSRF-Token'] = $window.$('meta[name=csrf-token]').attr('content')
+        config.headers['X-Requested-With'] = 'XMLHttpRequest'
+
       config
 
 ]

@@ -29,10 +29,10 @@ app.factory 'AuthToken', [
   '$window'
   ($window) ->
     request: (config) ->
-      corsCheck = /8000/
-      if $window.authToken and corsCheck.test(config.url)
-        config.headers = config.headers || {}
-        config.headers.Authorization = "Token #{$window.authToken}"
+      if $window.authToken and config.url.indexOf('8000') >= 0
+
+        config.url = "#{config.url}#{ if config.url.indexOf('&') < 0 then '?' else '&' }access_token=#{$window.authToken}"
+        config.headers['Content-Type'] = 'text/plain'
 
       console.log config
       config
