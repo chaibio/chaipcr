@@ -87,11 +87,11 @@ window.ChaiBioTech.ngApp
 
         $scope.greatest_elapsed_time = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length - 1].temperature_log.elapsed_time
 
-        widthPercent = $scope.resolution*1000/$scope.greatest_elapsed_time
-        if widthPercent > 1
-          widthPercent = 1
+        $scope.widthPercent = $scope.resolution*1000/$scope.greatest_elapsed_time
+        if $scope.widthPercent > 1
+          $scope.widthPercent = 1
 
-        elem.find('.scrollbar').css width: "#{widthPercent*100}%"
+        elem.find('.scrollbar').css width: "#{$scope.widthPercent*100}%"
 
       $scope.resizeTemperatureLogs = ->
         resolution = $scope.resolution
@@ -120,11 +120,15 @@ window.ChaiBioTech.ngApp
             $scope.updateScrollWidth()
             $scope.updateChart angular.copy $scope.temperatureLogs
 
+      $scope.$watch 'widthPercent', ->
+        if $scope.widthPercent is 1
+          $scope.autoUpdateTemperatureLogs()
+
       $scope.$watch 'scrollState', ->
         if $scope.scrollState and $scope.temperatureLogs && $scope.data
           $scope.updateData()
 
-          if $scope.scrollState >= 1
+          if $scope.scrollState >= 1 or $scope.widthPercent >= 1
             $scope.autoUpdateTemperatureLogs()
           else
             $scope.stopInterval()
