@@ -155,6 +155,9 @@ window.ChaiBioTech.ngApp
         $interval.cancel $scope.updateInterval if $scope.updateInterval
         $scope.updateInterval = null
 
+      elem.on '$destroy', ->
+        $scope.stopInterval()
+
       $scope.options = {
         axes: {
           x: {
