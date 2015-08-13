@@ -1,7 +1,4 @@
 class SessionsController < ApplicationController
-
-  before_filter :ensure_authenticated_user, :only => [:is_loggedin]
-
   respond_to :json
 
   resource_description {
@@ -18,14 +15,10 @@ class SessionsController < ApplicationController
     user = User.where("email=?", params[:email]).first
     if user && user.authenticate(params[:password])
       cookies.permanent[:authentication_token] = user.token
-      render json: {authentication_token: user.user_tokens.first.access_token}, status: 201
+      render json: {authentication_token: user.token}, status: 201
     else
       render json: {errors: "The email and password entered do not match"}, status: 401
     end
-  end
-
-  def is_loggedin
-    render json: {authentication_token: current_user.user_tokens.first.access_token}
   end
 
   api :POST, "/logout", "Logout"

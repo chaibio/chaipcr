@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150618061656) do
+ActiveRecord::Schema.define(version: 20150813073522) do
 
   create_table "experiment_definitions", force: true do |t|
     t.string "name",            null: false
@@ -30,6 +30,7 @@ ActiveRecord::Schema.define(version: 20150618061656) do
     t.string   "completion_message"
     t.integer  "experiment_definition_id"
     t.integer  "calibration_id"
+    t.boolean  "time_valid",               default: true, null: false
   end
 
   create_table "fluorescence_data", id: false, force: true do |t|
@@ -55,10 +56,8 @@ ActiveRecord::Schema.define(version: 20150618061656) do
   add_index "melt_curve_data", ["experiment_id", "stage_id", "well_num", "temperature"], name: "melt_curve_data_index", using: :btree
 
   create_table "protocols", force: true do |t|
-    t.decimal  "lid_temperature",          precision: 4, scale: 1, comment: "degrees C"
-    t.integer  "experiment_definition_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.decimal "lid_temperature",          precision: 4, scale: 1, comment: "degrees C"
+    t.integer "experiment_definition_id"
   end
 
   create_table "ramps", force: true do |t|
@@ -74,6 +73,7 @@ ActiveRecord::Schema.define(version: 20150618061656) do
     t.string  "wifi_password"
     t.boolean "wifi_enabled",   default: true
     t.integer "calibration_id"
+    t.boolean "time_valid",     default: true
   end
 
   create_table "stages", force: true do |t|
