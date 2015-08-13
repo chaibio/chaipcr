@@ -79,7 +79,8 @@
                <div class="dots" ng-click="deleteMode = !deleteMode"> ... </div>
             </div>
             <div class="all-experiments" ng-class="{'delete-mode': deleteMode}">
-               <div class="loading" ng-show="!experiments.length">Loading ......! <img src="assets/loading.gif"></div>
+               <div class="loading" ng-show="experiments === null">Loading ......! <img src="assets/loading.gif"></div>
+               <p ng-show="experiments !== null && experiments.length === 0"><i>No experiments yet.</i></p>
                <div class="individual-experiment" ng-class="{'del': exp.del}" ng-repeat="exp in experiments | orderBy:'experiment.created_at':true">
                   <div class="first-row">
                      <div class="image" ng-click="HomeCtrl.confirmDelete(exp)">&times;</div>
