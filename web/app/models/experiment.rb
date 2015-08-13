@@ -29,6 +29,7 @@ class Experiment < ActiveRecord::Base
     if experiment.calibration_id == nil
       experiment.calibration_id = Setting.calibration_id
     end
+    experiment.time_valid = Setting.time_valid
   end
   
   after_destroy do |experiment|
