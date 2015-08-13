@@ -34,6 +34,7 @@
 //= require app/libs/n3-line-chart
 //= require app/libs/ng-focus-on
 //= require app/libs/http-auth-interceptor
+//= require app/libs/jstorage
 //
 //  angular app ===============
 //
