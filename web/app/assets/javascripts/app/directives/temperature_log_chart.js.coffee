@@ -7,7 +7,8 @@ window.ChaiBioTech.ngApp
   'ChartData'
   'SecondsDisplay'
   '$interval'
-  (Experiment, ChartData, SecondsDisplay, $interval) ->
+  'Status'
+  (Experiment, ChartData, SecondsDisplay, $interval, Status) ->
 
     restrict: 'AE'
     scope:
@@ -19,6 +20,11 @@ window.ChaiBioTech.ngApp
         $scope.init() if id
 
       $scope.init = ->
+
+        $scope.$watch ->
+          Status.getData()
+        , (val) ->
+          $scope.isCurrentExperiment = val?.experimentController?.expriment?.id is $scope.experimentId
 
         $scope.resolutionOptions = [
           60
@@ -48,7 +54,7 @@ window.ChaiBioTech.ngApp
             $scope.updateScrollWidth()
             $scope.updateData()
           else
-            $scope.init()
+            $scope.autoUpdateTemperatureLogs()
 
       $scope.updateData = ->
         left_et_limit = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length-1].temperature_log.elapsed_time - ($scope.resolution*1000)
@@ -124,14 +130,14 @@ window.ChaiBioTech.ngApp
             $scope.updateChart angular.copy $scope.temperatureLogs
 
       $scope.$watch 'widthPercent', ->
-        if $scope.widthPercent is 1
+        if $scope.widthPercent is 1 and $scope.isCurrentExperiment
           $scope.autoUpdateTemperatureLogs()
 
       $scope.$watch 'scrollState', ->
-        if $scope.scrollState and $scope.temperatureLogs && $scope.data
+        if $scope.scrollState and $scope.temperatureLogs and $scope.data
           $scope.updateData()
 
-          if $scope.scrollState >= 1 or $scope.widthPercent >= 1
+          if $scope.scrollState >= 1 and $scope.isCurrentExperiment
             $scope.autoUpdateTemperatureLogs()
           else
             $scope.stopInterval()
@@ -140,7 +146,7 @@ window.ChaiBioTech.ngApp
         $scope.data = ChartData.temperatureLogs(temperature_logs).toN3LineChart()
 
       $scope.autoUpdateTemperatureLogs = =>
-         if not $scope.updateInterval
+        if !$scope.updateInterval
           $scope.updateInterval = $interval () ->
             Experiment
             .getTemperatureData($scope.experimentId, resolution: 1000)
