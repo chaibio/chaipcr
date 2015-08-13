@@ -152,7 +152,7 @@ window.ChaiBioTech.ngApp
               $scope.updateScrollWidth()
               $scope.updateData()
 
-          , 1000
+          , 10000
 
       $scope.stopInterval = =>
         $interval.cancel $scope.updateInterval if $scope.updateInterval
