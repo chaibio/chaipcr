@@ -1,7 +1,9 @@
 window.ChaiBioTech.ngApp.directive('startOnCycle', [
   'ExperimentLoader',
   '$timeout',
-  function(ExperimentLoader, $timeout) {
+  'alerts',
+  
+  function(ExperimentLoader, $timeout, alerts) {
     return {
       restric: 'EA',
       replace: true,
@@ -52,7 +54,7 @@ window.ChaiBioTech.ngApp.directive('startOnCycle', [
               });
             } else {
               scope.hidden = scope.shown;
-              var warningMessage = "The value you have entered is greater than NO OF CYCLES set for this stage. Please enetr a value lower than "+ scope.$parent.stage.num_cycles +", or Increase NO OF CYCLES for this stage.";
+              var warningMessage = alerts.startOnCycleWarning;
               scope.$parent.showMessage(warningMessage);
             }
           } else {

@@ -3,8 +3,9 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
   'ExperimentLoader',
   'canvas',
   '$modal',
+  'alerts',
 
-  function($scope, ExperimentLoader, canvas, $modal) {
+  function($scope, ExperimentLoader, canvas, $modal, alerts) {
 
     var that = this;
     $scope.stage = {};
@@ -49,7 +50,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
 
         if(isNaN(hr) || isNaN(min)) {
           deltaTime = null;
-          var warningMessage1 = "You have entered a wrong value. Please make sure you enter digits.";
+          var warningMessage1 = alerts.nonDigit;
           $scope.showMessage(warningMessage1);
           return false;
         } else {
@@ -59,7 +60,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
       }
 
       if(isNaN(deltaTime) || !deltaTime) {
-        var warningMessage2 = "You have entered a wrong value. Please make sure you enter digits.";
+        var warningMessage2 = alerts.nonDigit;
         $scope.showMessage(warningMessage2);
         return false;
       } else {

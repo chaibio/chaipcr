@@ -1,4 +1,3 @@
-window.ChaiBioTech.app.selectedCircle = null;
 window.ChaiBioTech.ngApp.factory('circle', [
   'ExperimentLoader',
   '$rootScope',
@@ -331,7 +330,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.makeItBig();
         this.parent.parentStage.selectStage();
         this.parent.selectStep();
-        
+
         if(previouslySelected.circle) {
           var previousSelected = previouslySelected.circle;
 

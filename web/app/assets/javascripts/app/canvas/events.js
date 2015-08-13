@@ -17,6 +17,7 @@ window.ChaiBioTech.ngApp.factory('events', [
           and we send the changes to backbone views.
       ***************************************/
       this.canvas.on("mouse:down", function(evt) {
+
         if(evt.target) {
           var me;
           switch(evt.target.name)  {
@@ -34,9 +35,10 @@ window.ChaiBioTech.ngApp.factory('events', [
             break;
 
             case "moveStepImage":
-              var moveStep = evt.target.moveStep;
-              moveStep.stepRect.setFill("yellow");
-              C.canvas.setActiveGroup(moveStep.stepGroup);
+              var moveStep = evt.target.step;
+              console.log("okay u clicked", moveStep);
+              //moveStep.stepRect.setFill("yellow");
+              //C.canvas.setActiveGroup(moveStep.stepGroup);
             break;
 
           }
