@@ -1,5 +1,6 @@
 #include <Poco/Net/HTTPServerRequest.h>
 #include <Poco/URI.h>
+#include <Poco/SHA1Engine.h>
 
 #include <boost/tokenizer.hpp>
 
@@ -98,7 +99,12 @@ bool QPCRRequestHandlerFactory::checkUserAuthorization(const HTTPServerRequest &
     }
 
     if (!token.empty())
-        return ExperimentController::getInstance()->getUserId(token) != -1;
+    {
+        Poco::SHA1Engine engine;
+        engine.update(token);
+
+        return ExperimentController::getInstance()->getUserId(Poco::SHA1Engine::digestToHex(engine.digest())) != -1;
+    }
 
     return false;
 }
