@@ -14,6 +14,10 @@ class Setting < ActiveRecord::Base
     instance.calibration_id
   end
     
+  def self.time_valid
+    instance.time_valid
+  end
+  
   def time_zone_offset
     (time_zone.nil?)? nil : ActiveSupport::TimeZone.new(time_zone).utc_offset
   end

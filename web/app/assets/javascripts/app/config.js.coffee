@@ -17,7 +17,7 @@ window.ChaiBioTech.ngApp
       if (rejection.data.errors is 'sign up')
         $state.go 'signup'
 
-      else if (rejection.data.errors is 'login in')
+      else
         $state.go 'login'
 
     $rootScope.$on '$stateChangeStart', (e, toState, params, fromState) ->
