@@ -94,10 +94,14 @@ window.ChaiBioTech.ngApp
 
       $scope.updateScrollWidth = ->
 
-        $scope.greatest_elapsed_time = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length - 1].temperature_log.elapsed_time
+        if $scope.temperatureLogsCache.length > 0
 
-        $scope.widthPercent = $scope.resolution*1000/$scope.greatest_elapsed_time
-        if $scope.widthPercent > 1
+          $scope.greatest_elapsed_time = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length - 1].temperature_log.elapsed_time
+
+          $scope.widthPercent = $scope.resolution*1000/$scope.greatest_elapsed_time
+          if $scope.widthPercent > 1
+            $scope.widthPercent = 1
+        else
           $scope.widthPercent = 1
 
         elem.find('.scrollbar').css width: "#{$scope.widthPercent*100}%"
