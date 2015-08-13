@@ -37,19 +37,14 @@
       height: 30px;
       margin-left: 32px;
       padding-top: 13px;
-    }
-    .stripes {
-      width: 21px;
-      height: 19px;
-      float: left;
-      cursor: pointer;
 
-      .stripe {
-        height: 3px;
-        width: 21px;
-        margin-bottom: 3px;
-        background-color: #fff;
+      a {
+        color: $lightgray;
+        float: left;
+        font-size: 20px;
+        margin-top: -3px;
       }
+
     }
 
     .btn-support-legal {
