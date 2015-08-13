@@ -2,7 +2,9 @@ window.ChaiBioTech.ngApp.directive('general', [
   'ExperimentLoader',
   '$timeout',
   '$modal',
-  function(ExperimentLoader, $timeout, $modal) {
+  'alerts',
+
+  function(ExperimentLoader, $timeout, $modal, alerts) {
 
     return {
       restric: 'EA',
@@ -17,7 +19,7 @@ window.ChaiBioTech.ngApp.directive('general', [
         scope.stageNoCycleShow = false;
         scope.popUp = false;
         scope.showCycling = false;
-        scope.warningMessage = "You have entered a wrong value. Please make sure you enter digits.";
+        scope.warningMessage = alerts.nonDigit;
 
         scope.$on("dataLoaded", function() {
           // there is a slight delay for the controller to catch up so wait for it and load
@@ -64,7 +66,7 @@ window.ChaiBioTech.ngApp.directive('general', [
             ExperimentLoader.saveCycle(scope);
             scope.cycleNoBackup = scope.stage.num_cycles;
           } else {
-            var warningMessage = "The value you have entered is less than AUTO DELTA START CYCLE. Please enter a value greater than " + scope.stage.auto_delta_start_cycle +" or reduce AUTO DELTA START CYCLE and re-enter value.";
+            var warningMessage = alerts.noOfCyclesWarning;
             scope.showMessage(warningMessage);
             scope.stage.num_cycles = scope.cycleNoBackup;
           }
@@ -80,7 +82,7 @@ window.ChaiBioTech.ngApp.directive('general', [
               console.log("Happy happy ---- Just testing ____-------______");
             });
           } else {
-            var warningMessage = "You can,t turn on auto delta on this stage. Please select a CYCLING STAGE to enable auto delat.";
+            var warningMessage = alerts.autoDeltaOnWrongStage;
             scope.showMessage(warningMessage);
           }
         };

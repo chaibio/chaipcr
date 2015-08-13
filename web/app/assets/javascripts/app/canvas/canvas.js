@@ -136,7 +136,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         step.darkFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["black-footer.png"]), step);
         this.canvas.add(step.darkFooterImage);
 
-        step.whiteFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["orange-footer.png"]), step);
+        step.whiteFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["orange-footer.png"]), step, 'moveStepImage');
         step.whiteFooterImage.top = 365;
         step.whiteFooterImage.left = step.left;
         this.canvas.add(step.whiteFooterImage);
@@ -146,7 +146,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       return this;
     };
 
-    this.applyPropertyToImages = function(imgObj, stepObj) {
+    this.applyPropertyToImages = function(imgObj, stepObj, name) {
 
       imgObj.left = stepObj.left - 1;
       imgObj.top = 384;
@@ -154,7 +154,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       imgObj.hasControls = false;
       imgObj.lockMovementY = true;
       imgObj.visible = false;
-
+      imgObj.name = name;
+      imgObj.step = stepObj;
       return imgObj;
     };
 

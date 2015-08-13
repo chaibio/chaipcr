@@ -34,7 +34,7 @@ app.factory 'AuthToken', [
         config.headers = config.headers || {}
         config.headers.Authorization = "Token #{$window.authToken}"
 
-      console.log config
+      #console.log config
       config
 
 ]
