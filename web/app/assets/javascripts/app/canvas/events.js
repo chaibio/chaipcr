@@ -36,7 +36,8 @@ window.ChaiBioTech.ngApp.factory('events', [
 
             case "moveStepImage":
               var moveStep = evt.target.step;
-              console.log("okay u clicked", moveStep);
+              //console.log("okay u clicked", moveStep);
+              C.indicator.setVisible(true);
               //moveStep.stepRect.setFill("yellow");
               //C.canvas.setActiveGroup(moveStep.stepGroup);
             break;
@@ -50,7 +51,8 @@ window.ChaiBioTech.ngApp.factory('events', [
           switch(evt.target.name)  {
 
           case "moveStepImage":
-              var moveStep = evt.target.moveStep;
+              var moveStep = evt.target.step;
+              C.indicator.setVisible(false);
               //C.canvas.bringToFront(moveStep.stepGroup);
               //moveStep.stepRect.setFill("red");
               //C.canvas.setActiveGroup(moveStep.stepGroup);
@@ -79,6 +81,7 @@ window.ChaiBioTech.ngApp.factory('events', [
 
             case "moveStepImage":
               var moveStep = evt.target.moveStep;
+              C.indicator.setLeft(evt.target.left);
               //moveStep.stepGroup.setLeft(evt.target.left);
             break;
           }
@@ -90,17 +93,25 @@ window.ChaiBioTech.ngApp.factory('events', [
       ***************************************/
       this.canvas.on('object:modified', function(evt) {
         if(evt.target) {
-          if(evt.target.name === "controlCircleGroup") {
-            // Right now we have only one item here otherwise switch case
-            var me = evt.target.me;
-            var targetCircleGroup = evt.target;
-            //appRouter.editStageStep.trigger("stepDrag", me);
-            var temp = evt.target.me.temperature.text;
-            ExperimentLoader.changeTemperature($scope)
-              .then(function(data) {
-                console.log(data);
+          switch(evt.target.name) {
+
+            case "controlCircleGroup":
+              // Right now we have only one item here otherwise switch case
+              var me = evt.target.me;
+              var targetCircleGroup = evt.target;
+              //appRouter.editStageStep.trigger("stepDrag", me);
+              var temp = evt.target.me.temperature.text;
+              ExperimentLoader.changeTemperature($scope)
+                .then(function(data) {
+                  console.log(data);
               });
+            break;
+
+            case "moveStepImage":
+              C.indicator.setVisible(false);
+              break;
           }
+
         }
       });
 

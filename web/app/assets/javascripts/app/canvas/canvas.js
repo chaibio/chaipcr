@@ -154,6 +154,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       imgObj.hasControls = false;
       imgObj.lockMovementY = true;
       imgObj.visible = false;
+      imgObj.showBoundingBox = false;
       imgObj.name = name;
       imgObj.step = stepObj;
       return imgObj;
@@ -184,6 +185,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       // We should put an infinity symbol if the last step has infinite hold time.
       thisCircle.doThingsForLast();
       console.log("All circles are added ....!!");
+      this.addMoveStepIndicator();
       return this;
     };
 
@@ -222,6 +224,46 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         this.drawCirclesArray.push(this.allStepViews[i].circle);
       }
       return this.drawCirclesArray;
+    };
+
+    this.addMoveStepIndicator = function() {
+
+      var smallCircle = new fabric.Circle({
+        radius: 4,
+        fill: 'black',
+        selectable: false,
+        left: 63,
+        top: 259,
+        //top: -2
+      });
+
+      var verticalLine = new fabric.Line([0, 0, 0, 263],{
+        left: 66,
+        top: -2,
+        stroke: 'black',
+        strokeWidth: 2
+      });
+
+      var rect = new fabric.Rect({
+        fill: 'white', width: 120, left: 5, height: 40, selectable: false, name: "step", me: this, top: 263
+      });
+      this.indicator = new fabric.Group([
+        verticalLine,
+        rect,
+        smallCircle,
+      ],
+        {
+          originX: "left",
+          originY: "top",
+          width: 122,
+          left: 33,
+          top: 61,
+          selectable: false,
+          visible: false
+        }
+      );
+
+      this.canvas.add(this.indicator);
     };
 
     this.addNewStage = function(data, currentStage) {
