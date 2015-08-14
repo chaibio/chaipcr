@@ -5,7 +5,7 @@ window.ChaiBioTech.ngApp
   'Experiment'
   ($scope, Experiment) ->
 
-    $scope.experiments = []
+    $scope.experiments = null
 
     $scope.deleteMode = false
 

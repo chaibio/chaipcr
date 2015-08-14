@@ -57,27 +57,28 @@ window.ChaiBioTech.ngApp
             $scope.autoUpdateTemperatureLogs()
 
       $scope.updateData = ->
-        left_et_limit = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length-1].temperature_log.elapsed_time - ($scope.resolution*1000)
+        if $scope.temperatureLogsCache?.length > 0
+          left_et_limit = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length-1].temperature_log.elapsed_time - ($scope.resolution*1000)
 
-        maxScroll = 0
-        for temp_log in $scope.temperatureLogs
-          if temp_log.temperature_log.elapsed_time <= left_et_limit
-            ++ maxScroll
-          else
-            break
+          maxScroll = 0
+          for temp_log in $scope.temperatureLogs
+            if temp_log.temperature_log.elapsed_time <= left_et_limit
+              ++ maxScroll
+            else
+              break
 
-        scrollState = Math.round $scope.scrollState * maxScroll
-        if $scope.scrollState < 0 then scrollState = 0
-        if $scope.scrollState > 1 then scrollState = maxScroll
-        left_et = $scope.temperatureLogs[scrollState].temperature_log.elapsed_time
+          scrollState = Math.round $scope.scrollState * maxScroll
+          if $scope.scrollState < 0 then scrollState = 0
+          if $scope.scrollState > 1 then scrollState = maxScroll
+          left_et = $scope.temperatureLogs[scrollState].temperature_log.elapsed_time
 
-        right_et = left_et + ($scope.resolution*1000)
+          right_et = left_et + ($scope.resolution*1000)
 
-        data = _.select $scope.temperatureLogs, (temp_log) ->
-          et = temp_log.temperature_log.elapsed_time
-          et >= left_et and et <= right_et
+          data = _.select $scope.temperatureLogs, (temp_log) ->
+            et = temp_log.temperature_log.elapsed_time
+            et >= left_et and et <= right_et
 
-        $scope.updateChart data
+          $scope.updateChart data
 
       $scope.updateScale = ->
         scales = _.map $scope.temperatureLogsCache, (temp_log) ->
@@ -94,10 +95,14 @@ window.ChaiBioTech.ngApp
 
       $scope.updateScrollWidth = ->
 
-        $scope.greatest_elapsed_time = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length - 1].temperature_log.elapsed_time
+        if $scope.temperatureLogsCache.length > 0
 
-        $scope.widthPercent = $scope.resolution*1000/$scope.greatest_elapsed_time
-        if $scope.widthPercent > 1
+          $scope.greatest_elapsed_time = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length - 1].temperature_log.elapsed_time
+
+          $scope.widthPercent = $scope.resolution*1000/$scope.greatest_elapsed_time
+          if $scope.widthPercent > 1
+            $scope.widthPercent = 1
+        else
           $scope.widthPercent = 1
 
         elem.find('.scrollbar').css width: "#{$scope.widthPercent*100}%"

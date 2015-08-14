@@ -22,6 +22,10 @@ module FactoryHelper
     Stage.create(:stage_type=>Stage::TYPE_CYCLE, :protocol_id=>protocol.id)
   end
   
+  def meltcurve_stage(protocol)
+    Stage.create(:stage_type=>Stage::TYPE_MELTCURVE, :protocol_id=>protocol.id)
+  end
+  
   def create_experiment(name)
     experiment = Experiment.new
     experiment.experiment_definition = ExperimentDefinition.new(:name=>name, :experiment_type=>ExperimentDefinition::TYPE_USER_DEFINED)
