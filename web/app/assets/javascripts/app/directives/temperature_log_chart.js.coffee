@@ -152,7 +152,7 @@ window.ChaiBioTech.ngApp
         $scope.data = ChartData.temperatureLogs(temperature_logs).toN3LineChart()
 
       $scope.autoUpdateTemperatureLogs = =>
-        if !$scope.updateInterval
+        if !$scope.updateInterval && $scope.isCurrentExperiment
           $scope.updateInterval = $interval () ->
             Experiment
             .getTemperatureData($scope.experimentId, resolution: 1000)
@@ -165,6 +165,9 @@ window.ChaiBioTech.ngApp
               $scope.updateData()
 
           , 10000
+
+        else if !$scope.isCurrentExperiment
+          $scope.stopInterval()
 
       $scope.stopInterval = =>
         $interval.cancel $scope.updateInterval if $scope.updateInterval
