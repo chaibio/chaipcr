@@ -26,10 +26,8 @@ window.ChaiBioTech.ngApp
 
       $scope.startExperiment = (expId) ->
         Experiment.startExperiment(expId)
-        .success update
 
       $scope.stopExperiment = ->
         Experiment.stopExperiment()
-        .success update
 
 ]

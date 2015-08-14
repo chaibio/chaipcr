@@ -24,7 +24,8 @@ window.ChaiBioTech.ngApp
         $scope.$watch ->
           Status.getData()
         , (val) ->
-          $scope.isCurrentExperiment = val?.experimentController?.expriment?.id is $scope.experimentId
+          if val
+            $scope.isCurrentExperiment = parseInt(val.experimentController.expriment.id) is parseInt($scope.experimentId)
 
         $scope.resolutionOptions = [
           60
