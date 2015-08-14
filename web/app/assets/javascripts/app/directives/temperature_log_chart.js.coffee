@@ -28,7 +28,7 @@ window.ChaiBioTech.ngApp
         , (val) ->
           if val
             $scope.isCurrentExperiment = parseInt(val.experimentController?.expriment?.id) is parseInt($scope.experimentId)
-            if $scope.isCurrentExperiment
+            if $scope.isCurrentExperiment and $scope.scrollState >= 1
               $scope.autoUpdateTemperatureLogs()
             else
               $scope.stopInterval()
