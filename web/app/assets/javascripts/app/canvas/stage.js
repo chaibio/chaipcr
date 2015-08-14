@@ -381,7 +381,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
             );
 
           } else {
-
+            console.log("For meltCurve");
             this.stageGroup = new fabric.Group([
                 this.stageRect, this.roof, this.border, this.stageNo, this.stageName
               ], {

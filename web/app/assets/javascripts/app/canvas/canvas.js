@@ -224,6 +224,10 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       return this.drawCirclesArray;
     };
 
+    this.addMoveStepIndicator = function() {
+
+    };
+    
     this.addNewStage = function(data, currentStage) {
 
       //move the stages, make space.
