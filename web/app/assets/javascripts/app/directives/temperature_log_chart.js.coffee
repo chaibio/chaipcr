@@ -21,11 +21,17 @@ window.ChaiBioTech.ngApp
 
       $scope.init = ->
 
+        Status.startSync()
+
         $scope.$watch ->
           Status.getData()
         , (val) ->
           if val
             $scope.isCurrentExperiment = parseInt(val.experimentController?.expriment?.id) is parseInt($scope.experimentId)
+            if $scope.isCurrentExperiment and $scope.scrollState >= 1
+              $scope.autoUpdateTemperatureLogs()
+            else
+              $scope.stopInterval()
 
         $scope.resolutionOptions = [
           60
@@ -152,7 +158,7 @@ window.ChaiBioTech.ngApp
         $scope.data = ChartData.temperatureLogs(temperature_logs).toN3LineChart()
 
       $scope.autoUpdateTemperatureLogs = =>
-        if !$scope.updateInterval
+        if !$scope.updateInterval and $scope.isCurrentExperiment and Status.getData().experimentController?.machine?.state is 'Running'
           $scope.updateInterval = $interval () ->
             Experiment
             .getTemperatureData($scope.experimentId, resolution: 1000)
@@ -166,11 +172,15 @@ window.ChaiBioTech.ngApp
 
           , 10000
 
+        else if !$scope.isCurrentExperiment
+          $scope.stopInterval()
+
       $scope.stopInterval = =>
         $interval.cancel $scope.updateInterval if $scope.updateInterval
         $scope.updateInterval = null
 
       elem.on '$destroy', ->
+        Status.stopSync()
         $scope.stopInterval()
 
       $scope.options = {
