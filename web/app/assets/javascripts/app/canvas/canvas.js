@@ -22,6 +22,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       this.allCircles = null;
       this.drawCirclesArray = [];
       this.findAllCirclesArray = [];
+      this.moveLimit = 0; // We set the limit for the movement of the step image to move steps
       this.images = [
         "common-step.png",
         "black-footer.png",
@@ -185,7 +186,6 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       // We should put an infinity symbol if the last step has infinite hold time.
       thisCircle.doThingsForLast();
       console.log("All circles are added ....!!");
-      this.addMoveStepIndicator();
       return this;
     };
 
@@ -264,6 +264,32 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       );
 
       this.canvas.add(this.indicator);
+    };
+
+    this.processMovement = function(step) {
+
+      // Make a clone of the step
+      var stepClone = $.extend({}, step);
+      // Find the place where you left the moved step
+      var moveTarget = Math.floor((stepClone.whiteFooterImage.left + 60) / 120);
+      // This is a way to understand moving direction.
+      if(stepClone.whiteFooterImage.startPosition < stepClone.whiteFooterImage.endPosition) {
+        moveTarget = (moveTarget > 0) ? moveTarget - 1 : 0;
+      }
+      // If the movement is atlest half of the width of the step, we are going to update
+      if(Math.abs(stepClone.whiteFooterImage.startPosition - stepClone.whiteFooterImage.endPosition) > 65) {
+        // Delete the step you moved
+        step.parentStage.deleteStep({}, step);
+        // add clone at the place
+        var moveToStage = this.allStepViews[moveTarget].parentStage;
+        var data = {
+          step: stepClone.model
+        };
+        moveToStage.addNewStep(data, this.allStepViews[moveTarget]);
+      } else { // we dont have to update so we update the move whiteFooterImage to old position.
+        stepClone.whiteFooterImage.setLeft(stepClone.left + 1);
+      }
+
     };
 
     this.addNewStage = function(data, currentStage) {
