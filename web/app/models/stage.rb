@@ -39,6 +39,11 @@ class Stage < ActiveRecord::Base
       elsif cycle_stage?
         stage.steps << Step.new(:temperature=>95, :hold_time=>30, :order_number=>0)
         stage.steps << Step.new(:temperature=>60, :hold_time=>30, :order_number=>1)
+      elsif meltcurve_stage?
+        stage.steps << Step.new(:temperature=>60, :hold_time=>30, :order_number=>0)
+        step = Step.new(:temperature=>95, :hold_time=>30, :order_number=>1)
+        step.ramp(:rate=>0.09)
+        stage.steps << step
       end
     end
   end

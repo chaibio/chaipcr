@@ -11,6 +11,13 @@ describe Stage do
       stage.name.should eq("Cycling Stage")
       stage.steps.should have(2).items
     end
+    
+    it "meltcurve stage with default name and default steps" do
+      stage = meltcurve_stage(@protocol).reload
+      stage.name.should eq("Melt Curve Stage")
+      stage.steps.should have(2).items
+      stage.steps.last.ramp.should_not be_nil
+    end
   
     it "hold stage with default name" do
       stage = hold_stage(@protocol).reload
