@@ -144,4 +144,23 @@ describe "User" do
       token.expired_at.should be > 23.hours.from_now
     end
   end
+  
+  describe "#destroy user" do
+    before(:each) do
+     @admin_user = create_admin_user
+     post '/login', { email: @admin_user.email, password: @admin_user.password }
+    end
+    
+    it "delete successfully" do
+      test_user = create_test_user
+      delete "/users/#{test_user.id}", {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      expect(response).to be_success
+    end
+    
+    it "cannot delete himself/herself" do
+      delete "/users/#{@admin_user.id}", {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      response.response_code.should == 422
+    end
+  end
+  
 end

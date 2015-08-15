@@ -54,7 +54,12 @@ class UsersController < ApplicationController
   api :DELETE, "/users/:id", "Destroy an user"
   def destroy
     @user = User.find_by_id(params[:id])
-    ret = @user.destroy
+    if @user == current_user
+      ret = false
+      @user.errors.add(:base, "cannot destroy yourself")
+    else
+      ret = @user.destroy
+    end
     respond_to do |format|
       format.json { render "destroy", :status => (ret)? :ok : :unprocessable_entity}
     end
