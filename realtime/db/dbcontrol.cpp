@@ -402,8 +402,8 @@ void DBControl::addMeltCurveData(const Experiment &experiment, const std::vector
 
     for (const Optics::MeltCurveData &data: meltCurveData)
     {
-        stream << "INSERT INTO melt_curve_data(stage_id, well_num, temperature, fluorescence_value) VALUES(" <<
-                  experiment.protocol()->currentStage()->id() << ", " << data.wellId << ", " << data.temperature << ", " << data.fluorescenceValue << ")";
+        stream << "INSERT INTO melt_curve_data(experiment_id, stage_id, well_num, temperature, fluorescence_value) VALUES(" <<
+                  experiment.id() << ", " << experiment.protocol()->currentStage()->id() << ", " << data.wellId << ", " << data.temperature << ", " << data.fluorescenceValue << ")";
 
         queries.emplace_back(std::move(stream.str()));
         stream.str("");
