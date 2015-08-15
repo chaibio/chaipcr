@@ -42,9 +42,10 @@ class Stage < ActiveRecord::Base
         stage.steps << Step.new(:temperature=>95, :hold_time=>30, :order_number=>0)
         stage.steps << Step.new(:temperature=>60, :hold_time=>30, :order_number=>1)
       elsif meltcurve_stage?
-        stage.steps << Step.new(:temperature=>60, :hold_time=>30, :order_number=>0)
-        step = Step.new(:temperature=>95, :hold_time=>30, :order_number=>1)
-        step.ramp = Ramp.new(:rate=>0.09)
+        stage.steps << Step.new(:temperature=>90, :hold_time=>30, :order_number=>0)
+        stage.steps << Step.new(:temperature=>60, :hold_time=>60, :order_number=>1)
+        step = Step.new(:temperature=>95, :hold_time=>30, :order_number=>2)
+        step.ramp = Ramp.new(:rate=>0.09, :collect_data=>true)
         stage.steps << step
       end
     end

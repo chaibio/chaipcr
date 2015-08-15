@@ -15,7 +15,7 @@ describe Stage do
     it "meltcurve stage with default name and default steps" do
       stage = meltcurve_stage(@protocol).reload
       stage.name.should eq("Melt Curve Stage")
-      stage.steps.should have(2).items
+      stage.steps.should have(3).items
       stage.steps.last.ramp.should_not be_nil
     end
   
