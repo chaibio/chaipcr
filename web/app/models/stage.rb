@@ -14,7 +14,9 @@ class Stage < ActiveRecord::Base
   ACCESSIBLE_ATTRS = [:name, :num_cycles, :stage_type, :auto_delta, :auto_delta_start_cycle]
   
   before_create do |stage|
-    if hold_stage? || num_cycles.nil?
+    if num_cycles.nil? && cycle_stage?
+      self.num_cycles = 40
+    elsif hold_stage? || num_cycles.nil?
       self.num_cycles = 1
     end
   end
