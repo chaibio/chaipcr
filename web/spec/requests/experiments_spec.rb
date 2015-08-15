@@ -63,7 +63,15 @@ describe "Experiments API" do
   it  'delete experiment' do
     experiment = create_experiment("test")
     delete "/experiments/#{experiment.id}", {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
-    expect(response).to be_success 
+    expect(response).to be_success
+  end
+  
+  it "delete not allowed in the middle of running" do
+    experiment = create_experiment("test")
+    experiment.started_at = Time.now
+    experiment.save
+    delete "/experiments/#{experiment.id}", {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+    response.response_code.should == 422
   end
   
   it "list experiments with no experiment" do

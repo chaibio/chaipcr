@@ -32,6 +32,13 @@ class Experiment < ActiveRecord::Base
     experiment.time_valid = Setting.time_valid
   end
   
+  before_destroy do |experiment|
+    if experiment.running?
+      errors.add(:base, "cannot delete experiment in the middle of running")
+      return false;
+    end
+  end
+  
   after_destroy do |experiment|
     if experiment_definition.experiment_type ==  ExperimentDefinition::TYPE_USER_DEFINED
       experiment_definition.destroy
@@ -49,6 +56,10 @@ class Experiment < ActiveRecord::Base
 
   def ran?
     return !started_at.nil?
+  end
+  
+  def running?
+    return !started_at.nil? && completed_at.nil?
   end
   
   def name
