@@ -22,8 +22,10 @@ class Step < ActiveRecord::Base
       step.temperature = (reference_step)? reference_step.temperature : 95 if step.temperature.nil?
       step.hold_time = (reference_step)? reference_step.hold_time : 30 if step.hold_time.nil?
     end
-    
-    step.ramp = Ramp.new(:rate=>Ramp::MAX_RATE)
+
+    if step.ramp == nil
+      step.ramp = Ramp.new(:rate=>Ramp::MAX_RATE)
+    end
   end
   
   after_save do |step|

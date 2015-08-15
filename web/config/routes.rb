@@ -60,9 +60,11 @@ Qpcrctl::Application.routes.draw do
 
   root 'main#index'
 
-  post '/login', :to => 'sessions#create', :as => 'login'
-  post '/logout', :to => 'sessions#destroy', :as => 'logout'
-  get '/loggedin', :to => 'sessions#is_loggedin'
+  get  '/welcome', :to => 'main#welcome', :as => 'welcome'
+  get '/login', :to => 'main#login', :as => 'login'
+  
+  post '/login', :to => 'sessions#create'
+  post '/logout', :to => 'sessions#destroy'
 
   resource :settings, only: [:update, :show]
   resources :users, defaults: { format: 'json' }
