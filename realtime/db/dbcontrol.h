@@ -16,6 +16,8 @@ class session;
 class statement;
 }
 
+namespace Poco { class Timer; }
+
 class Protocol;
 class Stage;
 class StageComponent;
@@ -52,6 +54,8 @@ private:
     void process();
     void stop();
 
+    void ping(Poco::Timer &timer);
+
     bool getExperimentDefination(Experiment &experiment);
     Protocol* getProtocol(int experimentId);
     std::vector<Stage> getStages(int protocolId);
@@ -74,6 +78,8 @@ private:
     std::atomic<bool> _writeThreadState;
     std::vector<std::string> _writeQueriesQueue;
     std::condition_variable _writeCondition;
+
+    Poco::Timer *_pingTimer;
 };
 
 #endif // DBCONTROL_H

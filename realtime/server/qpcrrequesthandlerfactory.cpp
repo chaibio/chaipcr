@@ -23,64 +23,75 @@ using namespace Poco::Net;
 // Class QPCRRequestHandlerFactory
 HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPServerRequest &request)
 {
-    vector<string> requestPath;
-    URI(request.getURI()).getPathSegments(requestPath);
-
-    if (!requestPath.empty())
+    try
     {
-        if (checkUserAuthorization(request))
+        vector<string> requestPath;
+        URI(request.getURI()).getPathSegments(requestPath);
+
+        if (!requestPath.empty())
         {
-            string method = request.getMethod();
+            if (checkUserAuthorization(request))
+            {
+                string method = request.getMethod();
 
-            if (method == "OPTIONS" && request.has("Access-Control-Request-Method"))
-                method = request.get("Access-Control-Request-Method");
+                if (method == "OPTIONS" && request.has("Access-Control-Request-Method"))
+                    method = request.get("Access-Control-Request-Method");
 
-            if (method == "GET")
-            {
-                if (requestPath.at(0) == "status")
-                    return new StatusHandler();
-                else if (requestPath.at(0) == "wifi")
+                if (method == "GET")
                 {
-                    if (requestPath.at(1) == "scan")
-                        return new WirelessManagerHandler(WirelessManagerHandler::Scan);
-                    else if (requestPath.at(1) == "status")
-                        return new WirelessManagerHandler(WirelessManagerHandler::Status);
+                    if (requestPath.at(0) == "status")
+                        return new StatusHandler();
+                    else if (requestPath.at(0) == "wifi")
+                    {
+                        if (requestPath.at(1) == "scan")
+                            return new WirelessManagerHandler(WirelessManagerHandler::Scan);
+                        else if (requestPath.at(1) == "status")
+                            return new WirelessManagerHandler(WirelessManagerHandler::Status);
+                    }
+                }
+                else if (method == "PUT")
+                {
+                    if (requestPath.at(0) == "testControl")
+                        return new TestControlHandler();
+                    else if (requestPath.at(0) == "settings")
+                        return new SettingsHandler();
+                    else if (requestPath.at(0) == "logData")
+                        return new LogDataHandler();
+                }
+                else if (method == "POST")
+                {
+                    if (requestPath.at(0) == "control")
+                    {
+                        if (requestPath.at(1) == "start")
+                            return new ControlHandler(ControlHandler::StartExperiment);
+                        else if (requestPath.at(1) == "resume")
+                            return new ControlHandler(ControlHandler::ResumeExperiment);
+                        else if (requestPath.at(1) == "stop")
+                            return new ControlHandler(ControlHandler::StopExperiment);
+                    }
+                    else if (requestPath.at(0) == "wifi")
+                    {
+                        if (requestPath.at(1) == "connect")
+                            return new WirelessManagerHandler(WirelessManagerHandler::Connect);
+                        else if (requestPath.at(1) == "shutdown")
+                            return new WirelessManagerHandler(WirelessManagerHandler::Shutdown);
+                    }
                 }
             }
-            else if (method == "PUT")
-            {
-                if (requestPath.at(0) == "testControl")
-                    return new TestControlHandler();
-                else if (requestPath.at(0) == "settings")
-                    return new SettingsHandler();
-                else if (requestPath.at(0) == "logData")
-                    return new LogDataHandler();
-            }
-            else if (method == "POST")
-            {
-                if (requestPath.at(0) == "control")
-                {
-                    if (requestPath.at(1) == "start")
-                        return new ControlHandler(ControlHandler::StartExperiment);
-                    else if (requestPath.at(1) == "resume")
-                        return new ControlHandler(ControlHandler::ResumeExperiment);
-                    else if (requestPath.at(1) == "stop")
-                        return new ControlHandler(ControlHandler::StopExperiment);
-                }
-                else if (requestPath.at(0) == "wifi")
-                {
-                    if (requestPath.at(1) == "connect")
-                        return new WirelessManagerHandler(WirelessManagerHandler::Connect);
-                    else if (requestPath.at(1) == "shutdown")
-                        return new WirelessManagerHandler(WirelessManagerHandler::Shutdown);
-                }
-            }
+            else
+                return new JSONHandler(HTTPResponse::HTTP_UNAUTHORIZED, "You must be logged in");
         }
-        else
-            return new JSONHandler(HTTPResponse::HTTP_UNAUTHORIZED, "You must be logged in");
-    }
 
-    return new HTTPCodeHandler(HTTPResponse::HTTP_NOT_FOUND);
+        return new HTTPCodeHandler(HTTPResponse::HTTP_NOT_FOUND);
+    }
+    catch (const std::exception &ex)
+    {
+        return new JSONHandler(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, std::string("Exception occured: ") + ex.what());
+    }
+    catch (...)
+    {
+        return new JSONHandler(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "Unknown exception occured");
+    }
 }
 
 bool QPCRRequestHandlerFactory::checkUserAuthorization(const HTTPServerRequest &request)

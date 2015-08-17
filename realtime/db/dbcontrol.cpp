@@ -3,14 +3,26 @@
 #include "qpcrapplication.h"
 #include "experimentcontroller.h"
 
+#include <Poco/Timer.h>
+
 #define DATABASE_ADDRESS "host=localhost db=chaipcr user=root"
 #define DATABASE_LOCKED_TRY_COUNT 3
 #define ROUND(x) ((int)(x * 100.0 + 0.5) / 100.0)
+
+#define PING_TIMER_INTERVAL 5 * 1000
 
 DBControl::DBControl()
 {
     _readSession = new soci::session(soci::mysql, DATABASE_ADDRESS);
     _writeSession = new soci::session(soci::mysql, DATABASE_ADDRESS);
+    _pingTimer = new Poco::Timer(PING_TIMER_INTERVAL, PING_TIMER_INTERVAL);
+
+    unsigned int reconnect = 1;
+
+    mysql_options(static_cast<soci::mysql_session_backend*>(_readSession->get_backend())->conn_, MYSQL_OPT_RECONNECT, &reconnect);
+    mysql_options(static_cast<soci::mysql_session_backend*>(_writeSession->get_backend())->conn_, MYSQL_OPT_RECONNECT, &reconnect);
+
+    _pingTimer->start(Poco::TimerCallback<DBControl>(*this, &DBControl::ping));
 
     start();
 }
@@ -21,6 +33,8 @@ DBControl::~DBControl()
 
     if (joinable())
         join();
+
+    delete _pingTimer;
 
     delete _readSession;
     delete _writeSession;
@@ -68,6 +82,19 @@ void DBControl::stop()
 {
     _writeThreadState = false;
     _writeCondition.notify_all();
+}
+
+void DBControl::ping(Poco::Timer &/*timer*/)
+{
+    {
+        std::lock_guard<std::mutex> lock(_readMutex);
+        mysql_ping(static_cast<soci::mysql_session_backend*>(_readSession->get_backend())->conn_);
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(_writeMutex);
+        mysql_ping(static_cast<soci::mysql_session_backend*>(_writeSession->get_backend())->conn_);
+    }
 }
 
 Experiment DBControl::getExperiment(int id)
