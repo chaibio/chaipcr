@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="WelcomeApp">
+<head>
+  <base href="/">
+  <meta charset="UTF-8">
+  <title>ChaiBioTech | Welcome</title>
+  <%= javascript_include_tag "welcome" %>
+  <%= stylesheet_link_tag "welcome" %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+{{errors}}
+  <div class="container" ng-controller="WelcomeCtrl">
+    <form name="registrationForm" role="form" ng-submit="submit(user)">
+      <div class="input-group">
+        <label for="name">Name</label>
+        <input type="text" class="form-control" ng-model="user.name">
+        <span ng-repeat="err in errors.name" class="help-block">
+          <span class="text-danger">Name {{err}}</span>
+        </span>
+      </div>
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input type="email" class="form-control" ng-model="user.email">
+        <span ng-repeat="err in errors.email" class="help-block">
+          <span class="text-danger">Email {{err}}</span>
+        </span>
+      </div>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" ng-model="user.password">
+        <span ng-repeat="err in errors.password" class="help-block">
+          <span class="text-danger">Password {{err}}</span>
+        </span>
+      </div>
+      <div class="input-group">
+        <label for="confirm_password">Confirm Password</label>
+        <input type="password" class="form-control" ng-model="user.password_confirmation">
+        <span ng-repeat="err in errors.password_confirmation" class="help-block">
+          <span class="text-danger">Password confirmation {{err}}</span>
+        </span>
+      </div>
+      <button class="btn btn-success">Submit</button>
+    </form>
+  </div>
+</body>
+</html>
