@@ -335,7 +335,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
             previousSelected.makeItSmall();
           }
         }
-        ChaiBioTech.app.selectedCircle = this;
+        //ChaiBioTech.app.selectedCircle = this;
         previouslySelected.circle = this;
         this.canvas.renderAll();
       };
