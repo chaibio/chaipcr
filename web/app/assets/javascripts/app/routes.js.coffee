@@ -40,6 +40,10 @@ window.ChaiBioTech.ngApp
         templateUrl: 'app/views/experiment/run-experiment.html'
         controller: 'RunExperimentCtrl'
 
+      .state 'temperatureLog',
+        url: '/experiments/:id/temperature-logs'
+        templateUrl: 'app/views/experiment/temperature-logs.html'
+
 
 
 ]
