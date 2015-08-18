@@ -153,7 +153,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       imgObj.hasControls = false;
       imgObj.lockMovementY = true;
       imgObj.visible = false;
-      imgObj.showBoundingBox = false;
+      imgObj.hasBorders = false;
       imgObj.name = name;
       imgObj.step = stepObj;
       return imgObj;
@@ -245,6 +245,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       var rect = new fabric.Rect({
         fill: 'white', width: 120, left: 5, height: 40, selectable: false, name: "step", me: this, top: 263
       });
+
       this.indicator = new fabric.Group([
         verticalLine,
         rect,
@@ -262,6 +263,25 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       );
 
       this.canvas.add(this.indicator);
+    };
+
+    this.onTheMove = function(movingObject) {
+
+      // 1)create a point or a small rectangle at the farthest end of each steps
+      // 2)hit test agaist it
+      // May be be group the common footer image with the look in the nicks design.
+      // Nicks design image is going to be the bacground
+      // Change the background in the beginning of the scroll
+      var length = this.allStepViews.length;
+
+      for(var run = 0; run < length; run ++) {
+        if(movingObject.intersectsWithObject(this.allCircles[run].circleGroup)) {
+          console.log(run);
+          // Make the Jump;
+          // use the previou to store the
+          return false;
+        }
+      }
     };
 
     this.processMovement = function(step) {

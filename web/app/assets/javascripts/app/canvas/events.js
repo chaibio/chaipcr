@@ -86,6 +86,8 @@ window.ChaiBioTech.ngApp.factory('events', [
 
               if(evt.target.left > 32 && evt.target.left < C.moveLimit ) {
                 C.indicator.setLeft(evt.target.left - 1);
+                C.indicator.setCoords();
+                C.onTheMove(C.indicator);
               } else{
                 evt.target.setLeft(C.indicator.getLeft());
               }
