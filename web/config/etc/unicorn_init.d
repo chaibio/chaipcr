@@ -32,12 +32,13 @@ PID=/root/shared/pids/unicorn.pid
 DESC="Unicorn app - $RAILS_ENV"
 # If you're using rbenv, you may need to use the following setup to get things
 # working properly:
-RBENV_RUBY_VERSION=`cat $APP_ROOT/.ruby-version`
-RBENV_ROOT="/home/$USER/.rbenv"
-PATH="$RBENV_ROOT/bin:$PATH"
-SET_PATH="cd $APP_ROOT && rbenv rehash && rbenv local $RBENV_RUBY_VERSION"
+# RBENV_RUBY_VERSION=`cat $APP_ROOT/.ruby-version`
+# RBENV_ROOT="/home/$USER/.rbenv"
+# PATH="$RBENV_ROOT/bin:$PATH"
+# SET_PATH="cd $APP_ROOT && rbenv rehash && rbenv local $RBENV_RUBY_VERSION"
+SET_PATH="cd $APP_ROOT
 # Unicorn can be run using `bundle exec unicorn` or `bin/unicorn`.
-UNICORN="bin/unicorn"
+UNICORN="bundle exec unicorn"
 # Execute the unicorn executable as a daemon, with the appropriate configuration
 # and in the appropriate environment.
 UNICORN_OPTS="-c $APP_ROOT/config/unicorn.rb -E $RAILS_ENV -D"
