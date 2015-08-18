@@ -70,6 +70,8 @@ gem 'rserve-client'
 gem "angularjs-rails"
 gem 'angular-rails-templates'
 
+gem 'unicorn'
+
 group :test, :development do
   gem 'jasmine-rails'
 end
