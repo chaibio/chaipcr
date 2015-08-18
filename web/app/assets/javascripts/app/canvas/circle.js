@@ -158,10 +158,6 @@ window.ChaiBioTech.ngApp.factory('circle', [
           holdTimeMinute = "0" + holdTimeMinute;
         }
 
-        if(holdTimeHour < 10) {
-          holdTimeHour = "0" + holdTimeHour;
-        }
-
         this.holdTime.text = holdTimeHour + ":" + holdTimeMinute;
       };
 

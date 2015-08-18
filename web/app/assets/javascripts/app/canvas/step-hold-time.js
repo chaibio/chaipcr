@@ -26,7 +26,8 @@ window.ChaiBioTech.ngApp.factory('stepHoldTime', [
         var holdTimeHour = Math.floor(this.holdTime / 60);
         var holdTimeMinute = (this.holdTime % 60);
 
-        holdTimeMinute = (holdTimeMinute === 0) ? "00" : holdTimeMinute;
+        holdTimeMinute = (holdTimeMinute < 10) ? "0" + holdTimeMinute : holdTimeMinute;
+        
         return holdTimeHour + ":" + holdTimeMinute;
       };
 
