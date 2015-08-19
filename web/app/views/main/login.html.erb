@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html ng-app="LoginApp">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <title>ChaiBioTech | Login</title>
-
+  <%= stylesheet_link_tag    "application" %>
   <%= javascript_include_tag "login" %>
-  <%= stylesheet_link_tag "application" %>
   <%= csrf_meta_tags %>
 </head>
 <body class="login-state-active" ng-controller="LoginCtrl">
-  <div class="container-fluid" id="container">
+  <div id="container" class="container-fluid">
     <div id="container">
       <form class="login-wrapper">
         <div class="login-box">
@@ -33,7 +32,6 @@
             <div class="login-bitton-container">
               <button type="submit" class="login-button" id="login-button" ng-click="login(user)">SIGN IN</button>
             </div>
-      <!--       <div class="login-trouble">Trouble signing in?</div> -->
           </div>
         </div>
       </form>
