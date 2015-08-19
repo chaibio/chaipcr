@@ -4,13 +4,6 @@ app.factory 'Auth', [
   '$http'
   ($http) ->
 
-    login: (email, password) ->
-      loginPromise = $http.post('/login', {email: email, password: password}, ignoreAuthModule: true)
-      loginPromise.then (resp) ->
-        $.jStorage.set 'authToken', resp.data.authentication_token
-
-      loginPromise
-
     logout: ->
       $http.post('/logout').then ->
         $.jStorage.deleteKey 'authToken'
