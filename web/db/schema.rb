@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150813073522) do
+ActiveRecord::Schema.define(version: 20150818055417) do
 
   create_table "experiment_definitions", force: true do |t|
     t.string "name",            null: false
@@ -66,6 +66,8 @@ ActiveRecord::Schema.define(version: 20150813073522) do
     t.boolean "collect_data",                          default: false
   end
 
+  add_index "ramps", ["next_step_id"], name: "index_ramps_on_next_step_id", unique: true, using: :btree
+
   create_table "settings", force: true do |t|
     t.boolean "debug",          default: false
     t.string  "time_zone"
@@ -78,7 +80,7 @@ ActiveRecord::Schema.define(version: 20150813073522) do
 
   create_table "stages", force: true do |t|
     t.string   "name"
-    t.integer  "num_cycles",             default: 1,     null: false
+    t.integer  "num_cycles",                             null: false
     t.integer  "order_number",           default: 0,     null: false
     t.integer  "protocol_id"
     t.string   "stage_type",                             null: false, comment: "holding, cycling, or meltcurve"
@@ -87,6 +89,8 @@ ActiveRecord::Schema.define(version: 20150813073522) do
     t.boolean  "auto_delta",             default: false
     t.integer  "auto_delta_start_cycle", default: 1
   end
+
+  add_index "stages", ["protocol_id", "order_number"], name: "index_stages_on_protocol_id_and_order_number", unique: true, using: :btree
 
   create_table "steps", force: true do |t|
     t.string   "name"
@@ -101,6 +105,8 @@ ActiveRecord::Schema.define(version: 20150813073522) do
     t.integer  "delta_duration_s",                          default: 0
     t.boolean  "pause",                                     default: false
   end
+
+  add_index "steps", ["stage_id", "order_number"], name: "index_steps_on_stage_id_and_order_number", unique: true, using: :btree
 
   create_table "temperature_debug_logs", id: false, force: true do |t|
     t.integer "experiment_id"

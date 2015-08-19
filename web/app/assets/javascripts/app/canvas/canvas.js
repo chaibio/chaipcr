@@ -1,5 +1,3 @@
-ChaiBioTech.app = ChaiBioTech.app || {};
-
 window.ChaiBioTech.ngApp.factory('canvas', [
   'ExperimentLoader',
   '$rootScope',

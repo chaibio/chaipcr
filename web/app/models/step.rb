@@ -38,7 +38,7 @@ class Step < ActiveRecord::Base
   end
   
   after_destroy do |step|
-    if step.siblings.length == 0
+    if step.siblings && step.siblings.length == 0
       if step.stage.destroy
         step.destroyed_stage_id = step.stage.id
       else
