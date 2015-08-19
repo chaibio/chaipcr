@@ -16,7 +16,8 @@ window.ChaiBioTech.ngApp
     @fetchExperiments()
 
     @newExperiment = ->
-      $scope.experiments = []
+      experiments = angular.copy $scope.experiments
+      $scope.experiments = null
       exp = new Experiment
         experiment:
           name: 'New Experiment'
@@ -24,6 +25,8 @@ window.ChaiBioTech.ngApp
 
       exp.$save (data) =>
         @fetchExperiments()
+      , ->
+        $scope.experiments = experiments
 
     @confirmDelete = (exp) ->
       if $scope.deleteMode
