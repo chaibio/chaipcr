@@ -48,13 +48,17 @@ class StepsController < ApplicationController
   
   api :POST, "/steps/:id/move", "Move a step"
   param :prev_id, Integer, :desc => "prev step id or null if it is the first node", :required=>true
+  param :stage_id, Integer, :desc => "stage id or null if it is the same stage", :required=>false
   def move
-    new_stage = Stage.find_by_id(params[:stage_id])
-    if new_stage == nil || @step.stage.protocol_id != new_stage.protocol_id
-      render json: {errors: "invalid stage id"}, status: :unprocessable_entity
-      return
+    if params[:stage_id] && @step.stage_id != params[:stage_id]
+      new_stage = Stage.find_by_id(params[:stage_id])
+      if new_stage == nil || @step.stage.protocol_id != new_stage.protocol_id
+        render json: {errors: "invalid stage id"}, status: :unprocessable_entity
+        return
+      end
+      @step.stage = new_stage
+      @step.order_number = 0
     end
-    @step.stage_id = params[:stage_id]
     @step.prev_id = params[:prev_id]
     ret = @step.save
     respond_to do |format|
