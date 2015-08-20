@@ -14,13 +14,13 @@ describe Step do
         step.reload.should be_same_step_as(last_step)
       end
 
-      it "default name based on order_number+1" do
+      it "check order number" do
         last_step = @stage.steps.last
         step = Step.new(:stage_id=>@stage.id)
         step.prev_id = nil
         step.save
-        step.reload.name.should eq("Step 1")
-        last_step.reload.name.should eq("Step 2")
+        step.reload.order_number.should == 0
+        last_step.reload.order_number.should == 1
       end
       
       it "not allowed after infinite hold step" do
