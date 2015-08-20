@@ -11,7 +11,7 @@ var update = function () {
   if(isRunning) {
     status.experimentController.expriment.run_duration += 1;
 
-    if(status.experimentController.expriment.run_duration > status.experimentController.expriment.estimated_duration) {
+    if(status.experimentController.expriment.run_duration - 5 > status.experimentController.expriment.estimated_duration) {
       status.experimentController.expriment.run_duration = 0;
       isRunning = false;
     }
