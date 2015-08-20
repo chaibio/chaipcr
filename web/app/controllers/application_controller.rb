@@ -16,6 +16,7 @@ class ApplicationController < ActionController::Base
     else
       respond_to do |format|
         format.json { render json: {errors: (logged_in?)? "unauthorized" : (User.empty?)? "sign up" : "login in"}, status: :unauthorized }
+        format.html { redirect_to (logged_in?)? login_path : (User.empty?)? welcome_path : login_path }
       end
       return false
     end
