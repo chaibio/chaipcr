@@ -20,7 +20,7 @@ window.ChaiBioTech.ngApp
         $scope.data = data
 
       $scope.timeRemaining = ->
-        if $scope.data
+        if $scope.data and $scope.data.experimentController.machine.state is 'Running'
           exp = $scope.data.experimentController.expriment
           time = (exp.estimated_duration*1+exp.paused_duration*1)-exp.run_duration*1
           if time < 0 then time = 0
@@ -30,7 +30,7 @@ window.ChaiBioTech.ngApp
           0
 
       $scope.barWidth = ->
-        if $scope.data
+        if $scope.data and $scope.data.experimentController.machine.state is 'Running'
           exp = $scope.data.experimentController.expriment
           width = exp.run_duration/exp.estimated_duration
           if width > 1 then width = 1
