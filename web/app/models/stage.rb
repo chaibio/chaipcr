@@ -102,6 +102,10 @@ class Stage < ActiveRecord::Base
     new_stage
   end
   
+  def new_sibling?
+    new_record?
+  end
+  
   def siblings
     if protocol.nil?
       nil

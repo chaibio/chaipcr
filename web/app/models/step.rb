@@ -33,6 +33,8 @@ class Step < ActiveRecord::Base
       children_count = Step.where("stage_id=?", step.stage_id_was).count
       if children_count == 0
         Stage.find_by_id(step.stage_id_was).destroy
+      else
+        Step.where("stage_id = ? and order_number > ?", step.stage_id_was, step.order_number_was).order("order_number ASC").update_all("order_number = order_number-1")
       end
     end
   end
@@ -48,14 +50,14 @@ class Step < ActiveRecord::Base
     end
   end
   
-  def name
-    name_attr = read_attribute(:name)
-    if name_attr.nil?
-      return "Step #{order_number+1}"
-    else
-      return name_attr
-    end
-  end
+#  def name
+#    name_attr = read_attribute(:name)
+#    if name_attr.nil?
+#      return "Step #{order_number+1}"
+#    else
+#      return name_attr
+#    end
+#  end
   
   def infinite_hold?
     hold_time == 0
@@ -65,6 +67,10 @@ class Step < ActiveRecord::Base
     new_step = copy_helper
     new_step.ramp = ramp.copy
     new_step
+  end
+  
+  def new_sibling?
+    new_record? || stage_id_changed?
   end
   
   def siblings

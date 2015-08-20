@@ -59,10 +59,39 @@ module ProtocolOrderHelper
       else
         new_order_number = @siblings[prev_sibling_index].order_number+1
       end
-      if @siblings[prev_sibling_index+1] && @siblings[prev_sibling_index+1].order_number <= new_order_number
-        ids = (prev_sibling_index+1..@siblings.length-1).collect { |i| @siblings[i].id }
-        ids << self.id if @siblings[prev_sibling_index].order_number < self.order_number #move from back to front
-        self.class.where("id in (?)", ids).order("order_number DESC").update_all("order_number=order_number+1") if ids.length > 0
+      start_index = prev_sibling_index+1
+      if @siblings[start_index]
+        if new_sibling?
+           ids = (start_index...@siblings.length).collect { |i| @siblings[i].id }
+           self.class.where("id in (?)", ids).order("order_number DESC").update_all("order_number=order_number+1") if ids.length > 0
+        elsif @siblings[start_index].order_number < self.order_number 
+          #back to front, increment order_number from prev_sibling_index+1 to the element before the current one
+          ids = []
+          (start_index...@siblings.length).each { |i|
+            if @siblings[i].order_number < self.order_number
+              ids << @siblings[i].id
+            else
+              break
+            end
+          }
+          if ids.length > 0
+            ids << self.id
+            self.class.where("id in (?)", ids).order("order_number DESC").update_all("order_number = CASE id WHEN #{self.id} THEN -1 ELSE order_number+1 END")
+          end
+        else
+          #front to back, decrement order_number from the element after the current one to the prev_sibling_index
+          ids = []
+          (0...start_index).each { |i|
+            if @siblings[i].order_number > self.order_number
+              ids << @siblings[i].id
+            end
+          }
+          if ids.length > 0
+            new_order_number = @siblings[prev_sibling_index].order_number
+            ids << self.id
+            self.class.where("id in (?)", ids).order("order_number ASC").update_all("order_number = CASE id WHEN #{self.id} THEN -1 ELSE order_number-1 END")
+          end
+        end
       end
       update_order!(new_order_number)
     end

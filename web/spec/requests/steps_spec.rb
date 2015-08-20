@@ -14,7 +14,7 @@ describe "Steps API" do
       post "/stages/#{@stage.id}/steps", {}, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       expect(response).to be_success            # test for the 200 status-code
       json = JSON.parse(response.body)
-      json["step"]["name"].should == "Step 1"
+      json["step"]["order_number"].should == 0
     end
     
     it 'last step' do
@@ -22,7 +22,7 @@ describe "Steps API" do
       post "/stages/#{@stage.id}/steps", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       expect(response).to be_success            # test for the 200 status-code
       json = JSON.parse(response.body)
-      json["step"]["name"].should == "Step 2"
+      json["step"]["order_number"].should == 1
     end
   end
   
@@ -45,10 +45,14 @@ describe "Steps API" do
     it "not last step" do
       new_step = Step.new
       @stage.steps << new_step
+      @stage.steps.reload
+      @stage.steps[0].id.should == new_step.id
       delete "/steps/#{new_step.id}", { :format => 'json' }
       expect(response).to be_success
       json = JSON.parse(response.body)
       json["step"]["destroyed_stage_id"].should be_nil
+      @stage.steps.reload
+      @stage.steps.should be_contiguous_order_numbers
     end
   end
   
@@ -62,8 +66,9 @@ describe "Steps API" do
       #move step 3 after step 1
       post "/steps/#{movestep.id}/move", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       expect(response).to be_success
-      movestep.reload
-      movestep.order_number.should == 1
+      @stage.steps.reload
+      @stage.steps.should be_contiguous_order_numbers
+      @stage.steps[1].id.should == movestep.id
     end
     
     it "step from front to back" do
@@ -74,8 +79,20 @@ describe "Steps API" do
       #move step 1 after step 2
       post "/steps/#{movestep.id}/move", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       expect(response).to be_success
-      movestep.reload
-      movestep.order_number.should == 2
+      @stage.steps.reload
+      @stage.steps.should be_contiguous_order_numbers
+      @stage.steps[1].id.should == movestep.id
+    end
+    
+    it "step to the same position (not moved)" do
+      @stage = meltcurve_stage(@stage.protocol) #3 steps
+      movestep = @stage.steps[2]
+      params = { prev_id: @stage.steps[1].id}
+      post "/steps/#{movestep.id}/move", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      expect(response).to be_success
+      @stage.steps.reload
+      @stage.steps.should be_contiguous_order_numbers
+      @stage.steps[2].id.should == movestep.id
     end
     
     it "step to non-existent prev_id" do
@@ -86,19 +103,41 @@ describe "Steps API" do
       #move step 3 after step 1
       post "/steps/#{movestep.id}/move", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       expect(response).to be_success
-      movestep.reload
-      movestep.order_number.should == 0
+      @stage.steps.reload
+      @stage.steps.should be_contiguous_order_numbers
+      @stage.steps[0].id.should == movestep.id
     end
     
-    it "step from one stage to another stage" do
+    it "step from hold stage to cycle stage" do
       new_stage = cycle_stage(@stage.protocol)
       steps_count = new_stage.steps.count
+      movestep = @stage.steps.first
       params = { stage_id: new_stage.id }
-      post "/steps/#{@stage.steps.first.id}/move", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      post "/steps/#{movestep.id}/move", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       expect(response).to be_success
-      @experiment.experiment_definition.protocol.stages.count.should == 1
+      @experiment.experiment_definition.protocol.stages.reload
+      @experiment.experiment_definition.protocol.stages.count.should == 1 #hold stage should be deleted because the only step is moved
       @experiment.experiment_definition.protocol.stages.first.id.should == new_stage.id
+      new_stage.steps.reload
       new_stage.steps.count.should == steps_count + 1
+      new_stage.steps.should be_contiguous_order_numbers
+      new_stage.steps[0].id.should == movestep.id
+    end
+    
+    it "step from meltcurve stage to cycle stage" do
+      @stage = meltcurve_stage(@stage.protocol)
+      new_stage = cycle_stage(@stage.protocol)
+      steps_count = new_stage.steps.count
+      movestep = @stage.steps[1]
+      params = { stage_id: new_stage.id }
+      post "/steps/#{movestep.id}/move", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      expect(response).to be_success
+      @stage.steps.reload
+      @stage.steps.count.should == 2
+      @stage.steps.should be_contiguous_order_numbers
+      new_stage.steps.reload
+      new_stage.steps.count.should == 3
+      new_stage.steps.should be_contiguous_order_numbers
     end
         
     it "step to non-existent stage not allowed" do
