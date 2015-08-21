@@ -123,27 +123,27 @@
 // New APP Original app common classes //
 @font-face {
 		font-family: "simplifica";
-		src: local('simplifica'), font-url("simplifica.woff") format('woff');
+		src: font-url("simplifica.woff");
 }
 
 @font-face {
 		font-family: "Ostrich Sans";
-		src: local('Ostrich Sans'), font-url("ostrich-sans.woff") format('woff');
+		src: font-url("ostrich-sans.woff");
 }
 
-@font-face {
+/*@font-face {
 	font-family: "fun city";
-	src: local('fun city'), font-url("FUNCITY LEVEL 1 BASIC.woff") format('woff');
-}
+	src: font-url("FUNCITY LEVEL 1 BASIC.woff");
+}*/
 
 @font-face {
 	font-family: "Open Sans";
-	src: local("Open Sans"), font-url("OpenSans-Regular.woff") format("woff");
+	src: font-url("OpenSans-Regular.woff");
 }
 
 @font-face {
 	font-family: "roboto";
-	src: local("roboto"), font-url("RobotoRegular.woff") format("woff");
+	src: font-url("RobotoRegular.woff");
 }
 
 .simplifica {
@@ -160,7 +160,7 @@
 }
 
 .fun-city {
-	font-family: "fun city";
+	font-family: "Fun City";
 }
 
 #container {
