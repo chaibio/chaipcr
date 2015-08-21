@@ -269,8 +269,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
       // 1)create a point or a small rectangle at the farthest end of each steps
       // 2)hit test agaist it
-      // May be be group the common footer image with the look in the nicks design.
-      // Nicks design image is going to be the bacground
+      // May be group the common footer image with the look in the nicks design.
+      // Nicks design image is going to be the background.
       // Change the background in the beginning of the scroll
       var length = this.allStepViews.length;
 
@@ -317,6 +317,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus,
       originalWidth = currentStage.myWidth,
       add = (data.stage.steps.length > 1) ? 121.5 : 122.5;
+      
       for(k = 0; k < noOfsteps; k++) {
         currentStage.myWidth = currentStage.myWidth + add;
         currentStage.moveAllStepsAndStages(false);
