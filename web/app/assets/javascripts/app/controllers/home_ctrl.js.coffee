@@ -16,7 +16,6 @@ window.ChaiBioTech.ngApp
     @fetchExperiments()
 
     @newExperiment = ->
-      $scope.experiments = []
       exp = new Experiment
         experiment:
           name: 'New Experiment'

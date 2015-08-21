@@ -3,7 +3,7 @@ class Stage < ActiveRecord::Base
   include ProtocolOrderHelper
   
   belongs_to :protocol
-  has_many :steps, -> {order("order_number")}, dependent: :destroy
+  has_many :steps, -> {order("order_number")}
   
   validate :validate
   
@@ -52,9 +52,18 @@ class Stage < ActiveRecord::Base
   end
   
   before_destroy do |stage|
-    if Stage.exists?(stage.id) && stage.protocol.stages.count <= 1
+    if stage.destroyed?
+      return false
+    elsif stage.protocol && stage.protocol.stages.count <= 1
       errors.add(:base, "At least one stage is required")
       return false
+    end
+  end
+  
+  #delete steps after stage destroy, so that step.stage will be nil
+  after_destroy do |stage|
+    for step in stage.steps
+      step.destroy
     end
   end
   
@@ -93,8 +102,14 @@ class Stage < ActiveRecord::Base
     new_stage
   end
   
+  def new_sibling?
+    new_record?
+  end
+  
   def siblings
-    if !id.nil?
+    if protocol.nil?
+      nil
+    elsif !id.nil?
       protocol.stages.where("id != ?", id)
     else
       protocol.stages

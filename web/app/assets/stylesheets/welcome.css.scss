@@ -1,0 +1,70 @@
+@import "./colors";
+
+.welcome-page {
+  font-family: 'Open sans', sans-serif;
+
+  .container {
+    width: 1024px;
+  }
+
+  img.logo {
+    width: 100%;
+    margin-bottom: 70px;
+  }
+
+  .welcome-title {
+    color: $orange;
+    font-family: 'Fun City', sans-serif;
+    font-weight: bold;
+    font-size: 30px;
+    line-height: 1;
+    padding-top: 50px;
+    text-align: center;
+  }
+
+  .welcome-subtitle {
+    padding-top: 20px;
+    color: $gray;
+    text-align: center;
+  }
+
+  form {
+    padding: 0px 20px;
+
+    .help-block {
+      text-align: center;
+    }
+  }
+
+  .input-group {
+    width: 100%;
+  }
+
+  input {
+    border-radius: 0;
+    font-size: 15px;
+    font-weight: bold;
+    margin: 10px 0;
+    height: 50px;
+    text-align: center;
+  }
+
+  .btn-green {
+    display: block;
+    border-radius: 0;
+    margin: 20px auto;
+    color: #fff;
+    background: $yellowgreen;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 15px 40px;
+  }
+
+  img.chai-img {
+    display: block;
+    margin: 0 auto;
+    margin-top: 100px;
+    width: 100px;
+  }
+
+}

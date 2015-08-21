@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html ng-app="LoginApp">
+<head>
+  <meta charset="utf-8">
+  <title>ChaiBioTech | Login</title>
+  <%= stylesheet_link_tag    "application" %>
+  <%= javascript_include_tag "login" %>
+  <%= csrf_meta_tags %>
+</head>
+<body class="login-state-active" ng-controller="LoginCtrl">
+  <div id="container" class="container-fluid">
+    <div id="container">
+      <form class="login-wrapper">
+        <div class="login-box">
+          <div class="login-section title-field">
+            <img src="assets/logo-qpcr.png">
+          </div>
+          <div class="login-section">
+            <div class="login-field">
+              <span class="login-field-text simplifica">USERNAME</span>
+              <input type="text" id="user" class="login-text-field" placeholder="E-Mail Address" autofocus="" ng-model="user.email">
+            </div>
+            <div class="login-field">
+              <span class="login-field-text simplifica">PASSWORD</span>
+              <input type="password" id="pass" placeholder="Enter Password" class="login-text-field" ng-model="user.password">
+            </div>
+          </div>
+          <p class="text-danger text-center" ng-show="error">
+            {{error}}
+          </p>
+          <div class="login-section">
+            <div class="login-bitton-container">
+              <button type="submit" class="login-button" id="login-button" ng-click="login(user)">SIGN IN</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

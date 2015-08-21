@@ -2,14 +2,29 @@ require 'rspec/expectations'
 
 RSpec::Matchers.define :be_same_step_as do |expected|
   match do |actual|
-    actual.temperature == expected.temperature
-    actual.hold_time == expected.hold_time
+    actual.temperature == expected.temperature && actual.hold_time == expected.hold_time
   end
 end
 
 RSpec::Matchers.define :exist_in_database do
   match do |actual|
     actual.class.exists?(actual.id)
+  end
+end
+
+RSpec::Matchers.define :be_contiguous_order_numbers do
+  match do |objs|
+    result = true
+    objs.each_index do |i|
+      if objs[i].order_number != i
+        result = false
+        break
+      end
+    end
+    result
+  end
+  failure_message_for_should do |objs|
+    "expected #{(0...objs.count).to_a} got #{objs.map{|obj| obj.order_number}}"
   end
 end
 
