@@ -61,7 +61,7 @@ a:hover{
 }
 /*********************** icons ****************************/
 .icon-del{
-	background: url("icons.png") no-repeat 0px -2px transparent;
+	background: image-url("icons.png") no-repeat 0px -2px transparent;
 	width: 16px;
 	height: 16px;
 }
@@ -115,7 +115,7 @@ label{
     padding: 4px 12px;
 	margin: 0px;
     border: 1px solid #cfd2d4;
-	background: url(button.gif) repeat-x left top;
+	background: asset-url("button.gif") repeat-x left top;
 	-webkit-box-shadow: rgba(255,255,255,0.3) 0 0 0 1px inset;
 	-moz-box-shadow: rgba(255,255,255,0.3) 0 0 0 1px inset;
 	box-shadow: rgba(255,255,255,0.3) 0 0 0 1px inset;
@@ -230,7 +230,7 @@ label{
     margin: 0 8px 0 0;
 }
 .tabmenu a:visited, .tabmenu a:active, .tabmenu a:link{
-    background: url(titlebg.png) repeat-x bottom left;
+    background: image-url("titlebg.png") repeat-x bottom left;
     color: #333;
     text-decoration: none;
 }
