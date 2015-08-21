@@ -71,7 +71,7 @@ window.ChaiBioTech.ngApp.factory('step', [
 
       this.addName = function() {
 
-        var stepName = (this.model.name).toUpperCase();
+        var stepName = (this.model.name) ? (this.model.name).toUpperCase() : "STEP";
 
         this.stepName = new fabric.Text(stepName, {
             fill: 'white',  fontSize: 9,  top : 4,  left: 3,  fontFamily: "Open Sans",  selectable: false
@@ -121,8 +121,7 @@ window.ChaiBioTech.ngApp.factory('step', [
 
       this.getUniqueName = function() {
 
-        var name = this.stepName.text + this.parentStage.stageNo.text + "step";
-        this.uniqueName = name;
+        this.uniqueName = this.model.id + this.parentStage.stageNo.text + "step";
         return this;
       };
 
