@@ -336,7 +336,7 @@ label{
 	float: left;
 }
 .ctl-panel{
-	width 200px;
+	width: 200px;
 	float: right;
 	padding: 15px;
 	margin-left: 30px;
