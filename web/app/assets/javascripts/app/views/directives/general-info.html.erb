@@ -2,7 +2,7 @@
   <div class="bottom-step-no ostrich">{{fabricStep.ordealStatus | preZero}}</div>
   <div class="bottom-no-of-stages ostrich">{{fabricStep.parentStage.parent.allStepViews.length | preZero: '/'}}</div>
   <div class="bottom-name-of-step-stage ostrich" ng-click="clickOnField('stepNameShow', 'edit-step-name')">
-    <span class="bottom-name-of-step-span" >{{step.name}}</span>
+    <span class="bottom-name-of-step-span" >{{step.name || fabricStep.stepNameText}}</span>
     <input type="text" class="edit-step-name" on-enter="saveStepName()" ng-blur="saveStepName()" ng-model="step.name" ng-show="stepNameShow">
   </div>
   <div class="bottom-stage-name sansa">{{stage.name | uppercase}}</div>

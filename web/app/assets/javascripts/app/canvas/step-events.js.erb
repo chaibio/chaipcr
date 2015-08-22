@@ -19,7 +19,7 @@ window.ChaiBioTech.ngApp.service('stepEvents',[
       $scope.$watch('step.name', function(newVal, oldVal) {
 
         var step = $scope.fabricStep;
-        step.stepName.text = (step.model.name) ? (step.model.name).toUpperCase() : "";
+        step.stepName.text = (step.model.name) ? (step.model.name).toUpperCase() : step.stepNameText;
         canvas.renderAll();
       });
 
