@@ -39,16 +39,17 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
     };
 
     this.update = function(url, dataToBeSend, delay) {
+      if(dataToBeSend.name !== null) {
+        $http.put(url, dataToBeSend)
+          .success(function(data) {
+            delay.resolve(data);
+          })
+          .error(function(data) {
+            delay.reject(data);
+          });
 
-      $http.put(url, dataToBeSend)
-        .success(function(data) {
-          delay.resolve(data);
-        })
-        .error(function(data) {
-          delay.reject(data);
-        });
-
-      return delay.promise;
+        return delay.promise;
+      }
     };
 
     /********************Stage API Methods************************/
