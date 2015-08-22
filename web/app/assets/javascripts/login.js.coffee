@@ -22,6 +22,7 @@ App.controller 'LoginCtrl', [
       promise = $http.post '/login', data
       promise.then (resp) ->
         $.jStorage.set 'authToken', resp.data.authentication_token
+        $.jStorage.set 'userId', resp.data.user_id
         $window.location.assign '/'
       promise.catch (resp) ->
         $scope.errors = resp.data.errors
