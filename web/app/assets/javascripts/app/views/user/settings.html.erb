@@ -151,7 +151,7 @@
             <p class="lead info" ng-repeat="user in users">
               <span class="text">{{user.user.email}}</span>
               <span class="elipsis">...</span>
-              <a ng-click="removeUser(user.user.id)" class="btn-remove"></a>
+              <a ng-click="removeUser(user.user.id)" class="btn-remove" ng-if="user.user.id !== currentUser.id"></a>
             </p>
 
             <a ng-click="openAddUserModal()" class="btn-large-green">

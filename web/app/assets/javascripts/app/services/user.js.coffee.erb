@@ -3,6 +3,11 @@ window.ChaiBioTech.ngApp.service 'User', [
   '$q'
   ($http, $q) ->
 
+    user =
+      id: $.jStorage.get 'userId', null
+
+    @currentUser = -> user
+
     @save = (user) ->
       deferred = $q.defer()
       $http.post '/users',
