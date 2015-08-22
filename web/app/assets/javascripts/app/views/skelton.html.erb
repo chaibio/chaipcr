@@ -1,5 +1,5 @@
 <div menu-overlay sidemenu-template="app/views/experiment/left-menu.html">
-  <div class="edit-stage-step-container">
+  <div class="edit-stage-step-container" ng-controller="StageStepCtrl">
     <div class="top-half noselect">
       <div class="name-on-top">
         <div class="stripes-and-name">
@@ -19,7 +19,7 @@
       </div>
     </div>
     <!-- bottom-half-->
-    <div class="bottom-half noselect" ng-controller="StageStepCtrl">
+    <div class="bottom-half noselect" >
       <arrow class="previous" action="previous" ng-click="arrowClicked()"></arrow>
       <div class="middle-ground">
         <general></general>

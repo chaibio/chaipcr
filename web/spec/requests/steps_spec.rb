@@ -14,6 +14,7 @@ describe "Steps API" do
       post "/stages/#{@stage.id}/steps", {}, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       expect(response).to be_success            # test for the 200 status-code
       json = JSON.parse(response.body)
+      json["step"]["name"].should be_nil
       json["step"]["order_number"].should == 0
     end
     
@@ -53,6 +54,24 @@ describe "Steps API" do
       json["step"]["destroyed_stage_id"].should be_nil
       @stage.steps.reload
       @stage.steps.should be_contiguous_order_numbers
+    end
+  end
+  
+  describe "#update" do
+    it "step name" do
+      params = { step: {name: "test"} }
+      put "steps/#{@stage.steps.first.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      json["step"]["name"].should eq("test")
+    end
+    
+    it "step name null" do
+      params = { step: {name: ""} }
+      put "steps/#{@stage.steps.first.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      json["step"]["name"].should be_nil
     end
   end
   

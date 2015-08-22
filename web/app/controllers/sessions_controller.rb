@@ -9,13 +9,13 @@ class SessionsController < ApplicationController
   param :email, String, :desc => "Email", :required => true
   param :password, String, :desc => "Password", :required => true
   error :code => 401, :desc => "{'errors':'The email and password entered do not match'}"
-  example "{'authentication_token':'adfadfdfadf'}"
+  example "{'user_id':4, 'authentication_token':'adfadfdfadf'}"
   description "cookie will be set with the authentication token, the token will expire in a day"
   def create
     user = User.where("email=?", params[:email]).first
     if user && user.authenticate(params[:password])
       cookies.permanent[:authentication_token] = user.token
-      render json: {authentication_token: user.token}, status: 201
+      render json: {user_id: user.id, authentication_token: user.token}, status: 201
     else
       render json: {errors: "The email and password entered do not match"}, status: 401
     end

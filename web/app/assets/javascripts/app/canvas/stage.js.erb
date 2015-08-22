@@ -337,11 +337,6 @@ window.ChaiBioTech.ngApp.factory('stage', [
             stepView.previousStep = tempStep;
           }
 
-          /*if(ChaiBioTech.app.newStepId && steps[stepIndex].step.id === ChaiBioTech.app.newStepId) {
-            ChaiBioTech.app.newlyCreatedStep = stepView;
-            ChaiBioTech.app.newStepId = null;
-          }*/
-
           tempStep = stepView;
           this.childSteps.push(stepView);
 
