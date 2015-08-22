@@ -7,6 +7,7 @@ describe "User" do
       post '/login', { email: admin_user.email, password: admin_user.password }
       expect(response).to be_success
       json = JSON.parse(response.body)
+      json["user_id"].should == admin_user.id
       json["authentication_token"].should == response.cookies['authentication_token']
     end
   
