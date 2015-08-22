@@ -58,6 +58,12 @@ class Step < ActiveRecord::Base
 #      return name_attr
 #    end
 #  end
+
+  def name=(val)
+    val = val.strip if !val.nil?
+    val = nil if val.blank?
+    write_attribute(:name, val)
+  end
   
   def infinite_hold?
     hold_time == 0
