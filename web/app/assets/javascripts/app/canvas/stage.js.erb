@@ -193,8 +193,14 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
           var thisStep = this.childSteps[j];
           thisStep.index = thisStep.index - 1;
-          thisStep.model.name = "STEP " + (thisStep.index + 1);
-          thisStep.stepName.text = thisStep.model.name;
+
+          if(thisStep.model.name === null) {
+            thisStep.stepNameText = "STEP " + (thisStep.index + 1);
+            thisStep.stepName.text = thisStep.stepNameText;
+          } else {
+            thisStep.stepName.text = thisStep.model.name;
+          }
+
           thisStep.moveStep(-1);
         }
       };
