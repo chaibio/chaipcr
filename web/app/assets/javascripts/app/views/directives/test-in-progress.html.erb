@@ -66,7 +66,7 @@
       <div class="button run" ng-show="data.experimentController.machine.state === 'Idle'" ng-click="startExperiment(experimentId)">
         START EXPERIMENT
       </div>
-      <div class="button stop" ng-show="data.experimentController.machine.state === 'Running'" ng-click="stopExperiment()">
+      <div class="button stop" ng-show="data.experimentController.machine.state === 'Running' || data.experimentController.machine.state === 'LidHeating'" ng-click="stopExperiment()">
         STOP EXPERIMENT
       </div>
     </div>
