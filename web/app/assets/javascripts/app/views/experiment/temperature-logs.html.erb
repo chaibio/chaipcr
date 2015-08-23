@@ -1,5 +1,5 @@
 <div menu-overlay sidemenu-template="app/views/experiment/left-menu.html">
-  <div class="page-layout run-experiment">
+  <div class="page-layout run-experiment" ng-controller="TemperatureLogCtrl">
     <!-- header -->
     <div class="header">
       <div class="stripes-and-name">
@@ -12,13 +12,20 @@
         </a>
         <div class="name-container">{{experiment.name}}</div>
       </div>
+      <div class="scrollbars-container">
+        <div class="scroll-wrapper">
+          <div class="text">SCROLL</div>
+          <div class="scroll-container">
+            <time-scrollbar ng-model="scrollState"></time-scrollbar>
+          </div>
+        </div>
+      </div>
     </div>
     <!-- content -->
     <div class="content">
-
+<input type="text" ng-model="scrollState">
 <div class="row temperature-log-chart">
   <div class="col-md-10">
-    <h3 class="text-center">Temperature Plot</h3>
     <div class="panel panel-primary">
       <div class="panel-heading">Temperature Plot</div>
       <div class="panel-body">
@@ -27,7 +34,6 @@
         <linechart data="data" options="options" width="700" height="300"></linechart>
         </div>
         <div class="scrollbar-container">
-          <time-scrollbar ng-model="scrollState"></time-scrollbar>
         </div>
         <div class="text-center">Time</div>
       </div>

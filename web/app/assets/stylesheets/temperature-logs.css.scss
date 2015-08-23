@@ -1,0 +1,46 @@
+@import "./colors";
+
+.temperatureLog-state-active {
+  .header {
+    .stripes-and-name {
+      display: inline-block;
+      width: 50%;
+    }
+    .scrollbars-container {
+      display: inline-block;
+      margin-left: -32px;
+      width: 50%;
+
+      .scroll-wrapper {
+        display: inline-block;
+        width: 50%;
+
+        .text {
+          color: #fff;
+          display: inline-block;
+          width: 38%;
+        }
+        .scroll-container {
+          display: inline-block;
+          width: 60%;
+        }
+      }
+
+      .time-scrollbar {
+        background: #000;
+        display: inline-block;
+        height: 3px;
+        vertical-align: middle;
+
+        .scrollbar {
+          background: $blue;
+          border-radius: 3px;
+          height: 7px;
+          margin-top: -2px;
+          margin-bottom: -2px;
+        }
+      }
+
+    }
+  }
+}

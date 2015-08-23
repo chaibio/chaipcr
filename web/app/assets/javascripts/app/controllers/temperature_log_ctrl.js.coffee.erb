@@ -1,9 +1,17 @@
 window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
   '$scope'
   '$stateParams'
-  ($scope, $stateParams) ->
+  'Status'
+  'ChartData'
+  'Experiment'
+  'SecondsDisplay'
+  '$interval'
+  ($scope, $stateParams, Status, ChartData, Experiment, SecondsDisplay, $interval) ->
 
     $scope.init = ->
+
+      Experiment.get id: $stateParams.id, (data) ->
+        $scope.experiment = data.experiment
 
       Status.startSync()
 
@@ -98,7 +106,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       else
         $scope.widthPercent = 1
 
-      elem.find('.scrollbar').css width: "#{$scope.widthPercent*100}%"
+      angular.element('.scrollbar').css width: "#{$scope.widthPercent*100}%"
 
     $scope.resizeTemperatureLogs = ->
       resolution = $scope.resolution
@@ -165,7 +173,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       $interval.cancel $scope.updateInterval if $scope.updateInterval
       $scope.updateInterval = null
 
-    elem.on '$destroy', ->
+    $scope.$on '$destroy', ->
       Status.stopSync()
       $scope.stopInterval()
 

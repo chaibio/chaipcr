@@ -14,6 +14,7 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
       margin = 0
       spaceWidth = 0
       scaleSize = 0
+      xDiff = 0
 
       scrollbar = elem.find('.scrollbar')
 
@@ -26,6 +27,15 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
           spaceWidth = getSpaceWidth()
           pageX = 0
           updateState 0
+
+      $scope.$watch ->
+        ngModel.$viewValue
+      , (newVal, oldVal) ->
+        newVal = parseFloat(newVal)
+        if !held
+          console.log newVal
+          updateState newVal
+
 
       # avoid text selection when dragging the scrollbar
       disableSelect = ->
@@ -48,16 +58,15 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
       getSpaceWidth = ->
         getElemWidth() - getScrollBarWidth()
 
-      updateState = (ePageX) ->
-          xDiff = ePageX - pageX
-          newMargin = oldMargin + xDiff
-          if newMargin < 0 then newMargin = 0
-          if newMargin > spaceWidth then newMargin = spaceWidth
-          scrollbar.css marginLeft: "#{newMargin}px"
+      updateState = (newMargin) ->
+        newMarginCopy = angular.copy newMargin
+        if newMargin > spaceWidth then newMargin = spaceWidth
+        if newMargin < 0 then newMargin = 0
+        scrollbar.css marginLeft: "#{newMargin}px"
 
-          # avoid dividing with spaceWidth = 0, else result is NaN
-          val = if spaceWidth > 0 then Math.round((oldMargin + xDiff)/spaceWidth*1000)/1000 else 0
-          ngModel.$setViewValue val
+        # avoid dividing with spaceWidth = 0, else result is NaN
+        val = if spaceWidth > 0 then Math.round((newMarginCopy)/spaceWidth*1000)/1000 else 0
+        ngModel.$setViewValue val
 
       elem.on 'mousedown', (e) ->
         held = true
@@ -70,9 +79,16 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
       $window.$(document).on 'mouseup', (e) ->
         held = false
         enableSelect()
+        # if ngModel.$viewValue < 0
+        #   ngModel.$setViewValue 0
+        # else if ngModel.$viewValue > 1
+        #   ngModel.$setViewValue 1
 
       $window.$(document).on 'mousemove', (e) ->
         if held
-          updateState e.pageX
+          xDiff = e.pageX - pageX
+          newMargin = oldMargin + xDiff
+
+          updateState newMargin
 
 ]
