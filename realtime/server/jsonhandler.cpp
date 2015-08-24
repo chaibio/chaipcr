@@ -26,7 +26,7 @@ void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
 
     try
     {
-        if (request.getContentLength() != -1)
+        if (request.getContentLength() > 0)
             read_json(requestStream, requestPt);
 
         processData(requestPt, responsePt);
