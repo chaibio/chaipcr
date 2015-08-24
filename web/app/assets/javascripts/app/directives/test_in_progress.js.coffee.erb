@@ -44,10 +44,4 @@ window.ChaiBioTech.ngApp
       elem.on '$destroy', ->
         Status.stopSync()
 
-      $scope.startExperiment = (expId) ->
-        Experiment.startExperiment(expId)
-
-      $scope.stopExperiment = ->
-        Experiment.stopExperiment()
-
 ]

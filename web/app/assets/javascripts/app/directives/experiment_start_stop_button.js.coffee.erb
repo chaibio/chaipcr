@@ -1,0 +1,28 @@
+window.ChaiBioTech.ngApp
+.directive 'experimentStartStopButton', [
+  'Status'
+  'Experiment'
+  (Status, Experiment) ->
+
+    restrict: 'EA'
+    replace: true
+    scope:
+      experimentId: '='
+    templateUrl: 'app/views/directives/experiment-start-stop-button.html'
+    link: ($scope, elem) ->
+      Status.startSync()
+
+      $scope.$watch ->
+        Status.getData()
+      , (val) ->
+        $scope.data = val
+
+      elem.on '$destroy', ->
+        Status.stopSync()
+
+      $scope.startExperiment = (expId) ->
+        Experiment.startExperiment(expId)
+
+      $scope.stopExperiment = ->
+        Experiment.stopExperiment()
+]
