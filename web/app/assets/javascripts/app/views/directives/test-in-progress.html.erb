@@ -8,8 +8,13 @@
             {{ data.experimentController.expriment.name }}
           </span>
         </span>
-        <span ng-show="data.experimentController.machine.state !== 'Running' && data.experimentController.machine.state !== 'LidHeating'">
+        <span ng-show="data.experimentController.machine.state === 'Idle' || data.experimentController.machine.state === 'Paused'">
           No experiment running
+        </span>
+        <span ng-show="data.experimentController.machine.state === 'Complete'">
+          TEST COMPLETE:
+          <span ng-show="completionStatus !== 'success'" class="text-red">UNSUCCESSFUL</span>
+          <span ng-show="completionStatus === 'success'" class="text-green">SUCCESSFUL</span>
         </span>
       </div>
     </div>
@@ -21,27 +26,32 @@
               STAGE {{data.experimentController.expriment.stage.number}},
               STEP {{data.experimentController.expriment.step.number}}
             </span>
+            <span ng-show="data.experimentController.machine.state == 'Complete'">
+              RAN ON
+            </span>
             <span ng-show="data.experimentController.machine.state == 'LidHeating'">
               Heating Lid
             </span>
             <span ng-show="data.experimentController.machine.state == 'Paused'">
               Paused
             </span>
-            <span ng-show="data.experimentController.machine.state == 'Complete'">
-              Experiment Complete
-            </span>
-            <span ng-show="data.experimentController.machine.state == 'Idle'">
-              Idle
-            </span>
           </div>
-          <div ng-show="data.experimentController.machine.state == 'Idle'">
-            {{data.experimentController.machine.thermal_state}}
+          <div ng-show="data.experimentController.machine.state == 'Complete'">
+            {{ experiment.started_at | date: 'MMM d, yyyy HH:mm' | uppercase }}
           </div>
         </div>
-        <div class="col-sm-6" ng-hide="data.experimentController.machine.state == 'LidHeating' || data.experimentController.machine.state == 'Complete' || data.experimentController.machine.state == 'Idle'">
+        <div class="col-sm-6" ng-show="data.experimentController.machine.state === 'Running' || data.experimentController.machine.state === 'Paused'">
           <div class="caption">TIME REMAINING</div>
           <div>{{ timeRemaining() | secondsDisplay:'display2'}}</div>
         </div>
+        <div class="col-sm-6" ng-show="data.experimentController.machine.state === 'Complete'">
+          <div class="caption" ng-show="completionStatus !== 'success'">FAILED</div>
+          <div class="caption" ng-show="completionStatus === 'success'">SUCCESS</div>
+          <div ng-show="data.experimentController.machine.state === 'Complete' && completionStatus !== 'success'">{{completionStatus|uppercase}}</div>
+        </div>
+      </div>
+      <div ng-show="data.experimentController.machine.state == 'Complete' && completionStatus !== 'success'" style="margin-top: 10px;">
+        <span style="font-weight: 300;">Something aweful happened and we all got very uncomfortable.</span>
       </div>
       <div class="row" ng-show="data.experimentController.machine.state == 'Running' || data.experimentController.machine.state == 'LidHeating'">
         <div class="col-sm-6">
