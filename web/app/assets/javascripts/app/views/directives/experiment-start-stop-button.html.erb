@@ -1,4 +1,4 @@
-<div class="experiment-start-stop-buttons" ng-show="experimentId">
+<div class="experiment-start-stop-buttons" ng-show="experimentId && data && experiment">
   <div class="button run" ng-show="data.experimentController.machine.state === 'Idle' && experiment.started_at === null" ng-click="startExperiment(experimentId)">
     START EXPERIMENT
   </div>
