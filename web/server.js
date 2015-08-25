@@ -24,6 +24,8 @@ var update = function () {
     if (i === STATUSES.length) i = 0;
     setTimeout(update, 5000);
   }
+
+  status.experimentController.expriment.started_at = (i === 0)? null : "2015-Jul-17 22:08:29.530621";
 };
 
 update();

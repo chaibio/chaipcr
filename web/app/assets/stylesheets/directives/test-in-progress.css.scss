@@ -1,6 +1,7 @@
 
 // Experiment in progress starts here
 .test-in-progress-container {
+  font-family: 'Open Sans', sans-serif;
   width: 100%;
   height: 110px;
   font-size: 12px;
@@ -35,27 +36,6 @@
         background-color: #00aeef;
         height: 5px;
         width: 0px;
-      }
-    }
-    .button-wrapper {
-      padding: 15px;
-    }
-    .button {
-      border-radius: 0px;
-      display: block;
-      font-weight: bold;
-      padding: 3px;
-      width: 100%;
-      &.stop {
-        background: #fff;
-        border: 3px solid red;
-        color: red;
-      }
-      &.run {
-        background: #6ACC0A;
-        border: none;
-        color: #fff;
-        padding: 6px;
       }
     }
   }

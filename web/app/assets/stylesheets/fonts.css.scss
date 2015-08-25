@@ -33,6 +33,13 @@
 
 @font-face {
   font-family: "Open Sans";
+  font-weight: 300;
+  src:
+    local("Open Sans"),
+    url("OpenSans-300.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Open Sans";
   font-weight: 400;
   src:
     local("Open Sans"),

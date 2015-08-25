@@ -14,10 +14,22 @@ window.ChaiBioTech.ngApp
 
       Status.startSync()
 
+      updateData = (data) ->
+
+        if data?.experimentController?.machine.state is 'Complete' and $scope.experimentId
+          Experiment.get {id: $scope.experimentId}, (exp) ->
+            $scope.data = data
+            $scope.completionStatus = exp.experiment.completion_status
+            $scope.experiment = exp.experiment
+        else
+          $scope.data = data
+
+      if Status.getData() then updateData Status.getData()
+
       $scope.$watch ->
         Status.getData()
       , (data) ->
-        $scope.data = data
+        updateData data
 
       $scope.timeRemaining = ->
         if $scope.data and $scope.data.experimentController.machine.state is 'Running'
@@ -43,11 +55,5 @@ window.ChaiBioTech.ngApp
       # // to prevent updating time after the DOM element was removed.
       elem.on '$destroy', ->
         Status.stopSync()
-
-      $scope.startExperiment = (expId) ->
-        Experiment.startExperiment(expId)
-
-      $scope.stopExperiment = ->
-        Experiment.stopExperiment()
 
 ]
