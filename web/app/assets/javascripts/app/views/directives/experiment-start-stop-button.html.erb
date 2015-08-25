@@ -1,14 +1,14 @@
 <div class="experiment-start-stop-buttons" ng-show="experimentId">
-  <div class="button run" ng-show="data.experimentController.machine.state === 'Idle' && data.experimentController.expriment.started_at === null" ng-click="startExperiment(experimentId)">
+  <div class="button run" ng-show="data.experimentController.machine.state === 'Idle' && experiment.started_at === null" ng-click="startExperiment(experimentId)">
     START EXPERIMENT
   </div>
-  <div class="button stop" ng-show="data.experimentController.machine.state !== 'Idle' && !completedAndStopped" ng-click="stopExperiment()">
+  <div class="button stop" ng-show="data.experimentController.machine.state !== 'Idle' && !completedAndStopped() "  ng-click="stopExperiment()">
     STOP EXPERIMENT
   </div>
   <div class="button run"
         duplicate-experiment
         experiment-id="experimentId"
-        ng-show="(data.experimentController.machine.state === 'Idle' || (data.experimentController.machine.state === 'Complete' && completedAndStopped)) && data.experimentController.expriment.started_at !== null && experimentId"
+        ng-show="(data.experimentController.machine.state === 'Idle' || (data.experimentController.machine.state === 'Complete' && completedAndStopped() ) ) && experiment.started_at !== null && experimentId"
         >
     DUPLICATE EXPERIMENT
   </div>
