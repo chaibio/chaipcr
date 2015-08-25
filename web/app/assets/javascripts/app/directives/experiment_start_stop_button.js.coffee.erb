@@ -22,6 +22,9 @@ window.ChaiBioTech.ngApp
 
       $scope.init = ->
         Status.startSync()
+        elem.on '$destroy', ->
+          Status.stopSync()
+
         $scope.stopped = false
 
         $scope.$watch ->
@@ -29,21 +32,16 @@ window.ChaiBioTech.ngApp
         , (val) ->
           $scope.data = val
 
-          if $scope.data?.experimentController?.machine.state is 'Idle'
-            $scope.stopped = false
-
-      elem.on '$destroy', ->
-        Status.stopSync()
-
       $scope.startExperiment = (expId) ->
+        $scope.stopped = false
         Experiment.startExperiment(expId)
 
       $scope.stopExperiment = ->
+        $scope.stopped = true
         Experiment.stopExperiment().then ->
-          getExperiment ->
-            $scope.stopped = true
+          getExperiment angular.noop
 
       $scope.completedAndStopped = ->
-        $scope.data?.experimentController?.machine.state is 'Complete' and $scope.stopped
+        ($scope.data?.experimentController?.machine.state is 'Complete') and $scope.stopped
 
 ]
