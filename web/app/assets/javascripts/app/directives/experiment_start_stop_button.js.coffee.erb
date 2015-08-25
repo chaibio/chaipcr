@@ -11,11 +11,15 @@ window.ChaiBioTech.ngApp
     templateUrl: 'app/views/directives/experiment-start-stop-button.html'
     link: ($scope, elem) ->
       Status.startSync()
+      $scope.completedAndStopped = false
 
       $scope.$watch ->
         Status.getData()
       , (val) ->
         $scope.data = val
+
+        if $scope.data?.experimentController?.machine.state is 'Idle'
+          $scope.completedAndStopped = false
 
       elem.on '$destroy', ->
         Status.stopSync()
@@ -24,5 +28,6 @@ window.ChaiBioTech.ngApp
         Experiment.startExperiment(expId)
 
       $scope.stopExperiment = ->
-        Experiment.stopExperiment()
+        Experiment.stopExperiment().then ->
+          $scope.completedAndStopped = true
 ]
