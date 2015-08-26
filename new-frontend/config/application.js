@@ -48,7 +48,7 @@ module.exports = function(lineman) {
     // and logging a manifest of logical-to-hashed filenames in dist/assets.json
     // via grunt-asset-fingerprint
     //
-    // enableAssetFingerprint: true,
+    enableAssetFingerprint: true,
 
     // LiveReload
     //
