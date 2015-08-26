@@ -25,16 +25,23 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
         if newVal != oldVal
           oldMargin = getMarginLeft()
           spaceWidth = getSpaceWidth()
-          pageX = 0
-          updateState 0
+          newMargin = spaceWidth * ngModel.$viewValue
+          updateMargin newMargin
 
       $scope.$watch ->
         ngModel.$viewValue
-      , (newVal, oldVal) ->
-        newVal = parseFloat(newVal)
-        if !held
-          console.log newVal
-          updateState newVal
+      , (val, oldVal) ->
+        if val isnt oldVal
+          val = parseFloat(val) || 0
+          val = if (val > 1) then 1 else val
+          val = if (val < 0) then 0 else val
+
+          if !held and angular.isNumber val
+
+            ngModel.$setViewValue val
+
+            newMargin = spaceWidth*val
+            updateMargin newMargin
 
 
       # avoid text selection when dragging the scrollbar
@@ -58,15 +65,10 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
       getSpaceWidth = ->
         getElemWidth() - getScrollBarWidth()
 
-      updateState = (newMargin) ->
-        newMarginCopy = angular.copy newMargin
+      updateMargin = (newMargin) ->
         if newMargin > spaceWidth then newMargin = spaceWidth
         if newMargin < 0 then newMargin = 0
         scrollbar.css marginLeft: "#{newMargin}px"
-
-        # avoid dividing with spaceWidth = 0, else result is NaN
-        val = if spaceWidth > 0 then Math.round((newMarginCopy)/spaceWidth*1000)/1000 else 0
-        ngModel.$setViewValue val
 
       elem.on 'mousedown', (e) ->
         held = true
@@ -79,16 +81,16 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
       $window.$(document).on 'mouseup', (e) ->
         held = false
         enableSelect()
-        # if ngModel.$viewValue < 0
-        #   ngModel.$setViewValue 0
-        # else if ngModel.$viewValue > 1
-        #   ngModel.$setViewValue 1
 
       $window.$(document).on 'mousemove', (e) ->
         if held
           xDiff = e.pageX - pageX
           newMargin = oldMargin + xDiff
 
-          updateState newMargin
+          updateMargin newMargin
+
+          # avoid dividing with spaceWidth = 0, else result is NaN
+          val = if spaceWidth > 0 then Math.round((newMargin)/spaceWidth*1000)/1000 else 0
+          ngModel.$setViewValue val
 
 ]

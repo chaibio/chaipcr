@@ -10,10 +10,16 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
     $scope.init = ->
 
+      Status.startSync()
+
+      $scope.$on '$destroy', ->
+        Status.stopSync()
+        $scope.stopInterval()
+
+      $scope.isCurrentExperiment = false
+
       Experiment.get id: $stateParams.id, (data) ->
         $scope.experiment = data.experiment
-
-      Status.startSync()
 
       $scope.$watch ->
         Status.getData()
@@ -24,6 +30,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
             $scope.autoUpdateTemperatureLogs()
           else
             $scope.stopInterval()
+
 
       $scope.resolutionOptions = [
         60
@@ -172,10 +179,6 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
     $scope.stopInterval = =>
       $interval.cancel $scope.updateInterval if $scope.updateInterval
       $scope.updateInterval = null
-
-    $scope.$on '$destroy', ->
-      Status.stopSync()
-      $scope.stopInterval()
 
     $scope.options = {
       axes: {
