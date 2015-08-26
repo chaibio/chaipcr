@@ -1,0 +1,15 @@
+{
+  "name": "new-frontend",
+  "description": "An HTML/JS/CSS app",
+  "version": "0.0.1",
+  "private": true,
+  "author": "John Doe",
+  "devDependencies": {
+    "lineman": "~0.36.3"
+  },
+  "scripts": {
+    "start": "lineman run",
+    "test": "lineman spec-ci",
+    "production": "lineman clean build && npm i express@3 && node -e \"var e = require('express'), a = e(); a.use(e.static('dist/')); a.listen(process.env.PORT)\""
+  }
+}

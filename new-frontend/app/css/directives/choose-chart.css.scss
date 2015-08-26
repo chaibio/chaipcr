@@ -1,0 +1,129 @@
+$yellow: #FFD200;
+$orange: #FFA800;
+$red_orange: #FF5A00;
+$red: #E50000;
+$pink: #F0007C;
+$violet: #8F1CE8;
+$blue: #003CB7;
+$light_blue: #00BEF5;
+
+
+.choose-chart {
+  .choose-chart-heading {
+    border-bottom: 2px solid black;
+  }
+  .chart-type-option {
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  .number {
+    text-align: center;
+    vertical-align: middle;
+    padding: 5px;
+    color: gray;
+    font-size: 15px;
+  }
+  .circle {
+    border-radius: 100px;
+    border-width: 5px;
+    border-style: solid;
+    color: lighten(#000, 25%);
+    cursor: pointer;
+    font-weight: bold;
+    height: 50px;
+    margin: 5px;
+    padding-top: 11px;
+    text-align: center;
+    width: 50px;
+  }
+  table {
+
+    tr:nth-of-type(2) {
+      td:nth-of-type(2) {
+        .circle{
+          border-color: lighten($yellow, 25%);
+        }
+      }
+      td:nth-of-type(3) {
+        .circle{
+          border-color: lighten($orange, 25%);
+        }
+      }
+      td:nth-of-type(4) {
+        .circle{
+          border-color: lighten($red_orange, 25%);
+        }
+      }
+      td:nth-of-type(5) {
+        .circle{
+          border-color: lighten($red, 25%);
+        }
+      }
+      td:nth-of-type(6) {
+        .circle{
+          border-color: lighten($pink, 25%);
+        }
+      }
+      td:nth-of-type(7) {
+        .circle{
+          border-color: lighten($violet, 25%);
+        }
+      }
+      td:nth-of-type(8) {
+        .circle{
+          border-color: lighten($blue, 25%);
+        }
+      }
+      td:nth-of-type(9) {
+        .circle{
+          border-color: lighten($light_blue, 25%);
+        }
+      }
+    }
+// second row of circles
+    tr:nth-of-type(3) {
+      td:nth-of-type(2) {
+        .circle{
+          border-color: $yellow;
+        }
+      }
+      td:nth-of-type(3) {
+        .circle{
+          border-color: $orange;
+        }
+      }
+      td:nth-of-type(4) {
+        .circle{
+          border-color: $red_orange;
+        }
+      }
+      td:nth-of-type(5) {
+        .circle{
+          border-color: $red;
+        }
+      }
+      td:nth-of-type(6) {
+        .circle{
+          border-color: $pink;
+        }
+      }
+      td:nth-of-type(7) {
+        .circle{
+          border-color: $violet;
+        }
+      }
+      td:nth-of-type(8) {
+        .circle{
+          border-color: $blue;
+        }
+      }
+      td:nth-of-type(9) {
+        .circle{
+          border-color: $light_blue;
+        }
+      }
+    }
+  }
+
+}

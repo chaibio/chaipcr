@@ -1,0 +1,94 @@
+@font-face {
+  font-family: 'Fun City';
+  font-weight: 400;
+
+  src: url('funcity/2D178A_1_0.eot');
+  src: url('funcity/2D178A_1_0.ttf');
+  src: url('funcity/2D178A_1_0.woff');
+}
+
+@font-face {
+  font-family: 'Fun City';
+  font-weight: 700;
+  src: url('funcity/2D178A_0_0.eot');
+  src: url('funcity/2D178A_0_0.ttf');
+  src: url('funcity/2D178A_0_0.woff');
+}
+
+
+@font-face {
+    font-family: "simplifica";
+    src: local('simplifica'), url("simplifica.woff") format('woff');
+}
+
+@font-face {
+    font-family: "Ostrich Sans";
+    src: local('Ostrich Sans'), url("ostrich-sans.woff") format('woff');
+}
+
+@font-face {
+  font-family: "fun city";
+  src: local('fun city'), url("FUNCITY LEVEL 1 BASIC.woff") format('woff');
+}
+
+@font-face {
+  font-family: "Open Sans";
+  font-weight: 300;
+  src:
+    local("Open Sans"),
+    url("OpenSans-300.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Open Sans";
+  font-weight: 400;
+  src:
+    local("Open Sans"),
+    url("OpenSans-Regular.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Open Sans";
+  font-weight: 600;
+  src:
+    local("Open Sans"),
+    url("OpenSans-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Open Sans";
+  font-weight: 700;
+  src:
+    local("Open Sans"),
+    url("OpenSans-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Open Sans";
+  font-weight: 800;
+  src:
+    local("Open Sans"),
+    url("OpenSans-800.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "roboto";
+  src: local("roboto"), url("RobotoRegular.woff") format("woff");
+}
+
+.simplifica {
+  font-family: "simplifica";
+  font-size: 30px;
+}
+
+.sansa {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+}
+.ostrich {
+  font-family: "Ostrich Sans";
+}
+
+.fun-city {
+  font-family: "fun city";
+}
+

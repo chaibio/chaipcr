@@ -1,0 +1,39 @@
+<div class="row temperature-log-chart">
+  <div class="col-md-10">
+    <h3 class="text-center">Temperature Plot</h3>
+    <div class="panel panel-primary">
+      <div class="panel-heading">Temperature Plot</div>
+      <div class="panel-body">
+        <div class="vertical-text">Temperature</div>
+        <div style="padding: 10px 0px;">
+        <linechart data="data" options="options" width="700" height="300"></linechart>
+        </div>
+        <div class="scrollbar-container">
+          <time-scrollbar ng-model="scrollState"></time-scrollbar>
+        </div>
+        <div class="text-center">Time</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <h3>&nbsp;</h3>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Temperature Plot
+      </div>
+      <div class="panel-body">
+        <form>
+          <div class="input-group">
+          </div>
+          <div class="input-group">
+            <label>View</label>
+            <select ng-change="updateResolution()" ng-model="resolution" class="form-control" ng-options="sec as sec | secondsDisplay: 'display1' for sec in resolutionOptions">
+              <option value=''>View All</option>
+            </select>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+

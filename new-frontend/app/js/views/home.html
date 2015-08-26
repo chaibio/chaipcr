@@ -1,0 +1,128 @@
+<div class="home-page-wrapper">
+   <!-- Left side of the home page -->
+   <div class="home-page-left-wing">
+      <div class="left-wing-content">
+         <div class="home-page-logo">
+            <img src="<%=asset_path('logo.png') %>">
+         </div>
+         <div class="home-page-menu">
+            <div class="menu-content">
+               <div class="menu-heading">
+                  <div class="welcome-text simplifica">
+                     WELCOME,
+                  </div>
+                  <div class="logout-text">
+                     <a class="sansa" logout>SIGN OUT</a>
+                  </div>
+               </div>
+               <div class="menu-items">
+                  <div class="NEWEXPERIMENT menu-item-bounce">
+                     <div class="simplifica">
+                        <div class="first-row">
+                           <div class="menu-item-image">
+                           </div>
+                           <div class="menu-item-text" ng-click="HomeCtrl.newExperiment()">
+                              NEW EXPERIMENT
+                           </div>
+                        </div>
+                        <div class="second-row">
+                           <div class="hand-container">
+                              <div class="hand"></div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="menu-item RUNA KIT">
+                     <div class="simplifica">
+                        <div class="first-row">
+                           <div class="menu-item-image">
+                           </div>
+                           <div class="menu-item-text">
+                              RUN A KIT
+                           </div>
+                        </div>
+                        <div class="second-row">
+                           <div class="hand-container">
+                              <div class="hand"></div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="menu-item SETTINGS">
+                     <div class="simplifica">
+                        <div class="first-row">
+                           <div class="menu-item-image">
+                           </div>
+                           <div ui-sref="settings" class="menu-item-text" style="font-weight: normal;">
+                              SETTINGS
+                           </div>
+                        </div>
+                        <div class="second-row">
+                           <div class="hand-container">
+                              <div class="hand" style="display: none;"></div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <test-in-progress></test-in-progress>
+      </div>
+   </div>
+   <!-- Right side of the home page -->
+   <div class="home-page-right-wing">
+      <div>
+         <div class="previous-experiment-container">
+            <div class="previous-experiment-heading">
+               <div class="text sansa">PREVIOUS EXPERIMENTS</div>
+               <div class="dots" ng-click="deleteMode = !deleteMode"> ... </div>
+            </div>
+            <div class="all-experiments" ng-class="{'delete-mode': deleteMode}">
+               <div class="loading" ng-show="experiments === null">Loading ......! <img src="<%=asset_path('loading.gif') %>"></div>
+               <p ng-show="experiments !== null && experiments.length === 0"><i>No experiments yet.</i></p>
+               <div class="individual-experiment" ng-class="{'del': exp.del}" ng-repeat="exp in experiments | orderBy:'experiment.created_at':true">
+                  <div class="first-row">
+                     <div class="image" ng-click="HomeCtrl.confirmDelete(exp)">&times;</div>
+                     <div class="text simplifica">
+                        <a ui-sref="edit-protocol({id: exp.experiment.id})">
+                           {{exp.experiment.name}}
+                        </a>
+                     </div>
+                     <div class="dotordate sansa" style="width: 70px;">
+                        {{exp.experiment.created_at | date: 'MMMM yyyy' | uppercase}}
+                     </div>
+                  </div>
+                  <div class="second-row">
+                     <div class="hand-container">
+                        <div class="hand"></div>
+                     </div>
+                     <div class="more-info sansa"  ng-show="!exp.experiment.started_at">
+                        <span class="created-text">
+                           CREATED
+                        </span>
+                        {{exp.experiment.created_at | amCalendar | uppercase}}
+                     </div>
+                     <div class="more-info sansa"  ng-show="exp.experiment.started_at">
+                        <span class="created-text">
+                           RUN
+                        </span>
+                        {{exp.experiment.started_at | amCalendar | uppercase}}
+                     </div>
+                     <div class="dotor">
+                        <div class="ball"></div>
+                     </div>
+                  </div>
+                  <div class="confirm-box sansa">
+                     <div>Are you sure ?.</div>
+                     <div>
+                        <button class="no-delete" ng-click="exp.del = false">No</button>
+                        <button class="yes-delete" ng-click="HomeCtrl.deleteExperiment(exp.experiment.id)">Yes</button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>

@@ -1,0 +1,53 @@
+
+// Experiment in progress starts here
+.test-in-progress-container {
+  font-family: 'Open Sans', sans-serif;
+  width: 100%;
+  height: 110px;
+  font-size: 12px;
+
+  .test-in-progress {
+
+    .test-in-progress-heading {
+      border-bottom: solid 2px #001827;
+      font-weight: bold;
+      .text-blue {
+        color: #00AEEF;
+      }
+    }
+    .test-info {
+      .caption {
+        font-weight: bold;
+        margin-top: 15px;
+        margin-bottom: 5px;
+
+        .normal-text {
+          font-weight: normal;
+        }
+      }
+
+    }
+    .test-progress-bar {
+      margin-top: 10px;
+      height: 5px;
+      background-color: black;
+
+      .pro-bar {
+        background-color: #00aeef;
+        height: 5px;
+        width: 0px;
+      }
+    }
+  }
+}
+
+.sidemenu {
+  .test-in-progress {
+    color: #fff;
+    margin: 50px;
+
+    .test-in-progress-heading {
+      border-bottom: 2px solid #fff;
+    }
+  }
+}

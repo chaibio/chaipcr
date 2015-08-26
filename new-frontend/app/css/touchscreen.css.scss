@@ -1,0 +1,79 @@
+// For touch screen
+#touchScreenContainer {
+	width: 800px;
+	height: 480px;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+
+	.experiment-list {
+		max-height: 300px;
+		overflow: scroll;
+	}
+	#track {
+		width: 700px;
+		overflow: scroll;
+
+		#innertrack {
+			width: 1000px;
+			height:240px;
+			border: 1px solid grey;
+
+			.stage-run {
+				border:1px solid red;
+				border-right: none;
+				width: 151px;
+				float: left;
+				height: 230px;
+			}
+
+			.stage-header {
+				width: 100%;
+				height:50px;
+				text-align: center;
+			}
+
+			.step-holder {
+				width: 100%;
+				height:100%;
+			}
+			.step-select {
+				background-color: orange;
+			}
+
+			.step-run {
+				width: 149px;
+				height: 175px;
+				float: left;
+				background-color: yellow;
+
+				.tempBar {
+					width: 45px;
+					height: 18px;
+					float: right;
+					cursor: move;
+					z-index: 100;
+					.label {
+						float: right;
+						width: 44px;
+					}
+				}
+
+				.line {
+					background-color: black;
+					width:150px;
+					height: 2px;
+					position:relative;
+					-webkit-transform-origin: 100% 100%;
+					right:150px;
+					z-index: 10;
+					top:6px;
+				}
+			}
+
+		}
+	}
+}

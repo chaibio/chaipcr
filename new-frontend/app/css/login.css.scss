@@ -1,0 +1,79 @@
+// Login page
+.login-state-active {
+  background-color: #ff8102;
+}
+.login-wrapper {
+  background-color: #ff8102;
+  min-height: 768px;
+
+
+  .login-box {
+    height: 364px;
+    width: 500px;
+    background-color: white;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+
+    .title-field {
+      padding-top: 26px;
+    }
+    .login-section {
+      width: 430px;
+      height: 108px;
+      margin: 0 auto;
+      text-align: center;
+
+      .login-field {
+        width: 430px;
+        height: 52px;
+        border-bottom: 1px solid #cbcbcb;
+      }
+
+      .login-field-text {
+        float: left;
+        margin-top: 31px;
+        color: #585858;
+        font-size: 18px;
+        width: 60px;
+      }
+
+      .login-text-field {
+
+        float: left;
+        margin-left: 10px;
+
+        margin-top: 25px;
+        border: solid 1px white;
+        width: 350px;
+
+        font-size: 16px;
+        outline: none;
+      }
+
+      .login-button {
+
+        width: 240px;
+        height: 40px;
+        margin: 0 auto;
+        background-color: black;
+        border: none;
+        color: white;
+        font-weight: 400;
+        margin-top: 33px;
+      }
+      .login-trouble {
+
+        color: #00aeef;
+        font-size: 9px;
+        margin-top: 20px;
+        text-align: center;
+        cursor: pointer;
+      }
+    }
+
+  }
+}

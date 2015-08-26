@@ -1,0 +1,96 @@
+.error-model-container {
+
+  .error-model-overlay {
+
+    min-width: 100%;
+    min-height: 100%;
+    background-color: black;
+    opacity: .5;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 10;
+  }
+  .error-model-content {
+
+    width: 441px;
+    height: 303px;
+    background-color: white;
+    z-index: 100;
+    margin:0 auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+
+    .error-model-title-container {
+
+      width: 366px;
+      height: 47px;
+      border-bottom: solid 1px black;
+      margin: 0 auto;
+      padding-top: 28px;
+
+      .error-model-title {
+        float: left;
+        width: 350px;
+        height: 15px;
+        font-size: 14px;
+      }
+      .error-model-close {
+        float: left;
+        width: 16px;
+        height: 14px;
+
+        img {
+          float: right;
+          margin-top: 5px;
+          cursor: pointer;
+        }
+      }
+    }
+
+    .error-model-message-container {
+
+      width: 366px;
+      height: 136px;
+      margin: 0 auto;
+      padding-top: 25px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .error-model-button-container {
+
+      width: 240px;
+      height: 91px;
+      margin: 0 auto;
+
+      button {
+        width: 240px;
+        height: 40px;
+        border: none;
+      }
+      .error-model-okay-button {
+
+        background-color: black;
+        color: white;
+
+      }
+
+      .error-model-spacer {
+        width: 240px;
+        height: 10px;
+      }
+
+      .error-model-cancel-button {
+
+        background-color: white;
+        color: black;
+        border: solid 1px black;
+      }
+    }
+  }
+}

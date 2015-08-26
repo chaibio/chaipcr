@@ -1,0 +1,524 @@
+/***********************  Global Initialize Settings ***********************/
+body {
+	font: 12px/18px "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif;
+	color: #333;
+	background-color: #f2f3f4;
+	margin: 0;
+	padding: 0;
+	min-width: 940px
+}
+.clear {
+	clear: both;
+}
+.clearfix:after {
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0;
+}
+
+.clearfix {
+    display: inline-block;
+}
+
+html[xmlns] .clearfix {
+    display: block;
+}
+
+* html .clearfix {
+    height: 1%;
+}
+
+img {
+	border: 0;
+	margin: 0;
+}
+strong {
+	font-weight: bold;
+	color: #666;
+}
+ul{
+	margin: 0;
+	padding: 0;
+}
+li {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.blur{
+	color: #aaa;
+	font-size: 0.8em;
+}
+a{
+	color: #2970a6;
+	text-decoration: none;
+}
+a:hover{
+	text-decoration: none;
+}
+/*********************** icons ****************************/
+.icon-del{
+	background: image-url("icons.png") no-repeat 0px -2px transparent;
+	width: 16px;
+	height: 16px;
+}
+
+/************************ tooltip *************************/
+.ui-tooltip{
+	position:absolute;
+    z-index:999;
+    left:-9999px;
+	color: #333;
+	background-color: #FFCC7F;
+    border:1px solid #FFCC7F;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+    padding:5px;
+    width:200px;
+	text-align: center;
+}
+
+/***********************  Form ***********************/
+.row{
+	margin: 10px;
+}
+label{
+	font-weight: bold;
+	display: block;
+	color: #666;
+	margin-bottom: 5px;
+}
+.textinput, textarea{
+	border: 1px solid #ccc;
+	padding: 6px;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+.textinput{
+	text-align: left;
+	width: 100px;
+}
+.forminput{
+	display: block;
+	margin: 0 0 20px 0;
+}
+.button {
+  display: block;
+  height: auto;
+	color: #525252;
+	text-align: center;
+	vertical-align: middle;
+	cursor: pointer;
+    padding: 4px 12px;
+	margin: 0px;
+    border: 1px solid #cfd2d4;
+	background: asset-url("button.gif") repeat-x left top;
+	-webkit-box-shadow: rgba(255,255,255,0.3) 0 0 0 1px inset;
+	-moz-box-shadow: rgba(255,255,255,0.3) 0 0 0 1px inset;
+	box-shadow: rgba(255,255,255,0.3) 0 0 0 1px inset;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+.button:hover{
+	background: -moz-linear-gradient(#fcfcfc,#e0e5e8);
+	background: linear-gradient(#fcfcfc,#e0e5e8);
+}
+.button a{
+	color: #525252;
+}
+
+.button-big{
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	display: block;
+	text-align: center;
+	vertical-align: middle;
+	cursor: pointer;
+	font-size: 1.7em;
+	font-weight: 200;
+	margin: 20px 0;
+	padding: 15px 40px;
+	width: 200px;
+}
+
+.button-big a{
+	color: #ffffff;
+}
+
+/***********************  flash Msg Settings ***********************/
+.flashmsg{
+	width: 100%;
+	padding: 20px 0;
+	font-weight: bold;
+	font-size: 1.2em;
+}
+.flashmsg span{
+	display: inline-block;
+	margin-left: 20px;
+}
+.errmsg{
+	color: #f00;
+	background-color: #ffecec;
+	border: 1px solid #f00;
+}
+.noticemsg{
+	background-color: #FFFFE5;
+}
+.infomsg{
+	background-color: #ecffec;
+}
+
+/***********************  Color Scheme  ***********************/
+.blue-scheme{
+	background-color: #3c6aa1;
+	background: -webkit-gradient(linear,100% 50%,0% 50%,color-stop(0%,#4d80af),color-stop(100%,#2b5593));
+	background: -webkit-linear-gradient(top,#4d80af 0,#2b5593 100%);
+	background: -moz-linear-gradient(top,#4d80af 0,#2b5593 100%);
+	background: -o-linear-gradient(top,#4d80af 0,#2b5593 100%);
+	background: linear-gradient(top,#4d80af 0,#2b5593 100%);
+	background: -ms-linear-gradient(top,#4d80af 0,#2b5593 100%);
+	color: #ffffff;
+}
+.blue-scheme a{
+	color: #ffffff;
+}
+/***********************  Popup Box ***********************/
+.popupBox {
+	position: absolute;
+	border: 5px solid #666;
+	top: 0;
+	left: 0;
+	margin: 0;
+	padding: 10px;
+	z-index: 99999;
+	background: #fff;
+	overflow: auto;
+	font-size: 1.1em;
+}
+.popup-handle{
+	padding: 10px;
+	margin: 0px 0px 15px 0px;
+	cursor:	 move;
+}
+.popup-handle h2{
+	margin: 0;
+	padding: 0;
+	font-size: 1.2em;
+}
+
+/***********************  Tab menu ***********************/
+.tabmenu {
+    border-bottom: 1px solid #ccc;
+    margin: 10px 0;
+    z-index: 1;
+}
+.tabmenu li {
+    display: inline;
+    overflow: hidden;
+    list-style-type: none;
+    margin: 0px 5px;
+}
+.tabmenu a:visited, .tabmenu a:active, .tabmenu a:link, .tabmenu span{
+    border:1px solid #e1e1e1;
+	border-bottom: none;
+    padding: 3px 10px;
+    margin: 0 8px 0 0;
+}
+.tabmenu a:visited, .tabmenu a:active, .tabmenu a:link{
+    background: image-url("titlebg.png") repeat-x bottom left;
+    color: #333;
+    text-decoration: none;
+}
+.tabmenu a:hover {
+    background: none;
+    background-color: #eee;
+}
+.tabmenu span.active {
+    background: #fff;
+    color: #333;
+    border-bottom: 1px solid #fff;
+}
+
+/***********************  General Panel Settings ***********************/
+#header{
+	width: 100%;
+	margin: 0;
+	padding: 15px;
+	font-size: 1.1em;
+}
+#header a{
+	color: #e7e7e7;
+}
+#header a:hover{
+	color: #ffffff;
+}
+#header #logo{
+	float: left;
+	margin-right: 30px;
+}
+#header #menu{
+	float: left;
+}
+#header ul li{
+	display: inline-block;
+	margin-right: 20px;
+}
+
+#container{
+	background-color: #fff;
+	width: 980px;
+	margin: 0px auto;
+	padding: 0px;
+}
+
+#maincontent{
+	margin: 40px;
+}
+
+/***********************  Experiment Settings ***********************/
+#experiments-list{
+	float: left;
+	width: 160px;
+	margin: 0px;
+	padding: 30px 0;
+}
+#experiments-list h5{
+	font-size: 1.0em;
+	margin: 0;
+	padding: 0;
+}
+#experiments-list li{
+	line-height: 2.2em;
+	padding: 2px 30px;
+}
+#experiments-list .button{
+	width: 100px;
+	margin: 20px auto;
+}
+#experiment-content{
+	width: 750px;
+	padding: 30px;
+	float: left;
+	border-left: 1px solid #ccc;
+}
+#experiment-header{
+	width: 100%;
+	padding: 0 0 10px 0;
+	margin: 0;
+}
+#experiment-header .experiment-info{
+	float: left;
+}
+#experiment-header .experiment-info h1{
+	margin: 0 0 20px 0;
+}
+#experiment-header .experiment-info p{
+	color: #777;
+	line-height: 1.5em;
+	margin: 0;
+}
+#experiment-header .experiment-ctl{
+	float: left;
+	margin-left: 10px;
+}
+#experiment-header .experiment-ctl .button{
+	float: left;
+	margin-right: 15px;
+}
+/***********************  Protocol Settings ***********************/
+.main-panel{
+	width: 470px;
+	float: left;
+}
+.ctl-panel{
+	width: 200px;
+	float: right;
+	padding: 15px;
+	margin-left: 30px;
+	border: 1px solid #d3d3d3;
+	border-radius: 8px;
+}
+.protocol{
+	width: 440px;
+	margin: 10px 0;
+	border: 5px solid #d5d5d5;
+	background-color: #d5d5d5;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+.protocol.hide{
+	border: none;
+	background-color: #fff;
+}
+.protocol.highlight{
+	border: 5px solid #FFCC7F !important;
+	background-color: #FFCC7F !important;
+}
+.protocol .title{
+	font-weight: bold;
+	color: #ffffff;
+	background-color: #666666;
+	padding: 10px;
+	margin: 0;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	-moz-border-radius-topleft: 4px;
+	-moz-border-radius-topright: 4px;
+	display: none;
+}
+.protocol.highlight .title{
+	color: #333;
+	background-color: #FFCC7F !important;
+	display: block;
+}
+.protocol.stage .title{
+	display: block;
+}
+.protocol.stage.hide .title{
+	display: none;
+}
+.titlebar{
+	width: 410px;
+	font-weight: bold;
+	padding: 0 20px;
+	margin: 0;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+.protocol li{
+	padding: 0 20px;
+	background-color: #eee;
+	border: 1px solid #ccc;
+	display: block;
+}
+.protocol li.placeholder{
+	padding: 0;
+	border: none;
+}
+.protocol li.placeholder.highlight, .protocol.highlight li.placeholder {
+	border: solid 2px #FFCC7F;
+	background: #FFFFE5;
+	height: 1.5em;
+	padding: 10px 20px;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+.protocol span, .titlebar span{
+	display: inline-block;
+}
+span.step-name label{
+	margin-left: -9px;
+	text-align: left;
+}
+span.step-name .textinput{
+	margin-left: -9px;
+}
+span.step-name{
+	width: 110px;
+	padding: 10px 0;
+}
+span.step-temperature{
+	width: 125px;
+	padding: 10px 0;
+	text-align: center;
+}
+span.step-hold-time{
+	width: 125px;
+	padding: 10px 0;
+	text-align: center;
+}
+span.stage-name{
+	margin-right: 10px;
+}
+span.stage-num-cycles{
+	margin-right: 10px;
+}
+span.stage-num-cycles .textinput, span.step-temperature .textinput, span.step-hold-time .textinput{
+	width: 62px;
+	text-align: center;
+}
+.protocol .title label{
+	color: white;
+}
+.protocol .icon-del{
+	padding: 0;
+	vertical-align: middle;
+	cursor: pointer;
+	display: none;
+}
+.protocol .title .icon-del{
+	float: right;
+	margin: 0 10px 0 0;
+}
+.protocol li .icon-del{
+	margin: 0 0 0 20px;
+}
+
+.droppable-highlight-top {
+    border-top: solid 5px #FFCC7F !important;
+}
+.droppable-highlight-bottom {
+    border-bottom: solid 5px #FFCC7F !important;
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	-moz-border-radius-bottomleft: 4px;
+	-moz-border-radius-bottomright: 4px;
+	margin-bottom: 0 !important;
+}
+.protocol li.move{
+	width: 400px;
+	border: 3px solid #ccc;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+.protocol li.move .icon-del{
+	display: none !important;
+}
+.protocol .row-ctl{
+	text-align: right;
+	padding-right: 58px;
+	margin-bottom: 5px;
+}
+
+.stage{
+	border-bottom: 1px solid #d5d5d5;
+}
+.stage li{
+	margin-bottom: 5px;
+}
+
+/***********************  Home Page ***********************/
+#homepage{
+	margin: 20px 300px;
+}
+#homepage h1{
+	text-align: center;
+	margin: 35px 0;
+}
+
+/***********************  Run Wizard ***********************/
+.edit_experiment{
+	width: 500px;
+}
+.edit_experiment input[type=radio]{
+	margin-right: 5px;
+}
+.edit_experiment .radio-button{
+	display: inline-block;
+	margin-right: 20px;
+}
+.edit_experiment label{
+	font-size: 1.2em;
+}
+.edit_experiment .textinput{
+	font-size: 1.1em;
+}
+.edit_experiment .submitctl{
+	margin: 20px 0;
+	text-align: left;
+}
