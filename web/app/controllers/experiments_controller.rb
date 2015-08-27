@@ -1,4 +1,5 @@
 require 'zip'
+require 'rserve'
 
 class ExperimentsController < ApplicationController
   include ParamsHelper
@@ -99,14 +100,34 @@ class ExperimentsController < ApplicationController
   end
 
   api :GET, "/experiments/:id/fluorescence_data", "Retrieve fluorescence data"
-  example "{'fluorescence_datum':{'fluorescence_value':75,'well_num':1,'cycle_num':1}, 'fluorescence_datum':{'fluorescence_value':50,'well_num':2,'cycle_num':1}}"
+  example "{'fluorescence_datum':{'calibrated_value':1.4299,'well_num':1,'cycle_num':1}, 'fluorescence_datum':{'calibrated_value':1.4974,'well_num':2,'cycle_num':1}}"
+  
+#  def fluorescence_data
+#    @fluorescence_data = @experiment.fluorescence_data.select("cycle_num, well_num, AVG(fluorescence_value) as fluorescence_value").group("cycle_num, well_num").order("cycle_num, well_num")
+#    respond_to do |format|
+#      format.json { render "fluorescence_data", :status => :ok}
+#    end
+#  end
+  
   def fluorescence_data
-    @fluorescence_data = @experiment.fluorescence_data.select("cycle_num, well_num, AVG(fluorescence_value) as fluorescence_value").group("cycle_num, well_num").order("cycle_num, well_num")
-    respond_to do |format|
-      format.json { render "fluorescence_data", :status => :ok}
+    if @experiment
+      config   = Rails.configuration.database_configuration
+      connection = Rserve::Connection.new
+      results = connection.eval("fluorescence_data('#{config[Rails.env]["database"]}', #{params[:id]})").to_ruby
+      @fluorescence_data = []
+      if !results[0].blank?
+        (0...results[0].length).each do |i|
+          @fluorescence_data[i] = FluorescenceDatum.new(:experiment_id=>params[:id], :well_num=>results[0][i], :cycle_num=>results[1][i], :calibrated_value=>results[2][i])
+        end
+      end
+      respond_to do |format|
+        format.json { render "fluorescence_data", :status => :ok}
+      end
+    else
+      render :json=>{:errors=>"experiment not found"}, :status => :not_found
     end
   end
-  
+   
   api :GET, "/experiments/:id/export.zip", "zip temperature, fluorescence and meltcurv csv files"
   def export
     respond_to do |format|

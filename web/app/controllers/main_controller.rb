@@ -27,9 +27,4 @@ class MainController < ApplicationController
     end
   end
 
-  def rtest
-    connection = Rserve::Connection.new
-    x = connection.eval("R.version.string")
-    render :text => x.as_string
-  end
 end
