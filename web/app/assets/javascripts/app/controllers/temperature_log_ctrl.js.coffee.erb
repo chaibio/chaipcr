@@ -36,7 +36,6 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       $scope.calibration = 800
       $scope.scrollState = 0
       $scope.updateInterval = null
-      $scope.resolutionOptionsIndex = 0
 
 
       $scope.resolutionOptions = [
@@ -50,6 +49,8 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         null
       ]
 
+      $scope.resolutionOptionsIndex = $scope.resolutionOptions.length-1
+
       $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
 
       Experiment
@@ -58,9 +59,12 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         if data.length > 0
           $scope.temperatureLogsCache = angular.copy data
           $scope.temperatureLogs = angular.copy data
-          $scope.updateScale()
-          $scope.resizeTemperatureLogs()
+          $scope.greatest_elapsed_time = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length - 1].temperature_log.elapsed_time
+
+          $scope.updateYScale()
           $scope.updateScrollWidth()
+          $scope.resizeTemperatureLogs()
+          $scope.updateResolution()
           $scope.updateData()
         else
           $scope.autoUpdateTemperatureLogs()
@@ -101,7 +105,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
         $scope.updateChart data
 
-    $scope.updateScale = ->
+    $scope.updateYScale = ->
       scales = _.map $scope.temperatureLogsCache, (temp_log) ->
         temp_log = temp_log.temperature_log
         greatest = Math.max.apply Math, [
@@ -117,9 +121,6 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
     $scope.updateScrollWidth = ->
 
       if $scope.temperatureLogsCache.length > 0
-
-        $scope.greatest_elapsed_time = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length - 1].temperature_log.elapsed_time
-
         $scope.widthPercent = $scope.resolution*1000/$scope.greatest_elapsed_time
         if $scope.widthPercent > 1
           $scope.widthPercent = 1
@@ -182,7 +183,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
           .success (data) ->
             $scope.temperatureLogsCache = angular.copy data
             $scope.temperatureLogs = angular.copy data
-            $scope.updateScale()
+            $scope.updateYScale()
             $scope.resizeTemperatureLogs()
             $scope.updateScrollWidth()
             $scope.updateData()
