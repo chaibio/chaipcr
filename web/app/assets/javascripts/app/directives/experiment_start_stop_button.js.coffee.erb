@@ -2,7 +2,8 @@ window.ChaiBioTech.ngApp
 .directive 'experimentStartStopButton', [
   'Status'
   'Experiment'
-  (Status, Experiment) ->
+  '$rootScope'
+  (Status, Experiment, $rootScope) ->
 
     restrict: 'EA'
     replace: true
@@ -34,7 +35,8 @@ window.ChaiBioTech.ngApp
 
       $scope.startExperiment = (expId) ->
         $scope.stopped = false
-        Experiment.startExperiment(expId)
+        Experiment.startExperiment(expId).then ->
+          $rootScope.$broadcast 'experiment:started', expId
 
       $scope.stopExperiment = ->
         $scope.stopped = true

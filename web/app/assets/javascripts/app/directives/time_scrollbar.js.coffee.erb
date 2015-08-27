@@ -27,6 +27,9 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
           newMargin = spaceWidth * ngModel.$viewValue
           updateMargin newMargin
 
+          if spaceWidth is 0
+            ngModel.$setViewValue 1
+
       $scope.$watch ->
         ngModel.$viewValue
       , (val, oldVal) ->
