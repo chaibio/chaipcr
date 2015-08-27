@@ -8,7 +8,33 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
   '$interval'
   ($scope, $stateParams, Status, ChartData, Experiment, SecondsDisplay, $interval) ->
 
+    hasStatusData = false
+    hasExperiment = false
+    hasInit = false
+
+    Experiment.get id: $stateParams.id, (data) ->
+      $scope.experiment = data.experiment
+      hasExperiment = true
+      $scope.init()
+
+    $scope.$watch ->
+      Status.getData()
+    , (val) ->
+      if val
+        hasStatusData = true
+        $scope.isCurrentExperiment = parseInt(val.experimentController?.expriment?.id) is parseInt($stateParams.id)
+        if $scope.isCurrentExperiment and $scope.scrollState >= 1 and (val.experimentController?.machine.state is 'LidHeating' || val.experimentController?.machine.state is 'Running')
+          $scope.autoUpdateTemperatureLogs()
+        else
+          $scope.stopInterval()
+
+        $scope.init()
+
     $scope.init = ->
+
+      return if !hasStatusData or !hasExperiment or hasInit
+
+      hasInit = true
 
       Status.startSync()
 
@@ -18,25 +44,11 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
       $scope.isCurrentExperiment = false
 
-      Experiment.get id: $stateParams.id, (data) ->
-        $scope.experiment = data.experiment
-
-      $scope.$watch ->
-        Status.getData()
-      , (val) ->
-        if val
-          $scope.isCurrentExperiment = parseInt(val.experimentController?.expriment?.id) is parseInt($stateParams.id)
-          if $scope.isCurrentExperiment and $scope.scrollState >= 1
-            $scope.autoUpdateTemperatureLogs()
-          else
-            $scope.stopInterval()
-
       $scope.temperatureLogs = []
       $scope.temperatureLogsCache = []
       $scope.calibration = 800
       $scope.scrollState = 0
       $scope.updateInterval = null
-      $scope.resolutionOptionsIndex = 0
 
 
       $scope.resolutionOptions = [
@@ -50,22 +62,26 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         null
       ]
 
+      $scope.resolutionOptionsIndex = $scope.resolutionOptions.length-1
+
       $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
 
       Experiment
       .getTemperatureData($stateParams.id, resolution: 1000)
       .success (data) =>
+        hasTemperatureLogs = true
         if data.length > 0
           $scope.temperatureLogsCache = angular.copy data
           $scope.temperatureLogs = angular.copy data
-          $scope.updateScale()
-          $scope.resizeTemperatureLogs()
+          $scope.greatest_elapsed_time = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length - 1].temperature_log.elapsed_time
+
+          $scope.updateYScale()
           $scope.updateScrollWidth()
+          $scope.resizeTemperatureLogs()
+          $scope.updateResolution()
           $scope.updateData()
         else
           $scope.autoUpdateTemperatureLogs()
-
-    $scope.init()
 
     $scope.zoomOut = ->
       if $scope.resolutionOptionsIndex isnt ($scope.resolutionOptions.length - 1)
@@ -101,7 +117,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
         $scope.updateChart data
 
-    $scope.updateScale = ->
+    $scope.updateYScale = ->
       scales = _.map $scope.temperatureLogsCache, (temp_log) ->
         temp_log = temp_log.temperature_log
         greatest = Math.max.apply Math, [
@@ -117,9 +133,6 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
     $scope.updateScrollWidth = ->
 
       if $scope.temperatureLogsCache.length > 0
-
-        $scope.greatest_elapsed_time = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length - 1].temperature_log.elapsed_time
-
         $scope.widthPercent = $scope.resolution*1000/$scope.greatest_elapsed_time
         if $scope.widthPercent > 1
           $scope.widthPercent = 1
@@ -143,7 +156,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       $scope.temperatureLogs = averagedLogs
 
     $scope.updateResolution = =>
-      if $scope.temperatureLogsCache.length > 0
+      if $scope.temperatureLogsCache?.length > 0
 
         if ($scope.resolution)
           $scope.resizeTemperatureLogs()
@@ -171,23 +184,32 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         else
           $scope.stopInterval()
 
+    $scope.$on 'experiment:started', (e, expId) ->
+      if expId is $scope.experiment.id
+        $scope.isCurrentExperiment = true
+        $scope.autoUpdateTemperatureLogs()
+
     $scope.updateChart = (temperature_logs) ->
       $scope.data = ChartData.temperatureLogs(temperature_logs).toN3LineChart()
 
-    $scope.autoUpdateTemperatureLogs = =>
-      if !$scope.updateInterval and $scope.isCurrentExperiment and Status.getData().experimentController?.machine?.state is 'Running'
-        $scope.updateInterval = $interval () ->
-          Experiment
-          .getTemperatureData($stateParams.id, resolution: 1000)
-          .success (data) ->
-            $scope.temperatureLogsCache = angular.copy data
-            $scope.temperatureLogs = angular.copy data
-            $scope.updateScale()
-            $scope.resizeTemperatureLogs()
-            $scope.updateScrollWidth()
-            $scope.updateData()
+    updateFunc = ->
+      Experiment
+      .getTemperatureData($stateParams.id, resolution: 1000)
+      .success (data) ->
+        $scope.temperatureLogsCache = angular.copy data
+        $scope.temperatureLogs = angular.copy data
 
-        , 10000
+        $scope.updateYScale()
+        $scope.resizeTemperatureLogs()
+        $scope.updateScrollWidth()
+        $scope.updateResolution()
+        $scope.updateData()
+
+    $scope.autoUpdateTemperatureLogs = =>
+
+      if !$scope.updateInterval and $scope.isCurrentExperiment
+        updateFunc()
+        $scope.updateInterval = $interval updateFunc, 10000
 
       else if !$scope.isCurrentExperiment
         $scope.stopInterval()

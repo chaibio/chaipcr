@@ -1,5 +1,5 @@
 <div menu-overlay sidemenu-template="app/views/experiment/left-menu.html">
-  <div class="page-layout run-experiment" ng-controller="TemperatureLogCtrl">
+  <div class="page-layout run-experiment" ng-controller="TemperatureLogCtrl" ng-show="experiment && data">
     <!-- header -->
     <div class="header">
       <div class="row">
@@ -38,10 +38,10 @@
                   <div class="col-sm-6 zoom-buttons">
                     <div class="row">
                       <div class="col-sm-6">
-                        <div class="zoom-button" ng-click="zoomOut()">-</div>
+                        <div class="zoom-button" ng-click="zoomIn()">-</div>
                       </div>
                       <div class="col-sm-6">
-                        <div class="zoom-button" ng-click="zoomIn()">+</div>
+                        <div class="zoom-button" ng-click="zoomOut()">+</div>
                       </div>
                     </div>
                   </div>
@@ -66,6 +66,15 @@
             </div>
             <div class="text-center">Time</div>
           </div>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-md-8">
+          <choose-chart ng-model="chartTypeData"></choose-chart>
+        </div>
+        <div class="col-md-4">
+          <test-in-progress experiment-id="experiment.id"></test-in-progress>
         </div>
       </div>
 
