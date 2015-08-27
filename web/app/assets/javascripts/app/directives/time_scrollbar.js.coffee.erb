@@ -23,7 +23,6 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
         scrollbar.css 'width'
       , (newVal, oldVal) ->
         if newVal != oldVal
-          oldMargin = getMarginLeft()
           spaceWidth = getSpaceWidth()
           newMargin = spaceWidth * ngModel.$viewValue
           updateMargin newMargin
