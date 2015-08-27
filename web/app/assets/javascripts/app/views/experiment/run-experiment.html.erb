@@ -15,7 +15,23 @@
     </div>
     <!-- content -->
     <div class="content">
-      <temperature-log-chart experiment-id="experiment.id" ng-show="chartTypeData.chartType === 'Thermal Profile'"></temperature-log-chart>
+
+<div class="panel panel-primary">
+      <div class="panel-heading">Temperature Plot</div>
+      <div class="panel-body">
+        <div class="vertical-text">Temperature</div>
+        <div style="padding: 10px 0px;">
+        <div data="data" options="options" width="700" height="300" class="ng-isolate-scope chart">
+        </div>
+        </div>
+        <div class="scrollbar-container">
+          <div time-scrollbar ng-model="scrollState">
+          </div>
+        </div>
+        <div class="text-center">Time</div>
+      </div>
+    </div>
+
       <div ng-show="chartTypeData.chartType === 'Amplification Chart'">
         <h3>Show Amplification Chart here!</h3>
       </div>
