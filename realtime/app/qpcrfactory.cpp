@@ -76,7 +76,7 @@ shared_ptr<IControl> QPCRFactory::constructLid(ADCController::ConsumersList &con
     settings.maxTargetTemp = kLidMaxTargetTemp;
     settings.minTempThreshold = kLidLowTempShutdownThreshold;
     settings.maxTempThreshold = kLidHighTempShutdownThreshold;
-    settings.pidController = new PIDController({{150, 0.1, 100, 0}}, kLidPIDMin, kLidPIDMax, SinglePoleRecursiveFilter(0.01));
+    settings.pidController = new PIDController({{150, 0.2, 100, 0}}, kLidPIDMin, kLidPIDMax, SinglePoleRecursiveFilter(0.01));//was 150, 0.2, 100, 0
 
     consumer[ADCController::EReadLid] = settings.thermistor;
 
