@@ -196,14 +196,16 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       Experiment
       .getTemperatureData($stateParams.id, resolution: 1000)
       .success (data) ->
-        $scope.temperatureLogsCache = angular.copy data
-        $scope.temperatureLogs = angular.copy data
+        if data.length > 0
+          $scope.temperatureLogsCache = angular.copy data
+          $scope.temperatureLogs = angular.copy data
+          $scope.greatest_elapsed_time = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length - 1].temperature_log.elapsed_time
 
-        $scope.updateYScale()
-        $scope.resizeTemperatureLogs()
-        $scope.updateScrollWidth()
-        $scope.updateResolution()
-        $scope.updateData()
+          $scope.updateYScale()
+          $scope.updateScrollWidth()
+          $scope.resizeTemperatureLogs()
+          $scope.updateResolution()
+          $scope.updateData()
 
     $scope.autoUpdateTemperatureLogs = =>
       if !$scope.updateInterval
