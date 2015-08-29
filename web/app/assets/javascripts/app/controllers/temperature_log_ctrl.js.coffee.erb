@@ -207,8 +207,9 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         $scope.updateData()
 
     $scope.autoUpdateTemperatureLogs = =>
-      updateFunc()
-      $scope.updateInterval = $interval updateFunc, 10000
+      if !$scope.updateInterval
+        updateFunc()
+        $scope.updateInterval = $interval updateFunc, 10000
 
     $scope.stopInterval = =>
       $interval.cancel $scope.updateInterval if $scope.updateInterval
