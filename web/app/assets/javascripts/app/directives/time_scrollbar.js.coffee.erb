@@ -22,15 +22,14 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
       $scope.$watch ->
         getScrollBarWidth()
       , ->
-        if !ngModel.$viewValue
-          spaceWidth = getSpaceWidth()
-          val = getMarginLeft()/spaceWidth
-          ngModel.$setViewValue val
-          newMargin = spaceWidth * val
-          updateMargin newMargin
+        spaceWidth = getSpaceWidth()
+        val = getMarginLeft()/spaceWidth
+        ngModel.$setViewValue val
+        newMargin = spaceWidth * val
+        updateMargin newMargin
 
-          if spaceWidth is 0
-            ngModel.$setViewValue 1
+        if spaceWidth is 0
+          ngModel.$setViewValue 1
 
       $scope.$watch ->
         ngModel.$viewValue
