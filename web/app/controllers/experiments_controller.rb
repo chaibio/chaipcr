@@ -113,7 +113,7 @@ class ExperimentsController < ApplicationController
     if @experiment
       config   = Rails.configuration.database_configuration
       connection = Rserve::Connection.new
-      results = connection.eval("fluorescence_data('#{config[Rails.env]["database"]}', #{params[:id]})").to_ruby
+      results = connection.eval("fluorescence_data('#{config[Rails.env]["database"]}', #{@experiment.id}, #{@experiment.calibration_id})").to_ruby
       @fluorescence_data = []
       if !results[0].blank?
         (0...results[0].length).each do |i|
