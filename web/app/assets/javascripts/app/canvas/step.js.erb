@@ -241,16 +241,19 @@ window.ChaiBioTech.ngApp.factory('step', [
       this.selectStep = function() {
 
         if(previouslySelected.circle) {
-          var previouslySelectedStep = previouslySelected.circle.parent;
-
-          previouslySelectedStep.showHideFooter(false);
-          previouslySelectedStep.manageBorderPrevious('#ff9f00');
+          this.unSelectStep();
         }
 
         this.manageBorder("black");
         this.showHideFooter(true);
       };
 
+      this.unSelectStep = function() {
+        var previouslySelectedStep = previouslySelected.circle.parent;
+
+        previouslySelectedStep.showHideFooter(false);
+        previouslySelectedStep.manageBorderPrevious('#ff9f00');
+      };
     };
   }
 ]);

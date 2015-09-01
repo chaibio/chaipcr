@@ -6,7 +6,8 @@
   ***************************************/
 window.ChaiBioTech.ngApp.factory('events', [
   'ExperimentLoader',
-  function(ExperimentLoader) {
+  'previouslySelected',
+  function(ExperimentLoader, previouslySelected) {
     return function(C, $scope) {
 
       this.canvas = C.canvas;
@@ -17,9 +18,9 @@ window.ChaiBioTech.ngApp.factory('events', [
           and we send the changes to backbone views.
       ***************************************/
       this.canvas.on("mouse:down", function(evt) {
-
         if(evt.target) {
           var me;
+
           switch(evt.target.name)  {
 
             case "stepGroup":
@@ -46,6 +47,12 @@ window.ChaiBioTech.ngApp.factory('events', [
             break;
 
           }
+        } else { // if the click is on canvas
+
+          var circle = previouslySelected.circle;
+          circle.parent.parentStage.unSelectStage();
+          circle.parent.unSelectStep();
+          circle.makeItSmall();
         }
       });
 
