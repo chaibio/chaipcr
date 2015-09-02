@@ -43,7 +43,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
       this.canvas.setHeight(420);
       var width = (this.allStepViews.length * 122 > 1024) ? this.allStepViews.length * 120 : 1024;
-      this.canvas.setWidth(width + 50);
+      this.canvas.setWidth(width + 120);
 
       //$timeout(function(context) {
         //context.canvas.renderAll();
@@ -95,7 +95,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     this.loadImages = function() {
 
-      var noOfImages = this.images.length - 1;
+      /*var noOfImages = this.images.length - 1;
       var that = this;
       loadImageRecursion = function(index) {
         fabric.Image.fromURL("assets/" + that.images[index], function(img) {
@@ -110,7 +110,30 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         });
       };
 
-      loadImageRecursion(0);
+      loadImageRecursion(0);*/
+
+      var that = this;
+      fabric.Image.fromURL("<%=asset_path('common-step.png') %>", function(img) {
+        that.imageobjects[that.images[0]] = $.extend(true, {}, img);
+
+        fabric.Image.fromURL("<%=asset_path('black-footer.png') %>", function(img) {
+          that.imageobjects[that.images[1]] = $.extend(true, {}, img);
+
+          fabric.Image.fromURL("<%=asset_path('orange-footer.png') %>", function(img) {
+            that.imageobjects[that.images[2]] = $.extend(true, {}, img);
+
+            fabric.Image.fromURL("<%=asset_path('gather-data.png') %>", function(img) {
+              that.imageobjects[that.images[3]] = $.extend(true, {}, img);
+
+              fabric.Image.fromURL("<%=asset_path('gather-data-image.png') %>", function(img) {
+                that.imageobjects[that.images[4]] = $.extend(true, {}, img);
+                console.log("All images loaded .... !");
+                that.canvas.fire("imagesLoaded");
+              });
+            });
+          });
+        });
+      });
     };
 
     /*******************************************************/
@@ -274,8 +297,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       var length = this.allStepViews.length;
 
       for(var run = 0; run < length; run ++) {
-        if(movingObject.intersectsWithObject(this.allCircles[run].circleGroup)) {
-          console.log(run);
+        if(movingObject.intersectsWithObject(this.allStepViews[run].hitPoint)) {
+          console.log(run, "Hit", length);
           // Make the Jump;
           // use the previou to store the
           return false;

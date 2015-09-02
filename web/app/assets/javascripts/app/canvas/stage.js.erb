@@ -199,7 +199,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       };
 
       this.configureStepName = function(thisStep) {
-        
+
         if(thisStep.model.name === null) {
           thisStep.stepNameText = "STEP " + (thisStep.index + 1);
           thisStep.stepName.text = thisStep.stepNameText;
@@ -431,12 +431,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         var length = this.childSteps.length;
 
         if(previouslySelected.circle) {
-          var previousSelectedStage = previouslySelected.circle.parent.parentStage;
-          var previousLength = previousSelectedStage.childSteps.length;
-
-          previousSelectedStage.changeFillsAndStrokes("white");
-          previousSelectedStage.manageBordersOnSelection("#ff9f00");
-          previousSelectedStage.manageFooter(false, "white", previousLength);
+          this.unSelectStage();
         }
 
         this.changeFillsAndStrokes("black");
@@ -444,6 +439,15 @@ window.ChaiBioTech.ngApp.factory('stage', [
         this.manageFooter(true, "black", length);
       };
 
+      this.unSelectStage = function() {
+
+        var previousSelectedStage = previouslySelected.circle.parent.parentStage;
+        var previousLength = previousSelectedStage.childSteps.length;
+
+        previousSelectedStage.changeFillsAndStrokes("white");
+        previousSelectedStage.manageBordersOnSelection("#ff9f00");
+        previousSelectedStage.manageFooter(false, "white", previousLength);
+      }
     };
 
   }

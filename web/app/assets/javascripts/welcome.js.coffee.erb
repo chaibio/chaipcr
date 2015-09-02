@@ -2,7 +2,6 @@
 #= require ./app/libs/jstorage
 #= require angular
 #= require_self
-
 App = angular.module 'WelcomeApp', []
 
 App.config ['$httpProvider', ($httpProvider) ->
