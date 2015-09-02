@@ -111,6 +111,29 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       };
 
       loadImageRecursion(0);
+
+      /*var that = this;
+      fabric.Image.fromURL("<%=asset_path('common-step.png') %>", function(img) {
+        that.imageobjects[that.images[0]] = $.extend(true, {}, img);
+
+        fabric.Image.fromURL("<%=asset_path('black-footer.png') %>", function(img) {
+          that.imageobjects[that.images[1]] = $.extend(true, {}, img);
+
+          fabric.Image.fromURL("<%=asset_path('orange-footer.png') %>", function(img) {
+            that.imageobjects[that.images[2]] = $.extend(true, {}, img);
+
+            fabric.Image.fromURL("<%=asset_path('gather-data.png') %>", function(img) {
+              that.imageobjects[that.images[3]] = $.extend(true, {}, img);
+
+              fabric.Image.fromURL("<%=asset_path('gather-data-image.png') %>", function(img) {
+                that.imageobjects[that.images[4]] = $.extend(true, {}, img);
+                console.log("All images loaded .... !");
+                that.canvas.fire("imagesLoaded");
+              });
+            });
+          });
+        });
+      });*/
     };
 
     /*******************************************************/
