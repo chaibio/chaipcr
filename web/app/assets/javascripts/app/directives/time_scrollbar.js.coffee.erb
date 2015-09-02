@@ -19,9 +19,14 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
       scrollbar = elem.find('.scrollbar')
 
       # respond to change in scrollbar width
-      $scope.$watch ->
-        getScrollBarWidth()
-      , ->
+      $scope.$on 'scrollbar:width:changed', (e) ->
+
+        if getSpaceWidth() > 0 and ngModel.$viewValue is 'FULL'
+          ngModel.$setViewValue 1
+
+        if ngModel.$viewValue >= 1
+          updateMargin getElemWidth()-getScrollBarWidth()
+
         spaceWidth = getSpaceWidth()
         if spaceWidth > 0
           if !ngModel.$viewValue
@@ -31,17 +36,17 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
           updateMargin newMargin
 
         else
-          ngModel.$setViewValue 1
+          ngModel.$setViewValue 'FULL'
 
       $scope.$watch ->
         ngModel.$viewValue
       , (val, oldVal) ->
-        if val isnt oldVal
+        if val isnt oldVal and val isnt 'FULL' and !held
           val = parseFloat(val) || 0
           val = if (val > 1) then 1 else val
           val = if (val < 0) then 0 else val
 
-          if !held and angular.isNumber val
+          if angular.isNumber val
 
             ngModel.$setViewValue val
 
@@ -59,13 +64,13 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
           'userSelect': ''
 
       getMarginLeft = ->
-        parseFloat scrollbar.css('marginLeft').replace /px/, ''
+        parseInt scrollbar.css('marginLeft').replace /px/, ''
 
       getElemWidth = ->
-        parseFloat elem.css('width').replace /px/, ''
+        parseInt elem.css('width').replace /px/, ''
 
       getScrollBarWidth = ->
-        parseFloat scrollbar.css('width').replace /px/, ''
+        parseInt scrollbar.css('width').replace /px/, ''
 
       getSpaceWidth = ->
         getElemWidth() - getScrollBarWidth()
