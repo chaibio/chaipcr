@@ -274,8 +274,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       var length = this.allStepViews.length;
 
       for(var run = 0; run < length; run ++) {
-        if(movingObject.intersectsWithObject(this.allCircles[run].circleGroup)) {
-          console.log(run);
+        if(movingObject.intersectsWithObject(this.allStepViews[run].hitPoint)) {
+          console.log(run, "Hit", length);
           // Make the Jump;
           // use the previou to store the
           return false;

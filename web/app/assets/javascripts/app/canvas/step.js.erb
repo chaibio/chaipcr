@@ -219,6 +219,11 @@ window.ChaiBioTech.ngApp.factory('step', [
           .getUniqueName()
           .rampSpeed();
 
+        // We create a hitPoint so that we know if the move step actually over the particular step.
+        this.hitPoint = new fabric.Circle({
+          radius: 3, fill: '', left: this.left + 110, top: 310, selectable: false, name: "hitPoint"
+        });
+
         this.stepRect = new fabric.Rect({
             fill: '#ffb400',  width: this.myWidth,  height: 340,  selectable: false,  name: "step", me: this
           }
@@ -229,6 +234,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         });
 
         this.canvas.add(this.stepGroup);
+        this.canvas.add(this.hitPoint);
         this.addCircle();
       };
 
