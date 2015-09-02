@@ -95,7 +95,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     this.loadImages = function() {
 
-      var noOfImages = this.images.length - 1;
+      /*var noOfImages = this.images.length - 1;
       var that = this;
       loadImageRecursion = function(index) {
         fabric.Image.fromURL("assets/" + that.images[index], function(img) {
@@ -110,9 +110,9 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         });
       };
 
-      loadImageRecursion(0);
+      loadImageRecursion(0);*/
 
-      /*var that = this;
+      var that = this;
       fabric.Image.fromURL("<%=asset_path('common-step.png') %>", function(img) {
         that.imageobjects[that.images[0]] = $.extend(true, {}, img);
 
@@ -133,7 +133,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
             });
           });
         });
-      });*/
+      });
     };
 
     /*******************************************************/
