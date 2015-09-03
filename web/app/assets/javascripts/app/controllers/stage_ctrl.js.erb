@@ -4,15 +4,15 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
   'canvas',
   '$modal',
   'alerts',
-  '$rootScope',
-  function($scope, ExperimentLoader, canvas, $modal, alerts, $rootScope) {
+  'expName',
+  function($scope, ExperimentLoader, canvas, $modal, alerts, expName) {
 
     var that = this;
     $scope.stage = {};
     $scope.step = {};
 
-    $scope.$on("expName:Updated", function(evt, data) {
-      $scope.protocol.name = data.exp.name;
+    $scope.$on("expName:Updated", function() {
+      $scope.protocol.name = expName.name;
     });
 
     $scope.initiate = function() {
