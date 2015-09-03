@@ -2,8 +2,9 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
   '$scope'
   'focus'
   'Experiment'
-  '$stateParams'
-  ($scope, focus, Experiment, $stateParams) ->
+  '$stateParams',
+  '$rootScope',
+  ($scope, focus, Experiment, $stateParams, $rootScope) ->
 
     $scope.experiment = {}
 
@@ -32,6 +33,7 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
 
       promise.then ->
         $scope.success = "Experiment updated successfully"
+        $rootScope.$broadcast("expName:Updated", {"exp": $scope.experiment});
 
       promise.catch (resp) ->
         $scope.errors = resp.data.errors
