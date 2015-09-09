@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="ChaiBioTech">
 <head>
   <title>ChaiPCR</title>
   <meta charset="utf-8">
   <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
-  <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
+  <script src="/assets/application.js"></script>
   <%= csrf_meta_tags %>
 </head>
 <body>
 
-<div id="container" class="container-fluid">
-  <%= yield %>
-</div>
+  <div id="container" class="container-fluid">
+    <%= yield %>
+  </div>
 
 </body>
 </html>

@@ -1,0 +1,18 @@
+<div class="modal-warning">
+  <div class="modal-warning-content">
+    <!-- TITLE -->
+    <div class="modal-warning-title-container">
+      <div class="modal-warning-title"> DESCRIPTION OF ERROR</div>
+      <div class="modal-warning-close"><img ng-click="modal.close()" src="<%=asset_path('close-modal.png') %>"></div>
+    </div>
+    <!-- MESSAGE -->
+    <div class="modal-warning-message">
+      {{warningMessage}}
+    </div>
+    <!--BUTTON -->
+    <div class="modal-warning-button-container">
+      <button ng-click="modal.close()" value="OK">OK</button>
+    </div>
+
+  </div>
+</div>

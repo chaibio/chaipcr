@@ -1,0 +1,87 @@
+@import "./colors.css.scss";
+
+.welcome-page {
+  font-family: 'Open sans', sans-serif;
+
+  .container {
+    width: 1024px;
+  }
+
+  img.logo {
+    width: 100%;
+    margin-bottom: 70px;
+  }
+
+  .welcome-title {
+    color: $orange;
+    font-family: 'Fun City', sans-serif;
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 1;
+    padding-top: 50px;
+    text-align: center;
+  }
+
+  .welcome-subtitle {
+    color: $gray;
+    padding-top: 20px;
+    text-align: center;
+  }
+
+  form {
+    padding: 0px 20px;
+
+    .help-block {
+      text-align: center;
+    }
+    ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+        color:    $gray;
+    }
+    :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+       color:    $gray;
+       opacity:  1;
+    }
+    ::-moz-placeholder { /* Mozilla Firefox 19+ */
+       color:    $gray;
+       opacity:  1;
+    }
+    :-ms-input-placeholder { /* Internet Explorer 10-11 */
+       color:    $gray;
+    }
+  }
+
+  .input-group {
+    width: 100%;
+  }
+
+  input {
+    border-color: $gray;
+    border-radius: 0;
+    font-size: 15px;
+    font-weight: bold;
+    margin: 10px 0;
+    height: 50px;
+    text-align: center;
+  }
+
+  .btn-green {
+    background: $yellowgreen;
+    border-radius: 0;
+    color: #fff;
+    display: block;
+    font-family: 'Open Sans';
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    margin: 20px auto;
+    padding: 15px 70px;
+  }
+
+  img.chai-img {
+    display: block;
+    margin: 0 auto;
+    margin-top: 100px;
+    width: 100px;
+  }
+
+}

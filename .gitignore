@@ -29,3 +29,5 @@ cache
 *.log
 *.tlog
 Debug
+/node_modules/
+/frontend/.tmp/

@@ -1,0 +1,15 @@
+@import "./colors.css.scss";
+
+.text-blue {
+  color: $blue;
+}
+.text-green {
+  color: $green;
+}
+.text-red {
+  color: red;
+}
+
+.semi-bold {
+  font-weight: 600;
+}

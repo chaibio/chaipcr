@@ -1,0 +1,89 @@
+@import "./colors.css.scss";
+
+.experiment-properties-subtoption {
+  padding: 0px 20px;
+
+  .heading {
+    margin-top: 35px;
+    border-bottom: 1px solid #000;
+    font-size: 11px;
+    font-weight: bold;
+  }
+  .exp-name-container {
+    border-bottom: 2px solid #000;
+    margin-top: 20px;
+    height: 27px;
+
+    .exp-name {
+      border: none;
+      font-size: 30px;
+    }
+    input.exp-name {
+      margin-top: -7px;
+      padding: 0;
+      width: 100%;
+
+      &:focus {
+        outline: 0;
+      }
+    }
+    .action {
+      color : $blue;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+  }
+
+  .experiment-types-list {
+    .item {
+      cursor: pointer;
+      margin-top: 15px;
+
+      .ball {
+        border: 7px solid $lightgray;
+        border-radius: 100%;
+        display: inline-block;
+        height: 30px;
+        margin-top: -2px;
+        vertical-align: middle;
+        width: 30px;
+      }
+      .text {
+        display: inline-block;
+        font-weight: bold;
+        padding-left: 15px;
+      }
+
+      &.active {
+        .ball {
+          border-color: $blue;
+        }
+      }
+    }
+  }
+
+  .buttons-container {
+    margin-top: 70px;
+    padding: 0px 50px;
+
+    .button {
+      background: #fff;
+      border: 1px solid #000;
+      border-radius: 0px;
+      color: #000;
+      margin-top: 10px;
+
+      &.special {
+        margin-top: 50px;
+        background: $green;
+        border: none;
+        color: #fff;
+        padding: 5px 13px;
+      }
+    }
+  }
+
+
+
+}

@@ -1,0 +1,78 @@
+@font-face {
+  font-family: 'Fun City';
+  font-weight: 400;
+
+  src: font-url('funcity/2D178A_1_0.eot');
+  src: font-url('funcity/2D178A_1_0.ttf');
+  src: font-url('funcity/2D178A_1_0.woff');
+}
+
+@font-face {
+  font-family: 'Fun City';
+  font-weight: 700;
+  src: font-url('funcity/2D178A_0_0.eot');
+  src: font-url('funcity/2D178A_0_0.ttf');
+  src: font-url('funcity/2D178A_0_0.woff');
+}
+
+
+@font-face {
+    font-family: "simplifica";
+    src: font-url("simplifica.woff");
+}
+
+@font-face {
+    font-family: "Ostrich Sans";
+    src: font-url("ostrich-sans.woff");
+}
+
+@font-face {
+  font-family: "Open Sans";
+  font-weight: 300;
+  src: font-url("OpenSans-300.woff2");
+}
+@font-face {
+  font-family: "Open Sans";
+  font-weight: 400;
+  src: font-url("OpenSans-Regular.woff");
+}
+
+@font-face {
+  font-family: "Open Sans";
+  font-weight: 600;
+  src: font-url("OpenSans-600.woff2");
+}
+
+@font-face {
+  font-family: "Open Sans";
+  font-weight: 700;
+  src: font-url("OpenSans-700.woff2");
+}
+
+@font-face {
+  font-family: "Open Sans";
+  font-weight: 800;
+  src: font-url("OpenSans-800.woff2");
+}
+
+@font-face {
+  font-family: "roboto";
+  src: font-url("RobotoRegular.woff");
+}
+
+.simplifica {
+  font-family: "simplifica";
+  font-size: 30px;
+}
+
+.sansa {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+}
+.ostrich {
+  font-family: "Ostrich Sans";
+}
+
+.fun-city {
+  font-family: "Fun City";
+}

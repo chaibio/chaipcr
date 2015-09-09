@@ -1,0 +1,87 @@
+<div menu-overlay sidemenu-template="app/views/experiment/left-menu.html">
+  <div class="page-layout run-experiment" ng-controller="TemperatureLogCtrl">
+    <!-- header -->
+    <div class="header">
+      <div class="row">
+        <div class="col-sm-8">
+          <div class="stripes-and-name">
+            <a toggle-sidemenu>
+              <div class="stripes">
+                <div class="stripe"></div>
+                <div class="stripe"></div>
+                <div class="stripe"></div>
+              </div>
+            </a>
+            <div class="name-container">{{experiment.name}}</div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="row scrollbars-container">
+            <div class="col-sm-6 time-scrollbar-container">
+              <div class="row">
+                <div class="col-sm-4">
+                  <div class="text">SCROLL</div>
+                </div>
+                <div class="col-sm-8">
+                  <div class="scroll-container">
+                    <time-scrollbar ng-model="scrollState"></time-scrollbar>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="row">
+                <div class="zoom-container">
+                  <div class="col-sm-4">
+                    <div class="text">ZOOM</div>
+                  </div>
+                  <div class="col-sm-6 zoom-buttons">
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <div class="zoom-button" ng-click="zoomOut()">-</div>
+                      </div>
+                      <div class="col-sm-6">
+                        <div class="zoom-button" ng-click="zoomIn()">+</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- content -->
+    <div class="content">
+      <div class="temperature-log-chart">
+        <div class="panel panel-primary">
+          <div class="panel-heading">Temperature Plot</div>
+          <div class="panel-body" ng-show="!experiment || !temperatureLogsCache">
+            <h3 class="text-center">Loading...</h3>
+          </div>
+          <div class="panel-body" ng-show="experiment && temperatureLogsCache">
+            <div class="vertical-text">Temperature</div>
+            <div class="chart-container">
+              <linechart data="data" options="options" width="800" height="450"></linechart>
+              <div class="chart-drag-scroll" chart-drag-scroll ng-model="scrollState"></div>
+            </div>
+            <div class="scrollbar-container">
+            </div>
+            <div class="text-center">Time</div>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-md-8">
+          <choose-chart ng-model="chartTypeData"></choose-chart>
+        </div>
+        <div class="col-md-4">
+          <test-in-progress experiment-id="experiment.id"></test-in-progress>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
