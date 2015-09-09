@@ -4,7 +4,7 @@
   <title>ChaiPCR</title>
   <meta charset="utf-8">
   <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
-  <script type="text/javascript" src="/assets/js/application-81b4aca5a57c9e99bfd9.js"></script>
+  <!--scripts-->
   <%= csrf_meta_tags %>
 </head>
 <body>

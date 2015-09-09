@@ -1,9 +1,13 @@
 var gulp = require('gulp');
+var templateCache = require('gulp-angular-templatecache');
 var concat = require('gulp-concat');
 var coffee = require('gulp-coffee');
 var rename = require('gulp-rename');
+var replace = require('gulp-replace');
+var uglify = require('gulp-uglify');
 var gutil = require('gulp-util');
 var del = require('del');
+var hash;
 
 var vendorFiles = [
   'app/libs/jquery-1.10.1.min.js',
@@ -41,6 +45,7 @@ var appFiles = [
   'app/views/**/*.js',
   'app/canvas/**/*.js',
   'app/filters/**/*.js',
+  'templates.js',
 ];
 
 function _renameJS (path) {
@@ -50,8 +55,20 @@ function _renameJS (path) {
   path.extname  = '.js';
 }
 
+function _makeHash()
+{
+    var text = "";
+    var possible = "abcdef0123456789";
+    var length = 20;
+
+    for( var i=0; i < length; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+}
+
 gulp.task('clean-js', function (done) {
-  del(['frontend/.tmp/js/**/*', 'web/public/assets/javascripts/**/*']).then(function () {
+  del(['frontend/.tmp/js/**/*', 'web/public/assets/js/**/*']).then(function () {
     done();
   });
 });
@@ -64,13 +81,25 @@ gulp.task('coffee', ['clean-js'], function () {
          .on('error', gutil.log);
 });
 
-gulp.task('copy-js-to-tmp', ['clean-js'], function () {
+gulp.task('templates', function () {
+  return gulp.src(['./frontend/javascripts/app/views/**/*.html', './frontend/javascripts/**/*html.erb'])
+    .pipe(templateCache({
+      module: 'templates',
+      standalone: true,
+      transformUrl: function(url) {
+        return url.replace(/\.html\.erb$/, '.html')
+      }
+    }))
+    .pipe(gulp.dest('./frontend/.tmp/js'));
+});
+
+gulp.task('copy-js-to-tmp', ['clean-js', 'templates'], function () {
   return gulp.src(['frontend/javascripts/**/*.js.erb', 'frontend/javascripts/**/*.js'])
          .pipe(rename(_renameJS))
          .pipe(gulp.dest('frontend/.tmp/js'));
 });
 
-gulp.task('concat-js', ['clean-js', 'coffee', 'copy-js-to-tmp'], function () {
+gulp.task('concat-js', ['clean-js', 'coffee', 'copy-js-to-tmp', 'templates'], function () {
   var files = vendorFiles.concat(appFiles);
 
   for (var i = files.length - 1; i >= 0; i--) {
@@ -79,8 +108,46 @@ gulp.task('concat-js', ['clean-js', 'coffee', 'copy-js-to-tmp'], function () {
 
   return gulp.src(files)
          .pipe(concat('application.js'))
-         .pipe(gulp.dest('./web/public/assets/javascripts'));
+         .pipe(gulp.dest('./frontend/.tmp/js'));
 
 });
 
-gulp.task('js', ['concat-js']);
+gulp.task('uglify', ['concat-js', 'hash-js'], function () {
+  return gulp.src('./frontend/.tmp/js/application-'+hash+'.js')
+         .pipe(uglify())
+         .pipe(gulp.dest('./frontend/.tmp/js'));
+});
+
+gulp.task('hash-js', ['concat-js'], function () {
+  hash = _makeHash();
+
+  return gulp.src('./frontend/.tmp/js/application.js')
+         .pipe(rename(function (path) {
+            path.basename = path.basename + '-' + hash;
+         }))
+         .pipe(gulp.dest('./frontend/.tmp/js'));
+
+});
+
+gulp.task('markup-js-link', ['hash-js'], function () {
+  var pattern = /<\!--scripts-->/;
+  var scriptTag = '<script type="text/javascript" src="/assets/js/application-'+hash+'.js"></script>';
+
+  return gulp.src('./web/app/views/**/*.source')
+         .pipe(replace(pattern, scriptTag))
+         .pipe(rename(function (path) {
+           path.basename = path.basename.replace('.erb.source', '');
+           path.extname = '';
+         }))
+         .pipe(gulp.dest('./web/app/views'));
+});
+
+gulp.task('js:debug', ['concat-js', 'markup-js-link'], function () {
+  return gulp.src('./frontend/.tmp/js/application-'+hash+'.js')
+         .pipe(gulp.dest('./web/public/assets/js'));
+});
+
+gulp.task('js:deploy', ['uglify', 'markup-js-link'], function () {
+  return gulp.src('./frontend/.tmp/js/application-'+hash+'.js')
+         .pipe(gulp.dest('./web/public/assets/js'));
+});

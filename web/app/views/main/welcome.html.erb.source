@@ -4,8 +4,11 @@
   <base href="/">
   <meta charset="UTF-8">
   <title>ChaiBioTech | Welcome</title>
-  <%= stylesheet_link_tag "application" %>
-  <script src="/assets/application.js"></script>
+  <!-- css:start -->
+  <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
+  <!-- css:end -->
+  <!--scripts-->
+
   <%= csrf_meta_tags %>
 </head>
 <body>
