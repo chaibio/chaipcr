@@ -31,6 +31,7 @@ cache
 Debug
 /node_modules/
 /frontend/.tmp/
-/web/views/layouts/application.html.erb
-/web/views/main/login.html.erb
-/web/views/main/welcome.html.erb
+/web/public/assets/
+/web/app/views/layouts/application.html.erb
+/web/app/views/main/login.html.erb
+/web/app/views/main/welcome.html.erb
