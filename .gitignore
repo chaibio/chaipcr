@@ -32,6 +32,3 @@ Debug
 /node_modules/
 /frontend/.tmp/
 /web/public/assets/
-/web/app/views/layouts/application.html.erb
-/web/app/views/main/login.html.erb
-/web/app/views/main/welcome.html.erb

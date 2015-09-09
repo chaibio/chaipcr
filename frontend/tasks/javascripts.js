@@ -130,15 +130,11 @@ gulp.task('hash-js', ['concat-js'], function () {
 });
 
 gulp.task('markup-js-link', ['hash-js'], function () {
-  var pattern = /<\!--scripts-->/;
-  var scriptTag = '<script type="text/javascript" src="/assets/js/application-'+hash+'.js"></script>';
+  var pattern = /src=\"\/assets\/js\/application-(.*)\.js\"/;
+  var replacement = 'src="/assets/js/application-'+hash+'.js"';
 
-  return gulp.src('./web/app/views/**/*.source')
-         .pipe(replace(pattern, scriptTag))
-         .pipe(rename(function (path) {
-           path.basename = path.basename.replace('.erb.source', '');
-           path.extname = '';
-         }))
+  return gulp.src('./web/app/views/**/*.html.erb')
+         .pipe(replace(pattern, replacement))
          .pipe(gulp.dest('./web/app/views'));
 });
 

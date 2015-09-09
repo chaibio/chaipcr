@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="WelcomeApp">
+<head>
+  <base href="/">
+  <meta charset="UTF-8">
+  <title>ChaiBioTech | Welcome</title>
+  <!-- css:start -->
+  <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
+  <!-- css:end -->
+  <script type="text/javascript" src="/assets/js/application-f16accde87b1aae969c7.js"></script>
+
+  <%= csrf_meta_tags %>
+</head>
+<body>
+  <div class="container">
+    <div class="welcome-page">
+      <div class="container-fluid" ng-controller="WelcomeCtrl">
+        <div class="row">
+          <div class="col-sm-8 col-sm-offset-2">
+            <img src="/assets/logo-qpcr-large.png" alt="" class="logo">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="welcome-title">
+              WELCOME TO <br>
+              OPENQPCR
+            </div>
+            <div class="welcome-subtitle">
+              Please create an account to get started.
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <form name="registrationForm" role="form" ng-submit="submit(user)">
+              <div class="input-group">
+                <input type="email" class="form-control" ng-model="user.email" placeholder="EMAIL ADDRESS">
+                <span ng-repeat="err in errors.email" class="help-block">
+                  <span class="text-danger">Email {{err}}</span>
+                </span>
+              </div>
+              <div class="input-group">
+                <input type="password" class="form-control" ng-model="user.password" placeholder="PASSWORD">
+                <span ng-repeat="err in errors.password" class="help-block">
+                  <span class="text-danger">Password {{err}}</span>
+                </span>
+              </div>
+              <div class="input-group">
+                <input type="password" class="form-control" ng-model="user.password_confirmation" placeholder="CONFIRM PASSWORD">
+                <span ng-repeat="err in errors.password_confirmation" class="help-block">
+                  <span class="text-danger">Password confirmation {{err}}</span>
+                </span>
+              </div>
+              <button class="btn btn-green">CREATE ACCOUNT</button>
+            </form>
+            <img src="/assets/chai.png" alt="" class="chai-img">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
