@@ -29,12 +29,12 @@
 
       .login-field {
         width: 430px;
-        height: 52px;
+        height: 57px;
         border-bottom: 1px solid #cbcbcb;
       }
 
       .login-field-text {
-        float: left;
+        display: inline-block;
         margin-top: 31px;
         color: #585858;
         font-size: 18px;
@@ -43,7 +43,7 @@
 
       .login-text-field {
 
-        float: left;
+        display: inline-block;
         margin-left: 10px;
 
         margin-top: 25px;
@@ -62,6 +62,7 @@
         background-color: black;
         border: none;
         color: white;
+        font-size: 13px;
         font-weight: 400;
         margin-top: 33px;
       }
