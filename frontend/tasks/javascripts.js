@@ -57,7 +57,7 @@ function _renameJS (path) {
 }
 
 gulp.task('clean-js', function (done) {
-  del(['frontend/.tmp/js/**/*', 'web/public/javascripts/**/*']).then(function () {
+  del(['.tmp/js/**/*', 'web/public/javascripts/**/*']).then(function () {
     done();
   });
 });
@@ -66,7 +66,7 @@ gulp.task('coffee', ['clean-js'], function () {
   return gulp.src(['frontend/javascripts/**/*.coffee', 'frontend/javascripts/**/*.coffee.erb'])
          .pipe(coffee({bare: true}))
          .pipe(rename(_renameJS))
-         .pipe(gulp.dest('frontend/.tmp/js'))
+         .pipe(gulp.dest('.tmp/js'))
          .on('error', gutil.log);
 });
 
@@ -79,42 +79,42 @@ gulp.task('templates', function () {
         return url.replace(/\.html\.erb$/, '.html')
       }
     }))
-    .pipe(gulp.dest('./frontend/.tmp/js'));
+    .pipe(gulp.dest('./.tmp/js'));
 });
 
 gulp.task('copy-js-to-tmp', ['clean-js', 'templates'], function () {
   return gulp.src(['frontend/javascripts/**/*.js.erb', 'frontend/javascripts/**/*.js'])
          .pipe(rename(_renameJS))
-         .pipe(gulp.dest('frontend/.tmp/js'));
+         .pipe(gulp.dest('.tmp/js'));
 });
 
 gulp.task('concat-js', ['clean-js', 'coffee', 'copy-js-to-tmp', 'templates'], function () {
   var files = vendorFiles.concat(appFiles);
 
   for (var i = files.length - 1; i >= 0; i--) {
-    files[i] = './frontend/.tmp/js/' + files[i];
+    files[i] = './.tmp/js/' + files[i];
   };
 
   return gulp.src(files)
          .pipe(concat('application.js'))
-         .pipe(gulp.dest('./frontend/.tmp/js'));
+         .pipe(gulp.dest('./.tmp/js'));
 
 });
 
 gulp.task('uglify', ['concat-js', 'hash-js'], function () {
-  return gulp.src('./frontend/.tmp/js/application-'+hash+'.js')
+  return gulp.src('./.tmp/js/application-'+hash+'.js')
          .pipe(uglify())
-         .pipe(gulp.dest('./frontend/.tmp/js'));
+         .pipe(gulp.dest('./.tmp/js'));
 });
 
 gulp.task('hash-js', ['concat-js'], function () {
   hash = _makeHash();
 
-  return gulp.src('./frontend/.tmp/js/application.js')
+  return gulp.src('./.tmp/js/application.js')
          .pipe(rename(function (path) {
             path.basename = path.basename + '-' + hash;
          }))
-         .pipe(gulp.dest('./frontend/.tmp/js'));
+         .pipe(gulp.dest('./.tmp/js'));
 
 });
 
@@ -128,11 +128,11 @@ gulp.task('markup-js-link', ['hash-js'], function () {
 });
 
 gulp.task('js:debug', ['concat-js', 'markup-js-link'], function () {
-  return gulp.src('./frontend/.tmp/js/application-'+hash+'.js')
+  return gulp.src('./.tmp/js/application-'+hash+'.js')
          .pipe(gulp.dest('./web/public/javascripts'));
 });
 
 gulp.task('js:deploy', ['uglify', 'markup-js-link'], function () {
-  return gulp.src('./frontend/.tmp/js/application-'+hash+'.js')
+  return gulp.src('./.tmp/js/application-'+hash+'.js')
          .pipe(gulp.dest('./web/public/javascripts'));
 });

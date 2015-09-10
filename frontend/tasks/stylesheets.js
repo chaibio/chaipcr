@@ -9,7 +9,7 @@ var makeHash = require('./helpers').makeHash;
 var hash;
 
 gulp.task('clean-css', function (done) {
-  del(['./frontend/.tmp/css/**/*', './web/public/stylesheets/**/*'])
+  del(['./.tmp/css/**/*', './web/public/stylesheets/**/*'])
   .then(function () {done();});
 });
 
@@ -22,35 +22,35 @@ gulp.task('sass', ['clean-css'], function () {
         .pipe(sass({
           includePaths: ['./frontend/stylesheets']
         }).on('error', sass.logError))
-        .pipe(gulp.dest('./frontend/.tmp/css'));
+        .pipe(gulp.dest('./.tmp/css'));
 });
 
 gulp.task('copy-css-tmp', ['clean-css'], function () {
   return gulp.src('./frontend/stylesheets/**/*.css')
-         .pipe(gulp.dest('./frontend/.tmp/css'));
+         .pipe(gulp.dest('./.tmp/css'));
 });
 
 gulp.task('concat-css', ['copy-css-tmp', 'sass'], function () {
-  return gulp.src(['./frontend/.tmp/css/**/*'])
+  return gulp.src(['./.tmp/css/**/*'])
          .pipe(concat("application.css"))
-         .pipe(gulp.dest('./frontend/.tmp/css'));
+         .pipe(gulp.dest('./.tmp/css'));
 });
 
 gulp.task('minify-css', ['concat-css', 'hash-css'], function () {
-  return gulp.src('./frontend/.tmp/css/application-'+hash+'.css')
+  return gulp.src('./.tmp/css/application-'+hash+'.css')
          .pipe(minifyCss({keepSpecialComments: 0}))
-         .pipe(gulp.dest('./frontend/.tmp/css'))
+         .pipe(gulp.dest('./.tmp/css'))
 });
 
 gulp.task('hash-css', ['concat-css'], function () {
 
   hash = makeHash();
 
-  return gulp.src('./frontend/.tmp/css/application.css')
+  return gulp.src('./.tmp/css/application.css')
          .pipe(rename(function (path) {
            path.basename = path.basename + '-' + hash;
          }))
-         .pipe(gulp.dest('./frontend/.tmp/css'));
+         .pipe(gulp.dest('./.tmp/css'));
 });
 
 gulp.task('markup-css-link', ['hash-css'], function () {
@@ -63,11 +63,11 @@ gulp.task('markup-css-link', ['hash-css'], function () {
 });
 
 gulp.task('css:debug', ['clean-css', 'concat-css', 'markup-css-link'], function () {
-  return gulp.src('./frontend/.tmp/css/application-'+hash+'.css')
+  return gulp.src('./.tmp/css/application-'+hash+'.css')
          .pipe(gulp.dest('./web/public/stylesheets'));
 });
 
 gulp.task('css:deploy', ['clean-css', 'concat-css', 'minify-css', 'markup-css-link'], function () {
-  return gulp.src('./frontend/.tmp/css/application-'+hash+'.css')
+  return gulp.src('./.tmp/css/application-'+hash+'.css')
          .pipe(gulp.dest('./web/public/stylesheets'));
 });

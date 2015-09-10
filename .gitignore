@@ -30,7 +30,7 @@ cache
 *.tlog
 Debug
 /node_modules/
-/frontend/.tmp/
+/.tmp/
 /web/public/fonts/
 /web/public/images/
 /web/public/javascripts/
