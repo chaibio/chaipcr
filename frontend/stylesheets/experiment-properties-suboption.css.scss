@@ -12,14 +12,15 @@
   .exp-name-container {
     border-bottom: 2px solid #000;
     margin-top: 20px;
-    height: 27px;
+    height: 40px;
 
     .exp-name {
       border: none;
       font-size: 30px;
     }
     input.exp-name {
-      margin-top: -7px;
+      background: transparent;
+      margin-top: 0px;
       padding: 0;
       width: 100%;
 
