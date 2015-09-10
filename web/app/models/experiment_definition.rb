@@ -6,9 +6,8 @@ class ExperimentDefinition < ActiveRecord::Base
   TYPE_CALIBRATION  = "calibration"
   
   DEFAULT_PROTOCOL = {lid_temperature:110, stages:[
-                      {stage:{stage_type:"holding",steps:[{step:{temperature:95,hold_time:180}}]}}, 
-                      {stage:{stage_type:"cycling"}},
-                      {stage:{stage_type:"holding",steps:[{step:{temperature:4,hold_time:0}}]}}]}
+                      {stage:{stage_type:"holding",steps:[{step:{name:"Initial Denaturing",temperature:95,hold_time:180}}]}},
+                      {stage:{stage_type:"cycling",steps:[{step:{name:"Denature",temperature:95,hold_time:30}},{step:{name:"Anneal",temperature:60,hold_time:30,collect_data:true}}]}}]}
                       
   validates :name, presence: true
   
