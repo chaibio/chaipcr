@@ -63,6 +63,7 @@ end
 Experiment.seed do |s|
   s.id = 1
   s.experiment_definition_id = 1
+  s.calibration_id = 1
 end
 
 waterstep_defaults = { step_id: 2, fluorescence_value: 1, cycle_num: 1, experiment_id: 1 }
