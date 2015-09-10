@@ -7,6 +7,7 @@ var replace = require('gulp-replace');
 var uglify = require('gulp-uglify');
 var gutil = require('gulp-util');
 var del = require('del');
+var _makeHash = require('./helpers').makeHash;
 var hash;
 
 var vendorFiles = [
@@ -55,20 +56,8 @@ function _renameJS (path) {
   path.extname  = '.js';
 }
 
-function _makeHash()
-{
-    var text = "";
-    var possible = "abcdef0123456789";
-    var length = 20;
-
-    for( var i=0; i < length; i++ )
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    return text;
-}
-
 gulp.task('clean-js', function (done) {
-  del(['frontend/.tmp/js/**/*', 'web/public/assets/js/**/*']).then(function () {
+  del(['frontend/.tmp/js/**/*', 'web/public/javascripts/**/*']).then(function () {
     done();
   });
 });
@@ -130,8 +119,8 @@ gulp.task('hash-js', ['concat-js'], function () {
 });
 
 gulp.task('markup-js-link', ['hash-js'], function () {
-  var pattern = /src=\"\/assets\/js\/application-(.*)\.js\"/;
-  var replacement = 'src="/assets/js/application-'+hash+'.js"';
+  var pattern = /src=\"\/javascripts\/application-(.*)\.js\"/;
+  var replacement = 'src="/javascripts/application-'+hash+'.js"';
 
   return gulp.src('./web/app/views/**/*.html.erb')
          .pipe(replace(pattern, replacement))
@@ -140,10 +129,10 @@ gulp.task('markup-js-link', ['hash-js'], function () {
 
 gulp.task('js:debug', ['concat-js', 'markup-js-link'], function () {
   return gulp.src('./frontend/.tmp/js/application-'+hash+'.js')
-         .pipe(gulp.dest('./web/public/assets/js'));
+         .pipe(gulp.dest('./web/public/javascripts'));
 });
 
 gulp.task('js:deploy', ['uglify', 'markup-js-link'], function () {
   return gulp.src('./frontend/.tmp/js/application-'+hash+'.js')
-         .pipe(gulp.dest('./web/public/assets/js'));
+         .pipe(gulp.dest('./web/public/javascripts'));
 });

@@ -65,7 +65,7 @@
                   width: 30px;
                   height: 30px;
                   float: left;
-                  background-image: image-url("smallO.png");
+                  background-image: url("/images/smallO.png");
                   margin-left: 24px;
                 }
                 .menu-item-text {
@@ -104,7 +104,7 @@
                   width: 60px;
                   height: 60px;
                   float: left;
-                  background-image: image-url("bigO.png");
+                  background-image: url("/images/bigO.png");
                   margin-left: 11px;
                 }
                 .menu-item-text {
@@ -213,7 +213,7 @@
               margin-left: 10px;
             }
             .image-red {
-              background-image: image-url('smallredO.png');
+              background-image: url('/images/smallredO.png');
               width: 30px;
               height: 30px;
             }

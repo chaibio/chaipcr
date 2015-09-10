@@ -19,7 +19,7 @@
   <div class="bottom-button-container bottom-autodelta-button">
     <div id="delta-button" class="delta-button-{{stage.auto_delta}}" ng-click="changeDelta()">
       <div class="delta-button-image-container">
-        <img class="delta-button-image" ng-show="stage.auto_delta" ng-src="<%=asset_path('delta-image.png') %>">
+        <img class="delta-button-image" ng-show="stage.auto_delta" ng-src="/images/delta-image.png">
       </div>
       <div class="delta-button-text">
         AUTODELTA {{delta_state}}
@@ -29,7 +29,7 @@
   <div class="bottom-button-container">
     <div id="gather-data-button" class="gather-data-button-{{step.collect_data || step.ramp.collect_data}}" ng-click="popUp = true">
       <div class="gather-data-button-image-container">
-        <img class="gather-data-button-image" ng-show="step.collect_data || step.ramp.collect_data" ng-src="<%=asset_path('gather-data-image.png') %>">
+        <img class="gather-data-button-image" ng-show="step.collect_data || step.ramp.collect_data" ng-src="/images/gather-data-image.png">
       </div>
       <div class="gather-data-button-text">
         GATHER DATA {{gather_data_state}}
@@ -42,7 +42,7 @@
       <div class="gather-data-popup-content">
         <div class="small-button first sansa" id="during-step" ng-click="changeDuringStep()">
           <div class="tik-image-container">
-            <img ng-show="step.collect_data" class="tik-image-during-step" src="<%=asset_path('tik.png') %>">
+            <img ng-show="step.collect_data" class="tik-image-during-step" src="/images/tik.png">
           </div>
           <div class="tik-text-container">
             <span>DURING STEP</span>
@@ -50,7 +50,7 @@
         </div>
         <div class="small-button sansa" id="after-step" ng-click="changeDuringRamp()">
           <div class="tik-image-container">
-            <img ng-show="step.ramp.collect_data" class="tik-image-during-ramp" src="<%=asset_path('tik.png') %>">
+            <img ng-show="step.ramp.collect_data" class="tik-image-during-ramp" src="/images/tik.png">
           </div>
           <div class="tik-text-container">
             <span>DURING RAMP</span>

@@ -31,4 +31,7 @@ cache
 Debug
 /node_modules/
 /frontend/.tmp/
-/web/public/assets/
+/web/public/fonts/
+/web/public/images/
+/web/public/javascripts/
+/web/public/stylesheets/

@@ -29,7 +29,7 @@
       margin-left: 13px;
       font-size: 18px;
       margin-top: 2px;
-      font-family: "fun city";
+      font-family: "Fun City";
     }
 
     .stripes-and-name {
@@ -171,14 +171,14 @@
         cursor: pointer;
       }
       .check-box {
-        background-image: image-url("checkbox-unchecked.png");
+        background-image: url("/images/checkbox-unchecked.png");
         background-size: 100% 100%;
         width: 50px;
         height: 50px;
         display: inline-block;
         vertical-align: middle;
         &.checked {
-          background-image: image-url("checkbox-checked.png");
+          background-image: url("/images/checkbox-checked.png");
         }
         &.placeholder {
           background: transparent;
@@ -211,7 +211,7 @@
         height: 30px;
         width: 30px;
         background-color: #fff !important;
-        background-image: image-url('btn-remove-user.png');
+        background-image: url('/images/btn-remove-user.png');
         background-size: 100% 100%;
         float: right;
       }
