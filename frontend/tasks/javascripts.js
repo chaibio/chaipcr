@@ -8,7 +8,10 @@ var uglify = require('gulp-uglify');
 var gutil = require('gulp-util');
 var del = require('del');
 var _makeHash = require('./helpers').makeHash;
-var hash;
+var debug;
+var applicationDebugJS = 'application-debug';
+var applicationTmpJS = 'application-tmp';
+var applicationJS;
 
 var vendorFiles = [
   'app/libs/jquery-1.10.1.min.js',
@@ -56,6 +59,16 @@ function _renameJS (path) {
   path.extname  = '.js';
 }
 
+gulp.task('set-js-debug', function (done) {
+  debug = true;
+  done();
+});
+
+gulp.task('set-js-deploy', function (done) {
+  debug = false;
+  done();
+});
+
 gulp.task('clean-js', function (done) {
   del(['.tmp/js/**/*', 'web/public/javascripts/**/*']).then(function () {
     done();
@@ -79,7 +92,7 @@ gulp.task('templates', function () {
         return url.replace(/\.html\.erb$/, '.html')
       }
     }))
-    .pipe(gulp.dest('./.tmp/js'));
+    .pipe(gulp.dest('.tmp/js'));
 });
 
 gulp.task('copy-js-to-tmp', ['clean-js', 'templates'], function () {
@@ -92,47 +105,48 @@ gulp.task('concat-js', ['clean-js', 'coffee', 'copy-js-to-tmp', 'templates'], fu
   var files = vendorFiles.concat(appFiles);
 
   for (var i = files.length - 1; i >= 0; i--) {
-    files[i] = './.tmp/js/' + files[i];
+    files[i] = '.tmp/js/' + files[i];
   };
 
   return gulp.src(files)
-         .pipe(concat('application.js'))
-         .pipe(gulp.dest('./.tmp/js'));
+         .pipe(concat(applicationTmpJS + '.js'))
+         .pipe(gulp.dest('.tmp/js'));
+
+});
+
+gulp.task('hash-js', ['concat-js'], function () {
+  var hash = _makeHash();
+
+  return gulp.src('.tmp/js/'+applicationTmpJS+'.js')
+         .pipe(rename(function (path) {
+            path.basename = debug? applicationDebugJS : 'application-' + hash;
+            applicationJS = path.basename;
+         }))
+         .pipe(gulp.dest('.tmp/js'));
 
 });
 
 gulp.task('uglify', ['concat-js', 'hash-js'], function () {
-  return gulp.src('./.tmp/js/application-'+hash+'.js')
+  return gulp.src('.tmp/js/'+applicationJS+'.js')
          .pipe(uglify())
-         .pipe(gulp.dest('./.tmp/js'));
-});
-
-gulp.task('hash-js', ['concat-js'], function () {
-  hash = _makeHash();
-
-  return gulp.src('./.tmp/js/application.js')
-         .pipe(rename(function (path) {
-            path.basename = path.basename + '-' + hash;
-         }))
-         .pipe(gulp.dest('./.tmp/js'));
-
+         .pipe(gulp.dest('.tmp/js'));
 });
 
 gulp.task('markup-js-link', ['hash-js'], function () {
-  var pattern = /src=\"\/javascripts\/application-(.*)\.js\"/;
-  var replacement = 'src="/javascripts/application-'+hash+'.js"';
+  var pattern = /src=\"\/javascripts\/application((.*)?)\.js\"/;
+  var replacement = 'src="/javascripts/'+applicationJS+'.js"';
 
   return gulp.src('./web/app/views/**/*.html.erb')
          .pipe(replace(pattern, replacement))
          .pipe(gulp.dest('./web/app/views'));
 });
 
-gulp.task('js:debug', ['concat-js', 'markup-js-link'], function () {
-  return gulp.src('./.tmp/js/application-'+hash+'.js')
+gulp.task('js:debug', ['set-js-debug', 'concat-js', 'markup-js-link'], function () {
+  return gulp.src('.tmp/js/'+applicationJS+'.js')
          .pipe(gulp.dest('./web/public/javascripts'));
 });
 
-gulp.task('js:deploy', ['uglify', 'markup-js-link'], function () {
-  return gulp.src('./.tmp/js/application-'+hash+'.js')
+gulp.task('js:deploy', ['set-js-deploy', 'uglify', 'markup-js-link'], function () {
+  return gulp.src('.tmp/js/'+applicationJS+'.js')
          .pipe(gulp.dest('./web/public/javascripts'));
 });
