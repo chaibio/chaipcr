@@ -26,7 +26,7 @@
 
         .menu-content {
           border-bottom: solid 1px black;
-          height: 22px;
+          height: 33px;
           // HEading part
           .menu-heading {
             height: 100%;
@@ -37,10 +37,11 @@
               height: 100%;
             }
             .logout-text {
-              width:150px;
               float: right;
-              text-align: right;
               height: 100%;
+              padding-top: 10px;
+              text-align: right;
+              width:150px;
 
               a {
                 color: #00aeef;
@@ -72,7 +73,7 @@
                   width: 300px;
                   float: left;
                   margin-left: 12px;
-                  margin-top: 8px;
+                  margin-top: 2px;
                   font-size: 22px;
                   cursor: pointer;
                 }
@@ -111,7 +112,7 @@
                   width: 300px;
                   float: left;
                   margin-left: 12px;
-                  margin-top: 22px;
+                  margin-top: 15px;
                   font-size: 30px;
                   cursor: pointer;
                 }
@@ -219,7 +220,8 @@
             }
             .text {
               margin-left: 15px;
-              margin-top: 8px;
+              margin-top: -4px;
+              margin-bottom: -10px;
               cursor: pointer;
             }
           }
@@ -312,9 +314,9 @@
                 border: 2px solid red;
                 color: red;
                 cursor: pointer;
-                text-align: center;
-                padding-top: 4px;
                 font-size: 25px;
+                line-height: 1.1;
+                text-align: center;
               }
             }
             .second-row {
