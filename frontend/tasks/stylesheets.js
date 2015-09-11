@@ -76,12 +76,12 @@ gulp.task('markup-css-link', ['hash-css'], function () {
          .pipe(gulp.dest('./web/app/views'));
 });
 
-gulp.task('css:debug', ['set-css-debug', 'clean-css', 'concat-css', 'markup-css-link'], function () {
+gulp.task('css:debug', ['copy-fonts-and-images', 'set-css-debug', 'clean-css', 'concat-css', 'markup-css-link'], function () {
   return gulp.src('./.tmp/css/'+applicationCSS+'.css')
          .pipe(gulp.dest('./web/public/stylesheets'));
 });
 
-gulp.task('css:deploy', ['set-css-deploy', 'clean-css', 'concat-css', 'minify-css', 'markup-css-link'], function () {
+gulp.task('css:deploy', ['copy-fonts-and-images', 'set-css-deploy', 'clean-css', 'concat-css', 'minify-css', 'markup-css-link'], function () {
   return gulp.src('./.tmp/css/'+applicationCSS+'.css')
          .pipe(gulp.dest('./web/public/stylesheets'));
 });
