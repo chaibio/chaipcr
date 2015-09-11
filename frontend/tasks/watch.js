@@ -8,5 +8,5 @@ gulp.task('watch', function () {
   ], ['css:debug', 'js:debug']);
 });
 
-gulp.task('build', ['css:debug', 'js:debug']);
+gulp.task('debug', ['css:debug', 'js:debug']);
 gulp.task('deploy', ['css:deploy', 'js:deploy']);
