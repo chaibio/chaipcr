@@ -1,0 +1,63 @@
+{
+    "heatblock":
+    {
+        "zone1":
+        {
+            "temperature": "95",
+            "drive": "0.212"
+        },
+        "zone2":
+        {
+            "temperature": "95",
+            "drive": "0.222"
+        },
+        "temperature": "95.0001"
+    },
+    "lid":
+    {
+        "temperature": "110.094",
+        "drive": "0.279"
+    },
+    "optics":
+    {
+        "intensity": "60",
+        "collectData": "false",
+        "lidOpen": "false",
+        "photodiodeValue": "1"
+    },
+    "heatSink":
+    {
+        "temperature": "31.599",
+        "fanDrive": "0"
+    },
+    "experimentController":
+    {
+        "machine":
+        {
+            "state": "Running",
+            "thermal_state": "Running"
+        },
+        "expriment":
+        {
+            "id": null,
+            "run_duration": "0",
+            "estimated_duration": "508",
+            "paused_duration": "0",
+            "name": "New Experiment",
+            "started_at": "2015-Jul-17 22:08:29.530621",
+            "stage":
+            {
+                "id": "35",
+                "name": "Stage 1",
+                "number": "2",
+                "cycle": "2"
+            },
+            "step":
+            {
+                "id": "46",
+                "name": "Step 0",
+                "number": "1"
+            }
+        }
+    }
+}

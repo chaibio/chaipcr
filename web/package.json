@@ -1,0 +1,20 @@
+{
+  "name": "chai-status-api",
+  "version": "1.0.0",
+  "description": "Mock /status api",
+  "main": "server.js",
+  "directories": {
+    "doc": "doc",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node server.js",
+    "start": "node server.js"
+  },
+  "author": "Adones Pitogo",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.13.3",
+    "mysql": "^2.9.0"
+  }
+}

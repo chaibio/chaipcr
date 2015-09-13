@@ -34,30 +34,8 @@
     {
         "machine":
         {
-            "state": "Running",
-            "thermal_state": "Heating"
-        },
-        "expriment":
-        {
-            "id": "5",
-            "run_duration": "0",
-            "estimated_duration": "508",
-            "paused_duration": "0",
-            "name": "New Experiment",
-            "started_at": "2015-Jul-17 22:08:29.530621",
-            "stage":
-            {
-                "id": "35",
-                "name": "Stage 1",
-                "number": "2",
-                "cycle": "2"
-            },
-            "step":
-            {
-                "id": "46",
-                "name": "Step 0",
-                "number": "1"
-            }
+            "state": "Idle",
+            "thermal_state": "Idle"
         }
     }
 }

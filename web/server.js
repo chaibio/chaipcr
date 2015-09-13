@@ -1,47 +1,130 @@
-var status = require('./status.json');
+var express = require('express');
+var app = express();
+
+app.use(function (req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, X-Prototype-Version, X-CSRF-Token, Content-Type, Authorization');
+  next();
+});
+
+function rawBody(req, res, next) {
+  var body;
+  req.setEncoding('utf8');
+  body = '';
+  req.on('data', function(chunk) {
+    body += chunk;
+  });
+  req.on('end', function(){
+    if (body !== '') req.payload = JSON.parse(body);
+    next();
+  });
+}
+
+app.use(rawBody);
+
+var mysql      = require('mysql');
+var connection = mysql.createConnection({
+  host     : 'localhost',
+  user     : 'root',
+  password : '',
+  database : 'chaipcr'
+});
+
+var status_idle = require('./status-idle.json');
+var status_lid_heating = require('./status-lid-heating.json');
+var status_running = require('./status-running.json');
 var STATUSES = ['Idle', 'LidHeating', 'Running', 'Paused', 'Complete'];
-status.experimentController.expriment.run_duration = 0;
-status.experimentController.expriment.paused_duration = 3;
-status.experimentController.expriment.estimated_duration = 20;
+var experiment_id = null;
+var lastLog = null;
+var data = status_idle;
+var intrvl = null;
+var lastElapsedTime = null;
 
-var i = 0;
+function getLastLog (cb) {
+  cb = cb || function () {};
+  connection.query('SELECT * FROM `temperature_logs` ORDER BY `elapsed_time` ASC', function (err, rows, fields) {
+    if (err) throw err;
+    lastLog = rows.length > 0 ? rows[rows.length-1] : {experiment_id: null, elapsed_time: 14, lid_temp:0, heat_block_zone_1_temp:0, heat_block_zone_2_temp: 0};
+    lastElapsedTime = lastLog.elapsed_time;
+    cb(lastLog);
+  });
+}
 
-var update = function () {
-  var isRunning = i === 2;
-  if(isRunning) {
-    status.experimentController.expriment.run_duration += 1;
+function insertLog (id, elapsed_time, lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp, cb) {
+  cb = cb || function () {};
+  connection.query("INSERT INTO `chaipcr`.`temperature_logs` (`experiment_id`, `elapsed_time`, `lid_temp`, `heat_block_zone_1_temp`, `heat_block_zone_2_temp`) VALUES ('"+id+"', '"+elapsed_time+"', '"+lid_temp+"', '"+heat_block_zone_1_temp+"', '"+heat_block_zone_2_temp+"')", function (err, rows, fields) {
+    if (err) throw err;
+    cb(err, rows, fields);
+  });
+}
 
-    if(status.experimentController.expriment.run_duration - 5 > status.experimentController.expriment.estimated_duration) {
-      status.experimentController.expriment.run_duration = 0;
-      isRunning = false;
-    }
-    else {
-      setTimeout(update, 500);
-    }
+function makeTemperature () {
+  return (Math.random() * 100).toFixed(2)*1;
+}
+
+function startExperiment (id, cb) {
+  cb = cb || function () {};
+  connection.query("UPDATE `chaipcr`.`experiments` SET `started_at` = '2015-09-02 00:00:00' WHERE `experiments`.`id` = "+id, cb);
+}
+
+function incrementLog (cb) {
+  cb = cb || function () {};
+
+  if(!experiment_id) throw new Error("Experiment ID can't be empty.");
+
+  function insert (lastET) {
+    var id = experiment_id;
+    var elapsed_time = lastET*1 + 1000;
+    var lid_temp = makeTemperature();
+    var heat_block_zone_1_temp = makeTemperature();
+    var heat_block_zone_2_temp = makeTemperature();
+
+    insertLog(id, elapsed_time, lid_temp ,heat_block_zone_1_temp, heat_block_zone_2_temp, function (err, rows, fields) {
+      lastElapsedTime = elapsed_time;
+      cb();
+    });
   }
-  if (!isRunning) {
-    i ++;
-    if (i === STATUSES.length) i = 0;
-    setTimeout(update, 5000);
+
+
+  if(!lastElapsedTime) {
+    getLastLog(function (dbLastLog) {
+      lastElapsedTime = dbLastLog.elapsed_time;
+      insert(lastElapsedTime);
+    });
   }
+  else {
+    insert(lastElapsedTime);
+  }
+}
 
-  status.experimentController.expriment.started_at = (i === 0)? null : "2015-Jul-17 22:08:29.530621";
-};
+function autoupdateLogs() {
+  incrementLog();
+  intrvl = setTimeout(autoupdateLogs, 1000);
+}
 
-update();
+app.get('/status', function (req, res, next) {
+  res.send(data);
+});
 
-var http = require('http');
-var app = http.createServer(function(req,res){
+app.post('/control/start', function (req, res, next) {
+  data = status_lid_heating;
+  data.experimentController.expriment.id = req.payload.experimentId;
+  startExperiment(req.payload.experimentId);
+  experiment_id = req.payload.experimentId;
+  setTimeout(function () {
+    data.experimentController.machine.state = 'Running';
+    data.experimentController.machine.thermal_state = 'Running';
+    autoupdateLogs();
+  }, 3000);
 
-    status.experimentController.machine.state = STATUSES[i];
+  res.send(true);
+});
 
-    res.setHeader('Content-Type', 'text/json');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, X-Prototype-Version, X-CSRF-Token, Content-Type, Authorization');
-    res.statusCode = 200;
-    res.end(JSON.stringify(status));
+app.post('/control/stop', function (req, res, next) {
+  data = status_idle;
+  clearTimeout(intrvl);
+  res.send(true);
 });
 
 app.listen(8000);
-
-console.log('Listening on http://localhost:8000');
