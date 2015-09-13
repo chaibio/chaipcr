@@ -10,7 +10,6 @@ window.ChaiBioTech.ngApp.directive 'chartDragScroll', [
       pageX = 0
       oldVal = 0
       elemWith = elem.css('width').replace /px/, ''
-      offset = elem.offset().left
 
       # avoid text selection when dragging the scrollbar
       disableSelect = ->
@@ -39,14 +38,13 @@ window.ChaiBioTech.ngApp.directive 'chartDragScroll', [
           ngModel.$setViewValue val
 
 
-      elem.on 'mouseup', (e) ->
+      $($window).on 'mouseup', (e) ->
         held = false
         enableSelect()
 
-      elem.on 'mouseout', (e) ->
-        mouseIn = false
-
-
       elem.on 'mouseenter', (e) ->
         mouseIn = true
+
+      elem.on 'mouseout', (e) ->
+        mouseIn = false
 ]

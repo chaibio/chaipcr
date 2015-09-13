@@ -76,14 +76,17 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
           $scope.autoUpdateTemperatureLogs()
 
     $scope.zoomOut = ->
-      if $scope.resolutionOptionsIndex isnt ($scope.resolutionOptions.length - 1)
+      if $scope.resolutionOptions.length > 0 and $scope.resolutionOptionsIndex isnt ($scope.resolutionOptions.length - 1)
         $scope.resolutionOptionsIndex += 1
-        $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
+
+      $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
+      $scope.updateResolution()
 
     $scope.zoomIn = ->
-      if $scope.resolutionOptionsIndex isnt 0
+      if $scope.resolutionOptionsIndex isnt 0 and $scope.resolutionOptions.length
         $scope.resolutionOptionsIndex -= 1
         $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
+        $scope.updateResolution()
 
     $scope.updateData = ->
       if $scope.temperatureLogsCache?.length > 0
@@ -160,9 +163,6 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         $scope.updateDragScrollWidthAttr()
         $scope.updateData()
 
-    $scope.$watch 'resolutionOptionsIndex', (val) ->
-      $scope.updateResolution()
-
     $scope.$watch 'widthPercent', ->
       if $scope.widthPercent is 1 and $scope.isCurrentExperiment
         $scope.autoUpdateTemperatureLogs()
@@ -198,6 +198,9 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
           $scope.temperatureLogs = angular.copy data
           $scope.greatest_elapsed_time = Math.floor data[data.length - 1].temperature_log.elapsed_time
           $scope.initResolutionOptions()
+          if !$scope.resolution
+            $scope.resolutionOptionsIndex = $scope.resolutionOptions.length-1
+            $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
           $scope.updateYScale()
           $scope.updateScrollWidth()
           $scope.resizeTemperatureLogs()
@@ -218,6 +221,9 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       options = [
         30
         60
+        60 * 2
+        60 * 3
+        60 * 5
         60 * 10
         60 * 20
         60 * 30
