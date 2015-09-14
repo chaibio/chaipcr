@@ -5,7 +5,7 @@ gulp.task('watch', function () {
     './frontend/**/*',
     '!./frontend/.tmp/**/*',
     '!./frontend/tasks/**/*',
-  ], ['css:debug', 'js:debug']);
+  ], ['css:debug', 'js:debug', 'css:deploy', 'js:deploy']);
 });
 
 gulp.task('copy-fonts-and-images', ['copy-fonts', 'copy-images']);
