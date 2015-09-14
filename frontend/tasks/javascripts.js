@@ -88,7 +88,8 @@ gulp.task('templates', function () {
   return gulp.src(['./frontend/javascripts/app/views/**/*.html', './frontend/javascripts/**/*html.erb'])
     .pipe(htmlmin({
       collapseWhitespace: true,
-      removeComments: true
+      removeComments: true,
+      removeRedundantAttributes: true
     }))
     .pipe(templateCache({
       module: 'templates',
