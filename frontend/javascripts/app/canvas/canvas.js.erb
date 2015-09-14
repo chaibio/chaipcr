@@ -11,7 +11,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     this.init = function(model) {
 
-      console.log("controller", model);
+      console.log("controller", model, "hi hi Jossie");
       this.model = model.protocol;
       this.$scope = model;
       this.allStepViews = [];
@@ -26,9 +26,11 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         "black-footer.png",
         "orange-footer.png",
         "gather-data.png",
-        "gather-data-image.png"
+        "gather-data-image.png",
+        "drag-footer-image"
       ];
 
+      this.imageLocation = "/images/"
       this.imageobjects = {};
       if(this.canvas) this.canvas.clear();
       this.canvas = new fabric.Canvas('canvas', {
@@ -95,24 +97,24 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     this.loadImages = function() {
 
-      /*var noOfImages = this.images.length - 1;
+      var noOfImages = this.images.length - 1;
       var that = this;
       loadImageRecursion = function(index) {
-        fabric.Image.fromURL("assets/" + that.images[index], function(img) {
+        fabric.Image.fromURL(that.imageLocation + that.images[index], function(img) {
 
           that.imageobjects[that.images[index]] = $.extend(true, {}, img);
           if(index < noOfImages) {
             loadImageRecursion(++index);
           } else {
-            console.log("All images loaded .... !");
+            console.log(noOfImages + " images loaded .... !");
             that.canvas.fire("imagesLoaded");
           }
         });
       };
 
-      loadImageRecursion(0);*/
+      loadImageRecursion(0);
 
-      var that = this;
+      /*var that = this;
       fabric.Image.fromURL("/images/common-step.png", function(img) {
         that.imageobjects[that.images[0]] = $.extend(true, {}, img);
 
@@ -133,7 +135,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
             });
           });
         });
-      });
+      });*/
     };
 
     /*******************************************************/
