@@ -1,5 +1,6 @@
 var gulp = require('gulp');
 var templateCache = require('gulp-angular-templatecache');
+var htmlmin = require('gulp-html-minifier');
 var concat = require('gulp-concat');
 var coffee = require('gulp-coffee');
 var rename = require('gulp-rename');
@@ -85,6 +86,11 @@ gulp.task('coffee', ['clean-js'], function () {
 
 gulp.task('templates', function () {
   return gulp.src(['./frontend/javascripts/app/views/**/*.html', './frontend/javascripts/**/*html.erb'])
+    .pipe(htmlmin({
+      collapseWhitespace: true,
+      removeComments: true,
+      removeRedundantAttributes: true
+    }))
     .pipe(templateCache({
       module: 'templates',
       standalone: true,
