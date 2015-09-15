@@ -18,9 +18,11 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
 
     if (heatBlock) {
         responsePt.put("heatblock.zone1.temperature", ROUND(heatBlock->zone1Temperature()));
+        responsePt.put("heatblock.zone1.targetTemperature", ROUND(heatBlock->zone1TargetTemperature()));
         responsePt.put("heatblock.zone1.drive", ROUND(heatBlock->zone1DriveValue()));
 
         responsePt.put("heatblock.zone2.temperature", ROUND(heatBlock->zone2Temperature()));
+        responsePt.put("heatblock.zone2.targetTemperature", ROUND(heatBlock->zone2TargetTemperature()));
         responsePt.put("heatblock.zone2.drive", ROUND(heatBlock->zone2DriveValue()));
 
         responsePt.put("heatblock.temperature", ROUND(heatBlock->temperature()));
@@ -28,6 +30,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
 
     if (lid) {
         responsePt.put("lid.temperature", ROUND(lid->currentTemperature()));
+        responsePt.put("lid.targetTemperature", ROUND(lid->targetTemperature()));
         responsePt.put("lid.drive", ROUND(lid->drive()));
     }
 
