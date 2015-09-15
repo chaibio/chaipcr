@@ -2,6 +2,8 @@
 #include <Poco/Net/HTTPServerRequest.h>
 #include <Poco/Net/HTTPServerResponse.h>
 
+#include <iostream>
+
 #include "jsonhandler.h"
 
 using namespace Poco::Net;
