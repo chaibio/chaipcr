@@ -292,6 +292,8 @@ void ExperimentController::stepBegun()
 {
     bool onPause = false;
 
+    _holdStepTimer->stop();
+
     {
         Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
 
@@ -314,7 +316,6 @@ void ExperimentController::stepBegun()
 
             if (holdTime > 0 || _experiment.protocol()->hasNextStep())
             {
-                _holdStepTimer->stop();
                 _holdStepTimer->setStartInterval(holdTime * 1000);
                 _holdStepTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::holdStepCallback));
 
