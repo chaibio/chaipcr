@@ -14,12 +14,10 @@ window.ChaiBioTech.ngApp.directive 'chartDragScroll', [
 
       # avoid text selection when dragging the scrollbar
       disableSelect = ->
-        $window.$(document.body).css
-          'userSelect': 'none'
+        $(document.body).addClass 'noselect'
 
       enableSelect = ->
-        $window.$(document.body).css
-          'userSelect': ''
+        $(document.body).removeClass 'noselect'
 
       getWidthAttr = ->
         parseInt(elem.attr 'width')
