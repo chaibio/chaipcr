@@ -16,10 +16,13 @@ window.ChaiBioTech.ngApp.factory('circle', [
   'gatherDataGroup',
   'gatherDataCircle',
   'previouslySelected',
+  'pauseStepOnScrollGroup',
+  'pauseStepCircleOnScroll',
 
   function(ExperimentLoader, $rootScope, Constants, circleGroup, outerMostCircle, outerCircle,
     centerCircle, littleCircleGroup, circleMaker, stepDataGroup, stepTemperature, stepHoldTime,
-    gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle, previouslySelected) {
+    gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle, previouslySelected,
+    pauseStepOnScrollGroup, pauseStepCircleOnScroll) {
     return function(model, parentStep) {
 
       this.model = model;
@@ -61,22 +64,30 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.getTop();
       };
 
+      this.setCenter = function(imgObj) {
+        imgObj.originX = imgObj.originY = "center";
+      };
+
       this.addImages = function() {
 
         var fabricStage = this.parent.parentStage.parent;
-
+        // This is the image shows in the left, when gather data during ramp is enabled
         this.gatherDataImage = $.extend({}, fabricStage.imageobjects["gather-data.png"]);
-        this.gatherDataImage.originX = "center";
-        this.gatherDataImage.originY = "center";
+        this.setCenter(this.gatherDataImage);
 
         this.gatherDataImageOnMoving = $.extend({}, fabricStage.imageobjects["gather-data-image.png"]);
-        this.gatherDataImageOnMoving.originX = "center";
-        this.gatherDataImageOnMoving.originY = "center";
+        this.setCenter(this.gatherDataImageOnMoving);
 
         this.gatherDataImageMiddle = $.extend({}, fabricStage.imageobjects["gather-data.png"]);
-        this.gatherDataImageMiddle.originX = "center";
-        this.gatherDataImageMiddle.originY = "center";
+        this.setCenter(this.gatherDataImageMiddle);
         this.gatherDataImageMiddle.setVisible(false);
+
+        this.pauseImage = $.extend({}, fabricStage.imageobjects["pause.png"]);
+        this.setCenter(this.pauseImage);
+
+        this.pauseImageMiddle = $.extend({}, fabricStage.imageobjects["pause.png"]);
+        this.setCenter(this.pauseImageMiddle);
+        this.pauseImageMiddle.setVisible(false);
 
         return this;
       };
@@ -103,14 +114,23 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.gatherDataOnScroll = new gatherDataGroupOnScroll(
           [
             this.gatherDataCircleOnScroll,
-            this.gatherDataImageOnMoving
+            this.gatherDataImageOnMoving,
           ], this);
+
+          this.pauseStepCircleOnScroll = new pauseStepCircleOnScroll();
+          this.pauseStepOnScrollGroup = new pauseStepOnScrollGroup(
+            [
+              this.pauseStepCircleOnScroll,
+              this.pauseImage,
+            ], this);
 
         // enable this when image is added on creating new circle ..
         this.circleGroup.set({"left": this.left + 60}).setCoords();
 
         this.circleGroup.add(this.gatherDataImageMiddle);
+        this.circleGroup.add(this.pauseImageMiddle);
         this.circleGroup.add(this.gatherDataOnScroll);
+        this.circleGroup.add(this.pauseStepOnScrollGroup);
         this.canvas.add(this.circleGroup);
 
         this.gatherDataCircle = new gatherDataCircle();
@@ -123,7 +143,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.gatherDataGroup.set({"left": this.left}).setCoords();
         this.canvas.add(this.gatherDataGroup);
         this.showHideGatherData(this.parent.gatherDataDuringStep);
-
+        this.controlPause(this.model.pause);
         if( this.parent.index !== 0 || this.parent.parentStage.index !== 0) {
           this.gatherDataGroup.setVisible(this.parent.gatherDataDuringRamp);
         }
@@ -195,10 +215,16 @@ window.ChaiBioTech.ngApp.factory('circle', [
           this.gatherDataOnScroll.setVisible(true);
         }
 
+        if(this.model.pause) {
+          this.circle.setFill("#ffb400");
+          this.pauseImageMiddle.setVisible(false);
+          this.pauseStepOnScrollGroup.setVisible(true);
+        }
+
         this.circle.setStroke("#ffb400");
         this.outerCircle.setStroke("black");
         this.outerCircle.strokeWidth = 7;
-        //this.stepDataGroup.setVisible(false);
+        //this.stepDataGroup.setVisible(false); // Change temperature display
         this.outerMostCircle.visible = this.littleCircleGroup.visible = true;
       };
 
@@ -206,16 +232,30 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         this.big = false;
 
+        this.circle.setStroke("white");
+        this.circle.setFill('#ffb400');
+        this.circle.radius = 13;
+        this.circle.strokeWidth = 10;
+        this.outerCircle.setStroke(null);
+        this.stepDataGroup.setVisible(true);
+        this.littleCircleGroup.visible = this.outerMostCircle.visible = false;
+
         if(this.model.collect_data) {
           this.circle.setFill("white");
           this.gatherDataImageMiddle.setVisible(true);
           this.gatherDataOnScroll.setVisible(false);
         }
 
-        this.circle.setStroke("white");
-        this.outerCircle.setStroke(null);
-        this.stepDataGroup.setVisible(true);
-        this.littleCircleGroup.visible = this.outerMostCircle.visible = false;
+        if(this.model.pause) {
+          this.circle.setFill("#ffb400");
+          this.circle.setStroke("#ffde00");
+          this.circle.strokeWidth = 5;
+          this.circle.radius = 18;
+          this.pauseImageMiddle.setVisible(true);
+          this.gatherDataImageMiddle.setVisible(false);
+          this.pauseStepOnScrollGroup.setVisible(false);
+        }
+
       };
 
       this.showHideGatherData = function(state) {
@@ -228,6 +268,27 @@ window.ChaiBioTech.ngApp.factory('circle', [
           this.circle.setFill("#ffb400");
           this.gatherDataOnScroll.setVisible(state);
         }
+      };
+
+      this.controlPause = function(state) {
+
+        if(state && this.big) {
+          this.pauseStepOnScrollGroup.setVisible(state);
+          this.holdTime.setVisible(false);
+          return;
+        }
+        this.pauseStepOnScrollGroup.setVisible(false);
+        this.holdTime.setVisible(true);
+        /*if(state && ! this.big) {
+
+          this.pauseImage.setVisible(state);
+          this.circle.setFill("white");
+        } else {
+          console.log("inside out");
+          this.circle.setFill("#ffb400");
+          this.pauseStepOnScrollGroup.setVisible(state);
+        }*/
+
       };
 
       this.manageDrag = function(targetCircleGroup) {
