@@ -34,7 +34,7 @@
               Paused
             </span>
           </div>
-          <div>
+          <div ng-show="data.experimentController.machine.state !== 'Idle'">
             {{data.experimentController.machine.thermal_state}}
           </div>
         </div>
