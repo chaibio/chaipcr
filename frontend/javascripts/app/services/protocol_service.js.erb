@@ -210,5 +210,12 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
       return this.update(url, dataToBeSend, delay);
     };
 
+    this.changePause = function($scope) {
+      console.log($scope.step.pause);
+      var dataToBeSend = {'step': {'pause': $scope.step.pause}},
+      url = "/steps/" + $scope.step.id,
+      delay = $q.defer();
+      return this.update(url, dataToBeSend, delay);
+    }
   }
 ]);
