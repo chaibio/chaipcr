@@ -22,7 +22,7 @@ gulp.task('set-css-deploy', function (done) {
 });
 
 gulp.task('clean-css', function (done) {
-  del(['./.tmp/css/**/*', './web/public/stylesheets/**/*'])
+  del(['.tmp/css/**/*', './web/public/stylesheets/**/*'])
   .then(function () {done();});
 });
 
@@ -36,36 +36,36 @@ gulp.task('sass', ['clean-css'], function () {
           includePaths: ['./frontend/stylesheets']
         })
         .on('error', sass.logError))
-        .pipe(gulp.dest('./.tmp/css'));
+        .pipe(gulp.dest('.tmp/css'));
 });
 
 gulp.task('copy-css-tmp', ['clean-css'], function () {
   return gulp.src('./frontend/stylesheets/**/*.css')
-         .pipe(gulp.dest('./.tmp/css'));
+         .pipe(gulp.dest('.tmp/css'));
 });
 
 gulp.task('concat-css', ['copy-css-tmp', 'sass'], function () {
-  return gulp.src(['./.tmp/css/**/*'])
+  return gulp.src(['.tmp/css/**/*'])
          .pipe(concat(applicationTmpCSS+".css"))
-         .pipe(gulp.dest('./.tmp/css'));
+         .pipe(gulp.dest('.tmp/css'));
 });
 
 gulp.task('hash-css', ['concat-css'], function () {
 
   var hash = makeHash();
 
-  return gulp.src('./.tmp/css/'+applicationTmpCSS+'.css')
+  return gulp.src('.tmp/css/'+applicationTmpCSS+'.css')
          .pipe(rename(function (path) {
            path.basename = debug? applicationDebugCss : 'application-' + hash;
            applicationCSS = path.basename;
          }))
-         .pipe(gulp.dest('./.tmp/css'));
+         .pipe(gulp.dest('.tmp/css'));
 });
 
 gulp.task('minify-css', ['concat-css', 'hash-css'], function () {
-  return gulp.src('./.tmp/css/'+applicationCSS+'.css')
+  return gulp.src('.tmp/css/'+applicationCSS+'.css')
          .pipe(minifyCss({keepSpecialComments: 0}))
-         .pipe(gulp.dest('./.tmp/css'))
+         .pipe(gulp.dest('.tmp/css'))
 });
 
 gulp.task('markup-css-link', ['hash-css'], function () {
@@ -78,11 +78,11 @@ gulp.task('markup-css-link', ['hash-css'], function () {
 });
 
 gulp.task('css:debug', ['copy-fonts-and-images', 'set-css-debug', 'clean-css', 'concat-css', 'markup-css-link'], function () {
-  return gulp.src('./.tmp/css/'+applicationCSS+'.css')
+  return gulp.src('.tmp/css/'+applicationCSS+'.css')
          .pipe(gulp.dest('./web/public/stylesheets'));
 });
 
 gulp.task('css:deploy', ['copy-fonts-and-images', 'set-css-deploy', 'clean-css', 'concat-css', 'minify-css', 'markup-css-link'], function () {
-  return gulp.src('./.tmp/css/'+applicationCSS+'.css')
+  return gulp.src('.tmp/css/'+applicationCSS+'.css')
          .pipe(gulp.dest('./web/public/stylesheets'));
 });
