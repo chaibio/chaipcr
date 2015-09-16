@@ -29,8 +29,6 @@ var vendorFiles = [
   'app/libs/angular-ui-router.js',
   'app/libs/moment.js',
   'app/libs/angular-moment.min.js',
-  'app/libs/Chart.js',
-  'app/libs/angular-chart.js',
   'app/libs/lodash.min.js',
   'app/libs/fabric.js',
   'app/libs/d3.js',
