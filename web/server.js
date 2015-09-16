@@ -121,17 +121,23 @@ app.post('/control/start', function (req, res, next) {
   experiment_id = req.payload.experimentId;
   setTimeout(function () {
     data.experimentController.machine.state = 'Running';
-    data.experimentController.machine.thermal_state = 'Running';
+    data.experimentController.machine.thermal_state = 'Holding';
     autoupdateLogs();
   }, 3000);
+
+  setTimeout(stop, 1000 * 15);
 
   res.send(true);
 });
 
-app.post('/control/stop', function (req, res, next) {
+function stop () {
   completeExperiment(experiment_id);
   data = status_idle;
   clearTimeout(intrvl);
+}
+
+app.post('/control/stop', function (req, res, next) {
+  stop();
   res.send(true);
 });
 

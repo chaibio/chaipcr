@@ -13,6 +13,7 @@ window.ChaiBioTech.ngApp
     link: ($scope, elem) ->
 
       getExperiment = (cb) ->
+        cb = cb || angular.noop
         Experiment.get {id: $scope.experimentId}, (resp) ->
           $scope.experiment = resp.experiment
           cb()
@@ -26,24 +27,23 @@ window.ChaiBioTech.ngApp
         elem.on '$destroy', ->
           Status.stopSync()
 
-        $scope.stopped = false
-
         $scope.$watch ->
           Status.getData()
         , (val) ->
           $scope.data = val
+          $scope.state = val?.experimentController?.machine.state
+
+        $scope.$watch 'data.experimentController.machine.state', (newState, oldState) ->
+          if (newState isnt oldState) and (newState is 'Idle')
+            getExperiment()
+
 
       $scope.startExperiment = (expId) ->
-        $scope.stopped = false
         Experiment.startExperiment(expId).then ->
           $rootScope.$broadcast 'experiment:started', expId
 
       $scope.stopExperiment = ->
-        $scope.stopped = true
         Experiment.stopExperiment().then ->
-          getExperiment angular.noop
-
-      $scope.completedAndStopped = ->
-        ($scope.data?.experimentController?.machine.state is 'Complete') and $scope.stopped
+          getExperiment()
 
 ]

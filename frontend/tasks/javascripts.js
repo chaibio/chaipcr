@@ -9,6 +9,7 @@ var uglify = require('gulp-uglify');
 var gutil = require('gulp-util');
 var del = require('del');
 var _makeHash = require('./helpers').makeHash;
+var swallowError = require('./helpers').swallowError;
 var debug;
 var applicationDebugJS = 'application-debug';
 var applicationTmpJS = 'application-tmp';
@@ -28,8 +29,6 @@ var vendorFiles = [
   'app/libs/angular-ui-router.js',
   'app/libs/moment.js',
   'app/libs/angular-moment.min.js',
-  'app/libs/Chart.js',
-  'app/libs/angular-chart.js',
   'app/libs/lodash.min.js',
   'app/libs/fabric.js',
   'app/libs/d3.js',
@@ -77,20 +76,22 @@ gulp.task('clean-js', function (done) {
 });
 
 gulp.task('coffee', ['clean-js'], function () {
-  return gulp.src(['frontend/javascripts/**/*.coffee', 'frontend/javascripts/**/*.coffee.erb'])
-         .pipe(coffee({bare: true}))
+  return gulp.src(['frontend/javascripts/**/*.{coffee,coffee.erb}'])
+         .pipe(coffee())
+         .on('error', swallowError)
          .pipe(rename(_renameJS))
          .pipe(gulp.dest('.tmp/js'))
          .on('error', gutil.log);
 });
 
 gulp.task('templates', function () {
-  return gulp.src(['./frontend/javascripts/app/views/**/*.html', './frontend/javascripts/**/*html.erb'])
+  return gulp.src(['./frontend/javascripts/**/*.{html,html.erb}'])
     .pipe(htmlmin({
       collapseWhitespace: true,
       removeComments: true,
       removeRedundantAttributes: true
     }))
+    .on('error', swallowError)
     .pipe(templateCache({
       module: 'templates',
       standalone: true,
@@ -98,6 +99,7 @@ gulp.task('templates', function () {
         return url.replace(/\.html\.erb$/, '.html')
       }
     }))
+    // .on('error', swallowError)
     .pipe(gulp.dest('.tmp/js'));
 });
 
@@ -135,6 +137,7 @@ gulp.task('hash-js', ['concat-js'], function () {
 gulp.task('uglify', ['concat-js', 'hash-js'], function () {
   return gulp.src('.tmp/js/'+applicationJS+'.js')
          .pipe(uglify())
+         .on('error', swallowError)
          .pipe(gulp.dest('.tmp/js'));
 });
 

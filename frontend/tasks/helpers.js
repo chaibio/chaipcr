@@ -1,3 +1,5 @@
+var gutil = require('gulp-util');
+
 module.exports = {
   makeHash: function _makeHash() {
       var text = "";
@@ -8,5 +10,11 @@ module.exports = {
           text += possible.charAt(Math.floor(Math.random() * possible.length));
 
       return text;
+  },
+
+  swallowError: function swallowError (err) {
+    gutil.log(err);
+    this.emit('end');
   }
+
 };

@@ -1,7 +1,4 @@
 <div class="test-in-progress-container" ng-show="data">
-  <div>
-    <b>{{data.experimentController.machine}}</b>
-  </div>
   <div class="test-in-progress">
     <div class="test-in-progress-heading">
       <div>
@@ -37,6 +34,9 @@
               Paused
             </span>
           </div>
+          <div ng-show="data.experimentController.machine.state !== 'Idle'">
+            {{data.experimentController.machine.thermal_state}}
+          </div>
         </div>
         <div class="col-sm-6" ng-show="data.experimentController.machine.state === 'Running' || data.experimentController.machine.state === 'Paused'">
           <div class="caption">TIME REMAINING</div>
@@ -57,7 +57,7 @@
         </span>
       </div>
       <div class="row" ng-show="data.experimentController.machine.state == 'Running' || data.experimentController.machine.state == 'LidHeating'">
-        <div class="col-sm-6">
+        <div class="col-sm-6" ng-show="data.experimentController.machine.state !== 'LidHeating'">
           <div class="caption">
             Block Temp:
             <span class="normal-text">
