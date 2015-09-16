@@ -147,12 +147,12 @@ gulp.task('markup-js-link', ['hash-js'], function () {
          .pipe(gulp.dest('./web/app/views'));
 });
 
-gulp.task('js:debug', ['set-js-debug', 'concat-js', 'markup-js-link', 'copy-fonts-and-images'], function () {
+gulp.task('js:debug', ['set-js-debug', 'concat-js', 'markup-js-link'], function () {
   return gulp.src('.tmp/js/'+applicationJS+'.js')
          .pipe(gulp.dest('./web/public/javascripts'));
 });
 
-gulp.task('js:deploy', ['set-js-deploy', 'uglify', 'markup-js-link', 'copy-fonts-and-images'], function () {
+gulp.task('js:deploy', ['set-js-deploy', 'uglify', 'markup-js-link'], function () {
   return gulp.src('.tmp/js/'+applicationJS+'.js')
          .pipe(gulp.dest('./web/public/javascripts'));
 });

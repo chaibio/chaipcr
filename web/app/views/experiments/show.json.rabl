@@ -1,5 +1,5 @@
 object @experiment
-attribute :id, :name, :started_at, :completed_at, :completion_status, :created_at
+attribute :id, :name, :started_at, :completed_at, :completion_status, :completion_message, :created_at
 
 node :name do |experiment|
  experiment.experiment_definition.name
@@ -10,5 +10,5 @@ node :type do |experiment|
 end
 
 node(:errors, :unless => lambda { |obj| obj.errors.empty? }) do |o|
-	o.errors
+  o.errors
 end

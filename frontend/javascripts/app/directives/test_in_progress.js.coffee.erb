@@ -14,9 +14,11 @@ window.ChaiBioTech.ngApp
 
       Status.startSync()
 
+      $scope.completionStatus = null
+
       updateData = (data) ->
 
-        if data?.experimentController?.machine.state is 'Complete' and $scope.experimentId
+        if !$scope.completionStatus and (data?.experimentController?.machine.state is 'Idle' or data?.experimentController?.machine.state is 'Complete') and $scope.experimentId
           Experiment.get {id: $scope.experimentId}, (exp) ->
             $scope.data = data
             $scope.completionStatus = exp.experiment.completion_status

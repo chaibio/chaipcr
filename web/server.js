@@ -68,6 +68,11 @@ function startExperiment (id, cb) {
   connection.query("UPDATE `chaipcr`.`experiments` SET `started_at` = '2015-09-02 00:00:00' WHERE `experiments`.`id` = "+id, cb);
 }
 
+function completeExperiment(id, cb) {
+  cb = cb || function () {};
+  connection.query("UPDATE `chaipcr`.`experiments` SET `completed_at` = '2015-09-02 00:00:00', `completion_status` = 'aborted' WHERE `experiments`.`id` = "+id, cb);
+}
+
 function incrementLog (cb) {
   cb = cb || function () {};
 
@@ -122,6 +127,7 @@ app.post('/control/start', function (req, res, next) {
 });
 
 app.post('/control/stop', function (req, res, next) {
+  completeExperiment(experiment_id);
   data = status_idle;
   clearTimeout(intrvl);
   res.send(true);

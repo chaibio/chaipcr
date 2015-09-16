@@ -306,16 +306,21 @@ void WirelessManager::ifdown()
 void WirelessManager::checkInterfaceStatus()
 {
     int iwSocket = iw_sockets_open();
+    bool showRangeError = true;
 
     if (iwSocket != -1)
     {
         iwrange range;
 
-        if (iw_get_range_info(iwSocket, _interfaceName.c_str(), &range) == 0)
+        while (_interfaceStatusThreadStatus == Working)
         {
-
-            while (_interfaceStatusThreadStatus == Working)
+            if (iw_get_range_info(iwSocket, _interfaceName.c_str(), &range) == 0)
             {
+                showRangeError = true;
+
+                if (_interfaceStatusThreadStatus != Working)
+                    break;
+
                 checkConnection();
 
                 if (_interfaceStatusThreadStatus != Working)
@@ -325,12 +330,15 @@ void WirelessManager::checkInterfaceStatus()
 
                 if (_interfaceStatusThreadStatus != Working)
                     break;
-
-                sleep(1); //Replace it with std::this_thread::sleep_for when BBB will have newer gcc
             }
+            else if (showRangeError)
+            {
+                showRangeError = false;
+                std::cout << "WirelessManager::checkInterfaceStatus - unable to get interface range info: " << std::strerror(errno) << '\n';
+            }
+
+            sleep(1);
         }
-        else
-            std::cout << "WirelessManager::checkInterfaceStatus - unable to get interface range info: " << std::strerror(errno) << '\n';
 
         iw_sockets_close(iwSocket);
     }

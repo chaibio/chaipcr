@@ -44,6 +44,7 @@ Experiment::Experiment(Experiment &&other)
     _startedAt = other._startedAt;
     _completedAt = other._completedAt;
     _completionStatus = other._completionStatus;
+    _completionMessage = std::move(other._completionMessage);
     _estimatedDuration = other._estimatedDuration;
     _pausedDuration = other._pausedDuration;
     _lastPauseTime = other._lastPauseTime;
@@ -73,6 +74,7 @@ Experiment& Experiment::operator= (const Experiment &other)
     setStartedAt(other.startedAt());
     setCompletedAt(other.completedAt());
     setCompletionStatus(other.completionStatus());
+    setCompletionMessage(other.completionMessage());
     setEstimatedDuration(other.estimatedDuration());
     setPausedDuration(other.pausedDuration());
     setPauseTime(other.lastPauseTime());
@@ -92,6 +94,7 @@ Experiment& Experiment::operator= (Experiment &&other)
     _name = std::move(other._name);
     _startedAt = other._startedAt;
     _completedAt = other._completedAt;
+    _completionMessage = std::move(other._completionMessage);
     _estimatedDuration = other._estimatedDuration;
     _pausedDuration = other._pausedDuration;
     _lastPauseTime = other._lastPauseTime;
