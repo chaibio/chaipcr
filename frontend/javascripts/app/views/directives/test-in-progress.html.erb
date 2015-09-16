@@ -57,7 +57,7 @@
         </span>
       </div>
       <div class="row" ng-show="data.experimentController.machine.state == 'Running' || data.experimentController.machine.state == 'LidHeating'">
-        <div class="col-sm-6">
+        <div class="col-sm-6" ng-show="data.experimentController.machine.state !== 'LidHeating'">
           <div class="caption">
             Block Temp:
             <span class="normal-text">
