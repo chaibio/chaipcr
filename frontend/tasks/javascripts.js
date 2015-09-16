@@ -93,6 +93,7 @@ gulp.task('templates', function () {
       removeComments: true,
       removeRedundantAttributes: true
     }))
+    .on('error', swallowError)
     .pipe(templateCache({
       module: 'templates',
       standalone: true,
@@ -100,6 +101,7 @@ gulp.task('templates', function () {
         return url.replace(/\.html\.erb$/, '.html')
       }
     }))
+    // .on('error', swallowError)
     .pipe(gulp.dest('.tmp/js'));
 });
 

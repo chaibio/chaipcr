@@ -13,7 +13,7 @@ module.exports = {
   },
 
   swallowError: function swallowError (err) {
-    gutil.log(err.toString());
+    gutil.log(err);
     this.emit('end');
   }
 
