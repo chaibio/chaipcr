@@ -76,7 +76,7 @@ gulp.task('clean-js', function (done) {
 });
 
 gulp.task('coffee', ['clean-js'], function () {
-  return gulp.src(['frontend/javascripts/**/*.coffee', 'frontend/javascripts/**/*.coffee.erb'])
+  return gulp.src(['frontend/javascripts/**/*.{coffee,coffee.erb}'])
          .pipe(coffee())
          .on('error', swallowError)
          .pipe(rename(_renameJS))
@@ -85,7 +85,7 @@ gulp.task('coffee', ['clean-js'], function () {
 });
 
 gulp.task('templates', function () {
-  return gulp.src(['./frontend/javascripts/app/views/**/*.html', './frontend/javascripts/**/*html.erb'])
+  return gulp.src(['./frontend/javascripts/**/*.{html,html.erb}'])
     .pipe(htmlmin({
       collapseWhitespace: true,
       removeComments: true,
