@@ -121,7 +121,7 @@ app.post('/control/start', function (req, res, next) {
   experiment_id = req.payload.experimentId;
   setTimeout(function () {
     data.experimentController.machine.state = 'Running';
-    data.experimentController.machine.thermal_state = 'Running';
+    data.experimentController.machine.thermal_state = 'Holding';
     autoupdateLogs();
   }, 3000);
 
