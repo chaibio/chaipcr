@@ -1,4 +1,7 @@
 <div class="test-in-progress-container" ng-show="data">
+  <div>
+    <b>{{data.experimentController.machine}}</b>
+  </div>
   <div class="test-in-progress">
     <div class="test-in-progress-heading">
       <div>
@@ -13,21 +16,19 @@
         </span>
         <span ng-show="completionStatus">
           TEST COMPLETE:
-          <span ng-show="completionStatus !== 'success'" class="text-red">UNSUCCESSFUL</span>
+          <span ng-show="completionStatus === 'aborted'" class="text-red">USER CANCELLED</span>
+          <span ng-show="completionStatus === 'failed'" class="text-red">FAILED</span>
           <span ng-show="completionStatus === 'success'" class="text-green">SUCCESSFUL</span>
         </span>
       </div>
     </div>
     <div class="test-info">
-      <div class="row">
+      <div class="row" ng-show="!completionStatus">
         <div class="col-sm-6">
           <div class="caption">
             <span ng-show="data.experimentController.machine.state == 'Running'">
               STAGE {{data.experimentController.expriment.stage.number}},
               STEP {{data.experimentController.expriment.step.number}}
-            </span>
-            <span ng-show="completionStatus">
-              RAN ON
             </span>
             <span ng-show="data.experimentController.machine.state == 'LidHeating'">
               Heating Lid
@@ -36,21 +37,18 @@
               Paused
             </span>
           </div>
-          <!-- <div ng-show="completionStatus && completionStatus !== 'aborted'">
-            {{ experiment.started_at | date: 'MMM d, yyyy HH:mm' | uppercase }}
-          </div> -->
         </div>
         <div class="col-sm-6" ng-show="data.experimentController.machine.state === 'Running' || data.experimentController.machine.state === 'Paused'">
           <div class="caption">TIME REMAINING</div>
           <div>{{ timeRemaining() | secondsDisplay:'display2'}}</div>
         </div>
-        <div class="col-sm-6" ng-show="completionStatus">
-          <div class="caption" style="font-weight: normal">
+      </div>
+      <div ng-show="completionStatus">
+        <div class="caption">
+          RAN ON
+          <span style="font-weight: normal">
             {{ experiment.started_at | date: 'MMM d, yyyy HH:mm' | uppercase }}
-          </div>
-          <!-- <div class="caption" ng-show="completionStatus === 'failed'">Failed</div>
-          <div class="caption" ng-show="completionStatus === 'success'">Success</div>
-          <div ng-show="data.experimentController.machine.state === 'Complete' && completionStatus !== 'success'">{{completionStatus|uppercase}}</div> -->
+          </span>
         </div>
       </div>
       <div ng-show="experiment.completion_message" style="margin-top: 10px;">

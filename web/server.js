@@ -60,7 +60,7 @@ function insertLog (id, elapsed_time, lid_temp, heat_block_zone_1_temp, heat_blo
 }
 
 function makeTemperature () {
-  return (Math.random() * 100).toFixed(2)*1;
+  return (Math.random() * 5).toFixed(2)*1 + 50;
 }
 
 function startExperiment (id, cb) {
@@ -85,9 +85,11 @@ function incrementLog (cb) {
     var heat_block_zone_1_temp = makeTemperature();
     var heat_block_zone_2_temp = makeTemperature();
 
-    insertLog(id, elapsed_time, lid_temp ,heat_block_zone_1_temp, heat_block_zone_2_temp, function (err, rows, fields) {
-      lastElapsedTime = elapsed_time;
-      cb();
+    insertLog(id, elapsed_time, lid_temp ,heat_block_zone_1_temp, heat_block_zone_2_temp, function () {
+      insertLog(id, elapsed_time+14, lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp,function (err, rows, fields) {
+        lastElapsedTime = elapsed_time;
+        cb();
+      });
     });
   }
 
