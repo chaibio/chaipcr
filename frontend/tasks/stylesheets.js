@@ -34,7 +34,8 @@ gulp.task('sass', ['clean-css'], function () {
         }))
         .pipe(sass({
           includePaths: ['./frontend/stylesheets']
-        }).on('error', sass.logError))
+        })
+        .on('error', sass.logError))
         .pipe(gulp.dest('./.tmp/css'));
 });
 
