@@ -28,7 +28,7 @@
           <div class="name-board sansa">TEMPERATURE CHANGE SPEED</div>
             <temperature caption="temperature" unit="ºC" reading="step.temperature" action="WOWaction(edit)"></temperature>
             <ramp-speed caption="ramp speed" reading="step.ramp.rate"></ramp-speed>
-            <hold-duration caption="hold duration" reading="step.hold_time"></hold-duration>
+            <hold-duration caption="hold duration" reading="step.hold_time" pause="! step.pause"></hold-duration>
         </div>
         <div class="data-boxes auto-delta">
           <div class="name-board sansa">AUTODELTA</div>

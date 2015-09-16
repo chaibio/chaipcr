@@ -8,14 +8,15 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
       scope: {
         caption: "@",
         unit: "@",
-        reading: '='
+        reading: '=',
+        pause: '='
       },
       templateUrl: 'app/views/directives/edit-value.html',
 
       link: function(scope, elem, attr) {
 
         scope.edit = false;
-        scope.delta = true; // This is to prevent the directive become disabled, check delta in template, this is used for auto delta field
+        scope.delta = false; // This is to prevent the directive become disabled, check delta in template, this is used for auto delta field
 
         scope.$watch("reading", function(val) {
 
@@ -24,12 +25,20 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
           }
         });
 
+        scope.$watch("pause", function(val) {
+
+          if(angular.isDefined(scope.pause)) {
+            scope.delta = scope.pause;
+          }
+        });
         scope.editAndFocus = function(className) {
 
-          scope.edit = ! scope.edit;
-          $timeout(function() {
-            $('.' + className).focus();
-          });
+          if(scope.pause) {
+            scope.edit = ! scope.edit;
+            $timeout(function() {
+              $('.' + className).focus();
+            });
+          }
         };
 
         scope.save = function() {
