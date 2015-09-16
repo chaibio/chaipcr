@@ -38,6 +38,16 @@ window.ChaiBioTech.ngApp.directive('actions', [
             });
         };
 
+        scope.addPause = function() {
+          scope.step.pause = ! scope.step.pause;
+          ExperimentLoader.changePause(scope)
+          .then(function(data) {
+            console.log("added", data);
+            scope.actionPopup = false;
+            //scope.fabricStep.parentStage.parent.addNewStage(data, scope.fabricStep.parentStage);
+          });
+        }
+
       }
     };
   }
