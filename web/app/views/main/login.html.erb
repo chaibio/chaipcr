@@ -25,8 +25,8 @@
               <input type="password" id="pass" placeholder="Enter Password" class="login-text-field" ng-model="user.password">
             </div>
           </div>
-          <p class="text-danger text-center" ng-show="error">
-            {{error}}
+          <p class="text-danger text-center err-message" ng-show="errors">
+            {{errors}}
           </p>
           <div class="login-section">
             <div class="login-bitton-container">
