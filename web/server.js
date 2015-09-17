@@ -59,8 +59,23 @@ function insertLog (id, elapsed_time, lid_temp, heat_block_zone_1_temp, heat_blo
   });
 }
 
-function makeTemperature () {
-  return (Math.random() * 5).toFixed(2)*1 + 50;
+var toUp = true;
+setInterval(function () {
+  toUp = (Math.random() > 0.5)? true: false;
+}, 3000);
+
+var stable = true;
+setInterval(function () {
+  stable = (Math.random() > 0.5)? true: false;
+}, 2000);
+
+function makeNewLog () {
+  return {
+    elapsed_time: (Math.floor(lastLog.elapsed_time/1000) * 1000) + 1000 + Math.round(Math.random() * 10),
+    lid_temp: stable? lastLog.lid_temp : Math.random() + lastLog.lid_temp + (!toUp && lastLog.lid_temp > 0 ? -Math.random() : Math.random()),
+    heat_block_zone_1_temp: stable? lastLog.heat_block_zone_1_temp : Math.random() + lastLog.heat_block_zone_1_temp + (!toUp && lastLog.heat_block_zone_1_temp > 0 ? -1 : 1),
+    heat_block_zone_2_temp: stable? lastLog.heat_block_zone_2_temp : Math.random() + lastLog.heat_block_zone_2_temp + (!toUp && lastLog.heat_block_zone_2_temp > 0 ? -1 : 1),
+  };
 }
 
 function startExperiment (id, cb) {
@@ -78,30 +93,42 @@ function incrementLog (cb) {
 
   if(!experiment_id) throw new Error("Experiment ID can't be empty.");
 
-  function insert (lastET) {
+  function insert () {
+    var newLog = makeNewLog();
+
     var id = experiment_id;
-    var elapsed_time = lastET*1 + 1000;
-    var lid_temp = makeTemperature();
-    var heat_block_zone_1_temp = makeTemperature();
-    var heat_block_zone_2_temp = makeTemperature();
+    var elapsed_time = newLog.elapsed_time;
+    var lid_temp = newLog.lid_temp;
+    var heat_block_zone_1_temp = newLog.heat_block_zone_1_temp;
+    var heat_block_zone_2_temp = newLog.heat_block_zone_2_temp;
 
     insertLog(id, elapsed_time, lid_temp ,heat_block_zone_1_temp, heat_block_zone_2_temp, function () {
-      insertLog(id, elapsed_time+14, lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp,function (err, rows, fields) {
-        lastElapsedTime = elapsed_time;
-        cb();
-      });
+      lastElapsedTime = elapsed_time;
+      lastLog = {
+        experiment_id: id,
+        elapsed_time: elapsed_time,
+        lid_temp: lid_temp,
+        heat_block_zone_1_temp: heat_block_zone_1_temp,
+        heat_block_zone_2_temp: heat_block_zone_2_temp
+      };
+      cb();
     });
   }
 
 
-  if(!lastElapsedTime) {
-    getLastLog(function (dbLastLog) {
-      lastElapsedTime = dbLastLog.elapsed_time;
-      insert(lastElapsedTime);
-    });
+  if(!lastLog) {
+    insertLog(experiment_id, 0, 0, 0);
+    lastLog = {
+      experiment_id: 0,
+      elapsed_time: 0,
+      lid_temp: 0,
+      heat_block_zone_1_temp: 0,
+      heat_block_zone_2_temp: 0
+    };
+    insert();
   }
   else {
-    insert(lastElapsedTime);
+    insert();
   }
 }
 
@@ -125,7 +152,7 @@ app.post('/control/start', function (req, res, next) {
     autoupdateLogs();
   }, 3000);
 
-  setTimeout(stop, 1000 * 15);
+  setTimeout(stop, 1000 * 60 * 15);
 
   res.send(true);
 });

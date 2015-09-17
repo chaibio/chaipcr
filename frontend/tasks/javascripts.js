@@ -7,6 +7,7 @@ var rename = require('gulp-rename');
 var replace = require('gulp-replace');
 var uglify = require('gulp-uglify');
 var gutil = require('gulp-util');
+var stripDebug = require('gulp-strip-debug');
 var del = require('del');
 var _makeHash = require('./helpers').makeHash;
 var swallowError = require('./helpers').swallowError;
@@ -137,6 +138,8 @@ gulp.task('hash-js', ['concat-js'], function () {
 gulp.task('uglify', ['concat-js', 'hash-js'], function () {
   return gulp.src('.tmp/js/'+applicationJS+'.js')
          .pipe(uglify())
+         .on('error', swallowError)
+         .pipe(stripDebug())
          .on('error', swallowError)
          .pipe(gulp.dest('.tmp/js'));
 });
