@@ -9,13 +9,24 @@ window.ChaiBioTech.ngApp.directive('actions', [
       templateUrl: 'app/views/directives/actions.html',
 
       link: function(scope, elem, attr) {
+
         scope.actionPopup = false;
+
+        scope.$on("dataLoaded", function() {
+
+          scope.$watch('step.pause', function(pauseState) {
+            if(pauseState) {
+              scope.pauseAction = "REMOVE";
+            } else {
+              scope.pauseAction = "ADD A";
+            }
+          })
+        });
 
         scope.addStep = function() {
           ExperimentLoader.addStep(scope)
             .then(function(data) {
               console.log(data);
-              //scope.reloadAll();
               //Now create a new step and insert it...!
               scope.fabricStep.parentStage.addNewStep(data, scope.fabricStep);
             });
@@ -43,8 +54,6 @@ window.ChaiBioTech.ngApp.directive('actions', [
           ExperimentLoader.changePause(scope)
           .then(function(data) {
             console.log("added", data);
-            scope.actionPopup = false;
-            //scope.fabricStep.parentStage.parent.addNewStage(data, scope.fabricStep.parentStage);
           });
         }
 

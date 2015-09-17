@@ -247,15 +247,20 @@ window.ChaiBioTech.ngApp.factory('circle', [
         }
 
         if(this.model.pause) {
-          this.circle.setFill("#ffb400");
-          this.circle.setStroke("#ffde00");
-          this.circle.strokeWidth = 5;
-          this.circle.radius = 18;
-          this.pauseImageMiddle.setVisible(true);
-          this.gatherDataImageMiddle.setVisible(false);
-          this.pauseStepOnScrollGroup.setVisible(false);
+          this.applyPauseChanges();
         }
 
+      };
+
+      this.applyPauseChanges = function() {
+
+        this.circle.setFill("#ffb400");
+        this.circle.setStroke("#ffde00");
+        this.circle.strokeWidth = 5;
+        this.circle.radius = 18;
+        this.pauseImageMiddle.setVisible(true);
+        this.gatherDataImageMiddle.setVisible(false);
+        this.pauseStepOnScrollGroup.setVisible(false);
       };
 
       this.showHideGatherData = function(state) {
@@ -273,22 +278,17 @@ window.ChaiBioTech.ngApp.factory('circle', [
       this.controlPause = function(state) {
 
         if(state && this.big) {
-          this.pauseStepOnScrollGroup.setVisible(state);
+          this.pauseStepOnScrollGroup.setVisible(true);
           this.holdTime.setVisible(false);
           return;
-        }
-        this.pauseStepOnScrollGroup.setVisible(false);
-        this.holdTime.setVisible(true);
-        /*if(state && ! this.big) {
-
-          this.pauseImage.setVisible(state);
-          this.circle.setFill("white");
+        } else if(state) {
+          this.holdTime.setVisible(false);
+          this.applyPauseChanges();
+          return;
         } else {
-          console.log("inside out");
-          this.circle.setFill("#ffb400");
-          this.pauseStepOnScrollGroup.setVisible(state);
-        }*/
-
+          this.pauseStepOnScrollGroup.setVisible(false);
+          this.holdTime.setVisible(true);
+        }
       };
 
       this.manageDrag = function(targetCircleGroup) {
