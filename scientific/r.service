@@ -1,0 +1,15 @@
+[Unit]
+Description=Rserve
+
+[Service]
+WorkingDirectory=/
+ExecStart=/usr/local/lib/R/bin/R CMD Rserve --no-save
+SyslogIdentifier=Rserve
+Restart=on-failure
+StartLimitBurst=0
+StartLimitInterval=0
+Type=forking
+
+[Install]
+WantedBy=multi-user.target
+
