@@ -62,7 +62,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         if data.length > 0
           $scope.temperatureLogsCache = angular.copy data
           $scope.temperatureLogs = angular.copy data
-          $scope.greatest_elapsed_time = Math.floor $scope.temperatureLogsCache[$scope.temperatureLogsCache.length - 1].temperature_log.elapsed_time
+          $scope.greatest_elapsed_time = Math.floor data[data.length - 1].temperature_log.elapsed_time
           $scope.initResolutionOptions()
           $scope.resolutionOptionsIndex = $scope.resolutionOptions.length-1
           $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
@@ -198,7 +198,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
           $scope.temperatureLogs = angular.copy data
           $scope.greatest_elapsed_time = Math.floor data[data.length - 1].temperature_log.elapsed_time
           $scope.initResolutionOptions()
-          if !$scope.resolution
+          if !$scope.resolution or $scope.greatest_elapsed_time/1000 < 60 * 5
             $scope.resolutionOptionsIndex = $scope.resolutionOptions.length-1
             $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
           $scope.updateYScale()
@@ -259,6 +259,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         {y: 'lid_temp', color: 'lightsteelblue'}
       ],
       lineMode: 'linear',
+      thickness: '2px',
       tension: 0.7,
       tooltip: {
         mode: 'scrubber',

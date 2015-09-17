@@ -160,6 +160,7 @@ app.post('/control/start', function (req, res, next) {
 function stop () {
   completeExperiment(experiment_id);
   data = status_idle;
+  lastLog = null;
   clearTimeout(intrvl);
 }
 
