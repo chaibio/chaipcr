@@ -2,11 +2,15 @@ app = window.ChaiBioTech.ngApp
 
 app.factory 'Auth', [
   '$http'
-  ($http) ->
+  '$window'
+  ($http, $window) ->
 
     logout: ->
       $http.post('/logout').then ->
         $.jStorage.deleteKey 'authToken'
+        # http://stackoverflow.com/questions/2144386/javascript-delete-cookie
+        # delete auth cookie
+        $window.document.cookie = 'authentication_token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;'
 
 ]
 
