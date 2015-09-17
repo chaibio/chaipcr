@@ -4,6 +4,9 @@ class Stage < ActiveRecord::Base
   
   belongs_to :protocol
   has_many :steps, -> {order("order_number")}
+  has_many :ramps, :through => :steps
+  
+  scope :collect_data, -> { joins(:steps, :protocol).joins("LEFT OUTER JOIN ramps ON ramps.next_step_id = steps.id").where("stage_type ='#{TYPE_CYCLE}' AND (steps.collect_data=true OR ramps.collect_data=true)").order("stages.order_number")}
   
   validate :validate
   

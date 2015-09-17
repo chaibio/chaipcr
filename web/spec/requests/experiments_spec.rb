@@ -123,6 +123,7 @@ describe "Experiments API" do
     get "/experiments/#{experiment.id}/fluorescence_data", { :format => 'json' }
     expect(response).to be_success
     json = JSON.parse(response.body)
+    puts "***********#{json}"
 #    json[0]["fluorescence_datum"]["fluorescence_value"].should == 75
 #    json[1]["fluorescence_datum"]["fluorescence_value"].should == 50
 #    json[2]["fluorescence_datum"]["fluorescence_value"].should == 30
@@ -134,6 +135,14 @@ describe "Experiments API" do
     create_fluorescence_data(experiment)
     get "/experiments/#{experiment.id}/export.zip", { :format => 'zip' }
     expect(response).to be_success
+  end
+
+  it "test token in url" do
+    body = system('curl http://localhost:3000/login')
+    request.cookies[:authentication_token] = nil
+    get "/experiments", { :format => 'json' }
+    expect(response).to be_success
+    puts "**************#{response.body}"
   end
   
   describe "check editable" do

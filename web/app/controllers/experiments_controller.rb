@@ -111,15 +111,8 @@ class ExperimentsController < ApplicationController
   
   def fluorescence_data
     if @experiment
-      config   = Rails.configuration.database_configuration
-      connection = Rserve::Connection.new
-      results = connection.eval("fluorescence_data('#{config[Rails.env]["database"]}', #{@experiment.id}, #{@experiment.calibration_id})").to_ruby
-      @fluorescence_data = []
-      if !results[0].blank?
-        (0...results[0].length).each do |i|
-          @fluorescence_data[i] = FluorescenceDatum.new(:experiment_id=>params[:id], :well_num=>results[0][i], :cycle_num=>results[1][i], :calibrated_value=>results[2][i])
-        end
-      end
+      @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
+      @fluorescence_data = retrieve_fluorescence_data(@first_stage_collect_data.id, @experiment.calibration_id) if !@first_stage_collect_data.blank?
       respond_to do |format|
         format.json { render "fluorescence_data", :status => :ok}
       end
@@ -135,8 +128,20 @@ class ExperimentsController < ApplicationController
         buffer = Zip::OutputStream.write_buffer do |out|
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/temperature_log.csv")
           out.write TemperatureLog.as_csv(params[:id])
+          
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/fluorescence.csv")
-          out.write FluorescenceDatum.as_csv(params[:id])
+          first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
+          columns = ["calibrated_value", ":well_num", ":cycle_num"]
+          csv_string = CSV.generate do |csv|
+            csv << columns
+            if first_stage_collect_data
+              retrieve_fluorescence_data(first_stage_collect_data.id, @experiment.calibration_id).each do |fluorescence_data|
+                csv << fluorescence_data.attributes.values_at(*columns)
+              end
+            end
+          end
+          out.write csv_string
+          
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve.csv")
           out.write MeltCurveDatum.as_csv(params[:id])
         end
@@ -150,6 +155,19 @@ class ExperimentsController < ApplicationController
   
   def get_experiment
     @experiment = Experiment.find_by_id(params[:id]) if @experiment.nil?
+  end
+  
+  def retrieve_fluorescence_data(stage_id, calibration_id)
+    fluorescence_data = []
+    config   = Rails.configuration.database_configuration
+    connection = Rserve::Connection.new
+    results = connection.eval("fluorescence_data('#{config[Rails.env]["database"]}', #{stage_id}, #{calibration_id})").to_ruby
+    if !results.blank? && !results[0].blank?
+      (0...results[0].length).each do |i|
+        fluorescence_data[i] = FluorescenceDatum.new(:experiment_id=>params[:id], :well_num=>results[0][i], :cycle_num=>results[1][i], :calibrated_value=>results[2][i])
+      end
+    end
+    return fluorescence_data
   end
   
 end
