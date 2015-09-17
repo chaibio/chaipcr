@@ -131,12 +131,12 @@ class ExperimentsController < ApplicationController
           
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/fluorescence.csv")
           first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
-          columns = ["calibrated_value", ":well_num", ":cycle_num"]
+          columns = ["well_num", "cycle_num"]
           csv_string = CSV.generate do |csv|
-            csv << columns
+            csv << ["calibrated_value"]+columns
             if first_stage_collect_data
               retrieve_fluorescence_data(first_stage_collect_data.id, @experiment.calibration_id).each do |fluorescence_data|
-                csv << fluorescence_data.attributes.values_at(*columns)
+                csv << [fluorescence_data.calibrated_value]+fluorescence_data.attributes.values_at(*columns)
               end
             end
           end
