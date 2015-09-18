@@ -2,7 +2,7 @@ class ExperimentDefinition < ActiveRecord::Base
   has_one :protocol, dependent: :destroy
 
   TYPE_USER_DEFINED = "user"
-  TYPE_DIAGONOSTIC  = "diagnostic"
+  TYPE_DIAGNOSTIC  = "diagnostic"
   TYPE_CALIBRATION  = "calibration"
   
   DEFAULT_PROTOCOL = {lid_temperature:110, stages:[
