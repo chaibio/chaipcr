@@ -133,6 +133,42 @@ struct type_conversion<Experiment::CompletionStatus>
     }
 };
 
+
+template<>
+struct type_conversion<Experiment::Type>
+{
+    typedef std::string base_type;
+
+    static void from_base(base_type const &in, soci::indicator indicator, Experiment::Type &out)
+    {
+        if (indicator != soci::i_null)
+        {
+            if (in == "diagnostic")
+                out = Experiment::DiagnosticType;
+            else
+                out = Experiment::NoneType;
+        }
+        else
+            out = Experiment::NoneType;
+    }
+
+    static void to_base(Experiment::Type const &in, base_type &out, soci::indicator &indicator)
+    {
+        switch (in)
+        {
+        case Experiment::DiagnosticType:
+            out = "diagnostic";
+            indicator = soci::i_ok;
+
+            break;
+
+        default:
+            indicator = soci::i_null;
+            break;
+        }
+    }
+};
+
 }
 
 #endif // SOCIINCLUDES_H

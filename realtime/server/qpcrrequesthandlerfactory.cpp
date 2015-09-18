@@ -97,15 +97,24 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
 bool QPCRRequestHandlerFactory::checkUserAuthorization(const HTTPServerRequest &request)
 {
     std::string token;
-    std::string query = URI(request.getURI()).getQuery();
-    boost::tokenizer<boost::char_separator<char>> tokens(query, boost::char_separator<char>("&"));
 
-    for (const std::string &argument: tokens)
+    if (request.has("Authorization"))
     {
-        if (argument.find("access_token=") == 0)
+        token = request.get("Authorization");
+        token.erase(0, 6); //Remove "Token "
+    }
+    else
+    {
+        std::string query = URI(request.getURI()).getQuery();
+        boost::tokenizer<boost::char_separator<char>> tokens(query, boost::char_separator<char>("&"));
+
+        for (const std::string &argument: tokens)
         {
-            token = argument.substr(std::string("access_token=").size());
-            break;
+            if (argument.find("access_token=") == 0)
+            {
+                token = argument.substr(std::string("access_token=").size());
+                break;
+            }
         }
     }
 

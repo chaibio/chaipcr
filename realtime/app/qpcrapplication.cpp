@@ -1,5 +1,8 @@
 #include <Poco/Net/HTTPServer.h>
 
+#include <unistd.h>
+#include <fcntl.h>
+
 #include "pcrincludes.h"
 #include "icontrol.h"
 #include "experimentcontroller.h"
@@ -13,6 +16,15 @@
 using namespace std;
 using namespace Poco::Net;
 using namespace Poco::Util;
+
+class QPCRServerSocket : public ServerSocket
+{
+public:
+    QPCRServerSocket(Poco::UInt16 port): ServerSocket(port)
+    {
+        fcntl(sockfd(), F_SETFD, FD_CLOEXEC);
+    }
+};
 
 // Class QPCRApplication
 void QPCRApplication::initialize(Application&) {
@@ -37,7 +49,8 @@ void QPCRApplication::initialize(Application&) {
 
 int QPCRApplication::main(const vector<string>&) {
     HTTPServerParams *params = new HTTPServerParams;
-    HTTPServer server(new QPCRRequestHandlerFactory, ServerSocket(kHttpServerPort), params);
+    QPCRServerSocket socket(kHttpServerPort);
+    HTTPServer server(new QPCRRequestHandlerFactory, socket, params);
 
     try
     {

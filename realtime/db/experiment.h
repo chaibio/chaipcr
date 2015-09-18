@@ -17,6 +17,12 @@ public:
         Aborted
     };
 
+    enum Type
+    {
+        NoneType,
+        DiagnosticType
+    };
+
     Experiment();
     Experiment(int id, int definationId = -1);
     Experiment(const Experiment &other);
@@ -34,6 +40,9 @@ public:
     inline void setName(const std::string &name) {_name = name;}
     inline void setName(std::string &&name) {_name = std::move(name);}
     inline const std::string& name() const {return _name;}
+
+    inline void setType(Type type) {_type = type;}
+    inline const Type type() const {return _type;}
 
     inline void setId(int id) { _id = id; }
     inline int id() const { return _id; }
@@ -68,6 +77,7 @@ public:
 private:
     int _definationId;
     std::string _name;
+    Type _type;
 
     int _id;
     boost::posix_time::ptime _startedAt;

@@ -150,6 +150,9 @@ bool DBControl::getExperimentDefination(Experiment &experiment)
         if (result.get_indicator("name") != soci::i_null)
             experiment.setName(result.get<std::string>("name"));
 
+        if (result.get_indicator("experiment_type") != soci::i_null)
+            experiment.setType(result.get<Experiment::Type>("experiment_type"));
+
         return true;
     }
 

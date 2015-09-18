@@ -5,6 +5,7 @@ Experiment::Experiment()
 {
     _definationId = -1;
     _id = -1;
+    _type = NoneType;
     _startedAt = boost::posix_time::not_a_date_time;
     _completedAt = boost::posix_time::not_a_date_time;
     _completionStatus = None;
@@ -25,6 +26,7 @@ Experiment::Experiment(const Experiment &other)
     :Experiment(other.id(), other.definationId())
 {
     setName(other.name());
+    setType(other.type());
     setStartedAt(other.startedAt());
     setCompletedAt(other.completedAt());
     setCompletionStatus(other.completionStatus());
@@ -41,6 +43,7 @@ Experiment::Experiment(Experiment &&other)
     _definationId = other._definationId;
     _id = other._id;
     _name = std::move(other._name);
+    _type = other._type;
     _startedAt = other._startedAt;
     _completedAt = other._completedAt;
     _completionStatus = other._completionStatus;
@@ -52,6 +55,7 @@ Experiment::Experiment(Experiment &&other)
 
     other._definationId = -1;
     other._id = -1;
+    other._type = NoneType;
     other._startedAt = boost::posix_time::not_a_date_time;
     other._completedAt = boost::posix_time::not_a_date_time;
     other._completionStatus = None;
@@ -71,6 +75,7 @@ Experiment& Experiment::operator= (const Experiment &other)
     setDefinationId(other.definationId());
     setId(other.id());
     setName(other.name());
+    setType(other.type());
     setStartedAt(other.startedAt());
     setCompletedAt(other.completedAt());
     setCompletionStatus(other.completionStatus());
@@ -92,6 +97,7 @@ Experiment& Experiment::operator= (Experiment &&other)
     _definationId = other._definationId;
     _id = other._id;
     _name = std::move(other._name);
+    _type = other._type;
     _startedAt = other._startedAt;
     _completedAt = other._completedAt;
     _completionMessage = std::move(other._completionMessage);
@@ -107,6 +113,7 @@ Experiment& Experiment::operator= (Experiment &&other)
 
     other._definationId = -1;
     other._id = -1;
+    other._type = NoneType;
     other._startedAt = boost::posix_time::not_a_date_time;
     other._completedAt = boost::posix_time::not_a_date_time;
     other._completionStatus = None;

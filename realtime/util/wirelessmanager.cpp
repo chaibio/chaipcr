@@ -175,7 +175,7 @@ void WirelessManager::ifup()
 
     int processPipes[2] = {-1};
 
-    if (pipe(processPipes) == -1)
+    if (pipe2(processPipes, O_CLOEXEC) == -1)
         throw std::system_error(errno, std::generic_category(), "WirelessManager::ifup - unable to create pipes:");
 
     pid_t pid = vfork();
@@ -192,7 +192,7 @@ void WirelessManager::ifup()
     {
         if (processPipes[1] != fileno(stdout))
         {
-            dup2(processPipes[1], fileno(stdout));
+            dup3(processPipes[1], fileno(stdout), O_CLOEXEC);
             close(processPipes[1]);
         }
 
