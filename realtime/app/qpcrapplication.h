@@ -12,6 +12,7 @@ class IControl;
 class IThreadControl;
 class ExperimentController;
 class WirelessManager;
+class TimeChecker;
 
 // Class QPCRApplication
 class QPCRApplication: public Poco::Util::ServerApplication
@@ -46,6 +47,7 @@ private:
     std::vector<std::shared_ptr<IThreadControl>> _threadControlUnits;
     std::shared_ptr<ExperimentController> _experimentController;
     std::shared_ptr<WirelessManager> _wirelessManager;
+    std::shared_ptr<TimeChecker> _timeChecker;
 
     std::exception_ptr _exception;
 };

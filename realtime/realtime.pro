@@ -11,13 +11,14 @@ INCLUDEPATH += ./libraries/include/soci #for internal SOCI use
 INCLUDEPATH += ./libraries/include/mysql
 INCLUDEPATH += $(BOOST_INCLUDE_PATH)
 
-LIBS += -L$$_PRO_FILE_PWD_/libraries/libhf/
+LIBS += -L$$_PRO_FILE_PWD_/libraries/lib/
 
 #Poco
 LIBS += -lPocoFoundation
 LIBS += -lPocoNet
 LIBS += -lPocoUtil
 LIBS += -lPocoXML
+LIBS += -lPocoJSON
 
 #Google Test and Mock
 #LIBS += -lgtest
@@ -131,7 +132,8 @@ HEADERS += \
     util/instance.h \
     server/httpcodehandler.h \
     util/wirelessmanager.h \
-    server/wirelessmanagerhandler.h
+    server/wirelessmanagerhandler.h \
+    util/timechecker.h
 
 SOURCES += \
     app/pins.cpp \
@@ -178,4 +180,5 @@ SOURCES += \
     control/test/adccontrollermock.cpp \
     server/httpcodehandler.cpp \
     util/wirelessmanager.cpp \
-    server/wirelessmanagerhandler.cpp
+    server/wirelessmanagerhandler.cpp \
+    util/timechecker.cpp

@@ -17,7 +17,7 @@ old_library='libgmock.a'
 inherited_linker_flags=' -pthread'
 
 # Libraries that this one depends upon.
-dependency_libs=''
+dependency_libs=' /opt/arm-unknown-linux-gnueabi/arm-unknown-linux-gnueabi/lib/libstdc++.la'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''

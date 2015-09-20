@@ -42,7 +42,7 @@ public:
     inline const std::string& name() const {return _name;}
 
     inline void setType(Type type) {_type = type;}
-    inline const Type type() const {return _type;}
+    inline Type type() const {return _type;}
 
     inline void setId(int id) { _id = id; }
     inline int id() const { return _id; }
