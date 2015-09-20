@@ -3,8 +3,9 @@ window.ChaiBioTech.ngApp.directive('general', [
   '$timeout',
   '$modal',
   'alerts',
+  'popupStatus',
 
-  function(ExperimentLoader, $timeout, $modal, alerts) {
+  function(ExperimentLoader, $timeout, $modal, alerts, popupStatus) {
 
     return {
       restric: 'EA',
@@ -21,9 +22,15 @@ window.ChaiBioTech.ngApp.directive('general', [
         scope.showCycling = false;
         scope.warningMessage = alerts.nonDigit;
 
+        
+
         scope.$on("dataLoaded", function() {
           // there is a slight delay for the controller to catch up so wait for it and load
           scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
+
+          scope.$watch('popUp', function(newVal) {
+            popupStatus.popup = scope.popUp;
+          });
 
 
 
@@ -98,6 +105,9 @@ window.ChaiBioTech.ngApp.directive('general', [
           scope.popUp = ! scope.popUp;
           scope.step.collect_data = ! scope.step.collect_data;
           ExperimentLoader.gatherDuringStep(scope);
+        };
+        scope.hidePopup = function() {
+            scope.popUp = false;
         };
 
         scope.changeDuringRamp = function() {

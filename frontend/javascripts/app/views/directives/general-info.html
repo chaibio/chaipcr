@@ -27,7 +27,7 @@
     </div>
   </div>
   <div class="bottom-button-container">
-    <div id="gather-data-button" class="gather-data-button-{{step.collect_data || step.ramp.collect_data}}" ng-click="popUp = true">
+    <div id="gather-data-button" class="gather-data-button-{{step.collect_data || step.ramp.collect_data}}" ng-click="popUp = !popUp">
       <div class="gather-data-button-image-container">
         <img class="gather-data-button-image" ng-show="step.collect_data || step.ramp.collect_data" ng-src="/images/gather-data-image.png">
       </div>

@@ -6,7 +6,7 @@ window.ChaiBioTech.ngApp.service('expName', [
     this.updateName = function(name) {
       this.name = name;
       $rootScope.$broadcast("expName:Updated");
-    }
+    };
     return this;
   }
 ]);

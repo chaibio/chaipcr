@@ -216,6 +216,6 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
       url = "/steps/" + $scope.step.id,
       delay = $q.defer();
       return this.update(url, dataToBeSend, delay);
-    }
+    };
   }
 ]);

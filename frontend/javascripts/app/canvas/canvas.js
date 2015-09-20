@@ -32,7 +32,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         "pause-middle.png"
       ];
 
-      this.imageLocation = "/images/"
+      this.imageLocation = "/images/";
       this.imageobjects = {};
       if(this.canvas) this.canvas.clear();
       this.canvas = new fabric.Canvas('canvas', {
