@@ -17,11 +17,15 @@ window.ChaiBioTech.ngApp.factory('events', [
 
       // We write this handler so that gather data popup is forced to hide when
       // clicked at some other part of the page, Given pop up is active.
+      
       angular.element('body').click(function(evt) {
-        if(popupStatus.popup && evt.target.parentNode.id != "gather-data-button") {
+        if(popupStatus.popupStatusGatherData && evt.target.parentNode.id != "gather-data-button") {
             // Here we induce a click so that, angular hides the popup.
             angular.element('#gather-data-button').click();
+        } else if(popupStatus.popupStatusAddStage && evt.target.id != "add-stage") {
+            angular.element('#add-stage').click();
         }
+
       });
       /**************************************
           what happens when click is happening in canvas.

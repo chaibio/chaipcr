@@ -22,14 +22,14 @@ window.ChaiBioTech.ngApp.directive('general', [
         scope.showCycling = false;
         scope.warningMessage = alerts.nonDigit;
 
-        
+
 
         scope.$on("dataLoaded", function() {
           // there is a slight delay for the controller to catch up so wait for it and load
           scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
 
           scope.$watch('popUp', function(newVal) {
-            popupStatus.popup = scope.popUp;
+            popupStatus.popupStatusGatherData = scope.popUp;
           });
 
 

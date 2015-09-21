@@ -2,7 +2,9 @@ window.ChaiBioTech.ngApp.directive('actions', [
   'ExperimentLoader',
   '$timeout',
   'canvas',
-  function(ExperimentLoader, $timeout, canvas) {
+  'popupStatus',
+
+  function(ExperimentLoader, $timeout, canvas, popupStatus) {
     return {
       restric: 'EA',
       replace: true,
@@ -14,13 +16,18 @@ window.ChaiBioTech.ngApp.directive('actions', [
 
         scope.$on("dataLoaded", function() {
 
+          scope.$watch("actionPopup", function(newVal) {
+            popupStatus.popupStatusAddStage = scope.actionPopup;
+            console.log(scope.actionPopup);
+          });
+
           scope.$watch('step.pause', function(pauseState) {
             if(pauseState) {
               scope.pauseAction = "REMOVE";
             } else {
               scope.pauseAction = "ADD A";
             }
-          })
+          });
         });
 
         scope.addStep = function() {
@@ -55,7 +62,7 @@ window.ChaiBioTech.ngApp.directive('actions', [
           .then(function(data) {
             console.log("added", data);
           });
-        }
+        };
 
       }
     };

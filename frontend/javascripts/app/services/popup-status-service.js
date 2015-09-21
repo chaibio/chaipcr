@@ -2,6 +2,7 @@ window.ChaiBioTech.ngApp.service('popupStatus', [
   '$rootScope',
 
   function($rootScope) {
-    this.popup = false;
+    this.popupStatusGatherData = false;
+    this.popupStatusAddStage = false;
   }
 ]);
