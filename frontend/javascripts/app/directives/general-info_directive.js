@@ -31,9 +31,7 @@ window.ChaiBioTech.ngApp.directive('general', [
           scope.$watch('popUp', function(newVal) {
             popupStatus.popupStatusGatherData = scope.popUp;
           });
-
-
-
+          
           scope.$watch('stage.auto_delta', function(newVal, oldVal) {
             scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
           });
