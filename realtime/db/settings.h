@@ -35,13 +35,18 @@ public:
     Settings()
     {
         _debugMode = false;
+        _timeValid = false;
     }
 
     inline void setDebugMode(bool mode) { _debugMode = mode; }
     inline bool debugMode() const { return _debugMode; }
 
+    inline void setTimeValud(bool state) { _timeValid = state; }
+    inline bool timeValid() const { return _timeValid; }
+
 private:
     std::atomic<bool> _debugMode;
+    std::atomic<bool> _timeValid;
 };
 
 #endif // SETTINGS_H

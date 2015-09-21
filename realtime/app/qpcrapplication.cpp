@@ -12,6 +12,8 @@
 #include "exceptionhandler.h"
 #include "wirelessmanager.h"
 #include "maincontrollers.h"
+#include "timechecker.h"
+#include "settings.h"
 
 using namespace std;
 using namespace Poco::Net;
@@ -34,6 +36,15 @@ void QPCRApplication::initialize(Application&) {
         QPCRFactory::constructMachine(_controlUnits, _threadControlUnits);
         _experimentController = ExperimentController::createInstance();
         _wirelessManager.reset(new WirelessManager("wlan0"));
+        _timeChecker.reset(new TimeChecker());
+
+        _timeChecker->timeBecameValid.connect([&]()
+        {
+            Settings *settings = _experimentController->settings();
+            settings->setTimeValud(true);
+
+            _experimentController->settingsUpdated();
+        });
 
         initSignals();
     }
