@@ -7,6 +7,17 @@ describe "Experiments API" do
   end
   
   it 'create experiment' do
+    params = { experiment: {name: "test", guid: "thermal_performance_diagnostic"} }
+    post "/experiments", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+    expect(response).to be_success            # test for the 200 status-code
+    json = JSON.parse(response.body)
+    json["experiment"]["name"].should == "test"
+    json["experiment"]["type"].should == "diagnostic"
+    json["experiment"]["protocol"]["stages"].should have(2).items
+    json["experiment"]["run_at"].should be_nil
+  end
+  
+  it 'create experiment with guid' do
     params = { experiment: {name: "test"} }
     post "/experiments", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
     expect(response).to be_success            # test for the 200 status-code

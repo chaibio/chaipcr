@@ -80,6 +80,7 @@ Qpcrctl::Application.routes.draw do
       get 'temperature_data'
       get 'fluorescence_data'
       get 'export'
+      get 'analyze'
     end
   end
 
