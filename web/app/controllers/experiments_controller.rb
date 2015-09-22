@@ -39,7 +39,7 @@ class ExperimentsController < ApplicationController
       experiment_definition = ExperimentDefinition.new(:name=>params[:experiment][:name], :experiment_type=>ExperimentDefinition::TYPE_USER_DEFINED)
       experiment_definition.protocol_params = params[:experiment][:protocol]
     else
-      experiment_definition = ExperimentDefinition.where("guid=?", params[:experiment][:guid])
+      experiment_definition = ExperimentDefinition.where("guid=?", params[:experiment][:guid]).first
     end
     @experiment = Experiment.new
     @experiment.experiment_definition = experiment_definition
@@ -150,7 +150,16 @@ class ExperimentsController < ApplicationController
       }
     end
   end
-    
+  
+  def analyze
+      config   = Rails.configuration.database_configuration
+      connection = Rserve::Connection.new
+      connection.eval("source(\"#{Rails.configuration.dynamic_file_path}/#{@experiment.experiment_definition.guid}/analysis.R\")")
+      response = connection.eval("analysis('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{@experiment.id})").to_ruby
+      json = JSON.parse(response)
+      render :text=>json
+  end
+  
   protected
   
   def get_experiment
@@ -161,7 +170,7 @@ class ExperimentsController < ApplicationController
     fluorescence_data = []
     config   = Rails.configuration.database_configuration
     connection = Rserve::Connection.new
-    results = connection.eval("fluorescence_data('#{config[Rails.env]["database"]}', #{stage_id}, #{calibration_id})").to_ruby
+    results = connection.eval("fluorescence_data('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{stage_id}, #{calibration_id})").to_ruby
     if !results.blank? && !results[0].blank?
       (0...results[0].length).each do |i|
         fluorescence_data[i] = FluorescenceDatum.new(:experiment_id=>params[:id], :well_num=>results[0][i], :cycle_num=>results[1][i], :calibrated_value=>results[2][i])
