@@ -154,7 +154,7 @@ class ExperimentsController < ApplicationController
   def analyze
       config   = Rails.configuration.database_configuration
       connection = Rserve::Connection.new
-      connection.eval("source(\"#{Rails.root}/public/dynexp/test/analysis.R\")")
+      connection.eval("source(\"#{Rails.configuration.dynamic_file_path}/#{@experiment.experiment_definition.guid}/analysis.R\")")
       response = connection.eval("analysis('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{@experiment.id})").to_ruby
       json = JSON.parse(response)
       render :text=>json

@@ -7,17 +7,6 @@ describe "Experiments API" do
   end
   
   it 'create experiment' do
-    params = { experiment: {name: "test", guid: "thermal_performance_diagnostic"} }
-    post "/experiments", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
-    expect(response).to be_success            # test for the 200 status-code
-    json = JSON.parse(response.body)
-    json["experiment"]["name"].should == "test"
-    json["experiment"]["type"].should == "diagnostic"
-    json["experiment"]["protocol"]["stages"].should have(2).items
-    json["experiment"]["run_at"].should be_nil
-  end
-  
-  it 'create experiment with guid' do
     params = { experiment: {name: "test"} }
     post "/experiments", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
     expect(response).to be_success            # test for the 200 status-code
@@ -25,6 +14,17 @@ describe "Experiments API" do
     json["experiment"]["name"].should == "test"
     json["experiment"]["type"].should == "user"
     json["experiment"]["protocol"]["stages"].should have(2).items
+    json["experiment"]["run_at"].should be_nil
+  end
+  
+  it 'create experiment with guid' do
+    params = { experiment: {guid: "thermal_performance_diagnostic"} }
+    post "/experiments", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+    expect(response).to be_success            # test for the 200 status-code
+    json = JSON.parse(response.body)
+    json["experiment"]["name"].should == "Thermal Performance Diagnostic"
+    json["experiment"]["type"].should == "diagnostic"
+    json["experiment"]["protocol"]["stages"].should have(1).item
     json["experiment"]["run_at"].should be_nil
   end
   
@@ -134,7 +134,6 @@ describe "Experiments API" do
     get "/experiments/#{experiment.id}/fluorescence_data", { :format => 'json' }
     expect(response).to be_success
     json = JSON.parse(response.body)
-    puts "***********#{json}"
 #    json[0]["fluorescence_datum"]["fluorescence_value"].should == 75
 #    json[1]["fluorescence_datum"]["fluorescence_value"].should == 50
 #    json[2]["fluorescence_datum"]["fluorescence_value"].should == 30
@@ -153,13 +152,12 @@ describe "Experiments API" do
     request.cookies[:authentication_token] = nil
     get "/experiments", { :format => 'json' }
     expect(response).to be_success
-    puts "**************#{response.body}"
   end
   
   describe "check editable" do
     it "not editable if experiment definition is not editable" do
       experiment = Experiment.new
-      experiment.experiment_definition = ExperimentDefinition.new(:name=>"diagnostic", :experiment_type=>ExperimentDefinition::TYPE_DIAGONOSTIC)
+      experiment.experiment_definition = ExperimentDefinition.new(:name=>"diagnostic", :experiment_type=>ExperimentDefinition::TYPE_DIAGNOSTIC)
       experiment.save
       params = {experiment: {name: "test1"}}
       put "/experiments/#{experiment.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }

@@ -1,23 +1,3 @@
-ExperimentDefinition.seed do |s|
-  s.id = 1
-  s.name = "calibration"
-  s.guid = "optical_cal"
-  s.experiment_type = ExperimentDefinition::TYPE_CALIBRATION
-end
-
-Protocol.seed do |s|
-  s.id = 1
-  s.lid_temperature = 110
-  s.experiment_definition_id = 1
-end
-
-Stage.seed do |s|
-  s.id = 1
-  s.num_cycles = 1
-  s.protocol_id = 1
-  s.stage_type = Stage::TYPE_HOLD
-end
-
 Step.seed do |s|
   s.id = 1
   s.name = "Warm Up"
@@ -57,6 +37,26 @@ Step.seed do |s|
   s.order_number = 3
   s.stage_id = 1
   s.collect_data = true
+end
+
+Stage.seed do |s|
+  s.id = 1
+  s.num_cycles = 1
+  s.protocol_id = 1
+  s.stage_type = Stage::TYPE_HOLD
+end
+
+Protocol.seed do |s|
+  s.id = 1
+  s.lid_temperature = 110
+  s.experiment_definition_id = 1
+end
+
+ExperimentDefinition.seed do |s|
+  s.id = 1
+  s.name = "calibration"
+  s.guid = "optical_cal"
+  s.experiment_type = ExperimentDefinition::TYPE_CALIBRATION
 end
 
 #Default Experiment
