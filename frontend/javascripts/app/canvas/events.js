@@ -14,10 +14,9 @@ window.ChaiBioTech.ngApp.factory('events', [
 
       this.canvas = C.canvas;
       console.log("Events loaded .... !", ExperimentLoader);
-
       // We write this handler so that gather data popup is forced to hide when
       // clicked at some other part of the page, Given pop up is active.
-      
+
       angular.element('body').click(function(evt) {
         if(popupStatus.popupStatusGatherData && evt.target.parentNode.id != "gather-data-button") {
             // Here we induce a click so that, angular hides the popup.
@@ -39,15 +38,21 @@ window.ChaiBioTech.ngApp.factory('events', [
           switch(evt.target.name)  {
 
             case "stepGroup":
+
+              $scope.curtain.hide();
               me = evt.target.me;
               me.circle.manageClick();
               $scope.applyValuesFromOutSide(me.circle);
+
             break;
 
             case "controlCircleGroup":
+
+              $scope.curtain.hide();
               me = evt.target.me;
               me.manageClick();
               $scope.applyValuesFromOutSide(me);
+
             break;
 
             case "moveStepImage":
@@ -63,7 +68,8 @@ window.ChaiBioTech.ngApp.factory('events', [
 
           }
         } else { // if the click is on canvas
-
+          //$scope.selected = false;
+          $scope.curtain.show();
           var circle = previouslySelected.circle;
           circle.parent.parentStage.unSelectStage();
           circle.parent.unSelectStep();

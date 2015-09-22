@@ -15,6 +15,10 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
       $scope.protocol.name = expName.name;
     });
 
+    $scope.$watch("selected", function() {
+      console.log("lets change val");
+    });
+
     $scope.initiate = function() {
 
       ExperimentLoader.getExperiment()
@@ -22,6 +26,8 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
           $scope.protocol = data.experiment;
           $scope.stage = ExperimentLoader.loadFirstStages();
           $scope.step = ExperimentLoader.loadFirstStep();
+          $scope.curtain = angular.element("#curtain");
+          $scope.curtain.hide();
           $scope.$emit('general-data-ready');
           canvas.init($scope);
         });
