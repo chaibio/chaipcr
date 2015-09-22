@@ -1,0 +1,62 @@
+<div class="first-data-row">
+  <div class="bottom-step-no ostrich">{{fabricStep.ordealStatus | preZero}}</div>
+  <div class="bottom-no-of-stages ostrich">{{fabricStep.parentStage.parent.allStepViews.length | preZero: '/'}}</div>
+  <div class="bottom-name-of-step-stage ostrich" ng-click="clickOnField('stepNameShow', 'edit-step-name')">
+    <span class="bottom-name-of-step-span" >{{step.name || fabricStep.stepNameText}}</span>
+    <input type="text" class="edit-step-name" on-enter="saveStepName()" ng-blur="saveStepName()" ng-model="step.name" ng-show="stepNameShow">
+  </div>
+  <div class="bottom-stage-name sansa">{{stage.name | uppercase}}</div>
+
+  <div class="bottom-step-no-cycle-container">
+    <div class="bottom-step-no-cycle ostrich" ng-show="showCycling">
+    <span class="bottom-step-no-cycle-span" ng-click="clickOnField('stageNoCycleShow', 'bottom-step-no-cycle-edit')">{{stage.num_cycles}}</span>
+    <input type="text" class="bottom-step-no-cycle-edit" ng-blur="saveCycle()" on-enter="saveCycle()" numbers-only="numbers-only" ng-show="stageNoCycleShow" ng-model="stage.num_cycles">
+    </div>
+    <div class="bottom-step-x ostrich" ng-show="showCycling">x</div>
+    <div class="bottom-cycles-and-dots sansa" ng-show="showCycling">CYCLES</div>
+  </div>
+
+  <div class="bottom-button-container bottom-autodelta-button">
+    <div id="delta-button" class="delta-button-{{stage.auto_delta}}" ng-click="changeDelta()">
+      <div class="delta-button-image-container">
+        <img class="delta-button-image" ng-show="stage.auto_delta" ng-src="/images/delta-image.png">
+      </div>
+      <div class="delta-button-text">
+        AUTODELTA {{delta_state}}
+      </div>
+    </div>
+  </div>
+  <div class="bottom-button-container">
+    <div id="gather-data-button" class="gather-data-button-{{step.collect_data || step.ramp.collect_data}}" ng-click="popUp = !popUp">
+      <div class="gather-data-button-image-container">
+        <img class="gather-data-button-image" ng-show="step.collect_data || step.ramp.collect_data" ng-src="/images/gather-data-image.png">
+      </div>
+      <div class="gather-data-button-text">
+        GATHER DATA {{gather_data_state}}
+      </div>
+    </div>
+    <div class="lol-pop" ng-show="popUp">
+      <div class="gather-data-popup">
+        <div class="tail"></div>
+      </div>
+      <div class="gather-data-popup-content">
+        <div class="small-button first sansa" id="during-step" ng-click="changeDuringStep()">
+          <div class="tik-image-container">
+            <img ng-show="step.collect_data" class="tik-image-during-step" src="/images/tik.png">
+          </div>
+          <div class="tik-text-container">
+            <span>DURING STEP</span>
+          </div>
+        </div>
+        <div class="small-button sansa" id="after-step" ng-click="changeDuringRamp()">
+          <div class="tik-image-container">
+            <img ng-show="step.ramp.collect_data" class="tik-image-during-ramp" src="/images/tik.png">
+          </div>
+          <div class="tik-text-container">
+            <span>DURING RAMP</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

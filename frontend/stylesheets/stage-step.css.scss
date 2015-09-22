@@ -70,6 +70,16 @@
     height: 303px;
     background-color: white;
 
+    .unselectOverlay {
+      width: 1024px;
+      height: 303px;
+      background-color: black;
+      position: relative;
+      top: 0;
+      left: 0;
+      opacity: .8;
+    }
+
     .previous {
       width: 71px;
       height: 60px;

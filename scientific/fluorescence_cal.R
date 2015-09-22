@@ -3,13 +3,13 @@ library(RMySQL)
 
 numberOfWells<-16
 
-fluorescence_data <- function(dbname,stageID,calibrationID){
+fluorescence_data <- function(dbname,dbuser,dbpassword,stageID,calibrationID){
 	#load chaipcr database
 	message("db: ", dbname)
 	message("stage id: ", stageID)
 	message("calibration id: ", calibrationID)
 	
-	dbconn <- dbConnect(RMySQL::MySQL(),  user='root', dbname=dbname)
+	dbconn <- dbConnect(RMySQL::MySQL(), user=dbuser, pwd=dbpassword, dbname=dbname)
 	
 	#extract data from database
    	queryData<-sprintf("SELECT well_num, cycle_num, AVG(fluorescence_value) as fluorescence FROM fluorescence_data LEFT OUTER JOIN ramps on ramps.id = fluorescence_data.ramp_id INNER JOIN steps ON steps.id = fluorescence_data.step_id OR steps.id = ramps.next_step_id WHERE steps.stage_id=%d GROUP BY well_num, cycle_num ORDER BY well_num, cycle_num", stageID)

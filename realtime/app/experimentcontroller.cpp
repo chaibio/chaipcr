@@ -84,7 +84,7 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
 
         LidInstance::getInstance()->setTargetTemperature(experiment.protocol()->lidTemperature());
 
-        _dbControl->startExperiment(experiment);
+        _dbControl->startExperiment(experiment, _settings->timeValid());
 
         _machineState = LidHeatingMachineState;
         _experiment = std::move(experiment);
@@ -160,7 +160,7 @@ void ExperimentController::complete()
         _experiment.setCompletionStatus(Experiment::Success);
         _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
 
-        _dbControl->completeExperiment(_experiment);
+        _dbControl->completeExperiment(_experiment, _settings->timeValid());
     }
 
     stopLogging();
@@ -202,7 +202,7 @@ void ExperimentController::stop()
             _experiment.setCompletionStatus(Experiment::Aborted);
             _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
 
-            _dbControl->completeExperiment(_experiment);
+            _dbControl->completeExperiment(_experiment, _settings->timeValid());
         }
 
         state = _machineState;
@@ -239,7 +239,7 @@ void ExperimentController::stop(const std::string &errorMessage)
             _experiment.setCompletionMessage(errorMessage);
             _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
 
-            _dbControl->completeExperiment(_experiment);
+            _dbControl->completeExperiment(_experiment, _settings->timeValid());
         }
 
         _machineState = IdleMachineState;
