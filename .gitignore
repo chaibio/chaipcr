@@ -29,6 +29,8 @@ cache
 *.log
 *.tlog
 Debug
+/.idea/
+.editorconfig
 /node_modules/
 /.tmp/
 /web/public/fonts/

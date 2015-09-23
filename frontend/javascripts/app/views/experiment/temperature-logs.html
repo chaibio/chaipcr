@@ -75,7 +75,19 @@
       <hr>
       <div class="row">
         <div class="col-md-8">
-          <choose-chart ng-model="chartTypeData"></choose-chart>
+          <div class="choose-chart">
+            <div class="choose-chart-heading">
+              CHOOSE CHART
+            </div>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="chart-type-option" ui-sref="amplification-chart({id: experiment.id})">Amplification Chart</div>
+              </div>
+              <div class="col-md-4">
+                <div class="chart-type-option">Thermal Profile</div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="col-md-4">
           <test-in-progress experiment-id="experiment.id"></test-in-progress>
