@@ -27,5 +27,5 @@ Qpcrctl::Application.configure do
   # number of complex assets.
   config.assets.debug = true
   
-  config.dynamic_file_path = "#{Rails.root}/public/dynexp/"
+  config.dynamic_file_path = "#{Rails.root}/public/dynexp"
 end

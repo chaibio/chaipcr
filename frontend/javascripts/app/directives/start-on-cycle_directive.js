@@ -2,7 +2,7 @@ window.ChaiBioTech.ngApp.directive('startOnCycle', [
   'ExperimentLoader',
   '$timeout',
   'alerts',
-  
+
   function(ExperimentLoader, $timeout, alerts) {
     return {
       restric: 'EA',
@@ -44,7 +44,13 @@ window.ChaiBioTech.ngApp.directive('startOnCycle', [
           scope.edit = false;
           if(! isNaN(scope.hidden)) {
 
-            if(scope.hidden <= Number(scope.$parent.stage.num_cycles)) {
+            if(Number(scope.hidden) <= 0) {
+
+              scope.hidden = scope.shown;
+              var warningMessage0 = alerts.startOnCycleMinimum;
+              scope.$parent.showMessage(warningMessage0);
+
+            } else if(Number(scope.hidden) <= Number(scope.$parent.stage.num_cycles)) {
 
               scope.reading = scope.hidden;
               $timeout(function() {
@@ -53,11 +59,14 @@ window.ChaiBioTech.ngApp.directive('startOnCycle', [
                 });
               });
             } else {
+
               scope.hidden = scope.shown;
-              var warningMessage = alerts.startOnCycleWarning;
-              scope.$parent.showMessage(warningMessage);
+              var warningMessage1 = alerts.startOnCycleWarning;
+              scope.$parent.showMessage(warningMessage1);
             }
+
           } else {
+
             scope.hidden = scope.shown;
           }
 

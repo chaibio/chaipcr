@@ -1,7 +1,9 @@
 window.ChaiBioTech.ngApp.directive('rampSpeed', [
   'ExperimentLoader',
   '$timeout',
-  function(ExperimentLoader, $timeout) {
+  'alerts',
+
+  function(ExperimentLoader, $timeout, alerts) {
     return {
       restric: 'EA',
       replace: true,
@@ -21,7 +23,15 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
 
           if(angular.isDefined(scope.reading)) {
             console.log(Number(scope.reading));
-            scope.shown = (Number(scope.reading) === 0) ? "AUTO" : scope.reading;
+
+            if(Number(scope.reading) <= 0) {
+              scope.shown = "AUTO";
+              scope.unit = "";
+            } else {
+              scope.shown = scope.reading;
+              scope.unit = "C/s";
+            }
+            //scope.shown = (Number(scope.reading) === 0) ? "AUTO" : scope.reading;
             scope.hidden = Number(scope.reading);
           }
         });
@@ -35,22 +45,22 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
         };
 
         scope.save = function() {
-          
+
           scope.edit = false;
-          if(! isNaN(scope.hidden)) {
-
-            scope.reading = scope.hidden;
-            $timeout(function() {
-              ExperimentLoader.changeRampSpeed(scope.$parent).then(function(data) {
-                console.log(data);
+          if(! isNaN(scope.hidden) && Number(scope.hidden) < 1000) {
+            //if(Number(scope.hidden) < 1000) {
+              scope.reading = Math.abs(Number(scope.hidden));
+              $timeout(function() {
+                ExperimentLoader.changeRampSpeed(scope.$parent).then(function(data) {
+                  console.log(data);
+                });
               });
-            });
-
-          } else {
-            scope.shown = "AUTO";
-            scope.hidden = 0;
+              return ;
+            //}
           }
-
+          scope.hidden = scope.reading;
+          var warningMessage = alerts.rampSpeedWarning;
+          scope.$parent.showMessage(warningMessage);
         };
       }
     };

@@ -29,6 +29,7 @@ window.ChaiBioTech.ngApp.service('stepEvents',[
         circle.changeHoldTime();
         //Check the last step. See if the last step has zero and put infinity in that case.
         C.allCircles[C.allCircles.length - 1].doThingsForLast();
+        canvas.renderAll();
       });
 
       $scope.$watch('step.collect_data', function(newVal, oldVal) {

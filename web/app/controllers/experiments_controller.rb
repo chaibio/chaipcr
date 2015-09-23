@@ -152,12 +152,16 @@ class ExperimentsController < ApplicationController
   end
   
   def analyze
+    if @experiment && !@experiment.experiment_definition.guid.blank?
       config   = Rails.configuration.database_configuration
       connection = Rserve::Connection.new
-      connection.eval("source(\"#{Rails.configuration.dynamic_file_path}/#{@experiment.experiment_definition.guid}/analysis.R\")")
-      response = connection.eval("analysis('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{@experiment.id})").to_ruby
+      connection.eval("source(\"#{Rails.configuration.dynamic_file_path}/#{@experiment.experiment_definition.guid}/analyze.R\")")
+      response = connection.eval("analyze('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{@experiment.id})").to_ruby
       json = JSON.parse(response)
       render :text=>json
+    else
+      render :json=>{:errors=>"experiment not found"}, :status => :not_found
+    end
   end
   
   protected
