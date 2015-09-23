@@ -17,12 +17,12 @@ window.ChaiBioTech.ngApp.directive('capsule', [
       link: function(scope, elem, attr) {
 
         // data is not readily available as its an inner directive
-        scope.$watch("data", function(val) {
+        scope.$watch("data", function(val, oldVal) {
           if(angular.isDefined(scope.data)) {
-            console.log("okay right place");
+            console.log("okay right place", scope.data);
             scope.originalValue = Number(scope.data);
               if(scope.delta === "true") {
-                scope.configure();
+                scope.configure(oldVal);
               }
           }
         });
@@ -52,12 +52,24 @@ window.ChaiBioTech.ngApp.directive('capsule', [
           $(scope.drag).parent().find(".minus").css("color", color);
         };
 
-        scope.configure = function() {
+        scope.configure = function(oldVal) {
+
+          /*if(scope.originalValue === 0) {
+          // In case we need to stop the slider to come back to zero, when we change the value form a value other than zero.
+            if(! oldVal) {
+              $(scope.drag).css("left", "0px");
+              $(scope.drag).parent().parent().css("background-color", "rgb(0, 174, 239)");
+            }
+            return ;
+          }*/
 
           if(scope.originalValue > 0) {
             $(scope.drag).css("left", "36px");
             $(scope.drag).parent().parent().css("background-color", "rgb(238, 49, 24)");
-          } else if(scope.originalValue <= 0) {
+          } else if(scope.originalValue < 0) {
+            $(scope.drag).css("left", "0px");
+            $(scope.drag).parent().parent().css("background-color", "rgb(0, 174, 239)");
+          } else {
             $(scope.drag).css("left", "0px");
             $(scope.drag).parent().parent().css("background-color", "rgb(0, 174, 239)");
           }
@@ -86,14 +98,14 @@ window.ChaiBioTech.ngApp.directive('capsule', [
                 $(this).parent().parent().css("background-color", "rgb(238, 49, 24)");
                 scope.originalValue = Math.abs(scope.originalValue);
               }
-
-              scope.$apply(function() {
-                scope.data = String(scope.originalValue);
-              });
-
-              ExperimentLoader[scope.fun](scope.$parent.$parent.$parent).then(function(data) {
-                console.log("updated", data.step);
-              });
+              if(scope.originalValue !== 0) {
+                scope.$apply(function() {
+                  scope.data = String(scope.originalValue);
+                });
+                ExperimentLoader[scope.fun](scope.$parent.$parent.$parent).then(function(data) {
+                  console.log("updated", data.step);
+                });
+              }
 
             } else {
               $(this).css("left", "0px");
