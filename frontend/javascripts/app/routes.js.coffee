@@ -39,6 +39,10 @@ window.ChaiBioTech.ngApp
         url: '/experiments/:id/temperature-logs'
         templateUrl: 'app/views/experiment/temperature-logs.html'
 
+      .state 'amplification-chart',
+        url: '/experiments/:id/amplification'
+        templateUrl: 'app/views/experiment/amplification-chart.html'
+
 
 
 ]

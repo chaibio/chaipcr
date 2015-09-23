@@ -1,0 +1,57 @@
+<div menu-overlay sidemenu-template="app/views/experiment/left-menu.html">
+  <div class="page-layout amplification-chart" ng-controller="AmplificationChartCtrl">
+    <div class="header">
+      <div class="stripes-and-name">
+        <a toggle-sidemenu>
+          <div class="stripes">
+            <div class="stripe"></div>
+            <div class="stripe"></div>
+            <div class="stripe"></div>
+          </div>
+        </a>
+        <div class="name-container">{{experiment.name}}</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <h1>Amplification Chart</h1>
+
+      <div class="row">
+        <div class="col-md-8">
+          <div class="choose-chart">
+            <div class="choose-chart-heading">
+              CHOOSE CHART
+            </div>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="chart-type-option">Amplification Chart</div>
+              </div>
+              <div class="col-md-4">
+                <div class="chart-type-option">Thermal Profile</div>
+              </div>
+            </div>
+            <table class="on-off-buttons">
+              <tr>
+                <td></td>
+                <td ng-repeat="i in [1,2,3,4,5,6,7,8]" class="number">{{i}}</td>
+              </tr>
+              <tr>
+                <td class="number">A</td>
+                <td ng-repeat="i in [1,2,3,4,5,6,7,8]">
+                  <amplification-circle-button ng-model="buttons.A[$index]"></amplification-circle-button>
+                </td>
+              </tr>
+              <tr>
+                <td class="number">B</td>
+                <td ng-repeat="i in [1,2,3,4,5,6,7,8]">
+                  <amplification-circle-button ng-model="buttons.B[$index]"></amplification-circle-button>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
