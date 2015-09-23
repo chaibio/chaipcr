@@ -128,7 +128,7 @@ window.ChaiBioTech.ngApp.factory('step', [
       this.showHideRamp = function() {
 
         this.rampSpeedText.text = String(this.model.ramp.rate + "º C/s");
-        var rampRate = parseInt(this.model.ramp.rate);
+        var rampRate = Number(this.model.ramp.rate);
         if(rampRate <= 0 || ! rampRate) {
           this.rampSpeedGroup.setVisible(false);
         } else {
