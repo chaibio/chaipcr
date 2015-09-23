@@ -76,7 +76,7 @@ const int kLedBlankPwmDutyNs = 500000;
 //Optics
 const long kFluorescenceDataCollectionDelayTimeMs = 70;
 const int kADCReadsPerOpticalMeasurement = 3;
-const std::vector<int> kWellList = {4, 3, 2, 1, 16, 15, 14, 13, 5, 6, 7, 8, 9, 10, 11, 12};
+const std::vector<int> kWellLedMappingList = {4, 3, 2, 1, 16, 15, 14, 13, 5, 6, 7, 8, 9, 10, 11, 12};
 
 //Steps
 const double kPCRBeginStepTemperatureThreshold = 0.5;

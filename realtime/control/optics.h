@@ -45,11 +45,13 @@ public:
     inline bool isMeltCurveCollection() const noexcept { return _meltCurveCollection; }
     void setCollectData(bool state, bool isMeltCurve = false);
 
+    inline unsigned wellNumber() const noexcept { return _wellNumber; } //Yes, it's used in multithreading. Yes, it isn't thread safe here. It's just for testing
+
     inline std::shared_ptr<LEDController> getLedController() noexcept { return _ledController; }
     inline MUX& getPhotodiodeMux() { return _photodiodeMux; }
 
     std::vector<int> getFluorescenceData();
-    std::vector<MeltCurveData> getMeltCurveData();
+    std::vector<MeltCurveData> getMeltCurveData(bool stopDataCollect = true);
 
 private:
     void toggleCollectData();
@@ -68,11 +70,12 @@ private:
     Poco::Timer *_collectDataTimer;
     mutable std::recursive_mutex _collectDataMutex;
 
-    unsigned int _ledNumber;
+    unsigned int _wellNumber;
     std::vector<std::vector<int>> _fluorescenceData;
 
     std::atomic<bool> _meltCurveCollection;
     std::vector<MeltCurveData> _meltCurveData;
+    std::mutex _meltCurveDataMutex;
 
     MUX _photodiodeMux;
 };

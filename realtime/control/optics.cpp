@@ -15,14 +15,14 @@ using namespace Poco;
 Optics::Optics(unsigned int lidSensePin, shared_ptr<LEDController> ledController, MUX &&photoDiodeMux)
     :_ledController(ledController),
      _lidSensePin(lidSensePin, GPIO::kInput),
-     _fluorescenceData(kWellList.size()),
+     _fluorescenceData(kWellLedMappingList.size()),
      _photodiodeMux(move(photoDiodeMux))
 {
     _lidOpen = false;
     _collectData = false;
     _meltCurveCollection = false;
     _collectDataTimer = new Timer;
-    _ledNumber = 0;
+    _wellNumber = 0;
     _adcValue =  0;
 
     _collectDataTimer->setPeriodicInterval(0);
@@ -55,15 +55,15 @@ void Optics::setCollectData(bool state, bool isMeltCurve)
         if (_collectData)
         {
             _meltCurveCollection = isMeltCurve;
-            _ledNumber = 0;
+            _wellNumber = 0;
 
             _fluorescenceData.clear();
-            _fluorescenceData.resize(kWellList.size());
+            _fluorescenceData.resize(kWellLedMappingList.size());
 
             _meltCurveData.clear();
 
-            _ledController->activateLED(kWellList.at(_ledNumber));
-            _photodiodeMux.setChannel(_ledNumber);
+            _ledController->activateLED(kWellLedMappingList.at(_wellNumber));
+            _photodiodeMux.setChannel(_wellNumber);
         }
 
         toggleCollectData();
@@ -71,10 +71,10 @@ void Optics::setCollectData(bool state, bool isMeltCurve)
         if (!_collectData)
         {
             _meltCurveCollection = false;
-            _ledNumber = 0;
+            _wellNumber = 0;
 
             _fluorescenceData.clear();
-            _fluorescenceData.resize(kWellList.size());
+            _fluorescenceData.resize(kWellLedMappingList.size());
 
             _meltCurveData.clear();
         }
@@ -114,7 +114,7 @@ void Optics::collectDataCallback(Poco::Timer &timer)
             for (int i = 0; i < kADCReadsPerOpticalMeasurement; ++i)
             {
                 _adcCondition.wait(waitLock);
-                _fluorescenceData[_ledNumber].emplace_back(_adcValue);
+                _fluorescenceData[_wellNumber].emplace_back(_adcValue);
 
                 if (!_collectData)
                     break;
@@ -134,15 +134,16 @@ void Optics::collectDataCallback(Poco::Timer &timer)
                     break;
             }
 
-            _meltCurveData.emplace_back(adc / kADCReadsPerOpticalMeasurement, temperature, kWellList.at(_ledNumber));
+            std::lock_guard<std::mutex> meltCurveDataLock(_meltCurveDataMutex);
+            _meltCurveData.emplace_back(adc / kADCReadsPerOpticalMeasurement, temperature, kWellLedMappingList.at(_wellNumber));
         }
 
-        ++_ledNumber;
-        if (_ledNumber >= kWellList.size())
-            _ledNumber = 0;
+        ++_wellNumber;
+        if (_wellNumber >= kWellLedMappingList.size())
+            _wellNumber = 0;
 
-        _ledController->activateLED(kWellList.at(_ledNumber));
-        _photodiodeMux.setChannel(_ledNumber);
+        _ledController->activateLED(kWellLedMappingList.at(_wellNumber));
+        _photodiodeMux.setChannel(_wellNumber);
 
         timer.restart(timer.getPeriodicInterval());
     }
@@ -178,15 +179,21 @@ std::vector<int> Optics::getFluorescenceData()
     return collectedData;
 }
 
-std::vector<Optics::MeltCurveData> Optics::getMeltCurveData()
+std::vector<Optics::MeltCurveData> Optics::getMeltCurveData(bool stopDataCollect)
 {
     std::vector<MeltCurveData> meltCurveData;
-    std::lock_guard<std::recursive_mutex> lock(_collectDataMutex);
+    std::lock_guard<std::recursive_mutex> collectDataLock(_collectDataMutex);
+    std::unique_lock<std::mutex> meltCurveDataLock(_meltCurveDataMutex, std::defer_lock);
 
     if (_collectData && _meltCurveCollection)
     {
-        _collectData = _meltCurveCollection = false;
-        toggleCollectData();
+        if (stopDataCollect)
+        {
+            _collectData = _meltCurveCollection = false;
+            toggleCollectData();
+        }
+        else
+            meltCurveDataLock.lock();
 
         meltCurveData = std::move(_meltCurveData);
     }

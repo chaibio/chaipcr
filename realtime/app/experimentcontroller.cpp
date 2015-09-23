@@ -135,6 +135,8 @@ void ExperimentController::resume()
         if (_machineState != PausedMachineState)
             return;
 
+        _machineState = RunningMachineState;
+
         _experiment.setPausedDuration(_experiment.pausedDuration() + (boost::posix_time::microsec_clock::local_time() - _experiment.lastPauseTime()).total_seconds());
 
         _holdStepTimer->stop();
@@ -260,11 +262,7 @@ void ExperimentController::meltCurveCallback(Poco::Timer &)
     Poco::RWLock::ScopedReadLock lock(*_machineMutex);
 
     if (_machineState == RunningMachineState)
-    {
-        _dbControl->addMeltCurveData(_experiment, OpticsInstance::getInstance()->getMeltCurveData());
-
-        OpticsInstance::getInstance()->setCollectData(true, true);
-    }
+        _dbControl->addMeltCurveData(_experiment, OpticsInstance::getInstance()->getMeltCurveData(false));
 }
 
 void ExperimentController::rampFinished()

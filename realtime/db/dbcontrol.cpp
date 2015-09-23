@@ -351,7 +351,7 @@ void DBControl::startExperiment(const Experiment &experiment, bool timeValid)
     std::unique_lock<std::mutex> lock(_writeMutex);
 
     statements.emplace_back((_writeSession->prepare << "UPDATE experiments SET started_at = :started_at, time_valid = :time_valid WHERE id = " << experiment.id(),
-                             soci::use(experiment.startedAt()))), soci::use(timeValid ? 1 : 0);
+                             soci::use(experiment.startedAt()), soci::use(timeValid ? 1 : 0)));
 
     write(statements);
 }
@@ -362,7 +362,7 @@ void DBControl::completeExperiment(const Experiment &experiment, bool timeValid)
     std::unique_lock<std::mutex> lock(_writeMutex);
 
     statements.emplace_back((_writeSession->prepare << "UPDATE experiments SET completed_at = :completed_at, completion_status = :completion_status, completion_message = :completion_message, time_valid = :time_valid WHERE id = "
-                             << experiment.id(), soci::use(experiment.completedAt()), soci::use(experiment.completionStatus()), soci::use(experiment.completionMessage()))), soci::use(timeValid ? 1 : 0);
+                             << experiment.id(), soci::use(experiment.completedAt()), soci::use(experiment.completionStatus()), soci::use(experiment.completionMessage()), soci::use(timeValid ? 1 : 0)));
 
     write(statements);
 }
@@ -465,7 +465,7 @@ void DBControl::updateSettings(const Settings &settings)
     std::vector<soci::statement> statements;
     std::unique_lock<std::mutex> lock(_writeMutex);
 
-    statements.emplace_back((_writeSession->prepare << "UPDATE settings SET debug = :debug, time_valid = :time_valid", soci::use(settings.debugMode() ? 1 : 0))), soci::use(settings.timeValid() ? 1 : 0);
+    statements.emplace_back((_writeSession->prepare << "UPDATE settings SET debug = :debug, time_valid = :time_valid", soci::use(settings.debugMode() ? 1 : 0), soci::use(settings.timeValid() ? 1 : 0)));
 
     write(statements);
 }
