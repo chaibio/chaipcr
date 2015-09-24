@@ -36,7 +36,7 @@ window.ChaiBioTech.ngApp
           $scope.data = val
           $scope.state = val?.experimentController?.machine.state
 
-          if val?.experimentController?.expriment.id and !experiment_id
+          if val?.experimentController?.expriment?.id and !experiment_id
             experiment_id = val.experimentController.expriment.id
 
         $scope.$watch 'data.experimentController.machine.state', (newState, oldState) ->
