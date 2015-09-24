@@ -12,9 +12,12 @@ window.ChaiBioTech.ngApp
     templateUrl: 'app/views/directives/experiment-start-stop-button.html'
     link: ($scope, elem) ->
 
+      experiment_id = null
+
       getExperiment = (cb) ->
         cb = cb || angular.noop
-        Experiment.get {id: $scope.experimentId}, (resp) ->
+        id = experiment_id || $scope.experimentId
+        Experiment.get {id: id}, (resp) ->
           $scope.experiment = resp.experiment
           cb()
 
@@ -32,6 +35,9 @@ window.ChaiBioTech.ngApp
         , (val) ->
           $scope.data = val
           $scope.state = val?.experimentController?.machine.state
+
+          if val?.experimentController?.expriment.id and !experiment_id
+            experiment_id = val.experimentController.expriment.id
 
         $scope.$watch 'data.experimentController.machine.state', (newState, oldState) ->
           if (newState isnt oldState) and (newState is 'Idle')

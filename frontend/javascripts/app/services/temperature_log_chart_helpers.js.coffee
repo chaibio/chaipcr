@@ -22,7 +22,31 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogChartHelpers', [
           et = temp_log.temperature_log.elapsed_time
           et >= left_et and et <= right_et
 
-        return data
+        data
+
+    @toN3LineChart = (temperature_logs) ->
+
+      temperature_logs = temperature_logs || []
+
+      tmp_logs = [];
+
+      for temp_log in temperature_logs
+        et = temp_log.temperature_log.elapsed_time/1000
+
+        # get heat_block_zone_temp average
+        hbz = (parseFloat(temp_log.temperature_log.heat_block_zone_1_temp)+ parseFloat(temp_log.temperature_log.heat_block_zone_2_temp))/2
+        # round to nearest hundreth
+        hbz = Math.ceil(hbz*100)/100
+
+        lid_temp = parseFloat temp_log.temperature_log.lid_temp
+
+        tmp_logs.push({
+          elapsed_time: et
+          heat_block_zone_temp: hbz
+          lid_temp: lid_temp
+        })
+
+      tmp_logs
 
     return
 ]
