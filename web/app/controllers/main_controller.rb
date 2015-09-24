@@ -12,7 +12,7 @@ class MainController < ApplicationController
   api :GET, "/welcome", "Show this page when there is no user in the database"
   def welcome
     if User.empty?
-      render :welcome, layout: false
+      render :welcome
     else
       redirect_to login_path
     end
@@ -21,7 +21,7 @@ class MainController < ApplicationController
   api :GET, "/login", "Show this page when there are users in the database and user is not logged in"
   def login
     if !User.empty?
-      render :login, layout: false
+      render :login
     else
       redirect_to welcome_path
     end

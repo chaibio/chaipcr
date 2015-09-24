@@ -9,11 +9,10 @@ window.ChaiBioTech.ngApp.directive 'sidemenuSuboption', [
       menuTemplate: '@'
     link: ($scope, elem) ->
 
-      template = $templateCache.get $scope.menuTemplate
-      compiled = $compile(template)($scope.$parent)
-      arrow = elem.find('.arrow-right')
-
       elem.click ->
+        template = $templateCache.get $scope.menuTemplate
+        compiled = $compile(template)($scope.$parent)
+        arrow = elem.find('.arrow-right')
         $rootScope.$broadcast('submenu:toggle', compiled, elem)
         $rootScope.$apply()
 

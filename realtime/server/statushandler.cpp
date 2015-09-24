@@ -10,46 +10,13 @@
 #define ROUND(x) ((float)(std::round(x * 1000.0) / 1000.0))
 
 void StatusHandler::processData(const boost::property_tree::ptree &, boost::property_tree::ptree &responsePt) {
-    std::shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();
-    std::shared_ptr<Optics> optics = OpticsInstance::getInstance();
-    std::shared_ptr<Lid> lid = LidInstance::getInstance();
-    std::shared_ptr<HeatSink> heatSink = HeatSinkInstance::getInstance();
     std::shared_ptr<ExperimentController> experimentController = ExperimentController::getInstance();
-
-    if (heatBlock) {
-        responsePt.put("heatblock.zone1.temperature", ROUND(heatBlock->zone1Temperature()));
-        responsePt.put("heatblock.zone1.targetTemperature", ROUND(heatBlock->zone1TargetTemperature()));
-        responsePt.put("heatblock.zone1.drive", ROUND(heatBlock->zone1DriveValue()));
-
-        responsePt.put("heatblock.zone2.temperature", ROUND(heatBlock->zone2Temperature()));
-        responsePt.put("heatblock.zone2.targetTemperature", ROUND(heatBlock->zone2TargetTemperature()));
-        responsePt.put("heatblock.zone2.drive", ROUND(heatBlock->zone2DriveValue()));
-
-        responsePt.put("heatblock.temperature", ROUND(heatBlock->temperature()));
-    }
-
-    if (lid) {
-        responsePt.put("lid.temperature", ROUND(lid->currentTemperature()));
-        responsePt.put("lid.targetTemperature", ROUND(lid->targetTemperature()));
-        responsePt.put("lid.drive", ROUND(lid->drive()));
-    }
-
-    if (optics) {
-        responsePt.put("optics.intensity", optics->getLedController()->intensity());
-        responsePt.put("optics.collectData", optics->collectData());
-        responsePt.put("optics.lidOpen", optics->lidOpen());
-        responsePt.put("optics.photodiodeValue", optics->adcValue());
-    }
-
-    if (heatSink) {
-        responsePt.put("heatSink.temperature", ROUND(heatSink->currentTemperature()));
-        responsePt.put("heatSink.fanDrive", ROUND(heatSink->fanDrive()));
-    }
 
     if (experimentController) {
         Experiment experiment = experimentController->experiment();
+        ExperimentController::MachineState state = experimentController->machineState();
 
-        switch (experimentController->machineState()) {
+        switch (state) {
         case ExperimentController::IdleMachineState:
             responsePt.put("experimentController.machine.state", "Idle");
             break;
@@ -120,6 +87,42 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
             responsePt.put("experimentController.expriment.step.id", experiment.protocol()->currentStep()->id());
             responsePt.put("experimentController.expriment.step.name", experiment.protocol()->currentStep()->name());
             responsePt.put("experimentController.expriment.step.number", experiment.protocol()->currentStep()->orderNumber() + 1);
+        }
+
+        std::shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();
+        std::shared_ptr<Optics> optics = OpticsInstance::getInstance();
+        std::shared_ptr<Lid> lid = LidInstance::getInstance();
+        std::shared_ptr<HeatSink> heatSink = HeatSinkInstance::getInstance();
+
+        if (heatBlock) {
+            responsePt.put("heatblock.zone1.temperature", ROUND(heatBlock->zone1Temperature()));
+            responsePt.put("heatblock.zone1.targetTemperature", state == ExperimentController::RunningMachineState ? ROUND(heatBlock->zone1TargetTemperature()) : 0);
+            responsePt.put("heatblock.zone1.drive", ROUND(heatBlock->zone1DriveValue()));
+
+            responsePt.put("heatblock.zone2.temperature", ROUND(heatBlock->zone2Temperature()));
+            responsePt.put("heatblock.zone2.targetTemperature", state == ExperimentController::RunningMachineState ? ROUND(heatBlock->zone2TargetTemperature()) : 0);
+            responsePt.put("heatblock.zone2.drive", ROUND(heatBlock->zone2DriveValue()));
+
+            responsePt.put("heatblock.temperature", ROUND(heatBlock->temperature()));
+        }
+
+        if (lid) {
+            responsePt.put("lid.temperature", ROUND(lid->currentTemperature()));
+            responsePt.put("lid.targetTemperature", state == ExperimentController::LidHeatingMachineState || state == ExperimentController::RunningMachineState ? ROUND(lid->targetTemperature()) : 0);
+            responsePt.put("lid.drive", ROUND(lid->drive()));
+        }
+
+        if (optics) {
+            responsePt.put("optics.intensity", optics->getLedController()->intensity());
+            responsePt.put("optics.collectData", optics->collectData());
+            responsePt.put("optics.lidOpen", optics->lidOpen());
+            responsePt.put("optics.photodiodeValue", optics->adcValue());
+            responsePt.put("optics.wellNumber", state == ExperimentController::RunningMachineState ? optics->wellNumber() : 0);
+        }
+
+        if (heatSink) {
+            responsePt.put("heatSink.temperature", ROUND(heatSink->currentTemperature()));
+            responsePt.put("heatSink.fanDrive", ROUND(heatSink->fanDrive()));
         }
     }
 }

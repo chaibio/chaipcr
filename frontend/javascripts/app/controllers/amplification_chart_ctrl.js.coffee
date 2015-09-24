@@ -3,6 +3,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
   '$stateParams'
   'Experiment'
   ($scope, $stateParams, Experiment) ->
+
     $scope.buttons =
       A: []
       B: []
