@@ -252,45 +252,6 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
       $scope.resolutionOptions.push Math.floor $scope.greatest_elapsed_time/1000
 
-    $scope.options = {
-      axes: {
-        x: {
-          key: 'elapsed_time',
-          ticksFormatter: (t) ->
-            SecondsDisplay.display2 t
-          ticks: 8
-        },
-        y: {
-          key: 'heat_block_zone_temp'
-          type: 'linear'
-          min: 0
-          max: 0
-        }
-      },
-      margin: {
-        left: 30
-      },
-      series: [
-        {y: 'heat_block_zone_temp', color: 'steelblue'},
-        {y: 'lid_temp', color: 'lightsteelblue'}
-      ],
-      lineMode: 'linear',
-      thickness: '2px',
-      tension: 0.7,
-      tooltip: {
-        mode: 'scrubber',
-        formatter: (x, y, series) ->
-          if series.y is 'lid_temp'
-            return "#{SecondsDisplay.display2(x)} | Lid Temp: #{y}"
-          else if series.y is 'heat_block_zone_temp'
-            return "#{SecondsDisplay.display2(x)} | Heat Block Zone Temp: #{y}"
-          else
-            return ''
-      },
-      drawLegend: false,
-      drawDots: false,
-      hideOverflow: false,
-      columnsHGap: 5
-    }
+    $scope.options = helper.chartConfig
 
 ]

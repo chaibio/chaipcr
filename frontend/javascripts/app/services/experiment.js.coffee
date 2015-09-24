@@ -22,6 +22,9 @@ window.ChaiBioTech.ngApp
           endtime: opts.endtime
           resolution: opts.resolution
 
+    self.getFluorescenceData = (expId) ->
+      $http.get("/experiments/#{expId}/fluorescence_data")
+
     self.duplicate = (expId, data) ->
       $http.post "/experiments/#{expId}/copy", data
 

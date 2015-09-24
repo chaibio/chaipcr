@@ -10,4 +10,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
     Experiment.get(id: $stateParams.id).$promise.then (data) ->
       $scope.experiment = data.experiment
+
+    Experiment.getFluorescenceData($stateParams.id)
+    .success (data) ->
+      console.log data
 ]
