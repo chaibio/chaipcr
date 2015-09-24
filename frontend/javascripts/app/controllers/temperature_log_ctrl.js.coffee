@@ -123,7 +123,9 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         greatest
 
       max_scale = Math.max.apply Math, scales
-      $scope.options.axes.y.max = Math.ceil(max_scale/10)*10
+      max_scale = Math.ceil(max_scale/10)*10
+      max_scale = if max_scale < 100 then 100 else max_scale
+      $scope.options.axes.y.max = max_scale
 
     $scope.updateDragScrollWidthAttr = ->
       dragScrollWidth = dragScroll.css('width').replace 'px', ''
