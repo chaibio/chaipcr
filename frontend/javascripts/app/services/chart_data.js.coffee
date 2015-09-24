@@ -8,6 +8,7 @@ window.ChaiBioTech.ngApp
   (SecondsDisplay) ->
 
     @temperatureLogs = (temperature_logs) ->
+      temperature_logs = temperature_logs || []
       # formats temperature logs for angular-charts
       toAngularCharts: ->
 

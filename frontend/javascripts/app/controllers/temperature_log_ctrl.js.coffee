@@ -8,7 +8,8 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
   '$interval'
   '$rootScope'
   'expName'
-  ($scope, $stateParams, Status, ChartData, Experiment, SecondsDisplay, $interval, $rootScope, expName) ->
+  'TemperatureLogChartHelpers'
+  ($scope, $stateParams, Status, ChartData, Experiment, SecondsDisplay, $interval, $rootScope, expName, helper) ->
 
     hasStatusData = false
     hasExperiment = false
@@ -77,7 +78,8 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
           $scope.updateScrollWidth()
           $scope.resizeTemperatureLogs()
           $scope.updateResolution()
-          $scope.updateData()
+          data = helper.updateData $scope.temperatureLogsCache, $scope.temperatureLogs, $scope.resolution, $scope.scrollState
+          $scope.updateChart data
         else
           $scope.data = []
           $scope.autoUpdateTemperatureLogs()
@@ -170,7 +172,8 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         $scope.resizeTemperatureLogs()
         $scope.updateScrollWidth()
         $scope.updateDragScrollWidthAttr()
-        $scope.updateData()
+        data = helper.updateData $scope.temperatureLogsCache, $scope.temperatureLogs, $scope.resolution, $scope.scrollState
+        $scope.updateChart data
 
     $scope.$watch 'widthPercent', ->
       if $scope.widthPercent is 1 and $scope.isCurrentExperiment
@@ -178,7 +181,8 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
     $scope.$watch 'scrollState', ->
       if $scope.scrollState and $scope.temperatureLogs and $scope.data
-        $scope.updateData()
+        data = helper.updateData $scope.temperatureLogsCache, $scope.temperatureLogs, $scope.resolution, $scope.scrollState
+        $scope.updateChart data
 
         if ($scope.scrollState >= 1 or $scope.scrollState is 'FULL') and $scope.isCurrentExperiment
           $scope.autoUpdateTemperatureLogs()
@@ -216,7 +220,8 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
           $scope.updateScrollWidth()
           $scope.resizeTemperatureLogs()
           $scope.updateResolution()
-          $scope.updateData()
+          data = helper.updateData $scope.temperatureLogsCache, $scope.temperatureLogs, $scope.resolution, $scope.scrollState
+          $scope.updateChart data
 
     $scope.autoUpdateTemperatureLogs = =>
       if !$scope.updateInterval
