@@ -161,7 +161,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.rampSpeedGroup = new fabric.Group([
               this.rampSpeedText, this.underLine
             ], {
-                selectable: true, hasControls: true,  originX: 'left',  originY: 'top', top : 0,  left:((50 - this.rampSpeedText.width) / 2)
+                selectable: true, hasControls: true,  originX: 'left',  originY: 'top', top : 0,  left:((120 - this.rampSpeedText.width) / 2)
               }
         );
 
