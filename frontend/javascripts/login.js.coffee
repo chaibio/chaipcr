@@ -10,7 +10,10 @@ App.controller 'LoginCtrl', [
   '$scope'
   '$http'
   '$window'
-  ($scope, $http, $window) ->
+  '$rootScope'
+  ($scope, $http, $window, $rootScope) ->
+
+    $rootScope.pageTitle = "ChaiPCR | Login"
 
     angular.element('body').addClass('login-state-active')
     $scope.$on 'destroy', ->
