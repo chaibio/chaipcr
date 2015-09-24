@@ -54,7 +54,6 @@ var appFiles = [
 ];
 
 function _renameJS (path) {
-  path.basename = path.basename.replace('.js.coffee.erb', '');
   path.basename = path.basename.replace('.js.coffee', '');
   path.basename = path.basename.replace('.js', '');
   path.extname  = '.js';
@@ -77,7 +76,7 @@ gulp.task('clean-js', function (done) {
 });
 
 gulp.task('coffee', ['clean-js'], function () {
-  return gulp.src(['frontend/javascripts/**/*.{coffee,coffee.erb}'])
+  return gulp.src(['frontend/javascripts/**/*.coffee'])
          .pipe(coffee())
          .on('error', swallowError)
          .pipe(rename(_renameJS))
@@ -86,7 +85,7 @@ gulp.task('coffee', ['clean-js'], function () {
 });
 
 gulp.task('templates', function () {
-  return gulp.src(['./frontend/javascripts/**/*.{html,html.erb}'])
+  return gulp.src(['./frontend/javascripts/**/*.html'])
     .pipe(htmlmin({
       collapseWhitespace: true,
       removeComments: true,
@@ -95,17 +94,14 @@ gulp.task('templates', function () {
     .on('error', swallowError)
     .pipe(templateCache({
       module: 'templates',
-      standalone: true,
-      transformUrl: function(url) {
-        return url.replace(/\.html\.erb$/, '.html')
-      }
+      standalone: true
     }))
     // .on('error', swallowError)
     .pipe(gulp.dest('.tmp/js'));
 });
 
 gulp.task('copy-js-to-tmp', ['clean-js', 'templates'], function () {
-  return gulp.src(['frontend/javascripts/**/*.js.erb', 'frontend/javascripts/**/*.js'])
+  return gulp.src(['frontend/javascripts/**/*.js'])
          .pipe(rename(_renameJS))
          .pipe(gulp.dest('.tmp/js'));
 });

@@ -1,41 +1,34 @@
-<!DOCTYPE html>
-<html ng-app="LoginApp">
-<head>
-  <meta charset="utf-8">
-  <title>ChaiBioTech | Login</title>
-  <link rel="stylesheet" href="/stylesheets/application-debug.css" media="all">
-  <script type="text/javascript" src="/javascripts/application-debug.js"></script>
-  <%= csrf_meta_tags %>
-</head>
-<body class="login-state-active" ng-controller="LoginCtrl">
-  <div id="container" class="container-fluid">
-    <div id="container">
-      <form class="login-wrapper">
-        <div class="login-box">
-          <div class="login-section title-field">
-            <img src="/images/logo-qpcr.png">
-          </div>
-          <div class="login-section">
-            <div class="login-field">
-              <span class="login-field-text simplifica">USERNAME</span>
-              <input type="text" id="user" class="login-text-field" placeholder="E-Mail Address" autofocus="" ng-model="user.email">
-            </div>
-            <div class="login-field">
-              <span class="login-field-text simplifica">PASSWORD</span>
-              <input type="password" id="pass" placeholder="Enter Password" class="login-text-field" ng-model="user.password">
-            </div>
-          </div>
-          <p class="text-danger text-center err-message" ng-show="errors">
-            {{errors}}
-          </p>
-          <div class="login-section">
-            <div class="login-bitton-container">
-              <button type="submit" class="login-button" id="login-button" ng-click="login(user)">SIGN IN</button>
-            </div>
-          </div>
+
+<div ng-controller="LoginCtrl">
+  <form class="login-wrapper">
+    <div class="login-box">
+      <div class="login-section title-field">
+        <img src="/images/logo-qpcr.png">
+      </div>
+      <div class="login-section">
+        <div class="login-field">
+          <span class="login-field-text simplifica">USERNAME</span>
+          <input type="text" id="user" class="login-text-field" placeholder="E-Mail Address" autofocus="" ng-model="user.email">
         </div>
-      </form>
+        <div class="login-field">
+          <span class="login-field-text simplifica">PASSWORD</span>
+          <input type="password" id="pass" placeholder="Enter Password" class="login-text-field" ng-model="user.password">
+        </div>
+      </div>
+      <p class="text-danger text-center err-message" ng-show="errors">
+        {{errors}}
+      </p>
+      <div class="login-section">
+        <div class="login-bitton-container">
+          <button type="submit" class="login-button" id="login-button" ng-click="login(user)">SIGN IN</button>
+        </div>
+      </div>
     </div>
-  </div>
-</body>
-</html>
+  </form>
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    angular.bootstrap(document, ['LoginApp']);
+  });
+</script>

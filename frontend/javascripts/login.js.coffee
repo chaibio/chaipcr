@@ -11,6 +11,11 @@ App.controller 'LoginCtrl', [
   '$http'
   '$window'
   ($scope, $http, $window) ->
+
+    angular.element('body').addClass('login-state-active')
+    $scope.$on 'destroy', ->
+      angular.element('body').removeClass('login-state-active')
+
     $scope.user =
       role: 'admin'
 

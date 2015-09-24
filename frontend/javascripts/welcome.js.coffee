@@ -11,6 +11,7 @@ App.controller 'WelcomeCtrl', [
   '$http'
   '$window'
   ($scope, $http, $window) ->
+
     $scope.user =
       name: 'Admin'
       role: 'admin'
