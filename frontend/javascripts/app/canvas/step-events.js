@@ -14,6 +14,7 @@ window.ChaiBioTech.ngApp.service('stepEvents',[
       $scope.$watch('step.ramp.rate', function(newVal, oldVal) {
 
         $scope.fabricStep.showHideRamp();
+        canvas.renderAll();
       });
 
       $scope.$watch('step.name', function(newVal, oldVal) {

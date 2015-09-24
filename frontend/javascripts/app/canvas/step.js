@@ -74,7 +74,8 @@ window.ChaiBioTech.ngApp.factory('step', [
         var stepName = (this.model.name) ? (this.model.name).toUpperCase() : "STEP " +(this.index + 1);
         this.stepNameText = stepName;
         this.stepName = new fabric.Text(stepName, {
-            fill: 'white',  fontSize: 9,  top : 4,  left: 3,  fontFamily: "Open Sans",  selectable: false
+            fill: 'white',  fontSize: 9,  top : -4,  left: 3,  fontFamily: "Open Sans",  selectable: false,
+            originX: 'left', originY: 'top'
           }
         );
 
@@ -84,7 +85,8 @@ window.ChaiBioTech.ngApp.factory('step', [
       this.addBorderRight = function() {
 
         this.borderRight = new fabric.Line([0, 0, 0, 342], {
-            stroke: '#ff9f00',  left: (this.myWidth - 2),  top: 15, strokeWidth: 1, selectable: false
+            stroke: '#ff9f00',  left: (this.myWidth - 2),  top: 7, strokeWidth: 1, selectable: false,
+            originX: 'left', originY: 'top'
           }
         );
 
@@ -133,7 +135,7 @@ window.ChaiBioTech.ngApp.factory('step', [
           this.rampSpeedGroup.setVisible(false);
         } else {
           this.rampSpeedGroup.setVisible(true);
-          this.underLine.width = this.rampSpeedText.width;
+          this.underLine.setWidth(this.rampSpeedText.width);
         }
 
         this.canvas.renderAll();
@@ -141,7 +143,7 @@ window.ChaiBioTech.ngApp.factory('step', [
 
       this.adjustRampSpeedPlacing = function() {
 
-        this.rampSpeedGroup.setTop(this.circle.circleGroup.top - this.circle.scrollTop - this.circle.halfway);
+        this.rampSpeedGroup.setTop(this.circle.circleGroup.top - this.circle.scrollTop - this.circle.halfway + 8);
       };
 
       this.rampSpeed = function() {
@@ -154,14 +156,14 @@ window.ChaiBioTech.ngApp.factory('step', [
         );
 
         this.underLine = new fabric.Line([0, 0, this.rampSpeedText.width, 0], {
-            stroke: "#ffde00",  strokeWidth: 2, originX: 'left',  originY: 'top', top: 16,  left: 0
+            stroke: "#ffde00",  strokeWidth: 2, originX: 'left',  originY: 'top', top: 13,  left: 0
           }
         );
 
         this.rampSpeedGroup = new fabric.Group([
               this.rampSpeedText, this.underLine
             ], {
-                selectable: true, hasControls: true,  originX: 'left',  originY: 'top', top : 0,  left:((120 - this.rampSpeedText.width) / 2)
+                selectable: true, hasControls: true,  originX: 'center',  originY: 'center', top : 0,  left: 60
               }
         );
 
@@ -230,7 +232,8 @@ window.ChaiBioTech.ngApp.factory('step', [
         );
 
         this.stepGroup = new fabric.Group([this.stepRect, this.stepName, this.rampSpeedGroup, this.borderRight], {
-          left: this.left || 32,  top: 44,  selectable: false,  hasControls: false, hasBoarders: false, name: "stepGroup",  me: this
+          left: this.left || 32,  top: 44,  selectable: false,  hasControls: false,
+          hasBoarders: false, name: "stepGroup",  me: this, originX: 'left', originY: 'top'
         });
 
         this.canvas.add(this.stepGroup);
