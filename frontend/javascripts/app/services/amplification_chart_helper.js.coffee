@@ -8,7 +8,9 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           key: 'cycle_num'
           ticks: 8
         y:
+          min: 0
           max: 10
+          ticksInterval: 1
       margin:
         left: 30
       series: [
