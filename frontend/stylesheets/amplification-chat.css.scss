@@ -1,0 +1,28 @@
+@import './colors.css.scss';
+$marginTop: 260px;
+
+.amplification-chart-state-active {
+
+  .chart-section {
+    .vertical-text {
+
+      transform: rotate(-90deg);
+      transform-origin: 20% 40%;
+      float: left;
+      margin-left: -5px;
+      margin-top: $marginTop;
+      margin-bottom: -$marginTop;
+    }
+
+    .chart-container {
+      height: 400px;
+      background: $lightgray;
+    }
+
+  }
+
+  .experiment-start-stop-buttons {
+    margin: 15px;
+    margin-top: 35px;
+  }
+}
