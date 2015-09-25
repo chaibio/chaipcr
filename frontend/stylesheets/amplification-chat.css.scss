@@ -12,11 +12,19 @@ $marginTop: 260px;
       margin-left: -5px;
       margin-top: $marginTop;
       margin-bottom: -$marginTop;
+
+      font-family: 'Open Sans';
+      font-weight: 300;
     }
 
     .chart-container {
-      height: 400px;
-      background: $lightgray;
+      margin-left: 80px;
+      margin-bottom: -30px;
+    }
+
+    .num-cycle-text {
+      font-family: 'Open Sans';
+      font-weight: 300;
     }
 
   }

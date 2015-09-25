@@ -4,7 +4,7 @@ window.ChaiBioTech.ngApp
     restrict: 'EA'
     require: 'ngModel'
     replace: true
-    template: '<div class="circle" ng-click="toggleState()" ng-style="style">{{text}}</div>'
+    template: '<div class="circle noselect" ng-click="toggleState()" ng-style="style">{{text}}</div>'
     link: ($scope, elem, attrs, ngModel) ->
 
       color = elem.css 'borderColor'
