@@ -63,7 +63,7 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
           'stage_type': type
         }
       },
-      url = "/protocols/" + $scope.protocol.id + "/stages",
+      url = "/protocols/" + $scope.protocol.protocol.id + "/stages",
       delay = $q.defer();
 
       $http.post(url, dataToBeSend)
