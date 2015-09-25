@@ -9,7 +9,11 @@ window.ChaiBioTech.ngApp
 
       color = elem.css 'borderColor'
 
-      $scope.state = angular.copy(ngModel.$modelValue) || false
+      $scope.$watch ->
+        ngModel.$modelValue
+      , (newVal) ->
+        $scope.state = ngModel.$modelValue || false
+        $scope.updateUI()
 
       $scope.updateUI = ->
         if $scope.state
