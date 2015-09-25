@@ -1,5 +1,6 @@
 window.ChaiBioTech.ngApp.service 'TemperatureLogChartHelpers', [
-  ->
+  'SecondsDisplay'
+  (SecondsDisplay) ->
     @updateData = (temperatureLogsCache, temperatureLogs, resolution, scrollState) ->
       if temperatureLogsCache?.length > 0
         left_et_limit = temperatureLogsCache[temperatureLogsCache.length-1].temperature_log.elapsed_time - (resolution*1000)
