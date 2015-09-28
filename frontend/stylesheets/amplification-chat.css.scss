@@ -9,14 +9,22 @@ $marginTop: 260px;
       transform: rotate(-90deg);
       transform-origin: 20% 40%;
       float: left;
-      margin-left: -5px;
+      margin-left: -35px;
       margin-top: $marginTop;
       margin-bottom: -$marginTop;
+
+      font-family: 'Open Sans';
+      font-weight: 300;
     }
 
     .chart-container {
-      height: 400px;
-      background: $lightgray;
+      margin-left: 15px;
+      margin-bottom: -35px;
+    }
+
+    .num-cycle-text {
+      font-family: 'Open Sans';
+      font-weight: 300;
     }
 
   }

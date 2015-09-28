@@ -2,6 +2,7 @@
 library(RMySQL)
 
 numberOfWells<-16
+scalingFactor<-900000
 
 fluorescence_data <- function(dbname,dbuser,dbpassword,stageID,calibrationID){
 	#load chaipcr database
@@ -26,7 +27,7 @@ fluorescence_data <- function(dbname,dbuser,dbpassword,stageID,calibrationID){
 	#perform calibration
 	mergeData <- merge(fluorescenceData, waterCalibrationData)
 	mergeData <- merge(mergeData, fluorescenceCalibrationData)
-	mergeData$F = (mergeData$fluorescence-mergeData$fluorescence_wc)/mergeData$fluorescence_c
+	mergeData$F = scalingFactor*(mergeData$fluorescence-mergeData$fluorescence_wc)/mergeData$fluorescence_c
     #print(data.frame(mergeData$well_num,mergeData$cycle_num,mergeData$F))
 	
 	return (data.frame(mergeData$well_num,mergeData$cycle_num,mergeData$F))
