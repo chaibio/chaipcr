@@ -12,22 +12,25 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
     $scope.$watch ->
       Status.getData()
-    , (data) ->
-      if data?.optics?.collectData
-        getFlurData()
+    , (data, oldData) ->
+      newStage = data?.experimentController?.expriment?.stage?.number
+      oldStage = oldData?.experimentController?.expriment?.stage?.number
+
+      if parseInt(data?.experimentController?.expriment?.id) is parseInt($stateParams.id) and data?.optics?.collectData and newStage isnt oldStage
+        updateFluorescenceData()
 
     $scope.chartConfig = helper.chartConfig()
 
     Experiment.get(id: $stateParams.id).$promise.then (data) ->
       $scope.experiment = data.experiment
 
-    getFlurData = ->
+    updateFluorescenceData = ->
       Experiment.getFluorescenceData($stateParams.id)
       .success (data) ->
         $scope.chartConfig.axes.x.max = data.total_cycles
         $scope.data = helper.neutralizeData data.fluorescence_data
 
-    getFlurData()
+    updateFluorescenceData()
 
     $scope.$watch 'wellButtons', (buttons) ->
       buttons = buttons || {}
