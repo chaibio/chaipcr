@@ -37,6 +37,12 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
     @neutralizeData = (fluorescence_data) ->
       neutralized_data = []
 
+      paddData = cycle_num: 0
+      for i in [0..15] by 1
+        paddData["well_#{i}"] = 0
+
+      neutralized_data.push paddData
+
       # get max cycle
       max_cycle = 0
       for datum in fluorescence_data by 1
