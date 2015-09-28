@@ -1,6 +1,7 @@
 window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
   'SecondsDisplay'
-  (SecondsDisplay) ->
+  '$filter'
+  (SecondsDisplay, $filter) ->
 
     @chartConfig = ->
       config =
@@ -14,7 +15,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
             min: 0
             ticks: 10
             ticksFormatter: (y) ->
-              "#{y/1000}k"
+              "#{$filter('round')(y/1000, 1)}k"
         margin:
           left: 70
         series: [

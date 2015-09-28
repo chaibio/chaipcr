@@ -3,20 +3,34 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
   '$stateParams'
   'Experiment'
   'AmplificationChartHelper'
-  ($scope, $stateParams, Experiment, helper) ->
+  'Status'
+  ($scope, $stateParams, Experiment, helper, Status) ->
+
+    Status.startSync()
+    $scope.$on 'destroy', ->
+      Status.stopSync()
+
+    $scope.$watch ->
+      Status.getData()
+    , (data) ->
+      if data?.optics?.collectData
+        getFlurData()
 
     $scope.chartConfig = helper.chartConfig()
 
     Experiment.get(id: $stateParams.id).$promise.then (data) ->
       $scope.experiment = data.experiment
 
-    Experiment.getFluorescenceData($stateParams.id)
-    .success (data) ->
-      $scope.chartConfig.axes.x.max = data.total_cycles
-      $scope.data = helper.neutralizeData data.fluorescence_data
+    getFlurData = ->
+      Experiment.getFluorescenceData($stateParams.id)
+      .success (data) ->
+        $scope.chartConfig.axes.x.max = data.total_cycles
+        $scope.data = helper.neutralizeData data.fluorescence_data
+
+    getFlurData()
 
     $scope.$watch 'wellButtons', (buttons) ->
-      buttons = buttons || []
+      buttons = buttons || {}
       $scope.chartConfig.series = []
 
       for i in [0..15] by 1

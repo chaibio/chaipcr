@@ -13,7 +13,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
       for i in [0..15] by 1
         $scope.buttons["well_#{i}"] =
-          selected : false
+          selected : true
 
       $scope.$watch 'buttons', watchButtons, true
 
