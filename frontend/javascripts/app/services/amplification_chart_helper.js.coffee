@@ -2,33 +2,37 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
   'SecondsDisplay'
   (SecondsDisplay) ->
 
-    @chartConfig =
-      axes:
-        x:
-          min: 0
-          max: 10
-          key: 'cycle_num'
-          ticks: 8
-        y:
-          min: 0
-          max: 10
-          ticksInterval: 1
-      margin:
-        left: 30
-      series: [
-      ]
-      lineMode: 'basis'
-      thickness: '2px'
-      tension: 0.7
-      tooltip:
-        mode: 'none'
-      # tooltip:
-      #   mode: 'scrubber'
-      #   formatter: (x, y, series) ->
-      drawLegend: false
-      drawDots: false
-      hideOverflow: false
-      columnsHGap: 5
+    @chartConfig = ->
+      config =
+        axes:
+          x:
+            min: 0
+            max: 10
+            key: 'cycle_num'
+            ticks: 8
+          y:
+            min: 0
+            ticks: 10
+            ticksFormatter: (y) ->
+              "#{y/1000}k"
+        margin:
+          left: 70
+        series: [
+        ]
+        lineMode: 'basis'
+        thickness: '2px'
+        tension: 0.7
+        tooltip:
+          mode: 'none'
+        # tooltip:
+        #   mode: 'scrubber'
+          # formatter: (x, y, series) ->
+        drawLegend: false
+        drawDots: false
+        hideOverflow: false
+        columnsHGap: 5
+
+      config
 
     @neutralizeData = (fluorescence_data) ->
       neutralized_data = []
@@ -50,12 +54,12 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
       neutralized_data
 
-    @getGreatestCalibration = (fluorescence_data) ->
-      data = []
-      for datum in fluorescence_data by 1
-        data.push datum.fluorescence_datum.calibrated_value
+    # @getGreatestCalibration = (fluorescence_data) ->
+    #   data = []
+    #   for datum in fluorescence_data by 1
+    #     data.push datum.fluorescence_datum.calibrated_value
 
-      Math.max.apply Math, data
+    #   Math.max.apply Math, data
 
     return
 ]
