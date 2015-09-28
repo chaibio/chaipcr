@@ -5,6 +5,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
     @chartConfig =
       axes:
         x:
+          min: 0
+          max: 10
           key: 'cycle_num'
           ticks: 8
         y:
