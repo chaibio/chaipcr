@@ -5,25 +5,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
   'AmplificationChartHelper'
   ($scope, $stateParams, Experiment, helper) ->
 
-    COLORS = [
-      '#FFE980'
-      '#FFD380'
-      '#FFAD80'
-      '#FF6666'
-      '#FF71BA'
-      '#C890F4'
-      '#3879FF'
-      '#75E0FF'
-      '#FFD200'
-      '#FFA800'
-      '#FF5A00'
-      '#E50000'
-      '#F0007C'
-      '#8F1CE8'
-      '#003CB7'
-      '#00BEF5'
-    ]
-
     $scope.chartConfig = helper.chartConfig()
 
     Experiment.get(id: $stateParams.id).$promise.then (data) ->
@@ -39,9 +20,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.chartConfig.series = []
 
       for i in [0..15] by 1
-        if buttons["well_#{i}"]
+        if buttons["well_#{i}"]?.selected
           $scope.chartConfig.series.push
             y: "well_#{i}"
-            color: COLORS[i]
+            color: buttons["well_#{i}"].color
             thickness: '3px'
 ]

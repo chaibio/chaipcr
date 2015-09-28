@@ -8,12 +8,13 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
       $scope.loop = [0..7]
       $scope.buttons = {}
 
-      watchButton = (val) ->
+      watchButtons = (val) ->
         ngModel.$setViewValue angular.copy val
 
       for i in [0..15] by 1
-        $scope.buttons["well_#{i}"] = false
+        $scope.buttons["well_#{i}"] =
+          selected : false
 
-      $scope.$watch 'buttons', watchButton, true
+      $scope.$watch 'buttons', watchButtons, true
 
 ]

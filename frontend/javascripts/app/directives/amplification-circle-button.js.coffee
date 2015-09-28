@@ -8,15 +8,20 @@ window.ChaiBioTech.ngApp
     link: ($scope, elem, attrs, ngModel) ->
 
       color = elem.css 'borderColor'
+      $scope.state =
+        selected: ngModel.$modelValue?.selected || false
+        color: ngModel.$modelValue?.color || color
 
       $scope.$watch ->
         ngModel.$modelValue
       , (newVal) ->
-        $scope.state = ngModel.$modelValue || false
-        $scope.updateUI()
+        if angular.isObject newVal
+          $scope.state.selected = newVal.selected || false
+          $scope.state.color = newVal.color || color
+          $scope.updateUI()
 
       $scope.updateUI = ->
-        if $scope.state
+        if $scope.state.selected
           $scope.style = color: color
           $scope.text = 'On'
         else
@@ -24,7 +29,7 @@ window.ChaiBioTech.ngApp
           $scope.text = 'Off'
 
       $scope.toggleState = ->
-        $scope.state = !$scope.state
+        $scope.state.selected = !$scope.state.selected
         ngModel.$setViewValue $scope.state
         $scope.updateUI()
 
