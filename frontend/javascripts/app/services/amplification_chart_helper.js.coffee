@@ -27,11 +27,11 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           mode: 'none'
         # tooltip:
         #   mode: 'scrubber'
-          # formatter: (x, y, series) ->
+        #   formatter: (x, y, series) ->
+        #     "cycle: #{x} | calibration: #{$filter('round')(y/1000, 1)}k"
         drawLegend: false
         drawDots: false
         hideOverflow: false
-        columnsHGap: 5
 
       config
 

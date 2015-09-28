@@ -30,38 +30,6 @@ $marginTop: 260px;
 
   }
 
-  .choose-chart {
-    .choose-chart-heading {
-      border-bottom: 2px solid black;
-    }
-    .chart-type-option {
-      cursor: pointer;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-    .number {
-      text-align: center;
-      vertical-align: middle;
-      padding: 5px;
-      color: gray;
-      font-size: 15px;
-    }
-    .circle {
-      border-radius: 100px;
-      border-width: 5px;
-      border-style: solid;
-      color: lighten(#000, 25%);
-      cursor: pointer;
-      font-weight: bold;
-      height: 50px;
-      margin: 5px;
-      padding-top: 11px;
-      text-align: center;
-      width: 50px;
-    }
-
-  }
-
   .experiment-start-stop-buttons {
     padding: 15px;
   }
