@@ -50,5 +50,12 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
       neutralized_data
 
+    @getGreatestCalibration = (fluorescence_data) ->
+      data = []
+      for datum in fluorescence_data by 1
+        data.push datum.fluorescence_datum.calibrated_value
+
+      Math.max.apply Math, data
+
     return
 ]
