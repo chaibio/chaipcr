@@ -45,6 +45,7 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
             delay.resolve(data);
           })
           .error(function(data) {
+            // we need to do something so that it shows correct error message.
             delay.reject(data);
           });
 
