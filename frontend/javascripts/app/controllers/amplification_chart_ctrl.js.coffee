@@ -13,13 +13,13 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
     $scope.$watch ->
       Status.getData()
     , (data, oldData) ->
-      newStage = data?.experimentController?.expriment?.stage?.number
-      oldStage = oldData?.experimentController?.expriment?.stage?.number
+      newStep = parseInt(data?.experimentController?.expriment?.step?.number) || null
+      oldStep = parseInt(oldData?.experimentController?.expriment?.step?.number) || null
       state = data?.experimentController?.machine?.state
+      isCurrentExp = parseInt(data?.experimentController?.expriment?.id) is parseInt($stateParams.id)
 
-      if (parseInt(data?.experimentController?.expriment?.id) is parseInt($stateParams.id) and data?.optics?.collectData and newStage isnt oldStage) or
-      (state is 'Idle' and $scope.experiment?.completion_status) or
-      (state is 'Running' and parseInt(newStage) > 1 and oldStage isnt newStage)
+      if (state is 'Idle' and $scope.experiment?.completed_at and !$scope.data) or
+      (state is 'Running' and newStep > 1 and (oldStep isnt newStep or !oldStep) and data.optics.collectData)
         updateFluorescenceData()
 
     $scope.chartConfig = helper.chartConfig()
@@ -32,6 +32,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       .success (data) ->
         $scope.chartConfig.axes.x.max = data.total_cycles
         $scope.data = helper.neutralizeData data.fluorescence_data
+        console.log data
 
     $scope.$watch 'wellButtons', (buttons) ->
       buttons = buttons || {}
