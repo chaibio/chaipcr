@@ -19,7 +19,10 @@ window.ChaiBioTech.ngApp.factory('path', [
         stroke: '#ffd100',
         selectable: false,
         originX: "center",
-        originY: "center"
+        originY: "center",
+        me: parent,
+        name: "path",
+        evented: false
       });
     };
   }

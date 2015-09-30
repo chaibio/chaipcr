@@ -6,7 +6,8 @@ window.ChaiBioTech.ngApp.factory('stepDataGroup', [
         left: parent.left + 60,
         originX: "center",
         originY: "center",
-        selectable: false
+        selectable: false,
+        evented: false,
       });
     };
   }

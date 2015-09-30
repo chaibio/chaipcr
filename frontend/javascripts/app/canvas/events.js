@@ -13,6 +13,7 @@ window.ChaiBioTech.ngApp.factory('events', [
     return function(C, $scope) {
 
       this.canvas = C.canvas;
+      var that = this;
       console.log("Events loaded .... !", ExperimentLoader);
       // We write this handler so that gather data popup is forced to hide when
       // clicked at some other part of the page, Given pop up is active.
@@ -26,6 +27,14 @@ window.ChaiBioTech.ngApp.factory('events', [
         }
 
       });
+
+      this.selectStep = function(circle) {
+
+        $scope.curtain.hide();
+        circle.manageClick();
+        $scope.applyValuesFromOutSide(circle);
+      };
+
       /**************************************
           what happens when click is happening in canvas.
           what we do is check if the click is up on some particular events.
@@ -34,28 +43,32 @@ window.ChaiBioTech.ngApp.factory('events', [
       this.canvas.on("mouse:down", function(evt) {
         if(evt.target) {
           var me;
-
+          console.log(evt.target);
           switch(evt.target.name)  {
 
             case "stepGroup":
 
-              $scope.curtain.hide();
               me = evt.target.me;
-              me.circle.manageClick();
-              $scope.applyValuesFromOutSide(me.circle);
+              that.selectStep(me.circle);
 
             break;
 
             case "controlCircleGroup":
 
-              $scope.curtain.hide();
               me = evt.target.me;
-              me.manageClick();
-              $scope.applyValuesFromOutSide(me);
+              that.selectStep(me);
+
+            break;
+
+            case "orangeFooter":
+
+              me = evt.target.step;
+              that.selectStep(me.circle);
 
             break;
 
             case "moveStepImage":
+
               var moveStep = evt.target.step;
               evt.target.startPosition = evt.target.left;
               C.moveLimit = C.allStepViews[C.allStepViews.length - 1].left + 3;
