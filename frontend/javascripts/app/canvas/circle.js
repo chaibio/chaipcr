@@ -196,7 +196,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
             )
           ], this);
         // adjust the placing of ramp speed, this method calculates the top
-        this.parent.adjustRampSpeedPlacing();
+        this.parent.adjustRampSpeedLeft().adjustRampSpeedPlacing();
 
         this.stepDataGroup = new stepDataGroup([
             this.temperature = new stepTemperature(this.model, this),
