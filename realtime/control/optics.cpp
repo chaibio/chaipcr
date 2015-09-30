@@ -15,7 +15,7 @@ using namespace Poco;
 Optics::Optics(unsigned int lidSensePin, shared_ptr<LEDController> ledController, MUX &&photoDiodeMux)
     :_ledController(ledController),
      _lidSensePin(lidSensePin, GPIO::kInput),
-     _fluorescenceData(kWellLedMappingList.size()),
+     _fluorescenceData(kWellToLedMappingList.size()),
      _photodiodeMux(move(photoDiodeMux))
 {
     _lidOpen = false;
@@ -58,11 +58,11 @@ void Optics::setCollectData(bool state, bool isMeltCurve)
             _wellNumber = 0;
 
             _fluorescenceData.clear();
-            _fluorescenceData.resize(kWellLedMappingList.size());
+            _fluorescenceData.resize(kWellToLedMappingList.size());
 
             _meltCurveData.clear();
 
-            _ledController->activateLED(kWellLedMappingList.at(_wellNumber));
+            _ledController->activateLED(kWellToLedMappingList.at(_wellNumber));
             _photodiodeMux.setChannel(_wellNumber);
         }
 
@@ -74,7 +74,7 @@ void Optics::setCollectData(bool state, bool isMeltCurve)
             _wellNumber = 0;
 
             _fluorescenceData.clear();
-            _fluorescenceData.resize(kWellLedMappingList.size());
+            _fluorescenceData.resize(kWellToLedMappingList.size());
 
             _meltCurveData.clear();
         }
@@ -135,14 +135,14 @@ void Optics::collectDataCallback(Poco::Timer &timer)
             }
 
             std::lock_guard<std::mutex> meltCurveDataLock(_meltCurveDataMutex);
-            _meltCurveData.emplace_back(adc / kADCReadsPerOpticalMeasurement, temperature, kWellLedMappingList.at(_wellNumber));
+            _meltCurveData.emplace_back(adc / kADCReadsPerOpticalMeasurement, temperature, kWellToLedMappingList.at(_wellNumber));
         }
 
         ++_wellNumber;
-        if (_wellNumber >= kWellLedMappingList.size())
+        if (_wellNumber >= kWellToLedMappingList.size())
             _wellNumber = 0;
 
-        _ledController->activateLED(kWellLedMappingList.at(_wellNumber));
+        _ledController->activateLED(kWellToLedMappingList.at(_wellNumber));
         _photodiodeMux.setChannel(_wellNumber);
 
         timer.restart(timer.getPeriodicInterval());
