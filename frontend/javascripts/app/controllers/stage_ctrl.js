@@ -45,10 +45,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
     };
 
     $scope.applyValues = function(circle) {
-
-      $scope.step = circle.parent.model;
-      $scope.stage = circle.parent.parentStage.model;
-      $scope.fabricStep = circle.parent;
+      $scope.applyValuesFromOutSide(circle);
     };
 
     $scope.convertToMinute = function(deltaTime) {

@@ -144,6 +144,7 @@ window.ChaiBioTech.ngApp.factory('step', [
       this.adjustRampSpeedPlacing = function() {
 
         this.rampSpeedGroup.setTop(this.circle.top + 24);
+        this.rampSpeedGroup.setLeft(this.left + 10);
       };
 
       this.rampSpeed = function() {
@@ -254,7 +255,6 @@ window.ChaiBioTech.ngApp.factory('step', [
           this.unSelectStep();
         }
 
-        this.canvas.bringToFront(this.rampSpeedGroup);
         this.manageBorder("black");
         this.showHideFooter(true);
       };
