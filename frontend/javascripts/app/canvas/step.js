@@ -143,7 +143,7 @@ window.ChaiBioTech.ngApp.factory('step', [
 
       this.adjustRampSpeedPlacing = function() {
 
-        this.rampSpeedGroup.setTop(this.circle.circleGroup.top - this.circle.scrollTop - this.circle.halfway + 8);
+        this.rampSpeedGroup.setTop(this.circle.top + 24);
       };
 
       this.rampSpeed = function() {
@@ -163,7 +163,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.rampSpeedGroup = new fabric.Group([
               this.rampSpeedText, this.underLine
             ], {
-                selectable: true, hasControls: true,  originX: 'center',  originY: 'center', top : 0,  left: 60
+                selectable: true, hasControls: true,  originX: 'left',  originY: 'top', top : 0,  left: this.left + 10
               }
         );
 
@@ -231,12 +231,13 @@ window.ChaiBioTech.ngApp.factory('step', [
           }
         );
 
-        this.stepGroup = new fabric.Group([this.stepRect, this.stepName, this.rampSpeedGroup, this.borderRight], {
+        this.stepGroup = new fabric.Group([this.stepRect, this.stepName, this.borderRight], {
           left: this.left || 32,  top: 44,  selectable: false,  hasControls: false,
           hasBoarders: false, name: "stepGroup",  me: this, originX: 'left', originY: 'top'
         });
 
         this.canvas.add(this.stepGroup);
+        this.canvas.add(this.rampSpeedGroup);
         this.canvas.add(this.hitPoint);
         this.addCircle();
       };
@@ -253,6 +254,7 @@ window.ChaiBioTech.ngApp.factory('step', [
           this.unSelectStep();
         }
 
+        this.canvas.bringToFront(this.rampSpeedGroup);
         this.manageBorder("black");
         this.showHideFooter(true);
       };
