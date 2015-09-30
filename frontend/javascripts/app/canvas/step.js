@@ -147,6 +147,7 @@ window.ChaiBioTech.ngApp.factory('step', [
       };
 
       this.adjustRampSpeedLeft = function() {
+
         this.rampSpeedGroup.setLeft(this.left + 5);
         return this;
       };
@@ -168,7 +169,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.rampSpeedGroup = new fabric.Group([
               this.rampSpeedText, this.underLine
             ], {
-                selectable: true, hasControls: true,  originX: 'left',  originY: 'top', top : 0,  left: this.left + 5
+                selectable: true, hasControls: true,  originX: 'left',  originY: 'top', top : 0,  left: this.left + 5, evented: false
               }
         );
 
