@@ -150,6 +150,19 @@ app.post('/control/start', function (req, res, next) {
     data.experimentController.machine.state = 'Running';
     data.experimentController.machine.thermal_state = 'Holding';
     autoupdateLogs();
+
+    setTimeout(function () {
+      data.optics.collectData = true;
+      data.experimentController.expriment.step.name = "Step 2";
+      data.experimentController.expriment.step.number = "2";
+    }, 3000);
+
+    setTimeout(function () {
+      data.optics.collectData = true;
+      data.experimentController.expriment.step.name = "Step 3";
+      data.experimentController.expriment.step.number = "3";
+    }, 5000);
+
   }, 3000);
 
   setTimeout(stop, 1000 * 60 * 15);
