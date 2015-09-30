@@ -199,12 +199,12 @@ window.ChaiBioTech.ngApp.factory('canvas', [
           thisCircle.curve = new path(thisCircle);
           this.canvas.add(thisCircle.curve);
 
-          //this.canvas.bringToFront(thisCircle.parent.rampSpeedGroup);
+
           if(thisCircle.previous) {
             //this.canvas.bringToFront(thisCircle.previous.parent.rampSpeedGroup);
           }
         }
-
+        this.canvas.bringToFront(thisCircle.parent.rampSpeedGroup);
         thisCircle.getCircle();
       }
       // We should put an infinity symbol if the last step has infinite hold time.

@@ -146,6 +146,11 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.rampSpeedGroup.setTop(this.circle.top + 24);
       };
 
+      this.adjustRampSpeedLeft = function() {
+        this.rampSpeedGroup.setLeft(this.left + 5);
+        return this;
+      };
+
       this.rampSpeed = function() {
 
         this.rampSpeedNumber = parseFloat(this.model.ramp.rate);
@@ -163,7 +168,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.rampSpeedGroup = new fabric.Group([
               this.rampSpeedText, this.underLine
             ], {
-                selectable: true, hasControls: true,  originX: 'left',  originY: 'top', top : 0,  left: this.left + 10
+                selectable: true, hasControls: true,  originX: 'left',  originY: 'top', top : 0,  left: this.left + 5
               }
         );
 
@@ -254,7 +259,6 @@ window.ChaiBioTech.ngApp.factory('step', [
           this.unSelectStep();
         }
 
-        this.canvas.bringToFront(this.rampSpeedGroup);
         this.manageBorder("black");
         this.showHideFooter(true);
       };
