@@ -31,7 +31,7 @@ window.ChaiBioTech.ngApp.directive('arrow', [
           } else if(step.parentStage.nextStage){
             circle = step.parentStage.nextStage.childSteps[0].circle;
             circle.manageClick();
-            scope.applyValues(circle);
+            scope.applyValuesFromOutSide(circle);
           }
         };
 
@@ -46,10 +46,10 @@ window.ChaiBioTech.ngApp.directive('arrow', [
             stage = step.parentStage.previousStage;
             circle = stage.childSteps[stage.childSteps.length - 1].circle;
             circle.manageClick();
-            scope.applyValues(circle);
+            scope.applyValuesFromOutSide(circle);
           }
         };
-        
+
       }
     };
   }

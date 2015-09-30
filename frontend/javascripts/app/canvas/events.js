@@ -43,7 +43,7 @@ window.ChaiBioTech.ngApp.factory('events', [
       this.canvas.on("mouse:down", function(evt) {
         if(evt.target) {
           var me;
-          console.log(evt.target);
+
           switch(evt.target.name)  {
 
             case "stepGroup":

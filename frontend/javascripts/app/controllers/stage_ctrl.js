@@ -37,25 +37,20 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
 
     $scope.applyValuesFromOutSide = function(circle) {
       // when the event or function call is initiated from non anular part of the app ... !!
-      try {
-        $scope.$apply(function() {
-          $scope.step = circle.parent.model;
-          $scope.stage = circle.parent.parentStage.model;
-          $scope.fabricStep = circle.parent;
-        });
-      } catch (e) {
-        console.log(e);
+      
+      $scope.$apply(function() {
         $scope.step = circle.parent.model;
         $scope.stage = circle.parent.parentStage.model;
         $scope.fabricStep = circle.parent;
-      } finally {
-
-      }
+      });
 
     };
 
     $scope.applyValues = function(circle) {
-      $scope.applyValuesFromOutSide(circle);
+
+      $scope.step = circle.parent.model;
+      $scope.stage = circle.parent.parentStage.model;
+      $scope.fabricStep = circle.parent;
     };
 
     $scope.convertToMinute = function(deltaTime) {
