@@ -63,11 +63,14 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       paddData
 
     @getMaxExperimentCycle = (exp) ->
-      stages = exp?.protocol?.stages || []
-
+      stages = exp.protocol.stages || []
       cycles = []
+
       for stage in stages by 1
         cycles.push stage.stage.num_cycles
+
+      console.log "num_cycles:"
+      console.log cycles
 
       Math.max.apply Math, cycles
 
