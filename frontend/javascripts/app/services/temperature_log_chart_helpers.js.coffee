@@ -56,6 +56,7 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogChartHelpers', [
           ticksFormatter: (t) ->
             SecondsDisplay.display2 t
           ticks: 8
+          max: 60 * 5
         },
         y: {
           key: 'heat_block_zone_temp'

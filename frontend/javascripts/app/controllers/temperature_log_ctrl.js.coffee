@@ -14,6 +14,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
     hasExperiment = false
     hasInit = false
     dragScroll = angular.element('.chart-drag-scroll')
+    $scope.options = helper.chartConfig
 
     $scope.$on 'expName:Updated', ->
       $scope.experiment?.name = expName.name
@@ -215,6 +216,8 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
           if !$scope.resolution or $scope.greatest_elapsed_time/1000 < 60 * 5 and $scope.scrollState is 'FULL'
             $scope.resolutionOptionsIndex = $scope.resolutionOptions.length-1
             $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
+          if $scope.greatest_elapsed_time/1000 > 60 * 5
+            $scope.options.axes.x.max = $scope.greatest_elapsed_time/1000
           $scope.updateYScale()
           $scope.updateScrollWidth()
           $scope.resizeTemperatureLogs()
@@ -251,7 +254,5 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
           $scope.resolutionOptions.push opt
 
       $scope.resolutionOptions.push Math.floor $scope.greatest_elapsed_time/1000
-
-    $scope.options = helper.chartConfig
 
 ]
