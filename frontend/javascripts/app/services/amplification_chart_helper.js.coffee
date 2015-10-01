@@ -9,6 +9,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           min: 0
           key: 'cycle_num'
           ticks: 8
+          ticksFormatter: (x) ->
+            parseInt(x)
         y:
           min: 0
           ticks: 10
