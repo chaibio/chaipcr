@@ -35,13 +35,9 @@ window.ChaiBioTech.ngApp
         templateUrl: 'app/views/skelton.html'
         controller: 'ProtocolCtrl'
 
-      .state 'temperatureLog',
-        url: '/experiments/:id/temperature-logs'
-        templateUrl: 'app/views/experiment/temperature-logs.html'
-
-      .state 'amplification-chart',
-        url: '/experiments/:id/amplification'
-        templateUrl: 'app/views/experiment/amplification-chart.html'
+      .state 'run-experiment',
+        url: '/experiments/:id/run-experiment?chart'
+        templateUrl: 'app/views/experiment/run-experiment.html'
 
 
 

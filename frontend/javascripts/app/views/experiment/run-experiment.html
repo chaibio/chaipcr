@@ -1,0 +1,8 @@
+<div ng-controller="RunExperimentCtrl as RunExperimentCtrl">
+  <div menu-overlay sidemenu-template="app/views/experiment/left-menu.html">
+    <div ng-show="RunExperimentCtrl.chart === 'amplification'" ng-include src="'app/views/experiment/amplification-chart.html'">
+    </div>
+    <div ng-show="RunExperimentCtrl.chart === 'temperature-logs'" ng-include src="'app/views/experiment/temperature-logs.html'">
+    </div>
+  </div>
+</div>

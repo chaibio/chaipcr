@@ -1,4 +1,4 @@
-<div menu-overlay sidemenu-template="app/views/experiment/left-menu.html">
+<div class="amplification-chart-state-active">
   <div class="page-layout" ng-controller="AmplificationChartCtrl">
     <div class="header">
       <div class="stripes-and-name">
@@ -38,7 +38,7 @@
                 <div class="chart-type-option">Amplification Chart</div>
               </div>
               <div class="col-md-4">
-                <div class="chart-type-option" ui-sref="temperatureLog({id:experiment.id})">Thermal Profile</div>
+                <div class="chart-type-option" ng-click="RunExperimentCtrl.changeChart('temperature-logs')">Thermal Profile</div>
               </div>
             </div>
             <amplification-well-switch ng-model="wellButtons"></amplification-well-switch>

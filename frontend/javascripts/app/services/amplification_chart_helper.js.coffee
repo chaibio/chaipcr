@@ -4,45 +4,39 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
   (SecondsDisplay, $filter) ->
 
     @chartConfig = ->
-      config =
-        axes:
-          x:
-            min: 0
-            max: 10
-            key: 'cycle_num'
-            ticks: 8
-          y:
-            min: 0
-            ticks: 10
-            ticksFormatter: (y) ->
-              "#{$filter('round')(y/1000, 1)}k"
-        margin:
-          left: 70
-        series: [
-        ]
-        lineMode: 'basis'
-        thickness: '2px'
-        tension: 0.7
-        tooltip:
-          mode: 'none'
-        # tooltip:
-        #   mode: 'scrubber'
-        #   formatter: (x, y, series) ->
-        #     "cycle: #{x} | calibration: #{$filter('round')(y/1000, 1)}k"
-        drawLegend: false
-        drawDots: false
-        hideOverflow: false
+      axes:
+        x:
+          min: 0
+          max: 10
+          key: 'cycle_num'
+          ticks: 8
+          ticksFormatter: (x) ->
+            Math.round (x*1)
+        y:
+          min: 0
+          ticks: 10
+          # ticksFormatter: (y) ->
+          #   "#{$filter('round')(y/1000, 1)}k"
+      margin:
+        left: 70
+      series: [
+      ]
+      lineMode: 'basis'
+      thickness: '2px'
+      tension: 0.7
+      tooltip:
+        mode: 'none'
+      # tooltip:
+      #   mode: 'scrubber'
+      #   formatter: (x, y, series) ->
+      #     "cycle: #{x} | calibration: #{$filter('round')(y/1000, 1)}k"
+      drawLegend: false
+      drawDots: false
+      hideOverflow: false
 
-      config
 
     @neutralizeData = (fluorescence_data) ->
-      neutralized_data = []
-
-      paddData = cycle_num: 0
-      for i in [0..15] by 1
-        paddData["well_#{i}"] = 0
-
-      neutralized_data.push paddData
+      neutralized_data = [@paddData()]
 
       # get max cycle
       max_cycle = 0
@@ -60,6 +54,24 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         neutralized_data.push data
 
       neutralized_data
+
+
+
+    @paddData = ->
+      paddData = cycle_num: 0
+      for i in [0..15] by 1
+        paddData["well_#{i}"] = 0
+
+      paddData
+
+    @getMaxExperimentCycle = (exp) ->
+      stages = exp?.protocol?.stages || []
+
+      cycles = []
+      for stage in stages by 1
+        cycles.push stage.stage.num_cycles
+
+      Math.max.apply Math, cycles
 
     # @getGreatestCalibration = (fluorescence_data) ->
     #   data = []
