@@ -12,7 +12,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
     Experiment.get(id: $stateParams.id).$promise.then (data) ->
       $scope.experiment = data.experiment
-      $scope.chartConfig.axes.x.ticks = helper.ticks helper.getMaxExperimentCycle data.experiment
+      $scope.chartConfig.axes.x.ticks = helper.Xticks helper.getMaxExperimentCycle data.experiment
       return
 
     Status.startSync()
@@ -34,7 +34,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
     updateFluorescenceData = ->
       Experiment.getFluorescenceData($stateParams.id)
       .success (data) ->
-        $scope.chartConfig.axes.x.ticks = helper.ticks data.total_cycles
+        $scope.chartConfig.axes.x.ticks = helper.Xticks data.total_cycles
+        $scope.chartConfig.axes.y.max = helper.getMaxCalibration data.fluorescence_data
         $scope.data = helper.neutralizeData data.fluorescence_data
         hasData = true
 

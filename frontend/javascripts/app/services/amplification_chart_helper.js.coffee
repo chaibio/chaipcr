@@ -71,19 +71,25 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
       Math.max.apply Math, cycles
 
-    @ticks = (max)->
+    @getMaxCalibration = (fluorescence_data) ->
+      calibs = _.map fluorescence_data, (datum) ->
+        datum.fluorescence_datum.calibrated_value
+
+      Math.max.apply Math, calibs
+
+    @Xticks = (max)->
+      num_ticks = 10
       ticks = []
-      for i in [0..max]
-        ticks.push i
+      if max < num_ticks
+        for i in [0..max] by 1
+          ticks.push i
+      else
+        chunkSize = Math.floor(max/num_ticks)
+        for i in [0..max] by chunkSize
+          ticks.push i
+        ticks.push max
 
       ticks
-
-    # @getGreatestCalibration = (fluorescence_data) ->
-    #   data = []
-    #   for datum in fluorescence_data by 1
-    #     data.push datum.fluorescence_datum.calibrated_value
-
-    #   Math.max.apply Math, data
 
     return
 ]
