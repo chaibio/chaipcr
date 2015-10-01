@@ -3,8 +3,13 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
   '$stateParams'
   'Experiment'
   '$state'
-  ($scope, $stateParams, Experiment, $state) ->
+  'AmplificationChartHelper'
+  ($scope, $stateParams, Experiment, $state, AmplificationChartHelper) ->
     $scope.params = $stateParams
+    $scope.maxCycle = 0
+
+    Experiment.get(id: $stateParams.id).$promise.then (data) ->
+      $scope.maxCycle = AmplificationChartHelper.getMaxExperimentCycle data.experiment
 
     $scope.deleteExperiment = (expId) ->
       exp = new Experiment id: expId

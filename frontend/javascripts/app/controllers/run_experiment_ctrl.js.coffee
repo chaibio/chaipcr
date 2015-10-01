@@ -6,7 +6,7 @@ window.ChaiBioTech.ngApp.controller 'RunExperimentCtrl', [
     @chart = $stateParams.chart
 
     @changeChart = (chart) ->
-      $state.go 'run-experiment', {id: $stateParams.id, chart: chart}, notify: false
+      $state.go 'run-experiment', {id: $stateParams.id, chart: chart, 'max-cycle': $stateParams.maxCycle}, notify: false
       @chart = chart
 
 ]

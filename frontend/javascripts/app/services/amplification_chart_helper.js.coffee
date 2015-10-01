@@ -7,7 +7,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       axes:
         x:
           min: 0
-          max: 10
+          max: 1
           key: 'cycle_num'
           ticks: 8
         y:
@@ -69,11 +69,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       for stage in stages by 1
         cycles.push stage.stage.num_cycles
 
-      console.log cycles
-
-      max = Math.max.apply Math, cycles
-      console.log "max_cycle: #{max}"
-      max
+      Math.max.apply Math, cycles
 
     @getMaxCalibration = (fluorescence_data) ->
       calibs = _.map fluorescence_data, (datum) ->
