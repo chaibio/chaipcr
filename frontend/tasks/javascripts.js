@@ -20,6 +20,7 @@ var vendorFiles = [
   'app/libs/jquery-1.10.1.min.js',
   'app/libs/jquery-ui.min.js',
   'app/libs/angular.js',
+  'app/libs/angular-animate.js',
   'app/libs/angular-resource.js',
   'app/libs/perfect-scrollbar.jquery.min.js',
   'app/libs/angular-perfect-scrollbar.js',

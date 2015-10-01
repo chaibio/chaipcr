@@ -12,4 +12,5 @@ window.ChaiBioTech.ngApp = angular.module 'ChaiBioTech', [
   'n3-line-chart'
   'focusOn'
   'http-auth-interceptor'
+  'ngAnimate'
 ]
