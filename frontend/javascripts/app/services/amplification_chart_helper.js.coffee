@@ -10,8 +10,6 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           max: 10
           key: 'cycle_num'
           ticks: 8
-          ticksFormatter: (x) ->
-            Math.round (x*1)
         y:
           min: 0
           ticks: 10
@@ -72,6 +70,13 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         cycles.push stage.stage.num_cycles
 
       Math.max.apply Math, cycles
+
+    @ticks = (max)->
+      ticks = []
+      for i in [0..max]
+        ticks.push i
+
+      ticks
 
     # @getGreatestCalibration = (fluorescence_data) ->
     #   data = []

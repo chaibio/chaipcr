@@ -7,6 +7,13 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
   ($scope, $stateParams, Experiment, helper, Status) ->
 
     hasData = false
+    $scope.data = [helper.paddData()]
+    $scope.chartConfig = helper.chartConfig()
+
+    Experiment.get(id: $stateParams.id).$promise.then (data) ->
+      $scope.experiment = data.experiment
+      $scope.chartConfig.axes.x.ticks = helper.ticks helper.getMaxExperimentCycle data.experiment
+      return
 
     Status.startSync()
     $scope.$on 'destroy', ->
@@ -24,19 +31,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       (state is 'Running' and (oldStep isnt newStep or !oldStep) and data.optics.collectData)
         updateFluorescenceData()
 
-    $scope.chartConfig = helper.chartConfig()
-    $scope.fluorescence_data = []
-
-    Experiment.get(id: $stateParams.id).$promise.then (data) ->
-      $scope.experiment = data.experiment
-      $scope.chartConfig.axes.x.max = helper.getMaxExperimentCycle data.experiment
-      $scope.data = [helper.paddData()]
-      return
-
     updateFluorescenceData = ->
       Experiment.getFluorescenceData($stateParams.id)
       .success (data) ->
-        $scope.chartConfig.axes.x.max = data.total_cycles
+        $scope.chartConfig.axes.x.ticks = helper.ticks data.total_cycles
         $scope.data = helper.neutralizeData data.fluorescence_data
         hasData = true
 
