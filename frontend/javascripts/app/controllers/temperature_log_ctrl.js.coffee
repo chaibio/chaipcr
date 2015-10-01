@@ -190,7 +190,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
     $scope.$on 'experiment:started', (e, expId) ->
       if parseInt(expId) is parseInt($stateParams.id)
-        $scope.scrollState = 1
+        $scope.scrollState = 'FULL'
         $scope.isCurrentExperiment = true
         $scope.autoUpdateTemperatureLogs()
 
