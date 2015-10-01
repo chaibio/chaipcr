@@ -1,6 +1,6 @@
 class Protocol < ActiveRecord::Base
   belongs_to :experiment_definition
-  has_many :stages, -> {order("order_number")}
+  has_many :stages, -> {order("order_number").includes(:steps, :ramps)}
   
   ACCESSIBLE_ATTRS = [:lid_temperature]
   
