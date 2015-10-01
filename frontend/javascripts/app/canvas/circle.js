@@ -357,12 +357,34 @@ window.ChaiBioTech.ngApp.factory('circle', [
             // Mid point
             previous.curve.path[1][3] = midPointX;
             previous.curve.path[1][4] = midPointY;
+
             // We move the gather data Circle along with it
             // Please pay attention here we move gatherdta of this
             this.gatherDataGroup.setTop(midPointY);
 
+            if(this.model.ramp.collect_data) {
+              this.gatherDataGroup.setCoords();
+              this.parent.rampSpeedGroup.setCoords();
+              if(this.gatherDataGroup.intersectsWithObject(this.parent.rampSpeedGroup)) {
+                /*var boo;
+                if(this.gatherDataGroup.top > this.parent.rampSpeedGroup.top) {
+                  boo = (this.gatherDataGroup.top - this.parent.rampSpeedGroup.top) - this.parent.rampSpeedGroup.height;
+                } else {
+                  boo = (this.parent.rampSpeedGroup.top - this.gatherDataGroup.top);
+                }
+
+                var val = Math.sqrt(Math.abs((boo * boo) - 256));
+                this.parent.rampSpeedGroup.left = this.parent.left + val;
+                console.log(boo, "val:", val);*/
+                this.parent.rampSpeedGroup.left = this.parent.left + 16;
+              } else {
+                this.parent.rampSpeedGroup.left = this.parent.left + 5;
+              }
+            }
+
             previous.curve.path[1][1] = endPointX + this.controlDistance;
             previous.curve.path[1][2] = endPointY;
+
         }
 
         if(targetCircleGroup.top >= this.middlePoint) {
