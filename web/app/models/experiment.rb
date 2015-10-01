@@ -1,6 +1,5 @@
 class Experiment < ActiveRecord::Base
   belongs_to :experiment_definition
-  has_one :protocol, through: :experiment_definition
   
   has_many :fluorescence_data
   has_many :temperature_logs, -> {order("elapsed_time")} do
@@ -48,6 +47,10 @@ class Experiment < ActiveRecord::Base
     TemperatureDebugLog.delete_all(:experiment_id => experiment.id)
     FluorescenceDatum.delete_all(:experiment_id => experiment.id)
     MeltCurveDatum.delete_all(:experiment_id => experiment.id)
+  end
+  
+  def protocol
+    experiment_definition.protocol
   end
   
   def editable?

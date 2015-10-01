@@ -146,15 +146,17 @@ describe "Experiments API" do
     get "/experiments/#{experiment.id}/export.zip", { :format => 'zip' }
     expect(response).to be_success
   end
-
-  it "test token in url" do
-    body = system('curl http://localhost:3000/login')
-    request.cookies[:authentication_token] = nil
-    get "/experiments", { :format => 'json' }
-    expect(response).to be_success
-  end
   
   describe "check editable" do
+    it "name editable if experiment has been run" do
+      experiment = create_experiment("test1")
+      experiment.started_at = Time.now
+      experiment.save
+      params = {experiment: {name: "test2"}}
+      put "/experiments/#{experiment.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      expect(response).to be_success
+    end
+    
     it "not editable if experiment definition is not editable" do
       experiment = Experiment.new
       experiment.experiment_definition = ExperimentDefinition.new(:name=>"diagnostic", :experiment_type=>ExperimentDefinition::TYPE_DIAGNOSTIC)

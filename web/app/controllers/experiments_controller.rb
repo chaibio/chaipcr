@@ -6,7 +6,6 @@ class ExperimentsController < ApplicationController
   
   before_filter :ensure_authenticated_user
   before_filter :get_experiment, :except => [:index, :create, :copy]
-  before_filter :experiment_definition_editable_check, :only => :update
   
   respond_to :json
 
@@ -24,7 +23,7 @@ class ExperimentsController < ApplicationController
   api :GET, "/experiments", "List all the experiments"
   example "[{'experiment':{'id':1,'name':'test1','type':'user','started_at':null,'completed_at':null,'completed_status':null}},{'experiment':{'id':2,'name':'test2','type':'user','started_at':null,'completed_at':null,'completed_status':null}}]"
   def index
-    @experiments = Experiment.joins(:experiment_definition).where("experiment_definitions.experiment_type"=>"user").all
+    @experiments = Experiment.includes(:experiment_definition).where("experiment_definitions.experiment_type"=>"user").all
     respond_to do |format|
       format.json { render "index", :status => :ok }
     end
@@ -53,6 +52,10 @@ class ExperimentsController < ApplicationController
   param_group :experiment
   example "{'experiment':{'id':1,'name':'test','type':'user','started_at':null,'completed_at':null,'completed_status':null}}"
   def update
+    if @experiment == nil || !@experiment.experiment_definition.editable? #if experiment has been run, the name is still editable
+      render json: {errors: "The experiment is not editable"}, status: :unprocessable_entity
+      return
+    end
     ret = @experiment.experiment_definition.update_attributes(experiment_params)
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok :  :unprocessable_entity}
@@ -75,6 +78,7 @@ class ExperimentsController < ApplicationController
   api :GET, "/experiments/:id", "Show an experiment"
   see "experiments#create", "json response"
   def show
+    @experiment.experiment_definition.protocol.stages.all
     respond_to do |format|
       format.json { render "fullshow", :status => (@experiment)? :ok :  :unprocessable_entity}
     end
