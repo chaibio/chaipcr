@@ -87,7 +87,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         chunkSize = Math.floor(max/num_ticks)
         for i in [0..max] by chunkSize
           ticks.push i
-        ticks.push max
+        ticks.push max if max % num_ticks isnt 0
 
       ticks
 

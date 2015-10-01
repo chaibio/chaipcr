@@ -37,6 +37,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.chartConfig.axes.x.ticks = helper.Xticks data.total_cycles
         $scope.chartConfig.axes.y.max = helper.getMaxCalibration data.fluorescence_data
         $scope.data = helper.neutralizeData data.fluorescence_data
+        console.log $scope.chartConfig
         hasData = true
 
     $scope.$watch 'wellButtons', (buttons) ->
