@@ -30,7 +30,7 @@ void TestControlHandler::processOptics(const ptree &requestPt)
             optics->getLedController()->setIntensity(ledIntensity->second.get_value<double>());
 
         if (activateLED != requestPt.not_found())
-            optics->getLedController()->activateLED(kWellLedMappingList.at(activateLED->second.get_value<int>()));
+            optics->getLedController()->activateLED(kWellToLedMappingList.at(activateLED->second.get_value<int>()));
 
         if (disableLEDs != requestPt.not_found())
             optics->getLedController()->disableLEDs();

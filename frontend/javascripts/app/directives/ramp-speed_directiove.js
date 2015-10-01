@@ -22,7 +22,6 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
         scope.$watch("reading", function(val) {
 
           if(angular.isDefined(scope.reading)) {
-            console.log(Number(scope.reading));
 
             if(Number(scope.reading) <= 0) {
               scope.shown = "AUTO";
