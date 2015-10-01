@@ -28,7 +28,7 @@ window.ChaiBioTech.ngApp.factory('step', [
 
         var can = this.parentStage.parent;
 
-        this.commonFooterImage = can.applyPropertyToImages($.extend({}, can.imageobjects["common-step.png"]), this);
+        this.commonFooterImage = can.applyPropertyToImages($.extend({}, can.imageobjects["common-step.png"]), this, 'orangeFooter');
         can.canvas.add(this.commonFooterImage);
 
         this.darkFooterImage = can.applyPropertyToImages($.extend({}, can.imageobjects["black-footer.png"]), this);
