@@ -10,11 +10,13 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           max: 10
           key: 'cycle_num'
           ticks: 8
+          ticksFormatter: (x) ->
+            Math.round (x*1)
         y:
           min: 0
           ticks: 10
-          ticksFormatter: (y) ->
-            "#{$filter('round')(y/1000, 1)}k"
+          # ticksFormatter: (y) ->
+          #   "#{$filter('round')(y/1000, 1)}k"
       margin:
         left: 70
       series: [
