@@ -7,7 +7,13 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogChartHelpers', [
           key: 'elapsed_time',
           ticksFormatter: (t) ->
             SecondsDisplay.display2 t
-          ticks: 8
+          ticks: [
+            60
+            60*2
+            60*3
+            60*4
+            60*5
+          ]
           max: 60 * 5
         },
         y: {

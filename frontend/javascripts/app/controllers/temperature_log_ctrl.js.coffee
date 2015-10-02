@@ -205,6 +205,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
             $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
           if $scope.greatest_elapsed_time/1000 > 60 * 5
             delete $scope.options.axes.x.max
+            delete $scope.options.axes.x.ticks
           $scope.updateYScale()
           $scope.updateScrollWidth()
           $scope.resizeTemperatureLogs()
