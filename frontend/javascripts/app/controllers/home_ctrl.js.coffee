@@ -4,7 +4,8 @@ window.ChaiBioTech.ngApp
   '$scope'
   'Experiment'
   '$window'
-  ($scope, Experiment, $window) ->
+  '$state'
+  ($scope, Experiment, $window, $state) ->
 
     $scope.experiments = null
 
@@ -38,6 +39,13 @@ window.ChaiBioTech.ngApp
       , (resp) ->
         $window.alert resp.data.experiment?.errors?.base || 'Unable to delete experiment.'
         data.del = false
+
+    @openExperiment = (exp) ->
+      if exp.started_at isnt null
+        $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
+      else
+        $state.go 'edit-protocol', {id: exp.id}
+
 
     return
 

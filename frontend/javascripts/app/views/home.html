@@ -87,7 +87,7 @@
                         <span ng-if="deleteMode">&times;</span>
                      </div>
                      <div class="text simplifica">
-                        <a ui-sref="edit-protocol({id: exp.experiment.id})">
+                        <a ng-click="HomeCtrl.openExperiment(exp.experiment)">
                            {{exp.experiment.name}}
                         </a>
                      </div>

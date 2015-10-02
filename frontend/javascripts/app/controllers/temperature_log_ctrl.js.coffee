@@ -10,9 +10,6 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
   'TemperatureLogChartHelpers'
   ($scope, $stateParams, Status, Experiment, SecondsDisplay, $interval, $rootScope, expName, helper) ->
 
-    $scope.$watch 'data', (val) ->
-      console.log val
-
     hasStatusData = false
     hasExperiment = false
     hasInit = false
@@ -187,7 +184,6 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       $scope.scrollState += val*-1
 
     $scope.updateChart = (temperature_logs) ->
-      console.log $scope.data
       $scope.data = helper.toN3LineChart(temperature_logs)
 
     updateFunc = ->
