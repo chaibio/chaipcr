@@ -1,10 +1,10 @@
 <div class="test-in-progress-container" ng-show="data">
   <div class="test-in-progress">
     <div class="test-in-progress-heading">
-      <div>
+      <div class="truncate text-blue">
         <span ng-show="data.experimentController.machine.state === 'LidHeating' || data.experimentController.machine.state === 'Running'">
-          TEST IN PROGRESS:
-          <span class="text-blue">
+          <span class="text-black">TEST IN PROGRESS:</span>
+          <span>
             {{ data.experimentController.expriment.name }}
           </span>
         </span>

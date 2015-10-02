@@ -3,7 +3,7 @@
     EXPERIMENT NAME
   </div>
   <div class="exp-name-container">
-    <span class="exp-name simplifica" ng-show="!editExpNameMode">
+    <span class="exp-name simplifica truncate" ng-show="!editExpNameMode">
       {{experiment.name}}
     </span>
     <input type="text" class="exp-name simplifica" ng-model="experiment.name" ng-show="editExpNameMode" ng-blur="saveExperiment()" focus-on="editExpNameMode">
