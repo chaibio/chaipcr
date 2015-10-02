@@ -10,14 +10,27 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
   'TemperatureLogChartHelpers'
   ($scope, $stateParams, Status, Experiment, SecondsDisplay, $interval, $rootScope, expName, helper) ->
 
+    $scope.$watch 'data', (val) ->
+      console.log val
+
     hasStatusData = false
     hasExperiment = false
     hasInit = false
     dragScroll = angular.element('.chart-drag-scroll')
     $scope.options = helper.chartConfig
+    $scope.data = []
+    $scope.data.push
+      elapsed_time: 0
+      lid_temp: 0
+      heat_block_zone_temp: 0
 
     $scope.$on 'expName:Updated', ->
       $scope.experiment?.name = expName.name
+
+    Status.startSync()
+    $scope.$on '$destroy', ->
+      Status.stopSync()
+      $scope.stopInterval()
 
     getExperiment = ->
       Experiment.get id: $stateParams.id, (data) ->
@@ -43,14 +56,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
     $scope.init = ->
 
       return if !hasStatusData or !hasExperiment or hasInit
-
       hasInit = true
-
-      Status.startSync()
-
-      $scope.$on '$destroy', ->
-        Status.stopSync()
-        $scope.stopInterval()
 
       $scope.isCurrentExperiment = false
 
@@ -81,12 +87,15 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
           data = helper.updateData $scope.temperatureLogsCache, $scope.temperatureLogs, $scope.resolution, $scope.scrollState
           $scope.updateChart data
         else
-          $scope.data = []
+          # $scope.data = []
           $scope.autoUpdateTemperatureLogs()
 
     $scope.zoomOut = ->
       if $scope.resolutionOptions.length > 0 and $scope.resolutionOptionsIndex isnt ($scope.resolutionOptions.length - 1)
         $scope.resolutionOptionsIndex += 1
+
+        if $scope.greatest_elapsed_time/1000 < 60*5 and $scope.resolutionOptionsIndex is $scope.resolutionOptions.length-1
+          $scope.options.axes.x.max = 60*5
 
       $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
       $scope.updateResolution()
@@ -96,30 +105,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         $scope.resolutionOptionsIndex -= 1
         $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
         $scope.updateResolution()
-
-    $scope.updateData = ->
-      if $scope.temperatureLogsCache?.length > 0
-        left_et_limit = $scope.temperatureLogsCache[$scope.temperatureLogsCache.length-1].temperature_log.elapsed_time - ($scope.resolution*1000)
-
-        maxScroll = 0
-        for temp_log in $scope.temperatureLogs
-          if temp_log.temperature_log.elapsed_time <= left_et_limit
-            ++ maxScroll
-          else
-            break
-
-        scrollState = Math.round (if $scope.scrollState is 'FULL' then 1 else $scope.scrollState) * maxScroll
-        if $scope.scrollState < 0 then scrollState = 0
-        if $scope.scrollState > 1 then scrollState = maxScroll
-        left_et = $scope.temperatureLogs[scrollState].temperature_log.elapsed_time
-
-        right_et = left_et + ($scope.resolution*1000)
-
-        data = _.select $scope.temperatureLogs, (temp_log) ->
-          et = temp_log.temperature_log.elapsed_time
-          et >= left_et and et <= right_et
-
-        $scope.updateChart data
+        delete $scope.options.axes.x.max
 
     $scope.updateYScale = ->
       scales = _.map $scope.temperatureLogsCache, (temp_log) ->
@@ -180,7 +166,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         $scope.autoUpdateTemperatureLogs()
 
     $scope.$watch 'scrollState', ->
-      if $scope.scrollState and $scope.temperatureLogs and $scope.data
+      if $scope.scrollState and $scope.temperatureLogs and $scope.data and $scope.temperatureLogsCache.length > 0
         data = helper.updateData $scope.temperatureLogsCache, $scope.temperatureLogs, $scope.resolution, $scope.scrollState
         $scope.updateChart data
 
@@ -191,7 +177,8 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
     $scope.$on 'experiment:started', (e, expId) ->
       if parseInt(expId) is parseInt($stateParams.id)
-        $scope.scrollState = 'FULL'
+        if $scope.temperatureLogsCache.length is 0
+          $scope.scrollState = 'FULL'
         $scope.isCurrentExperiment = true
         $scope.autoUpdateTemperatureLogs()
 
@@ -200,6 +187,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       $scope.scrollState += val*-1
 
     $scope.updateChart = (temperature_logs) ->
+      console.log $scope.data
       $scope.data = helper.toN3LineChart(temperature_logs)
 
     updateFunc = ->
@@ -217,7 +205,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
             $scope.resolutionOptionsIndex = $scope.resolutionOptions.length-1
             $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
           if $scope.greatest_elapsed_time/1000 > 60 * 5
-            $scope.options.axes.x.max = $scope.greatest_elapsed_time/1000
+            delete $scope.options.axes.x.max
           $scope.updateYScale()
           $scope.updateScrollWidth()
           $scope.resizeTemperatureLogs()

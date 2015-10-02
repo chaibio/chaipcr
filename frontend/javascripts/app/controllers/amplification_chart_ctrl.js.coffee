@@ -18,7 +18,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       return
 
     Status.startSync()
-    $scope.$on 'destroy', ->
+    $scope.$on '$destroy', ->
       Status.stopSync()
 
     $scope.$watch ->
@@ -29,8 +29,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       state = data?.experimentController?.machine?.state
       isCurrentExp = parseInt(data?.experimentController?.expriment?.id) is parseInt($stateParams.id)
 
-      if (state is 'Idle' and $scope.experiment?.completed_at and !hasData) or
-      (state is 'Running' and (oldStep isnt newStep or !oldStep) and data.optics.collectData)
+      if ((state is 'Idle' and $scope.experiment?.completed_at and !hasData) or
+      (state is 'Running' and (oldStep isnt newStep or !oldStep) and data.optics.collectData)) and
+      $scope.RunExperimentCtrl.chart is 'amplification'
         updateFluorescenceData()
 
     updateFluorescenceData = ->
