@@ -338,40 +338,10 @@ window.ChaiBioTech.ngApp.factory('circle', [
               this.next.parent.rampSpeedGroup.setCoords();
               var rampEdge = this.next.parent.rampSpeedGroup.top + this.next.parent.rampSpeedGroup.height;
               if((rampEdge > this.next.gatherDataGroup.top - 14) && this.next.parent.rampSpeedGroup.top < this.next.gatherDataGroup.top + 16) {
-
-                /*if(this.next.gatherDataGroup.top > this.next.parent.rampSpeedGroup.top) { // if ramp is above the center circle
-                  boo = this.next.gatherDataGroup.top - rampEdge;
-                } else {
-                  boo = (this.next.parent.rampSpeedGroup.top - this.next.gatherDataGroup.top);
-                }
-                //boo = this.next.gatherDataGroup.top - rampEdge;
-                if(this.next.parent.rampSpeedGroup.top > this.next.gatherDataGroup.top) {
-                  boo = (this.next.parent.rampSpeedGroup.top - this.next.gatherDataGroup.top);
-                } else if (rampEdge < this.next.gatherDataGroup.top) {
-                  boo = this.next.gatherDataGroup.top - rampEdge;
-                }
-
-                var val = Math.sqrt(Math.abs((boo * boo) - 256));*/
                 this.next.parent.rampSpeedGroup.left = this.next.parent.left + 16;
-                console.log("bingo");
               } else {
                 this.next.parent.rampSpeedGroup.left = this.next.parent.left + 5;
               }
-              /*if(this.next.gatherDataGroup.intersectsWithObject(this.next.parent.rampSpeedGroup)) {
-                var boo;
-                if(this.next.gatherDataGroup.top > this.next.parent.rampSpeedGroup.top) {
-                  boo = (this.next.gatherDataGroup.top - this.next.parent.rampSpeedGroup.top) - this.next.parent.rampSpeedGroup.height;
-                } else {
-                  boo = (this.next.parent.rampSpeedGroup.top - this.next.gatherDataGroup.top);
-                }
-
-                var val = Math.sqrt(Math.abs((boo * boo) - 256));
-                this.next.parent.rampSpeedGroup.left = this.next.parent.left + val;
-                console.log(boo, "val:", val);
-                this.next.parent.rampSpeedGroup.left = this.next.parent.left + 16;
-              } else {
-                this.next.parent.rampSpeedGroup.left = this.next.parent.left + 5;
-              }*/
             }
             // Controlling point for the next bent
             this.curve.path[2][1] = endPointX - this.controlDistance;
@@ -407,7 +377,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
               var rampEdge = this.parent.rampSpeedGroup.top + this.parent.rampSpeedGroup.height;
               if((rampEdge > this.gatherDataGroup.top - 14) && this.parent.rampSpeedGroup.top < this.gatherDataGroup.top + 16) {
 
-                
+
                 //boo = this.gatherDataGroup.top - rampEdge;
                 if(this.parent.rampSpeedGroup.top > this.gatherDataGroup.top) {
                   boo = (this.parent.rampSpeedGroup.top - this.gatherDataGroup.top);
