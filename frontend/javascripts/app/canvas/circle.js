@@ -147,7 +147,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
         if( this.parent.index !== 0 || this.parent.parentStage.index !== 0) {
           this.gatherDataGroup.setVisible(this.parent.gatherDataDuringRamp);
         }
-
+        this.runAlongCircle();
       };
 
       this.getUniqueId = function() {
@@ -196,7 +196,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
             )
           ], this);
         // adjust the placing of ramp speed, this method calculates the top
-        this.parent.adjustRampSpeedLeft().adjustRampSpeedPlacing();
+        this.parent.adjustRampSpeedPlacing().adjustRampSpeedLeft();
 
         this.stepDataGroup = new stepDataGroup([
             this.temperature = new stepTemperature(this.model, this),
@@ -372,40 +372,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
             this.gatherDataGroup.setTop(midPointY);
 
             if(this.model.ramp.collect_data) {
-              this.gatherDataGroup.setCoords();
-              this.parent.rampSpeedGroup.setCoords();
-              var rampEdge = this.parent.rampSpeedGroup.top + this.parent.rampSpeedGroup.height;
-              if((rampEdge > this.gatherDataGroup.top - 14) && this.parent.rampSpeedGroup.top < this.gatherDataGroup.top + 16) {
-
-
-                //boo = this.gatherDataGroup.top - rampEdge;
-                if(this.parent.rampSpeedGroup.top > this.gatherDataGroup.top) {
-                  boo = (this.parent.rampSpeedGroup.top - this.gatherDataGroup.top);
-                } else if (rampEdge < this.gatherDataGroup.top) {
-                  boo = this.gatherDataGroup.top - rampEdge;
-                }
-
-                var val = Math.sqrt(Math.abs((boo * boo) - 256));
-                this.parent.rampSpeedGroup.left = this.parent.left + val;
-                console.log("bingo");
-              } else {
-                this.parent.rampSpeedGroup.left = this.parent.left + 5;
-              }
-              /*if(this.gatherDataGroup.intersectsWithObject(this.parent.rampSpeedGroup)) {
-                var boo;
-                if(this.gatherDataGroup.top > this.parent.rampSpeedGroup.top) {
-                  boo = (this.gatherDataGroup.top - this.parent.rampSpeedGroup.top) - this.parent.rampSpeedGroup.height;
-                } else {
-                  boo = (this.parent.rampSpeedGroup.top - this.gatherDataGroup.top);
-                }
-
-                var val = Math.sqrt(Math.abs((boo * boo) - 256));
-                this.parent.rampSpeedGroup.left = this.parent.left + val;
-                console.log(boo, "val:", val);
-                this.parent.rampSpeedGroup.left = this.parent.left + 16;
-              } else {
-                this.parent.rampSpeedGroup.left = this.parent.left + 5;
-              }*/
+              this.runAlongCircle();
             }
 
             previous.curve.path[1][1] = endPointX + this.controlDistance;
@@ -446,6 +413,27 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.canvas.renderAll();
       };
 
+      this.runAlongCircle = function() {
+
+        this.gatherDataGroup.setCoords();
+        this.parent.rampSpeedGroup.setCoords();
+        var rampEdge = this.parent.rampSpeedGroup.top + this.parent.rampSpeedGroup.height;
+        if((rampEdge > this.gatherDataGroup.top - 14) && this.parent.rampSpeedGroup.top < this.gatherDataGroup.top + 16) {
+
+
+          //boo = this.gatherDataGroup.top - rampEdge;
+          if(this.parent.rampSpeedGroup.top > this.gatherDataGroup.top) {
+            boo = (this.parent.rampSpeedGroup.top - this.gatherDataGroup.top);
+          } else if (rampEdge < this.gatherDataGroup.top) {
+            boo = this.gatherDataGroup.top - rampEdge;
+          }
+
+          var val = Math.sqrt(Math.abs((boo * boo) - 256));
+          this.parent.rampSpeedGroup.left = this.parent.left + val;
+        } else {
+          this.parent.rampSpeedGroup.left = this.parent.left + 5;
+        }
+      };
     };
   }
 ]);
