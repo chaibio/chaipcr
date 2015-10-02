@@ -365,8 +365,29 @@ window.ChaiBioTech.ngApp.factory('circle', [
             if(this.model.ramp.collect_data) {
               this.gatherDataGroup.setCoords();
               this.parent.rampSpeedGroup.setCoords();
-              if(this.gatherDataGroup.intersectsWithObject(this.parent.rampSpeedGroup)) {
-                /*var boo;
+              var rampEdge = this.parent.rampSpeedGroup.top + this.parent.rampSpeedGroup.height;
+              if((rampEdge > this.gatherDataGroup.top - 14) && this.parent.rampSpeedGroup.top < this.gatherDataGroup.top + 16) {
+
+                /*if(this.gatherDataGroup.top > this.parent.rampSpeedGroup.top) { // if ramp is above the center circle
+                  boo = this.gatherDataGroup.top - rampEdge;
+                } else {
+                  boo = (this.parent.rampSpeedGroup.top - this.gatherDataGroup.top);
+                }
+                //boo = this.gatherDataGroup.top - rampEdge;
+                if(this.parent.rampSpeedGroup.top > this.gatherDataGroup.top) {
+                  boo = (this.parent.rampSpeedGroup.top - this.gatherDataGroup.top);
+                } else if (rampEdge < this.gatherDataGroup.top) {
+                  boo = this.gatherDataGroup.top - rampEdge;
+                }
+
+                var val = Math.sqrt(Math.abs((boo * boo) - 256));*/
+                this.parent.rampSpeedGroup.left = this.parent.left + 16;
+                console.log("bingo");
+              } else {
+                this.parent.rampSpeedGroup.left = this.parent.left + 5;
+              }
+              /*if(this.gatherDataGroup.intersectsWithObject(this.parent.rampSpeedGroup)) {
+                var boo;
                 if(this.gatherDataGroup.top > this.parent.rampSpeedGroup.top) {
                   boo = (this.gatherDataGroup.top - this.parent.rampSpeedGroup.top) - this.parent.rampSpeedGroup.height;
                 } else {
@@ -375,11 +396,11 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
                 var val = Math.sqrt(Math.abs((boo * boo) - 256));
                 this.parent.rampSpeedGroup.left = this.parent.left + val;
-                console.log(boo, "val:", val);*/
+                console.log(boo, "val:", val);
                 this.parent.rampSpeedGroup.left = this.parent.left + 16;
               } else {
                 this.parent.rampSpeedGroup.left = this.parent.left + 5;
-              }
+              }*/
             }
 
             previous.curve.path[1][1] = endPointX + this.controlDistance;
