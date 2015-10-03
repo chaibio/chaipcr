@@ -39,6 +39,12 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.RunExperimentCtrl.chart is 'amplification'
         updateFluorescenceData()
 
+    $scope.$watch ->
+      $scope.RunExperimentCtrl.chart
+    , (val) ->
+      if val is 'amplification'
+        updateFluorescenceData()
+
     updateFluorescenceData = ->
       Experiment.getFluorescenceData($stateParams.id)
       .success (data) ->
