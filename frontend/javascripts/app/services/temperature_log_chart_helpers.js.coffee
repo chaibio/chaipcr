@@ -15,6 +15,7 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogChartHelpers', [
             60*4
             60*5
           ]
+          min: 0
           max: 60 * 5
         },
         y: {

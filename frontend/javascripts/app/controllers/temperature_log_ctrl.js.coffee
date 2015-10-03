@@ -14,6 +14,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
     hasExperiment = false
     hasInit = false
     dragScroll = angular.element('.chart-drag-scroll')
+    $scope.loading = true
     $scope.options = helper.chartConfig
     $scope.data = []
     $scope.data.push
@@ -69,13 +70,14 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       Experiment
       .getTemperatureData($stateParams.id, resolution: 1000)
       .success (data) =>
-        hasTemperatureLogs = true
+        $scope.loading = false
         if data.length > 0
           $scope.temperatureLogsCache = angular.copy data
           $scope.temperatureLogs = angular.copy data
           $scope.greatest_elapsed_time = Math.floor data[data.length - 1].temperature_log.elapsed_time
           if $scope.greatest_elapsed_time/1000 > 60 * 5
             delete $scope.options.axes.x.max
+            delete $scope.options.axes.x.min
             $scope.options.axes.x.ticks = 8
           $scope.initResolutionOptions()
           $scope.resolutionOptionsIndex = $scope.resolutionOptions.length-1
@@ -95,6 +97,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         $scope.resolutionOptionsIndex += 1
 
         if $scope.greatest_elapsed_time/1000 < 60*5 and $scope.resolutionOptionsIndex is $scope.resolutionOptions.length-1
+          $scope.options.axes.x.min = 0
           $scope.options.axes.x.max = 60*5
           $scope.options.axes.x.ticks = []
           for i in [0..5]
@@ -109,6 +112,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
         $scope.updateResolution()
         delete $scope.options.axes.x.max
+        delete $scope.options.axes.x.min
         $scope.options.axes.x.ticks = 8
 
     $scope.updateYScale = ->
@@ -208,6 +212,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
             $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
           if $scope.greatest_elapsed_time/1000 > 60 * 5
             delete $scope.options.axes.x.max
+            delete $scope.options.axes.x.min
             $scope.options.axes.x.ticks = 8
           $scope.updateYScale()
           $scope.updateScrollWidth()
