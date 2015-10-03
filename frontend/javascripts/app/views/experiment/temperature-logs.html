@@ -63,7 +63,7 @@
             <div class="panel-body" ng-show="experiment && !loading">
               <div class="vertical-text">Temperature</div>
               <div class="chart-container">
-                <linechart data="data" options="options" width="800" height="450"></linechart>
+                <linechart data="data" options="options" width="800" height="450" ng-if="RunExperimentCtrl.chart === 'temperature-logs'"></linechart>
                 <div class="chart-drag-scroll" chart-drag-scroll ng-model="scrollState"></div>
               </div>
               <div class="scrollbar-container">
