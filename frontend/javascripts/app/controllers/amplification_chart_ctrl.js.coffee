@@ -8,6 +8,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
   ($scope, $stateParams, Experiment, helper, Status, expName) ->
 
     hasData = false
+    fetching = false
     $scope.chartConfig = helper.chartConfig()
     $scope.data = [helper.paddData()]
 
@@ -46,8 +47,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         updateFluorescenceData()
 
     updateFluorescenceData = ->
+      fetching = true
       Experiment.getFluorescenceData($stateParams.id)
       .success (data) ->
+        fetching = false
         if data.fluorescence_data.length > 0
           $scope.chartConfig.axes.x.max = data.total_cycles
           $scope.chartConfig.axes.x.ticks = helper.Xticks data.total_cycles
