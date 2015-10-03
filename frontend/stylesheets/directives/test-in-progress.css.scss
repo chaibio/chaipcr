@@ -48,6 +48,9 @@
 
     .test-in-progress-heading {
       border-bottom: 2px solid #fff;
+      .text-black {
+        color: #fff !important;
+      }
     }
   }
 }

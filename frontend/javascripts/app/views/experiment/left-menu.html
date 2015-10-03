@@ -25,7 +25,10 @@
       </div>
       <div class="ball"></div>
       <div class="menu-text simplifica">
-        <a ui-sref="edit-protocol({id: params.id})" toggle-sidemenu>EDIT PROTOCOL</a>
+        <a ui-sref="edit-protocol({id: params.id})" toggle-sidemenu>
+          <span ng-show="status === 'NOT_STARTED'">EDIT PROTOCOL</span>
+          <span ng-show="status === 'RUNNING' || status === 'COMPLETED'">VIEW PROTOCOL</span>
+        </a>
       </div>
     </div>
     <!-- <div class="menu-overlay-menu-item">
@@ -46,7 +49,11 @@
       <div class="ball">
       </div>
       <div class="menu-text simplifica">
-        <a ui-sref="run-experiment({id: params.id, chart: 'amplification'})" toggle-sidemenu>RUN EXPERIMENT</a>
+        <a ui-sref="run-experiment({id: params.id, chart: 'amplification'})" toggle-sidemenu>
+          <span ng-show="status === 'NOT_STARTED'">RUN EXPERIMENT</span>
+          <span ng-show="status === 'RUNNING'">EXPERIMENT STATUS</span>
+          <span ng-show="status === 'COMPLETED'">VIEW RESULTS</span>
+        </a>
       </div>
     </div>
   </div>
