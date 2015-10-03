@@ -8,6 +8,7 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogChartHelpers', [
           ticksFormatter: (t) ->
             SecondsDisplay.display2 t
           ticks: [
+            0
             60
             60*2
             60*3

@@ -31,9 +31,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       newStep = parseInt(data?.experimentController?.expriment?.step?.number) || null
       oldStep = parseInt(oldData?.experimentController?.expriment?.step?.number) || null
       state = data?.experimentController?.machine?.state
+      oldState = oldData?.experimentController?.machine?.state
       isCurrentExp = parseInt(data?.experimentController?.expriment?.id) is parseInt($stateParams.id)
 
-      if ((state is 'Idle' and $scope.experiment?.completed_at and !hasData) or
+      if ((state is 'Idle' and $scope.experiment?.completed_at and oldState isnt state) or
       (state is 'Running' and (oldStep isnt newStep or !oldStep) and data.optics.collectData)) and
       $scope.RunExperimentCtrl.chart is 'amplification'
         updateFluorescenceData()
