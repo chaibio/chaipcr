@@ -74,6 +74,9 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
           $scope.temperatureLogsCache = angular.copy data
           $scope.temperatureLogs = angular.copy data
           $scope.greatest_elapsed_time = Math.floor data[data.length - 1].temperature_log.elapsed_time
+          if $scope.greatest_elapsed_time/1000 > 60 * 5
+            delete $scope.options.axes.x.max
+            delete $scope.options.axes.x.ticks = 8
           $scope.initResolutionOptions()
           $scope.resolutionOptionsIndex = $scope.resolutionOptions.length-1
           $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
