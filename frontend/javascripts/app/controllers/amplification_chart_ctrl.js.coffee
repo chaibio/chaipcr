@@ -4,11 +4,16 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
   'Experiment'
   'AmplificationChartHelper'
   'Status'
-  ($scope, $stateParams, Experiment, helper, Status) ->
+  'expName'
+  ($scope, $stateParams, Experiment, helper, Status, expName) ->
 
     hasData = false
+    fetching = false
     $scope.chartConfig = helper.chartConfig()
     $scope.data = [helper.paddData()]
+
+    $scope.$on 'expName:Updated', ->
+      $scope.experiment?.name = expName.name
 
     Experiment.get(id: $stateParams.id).$promise.then (data) ->
       maxCycle = helper.getMaxExperimentCycle data.experiment
@@ -18,7 +23,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       return
 
     Status.startSync()
-    $scope.$on 'destroy', ->
+    $scope.$on '$destroy', ->
       Status.stopSync()
 
     $scope.$watch ->
@@ -27,21 +32,33 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       newStep = parseInt(data?.experimentController?.expriment?.step?.number) || null
       oldStep = parseInt(oldData?.experimentController?.expriment?.step?.number) || null
       state = data?.experimentController?.machine?.state
+      oldState = oldData?.experimentController?.machine?.state
       isCurrentExp = parseInt(data?.experimentController?.expriment?.id) is parseInt($stateParams.id)
 
-      if (state is 'Idle' and $scope.experiment?.completed_at and !hasData) or
-      (state is 'Running' and (oldStep isnt newStep or !oldStep) and data.optics.collectData)
+      if ((state is 'Idle' and $scope.experiment?.completed_at and !hasData) or
+      (state is 'Idle' and oldState isnt state) or
+      (state is 'Running' and (oldStep isnt newStep or !oldStep) and data.optics.collectData)) and
+      $scope.RunExperimentCtrl.chart is 'amplification'
+        updateFluorescenceData()
+
+    $scope.$watch ->
+      $scope.RunExperimentCtrl.chart
+    , (val) ->
+      if val is 'amplification'
         updateFluorescenceData()
 
     updateFluorescenceData = ->
-      Experiment.getFluorescenceData($stateParams.id)
-      .success (data) ->
-        $scope.chartConfig.axes.x.max = data.total_cycles
-        $scope.chartConfig.axes.x.ticks = helper.Xticks data.total_cycles
-        $scope.chartConfig.axes.y.max = helper.getMaxCalibration data.fluorescence_data
-        $scope.data = helper.neutralizeData data.fluorescence_data
-        console.log $scope.chartConfig
-        hasData = true
+      if !fetching
+        fetching = true
+        Experiment.getFluorescenceData($stateParams.id)
+        .success (data) ->
+          fetching = false
+          if data.fluorescence_data.length > 0
+            $scope.chartConfig.axes.x.max = data.total_cycles
+            $scope.chartConfig.axes.x.ticks = helper.Xticks data.total_cycles
+            $scope.chartConfig.axes.y.max = helper.getMaxCalibration data.fluorescence_data
+            $scope.data = helper.neutralizeData data.fluorescence_data
+            hasData = true
 
     $scope.$watch 'wellButtons', (buttons) ->
       buttons = buttons || {}

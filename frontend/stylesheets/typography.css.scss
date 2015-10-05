@@ -9,6 +9,9 @@
 .text-red {
   color: red;
 }
+.text-black {
+  color: $gray;
+}
 
 .semi-bold {
   font-weight: 600;
@@ -21,4 +24,11 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.truncate {
+// https://css-tricks.com/snippets/css/truncate-string-with-ellipsis/
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

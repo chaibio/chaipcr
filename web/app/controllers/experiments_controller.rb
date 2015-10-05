@@ -161,6 +161,7 @@ class ExperimentsController < ApplicationController
       connection = Rserve::Connection.new
       connection.eval("source(\"#{Rails.configuration.dynamic_file_path}/#{@experiment.experiment_definition.guid}/analyze.R\")")
       response = connection.eval("analyze('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{@experiment.id})").to_ruby
+      connection.close
       json = JSON.parse(response)
       render :text=>json
     else
@@ -179,6 +180,7 @@ class ExperimentsController < ApplicationController
     config   = Rails.configuration.database_configuration
     connection = Rserve::Connection.new
     results = connection.eval("fluorescence_data('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{stage_id}, #{calibration_id})").to_ruby
+    connection.close
     if !results.blank? && !results[0].blank?
       (0...results[0].length).each do |i|
         fluorescence_data[i] = FluorescenceDatum.new(:experiment_id=>params[:id], :well_num=>results[0][i], :cycle_num=>results[1][i], :calibrated_value=>results[2][i])

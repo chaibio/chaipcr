@@ -1,18 +1,18 @@
 <div class="test-in-progress-container" ng-show="data">
   <div class="test-in-progress">
     <div class="test-in-progress-heading">
-      <div>
+      <div class="truncate text-blue">
         <span ng-show="data.experimentController.machine.state === 'LidHeating' || data.experimentController.machine.state === 'Running'">
-          TEST IN PROGRESS:
-          <span class="text-blue">
+          <span class="text-black">TEST IN PROGRESS:</span>
+          <span>
             {{ data.experimentController.expriment.name }}
           </span>
         </span>
         <span ng-show="(data.experimentController.machine.state === 'Idle' || data.experimentController.machine.state === 'Paused') && completionStatus === null">
-          No experiment running
+          <span class="text-black">No experiment running</span>
         </span>
         <span ng-show="completionStatus">
-          TEST COMPLETE:
+          <span class="text-black">TEST COMPLETE:</span>
           <span ng-show="completionStatus === 'aborted'" class="text-red">USER CANCELLED</span>
           <span ng-show="completionStatus === 'failed'" class="text-red">FAILED</span>
           <span ng-show="completionStatus === 'success'" class="text-green">SUCCESSFUL</span>

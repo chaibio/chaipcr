@@ -6,10 +6,18 @@ window.ChaiBioTech.ngApp
   'host'
   ($resource, $http, host) ->
 
+    currentExperiment = null
+
     self = $resource('/experiments/:id', {id: '@id'}, {
       'update':
         method: 'PUT'
     })
+
+    self.setCurrentExperiment = (exp) ->
+      currentExperiment = exp
+
+    self.getCurrentExperiment = ->
+      currentExperiment
 
     self.getTemperatureData = (expId, opts = {}) ->
 

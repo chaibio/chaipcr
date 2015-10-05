@@ -18,6 +18,11 @@
       border: none;
       font-size: 30px;
     }
+    .truncate {
+      display: inline-block;
+      width: 80%;
+      vertical-align: middle;
+    }
     input.exp-name {
       background: transparent;
       margin-top: 0px;
@@ -29,6 +34,8 @@
       }
     }
     .action {
+      display: inline-block;
+      width: 18%;
       color : $blue;
       cursor: pointer;
       font-weight: bold;

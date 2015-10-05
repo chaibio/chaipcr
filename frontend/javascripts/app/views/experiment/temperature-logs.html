@@ -12,7 +12,7 @@
                   <div class="stripe"></div>
                 </div>
               </a>
-              <div class="name-container">{{experiment.name}}</div>
+              <div class="name-container truncate">{{experiment.name}}</div>
             </div>
           </div>
           <div class="col-sm-4">
@@ -57,13 +57,13 @@
         <div class="temperature-log-chart">
           <div class="panel panel-primary">
             <div class="panel-heading">Temperature Plot</div>
-            <div class="panel-body" ng-show="!experiment || !temperatureLogsCache">
+            <div class="panel-body" ng-show="!experiment || loading">
               <h3 class="text-center">Loading...</h3>
             </div>
-            <div class="panel-body" ng-show="experiment && temperatureLogsCache">
+            <div class="panel-body" ng-show="experiment && !loading">
               <div class="vertical-text">Temperature</div>
               <div class="chart-container">
-                <linechart data="data" options="options" width="800" height="450"></linechart>
+                <linechart data="data" options="options" width="800" height="450" ng-if="RunExperimentCtrl.chart === 'temperature-logs'"></linechart>
                 <div class="chart-drag-scroll" chart-drag-scroll ng-model="scrollState"></div>
               </div>
               <div class="scrollbar-container">
