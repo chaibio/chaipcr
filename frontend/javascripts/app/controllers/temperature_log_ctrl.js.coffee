@@ -204,7 +204,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
         if data.length > 0
           $scope.temperatureLogsCache = angular.copy data
-          $scope.temperatureLogs = data
+          $scope.temperatureLogs = angular.copy data
           $scope.greatest_elapsed_time = Math.floor data[data.length - 1].temperature_log.elapsed_time
           $scope.initResolutionOptions()
           if !$scope.resolution or $scope.greatest_elapsed_time/1000 < 60 * 5 and $scope.scrollState is 'FULL'
