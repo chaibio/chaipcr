@@ -1,0 +1,8 @@
+<form>
+  <div class="input-group">
+    <label for="name" class="control-label">Experiment Name</label>
+    <input type="text" ng-model="newExperimentName" class="form-control" placeholder="Experiment Name">
+  </div>
+  <button class="btn btn-green" ng-click="$close(newExperimentName)">OK</button>
+  <button class="btn btn-red" ng-click="$dismiss()">CANCEL</button>
+</form>
