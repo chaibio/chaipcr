@@ -135,7 +135,7 @@ void Optics::collectDataCallback(Poco::Timer &timer)
             }
 
             std::lock_guard<std::mutex> meltCurveDataLock(_meltCurveDataMutex);
-            _meltCurveData.emplace_back(adc / kADCReadsPerOpticalMeasurement, temperature, kWellToLedMappingList.at(_wellNumber));
+            _meltCurveData.emplace_back(adc / kADCReadsPerOpticalMeasurement, temperature, _wellNumber);
         }
 
         ++_wellNumber;
