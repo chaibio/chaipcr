@@ -420,16 +420,17 @@ window.ChaiBioTech.ngApp.factory('circle', [
         var rampEdge = this.parent.rampSpeedGroup.top + this.parent.rampSpeedGroup.height;
         if((rampEdge > this.gatherDataGroup.top - 14) && this.parent.rampSpeedGroup.top < this.gatherDataGroup.top + 16) {
 
-
-          //boo = this.gatherDataGroup.top - rampEdge;
+          var heightDifference, val;
           if(this.parent.rampSpeedGroup.top > this.gatherDataGroup.top) {
-            boo = (this.parent.rampSpeedGroup.top - this.gatherDataGroup.top);
+            heightDifference = (this.parent.rampSpeedGroup.top - this.gatherDataGroup.top);
+            val = Math.sqrt(Math.abs((heightDifference * heightDifference) - 256));
+            this.parent.rampSpeedGroup.left = this.parent.left + val;
           } else if (rampEdge < this.gatherDataGroup.top) {
-            boo = this.gatherDataGroup.top - rampEdge;
+            heightDifference = this.gatherDataGroup.top - rampEdge;
+            val = Math.sqrt(Math.abs((heightDifference * heightDifference) - 256));
+            this.parent.rampSpeedGroup.left = this.parent.left + val;
           }
 
-          var val = Math.sqrt(Math.abs((boo * boo) - 256));
-          this.parent.rampSpeedGroup.left = this.parent.left + val;
         } else {
           this.parent.rampSpeedGroup.left = this.parent.left + 5;
         }

@@ -12,12 +12,14 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
         unit: "@",
         reading: '='
       },
-      templateUrl: 'app/views/directives/edit-value.html',
+      templateUrl: 'app/views/directives/ramp-speed.html',
 
       link: function(scope, elem, attr) {
 
         scope.edit = false;
         scope.delta = true; // This is to prevent the directive become disabled, check delta in template, this is used for auto delta field
+        scope.cbar = "C/";
+        scope.s = "s";
 
         scope.$watch("reading", function(val) {
 
@@ -25,18 +27,20 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
 
             if(Number(scope.reading) <= 0) {
               scope.shown = "AUTO";
-              scope.unit = "";
+              scope.cbar = scope.s = "";
             } else {
               scope.shown = scope.reading;
-              scope.unit = "C/s";
+              scope.cbar = "C/";
+              scope.s = "s";
             }
             //scope.shown = (Number(scope.reading) === 0) ? "AUTO" : scope.reading;
-            scope.hidden = Number(scope.reading);
+            scope.hidden = scope.reading;
           }
         });
 
 
         scope.editAndFocus = function(className) {
+          console.log(className);
           scope.edit = ! scope.edit;
           $timeout(function() {
             $('.' + className).focus();
@@ -48,13 +52,20 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
           scope.edit = false;
           if(! isNaN(scope.hidden) && Number(scope.hidden) < 1000) {
             //if(Number(scope.hidden) < 1000) {
-              scope.reading = Math.abs(Number(scope.hidden));
-              $timeout(function() {
-                ExperimentLoader.changeRampSpeed(scope.$parent).then(function(data) {
-                  console.log(data);
-                });
+            if(Number(scope.hidden) % 1 === 0) { // if the number enrered is an integer.
+              scope.reading = (Number(scope.hidden).toFixed(1));
+              scope.hidden = scope.reading;
+            } else {
+              scope.reading = Number(scope.hidden);
+            }
+
+            console.log(scope.reading);
+            $timeout(function() {
+              ExperimentLoader.changeRampSpeed(scope.$parent).then(function(data) {
+                console.log(data);
               });
-              return ;
+            });
+            return ;
             //}
           }
           scope.hidden = scope.reading;

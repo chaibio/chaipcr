@@ -155,7 +155,7 @@ window.ChaiBioTech.ngApp.factory('step', [
 
       this.rampSpeed = function() {
 
-        this.rampSpeedNumber = parseFloat(this.model.ramp.rate);
+        this.rampSpeedNumber = this.model.ramp.rate;
 
         this.rampSpeedText = new fabric.Text(String(this.rampSpeedNumber)+ "º C/s", {
             fill: 'black',  fontSize: 14, fontWeight: "bold", fontFamily: "Open Sans",  originX: 'left',  originY: 'top'
