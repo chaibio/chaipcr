@@ -125,6 +125,20 @@ class ExperimentsController < ApplicationController
     end
   end
    
+  api :GET, "/experiments/:id/baseline_subtracted_ct_data", "Retrieve baseline subtracted and ct data"
+  example "{'fluorescence_datum':{'calibrated_value':1.4299,'well_num':1,'cycle_num':1}, 'fluorescence_datum':{'calibrated_value':1.4974,'well_num':2,'cycle_num':1}}"
+  def baseline_subtracted_ct_data
+    if @experiment
+      @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
+      @fluorescence_data = retrieve_baseline_subtracted_ct_data(@first_stage_collect_data.id, @experiment.calibration_id) if !@first_stage_collect_data.blank?
+      respond_to do |format|
+        format.json { render "fluorescence_data", :status => :ok}
+      end
+    else
+      render :json=>{:errors=>"experiment not found"}, :status => :not_found
+    end
+  end
+  
   api :GET, "/experiments/:id/export.zip", "zip temperature, fluorescence and meltcurv csv files"
   def export
     respond_to do |format|
@@ -180,6 +194,20 @@ class ExperimentsController < ApplicationController
     config   = Rails.configuration.database_configuration
     connection = Rserve::Connection.new
     results = connection.eval("fluorescence_data('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{stage_id}, #{calibration_id})").to_ruby
+    connection.close
+    if !results.blank? && !results[0].blank?
+      (0...results[0].length).each do |i|
+        fluorescence_data[i] = FluorescenceDatum.new(:experiment_id=>params[:id], :well_num=>results[0][i], :cycle_num=>results[1][i], :calibrated_value=>results[2][i])
+      end
+    end
+    return fluorescence_data
+  end
+  
+  def retrieve_baseline_subtracted_ct_data(stage_id, calibration_id)
+    fluorescence_data = []
+    config   = Rails.configuration.database_configuration
+    connection = Rserve::Connection.new
+    results = connection.eval("baseline_subtracted_ct_data('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{stage_id}, #{calibration_id})").to_ruby
     connection.close
     if !results.blank? && !results[0].blank?
       (0...results[0].length).each do |i|
