@@ -1,5 +1,6 @@
 #load RMySQL library for reading from the database
 library(RMySQL)
+library(qpcR)
 
 numberOfWells<-16
 scalingFactor<-900000
@@ -31,4 +32,17 @@ fluorescence_data <- function(dbname,dbuser,dbpassword,stageID,calibrationID){
     #print(data.frame(mergeData$well_num,mergeData$cycle_num,mergeData$F))
 	
 	return (data.frame(mergeData$well_num,mergeData$cycle_num,mergeData$F))
+}
+
+baseline_subtracted_ct_data <- function(dbname,dbuser,dbpassword,stageID,calibrationID){
+	data = fluorescence_data(dbname,dbuser,dbpassword,stageID,calibrationID)
+	curveFitData <- modlist(data,2,3)
+  	curveFitCoefficients <- getPar(curveFitData, type = "fit")
+	baseline <- curveFitCoefficients[2]
+	
+    #perform curve fitting with baseline subtraction
+    curveFitDataBaselineSub <- modlist(data,2,3, baseline="parm")
+    curveFitCoefficientsBaselineSub <- getPar(curveFitDataBaselineSub, type = "fit")
+	    
+#	return(list(data.frame(data$well_num,data$cycle_num,???), data.frame(data$well_num, ???)))
 }
