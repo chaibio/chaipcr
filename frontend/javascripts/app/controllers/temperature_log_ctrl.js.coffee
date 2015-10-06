@@ -199,14 +199,12 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
     updateFunc = ->
       Experiment
-      .getTemperatureData($stateParams.id, resolution: 1000, starttime: $scope.greatest_elapsed_time)
+      .getTemperatureData($stateParams.id, resolution: 1000)
       .success (data) ->
 
         if data.length > 0
-          data = helper.mergeNewData data, $scope.temperatureLogsCache
           $scope.temperatureLogsCache = angular.copy data
-          $scope.temperatureLogsCache = data
-          $scope.temperatureLogs = angular.copy data
+          $scope.temperatureLogs = data
           $scope.greatest_elapsed_time = Math.floor data[data.length - 1].temperature_log.elapsed_time
           $scope.initResolutionOptions()
           if !$scope.resolution or $scope.greatest_elapsed_time/1000 < 60 * 5 and $scope.scrollState is 'FULL'
