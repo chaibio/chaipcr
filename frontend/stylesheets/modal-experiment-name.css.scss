@@ -1,0 +1,37 @@
+@import "./colors.css.scss";
+
+.home-state-active {
+
+  .modal-dialog {
+    margin-top: 200px;
+    width: 400px;
+  }
+
+  .modal-experiment-name {
+    padding-bottom: 0px;
+
+    .input-wrapper {
+      margin-left: -50px;
+      margin-right: -30px;
+    }
+
+    input {
+      background: transparent;
+      margin-top: 3px;
+      margin-bottom: -5px;
+      width: 272px;
+    }
+
+    button {
+      background-color: $green;
+      border: none;
+      border-radius: 0px;
+      color: #fff;
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      margin: 30px auto;
+      padding: 10px 50px;
+    }
+  }
+}
