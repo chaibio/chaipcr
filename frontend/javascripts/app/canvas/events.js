@@ -35,6 +35,35 @@ window.ChaiBioTech.ngApp.factory('events', [
         $scope.applyValuesFromOutSide(circle);
       };
 
+      this.canvas.on("mouse:over", function(evt) {
+        if(evt.target) {
+          var me;
+          switch(evt.target.name) {
+
+            case "moveStepImage":
+              console.log("bingo Over");
+              evt.target.setVisible(false);
+              me = evt.target.step;
+              me.dragFooterImage.setVisible(true);
+              C.canvas.renderAll();
+          }
+        }
+      });
+
+      this.canvas.on("mouse:out", function(evt) {
+        if(evt.target) {
+          var me;
+          switch(evt.target.name) {
+
+            case "dragFooter":
+              console.log("bingo out");
+              evt.target.setVisible(false);
+              me = evt.target.step;
+              me.whiteFooterImage.setVisible(true);
+              C.canvas.renderAll();
+          }
+        }
+      });
       /**************************************
           what happens when click is happening in canvas.
           what we do is check if the click is up on some particular events.
