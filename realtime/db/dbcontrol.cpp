@@ -350,7 +350,7 @@ void DBControl::startExperiment(const Experiment &experiment, bool timeValid)
     std::vector<soci::statement> statements;
     std::unique_lock<std::mutex> lock(_writeMutex);
 
-    statements.emplace_back((_writeSession->prepare << "UPDATE experiments SET started_at = :started_at, time_valid = :time_valid WHERE id = " << experiment.id(),
+    statements.emplace_back((_writeSession->prepare << "UPDATE experiments SET started_at = :started_at, time_valid = :time_valid, calibration_id = (SELECT calibration_id FROM settings) WHERE id = " << experiment.id(),
                              soci::use(experiment.startedAt()), soci::use(timeValid ? 1 : 0)));
 
     write(statements);

@@ -100,5 +100,27 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogChartHelpers', [
 
       tmp_logs
 
+    @mergeNewData = (newTemperatureLogs, oldTemperaturelogs) ->
+      newTemperatureLogs = newTemperatureLogs || []
+      oldTemperaturelogs = oldTemperaturelogs || []
+      return if newTemperatureLogs.length is 0
+      return newTemperatureLogs if oldTemperaturelogs.length is 0
+
+      newData = []
+      insertionStartIndex = 0
+      minNewElapsedTime = newTemperatureLogs[1].temperature_log.elapsed_time
+      minOldElapsedTime = newTemperatureLogs[0].temperature_log.elapsed_time
+
+      return oldTemperaturelogs.concat(newTemperatureLogs) if minNewElapsedTime > minOldElapsedTime
+
+      for datum, i in oldTemperaturelogs by 1
+        if datum.temperature_log.elapsed_time > minNewElapsedTime
+          newData.concat oldTemperaturelogs.slice 0, i-1
+          newData.concat newTemperatureLogs
+          newData.concat oldTemperaturelogs.slice i, oldTemperaturelogs.length-1
+          break
+
+      newData
+
     return
 ]

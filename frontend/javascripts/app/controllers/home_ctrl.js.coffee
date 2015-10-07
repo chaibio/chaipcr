@@ -5,10 +5,10 @@ window.ChaiBioTech.ngApp
   'Experiment'
   '$window'
   '$state'
-  ($scope, Experiment, $window, $state) ->
+  '$modal'
+  ($scope, Experiment, $window, $state, $modal) ->
 
     $scope.experiments = null
-
     $scope.deleteMode = false
 
     @fetchExperiments = ->
@@ -18,13 +18,17 @@ window.ChaiBioTech.ngApp
     @fetchExperiments()
 
     @newExperiment = ->
-      exp = new Experiment
-        experiment:
-          name: 'New Experiment'
-          protocol: {}
+      modalInstance = $modal.open
+        templateUrl: 'app/views/experiment/experiment-name-modal.html'
 
-      exp.$save (data) =>
-        @fetchExperiments()
+      modalInstance.result.then (exp_name) =>
+        exp = new Experiment
+          experiment:
+            name: exp_name || 'New Experiment'
+            protocol: {}
+
+        exp.$save (data) =>
+          @fetchExperiments()
 
     @confirmDelete = (exp) ->
       if $scope.deleteMode
