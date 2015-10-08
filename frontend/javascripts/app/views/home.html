@@ -99,13 +99,13 @@
                      <div class="hand-container">
                         <div class="hand"></div>
                      </div>
-                     <div class="more-info sansa"  ng-show="!exp.experiment.started_at">
+                     <div class="more-info sansa truncate"  ng-show="!exp.experiment.started_at" title="{{exp.experiment.created_at | amCalendar | uppercase}}">
                         <span class="created-text">
                            CREATED
                         </span>
                         {{exp.experiment.created_at | amCalendar | uppercase}}
                      </div>
-                     <div class="more-info sansa"  ng-show="exp.experiment.started_at">
+                     <div class="more-info sansa truncate"  ng-show="exp.experiment.started_at" title="{{exp.experiment.started_at | amCalendar | uppercase}}">
                         <span class="created-text">
                            RUN
                         </span>
