@@ -6,6 +6,10 @@ window.ChaiBioTech.ngApp
   'User'
   ($scope, $window, $modal, User) ->
 
+    angular.element('body').addClass 'modal-form'
+    $scope.$on '$destroy', ->
+      angular.element('body').removeClass 'modal-form'
+
     $scope.settings =
       option: 'A'
       checkbox: true

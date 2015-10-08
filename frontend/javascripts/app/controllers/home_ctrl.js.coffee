@@ -8,6 +8,10 @@ window.ChaiBioTech.ngApp
   '$modal'
   ($scope, Experiment, $window, $state, $modal) ->
 
+    angular.element('body').addClass 'modal-form'
+    $scope.$on '$destroy', ->
+      angular.element('body').removeClass 'modal-form'
+
     $scope.experiments = null
     $scope.deleteMode = false
 
@@ -19,7 +23,7 @@ window.ChaiBioTech.ngApp
 
     @newExperiment = ->
       modalInstance = $modal.open
-        templateUrl: 'app/views/experiment/experiment-name-modal.html'
+        templateUrl: 'app/views/experiment/create-experiment-name-modal.html'
 
       modalInstance.result.then (exp_name) =>
         exp = new Experiment

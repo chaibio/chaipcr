@@ -1,7 +1,7 @@
 <div class="user-settings">
   <div class="modal-add-user modal-experiment-name">
     <p class="modal-title underlined">
-      CREATE EXPERIMENT
+      DUPLICATE EXPERIMENT
       <a class="pull-right close" ng-click="$dismiss()">&times;</a>
     </p>
     <form role="form" class="form-horizontal" name="form" ng-submit="$close(newExperimentName)" novalidate>
@@ -19,7 +19,7 @@
         </span>
       </span>
       <div class="text-center">
-        <button type="submit" disabled="form.$invalid">CREATE EXPERIMENT</button>
+        <button type="submit" ng-disabled="form.$invalid">DUPLICATE EXPERIMENT</button>
       </div>
     </form>
   </div>
