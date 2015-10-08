@@ -8,6 +8,10 @@ window.ChaiBioTech.ngApp
   '$modal'
   ($scope, Experiment, $window, $state, $modal) ->
 
+    angular.element('body').addClass 'modal-form'
+    $scope.$on '$destroy', ->
+      angular.element('body').removeClass 'modal-form'
+
     $scope.experiments = null
     $scope.deleteMode = false
 
