@@ -23,7 +23,7 @@ window.ChaiBioTech.ngApp
 
     @newExperiment = ->
       modalInstance = $modal.open
-        templateUrl: 'app/views/experiment/experiment-name-modal.html'
+        templateUrl: 'app/views/experiment/create-experiment-name-modal.html'
 
       modalInstance.result.then (exp_name) =>
         exp = new Experiment

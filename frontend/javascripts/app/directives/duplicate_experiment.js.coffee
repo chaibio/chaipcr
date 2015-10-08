@@ -29,7 +29,7 @@ window.ChaiBioTech.ngApp
         addClass()
 
         modalInstance = $modal.open
-          templateUrl: 'app/views/experiment/experiment-name-modal.html'
+          templateUrl: 'app/views/experiment/duplicate-experiment-name-modal.html'
 
         modalInstance.result.then (exp_name) ->
           copy = Experiment.duplicate($scope.expId, experiment: {name: exp_name})
