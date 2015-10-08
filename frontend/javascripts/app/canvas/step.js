@@ -39,6 +39,12 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.whiteFooterImage.left = this.left;
         can.canvas.add(this.whiteFooterImage);
 
+        this.dragFooterImage = can.applyPropertyToImages($.extend({}, can.imageobjects["drag-footer-image.png"]), this, 'dragFooter');
+        this.dragFooterImage.top = 364;
+        this.dragFooterImage.left = this.left;
+        //step.dragFooterImage.setVisible(true);
+        can.canvas.add(this.dragFooterImage);
+
         this.circle.gatherDataImage = $.extend({}, can.imageobjects["gather-data.png"]);
         this.circle.gatherDataImage.originX = "center";
         this.circle.gatherDataImage.originY = "center";
@@ -62,6 +68,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.commonFooterImage.set(leftVal).setCoords();
         this.darkFooterImage.set(leftVal).setCoords();
         this.whiteFooterImage.set(leftVal).setCoords();
+        this.dragFooterImage.set(leftVal).setCoords();
         this.stepGroup.set(leftVal).setCoords();
 
         this.ordealStatus = this.ordealStatus + action;

@@ -7,7 +7,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
   'path',
   'stageEvents',
   'stepEvents',
-  function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents) {
+  'moveStepRect',
+  function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents, moveStepRect) {
 
     this.init = function(model) {
 
@@ -253,43 +254,9 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     };
 
     this.addMoveStepIndicator = function() {
+      // Move this to a new file
 
-      var smallCircle = new fabric.Circle({
-        radius: 4,
-        fill: 'black',
-        selectable: false,
-        left: 63,
-        top: 259,
-        //top: -2
-      });
-
-      var verticalLine = new fabric.Line([0, 0, 0, 263],{
-        left: 66,
-        top: -2,
-        stroke: 'black',
-        strokeWidth: 2
-      });
-
-      var rect = new fabric.Rect({
-        fill: 'white', width: 120, left: 5, height: 40, selectable: false, name: "step", me: this, top: 263
-      });
-
-      this.indicator = new fabric.Group([
-        verticalLine,
-        rect,
-        smallCircle,
-      ],
-        {
-          originX: "left",
-          originY: "top",
-          width: 122,
-          left: 33,
-          top: 61,
-          selectable: false,
-          visible: false
-        }
-      );
-
+      this.indicator = moveStepRect.getMoveStepRect(this);
       this.canvas.add(this.indicator);
     };
 
@@ -313,17 +280,18 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     };
 
     this.processMovement = function(step) {
-
+      console.log("okay step");
       // Make a clone of the step
       var stepClone = $.extend({}, step);
       // Find the place where you left the moved step
-      var moveTarget = Math.floor((stepClone.whiteFooterImage.left + 60) / 120);
+      var moveTarget = Math.floor((stepClone.dragFooterImage.left + 60) / 120);
+      console.log("Move place", moveTarget);
       // This is a way to understand moving direction.
-      if(stepClone.whiteFooterImage.startPosition < stepClone.whiteFooterImage.endPosition) {
+      if(stepClone.whiteFooterImage.startPosition < stepClone.dragFooterImage.endPosition) {
         moveTarget = (moveTarget > 0) ? moveTarget - 1 : 0;
       }
       // If the movement is atlest half of the width of the step, we are going to update
-      if(Math.abs(stepClone.whiteFooterImage.startPosition - stepClone.whiteFooterImage.endPosition) > 65) {
+      if(Math.abs(stepClone.dragFooterImage.startPosition - stepClone.dragFooterImage.endPosition) > 65) {
         // Delete the step you moved
         step.parentStage.deleteStep({}, step);
         // add clone at the place
@@ -332,8 +300,14 @@ window.ChaiBioTech.ngApp.factory('canvas', [
           step: stepClone.model
         };
         moveToStage.addNewStep(data, this.allStepViews[moveTarget]);
+
+        ExperimentLoader.moveStep(stepClone.model.id, this.allStepViews[moveTarget].model.id)
+          .then(function(data) {
+            console.log("Moved", data);
+          });
+
       } else { // we dont have to update so we update the move whiteFooterImage to old position.
-        stepClone.whiteFooterImage.setLeft(stepClone.left + 1);
+        stepClone.dragFooterImage.setLeft(stepClone.left + 1);
       }
 
     };

@@ -106,6 +106,23 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
     };
     /********************Step API Methods************************/
 
+    this.moveStep = function(id, prev_id) {
+      console.log("I am looking");
+      var dataToBeSend = {'prev_id': prev_id},
+      url = "/steps/" + id + "/move";
+      delay = $q.defer();
+
+      $http.post(url, dataToBeSend)
+        .success(function(data) {
+          delay.resolve(data);
+        })
+        .error(function(data) {
+          delay.reject(data);
+        });
+
+      return delay.promise;
+    };
+
     this.changeTemperature = function($scope) {
 
       var dataToBeSend = {'step':{'temperature': $scope.step.temperature}},

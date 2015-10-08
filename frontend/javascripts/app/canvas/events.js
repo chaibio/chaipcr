@@ -41,10 +41,17 @@ window.ChaiBioTech.ngApp.factory('events', [
           switch(evt.target.name) {
 
             case "moveStepImage":
-              console.log("bingo Over");
+
               evt.target.setVisible(false);
               me = evt.target.step;
               me.dragFooterImage.setVisible(true);
+              me.dragFooterImage.startPosition = evt.target.left;
+              C.moveLimit = C.allStepViews[C.allStepViews.length - 1].left + 3;
+              C.canvas.bringToFront(me.dragFooterImage);
+              C.canvas.bringToFront(C.indicator);
+              C.indicator.setLeft(evt.target.left - 1);
+              C.indicator.setCoords();
+              C.indicator.setVisible(true);
               C.canvas.renderAll();
           }
         }
@@ -56,10 +63,11 @@ window.ChaiBioTech.ngApp.factory('events', [
           switch(evt.target.name) {
 
             case "dragFooter":
-              console.log("bingo out");
+
               evt.target.setVisible(false);
               me = evt.target.step;
               me.whiteFooterImage.setVisible(true);
+              C.indicator.setVisible(false);
               C.canvas.renderAll();
           }
         }
@@ -96,7 +104,7 @@ window.ChaiBioTech.ngApp.factory('events', [
 
             break;
 
-            case "moveStepImage":
+            /*case "moveStepImage":
 
               var moveStep = evt.target.step;
               evt.target.startPosition = evt.target.left;
@@ -106,7 +114,7 @@ window.ChaiBioTech.ngApp.factory('events', [
               C.canvas.renderAll();
               C.indicator.setVisible(true);
 
-            break;
+            break;*/
 
           }
         } else { // if the click is on canvas
@@ -123,9 +131,11 @@ window.ChaiBioTech.ngApp.factory('events', [
         if(evt.target) {
           switch(evt.target.name)  {
 
-          case "moveStepImage":
-              var moveStep = evt.target.step;
-              C.indicator.setVisible(false);
+          case "dragFooter":
+
+              //C.indicator.setVisible(false);
+              //evt.target.setVisible(false);
+              //me.whiteFooterImage.setVisible(true);
               //C.canvas.bringToFront(moveStep.stepGroup);
               //moveStep.stepRect.setFill("red");
               //C.canvas.setActiveGroup(moveStep.stepGroup);
@@ -152,7 +162,7 @@ window.ChaiBioTech.ngApp.factory('events', [
               });
             break;
 
-            case "moveStepImage":
+            case "dragFooter":
 
               if(evt.target.left > 32 && evt.target.left < C.moveLimit ) {
                 C.indicator.setLeft(evt.target.left - 1);
@@ -187,8 +197,12 @@ window.ChaiBioTech.ngApp.factory('events', [
               });
             break;
 
-            case "moveStepImage":
+            case "dragFooter":
+
+              var step = evt.target.step;
               C.indicator.setVisible(false);
+              evt.target.setVisible(false);
+              step.commonFooterImage.setVisible(true);
               evt.target.endPosition = evt.target.left;
               C.processMovement(evt.target.step);
             break;
