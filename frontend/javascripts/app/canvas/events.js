@@ -205,6 +205,7 @@ window.ChaiBioTech.ngApp.factory('events', [
               step.commonFooterImage.setVisible(true);
               evt.target.endPosition = evt.target.left;
               C.processMovement(evt.target.step);
+              C.canvas.renderAll();
             break;
           }
 

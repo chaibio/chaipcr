@@ -280,18 +280,25 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     };
 
     this.processMovement = function(step) {
+
+      this.indicator.setVisible(false);
+      step.dragFooterImage.setVisible(false);
       console.log("okay step");
       // Make a clone of the step
       var stepClone = $.extend({}, step);
       // Find the place where you left the moved step
-      var moveTarget = Math.floor((stepClone.dragFooterImage.left + 60) / 120);
-      console.log("Move place", moveTarget);
+      var moveTarget = Math.floor((stepClone.dragFooterImage.left + 60) / 120) - 1;
+
       // This is a way to understand moving direction.
       if(stepClone.whiteFooterImage.startPosition < stepClone.dragFooterImage.endPosition) {
+
         moveTarget = (moveTarget > 0) ? moveTarget - 1 : 0;
       }
       // If the movement is atlest half of the width of the step, we are going to update
       if(Math.abs(stepClone.dragFooterImage.startPosition - stepClone.dragFooterImage.endPosition) > 65) {
+
+        moveTarget = (moveTarget <= 0) ? 0 : moveTarget;
+        console.log("Move place fgdfgdfgdfgdfg", moveTarget);
         // Delete the step you moved
         step.parentStage.deleteStep({}, step);
         // add clone at the place
