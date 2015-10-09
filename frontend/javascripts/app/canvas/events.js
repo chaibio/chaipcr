@@ -46,6 +46,7 @@ window.ChaiBioTech.ngApp.factory('events', [
               me = evt.target.step;
               me.dragFooterImage.setVisible(true);
               me.dragFooterImage.startPosition = evt.target.left;
+              C.indicator.changeText(me.parentStage.index, me.index);
               C.moveLimit = C.allStepViews[C.allStepViews.length - 1].left + 3;
               C.canvas.bringToFront(me.dragFooterImage);
               C.canvas.bringToFront(C.indicator);
@@ -69,6 +70,17 @@ window.ChaiBioTech.ngApp.factory('events', [
               me.whiteFooterImage.setVisible(true);
               C.indicator.setVisible(false);
               C.canvas.renderAll();
+              break;
+
+            case "dragStepGroup":
+
+              evt.target.setVisible(false);
+              //me = evt.target.step;
+              //me.whiteFooterImage.setVisible(true);
+              C.indicator.setVisible(false);
+              C.canvas.renderAll();
+              break;
+
           }
         }
       });
