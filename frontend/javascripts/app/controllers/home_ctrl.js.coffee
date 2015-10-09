@@ -24,15 +24,7 @@ window.ChaiBioTech.ngApp
     @newExperiment = ->
       modalInstance = $modal.open
         templateUrl: 'app/views/experiment/create-experiment-name-modal.html'
-
-      modalInstance.result.then (exp_name) =>
-        exp = new Experiment
-          experiment:
-            name: exp_name || 'New Experiment'
-            protocol: {}
-
-        exp.$save (data) =>
-          $state.go 'edit-protocol', id: data.experiment.id
+        controller: 'CreateExperimentModalCtrl'
 
     @confirmDelete = (exp) ->
       if $scope.deleteMode

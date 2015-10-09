@@ -4,8 +4,8 @@ window.ChaiBioTech.ngApp
   '$state'
   '$window'
   ($rootScope, $state, $window) ->
-    $rootScope.title = "ChaiBioTech"
 
+    $rootScope.title = "ChaiBioTech"
 
     $rootScope.$on '$stateChangeSuccess', (e, toState, params, fromState) ->
       body = angular.element('body')
@@ -16,6 +16,13 @@ window.ChaiBioTech.ngApp
       $.jStorage.deleteKey 'authToken'
       $window.location.assign '/'
 
+]
+
+.config [
+  'laddaProvider'
+  (laddaProvider) ->
+    laddaProvider.setOption
+      style: 'expand-right'
 ]
 
 .value 'host', "http://#{window.location.hostname}"

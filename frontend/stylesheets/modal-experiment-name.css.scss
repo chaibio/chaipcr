@@ -37,6 +37,8 @@
       font-weight: bold;
       margin: 30px auto;
       padding: 10px 50px;
+
+      &:focus {outline:0;}
     }
   }
 }

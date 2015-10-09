@@ -1,8 +1,11 @@
-window.ChaiBioTech.ngApp.controller 'ExperimentNameModalCtrl', [
+window.ChaiBioTech.ngApp.controller 'CreateExperimentModalCtrl', [
   '$scope'
-  ($scope) ->
+  'Experiment'
+  '$state'
+  ($scope, Experiment, $state) ->
     $scope.newExperimentName = 'New Experiment'
     $scope.focused = false
+    $scope.loading = false
 
     $scope.focus = ->
       $scope.focused = true
@@ -18,6 +21,19 @@ window.ChaiBioTech.ngApp.controller 'ExperimentNameModalCtrl', [
     $scope.submit = (expName) ->
       $scope.submitted = true
       if $scope.form.$valid and $scope.newExperimentName isnt 'New Experiment'
-        $scope.$close expName
+        # $scope.$close expName
+
+        exp = new Experiment
+          experiment:
+            name: expName || 'New Experiment'
+            protocol: {}
+
+        $scope.loading = true
+
+        exp.$save()
+        .then (data) =>
+          $state.go 'edit-protocol', id: data.experiment.id
+        .finally =>
+          $scope.$close()
 
 ]

@@ -1,4 +1,4 @@
-<div class="user-settings" ng-controller="ExperimentNameModalCtrl">
+<div class="user-settings">
   <div class="modal-add-user modal-experiment-name">
     <p class="modal-title underlined">
       DUPLICATE EXPERIMENT
@@ -24,12 +24,13 @@
         </div>
       </div>
       <span class="help-block" ng-show="(form.name.$invalid || newExperimentName==='New Experiment') && submitted">
-        <span class="help-block">
           <span class="text-red">Please enter experiment name</span>
-        </span>
+      </span>
+      <span class="help-block" ng-show="error">
+        <span class="text-red">{{error}}</span>
       </span>
       <div class="text-center">
-        <button type="submit">DUPLICATE EXPERIMENT</button>
+        <button type="submit" ladda="loading">DUPLICATE EXPERIMENT</button>
       </div>
     </form>
   </div>
