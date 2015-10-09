@@ -15,18 +15,22 @@ window.ChaiBioTech.ngApp
     @getData = -> data
 
     @fetch = ->
-      @fetching = true
       deferred = $q.defer()
-      $http.get("#{host}\:8000/status")
-      .success (resp) =>
-        data = resp
+      if !@fetching
+        @fetching = true
+        $http.get("#{host}\:8000/status")
+        .success (resp) =>
+          data = resp
+          deferred.resolve data
+
+        .error (resp) ->
+          deferred.reject(resp)
+
+        .finally ->
+          @fetching = false
+
+      else
         deferred.resolve data
-
-      .error (resp) ->
-        deferred.reject(resp)
-
-      .finally ->
-        @fetching = false
 
       deferred.promise
 

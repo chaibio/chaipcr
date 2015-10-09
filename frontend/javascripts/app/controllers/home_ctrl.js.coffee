@@ -32,7 +32,7 @@ window.ChaiBioTech.ngApp
             protocol: {}
 
         exp.$save (data) =>
-          @fetchExperiments()
+          $state.go 'edit-protocol', id: data.experiment.id
 
     @confirmDelete = (exp) ->
       if $scope.deleteMode
