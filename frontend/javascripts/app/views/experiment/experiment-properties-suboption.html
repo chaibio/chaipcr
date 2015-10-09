@@ -5,6 +5,11 @@
           <span class="text-success">{{success}}</span>
         </span>
       </div>
+      <div class="text-center" style="padding-top: 20px;" ng-show="errors">
+        <span class="help-block">
+          <span class="text-danger">{{errors}}</span>
+        </span>
+      </div>
       <div class="heading">
         EXPERIMENT NAME
       </div>
@@ -14,18 +19,15 @@
         </span>
         <input type="text" class="exp-name simplifica" ng-model="experiment.name" ng-show="editExpNameMode" ng-blur="saveExperiment()" focus-on="editExpNameMode">
         <span class="action" ng-click="focusExpName()" ng-show="!editExpNameMode">EDIT</span>
-        <span class="help-block" ng-show="errors">
-          <span class="text-danger">{{errors}}</span>
-        </span>
       </div>
       <div class="heading">
         LID TEMPERATURE
       </div>
       <div class="exp-name-container">
-        <span class="exp-name simplifica truncate" ng-show="!editLidTempMode">
-          {{experiment.protocol.lid_temperature | degreeCelcius}}
+        <span class="exp-name simplifica truncate" ng-show="!editLidTempMode && experiment.protocol.lid_temperature">
+          {{ (experiment.protocol.lid_temperature) | degreeCelcius}}
         </span>
-        <input type="text" name="lidTemp" ng-pattern="/^[0-9]+((\.[0-9]+)?)$/" class="exp-name simplifica" ng-model="experiment.protocol.lid_temperature" ng-show="editLidTempMode" ng-blur="updateProtocol(experiment.protocol)" focus-on="editLidTempMode">
+        <input type="text" name="lidTemp" ng-pattern="/^[0-9]+((\.[0-9]+)?)$/" class="exp-name simplifica" ng-model="experiment.protocol.lid_temperature" ng-show="editLidTempMode" ng-blur="updateProtocol(experiment.protocol)" on-key-enter="updateProtocol(experiment.protocol)" focus-on="editLidTempMode">
         <span class="action" ng-click="focusLidTemp()" ng-show="!editLidTempMode">EDIT</span>
         <span class="help-block" ng-show="expForm.lidTemp.$error.pattern">
           <span class="text-danger">Must be a valid number.</span>

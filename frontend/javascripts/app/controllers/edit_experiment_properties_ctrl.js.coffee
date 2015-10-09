@@ -5,7 +5,8 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
   '$stateParams',
   'expName',
   'Protocol'
-  ($scope, focus, Experiment, $stateParams, expName, Protocol) ->
+  'Status'
+  ($scope, focus, Experiment, $stateParams, expName, Protocol, Status) ->
 
     $scope.experiment = {}
 
@@ -22,15 +23,39 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
       {text: 'QUANTIFICATION'}
     ]
 
+    $scope.$watch ->
+      Status.getData()
+    , (data) ->
+      exp = data?.experimentController?.expriment || $scope.experiment || {}
+      if parseInt(exp?.id) is parseInt($stateParams.id) and exp.started_at and !exp.completed_at
+        $scope.running = true
+      else
+        $scope.running = false
+
+    $scope.removeMessages = ->
+      $scope.success = null
+      $scope.errors = null
+
+
     $scope.typeSelected = (type) ->
       $scope.selectedType = type
 
     $scope.focusExpName = ->
+      $scope.removeMessages()
       $scope.editExpNameMode = true
       focus('editExpNameMode')
 
 
     $scope.focusLidTemp = ->
+      $scope.removeMessages()
+      if $scope.running
+        $scope.errors = "Experiment is currently running."
+        return
+
+      if !$scope.running and ($scope.experiment.started_at isnt null and $scope.experiment.completed_at isnt null)
+        $scope.errors = "Experiment has already been run."
+        return
+
       $scope.editLidTempMode = true
       focus('editLidTempMode')
 
