@@ -107,7 +107,7 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
     /********************Step API Methods************************/
 
     this.moveStep = function(id, prev_id) {
-      console.log("I am looking");
+      
       var dataToBeSend = {'prev_id': prev_id},
       url = "/steps/" + id + "/move";
       delay = $q.defer();
