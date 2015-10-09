@@ -17,9 +17,14 @@
 
     input {
       background: transparent;
+      color: $lightgray;
       margin-top: 3px;
       margin-bottom: -5px;
       width: 272px;
+
+      &.focused {
+        color: $gray;
+      }
     }
 
     button {

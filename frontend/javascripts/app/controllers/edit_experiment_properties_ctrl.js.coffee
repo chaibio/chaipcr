@@ -60,6 +60,10 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
       promise.success ->
         $scope.success = "Protocol lid temperature updated successfully"
 
+      promise.catch (resp) ->
+        $scope.errors = resp.data.errors
+        $scope.experiment = angular.copy $scope.experimentOrig
+
       promise.finally ->
         $scope.editModeOff()
 ]
