@@ -47,6 +47,7 @@ window.ChaiBioTech.ngApp.factory('events', [
               me.dragFooterImage.setVisible(true);
               me.dragFooterImage.startPosition = evt.target.left;
               C.indicator.changeText(me.parentStage.index, me.index);
+              C.indicator.currentStep = me;
               C.moveLimit = C.allStepViews[C.allStepViews.length - 1].left + 3;
               C.canvas.bringToFront(me.dragFooterImage);
               C.canvas.bringToFront(C.indicator);
@@ -75,9 +76,9 @@ window.ChaiBioTech.ngApp.factory('events', [
             case "dragStepGroup":
 
               evt.target.setVisible(false);
-              //me = evt.target.step;
-              //me.whiteFooterImage.setVisible(true);
-              C.indicator.setVisible(false);
+              me = evt.target.currentStep;
+              me.dragFooterImage.setVisible(false);
+              me.whiteFooterImage.setVisible(true);
               C.canvas.renderAll();
               break;
 
