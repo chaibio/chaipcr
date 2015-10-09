@@ -4,7 +4,7 @@
       DUPLICATE EXPERIMENT
       <a class="pull-right close" ng-click="$dismiss()">&times;</a>
     </p>
-    <form role="form" class="form-horizontal" name="form" ng-submit="$close(newExperimentName)" novalidate>
+    <form role="form" class="form-horizontal" name="form" ng-submit="submit(newExperimentName)" novalidate>
       <div class="underlined">
         <div class="form-group">
           <label for="name" class="col-sm-4 control-label">EXP NAME</label>
@@ -23,13 +23,13 @@
           </div>
         </div>
       </div>
-      <span class="help-block" ng-show="(form.name.$invalid || newExperimentName==='New Experiment') && form.name.$touched">
+      <span class="help-block" ng-show="(form.name.$invalid || newExperimentName==='New Experiment') && submitted">
         <span class="help-block">
           <span class="text-red">Please enter experiment name</span>
         </span>
       </span>
       <div class="text-center">
-        <button type="submit" ng-disabled="form.$invalid || newExperimentName==='New Experiment'">DUPLICATE EXPERIMENT</button>
+        <button type="submit">DUPLICATE EXPERIMENT</button>
       </div>
     </form>
   </div>
