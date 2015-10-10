@@ -32,6 +32,7 @@ window.ChaiBioTech.ngApp.controller 'CreateExperimentModalCtrl', [
 
         exp.$save()
         .then (data) =>
-          $state.go 'edit-protocol', id: data.experiment.id
+          $scope.$close ->
+            $state.go 'edit-protocol', id: data.experiment.id
 
 ]
