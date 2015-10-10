@@ -8,9 +8,14 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
   'Status'
   ($scope, focus, Experiment, $stateParams, expName, Protocol, Status) ->
 
-    Experiment.get {id: $stateParams.id}, (data) ->
-      $scope.experiment = data.experiment
-      $scope.experimentOrig = angular.copy data.experiment
+    if !Experiment.getCurrentExperiment()
+      Experiment.get {id: $stateParams.id}, (data) ->
+        Experiment.setCurrentExperiment data.experiment
+        $scope.experiment = data.experiment
+        $scope.experimentOrig = angular.copy data.experiment
+    else
+      $scope.experiment = Experiment.getCurrentExperiment()
+      $scope.experimentOrig = angular.copy $scope.experiment
 
     $scope.editExpNameMode = false
 
