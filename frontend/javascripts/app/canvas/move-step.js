@@ -118,23 +118,16 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
 
       this.indicator.onTheMove = function(C) {
 
-        // 1)create a point or a small rectangle at the farthest end of each steps
-        // 2)hit test agaist it
-        // May be group the common footer image with the look in the nicks design.
-        // Nicks design image is going to be the background.
-        // Change the background in the beginning of the scroll
-        var that = this;
+        C.allStepViews.some(function(step, index) {
 
-        C.allStepViews.every(function(step, index) {
-
-          if(that.intersectsWithObject(step.hitPoint) && that.currentHit !== index) {
+          if(this.intersectsWithObject(step.hitPoint) && this.currentHit !== index) {
               step.circle.manageClick();
-              that.currentHit = index;
-              return false;
+              this.currentHit = index;
+              return true;
           }
-          return true;
+          return false;
 
-        });
+        }, this);
 
       };
 

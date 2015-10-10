@@ -63,9 +63,9 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       var allStages = this.model.protocol.stages;
       var previousStage = null, noOfStages = allStages.length, stageView;
 
-      for (var stageIndex = 0; stageIndex < noOfStages; stageIndex ++) {
+      this.allStageViews = allStages.map(function(stageData, index) {
 
-        stageView = new stage(allStages[stageIndex].stage, this.canvas, this.allStepViews, stageIndex, this, this.$scope, false);
+        stageView = new stage(stageData.stage, this.canvas, this.allStepViews, index, this, this.$scope, false);
         // We connect the stages like a linked list so that we can go up and down.
         if(previousStage){
           previousStage.nextStage = stageView;
@@ -74,9 +74,9 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
         previousStage = stageView;
         stageView.render();
-        this.allStageViews.push(stageView);
-      }
-      // Only for the last stage
+        return stageView;
+      }, this);
+
       stageView.addBorderRight();
       console.log("Stages added ... !");
       return this;
@@ -105,7 +105,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       loadImageRecursion = function(index) {
         fabric.Image.fromURL(that.imageLocation + that.images[index], function(img) {
 
-          that.imageobjects[that.images[index]] = $.extend(true, {}, img);
+          that.imageobjects[that.images[index]] = img;
           if(index < noOfImages) {
             loadImageRecursion(++index);
           } else {
@@ -116,29 +116,6 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       };
 
       loadImageRecursion(0);
-
-      /*var that = this;
-      fabric.Image.fromURL("/images/common-step.png", function(img) {
-        that.imageobjects[that.images[0]] = $.extend(true, {}, img);
-
-        fabric.Image.fromURL("/images/black-footer.png", function(img) {
-          that.imageobjects[that.images[1]] = $.extend(true, {}, img);
-
-          fabric.Image.fromURL("/images/orange-footer.png", function(img) {
-            that.imageobjects[that.images[2]] = $.extend(true, {}, img);
-
-            fabric.Image.fromURL("/images/gather-data.png", function(img) {
-              that.imageobjects[that.images[3]] = $.extend(true, {}, img);
-
-              fabric.Image.fromURL("/images/gather-data-image.png", function(img) {
-                that.imageobjects[that.images[4]] = $.extend(true, {}, img);
-                console.log("All images loaded .... !");
-                that.canvas.fire("imagesLoaded");
-              });
-            });
-          });
-        });
-      });*/
     };
 
     /*******************************************************/
@@ -149,11 +126,9 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     /*******************************************************/
     this.addinvisibleFooterToStep = function() {
 
-      var that = this;
-      this.allStepViews.every(function(step) {
-        that.addImagesC(step);
-        return true;
-      });
+      this.allStepViews.forEach(function(step) {
+        this.addImagesC(step);
+      }, this);
 
       return this;
     };
@@ -190,61 +165,64 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     this.addRampLinesAndCircles = function(circles) {
 
       this.allCircles = circles || this.findAllCircles();
-      var limit = this.allCircles.length, thisCircle;
+      var limit = this.allCircles.length;
 
-      for(i = 0; i < limit; i++) {
-        thisCircle = this.allCircles[i];
+      this.allCircles.forEach(function(circle, index) {
 
-        if(i < (limit - 1)) {
-
-          thisCircle.moveCircle();
-          thisCircle.curve = new path(thisCircle);
-          this.canvas.add(thisCircle.curve);
-
+        if(index < (limit - 1)) {
+          circle.moveCircle();
+          circle.curve = new path(circle);
+          this.canvas.add(circle.curve);
         }
-        thisCircle.getCircle();
-        this.canvas.bringToFront(thisCircle.parent.rampSpeedGroup);
-      }
+
+        circle.getCircle();
+        this.canvas.bringToFront(circle.parent.rampSpeedGroup);
+      }, this);
+
       // We should put an infinity symbol if the last step has infinite hold time.
-      thisCircle.doThingsForLast();
+      this.allCircles[limit - 1].doThingsForLast();
       console.log("All circles are added ....!!");
       return this;
     };
 
     this.findAllCircles = function() {
 
-      var i = 0, limit = this.allStepViews.length, tempCirc = null;
+      var tempCirc = null;
       this.findAllCirclesArray.length = 0;
 
-      for(i = 0; i < limit; i++) {
+      this.findAllCirclesArray = this.allStepViews.map(function(step) {
+
         if(tempCirc) {
-          this.allStepViews[i].circle.previous = tempCirc;
-          tempCirc.next = this.allStepViews[i].circle;
+          step.circle.previous = tempCirc;
+          tempCirc.next = step.circle;
         }
-        tempCirc = this.allStepViews[i].circle;
-        this.findAllCirclesArray.push(this.allStepViews[i].circle);
-      }
+        tempCirc = step.circle;
+        return step.circle;
+      });
+
       return this.findAllCirclesArray;
     };
 
     this.reDrawCircles = function() {
 
-      var i = 0, limit = this.allStepViews.length, tempCirc = null;
+      var tempCirc = null;
       this.drawCirclesArray.length = 0;
 
-      for(i = 0; i < limit; i++) {
+      this.drawCirclesArray = this.allStepViews.map(function(step, index) {
 
-        this.allStepViews[i].circle.removeContents();
-        delete this.allStepViews[i].circle;
-        this.allStepViews[i].addCircle();
+        step.circle.removeContents();
+        delete step.circle;
+        step.addCircle();
 
         if(tempCirc) {
-          this.allStepViews[i].circle.previous = tempCirc;
-          tempCirc.next = this.allStepViews[i].circle;
+          step.circle.previous = tempCirc;
+          tempCirc.next = step.circle;
         }
-        tempCirc = this.allStepViews[i].circle;
-        this.drawCirclesArray.push(this.allStepViews[i].circle);
-      }
+
+        tempCirc = step.circle;
+        return step.circle;
+      }, this);
+
       return this.drawCirclesArray;
     };
 
@@ -256,18 +234,18 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     this.addNewStage = function(data, currentStage) {
 
+      // Re factor this part..
       //move the stages, make space.
-      var noOfsteps = data.stage.steps.length, k = 0,
-      ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus,
+      var ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus,
       originalWidth = currentStage.myWidth,
       add = (data.stage.steps.length > 1) ? 121.5 : 122.5;
 
-      for(k = 0; k < noOfsteps; k++) {
+      data.stage.steps.forEach(function(step) {
         currentStage.myWidth = currentStage.myWidth + add;
         currentStage.moveAllStepsAndStages(false);
-      }
+      });
 
-      currentStage.myWidth = originalWidth;
+      currentStage.myWidth = originalWidth; // This is some trick, But I forgot what it was , check back here.
 
       // now create a stage;
       var stageIndex = currentStage.index + 1;
@@ -285,16 +263,15 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       stageView.render();
 
       // configure steps;
-      var length = stageView.childSteps.length, l = 0;
+      stageView.childSteps.forEach(function(step) {
 
-      for(l = 0; l < length; l++) {
-        stageView.childSteps[l].ordealStatus = ordealStatus + 1;
-        stageView.childSteps[l].render();
-        stageView.childSteps[l].addImages();
+        step.ordealStatus = ordealStatus + 1;
+        step.render();
+        step.addImages();
 
-        this.allStepViews.splice(ordealStatus, 0, stageView.childSteps[l]);
+        this.allStepViews.splice(ordealStatus, 0, step);
         ordealStatus = ordealStatus + 1;
-      }
+      }, this);
 
       stageView.childSteps[stageView.childSteps.length - 1].borderRight.setVisible(false);
       if(stageView.nextStage === null) { // if its the last stage
