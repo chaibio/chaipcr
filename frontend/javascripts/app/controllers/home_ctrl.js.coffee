@@ -4,9 +4,10 @@ window.ChaiBioTech.ngApp
   '$scope'
   'Experiment'
   '$window'
-  '$state'
   '$modal'
-  ($scope, Experiment, $window, $state, $modal) ->
+  '$timeout'
+  '$state'
+  ($scope, Experiment, $window, $modal, $timeout, $state) ->
 
     angular.element('body').addClass 'modal-form'
     $scope.$on '$destroy', ->
@@ -24,15 +25,10 @@ window.ChaiBioTech.ngApp
     @newExperiment = ->
       modalInstance = $modal.open
         templateUrl: 'app/views/experiment/create-experiment-name-modal.html'
+        controller: 'CreateExperimentModalCtrl'
 
-      modalInstance.result.then (exp_name) =>
-        exp = new Experiment
-          experiment:
-            name: exp_name || 'New Experiment'
-            protocol: {}
-
-        exp.$save (data) =>
-          $state.go 'edit-protocol', id: data.experiment.id
+      modalInstance.result.then (exp) ->
+        $state.go 'edit-protocol', id: exp.id
 
     @confirmDelete = (exp) ->
       if $scope.deleteMode

@@ -13,4 +13,5 @@ window.ChaiBioTech.ngApp = angular.module 'ChaiBioTech', [
   'focusOn'
   'http-auth-interceptor'
   'ngAnimate'
+  'angular-ladda'
 ]

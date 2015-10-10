@@ -5,32 +5,54 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
   '$stateParams',
   'expName',
   'Protocol'
-  ($scope, focus, Experiment, $stateParams, expName, Protocol) ->
+  'Status'
+  ($scope, focus, Experiment, $stateParams, expName, Protocol, Status) ->
 
-    $scope.experiment = {}
-
-    Experiment.get {id: $stateParams.id}, (data) ->
-      $scope.experiment = data.experiment
+    if !Experiment.getCurrentExperiment()
+      Experiment.get {id: $stateParams.id}, (data) ->
+        Experiment.setCurrentExperiment data.experiment
+        $scope.experiment = data.experiment
+        $scope.experimentOrig = angular.copy data.experiment
+    else
+      $scope.experiment = Experiment.getCurrentExperiment()
       $scope.experimentOrig = angular.copy $scope.experiment
 
     $scope.editExpNameMode = false
 
-    $scope.expTypes = [
-      {text: 'END POINT'}
-      {text: 'PRESENCE/ABSENSE'}
-      {text: 'GENOTYPING'}
-      {text: 'QUANTIFICATION'}
-    ]
+    # $scope.expTypes = [
+    #   {text: 'END POINT'}
+    #   {text: 'PRESENCE/ABSENSE'}
+    #   {text: 'GENOTYPING'}
+    #   {text: 'QUANTIFICATION'}
+    # ]
+
+    $scope.$watch ->
+      Status.getData()
+    , (data) ->
+      if parseInt(data?.experimentController?.expriment?.id) is parseInt($stateParams.id)
+        $scope.experiment.started_at = data.experimentController.expriment.started_at
+        $scope.experiment.completed_at = data.experimentController.expriment.completed_at
+
+    $scope.removeMessages = ->
+      $scope.success = null
+      $scope.errors = null
+
 
     $scope.typeSelected = (type) ->
       $scope.selectedType = type
 
     $scope.focusExpName = ->
+      $scope.removeMessages()
       $scope.editExpNameMode = true
       focus('editExpNameMode')
 
 
     $scope.focusLidTemp = ->
+      $scope.removeMessages()
+      if $scope.experiment?.started_at
+        $scope.errors = "Experiment has been run."
+        return
+
       $scope.editLidTempMode = true
       focus('editLidTempMode')
 

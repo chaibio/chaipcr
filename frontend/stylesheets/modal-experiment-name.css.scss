@@ -1,6 +1,6 @@
 @import "./colors.css.scss";
 
-.home-state-active, .duplicate-experiment {
+.modal-open {
 
   .modal-dialog {
     margin-top: 200px;
@@ -37,6 +37,8 @@
       font-weight: bold;
       margin: 30px auto;
       padding: 10px 50px;
+
+      &:focus {outline:0;}
     }
   }
 }

@@ -38,6 +38,9 @@ var vendorFiles = [
   'app/libs/ng-focus-on.js',
   'app/libs/http-auth-interceptor.js',
   'app/libs/jstorage.js',
+  'app/libs/spin.min.js',
+  'app/libs/ladda.min.js',
+  'app/libs/angular-ladda.min.js',
 ];
 var appFiles = [
   'welcome.js',
