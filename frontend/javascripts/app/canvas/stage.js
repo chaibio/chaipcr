@@ -447,7 +447,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         previousSelectedStage.changeFillsAndStrokes("white");
         previousSelectedStage.manageBordersOnSelection("#ff9f00");
         previousSelectedStage.manageFooter(false, "white", previousLength);
-      }
+      };
     };
 
   }

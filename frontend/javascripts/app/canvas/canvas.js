@@ -169,7 +169,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
         step.dragFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["drag-footer-image.png"]), step, 'dragFooter');
         step.dragFooterImage.top = 364;
-        step.dragFooterImage.left = step.left;
+        step.dragFooterImage.left = step.left + 4;
         //step.dragFooterImage.setVisible(true);
         this.canvas.add(step.dragFooterImage);
 
@@ -254,69 +254,9 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     };
 
     this.addMoveStepIndicator = function() {
-      // Move this to a new file
 
       this.indicator = moveStepRect.getMoveStepRect(this);
       this.canvas.add(this.indicator);
-    };
-
-    this.onTheMove = function(movingObject) {
-
-      // 1)create a point or a small rectangle at the farthest end of each steps
-      // 2)hit test agaist it
-      // May be group the common footer image with the look in the nicks design.
-      // Nicks design image is going to be the background.
-      // Change the background in the beginning of the scroll
-      var length = this.allStepViews.length;
-
-      for(var run = 0; run < length; run ++) {
-        if(movingObject.intersectsWithObject(this.allStepViews[run].hitPoint)) {
-          console.log(run, "Hit", length);
-          // Make the Jump;
-          // use the previou to store the
-          return false;
-        }
-      }
-    };
-
-    this.processMovement = function(step) {
-
-      this.indicator.setVisible(false);
-      step.dragFooterImage.setVisible(false);
-      console.log("okay step");
-      // Make a clone of the step
-      var stepClone = $.extend({}, step);
-      // Find the place where you left the moved step
-      var moveTarget = Math.floor((stepClone.dragFooterImage.left + 60) / 120) - 1;
-
-      // This is a way to understand moving direction.
-      if(stepClone.whiteFooterImage.startPosition < stepClone.dragFooterImage.endPosition) {
-
-        moveTarget = (moveTarget > 0) ? moveTarget - 1 : 0;
-      }
-      // If the movement is atlest half of the width of the step, we are going to update
-      if(Math.abs(stepClone.dragFooterImage.startPosition - stepClone.dragFooterImage.endPosition) > 65) {
-
-        moveTarget = (moveTarget <= 0) ? 0 : moveTarget;
-        console.log("Move place fgdfgdfgdfgdfg", moveTarget);
-        // Delete the step you moved
-        step.parentStage.deleteStep({}, step);
-        // add clone at the place
-        var moveToStage = this.allStepViews[moveTarget].parentStage;
-        var data = {
-          step: stepClone.model
-        };
-        moveToStage.addNewStep(data, this.allStepViews[moveTarget]);
-
-        ExperimentLoader.moveStep(stepClone.model.id, this.allStepViews[moveTarget].model.id)
-          .then(function(data) {
-            console.log("Moved", data);
-          });
-
-      } else { // we dont have to update so we update the move whiteFooterImage to old position.
-        stepClone.dragFooterImage.setLeft(stepClone.left + 1);
-      }
-
     };
 
     this.addNewStage = function(data, currentStage) {

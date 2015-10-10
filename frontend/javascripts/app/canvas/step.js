@@ -68,6 +68,8 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.commonFooterImage.set(leftVal).setCoords();
         this.darkFooterImage.set(leftVal).setCoords();
         this.whiteFooterImage.set(leftVal).setCoords();
+
+        //leftVal = {left: (this.left + 4)};
         this.dragFooterImage.set(leftVal).setCoords();
         this.stepGroup.set(leftVal).setCoords();
 
@@ -237,7 +239,7 @@ window.ChaiBioTech.ngApp.factory('step', [
 
         // We create a hitPoint so that we know if the move step actually over the particular step.
         this.hitPoint = new fabric.Circle({
-          radius: 3, fill: '', left: this.left + 110, top: 310, selectable: false, name: "hitPoint"
+          radius: 1, fill: '', left: this.left + 110, top: 330, selectable: false, name: "hitPoint"
         });
 
         this.stepRect = new fabric.Rect({
