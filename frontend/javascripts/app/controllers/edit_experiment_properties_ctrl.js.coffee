@@ -8,11 +8,9 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
   'Status'
   ($scope, focus, Experiment, $stateParams, expName, Protocol, Status) ->
 
-    $scope.experiment = {}
-
     Experiment.get {id: $stateParams.id}, (data) ->
       $scope.experiment = data.experiment
-      $scope.experimentOrig = angular.copy $scope.experiment
+      $scope.experimentOrig = angular.copy data.experiment
 
     $scope.editExpNameMode = false
 
@@ -46,12 +44,8 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
 
     $scope.focusLidTemp = ->
       $scope.removeMessages()
-      if $scope.running
-        $scope.errors = "Experiment is currently running."
-        return
-
-      if !$scope.running and ($scope.experiment.started_at isnt null and $scope.experiment.completed_at isnt null)
-        $scope.errors = "Experiment has already been run."
+      if $scope.experiment?.started_at
+        $scope.errors = "Experiment has been run."
         return
 
       $scope.editLidTempMode = true
