@@ -16,21 +16,19 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
 
     $scope.editExpNameMode = false
 
-    $scope.expTypes = [
-      {text: 'END POINT'}
-      {text: 'PRESENCE/ABSENSE'}
-      {text: 'GENOTYPING'}
-      {text: 'QUANTIFICATION'}
-    ]
+    # $scope.expTypes = [
+    #   {text: 'END POINT'}
+    #   {text: 'PRESENCE/ABSENSE'}
+    #   {text: 'GENOTYPING'}
+    #   {text: 'QUANTIFICATION'}
+    # ]
 
     $scope.$watch ->
       Status.getData()
     , (data) ->
-      exp = data?.experimentController?.expriment || $scope.experiment || {}
-      if parseInt(exp?.id) is parseInt($stateParams.id) and exp.started_at and !exp.completed_at
-        $scope.running = true
-      else
-        $scope.running = false
+      if parseInt(data?.experimentController?.expriment?.id) is parseInt($stateParams.id)
+        $scope.experiment.started_at = data.experimentController.expriment.started_at
+        $scope.experiment.completed_at = data.experimentController.expriment.completed_at
 
     $scope.removeMessages = ->
       $scope.success = null
