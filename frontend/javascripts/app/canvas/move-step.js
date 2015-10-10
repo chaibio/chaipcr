@@ -7,6 +7,8 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
 
       getMoveStepRect: function(me) {
 
+        this.currentHit = 0;
+
         var smallCircle = new fabric.Circle({
           radius: 4,
           fill: 'black',
@@ -114,24 +116,26 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
       };
 
 
-      this.indicator.onTheMove = function(movingObject, C) {
+      this.indicator.onTheMove = function(C) {
 
         // 1)create a point or a small rectangle at the farthest end of each steps
         // 2)hit test agaist it
         // May be group the common footer image with the look in the nicks design.
         // Nicks design image is going to be the background.
         // Change the background in the beginning of the scroll
-        var length = C.allStepViews.length;
+        var that = this;
 
-        for(var run = 0; run < length; run ++) {
-          console.log("moving");
-          if(movingObject.intersectsWithObject(C.allStepViews[run].hitPoint)) {
-            console.log(run, "Hit", length);
-            // Make the Jump;
-            // use the previou to store the
-            return false;
+        C.allStepViews.every(function(step, index) {
+
+          if(that.intersectsWithObject(step.hitPoint) && that.currentHit !== index) {
+              step.circle.manageClick();
+              that.currentHit = index;
+              return false;
           }
-        }
+          return true;
+
+        });
+
       };
 
       return this.indicator;

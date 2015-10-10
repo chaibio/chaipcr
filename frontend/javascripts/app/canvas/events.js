@@ -171,7 +171,7 @@ window.ChaiBioTech.ngApp.factory('events', [
               } else {
                 indicator.setLeft(evt.target.left);
                 indicator.setCoords();
-                indicator.onTheMove(C.indicator, C);
+                indicator.onTheMove(C);
               }
 
             break;
@@ -185,7 +185,7 @@ window.ChaiBioTech.ngApp.factory('events', [
       this.canvas.on('object:modified', function(evt) {
 
         if(evt.target) {
-          
+
           switch(evt.target.name) {
 
             case "controlCircleGroup":
