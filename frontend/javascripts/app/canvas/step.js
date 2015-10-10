@@ -68,9 +68,6 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.commonFooterImage.set(leftVal).setCoords();
         this.darkFooterImage.set(leftVal).setCoords();
         this.whiteFooterImage.set(leftVal).setCoords();
-
-        //leftVal = {left: (this.left + 4)};
-        this.dragFooterImage.set(leftVal).setCoords();
         this.stepGroup.set(leftVal).setCoords();
 
         this.ordealStatus = this.ordealStatus + action;

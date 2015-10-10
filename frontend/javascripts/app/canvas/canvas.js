@@ -167,11 +167,11 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         step.whiteFooterImage.left = step.left;
         this.canvas.add(step.whiteFooterImage);
 
-        step.dragFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["drag-footer-image.png"]), step, 'dragFooter');
+        /*step.dragFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["drag-footer-image.png"]), step, 'dragFooter');
         step.dragFooterImage.top = 364;
         step.dragFooterImage.left = step.left + 4;
         //step.dragFooterImage.setVisible(true);
-        this.canvas.add(step.dragFooterImage);
+        this.canvas.add(step.dragFooterImage);*/
 
       }
 

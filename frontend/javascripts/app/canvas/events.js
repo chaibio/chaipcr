@@ -44,12 +44,9 @@ window.ChaiBioTech.ngApp.factory('events', [
 
               evt.target.setVisible(false);
               me = evt.target.step;
-              me.dragFooterImage.setVisible(true);
-              me.dragFooterImage.startPosition = evt.target.left;
               C.indicator.changeText(me.parentStage.index, me.index);
               C.indicator.currentStep = me;
               C.moveLimit = C.allStepViews[C.allStepViews.length - 1].left + 3;
-              C.canvas.bringToFront(me.dragFooterImage);
               C.canvas.bringToFront(C.indicator);
               C.indicator.setLeft(evt.target.left + 4);
               C.indicator.setCoords();
@@ -77,7 +74,6 @@ window.ChaiBioTech.ngApp.factory('events', [
 
               evt.target.setVisible(false);
               me = evt.target.currentStep;
-              me.dragFooterImage.setVisible(false);
               me.whiteFooterImage.setVisible(true);
               C.canvas.renderAll();
               break;
@@ -117,21 +113,18 @@ window.ChaiBioTech.ngApp.factory('events', [
 
             break;
 
-            /*case "moveStepImage":
+            case "dragStepGroup":
 
-              var moveStep = evt.target.step;
               evt.target.startPosition = evt.target.left;
               C.moveLimit = C.allStepViews[C.allStepViews.length - 1].left + 3;
-              C.canvas.bringToFront(evt.target);
               C.canvas.bringToFront(C.indicator);
               C.canvas.renderAll();
-              C.indicator.setVisible(true);
 
-            break;*/
+            break;
 
           }
         } else { // if the click is on canvas
-          //$scope.selected = false;
+
           $scope.curtain.show();
           var circle = previouslySelected.circle;
           circle.parent.parentStage.unSelectStage();
@@ -144,15 +137,7 @@ window.ChaiBioTech.ngApp.factory('events', [
         if(evt.target) {
           switch(evt.target.name)  {
 
-          case "dragFooter":
-
-              //C.indicator.setVisible(false);
-              //evt.target.setVisible(false);
-              //me.whiteFooterImage.setVisible(true);
-              //C.canvas.bringToFront(moveStep.stepGroup);
-              //moveStep.stepRect.setFill("red");
-              //C.canvas.setActiveGroup(moveStep.stepGroup);
-              //C.canvas.renderAll();
+            case "dragFooter":
             break;
           }
         }
@@ -166,6 +151,7 @@ window.ChaiBioTech.ngApp.factory('events', [
 
         if(evt.target) {
           switch(evt.target.name) {
+
             case "controlCircleGroup":
               var targetCircleGroup = evt.target,
               me = evt.target.me;
@@ -175,17 +161,19 @@ window.ChaiBioTech.ngApp.factory('events', [
               });
             break;
 
-            case "dragFooter":
+            case "dragStepGroup":
 
-              if(evt.target.left > 35 && evt.target.left < C.moveLimit ) {
-                C.indicator.setLeft(evt.target.left);
-                C.indicator.setCoords();
-                C.indicator.onTheMove(C.indicator, C);
-              } else{
-                evt.target.setLeft(C.indicator.getLeft());
+              var indicator = evt.target;
+              if(indicator.left < 35) {
+                indicator.setLeft(35);
+              } else if(indicator.left > C.moveLimit) {
+                indicator.setLeft(C.moveLimit);
+              } else {
+                indicator.setLeft(evt.target.left);
+                indicator.setCoords();
+                indicator.onTheMove(C.indicator, C);
               }
 
-              //moveStep.stepGroup.setLeft(evt.target.left);
             break;
           }
         }
@@ -195,7 +183,9 @@ window.ChaiBioTech.ngApp.factory('events', [
           When the dragging of the object is finished
       ***************************************/
       this.canvas.on('object:modified', function(evt) {
+
         if(evt.target) {
+          
           switch(evt.target.name) {
 
             case "controlCircleGroup":
@@ -210,14 +200,14 @@ window.ChaiBioTech.ngApp.factory('events', [
               });
             break;
 
-            case "dragFooter":
+            case "dragStepGroup":
 
-              var step = evt.target.step;
-              C.indicator.setVisible(false);
-              evt.target.setVisible(false);
+              var indicate = evt.target;
+              var step = indicate.currentStep;
+              indicate.setVisible(false);
               step.commonFooterImage.setVisible(true);
-              evt.target.endPosition = evt.target.left;
-              C.indicator.processMovement(evt.target.step, C);
+              indicate.endPosition = indicate.left;
+              indicate.processMovement(step, C);
               C.canvas.renderAll();
             break;
           }

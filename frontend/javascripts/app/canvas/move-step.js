@@ -61,9 +61,12 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
             width: 110,
             height:60,
             left: 38,
-            top: 200,
-            selectable: false,
-            visible: true,
+            top: 324,
+            selectable: true,
+            lockMovementY: true,
+            hasControls: false,
+            visible: false,
+            hasBorders: false,
             name: "dragStepGroup"
           }
         );
@@ -83,10 +86,10 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
         // Make a clone of the step
         var stepClone = $.extend({}, step);
 
-        if(Math.abs(stepClone.dragFooterImage.startPosition - stepClone.dragFooterImage.endPosition) > 65) {
+        if(Math.abs(this.startPosition - this.endPosition) > 65) {
 
           // Find the place where you left the moved step
-          var moveTarget = Math.floor((stepClone.dragFooterImage.left + 60) / 120);
+          var moveTarget = Math.floor((this.left + 60) / 120);
           var targetStep = C.allStepViews[moveTarget];
           var targetStage = C.allStepViews[moveTarget].parentStage;
 
