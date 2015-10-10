@@ -207,7 +207,7 @@ window.ChaiBioTech.ngApp.factory('step', [
 
         // We create a hitPoint so that we know if the move step actually over the particular step.
         this.hitPoint = new fabric.Rect({
-          width: 10, height: 30, fill: 'black', left: this.left + 60, top: 335, selectable: false, name: "hitPoint",
+          width: 10, height: 30, fill: '', left: this.left + 60, top: 335, selectable: false, name: "hitPoint",
           originX: 'left', originY: 'top',
         });
 
