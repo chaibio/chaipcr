@@ -1,8 +1,7 @@
 window.ChaiBioTech.ngApp.controller 'CreateExperimentModalCtrl', [
   '$scope'
   'Experiment'
-  '$state'
-  ($scope, Experiment, $state) ->
+  ($scope, Experiment) ->
     $scope.newExperimentName = 'New Experiment'
     $scope.focused = false
     $scope.loading = false
@@ -32,7 +31,6 @@ window.ChaiBioTech.ngApp.controller 'CreateExperimentModalCtrl', [
 
         exp.$save()
         .then (data) =>
-          $scope.$close ->
-            $state.go 'edit-protocol', id: data.experiment.id
+          $scope.$close data.experiment
 
 ]

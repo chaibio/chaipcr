@@ -6,7 +6,8 @@ window.ChaiBioTech.ngApp
   '$window'
   '$modal'
   '$timeout'
-  ($scope, Experiment, $window, $modal, $timeout) ->
+  '$state'
+  ($scope, Experiment, $window, $modal, $timeout, $state) ->
 
     angular.element('body').addClass 'modal-form'
     $scope.$on '$destroy', ->
@@ -26,8 +27,8 @@ window.ChaiBioTech.ngApp
         templateUrl: 'app/views/experiment/create-experiment-name-modal.html'
         controller: 'CreateExperimentModalCtrl'
 
-      modalInstance.result.then (cb) ->
-        $timeout cb, 300
+      modalInstance.result.then (exp) ->
+        $state.go 'edit-protocol', id: exp.id
 
     @confirmDelete = (exp) ->
       if $scope.deleteMode
