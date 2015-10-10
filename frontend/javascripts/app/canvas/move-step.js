@@ -108,7 +108,7 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
             });
 
         } else { // we dont have to update so we update the move whiteFooterImage to old position.
-          stepClone.dragFooterImage.setLeft(stepClone.left + 1);
+          this.setLeft(this.currentStep.left + 4);
         }
 
       };

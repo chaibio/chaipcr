@@ -149,33 +149,28 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     /*******************************************************/
     this.addinvisibleFooterToStep = function() {
 
-      var count = 0;
-      var limit = this.allStepViews.length;
-
-      for(count = 0; count < limit; count ++) {
-
-        var step = this.allStepViews[count];
-
-        step.commonFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["common-step.png"]), step, 'orangeFooter');
-        this.canvas.add(step.commonFooterImage);
-
-        step.darkFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["black-footer.png"]), step);
-        this.canvas.add(step.darkFooterImage);
-
-        step.whiteFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["orange-footer.png"]), step, 'moveStepImage');
-        step.whiteFooterImage.top = 365;
-        step.whiteFooterImage.left = step.left;
-        this.canvas.add(step.whiteFooterImage);
-
-        /*step.dragFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["drag-footer-image.png"]), step, 'dragFooter');
-        step.dragFooterImage.top = 364;
-        step.dragFooterImage.left = step.left + 4;
-        //step.dragFooterImage.setVisible(true);
-        this.canvas.add(step.dragFooterImage);*/
-
-      }
+      var that = this;
+      this.allStepViews.every(function(step) {
+        that.addImagesC(step);
+        return true;
+      });
 
       return this;
+    };
+
+    this.addImagesC = function(step) {
+
+      step.commonFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["common-step.png"]), step, 'orangeFooter');
+      this.canvas.add(step.commonFooterImage);
+
+      step.darkFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["black-footer.png"]), step);
+      this.canvas.add(step.darkFooterImage);
+
+      step.whiteFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["orange-footer.png"]), step, 'moveStepImage');
+      step.whiteFooterImage.top = 365;
+      step.whiteFooterImage.left = step.left;
+      this.canvas.add(step.whiteFooterImage);
+
     };
 
     this.applyPropertyToImages = function(imgObj, stepObj, name) {

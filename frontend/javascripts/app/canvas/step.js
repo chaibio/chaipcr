@@ -27,37 +27,8 @@ window.ChaiBioTech.ngApp.factory('step', [
       this.addImages = function() {
 
         var can = this.parentStage.parent;
-
-        this.commonFooterImage = can.applyPropertyToImages($.extend({}, can.imageobjects["common-step.png"]), this, 'orangeFooter');
-        can.canvas.add(this.commonFooterImage);
-
-        this.darkFooterImage = can.applyPropertyToImages($.extend({}, can.imageobjects["black-footer.png"]), this);
-        can.canvas.add(this.darkFooterImage);
-
-        this.whiteFooterImage = can.applyPropertyToImages($.extend({}, can.imageobjects["orange-footer.png"]), this, 'moveStepImage');
-        this.whiteFooterImage.top = 365;
-        this.whiteFooterImage.left = this.left;
-        can.canvas.add(this.whiteFooterImage);
-
-        this.dragFooterImage = can.applyPropertyToImages($.extend({}, can.imageobjects["drag-footer-image.png"]), this, 'dragFooter');
-        this.dragFooterImage.top = 364;
-        this.dragFooterImage.left = this.left;
-        //step.dragFooterImage.setVisible(true);
-        can.canvas.add(this.dragFooterImage);
-
-        this.circle.gatherDataImage = $.extend({}, can.imageobjects["gather-data.png"]);
-        this.circle.gatherDataImage.originX = "center";
-        this.circle.gatherDataImage.originY = "center";
-
-        this.circle.gatherDataImageOnMoving = $.extend({}, can.imageobjects["gather-data-image.png"]);
-        this.circle.gatherDataImageOnMoving.originX = "center";
-        this.circle.gatherDataImageOnMoving.originY = "center";
-
-        this.circle.gatherDataImageMiddle = $.extend({}, can.imageobjects["gather-data.png"]);
-        this.circle.gatherDataImageMiddle.originX = "center";
-        this.circle.gatherDataImageMiddle.originY = "center";
-        this.circle.gatherDataImageMiddle.setVisible(false);
-
+        can.addImagesC(this);
+        this.circle.addImages();
       };
 
       this.moveStep = function(action) {
