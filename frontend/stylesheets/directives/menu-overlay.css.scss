@@ -186,6 +186,18 @@ $sidemenu_width: 450px;
     float: left;
     min-height: 768px;
     width: $sidemenu_width;
+    overflow: hidden;
+
+    -webkit-transition: width 0.5s; /* Safari */
+    transition: width 0.5s;
+
+    &.ng-hide {
+      width: 0;
+    }
+
+    #submenu {
+      width: $sidemenu_width;
+    }
   }
   .page-wrapper {
     top: 0;
