@@ -7,8 +7,8 @@
           <span ng-show="!isHolding()">
             {{ data.experimentController.expriment.name }}
           </span>
-          <span class="text-black" ng-show="!isHolding()">ALL STAGES COMPLETE:</span>
-          <span ng-show="!isHolding()">
+          <span class="text-black" ng-show="isHolding()">ALL STAGES COMPLETE:</span>
+          <span ng-show="isHolding()">
             {{ data.experimentController.heatblock.temperature }}
           </span>
         </span>
