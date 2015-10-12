@@ -34,10 +34,7 @@ window.ChaiBioTech.ngApp
         current_step = parseInt($scope.data.experimentController.expriment.step.number)
         current_cycle = parseInt($scope.data.experimentController.expriment.stage.cycle)
 
-        if duration is 0 and stages.length is current_stage and steps.length is current_step and current_cycle is max_cycle
-          return true
-        else
-          return false
+        return duration is 0 and stages.length is current_stage and steps.length is current_step and current_cycle is max_cycle
 
       updateData = (data) ->
 
@@ -48,7 +45,7 @@ window.ChaiBioTech.ngApp
             $scope.experiment = exp.experiment
         else
           $scope.data = data
-
+        console.log isHolding()
         $scope.isHolding = isHolding()
 
       if Status.getData() then updateData Status.getData()
