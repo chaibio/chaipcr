@@ -4,7 +4,8 @@ window.ChaiBioTech.ngApp
   'Status'
   '$interval'
   'Experiment'
-  (Status, $interval, Experiment) ->
+  'AmplificationChartHelper'
+  (Status, $interval, Experiment, AmplificationChartHelper) ->
     restrict: 'EA'
     scope:
       experimentId: '='
@@ -63,11 +64,13 @@ window.ChaiBioTech.ngApp
         return false if !$scope.data.experimentController.expriment
         stages = $scope.experiment.protocol.stages
         steps = stages[stages.length-1].stage.steps
+        max_cycle = parseInt AmplificationChartHelper.getMaxExperimentCycle $scope.experiment
         duration = steps[steps.length-1].step.delta_duration_s
         current_stage = parseInt $scope.data.experimentController.expriment.stage.number
         current_step = parseInt $scope.data.experimentController.expriment.step.number
+        current_cycle = parseInt($scope.data.experimentController.expriment.stage.cycle)
 
-        if parseInt(duration) is 0 and stages.length is current_stage and steps.length is current_step
+        if parseInt(duration) is 0 and stages.length is current_stage and steps.length is current_step and current_cycle is max_cycle
           return true
         else
           return false
