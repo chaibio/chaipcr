@@ -9,7 +9,7 @@
           </span>
           <span class="text-black" ng-show="isHolding()">ALL STAGES COMPLETE:</span>
           <span ng-show="isHolding()">
-            {{ data.experimentController.heatblock.temperature }}
+            Holding at {{ data.heatblock.temperature | round: '1' | degreeCelcius }}
           </span>
         </span>
         <span ng-show="(data.experimentController.machine.state === 'Idle' || data.experimentController.machine.state === 'Paused') && completionStatus === null">

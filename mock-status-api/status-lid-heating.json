@@ -49,14 +49,14 @@
             {
                 "id": "35",
                 "name": "Stage 1",
-                "number": "1",
+                "number": "2",
                 "cycle": "1"
             },
             "step":
             {
                 "id": "46",
                 "name": "Step 0",
-                "number": "1"
+                "number": "2"
             }
         }
     }

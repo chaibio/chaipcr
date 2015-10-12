@@ -159,8 +159,8 @@ app.post('/control/start', function (req, res, next) {
 
     setTimeout(function () {
       data.optics.collectData = true;
-      data.experimentController.expriment.step.name = "Step 3";
-      data.experimentController.expriment.step.number = "3";
+      data.experimentController.expriment.step.name = "Step 2";
+      data.experimentController.expriment.step.number = "2";
     }, 5000);
 
   }, 3000);
