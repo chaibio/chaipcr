@@ -70,6 +70,7 @@ window.ChaiBioTech.ngApp
         current_step = parseInt $scope.data.experimentController.expriment.step.number
         current_cycle = parseInt($scope.data.experimentController.expriment.stage.cycle)
 
+        console.log '======================='
         console.log "duration: #{duration}"
         console.log "max_cycle: #{max_cycle}"
         console.log "current_cycle: #{current_cycle}"
