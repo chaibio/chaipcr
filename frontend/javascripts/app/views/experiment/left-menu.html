@@ -12,7 +12,7 @@
       </div>
       <div class="ball"></div>
       <div class="menu-text simplifica">
-        <a>
+        <a class="noselect">
           EXPERIMENT PROPERTIES
         </a>
         <span class="arrow-right"></span>
@@ -25,7 +25,7 @@
       </div>
       <div class="ball"></div>
       <div class="menu-text simplifica">
-        <a ui-sref="edit-protocol({id: params.id})" toggle-sidemenu>
+        <a ui-sref="edit-protocol({id: params.id})" toggle-sidemenu class="noselect">
           <span ng-show="status === 'NOT_STARTED'">EDIT PROTOCOL</span>
           <span ng-show="status === 'RUNNING' || status === 'COMPLETED'">VIEW PROTOCOL</span>
         </a>
@@ -49,7 +49,7 @@
       <div class="ball">
       </div>
       <div class="menu-text simplifica">
-        <a ui-sref="run-experiment({id: params.id, chart: 'amplification'})" toggle-sidemenu>
+        <a ui-sref="run-experiment({id: params.id, chart: 'amplification'})" toggle-sidemenu class="noselect">
           <span ng-show="status === 'NOT_STARTED'">RUN EXPERIMENT</span>
           <span ng-show="status === 'RUNNING'">EXPERIMENT STATUS</span>
           <span ng-show="status === 'COMPLETED'">VIEW RESULTS</span>
