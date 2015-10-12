@@ -4,6 +4,36 @@ $sidemenu_width: 450px;
 
 .menu-overlay-layout {
   width: 1024px;
+  -webkit-transition: margin 0.5s; /* Safari */
+  transition: margin 0.5s;
+
+  .page-wrapper {
+    margin-right: 0;
+    -webkit-transition: margin 0.5s; /* Safari */
+    transition: margin 0.5s;
+  }
+
+  &.sidemenu-open-remove {
+    float: left;
+    height: auto;
+    overflow: hidden;
+
+    .page-wrapper {
+      margin-right: -($sidemenu_width * 3);
+      position: relative;
+    }
+  }
+
+  &.sidemenu-open {
+    float: left;
+    height: auto;
+    overflow: hidden;
+
+    .page-wrapper {
+      margin-right: -($sidemenu_width * 3);
+      position: relative;
+    }
+  }
 
   .sidemenu {
     background-color: #001827;
@@ -11,9 +41,20 @@ $sidemenu_width: 450px;
     min-height: 768px;
     position: relative;
     width: $sidemenu_width;
+    overflow: hidden;
+    // margin-right: 0;
 
-    .sidemenu-content {
+    -webkit-transition: width 0.5s; /* Safari */
+    transition: width 0.5s;
+
+    &.ng-hide {
+      width: 0;
+      // margin-right: -($sidemenu_width);
+    }
+
+    #sidemenu-content {
       height: 100%;
+      width: $sidemenu_width;
     }
 
     .menu-overlay-menu {
@@ -168,17 +209,13 @@ $sidemenu_width: 450px;
       background-color: black;
       z-index: 99;
       opacity: 0.3;
-    }
-  }
 
-  &.sidemenu-open {
-    float: left;
-    height: auto;
-    overflow: hidden;
+      -webkit-transition: opacity 0.5s; /* Safari */
+      transition: opacity 0.5s;
 
-    .page-wrapper {
-      margin-right: -($sidemenu_width * 3);
-      position: relative;
+      &.ng-hide {
+        opacity: 0;
+      }
     }
   }
 }
