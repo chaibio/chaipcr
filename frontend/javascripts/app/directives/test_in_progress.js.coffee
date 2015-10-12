@@ -34,7 +34,7 @@ window.ChaiBioTech.ngApp
         current_step = parseInt($scope.data.experimentController.expriment.step.number)
         current_cycle = parseInt($scope.data.experimentController.expriment.stage.cycle)
 
-        if duration is 0 and stages.length is current_stage and steps.length is current_step and current_cycle is max_cycle
+        if duration is 0 and stages.length is current_stage and steps.length is current_step and current_cycle is max_cycle and $scope.data.experimentController.machine.thermal_state is 'Holding'
           return true
         else
           return false
