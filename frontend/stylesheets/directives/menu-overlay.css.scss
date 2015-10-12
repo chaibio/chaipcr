@@ -4,13 +4,13 @@ $sidemenu_width: 450px;
 
 .menu-overlay-layout {
   width: 1024px;
-  -webkit-transition: margin 0.5s; /* Safari */
-  transition: margin 0.5s;
+  -webkit-transition: margin 0.3s; /* Safari */
+  transition: margin 0.3s;
 
   .page-wrapper {
     margin-right: 0;
-    -webkit-transition: margin 0.5s; /* Safari */
-    transition: margin 0.5s;
+    -webkit-transition: margin 0.3s; /* Safari */
+    transition: margin 0.3s;
   }
 
   &.sidemenu-open-remove {
@@ -44,8 +44,8 @@ $sidemenu_width: 450px;
     overflow: hidden;
     // margin-right: 0;
 
-    -webkit-transition: width 0.5s; /* Safari */
-    transition: width 0.5s;
+    -webkit-transition: width 0.3s; /* Safari */
+    transition: width 0.3s;
 
     &.ng-hide {
       width: 0;
@@ -188,8 +188,8 @@ $sidemenu_width: 450px;
     width: $sidemenu_width;
     overflow: hidden;
 
-    -webkit-transition: width 0.5s; /* Safari */
-    transition: width 0.5s;
+    -webkit-transition: width 0.3s; /* Safari */
+    transition: width 0.3s;
 
     &.ng-hide {
       width: 0;
@@ -222,8 +222,8 @@ $sidemenu_width: 450px;
       z-index: 99;
       opacity: 0.3;
 
-      -webkit-transition: opacity 0.5s; /* Safari */
-      transition: opacity 0.5s;
+      -webkit-transition: opacity 0.3s; /* Safari */
+      transition: opacity 0.3s;
 
       &.ng-hide {
         opacity: 0;
