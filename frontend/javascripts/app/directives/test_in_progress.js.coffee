@@ -20,12 +20,12 @@ window.ChaiBioTech.ngApp
       $scope.experiment = Experiment.getCurrentExperiment()
       $scope.isHolding = false
 
-      isHolding = (data) ->
-        return false if !$scope.experiment
-        return false if !$scope.experiment.protocol
-        return false if !$scope.experiment.protocol.stages
-        return false if !data.experimentController
-        return false if !data.experimentController.expriment
+      updateIsHolding = (data) ->
+        return if !$scope.experiment
+        return if !$scope.experiment.protocol
+        return if !$scope.experiment.protocol.stages
+        return if !data.experimentController
+        return if !data.experimentController.expriment
         stages = $scope.experiment.protocol.stages
         steps = stages[stages.length-1].stage.steps
         max_cycle = parseInt(AmplificationChartHelper.getMaxExperimentCycle($scope.experiment))
@@ -36,7 +36,7 @@ window.ChaiBioTech.ngApp
 
         holding = duration is 0 and stages.length is current_stage and steps.length is current_step and current_cycle is max_cycle
         console.log holding
-        return holding
+        $scope.isHolding = holding
 
       updateData = (data) ->
 
@@ -45,10 +45,8 @@ window.ChaiBioTech.ngApp
             $scope.data = data
             $scope.completionStatus = exp.experiment.completion_status
             $scope.experiment = exp.experiment
-            $scope.isHolding = isHolding(data)
         else
           $scope.data = data
-          $scope.isHolding = isHolding(data)
 
       if Status.getData() then updateData Status.getData()
 
@@ -56,6 +54,7 @@ window.ChaiBioTech.ngApp
         Status.getData()
       , (data) ->
         updateData data
+        updateIsHolding data
 
       $scope.timeRemaining = ->
         if $scope.data and $scope.data.experimentController.machine.state is 'Running'
