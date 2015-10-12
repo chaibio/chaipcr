@@ -5,7 +5,8 @@ window.ChaiBioTech.ngApp
   '$interval'
   'Experiment'
   'AmplificationChartHelper'
-  (Status, $interval, Experiment, AmplificationChartHelper) ->
+  'TestInProgressHelper'
+  (Status, $interval, Experiment, AmplificationChartHelper, TestInProgressHelper) ->
     restrict: 'EA'
     scope:
       experimentId: '='
@@ -17,32 +18,18 @@ window.ChaiBioTech.ngApp
       elem.on '$destroy', ->
         Status.stopSync()
       $scope.completionStatus = null
-      $scope.experiment = Experiment.getCurrentExperiment()
       $scope.isHolding = false
 
       updateIsHolding = (data) ->
-        return if !$scope.experiment
-        return if !$scope.experiment.protocol
-        return if !$scope.experiment.protocol.stages
-        return if !data.experimentController
-        return if !data.experimentController.expriment
-        stages = $scope.experiment.protocol.stages
-        steps = stages[stages.length-1].stage.steps
-        max_cycle = parseInt(AmplificationChartHelper.getMaxExperimentCycle($scope.experiment))
-        duration = parseInt(steps[steps.length-1].step.delta_duration_s)
-        current_stage = parseInt(data.experimentController.expriment.stage.number)
-        current_step = parseInt(data.experimentController.expriment.step.number)
-        current_cycle = parseInt(data.experimentController.expriment.stage.cycle)
-
-        $scope.isHolding = duration is 0 and stages.length is current_stage and steps.length is current_step and current_cycle is max_cycle
+        $scope.isHolding = TestInProgressHelper.isHolding(data, $scope.experiment)
 
       updateData = (data) ->
 
-        if !$scope.completionStatus and (data?.experimentController?.machine.state is 'Idle' or data?.experimentController?.machine.state is 'Complete') and $scope.experimentId
-          Experiment.get {id: $scope.experimentId}, (exp) ->
+        if (!$scope.completionStatus and (data?.experimentController?.machine.state is 'Idle' or data?.experimentController?.machine.state is 'Complete') or !$scope.experiment) and $scope.experimentId
+          TestInProgressHelper.getExperiment($scope.experimentId).then (experiment) ->
             $scope.data = data
-            $scope.completionStatus = exp.experiment.completion_status
-            $scope.experiment = exp.experiment
+            $scope.completionStatus = experiment.completion_status
+            $scope.experiment = experiment
         else
           $scope.data = data
 
