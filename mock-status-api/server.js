@@ -161,6 +161,7 @@ app.post('/control/start', function (req, res, next) {
       data.optics.collectData = true;
       data.experimentController.expriment.step.name = "Step 2";
       data.experimentController.expriment.step.number = "2";
+      data.experimentController.expriment.stage.cycle = "40";
     }, 5000);
 
   }, 3000);
