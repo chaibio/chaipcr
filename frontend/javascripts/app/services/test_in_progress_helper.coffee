@@ -6,7 +6,6 @@ window.ChaiBioTech.ngApp.service 'TestInProgressHelper', [
   'Status'
   (AmplificationChartHelper, $rootScope, Experiment, $q, Status) ->
 
-    Status.startSync()
     directivesCount = 0
     status = null
     experiment = null
