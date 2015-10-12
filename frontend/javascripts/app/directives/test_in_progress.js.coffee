@@ -20,21 +20,23 @@ window.ChaiBioTech.ngApp
       $scope.experiment = Experiment.getCurrentExperiment()
       $scope.isHolding = false
 
-      isHolding = ->
+      isHolding = (data) ->
         return false if !$scope.experiment
         return false if !$scope.experiment.protocol
         return false if !$scope.experiment.protocol.stages
-        return false if !$scope.data.experimentController
-        return false if !$scope.data.experimentController.expriment
+        return false if !data.experimentController
+        return false if !data.experimentController.expriment
         stages = $scope.experiment.protocol.stages
         steps = stages[stages.length-1].stage.steps
         max_cycle = parseInt(AmplificationChartHelper.getMaxExperimentCycle($scope.experiment))
         duration = parseInt(steps[steps.length-1].step.delta_duration_s)
-        current_stage = parseInt($scope.data.experimentController.expriment.stage.number)
-        current_step = parseInt($scope.data.experimentController.expriment.step.number)
-        current_cycle = parseInt($scope.data.experimentController.expriment.stage.cycle)
+        current_stage = parseInt(data.experimentController.expriment.stage.number)
+        current_step = parseInt(data.experimentController.expriment.step.number)
+        current_cycle = parseInt(data.experimentController.expriment.stage.cycle)
 
-        return duration is 0 and stages.length is current_stage and steps.length is current_step and current_cycle is max_cycle
+        holding = duration is 0 and stages.length is current_stage and steps.length is current_step and current_cycle is max_cycle
+        console.log holding
+        return holding
 
       updateData = (data) ->
 
@@ -43,10 +45,10 @@ window.ChaiBioTech.ngApp
             $scope.data = data
             $scope.completionStatus = exp.experiment.completion_status
             $scope.experiment = exp.experiment
+            $scope.isHolding = isHolding(data)
         else
           $scope.data = data
-        console.log isHolding()
-        $scope.isHolding = isHolding()
+          $scope.isHolding = isHolding(data)
 
       if Status.getData() then updateData Status.getData()
 
