@@ -1,11 +1,15 @@
 <div class="test-in-progress-container" ng-show="data">
   <div class="test-in-progress">
     <div class="test-in-progress-heading">
-      <div class="truncate text-blue">
+      <div class="truncate" ng-class="{'text-blue': !isHolding(), 'text-green': isHolding()}">
         <span ng-show="data.experimentController.machine.state === 'LidHeating' || data.experimentController.machine.state === 'Running'">
-          <span class="text-black">TEST IN PROGRESS:</span>
-          <span>
+          <span class="text-black" ng-show="!isHolding()">TEST IN PROGRESS:</span>
+          <span ng-show="!isHolding()">
             {{ data.experimentController.expriment.name }}
+          </span>
+          <span class="text-black" ng-show="!isHolding()">ALL STAGES COMPLETE:</span>
+          <span ng-show="!isHolding()">
+            {{ data.experimentController.heatblock.temperature }}
           </span>
         </span>
         <span ng-show="(data.experimentController.machine.state === 'Idle' || data.experimentController.machine.state === 'Paused') && completionStatus === null">

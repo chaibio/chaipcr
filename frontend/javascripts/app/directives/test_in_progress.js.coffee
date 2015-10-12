@@ -13,8 +13,10 @@ window.ChaiBioTech.ngApp
     link: ($scope, elem) ->
 
       Status.startSync()
-
+      elem.on '$destroy', ->
+        Status.stopSync()
       $scope.completionStatus = null
+      $scope.experiment = Experiment.getCurrentExperiment()
 
       updateData = (data) ->
 
@@ -53,9 +55,21 @@ window.ChaiBioTech.ngApp
         else
           0
 
-      # // listen on DOM destroy (removal) event, and cancel the next UI update
-      # // to prevent updating time after the DOM element was removed.
-      elem.on '$destroy', ->
-        Status.stopSync()
+      $scope.isHolding = ->
+        return false if !$scope.experiment
+        return false if !$scope.experiment.protocol
+        return false if !$scope.experiment.protocol.stages
+        return false if !$scope.data.experimentController
+        return false if !$scope.data.experimentController.expriment
+        stages = $scope.experiment.protocol.stages
+        steps = stages[stages.length-1].stage.steps
+        duration = steps[steps.length-1].step.delta_duration_s
+        current_stage = parseInt $scope.data.experimentController.expriment.stage.number
+        current_step = parseInt $scope.data.experimentController.expriment.step.number
+
+        if parseInt(duration) is 0 and stages.length is current_stage and steps.length is current_step
+          return true
+        else
+          return false
 
 ]
