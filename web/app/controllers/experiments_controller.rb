@@ -116,7 +116,7 @@ class ExperimentsController < ApplicationController
   def fluorescence_data
     if @experiment
       @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
-      @fluorescence_data = retrieve_fluorescence_data(@first_stage_collect_data.id, @experiment.calibration_id) if !@first_stage_collect_data.blank?
+      @fluorescence_data = retrieve_fluorescence_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id) if !@first_stage_collect_data.blank?
       respond_to do |format|
         format.json { render "fluorescence_data", :status => :ok}
       end
@@ -130,7 +130,7 @@ class ExperimentsController < ApplicationController
   def baseline_subtracted_ct_data
     if @experiment
       @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
-      @fluorescence_data = retrieve_baseline_subtracted_ct_data(@first_stage_collect_data.id, @experiment.calibration_id) if !@first_stage_collect_data.blank?
+      @fluorescence_data = retrieve_baseline_subtracted_ct_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id) if !@first_stage_collect_data.blank?
       respond_to do |format|
         format.json { render "fluorescence_data", :status => :ok}
       end
@@ -153,7 +153,7 @@ class ExperimentsController < ApplicationController
           csv_string = CSV.generate do |csv|
             csv << ["calibrated_value"]+columns
             if first_stage_collect_data
-              retrieve_fluorescence_data(first_stage_collect_data.id, @experiment.calibration_id).each do |fluorescence_data|
+              retrieve_fluorescence_data(@experiment.id, first_stage_collect_data.id, @experiment.calibration_id).each do |fluorescence_data|
                 csv << [fluorescence_data.calibrated_value]+fluorescence_data.attributes.values_at(*columns)
               end
             end
@@ -189,11 +189,11 @@ class ExperimentsController < ApplicationController
     @experiment = Experiment.find_by_id(params[:id]) if @experiment.nil?
   end
   
-  def retrieve_fluorescence_data(stage_id, calibration_id)
+  def retrieve_fluorescence_data(experiment_id, stage_id, calibration_id)
     fluorescence_data = []
     config   = Rails.configuration.database_configuration
     connection = Rserve::Connection.new
-    results = connection.eval("fluorescence_data('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{stage_id}, #{calibration_id})").to_ruby
+    results = connection.eval("fluorescence_data('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{experiment_id}, #{stage_id}, #{calibration_id})").to_ruby
     connection.close
     if !results.blank? && !results[0].blank?
       (0...results[0].length).each do |i|
@@ -203,11 +203,11 @@ class ExperimentsController < ApplicationController
     return fluorescence_data
   end
   
-  def retrieve_baseline_subtracted_ct_data(stage_id, calibration_id)
+  def retrieve_baseline_subtracted_ct_data(experiment_id, stage_id, calibration_id)
     fluorescence_data = []
     config   = Rails.configuration.database_configuration
     connection = Rserve::Connection.new
-    results = connection.eval("baseline_subtracted_ct_data('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{stage_id}, #{calibration_id})").to_ruby
+    results = connection.eval("baseline_subtracted_ct_data('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{experiment_id}, #{stage_id}, #{calibration_id})").to_ruby
     connection.close
     if !results.blank? && !results[0].blank?
       (0...results[0].length).each do |i|
