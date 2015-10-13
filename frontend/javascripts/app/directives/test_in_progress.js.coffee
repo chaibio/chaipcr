@@ -4,7 +4,9 @@ window.ChaiBioTech.ngApp
   'Status'
   '$interval'
   'Experiment'
-  (Status, $interval, Experiment) ->
+  'AmplificationChartHelper'
+  'TestInProgressHelper'
+  (Status, $interval, Experiment, AmplificationChartHelper, TestInProgressHelper) ->
     restrict: 'EA'
     scope:
       experimentId: '='
@@ -13,16 +15,21 @@ window.ChaiBioTech.ngApp
     link: ($scope, elem) ->
 
       Status.startSync()
-
+      elem.on '$destroy', ->
+        Status.stopSync()
       $scope.completionStatus = null
+      $scope.isHolding = false
+
+      updateIsHolding = (data) ->
+        $scope.isHolding = TestInProgressHelper.isHolding(data, $scope.experiment)
 
       updateData = (data) ->
 
-        if !$scope.completionStatus and (data?.experimentController?.machine.state is 'Idle' or data?.experimentController?.machine.state is 'Complete') and $scope.experimentId
-          Experiment.get {id: $scope.experimentId}, (exp) ->
+        if (!$scope.completionStatus and (data?.experimentController?.machine.state is 'Idle' or data?.experimentController?.machine.state is 'Complete') or !$scope.experiment) and $scope.experimentId
+          TestInProgressHelper.getExperiment($scope.experimentId).then (experiment) ->
             $scope.data = data
-            $scope.completionStatus = exp.experiment.completion_status
-            $scope.experiment = exp.experiment
+            $scope.completionStatus = experiment.completion_status
+            $scope.experiment = experiment
         else
           $scope.data = data
 
@@ -32,6 +39,7 @@ window.ChaiBioTech.ngApp
         Status.getData()
       , (data) ->
         updateData data
+        updateIsHolding data
 
       $scope.timeRemaining = ->
         if $scope.data and $scope.data.experimentController.machine.state is 'Running'
@@ -52,10 +60,5 @@ window.ChaiBioTech.ngApp
           width
         else
           0
-
-      # // listen on DOM destroy (removal) event, and cancel the next UI update
-      # // to prevent updating time after the DOM element was removed.
-      elem.on '$destroy', ->
-        Status.stopSync()
 
 ]

@@ -17,7 +17,7 @@ window.ChaiBioTech.ngApp.directive 'menuOverlay', [
 
       sidemenu = $templateCache.get $scope.sidemenuTemplate
       compiled = $compile(sidemenu)($scope.$parent)
-      sidemenuContainer = elem.find('#sidemenu')
+      sidemenuContainer = elem.find('#sidemenu-content')
       sidemenuContainer.html compiled
 
       $rootScope.$on 'sidemenu:toggle', ->
@@ -25,6 +25,7 @@ window.ChaiBioTech.ngApp.directive 'menuOverlay', [
 
         $scope.sideMenuOpen = !$scope.sideMenuOpen
 
+        # also close the submenu
         if !$scope.sideMenuOpen
           $scope.sideMenuOptionsOpen = false
           elem.find('.menu-overlay-menu-item').removeClass 'active'

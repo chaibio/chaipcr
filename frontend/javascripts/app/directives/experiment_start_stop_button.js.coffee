@@ -3,7 +3,8 @@ window.ChaiBioTech.ngApp
   'Status'
   'Experiment'
   '$rootScope'
-  (Status, Experiment, $rootScope) ->
+  'TestInProgressHelper'
+  (Status, Experiment, $rootScope, TestInProgressHelper) ->
 
     restrict: 'EA'
     replace: true
@@ -17,6 +18,10 @@ window.ChaiBioTech.ngApp
       getExperiment = (cb) ->
         cb = cb || angular.noop
         id = experiment_id || $scope.experimentId
+        TestInProgressHelper.getExperiment(id).then (exp) ->
+          $scope.experiment = exp
+          cb()
+
         Experiment.get {id: id}, (resp) ->
           $scope.experiment = resp.experiment
           cb()
@@ -35,6 +40,7 @@ window.ChaiBioTech.ngApp
         , (val) ->
           $scope.data = val
           $scope.state = val?.experimentController?.machine.state
+          $scope.isHolding = TestInProgressHelper.isHolding()
 
           if val?.experimentController?.expriment?.id and !experiment_id
             experiment_id = val.experimentController.expriment.id
