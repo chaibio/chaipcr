@@ -88,7 +88,8 @@ window.ChaiBioTech.ngApp.factory('step', [
 
       this.adjustRampSpeedLeft = function() {
 
-        this.rampSpeedGroup.setLeft(this.left + 5);
+        //this.rampSpeedGroup.setLeft(this.left + 5);
+        this.circle.runAlongCircle();
         return this;
       };
 

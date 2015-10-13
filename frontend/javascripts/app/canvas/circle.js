@@ -147,7 +147,9 @@ window.ChaiBioTech.ngApp.factory('circle', [
         if( this.parent.index !== 0 || this.parent.parentStage.index !== 0) {
           this.gatherDataGroup.setVisible(this.parent.gatherDataDuringRamp);
         }
-        this.runAlongCircle();
+
+        //this.parent.adjustRampSpeedPlacing();
+        //this.runAlongCircle();
       };
 
       this.getUniqueId = function() {
@@ -196,12 +198,13 @@ window.ChaiBioTech.ngApp.factory('circle', [
             )
           ], this);
         // adjust the placing of ramp speed, this method calculates the top
-        this.parent.adjustRampSpeedPlacing().adjustRampSpeedLeft();
+
 
         this.stepDataGroup = new stepDataGroup([
             this.temperature = new stepTemperature(this.model, this),
             this.holdTime = new stepHoldTime(this.model, this)
           ], this);
+
 
       };
 
