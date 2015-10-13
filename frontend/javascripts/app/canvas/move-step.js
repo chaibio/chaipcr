@@ -104,7 +104,7 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
 
           targetStage.addNewStep(data, targetStep);
 
-          ExperimentLoader.moveStep(stepClone.model.id, targetStep.model.id)
+          ExperimentLoader.moveStep(stepClone.model.id, targetStep.model.id, targetStage.model.id)
             .then(function(data) {
               console.log("Moved", data);
             });

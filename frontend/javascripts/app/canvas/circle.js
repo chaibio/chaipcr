@@ -148,8 +148,8 @@ window.ChaiBioTech.ngApp.factory('circle', [
           this.gatherDataGroup.setVisible(this.parent.gatherDataDuringRamp);
         }
 
-        //this.parent.adjustRampSpeedPlacing();
-        //this.runAlongCircle();
+        this.parent.adjustRampSpeedPlacing();
+        this.runAlongCircle();
       };
 
       this.getUniqueId = function() {
