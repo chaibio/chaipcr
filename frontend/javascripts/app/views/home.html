@@ -83,7 +83,7 @@
                <p ng-show="experiments !== null && experiments.length === 0"><i>No experiments yet.</i></p>
                <div class="individual-experiment" ng-class="{'del': exp.del}" ng-repeat="exp in experiments | orderBy:'experiment.created_at':true">
                   <div class="first-row">
-                     <div class="image" ng-click="HomeCtrl.confirmDelete(exp)">
+                     <div class="image noselect" ng-click="HomeCtrl.confirmDelete(exp)">
                         <span ng-if="deleteMode">&times;</span>
                      </div>
                      <div class="text simplifica">
