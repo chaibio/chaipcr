@@ -8,7 +8,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
   'stageEvents',
   'stepEvents',
   'moveStepRect',
-  function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents, moveStepRect) {
+  'moveStageRect',
+  function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents, moveStepRect, moveStageRect) {
 
     this.init = function(model) {
 
@@ -135,10 +136,10 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     this.addImagesC = function(step) {
 
-      step.commonFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["common-step.png"]), step, 'orangeFooter');
+      step.commonFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["common-step.png"]), step, 'commonStep');
       this.canvas.add(step.commonFooterImage);
 
-      step.darkFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["black-footer.png"]), step);
+      step.darkFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["black-footer.png"]), step, 'blackFooter');
       this.canvas.add(step.darkFooterImage);
 
       step.whiteFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["orange-footer.png"]), step, 'moveStepImage');
@@ -229,11 +230,12 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     this.addMoveStepIndicator = function() {
 
       this.indicator = moveStepRect.getMoveStepRect(this);
+      this.stageMoveIndicator = moveStageRect.getMoveStepRect(this);
       this.canvas.add(this.indicator);
     };
 
     this.addNewStage = function(data, currentStage) {
-
+      
       // Re factor this part..
       //move the stages, make space.
       var ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus,
