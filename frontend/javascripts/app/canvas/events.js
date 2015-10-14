@@ -35,6 +35,20 @@ window.ChaiBioTech.ngApp.factory('events', [
         $scope.applyValuesFromOutSide(circle);
       };
 
+      this.onTheMoveDragGroup = function(dragging) {
+
+        var indicator = dragging;
+        if(indicator.left < 35) {
+          indicator.setLeft(35);
+        } else if(indicator.left > C.moveLimit) {
+          indicator.setLeft(C.moveLimit);
+        } else {
+          indicator.setLeft(dragging.left);
+          indicator.setCoords();
+          indicator.onTheMove(C);
+        }
+      };
+
       this.canvas.on("mouse:over", function(evt) {
         if(evt.target) {
           var me;
@@ -196,33 +210,11 @@ window.ChaiBioTech.ngApp.factory('events', [
             break;
 
             case "dragStepGroup":
-
-              var indicator = evt.target;
-              if(indicator.left < 35) {
-                indicator.setLeft(35);
-              } else if(indicator.left > C.moveLimit) {
-                indicator.setLeft(C.moveLimit);
-              } else {
-                indicator.setLeft(evt.target.left);
-                indicator.setCoords();
-                indicator.onTheMove(C);
-              }
-
+              that.onTheMoveDragGroup(evt.target);
             break;
 
             case "dragStageGroup":
-
-              var indicator = evt.target;
-              if(indicator.left < 35) {
-                indicator.setLeft(35);
-              } else if(indicator.left > C.moveLimit) {
-                indicator.setLeft(C.moveLimit);
-              } else {
-                indicator.setLeft(evt.target.left);
-                indicator.setCoords();
-                indicator.onTheMove(C);
-              }
-
+              that.onTheMoveDragGroup(evt.target);
             break;
 
           }
