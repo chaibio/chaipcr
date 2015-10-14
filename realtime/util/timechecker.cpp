@@ -10,9 +10,10 @@
 
 TimeChecker::TimeChecker()
 {
+    _firstTryState = true;
     _timeState = false;
 
-    _timer = new Poco::Timer(0, 30 * 1000);
+    _timer = new Poco::Timer(1000, 30 * 1000);
     _timer->start(Poco::TimerCallback<TimeChecker>(*this, &TimeChecker::timeCheckCallback));
 }
 
@@ -44,13 +45,16 @@ void TimeChecker::timeCheckCallback(Poco::Timer &/*timer*/)
                     setCurrentTime(savedTime);
                 else
                     saveCurrentTime();
+
+                if (_firstTryState)
+                    timeStateChanged(false);
             }
             else
             {
                 _timeState = true;
 
                 saveCurrentTime();
-                timeBecameValid();
+                timeStateChanged(true);
             }
         }
         else
@@ -58,6 +62,8 @@ void TimeChecker::timeCheckCallback(Poco::Timer &/*timer*/)
     }
     else
         saveCurrentTime();
+
+    _firstTryState = false;
 }
 
 void TimeChecker::saveCurrentTime()

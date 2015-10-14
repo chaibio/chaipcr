@@ -1,7 +1,7 @@
 #include "logdatahandler.h"
 #include "maincontrollers.h"
 #include "experimentcontroller.h"
-#include "settings.h"
+#include "machinesettings.h"
 
 using namespace boost::property_tree;
 
