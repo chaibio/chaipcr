@@ -2,6 +2,7 @@
 #include <Poco/URI.h>
 #include <Poco/SHA1Engine.h>
 
+#include <utility>
 #include <boost/tokenizer.hpp>
 
 #include "httpcodehandler.h"
@@ -18,6 +19,8 @@
 using namespace std;
 using namespace Poco;
 using namespace Poco::Net;
+
+const boost::chrono::hours USER_CACHE_DURATION(1);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class QPCRRequestHandlerFactory
@@ -123,8 +126,43 @@ bool QPCRRequestHandlerFactory::checkUserAuthorization(const HTTPServerRequest &
         Poco::SHA1Engine engine;
         engine.update(token);
 
-        return ExperimentController::getInstance()->getUserId(Poco::SHA1Engine::digestToHex(engine.digest())) != -1;
+        token = Poco::SHA1Engine::digestToHex(engine.digest());
+
+        int id = getCachedUserId(token);
+
+        if (id != -1)
+            return true;
+        else
+        {
+            id = ExperimentController::getInstance()->getUserId(Poco::SHA1Engine::digestToHex(engine.digest()));
+
+            if (id != -1)
+            {
+                addCachedUser(token, id);
+                return true;
+            }
+        }
     }
 
     return false;
+}
+
+int QPCRRequestHandlerFactory::getCachedUserId(const string &token)
+{
+    std::unordered_map<std::string, CachedUser>::iterator it = _cachedUsers.find(token);
+
+    if (it != _cachedUsers.end())
+    {
+        if ((boost::chrono::system_clock::now() - it->second.cacheTime) < USER_CACHE_DURATION)
+            return it->second.id;
+        else
+            _cachedUsers.erase(it);
+    }
+
+    return -1;
+}
+
+void QPCRRequestHandlerFactory::addCachedUser(const string &token, int id)
+{
+    _cachedUsers.insert(std::make_pair(token, CachedUser(id)));
 }

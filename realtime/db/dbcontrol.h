@@ -34,14 +34,14 @@ public:
     ~DBControl();
 
     Experiment getExperiment(int id);
-    void startExperiment(const Experiment &experiment, bool timeValid);
-    void completeExperiment(const Experiment &experiment, bool timeValid);
+    void startExperiment(const Experiment &experiment);
+    void completeExperiment(const Experiment &experiment);
 
     void addTemperatureLog(const std::vector<TemperatureLog> &logs);
     void addFluorescenceData(const Experiment &experiment, const std::vector<int> &fluorescenceData, bool isRamp = false);
     void addMeltCurveData(const Experiment &experiment, const std::vector<Optics::MeltCurveData> &meltCurveData);
 
-    Settings* getSettings();
+    Settings getSettings();
     void updateSettings(const Settings &settings);
 
     int getUserId(const std::string &token);

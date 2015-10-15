@@ -345,24 +345,24 @@ Ramp* DBControl::getRamp(int stepId)
     return ramp;
 }
 
-void DBControl::startExperiment(const Experiment &experiment, bool timeValid)
+void DBControl::startExperiment(const Experiment &experiment)
 {
     std::vector<soci::statement> statements;
     std::unique_lock<std::mutex> lock(_writeMutex);
 
-    statements.emplace_back((_writeSession->prepare << "UPDATE experiments SET started_at = :started_at, time_valid = :time_valid, calibration_id = (SELECT calibration_id FROM settings) WHERE id = " << experiment.id(),
-                             soci::use(experiment.startedAt()), soci::use(timeValid ? 1 : 0)));
+    statements.emplace_back((_writeSession->prepare << "UPDATE experiments SET started_at = :started_at, time_valid = (SELECT time_valid FROM settings), calibration_id = (SELECT calibration_id FROM settings) WHERE id = " << experiment.id(),
+                             soci::use(experiment.startedAt())));
 
     write(statements);
 }
 
-void DBControl::completeExperiment(const Experiment &experiment, bool timeValid)
+void DBControl::completeExperiment(const Experiment &experiment)
 {
     std::vector<soci::statement> statements;
     std::unique_lock<std::mutex> lock(_writeMutex);
 
-    statements.emplace_back((_writeSession->prepare << "UPDATE experiments SET completed_at = :completed_at, completion_status = :completion_status, completion_message = :completion_message, time_valid = :time_valid WHERE id = "
-                             << experiment.id(), soci::use(experiment.completedAt()), soci::use(experiment.completionStatus()), soci::use(experiment.completionMessage()), soci::use(timeValid ? 1 : 0)));
+    statements.emplace_back((_writeSession->prepare << "UPDATE experiments SET completed_at = :completed_at, completion_status = :completion_status, completion_message = :completion_message, time_valid = (SELECT time_valid FROM settings) WHERE id = "
+                             << experiment.id(), soci::use(experiment.completedAt()), soci::use(experiment.completionStatus()), soci::use(experiment.completionMessage())));
 
     write(statements);
 }
@@ -443,7 +443,7 @@ void DBControl::addMeltCurveData(const Experiment &experiment, const std::vector
     addWriteQueries(queries);
 }
 
-Settings* DBControl::getSettings()
+Settings DBControl::getSettings()
 {
     soci::row result;
     std::unique_lock<std::mutex> lock(_readMutex);
@@ -452,20 +452,96 @@ Settings* DBControl::getSettings()
 
     lock.unlock();
 
-    Settings *settings = new Settings();
+    Settings settings;
 
     if (result.get_indicator("debug") != soci::i_null)
-        settings->setDebugMode(result.get<int>("debug"));
+        settings.setDebugMode(result.get<int>("debug"));
+
+    if (result.get_indicator("time_zone") != soci::i_null)
+        settings.setTimeZone(result.get<std::string>("time_zone"));
+
+    if (result.get_indicator("wifi_ssid") != soci::i_null)
+        settings.setWifiSsid(result.get<std::string>("wifi_ssid"));
+
+    if (result.get_indicator("wifi_password") != soci::i_null)
+        settings.setWifiPassword(result.get<std::string>("wifi_password"));
+
+    if (result.get_indicator("wifi_enabled") != soci::i_null)
+        settings.setWifiEnabled(result.get<int>("wifi_enabled"));
+
+    if (result.get_indicator("calibration_id") != soci::i_null)
+        settings.setCallibrationId(result.get<int>("calibration_id"));
+
+    if (result.get_indicator("time_valid") != soci::i_null)
+        settings.setTimeValid(result.get<int>("time_valid"));
 
     return settings;
 }
 
 void DBControl::updateSettings(const Settings &settings)
 {
+    if (!settings.hasDirty())
+        return;
+
+    std::stringstream stream;
+
+    stream << "UPDATE settings SET ";
+
+    if (settings.isDebugModeDirty())
+    {
+        stream << "debug = " << (settings.debugMode() ? 1 : 0);
+
+        if (settings.isTimeZoneDirty())
+            stream << ", ";
+    }
+
+    if (settings.isTimeZoneDirty())
+    {
+        stream << "time_zone = \'" << settings.timeZone() << '\'';
+
+        if (settings.isWifiSsidDirty())
+            stream << ", ";
+    }
+
+    if (settings.isWifiSsidDirty())
+    {
+        stream << "wifi_ssid = \'" << settings.wifiSsid() << '\'';
+
+        if (settings.isWifiSsidPassword())
+            stream << ", ";
+    }
+
+    if (settings.isWifiSsidDirty())
+    {
+        stream << "wifi_password = \'" << settings.wifiPassword() << '\'';
+
+        if (settings.isWifiEnabledDirty())
+            stream << ", ";
+    }
+
+    if (settings.isWifiEnabledDirty())
+    {
+        stream << "wifi_enabled = " << (settings.wifiEnabled() ? 1 : 0);
+
+        if (settings.isCallibrationIdDirty())
+            stream << ", ";
+    }
+
+    if (settings.isCallibrationIdDirty())
+    {
+        stream << "calibration_id = " << settings.calibrationId();
+
+        if (settings.isTimeValidDirty())
+            stream << ", ";
+    }
+
+    if (settings.isTimeValidDirty())
+        stream << "time_valid = " << (settings.timeValid() ? 1 : 0);
+
     std::vector<soci::statement> statements;
     std::unique_lock<std::mutex> lock(_writeMutex);
 
-    statements.emplace_back((_writeSession->prepare << "UPDATE settings SET debug = :debug, time_valid = :time_valid", soci::use(settings.debugMode() ? 1 : 0), soci::use(settings.timeValid() ? 1 : 0)));
+    statements.emplace_back((_writeSession->prepare << stream.str()));
 
     write(statements);
 }

@@ -38,12 +38,12 @@ void QPCRApplication::initialize(Application&) {
         _wirelessManager.reset(new WirelessManager("wlan0"));
         _timeChecker.reset(new TimeChecker());
 
-        _timeChecker->timeBecameValid.connect([&]()
+        _timeChecker->timeStateChanged.connect([&](bool state)
         {
-            Settings *settings = _experimentController->settings();
-            settings->setTimeValud(true);
+            Settings settings;
+            settings.setTimeValid(state);
 
-            _experimentController->settingsUpdated();
+            _experimentController->updateSettings(settings);
         });
 
         initSignals();

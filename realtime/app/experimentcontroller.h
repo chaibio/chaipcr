@@ -10,6 +10,7 @@
 
 class DBControl;
 class Settings;
+class MachineSettings;
 class TemperatureLog;
 
 namespace Poco { class Timer; class RWLock; }
@@ -49,17 +50,16 @@ public:
     MachineState machineState() const;
     ThermalState thermalState() const;
     Experiment experiment() const;
-    inline Settings* settings() const { return _settings; }
+    inline MachineSettings* settings() const { return _settings; }
 
     StartingResult start(int experimentId);
     void resume();
     void stop();
     void stop(const std::string &errorMessage);
 
-    void settingsUpdated();
-
     void toggleTempLogs();
 
+    void updateSettings(const Settings &settings);
     int getUserId(const std::string &token) const;
 
 private:
@@ -86,7 +86,7 @@ private:
 
     DBControl *_dbControl;
     Experiment _experiment;
-    Settings *_settings;
+    MachineSettings *_settings;
 
     Poco::Timer *_meltCurveTimer;
     Poco::Timer *_holdStepTimer;
