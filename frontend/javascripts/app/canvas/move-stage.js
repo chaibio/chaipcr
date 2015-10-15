@@ -85,13 +85,14 @@ window.ChaiBioTech.ngApp.factory('moveStageRect', [
 
       this.indicator.processMovement = function(stage, C) {
 
-        // Make a clone of the step
-        var stageClone = $.extend({}, stage), tempClosure = [];
         var moveTarget = Math.floor((this.left + 60) / 120);
         var targetStep = C.allStepViews[moveTarget];
-        var targetStage = C.allStepViews[moveTarget].parentStage;
+        var targetStage = targetStep.parentStage;
 
-        if(stage.index !== targetStage.index) {
+        if(stage.index !== targetStage.index && stage.index !== this.currentHit) {
+          // Make a clone of the stage
+          var stageClone = $.extend({}, stage.model), tempClosure = [];
+          var stageStepsClone = $.extend([], stage.model.steps); // this is esential because array will change in the dletestep So keep the copy.
 
           tempClosure = stage.childSteps.map(function(step, index) {
             return step;
@@ -100,13 +101,15 @@ window.ChaiBioTech.ngApp.factory('moveStageRect', [
           tempClosure.forEach(function(step, index) {
             step.parentStage.deleteStep({}, step);
           });
+
+          stageClone.steps = stageStepsClone;
           var data = {
-            stage: stageClone.model
+            stage: stageClone
           };
 
           C.addNewStage(data, targetStage);
 
-          ExperimentLoader.moveStage(stageClone.model.id, targetStage.model.id)
+          ExperimentLoader.moveStage(stageClone.id, targetStage.model.id)
             .then(function(data) {
               console.log("Moved", data);
             });

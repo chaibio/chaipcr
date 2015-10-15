@@ -75,7 +75,7 @@ window.ChaiBioTech.ngApp.factory('events', [
               //evt.target.setVisible(false);
               me = evt.target.step;
               C.stageMoveIndicator.changeText(me.parentStage.index, me.index);
-              C.stageMoveIndicator.currentStage = me.parentStage;
+              C.stageMoveIndicator.currentStep = me;
               C.moveLimit = C.allStepViews[C.allStepViews.length - 1].left + 3;
               C.canvas.bringToFront(C.stageMoveIndicator);
               C.stageMoveIndicator.setLeft(evt.target.left + 4);
@@ -228,6 +228,7 @@ window.ChaiBioTech.ngApp.factory('events', [
 
         if(evt.target) {
 
+          var step;
           switch(evt.target.name) {
 
             case "controlCircleGroup":
@@ -245,7 +246,7 @@ window.ChaiBioTech.ngApp.factory('events', [
             case "dragStepGroup":
 
               var indicate = evt.target;
-              var step = indicate.currentStep;
+              step = indicate.currentStep;
               indicate.setVisible(false);
               step.commonFooterImage.setVisible(true);
               indicate.endPosition = indicate.left;
@@ -256,11 +257,12 @@ window.ChaiBioTech.ngApp.factory('events', [
             case "dragStageGroup":
 
               var indicateStage = evt.target;
-              var stepForStage = indicateStage.currentStage;
+              step = indicateStage.currentStep;
+              //console.log(step);
               indicateStage.setVisible(false);
               //step.commonFooterImage.setVisible(true);
               indicateStage.endPosition = indicateStage.left;
-              indicateStage.processMovement(stepForStage, C);
+              indicateStage.processMovement(step.parentStage, C);
               C.canvas.renderAll();
             break;
 
