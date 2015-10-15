@@ -28,6 +28,12 @@ window.ChaiBioTech.ngApp.factory('events', [
 
       });
 
+      angular.element('.canvas-container').mouseleave(function() {
+        C.indicator.setVisible(false);
+        C.stageMoveIndicator.setVisible(false);
+        C.canvas.renderAll();
+      });
+
       this.selectStep = function(circle) {
 
         $scope.curtain.hide();
@@ -235,7 +241,6 @@ window.ChaiBioTech.ngApp.factory('events', [
               // Right now we have only one item here otherwise switch case
               var me = evt.target.me;
               var targetCircleGroup = evt.target;
-              //appRouter.editStageStep.trigger("stepDrag", me);
               var temp = evt.target.me.temperature.text;
               ExperimentLoader.changeTemperature($scope)
                 .then(function(data) {
@@ -258,9 +263,7 @@ window.ChaiBioTech.ngApp.factory('events', [
 
               var indicateStage = evt.target;
               step = indicateStage.currentStep;
-              //console.log(step);
               indicateStage.setVisible(false);
-              //step.commonFooterImage.setVisible(true);
               indicateStage.endPosition = indicateStage.left;
               indicateStage.processMovement(step.parentStage, C);
               C.canvas.renderAll();

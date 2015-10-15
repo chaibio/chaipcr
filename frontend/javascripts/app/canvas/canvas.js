@@ -232,10 +232,11 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       this.indicator = moveStepRect.getMoveStepRect(this);
       this.stageMoveIndicator = moveStageRect.getMoveStepRect(this);
       this.canvas.add(this.indicator);
+      this.canvas.add(this.stageMoveIndicator);
     };
 
     this.addNewStage = function(data, currentStage) {
-      
+
       // Re factor this part..
       //move the stages, make space.
       var ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus,
