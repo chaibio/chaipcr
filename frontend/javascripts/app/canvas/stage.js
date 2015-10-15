@@ -18,7 +18,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.insertMode = insert;
 
       this.addNewStep = function(data, currentStep) {
-        console.log(this.model);
+
         var width = 120;//(currentStep.index === this.childSteps.length - 1) ? 121 : 120;
         this.myWidth = this.myWidth + width;
         this.stageRect.setWidth(this.myWidth);
@@ -77,7 +77,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         var ordealStatus = currentStep.ordealStatus;
         this.childSteps.splice(start, 1);
         this.model.steps.splice(start, 1);
-        console.log(this.model);
+
         this.parent.allStepViews.splice(ordealStatus - 1, 1);
 
         if(this.childSteps.length > 0) {
