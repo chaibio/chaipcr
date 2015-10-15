@@ -106,12 +106,10 @@ window.ChaiBioTech.ngApp.factory('moveStageRect', [
 
           C.addNewStage(data, targetStage);
 
-          /*
-          ExperimentLoader.moveStep(stepClone.model.id, targetStep.model.id, targetStage.model.id)
+          ExperimentLoader.moveStage(stageClone.model.id, targetStage.model.id)
             .then(function(data) {
               console.log("Moved", data);
             });
-            */
 
         } else { // we dont have to update so we update the move whiteFooterImage to old position.
           //this.setLeft(this.currentStep.left + 4);
