@@ -13,7 +13,9 @@ window.ChaiBioTech.ngApp.directive('actions', [
       link: function(scope, elem, attr) {
 
         scope.actionPopup = false;
-        scope.infiniteHold = false;
+        scope.infiniteHoldStep = false;
+        scope.infiniteHoldStage = false;
+
         scope.$on("dataLoaded", function() {
 
           scope.$watch("actionPopup", function(newVal) {
@@ -30,14 +32,24 @@ window.ChaiBioTech.ngApp.directive('actions', [
 
           scope.$watch("fabricStep.circle.holdTime.text", function(newVal) {
             if(newVal === "∞") {
-              scope.infiniteHold = true;
+              scope.infiniteHoldStep = true;
+              scope.infiniteHoldStage = true;
             } else {
-              scope.infiniteHold = false;
+              scope.infiniteHoldStep = false;
+              scope.infiniteHoldStage = scope.containInfiniteStep(scope.fabricStep.parentStage);
             }
           });
-
-
+          
         });
+
+        scope.containInfiniteStep = function(stage) {
+
+          var lastStep = stage.childSteps[stage.childSteps.length - 1];
+          if(lastStep.circle.holdTime.text === "∞") {
+            return true;
+          }
+          return false;
+        };
 
         scope.addStep = function() {
 
