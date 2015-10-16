@@ -153,7 +153,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
       imgObj.left = stepObj.left - 1;
       imgObj.top = 384;
-      imgObj.selectable = true;
+      imgObj.selectable = false;
       imgObj.hasControls = false;
       imgObj.lockMovementY = true;
       imgObj.visible = false;
