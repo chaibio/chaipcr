@@ -13,12 +13,11 @@ window.ChaiBioTech.ngApp.directive('actions', [
       link: function(scope, elem, attr) {
 
         scope.actionPopup = false;
-
+        scope.infiniteHold = false;
         scope.$on("dataLoaded", function() {
 
           scope.$watch("actionPopup", function(newVal) {
             popupStatus.popupStatusAddStage = scope.actionPopup;
-            console.log(scope.actionPopup);
           });
 
           scope.$watch('step.pause', function(pauseState) {
@@ -28,18 +27,33 @@ window.ChaiBioTech.ngApp.directive('actions', [
               scope.pauseAction = "ADD A";
             }
           });
+
+          scope.$watch("fabricStep.circle.holdTime.text", function(newVal) {
+            if(newVal === "∞") {
+              scope.infiniteHold = true;
+            } else {
+              scope.infiniteHold = false;
+            }
+          });
+
+
         });
 
         scope.addStep = function() {
-          ExperimentLoader.addStep(scope)
-            .then(function(data) {
-              console.log(data);
-              //Now create a new step and insert it...!
-              scope.fabricStep.parentStage.addNewStep(data, scope.fabricStep);
-            });
+
+          if(! scope.infiniteHold) {
+            ExperimentLoader.addStep(scope)
+              .then(function(data) {
+                console.log(data);
+                //Now create a new step and insert it...!
+                scope.fabricStep.parentStage.addNewStep(data, scope.fabricStep);
+              });
+          }
+
         };
 
         scope.deleteStep = function() {
+
           ExperimentLoader.deleteStep(scope)
             .then(function(data) {
               console.log("deleted", data);
@@ -48,12 +62,15 @@ window.ChaiBioTech.ngApp.directive('actions', [
         };
 
         scope.addStage = function(type) {
-          ExperimentLoader.addStage(scope, type)
-            .then(function(data) {
-              console.log("added", data);
-              scope.actionPopup = false;
-              scope.fabricStep.parentStage.parent.addNewStage(data, scope.fabricStep.parentStage);
-            });
+
+          if(! scope.infiniteHold) {
+            ExperimentLoader.addStage(scope, type)
+              .then(function(data) {
+                console.log("added", data);
+                scope.actionPopup = false;
+                scope.fabricStep.parentStage.parent.addNewStage(data, scope.fabricStep.parentStage);
+              });
+          }
         };
 
         scope.addPause = function() {
