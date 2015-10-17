@@ -21,17 +21,29 @@ window.ChaiBioTech.ngApp.directive('general', [
         scope.popUp = false;
         scope.showCycling = false;
         scope.warningMessage = alerts.nonDigit;
-
+        var stepName, noOfCycle;
 
 
         scope.$on("dataLoaded", function() {
           // there is a slight delay for the controller to catch up so wait for it and load
           scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
 
+          var unbindStepName = scope.$watch('step.name', function(newVal) {
+            stepName = newVal;
+            unbindStepName();
+            console.log("check id unbound");
+          });
+
+          var unbindCycleNo = scope.$watch('stage.num_cycles', function(newVal) {
+            noOfCycle = newVal;
+            unbindCycleNo();
+            console.log("check id unbound");
+          });
+
           scope.$watch('popUp', function(newVal) {
             popupStatus.popupStatusGatherData = scope.popUp;
           });
-          
+
           scope.$watch('stage.auto_delta', function(newVal, oldVal) {
             scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
           });
@@ -67,13 +79,18 @@ window.ChaiBioTech.ngApp.directive('general', [
         scope.saveCycle = function() {
 
           scope.stageNoCycleShow = false;
-          if(scope.stage.num_cycles >= scope.stage.auto_delta_start_cycle) {
-            ExperimentLoader.saveCycle(scope);
-            scope.cycleNoBackup = scope.stage.num_cycles;
-          } else {
-            var warningMessage = alerts.noOfCyclesWarning;
-            scope.showMessage(warningMessage);
-            scope.stage.num_cycles = scope.cycleNoBackup;
+
+          if(noOfCycle != scope.stage.num_cycles) {
+
+            if(scope.stage.num_cycles >= scope.stage.auto_delta_start_cycle) {
+              ExperimentLoader.saveCycle(scope);
+              scope.cycleNoBackup = scope.stage.num_cycles;
+            } else {
+              var warningMessage = alerts.noOfCyclesWarning;
+              scope.showMessage(warningMessage);
+              scope.stage.num_cycles = scope.cycleNoBackup;
+            }
+            noOfCycle = scope.stage.num_cycles;
           }
         };
 
@@ -95,7 +112,10 @@ window.ChaiBioTech.ngApp.directive('general', [
         scope.saveStepName = function() {
 
           scope.stepNameShow = false;
-          ExperimentLoader.saveName(scope);
+          if(stepName != scope.step.name) {
+            ExperimentLoader.saveName(scope);
+            stepName = scope.step.name;
+          }
         };
 
         scope.changeDuringStep = function() {
@@ -104,6 +124,7 @@ window.ChaiBioTech.ngApp.directive('general', [
           scope.step.collect_data = ! scope.step.collect_data;
           ExperimentLoader.gatherDuringStep(scope);
         };
+
         scope.hidePopup = function() {
             scope.popUp = false;
         };
