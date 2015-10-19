@@ -149,7 +149,7 @@ bool QPCRRequestHandlerFactory::checkUserAuthorization(const HTTPServerRequest &
 
 int QPCRRequestHandlerFactory::getCachedUserId(const string &token)
 {
-    std::unordered_map<std::string, CachedUser>::iterator it = _cachedUsers.find(token);
+    std::map<std::string, CachedUser>::iterator it = _cachedUsers.find(token);
 
     if (it != _cachedUsers.end())
     {
