@@ -2,7 +2,7 @@
 #define _REQUEST_HANDLER_FACTORY_H_
 
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
-#include <unordered_map>
+#include <map>
 #include <boost/chrono.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -31,7 +31,7 @@ private:
         boost::chrono::system_clock::time_point cacheTime;
     };
 
-    std::unordered_map<std::string, CachedUser> _cachedUsers;
+    std::map<std::string, CachedUser> _cachedUsers;
 };
 
 #endif
