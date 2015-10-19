@@ -12,7 +12,7 @@ public:
     TimeChecker();
     ~TimeChecker();
 
-    boost::signals2::signal<void()> timeBecameValid;
+    boost::signals2::signal<void(bool)> timeStateChanged;
 
 private:
     void timeCheckCallback(Poco::Timer &timer);
@@ -25,6 +25,7 @@ private:
 private:
     Poco::Timer *_timer;
 
+    bool _firstTryState;
     bool _timeState;
 };
 

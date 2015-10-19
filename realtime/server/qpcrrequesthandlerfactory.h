@@ -2,6 +2,8 @@
 #define _REQUEST_HANDLER_FACTORY_H_
 
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
+#include <unordered_map>
+#include <boost/chrono.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class QPCRRequestHandlerFactory
@@ -12,6 +14,24 @@ public:
 
 private:
     bool checkUserAuthorization(const Poco::Net::HTTPServerRequest &request);
+
+    int getCachedUserId(const std::string &token);
+    void addCachedUser(const std::string &token, int id);
+
+private:
+    struct CachedUser
+    {
+        CachedUser(int id)
+        {
+            this->id = id;
+            cacheTime = boost::chrono::system_clock::now();
+        }
+
+        int id;
+        boost::chrono::system_clock::time_point cacheTime;
+    };
+
+    std::unordered_map<std::string, CachedUser> _cachedUsers;
 };
 
 #endif

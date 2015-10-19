@@ -423,7 +423,7 @@
           padding-top: 20px;
           height: 200px;
 
-          .big-button {
+          .big_button {
             width: 243px;
             background-color: white;
             height: 30px;
@@ -431,6 +431,18 @@
             margin-bottom: 12px;
             font-size: 9px;
             font-weight: bold;
+          }
+
+          .big_button_disabled {
+            width: 243px;
+            background-color: white;
+            height: 30px;
+            border: 1px solid #cdcdcd;
+            margin-bottom: 12px;
+            font-size: 9px;
+            font-weight: bold;
+            color: #cdcdcd;
+            cursor: default;
           }
 
           .small-button {

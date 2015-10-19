@@ -34,6 +34,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         newStep.ordealStatus = currentStep.ordealStatus;
 
         this.childSteps.splice(start + 1, 0, newStep);
+        this.model.steps.splice(start + 1, 0, data);
         this.configureStep(newStep, start);
         this.parent.allStepViews.splice(currentStep.ordealStatus, 0, newStep);
 
@@ -75,6 +76,8 @@ window.ChaiBioTech.ngApp.factory('stage', [
         var start = currentStep.index;
         var ordealStatus = currentStep.ordealStatus;
         this.childSteps.splice(start, 1);
+        this.model.steps.splice(start, 1);
+
         this.parent.allStepViews.splice(ordealStatus - 1, 1);
 
         if(this.childSteps.length > 0) {

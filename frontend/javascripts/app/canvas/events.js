@@ -28,11 +28,83 @@ window.ChaiBioTech.ngApp.factory('events', [
 
       });
 
-      this.selectStep = function(circle) {
+      angular.element('.canvas-container').mouseleave(function() {
+        C.indicator.setVisible(false);
+        C.stageMoveIndicator.setVisible(false);
+        C.canvas.renderAll();
+      });
 
+      this.selectStep = function(circle) {
+        C.indicator.setVisible(false);
         $scope.curtain.hide();
         circle.manageClick();
         $scope.applyValuesFromOutSide(circle);
+      };
+
+      this.containInfiniteStep = function(step) {
+
+        var stage = step.parentStage;
+        if(stage.next) {
+          return false;
+        }
+
+        var lastOne = stage.childSteps[stage.childSteps.length - 1];
+        if(lastOne.circle.holdTime.text === "∞") {
+          return true;
+        }
+
+        return false;
+      };
+
+      this.infiniteStep =  function(step) {
+
+        if(step.circle.holdTime.text === "∞") {
+          return true;
+        }
+        return false;
+
+      };
+
+      this.calculateMoveLimit = function(moveElement) {
+
+        var lastStep = C.allStepViews[C.allStepViews.length - 1];
+
+        if(lastStep.circle.holdTime.text === "∞") {
+          if(moveElement === "step") {
+            return ((lastStep.left + 3) - 120);
+          } else if(moveElement === "stage") {
+            return ((lastStep.parentStage.left + 3) - 120);
+          }
+        }
+
+        return lastStep.left + 3;
+      };
+
+      this.onTheMoveDragGroup = function(dragging) {
+
+        var indicator = dragging;
+        if(indicator.left < 35) {
+          indicator.setLeft(35);
+        } else if(indicator.left > C.moveLimit) {
+          indicator.setLeft(C.moveLimit);
+        } else {
+          indicator.setLeft(dragging.left);
+          indicator.setCoords();
+          indicator.onTheMove(C);
+        }
+      };
+
+      this.footerMouseOver = function(indicate, me, moveElement) {
+
+        indicate.changeText(me.parentStage.index, me.index);
+        indicate.currentStep = me;
+        C.moveLimit = that.calculateMoveLimit(moveElement);
+        C.canvas.bringToFront(indicate);
+        indicate.setLeft(me.left + 4);
+        indicate.setCoords();
+        indicate.setVisible(true);
+        C.canvas.renderAll();
+
       };
 
       this.canvas.on("mouse:over", function(evt) {
@@ -43,15 +115,25 @@ window.ChaiBioTech.ngApp.factory('events', [
             case "moveStepImage":
 
               evt.target.setVisible(false);
+              C.stageMoveIndicator.setVisible(false);
               me = evt.target.step;
-              C.indicator.changeText(me.parentStage.index, me.index);
-              C.indicator.currentStep = me;
-              C.moveLimit = C.allStepViews[C.allStepViews.length - 1].left + 3;
-              C.canvas.bringToFront(C.indicator);
-              C.indicator.setLeft(evt.target.left + 4);
-              C.indicator.setCoords();
-              C.indicator.setVisible(true);
-              C.canvas.renderAll();
+              if(! that.infiniteStep(me)) {
+                that.footerMouseOver(C.indicator, me, "step");
+              }
+
+            break;
+
+            case "blackFooter":
+
+            case "commonStep":
+
+              me = evt.target.step;
+              C.indicator.setVisible(false);
+              if(! that.containInfiniteStep(me)) { // If the stage has infinite hold , we cant move it.
+                that.footerMouseOver(C.stageMoveIndicator, me, "stage");
+              }
+
+            break;
           }
         }
       });
@@ -61,20 +143,17 @@ window.ChaiBioTech.ngApp.factory('events', [
           var me;
           switch(evt.target.name) {
 
-            case "dragFooter":
-
-              evt.target.setVisible(false);
-              me = evt.target.step;
-              me.whiteFooterImage.setVisible(true);
-              C.indicator.setVisible(false);
-              C.canvas.renderAll();
-              break;
-
             case "dragStepGroup":
 
               evt.target.setVisible(false);
               me = evt.target.currentStep;
               me.whiteFooterImage.setVisible(true);
+              C.canvas.renderAll();
+              break;
+
+            case "dragStageGroup":
+
+              evt.target.setVisible(false);
               C.canvas.renderAll();
               break;
 
@@ -106,7 +185,7 @@ window.ChaiBioTech.ngApp.factory('events', [
 
             break;
 
-            case "orangeFooter":
+            case "commonStep":
 
               me = evt.target.step;
               that.selectStep(me.circle);
@@ -116,9 +195,15 @@ window.ChaiBioTech.ngApp.factory('events', [
             case "dragStepGroup":
 
               evt.target.startPosition = evt.target.left;
-              C.moveLimit = C.allStepViews[C.allStepViews.length - 1].left + 3;
-              C.canvas.bringToFront(C.indicator);
-              C.canvas.renderAll();
+              //C.moveLimit = C.allStepViews[C.allStepViews.length - 1].left + 3;
+            break;
+
+            case "dragStageGroup":
+
+              evt.target.startPosition = evt.target.left;
+              //C.moveLimit = C.allStepViews[C.allStepViews.length - 1].left + 3;
+              //C.canvas.bringToFront(C.indicator);
+              //C.canvas.renderAll();
 
             break;
 
@@ -130,16 +215,6 @@ window.ChaiBioTech.ngApp.factory('events', [
           circle.parent.parentStage.unSelectStage();
           circle.parent.unSelectStep();
           circle.makeItSmall();
-        }
-      });
-
-      this.canvas.on("mouse:up", function(evt) {
-        if(evt.target) {
-          switch(evt.target.name)  {
-
-            case "dragFooter":
-            break;
-          }
         }
       });
 
@@ -162,19 +237,13 @@ window.ChaiBioTech.ngApp.factory('events', [
             break;
 
             case "dragStepGroup":
-
-              var indicator = evt.target;
-              if(indicator.left < 35) {
-                indicator.setLeft(35);
-              } else if(indicator.left > C.moveLimit) {
-                indicator.setLeft(C.moveLimit);
-              } else {
-                indicator.setLeft(evt.target.left);
-                indicator.setCoords();
-                indicator.onTheMove(C);
-              }
-
+              that.onTheMoveDragGroup(evt.target);
             break;
+
+            case "dragStageGroup":
+              that.onTheMoveDragGroup(evt.target);
+            break;
+
           }
         }
       });
@@ -186,13 +255,13 @@ window.ChaiBioTech.ngApp.factory('events', [
 
         if(evt.target) {
 
+          var step, me;
           switch(evt.target.name) {
 
             case "controlCircleGroup":
-              // Right now we have only one item here otherwise switch case
-              var me = evt.target.me;
+
+              me = evt.target.me;
               var targetCircleGroup = evt.target;
-              //appRouter.editStageStep.trigger("stepDrag", me);
               var temp = evt.target.me.temperature.text;
               ExperimentLoader.changeTemperature($scope)
                 .then(function(data) {
@@ -203,13 +272,24 @@ window.ChaiBioTech.ngApp.factory('events', [
             case "dragStepGroup":
 
               var indicate = evt.target;
-              var step = indicate.currentStep;
+              step = indicate.currentStep;
               indicate.setVisible(false);
               step.commonFooterImage.setVisible(true);
               indicate.endPosition = indicate.left;
               indicate.processMovement(step, C);
               C.canvas.renderAll();
             break;
+
+            case "dragStageGroup":
+
+              var indicateStage = evt.target;
+              step = indicateStage.currentStep;
+              indicateStage.setVisible(false);
+              indicateStage.endPosition = indicateStage.left;
+              indicateStage.processMovement(step.parentStage, C);
+              C.canvas.renderAll();
+            break;
+
           }
 
         }
@@ -233,50 +313,6 @@ window.ChaiBioTech.ngApp.factory('events', [
         C.addStages().setDefaultWidthHeight().addinvisibleFooterToStep().addRampLinesAndCircles();
         C.selectStep();
         C.addMoveStepIndicator();
-        C.canvas.renderAll();
-      });
-
-      /**************************************
-           When a model in the server changed
-           changes like add step/stage or delete step/stage.
-      ***************************************/
-      /*this.canvas.on("modelChanged", function(evtData) {
-        console.log(evtData);
-        var keyVal = Object.keys(evtData)[0];
-
-        if(keyVal == "step") {
-          ChaiBioTech.app.newStepId = evtData[keyVal].id;
-        } else if(keyVal == "stage") {
-          ChaiBioTech.app.newStepId = evtData[keyVal].steps[0].step.id;
-        } else {
-          // Incase we delete a step..!!
-          if(ChaiBioTech.app.selectedStep.previousStep) {
-            var prevStep = ChaiBioTech.app.selectedStep.previousStep;
-            ChaiBioTech.app.newStepId = prevStep.model.get("step").id;
-          } else if(ChaiBioTech.app.selectedStep.nextStep) {
-            var nxtStep = ChaiBioTech.app.selectedStep.nextStep;
-            ChaiBioTech.app.newStepId = nxtStep.model.get("step").id;
-          }
-        }
-
-        C.model.getLatestModel(C.canvas);
-        C.canvas.clear();
-      });
-
-      /**************************************
-           When changed data after add/delete step/stage, we first remove all
-           the data saved.
-      ***************************************/
-      this.canvas.on("latestData", function() {
-        // re instantiate allStepViews. So that we can add fresh data.
-        C.allStepViews = [];
-
-        ChaiBioTech.app.selectedStage = null;
-        ChaiBioTech.app.selectedStep = null;
-        ChaiBioTech.app.selectedCircle = null;
-        // Then we chain the actions so that it adds all the UI stuffs
-        C.addStages().setDefaultWidthHeight().addinvisibleFooterToStep().addRampLinesAndCircles();
-        C.selectStep();
         C.canvas.renderAll();
       });
     };

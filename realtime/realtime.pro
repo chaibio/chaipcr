@@ -133,7 +133,8 @@ HEADERS += \
     server/httpcodehandler.h \
     util/wirelessmanager.h \
     server/wirelessmanagerhandler.h \
-    util/timechecker.h
+    util/timechecker.h \
+    app/machinesettings.h
 
 SOURCES += \
     app/pins.cpp \

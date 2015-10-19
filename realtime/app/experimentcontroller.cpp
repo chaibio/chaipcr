@@ -7,6 +7,7 @@
 #include "maincontrollers.h"
 #include "experimentcontroller.h"
 #include "qpcrapplication.h"
+#include "machinesettings.h"
 
 #define STORE_MELT_CURVE_DATA_INTERVAL 10 * 1000
 
@@ -19,7 +20,7 @@ ExperimentController::ExperimentController()
     _meltCurveTimer = new Poco::Timer();
     _holdStepTimer = new Poco::Timer();
     _logTimer = new Poco::Timer();
-    _settings = _dbControl->getSettings();
+    _settings->setDebugMode(_dbControl->getSettings().debugMode());
 
     LidInstance::getInstance()->startThresholdReached.connect(boost::bind(&ExperimentController::run, this));
 
@@ -84,7 +85,7 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
 
         LidInstance::getInstance()->setTargetTemperature(experiment.protocol()->lidTemperature());
 
-        _dbControl->startExperiment(experiment, _settings->timeValid());
+        _dbControl->startExperiment(experiment);
 
         _machineState = LidHeatingMachineState;
         _experiment = std::move(experiment);
@@ -162,7 +163,7 @@ void ExperimentController::complete()
         _experiment.setCompletionStatus(Experiment::Success);
         _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
 
-        _dbControl->completeExperiment(_experiment, _settings->timeValid());
+        _dbControl->completeExperiment(_experiment);
     }
 
     stopLogging();
@@ -204,7 +205,7 @@ void ExperimentController::stop()
             _experiment.setCompletionStatus(Experiment::Aborted);
             _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
 
-            _dbControl->completeExperiment(_experiment, _settings->timeValid());
+            _dbControl->completeExperiment(_experiment);
         }
 
         state = _machineState;
@@ -241,7 +242,7 @@ void ExperimentController::stop(const std::string &errorMessage)
             _experiment.setCompletionMessage(errorMessage);
             _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
 
-            _dbControl->completeExperiment(_experiment, _settings->timeValid());
+            _dbControl->completeExperiment(_experiment);
         }
 
         _machineState = IdleMachineState;
@@ -472,11 +473,6 @@ void ExperimentController::addLogCallback(Poco::Timer &)
     }
 }
 
-void ExperimentController::settingsUpdated()
-{
-    _dbControl->updateSettings(*_settings);
-}
-
 void ExperimentController::calculateEstimatedDuration()
 {
     Experiment experiment = this->experiment();
@@ -518,6 +514,14 @@ void ExperimentController::calculateEstimatedDuration()
         Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
         _experiment.setEstimatedDuration(std::round(duration / 1000));
     }
+}
+
+void ExperimentController::updateSettings(const Settings &settings)
+{
+    if (settings.isDebugModeDirty())
+        _settings->setDebugMode(settings.debugMode());
+
+    _dbControl->updateSettings(settings);
 }
 
 int ExperimentController::getUserId(const std::string &token) const

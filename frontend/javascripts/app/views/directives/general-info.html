@@ -10,7 +10,7 @@
   <div class="bottom-step-no-cycle-container">
     <div class="bottom-step-no-cycle ostrich" ng-show="showCycling">
     <span class="bottom-step-no-cycle-span" ng-click="clickOnField('stageNoCycleShow', 'bottom-step-no-cycle-edit')">{{stage.num_cycles}}</span>
-    <input type="text" class="bottom-step-no-cycle-edit" ng-blur="saveCycle()" on-enter="saveCycle()" numbers-only="numbers-only" ng-show="stageNoCycleShow" ng-model="stage.num_cycles">
+    <input type="text" class="bottom-step-no-cycle-edit" on-enter="saveCycle()" ng-blur="saveCycle()" numbers-only="numbers-only" ng-show="stageNoCycleShow" ng-model="stage.num_cycles">
     </div>
     <div class="bottom-step-x ostrich" ng-show="showCycling">x</div>
     <div class="bottom-cycles-and-dots sansa" ng-show="showCycling">CYCLES</div>

@@ -77,6 +77,22 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
 
       return delay.promise;
     };
+    this.moveStage = function(id, prev_id) {
+
+      var dataToBeSend = {'prev_id': prev_id},
+      url = "/stages/" + id + "/move";
+      delay = $q.defer();
+
+      $http.post(url, dataToBeSend)
+        .success(function(data) {
+          delay.resolve(data);
+        })
+        .error(function(data) {
+          delay.reject(data);
+        });
+
+      return delay.promise;
+    };
 
     this.saveCycle = function($scope) {
 
