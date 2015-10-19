@@ -1,0 +1,31 @@
+@import './colors.css.scss';
+
+.diagnostic-wizard-state-active {
+
+  font-family: 'Open Sans';
+  color: #000;
+
+  .diagnostic-in-progress {
+
+    h1 {
+      font-weight: 700;
+    }
+
+    h2 {
+      font-size: 40px;
+      font-weight: 700;
+    }
+
+    p {
+      color: $gray;
+      font-size: 14px;
+    }
+
+    button {
+      border: 1px solid $gray;
+      background: #fff;
+      padding: 5px 50px;
+    }
+
+  }
+}
