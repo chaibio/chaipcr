@@ -10,9 +10,10 @@ window.ChaiBioTech.ngApp.directive('onEnter', [
           element.on('keyup', function(evt) {
 
             if(evt.which === 13) {
-              scope.$apply(function (){
+              $(element).blur();
+              /*scope.$apply(function (){
                 scope.$eval(attrs.onEnter);
-              });
+              });*/
             }
           });
         };

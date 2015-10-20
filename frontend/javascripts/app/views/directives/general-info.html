@@ -3,14 +3,14 @@
   <div class="bottom-no-of-stages ostrich">{{fabricStep.parentStage.parent.allStepViews.length | preZero: '/'}}</div>
   <div class="bottom-name-of-step-stage ostrich" ng-click="clickOnField('stepNameShow', 'edit-step-name')">
     <span class="bottom-name-of-step-span" >{{step.name || fabricStep.stepNameText}}</span>
-    <input type="text" class="edit-step-name" on-enter="saveStepName()" ng-blur="saveStepName()" ng-model="step.name" ng-show="stepNameShow">
+    <input type="text" class="edit-step-name" on-enter ng-blur="saveStepName()" ng-model="step.name" ng-show="stepNameShow">
   </div>
   <div class="bottom-stage-name sansa">{{stage.name | uppercase}}</div>
 
   <div class="bottom-step-no-cycle-container">
     <div class="bottom-step-no-cycle ostrich" ng-show="showCycling">
     <span class="bottom-step-no-cycle-span" ng-click="clickOnField('stageNoCycleShow', 'bottom-step-no-cycle-edit')">{{stage.num_cycles}}</span>
-    <input type="text" class="bottom-step-no-cycle-edit" on-enter="saveCycle()" ng-blur="saveCycle()" numbers-only="numbers-only" ng-show="stageNoCycleShow" ng-model="stage.num_cycles">
+    <input type="text" class="bottom-step-no-cycle-edit" on-enter ng-blur="saveCycle()" numbers-only="numbers-only" ng-show="stageNoCycleShow" ng-model="stage.num_cycles">
     </div>
     <div class="bottom-step-x ostrich" ng-show="showCycling">x</div>
     <div class="bottom-cycles-and-dots sansa" ng-show="showCycling">CYCLES</div>
