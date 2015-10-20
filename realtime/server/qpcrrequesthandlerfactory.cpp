@@ -134,7 +134,7 @@ bool QPCRRequestHandlerFactory::checkUserAuthorization(const HTTPServerRequest &
             return true;
         else
         {
-            id = ExperimentController::getInstance()->getUserId(Poco::SHA1Engine::digestToHex(engine.digest()));
+            id = ExperimentController::getInstance()->getUserId(token);
 
             if (id != -1)
             {
