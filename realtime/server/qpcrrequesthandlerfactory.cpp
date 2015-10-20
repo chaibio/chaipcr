@@ -106,6 +106,9 @@ bool QPCRRequestHandlerFactory::checkUserAuthorization(const HTTPServerRequest &
         token = request.get("Authorization");
         token.erase(0, 6); //Remove "Token "
     }
+
+    if (checkUserAuthorization(token))
+        return true;
     else
     {
         std::string query = URI(request.getURI()).getQuery();
@@ -121,30 +124,35 @@ bool QPCRRequestHandlerFactory::checkUserAuthorization(const HTTPServerRequest &
         }
     }
 
-    if (!token.empty())
+    return checkUserAuthorization(token);
+}
+
+bool QPCRRequestHandlerFactory::checkUserAuthorization(string token)
+{
+    if (token.empty())
+        return false;
+
+    Poco::SHA1Engine engine;
+    engine.update(token);
+
+    token = Poco::SHA1Engine::digestToHex(engine.digest());
+
+    int id = getCachedUserId(token);
+
+    if (id != -1)
+        return true;
+    else
     {
-        Poco::SHA1Engine engine;
-        engine.update(token);
-
-        token = Poco::SHA1Engine::digestToHex(engine.digest());
-
-        int id = getCachedUserId(token);
+        id = ExperimentController::getInstance()->getUserId(token);
 
         if (id != -1)
-            return true;
-        else
         {
-            id = ExperimentController::getInstance()->getUserId(token);
-
-            if (id != -1)
-            {
-                addCachedUser(token, id);
-                return true;
-            }
+            addCachedUser(token, id);
+            return true;
         }
     }
 
-    return false;
+    return true;
 }
 
 int QPCRRequestHandlerFactory::getCachedUserId(const string &token)
