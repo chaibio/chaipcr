@@ -41,8 +41,7 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
 
 
         scope.editAndFocus = function(className) {
-          console.log(className);
-
+          
           scope.edit = ! scope.edit;
           editValue = Number(scope.hidden);
 
@@ -53,7 +52,6 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
 
         scope.save = function() {
 
-          console.log(editValue, Number(scope.hidden));
           scope.edit = false;
           if(! isNaN(scope.hidden) && Number(scope.hidden) < 1000) {
             if(editValue !== Number(scope.hidden)) {
