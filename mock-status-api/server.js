@@ -2,7 +2,6 @@ var express = require('express');
 var app = express();
 
 app.use(function (req, res, next) {
-  res.statusCode = 401;
   res.setHeader('Content-Type', 'text/json');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, X-Prototype-Version, X-CSRF-Token, Content-Type, Authorization');
