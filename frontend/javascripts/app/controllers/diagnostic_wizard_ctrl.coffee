@@ -45,7 +45,7 @@ window.ChaiBioTech.ngApp.controller 'DiagnosticWizardCtrl', [
 
       newState = data.experimentController.machine.state
       oldState = oldData?.experimentController?.machine?.state
-      $scope.status = data.experimentController.machine.thermal_state
+      $scope.status = if newState is 'Running' then data.experimentController.machine.thermal_state else newState
 
       if $params.id and !$scope.experiment
         getExperiment (resp) ->

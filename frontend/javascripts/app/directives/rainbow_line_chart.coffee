@@ -54,7 +54,7 @@ window.ChaiBioTech.ngApp.directive 'rainbowLineChart', [
         prev_X = 0;
         prev_Y = 0;
         maxY = getMax_Y($scope.data)
-        maxY = if maxY > 100 then maxY else 100
+        maxY = if maxY > 100 then maxY else 130
         maxX = getMax_X($scope.data)
         rainbow.setNumberRange 0, maxY
         ctx.clearRect(0, 0, width, height)

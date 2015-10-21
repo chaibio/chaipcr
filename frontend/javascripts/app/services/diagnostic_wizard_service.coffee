@@ -1,6 +1,18 @@
 window.ChaiBioTech.ngApp.service 'DiagnosticWizardService', [
   ->
     @temperatureLogs = (temperature_logs) ->
+      temperature_logs = angular.copy temperature_logs
+      last_elapsed_time_in_sec = temperature_logs[temperature_logs.length-1].temperature_log.elapsed_time/1000
+      if last_elapsed_time_in_sec > 30
+        temperature_logs = _.select temperature_logs, (datum) ->
+          datum.temperature_log.elapsed_time/1000 > last_elapsed_time_in_sec - 30
+
+        temperature_logs = _.map temperature_logs, (datum) ->
+          datumCp = datum
+          datumCp.temperature_log.elapsed_time = datum.temperature_log.elapsed_time - (last_elapsed_time_in_sec-30)*1000
+          datumCp
+
+
       getLidTemps: ->
         # if temperature_logs.length > 100
         #   new_temp_logs = []

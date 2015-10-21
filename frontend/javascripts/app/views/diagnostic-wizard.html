@@ -13,18 +13,19 @@
       </div>
     </div>
 
-    <div class="content text-center" ng-show="!experiment">
+    <div class="content text-center" ng-if="!experiment">
       Loading ... <img src="/images/loading.gif">
     </div>
 
-    <div class="content" ng-show="experiment && experiment.started_at && !experiment.completed_at">
+    <div class="content" ng-if="experiment && experiment.started_at && !experiment.completed_at">
       <div class="text-center">
         <h2>Diagnostic in Progress</h2>
         <p>Please do not touch or open device.</p>
-        <h1 ng-show="status === 'Idle'">Idle</h1>
-        <h1 ng-show="status === 'LidHeating'">Heating Lid</h1>
-        <h1 ng-show="status === 'Running'">Running Experiment</h1>
-        <h1 ng-show="status === 'Holding'">Holding</h1>
+        <h1 ng-if="status === 'Idle'">Idle</h1>
+        <h1 ng-if="status === 'LidHeating'">Heating Lid</h1>
+        <h1 ng-if="status === 'Heating'">Heating</h1>
+        <h1 ng-if="status === 'Holding'">Holding</h1>
+        <h1 ng-if="status === 'Cooling'">Cooling</h1>
         <p>Time Elapsed: {{elapsedTime/1000 | secondsDisplay: 'display2'}}</p>
       </div>
       <div class="row">
@@ -35,7 +36,7 @@
           </p>
         </div>
         <div class="col-md-3 col-md-offset-3">
-          <rainbow-line-chart data="lidTemps" width="200" height="100"></rainbow-line-chart>
+          <rainbow-line-chart data="blockTemps" width="200" height="100"></rainbow-line-chart>
           <p class="text-center temp-label">
             <b>BLOCK TEMP.</b> {{10 | degreeCelcius}}
           </p>
@@ -48,7 +49,7 @@
       </div>
     </div>
 
-    <div class="content" ng-show="experiment && experiment.completed_at">
+    <div class="content" ng-if="experiment && experiment.completed_at">
       <div class="text-center">
         <h2>Diagnostic Complete</h2>
         <p>{{experiment.started_at | date: 'MMM. d, yyyy hh:mm:ssa'}}</p>
