@@ -74,6 +74,7 @@ window.ChaiBioTech.ngApp.controller 'DiagnosticWizardCtrl', [
 
 
     $scope.stopExperiment = ->
-      Experiment.stopExperiment(id: $scope.experiment.id)
+      Experiment.stopExperiment(id: $scope.experiment.id).then ->
+        $state.go 'home'
 
 ]
