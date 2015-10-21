@@ -19,6 +19,7 @@ window.ChaiBioTech.ngApp.directive('time', [
       link: function(scope, elem, attr) {
 
         scope.edit = false;
+        var editValue;
 
         scope.$watch("reading", function(val) {
 
@@ -30,6 +31,7 @@ window.ChaiBioTech.ngApp.directive('time', [
         scope.editAndFocus = function(className) {
 
           if(scope.delta) {
+            editValue = scope.hidden;
             scope.edit = ! scope.edit;
             $timeout(function() {
               $('.' + className).focus();
@@ -41,8 +43,9 @@ window.ChaiBioTech.ngApp.directive('time', [
 
           scope.edit = false;
           var newHoldTime = scope.$parent.convertToMinute(scope.hidden);
-
-          if(newHoldTime || newHoldTime === 0) {
+          editValue = scope.$parent.convertToMinute(editValue);
+          
+          if((newHoldTime || newHoldTime === 0) && editValue !== newHoldTime) {
             scope.reading = newHoldTime;
             $timeout(function() {
               ExperimentLoader.changeDeltaTime(scope.$parent).then(function(data) {

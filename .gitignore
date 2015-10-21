@@ -37,3 +37,4 @@ Debug
 /web/public/images/
 /web/public/javascripts/
 /web/public/stylesheets/
+build/*

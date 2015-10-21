@@ -20,6 +20,8 @@ ExperimentController::ExperimentController()
     _meltCurveTimer = new Poco::Timer();
     _holdStepTimer = new Poco::Timer();
     _logTimer = new Poco::Timer();
+    _settings = new MachineSettings();
+    
     _settings->setDebugMode(_dbControl->getSettings().debugMode());
 
     LidInstance::getInstance()->startThresholdReached.connect(boost::bind(&ExperimentController::run, this));

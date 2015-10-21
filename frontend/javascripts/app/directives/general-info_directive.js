@@ -21,24 +21,12 @@ window.ChaiBioTech.ngApp.directive('general', [
         scope.popUp = false;
         scope.showCycling = false;
         scope.warningMessage = alerts.nonDigit;
-        var stepName, noOfCycle;
+        var onClickValue;
 
 
         scope.$on("dataLoaded", function() {
           // there is a slight delay for the controller to catch up so wait for it and load
           scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
-
-          var unbindStepName = scope.$watch('step.name', function(newVal) {
-            stepName = newVal;
-            unbindStepName();
-            console.log("check id unbound");
-          });
-
-          var unbindCycleNo = scope.$watch('stage.num_cycles', function(newVal) {
-            noOfCycle = newVal;
-            unbindCycleNo();
-            console.log("check id unbound");
-          });
 
           scope.$watch('popUp', function(newVal) {
             popupStatus.popupStatusGatherData = scope.popUp;
@@ -69,7 +57,12 @@ window.ChaiBioTech.ngApp.directive('general', [
         // focusElement is the classname of the desired input box to be shown
         scope.clickOnField = function(field, focusElement) {
 
+          //console.log($('.edit-step-name').val(), focusElement);
           scope[field] = true;
+          onClickValue = $('.' + focusElement).val();
+          if($('.' + focusElement).val() === "") {
+            onClickValue = null;
+          }
           // It takes while after render to focus, thats y we have a $timeout
           $timeout(function() {
             $('.' + focusElement).focus();
@@ -79,8 +72,8 @@ window.ChaiBioTech.ngApp.directive('general', [
         scope.saveCycle = function() {
 
           scope.stageNoCycleShow = false;
-
-          if(noOfCycle != scope.stage.num_cycles) {
+          
+          if(parseInt(onClickValue) !== parseInt(scope.stage.num_cycles)) {
 
             if(scope.stage.num_cycles >= scope.stage.auto_delta_start_cycle) {
               ExperimentLoader.saveCycle(scope);
@@ -90,8 +83,9 @@ window.ChaiBioTech.ngApp.directive('general', [
               scope.showMessage(warningMessage);
               scope.stage.num_cycles = scope.cycleNoBackup;
             }
-            noOfCycle = scope.stage.num_cycles;
+
           }
+          noOfCycle = scope.stage.num_cycles;
         };
 
         scope.changeDelta = function() {
@@ -111,10 +105,11 @@ window.ChaiBioTech.ngApp.directive('general', [
 
         scope.saveStepName = function() {
 
+          scope.step.name = (scope.step.name === "") ? null : scope.step.name;
+
           scope.stepNameShow = false;
-          if(stepName != scope.step.name) {
+          if(onClickValue !== scope.step.name) {
             ExperimentLoader.saveName(scope);
-            stepName = scope.step.name;
           }
         };
 
