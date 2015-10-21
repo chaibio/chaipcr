@@ -1,8 +1,8 @@
-<div class="diagnostic-in-progress">
+<div class="diagnostic-in-progress" ng-controller="DiagnosticWizardCtrl">
   <div class="page-layout">
     <div class="header">
       <div class="stripes-and-name">
-        <a toggle-sidemenu>
+        <a ui-sref="home">
           <div class="stripes">
             <div class="stripe"></div>
             <div class="stripe"></div>
@@ -19,6 +19,20 @@
         <p>Please do not touch or open device.</p>
         <h1>Heating Lid</h1>
         <p>Time Elapsed: 00:21:00</p>
+      </div>
+      <div class="row">
+        <div class="col-md-3 col-md-offset-2">
+          <rainbow-line-chart data="lidTemps" width="200" height="100"></rainbow-line-chart>
+          <p class="text-center">
+            <b>LID TEMP.</b> {{10 | degreeCelcius}}
+          </p>
+        </div>
+        <div class="col-md-3 col-md-offset-3">
+          <rainbow-line-chart data="lidTemps" width="200" height="100"></rainbow-line-chart>
+          <p class="text-center">
+            <b>BLOCK TEMP.</b> {{10 | degreeCelcius}}
+          </p>
+        </div>
       </div>
       <div class="text-center">
         <button>

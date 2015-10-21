@@ -41,6 +41,7 @@ var vendorFiles = [
   'app/libs/spin.min.js',
   'app/libs/ladda.min.js',
   'app/libs/angular-ladda.min.js',
+  'app/libs/rainbowvis.js',
 ];
 var appFiles = [
   'welcome.js',
