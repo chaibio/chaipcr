@@ -26,7 +26,7 @@ window.ChaiBioTech.ngApp.directive 'rainbowLineChart', [
       getMax_Y = (data) ->
         ys = _.map data, (datum) ->
           datum.y
-        margin + Math.max.apply Math, ys
+        margin*2 + Math.max.apply Math, ys
 
       getMax_X = (data) ->
         xs = _.map data, (datum) ->
@@ -34,6 +34,7 @@ window.ChaiBioTech.ngApp.directive 'rainbowLineChart', [
         Math.max.apply Math, xs
 
       drawPoint = (d) ->
+        d.y = d.y + margin
         new_X = width * d.x / maxX
         new_Y = height * d.y / maxY
         prev_X = new_X if prev_X is 0
@@ -53,6 +54,7 @@ window.ChaiBioTech.ngApp.directive 'rainbowLineChart', [
         prev_X = 0;
         prev_Y = 0;
         maxY = getMax_Y($scope.data)
+        maxY = if maxY > 100 then maxY else 100
         maxX = getMax_X($scope.data)
         rainbow.setNumberRange 0, maxY
         ctx.clearRect(0, 0, width, height)

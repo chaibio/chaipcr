@@ -22,6 +22,7 @@ window.ChaiBioTech.ngApp.controller 'DiagnosticWizardCtrl', [
       Experiment.getTemperatureData($scope.experiment.id).then (resp) ->
         $scope.lidTemps = DiagnosticWizardService.temperatureLogs(resp.data).getLidTemps()
         $scope.blockTemps = DiagnosticWizardService.temperatureLogs(resp.data).getBlockTemps()
+        $scope.elapsedTime = resp.data[resp.data.length-1]?.temperature_log?.elapsed_time || 0
 
     pollTemperatures = ->
       tempPoll = $interval fetchTempLogs, 3000
@@ -30,11 +31,10 @@ window.ChaiBioTech.ngApp.controller 'DiagnosticWizardCtrl', [
       $interval.cancel tempPoll
       tempPoll = null
 
-    getExperiment = ->
+    getExperiment = (cb) ->
+      cb = cb || angular.noop
       Experiment.get(id: $params.id).$promise.then (resp) ->
-        $scope.experiment = resp.experiment
-        if resp.experiment.started_at and !resp.experiment.completed_at
-          pollTemperatures()
+        cb resp
 
     $scope.$watch ->
       Status.getData()
@@ -45,13 +45,15 @@ window.ChaiBioTech.ngApp.controller 'DiagnosticWizardCtrl', [
 
       newState = data.experimentController.machine.state
       oldState = oldData?.experimentController?.machine?.state
+      $scope.status = data.experimentController.machine.thermal_state
 
       if $params.id and !$scope.experiment
-        Experiment.get(id: $params.id).$promise.then (resp) ->
+        getExperiment (resp) ->
           $scope.experiment = resp.experiment
-
-          pollTemperatures()
-          return
+          if resp.experiment.started_at and !resp.experiment.completed_at
+            pollTemperatures()
+          else
+            fetchTempLogs()
 
       if newState is 'Idle' and !$params.id and !creating
         creating = true
@@ -65,9 +67,13 @@ window.ChaiBioTech.ngApp.controller 'DiagnosticWizardCtrl', [
           Experiment.startExperiment(resp.experiment.id).then ->
             $state.go 'diagnostic-wizard', {id: resp.experiment.id}
 
-      # if newState is 'Idle' and oldState and oldState isnt 'Idle'
-      #   console.log test done
+      if newState is 'Idle' and oldState isnt 'Idle'
+        stopPolling()
+        getExperiment (resp) ->
+          $scope.experiment = resp.experiment
 
 
+    $scope.stopExperiment = ->
+      Experiment.stopExperiment(id: $scope.experiment.id)
 
 ]

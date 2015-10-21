@@ -5,15 +5,19 @@
   font-family: 'Open Sans';
   color: #000;
 
-  .diagnostic-in-progress {
+  .content {
+    padding-left: 35px;
+    padding-right: 35px;
+  }
 
-    h1 {
+    h1, h2 {
       font-weight: 700;
+      margin-top: 70px;
+      margin-bottom: 10px;
     }
 
     h2 {
       font-size: 40px;
-      font-weight: 700;
     }
 
     p {
@@ -21,11 +25,49 @@
       font-size: 14px;
     }
 
+    .temp-label {
+      font-size: 17px;
+      b {
+        font-weight: 800;
+      }
+    }
+
     button {
-      border: 1px solid $gray;
       background: #fff;
+      border: 1px solid $gray;
+      margin-top: 70px;
+      margin-bottom: 50px;
       padding: 5px 50px;
     }
 
-  }
+    .info-container {
+      margin-top: 100px;
+
+      .title {
+        font-size: 20px;
+        border-bottom: 2px solid #000;
+      }
+
+      .info {
+        margin-top: 20px;
+
+        img {
+          cursor: pointer;
+          float: right;
+          margin-top: -5px;
+          width: 30px;
+        }
+
+        .info-text {
+          font-size: 17px;
+        }
+
+        .block-text {
+          color: gray;
+          font-size: 10px;
+          height: 20px;
+        }
+      }
+    }
+
 }

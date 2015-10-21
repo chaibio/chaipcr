@@ -12,10 +12,10 @@ window.ChaiBioTech.ngApp
       days = Math.floor hours/24
       hours = hours - days * 24
 
-      days: days
-      hours: hours
-      mins: mins
-      seconds: seconds
+      days: days || 0
+      hours: hours || 0
+      mins: mins || 0
+      seconds: seconds || 0
 
     @display1 = (seconds) =>
       sec = @getSecondsComponents seconds

@@ -80,7 +80,7 @@ function makeNewLog () {
 
 function startExperiment (id, cb) {
   cb = cb || function () {};
-  connection.query("UPDATE `chaipcr`.`experiments` SET `started_at` = '2015-09-02 00:00:00' WHERE `experiments`.`id` = "+id, cb);
+  connection.query("UPDATE `chaipcr`.`experiments` SET `started_at` = NOW() WHERE `experiments`.`id` = "+id, cb);
 }
 
 function completeExperiment(id, cb) {

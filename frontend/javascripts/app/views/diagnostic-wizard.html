@@ -1,4 +1,4 @@
-<div class="diagnostic-in-progress" ng-controller="DiagnosticWizardCtrl">
+<div ng-controller="DiagnosticWizardCtrl">
   <div class="page-layout">
     <div class="header">
       <div class="stripes-and-name">
@@ -13,31 +13,108 @@
       </div>
     </div>
 
-    <div class="content">
+    <div class="content text-center" ng-show="!experiment">
+      Loading ... <img src="/images/loading.gif">
+    </div>
+
+    <div class="content" ng-show="experiment && experiment.started_at && !experiment.completed_at">
       <div class="text-center">
         <h2>Diagnostic in Progress</h2>
         <p>Please do not touch or open device.</p>
-        <h1>Heating Lid</h1>
-        <p>Time Elapsed: 00:21:00</p>
+        <h1 ng-show="status === 'Idle'">Idle</h1>
+        <h1 ng-show="status === 'LidHeating'">Heating Lid</h1>
+        <h1 ng-show="status === 'Running'">Running Experiment</h1>
+        <h1 ng-show="status === 'Holding'">Holding</h1>
+        <p>Time Elapsed: {{elapsedTime/1000 | secondsDisplay: 'display2'}}</p>
       </div>
       <div class="row">
         <div class="col-md-3 col-md-offset-2">
           <rainbow-line-chart data="lidTemps" width="200" height="100"></rainbow-line-chart>
-          <p class="text-center">
+          <p class="text-center temp-label">
             <b>LID TEMP.</b> {{10 | degreeCelcius}}
           </p>
         </div>
         <div class="col-md-3 col-md-offset-3">
           <rainbow-line-chart data="lidTemps" width="200" height="100"></rainbow-line-chart>
-          <p class="text-center">
+          <p class="text-center temp-label">
             <b>BLOCK TEMP.</b> {{10 | degreeCelcius}}
           </p>
         </div>
       </div>
       <div class="text-center">
-        <button>
+        <button ng-click="stopExperiment()">
           CANCEL
         </button>
+      </div>
+    </div>
+
+    <div class="content" ng-show="experiment && experiment.completed_at">
+      <div class="text-center">
+        <h2>Diagnostic Complete</h2>
+        <p>{{experiment.started_at | date: 'MMM. d, yyyy hh:mm:ssa'}}</p>
+      </div>
+      <div class="info-container">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="title">
+              <b>HEATING</b> {{50|degreeCelcius}}-{{90|degreeCelcius}}
+            </div>
+            <div class="info">
+              <div class="info-text">
+                Avg. Ramp Rate: <b>10&deg;</b>C/s
+                <img src="/images/diagnostic-wizard-x-button.png" alt="">
+              </div>
+              <div class="block-text">
+                Below acceptable rate of {{30|degreeCelcius}}/s
+              </div>
+            </div>
+            <div class="info">
+              <div class="info-text">
+                Total Time: <b>90:01</b>s
+                <img src="/images/diagnostic-wizard-check-button.png" alt="">
+              </div>
+              <div class="block-text"></div>
+            </div>
+            <div class="info">
+              <div class="info-text">
+                Total Time: <b>90:01</b>s
+                <img src="/images/diagnostic-wizard-check-button.png" alt="">
+              </div>
+              <div class="block-text"></div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="title">
+              <b>HEATING</b> {{50|degreeCelcius}}-{{90|degreeCelcius}}
+            </div>
+            <div class="info">
+              <div class="info-text">
+                Avg. Ramp Rate: <b>10&deg;</b>C/s
+                <img src="/images/diagnostic-wizard-x-button.png" alt="">
+              </div>
+              <div class="block-text">
+                Below acceptable rate of {{30|degreeCelcius}}/s
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="title">
+              <b>HEATING</b> {{50|degreeCelcius}}-{{90|degreeCelcius}}
+            </div>
+            <div class="info">
+              <div class="info-text">
+                Avg. Ramp Rate: <b>10&deg;</b>C/s
+                <img src="/images/diagnostic-wizard-x-button.png" alt="">
+              </div>
+              <div class="block-text">
+                Below acceptable rate of {{30|degreeCelcius}}/s
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="text-center">
+        <button>CLOSE</button>
       </div>
     </div>
 
