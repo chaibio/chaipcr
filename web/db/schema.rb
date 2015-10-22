@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150818055417) do
+ActiveRecord::Schema.define(version: 20151022061329) do
 
   create_table "experiment_definitions", force: true do |t|
     t.string "name",            null: false
@@ -36,21 +36,23 @@ ActiveRecord::Schema.define(version: 20150818055417) do
   create_table "fluorescence_data", id: false, force: true do |t|
     t.integer "step_id"
     t.integer "fluorescence_value"
-    t.integer "well_num",           comment: "0-15"
+    t.integer "well_num",                                              comment: "0-15"
     t.integer "cycle_num"
     t.integer "experiment_id"
     t.integer "ramp_id"
+    t.integer "channel",            limit: 1, default: 1, null: false
   end
 
   add_index "fluorescence_data", ["experiment_id", "ramp_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_ramp_cycle_well", unique: true, using: :btree
   add_index "fluorescence_data", ["experiment_id", "step_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_step_cycle_well", unique: true, using: :btree
 
   create_table "melt_curve_data", force: true do |t|
-    t.integer "stage_id",                                   null: false
-    t.integer "well_num",                                   null: false, comment: "0-15"
-    t.decimal "temperature",        precision: 5, scale: 2,              comment: "degrees C"
+    t.integer "stage_id",                                                         null: false
+    t.integer "well_num",                                                         null: false, comment: "0-15"
+    t.decimal "temperature",                  precision: 5, scale: 2,                          comment: "degrees C"
     t.integer "fluorescence_value"
     t.integer "experiment_id"
+    t.integer "channel",            limit: 1,                         default: 1, null: false
   end
 
   add_index "melt_curve_data", ["experiment_id", "stage_id", "well_num", "temperature"], name: "melt_curve_data_index", using: :btree
