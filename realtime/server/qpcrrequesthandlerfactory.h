@@ -14,6 +14,7 @@ public:
 
 private:
     bool checkUserAuthorization(const Poco::Net::HTTPServerRequest &request);
+    bool checkUserAuthorization(std::string token);
 
     int getCachedUserId(const std::string &token);
     void addCachedUser(const std::string &token, int id);

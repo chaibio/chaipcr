@@ -13,6 +13,7 @@ window.ChaiBioTech.ngApp
       body.removeClass "#{fromState.name}-state-active"
 
     $rootScope.$on 'event:auth-loginRequired', (e, rejection)->
+      $window.document.cookie = 'authentication_token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
       $.jStorage.deleteKey 'authToken'
       $window.location.assign '/'
 
