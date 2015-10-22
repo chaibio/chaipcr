@@ -77,6 +77,7 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
 
       return delay.promise;
     };
+
     this.moveStage = function(id, prev_id) {
 
       var dataToBeSend = {'prev_id': prev_id},
