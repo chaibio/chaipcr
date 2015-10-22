@@ -43,8 +43,8 @@ ActiveRecord::Schema.define(version: 20151022061329) do
     t.integer "channel",            limit: 1, default: 1, null: false
   end
 
-  add_index "fluorescence_data", ["experiment_id", "ramp_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_ramp_cycle_well", unique: true, using: :btree
-  add_index "fluorescence_data", ["experiment_id", "step_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_step_cycle_well", unique: true, using: :btree
+  add_index "fluorescence_data", ["experiment_id", "channel", "ramp_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_chan_ramp_cycle_well", unique: true, using: :btree
+  add_index "fluorescence_data", ["experiment_id", "channel", "step_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_chan_step_cycle_well", unique: true, using: :btree
 
   create_table "melt_curve_data", force: true do |t|
     t.integer "stage_id",                                                         null: false
