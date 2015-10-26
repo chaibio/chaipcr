@@ -47,7 +47,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     this.setDefaultWidthHeight = function() {
 
-      this.canvas.setHeight(420);
+      this.canvas.setHeight(400);
       var width = (this.allStepViews.length * 122 > 1024) ? this.allStepViews.length * 120 : 1024;
       this.canvas.setWidth(width + 120);
 
