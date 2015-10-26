@@ -60,6 +60,18 @@
   src: url("/fonts/RobotoRegular.woff");
 }
 
+@font-face {
+  font-family: "dinot";
+  font-weight: normal;
+  src: url("/fonts/dinot/DINOT-Light.otf");
+}
+
+@font-face {
+  font-family: "dinot";
+  font-weight: bold;
+  src: url("/fonts/dinot/DINOT-Bold.otf");
+}
+
 .simplifica {
   font-family: "simplifica";
   font-size: 30px;
