@@ -46,7 +46,7 @@
        return $http.post(host + ":8000/control/stop");
      };
      self.analyze = function (id) {
-       return $http.get(host+":8000/experiments/"+id+"/analyze");
+       return $http.get("/experiments/"+id+"/analyze");
      };
      return self;
    }

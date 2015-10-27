@@ -13,15 +13,42 @@
     '$urlRouterProvider',
     function ($stateProvider, $urlRouterProvider) {
 
-      $urlRouterProvider.otherwise('diagnostic/');
+      $urlRouterProvider.otherwise('diagnostic-initialization');
 
       $stateProvider
+      .state('diagnostic-initialization', {
+        url: '/diagnostic-initialization',
+        templateUrl: './views/loading.html',
+        controller: 'DiagnosticInitCtrl'
+      })
       .state('diagnostic', {
-        url: '/diagnostic/:id',
+        url: '/thermal-performance-diagnostic/:id',
         templateUrl: './views/diagnostic.html',
         controller: 'DiagnosticWizardCtrl'
       });
 
+    }
+  ]);
+
+  App.controller('DiagnosticInitCtrl', [
+    '$scope',
+    'Experiment',
+    '$state',
+    function ($scope, Experiment, $state) {
+      var exp;
+      exp = new Experiment({
+        experiment: {
+          guid: 'thermal_performance_diagnostic'
+        }
+      });
+      exp.$save().then(function(resp) {
+        $scope.experiment = resp.experiment;
+        Experiment.startExperiment(resp.experiment.id).then(function() {
+          $state.go('diagnostic', {
+            id: resp.experiment.id
+          });
+        });
+      });
     }
   ]);
 
@@ -48,11 +75,11 @@
         });
       };
       pollTemperatures = function() {
-        return tempPoll = $interval(fetchTempLogs, 3000);
+        if (!tempPoll) tempPoll = $interval(fetchTempLogs, 3000);
       };
       stopPolling = function() {
         $interval.cancel(tempPoll);
-        return tempPoll = null;
+        tempPoll = null;
       };
       getExperiment = function(cb) {
         cb = cb || angular.noop;
@@ -68,6 +95,7 @@
           console.log(resp.data);
         });
       };
+
       $scope.$watch(function() {
         return Status.getData();
       }, function(data, oldData) {
@@ -84,7 +112,7 @@
         newState = data.experimentController.machine.state;
         oldState = oldData != null ? (ref = oldData.experimentController) != null ? (ref1 = ref.machine) != null ? ref1.state : void 0 : void 0 : void 0;
         $scope.status = newState === 'Running' ? data.experimentController.machine.thermal_state : newState;
-        if ($params.id && !$scope.experiment) {
+        if (!$scope.experiment) {
           getExperiment(function(resp) {
             $scope.experiment = resp.experiment;
             if (resp.experiment.started_at && !resp.experiment.completed_at) {
@@ -94,37 +122,20 @@
             }
           });
         }
-        if (newState === 'Idle' && !$params.id && !creating) {
-          creating = true;
-          exp = new Experiment({
-            experiment: {
-              guid: 'optical_cal'
-            }
-          });
-          exp.$save().then(function(resp) {
-            $scope.experiment = resp.experiment;
-            return Experiment.startExperiment(resp.experiment.id).then(function() {
-              console.log('created');
-              return $state.go('diagnostic', {
-                id: resp.experiment.id
-              });
-            });
-          });
-        }
-        if (newState === 'Idle' && oldState !== 'Idle') {
+        if (newState === 'Idle' && oldState !== 'Idle' && $params.id) {
           stopPolling();
           analyzeExperiment($params.id);
-          return getExperiment(function(resp) {
-            return $scope.experiment = resp.experiment;
+          getExperiment(function(resp) {
+            $scope.experiment = resp.experiment;
           });
         }
       });
 
       $scope.stopExperiment = function() {
-        return Experiment.stopExperiment({
+        Experiment.stopExperiment({
           id: $scope.experiment.id
         }).then(function() {
-          return window.location.assign('/');
+          window.location.assign('/');
         });
       };
     }

@@ -1,0 +1,21 @@
+<div ng-controller="DiagnosticWizardCtrl">
+  <div class="page-layout">
+    <div class="header">
+      <div class="stripes-and-name">
+        <a href="/">
+          <div class="stripes">
+            <div class="stripe"></div>
+            <div class="stripe"></div>
+            <div class="stripe"></div>
+          </div>
+        </a>
+        <div class="name-container truncate">THERMAL PERFORMANCE DIAGNOSTIC</div>
+      </div>
+    </div>
+
+    <div class="content text-center" ng-if="!experiment">
+      Loading ... <img src="/images/loading.gif">
+    </div>
+
+  </div>
+</div>
