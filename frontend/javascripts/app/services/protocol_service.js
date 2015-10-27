@@ -25,6 +25,7 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
     };
 
     this.loadFirstStages = function() {
+      
       return this.protocol.protocol.stages[0].stage;
     };
 
@@ -39,6 +40,7 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
     };
 
     this.update = function(url, dataToBeSend, delay) {
+
       if(dataToBeSend.name !== null) {
         $http.put(url, dataToBeSend)
           .success(function(data) {
@@ -246,6 +248,7 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
     };
 
     this.changePause = function($scope) {
+
       console.log($scope.step.pause);
       var dataToBeSend = {'step': {'pause': $scope.step.pause}},
       url = "/steps/" + $scope.step.id,

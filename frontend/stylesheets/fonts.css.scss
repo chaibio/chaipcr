@@ -61,15 +61,21 @@
 }
 
 @font-face {
-  font-family: "Dinot";
-  font-weight: 400;
-  src: url("/fonts/DINOT-Regular.otf");
+  font-family: "dinot";
+  font-weight: normal;
+  src: url("/fonts/dinot/DINOT-Light.otf");
 }
 
 @font-face {
-  font-family: "Dinot";
-  font-weight: 700;
-  src: url("/fonts/DINOT-Bold.otf");
+  font-family: "dinot";
+  font-weight: 300;
+  src: url("/fonts/dinot/DINOT-Medium.otf");
+}
+
+@font-face {
+  font-family: "dinot";
+  font-weight: bold;
+  src: url("/fonts/dinot/DINOT-Bold.otf");
 }
 
 .simplifica {

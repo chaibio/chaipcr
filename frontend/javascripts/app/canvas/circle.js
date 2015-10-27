@@ -307,7 +307,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
           targetCircleGroup.setTop(this.scrollLength);
           this.manageRampLineMovement(left, this.scrollLength, targetCircleGroup);
         } else {
-          this.stepDataGroup.setTop(top + 58);
+          this.stepDataGroup.setTop(top + 48);
           this.manageRampLineMovement(left, top, targetCircleGroup);
         }
       };

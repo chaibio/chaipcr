@@ -152,7 +152,7 @@ bool QPCRRequestHandlerFactory::checkUserAuthorization(string token)
         }
     }
 
-    return true;
+    return false;
 }
 
 int QPCRRequestHandlerFactory::getCachedUserId(const string &token)

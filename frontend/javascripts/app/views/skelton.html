@@ -1,23 +1,38 @@
 <div menu-overlay sidemenu-template="app/views/experiment/left-menu.html">
   <div class="edit-stage-step-container" ng-controller="StageStepCtrl">
     <div class="top-half noselect">
+      <!-- Top part -->
       <div class="name-on-top">
-        <div class="stripes-and-name">
-          <a toggle-sidemenu>
-            <div class="stripes">
+        <div class="stripe-container">
+          <div class="stripes">
+            <a toggle-sidemenu>
               <div class="stripe"></div>
               <div class="stripe"></div>
               <div class="stripe"></div>
-            </div>
-          </a>
-          <div class="name-container truncate">{{protocol.name}}</div>
+            </a>
+          </div>
+        </div>
+        <div class="top-exp-name">
+          {{protocol.name}}
+        </div>
+        <div class="where-m-I">
+          <!-- This is going to be a directive -->
+          <div class="background-bar">
+            <div class="foreground-bar"></div>
+          </div>
+        </div>
+        <div class="undo-container">
+          <button id="undo-action">UNDO</button>
         </div>
       </div>
-
+      <!-- Top part End-->
+      <!-- Canvas Part -->
       <div class="canvas-containing">
           <canvas class="canvasClass" id="canvas"></canvas>
       </div>
     </div>
+    <!-- Canvas Part End-->
+
     <!-- bottom-half-->
     <div class="bottom-half noselect" >
       <arrow class="previous" action="previous" ng-click="arrowClicked()"></arrow>

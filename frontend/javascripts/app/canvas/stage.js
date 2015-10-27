@@ -11,7 +11,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.model = model;
       this.index = index;
       this.canvas = stage;
-      this.myWidth = (this.model.steps.length * 120);
+      this.myWidth = (this.model.steps.length * 128);
       this.parent = fabricStage;
       this.childSteps = [];
       this.previousStage = this.nextStage = this.noOfCycles = null;
@@ -19,7 +19,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
       this.addNewStep = function(data, currentStep) {
 
-        var width = 120;//(currentStep.index === this.childSteps.length - 1) ? 121 : 120;
+        var width = 128;//(currentStep.index === this.childSteps.length - 1) ? 121 : 120;
         this.myWidth = this.myWidth + width;
         this.stageRect.setWidth(this.myWidth);
         this.roof.setWidth(this.myWidth - 4);
@@ -56,7 +56,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.deleteStep = function(data, currentStep) {
 
         // This methode says what happens in the canvas when a step is deleted
-        var width = 120;//(currentStep.index === this.childSteps.length - 1) ? 121 : 120, selected = null;
+        var width = 128;//(currentStep.index === this.childSteps.length - 1) ? 121 : 120, selected = null;
         this.myWidth = this.myWidth - width;
         this.stageRect.setWidth(this.myWidth);
         this.roof.setWidth(this.myWidth - 4);
@@ -203,7 +203,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.configureStepName = function(thisStep) {
 
         if(thisStep.model.name === null) {
-          thisStep.stepNameText = "STEP " + (thisStep.index + 1);
+          thisStep.stepNameText = "Step " + (thisStep.index + 1);
           thisStep.stepName.text = thisStep.stepNameText;
         } else {
           thisStep.stepName.text = thisStep.model.name;
@@ -240,9 +240,9 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.getLeft = function() {
 
         if(this.previousStage) {
-          this.left = this.previousStage.left + this.previousStage.myWidth + 4;
+          this.left = this.previousStage.left + this.previousStage.myWidth + 8;
         } else {
-          this.left = 32;
+          this.left = 33;
         }
         return this;
       };
@@ -279,7 +279,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         }, null);
 
         if(this.insertMode === false) {
-          stepView.borderRight.setVisible(false);
+          stepView.borderRight.setVisible(true);
         }
       };
 
@@ -292,13 +292,10 @@ window.ChaiBioTech.ngApp.factory('stage', [
           stageGraphics.writeMyName.call(this);
           stageGraphics.writeNoOfCycles.call(this);
           stageGraphics.createStageRect.call(this);
+          stageGraphics.dotsOnStage.call(this);
+          stageGraphics.stageHeader.call(this);
 
-          var stageContents = [this.stageRect, this.roof, this.border, this.stageNo, this.stageName];
-
-          if(this.model.stage_type === "cycling" && this.model.steps.length > 1) {
-            stageContents.push(this.cycleGroup);
-          }
-
+          var stageContents = [this.stageRect, this.roof, this.border, this.stageName]; //this.dots
           stageGraphics.createStageGroup.apply(this, [stageContents]);
           this.canvas.add(this.stageGroup);
           this.addSteps();
@@ -320,15 +317,20 @@ window.ChaiBioTech.ngApp.factory('stage', [
         for(var i = 0; i< length; i++) {
 
           this.childSteps[i].commonFooterImage.setVisible(visible);
-          this.childSteps[i].stepName.setFill(color);
+          //this.childSteps[i].stepName.setFill(color);
         }
       };
 
-      this.changeFillsAndStrokes = function(color)  {
+      this.changeFillsAndStrokes = function(color, strokeWidth)  {
 
         this.roof.setStroke(color);
-        this.stageNo.fill = this.stageName.fill = color;
-        this.cycleNo.fill = this.cycleX.fill = this.cycles.fill = color;
+        this.roof.setStrokeWidth(strokeWidth);
+        this.dots.forEachObject(function(obj) {
+          obj.setFill(color);
+        });
+        this.stageName.fill = color;
+        //this.stageNo.fill = this.stageName.fill = color;
+        //this.cycleNo.fill = this.cycleX.fill = this.cycles.fill = color;
       };
 
       this.selectStage =  function() {
@@ -339,7 +341,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
           this.unSelectStage();
         }
 
-        this.changeFillsAndStrokes("black");
+        this.changeFillsAndStrokes("black", 4);
         this.manageBordersOnSelection("#cc6c00");
         this.manageFooter(true, "black", length);
       };
@@ -349,7 +351,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         var previousSelectedStage = previouslySelected.circle.parent.parentStage;
         var previousLength = previousSelectedStage.childSteps.length;
 
-        previousSelectedStage.changeFillsAndStrokes("white");
+        previousSelectedStage.changeFillsAndStrokes("white", 2);
         previousSelectedStage.manageBordersOnSelection("#ff9f00");
         previousSelectedStage.manageFooter(false, "white", previousLength);
       };

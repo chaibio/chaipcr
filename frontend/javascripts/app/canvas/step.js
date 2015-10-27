@@ -13,7 +13,7 @@ window.ChaiBioTech.ngApp.factory('step', [
       this.parentStage = parentStage;
       this.index = index;
       this.canvas = parentStage.canvas;
-      this.myWidth = 120;
+      this.myWidth = 128;
       this.nextStep = null;
       this.previousStep = null;
       this.gatherDataDuringStep = this.model.collect_data;
@@ -42,7 +42,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.whiteFooterImage.set(leftVal).setCoords();
         this.stepGroup.set(leftVal).setCoords();
 
-        leftVal = {left: this.left + 60};
+        leftVal = {left: this.left + (this.myWidth / 2)};
         this.hitPoint.set(leftVal).setCoords();
 
         this.ordealStatus = this.ordealStatus + action;
@@ -140,7 +140,9 @@ window.ChaiBioTech.ngApp.factory('step', [
         stepGraphics.addBorderRight.call(this);
         this.getUniqueName();
         stepGraphics.rampSpeed.call(this);
+        stepGraphics.numbering.call(this);
         stepGraphics.stepComponents.call(this);
+
         // Add all those components created.
         this.canvas.add(this.stepGroup);
         this.canvas.add(this.rampSpeedGroup);
@@ -162,6 +164,8 @@ window.ChaiBioTech.ngApp.factory('step', [
 
         this.manageBorder("black");
         this.showHideFooter(true);
+        this.stepName.setFill("black");
+        this.numberingText.setFill("black");
       };
 
       this.unSelectStep = function() {
@@ -169,6 +173,8 @@ window.ChaiBioTech.ngApp.factory('step', [
 
         previouslySelectedStep.showHideFooter(false);
         previouslySelectedStep.manageBorderPrevious('#ff9f00');
+        previouslySelectedStep.stepName.setFill("white");
+        previouslySelectedStep.numberingText.setFill("white");
       };
     };
   }

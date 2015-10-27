@@ -13,14 +13,14 @@ window.ChaiBioTech.ngApp.factory('stepTemperature', [
 
         this.text = new fabric.Text(temp +"º", {
           fill: 'black',
-          fontSize: 30,
-          top : this.parent.top + 30,
+          fontSize: 20,
+          top : this.parent.top + 10,
           left: this.parent.left - 15,
-          fontFamily: "Ostrich Sans",
+          fontFamily: "dinot",
           selectable: false,
-          fontWeight: "800"
+          //fontWeight: "800"
         });
-        
+
       };
 
       this.render();

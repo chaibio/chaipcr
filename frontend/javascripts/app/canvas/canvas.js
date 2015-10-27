@@ -38,7 +38,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       this.imageobjects = {};
       if(this.canvas) this.canvas.clear();
       this.canvas = new fabric.Canvas('canvas', {
-        backgroundColor: '#ffb400', selection: false, stateful: true
+        backgroundColor: '#FFB300', selection: false, stateful: true
       });
 
       new events(this, this.$scope); // Fire the events;
@@ -47,7 +47,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     this.setDefaultWidthHeight = function() {
 
-      this.canvas.setHeight(420);
+      this.canvas.setHeight(400);
       var width = (this.allStepViews.length * 122 > 1024) ? this.allStepViews.length * 120 : 1024;
       this.canvas.setWidth(width + 120);
 
@@ -137,15 +137,15 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     this.addImagesC = function(step) {
 
       step.commonFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["common-step.png"]), step, 'commonStep');
-      this.canvas.add(step.commonFooterImage);
+      //this.canvas.add(step.commonFooterImage);
 
       step.darkFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["black-footer.png"]), step, 'blackFooter');
-      this.canvas.add(step.darkFooterImage);
+      //this.canvas.add(step.darkFooterImage);
 
       step.whiteFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["orange-footer.png"]), step, 'moveStepImage');
       step.whiteFooterImage.top = 365;
       step.whiteFooterImage.left = step.left;
-      this.canvas.add(step.whiteFooterImage);
+      //this.canvas.add(step.whiteFooterImage);
 
     };
 
@@ -231,8 +231,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
       this.indicator = moveStepRect.getMoveStepRect(this);
       this.stageMoveIndicator = moveStageRect.getMoveStepRect(this);
-      this.canvas.add(this.indicator);
-      this.canvas.add(this.stageMoveIndicator);
+      //this.canvas.add(this.indicator);
+      //this.canvas.add(this.stageMoveIndicator);
     };
 
     this.addNewStage = function(data, currentStage) {
