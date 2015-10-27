@@ -3,7 +3,6 @@ window.ChaiBioTech.ngApp
 .config [
   '$stateProvider'
   '$urlRouterProvider'
-  '$locationProvider'
   ($stateProvider, $urlRouterProvider) ->
 
       $urlRouterProvider.otherwise("/home");
