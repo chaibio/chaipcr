@@ -5,7 +5,7 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
     this.addRoof = function() {
 
       this.roof = new fabric.Line([0, 25, (this.myWidth), 25], {
-          stroke: 'white', strokeWidth: 2, selectable: false
+          stroke: 'white', strokeWidth: 2, selectable: false, left: 0
         }
       );
       return this;
@@ -17,6 +17,25 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
           stroke: '#ff9f00',  left: 0,  top: 60,  strokeWidth: 2, selectable: false
         }
       );
+      return this;
+    };
+
+    this.dotsOnStage = function() {
+
+      var cordiantes = {
+        "dot1": [1, 1], "dot2": [12, 1], "dot3": [7, 5], "dot4": [1, 10], "dot5": [12, 10],
+      }, smallDotArray = [];
+
+      for(var dot in cordiantes) {
+        var cord = cordiantes[dot];
+        smallDotArray.push(new fabric.Circle({
+          radius: 1, fill: 'white', left: cord[0], top: cord[1], selectable: false, name: "stageDot", originX: "center", originY: "center"
+        }));
+      }
+
+      this.dots = new fabric.Group(smallDotArray, {
+        originX: "left", originY: "top", left: 0, top: 8, evented: false, width: 13, height: 11
+      });
       return this;
     };
 
@@ -54,18 +73,16 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
         noOfCycles = String(noOfCycles);
         text = text + ", " + noOfCycles + "x";
       }
-      console.log(text);
-      //this.header = new fabric.iText({
-      this.stageName.setText(text);
-      //});
 
+      this.stageName.setText(text);
     };
+
     this.writeMyName = function() {
 
-      var stageName = (this.model.name).toUpperCase();
-      stageName = stageName.replace("STAGE", "");
-      this.stageName = new fabric.Text(stageName, {
-          fill: 'white', fontWeight: "400",  fontSize: 12,  top : 8, left: 18, fontFamily: "dinot",  selectable: false,
+      //var stageName = (this.model.name).toUpperCase();
+      //stageName = stageName.replace("STAGE", "");
+      this.stageName = new fabric.Text("", {
+          fill: 'white', fontWeight: "400",  fontSize: 12,  top : 8, left: 1, fontFamily: "dinot",  selectable: false,
         }
       );
       return this;

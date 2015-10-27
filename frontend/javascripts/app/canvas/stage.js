@@ -292,9 +292,10 @@ window.ChaiBioTech.ngApp.factory('stage', [
           stageGraphics.writeMyName.call(this);
           stageGraphics.writeNoOfCycles.call(this);
           stageGraphics.createStageRect.call(this);
+          stageGraphics.dotsOnStage.call(this);
           stageGraphics.stageHeader.call(this);
 
-          var stageContents = [this.stageRect, this.roof, this.border, this.stageName];
+          var stageContents = [this.stageRect, this.roof, this.border, this.stageName]; //this.dots
           stageGraphics.createStageGroup.apply(this, [stageContents]);
           this.canvas.add(this.stageGroup);
           this.addSteps();
@@ -320,12 +321,16 @@ window.ChaiBioTech.ngApp.factory('stage', [
         }
       };
 
-      this.changeFillsAndStrokes = function(color, stroke)  {
+      this.changeFillsAndStrokes = function(color, strokeWidth)  {
 
         this.roof.setStroke(color);
-        this.roof.setStrokeWidth(stroke);
-        this.stageNo.fill = this.stageName.fill = color;
-        this.cycleNo.fill = this.cycleX.fill = this.cycles.fill = color;
+        this.roof.setStrokeWidth(strokeWidth);
+        this.dots.forEachObject(function(obj) {
+          obj.setFill(color);
+        });
+        this.stageName.fill = color;
+        //this.stageNo.fill = this.stageName.fill = color;
+        //this.cycleNo.fill = this.cycleX.fill = this.cycles.fill = color;
       };
 
       this.selectStage =  function() {
