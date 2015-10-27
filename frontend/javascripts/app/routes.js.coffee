@@ -38,10 +38,4 @@ window.ChaiBioTech.ngApp
         url: '/experiments/:id/run-experiment?chart'
         templateUrl: 'app/views/experiment/run-experiment.html'
 
-      .state 'diagnostic-wizard',
-        url: '/diagnostic-wizard/:id'
-        templateUrl: 'app/views/diagnostic-wizard.html'
-
-
-
 ]
