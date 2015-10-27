@@ -11,7 +11,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.model = model;
       this.index = index;
       this.canvas = stage;
-      this.myWidth = (this.model.steps.length * 120);
+      this.myWidth = (this.model.steps.length * 130);
       this.parent = fabricStage;
       this.childSteps = [];
       this.previousStage = this.nextStage = this.noOfCycles = null;
@@ -19,7 +19,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
       this.addNewStep = function(data, currentStep) {
 
-        var width = 120;//(currentStep.index === this.childSteps.length - 1) ? 121 : 120;
+        var width = 130;//(currentStep.index === this.childSteps.length - 1) ? 121 : 120;
         this.myWidth = this.myWidth + width;
         this.stageRect.setWidth(this.myWidth);
         this.roof.setWidth(this.myWidth - 4);
@@ -240,9 +240,9 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.getLeft = function() {
 
         if(this.previousStage) {
-          this.left = this.previousStage.left + this.previousStage.myWidth + 4;
+          this.left = this.previousStage.left + this.previousStage.myWidth + 8;
         } else {
-          this.left = 32;
+          this.left = 33;
         }
         return this;
       };
@@ -292,13 +292,9 @@ window.ChaiBioTech.ngApp.factory('stage', [
           stageGraphics.writeMyName.call(this);
           stageGraphics.writeNoOfCycles.call(this);
           stageGraphics.createStageRect.call(this);
+          stageGraphics.stageHeader.call(this);
 
-          var stageContents = [this.stageRect, this.roof, this.border, this.stageNo, this.stageName];
-
-          if(this.model.stage_type === "cycling" && this.model.steps.length > 1) {
-            stageContents.push(this.cycleGroup);
-          }
-
+          var stageContents = [this.stageRect, this.roof, this.border, this.stageName];
           stageGraphics.createStageGroup.apply(this, [stageContents]);
           this.canvas.add(this.stageGroup);
           this.addSteps();
@@ -324,9 +320,10 @@ window.ChaiBioTech.ngApp.factory('stage', [
         }
       };
 
-      this.changeFillsAndStrokes = function(color)  {
+      this.changeFillsAndStrokes = function(color, stroke)  {
 
         this.roof.setStroke(color);
+        this.roof.setStrokeWidth(stroke);
         this.stageNo.fill = this.stageName.fill = color;
         this.cycleNo.fill = this.cycleX.fill = this.cycles.fill = color;
       };
@@ -339,7 +336,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
           this.unSelectStage();
         }
 
-        this.changeFillsAndStrokes("black");
+        this.changeFillsAndStrokes("black", 4);
         this.manageBordersOnSelection("#cc6c00");
         this.manageFooter(true, "black", length);
       };
@@ -349,7 +346,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         var previousSelectedStage = previouslySelected.circle.parent.parentStage;
         var previousLength = previousSelectedStage.childSteps.length;
 
-        previousSelectedStage.changeFillsAndStrokes("white");
+        previousSelectedStage.changeFillsAndStrokes("white", 2);
         previousSelectedStage.manageBordersOnSelection("#ff9f00");
         previousSelectedStage.manageFooter(false, "white", previousLength);
       };
