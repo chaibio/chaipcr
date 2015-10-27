@@ -2,20 +2,13 @@
 
 # load libraries
 library(plyr)
-library(qpcR)
+#library(qpcR)
 library(reshape2)
 library(RMySQL)
 
 
-# function: set global constants using `<<-`
-set_global <- function(num_wells=16, scaling_factor=9e5) {
-    num_wells <<- num_wells
-    scaling_factor <<- scaling_factor
-    message('user-defined number of wells: ', num_wells)
-    message('scaling factor for water calibration: ', scaling_factor)
-    
-    return(NULL)
-    }
+num_wells <- 16
+scaling_factor <- 9e5
 
 
 # function: load MySQL database and process data
@@ -23,8 +16,13 @@ set_global <- function(num_wells=16, scaling_factor=9e5) {
 
 # function: get data from MySQL database and perform calibration 
 get_data_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
-                           exp_id, stage_id, calib_id # for selecting data to analyze
+                           exp_id, stage_id, calib_id, # for selecting data to analyze
+                           show_running_time=FALSE # option to show time cost to run this function
                            ) {
+    
+    # start counting for running time
+    func_name <- 'get_data_calib'
+    start_time <- proc.time()[['elapsed']]
     
     message('db: ', db_name)
     db_conn <- dbConnect(RMySQL::MySQL(), 
@@ -85,62 +83,36 @@ get_data_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for conn
                         function(row1) scaling_factor
                                            * (row1[,as.character(0:(num_calibd_wells-1))] - calib_water_fluo) 
                                            / (calib_signal_fluo - calib_water_fluo)) # column 'cycle_num' will be automatically retained
-
+    
+    # report time cost for this function
+    end_time <- proc.time()[['elapsed']]
+    if (show_running_time) message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
+    
     return(fluo_calib)
     }
 
 
 # function: baseline subtraction and Ct
 baseline_ct <- function(fluo_calib, 
-                        model, baseline, basecyc, # modlist parameters
+                        model, baselin, basecyc, # modlist parameters
                         type, cp, # getPar parameters
+                        show_running_time=FALSE, # option to show time cost to run this function
+                        
                         ...) {
-    fitted_curves <- modlist(fluo_calib, model=model, baseline=baseline, basecyc=basecyc)
+    # start counting for running time
+    func_name <- 'baseline_ct'
+    start_time <- proc.time()[['elapsed']]
+    
+    # do the work
+    fitted_curves <- modlist(fluo_calib, model=model, baseline=baselin, basecyc=basecyc)
     ct_eff <- getPar(fitted_curves, type=type, cp=cp)
-    return(ct_eff)
+    
+    # report time cost for this function
+    end_time <- proc.time()[['elapsed']]
+    if (show_running_time) message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
+    
+    return(list('fitted_curves'=fitted_curves, 'ct_eff'=ct_eff))
     }
-
-
-
-
-# workflow
-
-
-# user inputs
-
-# set_global
-num_wells <- 16
-scaling_factor <- 9e5
-
-# get_data_calib
-db_usr <- 'usr0'
-db_pwd <- '0rsu'
-db_host <- 'localhost'
-db_port <- 3306
-db_name <- 'josh1' # used: 'jyothi_data', 'josh'
-# option 1
-exp_id <- 10
-stg_id <- 19
-calib_id <- 9
-# option 2
-exp_id <- 23
-stg_id <- 42
-calib_id <- 9
-
-
-# baseline_ct
-model <- l4
-baseline <- 'lin'
-basecyc <- 1:5
-type <- 'curve'
-cp <- 'cpD2'
-
-
-# standard operations
-set_global(num_wells, scaling_factor)
-fluo_calib <- get_data_calib(db_usr, db_pwd, db_host, db_port, db_name,
-                             exp_id, stage_id, calib_id) 
-ct_eff <- baseline_ct(fluo_calib, model, baseline, basecyc, type, cp)
 
 
 
