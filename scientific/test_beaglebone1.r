@@ -1,26 +1,12 @@
 # test_beaglebone1
 
 
-# load dependencies from qpcR but not the whole package
-
-setwd('/root/xqrm/qpcR') # beaglebone
-
-library(MASS)
-library(minpack.lm)
-#library(rgl)
-library(robustbase)
-library(Matrix)
-library(DBI)
-
-qpcR_funcs <- c('Cy0.R', 'eff.R', 'efficiency.R', 'expfit.R', 'getPar.r', 'KOD.r', 'midpoint.R', 'modlist.r', 'pcrfit.r', 'replist.r', 'resVar.R', 'RMSE.R', 'sliwin.R', 'takeoff.R', 'utils.R')
-dummy <- lapply(qpcR_funcs, source)
-
-load('sysdata.rda')
+setwd('/root/xqrm') # beaglebone
 
 
 # workflow
 
-source('/root/xqrm/amp_cal.r')
+source('amp_cal.r')
 
 
 # user inputs

@@ -7,6 +7,22 @@ library(reshape2)
 library(RMySQL)
 
 
+# load dependencies from qpcR but not the whole package
+
+library(MASS)
+library(minpack.lm)
+#library(rgl)
+library(robustbase)
+library(Matrix)
+library(DBI)
+
+qpcR_funcs <- c('Cy0.R', 'eff.R', 'efficiency.R', 'expfit.R', 'getPar.r', 'KOD.r', 'midpoint.R', 'modlist.r', 'pcrfit.r', 'replist.r', 'resVar.R', 'RMSE.R', 'sliwin.R', 'takeoff.R', 'utils.R')
+dummy <- lapply(paste('qpcR', qpcR_funcs, sep='/'), source)
+
+load('qpcR/sysdata.rda')
+
+
+# set constants
 num_wells <- 16
 scaling_factor <- 9e5
 
