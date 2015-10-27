@@ -4,7 +4,7 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
 
     this.addRoof = function() {
 
-      this.roof = new fabric.Line([0, 25, (this.myWidth), 25], {
+      this.roof = new fabric.Line([0, 24, (this.myWidth), 24], {
           stroke: 'white', strokeWidth: 2, selectable: false, left: 0
         }
       );
@@ -13,8 +13,8 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
 
     this.borderLeft = function() {
 
-      this.border =  new fabric.Line([0, 0, 0, 342], {
-          stroke: '#ff9f00',  left: 0,  top: 60,  strokeWidth: 2, selectable: false
+      this.border =  new fabric.Line([0, 70, 0, 390], {
+          stroke: '#ff9f00',  left: 0, strokeWidth: 2, selectable: false
         }
       );
       return this;
@@ -119,7 +119,7 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
     this.createStageRect = function() {
 
       this.stageRect = new fabric.Rect({
-          left: 0,  top: 0, fill: '#ffb400',  width: this.myWidth,  height: 384,  selectable: false
+          left: 0,  top: 0, fill: '#FFB300',  width: this.myWidth,  height: 400,  selectable: false
         }
       );
 

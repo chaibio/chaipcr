@@ -11,7 +11,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.model = model;
       this.index = index;
       this.canvas = stage;
-      this.myWidth = (this.model.steps.length * 130);
+      this.myWidth = (this.model.steps.length * 128);
       this.parent = fabricStage;
       this.childSteps = [];
       this.previousStage = this.nextStage = this.noOfCycles = null;
@@ -19,7 +19,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
       this.addNewStep = function(data, currentStep) {
 
-        var width = 130;//(currentStep.index === this.childSteps.length - 1) ? 121 : 120;
+        var width = 128;//(currentStep.index === this.childSteps.length - 1) ? 121 : 120;
         this.myWidth = this.myWidth + width;
         this.stageRect.setWidth(this.myWidth);
         this.roof.setWidth(this.myWidth - 4);
@@ -56,7 +56,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.deleteStep = function(data, currentStep) {
 
         // This methode says what happens in the canvas when a step is deleted
-        var width = 120;//(currentStep.index === this.childSteps.length - 1) ? 121 : 120, selected = null;
+        var width = 128;//(currentStep.index === this.childSteps.length - 1) ? 121 : 120, selected = null;
         this.myWidth = this.myWidth - width;
         this.stageRect.setWidth(this.myWidth);
         this.roof.setWidth(this.myWidth - 4);
@@ -203,7 +203,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.configureStepName = function(thisStep) {
 
         if(thisStep.model.name === null) {
-          thisStep.stepNameText = "STEP " + (thisStep.index + 1);
+          thisStep.stepNameText = "Step " + (thisStep.index + 1);
           thisStep.stepName.text = thisStep.stepNameText;
         } else {
           thisStep.stepName.text = thisStep.model.name;
@@ -279,7 +279,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         }, null);
 
         if(this.insertMode === false) {
-          stepView.borderRight.setVisible(false);
+          stepView.borderRight.setVisible(true);
         }
       };
 
@@ -317,7 +317,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         for(var i = 0; i< length; i++) {
 
           this.childSteps[i].commonFooterImage.setVisible(visible);
-          this.childSteps[i].stepName.setFill(color);
+          //this.childSteps[i].stepName.setFill(color);
         }
       };
 

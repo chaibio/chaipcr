@@ -4,10 +4,14 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
 
     this.addName = function() {
 
-      var stepName = (this.model.name) ? (this.model.name).toUpperCase() : "STEP " +(this.index + 1);
+      var stepName = "Step " +(this.index + 1);
+      if(this.model.name) {
+        stepName = (this.model.name).charAt(0).toUpperCase() + (this.model.name).slice(1).toLowerCase();
+      }
+
       this.stepNameText = stepName;
       this.stepName = new fabric.Text(stepName, {
-          fill: 'white',  fontSize: 9,  top : -4,  left: 3,  fontFamily: "Open Sans",  selectable: false,
+          fill: 'white',  fontSize: 12,  top : 20,  left: -1,  fontFamily: "dinot",  selectable: false,
           originX: 'left', originY: 'top'
         }
       );
@@ -15,10 +19,25 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
       return this;
     };
 
+    this.numbering = function() {
+
+      var thisIndex = (this.index < 9) ? "0" + (this.index + 1) : (this.index + 1),
+      noofSteps = this.parentStage.model.steps.length;
+      thisLength = (noofSteps < 10) ? "0" + noofSteps : noofSteps;
+      text = thisIndex + "/" + thisLength;
+
+      this.numberingText = new fabric.Text(text, {
+          fill: 'white',  fontSize: 12,  top : 7,  left: -1,  fontFamily: "dinot",  selectable: false,
+          originX: 'left', originY: 'top'
+        }
+      );
+      return this;
+    };
+
     this.addBorderRight = function() {
 
-      this.borderRight = new fabric.Line([0, 0, 0, 342], {
-          stroke: '#ff9f00',  left: (this.myWidth - 2),  top: 7, strokeWidth: 1, selectable: false,
+      this.borderRight = new fabric.Line([-2, 42, -2, 362], {
+          stroke: '#ff9f00',  left: (this.myWidth - 2), strokeWidth: 1, selectable: false,
           originX: 'left', originY: 'top'
         }
       );
@@ -62,12 +81,12 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
       });
 
       this.stepRect = new fabric.Rect({
-          fill: '#ffb400',  width: this.myWidth,  height: 340,  selectable: false,  name: "step", me: this
+          fill: '#FFB300',  width: this.myWidth,  height: 363,  selectable: false,  name: "step", me: this
         }
       );
 
-      this.stepGroup = new fabric.Group([this.stepRect, this.stepName, this.borderRight], {
-        left: this.left || 32,  top: 44,  selectable: false,  hasControls: false,
+      this.stepGroup = new fabric.Group([this.stepRect, this.numberingText, this.stepName, this.borderRight], {
+        left: this.left || 33,  top: 28,  selectable: false,  hasControls: false,
         hasBoarders: false, name: "stepGroup",  me: this, originX: 'left', originY: 'top'
       });
     };

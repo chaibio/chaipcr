@@ -21,10 +21,10 @@ window.ChaiBioTech.ngApp.service('stepEvents',[
 
         var step = $scope.fabricStep;
         if(step.model.name) {
-          step.stepName.text = (step.model.name).toUpperCase();
+          step.stepName.text = (step.model.name).charAt(0).toUpperCase() + (step.model.name).slice(1).toLowerCase();
         } else {
-          step.stepName.text = "STEP " + (step.index + 1);
-          step.stepNameText =  "STEP " + (step.index + 1);
+          step.stepName.text = "Step " + (step.index + 1);
+          step.stepNameText =  "Step " + (step.index + 1);
         }
 
         canvas.renderAll();

@@ -12,11 +12,11 @@ window.ChaiBioTech.ngApp.factory('stepHoldTime', [
 
         this.text = new fabric.Text(this.formatHoldTime(), {
           fill: 'black',
-          fontSize: 30,
-          top : this.parent.top + 30,
+          fontSize: 20,
+          top : this.parent.top + 10,
           left: this.parent.left + 40,
-          fontFamily: "Ostrich Sans",
-          fontWeight: 'normal',
+          fontFamily: "dinot",
+          //fontWeight: 'normal',
           selectable: false
         });
       };
@@ -27,7 +27,7 @@ window.ChaiBioTech.ngApp.factory('stepHoldTime', [
         var holdTimeMinute = (this.holdTime % 60);
 
         holdTimeMinute = (holdTimeMinute < 10) ? "0" + holdTimeMinute : holdTimeMinute;
-        
+
         return holdTimeHour + ":" + holdTimeMinute;
       };
 
