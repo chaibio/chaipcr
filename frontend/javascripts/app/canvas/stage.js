@@ -300,6 +300,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
         this.border.setStroke(color);
         this.childSteps[this.childSteps.length - 1].borderRight.setStroke(color);
+        this.childSteps[this.childSteps.length - 1].borderRight.setStrokeWidth(2);
         //this.borderRight.setStroke(color);
         /*if(this.nextStage) {
           this.nextStage.border.setStroke(color);
