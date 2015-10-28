@@ -67,6 +67,7 @@
       fetchingTemps = false;
       fetchTempLogs = function() {
         if(!fetchingTemps) {
+          fetchingTemps = true;
           Experiment.getTemperatureData($scope.experiment.id).then(function(resp) {
             var ref, ref1;
             if (resp.data.length === 0) return;
