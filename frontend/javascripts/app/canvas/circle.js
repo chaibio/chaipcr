@@ -186,7 +186,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         this.circleGroup = new circleGroup(
           [
-            this.outerMostCircle = new outerMostCircle(),
+            //this.outerMostCircle = new outerMostCircle(),
             this.outerCircle = new outerCircle(),
             this.circle = new centerCircle(),
             this.littleCircleGroup = new littleCircleGroup(
@@ -226,9 +226,10 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         this.circle.setStroke("#ffb400");
         this.outerCircle.setStroke("black");
-        this.outerCircle.strokeWidth = 7;
+        this.outerCircle.strokeWidth = 5;
         //this.stepDataGroup.setVisible(false); // Change temperature display
-        this.outerMostCircle.visible = this.littleCircleGroup.visible = true;
+        //this.outerMostCircle.visible = this.littleCircleGroup.visible = true;
+        this.littleCircleGroup.visible = true;
       };
 
       this.makeItSmall = function() {
@@ -237,11 +238,12 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         this.circle.setStroke("white");
         this.circle.setFill('#ffb400');
-        this.circle.radius = 13;
-        this.circle.strokeWidth = 10;
+        this.circle.setRadius(11);
+        this.circle.setStrokeWidth(8);
         this.outerCircle.setStroke(null);
         this.stepDataGroup.setVisible(true);
-        this.littleCircleGroup.visible = this.outerMostCircle.visible = false;
+        //this.littleCircleGroup.visible = this.outerMostCircle.visible = false;
+        this.littleCircleGroup.visible = false;
 
         if(this.model.collect_data) {
           this.circle.setFill("white");

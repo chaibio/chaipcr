@@ -2,7 +2,7 @@ window.ChaiBioTech.ngApp.factory('circleMaker', [
   function() {
     return function(left) {
       return new fabric.Circle({
-        radius: 3,
+        radius: 2,
         fill: 'white',
         left: left,
         selectable: false,
