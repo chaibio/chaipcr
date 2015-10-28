@@ -110,7 +110,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
           selected = (this.previousStage) ? this.previousStage.childSteps[this.previousStage.childSteps.length - 1] : this.nextStage.childSteps[0];
           this.parent.allStageViews.splice(this.index, 1);
           this.updateStageData(-1);
-
+          console.log("lats dude", selected);
           //if(! selected.parentStage.nextStage && this.index !== 0) { //we are exclusively looking for last stage
             //selected.parentStage.addBorderRight();
             //selected.borderRight.setVisible(false);
@@ -340,9 +340,11 @@ window.ChaiBioTech.ngApp.factory('stage', [
         var previousSelectedStage = previouslySelected.circle.parent.parentStage;
         var previousLength = previousSelectedStage.childSteps.length;
 
-        previousSelectedStage.changeFillsAndStrokes("white", 2);
-        previousSelectedStage.manageBordersOnSelection("#ff9f00");
-        previousSelectedStage.manageFooter(false, "white", previousLength);
+        if(previousLength > 0) {
+          previousSelectedStage.changeFillsAndStrokes("white", 2);
+          previousSelectedStage.manageBordersOnSelection("#ff9f00");
+          previousSelectedStage.manageFooter(false, "white", previousLength);
+        }
       };
     };
 
