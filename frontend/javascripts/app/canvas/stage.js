@@ -173,7 +173,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
           currentStage = currentStage.nextStage;
         }
 
-        currentStage.borderRight.set({left: currentStage.myWidth + currentStage.left + 4 }).setCoords();
+        //currentStage.borderRight.set({left: currentStage.myWidth + currentStage.left + 4 }).setCoords();
       };
 
       this.updateStageData = function(action) {
@@ -247,11 +247,6 @@ window.ChaiBioTech.ngApp.factory('stage', [
         return this;
       };
 
-      this.addBorderRight = function() {
-
-        stageGraphics.addBorderRight.call(this);
-      };
-
       this.addSteps = function() {
 
         var stepView, that = this;
@@ -304,19 +299,20 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.manageBordersOnSelection = function(color) {
 
         this.border.setStroke(color);
-
-        if(this.nextStage) {
+        this.childSteps[this.childSteps.length - 1].borderRight.setStroke(color);
+        //this.borderRight.setStroke(color);
+        /*if(this.nextStage) {
           this.nextStage.border.setStroke(color);
         } else {
           this.borderRight.setStroke(color);
-        }
+        }*/
       };
 
       this.manageFooter = function(visible, color, length) {
 
         for(var i = 0; i< length; i++) {
 
-          this.childSteps[i].commonFooterImage.setVisible(visible);
+          //this.childSteps[i].commonFooterImage.setVisible(visible);
           //this.childSteps[i].stepName.setFill(color);
         }
       };

@@ -42,11 +42,11 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
     //This is a special case only for the last stage
     this.addBorderRight = function() {
 
-        this.borderRight = new fabric.Line([0, 0, 0, 342], {
-          stroke: '#ff9f00',  left: (this.myWidth + this.left + 2) || 122,  top: 60,  strokeWidth: 2, selectable: false
+        this.borderRight = new fabric.Line([0, 70, 0, 390], {
+          stroke: 'green',  left: 150, strokeWidth: 2, selectable: false
         }
       );
-      this.canvas.add(this.borderRight);
+      //this.canvas.add(this.borderRight);
       return this;
     };
 

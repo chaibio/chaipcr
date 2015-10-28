@@ -97,18 +97,18 @@ window.ChaiBioTech.ngApp.factory('step', [
       this.manageBorder = function(color) {
 
         //if(this.borderRight.visible === false) { // Means this is the last step in the stage
-        if(this.parentStage.childSteps.length - 1 === this.index) {
+        this.borderRight.setStroke(color);
+        if(this.previousStep) {
+          this.previousStep.borderRight.stroke = color;
+        } else {
+          this.parentStage.border.stroke = color;
+        }
+        /*if(this.parentStage.childSteps.length - 1 === this.index) {
 
           if(this.previousStep) {
             this.previousStep.borderRight.stroke = color;
           } else {
             this.parentStage.border.stroke = color;
-          }
-
-          if(this.parentStage.nextStage) {
-            this.parentStage.nextStage.border.stroke = color;
-          } else {
-            this.parentStage.borderRight.stroke = color;
           }
 
         } else {
@@ -121,7 +121,7 @@ window.ChaiBioTech.ngApp.factory('step', [
             this.parentStage.border.stroke = color;
           }
 
-        }
+        }*/
       };
 
       this.manageBorderPrevious = function(color) {
