@@ -96,10 +96,12 @@
         });
       };
       analyzeExperiment = function () {
-        Experiment.analyze($params.id).then(function (resp) {
-          $scope.analyzedExp = resp.data;
-          console.log(resp.data);
-        });
+        if (!$scope.analyzedExp) {
+          Experiment.analyze($params.id).then(function (resp) {
+            $scope.analyzedExp = resp.data;
+            console.log(resp.data);
+          });
+        }
       };
 
       $scope.$watch(function() {
