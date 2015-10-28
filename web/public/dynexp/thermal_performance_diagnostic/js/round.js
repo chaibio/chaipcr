@@ -6,7 +6,7 @@
     function() {
       return function(input, numDigit) {
         var num;
-        num = parseFloat(input);
+        num = parseFloat(input) || 0;
         return num.toFixed(numDigit);
       };
     }
