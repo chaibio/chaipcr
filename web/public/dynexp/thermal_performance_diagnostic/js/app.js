@@ -55,7 +55,7 @@
   App.controller('DiagnosticWizardCtrl', [
     '$scope', 'Experiment', 'Status', '$interval', 'DiagnosticWizardService', '$stateParams', '$state',
     function($scope, Experiment, Status, $interval, DiagnosticWizardService, $params, $state) {
-      var creating, fetchTempLogs, getExperiment, pollTemperatures, stopPolling, tempPoll, analyzeExperiment;
+      var fetchingTemps, fetchTempLogs, getExperiment, pollTemperatures, stopPolling, tempPoll, analyzeExperiment;
       Status.startSync();
       $scope.$on('$destroy', function() {
         Status.stopSync();
