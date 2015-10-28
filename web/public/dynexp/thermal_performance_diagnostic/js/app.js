@@ -95,8 +95,8 @@
           return cb(resp);
         });
       };
-      analyzeExperiment = function (id) {
-        Experiment.analyze(id).then(function (resp) {
+      analyzeExperiment = function () {
+        Experiment.analyze($params.id).then(function (resp) {
           $scope.analyzedExp = resp.data;
           console.log(resp.data);
         });
@@ -122,15 +122,18 @@
           getExperiment(function(resp) {
             $scope.experiment = resp.experiment;
             if (resp.experiment.started_at && !resp.experiment.completed_at) {
-              return pollTemperatures();
-            } else {
-              return fetchTempLogs();
+              pollTemperatures();
+            }
+            if (resp.experiment.started_at && resp.experiment.completed_at) {
+              fetchTempLogs();
+              analyzeExperiment();
             }
           });
         }
         if (newState === 'Idle' && oldState !== 'Idle' && $params.id) {
           stopPolling();
-          analyzeExperiment($params.id);
+          Status.stopSync();
+          analyzeExperiment();
           getExperiment(function(resp) {
             $scope.experiment = resp.experiment;
           });
