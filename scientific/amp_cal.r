@@ -16,7 +16,15 @@ library(robustbase)
 library(Matrix)
 library(DBI)
 
-qpcR_funcs <- c('Cy0.R', 'eff.R', 'efficiency.R', 'expfit.R', 'getPar.r', 'KOD.r', 'midpoint.R', 'modlist.r', 'pcrfit.r', 'replist.r', 'resVar.R', 'RMSE.R', 'sliwin.R', 'takeoff.R', 'utils.R')
+
+# qpcR_funcs <- c( # selected functions. Resulting in empty output of ct_eff
+                # 'modlist_R1.r', 'utils_R1.R', # customized
+                # #'modlist.r', 'utils.R', # original
+                # 'Cy0.R', 'eff.R', 'efficiency.R', 'expfit.R', 'getPar.r', 'KOD.r', 'midpoint.R', 'pcrfit.r', 'replist.r', 'resVar.R', 'RMSE.R', 'sliwin.R', 'takeoff.R')
+qpcR_funcs <- c( # all functions. Resulting in normal output of ct_eff
+                'modlist_R1.r', 'utils_R1.R', # customized
+                #'modlist.r', 'utils.R', # original
+                'AICc.R', 'akaike.weights.R', 'calib.r', 'Cy0.R', 'eff.R', 'efficiency.R', 'evidence.R', 'expcomp.R', 'expfit.R', 'fitchisq.r', 'getPar.r', 'is.outlier.r', 'KOD.r', 'llratio.r', 'LOF.test.r', 'LRE.r', 'maxRatio.r', 'meltcurve.r', 'midpoint.R', 'mselect.r', 'pcrbatch.r', 'pcrboot.r', 'pcrfit.r', 'pcrGOF.R', 'pcrimport.R', 'pcrimport2.R', 'pcropt1.R', 'pcrpred.R', 'pcrsim.r', 'plot.pcrfit.r', 'predict.pcrfit.r', 'PRESS.R', 'propagate.R', 'qpcR.news.r', 'ratiobatch.r', 'ratiocalc.r', 'ratioPar.r', 'refmean.R', 'replist.r', 'resplot.R', 'resVar.R', 'RMSE.R', 'Rsq.ad.r', 'Rsq.R', 'RSS.R', 'sliwin.R', 'takeoff.R', 'update.pcrfit.r') # dir('E:/WVU1/Dropbox/pRgRamNotes/R_resources/qpcR/R') and remove 'sysdata.rda'
 dummy <- lapply(paste('qpcR', qpcR_funcs, sep='/'), source)
 
 load('qpcR/sysdata.rda')
@@ -119,15 +127,23 @@ baseline_ct <- function(fluo_calib,
     func_name <- 'baseline_ct'
     start_time <- proc.time()[['elapsed']]
     
-    # do the work
-    fitted_curves <- modlist(fluo_calib, model=model, baseline=baselin, basecyc=basecyc)
-    ct_eff <- getPar(fitted_curves, type=type, cp=cp)
+    # using customized modlist and baseline functions
+    mod_R1 <- modlist(fluo_calib, model=model, baseline=baselin, basecyc=basecyc)
+    mod_ori <- mod_R1[['ori']] # original output from qpcR function modlist
+    bl_info <- mod_R1[['bl_info']] # baseline information that original modlist does not output
+    
+    # using original modlist and baseline functions
+    # mod_ori <- modlist(fluo_calib, model=model, baseline=baselin, basecyc=basecyc)
+    # bl_info <- NULL
+    
+    # threshold cycle and amplification efficiency
+    ct_eff <- getPar(mod_ori, type=type, cp=cp)
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]
     if (show_running_time) message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
     
-    return(list('fitted_curves'=fitted_curves, 'ct_eff'=ct_eff))
+    return(list('mod_ori'=mod_ori, 'bl_info'=bl_info, 'ct_eff'=ct_eff))
     }
 
 
