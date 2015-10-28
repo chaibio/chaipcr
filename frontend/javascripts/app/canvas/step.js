@@ -37,9 +37,9 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.setLeft();
         this.getUniqueName();
         var leftVal = {left: this.left};
-        this.commonFooterImage.set(leftVal).setCoords();
-        this.darkFooterImage.set(leftVal).setCoords();
-        this.whiteFooterImage.set(leftVal).setCoords();
+        //this.commonFooterImage.set(leftVal).setCoords();
+        //this.darkFooterImage.set(leftVal).setCoords();
+        //this.whiteFooterImage.set(leftVal).setCoords();
         this.stepGroup.set(leftVal).setCoords();
 
         leftVal = {left: this.left + (this.myWidth / 2)};
@@ -48,6 +48,17 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.ordealStatus = this.ordealStatus + action;
         this.circle.getUniqueId();
 
+      };
+
+      this.configureStepName = function(thisStep) {
+
+        if(this.model.name === null) {
+          this.stepNameText = "Step " + (this.index + 1);
+          this.stepName.text = this.stepNameText;
+        } else {
+          this.stepName.text = this.model.name;
+        }
+        stepGraphics.numberingValue.call(this);
       };
 
       this.addCircle = function() {
@@ -150,7 +161,8 @@ window.ChaiBioTech.ngApp.factory('step', [
         stepGraphics.addBorderRight.call(this);
         this.getUniqueName();
         stepGraphics.rampSpeed.call(this);
-        stepGraphics.numbering.call(this);
+        stepGraphics.initNumberText.call(this);
+        stepGraphics.numberingValue.call(this);
         stepGraphics.stepComponents.call(this);
 
         // Add all those components created.

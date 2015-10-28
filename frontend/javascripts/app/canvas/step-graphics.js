@@ -19,19 +19,24 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
       return this;
     };
 
-    this.numbering = function() {
+    this.numberingValue = function() {
 
       var thisIndex = (this.index < 9) ? "0" + (this.index + 1) : (this.index + 1),
       noofSteps = this.parentStage.model.steps.length;
       thisLength = (noofSteps < 10) ? "0" + noofSteps : noofSteps;
       text = thisIndex + "/" + thisLength;
 
-      this.numberingText = new fabric.Text(text, {
+      this.numberingText.setText(text);
+      return this;
+    };
+
+    this.initNumberText = function() {
+
+      this.numberingText = new fabric.Text('wow', {
           fill: 'white',  fontSize: 12,  top : 7,  left: -1,  fontFamily: "dinot",  selectable: false,
           originX: 'left', originY: 'top'
         }
       );
-      return this;
     };
 
     this.addBorderRight = function() {
