@@ -85,7 +85,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.pauseImage = $.extend({}, fabricStage.imageobjects["pause.png"]);
         this.setCenter(this.pauseImage);
 
-        this.pauseImageMiddle = $.extend({}, fabricStage.imageobjects["pause.png"]);
+        this.pauseImageMiddle = $.extend({}, fabricStage.imageobjects["pause-middle.png"]);
         this.setCenter(this.pauseImageMiddle);
         this.pauseImageMiddle.setVisible(false);
 
