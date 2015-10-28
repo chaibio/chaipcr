@@ -33,13 +33,13 @@
         <div class="col-md-3 col-md-offset-2">
           <rainbow-line-chart data="lidTemps" width="200" height="100"></rainbow-line-chart>
           <p class="text-center temp-label">
-            <b>LID TEMP.</b> {{10 | degreeCelcius}}
+            <b>LID TEMP.</b> {{lidTemps[lidTemps.length-1].y | degreeCelcius}}
           </p>
         </div>
         <div class="col-md-3 col-md-offset-3">
           <rainbow-line-chart data="blockTemps" width="200" height="100"></rainbow-line-chart>
           <p class="text-center temp-label">
-            <b>BLOCK TEMP.</b> {{10 | degreeCelcius}}
+            <b>BLOCK TEMP.</b> {{blockTemps[blockTemps.length-1].y | degreeCelcius}}
           </p>
         </div>
       </div>
