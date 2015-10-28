@@ -127,6 +127,7 @@
             if (resp.experiment.started_at && resp.experiment.completed_at) {
               fetchTempLogs();
               analyzeExperiment();
+              Status.stopSync();
             }
           });
         }
