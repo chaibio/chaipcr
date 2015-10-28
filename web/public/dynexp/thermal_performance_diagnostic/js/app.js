@@ -6,7 +6,7 @@
     'ngResource'
   ]);
 
-  App.value('host', 'http://localhost');
+  App.value('host', 'http://'+window.location.hostname);
 
   App.config([
     '$stateProvider',
