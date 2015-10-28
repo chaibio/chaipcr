@@ -50,7 +50,7 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
       this.rampSpeedNumber = this.model.ramp.rate;
 
       this.rampSpeedText = new fabric.Text(String(this.rampSpeedNumber)+ "º C/s", {
-          fill: 'black',  fontSize: 14, fontWeight: "bold", fontFamily: "Open Sans",  originX: 'left',  originY: 'top'
+          fill: 'black',  fontSize: 12, fontFamily: "dinot",  originX: 'left',  originY: 'top'
         }
       );
 
