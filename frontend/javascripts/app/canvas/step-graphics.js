@@ -86,7 +86,7 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
       });
 
       this.stepRect = new fabric.Rect({
-          fill: 'green',  width: this.myWidth,  height: 363,  selectable: false,  name: "step", me: this
+          fill: '#FFB300',  width: this.myWidth,  height: 363,  selectable: false,  name: "step", me: this
         }
       );
 

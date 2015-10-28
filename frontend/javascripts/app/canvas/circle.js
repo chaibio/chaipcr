@@ -133,7 +133,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.circleGroup.add(this.pauseStepOnScrollGroup);
         this.canvas.add(this.circleGroup);
 
-        this.gatherDataCircle = new gatherDataCircle();
+        //this.gatherDataCircle = new gatherDataCircle();
         this.gatherDataGroup = new gatherDataGroup(
           [
             this.gatherDataCircle = new gatherDataCircle(),
