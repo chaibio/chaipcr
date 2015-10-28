@@ -48,8 +48,14 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     this.setDefaultWidthHeight = function() {
 
       this.canvas.setHeight(400);
-      var width = (this.allStepViews.length * 128 > 1024) ? this.allStepViews.length * 128 : 1024;
-      this.canvas.setWidth(width + 120);
+      //var width = (this.allStepViews.length * 128 > 1024) ? this.allStepViews.length * 128 : 1024;
+
+      this.canvas.setWidth(
+        (this.allStepViews.length * 128) +
+        ((this.allStageViews.length) * 8) +
+        ((this.allStageViews.length) * 2) +
+        33
+      );
 
       //$timeout(function(context) {
         //context.canvas.renderAll();
