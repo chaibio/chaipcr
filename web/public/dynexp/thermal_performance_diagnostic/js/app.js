@@ -64,15 +64,20 @@
       tempPoll = null;
       $scope.lidTemps = null;
       $scope.blockTemps = null;
-      creating = false;
+      fetchingTemps = false;
       fetchTempLogs = function() {
-        return Experiment.getTemperatureData($scope.experiment.id).then(function(resp) {
-          var ref, ref1;
-          if (resp.data.length === 0) return;
-          $scope.lidTemps = DiagnosticWizardService.temperatureLogs(resp.data).getLidTemps();
-          $scope.blockTemps = DiagnosticWizardService.temperatureLogs(resp.data).getBlockTemps();
-          return $scope.elapsedTime = ((ref = resp.data[resp.data.length - 1]) != null ? (ref1 = ref.temperature_log) != null ? ref1.elapsed_time : void 0 : void 0) || 0;
-        });
+        if(!fetchingTemps) {
+          Experiment.getTemperatureData($scope.experiment.id).then(function(resp) {
+            var ref, ref1;
+            if (resp.data.length === 0) return;
+            $scope.lidTemps = DiagnosticWizardService.temperatureLogs(resp.data).getLidTemps();
+            $scope.blockTemps = DiagnosticWizardService.temperatureLogs(resp.data).getBlockTemps();
+            return $scope.elapsedTime = ((ref = resp.data[resp.data.length - 1]) != null ? (ref1 = ref.temperature_log) != null ? ref1.elapsed_time : void 0 : void 0) || 0;
+          })
+          .finally(function () {
+            fetchingTemps = false;
+          });
+        }
       };
       pollTemperatures = function() {
         if (!tempPoll) tempPoll = $interval(fetchTempLogs, 3000);
