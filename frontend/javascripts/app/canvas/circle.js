@@ -261,8 +261,8 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         this.circle.setFill("#ffb400");
         this.circle.setStroke("#ffde00");
-        this.circle.strokeWidth = 5;
-        this.circle.radius = 18;
+        this.circle.strokeWidth = 4;
+        this.circle.radius = 13;
         this.pauseImageMiddle.setVisible(true);
         this.gatherDataImageMiddle.setVisible(false);
         this.pauseStepOnScrollGroup.setVisible(false);
