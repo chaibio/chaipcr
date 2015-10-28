@@ -125,7 +125,8 @@ gulp.task('concat-js', ['clean-js', 'coffee', 'copy-js-to-tmp', 'templates'], fu
 });
 
 gulp.task('hash-js', ['concat-js'], function () {
-  var hash = _makeHash();
+  // var hash = _makeHash();
+  var hash = 'fcf0da2a986a77c49089c356075f71';
 
   return gulp.src('.tmp/js/'+applicationTmpJS+'.js')
          .pipe(rename(function (path) {
