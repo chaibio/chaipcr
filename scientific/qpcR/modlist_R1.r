@@ -62,12 +62,17 @@ modlist <- function(
   ## pre-allocate model list
   modLIST <- vector("list", length = ncol(allFLUO))
   
+  # xrqm
+  bl_list <- list()
+    
   for (i in 1:ncol(allFLUO)) {
     FLUO  <- allFLUO[, i]      
     NAME <- NAMES[i]
     
     ## version 1.4-0: baselining with first cycles using 'baseline' function
     if (baseline != "none" & baseline != "parm") { 
+      #FLUO <- baseline(cyc = CYCLES, fluo = FLUO, model = NULL, baseline = baseline, 
+                       #basecyc = basecyc, basefac = basefac)
       # xrqm
       bl_out <- baseline(cyc = CYCLES, fluo = FLUO, model = NULL, baseline = baseline, 
                          basecyc = basecyc, basefac = basefac)
@@ -95,13 +100,13 @@ modlist <- function(
     fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent = TRUE)
     
     ## version 1.4-0: baselining with 'c' parameter using 'baseline' function
-    if (baseline == "parm") {
+    if (baseline == "parm") { #fitOBJ <- baseline(model = fitOBJ, baseline = baseline) }
       # xrqm
       bl_out <- baseline(model = fitOBJ, baseline = baseline)
       fitOBJ <- bl_out[['fitOBJ']] }
     
     # xrqm
-    bl_info <- bl_out[['bl']]
+    bl_list[[i]] <- unlist(bl_out['bl'])
     
     ## tag names if fit failed
     if (inherits(fitOBJ, "try-error")) {  
@@ -146,6 +151,11 @@ modlist <- function(
     modLIST[[i]] <- fitOBJ
     modLIST[[i]]$names <- NAME    
   }  
+  
+  # xqrm
+  bl_info <- do.call(cbind, bl_list)
+  colnames(bl_info) <- colnames(x)[2:ncol(x)]
+  
   
   ## version 1.3-5: sigmoidal outlier detection by KOD
   ## version 1.3-8: turn off check with several models that are not sigmoid

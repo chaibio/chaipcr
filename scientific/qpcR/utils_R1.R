@@ -1089,18 +1089,27 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
   }
   
   if (baseline == "parm") {
-    BASE <- coef(model)["c"]    
-    newDATA <- model$DATA
-    newDATA[, 2] <- newDATA[, 2] - BASE
+    #BASE <- coef(model)["c"]    
+    #newDATA <- model$DATA
+    #newDATA[, 2] <- newDATA[, 2] - BASE
+    # xqrm
+    if (is.na(model)) {
+      BASE <- coef(model)["c"]    
+      newDATA <- model$DATA
+      newDATA[, 2] <- newDATA[, 2] - BASE
+    } else newDATA <- NA
+    
     newMODEL <- try(pcrfit(cyc = 1, fluo = 2, data = newDATA, model = model$MODEL), silent = TRUE)
     if (inherits(newMODEL, "try-error")) return()    
   }
   BASE <- BASE * basefac  
   
   # xqrm
+  output <- list('bl'=BASE)
   if (baseline != "parm") {
-    return(list('bl_subtracted'=fluo-BASE, 'bl'=BASE))
+    output[['bl_subtracted']] <- fluo - BASE
   } else {
-    return(list('fitOBJ'=newMODEL, 'bl'='baseline=`parm`, no baseline information available')) }
+    output[['fitOBJ']] <- newMODEL }
+  return(output)
 }
 
