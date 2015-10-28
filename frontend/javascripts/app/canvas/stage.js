@@ -111,10 +111,10 @@ window.ChaiBioTech.ngApp.factory('stage', [
           this.parent.allStageViews.splice(this.index, 1);
           this.updateStageData(-1);
 
-          if(! selected.parentStage.nextStage && this.index !== 0) { //we are exclusively looking for last stage
-            selected.parentStage.addBorderRight();
-            selected.borderRight.setVisible(false);
-          }
+          //if(! selected.parentStage.nextStage && this.index !== 0) { //we are exclusively looking for last stage
+            //selected.parentStage.addBorderRight();
+            //selected.borderRight.setVisible(false);
+          //}
         }
 
 
