@@ -26,7 +26,6 @@ Step.seed do |s|
   s.order_number = 2
   s.stage_id = 2
   s.collect_data = false
-  s.pause = true
 end
 
 Stage.seed do |s|
