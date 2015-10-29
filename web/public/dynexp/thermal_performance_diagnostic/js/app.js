@@ -88,6 +88,7 @@
         tempPoll = null;
       };
       getExperiment = function(cb) {
+        if (!$params.id) return;
         cb = cb || angular.noop;
         return Experiment.get({
           id: $params.id
