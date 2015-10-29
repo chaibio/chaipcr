@@ -62,16 +62,23 @@ modlist <- function(
   ## pre-allocate model list
   modLIST <- vector("list", length = ncol(allFLUO))
   
+  # xrqm
+  bl_list <- list()
+  blcor_list <- list()
+    
   for (i in 1:ncol(allFLUO)) {
     FLUO  <- allFLUO[, i]      
     NAME <- NAMES[i]
     
     ## version 1.4-0: baselining with first cycles using 'baseline' function
     if (baseline != "none" & baseline != "parm") { 
+      FLUO <- baseline(cyc = CYCLES, fluo = FLUO, model = NULL, baseline = baseline, 
+                       basecyc = basecyc, basefac = basefac)
       # xrqm
-      bl_out <- baseline(cyc = CYCLES, fluo = FLUO, model = NULL, baseline = baseline, 
-                         basecyc = basecyc, basefac = basefac)
-      FLUO <- bl_out[['bl_subtracted']]
+      # bl_out <- baseline(cyc = CYCLES, fluo = FLUO, model = NULL, baseline = baseline, 
+                         # basecyc = basecyc, basefac = basefac)
+      # FLUO <- bl_out[['bl_corrected']]
+      blcor <- FLUO
     }
     
     ## normalization
@@ -95,13 +102,15 @@ modlist <- function(
     fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent = TRUE)
     
     ## version 1.4-0: baselining with 'c' parameter using 'baseline' function
-    if (baseline == "parm") {
+    if (baseline == "parm") { fitOBJ <- baseline(model = fitOBJ, baseline = baseline)
       # xrqm
-      bl_out <- baseline(model = fitOBJ, baseline = baseline)
-      fitOBJ <- bl_out[['fitOBJ']] }
+      # bl_out <- baseline(model = fitOBJ, baseline = baseline)
+      # fitOBJ <- bl_out[['bl_corrected']]
+      blcor <- fitOBJ }
     
     # xrqm
-    bl_info <- bl_out[['bl']]
+    # bl_list[[i]] <- unlist(bl_out['bl'])
+    blcor_list[[i]] <- blcor
     
     ## tag names if fit failed
     if (inherits(fitOBJ, "try-error")) {  
@@ -147,6 +156,14 @@ modlist <- function(
     modLIST[[i]]$names <- NAME    
   }  
   
+  # xqrm
+  well_names <- colnames(x)[2:ncol(x)]
+  # bl_info <- do.call(cbind, bl_list)
+  # colnames(bl_info) <- well_names
+  bl_corrected <- do.call(cbind, blcor_list)
+  colnames(bl_corrected) <- well_names
+  
+  
   ## version 1.3-5: sigmoidal outlier detection by KOD
   ## version 1.3-8: turn off check with several models that are not sigmoid
   nsMODELS <- c("linexp", "mak2", "mak2i", "mak3", "mak3i", "lin2", "cm3", "spl3")
@@ -191,6 +208,7 @@ modlist <- function(
   }
   
   class(modLIST) <- c("modlist", "pcrfit")
-  #invisible(modLIST) # xqrm
-  return(list('ori'=modLIST, 'bl_info'=bl_info)) # xqrm
+  #invisible(modLIST)
+  # xqrm
+  return(list('ori'=modLIST, 'bl_corrected'=bl_corrected)) # , 'bl_info'=bl_info))
 }
