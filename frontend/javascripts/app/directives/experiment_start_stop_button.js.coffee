@@ -40,10 +40,13 @@ window.ChaiBioTech.ngApp
         , (val) ->
           $scope.data = val
           $scope.state = val?.experimentController?.machine.state
+          TestInProgressHelper.setHolding(val, $scope.experiment)
           $scope.isHolding = TestInProgressHelper.isHolding()
 
           if val?.experimentController?.expriment?.id and !experiment_id
             experiment_id = val.experimentController.expriment.id
+
+        , true
 
         $scope.$watch 'data.experimentController.machine.state', (newState, oldState) ->
           if (newState isnt oldState) and (newState is 'Idle')

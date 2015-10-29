@@ -103,7 +103,7 @@ class ExperimentsController < ApplicationController
     end
   end
 
-  api :GET, "/experiments/:id/fluorescence_data", "Retrieve fluorescence data"
+  api :GET, "/experiments/:id/fluorescence_data?mode=[background_subtracted:baseline_subtracted]", "Retrieve fluorescence data"
   example "{'fluorescence_datum':{'calibrated_value':1.4299,'well_num':1,'cycle_num':1}, 'fluorescence_datum':{'calibrated_value':1.4974,'well_num':2,'cycle_num':1}}"
   
 #  def fluorescence_data
@@ -116,21 +116,13 @@ class ExperimentsController < ApplicationController
   def fluorescence_data
     if @experiment
       @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
-      @fluorescence_data = retrieve_fluorescence_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id) if !@first_stage_collect_data.blank?
-      respond_to do |format|
-        format.json { render "fluorescence_data", :status => :ok}
+      if !@first_stage_collect_data.blank?
+        if params[:mode] == "baseline_subtracted"
+          @fluorescence_data = retrieve_baseline_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id)
+        else
+          @fluorescence_data = retrieve_fluorescence_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id)
+        end
       end
-    else
-      render :json=>{:errors=>"experiment not found"}, :status => :not_found
-    end
-  end
-   
-  api :GET, "/experiments/:id/baseline_subtracted_ct_data", "Retrieve baseline subtracted and ct data"
-  example "{'fluorescence_datum':{'calibrated_value':1.4299,'well_num':1,'cycle_num':1}, 'fluorescence_datum':{'calibrated_value':1.4974,'well_num':2,'cycle_num':1}}"
-  def baseline_subtracted_ct_data
-    if @experiment
-      @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
-      @fluorescence_data = retrieve_baseline_subtracted_ct_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id) if !@first_stage_collect_data.blank?
       respond_to do |format|
         format.json { render "fluorescence_data", :status => :ok}
       end
@@ -193,27 +185,39 @@ class ExperimentsController < ApplicationController
     fluorescence_data = []
     config   = Rails.configuration.database_configuration
     connection = Rserve::Connection.new
-    results = connection.eval("get_data_calib('#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibration_id})").to_ruby
+    start_time = Time.now
+    results = connection.eval("get_data_calib('#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibration_id})")
     connection.close
-    if !results.blank? && !results[0].blank?
-      (0...results[0].length).each do |i|
-        fluorescence_data[i] = FluorescenceDatum.new(:experiment_id=>params[:id], :well_num=>results[0][i], :cycle_num=>results[1][i], :calibrated_value=>results[2][i])
+    logger.info("R code time #{Time.now-start_time}")
+    start_time = Time.now
+    results = results.to_ruby
+    if !results.blank?
+      (1...results.length).each do |well_num|
+        (0...results[well_num].length).each do |cycle_num|
+          fluorescence_data << FluorescenceDatum.new(:experiment_id=>params[:id], :well_num=>well_num-1, :cycle_num=>cycle_num+1, :calibrated_value=>results[well_num][cycle_num])
+        end
       end
-    end
+    end 
+    logger.info("Rails code time #{Time.now-start_time}")
     return fluorescence_data
   end
   
-  def retrieve_baseline_subtracted_ct_data(experiment_id, stage_id, calibration_id)
+  def retrieve_baseline_data(experiment_id, stage_id, calibration_id)
     fluorescence_data = []
     config   = Rails.configuration.database_configuration
     connection = Rserve::Connection.new
-    results = connection.eval("baseline_subtracted_ct_data('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{experiment_id}, #{stage_id}, #{calibration_id})").to_ruby
+    start_time = Time.now
+    results = connection.eval("get_data_baseline('#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibration_id})")
     connection.close
-    if !results.blank? && !results[0].blank?
-      (0...results[0].length).each do |i|
-        fluorescence_data[i] = FluorescenceDatum.new(:experiment_id=>params[:id], :well_num=>results[0][i], :cycle_num=>results[1][i], :calibrated_value=>results[2][i])
+    logger.info("R code time #{Time.now-start_time}")
+    start_time = Time.now
+    results = results.to_ruby
+    if !results[0].blank?
+      results[0].each_with_index do |e, cycle_num, well_num|
+        fluorescence_data << FluorescenceDatum.new(:experiment_id=>params[:id], :well_num=>well_num, :cycle_num=>cycle_num+1, :calibrated_value=>e)
       end
-    end
+    end 
+    logger.info("Rails code time #{Time.now-start_time}")
     return fluorescence_data
   end
   

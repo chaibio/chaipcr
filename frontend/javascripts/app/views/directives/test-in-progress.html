@@ -2,32 +2,32 @@
   <div class="test-in-progress">
     <div class="test-in-progress-heading">
       <div class="truncate" ng-class="{'text-blue': !isHolding, 'text-green': isHolding}">
-        <span ng-show="data.experimentController.machine.state === 'LidHeating' || data.experimentController.machine.state === 'Running'">
+        <span ng-show="data.experimentController.machine.state === 'LidHeating' || data.experimentController.machine.state === 'Running' || data.experimentController.machine.state === 'Paused'">
           <span class="text-black" ng-show="!isHolding">TEST IN PROGRESS:</span>
           <span ng-show="!isHolding">
             {{ data.experimentController.expriment.name }}
           </span>
-          <span class="text-black" ng-show="isHolding">ALL STAGES COMPLETE:</span>
-          <span ng-show="isHolding">
-            Holding at {{ data.heatblock.temperature | round: '1' | degreeCelcius }}
-          </span>
         </span>
-        <span ng-show="(data.experimentController.machine.state === 'Idle' || data.experimentController.machine.state === 'Paused') && completionStatus === null">
+        <span ng-show="data.experimentController.machine.state === 'Idle' && completionStatus === null">
           <span class="text-black">No experiment running</span>
         </span>
-        <span ng-show="completionStatus">
+        <span ng-show="completionStatus && !isHolding">
           <span class="text-black">TEST COMPLETE:</span>
           <span ng-show="completionStatus === 'aborted'" class="text-red">USER CANCELLED</span>
           <span ng-show="completionStatus === 'failed'" class="text-red">FAILED</span>
           <span ng-show="completionStatus === 'success'" class="text-green">SUCCESSFUL</span>
         </span>
+        <span class="text-black" ng-show="completionStatus && isHolding">ALL STAGES COMPLETE:</span>
+        <span ng-show="completionStatus && isHolding">
+          Holding at {{ data.heatblock.temperature | round: '1' | degreeCelcius }}
+        </span>
       </div>
     </div>
     <div class="test-info">
-      <div class="row" ng-show="!completionStatus">
+      <div class="row" ng-show="!completionStatus || isHolding">
         <div class="col-sm-6">
           <div class="caption">
-            <span ng-show="data.experimentController.machine.state == 'Running'">
+            <span ng-show="data.experimentController.machine.state == 'Running' || isHolding">
               STAGE {{data.experimentController.expriment.stage.number}},
               STEP {{data.experimentController.expriment.step.number}}
             </span>
@@ -47,7 +47,7 @@
           <div>{{ timeRemaining() | secondsDisplay:'display2'}}</div>
         </div>
       </div>
-      <div ng-show="completionStatus">
+      <div ng-show="completionStatus && !isHolding">
         <div class="caption">
           RAN ON
           <span style="font-weight: normal">
@@ -55,7 +55,7 @@
           </span>
         </div>
       </div>
-      <div ng-show="experiment.completion_message" style="margin-top: 10px;">
+      <div ng-show="experiment.completion_message && !isHolding" style="margin-top: 10px;">
         <span style="font-weight: 300;">
           {{experiment.completion_message}}
         </span>
