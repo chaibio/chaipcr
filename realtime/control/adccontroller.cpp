@@ -46,10 +46,10 @@ void ADCController::process() {
             if (_ltc2444->waitBusy())
                 continue;
 
-            ADCState state = nextState();
+            ADCState nextState = calcNextState();
 
             //ensure ADC loop runs at regular interval without jitter
-            if (state == 0) {
+            if (nextState == 0) {
                 try {
                     loopStarted();
                 }
@@ -79,7 +79,7 @@ void ADCController::process() {
 
             //schedule conversion for next state, retrieve previous conversion value
             uint32_t value;
-            switch (state) {
+            switch (nextState) {
             case EReadZone1Singular:
                 value = _ltc2444->readSingleEndedChannel(0, kThermistorOversamplingRate);
                 break;
@@ -106,7 +106,7 @@ void ADCController::process() {
                 qpcrApp.stopExperiment(ex.what());
             }
 
-            _currentConversionState = state;
+            _currentConversionState = nextState;
         }
     }
     catch (...) {
@@ -119,7 +119,7 @@ void ADCController::stop() {
     _ltc2444->stopWaitinigBusy();
 }
 
-ADCController::ADCState ADCController::nextState() const {
+ADCController::ADCState ADCController::calcNextState() const {
     ADCController::ADCState nextState = static_cast<ADCController::ADCState>(static_cast<int>(_currentConversionState) + 1);
     return nextState == EFinal ? static_cast<ADCController::ADCState>(0) : nextState;
 }

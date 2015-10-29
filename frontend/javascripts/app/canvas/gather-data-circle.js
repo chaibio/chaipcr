@@ -2,12 +2,12 @@ window.ChaiBioTech.ngApp.factory('gatherDataCircle', [
   function() {
     return function() {
       return new fabric.Circle({
-        radius: 16,
+        radius: 13,
         stroke: '#ffde00',
         originX: "center",
         originY: "center",
         fill: '#ffb400',
-        strokeWidth: 3,
+        strokeWidth: 2,
         selectable: false,
         name: "gatherDataCircle"
       });
