@@ -3,7 +3,7 @@ Description=Rserve
 
 [Service]
 WorkingDirectory=/
-ExecStart=/usr/local/lib/R/bin/R CMD Rserve --no-save
+ExecStart=/usr/local/lib/R/bin/R CMD Rserve --RS-enable-control --no-save
 SyslogIdentifier=Rserve
 Restart=on-failure
 StartLimitBurst=0

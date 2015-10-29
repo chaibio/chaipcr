@@ -2,7 +2,7 @@ window.ChaiBioTech.ngApp.factory('outerCircle', [
   function() {
     return function() {
       return new fabric.Circle({
-        radius: 23,
+        radius: 18,
         originX: "center",
         originY: "center",
         hasBorders: false,
