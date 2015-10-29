@@ -60,6 +60,13 @@ window.ChaiBioTech.ngApp.directive('general', [
           //console.log($('.edit-step-name').val(), focusElement);
           scope[field] = true;
           onClickValue = $('.' + focusElement).val();
+
+          $('.' + focusElement).width($('.' + focusElement).parent().width()); // Set the width of the text field;
+          if($('.' + focusElement).parent().width() < 30) {
+            $('.' + focusElement).width(30);
+          }
+
+          console.log($('.' + focusElement).parent().width());
           if($('.' + focusElement).val() === "") {
             onClickValue = null;
           }
@@ -72,7 +79,7 @@ window.ChaiBioTech.ngApp.directive('general', [
         scope.saveCycle = function() {
 
           scope.stageNoCycleShow = false;
-          
+
           if(parseInt(onClickValue) !== parseInt(scope.stage.num_cycles)) {
 
             if(scope.stage.num_cycles >= scope.stage.auto_delta_start_cycle) {

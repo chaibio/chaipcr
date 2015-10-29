@@ -37,7 +37,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
 
     $scope.applyValuesFromOutSide = function(circle) {
       // when the event or function call is initiated from non anular part of the app ... !!
-      
+
       $scope.$apply(function() {
         $scope.step = circle.parent.model;
         $scope.stage = circle.parent.parentStage.model;
@@ -106,6 +106,9 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
         // This is tricky , we used it here so that,
         //Custom size of this modal doesn't change any other modal in use
       });
+    };
+    $scope.tryVal = function() {
+      console.log("all okay");
     };
   }
 ]);

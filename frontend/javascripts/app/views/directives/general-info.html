@@ -1,6 +1,31 @@
+<!-- See general-info.scss -->
 <div class="first-data-row">
-  <div class="bottom-step-no ostrich">{{fabricStep.ordealStatus | preZero}}</div>
-  <div class="bottom-no-of-stages ostrich">{{fabricStep.parentStage.parent.allStepViews.length | preZero: '/'}}</div>
+  <div class="bottom-step-no">{{fabricStep.ordealStatus | preZero}}</div>
+  <div class="bottom-no-of-stages">{{fabricStep.parentStage.parent.allStepViews.length | preZero: ' /'}}</div>
+
+  <div class="bottom-name-of-step-stage" ng-click="clickOnField('stepNameShow', 'edit-step-name')">
+    <span class="bottom-name-of-step-span"  ng-class="{visible: stepNameShow}">{{(step.name | uppercase) || (fabricStep.stepNameText | uppercase)}}</span>
+    <input type="text" class="edit-step-name" on-enter ng-blur="saveStepName()" ng-model="step.name" ng-show="stepNameShow">
+  </div>
+  <div class="bottom-stage-name" ng-class="{visible: stepNameShow}">{{stage.name}}</div>
+
+  <div class="bottom-step-no-cycle-container">
+    <div class="bottom-step-no-cycle" ng-show="showCycling">
+    <span class="bottom-step-no-cycle-span" ng-show="!stageNoCycleShow" ng-click="clickOnField('stageNoCycleShow', 'bottom-step-no-cycle-edit')">{{stage.num_cycles}}</span>
+    <input type="text" class="bottom-step-no-cycle-edit" on-enter ng-blur="saveCycle()" numbers-only="numbers-only" ng-show="stageNoCycleShow" ng-model="stage.num_cycles">
+    </div>
+    <div class="bottom-step-x" ng-show="!stageNoCycleShow && showCycling">x</div>
+    <div class="bottom-cycles-and-dots" ng-show="!stageNoCycleShow && showCycling">Cycles</div>
+  </div>
+
+  <div class="bottom-gather-data">
+    <span class=bottom-gather-data-text>GATHER DATA</span>
+    <div class="bottom-gather-data-step"><gather-data-toggle data="step.collect_data" call="changeDuringStep"></gather-data-toggle></div><span>STEP</span>
+    <div class="bottom-gather-data-ramp"><gather-data-toggle data="step.ramp.collect_data" call="changeDuringRamp"></gather-data-toggle></div><span>RAMP</span>
+  </div>
+  <!--
+  <div class="bottom-step-no">{{fabricStep.ordealStatus | preZero}}</div>
+  <div class="bottom-no-of-stages">{{fabricStep.parentStage.parent.allStepViews.length | preZero: '/'}}</div>
   <div class="bottom-name-of-step-stage ostrich" ng-click="clickOnField('stepNameShow', 'edit-step-name')">
     <span class="bottom-name-of-step-span" >{{step.name || fabricStep.stepNameText}}</span>
     <input type="text" class="edit-step-name" on-enter ng-blur="saveStepName()" ng-model="step.name" ng-show="stepNameShow">
@@ -59,4 +84,5 @@
       </div>
     </div>
   </div>
+  -->
 </div>
