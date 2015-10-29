@@ -36,7 +36,7 @@ public:
     boost::signals2::lockfree_signal<void()> loopStarted;
 
 protected:
-    ADCState nextState() const;
+    ADCState calcNextState() const;
 	
 protected:
     std::atomic<bool> _workState;
