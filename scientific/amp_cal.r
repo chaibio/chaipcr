@@ -115,6 +115,23 @@ get_data_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for conn
     return(fluo_calib)
     }
 
+get_data_baseline <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
+                           	  exp_id, stage_id, calib_id, # for selecting data to analyze
+                           	  show_running_time=FALSE # option to show time cost to run this function
+                          	 ) {
+	 # baseline_ct
+	 model <- l4
+	 baselin <- 'lin'
+	 basecyc <- 1:5
+	 type <- 'curve'
+	 cp <- 'cpD2'
+
+	 # use functions
+	 fluo_calib <- get_data_calib(db_usr, db_pwd, db_host, db_port, db_name,
+	                              exp_id, stage_id, calib_id,
+	                              show_running_time) # 1.63-1.75 sec (1st time, 3 tests); 0.94-1.60 sec (2nd time and on, 5 tests)
+	 return (baseline_ct(fluo_calib, model, baselin, basecyc, type, cp, show_running_time)['bl_corrected'])
+}
 
 # function: baseline subtraction and Ct
 baseline_ct <- function(fluo_calib, 
