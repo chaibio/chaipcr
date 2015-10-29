@@ -62,7 +62,7 @@ App.service('SecondsDisplay', [
         if (sec.seconds < 10) {
           sec.seconds = "0" + sec.seconds;
         }
-        return "" + ((parseInt(sec.days)) > 0 ? sec.days + ':' : '') + sec.hours + ":" + sec.mins + ":" + sec.seconds;
+        return "" + ((parseInt(sec.days)) > 0 ? sec.days + ':' : '') + ((parseInt(sec.hours)) > 0 || parseInt(sec.days) > 0 ? sec.hours + ':' : '') + sec.mins + ":" + sec.seconds;
       };
     })(this);
     this.display3 = (function(_this) {
@@ -85,6 +85,29 @@ App.service('SecondsDisplay', [
         return text;
       };
     })(this);
+
+    // this.display4 = (function(_this) {
+    //   return function(seconds) {
+    //     var sec, text;
+    //     sec = _this.getSecondsComponents(seconds);
+    //     text = '';
+    //     if (sec.days < 10) {
+    //       sec.days = "0" + sec.days;
+    //     }
+    //     if (sec.hours < 10) {
+    //       sec.hours = "0" + sec.hours;
+    //     }
+    //     if (sec.mins < 10) {
+    //       sec.mins = "0" + sec.mins;
+    //     }
+    //     if (sec.seconds < 10) {
+    //       sec.seconds = "0" + sec.seconds;
+    //     }
+    //     return "" + ((parseInt(sec.days)) > 0 ? sec.days + ':' : '') + sec.hours + ":" + sec.mins + ":" + sec.seconds;
+    //   };
+    // })(this);
+
+
   }
 ]);
 

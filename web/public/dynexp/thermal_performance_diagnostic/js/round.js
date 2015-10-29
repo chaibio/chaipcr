@@ -1,5 +1,3 @@
-
-
 (function () {
 
   App.filter('round', [

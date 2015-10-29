@@ -1,46 +1,77 @@
-.diagnostic-wizard-state-active {
-  font-family: 'Dinot';
-  color: #000; }
-
-  .diagnostic-wizard-state-active .content {
+.diagnostic-wizard {
+    font-family: 'Dinot';
+    color: #000;
+}
+.diagnostic-wizard .content {
     padding-left: 35px;
-    padding-right: 35px; }
-  .diagnostic-wizard-state-active h1, .diagnostic-wizard-state-active h2 {
+    padding-right: 35px;
+}
+.diagnostic-wizard h1,
+.diagnostic-wizard h2 {
     font-weight: 700;
     margin-top: 70px;
-    margin-bottom: 10px; }
-  .diagnostic-wizard-state-active h2 {
-    font-size: 40px; }
-  .diagnostic-wizard-state-active h1 {
-    font-size: 50px; }
-  .diagnostic-wizard-state-active p {
+    margin-bottom: 10px;
+}
+.diagnostic-wizard h2 {
+    font-size: 40px;
+}
+.diagnostic-wizard h1 {
+    font-size: 50px;
+}
+.diagnostic-wizard p {
     color: #333;
-    font-size: 14px; }
-  .diagnostic-wizard-state-active .temp-label {
-    font-size: 17px; }
-    .diagnostic-wizard-state-active .temp-label b {
-      font-weight: 800; }
-  .diagnostic-wizard-state-active button {
+    font-size: 14px;
+}
+.diagnostic-wizard .temp-label {
+    font-size: 17px;
+}
+.diagnostic-wizard .temp-label b {
+    font-weight: 800;
+}
+.diagnostic-wizard button {
     background: #fff;
     border: 1px solid #333;
     margin-top: 70px;
     margin-bottom: 50px;
-    padding: 5px 50px; }
-  .diagnostic-wizard-state-active .info-container {
-    margin-top: 100px; }
-    .diagnostic-wizard-state-active .info-container .title {
-      font-size: 20px;
-      border-bottom: 2px solid #000; }
-    .diagnostic-wizard-state-active .info-container .info {
-      margin-top: 20px; }
-      .diagnostic-wizard-state-active .info-container .info img {
-        cursor: pointer;
-        float: right;
-        margin-top: -5px;
-        width: 30px; }
-      .diagnostic-wizard-state-active .info-container .info .info-text {
-        font-size: 17px; }
-      .diagnostic-wizard-state-active .info-container .info .block-text {
-        color: gray;
-        font-size: 10px;
-        height: 20px; }
+    padding: 5px 50px;
+}
+.diagnostic-wizard .info-container {
+    margin-top: 100px;
+}
+.diagnostic-wizard .info-container .title {
+    font-size: 20px;
+    border-bottom: 2px solid #000;
+}
+.diagnostic-wizard .info-container .info {
+    margin-top: 20px;
+}
+
+.diagnostic-wizard .info-container .info .info-text {
+    font-size: 17px;
+}
+
+.diagnostic-wizard .info-container .info .info-text .info-title {
+  display: inline-block;
+  width: 45%;
+}
+
+.diagnostic-wizard .info-container .info .info-text .info-details {
+  display: inline-block;
+  width: 30%;
+}
+
+.diagnostic-wizard .info-container .info .info-text .img-button {
+  display: inline-block;
+  width: 20%;
+}
+
+.diagnostic-wizard .info-container .info img {
+    margin-top: -3px;
+    width: 30px;
+}
+
+.diagnostic-wizard .info-container .info .block-text {
+    color: gray;
+    font-size: 10px;
+    height: 20px;
+}

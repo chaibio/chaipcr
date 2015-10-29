@@ -59,57 +59,115 @@
         <div class="row">
           <div class="col-md-4">
             <div class="title">
-              <b>HEATING</b> {{50|degreeCelcius}}-{{90|degreeCelcius}}
+              <b>HEATING</b> <!-- {{50|degreeCelcius}}-{{90|degreeCelcius}} -->
             </div>
             <div class="info">
               <div class="info-text">
-                Avg. Ramp Rate: <b>10&deg;</b>C/s
-                <img src="/images/diagnostic-wizard-x-button.png" alt="">
+                <div class="info-title">Avg. Ramp Rate:</div>
+                <div class="info-details"><b>{{ analyzedExp.Heating.AvgRampRate[0] }}</b> &deg;C/s</div>
+                <div class="img-button">
+                  <img ng-src="{{ analyzedExp.Heating.AvgRampRate[0] > 2 ? '/images/diagnostic-wizard-check-button.png': '/images/diagnostic-wizard-x-button.png' }}">
+                </div>
               </div>
               <div class="block-text">
-                Below acceptable rate of {{30|degreeCelcius}}/s
+                <span ng-show="!(analyzedExp.Heating.AvgRampRate[0] > 2)">Below acceptable rate of <b>2</b> &deg;C/s</span>
               </div>
             </div>
             <div class="info">
               <div class="info-text">
-                Total Time: <b>90:01</b>s
-                <img src="/images/diagnostic-wizard-check-button.png" alt="">
+                <div class="info-title">Total Time:</div>
+                <div class="info-details"><b>{{analyzedExp.Heating.TotalTime[0]/1000 | secondsDisplay:'display2'}}</b> s</div>
+                <div class="img-button">
+                  <img ng-src="{{ analyzedExp.Heating.TotalTime[0]/1000 < 22.5 ? '/images/diagnostic-wizard-check-button.png' : '/images/diagnostic-wizard-x-button.png' }}">
+                </div>
               </div>
-              <div class="block-text"></div>
+              <div class="block-text">
+                <span ng-show="!(analyzedExp.Heating.TotalTime[0]/1000 < 22.5)">
+                Above acceptable time of <b>22.5</b> s</span>
+              </div>
             </div>
             <div class="info">
               <div class="info-text">
-                Total Time: <b>90:01</b>s
-                <img src="/images/diagnostic-wizard-check-button.png" alt="">
+                <div class="info-title">Max. Block &Delta;T:</div>
+                <div class="info-details"><b>{{analyzedExp.Heating.MaxBlockDeltaT[0]}}</b> &deg;C</div>
+                <div class="img-button">
+                  <img ng-src="{{ analyzedExp.Heating.MaxBlockDeltaT[0] < 2 ? '/images/diagnostic-wizard-check-button.png' : '/images/diagnostic-wizard-x-button.png' }}">
+                </div>
               </div>
-              <div class="block-text"></div>
+              <div class="block-text">
+                <span ng-show="!(analyzedExp.Heating.MaxBlockDeltaT[0] < 2)">Above acceptable Max.Block &Delta;T of <b>2</b> &deg;C</span>
+              </div>
             </div>
           </div>
           <div class="col-md-4">
             <div class="title">
-              <b>COOLING</b> {{50|degreeCelcius}}-{{90|degreeCelcius}}
+              <b>COLLING</b> <!-- {{50|degreeCelcius}}-{{90|degreeCelcius}} -->
             </div>
             <div class="info">
               <div class="info-text">
-                Avg. Ramp Rate: <b>10&deg;</b>C/s
-                <img src="/images/diagnostic-wizard-x-button.png" alt="">
+                <div class="info-title">Avg. Ramp Rate:</div>
+                <div class="info-details"><b>{{ analyzedExp.Cooling.AvgRampRate[0] }}</b> &deg;C/s</div>
+                <div class="img-button">
+                  <img ng-src="{{ analyzedExp.Cooling.AvgRampRate[0] > 2 ? '/images/diagnostic-wizard-check-button.png': '/images/diagnostic-wizard-x-button.png' }}">
+                </div>
               </div>
               <div class="block-text">
-                Below acceptable rate of {{30|degreeCelcius}}/s
+                <span ng-show="!(analyzedExp.Cooling.AvgRampRate[0] > 2)">Below acceptable rate of <b>2</b> &deg;C/s +</span>
+              </div>
+            </div>
+            <div class="info">
+              <div class="info-text">
+                <div class="info-title">Total Time:</div>
+                <div class="info-details"><b>{{analyzedExp.Cooling.TotalTime[0]/1000 | secondsDisplay:'display2'}}</b> s</div>
+                <div class="img-button">
+                  <img ng-src="{{ analyzedExp.Cooling.TotalTime[0]/1000 < 22.5 ? '/images/diagnostic-wizard-check-button.png' : '/images/diagnostic-wizard-x-button.png' }}">
+                </div>
+              </div>
+              <div class="block-text">
+                <span ng-show="!(analyzedExp.Cooling.TotalTime[0]/1000 < 22.5)">
+                Above acceptable time of <b>22.5</b> s</span>
+              </div>
+            </div>
+            <div class="info">
+              <div class="info-text">
+                <div class="info-title">Max. Block &Delta;T:</div>
+                <div class="info-details"><b>{{analyzedExp.Cooling.MaxBlockDeltaT[0]}}</b> &deg;C</div>
+                <div class="img-button">
+                  <img ng-src="{{ analyzedExp.Cooling.MaxBlockDeltaT[0] < 2 ? '/images/diagnostic-wizard-check-button.png' : '/images/diagnostic-wizard-x-button.png' }}">
+                </div>
+              </div>
+              <div class="block-text">
+                <span ng-show="!(analyzedExp.Cooling.MaxBlockDeltaT[0] < 2)">Above acceptable Max.Block &Delta;T of <b>2</b> &deg;C</span>
               </div>
             </div>
           </div>
           <div class="col-md-4">
             <div class="title">
-              <b>LID</b> {{50|degreeCelcius}}-{{90|degreeCelcius}}
+              <b>LID</b> <!-- {{50|degreeCelcius}}-{{90|degreeCelcius}} -->
             </div>
             <div class="info">
               <div class="info-text">
-                Avg. Ramp Rate: <b>10&deg;</b>C/s
-                <img src="/images/diagnostic-wizard-x-button.png" alt="">
+                <div class="info-title">Heating Rate:</div>
+                <div class="info-details"><b>{{ analyzedExp.Lid.HeatingRate[0]}}</b> &deg;C/s</div>
+                <div class="img-button">
+                  <img ng-src="{{ analyzedExp.Lid.HeatingRate[0] > 1 ? '/images/diagnostic-wizard-check-button.png': '/images/diagnostic-wizard-x-button.png' }}">
+                </div>
               </div>
               <div class="block-text">
-                Below acceptable rate of {{30|degreeCelcius}}/s
+                <span ng-show="!(analyzedExp.Lid.HeatingRate[0] > 1)">Below acceptable rate of <b>1</b> &deg;C/s</span>
+              </div>
+            </div>
+            <div class="info">
+              <div class="info-text">
+                <div class="info-title">Time to Heat:</div>
+                <div class="info-details"><b>{{analyzedExp.Lid.TotalTime[0]/1000 | secondsDisplay:'display2'}}</b> s</div>
+                <div class="img-button">
+                  <img ng-src="{{ analyzedExp.Lid.TotalTime[0]/1000 < 90 ? '/images/diagnostic-wizard-check-button.png' : '/images/diagnostic-wizard-x-button.png' }}">
+                </div>
+              </div>
+              <div class="block-text">
+                <span ng-show="!(analyzedExp.Lid.TotalTime[0]/1000 < 90)">
+                Above acceptable time of <b>90</b> s</span>
               </div>
             </div>
           </div>
