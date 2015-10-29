@@ -169,7 +169,7 @@ class ExperimentsController < ApplicationController
       response = connection.eval("analyze('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{@experiment.id})").to_ruby
       connection.close
       json = JSON.parse(response)
-      render :text=>json
+      render :json=>json
     else
       render :json=>{:errors=>"experiment not found"}, :status => :not_found
     end
