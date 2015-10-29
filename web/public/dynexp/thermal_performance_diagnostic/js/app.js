@@ -120,6 +120,10 @@
         newState = data.experimentController.machine.state;
         oldState = oldData != null ? (ref = oldData.experimentController) != null ? (ref1 = ref.machine) != null ? ref1.state : void 0 : void 0 : void 0;
         $scope.status = newState === 'Running' ? data.experimentController.machine.thermal_state : newState;
+        $scope.heat_block_temp = data.heatblock.temperature
+        $scope.lid_temp = data.lid.temperature
+
+
         if (!$scope.experiment) {
           getExperiment(function(resp) {
             $scope.experiment = resp.experiment;
