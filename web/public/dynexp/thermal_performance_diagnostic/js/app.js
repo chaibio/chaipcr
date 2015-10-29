@@ -98,25 +98,8 @@
       };
       analyzeExperiment = function () {
         if (!$scope.analyzedExp) {
-          // $scope.analyzedExp = {
-          //   Heating: {
-          //     AvgRampRate: [3],
-          //     TotalTime: [22.0*1000],
-          //     MaxBlockDeltaT: [1]
-          //   },
-          //   Cooling: {
-          //     AvgRampRate: [1],
-          //     TotalTime: [23.9*1000],
-          //     MaxBlockDeltaT: [10]
-          //   },
-          //   Lid: {
-          //     HeatingRate: [1],
-          //     TotalTime: [160000]
-          //   }
-          // };
           Experiment.analyze($params.id).then(function (resp) {
             $scope.analyzedExp = resp.data;
-            console.log(resp.data);
           });
         }
       };
