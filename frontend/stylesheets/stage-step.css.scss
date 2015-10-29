@@ -13,7 +13,7 @@
   height: 768px;
 
   .top-half {
-    height: 465px;
+    height: 448px;
     width: 1024px;
     background-color: #ffb400;
 
@@ -93,7 +93,7 @@
     }
 
     .canvas-containing {
-      height: 420px;
+      height: 400px;
       width: 1024px;
       overflow-x: auto;
       overflow-y: hidden;
@@ -106,7 +106,7 @@
   }
   .bottom-half {
     width: 1024px;
-    height: 303px;
+    height: 280px;
     background-color: white;
 
     .unselectOverlay {
@@ -120,319 +120,29 @@
     }
 
     .previous {
-      width: 71px;
+      width: 60px;
       height: 60px;
       float:left;
 
       img {
-        padding-left: 41px;
-        padding-top: 31px;
+        padding-left: 32px;
+        padding-top: 25px;
         cursor: pointer;
       }
     }
     // The middle section of the bottom part of the screen
     .middle-ground {
-      width: 882px;
+      width: 901px;
       height: 272px;
       float: left;
 
       .first-data-row {
-        width: 882px;
-        height: 62px;
+        width: 900px;
+        height: 64px;
         border-bottom-style: solid;
         border-bottom-width: 2px;
         border-bottom-color: black;
-
-        .bottom-step-no {
-          height: 35px;
-          padding-top: 5px;
-          margin-top: 0px;
-          font-size: 48px;
-          font-weight: bold;
-          width: 35px;
-          float: left;
-          margin-left:2px;
-          text-align: right;
-        }
-        .bottom-no-of-stages {
-          float: left;
-          font-size: 26px;
-          height: 20px;
-          width:20px;
-          margin-top: 29px;
-        }
-        .bottom-name-of-step-stage {
-          width: 267px;
-          height: 35px;
-          font-size: 41px;
-          float: left;
-          margin-top: 5px;
-          padding-top: 7px;
-          margin-left: 10px;
-          text-align: center;
-          position: relative;
-
-          .bottom-name-of-step-span {
-            width: 267px;
-            height: 35px;
-            font-size: 41px;
-            margin-top: 5px !important;
-          }
-          .edit-step-name {
-            width: 267px;
-            position: absolute;
-            top: -5px;
-            left: 0px;
-            border: none;
-            background-color: black;
-            color: white;
-            text-align: center;
-          }
-        }
-        .bottom-stage-name {
-          width: 93px;
-          font-size: 10px;
-          height: 15px;
-          margin-top: 42px;
-          margin-left: 1px;
-          float: left;
-        }
-
-        .bottom-step-no-cycle-container {
-          width: 145px;
-          height: 35px;
-          visibility: visible;
-          float: left;
-          position: relative;
-
-          .bottom-step-no-cycle {
-            height: 35px;
-            padding-top: 8px;
-            margin-top: 1px;
-            font-size: 44px;
-            font-weight: bold;
-            width: 90px;
-            float: left;
-            margin-left: 2px;
-            text-align: right;
-
-            .bottom-step-no-cycle-edit {
-
-              width: 90px;
-              position: absolute;
-              background-color: black;
-              color: white;
-              text-align: right;
-              top: 0px;
-              left: 0px;
-              height: 58px;
-              border: none;
-
-            }
-          }
-        }
-
-        .bottom-step-x {
-          float: left;
-          font-size: 26px;
-          font-weight: bold;
-          height: 20px;
-          margin-top: 28px;
-        }
-        .bottom-cycles-and-dots {
-          font-size: 10px;
-          height: 15px;
-          margin-top: 42px;
-          margin-left: 5px;
-          float: left;
-          width: 35px;
-        }
-        .bottom-cycle-dots {
-          width: 18px;
-          height: 15px;
-          margin-top: 42px;
-          float: left;
-          margin-left: 5px;
-          margin-right: 10px;
-        }
-
-        .bottom-autodelta-button {
-          margin-left: 15px;
-        }
-
-        .bottom-button-container {
-          float: left;
-          width: 147px;
-          height: 41px;
-          margin-top: 25px;
-
-          .delta-button-true {
-            width: 142px;
-            height: 31px;
-            background-color: black;
-            font-size: 9px;
-            border: 1px solid black;
-            margin-left: 5px;
-            color: white;
-            cursor: pointer;
-
-            .delta-button-image-container {
-              width: 41px;
-              height: 30px;
-              float: left;
-            }
-
-            .delta-button-text {
-              float: left;
-              width:95px;
-              height: 31px;
-              padding-top: 7px;
-            }
-          }
-
-          .delta-button-false {
-            width: 142px;
-            height: 31px;
-            background-color: white;
-            font-size: 9px;
-            border: 1px solid black;
-            margin-left: 5px;
-            color: black;
-            cursor: pointer;
-
-            .delta-button-image-container {
-              width: 41px;
-              height: 30px;
-              float: left;
-            }
-            .delta-button-text {
-              float: left;
-              width:95px;
-              height: 31px;
-              padding-top: 7px;
-            }
-          }
-
-          .gather-data-button-true {
-            width: 142px;
-            height: 31px;
-            background-color: black;
-            font-size: 9px;
-            border: 1px solid black;
-            margin-left: 5px;
-            color: white;
-            cursor: pointer;
-
-            .gather-data-button-image-container {
-              width: 41px;
-              height: 30px;
-              float: left;
-              padding-top: 5px;
-            }
-            .gather-data-button-text {
-              float: left;
-              width:95px;
-              height: 31px;
-              padding-top: 7px;
-            }
-          }
-
-          .gather-data-button-false {
-            width: 142px;
-            height: 31px;
-            background-color: white;
-            font-size: 9px;
-            border: 1px solid black;
-            margin-left: 5px;
-            color: black;
-            cursor: pointer;
-
-            .gather-data-button-image-container {
-              width: 41px;
-              height: 30px;
-              float: left;
-              padding-top: 5px;
-            }
-            .gather-data-button-text {
-              float: left;
-              width:95px;
-              height: 31px;
-              padding-top: 7px;
-            }
-          }
-
-          .lol-pop {
-            width: 180px;
-            height: 111px;
-            position: relative;
-            top: -156px;
-            left: -20px;
-
-            .gather-data-popup {
-              width: 180px;
-              height: 111px;
-              background-color: black;
-              position: absolute;
-              opacity: .8;
-
-              .tail {
-                width: 20px;
-                height: 20px;
-                position: absolute;
-                background-color: black;
-                -ms-transform: rotate(45deg); /* IE 9 */
-                -webkit-transform: rotate(45deg); /* Chrome, Safari, Opera */
-                transform: rotate(45deg);
-                top: 100px;
-                left: 80px;
-              }
-            }
-
-            .gather-data-popup-content {
-              width: 150px;
-              height: 111px;
-              position: absolute;
-              left: 18px;
-              top: 12px;
-
-              .small-button {
-                width: 142px;
-                background-color: white;
-                height: 31px;
-                border: 1px solid black;
-                font-size: 9px;
-                font-weight: bold;
-                cursor: pointer;
-
-                .tik-image-container {
-                  height: 31px;
-                  width: 34px;
-                  float: left;
-                  padding-top: 5px;
-                  padding-left: 8px;
-                }
-                .tik-text-container {
-                  height: 31px;
-                  width: 100px;
-                  float: left;
-                  padding-top: 7px;
-                }
-              }
-              .first {
-                margin-top: 8px;
-                margin-bottom: 10px;
-              }
-
-              button {
-                margin-bottom: 5px;
-                width: 140px;
-              }
-            }
-          }
-        }
-
-
-
+        position: relative;
       }
 
       .data-boxes {
@@ -701,14 +411,14 @@
     }
 
     .next {
-      width: 71px;
+      width: 60px;
       height: 60px;
       float:left;
 
       img {
         // We rotate the image so just inverse the left and top too..
-        padding-right: 30px; // 41 - image width
-        padding-bottom: 31px;
+        padding-right: 15px; // 41 - image width
+        padding-bottom: 25px;
         cursor: pointer;
          -ms-transform: rotate(180deg); /* IE 9 */
          -webkit-transform: rotate(180deg); /* Chrome, Safari, Opera */
