@@ -1104,12 +1104,14 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
   }
   BASE <- BASE * basefac  
   
-  # xqrm
-  output <- list('bl'=BASE)
-  if (baseline != "parm") {
-    output[['bl_subtracted']] <- fluo - BASE
-  } else {
-    output[['fitOBJ']] <- newMODEL }
-  return(output)
+  if (baseline != "parm") return(fluo - BASE) else return(newMODEL)
+  
+  # xqrm (removed for performance)
+  # output <- list('bl'=BASE)
+  # if (baseline != "parm") {
+    # output[['bl_corrected']] <- fluo - BASE
+  # } else {
+    # output[['bl_corrected']] <- newMODEL }
+  # return(output)
 }
 
