@@ -195,11 +195,14 @@ class ExperimentsController < ApplicationController
     connection = Rserve::Connection.new
     results = connection.eval("get_data_calib('#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibration_id})").to_ruby
     connection.close
-    if !results.blank? && !results[0].blank?
-      (0...results[0].length).each do |i|
-        fluorescence_data[i] = FluorescenceDatum.new(:experiment_id=>params[:id], :well_num=>results[0][i], :cycle_num=>results[1][i], :calibrated_value=>results[2][i])
+    logger.info(results)
+    if !results.blank?
+      (1...results.length).each do |well_num|
+        (0...results[well_num].length).each do |cycle_num|
+          fluorescence_data << FluorescenceDatum.new(:experiment_id=>params[:id], :well_num=>well_num-1, :cycle_num=>cycle_num+1, :calibrated_value=>results[well_num][cycle_num])
+        end
       end
-    end
+    end 
     return fluorescence_data
   end
   
