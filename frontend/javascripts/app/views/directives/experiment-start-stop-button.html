@@ -2,9 +2,11 @@
   <div class="button run" ng-show="state === 'Idle' && !experiment.started_at && !experiment.completed_at" ng-click="startExperiment(experimentId)">
     START EXPERIMENT
   </div>
-  <div class="button" ng-class="{stop: !isHolding, run: isHolding}" ng-show="state !== 'Idle' && !experiment.completed_at"  ng-click="stopExperiment()">
-    <span ng-show="!isHolding">STOP EXPERIMENT</span>
-    <span ng-show="isHolding">COMPLETE EXPERIMENT</span>
+  <div class="button stop" ng-show="state !== 'Idle' && !experiment.completed_at && !isHolding"  ng-click="stopExperiment()">
+    STOP EXPERIMENT
+  </div>
+  <div class="button run" ng-show="state === 'Complete' && isHolding" ng-click="stopExperiment()">
+    COMPLETE EXPERIMENT
   </div>
   <div ng-show="state === 'Idle' && experiment.started_at !== null">
 

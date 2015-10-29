@@ -47,17 +47,23 @@ window.ChaiBioTech.ngApp.service 'TestInProgressHelper', [
       return false if !experiment
       return false if !experiment.protocol
       return false if !experiment.protocol.stages
+      return false if !data
       return false if !data.experimentController
-      return false if !data.experimentController.expriment
+
       stages = experiment.protocol.stages
       steps = stages[stages.length-1].stage.steps
-      max_cycle = parseInt(AmplificationChartHelper.getMaxExperimentCycle(experiment))
+      # max_cycle = parseInt(AmplificationChartHelper.getMaxExperimentCycle(experiment))
       duration = parseInt(steps[steps.length-1].step.delta_duration_s)
-      current_stage = parseInt(data.experimentController.expriment.stage.number)
-      current_step = parseInt(data.experimentController.expriment.step.number)
-      current_cycle = parseInt(data.experimentController.expriment.stage.cycle)
+      # current_stage = parseInt(data.experimentController.expriment.stage.number)
+      # current_step = parseInt(data.experimentController.expriment.step.number)
+      # current_cycle = parseInt(data.experimentController.expriment.stage.cycle)
+      state = data.experimentController.machine.state
 
-      holding = duration is 0 and stages.length is current_stage and steps.length is current_step and current_cycle is max_cycle
+      holding = state is 'Complete' and duration is 0
+
+      # console.log holding
+
+      holding
 
     return
 ]

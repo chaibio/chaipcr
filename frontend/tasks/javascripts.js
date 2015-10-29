@@ -165,16 +165,21 @@ gulp.task('js:deploy', ['set-js-deploy', 'uglify', 'markup-js-link'], function (
 
 
 // NOTE: Make sure VPN is connected and sshpass is installed on your system
+// Usage:
+//
+//       host=10.0.2.199 hash=fcf0da2a986a77c49089c356075f71 user=root password=chaipcr gulp js:upload
+//
+// where hash is the remote hash of application-[hash].js file
 var shell = require('shelljs');
 gulp.task('js:upload', ['uglify'], function (done) {
   var host = process.env.host || '10.0.2.199';
+  var user = process.env.user || 'root';
+  var password = process.env.password || 'chaipcr';
   var file = '.tmp/js/'+applicationJS+'.js';
   var _hash_ = process.env.hash || 'fcf0da2a986a77c49089c356075f71';
   var remote_file = '/root/chaipcr/web/public/javascripts/application-'+_hash_+'.js';
-  var user = 'root';
-  var password = 'chaipcr';
   var command = 'sshpass -p \''+password+'\' scp '+file+' '+user+'@'+host+':'+remote_file;
-  console.log('Running: \n' + command+'\n');
+  console.log('Running: \n' + command.replace(password, '*******'));
 
   shell.exec(command, {async:true, silent: true}, done);
 
