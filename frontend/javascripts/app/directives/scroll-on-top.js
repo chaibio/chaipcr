@@ -11,6 +11,11 @@ window.ChaiBioTech.ngApp.directive('scrollOnTop', [
 
       link: function(scope, elem, attr) {
 
+        //console.log("hilll", elem);
+        scope.dragElem = $(elem).find(".foreground-bar").draggable({
+          containment: "parent",
+          axis: "x",
+        });
       }
     };
   }
