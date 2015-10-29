@@ -48,8 +48,14 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     this.setDefaultWidthHeight = function() {
 
       this.canvas.setHeight(400);
-      var width = (this.allStepViews.length * 128 > 1024) ? this.allStepViews.length * 128 : 1024;
-      this.canvas.setWidth(width + 120);
+      //var width = (this.allStepViews.length * 128 > 1024) ? this.allStepViews.length * 128 : 1024;
+      // Add these numbers to constants.
+      this.canvas.setWidth(
+        (this.allStepViews.length * 128) +
+        ((this.allStageViews.length) * 8) +
+        ((this.allStageViews.length) * 2) +
+        33
+      );
 
       //$timeout(function(context) {
         //context.canvas.renderAll();
@@ -237,11 +243,11 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     this.addNewStage = function(data, currentStage) {
 
-      // Re factor this part..
+      // Re factor this part.. // what if stage with no step is returned LATER.
       //move the stages, make space.
       var ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus,
       originalWidth = currentStage.myWidth,
-      add = (data.stage.steps.length > 1) ? 121.5 : 122.5;
+      add = (data.stage.steps.length > 0) ? 128 + Math.floor(8 / data.stage.steps.length) : 128;
 
       data.stage.steps.forEach(function(step) {
         currentStage.myWidth = currentStage.myWidth + add;
@@ -249,7 +255,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       });
 
       currentStage.myWidth = originalWidth; // This is some trick, But I forgot what it was , check back here.
-
+      // okay we puhed stages in front by inflating the current stage and put the old value back.
       // now create a stage;
       var stageIndex = currentStage.index + 1;
       var stageView = new stage(data.stage, this.canvas, this.allStepViews, stageIndex, this, this.$scope, true);
@@ -276,11 +282,11 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         ordealStatus = ordealStatus + 1;
       }, this);
 
-      stageView.childSteps[stageView.childSteps.length - 1].borderRight.setVisible(false);
+      /*stageView.childSteps[stageView.childSteps.length - 1].borderRight.setVisible(false);
       if(stageView.nextStage === null) { // if its the last stage
         stageView.addBorderRight();
         this.canvas.remove(stageView.previousStage.borderRight);
-      }
+      }*/
 
       var circles = this.reDrawCircles();
       this.addRampLinesAndCircles(circles);

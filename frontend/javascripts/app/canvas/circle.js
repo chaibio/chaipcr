@@ -85,7 +85,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.pauseImage = $.extend({}, fabricStage.imageobjects["pause.png"]);
         this.setCenter(this.pauseImage);
 
-        this.pauseImageMiddle = $.extend({}, fabricStage.imageobjects["pause.png"]);
+        this.pauseImageMiddle = $.extend({}, fabricStage.imageobjects["pause-middle.png"]);
         this.setCenter(this.pauseImageMiddle);
         this.pauseImageMiddle.setVisible(false);
 
@@ -133,7 +133,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.circleGroup.add(this.pauseStepOnScrollGroup);
         this.canvas.add(this.circleGroup);
 
-        this.gatherDataCircle = new gatherDataCircle();
+        //this.gatherDataCircle = new gatherDataCircle();
         this.gatherDataGroup = new gatherDataGroup(
           [
             this.gatherDataCircle = new gatherDataCircle(),
@@ -186,7 +186,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         this.circleGroup = new circleGroup(
           [
-            this.outerMostCircle = new outerMostCircle(),
+            //this.outerMostCircle = new outerMostCircle(),
             this.outerCircle = new outerCircle(),
             this.circle = new centerCircle(),
             this.littleCircleGroup = new littleCircleGroup(
@@ -226,9 +226,10 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         this.circle.setStroke("#ffb400");
         this.outerCircle.setStroke("black");
-        this.outerCircle.strokeWidth = 7;
+        this.outerCircle.strokeWidth = 5;
         //this.stepDataGroup.setVisible(false); // Change temperature display
-        this.outerMostCircle.visible = this.littleCircleGroup.visible = true;
+        //this.outerMostCircle.visible = this.littleCircleGroup.visible = true;
+        this.littleCircleGroup.visible = true;
       };
 
       this.makeItSmall = function() {
@@ -237,11 +238,12 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         this.circle.setStroke("white");
         this.circle.setFill('#ffb400');
-        this.circle.radius = 13;
-        this.circle.strokeWidth = 10;
+        this.circle.setRadius(11);
+        this.circle.setStrokeWidth(8);
         this.outerCircle.setStroke(null);
         this.stepDataGroup.setVisible(true);
-        this.littleCircleGroup.visible = this.outerMostCircle.visible = false;
+        //this.littleCircleGroup.visible = this.outerMostCircle.visible = false;
+        this.littleCircleGroup.visible = false;
 
         if(this.model.collect_data) {
           this.circle.setFill("white");
@@ -259,8 +261,8 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         this.circle.setFill("#ffb400");
         this.circle.setStroke("#ffde00");
-        this.circle.strokeWidth = 5;
-        this.circle.radius = 18;
+        this.circle.strokeWidth = 4;
+        this.circle.radius = 13;
         this.pauseImageMiddle.setVisible(true);
         this.gatherDataImageMiddle.setVisible(false);
         this.pauseStepOnScrollGroup.setVisible(false);

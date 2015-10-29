@@ -25,9 +25,9 @@ qpcR_funcs <- c( # all functions. Resulting in normal output of ct_eff
                 'modlist_R1.r', 'utils_R1.R', # customized
                 #'modlist.r', 'utils.R', # original
                 'AICc.R', 'akaike.weights.R', 'calib.r', 'Cy0.R', 'eff.R', 'efficiency.R', 'evidence.R', 'expcomp.R', 'expfit.R', 'fitchisq.r', 'getPar.r', 'is.outlier.r', 'KOD.r', 'llratio.r', 'LOF.test.r', 'LRE.r', 'maxRatio.r', 'meltcurve.r', 'midpoint.R', 'mselect.r', 'pcrbatch.r', 'pcrboot.r', 'pcrfit.r', 'pcrGOF.R', 'pcrimport.R', 'pcrimport2.R', 'pcropt1.R', 'pcrpred.R', 'pcrsim.r', 'plot.pcrfit.r', 'predict.pcrfit.r', 'PRESS.R', 'propagate.R', 'qpcR.news.r', 'ratiobatch.r', 'ratiocalc.r', 'ratioPar.r', 'refmean.R', 'replist.r', 'resplot.R', 'resVar.R', 'RMSE.R', 'Rsq.ad.r', 'Rsq.R', 'RSS.R', 'sliwin.R', 'takeoff.R', 'update.pcrfit.r') # dir('E:/WVU1/Dropbox/pRgRamNotes/R_resources/qpcR/R') and remove 'sysdata.rda'
-dummy <- lapply(paste('qpcR', qpcR_funcs, sep='/'), source)
+dummy <- lapply(paste('/root/chaipcr/scientific/qpcR', qpcR_funcs, sep='/'), source)
 
-load('qpcR/sysdata.rda')
+load('/root/chaipcr/scientific/qpcR/sysdata.rda')
 
 
 # set constants
@@ -57,7 +57,7 @@ get_data_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for conn
                          dbname=db_name)
     
     message('experiment_id: ', exp_id)
-    message('stage_id: ', stg_id)
+    message('stage_id: ', stage_id)
     message('calibration_id: ', calib_id)
     
     # get fluorescence data for amplification
@@ -67,7 +67,7 @@ get_data_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for conn
                             INNER JOIN steps ON fluorescence_data.step_id = steps.id OR steps.id = ramps.next_step_id 
                             WHERE fluorescence_data.experiment_id=%d AND steps.stage_id=%d 
                             ORDER BY well_num, cycle_num',
-                            exp_id, stg_id)
+                            exp_id, stage_id)
     fluo_sel <- dbGetQuery(db_conn, fluo_qry)
     
     # cast fluo_sel into a pivot table organized by cycle_num (row label) and well_num (column label), average the data from all the available steps/ramps for each well and cycle
@@ -115,10 +115,28 @@ get_data_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for conn
     return(fluo_calib)
     }
 
+get_data_baseline <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
+                           	  exp_id, stage_id, calib_id, # for selecting data to analyze
+                           	  show_running_time=FALSE # option to show time cost to run this function
+                          	 ) {
+	 # baseline_ct
+	 model <- l4
+	 baselin <- 'lin'
+	 basecyc <- 1:5
+	 type <- 'curve'
+	 cp <- 'cpD2'
+
+	 # use functions
+	 fluo_calib <- get_data_calib(db_usr, db_pwd, db_host, db_port, db_name,
+	                              exp_id, stage_id, calib_id,
+	                              show_running_time) # 1.63-1.75 sec (1st time, 3 tests); 0.94-1.60 sec (2nd time and on, 5 tests)
+	 return (baseline_ct(fluo_calib, model, baselin, basecyc, type, cp, show_running_time)['bl_corrected'])
+}
 
 # function: baseline subtraction and Ct
 baseline_ct <- function(fluo_calib, 
-                        model, baselin, basecyc, # modlist parameters
+                        model, baselin, basecyc, # modlist parameters. 
+                        # baselin = c('mean', 'median', 'lin', 'quad', 'parm'). But 'parm' doesn't work properly right now.
                         type, cp, # getPar parameters
                         show_running_time=FALSE, # option to show time cost to run this function
                         
@@ -127,14 +145,27 @@ baseline_ct <- function(fluo_calib,
     func_name <- 'baseline_ct'
     start_time <- proc.time()[['elapsed']]
     
+    
     # using customized modlist and baseline functions
+    
     mod_R1 <- modlist(fluo_calib, model=model, baseline=baselin, basecyc=basecyc)
     mod_ori <- mod_R1[['ori']] # original output from qpcR function modlist
-    bl_info <- mod_R1[['bl_info']] # baseline information that original modlist does not output
+    coef_mtx <- do.call(cbind, lapply(mod_ori, 
+        function(item) {
+            coefs <- coef(item)
+            if (is.null(coefs)) coefs <- NA
+            return(coefs) })) # coefficients of sigmoid-fitted amplification curves
+    colnames(coef_mtx) <- colnames(fluo_calib)[2:ncol(fluo_calib)]
+    #bl_info <- mod_R1[['bl_info']] # baseline to subtract, which original modlist does not output
+    bl_corrected <- mod_R1[['bl_corrected']] # fluorescence data corrected via baseline subtraction, which original modlist does not output
+    
+    # extract
     
     # using original modlist and baseline functions
     # mod_ori <- modlist(fluo_calib, model=model, baseline=baselin, basecyc=basecyc)
+    # coef_mtx <- NULL
     # bl_info <- NULL
+    # bl_corrected <- NULL
     
     # threshold cycle and amplification efficiency
     ct_eff <- getPar(mod_ori, type=type, cp=cp)
@@ -143,7 +174,8 @@ baseline_ct <- function(fluo_calib,
     end_time <- proc.time()[['elapsed']]
     if (show_running_time) message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
     
-    return(list('mod_ori'=mod_ori, 'bl_info'=bl_info, 'ct_eff'=ct_eff))
+    return(list('bl_corrected'=bl_corrected, 'coefficients'=coef_mtx, 'ct_eff'=ct_eff))
+                # removed for performance: , 'mod_ori'=mod_ori, 'bl_info'=bl_info))
     }
 
 

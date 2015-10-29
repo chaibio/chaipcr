@@ -22,6 +22,7 @@ window.ChaiBioTech.ngApp
 
       updateIsHolding = (data) ->
         $scope.isHolding = TestInProgressHelper.isHolding(data, $scope.experiment)
+        console.log $scope.isHolding
 
       updateData = (data) ->
 

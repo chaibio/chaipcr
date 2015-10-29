@@ -2,7 +2,7 @@ window.ChaiBioTech.ngApp.factory('pauseStepCircleOnScroll', [
   function() {
     return function() {
       return new fabric.Circle({
-        radius: 13,
+        radius: 8,
         stroke: '#ffde00',
         originX: "center",
         originY: "center",

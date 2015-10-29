@@ -37,9 +37,9 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.setLeft();
         this.getUniqueName();
         var leftVal = {left: this.left};
-        this.commonFooterImage.set(leftVal).setCoords();
-        this.darkFooterImage.set(leftVal).setCoords();
-        this.whiteFooterImage.set(leftVal).setCoords();
+        //this.commonFooterImage.set(leftVal).setCoords();
+        //this.darkFooterImage.set(leftVal).setCoords();
+        //this.whiteFooterImage.set(leftVal).setCoords();
         this.stepGroup.set(leftVal).setCoords();
 
         leftVal = {left: this.left + (this.myWidth / 2)};
@@ -48,6 +48,17 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.ordealStatus = this.ordealStatus + action;
         this.circle.getUniqueId();
 
+      };
+
+      this.configureStepName = function(thisStep) {
+
+        if(this.model.name === null) {
+          this.stepNameText = "Step " + (this.index + 1);
+          this.stepName.text = this.stepNameText;
+        } else {
+          this.stepName.text = this.model.name;
+        }
+        stepGraphics.numberingValue.call(this);
       };
 
       this.addCircle = function() {
@@ -82,7 +93,7 @@ window.ChaiBioTech.ngApp.factory('step', [
 
       this.adjustRampSpeedPlacing = function() {
 
-        this.rampSpeedGroup.setTop(this.circle.top + 25);
+        this.rampSpeedGroup.setTop(this.circle.top + 20);
         return this;
       };
 
@@ -98,10 +109,12 @@ window.ChaiBioTech.ngApp.factory('step', [
 
         //if(this.borderRight.visible === false) { // Means this is the last step in the stage
         this.borderRight.setStroke(color);
+        this.borderRight.setStrokeWidth(2);
         if(this.previousStep) {
-          this.previousStep.borderRight.stroke = color;
+          this.previousStep.borderRight.setStroke(color);
+          this.previousStep.borderRight.setStrokeWidth(2);
         } else {
-          this.parentStage.border.stroke = color;
+          this.parentStage.border.setStroke(color);
         }
         /*if(this.parentStage.childSteps.length - 1 === this.index) {
 
@@ -124,12 +137,20 @@ window.ChaiBioTech.ngApp.factory('step', [
         }*/
       };
 
-      this.manageBorderPrevious = function(color) {
+      this.manageBorderPrevious = function(color, currentStep) {
 
-        this.borderRight.setStroke(color);
+        if(this.parentStage.childSteps.length - 1 === this.index && this.parentStage.index === currentStep.parentStage.index) {
+          //console.log("okay hitt", currentStep.parentStage);
+          this.borderRight.setStroke("#cc6c00");
+          this.borderRight.setStrokeWidth(2);
+        } else {
+          this.borderRight.setStroke(color);
+          this.borderRight.setStrokeWidth(1);
+        }
 
         if(this.previousStep) {
           this.previousStep.borderRight.setStroke(color);
+          this.previousStep.borderRight.setStrokeWidth(1);
         }
       };
 
@@ -140,7 +161,8 @@ window.ChaiBioTech.ngApp.factory('step', [
         stepGraphics.addBorderRight.call(this);
         this.getUniqueName();
         stepGraphics.rampSpeed.call(this);
-        stepGraphics.numbering.call(this);
+        stepGraphics.initNumberText.call(this);
+        stepGraphics.numberingValue.call(this);
         stepGraphics.stepComponents.call(this);
 
         // Add all those components created.
@@ -172,7 +194,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         var previouslySelectedStep = previouslySelected.circle.parent;
 
         previouslySelectedStep.showHideFooter(false);
-        previouslySelectedStep.manageBorderPrevious('#ff9f00');
+        previouslySelectedStep.manageBorderPrevious('#ff9f00', this);
         previouslySelectedStep.stepName.setFill("white");
         previouslySelectedStep.numberingText.setFill("white");
       };
