@@ -1,4 +1,7 @@
+#include <fstream>
 #include <boost/date_time.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include <Poco/Timer.h>
 #include <Poco/RWLock.h>
 
@@ -24,6 +27,8 @@ ExperimentController::ExperimentController()
     
     _settings->setDebugMode(_dbControl->getSettings().debugMode());
 
+    readDeviceFile();
+
     LidInstance::getInstance()->startThresholdReached.connect(boost::bind(&ExperimentController::run, this));
 
     HeatBlockInstance::getInstance()->rampFinished.connect(boost::bind(&ExperimentController::rampFinished, this));
@@ -40,6 +45,21 @@ ExperimentController::~ExperimentController()
     delete _dbControl;
     delete _settings;
     delete _machineMutex;
+}
+
+void ExperimentController::readDeviceFile()
+{
+    std::fstream deviceFile(kDeviceFilePath);
+
+    if (deviceFile.is_open())
+    {
+        boost::property_tree::ptree ptree;
+        boost::property_tree::read_json(deviceFile, ptree);
+
+        _settings->device.setOpticsChannels(ptree.get<std::size_t>("capabilities.channels", 1));
+    }
+    else
+        std::cout << "ExperimentController::readDeviceFile - unable to read device file: " << std::strerror(errno) << '\n';
 }
 
 ExperimentController::MachineState ExperimentController::machineState() const

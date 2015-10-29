@@ -1,4 +1,6 @@
 #include <cmath>
+#include <utility>
+#include <map>
 #include <boost/date_time.hpp>
 
 #include "controlincludes.h"
@@ -116,8 +118,20 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
             responsePt.put("optics.intensity", optics->getLedController()->intensity());
             responsePt.put("optics.collectData", optics->collectData());
             responsePt.put("optics.lidOpen", optics->lidOpen());
-            responsePt.put("optics.photodiodeValue", optics->adcValue());
             responsePt.put("optics.wellNumber", state == ExperimentController::RunningMachineState ? optics->wellNumber() : 0);
+
+            boost::property_tree::ptree adcArray;
+            const std::map<std::size_t, std::atomic<unsigned long>> &adcValues = optics->lastAdcValues();
+
+            for (std::map<std::size_t, std::atomic<unsigned long>>::const_iterator it = adcValues.begin(); it != adcValues.end(); ++it)
+            {
+                boost::property_tree::ptree item;
+                item.put("", it->second);
+
+                adcArray.push_back(std::make_pair("", item));
+            }
+
+            responsePt.put_child("optics.photodiodeValue", adcArray);
         }
 
         if (heatSink) {

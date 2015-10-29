@@ -36,7 +36,7 @@ public:
     boost::signals2::lockfree_signal<void()> loopStarted;
 
 protected:
-    ADCState calcNextState() const;
+    ADCState calcNextState(std::size_t &nextChannel) const;
 	
 protected:
     std::atomic<bool> _workState;
@@ -44,6 +44,8 @@ protected:
     LTC2444 *_ltc2444;
     ADCState _currentConversionState;
     uint32_t _differentialValue;
+
+    std::size_t _currentChannel;
 
     ConsumersList _consumers;
 

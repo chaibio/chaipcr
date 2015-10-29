@@ -63,6 +63,8 @@ public:
     int getUserId(const std::string &token) const;
 
 private:
+    void readDeviceFile();
+
     void run();
     void complete();
 

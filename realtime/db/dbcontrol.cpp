@@ -369,76 +369,102 @@ void DBControl::completeExperiment(const Experiment &experiment)
 
 void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
 {
+    if (logs.empty())
+        return;
+
     std::vector<std::string> queries;
     std::stringstream stream;
+    std::stringstream stream2;
 
-    for (const TemperatureLog &log: logs)
+    bool tempLogs = false;
+    bool debugTempLogs = false;
+
+    stream << "INSERT INTO temperature_logs(experiment_id, elapsed_time, lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp) VALUES";
+    stream2 << "INSERT INTO temperature_debug_logs(experiment_id, elapsed_time, lid_drive, heat_block_zone_1_drive, heat_block_zone_2_drive) VALUES";
+
+    for (std::vector<TemperatureLog>::const_iterator it = logs.begin(); it != logs.end(); ++it)
     {
-        if (log.hasTemperatureInfo())
+        if (it->hasTemperatureInfo())
         {
-            stream << "INSERT INTO temperature_logs(experiment_id, elapsed_time, lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp) VALUES("
-                      << log.experimentId() << ", " << log.elapsedTime() << ", " << ROUND(log.lidTemperature()) << ", "
-                      << ROUND(log.heatBlockZone1Temperature()) << ", " << ROUND(log.heatBlockZone2Temperature()) << ")";
+            if (tempLogs)
+                stream << ",";
 
-            queries.emplace_back(std::move(stream.str()));
-            stream.str("");
+            tempLogs = true;
+
+            stream << "(" << it->experimentId() << "," << it->elapsedTime() << "," << ROUND(it->lidTemperature()) << ","
+                      << ROUND(it->heatBlockZone1Temperature()) << "," << ROUND(it->heatBlockZone2Temperature()) << ")";
         }
 
-        if (log.hasDebugInfo())
+        if (it->hasDebugInfo())
         {
-            stream << "INSERT INTO temperature_debug_logs(experiment_id, elapsed_time, lid_drive, heat_block_zone_1_drive, heat_block_zone_2_drive) VALUES("
-                   << log.experimentId() << ", " << log.elapsedTime() << ", " << ROUND(log.lidTemperature()) << ", "
-                   << ROUND(log.heatBlockZone1Drive()) << ", " << ROUND(log.heatBlockZone2Drive()) << ")";
+            if (debugTempLogs)
+                stream2 << ",";
 
-            queries.emplace_back(std::move(stream.str()));
-            stream.str("");
+            debugTempLogs = true;
+
+            stream2 << "(" << it->experimentId() << "," << it->elapsedTime() << "," << ROUND(it->lidTemperature()) << ","
+                   << ROUND(it->heatBlockZone1Drive()) << "," << ROUND(it->heatBlockZone2Drive()) << ")";
         }
     }
+
+    if (tempLogs)
+        queries.emplace_back(std::move(stream.str()));
+    if (debugTempLogs)
+        queries.emplace_back(std::move(stream2.str()));
 
     addWriteQueries(queries);
 }
 
-void DBControl::addFluorescenceData(const Experiment &experiment, const std::vector<int> &fluorescenceData, bool isRamp)
+void DBControl::addFluorescenceData(const Experiment &experiment, const std::vector<Optics::FluorescenceData> &fluorescenceData, bool isRamp)
 {
+    if (fluorescenceData.empty())
+        return;
+
     std::vector<std::string> queries;
     std::stringstream stream;
 
-    for (size_t i = 0; i < fluorescenceData.size(); ++i)
+    stream << "INSERT INTO fluorescence_data(experiment_id, step_id, ramp_id, fluorescence_value, well_num, channel, cycle_num) VALUES";
+
+    for (std::vector<Optics::FluorescenceData>::const_iterator it = fluorescenceData.begin(); it != fluorescenceData.end(); ++it)
     {
-        stream << "INSERT INTO fluorescence_data(experiment_id, step_id, ramp_id, fluorescence_value, well_num, cycle_num) VALUES(" << experiment.id() << ", ";
+        stream << "(" << experiment.id() << ",";
 
         if (!isRamp)
-            stream << experiment.protocol()->currentStep()->id() << ", ";
+            stream << experiment.protocol()->currentStep()->id() << ",NULL,";
         else
-            stream << "NULL, ";
+            stream << "NULL,"  << experiment.protocol()->currentRamp()->id() << ",";
 
-        if (isRamp)
-            stream << experiment.protocol()->currentRamp()->id() << ", ";
-        else
-            stream << "NULL, ";
+        stream << it->value << "," << it->wellId << "," << (it->channel + 1) << "," << experiment.protocol()->currentStage()->currentCycle() << ")";
 
-        stream << fluorescenceData.at(i) << ", " << i << ", " << experiment.protocol()->currentStage()->currentCycle() << ")";
-
-        queries.emplace_back(std::move(stream.str()));
-        stream.str("");
+        if (it + 1 != fluorescenceData.end())
+            stream << ",";
     }
+
+    queries.emplace_back(std::move(stream.str()));
 
     addWriteQueries(queries);
 }
 
 void DBControl::addMeltCurveData(const Experiment &experiment, const std::vector<Optics::MeltCurveData> &meltCurveData)
 {
+    if (meltCurveData.empty())
+        return;
+
     std::vector<std::string> queries;
     std::stringstream stream;
 
-    for (const Optics::MeltCurveData &data: meltCurveData)
-    {
-        stream << "INSERT INTO melt_curve_data(experiment_id, stage_id, well_num, temperature, fluorescence_value) VALUES(" <<
-                  experiment.id() << ", " << experiment.protocol()->currentStage()->id() << ", " << data.wellId << ", " << data.temperature << ", " << data.fluorescenceValue << ")";
+    stream << "INSERT INTO melt_curve_data(experiment_id, stage_id, well_num, temperature, fluorescence_value, channel) VALUES";
 
-        queries.emplace_back(std::move(stream.str()));
-        stream.str("");
+    for (std::vector<Optics::MeltCurveData>::const_iterator it = meltCurveData.begin(); it != meltCurveData.end(); ++it)
+    {
+        stream << "(" << experiment.id() << "," << experiment.protocol()->currentStage()->id() << ","
+               << it->wellId << "," << it->temperature << "," << it->fluorescenceValue << "," << (it->channel + 1) << ")";
+
+        if (it + 1 != meltCurveData.end())
+            stream << ",";
     }
+
+    queries.emplace_back(std::move(stream.str()));
 
     addWriteQueries(queries);
 }

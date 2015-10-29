@@ -6,6 +6,8 @@
 #include "adcconsumer.h"
 #include "adccontroller.h"
 #include "qpcrapplication.h"
+#include "experimentcontroller.h"
+#include "machinesettings.h"
 
 using namespace std;
 
@@ -17,6 +19,7 @@ const LTC2444::OversamplingRatio kLIAOversamplingRate = LTC2444::kOversamplingRa
 ADCController::ADCController(ConsumersList &&consumers, unsigned int csPinNumber, SPIPort &&spiPort, unsigned int busyPinNumber):
     _consumers(std::move(consumers)) {
     _currentConversionState = static_cast<ADCState>(0);
+    _currentChannel = 0;
     _workState = false;
 
     _ltc2444 = new LTC2444(csPinNumber, std::move(spiPort), busyPinNumber);
@@ -46,7 +49,8 @@ void ADCController::process() {
             if (_ltc2444->waitBusy())
                 continue;
 
-            ADCState nextState = calcNextState();
+            std::size_t channel = 0;
+            ADCState nextState = calcNextState(channel);
 
             //ensure ADC loop runs at regular interval without jitter
             if (nextState == 0) {
@@ -73,8 +77,8 @@ void ADCController::process() {
 
                     repeatFrequencyLastTime = boost::chrono::high_resolution_clock::now();
                 }
-                else
-                    std::cout << "ADCController::process - ADC measurements could not be completed in scheduled time\n";
+                //else
+                //    std::cout << "ADCController::process - ADC measurements could not be completed in scheduled time\n";
             }
 
             //schedule conversion for next state, retrieve previous conversion value
@@ -87,7 +91,7 @@ void ADCController::process() {
                 value = _ltc2444->readSingleEndedChannel(1, kThermistorOversamplingRate);
                 break;
             case EReadLIA:
-                value = _ltc2444->readSingleEndedChannel(6, kLIAOversamplingRate);
+                value = _ltc2444->readSingleEndedChannel(kADCOpticsChannels.at(channel), kLIAOversamplingRate);
                 break;
             case EReadLid:
                 value = _ltc2444->readSingleEndedChannel(7, kThermistorOversamplingRate);
@@ -98,7 +102,10 @@ void ADCController::process() {
 
             try {
                 //process previous conversion value
-                _consumers[_currentConversionState]->setADCValue(value);
+                if (_currentConversionState != EReadLIA)
+                    _consumers[_currentConversionState]->setADCValue(value);
+                else
+                    _consumers[_currentConversionState]->setADCValue(value, _currentChannel);
             }
             catch (const TemperatureLimitError &ex) {
                 std::cout << "ADCController::process - consumer exception: " << ex.what() << '\n';
@@ -107,6 +114,7 @@ void ADCController::process() {
             }
 
             _currentConversionState = nextState;
+            _currentChannel = channel;
         }
     }
     catch (...) {
@@ -119,7 +127,16 @@ void ADCController::stop() {
     _ltc2444->stopWaitinigBusy();
 }
 
-ADCController::ADCState ADCController::calcNextState() const {
+ADCController::ADCState ADCController::calcNextState(size_t &nextChannel) const {
+    if (_currentConversionState == EReadLIA) {
+        nextChannel = _currentChannel + 1;
+
+        if (nextChannel < ExperimentController::getInstance()->settings()->device.opticsChannels())
+            return _currentConversionState;
+    }
+
+    nextChannel = 0;
+
     ADCController::ADCState nextState = static_cast<ADCController::ADCState>(static_cast<int>(_currentConversionState) + 1);
     return nextState == EFinal ? static_cast<ADCController::ADCState>(0) : nextState;
 }
