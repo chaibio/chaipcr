@@ -64,7 +64,7 @@
             <div class="info">
               <div class="info-text">
                 <div class="info-title">Avg. Ramp Rate:</div>
-                <div class="info-details"><b>{{ analyzedExp.Heating.AvgRampRate[0] }}</b> &deg;C/s</div>
+                <div class="info-details"><b>{{ analyzedExp.Heating.AvgRampRate[0] | round:2 }}</b> &deg;C/s</div>
                 <div class="img-button">
                   <img ng-src="{{ analyzedExp.Heating.AvgRampRate[0] > 2 ? '/images/diagnostic-wizard-check-button.png': '/images/diagnostic-wizard-x-button.png' }}">
                 </div>
@@ -106,7 +106,7 @@
             <div class="info">
               <div class="info-text">
                 <div class="info-title">Avg. Ramp Rate:</div>
-                <div class="info-details"><b>{{ analyzedExp.Cooling.AvgRampRate[0] }}</b> &deg;C/s</div>
+                <div class="info-details"><b>{{ analyzedExp.Cooling.AvgRampRate[0] | round:2 }}</b> &deg;C/s</div>
                 <div class="img-button">
                   <img ng-src="{{ analyzedExp.Cooling.AvgRampRate[0] > 2 ? '/images/diagnostic-wizard-check-button.png': '/images/diagnostic-wizard-x-button.png' }}">
                 </div>
@@ -148,7 +148,7 @@
             <div class="info">
               <div class="info-text">
                 <div class="info-title">Heating Rate:</div>
-                <div class="info-details"><b>{{ analyzedExp.Lid.HeatingRate[0]}}</b> &deg;C/s</div>
+                <div class="info-details"><b>{{ analyzedExp.Lid.HeatingRate[0] | round:2}}</b> &deg;C/s</div>
                 <div class="img-button">
                   <img ng-src="{{ analyzedExp.Lid.HeatingRate[0] > 1 ? '/images/diagnostic-wizard-check-button.png': '/images/diagnostic-wizard-x-button.png' }}">
                 </div>
