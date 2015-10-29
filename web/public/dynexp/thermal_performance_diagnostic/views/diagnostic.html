@@ -27,7 +27,7 @@
         <h1 ng-if="status === 'Heating'">Heating</h1>
         <h1 ng-if="status === 'Holding'">Holding</h1>
         <h1 ng-if="status === 'Cooling'">Cooling</h1>
-        <p>Time Elapsed: {{elapsedTime/1000 | secondsDisplay: 'display2'}}</p>
+        <p>Time Elapsed: {{elapsedTime | secondsDisplay: 'display2'}}</p>
       </div>
       <div class="row">
         <div class="col-md-3 col-md-offset-2">
