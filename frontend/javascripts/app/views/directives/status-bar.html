@@ -1,3 +1,10 @@
 <div class="status-bar">
-  
+  <div class="status-container">
+    <b ng-show="state === 'Idle'">NO EXPERIMENT RUNNING</b>
+    <b ng-show="state !== 'Idle'">EXPERIMENT IN PROGRESS</b>
+  </div>
+  <div class="controls-container">
+    <div class="control">DUPLICATE EXPERIMENT</div>
+    <div class="control">BEGIN EXPERIMENT</div>
+  </div>
 </div>

@@ -8,6 +8,7 @@ window.ChaiBioTech.ngApp.controller 'RunExperimentCtrl', [
 
     Experiment.get(id: $stateParams.id).$promise.then (data) ->
       Experiment.setCurrentExperiment data.experiment
+      $scope.experiment = data.experiment
 
     @changeChart = (chart) ->
       $state.go 'run-experiment', {id: $stateParams.id, chart: chart}, notify: false

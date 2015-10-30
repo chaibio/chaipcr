@@ -1,6 +1,30 @@
 @import '../colors.css.scss';
 
 .status-bar {
-  padding: 20px;
   background-color: $gray;
+  color: #fff;
+  font-family: 'Open Sans';
+  font-size: 10px;
+  padding: 10px;
+
+  .status-container {
+    display: inline-block;
+    width: 70%;
+  }
+
+  .controls-container {
+    display: inline-block;
+    text-align: right;
+    width: 30%;
+
+    .control {
+      display: inline-block;
+      font-weight: 700;
+      padding: 0 5px;
+
+      &.disabled {
+        color: $lightgray;
+      }
+    }
+  }
 }
