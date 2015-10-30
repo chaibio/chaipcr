@@ -104,10 +104,13 @@
       }
     }
   }
+
+  // ===========================================================//
   .bottom-half {
     width: 1024px;
-    height: 280px;
+    height: 320px;
     background-color: white;
+    position: relative;
 
     .unselectOverlay {
       width: 1024px;
@@ -133,7 +136,7 @@
     // The middle section of the bottom part of the screen
     .middle-ground {
       width: 901px;
-      height: 272px;
+      height: 258px;
       float: left;
 
       .first-data-row {
@@ -453,6 +456,7 @@
       }
     }
 
+
     .speedCaption {
       padding-left: 7px;
       span {
@@ -460,4 +464,12 @@
       }
     }
   }
+}
+
+.exp-info-bar {
+  width: 1024px;
+  height: 40px;
+  background-color: #323232;
+  position: absolute;
+  top: 278px;
 }
