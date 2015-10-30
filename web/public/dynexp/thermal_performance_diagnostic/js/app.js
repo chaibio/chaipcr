@@ -75,7 +75,7 @@
           Experiment.getTemperatureData($scope.experiment.id, {starttime: last_elapsed_time}).then(function(resp) {
             var ref, ref1;
             if (resp.data.length === 0) return;
-            temperatureLogs.concat(resp.data);
+            temperatureLogs = temperatureLogs.concat(resp.data);
             $scope.lidTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getLidTemps();
             $scope.blockTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getBlockTemps();
           })
