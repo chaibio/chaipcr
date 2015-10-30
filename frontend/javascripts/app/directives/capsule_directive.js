@@ -68,11 +68,13 @@ window.ChaiBioTech.ngApp.directive('capsule', [
           if(scope.originalValue > 0) {
             $(scope.drag).css("left", "16px");
             $(scope.drag).parent().parent().css("background-color", "rgb(238, 49, 24)");
+            $(scope.drag).parent().parent().css("border-color", "rgb(238, 49, 24)");
             $(scope.drag).find(".center-circle").css("background-color", "rgb(238, 49, 24)");
 
           } else if(scope.originalValue < 0) {
             $(scope.drag).css("left", "0px");
             $(scope.drag).parent().parent().css("background-color", "#000");
+            $(scope.drag).parent().parent().css("border-color", "#000");
             $(scope.drag).find(".center-circle").css("background-color", "#000");
           } else {
             $(scope.drag).css("left", "0px");

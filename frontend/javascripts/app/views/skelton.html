@@ -44,7 +44,7 @@
             <hold-duration caption="Hold Duration" reading="step.hold_time" pause="! step.pause"></hold-duration>
         </div>
         <div class="data-boxes auto-delta">
-          <div class="name-board ">AUTODELTA</div>
+          <div class="name-board "><auto-delta-toggle data="stage.auto_delta" type="{{stage.stage_type}}" call="changeDelta"></auto-delta-toggle> <span><b>Δ</b>&nbspAUTODELTA</span></div>
           <start-on-cycle caption="Start On Cycle" delta="stage.auto_delta" reading="stage.auto_delta_start_cycle"></start-on-cycle>
           <temp caption="Δ Temp" unit="ºC" delta="stage.auto_delta" reading="step.delta_temperature"><capsule func="changeDeltaTemperature" delta="{{stage.auto_delta}}" data="step.delta_temperature"></capsule></temp>
           <time caption="Δ Time" delta="stage.auto_delta" reading="step.delta_duration_s"><capsule func="changeDeltaTime" delta="{{stage.auto_delta}}" data="step.delta_duration_s"></capsule></time>
