@@ -38,19 +38,19 @@
         <general></general>
 
         <div class="data-boxes temperature-change">
-          <div class="name-board sansa">TEMPERATURE CHANGE SPEED</div>
+          <div class="name-board ">TEMPERATURE DETAILS</div>
             <temperature caption="temperature" unit="ºC" reading="step.temperature" action="WOWaction(edit)"></temperature>
             <ramp-speed caption="ramp speed" unit="C/s" reading="step.ramp.rate"></ramp-speed>
             <hold-duration caption="hold duration" reading="step.hold_time" pause="! step.pause"></hold-duration>
         </div>
         <div class="data-boxes auto-delta">
-          <div class="name-board sansa">AUTODELTA</div>
+          <div class="name-board ">AUTODELTA</div>
           <start-on-cycle caption="start on cycle" delta="stage.auto_delta" reading="stage.auto_delta_start_cycle"></start-on-cycle>
           <temp caption="temp" unit="ºC" delta="stage.auto_delta" reading="step.delta_temperature"><capsule func="changeDeltaTemperature" delta="{{stage.auto_delta}}" data="step.delta_temperature"></capsule></temp>
           <time caption="time" delta="stage.auto_delta" reading="step.delta_duration_s"><capsule func="changeDeltaTime" delta="{{stage.auto_delta}}" data="step.delta_duration_s"></capsule></time>
         </div>
         <div class="data-boxes edit-stage-step">
-          <div class="name-board sansa">EDIT STEP & STAGE</div>
+          <div class="name-board ">EDIT STEPS + STAGES</div>
             <actions></actions>
         </div>
       </div>
