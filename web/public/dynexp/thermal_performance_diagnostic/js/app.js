@@ -126,7 +126,7 @@
         $scope.status = newState === 'Running' ? data.experimentController.machine.thermal_state : newState;
         $scope.heat_block_temp = data.heatblock.temperature
         $scope.lid_temp = data.lid.temperature
-        $scope.elapsedTime = data.experimentController.expriment.run_duration
+        if (data.experimentController.expriment) $scope.elapsedTime = data.experimentController.expriment.run_duration
 
         if (!$scope.experiment) {
           getExperiment(function(resp) {
