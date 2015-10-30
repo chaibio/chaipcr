@@ -66,14 +66,17 @@
       $scope.lidTemps = null;
       $scope.blockTemps = null;
       fetchingTemps = false;
+      var temperatureLogs = [];
       fetchTempLogs = function() {
         if(!fetchingTemps) {
           fetchingTemps = true;
-          Experiment.getTemperatureData($scope.experiment.id).then(function(resp) {
+          var last_elapsed_time = temperatureLogs[temperatureLogs.length-1]? temperatureLogs[temperatureLogs.length-1].temperature_log.elapsed_time || 0
+          Experiment.getTemperatureData($scope.experiment.id, {starttime: last_elapsed_time}).then(function(resp) {
             var ref, ref1;
             if (resp.data.length === 0) return;
-            $scope.lidTemps = DiagnosticWizardService.temperatureLogs(resp.data).getLidTemps();
-            $scope.blockTemps = DiagnosticWizardService.temperatureLogs(resp.data).getBlockTemps();
+            temperatureLogs.push(resp.data);
+            $scope.lidTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getLidTemps();
+            $scope.blockTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getBlockTemps();
           })
           .finally(function () {
             fetchingTemps = false;
