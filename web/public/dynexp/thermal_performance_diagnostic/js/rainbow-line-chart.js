@@ -57,6 +57,7 @@
             return ctx.stroke();
           };
           makeChart = function(data) {
+            console.log('updating chart ...');
             var dpt, i, len, results;
             prev_X = 0;
             prev_Y = 0;
@@ -65,14 +66,14 @@
             maxX = getMax_X($scope.data);
             rainbow.setNumberRange(0, maxY);
             ctx.clearRect(0, 0, width, height);
-            results = [];
+            // results = [];
             for (i = 0, len = data.length; i < len; i += 1) {
               dpt = data[i];
-              results.push(drawPoint(dpt));
+              drawPoint(dpt)
+              // results.push(drawPoint(dpt));
             }
-            return results;
           };
-          return $scope.$watch('data', function(val, oldVal) {
+          $scope.$watch('data', function(val, oldVal) {
             if (!val) {
               return;
             }
@@ -83,7 +84,7 @@
               return;
             }
             return makeChart(val);
-          });
+          }, false);
         }
       };
     }
