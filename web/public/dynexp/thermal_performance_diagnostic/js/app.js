@@ -3,7 +3,8 @@
 
   var App = window.App = angular.module('ThermalDiagnosticApp', [
     'ui.router',
-    'ngResource'
+    'ngResource',
+    'http-auth-interceptor'
   ]);
 
   App.value('host', 'http://'+window.location.hostname);

@@ -43,3 +43,18 @@ App.config([
     return $httpProvider.interceptors.push('CSRFToken');
   }
 ]);
+
+App.run([
+  '$window', '$rootScope',
+  function ($window, $rootScope) {
+
+    $rootScope.$on( 'event:auth-loginRequired', function (e, rejection) {
+      console.log('here!!!');
+      $window.document.cookie = 'authentication_token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      $.jStorage.deleteKey( 'authToken')
+      $window.location.assign( '/');
+
+    });
+
+  }
+]);
