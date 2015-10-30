@@ -1,9 +1,12 @@
 <div class="action-container">
   <button ng-class="{big_button: !infiniteHoldStep, big_button_disabled: infiniteHoldStep}" id="add-step" ng-click="addStep()">ADD STEP</button>
   <button ng-class="{big_button: !infiniteHoldStage, big_button_disabled: infiniteHoldStage}" id="add-stage" ng-click="actionPopup = !actionPopup">ADD STAGE</button>
-  <button class="big_button" id="delete-step" ng-click="deleteStep()">DELETE STEP</button>
 
-  <button class="big_button" id="delete-step" ng-click="addPause()">{{pauseAction}} PAUSE</button>
+  <button class="small-button" id="delete-step" ng-click="addPause()">{{pauseAction}} PAUSE</button>
+  <!-- <button class="small-button" id="delete-step" ng-click="deleteStep()">DELETE STEP</button> -->
+  <button class="small-button move-small-button" id="edit-stage" ng-click="">EDIT STAGE</button>
+
+
 
   <div class="lol-pop" ng-show="actionPopup && !infiniteHoldStage">
     <div class="add-stage-popup">

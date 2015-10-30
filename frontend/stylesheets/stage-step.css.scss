@@ -165,22 +165,21 @@
         }
       }
       .auto-delta {
-        margin-left: 53px;
+        margin-left: 61px;
       }
 
       .edit-stage-step {
         margin-left: 53px;
 
         .action-container {
-          padding-top: 20px;
-          height: 200px;
+          padding-top: 15px;
 
           .big_button {
-            width: 243px;
+            width: 263px;
             background-color: white;
             height: 30px;
             border: 1px solid black;
-            margin-bottom: 12px;
+            margin-bottom: 17px;
             font-size: 9px;
             font-weight: bold;
           }
@@ -198,12 +197,15 @@
           }
 
           .small-button {
-            width: 115px;
+            width: 120px;
             background-color: white;
             height: 30px;
             border: 1px solid black;
             font-size: 9px;
             font-weight: bold;
+          }
+          .move-small-button {
+            margin-left: 18px;
           }
           .go-right {
             float: right;
@@ -255,28 +257,37 @@
       // For disabling the field
       .disabled {
         color: #cdcdcd;
+        border-bottom-color: #545454;
+      }
+      .notDisabled {
+
+        border-bottom-color: #cdcdcd;
       }
 
-      .bottom-common-item {
-        height: 58px;
-        width: 243px;
+     .bottom-common-item {
+        height: 47px;
+        width: 262px;
         border-bottom-style: solid;
         border-bottom-width: 1px;
-        border-bottom-color: black;
+        //border-bottom-color: #545454;
 
         .caption-part {
-          height: 53px;
-          width: 135px;
+          height: 47px;
+          width: 150px;
           float: left;
-          line-height: 2.5;
+          padding-top: 16px;
+          position: relative;
 
           .capsule {
-            width: 62px;
-            height: 26px;
-            background-color: #cdcdcd;
-            position: relative;
+
+            font-family: "dinot";
+            position: absolute;
             float: right;
-            top: 20px;
+            top: 10px;
+            left: 100px;
+            width: 32px;
+            height: 16px;
+            background-color: #cdcdcd;
             -webkit-border-radius: 15px;
             -moz-border-radius: 15px;
             border-radius: 15px;
@@ -284,24 +295,28 @@
             border-width:1px;
             border-style: solid;
 
+            .capsule-container {
+                position: relative;
+
+
             .plus {
               position: absolute;
-              top: -12px;
-              left: 8px;
-              font-size: 20px;
+              left: 3px;
+              top: -5px;
+              font-size: 16px;
               font-weight: 800;
               color: grey;
               cursor: pointer;
             }
 
             .ball-cover {
-              width: 24px;
-              height: 24px;
+              width: 14px;
+              height: 14px;
               cursor: move;
 
               .white-ball {
-                width: 24px;
-                height: 24px;
+                width: 14px;
+                height: 14px;
                 -webkit-border-radius: 50%;
                 -moz-border-radius: 50%;
                 border-radius: 50%;
@@ -309,42 +324,45 @@
                 position: absolute;
 
                 .center-circle {
-                  width: 12px;
-                  height: 12px;
+                  width: 6px;
+                  height: 6px;
                   background-color: #cdcdcd;
                   border-radius: 50%;
                   -webkit-border-radius: 50%;
                   -moz-border-radius: 50%;
                   position: absolute;
-                  top: 6px;
-                  left: 6px;
+                  top: 4px;
+                  left: 4px;
                 }
               }
             }
 
             .minus {
               position: absolute;
-              top: -26px;
-              font-size: 28px;
-              /* font-weight: 800; */
-              left: 44px;
+              left: 20px;
+              top: -5px;
+              font-size: 16px;
+              font-weight: 800;
               color: grey;
               cursor: pointer;
             }
           }
         }
+        }
 
         .data-part {
-          height: 53px;
+          height: 47px;
           width: 95px;
           float: right;
-          line-height: 1.4;
+          font-family: "dinot";
           font-weight: bold;
-          font-size: 48px;
+          font-size: 16px;
           text-align: right;
+          padding-top: 16px;
+          position: relative;
 
           .small-s {
-              font-size: 30px;
+              //font-size: 30px;
           }
 
           .time-part {
@@ -369,7 +387,7 @@
             padding-left: 6px;
           }
 
-          .minute-part {
+          /*.minute-part {
             width: 40px;
             float: left;
 
@@ -383,12 +401,14 @@
               border: none;
               display: none;
             }
-          }
+          }*/
 
           .data-part-edit-value {
             width: 95px;
-            height: 53px;
-            position: relative;
+            height: 27px;
+            position: absolute;
+            top: 10px;
+            left: 0px;
             background-color: black;
             color: white;
             font-weight: bold;
