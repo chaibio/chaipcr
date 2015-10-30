@@ -21,17 +21,17 @@ db_port <- 3306
 db_name <- 'xqrm_josh1' # used: 'xqrm_jyothi', 'xqrm_josh1'
 # # option 1
 # exp_id <- 10
-# stg_id <- 19
+# stage_id <- 19
 # calib_id <- 9
 # option 2
 exp_id <- 23
-stg_id <- 42
+stage_id <- 42
 calib_id <- 9
 
 
 # baseline_ct
 model <- l4
-baselin <- 'lin'
+baselin <- 'lin' # used: 'mean', 'median', 'lin', 'quad', 'parm'
 basecyc <- 1:5
 type <- 'curve'
 cp <- 'cpD2'

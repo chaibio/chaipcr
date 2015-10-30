@@ -54,7 +54,7 @@ get_data_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for conn
                          dbname=db_name)
     
     message('experiment_id: ', exp_id)
-    message('stage_id: ', stg_id)
+    message('stage_id: ', stage_id)
     message('calibration_id: ', calib_id)
     
     # get fluorescence data for amplification
@@ -64,7 +64,7 @@ get_data_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for conn
                             INNER JOIN steps ON fluorescence_data.step_id = steps.id OR steps.id = ramps.next_step_id 
                             WHERE fluorescence_data.experiment_id=%d AND steps.stage_id=%d 
                             ORDER BY well_num, cycle_num',
-                            exp_id, stg_id)
+                            exp_id, stage_id)
     fluo_sel <- dbGetQuery(db_conn, fluo_qry)
     
     # cast fluo_sel into a pivot table organized by cycle_num (row label) and well_num (column label), average the data from all the available steps/ramps for each well and cycle
