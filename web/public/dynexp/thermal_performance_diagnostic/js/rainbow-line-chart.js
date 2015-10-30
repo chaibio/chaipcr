@@ -57,7 +57,6 @@
             return ctx.stroke();
           };
           makeChart = function(data) {
-            console.log('updating chart ...');
             var dpt, i, len, results;
             prev_X = 0;
             prev_Y = 0;
