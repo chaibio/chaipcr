@@ -1,7 +1,7 @@
 class FluorescenceDatum < ActiveRecord::Base
   belongs_to :experiment
   
-  attr_accessor :calibrated_value
+  attr_accessor :background_subtracted_value, :baseline_subtracted_value
   
   def self.as_csv(experiment_id)
     query = self.where("fluorescence_data.experiment_id=?", experiment_id).joins("LEFT JOIN ramps ON ramps.id = fluorescence_data.ramp_id INNER JOIN steps ON steps.id = ramps.next_step_id or steps.id = fluorescence_data.step_id INNER JOIN stages ON stages.id = steps.stage_id")
