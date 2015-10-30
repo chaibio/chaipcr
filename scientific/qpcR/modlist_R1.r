@@ -1,4 +1,5 @@
 # customized by Xiaoqing Rong-Mullins. 2015-10-27.
+# all the ', silent = FALSE' were added by xqrm
 
 modlist <- function(
   x, 
@@ -99,14 +100,15 @@ modlist <- function(
     if (verbose) cat("Making model for ", NAME, " (", model$name, ")\n", sep= "")  
     flush.console()
     
-    fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent = TRUE)
+    #fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent = TRUE) # ori
+    fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent=FALSE) # xrqm
     
     ## version 1.4-0: baselining with 'c' parameter using 'baseline' function
-    if (baseline == "parm") { fitOBJ <- baseline(model = fitOBJ, baseline = baseline)
+    if (baseline == "parm") { #fitOBJ <- baseline(model = fitOBJ, baseline = baseline) # ori
       # xrqm
-      # bl_out <- baseline(model = fitOBJ, baseline = baseline)
-      # fitOBJ <- bl_out[['bl_corrected']]
-      blcor <- fitOBJ }
+      bl_out <- baseline(model = fitOBJ, baseline = baseline)
+      fitOBJ <- bl_out[['newMODEL']]
+      blcor <- bl_out[['blcor']] }
     
     # xrqm
     # bl_list[[i]] <- unlist(bl_out['bl'])
@@ -131,7 +133,7 @@ modlist <- function(
     
     ## optional model selection  
     if (opt) {
-      fitOBJ2 <- try(mselect(fitOBJ, verbose = FALSE, sig.level = optPAR$sig.level, crit = optPAR$crit), silent = TRUE)             
+      fitOBJ2 <- try(mselect(fitOBJ, verbose = FALSE, sig.level = optPAR$sig.level, crit = optPAR$crit), silent = FALSE) # xqrm added ', silent = FALSE'             
       if (inherits(fitOBJ2, "try-error")) {
         if (verbose) cat(" => Model selection failed! Using original model...\n", sep = "")
         fitOBJ$isFitted <- TRUE
@@ -161,7 +163,7 @@ modlist <- function(
   # bl_info <- do.call(cbind, bl_list)
   # colnames(bl_info) <- well_names
   bl_corrected <- do.call(cbind, blcor_list)
-  colnames(bl_corrected) <- well_names
+  try(colnames(bl_corrected) <- well_names, silent=FALSE)
   
   
   ## version 1.3-5: sigmoidal outlier detection by KOD
@@ -208,7 +210,7 @@ modlist <- function(
   }
   
   class(modLIST) <- c("modlist", "pcrfit")
-  #invisible(modLIST)
+  #invisible(modLIST) # ori
   # xqrm
   return(list('ori'=modLIST, 'bl_corrected'=bl_corrected)) # , 'bl_info'=bl_info))
 }
