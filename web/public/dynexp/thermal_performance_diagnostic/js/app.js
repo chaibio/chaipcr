@@ -70,7 +70,7 @@
       fetchTempLogs = function() {
         if(!fetchingTemps) {
           fetchingTemps = true;
-          var last_elapsed_time = temperatureLogs[temperatureLogs.length-1]? temperatureLogs[temperatureLogs.length-1].temperature_log.elapsed_time || 0
+          var last_elapsed_time = temperatureLogs[temperatureLogs.length-1]? temperatureLogs[temperatureLogs.length-1].temperature_log.elapsed_time : 0;
           Experiment.getTemperatureData($scope.experiment.id, {starttime: last_elapsed_time}).then(function(resp) {
             var ref, ref1;
             if (resp.data.length === 0) return;
