@@ -1,30 +1,58 @@
 @import '../colors.css.scss';
 
 .status-bar {
-  background-color: $gray;
+  background: $gray;
   color: #fff;
   font-family: 'Open Sans';
   font-size: 10px;
-  padding: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
 
-  .status-container {
+  .normal {
+    font-weight: normal;
+  }
+
+  .experiment-result {
     display: inline-block;
-    width: 70%;
+    padding: 10px 20px;
+
+    &.success {
+      background: $green;
+    }
+    &.failed {
+      background: red;
+    }
+  }
+
+  .completion-message {
+    padding-left: 10px;
   }
 
   .controls-container {
-    display: inline-block;
+    float: right;
+    padding: 10px;
+    padding-right: 20px;
     text-align: right;
-    width: 30%;
+  }
 
-    .control {
-      display: inline-block;
-      font-weight: 700;
-      padding: 0 5px;
+  .control {
+    cursor: pointer;
+    padding-right: 0 5px;
 
-      &.disabled {
-        color: $lightgray;
-      }
+    &:last-of-type {
+      padding-right: 0;
+    }
+
+    &.disabled {
+      color: $lightgray;
+    }
+
+    img {
+      width: 15px;
+      height: 15px;
+      vertical-align: middle;
+      margin-top: -2.5px;
     }
   }
+
 }
