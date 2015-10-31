@@ -171,7 +171,7 @@ gulp.task('js:deploy', ['set-js-deploy', 'uglify', 'markup-js-link'], function (
 //       host=10.0.2.199 hash=fcf0da2a986a77c49089c356075f71 user=root password=chaipcr gulp js:upload
 //
 // where hash is the remote hash of application-[hash].js file
-var shell = require('shelljs');
+/*var shell = require('shelljs');
 gulp.task('js:upload', ['uglify'], function (done) {
   var host = process.env.host || '10.0.2.199';
   var user = process.env.user || 'root';
@@ -184,4 +184,4 @@ gulp.task('js:upload', ['uglify'], function (done) {
 
   shell.exec(command, {async:true, silent: true}, done);
 
-});
+});*/

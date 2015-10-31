@@ -34,6 +34,18 @@ public:
         boost::posix_time::ptime _startTime;
     }temperatureLogs;
 
+    class Device
+    {
+    public:
+        Device() { _opticsChannels = 1; }
+
+        inline void setOpticsChannels(std::size_t channels) { _opticsChannels = channels; }
+        inline std::size_t opticsChannels() const { return _opticsChannels; }
+
+    private:
+        std::atomic<std::size_t> _opticsChannels;
+    }device;
+
     MachineSettings() { _debugMode = false; }
 
     inline void setDebugMode(bool mode) { _debugMode = mode; }

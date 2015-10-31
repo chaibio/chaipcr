@@ -21,7 +21,7 @@ void ADCControllerMock::process() {
         processLid();
         processOptics();
 
-        _currentConversionState = calcNextState();
+        _currentConversionState = calcNextState(_currentChannel);
     }
 }
 

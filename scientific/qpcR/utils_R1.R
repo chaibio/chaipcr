@@ -1,4 +1,5 @@
 # `baseline` customized by Xiaoqing Rong-Mullins. 2015-10-27.
+# all the ', silent = FALSE' were added by xqrm
 
 ######################################################################
 ## cbind modification without replication ############################
@@ -1067,6 +1068,7 @@ smoothit <- function(x, selfun, pars)
 ####################################################
 ###### baseline => modlist #########################
 # customized by Xiaoqing Rong-Mullins. 2015-10-27.
+# all the ', silent = FALSE' were added by xqrm
 baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
                      baseline = NULL, basecyc = NULL, basefac = NULL) 
 {  
@@ -1089,22 +1091,35 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
   }
   
   if (baseline == "parm") {
-    #BASE <- coef(model)["c"]    
-    #newDATA <- model$DATA
-    #newDATA[, 2] <- newDATA[, 2] - BASE
+    
+    #ori # stops at 'Error: $ operator is invalid for atomic vectors'
+    # BASE <- coef(model)["c"]    
+    # newDATA <- model$DATA
+    # newDATA[, 2] <- newDATA[, 2] - BASE
+    
     # xqrm
-    if (is.na(model)) {
+    if (class(model) == 'try-error') {
+    # reference in 'modlist_R1.r': 
+      # line 103: fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent=FALSE) # xqrm
+      # line 106: if (baseline == "parm") { fitOBJ <- baseline(model = fitOBJ, baseline = baseline)
+      newDATA <- NA
+      blcor <- NA
+    } else {
       BASE <- coef(model)["c"]    
       newDATA <- model$DATA
       newDATA[, 2] <- newDATA[, 2] - BASE
-    } else newDATA <- NA
+      blcor <- newDATA[, 2] }
     
-    newMODEL <- try(pcrfit(cyc = 1, fluo = 2, data = newDATA, model = model$MODEL), silent = TRUE)
-    if (inherits(newMODEL, "try-error")) return()    
+    #newMODEL <- try(pcrfit(cyc = 1, fluo = 2, data = newDATA, model = model$MODEL), silent = TRUE) # ori
+    newMODEL <- tryCatch(pcrfit(cyc = 1, fluo = 2, data = newDATA, model = model$MODEL), error=err_NA) # xqrm
+    return(list('newMODEL'=newMODEL, 'blcor'=blcor))
+    #if (inherits(newMODEL, "try-error")) return() # ori
   }
+  
   BASE <- BASE * basefac  
   
-  if (baseline != "parm") return(fluo - BASE) else return(newMODEL)
+  #if (baseline != "parm") return(fluo - BASE) else return(newMODEL) # ori
+  return(fluo - BASE) # xqrm
   
   # xqrm (removed for performance)
   # output <- list('bl'=BASE)
@@ -1114,4 +1129,11 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
     # output[['bl_corrected']] <- newMODEL }
   # return(output)
 }
+
+
+# xqrm
+err_NA <- function(e) {
+    print(e)
+    return(NA) }
+
 

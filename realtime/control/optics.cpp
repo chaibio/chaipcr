@@ -6,6 +6,8 @@
 #include "optics.h"
 #include "maincontrollers.h"
 #include "qpcrapplication.h"
+#include "experimentcontroller.h"
+#include "machinesettings.h"
 
 using namespace std;
 using namespace Poco;
@@ -15,7 +17,6 @@ using namespace Poco;
 Optics::Optics(unsigned int lidSensePin, shared_ptr<LEDController> ledController, MUX &&photoDiodeMux)
     :_ledController(ledController),
      _lidSensePin(lidSensePin, GPIO::kInput),
-     _fluorescenceData(kWellToLedMappingList.size()),
      _photodiodeMux(move(photoDiodeMux))
 {
     _lidOpen = false;
@@ -23,7 +24,7 @@ Optics::Optics(unsigned int lidSensePin, shared_ptr<LEDController> ledController
     _meltCurveCollection = false;
     _collectDataTimer = new Timer;
     _wellNumber = 0;
-    _adcValue =  0;
+    _adcValue = {0, 0};
 
     _collectDataTimer->setPeriodicInterval(0);
 }
@@ -40,10 +41,16 @@ void Optics::process()
         toggleCollectData();
 }
 
-void Optics::setADCValue(unsigned int adcValue)
+void Optics::setADCValue(unsigned int adcValue, std::size_t channel)
 {
-    _adcValue = (adcValue >> 7); //convert positive range of signed 24 bit ADC value to 16 bit unsigned value
-    _adcCondition.notify_all();
+    {
+        std::lock_guard<std::mutex> lock(_adcMutex);
+
+        _adcValue = {(adcValue >> 7), channel}; //convert positive range of signed 24 bit ADC value to 16 bit unsigned value
+        _adcCondition.notify_all();
+    }
+
+    _lastAdcValues[channel] = (adcValue >> 7);
 }
 
 void Optics::setCollectData(bool state, bool isMeltCurve)
@@ -58,8 +65,6 @@ void Optics::setCollectData(bool state, bool isMeltCurve)
             _wellNumber = 0;
 
             _fluorescenceData.clear();
-            _fluorescenceData.resize(kWellToLedMappingList.size());
-
             _meltCurveData.clear();
 
             _ledController->activateLED(kWellToLedMappingList.at(_wellNumber));
@@ -74,8 +79,6 @@ void Optics::setCollectData(bool state, bool isMeltCurve)
             _wellNumber = 0;
 
             _fluorescenceData.clear();
-            _fluorescenceData.resize(kWellToLedMappingList.size());
-
             _meltCurveData.clear();
         }
     }
@@ -106,36 +109,66 @@ void Optics::collectDataCallback(Poco::Timer &timer)
 {
     try
     {
-        std::mutex waitMutex;
-        std::unique_lock<std::mutex> waitLock(waitMutex);
+        std::vector<std::vector<unsigned long>> adcValues;
+        adcValues.resize(ExperimentController::getInstance()->settings()->device.opticsChannels());
 
-        if (!_meltCurveCollection)
         {
-            for (int i = 0; i < kADCReadsPerOpticalMeasurement; ++i)
+            std::size_t doneChannels = 0;
+            std::unique_lock<std::mutex> lock(_adcMutex);
+
+            while (doneChannels < adcValues.size())
             {
-                _adcCondition.wait(waitLock);
-                _fluorescenceData[_wellNumber].emplace_back(_adcValue);
+                _adcCondition.wait(lock);
+
+                std::vector<unsigned long> &channel = adcValues.at(_adcValue.second);
+
+                if (channel.size() < kADCReadsPerOpticalMeasurement)
+                {
+                    channel.emplace_back(_adcValue.first);
+
+                    if (channel.size() == kADCReadsPerOpticalMeasurement)
+                        ++doneChannels;
+                }
 
                 if (!_collectData)
+                {
+                    adcValues.clear();
                     break;
+                }
             }
         }
-        else
+
+        if (!adcValues.empty())
         {
-            double temperature = HeatBlockInstance::getInstance()->temperature();
-            unsigned int adc = 0;
-
-            for (int i = 0; i < kADCReadsPerOpticalMeasurement; ++i)
+            if (!_meltCurveCollection)
             {
-                _adcCondition.wait(waitLock);
-                adc += _adcValue;
+                std::size_t i = 0;
+                for (std::vector<unsigned long> &channel: adcValues)
+                {
+                    for (unsigned long value: channel)
+                        _fluorescenceData[_wellNumber][i].emplace_back(value);
 
-                if (!_collectData)
-                    break;
+                    ++i;
+                }
             }
+            else
+            {
+                double temperature = HeatBlockInstance::getInstance()->temperature();
 
-            std::lock_guard<std::mutex> meltCurveDataLock(_meltCurveDataMutex);
-            _meltCurveData.emplace_back(adc / kADCReadsPerOpticalMeasurement, temperature, _wellNumber);
+                std::size_t i = 0;
+                for (std::vector<unsigned long> &channel: adcValues)
+                {
+                    unsigned int adc = 0;
+
+                    for (unsigned long value: channel)
+                        adc += value;
+
+                    std::lock_guard<std::mutex> meltCurveDataLock(_meltCurveDataMutex);
+                    _meltCurveData.emplace_back(adc / kADCReadsPerOpticalMeasurement, temperature, _wellNumber, i);
+
+                    ++i;
+                }
+            }
         }
 
         ++_wellNumber;
@@ -153,9 +186,9 @@ void Optics::collectDataCallback(Poco::Timer &timer)
     }
 }
 
-std::vector<int> Optics::getFluorescenceData()
+std::vector<Optics::FluorescenceData> Optics::getFluorescenceData()
 {
-    std::vector<int> collectedData;
+    std::vector<FluorescenceData> data;
     std::lock_guard<std::recursive_mutex> lock(_collectDataMutex);
 
     if (_collectData)
@@ -163,20 +196,23 @@ std::vector<int> Optics::getFluorescenceData()
         _collectData = false;
         toggleCollectData();
 
-        for (std::vector<int> &data: _fluorescenceData)
+        for (std::map<unsigned int, std::map<std::size_t, std::vector<unsigned long>>>::iterator it = _fluorescenceData.begin(); it != _fluorescenceData.end(); ++it)
         {
-            if (!data.empty())
+            for (std::map<std::size_t, std::vector<unsigned long>>::iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2)
             {
-                collectedData.emplace_back(std::accumulate(data.begin(), data.end(), 0) / data.size());
+                if (!it2->second.empty())
+                {
+                    data.emplace_back(std::accumulate(it2->second.begin(), it2->second.end(), 0) / it2->second.size(), it->first, it2->first);
 
-                data.clear();
+                    it2->second.clear();
+                }
+                else
+                    data.emplace_back(0, it->first, it2->first);
             }
-            else
-                collectedData.emplace_back(0);
         }
     }
 
-    return collectedData;
+    return data;
 }
 
 std::vector<Optics::MeltCurveData> Optics::getMeltCurveData(bool stopDataCollect)

@@ -41,9 +41,11 @@ window.ChaiBioTech.ngApp.directive('capsule', [
 
         scope.disable = function() {
 
-          scope.configurePlusMinus("grey");
+          scope.configurePlusMinus("rgb(205, 205, 205)");
           $(scope.drag).css("left", "0px");
           $(scope.drag).parent().parent().css("background-color", "rgb(205, 205, 205)");
+          $(scope.drag).parent().parent().css("border-color", "rgb(205, 205, 205)");
+          $(scope.drag).find(".center-circle").css("background-color", "rgb(205, 205, 205)");
         };
 
         scope.configurePlusMinus = function(color) {
@@ -64,14 +66,21 @@ window.ChaiBioTech.ngApp.directive('capsule', [
           }*/
 
           if(scope.originalValue > 0) {
-            $(scope.drag).css("left", "36px");
+            $(scope.drag).css("left", "16px");
             $(scope.drag).parent().parent().css("background-color", "rgb(238, 49, 24)");
+            $(scope.drag).parent().parent().css("border-color", "rgb(238, 49, 24)");
+            $(scope.drag).find(".center-circle").css("background-color", "rgb(238, 49, 24)");
+
           } else if(scope.originalValue < 0) {
             $(scope.drag).css("left", "0px");
-            $(scope.drag).parent().parent().css("background-color", "rgb(0, 174, 239)");
+            $(scope.drag).parent().parent().css("background-color", "#000");
+            $(scope.drag).parent().parent().css("border-color", "#000");
+            $(scope.drag).find(".center-circle").css("background-color", "#000");
           } else {
             $(scope.drag).css("left", "0px");
-            $(scope.drag).parent().parent().css("background-color", "rgb(0, 174, 239)");
+            $(scope.drag).parent().parent().css("background-color", "#000");
+            $(scope.drag).parent().parent().css("border-color", "#000");
+            $(scope.drag).find(".center-circle").css("background-color", "#000");
           }
         };
 
@@ -88,14 +97,18 @@ window.ChaiBioTech.ngApp.directive('capsule', [
 
             if(scope.delta === "true") {
               var pos = $(this).position().left;
-              if(pos < 18) {
+              if(pos < 7) {
                 $(this).css("left", "0px");
-                $(this).parent().parent().css("background-color", "rgb(0, 174, 239)");
+                $(this).parent().parent().css("background-color", "#000");
+                $(this).parent().parent().css("border-color", "#000");
+                $(this).find(".center-circle").css("background-color", "#000");
                 scope.originalValue = scope.originalValue * -1;
 
               } else {
-                $(this).css("left", "36px");
+                $(this).css("left", "16px");
                 $(this).parent().parent().css("background-color", "rgb(238, 49, 24)");
+                $(this).parent().parent().css("border-color", "rgb(238, 49, 24)");
+                $(this).find(".center-circle").css("background-color", "rgb(238, 49, 24)");
                 scope.originalValue = Math.abs(scope.originalValue);
               }
               if(scope.originalValue !== 0) {

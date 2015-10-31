@@ -53,14 +53,15 @@
   ]);
 
   App.controller('DiagnosticWizardCtrl', [
-    '$scope', 'Experiment', 'Status', '$interval', 'DiagnosticWizardService', '$stateParams', '$state',
-    function($scope, Experiment, Status, $interval, DiagnosticWizardService, $params, $state) {
+    '$scope', 'Experiment', 'Status', '$interval', 'DiagnosticWizardService', '$stateParams', '$state', 'CONSTANTS',
+    function ($scope, Experiment, Status, $interval, DiagnosticWizardService, $params, $state, CONSTANTS) {
       var fetchingTemps, fetchTempLogs, getExperiment, pollTemperatures, stopPolling, tempPoll, analyzeExperiment;
       Status.startSync();
       $scope.$on('$destroy', function() {
         Status.stopSync();
         return stopPolling();
       });
+      $scope.CONSTANTS = CONSTANTS;
       tempPoll = null;
       $scope.lidTemps = null;
       $scope.blockTemps = null;
@@ -73,7 +74,6 @@
             if (resp.data.length === 0) return;
             $scope.lidTemps = DiagnosticWizardService.temperatureLogs(resp.data).getLidTemps();
             $scope.blockTemps = DiagnosticWizardService.temperatureLogs(resp.data).getBlockTemps();
-            return $scope.elapsedTime = ((ref = resp.data[resp.data.length - 1]) != null ? (ref1 = ref.temperature_log) != null ? ref1.elapsed_time : void 0 : void 0) || 0;
           })
           .finally(function () {
             fetchingTemps = false;
@@ -122,7 +122,7 @@
         $scope.status = newState === 'Running' ? data.experimentController.machine.thermal_state : newState;
         $scope.heat_block_temp = data.heatblock.temperature
         $scope.lid_temp = data.lid.temperature
-
+        $scope.elapsedTime = data.experimentController.expriment.run_duration
 
         if (!$scope.experiment) {
           getExperiment(function(resp) {

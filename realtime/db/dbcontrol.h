@@ -38,7 +38,7 @@ public:
     void completeExperiment(const Experiment &experiment);
 
     void addTemperatureLog(const std::vector<TemperatureLog> &logs);
-    void addFluorescenceData(const Experiment &experiment, const std::vector<int> &fluorescenceData, bool isRamp = false);
+    void addFluorescenceData(const Experiment &experiment, const std::vector<Optics::FluorescenceData> &fluorescenceData, bool isRamp = false);
     void addMeltCurveData(const Experiment &experiment, const std::vector<Optics::MeltCurveData> &meltCurveData);
 
     Settings getSettings();

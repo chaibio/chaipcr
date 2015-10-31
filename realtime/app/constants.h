@@ -2,6 +2,7 @@
 #define _CONSTANTS_H_
 
 #include <vector>
+#include <string>
 
 //Steinhart-Hart coefficients
 const double kUSSensorJThermistorC0Coefficient = 0.00112502978660426;
@@ -37,6 +38,8 @@ const int kPIDDerivativeGainLimiter = 12;
 //ADC
 const int kADCRepeatFrequency = 80; // Hz
 const int kADCSPIFrequencyHz = 10000000; //10 MHz
+
+const std::vector<uint8_t> kADCOpticsChannels = { 6, 5 };
 
 //thermistor & ADC params
 const unsigned int kLidThermistorVoltageDividerResistanceOhms = 33000;
@@ -85,6 +88,8 @@ const double kPCRBeginStepTemperatureThreshold = 0.5;
 const long kTemperatureLoggerInterval = 1000;
 const long kTemperatureLoggerFlushInterval = 10000; //ms
 
+const std::string kDeviceFilePath = {"/root/device.json"};
+
 //Heat Sink
 const double kHeatSinkTargetTemperature = 50; //C
 const unsigned int kHeatSinkThermistorVoltageDividerResistanceOhms = 6800;
@@ -102,6 +107,6 @@ const double kHeatSinkPIDMax = 0;
 const unsigned int kBeagleboneADCBits = 12;
 
 //App
-const long kAppSignalInterval = 5 * 1000 * 1000; //Nanosec
+const long kAppSignalInterval = 50 * 1000 * 1000; //Nanosec
 
 #endif

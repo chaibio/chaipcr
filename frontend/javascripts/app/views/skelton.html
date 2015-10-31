@@ -33,28 +33,32 @@
 
     <!-- bottom-half-->
     <div class="bottom-half noselect" >
+
       <arrow class="previous" action="previous" ng-click="arrowClicked()"></arrow>
       <div class="middle-ground">
         <general></general>
 
         <div class="data-boxes temperature-change">
-          <div class="name-board sansa">TEMPERATURE CHANGE SPEED</div>
-            <temperature caption="temperature" unit="ºC" reading="step.temperature" action="WOWaction(edit)"></temperature>
-            <ramp-speed caption="ramp speed" unit="C/s" reading="step.ramp.rate"></ramp-speed>
-            <hold-duration caption="hold duration" reading="step.hold_time" pause="! step.pause"></hold-duration>
+          <div class="name-board ">TEMPERATURE DETAILS</div>
+            <temperature caption="Temperature" unit="ºC" reading="step.temperature" action="WOWaction(edit)"></temperature>
+            <ramp-speed caption="Ramp Speed" unit="C/s" reading="step.ramp.rate"></ramp-speed>
+            <hold-duration caption="Hold Duration" reading="step.hold_time" pause="! step.pause"></hold-duration>
         </div>
         <div class="data-boxes auto-delta">
-          <div class="name-board sansa">AUTODELTA</div>
-          <start-on-cycle caption="start on cycle" delta="stage.auto_delta" reading="stage.auto_delta_start_cycle"></start-on-cycle>
-          <temp caption="temp" unit="ºC" delta="stage.auto_delta" reading="step.delta_temperature"><capsule func="changeDeltaTemperature" delta="{{stage.auto_delta}}" data="step.delta_temperature"></capsule></temp>
-          <time caption="time" delta="stage.auto_delta" reading="step.delta_duration_s"><capsule func="changeDeltaTime" delta="{{stage.auto_delta}}" data="step.delta_duration_s"></capsule></time>
+          <div class="name-board "><auto-delta-toggle data="stage.auto_delta" type="{{stage.stage_type}}" call="changeDelta"></auto-delta-toggle> <span><b>Δ</b>&nbspAUTODELTA</span></div>
+          <start-on-cycle caption="Start On Cycle" delta="stage.auto_delta" reading="stage.auto_delta_start_cycle"></start-on-cycle>
+          <temp caption="Δ Temp" unit="ºC" delta="stage.auto_delta" reading="step.delta_temperature"><capsule func="changeDeltaTemperature" delta="{{stage.auto_delta}}" data="step.delta_temperature"></capsule></temp>
+          <time caption="Δ Time" delta="stage.auto_delta" reading="step.delta_duration_s"><capsule func="changeDeltaTime" delta="{{stage.auto_delta}}" data="step.delta_duration_s"></capsule></time>
         </div>
         <div class="data-boxes edit-stage-step">
-          <div class="name-board sansa">EDIT STEP & STAGE</div>
+          <div class="name-board ">EDIT STEPS + STAGES</div>
             <actions></actions>
         </div>
       </div>
       <arrow class="next" action="next" ng-click="arrowClicked()"></arrow>
+
+      <div class="exp-info-bar"> <!--the balack bar in the bottom comes here --></div>
+    </div>
       <div id="curtain" class="unselectOverlay"></div>
     </div>
   </div>

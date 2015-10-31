@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.directive('gatherDataToggle', [
+window.ChaiBioTech.ngApp.directive('autoDeltaToggle', [
   function() {
     return {
       restric: 'EA',
@@ -7,15 +7,20 @@ window.ChaiBioTech.ngApp.directive('gatherDataToggle', [
 
       scope: {
         data: '=data',
+        type: '@',
         call: "@"
       },
 
       link: function(scope, elem, attr) {
-        scope.show = true;
+        scope.show = false;
         scope.$on("dataLoaded", function() {
           scope.$watch("data", function(val, oldVal) {
             scope.configureSwitch(val);
           });
+
+          scope.$watch("type", function(val, oldVal) {
+          });
+
         });
 
         scope.configureSwitch = function(val) {
@@ -39,15 +44,19 @@ window.ChaiBioTech.ngApp.directive('gatherDataToggle', [
           stop: function() {
             var pos = $(this).position().left;
             var val = false;
-            if(pos < 6) {
-              $(this).css("left", "1px");
+            if(scope.type === "cycling") {
+              if(pos < 6) {
+                $(this).css("left", "1px");
+              } else {
+                $(this).css("left", "11px");
+                val = true;
+              }
+              if(val !== scope.data) {
+                scope.data = !scope.data;
+                scope.$parent[scope.call]();
+              }
             } else {
-              $(this).css("left", "11px");
-              val = true;
-            }
-            if(val !== scope.data) {
-              scope.data = !scope.data;
-              scope.$parent[scope.call]();
+              $(this).css("left", "1px");
             }
           }
         });
