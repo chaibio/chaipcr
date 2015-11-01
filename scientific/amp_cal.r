@@ -34,11 +34,12 @@ load('qpcR/sysdata.rda')
 num_wells <- 16
 scaling_factor <- 9e5
 
+
 # function by Xia Hong
 get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
-                              exp_id, stage_id, calib_id, # for selecting data to analyze
-                              show_running_time=FALSE # option to show time cost to run this function
-                              ) {
+                                   exp_id, stage_id, calib_id, # for selecting data to analyze
+                                   show_running_time=FALSE # option to show time cost to run this function
+                                   ) {
     # baseline_ct
     model <- l4
     baselin <- 'lin'
@@ -48,9 +49,9 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     
     # use functions
     fluo_calib <- get_data_calib(db_usr, db_pwd, db_host, db_port, db_name,
-                              exp_id, stage_id, calib_id,
-                              show_running_time) # 1.63-1.75 sec (1st time, 3 tests); 0.94-1.60 sec (2nd time and on, 5 tests)
-	baseline_calib <- baseline_ct(fluo_calib, model, baselin, basecyc, type, cp, show_running_time)
+                                 exp_id, stage_id, calib_id,
+                                 show_running_time) # 1.63-1.75 sec (1st time, 3 tests); 0.94-1.60 sec (2nd time and on, 5 tests)
+    baseline_calib <- baseline_ct(fluo_calib, model, baselin, basecyc, type, cp, show_running_time)
     return (list('background_subtracted'=fluo_calib, 'baseline_subtracted'=baseline_calib['bl_corrected'], 'ct'=baseline_calib['ct_eff']))
     }
 
@@ -132,6 +133,7 @@ get_data_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for conn
     return(fluo_calib)
     }
 
+
 # function: baseline subtraction and Ct
 baseline_ct <- function(fluo_calib, 
                         model, baselin, basecyc, # modlist parameters. 
@@ -164,7 +166,14 @@ baseline_ct <- function(fluo_calib,
     # bl_corrected <- NULL
     
     # threshold cycle and amplification efficiency
-    ct_eff <- getPar(mod_ori, type=type, cp=cp)
+    ct_eff_raw <- getPar(mod_ori, type=type, cp=cp)
+    ct_eff <- do.call(cbind, alply(ct_eff_raw, .margins=2, 
+                                   .fun=function(col1) {
+                                       ct <- col1['ct']
+                                       ct_adj <- if (!is.na(ct) & ct == nrow(fluo_calib)) NA else ct
+                                       c(ct_adj, col1['eff']) }))
+    rownames(ct_eff) <- rownames(ct_eff_raw)
+    colnames(ct_eff) <- colnames(ct_eff_raw)
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]
