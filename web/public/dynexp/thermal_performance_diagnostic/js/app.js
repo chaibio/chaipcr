@@ -19,13 +19,11 @@
       $stateProvider
       .state('diagnostic-initialization', {
         url: '/diagnostic-initialization',
-        templateUrl: './views/loading.html',
-        controller: 'DiagnosticInitCtrl'
+        templateUrl: './views/init.html'
       })
       .state('diagnostic', {
         url: '/thermal-performance-diagnostic/:id',
-        templateUrl: './views/diagnostic.html',
-        controller: 'DiagnosticWizardCtrl'
+        templateUrl: './views/diagnostic.html'
       });
 
     }
@@ -36,20 +34,24 @@
     'Experiment',
     '$state',
     function ($scope, Experiment, $state) {
-      var exp;
-      exp = new Experiment({
-        experiment: {
-          guid: 'thermal_performance_diagnostic'
-        }
-      });
-      exp.$save().then(function(resp) {
-        $scope.experiment = resp.experiment;
-        Experiment.startExperiment(resp.experiment.id).then(function() {
-          $state.go('diagnostic', {
-            id: resp.experiment.id
+
+      $scope.proceed = function () {
+        var exp;
+        exp = new Experiment({
+          experiment: {
+            guid: 'thermal_performance_diagnostic'
+          }
+        });
+        exp.$save().then(function(resp) {
+          $scope.experiment = resp.experiment;
+          Experiment.startExperiment(resp.experiment.id).then(function() {
+            $state.go('diagnostic', {
+              id: resp.experiment.id
+            });
           });
         });
-      });
+      };
+
     }
   ]);
 

@@ -1,3 +1,19 @@
+.diagnostic-wizard .intro-text-container {
+    width: 600px;
+    margin: 0 auto;
+}
+.diagnostic-wizard .intro-text-container h1 {
+    margin-top: 0px;
+    margin-bottom: 50px;
+}
+.diagnostic-wizard .intro-text-container p {
+    font-size: 20px;
+    text-align: justify;
+}
+.diagnostic-wizard .intro-text-container img {
+    margin: 50px 0;
+}
+
 .diagnostic-wizard {
     font-family: 'Dinot';
     color: #000;
@@ -37,6 +53,12 @@
     margin-bottom: 50px;
     padding: 5px 50px;
     text-decoration: none;
+}
+.diagnostic-wizard button.green,
+.diagnostic-wizard .button.green {
+    background: #6ACC0A;
+    border-color: transparent;
+    color: #fff;
 }
 .diagnostic-wizard .info-container {
     margin-top: 100px;
