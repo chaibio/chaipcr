@@ -69,5 +69,17 @@ window.ChaiBioTech.ngApp.service 'TestInProgressHelper', [
 
       holding
 
+    @timeRemaining = (data) ->
+      return 0 if !data
+      return 0 if !data.experimentController
+      if data.experimentController.machine.state is 'Running'
+        exp = data.experimentController.expriment
+        time = (exp.estimated_duration*1+exp.paused_duration*1)-exp.run_duration*1
+        if time < 0 then time = 0
+
+        time
+      else
+        0
+
     return
 ]

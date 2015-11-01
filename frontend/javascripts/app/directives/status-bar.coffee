@@ -20,6 +20,7 @@ window.App.directive 'statusBar', [
         getExperiment (exp) ->
           $scope.experiment = exp
 
+      $scope.isHolding = false
 
       Status.startSync()
       elem.on '$destroy', ->
@@ -37,8 +38,12 @@ window.App.directive 'statusBar', [
           getExperiment (exp) ->
             $scope.experiment = exp
             $scope.status = data
+            $scope.isHolding = TestInProgressHelper.setHolding(data, exp)
         else
           $scope.status = data
+          $scope.isHolding = TestInProgressHelper.setHolding(data, $scope.experiment)
+
+        $scope.timeRemaining = TestInProgressHelper.timeRemaining(data)
 
       , true
 

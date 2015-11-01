@@ -1,36 +1,44 @@
-<div class="status-bar" ng-class="{'status-complete': experiment.completed_at}">
-  <span class="experiment-result" ng-show="experiment.completed_at" ng-class="experiment.completion_status === 'success' ? 'success' : 'failed'" ng-show="experiment.completed_at">
-    <span ng-show="experiment.completion_status === 'success'">EXPERIMENT COMPLETE</span>
-    <span ng-show="experiment.completion_status !== 'success'">EXPERIMENT FAILED</span>
-  </span>
-  <span class="completion-message" ng-show="experiment.completed_at">
-    {{experiment.name}}
-    <span ng-show="experiment.completion_status === 'success'">WAS COMPLETED SUCCESSFULLY</span>
-    <span ng-show="experiment.completion_message">{{experiment.completion_message}}</span>
-    <span ng-show="!experiment.completion_message">
-      <span ng-show="experiment.completion_status === 'aborted' ">WAS ABORTED BY THE USER</span>
+<div class="status-bar" ng-show="experiment & state">
+  <span ng-show="status && experiment">
+    <span class="experiment-result" ng-show="experiment.completed_at" ng-class="experiment.completion_status === 'success' ? 'success' : 'failed'" ng-show="experiment.completed_at">
+      <span ng-show="experiment.completion_status === 'success'">EXPERIMENT COMPLETE</span>
+      <span ng-show="experiment.completion_status !== 'success'">EXPERIMENT FAILED</span>
     </span>
-    <span class="normal">{{getDuration() | secondsDisplay: 'display2'}}</span>
-  </span>
-  <span class="running-info" ng-show="state !== 'Idle'">
-    Experiment in progress
-    <span class="time-remaining">
-      TIME REMAINING:
-      <span class="holding">HOLDING</span>
+    <span class="completion-message" ng-show="experiment.completed_at && !isHolding">
+      {{experiment.name}}
+      <span ng-show="experiment.completion_status === 'success'">WAS COMPLETED SUCCESSFULLY</span>
+      <span ng-show="experiment.completion_message">{{experiment.completion_message}}</span>
+      <span ng-show="!experiment.completion_message">
+        <span ng-show="experiment.completion_status === 'aborted' ">WAS ABORTED BY THE USER</span>
+      </span>
+      <span class="normal">{{getDuration() | secondsDisplay: 'display2'}}</span>
     </span>
-    <span class="temp-info">
-      BLOCK: 57.2&deg;C
+    <span class="idle-state" ng-show="state === 'Idle' && !experiment.started_at">
+      <span ng-show="!experiment.id">NO EXPERIMENT RUNNING</span>
+      <span ng-show="experiment.id && !experiment.started_at">{{experiment.name}} <span class="normal">is valid and ready to run</span></span>
     </span>
-    <span class="temp-info">
-      LID: 57.2&deg;C
+    <span class="running-info" ng-show="state !== 'Idle'">
+      Experiment in progress
+      <span class="time-remaining">
+        TIME REMAINING:
+        <span ng-show="!isHolding">{{timeRemaining | secondsDisplay: 'display2'}}</span>
+        <span class="holding" ng-show="isHolding">HOLDING</span>
+      </span>
+      <span class="temp-info">
+        BLOCK: {{status.heatblock.temperature | round: 1}}&deg;C
+      </span>
+      <span class="temp-info">
+        LID: {{status.lid.temperature | round: 1}}&deg;C
+      </span>
     </span>
-  </span>
-  <span class="controls-container">
-    <span class="control" ng-show="state === 'Idle'" experiment-id="experiment.id" duplicate-experiment>DUPLICATE EXPERIMENT</span>
-    <span class="control" ng-show="!experiment.started_at" ng-class="{'disabled': experiment.started_at}" ng-click="startExperiment()">BEGIN EXPERIMENT</span>
-    <span class="control" ng-show="experiment.started_at && !experiment.completed_at && state !== 'Idle' " ng-click="stopExperiment()">
-      <img src="/images/status-bar-stop-btn.png">
-      STOP EXPERIMENT
+    <span class="controls-container">
+      <span class="control" ng-show="state === 'Idle'" experiment-id="experiment.id" duplicate-experiment>DUPLICATE EXPERIMENT</span>
+      <span class="control" ng-show="!experiment.started_at" ng-class="{'disabled': experiment.started_at}" ng-click="startExperiment()">BEGIN EXPERIMENT</span>
+      <span class="control" ng-show="experiment.started_at && (!experiment.completed_at || isHolding) && state !== 'Idle' " ng-click="stopExperiment()">
+        <img src="/images/status-bar-stop-btn.png">
+        <span ng-show="!isHolding">STOP EXPERIMENT</span>
+        <span ng-show="isHolding">END HOLD</span>
+      </span>
     </span>
   </span>
 </div>

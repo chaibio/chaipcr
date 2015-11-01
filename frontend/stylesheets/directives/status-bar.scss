@@ -7,7 +7,7 @@
   font-family: 'Open Sans';
   font-size: 10px;
   font-weight: bold;
-  min-height: 34px;
+  height: 34px;
   margin-top: 20px;
   text-transform: uppercase;
 
@@ -41,6 +41,10 @@
 
     .time-remaining, .temp-info {
       padding-left: 10px;
+    }
+
+    .holding {
+      border-bottom: 1px solid $green;
     }
   }
 
