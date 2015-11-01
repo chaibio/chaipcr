@@ -1,12 +1,19 @@
 @import '../colors.css.scss';
 
 .status-bar {
+  position: relative;
   background: $gray;
   color: #fff;
   font-family: 'Open Sans';
   font-size: 10px;
   font-weight: bold;
+  min-height: 34px;
+  margin-top: 20px;
   text-transform: uppercase;
+
+  * {
+    display: inline-block;
+  }
 
   .normal {
     font-weight: normal;
@@ -28,20 +35,26 @@
     padding-left: 10px;
   }
 
+  .running-info {
+    margin-left: 20px;
+    padding: 10px 0;
+
+    .time-remaining, .temp-info {
+      padding-left: 10px;
+    }
+  }
+
   .controls-container {
     float: right;
     padding: 10px;
     padding-right: 20px;
     text-align: right;
+    margin-right: -5px;
   }
 
   .control {
     cursor: pointer;
-    padding-right: 0 5px;
-
-    &:last-of-type {
-      padding-right: 0;
-    }
+    padding: 0 5px;
 
     &.disabled {
       color: $lightgray;
@@ -51,7 +64,7 @@
       width: 15px;
       height: 15px;
       vertical-align: middle;
-      margin-top: -2.5px;
+      margin-top: -3px;
     }
   }
 

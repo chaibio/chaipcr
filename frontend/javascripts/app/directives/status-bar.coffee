@@ -5,6 +5,7 @@ window.App.directive 'statusBar', [
   (Experiment, Status, TestInProgressHelper) ->
 
     restrict: 'EA'
+    replace: true
     scope:
       experimentId: '='
     templateUrl: 'app/views/directives/status-bar.html'
@@ -44,5 +45,11 @@ window.App.directive 'statusBar', [
       $scope.getDuration = ->
         return 0 if !$scope?.experiment?.completed_at
         Experiment.getExperimentDuration($scope.experiment)
+
+      $scope.startExperiment = ->
+        Experiment.startExperiment($scope.experiment.id)
+
+      $scope.stopExperiment = ->
+        Experiment.stopExperiment($scope.experiment.id)
 
 ]
