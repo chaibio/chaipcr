@@ -11,6 +11,7 @@
       <span ng-show="experiment.completion_message">{{experiment.completion_message}}</span>
       <span ng-show="!experiment.completion_message">
         <span ng-show="experiment.completion_status === 'aborted' ">ABORTED BY THE USER</span>
+        <span ng-show="experiment.completion_status !== 'aborted' && experiment.completion_status !== 'success' ">{{experiment.completion_status}}</span>
       </span>
       <span class="normal">{{getDuration() | secondsDisplay: 'display2'}}</span>
     </span>
