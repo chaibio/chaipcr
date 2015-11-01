@@ -7,11 +7,10 @@
       <span ng-show="experiment.completion_status !== 'success'">EXPERIMENT FAILED</span>
     </span>
     <span class="completion-message" ng-show="experiment.completed_at && !isHolding">
-      {{experiment.name}}
-      <span ng-show="experiment.completion_status === 'success'">WAS COMPLETED SUCCESSFULLY</span>
+      <span ng-show="experiment.completion_status === 'success'">COMPLETED SUCCESSFULLY</span>
       <span ng-show="experiment.completion_message">{{experiment.completion_message}}</span>
       <span ng-show="!experiment.completion_message">
-        <span ng-show="experiment.completion_status === 'aborted' ">WAS ABORTED BY THE USER</span>
+        <span ng-show="experiment.completion_status === 'aborted' ">ABORTED BY THE USER</span>
       </span>
       <span class="normal">{{getDuration() | secondsDisplay: 'display2'}}</span>
     </span>
