@@ -32,6 +32,7 @@ window.App.directive 'statusBar', [
         return if !data
         return if !data.experimentController
         $scope.state = data.experimentController.machine.state
+        $scope.thermal_state = data.experimentController.machine.thermal_state
         $scope.oldState = oldData?.experimentController?.machine?.state || 'NONE'
 
         if ((($scope.oldState isnt $scope.state or !$scope.experiment))) and $scope.experimentId

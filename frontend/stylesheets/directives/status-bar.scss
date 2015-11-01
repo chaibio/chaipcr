@@ -1,7 +1,6 @@
 @import '../colors.css.scss';
 
 .status-bar {
-  position: relative;
   background: $gray;
   color: #fff;
   font-family: 'Open Sans';
@@ -35,11 +34,11 @@
     padding-left: 10px;
   }
 
-  .running-info {
+  .running-info, .idle-state {
     margin-left: 20px;
     padding: 10px 0;
 
-    .time-remaining, .temp-info {
+    .machine-state, .time-remaining, .temp-info {
       padding-left: 10px;
     }
 

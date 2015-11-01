@@ -1,6 +1,8 @@
-<div class="status-bar" ng-show="experiment & state">
-  <span ng-show="status && experiment">
-    <span class="experiment-result" ng-show="experiment.completed_at" ng-class="experiment.completion_status === 'success' ? 'success' : 'failed'" ng-show="experiment.completed_at">
+<div>
+  <div class="status-bar" ng-show="!experiment || !status"></div>
+
+  <div class="status-bar" ng-show="experiment && status">
+    <span class="experiment-result" ng-show="experiment.completed_at && !isHolding" ng-class="experiment.completion_status === 'success' ? 'success' : 'failed'" ng-show="experiment.completed_at">
       <span ng-show="experiment.completion_status === 'success'">EXPERIMENT COMPLETE</span>
       <span ng-show="experiment.completion_status !== 'success'">EXPERIMENT FAILED</span>
     </span>
@@ -19,12 +21,19 @@
     </span>
     <span class="running-info" ng-show="state !== 'Idle'">
       Experiment in progress
-      <span class="time-remaining">
+      <span class="machine-state">
+        <span class="holding">
+          <span ng-show="state === 'LidHeating'">heating lid</span>
+          <span ng-show="state === 'Paused'">Paused</span>
+          <span ng-show="state === 'Running'">{{thermal_state}}</span>
+        </span>
+      </span>
+      <span class="time-remaining" ng-show="state === 'Running' || isHolding">
         TIME REMAINING:
         <span ng-show="!isHolding">{{timeRemaining | secondsDisplay: 'display2'}}</span>
         <span class="holding" ng-show="isHolding">HOLDING</span>
       </span>
-      <span class="temp-info">
+      <span class="temp-info" ng-show="state !== 'LidHeating'">
         BLOCK: {{status.heatblock.temperature | round: 1}}&deg;C
       </span>
       <span class="temp-info">
@@ -40,5 +49,5 @@
         <span ng-show="isHolding">END HOLD</span>
       </span>
     </span>
-  </span>
+  </div>
 </div>
