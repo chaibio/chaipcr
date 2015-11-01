@@ -69,11 +69,11 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
       var text = "STAGE " + index + ":" + stageName;
 
       if(this.model.stage_type === "cycling") {
-        var noOfCycles = this.noOfCycles || this.model.num_cycles;
+        var noOfCycles = this.model.num_cycles;
         noOfCycles = String(noOfCycles);
         text = text + ", " + noOfCycles + "x";
       }
-
+      
       this.stageName.setText(text);
     };
 

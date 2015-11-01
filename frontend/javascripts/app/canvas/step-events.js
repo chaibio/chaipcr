@@ -1,5 +1,19 @@
 window.ChaiBioTech.ngApp.service('stepEvents',[
-  function() {
+  'stageGraphics',
+  'stepGraphics',
+  function(stageGraphics, stepGraphics) {
+
+    var that = this;
+    this.changeDeltaText = function($scope) {
+
+      var stage = $scope.fabricStep.parentStage;
+      if(stage.model.stage_type === "cycling") {
+        stage.childSteps.forEach(function(step, index) {
+          stepGraphics.autoDeltaDetails.call(step);
+        });
+      }
+    };
+
     this.init = function($scope, canvas, C) {
 
       $scope.$watch('step.temperature', function(newVal, oldVal) {
@@ -66,6 +80,16 @@ window.ChaiBioTech.ngApp.service('stepEvents',[
           circle.controlPause(newVal);
           canvas.renderAll();
         //}
+      });
+
+      $scope.$watch('step.delta_duration_s', function(newVal, oldVal) {
+        that.changeDeltaText($scope);
+        canvas.renderAll();
+      });
+
+      $scope.$watch('step.delta_temperature', function(newVal, oldVal) {
+        that.changeDeltaText($scope);
+        canvas.renderAll();
       });
     };
   }

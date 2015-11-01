@@ -19,6 +19,57 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
       return this;
     };
 
+    this.autoDeltaDetails = function() {
+
+      var model = this.parentStage.model;
+
+      if(model.auto_delta && model.stage_type === "cycling") {
+        var tempSymbol = (parseFloat(this.model.delta_temperature) < 0) ? "" : "+";
+        var timeSymbol = (parseFloat(this.model.delta_duration_s) < 0) ? "" : "+";
+
+        var deltaText = tempSymbol + this.model.delta_temperature + 'ºC,'+ timeSymbol + parseFloat(this.model.delta_duration_s) + 's';
+        var startOnText = "Start Cycle: " + model.auto_delta_start_cycle;
+        //console.log(model, this.model);
+        this.autoDeltaTempTime.setText(deltaText);
+        this.autoDeltaStartCycle.setText(startOnText);
+        this.deltaGroup.setVisible(true);
+
+        if(this.index === 0) {
+          this.deltaSymbol.setVisible(true);
+        } else {
+          this.deltaSymbol.setVisible(false);
+        }
+      } else {
+        this.deltaGroup.setVisible(false);
+        this.deltaSymbol.setVisible(false);
+      }
+      
+    };
+
+    this.initAutoDelta = function() {
+
+      this.deltaSymbol = this.autoDeltaStartCycle = new fabric.Text('Δ', {
+          fill: 'white',  fontSize: 14,  top : 338,  left: 10,  fontFamily: "dinot",  selectable: false,
+          originX: 'left', originY: 'top', fontWeight: 'bold', visible: false
+        }
+      );
+
+      this.autoDeltaTempTime = new fabric.Text('-0.15ºC, +5.0s', {
+          fill: 'white',  fontSize: 12,  top : 0, left: 0,  fontFamily: "dinot",  selectable: false,
+          originX: 'left', originY: 'top'
+        }
+      );
+      this.autoDeltaStartCycle = new fabric.Text('Start Cycle: 5', {
+          fill: 'white',  fontSize: 12,  top : 15,  left: 0,  fontFamily: "dinot",  selectable: false,
+          originX: 'left', originY: 'top'
+        }
+      );
+
+      this.deltaGroup = new fabric.Group([this.autoDeltaTempTime, this.autoDeltaStartCycle], {
+        originX: 'left', originY: 'top', top: 338, left: 24,  visible: false
+      });
+    };
+
     this.numberingValue = function() {
 
       var thisIndex = (this.index < 9) ? "0" + (this.index + 1) : (this.index + 1),
@@ -90,7 +141,7 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
         }
       );
 
-      this.stepGroup = new fabric.Group([this.stepRect, this.numberingText, this.stepName, this.borderRight], {
+      this.stepGroup = new fabric.Group([this.stepRect, this.numberingText, this.stepName, this.deltaSymbol, this.deltaGroup, this.borderRight], {
         left: this.left || 33,  top: 28,  selectable: false,  hasControls: false,
         hasBoarders: false, name: "stepGroup",  me: this, originX: 'left', originY: 'top'
       });
