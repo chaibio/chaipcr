@@ -55,7 +55,10 @@
         <h2>Diagnostic Complete</h2>
         <p>{{experiment.started_at | date: 'MMM. d, yyyy hh:mm:ssa'}}</p>
       </div>
-      <div class="info-container">
+      <div ng-show="!analyzedExp" class="text-center">
+        Analyzing results. Please wait ... <img src="/images/loading.gif">
+      </div>
+      <div class="info-container" ng-show="analyzedExp">
         <div class="row">
           <div class="col-md-4">
             <div class="title">
@@ -173,7 +176,7 @@
           </div>
         </div>
       </div>
-      <div class="text-center">
+      <div class="text-center" style="padding: 70px 0;">
         <a href="/" class="button">CLOSE</a>
       </div>
     </div>

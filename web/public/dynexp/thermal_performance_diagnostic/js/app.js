@@ -3,7 +3,8 @@
 
   var App = window.App = angular.module('ThermalDiagnosticApp', [
     'ui.router',
-    'ngResource'
+    'ngResource',
+    'http-auth-interceptor'
   ]);
 
   App.value('host', 'http://'+window.location.hostname);
@@ -59,21 +60,24 @@
       Status.startSync();
       $scope.$on('$destroy', function() {
         Status.stopSync();
-        return stopPolling();
+        stopPolling();
       });
       $scope.CONSTANTS = CONSTANTS;
       tempPoll = null;
       $scope.lidTemps = null;
       $scope.blockTemps = null;
       fetchingTemps = false;
+      var temperatureLogs = [];
       fetchTempLogs = function() {
         if(!fetchingTemps) {
           fetchingTemps = true;
-          Experiment.getTemperatureData($scope.experiment.id).then(function(resp) {
+          var last_elapsed_time = temperatureLogs[temperatureLogs.length-1]? temperatureLogs[temperatureLogs.length-1].temperature_log.elapsed_time : 0;
+          Experiment.getTemperatureData($scope.experiment.id, {starttime: last_elapsed_time}).then(function(resp) {
             var ref, ref1;
             if (resp.data.length === 0) return;
-            $scope.lidTemps = DiagnosticWizardService.temperatureLogs(resp.data).getLidTemps();
-            $scope.blockTemps = DiagnosticWizardService.temperatureLogs(resp.data).getBlockTemps();
+            temperatureLogs = temperatureLogs.concat(resp.data);
+            $scope.lidTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getLidTemps();
+            $scope.blockTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getBlockTemps();
           })
           .finally(function () {
             fetchingTemps = false;
@@ -122,7 +126,7 @@
         $scope.status = newState === 'Running' ? data.experimentController.machine.thermal_state : newState;
         $scope.heat_block_temp = data.heatblock.temperature
         $scope.lid_temp = data.lid.temperature
-        $scope.elapsedTime = data.experimentController.expriment.run_duration
+        if (data.experimentController.expriment) $scope.elapsedTime = data.experimentController.expriment.run_duration
 
         if (!$scope.experiment) {
           getExperiment(function(resp) {
