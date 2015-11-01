@@ -1,17 +1,24 @@
 .diagnostic-wizard .intro-text-container {
-    width: 600px;
+    width: 700px;
     margin: 0 auto;
 }
-.diagnostic-wizard .intro-text-container h1 {
-    margin-top: 0px;
-    margin-bottom: 50px;
-}
-.diagnostic-wizard .intro-text-container p {
-    font-size: 20px;
-    text-align: justify;
+.diagnostic-wizard .intro-text-container h2 {
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
 .diagnostic-wizard .intro-text-container img {
-    margin: 50px 0;
+    display: block;
+    margin: 10px 0;
+    width: 100%;
+}
+.diagnostic-wizard .intro-text-container p {
+    font-size: 17px;
+    margin-top: 30px;
+}
+
+.diagnostic-wizard .intro-text-container .button {
+    margin-top: 30px;
+    margin-bottom: 10px;
 }
 
 .diagnostic-wizard {

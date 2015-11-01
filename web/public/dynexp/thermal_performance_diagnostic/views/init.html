@@ -1,4 +1,4 @@
-<!-- div class="page-layout">
+<div class="page-layout" ng-controller="DiagnosticInitCtrl">
   <div class="header">
     <div class="stripes-and-name">
       <a href="/">
@@ -15,22 +15,28 @@
   <div class="content text-center" ng-controller="DiagnosticInitCtrl">
 
     <div class="intro-text-container">
-      <h1>Thermal Performance Diagnostic</h1>
+      <h2>Thermal Performance Diagnostic</h2>
+
+      <img src="./images/machine.png">
 
       <p>
-        This diagnostic will test the heating and cooling performance of your Open qPCR's heat block, as well as its lid heater. Before continuing, remove all tubes from your Open qPCR, and ensure the lid is closed.
+        This diagnostic will test the heating and cooling performance of your Open qPCR's heat block, as well as its lid heater.
       </p>
 
-      <button class="button green" ng-click="proceed()">CONTINUE</button>
+      <p>
+        Before continuing, remove all tubes from your Open qPCR, and ensure the lid is closed.
+      </p>
+
+      <button class="button" ng-click="proceed()">CONTINUE</button>
       <a href="/" class="button">CANCEL</a>
 
     </div>
 
   </div>
 
-</div> -->
+</div>
 
-
+<!--
   <div ng-controller="DiagnosticInitCtrl">
 
     <div class="intro-text-container text-center">
@@ -48,4 +54,4 @@
 
     </div>
 
-  </div>
+  </div> -->
