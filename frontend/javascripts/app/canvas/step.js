@@ -162,6 +162,8 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.getUniqueName();
         stepGraphics.rampSpeed.call(this);
         stepGraphics.initNumberText.call(this);
+        stepGraphics.initAutoDelta.call(this);
+        stepGraphics.autoDeltaDetails.call(this);
         stepGraphics.numberingValue.call(this);
         stepGraphics.stepComponents.call(this);
 
