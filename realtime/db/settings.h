@@ -3,7 +3,7 @@
 
 #include <string>
 #include <utility>
-
+#include <iostream>
 class Settings
 {
 public:
@@ -41,7 +41,7 @@ public:
     inline bool isWifiEnabledDirty() const { return _wifiEnabledDirtyState; }
 
     inline void setCallibrationId(int id) { _calibrationId = id; _calibrationIdDirtyState = true; }
-    inline bool calibrationId() const { return _calibrationId; }
+    inline int calibrationId() const { return _calibrationId; }
     inline bool isCallibrationIdDirty() const { return _calibrationIdDirtyState; }
 
     inline void setTimeValid(bool state) { _timeValid = state; _timeValidDirtyState = true; }
