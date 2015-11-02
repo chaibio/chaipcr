@@ -47,6 +47,6 @@ analyze <- function(dbname,dbuser,dbpassword,experimentID){
 	avgLidHeaterRampUpRate <- ((highTemperature-lowTemperature-2*deltaTSetPoint)*1000)/(lidHeaterStopRampTime-lidHeaterStartRampTime)
 	
 	return (toJSON(list(Heating=list(AvgRampRate=avgHeatBlockRampUpRate, TotalTime=apprxRampUpEndTime-apprxRampUpStartTime, MaxBlockDeltaT=0),
-						Cooling=list(AvgRampRate=avgHeatBlockRampDownRate, TotalTime=apprxRampDownEndTime-apprxRampDownStartTime, MaxBlockDeltaT=0),
+						Cooling=list(AvgRampRate=avgHeatBlockRampDownRate*-1, TotalTime=apprxRampDownEndTime-apprxRampDownStartTime, MaxBlockDeltaT=0),
 						Lid=list(HeatingRate=avgLidHeaterRampUpRate, TotalTime=lidHeaterStopRampTime-lidHeaterStartRampTime))))
 }
