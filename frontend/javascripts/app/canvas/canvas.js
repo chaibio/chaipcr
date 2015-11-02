@@ -241,6 +241,10 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       //this.canvas.add(this.stageMoveIndicator);
     };
 
+    this.editStageMode = function() {
+      console.log("I am at right place");
+    };
+    
     this.addNewStage = function(data, currentStage) {
 
       // Re factor this part.. // what if stage with no step is returned LATER.
