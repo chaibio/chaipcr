@@ -108,6 +108,15 @@
 
             transitioning = true;
 
+            if (old_data_points && new_data_points) {
+              if (old_data_points.length > 0 && new_data_points.length > 0) {
+                dpt_calibration = Math.round(new_data_points[new_data_points.length-1].y - old_data_points[old_data_points.length-1].y)
+                dpt_calibration = Math.abs(dpt_calibration);
+                dpt_calibration = dpt_calibration > 10? dpt_calibration : 10;
+                console.log(dpt_calibration);
+              }
+            }
+
             for (var i = 0; i < dpt_calibration; i++) {
               transition_threads[i] = [];
             }
