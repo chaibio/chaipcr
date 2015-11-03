@@ -26,7 +26,7 @@
             temperatureLogs = temperatureLogs.concat(resp.data);
             $scope.lidTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getLidTemps();
             $scope.blockTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getBlockTemps();
-            temperatureLogs = DiagnosticWizardService.temperatureLogs(temperatureLogs).getSliced();
+            // temperatureLogs = DiagnosticWizardService.temperatureLogs(temperatureLogs).getSliced();
           })
           .finally(function () {
             fetchingTemps = false;

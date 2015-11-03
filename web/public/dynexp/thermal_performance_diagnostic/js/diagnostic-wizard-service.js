@@ -34,9 +34,6 @@
                 y: (parseFloat(datum.temperature_log.heat_block_zone_1_temp) + parseFloat(datum.temperature_log.heat_block_zone_2_temp)) / 2
               };
             });
-          },
-          getSliced: function () {
-            return temperature_logs_cp;
           }
         };
       };
