@@ -242,14 +242,22 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     };
 
     this.editStageMode = function(status) {
-      console.log("I am at right place", this.allStageViews);
+      //console.log("I am at right place", this.allStageViews);
       //Show dots at the top
+      var add = (status) ? 25 : -25;
       this.allStageViews.forEach(function(stage, index) {
+        //console.log(fabric);
+        //console.log(stage.stageRect.animate());
+        //var rex = new fabric.Rect();
+        //console.log(rex.animate());
+        stage.dots.setVisible(status);
 
-        stage.dots.setVisible(true);
-        this.canvas.renderAll();
+        stage.stageNameGroup.left = stage.stageNameGroup.left + add;
+        console.log(stage.stageNameGroup.left, stage.roof.left);
+
         //console.log(stage);
-      });
+      }, this);
+      this.canvas.renderAll();
       //Bring the footer
       // Bring delete
     };

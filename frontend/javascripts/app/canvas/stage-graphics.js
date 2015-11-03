@@ -34,7 +34,7 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
       }
 
       this.dots = new fabric.Group(smallDotArray, {
-        originX: "left", originY: "top", left: 0, top: 8, evented: false, width: 13, height: 11, visible: false
+        originX: "left", originY: "top", left: 1, top: 8, evented: false, width: 13, height: 11, visible: false
       });
       return this;
     };
@@ -75,6 +75,7 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
       }
 
       this.stageName.setText(text);
+      //this.stageNameGroup.setLeft(this.stageNameGroup.left + 5);
     };
 
     this.writeMyName = function() {
@@ -82,9 +83,13 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
       //var stageName = (this.model.name).toUpperCase();
       //stageName = stageName.replace("STAGE", "");
       this.stageName = new fabric.Text("", {
-          fill: 'white', fontWeight: "400",  fontSize: 12,  top : 8, left: 1, fontFamily: "dinot",  selectable: false,
+          fill: 'white', fontWeight: "400",  fontSize: 12,   fontFamily: "dinot",
+          originX: "left", originY: "top", selectable: true
         }
       );
+      this.stageNameGroup = new fabric.Group([this.stageName], {
+        originX: "left", originY: "top", selectable: true, top : 8, left: 1,
+      });
       return this;
     };
 
