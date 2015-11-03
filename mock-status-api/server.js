@@ -73,7 +73,7 @@ function makeNewLog () {
   return {
     elapsed_time: (Math.floor(lastLog.elapsed_time/1000) * 1000) + 1000 + Math.round(Math.random() * 10),
     lid_temp: stable? lastLog.lid_temp : Math.random() + lastLog.lid_temp + (!toUp && lastLog.lid_temp > 0 ? -Math.random() : Math.random()),
-    heat_block_zone_1_temp: stable? lastLog.heat_block_zone_1_temp : Math.random() + lastLog.heat_block_zone_1_temp + (!toUp && lastLog.heat_block_zone_1_temp > 0 ? -1 : 1),
+    heat_block_zone_1_temp: stable? lastLog.heat_block_zone_1_temp : Math.random() + lastLog.heat_block_zone_1_temp + (!toUp && lastLog.heat_block_zone_1_temp > 0 ? -10 : 10),
     heat_block_zone_2_temp: stable? lastLog.heat_block_zone_2_temp : Math.random() + lastLog.heat_block_zone_2_temp + (!toUp && lastLog.heat_block_zone_2_temp > 0 ? -1 : 1),
   };
 }

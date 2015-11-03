@@ -19,6 +19,7 @@
           var prev_Y = 0;
           var maxY = 0;
           var maxX = 0;
+          var minX = 0;
           var margin = 10;
           var prev_data_points = [];
 
@@ -41,11 +42,19 @@
             return Math.max.apply(Math, xs);
           };
 
-          function drawPoint(d) {
+          function getMin_X(data) {
+            var xs;
+            xs = _.map(data, function(datum) {
+              return datum.x;
+            });
+            return Math.min.apply(Math, xs);
+          };
+
+          function drawPoint(d, data) {
             var new_X, new_Y, y_diff;
             d.y = d.y + margin;
             d.x = d.x + margin;
-            new_X = width * d.x / maxX;
+            new_X = width * (d.x- minX) / (maxX-minX) ;
             new_Y = height * d.y / maxY;
 
             if (prev_Y === 0) {
@@ -60,6 +69,7 @@
             ctx.lineWidth = 3;
             ctx.strokeStyle = "#" + (rainbow.colourAt(d.y - (y_diff / 2)));
             ctx.stroke();
+            x_index ++;
           };
 
           function makeChart(data) {
@@ -69,17 +79,19 @@
             maxY = getMax_Y(data);
             maxY = maxY > 100 ? maxY : 130;
             maxX = getMax_X(data);
+            minX = getMin_X(data);
+            x_index = 0;
             rainbow.setNumberRange(0, maxY);
             ctx.clearRect(0, 0, width, height);
             for (i = 0, len = data.length; i < len; i += 1) {
               dpt = data[i];
-              drawPoint(dpt);
+              drawPoint(dpt, data);
             }
           };
 
           var transitioning = false;
-          var duration = 1000; //ms
-          var dpt_calibration = 50; //move 100 datapoints during transition
+          var duration = 800; //ms
+          var dpt_calibration = 20; //move 100 datapoints during transition
           var dpt_index = 1;
           var transition_threads = [];
           var animation;
@@ -135,7 +147,7 @@
             if(!animation) return;
             $interval.cancel(animation);
             animation = null;
-            prev_data_points = transition_threads[dpt_index];
+            // prev_data_points = transition_threads[dpt_index];
             transitioning = false;
           }
 
