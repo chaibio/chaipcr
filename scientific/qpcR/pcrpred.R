@@ -1,1 +1,0 @@
-pcrpred <- function(...) predict(...)
