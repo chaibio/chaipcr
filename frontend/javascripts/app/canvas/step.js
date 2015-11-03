@@ -165,12 +165,14 @@ window.ChaiBioTech.ngApp.factory('step', [
         stepGraphics.initAutoDelta.call(this);
         stepGraphics.autoDeltaDetails.call(this);
         stepGraphics.numberingValue.call(this);
+        stepGraphics.deleteButton.call(this);
         stepGraphics.stepComponents.call(this);
 
         // Add all those components created.
         this.canvas.add(this.stepGroup);
         this.canvas.add(this.rampSpeedGroup);
         this.canvas.add(this.hitPoint);
+        this.canvas.add(this.delGroup);
         this.addCircle();
       };
 

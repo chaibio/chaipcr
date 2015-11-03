@@ -23,18 +23,18 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
     this.dotsOnStage = function() {
 
       var cordiantes = {
-        "dot1": [1, 1], "dot2": [12, 1], "dot3": [7, 5], "dot4": [1, 10], "dot5": [12, 10],
+        "dot1": [1, 1], "dot2": [12, 1], "dot3": [6.5, 6], "dot4": [1, 10], "dot5": [12, 10],
       }, smallDotArray = [];
 
       for(var dot in cordiantes) {
         var cord = cordiantes[dot];
         smallDotArray.push(new fabric.Circle({
-          radius: 1, fill: 'white', left: cord[0], top: cord[1], selectable: false, name: "stageDot", originX: "center", originY: "center"
+          radius: 2, fill: 'white', left: cord[0], top: cord[1], selectable: false, name: "stageDot", originX: "center", originY: "center"
         }));
       }
 
       this.dots = new fabric.Group(smallDotArray, {
-        originX: "left", originY: "top", left: 1, top: 8, evented: false, width: 13, height: 11, visible: false
+        originX: "left", originY: "top", left: 3, top: 8, evented: false, width: 13, height: 11, visible: false
       });
       return this;
     };
