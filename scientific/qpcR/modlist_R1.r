@@ -94,6 +94,9 @@ modlist <- function(
     ## changing magnitude
     if (factor != 1) FLUO <- FLUO * factor                
     
+    # xqrm: when baseline == "parm", adjust fluorescence value if no value in FLUO > 0, so lm.fit won't fail on '0 (non-NA) cases'
+    if (baseline == "parm" & all(FLUO <= 0)) FLUO <- FLUO - min(FLUO)
+    
     ## fit model
     DATA <- data.frame(Cycles = CYCLES, Fluo = FLUO)    
     
