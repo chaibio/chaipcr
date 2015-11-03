@@ -24,7 +24,6 @@
             var ref, ref1;
             if (resp.data.length === 0) return;
             temperatureLogs = temperatureLogs.concat(resp.data);
-            // if (temperatureLogs.length < 30) return;
             $scope.lidTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getLidTemps();
             $scope.blockTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getBlockTemps();
           })

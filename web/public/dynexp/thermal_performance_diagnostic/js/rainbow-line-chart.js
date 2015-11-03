@@ -44,6 +44,7 @@
           function drawPoint(d) {
             var new_X, new_Y, y_diff;
             d.y = d.y + margin;
+            d.x = d.x + margin;
             new_X = width * d.x / maxX;
             new_Y = height * d.y / maxY;
             // if (prev_X === 0) {
@@ -67,9 +68,9 @@
             var dpt, i, len, results;
             prev_X = 0;
             prev_Y = 0;
-            maxY = getMax_Y($scope.data);
+            maxY = getMax_Y(data);
             maxY = maxY > 100 ? maxY : 130;
-            maxX = getMax_X($scope.data);
+            maxX = getMax_X(data);
             rainbow.setNumberRange(0, maxY);
             ctx.clearRect(0, 0, width, height);
             for (i = 0, len = data.length; i < len; i += 1) {
@@ -80,11 +81,13 @@
 
           var transitioning = false;
           var duration = 900; //ms
-          var dpt_calibration = 50; //move 100 datapoints during transition
+          var dpt_calibration = 20; //move 100 datapoints during transition
           var dpt_index = 1;
           var transition_threads = [];
           var animation;
           function transition (old_data_points, new_data_points) {
+
+            // cancelAnimation();
 
             for (var i = 0; i < dpt_calibration; i++) {
               transition_threads[i] = [];
@@ -97,11 +100,8 @@
               var dpt_x_diff = new_dtp.x - prev_dpt.x;
 
               for (var ii = 0; ii < dpt_calibration; ii ++) {
-                var new_y = ii === 0? prev_dpt.y : prev_dpt.y + ((dpt_y_diff/dpt_calibration) * ii);
-                var new_y = ii === dpt_calibration-1? new_dtp.y : new_y;
-
-                var new_x = ii === 0? prev_dpt.x : prev_dpt.x + ((dpt_x_diff/dpt_calibration) * ii);
-                var new_x = ii === dpt_calibration-1? new_dtp.x : new_x;
+                var new_y = prev_dpt.y + (dpt_y_diff/dpt_calibration) * ii;
+                var new_x = prev_dpt.x + (dpt_x_diff/dpt_calibration) * ii;
 
                 transition_threads[ii][i] = {
                   y: new_y,
@@ -113,16 +113,21 @@
 
             dpt_index = 0;
             animation = $interval( animate_transition, duration/dpt_calibration);
-
           }
 
           function animate_transition () {
             if (dpt_index === dpt_calibration) {
-              $interval.cancel(animation);
+              cancelAnimation();
               return;
             }
             makeChart(transition_threads[dpt_index]);
             dpt_index ++;
+          }
+
+          function cancelAnimation () {
+            if(!animation) return;
+            $interval.cancel(animation);
+            animation = null;
           }
 
           $scope.$watch('data', function(data, oldVal) {
@@ -137,7 +142,7 @@
             }
             transition(prev_data_points, data);
             prev_data_points = data;
-            // makeChart(data);
+
           }, false);
         }
       };
