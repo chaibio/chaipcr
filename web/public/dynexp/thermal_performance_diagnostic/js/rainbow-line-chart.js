@@ -148,6 +148,7 @@
             if (data === oldVal) {
               return;
             }
+            cancelAnimation();
             transition(prev_data_points, data);
             prev_data_points = data;
 
