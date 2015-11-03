@@ -22,7 +22,6 @@ window.ChaiBioTech.ngApp
 
       updateIsHolding = (data) ->
         $scope.isHolding = TestInProgressHelper.isHolding(data, $scope.experiment)
-        console.log $scope.isHolding
 
       updateData = (data) ->
 
@@ -41,16 +40,7 @@ window.ChaiBioTech.ngApp
       , (data) ->
         updateData data
         updateIsHolding data
-
-      $scope.timeRemaining = ->
-        if $scope.data and $scope.data.experimentController.machine.state is 'Running'
-          exp = $scope.data.experimentController.expriment
-          time = (exp.estimated_duration*1+exp.paused_duration*1)-exp.run_duration*1
-          if time < 0 then time = 0
-
-          time
-        else
-          0
+        $scope.timeRemaining = TestInProgressHelper.timeRemaining(data)
 
       $scope.barWidth = ->
         if $scope.data and $scope.data.experimentController.machine.state is 'Running'

@@ -10,8 +10,8 @@ window.ChaiBioTech.ngApp.service 'TestInProgressHelper', [
     status = null
     experiment = null
     holding = false
+    experimentQues = {}
     isFetchingExp = false
-    experimentQues = []
 
     $rootScope.$watch =>
       Status.getData()
@@ -21,23 +21,27 @@ window.ChaiBioTech.ngApp.service 'TestInProgressHelper', [
 
     @getExperiment = (id) ->
       deferred = $q.defer()
-      experimentQues.push deferred
+      experimentQues["exp_id_#{id}"] = experimentQues["exp_id_#{id}"] || []
+      experimentQues["exp_id_#{id}"].push deferred
 
       if !isFetchingExp
         isFetchingExp = true
         fetchPromise = Experiment.get(id: id).$promise
         fetchPromise.then (resp) =>
           @setHolding status, experiment
-          for def in experimentQues by 1
+          experimentQues["exp_id_#{resp.experiment.id}"] = experimentQues["exp_id_#{resp.experiment.id}"] || []
+          for def in experimentQues["exp_id_#{resp.experiment.id}"] by 1
             experiment = resp.experiment
             def.resolve experiment
 
         fetchPromise.catch (err) ->
           for def in experimentQues by 1
             def.reject err
+            experiment = null
+
         fetchPromise.finally ->
           isFetchingExp = false
-          experimentQues = []
+          experimentQues["exp_id_#{id}"] = []
 
       deferred.promise
 
@@ -64,6 +68,18 @@ window.ChaiBioTech.ngApp.service 'TestInProgressHelper', [
       # console.log holding
 
       holding
+
+    @timeRemaining = (data) ->
+      return 0 if !data
+      return 0 if !data.experimentController
+      if data.experimentController.machine.state is 'Running'
+        exp = data.experimentController.expriment
+        time = (exp.estimated_duration*1+exp.paused_duration*1)-exp.run_duration*1
+        if time < 0 then time = 0
+
+        time
+      else
+        0
 
     return
 ]

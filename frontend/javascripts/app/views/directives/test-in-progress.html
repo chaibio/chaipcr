@@ -44,7 +44,7 @@
         </div>
         <div class="col-sm-6" ng-show="data.experimentController.machine.state === 'Running' || data.experimentController.machine.state === 'Paused'">
           <div class="caption">TIME REMAINING</div>
-          <div>{{ timeRemaining() | secondsDisplay:'display2'}}</div>
+          <div>{{ timeRemaining | secondsDisplay:'display2'}}</div>
         </div>
       </div>
       <div ng-show="completionStatus && !isHolding">

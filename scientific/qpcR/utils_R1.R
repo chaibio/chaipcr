@@ -601,6 +601,8 @@ uni2 <- function(object, cp.crit, verbose = FALSE,  ...) {
   
     EFF <- try(efficiency(object[[i]], plot = FALSE, ...), silent = TRUE)    
     if (inherits(EFF, "try-error")) next
+    #message('EFF$cpD1: ', EFF$cpD1) # xqrm
+    #message('EFF$cpD2: ', EFF$cpD2) # xqrm
     cpD2 <- EFF$cpD2
     cpD1 <- EFF$cpD1
     PAR[i, ] <- cpD1 - cpD2    

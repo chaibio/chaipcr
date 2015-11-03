@@ -1,0 +1,74 @@
+@import '../colors.css.scss';
+
+.status-bar {
+  background: $gray;
+  color: #fff;
+  font-family: 'Open Sans';
+  font-size: 10px;
+  font-weight: bold;
+  height: 34px;
+  margin-top: 20px;
+  text-transform: uppercase;
+
+  * {
+    display: inline-block;
+  }
+
+  .normal {
+    font-weight: normal;
+  }
+
+  .experiment-result {
+    display: inline-block;
+    padding: 10px 20px;
+
+    &.success {
+      background: $green;
+    }
+    &.failed {
+      background: red;
+    }
+  }
+
+  .completion-message {
+    padding-left: 10px;
+  }
+
+  .running-info, .idle-state {
+    margin-left: 20px;
+    padding: 10px 0;
+
+    .machine-state, .time-remaining, .temp-info {
+      padding-left: 10px;
+    }
+
+    .holding {
+      border-bottom: 1px solid $green;
+    }
+  }
+
+  .controls-container {
+    float: right;
+    padding: 10px;
+    padding-right: 20px;
+    text-align: right;
+    margin-right: -5px;
+  }
+
+  .control {
+    cursor: pointer;
+    padding: 0 5px;
+
+    &.disabled {
+      color: $lightgray;
+    }
+
+    img {
+      width: 15px;
+      height: 15px;
+      vertical-align: middle;
+      margin-top: -3px;
+    }
+  }
+
+}

@@ -86,7 +86,7 @@ const double kPCRBeginStepTemperatureThreshold = 0.5;
 
 //Experiment Controller
 const long kTemperatureLoggerInterval = 1000;
-const long kTemperatureLoggerFlushInterval = 10000; //ms
+const long kTemperatureLoggerFlushInterval = 1000; //ms
 
 const std::string kDeviceFilePath = {"/root/device.json"};
 

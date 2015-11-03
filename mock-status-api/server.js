@@ -85,7 +85,7 @@ function startExperiment (id, cb) {
 
 function completeExperiment(id, cb) {
   cb = cb || function () {};
-  connection.query("UPDATE `chaipcr`.`experiments` SET `completed_at` = '2015-09-02 00:00:00', `completion_status` = 'aborted' WHERE `experiments`.`id` = "+id, cb);
+  connection.query("UPDATE `chaipcr`.`experiments` SET `completed_at` = NOW(), `completion_status` = 'aborted' WHERE `experiments`.`id` = "+id, cb);
 }
 
 function incrementLog (cb) {
