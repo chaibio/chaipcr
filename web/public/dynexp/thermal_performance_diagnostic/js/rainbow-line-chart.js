@@ -140,6 +140,7 @@
               return;
             }
             makeChart(transition_threads[dpt_index]);
+            // prev_data_points = transition_threads[dpt_index];
             dpt_index ++;
           }
 
@@ -147,20 +148,14 @@
             if(!animation) return;
             $interval.cancel(animation);
             animation = null;
-            // prev_data_points = transition_threads[dpt_index];
             transitioning = false;
           }
 
           $scope.$watch('data', function(data, oldVal) {
-            if (!data) {
-              return;
-            }
-            if (data.length === 0) {
-              return;
-            }
-            if (data === oldVal) {
-              return;
-            }
+            if (!data) return;
+            if (data.length === 0) return;
+            if (data === oldVal) return;
+            if (transitioning) return;
             transition(prev_data_points, data);
             prev_data_points = data;
 
