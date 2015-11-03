@@ -87,14 +87,21 @@
           var animation;
           function transition (old_data_points, new_data_points) {
 
-            // cancelAnimation();
+            if (!old_data_points) {
+              return;
+            }
+            if (old_data_points.length === 0) {
+              return;
+            }
+
+            cancelAnimation();
 
             for (var i = 0; i < dpt_calibration; i++) {
               transition_threads[i] = [];
             }
 
             for (var i = 0; i < new_data_points.length; i++) {
-              var prev_dpt = old_data_points[i] || new_data_points[i];
+              var prev_dpt = old_data_points[i] || old_data_points[old_data_points.length-1] || new_data_points[i];
               var new_dtp = new_data_points[i];
               var dpt_y_diff = new_dtp.y - prev_dpt.y;
               var dpt_x_diff = new_dtp.x - prev_dpt.x;
@@ -128,6 +135,7 @@
             if(!animation) return;
             $interval.cancel(animation);
             animation = null;
+            prev_data_points = transition_threads[dpt_index];
           }
 
           $scope.$watch('data', function(data, oldVal) {
