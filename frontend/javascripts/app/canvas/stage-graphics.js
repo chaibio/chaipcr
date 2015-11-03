@@ -34,7 +34,7 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
       }
 
       this.dots = new fabric.Group(smallDotArray, {
-        originX: "left", originY: "top", left: 0, top: 8, evented: false, width: 13, height: 11
+        originX: "left", originY: "top", left: 0, top: 8, evented: false, width: 13, height: 11, visible: false
       });
       return this;
     };
@@ -73,7 +73,7 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
         noOfCycles = String(noOfCycles);
         text = text + ", " + noOfCycles + "x";
       }
-      
+
       this.stageName.setText(text);
     };
 

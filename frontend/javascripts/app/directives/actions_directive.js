@@ -91,15 +91,14 @@ window.ChaiBioTech.ngApp.directive('actions', [
         };
 
         scope.editStage = function() {
-          console.log("edit stage");
-          //scope.fabricStep.parentStage.editStageMode();
-          //console.log(canvas);
+
           scope.editStageMode = ! scope.editStageMode;
           scope.editStageText = (scope.editStageMode) ? "DONE" : "EDIT STAGE";
           canvas.editStageMode(scope.editStageMode);
         };
 
         scope.addPause = function() {
+          
           scope.step.pause = ! scope.step.pause;
           ExperimentLoader.changePause(scope)
           .then(function(data) {
