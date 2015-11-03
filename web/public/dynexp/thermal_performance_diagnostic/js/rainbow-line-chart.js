@@ -92,6 +92,10 @@
               return;
             }
 
+            if (transitioning) return;
+
+            transitioning = true;
+
             for (var i = 0; i < dpt_calibration; i++) {
               transition_threads[i] = [];
             }
@@ -113,8 +117,6 @@
               }
 
             }
-            
-
 
             dpt_index = 0;
             animation = $interval( animate_transition, duration/dpt_calibration);
@@ -134,6 +136,7 @@
             $interval.cancel(animation);
             animation = null;
             prev_data_points = transition_threads[dpt_index];
+            transitioning = false;
           }
 
           $scope.$watch('data', function(data, oldVal) {
@@ -146,7 +149,6 @@
             if (data === oldVal) {
               return;
             }
-            cancelAnimation();
             transition(prev_data_points, data);
             prev_data_points = data;
 
