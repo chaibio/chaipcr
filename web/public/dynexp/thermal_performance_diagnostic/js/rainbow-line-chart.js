@@ -46,9 +46,9 @@
             d.y = d.y + margin;
             new_X = width * d.x / maxX;
             new_Y = height * d.y / maxY;
-            if (prev_X === 0) {
-              prev_X = new_X;
-            }
+            // if (prev_X === 0) {
+            //   prev_X = new_X;
+            // }
             if (prev_Y === 0) {
               prev_Y = new_Y;
             }
