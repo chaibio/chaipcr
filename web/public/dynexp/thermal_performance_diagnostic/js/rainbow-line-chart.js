@@ -91,7 +91,7 @@
 
           var transitioning = false;
           var duration = 800; //ms
-          var dpt_calibration = 20; //move 100 datapoints during transition
+          var dpt_calibration = 10; //move 100 datapoints during transition
           var dpt_index = 1;
           var transition_threads = [];
           var animation;
