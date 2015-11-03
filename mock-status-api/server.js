@@ -168,7 +168,7 @@ app.post('/control/start', function (req, res, next) {
 
   }, 3000);
 
-  setTimeout(stop, 1000 * 60 * 1); //1mins
+  setTimeout(stop, 1000 * 60 * 60); //60 mins
 
   res.send(true);
 });
