@@ -4,7 +4,7 @@
 
   <button class="small-button" id="delete-step" ng-click="addPause()">{{pauseAction}} PAUSE</button>
   <!-- <button class="small-button" id="delete-step" ng-click="deleteStep()">DELETE STEP</button> -->
-  <button class="small-button move-small-button" id="edit-stage" ng-click="">EDIT STAGE</button>
+  <button class="small-button move-small-button" ng-class="{smallButtonEdit: editStageMode}" id="edit-stage" ng-click="editStage()">{{editStageText}}</button>
 
 
 

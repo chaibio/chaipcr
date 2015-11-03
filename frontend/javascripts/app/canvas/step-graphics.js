@@ -19,6 +19,38 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
       return this;
     };
 
+    this.deleteButton = function() {
+
+      this.delCircle = new fabric.Circle({
+        radius: 6,
+        stroke: 'black',
+        originX: "center",
+        originY: "center",
+        fill: '#ffb400',
+        left: 5,
+        top: 5,
+        strokeWidth: 1,
+        selectable: false,
+      });
+
+      this.line1 = new fabric.Line([0, 0, 6, 0], {
+        stroke: 'black', strokeWidth: 1, selectable: false, originX: 'left', originY: 'top',
+        angle: 45, left: 3, top: 2
+      });
+
+      this.line2 = new fabric.Line([0, 0, 6, 0], {
+        stroke: 'black', strokeWidth: 1, selectable: true, originX: 'left', originY: 'top',
+        angle: 315, left: 2, top: 7
+      });
+
+
+      this.delGroup = new fabric.Group([this.delCircle, this.line1, this.line2], {
+        originX: 'left', originY: 'top', left: this.left + 108, top: 79, visible: false, name: "deleteStep", me: this, selectable: false
+      });
+
+      return this;
+    };
+
     this.autoDeltaDetails = function() {
 
       var model = this.parentStage.model;
@@ -43,7 +75,7 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
         this.deltaGroup.setVisible(false);
         this.deltaSymbol.setVisible(false);
       }
-      
+
     };
 
     this.initAutoDelta = function() {
@@ -141,7 +173,8 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
         }
       );
 
-      this.stepGroup = new fabric.Group([this.stepRect, this.numberingText, this.stepName, this.deltaSymbol, this.deltaGroup, this.borderRight], {
+      this.stepGroup = new fabric.Group([this.stepRect, this.numberingText, this.stepName, this.deltaSymbol,
+        this.deltaGroup, this.borderRight], {
         left: this.left || 33,  top: 28,  selectable: false,  hasControls: false,
         hasBoarders: false, name: "stepGroup",  me: this, originX: 'left', originY: 'top'
       });

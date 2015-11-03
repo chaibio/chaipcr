@@ -241,6 +241,24 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       //this.canvas.add(this.stageMoveIndicator);
     };
 
+    this.editStageMode = function(status) {
+      //console.log("I am at right place", this.allStageViews);
+      //Show dots at the top
+      var add = (status) ? 25 : -25;
+
+      this.allStageViews.forEach(function(stage, index) {
+        stage.dots.setVisible(status);
+        stage.stageNameGroup.left = stage.stageNameGroup.left + add;
+
+        stage.childSteps.forEach(function(step, index) {
+          step.delGroup.setVisible(status);
+        });
+      }, this);
+      this.canvas.renderAll();
+      //Bring the footer
+      // Bring delete
+    };
+
     this.addNewStage = function(data, currentStage) {
 
       // Re factor this part.. // what if stage with no step is returned LATER.

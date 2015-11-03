@@ -23,18 +23,18 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
     this.dotsOnStage = function() {
 
       var cordiantes = {
-        "dot1": [1, 1], "dot2": [12, 1], "dot3": [7, 5], "dot4": [1, 10], "dot5": [12, 10],
+        "dot1": [1, 1], "dot2": [12, 1], "dot3": [6.5, 6], "dot4": [1, 10], "dot5": [12, 10],
       }, smallDotArray = [];
 
       for(var dot in cordiantes) {
         var cord = cordiantes[dot];
         smallDotArray.push(new fabric.Circle({
-          radius: 1, fill: 'white', left: cord[0], top: cord[1], selectable: false, name: "stageDot", originX: "center", originY: "center"
+          radius: 2, fill: 'white', left: cord[0], top: cord[1], selectable: false, name: "stageDot", originX: "center", originY: "center"
         }));
       }
 
       this.dots = new fabric.Group(smallDotArray, {
-        originX: "left", originY: "top", left: 0, top: 8, evented: false, width: 13, height: 11
+        originX: "left", originY: "top", left: 3, top: 8, evented: false, width: 13, height: 11, visible: false
       });
       return this;
     };
@@ -73,8 +73,9 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
         noOfCycles = String(noOfCycles);
         text = text + ", " + noOfCycles + "x";
       }
-      
+
       this.stageName.setText(text);
+      //this.stageNameGroup.setLeft(this.stageNameGroup.left + 5);
     };
 
     this.writeMyName = function() {
@@ -82,9 +83,13 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
       //var stageName = (this.model.name).toUpperCase();
       //stageName = stageName.replace("STAGE", "");
       this.stageName = new fabric.Text("", {
-          fill: 'white', fontWeight: "400",  fontSize: 12,  top : 8, left: 1, fontFamily: "dinot",  selectable: false,
+          fill: 'white', fontWeight: "400",  fontSize: 12,   fontFamily: "dinot",
+          originX: "left", originY: "top", selectable: true
         }
       );
+      this.stageNameGroup = new fabric.Group([this.stageName], {
+        originX: "left", originY: "top", selectable: true, top : 8, left: 1,
+      });
       return this;
     };
 

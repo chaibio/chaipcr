@@ -110,6 +110,7 @@ window.ChaiBioTech.ngApp.factory('events', [
       this.canvas.on("mouse:over", function(evt) {
         if(evt.target) {
           var me;
+
           switch(evt.target.name) {
 
             case "moveStepImage":
@@ -207,6 +208,18 @@ window.ChaiBioTech.ngApp.factory('events', [
 
             break;
 
+            case "deleteStep":
+
+              me  = evt.target.me;
+              that.selectStep(me.circle);
+              ExperimentLoader.deleteStep($scope)
+              .then(function(data) {
+                console.log("deleted", data);
+                me.parentStage.deleteStep({}, me);
+              });
+
+
+            break;
           }
         } else { // if the click is on canvas
 

@@ -15,6 +15,8 @@ window.ChaiBioTech.ngApp.directive('actions', [
         scope.actionPopup = false;
         scope.infiniteHoldStep = false;
         scope.infiniteHoldStage = false;
+        scope.editStageMode = false;
+        scope.editStageText = "EDIT STAGE";
 
         scope.$on("dataLoaded", function() {
 
@@ -88,7 +90,15 @@ window.ChaiBioTech.ngApp.directive('actions', [
           }
         };
 
+        scope.editStage = function() {
+
+          scope.editStageMode = ! scope.editStageMode;
+          scope.editStageText = (scope.editStageMode) ? "DONE" : "EDIT STAGE";
+          canvas.editStageMode(scope.editStageMode);
+        };
+
         scope.addPause = function() {
+          
           scope.step.pause = ! scope.step.pause;
           ExperimentLoader.changePause(scope)
           .then(function(data) {
