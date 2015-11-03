@@ -47,9 +47,7 @@
             d.x = d.x + margin;
             new_X = width * d.x / maxX;
             new_Y = height * d.y / maxY;
-            // if (prev_X === 0) {
-            //   prev_X = new_X;
-            // }
+
             if (prev_Y === 0) {
               prev_Y = new_Y;
             }
@@ -80,8 +78,8 @@
           };
 
           var transitioning = false;
-          var duration = 900; //ms
-          var dpt_calibration = 20; //move 100 datapoints during transition
+          var duration = 1000; //ms
+          var dpt_calibration = 50; //move 100 datapoints during transition
           var dpt_index = 1;
           var transition_threads = [];
           var animation;
@@ -93,8 +91,6 @@
             if (old_data_points.length === 0) {
               return;
             }
-
-            cancelAnimation();
 
             for (var i = 0; i < dpt_calibration; i++) {
               transition_threads[i] = [];
@@ -117,6 +113,8 @@
               }
 
             }
+            
+
 
             dpt_index = 0;
             animation = $interval( animate_transition, duration/dpt_calibration);

@@ -10,13 +10,13 @@
           temperature_logs_cp = _.select(temperature_logs_cp, function(datum) {
             return datum.temperature_log.elapsed_time / 1000 > last_elapsed_time_in_sec - 30;
           });
+          temperature_logs_cp = _.map(temperature_logs_cp, function(datum) {
+            var datumCp;
+            datumCp = datum;
+            datumCp.temperature_log.elapsed_time = datum.temperature_log.elapsed_time - (last_elapsed_time_in_sec - 30) * 1000;
+            return datumCp;
+          });
         }
-        temperature_logs_cp = _.map(temperature_logs_cp, function(datum) {
-          var datumCp;
-          datumCp = datum;
-          datumCp.temperature_log.elapsed_time = datum.temperature_log.elapsed_time - (last_elapsed_time_in_sec - 30) * 1000;
-          return datumCp;
-        });
 
         return {
           getLidTemps: function() {
@@ -34,6 +34,9 @@
                 y: (parseFloat(datum.temperature_log.heat_block_zone_1_temp) + parseFloat(datum.temperature_log.heat_block_zone_2_temp)) / 2
               };
             });
+          },
+          getSliced: function () {
+            return temperature_logs_cp;
           }
         };
       };
