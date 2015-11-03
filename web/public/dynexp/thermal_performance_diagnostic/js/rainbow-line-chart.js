@@ -1,7 +1,8 @@
 (function () {
 
   App.directive('rainbowLineChart', [
-    function() {
+    '$interval',
+    function ($interval) {
       return {
         restrict: 'EA',
         scope: {
@@ -10,32 +11,37 @@
         replace: true,
         template: '<canvas class="rainbow-line-chart">',
         link: function($scope, elem, attrs) {
-          var ctx, drawPoint, getMax_X, getMax_Y, height, makeChart, margin, maxX, maxY, prev_X, prev_Y, rainbow, width;
-          ctx = elem[0].getContext('2d');
-          width = attrs.width;
-          height = attrs.height;
-          prev_X = 0;
-          prev_Y = 0;
-          maxY = 0;
-          maxX = 0;
-          margin = 10;
-          rainbow = new Rainbow;
+
+          var ctx = elem[0].getContext('2d');
+          var width = attrs.width;
+          var height = attrs.height;
+          var prev_X = 0;
+          var prev_Y = 0;
+          var maxY = 0;
+          var maxX = 0;
+          var margin = 10;
+          var prev_data_points = [];
+
+          var rainbow = new Rainbow;
           rainbow.setSpectrum('#00AEEF', 'blue', 'violet', 'red');
-          getMax_Y = function(data) {
+
+          function getMax_Y(data) {
             var ys;
             ys = _.map(data, function(datum) {
               return datum.y;
             });
             return margin * 2 + Math.max.apply(Math, ys);
           };
-          getMax_X = function(data) {
+
+          function getMax_X(data) {
             var xs;
             xs = _.map(data, function(datum) {
               return datum.x;
             });
             return Math.max.apply(Math, xs);
           };
-          drawPoint = function(d) {
+
+          function drawPoint(d) {
             var new_X, new_Y, y_diff;
             d.y = d.y + margin;
             new_X = width * d.x / maxX;
@@ -54,9 +60,10 @@
             ctx.lineTo(prev_X, prev_Y);
             ctx.lineWidth = 3;
             ctx.strokeStyle = "#" + (rainbow.colourAt(d.y - (y_diff / 2)));
-            return ctx.stroke();
+            ctx.stroke();
           };
-          makeChart = function(data) {
+
+          function makeChart(data) {
             var dpt, i, len, results;
             prev_X = 0;
             prev_Y = 0;
@@ -65,24 +72,72 @@
             maxX = getMax_X($scope.data);
             rainbow.setNumberRange(0, maxY);
             ctx.clearRect(0, 0, width, height);
-            // results = [];
             for (i = 0, len = data.length; i < len; i += 1) {
               dpt = data[i];
-              drawPoint(dpt)
-              // results.push(drawPoint(dpt));
+              drawPoint(dpt);
             }
           };
-          $scope.$watch('data', function(val, oldVal) {
-            if (!val) {
+
+          var transitioning = false;
+          var duration = 900; //ms
+          var dpt_calibration = 50; //move 100 datapoints during transition
+          var dpt_index = 1;
+          var transition_threads = [];
+          var animation;
+          function transition (old_data_points, new_data_points) {
+
+            for (var i = 0; i < dpt_calibration; i++) {
+              transition_threads[i] = [];
+            }
+
+            for (var i = 0; i < new_data_points.length; i++) {
+              var prev_dpt = old_data_points[i] || new_data_points[i];
+              var new_dtp = new_data_points[i];
+              var dpt_y_diff = new_dtp.y - prev_dpt.y;
+              var dpt_x_diff = new_dtp.x - prev_dpt.x;
+
+              for (var ii = 0; ii < dpt_calibration; ii ++) {
+                var new_y = ii === 0? prev_dpt.y : prev_dpt.y + ((dpt_y_diff/dpt_calibration) * ii);
+                var new_y = ii === dpt_calibration-1? new_dtp.y : new_y;
+
+                var new_x = ii === 0? prev_dpt.x : prev_dpt.x + ((dpt_x_diff/dpt_calibration) * ii);
+                var new_x = ii === dpt_calibration-1? new_dtp.x : new_x;
+
+                transition_threads[ii][i] = {
+                  y: new_y,
+                  x: new_x
+                };
+              }
+
+            }
+
+            dpt_index = 0;
+            animation = $interval( animate_transition, duration/dpt_calibration);
+
+          }
+
+          function animate_transition () {
+            if (dpt_index === dpt_calibration) {
+              $interval.cancel(animation);
               return;
             }
-            if (val.length === 0) {
+            makeChart(transition_threads[dpt_index]);
+            dpt_index ++;
+          }
+
+          $scope.$watch('data', function(data, oldVal) {
+            if (!data) {
               return;
             }
-            if (val === oldVal) {
+            if (data.length === 0) {
               return;
             }
-            return makeChart(val);
+            if (data === oldVal) {
+              return;
+            }
+            transition(prev_data_points, data);
+            prev_data_points = data;
+            // makeChart(data);
           }, false);
         }
       };
