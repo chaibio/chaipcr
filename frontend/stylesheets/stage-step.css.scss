@@ -13,7 +13,7 @@
   height: 768px;
 
   .top-half {
-    height: 448px;
+    height: 468px; // change it to 448 when top scroll is implementing.
     width: 1024px;
     background-color: #ffb400;
 
@@ -59,6 +59,7 @@
           width: 304px;
           height: 48px;
           padding-top: 22px;
+          visibility: hidden;
 
           .background-bar {
             width: 300px;
@@ -78,6 +79,7 @@
           float: left;
           padding-left: 20px;
           padding-top: 9px;
+          visibility: hidden;
 
           button {
             width: 120px;
@@ -93,7 +95,7 @@
     }
 
     .canvas-containing {
-      height: 400px;
+      height: 420px;
       width: 1024px;
       overflow-x: auto;
       overflow-y: hidden;
