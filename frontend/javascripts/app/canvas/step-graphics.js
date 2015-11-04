@@ -19,6 +19,27 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
       return this;
     };
 
+    this.stepFooter = function() {
+
+      var  cordinates = this.parentStage.parent.dotCordiantes;
+      var smallDotArray = [];
+
+      for(var dot in cordinates) {
+        var cord = cordinates[dot];
+        smallDotArray.push(new fabric.Circle({
+          radius: 2, fill: 'white', left: cord[0], top: cord[1], selectable: false, name: "stageDot", originX: "center", originY: "center"
+        }));
+      }
+
+      var editStageStatus = this.parentStage.parent.editStageStatus;
+
+      this.dots = new fabric.Group(smallDotArray, {
+        originX: "left", originY: "top", left: this.left + 16, top: 378, visible: editStageStatus, lockMovementY: true,
+        hasBorders: false, hasControls: false,
+      });
+      return this;
+    };
+
     this.deleteButton = function() {
 
       this.delCircle = new fabric.Circle({

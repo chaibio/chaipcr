@@ -147,6 +147,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         this.canvas.remove(currentStep.stepGroup);
         this.canvas.remove(currentStep.hitPoint);
         this.canvas.remove(currentStep.delGroup);
+        this.canvas.remove(currentStep.dots);
         this.canvas.remove(currentStep.rampSpeedGroup);
         this.canvas.remove(currentStep.commonFooterImage);
         this.canvas.remove(currentStep.darkFooterImage);
@@ -198,7 +199,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
           }
 
       };
-      
+
       this.configureStepForDelete = function(newStep, start) {
 
         this.childSteps.slice(start, this.childSteps.length).forEach(function(thisStep) {

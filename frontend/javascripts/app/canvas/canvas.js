@@ -9,7 +9,9 @@ window.ChaiBioTech.ngApp.factory('canvas', [
   'stepEvents',
   'moveStepRect',
   'moveStageRect',
-  function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents, moveStepRect, moveStageRect) {
+  'previouslySelected',
+
+  function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents, moveStepRect, moveStageRect, previouslySelected) {
 
     this.init = function(model) {
 
@@ -24,6 +26,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       this.findAllCirclesArray = [];
       this.moveLimit = 0; // We set the limit for the movement of the step image to move steps
       this.editStageStatus = false;
+      this.dotCordiantes = {};
+
       this.images = [
         "common-step.png",
         "black-footer.png",
@@ -43,6 +47,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       });
 
       new events(this, this.$scope); // Fire the events;
+      this.createFooterDotCordinates();
       this.loadImages();
     };
 
@@ -132,8 +137,25 @@ window.ChaiBioTech.ngApp.factory('canvas', [
          It uses recursive function to do the job. See the inner function mainWrapper()
       */
     /*******************************************************/
+    this.createFooterDotCordinates = function() {
+
+      this.dotCordiantes = {
+        "topDot0": [1, 1], "bottomDot0": [1, 10], "middleDot0": [6.5, 6],
+      };
+
+      for(var i = 1; i < 9; i++) {
+        this.dotCordiantes["topDot" + i] = [(11 * i) + 1, 1];
+        this.dotCordiantes["middleDot" + i] = [(11 * i) + 6.5, 6];
+        this.dotCordiantes["bottomDot" + i] = [(11 * i) + 1, 10];
+      }
+
+      delete this.dotCordiantes["middleDot" + (i - 1)];
+      return this.cordinates;
+    };
+
     this.addinvisibleFooterToStep = function() {
 
+      // we are going to remove this part
       this.allStepViews.forEach(function(step) {
         this.addImagesC(step);
       }, this);
@@ -243,10 +265,14 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     };
 
     this.editStageMode = function(status) {
-      //console.log("I am at right place", this.allStageViews);
-      //Show dots at the top
+
       this.editStageStatus = status;
       var add = (status) ? 25 : -25;
+      if(status === true) {
+        previouslySelected.circle.parent.showHideFooter(true, "black");
+      } else {
+        previouslySelected.circle.parent.showHideFooter(false, "white");
+      }
 
       this.allStageViews.forEach(function(stage, index) {
         stage.dots.setVisible(status);
@@ -254,11 +280,19 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
         stage.childSteps.forEach(function(step, index) {
           step.delGroup.setVisible(status);
+          step.dots.setVisible(status);
+
+          if(step.parentStage.model.auto_delta) {
+            if(step.index === 0) {
+
+              step.deltaSymbol.setVisible(!status);
+            }
+            step.deltaGroup.setVisible(!status);
+          }
+
         });
       }, this);
       this.canvas.renderAll();
-      //Bring the footer
-      // Bring delete
     };
 
     this.addNewStage = function(data, currentStage) {

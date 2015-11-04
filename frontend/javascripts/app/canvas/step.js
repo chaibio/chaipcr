@@ -47,7 +47,10 @@ window.ChaiBioTech.ngApp.factory('step', [
 
         leftVal = {left: this.left + 108};
         this.delGroup.set(leftVal).setCoords();
-        
+
+        leftVal = {left: this.left + 16};
+        this.dots.set(leftVal).setCoords();
+
         this.ordealStatus = this.ordealStatus + action;
         this.circle.getUniqueId();
 
@@ -169,6 +172,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         stepGraphics.autoDeltaDetails.call(this);
         stepGraphics.numberingValue.call(this);
         stepGraphics.deleteButton.call(this);
+        stepGraphics.stepFooter.call(this);
         stepGraphics.stepComponents.call(this);
 
         // Add all those components created.
@@ -176,13 +180,15 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.canvas.add(this.rampSpeedGroup);
         this.canvas.add(this.hitPoint);
         this.canvas.add(this.delGroup);
+        this.canvas.add(this.dots);
         this.addCircle();
       };
 
-      this.showHideFooter = function(visibility) {
+      this.showHideFooter = function(visibility, color) {
 
-        this.darkFooterImage.setVisible(visibility);
-        this.whiteFooterImage.setVisible(visibility);
+        this.dots.forEachObject(function(obj) {
+          obj.setFill(color);
+        });
       };
 
       this.selectStep = function() {
@@ -192,7 +198,10 @@ window.ChaiBioTech.ngApp.factory('step', [
         }
 
         this.manageBorder("black");
-        this.showHideFooter(true);
+        if(this.parentStage.parent.editStageStatus) {
+          this.showHideFooter(true, "black");
+        }
+
         this.stepName.setFill("black");
         this.numberingText.setFill("black");
       };
@@ -200,7 +209,10 @@ window.ChaiBioTech.ngApp.factory('step', [
       this.unSelectStep = function() {
         var previouslySelectedStep = previouslySelected.circle.parent;
 
-        previouslySelectedStep.showHideFooter(false);
+        if(this.parentStage.parent.editStageStatus) {
+          previouslySelectedStep.showHideFooter(false, "white");
+        }
+
         previouslySelectedStep.manageBorderPrevious('#ff9f00', this);
         previouslySelectedStep.stepName.setFill("white");
         previouslySelectedStep.numberingText.setFill("white");

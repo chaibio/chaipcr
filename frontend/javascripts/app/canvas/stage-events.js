@@ -4,10 +4,10 @@ window.ChaiBioTech.ngApp.service('stageEvents',[
   function(stepGraphics, stageGraphics) {
 
     var that = this;
-    this.changeDeltaText = function($scope) {
+    this.changeDeltaText = function($scope, C) {
 
       var stage = $scope.fabricStep.parentStage;
-      if(stage.model.stage_type === "cycling") {
+      if(stage.model.stage_type === "cycling" && ! stage.parent.editStageStatus) {
         stage.childSteps.forEach(function(step, index) {
           stepGraphics.autoDeltaDetails.call(step);
         });
@@ -33,8 +33,8 @@ window.ChaiBioTech.ngApp.service('stageEvents',[
       });
 
       $scope.$watch('stage.auto_delta_start_cycle', function(newVal, oldVal) {
-        
-        that.changeDeltaText($scope);
+
+        that.changeDeltaText($scope, C);
         canvas.renderAll();
       });
 
