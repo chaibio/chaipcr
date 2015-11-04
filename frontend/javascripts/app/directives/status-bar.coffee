@@ -2,7 +2,8 @@ window.App.directive 'statusBar', [
   'Experiment'
   'Status'
   'TestInProgressHelper'
-  (Experiment, Status, TestInProgressHelper) ->
+  '$rootScope'
+  (Experiment, Status, TestInProgressHelper, $rootScope) ->
 
     restrict: 'EA'
     replace: true
@@ -61,7 +62,8 @@ window.App.directive 'statusBar', [
         Experiment.getExperimentDuration($scope.experiment)
 
       $scope.startExperiment = ->
-        Experiment.startExperiment($scope.experiment.id)
+        Experiment.startExperiment($scope.experiment.id).then ->
+          $rootScope.$broadcast 'experiment:started', $scope.experimentId
 
       $scope.stopExperiment = ->
         Experiment.stopExperiment($scope.experiment.id)
