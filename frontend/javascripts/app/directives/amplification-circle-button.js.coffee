@@ -10,9 +10,9 @@ window.ChaiBioTech.ngApp
       $scope.$watch ->
         ngModel.$modelValue
       , (newVal) ->
-        $scope.updateUI(newVal) if newVal
+        $scope.updateUI() if newVal
 
-      $scope.updateUI = (val) ->
+      $scope.updateUI = ->
         $scope.selected = ngModel.$modelValue.selected
         $scope.color = ngModel.$modelValue.color || 'gray'
 
@@ -25,6 +25,6 @@ window.ChaiBioTech.ngApp
           color: ngModel.$modelValue.color || 'gray'
 
         ngModel.$setViewValue state
-        $scope.updateUI(state)
+        $scope.updateUI()
 
 ]
