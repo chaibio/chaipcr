@@ -216,6 +216,7 @@ window.ChaiBioTech.ngApp.factory('events', [
               .then(function(data) {
                 console.log("deleted", data);
                 me.parentStage.deleteStep({}, me);
+                C.canvas.renderAll();
               });
 
 

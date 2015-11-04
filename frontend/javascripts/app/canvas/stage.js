@@ -109,12 +109,13 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
           selected = (this.previousStage) ? this.previousStage.childSteps[this.previousStage.childSteps.length - 1] : this.nextStage.childSteps[0];
           this.parent.allStageViews.splice(this.index, 1);
-          this.updateStageData(-1);
-          console.log("lats dude", selected);
+          selected.parentStage.updateStageData(-1);
+          console.log("last dude", selected);
           //if(! selected.parentStage.nextStage && this.index !== 0) { //we are exclusively looking for last stage
             //selected.parentStage.addBorderRight();
             //selected.borderRight.setVisible(false);
           //}
+          //this.parent.setDefaultWidthHeight();
         }
 
 
@@ -144,10 +145,13 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.deleteAllStepContents = function(currentStep) {
 
         this.canvas.remove(currentStep.stepGroup);
+        this.canvas.remove(currentStep.hitPoint);
+        this.canvas.remove(currentStep.delGroup);
         this.canvas.remove(currentStep.rampSpeedGroup);
         this.canvas.remove(currentStep.commonFooterImage);
         this.canvas.remove(currentStep.darkFooterImage);
         this.canvas.remove(currentStep.whiteFooterImage);
+
         currentStep.circle.removeContents();
 
       };
@@ -180,18 +184,21 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
       this.updateStageData = function(action) {
 
-        var currentStage = this;
+          if(! this.previousStage && action === -1 && this.index === 1) {
+            // This is a special case when very first stage is being deleted and the second stage is selected right away..!
+            this.index = this.index + action;
+            stageGraphics.stageHeader.call(this);
+          }
+          var currentStage = this.nextStage;
 
-        while(currentStage.nextStage) {
-          currentStage.nextStage.index = currentStage.nextStage.index + action;
-          //this.stageNo.text = "''"
-          var indexNumber = currentStage.nextStage.index + 1;
-          var number = (indexNumber < 10) ? "0" + indexNumber : indexNumber;
-          currentStage.nextStage.stageNo.text = number.toString();
-          currentStage = currentStage.nextStage;
-        }
+          while(currentStage) {
+            currentStage.index = currentStage.index + action;
+            stageGraphics.stageHeader.call(currentStage);
+            currentStage = currentStage.nextStage;
+          }
 
       };
+      
       this.configureStepForDelete = function(newStep, start) {
 
         this.childSteps.slice(start, this.childSteps.length).forEach(function(thisStep) {

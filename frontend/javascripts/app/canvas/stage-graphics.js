@@ -32,9 +32,9 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
           radius: 2, fill: 'white', left: cord[0], top: cord[1], selectable: false, name: "stageDot", originX: "center", originY: "center"
         }));
       }
-
+      var editStageStatus = this.parent.editStageStatus;
       this.dots = new fabric.Group(smallDotArray, {
-        originX: "left", originY: "top", left: 3, top: 8, evented: false, width: 13, height: 11, visible: false
+        originX: "left", originY: "top", left: 3, top: 8, evented: false, width: 13, height: 11, visible: editStageStatus
       });
       return this;
     };
@@ -64,31 +64,38 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
 
     this.stageHeader = function() {
 
-      var index = parseInt(this.index) + 1;
-      var stageName = (this.model.name).toUpperCase().replace("STAGE", "");
-      var text = "STAGE " + index + ":" + stageName;
+      if(this.stageName) {
 
-      if(this.model.stage_type === "cycling") {
-        var noOfCycles = this.model.num_cycles;
-        noOfCycles = String(noOfCycles);
-        text = text + ", " + noOfCycles + "x";
+        var index = parseInt(this.index) + 1;
+        var stageName = (this.model.name).toUpperCase().replace("STAGE", "");
+        var text = "STAGE " + index + ":" + stageName;
+
+        if(this.model.stage_type === "cycling") {
+          var noOfCycles = this.model.num_cycles;
+          noOfCycles = String(noOfCycles);
+          text = text + ", " + noOfCycles + "x";
+        }
+
+        this.stageName.setText(text);
+        //this.canvas.renderAll();
       }
 
-      this.stageName.setText(text);
       //this.stageNameGroup.setLeft(this.stageNameGroup.left + 5);
     };
 
     this.writeMyName = function() {
 
-      //var stageName = (this.model.name).toUpperCase();
-      //stageName = stageName.replace("STAGE", "");
       this.stageName = new fabric.Text("", {
           fill: 'white', fontWeight: "400",  fontSize: 12,   fontFamily: "dinot",
           originX: "left", originY: "top", selectable: true
         }
       );
+
+      var editStageStatus = this.parent.editStageStatus;
+      var addUp = (editStageStatus) ? 26 : 1;
+
       this.stageNameGroup = new fabric.Group([this.stageName], {
-        originX: "left", originY: "top", selectable: true, top : 8, left: 1,
+        originX: "left", originY: "top", selectable: true, top : 8, left: addUp,
       });
       return this;
     };

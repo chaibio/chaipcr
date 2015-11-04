@@ -23,6 +23,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       this.drawCirclesArray = [];
       this.findAllCirclesArray = [];
       this.moveLimit = 0; // We set the limit for the movement of the step image to move steps
+      this.editStageStatus = false;
       this.images = [
         "common-step.png",
         "black-footer.png",
@@ -244,6 +245,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     this.editStageMode = function(status) {
       //console.log("I am at right place", this.allStageViews);
       //Show dots at the top
+      this.editStageStatus = status;
       var add = (status) ? 25 : -25;
 
       this.allStageViews.forEach(function(stage, index) {

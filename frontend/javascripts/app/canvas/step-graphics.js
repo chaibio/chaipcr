@@ -43,9 +43,10 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
         angle: 315, left: 2, top: 7
       });
 
+      var editStageStatus = this.parentStage.parent.editStageStatus;
 
       this.delGroup = new fabric.Group([this.delCircle, this.line1, this.line2], {
-        originX: 'left', originY: 'top', left: this.left + 108, top: 79, visible: false, name: "deleteStep", me: this, selectable: false
+        originX: 'left', originY: 'top', left: this.left + 108, top: 79, visible: editStageStatus, name: "deleteStep", me: this, selectable: false
       });
 
       return this;
