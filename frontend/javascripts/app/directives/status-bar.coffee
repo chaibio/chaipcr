@@ -7,9 +7,12 @@ window.App.directive 'statusBar', [
     restrict: 'EA'
     replace: true
     scope:
-      experimentId: '='
+      experimentId: '=?'
     templateUrl: 'app/views/directives/status-bar.html'
     link: ($scope, elem, attrs) ->
+
+      $scope.show = ->
+        if attrs.experimentId then ($scope.experimentId and $scope.status) else $scope.status
 
       getExperiment = (cb) ->
         TestInProgressHelper.getExperiment($scope.experimentId).then (experiment) ->
@@ -45,6 +48,11 @@ window.App.directive 'statusBar', [
           $scope.isHolding = TestInProgressHelper.setHolding(data, $scope.experiment)
 
         $scope.timeRemaining = TestInProgressHelper.timeRemaining(data)
+
+        if ($scope.state is 'Running' and !attrs.experimentId and data.experimentController?.expriment?.id)
+          $scope.experimentId = data.experimentController.expriment.id
+          getExperiment (exp) ->
+            $scope.experiment = exp
 
       , true
 

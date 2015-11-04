@@ -1,7 +1,8 @@
 <div>
-  <div class="status-bar" ng-show="!experiment || !status"></div>
 
-  <div class="status-bar" ng-show="experiment && status">
+  <div class="status-bar" ng-show="!show()"></div>
+
+  <div class="status-bar" ng-show="show()">
     <span class="experiment-result" ng-show="experiment.completed_at && !isHolding" ng-class="experiment.completion_status === 'success' ? 'success' : 'failed'" ng-show="experiment.completed_at">
       <span ng-show="experiment.completion_status === 'success'">EXPERIMENT COMPLETE</span>
       <span ng-show="experiment.completion_status !== 'success'">EXPERIMENT FAILED</span>
@@ -41,8 +42,8 @@
       </span>
     </span>
     <span class="controls-container">
-      <span class="control" ng-show="state === 'Idle'" experiment-id="experiment.id" duplicate-experiment>DUPLICATE EXPERIMENT</span>
-      <span class="control" ng-show="!experiment.started_at" ng-class="{'disabled': experiment.started_at}" ng-click="startExperiment()">BEGIN EXPERIMENT</span>
+      <span class="control" ng-show="state === 'Idle' && experiment" experiment-id="experiment.id" duplicate-experiment>DUPLICATE EXPERIMENT</span>
+      <span class="control" ng-show="!experiment.started_at && experiment.id" ng-class="{'disabled': experiment.started_at}" ng-click="startExperiment()">BEGIN EXPERIMENT</span>
       <span class="control" ng-show="experiment.started_at && (!experiment.completed_at || isHolding) && state !== 'Idle' " ng-click="stopExperiment()">
         <img src="/images/status-bar-stop-btn.png">
         <span ng-show="!isHolding">STOP EXPERIMENT</span>
