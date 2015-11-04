@@ -4,31 +4,27 @@ window.ChaiBioTech.ngApp
     restrict: 'EA'
     require: 'ngModel'
     replace: true
-    template: '<div class="circle noselect" ng-click="toggleState()" ng-style="style">{{text}}</div>'
+    templateUrl: 'app/views/directives/amplification-chart-button.html'
     link: ($scope, elem, attrs, ngModel) ->
 
       $scope.$watch ->
         ngModel.$modelValue
       , (newVal) ->
-        if newVal
-          $scope.updateUI()
+        $scope.updateUI(newVal) if newVal
 
-      $scope.updateUI = ->
+      $scope.updateUI = (val) ->
+        $scope.selected = ngModel.$modelValue.selected
+        $scope.color = ngModel.$modelValue.color || 'gray'
+
         $scope.style =
-          'border-color': angular.copy (ngModel.$modelValue.color || 'gray' )
-
-        if ngModel.$modelValue.selected
-          $scope.style.color = ngModel.$modelValue.color || 'gray'
-          $scope.text = 'On'
-        else
-          $scope.style.color = 'gray'
-          $scope.text = 'Off'
+          borderColor: $scope.color
 
       $scope.toggleState = ->
-        ngModel.$setViewValue
+        state =
           selected: !ngModel.$modelValue.selected || false
           color: ngModel.$modelValue.color || 'gray'
-        $scope.updateUI()
 
-      $scope.updateUI()
+        ngModel.$setViewValue state
+        $scope.updateUI(state)
+
 ]
