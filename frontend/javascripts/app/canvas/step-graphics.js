@@ -22,15 +22,8 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
     this.deleteButton = function() {
 
       this.delCircle = new fabric.Circle({
-        radius: 6,
-        stroke: 'black',
-        originX: "center",
-        originY: "center",
-        fill: '#ffb400',
-        left: 5,
-        top: 5,
-        strokeWidth: 1,
-        selectable: false,
+        radius: 6, stroke: 'black', originX: "center", originY: "center", fill: '#ffb400', left: 5, top: 5, strokeWidth: 1,
+        selectable: false, evented: false
       });
 
       this.line1 = new fabric.Line([0, 0, 6, 0], {
@@ -46,7 +39,8 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
       var editStageStatus = this.parentStage.parent.editStageStatus;
 
       this.delGroup = new fabric.Group([this.delCircle, this.line1, this.line2], {
-        originX: 'left', originY: 'top', left: this.left + 108, top: 79, visible: editStageStatus, name: "deleteStep", me: this, selectable: false
+        originX: 'left', originY: 'top', left: this.left + 108, top: 79, visible: editStageStatus, name: "deleteStepButton",
+        me: this, selectable: false
       });
 
       return this;

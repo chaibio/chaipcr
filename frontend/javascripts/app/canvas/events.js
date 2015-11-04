@@ -8,8 +8,9 @@ window.ChaiBioTech.ngApp.factory('events', [
   'ExperimentLoader',
   'previouslySelected',
   'popupStatus',
+  'previouslyHoverd',
 
-  function(ExperimentLoader, previouslySelected, popupStatus) {
+  function(ExperimentLoader, previouslySelected, popupStatus, previouslyHoverd) {
     return function(C, $scope) {
 
       this.canvas = C.canvas;
@@ -113,6 +114,18 @@ window.ChaiBioTech.ngApp.factory('events', [
 
           switch(evt.target.name) {
 
+            case "stepGroup":
+              me = evt.target.me;
+              if(C.editStageStatus === false && me.delGroup.visible === false) {
+                  me.delGroup.setVisible(true);
+                  if(previouslyHoverd.step) {
+                    previouslyHoverd.step.delGroup.setVisible(false);
+                  }
+                  previouslyHoverd.step = me;
+                  C.canvas.renderAll();
+              }
+            break;
+
             case "moveStepImage":
 
               evt.target.setVisible(false);
@@ -208,7 +221,7 @@ window.ChaiBioTech.ngApp.factory('events', [
 
             break;
 
-            case "deleteStep":
+            case "deleteStepButton":
 
               me  = evt.target.me;
               that.selectStep(me.circle);
