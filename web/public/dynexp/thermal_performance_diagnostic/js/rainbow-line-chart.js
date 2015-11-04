@@ -19,6 +19,7 @@
           var prev_Y = 0;
           var maxY = 0;
           var maxX = 0;
+          var minX = 0;
           var margin = 10;
           var prev_data_points = [];
 
@@ -32,6 +33,13 @@
             });
             return margin * 2 + Math.max.apply(Math, ys);
           };
+          function getMin_Y(data) {
+            var ys;
+            ys = _.map(data, function(datum) {
+              return datum.y;
+            });
+            return margin * 2 + Math.min.apply(Math, ys);
+          };
 
           function getMax_X(data) {
             var xs;
@@ -41,15 +49,21 @@
             return Math.max.apply(Math, xs);
           };
 
-          function drawPoint(d) {
+          function getMin_X(data) {
+            var xs;
+            xs = _.map(data, function(datum) {
+              return datum.x;
+            });
+            return Math.min.apply(Math, xs);
+          };
+
+          function drawPoint(d, data) {
             var new_X, new_Y, y_diff;
             d.y = d.y + margin;
             d.x = d.x + margin;
-            new_X = width * d.x / maxX;
+            new_X = width * (d.x- minX) / (maxX-minX) ;
             new_Y = height * d.y / maxY;
-            // if (prev_X === 0) {
-            //   prev_X = new_X;
-            // }
+
             if (prev_Y === 0) {
               prev_Y = new_Y;
             }
@@ -62,6 +76,7 @@
             ctx.lineWidth = 3;
             ctx.strokeStyle = "#" + (rainbow.colourAt(d.y - (y_diff / 2)));
             ctx.stroke();
+            x_index ++;
           };
 
           function makeChart(data) {
@@ -71,30 +86,51 @@
             maxY = getMax_Y(data);
             maxY = maxY > 100 ? maxY : 130;
             maxX = getMax_X(data);
+            minX = getMin_X(data);
+            x_index = 0;
             rainbow.setNumberRange(0, maxY);
             ctx.clearRect(0, 0, width, height);
             for (i = 0, len = data.length; i < len; i += 1) {
               dpt = data[i];
-              drawPoint(dpt);
+              drawPoint(dpt, data);
             }
           };
 
           var transitioning = false;
-          var duration = 900; //ms
-          var dpt_calibration = 20; //move 100 datapoints during transition
+          var duration = 800; //ms
+          var dpt_calibration = 10; //move 100 datapoints during transition
           var dpt_index = 1;
           var transition_threads = [];
           var animation;
           function transition (old_data_points, new_data_points) {
 
-            // cancelAnimation();
+            if (!old_data_points) {
+              return;
+            }
+            if (old_data_points.length === 0) {
+              return;
+            }
+
+            if (transitioning) return;
+
+            transitioning = true;
+
+            if (old_data_points && new_data_points) {
+              if (old_data_points.length > 0 && new_data_points.length > 0) {
+                dpt_calibration = maxY - getMin_Y(old_data_points)
+                dpt_calibration = Math.round(dpt_calibration);
+                dpt_calibration = Math.abs(dpt_calibration);
+                dpt_calibration = dpt_calibration > 10? dpt_calibration : 10;
+                console.log(dpt_calibration);
+              }
+            }
 
             for (var i = 0; i < dpt_calibration; i++) {
               transition_threads[i] = [];
             }
 
             for (var i = 0; i < new_data_points.length; i++) {
-              var prev_dpt = old_data_points[i] || new_data_points[i];
+              var prev_dpt = old_data_points[i] || old_data_points[old_data_points.length-1] || new_data_points[i];
               var new_dtp = new_data_points[i];
               var dpt_y_diff = new_dtp.y - prev_dpt.y;
               var dpt_x_diff = new_dtp.x - prev_dpt.x;
@@ -121,6 +157,7 @@
               return;
             }
             makeChart(transition_threads[dpt_index]);
+            // prev_data_points = transition_threads[dpt_index];
             dpt_index ++;
           }
 
@@ -128,18 +165,14 @@
             if(!animation) return;
             $interval.cancel(animation);
             animation = null;
+            transitioning = false;
           }
 
           $scope.$watch('data', function(data, oldVal) {
-            if (!data) {
-              return;
-            }
-            if (data.length === 0) {
-              return;
-            }
-            if (data === oldVal) {
-              return;
-            }
+            if (!data) return;
+            if (data.length === 0) return;
+            if (data === oldVal) return;
+            if (transitioning) return;
             transition(prev_data_points, data);
             prev_data_points = data;
 
