@@ -44,12 +44,24 @@
             <ramp-speed caption="Ramp Speed" unit="C/s" reading="step.ramp.rate"></ramp-speed>
             <hold-duration caption="Hold Duration" reading="step.hold_time" pause="! step.pause"></hold-duration>
         </div>
+
         <div class="data-boxes auto-delta">
-          <div class="name-board "><auto-delta-toggle data="stage.auto_delta" type="{{stage.stage_type}}" call="changeDelta"></auto-delta-toggle> <span><b>Δ</b>&nbspAUTODELTA</span></div>
+          <div class="name-board">
+            <auto-delta-toggle ng-show="editStageMode" data="stage.auto_delta" type="{{stage.stage_type}}" call="changeDelta">
+            </auto-delta-toggle>
+            <auto-delta-caption ng-show="editStageMode" type="{{stage.stage_type}}">
+            </auto-delta-caption>
+          </div>
           <start-on-cycle caption="Start On Cycle" delta="stage.auto_delta" reading="stage.auto_delta_start_cycle"></start-on-cycle>
-          <temp caption="Δ Temp" unit="ºC" delta="stage.auto_delta" reading="step.delta_temperature"><capsule func="changeDeltaTemperature" delta="{{stage.auto_delta}}" data="step.delta_temperature"></capsule></temp>
-          <time caption="Δ Time" delta="stage.auto_delta" reading="step.delta_duration_s"><capsule func="changeDeltaTime" delta="{{stage.auto_delta}}" data="step.delta_duration_s"></capsule></time>
+          <temp caption="Δ Temp" unit="ºC" delta="stage.auto_delta" reading="step.delta_temperature">
+            <capsule func="changeDeltaTemperature" delta="{{stage.auto_delta}}" data="step.delta_temperature"></capsule>
+          </temp>
+          <time caption="Δ Time" delta="stage.auto_delta" reading="step.delta_duration_s">
+            <capsule func="changeDeltaTime" delta="{{stage.auto_delta}}" data="step.delta_duration_s">
+            </capsule>
+          </time>
         </div>
+
         <div class="data-boxes edit-stage-step">
           <div class="name-board ">EDIT STEPS + STAGES</div>
             <actions></actions>

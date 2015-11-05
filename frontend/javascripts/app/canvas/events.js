@@ -236,7 +236,7 @@ window.ChaiBioTech.ngApp.factory('events', [
             break;
           }
         } else { // if the click is on canvas
-
+          console.log("stray click");
           $scope.curtain.show();
           var circle = previouslySelected.circle;
           circle.parent.parentStage.unSelectStage();
