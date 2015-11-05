@@ -314,68 +314,28 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
       this.manageRampLineMovement = function(left, top, targetCircleGroup) {
 
-        var endPointX, endPointY, midPointX, midPointY;
+        var midPointY;
 
         if(this.next) {
 
-            this.curve.path[0][1] = left;
-            this.curve.path[0][2] = top;
-            // Calculating the mid point of the line at the right side of the circle
-            // Remeber take the point which is static at the other side
-            endPointX = this.curve.path[2][3];
-            endPointY = this.curve.path[2][4];
+          midPointY = this.curve.nextOne(left, top);
+          // We move the gather data Circle along with it [its next object's]
+          this.next.gatherDataGroup.setTop(midPointY);
 
-            midPointX = (left + endPointX) / 2;
-            midPointY = (top + endPointY) / 2;
-
-            this.curve.path[1][1] = left + this.controlDistance;
-            this.curve.path[1][2] = top;
-
-            // Mid point
-            this.curve.path[1][3] = midPointX;
-            this.curve.path[1][4] = midPointY;
-
-            // We move the gather data Circle along with it [its next object's]
-            this.next.gatherDataGroup.setTop(midPointY);
-
-            if(this.next.model.ramp.collect_data) {
-              this.runAlongEdge();
-            }
-            // Controlling point for the next bent
-            this.curve.path[2][1] = endPointX - this.controlDistance;
-            this.curve.path[2][2] = endPointY;
+          if(this.next.model.ramp.collect_data) {
+            this.runAlongEdge();
+          }
         }
 
         if(this.previous) {
-            previous = this.previous;
-            previous.curve.path[2][3] = left;
-            previous.curve.path[2][4] = top;
-            // Calculating the mid point of the line at the left side of the cycle
-            // Remeber take the point which is static at the other side
-            endPointX = previous.curve.path[0][1];
-            endPointY = previous.curve.path[0][2];
 
-            midPointX = (left + endPointX) / 2;
-            midPointY = (top + endPointY) / 2;
+          midPointY = this.previous.curve.previousOne(left, top);
 
-            previous.curve.path[2][1] = left - this.controlDistance;
-            previous.curve.path[2][2] = top;
+          this.gatherDataGroup.setTop(midPointY);
 
-            // Mid point
-            previous.curve.path[1][3] = midPointX;
-            previous.curve.path[1][4] = midPointY;
-
-            // We move the gather data Circle along with it
-            // Please pay attention here we move gatherdta of this
-            this.gatherDataGroup.setTop(midPointY);
-
-            if(this.model.ramp.collect_data) {
-              this.runAlongCircle();
-            }
-
-            previous.curve.path[1][1] = endPointX + this.controlDistance;
-            previous.curve.path[1][2] = endPointY;
-
+          if(this.model.ramp.collect_data) {
+            this.runAlongCircle();
+          }
         }
 
         this.temperatureDisplay(targetCircleGroup);
