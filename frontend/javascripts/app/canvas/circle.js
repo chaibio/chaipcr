@@ -337,7 +337,6 @@ window.ChaiBioTech.ngApp.factory('circle', [
             this.curve.path[1][4] = midPointY;
 
             // We move the gather data Circle along with it [its next object's]
-            console.log(midPointY, top);
             this.next.gatherDataGroup.setTop(midPointY);
             if(this.next.model.ramp.collect_data) {
               this.next.gatherDataGroup.setCoords();

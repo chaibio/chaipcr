@@ -10,8 +10,10 @@ window.ChaiBioTech.ngApp.factory('canvas', [
   'moveStepRect',
   'moveStageRect',
   'previouslySelected',
+  'constants',
 
-  function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents, moveStepRect, moveStageRect, previouslySelected) {
+  function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
+    moveStepRect, moveStageRect, previouslySelected, constants) {
 
     this.init = function(model) {
 
@@ -57,7 +59,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       //var width = (this.allStepViews.length * 128 > 1024) ? this.allStepViews.length * 128 : 1024;
       // Add these numbers to constants.
       this.canvas.setWidth(
-        (this.allStepViews.length * 128) +
+        (this.allStepViews.length * constants.stepWidth) +
         ((this.allStageViews.length) * 8) +
         ((this.allStageViews.length) * 2) +
         33

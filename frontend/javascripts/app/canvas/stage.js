@@ -4,14 +4,16 @@ window.ChaiBioTech.ngApp.factory('stage', [
   'step',
   'previouslySelected',
   'stageGraphics',
-  function(ExperimentLoader, $rootScope, step, previouslySelected, stageGraphics) {
+  'constants',
+
+  function(ExperimentLoader, $rootScope, step, previouslySelected, stageGraphics, constants) {
 
     return function(model, stage, allSteps, index, fabricStage, $scope, insert) {
 
       this.model = model;
       this.index = index;
       this.canvas = stage;
-      this.myWidth = (this.model.steps.length * 128) + 2;
+      this.myWidth = (this.model.steps.length * (constants.stepWidth)) + 2;
       this.parent = fabricStage;
       this.childSteps = [];
       this.previousStage = this.nextStage = this.noOfCycles = null;
@@ -19,7 +21,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
       this.addNewStep = function(data, currentStep) {
 
-        var width = 128;//(currentStep.index === this.childSteps.length - 1) ? 121 : 120;
+        var width = constants.stepWidth;
         this.myWidth = this.myWidth + width;
         this.stageRect.setWidth(this.myWidth);//.setCoords;
         this.stageRect.setCoords();
@@ -57,7 +59,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.deleteStep = function(data, currentStep) {
 
         // This methode says what happens in the canvas when a step is deleted
-        var width = 128;//(currentStep.index === this.childSteps.length - 1) ? 121 : 120, selected = null;
+        var width = constants.stepWidth;//(currentStep.index === this.childSteps.length - 1) ? 121 : 120, selected = null;
         this.myWidth = this.myWidth - width;
         this.stageRect.setWidth(this.myWidth);
         this.roof.setWidth(this.myWidth);

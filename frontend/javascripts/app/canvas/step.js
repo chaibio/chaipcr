@@ -4,8 +4,9 @@ window.ChaiBioTech.ngApp.factory('step', [
   'circle',
   'previouslySelected',
   'stepGraphics',
+  'constants',
 
-  function(ExperimentLoader, $rootScope, circle, previouslySelected, stepGraphics) {
+  function(ExperimentLoader, $rootScope, circle, previouslySelected, stepGraphics, constants) {
 
     return function(model, parentStage, index) {
 
@@ -13,7 +14,7 @@ window.ChaiBioTech.ngApp.factory('step', [
       this.parentStage = parentStage;
       this.index = index;
       this.canvas = parentStage.canvas;
-      this.myWidth = 128;
+      this.myWidth = constants.stepWidth;
       this.nextStep = null;
       this.previousStep = null;
       this.gatherDataDuringStep = this.model.collect_data;
