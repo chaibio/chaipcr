@@ -154,7 +154,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
       this.getUniqueId = function() {
 
-        this.uniqueName = this.model.id + this.parent.parentStage.stageNo.text + "circle";
+        this.uniqueName = this.model.id + this.parent.parentStage.index + "circle";
         return this;
       };
 

@@ -30,14 +30,10 @@ window.ChaiBioTech.ngApp.factory('events', [
       });
 
       angular.element('.canvas-container').mouseleave(function() {
-        C.indicator.setVisible(false);
-        C.stageMoveIndicator.setVisible(false);
-        C.canvas.renderAll();
+
       });
 
       this.selectStep = function(circle) {
-        C.indicator.setVisible(false);
-        $scope.curtain.hide();
         circle.manageClick();
         $scope.applyValuesFromOutSide(circle);
       };
@@ -337,9 +333,9 @@ window.ChaiBioTech.ngApp.factory('events', [
            or wait for images to complete
       ***************************************/
       this.canvas.on("imagesLoaded", function() {
-        C.addStages().setDefaultWidthHeight().addinvisibleFooterToStep().addRampLinesAndCircles();
+        C.addStages().setDefaultWidthHeight().addRampLinesAndCircles();
         C.selectStep();
-        C.addMoveStepIndicator();
+        //C.addMoveStepIndicator();
         C.canvas.renderAll();
       });
     };

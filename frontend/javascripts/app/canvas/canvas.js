@@ -31,12 +31,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       this.dotCordiantes = {};
 
       this.images = [
-        "common-step.png",
-        "black-footer.png",
-        "orange-footer.png",
         "gather-data.png",
         "gather-data-image.png",
-        "drag-footer-image.png",
         "pause.png",
         "pause-middle.png"
       ];
@@ -155,45 +151,6 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       return this.cordinates;
     };
 
-    this.addinvisibleFooterToStep = function() {
-
-      // we are going to remove this part
-      this.allStepViews.forEach(function(step) {
-        this.addImagesC(step);
-      }, this);
-
-      return this;
-    };
-
-    this.addImagesC = function(step) {
-
-      step.commonFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["common-step.png"]), step, 'commonStep');
-      //this.canvas.add(step.commonFooterImage);
-
-      step.darkFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["black-footer.png"]), step, 'blackFooter');
-      //this.canvas.add(step.darkFooterImage);
-
-      step.whiteFooterImage = this.applyPropertyToImages($.extend({}, this.imageobjects["orange-footer.png"]), step, 'moveStepImage');
-      step.whiteFooterImage.top = 365;
-      step.whiteFooterImage.left = step.left;
-      //this.canvas.add(step.whiteFooterImage);
-
-    };
-
-    this.applyPropertyToImages = function(imgObj, stepObj, name) {
-
-      imgObj.left = stepObj.left - 1;
-      imgObj.top = 384;
-      imgObj.selectable = false;
-      imgObj.hasControls = false;
-      imgObj.lockMovementY = true;
-      imgObj.visible = false;
-      imgObj.hasBorders = false;
-      imgObj.name = name;
-      imgObj.step = stepObj;
-      return imgObj;
-    };
-
     this.addRampLinesAndCircles = function(circles) {
 
       this.allCircles = circles || this.findAllCircles();
@@ -260,20 +217,24 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     this.addMoveStepIndicator = function() {
 
-      this.indicator = moveStepRect.getMoveStepRect(this);
-      this.stageMoveIndicator = moveStageRect.getMoveStepRect(this);
+      //this.indicator = moveStepRect.getMoveStepRect(this);
+      //this.stageMoveIndicator = moveStageRect.getMoveStepRect(this);
       //this.canvas.add(this.indicator);
       //this.canvas.add(this.stageMoveIndicator);
     };
 
     this.editStageMode = function(status) {
 
-      this.editStageStatus = status;
       var add = (status) ? 25 : -25;
       if(status === true) {
-        previouslySelected.circle.parent.showHideFooter(true, "black");
+        this.editStageStatus = status;
+        previouslySelected.circle.parent.manageFooter("black");
+        previouslySelected.circle.parent.parentStage.changeFillsAndStrokes("black", 4);
       } else {
-        previouslySelected.circle.parent.showHideFooter(false, "white");
+        previouslySelected.circle.parent.manageFooter("white");
+        previouslySelected.circle.parent.parentStage.changeFillsAndStrokes("white", 2);
+        this.editStageStatus = status; // This order editStageStatus is changed is important, because changeFillsAndStrokes()
+        //Works only if editStageStatus === true
       }
 
       this.allStageViews.forEach(function(stage, index) {
@@ -332,17 +293,9 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
         step.ordealStatus = ordealStatus + 1;
         step.render();
-        step.addImages();
-
         this.allStepViews.splice(ordealStatus, 0, step);
         ordealStatus = ordealStatus + 1;
       }, this);
-
-      /*stageView.childSteps[stageView.childSteps.length - 1].borderRight.setVisible(false);
-      if(stageView.nextStage === null) { // if its the last stage
-        stageView.addBorderRight();
-        this.canvas.remove(stageView.previousStage.borderRight);
-      }*/
 
       var circles = this.reDrawCircles();
       this.addRampLinesAndCircles(circles);

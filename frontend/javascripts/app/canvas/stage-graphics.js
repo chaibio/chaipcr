@@ -39,29 +39,6 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
       return this;
     };
 
-    //This is a special case only for the last stage
-    this.addBorderRight = function() {
-
-        this.borderRight = new fabric.Line([0, 70, 0, 390], {
-          stroke: 'green',  left: 150, strokeWidth: 2, selectable: false
-        }
-      );
-      //this.canvas.add(this.borderRight);
-      return this;
-    };
-
-    this.writeMyNo= function() {
-
-      var temp = parseInt(this.index) + 1;
-      //temp = (temp < 10) ? "0" + temp : temp;
-
-      this.stageNo = new fabric.Text("STAGE " + temp.toString() + ":", {
-          fill: 'white',  fontSize: 12, top : 7,  left: 2,  fontFamily: "dinot", selectable: false
-        }
-      );
-      return this;
-    };
-
     this.stageHeader = function() {
 
       if(this.stageName) {
@@ -77,10 +54,7 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
         }
 
         this.stageName.setText(text);
-        //this.canvas.renderAll();
       }
-
-      //this.stageNameGroup.setLeft(this.stageNameGroup.left + 5);
     };
 
     this.writeMyName = function() {
@@ -96,34 +70,6 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
 
       this.stageNameGroup = new fabric.Group([this.stageName], {
         originX: "left", originY: "top", selectable: true, top : 8, left: addUp,
-      });
-      return this;
-    };
-
-    this.writeNoOfCycles = function() {
-
-      this.noOfCycles = this.noOfCycles || this.model.num_cycles;
-
-      this.cycleNo = new fabric.Text(String(this.noOfCycles), {
-        fill: 'white',  fontSize: 12, top : 7,  left: 0, fontFamily: "dinot", selectable: false
-      });
-
-      this.cycleX = new fabric.Text("x", {
-          fill: 'white',  fontSize: 12, top : 16, left: this.cycleNo.width + 5,
-          fontFamily: "dinot", selectable: false
-        }
-      );
-
-      this.cycles = new fabric.Text("CYCLES", {
-          fill: 'white',  fontSize: 12, top : 28,
-          left: this.cycleX.width + this.cycleNo.width + 10 ,
-          fontFamily: "dinot",  selectable: false
-        }
-      );
-
-      this.cycleGroup = new fabric.Group([this.cycleNo, this.cycleX, this.cycles], {
-        originX: "left",  originY: "top",
-        left: 120
       });
       return this;
     };

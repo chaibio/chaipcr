@@ -77,16 +77,20 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
 
         var deltaText = tempSymbol + this.model.delta_temperature + 'ºC,'+ timeSymbol + parseFloat(this.model.delta_duration_s) + 's';
         var startOnText = "Start Cycle: " + model.auto_delta_start_cycle;
-        //console.log(model, this.model);
+
         this.autoDeltaTempTime.setText(deltaText);
         this.autoDeltaStartCycle.setText(startOnText);
-        this.deltaGroup.setVisible(true);
 
-        if(this.index === 0) {
-          this.deltaSymbol.setVisible(true);
-        } else {
-          this.deltaSymbol.setVisible(false);
+        if(! this.parentStage.parent.editStageStatus) { // If we are not in edit stage mode.
+          this.deltaGroup.setVisible(true);
+
+          if(this.index === 0) {
+            this.deltaSymbol.setVisible(true);
+          } else {
+            this.deltaSymbol.setVisible(false);
+          }
         }
+      // ==============================//
       } else {
         this.deltaGroup.setVisible(false);
         this.deltaSymbol.setVisible(false);
