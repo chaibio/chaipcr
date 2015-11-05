@@ -107,7 +107,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
       ********************************************/
       this.getCircle = function() {
 
-        this.stepDataGroup.set({"left": this.left + 60}).setCoords();
+        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
         this.canvas.add(this.stepDataGroup);
 
         this.gatherDataCircleOnScroll = new gatherDataCircleOnScroll();
@@ -125,7 +125,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
             ], this);
 
         // enable this when image is added on creating new circle ..
-        this.circleGroup.set({"left": this.left + 60}).setCoords();
+        this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
 
         this.circleGroup.add(this.gatherDataImageMiddle);
         this.circleGroup.add(this.pauseImageMiddle);
@@ -210,26 +210,27 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
       this.makeItBig = function() {
 
+        if(! this.big) {
+          if(this.model.collect_data) {
+            this.circle.setFill("#ffb400;");
+            this.gatherDataImageMiddle.setVisible(false);
+            this.gatherDataOnScroll.setVisible(true);
+          }
+
+          if(this.model.pause) {
+            this.circle.setFill("#ffb400");
+            this.pauseImageMiddle.setVisible(false);
+            this.pauseStepOnScrollGroup.setVisible(true);
+          }
+
+          this.circle.setStroke("#ffb400");
+          this.outerCircle.setStroke("black");
+          this.outerCircle.strokeWidth = 5;
+
+          this.littleCircleGroup.visible = true;
+        }
+
         this.big = true;
-
-        if(this.model.collect_data) {
-          this.circle.setFill("#ffb400;");
-          this.gatherDataImageMiddle.setVisible(false);
-          this.gatherDataOnScroll.setVisible(true);
-        }
-
-        if(this.model.pause) {
-          this.circle.setFill("#ffb400");
-          this.pauseImageMiddle.setVisible(false);
-          this.pauseStepOnScrollGroup.setVisible(true);
-        }
-
-        this.circle.setStroke("#ffb400");
-        this.outerCircle.setStroke("black");
-        this.outerCircle.strokeWidth = 5;
-        //this.stepDataGroup.setVisible(false); // Change temperature display
-        //this.outerMostCircle.visible = this.littleCircleGroup.visible = true;
-        this.littleCircleGroup.visible = true;
       };
 
       this.makeItSmall = function() {
@@ -285,11 +286,9 @@ window.ChaiBioTech.ngApp.factory('circle', [
         if(state && this.big) {
           this.pauseStepOnScrollGroup.setVisible(true);
           this.holdTime.setVisible(false);
-          return;
         } else if(state) {
           this.holdTime.setVisible(false);
           this.applyPauseChanges();
-          return;
         } else {
           this.pauseStepOnScrollGroup.setVisible(false);
           this.holdTime.setVisible(true);
@@ -300,7 +299,6 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         var top = targetCircleGroup.top;
         var left = targetCircleGroup.left;
-        var previousTop = 0;
 
         if(top < this.scrollTop) {
           targetCircleGroup.setTop(this.scrollTop);
@@ -316,8 +314,10 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
       this.manageRampLineMovement = function(left, top, targetCircleGroup) {
 
-        var endPointX, endPointY, midPointX, midPointY, dynamicTemp;
+        var endPointX, endPointY, midPointX, midPointY;
+
         if(this.next) {
+
             this.curve.path[0][1] = left;
             this.curve.path[0][2] = top;
             // Calculating the mid point of the line at the right side of the circle
@@ -327,7 +327,6 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
             midPointX = (left + endPointX) / 2;
             midPointY = (top + endPointY) / 2;
-            previousTop  = midPointY;
 
             this.curve.path[1][1] = left + this.controlDistance;
             this.curve.path[1][2] = top;
@@ -338,15 +337,9 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
             // We move the gather data Circle along with it [its next object's]
             this.next.gatherDataGroup.setTop(midPointY);
+
             if(this.next.model.ramp.collect_data) {
-              this.next.gatherDataGroup.setCoords();
-              this.next.parent.rampSpeedGroup.setCoords();
-              var rampEdge = this.next.parent.rampSpeedGroup.top + this.next.parent.rampSpeedGroup.height;
-              if((rampEdge > this.next.gatherDataGroup.top - 14) && this.next.parent.rampSpeedGroup.top < this.next.gatherDataGroup.top + 16) {
-                this.next.parent.rampSpeedGroup.left = this.next.parent.left + 16;
-              } else {
-                this.next.parent.rampSpeedGroup.left = this.next.parent.left + 5;
-              }
+              this.runAlongEdge();
             }
             // Controlling point for the next bent
             this.curve.path[2][1] = endPointX - this.controlDistance;
@@ -385,37 +378,55 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         }
 
+        this.temperatureDisplay(targetCircleGroup);
+        this.parent.adjustRampSpeedPlacing();
+      };
+
+      this.temperatureDisplay = function(targetCircleGroup) {
+
+        var dynamicTemp;
         if(targetCircleGroup.top >= this.middlePoint) {
           dynamicTemp = 50 - ((targetCircleGroup.top - this.middlePoint) / this.scrollRatio1);
         } else {
           dynamicTemp = 100 - ((targetCircleGroup.top - this.scrollTop) / this.scrollRatio2);
         }
-        // Change temperature display as its circle is moved
-        //var dynamicTemp = Math.abs((100 - ((targetCircleGroup.top - this.scrollTop) / this.scrollRatio)));
 
-        dynamicTemp = Math.abs(dynamicTemp).toFixed(1);//(dynamicTemp < 100) ? dynamicTemp.toFixed(1) : dynamicTemp;
+        dynamicTemp = Math.abs(dynamicTemp).toFixed(1);
         this.temperature.text = String(dynamicTemp + "º");
         this.model.temperature = String(dynamicTemp);
-        this.parent.adjustRampSpeedPlacing();
       };
 
       this.manageClick = function() {
 
-        this.makeItBig();
-        this.parent.parentStage.selectStage();
-        this.parent.selectStep();
+        if(! this.big) {
+          this.makeItBig();
+          this.parent.parentStage.selectStage();
+          this.parent.selectStep();
 
-        if(previouslySelected.circle) {
-          var previousSelected = previouslySelected.circle;
+          if(previouslySelected.circle) {
+            var previousSelected = previouslySelected.circle;
 
-          if(previousSelected.uniqueName != this.uniqueName) {
+            if(previousSelected.uniqueName != this.uniqueName) {
 
-            previousSelected.makeItSmall();
+              previousSelected.makeItSmall();
+            }
           }
+
+          previouslySelected.circle = this;
+          this.canvas.renderAll();
         }
-        //ChaiBioTech.app.selectedCircle = this;
-        previouslySelected.circle = this;
-        this.canvas.renderAll();
+      };
+
+      this.runAlongEdge = function() {
+
+        this.next.gatherDataGroup.setCoords();
+        this.next.parent.rampSpeedGroup.setCoords();
+        var rampEdge = this.next.parent.rampSpeedGroup.top + this.next.parent.rampSpeedGroup.height;
+        if((rampEdge > this.next.gatherDataGroup.top - 14) && this.next.parent.rampSpeedGroup.top < this.next.gatherDataGroup.top + 16) {
+          this.next.parent.rampSpeedGroup.left = this.next.parent.left + 16;
+        } else {
+          this.next.parent.rampSpeedGroup.left = this.next.parent.left + 5;
+        }
       };
 
       this.runAlongCircle = function() {
