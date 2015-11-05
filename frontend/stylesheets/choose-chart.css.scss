@@ -1,4 +1,4 @@
-
+@import './colors.css.scss';
 
   .choose-chart {
     .choose-chart-heading {
@@ -17,17 +17,53 @@
       font-size: 15px;
     }
     .circle {
+      border-width: 3px;
       border-radius: 100px;
-      border-width: 5px;
       border-style: solid;
-      color: lighten(#000, 25%);
       cursor: pointer;
-      font-weight: bold;
-      height: 50px;
+      font-size: 10px;
+      line-height: 1.5;
+      height: 60px;
       margin: 5px;
       padding-top: 11px;
       text-align: center;
-      width: 50px;
+      width: 60px;
+
+      &.selected {
+        border-width: 5px;
+        padding-top: 9px;
+      }
+
+      .ct {
+
+        display: inline-block;
+        position: relative;
+
+        .dot {
+          border-radius: 10px;
+          width: 5px;
+          height: 5px;
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        &.ct-1 {
+          .dot {
+            background: $lightgray;
+          }
+        }
+        &.ct-2 {
+          .dot {
+            background: $gray;
+          }
+        }
+
+        .text {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+      }
     }
 
   }

@@ -4,6 +4,13 @@
 .home-page-wrapper {
   width: 1024px;
   height: 768px;
+  position: relative;
+
+  .status-bar {
+    position: absolute;
+    bottom: -50px;
+    width: 1024px;
+  }
 
   .home-page-left-wing {
     float: left;

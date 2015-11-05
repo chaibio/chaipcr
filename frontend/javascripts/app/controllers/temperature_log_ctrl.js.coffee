@@ -89,7 +89,6 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
           data = helper.updateData $scope.temperatureLogsCache, $scope.temperatureLogs, $scope.resolution, $scope.scrollState
           $scope.updateChart data
         else
-          # $scope.data = []
           $scope.autoUpdateTemperatureLogs()
 
     $scope.zoomOut = ->
