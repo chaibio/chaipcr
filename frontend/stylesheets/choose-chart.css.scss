@@ -28,10 +28,12 @@
       padding-top: 11px;
       text-align: center;
       width: 60px;
+      opacity: 0.5;
 
       &.selected {
         border-width: 5px;
         padding-top: 9px;
+        opacity: 1;
       }
 
       .ct {
@@ -49,7 +51,7 @@
 
         &.ct-1 {
           .dot {
-            background: $lightgray;
+            background: #dedede;
           }
         }
         &.ct-2 {
