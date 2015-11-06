@@ -239,6 +239,7 @@
         left: 637px;
 
         .action-container {
+          position: relative;;
           padding-top: 15px;
 
           .big_button {
@@ -285,9 +286,10 @@
           .lol-pop {
             width: 180px;
             height: 120px;
-            position: relative;
-            top: -248px;
-            left: 15px;
+            position: absolute;
+            top: -70px;
+            left: 38px;
+            z-index: 500;
 
             .add-stage-popup {
               width: 180px;
