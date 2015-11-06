@@ -14,11 +14,17 @@ window.ChaiBioTech.ngApp.directive('summaryModeItem', [
 
       link: function(scope, elem, attr) {
         scope.delta = true;
+        scope.date = false;
         scope.$watch("reading", function(val) {
+          scope.data = scope.reading;
 
           if(angular.isDefined(scope.reading)) {
-            //scope.shown = scope.hidden = scope.$parent.timeFormating(scope.reading);
+            if(scope.caption === "Created on") {
+              scope.date = true;
+              scope.data = (scope.reading).replace("T", ",").slice(0, -8);
+            }
           }
+
         });
 
       }

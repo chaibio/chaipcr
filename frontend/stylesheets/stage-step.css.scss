@@ -421,6 +421,23 @@
         }
         }
 
+        .data-part-summary {
+          height: 47px;
+          width: 112px;
+          float: right;
+          font-family: "dinot";
+          font-weight: bold;
+          font-size: 16px;
+          text-align: right;
+          padding-top: 16px;
+          position: relative;
+        }
+
+        .dataPartSpanSummary {
+          font-size: 12px;
+          width: 112px;
+        }
+
         .data-part {
           height: 47px;
           width: 95px;
