@@ -67,7 +67,7 @@ window.ChaiBioTech.ngApp.service('stepEvents',[
         if( $scope.fabricStep.index !== 0 || $scope.fabricStep.parentStage.index !== 0) {
           //if its not the very first step
           var circle = $scope.fabricStep.circle;
-          circle.gatherDataGroup.setVisible(newVal);
+          circle.gatherDataDuringRampGroup.setVisible(newVal);
           circle.parent.gatherDataDuringRamp = newVal;
           canvas.renderAll();
         }

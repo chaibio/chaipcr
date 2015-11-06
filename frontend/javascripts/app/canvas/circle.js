@@ -98,11 +98,11 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.canvas.remove(this.curve);
         this.canvas.remove(this.gatherDataOnScroll);
         this.canvas.remove(this.circleGroup);
-        this.canvas.remove(this.gatherDataGroup);
+        this.canvas.remove(this.gatherDataDuringRampGroup);
 
       };
       /*******************************************
-        This method shows circles and gather data. Pease note
+        This method shows circles and gather data. Please note
         this method is invoked from canvas.js once all the stage/step are loaded.
       ********************************************/
       this.getCircle = function() {
@@ -133,19 +133,20 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.circleGroup.add(this.pauseStepOnScrollGroup);
         this.canvas.add(this.circleGroup);
 
-        //this.gatherDataCircle = new gatherDataCircle();
-        this.gatherDataGroup = new gatherDataGroup(
+        this.gatherDataDuringRampGroup = new gatherDataGroup(
           [
             this.gatherDataCircle = new gatherDataCircle(),
             this.gatherDataImage
           ], this);
 
-        this.gatherDataGroup.set({"left": this.left}).setCoords();
-        this.canvas.add(this.gatherDataGroup);
+
+        var left = (this.previous) ? (this.left + (this.previous.left + 128)) / 2 : this.left;
+        this.gatherDataDuringRampGroup.set({"left": left}).setCoords();
+        this.canvas.add(this.gatherDataDuringRampGroup);
         this.showHideGatherData(this.parent.gatherDataDuringStep);
         this.controlPause(this.model.pause);
-        if( this.parent.index !== 0 || this.parent.parentStage.index !== 0) {
-          this.gatherDataGroup.setVisible(this.parent.gatherDataDuringRamp);
+        if(this.previous) {
+          this.gatherDataDuringRampGroup.setVisible(this.parent.gatherDataDuringRamp);
         }
 
         this.parent.adjustRampSpeedPlacing();
@@ -182,11 +183,8 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
       this.render = function() {
 
-        //this.getLeft().getTop().getUniqueId();
-
         this.circleGroup = new circleGroup(
           [
-            //this.outerMostCircle = new outerMostCircle(),
             this.outerCircle = new outerCircle(),
             this.circle = new centerCircle(),
             this.littleCircleGroup = new littleCircleGroup(
@@ -197,8 +195,6 @@ window.ChaiBioTech.ngApp.factory('circle', [
               ]
             )
           ], this);
-        // adjust the placing of ramp speed, this method calculates the top
-
 
         this.stepDataGroup = new stepDataGroup([
             this.temperature = new stepTemperature(this.model, this),
@@ -228,9 +224,8 @@ window.ChaiBioTech.ngApp.factory('circle', [
           this.outerCircle.strokeWidth = 5;
 
           this.littleCircleGroup.visible = true;
+          this.big = true;
         }
-
-        this.big = true;
       };
 
       this.makeItSmall = function() {
@@ -320,7 +315,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
           midPointY = this.curve.nextOne(left, top);
           // We move the gather data Circle along with it [its next object's]
-          this.next.gatherDataGroup.setTop(midPointY);
+          this.next.gatherDataDuringRampGroup.setTop(midPointY);
 
           if(this.next.model.ramp.collect_data) {
             this.runAlongEdge();
@@ -331,7 +326,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
           midPointY = this.previous.curve.previousOne(left, top);
 
-          this.gatherDataGroup.setTop(midPointY);
+          this.gatherDataDuringRampGroup.setTop(midPointY);
 
           if(this.model.ramp.collect_data) {
             this.runAlongCircle();
@@ -364,12 +359,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
           this.parent.selectStep();
 
           if(previouslySelected.circle) {
-            var previousSelected = previouslySelected.circle;
-
-            if(previousSelected.uniqueName != this.uniqueName) {
-
-              previousSelected.makeItSmall();
-            }
+            previouslySelected.circle.makeItSmall();
           }
 
           previouslySelected.circle = this;
@@ -379,10 +369,10 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
       this.runAlongEdge = function() {
 
-        this.next.gatherDataGroup.setCoords();
+        this.next.gatherDataDuringRampGroup.setCoords();
         this.next.parent.rampSpeedGroup.setCoords();
         var rampEdge = this.next.parent.rampSpeedGroup.top + this.next.parent.rampSpeedGroup.height;
-        if((rampEdge > this.next.gatherDataGroup.top - 14) && this.next.parent.rampSpeedGroup.top < this.next.gatherDataGroup.top + 16) {
+        if((rampEdge > this.next.gatherDataDuringRampGroup.top - 14) && this.next.parent.rampSpeedGroup.top < this.next.gatherDataDuringRampGroup.top + 16) {
           this.next.parent.rampSpeedGroup.left = this.next.parent.left + 16;
         } else {
           this.next.parent.rampSpeedGroup.left = this.next.parent.left + 5;
@@ -391,18 +381,18 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
       this.runAlongCircle = function() {
 
-        this.gatherDataGroup.setCoords();
+        this.gatherDataDuringRampGroup.setCoords();
         this.parent.rampSpeedGroup.setCoords();
         var rampEdge = this.parent.rampSpeedGroup.top + this.parent.rampSpeedGroup.height;
-        if((rampEdge > this.gatherDataGroup.top - 14) && this.parent.rampSpeedGroup.top < this.gatherDataGroup.top + 16) {
+        if((rampEdge > this.gatherDataDuringRampGroup.top - 14) && this.parent.rampSpeedGroup.top < this.gatherDataDuringRampGroup.top + 16) {
 
           var heightDifference, val;
-          if(this.parent.rampSpeedGroup.top > this.gatherDataGroup.top) {
-            heightDifference = (this.parent.rampSpeedGroup.top - this.gatherDataGroup.top);
+          if(this.parent.rampSpeedGroup.top > this.gatherDataDuringRampGroup.top) {
+            heightDifference = (this.parent.rampSpeedGroup.top - this.gatherDataDuringRampGroup.top);
             val = Math.sqrt(Math.abs((heightDifference * heightDifference) - 256));
             this.parent.rampSpeedGroup.left = this.parent.left + val;
-          } else if (rampEdge < this.gatherDataGroup.top) {
-            heightDifference = this.gatherDataGroup.top - rampEdge;
+          } else if (rampEdge < this.gatherDataDuringRampGroup.top) {
+            heightDifference = this.gatherDataDuringRampGroup.top - rampEdge;
             val = Math.sqrt(Math.abs((heightDifference * heightDifference) - 256));
             this.parent.rampSpeedGroup.left = this.parent.left + val;
           }
