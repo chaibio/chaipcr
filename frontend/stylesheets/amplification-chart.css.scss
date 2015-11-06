@@ -1,5 +1,5 @@
 @import './colors.css.scss';
-$marginTop: 260px;
+$marginTop: 200px;
 
 .amplification-chart-state-active {
 
@@ -10,27 +10,32 @@ $marginTop: 260px;
   }
 
   .chart-section {
+    width: 700px;
+
     .vertical-text {
 
       transform: rotate(-90deg);
       transform-origin: 20% 40%;
       float: left;
-      margin-left: -35px;
+      font-size: 10px;
+      font-weight: bold;
+      margin-left: -26px;
       margin-top: $marginTop;
       margin-bottom: -$marginTop;
 
       font-family: 'Open Sans';
-      font-weight: 300;
     }
 
     .chart-container {
       margin-left: 15px;
       margin-bottom: -35px;
+      width: 700px;
     }
 
     .num-cycle-text {
       font-family: 'Open Sans';
-      font-weight: 300;
+      font-size: 10px;
+      font-weight: bold;
       margin-bottom: -15px;
     }
 

@@ -15,43 +15,32 @@
 
     <div class="content">
 
-    <div class="chart-section">
-      <div class="vertical-text">RELATIVE FLUORESCENCE UNITS</div>
-      <div class="chart-container">
-        <linechart data="data" options="chartConfig" width="1059" height="450"></linechart>
-      </div>
-      <div class="text-center num-cycle-text">NUMBER OF CYCLES</div>
-    </div>
-
-    <div class="hr-section">
-      <hr>
-    </div>
-
-      <div class="row">
-        <div class="col-md-8">
-          <div class="choose-chart">
-            <div class="choose-chart-heading">
-              CHOOSE CHART
-            </div>
-            <div class="row">
-              <div class="col-md-4">
-                <div class="chart-type-option">Amplification Chart</div>
-              </div>
-              <div class="col-md-4">
-                <div class="chart-type-option" ng-click="RunExperimentCtrl.changeChart('temperature-logs')">Thermal Profile</div>
-              </div>
-            </div>
-            <amplification-well-switch ng-model="wellButtons"></amplification-well-switch>
-          </div>
+      <div class="chart-section">
+        <div class="vertical-text">RELATIVE FLUORESCENCE UNITS</div>
+        <div class="chart-container">
+          <linechart data="data" options="chartConfig" width="700" height="300"></linechart>
         </div>
-        <div class="col-md-4">
-          <test-in-progress experiment-id="experiment.id"></test-in-progress>
+        <div class="text-center num-cycle-text">NUMBER OF CYCLES</div>
+
+        <div class="hr-section">
+          <hr>
+        </div>
+
+        <div class="choose-chart">
+          <div class="choose-chart-heading">
+            CHOOSE CHART
+          </div>
           <div class="row">
-            <div class="col-md-12">
-              <experiment-start-stop-button experiment-id="experiment.id"></experiment-start-stop-button>
+            <div class="col-md-4">
+              <div class="chart-type-option">Amplification Chart</div>
+            </div>
+            <div class="col-md-4">
+              <div class="chart-type-option" ng-click="RunExperimentCtrl.changeChart('temperature-logs')">Thermal Profile</div>
             </div>
           </div>
+          <amplification-well-switch ng-model="wellButtons"></amplification-well-switch>
         </div>
+
       </div>
     </div>
 
