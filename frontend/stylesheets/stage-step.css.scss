@@ -138,8 +138,14 @@
       width: 901px;
       height: 258px;
       float: left;
+      overflow: hidden;
 
       .first-data-row {
+        width: 1801px;
+        height: 64px;
+        position: relative;
+      }
+      .general-info-container {
         width: 900px;
         height: 64px;
         border-bottom-style: solid;
@@ -147,8 +153,29 @@
         border-bottom-color: black;
         position: relative;
         box-shadow: 0 3px 2px -2px gray;
+        position: absolute;
+        top: 0px;
+        left: 0px;
       }
+      .summary-mode {
+        width: 900px;
+        height: 64px;
+        border-bottom-style: solid;
+        border-bottom-width: 1px;
+        border-bottom-color: black;
+        position: relative;
+        box-shadow: 0 3px 2px -2px gray;
+        position: absolute;
+        top: 0px;
+        left: 901px;
+        padding-top: 17px;
 
+        span {
+          font-family: "dinot";
+          font-weight: 300;
+          font-size: 20px;
+        }
+      }
       .data-boxes {
         width: 262px;
         height: 194px;

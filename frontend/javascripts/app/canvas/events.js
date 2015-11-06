@@ -29,11 +29,13 @@ window.ChaiBioTech.ngApp.factory('events', [
 
       });
 
-      angular.element('.canvas-container').mouseleave(function() {
+      /*angular.element('.canvas-container').mouseleave(function() {
 
-      });
+      });*/
 
       this.selectStep = function(circle) {
+
+        $scope.summaryMode = false;
         circle.manageClick();
         $scope.applyValuesFromOutSide(circle);
       };
@@ -232,8 +234,9 @@ window.ChaiBioTech.ngApp.factory('events', [
             break;
           }
         } else { // if the click is on canvas
-          console.log("stray click");
-          $scope.curtain.show();
+          $scope.$apply(function() {
+            $scope.summaryMode = true;
+          });
           var circle = previouslySelected.circle;
           circle.parent.parentStage.unSelectStage();
           circle.parent.unSelectStep();
