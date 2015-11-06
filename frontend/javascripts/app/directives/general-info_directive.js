@@ -38,7 +38,13 @@ window.ChaiBioTech.ngApp.directive('general', [
 
               $(".first-data-row").animate({
                 left: "-=900"
-              }, 1000);
+              }, 500, function() {
+
+                $(".data-box-container-summary-scroll").animate({
+                  left: "-=645"
+                }, 600);
+
+              });
             }
           });
 

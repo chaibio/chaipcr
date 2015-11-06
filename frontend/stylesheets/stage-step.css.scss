@@ -176,10 +176,42 @@
           font-size: 20px;
         }
       }
+
+      .data-boxes-container {
+        width: 900px;
+        height: 194px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .data-box-container-summary { // To keep the first two data baoxes.
+        width: 585px;
+        height: 194px;
+        float: left;
+        overflow: hidden;
+        position: relative;
+        left: 0px;
+      }
+      .data-box-container-summary-scroll {
+        width: 1000px;
+        height: 194px;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+      }
+
+      .exp-overview {
+        left: 645px;
+      }
+
+      .exp-metadata {
+        left: 968px;
+      }
+
       .data-boxes {
         width: 262px;
         height: 194px;
-        float: left;
+        position: absolute;
 
         .name-board {
           height: 50px;
@@ -198,11 +230,13 @@
         }
       }
       .auto-delta {
-        margin-left: 61px;
+        //margin-left: 61px;
+        left: 323px;//
       }
 
       .edit-stage-step {
-        margin-left: 53px;
+        //margin-left: 53px;
+        left: 637px;
 
         .action-container {
           padding-top: 15px;

@@ -35,40 +35,67 @@
     <div class="bottom-half noselect" >
 
       <arrow class="previous" action="previous" ng-click="arrowClicked()"></arrow>
+
       <div class="middle-ground">
         <div class="first-data-row">
           <general></general>
           <summary-mode></summary-mode>
         </div>
 
-        <div class="data-boxes temperature-change">
-          <div class="name-board ">TEMPERATURE DETAILS</div>
-            <temperature caption="Temperature" unit="ºC" reading="step.temperature" action="WOWaction(edit)"></temperature>
-            <ramp-speed caption="Ramp Speed" unit="C/s" reading="step.ramp.rate"></ramp-speed>
-            <hold-duration caption="Hold Duration" reading="step.hold_time" pause="! step.pause"></hold-duration>
-        </div>
+        <div class="data-boxes-container">
 
-        <div class="data-boxes auto-delta">
-          <div class="name-board">
-            <auto-delta-toggle ng-show="editStageMode" data="stage.auto_delta" type="{{stage.stage_type}}" call="changeDelta">
-            </auto-delta-toggle>
-            <auto-delta-caption ng-show="editStageMode" type="{{stage.stage_type}}">
-            </auto-delta-caption>
-          </div>
-          <start-on-cycle caption="Start On Cycle" delta="stage.auto_delta" reading="stage.auto_delta_start_cycle"></start-on-cycle>
-          <temp caption="Δ Temp" unit="ºC" delta="stage.auto_delta" reading="step.delta_temperature">
-            <capsule func="changeDeltaTemperature" delta="{{stage.auto_delta}}" data="step.delta_temperature"></capsule>
-          </temp>
-          <time caption="Δ Time" delta="stage.auto_delta" reading="step.delta_duration_s">
-            <capsule func="changeDeltaTime" delta="{{stage.auto_delta}}" data="step.delta_duration_s">
-            </capsule>
-          </time>
-        </div>
+          <div class="data-box-container-summary"> <!--First two data boxes -->
+
+              <div class="data-box-container-summary-scroll">
+
+                <div class="data-boxes temperature-change">
+                  <div class="name-board ">TEMPERATURE DETAILS</div>
+                    <temperature caption="Temperature" unit="ºC" reading="step.temperature" action="WOWaction(edit)"></temperature>
+                    <ramp-speed caption="Ramp Speed" unit="C/s" reading="step.ramp.rate"></ramp-speed>
+                    <hold-duration caption="Hold Duration" reading="step.hold_time" pause="! step.pause"></hold-duration>
+                </div>
+
+                <div class="data-boxes auto-delta">
+                  <div class="name-board">
+                    <auto-delta-toggle ng-show="editStageMode" data="stage.auto_delta" type="{{stage.stage_type}}" call="changeDelta">
+                    </auto-delta-toggle>
+                    <auto-delta-caption ng-show="editStageMode" type="{{stage.stage_type}}">
+                    </auto-delta-caption>
+                  </div>
+
+                  <start-on-cycle caption="Start On Cycle" delta="stage.auto_delta" reading="stage.auto_delta_start_cycle"></start-on-cycle>
+
+                  <temp caption="Δ Temp" unit="ºC" delta="stage.auto_delta" reading="step.delta_temperature">
+                    <capsule func="changeDeltaTemperature" delta="{{stage.auto_delta}}" data="step.delta_temperature"></capsule>
+                  </temp>
+
+                  <time caption="Δ Time" delta="stage.auto_delta" reading="step.delta_duration_s">
+                    <capsule func="changeDeltaTime" delta="{{stage.auto_delta}}" data="step.delta_duration_s">
+                    </capsule>
+                  </time>
+
+                </div>
+
+                <div class="data-boxes exp-overview">
+                  <div class="name-board ">EXPERIMENT OVERVIEW</div>
+                    <summary-mode-item caption="Stages" reading="{{fabricStep.parentStage.parent.allStageViews.length}}"></summary-mode-item>
+                    <summary-mode-item caption="Steps" reading="{{fabricStep.parentStage.parent.allStepViews.length}}"></summary-mode-item>
+                    <summary-mode-item caption="Est. Time to Complete" reading=""></summary-mode-item>
+                </div>
+
+                <div class="data-boxes exp-metadata">
+                  <div class="name-board">EXPERIMENT META DATA</div>
+                  <summary-mode-item caption="Created on" reading="{{protocol.created_at}}"></summary-mode-item>
+
+                </div>
+            </div>
+          </div><!--First two data boxes -->
 
         <div class="data-boxes edit-stage-step">
           <div class="name-board ">EDIT STEPS + STAGES</div>
             <actions></actions>
         </div>
+      </div>
       </div>
       <arrow class="next" action="next" ng-click="arrowClicked()"></arrow>
 
