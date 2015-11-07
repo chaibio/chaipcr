@@ -1072,8 +1072,8 @@ smoothit <- function(x, selfun, pars)
 # customized by Xiaoqing Rong-Mullins. 2015-10-27.
 # all the ', silent = FALSE' were added by xqrm
 baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
-                     baseline = NULL, basecyc = NULL, basefac = NULL) 
-{  
+                     baseline = NULL, basecyc = NULL, basefac = NULL)
+{ 
   if (is.numeric(baseline) & length(baseline == 1)) BASE <- baseline
   if (baseline == "mean") BASE <- mean(fluo[basecyc], na.rm = TRUE) 
   if (baseline == "median") BASE <- median(fluo[basecyc], na.rm = TRUE) 
@@ -1100,18 +1100,12 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
     # newDATA[, 2] <- newDATA[, 2] - BASE
     
     # xqrm
-    if (class(model) == 'try-error') {
-    # reference in 'modlist_R1.r': 
-      # line 103: fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent=FALSE) # xqrm
-      # line 106: if (baseline == "parm") { fitOBJ <- baseline(model = fitOBJ, baseline = baseline)
-      newDATA <- NA
-      blcor <- NA
-    } else {
-      BASE <- coef(model)["c"]    
-      newDATA <- model$DATA
-      newDATA[, 2] <- newDATA[, 2] - BASE
-      blcor <- newDATA[, 2] }
+    BASE <- coef(model)["c"]    
+    newDATA <- model$DATA
+    newDATA[, 2] <- newDATA[, 2] - BASE
+    blcor <- newDATA[, 2]
     
+    # sigmoid fitting for amplification curve is done here when 'parm', but not part of baseline subtraction process
     #newMODEL <- try(pcrfit(cyc = 1, fluo = 2, data = newDATA, model = model$MODEL), silent = TRUE) # ori
     newMODEL <- tryCatch(pcrfit(cyc = 1, fluo = 2, data = newDATA, model = model$MODEL), error=err_NA) # xqrm
     return(list('newMODEL'=newMODEL, 'blcor'=blcor))
