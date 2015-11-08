@@ -77,9 +77,8 @@ modlist <- function(
     
     # xqrm
     baseline_looped <- baseline # Within the 'for' loop, all `baseline` parameter after this point is changed to `baseline_looped` by xqrm
-    baseline_subtraction_not_finished <- TRUE
     
-    while (baseline_subtraction_not_finished) { # xqrm
+    while (TRUE) { # xqrm
       
       ## version 1.4-0: baselining with first cycles using 'baseline' function
       #if (baseline != "none" & baseline != "parm") { # ori
@@ -96,8 +95,7 @@ modlist <- function(
                            # basecyc = basecyc, basefac = basefac)
         # FLUO <- bl_out[['bl_corrected']]
         blcor <- FLUO
-        baseline_subtraction_not_finished <- FALSE
-        # for testing: message('\'', baseline_looped, '\'', ' was used as the final method for baseline subtraction.')
+        # message('\'', baseline_looped, '\'', ' was used as the final method for baseline subtraction.') # for testing
       
       } else { # if (baseline_looped == "parm")
         FLUO <- FLUO_ori }
@@ -135,16 +133,17 @@ modlist <- function(
           # line 117: fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent=FALSE) # xqrm
           # line 120: if (baseline == "parm") { #fitOBJ <- baseline(model = fitOBJ, baseline = baseline)
           baseline_looped <- fallback
-          message('Baseline subtraction method falls back from \'parm\' to \'', fallback, '\', since sigmoid fitting failed for amplifcation data before baseline subtraction ')
+          message('Baseline subtraction method falls back from \'parm\' to \'', fallback, '\', since sigmoid fitting failed for amplifcation data before baseline subtraction.')
           next }
         
         # xqrm
         bl_out <- baseline(model = fitOBJ, baseline = baseline_looped)
         fitOBJ <- bl_out[['newMODEL']]
         blcor <- bl_out[['blcor']]
-        baseline_subtraction_not_finished <- FALSE
-        # for testing: message('\'parm\' was used as the final method for baseline subtraction.') 
+        # message('\'parm\' was used as the final method for baseline subtraction.') # for testing
         }
+      
+      break
       
     } # xqrm: end: while
     
