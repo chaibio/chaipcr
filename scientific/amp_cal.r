@@ -16,8 +16,6 @@ library(robustbase)
 library(Matrix)
 library(DBI)
 
-setwd(Sys.getenv('RWORKDIR')) # Xia Hong
-
 qpcR_funcs <- c(
                 #'modlist_R0.r', 'getPar_R1.r', 'utils_R1.R', # customized, for testing
                 'modlist_R1.r', 'getPar_R1.r', 'utils_R1.R', # customized
