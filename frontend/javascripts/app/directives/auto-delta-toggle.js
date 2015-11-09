@@ -19,6 +19,11 @@ window.ChaiBioTech.ngApp.directive('autoDeltaToggle', [
           });
 
           scope.$watch("type", function(val, oldVal) {
+            if(val === "cycling") {
+              scope.show = true;
+            } else {
+              scope.show = false;
+            }
           });
 
         });

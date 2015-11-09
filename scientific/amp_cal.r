@@ -16,7 +16,7 @@ library(robustbase)
 library(Matrix)
 library(DBI)
 
-setwd(Sys.getenv('RWORKDIR'))
+setwd(Sys.getenv('RWORKDIR')) # Xia Hong
 
 qpcR_funcs <- c('modlist_R1.r', 'getPar_R1.r', 'utils_R1.R', # customized
                 #'modlist.r', 'getPar.r', 'utils.R', # original
@@ -134,8 +134,9 @@ get_data_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for conn
 
 # function: baseline subtraction and Ct
 baseline_ct <- function(fluo_calib, 
-                        model, baselin, basecyc, # modlist parameters. 
-                        # baselin = c('mean', 'median', 'lin', 'quad', 'parm'). But 'parm' doesn't work properly right now.
+                        model, baselin, basecyc, fallback, # modlist parameters. 
+                        # baselin = c('none', 'mean', 'median', 'lin', 'quad', 'parm').
+                        # fallback = c('none', 'mean', 'median', 'lin', 'quad'). only valid when baselin = 'parm'
                         type, cp, # getPar parameters
                         show_running_time=FALSE, # option to show time cost to run this function
                         
@@ -146,7 +147,7 @@ baseline_ct <- function(fluo_calib,
     
     
     # using customized modlist and baseline functions
-    mod_R1 <- modlist(fluo_calib, model=model, baseline=baselin, basecyc=basecyc)
+    mod_R1 <- modlist(fluo_calib, model=model, baseline=baselin, basecyc=basecyc, fallback=fallback)
     mod_ori <- mod_R1[['ori']] # original output from qpcR function modlist
     coef_mtx <- do.call(cbind, lapply(mod_ori, 
         function(item) {
@@ -154,8 +155,10 @@ baseline_ct <- function(fluo_calib,
             if (is.null(coefs)) coefs <- NA
             return(coefs) })) # coefficients of sigmoid-fitted amplification curves
     colnames(coef_mtx) <- colnames(fluo_calib)[2:ncol(fluo_calib)]
+    
     #bl_info <- mod_R1[['bl_info']] # baseline to subtract, which original modlist does not output
     bl_corrected <- mod_R1[['bl_corrected']] # fluorescence data corrected via baseline subtraction, which original modlist does not output
+    rownames(bl_corrected) <- fluo_calib[,'cycle_num']
     
     # using original modlist and baseline functions
     # mod_ori <- modlist(fluo_calib, model=model, baseline=baselin, basecyc=basecyc)

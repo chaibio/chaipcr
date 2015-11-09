@@ -13,7 +13,7 @@
   height: 768px;
 
   .top-half {
-    height: 468px; // change it to 448 when top scroll is implementing.
+    height: 448px;
     width: 1024px;
     background-color: #ffb400;
 
@@ -59,7 +59,6 @@
           width: 304px;
           height: 48px;
           padding-top: 22px;
-          visibility: hidden;
 
           .background-bar {
             width: 300px;
@@ -79,7 +78,6 @@
           float: left;
           padding-left: 20px;
           padding-top: 9px;
-          visibility: hidden;
 
           button {
             width: 120px;
@@ -95,7 +93,7 @@
     }
 
     .canvas-containing {
-      height: 420px;
+      height: 400px;
       width: 1024px;
       overflow-x: auto;
       overflow-y: hidden;
@@ -140,8 +138,14 @@
       width: 901px;
       height: 258px;
       float: left;
+      overflow: hidden;
 
       .first-data-row {
+        width: 1801px;
+        height: 64px;
+        position: relative;
+      }
+      .general-info-container {
         width: 900px;
         height: 64px;
         border-bottom-style: solid;
@@ -149,12 +153,65 @@
         border-bottom-color: black;
         position: relative;
         box-shadow: 0 3px 2px -2px gray;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+      }
+      .summary-mode {
+        width: 900px;
+        height: 64px;
+        border-bottom-style: solid;
+        border-bottom-width: 1px;
+        border-bottom-color: black;
+        position: relative;
+        box-shadow: 0 3px 2px -2px gray;
+        position: absolute;
+        top: 0px;
+        left: 901px;
+        padding-top: 17px;
+
+        span {
+          font-family: "dinot";
+          font-weight: 300;
+          font-size: 20px;
+        }
+      }
+
+      .data-boxes-container {
+        width: 900px;
+        height: 194px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .data-box-container-summary { // To keep the first two data baoxes.
+        width: 585px;
+        height: 194px;
+        float: left;
+        overflow: hidden;
+        position: relative;
+        left: 0px;
+      }
+      .data-box-container-summary-scroll {
+        width: 1000px;
+        height: 194px;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+      }
+
+      .exp-overview {
+        left: 645px;
+      }
+
+      .exp-metadata {
+        left: 968px;
       }
 
       .data-boxes {
         width: 262px;
         height: 194px;
-        float: left;
+        position: absolute;
 
         .name-board {
           height: 50px;
@@ -173,13 +230,16 @@
         }
       }
       .auto-delta {
-        margin-left: 61px;
+        //margin-left: 61px;
+        left: 323px;//
       }
 
       .edit-stage-step {
-        margin-left: 53px;
+        //margin-left: 53px;
+        left: 637px;
 
         .action-container {
+          position: relative;;
           padding-top: 15px;
 
           .big_button {
@@ -226,9 +286,10 @@
           .lol-pop {
             width: 180px;
             height: 120px;
-            position: relative;
-            top: -248px;
-            left: 15px;
+            position: absolute;
+            top: -70px;
+            left: 38px;
+            z-index: 500;
 
             .add-stage-popup {
               width: 180px;
@@ -360,6 +421,23 @@
             }
           }
         }
+        }
+
+        .data-part-summary {
+          height: 47px;
+          width: 112px;
+          float: right;
+          font-family: "dinot";
+          font-weight: bold;
+          font-size: 16px;
+          text-align: right;
+          padding-top: 16px;
+          position: relative;
+        }
+
+        .dataPartSpanSummary {
+          font-size: 12px;
+          width: 112px;
         }
 
         .data-part {

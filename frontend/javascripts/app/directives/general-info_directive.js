@@ -32,16 +32,20 @@ window.ChaiBioTech.ngApp.directive('general', [
             popupStatus.popupStatusGatherData = scope.popUp;
           });
 
-          scope.$watch('stage.auto_delta', function(newVal, oldVal) {
-            scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
-          });
+          scope.$watch('summaryMode', function(summary) {
 
-          scope.$watch('step.collect_data', function(newVal, oldVal) {
-            scope.gather_data_state = (scope.step.collect_data || scope.step.ramp.collect_data) ? "ON" : "OFF";
-          });
+            if(summary) {
 
-          scope.$watch('step.ramp.collect_data', function(newVal, oldVal) {
-            scope.gather_data_state = (scope.step.collect_data || scope.step.ramp.collect_data) ? "ON" : "OFF";
+              $(".first-data-row").animate({
+                left: "-=900"
+              }, 500, function() {
+
+                $(".data-box-container-summary-scroll").animate({
+                  left: "-=645"
+                }, 600);
+
+              });
+            }
           });
 
           scope.$watch('stage.stage_type', function(newVal, oldVal) {

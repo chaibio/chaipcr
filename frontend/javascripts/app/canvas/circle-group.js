@@ -1,8 +1,9 @@
 window.ChaiBioTech.ngApp.factory('circleGroup', [
-  function() {
+  'constants',
+  function(constants) {
     return function(circles, parent) {
       return new fabric.Group(circles, {
-        left: parent.left + 60,
+        left: parent.left + (constants.stepWidth / 2),
         top: parent.top,
         me: parent,
         selectable: true,

@@ -5,7 +5,8 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
   '$modal',
   'alerts',
   'expName',
-  function($scope, ExperimentLoader, canvas, $modal, alerts, expName) {
+  '$rootScope',
+  function($scope, ExperimentLoader, canvas, $modal, alerts, expName, $rootScope) {
 
     var that = this;
     $scope.stage = {};
@@ -26,9 +27,11 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
           $scope.protocol = data.experiment;
           $scope.stage = ExperimentLoader.loadFirstStages();
           $scope.step = ExperimentLoader.loadFirstStep();
-          $scope.curtain = angular.element("#curtain");
-          $scope.curtain.hide();
-          $scope.$emit('general-data-ready');
+
+          $scope.summaryMode = false;
+          $scope.editStageMode = false;
+          $scope.$broadcast("dataLoaded");
+          //console.log("BINGOOOOO", $rootScope);
           canvas.init($scope);
         });
     };
@@ -37,7 +40,6 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
 
     $scope.applyValuesFromOutSide = function(circle) {
       // when the event or function call is initiated from non anular part of the app ... !!
-
       $scope.$apply(function() {
         $scope.step = circle.parent.model;
         $scope.stage = circle.parent.parentStage.model;

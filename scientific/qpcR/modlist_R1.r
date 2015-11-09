@@ -21,9 +21,12 @@ modlist <- function(
   opt = FALSE,
   optPAR = list(sig.level = 0.05, crit = "ftest"),
   verbose = TRUE,
+  fallback = c("none", "mean", "median", "lin", "quad"), # xqrm
   ...
 )
 {
+  if (fallback == 'parm') stop('`fallback` cannot be \'parm\'.') # xqrm
+  
   options(expressions = 50000)  
   remove <- match.arg(remove) 
   if (!is.numeric(baseline)) baseline <- match.arg(baseline)  
@@ -68,50 +71,81 @@ modlist <- function(
   blcor_list <- list()
     
   for (i in 1:ncol(allFLUO)) {
-    FLUO  <- allFLUO[, i]      
+    #FLUO  <- allFLUO[, i] # ori
+    FLUO_ori <- allFLUO[, i] # xqrm
     NAME <- NAMES[i]
     
-    ## version 1.4-0: baselining with first cycles using 'baseline' function
-    if (baseline != "none" & baseline != "parm") { 
-      FLUO <- baseline(cyc = CYCLES, fluo = FLUO, model = NULL, baseline = baseline, 
-                       basecyc = basecyc, basefac = basefac)
-      # xrqm
-      # bl_out <- baseline(cyc = CYCLES, fluo = FLUO, model = NULL, baseline = baseline, 
-                         # basecyc = basecyc, basefac = basefac)
-      # FLUO <- bl_out[['bl_corrected']]
-      blcor <- FLUO
-    }
+    # xqrm
+    baseline_looped <- baseline # Within the 'for' loop, all `baseline` parameter after this point is changed to `baseline_looped` by xqrm
     
-    ## normalization
-    if (norm) FLUO <- rescale(FLUO, 0, 1)    
-    
-    ## version 1.3-8: smoothing
-    if (!is.null(smooth)) {    
-      smooth <- match.arg(smooth, c("lowess", "supsmu", "spline", "savgol", "kalman", "runmean", "whit", "ema"))
-      FLUO <- smoothit(FLUO, smooth, smoothPAR)
-    }
-    
-    ## changing magnitude
-    if (factor != 1) FLUO <- FLUO * factor                
-    
-    # xqrm: when baseline == "parm", adjust fluorescence value if no value in FLUO > 0, so lm.fit won't fail on '0 (non-NA) cases'
-    if (baseline == "parm" & all(FLUO <= 0)) FLUO <- FLUO - min(FLUO)
-    
-    ## fit model
-    DATA <- data.frame(Cycles = CYCLES, Fluo = FLUO)    
-    
-    if (verbose) cat("Making model for ", NAME, " (", model$name, ")\n", sep= "")  
-    flush.console()
-    
-    #fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent = TRUE) # ori
-    fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent=FALSE) # xrqm
-    
-    ## version 1.4-0: baselining with 'c' parameter using 'baseline' function
-    if (baseline == "parm") { #fitOBJ <- baseline(model = fitOBJ, baseline = baseline) # ori
-      # xrqm
-      bl_out <- baseline(model = fitOBJ, baseline = baseline)
-      fitOBJ <- bl_out[['newMODEL']]
-      blcor <- bl_out[['blcor']] }
+    while (TRUE) { # xqrm
+      
+      ## version 1.4-0: baselining with first cycles using 'baseline' function
+      #if (baseline != "none" & baseline != "parm") { # ori
+      if (baseline_looped != "parm") { # xqrm
+        #FLUO <- baseline(cyc = CYCLES, fluo = FLUO, model = NULL, baseline = baseline, # ori
+        
+        # xqrm
+        if (baseline_looped == "none") {
+          FLUO <- FLUO_ori
+        } else {
+          FLUO <- baseline(cyc = CYCLES, fluo = FLUO_ori, model = NULL, baseline = baseline_looped, # xqrm
+                           basecyc = basecyc, basefac = basefac) }
+        # bl_out <- baseline(cyc = CYCLES, fluo = FLUO, model = NULL, baseline = baseline, 
+                           # basecyc = basecyc, basefac = basefac)
+        # FLUO <- bl_out[['bl_corrected']]
+        blcor <- FLUO
+        # message('\'', baseline_looped, '\'', ' was used as the final method for baseline subtraction.') # for testing
+      
+      } else { # if (baseline_looped == "parm")
+        FLUO <- FLUO_ori }
+      
+      ## normalization
+      if (norm) FLUO <- rescale(FLUO, 0, 1)    
+      
+      ## version 1.3-8: smoothing
+      if (!is.null(smooth)) {    
+        smooth <- match.arg(smooth, c("lowess", "supsmu", "spline", "savgol", "kalman", "runmean", "whit", "ema"))
+        FLUO <- smoothit(FLUO, smooth, smoothPAR)
+      }
+      
+      ## changing magnitude
+      if (factor != 1) FLUO <- FLUO * factor                
+      
+      # xqrm: when baseline == "parm", adjust fluorescence value if no value in FLUO > 0, so lm.fit won't fail on '0 (non-NA) cases'
+      if (baseline == "parm" & all(FLUO <= 0)) FLUO <- FLUO - min(FLUO)
+      
+      ## fit model
+      DATA <- data.frame(Cycles = CYCLES, Fluo = FLUO)    
+      
+      if (verbose) cat("Making model for ", NAME, " (", model$name, ")\n", sep= "")  
+      flush.console()
+      
+      #fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent = TRUE) # ori
+      fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent=FALSE) # xrqm
+      
+      ## version 1.4-0: baselining with 'c' parameter using 'baseline' function
+      if (baseline_looped == "parm") { #fitOBJ <- baseline(model = fitOBJ, baseline = baseline) # ori
+        
+        # xqrm: if baseline == 'parm' (model automatically not NULL) and sigmoid fitting of pre-subtracted amplifcation data fails (determined by 'modlist_R1.r')
+        if (class(fitOBJ) == 'try-error') {
+        # reference in 'modlist_R1.r': 
+          # line 117: fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent=FALSE) # xqrm
+          # line 120: if (baseline == "parm") { #fitOBJ <- baseline(model = fitOBJ, baseline = baseline)
+          baseline_looped <- fallback
+          message('Baseline subtraction method falls back from \'parm\' to \'', fallback, '\', since sigmoid fitting failed for amplifcation data before baseline subtraction.')
+          next }
+        
+        # xqrm
+        bl_out <- baseline(model = fitOBJ, baseline = baseline_looped)
+        fitOBJ <- bl_out[['newMODEL']]
+        blcor <- bl_out[['blcor']]
+        # message('\'parm\' was used as the final method for baseline subtraction.') # for testing
+        }
+      
+      break
+      
+    } # xqrm: end: while
     
     # xrqm
     # bl_list[[i]] <- unlist(bl_out['bl'])
@@ -166,7 +200,8 @@ modlist <- function(
   # bl_info <- do.call(cbind, bl_list)
   # colnames(bl_info) <- well_names
   bl_corrected <- do.call(cbind, blcor_list)
-  try(colnames(bl_corrected) <- well_names, silent=FALSE)
+  colnames(bl_corrected) <- well_names
+  #try(colnames(bl_corrected) <- well_names, silent=FALSE) # old
   
   
   ## version 1.3-5: sigmoidal outlier detection by KOD

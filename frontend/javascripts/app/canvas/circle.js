@@ -98,16 +98,16 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.canvas.remove(this.curve);
         this.canvas.remove(this.gatherDataOnScroll);
         this.canvas.remove(this.circleGroup);
-        this.canvas.remove(this.gatherDataGroup);
+        this.canvas.remove(this.gatherDataDuringRampGroup);
 
       };
       /*******************************************
-        This method shows circles and gather data. Pease note
+        This method shows circles and gather data. Please note
         this method is invoked from canvas.js once all the stage/step are loaded.
       ********************************************/
       this.getCircle = function() {
 
-        this.stepDataGroup.set({"left": this.left + 60}).setCoords();
+        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
         this.canvas.add(this.stepDataGroup);
 
         this.gatherDataCircleOnScroll = new gatherDataCircleOnScroll();
@@ -125,7 +125,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
             ], this);
 
         // enable this when image is added on creating new circle ..
-        this.circleGroup.set({"left": this.left + 60}).setCoords();
+        this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
 
         this.circleGroup.add(this.gatherDataImageMiddle);
         this.circleGroup.add(this.pauseImageMiddle);
@@ -133,19 +133,20 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.circleGroup.add(this.pauseStepOnScrollGroup);
         this.canvas.add(this.circleGroup);
 
-        //this.gatherDataCircle = new gatherDataCircle();
-        this.gatherDataGroup = new gatherDataGroup(
+        this.gatherDataDuringRampGroup = new gatherDataGroup(
           [
             this.gatherDataCircle = new gatherDataCircle(),
             this.gatherDataImage
           ], this);
 
-        this.gatherDataGroup.set({"left": this.left}).setCoords();
-        this.canvas.add(this.gatherDataGroup);
+
+        var left = (this.previous) ? (this.left + (this.previous.left + 128)) / 2 : this.left;
+        this.gatherDataDuringRampGroup.set({"left": left}).setCoords();
+        this.canvas.add(this.gatherDataDuringRampGroup);
         this.showHideGatherData(this.parent.gatherDataDuringStep);
         this.controlPause(this.model.pause);
-        if( this.parent.index !== 0 || this.parent.parentStage.index !== 0) {
-          this.gatherDataGroup.setVisible(this.parent.gatherDataDuringRamp);
+        if(this.previous) {
+          this.gatherDataDuringRampGroup.setVisible(this.parent.gatherDataDuringRamp);
         }
 
         this.parent.adjustRampSpeedPlacing();
@@ -154,7 +155,7 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
       this.getUniqueId = function() {
 
-        this.uniqueName = this.model.id + this.parent.parentStage.stageNo.text + "circle";
+        this.uniqueName = this.model.id + this.parent.parentStage.index + "circle";
         return this;
       };
 
@@ -182,11 +183,8 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
       this.render = function() {
 
-        //this.getLeft().getTop().getUniqueId();
-
         this.circleGroup = new circleGroup(
           [
-            //this.outerMostCircle = new outerMostCircle(),
             this.outerCircle = new outerCircle(),
             this.circle = new centerCircle(),
             this.littleCircleGroup = new littleCircleGroup(
@@ -197,8 +195,6 @@ window.ChaiBioTech.ngApp.factory('circle', [
               ]
             )
           ], this);
-        // adjust the placing of ramp speed, this method calculates the top
-
 
         this.stepDataGroup = new stepDataGroup([
             this.temperature = new stepTemperature(this.model, this),
@@ -210,26 +206,26 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
       this.makeItBig = function() {
 
-        this.big = true;
+        if(! this.big) {
+          if(this.model.collect_data) {
+            this.circle.setFill("#ffb400;");
+            this.gatherDataImageMiddle.setVisible(false);
+            this.gatherDataOnScroll.setVisible(true);
+          }
 
-        if(this.model.collect_data) {
-          this.circle.setFill("#ffb400;");
-          this.gatherDataImageMiddle.setVisible(false);
-          this.gatherDataOnScroll.setVisible(true);
+          if(this.model.pause) {
+            this.circle.setFill("#ffb400");
+            this.pauseImageMiddle.setVisible(false);
+            this.pauseStepOnScrollGroup.setVisible(true);
+          }
+
+          this.circle.setStroke("#ffb400");
+          this.outerCircle.setStroke("black");
+          this.outerCircle.strokeWidth = 5;
+
+          this.littleCircleGroup.visible = true;
+          this.big = true;
         }
-
-        if(this.model.pause) {
-          this.circle.setFill("#ffb400");
-          this.pauseImageMiddle.setVisible(false);
-          this.pauseStepOnScrollGroup.setVisible(true);
-        }
-
-        this.circle.setStroke("#ffb400");
-        this.outerCircle.setStroke("black");
-        this.outerCircle.strokeWidth = 5;
-        //this.stepDataGroup.setVisible(false); // Change temperature display
-        //this.outerMostCircle.visible = this.littleCircleGroup.visible = true;
-        this.littleCircleGroup.visible = true;
       };
 
       this.makeItSmall = function() {
@@ -285,11 +281,9 @@ window.ChaiBioTech.ngApp.factory('circle', [
         if(state && this.big) {
           this.pauseStepOnScrollGroup.setVisible(true);
           this.holdTime.setVisible(false);
-          return;
         } else if(state) {
           this.holdTime.setVisible(false);
           this.applyPauseChanges();
-          return;
         } else {
           this.pauseStepOnScrollGroup.setVisible(false);
           this.holdTime.setVisible(true);
@@ -300,7 +294,6 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
         var top = targetCircleGroup.top;
         var left = targetCircleGroup.left;
-        var previousTop = 0;
 
         if(top < this.scrollTop) {
           targetCircleGroup.setTop(this.scrollTop);
@@ -316,122 +309,90 @@ window.ChaiBioTech.ngApp.factory('circle', [
 
       this.manageRampLineMovement = function(left, top, targetCircleGroup) {
 
-        var endPointX, endPointY, midPointX, midPointY, dynamicTemp;
+        var midPointY;
+
         if(this.next) {
-            this.curve.path[0][1] = left;
-            this.curve.path[0][2] = top;
-            // Calculating the mid point of the line at the right side of the circle
-            // Remeber take the point which is static at the other side
-            endPointX = this.curve.path[2][3];
-            endPointY = this.curve.path[2][4];
 
-            midPointX = (left + endPointX) / 2;
-            midPointY = (top + endPointY) / 2;
-            previousTop  = midPointY;
+          midPointY = this.curve.nextOne(left, top);
+          // We move the gather data Circle along with it [its next object's]
+          this.next.gatherDataDuringRampGroup.setTop(midPointY);
 
-            this.curve.path[1][1] = left + this.controlDistance;
-            this.curve.path[1][2] = top;
-
-            // Mid point
-            this.curve.path[1][3] = midPointX;
-            this.curve.path[1][4] = midPointY;
-
-            // We move the gather data Circle along with it [its next object's]
-            this.next.gatherDataGroup.setTop(midPointY);
-            if(this.next.model.ramp.collect_data) {
-              this.next.gatherDataGroup.setCoords();
-              this.next.parent.rampSpeedGroup.setCoords();
-              var rampEdge = this.next.parent.rampSpeedGroup.top + this.next.parent.rampSpeedGroup.height;
-              if((rampEdge > this.next.gatherDataGroup.top - 14) && this.next.parent.rampSpeedGroup.top < this.next.gatherDataGroup.top + 16) {
-                this.next.parent.rampSpeedGroup.left = this.next.parent.left + 16;
-              } else {
-                this.next.parent.rampSpeedGroup.left = this.next.parent.left + 5;
-              }
-            }
-            // Controlling point for the next bent
-            this.curve.path[2][1] = endPointX - this.controlDistance;
-            this.curve.path[2][2] = endPointY;
+          if(this.next.model.ramp.collect_data) {
+            this.runAlongEdge();
+          }
         }
 
         if(this.previous) {
-            previous = this.previous;
-            previous.curve.path[2][3] = left;
-            previous.curve.path[2][4] = top;
-            // Calculating the mid point of the line at the left side of the cycle
-            // Remeber take the point which is static at the other side
-            endPointX = previous.curve.path[0][1];
-            endPointY = previous.curve.path[0][2];
 
-            midPointX = (left + endPointX) / 2;
-            midPointY = (top + endPointY) / 2;
+          midPointY = this.previous.curve.previousOne(left, top);
 
-            previous.curve.path[2][1] = left - this.controlDistance;
-            previous.curve.path[2][2] = top;
+          this.gatherDataDuringRampGroup.setTop(midPointY);
 
-            // Mid point
-            previous.curve.path[1][3] = midPointX;
-            previous.curve.path[1][4] = midPointY;
-
-            // We move the gather data Circle along with it
-            // Please pay attention here we move gatherdta of this
-            this.gatherDataGroup.setTop(midPointY);
-
-            if(this.model.ramp.collect_data) {
-              this.runAlongCircle();
-            }
-
-            previous.curve.path[1][1] = endPointX + this.controlDistance;
-            previous.curve.path[1][2] = endPointY;
-
+          if(this.model.ramp.collect_data) {
+            this.runAlongCircle();
+          }
         }
 
+        this.temperatureDisplay(targetCircleGroup);
+        this.parent.adjustRampSpeedPlacing();
+      };
+
+      this.temperatureDisplay = function(targetCircleGroup) {
+
+        var dynamicTemp;
         if(targetCircleGroup.top >= this.middlePoint) {
           dynamicTemp = 50 - ((targetCircleGroup.top - this.middlePoint) / this.scrollRatio1);
         } else {
           dynamicTemp = 100 - ((targetCircleGroup.top - this.scrollTop) / this.scrollRatio2);
         }
-        // Change temperature display as its circle is moved
-        //var dynamicTemp = Math.abs((100 - ((targetCircleGroup.top - this.scrollTop) / this.scrollRatio)));
 
-        dynamicTemp = Math.abs(dynamicTemp).toFixed(1);//(dynamicTemp < 100) ? dynamicTemp.toFixed(1) : dynamicTemp;
+        dynamicTemp = Math.abs(dynamicTemp).toFixed(1);
         this.temperature.text = String(dynamicTemp + "º");
         this.model.temperature = String(dynamicTemp);
-        this.parent.adjustRampSpeedPlacing();
       };
 
       this.manageClick = function() {
 
-        this.makeItBig();
-        this.parent.parentStage.selectStage();
-        this.parent.selectStep();
+        if(! this.big) {
+          this.makeItBig();
+          this.parent.parentStage.selectStage();
+          this.parent.selectStep();
 
-        if(previouslySelected.circle) {
-          var previousSelected = previouslySelected.circle;
-
-          if(previousSelected.uniqueName != this.uniqueName) {
-
-            previousSelected.makeItSmall();
+          if(previouslySelected.circle) {
+            previouslySelected.circle.makeItSmall();
           }
+
+          previouslySelected.circle = this;
+          this.canvas.renderAll();
         }
-        //ChaiBioTech.app.selectedCircle = this;
-        previouslySelected.circle = this;
-        this.canvas.renderAll();
+      };
+
+      this.runAlongEdge = function() {
+
+        this.next.gatherDataDuringRampGroup.setCoords();
+        this.next.parent.rampSpeedGroup.setCoords();
+        var rampEdge = this.next.parent.rampSpeedGroup.top + this.next.parent.rampSpeedGroup.height;
+        if((rampEdge > this.next.gatherDataDuringRampGroup.top - 14) && this.next.parent.rampSpeedGroup.top < this.next.gatherDataDuringRampGroup.top + 16) {
+          this.next.parent.rampSpeedGroup.left = this.next.parent.left + 16;
+        } else {
+          this.next.parent.rampSpeedGroup.left = this.next.parent.left + 5;
+        }
       };
 
       this.runAlongCircle = function() {
 
-        this.gatherDataGroup.setCoords();
+        this.gatherDataDuringRampGroup.setCoords();
         this.parent.rampSpeedGroup.setCoords();
         var rampEdge = this.parent.rampSpeedGroup.top + this.parent.rampSpeedGroup.height;
-        if((rampEdge > this.gatherDataGroup.top - 14) && this.parent.rampSpeedGroup.top < this.gatherDataGroup.top + 16) {
+        if((rampEdge > this.gatherDataDuringRampGroup.top - 14) && this.parent.rampSpeedGroup.top < this.gatherDataDuringRampGroup.top + 16) {
 
           var heightDifference, val;
-          if(this.parent.rampSpeedGroup.top > this.gatherDataGroup.top) {
-            heightDifference = (this.parent.rampSpeedGroup.top - this.gatherDataGroup.top);
+          if(this.parent.rampSpeedGroup.top > this.gatherDataDuringRampGroup.top) {
+            heightDifference = (this.parent.rampSpeedGroup.top - this.gatherDataDuringRampGroup.top);
             val = Math.sqrt(Math.abs((heightDifference * heightDifference) - 256));
             this.parent.rampSpeedGroup.left = this.parent.left + val;
-          } else if (rampEdge < this.gatherDataGroup.top) {
-            heightDifference = this.gatherDataGroup.top - rampEdge;
+          } else if (rampEdge < this.gatherDataDuringRampGroup.top) {
+            heightDifference = this.gatherDataDuringRampGroup.top - rampEdge;
             val = Math.sqrt(Math.abs((heightDifference * heightDifference) - 256));
             this.parent.rampSpeedGroup.left = this.parent.left + val;
           }

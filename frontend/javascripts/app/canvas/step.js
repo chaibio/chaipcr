@@ -4,8 +4,9 @@ window.ChaiBioTech.ngApp.factory('step', [
   'circle',
   'previouslySelected',
   'stepGraphics',
+  'constants',
 
-  function(ExperimentLoader, $rootScope, circle, previouslySelected, stepGraphics) {
+  function(ExperimentLoader, $rootScope, circle, previouslySelected, stepGraphics, constants) {
 
     return function(model, parentStage, index) {
 
@@ -13,7 +14,7 @@ window.ChaiBioTech.ngApp.factory('step', [
       this.parentStage = parentStage;
       this.index = index;
       this.canvas = parentStage.canvas;
-      this.myWidth = 128;
+      this.myWidth = constants.stepWidth;
       this.nextStep = null;
       this.previousStep = null;
       this.gatherDataDuringStep = this.model.collect_data;
@@ -25,21 +26,11 @@ window.ChaiBioTech.ngApp.factory('step', [
         return this;
       };
 
-      this.addImages = function() {
-
-        var can = this.parentStage.parent;
-        can.addImagesC(this);
-        this.circle.addImages();
-      };
-
       this.moveStep = function(action) {
 
         this.setLeft();
         this.getUniqueName();
         var leftVal = {left: this.left};
-        //this.commonFooterImage.set(leftVal).setCoords();
-        //this.darkFooterImage.set(leftVal).setCoords();
-        //this.whiteFooterImage.set(leftVal).setCoords();
         this.stepGroup.set(leftVal).setCoords();
 
         leftVal = {left: this.left + (this.myWidth / 2)};
@@ -79,7 +70,7 @@ window.ChaiBioTech.ngApp.factory('step', [
 
       this.getUniqueName = function() {
 
-        this.uniqueName = this.model.id + this.parentStage.stageNo.text + "step";
+        this.uniqueName = this.model.id + this.parentStage.index + "step";
         return this;
       };
 
@@ -105,7 +96,6 @@ window.ChaiBioTech.ngApp.factory('step', [
 
       this.adjustRampSpeedLeft = function() {
 
-        //this.rampSpeedGroup.setLeft(this.left + 5);
         this.circle.runAlongCircle();
         return this;
       };
@@ -113,7 +103,6 @@ window.ChaiBioTech.ngApp.factory('step', [
 
       this.manageBorder = function(color) {
 
-        //if(this.borderRight.visible === false) { // Means this is the last step in the stage
         this.borderRight.setStroke(color);
         this.borderRight.setStrokeWidth(2);
         if(this.previousStep) {
@@ -122,31 +111,12 @@ window.ChaiBioTech.ngApp.factory('step', [
         } else {
           this.parentStage.border.setStroke(color);
         }
-        /*if(this.parentStage.childSteps.length - 1 === this.index) {
-
-          if(this.previousStep) {
-            this.previousStep.borderRight.stroke = color;
-          } else {
-            this.parentStage.border.stroke = color;
-          }
-
-        } else {
-
-          this.borderRight.stroke = color;
-
-          if(this.previousStep) {
-            this.previousStep.borderRight.stroke = color;
-          } else {
-            this.parentStage.border.stroke = color;
-          }
-
-        }*/
       };
 
       this.manageBorderPrevious = function(color, currentStep) {
 
         if(this.parentStage.childSteps.length - 1 === this.index && this.parentStage.index === currentStep.parentStage.index) {
-          //console.log("okay hitt", currentStep.parentStage);
+
           this.borderRight.setStroke("#cc6c00");
           this.borderRight.setStrokeWidth(2);
         } else {
@@ -184,7 +154,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.addCircle();
       };
 
-      this.showHideFooter = function(visibility, color) {
+      this.manageFooter = function(color) {
 
         this.dots.forEachObject(function(obj) {
           obj.setFill(color);
@@ -199,7 +169,7 @@ window.ChaiBioTech.ngApp.factory('step', [
 
         this.manageBorder("black");
         if(this.parentStage.parent.editStageStatus) {
-          this.showHideFooter(true, "black");
+          this.manageFooter("black");
         }
 
         this.stepName.setFill("black");
@@ -210,7 +180,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         var previouslySelectedStep = previouslySelected.circle.parent;
 
         if(this.parentStage.parent.editStageStatus) {
-          previouslySelectedStep.showHideFooter(false, "white");
+          previouslySelectedStep.manageFooter("white");
         }
 
         previouslySelectedStep.manageBorderPrevious('#ff9f00', this);
