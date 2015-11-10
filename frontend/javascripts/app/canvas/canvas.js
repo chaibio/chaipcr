@@ -224,9 +224,29 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       //this.canvas.add(this.stageMoveIndicator);
     };
 
+    this.addDelImage = function() {
+
+      this.delImageObj = $.extend({}, this.imageobjects["close.png"]);
+      this.delImageObj.opacity = 0;
+      this.delImageObj.originX = "left";
+      this.delImageObj.originY = "top";
+      this.delImageObj.left = -100;
+      this.delImageObj.top = 79;
+      this.delImageObj.name = "commonDeleteButton";
+      this.delImageObj.me = this;
+      this.delImageObj.selectable = true;
+      this.delImageObj.hasBorders = false;
+      this.delImageObj.hasControls = false;
+      this.delImageObj.lockMovementY = true;
+      this.delImageObj.lockMovementX = true;
+
+      this.canvas.add(this.delImageObj);
+    };
+
     this.editStageMode = function(status) {
 
       var add = (status) ? 25 : -25;
+      this.delImageObj.setOpacity(0);
       if(status === true) {
         this.editStageStatus = status;
         previouslySelected.circle.parent.manageFooter("black");

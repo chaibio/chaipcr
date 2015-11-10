@@ -122,19 +122,20 @@ window.ChaiBioTech.ngApp.factory('events', [
             case "stepGroup":
               me = evt.target.me;
               if(C.editStageStatus === false) {
-                  /*me.closeImage.animate('opacity', 1, {
-                    duration: 400,
-                    onChange: C.canvas.renderAll.bind(C.canvas)
-                  });
-                  if(previouslyHoverd.step) {
-                    previouslyHoverd.step.closeImage.animate('opacity', 0, {
-                      duration: 400,
-                      onChange: C.canvas.renderAll.bind(C.canvas)
-                    });
-                  }
-                  previouslyHoverd.step = me;*/
-                  C.canvas.renderAll();
+                C.delImageObj.me = me;
+                C.delImageObj.setLeft(me.left + 108).setCoords();
+                C.delImageObj.animate('opacity', 1, {
+                  duration: 400,
+                  onChange: C.canvas.renderAll.bind(C.canvas)
+                });
               }
+            break;
+
+            case "commonDeleteButton":
+
+              C.delImageObj.setOpacity(1);
+              that.canvas.hoverCursor = "pointer";
+              C.canvas.renderAll();
             break;
 
             case "deleteStepButton":
@@ -170,6 +171,14 @@ window.ChaiBioTech.ngApp.factory('events', [
         if(evt.target) {
           var me;
           switch(evt.target.name) {
+
+            case "stepGroup":
+              C.delImageObj.setOpacity(0);
+            break;
+
+            case "commonDeleteButton":
+              that.canvas.hoverCursor = "move";
+            break;
 
             case "dragStepGroup":
 
@@ -357,6 +366,7 @@ window.ChaiBioTech.ngApp.factory('events', [
       this.canvas.on("imagesLoaded", function() {
         C.addStages().setDefaultWidthHeight().addRampLinesAndCircles();
         C.selectStep();
+        C.addDelImage();
         //C.addMoveStepIndicator();
         C.canvas.renderAll();
       });
