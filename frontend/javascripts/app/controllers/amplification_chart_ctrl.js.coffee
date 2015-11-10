@@ -11,6 +11,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
     fetching = false
     $scope.chartConfig = helper.chartConfig()
     $scope.data = [helper.paddData()]
+    $scope.log_linear = 'log'
 
     $scope.$on 'expName:Updated', ->
       $scope.experiment?.name = expName.name

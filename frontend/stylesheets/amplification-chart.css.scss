@@ -2,6 +2,7 @@
 $marginTop: 200px;
 
 .amplification-chart-state-active {
+  font-family: 'dinot';
 
   .header {
     .name-container {
@@ -11,6 +12,73 @@ $marginTop: 200px;
 
   .chart-section {
     width: 700px;
+
+    .curve-header {
+      border-bottom: 3px solid $gray;
+      padding-bottom: 10px;
+
+      .curve-title {
+        display: inline-block;
+        font-weight: bold;
+        font-size: 30px;
+        width: 70%;
+
+        img {
+          display: inline-block;
+          margin-top: -5px;
+          width: 20px;
+        }
+      }
+
+      .log-checkboxes {
+        margin-bottom: -10px;
+
+        .checkbox-item {
+          cursor: pointer;
+          display: inline-block;
+          font-weight: bold;
+          text-align: right;
+          width: 14%;
+
+          .checkbox-icon {
+            border-radius: 100px;
+            border: 1px solid black;
+            display: inline-block;
+            width: 11px;
+            height: 11px;
+            padding: 0;
+          }
+
+          &.checked {
+            .checkbox-icon {
+              background-color: $green;
+              .inner {
+                width: 9px;
+                height: 9px;
+                border: 2px solid #fff;
+                border-radius: 100px;
+                display: block;
+                background: transparent;
+              }
+            }
+          }
+
+          &.unchecked {
+            opacity: 0.5;
+
+            .checkbox-icon {
+              background: #fff;
+
+              .inner {
+                display: none;
+              }
+            }
+          }
+
+        }
+      }
+
+    }
 
     .vertical-text {
 
@@ -23,7 +91,6 @@ $marginTop: 200px;
       margin-top: $marginTop;
       margin-bottom: -$marginTop;
 
-      font-family: 'Open Sans';
     }
 
     .chart-container {

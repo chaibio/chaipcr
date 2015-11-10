@@ -16,9 +16,9 @@ library(robustbase)
 library(Matrix)
 library(DBI)
 
-setwd(Sys.getenv('RWORKDIR')) # Xia Hong
-
-qpcR_funcs <- c('modlist_R1.r', 'getPar_R1.r', 'utils_R1.R', # customized
+qpcR_funcs <- c(
+                #'modlist_R0.r', 'getPar_R1.r', 'utils_R1.R', # customized, for testing
+                'modlist_R1.r', 'getPar_R1.r', 'utils_R1.R', # customized
                 #'modlist.r', 'getPar.r', 'utils.R', # original
                 'AICc.R', 'Cy0.R', 'eff.R', 'efficiency.R', 'expfit.R', 'KOD.r', 'midpoint.R', 'pcrfit.r', 'predict.pcrfit.r', 'replist.r', 'resVar.R', 'RMSE.R', 'Rsq.ad.r', 'Rsq.R', 'sliwin.R', 'takeoff.R')
                 # (not used) 'akaike.weights.R', 'calib.r', 'evidence.R', 'expcomp.R', 'expfit.R', 'fitchisq.r', 'is.outlier.r', 'llratio.r', 'LOF.test.r', 'LRE.r', 'maxRatio.r', 'meltcurve.r', 'mselect.r', 'pcrbatch.r', 'pcrboot.r', 'pcrGOF.R', 'pcrimport.R', 'pcrimport2.R', 'pcropt1.R', 'pcrpred.R', 'pcrsim.r', 'plot.pcrfit.r', 'PRESS.R', 'propagate.R', 'qpcR.news.r', 'ratiobatch.r', 'ratiocalc.r', 'ratioPar.r', 'refmean.R', 'resplot.R', 'resVar.R', 'RSS.R', 'update.pcrfit.r') # dir('E:/WVU1/Dropbox/pRgRamNotes/R_resources/qpcR/R') and remove 'sysdata.rda'
@@ -40,8 +40,9 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
                                    ) {
     # baseline_ct
     model <- l4
-    baselin <- 'lin'
+    baselin <- 'parm'
     basecyc <- 1:5
+    fallback <- 'lin'
     type <- 'curve'
     cp <- 'cpD2'
     
@@ -49,7 +50,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     fluo_calib <- get_data_calib(db_usr, db_pwd, db_host, db_port, db_name,
                                  exp_id, stage_id, calib_id,
                                  show_running_time) # 1.63-1.75 sec (1st time, 3 tests); 0.94-1.60 sec (2nd time and on, 5 tests)
-    baseline_calib <- baseline_ct(fluo_calib, model, baselin, basecyc, type, cp, show_running_time)
+    baseline_calib <- baseline_ct(fluo_calib, model, baselin, basecyc, fallback, type, cp, show_running_time)
     return (list('background_subtracted'=fluo_calib, 'baseline_subtracted'=baseline_calib['bl_corrected'], 'ct'=baseline_calib['ct_eff']))
     }
 
