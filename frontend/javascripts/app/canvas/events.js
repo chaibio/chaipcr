@@ -29,9 +29,16 @@ window.ChaiBioTech.ngApp.factory('events', [
 
       });
 
-      /*angular.element('.canvas-container').mouseleave(function() {
+      angular.element('.canvas-container').mouseleave(function() {
 
-      });*/
+        if(C.editStageStatus === false) {
+            if(previouslyHoverd.step) {
+              previouslyHoverd.step.delGroup.setVisible(false);
+            }
+            previouslyHoverd.step = null;
+            C.canvas.renderAll();
+        }
+      });
 
       this.selectStep = function(circle) {
 
@@ -124,6 +131,9 @@ window.ChaiBioTech.ngApp.factory('events', [
               }
             break;
 
+            case "deleteStepButton":
+              that.canvas.hoverCursor = "pointer";
+            break;
             case "moveStepImage":
 
               evt.target.setVisible(false);
@@ -161,14 +171,17 @@ window.ChaiBioTech.ngApp.factory('events', [
               me = evt.target.currentStep;
               me.whiteFooterImage.setVisible(true);
               C.canvas.renderAll();
-              break;
+            break;
+
+            case "deleteStepButton":
+              that.canvas.hoverCursor = "move";
+            break;
 
             case "dragStageGroup":
 
               evt.target.setVisible(false);
               C.canvas.renderAll();
               break;
-
           }
         }
       });

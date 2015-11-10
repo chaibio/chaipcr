@@ -4,9 +4,10 @@ window.ChaiBioTech.ngApp.factory('stage', [
   'step',
   'previouslySelected',
   'stageGraphics',
+  'stepGraphics',
   'constants',
 
-  function(ExperimentLoader, $rootScope, step, previouslySelected, stageGraphics, constants) {
+  function(ExperimentLoader, $rootScope, step, previouslySelected, stageGraphics, stepGraphics, constants) {
 
     return function(model, stage, allSteps, index, fabricStage, $scope, insert) {
 
@@ -183,12 +184,17 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
       this.configureStep = function(newStep, start) {
         // insert it to all steps, add next and previous , re-render circles;
-        for(var j = start + 1; j < this.childSteps.length; j++) {
+        for(var j = 0; j < this.childSteps.length; j++) {
 
           var thisStep = this.childSteps[j];
-          thisStep.index = thisStep.index + 1;
-          thisStep.configureStepName();
-          thisStep.moveStep(1);
+          if(j >= start + 1) {
+            thisStep.index = thisStep.index + 1;
+            thisStep.configureStepName();
+            thisStep.moveStep(1);
+          } else {
+            stepGraphics.numberingValue.call(thisStep);
+          }
+
         }
 
         if(this.childSteps[newStep.index + 1]) {
@@ -272,7 +278,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
         this.roof.setStroke(color);
         this.roof.setStrokeWidth(strokeWidth);
-        
+
         if(this.parent.editStageStatus) {
           this.dots.forEachObject(function(obj) {
             obj.setFill(color);
