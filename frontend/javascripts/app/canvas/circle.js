@@ -88,6 +88,8 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.pauseImageMiddle = $.extend({}, fabricStage.imageobjects["pause-middle.png"]);
         this.setCenter(this.pauseImageMiddle);
         this.pauseImageMiddle.setVisible(false);
+        //this.setCenter(this.pauseImageMiddle);
+        //this.pauseImageMiddle.setVisible(false);
 
         return this;
       };

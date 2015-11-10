@@ -34,7 +34,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         "gather-data.png",
         "gather-data-image.png",
         "pause.png",
-        "pause-middle.png"
+        "pause-middle.png",
+        "close.png"
       ];
 
       this.imageLocation = "/images/";
@@ -242,7 +243,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         stage.stageNameGroup.left = stage.stageNameGroup.left + add;
 
         stage.childSteps.forEach(function(step, index) {
-          step.delGroup.setVisible(status);
+          step.closeImage.setOpacity(status);
           step.dots.setVisible(status);
 
           if(step.parentStage.model.auto_delta) {

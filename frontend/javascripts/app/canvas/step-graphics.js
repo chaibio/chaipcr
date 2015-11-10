@@ -44,12 +44,12 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
 
       this.delCircle = new fabric.Circle({
         radius: 6, stroke: 'black', originX: "center", originY: "center", fill: '#ffb400', left: 5, top: 5, strokeWidth: 1,
-        selectable: false, evented: false
+        selectable: false, evented: false,
       });
 
       this.line1 = new fabric.Line([0, 0, 6, 0], {
         stroke: 'black', strokeWidth: 1, selectable: false, originX: 'left', originY: 'top',
-        angle: 45, left: 3, top: 2
+        angle: 45, left: 3, top: 3
       });
 
       this.line2 = new fabric.Line([0, 0, 6, 0], {
@@ -57,12 +57,25 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
         angle: 315, left: 2, top: 7
       });
 
+      this.closeImage = $.extend({}, this.parentStage.parent.imageobjects["close.png"]);
+      this.closeImage.opacity = 0;
+      this.closeImage.originX = "left";
+      this.closeImage.originY = "top";
+      this.closeImage.left = this.left + 108;
+      this.closeImage.top = 79;
+      this.closeImage.name = "deleteStepButton";
+      this.closeImage.me = this;
+      this.closeImage.selectable = true;
+      this.closeImage.hasBorders = false;
+      this.closeImage.hasControls = false;
+
       var editStageStatus = this.parentStage.parent.editStageStatus;
 
-      this.delGroup = new fabric.Group([this.delCircle, this.line1, this.line2], {
-        originX: 'left', originY: 'top', left: this.left + 108, top: 79, visible: editStageStatus, name: "deleteStepButton",
-        me: this, selectable: true, hasBorders: false, hasControls: false
-      });
+
+      /*this.delGroup = new fabric.Group([this.closeImage], {
+        originX: 'left', originY: 'top', left: this.left + 108, top: 79, true: "deleteStepButton",
+        me: this, selectable: true, hasBorders: false, hasControls: false, opacity: 1
+      });*/
 
       return this;
     };

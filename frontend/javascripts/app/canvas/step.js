@@ -37,7 +37,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.hitPoint.set(leftVal).setCoords();
 
         leftVal = {left: this.left + 108};
-        this.delGroup.set(leftVal).setCoords();
+        this.closeImage.set(leftVal).setCoords();
 
         leftVal = {left: this.left + 16};
         this.dots.set(leftVal).setCoords();
@@ -149,7 +149,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.canvas.add(this.stepGroup);
         this.canvas.add(this.rampSpeedGroup);
         this.canvas.add(this.hitPoint);
-        this.canvas.add(this.delGroup);
+        this.canvas.add(this.closeImage);
         this.canvas.add(this.dots);
         this.addCircle();
       };

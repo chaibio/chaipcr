@@ -33,7 +33,7 @@ window.ChaiBioTech.ngApp.factory('events', [
 
         if(C.editStageStatus === false) {
             if(previouslyHoverd.step) {
-              previouslyHoverd.step.delGroup.setVisible(false);
+              previouslyHoverd.step.closeImage.setOpacity(0);
             }
             previouslyHoverd.step = null;
             C.canvas.renderAll();
@@ -121,10 +121,16 @@ window.ChaiBioTech.ngApp.factory('events', [
 
             case "stepGroup":
               me = evt.target.me;
-              if(C.editStageStatus === false && me.delGroup.visible === false) {
-                  me.delGroup.setVisible(true);
+              if(C.editStageStatus === false) {
+                  me.closeImage.animate('opacity', 1, {
+                    duration: 400,
+                    onChange: C.canvas.renderAll.bind(C.canvas)
+                  });
                   if(previouslyHoverd.step) {
-                    previouslyHoverd.step.delGroup.setVisible(false);
+                    previouslyHoverd.step.closeImage.animate('opacity', 0, {
+                      duration: 400,
+                      onChange: C.canvas.renderAll.bind(C.canvas)
+                    });
                   }
                   previouslyHoverd.step = me;
                   C.canvas.renderAll();

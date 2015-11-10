@@ -124,7 +124,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
         this.canvas.remove(currentStep.stepGroup);
         this.canvas.remove(currentStep.hitPoint);
-        this.canvas.remove(currentStep.delGroup);
+        this.canvas.remove(currentStep.closeImage);
         this.canvas.remove(currentStep.dots);
         this.canvas.remove(currentStep.rampSpeedGroup);
         currentStep.circle.removeContents();
