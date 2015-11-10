@@ -11,6 +11,10 @@ class Ramp < ActiveRecord::Base
     rate == 0
   end
   
+  def max_rate
+    3.0
+  end
+  
   def copy
     copy_helper
   end
