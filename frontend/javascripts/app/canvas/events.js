@@ -32,10 +32,10 @@ window.ChaiBioTech.ngApp.factory('events', [
       angular.element('.canvas-container').mouseleave(function() {
 
         if(C.editStageStatus === false) {
-            if(previouslyHoverd.step) {
+            /*if(previouslyHoverd.step) {
               previouslyHoverd.step.closeImage.setOpacity(0);
             }
-            previouslyHoverd.step = null;
+            previouslyHoverd.step = null;*/
             C.canvas.renderAll();
         }
       });
@@ -122,7 +122,7 @@ window.ChaiBioTech.ngApp.factory('events', [
             case "stepGroup":
               me = evt.target.me;
               if(C.editStageStatus === false) {
-                  me.closeImage.animate('opacity', 1, {
+                  /*me.closeImage.animate('opacity', 1, {
                     duration: 400,
                     onChange: C.canvas.renderAll.bind(C.canvas)
                   });
@@ -132,7 +132,7 @@ window.ChaiBioTech.ngApp.factory('events', [
                       onChange: C.canvas.renderAll.bind(C.canvas)
                     });
                   }
-                  previouslyHoverd.step = me;
+                  previouslyHoverd.step = me;*/
                   C.canvas.renderAll();
               }
             break;

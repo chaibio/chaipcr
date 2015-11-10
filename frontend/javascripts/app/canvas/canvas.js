@@ -243,7 +243,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         stage.stageNameGroup.left = stage.stageNameGroup.left + add;
 
         stage.childSteps.forEach(function(step, index) {
-          step.closeImage.setOpacity(status);
+          step.closeImage.setVisible(status);
           step.dots.setVisible(status);
 
           if(step.parentStage.model.auto_delta) {

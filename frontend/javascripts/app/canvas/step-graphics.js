@@ -57,8 +57,10 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
         angle: 315, left: 2, top: 7
       });
 
+      var editStageStatus = this.parentStage.parent.editStageStatus;
+
       this.closeImage = $.extend({}, this.parentStage.parent.imageobjects["close.png"]);
-      this.closeImage.opacity = 0;
+      this.closeImage.visible = editStageStatus;
       this.closeImage.originX = "left";
       this.closeImage.originY = "top";
       this.closeImage.left = this.left + 108;
@@ -69,7 +71,7 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
       this.closeImage.hasBorders = false;
       this.closeImage.hasControls = false;
 
-      var editStageStatus = this.parentStage.parent.editStageStatus;
+
 
 
       /*this.delGroup = new fabric.Group([this.closeImage], {
