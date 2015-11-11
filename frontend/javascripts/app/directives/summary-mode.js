@@ -23,7 +23,6 @@ window.ChaiBioTech.ngApp.directive('summaryMode', [
 
           } else {
             ExperimentLoader.getExperiment().then(function(data) {
-              console.log("wow we get data", data.experiment.protocol.estimate_duration, scope);
               var estimateTime = data.experiment.protocol.estimate_duration;
               scope.protocol.protocol.estimate_duration = estimateTime;
             });

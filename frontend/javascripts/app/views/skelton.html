@@ -17,9 +17,9 @@
         </div>
         <div class="where-m-I">
           <!-- This is going to be a directive -->
-          <scroll-on-top></scroll-on-top>
+          <scroll-on-top ng-if="showScrollbar"></scroll-on-top>
         </div>
-        <div class="undo-container">
+        <div ng-if="false" class="undo-container">
           <button id="undo-action">UNDO</button>
         </div>
       </div>
@@ -77,7 +77,7 @@
                 </div>
 
                 <div class="data-boxes exp-overview">
-                  <div class="name-board ">EXPERIMENT OVERVIEW</div>
+                  <div class="name-board">EXPERIMENT OVERVIEW</div>
                     <summary-mode-item caption="Stages" reading="{{fabricStep.parentStage.parent.allStageViews.length}}"></summary-mode-item>
                     <summary-mode-item caption="Steps" reading="{{fabricStep.parentStage.parent.allStepViews.length}}"></summary-mode-item>
                     <summary-mode-item caption="Est. Time to Complete" reading="{{protocol.protocol.estimate_duration | toHour}}"></summary-mode-item>
@@ -86,7 +86,7 @@
                 <div class="data-boxes exp-metadata">
                   <div class="name-board">EXPERIMENT META DATA</div>
                   <summary-mode-item caption="Created on" reading="{{protocol.created_at | amDateFormat: 'MMM D, YYYY hh:mm A'}}"></summary-mode-item>
-                  <summary-mode-item caption="Created on" reading="{{protocol.protocol.estimate_duration}}"></summary-mode-item>
+                  <summary-mode-item ng-if="protocol.started_at" caption="Run on" reading="{{protocol.started_at | amDateFormat: 'MMM D, YYYY hh:mm A'}}"></summary-mode-item>
                 </div>
             </div>
           </div><!--First two data boxes -->

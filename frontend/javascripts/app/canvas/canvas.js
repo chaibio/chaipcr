@@ -61,7 +61,9 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         ((this.allStageViews.length) * 2) +
         33 + 33
       );
-
+      var that = this, showScrollbar;
+      // Show Hide scroll bar in the top
+      this.$scope.showScrollbar = (this.canvas.getWidth() > 1024) ? true : false;
       //$timeout(function(context) {
         //context.canvas.renderAll();
         this.canvas.renderAll();

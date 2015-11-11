@@ -30,6 +30,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
 
           $scope.summaryMode = false;
           $scope.editStageMode = false;
+          $scope.showScrollbar = false;
           $scope.$broadcast("dataLoaded");
           //console.log("BINGOOOOO", $rootScope);
           canvas.init($scope);

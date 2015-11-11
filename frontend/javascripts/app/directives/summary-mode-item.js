@@ -24,9 +24,6 @@ window.ChaiBioTech.ngApp.directive('summaryModeItem', [
               //timeFormat.getForSummaryMode(scope.reading);
               //scope.data = (scope.reading).replace("T", ",").slice(0, -8);
             }
-            if(scope.caption === "Est. Time to Complete") {
-              
-            }
           }
 
         });
