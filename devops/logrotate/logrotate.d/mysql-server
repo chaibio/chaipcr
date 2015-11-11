@@ -5,7 +5,7 @@
 /var/log/mysql.log /var/log/mysql/mysql.log /var/log/mysql/mysql-slow.log {
         daily
         rotate 2
-        size 10M
+        maxsize 10M
         missingok
         create 640 mysql adm
         compress

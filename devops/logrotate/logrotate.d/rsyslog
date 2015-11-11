@@ -1,7 +1,7 @@
 /var/log/syslog
 {
         rotate 2
-        size 10M
+        maxsize 10M
         daily
         missingok
         notifempty
@@ -26,7 +26,7 @@
 /var/log/messages
 {
         rotate 2
-        size 10M
+        maxsize 10M
         weekly
         missingok
         notifempty
