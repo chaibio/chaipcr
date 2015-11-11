@@ -28,15 +28,6 @@
           Experiment.getTemperatureData($scope.experiment.id, {starttime: last_elapsed_time}).then(function(resp) {
             if (resp.data.length === 0) return;
             var data = resp.data;
-            // if ($scope.max_x) {
-            //   var diff = $scope.max_x - (resp.data[0].temperature_log.elapsed_time);
-            //   if (diff > 0) {
-            //     data = _.map(angular.copy(resp.data), function (datum) {
-            //       datum.temperature_log.elapsed_time = datum.temperature_log.elapsed_time + diff;
-            //       return datum;
-            //     });
-            //   }
-            // }
             updateData(oldData, angular.copy(data));
             oldData = resp.data;
           })
@@ -58,7 +49,7 @@
 
         cancelAnimation();
         var calibration = 50;
-        var duration = 1500;//ms
+        var duration = 2500;//ms
         var calibration_index = 0;
 
         old = old.length > 0? old : data;

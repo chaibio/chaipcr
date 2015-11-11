@@ -89,11 +89,8 @@
             prev_X = 0;
             prev_Y = 0;
             maxY = getMax_Y(data);
-            maxY = maxY > 100 ? maxY : 130;
+            maxY = maxY > 130 ? maxY : 130;
             maxX = $scope.maxX;
-            // if (data[data.length-1].x < maxX) {
-            //   data[data.length-1].x = maxX;
-            // }
             minX = $scope.minX;
             x_index = 0;
             rainbow.setNumberRange(0, maxY);
