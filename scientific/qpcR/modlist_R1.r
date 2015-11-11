@@ -1,4 +1,4 @@
-# customized by Xiaoqing Rong-Mullins. 2015-10-27.
+# customized by Xiaoqing Rong-Mullins.
 # all the ', silent = FALSE' were added by xqrm
 
 modlist <- function(
@@ -25,6 +25,10 @@ modlist <- function(
   ...
 )
 {
+  # xqrm: start counting for running time
+  func_name <- 'modlist'
+  start_time <- proc.time()[['elapsed']]
+  
   if (fallback == 'parm') stop('`fallback` cannot be \'parm\'.') # xqrm
   
   options(expressions = 50000)  
@@ -71,6 +75,10 @@ modlist <- function(
   blcor_list <- list()
     
   for (i in 1:ncol(allFLUO)) {
+    
+    # xqrm: start counting for running time
+    start_time_for <- proc.time()[['elapsed']]
+    
     #FLUO  <- allFLUO[, i] # ori
     FLUO_ori <- allFLUO[, i] # xqrm
     NAME <- NAMES[i]
@@ -113,7 +121,13 @@ modlist <- function(
       if (factor != 1) FLUO <- FLUO * factor                
       
       # xqrm: when baseline == "parm", adjust fluorescence value if no value in FLUO > 0, so lm.fit won't fail on '0 (non-NA) cases'
-      if (baseline == "parm" & all(FLUO <= 0)) FLUO <- FLUO - min(FLUO)
+      if (baseline == "parm" & all(FLUO <= 0)) {
+        addition <- -min(FLUO)
+        FLUO <- FLUO + addition
+        message('\nFluorescence values are all negative, added ', 
+                round(addition, 2), 
+                ' before baseline subtraction by \'parm\'.')
+        }
       
       ## fit model
       DATA <- data.frame(Cycles = CYCLES, Fluo = FLUO)    
@@ -122,7 +136,11 @@ modlist <- function(
       flush.console()
       
       #fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent = TRUE) # ori
-      fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent=FALSE) # xrqm
+      # xqrm
+      t1 <- Sys.time() # time
+      fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent=FALSE)
+      td <- Sys.time() - t1 # time
+      message('First sigmoid fitting took ', round(as.numeric(td), digits=2), ' seconds. (prior to baseline subtraction for \'parm\', after for other options)') # time
       
       ## version 1.4-0: baselining with 'c' parameter using 'baseline' function
       if (baseline_looped == "parm") { #fitOBJ <- baseline(model = fitOBJ, baseline = baseline) # ori
@@ -137,7 +155,10 @@ modlist <- function(
           next }
         
         # xqrm
+        t1 <- Sys.time() # time
         bl_out <- baseline(model = fitOBJ, baseline = baseline_looped)
+        td <- Sys.time() - t1 # time
+        message('Baseline subtraction with \'parm\' took ', round(as.numeric(td), digits=2), ' seconds.') # time
         fitOBJ <- bl_out[['newMODEL']]
         blcor <- bl_out[['blcor']]
         # message('\'parm\' was used as the final method for baseline subtraction.') # for testing
@@ -193,7 +214,12 @@ modlist <- function(
     
     modLIST[[i]] <- fitOBJ
     modLIST[[i]]$names <- NAME    
-  }  
+    
+    # xqrm: report time cost for this function
+    end_time_for <- proc.time()[['elapsed']]
+    message('iteration ', i, ' took ', round(end_time_for - start_time_for, 2), ' seconds.\n')
+    
+  } # xqrm: end: 'for' loop
   
   # xqrm
   well_names <- colnames(x)[2:ncol(x)]
@@ -249,6 +275,12 @@ modlist <- function(
   
   class(modLIST) <- c("modlist", "pcrfit")
   #invisible(modLIST) # ori
+  
+  # xqrm: report time cost for this function
+  end_time <- proc.time()[['elapsed']]
+  message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
+  
+  
   # xqrm
   return(list('ori'=modLIST, 'bl_corrected'=bl_corrected)) # , 'bl_info'=bl_info))
 }
