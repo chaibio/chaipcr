@@ -59,7 +59,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         (this.allStepViews.length * constants.stepWidth) +
         ((this.allStageViews.length) * 8) +
         ((this.allStageViews.length) * 2) +
-        33
+        33 + 33
       );
 
       //$timeout(function(context) {
@@ -226,7 +226,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     this.addDelImage = function() {
 
-      this.delImageObj = $.extend({}, this.imageobjects["close.png"]);
+      /*this.delImageObj = $.extend({}, this.imageobjects["close.png"]);
       this.delImageObj.opacity = 0;
       this.delImageObj.originX = "left";
       this.delImageObj.originY = "top";
@@ -240,13 +240,13 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       this.delImageObj.lockMovementY = true;
       this.delImageObj.lockMovementX = true;
 
-      this.canvas.add(this.delImageObj);
+      this.canvas.add(this.delImageObj);*/
     };
 
     this.editStageMode = function(status) {
 
       var add = (status) ? 25 : -25;
-      this.delImageObj.setOpacity(0);
+      //this.delImageObj.setOpacity(0);
       if(status === true) {
         this.editStageStatus = status;
         previouslySelected.circle.parent.manageFooter("black");

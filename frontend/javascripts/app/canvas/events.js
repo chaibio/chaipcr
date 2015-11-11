@@ -29,13 +29,13 @@ window.ChaiBioTech.ngApp.factory('events', [
 
       });
 
-      angular.element('.canvas-container').mouseleave(function() {
+      angular.element('.canvas-container, .canvasClass').mouseleave(function() {
 
         if(C.editStageStatus === false) {
-            /*if(previouslyHoverd.step) {
-              previouslyHoverd.step.closeImage.setOpacity(0);
+            if(previouslyHoverd.step) {
+              previouslyHoverd.step.closeImage.setVisible(false);
             }
-            previouslyHoverd.step = null;*/
+            previouslyHoverd.step = null;
             C.canvas.renderAll();
         }
       });
@@ -122,12 +122,18 @@ window.ChaiBioTech.ngApp.factory('events', [
             case "stepGroup":
               me = evt.target.me;
               if(C.editStageStatus === false) {
-                C.delImageObj.me = me;
+                me.closeImage.setVisible(true);
+                if(previouslyHoverd.step) {
+                  previouslyHoverd.step.closeImage.setVisible(false);
+                }
+                previouslyHoverd.step = me;
+                /*C.delImageObj.me = me;
                 C.delImageObj.setLeft(me.left + 108).setCoords();
                 C.delImageObj.animate('opacity', 1, {
                   duration: 400,
                   onChange: C.canvas.renderAll.bind(C.canvas)
-                });
+                });*/
+                C.canvas.renderAll();
               }
             break;
 
@@ -173,11 +179,11 @@ window.ChaiBioTech.ngApp.factory('events', [
           switch(evt.target.name) {
 
             case "stepGroup":
-              C.delImageObj.setOpacity(0);
+              //C.delImageObj.setOpacity(0);
             break;
 
             case "commonDeleteButton":
-              that.canvas.hoverCursor = "move";
+              //that.canvas.hoverCursor = "move";
             break;
 
             case "dragStepGroup":
