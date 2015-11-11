@@ -56,6 +56,7 @@ window.ChaiBioTech.ngApp.factory('events', [
         circle.parent.parentStage.unSelectStage();
         circle.parent.unSelectStep();
         circle.makeItSmall();
+        C.canvas.renderAll();
       };
 
       this.selectStep = function(circle) {

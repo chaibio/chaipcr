@@ -1,6 +1,6 @@
 window.ChaiBioTech.ngApp.directive('summaryModeItem', [
   'ExperimentLoader',
-  function(ExperimentLoader, timeFormat) {
+  function(ExperimentLoader) {
 
     return {
       restric: 'EA',
@@ -23,6 +23,9 @@ window.ChaiBioTech.ngApp.directive('summaryModeItem', [
               scope.date = true;
               //timeFormat.getForSummaryMode(scope.reading);
               //scope.data = (scope.reading).replace("T", ",").slice(0, -8);
+            }
+            if(scope.caption === "Est. Time to Complete") {
+              
             }
           }
 
