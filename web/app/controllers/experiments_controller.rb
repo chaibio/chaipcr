@@ -13,6 +13,8 @@ class ExperimentsController < ApplicationController
     formats ['json']
   }
   
+  RSERVE_TIMEOUT  = 30
+  
   def_param_group :experiment do
     param :experiment, Hash, :desc => "Experiment Info", :required => true do
       param :name, String, :desc => "Name of the experiment", :required => false
@@ -109,7 +111,12 @@ class ExperimentsController < ApplicationController
     if @experiment
       @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
       if !@first_stage_collect_data.blank?
-        @fluorescence_data, @ct = retrieve_fluorescence_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id)
+        begin
+          @fluorescence_data, @ct = retrieve_fluorescence_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id)
+        rescue => e
+           render :json=>{:errors=>"Internal Server Error (#{e})"}, :status => 500
+           return
+        end
       end
       respond_to do |format|
         format.json { render "fluorescence_data", :status => :ok}
@@ -129,7 +136,10 @@ class ExperimentsController < ApplicationController
           
           first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
           if first_stage_collect_data
-            fluorescence_data, ct = retrieve_fluorescence_data(@experiment.id, first_stage_collect_data.id, @experiment.calibration_id)
+            begin
+              fluorescence_data, ct = retrieve_fluorescence_data(@experiment.id, first_stage_collect_data.id, @experiment.calibration_id)
+            rescue => e
+            end
           end
           
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/fluorescence.csv")
@@ -169,10 +179,17 @@ class ExperimentsController < ApplicationController
   def analyze
     if @experiment && !@experiment.experiment_definition.guid.blank?
       config   = Rails.configuration.database_configuration
-      connection = Rserve::Connection.new
-      connection.eval("source(\"#{Rails.configuration.dynamic_file_path}/#{@experiment.experiment_definition.guid}/analyze.R\")")
-      response = connection.eval("analyze('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{@experiment.id})").to_ruby
-      connection.close
+      connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
+      begin
+        connection.eval("source(\"#{Rails.configuration.dynamic_file_path}/#{@experiment.experiment_definition.guid}/analyze.R\")")
+        response = connection.eval("analyze('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{@experiment.id})").to_ruby
+      rescue  => e
+        logger.error("Rserve error: #{e}")
+        kill_rserve
+        render :json=>{:errors=>"Internal Server Error (#{e})"}, :status => 500
+      ensure
+        connection.close
+      end
       json = JSON.parse(response)
       render :json=>json
     else
@@ -188,15 +205,22 @@ class ExperimentsController < ApplicationController
   
   def retrieve_fluorescence_data(experiment_id, stage_id, calibration_id)
     config   = Rails.configuration.database_configuration
-    connection = Rserve::Connection.new
+    connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
-    results = connection.eval("get_amplification_data('#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibration_id})")
-    connection.close
+    begin
+      results = connection.eval("get_amplification_data('#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibration_id})")
+    rescue  => e
+      logger.error("Rserve error: #{e}")
+      kill_rserve
+      raise e
+    ensure
+      connection.close
+    end
     logger.info("R code time #{Time.now-start_time}")
     start_time = Time.now
     results = results.to_ruby
+    fluorescence_data = []
     if !results.blank?
-      fluorescence_data = []
       background_subtracted_results = results[0]
       baseline_subtracted_results = results[1][0]
       (1...background_subtracted_results.length).each do |well_num|
@@ -208,6 +232,17 @@ class ExperimentsController < ApplicationController
     end 
     logger.info("Rails code time #{Time.now-start_time}")
     return fluorescence_data, ct
+  end
+  
+  def kill_rserve
+    processes = `ps -ef | grep Rserve`
+    logger.info(processes)
+    processes.lines.each do |process|
+      nodes = process.split(/\W+/)
+      cmd = "kill -9 #{nodes[2]}"
+      logger.info(cmd)
+      system(cmd)
+    end
   end
   
 end
