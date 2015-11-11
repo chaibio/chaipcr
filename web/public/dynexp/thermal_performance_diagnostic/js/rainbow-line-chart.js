@@ -6,7 +6,10 @@
       return {
         restrict: 'EA',
         scope: {
-          data: '='
+          data: '=?',
+          maxY: '=?',
+          maxX: '=?',
+          minX: '=?'
         },
         replace: true,
         template: '<canvas class="rainbow-line-chart">',
@@ -26,32 +29,36 @@
           var rainbow = new Rainbow;
           rainbow.setSpectrum('#00AEEF', 'blue', 'violet', 'red');
 
-          function getMax_Y(data) {
+          function getMax_Y() {
+            // if ($scope.maxY) return margin * 2 + parseFloat($scope.maxY);
             var ys;
-            ys = _.map(data, function(datum) {
+            ys = _.map($scope.data, function(datum) {
               return datum.y;
             });
-            return margin * 2 + Math.max.apply(Math, ys);
+            return (margin*2)+Math.max.apply(Math, ys);
           };
-          function getMin_Y(data) {
+          function getMin_Y() {
+            // if ($scope.minY) return margin * 2 + parseFloat($scope.minY);
             var ys;
-            ys = _.map(data, function(datum) {
+            ys = _.map($scope.data, function(datum) {
               return datum.y;
             });
-            return margin * 2 + Math.min.apply(Math, ys);
+            return Math.min.apply(Math, ys);
           };
 
-          function getMax_X(data) {
+          function getMax_X() {
+            if ($scope.maxX) return parseFloat($scope.maxX);
             var xs;
-            xs = _.map(data, function(datum) {
+            xs = _.map($scope.data, function(datum) {
               return datum.x;
             });
             return Math.max.apply(Math, xs);
           };
 
-          function getMin_X(data) {
+          function getMin_X() {
+            if ($scope.minX) return parseFloat($scope.minX);
             var xs;
-            xs = _.map(data, function(datum) {
+            xs = _.map($scope.data, function(datum) {
               return datum.x;
             });
             return Math.min.apply(Math, xs);
@@ -59,10 +66,8 @@
 
           function drawPoint(d, data) {
             var new_X, new_Y, y_diff;
-            d.y = d.y + margin;
-            d.x = d.x + margin;
             new_X = width * (d.x- minX) / (maxX-minX) ;
-            new_Y = height * d.y / maxY;
+            new_Y = height * (margin+d.y) / maxY;
 
             if (prev_Y === 0) {
               prev_Y = new_Y;
@@ -85,8 +90,11 @@
             prev_Y = 0;
             maxY = getMax_Y(data);
             maxY = maxY > 100 ? maxY : 130;
-            maxX = getMax_X(data);
-            minX = getMin_X(data);
+            maxX = $scope.maxX;
+            // if (data[data.length-1].x < maxX) {
+            //   data[data.length-1].x = maxX;
+            // }
+            minX = $scope.minX;
             x_index = 0;
             rainbow.setNumberRange(0, maxY);
             ctx.clearRect(0, 0, width, height);
@@ -96,85 +104,16 @@
             }
           };
 
-          var transitioning = false;
-          var duration = 800; //ms
-          var dpt_calibration = 10; //move 100 datapoints during transition
-          var dpt_index = 1;
-          var transition_threads = [];
-          var animation;
-          function transition (old_data_points, new_data_points) {
-
-            if (!old_data_points) {
-              return;
-            }
-            if (old_data_points.length === 0) {
-              return;
-            }
-
-            if (transitioning) return;
-
-            transitioning = true;
-
-            if (old_data_points && new_data_points) {
-              if (old_data_points.length > 0 && new_data_points.length > 0) {
-                dpt_calibration = maxY - getMin_Y(old_data_points)
-                dpt_calibration = Math.round(dpt_calibration);
-                dpt_calibration = Math.abs(dpt_calibration);
-                dpt_calibration = dpt_calibration > 10? dpt_calibration : 10;
-                console.log(dpt_calibration);
-              }
-            }
-
-            for (var i = 0; i < dpt_calibration; i++) {
-              transition_threads[i] = [];
-            }
-
-            for (var i = 0; i < new_data_points.length; i++) {
-              var prev_dpt = old_data_points[i] || old_data_points[old_data_points.length-1] || new_data_points[i];
-              var new_dtp = new_data_points[i];
-              var dpt_y_diff = new_dtp.y - prev_dpt.y;
-              var dpt_x_diff = new_dtp.x - prev_dpt.x;
-
-              for (var ii = 0; ii < dpt_calibration; ii ++) {
-                var new_y = prev_dpt.y + (dpt_y_diff/dpt_calibration) * ii;
-                var new_x = prev_dpt.x + (dpt_x_diff/dpt_calibration) * ii;
-
-                transition_threads[ii][i] = {
-                  y: new_y,
-                  x: new_x
-                };
-              }
-
-            }
-
-            dpt_index = 0;
-            animation = $interval( animate_transition, duration/dpt_calibration);
-          }
-
-          function animate_transition () {
-            if (dpt_index === dpt_calibration) {
-              cancelAnimation();
-              return;
-            }
-            makeChart(transition_threads[dpt_index]);
-            // prev_data_points = transition_threads[dpt_index];
-            dpt_index ++;
-          }
-
-          function cancelAnimation () {
-            if(!animation) return;
-            $interval.cancel(animation);
-            animation = null;
-            transitioning = false;
-          }
+          $scope.$watch('maxX', function () {
+            if (!$scope.data) return;
+            makeChart($scope.data);
+          });
 
           $scope.$watch('data', function(data, oldVal) {
             if (!data) return;
             if (data.length === 0) return;
             if (data === oldVal) return;
-            if (transitioning) return;
-            transition(prev_data_points, data);
-            prev_data_points = data;
+            makeChart(data);
 
           }, false);
         }
