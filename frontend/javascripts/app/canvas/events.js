@@ -40,6 +40,24 @@ window.ChaiBioTech.ngApp.factory('events', [
         }
       });
 
+      angular.element('.canvas-containing').click(function(evt) {
+
+        if(evt.target == evt.currentTarget) {
+          that.setSummaryMode();
+        }
+      });
+
+      this.setSummaryMode = function() {
+
+        $scope.$apply(function() {
+          $scope.summaryMode = true;
+        });
+        var circle = previouslySelected.circle;
+        circle.parent.parentStage.unSelectStage();
+        circle.parent.unSelectStep();
+        circle.makeItSmall();
+      };
+
       this.selectStep = function(circle) {
 
         $scope.summaryMode = false;
@@ -122,7 +140,6 @@ window.ChaiBioTech.ngApp.factory('events', [
             case "stepGroup":
               me = evt.target.me;
               if(C.editStageStatus === false) {
-                console.log(me);
                 me.closeImage.setVisible(true);
                 if(previouslyHoverd.step && previouslyHoverd.step.uniqueName !== me.uniqueName) {
                   previouslyHoverd.step.closeImage.setVisible(false);
@@ -232,13 +249,6 @@ window.ChaiBioTech.ngApp.factory('events', [
 
             break;
 
-            case "commonStep":
-
-              me = evt.target.step;
-              that.selectStep(me.circle);
-
-            break;
-
             case "dragStepGroup":
 
               evt.target.startPosition = evt.target.left;
@@ -269,13 +279,7 @@ window.ChaiBioTech.ngApp.factory('events', [
             break;
           }
         } else { // if the click is on canvas
-          $scope.$apply(function() {
-            $scope.summaryMode = true;
-          });
-          var circle = previouslySelected.circle;
-          circle.parent.parentStage.unSelectStage();
-          circle.parent.unSelectStep();
-          circle.makeItSmall();
+          that.setSummaryMode();
         }
       });
 
