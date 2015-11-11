@@ -23,9 +23,6 @@ analyze <- function(dbname,dbuser,dbpassword,experimentID){
 	temperatureData <- dbGetQuery(dbconn, queryTemperatureData)
 
 	dbDisconnect(dbconn)
-	
-	#calculate maximum temperature difference between heat block zones during experiment
-	maxDeltaT <- max(abs(temperatureData$heat_block_zone_1_temp-temperatureData$heat_block_zone_2_temp))
 
 	#add a new row that is the average of the two heat block zones
 	temperatureData$heat_block_zone_average_temp <- rowMeans(subset(temperatureData, select = c(heat_block_zone_1_temp, heat_block_zone_2_temp)))
@@ -41,12 +38,16 @@ analyze <- function(dbname,dbuser,dbpassword,experimentID){
 	avgHeatBlockRampUpRate <- ((highTemperature-lowTemperature-2*deltaTSetPoint)*1000)/(apprxRampUpEndTime-apprxRampUpStartTime)
 	avgHeatBlockRampDownRate <- ((lowTemperature-highTemperature-2*deltaTSetPoint)*1000)/(apprxRampDownEndTime-apprxRampDownStartTime)
 
+	#calculate maximum temperature difference between heat block zones during ramp up and down
+	maxDeltaTRampUp <- max(abs(temperatureData[(temperatureData$elapsed_time>apprxRampUpStartTime) & (temperatureData$elapsed_time<apprxRampUpEndTime),'heat_block_zone_1_temp']-temperatureData[(temperatureData$elapsed_time>apprxRampUpStartTime) & (temperatureData$elapsed_time<apprxRampUpEndTime),'heat_block_zone_2_temp']))
+	maxDeltaTRampDown <- max(abs(temperatureData[(temperatureData$elapsed_time>apprxRampDownStartTime) & (temperatureData$elapsed_time<apprxRampDownEndTime),'heat_block_zone_1_temp']-temperatureData[(temperatureData$elapsed_time>apprxRampDownStartTime) & (temperatureData$elapsed_time<apprxRampDownEndTime),'heat_block_zone_2_temp']))
+
 	#calculate the average ramp rate of the lid heater in degrees C per second
 	lidHeaterStartRampTime <- min(temperatureData[(temperatureData$lid_temp>(lowTemperature+deltaTSetPoint)),'elapsed_time'])
 	lidHeaterStopRampTime <- max(temperatureData[(temperatureData$lid_temp<(highTemperature-deltaTSetPoint)),'elapsed_time'])
 	avgLidHeaterRampUpRate <- ((highTemperature-lowTemperature-2*deltaTSetPoint)*1000)/(lidHeaterStopRampTime-lidHeaterStartRampTime)
 	
-	return (toJSON(list(Heating=list(AvgRampRate=avgHeatBlockRampUpRate, TotalTime=apprxRampUpEndTime-apprxRampUpStartTime, MaxBlockDeltaT=0),
-						Cooling=list(AvgRampRate=avgHeatBlockRampDownRate*-1, TotalTime=apprxRampDownEndTime-apprxRampDownStartTime, MaxBlockDeltaT=0),
+	return (toJSON(list(Heating=list(AvgRampRate=avgHeatBlockRampUpRate, TotalTime=apprxRampUpEndTime-apprxRampUpStartTime, MaxBlockDeltaT=maxDeltaTRampUp),
+						Cooling=list(AvgRampRate=avgHeatBlockRampDownRate*-1, TotalTime=apprxRampDownEndTime-apprxRampDownStartTime, MaxBlockDeltaT=maxDeltaTRampDown),
 						Lid=list(HeatingRate=avgLidHeaterRampUpRate, TotalTime=lidHeaterStopRampTime-lidHeaterStartRampTime))))
 }
