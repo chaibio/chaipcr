@@ -1,6 +1,5 @@
 window.ChaiBioTech.ngApp.directive('summaryModeItem', [
   'ExperimentLoader',
-  'timeFormat',
   function(ExperimentLoader, timeFormat) {
 
     return {
