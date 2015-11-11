@@ -53,8 +53,8 @@ window.ChaiBioTech.ngApp.factory('events', [
           $scope.summaryMode = true;
         });
         var circle = previouslySelected.circle;
-        circle.parent.parentStage.unSelectStage();
         circle.parent.unSelectStep();
+        circle.parent.parentStage.unSelectStage();
         circle.makeItSmall();
         C.canvas.renderAll();
       };
