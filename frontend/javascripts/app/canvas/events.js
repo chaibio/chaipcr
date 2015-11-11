@@ -122,8 +122,9 @@ window.ChaiBioTech.ngApp.factory('events', [
             case "stepGroup":
               me = evt.target.me;
               if(C.editStageStatus === false) {
+                console.log(me);
                 me.closeImage.setVisible(true);
-                if(previouslyHoverd.step) {
+                if(previouslyHoverd.step && previouslyHoverd.step.uniqueName !== me.uniqueName) {
                   previouslyHoverd.step.closeImage.setVisible(false);
                 }
                 previouslyHoverd.step = me;

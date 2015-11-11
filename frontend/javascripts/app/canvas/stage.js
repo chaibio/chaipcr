@@ -174,6 +174,13 @@ window.ChaiBioTech.ngApp.factory('stage', [
 
       this.configureStepForDelete = function(newStep, start) {
 
+        this.childSteps.slice(0, start).forEach(function(thisStep) {
+
+          //thisStep.index = thisStep.index - 1;
+          thisStep.configureStepName();
+          //thisStep.moveStep(-1);
+        }, this);
+
         this.childSteps.slice(start, this.childSteps.length).forEach(function(thisStep) {
 
           thisStep.index = thisStep.index - 1;
