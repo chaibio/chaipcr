@@ -1,6 +1,7 @@
 window.ChaiBioTech.ngApp.directive('summaryModeItem', [
   'ExperimentLoader',
-  function(ExperimentLoader) {
+  'timeFormat',
+  function(ExperimentLoader, timeFormat) {
 
     return {
       restric: 'EA',
@@ -21,7 +22,8 @@ window.ChaiBioTech.ngApp.directive('summaryModeItem', [
           if(angular.isDefined(scope.reading)) {
             if(scope.caption === "Created on") {
               scope.date = true;
-              scope.data = (scope.reading).replace("T", ",").slice(0, -8);
+              //timeFormat.getForSummaryMode(scope.reading);
+              //scope.data = (scope.reading).replace("T", ",").slice(0, -8);
             }
           }
 
