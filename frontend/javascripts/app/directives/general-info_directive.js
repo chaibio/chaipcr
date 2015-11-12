@@ -32,22 +32,6 @@ window.ChaiBioTech.ngApp.directive('general', [
             popupStatus.popupStatusGatherData = scope.popUp;
           });
 
-          scope.$watch('summaryMode', function(summary) {
-
-            if(summary) {
-
-              $(".first-data-row").animate({
-                left: "-=900"
-              }, 500, function() {
-
-                $(".data-box-container-summary-scroll").animate({
-                  left: "-=645"
-                }, 600);
-
-              });
-            }
-          });
-
           scope.$watch('stage.stage_type', function(newVal, oldVal) {
             if(newVal === "cycling") {
               scope.showCycling = true;
