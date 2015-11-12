@@ -51,15 +51,15 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
     updateFluorescenceData = ->
       if !fetching
         fetching = true
-        Experiment.getFluorescenceData($stateParams.id)
-        .success (data) ->
-          return if !data.fluorescence_data
-          fetching = false
-          $scope.chartConfig.axes.x.max = data.total_cycles
-          $scope.chartConfig.axes.x.ticks = helper.Xticks data.total_cycles
-          $scope.chartConfig.axes.y.max = helper.getMaxCalibration data.fluorescence_data
-          $scope.data = helper.neutralizeData data.fluorescence_data
-          hasData = true
+        # Experiment.getFluorescenceData($stateParams.id)
+        # .success (data) ->
+        #   return if !data.fluorescence_data
+        #   fetching = false
+        #   $scope.chartConfig.axes.x.max = data.total_cycles
+        #   $scope.chartConfig.axes.x.ticks = helper.Xticks data.total_cycles
+        #   $scope.chartConfig.axes.y.max = helper.getMaxCalibration data.fluorescence_data
+        #   $scope.data = helper.neutralizeData data.fluorescence_data
+        #   hasData = true
 
     $scope.$watch 'wellButtons', (buttons) ->
       buttons = buttons || {}

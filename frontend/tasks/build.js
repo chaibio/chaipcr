@@ -1,13 +1,17 @@
 var gulp = require('gulp');
+var watch = require('gulp-watch');
+var batch = require('gulp-batch');
 
 gulp.task('watch', function () {
-  gulp.watch([
+
+  watch([
     './frontend/**/*',
     '!./frontend/.tmp/**/*',
     '!./frontend/tasks/**/*',
-  ],
+  ], batch(function (events, done) {
+      gulp.start('debug', done);
+  }));
 
-  ['debug']);
 });
 
 gulp.task('copy-fonts-and-images', ['copy-fonts', 'copy-images']);
