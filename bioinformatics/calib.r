@@ -2,7 +2,7 @@
 
 # function: water calibration
 
-calib <- function(fluo, db_conn, calib_id) {
+calib <- function(fluo, db_conn, calib_id, show_running_time) {
     
     # start counting for running time
     func_name <- 'calib'

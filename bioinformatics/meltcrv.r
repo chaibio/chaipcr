@@ -62,7 +62,7 @@ get_mc_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connec
     tf_ladj <- lapply(tf_list, function(tf) rbind(as.matrix(tf), matrix(NA, nrow=(max_len-dim(tf)[1]), ncol=2)))
     # water calibration
     fluo_mtx <- do.call(cbind, lapply(tf_ladj, function(tf) tf[, 'fluorescence_value']))
-    fluo_calib <- calib(fluo_mtx, db_conn, calib_id)[,2:(num_wells+1)]
+    fluo_calib <- calib(fluo_mtx, db_conn, calib_id, show_running_time)[,2:(num_wells+1)]
     # combine temperature and fluo data
     fluo_calib_list <- alply(fluo_calib, .margins=2, .fun=function(col1) col1)
     mc_calib <- do.call(cbind, lapply(1:num_wells, function(well_num) cbind(tf_ladj[[well_num]][, 'temperature'], 

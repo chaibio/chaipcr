@@ -79,6 +79,7 @@ Qpcrctl::Application.routes.draw do
       get 'status'
       get 'temperature_data'
       get 'fluorescence_data'
+      get 'melt_curve_data'
       get 'baseline_subtracted_ct_data'
       get 'export'
       get 'analyze'
