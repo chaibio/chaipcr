@@ -61,7 +61,7 @@ get_amp_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for conne
     fluo_cast <- dcast(fluo_mlt, cycle_num ~ well_num, mean)
     
     # get calibration data
-    amp_calib <- cbind(fluo_cast[, 'cycle_num'], calib(fluo_cast[,2:(num_wells+1)], db_conn, calib_id))
+    amp_calib <- cbind(fluo_cast[, 'cycle_num'], calib(fluo_cast[,2:(num_wells+1)], db_conn, calib_id, show_running_time))
     colnames(amp_calib)[1] <- 'cycle_num'
     
     # report time cost for this function
