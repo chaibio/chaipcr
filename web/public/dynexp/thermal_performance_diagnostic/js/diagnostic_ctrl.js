@@ -4,43 +4,87 @@
   App.controller('DiagnosticWizardCtrl', [
     '$scope', 'Experiment', 'Status', '$interval', 'DiagnosticWizardService', '$stateParams', '$state', 'CONSTANTS',
     function ($scope, Experiment, Status, $interval, DiagnosticWizardService, $params, $state, CONSTANTS) {
-      var fetchingTemps, fetchTempLogs, getExperiment, pollTemperatures, stopPolling, tempPoll, analyzeExperiment;
+
       Status.startSync();
       $scope.$on('$destroy', function() {
         Status.stopSync();
         stopPolling();
+        cancelAnimation();
       });
+
       $scope.CONSTANTS = CONSTANTS;
-      tempPoll = null;
       $scope.lidTemps = null;
       $scope.blockTemps = null;
-      fetchingTemps = false;
+      var fetchingTemps = false;
       var temperatureLogs = [];
-      fetchTempLogs = function() {
+      var tempPoll = null;
+      var animation;
+      var oldData;
+
+      function fetchTempLogs () {
         if(!fetchingTemps) {
           fetchingTemps = true;
           var last_elapsed_time = temperatureLogs[temperatureLogs.length-1]? temperatureLogs[temperatureLogs.length-1].temperature_log.elapsed_time : 0;
           Experiment.getTemperatureData($scope.experiment.id, {starttime: last_elapsed_time}).then(function(resp) {
-            var ref, ref1;
             if (resp.data.length === 0) return;
-            temperatureLogs = temperatureLogs.concat(resp.data);
-            $scope.lidTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getLidTemps();
-            $scope.blockTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getBlockTemps();
-            // temperatureLogs = DiagnosticWizardService.temperatureLogs(temperatureLogs).getSliced();
+            var data = resp.data;
+            updateData(oldData, angular.copy(data));
+            oldData = resp.data;
           })
           .finally(function () {
             fetchingTemps = false;
           });
         }
       };
-      pollTemperatures = function() {
+
+      function updateData (old, data) {
+        animate(angular.copy(temperatureLogs), angular.copy(data));
+        temperatureLogs = temperatureLogs.concat(data);
+        $scope.lidTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getLidTemps();
+        $scope.blockTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getBlockTemps();
+        temperatureLogs = DiagnosticWizardService.temperatureLogs(temperatureLogs).getLast30seconds();
+      }
+
+      function animate (old, data) {
+
+        cancelAnimation();
+        var calibration = 50;
+        var duration = 2500;//ms
+        var calibration_index = 0;
+
+        old = old.length > 0? old : data;
+        $scope.min_x = $scope.min_x || old[0].temperature_log.elapsed_time;
+        $scope.max_x = $scope.max_x ||old[old.length-1].temperature_log.elapsed_time;
+
+        var x_diff = (data[data.length-1].temperature_log.elapsed_time) - $scope.max_x;
+        var x_increment;
+        x_increment = x_increment || x_diff/calibration;
+
+        animation = $interval(function () {
+
+          if (calibration_index === calibration) {
+            cancelAnimation();
+          }
+
+          if ($scope.max_x/1000 > 30) $scope.min_x += x_increment;
+          $scope.max_x += x_increment;
+          calibration_index ++;
+        }, duration/calibration);
+
+      }
+
+      function cancelAnimation () {
+        $interval.cancel(animation);
+      }
+
+      function pollTemperatures () {
         if (!tempPoll) tempPoll = $interval(fetchTempLogs, 1000);
       };
-      stopPolling = function() {
+      function stopPolling () {
         $interval.cancel(tempPoll);
         tempPoll = null;
       };
-      getExperiment = function(cb) {
+      function getExperiment (cb) {
         if (!$params.id) return;
         cb = cb || angular.noop;
         return Experiment.get({
@@ -49,7 +93,7 @@
           return cb(resp);
         });
       };
-      analyzeExperiment = function () {
+      function analyzeExperiment () {
         if (!$scope.analyzedExp) {
           Experiment.analyze($params.id).then(function (resp) {
             $scope.analyzedExp = resp.data;

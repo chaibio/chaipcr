@@ -3,6 +3,11 @@
 
 getPar <- function(x, type = c("fit", "curve"), cp = "cpD2", eff = "sigfit", ...) 
 {
+  
+  # xqrm: start counting for running time
+  func_name <- 'getPar'
+  start_time <- proc.time()[['elapsed']]
+  
   type <- match.arg(type)
   options(expressions = 20000)  
   
@@ -66,5 +71,10 @@ getPar <- function(x, type = c("fit", "curve"), cp = "cpD2", eff = "sigfit", ...
   rownames(RES) <- RN  
                    
   cat("\n")
+  
+  # xqrm: report time cost for this function
+  end_time <- proc.time()[['elapsed']]
+  message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
+  
   return(RES)
 }
