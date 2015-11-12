@@ -95,7 +95,7 @@
     .canvas-containing {
       height: 400px;
       width: 1024px;
-      overflow-x: auto;
+      overflow-x: hidden;
       overflow-y: hidden;
 
       .canvasClass {
