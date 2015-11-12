@@ -272,7 +272,6 @@ class ExperimentsController < ApplicationController
     logger.info("R code time #{Time.now-start_time}")
     start_time = Time.now
     results = results.to_ruby
-    logger.info(results[0])
     melt_curve_data = []
     if !results.blank?
       results.each_index do |i|
