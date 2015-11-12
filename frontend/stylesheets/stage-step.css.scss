@@ -111,6 +111,7 @@
     height: 320px;
     background-color: white;
     position: relative;
+    font-family: "dinot";
 
     .unselectOverlay {
       width: 1024px;
@@ -216,7 +217,7 @@
         .name-board {
           height: 50px;
           color: black;
-          font-size: 11px;
+          font-size: 12px;
           font-weight: 100;
           padding-top: 23px;
           font-family: "dinot";
@@ -248,8 +249,8 @@
             height: 30px;
             border: 1px solid black;
             margin-bottom: 17px;
-            font-size: 9px;
-            font-weight: bold;
+            font-size: 12px;
+            font-weight: 100;
           }
 
           .big_button_disabled {
@@ -258,7 +259,7 @@
             height: 30px;
             border: 1px solid #cdcdcd;
             margin-bottom: 12px;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: bold;
             color: #cdcdcd;
             cursor: default;
@@ -269,8 +270,8 @@
             background-color: white;
             height: 30px;
             border: 1px solid black;
-            font-size: 9px;
-            font-weight: bold;
+            font-size: 12px;
+            font-weight: 100;
           }
           .smallButtonEdit {
             background-color: black;
