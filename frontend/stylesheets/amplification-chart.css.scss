@@ -80,6 +80,48 @@ $marginTop: 200px;
 
     }
 
+    $item_switch_gap: 70px;
+    .subheader-switches {
+      margin-top: 20px;
+      margin-left: -($item_switch_gap);
+
+      .item-switch {
+        display: inline-block;
+        margin-left: $item_switch_gap;
+
+        .switch {
+          height: 15px;
+          margin-top: -2px;
+          width: 31px;
+          vertical-align: middle;
+
+          small {
+            width: 15px;
+            height: 15px;
+            border-width: 4px;
+          }
+
+          &.checked {
+            small {
+              left: 16px;
+            }
+          }
+        }
+
+        label {
+          color: $gray;
+          display: inline-block;
+          margin-left: 15px;
+          font-weight: 700;
+        }
+        span.set-auto {
+          color: $blue;
+          cursor: pointer;
+          margin-left: 15px;
+        }
+      }
+    }
+
     .vertical-text {
 
       transform: rotate(-90deg);
