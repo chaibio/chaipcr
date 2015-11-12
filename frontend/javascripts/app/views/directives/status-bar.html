@@ -14,7 +14,7 @@
         <span ng-show="experiment.completion_status === 'aborted' ">ABORTED BY THE USER</span>
         <span ng-show="experiment.completion_status !== 'aborted' && experiment.completion_status !== 'success' ">{{experiment.completion_status}}</span>
       </span>
-      <span class="normal">ran on {{ experiment.completed_at | amCalendar }}</span>
+      <span class="normal">ran {{ experiment.completed_at | amCalendar }}</span>
     </span>
     <span class="idle-state" ng-show="state === 'Idle' && !experiment.started_at">
       <span ng-show="!experiment.id">NO EXPERIMENT RUNNING</span>
