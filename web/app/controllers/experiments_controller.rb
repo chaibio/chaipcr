@@ -13,7 +13,7 @@ class ExperimentsController < ApplicationController
     formats ['json']
   }
   
-  RSERVE_TIMEOUT  = 30
+  RSERVE_TIMEOUT  = 90
   
   def_param_group :experiment do
     param :experiment, Hash, :desc => "Experiment Info", :required => true do
