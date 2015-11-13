@@ -289,7 +289,7 @@ class ExperimentsController < ApplicationController
     logger.info(processes)
     processes.lines.each do |process|
       nodes = process.split(/\W+/)
-      cmd = "kill -9 #{nodes[2]}"
+      cmd = "kill -9 #{nodes[1]}"
       logger.info(cmd)
       system(cmd)
     end
