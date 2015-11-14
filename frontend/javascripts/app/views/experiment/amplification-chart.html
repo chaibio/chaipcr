@@ -48,7 +48,7 @@
         <div>
           <div class="vertical-text">RELATIVE FLUORESCENCE UNITS</div>
           <div class="chart-container">
-            <linechart data="data" options="chartConfig" width="700" height="300"></linechart>
+            <linechart data="data" options="chartConfig" width="700" height="250"></linechart>
           </div>
           <div class="text-center num-cycle-text">NUMBER OF CYCLES</div>
           <div class="choose-chart">
@@ -75,10 +75,10 @@
               <th>Name</th>
               <th>Value</th>
             </tr>
-            <tr ng-repeat="i in [1,2,3,4,5,6,7]">
+            <tr ng-repeat="i in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]">
               <td>
-                <span class="dot"></span>
-                A1
+                <span class="dot" style="background-color: {{COLORS[$index]}}"></span>
+                <span class="text">A{{i}}</span>
               </td>
               <td>Label</td>
               <td>21.23254</td>
