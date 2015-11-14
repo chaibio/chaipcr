@@ -39,7 +39,7 @@ shared_ptr<IControl> QPCRFactory::constructOptics(shared_ptr<SPIPort> ledSPIPort
 }
 
 shared_ptr<IControl> QPCRFactory::constructHeatBlock(ADCController::ConsumersList &consumers) {
-    static const std::vector<SPIDTuning> heatBlockPIDSchedule = {{150, 0.16, 32.0, 0.20}};
+    static const std::vector<SPIDTuning> heatBlockPIDSchedule = {{10, 0.25, 32.0, 0.20},{20, 0.2, 32.0, 0.20},{60, 0.14, 32.0, 0.20},{150, 0.25, 32.0, 0.20}};
     double cutoffFrequency = Filters::CutoffFrequencyForTimeConstant(heatBlockPIDSchedule.at(0).kDerivativeTimeS * kADCRepeatFrequency / kPIDDerivativeGainLimiter);
 
     TemperatureController::Settings settings;
@@ -76,7 +76,7 @@ shared_ptr<IControl> QPCRFactory::constructLid(ADCController::ConsumersList &con
     settings.maxTargetTemp = kLidMaxTargetTemp;
     settings.minTempThreshold = kLidLowTempShutdownThreshold;
     settings.maxTempThreshold = kLidHighTempShutdownThreshold;
-    settings.pidController = new PIDController({{150, 0.2, 100, 0}}, kLidPIDMin, kLidPIDMax, SinglePoleRecursiveFilter(0.01));//was 150, 0.2, 100, 0
+    settings.pidController = new PIDController({{150, 0.35, 100, 0}}, kLidPIDMin, kLidPIDMax, SinglePoleRecursiveFilter(0.01));//was 150, 0.2, 100, 0 ///0.3 works for gain
 
     consumer[ADCController::EReadLid] = settings.thermistor;
 
@@ -94,7 +94,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatSink() {
     settings.maxTargetTemp = kHeatSinkMaxTargetTemp;
     settings.minTempThreshold = kHeatSinkLowTempShutdownThreshold;
     settings.maxTempThreshold = kHeatSinkHighTempShutdownThreshold;
-    settings.pidController = new PIDController({{100,0.05,10000,0.0}}, kHeatSinkPIDMin, kHeatSinkPIDMax, SinglePoleRecursiveFilter(5));
+    settings.pidController = new PIDController({{100,0.2,10000,0.0}}, kHeatSinkPIDMin, kHeatSinkPIDMax, SinglePoleRecursiveFilter(5));
 
     return HeatSinkInstance::createInstance(settings, kHeatSinkFanControlPWMPath, kFanPWMPeriodNs, ADCPin(kADCPinPath, kHeatSinkThermistorADCPinChannel));
 }

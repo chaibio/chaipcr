@@ -504,14 +504,17 @@ void ExperimentController::calculateEstimatedDuration()
     do
     {
         Stage *stage = experiment.protocol()->currentStage();
-
-        if (!stage->currentStep()->pauseState())
-            duration += stage->currentStep()->holdTime() * 1000;
+        std::time_t holdTime = stage->currentStep()->holdTime();
 
         double temperature = stage->currentStep()->temperature();
 
         if (stage->autoDelta() && stage->currentCycle() > stage->autoDeltaStartCycle())
         {
+            holdTime += stage->currentStep()->deltaDuration() * (stage->currentCycle() - stage->autoDeltaStartCycle());
+
+            if (holdTime < 0)
+                holdTime = 0;
+
             temperature += stage->currentStep()->deltaTemperature() * (stage->currentCycle() - stage->autoDeltaStartCycle());
 
             if (temperature < HeatBlockInstance::getInstance()->minTargetTemperature())
@@ -524,9 +527,9 @@ void ExperimentController::calculateEstimatedDuration()
         rate = rate > 0 && rate <= kDurationCalcHeatBlockRampSpeed ? rate : kDurationCalcHeatBlockRampSpeed;
 
         if (previousTargetTemp < temperature)
-            duration += ((temperature - previousTargetTemp) / rate) * 1000;
+            duration += (((temperature - previousTargetTemp) / rate) + holdTime) * 1000;
         else
-            duration += ((previousTargetTemp - temperature) / rate) * 1000;
+            duration += (((previousTargetTemp - temperature) / rate) + holdTime) * 1000;
 
         previousTargetTemp = temperature;
     }
