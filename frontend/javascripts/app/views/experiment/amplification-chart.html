@@ -15,56 +15,77 @@
 
     <div class="content">
 
-      <div class="chart-section">
+      <!-- <div style="display: inline-block;"> -->
+        <div class="chart-section">
 
-        <div class="curve-header">
-          <span class="curve-title">
-            Standard Curve
-            <img class="arrow-down" src="/images/arrow-down.png">
-          </span>
-          <span class="log-checkboxes">
-            <span class="checkbox-item" ng-click="log_linear = 'log'" ng-class="{checked:log_linear === 'log', unchecked: log_linear !== 'log'}">
-              <span class="checkbox-icon">
-                <span class="inner"></span>
-              </span>
-              LOG.
+          <div class="curve-header">
+            <span class="curve-title">
+              Standard Curve
+              <img class="arrow-down" src="/images/arrow-down.png">
             </span>
-            <span class="checkbox-item" ng-click="log_linear = 'linear'" ng-class="{checked:log_linear === 'linear', unchecked: log_linear !== 'linear'}">
-              <span class="checkbox-icon">
-                <span class="inner"></span>
+            <span class="log-checkboxes">
+              <span class="checkbox-item" ng-click="log_linear = 'log'" ng-class="{checked:log_linear === 'log', unchecked: log_linear !== 'log'}">
+                <span class="checkbox-icon">
+                  <span class="inner"></span>
+                </span>
+                LOG.
               </span>
-              LINEAR
+              <span class="checkbox-item" ng-click="log_linear = 'linear'" ng-class="{checked:log_linear === 'linear', unchecked: log_linear !== 'linear'}">
+                <span class="checkbox-icon">
+                  <span class="inner"></span>
+                </span>
+                LINEAR
+              </span>
             </span>
-          </span>
-        </div>
-        <div>
-          <div class="vertical-text">RELATIVE FLUORESCENCE UNITS</div>
-          <div class="chart-container">
-            <linechart data="data" options="chartConfig" width="700" height="300"></linechart>
           </div>
-          <div class="text-center num-cycle-text">NUMBER OF CYCLES</div>
-
-          <div class="hr-section">
-            <hr>
-          </div>
-
-          <div class="choose-chart">
-            <div class="choose-chart-heading">
-              CHOOSE CHART
+          <div>
+            <div class="vertical-text">RELATIVE FLUORESCENCE UNITS</div>
+            <div class="chart-container">
+              <linechart data="data" options="chartConfig" width="700" height="300"></linechart>
             </div>
-            <div class="row">
-              <div class="col-md-4">
-                <div class="chart-type-option">Amplification Chart</div>
-              </div>
-              <div class="col-md-4">
-                <div class="chart-type-option" ng-click="RunExperimentCtrl.changeChart('temperature-logs')">Thermal Profile</div>
-              </div>
-            </div>
-            <amplification-well-switch ng-model="wellButtons"></amplification-well-switch>
-          </div>
-        </div>
+            <div class="text-center num-cycle-text">NUMBER OF CYCLES</div>
 
-      </div>
+            <div class="hr-section">
+              <hr>
+            </div>
+
+            <div class="choose-chart">
+              <div class="choose-chart-heading">
+                CHOOSE CHART
+              </div>
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="chart-type-option">Amplification Chart</div>
+                </div>
+                <div class="col-md-4">
+                  <div class="chart-type-option" ng-click="RunExperimentCtrl.changeChart('temperature-logs')">Thermal Profile</div>
+                </div>
+              </div>
+              <amplification-well-switch ng-model="wellButtons"></amplification-well-switch>
+            </div>
+          </div>
+
+        </div>
+        <div class="table-container">
+          <table>
+            <tbody>
+              <tr>
+                <th>Well</th>
+                <th>Name</th>
+                <th>Value</th>
+              </tr>
+              <tr ng-repeat="i in [1,2,3,4,5,6,7]">
+                <td>
+                  <span class="dot"></span>
+                  A1
+                </td>
+                <td>Label</td>
+                <td>21.23254</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      <!-- </div> -->
     </div>
 
   </div>
