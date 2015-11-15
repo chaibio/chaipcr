@@ -68,4 +68,7 @@ window.App.directive 'statusBar', [
       $scope.stopExperiment = ->
         Experiment.stopExperiment($scope.experiment.id)
 
+      $scope.resumeExperiment = ->
+        Experiment.resumeExperiment($scope.experiment.id)
+
 ]

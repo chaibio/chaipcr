@@ -1,0 +1,42 @@
+#container {
+  width: 1024px;
+  margin: 0 auto;
+}
+
+.page-layout .row {
+  margin: 0;
+  margin-right: -15px;
+  margin-left: -15px; }
+
+.page-layout .header {
+  width: 100%;
+  background-color: #333;
+  padding: 8px 0px;
+  padding-bottom: 9px;
+}
+  .page-layout .header .name-container {
+    display: inline-block;
+    color: #d6d4d1;
+    margin-left: 10px;
+    font-size: 13px;
+    font-family: "Fun City"; }
+  .page-layout .header .stripes-and-name {
+    width: 100%;
+    padding-left: 32px;
+  }
+  .page-layout .header .stripes-and-name a {
+    display: inline-block;
+  }
+  .page-layout .header .stripes {
+    width: 10px;
+    display: inline-block;
+    cursor: pointer;
+  }
+    .page-layout .header .stripes .stripe {
+      height: 1px;
+      width: 100%;
+      margin-bottom: 2px;
+      background-color: #fff; }
+
+.page-layout .content {
+  padding-top: 20px; }

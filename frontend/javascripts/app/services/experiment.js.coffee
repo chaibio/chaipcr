@@ -42,6 +42,9 @@ window.ChaiBioTech.ngApp
     self.stopExperiment = ->
       $http.post "#{host}:8000/control/stop"
 
+    self.resumeExperiment = ->
+      $http.post "#{host}:8000/control/resume"
+
     self.getExperimentDuration = (exp) ->
       start = new Date(exp.started_at)
       end = new Date(exp.completed_at)

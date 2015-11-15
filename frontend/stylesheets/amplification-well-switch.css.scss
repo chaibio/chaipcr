@@ -1,6 +1,9 @@
 @import './colors.css.scss';
 
   .choose-chart {
+
+    margin-top: 50px;
+
     .choose-chart-heading {
       border-bottom: 2px solid black;
     }
@@ -40,6 +43,7 @@
 
         display: inline-block;
         position: relative;
+        margin-top: 8px; // <-- should be removed if show 2 cts
 
         .dot {
           border-radius: 10px;
@@ -54,11 +58,11 @@
             background: #dedede;
           }
         }
-        &.ct-2 {
-          .dot {
-            background: $gray;
-          }
-        }
+        // &.ct-2 {
+        //   .dot {
+        //     background: $gray;
+        //   }
+        // }
 
         .text {
           display: inline-block;

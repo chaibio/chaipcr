@@ -14,7 +14,7 @@
         <span ng-show="experiment.completion_status === 'aborted' ">ABORTED BY THE USER</span>
         <span ng-show="experiment.completion_status !== 'aborted' && experiment.completion_status !== 'success' ">{{experiment.completion_status}}</span>
       </span>
-      <span class="normal">{{getDuration() | secondsDisplay: 'display2'}}</span>
+      <span class="normal">ran {{ experiment.completed_at | amCalendar }}</span>
     </span>
     <span class="idle-state" ng-show="state === 'Idle' && !experiment.started_at">
       <span ng-show="!experiment.id">NO EXPERIMENT RUNNING</span>
@@ -44,6 +44,10 @@
     <span class="controls-container">
       <span class="control" ng-show="state === 'Idle' && experiment" experiment-id="experiment.id" duplicate-experiment>DUPLICATE EXPERIMENT</span>
       <span class="control" ng-show="!experiment.started_at && experiment.id" ng-class="{'disabled': experiment.started_at}" ng-click="startExperiment()">BEGIN EXPERIMENT</span>
+      <span class="control" ng-show="state === 'Paused'" ng-click="resumeExperiment()">
+        <img src="/images/status-resume-btn.png">
+        RESUME
+      </span>
       <span class="control" ng-show="experiment.started_at && (!experiment.completed_at || isHolding) && state !== 'Idle' " ng-click="stopExperiment()">
         <img src="/images/status-bar-stop-btn.png">
         <span ng-show="!isHolding">STOP EXPERIMENT</span>

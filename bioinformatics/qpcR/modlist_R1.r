@@ -71,7 +71,9 @@ modlist <- function(
   modLIST <- vector("list", length = ncol(allFLUO))
   
   # xrqm
-  bl_list <- list()
+  # bl_list <- list()
+  fluo_add_list <- list()
+  blmod_list <- list()
   blcor_list <- list()
     
   for (i in 1:ncol(allFLUO)) {
@@ -92,6 +94,9 @@ modlist <- function(
       #if (baseline != "none" & baseline != "parm") { # ori
       if (baseline_looped != "parm") { # xqrm
         #FLUO <- baseline(cyc = CYCLES, fluo = FLUO, model = NULL, baseline = baseline, # ori
+        
+        # xqrm
+        blmod <- NULL # baseline subtraction is not thru 'parm', thus no sigmoid model to output
         
         # xqrm
         if (baseline_looped == "none") {
@@ -128,6 +133,7 @@ modlist <- function(
                 round(addition, 2), 
                 ' before baseline subtraction by \'parm\'.')
         }
+      fluo_add_list[[i]] <- FLUO
       
       ## fit model
       DATA <- data.frame(Cycles = CYCLES, Fluo = FLUO)    
@@ -151,10 +157,12 @@ modlist <- function(
           # line 117: fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent=FALSE) # xqrm
           # line 120: if (baseline == "parm") { #fitOBJ <- baseline(model = fitOBJ, baseline = baseline)
           baseline_looped <- fallback
+          blmod <- NULL # baseline subtraction is not thru 'parm', thus no sigmoid model to output
           message('Baseline subtraction method falls back from \'parm\' to \'', fallback, '\', since sigmoid fitting failed for amplifcation data before baseline subtraction.')
           next }
         
         # xqrm
+        blmod <- fitOBJ
         t1 <- Sys.time() # time
         bl_out <- baseline(model = fitOBJ, baseline = baseline_looped)
         td <- Sys.time() - t1 # time
@@ -170,6 +178,7 @@ modlist <- function(
     
     # xrqm
     # bl_list[[i]] <- unlist(bl_out['bl'])
+    blmod_list[[i]] <- blmod
     blcor_list[[i]] <- blcor
     
     ## tag names if fit failed
@@ -189,7 +198,7 @@ modlist <- function(
       fitOBJ$isOutlier <- FALSE
     }
     
-    ## optional model selection  
+    ## optional model selection  # xqrm: use `mselect` to choose model for sigmoid fitting of amplification curve
     if (opt) {
       fitOBJ2 <- try(mselect(fitOBJ, verbose = FALSE, sig.level = optPAR$sig.level, crit = optPAR$crit), silent = FALSE) # xqrm added ', silent = FALSE'             
       if (inherits(fitOBJ2, "try-error")) {
@@ -225,6 +234,16 @@ modlist <- function(
   well_names <- colnames(x)[2:ncol(x)]
   # bl_info <- do.call(cbind, bl_list)
   # colnames(bl_info) <- well_names
+  
+  # xqrm
+  # fluo_add for adjusted fluo values when baseline == 'parm'
+  if (length(fluo_add_list) > 0) {
+    fluo_add <- do.call(cbind, fluo_add_list)
+    colnames(fluo_add) <- well_names
+  } else fluo_add <- NULL
+  
+  # xqrm
+  # baseline corrected fluo values
   bl_corrected <- do.call(cbind, blcor_list)
   colnames(bl_corrected) <- well_names
   #try(colnames(bl_corrected) <- well_names, silent=FALSE) # old
@@ -273,6 +292,7 @@ modlist <- function(
     } 
   }
   
+  class(blmod_list) <- c("modlist", "pcrfit") # xqrm
   class(modLIST) <- c("modlist", "pcrfit")
   #invisible(modLIST) # ori
   
@@ -282,5 +302,7 @@ modlist <- function(
   
   
   # xqrm
-  return(list('ori'=modLIST, 'bl_corrected'=bl_corrected)) # , 'bl_info'=bl_info))
+  return(list('ori'=modLIST, 
+              'fluoa'=fluo_add, 'blmods'=blmod_list, 
+              'bl_corrected'=bl_corrected)) # , 'bl_info'=bl_info))
 }

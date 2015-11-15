@@ -1,28 +1,12 @@
 window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
-  ->
+  'AmplificationChartHelper'
+  (AmplificationChartHelper) ->
     restrict: 'EA'
     require: 'ngModel'
     templateUrl: 'app/views/directives/amplification-well-switch.html'
     link: ($scope, elem, attrs, ngModel) ->
 
-      COLORS = [
-        '#04A0D9'
-        '#1578BE'
-        '#2455A8'
-        '#3B2F90'
-        '#73258C'
-        '#B01C8B'
-        '#FA1284'
-        '#FF004E'
-        '#EA244E'
-        '#FA3C00'
-        '#EF632A'
-        '#F5AF13'
-        '#FBDE26'
-        '#B6D333'
-        '#67BC42'
-        '#13A350'
-      ]
+      COLORS = AmplificationChartHelper.COLORS
 
       $scope.loop = [0..7]
       $scope.buttons = {}

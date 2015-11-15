@@ -12,30 +12,38 @@
         <div class="name-container truncate">{{experiment.name}}</div>
       </div>
     </div>
-
     <div class="content">
-
       <div class="chart-section">
-
         <div class="curve-header">
           <span class="curve-title">
-            Standard Curve
-            <img class="arrow-down" src="/images/arrow-down.png">
+          Standard Curve
+          <img class="arrow-down" src="/images/arrow-down.png">
           </span>
           <span class="log-checkboxes">
-            <span class="checkbox-item" ng-click="log_linear = 'log'" ng-class="{checked:log_linear === 'log', unchecked: log_linear !== 'log'}">
-              <span class="checkbox-icon">
-                <span class="inner"></span>
-              </span>
-              LOG.
-            </span>
-            <span class="checkbox-item" ng-click="log_linear = 'linear'" ng-class="{checked:log_linear === 'linear', unchecked: log_linear !== 'linear'}">
-              <span class="checkbox-icon">
-                <span class="inner"></span>
-              </span>
-              LINEAR
-            </span>
+          <span class="checkbox-item" ng-click="log_linear = 'log'" ng-class="{checked:log_linear === 'log', unchecked: log_linear !== 'log'}">
+          <span class="checkbox-icon">
+          <span class="inner"></span>
           </span>
+          LOG.
+          </span>
+          <span class="checkbox-item" ng-click="log_linear = 'linear'" ng-class="{checked:log_linear === 'linear', unchecked: log_linear !== 'linear'}">
+          <span class="checkbox-icon">
+          <span class="inner"></span>
+          </span>
+          LINEAR
+          </span>
+          </span>
+        </div>
+        <div class="subheader-switches">
+          <div class="item-switch">
+            <switch ng-model="baseline_subtraction"></switch>
+            <label>BASELINE SUBTRACTION</label>
+          </div>
+          <div class="item-switch">
+            <switch ng-model="show_thereshold"></switch>
+            <label>SHOW THERSEHOLD</label>
+            <span class="set-auto">Set Automatically</span>
+          </div>
         </div>
         <div>
           <div class="vertical-text">RELATIVE FLUORESCENCE UNITS</div>
@@ -43,11 +51,6 @@
             <linechart data="data" options="chartConfig" width="700" height="300"></linechart>
           </div>
           <div class="text-center num-cycle-text">NUMBER OF CYCLES</div>
-
-          <div class="hr-section">
-            <hr>
-          </div>
-
           <div class="choose-chart">
             <div class="choose-chart-heading">
               CHOOSE CHART
@@ -63,9 +66,26 @@
             <amplification-well-switch ng-model="wellButtons"></amplification-well-switch>
           </div>
         </div>
-
+      </div>
+      <div class="table-container">
+        <table>
+          <tbody>
+            <tr>
+              <th>Well</th>
+              <th>Type</th>
+              <th>Value</th>
+            </tr>
+            <tr ng-repeat="i in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]">
+              <td>
+                <span class="dot" style="background-color: {{COLORS[$index]}}"></span>
+                <span class="text">A{{i}}</span>
+              </td>
+              <td>Sample</td>
+              <td>Ct</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-
   </div>
 </div>

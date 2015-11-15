@@ -66,7 +66,7 @@ const double kHeatBlockZonesMaxTargetTemp = 105;
 const double kHeatBlockLowTempShutdownThreshold = -20;
 const double kHeatBlockHighTempShutdownThreshold = 120;
 
-const double kMaxHeatBlockRampSpeed = 3.0;
+const double kMaxHeatBlockRampSpeed = 6.0;
 const double kDurationCalcHeatBlockRampSpeed = kMaxHeatBlockRampSpeed;
 
 //LED constants
@@ -85,7 +85,7 @@ const std::vector<int> kWellToLedMappingList = {4, 3, 2, 1, 16, 15, 14, 13, 5, 6
 const double kPCRBeginStepTemperatureThreshold = 0.5;
 
 //Experiment Controller
-const long kTemperatureLoggerInterval = 1000;
+const long kTemperatureLoggerInterval = 200;
 const long kTemperatureLoggerFlushInterval = 1000; //ms
 
 const std::string kDeviceFilePath = {"/root/device.json"};

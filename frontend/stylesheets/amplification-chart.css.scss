@@ -11,7 +11,10 @@ $marginTop: 200px;
   }
 
   .chart-section {
+    display: inline-block;
+    padding-right: 50px;
     width: 700px;
+    vertical-align: top;
 
     .curve-header {
       border-bottom: 3px solid $gray;
@@ -80,6 +83,48 @@ $marginTop: 200px;
 
     }
 
+    $item_switch_gap: 70px;
+    .subheader-switches {
+      margin-top: 20px;
+      margin-left: -($item_switch_gap);
+
+      .item-switch {
+        display: inline-block;
+        margin-left: $item_switch_gap;
+
+        .switch {
+          height: 15px;
+          margin-top: -2px;
+          width: 31px;
+          vertical-align: middle;
+
+          small {
+            width: 15px;
+            height: 15px;
+            border-width: 4px;
+          }
+
+          &.checked {
+            small {
+              left: 16px;
+            }
+          }
+        }
+
+        label {
+          color: $gray;
+          display: inline-block;
+          margin-left: 15px;
+          font-weight: 700;
+        }
+        span.set-auto {
+          color: $blue;
+          cursor: pointer;
+          margin-left: 15px;
+        }
+      }
+    }
+
     .vertical-text {
 
       transform: rotate(-90deg);
@@ -106,6 +151,58 @@ $marginTop: 200px;
       margin-bottom: -15px;
     }
 
+  }
+
+  .table-container {
+    display: inline-block;
+    margin-top: -20px;
+    margin-bottom: -4px;
+    width: 324px;
+
+    table {
+      width: 100%;
+      // box-shadow: -1px 0px 1px $lightgray;
+
+      th {
+        background-color: lighten($gray, 15%);
+        color: #fff;
+        padding: 10px 15px;
+        &:last-of-type {
+          border-right: 1px solid lighten($gray, 15%);
+        }
+      }
+      td {
+        border-left: 1px solid lighten($lightgray, 15%);
+        border-bottom: 1px solid lighten($lightgray, 15%);
+        color: $lightgray;
+        font-family: 'dinot';
+        font-size: 15px;
+        padding: 10px 15px;
+
+        &:first-of-type {
+          color: $gray;
+          font-weight: bold;
+        }
+
+        &:last-of-type {
+          border-right: 1px solid lighten($lightgray, 15%);
+        }
+
+        .dot {
+          border-radius: 100px;
+          display: inline-block;
+          height: 10px;
+          margin-right: 10px;
+          vertical-align: middle;
+          width: 10px;
+        }
+
+        .text {
+          display: inline-block;
+          vertical-align: middle;
+        }
+      }
+    }
   }
 
   .experiment-start-stop-buttons {
