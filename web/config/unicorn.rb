@@ -29,7 +29,7 @@ listen "/root/shared/sockets/unicorn.sock", :backlog => 64
 listen 8080, :tcp_nopush => true
 
 # nuke workers after 30 seconds instead of 60 seconds (the default)
-timeout 30
+timeout 90
 
 # feel free to point this anywhere accessible on the filesystem
 pid "/tmp/unicorn.pid"
