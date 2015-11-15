@@ -1114,7 +1114,7 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
     
     # sigmoid fitting for amplification curve is done here when 'parm', but not part of baseline subtraction process
     #newMODEL <- try(pcrfit(cyc = 1, fluo = 2, data = newDATA, model = model$MODEL), silent = TRUE) # ori
-    newMODEL <- tryCatch(pcrfit(cyc = 1, fluo = 2, data = newDATA, model = model$MODEL), error=err_NA) # xqrm
+    newMODEL <- tryCatch(pcrfit(cyc = 1, fluo = 2, data = newDATA, model = model$MODEL), error=err_NA) # xqrm: use the same model as sigmoid fitting of amplification curve
     return(list('newMODEL'=newMODEL, 'blcor'=blcor))
     #if (inherits(newMODEL, "try-error")) return() # ori
   }

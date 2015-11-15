@@ -9,16 +9,21 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     # baseline_ct
     model <- l4
     baselin <- 'parm'
-    basecyc <- 1:5
+    basecyc <- 3:6 # 1:5 gave poor baseline subtraction results for non-sigmoid shaped data when using 'lin'
     fallback <- 'lin'
+    maxiter <- 20
+    maxfev <- 10000
     type <- 'curve'
     cp <- 'cpD2'
     
     # use functions
     amp_calib <- get_amp_calib(db_usr, db_pwd, db_host, db_port, db_name,
                                exp_id, stage_id, calib_id,
-                               show_running_time) # 1.63-1.75 sec (1st time, 3 tests); 0.94-1.60 sec (2nd time and on, 5 tests)
-    baseline_calib <- baseline_ct(amp_calib, model, baselin, basecyc, fallback, type, cp, show_running_time)
+                               show_running_time)
+    baseline_calib <- baseline_ct(amp_calib, model, baselin, basecyc, fallback, 
+                                  maxiter, maxfev, 
+                                  type, cp, 
+                                  show_running_time)
     return (list('background_subtracted'=amp_calib, 'baseline_subtracted'=baseline_calib['bl_corrected'], 'ct'=baseline_calib['ct_eff']))
     }
 
@@ -72,11 +77,24 @@ get_amp_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for conne
     }
 
 
+# function: extract coefficients as a matrix from a modlist object
+modlist_coef <- function(modLIST, coef_cols) {
+    coef_mtx <- do.call(cbind, lapply(modLIST, 
+        function(item) {
+            coefs <- coef(item)
+            if (is.null(coefs)) coefs <- NA
+            return(coefs) })) # coefficients of sigmoid-fitted models
+    colnames(coef_mtx) <- coef_cols
+    return(coef_mtx)
+    }
+
+
 # function: baseline subtraction and Ct
 baseline_ct <- function(amp_calib, 
                         model, baselin, basecyc, fallback, # modlist parameters. 
                         # baselin = c('none', 'mean', 'median', 'lin', 'quad', 'parm').
                         # fallback = c('none', 'mean', 'median', 'lin', 'quad'). only valid when baselin = 'parm'
+                        maxiter, maxfev, # control parameters for `nlsLM` in `pcrfit`
                         type, cp, # getPar parameters
                         show_running_time=FALSE # option to show time cost to run this function
                         ) {
@@ -84,16 +102,31 @@ baseline_ct <- function(amp_calib,
     func_name <- 'baseline_ct'
     start_time <- proc.time()[['elapsed']]
     
+    control <<- nls.lm.control(maxiter=maxiter, maxfev=maxfev) # define as a global variable to be used in `nlsLM` in `pcrfit`. If not set, (maxiter = 1000, maxfev = 10000) will be used.
     
     # using customized modlist and baseline functions
+    
     mod_R1 <- modlist(amp_calib, model=model, baseline=baselin, basecyc=basecyc, fallback=fallback)
     mod_ori <- mod_R1[['ori']] # original output from qpcR function modlist
-    coef_mtx <- do.call(cbind, lapply(mod_ori, 
-        function(item) {
-            coefs <- coef(item)
-            if (is.null(coefs)) coefs <- NA
-            return(coefs) })) # coefficients of sigmoid-fitted amplification curves
-    colnames(coef_mtx) <- colnames(amp_calib)[2:ncol(amp_calib)]
+    well_names <- colnames(amp_calib)[2:ncol(amp_calib)]
+    mod_ori_cm <- modlist_coef(mod_ori, well_names) # coefficients of sigmoid-fitted amplification curves
+    
+    if (baselin == 'parm') { # prepare output for baseline subtraction sigmoid fitting
+      fluoa <- mod_R1[['fluoa']] # fluorecence with addition to ensure not all negative
+      num_cycles <- dim(fluoa)[1]
+      blmods <- mod_R1[['blmods']] # sigmoid models fitted during baseline subtraction thru 'parm'
+      blmods_cm <- modlist_coef(blmods, well_names) # coefficients for sigmoid-fitted models fitted during baseline subtraction thru 'parm'
+      fluo_blmods <- do.call(cbind, 
+                             lapply(well_names, 
+                                    function(well_name) 
+                                      sapply(1:num_cycles, model$fct, blmods_cm[,well_name])))
+      colnames(fluo_blmods) <- well_names
+    } else {
+      fluoa <- NULL
+      blmods <- NULL
+      blmods_cm <- NULL
+      fluo_blmods <- NULL
+      }
     
     #bl_info <- mod_R1[['bl_info']] # baseline to subtract, which original modlist does not output
     bl_corrected <- mod_R1[['bl_corrected']] # fluorescence data corrected via baseline subtraction, which original modlist does not output
@@ -119,8 +152,11 @@ baseline_ct <- function(amp_calib,
     end_time <- proc.time()[['elapsed']]
     if (show_running_time) message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
     
-    return(list('bl_corrected'=bl_corrected, 'coefficients'=coef_mtx, 'ct_eff'=ct_eff))
-                # removed for performance: , 'mod_ori'=mod_ori, 'bl_info'=bl_info))
+    return(list(
+                'mod_ori'=mod_ori, 
+                # 'bl_info'=bl_info, # removed for performance
+                'fluoa'=fluoa, 'bl_coefs'=blmods_cm, 'fluo_blmods'=fluo_blmods, 
+                'bl_corrected'=bl_corrected, 'coefficients'=mod_ori_cm, 'ct_eff'=ct_eff))
     }
 
 
