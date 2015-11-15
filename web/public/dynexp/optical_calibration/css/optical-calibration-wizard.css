@@ -1,0 +1,80 @@
+.optical-calibration .intro-text-container {
+    width: 700px;
+    margin: 0 auto;
+}
+.optical-calibration .intro-text-container h2 {
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+.optical-calibration .intro-text-container img {
+    display: block;
+    margin: 10px 0;
+    width: 100%;
+}
+.optical-calibration .intro-text-container p {
+    display: block;
+    margin: 0 auto;
+    font-size: 17px;
+    text-align: justify;
+    width: 550px;
+}
+
+.optical-calibration .intro-text-container .button {
+    margin-top: 50px;
+    margin-bottom: 10px;
+}
+
+.optical-calibration {
+    font-family: 'Dinot';
+    color: #000;
+}
+.optical-calibration .content {
+    padding-left: 35px;
+    padding-right: 35px;
+}
+.optical-calibration h1,
+.optical-calibration h2 {
+    font-weight: 700;
+    margin-top: 70px;
+    margin-bottom: 10px;
+}
+.optical-calibration h2 {
+    font-size: 40px;
+}
+.optical-calibration h1 {
+    font-size: 50px;
+}
+.optical-calibration p {
+    color: #333;
+    font-size: 14px;
+}
+.optical-calibration .temp-label {
+    font-size: 17px;
+}
+.optical-calibration .temp-label b {
+    font-weight: 800;
+}
+.optical-calibration button,
+.optical-calibration .button {
+    background: #fff;
+    border: 1px solid #333;
+    color: #000;
+    margin-top: 70px;
+    margin-bottom: 50px;
+    padding: 5px 50px;
+    text-decoration: none;
+}
+.optical-calibration button.green,
+.optical-calibration .button.green {
+    background: #6ACC0A;
+    border-color: transparent;
+    color: #fff;
+}
+.optical-calibration .intro .mini-description {
+    width: 550px;
+    margin: 0 auto;
+}
+
+.optical-calibration .intro .mini-description table>tbody>tr>td{
+    padding-right: 10px;
+}
