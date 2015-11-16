@@ -4,7 +4,8 @@
   var App = window.App = angular.module('OpticalCalibrationApp', [
     'ui.router',
     'ngResource',
-    'http-auth-interceptor'
+    'http-auth-interceptor',
+    'angularMoment'
   ]);
 
   App.value('host', 'http://'+window.location.hostname);
@@ -14,16 +15,16 @@
     '$urlRouterProvider',
     function ($stateProvider, $urlRouterProvider) {
 
-      $urlRouterProvider.otherwise('diagnostic-initialization');
+      $urlRouterProvider.otherwise('introduction');
 
       $stateProvider
-      .state('diagnostic-initialization', {
-        url: '/diagnostic-initialization',
+      .state('introduction', {
+        url: '/introduction',
         templateUrl: './views/intro.html'
       })
-      .state('diagnostic', {
-        url: '/thermal-performance-diagnostic/:id',
-        templateUrl: './views/diagnostic.html'
+      .state('step-1', {
+        url: '/step-1',
+        templateUrl: './views/step-1.html'
       });
 
     }

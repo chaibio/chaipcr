@@ -23,3 +23,33 @@
   font-family: "Dinot";
   font-weight: 700;
   src: url("../fonts/DINOT-Bold.otf"); }
+
+
+@font-face {
+  font-family: "Open Sans";
+  font-weight: 300;
+  src: url("../fonts/open-sans/OpenSans-300.woff2");
+}
+@font-face {
+  font-family: "Open Sans";
+  font-weight: 400;
+  src: url("../fonts/open-sans/OpenSans-Regular.woff");
+}
+
+@font-face {
+  font-family: "Open Sans";
+  font-weight: 600;
+  src: url("../fonts/open-sans/OpenSans-600.woff2");
+}
+
+@font-face {
+  font-family: "Open Sans";
+  font-weight: 700;
+  src: url("../fonts/open-sans/OpenSans-700.woff2");
+}
+
+@font-face {
+  font-family: "Open Sans";
+  font-weight: 800;
+  src: url("../fonts/open-sans/OpenSans-800.woff2");
+}
