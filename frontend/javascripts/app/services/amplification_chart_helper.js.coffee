@@ -35,7 +35,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
 
     @neutralizeData = (fluorescence_data) ->
-      neutralized_data = [@paddData()]
+      neutralized_baseline_data = [@paddData()]
+      neutralized_background_data = [@paddData()]
 
       # get max cycle
       max_cycle = 0
@@ -46,13 +47,17 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         data_by_cycle = _.select fluorescence_data, (datum) ->
           datum.fluorescence_datum.cycle_num is i
 
-        data = cycle_num: i
+        baseline_data = cycle_num: i
+        background_data = cycle_num: i
         for datum in data_by_cycle by 1
-          data["well_#{datum.fluorescence_datum.well_num}"] = datum.fluorescence_datum.calibrated_value
+          baseline_data["well_#{datum.fluorescence_datum.well_num}"] = datum.fluorescence_datum['baseline_subtracted_value']
+          background_data["well_#{datum.fluorescence_datum.well_num}"] = datum.fluorescence_datum['background_subtracted_value']
 
-        neutralized_data.push data
+        neutralized_baseline_data.push baseline_data
+        neutralized_background_data.push background_data
 
-      neutralized_data
+      baseline: neutralized_baseline_data
+      background: neutralized_background_data
 
 
 
@@ -72,11 +77,17 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
       Math.max.apply Math, cycles
 
-    @getMaxCalibration = (fluorescence_data) ->
+    @getMaxCalibration = (fluorescence_data, is_baseline) ->
       calibs = _.map fluorescence_data, (datum) ->
-        datum.fluorescence_datum.calibrated_value
+        datum.fluorescence_datum['baseline_subtracted_value']
 
-      Math.max.apply Math, calibs
+      max_baseline = Math.max.apply Math, calibs
+      calibs = _.map fluorescence_data, (datum) ->
+        datum.fluorescence_datum['background_subtracted_value']
+
+      max_background = Math.max.apply Math, calibs
+
+      return if max_baseline > max_background then max_baseline else max_background
 
     @Xticks = (max)->
       num_ticks = 10

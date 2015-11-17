@@ -13,6 +13,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
     $scope.data = [helper.paddData()]
     $scope.log_linear = 'log'
     $scope.COLORS = helper.COLORS
+    $scope.fluorescence_data = null
 
     $scope.$on 'expName:Updated', ->
       $scope.experiment?.name = expName.name
@@ -56,11 +57,18 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         .success (data) ->
           return if !data.fluorescence_data
           fetching = false
-          $scope.chartConfig.axes.x.max = data.total_cycles
-          $scope.chartConfig.axes.x.ticks = helper.Xticks data.total_cycles
-          $scope.chartConfig.axes.y.max = helper.getMaxCalibration data.fluorescence_data
-          $scope.data = helper.neutralizeData data.fluorescence_data
+          $scope.fluorescence_data = data
+          $scope.chartConfig.axes.x.max = $scope.fluorescence_data.total_cycles
+          $scope.chartConfig.axes.x.ticks = helper.Xticks $scope.fluorescence_data.total_cycles
+          $scope.chartConfig.axes.y.max = helper.getMaxCalibration $scope.fluorescence_data.fluorescence_data
+          $scope.neutralizeData = helper.neutralizeData $scope.fluorescence_data.fluorescence_data, $scope.baseline_subtraction
+          updateChartData()
           hasData = true
+
+    updateChartData = ->
+      return if !$scope.neutralizeData
+      $scope.data = $scope.neutralizeData["#{if $scope.baseline_subtraction then 'baseline' else 'background'}"]
+
 
     $scope.$watch 'wellButtons', (buttons) ->
       buttons = buttons || {}
@@ -72,4 +80,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             y: "well_#{i}"
             color: buttons["well_#{i}"].color
             thickness: '3px'
+
+    $scope.$watch 'baseline_subtraction', (val) ->
+      updateChartData()
+
 ]
