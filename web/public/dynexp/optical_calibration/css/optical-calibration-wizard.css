@@ -114,40 +114,39 @@ p.step{
     padding-right: 0;
 }
 
-.step-1-screen .tubes-container .col-md-6:last-of-type {
+.step-1 .tubes-container .col-md-6:last-of-type {
     padding-left: 50px;
 }
 
 /*step 2 & 4*/
-.step-2-screen .machine-icon-container img,
-.step-4-screen .machine-icon-container img {
+.step-2 .machine-icon-container img,
+.step-4 .machine-icon-container img {
     width: 230px;
     margin-left: 45px;
     display: block;
 }
 
 /*step 3*/
-.step-3-screen img.machine-heating-icon {
+.step-3 img.machine-heating-icon {
     margin: 0 auto;
     margin-top: 50px;
     margin-bottom: 30px;
     width: 200px;
     display: block;
 }
-.step-3-screen p.wait {
+.step-3 p.wait {
     font-weight: bold;
     margin-bottom: 0px;
 }
-.step-3-screen p.heating {
+.step-3 p.heating {
     margin-bottom: 0px;
 }
-.step-3-screen p.note {
+.step-3 p.note {
     color: #777;
     font-size: 10px;
     margin-bottom: 0px;
 }
-.step-3-screen p.dont-open {
-    /*font-size: 14px;*/
+.step-3 p.dont-open {
     margin-top: 30px;
     margin-bottom: 0px;
 }

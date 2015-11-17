@@ -1,4 +1,4 @@
-<div class="step-3-screen">
+<div class="step-3">
   <p class="step"><b>STEP 3</b>/6</p>
   <h2>Heating + Data Collection</h2>
 
@@ -7,7 +7,7 @@
   <div class="text-center">
     <p class="wait">PLEASE WAIT:</p>
     <p class="heating">
-      The lid is heating to <b>120&deg;</b>C <br>
+      The lid is heating to <b>{{experiment.protocol.lid_temperature | round: 1}}&deg;</b>C <br>
     </p>
     <p class="note">
       This will take about one minute
@@ -17,7 +17,7 @@
     </p>
 
     <button class="button" ng-click="cancel=true" ng-show="!cancel">CANCEL</button>
-    <button class="button red" ng-show="cancel">CONFIRM CANCEL</button>
+    <button class="button red" ng-show="cancel" ng-click="cancelExperiment()">CONFIRM CANCEL</button>
   </div>
 
 </div>

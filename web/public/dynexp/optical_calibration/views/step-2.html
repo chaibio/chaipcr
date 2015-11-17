@@ -1,4 +1,4 @@
-<div class="step-2-screen">
+<div class="step-2">
   <p class="step"><b>STEP 2</b>/6</p>
   <h2>Insert Water Strips</h2>
 
@@ -22,8 +22,8 @@
 
   <div class="text-center">
     <a ng-click="cancel=true" class="button" ng-show="!cancel">CANCEL</a>
-    <a href="/" class="button red" ng-show="cancel">CONFIRM CANCEL</a>
-    <a ui-sref="step-3" class="button" ng-show="!cancel">NEXT</a>
+    <a href="/#/user/settings" class="button red" ng-show="cancel">CONFIRM CANCEL</a>
+    <a class="button" ng-show="!cancel" ng-click="createExperiment()">NEXT</a>
   </div>
 
 </div>
