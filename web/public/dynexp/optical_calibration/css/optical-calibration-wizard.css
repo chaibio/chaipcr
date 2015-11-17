@@ -3,23 +3,23 @@ body {
     color: #000;
 }
 
-body h1 {
+h1 {
     font-size: 50px;
 }
 
-body h2 {
+h2 {
     margin-bottom: 10px;
     margin-top: 0;
     font-size: 40px;
     font-weight: 700;
 }
-body p {
+p {
     color: #333;
     font-size: 14px;
 }
 
-body button,
-body .button {
+button,
+.button {
     background: #fff;
     border: 1px solid #333;
     color: #000;
@@ -31,27 +31,33 @@ body .button {
     text-decoration: none;
 }
 
-body button.red,
-body .button.red {
+button:hover,
+.button:hover {
+    text-decoration: none;
+    color: #000;
+}
+
+button.red,
+.button.red {
     background: #E02127;
     border-color: transparent;
     color: #fff;
 }
-body p.step{
+p.step{
     text-align: left;
     margin-bottom: 0px;
 }
 
-body .instruction {
+.instruction {
     margin-top: 50px;
 }
 
-body .instruction .top-text {
+.instruction .top-text {
     color: #333;
 }
 
 /*tubes container sulotion label*/
-body .tubes-container .solution-label img {
+.tubes-container .solution-label img {
     display: inline-block;
     margin: 0 5px;
     margin-right: 10px;
@@ -59,68 +65,89 @@ body .tubes-container .solution-label img {
     height: 20px;
 }
 
-body .tubes-container .solution-label span {
+.tubes-container .solution-label span {
     display: inline-block;
     vertical-align: middle;
 }
 
-body .tubes-container img.tubes {
+.tubes-container img.tubes {
     margin-top: 10px;
     width: 225px;
 }
 
 /*intro page*/
-body .intro h2 {
+.intro h2 {
     margin-top: 17px;
 }
 
-body .intro p {
+.intro p {
     display: block;
     font-size: 17px;
     text-align: justify;
 }
-body .intro .mini-description {
+.intro .mini-description {
     margin-top: 50px;
 }
 
-body .intro .mini-description .section-title{
+.intro .mini-description .section-title{
     color: #333333;
 }
 
-body .intro .mini-description table>tbody>tr>td{
+.intro .mini-description table>tbody>tr>td{
     padding-top: 5px;
     padding-bottom: 5px;
     padding-right: 10px;
 }
-body .intro .mini-description .note{
+.intro .mini-description .note{
     color: #777;
     font-size: 12px;
 }
 
 /*step 1*/
 
-body .row.tubes-container{
+.row.tubes-container{
     margin: 0;
     margin-top: 30px;
 }
-body .tubes-container .col-md-6{
+.tubes-container .col-md-6{
     padding-left: 0;
     padding-right: 0;
 }
 
-body .step-1-screen .tubes-container .col-md-6:last-of-type {
+.step-1-screen .tubes-container .col-md-6:last-of-type {
     padding-left: 50px;
 }
 
-/*step 2*/
-body .step-2-screen .machine-icon-container img {
+/*step 2 & 4*/
+.step-2-screen .machine-icon-container img,
+.step-4-screen .machine-icon-container img {
     width: 230px;
     margin-left: 45px;
     display: block;
 }
-/*step 4*/
-body .step-4-screen .machine-icon-container img {
-    width: 230px;
-    margin-left: 45px;
+
+/*step 3*/
+.step-3-screen img.machine-heating-icon {
+    margin: 0 auto;
+    margin-top: 50px;
+    margin-bottom: 30px;
+    width: 200px;
     display: block;
+}
+.step-3-screen p.wait {
+    font-weight: bold;
+    margin-bottom: 0px;
+}
+.step-3-screen p.heating {
+    margin-bottom: 0px;
+}
+.step-3-screen p.note {
+    color: #777;
+    font-size: 10px;
+    margin-bottom: 0px;
+}
+.step-3-screen p.dont-open {
+    /*font-size: 14px;*/
+    margin-top: 30px;
+    margin-bottom: 0px;
 }
