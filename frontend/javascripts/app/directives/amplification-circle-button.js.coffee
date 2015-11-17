@@ -25,6 +25,7 @@ window.ChaiBioTech.ngApp
         state =
           selected: !ngModel.$modelValue.selected || false
           color: ngModel.$modelValue.color || 'gray'
+          ct: $scope.ct
 
         ngModel.$setViewValue state
         $scope.updateUI()
