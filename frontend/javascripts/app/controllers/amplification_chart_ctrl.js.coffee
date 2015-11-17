@@ -63,7 +63,12 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.chartConfig.axes.y.max = helper.getMaxCalibration $scope.fluorescence_data.fluorescence_data
           $scope.neutralizeData = helper.neutralizeData $scope.fluorescence_data.fluorescence_data, $scope.baseline_subtraction
           updateChartData()
+          updateButtonCts()
           hasData = true
+
+    updateButtonCts = ->
+      for ct, i in $scope.fluorescence_data.ct
+        $scope.wellButtons["well_#{i}"].ct = ct
 
     updateChartData = ->
       return if !$scope.neutralizeData

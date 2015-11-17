@@ -11,10 +11,12 @@ window.ChaiBioTech.ngApp
         ngModel.$modelValue
       , (newVal) ->
         $scope.updateUI() if newVal
+      , true
 
       $scope.updateUI = ->
         $scope.selected = ngModel.$modelValue.selected
         $scope.color = ngModel.$modelValue.color || 'gray'
+        $scope.ct = ngModel.$modelValue.ct || 0;
 
         $scope.style =
           borderColor: $scope.color
