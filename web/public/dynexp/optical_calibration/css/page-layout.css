@@ -39,4 +39,11 @@
       background-color: #fff; }
 
 .page-layout .content {
-  padding-top: 20px; }
+  padding-top: 20px;
+  width: 550px;
+  margin: 0 auto;
+}
+
+a {
+  cursor: pointer;
+}

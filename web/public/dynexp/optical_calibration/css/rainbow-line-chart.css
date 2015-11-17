@@ -1,7 +1,0 @@
-.rainbow-line-chart {
-  -moz-transform: rotateX(180deg);
-  -webkit-transform: rotateX(180deg);
-  -ms-transform: rotateX(180deg);
-  -o-transform: rotateX(180deg);
-  transform: rotateX(180deg);
-  width: 100%; }

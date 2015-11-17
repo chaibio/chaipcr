@@ -25,6 +25,10 @@
       .state('step-1', {
         url: '/step-1',
         templateUrl: './views/step-1.html'
+      })
+      .state('step-2', {
+        url: '/step-2',
+        templateUrl: './views/step-2.html'
       });
 
     }

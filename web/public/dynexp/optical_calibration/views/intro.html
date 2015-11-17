@@ -1,66 +1,47 @@
-<div class="page-layout" ng-controller="DiagnosticInitCtrl">
-  <div class="header">
-    <div class="stripes-and-name">
-      <a href="/">
-        <div class="stripes">
-          <div class="stripe"></div>
-          <div class="stripe"></div>
-          <div class="stripe"></div>
-        </div>
-      </a>
-      <div class="name-container truncate">OPEN QPCR OPTICAL CALIBRATION</div>
+<div class="intro">
+  <h2>Open qPCR Optical Calibration</h2>
+
+  <p>
+    The optical calibration procedure corrects well-to-well differences in Open qPCR's optical path,
+    allowing data to be compared between wells. The calibration should be performed whenever the lid height is adjusted, the make of PCR tubes is changed, or the Open qPCR is transported.
+  </p>
+
+  <div class="mini-description">
+    <div class="row text-left">
+      <div class="col-md-3">
+        <b class="section-title">DURATION</b>
+        <br>
+        ~30 minutes
+      </div>
+      <div class="col-md-9">
+        <b class="section-title">MATERIALS REQUIRED</b>
+        <table>
+          <tbody>
+            <tr>
+              <td>4x</td>
+              <td><b>8-well PCR strips</b></td>
+            </tr>
+            <tr>
+              <td>200uL</td>
+              <td><b>Water</b> [25uL/tube]</td>
+            </tr>
+            <tr>
+              <td>200uL</td>
+              <td><b>Chai's Open qPCR Calibration Solution</b> [25uL/tube]</td>
+            </tr>
+          </tbody>
+        </table>
+        <span class="note">
+          *It is important to pipette the caliration solution from the same stock tube. If the solution is pipetted from different stock tubes, the stock solution  should first be mixed.
+        </span>
+      </div>
     </div>
   </div>
 
-  <div class="content text-center intro">
-
-    <div class="intro-text-container">
-      <h2>Open qPCR Optical Calibration</h2>
-
-      <p>
-        The optical calibration procedure corrects well-to-well differences in Open qPCR's optical path,
-        allowing data to be compared between wells. The calibration should be performed whenever the lid height is adjusted, the make of PCR tubes is changed, or the Open qPCR is transported.
-      </p>
-
-      <div class="mini-description">
-        <div class="row text-left">
-          <div class="col-md-3">
-            <b class="section-title">DURATION</b>
-            <br>
-            ~30 minutes
-          </div>
-          <div class="col-md-9">
-            <b class="section-title">MATERIALS REQUIRED</b>
-            <table>
-              <tbody>
-                <tr>
-                  <td>4x</td>
-                  <td><b>8-well PCR strips</b></td>
-                </tr>
-                <tr>
-                  <td>200uL</td>
-                  <td><b>Water</b> [25uL/tube]</td>
-                </tr>
-                <tr>
-                  <td>200uL</td>
-                  <td><b>Chai's Open qPCR Calibration Solution</b> [25uL/tube]</td>
-                </tr>
-              </tbody>
-            </table>
-            <span class="note">
-              *It is important to pipette the caliration solution from the same stock tube. If the solution is pipetted from different stock tubes, the stock solution  should first be mixed.
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div style="buttons-con">
-        <a href="/" class="button">CANCEL</a>
-        <a ui-sref="step-1" class="button">NEXT</a>
-      </div>
-
-    </div>
-
+  <div class="text-center">
+    <a ng-click="cancel=true" class="button" ng-show="!cancel">CANCEL</a>
+    <a href="/" class="button red" ng-show="cancel">CONFIRM CANCEL</a>
+    <a ui-sref="step-1" class="button" ng-show="!cancel">NEXT</a>
   </div>
-  <status-bar></status-bar>
+
 </div>

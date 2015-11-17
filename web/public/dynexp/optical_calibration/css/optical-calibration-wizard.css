@@ -1,75 +1,85 @@
-.optical-calibration .intro-text-container {
-    width: 700px;
-    margin: 0 auto;
-}
-.optical-calibration .intro-text-container h2 {
-    margin-top: 30px;
-    margin-bottom: 10px;
-}
-.optical-calibration .intro-text-container img {
-    display: block;
-    margin: 10px 0;
-    width: 100%;
-}
-.optical-calibration .intro-text-container p {
-    display: block;
-    margin: 0 auto;
-    font-size: 17px;
-    text-align: justify;
-    width: 550px;
-}
-
 .optical-calibration {
     font-family: 'Dinot';
     color: #000;
 }
 
-.optical-calibration .content {
-    padding-left: 35px;
-    padding-right: 35px;
-}
-.optical-calibration h1,
-.optical-calibration h2 {
-    font-weight: 700;
-    margin-top: 70px;
-    margin-bottom: 10px;
-}
-.optical-calibration h2 {
-    font-size: 40px;
-}
 .optical-calibration h1 {
     font-size: 50px;
+}
+
+.optical-calibration h2 {
+    margin-bottom: 10px;
+    margin-top: 0;
+    font-size: 40px;
+    font-weight: 700;
 }
 .optical-calibration p {
     color: #333;
     font-size: 14px;
 }
-.optical-calibration .temp-label {
-    font-size: 17px;
-}
-.optical-calibration .temp-label b {
-    font-weight: 800;
-}
+
 .optical-calibration button,
 .optical-calibration .button {
     background: #fff;
     border: 1px solid #333;
     color: #000;
     display: inline-block;
+    font-weight: bold;
     margin-top: 70px;
     margin-bottom: 50px;
     padding: 5px 50px;
     text-decoration: none;
 }
-.optical-calibration button.green,
-.optical-calibration .button.green {
-    background: #6ACC0A;
+
+.optical-calibration button.red,
+.optical-calibration .button.red {
+    background: #E02127;
     border-color: transparent;
     color: #fff;
 }
+.optical-calibration p.step{
+    text-align: left;
+    margin-bottom: 0px;
+}
+
+.optical-calibration .instruction {
+    margin-top: 50px;
+}
+
+.optical-calibration .instruction .top-text {
+    color: #333;
+}
+
+/*tubes container sulotion label*/
+.optical-calibration .tubes-container .solution-label img {
+    display: inline-block;
+    margin: 0 5px;
+    margin-right: 10px;
+    vertical-align: middle;
+    height: 20px;
+}
+
+.optical-calibration .tubes-container .solution-label span {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.optical-calibration .tubes-container img.tubes {
+    margin-top: 10px;
+    width: 225px;
+}
+
+/*intro page*/
+.optical-calibration .intro h2 {
+    margin-top: 17px;
+}
+
+.optical-calibration .intro p {
+    display: block;
+    font-size: 17px;
+    text-align: justify;
+}
 .optical-calibration .intro .mini-description {
-    width: 550px;
-    margin: 0 auto;
     margin-top: 50px;
 }
 
@@ -85,4 +95,26 @@
 .optical-calibration .intro .mini-description .note{
     color: #777;
     font-size: 12px;
+}
+
+/*step 1*/
+
+.optical-calibration .row.tubes-container{
+    margin: 0;
+    margin-top: 30px;
+}
+.optical-calibration .tubes-container .col-md-6{
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.optical-calibration .step-1-screen .tubes-container .col-md-6:last-of-type {
+    padding-left: 50px;
+}
+
+/*step 2*/
+.optical-calibration .step-2-screen .machine-icon-container img {
+    width: 230px;
+    margin-left: 45px;
+    display: block;
 }
