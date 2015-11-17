@@ -78,7 +78,14 @@
             <tr ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]">
               <td>
                 <span class="dot" style="background-color: {{wellButtons['well_'+i].color}}"></span>
-                <span class="text">A{{i+1}}</span>
+                <span class="text">
+                  <span ng-show="i < 8">
+                    A{{i+1}}
+                  </span>
+                  <span ng-show="i > 7">
+                    B{{i-7}}
+                  </span>
+                </span>
               </td>
               <td>Sample</td>
               <td>

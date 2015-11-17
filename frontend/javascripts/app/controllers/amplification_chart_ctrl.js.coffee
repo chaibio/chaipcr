@@ -14,6 +14,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
     $scope.log_linear = 'log'
     $scope.COLORS = helper.COLORS
     $scope.fluorescence_data = null
+    $scope.baseline_subtraction = true
 
     $scope.$on 'expName:Updated', ->
       $scope.experiment?.name = expName.name
