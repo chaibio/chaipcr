@@ -15,10 +15,8 @@
       }, function (data, oldData) {
         if (!data) return;
         if (!data.experimentController) return;
-        if (!data.experimentController.expriment) return;
         if (!oldData) return;
         if (!oldData.experimentController) return;
-        if (!oldData.experimentController.expriment) return;
 
         $scope.data = data;
         $scope.state = data.experimentController.machine.state;
