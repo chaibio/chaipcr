@@ -13,7 +13,8 @@ window.ChaiBioTech.ngApp.directive('scrollOnTop', [
         scope.move = 0;
         scope.element = $(".canvas-containing");
         scope.scrollDiff = 0;
-        scope.position = null;
+        scope.position = 0;
+        var bar = $(elem).find(".foreground-bar");
         scope.$watch("width", function(newVal, oldVal) {
 
           var ratio = (newVal / 1024);
@@ -23,16 +24,15 @@ window.ChaiBioTech.ngApp.directive('scrollOnTop', [
 
           scope.move = canvasDiff / scope.scrollDiff;
           // Automatically update
-          if(scope.position) {
+          if(scope.position !== 0) {
               var oldWidth = 300 / (oldVal / 1024);
-              var moveLeft = (oldWidth - width) / 2;
-              //$(elem).find(".foreground-bar").css("left", scope.scrollDiff + "px");
-          } else {
-            $(elem).find(".foreground-bar").css("width", width + "px");
+              var moveLeft = Math.abs(oldWidth - width);
+              scope.position = Math.abs(scope.position - moveLeft);
+              bar.css("left", scope.position + "px");
+              bar.css("width", width + "px");
           }
 
-          //$(elem).find(".foreground-bar").css("left", scope.scrollDiff + "px");
-          //console.log(scrollDiff, canvasDiff, scope.move);
+          bar.css("width", width + "px");
         });
 
         scope.dragElem = $(elem).find(".foreground-bar").draggable({
@@ -49,8 +49,7 @@ window.ChaiBioTech.ngApp.directive('scrollOnTop', [
           },
 
           stop: function(event, ui) {
-            console.log(ui);
-            scope.position = ui.position;
+            scope.position = ui.position.left;
           }
         });
       }
