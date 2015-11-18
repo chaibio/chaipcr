@@ -2,24 +2,39 @@
 	"serial_number": "1234789127894212",
 	"model_number": "M2342JA",
 	"capabilities": {
-		"well_rows": 2,
-		"well_columns": 8,
-		"well_min_volume_ul": 5,
-		"well_max_volume_ul": 100,
-		"excitation_channels": [
-			{
-				"begin_wavelength": 462,
-				"end_wavelength": 490
+		"plate": {
+			"rows": 2,
+			"columns": 8,
+			"min_volume_ul": 5,
+			"max_volume_ul": 100
+		},
+		"optics": {
+			"excitation_channels": [
+				{
+					"begin_wavelength": 462,
+					"end_wavelength": 490
+				}
+			],
+			"emission_channels": [
+				{
+					"begin_wavelength": 510,
+					"end_wavelength": 700
+				}
+			]
+		},
+		"thermal": {
+			"lid": {
+				"max_temp_c": 120
+			},
+			"block": {
+				"min_temp_c": 4,
+				"max_temp_c": 100
 			}
-		],
-		"emission_channels": [
-			{
-				"begin_wavelength": 510,
-				"end_wavelength": 700
-			}
-		],
-		"microsd_size": 8,
-		"emmc_size": 4
+		}
+		"storage": {
+			"microsd_size_gb": 8,
+			"emmc_size_gb": 4
+		}
 	},
 	"processor_architecture": "armv7l",
 	"hardware_definition": {
