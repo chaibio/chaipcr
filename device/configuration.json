@@ -1,0 +1,13 @@
+{
+	"version": "1.0.0",
+	"model": "S0100",
+	"thermal": {
+		"lid": {
+			"max_temp_c": 120
+		},
+		"block": {
+			"min_temp_c": 4,
+			"max_temp_c": 100
+		}
+	}
+}

@@ -22,15 +22,6 @@
 				}
 			]
 		},
-		"thermal": {
-			"lid": {
-				"max_temp_c": 120
-			},
-			"block": {
-				"min_temp_c": 4,
-				"max_temp_c": 100
-			}
-		}
 		"storage": {
 			"microsd_size_gb": 8,
 			"emmc_size_gb": 4
