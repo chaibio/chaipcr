@@ -12,21 +12,28 @@
 
       $scope.$watch(function () {
         return Status.getData();
-      }, function (data) {
-        console.log(data);
+      }, function (data, oldData) {
         if (!data) return;
         if (!data.experimentController) return;
         if (!data.experimentController.expriment) return;
+        if (!oldData) return;
+        if (!oldData.experimentController) return;
+        if (!oldData.experimentController.expriment) return;
+
         $scope.data = data;
         $scope.state = data.experimentController.machine.state;
-        if ($scope.state === 'Paused' && $state.current.name === 'step-3') {
-          $state.go('step-4');
-          return;
-        }
         if (data.experimentController.expriment && !$scope.experiment) {
           TestInProgressService.getExperiment(data.experimentController.expriment.id).then(function (exp) {
             $scope.experiment = exp;
           });
+        }
+        if ($scope.state === 'Paused' && $state.current.name === 'step-3') {
+          $state.go('step-4');
+          return;
+        }
+        if ($scope.state === 'Idle' && oldData.experimentController.machine.state !== $scope.state) {
+          // experiment is complete
+          $state.go('step-6');
         }
       });
 
