@@ -73,6 +73,17 @@
 }
 
 @font-face {
+  font-family: "dinot-regular";
+  font-weight: 300;
+  src: url("/fonts/dinot/DINOT-Regular.otf");
+}
+
+@font-face {
+  font-family: "dinot-bold";
+  src: url("/fonts/dinot/DINOT-Bold.otf");
+}
+
+@font-face {
   font-family: "dinot";
   font-weight: bold;
   src: url("/fonts/dinot/DINOT-Bold.otf");

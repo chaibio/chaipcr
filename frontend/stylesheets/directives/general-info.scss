@@ -1,8 +1,9 @@
 .bottom-step-no {
 
   font-size: 20px;
-  font-family: "dinot";
+  font-family: "dinot-bold";
   float: left;
+  //font-weight: bold;
   margin-top: 22px;
   margin-left: 2px;
   float: left;
@@ -10,7 +11,7 @@
 .bottom-no-of-stages {
   float: left;
   font-size: 16px;
-  font-family: "dinot";
+  font-family: "dinot-regular";
   margin-top: 27px;
 }
 
@@ -24,9 +25,10 @@
   float: left;
   margin-left: 23px;
   position: relative;
-  font-family: "dinot";
+  font-family: "dinot-bold";
   margin-top: 22px;
   max-width: 400px;
+  //font-weight: bold;
 
   .bottom-name-of-step-span {
 
@@ -43,7 +45,7 @@
 }
 .bottom-stage-name {
 
-  font-family: "dinot";
+  font-family: "dinot-regular";
   font-size: 16px;
   margin-top: 27px;
   margin-left: 5px;
@@ -51,7 +53,7 @@
 }
 
 .bottom-step-no-cycle-container {
-  font-family: "dinot";
+  font-family: "dinot-bold";
   visibility: visible;
   float: left;
   position: absolute;
@@ -62,7 +64,7 @@
     font-size: 20px;
     float: left;
     span {
-      text-decoration: underline;;
+      text-decoration: underline;
     }
 
     .bottom-step-no-cycle-edit {
@@ -72,7 +74,6 @@
       top: 0px;
       left: 0px;
       border: none;
-
     }
   }
 }
@@ -83,6 +84,7 @@
   margin-top: 4px;
 }
 .bottom-cycles-and-dots {
+  font-family: "dinot-regular";
   font-size: 16px;
   margin-top: 6px;
   margin-left: 3px;
@@ -92,7 +94,7 @@
 .bottom-gather-data {
     position: absolute;
     left: 641px;
-    font-family: "dinot";
+    font-family: "dinot-bold";
     font-size: 12px;
     font-weight: 100;
     margin-top: 30px;
