@@ -25,41 +25,44 @@
         }
       });
 
-      function getSteps (experiment) {
-        var steps = [];
-        for (var i=0; i < experiment.protocol.stages.length;i++) {
-          var stage = experiment.protocol.stages[i];
-          var stage_steps = stage.stage.steps;
+      // function getSteps (experiment) {
+      //   var steps = [];
+      //   for (var i=0; i < experiment.protocol.stages.length;i++) {
+      //     var stage = experiment.protocol.stages[i];
+      //     var stage_steps = stage.stage.steps;
 
-          for (var ii=0; ii < stage_steps.length; ii ++) {
-            var step = stage_steps[i].step;
-            step.id = parseInt(step.id);
-            steps.push(step);
-          }
-        }
-        console.log('steps:');
-        console.log(steps);
-        return steps;
-      }
+      //     for (var ii=0; ii < stage_steps.length; ii ++) {
+      //       var step = stage_steps[i].step;
+      //       step.id = parseInt(step.id);
+      //       steps.push(step);
+      //     }
+      //   }
+      //   console.log('steps:');
+      //   console.log(steps);
+      //   return steps;
+      // }
 
-      function getCurrentStep (steps, step_id) {
-        console.log('step_id: '+ step_id);
-        step_id = parseInt(step_id);
-        var s = _.find(steps, {id: step_id});
-        console.log('currentStep:');
-        console.log(s);
-        return s;
-      }
+      // function getCurrentStep (steps, step_id) {
+      //   console.log('step_id: '+ step_id);
+      //   step_id = parseInt(step_id);
+      //   var s = _.find(steps, {id: step_id});
+      //   console.log('currentStep:');
+      //   console.log(s);
+      //   return s;
+      // }
 
       $scope.getBlockHeat = function () {
         if (!$scope.experiment) return;
-        if (!$scope.data) return;
-        if (!$scope.data.experimentController) return;
-        if (!$scope.data.experimentController.expriment) return;
+        if (!$scope.experiment.protocol.stages[0]) return;
+        if (!$scope.experiment.protocol.stages[0].stage.steps[0]) return;
+        return $scope.experiment.protocol.stages[0].stage.steps[0].temperature;
+        // if (!$scope.data) return;
+        // if (!$scope.data.experimentController) return;
+        // if (!$scope.data.experimentController.expriment) return;
 
-        var steps = getSteps($scope.experiment);
-        var currentStep = getCurrentStep(steps, $scope.data.experimentController.expriment.step.id);
-        return currentStep.temperature;
+        // var steps = getSteps($scope.experiment);
+        // var currentStep = getCurrentStep(steps, $scope.data.experimentController.expriment.step.id);
+        // return currentStep.temperature;
       }
 
       $scope.createExperiment = function () {
