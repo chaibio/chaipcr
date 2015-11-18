@@ -31,7 +31,8 @@
           $state.go('step-4');
           return;
         }
-        if ($scope.state === 'Idle' && oldData.experimentController.machine.state !== $scope.state) {
+        console.log('old state: '+oldData.experimentController.machine.state);
+        if ($scope.state === 'Idle' && oldData.experimentController.machine.state !== 'Idle') {
           // experiment is complete
           $state.go('step-6');
         }
