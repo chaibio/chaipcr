@@ -36,7 +36,7 @@
           // experiment is complete
           $state.go('step-6');
         }
-      });
+      }, true);
 
       // function getSteps (experiment) {
       //   var steps = [];
