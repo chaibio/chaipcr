@@ -42,6 +42,9 @@
          experimentId: expId
        });
      };
+     self.resumeExperiment = function() {
+       return $http.post(host + ":8000/control/resume");
+     };
      self.stopExperiment = function() {
        return $http.post(host + ":8000/control/stop");
      };

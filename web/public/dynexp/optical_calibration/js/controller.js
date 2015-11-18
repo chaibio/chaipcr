@@ -13,12 +13,13 @@
       $scope.$watch(function () {
         return Status.getData();
       }, function (data) {
+        console.log(data);
         if (!data) return;
         if (!data.experimentController) return;
         if (!data.experimentController.expriment) return;
         $scope.data = data;
         $scope.state = data.experimentController.machine.state;
-        if ($scope.state === 'Paused' && $state.current.name !== 'step-4') {
+        if ($scope.state === 'Paused' && $state.current.name !== 'step-3') {
           $state.go('step-4');
           return;
         }
@@ -78,6 +79,12 @@
             $scope.experiment = resp.experiment;
             $state.go('step-3');
           });
+        });
+      };
+
+      $scope.resumeExperiment = function () {
+        Experiment.resumeExperiment().then(function () {
+          $state.go('step-5');
         });
       };
 
