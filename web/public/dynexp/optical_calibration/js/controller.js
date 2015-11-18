@@ -19,7 +19,7 @@
         if (!data.experimentController.expriment) return;
         $scope.data = data;
         $scope.state = data.experimentController.machine.state;
-        if ($scope.state === 'Paused' && $state.current.name !== 'step-3') {
+        if ($scope.state === 'Paused' && $state.current.name === 'step-3') {
           $state.go('step-4');
           return;
         }
