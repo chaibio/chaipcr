@@ -18,6 +18,7 @@
         if (!data.experimentController.expriment) return;
         $scope.data = data;
         $scope.state = data.experimentController.machine.state;
+        console.log($scope.state);
         if (data.experimentController.expriment && !$scope.experiment) {
           TestInProgressService.getExperiment(data.experimentController.expriment.id).then(function (exp) {
             $scope.experiment = exp;
