@@ -36,12 +36,18 @@
             steps.push(step);
           }
         }
+        console.log('steps:');
+        console.log(steps);
         return steps;
       }
 
       function getCurrentStep (steps, step_id) {
+        console.log('step_id: '+ step_id);
         step_id = parseInt(step_id);
-        return _.find(steps, {id: step_id});
+        var s = _.find(steps, {id: step_id});
+        console.log('currentStep:');
+        console.log(s);
+        return s;
       }
 
       $scope.getBlockHeat = function () {
