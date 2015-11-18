@@ -6,10 +6,16 @@
 
   <div class="text-center">
     <p class="wait">PLEASE WAIT:</p>
-    <p class="heating">
+    <p class="heating" ng-show="state === 'LidHeating'">
       The lid is heating to <b>{{experiment.protocol.lid_temperature | round: 1}}&deg;</b>C <br>
     </p>
-    <p class="note">
+    <p class="note" ng-show="state === 'LidHeating'">
+      This will take about one minute
+    </p>
+    <p class="heating" ng-show="state === 'Running'">
+      The block is heating to <b>{{getBlockHeat() | round: 1}}&deg;</b>C <br>
+    </p>
+    <p class="note" ng-show="state === 'Running'">
       This will take about one minute
     </p>
     <p class="dont-open">
