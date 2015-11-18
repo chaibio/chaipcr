@@ -58,6 +58,8 @@ gem 'seed-fu'
 
 gem 'rserve-client', :git=>"https://github.com/rapofran/Rserve-Ruby-client.git", :branch => 'sockets-with-timeouts'
 
+gem 'activerecord-import'
+
 # Use unicorn as the app server
 # gem 'unicorn'
 
