@@ -133,15 +133,29 @@ p.step{
     margin-bottom: 30px;
     position: relative;
     width: 200px;
+    height: 166px;
 }
 .step-3 .machine-heating-icon img {
-    width: 100%;
-    display: block;
     position: absolute;
+    display: block;
     top: 0;
     left: 0;
     -webkit-transition: opacity 3s; /* Safari */
     transition: opacity 3s;
+}
+.step-3 .machine-heating-icon img.machine-idle {
+    width: 100%;
+    height: 100%;
+}
+.step-3 .machine-heating-icon img.lid-heating {
+    margin-top: 12px;
+    margin-left: 52px;
+    width: 95px;
+}
+.step-3 .machine-heating-icon img.block-heating {
+    margin-top: 20px;
+    margin-left: 42px;
+    width: 114px;
 }
 .step-3 p.wait {
     font-weight: bold;
