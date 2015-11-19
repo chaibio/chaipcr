@@ -1,17 +1,14 @@
 diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-eMMC-flasher.sh
 --- ./beaglebone-black-eMMC-flasher.sh	2015-10-22 22:22:42.645844935 +0200
-+++ ../tools_updated/beaglebone-black-eMMC-flasher.sh	2015-11-04 00:10:19.297442624 +0200
-@@ -1,4 +1,9 @@
++++ ../tools_updated/beaglebone-black-eMMC-flasher.sh	2015-11-19 02:16:58.000000000 +0200
+@@ -1,4 +1,6 @@
  #!/bin/bash -e
 +
-+/opt/scripts/tools/flasher2.sh>/flasher.log
-+
-+exit
 +
  #
  # Copyright (c) 2013-2014 Robert Nelson <robertcnelson@gmail.com>
  #
-@@ -23,6 +28,12 @@
+@@ -23,6 +25,12 @@
  #This script assumes, these packages are installed, as network may not be setup
  #dosfstools initramfs-tools rsync u-boot-tools
  
@@ -24,7 +21,7 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  if ! id | grep -q root; then
  	echo "must be run as root"
  	exit
-@@ -38,12 +49,12 @@
+@@ -38,12 +46,12 @@
  
  if [ "x${boot_drive}" = "xmmcblk0p1" ] ; then
  	source="/dev/mmcblk0"
@@ -39,7 +36,7 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  fi
  
  flush_cache () {
-@@ -52,11 +63,11 @@
+@@ -52,11 +60,11 @@
  
  flush_cache_mounted () {
  	sync
@@ -53,27 +50,30 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  
  	if [ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] ; then
  		echo heartbeat > /sys/class/leds/beaglebone\:green\:usr0/trigger
-@@ -66,17 +77,20 @@
+@@ -66,17 +74,23 @@
  	fi
  	echo "-----------------------------"
  	flush_cache
 -	umount ${destination}p1 || true
 -	umount ${destination}p2 || true
++
 +	umount ${emmcdev}p1 || true
 +	umount ${emmcdev}p2 || true
 +        umount ${emmcdev}p3 || true
 +        umount ${emmcdev}p4 || true
-+ 
++
  	exit
  }
  
  umount_p1 () {
 -	umount ${destination}p1 || umount -l ${destination}p1 || write_failure
++	echo "umount p1"
 +	umount ${emmcdev}p1 || umount -l ${emmcdev}p1 || write_failure
  }
  
  umount_p2 () {
 -	umount ${destination}p2 || umount -l ${destination}p2 || write_failure
++	echo "umount p2"
 +	umount ${emmcdev}p2 || umount -l ${emmcdev}p2 || write_failure
  }
  
@@ -103,7 +103,7 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  	a
  	1
  	w
-@@ -125,38 +139,65 @@
+@@ -125,38 +139,66 @@
  }
  
  format_boot () {
@@ -173,10 +173,11 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  	do
 -		DRIVE=$(mount | grep -v none | grep "${destination}" | tail -1 | awk '{print $1}')
 +		DRIVE=$(mount | grep -v none | grep "${emmcdev}" | tail -1 | awk '{print $1}')
++		echo "debug: unmount loop"
  		umount ${DRIVE} >/dev/null 2>&1 || umount -l ${DRIVE} >/dev/null 2>&1 || write_failure
  	done
  
-@@ -166,23 +207,13 @@
+@@ -166,23 +208,13 @@
  
  	format_boot
  	format_root
@@ -204,7 +205,7 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  	if [ "${root_uuid}" ] ; then
  		root_uuid="UUID=${root_uuid}"
  		device_id=$(cat /tmp/boot/uEnv.txt | grep mmcroot | grep mmcblk | awk '{print $1}' | awk -F '=' '{print $2}')
-@@ -195,13 +226,96 @@
+@@ -195,13 +227,105 @@
  		root_uuid="${source}p2"
  	fi
  	flush_cache_mounted
@@ -215,13 +216,21 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
 +	mkdir -p /tmp/boot/ || true
 +	mount ${emmcdev}p1 /tmp/boot/ -o sync
 +	#Make sure the BootLoader gets copied first:
++
++	echo "debug: Removing everything on boot partition first!"
++	rm -r /tmp/boot/*
++
++	echo "debug: copy 1"
 +	cp -v /boot/uboot/MLO /tmp/boot/MLO || write_failure
 +	flush_cache_mounted
 +
++	echo "debug: copy 2"
 +	cp -v /boot/uboot/u-boot.img /tmp/boot/u-boot.img || write_failure
 +	flush_cache_mounted
 +
-+	rsync -aAXv /boot/uboot/ /tmp/boot/ --exclude={MLO,u-boot.img,*bak,flash-eMMC.txt,flash-eMMC.log} || write_failure
++	echo "debug: copy 3"
++	#this command should fail as we are copying to a fat partition and we cant set permissions for fat
++	rsync -aAXv /boot/uboot/ /tmp/boot/ --exclude={MLO,u-boot.img,*bak,flash-eMMC.txt,flash-eMMC.log} || true #write_failure
 +	flush_cache_mounted
 +
 +	set_boot_uuid
@@ -276,7 +285,7 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
 +
 +
 +	echo "Removing uEnv..."
-+	mv /boot/uboot/uEnv.txt /boot/uboot/uEnv.txt.org
++	cp /boot/uboot/uEnv.txt /boot/uboot/uEnv.txt.org
 +
 +	echo "Shutting Down..."
 +
@@ -294,6 +303,7 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  	mkdir -p /tmp/rootfs/ || true
 -	mount ${destination}p2 /tmp/rootfs/ -o async,noatime
 +	mount ${emmcdev}p2 /tmp/rootfs/ -o async,noatime
++	echo "debug: rsync"
  	rsync -aAXv /* /tmp/rootfs/ --exclude={/dev/*,/proc/*,/sys/*,/tmp/*,/run/*,/mnt/*,/media/*,/lost+found,/boot/*,/lib/modules/*} || write_failure
 +
 +	mkdir /tmp/rootfs/data/ || true
@@ -302,7 +312,17 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  	flush_cache_mounted
  
  	if [ -f /tmp/rootfs/opt/scripts/images/beaglebg.jpg ] ; then
-@@ -221,7 +335,7 @@
+@@ -214,14 +338,17 @@
+ 
+ 	mkdir -p /tmp/rootfs/boot/uboot/ || true
+ 	mkdir -p /tmp/rootfs/lib/modules/$(uname -r)/ || true
++
++	echo "debug: rsync2"
+ 	rsync -aAXv /lib/modules/$(uname -r)/* /tmp/rootfs/lib/modules/$(uname -r)/ || write_failure
+ 	flush_cache_mounted
+ 
++	echo "debug: cp //"
+ 	cp /boot/initrd.img-$(uname -r) /tmp/rootfs/boot/ || write_failure
  	flush_cache_mounted
  
  	unset boot_uuid
@@ -311,7 +331,7 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  	if [ "${boot_uuid}" ] ; then
  		boot_uuid="UUID=${boot_uuid}"
  	else
-@@ -238,26 +352,89 @@
+@@ -238,26 +365,89 @@
  	flush_cache_mounted
  	umount_p2
  
@@ -363,7 +383,7 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
 -copy_rootfs
 +
 +echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-+ 
++
 +if [ -e "${emmcdev}p4" ]
 +then
 +        echo "Perminant data partition found! bypassing repartitioning!"
@@ -419,635 +439,187 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
 +
 +alldone
 +
-+#shutdown now
-diff -urN ./factory_settings_image_creator0.sh ../tools_updated/factory_settings_image_creator0.sh
---- ./factory_settings_image_creator0.sh	1970-01-01 02:00:00.000000000 +0200
-+++ ../tools_updated/factory_settings_image_creator0.sh	2015-11-04 00:10:19.321442625 +0200
-@@ -0,0 +1,79 @@
-+#!/bin/bash
++shutdown now
+diff -urN ./make_factory_settings_sdcard.sh ../tools_updated/make_factory_settings_sdcard.sh
+--- ./make_factory_settings_sdcard.sh	1970-01-01 02:00:00.000000000 +0200
++++ ../tools_updated/make_factory_settings_sdcard.sh	2015-11-02 11:49:28.000000000 +0200
+@@ -0,0 +1,172 @@
++#!/bin/sh
++
++#exit
 +
 +echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger 
-+
-+image_filename_prfx="../../factory_settings"
-+image_filename_bin="$image_filename_prfx-rootfs.img.gz" 
-+image_filename_data="$image_filename_prfx-data.img.gz"
-+image_filename_boot="$image_filename_prfx-boot.img.gz"
-+image_filename_pt="$image_filename_prfx-pt.img.gz"
-+
-+echo "Removing previous images"
-+
-+if [ -e $image_filename_bin ]
-+then
-+	rm $image_filename_pt
-+	rm $image_filename_bin
-+	rm $image_filename_data
-+	rm $image_filename_boot
-+fi
-+
-+#echo "Backing up binaries partition to: $image_filename_bin"
-+#exit 0
-+
-+echo "Zeroing binaries partition"
-+dd if=/dev/zero bs=16MB of=/big_zero_file.bin
-+
-+sleep 5
-+sync
-+
-+echo "Removing zeros file"
-+rm /big_zero_file.bin
-+
-+sleep 5
-+sync
-+
-+echo "Zeroing data partition"
-+dd if=/dev/zero bs=16MB of=/data/big_zero_file.bin
-+
-+sleep 5
-+sync
-+
-+echo "Removing zeros file"
-+rm /data/big_zero_file.bin
-+sync
-+
-+echo "Init..."
-+cp /bin/dd .
-+cp /bin/gzip .
-+
-+sleep 5
-+sync
-+
-+echo "Backing up partition table to: $image_filename_pt"
-+dd  if=/dev/mmcblk0 bs=16M count=1 | gzip -c > $image_filename_pt
-+
-+sleep 5
-+sync
-+
-+echo "Backing up binaries partition to: $image_filename_bin"
-+dd  if=/dev/mmcblk0p2 bs=16M | gzip -c > $image_filename_bin
-+
-+sleep 5
-+sync
-+
-+echo "Backing up data partition to: $image_filename_data"
-+dd  if=/dev/mmcblk0p3 bs=16M | gzip -c > $image_filename_data
-+
-+sleep 5
-+sync
-+
-+echo "Backing up boot partition to: $image_filename_boot"
-+dd  if=/dev/mmcblk0p1 bs=16M | gzip -c > $image_filename_boot
-+
-+echo "Finished.. byebye!"
-+
-+sleep 5
-+sync
-+
-+echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
-diff -urN ./factory_settings_image_creator1.sh ../tools_updated/factory_settings_image_creator1.sh
---- ./factory_settings_image_creator1.sh	1970-01-01 02:00:00.000000000 +0200
-+++ ../tools_updated/factory_settings_image_creator1.sh	2015-11-04 00:10:19.325442625 +0200
-@@ -0,0 +1,68 @@
-+#!/bin/bash
-+echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger 
-+
-+image_filename_prfx="../../factory_settings"
-+image_filename_bin="$image_filename_prfx-rootfs.img.gz" 
-+image_filename_data="$image_filename_prfx-data.img.gz"
-+image_filename_boot="$image_filename_prfx-boot.img.gz"
-+image_filename_pt="$image_filename_prfx-pt.img.gz"
-+
-+echo "Removing previous images"
-+
-+if [ -e $image_filename_bin ]
-+then
-+	rm $image_filename_pt
-+	rm $image_filename_bin
-+	rm $image_filename_data
-+	rm $image_filename_boot
-+fi
-+
-+#echo "Backing up binaries partition to: $image_filename_bin"
-+#exit 0
-+
-+echo "Zeroing binaries partition"
-+#dd if=/dev/zero bs=16MB of=/big_zero_file.bin
-+sync
-+
-+echo "Removing zeros file"
-+rm /big_zero_file.bin
-+sync
-+
-+#mount /dev/mmcblk1p3 /data
-+
-+echo "Zeroing data partition"
-+#dd if=/dev/zero bs=16MB of=/data/big_zero_file.bin
-+sync
-+
-+echo "Removing zeros file"
-+rm /data/big_zero_file.bin
-+sync
-+
-+echo "Init..."
-+cp /bin/dd .
-+cp /bin/gzip .
-+
-+sync
-+sleep 5
-+sync
-+
-+echo "Backing up partition table to: $image_filename_pt"
-+dd  if=/dev/mmcblk1 bs=16M count=1 | gzip -c > $image_filename_pt
-+sync
-+
-+echo "Backing up binaries partition to: $image_filename_bin"
-+dd  if=/dev/mmcblk1p2 bs=16M | gzip -c > $image_filename_bin
-+
-+sync
-+echo "Backing up data partition to: $image_filename_data"
-+dd  if=/dev/mmcblk1p3 bs=16M | gzip -c > $image_filename_data
-+
-+sync
-+echo "Backing up boot partition to: $image_filename_boot"
-+dd  if=/dev/mmcblk1p1 bs=16M | gzip -c > $image_filename_boot
-+
-+echo "Finished.. byebye!"
-+sync
-+echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
-+
-+exit 0
-diff -urN ./factory_settings_image_creator.sh ../tools_updated/factory_settings_image_creator.sh
---- ./factory_settings_image_creator.sh	1970-01-01 02:00:00.000000000 +0200
-+++ ../tools_updated/factory_settings_image_creator.sh	2015-11-04 00:10:19.329442626 +0200
-@@ -0,0 +1,12 @@
-+#!/bin/bash
 +
 +if [ -e /dev/mmcblk0p4 ]
 +then
-+        sh ./factory_settings_image_creator0.sh;
++        eMMC=/dev/mmcblk0
++	sdcard=/dev/mmcblk1
 +elif [ -e /dev/mmcblk1p4 ]
 +then
-+       	./factory_settings_image_creator1.sh
++       	eMMC=/dev/mmcblk1
++	sdcard=/dev/mmcblk0
 +else
 +       	echo "4 partitions eMMC not found!"
-+fi
-+
-diff -urN ./flasher2.sh ../tools_updated/flasher2.sh
---- ./flasher2.sh	1970-01-01 02:00:00.000000000 +0200
-+++ ../tools_updated/flasher2.sh	2015-11-04 00:10:19.353442627 +0200
-@@ -0,0 +1,449 @@
-+#!/bin/bash -e
-+
-+
-+#
-+# Copyright (c) 2013-2014 Robert Nelson <robertcnelson@gmail.com>
-+#
-+# Permission is hereby granted, free of charge, to any person obtaining a copy
-+# of this software and associated documentation files (the "Software"), to deal
-+# in the Software without restriction, including without limitation the rights
-+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+# copies of the Software, and to permit persons to whom the Software is
-+# furnished to do so, subject to the following conditions:
-+#
-+# The above copyright notice and this permission notice shall be included in
-+# all copies or substantial portions of the Software.
-+#
-+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+# THE SOFTWARE.
-+
-+#This script assumes, these packages are installed, as network may not be setup
-+#dosfstools initramfs-tools rsync u-boot-tools
-+
-+#uncomment to nutralize the script
-+#echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-+#echo "Temprary off for testing!"
-+#exit
-+
-+
-+if ! id | grep -q root; then
-+	echo "must be run as root"
++	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger 
 +	exit
 +fi
 +
-+unset boot_drive
-+boot_drive=$(LC_ALL=C lsblk -l | grep "/boot/uboot" | awk '{print $1}')
++sync
++echo "Copying from eMMC at $eMMC to sdcard at $sdcard!"
 +
-+if [ "x${boot_drive}" = "x" ] ; then
-+	echo "Error: script halting, system unrecognized..."
-+	exit 1
++image_filename_prfx="/sdcard/temp_factory_settings"
++image_filename_rootfs="$image_filename_prfx-rootfs.img.gz"
++image_filename_data="$image_filename_prfx-data.img.gz"
++image_filename_boot="$image_filename_prfx-boot.img.gz"
++image_filename_pt="$image_filename_prfx-pt.img.gz"
++
++if [ ! -e /sdcard ]
++then
++	mkdir /sdcard
 +fi
 +
-+if [ "x${boot_drive}" = "xmmcblk0p1" ] ; then
-+	source="/dev/mmcblk0"
-+	emmcdev="/dev/mmcblk1"
++if [ ! -e /emmc ]
++then
++	mkdir /emmc
 +fi
 +
-+if [ "x${boot_drive}" = "xmmcblk1p1" ] ; then
-+	source="/dev/mmcblk1"
-+	emmcdev="/dev/mmcblk0"
++
++if [ ! -e /emmcboot ]
++then
++        mkdir /emmcboot
 +fi
 +
-+flush_cache () {
++umount /sdcard || true
++mount ${sdcard}p1 /sdcard
++
++retval=$?
++
++if [ $retval -ne 0 ]; then
++    echo "Chai Factory Settings: Error mounting SDCard! Error($retval)"
++#    exit
++fi
++
++echo "Removing previous images"
++
++if [ -e $image_filename_rootfs ]
++then
++	rm -f $image_filename_pt
++	rm -f $image_filename_rootfs
++	rm -f $image_filename_data
++	rm -f $image_filename_boot
++fi
++
++image_filename_prfx2="/sdcard/factory_settings"
++image_filename_rootfs2="$image_filename_prfx2-rootfs.img.gz"
++image_filename_data2="$image_filename_prfx2-data.img.gz"
++image_filename_boot2="$image_filename_prfx2-boot.img.gz"
++image_filename_pt2="$image_filename_prfx2-pt.img.gz"
++
++if [ -e $image_filename_rootfs2 ]
++then
++	rm -f $image_filename_pt2
++	rm -f $image_filename_rootfs2
++	rm -f $image_filename_data2
++	rm -f $image_filename_boot2
++fi
++
++#echo "Zeroing empty space of rootfs"
++rootfs_partition=${eMMC}p2
++#echo "Rootfs partition: $rootfs_partition"
++#mount $rootfs_partition /mnt
++#echo "Zeroing binaries partition"
++#dd if=/dev/zero of=/mnt/big_zero_file.bin
++
++#sync
++#sleep 5
++#sync
++#sleep 10
++#echo "Removing big zero file"
++#rm /mnt/big_zero_file.bin
++#sleep 5
++#sync
++#sleep 10
++#sync
++#sleep 5
++
++#umount /mnt
++
++data_partition=${eMMC}p3
++echo "Data partition: $data_partition"
++
++mount $data_partition /emmc
++
++retval=$?
++
++if [ $retval -ne 0 ]; then
++    echo "Error mounting data partition! Error($retval)"
++else
++	echo "Zeroing data partition"
++	dd if=/dev/zero of=/emmc/big_zero_file.bin
 +	sync
-+}
-+
-+flush_cache_mounted () {
++	sleep 5
 +	sync
-+	blockdev --flushbufs ${emmcdev}
-+}
++	sleep 10
 +
-+write_failure () {
-+	echo "writing to [${emmcdev}] failed..."
++	echo "Removing zeros file"
++	rm /emmc/big_zero_file.bin
++	sync
++	umount /emmc || true
++fi
 +
-+	if [ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] ; then
-+		echo heartbeat > /sys/class/leds/beaglebone\:green\:usr0/trigger
-+		echo heartbeat > /sys/class/leds/beaglebone\:green\:usr1/trigger
-+		echo heartbeat > /sys/class/leds/beaglebone\:green\:usr2/trigger
-+		echo heartbeat > /sys/class/leds/beaglebone\:green\:usr3/trigger
-+	fi
-+	echo "-----------------------------"
-+	flush_cache
-+
-+	umount ${emmcdev}p1 || true
-+	umount ${emmcdev}p2 || true
-+        umount ${emmcdev}p3 || true
-+        umount ${emmcdev}p4 || true
-+
++finish() {
++	sync
++	umount /sdcard || true
++	umount /emmc || true
++	echo "Finished.. byebye!"
++	sleep 15
++	echo heartbeat > /sys/class/leds/beaglebone\:green\:usr0/trigger
 +	exit
 +}
 +
-+umount_p1 () {
-+	echo "umount p1"
-+	umount ${emmcdev}p1 || umount -l ${emmcdev}p1 || write_failure
-+}
++mount ${sdcard}p1 /mnt || true
 +
-+umount_p2 () {
-+	echo "umount p2"
-+	umount ${emmcdev}p2 || umount -l ${emmcdev}p2 || write_failure
-+}
++echo "Backing up partition table to: $image_filename_pt"
++dd  if=$eMMC bs=16M count=1 | gzip -c > $image_filename_pt
 +
-+check_running_system () {
-+	if [ ! -f /boot/uboot/uEnv.txt ] ; then
-+		echo "Error: script halting, system unrecognized..."
-+		echo "unable to find: [/boot/uboot/uEnv.txt] is ${source}p1 mounted?"
-+		exit 1
-+	fi
++sleep 15
++sync
 +
-+	echo "-----------------------------"
-+	echo "debug copying: [${source}] -> [${emmcdev}]"
-+	lsblk
-+	echo "-----------------------------"
++echo "Backing up boot partition to: $image_filename_boot"
++dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
 +
-+	if [ ! -b "${emmcdev}" ] ; then
-+		echo "Error: [${emmcdev}] does not exist"
-+		write_failure
-+	fi
-+}
++sleep 15
++sync
 +
-+update_boot_files () {
-+	if [ ! -f /boot/initrd.img-$(uname -r) ] ; then
-+		update-initramfs -c -k $(uname -r)
-+	else
-+		update-initramfs -u -k $(uname -r)
-+	fi
++echo "Backing up data partition to: $image_filename_data"
++dd  if=${eMMC}p3 bs=16M | gzip -c > $image_filename_data
 +
-+	if [ -f /boot/vmlinuz-$(uname -r) ] ; then
-+		cp -v /boot/vmlinuz-$(uname -r) /boot/uboot/zImage
-+	fi
++sleep 15
++sync
 +
-+	if [ -f /boot/initrd.img-$(uname -r) ] ; then
-+		cp -v /boot/initrd.img-$(uname -r) /boot/uboot/initrd.img
-+	fi
++echo "Backing up binaries partition to: $image_filename_rootfs"
++dd  if=${eMMC}p2 bs=16M | gzip -c > $image_filename_rootfs
 +
-+	mkimage -A arm -O linux -T ramdisk -C none -a 0 -e 0 -n initramfs -d /boot/initrd.img-$(uname -r) /boot/uboot/uInitrd
-+}
++sleep 15
++sync
 +
-+fdisk_toggle_boot () {
-+	fdisk ${emmcdev} <<-__EOF__
-+	a
-+	1
-+	w
-+	__EOF__
-+	flush_cache
-+}
++mv $image_filename_rootfs $image_filename_rootfs2
++mv $image_filename_data $image_filename_data2
++mv $image_filename_boot $image_filename_boot2
++mv $image_filename_pt $image_filename_pt2
 +
-+format_boot () {
-+	LC_ALL=C fdisk -l ${emmcdev} | grep ${emmcdev}p1 | grep '*' || fdisk_toggle_boot
++sync
++echo "creating factory settings images  done!!"
 +
-+	mkfs.vfat -F 16 ${emmcdev}p1 -n boot
-+	flush_cache
-+}
++sleep 5
 +
-+format_root () {
-+	mkfs.ext4 ${emmcdev}p2 -L rootfs
-+	flush_cache
-+}
++finish
 +
-+format_perm () {
-+	mkfs.ext4 ${emmcdev}p3 -L rootfs
-+	flush_cache
-+}
-+
-+format_data () {
-+	mkfs.ext4 ${emmcdev}p4 -L rootfs
-+	flush_cache
-+}
-+
-+repartition_drive () {
-+	dd if=/dev/zero of=${emmcdev} bs=1M count=16
-+	flush_cache
-+
-+	echo "Repartitioning eMMC!"
-+#	emmc_sectors=$( blockdev --getsize "${emmcdev}" )
-+	echo "eMMC Sectors are: $emmc_sectors.. at $emmcdev"
-+
-+#	rootfs_size=$(( (emmc_sectors - 8*1024*2 - 512*1024*2 - 96*1024*2 - 2*1024*2)/1024/2 ))
-+	echo "rootfs size: $rootfs_size M.. before partitioning"
-+
-+	#96Mb fat formatted boot partition
-+	LC_ALL=C sfdisk --force --in-order --Linux --unit M "${emmcdev}" <<-__EOF__
-+		1,96,0xe,*
-+		,$rootfs_size,,-
-+		,512,,-
-+		,,,-
-+	__EOF__
-+
-+	echo "Partitioned!"
-+}
-+
-+perm_lastsector=$((emmc_sectors - 1))
-+perm_firstsector=$((perm_lastsector - 8*1024*2))
-+data_lastsector=$((perm_firstsector - 1 ))
-+data_firstsector=$((data_lastsector - 500*1024*2 ))
-+rootfs_lastsector=$((data_firstsector - 1))
-+
-+partition_drive () {
-+	flush_cache
-+#	umount_p1
-+#	umount_p2
-+
-+	NUM_MOUNTS=$(mount | grep -v none | grep "${emmcdev}" | wc -l)
-+
-+	for ((i=1;i<=${NUM_MOUNTS};i++))
-+	do
-+		DRIVE=$(mount | grep -v none | grep "${emmcdev}" | tail -1 | awk '{print $1}')
-+		echo "debug: unmount loop"
-+		umount ${DRIVE} >/dev/null 2>&1 || umount -l ${DRIVE} >/dev/null 2>&1 || write_failure
-+	done
-+
-+	flush_cache
-+	repartition_drive
-+	flush_cache
-+
-+	format_boot
-+	format_root
-+	format_perm
-+	format_data
-+}
-+
-+set_boot_uuid () {
-+	unset root_uuid
-+	root_uuid=$(/sbin/blkid -s UUID -o value ${emmcdev}p2)
-+	if [ "${root_uuid}" ] ; then
-+		root_uuid="UUID=${root_uuid}"
-+		device_id=$(cat /tmp/boot/uEnv.txt | grep mmcroot | grep mmcblk | awk '{print $1}' | awk -F '=' '{print $2}')
-+		if [ ! "${device_id}" ] ; then
-+			device_id=$(cat /tmp/boot/uEnv.txt | grep mmcroot | grep UUID | awk '{print $1}' | awk -F '=' '{print $3}')
-+			device_id="UUID=${device_id}"
-+		fi
-+		sed -i -e 's:'${device_id}':'${root_uuid}':g' /tmp/boot/uEnv.txt
-+	else
-+		root_uuid="${source}p2"
-+	fi
-+	flush_cache_mounted
-+
-+}
-+
-+copy_boot () {
-+	mkdir -p /tmp/boot/ || true
-+	mount ${emmcdev}p1 /tmp/boot/ -o sync
-+	#Make sure the BootLoader gets copied first:
-+	echo "deug: copy 1"
-+	cp -v /boot/uboot/MLO /tmp/boot/MLO || write_failure
-+	flush_cache_mounted
-+
-+	echo "debug: copy 2"
-+	cp -v /boot/uboot/u-boot.img /tmp/boot/u-boot.img || write_failure
-+	flush_cache_mounted
-+
-+	echo "debug: copy 3"
-+	#this command should fail as we are copying to a fat partition and we cant set permissions for fat
-+	rsync -aAXv /boot/uboot/ /tmp/boot/ --exclude={MLO,u-boot.img,*bak,flash-eMMC.txt,flash-eMMC.log} || true #write_failure
-+	flush_cache_mounted
-+
-+	set_boot_uuid
-+	umount_p1
-+}
-+
-+lable_partitions () {
-+	tune2fs -L data ${emmcdev}p3
-+	tune2fs -L perm ${emmcdev}p4
-+}
-+
-+write_rootfs_image () {
-+	echo "Writing rootfs partition image!"
-+	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-+        gunzip -c /opt/factory_settings-rootfs.img.gz | dd of=${emmcdev}p2 bs=16M
-+	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
-+	echo "Done writing rootfs partition image!"
-+}
-+
-+write_data_image () {
-+        echo "Writing data partition image!"
-+        echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-+        gunzip -c /opt/factory_settings-data.img.gz | dd of=${emmcdev}p3 bs=16M
-+        echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
-+        echo "Done writing data partition image!"
-+}
-+
-+write_boot_image () {
-+	echo "Writing boot partition image!"
-+	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-+	gunzip -c /opt/factory_settings-boot.img.gz | dd of=${emmcdev}p1 bs=16M
-+	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
-+	echo "Done writing boot partition image!"
-+}
-+
-+alldone () {
-+
-+	#exit
-+
-+	if [ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] ; then
-+		echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
-+		echo default-on > /sys/class/leds/beaglebone\:green\:usr1/trigger
-+		echo default-on > /sys/class/leds/beaglebone\:green\:usr2/trigger
-+		echo default-on > /sys/class/leds/beaglebone\:green\:usr3/trigger
-+	fi
-+
-+	echo ""
-+	echo "This script has now completed it's task"
-+	echo "-----------------------------"
-+	echo "Note: Actually unpower the board, a reset [sudo reboot] is not enough."
-+	echo "-----------------------------"
-+
-+
-+	echo "Removing uEnv..."
-+#	mv /boot/uboot/uEnv.txt /boot/uboot/uEnv.txt.org
-+
-+	echo "Shutting Down..."
-+
-+	sync
-+	sleep 5
-+	sync
-+	sleep 5
-+
-+
-+	#shutdown now
-+	halt
-+}
-+
-+copy_rootfs () {
-+	mkdir -p /tmp/rootfs/ || true
-+	mount ${emmcdev}p2 /tmp/rootfs/ -o async,noatime
-+	echo "debug: rsync"
-+	rsync -aAXv /* /tmp/rootfs/ --exclude={/dev/*,/proc/*,/sys/*,/tmp/*,/run/*,/mnt/*,/media/*,/lost+found,/boot/*,/lib/modules/*} || write_failure
-+
-+	mkdir /tmp/rootfs/data/ || true
-+	mkdir /tmp/rootfs/perm/ || true
-+
-+	flush_cache_mounted
-+
-+	if [ -f /tmp/rootfs/opt/scripts/images/beaglebg.jpg ] ; then
-+		if [ -f /tmp/rootfs/opt/desktop-background.jpg ] ; then
-+			rm -f /tmp/rootfs/opt/desktop-background.jpg || true
-+		fi
-+		cp -v /tmp/rootfs/opt/scripts/images/beaglebg.jpg /tmp/rootfs/opt/desktop-background.jpg
-+	fi
-+	flush_cache_mounted
-+
-+	mkdir -p /tmp/rootfs/boot/uboot/ || true
-+	mkdir -p /tmp/rootfs/lib/modules/$(uname -r)/ || true
-+
-+	echo "debug: rsync2"
-+	rsync -aAXv /lib/modules/$(uname -r)/* /tmp/rootfs/lib/modules/$(uname -r)/ || write_failure
-+	flush_cache_mounted
-+
-+	echo "debug: cp //"
-+	cp /boot/initrd.img-$(uname -r) /tmp/rootfs/boot/ || write_failure
-+	flush_cache_mounted
-+
-+	unset boot_uuid
-+	boot_uuid=$(/sbin/blkid -s UUID -o value ${emmcdev}p1)
-+	if [ "${boot_uuid}" ] ; then
-+		boot_uuid="UUID=${boot_uuid}"
-+	else
-+		boot_uuid="${source}p1"
-+	fi
-+
-+	echo "# /etc/fstab: static file system information." > /tmp/rootfs/etc/fstab
-+	echo "#" >> /tmp/rootfs/etc/fstab
-+	echo "# Auto generated by: beaglebone-black-eMMC-flasher.sh" >> /tmp/rootfs/etc/fstab
-+	echo "#" >> /tmp/rootfs/etc/fstab
-+	echo "${root_uuid}  /  ext4  noatime,errors=remount-ro  0  1" >> /tmp/rootfs/etc/fstab
-+	echo "${boot_uuid}  /boot/uboot  auto  defaults  0  0" >> /tmp/rootfs/etc/fstab
-+	echo "debugfs         /sys/kernel/debug  debugfs  defaults          0  0" >> /tmp/rootfs/etc/fstab
-+	flush_cache_mounted
-+	umount_p2
-+
-+#	alldone
-+}
-+
-+echo "eMMC Flasher: Checking system"
-+check_running_system
-+
-+#emmc_sectors=$( blockdev --getsize /dev/mmcblk0 )
-+
-+#echo "eMMC Sectors are: $emmc_sectors"
-+emmc_sectors=$( blockdev --getsize "${emmcdev}" )
-+echo "eMMC Sectors are: $emmc_sectors.. at $emmcdev"
-+rootfs_size=$(( (emmc_sectors - 8*1024*2 - 512*1024*2 - 96*1024*2 - 2*1024*2)/1024/2 ))
-+echo "rootfs size: $rootfs_size M"
-+
-+
-+perm_lastsector=$((emmc_sectors - 1))
-+perm_firstsector=$((perm_lastsector - 8*1024*2))
-+data_lastsector=$((perm_firstsector - 1 ))
-+data_firstsector=$((data_lastsector - 500*1024*2 ))
-+rootfs_lastsector=$((data_firstsector - 1))
-+
-+echo "rootfs last sector: $rootfs_lastsector"
-+echo "data partition: $data_firstsector - $data_lastsector"
-+echo "perm partition: $perm_firstsector - $perm_lastsector"
-+
-+echo "eMMC Flasher: Update boot files"
-+update_boot_files
-+
-+echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-+
-+if [ -e "${emmcdev}p4" ]
-+then
-+        echo "Perminant data partition found! bypassing repartitioning!"
-+else
-+	echo "Repartitioning!"
-+        partition_drive
-+fi
-+
-+echo "eMMC Flasher: Creating boot partition"
-+if [ -e /opt/factory_settings-boot.img.gz ]
-+then
-+        write_boot_image
-+else
-+        copy_boot
-+fi
-+
-+echo "eMMC Flasher: writing to data partition"
-+if [ -e /opt/factory_settings-data.img.gz ]
-+then
-+        write_data_image
-+fi
-+
-+echo default-on > /sys/class/leds/beaglebone\:green\:usr1/trigger
-+
-+echo "eMMC Flasher: writing to rootfs partition"
-+if [ -e /opt/factory_settings-rootfs.img.gz ]
-+then
-+	write_rootfs_image
-+else
-+        copy_rootfs
-+fi
-+
-+echo heartbeat > /sys/class/leds/beaglebone\:green\:usr1/trigger
-+
-+echo "eMMC Flasher: labling partitions"
-+lable_partitions || true
-+
-+echo "eMMC Flasher: all done!"
-+
-+mkdir -p /tmp/boot/ || true
-+mount ${emmcdev}p1 /tmp/boot/ -o sync || true
-+
-+#cp /opt/scripts/tools/uEnv.txt.replace /tmp/boot/uEnv.txt
-+
-+set_boot_uuid || true
-+
-+#mv /boot/uboot/uEnv.txt /boot/uboot/uEnv.txt.org
-+#cp /opt/scripts/tools/uEnv.txt.replace /tmp/boot/uEnv.txt
-+
-+umount /tmp/boot/ || true
-+
-+echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
-+
-+alldone
-+
-+#shutdown now
++# reboot
 diff -urN ./pack_latest_version.sh ../tools_updated/pack_latest_version.sh
 --- ./pack_latest_version.sh	1970-01-01 02:00:00.000000000 +0200
-+++ ../tools_updated/pack_latest_version.sh	2015-11-04 00:10:19.365442628 +0200
-@@ -0,0 +1,160 @@
++++ ../tools_updated/pack_latest_version.sh	2015-11-02 11:49:28.000000000 +0200
+@@ -0,0 +1,165 @@
 +#!/bin/bash
 +
 +if ! id | grep -q root; then
@@ -1093,7 +665,7 @@ diff -urN ./pack_latest_version.sh ../tools_updated/pack_latest_version.sh
 +
 +if [ ! -e "${eMMC}p4" ]
 +then
-+        echo "Proper partitionining not found!"
++        echo "Proper eMMC partitionining not found!"
 +	exit 1
 +fi
 +
@@ -1101,14 +673,14 @@ diff -urN ./pack_latest_version.sh ../tools_updated/pack_latest_version.sh
 +
 +echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger 
 +
-+image_filename_prfx="../../../tmp/upgrade"
++image_filename_prfx="/sdcard/tmp/upgrade"
 +image_filename_rootfs="$image_filename_prfx-rootfs.img.gz" 
 +image_filename_data="$image_filename_prfx-data.img.gz"
 +image_filename_boot="$image_filename_prfx-boot.img.gz"
 +image_filename_pt="$image_filename_prfx-pt.img.gz"
-+image_filename_upgrade_tar_temp="../../temp.tar"
-+image_filename_upgrade_temp="../../temp.tar.gz"
-+image_filename_upgrade="../../upgrade.img.gz"
++image_filename_upgrade_tar_temp="/sdcard/tmp/temp.tar"
++image_filename_upgrade_temp="/sdcard/tmp/temp.tar.gz"
++image_filename_upgrade="/sdcard/upgrade.img.gz"
 +
 +echo "Packing eMMC image.."
 +
@@ -1125,6 +697,11 @@ diff -urN ./pack_latest_version.sh ../tools_updated/pack_latest_version.sh
 +if [ -e $image_filename_upgrade ]
 +then
 +	rm $image_filename_upgrade
++fi
++
++if [ ! -e /sdcard/tmp ]
++then
++        mkdir -p /sdcard/tmp/
 +fi
 +
 +
@@ -1329,8 +906,8 @@ diff -urN ./restore_factory_settings.sh ../tools_updated/restore_factory_setting
 +lable_partitions
 diff -urN ./unpack_latest_version.sh ../tools_updated/unpack_latest_version.sh
 --- ./unpack_latest_version.sh	1970-01-01 02:00:00.000000000 +0200
-+++ ../tools_updated/unpack_latest_version.sh	2015-11-04 00:10:19.381442628 +0200
-@@ -0,0 +1,319 @@
++++ ../tools_updated/unpack_latest_version.sh	2015-11-02 12:25:30.000000000 +0200
+@@ -0,0 +1,325 @@
 +#!/bin/bash
 +
 +if ! id | grep -q root; then
@@ -1454,18 +1031,24 @@ diff -urN ./unpack_latest_version.sh ../tools_updated/unpack_latest_version.sh
 +#echo "Debug copy!"
 +#cp ../../backup/upgrade.img.gz ../../
 +
-+image_filename_prfx="../../../tmp/upgrade"
++image_filename_prfx="/sdcard/tmp/upgrade"
 +image_filename_rootfs="$image_filename_prfx-rootfs.img.gz" 
 +image_filename_data="$image_filename_prfx-data.img.gz"
 +image_filename_boot="$image_filename_prfx-boot.img.gz"
 +image_filename_pt="$image_filename_prfx-pt.img.gz"
-+image_filename_upgrade_tar_temp="../../../tmp/temp.tar"
-+image_filename_upgrade_temp="../../../tmp/temp.tar.gz"
-+image_filename_upgrade_tar_temp_folder="../../../tmp/"
++image_filename_upgrade_tar_temp="/sdcard/tmp/temp.tar"
++image_filename_upgrade_temp="/sdcard/tmp/temp.tar.gz"
++image_filename_upgrade_tar_temp_folder="/sdcard/tmp/"
 +
-+image_filename_upgrade="../../upgrade.img.gz"
++image_filename_upgrade="/sdcard/upgrade.img.gz"
 +
 +echo "Unpacking eMMC image.."
++
++if [ ! -e /sdcard/tmp/ ]
++then
++       mkdir /sdcard/tmp/
++fi
++
 +extract_image_files
 +
 +if [ -e $image_filename_boot ]
@@ -1480,7 +1063,7 @@ diff -urN ./unpack_latest_version.sh ../tools_updated/unpack_latest_version.sh
 +then
 +	write_rootfs_image
 +	rm $image_filename_rootfs
-+else 
++else
 +        echo "Rootfs image not found: $image_filename_rootfs"
 +fi
 +
