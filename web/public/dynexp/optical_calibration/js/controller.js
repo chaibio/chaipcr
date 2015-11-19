@@ -42,8 +42,7 @@
         if (!$scope.data) return 0;
         console.log('$scope.data.lid.temperature: '+$scope.data.lid.temperature);
         console.log('$scope.experiment.protocol.lid_temperature: '+$scope.experiment.protocol.lid_temperature);
-        // var op = ($scope.data.lid.temperature/$scope.experiment.protocol.lid_temperature);
-        return 0.5;
+        return ($scope.data.lid.temperature/$scope.experiment.protocol.lid_temperature);
       };
 
       $scope.blockHeatPercentage = function () {
@@ -52,8 +51,7 @@
         if (!$scope.experiment) return 0;
         console.log('$scope.data.heatblock.temperature: '+$scope.data.heatblock.temperature);
         console.log('$scope.data.heatblock.temperature: '+$scope.data.heatblock.temperature);
-        return 0.5;
-        // return ($scope.data.heatblock.temperature/blockHeat);
+        return ($scope.data.heatblock.temperature/blockHeat);
       };
 
       $scope.getBlockHeat = function () {
