@@ -141,8 +141,8 @@ p.step{
     top: 0;
     left: 0;
     opacity: 0;
-    -webkit-transition: opacity 3s; /* Safari */
-    transition: opacity 3s;
+    -webkit-transition: opacity 2s; /* Safari */
+    transition: opacity 2s;
 }
 .step-3 .machine-heating-icon img.machine-idle {
     opacity: 1;
