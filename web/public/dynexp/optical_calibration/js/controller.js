@@ -7,7 +7,8 @@
     'Status',
     'TestInProgressService',
     'host',
-    function OpticalCalibrationCtrl ($scope, $window, Experiment, $state, Status, TestInProgressService, host) {
+    '$http',
+    function OpticalCalibrationCtrl ($scope, $window, Experiment, $state, Status, TestInProgressService, host, $http) {
 
       $scope.cancel = false;
 
