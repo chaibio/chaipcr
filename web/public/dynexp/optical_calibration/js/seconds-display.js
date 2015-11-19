@@ -69,6 +69,7 @@ App.service('SecondsDisplay', [
     this.display3 = (function(_this) {
       return function(seconds) {
         var text;
+        if (parseFloat(seconds || 0) === 0) return '0 seconds';
         seconds = _this.getSecondsComponents(seconds);
         text = '';
         if (seconds.days > 0) {
