@@ -37,6 +37,19 @@
         }
       }, true);
 
+      $scope.lidHeatPercentage = function () {
+        if (!$scope.experiment) return 0;
+        if (!$scope.data) return 0;
+        return ($scope.data.lid.temperature/$scope.experiment.protocol.lid_temperature);
+      };
+
+      $scope.blockHeatPercentage = function () {
+        var blockHeat = $scope.getBlockHeat();
+        if (!blockHeat) return 0;
+        if (!$scope.experiment) return 0;
+        return ($scope.data.heatblock.temperature/blockHeat);
+      };
+
       $scope.getBlockHeat = function () {
         if (!$scope.experiment) return;
         if (!$scope.experiment.protocol.stages[0]) return;
