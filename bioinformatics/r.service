@@ -2,7 +2,7 @@
 Description=Rserve
 
 [Service]
-WorkingDirectory=/root/chaipcr/scientific
+WorkingDirectory=/root/chaipcr/bioinformatics
 ExecStart=/usr/local/bin/R CMD Rserve --RS-enable-control --no-save
 SyslogIdentifier=Rserve
 Restart=on-failure
