@@ -251,6 +251,8 @@
           padding-top: 15px;
 
           .big_button {
+
+            font-family: "dinot-bold";
             width: 263px;
             background-color: white;
             height: 30px;
@@ -273,6 +275,7 @@
           }
 
           .small-button {
+            font-family: "dinot-bold";
             width: 120px;
             background-color: white;
             height: 30px;
@@ -351,11 +354,11 @@
         border-bottom-style: solid;
         border-bottom-width: 1px;
         border-bottom-color: #cdcdcd;
-        //border-bottom-color: #545454;
 
         .caption-part {
 
           font-family: "dinot-regular";
+          font-size: 16px;
           height: 47px;
           width: 140px;
           float: left;
