@@ -3,7 +3,7 @@ Description=Rserve
 
 [Service]
 WorkingDirectory=/root/chaipcr/scientific
-ExecStart=/usr/local/lib/R/bin/R CMD Rserve --RS-enable-control --no-save
+ExecStart=/usr/local/bin/R CMD Rserve --RS-enable-control --no-save
 SyslogIdentifier=Rserve
 Restart=on-failure
 StartLimitBurst=0
