@@ -4,8 +4,8 @@
 
   <div class="machine-heating-icon">
     <img src="./images/machine-idle.png" class="machine-idle">
-    <img src="./images/lid-heating.png" style=" opacity: {{lidHeatPercentage()}}" class="lid-heating">
-    <img src="./images/block-heating.png" style="opacity: {{blockHeatPercentage()}}" class="block-heating">
+    <img src="./images/lid-heating.png" style=" opacity: {{lidHeatPercentage() | round: 3}}" class="lid-heating">
+    <img src="./images/block-heating.png" style="opacity: {{blockHeatPercentage() | round: 3}}" class="block-heating">
   </div>
 
   <div class="text-center">

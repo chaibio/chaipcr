@@ -95,8 +95,8 @@ App.service('SecondsDisplay', [
         var hasAnd = false;
         sec = _this.getSecondsComponents(seconds);
         text = '';
-        if (sec.seconds > 0) text = $window.num2str(sec.seconds) + ' seconds';
-        if (sec.mins > 0) text = $window.num2str(sec.mins) + ' minutes' + (text.length > 0 ? (hasAnd? ', ': ' and ') : '' ) + text;
+        if (sec.mins >0 || sec.hours > 0 || sec.days > 0) text = $window.num2str(sec.seconds) + ' seconds';
+        if (sec.mins > 0) text = $window.num2str(sec.mins) + ' minutes, ' + text;
         if (sec.hours > 0) text = $window.num2str(sec.hours) + ' hours' + (text.length > 0 ? (hasAnd? ', ': ' and ') : '' ) + text;
         if (sec.days > 0) text = $window.num2str(sec.days) + ' days' + (text.length > 0 ? (hasAnd? ', ': ' and ') : '' ) + text;
         return text;
