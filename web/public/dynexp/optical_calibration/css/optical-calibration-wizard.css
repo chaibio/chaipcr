@@ -150,14 +150,14 @@ p.step{
     height: 100%;
 }
 .step-3 .machine-heating-icon img.lid-heating {
-    margin-top: 12px;
-    margin-left: 52px;
-    width: 95px;
+    margin-top: 10px;
+    margin-left: 51px;
+    width: 99px;
 }
 .step-3 .machine-heating-icon img.block-heating {
-    margin-top: 20px;
-    margin-left: 42px;
-    width: 114px;
+    margin-top: 18px;
+    margin-left: 41px;
+    width: 118px;
 }
 .step-3 p.wait,
 .step-5 p.wait,
