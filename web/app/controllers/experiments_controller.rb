@@ -226,7 +226,7 @@ class ExperimentsController < ApplicationController
         response = connection.eval("analyze('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{@experiment.id})").to_ruby
       rescue  => e
         logger.error("Rserve error: #{e}")
-        kill_rserve
+        kill_rserve if e.is_a? Rserve::Talk::SocketTimeoutError
         render :json=>{:errors=>"Internal Server Error (#{e})"}, :status => 500
       ensure
         connection.close
@@ -252,7 +252,7 @@ class ExperimentsController < ApplicationController
       results = connection.eval("get_amplification_data('#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibration_id})")
     rescue  => e
       logger.error("Rserve error: #{e}")
-      kill_rserve
+      kill_rserve if e.is_a? Rserve::Talk::SocketTimeoutError
       raise e
     ensure
       connection.close
@@ -283,7 +283,7 @@ class ExperimentsController < ApplicationController
       results = connection.eval("process_mc('#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibration_id})")
     rescue  => e
       logger.error("Rserve error: #{e}")
-      kill_rserve
+      kill_rserve if e.is_a? Rserve::Talk::SocketTimeoutError
       raise e
     ensure
       connection.close
