@@ -127,12 +127,21 @@ p.step{
 }
 
 /*step 3*/
-.step-3 img.machine-heating-icon {
+.step-3 .machine-heating-icon {
     margin: 0 auto;
     margin-top: 50px;
     margin-bottom: 30px;
+    position: relative;
     width: 200px;
+}
+.step-3 .machine-heating-icon img {
+    width: 100%;
     display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    -webkit-transition: opacity 3s; /* Safari */
+    transition: opacity 3s;
 }
 .step-3 p.wait {
     font-weight: bold;
