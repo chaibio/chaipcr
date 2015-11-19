@@ -1,4 +1,18 @@
-<div>
-  <h1>Experiment Complete</h1>
-  <a href="/#/user/settings">OK</a>
+<div class="step-6">
+  <p class="step"><b>STEP 6</b>/6</p>
+  <h2>Calibration Complete</h2>
+
+  <div class="machine-icon">
+    <img src="./images/calibration-complete.png">
+  </div>
+
+  <div class="text-center">
+    <p class="wait">YOUR OPEN QPCR HAS BEEN SUCCESSFULLY CALIBRATED</p>
+    <p class="heating">
+      Remember to re-run the calibration should you adjust the lid height or make of PCR tubes.
+    </p>
+
+    <button class="button" ng-click="cancel=true" ng-show="!cancel">CANCEL</button>
+    <button class="button red" ng-show="cancel" ng-click="cancelExperiment()">CONFIRM CANCEL</button>
+  </div>
 </div>

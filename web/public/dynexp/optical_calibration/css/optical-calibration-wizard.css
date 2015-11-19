@@ -127,7 +127,7 @@ p.step{
 }
 
 /*step 3*/
-.step-3 .machine-heating-icon {
+.step-3 .machine-heating-icon{
     margin: 0 auto;
     margin-top: 50px;
     margin-bottom: 30px;
@@ -160,12 +160,14 @@ p.step{
     width: 114px;
 }
 .step-3 p.wait,
-.step-5 p.wait {
+.step-5 p.wait,
+.step-6 p.wait {
     font-weight: bold;
     margin-bottom: 0px;
 }
 .step-3 p.heating,
-.step-5 p.heating {
+.step-5 p.heating,
+.step-6 p.heating {
     margin-bottom: 0px;
 }
 .step-3 p.note {
@@ -174,7 +176,8 @@ p.step{
     margin-bottom: 0px;
 }
 .step-3 p.dont-open,
-.step-5 p.dont-open {
+.step-5 p.dont-open,
+.step-6 p.dont-open {
     margin-top: 30px;
     margin-bottom: 0px;
 }
@@ -183,6 +186,7 @@ p.step{
 .step-5 .machine-icon {
     margin: 0 auto;
     margin-top: 50px;
+    margin-bottom: 30px;
     position: relative;
     width: 200px;
 }
@@ -196,3 +200,16 @@ p.step{
     left: 90px;
     width: 20px;
 }
+
+/*step 6*/
+.step-6 .machine-icon img{
+    width: 200px;
+    display: block;
+    margin: 0 auto;
+    margin-top: 50px;
+    margin-bottom: 30px;
+}
+.step-6 p.heating {
+    margin-top: 20px;
+}
+
