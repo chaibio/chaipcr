@@ -10,7 +10,7 @@ window.App.directive('statusBar', [
       link: function($scope, elem, attrs) {
         var getExperiment;
         $scope.show = function() {
-          if (attrs.experimentId) {
+          if ($scope.experimentId) {
             return $scope.experimentId && $scope.status;
           } else {
             return $scope.status;

@@ -1,3 +1,21 @@
 <div class="step-5">
-  step 5 spinning indicator
+  <p class="step"><b>STEP 5</b>/6</p>
+  <h2>Reading Fluorescence</h2>
+  <div class="machine-icon">
+    <img src="./images/machine-idle.png">
+    <img src="./images/spinner-green.png" class="image-rotate">
+  </div>
+
+  <div class="text-center">
+    <p class="wait">FLUORESCENCE MEASUREMENT IS NEARLY COMPLETE:</p>
+    <p class="heating">
+      Less than {{timeRemaining | secondsDisplay: 'display4'}} remaining
+    </p>
+    <p class="dont-open">
+      Please don't open the machine during this step.
+    </p>
+
+    <button class="button" ng-click="cancel=true" ng-show="!cancel">CANCEL</button>
+    <button class="button red" ng-show="cancel" ng-click="cancelExperiment()">CONFIRM CANCEL</button>
+  </div>
 </div>

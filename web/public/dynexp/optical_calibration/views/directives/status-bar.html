@@ -41,7 +41,7 @@
         LID: {{status.lid.temperature | round: 1}}&deg;C
       </span>
     </span>
-    <span class="controls-container">
+<!--     <span class="controls-container">
       <span class="control" ng-show="state === 'Idle' && experiment" experiment-id="experiment.id" duplicate-experiment>DUPLICATE EXPERIMENT</span>
       <span class="control" ng-show="!experiment.started_at && experiment.id" ng-class="{'disabled': experiment.started_at}" ng-click="startExperiment()">BEGIN EXPERIMENT</span>
       <span class="control" ng-show="state === 'Paused'" ng-click="resumeExperiment()">
@@ -53,6 +53,6 @@
         <span ng-show="!isHolding">STOP EXPERIMENT</span>
         <span ng-show="isHolding">END HOLD</span>
       </span>
-    </span>
+    </span> -->
   </div>
 </div>

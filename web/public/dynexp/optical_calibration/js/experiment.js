@@ -1,7 +1,7 @@
 (function () {
 
   App.service('Experiment', [
-   '$resource', '$http', 'host', function($resource, $http, host) {
+   '$resource', '$http', 'host', function ($resource, $http, host) {
      var currentExperiment, self;
      currentExperiment = null;
      self = $resource('/experiments/:id', {

@@ -6,7 +6,9 @@
     '$state',
     'Status',
     'TestInProgressService',
-    function OpticalCalibrationCtrl ($scope, $window, Experiment, $state, Status, TestInProgressService) {
+    'host',
+    '$http',
+    function OpticalCalibrationCtrl ($scope, $window, Experiment, $state, Status, TestInProgressService, host, $http) {
 
       $scope.cancel = false;
 
@@ -34,8 +36,22 @@
         if ($scope.state === 'Idle' && (oldData.experimentController.machine.state !== 'Idle' || $state.current.name === 'step-5')) {
           // experiment is complete
           $state.go('step-6');
+          $http.put(host + '/settings', {settings: {"calibrationId": $scope.experiment.id}});
         }
       }, true);
+
+      $scope.lidHeatPercentage = function () {
+        if (!$scope.experiment) return 0;
+        if (!$scope.data) return 0;
+        return ($scope.data.lid.temperature/$scope.experiment.protocol.lid_temperature);
+      };
+
+      $scope.blockHeatPercentage = function () {
+        var blockHeat = $scope.getBlockHeat();
+        if (!blockHeat) return 0;
+        if (!$scope.experiment) return 0;
+        return ($scope.data.heatblock.temperature/blockHeat);
+      };
 
       $scope.getBlockHeat = function () {
         if (!$scope.experiment) return;
@@ -64,7 +80,8 @@
 
       $scope.cancelExperiment = function () {
         Experiment.stopExperiment($scope.experiment_id).then(function () {
-          $window.location.assign('/#/user/settings');
+          var redirect = '/#/user/settings';
+          $window.location = redirect;
         });
       };
 

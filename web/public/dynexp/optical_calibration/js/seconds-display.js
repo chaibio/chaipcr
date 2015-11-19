@@ -8,7 +8,8 @@ App.filter('secondsDisplay', [
 ]);
 
 App.service('SecondsDisplay', [
-  function() {
+  '$window',
+  function ($window) {
     this.getSecondsComponents = function(secs) {
       var days, hours, mins, seconds;
       secs = Math.round(secs);
@@ -86,26 +87,19 @@ App.service('SecondsDisplay', [
       };
     })(this);
 
-    // this.display4 = (function(_this) {
-    //   return function(seconds) {
-    //     var sec, text;
-    //     sec = _this.getSecondsComponents(seconds);
-    //     text = '';
-    //     if (sec.days < 10) {
-    //       sec.days = "0" + sec.days;
-    //     }
-    //     if (sec.hours < 10) {
-    //       sec.hours = "0" + sec.hours;
-    //     }
-    //     if (sec.mins < 10) {
-    //       sec.mins = "0" + sec.mins;
-    //     }
-    //     if (sec.seconds < 10) {
-    //       sec.seconds = "0" + sec.seconds;
-    //     }
-    //     return "" + ((parseInt(sec.days)) > 0 ? sec.days + ':' : '') + sec.hours + ":" + sec.mins + ":" + sec.seconds;
-    //   };
-    // })(this);
+    this.display4 = (function(_this) {
+      return function(seconds) {
+        var sec, text;
+        var hasAnd = false;
+        sec = _this.getSecondsComponents(seconds);
+        text = '';
+        text = sec.seconds + ' seconds';
+        if (sec.mins > 0) text = sec.mins + ' minutes' + (text.length > 0 ? (hasAnd? ', ': ' and ') : '' ) + text;
+        if (sec.hours > 0) text = sec.hours + ' hours' + (text.length > 0 ? (hasAnd? ', ': ' and ') : '' ) + text;
+        if (sec.days > 0) text = sec.days + ' days' + (text.length > 0 ? (hasAnd? ', ': ' and ') : '' ) + text;
+        return text;
+      };
+    })(this);
 
 
   }

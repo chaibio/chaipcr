@@ -127,18 +127,47 @@ p.step{
 }
 
 /*step 3*/
-.step-3 img.machine-heating-icon {
+.step-3 .machine-heating-icon{
     margin: 0 auto;
     margin-top: 50px;
     margin-bottom: 30px;
+    position: relative;
     width: 200px;
-    display: block;
+    height: 166px;
 }
-.step-3 p.wait {
+.step-3 .machine-heating-icon img {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    -webkit-transition: opacity 2s; /* Safari */
+    transition: opacity 2s;
+}
+.step-3 .machine-heating-icon img.machine-idle {
+    opacity: 1;
+    width: 100%;
+    height: 100%;
+}
+.step-3 .machine-heating-icon img.lid-heating {
+    margin-top: 10px;
+    margin-left: 51px;
+    width: 99px;
+}
+.step-3 .machine-heating-icon img.block-heating {
+    margin-top: 18px;
+    margin-left: 41px;
+    width: 118px;
+}
+.step-3 p.wait,
+.step-5 p.wait,
+.step-6 p.wait {
     font-weight: bold;
     margin-bottom: 0px;
 }
-.step-3 p.heating {
+.step-3 p.heating,
+.step-5 p.heating,
+.step-6 p.heating {
     margin-bottom: 0px;
 }
 .step-3 p.note {
@@ -146,7 +175,41 @@ p.step{
     font-size: 10px;
     margin-bottom: 0px;
 }
-.step-3 p.dont-open {
+.step-3 p.dont-open,
+.step-5 p.dont-open,
+.step-6 p.dont-open {
     margin-top: 30px;
     margin-bottom: 0px;
 }
+
+/*step 5*/
+.step-5 .machine-icon {
+    margin: 0 auto;
+    margin-top: 50px;
+    margin-bottom: 30px;
+    position: relative;
+    width: 200px;
+}
+.step-5 .machine-icon img {
+    width: 100%;
+}
+
+.step-5 .machine-icon .image-rotate {
+    position: absolute;
+    top: 84px;
+    left: 90px;
+    width: 20px;
+}
+
+/*step 6*/
+.step-6 .machine-icon img{
+    width: 200px;
+    display: block;
+    margin: 0 auto;
+    margin-top: 50px;
+    margin-bottom: 30px;
+}
+.step-6 p.heating {
+    margin-top: 20px;
+}
+
