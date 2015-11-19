@@ -29,12 +29,15 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
       for(var dot in cordiantes) {
         var cord = cordiantes[dot];
         smallDotArray.push(new fabric.Circle({
-          radius: 2, fill: 'white', left: cord[0], top: cord[1], selectable: false, name: "stageDot", originX: "center", originY: "center"
+          radius: 2, fill: 'white', left: cord[0], top: cord[1], selectable: false,
+          name: "stageDot", originX: "center", originY: "center"
         }));
       }
+
       var editStageStatus = this.parent.editStageStatus;
+
       this.dots = new fabric.Group(smallDotArray, {
-        originX: "left", originY: "top", left: 3, top: 8, evented: false, width: 13, height: 11, visible: editStageStatus
+        originX: "left", originY: "top", left: 3, top: 8, evented: false, width: 13, height: 12, visible: editStageStatus
       });
       return this;
     };
@@ -45,7 +48,8 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
 
         var index = parseInt(this.index) + 1;
         var stageName = (this.model.name).toUpperCase().replace("STAGE", "");
-        var text = "STAGE " + index + ":" + stageName;
+        var text = (stageName).trim();
+        this.stageCaption.setText("STAGE " + index + ": " );
 
         if(this.model.stage_type === "cycling") {
           var noOfCycles = this.model.num_cycles;
@@ -54,10 +58,17 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
         }
 
         this.stageName.setText(text);
+        this.stageName.setLeft(this.stageCaption.left + this.stageCaption.width);
       }
     };
 
     this.writeMyName = function() {
+
+      this.stageCaption = new fabric.Text("", {
+          fill: 'white', fontWeight: "400",  fontSize: 12,   fontFamily: "dinot-bold",
+          originX: "left", originY: "top", selectable: true, left: 0
+        }
+      );
 
       this.stageName = new fabric.Text("", {
           fill: 'white', fontWeight: "400",  fontSize: 12,   fontFamily: "dinot",
@@ -68,7 +79,7 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
       var editStageStatus = this.parent.editStageStatus;
       var addUp = (editStageStatus) ? 26 : 1;
 
-      this.stageNameGroup = new fabric.Group([this.stageName], {
+      this.stageNameGroup = new fabric.Group([this.stageCaption, this.stageName], {
         originX: "left", originY: "top", selectable: true, top : 8, left: addUp,
       });
       return this;

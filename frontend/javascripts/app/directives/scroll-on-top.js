@@ -15,6 +15,7 @@ window.ChaiBioTech.ngApp.directive('scrollOnTop', [
         scope.scrollDiff = 0;
         scope.position = 0;
         var bar = $(elem).find(".foreground-bar");
+
         scope.$watch("width", function(newVal, oldVal) {
 
           var ratio = (newVal / 1024);
