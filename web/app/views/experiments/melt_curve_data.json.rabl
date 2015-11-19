@@ -1,8 +1,7 @@
-object false
+collection @melt_curve_data, :root=>:melt_curve_data, :object_root => false
+attributes :well_num, :temperature, :fluorescence_data, :derivative
 
-child(@melt_curve_data => :melt_curve_data) do
-	attributes :well_num, :temperature, :fluorescence_data, :derivative
-end
+
 
 
 

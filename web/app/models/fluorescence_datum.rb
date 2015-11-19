@@ -6,7 +6,7 @@ class FluorescenceDatum < ActiveRecord::Base
                   LEFT JOIN amplification_data ON amplification_data.stage_id = steps.stage_id AND amplification_data.experiment_id = fluorescence_data.experiment_id")
            .where(["fluorescence_data.experiment_id=? AND steps.stage_id=? AND fluorescence_data.channel=?", experiment_id, stage_id, channel])
            .order("fluorescence_data.cycle_num DESC").select("fluorescence_data.*, background_subtracted_value").first
-    return data.background_subtracted_value == nil 
+    return data && data.background_subtracted_value == nil 
   end
 
 end
