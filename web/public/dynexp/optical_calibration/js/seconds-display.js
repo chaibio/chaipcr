@@ -69,7 +69,6 @@ App.service('SecondsDisplay', [
     this.display3 = (function(_this) {
       return function(seconds) {
         var text;
-        if (parseFloat(seconds || 0) === 0) return '0 seconds';
         seconds = _this.getSecondsComponents(seconds);
         text = '';
         if (seconds.days > 0) {
@@ -90,13 +89,12 @@ App.service('SecondsDisplay', [
 
     this.display4 = (function(_this) {
       return function(seconds) {
-        console.log('here');
         var sec, text;
         var hasAnd = false;
         sec = _this.getSecondsComponents(seconds);
         text = '';
-        if (sec.mins >0 || sec.hours > 0 || sec.days > 0) text = $window.num2str(sec.seconds) + ' seconds';
-        if (sec.mins > 0) text = $window.num2str(sec.mins) + ' minutes, ' + text;
+        if (sec.mins > 0 || sec.hours > 0 || sec.days > 0) text = $window.num2str(sec.seconds) + ' seconds';
+        if (sec.mins > 0) text = $window.num2str(sec.mins) + ' minutes' + (text.length > 0 ? (hasAnd? ', ': ' and ') : '' ) + text;
         if (sec.hours > 0) text = $window.num2str(sec.hours) + ' hours' + (text.length > 0 ? (hasAnd? ', ': ' and ') : '' ) + text;
         if (sec.days > 0) text = $window.num2str(sec.days) + ' days' + (text.length > 0 ? (hasAnd? ', ': ' and ') : '' ) + text;
         return text;
