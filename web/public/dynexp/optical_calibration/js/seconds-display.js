@@ -93,10 +93,10 @@ App.service('SecondsDisplay', [
         var hasAnd = false;
         sec = _this.getSecondsComponents(seconds);
         text = '';
-        text = $window.num2str(sec.seconds) + ' seconds';
-        if (sec.mins > 0) text = $window.num2str(sec.mins) + ' minutes' + (text.length > 0 ? (hasAnd? ', ': ' and ') : '' ) + text;
-        if (sec.hours > 0) text = $window.num2str(sec.hours) + ' hours' + (text.length > 0 ? (hasAnd? ', ': ' and ') : '' ) + text;
-        if (sec.days > 0) text = $window.num2str(sec.days) + ' days' + (text.length > 0 ? (hasAnd? ', ': ' and ') : '' ) + text;
+        text = sec.seconds + ' seconds';
+        if (sec.mins > 0) text = sec.mins + ' minutes' + (text.length > 0 ? (hasAnd? ', ': ' and ') : '' ) + text;
+        if (sec.hours > 0) text = sec.hours + ' hours' + (text.length > 0 ? (hasAnd? ', ': ' and ') : '' ) + text;
+        if (sec.days > 0) text = sec.days + ' days' + (text.length > 0 ? (hasAnd? ', ': ' and ') : '' ) + text;
         return text;
       };
     })(this);
