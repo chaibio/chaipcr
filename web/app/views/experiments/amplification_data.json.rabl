@@ -6,9 +6,10 @@ node :ct do
   @ct
 end
 
-child(@amplification_data => :fluorescence_data) do
+child(@amplification_data, :root=>:fluorescence_data, :object_root=>false) do
 	attributes :baseline_subtracted_value, :background_subtracted_value, :well_num, :cycle_num
 end
+
 
 
 

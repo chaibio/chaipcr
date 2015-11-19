@@ -16,7 +16,6 @@ App.controller 'WelcomeCtrl', [
     $rootScope.pageTitle = "ChaiPCR | Login"
 
     $scope.user =
-      name: 'Admin'
       role: 'admin'
 
     $scope.submit = (data) ->

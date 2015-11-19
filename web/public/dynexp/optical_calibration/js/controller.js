@@ -12,16 +12,37 @@
 
       $scope.$watch(function () {
         return Status.getData();
-      }, function (data) {
+      }, function (data, oldData) {
         if (!data) return;
         if (!data.experimentController) return;
-        if (!data.experimentController.expriment) return;
+        if (!oldData) return;
+        if (!oldData.experimentController) return;
+
+        $scope.data = data;
+        $scope.state = data.experimentController.machine.state;
+        $scope.timeRemaining = TestInProgressService.timeRemaining(data);
+
         if (data.experimentController.expriment && !$scope.experiment) {
           TestInProgressService.getExperiment(data.experimentController.expriment.id).then(function (exp) {
             $scope.experiment = exp;
           });
         }
-      });
+        if ($scope.state === 'Paused' && $state.current.name === 'step-3') {
+          $state.go('step-4');
+          return;
+        }
+        if ($scope.state === 'Idle' && (oldData.experimentController.machine.state !== 'Idle' || $state.current.name === 'step-5')) {
+          // experiment is complete
+          $state.go('step-6');
+        }
+      }, true);
+
+      $scope.getBlockHeat = function () {
+        if (!$scope.experiment) return;
+        if (!$scope.experiment.protocol.stages[0]) return;
+        if (!$scope.experiment.protocol.stages[0].stage.steps[0]) return;
+        return $scope.experiment.protocol.stages[0].stage.steps[0].step.temperature;
+      }
 
       $scope.createExperiment = function () {
         var exp = new Experiment({
@@ -32,6 +53,12 @@
             $scope.experiment = resp.experiment;
             $state.go('step-3');
           });
+        });
+      };
+
+      $scope.resumeExperiment = function () {
+        Experiment.resumeExperiment().then(function () {
+          $state.go('step-5');
         });
       };
 
