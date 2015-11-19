@@ -6,7 +6,8 @@
     '$state',
     'Status',
     'TestInProgressService',
-    function OpticalCalibrationCtrl ($scope, $window, Experiment, $state, Status, TestInProgressService) {
+    'host',
+    function OpticalCalibrationCtrl ($scope, $window, Experiment, $state, Status, TestInProgressService, host) {
 
       $scope.cancel = false;
 
@@ -34,6 +35,7 @@
         if ($scope.state === 'Idle' && (oldData.experimentController.machine.state !== 'Idle' || $state.current.name === 'step-5')) {
           // experiment is complete
           $state.go('step-6');
+          $http.put(host + '/settings', {"calibrationId": $scope.experiment.id})
         }
       }, true);
 
@@ -77,7 +79,7 @@
 
       $scope.cancelExperiment = function () {
         Experiment.stopExperiment($scope.experiment_id).then(function () {
-          $window.location.assign('/#/user/settings');
+          $window.location.assign(host+'/#/user/settings');
         });
       };
 
