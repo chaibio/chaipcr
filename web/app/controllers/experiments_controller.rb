@@ -106,7 +106,9 @@ class ExperimentsController < ApplicationController
   end
 
   api :GET, "/experiments/:id/fluorescence_data", "Retrieve fluorescence data"
-  example "{'fluorescence_datum':{'baseline_subtracted_value':1.4299,'background_subtracted_value':1.234,'well_num':1,'cycle_num':1}, 'fluorescence_datum':{'baseline_subtracted_value':1.4299,'background_subtracted_value':1.234,'well_num':2,'cycle_num':1}}"
+  example "{'total_cycles':40,'ct':['1.0',null,'1.28','20.19','1.0','20.83','20.21','19.23','21.02','15.33','15.11','15.14','15.21','14.67','14.97',null],
+  'amplification_data':[{'baseline_subtracted_value':1.4299,'background_subtracted_value':1.234,'well_num':1,'cycle_num':1},
+                        {'baseline_subtracted_value':1.4299,'background_subtracted_value':1.234,'well_num':2,'cycle_num':1}]}"
   def fluorescence_data
     if @experiment
       if @experiment.ran?
@@ -140,7 +142,8 @@ class ExperimentsController < ApplicationController
   end
   
   api :GET, "/experiments/:id/melt_curve_data", "Retrieve melt curve data"
-  example "{'melt_curve_datum':{'well_num':0, 'temperature':[0,1,2,3,4,5], 'fluorescence_data':[0,1,2,3,4,5], 'derivative':[0,1,2,3,4,5]}}"
+  example "{'melt_curve_data':[{'well_num':0, 'temperature':[0,1,2,3,4,5], 'fluorescence_data':[0,1,2,3,4,5], 'derivative':[0,1,2,3,4,5]},
+                               {'well_num':1, 'temperature':[0,1,2,3,4,5], 'fluorescence_data':[0,1,2,3,4,5], 'derivative':[0,1,2,3,4,5]}]}"
   def melt_curve_data
     if @experiment
       if @experiment.ran?
