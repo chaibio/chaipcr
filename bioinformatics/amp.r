@@ -98,6 +98,15 @@ baseline_ct <- function(amp_calib,
                         type, cp, # getPar parameters
                         show_running_time=FALSE # option to show time cost to run this function
                         ) {
+    
+    if (dim(amp_calib)[1] <= 2) {
+        message('Two or fewer cycles of fluorescence data are available. Baseline subtraction and calculation of Ct and amplification efficiency cannot be performed.')
+        ct_eff <- matrix(NA, nrow=2, ncol=num_wells, 
+                         dimnames=list(c('ct', 'eff'), colnames(amp_calib)[2:(num_wells+1)]))
+        
+        return(list('bl_corrected'=amp_calib[,2:(num_wells+1)], 'ct_eff'=ct_eff))
+        }
+    
     # start counting for running time
     func_name <- 'baseline_ct'
     start_time <- proc.time()[['elapsed']]
