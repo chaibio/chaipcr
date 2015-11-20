@@ -26,5 +26,16 @@ class MainController < ApplicationController
       redirect_to welcome_path
     end
   end
-
+  
+  def device
+  end
+  
+  def capabilities
+  end
+  
+  api :PUT, "/root_password", "Set root password"
+  param :password, String, :desc => "password to set", :required=>true
+  def root_password
+  end
+   
 end

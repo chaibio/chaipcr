@@ -107,7 +107,7 @@ class ExperimentsController < ApplicationController
 
   api :GET, "/experiments/:id/fluorescence_data", "Retrieve fluorescence data"
   example "{'total_cycles':40,'ct':['1.0',null,'1.28','20.19','1.0','20.83','20.21','19.23','21.02','15.33','15.11','15.14','15.21','14.67','14.97',null],
-  'amplification_data':[{'baseline_subtracted_value':1.4299,'background_subtracted_value':1.234,'well_num':1,'cycle_num':1},
+  'fluorescence_data':[{'baseline_subtracted_value':1.4299,'background_subtracted_value':1.234,'well_num':1,'cycle_num':1},
                         {'baseline_subtracted_value':1.4299,'background_subtracted_value':1.234,'well_num':2,'cycle_num':1}]}"
   def fluorescence_data
     if @experiment
@@ -142,8 +142,8 @@ class ExperimentsController < ApplicationController
   end
   
   api :GET, "/experiments/:id/melt_curve_data", "Retrieve melt curve data"
-  example "{'melt_curve_data':[{'well_num':0, 'temperature':[0,1,2,3,4,5], 'fluorescence_data':[0,1,2,3,4,5], 'derivative':[0,1,2,3,4,5]},
-                               {'well_num':1, 'temperature':[0,1,2,3,4,5], 'fluorescence_data':[0,1,2,3,4,5], 'derivative':[0,1,2,3,4,5]}]}"
+  example "{'melt_curve_data':[{'well_num':0, 'temperature':[0,1,2,3,4,5], 'fluorescence_data':[0,1,2,3,4,5], 'derivative':[0,1,2,3,4,5], 'tm':[1,2,3], 'area':[2,4,5]},
+                               {'well_num':1, 'temperature':[0,1,2,3,4,5], 'fluorescence_data':[0,1,2,3,4,5], 'derivative':[0,1,2,3,4,5], 'tm':[1,2,3], 'area':[2,4,5]}]}"
   def melt_curve_data
     if @experiment
       if @experiment.ran?
@@ -295,7 +295,7 @@ class ExperimentsController < ApplicationController
     if !results.blank?
       results.each_index do |i|
         results_per_well = results[i]
-        hash = OpenStruct.new({:well_num=>i, :temperature=>results_per_well[0][0], :fluorescence_data=>results_per_well[0][1], :derivative=>results_per_well[0][2]})
+        hash = OpenStruct.new({:well_num=>i, :temperature=>results_per_well[0][0], :fluorescence_data=>results_per_well[0][1], :derivative=>results_per_well[0][2], :tm=>results_per_well[1][0], :area=>results_per_well[1][1]})
         melt_curve_data << hash
       end
     end 
