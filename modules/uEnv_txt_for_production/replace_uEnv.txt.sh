@@ -33,7 +33,26 @@ cape_disable=capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN
 
 ##note: the eMMC flasher script relies on the next line
 _EOF_
-UUID=$(lsblk -no UUID /dev/mmcblk0p2)
+
+
+UUID=$(lsblk -no UUID /dev/mmcblk1p2)
+if [ $? -eq 1 ]
+then
+	echo "/dev/mmcblk1 is not a valid block device"
+	UUID=$(lsblk -no UUID /dev/mmcblk0p2)
+#	echo "UUID for /dev/mmcblk0p2 is $UUID"
+	if [ $? -eq 1 ]
+	then
+#		echo $?
+ # 	  echo "UUID for /dev/mmcblk0p2 is $UUID"
+		echo "Cann't find a booting root!"
+		exit 0
+	fi
+fi
+
+echo "Root fs Block device found at $UUID"
+
+#exit
 
 cat << _EOF_ >> $uEnv
 mmcroot=UUID=${UUID} ro
@@ -72,7 +91,12 @@ usbargs=setenv bootargs console=tty0 console=\${console} \${optargs} \${cape_dis
 uenvcmdusb=run loadusbfiles; run usbargs; bootz \${loadaddr} \${initrd_addr}:\${initrd_size} \${fdtaddr}
 
 #uenvcmd=usb start; if test -e usb 0:1 /boot/${usb_kernel_file}; then run uenvcmdusb; else run uenvcmdmmc; fi
-uenvcmd= if gpio input 72; then usb start; if test -e usb 0:1 /boot/\${usb_kernel_file}; then echo "USB loaded";  run uenvcmdusb; else echo "MMC loaded"; run uenvcmdmmc; fi; else echo "MMC loaded"; run uenvcmdmmc; fi
+#uenvcmd= if gpio input 72; then usb start; if test -e usb 0:1 /boot/\${usb_kernel_file}; then echo "USB loaded";  run uenvcmdusb; else echo "MMC loaded"; run uenvcmdmmc; fi; else echo "MMC loaded"; run uenvcmdmmc; fi
+
+uenvcmdmmc=echo "*** Boot button Unpressed..!!"; run loadfiles; run mmcargs; bootz \${loadaddr} \${initrd_addr}:\${initrd_size} \${fdtaddr}
+uenvcmdsdcard=echo "*** Boot button pressed..!!"; bootpart=0:1;bootdir=;fdtaddr=0x81FF0000;optargs=quiet capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN;load mmc 0 \${loadaddr} uImage;run loadfdt;setenv bootargs console=\${console} \${optargs};bootm \${loadaddr} - \${fdtaddr}
+uenvcmd= if gpio input 72; then run uenvcmdsdcard; else run uenvcmdmmc; fi
+
 
 #
 _EOF_
