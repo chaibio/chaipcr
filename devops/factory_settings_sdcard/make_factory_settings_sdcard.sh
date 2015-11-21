@@ -26,6 +26,7 @@ image_filename_rootfs="$image_filename_prfx-rootfs.img.gz"
 image_filename_data="$image_filename_prfx-data.img.gz"
 image_filename_boot="$image_filename_prfx-boot.img.gz"
 image_filename_pt="$image_filename_prfx-pt.img.gz"
+image_filename_perm="$image_filename_prfx-perm.img.gz"
 
 if [ ! -e /sdcard ]
 then
@@ -58,6 +59,7 @@ echo "Removing previous images"
 if [ -e $image_filename_rootfs ]
 then
 	rm -f $image_filename_pt
+	rm -f $image_filename_perm
 	rm -f $image_filename_rootfs
 	rm -f $image_filename_data
 	rm -f $image_filename_boot
@@ -68,6 +70,7 @@ image_filename_rootfs2="$image_filename_prfx2-rootfs.img.gz"
 image_filename_data2="$image_filename_prfx2-data.img.gz"
 image_filename_boot2="$image_filename_prfx2-boot.img.gz"
 image_filename_pt2="$image_filename_prfx2-pt.img.gz"
+image_filename_perm2="$image_filename_prfx2-perm.img.gz"
 
 if [ -e $image_filename_rootfs2 ]
 then
@@ -75,10 +78,11 @@ then
 	rm -f $image_filename_rootfs2
 	rm -f $image_filename_data2
 	rm -f $image_filename_boot2
+	rm -f $image_filename_perm2
 fi
 
 rootfs_partition=${eMMC}p2
-
+perm_partition=${eMMC}p4
 data_partition=${eMMC}p3
 echo "Data partition: $data_partition"
 
@@ -131,6 +135,12 @@ dd  if=${eMMC}p3 bs=16M | gzip -c > $image_filename_data
 sleep 15
 sync
 
+echo "Backing up perm partition to: $image_filename_perm"
+dd  if=${eMMC}p4 bs=16M | gzip -c > $image_filename_perm
+
+sleep 15
+sync
+
 echo "Backing up binaries partition to: $image_filename_rootfs"
 dd  if=${eMMC}p2 bs=16M | gzip -c > $image_filename_rootfs
 
@@ -141,8 +151,10 @@ mv $image_filename_rootfs $image_filename_rootfs2
 mv $image_filename_data $image_filename_data2
 mv $image_filename_boot $image_filename_boot2
 mv $image_filename_pt $image_filename_pt2
+mv $image_filename_perm $image_filename_perm2
 
 sync
+
 echo "creating factory settings images  done!!"
 
 sleep 5
