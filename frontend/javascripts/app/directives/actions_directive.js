@@ -78,17 +78,6 @@ window.ChaiBioTech.ngApp.directive('actions', [
             });
         };
 
-        scope.addStage = function(type) {
-
-          if(! scope.infiniteHold) {
-            ExperimentLoader.addStage(scope, type)
-              .then(function(data) {
-                console.log("added", data);
-                scope.actionPopup = false;
-                scope.fabricStep.parentStage.parent.addNewStage(data, scope.fabricStep.parentStage);
-              });
-          }
-        };
 
         scope.editStage = function() {
 
@@ -98,7 +87,7 @@ window.ChaiBioTech.ngApp.directive('actions', [
         };
 
         scope.addPause = function() {
-          
+
           scope.step.pause = ! scope.step.pause;
           ExperimentLoader.changePause(scope)
           .then(function(data) {
