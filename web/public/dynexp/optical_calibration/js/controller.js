@@ -36,7 +36,7 @@
         if ($scope.state === 'Idle' && (oldData.experimentController.machine.state !== 'Idle' || $state.current.name === 'step-5')) {
           // experiment is complete
           $state.go('step-6');
-          $http.put(host + '/settings', {settings: {"calibrationId": $scope.experiment.id}});
+          $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
         }
       }, true);
 
