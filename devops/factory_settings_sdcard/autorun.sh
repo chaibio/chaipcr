@@ -1,5 +1,6 @@
 #!/bin/sh
 
+#exit
 id | grep -q root
 is_root=$?
 #echo $is_root
@@ -20,8 +21,13 @@ then
 	sdcard_dev=/dev/mmcblk0p1
 else
        	echo "4 partitions eMMC not found!"
-	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger 
-	exit
+#	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger 
+
+	eMMC=/dev/mmcblk1
+        sdcard_dev=/dev/mmcblk0p1
+
+
+	#exit
 fi
 
 sync
@@ -74,6 +80,14 @@ write_boot_image () {
 	echo "Done writing boot partition image!"
 }
 
+write_perm_image () {
+        echo "Writing perm partition image!"
+        echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+        gunzip -c ${sdcard}/factory_settings-perm.img.gz | dd of=${eMMC}p4 bs=16M
+        echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+        echo "Done writing perm partition image!"
+}
+
 write_pt_image () {
 	echo "Writing partition table!"
 	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
@@ -93,7 +107,7 @@ alldone () {
 	fi
 
 	echo "Done!"
-#exit
+exit
 
 	echo "-----------------------------"
 	echo "Note: Please unpower the board, a reset [sudo reboot] is not enough."
@@ -104,12 +118,63 @@ alldone () {
 	halt
 }
 
+flush_cache () {
+	sync
+}
+
+repartition_drive () {
+	dd if=/dev/zero of=${eMMC} bs=1M count=16
+	flush_cache
+
+	echo "Repartitioning eMMC!"
+
+	write_pt_image
+	flush_cache
+	flush_cache_mounted
+
+	echo "Partitioned!"
+}
+
+partition_drive () {
+	flush_cache
+
+	echo "Unmounting!"
+	umount ${eMMC}p1 > /dev/null || true
+	umount ${eMMC}p2 > /dev/null || true
+	umount ${eMMC}p3 > /dev/null || true
+	umount ${eMMC}p4 > /dev/null || true
+
+	flush_cache
+	repartition_drive
+	flush_cache
+}
+
+#partition_emmc () {
+	#7667712
+#	emmc_sectors=$( cat /sdcard/emmc_sectors.ini )
+#	echo "eMMC Sectors are: $emmc_sectors.. at $eMMC"
+#	rootfs_size=$(( (emmc_sectors - 8*1024*2 - 512*1024*2 - 96*1024*2 - 2*1024*2)/1024/2 ))
+#	echo "rootfs size: $rootfs_size M"
+
+#	perm_lastsector=$((emmc_sectors - 1))
+#	perm_firstsector=$((perm_lastsector - 8*1024*2))
+#	data_lastsector=$((perm_firstsector - 1 ))
+#	data_firstsector=$((data_lastsector - 500*1024*2 ))
+#	rootfs_lastsector=$((data_firstsector - 1))
+#	echo "rootfs last sector: $rootfs_lastsector"
+#	echo "data partition: $data_firstsector - $data_lastsector"
+#	echo "perm partition: $perm_firstsector - $perm_lastsector"
+
+#	partition_drive
+#}
+
+
 update_uenv () {
 	echo copying coupling uEng.txt
 	mount ${eMMC}p1 /emmcboot || true
 	cp /sdcard/uEnv.txt /emmcboot/
 	sync
-	sleep 5	
+	sleep 5
 	umount /emmcboot || true
 }
 
@@ -133,6 +198,29 @@ then
 	alldone
 	exit
 fi
+
+if [ ! -e ${eMMC}p4 ]
+then
+        echo "Partitioning $eMMC"
+	partition_drive
+	sync
+	if [ -e ${eMMC}p4 ]
+	then
+		echo "Done partitioning $eMMC!"
+	else
+		echo "Cannot update partition table at  $eMMC! restarting!"
+		echo Write Perm Partition > /sdcard/write_perm_partition.flag
+#leep 60
+	reboot
+		exit
+	fi
+
+
+else
+	echo "Device is partitioned"
+fi
+
+#exit
 
 echo "Copying from sdcard at $sdcard_dev to eMMC at $eMMC!"
 
@@ -166,6 +254,23 @@ echo "eMMC Flasher: writing to data partition"
 if [ -e ${sdcard}/factory_settings-data.img.gz ]
 then
         write_data_image
+fi
+
+if [ -e ${sdcard}/write_perm_partition.flag ]
+then
+	echo "eMMC Flasher: writing to /perm partition (to format)"
+	if [ -e ${sdcard}/factory_settings-perm.img.gz ]
+	then
+        	write_perm_image
+		echo "/perm image wrote.. cleaning!"
+		rm ${sdcard}/write_perm_partition.flag
+		mkdir -p /tmp/perm
+		mount ${eMMC}p4 /tmp/perm
+		rm -r /tmp/perm/*
+		sync
+		umount /tmp/perm/
+		echo "Done formatting /perm partition"
+	fi
 fi
 
 echo "eMMC Flasher: writing to rootfs partition"
