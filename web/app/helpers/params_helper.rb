@@ -22,6 +22,6 @@ private
   end
   
   def settings_params
-    params.require(:settings).permit(:time_zone, :debug)
+    params.require(:settings).permit(:calibration_id, :time_zone, :debug)
   end
 end
