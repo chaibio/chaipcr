@@ -25,7 +25,7 @@ window.ChaiBioTech.ngApp.directive('scrollOnTop', [
 
           scope.move = canvasDiff / scope.scrollDiff;
           // Automatically update
-          if(scope.position !== 0) {
+          if(scope.position !== 0) { // make this a new service , so these numbers can be used in events..
               var oldWidth = 300 / (oldVal / 1024);
               var moveLeft = Math.abs(oldWidth - width);
               scope.position = Math.abs(scope.position - moveLeft);
