@@ -17,7 +17,7 @@
       This will take about one minute
     </p>
     <p class="heating" ng-show="state === 'Running'">
-      The block is heating to <b>{{getBlockHeat() | round: 1}}&deg;</b>C <br>
+      Warming the instrument at <b>{{getBlockHeat() | round: 1}}&deg;</b>C <br>
     </p>
     <p class="note" ng-show="state === 'Running'">
       Estimated remaining time <b>{{timeRemaining | secondsDisplay: 'display2'}}</b>
