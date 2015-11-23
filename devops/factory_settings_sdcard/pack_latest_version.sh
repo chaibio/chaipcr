@@ -117,7 +117,7 @@ dd  if=${eMMC}p2 bs=16M | gzip -c > $image_filename_rootfs
 sleep 5
 sync
 
-echo "Backing up boot partition to: $image_filename_boot"
+echo "Packing up boot partition to: $image_filename_boot"
 dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
 
 #compressing

@@ -38,7 +38,6 @@ then
 	mkdir /emmc
 fi
 
-
 if [ ! -e /emmcboot ]
 then
         mkdir /emmcboot
@@ -140,6 +139,34 @@ dd  if=${eMMC}p4 bs=16M | gzip -c > $image_filename_perm
 
 sleep 15
 sync
+
+mount $rootfs_partition /emmc
+retval=$?
+
+if [ $retval -ne 0 ]; then
+    echo "Error mounting rootfs partition! Error($retval)"
+else
+	echo "Zeroing rootfs partition"
+	dd if=/dev/zero of=/emmc/big_zero_file1.bin bs=16M count=70> /dev/null
+	sync
+	sleep 5
+	dd if=/dev/zero of=/emmc/big_zero_file2.bin bs=16M count=70> /dev/null
+	sync
+	sleep 5
+	dd if=/dev/zero of=/emmc/big_zero_file3.bin bs=16M count=70> /dev/null
+	sync
+	sleep 5
+	dd if=/dev/zero of=/emmc/big_zero_file4.bin bs=16M> /dev/null
+	sync
+	sleep 10
+
+	echo "Removing zeros files"
+	rm /emmc/big_zero_file*
+	sync
+	sleep 10
+	sync
+	umount /emmc > /dev/null || true
+fi
 
 echo "Backing up binaries partition to: $image_filename_rootfs"
 dd  if=${eMMC}p2 bs=16M | gzip -c > $image_filename_rootfs

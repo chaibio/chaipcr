@@ -21,13 +21,10 @@ then
 	sdcard_dev=/dev/mmcblk0p1
 else
        	echo "4 partitions eMMC not found!"
-#	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger 
+	echo default-on > /sys/class/leds/beaglebone\:green\:usr1/trigger
 
 	eMMC=/dev/mmcblk1
         sdcard_dev=/dev/mmcblk0p1
-
-
-	#exit
 fi
 
 sync
@@ -107,15 +104,11 @@ alldone () {
 	fi
 
 	echo "Done!"
-exit
-
-	echo "-----------------------------"
-	echo "Note: Please unpower the board, a reset [sudo reboot] is not enough."
-	echo "-----------------------------"
-
-	echo "Shutting Down..."
+#exit
+	echo "Rebooting..."
 	sync
-	halt
+
+	reboot
 }
 
 flush_cache () {
@@ -149,26 +142,6 @@ partition_drive () {
 	flush_cache
 }
 
-#partition_emmc () {
-	#7667712
-#	emmc_sectors=$( cat /sdcard/emmc_sectors.ini )
-#	echo "eMMC Sectors are: $emmc_sectors.. at $eMMC"
-#	rootfs_size=$(( (emmc_sectors - 8*1024*2 - 512*1024*2 - 96*1024*2 - 2*1024*2)/1024/2 ))
-#	echo "rootfs size: $rootfs_size M"
-
-#	perm_lastsector=$((emmc_sectors - 1))
-#	perm_firstsector=$((perm_lastsector - 8*1024*2))
-#	data_lastsector=$((perm_firstsector - 1 ))
-#	data_firstsector=$((data_lastsector - 500*1024*2 ))
-#	rootfs_lastsector=$((data_firstsector - 1))
-#	echo "rootfs last sector: $rootfs_lastsector"
-#	echo "data partition: $data_firstsector - $data_lastsector"
-#	echo "perm partition: $perm_firstsector - $perm_lastsector"
-
-#	partition_drive
-#}
-
-
 update_uenv () {
 	echo copying coupling uEng.txt
 	mount ${eMMC}p1 /emmcboot || true
@@ -195,6 +168,10 @@ then
 	sh /sdcard/make_factory_settings_sdcard.sh || true
 	sync
 	update_uenv
+
+	echo Creating factory settings image done.. Now creating upgrade image. 
+	echo timer > /sys/class/leds/beaglebone\:green\:usr1/trigger
+	sh /sdcard/pack_factorysettings.sh || true
 	alldone
 	exit
 fi
@@ -210,12 +187,9 @@ then
 	else
 		echo "Cannot update partition table at  $eMMC! restarting!"
 		echo Write Perm Partition > /sdcard/write_perm_partition.flag
-#leep 60
-	reboot
+		reboot
 		exit
 	fi
-
-
 else
 	echo "Device is partitioned"
 fi
@@ -282,8 +256,10 @@ fi
 echo "eMMC Flasher: all done!"
 sync
 sleep 5
-umount /sdcard || true 
+umount /sdcard || true
 umount /emmc || true
 echo "Done!"
+
 alldone
 
+reboot
