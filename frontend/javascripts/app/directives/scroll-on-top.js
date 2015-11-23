@@ -1,5 +1,6 @@
 window.ChaiBioTech.ngApp.directive('scrollOnTop', [
-  function() {
+  'scrollService',
+  function(scrollService) {
     return {
       restric: 'EA',
       replace: true,
