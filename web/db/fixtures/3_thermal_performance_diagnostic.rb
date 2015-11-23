@@ -35,7 +35,7 @@ Stage.seed do |s|
   s.stage_type = Stage::TYPE_HOLD
 end
 
-Protocol.seed do |s|
+protocol = Protocol.seed do |s|
   s.id = 2
   s.lid_temperature = 110
   s.experiment_definition_id = 2
@@ -46,4 +46,5 @@ ExperimentDefinition.seed do |s|
   s.name = "Thermal Performance Diagnostic"
   s.guid = "thermal_performance_diagnostic"
   s.experiment_type = ExperimentDefinition::TYPE_DIAGNOSTIC
+  s.protocol = protocol.first
 end

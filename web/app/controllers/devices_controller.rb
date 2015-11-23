@@ -9,8 +9,9 @@ class DevicesController < ApplicationController
   resource_description { 
     formats ['json']
   }
-  
-  DEVICE_FILE_PATH  = "/Users/xia/device.json"
+
+#  DEVICE_FILE_PATH  = "/Users/xia/device.json"
+  DEVICE_FILE_PATH  = "/perm/device.json"
   
   def show
   end
@@ -45,8 +46,8 @@ class DevicesController < ApplicationController
   private
 
   def retrieve_mac
-    # str = `ifconfig eth0 | grep HWaddr`
-    str = "eth0      Link encap:Ethernet  HWaddr 54:4a:16:c0:7e:28 "
+    str = `ifconfig eth0 | grep HWaddr`
+    #str = "eth0      Link encap:Ethernet  HWaddr 54:4a:16:c0:7e:28 "
     re = %r/([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}/
     return re.match(str).to_s.strip
   end
