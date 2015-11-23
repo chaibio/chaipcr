@@ -60,13 +60,22 @@ Qpcrctl::Application.routes.draw do
 
   root 'main#index'
 
-  get  '/welcome', :to => 'main#welcome', :as => 'welcome'
+  get '/welcome', :to => 'main#welcome', :as => 'welcome'
   get '/login', :to => 'main#login', :as => 'login'
   
   post '/login', :to => 'sessions#create'
   post '/logout', :to => 'sessions#destroy'
 
+  match 'device/mac_address', to: 'devices#mac_address', via: [:options]
+  match 'device', to: 'devices#show', via: [:options]
+  resource :device, path_names: { show: 'info'}, only: [:update, :show] do
+    get 'capabilities'
+    get 'mac_address'
+    put 'root_password'
+  end
+  
   resource :settings, only: [:update, :show]
+
   resources :users, defaults: { format: 'json' }
 
   resources :experiments, defaults: { format: 'json' } do
