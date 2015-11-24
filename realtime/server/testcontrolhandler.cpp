@@ -21,10 +21,10 @@ void TestControlHandler::processOptics(const ptree &requestPt)
 
     if (optics)
     {
-        ptree::const_assoc_iterator ledIntensity = requestPt.find("ledIntensity");
-        ptree::const_assoc_iterator activateLED = requestPt.find("activateLED");
-        ptree::const_assoc_iterator disableLEDs = requestPt.find("disableLEDs");
-        ptree::const_assoc_iterator photodiodeMuxChannel = requestPt.find("photodiodeMuxChannel");
+        ptree::const_assoc_iterator ledIntensity = requestPt.find("led_intensity");
+        ptree::const_assoc_iterator activateLED = requestPt.find("activate_led");
+        ptree::const_assoc_iterator disableLEDs = requestPt.find("disable_leds");
+        ptree::const_assoc_iterator photodiodeMuxChannel = requestPt.find("photodiode_mux_channel");
 
         if (ledIntensity != requestPt.not_found())
             optics->getLedController()->setIntensity(ledIntensity->second.get_value<double>());
@@ -46,8 +46,8 @@ void TestControlHandler::processLid(const ptree &requestPt)
 
     if (lid)
     {
-        ptree::const_assoc_iterator lidTargetTemp = requestPt.find("lidTargetTemp");
-        ptree::const_assoc_iterator lidDrive = requestPt.find("lidDrive");
+        ptree::const_assoc_iterator lidTargetTemp = requestPt.find("lid_target_temp");
+        ptree::const_assoc_iterator lidDrive = requestPt.find("lid_drive");
 
         if (lidTargetTemp != requestPt.not_found())
         {
@@ -66,7 +66,7 @@ void TestControlHandler::processHeatSink(const ptree &requestPt)
 
     if (heatSink)
     {
-        ptree::const_assoc_iterator heatSinkTargetTemp = requestPt.find("heatSinkTargetTemp");
+        ptree::const_assoc_iterator heatSinkTargetTemp = requestPt.find("heat_sink_target_temp");
 
         if (heatSinkTargetTemp != requestPt.not_found())
             heatSink->setTargetTemperature(heatSinkTargetTemp->second.get_value<double>());
@@ -79,8 +79,8 @@ void TestControlHandler::processHeatBlock(const ptree &requestPt)
 
     if (heatBlock)
     {
-        ptree::const_assoc_iterator heatBlockTargetTemp = requestPt.find("heatBlockTargetTemp");
-        ptree::const_assoc_iterator heatBlockDrive = requestPt.find("heatBlockDrive");
+        ptree::const_assoc_iterator heatBlockTargetTemp = requestPt.find("heat_block_target_temp");
+        ptree::const_assoc_iterator heatBlockDrive = requestPt.find("heat_block_drive");
 
         if (heatBlockTargetTemp != requestPt.not_found())
         {

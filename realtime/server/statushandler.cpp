@@ -20,75 +20,75 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
 
         switch (state) {
         case ExperimentController::IdleMachineState:
-            responsePt.put("experimentController.machine.state", "Idle");
+            responsePt.put("experiment_controller.machine.state", "idle");
             break;
 
         case ExperimentController::LidHeatingMachineState:
-            responsePt.put("experimentController.machine.state", "LidHeating");
-            responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
+            responsePt.put("experiment_controller.machine.state", "lid_heating");
+            responsePt.put("experiment_controller.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
             break;
 
         case ExperimentController::RunningMachineState:
-            responsePt.put("experimentController.machine.state", "Running");
-            responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
-            responsePt.put("experimentController.expriment.estimated_duration", experiment.estimatedDuration());
-            responsePt.put("experimentController.expriment.paused_duration", experiment.pausedDuration());
+            responsePt.put("experiment_controller.machine.state", "running");
+            responsePt.put("experiment_controller.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
+            responsePt.put("experiment_controller.expriment.estimated_duration", experiment.estimatedDuration());
+            responsePt.put("experiment_controller.expriment.paused_duration", experiment.pausedDuration());
             break;
 
         case ExperimentController::PausedMachineState:
-            responsePt.put("experimentController.machine.state", "Paused");
-            responsePt.put("experimentController.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
-            responsePt.put("experimentController.expriment.estimated_duration", experiment.estimatedDuration());
-            responsePt.put("experimentController.expriment.paused_duration", experiment.pausedDuration() +
+            responsePt.put("experiment_controller.machine.state", "paused");
+            responsePt.put("experiment_controller.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
+            responsePt.put("experiment_controller.expriment.estimated_duration", experiment.estimatedDuration());
+            responsePt.put("experiment_controller.expriment.paused_duration", experiment.pausedDuration() +
                            (boost::posix_time::microsec_clock::local_time() - experiment.lastPauseTime()).total_seconds());
             break;
 
         case ExperimentController::CompleteMachineState:
-            responsePt.put("experimentController.machine.state", "Complete");
-            responsePt.put("experimentController.expriment.run_duration", (experiment.completedAt() - experiment.startedAt()).total_seconds());
+            responsePt.put("experiment_controller.machine.state", "complete");
+            responsePt.put("experiment_controller.expriment.run_duration", (experiment.completedAt() - experiment.startedAt()).total_seconds());
             break;
 
         default:
-            responsePt.put("experimentController.machine.state", "Unknown");
+            responsePt.put("experiment_controller.machine.state", "unknown");
             break;
         }
 
         switch (experimentController->thermalState())
         {
         case ExperimentController::IdleThermalState:
-            responsePt.put("experimentController.machine.thermal_state", "Idle");
+            responsePt.put("experiment_controller.machine.thermal_state", "idle");
             break;
 
         case ExperimentController::HoldingThermalState:
-            responsePt.put("experimentController.machine.thermal_state", "Holding");
+            responsePt.put("experiment_controller.machine.thermal_state", "holding");
             break;
 
         case ExperimentController::HeatingThermalState:
-            responsePt.put("experimentController.machine.thermal_state", "Heating");
+            responsePt.put("experiment_controller.machine.thermal_state", "heating");
             break;
 
         case ExperimentController::CoolingThermalState:
-            responsePt.put("experimentController.machine.thermal_state", "Cooling");
+            responsePt.put("experiment_controller.machine.thermal_state", "cooling");
             break;
 
         default:
-            responsePt.put("experimentController.machine.thermal_state", "Unknown");
+            responsePt.put("experiment_controller.machine.thermal_state", "unknown");
             break;
         }
 
         if (experimentController->machineState() != ExperimentController::IdleMachineState) {
-            responsePt.put("experimentController.expriment.id", experiment.id());
-            responsePt.put("experimentController.expriment.name", experiment.name());
-            responsePt.put("experimentController.expriment.started_at", experiment.startedAt());
+            responsePt.put("experiment_controller.expriment.id", experiment.id());
+            responsePt.put("experiment_controller.expriment.name", experiment.name());
+            responsePt.put("experiment_controller.expriment.started_at", experiment.startedAt());
 
-            responsePt.put("experimentController.expriment.stage.id", experiment.protocol()->currentStage()->id());
-            responsePt.put("experimentController.expriment.stage.name", experiment.protocol()->currentStage()->name());
-            responsePt.put("experimentController.expriment.stage.number", experiment.protocol()->currentStage()->orderNumber() + 1);
-            responsePt.put("experimentController.expriment.stage.cycle", experiment.protocol()->currentStage()->currentCycle());
+            responsePt.put("experiment_controller.expriment.stage.id", experiment.protocol()->currentStage()->id());
+            responsePt.put("experiment_controller.expriment.stage.name", experiment.protocol()->currentStage()->name());
+            responsePt.put("experiment_controller.expriment.stage.number", experiment.protocol()->currentStage()->orderNumber() + 1);
+            responsePt.put("experiment_controller.expriment.stage.cycle", experiment.protocol()->currentStage()->currentCycle());
 
-            responsePt.put("experimentController.expriment.step.id", experiment.protocol()->currentStep()->id());
-            responsePt.put("experimentController.expriment.step.name", experiment.protocol()->currentStep()->name());
-            responsePt.put("experimentController.expriment.step.number", experiment.protocol()->currentStep()->orderNumber() + 1);
+            responsePt.put("experiment_controller.expriment.step.id", experiment.protocol()->currentStep()->id());
+            responsePt.put("experiment_controller.expriment.step.name", experiment.protocol()->currentStep()->name());
+            responsePt.put("experiment_controller.expriment.step.number", experiment.protocol()->currentStep()->orderNumber() + 1);
         }
 
         std::shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();
@@ -97,28 +97,28 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
         std::shared_ptr<HeatSink> heatSink = HeatSinkInstance::getInstance();
 
         if (heatBlock) {
-            responsePt.put("heatblock.zone1.temperature", ROUND(heatBlock->zone1Temperature()));
-            responsePt.put("heatblock.zone1.targetTemperature", state == ExperimentController::RunningMachineState ? ROUND(heatBlock->zone1TargetTemperature()) : 0);
-            responsePt.put("heatblock.zone1.drive", ROUND(heatBlock->zone1DriveValue()));
+            responsePt.put("heat_block.zone1.temperature", ROUND(heatBlock->zone1Temperature()));
+            responsePt.put("heat_block.zone1.target_temperature", state == ExperimentController::RunningMachineState ? ROUND(heatBlock->zone1TargetTemperature()) : 0);
+            responsePt.put("heat_block.zone1.drive", ROUND(heatBlock->zone1DriveValue()));
 
-            responsePt.put("heatblock.zone2.temperature", ROUND(heatBlock->zone2Temperature()));
-            responsePt.put("heatblock.zone2.targetTemperature", state == ExperimentController::RunningMachineState ? ROUND(heatBlock->zone2TargetTemperature()) : 0);
-            responsePt.put("heatblock.zone2.drive", ROUND(heatBlock->zone2DriveValue()));
+            responsePt.put("heat_block.zone2.temperature", ROUND(heatBlock->zone2Temperature()));
+            responsePt.put("heat_block.zone2.target_temperature", state == ExperimentController::RunningMachineState ? ROUND(heatBlock->zone2TargetTemperature()) : 0);
+            responsePt.put("heat_block.zone2.drive", ROUND(heatBlock->zone2DriveValue()));
 
-            responsePt.put("heatblock.temperature", ROUND(heatBlock->temperature()));
+            responsePt.put("heat_block.temperature", ROUND(heatBlock->temperature()));
         }
 
         if (lid) {
             responsePt.put("lid.temperature", ROUND(lid->currentTemperature()));
-            responsePt.put("lid.targetTemperature", state == ExperimentController::LidHeatingMachineState || state == ExperimentController::RunningMachineState ? ROUND(lid->targetTemperature()) : 0);
+            responsePt.put("lid.target_temperature", state == ExperimentController::LidHeatingMachineState || state == ExperimentController::RunningMachineState ? ROUND(lid->targetTemperature()) : 0);
             responsePt.put("lid.drive", ROUND(lid->drive()));
         }
 
         if (optics) {
             responsePt.put("optics.intensity", optics->getLedController()->intensity());
-            responsePt.put("optics.collectData", optics->collectData());
-            responsePt.put("optics.lidOpen", optics->lidOpen());
-            responsePt.put("optics.wellNumber", state == ExperimentController::RunningMachineState ? optics->wellNumber() : 0);
+            responsePt.put("optics.collect_data", optics->collectData());
+            responsePt.put("optics.lid_open", optics->lidOpen());
+            responsePt.put("optics.well_number", state == ExperimentController::RunningMachineState ? optics->wellNumber() : 0);
 
             boost::property_tree::ptree adcArray;
             const std::map<std::size_t, std::atomic<unsigned long>> &adcValues = optics->lastAdcValues();
@@ -131,12 +131,12 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
                 adcArray.push_back(std::make_pair("", item));
             }
 
-            responsePt.put_child("optics.photodiodeValue", adcArray);
+            responsePt.put_child("optics.photodiode_value", adcArray);
         }
 
         if (heatSink) {
-            responsePt.put("heatSink.temperature", ROUND(heatSink->currentTemperature()));
-            responsePt.put("heatSink.fanDrive", ROUND(heatSink->fanDrive()));
+            responsePt.put("heat_sink.temperature", ROUND(heatSink->currentTemperature()));
+            responsePt.put("heat_sink.fan_drive", ROUND(heatSink->fanDrive()));
         }
     }
 }

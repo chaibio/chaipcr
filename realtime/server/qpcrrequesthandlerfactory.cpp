@@ -54,11 +54,11 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
                 }
                 else if (method == "PUT")
                 {
-                    if (requestPath.at(0) == "testControl")
+                    if (requestPath.at(0) == "test_control")
                         return new TestControlHandler();
                     else if (requestPath.at(0) == "settings")
                         return new SettingsHandler();
-                    else if (requestPath.at(0) == "logData")
+                    else if (requestPath.at(0) == "log_data")
                         return new LogDataHandler();
                 }
                 else if (method == "POST")
