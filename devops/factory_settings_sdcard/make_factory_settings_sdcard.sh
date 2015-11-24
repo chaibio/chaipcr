@@ -38,6 +38,7 @@ then
 	mkdir /emmc
 fi
 
+
 if [ ! -e /emmcboot ]
 then
         mkdir /emmcboot
@@ -139,6 +140,8 @@ dd  if=${eMMC}p4 bs=16M | gzip -c > $image_filename_perm
 
 sleep 15
 sync
+
+
 
 mount $rootfs_partition /emmc
 retval=$?

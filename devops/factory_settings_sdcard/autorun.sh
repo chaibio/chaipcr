@@ -105,6 +105,11 @@ alldone () {
 
 	echo "Done!"
 #exit
+
+#	echo "-----------------------------"
+#	echo "Note: Please unpower the board, a reset [sudo reboot] is not enough."
+#	echo "-----------------------------"
+
 	echo "Rebooting..."
 	sync
 
@@ -151,6 +156,11 @@ update_uenv () {
 	umount /emmcboot || true
 }
 
+
+#sh /sdcard/pack_factorysettings.sh || true
+#exit
+
+
 if [ -e ${sdcard}/upgrade_resume_autorun.flag ]
 then
 	echo "Resuming incomplete upgrade!"
@@ -170,8 +180,13 @@ then
 	update_uenv
 
 	echo Creating factory settings image done.. Now creating upgrade image. 
+
 	echo timer > /sys/class/leds/beaglebone\:green\:usr1/trigger
+
 	sh /sdcard/pack_factorysettings.sh || true
+
+
+
 	alldone
 	exit
 fi
@@ -256,10 +271,15 @@ fi
 echo "eMMC Flasher: all done!"
 sync
 sleep 5
-umount /sdcard || true
+umount /sdcard || true 
 umount /emmc || true
 echo "Done!"
+
+#echo timer > /sys/class/leds/beaglebone\:green\:usr1/trigger
+
+#sh /sdcard/pack_factorysettings.sh || true
 
 alldone
 
 reboot
+

@@ -6,6 +6,7 @@ if ! id | grep -q root; then
 fi
 
 check_running_system () {
+
 	if [ ! -f /boot/uboot/uEnv.txt ] ; then
 		echo "Error: script halting, system unrecognized..."
 		echo "unable to find: [/boot/uboot/uEnv.txt] is ${sdcard_dev}p1 mounted?"
@@ -23,13 +24,13 @@ check_running_system () {
 	fi
 }
 
-unset boot_drive
-boot_drive=$(LC_ALL=C lsblk -l | grep "/boot/uboot" | awk '{print $1}')
+#unset boot_drive
+#boot_drive=$(LC_ALL=C lsblk -l | grep "/boot/uboot" | awk '{print $1}')
 
-if [ "x${boot_drive}" = "x" ] ; then
-	echo "Error: script halting, system unrecognized..."
-	exit 1
-fi
+#if [ "x${boot_drive}" = "x" ] ; then
+	#echo "Error: script halting, system unrecognized..."
+	#exit 1
+#fi
 
 if [ -e /dev/mmcblk1p4 ] ; then
 	sdcard_dev="/dev/mmcblk0"
@@ -47,14 +48,13 @@ then
 	exit 1
 fi
 
-check_running_system
+#check_running_system
 
 echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger 
 
 sdcard="/sdcard"
 
-image_filename_folder="${sdcard}/tmp"
-image_filename_prfx="${image_filename_folder}/upgrade"
+image_filename_prfx="${sdcard}/tmp/upgrade"
 image_filename_rootfs="$image_filename_prfx-rootfs.img.gz" 
 image_filename_data="$image_filename_prfx-data.img.gz"
 image_filename_boot="$image_filename_prfx-boot.img.gz"
@@ -125,10 +125,7 @@ dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
 #echo "tar -cvf $image_filename_upgrade_tar_temp $image_filename_pt $image_filename_boot $image_filename_rootfs"
 
 echo "compressing all images to $image_filename_upgrade_tar_temp"
-
-echo "tar -cvf $image_filename_upgrade_tar_temp $image_filename_pt $image_filename_boot $image_filename_rootfs -C $image_filename_folder"
-exit
-
+tar -cvf $image_filename_upgrade_tar_temp $image_filename_pt $image_filename_boot $image_filename_rootfs
 
 echo "Pack images tar to $image_filename_upgrade_temp"
 gzip $image_filename_upgrade_tar_temp
