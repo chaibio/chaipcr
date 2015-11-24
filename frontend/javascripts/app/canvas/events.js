@@ -16,6 +16,7 @@ window.ChaiBioTech.ngApp.factory('events', [
 
       this.canvas = C.canvas;
       this.startDrag = 0;
+      this.canvasContaining = $('.canvas-containing');
       var that = this;
       console.log("Events loaded .... !", ExperimentLoader);
       // We write this handler so that gather data popup is forced to hide when
@@ -366,16 +367,22 @@ window.ChaiBioTech.ngApp.factory('events', [
       this.canvas.on("mouse:move", function(evt) {
 
         if(that.mouseDown && evt.target) {
-          that.canvas.defaultCursor = "move";
+
           if(that.startDrag === 0) {
+            that.canvas.defaultCursor = "move";
             that.startDrag = evt.e.clientX;
             that.startPos = $(".canvas-containing").scrollLeft();
           }
 
-          $scope.$apply(function() {
-            $scope.scrollLeft = that.startPos + (evt.e.clientX - that.startDrag);
-          });
-          $(".canvas-containing").scrollLeft($scope.scrollLeft);
+          var left = that.startPos + (evt.e.clientX - that.startDrag);
+          if((left >= 0) && (left <= $scope.scrollWidth - 1024)) {
+            
+            $scope.$apply(function() {
+              $scope.scrollLeft = left;
+            });
+
+            that.canvasContaining.scrollLeft(left);
+          }
         }
       });
 
@@ -393,9 +400,6 @@ window.ChaiBioTech.ngApp.factory('events', [
       ***************************************/
       $(".canvas-containing").scroll(function(){
         C.canvas.calcOffset();
-        var left = $(".canvas-containing").scrollLeft() / scrollService.move;
-        $(".foreground-bar").css("left", left + "px");
-
       });
 
       /**************************************

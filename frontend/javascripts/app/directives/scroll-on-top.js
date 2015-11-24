@@ -7,7 +7,8 @@ window.ChaiBioTech.ngApp.directive('scrollOnTop', [
       templateUrl: 'app/views/directives/scroll-on-top.html',
 
       scope: {
-        width: "@width"
+        width: "@width",
+        left: "@left"
       },
 
       link: function(scope, elem, attr) {
@@ -37,6 +38,10 @@ window.ChaiBioTech.ngApp.directive('scrollOnTop', [
           bar.css("width", width + "px");
         });
 
+        scope.$watch('left', function(newVal, oldVal) {
+          bar.css("left", (newVal / scrollService.move) + "px");
+        });
+        
         scope.dragElem = $(elem).find(".foreground-bar").draggable({
           refreshPositions: true,
           containment: "parent",
