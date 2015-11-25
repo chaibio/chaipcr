@@ -24,11 +24,6 @@
         $scope.state = data.experimentController.machine.state;
         $scope.timeRemaining = TestInProgressService.timeRemaining(data);
 
-        if ($scope.state !== 'Idle' && parseInt(data.experimentController.expriment.step.id) !== parseInt(oldData.experimentController.expriment.step.id)) {
-          console.log(data.experimentController.expriment.step);
-          console.log($scope.experiment);
-        }
-
         if (data.experimentController.expriment && !$scope.experiment) {
           TestInProgressService.getExperiment(data.experimentController.expriment.id).then(function (exp) {
             $scope.experiment = exp;
@@ -37,10 +32,7 @@
         if ($scope.isCollectingData() && $state.current.name === 'step-3') {
           $state.go('step-4');
         }
-        if ($state.current.name === 'step-3' || $state.current.name === 'step-4') {
-          $scope.timeRemaining = $scope.timeRemaining - $scope.finalStep().hold_time;
-        }
-        if (!$scope.isCollectingData() && $state.current.name === 'step-4') {
+        if (!$scope.isCollectingData() && ($state.current.name === 'step-3' || $state.current.name === 'step-4') ) {
           $state.go('step-5');
         }
         if ($scope.state === 'Idle' && (oldData.experimentController.machine.state !== 'Idle' || $state.current.name === 'step-6')) {
@@ -84,7 +76,7 @@
 
       $scope.resumeExperiment = function () {
         Experiment.resumeExperiment().then(function () {
-          $state.go('step-5');
+          $state.go('step-6');
         });
       };
 
