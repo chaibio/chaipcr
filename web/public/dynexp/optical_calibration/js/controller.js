@@ -36,8 +36,9 @@
         }
         if ($scope.isCollectingData() && $state.current.name === 'step-3') {
           $state.go('step-4');
+        }
+        if ($state.current.name === 'step-3' || $state.current.name === 'step-4') {
           $scope.timeRemaining = $scope.timeRemaining - $scope.finalStep().hold_time;
-          return;
         }
         if (!$scope.isCollectingData() && $state.current.name === 'step-4') {
           $state.go('step-5');
