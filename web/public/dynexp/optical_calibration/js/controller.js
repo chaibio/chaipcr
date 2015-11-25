@@ -110,12 +110,10 @@
         if (!$scope.experiment) return 0;
         if (!$scope.data) return 0;
         if (!$scope.data.experimentController) return 0;
-        if (!$scope.data.experimentController.experiment) return 0;
+        if (!$scope.data.experimentController.expriment) return 0;
 
         var step_id = parseInt($scope.data.experimentController.expriment.step.id);
         var steps = $scope.experiment.protocol.stages[0].stage.steps;
-        console.log(steps);
-        console.log($scope.experiment.protocol);
         return steps[steps.length-1].step.hold_time;
 
       };
