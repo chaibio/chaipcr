@@ -46,7 +46,7 @@ Stage.seed do |s|
   s.stage_type = Stage::TYPE_HOLD
 end
 
-Protocol.seed do |s|
+protocol = Protocol.seed do |s|
   s.id = 1
   s.lid_temperature = 110
   s.experiment_definition_id = 1
@@ -57,6 +57,7 @@ ExperimentDefinition.seed do |s|
   s.name = "calibration"
   s.guid = "optical_cal"
   s.experiment_type = ExperimentDefinition::TYPE_CALIBRATION
+  s.protocol = protocol.first
 end
 
 #Default Experiment

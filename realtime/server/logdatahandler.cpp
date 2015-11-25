@@ -12,7 +12,7 @@ void LogDataHandler::processData(const ptree &requestPt, ptree &)
 
     if (optics)
     {
-        ptree::const_assoc_iterator opticalData = requestPt.find("opticalData");
+        ptree::const_assoc_iterator opticalData = requestPt.find("optical_data");
 
         if (opticalData != requestPt.not_found())
             optics->setCollectData(opticalData->second.get_value<bool>());
@@ -20,8 +20,8 @@ void LogDataHandler::processData(const ptree &requestPt, ptree &)
 
     if (experimentController)
     {
-        ptree::const_assoc_iterator temperatureData = requestPt.find("temperatureData");
-        ptree::const_assoc_iterator temperatureDebugData = requestPt.find("temperatureDebugData");
+        ptree::const_assoc_iterator temperatureData = requestPt.find("temperature_data");
+        ptree::const_assoc_iterator temperatureDebugData = requestPt.find("temperature_debug_data");
 
         if (temperatureData != requestPt.not_found())
             experimentController->settings()->temperatureLogs.setTemperatureLogs(temperatureData->second.get_value<bool>());

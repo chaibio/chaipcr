@@ -16,7 +16,7 @@ window.ChaiBioTech.ngApp.factory('stepTemperature', [
           fontSize: 20,
           top : this.parent.top + 10,
           left: this.parent.left - 15,
-          fontFamily: "dinot",
+          fontFamily: "dinot-bold",
           selectable: false,
           //fontWeight: "800"
         });

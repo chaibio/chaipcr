@@ -26,5 +26,5 @@ class MainController < ApplicationController
       redirect_to welcome_path
     end
   end
-
+  
 end

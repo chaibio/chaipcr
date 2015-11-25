@@ -9,11 +9,14 @@ window.ChaiBioTech.ngApp.factory('events', [
   'previouslySelected',
   'popupStatus',
   'previouslyHoverd',
+  'scrollService',
 
-  function(ExperimentLoader, previouslySelected, popupStatus, previouslyHoverd) {
+  function(ExperimentLoader, previouslySelected, popupStatus, previouslyHoverd, scrollService) {
     return function(C, $scope) {
 
       this.canvas = C.canvas;
+      this.startDrag = 0;
+      this.canvasContaining = $('.canvas-containing');
       var that = this;
       console.log("Events loaded .... !", ExperimentLoader);
       // We write this handler so that gather data popup is forced to hide when
@@ -231,6 +234,7 @@ window.ChaiBioTech.ngApp.factory('events', [
           and we send the changes to backbone views.
       ***************************************/
       this.canvas.on("mouse:down", function(evt) {
+        that.mouseDown = true;
         if(evt.target) {
           var me;
 
@@ -289,7 +293,6 @@ window.ChaiBioTech.ngApp.factory('events', [
           here too we look for the target in the event and do the action.
       ***************************************/
       this.canvas.on('object:moving', function(evt) {
-
         if(evt.target) {
           switch(evt.target.name) {
 
@@ -361,6 +364,36 @@ window.ChaiBioTech.ngApp.factory('events', [
         }
       });
 
+      this.canvas.on("mouse:move", function(evt) {
+
+        if(that.mouseDown && evt.target) {
+
+          if(that.startDrag === 0) {
+            that.canvas.defaultCursor = "move";
+            that.startDrag = evt.e.clientX;
+            that.startPos = $(".canvas-containing").scrollLeft();
+          }
+
+          var left = that.startPos + (evt.e.clientX - that.startDrag);
+          if((left >= 0) && (left <= $scope.scrollWidth - 1024)) {
+            
+            $scope.$apply(function() {
+              $scope.scrollLeft = left;
+            });
+
+            that.canvasContaining.scrollLeft(left);
+          }
+        }
+      });
+
+      this.canvas.on("mouse:up", function(evt) {
+
+        if(that.mouseDown) {
+          that.canvas.defaultCursor = "default";
+          that.startDrag = 0;
+          that.mouseDown = false;
+        }
+      });
       /**************************************
           A tricky one, fired from the DOM perspective. When we have long
           canvas and when we scroll canvas recalculate the offset.

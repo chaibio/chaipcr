@@ -173,7 +173,8 @@ window.ChaiBioTech.ngApp.factory('step', [
         }
 
         this.stepName.setFill("black");
-        this.numberingText.setFill("black");
+        this.numberingTextCurrent.setFill("black");
+        this.numberingTextTotal.setFill("black");
       };
 
       this.unSelectStep = function() {
@@ -185,7 +186,8 @@ window.ChaiBioTech.ngApp.factory('step', [
 
         previouslySelectedStep.manageBorderPrevious('#ff9f00', this);
         previouslySelectedStep.stepName.setFill("white");
-        previouslySelectedStep.numberingText.setFill("white");
+        previouslySelectedStep.numberingTextCurrent.setFill("white");
+        previouslySelectedStep.numberingTextTotal.setFill("white");
       };
     };
   }

@@ -17,7 +17,7 @@
         </div>
         <div class="where-m-I">
           <!-- This is going to be a directive -->
-          <scroll-on-top ng-if="showScrollbar" width="{{scrollWidth}}"></scroll-on-top>
+          <scroll-on-top ng-if="showScrollbar" width="{{scrollWidth}}" left="{{scrollLeft}}"></scroll-on-top>
         </div>
         <div ng-if="false" class="undo-container">
           <button id="undo-action">UNDO</button>
@@ -97,11 +97,13 @@
           <div class="name-board ">EDIT STEPS + STAGES</div>
             <actions></actions>
         </div>
+
       </div>
+      <stage-type-popup ng-show="actionPopup && !infiniteHoldStage"></stage-type-popup>
       </div>
       <arrow class="next" action="next" ng-click="arrowClicked()"></arrow>
 
-      <div class="exp-info-bar"> <!--the balack bar in the bottom comes here --></div>
+      <div class="exp-info-bar"> <!--the black bar in the bottom comes here --></div>
     </div>
     </div>
   </div>

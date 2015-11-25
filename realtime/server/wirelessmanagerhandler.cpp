@@ -54,23 +54,23 @@ void WirelessManagerHandler::processData(const boost::property_tree::ptree &requ
         switch (status)
         {
         case WirelessManager::Connecting:
-            responsePt.put("wifi.status", "Connecting");
+            responsePt.put("wifi.status", "connecting");
             break;
 
         case WirelessManager::ConnectionError:
-            responsePt.put("wifi.status", "ConnectionError");
+            responsePt.put("wifi.status", "connection_error");
             break;
 
         case WirelessManager::AuthenticationError:
-            responsePt.put("wifi.status", "AuthenticationError");
+            responsePt.put("wifi.status", "authentication_error");
             break;
 
         case WirelessManager::Connected:
-            responsePt.put("wifi.status", "Connected");
+            responsePt.put("wifi.status", "connected");
             break;
 
         default:
-            responsePt.put("wifi.status", "NotConnected");
+            responsePt.put("wifi.status", "not_connected");
             break;
         }
 

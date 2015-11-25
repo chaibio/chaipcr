@@ -12,7 +12,14 @@ window.ChaiBioTech.ngApp.directive('summaryModeItem', [
 
       templateUrl: 'app/views/directives/summary-mode-item.html',
 
+
       link: function(scope, elem, attr) {
+
+
+        if(scope.caption.length > 15) {
+          $(elem).find(".caption-part").css("font-size", "14px");
+        }
+
         scope.delta = true;
         scope.date = false;
         scope.$watch("reading", function(val) {

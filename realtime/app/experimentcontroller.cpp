@@ -56,7 +56,12 @@ void ExperimentController::readDeviceFile()
         boost::property_tree::ptree ptree;
         boost::property_tree::read_json(deviceFile, ptree);
 
-        _settings->device.setOpticsChannels(ptree.get<std::size_t>("capabilities.channels", 1));
+        boost::optional<boost::property_tree::ptree&> array = ptree.get_child_optional("capabilities.optics.emission_channels");
+
+        if (array)
+            _settings->device.setOpticsChannels(array.get().size());
+        else
+            _settings->device.setOpticsChannels(1);
     }
     else
         std::cout << "ExperimentController::readDeviceFile - unable to read device file: " << std::strerror(errno) << '\n';

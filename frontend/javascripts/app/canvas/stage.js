@@ -293,6 +293,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         }
 
         this.stageName.setFill(color);
+        this.stageCaption.setFill(color);
 
       };
 

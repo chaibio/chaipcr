@@ -11,7 +11,7 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
 
       this.stepNameText = stepName;
       this.stepName = new fabric.Text(stepName, {
-          fill: 'white',  fontSize: 12,  top : 20,  left: -1,  fontFamily: "dinot",  selectable: false,
+          fill: 'white',  fontSize: 12,  top : 20,  left: -1,  fontFamily: "dinot-regular",  selectable: false,
           originX: 'left', originY: 'top'
         }
       );
@@ -27,7 +27,8 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
       for(var dot in cordinates) {
         var cord = cordinates[dot];
         smallDotArray.push(new fabric.Circle({
-          radius: 2, fill: 'white', left: cord[0], top: cord[1], selectable: false, name: "stageDot", originX: "center", originY: "center"
+          radius: 2, fill: 'white', left: cord[0], top: cord[1], selectable: false,
+          name: "stepDot", originX: "center", originY: "center"
         }));
       }
 
@@ -104,13 +105,13 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
       );
 
       this.autoDeltaTempTime = new fabric.Text('-0.15ºC, +5.0s', {
-          fill: 'white',  fontSize: 12,  top : 0, left: 0,  fontFamily: "dinot",  selectable: false,
+          fill: 'white',  fontSize: 12,  top : 0, left: 0,  fontFamily: "dinot-regular",  selectable: false,
           originX: 'left', originY: 'top'
         }
       );
       this.autoDeltaStartCycle = new fabric.Text('Start Cycle: 5', {
-          fill: 'white',  fontSize: 12,  top : 15,  left: 0,  fontFamily: "dinot",  selectable: false,
-          originX: 'left', originY: 'top'
+          fill: 'white',  fontSize: 12,  top : 15,  left: 0,  fontFamily: "dinot-bold",  selectable: false,
+          originX: 'left', originY: 'top',
         }
       );
 
@@ -126,17 +127,26 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
       thisLength = (noofSteps < 10) ? "0" + noofSteps : noofSteps;
       text = thisIndex + "/" + thisLength;
 
-      this.numberingText.setText(text);
+      this.numberingTextCurrent.setText(thisIndex);
+      this.numberingTextTotal.setText("/" + thisLength);
+      this.numberingTextTotal.setLeft(this.numberingTextCurrent.left + this.numberingTextCurrent.width);
       return this;
     };
 
     this.initNumberText = function() {
 
-      this.numberingText = new fabric.Text('wow', {
-          fill: 'white',  fontSize: 12,  top : 7,  left: -1,  fontFamily: "dinot",  selectable: false,
+      this.numberingTextCurrent = new fabric.Text('wow', {
+          fill: 'white',  fontSize: 12,  top : 7,  left: -1,  fontFamily: "dinot-bold",  selectable: false,
           originX: 'left', originY: 'top'
         }
       );
+
+      this.numberingTextTotal = new fabric.Text('wow', {
+          fill: 'white',  fontSize: 12,  top : 7,  fontFamily: "dinot",  selectable: false,
+          originX: 'left', originY: 'top'
+        }
+      );
+
     };
 
     this.addBorderRight = function() {
@@ -190,7 +200,7 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
         }
       );
 
-      this.stepGroup = new fabric.Group([this.stepRect, this.numberingText, this.stepName, this.deltaSymbol,
+      this.stepGroup = new fabric.Group([this.stepRect, this.numberingTextCurrent, this.numberingTextTotal, this.stepName, this.deltaSymbol,
         this.deltaGroup, this.borderRight], {
         left: this.left || 33,  top: 28,  selectable: false,  hasControls: false,
         hasBoarders: false, name: "stepGroup",  me: this, originX: 'left', originY: 'top'

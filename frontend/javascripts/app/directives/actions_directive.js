@@ -32,16 +32,22 @@ window.ChaiBioTech.ngApp.directive('actions', [
             }
           });
 
-          scope.$watch("fabricStep.circle.holdTime.text", function(newVal) {
+          scope.$watch("step.id", function(newVal) {
 
-            if(newVal) {
-              if(newVal === "∞") {
-                scope.infiniteHoldStep = true;
-                scope.infiniteHoldStage = true;
-              } else {
-                scope.infiniteHoldStep = false;
-                scope.infiniteHoldStage = scope.containInfiniteStep(scope.fabricStep.parentStage);
+            if(scope.fabricStep) {
+
+              if(scope.fabricStep.circle.holdTime.text === "∞") {
+                scope.infiniteHoldStep = scope.infiniteHoldStage = true;
+                return true;
               }
+              scope.infiniteHoldStep = false;
+
+              if(scope.containInfiniteStep(scope.fabricStep.parentStage)) {
+                scope.infiniteHoldStage = true;
+                return true;
+              }
+
+              scope.infiniteHoldStage = false;
             }
           });
 
@@ -78,17 +84,6 @@ window.ChaiBioTech.ngApp.directive('actions', [
             });
         };
 
-        scope.addStage = function(type) {
-
-          if(! scope.infiniteHold) {
-            ExperimentLoader.addStage(scope, type)
-              .then(function(data) {
-                console.log("added", data);
-                scope.actionPopup = false;
-                scope.fabricStep.parentStage.parent.addNewStage(data, scope.fabricStep.parentStage);
-              });
-          }
-        };
 
         scope.editStage = function() {
 
@@ -98,7 +93,7 @@ window.ChaiBioTech.ngApp.directive('actions', [
         };
 
         scope.addPause = function() {
-          
+
           scope.step.pause = ! scope.step.pause;
           ExperimentLoader.changePause(scope)
           .then(function(data) {

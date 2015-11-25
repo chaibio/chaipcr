@@ -82,7 +82,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
         stageView = new stage(stageData.stage, this.canvas, this.allStepViews, index, this, this.$scope, false);
         // We connect the stages like a linked list so that we can go up and down.
-        if(previousStage){
+        if(previousStage) {
           previousStage.nextStage = stageView;
           stageView.previousStage = previousStage;
         }
