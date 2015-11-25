@@ -40,6 +40,9 @@
           $state.go('step-7');
           $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
         }
+        if ($state.current.name === 'step-3' || $state.current.name === 'step-4') {
+          $scope.timeRemaining  = ($scope.timeRemaining - $scope.finalStep().hold_time);
+        }
       }, true);
 
       $scope.lidHeatPercentage = function () {
