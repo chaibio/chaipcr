@@ -52,8 +52,6 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     this.setDefaultWidthHeight = function() {
 
       this.canvas.setHeight(400);
-      //var width = (this.allStepViews.length * 128 > 1024) ? this.allStepViews.length * 128 : 1024;
-      // Add these numbers to constants.
       var stageCount = this.allStageViews.length;
       this.canvas.setWidth(
         (this.allStepViews.length * constants.stepWidth) +
@@ -92,7 +90,6 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         return stageView;
       }, this);
 
-      //stageView.addBorderRight();
       console.log("Stages added ... !");
       return this;
 
@@ -119,12 +116,10 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       var that = this;
       loadImageRecursion = function(index) {
         fabric.Image.fromURL(that.imageLocation + that.images[index], function(img) {
-
           that.imageobjects[that.images[index]] = img;
           if(index < noOfImages) {
             loadImageRecursion(++index);
           } else {
-            console.log(noOfImages + " images loaded .... !");
             that.canvas.fire("imagesLoaded");
           }
         });
