@@ -41,7 +41,7 @@
           $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
         }
         if ($state.current.name === 'step-3' || $state.current.name === 'step-4') {
-          $scope.timeRemaining  = ($scope.timeRemaining - $scope.finalStep().hold_time);
+          $scope.timeRemaining  = ($scope.timeRemaining - $scope.finalStepHoldTime());
         }
       }, true);
 
@@ -106,15 +106,17 @@
 
       };
 
-      $scope.finalStep = function () {
-        if (!$scope.experiment) return;
-        if (!$scope.data) return;
-        if (!$scope.data.experimentController) return;
-        if (!$scope.data.experimentController.experiment) return;
+      $scope.finalStepHoldTime = function () {
+        if (!$scope.experiment) return 0;
+        if (!$scope.data) return 0;
+        if (!$scope.data.experimentController) return 0;
+        if (!$scope.data.experimentController.experiment) return 0;
 
         var step_id = parseInt($scope.data.experimentController.expriment.step.id);
         var steps = $scope.experiment.protocol.stages[0].stage.steps;
-        return steps[steps.length-1].step;
+        console.log(steps);
+        console.log($scope.experiment.protocol);
+        return steps[steps.length-1].step.hold_time;
 
       };
 
