@@ -17,7 +17,6 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     this.init = function(model) {
 
-      console.log("controller", model, "hi hi Jossie");
       this.model = model.protocol;
       this.$scope = model;
       this.allStepViews = [];
@@ -55,11 +54,12 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       this.canvas.setHeight(400);
       //var width = (this.allStepViews.length * 128 > 1024) ? this.allStepViews.length * 128 : 1024;
       // Add these numbers to constants.
+      var stageCount = this.allStageViews.length;
       this.canvas.setWidth(
         (this.allStepViews.length * constants.stepWidth) +
-        ((this.allStageViews.length) * 8) +
-        ((this.allStageViews.length) * 2) +
-        33 + 33
+        ((stageCount) * constants.newStageOffset) +
+        ((stageCount) * constants.additionalWidth) +
+        (constants.canvasSpacingFrontAndRear * 2)
       );
       var that = this, showScrollbar;
       // Show Hide scroll bar in the top
@@ -227,25 +227,6 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       //this.canvas.add(this.stageMoveIndicator);
     };
 
-    this.addDelImage = function() {
-
-      /*this.delImageObj = $.extend({}, this.imageobjects["close.png"]);
-      this.delImageObj.opacity = 0;
-      this.delImageObj.originX = "left";
-      this.delImageObj.originY = "top";
-      this.delImageObj.left = -100;
-      this.delImageObj.top = 79;
-      this.delImageObj.name = "commonDeleteButton";
-      this.delImageObj.me = this;
-      this.delImageObj.selectable = true;
-      this.delImageObj.hasBorders = false;
-      this.delImageObj.hasControls = false;
-      this.delImageObj.lockMovementY = true;
-      this.delImageObj.lockMovementX = true;
-
-      this.canvas.add(this.delImageObj);*/
-    };
-
     this.editStageMode = function(status) {
 
       var add = (status) ? 25 : -25;
@@ -288,7 +269,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       //move the stages, make space.
       var ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus,
       originalWidth = currentStage.myWidth,
-      add = (data.stage.steps.length > 0) ? 128 + Math.floor(8 / data.stage.steps.length) : 128;
+      add = (data.stage.steps.length > 0) ? 128 + Math.floor(constants.newStageOffset / data.stage.steps.length) : 128;
 
       data.stage.steps.forEach(function(step) {
         currentStage.myWidth = currentStage.myWidth + add;

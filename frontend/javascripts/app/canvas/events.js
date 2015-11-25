@@ -376,7 +376,7 @@ window.ChaiBioTech.ngApp.factory('events', [
 
           var left = that.startPos + (evt.e.clientX - that.startDrag);
           if((left >= 0) && (left <= $scope.scrollWidth - 1024)) {
-            
+
             $scope.$apply(function() {
               $scope.scrollLeft = left;
             });
@@ -411,7 +411,6 @@ window.ChaiBioTech.ngApp.factory('events', [
       this.canvas.on("imagesLoaded", function() {
         C.addStages().setDefaultWidthHeight().addRampLinesAndCircles();
         C.selectStep();
-        C.addDelImage();
         //C.addMoveStepIndicator();
         C.canvas.renderAll();
       });

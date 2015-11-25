@@ -14,7 +14,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.model = model;
       this.index = index;
       this.canvas = stage;
-      this.myWidth = (this.model.steps.length * (constants.stepWidth)) + 2;
+      this.myWidth = (this.model.steps.length * (constants.stepWidth)) + constants.additionalWidth;
       this.parent = fabricStage;
       this.childSteps = [];
       this.previousStage = this.nextStage = this.noOfCycles = null;
@@ -218,7 +218,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.getLeft = function() {
 
         if(this.previousStage) {
-          this.left = this.previousStage.left + this.previousStage.myWidth + 8;
+          this.left = this.previousStage.left + this.previousStage.myWidth + constants.newStageOffset;
         } else {
           this.left = 33;
         }
