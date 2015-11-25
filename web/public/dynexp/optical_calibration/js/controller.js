@@ -12,11 +12,6 @@
 
       $scope.cancel = false;
 
-      $scope.$on('stateChangeSuccess', function () {
-        console.log('current state: ' + $state.current.name);
-        console.log($scope.currentStep());
-      });
-
       $scope.$watch(function () {
         return Status.getData();
       }, function (data, oldData) {
@@ -112,6 +107,7 @@
         if (!$scope.experiment) return;
         if (!$scope.data) return;
         if (!$scope.data.experimentController) return;
+        if (!$scope.data.experimentController.experiment) return;
 
         var step_id = parseInt($scope.data.experimentController.expriment.step.id);
         var steps = $scope.experiment.protocol.stages[0].stage.steps;
