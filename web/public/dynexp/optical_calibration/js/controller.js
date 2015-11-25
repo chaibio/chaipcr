@@ -12,6 +12,11 @@
 
       $scope.cancel = false;
 
+      $scope.$on('stateChangeSuccess', function () {
+        console.log('current state: ' + $state.current.name);
+        console.log($scope.currentStep());
+      });
+
       $scope.$watch(function () {
         return Status.getData();
       }, function (data, oldData) {
@@ -32,7 +37,7 @@
         if ($scope.isCollectingData() && $state.current.name === 'step-3') {
           $state.go('step-4');
         }
-        if (!$scope.isCollectingData() && ($state.current.name === 'step-3' || $state.current.name === 'step-4') ) {
+        if (!$scope.isCollectingData() && ($state.current.name === 'step-4') ) {
           $state.go('step-5');
         }
         if ($scope.state === 'Idle' && (oldData.experimentController.machine.state !== 'Idle' || $state.current.name === 'step-6')) {
