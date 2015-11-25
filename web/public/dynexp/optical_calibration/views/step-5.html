@@ -1,21 +1,29 @@
-<div class="step-5">
-  <p class="step"><b>STEP 5</b>/6</p>
-  <h2>Reading Fluorescence</h2>
-  <div class="machine-icon">
-    <img src="./images/machine-idle.png">
-    <img src="./images/spinner-green.png" class="image-rotate">
+<div class="step-4">
+  <p class="step"><b>STEP 5</b>/7</p>
+  <h2>Insert Solution Strips</h2>
+
+  <div class="row tubes-container">
+    <div class="col-md-6">
+      <div class="solution-label">
+        <span><b>2</b>x 8-well PCR Strips, Solution</span>
+      </div>
+      <img src="./images/tubes-green.png" class="tubes">
+    </div>
+    <div class="col-md-6 machine-icon-container">
+      <img src="./images/machine-idle.png" alt="">
+    </div>
+  </div>
+
+  <div class="instruction">
+    <b class="top-text">NEXT:</b> <BR>
+    Load the 2 strips of <b>Open qPCR Calibration Solution</b>. <br>
+    Ensure the <b>lid height</b> is properly adjusted, and hit <b>Next</b> to continue.
   </div>
 
   <div class="text-center">
-    <p class="wait">FLUORESCENCE MEASUREMENT IS NEARLY COMPLETE:</p>
-    <p class="heating">
-      Less than {{timeRemaining | secondsDisplay: 'display4'}} remaining
-    </p>
-    <p class="dont-open">
-      Please don't open the machine during this step.
-    </p>
-
-    <button class="button" ng-click="cancel=true" ng-show="!cancel">CANCEL</button>
-    <button class="button red" ng-show="cancel" ng-click="cancelExperiment()">CONFIRM CANCEL</button>
+    <a ng-click="cancel=true" class="button" ng-show="!cancel">CANCEL</a>
+    <a href="/" class="button red" ng-show="cancel">CONFIRM CANCEL</a>
+    <a ng-click="resumeExperiment()" class="button" ng-show="!cancel">NEXT</a>
   </div>
+
 </div>

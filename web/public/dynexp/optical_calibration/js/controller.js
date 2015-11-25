@@ -34,13 +34,17 @@
             $scope.experiment = exp;
           });
         }
-        if ($scope.state === 'Paused' && $state.current.name === 'step-3') {
+        if ($scope.isCollectingData() && $state.current.name === 'step-3') {
           $state.go('step-4');
+          $scope.timeRemaining = $scope.timeRemaining - $scope.finalStep().hold_time;
           return;
+        }
+        if (!$scope.isCollectingData() && $state.current.name === 'step-4') {
+          $state.go('step-5');
         }
         if ($scope.state === 'Idle' && (oldData.experimentController.machine.state !== 'Idle' || $state.current.name === 'step-5')) {
           // experiment is complete
-          $state.go('step-6');
+          $state.go('step-7');
           $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
         }
       }, true);
@@ -88,6 +92,33 @@
           var redirect = '/#/user/settings';
           $window.location = redirect;
         });
+      };
+
+      $scope.isCollectingData = function () {
+        if (!$scope.data) return false;
+        if (!$scope.data.optics) return false;
+        return $scope.data.optics.collectData === 'true' ? true: false;
+      };
+
+      $scope.currentStep = function () {
+        if (!$scope.experiment) return;
+        if (!$scope.data) return;
+        if (!$scope.data.experimentController) return;
+
+        var step_id = parseInt($scope.data.experimentController.expriment.step.id);
+        return $scope.experiment.protocol.stages[0].stage.steps[step_id-1].step;
+
+      };
+
+      $scope.finalStep = function () {
+        if (!$scope.experiment) return;
+        if (!$scope.data) return;
+        if (!$scope.data.experimentController) return;
+
+        var step_id = parseInt($scope.data.experimentController.expriment.step.id);
+        var steps = $scope.experiment.protocol.stages[0].stage.steps;
+        return steps[steps.length-1].step;
+
       };
 
     }
