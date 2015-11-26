@@ -1,6 +1,6 @@
 diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-eMMC-flasher.sh
---- ./beaglebone-black-eMMC-flasher.sh	2015-11-25 06:32:08.418396703 +0200
-+++ ../tools_updated/beaglebone-black-eMMC-flasher.sh	2015-11-25 07:01:41.726316364 +0200
+--- ./beaglebone-black-eMMC-flasher.sh	2015-11-26 05:59:16.344566584 +0200
++++ ../tools_updated/beaglebone-black-eMMC-flasher.sh	2015-11-26 06:07:22.700594069 +0200
 @@ -1,4 +1,6 @@
  #!/bin/bash -e
 +
@@ -36,7 +36,7 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  fi
  
  flush_cache () {
-@@ -52,12 +60,14 @@
+@@ -52,12 +60,23 @@
  
  flush_cache_mounted () {
  	sync
@@ -44,9 +44,18 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
 +	blockdev --flushbufs ${emmcdev}
  }
  
- write_failure () {
+-write_failure () {
 -	echo "writing to [${destination}] failed..."
--
++umount_all () {
++	echo unmounting all partitions.
++
++        umount ${emmcdev}p1 > /dev/null || true
++        umount ${emmcdev}p2 > /dev/null || true
++        umount ${emmcdev}p3 > /dev/null || true
++        umount ${emmcdev}p4 > /dev/null || true
++}
+ 
++write_failure () {
 +	echo "writing to [${emmcdev}] failed..."
 +#lsblk
 +#df -h
@@ -54,17 +63,13 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  	if [ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] ; then
  		echo heartbeat > /sys/class/leds/beaglebone\:green\:usr0/trigger
  		echo heartbeat > /sys/class/leds/beaglebone\:green\:usr1/trigger
-@@ -66,20 +76,27 @@
+@@ -66,20 +85,23 @@
  	fi
  	echo "-----------------------------"
  	flush_cache
 -	umount ${destination}p1 || true
 -	umount ${destination}p2 || true
-+
-+	umount ${emmcdev}p1 > /dev/null || true
-+	umount ${emmcdev}p2 > /dev/null || true
-+        umount ${emmcdev}p3 > /dev/null || true
-+        umount ${emmcdev}p4 > /dev/null || true
++	umount_all
 +
  	exit
  }
@@ -86,7 +91,7 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  	if [ ! -f /boot/uboot/uEnv.txt ] ; then
  		echo "Error: script halting, system unrecognized..."
  		echo "unable to find: [/boot/uboot/uEnv.txt] is ${source}p1 mounted?"
-@@ -87,12 +104,12 @@
+@@ -87,12 +109,12 @@
  	fi
  
  	echo "-----------------------------"
@@ -102,7 +107,7 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  		write_failure
  	fi
  }
-@@ -116,7 +133,7 @@
+@@ -116,7 +138,7 @@
  }
  
  fdisk_toggle_boot () {
@@ -111,7 +116,7 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  	a
  	1
  	w
-@@ -125,38 +142,66 @@
+@@ -125,38 +147,67 @@
  }
  
  format_boot () {
@@ -125,17 +130,18 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  
  format_root () {
 -	mkfs.ext4 ${destination}p2 -L rootfs
++	echo "formating root fs at ${emmcdev}p2"
 +	mkfs.ext4 ${emmcdev}p2 -L rootfs
 +	flush_cache
 +}
 +
 +format_perm () {
-+	mkfs.ext4 ${emmcdev}p3 -L rootfs
++	mkfs.ext4 ${emmcdev}p3 -L perm
 +	flush_cache
 +}
 +
 +format_data () {
-+	mkfs.ext4 ${emmcdev}p4 -L rootfs
++	mkfs.ext4 ${emmcdev}p4 -L data
  	flush_cache
  }
  
@@ -185,7 +191,7 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  		umount ${DRIVE} >/dev/null 2>&1 || umount -l ${DRIVE} >/dev/null 2>&1 || write_failure
  	done
  
-@@ -166,23 +211,13 @@
+@@ -166,23 +217,13 @@
  
  	format_boot
  	format_root
@@ -213,7 +219,7 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  	if [ "${root_uuid}" ] ; then
  		root_uuid="UUID=${root_uuid}"
  		device_id=$(cat /tmp/boot/uEnv.txt | grep mmcroot | grep mmcblk | awk '{print $1}' | awk -F '=' '{print $2}')
-@@ -195,13 +230,104 @@
+@@ -195,13 +236,104 @@
  		root_uuid="${source}p2"
  	fi
  	flush_cache_mounted
@@ -319,7 +325,7 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  	flush_cache_mounted
  
  	if [ -f /tmp/rootfs/opt/scripts/images/beaglebg.jpg ] ; then
-@@ -214,14 +340,17 @@
+@@ -214,14 +346,17 @@
  
  	mkdir -p /tmp/rootfs/boot/uboot/ || true
  	mkdir -p /tmp/rootfs/lib/modules/$(uname -r)/ || true
@@ -338,7 +344,7 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  	if [ "${boot_uuid}" ] ; then
  		boot_uuid="UUID=${boot_uuid}"
  	else
-@@ -238,26 +367,93 @@
+@@ -238,26 +373,97 @@
  	flush_cache_mounted
  	umount_p2
  
@@ -363,6 +369,10 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
  
 +echo "eMMC Flasher: Checking system"
  check_running_system
+-update_boot_files
+-partition_drive
+-copy_boot
+-copy_rootfs
 +
 +#emmc_sectors=$( blockdev --getsize /dev/mmcblk0 )
 +
@@ -382,11 +392,8 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
 +echo "data partition: $data_firstsector - $data_lastsector"
 +echo "perm partition: $perm_firstsector - $perm_lastsector"
 +
-+echo "eMMC Flasher: Update boot files"
- update_boot_files
--partition_drive
--copy_boot
--copy_rootfs
++#echo "eMMC Flasher: Update boot files"
++#update_boot_files
 +
 +echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
 +
@@ -398,12 +405,16 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
 +        partition_drive
 +fi
 +
++umount_all
++
 +echo "eMMC Flasher: Creating boot partition"
 +if [ -e /opt/factory_settings-boot.img.gz ]
 +then
 +        write_boot_image
 +else
 +	format_boot
++	echo "eMMC Flasher: Update boot files"
++	update_boot_files
 +        copy_boot
 +fi
 +
@@ -453,7 +464,7 @@ diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-e
 +
 diff -urN ./make_factory_settings_sdcard.sh ../tools_updated/make_factory_settings_sdcard.sh
 --- ./make_factory_settings_sdcard.sh	1970-01-01 02:00:00.000000000 +0200
-+++ ../tools_updated/make_factory_settings_sdcard.sh	2015-11-25 06:32:08.362396705 +0200
++++ ../tools_updated/make_factory_settings_sdcard.sh	2015-11-26 05:58:17.820563277 +0200
 @@ -0,0 +1,172 @@
 +#!/bin/sh
 +
@@ -629,7 +640,7 @@ diff -urN ./make_factory_settings_sdcard.sh ../tools_updated/make_factory_settin
 +# reboot
 diff -urN ./pack_latest_version.sh ../tools_updated/pack_latest_version.sh
 --- ./pack_latest_version.sh	1970-01-01 02:00:00.000000000 +0200
-+++ ../tools_updated/pack_latest_version.sh	2015-11-25 06:32:08.382396704 +0200
++++ ../tools_updated/pack_latest_version.sh	2015-11-26 05:58:17.820563277 +0200
 @@ -0,0 +1,165 @@
 +#!/bin/bash
 +
@@ -798,7 +809,7 @@ diff -urN ./pack_latest_version.sh ../tools_updated/pack_latest_version.sh
 +exit 0
 diff -urN ./restore_factory_settings.sh ../tools_updated/restore_factory_settings.sh
 --- ./restore_factory_settings.sh	1970-01-01 02:00:00.000000000 +0200
-+++ ../tools_updated/restore_factory_settings.sh	2015-11-25 06:32:08.386396704 +0200
++++ ../tools_updated/restore_factory_settings.sh	2015-11-26 05:58:17.820563277 +0200
 @@ -0,0 +1,115 @@
 +#!/bin/bash -e
 +
@@ -917,7 +928,7 @@ diff -urN ./restore_factory_settings.sh ../tools_updated/restore_factory_setting
 +lable_partitions
 diff -urN ./unpack_latest_version.sh ../tools_updated/unpack_latest_version.sh
 --- ./unpack_latest_version.sh	1970-01-01 02:00:00.000000000 +0200
-+++ ../tools_updated/unpack_latest_version.sh	2015-11-25 06:32:08.386396704 +0200
++++ ../tools_updated/unpack_latest_version.sh	2015-11-26 05:58:17.820563277 +0200
 @@ -0,0 +1,325 @@
 +#!/bin/bash
 +
