@@ -12,9 +12,13 @@
         url: '/introduction',
         templateUrl: './views/intro.html'
       })
-      .state('step-2', {
-        url: '/step-2',
-        templateUrl: './views/page-2.html'
+      .state('exp-running', {
+        url: '/exp-running',
+        templateUrl: './views/exp-running.html'
+      })
+      .state('analyze', {
+        url: '/analyze',
+        templateUrl: './views/analyze.html'
       });
 
     }

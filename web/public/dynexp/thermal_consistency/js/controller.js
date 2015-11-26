@@ -22,6 +22,7 @@
 
         $scope.data = data;
         $scope.state = data.experimentController.machine.state;
+        $scope.old_state = oldData.experimentController.machine.state;
         $scope.timeRemaining = TestInProgressService.timeRemaining(data);
 
         if (data.experimentController.expriment && !$scope.experiment) {
@@ -29,7 +30,24 @@
             $scope.experiment = exp;
           });
         }
+
+        if($scope.state === 'Idle' && $scope.old_state !=='Idle') {
+          // exp complete
+          analyzeExperiment();
+        }
+
       }, true);
+
+
+      function analyzeExperiment () {
+        $state.go('analyze');
+        if (!$scope.analyzedExp) {
+          Experiment.analyze($scope.experiment.id).then(function (resp) {
+            $scope.analyzedExp = resp.data;
+            console.log($scope.analyzedExp);
+          });
+        }
+      };
 
       $scope.lidHeatPercentage = function () {
         if (!$scope.experiment) return 0;
@@ -59,7 +77,7 @@
         exp.$save().then(function (resp) {
           Experiment.startExperiment(resp.experiment.id).then(function () {
             $scope.experiment = resp.experiment;
-            $state.go('step-2');
+            $state.go('exp-running');
           });
         });
       };
