@@ -93,7 +93,7 @@
       $scope.isCollectingData = function () {
         if (!$scope.data) return false;
         if (!$scope.data.optics) return false;
-        return $scope.data.optics.collectData === 'true' ? true: false;
+        return ($scope.data.optics.collectData === 'true');
       };
 
       $scope.currentStep = function () {
