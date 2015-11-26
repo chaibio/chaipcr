@@ -109,6 +109,20 @@ window.App.service('TestInProgressService', [
         return 0;
       }
     };
+    this.getExperimentSteps = function (exp) {
+      var stages = exp.protocol.stages;
+      var steps = [];
+
+      for (var i=0; i < stages.length; i++) {
+        var stage = stages[i].stage;
+        var _steps = stage.steps;
+
+        for (var ii=0; ii < _steps.length; ii ++) {
+          steps.push(_steps[ii].step);
+        }
+      }
+      return steps;
+    };
   }
 ]);
 

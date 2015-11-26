@@ -90,7 +90,8 @@
         if (!$scope.data.experimentController.expriment) return;
         var step_id = parseInt($scope.data.experimentController.expriment.step.id);
         if (!step_id) return;
-        return $scope.experiment.protocol.stages[0].stage.steps[step_id-1].step;
+        var steps = TestInProgressService.getExperimentSteps($scope.experiment);
+        return _.find(steps, {id: step_id});
 
       };
 
