@@ -16,9 +16,10 @@ window.ChaiBioTech.ngApp.factory('events', [
   'objectMoving',
   'objectModified',
   'mouseMove',
+  'mouseUp',
 
   function(ExperimentLoader, previouslySelected, popupStatus, previouslyHoverd, scrollService,
-    mouseOver, mouseOut, mouseDown, objectMoving, objectModified, mouseMove) {
+    mouseOver, mouseOut, mouseDown, objectMoving, objectModified, mouseMove, mouseUp) {
     return function(C, $scope) {
 
       this.canvas = C.canvas;
@@ -31,9 +32,22 @@ window.ChaiBioTech.ngApp.factory('events', [
       mouseOver.init.call(this, C, $scope, that);
       mouseOut.init.call(this, C, $scope, that);
       mouseDown.init.call(this, C, $scope, that);
+      mouseMove.init.call(this, C, $scope, that);
+      mouseUp.init.call(this, C, $scope, that);
+
       objectMoving.init.call(this, C, $scope, that);
       objectModified.init.call(this, C, $scope, that);
-      mouseMove.init.call(this, C, $scope, that);
+
+
+      angular.element('body').click(function(evt) {
+        if(popupStatus.popupStatusGatherData && evt.target.parentNode.id != "gather-data-button") {
+            // Here we induce a click so that, angular hides the popup.
+            angular.element('#gather-data-button').click();
+        } else if(popupStatus.popupStatusAddStage && evt.target.id != "add-stage") {
+            angular.element('#add-stage').click();
+        }
+
+      });
 
       angular.element('.canvas-container, .canvasClass').mouseleave(function() {
 
@@ -138,14 +152,6 @@ window.ChaiBioTech.ngApp.factory('events', [
 
       };
 
-      this.canvas.on("mouse:up", function(evt) {
-
-        if(that.mouseDown) {
-          that.canvas.defaultCursor = "default";
-          that.startDrag = 0;
-          that.mouseDown = false;
-        }
-      });
       /**************************************
           A tricky one, fired from the DOM perspective. When we have long
           canvas and when we scroll canvas recalculate the offset.
