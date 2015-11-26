@@ -10,8 +10,9 @@ window.ChaiBioTech.ngApp.factory('events', [
   'popupStatus',
   'previouslyHoverd',
   'scrollService',
+  'mouseOver',
 
-  function(ExperimentLoader, previouslySelected, popupStatus, previouslyHoverd, scrollService) {
+  function(ExperimentLoader, previouslySelected, popupStatus, previouslyHoverd, scrollService, mouseOver) {
     return function(C, $scope) {
 
       this.canvas = C.canvas;
@@ -21,16 +22,8 @@ window.ChaiBioTech.ngApp.factory('events', [
       console.log("Events loaded .... !", ExperimentLoader);
       // We write this handler so that gather data popup is forced to hide when
       // clicked at some other part of the page, Given pop up is active.
-
-      angular.element('body').click(function(evt) {
-        if(popupStatus.popupStatusGatherData && evt.target.parentNode.id != "gather-data-button") {
-            // Here we induce a click so that, angular hides the popup.
-            angular.element('#gather-data-button').click();
-        } else if(popupStatus.popupStatusAddStage && evt.target.id != "add-stage") {
-            angular.element('#add-stage').click();
-        }
-
-      });
+      //mouseOver.init();
+      mouseOver.init.call(this, C, $scope, that);
 
       angular.element('.canvas-container, .canvasClass').mouseleave(function() {
 
@@ -135,65 +128,7 @@ window.ChaiBioTech.ngApp.factory('events', [
 
       };
 
-      this.canvas.on("mouse:over", function(evt) {
-        if(evt.target) {
-          var me;
 
-          switch(evt.target.name) {
-
-            case "stepGroup":
-              me = evt.target.me;
-              if(C.editStageStatus === false) {
-                me.closeImage.setVisible(true);
-                if(previouslyHoverd.step && previouslyHoverd.step.uniqueName !== me.uniqueName) {
-                  previouslyHoverd.step.closeImage.setVisible(false);
-                }
-                previouslyHoverd.step = me;
-                /*C.delImageObj.me = me;
-                C.delImageObj.setLeft(me.left + 108).setCoords();
-                C.delImageObj.animate('opacity', 1, {
-                  duration: 400,
-                  onChange: C.canvas.renderAll.bind(C.canvas)
-                });*/
-                C.canvas.renderAll();
-              }
-            break;
-
-            case "commonDeleteButton":
-
-              C.delImageObj.setOpacity(1);
-              that.canvas.hoverCursor = "pointer";
-              C.canvas.renderAll();
-            break;
-
-            case "deleteStepButton":
-              that.canvas.hoverCursor = "pointer";
-            break;
-            case "moveStepImage":
-
-              evt.target.setVisible(false);
-              C.stageMoveIndicator.setVisible(false);
-              me = evt.target.step;
-              if(! that.infiniteStep(me)) {
-                that.footerMouseOver(C.indicator, me, "step");
-              }
-
-            break;
-
-            case "blackFooter":
-
-            case "commonStep":
-
-              me = evt.target.step;
-              C.indicator.setVisible(false);
-              if(! that.containInfiniteStep(me)) { // If the stage has infinite hold , we cant move it.
-                that.footerMouseOver(C.stageMoveIndicator, me, "stage");
-              }
-
-            break;
-          }
-        }
-      });
 
       this.canvas.on("mouse:out", function(evt) {
         if(evt.target) {

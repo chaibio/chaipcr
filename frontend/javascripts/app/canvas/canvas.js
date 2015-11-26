@@ -214,18 +214,10 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       return this.drawCirclesArray;
     };
 
-    this.addMoveStepIndicator = function() {
-
-      //this.indicator = moveStepRect.getMoveStepRect(this);
-      //this.stageMoveIndicator = moveStageRect.getMoveStepRect(this);
-      //this.canvas.add(this.indicator);
-      //this.canvas.add(this.stageMoveIndicator);
-    };
-
     this.editStageMode = function(status) {
 
       var add = (status) ? 25 : -25;
-      //this.delImageObj.setOpacity(0);
+
       if(status === true) {
         this.editStageStatus = status;
         previouslySelected.circle.parent.manageFooter("black");
@@ -234,7 +226,6 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         previouslySelected.circle.parent.manageFooter("white");
         previouslySelected.circle.parent.parentStage.changeFillsAndStrokes("white", 2);
         this.editStageStatus = status; // This order editStageStatus is changed is important, because changeFillsAndStrokes()
-        //Works only if editStageStatus === true
       }
 
       this.allStageViews.forEach(function(stage, index) {
