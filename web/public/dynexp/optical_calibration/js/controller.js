@@ -62,7 +62,8 @@
         if (!$scope.experiment) return;
         if (!$scope.experiment.protocol.stages[0]) return;
         if (!$scope.experiment.protocol.stages[0].stage.steps[0]) return;
-        return $scope.experiment.protocol.stages[0].stage.steps[0].step.temperature;
+        if (!$scope.currentStep()) return;
+        return $scope.currentStep().temperature;
       }
 
       $scope.createExperiment = function () {
