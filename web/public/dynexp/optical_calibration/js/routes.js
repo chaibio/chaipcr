@@ -24,6 +24,10 @@
         url: '/step-3',
         templateUrl: './views/step-3.html'
       })
+      .state('step-3-reading', {
+        url: '/step-3-reading-data',
+        templateUrl: './views/step-3-reading.html'
+      })
       .state('step-4', {
         url: '/step-4',
         templateUrl: './views/step-4.html'
@@ -35,10 +39,6 @@
       .state('step-6', {
         url: '/step-6',
         templateUrl: './views/step-6.html'
-      })
-      .state('step-7', {
-        url: '/step-7',
-        templateUrl: './views/step-7.html'
       });
 
     }
