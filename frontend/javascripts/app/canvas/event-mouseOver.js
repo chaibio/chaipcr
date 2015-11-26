@@ -6,7 +6,7 @@ window.ChaiBioTech.ngApp.factory('mouseOver', [
   function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService) {
 
     this.init = function(C, $scope, that) {
-      
+
       var me;
       this.canvas.on("mouse:over", function(evt) {
 
@@ -28,16 +28,6 @@ window.ChaiBioTech.ngApp.factory('mouseOver', [
 
           case "deleteStepButton":
             that.canvas.hoverCursor = "pointer";
-          break;
-
-          case "moveStepImage":
-            evt.target.setVisible(false);
-            C.stageMoveIndicator.setVisible(false);
-            me = evt.target.step;
-            if(! that.infiniteStep(me)) {
-              that.footerMouseOver(C.indicator, me, "step");
-            }
-
           break;
 
         }

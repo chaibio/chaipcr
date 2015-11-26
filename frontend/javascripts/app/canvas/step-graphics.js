@@ -36,7 +36,7 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
 
       this.dots = new fabric.Group(smallDotArray, {
         originX: "left", originY: "top", left: this.left + 16, top: 378, visible: editStageStatus, lockMovementY: true,
-        hasBorders: false, hasControls: false,
+        hasBorders: false, hasControls: false, name: "moveStep"
       });
       return this;
     };

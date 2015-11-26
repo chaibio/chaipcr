@@ -11,8 +11,9 @@ window.ChaiBioTech.ngApp.factory('events', [
   'previouslyHoverd',
   'scrollService',
   'mouseOver',
-
-  function(ExperimentLoader, previouslySelected, popupStatus, previouslyHoverd, scrollService, mouseOver) {
+  'mouseOut',
+  function(ExperimentLoader, previouslySelected, popupStatus, previouslyHoverd, scrollService,
+    mouseOver, mouseOut) {
     return function(C, $scope) {
 
       this.canvas = C.canvas;
@@ -24,6 +25,7 @@ window.ChaiBioTech.ngApp.factory('events', [
       // clicked at some other part of the page, Given pop up is active.
       //mouseOver.init();
       mouseOver.init.call(this, C, $scope, that);
+      mouseOut.init.call(this, C, $scope, that);
 
       angular.element('.canvas-container, .canvasClass').mouseleave(function() {
 
@@ -128,41 +130,6 @@ window.ChaiBioTech.ngApp.factory('events', [
 
       };
 
-
-
-      this.canvas.on("mouse:out", function(evt) {
-        if(evt.target) {
-          var me;
-          switch(evt.target.name) {
-
-            case "stepGroup":
-              //C.delImageObj.setOpacity(0);
-            break;
-
-            case "commonDeleteButton":
-              //that.canvas.hoverCursor = "move";
-            break;
-
-            case "dragStepGroup":
-
-              evt.target.setVisible(false);
-              me = evt.target.currentStep;
-              me.whiteFooterImage.setVisible(true);
-              C.canvas.renderAll();
-            break;
-
-            case "deleteStepButton":
-              that.canvas.hoverCursor = "move";
-            break;
-
-            case "dragStageGroup":
-
-              evt.target.setVisible(false);
-              C.canvas.renderAll();
-              break;
-          }
-        }
-      });
       /**************************************
           what happens when click is happening in canvas.
           what we do is check if the click is up on some particular events.
