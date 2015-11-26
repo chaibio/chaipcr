@@ -29,14 +29,19 @@
             $scope.experiment = exp;
           });
         }
-        if ($scope.state === 'Paused' && $state.current.name === 'step-3') {
+        if ($scope.isCollectingData() && $state.current.name === 'step-3') {
           $state.go('step-4');
-          return;
         }
-        if ($scope.state === 'Idle' && (oldData.experimentController.machine.state !== 'Idle' || $state.current.name === 'step-5')) {
+        if (!$scope.isCollectingData() && ($state.current.name === 'step-4') ) {
+          $state.go('step-5');
+        }
+        if ($scope.state === 'Idle' && (oldData.experimentController.machine.state !== 'Idle' || $state.current.name === 'step-6')) {
           // experiment is complete
-          $state.go('step-6');
+          $state.go('step-7');
           $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
+        }
+        if ($state.current.name === 'step-3' || $state.current.name === 'step-4') {
+          $scope.timeRemaining  = ($scope.timeRemaining - $scope.finalStepHoldTime());
         }
       }, true);
 
@@ -57,7 +62,8 @@
         if (!$scope.experiment) return;
         if (!$scope.experiment.protocol.stages[0]) return;
         if (!$scope.experiment.protocol.stages[0].stage.steps[0]) return;
-        return $scope.experiment.protocol.stages[0].stage.steps[0].step.temperature;
+        if (!$scope.currentStep()) return;
+        return $scope.currentStep().temperature;
       }
 
       $scope.createExperiment = function () {
@@ -74,7 +80,7 @@
 
       $scope.resumeExperiment = function () {
         Experiment.resumeExperiment().then(function () {
-          $state.go('step-5');
+          $state.go('step-6');
         });
       };
 
@@ -83,6 +89,34 @@
           var redirect = '/#/user/settings';
           $window.location = redirect;
         });
+      };
+
+      $scope.isCollectingData = function () {
+        if (!$scope.data) return false;
+        if (!$scope.data.optics) return false;
+        return ($scope.data.optics.collectData === 'true');
+      };
+
+      $scope.currentStep = function () {
+        if (!$scope.experiment) return;
+        if (!$scope.data) return;
+        if (!$scope.data.experimentController) return;
+
+        var step_id = parseInt($scope.data.experimentController.expriment.step.id);
+        return $scope.experiment.protocol.stages[0].stage.steps[step_id-1].step;
+
+      };
+
+      $scope.finalStepHoldTime = function () {
+        if (!$scope.experiment) return 0;
+        if (!$scope.data) return 0;
+        if (!$scope.data.experimentController) return 0;
+        if (!$scope.data.experimentController.expriment) return 0;
+
+        var step_id = parseInt($scope.data.experimentController.expriment.step.id);
+        var steps = $scope.experiment.protocol.stages[0].stage.steps;
+        return steps[steps.length-1].step.hold_time;
+
       };
 
     }
