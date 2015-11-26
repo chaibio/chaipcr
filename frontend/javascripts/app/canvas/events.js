@@ -15,15 +15,16 @@ window.ChaiBioTech.ngApp.factory('events', [
   'mouseDown',
   'objectMoving',
   'objectModified',
+  'mouseMove',
 
   function(ExperimentLoader, previouslySelected, popupStatus, previouslyHoverd, scrollService,
-    mouseOver, mouseOut, mouseDown, objectMoving, objectModified) {
+    mouseOver, mouseOut, mouseDown, objectMoving, objectModified, mouseMove) {
     return function(C, $scope) {
 
       this.canvas = C.canvas;
-      this.startDrag = 0;
+      this.startDrag = 0; // beginning position of dragging
       this.mouseDown = false;
-      this.canvasContaining = $('.canvas-containing');
+      //this.canvasContaining = $('.canvas-containing');
       var that = this;
       console.log("Events loaded .... !", ExperimentLoader);
 
@@ -32,6 +33,7 @@ window.ChaiBioTech.ngApp.factory('events', [
       mouseDown.init.call(this, C, $scope, that);
       objectMoving.init.call(this, C, $scope, that);
       objectModified.init.call(this, C, $scope, that);
+      mouseMove.init.call(this, C, $scope, that);
 
       angular.element('.canvas-container, .canvasClass').mouseleave(function() {
 
@@ -135,28 +137,6 @@ window.ChaiBioTech.ngApp.factory('events', [
         C.canvas.renderAll();
 
       };
-
-      this.canvas.on("mouse:move", function(evt) {
-
-        if(that.mouseDown && evt.target) {
-
-          if(that.startDrag === 0) {
-            that.canvas.defaultCursor = "move";
-            that.startDrag = evt.e.clientX;
-            that.startPos = $(".canvas-containing").scrollLeft();
-          }
-
-          var left = that.startPos + (evt.e.clientX - that.startDrag);
-          if((left >= 0) && (left <= $scope.scrollWidth - 1024)) {
-
-            $scope.$apply(function() {
-              $scope.scrollLeft = left;
-            });
-
-            that.canvasContaining.scrollLeft(left);
-          }
-        }
-      });
 
       this.canvas.on("mouse:up", function(evt) {
 
