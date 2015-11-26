@@ -11,7 +11,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
   'moveStageRect',
   'previouslySelected',
   'constants',
-
+  
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
     moveStepRect, moveStageRect, previouslySelected, constants) {
 

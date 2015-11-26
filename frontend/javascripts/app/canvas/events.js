@@ -17,17 +17,16 @@ window.ChaiBioTech.ngApp.factory('events', [
   'objectModified',
   'mouseMove',
   'mouseUp',
+  'htmlEvents',
 
   function(ExperimentLoader, previouslySelected, popupStatus, previouslyHoverd, scrollService,
-    mouseOver, mouseOut, mouseDown, objectMoving, objectModified, mouseMove, mouseUp) {
+    mouseOver, mouseOut, mouseDown, objectMoving, objectModified, mouseMove, mouseUp, htmlEvents) {
     return function(C, $scope) {
 
       this.canvas = C.canvas;
       this.startDrag = 0; // beginning position of dragging
       this.mouseDown = false;
-      //this.canvasContaining = $('.canvas-containing');
       var that = this;
-      console.log("Events loaded .... !", ExperimentLoader);
 
       mouseOver.init.call(this, C, $scope, that);
       mouseOut.init.call(this, C, $scope, that);
@@ -38,35 +37,9 @@ window.ChaiBioTech.ngApp.factory('events', [
       objectMoving.init.call(this, C, $scope, that);
       objectModified.init.call(this, C, $scope, that);
 
+      htmlEvents.init.call(this, C, $scope, that);
 
-      angular.element('body').click(function(evt) {
-        if(popupStatus.popupStatusGatherData && evt.target.parentNode.id != "gather-data-button") {
-            // Here we induce a click so that, angular hides the popup.
-            angular.element('#gather-data-button').click();
-        } else if(popupStatus.popupStatusAddStage && evt.target.id != "add-stage") {
-            angular.element('#add-stage').click();
-        }
-
-      });
-
-      angular.element('.canvas-container, .canvasClass').mouseleave(function() {
-
-        if(C.editStageStatus === false) {
-            if(previouslyHoverd.step) {
-              previouslyHoverd.step.closeImage.setVisible(false);
-            }
-            previouslyHoverd.step = null;
-            C.canvas.renderAll();
-        }
-      });
-
-      angular.element('.canvas-containing').click(function(evt) {
-
-        if(evt.target == evt.currentTarget) {
-          that.setSummaryMode();
-        }
-      });
-
+      // Methods
       this.setSummaryMode = function() {
 
         $scope.$apply(function() {
@@ -169,7 +142,6 @@ window.ChaiBioTech.ngApp.factory('events', [
       this.canvas.on("imagesLoaded", function() {
         C.addStages().setDefaultWidthHeight().addRampLinesAndCircles();
         C.selectStep();
-        //C.addMoveStepIndicator();
         C.canvas.renderAll();
       });
     };
