@@ -14,9 +14,10 @@ window.ChaiBioTech.ngApp.factory('events', [
   'mouseOut',
   'mouseDown',
   'objectMoving',
+  'objectModified',
 
   function(ExperimentLoader, previouslySelected, popupStatus, previouslyHoverd, scrollService,
-    mouseOver, mouseOut, mouseDown, objectMoving) {
+    mouseOver, mouseOut, mouseDown, objectMoving, objectModified) {
     return function(C, $scope) {
 
       this.canvas = C.canvas;
@@ -30,6 +31,7 @@ window.ChaiBioTech.ngApp.factory('events', [
       mouseOut.init.call(this, C, $scope, that);
       mouseDown.init.call(this, C, $scope, that);
       objectMoving.init.call(this, C, $scope, that);
+      objectModified.init.call(this, C, $scope, that);
 
       angular.element('.canvas-container, .canvasClass').mouseleave(function() {
 
@@ -133,53 +135,6 @@ window.ChaiBioTech.ngApp.factory('events', [
         C.canvas.renderAll();
 
       };
-
-      /**************************************
-          When the dragging of the object is finished
-      ***************************************/
-      this.canvas.on('object:modified', function(evt) {
-
-        if(evt.target) {
-
-          var step, me;
-          switch(evt.target.name) {
-
-            case "controlCircleGroup":
-
-              me = evt.target.me;
-              var targetCircleGroup = evt.target;
-              var temp = evt.target.me.temperature.text;
-              ExperimentLoader.changeTemperature($scope)
-                .then(function(data) {
-                  console.log(data);
-              });
-            break;
-
-            case "dragStepGroup":
-
-              var indicate = evt.target;
-              step = indicate.currentStep;
-              indicate.setVisible(false);
-              step.commonFooterImage.setVisible(true);
-              indicate.endPosition = indicate.left;
-              indicate.processMovement(step, C);
-              C.canvas.renderAll();
-            break;
-
-            case "dragStageGroup":
-
-              var indicateStage = evt.target;
-              step = indicateStage.currentStep;
-              indicateStage.setVisible(false);
-              indicateStage.endPosition = indicateStage.left;
-              indicateStage.processMovement(step.parentStage, C);
-              C.canvas.renderAll();
-            break;
-
-          }
-
-        }
-      });
 
       this.canvas.on("mouse:move", function(evt) {
 

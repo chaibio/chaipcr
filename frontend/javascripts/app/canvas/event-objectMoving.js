@@ -18,22 +18,16 @@ window.ChaiBioTech.ngApp.factory('objectMoving', [
         switch(evt.target.name) {
 
           case "controlCircleGroup":
-            var targetCircleGroup = evt.target,
             me = evt.target.me;
-            me.manageDrag(targetCircleGroup);
+            me.manageDrag(evt.target);
             $scope.$apply(function() {
               $scope.step.temperature = me.model.temperature;
             });
           break;
 
           case "dragStepGroup":
-            that.onTheMoveDragGroup(evt.target);
+            //that.onTheMoveDragGroup(evt.target);
           break;
-
-          case "dragStageGroup":
-            that.onTheMoveDragGroup(evt.target);
-          break;
-
         }
       });
     };
