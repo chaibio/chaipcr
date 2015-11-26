@@ -12,20 +12,24 @@ window.ChaiBioTech.ngApp.factory('events', [
   'scrollService',
   'mouseOver',
   'mouseOut',
+  'mouseDown',
+  'objectMoving',
+
   function(ExperimentLoader, previouslySelected, popupStatus, previouslyHoverd, scrollService,
-    mouseOver, mouseOut) {
+    mouseOver, mouseOut, mouseDown, objectMoving) {
     return function(C, $scope) {
 
       this.canvas = C.canvas;
       this.startDrag = 0;
+      this.mouseDown = false;
       this.canvasContaining = $('.canvas-containing');
       var that = this;
       console.log("Events loaded .... !", ExperimentLoader);
-      // We write this handler so that gather data popup is forced to hide when
-      // clicked at some other part of the page, Given pop up is active.
-      //mouseOver.init();
+
       mouseOver.init.call(this, C, $scope, that);
       mouseOut.init.call(this, C, $scope, that);
+      mouseDown.init.call(this, C, $scope, that);
+      objectMoving.init.call(this, C, $scope, that);
 
       angular.element('.canvas-container, .canvasClass').mouseleave(function() {
 
@@ -129,95 +133,6 @@ window.ChaiBioTech.ngApp.factory('events', [
         C.canvas.renderAll();
 
       };
-
-      /**************************************
-          what happens when click is happening in canvas.
-          what we do is check if the click is up on some particular events.
-          and we send the changes to backbone views.
-      ***************************************/
-      this.canvas.on("mouse:down", function(evt) {
-        that.mouseDown = true;
-        if(evt.target) {
-          var me;
-
-          switch(evt.target.name)  {
-
-            case "stepGroup":
-
-              me = evt.target.me;
-              that.selectStep(me.circle);
-
-            break;
-
-            case "controlCircleGroup":
-
-              me = evt.target.me;
-              that.selectStep(me);
-
-            break;
-
-            case "dragStepGroup":
-
-              evt.target.startPosition = evt.target.left;
-              //C.moveLimit = C.allStepViews[C.allStepViews.length - 1].left + 3;
-            break;
-
-            case "dragStageGroup":
-
-              evt.target.startPosition = evt.target.left;
-              //C.moveLimit = C.allStepViews[C.allStepViews.length - 1].left + 3;
-              //C.canvas.bringToFront(C.indicator);
-              //C.canvas.renderAll();
-
-            break;
-
-            case "deleteStepButton":
-
-              me  = evt.target.me;
-              that.selectStep(me.circle);
-              ExperimentLoader.deleteStep($scope)
-              .then(function(data) {
-                console.log("deleted", data);
-                me.parentStage.deleteStep({}, me);
-                C.canvas.renderAll();
-              });
-
-
-            break;
-          }
-        } else { // if the click is on canvas
-          that.setSummaryMode();
-        }
-      });
-
-      /**************************************
-          Here we write what happens when we drag over the canvas.
-          here too we look for the target in the event and do the action.
-      ***************************************/
-      this.canvas.on('object:moving', function(evt) {
-        if(evt.target) {
-          switch(evt.target.name) {
-
-            case "controlCircleGroup":
-              var targetCircleGroup = evt.target,
-              me = evt.target.me;
-              me.manageDrag(targetCircleGroup);
-              $scope.$apply(function() {
-                $scope.step.temperature = me.model.temperature;
-              });
-            break;
-
-            case "dragStepGroup":
-              that.onTheMoveDragGroup(evt.target);
-            break;
-
-            case "dragStageGroup":
-              that.onTheMoveDragGroup(evt.target);
-            break;
-
-          }
-        }
-      });
 
       /**************************************
           When the dragging of the object is finished
