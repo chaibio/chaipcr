@@ -28,11 +28,11 @@ window.ChaiBioTech.ngApp.directive('scrollOnTop', [
           scrollService.move = canvasDiff / scope.scrollDiff;
           // Automatically update
           if(scope.position !== 0) { // make this a new service , so these numbers can be used in events..
-              var oldWidth = 300 / (oldVal / 1024);
-              var moveLeft = Math.abs(oldWidth - width);
-              scope.position = Math.abs(scope.position - moveLeft);
-              bar.css("left", scope.position + "px");
-              bar.css("width", width + "px");
+            var oldWidth = 300 / (oldVal / 1024);
+            var moveLeft = Math.abs(oldWidth - width);
+            scope.position = Math.abs(scope.position - moveLeft);
+            bar.css("left", scope.position + "px");
+            bar.css("width", width + "px");
           }
 
           bar.css("width", width + "px");
@@ -41,7 +41,7 @@ window.ChaiBioTech.ngApp.directive('scrollOnTop', [
         scope.$watch('left', function(newVal, oldVal) {
           bar.css("left", (newVal / scrollService.move) + "px");
         });
-        
+
         scope.dragElem = $(elem).find(".foreground-bar").draggable({
           refreshPositions: true,
           containment: "parent",

@@ -14,41 +14,32 @@ window.ChaiBioTech.ngApp.factory('events', [
   'mouseOut',
   'mouseDown',
   'objectMoving',
+  'objectModified',
+  'mouseMove',
+  'mouseUp',
+  'htmlEvents',
 
   function(ExperimentLoader, previouslySelected, popupStatus, previouslyHoverd, scrollService,
-    mouseOver, mouseOut, mouseDown, objectMoving) {
+    mouseOver, mouseOut, mouseDown, objectMoving, objectModified, mouseMove, mouseUp, htmlEvents) {
     return function(C, $scope) {
 
       this.canvas = C.canvas;
-      this.startDrag = 0;
+      this.startDrag = 0; // beginning position of dragging
       this.mouseDown = false;
-      this.canvasContaining = $('.canvas-containing');
       var that = this;
-      console.log("Events loaded .... !", ExperimentLoader);
 
       mouseOver.init.call(this, C, $scope, that);
       mouseOut.init.call(this, C, $scope, that);
       mouseDown.init.call(this, C, $scope, that);
+      mouseMove.init.call(this, C, $scope, that);
+      mouseUp.init.call(this, C, $scope, that);
+
       objectMoving.init.call(this, C, $scope, that);
+      objectModified.init.call(this, C, $scope, that);
 
-      angular.element('.canvas-container, .canvasClass').mouseleave(function() {
+      htmlEvents.init.call(this, C, $scope, that);
 
-        if(C.editStageStatus === false) {
-            if(previouslyHoverd.step) {
-              previouslyHoverd.step.closeImage.setVisible(false);
-            }
-            previouslyHoverd.step = null;
-            C.canvas.renderAll();
-        }
-      });
-
-      angular.element('.canvas-containing').click(function(evt) {
-
-        if(evt.target == evt.currentTarget) {
-          that.setSummaryMode();
-        }
-      });
-
+      // Methods
       this.setSummaryMode = function() {
 
         $scope.$apply(function() {
@@ -135,83 +126,6 @@ window.ChaiBioTech.ngApp.factory('events', [
       };
 
       /**************************************
-          When the dragging of the object is finished
-      ***************************************/
-      this.canvas.on('object:modified', function(evt) {
-
-        if(evt.target) {
-
-          var step, me;
-          switch(evt.target.name) {
-
-            case "controlCircleGroup":
-
-              me = evt.target.me;
-              var targetCircleGroup = evt.target;
-              var temp = evt.target.me.temperature.text;
-              ExperimentLoader.changeTemperature($scope)
-                .then(function(data) {
-                  console.log(data);
-              });
-            break;
-
-            case "dragStepGroup":
-
-              var indicate = evt.target;
-              step = indicate.currentStep;
-              indicate.setVisible(false);
-              step.commonFooterImage.setVisible(true);
-              indicate.endPosition = indicate.left;
-              indicate.processMovement(step, C);
-              C.canvas.renderAll();
-            break;
-
-            case "dragStageGroup":
-
-              var indicateStage = evt.target;
-              step = indicateStage.currentStep;
-              indicateStage.setVisible(false);
-              indicateStage.endPosition = indicateStage.left;
-              indicateStage.processMovement(step.parentStage, C);
-              C.canvas.renderAll();
-            break;
-
-          }
-
-        }
-      });
-
-      this.canvas.on("mouse:move", function(evt) {
-
-        if(that.mouseDown && evt.target) {
-
-          if(that.startDrag === 0) {
-            that.canvas.defaultCursor = "move";
-            that.startDrag = evt.e.clientX;
-            that.startPos = $(".canvas-containing").scrollLeft();
-          }
-
-          var left = that.startPos + (evt.e.clientX - that.startDrag);
-          if((left >= 0) && (left <= $scope.scrollWidth - 1024)) {
-
-            $scope.$apply(function() {
-              $scope.scrollLeft = left;
-            });
-
-            that.canvasContaining.scrollLeft(left);
-          }
-        }
-      });
-
-      this.canvas.on("mouse:up", function(evt) {
-
-        if(that.mouseDown) {
-          that.canvas.defaultCursor = "default";
-          that.startDrag = 0;
-          that.mouseDown = false;
-        }
-      });
-      /**************************************
           A tricky one, fired from the DOM perspective. When we have long
           canvas and when we scroll canvas recalculate the offset.
       ***************************************/
@@ -228,7 +142,6 @@ window.ChaiBioTech.ngApp.factory('events', [
       this.canvas.on("imagesLoaded", function() {
         C.addStages().setDefaultWidthHeight().addRampLinesAndCircles();
         C.selectStep();
-        //C.addMoveStepIndicator();
         C.canvas.renderAll();
       });
     };
