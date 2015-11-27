@@ -2,13 +2,15 @@ window.ChaiBioTech.ngApp.factory('dots', [
 
   function() {
 
-    this.smallDotArray = [];
-    
-    this.stageDots = function() {
+    this.getStageCordinates = function() {
+
+      return  {
+        "dot1": [1, 1], "dot2": [12, 1], "dot3": [6.5, 6], "dot4": [1, 10], "dot5": [12, 10],
+      };
 
     };
 
-    this.getCordinates = function() {
+    this.getStepCordinates = function() {
 
       var dotCordiantes = {
         "topDot0": [1, 1], "bottomDot0": [1, 10], "middleDot0": [6.5, 6],
@@ -24,22 +26,32 @@ window.ChaiBioTech.ngApp.factory('dots', [
       return dotCordiantes;
     };
 
-    this.stepDots = function() {
+    this.prepareArray = function(cordinates) {
 
-      this.smallDotArray = [];
+      var circleArray = [];
 
-      for(var dot in this.dotCordiantes) {
-        var cord = this.dotCordiantes[dot];
-        this.smallDotArray.push(new fabric.Circle({
+      for(var dot in cordinates) {
+        var cord = cordinates[dot];
+        circleArray.push(new fabric.Circle({
           radius: 2, fill: 'white', left: cord[0], top: cord[1], selectable: false,
-          name: "stepDot", originX: "center", originY: "center"
+          name: "stageDot", originX: "center", originY: "center"
         }));
       }
-
-      return this.smallDotArray;
+      return circleArray;
     };
 
-    this.dotCordiantes = this.getCordinates();
+    this.stepDots = function() {
+
+      return this.prepareArray(this.stepDotCordiantes);
+    };
+
+    this.stageDots = function() {
+
+      return this.prepareArray(this.stageDotCordinates);
+    };
+
+    this.stepDotCordiantes = this.getStepCordinates();
+    this.stageDotCordinates = this.getStageCordinates();
 
     return this;
   }
