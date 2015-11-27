@@ -22,13 +22,11 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
 
     this.dotsOnStage = function() {
 
-
-
       var editStageStatus = this.parent.editStageStatus;
 
       this.dots = new fabric.Group(dots.stageDots(), {
         originX: "left", originY: "top", left: 3, top: 8, evented: false, width: 13, height: 12, visible: editStageStatus,
-        parent: this
+        parent: this, name: "moveStage"
       });
       return this;
     };
