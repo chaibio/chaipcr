@@ -116,7 +116,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
          It uses recursive function to do the job. See the inner function mainWrapper()
       */
     /*******************************************************/
-    
+
     this.loadImages = function() {
 
       var noOfImages = this.images.length - 1;
