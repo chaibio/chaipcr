@@ -37,7 +37,8 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
       var editStageStatus = this.parent.editStageStatus;
 
       this.dots = new fabric.Group(smallDotArray, {
-        originX: "left", originY: "top", left: 3, top: 8, evented: false, width: 13, height: 12, visible: editStageStatus
+        originX: "left", originY: "top", left: 3, top: 8, evented: false, width: 13, height: 12, visible: editStageStatus,
+        parent: this
       });
       return this;
     };

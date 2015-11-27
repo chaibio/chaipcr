@@ -45,7 +45,6 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       });
 
       new events(this, this.$scope); // Fire the events;
-      this.createFooterDotCordinates();
       this.loadImages();
     };
 
@@ -133,23 +132,6 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       };
 
       loadImageRecursion(0);
-    };
-
-
-    this.createFooterDotCordinates = function() {
-
-      this.dotCordiantes = {
-        "topDot0": [1, 1], "bottomDot0": [1, 10], "middleDot0": [6.5, 6],
-      };
-
-      for(var i = 1; i < 9; i++) {
-        this.dotCordiantes["topDot" + i] = [(11 * i) + 1, 1];
-        this.dotCordiantes["middleDot" + i] = [(11 * i) + 6.5, 6];
-        this.dotCordiantes["bottomDot" + i] = [(11 * i) + 1, 10];
-      }
-
-      delete this.dotCordiantes["middleDot" + (i - 1)];
-      return this.cordinates;
     };
 
     this.addRampLinesAndCircles = function(circles) {

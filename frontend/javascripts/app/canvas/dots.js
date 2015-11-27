@@ -2,6 +2,8 @@ window.ChaiBioTech.ngApp.factory('dots', [
 
   function() {
 
+    this.smallDotArray = [];
+    
     this.stageDots = function() {
 
     };
@@ -38,6 +40,7 @@ window.ChaiBioTech.ngApp.factory('dots', [
     };
 
     this.dotCordiantes = this.getCordinates();
+
     return this;
   }
 ]);
