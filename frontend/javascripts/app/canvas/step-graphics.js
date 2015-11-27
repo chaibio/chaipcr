@@ -57,11 +57,6 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
       this.closeImage.hasBorders = false;
       this.closeImage.hasControls = false;
 
-      /*this.delGroup = new fabric.Group([this.closeImage], {
-        originX: 'left', originY: 'top', left: this.left + 108, top: 79, true: "deleteStepButton",
-        me: this, selectable: true, hasBorders: false, hasControls: false, opacity: 1
-      });*/
-
       return this;
     };
 
