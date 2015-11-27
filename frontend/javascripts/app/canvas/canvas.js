@@ -11,7 +11,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
   'moveStageRect',
   'previouslySelected',
   'constants',
-  
+
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
     moveStepRect, moveStageRect, previouslySelected, constants) {
 
@@ -110,6 +110,13 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     };
 
+    /*******************************************************/
+      /* This method adds those footer images on the step. Its a tricky one beacuse images
+         are taking longer time to load. So we load it once and clone it to all the steps.
+         It uses recursive function to do the job. See the inner function mainWrapper()
+      */
+    /*******************************************************/
+    
     this.loadImages = function() {
 
       var noOfImages = this.images.length - 1;
@@ -128,12 +135,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       loadImageRecursion(0);
     };
 
-    /*******************************************************/
-      /* This method adds those footer images on the step. Its a tricky one beacuse images
-         are taking longer time to load. So we load it once and clone it to all the steps.
-         It uses recursive function to do the job. See the inner function mainWrapper()
-      */
-    /*******************************************************/
+
     this.createFooterDotCordinates = function() {
 
       this.dotCordiantes = {
@@ -249,24 +251,16 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       this.canvas.renderAll();
     };
 
-    this.addNewStage = function(data, currentStage) {
-
-      // Re factor this part.. // what if stage with no step is returned LATER.
-      //move the stages, make space.
-      var ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus,
-      originalWidth = currentStage.myWidth,
-      add = (data.stage.steps.length > 0) ? 128 + Math.floor(constants.newStageOffset / data.stage.steps.length) : 128;
+    this.makeSpaceForNewStage = function(data, currentStage, add) {
 
       data.stage.steps.forEach(function(step) {
         currentStage.myWidth = currentStage.myWidth + add;
         currentStage.moveAllStepsAndStages(false);
       });
+      return currentStage;
+    };
 
-      currentStage.myWidth = originalWidth; // This is some trick, But I forgot what it was , check back here.
-      // okay we puhed stages in front by inflating the current stage and put the old value back.
-      // now create a stage;
-      var stageIndex = currentStage.index + 1;
-      var stageView = new stage(data.stage, this.canvas, this.allStepViews, stageIndex, this, this.$scope, true);
+    this.addNextandPrevious = function(currentStage, stageView) {
 
       if(currentStage.nextStage) {
         stageView.nextStage = currentStage.nextStage;
@@ -274,12 +268,10 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       }
       currentStage.nextStage = stageView;
       stageView.previousStage = currentStage;
+    };
 
-      stageView.updateStageData(1);
-      this.allStageViews.splice(stageIndex, 0, stageView);
-      stageView.render();
+    this.configureStepsofNewStage = function(stageView, ordealStatus) {
 
-      // configure steps;
       stageView.childSteps.forEach(function(step) {
 
         step.ordealStatus = ordealStatus + 1;
@@ -287,9 +279,31 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         this.allStepViews.splice(ordealStatus, 0, step);
         ordealStatus = ordealStatus + 1;
       }, this);
+    };
 
-      var circles = this.reDrawCircles();
-      this.addRampLinesAndCircles(circles);
+    this.addNewStage = function(data, currentStage) {
+      //move the stages, make space.
+      var ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus;
+      var originalWidth = currentStage.myWidth;
+      var add = (data.stage.steps.length > 0) ? 128 + Math.floor(constants.newStageOffset / data.stage.steps.length) : 128;
+
+      currentStage = this.makeSpaceForNewStage(data, currentStage, add);
+      // okay we puhed stages in front by inflating the current stage and put the old value back.
+      currentStage.myWidth = originalWidth;
+
+      // now create a stage;
+      var stageIndex = currentStage.index + 1;
+      var stageView = new stage(data.stage, this.canvas, this.allStepViews, stageIndex, this, this.$scope, true);
+
+      this.addNextandPrevious(currentStage, stageView);
+      stageView.updateStageData(1);
+      this.allStageViews.splice(stageIndex, 0, stageView);
+      stageView.render();
+
+      // configure steps;
+      this.configureStepsofNewStage(stageView, ordealStatus);
+
+      this.addRampLinesAndCircles(this.reDrawCircles());
 
       this.$scope.applyValues(stageView.childSteps[0].circle);
       stageView.childSteps[0].circle.manageClick(true);

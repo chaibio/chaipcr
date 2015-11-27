@@ -240,7 +240,6 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.circle.setStrokeWidth(8);
         this.outerCircle.setStroke(null);
         this.stepDataGroup.setVisible(true);
-        //this.littleCircleGroup.visible = this.outerMostCircle.visible = false;
         this.littleCircleGroup.visible = false;
 
         if(this.model.collect_data) {

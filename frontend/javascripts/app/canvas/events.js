@@ -28,6 +28,7 @@ window.ChaiBioTech.ngApp.factory('events', [
       this.mouseDown = false;
       var that = this;
 
+      // Initiate all events
       mouseOver.init.call(this, C, $scope, that);
       mouseOut.init.call(this, C, $scope, that);
       mouseDown.init.call(this, C, $scope, that);
