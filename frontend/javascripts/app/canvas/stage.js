@@ -6,7 +6,9 @@ window.ChaiBioTech.ngApp.factory('stage', [
   'stageGraphics',
   'stepGraphics',
   'constants',
-  function(ExperimentLoader, $rootScope, step, previouslySelected, stageGraphics, stepGraphics, constants) {
+  'circleManager',
+
+  function(ExperimentLoader, $rootScope, step, previouslySelected, stageGraphics, stepGraphics, constants, circleManager) {
 
     return function(model, stage, allSteps, index, fabricStage, $scope, insert) {
 
@@ -40,13 +42,13 @@ window.ChaiBioTech.ngApp.factory('stage', [
         this.configureStep(newStep, start);
         this.parent.allStepViews.splice(currentStep.ordealStatus, 0, newStep);
 
-        var circles = this.parent.reDrawCircles();
-        this.parent.addRampLinesAndCircles(circles);
+        circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
 
         $scope.applyValues(newStep.circle);
         newStep.circle.manageClick(true);
 
         this.parent.setDefaultWidthHeight();
+        circleManager.wow();
       };
 
       this.deleteStep = function(data, currentStep) {
@@ -82,7 +84,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         }
         // true imply call is from delete section;
         this.moveAllStepsAndStages(true);
-        this.parent.addRampLinesAndCircles(this.parent.reDrawCircles());
+        circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
 
         $scope.applyValues(selected.circle);
         selected.circle.manageClick();

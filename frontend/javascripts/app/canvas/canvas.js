@@ -11,9 +11,10 @@ window.ChaiBioTech.ngApp.factory('canvas', [
   'moveStageRect',
   'previouslySelected',
   'constants',
+  'circleManager',
 
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
-    moveStepRect, moveStageRect, previouslySelected, constants) {
+    moveStepRect, moveStageRect, previouslySelected, constants, circleManager) {
 
     this.init = function(model) {
 
@@ -43,7 +44,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       this.canvas = new fabric.Canvas('canvas', {
         backgroundColor: '#FFB300', selection: false, stateful: true
       });
-
+      circleManager.init(this);
       new events(this, this.$scope); // Fire the events;
       this.loadImages();
     };
@@ -134,70 +135,6 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       loadImageRecursion(0);
     };
 
-    this.addRampLinesAndCircles = function(circles) {
-
-      this.allCircles = circles || this.findAllCircles();
-      var limit = this.allCircles.length;
-
-      this.allCircles.forEach(function(circle, index) {
-
-        if(index < (limit - 1)) {
-          circle.moveCircle();
-          circle.curve = new path(circle);
-          this.canvas.add(circle.curve);
-        }
-
-        circle.getCircle();
-        this.canvas.bringToFront(circle.parent.rampSpeedGroup);
-      }, this);
-
-      // We should put an infinity symbol if the last step has infinite hold time.
-      this.allCircles[limit - 1].doThingsForLast();
-      console.log("All circles are added ....!!");
-      return this;
-    };
-
-    this.findAllCircles = function() {
-
-      var tempCirc = null;
-      this.findAllCirclesArray.length = 0;
-
-      this.findAllCirclesArray = this.allStepViews.map(function(step) {
-
-        if(tempCirc) {
-          step.circle.previous = tempCirc;
-          tempCirc.next = step.circle;
-        }
-        tempCirc = step.circle;
-        return step.circle;
-      });
-
-      return this.findAllCirclesArray;
-    };
-
-    this.reDrawCircles = function() {
-
-      var tempCirc = null;
-      this.drawCirclesArray.length = 0;
-
-      this.drawCirclesArray = this.allStepViews.map(function(step, index) {
-
-        step.circle.removeContents();
-        delete step.circle;
-        step.addCircle();
-
-        if(tempCirc) {
-          step.circle.previous = tempCirc;
-          tempCirc.next = step.circle;
-        }
-
-        tempCirc = step.circle;
-        return step.circle;
-      }, this);
-
-      return this.drawCirclesArray;
-    };
-
     this.editStageMode = function(status) {
 
       var add = (status) ? 25 : -25;
@@ -281,11 +218,10 @@ window.ChaiBioTech.ngApp.factory('canvas', [
       stageView.updateStageData(1);
       this.allStageViews.splice(stageIndex, 0, stageView);
       stageView.render();
-
       // configure steps;
       this.configureStepsofNewStage(stageView, ordealStatus);
 
-      this.addRampLinesAndCircles(this.reDrawCircles());
+      circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
 
       this.$scope.applyValues(stageView.childSteps[0].circle);
       stageView.childSteps[0].circle.manageClick(true);
