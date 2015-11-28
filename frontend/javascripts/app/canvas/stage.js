@@ -21,14 +21,17 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.previousStage = this.nextStage = this.noOfCycles = null;
       this.insertMode = insert;
 
-      this.addNewStep = function(data, currentStep) {
+      this.setNewWidth = function(add) {
 
-        var width = constants.stepWidth;
-        this.myWidth = this.myWidth + width;
+        this.myWidth = this.myWidth + add;
         this.stageRect.setWidth(this.myWidth);
         this.stageRect.setCoords();
         this.roof.setWidth(this.myWidth);
+      };
 
+      this.addNewStep = function(data, currentStep) {
+
+        this.setNewWidth(constants.stepWidth);
         this.moveAllStepsAndStages();
         // Now insert new step;
         var start = currentStep.index;
@@ -48,18 +51,12 @@ window.ChaiBioTech.ngApp.factory('stage', [
         newStep.circle.manageClick(true);
 
         this.parent.setDefaultWidthHeight();
-        circleManager.wow();
       };
 
       this.deleteStep = function(data, currentStep) {
-
         // This methode says what happens in the canvas when a step is deleted
-        var width = constants.stepWidth;
         var selected;
-        this.myWidth = this.myWidth - width;
-        this.stageRect.setWidth(this.myWidth);
-        this.roof.setWidth(this.myWidth);
-
+        this.setNewWidth(constants.stepWidth * -1);
         this.deleteAllStepContents(currentStep);
         selected = this.wireNextAndPreviousStep(currentStep, selected);
 
@@ -71,9 +68,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
         this.parent.allStepViews.splice(ordealStatus - 1, 1);
 
         if(this.childSteps.length > 0) {
-
           this.configureStepForDelete(currentStep, start);
-
         } else { // if all the steps in the stages are deleted, We delete the stage itself.
           this.deleteStageContents();
           this.wireStageNextAndPrevious();
