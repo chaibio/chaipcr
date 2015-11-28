@@ -20,9 +20,9 @@ class DevicesController < ApplicationController
     if !File.exists?(DEVICE_FILE_PATH)
       File.open(DEVICE_FILE_PATH, 'w+') { |file| file.write(params[:data]) }
 #      `passwd -d root`
-      render json: {response: "success"}, status: :ok
+      render json: {response: "Device is programmed successfully"}, status: :ok
     else
-      render json: {errors: "device is already serialized"}, status: 405
+      render json: {errors: "Device is already serialized"}, status: 405
     end 
   end
   
@@ -39,7 +39,7 @@ class DevicesController < ApplicationController
       mac = retrieve_mac
       render json: {mac: mac}
     else
-      render json: {errors: "Not authorized"}, status: 401
+      render json: {errors: "Device is already serialized"}, status: 401
     end
   end
   
@@ -47,7 +47,7 @@ class DevicesController < ApplicationController
 
   def retrieve_mac
     str = `ifconfig eth0 | grep HWaddr`
-    #str = "eth0      Link encap:Ethernet  HWaddr 54:4a:16:c0:7e:28 "
+#    str = "eth0      Link encap:Ethernet  HWaddr 54:4a:16:c0:7e:28 "
     re = %r/([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}/
     return re.match(str).to_s.strip
   end
