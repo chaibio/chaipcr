@@ -223,7 +223,7 @@ class ExperimentsController < ApplicationController
       connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
       begin
         connection.eval("source(\"#{Rails.configuration.dynamic_file_path}/#{@experiment.experiment_definition.guid}/analyze.R\")")
-        response = connection.eval("analyze('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{@experiment.id})").to_ruby
+        response = connection.eval("analyze('#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{@experiment.id}, #{@experiment.calibration_id})").to_ruby
       rescue  => e
         logger.error("Rserve error: #{e}")
         kill_rserve if e.is_a? Rserve::Talk::SocketTimeoutError

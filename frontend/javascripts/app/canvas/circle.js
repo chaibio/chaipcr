@@ -88,8 +88,6 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.pauseImageMiddle = $.extend({}, fabricStage.imageobjects["pause-middle.png"]);
         this.setCenter(this.pauseImageMiddle);
         this.pauseImageMiddle.setVisible(false);
-        //this.setCenter(this.pauseImageMiddle);
-        //this.pauseImageMiddle.setVisible(false);
 
         return this;
       };
@@ -202,8 +200,6 @@ window.ChaiBioTech.ngApp.factory('circle', [
             this.temperature = new stepTemperature(this.model, this),
             this.holdTime = new stepHoldTime(this.model, this)
           ], this);
-
-
       };
 
       this.makeItBig = function() {
@@ -240,7 +236,6 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.circle.setStrokeWidth(8);
         this.outerCircle.setStroke(null);
         this.stepDataGroup.setVisible(true);
-        //this.littleCircleGroup.visible = this.outerMostCircle.visible = false;
         this.littleCircleGroup.visible = false;
 
         if(this.model.collect_data) {

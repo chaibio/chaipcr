@@ -18,9 +18,11 @@ window.ChaiBioTech.ngApp.factory('events', [
   'mouseMove',
   'mouseUp',
   'htmlEvents',
+  'circleManager',
 
   function(ExperimentLoader, previouslySelected, popupStatus, previouslyHoverd, scrollService,
-    mouseOver, mouseOut, mouseDown, objectMoving, objectModified, mouseMove, mouseUp, htmlEvents) {
+    mouseOver, mouseOut, mouseDown, objectMoving, objectModified, mouseMove, mouseUp, htmlEvents,
+    circleManager) {
     return function(C, $scope) {
 
       this.canvas = C.canvas;
@@ -28,6 +30,7 @@ window.ChaiBioTech.ngApp.factory('events', [
       this.mouseDown = false;
       var that = this;
 
+      // Initiate all events
       mouseOver.init.call(this, C, $scope, that);
       mouseOut.init.call(this, C, $scope, that);
       mouseDown.init.call(this, C, $scope, that);
@@ -140,7 +143,8 @@ window.ChaiBioTech.ngApp.factory('events', [
            or wait for images to complete
       ***************************************/
       this.canvas.on("imagesLoaded", function() {
-        C.addStages().setDefaultWidthHeight().addRampLinesAndCircles();
+        C.addStages().setDefaultWidthHeight();
+        circleManager.addRampLinesAndCircles();
         C.selectStep();
         C.canvas.renderAll();
       });

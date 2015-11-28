@@ -1,6 +1,6 @@
 window.ChaiBioTech.ngApp.factory('stageGraphics', [
-
-  function() {
+  'dots',
+  function(dots) {
 
     this.addRoof = function() {
 
@@ -22,22 +22,11 @@ window.ChaiBioTech.ngApp.factory('stageGraphics', [
 
     this.dotsOnStage = function() {
 
-      var cordiantes = {
-        "dot1": [1, 1], "dot2": [12, 1], "dot3": [6.5, 6], "dot4": [1, 10], "dot5": [12, 10],
-      }, smallDotArray = [];
-
-      for(var dot in cordiantes) {
-        var cord = cordiantes[dot];
-        smallDotArray.push(new fabric.Circle({
-          radius: 2, fill: 'white', left: cord[0], top: cord[1], selectable: false,
-          name: "stageDot", originX: "center", originY: "center"
-        }));
-      }
-
       var editStageStatus = this.parent.editStageStatus;
 
-      this.dots = new fabric.Group(smallDotArray, {
-        originX: "left", originY: "top", left: 3, top: 8, evented: false, width: 13, height: 12, visible: editStageStatus
+      this.dots = new fabric.Group(dots.stageDots(), {
+        originX: "left", originY: "top", left: 3, top: 8, evented: false, width: 13, height: 12, visible: editStageStatus,
+        parent: this, name: "moveStage"
       });
       return this;
     };
