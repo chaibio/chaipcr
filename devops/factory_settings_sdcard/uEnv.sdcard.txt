@@ -29,7 +29,7 @@ cape_disable=capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN
 #cape=
 
 ##note: the eMMC flasher script relies on the next line
-mmcroot=UUID=b739c441-12af-4f7b-8817-08b1f115e13f ro
+mmcroot=/dev/mmcblk1p2
 mmcrootfstype=ext4 rootwait fixrtc
 
 ##These are needed to be compliant with Angstrom's 2013.06.20 u-boot.
