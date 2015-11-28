@@ -1,9 +1,9 @@
-window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
+window.ChaiBioTech.ngApp.directive 'scrollbar', [
   '$window'
   ($window) ->
-    restrict: 'EA'
+    restrict: 'E'
     replace: true
-    templateUrl: 'app/views/directives/time-scrollbar.html'
+    templateUrl: 'app/views/directives/scrollbar.html'
     require: 'ngModel'
     link: ($scope, elem, attr, ngModel) ->
 
@@ -25,7 +25,7 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
           ngModel.$setViewValue 1
 
         if ngModel.$viewValue >= 1
-          updateMargin getElemWidth()-getScrollBarWidth()
+          updateMargin getElemWidth() - getScrollBarWidth()
 
         spaceWidth = getSpaceWidth()
         if spaceWidth > 0
