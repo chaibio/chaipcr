@@ -2,32 +2,6 @@
 
 if ! id | grep -q root; then
 	echo "must be run as root"
-	exit 0
-fi
-
-check_running_system () {
-	if [ ! -f /boot/uboot/uEnv.txt ] ; then
-		echo "Error: script halting, system unrecognized..."
-		echo "unable to find: [/boot/uboot/uEnv.txt] is ${sdcard_dev}p1 mounted?"
-		exit 1
-	fi
-
-	echo "-----------------------------"
-	echo "debug copying: [${sdcard_dev}] -> [${eMMC}]"
-	lsblk
-	echo "-----------------------------"
-
-	if [ ! -b "${eMMC}" ] ; then
-		echo "Error: [${eMMC}] does not exist"
-		exit 1
-	fi
-}
-
-unset boot_drive
-boot_drive=$(LC_ALL=C lsblk -l | grep "/boot/uboot" | awk '{print $1}')
-
-if [ "x${boot_drive}" = "x" ] ; then
-	echo "Error: script halting, system unrecognized..."
 	exit 1
 fi
 
@@ -48,13 +22,11 @@ then
 fi
 
 check_running_system
-
 echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger 
-
 sdcard="/sdcard"
 
 image_filename_folder="${sdcard}/tmp"
-image_filename_prfx="${image_filename_folder}/upgrade"
+image_filename_prfx="upgrade"
 image_filename_rootfs="$image_filename_prfx-rootfs.img.gz" 
 image_filename_data="$image_filename_prfx-data.img.gz"
 image_filename_boot="$image_filename_prfx-boot.img.gz"
@@ -64,6 +36,11 @@ image_filename_upgrade_temp="${sdcard}/tmp/temp.tar.gz"
 image_filename_upgrade="${sdcard}/upgrade.img.gz"
 
 echo "Packing eMMC image.."
+
+umount ${sdcard} || true
+mount ${sdcard_dev}p1 ${sdcard} || true
+
+cd $image_filename_folder
 
 if [ -e  $image_filename_upgrade_tar_temp ]
 then
@@ -85,21 +62,22 @@ then
         mkdir -p ${sdcard}/tmp/
 fi
 
-umount ${sdcard} || true
-mount ${sdcard_dev}p1 ${sdcard} || true
+#umount ${sdcard} || true
+#mount ${sdcard_dev}p1 ${sdcard} || true
 
 #initiat auto run on first run for the eMMC after the upgrade.
 echo mounting rootfs partition
 
-mount ${eMMC}p2 /mnt
-echo "#!/bin/bash" >  /mnt/opt/scripts/boot/autorun.upgrade.sh
-echo "cd /mnt/root/chaipcr/web" >> /mnt/opt/scripts/boot/autorun.upgrade.sh
-echo "bundle exec rake db:migrate" >> /mnt/opt/scripts/boot/autorun.upgrade.sh
-echo "bundle exec rake db:seed_fu" >> /mnt/opt/scripts/boot/autorun.upgrade.sh
-echo "cd" >> /mnt/opt/scripts/boot/autorun.upgrade.sh
-chmod +x /mnt/opt/scripts/boot/autorun.upgrade.sh
+mkdir -p /tmp/emmcp2
+mount ${eMMC}p2 /tmp/emmcp2
+echo "#!/bin/bash" >  /tmp/emmcp2/opt/scripts/boot/autorun.upgrade.sh
+echo "cd /mnt/root/chaipcr/web" >> /tmp/emmcp2/opt/scripts/boot/autorun.upgrade.sh
+echo "bundle exec rake db:migrate" >> /tmp/emmcp2/opt/scripts/boot/autorun.upgrade.sh
+echo "bundle exec rake db:seed_fu" >> /tmp/emmcp2/opt/scripts/boot/autorun.upgrade.sh
+echo "cd" >> /tmp/emmcp2/opt/scripts/boot/autorun.upgrade.sh
+chmod +x /tmp/emmcp2/opt/scripts/boot/autorun.upgrade.sh
 sync
-umount /mnt
+umount /tmp/emmcp2
 
 #exit
 
@@ -126,15 +104,15 @@ dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
 
 echo "compressing all images to $image_filename_upgrade_tar_temp"
 
-echo "tar -cvf $image_filename_upgrade_tar_temp $image_filename_pt $image_filename_boot $image_filename_rootfs -C $image_filename_folder"
-exit
+tar -cvf $image_filename_upgrade_tar_temp $image_filename_pt $image_filename_boot $image_filename_rootfs
+#exit
 
 
 echo "Pack images tar to $image_filename_upgrade_temp"
 gzip $image_filename_upgrade_tar_temp
 
-echo "Finalizing: $image_filename_upgrade"
-mv $image_filename_upgrade_temp $image_filename_upgrade
+echo "Remove packed files"
+#mv $image_filename_upgrade_temp $image_filename_upgrade
 
 if [ -e $image_filename_boot ]
 then
@@ -155,16 +133,20 @@ then
 	rm $image_filename_pt
 fi
 
-echo "Removing upgrade autorun script from eMMC!"
+echo "Finalizing: $image_filename_upgrade"
+mv $image_filename_upgrade_temp $image_filename_upgrade
 
-mount ${eMMC}p2 /mnt
-rm /mnt/opt/scripts/boot/autorun.upgrade.sh
+echo "Removing packing autorun script from eMMC!"
+
+#mkdir -p /tmp/emmcp2
+mount ${eMMC}p2 /tmp/emmcp2
+rm /tmp/emmcp2/opt/scripts/boot/autorun.upgrade.sh
 sync
-umount /mnt
+umount /tmp/emmcp2
 
 echo "Finished.. byebye!"
 
-rm ${sdcard}/upgrade_resume_autorun.flag || true > /dev/null
+rm ${sdcard}/pack_resume_autorun.flag || true > /dev/null
 
 sync
 echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger

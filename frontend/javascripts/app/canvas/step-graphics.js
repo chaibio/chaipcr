@@ -1,6 +1,6 @@
 window.ChaiBioTech.ngApp.factory('stepGraphics', [
-
-  function() {
+  'dots',
+  function(dots) {
 
     this.addName = function() {
 
@@ -21,22 +21,11 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
 
     this.stepFooter = function() {
 
-      var  cordinates = this.parentStage.parent.dotCordiantes;
-      var smallDotArray = [];
-
-      for(var dot in cordinates) {
-        var cord = cordinates[dot];
-        smallDotArray.push(new fabric.Circle({
-          radius: 2, fill: 'white', left: cord[0], top: cord[1], selectable: false,
-          name: "stepDot", originX: "center", originY: "center"
-        }));
-      }
-
       var editStageStatus = this.parentStage.parent.editStageStatus;
 
-      this.dots = new fabric.Group(smallDotArray, {
+      this.dots = new fabric.Group(dots.stepDots(), {
         originX: "left", originY: "top", left: this.left + 16, top: 378, visible: editStageStatus, lockMovementY: true,
-        hasBorders: false, hasControls: false, name: "moveStep"
+        hasBorders: false, hasControls: false, name: "moveStep", parent: this
       });
       return this;
     };
@@ -56,11 +45,6 @@ window.ChaiBioTech.ngApp.factory('stepGraphics', [
       this.closeImage.selectable = true;
       this.closeImage.hasBorders = false;
       this.closeImage.hasControls = false;
-
-      /*this.delGroup = new fabric.Group([this.closeImage], {
-        originX: 'left', originY: 'top', left: this.left + 108, top: 79, true: "deleteStepButton",
-        me: this, selectable: true, hasBorders: false, hasControls: false, opacity: 1
-      });*/
 
       return this;
     };

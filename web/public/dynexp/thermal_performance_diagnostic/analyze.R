@@ -7,19 +7,19 @@ deltaTSetPoint <- 1
 highTemperature <- 95
 lowTemperature <- 50
 
-analyze <- function(dbname,dbuser,dbpassword,experimentID){
+analyze <- function(db_usr, db_pwd, db_host, db_port, db_name, experiment_id, calibration_id){
 	#load chaipcr database
-	message("db: ", dbname)
-	message("dbuser: ", dbuser)
-	message("dbpassword: ", dbpassword)
-	message("experiment id: ", experimentID)
+	message("db: ", db_name)
+	message("dbuser: ", db_usr)
+	message("dbpassword: ", db_pwd)
+	message("experiment id: ", experiment_id)
 
 	#load chaipcr database
-	dbconn <- dbConnect(RMySQL::MySQL(), user=dbuser, pwd=dbpassword, dbname=dbname)
+	dbconn <- dbConnect(RMySQL::MySQL(), user=db_usr, pwd=db_pwd, host=db_host, port=db_port, dbname=db_name)
 
 	#extract data from database
 	temperatureData <- list()
-	queryTemperatureData<-sprintf("SELECT * FROM temperature_logs WHERE experiment_id=%d order by elapsed_time",experimentID)
+	queryTemperatureData<-sprintf("SELECT * FROM temperature_logs WHERE experiment_id=%d order by elapsed_time",experiment_id)
 	temperatureData <- dbGetQuery(dbconn, queryTemperatureData)
 
 	dbDisconnect(dbconn)
