@@ -1,5 +1,7 @@
 #!/bin/sh
 
+#exit
+
 id | grep -q root
 is_root=$?
 #echo $is_root
@@ -170,16 +172,11 @@ reset_uenv () {
         echo "Done returning to gpio 72 check version"
 }
 
-stop_upgrade_restarting ()
-{
-	reset_uenv
-        rm ${sdcard}/upgrade_resume_autorun.flag
-}
-
 stop_packing_restarting ()
 {
 	reset_uenv
         rm ${sdcard}/pack_resume_autorun.flag
+        rm ${sdcard}/unpack_resume_autorun.flag
 }
 
 incriment_restart_counter () {
@@ -191,6 +188,36 @@ incriment_restart_counter () {
 	echo "Restart counter: $counter"
 }
 
+if [ -e ${sdcard}/unpack_resume_autorun.flag ]
+then
+        echo "Resume eMMC unpacking flag found up"
+        incriment_restart_counter
+
+        if [ "$counter" -ge 5 ]
+        then
+                echo Restart counter exceeded 4.. quitting upgrade operation
+                stop_packing_restarting
+                echo Rebooting
+#                exit 0
+                reboot
+        fi
+
+        echo "Resuming eMMC packing"
+ 	sh /sdcard/unpack_latest_version.sh noreboot || true
+        result=$?
+        if [ result -eq 1 ]
+        then
+                echo Error unpacking eMMC, restarting...
+#                exit 0
+                reboot
+        fi
+
+        update_uenv
+        stop_packing_restarting
+        alldone
+        exit
+fi
+
 if [ -e ${sdcard}/pack_resume_autorun.flag ]
 then
 	echo "Resume eMMC packing flag found up"
@@ -198,7 +225,7 @@ then
 
 	if [ "$counter" -ge 5 ] 
 	then
-		echo Restart counter exceeded 4.. quitting upgrade operation
+		echo Restart counter exceeded 4.. quitting packing operation
 		stop_packing_restarting
 		echo Rebooting
 #		exit 0
@@ -217,9 +244,7 @@ then
 	fi
 
 	update_uenv
-
 	stop_packing_restarting
-
 	alldone
 	exit
 fi
