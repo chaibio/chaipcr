@@ -265,8 +265,12 @@ class ExperimentsController < ApplicationController
       background_subtracted_results = results[0]
       baseline_subtracted_results = results[1][0]
       (1...background_subtracted_results.length).each do |well_num|
-        (0...background_subtracted_results[well_num].length).each do |cycle_num|
-          amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num-1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_results[well_num][cycle_num], :baseline_subtracted_value=>baseline_subtracted_results[cycle_num, well_num-1])
+        if background_subtracted_results[well_num].is_a? Array
+          (0...background_subtracted_results[well_num].length).each do |cycle_num|
+            amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num-1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_results[well_num][cycle_num], :baseline_subtracted_value=>baseline_subtracted_results[cycle_num, well_num-1])
+          end
+        else
+          amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num-1, :cycle_num=>1, :background_subtracted_value=>background_subtracted_results[well_num], :baseline_subtracted_value=>baseline_subtracted_results[well_num-1])
         end
       end
       ct = results[2][0].row(0)
