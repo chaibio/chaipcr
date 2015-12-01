@@ -24,6 +24,8 @@ class Experiment < ActiveRecord::Base
     end
   end
   
+  validates :time_valid, inclusion: {in: [true, false]}
+  
   before_create do |experiment|
     experiment.time_valid = Setting.time_valid
   end
