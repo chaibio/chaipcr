@@ -1,5 +1,4 @@
 @import './colors.css.scss';
-$marginTop: 200px;
 
 .amplification-chart-state-active {
   font-family: 'dinot';
@@ -125,6 +124,7 @@ $marginTop: 200px;
       }
     }
 
+    $marginTop: 170px;
     .vertical-text {
 
       transform: rotate(-90deg);
