@@ -28,6 +28,12 @@ Step.seed do |s|
   s.collect_data = false
 end
 
+ramp = Ramp.seed do |r|
+  r.next_step_id = 11
+  r.collect_data = true
+  r.rate = 0.1
+end
+
 Step.seed do |s|
   s.id = 11
   s.name = "Melt"
@@ -35,7 +41,8 @@ Step.seed do |s|
   s.hold_time = 1
   s.order_number = 1
   s.stage_id = 4
-  s.collect_data = true
+  s.collect_data = false
+  s.ramp = ramp.first
 end
 
 Stage.seed do |s|

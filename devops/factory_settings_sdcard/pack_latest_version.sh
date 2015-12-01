@@ -21,7 +21,7 @@ then
 	exit 1
 fi
 
-check_running_system
+#check_running_system
 echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger 
 sdcard="/sdcard"
 
@@ -36,6 +36,11 @@ image_filename_upgrade_temp="${sdcard}/tmp/temp.tar.gz"
 image_filename_upgrade="${sdcard}/upgrade.img.gz"
 
 echo "Packing eMMC image.."
+
+if [ ! -e  ${sdcard} ]
+then
+	mkdir -p ${sdcard}
+fi
 
 umount ${sdcard} || true
 mount ${sdcard_dev}p1 ${sdcard} || true
@@ -62,9 +67,6 @@ then
         mkdir -p ${sdcard}/tmp/
 fi
 
-#umount ${sdcard} || true
-#mount ${sdcard_dev}p1 ${sdcard} || true
-
 #initiat auto run on first run for the eMMC after the upgrade.
 echo mounting rootfs partition
 
@@ -77,6 +79,7 @@ echo "bundle exec rake db:seed_fu" >> /tmp/emmcp2/opt/scripts/boot/autorun.upgra
 echo "cd" >> /tmp/emmcp2/opt/scripts/boot/autorun.upgrade.sh
 chmod +x /tmp/emmcp2/opt/scripts/boot/autorun.upgrade.sh
 sync
+ls -ahl /tmp/emmcp2/opt/scripts/boot/
 umount /tmp/emmcp2
 
 #exit
@@ -84,13 +87,13 @@ umount /tmp/emmcp2
 #copy eMMC contents
 echo "Copying eMMC partitions at $eMMC"
 sync
-echo "Backing up partition table to: $image_filename_pt"
+echo "Packing up partition table to: $image_filename_pt"
 dd  if=${eMMC} bs=16M count=1 | gzip -c > $image_filename_pt
 
 sleep 5
 sync
 
-echo "Backing up binaries partition to: $image_filename_rootfs"
+echo "Packing up binaries partition to: $image_filename_rootfs"
 dd  if=${eMMC}p2 bs=16M | gzip -c > $image_filename_rootfs
 
 sleep 5
@@ -99,21 +102,13 @@ sync
 echo "Packing up boot partition to: $image_filename_boot"
 dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
 
-#compressing
-#echo "tar -cvf $image_filename_upgrade_tar_temp $image_filename_pt $image_filename_boot $image_filename_rootfs"
-
+#tarring
 echo "compressing all images to $image_filename_upgrade_tar_temp"
+tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs
 
-tar -cvf $image_filename_upgrade_tar_temp $image_filename_pt $image_filename_boot $image_filename_rootfs
-#exit
-
-
-echo "Pack images tar to $image_filename_upgrade_temp"
-gzip $image_filename_upgrade_tar_temp
+#error handling needed..
 
 echo "Remove packed files"
-#mv $image_filename_upgrade_temp $image_filename_upgrade
-
 if [ -e $image_filename_boot ]
 then
 	rm $image_filename_boot
@@ -134,21 +129,29 @@ then
 fi
 
 echo "Finalizing: $image_filename_upgrade"
+echo "mv $image_filename_upgrade_temp $image_filename_upgrade"
 mv $image_filename_upgrade_temp $image_filename_upgrade
 
 echo "Removing packing autorun script from eMMC!"
-
-#mkdir -p /tmp/emmcp2
+#echo "mount ${eMMC}p2 /tmp/emmcp2"
 mount ${eMMC}p2 /tmp/emmcp2
+ls /tmp/emmcp2/opt/scripts/boot/
 rm /tmp/emmcp2/opt/scripts/boot/autorun.upgrade.sh
+ls /tmp/emmcp2/opt/scripts/boot/
+
 sync
 umount /tmp/emmcp2
 
 echo "Finished.. byebye!"
 
-rm ${sdcard}/pack_resume_autorun.flag || true > /dev/null
+rm ${sdcard}/pack_resume_autorun.flag>/dev/null || true 
 
 sync
 echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 
-exit 0
+if [ -e $image_filename_upgrade ]
+then
+	exit 0
+fi
+
+exit 1

@@ -1,6 +1,7 @@
 #!/bin/sh
 
 #exit
+
 id | grep -q root
 is_root=$?
 #echo $is_root
@@ -104,12 +105,7 @@ alldone () {
 	fi
 
 	echo "Done!"
-#exit
-
-#	echo "-----------------------------"
-#	echo "Note: Please unpower the board, a reset [sudo reboot] is not enough."
-#	echo "-----------------------------"
-
+#exi
 	echo "Rebooting..."
 	sync
 
@@ -156,21 +152,100 @@ update_uenv () {
 	umount /emmcboot || true
 }
 
+reset_uenv () {
+	echo "resetting uEnv!"
+	cp ${sdcard}/uEnv.72check.txt ${sdcard}/uEnv.txt
 
-#sh /sdcard/pack_factorysettings.sh || true
-#exit
+        mkdir -p /tmp/emmcboot
+        mount ${eMMC}p1 /tmp/emmcboot
 
-
-if [ -e ${sdcard}/upgrade_resume_autorun.flag ]
-then
-	echo "Resuming incomplete upgrade!"
+	cp /tmp/emmcboot/uEnv.72check.txt /tmp/emmcboot/uEnv.txt
 	sync
-	rm ${sdcard}/upgrade_resume_autorun.flag
-	sh /sdcard/unpack_latest_version.sh || true
+#exit
+ 	umount /tmp/emmcboot
+	rm -r /tmp/emmcboot
+        echo "Done returning to gpio 72 check version"
+}
+
+stop_packing_restarting ()
+{
+	reset_uenv
+        rm ${sdcard}/pack_resume_autorun.flag
+        rm ${sdcard}/unpack_resume_autorun.flag
+}
+
+incriment_restart_counter () {
+	# Incriment and display restart counter
+	counter_file=${sdcard}/restart_counter.ini
+	counter_old=$(cat ${counter_file})
+	counter=$((counter_old+1))
+	echo $counter > $counter_file
+	echo "Restart counter: $counter"
+}
+
+if [ -e ${sdcard}/unpack_resume_autorun.flag ]
+then
+        echo "Resume eMMC unpacking flag found up"
+        incriment_restart_counter
+
+        if [ "$counter" -ge 5 ]
+        then
+                echo Restart counter exceeded 4.. quitting upgrade operation
+                stop_packing_restarting
+                echo Rebooting
+#                exit 0
+                reboot
+        fi
+
+        echo "Resuming eMMC packing"
+ 	sh /sdcard/unpack_latest_version.sh noreboot || true
+        result=$?
+        if [ result -eq 1 ]
+        then
+                echo Error unpacking eMMC, restarting...
+#                exit 0
+                reboot
+        fi
+
+        update_uenv
+        stop_packing_restarting
+        alldone
+        exit
+fi
+
+if [ -e ${sdcard}/pack_resume_autorun.flag ]
+then
+	echo "Resume eMMC packing flag found up"
+	incriment_restart_counter
+
+	if [ "$counter" -ge 5 ] 
+	then
+		echo Restart counter exceeded 4.. quitting packing operation
+		stop_packing_restarting
+		echo Rebooting
+#		exit 0
+		reboot
+	fi
+
+	echo "Resuming eMMC packing"
+
+	sh /sdcard/pack_latest_version.sh || true
+	result=$?
+	if [ result -eq 1 ]
+	then
+		echo Error packing eMMC, restarting...
+#		exit 0
+		reboot
+	fi
+
 	update_uenv
+	stop_packing_restarting
 	alldone
 	exit
 fi
+
+#echo "Error reaching here on packing">/errorpoint.check
+#exit 0
 
 if [ ! -e ${sdcard}/factory_settings-pt.img.gz ]
 then
@@ -183,9 +258,7 @@ then
 
 	echo timer > /sys/class/leds/beaglebone\:green\:usr1/trigger
 
-	sh /sdcard/pack_factorysettings.sh || true
-
-
+	sh /sdcard/pack_latest_version.sh || true
 
 	alldone
 	exit
@@ -256,7 +329,8 @@ then
 		mkdir -p /tmp/perm
 		mount ${eMMC}p4 /tmp/perm
 		rm -r /tmp/perm/*
-		sync
+		syo "Done formatting /perm partition"
+c
 		umount /tmp/perm/
 		echo "Done formatting /perm partition"
 	fi

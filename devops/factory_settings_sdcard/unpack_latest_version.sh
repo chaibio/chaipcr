@@ -120,15 +120,32 @@ fi
 
 cp $image_filename_upgrade $image_filename_upgrade_temp
 
-echo "Unzip upgrade tar from $image_filename_upgrade_temp"
-gunzip $image_filename_upgrade_temp
+echo "Untar upgrade tar from $image_filename_upgrade_temp"
+#gunzip $image_filename_upgrade_temp
 
-echo "uncompressing tar ball from $image_filename_upgrade_tar_temp to $image_filename_upgrade_tar_temp_folder"
-tar --strip=2 -xvf $image_filename_upgrade_tar_temp --directory $image_filename_upgrade_tar_temp_folder
+#echo "uncompressing tar ball from $image_filename_upgrade_tar_temp to $image_filename_upgrade_temp_folder"
+cd $image_filename_upgrade_tar_temp_folder
+tar -xvf $image_filename_upgrade_temp
+# --directory $image_filename_upgrade_tar_temp_folder
 
 #exit
 
-rm $image_filename_upgrade_tar_temp
+#rm $image_filename_upgrade_tar_temp
+
+
+if [ -e  $image_filename_upgrade_tar_temp ]
+then
+        rm $image_filename_upgrade_tar_temp
+fi
+
+if [ -e $image_filename_upgrade_temp ]
+then
+        rm $image_filename_upgrade_temp
+fi
+
+
+
+
 
 echo "Writing images to eMMC!"
 }
@@ -161,15 +178,9 @@ fi
 umount ${sdcard} || true
 mount ${sdcard_dev}p1 ${sdcard} || true
 
-
-#unmount_emmc
-
-
-
-
 NOW=$(date +"%m-%d-%Y %H:%M:%S")
 echo "Upgrade resume flag up!"
-echo "Upgrade started at: $NOW">>${sdcard}/upgrade_resume_autorun.flag
+echo "Upgrade started at: $NOW">>${sdcard}/unpack_resume_autorun.flag
 
 #exit 0
 
@@ -184,7 +195,7 @@ if [ ! -e  $image_filename_upgrade ]
 then
 	echo "Uprade image not found: $image_filename_upgrade.. exit!"
 #	echo "Upgrade resume flag down!"
-	rm ${sdcard}/upgrade_resume_autorun.flag
+	rm ${sdcard}/unpack_resume_autorun.flag
 
 	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 	echo default-on > /sys/class/leds/beaglebone\:green\:usr1/trigger
@@ -222,11 +233,15 @@ fi
 
 echo "Finished.. byebye!"
 echo "Upgrade resume flag down!"
-rm ${sdcard}/upgrade_resume_autorun.flag || true
+rm ${sdcard}/unpack_resume_autorun.flag || true
 
 sync
 echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 
-reboot
+if [ $# -eq 0 ]
+then
+	reboot
+fi
+
 
 exit 0
