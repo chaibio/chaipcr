@@ -58,10 +58,10 @@
                 <div class="data-boxes auto-delta">
                   <div class="name-board">
                     <div class="toggle-container">
-                    <auto-delta-toggle ng-show="editStageMode" data="stage.auto_delta" type="{{stage.stage_type}}" call="changeDelta">
+                    <auto-delta-toggle data="stage.auto_delta" type="{{stage.stage_type}}" call="changeDelta">
                     </auto-delta-toggle>
                   </div>
-                    <auto-delta-caption ng-show="editStageMode" type="{{stage.stage_type}}">
+                    <auto-delta-caption type="{{stage.stage_type}}">
                     </auto-delta-caption>
                   </div>
 
@@ -103,7 +103,7 @@
       </div>
       <arrow class="next" action="next" ng-click="arrowClicked()"></arrow>
 
-      <div class="exp-info-bar"> <!--the black bar in the bottom comes here --></div>
+      <div class="exp-info-bar"> <status-bar experiment-id="protocol.id"></status-bar></div>
     </div>
     </div>
   </div>

@@ -17,7 +17,7 @@ window.ChaiBioTech.ngApp.factory('canvas', [
     moveStepRect, moveStageRect, previouslySelected, constants, circleManager) {
 
     this.init = function(model) {
-
+      console.log(model);
       this.model = model.protocol;
       this.$scope = model;
       this.allStepViews = [];
