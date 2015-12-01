@@ -28,6 +28,13 @@ window.ChaiBioTech.ngApp.directive('autoDeltaToggle', [
 
         });
 
+        $(elem).click(function(evt) {
+          if($(evt.target).is(".gather-data-toggle")) {
+            scope.configureSwitch(!scope.data);
+            scope.sendData();
+          }
+        });
+
         scope.configureSwitch = function(val) {
 
           if(val) {
@@ -40,6 +47,12 @@ window.ChaiBioTech.ngApp.directive('autoDeltaToggle', [
             $(scope.dragElem).css("left", "1px");
           }
 
+        };
+
+        scope.sendData = function() {
+
+          scope.data = !scope.data;
+          scope.$parent[scope.call]();
         };
 
         scope.dragElem = $(elem).find(".outer-circle").draggable({
@@ -57,8 +70,7 @@ window.ChaiBioTech.ngApp.directive('autoDeltaToggle', [
                 val = true;
               }
               if(val !== scope.data) {
-                scope.data = !scope.data;
-                scope.$parent[scope.call]();
+                scope.sendData();
               }
             } else {
               $(this).css("left", "1px");
