@@ -13,13 +13,10 @@ window.ChaiBioTech.ngApp.factory('objectModified', [
       ***************************************/
       this.canvas.on('object:modified', function(evt) {
 
-        if(evt.target) return false;
-
         switch(evt.target.name) {
 
           case "controlCircleGroup":
 
-            me = evt.target.me;
             ExperimentLoader.changeTemperature($scope)
               .then(function(data) {
                 console.log(data);
