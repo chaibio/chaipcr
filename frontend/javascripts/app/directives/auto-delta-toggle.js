@@ -29,7 +29,7 @@ window.ChaiBioTech.ngApp.directive('autoDeltaToggle', [
         });
 
         $(elem).click(function(evt) {
-          if($(evt.target).is(".gather-data-toggle")) {
+          if($(evt.target).is(".gather-data-toggle") && scope.type === "cycling") {
             scope.configureSwitch(!scope.data);
             scope.sendData();
           }

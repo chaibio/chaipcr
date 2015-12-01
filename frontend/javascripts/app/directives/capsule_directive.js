@@ -39,6 +39,16 @@ window.ChaiBioTech.ngApp.directive('capsule', [
           }
         });
 
+        $(elem).click(function(evt) {
+
+          if(($(evt.target).is(".minus") || $(evt.target).is(".plus")) && scope.delta === "true") {
+            
+            scope.originalValue = scope.originalValue * -1;
+            scope.configure();
+            scope.sendValue();
+          }
+        });
+
         scope.disable = function() {
 
           scope.configurePlusMinus("rgb(205, 205, 205)");
@@ -55,15 +65,6 @@ window.ChaiBioTech.ngApp.directive('capsule', [
         };
 
         scope.configure = function(oldVal) {
-
-          /*if(scope.originalValue === 0) {
-          // In case we need to stop the slider to come back to zero, when we change the value form a value other than zero.
-            if(! oldVal) {
-              $(scope.drag).css("left", "0px");
-              $(scope.drag).parent().parent().css("background-color", "rgb(0, 174, 239)");
-            }
-            return ;
-          }*/
 
           if(scope.originalValue > 0) {
             $(scope.drag).css("left", "16px");
@@ -84,6 +85,15 @@ window.ChaiBioTech.ngApp.directive('capsule', [
           }
         };
 
+        scope.sendValue = function() {
+
+          scope.$apply(function() {
+            scope.data = String(scope.originalValue);
+          });
+          ExperimentLoader[scope.fun](scope.$parent.$parent.$parent).then(function(data) {
+            console.log("updated", data.step);
+          });
+        };
         // Enabling the drag
         scope.drag = $(elem).find(".ball-cover").draggable({
           containment: "parent",
@@ -112,12 +122,7 @@ window.ChaiBioTech.ngApp.directive('capsule', [
                 scope.originalValue = Math.abs(scope.originalValue);
               }
               if(scope.originalValue !== 0) {
-                scope.$apply(function() {
-                  scope.data = String(scope.originalValue);
-                });
-                ExperimentLoader[scope.fun](scope.$parent.$parent.$parent).then(function(data) {
-                  console.log("updated", data.step);
-                });
+                scope.sendValue();
               }
 
             } else {
