@@ -105,12 +105,7 @@ alldone () {
 	fi
 
 	echo "Done!"
-#exit
-
-#	echo "-----------------------------"
-#	echo "Note: Please unpower the board, a reset [sudo reboot] is not enough."
-#	echo "-----------------------------"
-
+#exi
 	echo "Rebooting..."
 	sync
 
@@ -263,9 +258,7 @@ then
 
 	echo timer > /sys/class/leds/beaglebone\:green\:usr1/trigger
 
-	sh /sdcard/pack_factorysettings.sh || true
-
-
+	sh /sdcard/pack_latest_version.sh || true
 
 	alldone
 	exit

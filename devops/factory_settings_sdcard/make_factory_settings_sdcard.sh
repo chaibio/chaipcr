@@ -96,14 +96,16 @@ if [ $retval -ne 0 ]; then
 else
 	echo "Zeroing data partition"
 	dd if=/dev/zero of=/emmc/big_zero_file.bin > /dev/null
-	sync
+	sync &
 	sleep 5
 	sync
-	sleep 10
 
 	echo "Removing zeros file"
 	rm /emmc/big_zero_file.bin
+	sync &
+	sleep 10
 	sync
+
 	umount /emmc > /dev/null || true
 fi
 
@@ -117,25 +119,25 @@ finish() {
 	exit
 }
 
-echo "Backing up partition table to: $image_filename_pt"
+echo "Packing up partition table to: $image_filename_pt"
 dd  if=$eMMC bs=16M count=1 | gzip -c > $image_filename_pt
 
 sleep 15
 sync
 
-echo "Backing up boot partition to: $image_filename_boot"
+echo "Packing up boot partition to: $image_filename_boot"
 dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
 
 sleep 15
 sync
 
-echo "Backing up data partition to: $image_filename_data"
+echo "Packing up data partition to: $image_filename_data"
 dd  if=${eMMC}p3 bs=16M | gzip -c > $image_filename_data
 
 sleep 15
 sync
 
-echo "Backing up perm partition to: $image_filename_perm"
+echo "Packing up perm partition to: $image_filename_perm"
 dd  if=${eMMC}p4 bs=16M | gzip -c > $image_filename_perm
 
 sleep 15
@@ -146,32 +148,37 @@ sync
 mount $rootfs_partition /emmc
 retval=$?
 
+#30 minutes of delay allowed syncing big zero files
+echo 1800 > /proc/sys/kernel/hung_task_timeout_secs
+
 if [ $retval -ne 0 ]; then
     echo "Error mounting rootfs partition! Error($retval)"
 else
 	echo "Zeroing rootfs partition"
 	dd if=/dev/zero of=/emmc/big_zero_file1.bin bs=16M count=70> /dev/null
-	sync
+	sync &
 	sleep 5
 	dd if=/dev/zero of=/emmc/big_zero_file2.bin bs=16M count=70> /dev/null
-	sync
+	sync &
 	sleep 5
 	dd if=/dev/zero of=/emmc/big_zero_file3.bin bs=16M count=70> /dev/null
-	sync
+	sync &
 	sleep 5
 	dd if=/dev/zero of=/emmc/big_zero_file4.bin bs=16M> /dev/null
-	sync
+	sync &
 	sleep 10
 
+	sync
 	echo "Removing zeros files"
 	rm /emmc/big_zero_file*
-	sync
+	sync &
 	sleep 10
 	sync
 	umount /emmc > /dev/null || true
 fi
 
-echo "Backing up binaries partition to: $image_filename_rootfs"
+
+echo "Packing up binaries partition to: $image_filename_rootfs"
 dd  if=${eMMC}p2 bs=16M | gzip -c > $image_filename_rootfs
 
 sleep 15
@@ -183,9 +190,14 @@ mv $image_filename_boot $image_filename_boot2
 mv $image_filename_pt $image_filename_pt2
 mv $image_filename_perm $image_filename_perm2
 
-sync
+sync &
+
+sleep 5
 
 echo "creating factory settings images  done!!"
+echo 60 > /proc/sys/kernel/hung_task_timeout_secs
+
+sync
 
 sleep 5
 
