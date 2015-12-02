@@ -11,7 +11,7 @@ window.ChaiBioTech.ngApp.factory('mouseOver', [
       this.canvas.on("mouse:over", function(evt) {
 
         if(! evt.target) return false;
-
+        
         switch(evt.target.name) {
 
           case "stepGroup":
@@ -24,6 +24,18 @@ window.ChaiBioTech.ngApp.factory('mouseOver', [
               previouslyHoverd.step = me;
               C.canvas.renderAll();
             }
+          break;
+
+          case "controlCircleGroup":
+            that.canvas.hoverCursor = "pointer";
+          break;
+
+          case "moveStep":
+            that.canvas.hoverCursor = "pointer";
+          break;
+
+          case "moveStage":
+            that.canvas.hoverCursor = "pointer";
           break;
 
           case "deleteStepButton":

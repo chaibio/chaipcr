@@ -65,6 +65,7 @@
             height: 4px;
             background-color: #ADADAD;
             border-radius: 5px;
+            cursor: pointer;
           }
 
           .foreground-bar {
@@ -341,6 +342,7 @@
             border-color: #cdcdcd;
             border-width:1px;
             border-style: solid;
+            cursor: pointer;
 
             .capsule-container {
                 position: relative;
@@ -353,13 +355,11 @@
               font-size: 16px;
               font-weight: 800;
               color: grey;
-              cursor: pointer;
             }
 
             .ball-cover {
               width: 14px;
               height: 14px;
-              cursor: move;
 
               .white-ball {
                 width: 14px;

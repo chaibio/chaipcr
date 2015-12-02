@@ -16,11 +16,11 @@ window.ChaiBioTech.ngApp.directive('autoDeltaCaption', [
         scope.$on("dataLoaded", function() {
 
           scope.$watch("type", function(val, oldVal) {
-            console.log(val);
+
             if(val === "cycling") {
-              scope.disabled = false;
+              scope.show = true;
             } else {
-              scope.disabled = true;
+              scope.show = false;
             }
           });
 

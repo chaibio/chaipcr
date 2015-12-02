@@ -1,0 +1,31 @@
+<div class="intro" ng-init="analyzeExperiment()">
+  <h2> Thermal Consistency Test Results</h2>
+
+  <h4 class="text-center" ng-show="!tm_values"><b>Analyzing Results...</b></h4>
+
+  <table class="table table-bordered" ng-show="tm_values">
+    <thead>
+      <tr>
+        <th>Well</th>
+        <th>Tm</th>
+        <th>Fluorescence @72 C</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="i in loop">
+        <td>{{i+1}}</td>
+        <td>
+          {{ tm_values[i] | round:2 }}
+        </td>
+        <td>
+          {{ analyzedExp['72c_fluorescence'][i]  | round:2 }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="text-center" ng-show="tm_values">
+    <a href="/#/user/settings" class="button">OKAY</a>
+  </div>
+
+</div>

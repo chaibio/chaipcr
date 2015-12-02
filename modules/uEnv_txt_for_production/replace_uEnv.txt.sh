@@ -1,5 +1,10 @@
 #!/bin/bash
 uEnv=/boot/uboot/uEnv.txt
+uEnvSDCard=/boot/uboot/uEnv.sdcard.txt
+uEnv72Check=/boot/uboot/uEnv.72check.txt
+
+
+
 cat << _EOF_ > $uEnv
 ##Video: Uncomment to override:
 ##see: https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/fb/modedb.txt
@@ -99,7 +104,17 @@ uenvcmd= if gpio input 72; then run uenvcmdsdcard; else run uenvcmdmmc; fi
 
 
 #
+
 _EOF_
 
 
 echo "uEnv.txt done updating"
+
+cp $uEnv $uEnvSDCard
+cp $uEnv $uEnv72Check
+echo " " >> $uEnvSDCard
+echo "uenvcmd=run uenvcmdsdcard" >> $uEnvSDCard
+echo "#" >> $uEnvSDCard
+
+echo "SDCard version of uEnv.txt done updating"
+

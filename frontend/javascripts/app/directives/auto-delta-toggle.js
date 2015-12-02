@@ -19,13 +19,16 @@ window.ChaiBioTech.ngApp.directive('autoDeltaToggle', [
           });
 
           scope.$watch("type", function(val, oldVal) {
-            if(val === "cycling") {
-              scope.show = true;
-            } else {
-              scope.show = false;
-            }
+            scope.show = (val === "cycling") ? true : false;
           });
 
+        });
+
+        $(elem).click(function(evt) {
+          //if($(evt.target).is(".gather-data-toggle") && scope.type === "cycling") {
+            scope.configureSwitch(!scope.data);
+            scope.sendData();
+          //}
         });
 
         scope.configureSwitch = function(val) {
@@ -33,13 +36,23 @@ window.ChaiBioTech.ngApp.directive('autoDeltaToggle', [
           if(val) {
             $(scope.dragElem).parent().css("background-color", "#8dc63f");
             $(scope.dragElem).children().css("background-color", "#8dc63f");
-            $(scope.dragElem).css("left", "11px");
+            $(scope.dragElem).animate({
+              left: "11"
+            }, 100);
           } else {
             $(scope.dragElem).parent().css("background-color", "#bbbbbb");
             $(scope.dragElem).children().css("background-color", "#bbbbbb");
-            $(scope.dragElem).css("left", "1px");
+            $(scope.dragElem).animate({
+              left: "1"
+            }, 100);
           }
 
+        };
+
+        scope.sendData = function() {
+
+          scope.data = !scope.data;
+          scope.$parent[scope.call]();
         };
 
         scope.dragElem = $(elem).find(".outer-circle").draggable({
@@ -57,8 +70,7 @@ window.ChaiBioTech.ngApp.directive('autoDeltaToggle', [
                 val = true;
               }
               if(val !== scope.data) {
-                scope.data = !scope.data;
-                scope.$parent[scope.call]();
+                scope.sendData();
               }
             } else {
               $(this).css("left", "1px");

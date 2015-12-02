@@ -14,12 +14,12 @@ window.ChaiBioTech.ngApp.factory('mouseMove', [
         if(that.mouseDown && evt.target) {
 
           if(that.startDrag === 0) {
-            that.canvas.defaultCursor = "move";
+            that.canvas.defaultCursor = "ew-resize";
             that.startDrag = evt.e.clientX;
             startPos = canvasContaining.scrollLeft();
           }
 
-          left = startPos + (evt.e.clientX - that.startDrag);
+          left = startPos - (evt.e.clientX - that.startDrag); // Add startPos to reverse the moving direction.
 
           if((left >= 0) && (left <= $scope.scrollWidth - 1024)) {
 
