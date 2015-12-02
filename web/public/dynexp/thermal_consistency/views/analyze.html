@@ -11,8 +11,7 @@
     </thead>
     <tbody>
       <tr ng-repeat="i in loop">
-        <td ng-if="i < 8">A{{i+1}}</td>
-        <td ng-if="i > 7">B{{i-7}}</td>
+        <td>{{i+1}}</td>
         <td>
           {{ analyzedExp['fluo_'+i].tm[0].Tm }}
         </td>
