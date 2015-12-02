@@ -1,0 +1,29 @@
+<div class="intro" ng-init="analyzeExperiment()">
+  <h2> Thermal Consistency Test Results</h2>
+
+  <h4 class="text-center" ng-show="!analyzedExp"><b>Analyzing Results...</b></h4>
+
+  <table class="table table-bordered" ng-show="analyzedExp">
+    <thead>
+      <tr>
+        <th>Well</th>
+        <th>Tm</th>
+        <th>Fluorescence @72 C</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="i in loop">
+        <td>{{i+1}}</td>
+        <td>
+          {{ analyzedExp['fluo_'+i].tm[0].Tm }}
+        </td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="text-center" ng-show="analyzedExp">
+    <a href="/#/user/settings" class="button">OKAY</a>
+  </div>
+
+</div>
