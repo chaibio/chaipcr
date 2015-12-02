@@ -40,11 +40,11 @@ window.ChaiBioTech.ngApp.factory('mouseDown', [
           break;
 
           case "moveStep":
-            that.canvas.moveCursor = "ew-resize";
+            that.canvas.moveCursor = "move";
           break;
 
           case "moveStage":
-            that.canvas.moveCursor = "ew-resize";
+            that.canvas.moveCursor = "move";
           break;
 
           case "deleteStepButton":
