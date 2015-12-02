@@ -118,6 +118,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.deleteStageContents = function() {
 
         this.canvas.remove(this.stageGroup);
+        this.canvas.remove(this.dots);
         this.canvas.remove(this.borderRight);
 
       };
