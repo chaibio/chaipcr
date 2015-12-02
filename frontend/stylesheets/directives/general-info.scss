@@ -126,7 +126,8 @@
   background-color: #bbbbbb;
   position: relative;
   float: left;
-
+  cursor: pointer;
+  
   .outer-circle {
     width:10px;
     height: 10px;
@@ -135,8 +136,7 @@
     position: absolute;
     top: 1px;
     left: 1px;
-    cursor: move;
-    
+
     .inner-circle {
       width:6px;
       height: 6px;

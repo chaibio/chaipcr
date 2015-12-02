@@ -41,8 +41,8 @@ window.ChaiBioTech.ngApp.directive('capsule', [
 
         $(elem).click(function(evt) {
 
-          if(($(evt.target).is(".minus") || $(evt.target).is(".plus")) && scope.delta === "true") {
-            
+          if(scope.delta === "true") {
+
             scope.originalValue = scope.originalValue * -1;
             scope.configure();
             scope.sendValue();
@@ -67,18 +67,24 @@ window.ChaiBioTech.ngApp.directive('capsule', [
         scope.configure = function(oldVal) {
 
           if(scope.originalValue > 0) {
-            $(scope.drag).css("left", "16px");
+            $(scope.drag).animate({
+              left: "16"
+            }, 100);
             $(scope.drag).parent().parent().css("background-color", "rgb(238, 49, 24)");
             $(scope.drag).parent().parent().css("border-color", "rgb(238, 49, 24)");
             $(scope.drag).find(".center-circle").css("background-color", "rgb(238, 49, 24)");
 
           } else if(scope.originalValue < 0) {
-            $(scope.drag).css("left", "0px");
+            $(scope.drag).animate({
+              left: "0"
+            }, 100);
             $(scope.drag).parent().parent().css("background-color", "#000");
             $(scope.drag).parent().parent().css("border-color", "#000");
             $(scope.drag).find(".center-circle").css("background-color", "#000");
           } else {
-            $(scope.drag).css("left", "0px");
+            $(scope.drag).animate({
+              left: "0"
+            }, 100);
             $(scope.drag).parent().parent().css("background-color", "#000");
             $(scope.drag).parent().parent().css("border-color", "#000");
             $(scope.drag).find(".center-circle").css("background-color", "#000");
