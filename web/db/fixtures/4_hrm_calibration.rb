@@ -8,6 +8,11 @@ Step.seed do |s|
   s.collect_data = false
 end
 
+ramp = Ramp.seed do |r|
+  r.next_step_id = 9
+  r.rate = 3.0
+end
+
 Step.seed do |s|
   s.id = 9
   s.name = "Anneal"
@@ -16,6 +21,12 @@ Step.seed do |s|
   s.order_number = 1
   s.stage_id = 3
   s.collect_data = false
+  s.ramp = ramp.first
+end
+
+ramp = Ramp.seed do |r|
+  r.next_step_id = 10
+  r.rate = 3.0
 end
 
 Step.seed do |s|
@@ -26,6 +37,7 @@ Step.seed do |s|
   s.order_number = 0
   s.stage_id = 4
   s.collect_data = false
+  s.ramp = ramp.first
 end
 
 ramp = Ramp.seed do |r|
