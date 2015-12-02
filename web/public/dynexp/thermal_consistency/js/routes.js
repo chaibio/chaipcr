@@ -17,7 +17,7 @@
         templateUrl: './views/exp-running.html'
       })
       .state('analyze', {
-        url: '/analyze',
+        url: '/analyze/:id',
         templateUrl: './views/analyze.html'
       });
 
