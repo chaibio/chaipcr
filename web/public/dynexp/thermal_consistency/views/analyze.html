@@ -1,7 +1,9 @@
 <div class="intro" ng-init="analyzeExperiment()">
   <h2> Thermal Consistency Test Results</h2>
 
-  <table class="table table-bordered">
+  <p class="text-center"><b>Analyzing Results...</b></p>
+
+  <table class="table table-bordered" ng-show="analyzedExp">
     <thead>
       <tr>
         <th>Well</th>
