@@ -19,10 +19,9 @@ window.ChaiBioTech.ngApp.directive('gatherDataToggle', [
         });
 
         $(elem).click(function(evt) {
-          if($(evt.target).is(".gather-data-toggle")) {
-            scope.configureSwitch(!scope.data);
-            scope.sendData();
-          }
+
+          scope.configureSwitch(!scope.data);
+          scope.sendData();
         });
 
         scope.configureSwitch = function(val) {
@@ -30,11 +29,15 @@ window.ChaiBioTech.ngApp.directive('gatherDataToggle', [
           if(val) {
             $(scope.dragElem).parent().css("background-color", "#8dc63f");
             $(scope.dragElem).children().css("background-color", "#8dc63f");
-            $(scope.dragElem).css("left", "11px");
+            $(scope.dragElem).animate({
+              left: "11"
+            }, 100);
           } else {
             $(scope.dragElem).parent().css("background-color", "#bbbbbb");
             $(scope.dragElem).children().css("background-color", "#bbbbbb");
-            $(scope.dragElem).css("left", "1px");
+            $(scope.dragElem).animate({
+              left: "1"
+            }, 100);
           }
 
         };
