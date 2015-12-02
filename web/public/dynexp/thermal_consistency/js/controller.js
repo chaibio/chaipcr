@@ -11,6 +11,11 @@
     function AppController ($scope, $window, Experiment, $state, Status, TestInProgressService, host, $http) {
 
       $scope.cancel = false;
+      $scope.loop = [];
+
+      for (var i=0; i < 16; i ++) {
+        $scope.loop.push(i);
+      }
 
       $scope.$watch(function () {
         return Status.getData();
@@ -33,18 +38,16 @@
 
         if($scope.state === 'Idle' && $scope.old_state !=='Idle') {
           // exp complete
-          analyzeExperiment();
+          $state.go('analyze');
         }
 
       }, true);
 
 
-      function analyzeExperiment () {
-        $state.go('analyze');
+      $scope.analyzeExperiment = function () {
         if (!$scope.analyzedExp) {
           Experiment.analyze($scope.experiment.id).then(function (resp) {
             $scope.analyzedExp = resp.data;
-            console.log($scope.analyzedExp);
           });
         }
       };
