@@ -15,9 +15,11 @@
       <tr ng-repeat="i in loop">
         <td>{{i+1}}</td>
         <td>
-          {{ tm_values[i] }}
+          {{ tm_values[i] | round:2 }}
         </td>
-        <td></td>
+        <td>
+          {{ analyzedExp.72c_fluorescence[i]  | round:2 }}
+        </td>
       </tr>
     </tbody>
   </table>
