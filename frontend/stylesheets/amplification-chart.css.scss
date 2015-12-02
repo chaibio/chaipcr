@@ -110,6 +110,19 @@
           }
         }
 
+        &.auto {
+          .switch {
+            background: #BBB;
+            border-color: #BBB;
+          }
+          small {
+            background: #bbb;
+          }
+          .set-auto {
+            color: $gray;
+          }
+        }
+
         label {
           color: $gray;
           display: inline-block;
