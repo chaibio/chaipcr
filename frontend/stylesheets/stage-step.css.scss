@@ -65,6 +65,7 @@
             height: 4px;
             background-color: #ADADAD;
             border-radius: 5px;
+            cursor: pointer;
           }
 
           .foreground-bar {
@@ -342,7 +343,7 @@
             border-width:1px;
             border-style: solid;
             cursor: pointer;
-            
+
             .capsule-container {
                 position: relative;
 

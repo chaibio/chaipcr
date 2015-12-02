@@ -19,6 +19,15 @@ window.ChaiBioTech.ngApp.factory('mouseOut', [
           case "controlCircleGroup":
             that.canvas.hoverCursor = "move";
           break;
+
+          case "moveStep":
+            that.canvas.hoverCursor = "move";
+          break;
+
+          case "moveStage":
+            that.canvas.hoverCursor = "move";
+          break;
+
           case "deleteStepButton":
             that.canvas.hoverCursor = "move";
           break;

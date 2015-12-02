@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151201063955) do
+ActiveRecord::Schema.define(version: 20151202070118) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -154,7 +154,7 @@ ActiveRecord::Schema.define(version: 20151201063955) do
     t.string   "version",           null: false
     t.string   "checksum",          null: false
     t.datetime "release_date",      null: false
-    t.string   "brief_description"
+    t.text     "brief_description"
     t.text     "full_description"
   end
 

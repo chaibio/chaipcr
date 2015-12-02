@@ -10,7 +10,7 @@ window.ChaiBioTech.ngApp.factory('mouseDown', [
         what we do is check if the click is up on some particular canvas element.
         and we send the changes to angular directives.
     ***************************************/
-    
+
     this.init = function(C, $scope, that) {
 
       var me;
@@ -29,12 +29,22 @@ window.ChaiBioTech.ngApp.factory('mouseDown', [
 
             me = evt.target.me;
             that.selectStep(me.circle);
+
           break;
 
           case "controlCircleGroup":
 
             me = evt.target.me;
             that.selectStep(me);
+            that.canvas.moveCursor = "ns-resize";
+          break;
+
+          case "moveStep":
+            that.canvas.moveCursor = "move";
+          break;
+
+          case "moveStage":
+            that.canvas.moveCursor = "move";
           break;
 
           case "deleteStepButton":
