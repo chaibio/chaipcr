@@ -4,11 +4,12 @@
     '$window',
     'Experiment',
     '$state',
+    '$stateParams',
     'Status',
     'TestInProgressService',
     'host',
     '$http',
-    function AppController ($scope, $window, Experiment, $state, Status, TestInProgressService, host, $http) {
+    function AppController ($scope, $window, Experiment, $state, $stateParams, Status, TestInProgressService, host, $http) {
 
       $scope.cancel = false;
       $scope.loop = [];
@@ -38,7 +39,7 @@
 
         if($scope.state === 'Idle' && $scope.old_state !=='Idle') {
           // exp complete
-          $state.go('analyze');
+          $state.go('analyze', {id: $scope.experiment.id});
           Status.stopSync();
         }
 
@@ -47,7 +48,7 @@
 
       $scope.analyzeExperiment = function () {
         if (!$scope.analyzedExp) {
-          Experiment.analyze($scope.experiment.id).then(function (resp) {
+          Experiment.analyze($stateParams.id).then(function (resp) {
             $scope.analyzedExp = resp.data;
           });
         }
