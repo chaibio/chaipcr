@@ -14,7 +14,10 @@ window.ChaiBioTech.ngApp.factory('mouseUp', [
           that.startDrag = 0;
           that.mouseDown = false;
           that.canvas.renderAll();
+        } else {
+          that.canvas.moveCursor = "move";
         }
+
       });
     };
     return this;
