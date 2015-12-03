@@ -49,7 +49,7 @@ window.ChaiBioTech.ngApp.factory('dots', [
 
       return this.prepareArray(this.stageDotCordinates);
     };
-    
+
     this.stepDotCordiantes = this.getStepCordinates();
     this.stageDotCordinates = this.getStageCordinates();
 
