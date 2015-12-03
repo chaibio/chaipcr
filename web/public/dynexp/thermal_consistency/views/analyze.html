@@ -37,7 +37,7 @@
         </thead>
         <tbody>
           <tr ng-repeat="i in loop">
-            <td>{{i+8}}</td>
+            <td>{{i+9}}</td>
             <td ng-class="{'text-success': tm_values[i+8] >= CONSTANTS.MIN_TM_VAL && tm_values[i+8] <= CONSTANTS.MAX_TM_VAL, 'text-danger': tm_values[i+8] < CONSTANTS.MIN_TM_VAL || tm_values[i+8] > CONSTANTS.MAX_TM_VAL}">
               {{ tm_values[i+8] | round:2 }}
             </td>
