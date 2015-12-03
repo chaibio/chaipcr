@@ -56,24 +56,6 @@ p.step{
     color: #333;
 }
 
-/*tubes container sulotion label*/
-.tubes-container .solution-label img {
-    display: inline-block;
-    margin: 0 5px;
-    margin-right: 10px;
-    vertical-align: middle;
-    height: 20px;
-}
-
-.tubes-container .solution-label span {
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.tubes-container img.tubes {
-    margin-top: 10px;
-    width: 225px;
-}
 
 /*intro page*/
 .intro h2 {
@@ -101,29 +83,6 @@ p.step{
 .intro .mini-description .note{
     color: #777;
     font-size: 12px;
-}
-
-/*step 1*/
-
-.row.tubes-container{
-    margin: 0;
-    margin-top: 30px;
-}
-.tubes-container .col-md-6{
-    padding-left: 0;
-    padding-right: 0;
-}
-
-.step-1 .tubes-container .col-md-6:last-of-type {
-    padding-left: 50px;
-}
-
-/*step 2 & 4*/
-.step-2 .machine-icon-container img,
-.step-4 .machine-icon-container img {
-    width: 230px;
-    margin-left: 45px;
-    display: block;
 }
 
 /*step 3*/
@@ -213,3 +172,6 @@ p.step{
     margin-top: 20px;
 }
 
+.page-layout .content.analyze {
+    width: 1024px;
+}

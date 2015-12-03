@@ -12,6 +12,12 @@ window.App.service('TestInProgressService', [
     experimentQues = {};
     isFetchingExp = false;
 
+    this.getMaxDeltaTm = function (tms) {
+      var min_tm = Math.min.apply(Math, tms);
+      var max_tm = Math.max.apply(Math, tms);
+      return max_tm - min_tm;
+    }
+
     this.getTmValues = function (analyze_data) {
       var tms = [];
       for (var i=0; i< 16; i++) {
