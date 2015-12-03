@@ -14,7 +14,7 @@
     <tbody>
       <tr ng-repeat="i in loop">
         <td>{{i+1}}</td>
-        <td>
+        <td ng-class="{'text-success': tm_values[i] >= CONSTANTS.MIN_TM_VAL && tm_values[i] <= CONSTANTS.MAX_TM_VAL, 'text-danger': tm_values[i] < CONSTANTS.MIN_TM_VAL || tm_values[i] > CONSTANTS.MAX_TM_VAL}">
           {{ tm_values[i] | round:2 }}
         </td>
         <td ng-class="{'text-success': analyzedExp['72c_fluorescence'][i] >= CONSTANTS.MIN_FLUORESCENCE_VAL, 'text-danger': analyzedExp['72c_fluorescence'][i] < CONSTANTS.MIN_FLUORESCENCE_VAL}">
