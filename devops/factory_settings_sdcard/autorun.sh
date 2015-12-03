@@ -197,7 +197,7 @@ then
                 reboot
         fi
 
-        echo "Resuming eMMC packing"
+        echo "Resuming eMMC unpacking"
  	sh /sdcard/unpack_latest_version.sh noreboot || true
         result=$?
         if [ result -eq 1 ]
@@ -254,12 +254,8 @@ then
 	sync
 	update_uenv
 
-	echo Creating factory settings image done.. Now creating upgrade image. 
-
+	echo Creating factory settings image done.. Now creating upgrade image. 	
 	echo timer > /sys/class/leds/beaglebone\:green\:usr1/trigger
-
-	sh /sdcard/pack_latest_version.sh || true
-
 	alldone
 	exit
 fi

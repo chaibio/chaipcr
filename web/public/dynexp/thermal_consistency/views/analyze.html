@@ -1,9 +1,9 @@
 <div class="intro" ng-init="analyzeExperiment()">
   <h2> Thermal Consistency Test Results</h2>
 
-  <h4 class="text-center" ng-show="!analyzedExp"><b>Analyzing Results...</b></h4>
+  <h4 class="text-center" ng-show="!tm_values"><b>Analyzing Results...</b></h4>
 
-  <table class="table table-bordered" ng-show="analyzedExp">
+  <table class="table table-bordered" ng-show="tm_values">
     <thead>
       <tr>
         <th>Well</th>
@@ -14,15 +14,17 @@
     <tbody>
       <tr ng-repeat="i in loop">
         <td>{{i+1}}</td>
-        <td>
-          {{ analyzedExp['fluo_'+i].tm[0].Tm }}
+        <td ng-class="{'text-success': tm_values[i] >= CONSTANTS.MIN_TM_VAL && tm_values[i] <= CONSTANTS.MAX_TM_VAL, 'text-danger': tm_values[i] < CONSTANTS.MIN_TM_VAL || tm_values[i] > CONSTANTS.MAX_TM_VAL}">
+          {{ tm_values[i] | round:2 }}
         </td>
-        <td></td>
+        <td ng-class="{'text-success': analyzedExp['72c_fluorescence'][i] >= CONSTANTS.MIN_FLUORESCENCE_VAL, 'text-danger': analyzedExp['72c_fluorescence'][i] < CONSTANTS.MIN_FLUORESCENCE_VAL}">
+          {{ analyzedExp['72c_fluorescence'][i]  | commaSeparated }}
+        </td>
       </tr>
     </tbody>
   </table>
 
-  <div class="text-center" ng-show="analyzedExp">
+  <div class="text-center" ng-show="tm_values">
     <a href="/#/user/settings" class="button">OKAY</a>
   </div>
 
