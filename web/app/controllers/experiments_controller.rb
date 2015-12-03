@@ -208,8 +208,25 @@ class ExperimentsController < ApplicationController
           end
           out.write csv_string
           
+          first_stage_meltcurve_data = Stage.joins(:protocol).where(["experiment_definition_id=? and stage_type='meltcurve'", @experiment.experiment_definition_id]).first
+          if first_stage_meltcurve_data
+            begin
+              melt_curve_data = retrieve_melt_curve_data(@experiment.id, first_stage_meltcurve_data.id, @experiment.calibration_id)
+            rescue => e
+            end
+          end
+          
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve.csv")
-          out.write MeltCurveDatum.as_csv(params[:id])
+          columns = ["well_num", "temperature", "fluorescence_data", "derivative", "tm", "area"]
+          csv_string = CSV.generate do |csv|
+            csv << columns
+            if melt_curve_data
+              melt_curve_data.each do |data|
+                csv << data.to_h.values_at(*columns.map { |x| x.to_sym })
+              end
+            end
+          end
+          out.write csv_string
         end
         buffer.rewind
         send_data buffer.sysread

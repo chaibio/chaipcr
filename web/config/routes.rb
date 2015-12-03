@@ -68,8 +68,8 @@ Qpcrctl::Application.routes.draw do
 
   match 'device/mac_address', to: 'devices#mac_address', via: [:options]
   match 'device', to: 'devices#show', via: [:options]
-  resource :device, path_names: { show: 'info'}, only: [:update, :show] do
-    get 'capabilities'
+  get 'capabilities', to: "devices#capabilities"
+  resource :device, only: [:show, :update] do
     get 'mac_address'
     put 'root_password'
   end
