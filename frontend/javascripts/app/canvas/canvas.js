@@ -35,7 +35,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         "gather-data-image.png",
         "pause.png",
         "pause-middle.png",
-        "close.png"
+        "close.png",
+        "drag-footer-image.png"
       ];
 
       this.imageLocation = "/images/";
@@ -107,7 +108,9 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         // here we initiate stage/step events service.. So now we can listen for changes from the bottom.
         stageEvents.init(this.$scope, this.canvas, this);
         stepEvents.init(this.$scope, this.canvas, this);
-
+        console.log(moveStepRect.getMoveStepRect(this));
+        this.stepIndicator = moveStepRect.getMoveStepRect(this);
+        this.canvas.add(this.stepIndicator);
     };
 
     /*******************************************************/

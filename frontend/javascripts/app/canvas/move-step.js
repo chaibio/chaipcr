@@ -10,69 +10,108 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
         this.currentHit = 0;
 
         var smallCircle = new fabric.Circle({
-          radius: 4,
-          fill: 'black',
+          radius: 6,
+          fill: '#FFB300',
+          stroke: "black",
+          strokeWidth: 3,
           selectable: false,
-          left: 63,
-          top: 259,
+          left: 48,
+          top: 298,
+          originX: 'center', originY: 'center',
           //top: -2
         });
 
-        var stageText = new fabric.Text(
-          "MOVING STAGE 2", {
-            fill: 'black',  fontSize: 10, selectable: false, originX: 'left', originY: 'top',
-            top: 12, left: 10, fontFamily: "Open Sans", fontWeight: "bold"
+        var smallCircleTop = new fabric.Circle({
+          radius: 5, fill: 'black', selectable: false, left: 48, top: 13, originX: 'center', originY: 'center',
+        });
+
+        var temperatureText = new fabric.Text(
+          "20º", {
+            fill: 'black',  fontSize: 20, selectable: false, originX: 'left', originY: 'top',
+            top: 9, left: 12, fontFamily: "dinot-bold"
           }
         );
 
-        var stepText = new fabric.Text(
-          "STEP: 2", {
-            fill: 'black',  fontSize: 10, selectable: false, originX: 'left', originY: 'top',
-            top: 25, left: 10, fontFamily: "Open Sans", fontWeight: "bold"
+        var holdTimeText = new fabric.Text(
+          "0:05", {
+            fill: 'black',  fontSize: 20, selectable: false, originX: 'left', originY: 'top',
+            top: 9, left: 50, fontFamily: "dinot"
           }
         );
 
-        var verticalLine = new fabric.Line([0, 0, 0, 263],{
-          left: 66,
-          top: -2,
+        var indexText = new fabric.Text(
+          "02", {
+            fill: 'black',  fontSize: 16, selectable: false, originX: 'left', originY: 'top',
+            top: 30, left: 17, fontFamily: "dinot-bold"
+          }
+        );
+
+        var placeText= new fabric.Text(
+          "01/01", {
+            fill: 'black',  fontSize: 16, selectable: false, originX: 'left', originY: 'top',
+            top: 30, left: 42, fontFamily: "dinot"
+          }
+        );
+
+        var verticalLine = new fabric.Line([0, 0, 0, 276],{
+          left: 47,
+          top: 16,
           stroke: 'black',
-          strokeWidth: 2
+          strokeWidth: 2,
+          originX: 'left', originY: 'top',
         });
 
         var rect = new fabric.Rect({
-          fill: 'white', width: 110, left: 5, height: 60, selectable: false, name: "step", me: this, rx: 3,
+          fill: 'white', width: 96, left: 0, height: 72, selectable: false, name: "step", me: this, rx: 1,
         });
 
-        me.imageobjects["drag-footer-image.png"].top = 38;
-        me.imageobjects["drag-footer-image.png"].left = 5;
+        var coverRect = new fabric.Rect({
+          fill: null, width: 96, left: 0, top: 0, height: 372, selectable: false, me: this, rx: 1,
+        });
+
         me.imageobjects["drag-footer-image.png"].originX = "left";
         me.imageobjects["drag-footer-image.png"].originY = "top";
-        this.indicator = new fabric.Group([
-          //verticalLine,
+        me.imageobjects["drag-footer-image.png"].top = 52;
+        me.imageobjects["drag-footer-image.png"].left = 9;
 
+        indicator = new fabric.Group([
           rect,
-          //smallCircle,
-          stageText,
-          stepText,
+          temperatureText,
+          holdTimeText,
+          indexText,
+          placeText,
           me.imageobjects["drag-footer-image.png"],
 
         ],
           {
             originX: "left",
             originY: "top",
-            width: 110,
-            height:60,
-            left: 38,
-            top: 324,
+            left: 0,
+            top: 298,
+            height: 72,
             selectable: true,
             lockMovementY: true,
             hasControls: false,
-            visible: false,
+            visible: true,
             hasBorders: false,
             name: "dragStepGroup"
           }
         );
 
+        this.indicator = new fabric.Group([coverRect, indicator, verticalLine, smallCircle, smallCircleTop], {
+          originX: "left",
+          originY: "top",
+          left: 38,
+          top: 28,
+          height: 372,
+          width: 96,
+          selectable: true,
+          lockMovementY: true,
+          hasControls: false,
+          visible: true,
+          hasBorders: false,
+          name: "dragStepGroup"
+        });
       this.indicator.changeText = function(stageId, stepId) {
 
         var stageText = this.item(1);
