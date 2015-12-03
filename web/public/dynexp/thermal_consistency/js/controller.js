@@ -15,8 +15,9 @@
       $scope.cancel = false;
       $scope.loop = [];
       $scope.CONSTANTS = CONSTANTS;
+      $('.content').addClass('analyze');
 
-      for (var i=0; i < 16; i ++) {
+      for (var i=0; i < 8; i ++) {
         $scope.loop.push(i);
       }
 
@@ -92,12 +93,6 @@
         });
       };
 
-      // $scope.resumeExperiment = function () {
-      //   Experiment.resumeExperiment().then(function () {
-      //     $state.go('step-5');
-      //   });
-      // };
-
       $scope.cancelExperiment = function () {
         Experiment.stopExperiment($scope.experiment_id).then(function () {
           var redirect = '/#/user/settings';
@@ -132,7 +127,11 @@
         var step_id = parseInt($scope.data.experimentController.expriment.step.id);
         var steps = $scope.experiment.protocol.stages[0].stage.steps;
         return steps[steps.length-1].step.hold_time;
+      };
 
+      $scope.maxDeltaTm = function () {
+        if (!$scope.tm_values) return 0;
+        return TestInProgressService.getMaxDeltaTm($scope.tm_values);
       };
 
     }
