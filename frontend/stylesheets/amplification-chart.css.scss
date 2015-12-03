@@ -182,6 +182,14 @@
           vertical-align: middle;
         }
       }
+
+      .ampli-scrollbar-container {
+        .scrollbar {
+          height: 5px;
+          border-radius: 10px;
+        }
+      }
+
     }
 
   }
