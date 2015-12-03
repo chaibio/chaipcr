@@ -17,7 +17,7 @@
         <td>
           {{ tm_values[i] | round:2 }}
         </td>
-        <td>
+        <td ng-class="{'text-success': analyzedExp['72c_fluorescence'][i] >= CONSTANTS.MIN_FLUORESCENCE_VAL, 'text-danger': analyzedExp['72c_fluorescence'][i] < CONSTANTS.MIN_FLUORESCENCE_VAL}">
           {{ analyzedExp['72c_fluorescence'][i]  | commaSeparated }}
         </td>
       </tr>

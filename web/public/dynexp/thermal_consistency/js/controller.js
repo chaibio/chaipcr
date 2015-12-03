@@ -9,10 +9,12 @@
     'TestInProgressService',
     'host',
     '$http',
-    function AppController ($scope, $window, Experiment, $state, $stateParams, Status, TestInProgressService, host, $http) {
+    'CONSTANTS',
+    function AppController ($scope, $window, Experiment, $state, $stateParams, Status, TestInProgressService, host, $http, CONSTANTS) {
 
       $scope.cancel = false;
       $scope.loop = [];
+      $scope.CONSTANTS = CONSTANTS;
 
       for (var i=0; i < 16; i ++) {
         $scope.loop.push(i);
