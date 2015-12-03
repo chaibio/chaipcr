@@ -43,8 +43,9 @@
         if($scope.state === 'Idle' && $scope.old_state !=='Idle') {
           // exp complete
           $state.go('analyze', {id: $scope.experiment.id});
-          Status.stopSync();
         }
+
+        if ($state.current.name === 'analyze') Status.stopSync();
 
       }, true);
 
