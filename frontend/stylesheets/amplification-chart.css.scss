@@ -164,6 +164,26 @@
       margin-bottom: -15px;
     }
 
+    .ampli-zoom-scroll-container {
+      margin-top: 50px;
+      padding-left: 50px;
+      padding-right: 50px;
+
+      .zoom-container {
+
+        .zoom-text {
+          display: inline-block;
+          width: 20%;
+          vertical-align: middle;
+        }
+        .ampli-slider {
+          display: inline-block;
+          width: 80%;
+          vertical-align: middle;
+        }
+      }
+    }
+
   }
 
   .table-container {

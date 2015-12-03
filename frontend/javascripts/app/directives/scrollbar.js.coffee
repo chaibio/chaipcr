@@ -1,6 +1,7 @@
 window.ChaiBioTech.ngApp.directive 'scrollbar', [
   '$window'
-  ($window) ->
+  'TextSelection'
+  ($window, textSelection) ->
     restrict: 'E'
     replace: true
     templateUrl: 'app/views/directives/scrollbar.html'
@@ -53,16 +54,6 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
             newMargin = spaceWidth*val
             updateMargin newMargin
 
-
-      # avoid text selection when dragging the scrollbar
-      disableSelect = ->
-        $window.$(document.body).css
-          'userSelect': 'none'
-
-      enableSelect = ->
-        $window.$(document.body).css
-          'userSelect': ''
-
       getMarginLeft = ->
         parseInt scrollbar.css('marginLeft').replace /px/, ''
 
@@ -83,14 +74,14 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
       elem.on 'mousedown', (e) ->
         held = true
         pageX = e.pageX
-        disableSelect()
+        textSelection.disable()
 
         oldMargin = getMarginLeft()
         spaceWidth = getSpaceWidth()
 
       $window.$(document).on 'mouseup', (e) ->
         held = false
-        enableSelect()
+        textSelection.enable()
 
       $window.$(document).on 'mousemove', (e) ->
         if held

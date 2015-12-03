@@ -51,6 +51,24 @@
             <linechart data="data" options="chartConfig" width="700" height="300"></linechart>
           </div>
           <div class="text-center num-cycle-text">NUMBER OF CYCLES</div>
+
+          <div class="ampli-zoom-scroll-container">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="zoom-container">
+                  <div class="zoom-text">
+                    <b>ZOOM</b>
+                  </div>
+                  <ampli-slider ng-model="ampli_zoom"></ampli-slider>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <scrollbar ng-model="ampli_scroll"></scrollbar>
+              </div>
+            </div>
+          </div>
+
+
           <div class="choose-chart">
             <div class="choose-chart-heading">
               CHOOSE CHART
