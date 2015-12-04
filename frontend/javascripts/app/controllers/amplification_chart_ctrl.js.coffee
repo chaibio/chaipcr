@@ -19,6 +19,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
     $scope.$on 'expName:Updated', ->
       $scope.experiment?.name = expName.name
 
+    $scope.$on 
+
     Experiment.get(id: $stateParams.id).$promise.then (data) ->
       maxCycle = helper.getMaxExperimentCycle data.experiment
       $scope.chartConfig.axes.x.ticks = helper.Xticks maxCycle
@@ -41,7 +43,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       if ((state is 'Idle' and $scope.experiment?.completed_at and !hasData) or
       (state is 'Idle' and oldState isnt state) or
-      (state is 'Running' and (oldStep isnt newStep or !oldStep) and data.optics.collectData)) and
+      # (state is 'Running' and (oldStep isnt newStep or !oldStep) and data.optics.collectData)) and
+      (state is 'Running' and (oldStep isnt newStep or !oldStep))) and
       $scope.RunExperimentCtrl.chart is 'amplification'
         updateFluorescenceData()
 
