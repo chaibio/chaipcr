@@ -39,10 +39,10 @@
             <switch ng-model="baseline_subtraction"></switch>
             <label>BASELINE SUBTRACTION</label>
           </div>
-          <div class="item-switch">
+          <div class="item-switch" ng-class="{auto: auto_thereshold}">
             <switch ng-model="show_thereshold"></switch>
             <label>SHOW THERSEHOLD</label>
-            <span class="set-auto">Set Automatically</span>
+            <span class="set-auto" ng-click="auto_thereshold = true">Set Automatically</span>
           </div>
         </div>
         <div>
@@ -51,6 +51,24 @@
             <linechart data="data" options="chartConfig" width="700" height="300"></linechart>
           </div>
           <div class="text-center num-cycle-text">NUMBER OF CYCLES</div>
+
+          <div class="ampli-zoom-scroll-container">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="zoom-container">
+                  <div class="zoom-text">
+                    <b>ZOOM</b>
+                  </div>
+                  <ampli-slider ng-model="ampli_zoom"></ampli-slider>
+                </div>
+              </div>
+              <div class="col-md-6 ampli-scrollbar-container">
+                <scrollbar ng-model="ampli_scroll"></scrollbar>
+              </div>
+            </div>
+          </div>
+
+
           <div class="choose-chart">
             <div class="choose-chart-heading">
               CHOOSE CHART

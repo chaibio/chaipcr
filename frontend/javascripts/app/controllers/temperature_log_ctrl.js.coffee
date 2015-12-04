@@ -197,6 +197,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       $scope.data = helper.toN3LineChart(temperature_logs)
 
     updateFunc = ->
+      return if $scope.RunExperimentCtrl.chart is 'amplification'
       Experiment
       .getTemperatureData($stateParams.id, resolution: 1000)
       .success (data) ->

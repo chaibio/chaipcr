@@ -1,9 +1,10 @@
-window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
+window.ChaiBioTech.ngApp.directive 'scrollbar', [
   '$window'
-  ($window) ->
-    restrict: 'EA'
+  'TextSelection'
+  ($window, textSelection) ->
+    restrict: 'E'
     replace: true
-    templateUrl: 'app/views/directives/time-scrollbar.html'
+    templateUrl: 'app/views/directives/scrollbar.html'
     require: 'ngModel'
     link: ($scope, elem, attr, ngModel) ->
 
@@ -25,7 +26,7 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
           ngModel.$setViewValue 1
 
         if ngModel.$viewValue >= 1
-          updateMargin getElemWidth()-getScrollBarWidth()
+          updateMargin getElemWidth() - getScrollBarWidth()
 
         spaceWidth = getSpaceWidth()
         if spaceWidth > 0
@@ -53,16 +54,6 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
             newMargin = spaceWidth*val
             updateMargin newMargin
 
-
-      # avoid text selection when dragging the scrollbar
-      disableSelect = ->
-        $window.$(document.body).css
-          'userSelect': 'none'
-
-      enableSelect = ->
-        $window.$(document.body).css
-          'userSelect': ''
-
       getMarginLeft = ->
         parseInt scrollbar.css('marginLeft').replace /px/, ''
 
@@ -83,14 +74,14 @@ window.ChaiBioTech.ngApp.directive 'timeScrollbar', [
       elem.on 'mousedown', (e) ->
         held = true
         pageX = e.pageX
-        disableSelect()
+        textSelection.disable()
 
         oldMargin = getMarginLeft()
         spaceWidth = getSpaceWidth()
 
       $window.$(document).on 'mouseup', (e) ->
         held = false
-        enableSelect()
+        textSelection.enable()
 
       $window.$(document).on 'mousemove', (e) ->
         if held
