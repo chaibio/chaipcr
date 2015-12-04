@@ -24,7 +24,7 @@ window.App.directive 'statusBar', [
         getExperiment (exp) ->
           $scope.experiment = exp
 
-      $scope.isHolding = false
+      $scope.is_holding = false
 
       Status.startSync()
       elem.on '$destroy', ->
@@ -34,24 +34,24 @@ window.App.directive 'statusBar', [
         Status.getData()
       , (data, oldData) ->
         return if !data
-        return if !data.experimentController
-        $scope.state = data.experimentController.machine.state
-        $scope.thermal_state = data.experimentController.machine.thermal_state
-        $scope.oldState = oldData?.experimentController?.machine?.state || 'NONE'
+        return if !data.experiment_controller
+        $scope.state = data.experiment_controller.machine.state
+        $scope.thermal_state = data.experiment_controller.machine.thermal_state
+        $scope.oldState = oldData?.experiment_controller?.machine?.state || 'NONE'
 
         if ((($scope.oldState isnt $scope.state or !$scope.experiment))) and $scope.experimentId
           getExperiment (exp) ->
             $scope.experiment = exp
             $scope.status = data
-            $scope.isHolding = TestInProgressHelper.setHolding(data, exp)
+            $scope.is_holding = TestInProgressHelper.set_holding(data, exp)
         else
           $scope.status = data
-          $scope.isHolding = TestInProgressHelper.setHolding(data, $scope.experiment)
+          $scope.is_holding = TestInProgressHelper.set_holding(data, $scope.experiment)
 
         $scope.timeRemaining = TestInProgressHelper.timeRemaining(data)
 
-        if ($scope.state is 'Running' and !attrs.experimentId and data.experimentController?.expriment?.id)
-          $scope.experimentId = data.experimentController.expriment.id
+        if ($scope.state is 'running' and !attrs.experimentId and data.experiment_controller?.expriment?.id)
+          $scope.experimentId = data.experiment_controller.expriment.id
           getExperiment (exp) ->
             $scope.experiment = exp
 

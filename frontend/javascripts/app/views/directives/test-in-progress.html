@@ -1,53 +1,53 @@
 <div class="test-in-progress-container" ng-show="data">
   <div class="test-in-progress">
     <div class="test-in-progress-heading">
-      <div class="truncate" ng-class="{'text-blue': !isHolding, 'text-green': isHolding}">
-        <span ng-show="data.experimentController.machine.state === 'LidHeating' || data.experimentController.machine.state === 'Running' || data.experimentController.machine.state === 'Paused'">
-          <span class="text-black" ng-show="!isHolding">TEST IN PROGRESS:</span>
-          <span ng-show="!isHolding">
-            {{ data.experimentController.expriment.name }}
+      <div class="truncate" ng-class="{'text-blue': !is_holding, 'text-green': is_holding}">
+        <span ng-show="data.experiment_controller.machine.state === 'lid_heating' || data.experiment_controller.machine.state === 'running' || data.experiment_controller.machine.state === 'paused'">
+          <span class="text-black" ng-show="!is_holding">TEST IN PROGRESS:</span>
+          <span ng-show="!is_holding">
+            {{ data.experiment_controller.expriment.name }}
           </span>
         </span>
-        <span ng-show="data.experimentController.machine.state === 'Idle' && completionStatus === null">
+        <span ng-show="data.experiment_controller.machine.state === 'idle' && completionStatus === null">
           <span class="text-black">No experiment running</span>
         </span>
-        <span ng-show="completionStatus && !isHolding">
+        <span ng-show="completionStatus && !is_holding">
           <span class="text-black">TEST COMPLETE:</span>
           <span ng-show="completionStatus === 'aborted'" class="text-red">USER CANCELLED</span>
           <span ng-show="completionStatus === 'failed'" class="text-red">FAILED</span>
           <span ng-show="completionStatus === 'success'" class="text-green">SUCCESSFUL</span>
         </span>
-        <span class="text-black" ng-show="completionStatus && isHolding">ALL STAGES COMPLETE:</span>
-        <span ng-show="completionStatus && isHolding">
-          Holding at {{ data.heatblock.temperature | round: '1' | degreeCelcius }}
+        <span class="text-black" ng-show="completionStatus && is_holding">ALL STAGES COMPLETE:</span>
+        <span ng-show="completionStatus && is_holding">
+          holding at {{ data.heat_block.temperature | round: '1' | degreeCelcius }}
         </span>
       </div>
     </div>
     <div class="test-info">
-      <div class="row" ng-show="!completionStatus || isHolding">
+      <div class="row" ng-show="!completionStatus || is_holding">
         <div class="col-sm-6">
           <div class="caption">
-            <span ng-show="data.experimentController.machine.state == 'Running' || isHolding">
-              STAGE {{data.experimentController.expriment.stage.number}},
-              STEP {{data.experimentController.expriment.step.number}}
+            <span ng-show="data.experiment_controller.machine.state == 'running' || is_holding">
+              STAGE {{data.experiment_controller.expriment.stage.number}},
+              STEP {{data.experiment_controller.expriment.step.number}}
             </span>
-            <span ng-show="data.experimentController.machine.state == 'LidHeating'">
-              Heating Lid
+            <span ng-show="data.experiment_controller.machine.state == 'lid_heating'">
+              heating Lid
             </span>
-            <span ng-show="data.experimentController.machine.state == 'Paused'">
-              Paused
+            <span ng-show="data.experiment_controller.machine.state == 'paused'">
+              paused
             </span>
           </div>
-          <div ng-show="data.experimentController.machine.state !== 'Idle'">
-            {{data.experimentController.machine.thermal_state}}
+          <div ng-show="data.experiment_controller.machine.state !== 'idle'">
+            {{data.experiment_controller.machine.thermal_state}}
           </div>
         </div>
-        <div class="col-sm-6" ng-show="data.experimentController.machine.state === 'Running' || data.experimentController.machine.state === 'Paused'">
+        <div class="col-sm-6" ng-show="data.experiment_controller.machine.state === 'running' || data.experiment_controller.machine.state === 'paused'">
           <div class="caption">TIME REMAINING</div>
           <div>{{ timeRemaining | secondsDisplay:'display2'}}</div>
         </div>
       </div>
-      <div ng-show="completionStatus && !isHolding">
+      <div ng-show="completionStatus && !is_holding">
         <div class="caption">
           RAN
           <span style="font-weight: normal">
@@ -55,17 +55,17 @@
           </span>
         </div>
       </div>
-      <div ng-show="experiment.completion_message && !isHolding" style="margin-top: 10px;">
+      <div ng-show="experiment.completion_message && !is_holding" style="margin-top: 10px;">
         <span style="font-weight: 300;">
           {{experiment.completion_message}}
         </span>
       </div>
-      <div class="row" ng-show="data.experimentController.machine.state == 'Running' || data.experimentController.machine.state == 'LidHeating'">
-        <div class="col-sm-6" ng-show="data.experimentController.machine.state !== 'LidHeating'">
+      <div class="row" ng-show="data.experiment_controller.machine.state == 'running' || data.experiment_controller.machine.state == 'lid_heating'">
+        <div class="col-sm-6" ng-show="data.experiment_controller.machine.state !== 'lid_heating'">
           <div class="caption">
             Block Temp:
             <span class="normal-text">
-              {{data.heatblock.temperature | round:1 | degreeCelcius}}
+              {{data.heat_block.temperature | round:1 | degreeCelcius}}
             </span>
           </div>
         </div>
@@ -78,7 +78,7 @@
     </div>
     <div class="row">
       <div class="col-md-12">
-        <div class="test-progress-bar" ng-show="data.experimentController.machine.state == 'Running' || data.experimentController.machine.state == 'Paused'">
+        <div class="test-progress-bar" ng-show="data.experiment_controller.machine.state == 'running' || data.experiment_controller.machine.state == 'paused'">
           <div class="pro-bar" style="width: {{barWidth()*100}}%;"></div>
         </div>
       </div>
