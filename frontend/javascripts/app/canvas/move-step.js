@@ -28,14 +28,14 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
         var temperatureText = new fabric.Text(
           "20º", {
             fill: 'black',  fontSize: 20, selectable: false, originX: 'left', originY: 'top',
-            top: 9, left: 12, fontFamily: "dinot-bold"
+            top: 9, left: 1, fontFamily: "dinot-bold"
           }
         );
 
         var holdTimeText = new fabric.Text(
           "0:05", {
             fill: 'black',  fontSize: 20, selectable: false, originX: 'left', originY: 'top',
-            top: 9, left: 50, fontFamily: "dinot"
+            top: 9, left: 59, fontFamily: "dinot"
           }
         );
 
@@ -74,7 +74,7 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
         me.imageobjects["drag-footer-image.png"].top = 52;
         me.imageobjects["drag-footer-image.png"].left = 9;
 
-        indicator = new fabric.Group([
+        indicatorRectangle = new fabric.Group([
           rect,
           temperatureText,
           holdTimeText,
@@ -98,7 +98,7 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
           }
         );
 
-        this.indicator = new fabric.Group([coverRect, indicator, verticalLine, smallCircle, smallCircleTop], {
+        this.indicator = new fabric.Group([coverRect, indicatorRectangle, verticalLine, smallCircle, smallCircleTop], {
           originX: "left",
           originY: "top",
           left: 38,
@@ -119,14 +119,12 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
         this.setLeft(footer.left);
       };
 
-      this.indicator.changeText = function(stageId, stepId) {
+      this.indicator.changeText = function(step) {
 
-        var stageText = this.item(1);
-        stageText.setText("MOVING STAGE " + (stageId + 1));
-
-        var stepText = this.item(2);
-        stepText.setText("STEP: " + (stepId + 1));
-
+        temperatureText.setText(step.model.temperature + "º");
+        holdTimeText.setText(step.circle.holdTime.text);
+        indexText.setText(step.numberingTextCurrent.text);
+        placeText.setText(step.numberingTextCurrent.text + step.numberingTextTotal.text);
       };
 
       this.indicator.processMovement = function(step, C) {

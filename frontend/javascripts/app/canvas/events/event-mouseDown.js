@@ -3,7 +3,8 @@ window.ChaiBioTech.ngApp.factory('mouseDown', [
   'previouslySelected',
   'previouslyHoverd',
   'scrollService',
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService) {
+  'circleManager',
+  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager) {
 
     /**************************************
         what happens when click is happening in canvas.
@@ -44,9 +45,12 @@ window.ChaiBioTech.ngApp.factory('mouseDown', [
             that.moveStepActive = true;
             that.canvas.moveCursor = "move";
             C.stepIndicator.changePlacing(evt.target);
+            C.stepIndicator.changeText(evt.target.parent);
             that.calculateMoveLimit("step");
+            circleManager.disablePaths();
+            C.canvas.bringToFront(C.stepIndicator);
             C.canvas.renderAll();
-            //console.log(that.stepIndicator);
+
           break;
 
           case "moveStage":

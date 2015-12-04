@@ -11,6 +11,16 @@ window.ChaiBioTech.ngApp.factory('circleManager', [
       this.canvas = kanvas.canvas;
     };
 
+    this.disablePaths = function() {
+
+      this.allCircles.forEach(function(circle, index) {
+        if(circle.curve) {
+          circle.curve.setVisible(false);
+        }
+      }, this);
+
+    };
+
     this.addRampLinesAndCircles = function(circles) {
 
       this.originalCanvas.allCircles = this.allCircles = circles || this.findAllCircles();
