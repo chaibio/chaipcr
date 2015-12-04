@@ -108,7 +108,7 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
           selectable: true,
           lockMovementY: true,
           hasControls: false,
-          visible: true,
+          visible: false,
           hasBorders: false,
           name: "dragStepGroup"
         });
