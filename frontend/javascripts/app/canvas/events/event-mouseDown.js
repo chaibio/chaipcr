@@ -12,7 +12,7 @@ window.ChaiBioTech.ngApp.factory('mouseDown', [
     ***************************************/
 
     this.init = function(C, $scope, that) {
-
+      // that originally points to event. Refer event.js
       var me;
 
       this.canvas.on("mouse:down", function(evt) {
@@ -40,6 +40,8 @@ window.ChaiBioTech.ngApp.factory('mouseDown', [
           break;
 
           case "moveStep":
+
+            that.moveStepActive = true;
             that.canvas.moveCursor = "move";
             C.stepIndicator.changePlacing(evt.target);
             that.calculateMoveLimit("step");
