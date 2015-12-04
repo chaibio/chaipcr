@@ -25,8 +25,18 @@ window.ChaiBioTech.ngApp.factory('objectMoving', [
             });
           break;
 
-          case "dragStepGroup":
-            //that.onTheMoveDragGroup(evt.target);
+          case "moveStep":
+            if(evt.target.left < 35) {
+              evt.target.setLeft(35);
+              that.onTheMoveDragGroup(evt.target);
+            } else if(evt.target.left > C.moveLimit) {
+              evt.target.setLeft(C.moveLimit);
+              that.onTheMoveDragGroup(evt.target);
+            } else {
+              that.onTheMoveDragGroup(evt.target);
+              C.stepIndicator.onTheMove(C);
+            }
+
           break;
         }
       });

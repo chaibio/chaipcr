@@ -23,18 +23,17 @@ window.ChaiBioTech.ngApp.factory('objectModified', [
             });
           break;
 
-          /*case "dragStepGroup":
+          case "moveStep":
 
             var indicate = evt.target;
-            step = indicate.currentStep;
-            indicate.setVisible(false);
-            step.commonFooterImage.setVisible(true);
-            indicate.endPosition = indicate.left;
-            indicate.processMovement(step, C);
+            step = indicate.parent;
+            //step.commonFooterImage.setVisible(true);
+            C.stepIndicator.endPosition = indicate.left;
+            C.stepIndicator.processMovement(step, C);
             C.canvas.renderAll();
           break;
 
-          case "dragStageGroup":
+          /*case "dragStageGroup":
 
             var indicateStage = evt.target;
             step = indicateStage.currentStep;

@@ -1,24 +1,20 @@
 window.ChaiBioTech.ngApp.factory('moveStepRect', [
   'ExperimentLoader',
-
-  function(ExperimentLoader) {
+  'previouslySelected',
+  'circleManager',
+  function(ExperimentLoader, previouslySelected, circleManager) {
 
     return {
 
       getMoveStepRect: function(me) {
 
         this.currentHit = 0;
+        this.startPosition = 0;
+        this.endPosition = 0;
 
         var smallCircle = new fabric.Circle({
-          radius: 6,
-          fill: '#FFB300',
-          stroke: "black",
-          strokeWidth: 3,
-          selectable: false,
-          left: 48,
-          top: 298,
-          originX: 'center', originY: 'center',
-          //top: -2
+          radius: 6, fill: '#FFB300', stroke: "black", strokeWidth: 3, selectable: false,
+          left: 48, top: 298, originX: 'center', originY: 'center',
         });
 
         var smallCircleTop = new fabric.Circle({
@@ -28,14 +24,14 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
         var temperatureText = new fabric.Text(
           "20º", {
             fill: 'black',  fontSize: 20, selectable: false, originX: 'left', originY: 'top',
-            top: 9, left: 12, fontFamily: "dinot-bold"
+            top: 9, left: 1, fontFamily: "dinot-bold"
           }
         );
 
         var holdTimeText = new fabric.Text(
           "0:05", {
             fill: 'black',  fontSize: 20, selectable: false, originX: 'left', originY: 'top',
-            top: 9, left: 50, fontFamily: "dinot"
+            top: 9, left: 59, fontFamily: "dinot"
           }
         );
 
@@ -74,52 +70,35 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
         me.imageobjects["drag-footer-image.png"].top = 52;
         me.imageobjects["drag-footer-image.png"].left = 9;
 
-        indicator = new fabric.Group([
-          rect,
-          temperatureText,
-          holdTimeText,
-          indexText,
-          placeText,
+        indicatorRectangle = new fabric.Group([
+          rect, temperatureText, holdTimeText, indexText, placeText,
           me.imageobjects["drag-footer-image.png"],
 
         ],
           {
-            originX: "left",
-            originY: "top",
-            left: 0,
-            top: 298,
-            height: 72,
-            selectable: true,
-            lockMovementY: true,
-            hasControls: false,
-            visible: true,
-            hasBorders: false,
-            name: "dragStepGroup"
+            originX: "left", originY: "top", left: 0, top: 298, height: 72, selectable: true, lockMovementY: true, hasControls: false,
+            visible: true, hasBorders: false, name: "dragStepGroup"
           }
         );
 
-        this.indicator = new fabric.Group([coverRect, indicator, verticalLine, smallCircle, smallCircleTop], {
-          originX: "left",
-          originY: "top",
-          left: 38,
-          top: 28,
-          height: 372,
-          width: 96,
-          selectable: true,
-          lockMovementY: true,
-          hasControls: false,
-          visible: false,
-          hasBorders: false,
-          name: "dragStepGroup"
+        this.indicator = new fabric.Group([coverRect, indicatorRectangle, verticalLine, smallCircle, smallCircleTop], {
+          originX: "left", originY: "top", left: 38, top: 28, height: 372, width: 96, selectable: true,
+          lockMovementY: true, hasControls: false, visible: false, hasBorders: false, name: "dragStepGroup"
         });
-      this.indicator.changeText = function(stageId, stepId) {
 
-        var stageText = this.item(1);
-        stageText.setText("MOVING STAGE " + (stageId + 1));
+      this.indicator.changePlacing = function(footer) {
 
-        var stepText = this.item(2);
-        stepText.setText("STEP: " + (stepId + 1));
+        this.setVisible(true);
+        this.setLeft(footer.left);
+        this.startPosition = footer.left;
+      };
 
+      this.indicator.changeText = function(step) {
+
+        temperatureText.setText(step.model.temperature + "º");
+        holdTimeText.setText(step.circle.holdTime.text);
+        indexText.setText(step.numberingTextCurrent.text);
+        placeText.setText(step.numberingTextCurrent.text + step.numberingTextTotal.text);
       };
 
       this.indicator.processMovement = function(step, C) {
@@ -130,9 +109,9 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
         if(Math.abs(this.startPosition - this.endPosition) > 65) {
 
           // Find the place where you left the moved step
-          var moveTarget = Math.floor((this.left + 60) / 120);
-          var targetStep = C.allStepViews[moveTarget];
-          var targetStage = C.allStepViews[moveTarget].parentStage;
+          //var moveTarget = Math.floor((this.left + 60) / 120);
+          var targetStep = previouslySelected.circle.parent;
+          var targetStage = targetStep.parentStage;
 
           // Delete the step you moved
           step.parentStage.deleteStep({}, step);
@@ -148,8 +127,9 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
               console.log("Moved", data);
             });
 
-        } else { // we dont have to update so we update the move whiteFooterImage to old position.
-          this.setLeft(this.currentStep.left + 4);
+        } else { // we dont have to update so bring back the path.
+          circleManager.togglePaths(true);
+          step.dots.setLeft(step.left + 16);
         }
 
       };
