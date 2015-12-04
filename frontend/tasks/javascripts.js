@@ -140,8 +140,8 @@ gulp.task('uglify', ['concat-js', 'hash-js'], function () {
   return gulp.src('.tmp/js/'+applicationJS+'.js')
          .pipe(uglify())
          .on('error', swallowError)
-         // .pipe(stripDebug())
-         // .on('error', swallowError)
+         .pipe(stripDebug())
+         .on('error', swallowError)
          .pipe(gulp.dest('.tmp/js'));
 });
 
