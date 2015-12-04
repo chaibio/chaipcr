@@ -8,6 +8,8 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
       getMoveStepRect: function(me) {
 
         this.currentHit = 0;
+        this.startPosition = 0;
+        this.endPosition = 0;
 
         var smallCircle = new fabric.Circle({
           radius: 6,
@@ -117,6 +119,7 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
 
         this.setVisible(true);
         this.setLeft(footer.left);
+        this.startPosition = footer.left;
       };
 
       this.indicator.changeText = function(step) {

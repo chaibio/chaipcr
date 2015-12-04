@@ -34,6 +34,7 @@ window.ChaiBioTech.ngApp.factory('objectMoving', [
               that.onTheMoveDragGroup(evt.target);
             } else {
               that.onTheMoveDragGroup(evt.target);
+              C.stepIndicator.onTheMove(C);
             }
 
           break;
