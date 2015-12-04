@@ -15,6 +15,22 @@ $(document).ready(function(){
     $(window).bind('resize', function() {
         $('#splash').center({transition:300});
     });
+
+	var interval = setInterval(function () {
+		console.log("Checking ... !");
+		checkConnection();
+	}, 30000);
+
+	var checkConnection = function() {
+		$.get("/network/eth0")
+			.done(function(data) {
+				$("#ip").text(data.ip); // Still not sure about the data being sent.
+			})
+			.fail(function() {
+				$("#ip").text("Not connected yet.")
+			});
+	}
+	checkConnection();
 });
 //-->
 </script>
@@ -23,6 +39,9 @@ $(document).ready(function(){
 <body>
 <div id="splash">
 	<img src="images/openqpcr_logo_dark.svg">
+</div>
+<div id="ip">
+	Jossie
 </div>
 </body>
 

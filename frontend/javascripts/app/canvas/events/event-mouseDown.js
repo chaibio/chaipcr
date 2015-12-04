@@ -3,7 +3,8 @@ window.ChaiBioTech.ngApp.factory('mouseDown', [
   'previouslySelected',
   'previouslyHoverd',
   'scrollService',
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService) {
+  'circleManager',
+  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager) {
 
     /**************************************
         what happens when click is happening in canvas.
@@ -12,7 +13,7 @@ window.ChaiBioTech.ngApp.factory('mouseDown', [
     ***************************************/
 
     this.init = function(C, $scope, that) {
-
+      // that originally points to event. Refer event.js
       var me;
 
       this.canvas.on("mouse:down", function(evt) {
@@ -40,11 +41,21 @@ window.ChaiBioTech.ngApp.factory('mouseDown', [
           break;
 
           case "moveStep":
+
+            that.moveStepActive = true;
             that.canvas.moveCursor = "move";
+            C.stepIndicator.changePlacing(evt.target);
+            C.stepIndicator.changeText(evt.target.parent);
+            that.calculateMoveLimit("step");
+            circleManager.togglePaths(false); //put it back later
+            C.canvas.bringToFront(C.stepIndicator);
+            C.canvas.renderAll();
+
           break;
 
           case "moveStage":
             that.canvas.moveCursor = "move";
+
           break;
 
           case "deleteStepButton":
