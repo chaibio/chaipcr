@@ -11,7 +11,7 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
     # start counting for running time
     func_name <- 'process_mc'
     start_time <- proc.time()[['elapsed']]
-    
+
     mc_calib <- get_mc_calib(db_usr, db_pwd, db_host, db_port, db_name,
                              exp_id, stage_id, calib_id,
                              show_running_time)
@@ -34,7 +34,7 @@ get_mc_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connec
     # start counting for running time
     func_name <- 'get_mc_calib'
     start_time <- proc.time()[['elapsed']]
-    
+    message('get_mc_calib')
     message('db: ', db_name)
     db_conn <- dbConnect(RMySQL::MySQL(), 
                          user=db_usr, 
