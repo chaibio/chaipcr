@@ -39,17 +39,17 @@ window.ChaiBioTech.ngApp
           Status.getData()
         , (val) ->
           $scope.data = val
-          $scope.state = val?.experimentController?.machine.state
-          TestInProgressHelper.setHolding(val, $scope.experiment)
-          $scope.isHolding = TestInProgressHelper.isHolding()
+          $scope.state = val?.experiment_controller?.machine.state
+          TestInProgressHelper.set_holding(val, $scope.experiment)
+          $scope.is_holding = TestInProgressHelper.is_holding()
 
-          if val?.experimentController?.expriment?.id and !experiment_id
-            experiment_id = val.experimentController.expriment.id
+          if val?.experiment_controller?.expriment?.id and !experiment_id
+            experiment_id = val.experiment_controller.expriment.id
 
         , true
 
-        $scope.$watch 'data.experimentController.machine.state', (newState, oldState) ->
-          if (newState isnt oldState) and (newState is 'Idle')
+        $scope.$watch 'data.experiment_controller.machine.state', (newState, oldState) ->
+          if (newState isnt oldState) and (newState is 'idle')
             getExperiment()
 
 

@@ -18,14 +18,14 @@ window.ChaiBioTech.ngApp
       elem.on '$destroy', ->
         Status.stopSync()
       $scope.completionStatus = null
-      $scope.isHolding = false
+      $scope.is_holding = false
 
       updateIsHolding = (data) ->
-        $scope.isHolding = TestInProgressHelper.isHolding(data, $scope.experiment)
+        $scope.is_holding = TestInProgressHelper.set_holding(data, $scope.experiment)
 
       updateData = (data) ->
 
-        if (!$scope.completionStatus and (data?.experimentController?.machine.state is 'Idle' or data?.experimentController?.machine.state is 'Complete') or !$scope.experiment) and $scope.experimentId
+        if (!$scope.completionStatus and (data?.experiment_controller?.machine.state is 'idle' or data?.experiment_controller?.machine.state is 'complete') or !$scope.experiment) and $scope.experimentId
           TestInProgressHelper.getExperiment($scope.experimentId).then (experiment) ->
             $scope.data = data
             $scope.completionStatus = experiment.completion_status
@@ -43,8 +43,8 @@ window.ChaiBioTech.ngApp
         $scope.timeRemaining = TestInProgressHelper.timeRemaining(data)
 
       $scope.barWidth = ->
-        if $scope.data and $scope.data.experimentController.machine.state is 'Running'
-          exp = $scope.data.experimentController.expriment
+        if $scope.data and $scope.data.experiment_controller.machine.state is 'running'
+          exp = $scope.data.experiment_controller.expriment
           width = exp.run_duration/exp.estimated_duration
           if width > 1 then width = 1
 

@@ -29,9 +29,9 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
     $scope.$watch ->
       Status.getData()
     , (data) ->
-      if parseInt(data?.experimentController?.expriment?.id) is parseInt($stateParams.id)
-        $scope.experiment.started_at = data.experimentController.expriment.started_at
-        $scope.experiment.completed_at = data.experimentController.expriment.completed_at
+      if parseInt(data?.experiment_controller?.expriment?.id) is parseInt($stateParams.id)
+        $scope.experiment.started_at = data.experiment_controller.expriment.started_at
+        $scope.experiment.completed_at = data.experiment_controller.expriment.completed_at
 
     $scope.removeMessages = ->
       $scope.success = null

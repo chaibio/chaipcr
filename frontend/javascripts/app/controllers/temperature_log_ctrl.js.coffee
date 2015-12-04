@@ -43,8 +43,8 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
     , (val) ->
       if val
         hasStatusData = true
-        $scope.isCurrentExperiment = parseInt(val.experimentController?.expriment?.id) is parseInt($stateParams.id)
-        if $scope.isCurrentExperiment and ($scope.scrollState >= 1 || $scope.scrollState is 'FULL') and (val.experimentController?.machine.state is 'LidHeating' || val.experimentController?.machine.state is 'Running')
+        $scope.isCurrentExperiment = parseInt(val.experiment_controller?.expriment?.id) is parseInt($stateParams.id)
+        if $scope.isCurrentExperiment and ($scope.scrollState >= 1 || $scope.scrollState is 'FULL') and (val.experiment_controller?.machine.state is 'lid_heating' || val.experiment_controller?.machine.state is 'running')
           $scope.autoUpdateTemperatureLogs()
         else
           $scope.stopInterval()
