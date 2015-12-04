@@ -1,7 +1,8 @@
 window.ChaiBioTech.ngApp.factory('moveStepRect', [
   'ExperimentLoader',
-
-  function(ExperimentLoader) {
+  'previouslySelected',
+  'circleManager',
+  function(ExperimentLoader, previouslySelected, circleManager) {
 
     return {
 
@@ -12,15 +13,8 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
         this.endPosition = 0;
 
         var smallCircle = new fabric.Circle({
-          radius: 6,
-          fill: '#FFB300',
-          stroke: "black",
-          strokeWidth: 3,
-          selectable: false,
-          left: 48,
-          top: 298,
-          originX: 'center', originY: 'center',
-          //top: -2
+          radius: 6, fill: '#FFB300', stroke: "black", strokeWidth: 3, selectable: false,
+          left: 48, top: 298, originX: 'center', originY: 'center',
         });
 
         var smallCircleTop = new fabric.Circle({
@@ -77,42 +71,19 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
         me.imageobjects["drag-footer-image.png"].left = 9;
 
         indicatorRectangle = new fabric.Group([
-          rect,
-          temperatureText,
-          holdTimeText,
-          indexText,
-          placeText,
+          rect, temperatureText, holdTimeText, indexText, placeText,
           me.imageobjects["drag-footer-image.png"],
 
         ],
           {
-            originX: "left",
-            originY: "top",
-            left: 0,
-            top: 298,
-            height: 72,
-            selectable: true,
-            lockMovementY: true,
-            hasControls: false,
-            visible: true,
-            hasBorders: false,
-            name: "dragStepGroup"
+            originX: "left", originY: "top", left: 0, top: 298, height: 72, selectable: true, lockMovementY: true, hasControls: false,
+            visible: true, hasBorders: false, name: "dragStepGroup"
           }
         );
 
         this.indicator = new fabric.Group([coverRect, indicatorRectangle, verticalLine, smallCircle, smallCircleTop], {
-          originX: "left",
-          originY: "top",
-          left: 38,
-          top: 28,
-          height: 372,
-          width: 96,
-          selectable: true,
-          lockMovementY: true,
-          hasControls: false,
-          visible: false,
-          hasBorders: false,
-          name: "dragStepGroup"
+          originX: "left", originY: "top", left: 38, top: 28, height: 372, width: 96, selectable: true,
+          lockMovementY: true, hasControls: false, visible: false, hasBorders: false, name: "dragStepGroup"
         });
 
       this.indicator.changePlacing = function(footer) {
@@ -138,9 +109,9 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
         if(Math.abs(this.startPosition - this.endPosition) > 65) {
 
           // Find the place where you left the moved step
-          var moveTarget = Math.floor((this.left + 60) / 120);
-          var targetStep = C.allStepViews[moveTarget];
-          var targetStage = C.allStepViews[moveTarget].parentStage;
+          //var moveTarget = Math.floor((this.left + 60) / 120);
+          var targetStep = previouslySelected.circle.parent;
+          var targetStage = targetStep.parentStage;
 
           // Delete the step you moved
           step.parentStage.deleteStep({}, step);
@@ -156,8 +127,9 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
               console.log("Moved", data);
             });
 
-        } else { // we dont have to update so we update the move whiteFooterImage to old position.
-          this.setLeft(this.currentStep.left + 4);
+        } else { // we dont have to update so bring back the path.
+          circleManager.togglePaths(true);
+          step.dots.setLeft(step.left + 16);
         }
 
       };
