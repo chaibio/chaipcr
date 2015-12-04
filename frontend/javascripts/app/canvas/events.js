@@ -92,18 +92,20 @@ window.ChaiBioTech.ngApp.factory('events', [
 
         if(lastStep.circle.holdTime.text === "∞") {
           if(moveElement === "step") {
-            return ((lastStep.left + 3) - 120);
+            C.moveLimit = ((lastStep.left + 3) - 120);
           } else if(moveElement === "stage") {
-            return ((lastStep.parentStage.left + 3) - 120);
+            C.moveLimit = ((lastStep.parentStage.left + 3) - 120);
           }
         }
 
-        return lastStep.left + 3;
+         C.moveLimit = lastStep.left + 3;
       };
 
       this.onTheMoveDragGroup = function(dragging) {
 
-        var indicator = dragging;
+        C.stepIndicator.setLeft(dragging.left);
+        C.stepIndicator.setCoords();
+        /*var indicator = dragging;
         if(indicator.left < 35) {
           indicator.setLeft(35);
         } else if(indicator.left > C.moveLimit) {
@@ -112,7 +114,7 @@ window.ChaiBioTech.ngApp.factory('events', [
           indicator.setLeft(dragging.left);
           indicator.setCoords();
           indicator.onTheMove(C);
-        }
+        }*/
       };
 
       this.footerMouseOver = function(indicate, me, moveElement) {

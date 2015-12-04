@@ -112,6 +112,13 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
           hasBorders: false,
           name: "dragStepGroup"
         });
+
+      this.indicator.changePlacing = function(footer) {
+
+        this.setVisible(true);
+        this.setLeft(footer.left);
+      };
+
       this.indicator.changeText = function(stageId, stepId) {
 
         var stageText = this.item(1);

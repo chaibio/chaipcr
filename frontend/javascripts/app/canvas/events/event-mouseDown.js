@@ -41,10 +41,15 @@ window.ChaiBioTech.ngApp.factory('mouseDown', [
 
           case "moveStep":
             that.canvas.moveCursor = "move";
+            C.stepIndicator.changePlacing(evt.target);
+            that.calculateMoveLimit("step");
+            C.canvas.renderAll();
+            //console.log(that.stepIndicator);
           break;
 
           case "moveStage":
             that.canvas.moveCursor = "move";
+
           break;
 
           case "deleteStepButton":
