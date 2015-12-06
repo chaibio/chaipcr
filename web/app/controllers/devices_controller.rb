@@ -88,6 +88,22 @@ class DevicesController < ApplicationController
     end
   end
   
+  api :GET, "/device/software_update", "query the software update meta data"
+  example "{'upgrade':{'version':'1.0.1','release_date':null,'brief_description':'this is the brief description','full_description':'this is the full description'}}"
+  def software_update
+    @upgrade = Upgrade.first
+    if @upgrade
+      configuration_file = File.read(CONFIGURATION_FILE_PATH)
+      configuration_hash = JSON.parse(configuration_file)
+      logger.info(configuration_hash)
+      #no upgrade available if the upgrade version is the same as current software version
+      @upgrade = nil if @upgrade.version == configuration_hash["software"]["version"]
+    end
+    respond_to do |format|
+      format.json { render "software_update", :status => :ok}
+    end
+  end
+  
   private
 
   def retrieve_mac
