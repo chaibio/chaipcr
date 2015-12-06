@@ -28,6 +28,7 @@ window.ChaiBioTech.ngApp.factory('objectModified', [
             var indicate = evt.target;
             step = indicate.parent;
             //step.commonFooterImage.setVisible(true);
+            C.moveDots.setVisible(false);
             C.stepIndicator.endPosition = indicate.left;
             C.stepIndicator.processMovement(step, C);
             C.canvas.renderAll();

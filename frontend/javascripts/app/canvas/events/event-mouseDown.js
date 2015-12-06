@@ -48,6 +48,9 @@ window.ChaiBioTech.ngApp.factory('mouseDown', [
             C.stepIndicator.changeText(evt.target.parent);
             that.calculateMoveLimit("step");
             circleManager.togglePaths(false); //put it back later
+            C.moveDots.setLeft(evt.target.parent.left + 58);
+            C.moveDots.setVisible(true);
+            C.canvas.bringToFront(C.moveDots);
             C.canvas.bringToFront(C.stepIndicator);
             C.canvas.renderAll();
 
