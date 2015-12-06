@@ -25,22 +25,22 @@
         return Status.getData();
       }, function (data, oldData) {
         if (!data) return;
-        if (!data.experimentController) return;
+        if (!data.experiment_controller) return;
         if (!oldData) return;
-        if (!oldData.experimentController) return;
+        if (!oldData.experiment_controller) return;
 
         $scope.data = data;
-        $scope.state = data.experimentController.machine.state;
-        $scope.old_state = oldData.experimentController.machine.state;
+        $scope.state = data.experiment_controller.machine.state;
+        $scope.old_state = oldData.experiment_controller.machine.state;
         $scope.timeRemaining = TestInProgressService.timeRemaining(data);
 
-        if (data.experimentController.expriment && !$scope.experiment) {
-          TestInProgressService.getExperiment(data.experimentController.expriment.id).then(function (exp) {
+        if (data.experiment_controller.expriment && !$scope.experiment) {
+          TestInProgressService.getExperiment(data.experiment_controller.expriment.id).then(function (exp) {
             $scope.experiment = exp;
           });
         }
 
-        if($scope.state === 'Idle' && $scope.old_state !=='Idle') {
+        if($scope.state === 'idle' && $scope.old_state !=='idle') {
           // exp complete
           $state.go('analyze', {id: $scope.experiment.id});
         }
@@ -71,7 +71,7 @@
         var blockHeat = $scope.getBlockHeat();
         if (!blockHeat) return 0;
         if (!$scope.experiment) return 0;
-        return ($scope.data.heatblock.temperature/blockHeat);
+        return ($scope.data.heat_block.temperature/blockHeat);
       };
 
       $scope.getBlockHeat = function () {
@@ -104,15 +104,15 @@
       $scope.isCollectingData = function () {
         if (!$scope.data) return false;
         if (!$scope.data.optics) return false;
-        return ($scope.data.optics.collectData === 'true');
+        return ($scope.data.optics.collect_data === 'true');
       };
 
       $scope.currentStep = function () {
         if (!$scope.experiment) return;
         if (!$scope.data) return;
-        if (!$scope.data.experimentController) return;
-        if (!$scope.data.experimentController.expriment) return;
-        var step_id = parseInt($scope.data.experimentController.expriment.step.id);
+        if (!$scope.data.experiment_controller) return;
+        if (!$scope.data.experiment_controller.expriment) return;
+        var step_id = parseInt($scope.data.experiment_controller.expriment.step.id);
         if (!step_id) return;
         var steps = TestInProgressService.getExperimentSteps($scope.experiment);
         return _.find(steps, {id: step_id});
@@ -122,10 +122,10 @@
       $scope.finalStepHoldTime = function () {
         if (!$scope.experiment) return 0;
         if (!$scope.data) return 0;
-        if (!$scope.data.experimentController) return 0;
-        if (!$scope.data.experimentController.expriment) return 0;
+        if (!$scope.data.experiment_controller) return 0;
+        if (!$scope.data.experiment_controller.expriment) return 0;
 
-        var step_id = parseInt($scope.data.experimentController.expriment.step.id);
+        var step_id = parseInt($scope.data.experiment_controller.expriment.step.id);
         var steps = $scope.experiment.protocol.stages[0].stage.steps;
         return steps[steps.length-1].step.hold_time;
       };

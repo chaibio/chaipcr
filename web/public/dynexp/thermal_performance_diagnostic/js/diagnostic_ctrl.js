@@ -108,18 +108,18 @@
         if (!data) {
           return;
         }
-        if (!data.experimentController) {
+        if (!data.experiment_controller) {
           return;
         }
-        if (!data.experimentController.machine) {
+        if (!data.experiment_controller.machine) {
           return;
         }
-        newState = data.experimentController.machine.state;
-        oldState = oldData != null ? (ref = oldData.experimentController) != null ? (ref1 = ref.machine) != null ? ref1.state : void 0 : void 0 : void 0;
-        $scope.status = newState === 'Running' ? data.experimentController.machine.thermal_state : newState;
-        $scope.heat_block_temp = data.heatblock.temperature
+        newState = data.experiment_controller.machine.state;
+        oldState = oldData != null ? (ref = oldData.experiment_controller) != null ? (ref1 = ref.machine) != null ? ref1.state : void 0 : void 0 : void 0;
+        $scope.status = newState === 'running' ? data.experiment_controller.machine.thermal_state : newState;
+        $scope.heat_block_temp = data.heat_block.temperature
         $scope.lid_temp = data.lid.temperature
-        if (data.experimentController.expriment) $scope.elapsedTime = data.experimentController.expriment.run_duration
+        if (data.experiment_controller.expriment) $scope.elapsedTime = data.experiment_controller.expriment.run_duration
 
         if (!$scope.experiment) {
           getExperiment(function(resp) {
@@ -134,7 +134,7 @@
             }
           });
         }
-        if (newState === 'Idle' && oldState !== 'Idle' && $params.id) {
+        if (newState === 'idle' && oldState !== 'idle' && $params.id) {
           stopPolling();
           Status.stopSync();
           analyzeExperiment();

@@ -6,7 +6,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
     @chartConfig = ->
       axes:
         x:
-          min: 0
+          min: 1
           key: 'cycle_num'
           ticks: 8
           ticksFormatter: (x) ->
@@ -35,8 +35,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
 
     @neutralizeData = (fluorescence_data) ->
-      neutralized_baseline_data = [@paddData()]
-      neutralized_background_data = [@paddData()]
+      neutralized_baseline_data = []
+      neutralized_background_data = []
 
       # get max cycle
       max_cycle = 0
@@ -93,11 +93,11 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       num_ticks = 10
       ticks = []
       if max < num_ticks
-        for i in [0..max] by 1
+        for i in [1..max] by 1
           ticks.push i
       else
         chunkSize = Math.floor(max/num_ticks)
-        for i in [0..max] by chunkSize
+        for i in [1..max] by chunkSize
           ticks.push i
         ticks.push max if max % num_ticks isnt 0
 

@@ -23,6 +23,8 @@ void QPCRPage::reply(QNetworkReply *reply)
 {
     reply->deleteLater();
 
+    //temp disable reloading
+    return;
     if (reply->error() != QNetworkReply::NoError)
     {
         qDebug() << "QPCRPage::reply::error -" << reply->error() << reply->errorString();

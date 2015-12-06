@@ -17,7 +17,7 @@ window.ChaiBioTech.ngApp.service 'TestInProgressHelper', [
       Status.getData()
     , (data) =>
       status = data
-      @setHolding status, experiment
+      @set_holding status, experiment
 
     @getExperiment = (id) ->
       deferred = $q.defer()
@@ -28,7 +28,7 @@ window.ChaiBioTech.ngApp.service 'TestInProgressHelper', [
         isFetchingExp = true
         fetchPromise = Experiment.get(id: id).$promise
         fetchPromise.then (resp) =>
-          @setHolding status, experiment
+          @set_holding status, experiment
           experimentQues["exp_id_#{resp.experiment.id}"] = experimentQues["exp_id_#{resp.experiment.id}"] || []
           for def in experimentQues["exp_id_#{resp.experiment.id}"] by 1
             experiment = resp.experiment
@@ -45,25 +45,25 @@ window.ChaiBioTech.ngApp.service 'TestInProgressHelper', [
 
       deferred.promise
 
-    @isHolding = -> holding
+    @is_holding = -> holding
 
-    @setHolding = (data, experiment) ->
+    @set_holding = (data, experiment) ->
       return false if !experiment
       return false if !experiment.protocol
       return false if !experiment.protocol.stages
       return false if !data
-      return false if !data.experimentController
+      return false if !data.experiment_controller
 
       stages = experiment.protocol.stages
       steps = stages[stages.length-1].stage.steps
       # max_cycle = parseInt(AmplificationChartHelper.getMaxExperimentCycle(experiment))
       duration = parseInt(steps[steps.length-1].step.delta_duration_s)
-      # current_stage = parseInt(data.experimentController.expriment.stage.number)
-      # current_step = parseInt(data.experimentController.expriment.step.number)
-      # current_cycle = parseInt(data.experimentController.expriment.stage.cycle)
-      state = data.experimentController.machine.state
+      # current_stage = parseInt(data.experiment_controller.expriment.stage.number)
+      # current_step = parseInt(data.experiment_controller.expriment.step.number)
+      # current_cycle = parseInt(data.experiment_controller.expriment.stage.cycle)
+      state = data.experiment_controller.machine.state
 
-      holding = state is 'Complete' and duration is 0
+      holding = state is 'complete' and duration is 0
 
       # console.log holding
 
@@ -71,9 +71,9 @@ window.ChaiBioTech.ngApp.service 'TestInProgressHelper', [
 
     @timeRemaining = (data) ->
       return 0 if !data
-      return 0 if !data.experimentController
-      if data.experimentController.machine.state is 'Running'
-        exp = data.experimentController.expriment
+      return 0 if !data.experiment_controller
+      if data.experiment_controller.machine.state is 'running'
+        exp = data.experiment_controller.expriment
         time = (exp.estimated_duration*1+exp.paused_duration*1)-exp.run_duration*1
         if time < 0 then time = 0
 

@@ -32,5 +32,9 @@ window.ChaiBioTech.ngApp.controller 'CreateExperimentModalCtrl', [
         exp.$save()
         .then (data) =>
           $scope.$close data.experiment
+        , (err) ->
+          console.log err
+          $scope.error = true
+          $scope.loading = false
 
 ]

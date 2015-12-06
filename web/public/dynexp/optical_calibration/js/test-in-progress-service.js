@@ -18,7 +18,7 @@ window.App.service('TestInProgressService', [
     })(this), (function(_this) {
       return function(data) {
         status = data;
-        return _this.setHolding(status, experiment);
+        return _this.set_holding(status, experiment);
       };
     })(this));
     this.getExperiment = function(id) {
@@ -34,7 +34,7 @@ window.App.service('TestInProgressService', [
         fetchPromise.then((function(_this) {
           return function(resp) {
             var def, i, len, ref, results;
-            _this.setHolding(status, experiment);
+            _this.set_holding(status, experiment);
             experimentQues["exp_id_" + resp.experiment.id] = experimentQues["exp_id_" + resp.experiment.id] || [];
             ref = experimentQues["exp_id_" + resp.experiment.id];
             results = [];
@@ -63,10 +63,10 @@ window.App.service('TestInProgressService', [
       }
       return deferred.promise;
     };
-    this.isHolding = function() {
+    this.is_holding = function() {
       return holding;
     };
-    this.setHolding = function(data, experiment) {
+    this.set_holding = function(data, experiment) {
       var duration, stages, state, steps;
       if (!experiment) {
         return false;
@@ -80,14 +80,14 @@ window.App.service('TestInProgressService', [
       if (!data) {
         return false;
       }
-      if (!data.experimentController) {
+      if (!data.experiment_controller) {
         return false;
       }
       stages = experiment.protocol.stages;
       steps = stages[stages.length - 1].stage.steps;
       duration = parseInt(steps[steps.length - 1].step.delta_duration_s);
-      state = data.experimentController.machine.state;
-      holding = state === 'Complete' && duration === 0;
+      state = data.experiment_controller.machine.state;
+      holding = state === 'complete' && duration === 0;
       return holding;
     };
     this.timeRemaining = function(data) {
@@ -95,11 +95,11 @@ window.App.service('TestInProgressService', [
       if (!data) {
         return 0;
       }
-      if (!data.experimentController) {
+      if (!data.experiment_controller) {
         return 0;
       }
-      if (data.experimentController.machine.state === 'Running') {
-        exp = data.experimentController.expriment;
+      if (data.experiment_controller.machine.state === 'running') {
+        exp = data.experiment_controller.expriment;
         time = (exp.estimated_duration * 1 + exp.paused_duration * 1) - exp.run_duration * 1;
         if (time < 0) {
           time = 0;
