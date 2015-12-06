@@ -19,6 +19,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
     $scope.$on 'expName:Updated', ->
       $scope.experiment?.name = expName.name
 
+    $scope.$on 
+
     Experiment.get(id: $stateParams.id).$promise.then (data) ->
       maxCycle = helper.getMaxExperimentCycle data.experiment
       $scope.chartConfig.axes.x.ticks = helper.Xticks maxCycle
@@ -33,15 +35,15 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
     $scope.$watch ->
       Status.getData()
     , (data, oldData) ->
-      newStep = parseInt(data?.experimentController?.expriment?.step?.number) || null
-      oldStep = parseInt(oldData?.experimentController?.expriment?.step?.number) || null
-      state = data?.experimentController?.machine?.state
-      oldState = oldData?.experimentController?.machine?.state
-      isCurrentExp = parseInt(data?.experimentController?.expriment?.id) is parseInt($stateParams.id)
+      newStep = parseInt(data?.experiment_controller?.expriment?.step?.number) || null
+      oldStep = parseInt(oldData?.experiment_controller?.expriment?.step?.number) || null
+      state = data?.experiment_controller?.machine?.state
+      oldState = oldData?.experiment_controller?.machine?.state
+      isCurrentExp = parseInt(data?.experiment_controller?.expriment?.id) is parseInt($stateParams.id)
 
-      if ((state is 'Idle' and $scope.experiment?.completed_at and !hasData) or
-      (state is 'Idle' and oldState isnt state) or
-      (state is 'Running' and (oldStep isnt newStep or !oldStep) and data.optics.collectData)) and
+      if ((state is 'idle' and $scope.experiment?.completed_at and !hasData) or
+      (state is 'idle' and oldState isnt state) or
+      (state is 'running' and (oldStep isnt newStep or !oldStep) and data.optics.collect_data)) and
       $scope.RunExperimentCtrl.chart is 'amplification'
         updateFluorescenceData()
 
@@ -52,12 +54,12 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         updateFluorescenceData()
 
     updateFluorescenceData = ->
+      return if $scope.RunExperimentCtrl.chart isnt 'amplification'
       if !fetching
         fetching = true
         Experiment.getFluorescenceData($stateParams.id)
         .success (data) ->
           return if !data.fluorescence_data
-          fetching = false
           $scope.fluorescence_data = data
           $scope.chartConfig.axes.x.max = $scope.fluorescence_data.total_cycles
           $scope.chartConfig.axes.x.ticks = helper.Xticks $scope.fluorescence_data.total_cycles
@@ -66,6 +68,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           updateChartData()
           updateButtonCts()
           hasData = true
+
+        .finally ->
+          fetching = false
 
     updateButtonCts = ->
       for ct, i in $scope.fluorescence_data.ct

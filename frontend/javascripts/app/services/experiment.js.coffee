@@ -37,7 +37,7 @@ window.ChaiBioTech.ngApp
       $http.post "/experiments/#{expId}/copy", data
 
     self.startExperiment = (expId) ->
-      $http.post "#{host}:8000/control/start", {experimentId: expId}
+      $http.post "#{host}:8000/control/start", {experiment_id: expId}
 
     self.stopExperiment = ->
       $http.post "#{host}:8000/control/stop"

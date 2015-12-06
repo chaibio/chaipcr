@@ -71,6 +71,7 @@ Qpcrctl::Application.routes.draw do
   get 'capabilities', to: "devices#capabilities"
   resource :device, only: [:show, :update] do
     get 'mac_address'
+    get 'software_update'
     put 'root_password'
   end
   

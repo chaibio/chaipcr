@@ -11,15 +11,16 @@ class DevicesController < ApplicationController
     formats ['json']
   }
 
-  DEVICE_FILE_PATH  = "/Users/xia/chaipcr/device/device.json"
-  CONFIGURATION_FILE_PATH  = "/Users/xia/chaipcr/device/configuration.json"
-  #DEVICE_FILE_PATH  = "/perm/device.json"
-  #CONFIGURATION_FILE_PATH = "/root/configuration.json"
+  #DEVICE_FILE_PATH  = "/Users/xia/chaipcr/device/device.json"
+  #CONFIGURATION_FILE_PATH  = "/Users/xia/chaipcr/device/configuration.json"
+  DEVICE_FILE_PATH  = "/perm/device.json"
+  CONFIGURATION_FILE_PATH = "/root/configuration.json"
   
   def update
     if !File.exists?(DEVICE_FILE_PATH)
       File.open(DEVICE_FILE_PATH, 'w+') { |file| file.write(params[:data]) }
-#      `passwd -d root`
+      `passwd -d root`
+      User.delete_all
       render json: {response: "Device is programmed successfully"}, status: :ok
     else
       render json: {errors: "Device is already serialized"}, status: 405
@@ -70,14 +71,36 @@ class DevicesController < ApplicationController
   api :PUT, "/root_password", "Set root password"
   param :password, String, :desc => "password to set", :required=>true
   def root_password
+    system("printf '#{params[:password]}\n#{params[:password]}\n' | passwd")
+    render json: {response: "Root password is set properly"}, status: :ok
   end
    
   def mac_address
     if !File.exists?(DEVICE_FILE_PATH)
       mac = retrieve_mac
-      render json: {mac: mac}
+      if !mac.blank?
+        render json: {mac: mac}
+      else
+        render json: {errors: "Device mac address not found"}, status: 500
+      end
     else
       render json: {errors: "Device is already serialized"}, status: 401
+    end
+  end
+  
+  api :GET, "/device/software_update", "query the software update meta data"
+  example "{'upgrade':{'version':'1.0.1','release_date':null,'brief_description':'this is the brief description','full_description':'this is the full description'}}"
+  def software_update
+    @upgrade = Upgrade.first
+    if @upgrade
+      configuration_file = File.read(CONFIGURATION_FILE_PATH)
+      configuration_hash = JSON.parse(configuration_file)
+      logger.info(configuration_hash)
+      #no upgrade available if the upgrade version is the same as current software version
+      @upgrade = nil if @upgrade.version == configuration_hash["software"]["version"]
+    end
+    respond_to do |format|
+      format.json { render "software_update", :status => :ok}
     end
   end
   

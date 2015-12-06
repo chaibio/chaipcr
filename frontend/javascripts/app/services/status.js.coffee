@@ -48,7 +48,7 @@ window.ChaiBioTech.ngApp
       if !@fetching then @fetch()
 
       if !@interval
-        @interval = $interval @fetch, 3000
+        @interval = $interval @fetch, 1000
 
     @stopSync = ->
       @listenersCount -= 1

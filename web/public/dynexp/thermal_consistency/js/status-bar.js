@@ -29,7 +29,7 @@ window.App.directive('statusBar', [
             return $scope.experiment = exp;
           });
         });
-        $scope.isHolding = false;
+        $scope.is_holding = false;
         Status.startSync();
         elem.on('$destroy', function() {
           return Status.stopSync();
@@ -41,25 +41,25 @@ window.App.directive('statusBar', [
           if (!data) {
             return;
           }
-          if (!data.experimentController) {
+          if (!data.experiment_controller) {
             return;
           }
-          $scope.state = data.experimentController.machine.state;
-          $scope.thermal_state = data.experimentController.machine.thermal_state;
-          $scope.oldState = (oldData != null ? (ref = oldData.experimentController) != null ? (ref1 = ref.machine) != null ? ref1.state : void 0 : void 0 : void 0) || 'NONE';
+          $scope.state = data.experiment_controller.machine.state;
+          $scope.thermal_state = data.experiment_controller.machine.thermal_state;
+          $scope.oldState = (oldData != null ? (ref = oldData.experiment_controller) != null ? (ref1 = ref.machine) != null ? ref1.state : void 0 : void 0 : void 0) || 'NONE';
           if (($scope.oldState !== $scope.state || !$scope.experiment) && $scope.experimentId) {
             getExperiment(function(exp) {
               $scope.experiment = exp;
               $scope.status = data;
-              return $scope.isHolding = TestInProgressService.setHolding(data, exp);
+              return $scope.is_holding = TestInProgressService.set_holding(data, exp);
             });
           } else {
             $scope.status = data;
-            $scope.isHolding = TestInProgressService.setHolding(data, $scope.experiment);
+            $scope.is_holding = TestInProgressService.set_holding(data, $scope.experiment);
           }
           $scope.timeRemaining = TestInProgressService.timeRemaining(data);
-          if ($scope.state === 'Running' && !attrs.experimentId && ((ref2 = data.experimentController) != null ? (ref3 = ref2.expriment) != null ? ref3.id : void 0 : void 0)) {
-            $scope.experimentId = data.experimentController.expriment.id;
+          if ($scope.state === 'running' && !attrs.experimentId && ((ref2 = data.experiment_controller) != null ? (ref3 = ref2.expriment) != null ? ref3.id : void 0 : void 0)) {
+            $scope.experimentId = data.experiment_controller.expriment.id;
             return getExperiment(function(exp) {
               return $scope.experiment = exp;
             });

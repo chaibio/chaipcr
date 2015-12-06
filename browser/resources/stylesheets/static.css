@@ -13,10 +13,10 @@ body {
 }
 
 #ip {
-	width: 100%;
+	width: 99%;
 	height: 100px;
 	position: absolute;
-	top: 630px;
+	top: 380px;
 	color: white;
 	text-align: center;
 }
