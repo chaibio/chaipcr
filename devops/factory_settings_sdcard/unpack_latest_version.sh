@@ -5,14 +5,6 @@ if ! id | grep -q root; then
 	exit 0
 fi
 
-#unset boot_drive
-#boot_drive=$(LC_ALL=C lsblk -l | grep "/boot/uboot" | awk '{print $1}')
-
-#if [ "x${boot_drive}" = "x" ] ; then
-#	echo "Error: script halting, system unrecognized..."
-#	exit 1
-#fi
-
 if [ -e /dev/mmcblk1p4 ] ; then
 	sdcard_dev="/dev/mmcblk0"
 	eMMC="/dev/mmcblk1"
@@ -48,27 +40,12 @@ lsblk
 
 flush_cache_mounted () {
 	sync
-	blockdev --flushbufs ${eMMC}
+	command -v -- blockdev
+	if [ $? -eq 0 ]
+	then
+		blockdev --flushbufs ${eMMC}
+	fi
 }
-
-#
-#check_running_system () {
-#	if [ ! -f /boot/uboot/uEnv.txt ] ; then
-#		echo "Error: script halting, system unrecognized..."
-#		echo "unable to find: [/boot/uboot/uEnv.txt] is ${sdcard_dev}p1 mounted?"
-#		exit 1
-#	fi
-
-#	echo "-----------------------------"
-#	echo "debug copying: [${sdcard_dev}] -> [${eMMC}]"
-#	lsblk
-#	echo "-----------------------------"
-#
-#	if [ ! -b "${eMMC}" ] ; then
-#		echo "Error: [${eMMC}] does not exist"
-#		exit 1
-#	fi
-#}
 
 write_pt_image () {
 	echo "Writing partition table image!"
@@ -143,10 +120,6 @@ then
         rm $image_filename_upgrade_temp
 fi
 
-
-
-
-
 echo "Writing images to eMMC!"
 }
 
@@ -182,8 +155,6 @@ NOW=$(date +"%m-%d-%Y %H:%M:%S")
 echo "Upgrade resume flag up!"
 echo "Upgrade started at: $NOW">>${sdcard}/unpack_resume_autorun.flag
 
-#exit 0
-
 echo "Unpacking eMMC image.."
 
 if [ ! -e ${sdcard}/tmp/ ]
@@ -216,7 +187,7 @@ fi
 if [ -e $image_filename_rootfs ]
 then
 	write_rootfs_image
-	rm $image_filename_rootfs
+ 	rm $image_filename_rootfs
 else
         echo "Rootfs image not found: $image_filename_rootfs"
 fi
@@ -229,19 +200,38 @@ else
 	echo "Partition table image not found!"
 fi
 
-#exit
+if [ "$1" -eq "withdata" ]
+then
+	if [ -e $image_filename_data ]
+	then
+        	write_data_image
+	        rm $image_filename_data
+	else
+        	echo "Data image not found!"
+	fi
+fi
 
 echo "Finished.. byebye!"
 echo "Upgrade resume flag down!"
 rm ${sdcard}/unpack_resume_autorun.flag || true
 
 sync
+
 echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+
+upgrade_autorun_flag_up () {
+	echo "Autorun scripts after boot.. requested on $NOW" > ${sdcard}/upgrade_autorun.flag
+}
 
 if [ $# -eq 0 ]
 then
+	upgrade_autorun_flag_up
 	reboot
 fi
 
+if [ ! $1 -eq "withdata" ]
+then
+	upgrade_autorun_flag_up
+fi
 
 exit 0
