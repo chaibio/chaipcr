@@ -3,9 +3,11 @@ body {
 }
 
 #splash {
+	position: absolute;
+	top: 33%;
 	margin-left: auto;
 	margin-right: auto;
-	width: 90%;
+	width: 99%;
 }
 
 #splash img {
@@ -13,10 +15,10 @@ body {
 }
 
 #ip {
-	width: 100%;
+	width: 99%;
 	height: 100px;
 	position: absolute;
-	top: 630px;
+	top: 380px;
 	color: white;
 	text-align: center;
 }

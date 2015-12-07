@@ -10,6 +10,31 @@ window.ChaiBioTech.ngApp.factory('dots', [
 
     };
 
+    this.stepStageMoveDots = function() {
+
+      var circleArray = [];
+      var dotCordiantes = {
+        "left": [1, 1], "right": [11, 1], "middle": [6, 6]
+      };
+
+      for(var i = 1; i < 30; i++) {
+        dotCordiantes["left" + i] = [1, (11 * i) + 1];
+        dotCordiantes["middle" + i] = [6, (11 * i) + 6];
+        dotCordiantes["right" + i] = [11, (11 * i) + 1];
+      }
+      delete dotCordiantes["middle" + (i - 1)];
+
+      for(var dot in dotCordiantes) {
+        var cord = dotCordiantes[dot];
+        circleArray.push(new fabric.Circle({
+          radius: 2, fill: 'black', left: cord[0], top: cord[1], selectable: false,
+          name: "stageDot", originX: "center", originY: "center"
+        }));
+      }
+
+      return circleArray;
+    };
+
     this.getStepCordinates = function() {
 
       var dotCordiantes = {

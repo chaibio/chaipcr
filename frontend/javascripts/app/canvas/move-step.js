@@ -9,6 +9,7 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
       getMoveStepRect: function(me) {
 
         this.currentHit = 0;
+        this.currentDrop = null;
         this.startPosition = 0;
         this.endPosition = 0;
 
@@ -86,6 +87,11 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
           lockMovementY: true, hasControls: false, visible: false, hasBorders: false, name: "dragStepGroup"
         });
 
+      this.indicator.init = function(step) {
+
+          this.currentDrop = step;
+      };
+
       this.indicator.changePlacing = function(footer) {
 
         this.setVisible(true);
@@ -102,15 +108,12 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
       };
 
       this.indicator.processMovement = function(step, C) {
-
         // Make a clone of the step
-        var stepClone = $.extend({}, step);
-
         if(Math.abs(this.startPosition - this.endPosition) > 65) {
-
+          var stepClone = $.extend({}, step);
           // Find the place where you left the moved step
           //var moveTarget = Math.floor((this.left + 60) / 120);
-          var targetStep = previouslySelected.circle.parent;
+          var targetStep = this.currentDrop.circle.parent;
           var targetStage = targetStep.parentStage;
 
           // Delete the step you moved
@@ -128,8 +131,10 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
             });
 
         } else { // we dont have to update so bring back the path.
-          circleManager.togglePaths(true);
           step.dots.setLeft(step.left + 16);
+          C.moveDots.setVisible(false);
+          circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
+          //step.toggleComponents(true);
         }
 
       };
@@ -140,7 +145,8 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
         C.allStepViews.some(function(step, index) {
 
           if(this.intersectsWithObject(step.hitPoint) && this.currentHit !== index) {
-              step.circle.manageClick();
+              //step.circle.manageClick();
+              this.currentDrop = step;
               this.currentHit = index;
               return true;
           }

@@ -13,6 +13,9 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
       exp.$delete id: $stateParams.id, ->
         $state.go 'home'
 
+    $scope.$on 'cycle:number:updated', (e, num) ->
+      $scope.maxCycle = num
+
     getExperiment = ->
       Experiment.get(id: $stateParams.id).$promise.then (data) ->
         if !data.experiment.started_at and !data.experiment.completed_at
@@ -21,6 +24,8 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
           $scope.status = 'RUNNING'
         if data.experiment.started_at and data.experiment.completed_at
           $scope.status = 'COMPLETED'
+
+        $scope.maxCycle = AmplificationChartHelper.getMaxExperimentCycle data.experiment
 
     getExperiment()
 

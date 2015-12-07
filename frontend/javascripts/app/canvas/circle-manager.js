@@ -3,6 +3,7 @@ window.ChaiBioTech.ngApp.factory('circleManager', [
   function(path) {
 
     this.init = function(kanvas) {
+      
       this.originalCanvas = kanvas;
       this.allStepViews = kanvas.allStepViews;
       this.allCircles = kanvas.allCircles;

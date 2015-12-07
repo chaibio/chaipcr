@@ -23,7 +23,12 @@ server {
 
   # You can override error pages by redirecting the requests to a file in your
   # application's public folder, if you so desire:
-  error_page 500 502 503 504 /500.html;
+  error_page 502 /502.html;
+  location = /502.html {
+          root /root/chaipcr/web/public;
+  }
+	
+  error_page 500 503 504 /500.html;
   location = /500.html {
           root /root/chaipcr/web/public;
   }
