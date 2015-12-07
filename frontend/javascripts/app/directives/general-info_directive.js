@@ -4,8 +4,9 @@ window.ChaiBioTech.ngApp.directive('general', [
   '$modal',
   'alerts',
   'popupStatus',
+  '$rootScope',
 
-  function(ExperimentLoader, $timeout, $modal, alerts, popupStatus) {
+  function (ExperimentLoader, $timeout, $modal, alerts, popupStatus, $rootScope) {
 
     return {
       restric: 'EA',
@@ -71,7 +72,9 @@ window.ChaiBioTech.ngApp.directive('general', [
           if(parseInt(onClickValue) !== parseInt(scope.stage.num_cycles)) {
 
             if(scope.stage.num_cycles >= scope.stage.auto_delta_start_cycle) {
-              ExperimentLoader.saveCycle(scope);
+              ExperimentLoader.saveCycle(scope).then(function () {
+                $rootScope.$broadcast('cycle:number:updated', scope.stage.num_cycles);
+              });
               scope.cycleNoBackup = scope.stage.num_cycles;
             } else {
               var warningMessage = alerts.noOfCyclesWarning;
