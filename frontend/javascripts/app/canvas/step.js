@@ -26,6 +26,14 @@ window.ChaiBioTech.ngApp.factory('step', [
         return this;
       };
 
+      this.toggleComponents = function(state) {
+
+        this.circle.stepDataGroup.setVisible(state);
+        this.circle.gatherDataOnScroll.setVisible(state);
+        this.circle.circleGroup.setVisible(state);
+        this.circle.gatherDataDuringRampGroup.setVisible(state);
+      };
+
       this.moveStep = function(action) {
 
         this.setLeft();

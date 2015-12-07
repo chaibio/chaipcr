@@ -4,6 +4,7 @@ window.ChaiBioTech.ngApp.factory('mouseDown', [
   'previouslyHoverd',
   'scrollService',
   'circleManager',
+
   function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager) {
 
     /**************************************
@@ -42,6 +43,9 @@ window.ChaiBioTech.ngApp.factory('mouseDown', [
 
           case "moveStep":
 
+            that.mouseDownPos = evt.e.clientX;
+            C.stepIndicator.init(evt.target.parent);
+            evt.target.parent.toggleComponents(false);
             that.moveStepActive = true;
             that.canvas.moveCursor = "move";
             C.stepIndicator.changePlacing(evt.target);
