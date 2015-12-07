@@ -22,6 +22,8 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
         if data.experiment.started_at and data.experiment.completed_at
           $scope.status = 'COMPLETED'
 
+        $scope.maxCycle = AmplificationChartHelper.getMaxExperimentCycle data.experiment
+
     getExperiment()
 
     $scope.$watch ->

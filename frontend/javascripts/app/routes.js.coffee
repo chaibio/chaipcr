@@ -35,7 +35,7 @@ window.ChaiBioTech.ngApp
         controller: 'ProtocolCtrl'
 
       .state 'run-experiment',
-        url: '/experiments/:id/run-experiment?chart'
+        url: '/experiments/:id/run-experiment?chart?max_cycle'
         templateUrl: 'app/views/experiment/run-experiment.html'
 
 ]
