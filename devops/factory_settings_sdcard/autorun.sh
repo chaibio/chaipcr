@@ -1,4 +1,4 @@
-#!/bin/sh
+!/bin/sh
 
 #exit
 
@@ -54,48 +54,8 @@ flush_cache_mounted () {
 #	blockdev --flushbufs ${eMMC} || true
 }
 
-write_rootfs_image () {
-	echo "Writing rootfs partition image!"
-	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-        gunzip -c ${sdcard}/factory_settings-rootfs.img.gz | dd of=${eMMC}p2 bs=16M
-	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
-	echo "Done writing rootfs partition image!"
-}
-
-write_data_image () {
-        echo "Writing data partition image!"
-        echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-        gunzip -c ${sdcard}/factory_settings-data.img.gz | dd of=${eMMC}p3 bs=16M
-        echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
-        echo "Done writing data partition image!"
-}
-
-write_boot_image () {
-	echo "Writing boot partition image!"
-	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-	gunzip -c ${sdcard}/factory_settings-boot.img.gz | dd of=${eMMC}p1 bs=16M
-	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
-	echo "Done writing boot partition image!"
-}
-
-write_perm_image () {
-        echo "Writing perm partition image!"
-        echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-        gunzip -c ${sdcard}/factory_settings-perm.img.gz | dd of=${eMMC}p4 bs=16M
-        echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
-        echo "Done writing perm partition image!"
-}
-
-write_pt_image () {
-	echo "Writing partition table!"
-	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-	gunzip -c ${sdcard}/factory_settings-pt.img.gz | dd of=${eMMC} bs=16M
-	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
-	echo "Done writing partition table!"
-}
-
 alldone () {
-#	exit
+
 
 	if [ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] ; then
 		echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
@@ -105,7 +65,7 @@ alldone () {
 	fi
 
 	echo "Done!"
-#exi
+
 	echo "Rebooting..."
 	sync
 
@@ -147,10 +107,13 @@ update_uenv () {
 	echo copying coupling uEng.txt
 	mount ${eMMC}p1 /emmcboot || true
 	cp /sdcard/uEnv.txt /emmcboot/
+	sh /sdcard/replace_uEnv.txt.sh /emmcboot || true
 	sync
 	sleep 5
 	umount /emmcboot || true
 }
+
+
 
 reset_uenv () {
 	echo "resetting uEnv!"
@@ -244,21 +207,21 @@ then
 	exit
 fi
 
-#echo "Error reaching here on packing">/errorpoint.check
-#exit 0
-
-if [ ! -e ${sdcard}/factory_settings-pt.img.gz ]
+if [ ! -e ${sdcard}/upgrade.img.gz ]
 then
 	echo "Creating factory settings images! Copying from eMMC at $eMMC to sdcard at $sdcard_dev!"
-	sh /sdcard/make_factory_settings_sdcard.sh || true
+	sh /sdcard/pack_latest_Version.sh || true
 	sync
-	update_uenv
-
 	echo Creating factory settings image done.. Now creating upgrade image. 	
 	echo timer > /sys/class/leds/beaglebone\:green\:usr1/trigger
 	alldone
-	exit
+	exit 0
 fi
+
+
+
+
+
 
 if [ ! -e ${eMMC}p4 ]
 then
@@ -278,18 +241,8 @@ else
 	echo "Device is partitioned"
 fi
 
-#exit
-
 echo "Copying from sdcard at $sdcard_dev to eMMC at $eMMC!"
-
-echo "eMMC Flasher: writing to partition table"
-
-if [ -e ${sdcard}/factory_settings-pt.img.gz ]
-then
-	write_pt_image
-	flush_cache
-	flush_cache_mounted
-fi
+sh /sdcard/unpack_latest_version.sh withdata || true
 
 if [ -e "${eMMC}p4" ]
 then
@@ -300,54 +253,29 @@ else
 	exit
 fi
 
-echo "eMMC Flasher: Creating boot partition"
-if [ -e ${sdcard}/factory_settings-boot.img.gz ]
-then
-        write_boot_image
-fi
-
 update_uenv
-
-echo "eMMC Flasher: writing to data partition"
-if [ -e ${sdcard}/factory_settings-data.img.gz ]
-then
-        write_data_image
-fi
 
 if [ -e ${sdcard}/write_perm_partition.flag ]
 then
 	echo "eMMC Flasher: writing to /perm partition (to format)"
-	if [ -e ${sdcard}/factory_settings-perm.img.gz ]
+	if [ -e ${sdcard}/upgrade.img.gz ]
 	then
-        	write_perm_image
-		echo "/perm image wrote.. cleaning!"
 		rm ${sdcard}/write_perm_partition.flag
 		mkdir -p /tmp/perm
 		mount ${eMMC}p4 /tmp/perm
 		rm -r /tmp/perm/*
-		syo "Done formatting /perm partition"
-c
+		echo "Done formatting /perm partition"
 		umount /tmp/perm/
 		echo "Done formatting /perm partition"
 	fi
 fi
 
-echo "eMMC Flasher: writing to rootfs partition"
-if [ -e ${sdcard}/factory_settings-rootfs.img.gz ]
-then
-	write_rootfs_image
-fi
-
 echo "eMMC Flasher: all done!"
 sync
 sleep 5
-umount /sdcard || true 
-umount /emmc || true
-echo "Done!"
+umount /sdcard > /dev/null || true 
+ 
 
-#echo timer > /sys/class/leds/beaglebone\:green\:usr1/trigger
-
-#sh /sdcard/pack_factorysettings.sh || true
 
 alldone
 

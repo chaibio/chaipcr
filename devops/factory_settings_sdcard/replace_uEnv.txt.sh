@@ -1,7 +1,29 @@
 #!/bin/bash
-uEnv=/boot/uboot/uEnv.txt
-uEnvSDCard=/boot/uboot/uEnv.sdcard.txt
-uEnv72Check=/boot/uboot/uEnv.72check.txt
+
+boot=/boot/uboot
+if [ $# -gt 0 ]
+then
+	boot=$1
+	
+fi
+echo "Boot partition path is: $boot"
+if [ ! -e $boot ]
+then
+	echo "Boot path not found: $boot"
+	exit 1
+fi
+
+
+
+uEnv=$boot/uEnv.txt
+uEnvSDCard=$boot/uEnv.sdcard.txt
+uEnv72Check=$boot/uEnv.72check.txt
+NOW=$(date +"%m-%d-%Y %H:%M:%S")
+
+
+
+
+
 
 
 
@@ -40,7 +62,8 @@ cape_disable=capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN
 _EOF_
 
 
-UUID=$(lsblk -no UUID /dev/mmcblk1p2)
+#UUID=$(lsblk -no UUID /dev/mmcblk1p2)
+UUID=$(blkid /dev/mmcblk1p2 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
 if [ $? -eq 1 ]
 then
 	echo "/dev/mmcblk1 is not a valid block device"
@@ -103,7 +126,7 @@ uenvcmdsdcard=echo "*** Boot button pressed..!!"; bootpart=0:1;bootdir=;fdtaddr=
 uenvcmd= if gpio input 72; then run uenvcmdsdcard; else run uenvcmdmmc; fi
 
 
-#
+# Updated: $NOW
 
 _EOF_
 
