@@ -3,9 +3,11 @@ body {
 }
 
 #splash {
+	position: absolute;
+	top: 33%;
 	margin-left: auto;
 	margin-right: auto;
-	width: 90%;
+	width: 99%;
 }
 
 #splash img {

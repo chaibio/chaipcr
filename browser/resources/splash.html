@@ -9,12 +9,12 @@
 <script type="text/javascript" language="javascript">
 <!--
 $(document).ready(function(){
-	setTimeout(function() {
+	/*setTimeout(function() {
 		$('#splash').center()
 	}, 1);
     $(window).bind('resize', function() {
-        $('#splash').center({transition:300});
-    });
+        $('#splash').center({transition:0});
+    });*/
 
 	var interval = setInterval(function () {
 		console.log("Checking ... !");
@@ -27,7 +27,7 @@ $(document).ready(function(){
 				$("#ip").text(data.ip); // Still not sure about the data being sent.
 			})
 			.fail(function() {
-				$("#ip").text("Not connected yet.")
+				$("#ip").text("No ethernet connection.")
 			});
 	}
 	checkConnection();
