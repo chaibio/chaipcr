@@ -103,6 +103,7 @@ describe "Experiments API" do
   
   it "list all temperature data" do
     experiment = create_experiment("test1")
+    run_experiment(experiment)
     totallength = experiment.temperature_logs.length
     get "/experiments/#{experiment.id}/temperature_data?starttime=0&resolution=1000", { :format => 'json' }
     expect(response).to be_success
@@ -112,6 +113,7 @@ describe "Experiments API" do
   
   it "list temperature data every 2 second" do
     experiment = create_experiment("test1")
+    run_experiment(experiment)
     totallength = experiment.temperature_logs.length
     get "/experiments/#{experiment.id}/temperature_data?starttime=0&resolution=2000", { :format => 'json' }
     expect(response).to be_success
@@ -121,6 +123,7 @@ describe "Experiments API" do
   
   it "list temperature data every 3 second" do
     experiment = create_experiment("test1")
+    run_experiment(experiment)
     totallength = experiment.temperature_logs.length
     get "/experiments/#{experiment.id}/temperature_data?starttime=0&resolution=3000", { :format => 'json' }
     expect(response).to be_success
@@ -130,6 +133,7 @@ describe "Experiments API" do
   
   it "list fluorescence data" do    
     experiment = create_experiment("test1")
+    run_experiment(experiment)
     create_fluorescence_data(experiment)
     get "/experiments/#{experiment.id}/fluorescence_data", { :format => 'json' }
     expect(response).to be_success
@@ -142,9 +146,24 @@ describe "Experiments API" do
   
   it "export" do
     experiment = create_experiment("test1")
+    run_experiment(experiment)
     create_fluorescence_data(experiment)
     get "/experiments/#{experiment.id}/export.zip", { :format => 'zip' }
     expect(response).to be_success
+  end
+  
+  it "set time_valid to false" do
+    Setting.where(:id=>1).update_all(:time_valid=>false)
+    Setting.instance.reload
+    puts "time_valid=#{Setting.time_valid}"
+    params = { experiment: {name: "test"} }
+    post "/experiments", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+    expect(response).to be_success            # test for the 200 status-code
+    json = JSON.parse(response.body)
+    json["experiment"]["name"].should == "test"
+    json["experiment"]["time_valid"].should == false
+    Setting.where(:id=>1).update_all(:time_valid=>true)
+    Setting.instance.reload
   end
   
   describe "check editable" do

@@ -48,6 +48,11 @@ module FactoryHelper
     experiment
   end
   
+  def run_experiment(experiment)
+    experiment.calibration_id = 1
+    experiment.save
+  end
+  
   def create_experiment_with_one_stage(name)
     params = { experiment: {name: name, protocol: {lid_temperature:110, stages:[
                       {stage:{stage_type:"holding",steps:[{step:{temperature:95,hold_time:180}}]}}, 

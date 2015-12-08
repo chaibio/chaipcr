@@ -22,5 +22,7 @@ describe "Settings" do
     json = JSON.parse(response.body)
     json["settings"]["time_zone"].should == "Hawaii"
     json["settings"]["time_zone_offset"].should == -36000
+    params = { settings: {time_zone: "Pacific Time (US & Canada)"} }
+    put "/settings", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
   end
 end

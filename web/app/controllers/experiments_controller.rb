@@ -118,7 +118,7 @@ class ExperimentsController < ApplicationController
             begin
                @amplification_data, @ct = retrieve_amplification_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id)
             rescue => e
-               render :json=>{:errors=>"Internal Server Error (#{e})"}, :status => 500
+               render :json=>{:errors=>e}, :status => 500
                return
             end
             #update cache
@@ -152,7 +152,7 @@ class ExperimentsController < ApplicationController
           begin
             @melt_curve_data = retrieve_melt_curve_data(@experiment.id, @first_stage_meltcurve_data.id, @experiment.calibration_id)
           rescue => e
-            render :json=>{:errors=>"Internal Server Error (#{e})"}, :status => 500
+            render :json=>{:errors=>e}, :status => 500
             return
           end
         end
