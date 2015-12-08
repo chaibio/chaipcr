@@ -166,6 +166,15 @@ describe "Experiments API" do
     Setting.instance.reload
   end
   
+  it "set calibration_id 1 for thermal consistency experiment" do
+    params = { experiment: {name: "test", guid: "thermal_consistency"} }
+    post "/experiments", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+    expect(response).to be_success  
+    json = JSON.parse(response.body)
+    experiment = Experiment.find_by_id(json["experiment"]["id"])
+    experiment.calibration_id.should == 1
+  end
+  
   describe "check editable" do
     it "name editable if experiment has been run" do
       experiment = create_experiment("test1")
