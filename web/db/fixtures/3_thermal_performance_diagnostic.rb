@@ -1,4 +1,4 @@
-Step.seed do |s|
+Step.seed(:stage_id, :order_number) do |s|
   s.id = 5
   s.name = "Preheat"
   s.temperature = 50
@@ -8,7 +8,7 @@ Step.seed do |s|
   s.collect_data = false
 end
 
-Step.seed do |s|
+Step.seed(:stage_id, :order_number) do |s|
   s.id = 6
   s.name = "Heat"
   s.temperature = 95
@@ -18,7 +18,7 @@ Step.seed do |s|
   s.collect_data = true
 end
 
-Step.seed do |s|
+Step.seed(:stage_id, :order_number) do |s|
   s.id = 7
   s.name = "Cool"
   s.temperature = 50
@@ -28,20 +28,21 @@ Step.seed do |s|
   s.collect_data = false
 end
 
-Stage.seed do |s|
+Stage.seed(:protocol_id, :order_number) do |s|
   s.id = 2
   s.num_cycles = 1
   s.protocol_id = 2
   s.stage_type = Stage::TYPE_HOLD
+  s.order_number = 0
 end
 
-protocol = Protocol.seed do |s|
+protocol = Protocol.seed(:experiment_definition_id) do |s|
   s.id = 2
   s.lid_temperature = 110
   s.experiment_definition_id = 2
 end
 
-ExperimentDefinition.seed do |s|
+ExperimentDefinition.seed(:guid) do |s|
   s.id = 2
   s.name = "Thermal Performance Diagnostic"
   s.guid = "thermal_performance_diagnostic"
