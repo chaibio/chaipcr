@@ -27,6 +27,9 @@ class Experiment < ActiveRecord::Base
 #  validates :time_valid, inclusion: {in: [true, false]}
   
   before_create do |experiment|
+    if experiment.experiment_definition.guid == "thermal_consistency"
+      experiment.calibration_id = 1
+    end
 #    experiment.time_valid = Setting.time_valid
   end
   

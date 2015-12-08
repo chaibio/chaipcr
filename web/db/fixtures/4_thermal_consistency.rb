@@ -81,8 +81,8 @@ end
 
 ExperimentDefinition.seed(:guid) do |s|
   s.id = 3
-  s.name = "HRM Calibration"
-  s.guid = "hrm_calibration"
+  s.name = "Thermal Consistency"
+  s.guid = "thermal_consistency"
   s.experiment_type = ExperimentDefinition::TYPE_CALIBRATION
   s.protocol = protocol.first
 end
