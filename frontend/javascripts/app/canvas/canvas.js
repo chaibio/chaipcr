@@ -37,7 +37,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         "pause.png",
         "pause-middle.png",
         "close.png",
-        "drag-footer-image.png"
+        "drag-footer-image.png",
+        "move-step-on.png"
       ];
 
       this.imageLocation = "/images/";
@@ -117,11 +118,11 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     this.addMoveDots = function() {
 
-      var moveDotsLastCircle = new fabric.Circle({
-
-      });
-
-      this.moveDots = new fabric.Group(dots.stepStageMoveDots(), {
+      var arr = dots.stepStageMoveDots();
+      this.imageobjects["move-step-on.png"].setTop(328);
+      this.imageobjects["move-step-on.png"].setLeft(-2);
+      arr.push(this.imageobjects["move-step-on.png"]);
+      this.moveDots = new fabric.Group(arr, {
         width: 13, left: 70, top: 35, backgroundColor: "white", visible: false
       });
       this.canvas.add(this.moveDots);
