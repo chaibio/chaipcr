@@ -9,6 +9,8 @@
 <script type="text/javascript" language="javascript">
 <!--
 $(document).ready(function(){
+
+	// This part was written to align the image and no more used.
 	/*setTimeout(function() {
 		$('#splash').center()
 	}, 1);
@@ -24,37 +26,13 @@ $(document).ready(function(){
 	var checkConnection = function() {
 		$.get("http://10.0.2.37:8000/network/eth0")
 			.done(function(data) {
-				$("#ip").text("IP:" + data.state.address); // Still not sure about the data being sent.
+				$("#ip").text("IP:" + data.state.address);
 			})
 			.fail(function() {
 				$("#ip").text("No ethernet connection.")
 			});
-			/*console.log("ajax call ----");
-			$.ajax({
-				url: "10.0.2.37:8000//network/eth0",
-				crossOrigin: true,
-				contentType: 'application/json',
-				type: 'GET',
-				dataType: 'jsonp',
-				jsonpCallback: 'updateRecordDisplay',
-				success: function(data) {
-					console.log(data);
-				},
-				fail: function(data) {
-					console.log(data);
-				}
-
-			})
-			.done(function(data) {
-				console.log(data);
-				//that.set("statusData", data);
-				//that.trigger("data-updated");
-			});*/
 	}
 
-	/*updateRecordDisplay = function(data) {
-		console.log(data);
-	}*/
 	checkConnection();
 });
 //-->
