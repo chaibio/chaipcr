@@ -74,12 +74,10 @@ window.ChaiBioTech.ngApp.service('stepEvents',[
       });
 
       $scope.$watch('step.pause', function(newVal, oldVal) {
-        //if(newVal) {
-          //console.log(newVal);
+
         var circle = $scope.fabricStep.circle;
         circle.controlPause(newVal);
         canvas.renderAll();
-        //}
       });
 
       $scope.$watch('step.delta_duration_s', function(newVal, oldVal) {

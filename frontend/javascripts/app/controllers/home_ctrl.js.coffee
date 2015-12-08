@@ -26,6 +26,7 @@ window.ChaiBioTech.ngApp
       modalInstance = $modal.open
         templateUrl: 'app/views/experiment/create-experiment-name-modal.html'
         controller: 'CreateExperimentModalCtrl'
+        backdrop: false
 
       modalInstance.result.then (exp) ->
         $state.go 'edit-protocol', id: exp.id

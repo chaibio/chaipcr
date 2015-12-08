@@ -1,6 +1,8 @@
 {
-	"version": "1.0.0",
-	"model": "S0100",
+	"software": {
+		"version": "1.0.0",
+		"platform": "S0100"	
+	},
 	"thermal": {
 		"lid": {
 			"max_temp_c": 120

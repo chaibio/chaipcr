@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="ThermalConsistency">
+<head>
+  <meta charset="UTF-8">
+  <title>Thermal Consistency Test</title>
+  <link rel="stylesheet" href="./css/bootstrap.css">
+  <link rel="stylesheet" href="./css/fonts.css">
+  <link rel="stylesheet" href="./css/page-layout.css">
+  <link rel="stylesheet" href="./css/application.css">
+  <link rel="stylesheet" href="./css/status-bar.css">
+  <link rel="stylesheet" href="./css/image-rotate.css">
+</head>
+<body class="optical-calibration" ng-controller="AppController">
+  <div id="container">
+    <div class="page-layout">
+    <div class="header">
+      <div class="stripes-and-name">
+        <a href="/">
+          <div class="stripes">
+            <div class="stripe"></div>
+            <div class="stripe"></div>
+            <div class="stripe"></div>
+          </div>
+        </a>
+        <div class="name-container truncate">THERMAL CONSISTENCY WIZARD</div>
+      </div>
+    </div>
+    <div class="content" ui-view></div>
+    <status-bar experiment-id="experiment.id"></status-bar>
+    </div>
+  </div>
+  <script type="text/javascript" src="./js/libs/jquery.js"></script>
+  <script type="text/javascript" src="./js/libs/lodash.js"></script>
+  <script type="text/javascript" src="./js/libs/angular.js"></script>
+  <script type="text/javascript" src="./js/libs/angular-resource.js"></script>
+  <script type="text/javascript" src="./js/libs/angular-ui-router.js"></script>
+  <script type="text/javascript" src="./js/libs/http-auth-interceptor.js"></script>
+  <script type="text/javascript" src="./js/libs/jstorage.js"></script>
+  <script type="text/javascript" src="./js/libs/moment.js"></script>
+  <script type="text/javascript" src="./js/libs/angular-moment.min.js"></script>
+  <script type="text/javascript" src="./js/app.js"></script>
+  <script type="text/javascript" src="./js/routes.js"></script>
+  <script type="text/javascript" src="./js/controller.js"></script>
+  <script type="text/javascript" src="./js/auth.js"></script>
+  <script type="text/javascript" src="./js/status.js"></script>
+  <script type="text/javascript" src="./js/experiment.js"></script>
+  <script type="text/javascript" src="./js/seconds-display.js"></script>
+  <script type="text/javascript" src="./js/degree-celcius.js"></script>
+  <script type="text/javascript" src="./js/number-format.js"></script>
+  <script type="text/javascript" src="./js/status-bar.js"></script>
+  <script type="text/javascript" src="./js/test-in-progress-service.js"></script>
+  <script type="text/javascript" src="./js/constants.js"></script>
+</body>
+</html>

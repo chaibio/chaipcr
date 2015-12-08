@@ -65,6 +65,7 @@
             height: 4px;
             background-color: #ADADAD;
             border-radius: 5px;
+            cursor: pointer;
           }
 
           .foreground-bar {
@@ -139,6 +140,9 @@
       width: 901px;
       height: 258px;
       float: left;
+      position: relative;
+      top: 0px;
+      left: 0px;
       overflow: hidden;
 
       .first-data-row {
@@ -245,12 +249,14 @@
       .edit-stage-step {
         //margin-left: 53px;
         left: 637px;
-
+      }
         .action-container {
           position: relative;;
           padding-top: 15px;
-
+        }
           .big_button {
+
+            font-family: "dinot-bold";
             width: 263px;
             background-color: white;
             height: 30px;
@@ -261,11 +267,11 @@
           }
 
           .big_button_disabled {
-            width: 243px;
+            width: 263px;
             background-color: white;
             height: 30px;
             border: 1px solid #cdcdcd;
-            margin-bottom: 12px;
+            margin-bottom: 17px;
             font-size: 12px;
             font-weight: bold;
             color: #cdcdcd;
@@ -273,6 +279,7 @@
           }
 
           .small-button {
+            font-family: "dinot-bold";
             width: 120px;
             background-color: white;
             height: 30px;
@@ -291,49 +298,6 @@
             float: right;
           }
 
-          .lol-pop {
-            width: 180px;
-            height: 120px;
-            position: absolute;
-            top: -70px;
-            left: 38px;
-            z-index: 500;
-
-            .add-stage-popup {
-              width: 180px;
-              height: 120px;
-              background-color: black;
-              position: absolute;
-              opacity: .8;
-
-              .tail {
-                width: 20px;
-                height: 20px;
-                position: absolute;
-                background-color: black;
-                -ms-transform: rotate(45deg); /* IE 9 */
-                -webkit-transform: rotate(45deg); /* Chrome, Safari, Opera */
-                transform: rotate(45deg);
-                top: 110px;
-                left: 80px;
-              }
-            }
-
-            .add-stage-popup-content {
-              width: 150px;
-              height: 111px;
-              position: absolute;
-              left: 15px;
-              top: 12px;
-
-              button {
-                margin-bottom: 3px;
-                width: 150px;
-              }
-            }
-          }
-        }
-      }
 
       // For disabling the field
       .disabled {
@@ -351,9 +315,11 @@
         border-bottom-style: solid;
         border-bottom-width: 1px;
         border-bottom-color: #cdcdcd;
-        //border-bottom-color: #545454;
 
         .caption-part {
+
+          font-family: "dinot-regular";
+          font-size: 16px;
           height: 47px;
           width: 140px;
           float: left;
@@ -376,6 +342,7 @@
             border-color: #cdcdcd;
             border-width:1px;
             border-style: solid;
+            cursor: pointer;
 
             .capsule-container {
                 position: relative;
@@ -388,13 +355,11 @@
               font-size: 16px;
               font-weight: 800;
               color: grey;
-              cursor: pointer;
             }
 
             .ball-cover {
               width: 14px;
               height: 14px;
-              cursor: move;
 
               .white-ball {
                 width: 14px;
@@ -565,4 +530,46 @@
   background-color: #323232;
   position: absolute;
   top: 280px;
+}
+
+.lol-pop {
+  width: 180px;
+  height: 120px;
+  position: absolute;
+  top: 43px;
+  left: 678px;
+  z-index: 500;
+
+  .add-stage-popup {
+    width: 180px;
+    height: 120px;
+    background-color: black;
+    position: fixed;
+    opacity: .8;
+
+    .tail {
+      width: 20px;
+      height: 20px;
+      position: absolute;
+      background-color: black;
+      -ms-transform: rotate(45deg); /* IE 9 */
+      -webkit-transform: rotate(45deg); /* Chrome, Safari, Opera */
+      transform: rotate(45deg);
+      top: 110px;
+      left: 80px;
+    }
+  }
+
+  .add-stage-popup-content {
+    width: 150px;
+    height: 111px;
+    position: relative;
+    left: 30px;
+    top: 12px;
+
+    button {
+      margin-bottom: 3px;
+      width: 150px;
+    }
+  }
 }

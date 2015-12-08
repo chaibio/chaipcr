@@ -12,7 +12,7 @@ void ControlHandler::processData(const boost::property_tree::ptree &requestPt, b
     {
     case StartExperiment:
     {
-        int experimentId = requestPt.get<int>("experimentId");
+        int experimentId = requestPt.get<int>("experiment_id");
 
         switch (ExperimentController::getInstance()->start(experimentId))
         {

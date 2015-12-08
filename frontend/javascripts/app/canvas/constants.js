@@ -11,7 +11,9 @@ window.ChaiBioTech.ngApp.factory('constants', [
       "originalStepHeight": originalStepHeight,
       "rad2deg": 180 / Math.PI,
       "controlDistance": 50,
-      //"stepWidth": 128,
+      "canvasSpacingFrontAndRear": 33,
+      "newStageOffset": 8,
+      "additionalWidth": 2
     };
   }
 ]);

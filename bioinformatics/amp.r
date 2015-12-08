@@ -4,6 +4,7 @@
 # function by Xia Hong
 get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
                                    exp_id, stage_id, calib_id, # for selecting data to analyze
+                                   verbose=FALSE, 
                                    show_running_time=FALSE # option to show time cost to run this function
                                    ) {
     # baseline_ct
@@ -17,8 +18,9 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     cp <- 'cpD2'
     
     # use functions
-    amp_calib <- get_amp_calib(db_usr, db_pwd, db_host, db_port, db_name,
-                               exp_id, stage_id, calib_id,
+    amp_calib <- get_amp_calib(db_usr, db_pwd, db_host, db_port, db_name, 
+                               exp_id, stage_id, calib_id, 
+                               verbose, 
                                show_running_time)
     baseline_calib <- baseline_ct(amp_calib, model, baselin, basecyc, fallback, 
                                   maxiter, maxfev, 
@@ -31,6 +33,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
 # function: get amplification data from MySQL database and perform water calibration 
 get_amp_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
                           exp_id, stage_id, calib_id, # for selecting data to analyze
+                          verbose=FALSE, 
                           show_running_time=FALSE # option to show time cost to run this function
                           ) {
     
@@ -66,7 +69,8 @@ get_amp_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for conne
     fluo_cast <- dcast(fluo_mlt, cycle_num ~ well_num, mean)
     
     # get calibration data
-    amp_calib <- cbind(fluo_cast[, 'cycle_num'], calib(fluo_cast[,2:(num_wells+1)], db_conn, calib_id, show_running_time))
+    amp_calib <- cbind(fluo_cast[, 'cycle_num'], 
+                       calib(fluo_cast[,2:(num_wells+1)], db_conn, calib_id, verbose, show_running_time))
     colnames(amp_calib)[1] <- 'cycle_num'
     
     # report time cost for this function
@@ -98,6 +102,15 @@ baseline_ct <- function(amp_calib,
                         type, cp, # getPar parameters
                         show_running_time=FALSE # option to show time cost to run this function
                         ) {
+    
+    if (dim(amp_calib)[1] <= 2) {
+        message('Two or fewer cycles of fluorescence data are available. Baseline subtraction and calculation of Ct and amplification efficiency cannot be performed.')
+        ct_eff <- matrix(NA, nrow=2, ncol=num_wells, 
+                         dimnames=list(c('ct', 'eff'), colnames(amp_calib)[2:(num_wells+1)]))
+        
+        return(list('bl_corrected'=amp_calib[,2:(num_wells+1)], 'ct_eff'=ct_eff))
+        }
+    
     # start counting for running time
     func_name <- 'baseline_ct'
     start_time <- proc.time()[['elapsed']]

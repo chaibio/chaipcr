@@ -19,7 +19,6 @@ window.ChaiBioTech.ngApp.directive('capsule', [
         // data is not readily available as its an inner directive
         scope.$watch("data", function(val, oldVal) {
           if(angular.isDefined(scope.data)) {
-            console.log("okay right place", scope.data);
             scope.originalValue = Number(scope.data);
               if(scope.delta === "true") {
                 scope.configure(oldVal);
@@ -39,6 +38,51 @@ window.ChaiBioTech.ngApp.directive('capsule', [
           }
         });
 
+        $(elem).click(function(evt) {
+
+          if(scope.delta === "true") {
+
+            scope.originalValue = scope.originalValue * -1;
+            if(scope.originalValue === 0) {
+              scope.justInverse();
+              return true;
+            }
+            scope.configure();
+            scope.sendValue();
+          }
+        });
+
+        scope.justInverse = function() {
+
+            var place = $(scope.drag).position().left;
+
+            if(place === 0) {
+              scope.positive();
+              return true;
+            }
+            scope.negative();
+        };
+
+        scope.positive = function() {
+
+          $(scope.drag).animate({
+            left: "16"
+          }, 100);
+          $(scope.drag).parent().parent().css("background-color", "rgb(238, 49, 24)");
+          $(scope.drag).parent().parent().css("border-color", "rgb(238, 49, 24)");
+          $(scope.drag).find(".center-circle").css("background-color", "rgb(238, 49, 24)");
+        };
+
+        scope.negative = function() {
+
+          $(scope.drag).animate({
+            left: "0"
+          }, 100);
+          $(scope.drag).parent().parent().css("background-color", "#000");
+          $(scope.drag).parent().parent().css("border-color", "#000");
+          $(scope.drag).find(".center-circle").css("background-color", "#000");
+        };
+
         scope.disable = function() {
 
           scope.configurePlusMinus("rgb(205, 205, 205)");
@@ -56,34 +100,23 @@ window.ChaiBioTech.ngApp.directive('capsule', [
 
         scope.configure = function(oldVal) {
 
-          /*if(scope.originalValue === 0) {
-          // In case we need to stop the slider to come back to zero, when we change the value form a value other than zero.
-            if(! oldVal) {
-              $(scope.drag).css("left", "0px");
-              $(scope.drag).parent().parent().css("background-color", "rgb(0, 174, 239)");
-            }
-            return ;
-          }*/
-
           if(scope.originalValue > 0) {
-            $(scope.drag).css("left", "16px");
-            $(scope.drag).parent().parent().css("background-color", "rgb(238, 49, 24)");
-            $(scope.drag).parent().parent().css("border-color", "rgb(238, 49, 24)");
-            $(scope.drag).find(".center-circle").css("background-color", "rgb(238, 49, 24)");
+            scope.positive();
 
-          } else if(scope.originalValue < 0) {
-            $(scope.drag).css("left", "0px");
-            $(scope.drag).parent().parent().css("background-color", "#000");
-            $(scope.drag).parent().parent().css("border-color", "#000");
-            $(scope.drag).find(".center-circle").css("background-color", "#000");
-          } else {
-            $(scope.drag).css("left", "0px");
-            $(scope.drag).parent().parent().css("background-color", "#000");
-            $(scope.drag).parent().parent().css("border-color", "#000");
-            $(scope.drag).find(".center-circle").css("background-color", "#000");
+          } else if(scope.originalValue <= 0) {
+            scope.negative();
           }
         };
 
+        scope.sendValue = function() {
+
+          scope.$apply(function() {
+            scope.data = String(scope.originalValue);
+          });
+          ExperimentLoader[scope.fun](scope.$parent.$parent.$parent).then(function(data) {
+            console.log("updated", data.step);
+          });
+        };
         // Enabling the drag
         scope.drag = $(elem).find(".ball-cover").draggable({
           containment: "parent",
@@ -98,26 +131,15 @@ window.ChaiBioTech.ngApp.directive('capsule', [
             if(scope.delta === "true") {
               var pos = $(this).position().left;
               if(pos < 7) {
-                $(this).css("left", "0px");
-                $(this).parent().parent().css("background-color", "#000");
-                $(this).parent().parent().css("border-color", "#000");
-                $(this).find(".center-circle").css("background-color", "#000");
+                scope.negative();
                 scope.originalValue = scope.originalValue * -1;
 
               } else {
-                $(this).css("left", "16px");
-                $(this).parent().parent().css("background-color", "rgb(238, 49, 24)");
-                $(this).parent().parent().css("border-color", "rgb(238, 49, 24)");
-                $(this).find(".center-circle").css("background-color", "rgb(238, 49, 24)");
+                scope.positive();
                 scope.originalValue = Math.abs(scope.originalValue);
               }
               if(scope.originalValue !== 0) {
-                scope.$apply(function() {
-                  scope.data = String(scope.originalValue);
-                });
-                ExperimentLoader[scope.fun](scope.$parent.$parent.$parent).then(function(data) {
-                  console.log("updated", data.step);
-                });
+                scope.sendValue();
               }
 
             } else {

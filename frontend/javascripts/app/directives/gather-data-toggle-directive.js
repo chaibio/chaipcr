@@ -18,18 +18,47 @@ window.ChaiBioTech.ngApp.directive('gatherDataToggle', [
           });
         });
 
+        $(elem).click(function(evt) {
+
+          scope.configureSwitch(!scope.data);
+          scope.sendData();
+        });
+
         scope.configureSwitch = function(val) {
 
           if(val) {
             $(scope.dragElem).parent().css("background-color", "#8dc63f");
             $(scope.dragElem).children().css("background-color", "#8dc63f");
-            $(scope.dragElem).css("left", "11px");
+            $(scope.dragElem).animate({
+              left: "11"
+            }, 100);
           } else {
             $(scope.dragElem).parent().css("background-color", "#bbbbbb");
             $(scope.dragElem).children().css("background-color", "#bbbbbb");
-            $(scope.dragElem).css("left", "1px");
+            $(scope.dragElem).animate({
+              left: "1"
+            }, 100);
           }
 
+        };
+
+        scope.processMovement = function(pos, val) {
+
+          if(pos < 6) {
+            $(this).css("left", "1px");
+          } else {
+            $(this).css("left", "11px");
+            val = true;
+          }
+          if(val !== scope.data) {
+            scope.sendData();
+          }
+        };
+
+        scope.sendData = function() {
+
+          scope.data = !scope.data;
+          scope.$parent[scope.call]();
         };
 
         scope.dragElem = $(elem).find(".outer-circle").draggable({
@@ -38,17 +67,7 @@ window.ChaiBioTech.ngApp.directive('gatherDataToggle', [
 
           stop: function() {
             var pos = $(this).position().left;
-            var val = false;
-            if(pos < 6) {
-              $(this).css("left", "1px");
-            } else {
-              $(this).css("left", "11px");
-              val = true;
-            }
-            if(val !== scope.data) {
-              scope.data = !scope.data;
-              scope.$parent[scope.call]();
-            }
+            scope.processMovement(pos, false);
           }
         });
       }

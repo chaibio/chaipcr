@@ -1,20 +1,23 @@
 window.ChaiBioTech.ngApp.directive('scrollOnTop', [
-  function() {
+  'scrollService',
+  function(scrollService) {
     return {
       restric: 'EA',
       replace: true,
       templateUrl: 'app/views/directives/scroll-on-top.html',
 
       scope: {
-        width: "@width"
+        width: "@width",
+        left: "@left"
       },
 
       link: function(scope, elem, attr) {
-        scope.move = 0;
+        scrollService.move = 0;
         scope.element = $(".canvas-containing");
         scope.scrollDiff = 0;
         scope.position = 0;
         var bar = $(elem).find(".foreground-bar");
+
         scope.$watch("width", function(newVal, oldVal) {
 
           var ratio = (newVal / 1024);
@@ -22,17 +25,21 @@ window.ChaiBioTech.ngApp.directive('scrollOnTop', [
           var canvasDiff = newVal - 1024;
           scope.scrollDiff = 300 - width;
 
-          scope.move = canvasDiff / scope.scrollDiff;
+          scrollService.move = canvasDiff / scope.scrollDiff;
           // Automatically update
-          if(scope.position !== 0) {
-              var oldWidth = 300 / (oldVal / 1024);
-              var moveLeft = Math.abs(oldWidth - width);
-              scope.position = Math.abs(scope.position - moveLeft);
-              bar.css("left", scope.position + "px");
-              bar.css("width", width + "px");
+          if(scope.position !== 0) { // make this a new service , so these numbers can be used in events..
+            var oldWidth = 300 / (oldVal / 1024);
+            var moveLeft = Math.abs(oldWidth - width);
+            scope.position = Math.abs(scope.position - moveLeft);
+            bar.css("left", scope.position + "px");
+            bar.css("width", width + "px");
           }
 
           bar.css("width", width + "px");
+        });
+
+        scope.$watch('left', function(newVal, oldVal) {
+          bar.css("left", (newVal / scrollService.move) + "px");
         });
 
         scope.dragElem = $(elem).find(".foreground-bar").draggable({
@@ -43,7 +50,7 @@ window.ChaiBioTech.ngApp.directive('scrollOnTop', [
           drag: function(event, ui) {
 
             if(ui.position.left > 0 && ui.position.left <= scope.scrollDiff) {
-              scope.element.scrollLeft(ui.position.left * scope.move);
+              scope.element.scrollLeft(ui.position.left * scrollService.move);
             }
 
           },

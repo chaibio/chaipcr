@@ -9,12 +9,31 @@
 <script type="text/javascript" language="javascript">
 <!--
 $(document).ready(function(){
-	setTimeout(function() {
+
+	// This part was written to align the image and no more used.
+	/*setTimeout(function() {
 		$('#splash').center()
 	}, 1);
     $(window).bind('resize', function() {
-        $('#splash').center({transition:300});
-    });
+        $('#splash').center({transition:0});
+    });*/
+
+	var interval = setInterval(function () {
+		console.log("Checking ... !");
+		checkConnection();
+	}, 30000);
+
+	var checkConnection = function() {
+		$.get("http://localhost:8000/network/eth0")
+			.done(function(data) {
+				$("#ip").text("IP: " + data.state.address);
+			})
+			.fail(function() {
+				$("#ip").text("No ethernet connection.")
+			});
+	}
+
+	checkConnection();
 });
 //-->
 </script>
@@ -23,6 +42,8 @@ $(document).ready(function(){
 <body>
 <div id="splash">
 	<img src="images/openqpcr_logo_dark.svg">
+</div>
+<div id="ip">
 </div>
 </body>
 

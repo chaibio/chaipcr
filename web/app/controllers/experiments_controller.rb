@@ -25,7 +25,7 @@ class ExperimentsController < ApplicationController
   api :GET, "/experiments", "List all the experiments"
   example "[{'experiment':{'id':1,'name':'test1','type':'user','started_at':null,'completed_at':null,'completed_status':null}},{'experiment':{'id':2,'name':'test2','type':'user','started_at':null,'completed_at':null,'completed_status':null}}]"
   def index
-    @experiments = Experiment.includes(:experiment_definition).where("experiment_definitions.experiment_type"=>"user").all
+    @experiments = Experiment.includes(:experiment_definition).where("experiment_definitions.experiment_type"=>"user").load
     respond_to do |format|
       format.json { render "index", :status => :ok }
     end
@@ -80,7 +80,7 @@ class ExperimentsController < ApplicationController
   api :GET, "/experiments/:id", "Show an experiment"
   see "experiments#create", "json response"
   def show
-    @experiment.experiment_definition.protocol.stages.all
+    @experiment.experiment_definition.protocol.stages.load
     respond_to do |format|
       format.json { render "fullshow", :status => (@experiment)? :ok :  :unprocessable_entity}
     end
@@ -106,7 +106,9 @@ class ExperimentsController < ApplicationController
   end
 
   api :GET, "/experiments/:id/fluorescence_data", "Retrieve fluorescence data"
-  example "{'fluorescence_datum':{'baseline_subtracted_value':1.4299,'background_subtracted_value':1.234,'well_num':1,'cycle_num':1}, 'fluorescence_datum':{'baseline_subtracted_value':1.4299,'background_subtracted_value':1.234,'well_num':2,'cycle_num':1}}"
+  example "{'total_cycles':40,'ct':['1.0',null,'1.28','20.19','1.0','20.83','20.21','19.23','21.02','15.33','15.11','15.14','15.21','14.67','14.97',null],
+  'fluorescence_data':[{'baseline_subtracted_value':1.4299,'background_subtracted_value':1.234,'well_num':1,'cycle_num':1},
+                        {'baseline_subtracted_value':1.4299,'background_subtracted_value':1.234,'well_num':2,'cycle_num':1}]}"
   def fluorescence_data
     if @experiment
       if @experiment.ran?
@@ -116,7 +118,7 @@ class ExperimentsController < ApplicationController
             begin
                @amplification_data, @ct = retrieve_amplification_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id)
             rescue => e
-               render :json=>{:errors=>"Internal Server Error (#{e})"}, :status => 500
+               render :json=>{:errors=>e}, :status => 500
                return
             end
             #update cache
@@ -140,7 +142,8 @@ class ExperimentsController < ApplicationController
   end
   
   api :GET, "/experiments/:id/melt_curve_data", "Retrieve melt curve data"
-  example "{'melt_curve_datum':{'well_num':0, 'temperature':[0,1,2,3,4,5], 'fluorescence_data':[0,1,2,3,4,5], 'derivative':[0,1,2,3,4,5]}}"
+  example "{'melt_curve_data':[{'well_num':0, 'temperature':[0,1,2,3,4,5], 'fluorescence_data':[0,1,2,3,4,5], 'derivative':[0,1,2,3,4,5], 'tm':[1,2,3], 'area':[2,4,5]},
+                               {'well_num':1, 'temperature':[0,1,2,3,4,5], 'fluorescence_data':[0,1,2,3,4,5], 'derivative':[0,1,2,3,4,5], 'tm':[1,2,3], 'area':[2,4,5]}]}"
   def melt_curve_data
     if @experiment
       if @experiment.ran?
@@ -149,7 +152,7 @@ class ExperimentsController < ApplicationController
           begin
             @melt_curve_data = retrieve_melt_curve_data(@experiment.id, @first_stage_meltcurve_data.id, @experiment.calibration_id)
           rescue => e
-            render :json=>{:errors=>"Internal Server Error (#{e})"}, :status => 500
+            render :json=>{:errors=>e}, :status => 500
             return
           end
         end
@@ -205,8 +208,42 @@ class ExperimentsController < ApplicationController
           end
           out.write csv_string
           
-          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve.csv")
-          out.write MeltCurveDatum.as_csv(params[:id])
+          first_stage_meltcurve_data = Stage.joins(:protocol).where(["experiment_definition_id=? and stage_type='meltcurve'", @experiment.experiment_definition_id]).first
+          if first_stage_meltcurve_data
+            begin
+              melt_curve_data = retrieve_melt_curve_data(@experiment.id, first_stage_meltcurve_data.id, @experiment.calibration_id)
+            rescue => e
+            end
+          end
+          
+          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_data.csv")
+          columns = ["well_num", "temperature", "fluorescence_data", "derivative"]
+          csv_string = CSV.generate do |csv|
+            csv << columns
+            if melt_curve_data
+              melt_curve_data.each do |data|
+                data.temperature.each_index do |index|
+                  csv << [data.well_num, data.temperature[index], data.fluorescence_data[index], data.derivative[index]]
+                end
+              end
+            end
+          end
+          out.write csv_string
+          
+          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_analysis.csv")
+          columns = ["well_num", "Tm1", "Tm2", "Tm3", "Tm4", "area1", "area2", "area3", "area4"]
+          csv_string = CSV.generate do |csv|
+            csv << columns
+            if melt_curve_data
+              melt_curve_data.each do |data|
+                tm_arr = (data.tm.is_a?Array)? [data.tm[0], data.tm[1], data.tm[2], data.tm[3]] : [data.tm, nil, nil, nil]
+                area_arr = (data.area.is_a?Array)? [data.area[0], data.area[1], data.area[2], data.area[3]] : [data.area, nil, nil, nil]
+                csv << [data.well_num]+tm_arr+area_arr
+              end
+            end
+          end
+          out.write csv_string
+          
         end
         buffer.rewind
         send_data buffer.sysread
@@ -220,10 +257,10 @@ class ExperimentsController < ApplicationController
       connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
       begin
         connection.eval("source(\"#{Rails.configuration.dynamic_file_path}/#{@experiment.experiment_definition.guid}/analyze.R\")")
-        response = connection.eval("analyze('#{config[Rails.env]["database"]}', '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', #{@experiment.id})").to_ruby
+        response = connection.eval("analyze('#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{@experiment.id}, #{@experiment.calibration_id})").to_ruby
       rescue  => e
         logger.error("Rserve error: #{e}")
-        kill_rserve
+        kill_rserve if e.is_a? Rserve::Talk::SocketTimeoutError
         render :json=>{:errors=>"Internal Server Error (#{e})"}, :status => 500
       ensure
         connection.close
@@ -249,7 +286,7 @@ class ExperimentsController < ApplicationController
       results = connection.eval("get_amplification_data('#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibration_id})")
     rescue  => e
       logger.error("Rserve error: #{e}")
-      kill_rserve
+      kill_rserve if e.is_a? Rserve::Talk::SocketTimeoutError
       raise e
     ensure
       connection.close
@@ -262,8 +299,12 @@ class ExperimentsController < ApplicationController
       background_subtracted_results = results[0]
       baseline_subtracted_results = results[1][0]
       (1...background_subtracted_results.length).each do |well_num|
-        (0...background_subtracted_results[well_num].length).each do |cycle_num|
-          amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num-1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_results[well_num][cycle_num], :baseline_subtracted_value=>baseline_subtracted_results[cycle_num, well_num-1])
+        if background_subtracted_results[well_num].is_a? Array
+          (0...background_subtracted_results[well_num].length).each do |cycle_num|
+            amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num-1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_results[well_num][cycle_num], :baseline_subtracted_value=>baseline_subtracted_results[cycle_num, well_num-1])
+          end
+        else
+          amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num-1, :cycle_num=>1, :background_subtracted_value=>background_subtracted_results[well_num], :baseline_subtracted_value=>baseline_subtracted_results[well_num-1])
         end
       end
       ct = results[2][0].row(0)
@@ -280,7 +321,7 @@ class ExperimentsController < ApplicationController
       results = connection.eval("process_mc('#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibration_id})")
     rescue  => e
       logger.error("Rserve error: #{e}")
-      kill_rserve
+      kill_rserve if e.is_a? Rserve::Talk::SocketTimeoutError
       raise e
     ensure
       connection.close
@@ -292,7 +333,7 @@ class ExperimentsController < ApplicationController
     if !results.blank?
       results.each_index do |i|
         results_per_well = results[i]
-        hash = OpenStruct.new({:well_num=>i, :temperature=>results_per_well[0][0], :fluorescence_data=>results_per_well[0][1], :derivative=>results_per_well[0][2]})
+        hash = OpenStruct.new({:well_num=>i, :temperature=>results_per_well[0][0], :fluorescence_data=>results_per_well[0][1], :derivative=>results_per_well[0][2], :tm=>results_per_well[1][0], :area=>results_per_well[1][1]})
         melt_curve_data << hash
       end
     end 

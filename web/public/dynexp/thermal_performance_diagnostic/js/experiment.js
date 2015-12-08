@@ -39,7 +39,7 @@
      };
      self.startExperiment = function(expId) {
        return $http.post(host + ":8000/control/start", {
-         experimentId: expId
+         experiment_id: expId
        });
      };
      self.stopExperiment = function() {

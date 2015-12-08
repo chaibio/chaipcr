@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151117070530) do
+ActiveRecord::Schema.define(version: 20151202070118) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -50,7 +50,7 @@ ActiveRecord::Schema.define(version: 20151117070530) do
     t.string   "completion_message"
     t.integer  "experiment_definition_id"
     t.integer  "calibration_id"
-    t.boolean  "time_valid",               default: true, null: false
+    t.boolean  "time_valid",               default: true
   end
 
   create_table "fluorescence_data", id: false, force: true do |t|
@@ -149,6 +149,14 @@ ActiveRecord::Schema.define(version: 20151117070530) do
   end
 
   add_index "temperature_logs", ["experiment_id", "elapsed_time"], name: "index_temperature_logs_on_experiment_id_and_elapsed_time", unique: true, using: :btree
+
+  create_table "upgrades", force: true do |t|
+    t.string   "version",           null: false
+    t.string   "checksum",          null: false
+    t.datetime "release_date",      null: false
+    t.text     "brief_description"
+    t.text     "full_description"
+  end
 
   create_table "user_tokens", force: true do |t|
     t.integer  "user_id"

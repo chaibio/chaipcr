@@ -92,6 +92,7 @@ void Optics::toggleCollectData()
     {
         if (_collectDataTimer->getPeriodicInterval() == 0)
         {
+            _collectDataTimer->setStartInterval(kFluorescenceDataCollectionDelayTimeMs);
             _collectDataTimer->setPeriodicInterval(kFluorescenceDataCollectionDelayTimeMs);
             _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));
         }

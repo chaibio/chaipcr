@@ -5,14 +5,6 @@ if ! id | grep -q root; then
 	exit 0
 fi
 
-unset boot_drive
-boot_drive=$(LC_ALL=C lsblk -l | grep "/boot/uboot" | awk '{print $1}')
-
-if [ "x${boot_drive}" = "x" ] ; then
-	echo "Error: script halting, system unrecognized..."
-	exit 1
-fi
-
 if [ -e /dev/mmcblk1p4 ] ; then
 	sdcard_dev="/dev/mmcblk0"
 	eMMC="/dev/mmcblk1"
@@ -29,26 +21,29 @@ then
 	exit 1
 fi
 
-flush_cache_mounted () {
-	sync
-	blockdev --flushbufs ${eMMC}
+unmount_emmc () {
+echo "Prevent writing to eMMC"
+#umount -l /boot/uboot
+
+mount -o ro,remount /dev/mmcblk1p1
+
+lsblk
+fuser -wkm /dev/mmcblk1p2 && mount -o ro,remount /dev/mmcblk1p2
+
+#fuser -km ${eMMC}p2
+#umount -l ${eMMC}p2
+
+lsblk
+#exit
 }
 
-check_running_system () {
-	if [ ! -f /boot/uboot/uEnv.txt ] ; then
-		echo "Error: script halting, system unrecognized..."
-		echo "unable to find: [/boot/uboot/uEnv.txt] is ${sdcard_dev}p1 mounted?"
-		exit 1
-	fi
 
-	echo "-----------------------------"
-	echo "debug copying: [${sdcard_dev}] -> [${eMMC}]"
-	lsblk
-	echo "-----------------------------"
-
-	if [ ! -b "${eMMC}" ] ; then
-		echo "Error: [${eMMC}] does not exist"
-		exit 1
+flush_cache_mounted () {
+	sync
+	command -v -- blockdev
+	if [ $? -eq 0 ]
+	then
+		blockdev --flushbufs ${eMMC}
 	fi
 }
 
@@ -89,6 +84,7 @@ write_boot_image () {
 }
 
 extract_image_files () {
+
 if [ -e  $image_filename_upgrade_tar_temp ]
 then
 	rm $image_filename_upgrade_tar_temp
@@ -99,22 +95,37 @@ then
 	rm $image_filename_upgrade_temp
 fi
 
-mv $image_filename_upgrade $image_filename_upgrade_temp
+cp $image_filename_upgrade $image_filename_upgrade_temp
 
-echo "Unpack upgrade tar from $image_filename_upgrade_tar_temp"
-gunzip $image_filename_upgrade_tar_temp
+echo "Untar upgrade tar from $image_filename_upgrade_temp"
+#gunzip $image_filename_upgrade_temp
 
-echo "uncompressing tar ball from $image_filename_upgrade_tar_temp to $image_filename_upgrade_tar_temp_folder"
-tar -xvf $image_filename_upgrade_tar_temp --directory $image_filename_upgrade_tar_temp_folder
+#echo "uncompressing tar ball from $image_filename_upgrade_tar_temp to $image_filename_upgrade_temp_folder"
+cd $image_filename_upgrade_tar_temp_folder
+tar -xvf $image_filename_upgrade_temp
+# --directory $image_filename_upgrade_tar_temp_folder
 
-rm $image_filename_upgrade_tar_temp
+#exit
+
+#rm $image_filename_upgrade_tar_temp
+
+
+if [ -e  $image_filename_upgrade_tar_temp ]
+then
+        rm $image_filename_upgrade_tar_temp
+fi
+
+if [ -e $image_filename_upgrade_temp ]
+then
+        rm $image_filename_upgrade_temp
+fi
 
 echo "Writing images to eMMC!"
 }
 
-check_running_system
+#check_running_system
 
-echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger 
+echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
 
 #echo "Debug copy!"
 #cp ../../backup/upgrade.img.gz ../../
@@ -136,14 +147,13 @@ if [ ! -e ${sdcard}/tmp/ ]
 then
        mkdir -p ${sdcard}/tmp/
 fi
+
 umount ${sdcard} || true
 mount ${sdcard_dev}p1 ${sdcard} || true
 
 NOW=$(date +"%m-%d-%Y %H:%M:%S")
-echo "Upgrade flag up!"
-echo "Upgrade started at: $NOW">>${sdcard}/upgrade_resume_autorun.flag
-
-#exit 0
+echo "Upgrade resume flag up!"
+echo "Upgrade started at: $NOW">>${sdcard}/unpack_resume_autorun.flag
 
 echo "Unpacking eMMC image.."
 
@@ -156,8 +166,8 @@ if [ ! -e  $image_filename_upgrade ]
 then
 	echo "Uprade image not found: $image_filename_upgrade.. exit!"
 #	echo "Upgrade resume flag down!"
-	rm ${sdcard}/upgrade_resume_autorun.flag
-	
+	rm ${sdcard}/unpack_resume_autorun.flag
+
 	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 	echo default-on > /sys/class/leds/beaglebone\:green\:usr1/trigger
 
@@ -177,7 +187,7 @@ fi
 if [ -e $image_filename_rootfs ]
 then
 	write_rootfs_image
-	rm $image_filename_rootfs
+ 	rm $image_filename_rootfs
 else
         echo "Rootfs image not found: $image_filename_rootfs"
 fi
@@ -186,13 +196,42 @@ if [ -e $image_filename_pt ]
 then
         write_pt_image
 	rm $image_filename_pt
+else
+	echo "Partition table image not found!"
+fi
+
+if [ "$1" -eq "withdata" ]
+then
+	if [ -e $image_filename_data ]
+	then
+        	write_data_image
+	        rm $image_filename_data
+	else
+        	echo "Data image not found!"
+	fi
 fi
 
 echo "Finished.. byebye!"
-#	echo "Upgrade resume flag down!"
-rm ${sdcard}/upgrade_resume_autorun.flag || true
+echo "Upgrade resume flag down!"
+rm ${sdcard}/unpack_resume_autorun.flag || true
 
 sync
+
 echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+
+upgrade_autorun_flag_up () {
+	echo "Autorun scripts after boot.. requested on $NOW" > ${sdcard}/upgrade_autorun.flag
+}
+
+if [ $# -eq 0 ]
+then
+	upgrade_autorun_flag_up
+	reboot
+fi
+
+if [ ! $1 -eq "withdata" ]
+then
+	upgrade_autorun_flag_up
+fi
 
 exit 0

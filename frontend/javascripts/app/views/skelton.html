@@ -17,7 +17,7 @@
         </div>
         <div class="where-m-I">
           <!-- This is going to be a directive -->
-          <scroll-on-top ng-if="showScrollbar" width="{{scrollWidth}}"></scroll-on-top>
+          <scroll-on-top ng-if="showScrollbar" width="{{scrollWidth}}" left="{{scrollLeft}}"></scroll-on-top>
         </div>
         <div ng-if="false" class="undo-container">
           <button id="undo-action">UNDO</button>
@@ -58,10 +58,10 @@
                 <div class="data-boxes auto-delta">
                   <div class="name-board">
                     <div class="toggle-container">
-                    <auto-delta-toggle ng-show="editStageMode" data="stage.auto_delta" type="{{stage.stage_type}}" call="changeDelta">
+                    <auto-delta-toggle data="stage.auto_delta" type="{{stage.stage_type}}" call="changeDelta">
                     </auto-delta-toggle>
                   </div>
-                    <auto-delta-caption ng-show="editStageMode" type="{{stage.stage_type}}">
+                    <auto-delta-caption type="{{stage.stage_type}}">
                     </auto-delta-caption>
                   </div>
 
@@ -97,11 +97,13 @@
           <div class="name-board ">EDIT STEPS + STAGES</div>
             <actions></actions>
         </div>
+
       </div>
+      <stage-type-popup ng-show="actionPopup && !infiniteHoldStage"></stage-type-popup>
       </div>
       <arrow class="next" action="next" ng-click="arrowClicked()"></arrow>
 
-      <div class="exp-info-bar"> <!--the balack bar in the bottom comes here --></div>
+      <div class="exp-info-bar"> <status-bar experiment-id="protocol.id"></status-bar></div>
     </div>
     </div>
   </div>

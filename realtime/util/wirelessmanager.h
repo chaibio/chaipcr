@@ -42,6 +42,7 @@ private:
 
     void _connect(std::string ssid, std::string passkey);
 
+    void setCredentials(const std::string &ssid, const std::string &passkey);
     void generateWpaFile(const std::string &ssid, const std::string &passkey);
 
     void ifup();

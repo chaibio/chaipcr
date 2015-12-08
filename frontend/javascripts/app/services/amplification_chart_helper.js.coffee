@@ -6,7 +6,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
     @chartConfig = ->
       axes:
         x:
-          min: 0
+          min: 1
           key: 'cycle_num'
           ticks: 8
           ticksFormatter: (x) ->
@@ -35,23 +35,23 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
 
     @neutralizeData = (fluorescence_data) ->
-      neutralized_baseline_data = [@paddData()]
-      neutralized_background_data = [@paddData()]
+      neutralized_baseline_data = []
+      neutralized_background_data = []
 
       # get max cycle
       max_cycle = 0
       for datum in fluorescence_data by 1
-        max_cycle = if datum.fluorescence_datum.cycle_num > max_cycle then datum.fluorescence_datum.cycle_num else max_cycle
+        max_cycle = if datum.cycle_num > max_cycle then datum.cycle_num else max_cycle
 
       for i in [1..max_cycle] by 1
         data_by_cycle = _.select fluorescence_data, (datum) ->
-          datum.fluorescence_datum.cycle_num is i
+          datum.cycle_num is i
 
         baseline_data = cycle_num: i
         background_data = cycle_num: i
         for datum in data_by_cycle by 1
-          baseline_data["well_#{datum.fluorescence_datum.well_num}"] = datum.fluorescence_datum['baseline_subtracted_value']
-          background_data["well_#{datum.fluorescence_datum.well_num}"] = datum.fluorescence_datum['background_subtracted_value']
+          baseline_data["well_#{datum.well_num}"] = datum['baseline_subtracted_value']
+          background_data["well_#{datum.well_num}"] = datum['background_subtracted_value']
 
         neutralized_baseline_data.push baseline_data
         neutralized_background_data.push background_data
@@ -79,11 +79,11 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
     @getMaxCalibration = (fluorescence_data, is_baseline) ->
       calibs = _.map fluorescence_data, (datum) ->
-        datum.fluorescence_datum['baseline_subtracted_value']
+        datum['baseline_subtracted_value']
 
       max_baseline = Math.max.apply Math, calibs
       calibs = _.map fluorescence_data, (datum) ->
-        datum.fluorescence_datum['background_subtracted_value']
+        datum['background_subtracted_value']
 
       max_background = Math.max.apply Math, calibs
 
@@ -93,11 +93,11 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       num_ticks = 10
       ticks = []
       if max < num_ticks
-        for i in [0..max] by 1
+        for i in [1..max] by 1
           ticks.push i
       else
         chunkSize = Math.floor(max/num_ticks)
-        for i in [0..max] by chunkSize
+        for i in [1..max] by chunkSize
           ticks.push i
         ticks.push max if max % num_ticks isnt 0
 

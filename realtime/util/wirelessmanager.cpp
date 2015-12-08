@@ -1,4 +1,6 @@
 #include "wirelessmanager.h"
+#include "networkinterfaces.h"
+#include "constants.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -141,7 +143,8 @@ void WirelessManager::_connect(std::string ssid, std::string passkey)
             return;
         }
 
-        generateWpaFile(ssid, passkey);
+        setCredentials(ssid, passkey);
+        //generateWpaFile(ssid, passkey);
 
         if (_connectionThreadState != Working)
         {
@@ -159,6 +162,21 @@ void WirelessManager::_connect(std::string ssid, std::string passkey)
 
         _connectionStatus = ConnectionError;
     }
+}
+
+void WirelessManager::setCredentials(const std::string &ssid, const std::string &passkey)
+{
+    NetworkInterfaces::InterfaceSettings interface = NetworkInterfaces::readInterfaceSettings(kNetworkInterfacesFile, _interfaceName);
+
+    if (interface.isEmpty()) {
+        interface.interface = _interfaceName;
+        interface.type = "dhcp";
+    }
+
+    interface.arguments["wpa-ssid"] = ssid;
+    interface.arguments["wpa-psk"] = passkey;
+
+    NetworkInterfaces::writeInterfaceSettings(kNetworkInterfacesFile, interface);
 }
 
 void WirelessManager::generateWpaFile(const std::string &ssid, const std::string &passkey)
@@ -257,7 +275,7 @@ void WirelessManager::ifup()
 
         if (pid != -1 && status == 0)
         {
-            ifaddrs *interfaces = nullptr;
+            /*ifaddrs *interfaces = nullptr;
 
             if (getifaddrs(&interfaces) == 0)
             {
@@ -275,7 +293,12 @@ void WirelessManager::ifup()
                 freeifaddrs(interfaces);
             }
             else
-                throw std::system_error(errno, std::generic_category(), "WirelessManager::ifup - unable to get interfaces:");
+                throw std::system_error(errno, std::generic_category(), "WirelessManager::ifup - unable to get interfaces:");*/
+
+            NetworkInterfaces::InterfaceState state = NetworkInterfaces::getInterfaceState(_interfaceName);
+
+            if (state.isEmpty() || !(state.flags & IFF_UP))
+                _connectionStatus = ConnectionError;
         }
         else
             throw std::runtime_error("WirelessManager::ifup - unknown error occured upon watching the ifup process.");
@@ -293,12 +316,14 @@ void WirelessManager::ifup()
 
 void WirelessManager::ifdown()
 {
-    std::stringstream stream;
+    /*std::stringstream stream;
     stream << "ifdown " << _interfaceName;
 
     system(stream.str().c_str());
 
-    std::remove("./qpcr_wpa_config.conf");
+    std::remove("./qpcr_wpa_config.conf");*/
+
+    NetworkInterfaces::ifdown(_interfaceName);
 
     _connectionStatus = NotConnected;
 }
@@ -350,7 +375,27 @@ void WirelessManager::checkInterfaceStatus()
 
 void WirelessManager::checkConnection()
 {
-    ifaddrs *interfaces = nullptr;
+    NetworkInterfaces::InterfaceState state = NetworkInterfaces::getInterfaceState(_interfaceName);
+
+    if (!state.isEmpty())
+    {
+        if (state.flags & IFF_UP)
+        {
+            if (state.flags & IFF_RUNNING)
+                _connectionStatus = Connected;
+            else if (_connectionThreadState != Working && _connectionStatus == Connecting)
+                _connectionStatus = AuthenticationError;
+        }
+        else if (_connectionThreadState != Working)
+        {
+            if (_connectionStatus == Connecting)
+                _connectionStatus = ConnectionError;
+            else if (_connectionStatus != ConnectionError)
+                _connectionStatus = NotConnected;
+        }
+    }
+
+    /*ifaddrs *interfaces = nullptr;
 
     if (getifaddrs(&interfaces) == 0)
     {
@@ -380,7 +425,7 @@ void WirelessManager::checkConnection()
         freeifaddrs(interfaces);
     }
     else
-        std::cout << "WirelessManager::checkConnection - unable to get interfaces: " << std::strerror(errno) << '\n';
+        std::cout << "WirelessManager::checkConnection - unable to get interfaces: " << std::strerror(errno) << '\n';*/
 }
 
 void WirelessManager::scan(int iwSocket, const iw_range &range)

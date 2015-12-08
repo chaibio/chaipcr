@@ -24,8 +24,10 @@ class Experiment < ActiveRecord::Base
     end
   end
   
+#  validates :time_valid, inclusion: {in: [true, false]}
+  
   before_create do |experiment|
-    experiment.time_valid = Setting.time_valid
+#    experiment.time_valid = Setting.time_valid
   end
   
   before_destroy do |experiment|
@@ -66,4 +68,12 @@ class Experiment < ActiveRecord::Base
     experiment_definition.name
   end
 
+  def calibration_id
+    if experiment_definition.guid == "thermal_consistency"
+      return 1
+    else
+      return read_attribute(:calibration_id)
+    end
+  end
+  
 end

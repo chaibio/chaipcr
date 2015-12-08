@@ -1,0 +1,61 @@
+<div class="intro" ng-init="analyzeExperiment()">
+  <h2> Thermal Consistency Test Results</h2>
+
+  <h4 class="text-center" ng-show="!tm_values"><b>Analyzing Results...</b></h4>
+
+  <div class="row">
+    <div class="col-md-6">
+      <table class="table table-bordered" ng-show="tm_values">
+        <thead>
+          <tr>
+            <th>Well</th>
+            <th>Tm</th>
+            <th>Fluo @72 C</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="i in loop">
+            <td>{{i+1}}</td>
+            <td ng-class="{'text-success': tm_values[i] >= CONSTANTS.MIN_TM_VAL && tm_values[i] <= CONSTANTS.MAX_TM_VAL, 'text-danger': tm_values[i] < CONSTANTS.MIN_TM_VAL || tm_values[i] > CONSTANTS.MAX_TM_VAL}">
+              {{ tm_values[i] | round:2 }}
+            </td>
+            <td ng-class="{'text-success': analyzedExp['72c_fluorescence'][i] >= CONSTANTS.MIN_FLUORESCENCE_VAL, 'text-danger': analyzedExp['72c_fluorescence'][i] < CONSTANTS.MIN_FLUORESCENCE_VAL}">
+              {{ analyzedExp['72c_fluorescence'][i]  | commaSeparated }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-6">
+      <table class="table table-bordered" ng-show="tm_values">
+        <thead>
+          <tr>
+            <th>Well</th>
+            <th>Tm</th>
+            <th>Fluo @72 C</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="i in loop">
+            <td>{{i+9}}</td>
+            <td ng-class="{'text-success': tm_values[i+8] >= CONSTANTS.MIN_TM_VAL && tm_values[i+8] <= CONSTANTS.MAX_TM_VAL, 'text-danger': tm_values[i+8] < CONSTANTS.MIN_TM_VAL || tm_values[i+8] > CONSTANTS.MAX_TM_VAL}">
+              {{ tm_values[i+8] | round:2 }}
+            </td>
+            <td ng-class="{'text-success': analyzedExp['72c_fluorescence'][i+8] >= CONSTANTS.MIN_FLUORESCENCE_VAL, 'text-danger': analyzedExp['72c_fluorescence'][i+8] < CONSTANTS.MIN_FLUORESCENCE_VAL}">
+              {{ analyzedExp['72c_fluorescence'][i+8]  | commaSeparated }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h3 class="text-center" ng-show="tm_values" ng-class="{'text-success': maxDeltaTm() < CONSTANTS.MAX_DELTA_TM_VAL, 'text-danger': maxDeltaTm() >= CONSTANTS.MAX_DELTA_TM_VAL}">
+    Max ΔTm: {{maxDeltaTm() | round:2}} &deg;C
+  </h3>
+
+  <div class="text-center" ng-show="tm_values">
+    <a href="/#/user/settings" class="button">OKAY</a>
+  </div>
+
+</div>

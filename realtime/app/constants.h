@@ -109,4 +109,7 @@ const unsigned int kBeagleboneADCBits = 12;
 //App
 const long kAppSignalInterval = 50 * 1000 * 1000; //Nanosec
 
+//Network settings
+const std::string kNetworkInterfacesFile = "/etc/network/interfaces";
+
 #endif

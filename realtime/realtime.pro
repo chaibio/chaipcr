@@ -44,7 +44,9 @@ LIBS += -lrt
 QMAKE_CXXFLAGS += -Wno-unused-local-typedefs -Wno-unused-parameter -Wno-unused-but-set-parameter
 
 QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS -= -m64
 QMAKE_LFLAGS += -rdynamic
+QMAKE_LFLAGS -= -m64
 
 unix:!unix_m {
     QMAKE_CC = arm-unknown-linux-gnueabi-gcc
@@ -134,7 +136,9 @@ HEADERS += \
     util/wirelessmanager.h \
     server/wirelessmanagerhandler.h \
     util/timechecker.h \
-    app/machinesettings.h
+    app/machinesettings.h \
+    util/networkinterfaces.h \
+    server/networkmanagerhandler.h
 
 SOURCES += \
     app/pins.cpp \
@@ -182,4 +186,6 @@ SOURCES += \
     server/httpcodehandler.cpp \
     util/wirelessmanager.cpp \
     server/wirelessmanagerhandler.cpp \
-    util/timechecker.cpp
+    util/timechecker.cpp \
+    util/networkinterfaces.cpp \
+    server/networkmanagerhandler.cpp

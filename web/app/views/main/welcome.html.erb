@@ -1,6 +1,6 @@
 
 <div class="welcome-page" ng-controller="WelcomeCtrl">
-  <div class="container-fluid" ng-controller="WelcomeCtrl">
+  <div class="container-fluid">
     <div class="row">
       <div class="col-sm-8 col-sm-offset-2">
         <img src="/images/logo-qpcr-large.png" alt="" class="logo">
@@ -18,6 +18,12 @@
       </div>
       <div class="col-sm-6">
         <form name="registrationForm" role="form" ng-submit="submit(user)">
+          <div class="input-group">
+            <input type="text" class="form-control" ng-model="user.name" placeholder="NAME">
+            <span ng-repeat="err in errors.name" class="help-block">
+              <span class="text-danger">Email {{err}}</span>
+            </span>
+          </div>
           <div class="input-group">
             <input type="email" class="form-control" ng-model="user.email" placeholder="EMAIL ADDRESS">
             <span ng-repeat="err in errors.email" class="help-block">
