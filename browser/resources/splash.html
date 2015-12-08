@@ -22,7 +22,7 @@ $(document).ready(function(){
 	}, 30000);
 
 	var checkConnection = function() {
-		$.get("“http://localhost:8000/network/eth0”")
+		$.get("http://localhost:8000/network/eth0")
 			.done(function(data) {
 				$("#ip").text("IP:" + data.state.address); // Still not sure about the data being sent.
 			})
