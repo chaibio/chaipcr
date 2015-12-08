@@ -68,7 +68,7 @@ class DevicesController < ApplicationController
     render json: result_hash.to_json, status: :ok
   end
   
-  api :PUT, "/root_password", "Set root password"
+  api :PUT, "/device/root_password", "Set root password"
   param :password, String, :desc => "password to set", :required=>true
   def root_password
     system("printf '#{params[:password]}\n#{params[:password]}\n' | passwd")
