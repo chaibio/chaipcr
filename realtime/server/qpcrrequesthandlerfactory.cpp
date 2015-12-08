@@ -11,7 +11,6 @@
 #include "controlhandler.h"
 #include "settingshandler.h"
 #include "logdatahandler.h"
-#include "wirelessmanagerhandler.h"
 #include "networkmanagerhandler.h"
 
 #include "qpcrrequesthandlerfactory.h"
@@ -36,33 +35,38 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
         {
             string method = request.getMethod();
 
+            if (method == "OPTIONS" && request.has("Access-Control-Request-Method"))
+                method = request.get("Access-Control-Request-Method");
+
             if (method == "GET")
             {
-                if (requestPath.size() == 2 && requestPath.at(0) == "network" && requestPath.at(1) == "eth0")
-                    return new NetworkManagerHandler("eth0", NetworkManagerHandler::GetStat);
+                if (requestPath.size() > 2 && requestPath.at(0) == "network")
+                {
+                    if (requestPath.size() == 2)
+                        return new NetworkManagerHandler(requestPath.at(1), NetworkManagerHandler::GetStat);
+                    else if (requestPath.at(2) == "scan")
+                        return new NetworkManagerHandler(requestPath.at(1), NetworkManagerHandler::WifiScan);
+                }
             }
             else if (method == "PUT")
             {
-                if (requestPath.size() == 2 && requestPath.at(0) == "network" && requestPath.at(1) == "eth0")
-                    return new NetworkManagerHandler("eth0", NetworkManagerHandler::SetSettings);
+                if (requestPath.size() == 2 && requestPath.at(0) == "network")
+                    return new NetworkManagerHandler(requestPath.at(1), NetworkManagerHandler::SetSettings);
+            }
+            else if (method == "POST" && requestPath.size() == 3)
+            {
+                if (requestPath.at(2) == "connect")
+                    return new NetworkManagerHandler(requestPath.at(1), NetworkManagerHandler::WifiConnect);
+                else if (requestPath.at(2) == "disconnect")
+                    return new NetworkManagerHandler(requestPath.at(1), NetworkManagerHandler::WifiDisconnect);
             }
 
             if (checkUserAuthorization(request))
             {
-                if (method == "OPTIONS" && request.has("Access-Control-Request-Method"))
-                    method = request.get("Access-Control-Request-Method");
-
                 if (method == "GET")
                 {
                     if (requestPath.at(0) == "status")
                         return new StatusHandler();
-                    else if (requestPath.at(0) == "wifi")
-                    {
-                        if (requestPath.at(1) == "scan")
-                            return new WirelessManagerHandler(WirelessManagerHandler::Scan);
-                        else if (requestPath.at(1) == "status")
-                            return new WirelessManagerHandler(WirelessManagerHandler::Status);
-                    }
                 }
                 else if (method == "PUT")
                 {
@@ -75,7 +79,7 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
                 }
                 else if (method == "POST")
                 {
-                    if (requestPath.at(0) == "control")
+                    if (requestPath.at(0) == "control" && requestPath.size() == 2)
                     {
                         if (requestPath.at(1) == "start")
                             return new ControlHandler(ControlHandler::StartExperiment);
@@ -83,13 +87,6 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
                             return new ControlHandler(ControlHandler::ResumeExperiment);
                         else if (requestPath.at(1) == "stop")
                             return new ControlHandler(ControlHandler::StopExperiment);
-                    }
-                    else if (requestPath.at(0) == "wifi")
-                    {
-                        if (requestPath.at(1) == "connect")
-                            return new WirelessManagerHandler(WirelessManagerHandler::Connect);
-                        else if (requestPath.at(1) == "shutdown")
-                            return new WirelessManagerHandler(WirelessManagerHandler::Shutdown);
                     }
                 }
             }
