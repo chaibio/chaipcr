@@ -117,6 +117,10 @@ window.ChaiBioTech.ngApp.factory('canvas', [
 
     this.addMoveDots = function() {
 
+      var moveDotsLastCircle = new fabric.Circle({
+
+      });
+
       this.moveDots = new fabric.Group(dots.stepStageMoveDots(), {
         width: 13, left: 70, top: 35, backgroundColor: "white", visible: false
       });

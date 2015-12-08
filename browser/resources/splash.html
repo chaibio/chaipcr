@@ -22,14 +22,39 @@ $(document).ready(function(){
 	}, 30000);
 
 	var checkConnection = function() {
-		$.get("/network/eth0")
+		$.get("“http://localhost:8000/network/eth0”")
 			.done(function(data) {
-				$("#ip").text(data.ip); // Still not sure about the data being sent.
+				$("#ip").text("IP:" + data.state.address); // Still not sure about the data being sent.
 			})
 			.fail(function() {
 				$("#ip").text("No ethernet connection.")
 			});
+			/*console.log("ajax call ----");
+			$.ajax({
+				url: "10.0.2.37:8000//network/eth0",
+				crossOrigin: true,
+				contentType: 'application/json',
+				type: 'GET',
+				dataType: 'jsonp',
+				jsonpCallback: 'updateRecordDisplay',
+				success: function(data) {
+					console.log(data);
+				},
+				fail: function(data) {
+					console.log(data);
+				}
+
+			})
+			.done(function(data) {
+				console.log(data);
+				//that.set("statusData", data);
+				//that.trigger("data-updated");
+			});*/
 	}
+
+	/*updateRecordDisplay = function(data) {
+		console.log(data);
+	}*/
 	checkConnection();
 });
 //-->
@@ -41,7 +66,7 @@ $(document).ready(function(){
 	<img src="images/openqpcr_logo_dark.svg">
 </div>
 <div id="ip">
-	Jossie
+	Ip:
 </div>
 </body>
 
