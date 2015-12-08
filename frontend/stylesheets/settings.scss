@@ -1,0 +1,75 @@
+@import './colors.css.scss';
+
+.settings-state-active {
+
+  .padd-top {
+    padding-top: 20px;
+  }
+
+  .row {
+    margin: 0;
+    margin-right: -15px;
+    margin-left: -15px;
+  }
+
+  .underlined {
+    border-bottom-style: solid;
+    border-bottom-width: 2px;
+    border-bottom-color: $gray;
+  }
+
+  .header{
+    width: 1024px;
+    height: 45px;
+    background-color: $gray;
+
+    .name-container {
+      float: left;
+      color: #d6d4d1;
+      margin-left: 13px;
+      font-size: 18px;
+      margin-top: 8px;
+      font-family: "Fun City";
+    }
+
+    .stripes {
+      width: 13px;
+      height: 9px;
+      float: left;
+      cursor: pointer;
+      margin-top: 18px;
+      margin-left: 32px;
+
+      .stripe {
+        height: 1px;
+        width: 13px;
+        margin-bottom: 3px;
+        background-color: white;
+      }
+    }
+
+    .btn-support-legal {
+      border: 2px solid #fff;
+      margin-right: 32px;
+      margin-top: 7px;
+      color: #fff;
+      padding: 3px 20px;
+      font-weight: 700;
+    }
+  }
+
+  .content {
+
+    .menu-container {
+      display: inline-block;
+      width: 50%;
+    }
+
+    .device-info-container {
+      display: inline-block;
+      width: 50%;
+    }
+
+  }
+
+}
