@@ -24,9 +24,9 @@ $(document).ready(function(){
 	}, 30000);
 
 	var checkConnection = function() {
-		$.get("http://10.0.2.37:8000/network/eth0")
+		$.get("http://localhost:8000/network/eth0")
 			.done(function(data) {
-				$("#ip").text("IP:" + data.state.address);
+				$("#ip").text("IP: " + data.state.address);
 			})
 			.fail(function() {
 				$("#ip").text("No ethernet connection.")
@@ -44,7 +44,6 @@ $(document).ready(function(){
 	<img src="images/openqpcr_logo_dark.svg">
 </div>
 <div id="ip">
-	Ip:
 </div>
 </body>
 

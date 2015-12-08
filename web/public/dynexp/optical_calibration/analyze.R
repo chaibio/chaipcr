@@ -3,10 +3,11 @@
 
 library(jsonlite)
 
-analyze_optical_calibration <- function(
+analyze <- function(
     db_usr, db_pwd, db_host, db_port, db_name, 
     exp_id, 
-    calib_id)
+    calib_id, 
+    verbose=FALSE)
 {
     message('db: ', db_name)
     db_conn <- dbConnect(RMySQL::MySQL(), 
@@ -16,11 +17,11 @@ analyze_optical_calibration <- function(
                          port=db_port, 
                          dbname=db_name)
     
-    result1 <- try(prep_calib(db_conn, exp_id))
+    result1 <- try(prep_calib(db_conn, exp_id, verbose))
     
     if (class(result1) == 'try-error') {
         valid <- FALSE
-        err <- as.character(result1)
+        err <- 'Fluorescein calibrator was less fluorescent than water in some wells. Please retry with new fluorescein calibrator.'
     } else {
         valid <- TRUE
         err <- NULL }

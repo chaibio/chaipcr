@@ -5,6 +5,7 @@ melt_1cr <- function(floor_temp,
                      exp_id, 
                      stage_id, 
                      calib_id, 
+                     verbose=FALSE, 
                      show_running_time=FALSE) {
     
     # start counting for running time
@@ -14,6 +15,7 @@ melt_1cr <- function(floor_temp,
     # get calibrated melting curve data
     mc_calib <- get_mc_calib(db_usr, db_pwd, db_host, db_port, db_name, 
                              exp_id, stage_id, calib_id, 
+                             verbose, 
                              show_running_time)
     
     # get melting curve data for all the temperatures as well as Tm
