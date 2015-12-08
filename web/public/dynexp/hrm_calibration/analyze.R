@@ -8,6 +8,7 @@ analyze <- function(#floor_temp, # hard-coded inside of the function
     exp_id, 
     #stage_id, # hard-coded inside of the function
     calib_id, 
+    verbose=FALSE, 
     show_running_time=FALSE)
 {
     # hard-coded arguments
@@ -19,6 +20,7 @@ analyze <- function(#floor_temp, # hard-coded inside of the function
                         exp_id, 
                         stage_id, 
                         calib_id, 
+                        verbose, 
                         show_running_time)
     
     names(mc_w72c) <- c('mc_out', '72c_fluorescence')
