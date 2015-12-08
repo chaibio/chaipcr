@@ -10,6 +10,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
     hasData = false
     fetching = false
     $scope.chartConfig = helper.chartConfig()
+    $scope.chartConfig.axes.x.ticks = helper.Xticks $stateParams.max_cycle || 1
+    $scope.chartConfig.axes.x.max = $stateParams.max_cycle || 1
     $scope.data = [helper.paddData()]
     $scope.log_linear = 'log'
     $scope.COLORS = helper.COLORS
@@ -43,8 +45,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       if ((state is 'idle' and $scope.experiment?.completed_at and !hasData) or
       (state is 'idle' and oldState isnt state) or
-      (state is 'running' and (oldStep isnt newStep or !oldStep) and data.optics.collect_data)) and
-      $scope.RunExperimentCtrl.chart is 'amplification'
+      (state is 'running' and (oldStep isnt newStep or !oldStep) and data.optics.collect_data))
         updateFluorescenceData()
 
     $scope.$watch ->

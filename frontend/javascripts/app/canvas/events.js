@@ -28,6 +28,8 @@ window.ChaiBioTech.ngApp.factory('events', [
       this.canvas = C.canvas;
       this.startDrag = 0; // beginning position of dragging
       this.mouseDown = false;
+      this.mouseDownPos = 0;
+      this.mouseUpPos = 0;
       this.moveStepActive = false;
       var that = this;
 

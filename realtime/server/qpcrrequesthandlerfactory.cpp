@@ -12,6 +12,7 @@
 #include "settingshandler.h"
 #include "logdatahandler.h"
 #include "wirelessmanagerhandler.h"
+#include "networkmanagerhandler.h"
 
 #include "qpcrrequesthandlerfactory.h"
 #include "experimentcontroller.h"
@@ -33,10 +34,21 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
 
         if (!requestPath.empty())
         {
+            string method = request.getMethod();
+
+            if (method == "GET")
+            {
+                if (requestPath.size() == 2 && requestPath.at(0) == "network" && requestPath.at(1) == "eth0")
+                    return new NetworkManagerHandler("eth0", NetworkManagerHandler::GetStat);
+            }
+            else if (method == "PUT")
+            {
+                if (requestPath.size() == 2 && requestPath.at(0) == "network" && requestPath.at(1) == "eth0")
+                    return new NetworkManagerHandler("eth0", NetworkManagerHandler::SetSettings);
+            }
+
             if (checkUserAuthorization(request))
             {
-                string method = request.getMethod();
-
                 if (method == "OPTIONS" && request.has("Access-Control-Request-Method"))
                     method = request.get("Access-Control-Request-Method");
 

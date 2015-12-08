@@ -19,6 +19,12 @@ window.ChaiBioTech.ngApp.factory('mouseUp', [
         }
 
         if(that.moveStepActive) {
+          if(that.mouseDownPos === evt.e.clientX) {
+            var indicate = evt.target;
+            step = indicate.parent;
+            C.stepIndicator.processMovement(step, C);
+          }
+          C.moveDots.setVisible(false);
           C.stepIndicator.setVisible(false);
           that.moveStepActive = false;
           C.canvas.renderAll();

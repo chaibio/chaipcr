@@ -12,9 +12,10 @@ window.ChaiBioTech.ngApp.factory('canvas', [
   'previouslySelected',
   'constants',
   'circleManager',
+  'dots',
 
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
-    moveStepRect, moveStageRect, previouslySelected, constants, circleManager) {
+    moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots) {
 
     this.init = function(model) {
       console.log(model);
@@ -36,7 +37,8 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         "pause.png",
         "pause-middle.png",
         "close.png",
-        "drag-footer-image.png"
+        "drag-footer-image.png",
+        "move-step-on.png"
       ];
 
       this.imageLocation = "/images/";
@@ -108,11 +110,23 @@ window.ChaiBioTech.ngApp.factory('canvas', [
         // here we initiate stage/step events service.. So now we can listen for changes from the bottom.
         stageEvents.init(this.$scope, this.canvas, this);
         stepEvents.init(this.$scope, this.canvas, this);
-        console.log(moveStepRect.getMoveStepRect(this));
+
         this.stepIndicator = moveStepRect.getMoveStepRect(this);
         this.canvas.add(this.stepIndicator);
+        this.addMoveDots();
     };
 
+    this.addMoveDots = function() {
+
+      var arr = dots.stepStageMoveDots();
+      this.imageobjects["move-step-on.png"].setTop(328);
+      this.imageobjects["move-step-on.png"].setLeft(-2);
+      arr.push(this.imageobjects["move-step-on.png"]);
+      this.moveDots = new fabric.Group(arr, {
+        width: 13, left: 70, top: 35, backgroundColor: "white", visible: false
+      });
+      this.canvas.add(this.moveDots);
+    };
     /*******************************************************/
       /* This method adds those footer images on the step. Its a tricky one beacuse images
          are taking longer time to load. So we load it once and clone it to all the steps.

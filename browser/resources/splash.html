@@ -9,12 +9,14 @@
 <script type="text/javascript" language="javascript">
 <!--
 $(document).ready(function(){
-	setTimeout(function() {
+
+	// This part was written to align the image and no more used.
+	/*setTimeout(function() {
 		$('#splash').center()
 	}, 1);
     $(window).bind('resize', function() {
-        $('#splash').center({transition:300});
-    });
+        $('#splash').center({transition:0});
+    });*/
 
 	var interval = setInterval(function () {
 		console.log("Checking ... !");
@@ -22,14 +24,15 @@ $(document).ready(function(){
 	}, 30000);
 
 	var checkConnection = function() {
-		$.get("/network/eth0")
+		$.get("http://localhost:8000/network/eth0")
 			.done(function(data) {
-				$("#ip").text(data.ip); // Still not sure about the data being sent.
+				$("#ip").text("IP: " + data.state.address);
 			})
 			.fail(function() {
-				$("#ip").text("Not connected yet.")
+				$("#ip").text("No ethernet connection.")
 			});
 	}
+
 	checkConnection();
 });
 //-->
@@ -41,7 +44,6 @@ $(document).ready(function(){
 	<img src="images/openqpcr_logo_dark.svg">
 </div>
 <div id="ip">
-	Jossie
 </div>
 </body>
 
