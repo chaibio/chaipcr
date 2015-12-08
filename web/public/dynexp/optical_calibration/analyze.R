@@ -3,7 +3,7 @@
 
 library(jsonlite)
 
-analyze_optical_calibration <- function(
+analyze <- function(
     db_usr, db_pwd, db_host, db_port, db_name, 
     exp_id, 
     calib_id, 
