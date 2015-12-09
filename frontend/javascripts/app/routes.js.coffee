@@ -27,7 +27,6 @@ window.ChaiBioTech.ngApp
       .state 'settings',
         url: '/user/settings'
         templateUrl: 'app/views/user/settings.html'
-        controller: 'UserSettingsCtrl'
 
       .state 'edit-protocol',
         url: '/edit-protocol/:id'
