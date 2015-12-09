@@ -1,0 +1,34 @@
+.version-info-container {
+  .machine-icon {
+    display: block;
+    margin: 0 auto;
+    margin-top: 100px;
+    width: 250px;
+  }
+
+  .version-info {
+    text-align: center;
+    color: #fff;
+
+    .item-version {
+      margin-top: 30px;
+
+      h3 {
+        margin: 0;
+      }
+      h2 {
+        margin: 0;
+        margin-top: 5px;
+      }
+    }
+  }
+
+  .update-button {
+    margin: 0 auto;
+    margin-top: 30px;
+    border: 1px solid #fff;
+    padding: 2px 20px;
+    background: #999;
+    font-weight: bold;
+  }
+}

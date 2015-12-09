@@ -1,4 +1,4 @@
-<div class="user-settings" ng-controller="SettingsCtrl">
+<div class="settings" ng-controller="SettingsCtrl">
   <div class="header">
     <div class="row">
       <div class="col-md-6">
@@ -43,29 +43,11 @@
             <a>HARDWARE DETAILS</a>
           </li>
           <li>
-            <a>MAINTAINANCE</a>
+            <a ui-sref="settings.maintainance" ui-sref-active="active">MAINTAINANCE</a>
           </li>
         </ul>
       </div>
-      <div class="col-md-8 device-info-container">
-        <img src="/images/settings-machine-icon.png" class="machine-icon">
-        <div class="version-info">
-          <div class="item-version">
-            <h3>Serial Number:</h3>
-            <h2>23165515648484984</h2>
-          </div>
-          <div class="item-version">
-            <h3>Software Version:</h3>
-            <h2>23165515648484984</h2>
-          </div>
-          <div class="item-version">
-            <h3>Model Number:</h3>
-            <h2>23165515648484984</h2>
-          </div>
-          <button class="update-button">
-            SOFTWARE UPDATE AVAILABLE
-          </button>
-        </div>
+      <div class="col-md-8 device-info-container" ui-view>
       </div>
     </div>
   </div>

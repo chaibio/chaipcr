@@ -1,6 +1,6 @@
 @import './colors.css.scss';
 
-.settings-state-active {
+.settings {
 
 
   h1 {
@@ -116,12 +116,13 @@
           margin-right: -15px;
           margin-left: -45px;
           a {
+            cursor: pointer;
             font-size: 18px;
             font-weight: bold;
             color: $gray;
             display: block;
             padding: 15px 0px 15px  45px;
-            &:hover {
+            &:hover, &.active {
               text-decoration: none;
               color: #fff;
               background: $blue;
@@ -137,40 +138,7 @@
       padding-bottom: 50px;
       height: 100%;
       background: #999;
-      border-left: 2px solid #ddd;
-
-      .machine-icon {
-        display: block;
-        margin: 0 auto;
-        margin-top: 100px;
-        width: 250px;
-      }
-
-      .version-info {
-        text-align: center;
-        color: #fff;
-
-        .item-version {
-          margin-top: 30px;
-
-          h3 {
-            margin: 0;
-          }
-          h2 {
-            margin: 0;
-            margin-top: 5px;
-          }
-        }
-      }
-
-      .update-button {
-        margin: 0 auto;
-        margin-top: 30px;
-        border: 1px solid #fff;
-        padding: 2px 20px;
-        background: #999;
-        font-weight: bold;
-      }
+      border-left: 1px solid #ddd;
 
     }
 

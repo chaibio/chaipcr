@@ -25,8 +25,17 @@ window.ChaiBioTech.ngApp
         controller: 'HomeCtrl as HomeCtrl'
 
       .state 'settings',
-        url: '/user/settings'
-        templateUrl: 'app/views/user/settings.html'
+        abstruct: true
+        url: '/settings'
+        templateUrl: 'app/views/settings/root-menu.html'
+
+      .state 'settings.root',
+        url: '/'
+        template: '<version-info></version-info>'
+
+      .state 'settings.maintainance',
+        url: '/maintainance'
+        templateUrl: 'app/views/settings/maintainance.html'
 
       .state 'edit-protocol',
         url: '/edit-protocol/:id'
