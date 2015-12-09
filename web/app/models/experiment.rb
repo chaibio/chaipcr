@@ -68,4 +68,12 @@ class Experiment < ActiveRecord::Base
     experiment_definition.name
   end
 
+  def calibration_id
+    if experiment_definition.guid == "thermal_consistency"
+      return 1
+    else
+      return read_attribute(:calibration_id)
+    end
+  end
+  
 end

@@ -27,7 +27,7 @@ private:
     void setSettings(const boost::property_tree::ptree &requestPt);
 
     void wifiScan(boost::property_tree::ptree &responsePt);
-    void wifiConnect(const boost::property_tree::ptree &requestPt);
+    void wifiConnect();
     void wifiDisconnect();
 
 private:

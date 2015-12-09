@@ -118,7 +118,7 @@ class ExperimentsController < ApplicationController
             begin
                @amplification_data, @ct = retrieve_amplification_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id)
             rescue => e
-               render :json=>{:errors=>"Internal Server Error (#{e})"}, :status => 500
+               render :json=>{:errors=>e}, :status => 500
                return
             end
             #update cache
@@ -152,7 +152,7 @@ class ExperimentsController < ApplicationController
           begin
             @melt_curve_data = retrieve_melt_curve_data(@experiment.id, @first_stage_meltcurve_data.id, @experiment.calibration_id)
           rescue => e
-            render :json=>{:errors=>"Internal Server Error (#{e})"}, :status => 500
+            render :json=>{:errors=>e}, :status => 500
             return
           end
         end
@@ -216,17 +216,34 @@ class ExperimentsController < ApplicationController
             end
           end
           
-          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve.csv")
-          columns = ["well_num", "temperature", "fluorescence_data", "derivative", "tm", "area"]
+          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_data.csv")
+          columns = ["well_num", "temperature", "fluorescence_data", "derivative"]
           csv_string = CSV.generate do |csv|
             csv << columns
             if melt_curve_data
               melt_curve_data.each do |data|
-                csv << data.to_h.values_at(*columns.map { |x| x.to_sym })
+                data.temperature.each_index do |index|
+                  csv << [data.well_num, data.temperature[index], data.fluorescence_data[index], data.derivative[index]]
+                end
               end
             end
           end
           out.write csv_string
+          
+          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_analysis.csv")
+          columns = ["well_num", "Tm1", "Tm2", "Tm3", "Tm4", "area1", "area2", "area3", "area4"]
+          csv_string = CSV.generate do |csv|
+            csv << columns
+            if melt_curve_data
+              melt_curve_data.each do |data|
+                tm_arr = (data.tm.is_a?Array)? [data.tm[0], data.tm[1], data.tm[2], data.tm[3]] : [data.tm, nil, nil, nil]
+                area_arr = (data.area.is_a?Array)? [data.area[0], data.area[1], data.area[2], data.area[3]] : [data.area, nil, nil, nil]
+                csv << [data.well_num]+tm_arr+area_arr
+              end
+            end
+          end
+          out.write csv_string
+          
         end
         buffer.rewind
         send_data buffer.sysread

@@ -1,4 +1,4 @@
-Step.seed do |s|
+Step.seed(:stage_id, :order_number) do |s|
   s.id = 1
   s.name = "Warm Up"
   s.temperature = 65
@@ -8,7 +8,7 @@ Step.seed do |s|
   s.collect_data = false
 end
 
-Step.seed do |s|
+Step.seed(:stage_id, :order_number) do |s|
   s.id = 2
   s.name = "Water"
   s.temperature = 65
@@ -18,7 +18,7 @@ Step.seed do |s|
   s.collect_data = true
 end
 
-Step.seed do |s|
+Step.seed(:stage_id, :order_number) do |s|
   s.id = 3
   s.name = "Swap"
   s.temperature = 65
@@ -29,7 +29,7 @@ Step.seed do |s|
   s.pause = true
 end
 
-Step.seed do |s|
+Step.seed(:stage_id, :order_number) do |s|
   s.id = 4
   s.name = "Signal"
   s.temperature = 65
@@ -39,20 +39,21 @@ Step.seed do |s|
   s.collect_data = true
 end
 
-Stage.seed do |s|
+Stage.seed(:protocol_id, :order_number) do |s|
   s.id = 1
   s.num_cycles = 1
   s.protocol_id = 1
   s.stage_type = Stage::TYPE_HOLD
+  s.order_number = 0
 end
 
-protocol = Protocol.seed do |s|
+protocol = Protocol.seed(:experiment_definition_id) do |s|
   s.id = 1
   s.lid_temperature = 110
   s.experiment_definition_id = 1
 end
 
-ExperimentDefinition.seed do |s|
+ExperimentDefinition.seed(:guid) do |s|
   s.id = 1
   s.name = "calibration"
   s.guid = "optical_cal"
