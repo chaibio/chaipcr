@@ -28,7 +28,7 @@ public:
 
     inline const std::string& interfaceName() const noexcept { return _interfaceName; }
 
-    void connect(const std::string &ssid, const std::string &passkey);
+    void connect();
     void shutdown();
 
     std::string getCurrentSsid() const;
@@ -40,10 +40,7 @@ public:
 private:
     void stopCommands();
 
-    void _connect(std::string ssid, std::string passkey);
-
-    void setCredentials(const std::string &ssid, const std::string &passkey);
-    void generateWpaFile(const std::string &ssid, const std::string &passkey);
+    void _connect();
 
     void ifup();
     void ifdown();

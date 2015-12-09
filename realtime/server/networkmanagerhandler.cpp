@@ -28,7 +28,7 @@ void NetworkManagerHandler::processData(const boost::property_tree::ptree &reque
         break;
 
     case WifiConnect:
-        wifiConnect(requestPt);
+        wifiConnect();
         JSONHandler::processData(requestPt, responsePt);
         break;
 
@@ -111,8 +111,14 @@ void NetworkManagerHandler::setSettings(const boost::property_tree::ptree &reque
             settings.arguments[it->first] = it->second.get_value<std::string>();
 
         NetworkInterfaces::writeInterfaceSettings(kNetworkInterfacesFile, settings);
-        NetworkInterfaces::ifdown(_interfaceName);
-        NetworkInterfaces::ifup(_interfaceName);
+
+        if (_interfaceName != qpcrApp.wirelessManager()->interfaceName())
+        {
+            NetworkInterfaces::ifdown(_interfaceName);
+            NetworkInterfaces::ifup(_interfaceName);
+        }
+        else
+            wifiConnect();
     }
     else
     {
@@ -137,9 +143,9 @@ void NetworkManagerHandler::wifiScan(boost::property_tree::ptree &responsePt)
     responsePt.put_child("scan_result", array);
 }
 
-void NetworkManagerHandler::wifiConnect(const boost::property_tree::ptree &requestPt)
+void NetworkManagerHandler::wifiConnect()
 {
-    qpcrApp.wirelessManager()->connect(requestPt.get<std::string>("ssid"), requestPt.get<std::string>("password"));
+    qpcrApp.wirelessManager()->connect();
 }
 
 void NetworkManagerHandler::wifiDisconnect()

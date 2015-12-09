@@ -134,7 +134,6 @@ HEADERS += \
     util/instance.h \
     server/httpcodehandler.h \
     util/wirelessmanager.h \
-    server/wirelessmanagerhandler.h \
     util/timechecker.h \
     app/machinesettings.h \
     util/networkinterfaces.h \
@@ -185,7 +184,6 @@ SOURCES += \
     control/test/adccontrollermock.cpp \
     server/httpcodehandler.cpp \
     util/wirelessmanager.cpp \
-    server/wirelessmanagerhandler.cpp \
     util/timechecker.cpp \
     util/networkinterfaces.cpp \
     server/networkmanagerhandler.cpp

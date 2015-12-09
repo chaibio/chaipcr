@@ -49,14 +49,14 @@ WirelessManager::~WirelessManager()
     }
 }
 
-void WirelessManager::connect(const std::string &ssid, const std::string &passkey)
+void WirelessManager::connect()
 {
     std::lock_guard<std::recursive_mutex> lock(_commandsMutex);
 
     stopCommands();
 
     _connectionThreadState = Working;
-    _connectionThread = std::thread(&WirelessManager::_connect, this, std::string(ssid), std::string(passkey));
+    _connectionThread = std::thread(&WirelessManager::_connect, this);
 }
 
 void WirelessManager::shutdown()
@@ -122,7 +122,7 @@ void WirelessManager::stopCommands()
         _shutdownThread.join();
 }
 
-void WirelessManager::_connect(std::string ssid, std::string passkey)
+void WirelessManager::_connect()
 {
     try
     {
@@ -143,15 +143,6 @@ void WirelessManager::_connect(std::string ssid, std::string passkey)
             return;
         }
 
-        setCredentials(ssid, passkey);
-        //generateWpaFile(ssid, passkey);
-
-        if (_connectionThreadState != Working)
-        {
-            _connectionThreadState = Idle;
-            return;
-        }
-
         ifup();
 
         _connectionThreadState = Idle;
@@ -162,29 +153,6 @@ void WirelessManager::_connect(std::string ssid, std::string passkey)
 
         _connectionStatus = ConnectionError;
     }
-}
-
-void WirelessManager::setCredentials(const std::string &ssid, const std::string &passkey)
-{
-    NetworkInterfaces::InterfaceSettings interface = NetworkInterfaces::readInterfaceSettings(kNetworkInterfacesFile, _interfaceName);
-
-    if (interface.isEmpty()) {
-        interface.interface = _interfaceName;
-        interface.type = "dhcp";
-    }
-
-    interface.arguments["wpa-ssid"] = ssid;
-    interface.arguments["wpa-psk"] = passkey;
-
-    NetworkInterfaces::writeInterfaceSettings(kNetworkInterfacesFile, interface);
-}
-
-void WirelessManager::generateWpaFile(const std::string &ssid, const std::string &passkey)
-{
-    std::stringstream stream;
-    stream << "wpa_passphrase \"" << ssid << "\" \"" << passkey << "\" > ./qpcr_wpa_config.conf";
-
-    system(stream.str().c_str());
 }
 
 void WirelessManager::ifup()
@@ -275,26 +243,6 @@ void WirelessManager::ifup()
 
         if (pid != -1 && status == 0)
         {
-            /*ifaddrs *interfaces = nullptr;
-
-            if (getifaddrs(&interfaces) == 0)
-            {
-                for (ifaddrs *interface = interfaces; interface; interface = interface->ifa_next)
-                {
-                    if (interface->ifa_name == _interfaceName)
-                    {
-                        if (!(interface->ifa_flags & IFF_UP))
-                            _connectionStatus = ConnectionError;
-
-                        break;
-                    }
-                }
-
-                freeifaddrs(interfaces);
-            }
-            else
-                throw std::system_error(errno, std::generic_category(), "WirelessManager::ifup - unable to get interfaces:");*/
-
             NetworkInterfaces::InterfaceState state = NetworkInterfaces::getInterfaceState(_interfaceName);
 
             if (state.isEmpty() || !(state.flags & IFF_UP))
@@ -316,13 +264,6 @@ void WirelessManager::ifup()
 
 void WirelessManager::ifdown()
 {
-    /*std::stringstream stream;
-    stream << "ifdown " << _interfaceName;
-
-    system(stream.str().c_str());
-
-    std::remove("./qpcr_wpa_config.conf");*/
-
     NetworkInterfaces::ifdown(_interfaceName);
 
     _connectionStatus = NotConnected;
@@ -394,38 +335,6 @@ void WirelessManager::checkConnection()
                 _connectionStatus = NotConnected;
         }
     }
-
-    /*ifaddrs *interfaces = nullptr;
-
-    if (getifaddrs(&interfaces) == 0)
-    {
-        for (ifaddrs *interface = interfaces; interface; interface = interface->ifa_next)
-        {
-            if (interface->ifa_name == _interfaceName)
-            {
-                if (interface->ifa_flags & IFF_UP)
-                {
-                    if (interface->ifa_flags & IFF_RUNNING)
-                        _connectionStatus = Connected;
-                    else if (_connectionThreadState != Working && _connectionStatus == Connecting)
-                        _connectionStatus = AuthenticationError;
-                }
-                else if (_connectionThreadState != Working)
-                {
-                    if (_connectionStatus == Connecting)
-                        _connectionStatus = ConnectionError;
-                    else if (_connectionStatus != ConnectionError)
-                        _connectionStatus = NotConnected;
-                }
-
-                break;
-            }
-        }
-
-        freeifaddrs(interfaces);
-    }
-    else
-        std::cout << "WirelessManager::checkConnection - unable to get interfaces: " << std::strerror(errno) << '\n';*/
 }
 
 void WirelessManager::scan(int iwSocket, const iw_range &range)
