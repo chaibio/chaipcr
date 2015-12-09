@@ -2,6 +2,25 @@
 
 .settings-state-active {
 
+
+  h1 {
+    font-family: 'dinot-bold';
+    font-size: 18px;
+  }
+
+  h2 {
+    font-family: 'dinot-bold';
+    font-size: 18px;
+    margin-top: 15px;
+    margin-bottom: 5px;
+  }
+  h3 {
+    font-family: 'dinot';
+    font-size: 15px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+  }
+
   .padd-top {
     padding-top: 20px;
   }
@@ -14,8 +33,10 @@
 
   .underlined {
     border-bottom-style: solid;
-    border-bottom-width: 2px;
+    border-bottom-width: 1px;
     border-bottom-color: $gray;
+    padding-bottom: 15px;
+    margin-top: 50px;
   }
 
   .header{
@@ -38,7 +59,7 @@
       float: left;
       cursor: pointer;
       margin-top: 18px;
-      margin-left: 32px;
+      margin-left: 30px;
 
       .stripe {
         height: 1px;
@@ -60,14 +81,97 @@
 
   .content {
 
-    .menu-container {
-      display: inline-block;
-      width: 50%;
+    .content-row {
+      margin-right: 0;
     }
 
+    .left-menu-container {
+      padding-left: 45px;
+
+      .button {
+        border: 1px solid $gray;
+        background: #fff;
+        color: $gray;
+        display: inline-block;
+        border-radius: 0;
+        font-weight: bold;
+        width: 100px;
+        padding: 2px 0;
+
+        &:hover {
+          background: $gray;
+          color: #fff;
+        }
+      }
+
+      .user-container {
+        text-align: center;
+      }
+
+      ul {
+        margin-top: 50px;
+        display: block;
+        li {
+          padding: 0;
+          margin-right: -15px;
+          margin-left: -45px;
+          a {
+            font-size: 18px;
+            font-weight: bold;
+            color: $gray;
+            display: block;
+            padding: 15px 0px 15px  45px;
+            &:hover {
+              text-decoration: none;
+              color: #fff;
+              background: $blue;
+            }
+          }
+        }
+      }
+
+    }
     .device-info-container {
-      display: inline-block;
-      width: 50%;
+      padding-left: 0;
+      padding-right: 0;
+      padding-bottom: 50px;
+      height: 100%;
+      background: #999;
+      border-left: 2px solid #ddd;
+
+      .machine-icon {
+        display: block;
+        margin: 0 auto;
+        margin-top: 100px;
+        width: 250px;
+      }
+
+      .version-info {
+        text-align: center;
+        color: #fff;
+
+        .item-version {
+          margin-top: 30px;
+
+          h3 {
+            margin: 0;
+          }
+          h2 {
+            margin: 0;
+            margin-top: 5px;
+          }
+        }
+      }
+
+      .update-button {
+        margin: 0 auto;
+        margin-top: 30px;
+        border: 1px solid #fff;
+        padding: 2px 20px;
+        background: #999;
+        font-weight: bold;
+      }
+
     }
 
   }
