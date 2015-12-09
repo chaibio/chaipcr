@@ -109,33 +109,27 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
 
       this.indicator.processMovement = function(step, C) {
         // Make a clone of the step
-        if(Math.abs(this.startPosition - this.endPosition) > 65) {
-          var stepClone = $.extend({}, step);
+        //if(Math.abs(this.startPosition - this.endPosition) > 65) {
+          var modelClone = $.extend({}, step.model);
           // Find the place where you left the moved step
           //var moveTarget = Math.floor((this.left + 60) / 120);
           var targetStep = this.currentDrop.circle.parent;
-          var targetStage = targetStep.parentStage;
 
-          // Delete the step you moved
-          step.parentStage.deleteStep({}, step);
-          // add clone at the place
-          var data = {
-            step: stepClone.model
-          };
+            var targetStage = targetStep.parentStage;
 
-          targetStage.addNewStep(data, targetStep);
+            // Delete the step, you moved
+            step.parentStage.deleteStep({}, step);
+            // add clone at the place
+            var data = {
+              step: modelClone
+            };
 
-          ExperimentLoader.moveStep(stepClone.model.id, targetStep.model.id, targetStage.model.id)
-            .then(function(data) {
-              console.log("Moved", data);
-            });
-
-        } else { // we dont have to update so bring back the path.
-          step.dots.setLeft(step.left + 16);
-          C.moveDots.setVisible(false);
-          circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
-          //step.toggleComponents(true);
-        }
+            targetStage.addNewStep(data, targetStep);
+            console.log(modelClone.id, targetStep.model.id, targetStage.model.id);
+            ExperimentLoader.moveStep(modelClone.id, targetStep.model.id, targetStage.model.id)
+              .then(function(data) {
+                console.log("Moved", data);
+              });
 
       };
 
