@@ -64,6 +64,14 @@ window.ChaiBioTech.ngApp.factory('circle', [
         this.getTop();
       };
 
+      this.moveCircleWithStep = function() {
+
+        this.getLeft();
+        this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
+        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
+        this.gatherDataDuringRampGroup.set({"left": this.left}).setCoords();
+      };
+
       this.setCenter = function(imgObj) {
         imgObj.originX = imgObj.originY = "center";
       };

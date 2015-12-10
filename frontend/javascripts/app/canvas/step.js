@@ -19,11 +19,34 @@ window.ChaiBioTech.ngApp.factory('step', [
       this.previousStep = null;
       this.gatherDataDuringStep = this.model.collect_data;
       this.gatherDataDuringRamp = this.model.ramp.collect_data;
+      this.shrinked = false;
 
       this.setLeft = function() {
 
         this.left = this.parentStage.left + 3 + (parseInt(this.index) * this.myWidth);
         return this;
+      };
+
+      this.shrinkStep = function() {
+        this.shrinked = true;
+        this.myWidth = 45;
+        this.stepRect.setWidth(45).setCoords();
+        this.borderRight.setLeft(-18).setCoords();
+        leftVal = {left: this.left + (this.myWidth / 2)};
+        this.hitPoint.set(leftVal).setCoords();
+        this.moveOtherStepsInStage();
+      };
+
+      this.moveOtherStepsInStage = function() {
+
+        var nxt = this.nextStep;
+        while(nxt) {
+          nxt.left = nxt.left - 80;
+          nxt.moveStep(0, false);
+          nxt.circle.moveCircleWithStep();
+          nxt = nxt.nextStep;
+        }
+        this.canvas.renderAll();
       };
 
       this.toggleComponents = function(state) {
@@ -32,11 +55,18 @@ window.ChaiBioTech.ngApp.factory('step', [
         this.circle.gatherDataOnScroll.setVisible(state);
         this.circle.circleGroup.setVisible(state);
         this.circle.gatherDataDuringRampGroup.setVisible(state);
+        this.closeImage.setVisible(state);
+        this.stepName.setVisible(state);
+        this.numberingTextCurrent.setVisible(state);
+        this.numberingTextTotal.setVisible(state);
       };
 
-      this.moveStep = function(action) {
+      this.moveStep = function(action, callSetLeft) {
 
-        this.setLeft();
+        if(callSetLeft) {
+          this.setLeft();
+        }
+
         this.getUniqueName();
         var leftVal = {left: this.left};
         this.stepGroup.set(leftVal).setCoords();

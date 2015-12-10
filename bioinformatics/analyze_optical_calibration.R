@@ -6,9 +6,9 @@ library(jsonlite)
 analyze_optical_calibration <- function(
     db_usr, db_pwd, db_host, db_port, db_name, 
     exp_id, 
-    calib_id, 
-    verbose=FALSE,
-    out_json=TRUE)
+    calib_id=NULL, # not used
+    verbose=FALSE, 
+    out_json=TRUE) 
 {
     message('db: ', db_name)
     db_conn <- dbConnect(RMySQL::MySQL(), 

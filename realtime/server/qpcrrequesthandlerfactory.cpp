@@ -40,7 +40,7 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
 
             if (method == "GET")
             {
-                if (requestPath.size() > 2 && requestPath.at(0) == "network")
+                if (requestPath.size() >= 2 && requestPath.at(0) == "network")
                 {
                     if (requestPath.size() == 2)
                         return new NetworkManagerHandler(requestPath.at(1), NetworkManagerHandler::GetStat);

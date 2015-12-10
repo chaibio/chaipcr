@@ -6,7 +6,7 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
                        exp_id, stage_id, calib_id, # for selecting data to analyze
                        verbose=FALSE, 
                        show_running_time=FALSE, # option to show time cost to run this function
-                       ... # options to pass onto `meltcurve`
+                       ... # options to pass onto `mc_tm_pw`
                        ) {
     
     # start counting for running time
@@ -81,23 +81,43 @@ get_mc_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connec
 
 
 # function: extract melting curve data and Tm for each well
-mc_tm_pw <- function(mt_pw) { # per well
+mc_tm_pw <- function(mt_pw, 
+                     qt_prob=0.8, # quantile probability point for normalized df/dT
+                     max_normd_qtv=0.5, # maximum normalized df/dT values (range 0-1) at the quantile probablity point
+                     top_N=4, # top number of Tm peaks to report
+                     min_frac_report=0.1 # minimum area fraction of the Tm peak to be reported in regards to the largest real Tm peak
+                     ) { # per well
+
     mc <- mt_pw[, c('Temp', 'Fluo', 'df.dT')]
-    tm <- na.omit(mt_pw[, c('Tm', 'Area')])
-    return(list('mc'=mc, 'tm'=tm))
+    
+    raw_tm <- na.omit(mt_pw[, c('Tm', 'Area')])
+    
+    range_dfdT <- range(mc$df.dT)
+    summit_pos <- which.max(mc$df.dT)
+    dfdT_normd <- (mc$df.dT - range_dfdT[1]) / (range_dfdT[2] - range_dfdT[1])
+    # range_dfdT[1] == min(mc$df.dT). range_dfdT[2] == max(mc$df.dT).
+    
+    if (  quantile(dfdT_normd[1:summit_pos],                qt_prob) <= max_normd_qtv
+        & quantile(dfdT_normd[summit_pos:length(dfdT_normd)], qt_prob) <= max_normd_qtv) {
+        tm_sorted <- raw_tm[order(-raw_tm$Area),]
+        tm_topN <- na.omit(tm_sorted[1:top_N,])
+        tm <- tm_topN[tm_topN$Area >= tm_topN[1, 'Area'] * min_frac_report,]
+    } else tm <- raw_tm[FALSE,]
+    
+    return(list('mc'=mc, 'tm'=tm, 'raw_tm'=raw_tm))
     }
 
 
 # function: output melting curve data and Tm for all the wells
 mc_tm_all <- function(mc_calib, show_running_time=FALSE, 
-                      ...) { # options to pass onto `meltcurve`
+                      ...) { # options to pass onto `mc_tm_pw`
     
     # start counting for running time
     func_name <- 'mc_tm_all'
     start_time <- proc.time()[['elapsed']]
     
-    mt_ori <- meltcurve(mc_calib, ...)
-    mt_out <- lapply(mt_ori, mc_tm_pw)
+    mt_ori <- meltcurve(mc_calib) # using qpcR function `meltcurve`
+    mt_out <- lapply(mt_ori, FUN=mc_tm_pw, ...)
     names(mt_out) <- colnames(mc_calib)[seq(2, dim(mc_calib)[2], by=2)]
     
     # report time cost for this function

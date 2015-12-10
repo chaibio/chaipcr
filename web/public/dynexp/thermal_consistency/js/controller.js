@@ -84,7 +84,7 @@
 
       $scope.createExperiment = function () {
         var exp = new Experiment({
-          experiment: {guid: 'hrm_calibration'}
+          experiment: {guid: 'thermal_consistency'}
         });
         exp.$save().then(function (resp) {
           Experiment.startExperiment(resp.experiment.id).then(function () {
