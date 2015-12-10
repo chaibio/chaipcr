@@ -8,10 +8,11 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
     exp_id, 
     #stage_id, # hard-coded inside of the function
     calib_id, 
-    min_fdiff_real=35, top_N=4, min_frac_report=0.1, 
     verbose=FALSE, 
     out_json=TRUE, 
-    show_running_time=FALSE)
+    show_running_time=FALSE, 
+    ... # options to pass onto `mc_tm_pw`
+    )
 {
     # hard-coded arguments
     floor_temp <- 72
@@ -22,9 +23,9 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
                         exp_id, 
                         stage_id, 
                         calib_id, 
-                        min_fdiff_real, top_N, min_frac_report, 
                         verbose, 
-                        show_running_time)
+                        show_running_time, 
+                        ...)
     
     names(mc_w72c) <- c('mc_out', '72c_fluorescence')
     

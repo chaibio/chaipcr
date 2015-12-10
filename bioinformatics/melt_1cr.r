@@ -5,9 +5,10 @@ melt_1cr <- function(floor_temp,
                      exp_id, 
                      stage_id, 
                      calib_id, 
-                     min_fdiff_real=35, top_N=4, min_frac_report=0.1, 
                      verbose=FALSE, 
-                     show_running_time=FALSE) {
+                     show_running_time=FALSE,
+                     ... # options to pass onto `mc_tm_pw`
+                     ) {
     
     # start counting for running time
     func_name <- 'melt_1cr'
@@ -20,7 +21,7 @@ melt_1cr <- function(floor_temp,
                              show_running_time)
     
     # get melting curve data for all the temperatures as well as Tm
-    mc_out <- mc_tm_all(mc_calib, min_fdiff_real, top_N, min_frac_report, show_running_time)
+    mc_out <- mc_tm_all(mc_calib, show_running_time, ...)
     
     # For each well, average the calibrated fluorescence values for the temperatures 72-73C
     mc_cols <- colnames(mc_calib)
