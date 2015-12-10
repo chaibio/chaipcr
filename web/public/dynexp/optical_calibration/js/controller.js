@@ -37,8 +37,10 @@
         }
         if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle' || $state.current.name === 'step-5')) {
           // experiment is complete
-          $state.go('step-6');
-          $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
+          Experiment.analyze($scope.experiment.id).then(function (resp) {
+            $state.go('step-6');
+            $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
+          });
         }
         if ($state.current.name === 'step-3' || $state.current.name === 'step-3-reading') {
           $scope.timeRemaining  = ($scope.timeRemaining - $scope.finalStepHoldTime());
