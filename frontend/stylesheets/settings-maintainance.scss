@@ -1,6 +1,9 @@
 @import 'colors.css.scss';
 
+
 .maintainance-container {
+
+  color: #000;
 
   .maintainance-container-backdrop {
     background: $gray;
@@ -28,5 +31,40 @@
       border-color: #ddd;
       border-width: 2px;
     }
+
+    .close {
+      font-size: 30px;
+      margin-top: -8px;
+    }
+    h3 {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .wizard-header {
+      margin-top: 30px;
+      margin-bottom: 15px;
+    }
+
+    .wizard {
+
+      margin-bottom: 10px;
+
+      h3 {
+        margin-top: 10px;
+      }
+      p {
+        color: $gray;
+        font-size: 15px;
+        font-family: 'dinot';
+      }
+
+      .button {
+        width: 100%;
+      }
+    }
+
+
+
   }
 }

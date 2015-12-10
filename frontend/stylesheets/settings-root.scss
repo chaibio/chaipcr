@@ -2,6 +2,7 @@
 
 .settings {
 
+  color: #fff;
 
   h1 {
     font-family: 'dinot-bold';
@@ -81,6 +82,26 @@
 
   .content {
 
+    .button {
+      border: 1px solid $gray;
+      background: #fff;
+      color: $gray;
+      display: inline-block;
+      border-radius: 0;
+      font-weight: bold;
+      width: 100px;
+      padding: 4px 0;
+
+      &:hover {
+        text-decoration: none;
+        background: $gray;
+        color: #fff;
+        border: none;
+        padding-top: 5px;
+        padding-bottom: 5px;
+      }
+    }
+
     .content-row {
       margin-right: 0;
     }
@@ -88,25 +109,9 @@
     .left-menu-container {
       padding-left: 45px;
 
-      .button {
-        border: 1px solid $gray;
-        background: #fff;
-        color: $gray;
-        display: inline-block;
-        border-radius: 0;
-        font-weight: bold;
-        width: 100px;
-        padding: 2px 0;
-
-        &:hover {
-          background: $lightgray;
-          color: #fff;
-          border-color: $lightgray;
-        }
-      }
-
       .user-container {
         text-align: center;
+        color: #000;
       }
 
       ul {
@@ -120,7 +125,7 @@
             cursor: pointer;
             font-size: 18px;
             font-weight: bold;
-            color: $gray;
+            color: #000;
             display: block;
             padding: 15px 0px 15px  45px;
             text-decoration: none;
