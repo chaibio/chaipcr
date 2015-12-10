@@ -4,6 +4,7 @@
 # function: get melting curve data and output it for plotting as well as Tm
 process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
                        exp_id, stage_id, calib_id, # for selecting data to analyze
+                       min_fdiff_real=1e2, top_N=4, min_frac_report=0.1, # for selecting most pronounced Tm peaks to report
                        verbose=FALSE, 
                        show_running_time=FALSE, # option to show time cost to run this function
                        ... # options to pass onto `meltcurve`
@@ -17,7 +18,9 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
                              exp_id, stage_id, calib_id, 
                              verbose, 
                              show_running_time)
-    mc_out <- mc_tm_all(mc_calib, show_running_time, ...)
+    mc_out <- mc_tm_all(mc_calib, 
+                        min_fdiff_real, top_N, min_frac_report, 
+                        show_running_time, ...)
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]
@@ -81,15 +84,30 @@ get_mc_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connec
 
 
 # function: extract melting curve data and Tm for each well
-mc_tm_pw <- function(mt_pw) { # per well
+mc_tm_pw <- function(mt_pw, 
+                     min_fdiff_real, # minimum fold difference between the Tm peaks with largest vs. smallest area for the well to be considered showing real Tm peaks instead of minimal noisy peaks
+                     top_N, # top number of Tm peaks to report
+                     min_frac_report # minimum area fraction of the Tm peak to be reported in regards to the largest real Tm peak
+                     # default values defined in `process_mc`, `melt_1cr`, `analyze_thermal_consistency`, 'test_pc1', 'test_beglebone1': min_fdiff_real=1e2, top_N=4, min_frac_report=0.1, 
+                     ) { # per well
+
     mc <- mt_pw[, c('Temp', 'Fluo', 'df.dT')]
-    tm <- na.omit(mt_pw[, c('Tm', 'Area')])
-    return(list('mc'=mc, 'tm'=tm))
+    
+    raw_tm <- na.omit(mt_pw[, c('Tm', 'Area')])
+    tm_sorted <- raw_tm[order(-raw_tm$Area),]
+    if (tm_sorted[1, 'Area'] / tm_sorted[nrow(tm_sorted), 'Area'] >= min_fdiff_real) {
+        tm_topN <- na.omit(tm_sorted[1:top_N,])
+        tm <- tm_topN[tm_topN$Area >= tm_topN[1, 'Area'] * min_frac_report,]
+    } else tm <- raw_tm[FALSE,]
+    
+    return(list('mc'=mc, 'tm'=tm, 'raw_tm'=raw_tm))
     }
 
 
 # function: output melting curve data and Tm for all the wells
-mc_tm_all <- function(mc_calib, show_running_time=FALSE, 
+mc_tm_all <- function(mc_calib, 
+                      min_fdiff_real, top_N, min_frac_report, # for mc_tm_pw
+                      show_running_time=FALSE, 
                       ...) { # options to pass onto `meltcurve`
     
     # start counting for running time
@@ -97,7 +115,8 @@ mc_tm_all <- function(mc_calib, show_running_time=FALSE,
     start_time <- proc.time()[['elapsed']]
     
     mt_ori <- meltcurve(mc_calib, ...)
-    mt_out <- lapply(mt_ori, mc_tm_pw)
+    mt_out <- lapply(mt_ori, FUN=mc_tm_pw, 
+                     min_fdiff_real=min_fdiff_real, top_N=top_N, min_frac_report=min_frac_report)
     names(mt_out) <- colnames(mc_calib)[seq(2, dim(mc_calib)[2], by=2)]
     
     # report time cost for this function
