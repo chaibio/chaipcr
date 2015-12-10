@@ -9,6 +9,6 @@ window.App.directive 'versionInfo', [
     link: ($scope, elem, attrs) ->
 
       Device.getVersion($scope.cache).then (resp) ->
-        console.log resp
+        $scope.data = resp
 
 ]

@@ -99,8 +99,9 @@
         padding: 2px 0;
 
         &:hover {
-          background: $gray;
+          background: $lightgray;
           color: #fff;
+          border-color: $lightgray;
         }
       }
 
@@ -122,8 +123,12 @@
             color: $gray;
             display: block;
             padding: 15px 0px 15px  45px;
-            &:hover, &.active {
-              text-decoration: none;
+            text-decoration: none;
+            &:hover {
+              color: #fff;
+              background: $lightgray;
+            }
+            &.active {
               color: #fff;
               background: $blue;
             }

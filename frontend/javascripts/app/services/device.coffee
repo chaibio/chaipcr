@@ -1,8 +1,12 @@
+
+
+
 window.App.service 'Device', [
   '$http'
   '$q'
   ($http, $q) ->
-    return new class Device
+
+    class Device
 
       version_info = null
 
@@ -13,9 +17,13 @@ window.App.service 'Device', [
         else
           promise = $http.get('/device')
           promise.then (resp) ->
-            version_info = resp
-            deferred.resolve resp
+            version_info = resp.data
+            deferred.resolve resp.data
+          promise.catch (resp) ->
+            deferred.reject resp
 
         return deferred.promise
+
+    return new Device
 
 ]
