@@ -10,6 +10,9 @@ window.App.service 'Device', [
 
       version_info = null
 
+      checkForUpdate: ->
+        $http.get('/device/software_update')
+
       getVersion: (cache = false) ->
         deferred = $q.defer()
         if cache and version_info
