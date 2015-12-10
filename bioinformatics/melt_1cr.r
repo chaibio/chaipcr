@@ -5,7 +5,7 @@ melt_1cr <- function(floor_temp,
                      exp_id, 
                      stage_id, 
                      calib_id, 
-                     min_fdiff_real=1e2, top_N=4, min_frac_report=0.1, 
+                     min_fdiff_real=35, top_N=4, min_frac_report=0.1, 
                      verbose=FALSE, 
                      show_running_time=FALSE) {
     

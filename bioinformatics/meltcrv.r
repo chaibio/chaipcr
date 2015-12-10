@@ -4,7 +4,7 @@
 # function: get melting curve data and output it for plotting as well as Tm
 process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
                        exp_id, stage_id, calib_id, # for selecting data to analyze
-                       min_fdiff_real=1e2, top_N=4, min_frac_report=0.1, # for selecting most pronounced Tm peaks to report
+                       min_fdiff_real=35, top_N=4, min_frac_report=0.1, # for selecting most pronounced Tm peaks to report
                        verbose=FALSE, 
                        show_running_time=FALSE, # option to show time cost to run this function
                        ... # options to pass onto `meltcurve`

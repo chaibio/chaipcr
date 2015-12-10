@@ -8,7 +8,7 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
     exp_id, 
     #stage_id, # hard-coded inside of the function
     calib_id, 
-    min_fdiff_real=1e2, top_N=4, min_frac_report=0.1, 
+    min_fdiff_real=35, top_N=4, min_frac_report=0.1, 
     verbose=FALSE, 
     out_json=TRUE, 
     show_running_time=FALSE)
