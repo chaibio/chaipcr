@@ -20,6 +20,9 @@ window.ChaiBioTech.ngApp.service 'User', [
 
       deferred.promise
 
+    @getCurrent = ->
+      $http.get('/users/current')
+
     @fetch = ->
       deferred = $q.defer()
       $http.get('/users').then (resp) ->

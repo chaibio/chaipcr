@@ -1,6 +1,6 @@
 object @user
-attribute :id, :email, :role
+attribute :id, :email, :role, :name
 
 node(:errors, :unless => lambda { |obj| obj.errors.empty? }) do |o|
-	o.errors
+  o.errors
 end
