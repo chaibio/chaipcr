@@ -1,8 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>We're sorry, but something went wrong (502)</title>
+  <title>Open qPCR is booting up</title>
   <style>
+
+  @font-face {
+    font-family: "dinot-regular";
+    font-weight: 300;
+    src: url("/fonts/dinot/DINOT-Regular.otf");
+  }
+
   body {
     background-color: #ff7b02;
     color: #ffffff;
@@ -15,10 +22,10 @@
   }
 
   #main-text {
-    width: 50%;
+    width: 55%;
     margin: auto;
     font-size: 40px;
-    font-family: sans-serif;
+    font-family: "dinot-regular";
     margin-top: 8%;
   }
 
@@ -26,10 +33,19 @@
     width: 50%;
     margin: auto;
     margin-top: 3%;
-    font-family: sans-serif;
+    font-family: "dinot-regular";
+    font-size: 18px;
   }
   </style>
   <script type="text/javascript" language="javascript">
+
+  var ref = window.location.href; // here we find the url of the page.
+  console.log("Coming from", ref);
+
+  var look = function(data) {
+    //console.log(data); Do Nothing here
+  };
+
   var ajax = {};
     ajax.x = function() {
       if (typeof XMLHttpRequest !== 'undefined') {
@@ -59,17 +75,25 @@
       var x = ajax.x();
       x.open(method, url, sync);
       x.onreadystatechange = function() {
-          if (x.readyState == 4) {
-              callback(x.responseText)
-          }
+        if(x.status === 200) { // 200 means that the page we are looking is ready.
+          console.log("Machine is ready");
+          location.href = ref; // Tell the browser to reload the page
+        } else { // if 502 , 404 anything other than 200.
+          ajax.send(ref, look, "GET", "", true);
+        }
+
+        if (x.readyState == 4) {
+          //callback(x.responseText)
+        }
       };
       if (method == 'POST') {
           x.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
       }
-      x.send(data)
+      x.send(data);
     };
 
-    ajax.get = function(url, data, callback, sync) {
+    ajax.send(ref, look, "GET", "", true);
+    /*ajax.get = function(url, data, callback, sync) {
       var query = [];
       for (var key in data) {
           query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
@@ -85,9 +109,7 @@
       ajax.send(url, callback, 'POST', query.join('&'), sync)
     };
 
-  </script>
-
-  </script>>
+    ajax.send(ref, look, "GET", "", true);*/
 
   </script>
 </head>
@@ -99,10 +121,10 @@
 
   <div id="main-text">
     Please wait,<br />
-    your qPcr is booting up.
+    Open qPCR is booting up.
   </div>
   <div id="small-text">
-    The web app will be unavailable untill this is complete.
+    The web app will be unavailable until this is complete.
   </div>
 </body>
 </html>

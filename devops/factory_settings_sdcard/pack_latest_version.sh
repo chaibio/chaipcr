@@ -35,6 +35,12 @@ image_filename_upgrade_tar_temp="${sdcard}/tmp/temp.tar"
 image_filename_upgrade_temp="${sdcard}/tmp/temp.tar.gz"
 image_filename_upgrade="${sdcard}/upgrade.img.gz"
 
+if [ "$1" = "factorysettings" ]
+then	
+	echo "Factory settings image creation"
+	image_filename_upgrade="${sdcard}/factory_settings.img.gz"
+fi
+
 echo "Packing eMMC image.."
 
 if [ ! -e  ${sdcard} ]
@@ -43,7 +49,7 @@ then
 fi
 
 umount ${sdcard} || true
-mount ${sdcard_dev}p1 ${sdcard} || true
+mount ${sdcard_dev}p1 ${sdcard} -t vfat || true
 
 cd $image_filename_folder
 
@@ -70,24 +76,6 @@ then
         mkdir -p ${sdcard}/tmp/
 fi
 
-#initiat auto run on first run for the eMMC after the upgrade.
-#echo mounting rootfs partition
-
-#mkdir -p /tmp/emmcp2
-#mount ${eMMC}p2 /tmp/emmcp2
-#echo "#!/bin/bash" >  /tmp/emmcp2/opt/scripts/boot/autorun.upgrade.sh
-#echo "cd /mnt/root/chaipcr/web" >> /tmp/emmcp2/opt/scripts/boot/autorun.upgrade.sh
-#echo "bundle exec rake db:migrate" >> /tmp/emmcp2/opt/scripts/boot/autorun.upgrade.sh
-#echo "bundle exec rake db:seed_fu" >> /tmp/emmcp2/opt/scripts/boot/autorun.upgrade.sh
-#echo "cd" >> /tmp/emmcp2/opt/scripts/boot/autorun.upgrade.sh
-#chmod +x /tmp/emmcp2/opt/scripts/boot/autorun.upgrade.sh
-#sync
-#ls -ahl /tmp/emmcp2/opt/scripts/boot/
-#umount /tmp/emmcp2
-
-#exit
-
-#copy eMMC contents
 echo "Copying eMMC partitions at $eMMC"
 sync
 echo "Packing up partition table to: $image_filename_pt"
@@ -104,7 +92,7 @@ fi
 rootfs_partition=${eMMC}p2
 data_partition=${eMMC}p3
 
-mount $rootfs_partition /tmp/emmc
+mount $rootfs_partition /tmp/emmc -t ext4
 retval=$?
 
 #30 minutes of delay allowed syncing big zero files
@@ -114,18 +102,31 @@ if [ $retval -ne 0 ]; then
     echo "Error mounting rootfs partition! Error($retval)"
 else
 	echo "Zeroing rootfs partition"
-	dd if=/dev/zero of=/tmp/emmc/big_zero_file1.bin bs=16M count=70> /dev/null
+	dd if=/dev/zero of=/tmp/emmc/big_zero_file1.bin bs=16M count=30> /dev/null
+	result=$?
 	sync &
 	sleep 5
-	dd if=/dev/zero of=/tmp/emmc/big_zero_file2.bin bs=16M count=70> /dev/null
-	sync &
-	sleep 5
-	dd if=/dev/zero of=/tmp/emmc/big_zero_file3.bin bs=16M count=70> /dev/null
-	sync &
-	sleep 5
-	dd if=/dev/zero of=/tmp/emmc/big_zero_file4.bin bs=16M> /dev/null
-	sync &
-	sleep 10
+
+	if [ $result -eq 0 ]
+	then
+		dd if=/dev/zero of=/tmp/emmc/big_zero_file2.bin bs=16M count=30> /dev/null
+		result=$?
+		sync &
+		sleep 5
+	fi
+	if [ $result -eq 0 ]
+	then
+		dd if=/dev/zero of=/tmp/emmc/big_zero_file3.bin bs=16M count=30> /dev/null
+		result=$?
+		sync &
+		sleep 5
+	fi
+	if [ $result -eq 0 ]
+	then
+		dd if=/dev/zero of=/tmp/emmc/big_zero_file4.bin bs=16M> /dev/null
+		sync &
+		sleep 10
+	fi
 
 	sync
 	echo "Removing zeros files"
@@ -145,37 +146,51 @@ sync
 echo "Packing up boot partition to: $image_filename_boot"
 dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
 
-echo "Data partition: $data_partition"
+if [ "$1" = "factorysettings" ]
+then
+	echo "Data partition: $data_partition"
+	umount /tmp/emmc>/dev/null || true
+	mount $data_partition /tmp/emmc -t ext4
 
-umount /tmp/emmc>/dev/null || true
-mount $data_partition /tmp/emmc
+	retval=$?
 
-retval=$?
+	if [ $retval -ne 0 ]; then
+	    echo "Error mounting data partition! Error($retval)"
+	else
+		echo "Zeroing data partition"
+		dd if=/dev/zero of=/tmp/emmc/big_zero_file.bin > /dev/null
+		sync &
+		sleep 5
+		sync
 
-if [ $retval -ne 0 ]; then
-    echo "Error mounting data partition! Error($retval)"
+		echo "Removing zeros file"
+		rm /tmp/emmc/big_zero_file.bin
+		sync &
+		sleep 10
+		sync
+
+		umount /tmp/emmc > /dev/null || true
+	fi
+
+	echo "Packing up data partition to: $image_filename_data"
+	dd  if=${eMMC}p3 bs=16M | gzip -c > $image_filename_data
+
+	#tarring
+	echo "compressing all images to $image_filename_upgrade_tar_temp"
+	tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_data $image_filename_rootfs
+
+	if [ -e $image_filename_data ]
+	then
+		rm $image_filename_data
+	else
+       		echo "Data image not found: $image_filename_data"
+	fi
 else
-	echo "Zeroing data partition"
-	dd if=/dev/zero of=/tmp/emmc/big_zero_file.bin > /dev/null
-	sync &
-	sleep 5
-	sync
-
-	echo "Removing zeros file"
-	rm /tmp/emmc/big_zero_file.bin
-	sync &
-	sleep 10
-	sync
-
-	umount /tmp/emmc > /dev/null || true
+	#tarring
+	echo "compressing all images to $image_filename_upgrade_tar_temp"
+	tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs
 fi
 
-echo "Packing up data partition to: $image_filename_data"
-dd  if=${eMMC}p3 bs=16M | gzip -c > $image_filename_data
-
-#tarring
-echo "compressing all images to $image_filename_upgrade_tar_temp"
-tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_data $image_filename_rootfs
 
 #error handling needed..
 
@@ -185,13 +200,6 @@ then
 	rm $image_filename_boot
 else
        	echo "Boot image not found: $image_filename_boot"
-fi
-
-if [ -e $image_filename_data ]
-then
-	rm $image_filename_data
-else
-       	echo "Data image not found: $image_filename_data"
 fi
 
 if [ -e $image_filename_rootfs ]
@@ -210,24 +218,12 @@ echo "Finalizing: $image_filename_upgrade"
 echo "mv $image_filename_upgrade_temp $image_filename_upgrade"
 mv $image_filename_upgrade_temp $image_filename_upgrade
 
-#echo "Removing packing autorun script from eMMC!"
-#echo "mount ${eMMC}p2 /tmp/emmcp2"
-#mount ${eMMC}p2 /tmp/emmcp2
-#ls /tmp/emmcp2/opt/scripts/boot/
-#rm /tmp/emmcp2/opt/scripts/boot/autorun.upgrade.sh
-#ls /tmp/emmcp2/opt/scripts/boot/
-
-#sync
-#umount /tmp/emmcp2
-
 echo "Finished.. byebye!"
 
 if [ -e ${sdcard}/pack_resume_autorun.flag ]
 then
 	rm ${sdcard}/pack_resume_autorun.flag>/dev/null || true 
 fi
-
-
 
 echo 60 > /proc/sys/kernel/hung_task_timeout_secs
 

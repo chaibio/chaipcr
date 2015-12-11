@@ -26,7 +26,18 @@ class UsersController < ApplicationController
       format.json { render "index", :status => :ok }
     end
   end
-  
+
+  api :GET, "/users/:id or /users/current", "show user with id or current user info"
+  example "[{'user':{'id':1,'name':'test','email':'test@test.com','role':'user'}}]"
+  def show
+    if params[:id] == "current"
+      @user = current_user
+    end
+    respond_to do |format|
+      format.json { render "show", :status => :ok}
+    end
+  end
+    
   api :POST, "/users", "Create an user"
   param_group :user
   example "[{'user':{'id':1,'name':'test','email':'test@test.com','role':'user'}}]"
