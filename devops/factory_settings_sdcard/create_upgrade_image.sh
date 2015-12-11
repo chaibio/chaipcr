@@ -21,7 +21,7 @@ then
 	exit 1
 fi
 
-echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger 
+echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
 sdcard="/sdcard"
 
 set_sdcard_uEnv () {
@@ -39,11 +39,11 @@ uEnvPath=/tmp/uEnvPath
 mkdir -p ${uEnvPath} > /dev/null
 
 umount ${uEnvPath} > /dev/null
-mount ${eMMC}p1 ${uEnvPath}
+mount ${eMMC}p1 ${uEnvPath} -t vfat
 set_sdcard_uEnv
 umount ${uEnvPath}> /dev/null
 
-mount ${sdcard_dev}p1 ${uEnvPath}
+mount ${sdcard_dev}p1 ${uEnvPath} -t vfat
 set_sdcard_uEnv
 
 NOW=$(date +"%m-%d-%Y %H:%M:%S")
