@@ -38,6 +38,16 @@
   }
   </style>
   <script type="text/javascript" language="javascript">
+
+  var ref = window.location.href; // here we find the url of the page.
+  console.log("Coming from", ref);
+
+  var look = function(data) {
+    //console.log(data); Do Nothing here
+  };
+
+
+
   var ajax = {};
     ajax.x = function() {
       if (typeof XMLHttpRequest !== 'undefined') {
@@ -67,17 +77,25 @@
       var x = ajax.x();
       x.open(method, url, sync);
       x.onreadystatechange = function() {
-          if (x.readyState == 4) {
-              callback(x.responseText)
-          }
+        if(x.status === 200) { // 200 means that the page we are looking is ready.
+          console.log("Machine is ready");
+          location.href = ref; // Tell the browser to reload the page
+        } else {
+          ajax.send(ref, look, "GET", "", true);
+        }
+
+        if (x.readyState == 4) {
+          //callback(x.responseText)
+        }
       };
       if (method == 'POST') {
           x.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
       }
-      x.send(data)
+      x.send(data);
     };
 
-    ajax.get = function(url, data, callback, sync) {
+    ajax.send(ref, look, "GET", "", true);
+    /*ajax.get = function(url, data, callback, sync) {
       var query = [];
       for (var key in data) {
           query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
@@ -92,6 +110,8 @@
       }
       ajax.send(url, callback, 'POST', query.join('&'), sync)
     };
+
+    ajax.send(ref, look, "GET", "", true);*/
 
   </script>
 </head>
