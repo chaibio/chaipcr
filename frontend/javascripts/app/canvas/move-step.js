@@ -111,6 +111,8 @@ window.ChaiBioTech.ngApp.factory('moveStepRect', [
         // Make a clone of the step
         //if(Math.abs(this.startPosition - this.endPosition) > 65) {
           var modelClone = $.extend({}, step.model);
+          // We had shrinked the stage, Now we undo it.
+          step.parentStage.expand();
           // Find the place where you left the moved step
           //var moveTarget = Math.floor((this.left + 60) / 120);
           var targetStep = this.currentDrop.circle.parent;

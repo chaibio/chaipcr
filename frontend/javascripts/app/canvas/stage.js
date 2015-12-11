@@ -20,6 +20,7 @@ window.ChaiBioTech.ngApp.factory('stage', [
       this.childSteps = [];
       this.previousStage = this.nextStage = this.noOfCycles = null;
       this.insertMode = insert;
+      this.shrinked = false;
 
       this.setNewWidth = function(add) {
 
@@ -27,6 +28,24 @@ window.ChaiBioTech.ngApp.factory('stage', [
         this.stageRect.setWidth(this.myWidth);
         this.stageRect.setCoords();
         this.roof.setWidth(this.myWidth);
+      };
+
+      this.shrinkStage = function() {
+
+        console.log("okay Shrinking");
+        this.shrinked = true;
+        this.myWidth = this.myWidth - 64;
+        this.roof.setWidth(this.myWidth).setCoords();
+        this.stageRect.setWidth(this.myWidth).setCoords();
+        // Befor actually move the step in process movement stage values.
+        // Find next stageDots
+        // Move all the steps in it to left.
+        // Move stage to left ...!!
+      };
+
+      this.expand = function() {
+
+        this.myWidth = this.myWidth + 64;
       };
 
       this.addNewStep = function(data, currentStep) {
