@@ -27,7 +27,7 @@ analyze_optical_calibration <- function(
         valid <- TRUE
         err <- NULL }
     
-    result2 <- list('valid'=valid, 'error_message'=err)
+    result2 <- list('valid'=unbox(valid), 'error_message'=unbox(err))
     
     if (out_json) result2 <- toJSON(result2)
     
