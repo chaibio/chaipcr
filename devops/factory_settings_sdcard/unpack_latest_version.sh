@@ -21,23 +21,6 @@ then
 	exit 1
 fi
 
-unmount_emmc () {
-echo "Prevent writing to eMMC"
-#umount -l /boot/uboot
-
-mount -o ro,remount /dev/mmcblk1p1
-
-lsblk
-fuser -wkm /dev/mmcblk1p2 && mount -o ro,remount /dev/mmcblk1p2
-
-#fuser -km ${eMMC}p2
-#umount -l ${eMMC}p2
-
-lsblk
-#exit
-}
-
-
 flush_cache_mounted () {
 	sync
 	command -v -- blockdev
@@ -84,51 +67,37 @@ write_boot_image () {
 }
 
 extract_image_files () {
+	if [ -e  $image_filename_upgrade_tar_temp ]
+	then
+		rm $image_filename_upgrade_tar_temp
+	fi
 
-if [ -e  $image_filename_upgrade_tar_temp ]
-then
-	rm $image_filename_upgrade_tar_temp
-fi
+	if [ -e $image_filename_upgrade_temp ]
+	then	
+		rm $image_filename_upgrade_temp
+	fi
 
-if [ -e $image_filename_upgrade_temp ]
-then
-	rm $image_filename_upgrade_temp
-fi
+	cp $image_filename_upgrade $image_filename_upgrade_temp
 
-cp $image_filename_upgrade $image_filename_upgrade_temp
+	echo "Untar upgrade tar from $image_filename_upgrade_temp"
 
-echo "Untar upgrade tar from $image_filename_upgrade_temp"
-#gunzip $image_filename_upgrade_temp
+	cd $image_filename_upgrade_tar_temp_folder
+	tar -xvf $image_filename_upgrade_temp
 
-#echo "uncompressing tar ball from $image_filename_upgrade_tar_temp to $image_filename_upgrade_temp_folder"
-cd $image_filename_upgrade_tar_temp_folder
-tar -xvf $image_filename_upgrade_temp
-# --directory $image_filename_upgrade_tar_temp_folder
+	if [ -e  $image_filename_upgrade_tar_temp ]
+	then
+        	rm $image_filename_upgrade_tar_temp
+	fi
 
-#exit
+	if [ -e $image_filename_upgrade_temp ]
+	then
+        	rm $image_filename_upgrade_temp
+	fi
 
-#rm $image_filename_upgrade_tar_temp
-
-
-if [ -e  $image_filename_upgrade_tar_temp ]
-then
-        rm $image_filename_upgrade_tar_temp
-fi
-
-if [ -e $image_filename_upgrade_temp ]
-then
-        rm $image_filename_upgrade_temp
-fi
-
-echo "Writing images to eMMC!"
+	echo "Writing images to eMMC!"
 }
 
-#check_running_system
-
 echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-
-#echo "Debug copy!"
-#cp ../../backup/upgrade.img.gz ../../
 
 sdcard="/sdcard"
 
@@ -143,18 +112,25 @@ image_filename_upgrade_tar_temp_folder="${sdcard}/tmp/"
 
 image_filename_upgrade="${sdcard}/upgrade.img.gz"
 
+if [ "$1" = "factorysettings" ]
+then
+	image_filename_upgrade="${sdcard}/factory_settings.img.gz"
+fi
+
 if [ ! -e ${sdcard}/tmp/ ]
 then
        mkdir -p ${sdcard}/tmp/
 fi
 
 umount ${sdcard} || true
-mount ${sdcard_dev}p1 ${sdcard} || true
+mount ${sdcard_dev}p1 ${sdcard} -t vfat || true
 
 NOW=$(date +"%m-%d-%Y %H:%M:%S")
-echo "Upgrade resume flag up!"
-echo "Upgrade started at: $NOW">>${sdcard}/unpack_resume_autorun.flag
 
+unpack_resume_flag_up () {
+	echo "Upgrade resume flag up!"
+	echo "Upgrade started at: $NOW">>${sdcard}/unpack_resume_autorun.flag
+}
 echo "Unpacking eMMC image.."
 
 if [ ! -e ${sdcard}/tmp/ ]
@@ -164,8 +140,7 @@ fi
 
 if [ ! -e  $image_filename_upgrade ]
 then
-	echo "Uprade image not found: $image_filename_upgrade.. exit!"
-#	echo "Upgrade resume flag down!"
+	echo "Image not found: $image_filename_upgrade.. exit!"
 	rm ${sdcard}/unpack_resume_autorun.flag
 
 	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
@@ -174,42 +149,125 @@ then
 	exit 0
 fi
 
-extract_image_files
+echo "Run with $1 $2"
 
-if [ -e $image_filename_boot ]
+stage=0
+counter_file=${sdcard}/unpack_stage.ini
+
+incriment_stage_counter () {
+	# Incriment and display restart counter
+	counter_old=$(cat ${counter_file})
+	stage=$((counter_old+1))
+	echo $stage > $counter_file
+	echo "Unpacking stage: $stage"
+}
+
+reset_stage_counter () {
+	echo "Resetting stage counter."
+	echo 1 > ${sdcard}/unpack_stage.ini
+	stage=1
+	echo "Unpacking stage: $stage"
+}
+
+if [ $# -eq 2 ] && [ $2 -eq 2 ]
 then
-        write_boot_image
-	rm $image_filename_boot
+	reset_stage_counter
 else
-       	echo "Boot image not found: $image_filename_boot"
+	stage=$(cat ${counter_file})
+	echo "Unpacking stage: $stage"
 fi
 
-if [ -e $image_filename_rootfs ]
+if [ $stage -lt 2 -o  ! -e $image_filename_boot -o ! -e $image_filename_rootfs -o ! -e $image_filename_pt ]
 then
-	write_rootfs_image
- 	rm $image_filename_rootfs
-else
-        echo "Rootfs image not found: $image_filename_rootfs"
+	echo "Extracting image.."
+	reset_stage_counter 
+	extract_image_files
+	incriment_stage_counter
 fi
 
 if [ -e $image_filename_pt ]
 then
         write_pt_image
 	rm $image_filename_pt
+	if [ $stage -le 2 ]
+	then
+		echo Partition table wrote.
+		incriment_stage_counter
+		#reboot needs to set sdcard only
+	fi
 else
 	echo "Partition table image not found!"
 fi
 
-if [ "$1" -eq "withdata" ]
+set_sdcard_uEnv () {
+	echo copying coupling uEng.txt
+	mount ${eMMC}p1 /emmcboot -t vfat || true
+	cp /sdcard/uEnv.txt /emmcboot/
+	sh /sdcard/replace_uEnv.txt.sh /emmcboot || true
+	uEnvPath=/emmcboot
+
+	cp ${uEnvPath}/uEnv.txt ${uEnvPath}/uEnv.org.txt
+	cp ${uEnvPath}/uEnv.sdcard.txt ${uEnvPath}/uEnv.txt
+
+	sync
+	sleep 5
+	umount /emmcboot || true
+}
+
+update_uenv () {
+	echo copying coupling uEng.txt
+	mount ${eMMC}p1 /emmcboot -t vfat || true
+	cp /sdcard/uEnv.txt /emmcboot/
+	sh /sdcard/replace_uEnv.txt.sh /emmcboot || true
+	sync
+	sleep 5
+	umount /emmcboot || true
+}
+
+if [ -e $image_filename_boot ]
+then
+	# needs to add a uEnv to swtich things to sdcard
+	echo "Freeup boot during the backup process"
+	mkfs.vfat ${eMMC}p1 -n boot
+#	update_uenv
+#	set_sdcard_uEnv
+	incriment_stage_counter
+fi
+
+if [ "$1" = "factorysettings" ]
 then
 	if [ -e $image_filename_data ]
 	then
         	write_data_image
 	        rm $image_filename_data
+		incriment_stage_counter	
 	else
         	echo "Data image not found!"
 	fi
 fi
+
+if [ -e $image_filename_rootfs ]
+then
+	write_rootfs_image
+ 	rm $image_filename_rootfs
+	incriment_stage_counter	
+else
+        echo "Rootfs image not found: $image_filename_rootfs"
+fi
+
+if [ -e $image_filename_boot ]
+then
+        write_boot_image
+	rm $image_filename_boot
+	incriment_stage_counter	
+	update_uenv
+	incriment_stage_counter
+else
+       	echo "Boot image not found: $image_filename_boot"
+fi
+
+update_uenv
+incriment_stage_counter
 
 echo "Finished.. byebye!"
 echo "Upgrade resume flag down!"
@@ -223,15 +281,22 @@ upgrade_autorun_flag_up () {
 	echo "Autorun scripts after boot.. requested on $NOW" > ${sdcard}/upgrade_autorun.flag
 }
 
+upgrade_autorun_flag_down () {
+	if [ -e ${sdcard}/upgrade_autorun.flag ] 
+	then
+		rm ${sdcard}/upgrade_autorun.flag || true
+	fi
+}
+
 if [ $# -eq 0 ]
 then
-	upgrade_autorun_flag_up
+	upgrade_autorun_flag_down
 	reboot
 fi
 
-if [ ! $1 -eq "withdata" ]
+if [ "$1" != "factorysettings" ]
 then
-	upgrade_autorun_flag_up
+	upgrade_autorun_flag_down
 fi
 
 exit 0

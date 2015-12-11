@@ -41,7 +41,7 @@ then
 fi
 
 umount /sdcard > /dev/null || true
-mount $sdcard_dev /sdcard || true
+mount $sdcard_dev /sdcard -t vfat || true
 
 sdcard="/sdcard"
 
@@ -105,7 +105,7 @@ partition_drive () {
 
 update_uenv () {
 	echo copying coupling uEng.txt
-	mount ${eMMC}p1 /emmcboot || true
+	mount ${eMMC}p1 /emmcboot -t vfat || true
 	cp /sdcard/uEnv.txt /emmcboot/
 	sh /sdcard/replace_uEnv.txt.sh /emmcboot || true
 	sync
@@ -113,14 +113,12 @@ update_uenv () {
 	umount /emmcboot || true
 }
 
-
-
 reset_uenv () {
 	echo "resetting uEnv!"
 	cp ${sdcard}/uEnv.72check.txt ${sdcard}/uEnv.txt
 
         mkdir -p /tmp/emmcboot
-        mount ${eMMC}p1 /tmp/emmcboot
+        mount ${eMMC}p1 /tmp/emmcboot -t vfat
 
 	cp /tmp/emmcboot/uEnv.72check.txt /tmp/emmcboot/uEnv.txt
 	sync
@@ -133,8 +131,15 @@ reset_uenv () {
 stop_packing_restarting ()
 {
 	reset_uenv
-        rm ${sdcard}/pack_resume_autorun.flag
-        rm ${sdcard}/unpack_resume_autorun.flag
+	if [ -e ${sdcard}/pack_resume_autorun.flag ]
+	then
+        	rm ${sdcard}/pack_resume_autorun.flag
+	fi
+
+	if [ -e ${sdcard}/unpack_resume_autorun.flag ]
+	then
+        	rm ${sdcard}/unpack_resume_autorun.flag
+	fi
 }
 
 incriment_restart_counter () {
@@ -146,14 +151,16 @@ incriment_restart_counter () {
 	echo "Restart counter: $counter"
 }
 
+counter=2
+
 if [ -e ${sdcard}/unpack_resume_autorun.flag ]
 then
         echo "Resume eMMC unpacking flag found up"
         incriment_restart_counter
 
-        if [ "$counter" -ge 5 ]
+        if [ "$counter" -ge 7 ]
         then
-                echo Restart counter exceeded 4.. quitting upgrade operation
+                echo Restart counter exceeded 7.. quitting upgrade operation
                 stop_packing_restarting
                 echo Rebooting
 #                exit 0
@@ -161,9 +168,9 @@ then
         fi
 
         echo "Resuming eMMC unpacking"
- 	sh /sdcard/unpack_latest_version.sh noreboot || true
+ 	sh /sdcard/unpack_latest_version.sh noreboot $counter || true
         result=$?
-        if [ result -eq 1 ]
+        if [ $result -eq 1 ]
         then
                 echo Error unpacking eMMC, restarting...
 #                exit 0
@@ -194,7 +201,7 @@ then
 
 	sh /sdcard/pack_latest_version.sh || true
 	result=$?
-	if [ result -eq 1 ]
+	if [ $result -eq 1 ]
 	then
 		echo Error packing eMMC, restarting...
 #		exit 0
@@ -207,21 +214,16 @@ then
 	exit
 fi
 
-if [ ! -e ${sdcard}/upgrade.img.gz ]
+if [ ! -e ${sdcard}/factory_settings.img.gz ]
 then
 	echo "Creating factory settings images! Copying from eMMC at $eMMC to sdcard at $sdcard_dev!"
-	sh /sdcard/pack_latest_Version.sh || true
+	sh /sdcard/pack_latest_Version.sh factorysettings || true
 	sync
 	echo Creating factory settings image done.. Now creating upgrade image. 	
 	echo timer > /sys/class/leds/beaglebone\:green\:usr1/trigger
 	alldone
 	exit 0
 fi
-
-
-
-
-
 
 if [ ! -e ${eMMC}p4 ]
 then
@@ -242,7 +244,7 @@ else
 fi
 
 echo "Copying from sdcard at $sdcard_dev to eMMC at $eMMC!"
-sh /sdcard/unpack_latest_version.sh withdata || true
+sh /sdcard/unpack_latest_version.sh factorysettings $counter || true
 
 if [ -e "${eMMC}p4" ]
 then
@@ -262,7 +264,7 @@ then
 	then
 		rm ${sdcard}/write_perm_partition.flag
 		mkdir -p /tmp/perm
-		mount ${eMMC}p4 /tmp/perm
+		mount ${eMMC}p4 /tmp/perm -t ext4
 		rm -r /tmp/perm/*
 		echo "Done formatting /perm partition"
 		umount /tmp/perm/
@@ -274,8 +276,6 @@ echo "eMMC Flasher: all done!"
 sync
 sleep 5
 umount /sdcard > /dev/null || true 
- 
-
 
 alldone
 
