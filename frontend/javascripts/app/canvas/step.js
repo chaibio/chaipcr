@@ -35,6 +35,7 @@ window.ChaiBioTech.ngApp.factory('step', [
         leftVal = {left: this.left + (this.myWidth / 2)};
         this.hitPoint.set(leftVal).setCoords();
         this.moveOtherStepsInStage();
+        this.parentStage.shrinkStage();
       };
 
       this.moveOtherStepsInStage = function() {
