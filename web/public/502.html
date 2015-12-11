@@ -3,6 +3,13 @@
 <head>
   <title>Open qPCR is booting up</title>
   <style>
+
+  @font-face {
+    font-family: "dinot-regular";
+    font-weight: 300;
+    src: url("/fonts/dinot/DINOT-Regular.otf");
+  }
+
   body {
     background-color: #ff7b02;
     color: #ffffff;
@@ -15,10 +22,10 @@
   }
 
   #main-text {
-    width: 50%;
+    width: 55%;
     margin: auto;
     font-size: 40px;
-    font-family: sans-serif;
+    font-family: "dinot-regular";
     margin-top: 8%;
   }
 
@@ -26,7 +33,8 @@
     width: 50%;
     margin: auto;
     margin-top: 3%;
-    font-family: sans-serif;
+    font-family: "dinot-regular";
+    font-size: 18px;
   }
   </style>
   <script type="text/javascript" language="javascript">
@@ -84,10 +92,6 @@
       }
       ajax.send(url, callback, 'POST', query.join('&'), sync)
     };
-
-  </script>
-
-  </script>>
 
   </script>
 </head>
