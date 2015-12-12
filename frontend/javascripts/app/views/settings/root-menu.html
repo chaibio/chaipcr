@@ -25,8 +25,8 @@
           ACTIVE USER
         </h2>
         <div class="user-container">
-          <h2>Josh Perfetto</h2>
-          <h3>Admin</h3>
+          <h2>{{user.name}}</h2>
+          <h3 ng-show="user.role === 'admin'">Admin</h3>
           <div class="buttons-container">
             <button class="button" logout>LOG OUT</button>
             <button class="button">EDIT</button>

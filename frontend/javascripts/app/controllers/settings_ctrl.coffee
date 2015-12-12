@@ -1,6 +1,11 @@
 window.App.controller 'SettingsCtrl', [
   '$scope'
-  ($scope) ->
-    console.log 'SettingsCtrl'
+  'User'
+  ($scope, User) ->
+    User.getCurrent().then (resp) ->
+      $scope.user = resp.data.user
 
+
+    backdrop = $('.maintainance-backdrop')
+    backdrop.css('height', $('.wizards-container').height())
 ]

@@ -11,4 +11,8 @@ window.App.directive 'versionInfo', [
       Device.getVersion($scope.cache).then (resp) ->
         $scope.data = resp
 
+      $scope.checkForUpdate = ->
+        Device.checkForUpdate().then (resp) ->
+          $scope.update = resp
+
 ]
