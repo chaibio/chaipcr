@@ -79,7 +79,7 @@
           console.log("Machine is ready");
           location.href = ref; // Tell the browser to reload the page
         } else { // if 502 , 404 anything other than 200.
-          ajax.send(ref, look, "GET", "", true);
+          //ajax.send(ref, look, "GET", "", true);
         }
 
         if (x.readyState == 4) {
@@ -92,7 +92,11 @@
       x.send(data);
     };
 
-    ajax.send(ref, look, "GET", "", true);
+    var timeout = setInterval(function() {
+      ajax.send(ref, look, "GET", "", true);
+    }, 1000);
+
+    //ajax.send(ref, look, "GET", "", true);
     /*ajax.get = function(url, data, callback, sync) {
       var query = [];
       for (var key in data) {
