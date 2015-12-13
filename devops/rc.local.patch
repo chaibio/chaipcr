@@ -34,7 +34,7 @@ diff -urN ./rc.local ../updated/rc.local
 +	then
 +		echo "SDCard block device found at $sdcard_dev" >> $log_file
 +
-+		sdcard=/tmp/sdcard
++		sdcard=/sdcard
 +		mkdir -p ${sdcard}>/dev/null || true
 +		mount ${sdcard_dev}p1 ${sdcard}>/dev/null || true
 +
@@ -55,7 +55,7 @@ diff -urN ./rc.local ../updated/rc.local
 +			echo "No autorun flag found!" >> $log_file
 +		fi
 +
-+		umount ${sdcard}>/dev/null || true
++		#umount ${sdcard}>/dev/null || true
 +		return 0
 +	fi
 +	return 1
