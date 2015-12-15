@@ -24,7 +24,9 @@
     width: 300px;
     //min-height: 100%;
     height: 100%;
-    overflow: auto;
+    //overflow: scroll;
+    overflow-x: hidden;
+    overflow-y: scroll;
     border-right: 1px solid #ddd;
     padding-left: 15px;
     padding-right: 15px;
