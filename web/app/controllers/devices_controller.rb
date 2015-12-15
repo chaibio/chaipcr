@@ -7,8 +7,6 @@ class DevicesController < ApplicationController
   before_filter :allow_cors, :except=>[:root_password]
   before_filter :ensure_authenticated_user, :only=>[:show, :capabilities, :enable_support_access]
   
-  CLOUD_SERVER = "http://cloudops.chaibio.com"
-  
   respond_to :json
   
   resource_description { 
@@ -160,6 +158,8 @@ class DevicesController < ApplicationController
     
     #run ngrok
     system("/root/ngrok tcp -log=stdout 22 > /dev/null &")
+    
+    sleep(1.0)
     
     #get tunnel_url
     begin

@@ -3,6 +3,8 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :null_session
 
+  CLOUD_SERVER = "http://cloudops.chaibio.com"
+ 
   protected
 
   def kill_process(process_name)
