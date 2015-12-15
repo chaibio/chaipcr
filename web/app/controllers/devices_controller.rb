@@ -1,9 +1,13 @@
+require "net/http"
+
 class DevicesController < ApplicationController
   include ParamsHelper
   
   skip_before_action :verify_authenticity_token, :except=>[:root_password]
   before_filter :allow_cors, :except=>[:root_password]
-  before_filter :ensure_authenticated_user, :only=>[:show, :capabilities]
+  before_filter :ensure_authenticated_user, :only=>[:show, :capabilities, :enable_support_access]
+  
+  CLOUD_SERVER = "http://cloudops.chaibio.com"
   
   respond_to :json
   
@@ -104,8 +108,101 @@ class DevicesController < ApplicationController
     end
   end
   
+  api :POST, "/device/enable_support_access", "enable remote support access"
+  def enable_support_access
+    device_file = File.read(DEVICE_FILE_PATH)
+    device_hash = JSON.parse(device_file)
+    configuration_file = File.read(CONFIGURATION_FILE_PATH)
+    configuration_hash = JSON.parse(configuration_file)
+    query_hash = Hash.new
+    query_hash[:v] = 1
+    query_hash[:model_number] = device_hash["model_number"]
+    query_hash[:software_version] = configuration_hash["software"]["version"]
+    query_hash[:software_platform] = configuration_hash["software"]["platform"]
+    query_hash[:serial_number] = device_hash["serial_number"]
+    #query_hash[:device_signature]
+    
+    #query cloud server for auth_token and ssh keys
+    url = URI.parse("#{CLOUD_SERVER}/device/provision_support_access?#{query_hash.to_query}")
+    begin
+      response = Net::HTTP.get_response(url)
+    rescue  => e
+      render json: {errors: "chai cloud server #{CLOUD_SERVER} cannot be reached: #{e}"}, status: 500
+      return
+    end
+    
+    if response.code.to_i != 200 
+      render json: {errors: "chai cloud server #{CLOUD_SERVER} provision_support_access fails (#{response.code}): #{response.body}"}, status: 500
+      return
+    end
+    
+    #setup ngrok
+    json_response = JSON.parse(response.body)
+    
+    begin
+      logger.info("replace /root/.ngrok2/ngrok.yml")
+      File.open("/root/.ngrok2/ngrok.yml", 'w') {|f| f.write("authtoken: #{json_response["tunnel_authtoken"]}") }
+    rescue  => e
+      render json: {errors: "open ngrok.yml fails: #{e}"}, status: 500
+      return
+    end
+    
+    begin
+      logger.info("replace /home/service/.ssh/authorized_keys")
+      File.open("/home/service/.ssh/authorized_keys", 'w') {|f| f.write(json_response["ssh_access_key"]) }
+    rescue  => e
+      render json: {errors: "open .ssh/authorized_keys fails: #{e}"}, status: 500
+      return
+    end
+        
+    #kill ngrok
+    kill_process("ngrok")
+    
+    #run ngrok
+    system("/root/ngrok tcp -log=stdout 22 > /dev/null &")
+    
+    #get tunnel_url
+    begin
+      response = Net::HTTP.get_response(URI.parse("http://localhost:4040/api/tunnels"))
+    rescue  => e
+      render json: {errors: "ngrok is not running: #{e}"}, status: 500
+      return
+    end
+    
+    if response.code.to_i != 200 
+      render json: {errors: "ngrok api/tunnels returns error ()#{response.code}): #{response.body}"}, status: 500
+      return
+    end
+    
+    json_response = JSON.parse(response.body)
+    tunnel_url = json_response["tunnels"][0]["public_url"]
+    logger.info("tunnel_url=#{tunnel_url}")
+    
+    if tunnel_url.blank?
+      render json: {errors: "tunnel_url is not found"}, status: 500
+      return
+    end
+    
+    #post to cloud server
+    begin
+      uri = URI.parse("#{CLOUD_SERVER}/device/establish_support_tunnel")
+      response = Net::HTTP.post_form(uri, 'serial' => device_hash["serial_number"], 'url' => tunnel_url)
+    rescue => e
+      render json: {errors: "chai cloud server #{CLOUD_SERVER} cannot be reached: #{e}"}, status: 500
+      return
+    end
+    
+    if response.code.to_i != 200 
+      render json: {errors: "publish tunnel url #{tunnel_url} failed (#{response.code}): #{response.body}"}, status: 500
+      return
+    end
+    
+    render :nothing=>true, :status=>:ok
+  end
+    
+  
   private
-
+  
   def retrieve_mac
     str = `ifconfig eth0 | grep HWaddr`
 #    str = "eth0      Link encap:Ethernet  HWaddr 54:4a:16:c0:7e:28 "

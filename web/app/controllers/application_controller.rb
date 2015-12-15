@@ -5,6 +5,17 @@ class ApplicationController < ActionController::Base
 
   protected
 
+  def kill_process(process_name)
+    processes = `ps -ef | grep #{process_name}`
+    logger.info(processes)
+    processes.lines.each do |process|
+      nodes = process.split(/\W+/)
+      cmd = "kill -9 #{nodes[1]}"
+      logger.info(cmd)
+      system(cmd)
+    end
+  end
+  
   def logged_in?
     current_user != nil
   end

@@ -260,7 +260,7 @@ class ExperimentsController < ApplicationController
         response = connection.eval("analyze('#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{@experiment.id}, #{@experiment.calibration_id})").to_ruby
       rescue  => e
         logger.error("Rserve error: #{e}")
-        kill_rserve if e.is_a? Rserve::Talk::SocketTimeoutError
+        kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
         render :json=>{:errors=>"Internal Server Error (#{e})"}, :status => 500
       ensure
         connection.close
@@ -286,7 +286,7 @@ class ExperimentsController < ApplicationController
       results = connection.eval("get_amplification_data('#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibration_id})")
     rescue  => e
       logger.error("Rserve error: #{e}")
-      kill_rserve if e.is_a? Rserve::Talk::SocketTimeoutError
+      kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
       raise e
     ensure
       connection.close
@@ -321,7 +321,7 @@ class ExperimentsController < ApplicationController
       results = connection.eval("process_mc('#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibration_id})")
     rescue  => e
       logger.error("Rserve error: #{e}")
-      kill_rserve if e.is_a? Rserve::Talk::SocketTimeoutError
+      kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
       raise e
     ensure
       connection.close
@@ -339,17 +339,6 @@ class ExperimentsController < ApplicationController
     end 
     logger.info("Rails code time #{Time.now-start_time}")
     return melt_curve_data
-  end
-  
-  def kill_rserve
-    processes = `ps -ef | grep Rserve`
-    logger.info(processes)
-    processes.lines.each do |process|
-      nodes = process.split(/\W+/)
-      cmd = "kill -9 #{nodes[1]}"
-      logger.info(cmd)
-      system(cmd)
-    end
   end
   
 end
