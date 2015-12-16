@@ -19,11 +19,9 @@ window.App.service('TestInProgressService', [
     };
 
     this.getTmValues = function (analyze_data) {
-      console.log("This is analyze_data", analyze_data);
       var tms = [];
       for (var i=0; i< 16; i++) {
         if(analyze_data.mc_out['fluo_'+i].tm.length > 0) {
-          console.log("inside loop", i, analyze_data.mc_out['fluo_'+i]);
           tms.push(analyze_data.mc_out['fluo_'+i].tm[0].Tm);
         }
       }
