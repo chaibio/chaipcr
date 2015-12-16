@@ -22,7 +22,9 @@ window.App.service('TestInProgressService', [
       console.log("This is analyze_data", analyze_data);
       var tms = [];
       for (var i=0; i< 16; i++) {
-        tms.push(analyze_data.mc_out['fluo_'+i].tm[0].Tm);
+        if(analyze_data.mc_out['fluo_'+i].tm) {
+          tms.push(analyze_data.mc_out['fluo_'+i].tm[0].Tm);
+        }
       }
       return tms;
     };
