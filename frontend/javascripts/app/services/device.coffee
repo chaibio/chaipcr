@@ -4,7 +4,8 @@
 window.App.service 'Device', [
   '$http'
   '$q'
-  ($http, $q) ->
+  'host'
+  ($http, $q, host) ->
 
     class Device
 
@@ -26,6 +27,9 @@ window.App.service 'Device', [
             deferred.reject resp
 
         return deferred.promise
+
+      updateSoftware: ->
+        return $http.post("/device/update_software")
 
     return new Device
 

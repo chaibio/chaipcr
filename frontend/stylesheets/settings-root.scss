@@ -1,6 +1,6 @@
 @import './colors.css.scss';
 
-.settings {
+.settings{
 
   color: #fff;
 
@@ -20,6 +20,26 @@
     font-size: 15px;
     margin-top: 5px;
     margin-bottom: 20px;
+  }
+
+  .button {
+    border: 1px solid $gray;
+    background: #fff;
+    color: $gray;
+    display: inline-block;
+    border-radius: 0;
+    font-weight: bold;
+    width: 100px;
+    padding: 4px 0;
+
+    &:hover {
+      text-decoration: none;
+      background: $gray;
+      color: #fff;
+      border: none;
+      padding-top: 5px;
+      padding-bottom: 5px;
+    }
   }
 
   .padd-top {
@@ -81,26 +101,6 @@
   }
 
   .content {
-
-    .button {
-      border: 1px solid $gray;
-      background: #fff;
-      color: $gray;
-      display: inline-block;
-      border-radius: 0;
-      font-weight: bold;
-      width: 100px;
-      padding: 4px 0;
-
-      &:hover {
-        text-decoration: none;
-        background: $gray;
-        color: #fff;
-        border: none;
-        padding-top: 5px;
-        padding-bottom: 5px;
-      }
-    }
 
     .content-row {
       margin-right: 0;

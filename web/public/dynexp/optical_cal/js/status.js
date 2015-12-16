@@ -48,7 +48,7 @@
           self.fetch();
         }
         if (!self.interval) {
-          return self.interval = $interval(self.fetch, 3000);
+          return self.interval = $interval(self.fetch, 1000);
         }
       };
       self.stopSync = function() {

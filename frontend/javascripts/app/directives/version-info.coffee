@@ -1,6 +1,7 @@
 window.App.directive 'versionInfo', [
   'Device'
-  (Device) ->
+  '$modal'
+  (Device, $modal) ->
     restrict: 'EA'
     replace: true
     scope:
@@ -11,8 +12,5 @@ window.App.directive 'versionInfo', [
       Device.getVersion(true).then (resp) ->
         $scope.data = resp
 
-      $scope.checkForUpdate = ->
-        Device.checkForUpdate().then (resp) ->
-          $scope.update = resp
 
 ]
