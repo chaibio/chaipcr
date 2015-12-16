@@ -8,7 +8,7 @@ window.App.directive 'versionInfo', [
     templateUrl: 'app/views/directives/version-info.html'
     link: ($scope, elem, attrs) ->
 
-      Device.getVersion($scope.cache).then (resp) ->
+      Device.getVersion(true).then (resp) ->
         $scope.data = resp
 
       $scope.checkForUpdate = ->
