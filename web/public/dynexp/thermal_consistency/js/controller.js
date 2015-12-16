@@ -80,7 +80,7 @@
         if (!$scope.experiment.protocol.stages[0].stage.steps[0]) return;
         if (!$scope.currentStep()) return;
         return $scope.currentStep().temperature;
-      }
+      };
 
       $scope.createExperiment = function () {
         var exp = new Experiment({
