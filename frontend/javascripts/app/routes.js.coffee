@@ -37,6 +37,10 @@ window.ChaiBioTech.ngApp
         url: '/maintainance'
         templateUrl: 'app/views/settings/maintainance.html'
 
+      .state 'settings.usermanagement',
+        url: '/usermanagement'
+        templateUrl: 'app/views/settings/usermanagement.html'
+
       .state 'edit-protocol',
         url: '/edit-protocol/:id'
         templateUrl: 'app/views/skelton.html'
