@@ -84,7 +84,9 @@
           // Do nothing
         } else {
           console.log("Machine is ready");
-          location.href = ref; // Tell the browser to reload the page
+          //location.href = ref; // Tell the browser to reload the page
+          console.log(ref);
+          location.reload();
         }
 
         if (x.readyState == 4) {
