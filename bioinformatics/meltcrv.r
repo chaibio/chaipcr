@@ -82,8 +82,8 @@ get_mc_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connec
 
 # function: extract melting curve data and Tm for each well
 mc_tm_pw <- function(mt_pw, 
-                     qt_prob=0.8, # quantile probability point for normalized df/dT
-                     max_normd_qtv=1.0, # maximum normalized df/dT values (range 0-1) at the quantile probablity point
+                     qt_prob=0.8, # quantile probability point for normalized df/dT (range 0-1)
+                     max_normd_qtv=0.5, # maximum normalized df/dT values (range 0-1) at the quantile probablity point
                      top_N=4, # top number of Tm peaks to report
                      min_frac_report=0.1 # minimum area fraction of the Tm peak to be reported in regards to the largest real Tm peak
                      ) { # per well
@@ -93,7 +93,8 @@ mc_tm_pw <- function(mt_pw,
     raw_tm <- na.omit(mt_pw[, c('Tm', 'Area')])
     
     range_dfdT <- range(mc$df.dT)
-    summit_pos <- which.max(mc$df.dT)
+    #summit_pos <- which.max(mc$df.dT) # original: invalid when df/dT very high at the beginning of melt curve
+    summit_pos <- which(mc$Temp == raw_tm[which.max(raw_tm$Area), 'Tm']) # postion in df/dT curve corresponding to Tm peak of largest area.
     dfdT_normd <- (mc$df.dT - range_dfdT[1]) / (range_dfdT[2] - range_dfdT[1])
     # range_dfdT[1] == min(mc$df.dT). range_dfdT[2] == max(mc$df.dT).
     
