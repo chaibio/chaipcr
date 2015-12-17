@@ -79,7 +79,7 @@
       var x = ajax.x();
       x.open(method, url, sync);
       x.onreadystatechange = function() {
-
+        console.log("status :", x.status);
         if(x.status === 502) { // .
           // Do nothing
         } else {
