@@ -1,6 +1,4 @@
-!/bin/sh
-
-#exit
+#!/bin/sh
 
 id | grep -q root
 is_root=$?
@@ -35,12 +33,12 @@ then
 	mkdir /sdcard
 fi
 
-if [ ! -e /emmcboot ]
+if [ ! -e /tmp/emmcboot ]
 then
-	mkdir /emmcboot
+	mkdir -p /tmp/emmcboot
 fi
 
-umount /sdcard > /dev/null || true
+#umount /sdcard > /dev/null || true
 mount $sdcard_dev /sdcard -t vfat || true
 
 sdcard="/sdcard"
@@ -55,8 +53,6 @@ flush_cache_mounted () {
 }
 
 alldone () {
-
-
 	if [ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] ; then
 		echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 		echo default-on > /sys/class/leds/beaglebone\:green\:usr1/trigger
@@ -105,19 +101,27 @@ partition_drive () {
 
 update_uenv () {
 	echo copying coupling uEng.txt
-	mount ${eMMC}p1 /emmcboot -t vfat || true
-	cp /sdcard/uEnv.txt /emmcboot/
-	sh /sdcard/replace_uEnv.txt.sh /emmcboot || true
+	if [ ! -e /tmp/emmcboot ]
+	then
+	      mkdir -p /tmp/emmcboot
+	fi
+	mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
+	cp /sdcard/uEnv.txt /tmp/emmcboot/
+	sh /sdcard/replace_uEnv.txt.sh /tmp/emmcboot || true
 	sync
 	sleep 5
-	umount /emmcboot || true
+	umount /tmp/emmcboot || true
 }
 
 reset_uenv () {
 	echo "resetting uEnv!"
 	cp ${sdcard}/uEnv.72check.txt ${sdcard}/uEnv.txt
 
-        mkdir -p /tmp/emmcboot
+	if [ ! -e /tmp/emmcboot ]
+	then
+	        mkdir -p /tmp/emmcboot
+	fi
+
         mount ${eMMC}p1 /tmp/emmcboot -t vfat
 
 	cp /tmp/emmcboot/uEnv.72check.txt /tmp/emmcboot/uEnv.txt
@@ -183,48 +187,6 @@ then
         exit
 fi
 
-if [ -e ${sdcard}/pack_resume_autorun.flag ]
-then
-	echo "Resume eMMC packing flag found up"
-	incriment_restart_counter
-
-	if [ "$counter" -ge 5 ] 
-	then
-		echo Restart counter exceeded 4.. quitting packing operation
-		stop_packing_restarting
-		echo Rebooting
-#		exit 0
-		reboot
-	fi
-
-	echo "Resuming eMMC packing"
-
-	sh /sdcard/pack_latest_version.sh || true
-	result=$?
-	if [ $result -eq 1 ]
-	then
-		echo Error packing eMMC, restarting...
-#		exit 0
-		reboot
-	fi
-
-	update_uenv
-	stop_packing_restarting
-	alldone
-	exit
-fi
-
-if [ ! -e ${sdcard}/factory_settings.img.gz ]
-then
-	echo "Creating factory settings images! Copying from eMMC at $eMMC to sdcard at $sdcard_dev!"
-	sh /sdcard/pack_latest_Version.sh factorysettings || true
-	sync
-	echo Creating factory settings image done.. Now creating upgrade image. 	
-	echo timer > /sys/class/leds/beaglebone\:green\:usr1/trigger
-	alldone
-	exit 0
-fi
-
 if [ ! -e ${eMMC}p4 ]
 then
         echo "Partitioning $eMMC"
@@ -243,7 +205,7 @@ else
 	echo "Device is partitioned"
 fi
 
-echo "Copying from sdcard at $sdcard_dev to eMMC at $eMMC!"
+echo "Restoring system from sdcard at $sdcard_dev to eMMC at $eMMC!"
 sh /sdcard/unpack_latest_version.sh factorysettings $counter || true
 
 if [ -e "${eMMC}p4" ]
@@ -280,4 +242,3 @@ umount /sdcard > /dev/null || true
 alldone
 
 reboot
-
