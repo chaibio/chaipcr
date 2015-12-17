@@ -83,7 +83,7 @@ get_mc_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connec
 # function: extract melting curve data and Tm for each well
 mc_tm_pw <- function(mt_pw, 
                      qt_prob=0.8, # quantile probability point for normalized df/dT
-                     max_normd_qtv=0.5, # maximum normalized df/dT values (range 0-1) at the quantile probablity point
+                     max_normd_qtv=1.0, # maximum normalized df/dT values (range 0-1) at the quantile probablity point
                      top_N=4, # top number of Tm peaks to report
                      min_frac_report=0.1 # minimum area fraction of the Tm peak to be reported in regards to the largest real Tm peak
                      ) { # per well
