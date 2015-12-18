@@ -35,5 +35,8 @@ void SettingsHandler::processData(const boost::property_tree::ptree &requestPt, 
     if (it != requestPt.not_found())
         settings.setTimeValid(it->second.get_value<bool>());
 
-    ExperimentController::getInstance()->updateSettings(settings);
+    if (settings.isDebugModeDirty())
+        ExperimentController::getInstance()->setDebugMode(settings.debugMode());
+
+    //ExperimentController::getInstance()->updateSettings(settings);
 }

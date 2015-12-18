@@ -6,6 +6,8 @@
 #include "controlincludes.h"
 #include "dbincludes.h"
 #include "experimentcontroller.h"
+#include "qpcrapplication.h"
+#include "updatemanager.h"
 
 #include "statushandler.h"
 
@@ -138,5 +140,28 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
             responsePt.put("heat_sink.temperature", ROUND(heatSink->currentTemperature()));
             responsePt.put("heat_sink.fan_drive", ROUND(heatSink->fanDrive()));
         }
+    }
+
+    switch (qpcrApp.updateManager()->updateState())
+    {
+    case UpdateManager::Unavailable:
+        responsePt.put("device.update_available", "unavailable");
+        break;
+
+    case UpdateManager::Available:
+        responsePt.put("device.update_available", "available");
+        break;
+
+    case UpdateManager::Downloading:
+        responsePt.put("device.update_available", "downloading");
+        break;
+
+    case UpdateManager::Updating:
+        responsePt.put("device.update_available", "updating");
+        break;
+
+    default:
+        responsePt.put("device.update_available", "unknown");
+        break;
     }
 }

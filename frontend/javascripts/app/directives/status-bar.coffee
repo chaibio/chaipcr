@@ -50,7 +50,7 @@ window.App.directive 'statusBar', [
 
         $scope.timeRemaining = TestInProgressHelper.timeRemaining(data)
 
-        if ($scope.state is 'running' and !attrs.experimentId and data.experiment_controller?.expriment?.id)
+        if ($scope.state is 'running' and !$scope.experimentId and data.experiment_controller?.expriment?.id)
           $scope.experimentId = data.experiment_controller.expriment.id
           getExperiment (exp) ->
             $scope.experiment = exp

@@ -1,6 +1,7 @@
 #include "wirelessmanager.h"
 #include "networkinterfaces.h"
 #include "constants.h"
+#include "util.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -12,14 +13,9 @@
 #include <system_error>
 
 #include <iwlib.h>
-#include <poll.h>
-#include <fcntl.h>
-#include <signal.h>
 #include <unistd.h>
 #include <ifaddrs.h>
 #include <net/if.h>
-#include <sys/wait.h>
-#include <sys/types.h>
 #include <sys/eventfd.h>
 
 WirelessManager::WirelessManager(const std::string &interfaceName)
@@ -157,109 +153,18 @@ void WirelessManager::_connect()
 
 void WirelessManager::ifup()
 {
-    _connectionStatus = Connecting;
+    std::stringstream stream;
+    stream << "ifup " << _interfaceName;
 
-    int processPipes[2] = {-1};
-
-    if (pipe2(processPipes, O_CLOEXEC) == -1)
-        throw std::system_error(errno, std::generic_category(), "WirelessManager::ifup - unable to create pipes:");
-
-    pid_t pid = vfork();
-
-    if (pid == -1)
+    if (Util::watchProcess(stream.str(), _connectionEventFd, [](const char buffer[]){ std::cout << "WirelessManager::ifup - ifup:" << buffer << '\n'; }))
     {
-        close(processPipes[0]);
-        close(processPipes[1]);
+        NetworkInterfaces::InterfaceState state = NetworkInterfaces::getInterfaceState(_interfaceName);
 
-        throw std::system_error(errno, std::generic_category(), "WirelessManager::ifup - unable to fork:");
-    }
-
-    if (pid == 0) //Child process
-    {
-        if (processPipes[1] != fileno(stdout))
-        {
-            dup3(processPipes[1], fileno(stdout), O_CLOEXEC);
-            close(processPipes[1]);
-        }
-
-        close(processPipes[0]);
-
-        std::stringstream stream;
-        stream << "ifup " << _interfaceName;
-
-        execl("/bin/sh", "sh", "-c", stream.str().c_str(), NULL);
-        _exit(127);
-
-        //It will never reach this line
-    }
-
-    close(processPipes[1]);
-
-    bool processFinished = false;
-
-    pollfd fdArray[2];
-    fdArray[0].fd = processPipes[0];
-    fdArray[0].events = POLLIN | POLLPRI;
-    fdArray[0].revents = 0;
-
-    fdArray[1].fd = _connectionEventFd;
-    fdArray[1].events = POLLIN | POLLPRI;
-    fdArray[1].revents = 0;
-
-    while (poll(fdArray, 2, -1) > 0)
-    {
-        if (fdArray[0].revents > 0)
-        {
-            if (fdArray[0].revents & POLLIN || fdArray[0].revents & POLLPRI)
-            {
-                //There won't be any output since ifup doens't wirte to stdout. Instead it will write just to current session and to /var/log/syslog
-            }
-            else if (fdArray[0].revents & POLLHUP)
-            {
-                processFinished = true;
-                break;
-            }
-            else if (fdArray[0].revents & POLLNVAL || fdArray[0].revents & POLLERR)
-                break;
-        }
-        else
-        {
-            uint64_t i = 0;
-            read(_connectionEventFd, &i, sizeof(i));
-
-            break;
-        }
-
-        fdArray[0].revents = 0;
-        fdArray[1].revents = 0;
-    }
-
-    close(processPipes[0]);
-
-    if (processFinished)
-    {
-        int status = -1;
-        pid = waitpid(pid, &status, 0);
-
-        if (pid != -1 && status == 0)
-        {
-            NetworkInterfaces::InterfaceState state = NetworkInterfaces::getInterfaceState(_interfaceName);
-
-            if (state.isEmpty() || !(state.flags & IFF_UP))
-                _connectionStatus = ConnectionError;
-        }
-        else
-            throw std::runtime_error("WirelessManager::ifup - unknown error occured upon watching the ifup process.");
+        if (state.isEmpty() || !(state.flags & IFF_UP))
+            _connectionStatus = ConnectionError;
     }
     else
-    {
-        kill(pid, SIGTERM);
-
-        if (fdArray[1].revents == 0)
-            throw std::runtime_error("WirelessManager::ifup - unknown error occured upon watching the ifup process.");
-        else
-            _connectionStatus = NotConnected;
-    }
+        _connectionStatus = NotConnected;
 }
 
 void WirelessManager::ifdown()

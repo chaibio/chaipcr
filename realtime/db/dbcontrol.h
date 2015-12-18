@@ -26,6 +26,7 @@ class Ramp;
 class TemperatureLog;
 class DebugTemperatureLog;
 class Settings;
+class Upgrade;
 
 class DBControl : private IThreadControl
 {
@@ -43,6 +44,8 @@ public:
 
     Settings getSettings();
     void updateSettings(const Settings &settings);
+
+    void updateUpgrade(const Upgrade &upgrade);
 
     int getUserId(const std::string &token);
 

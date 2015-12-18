@@ -12,6 +12,7 @@
 #include "settingshandler.h"
 #include "logdatahandler.h"
 #include "networkmanagerhandler.h"
+#include "updatehandler.h"
 
 #include "qpcrrequesthandlerfactory.h"
 #include "experimentcontroller.h"
@@ -79,14 +80,19 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
                 }
                 else if (method == "POST")
                 {
-                    if (requestPath.at(0) == "control" && requestPath.size() == 2)
+                    if (requestPath.size() == 2)
                     {
-                        if (requestPath.at(1) == "start")
-                            return new ControlHandler(ControlHandler::StartExperiment);
-                        else if (requestPath.at(1) == "resume")
-                            return new ControlHandler(ControlHandler::ResumeExperiment);
-                        else if (requestPath.at(1) == "stop")
-                            return new ControlHandler(ControlHandler::StopExperiment);
+                        if (requestPath.at(0) == "control")
+                        {
+                            if (requestPath.at(1) == "start")
+                                return new ControlHandler(ControlHandler::StartExperiment);
+                            else if (requestPath.at(1) == "resume")
+                                return new ControlHandler(ControlHandler::ResumeExperiment);
+                            else if (requestPath.at(1) == "stop")
+                                return new ControlHandler(ControlHandler::StopExperiment);
+                        }
+                        else if (requestPath.at(0) == "device" && requestPath.at(1) == "check_for_updates")
+                            return new UpdateHandler(UpdateHandler::CheckUpdate);
                     }
                 }
             }

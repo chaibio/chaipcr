@@ -10,24 +10,20 @@
 #include "maincontrollers.h"
 #include "experimentcontroller.h"
 #include "qpcrapplication.h"
-#include "machinesettings.h"
 
 #define STORE_MELT_CURVE_DATA_INTERVAL 10 * 1000
 
-ExperimentController::ExperimentController()
+ExperimentController::ExperimentController(std::shared_ptr<DBControl> dbControl)
 {
     _machineMutex = new Poco::RWLock;
     _machineState = IdleMachineState;
     _thermalState = IdleThermalState;
-    _dbControl = new DBControl();
+    _dbControl = dbControl;
     _meltCurveTimer = new Poco::Timer();
     _holdStepTimer = new Poco::Timer();
     _logTimer = new Poco::Timer();
-    _settings = new MachineSettings();
     
-    _settings->setDebugMode(_dbControl->getSettings().debugMode());
-
-    readDeviceFile();
+    _settings.debugMode = _dbControl->getSettings().debugMode();
 
     LidInstance::getInstance()->startThresholdReached.connect(boost::bind(&ExperimentController::run, this));
 
@@ -42,29 +38,7 @@ ExperimentController::~ExperimentController()
     delete _logTimer;
     delete _meltCurveTimer;
     delete _holdStepTimer;
-    delete _dbControl;
-    delete _settings;
     delete _machineMutex;
-}
-
-void ExperimentController::readDeviceFile()
-{
-    std::fstream deviceFile(kDeviceFilePath);
-
-    if (deviceFile.is_open())
-    {
-        boost::property_tree::ptree ptree;
-        boost::property_tree::read_json(deviceFile, ptree);
-
-        boost::optional<boost::property_tree::ptree&> array = ptree.get_child_optional("capabilities.optics.emission_channels");
-
-        if (array)
-            _settings->device.setOpticsChannels(array.get().size());
-        else
-            _settings->device.setOpticsChannels(1);
-    }
-    else
-        std::cout << "ExperimentController::readDeviceFile - unable to read device file: " << std::strerror(errno) << '\n';
 }
 
 ExperimentController::MachineState ExperimentController::machineState() const
@@ -107,8 +81,8 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
     {
         Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
 
-        _settings->temperatureLogs.setTemperatureLogs(false);
-        _settings->temperatureLogs.setDebugTemperatureLogs(false);
+        _settings.temperatureLogsState = false;
+        _settings.debugTemperatureLogsState = false;
 
         LidInstance::getInstance()->setTargetTemperature(experiment.protocol()->lidTemperature());
 
@@ -432,21 +406,24 @@ void ExperimentController::stopLogging()
 {
     _logTimer->stop();
 
-    _settings->temperatureLogs.setStartTime(boost::posix_time::not_a_date_time);
+    _settings.startTime = boost::posix_time::not_a_date_time;
 
     _dbControl->addTemperatureLog(_logs);
     _logs.clear();
 }
 
-void ExperimentController::toggleTempLogs()
+void ExperimentController::toggleTempLogs(bool temperatureLogsState, bool debugTemperatureLogsState)
 {
+    _settings.temperatureLogsState = temperatureLogsState;
+    _settings.debugTemperatureLogsState = debugTemperatureLogsState;
+
     if (machineState() == IdleMachineState)
     {
-        if (_settings->temperatureLogs.hasTemperatureLogs() || _settings->temperatureLogs.hasDebugTemperatureLogs())
+        if (_settings.temperatureLogsState || _settings.debugTemperatureLogsState)
         {
-            if (_settings->temperatureLogs.startTime() == boost::posix_time::not_a_date_time)
+            if (_settings.startTime == boost::posix_time::not_a_date_time)
             {
-                _settings->temperatureLogs.setStartTime(boost::posix_time::microsec_clock::universal_time());
+                _settings.startTime = boost::posix_time::microsec_clock::universal_time();
 
                 startLogging();
             }
@@ -464,7 +441,7 @@ void ExperimentController::addLogCallback(Poco::Timer &)
 
     if (_machineState != IdleMachineState)
     {
-        log = TemperatureLog(_experiment.id(), true, _experiment.type() == Experiment::DiagnosticType || _settings->debugMode());
+        log = TemperatureLog(_experiment.id(), true, _experiment.type() == Experiment::DiagnosticType || _settings.debugMode);
         log.setElapsedTime((boost::posix_time::microsec_clock::local_time() - _experiment.startedAt()).total_milliseconds());
 
         _machineMutex->unlock();
@@ -473,8 +450,8 @@ void ExperimentController::addLogCallback(Poco::Timer &)
     {
         _machineMutex->unlock();
 
-        log = TemperatureLog(0, _settings->temperatureLogs.hasTemperatureLogs(), _settings->temperatureLogs.hasDebugTemperatureLogs());
-        log.setElapsedTime((boost::posix_time::microsec_clock::universal_time() - _settings->temperatureLogs.startTime()).total_milliseconds());
+        log = TemperatureLog(0, _settings.temperatureLogsState, _settings.debugTemperatureLogsState);
+        log.setElapsedTime((boost::posix_time::microsec_clock::universal_time() - _settings.startTime).total_milliseconds());
     }
 
     if (log.hasTemperatureInfo())
@@ -546,13 +523,13 @@ void ExperimentController::calculateEstimatedDuration()
     }
 }
 
-void ExperimentController::updateSettings(const Settings &settings)
+/*void ExperimentController::updateSettings(const Settings &settings)
 {
     if (settings.isDebugModeDirty())
         _settings->setDebugMode(settings.debugMode());
 
     _dbControl->updateSettings(settings);
-}
+}*/
 
 int ExperimentController::getUserId(const std::string &token) const
 {
