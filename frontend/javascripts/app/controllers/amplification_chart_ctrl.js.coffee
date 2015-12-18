@@ -45,7 +45,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       if ((state is 'idle' and $scope.experiment?.completed_at and !hasData) or
       (state is 'idle' and oldState isnt state) or
-      (state is 'running' and (oldStep isnt newStep or !oldStep) and data.optics.collect_data))
+      (state is 'running' and (oldStep isnt newStep or !oldStep) and data.optics.collect_data and oldData.optics.collect_data is 'true') )
         updateFluorescenceData()
 
     $scope.$watch ->
