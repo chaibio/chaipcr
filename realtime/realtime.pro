@@ -135,9 +135,12 @@ HEADERS += \
     server/httpcodehandler.h \
     util/wirelessmanager.h \
     util/timechecker.h \
-    app/machinesettings.h \
     util/networkinterfaces.h \
-    server/networkmanagerhandler.h
+    server/networkmanagerhandler.h \
+    db/upgrade.h \
+    app/updatemanager.h \
+    util/util.h \
+    server/updatehandler.h
 
 SOURCES += \
     app/pins.cpp \
@@ -186,4 +189,7 @@ SOURCES += \
     util/wirelessmanager.cpp \
     util/timechecker.cpp \
     util/networkinterfaces.cpp \
-    server/networkmanagerhandler.cpp
+    server/networkmanagerhandler.cpp \
+    app/updatemanager.cpp \
+    util/util.cpp \
+    server/updatehandler.cpp

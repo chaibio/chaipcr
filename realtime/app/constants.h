@@ -88,8 +88,6 @@ const double kPCRBeginStepTemperatureThreshold = 0.5;
 const long kTemperatureLoggerInterval = 1000;
 const long kTemperatureLoggerFlushInterval = 1000; //ms
 
-const std::string kDeviceFilePath = {"/root/device.json"};
-
 //Heat Sink
 const double kHeatSinkTargetTemperature = 50; //C
 const unsigned int kHeatSinkThermistorVoltageDividerResistanceOhms = 6800;
@@ -107,7 +105,18 @@ const double kHeatSinkPIDMax = 0;
 const unsigned int kBeagleboneADCBits = 12;
 
 //App
+const std::string kDeviceFilePath = "/root/device.json";
+const std::string kConfigurationFilePath = "/root/configuration.json";
+
+const long kAppUpdageInterva = 4 * 60 * 60 * 1000;
+
 const long kAppSignalInterval = 50 * 1000 * 1000; //Nanosec
+
+//Http updage client
+const std::string kUpdagesHost = "update.chaibio.com";
+const std::string kChecUpdatesUri = "http://update.chaibio.com/device/software_update";
+const std::string kUpdateApiPassword = "chai";
+const std::string kUpdateFilePath = "/sdcard/upgrade-rootfs.img.gz";
 
 //Network settings
 const std::string kNetworkInterfacesFile = "/etc/network/interfaces";

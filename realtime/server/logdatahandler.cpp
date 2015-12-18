@@ -1,7 +1,6 @@
 #include "logdatahandler.h"
 #include "maincontrollers.h"
 #include "experimentcontroller.h"
-#include "machinesettings.h"
 
 using namespace boost::property_tree;
 
@@ -23,12 +22,15 @@ void LogDataHandler::processData(const ptree &requestPt, ptree &)
         ptree::const_assoc_iterator temperatureData = requestPt.find("temperature_data");
         ptree::const_assoc_iterator temperatureDebugData = requestPt.find("temperature_debug_data");
 
+        bool tempLogsState = experimentController->settings().temperatureLogsState;
+        bool debugTempLogsState = experimentController->settings().debugTemperatureLogsState;
+
         if (temperatureData != requestPt.not_found())
-            experimentController->settings()->temperatureLogs.setTemperatureLogs(temperatureData->second.get_value<bool>());
+            tempLogsState = temperatureData->second.get_value<bool>();
 
         if (temperatureDebugData != requestPt.not_found())
-            experimentController->settings()->temperatureLogs.setDebugTemperatureLogs(temperatureDebugData->second.get_value<bool>());
+            debugTempLogsState = temperatureDebugData->second.get_value<bool>();
 
-        experimentController->toggleTempLogs();
+        experimentController->toggleTempLogs(tempLogsState, debugTempLogsState);
     }
 }

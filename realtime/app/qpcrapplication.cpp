@@ -3,17 +3,22 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
 #include "pcrincludes.h"
 #include "icontrol.h"
 #include "experimentcontroller.h"
 #include "qpcrrequesthandlerfactory.h"
 #include "qpcrfactory.h"
 #include "qpcrapplication.h"
+#include "dbcontrol.h"
 #include "exceptionhandler.h"
 #include "wirelessmanager.h"
 #include "maincontrollers.h"
 #include "timechecker.h"
 #include "settings.h"
+#include "updatemanager.h"
 
 using namespace std;
 using namespace Poco::Net;
@@ -29,21 +34,31 @@ public:
 };
 
 // Class QPCRApplication
+void QPCRApplication::stopExperiment(const string &message) {
+    _experimentController->stop(message);
+}
+
 void QPCRApplication::initialize(Application&) {
     _workState = false;
 
     try {
+        readDeviceFile();
+        readConfigurationFile();
+
         QPCRFactory::constructMachine(_controlUnits, _threadControlUnits);
-        _experimentController = ExperimentController::createInstance();
+
+        _dbControl.reset(new DBControl());
+        _experimentController = ExperimentController::createInstance(_dbControl);
         _wirelessManager.reset(new WirelessManager("wlan0"));
         _timeChecker.reset(new TimeChecker());
+        _updateManager.reset(new UpdateManager(_dbControl));
 
         _timeChecker->timeStateChanged.connect([&](bool state)
         {
             Settings settings;
             settings.setTimeValid(state);
 
-            _experimentController->updateSettings(settings);
+            _dbControl->updateSettings(settings);
         });
 
         initSignals();
@@ -66,6 +81,7 @@ int QPCRApplication::main(const vector<string>&) {
     try
     {
         server.start();
+        _updateManager->start();
 
         for (auto threadControlUnit: _threadControlUnits)
             threadControlUnit->start();
@@ -121,6 +137,41 @@ int QPCRApplication::main(const vector<string>&) {
     }
 }
 
+void QPCRApplication::readDeviceFile()
+{
+    std::ifstream deviceFile(kDeviceFilePath);
+
+    if (deviceFile.is_open())
+    {
+        boost::property_tree::ptree ptree;
+        boost::property_tree::read_json(deviceFile, ptree);
+
+        boost::optional<boost::property_tree::ptree&> array = ptree.get_child_optional("capabilities.optics.emission_channels");
+
+        if (array)
+            _settings.device.opticsChannels = array.get().size();
+        else
+            _settings.device.opticsChannels = 1;
+    }
+    else
+        std::cout << "QPCRApplication::readDeviceFile - unable to read device file: " << std::strerror(errno) << '\n';
+}
+
+void QPCRApplication::readConfigurationFile()
+{
+    std::ifstream deviceFile(kConfigurationFilePath);
+
+    if (deviceFile.is_open())
+    {
+        boost::property_tree::ptree ptree;
+        boost::property_tree::read_json(deviceFile, ptree);
+
+        _settings.configuration.version = ptree.get<std::string>("software.version");
+    }
+    else
+        std::cout << "QPCRApplication::readConfigurationFile - unable to read configuration file: " << std::strerror(errno) << '\n';
+}
+
 void QPCRApplication::initSignals() {
     sigemptyset(&_signalsSet);
     sigaddset(&_signalsSet, SIGQUIT);
@@ -137,8 +188,4 @@ bool QPCRApplication::waitSignal() const {
     time.tv_sec = 0;
 
     return sigtimedwait(&_signalsSet, &signalInfo, &time) > 0;
-}
-
-void QPCRApplication::stopExperiment(const string &message) {
-    _experimentController->stop(message);
 }

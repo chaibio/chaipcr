@@ -7,7 +7,6 @@
 #include "adccontroller.h"
 #include "qpcrapplication.h"
 #include "experimentcontroller.h"
-#include "machinesettings.h"
 
 using namespace std;
 
@@ -139,7 +138,7 @@ ADCController::ADCState ADCController::calcNextState(size_t &nextChannel) const 
     if (_currentConversionState == EReadLIA) {
         nextChannel = _currentChannel + 1;
 
-        if (nextChannel < ExperimentController::getInstance()->settings()->device.opticsChannels())
+        if (nextChannel < qpcrApp.settings().device.opticsChannels)
             return _currentConversionState;
     }
 

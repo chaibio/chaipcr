@@ -9,6 +9,7 @@
 #include "experiment.h"
 #include "temperaturelog.h"
 #include "settings.h"
+#include "upgrade.h"
 
 #include "dbcontrol.h"
 

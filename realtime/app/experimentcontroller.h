@@ -7,6 +7,7 @@
 #include <atomic>
 #include <vector>
 #include <memory>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 class DBControl;
 class Settings;
@@ -18,6 +19,28 @@ namespace Poco { class Timer; class RWLock; }
 class ExperimentController : public Instance<ExperimentController>
 {
 public:
+    class LogsSettings
+    {
+    public:
+        LogsSettings()
+        {
+            debugMode = false;
+
+            temperatureLogsState = false;
+            debugTemperatureLogsState = false;
+
+            startTime = boost::posix_time::not_a_date_time;
+        }
+
+    public:
+        std::atomic<bool> debugMode;
+
+        std::atomic<bool> temperatureLogsState;
+        std::atomic<bool> debugTemperatureLogsState;
+
+        boost::posix_time::ptime startTime;
+    };
+
     enum MachineState
     {
         IdleMachineState,
@@ -44,27 +67,27 @@ public:
         CoolingThermalState
     };
 
-    ExperimentController();
+    ExperimentController(std::shared_ptr<DBControl> dbControl);
     ~ExperimentController();
 
     MachineState machineState() const;
     ThermalState thermalState() const;
     Experiment experiment() const;
-    inline MachineSettings* settings() const { return _settings; }
+
+    inline const LogsSettings& settings() const { return _settings; }
+    inline void setDebugMode(bool state) { _settings.debugMode = state; }
 
     StartingResult start(int experimentId);
     void resume();
     void stop();
     void stop(const std::string &errorMessage);
 
-    void toggleTempLogs();
+    void toggleTempLogs(bool temperatureLogsState, bool debugTemperatureLogsState);
 
-    void updateSettings(const Settings &settings);
+    //void updateSettings(const Settings &settings);
     int getUserId(const std::string &token) const;
 
 private:
-    void readDeviceFile();
-
     void run();
     void complete();
 
@@ -86,9 +109,9 @@ private:
     MachineState _machineState;
     ThermalState _thermalState;
 
-    DBControl *_dbControl;
+    std::shared_ptr<DBControl> _dbControl;
     Experiment _experiment;
-    MachineSettings *_settings;
+    LogsSettings _settings;
 
     Poco::Timer *_meltCurveTimer;
     Poco::Timer *_holdStepTimer;

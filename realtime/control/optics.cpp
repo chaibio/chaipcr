@@ -6,8 +6,6 @@
 #include "optics.h"
 #include "maincontrollers.h"
 #include "qpcrapplication.h"
-#include "experimentcontroller.h"
-#include "machinesettings.h"
 
 using namespace std;
 using namespace Poco;
@@ -111,7 +109,7 @@ void Optics::collectDataCallback(Poco::Timer &timer)
     try
     {
         std::vector<std::vector<unsigned long>> adcValues;
-        adcValues.resize(ExperimentController::getInstance()->settings()->device.opticsChannels());
+        adcValues.resize(qpcrApp.settings().device.opticsChannels);
 
         {
             std::size_t doneChannels = 0;
