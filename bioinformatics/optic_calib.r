@@ -2,7 +2,7 @@
 
 # function: check whether the data in optical calibration experiment is valid; if yes, prepare calibration data
 
-prep_calib <- function(db_conn, calib_id, verbose=FALSE) {
+prep_optic_calib <- function(db_conn, calib_id, verbose=FALSE) {
     
     calib_water_qry <-  sprintf('SELECT fluorescence_value, well_num 
                                     FROM fluorescence_data 
@@ -43,15 +43,15 @@ prep_calib <- function(db_conn, calib_id, verbose=FALSE) {
 }
 
 
-# function: perform water calibration on fluo
+# function: perform optical (water) calibration on fluo
 
-calib <- function(fluo, db_conn, calib_id, verbose=FALSE, show_running_time=FALSE) {
+optic_calib <- function(fluo, db_conn, calib_id, verbose=FALSE, show_running_time=FALSE) {
     
     # start counting for running time
     func_name <- 'calib'
     start_time <- proc.time()[['elapsed']]
     
-    calib_data <- prep_calib(db_conn, calib_id, verbose)
+    calib_data <- prep_optic_calib(db_conn, calib_id, verbose)
     
     if (!(calib_data$num_calib_wells == num_wells)) {
         stop('number of calibration wells is not equal to user-defined number of wells') }
