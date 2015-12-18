@@ -1,16 +1,74 @@
+@import './colors.css.scss';
 .usermanagement-container {
   height: 723px;
   width: 100%;
   background-color: white;
+  color: black;
+
+  .close {
+      font-size: 30px;
+  }
 
   .left {
     width: 320px;
     height: 100%;
     float: left;
+    border-right-style: solid;
+    border-right-width: 1px;
+    border-right-color: #cdcdcd;
+
+    .underlined {
+      margin-left: 18px;
+      margin-right: 18px;
+    }
+    .buttons-container {
+      margin-top: 22px;
+      margin-left: 18px;
+      margin-bottom: 10px;
+      button {
+        width: 260px;
+      }
+    }
+
+    .user-data {
+      font-size: 16px;
+      //margin-top: 25px;
+      //margin-left: 10px;
+
+      ul {
+        li {
+          a {
+            cursor: pointer;
+            color: #000;
+            display: block;
+            padding: 10px 0px 10px 28px;
+            text-decoration: none;
+            font-size: 16px;
+          }
+          a:hover {
+            color: #fff;
+            background: $lightgray;
+          }
+          a.highlite {
+            color: #fff;
+            background: $blue;
+          }
+        }
+
+      }
+    }
   }
 
   .right {
-    width: 370px;
+    width: 350px;
     height: 100%;
+    float: left;
+    padding-left: 30px;
+
+    .user-details p {
+      font-size: 16px;
+      color: $lightgray;
+      padding-top: 25px;
+    }
   }
 }

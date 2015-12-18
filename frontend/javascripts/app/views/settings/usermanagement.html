@@ -1,12 +1,27 @@
-<div class="usermanagement-container">
+<div class="usermanagement-container" ng-controller="UserSettingsCtrl">
   <!--<version-info></version-info>
   <div class="maintainance-container-backdrop" ui-sref="settings.root">
   </div> -->
 
   <div class="left">
-    left
+    <h2 class="underlined">CURRENT USER<span class="close" ui-sref="settings.root">&times;</span></h2>
+    <div class="buttons-container">
+      <button class="button" ng-click="openAddUserModal()">ADD USER</button>
+    </div>
+
+    <div class="user-data">
+      <ul>
+        <li ng-repeat="user in users">
+          <a ng-click="changeUser($index)" ui-sref="settings.usermanagement.user({user: '{{user.user.name}}'})" ui-sref-active="highlite">{{user.user.name}}</a>
+          <!--<a ng-click="removeUser(user.user.id)" class="btn-remove" ng-if="user.user.id !== currentUser.id"></a>-->
+        </li>
+      </ul>
+    </div>
   </div>
   <div class="right">
-    right
+    <h2 class="underlined">USER DETAILS<span class="close" ui-sref="settings.root">&times;</span></h2>
+    <div class="user-details" ui-view>
+      <p>Select a User in the center column to see details.</p>
+    </div>
   </div>
 </div>

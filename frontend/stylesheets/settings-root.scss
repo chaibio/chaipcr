@@ -101,6 +101,8 @@
   }
 
   .content {
+    width: 1024px;
+    height: 723px;
 
     .content-row {
       margin-right: 0;
@@ -145,7 +147,7 @@
     .device-info-container {
       padding-left: 0;
       padding-right: 0;
-      padding-bottom: 50px;
+      //padding-bottom: 50px;
       height: 100%;
       background: #999;
       border-left: 1px solid #ddd;
