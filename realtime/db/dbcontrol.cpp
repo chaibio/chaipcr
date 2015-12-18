@@ -572,6 +572,20 @@ void DBControl::updateSettings(const Settings &settings)
     write(statements);
 }
 
+void DBControl::updateUpgrade(const Upgrade &upgrade)
+{
+    std::vector<soci::statement> statements;
+    std::lock_guard<std::mutex> lock(_writeMutex);
+
+    statements.emplace_back((_writeSession->prepare << "INSERT INTO upgrades(id, version, checksum, release_date, brief_description, full_description) VALUES("
+                             "1, :version, :checksum, :release_date, :brief_description, :full_description) ON DUPLICATE KEY UPDATE "
+                             "version = :version, checksum = :checksum, release_date = :release_date, brief_description = :brief_description, full_description = :full_description",
+                             soci::use(upgrade.version()), soci::use(upgrade.checksum()), soci::use(upgrade.releaseDate()), soci::use(upgrade.briefDescription()), soci::use(upgrade.fullDescription()),
+                             soci::use(upgrade.version()), soci::use(upgrade.checksum()), soci::use(upgrade.releaseDate()), soci::use(upgrade.briefDescription()), soci::use(upgrade.fullDescription())));
+
+    write(statements);
+}
+
 int DBControl::getUserId(const std::string &token)
 {
     int id = -1;
@@ -613,38 +627,11 @@ void DBControl::write(std::vector<soci::statement> &statements)
 {
     if (!statements.empty())
     {
-        bool success = false;
-        //int tryCount = 0;
+        soci::transaction transaction(*_writeSession);
 
-        while (!success)
-        {
-            try
-            {
-                soci::transaction transaction(*_writeSession);
+        for (soci::statement &statement: statements)
+            statement.execute(true);
 
-                for (soci::statement &statement: statements)
-                    statement.execute(true);
-
-                transaction.commit();
-
-                success = true;
-            }
-            catch (const soci::soci_error&)
-            {
-                /*int error = sqlite_api::sqlite3_errcode(static_cast<soci::sqlite3_session_backend*>(_writeSession->get_backend())->conn_);
-
-                if (error == SQLITE_BUSY || error == SQLITE_LOCKED)
-                {
-                    ++tryCount;
-
-                    if (tryCount > DATABASE_LOCKED_TRY_COUNT)
-                        throw;
-                }
-                else
-                    throw;*/
-
-                throw;
-            }
-        }
+        transaction.commit();
     }
 }
