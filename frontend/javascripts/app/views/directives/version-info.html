@@ -13,8 +13,14 @@
       <h3>Model Number:</h3>
       <h2>{{data.model_number}}</h2>
     </div>
-    <button class="update-button" update-software>
+    <button class="update-button" ng-show="update_available === 'unavailable' || update_available === 'unknown'" ng-click="checkForUpdates()">
+      CHECK FOR UPDATES
+    </button>
+    <button class="update-button" ng-show="update_available === 'available'" ng-click="checkForUpdates()">
       SOFTWARE UPDATE AVAILABLE
+    </button>
+    <button class="update-button text" ng-show="update_available === 'downloading'">
+      DOWNLOADING SOFTWARE UPDATE
     </button>
   </div>
 </div>

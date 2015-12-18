@@ -1,7 +1,8 @@
 window.App.directive 'versionInfo', [
   'Device'
-  '$modal'
-  (Device, $modal) ->
+  'Status'
+  'SoftwareUpdater'
+  (Device, Status, SoftwareUpdater) ->
     restrict: 'EA'
     replace: true
     scope:
@@ -9,8 +10,19 @@ window.App.directive 'versionInfo', [
     templateUrl: 'app/views/directives/version-info.html'
     link: ($scope, elem, attrs) ->
 
+      $scope.$watch ->
+        Status.getData()
+      , (data) ->
+        $scope.update_available = data?.device?.update_available
+
       Device.getVersion(true).then (resp) ->
         $scope.data = resp
+
+      $scope.updateSoftware = ->
+        Device.updateSoftware()
+
+      $scope.checkForUpdates = ->
+        SoftwareUpdater.checkForUpdate()
 
 
 ]
