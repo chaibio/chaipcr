@@ -287,8 +287,8 @@ dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
        		echo "Data image not found: $image_filename_data"
 	fi
 
-	echo "Finalizing: $image_filename_upgrade1"
-	mv $image_filename_upgrade_temp $image_filename_upgrade1
+	echo "Finalizing: $image_filename_upgrade2"
+	mv $image_filename_upgrade_temp $image_filename_upgrade2
 
 #if [ -e  $image_filename_upgrade_tar_temp ]
 #then
@@ -328,8 +328,8 @@ fi
 
 cd $current_folder
 
-echo "Finalizing: $image_filename_upgrade1, and $image_filename_upgrade2"
-mv $image_filename_upgrade_temp $image_filename_upgrade2
+echo "Finalizing: $image_filename_upgrade1"
+mv $image_filename_upgrade_temp $image_filename_upgrade1
 
 if [ -e ${sdcard}/pack_resume_autorun.flag ]
 then
