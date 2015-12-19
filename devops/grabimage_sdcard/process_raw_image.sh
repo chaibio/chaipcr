@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 if ! id | grep -q root; then
@@ -54,8 +53,8 @@ else
 		then
 			echo "Path created: $2"
 			BASEDIR=$(dirname $0)
-			echo copying card contents from $BASEDIR to $output_dir
-			cp -r $BASEDIR/* $output_dir
+			echo copying card contents from $BASEDIR/factory_settings_sdcard/ to $output_dir
+			cp -r $BASEDIR/factory_settings_sdcard/* $output_dir
 		else
 			echo "Cann't create path: $2"
 			exit 1
@@ -251,7 +250,7 @@ dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
 #if [ "$1" = "factorysettings" ]
 #then
 	echo "Data partition: $data_partition"
-	umount /tmp/emmc>/dev/null || true
+#	umount /tmp/emmc>/dev/null || true
 	mount $data_partition /tmp/emmc -t ext4
 
 	retval=$?
@@ -334,15 +333,15 @@ mv $image_filename_upgrade_temp $image_filename_upgrade2
 
 if [ -e ${sdcard}/pack_resume_autorun.flag ]
 then
-	rm ${sdcard}/pack_resume_autorun.flag>/dev/null || true 
+	rm ${sdcard}/pack_resume_autorun.flag>/dev/null || true
 fi
 
 sync
 unmount_all
-
+ls -ahl $output_dir
 echo "Finished.. byebye!"
 
-if [ -e $image_filename_upgrade ]
+if [ -e $image_filename_upgrade1 ]
 then
 	exit 0
 fi
