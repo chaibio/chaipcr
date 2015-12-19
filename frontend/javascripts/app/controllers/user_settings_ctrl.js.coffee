@@ -20,7 +20,6 @@
      fetchUsers = ->
        User.fetch().then (users) ->
          $scope.users = users
-         console.log $scope
 
      fetchUsers()
 
@@ -30,10 +29,8 @@
 
      $scope.changeUser = (index)->
        $scope.selectedUser = $scope.users[index].user;
+       User.selectedUSer = $scope.users[index].user;
        console.log "clciked", $scope.selectedUser
-
-
-
 
 
      $scope.addUser = ->

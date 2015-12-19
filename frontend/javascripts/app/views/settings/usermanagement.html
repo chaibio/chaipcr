@@ -12,7 +12,7 @@
     <div class="user-data">
       <ul>
         <li ng-repeat="user in users">
-          <a ng-click="changeUser($index)" ui-sref="settings.usermanagement.user({user: '{{user.user.name}}'})" ui-sref-active="highlite">{{user.user.name}}</a>
+          <a ui-sref="settings.usermanagement.user({id: '{{user.user.id}}'})" ui-sref-active="highlite">{{user.user.name}}</a>
           <!--<a ng-click="removeUser(user.user.id)" class="btn-remove" ng-if="user.user.id !== currentUser.id"></a>-->
         </li>
       </ul>

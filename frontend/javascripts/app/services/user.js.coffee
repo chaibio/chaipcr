@@ -30,6 +30,9 @@ window.ChaiBioTech.ngApp.service 'User', [
 
       deferred.promise
 
+    @get = (id)->
+      console.log @all
+
     @remove = (id) ->
       $http.delete("/users/#{id}")
 

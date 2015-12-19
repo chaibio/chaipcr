@@ -42,7 +42,7 @@ window.ChaiBioTech.ngApp
         templateUrl: 'app/views/settings/usermanagement.html'
 
       .state 'settings.usermanagement.user',
-        url: '/:user'
+        url: '/:id'
         templateUrl: 'app/views/settings/user-details.html'
 
       .state 'edit-protocol',

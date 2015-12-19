@@ -1,14 +1,14 @@
-<div class="user-details-container">
+<div class="user-details-container" ng-controller="userDataController">
   <div class="admin-access">
     ALLOW ADMIN ACCESS
   </div>
   <div class="name-field">
     <p>NAME</p>
-    <input type="text" ng-model="selectedUser.name">
+    <input type="text" ng-model="userData.name" >
   </div>
   <div class="email-field">
     <p>E-Mail</p>
-    <input type="text" ng-model="selectedUser.email">
+    <input type="text" ng-model="userData.email">
   </div>
 
 </div>
