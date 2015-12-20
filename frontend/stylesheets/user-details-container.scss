@@ -7,8 +7,20 @@
   .admin-access {
     font-size: 14px;
     font-weight: bold;
+    height: 20px;
     margin-top: 30px;
     margin-bottom: 10px;
+
+    .admin-toggle {
+        padding-top: 3px;
+        width: 30px;
+        height: 20px;
+        float: left;
+    }
+    .allow-admin-text {
+      //margin-left: 15px;
+      float: left;
+    }
   }
 
   .field {
