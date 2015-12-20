@@ -1,4 +1,4 @@
-# chaipcr/web/public/dynexp/optical_calibration/analyze.R
+# chaipcr/web/public/dynexp/optical_cal/analyze.R
 # use `prep_calib` to check validity of water calibration data
 
 library(jsonlite)
@@ -18,16 +18,17 @@ analyze_optical_calibration <- function(
                          port=db_port, 
                          dbname=db_name)
     
-    result1 <- try(prep_calib(db_conn, exp_id, verbose))
+    result1 <- try(prep_optic_calib(db_conn, exp_id, verbose))
     
     if (class(result1) == 'try-error') {
         valid <- FALSE
-        err <- 'Fluorescein calibrator was less fluorescent than water in some wells. Please retry with new fluorescein calibrator.'
+        #err <- 'Fluorescein calibrator was less fluorescent than water in some wells. Please retry with new fluorescein calibrator.' # solution 1
+        err <- result1 # solution 2
     } else {
         valid <- TRUE
         err <- NULL }
     
-    result2 <- list('valid'=unbox(valid), 'error_message'=unbox(err))
+    result2 <- list('valid'=unbox(valid), 'error_message'=unbox(err)) # `unbox` so atomic elements not returned as array in JSON
     
     if (out_json) result2 <- toJSON(result2)
     

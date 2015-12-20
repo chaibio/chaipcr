@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 if ! id | grep -q root; then
@@ -11,19 +10,29 @@ eMMC=/dev/md2
 sdcard="."
 current_folder=$(pwd)
 output_dir=$current_folder
+BASEDIR=$(dirname $0)
 
 echo "current dir $current_folder"
 
 if [ -z $1 ]
 then
-	echo "No sdcard path given.. assuming same directory: $current_folder"
 	sdcard=$current_folder
+
+	if [ -e ${current_folder}/eMMC_part1.img ]
+	then
+		sdcard=$current_folder
+	elif [ -e ${BASEDIR}/eMMC_part1.img ]
+        then
+                sdcard=$BASEDIR
+	fi
+
+	echo "No sdcard path given.. assuming same directory: $sdcard"
 else
 	if [ -e $1 ]
 	then
 		echo "Path found: $1"
 		sdcard=$1
-	else	
+	else
 		echo "Path not found: $1"
 		exit 1
 	fi
@@ -31,22 +40,22 @@ fi
 
 if [ -z $2 ]
 then
-	echo "No output path.. assuming current directory: $current_folder"
+	echo "No output path given.. assuming current directory: $current_folder"
 	output_dir=$current_folder
 else
 	output_dir=$2
 	if [ -e $2 ]
 	then
 		echo "Path found: $2"
-	else	
+	else
 		mkdir -p $2
 		if [ -e $2 ]
 		then
 			echo "Path created: $2"
 			BASEDIR=$(dirname $0)
-			echo copying card contents from $BASEDIR to $output_dir
-			cp -r $BASEDIR/* $output_dir
-		else		
+			echo copying card contents from $BASEDIR/factory_settings_sdcard/ to $output_dir
+			cp -r $BASEDIR/factory_settings_sdcard/* $output_dir
+		else
 			echo "Cann't create path: $2"
 			exit 1
 		fi
@@ -241,7 +250,7 @@ dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
 #if [ "$1" = "factorysettings" ]
 #then
 	echo "Data partition: $data_partition"
-	umount /tmp/emmc>/dev/null || true
+#	umount /tmp/emmc>/dev/null || true
 	mount $data_partition /tmp/emmc -t ext4
 
 	retval=$?
@@ -278,8 +287,8 @@ dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
        		echo "Data image not found: $image_filename_data"
 	fi
 
-	echo "Finalizing: $image_filename_upgrade1"
-	mv $image_filename_upgrade_temp $image_filename_upgrade1
+	echo "Finalizing: $image_filename_upgrade2"
+	mv $image_filename_upgrade_temp $image_filename_upgrade2
 
 #if [ -e  $image_filename_upgrade_tar_temp ]
 #then
@@ -319,20 +328,20 @@ fi
 
 cd $current_folder
 
-echo "Finalizing: $image_filename_upgrade1, and $image_filename_upgrade2"
-mv $image_filename_upgrade_temp $image_filename_upgrade2
+echo "Finalizing: $image_filename_upgrade1"
+mv $image_filename_upgrade_temp $image_filename_upgrade1
 
 if [ -e ${sdcard}/pack_resume_autorun.flag ]
 then
-	rm ${sdcard}/pack_resume_autorun.flag>/dev/null || true 
+	rm ${sdcard}/pack_resume_autorun.flag>/dev/null || true
 fi
 
 sync
 unmount_all
-
+ls -ahl $output_dir
 echo "Finished.. byebye!"
 
-if [ -e $image_filename_upgrade ]
+if [ -e $image_filename_upgrade1 ]
 then
 	exit 0
 fi

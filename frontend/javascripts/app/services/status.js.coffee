@@ -43,19 +43,18 @@ window.ChaiBioTech.ngApp
       deferred.promise
 
     @startSync = ->
-      @listenersCount += 1
-
       if !@fetching then @fetch()
-
       if !@interval
         @interval = $interval @fetch, 1000
 
     @stopSync = ->
-      @listenersCount -= 1
+      # @listenersCount -= 1
 
-      if @listenersCount is 0
-        $interval.cancel @interval
-        @interval = null
+      # if @listenersCount is 0
+      #   $interval.cancel @interval
+      #   @interval = null
+
+    @startSync()
 
     return
 

@@ -7,14 +7,20 @@
     </div>
     <div class="item-version">
       <h3>Software Version:</h3>
-      <h2>{{data.software.version}}</h2>
+      <h2>{{data.software.version}} <span ng-show="update_available === 'unavailable'">(Latest)</span></h2>
     </div>
     <div class="item-version">
       <h3>Model Number:</h3>
       <h2>{{data.model_number}}</h2>
     </div>
-    <button class="update-button" update-software>
+    <button class="update-button" ng-show="update_available === 'unavailable' || update_available === 'unknown'" ng-click="checkForUpdates()">
+      CHECK FOR UPDATES
+    </button>
+    <button class="update-button" ng-show="update_available === 'available'" ng-click="checkForUpdates()">
       SOFTWARE UPDATE AVAILABLE
+    </button>
+    <button class="update-button text" ng-show="update_available === 'downloading'">
+      DOWNLOADING SOFTWARE UPDATE
     </button>
   </div>
 </div>
