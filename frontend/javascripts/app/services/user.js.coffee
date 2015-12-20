@@ -30,8 +30,14 @@ window.ChaiBioTech.ngApp.service 'User', [
 
       deferred.promise
 
-    @get = (id)->
-      console.log @all
+    @findUSer = (key)->
+      deferred = $q.defer()
+      console.log "getUSerPArt", key
+      #$http.get('/users/' + key).then (resp) ->
+      $http.get('/users/').then (resp) ->
+        deferred.resolve resp.data
+
+      deferred.promise
 
     @remove = (id) ->
       $http.delete("/users/#{id}")

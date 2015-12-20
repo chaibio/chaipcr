@@ -2,13 +2,29 @@
   <div class="admin-access">
     ALLOW ADMIN ACCESS
   </div>
-  <div class="name-field">
-    <p>NAME</p>
-    <input type="text" ng-model="userData.name" >
+  <div class="field">
+    <div class="name-field">
+      <p class="p-caption">NAME</p>
+      <input type="text" class="text-class"ng-model="userData.name" >
+    </div>
+    <div class="email-field">
+      <p class="p-caption">E-Mail</p>
+      <input type="text" class="text-class" ng-model="userData.email">
+    </div>
+    <div class="email-field">
+      <p class="p-caption">Password</p>
+      <button class="button" ng-click="">RESET PASSWORD</button>
+    </div>
   </div>
-  <div class="email-field">
-    <p>E-Mail</p>
-    <input type="text" ng-model="userData.email">
+  <div class="action-buttons">
+    <div class="button-containers">
+      <button class="button first-button" ng-click="">DELETE USER</button>
+    </div>
+    <div class="button-containers second-spacing">
+      <button class="button second-button" ng-click="">CANCEL</button>
+    </div>
+    <div class="button-containers">
+      <button class="third-button" ng-click="">SAVE CHANGES</button>
+    </div>
   </div>
-
 </div>

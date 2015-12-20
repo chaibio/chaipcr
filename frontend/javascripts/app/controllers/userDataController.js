@@ -5,13 +5,19 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
   function($scope, $stateParams, userService) {
     //$scope.name = "john";
     $scope.id = $stateParams.id - 1;
+    $scope.userData = {};
 
     $scope.getUserData = function() {
-      userService.fetch().
+      console.log($scope.id, "good work");
+      userService.findUSer($scope.id).
         then(function(data) {
-          $scope.userData = data[$scope.id].user;
+          //console.log(data);
+          $scope.userData = data[$scope.id].user; // There is some error on bringing the individual user.
         });
-    }
+    };
+
+
+
 
     $scope.getUserData();
   }
