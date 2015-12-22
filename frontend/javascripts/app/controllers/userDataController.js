@@ -24,10 +24,9 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
 
     $scope.update = function() {
       $scope.resetPassStatus = false;
-    };
-
-    $scope.cancel = function() {
-
+      userService.save($scope.userData).then(function(data) {
+        console.log(data);
+      });
     };
 
     $scope.getUserData();
