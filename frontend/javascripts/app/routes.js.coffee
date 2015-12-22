@@ -46,9 +46,9 @@ window.ChaiBioTech.ngApp
         templateUrl: 'app/views/settings/user-details.html'
         controller: 'newUserController'
 
-      .state 'settings.usermanagement.current',
-        url: '/current/user'
-        templateUrl: 'app/views/settings/user-details.html'
+      .state 'settings.current-user',
+        url: '/current-user'
+        templateUrl: 'app/views/settings/edit-current-user.html'
         controller: 'userDataController'
 
       .state 'settings.usermanagement.user',

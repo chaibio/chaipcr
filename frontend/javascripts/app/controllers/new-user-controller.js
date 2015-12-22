@@ -13,13 +13,12 @@ window.ChaiBioTech.ngApp.controller('newUserController', [
     $scope.userData.password_confirmation = "";
 
     $scope.update = function() { // This method actually saves and create a new user
+      
       $scope.resetPassStatus = false;
       var format = $scope.userData;
       userService.save(format).then(function(data) {
         $state.transitionTo('settings.usermanagement', {}, { reload: true });
       });
     };
-
-
   }
 ]);

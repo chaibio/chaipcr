@@ -1,0 +1,44 @@
+<div class="usermanagement-container-current" ng-controller="UserSettingsCtrl">
+  <version-info></version-info>
+  <div class="maintainance-container-backdrop" ui-sref="settings.root">
+  </div>
+
+  <div class="left">
+    <h2 class="underlined">EDIT LOGGED IN USER<span class="close" ui-sref="settings.root">&times;</span></h2>
+    <!--<ng-include src="'app/views/settings/user-details.html'"></ng-include> -->
+    <div class="user-details-container">
+      <div class="field">
+        <div class="name-field">
+          <p class="p-caption">NAME</p>
+          <input type="text" class="text-class"ng-model="userData.name" >
+        </div>
+        <div class="email-field">
+          <p class="p-caption">E-Mail</p>
+          <input type="text" class="text-class" ng-model="userData.email">
+        </div>
+        <div class="email-field">
+          <p class="p-caption">Password</p>
+          <button ng-if="! resetPassStatus" class="button" ng-click="resetPass()">RESET PASSWORD</button>
+          <div class="edit-pass-container" ng-if="resetPassStatus">
+            <div class="name-field">
+              <p class="p-caption">Enter New Password</p>
+              <input type="password" ng-model="userData.password" placeholder="Alphanumeric only" class="text-class">
+            </div>
+            <div class="name-field">
+              <p class="p-caption">Confirm Password</p>
+              <input type="password" ng-model="userData.password_confirmation" placeholder="Retype exactly as above" class="text-class">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="action-buttons">
+        <div class="button-containers second-spacing">
+          <button class="button second-button" ui-sref="settings.usermanagement">CANCEL</button>
+        </div>
+        <div class="button-containers">
+          <button class="third-button" ng-click="update()">SAVE CHANGES</button>
+        </div>
+      </div>
+    </div
+  </div>
+</div>

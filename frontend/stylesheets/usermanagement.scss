@@ -72,3 +72,53 @@
     }
   }
 }
+
+.usermanagement-container-current {
+  background-color: #999;
+  width: 100%;
+  color: black;
+
+  .left {
+    width: 320px;
+    height: 100%;
+    float: left;
+    border-right-style: solid;
+    border-right-width: 1px;
+    border-right-color: #cdcdcd;
+    background-color: white;
+    position: absolute;
+    top: 0px;
+
+    .user-details-container {
+        margin-left: 18px;
+        .p-caption {
+          font-size: 14px;
+          color: black;
+          padding-top: 25px;
+        }
+
+        .field {
+          height: 400px;
+
+          .text-class {
+            width: 260px;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-bottom: 1px solid lightgray;
+          }
+          .email-field {
+            .button {
+              width: 260px;
+            }
+          }
+        }
+
+    }
+
+    .underlined {
+      margin-left: 18px;
+      margin-right: 18px;
+    }
+  }
+}
