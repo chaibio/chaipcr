@@ -9,6 +9,7 @@ window.ChaiBioTech.ngApp.service 'User', [
     @currentUser = -> user
 
     @save = (user) ->
+      console.log user
       deferred = $q.defer()
       $http.post '/users',
         user: user
@@ -30,6 +31,15 @@ window.ChaiBioTech.ngApp.service 'User', [
 
       deferred.promise
 
+    @updateUser = (id, data)->
+      console.log data
+      deferred = $q.defer()
+      $http.put("/users/#{id}", data).then (resp) ->
+        deferred.resolve resp.data
+
+      deferred.promise;
+
+
     @findUSer = (key)->
       deferred = $q.defer()
       console.log "getUSerPArt", key
@@ -40,7 +50,12 @@ window.ChaiBioTech.ngApp.service 'User', [
       deferred.promise
 
     @remove = (id) ->
-      $http.delete("/users/#{id}")
+      deferred = $q.defer()
+      $http.delete("/users/#{id}").then (resp) ->
+        deferred.resolve resp.data
+
+      deferred.promise;
+    
 
     return
 

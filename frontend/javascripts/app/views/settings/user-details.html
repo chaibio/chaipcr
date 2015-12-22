@@ -20,18 +20,18 @@
       <div class="edit-pass-container" ng-if="resetPassStatus">
         <div class="name-field">
           <p class="p-caption">Enter New Password</p>
-          <input type="password" placeholder="Alphanumeric only" class="text-class">
+          <input type="password" ng-model="userData.password" placeholder="Alphanumeric only" class="text-class">
         </div>
         <div class="name-field">
           <p class="p-caption">Confirm Password</p>
-          <input type="password" placeholder="Retype exactly as above" class="text-class">
+          <input type="password" ng-model="userData.password_confirmation" placeholder="Retype exactly as above" class="text-class">
         </div>
       </div>
     </div>
   </div>
   <div class="action-buttons">
     <div class="button-containers">
-      <button class="button first-button" ng-if="! resetPassStatus" ng-click="">DELETE USER</button>
+      <button class="button first-button" ng-if="! resetPassStatus" ng-click="deleteUser()">DELETE USER</button>
     </div>
     <div class="button-containers second-spacing">
       <button class="button second-button" ui-sref="settings.usermanagement">CANCEL</button>
