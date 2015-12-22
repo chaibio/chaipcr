@@ -113,7 +113,7 @@ bool UpdateManager::update()
 
 void UpdateManager::download(std::istream &dataStream)
 {
-    std::unique_lock<std::recursive_mutex> lock(_downalodMutex);
+    std::unique_lock<std::recursive_mutex> lock(_downloadMutex);
 
     stopDownload();
 
@@ -161,7 +161,7 @@ void UpdateManager::download(std::istream &dataStream)
 
 void UpdateManager::stopDownload()
 {
-    std::lock_guard<std::recursive_mutex> lock(_downalodMutex);
+    std::lock_guard<std::recursive_mutex> lock(_downloadMutex);
 
     if (_downloadThread.joinable())
     {
@@ -221,7 +221,7 @@ void UpdateManager::checkUpdateCallback()
 
     if (qpcrApp.settings().configuration.version != upgrade.version())
     {
-        std::lock_guard<std::recursive_mutex> lock(_downalodMutex);
+        std::lock_guard<std::recursive_mutex> lock(_downloadMutex);
 
         if (_updateState.compare_exchange_strong(state, Downloading))
             _downloadThread = std::thread(static_cast<void(UpdateManager::*)(std::string,std::string)>(&UpdateManager::downlaod), this, imageUrl, upgrade.checksum());

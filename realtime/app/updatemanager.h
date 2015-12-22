@@ -58,7 +58,7 @@ private:
 
     std::atomic<UpdateState> _updateState;
 
-    std::recursive_mutex _downalodMutex;
+    std::recursive_mutex _downloadMutex;
     std::thread _downloadThread;
     int _downloadEventFd;
 };
