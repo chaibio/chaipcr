@@ -13,8 +13,6 @@ window.ChaiBioTech.ngApp.directive('allowAdminToggle', [
         scope.show = true;
 
         scope.$watch("data", function(val, oldVal) {
-          console.log("inside", scope);
-          //console.log(scope);
           scope.configureSwitch(val);
         });
 

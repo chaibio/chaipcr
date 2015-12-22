@@ -43,8 +43,8 @@ window.ChaiBioTech.ngApp.service 'User', [
     @findUSer = (key)->
       deferred = $q.defer()
       #console.log "getUSerPArt", key
-      #$http.get('/users/' + key).then (resp) ->
-      $http.get('/users/').then (resp) ->
+      $http.get('/users/' + key).then (resp) ->
+      #$http.get('/users/').then (resp) ->
         deferred.resolve resp.data
 
       deferred.promise
