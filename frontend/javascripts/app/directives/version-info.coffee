@@ -22,6 +22,7 @@ window.App.directive 'versionInfo', [
         Device.updateSoftware()
 
       $scope.checkForUpdates = ->
+        $scope.checkedUpdate = true
         SoftwareUpdater.checkForUpdate()
 
 
