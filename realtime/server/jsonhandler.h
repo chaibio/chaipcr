@@ -1,31 +1,28 @@
 #ifndef JSONHANDLER_H
 #define JSONHANDLER_H
 
-#include <Poco/Net/HTTPRequestHandler.h>
-#include <Poco/Net/HTTPServerResponse.h>
+#include "datahandler.h"
 
 #include <boost/property_tree/ptree.hpp>
 
-class JSONHandler : public Poco::Net::HTTPRequestHandler
+class JsonHandler : public DataHandler
 {
 public:
-    JSONHandler();
-    JSONHandler(Poco::Net::HTTPResponse::HTTPStatus code, const std::string &errorMessage);
-
-    void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) final;
-
-    inline Poco::Net::HTTPResponse::HTTPStatus getStatus() const { return _status; }
-    inline void setStatus(Poco::Net::HTTPResponse::HTTPStatus status) { _status = status; }
+    JsonHandler();
+    JsonHandler(Poco::Net::HTTPResponse::HTTPStatus status, const std::string &errorMessage);
 
     inline const std::string& getErrorString() const { return _errorString; }
     inline void setErrorString(const std::string &text) { _errorString = text; }
 
 protected:
+    void processRequest(Poco::Net::HTTPServerRequest &request) final;
+    void processResponse(Poco::Net::HTTPServerResponse &response) final;
+
     virtual void processData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt);
 
 private:
-private:
-    Poco::Net::HTTPResponse::HTTPStatus _status;
+    boost::property_tree::ptree _responsePt;
+
     std::string _errorString;
 };
 

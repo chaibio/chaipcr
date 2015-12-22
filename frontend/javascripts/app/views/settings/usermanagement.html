@@ -6,13 +6,13 @@
   <div class="left">
     <h2 class="underlined">CURRENT USER<span class="close" ui-sref="settings.root">&times;</span></h2>
     <div class="buttons-container">
-      <button class="button" ng-click="openAddUserModal()">ADD USER</button>
+      <button ui-sref="settings.usermanagement.new" class="button">ADD USER</button>
     </div>
 
     <div class="user-data">
       <ul>
         <li ng-repeat="user in users">
-          <a ui-sref="settings.usermanagement.user({id: '{{user.user.id}}'})" ui-sref-active="highlite">{{user.user.name}}</a>
+          <a ui-sref="settings.usermanagement.user({id: '{{user.user.id}}'})" ui-sref-active="highlite">{{user.user.name}}<span ng-if="user.user.role=='admin'" class="if-admin">, Admin</span></a>
           <!--<a ng-click="removeUser(user.user.id)" class="btn-remove" ng-if="user.user.id !== currentUser.id"></a>-->
         </li>
       </ul>

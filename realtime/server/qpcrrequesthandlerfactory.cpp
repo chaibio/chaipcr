@@ -13,6 +13,7 @@
 #include "logdatahandler.h"
 #include "networkmanagerhandler.h"
 #include "updatehandler.h"
+#include "updateuploadhandler.h"
 
 #include "qpcrrequesthandlerfactory.h"
 #include "experimentcontroller.h"
@@ -91,24 +92,31 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
                             else if (requestPath.at(1) == "stop")
                                 return new ControlHandler(ControlHandler::StopExperiment);
                         }
-                        else if (requestPath.at(0) == "device" && requestPath.at(1) == "check_for_updates")
-                            return new UpdateHandler(UpdateHandler::CheckUpdate);
+                        else if (requestPath.at(0) == "device")
+                        {
+                            if (requestPath.at(1) == "check_for_updates")
+                                return new UpdateHandler(UpdateHandler::CheckUpdate);
+                            else if (requestPath.at(1) == "update_software")
+                                return new UpdateHandler(UpdateHandler::Update);
+                            else if (requestPath.at(1) == "upload_software_update")
+                                return new UpdateUploadHandler();
+                        }
                     }
                 }
             }
             else
-                return new JSONHandler(HTTPResponse::HTTP_UNAUTHORIZED, "You must be logged in");
+                return new JsonHandler(HTTPResponse::HTTP_UNAUTHORIZED, "You must be logged in");
         }
 
         return new HTTPCodeHandler(HTTPResponse::HTTP_NOT_FOUND);
     }
     catch (const std::exception &ex)
     {
-        return new JSONHandler(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, std::string("Exception occured: ") + ex.what());
+        return new JsonHandler(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, std::string("Exception occured: ") + ex.what());
     }
     catch (...)
     {
-        return new JSONHandler(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "Unknown exception occured");
+        return new JsonHandler(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "Unknown exception occured");
     }
 }
 

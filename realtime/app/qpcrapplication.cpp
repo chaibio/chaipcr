@@ -81,7 +81,7 @@ int QPCRApplication::main(const vector<string>&) {
     try
     {
         server.start();
-        _updateManager->start();
+        _updateManager->startChecking();
 
         for (auto threadControlUnit: _threadControlUnits)
             threadControlUnit->start();

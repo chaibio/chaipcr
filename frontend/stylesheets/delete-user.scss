@@ -1,0 +1,44 @@
+.delete-user {
+  width:482px;
+  height: 245px;
+  background-color: white;
+
+  .close-container {
+    height: 55px;
+    width: 100%;
+
+    .close {
+      margin: 10px 10px;
+    }
+  }
+
+  .bold-text-container {
+    height: 50px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+  }
+
+  .normal-text-container {
+    height: 80px;
+    text-align: center;
+    padding-top: 15px;
+    font-size: 16px;
+  }
+  .button-container {
+      text-align: center;
+    .del-button {
+      width: 260px;
+      height: 32px;
+      color: white;
+      background-color: #e02127;
+      border: none;
+      font-weight: bold;
+    }
+    .del-button:hover {
+      color: #e02127;
+      background-color: white;
+      border: solid 1px #e02127;
+    }
+  }
+}

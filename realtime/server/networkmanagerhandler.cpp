@@ -20,7 +20,7 @@ void NetworkManagerHandler::processData(const boost::property_tree::ptree &reque
 
     case SetSettings:
         setSettings(requestPt);
-        JSONHandler::processData(requestPt, responsePt);
+        JsonHandler::processData(requestPt, responsePt);
         break;
 
     case WifiScan:
@@ -29,19 +29,19 @@ void NetworkManagerHandler::processData(const boost::property_tree::ptree &reque
 
     case WifiConnect:
         wifiConnect();
-        JSONHandler::processData(requestPt, responsePt);
+        JsonHandler::processData(requestPt, responsePt);
         break;
 
     case WifiDisconnect:
         wifiDisconnect();
-        JSONHandler::processData(requestPt, responsePt);
+        JsonHandler::processData(requestPt, responsePt);
         break;
 
     default:
         setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
         setErrorString("Unknown opeation type");
 
-        JSONHandler::processData(requestPt, responsePt);
+        JsonHandler::processData(requestPt, responsePt);
 
         break;
     }

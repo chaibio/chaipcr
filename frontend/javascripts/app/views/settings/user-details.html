@@ -1,7 +1,7 @@
-<div class="user-details-container" ng-controller="userDataController">
+<div class="user-details-container">
   <div class="admin-access">
     <div class="admin-toggle">
-      <gather-data-toggle data="true" call="changeDuringStep"></gather-data-toggle>
+      <allow-admin-toggle data="userData.role"></allow-admin-toggle>
     </div>
     <div class="allow-admin-text">ALLOW ADMIN ACCESS</div>
   </div>
@@ -31,7 +31,7 @@
   </div>
   <div class="action-buttons">
     <div class="button-containers">
-      <button class="button first-button" ng-if="! resetPassStatus" ng-click="deleteUser()">DELETE USER</button>
+      <button class="button first-button" ng-if="! resetPassStatus" ng-click="deleteMessage()">DELETE USER</button>
     </div>
     <div class="button-containers second-spacing">
       <button class="button second-button" ui-sref="settings.usermanagement">CANCEL</button>

@@ -108,15 +108,18 @@ const unsigned int kBeagleboneADCBits = 12;
 const std::string kDeviceFilePath = "/root/device.json";
 const std::string kConfigurationFilePath = "/root/configuration.json";
 
-const long kAppUpdageInterva = 4 * 60 * 60 * 1000;
-
 const long kAppSignalInterval = 50 * 1000 * 1000; //Nanosec
 
 //Http updage client
-const std::string kUpdagesHost = "update.chaibio.com";
-const std::string kChecUpdatesUri = "http://update.chaibio.com/device/software_update";
-const std::string kUpdateApiPassword = "chai";
+
+//Updater
+const long kUpdateInterval = 4 * 60 * 60 * 1000;
+
+const std::string kUpdateHost = "update.chaibio.com";
+const std::string kUpdatesUrl = "http://update.chaibio.com/device/software_update";
+const std::string kUpdatePassword = "chai";
 const std::string kUpdateFilePath = "/sdcard/upgrade-rootfs.img.gz";
+const std::string kUpdateScriptPath = "/sdcard/update_software_image.sh";
 
 //Network settings
 const std::string kNetworkInterfacesFile = "/etc/network/interfaces";

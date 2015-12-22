@@ -3,28 +3,23 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
   '$stateParams',
   'User',
   '$state',
+  '$uibModal',
+  function($scope, $stateParams, userService, $state, $uibModal) {
 
-  function($scope, $stateParams, userService, $state) {
-    //$scope.name = "john";
-    $scope.id = $stateParams.id;
+    $scope.id = $stateParams.id || 'current';
     $scope.userData = {};
     $scope.resetPassStatus = false;
     $scope.userData.password = "";
     $scope.userData.password_confirmation = "";
 
     $scope.getUserData = function() {
-      console.log($scope, "good work");
+      if(isNaN($scope.id)) {
+        //userService.curr
+      }
       userService.findUSer($scope.id).
         then(function(data) {
-          //console.log(data);
-          data.some(function(userData, index) {
-            if(userData.user.id == $scope.id) {
-              $scope.userData = userData.user;
-              return true;
-            }
-            return false;
-          });
-           // There is some error on bringing the individual user.
+          $scope.id = data.user.id;
+          $scope.userData = data.user;
         });
     };
 
@@ -47,6 +42,13 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
       var format = $scope.userData;
       userService.updateUser($scope.id, format).then(function(data) {
         $state.transitionTo('settings.usermanagement', {}, { reload: true });
+      });
+    };
+
+    $scope.deleteMessage = function() {
+      $scope.uiModal = $uibModal.open({
+        templateUrl: 'app/views/settings/delete-user.html',
+        scope: $scope,
       });
     };
 
