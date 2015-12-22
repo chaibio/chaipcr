@@ -7,7 +7,7 @@
     </div>
     <div class="item-version">
       <h3>Software Version:</h3>
-      <h2>{{data.software.version}} <span ng-show="update_available === 'unavailable'">(Latest)</span></h2>
+      <h2>{{ data.software.version + (update_available === 'unavailable' ? ' (Latest)' : '') }}</h2>
     </div>
     <div class="item-version">
       <h3>Model Number:</h3>
@@ -20,7 +20,7 @@
       SOFTWARE UPDATE AVAILABLE
     </button>
     <button class="update-button text" ng-show="update_available === 'downloading'">
-      DOWNLOADING SOFTWARE UPDATE
+      DOWNLOADING SOFTWARE UPDATE <ellipsis-animated />
     </button>
   </div>
 </div>

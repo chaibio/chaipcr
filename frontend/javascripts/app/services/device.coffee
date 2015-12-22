@@ -29,7 +29,7 @@ window.App.service 'Device', [
         return deferred.promise
 
       updateSoftware: ->
-        return $http.post("/device/update_software")
+        return $http.post("#{host}\:8000/device/update_software") # "#{host}\:8000/status"
 
     return new Device
 
