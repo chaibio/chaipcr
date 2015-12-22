@@ -32,6 +32,8 @@ class UsersController < ApplicationController
   def show
     if params[:id] == "current"
       @user = current_user
+    else
+      @user = User.find_by_id(params[:id])
     end
     respond_to do |format|
       format.json { render "show", :status => :ok}
