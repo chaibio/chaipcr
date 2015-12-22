@@ -3,8 +3,8 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
   '$stateParams',
   'User',
   '$state',
-
-  function($scope, $stateParams, userService, $state) {
+  '$uibModal',
+  function($scope, $stateParams, userService, $state, $uibModal) {
     //$scope.name = "john";
     $scope.id = $stateParams.id;
     $scope.userData = {};
@@ -47,6 +47,13 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
       var format = $scope.userData;
       userService.updateUser($scope.id, format).then(function(data) {
         $state.transitionTo('settings.usermanagement', {}, { reload: true });
+      });
+    };
+
+    $scope.deleteMessage = function() {
+      $scope.uiModal = $uibModal.open({
+        templateUrl: 'app/views/settings/delete-user.html',
+        scope: $scope, //passed current scope to the modal
       });
     };
 
