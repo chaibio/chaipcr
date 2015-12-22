@@ -13,7 +13,7 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
     $scope.userData.password_confirmation = "";
 
     $scope.getUserData = function() {
-      console.log($scope, "good work");
+      //console.log($scope, "good work");
       userService.findUSer($scope.id).
         then(function(data) {
           //console.log(data);
