@@ -140,7 +140,9 @@ HEADERS += \
     db/upgrade.h \
     app/updatemanager.h \
     util/util.h \
-    server/updatehandler.h
+    server/updatehandler.h \
+    server/datahandler.h \
+    server/updateuploadhandler.h
 
 SOURCES += \
     app/pins.cpp \
@@ -192,4 +194,6 @@ SOURCES += \
     server/networkmanagerhandler.cpp \
     app/updatemanager.cpp \
     util/util.cpp \
-    server/updatehandler.cpp
+    server/updatehandler.cpp \
+    server/datahandler.cpp \
+    server/updateuploadhandler.cpp

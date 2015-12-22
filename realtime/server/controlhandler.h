@@ -3,7 +3,7 @@
 
 #include "jsonhandler.h"
 
-class ControlHandler : public JSONHandler
+class ControlHandler : public JsonHandler
 {
 public:
     enum OperationType

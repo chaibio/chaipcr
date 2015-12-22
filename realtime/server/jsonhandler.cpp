@@ -1,87 +1,70 @@
-#include <boost/property_tree/json_parser.hpp>
-#include <Poco/Net/HTTPServerRequest.h>
-#include <Poco/Net/HTTPServerResponse.h>
+#include "jsonhandler.h"
 
 #include <iostream>
 
-#include "jsonhandler.h"
+#include <boost/property_tree/json_parser.hpp>
 
-using namespace Poco::Net;
-using namespace boost::property_tree;
-using namespace std;
-
-JSONHandler::JSONHandler()
+JsonHandler::JsonHandler()
 {
-    setStatus(HTTPResponse::HTTP_OK);
+
 }
 
-JSONHandler::JSONHandler(HTTPResponse::HTTPStatus code, const string &errorMessage)
+JsonHandler::JsonHandler(Poco::Net::HTTPResponse::HTTPStatus status, const std::string &errorMessage)
+    :DataHandler(status)
 {
-    setStatus(code);
     setErrorString(errorMessage);
 }
 
-void JSONHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
+void JsonHandler::processRequest(Poco::Net::HTTPServerRequest &request)
 {
-    istream &requestStream = request.stream();
-    ptree requestPt, responsePt;
+    boost::property_tree::ptree requestPt;
 
     try
     {
         if (request.getContentLength() > 0)
-            read_json(requestStream, requestPt);
+            boost::property_tree::read_json(request.stream(), requestPt);
 
-        processData(requestPt, responsePt);
+        processData(requestPt, _responsePt);
     }
-    catch (json_parser_error &ex)
+    catch (const std::exception &ex)
     {
-        cout << "JSONHandler::handleRequest - Failed to parse JSON: " << ex.what() << '\n';
+        std::cout << "JsonHandler::processRequest - error: " << ex.what() << '\n';
 
-        setStatus(HTTPResponse::HTTP_BAD_REQUEST);
+        _responsePt.clear();
+
+        setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
         setErrorString(ex.what());
-
-        responsePt.clear();
-        JSONHandler::processData(requestPt, responsePt);
+        JsonHandler::processData(requestPt, _responsePt);
     }
-    catch (exception &ex)
+    catch (...)
     {
-        cout << "JSONHandler::handleRequest - Error occured: " << ex.what() << '\n';
+        std::cout << "JsonHandler::processRequest - unknown error\n";
 
-        setStatus(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-        setErrorString(ex.what());
+        _responsePt.clear();
 
-        responsePt.clear();
-        JSONHandler::processData(requestPt, responsePt);
-    }
-
-    try
-    {
-        response.setStatusAndReason(getStatus(), Poco::Net::HTTPServerResponse::getReasonForStatus(getStatus()));
-
-        //CORS
-        response.add("Access-Control-Allow-Origin", "*");
-        response.add("Access-Control-Allow-Headers", "X-Requested-With, X-Prototype-Version, X-CSRF-Token, Authorization");
-
-        if (!responsePt.empty())
-        {
-            response.setContentType("text/json");
-
-            ostream &responseStream = response.send();
-            write_json(responseStream, responsePt);
-            responseStream.flush();
-        }
-        else
-            response.send().flush();
-    }
-    catch (exception &ex)
-    {
-        cout << "JSONHandler::handleRequest - Failed to write JSON: " << ex.what() << '\n';
+        setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+        setErrorString("Unknown error");
+        JsonHandler::processData(requestPt, _responsePt);
     }
 }
 
-void JSONHandler::processData(const ptree &, ptree &responsePt)
+void JsonHandler::processResponse(Poco::Net::HTTPServerResponse &response)
 {
-    if (getStatus() == HTTPResponse::HTTP_OK)
+    if (!_responsePt.empty())
+    {
+        response.setContentType("text/json");
+
+        std::ostream &responseStream = response.send();
+        write_json(responseStream, _responsePt);
+        responseStream.flush();
+    }
+    else
+        response.send().flush();
+}
+
+void JsonHandler::processData(const boost::property_tree::ptree &/*requestPt*/, boost::property_tree::ptree &responsePt)
+{
+    if (getStatus() == Poco::Net::HTTPResponse::HTTP_OK)
         responsePt.put("status.status", true);
     else
     {

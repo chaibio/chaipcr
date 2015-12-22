@@ -3,12 +3,13 @@
 
 #include "jsonhandler.h"
 
-class UpdateHandler : public JSONHandler
+class UpdateHandler : public JsonHandler
 {
 public:
     enum OperationType
     {
-        CheckUpdate
+        CheckUpdate,
+        Update
     };
 
     UpdateHandler(OperationType type);

@@ -3,7 +3,7 @@
 
 #include "jsonhandler.h"
 
-class LogDataHandler : public JSONHandler
+class LogDataHandler : public JsonHandler
 {
 protected:
     void processData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt);

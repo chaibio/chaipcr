@@ -14,7 +14,7 @@ void UpdateHandler::processData(const boost::property_tree::ptree &requestPt, bo
     switch (_type)
     {
     case CheckUpdate:
-        if (updateManager->checkUpdates())
+        if (updateManager->checkUpdate())
         {
             UpdateManager::UpdateState state = updateManager->updateState();
 
@@ -31,6 +31,7 @@ void UpdateHandler::processData(const boost::property_tree::ptree &requestPt, bo
                     break;
 
                 case UpdateManager::Downloading:
+                case UpdateManager::ManualDownloading:
                     responsePt.put("device.update_available", "downloading");
                     break;
 
@@ -57,11 +58,22 @@ void UpdateHandler::processData(const boost::property_tree::ptree &requestPt, bo
 
         break;
 
+    case Update:
+        if (updateManager->update())
+            JsonHandler::processData(requestPt, responsePt);
+        else
+        {
+            setStatus(Poco::Net::HTTPResponse::HTTP_PRECONDITION_FAILED);
+            setErrorString("Update is not available");
+        }
+
+        break;
+
     default:
         setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
         setErrorString("Unknown opeation type");
 
-        JSONHandler::processData(requestPt, responsePt);
+        JsonHandler::processData(requestPt, responsePt);
 
         break;
     }

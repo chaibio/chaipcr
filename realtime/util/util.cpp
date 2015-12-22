@@ -11,6 +11,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 namespace Util
 {
@@ -63,6 +65,8 @@ bool watchProcess(const std::string &command, int eventFd, std::function<void(co
         }
 
         close(processPipes[0]);
+
+        setpriority(PRIO_PROCESS, getpid(), 20);
 
         execl("/bin/sh", "sh", "-c", command.c_str(), NULL);
         _exit(127);
