@@ -55,7 +55,7 @@ window.ChaiBioTech.ngApp.service 'User', [
         deferred.resolve resp.data
 
       deferred.promise;
-    
+
 
     return
 

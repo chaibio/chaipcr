@@ -13,7 +13,7 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
     $scope.userData.password_confirmation = "";
 
     $scope.getUserData = function() {
-      console.log($scope.id, "good work");
+      console.log($scope, "good work");
       userService.findUSer($scope.id).
         then(function(data) {
           //console.log(data);
@@ -38,9 +38,7 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
     $scope.deleteUser = function() {
 
       userService.remove($scope.id).then(function(data) {
-        //$state.go("settings.usermanagement");
-        location.href = "#settings/usermanagement";
-        console.log("deleted");
+        $state.go('settings.usermanagement', {}, { reload: true });
       });
     };
 
@@ -48,7 +46,7 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
       $scope.resetPassStatus = false;
       var format = $scope.userData;
       userService.updateUser($scope.id, format).then(function(data) {
-        console.log("Update");
+        $state.transitionTo('settings.usermanagement', {}, { reload: true });
       });
     };
 
