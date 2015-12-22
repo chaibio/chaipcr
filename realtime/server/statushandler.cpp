@@ -153,6 +153,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
         break;
 
     case UpdateManager::Downloading:
+    case UpdateManager::ManualDownloading:
         responsePt.put("device.update_available", "downloading");
         break;
 

@@ -72,5 +72,5 @@ void ControlHandler::processData(const boost::property_tree::ptree &requestPt, b
         break;
     }
 
-    JSONHandler::processData(requestPt, responsePt);
+    JsonHandler::processData(requestPt, responsePt);
 }

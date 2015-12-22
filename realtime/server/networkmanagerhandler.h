@@ -3,7 +3,7 @@
 
 #include "jsonhandler.h"
 
-class NetworkManagerHandler : public JSONHandler
+class NetworkManagerHandler : public JsonHandler
 {
 public:
     enum OperationType
@@ -20,6 +20,7 @@ public:
 
     NetworkManagerHandler(const std::string &interfaceName, OperationType type);
 
+protected:
     void processData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt);
 
 private:

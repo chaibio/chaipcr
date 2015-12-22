@@ -7,10 +7,9 @@
 #include <mutex>
 #include <atomic>
 
-//Can't use here std::condition_variable because wait_for/wait_until requires newer gcc
-#include <Poco/Condition.h>
+#include <Poco/Event.h>
 
-namespace Poco { class Timer; namespace Net { class HTTPClientSession; } }
+namespace Poco { namespace Util { class Timer; } namespace Net { class HTTPClientSession; } }
 
 class DBControl;
 
@@ -23,6 +22,7 @@ public:
         Unavailable,
         Available,
         Downloading,
+        ManualDownloading,
         Updating
     };
 
@@ -31,14 +31,18 @@ public:
 
     inline UpdateState updateState() const { return _updateState; }
 
-    void start();
+    void startChecking();
+    void stopChecking(bool wait = true);
 
-    bool checkUpdates();
+    bool checkUpdate();
 
+    bool update();
+
+    void download(std::istream &dataStream);
     void stopDownload();
 
 private:
-    void checkUpdates(Poco::Timer &timer);
+    void checkUpdateCallback();
 
     void downlaod(std::string imageUrl, std::string checksum);
     bool downlaod(const std::string &imageUrl);
@@ -47,13 +51,12 @@ private:
 
 private:
     std::shared_ptr<DBControl> _dbControl;
-
-    Poco::Timer *_updateTimer;
     Poco::Net::HTTPClientSession *_httpClient;
 
-    std::atomic<UpdateState> _updateState;
+    Poco::Util::Timer *_updateTimer;
+    Poco::Event _updateEvent;
 
-    Poco::Condition _updateCheckCondition;
+    std::atomic<UpdateState> _updateState;
 
     std::recursive_mutex _downloadMutex;
     std::thread _downloadThread;
