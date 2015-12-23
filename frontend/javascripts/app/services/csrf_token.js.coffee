@@ -8,7 +8,7 @@ app.service 'CSRFToken', [
   ($window) ->
     request: (config) ->
 
-      if config.url.indexOf('8000') < 0
+      if config.url.indexOf('8000') < 0 && config.url.indexOf("update.chaibio.com") < 0
         config.headers['X-CSRF-Token'] = $window.$('meta[name=csrf-token]').attr('content')
         config.headers['X-Requested-With'] = 'XMLHttpRequest'
 

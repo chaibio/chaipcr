@@ -137,12 +137,21 @@ gulp.task('hash-js', ['concat-js'], function () {
 });
 
 gulp.task('uglify', ['concat-js', 'hash-js'], function () {
-  return gulp.src('.tmp/js/'+applicationJS+'.js')
-         .pipe(uglify())
-         .on('error', swallowError)
-         .pipe(stripDebug())
-         .on('error', swallowError)
-         .pipe(gulp.dest('.tmp/js'));
+  var shouldStripDebug = (process.env.stripdebug === 'false')? false : true;
+  var stream = gulp.src('.tmp/js/'+applicationJS+'.js');
+
+  stream.pipe(uglify())
+  .on('error', swallowError);
+
+  if(shouldStripDebug) {
+    stream.pipe(stripDebug())
+    .on('error', swallowError);
+  }
+
+  stream.pipe(gulp.dest('.tmp/js'));
+
+  return stream;
+
 });
 
 gulp.task('markup-js-link', ['hash-js'], function () {

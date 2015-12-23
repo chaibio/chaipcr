@@ -10,17 +10,17 @@
       <a class="close" ng-click="$dismiss()">&times;</a>
     </div>
     <h1>SOFTWARE UPDATE READY TO INSTALL</h1>
-    <p class="text-center text-gray">v.2.0.1, Nov. 21, 2015</p>
+    <p class="text-center text-gray">v.{{new_update.version}}, {{new_update.release_date | date: 'MMM d, yyyy'}}</p>
     <div class="update-details-container">
       <p>
         <b>New in this version:</b>
       </p>
       <div class="update-info-full" ng-class="{expand: full_update_info}">
         <p class="text-gray" ng-show="!full_update_info">
-          {{update.upgrade.brief_description}}
+          {{new_update.brief_description}}
         </p>
         <p class="text-gray" ng-show="full_update_info">
-          {{update.upgrade.full_description}}
+          {{new_update.full_description}}
         </p>
         <p>
           <b>

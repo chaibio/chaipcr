@@ -15,27 +15,29 @@ window.App.controller 'SoftwareUpdateCtrl', [
 
     checkForUpdatePromise.then (resp) ->
       $scope.content = 'update_available'
-      $scope.update_available = resp.data
+      $scope.new_update = resp.data.upgrade
 
     checkForUpdatePromise.catch ->
       cloudCheckPromise = Device.checkCloudUpdate()
       cloudCheckPromise.then (resp) ->
+        console.log resp
         cloudInfo = resp.data
         Device.getVersion().then (device) ->
           if cloudInfo.software_version isnt device.software.version
             $scope.content = 'update_available'
-            $scope.update_available =
-              upgrade:
-                brief_description: cloudInfo.brief_description
-                full_description: cloudInfo.full_description
-                release_date: cloudInfo.release_date
-                version: cloudInfo.software_version
+            $scope.new_update =
+              brief_description: cloudInfo.brief_description
+              full_description: cloudInfo.full_description
+              release_date: cloudInfo.release_date
+              version: cloudInfo.software_version
 
           else
             $scope.content = 'update_unavailable'
 
-      cloudCheckPromise.catch ->
+      cloudCheckPromise.catch (resp) ->
+        console.log resp
         window.alert('Unable to check for updates!');
+        $modalInstance.dismiss()
 
     $scope.doUpdate = ->
       $scope.content = 'update_in_progress'
