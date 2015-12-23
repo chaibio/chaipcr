@@ -39,7 +39,7 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
 
     $scope.update = function() {
       $scope.resetPassStatus = false;
-      var format = $scope.userData;
+      var format = {'user': $scope.userData};
       userService.updateUser($scope.id, format).then(function(data) {
         $state.transitionTo('settings.usermanagement', {}, { reload: true });
       });
