@@ -252,7 +252,7 @@ void UpdateManager::downlaod(std::string imageUrl, std::string checksum)
 bool UpdateManager::downlaod(const std::string &imageUrl)
 {
     std::stringstream stream;
-    stream << "sshpass -p \'" << kUpdatePassword << "\' rsync --inplace " << imageUrl << " " << kUpdateFilePath;
+    stream << "sshpass -p \'" << kUpdatePassword << "\' rsync -a --checksum --no-whole-file --inplace " << imageUrl << " " << kUpdateFilePath;
 
     return Util::watchProcess(stream.str(), _downloadEventFd, [](const char buffer[]){ std::cout << "UpdateManager::downlaod - rsync:" << buffer << '\n'; });
 }
