@@ -226,10 +226,11 @@ void ExperimentController::stop()
 
 void ExperimentController::stop(const std::string &errorMessage)
 {
-    bool stopTimers = false;
-
     {
         Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
+
+        if (_machineState == IdleMachineState)
+            return;
 
         LidInstance::getInstance()->setEnableMode(false);
         HeatBlockInstance::getInstance()->setEnableMode(false);
@@ -237,8 +238,6 @@ void ExperimentController::stop(const std::string &errorMessage)
 
         if (_experiment.id() != -1)
         {
-            stopTimers = true;
-
             _experiment.setCompletionStatus(Experiment::Failed);
             _experiment.setCompletionMessage(errorMessage);
             _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
@@ -251,12 +250,9 @@ void ExperimentController::stop(const std::string &errorMessage)
         _experiment = Experiment();
     }
 
-    if (stopTimers)
-    {
-        stopLogging();
-        _holdStepTimer->stop();
-        _meltCurveTimer->stop();
-    }
+    stopLogging();
+    _holdStepTimer->stop();
+    _meltCurveTimer->stop();
 }
 
 void ExperimentController::meltCurveCallback(Poco::Timer &)

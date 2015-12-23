@@ -36,7 +36,12 @@ void Optics::process()
 {
     bool lidState = _lidSensePin.value() == GPIO::kHigh ? true : false;
     if (_lidOpen.compare_exchange_strong(lidState, !lidState))
+    {
         toggleCollectData();
+
+        if (_lidOpen)
+            qpcrApp.stopExperiment("Lid opened during run");
+    }
 }
 
 void Optics::setADCValue(unsigned int adcValue, std::size_t channel)
