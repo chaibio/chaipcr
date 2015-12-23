@@ -37,6 +37,8 @@
 
       ul {
         li {
+          font-family: "dinot-regular";
+          font-size: 16px;
           a {
             cursor: pointer;
             color: #000;
@@ -66,6 +68,7 @@
     padding-left: 30px;
 
     .user-details p {
+      font-family: "dinot-bold";
       font-size: 14px;
       color: black;
       padding-top: 25px;
@@ -77,6 +80,17 @@
   background-color: #999;
   width: 100%;
   color: black;
+
+  .usermanagement-container-backdrop {
+    background: #333;
+    width: 100%;
+    height: 500px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0.5;
+    min-height: 100%;
+  }
 
   .left {
     width: 320px;
@@ -91,7 +105,9 @@
 
     .user-details-container {
         margin-left: 18px;
+
         .p-caption {
+          font-family: "dinot-bold";
           font-size: 14px;
           color: black;
           padding-top: 25px;

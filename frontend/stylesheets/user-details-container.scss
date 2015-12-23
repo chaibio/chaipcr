@@ -1,18 +1,24 @@
 .user-details-container {
 
+  font-family: "dinot-regular";
   .p-caption {
     color: black;
     font-weight: bold;
   }
+  .button {
+    font-family: "dinot-bold";
+    font-size: 16px;
+  }
   .admin-access {
-    font-size: 14px;
+    font-family: "dinot-bold";
+    font-size: 16px;
     font-weight: bold;
     height: 20px;
     margin-top: 30px;
     margin-bottom: 10px;
 
     .admin-toggle {
-        padding-top: 3px;
+        padding-top: 5px;
         width: 30px;
         height: 20px;
         float: left;
@@ -66,7 +72,8 @@
       border-color: grey;
     }
     .third-button {
-      font-weight: bold;
+      font-family: "dinot-bold";
+      font-size: 16px;
       color: white;
       background-color: #8dc63f;
       border: 1px solid white;
