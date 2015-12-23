@@ -30,5 +30,11 @@
     padding: 2px 20px;
     background: #999;
     font-weight: bold;
+
+    &.text {
+      padding: 3px 21px;
+      border: none;
+      cursor: default;
+    }
   }
 }

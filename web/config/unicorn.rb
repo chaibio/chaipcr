@@ -28,8 +28,8 @@ working_directory "/root/chaipcr/web" # available in 0.94.0+
 listen "/root/shared/sockets/unicorn.sock", :backlog => 64
 listen 8080, :tcp_nopush => true
 
-# nuke workers after 30 seconds instead of 60 seconds (the default)
-timeout 90
+# nuke workers after 300 seconds instead of 60 seconds (the default)
+timeout 300
 
 # feel free to point this anywhere accessible on the filesystem
 pid "/tmp/unicorn.pid"

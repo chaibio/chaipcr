@@ -41,6 +41,7 @@ var vendorFiles = [
   'app/libs/ladda.min.js',
   'app/libs/angular-ladda.min.js',
   'app/libs/rainbowvis.js',
+  'app/libs/ellipsis-animated.js',
 ];
 var appFiles = [
   'welcome.js',

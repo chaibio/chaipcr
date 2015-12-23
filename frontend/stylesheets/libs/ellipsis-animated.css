@@ -1,0 +1,106 @@
+/*
+
+Expected usage:
+
+    <span class="ellipsis_animated-inner">
+        <span>.</span>
+        <span>.</span>
+        <span>.</span>
+    </span>
+
+*/
+
+@-webkit-keyframes ellipsis_animated-toggle {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@-moz-keyframes ellipsis_animated-toggle {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@-ms-keyframes ellipsis_animated-toggle {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@-o-keyframes ellipsis_animated-toggle {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes ellipsis_animated-toggle {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.ellipsis_animated-inner span {
+    -webkit-animation-name: ellipsis_animated-toggle;
+    -moz-animation-name: ellipsis_animated-toggle;
+    -ms-animation-name: ellipsis_animated-toggle;
+    -o-animation-name: ellipsis_animated-toggle;
+    animation-name: ellipsis_animated-toggle;
+
+    -webkit-animation-duration: 1000ms;
+    -moz-animation-duration: 1000ms;
+    -ms-animation-duration: 1000ms;
+    -o-animation-duration: 1000ms;
+    animation-duration: 1000ms;
+
+    -webkit-animation-iteration-count: infinite;
+    -moz-animation-iteration-count: infinite;
+    -ms-animation-iteration-count: infinite;
+    -o-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
+
+    -webkit-animation-timing-function: cubic-bezier(.02,.85,.69,1);
+    -moz-animation-timing-function: cubic-bezier(.02,.85,.69,1);
+    -ms-animation-timing-function: cubic-bezier(.02,.85,.69,1);
+    -o-animation-timing-function: cubic-bezier(.02,.85,.69,1);
+    animation-timing-function: cubic-bezier(.02,.85,.69,1);
+}
+
+.ellipsis_animated-inner span:nth-child(1) {
+    -webkit-animation-delay: -1000ms;
+    -moz-animation-delay: -1000ms;
+    -ms-animation-delay: -1000ms;
+    -o-animation-delay: -1000ms;
+    animation-delay: -1000ms;
+}
+
+.ellipsis_animated-inner span:nth-child(2) {
+    -webkit-animation-delay: -900ms;
+    -moz-animation-delay: -900ms;
+    -ms-animation-delay: -900ms;
+    -o-animation-delay: -900ms;
+    animation-delay: -900ms;
+}
+
+.ellipsis_animated-inner span:nth-child(3) {
+    -webkit-animation-delay: -800ms;
+    -moz-animation-delay: -800ms;
+    -ms-animation-delay: -800ms;
+    -o-animation-delay: -800ms;
+    animation-delay: -800ms;
+}

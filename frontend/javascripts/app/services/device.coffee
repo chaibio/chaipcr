@@ -12,7 +12,13 @@ window.App.service 'Device', [
       version_info = null
 
       checkForUpdate: ->
-        $http.get('/device/software_update')
+        # $http.get('/device/software_update')
+        def = $q.defer()
+        def.reject()
+        def.promise
+
+      checkCloudUpdate: ->
+        $http.get("http://update.chaibio.com/device/software_update", {headers: {'Content-Type': 'text/plain'}})
 
       getVersion: (cache = false) ->
         deferred = $q.defer()
@@ -29,7 +35,7 @@ window.App.service 'Device', [
         return deferred.promise
 
       updateSoftware: ->
-        return $http.post("/device/update_software")
+        return $http.post("#{host}\:8000/device/update_software") # "#{host}\:8000/status"
 
     return new Device
 

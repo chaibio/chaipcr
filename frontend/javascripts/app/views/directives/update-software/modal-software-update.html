@@ -1,0 +1,62 @@
+<div>
+  <!-- checking for new updates -->
+  <h1 ng-show="content === 'checking_for_updates'">
+    Checking available updates <ellipsis-animated></ellipsis-animated>
+  </h1>
+
+  <!-- new software update is available -->
+  <div class="modal-software-update" ng-show="content === 'update_available'">
+    <div class="text-right">
+      <a class="close" ng-click="$dismiss()">&times;</a>
+    </div>
+    <h1>SOFTWARE UPDATE READY TO INSTALL</h1>
+    <p class="text-center text-gray">v.2.0.1, Nov. 21, 2015</p>
+    <div class="update-details-container">
+      <p>
+        <b>New in this version:</b>
+      </p>
+      <div class="update-info-full" ng-class="{expand: full_update_info}">
+        <p class="text-gray" ng-show="!full_update_info">
+          {{update.upgrade.brief_description}}
+        </p>
+        <p class="text-gray" ng-show="full_update_info">
+          {{update.upgrade.full_description}}
+        </p>
+        <p>
+          <b>
+            After updating, your hardware will reboot. This process takes about 30 minutes and the screen may be blank throughout. Please do not power cycle the hardware during this process.
+          </b>
+        </p>
+      </div>
+      <p>
+        <b class="text-blue full-update-details" ng-click="full_update_info = true" ng-show="!full_update_info">Full update details</b>
+      </p>
+    </div>
+    <div class="buttons-container">
+      <div>
+        <button class="button button-green" ng-click="doUpdate()">INSTALL NOW</button>
+      </div>
+      <div>
+        <button class="button" ng-click="$dismiss()">REMIND ME LATER</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- software is up to date -->
+  <div class="modal-software-update" ng-show="content === 'update_unavailable'">
+    <h1 class="text-green">Software is up to date.</h1>
+  </div>
+
+  <!-- update is in progress -->
+  <div class="modal-software-update" ng-show="content === 'update_in_progress'">
+    <h1>
+      Update in Progress
+      <img src="/images/loading.gif">
+    </h1>
+    <p class="text-gray">
+      This will take approximately 30 minutes. Your device will reboot when complete.
+    </p>
+  </div>
+
+
+</div>
