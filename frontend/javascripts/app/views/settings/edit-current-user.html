@@ -1,4 +1,4 @@
-<div class="usermanagement-container-current" ng-controller="UserSettingsCtrl">
+<div class="usermanagement-container-current" ng-controller="userDataController">
   <version-info></version-info>
   <div class="usermanagement-container-backdrop" ui-sref="settings.root"></div>
 
@@ -32,7 +32,7 @@
       </div>
       <div class="action-buttons">
         <div class="button-containers second-spacing">
-          <button class="button second-button" ui-sref="settings.usermanagement">CANCEL</button>
+          <button class="button second-button" ui-sref="settings">CANCEL</button>
         </div>
         <div class="button-containers">
           <button class="third-button" ng-click="update()">SAVE CHANGES</button>

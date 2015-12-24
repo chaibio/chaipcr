@@ -24,12 +24,17 @@ window.ChaiBioTech.ngApp.directive('autoDeltaToggle', [
 
         });
 
-        $(elem).click(function(evt) {
+        scope.clickHandler = function() {
+
+          scope.configureSwitch(!scope.data);
+          scope.sendData();
+        };
+        /*$(elem).click(function(evt) {
           //if($(evt.target).is(".gather-data-toggle") && scope.type === "cycling") {
             scope.configureSwitch(!scope.data);
             scope.sendData();
           //}
-        });
+        });*/
 
         scope.configureSwitch = function(val) {
 
@@ -55,7 +60,7 @@ window.ChaiBioTech.ngApp.directive('autoDeltaToggle', [
           scope.$parent[scope.call]();
         };
 
-        scope.dragElem = $(elem).find(".outer-circle").draggable({
+        scope.dragElem = angular.element(elem).find(".outer-circle").draggable({
           containment: "parent",
           axis: "x",
 

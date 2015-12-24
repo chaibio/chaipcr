@@ -25,6 +25,10 @@
 
      $scope.currentUser = User.currentUser()
 
+     User.getCurrent().then (data) ->
+       $scope.loggedInUser = data.data.user
+       console.log data.data.user
+
      $scope.user = {}
 
      $scope.changeUser = (index)->

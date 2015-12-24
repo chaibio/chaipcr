@@ -1,5 +1,5 @@
 <div class="user-details-container">
-  <div class="admin-access">
+  <div ng-if="isAdmin" class="admin-access">
     <div class="admin-toggle">
       <allow-admin-toggle data="userData.role"></allow-admin-toggle>
     </div>
@@ -14,7 +14,7 @@
       <p class="p-caption">E-Mail</p>
       <input type="text" class="text-class" ng-model="userData.email">
     </div>
-    <div class="email-field">
+    <div ng-if="allowEditPassword" class="email-field">
       <p class="p-caption">Password</p>
       <button ng-if="! resetPassStatus" class="button" ng-click="resetPass()">RESET PASSWORD</button>
       <div class="edit-pass-container" ng-if="resetPassStatus">
@@ -29,7 +29,7 @@
       </div>
     </div>
   </div>
-  <div class="action-buttons">
+  <div class="action-buttons" ng-if="allowButtons">
     <div class="button-containers">
       <button class="button first-button" ng-if="! resetPassStatus" ng-click="deleteMessage()">DELETE USER</button>
     </div>

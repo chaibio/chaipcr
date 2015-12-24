@@ -53,13 +53,27 @@ else
 		then
 			echo "Path created: $2"
 			BASEDIR=$(dirname $0)
-			echo copying card contents from $BASEDIR/factory_settings_sdcard/ to $output_dir
-			cp -r $BASEDIR/factory_settings_sdcard/* $output_dir
+			echo copying card contents from $BASEDIR/factory_settings_sdcard/ to $output_dir/p1
+			if [ ! -e ${output_dir}/p1 ]
+			then
+				mkdir -p ${output_dir}/p1
+			fi
+			cp -r $BASEDIR/factory_settings_sdcard/* $output_dir/p1
 		else
 			echo "Cann't create path: $2"
 			exit 1
 		fi
 	fi
+fi
+
+if [ ! -e ${output_dir}/p1 ]
+then
+	mkdir -p ${output_dir}/p1
+fi
+
+if [ ! -e ${output_dir}/p2 ]
+then
+	mkdir -p ${output_dir}/p2
 fi
 
 image_filename_upgrade="${temp}/eMMC.img"
@@ -132,7 +146,7 @@ image_filename_pt="$image_filename_prfx-pt.img.gz"
 
 #image_filename_upgrade_tar_temp="${temp}/temp.tar"
 image_filename_upgrade_temp="${temp}/temp.tar.gz"
-image_filename_upgrade1="${output_dir}/upgrade.img.gz"
+image_filename_upgrade1="${output_dir}/p2/upgrade.img.gz"
 
 echo "SDCard: $sdcard" #current_folder"
 cd ${temp}
@@ -140,7 +154,7 @@ cd ${temp}
 #if [ "$1" = "factorysettings" ]
 #then	
 #	echo "Factory settings image creation"
-image_filename_upgrade2="${output_dir}/factory_settings.img.gz"
+image_filename_upgrade2="${output_dir}/p1/factory_settings.img.gz"
 #fi
 
 echo "Packing eMMC image.."
@@ -338,7 +352,8 @@ fi
 
 sync
 unmount_all
-ls -ahl $output_dir
+ls -ahl $output_dir/p1 $output_dir/p2
+
 echo "Finished.. byebye!"
 
 if [ -e $image_filename_upgrade1 ]
