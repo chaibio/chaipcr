@@ -42,6 +42,8 @@ var vendorFiles = [
   'app/libs/angular-ladda.min.js',
   'app/libs/rainbowvis.js',
   'app/libs/ellipsis-animated.js',
+  'app/libs/ng-file-upload-shim.js',
+  'app/libs/ng-file-upload.js',
 ];
 var appFiles = [
   'welcome.js',

@@ -1,0 +1,8 @@
+<div ng-controller="UploadImageCtrl">
+  <h1>Upload Image</h1>
+  <div class="btn btn-default" ngf-select="upload($file)">Upload on file select</div>
+
+  <p ng-show="uploading">
+    {{percent_upload || 0}}% uploaded <ellipsis-animated></ellipsis-animated>
+  </p>
+</div>
