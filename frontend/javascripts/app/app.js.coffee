@@ -14,5 +14,5 @@ window.App = window.ChaiBioTech.ngApp = angular.module 'ChaiBioTech', [
   'http-auth-interceptor'
   'ngAnimate'
   'angular-ladda'
-  #'ellipsisAnimated'
+  'ellipsisAnimated'
 ]
