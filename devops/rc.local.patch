@@ -1,6 +1,8 @@
---- rc.local	2015-12-24 14:04:19.409149502 +0200
-+++ ../rc.updated/rc.local	2015-12-24 14:00:32.701136690 +0200
-@@ -11,4 +11,128 @@
+Only in ../rc.updated/: check_sdcard.sh
+diff -ur ./rc.local ../rc.updated/rc.local
+--- ./rc.local	2015-12-24 14:04:19.409149502 +0200
++++ ../rc.updated/rc.local	2015-12-25 01:04:18.731387338 +0200
+@@ -11,4 +11,139 @@
  #
  # By default this script does nothing.
  
@@ -64,6 +66,15 @@
 +	return 1
 +}
 +
++check_corruption () {
++	echo "Corruption test started!" >> $log_file
++	sh /etc/check_sdcard.sh >> $log_file || true
++	echo "Corruption test result: $?" >> $log_file
++}
++
++#check_corruption
++#exit 0
++
 +network_watchdog() {
 +        echo "Network watchdog: Starting"
 +        while [ 1 ]
@@ -123,6 +134,8 @@
 +then
 +        mount /dev/mmcblk1p4 /perm
 +fi
++
++check_corruption || true
 +
 +check_upgrade_autorun &
 +
