@@ -1,13 +1,13 @@
 class UsersController < ApplicationController
-  before_filter :ensure_authenticated_user, :except => :create
+  #before_filter :ensure_authenticated_user, :except => :create
 
   respond_to :json
-  
-  resource_description { 
+
+  resource_description {
     formats ['json']
     description "all the actions only allowed if admin user logged in, otherwise response code 401 will be returned"
   }
-  
+
   def_param_group :user do
     param :user, Hash, :desc => "User Info", :required => true do
       param :name, String, :desc => "User Name", :required => true
@@ -17,7 +17,7 @@ class UsersController < ApplicationController
       param :role, ["admin", "user"], :desc => "User Role", :required => false
      end
   end
-  
+
   api :GET, "/users", "List all the users"
   example "[{'user':{'id':1,'name':'admin','email':'admin@admin.com','role':'admin'}}]"
   def index
@@ -39,7 +39,7 @@ class UsersController < ApplicationController
       format.json { render "show", :status => :ok}
     end
   end
-    
+
   api :POST, "/users", "Create an user"
   param_group :user
   example "[{'user':{'id':1,'name':'test','email':'test@test.com','role':'user'}}]"
@@ -63,7 +63,7 @@ class UsersController < ApplicationController
       format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
-  
+
   api :DELETE, "/users/:id", "Destroy an user"
   def destroy
     @user = User.find_by_id(params[:id])
@@ -77,13 +77,13 @@ class UsersController < ApplicationController
       format.json { render "destroy", :status => (ret)? :ok : :unprocessable_entity}
     end
   end
-  
+
   private
 
   def user_params
     params.require(:user).permit(:name, :email, :password, :password_confirmation, :role)
   end
-  
+
   def authorized?
     current_user.admin?
   end
