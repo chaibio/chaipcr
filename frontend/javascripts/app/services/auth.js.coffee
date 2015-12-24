@@ -20,7 +20,7 @@ app.factory 'AuthToken', [
       access_token = $.jStorage.get('authToken', null)
       if access_token and config.url.indexOf('8000') >= 0
         config.url = "#{config.url}#{ if config.url.indexOf('&') < 0 then '?' else '&' }access_token=#{access_token}"
-        config.headers['Content-Type'] = config.headers['Content-Type'] || 'multipart/form-data'
+        config.headers['Content-Type'] = config.headers['Content-Type'] || 'application/x-www-form-urlencoded'
 
       config
 

@@ -5,7 +5,9 @@ window.App.controller 'SoftwareUpdateCtrl', [
   '$uibModal'
   '$uibModalInstance'
   'Device'
-  ($scope, $uibModal, $uibModalInstance, Device) ->
+  '$window'
+  '$state'
+  ($scope, $uibModal, $uibModalInstance, Device, $window, $state) ->
 
     # $scope.update = {'upgrade':{'version':'1.0.1','release_date':null,'brief_description':'this is the brief description','full_description':'this is the full description'}}
     $scope.content = 'checking_for_updates'
@@ -26,6 +28,8 @@ window.App.controller 'SoftwareUpdateCtrl', [
           if cloudInfo.software_version isnt device.software.version
             $scope.content = 'update_available'
             $scope.new_update =
+              is_offline: true
+              image_url: cloudInfo.image_url
               brief_description: cloudInfo.brief_description
               full_description: cloudInfo.full_description
               release_date: cloudInfo.release_date
@@ -36,7 +40,7 @@ window.App.controller 'SoftwareUpdateCtrl', [
 
       cloudCheckPromise.catch (resp) ->
         console.log resp
-        window.alert('Unable to check for updates!');
+        $window.alert('Unable to check for updates!');
         $uibModalInstance.dismiss()
 
     $scope.doUpdate = ->
@@ -49,5 +53,10 @@ window.App.controller 'SoftwareUpdateCtrl', [
 
       updatePromise.catch ->
         $scope.data.updating = 'failed'
+
+    $scope.downloadUpdate = ->
+      $state.go 'upload-image'
+      $window.open("ftp://#{$scope.new_update.image_url}", '_blank')
+      $uibModalInstance.dismiss()
 
 ]

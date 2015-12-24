@@ -13,10 +13,13 @@ window.App.service 'Device', [
       version_info = null
 
       checkForUpdate: ->
-        $http.get('/device/software_update')
+        def = $q.defer()
+        # $http.get('/device/software_update')
+        def.reject()
+        def.promise
 
       checkCloudUpdate: ->
-        $http.get("http://update.chaibio.com/device/software_update", {headers: {'Content-Type': 'text/plain'}})
+        $http.get("http://update.chaibio.com/device/software_update")
 
       getVersion: (cache = false) ->
         deferred = $q.defer()
@@ -39,10 +42,7 @@ window.App.service 'Device', [
         Upload.upload
           url: "#{host}\:8000/device/upload_software_update"
           method: 'POST'
-          data:
-            data: file
-          headers:
-            'Content-Type': 'multipart/form-data'
+          data: file
 
     return new Device
 

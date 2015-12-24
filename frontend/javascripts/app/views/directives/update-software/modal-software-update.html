@@ -34,7 +34,8 @@
     </div>
     <div class="buttons-container">
       <div>
-        <button class="button button-green" ng-click="doUpdate()">INSTALL NOW</button>
+        <button class="button button-green" ng-click="doUpdate()" ng-show="!new_update.is_offline">INSTALL NOW</button>
+        <button class="button button-green" ng-click="downloadUpdate()" ng-show="new_update.is_offline">DOWNLOAD IMAGE</button>
       </div>
       <div>
         <button class="button" ng-click="$dismiss()">REMIND ME LATER</button>
