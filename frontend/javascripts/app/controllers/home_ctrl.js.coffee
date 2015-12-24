@@ -4,10 +4,10 @@ window.ChaiBioTech.ngApp
   '$scope'
   'Experiment'
   '$window'
-  '$modal'
+  '$uibModal'
   '$timeout'
   '$state'
-  ($scope, Experiment, $window, $modal, $timeout, $state) ->
+  ($scope, Experiment, $window, $uibModal, $timeout, $state) ->
 
     angular.element('body').addClass 'modal-form'
     $scope.$on '$destroy', ->
@@ -23,7 +23,7 @@ window.ChaiBioTech.ngApp
     @fetchExperiments()
 
     @newExperiment = ->
-      modalInstance = $modal.open
+      modalInstance = $uibModal.open
         templateUrl: 'app/views/experiment/create-experiment-name-modal.html'
         controller: 'CreateExperimentModalCtrl'
         backdrop: false

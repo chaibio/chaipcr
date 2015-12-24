@@ -3,9 +3,9 @@ window.ChaiBioTech.ngApp
 .directive 'duplicateExperiment', [
   'Experiment'
   '$state'
-  '$modal'
+  '$uibModal'
   '$rootScope'
-  (Experiment, $state, $modal, $rootScope) ->
+  (Experiment, $state, $uibModal, $rootScope) ->
     restrict: 'EA'
     replace: true
     transclude: true
@@ -17,7 +17,7 @@ window.ChaiBioTech.ngApp
       $scope.copy = ->
         scope = $rootScope.$new()
         scope.expId = $scope.expId
-        $modal.open
+        $uibModal.open
           templateUrl: 'app/views/experiment/duplicate-experiment-name-modal.html'
           controller: 'DuplicateExperimentModalCtrl'
           scope: scope

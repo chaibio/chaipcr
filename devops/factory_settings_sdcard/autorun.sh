@@ -2,7 +2,6 @@
 
 id | grep -q root
 is_root=$?
-#echo $is_root
 
 if [ ! $is_root ]
 then
@@ -13,24 +12,22 @@ fi
 if [ -e /dev/mmcblk0p4 ]
 then
         eMMC=/dev/mmcblk0
-	sdcard_dev=/dev/mmcblk1p1
+	sdcard_dev=/dev/mmcblk1
 elif [ -e /dev/mmcblk1p4 ]
 then
        	eMMC=/dev/mmcblk1
-	sdcard_dev=/dev/mmcblk0p1
+	sdcard_dev=/dev/mmcblk0
 else
        	echo "4 partitions eMMC not found!"
 	echo default-on > /sys/class/leds/beaglebone\:green\:usr1/trigger
 
 	eMMC=/dev/mmcblk1
-        sdcard_dev=/dev/mmcblk0p1
+        sdcard_dev=/dev/mmcblk0
 fi
 
-sync
-
-if [ ! -e /sdcard ]
+if [ ! -e /sdcard/p1 ]
 then
-	mkdir /sdcard
+	mkdir -p /sdcard/p1
 fi
 
 if [ ! -e /tmp/emmcboot ]
@@ -38,10 +35,11 @@ then
 	mkdir -p /tmp/emmcboot
 fi
 
-#umount /sdcard > /dev/null || true
-mount $sdcard_dev /sdcard -t vfat || true
+sdcard_p1="/sdcard/p1"
+sdcard_p2="/sdcard/p2"
 
-sdcard="/sdcard"
+mount ${sdcard_dev}p1 ${sdcard_p1} -t vfat || true
+mount ${sdcard_dev}p2 ${sdcard_p2} -t ext4 || true
 
 flush_cache () {
 	sync
@@ -106,8 +104,8 @@ update_uenv () {
 	      mkdir -p /tmp/emmcboot
 	fi
 	mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
-	cp /sdcard/uEnv.txt /tmp/emmcboot/
-	sh /sdcard/replace_uEnv.txt.sh /tmp/emmcboot || true
+	cp /sdcard/p1/uEnv.txt /tmp/emmcboot/
+	sh /sdcard/p1/replace_uEnv.txt.sh /tmp/emmcboot || true
 	sync
 	sleep 5
 	umount /tmp/emmcboot || true
@@ -115,7 +113,7 @@ update_uenv () {
 
 reset_uenv () {
 	echo "resetting uEnv!"
-	cp ${sdcard}/uEnv.72check.txt ${sdcard}/uEnv.txt
+	cp ${sdcard_p1}/uEnv.72check.txt ${sdcard_p1}/uEnv.txt
 
 	if [ ! -e /tmp/emmcboot ]
 	then
@@ -135,20 +133,20 @@ reset_uenv () {
 stop_packing_restarting ()
 {
 	reset_uenv
-	if [ -e ${sdcard}/pack_resume_autorun.flag ]
+	if [ -e ${sdcard_p1}/pack_resume_autorun.flag ]
 	then
-        	rm ${sdcard}/pack_resume_autorun.flag
+        	rm ${sdcard_p1}/pack_resume_autorun.flag
 	fi
 
-	if [ -e ${sdcard}/unpack_resume_autorun.flag ]
+	if [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
 	then
-        	rm ${sdcard}/unpack_resume_autorun.flag
+        	rm ${sdcard_p1}/unpack_resume_autorun.flag
 	fi
 }
 
 incriment_restart_counter () {
 	# Incriment and display restart counter
-	counter_file=${sdcard}/restart_counter.ini
+	counter_file=${sdcard_p1}/restart_counter.ini
 	counter_old=$(cat ${counter_file})
 	counter=$((counter_old+1))
 	echo $counter > $counter_file
@@ -157,7 +155,7 @@ incriment_restart_counter () {
 
 counter=2
 
-if [ -e ${sdcard}/unpack_resume_autorun.flag ]
+if [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
 then
         echo "Resume eMMC unpacking flag found up"
         incriment_restart_counter
@@ -172,7 +170,7 @@ then
         fi
 
         echo "Resuming eMMC unpacking"
- 	sh /sdcard/unpack_latest_version.sh noreboot $counter || true
+ 	sh ${sdcard_p1}/unpack_latest_version.sh noreboot $counter || true
         result=$?
         if [ $result -eq 1 ]
         then
@@ -197,7 +195,7 @@ then
 		echo "Done partitioning $eMMC!"
 	else
 		echo "Cannot update partition table at  $eMMC! restarting!"
-		echo Write Perm Partition > /sdcard/write_perm_partition.flag
+		echo Write Perm Partition > ${sdcard_p1}/write_perm_partition.flag
 		reboot
 		exit
 	fi
@@ -206,7 +204,7 @@ else
 fi
 
 echo "Restoring system from sdcard at $sdcard_dev to eMMC at $eMMC!"
-sh /sdcard/unpack_latest_version.sh factorysettings $counter || true
+sh ${sdcard_p1}/unpack_latest_version.sh factorysettings $counter || true
 
 if [ -e "${eMMC}p4" ]
 then
@@ -219,12 +217,13 @@ fi
 
 update_uenv
 
-if [ -e ${sdcard}/write_perm_partition.flag ]
+if [ -e ${sdcard_p1}/write_perm_partition.flag ]
 then
 	echo "eMMC Flasher: writing to /perm partition (to format)"
-	if [ -e ${sdcard}/upgrade.img.gz ]
+	if [ -e ${sdcard_p2}/upgrade.img.gz ]
 	then
-		rm ${sdcard}/write_perm_partition.flag
+		# todo check mkfs.ext4
+		rm ${sdcard_p1}/write_perm_partition.flag
 		mkdir -p /tmp/perm
 		mount ${eMMC}p4 /tmp/perm -t ext4
 		rm -r /tmp/perm/*
@@ -236,8 +235,11 @@ fi
 
 echo "eMMC Flasher: all done!"
 sync
+
 sleep 5
-umount /sdcard > /dev/null || true 
+
+umount ${sdcard_p1} > /dev/null || true 
+umount ${sdcard_p2} > /dev/null || true 
 
 alldone
 

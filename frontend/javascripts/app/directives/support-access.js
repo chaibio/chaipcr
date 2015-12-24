@@ -1,8 +1,8 @@
 window.ChaiBioTech.ngApp.directive('supportAccess', [
   'supportAccessService',
-  '$modal',
+  '$uibModal',
 
-  function(supportAccessService, $modal) {
+  function(supportAccessService, $uibModal) {
     return {
       restric: 'EA',
       replace: true,
@@ -28,7 +28,7 @@ window.ChaiBioTech.ngApp.directive('supportAccess', [
 
         scope.getMessage = function() {
 
-          scope.modal = $modal.open({
+          scope.modal = $uibModal.open({
             scope: scope,
             templateUrl: 'app/views/support-access-result.html',
             windowClass: 'small-modal'

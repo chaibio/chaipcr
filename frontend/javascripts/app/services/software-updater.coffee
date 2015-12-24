@@ -2,12 +2,12 @@ window.App.service 'SoftwareUpdater', [
   'Status'
   'Device'
   '$rootScope'
-  '$modal'
+  '$uibModal'
   '$window'
-  (Status, Device, $rootScope, $modal, $window) ->
+  (Status, Device, $rootScope, $uibModal, $window) ->
 
     @checkForUpdate = ->
-      checkUpdateModal = $modal.open
+      checkUpdateModal = $uibModal.open
         templateUrl: 'app/views/directives/update-software/modal-software-update.html'
         controller: 'SoftwareUpdateCtrl'
         openedClass: 'modal-software-update-open'

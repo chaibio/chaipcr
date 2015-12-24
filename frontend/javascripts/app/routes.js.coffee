@@ -65,4 +65,8 @@ window.ChaiBioTech.ngApp
         url: '/experiments/:id/run-experiment?chart?max_cycle'
         templateUrl: 'app/views/experiment/run-experiment.html'
 
+      .state 'upload-image',
+        url: '/upload-image'
+        templateUrl: 'app/views/upload-image.html'
+
 ]

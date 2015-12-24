@@ -68,7 +68,8 @@ write_boot_image () {
 
 echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
 
-sdcard="/sdcard"
+sdcard_p1="/sdcard/p1"
+sdcard_p2="/sdcard/p2"
 
 image_filename_prfx="upgrade"
 image_filename_rootfs="$image_filename_prfx-rootfs.img.gz" 
@@ -76,16 +77,21 @@ image_filename_data="$image_filename_prfx-data.img.gz"
 image_filename_boot="$image_filename_prfx-boot.img.gz"
 image_filename_pt="$image_filename_prfx-pt.img.gz"
 
-image_filename_upgrade="${sdcard}/upgrade.img.gz"
+image_filename_upgrade="${sdcard_p2}/upgrade.img.gz"
 
 if [ "$1" = "factorysettings" ]
 then
-	image_filename_upgrade="${sdcard}/factory_settings.img.gz"
+	image_filename_upgrade="${sdcard_p1}/factory_settings.img.gz"
 fi
 
-if [ ! -e ${sdcard}/tmp/ ]
+if [ ! -e ${sdcard_p1} ]
 then
-       mkdir -p ${sdcard}/tmp/
+       mkdir -p ${sdcard_p1}
+fi
+
+if [ ! -e ${sdcard_p2} ]
+then
+       mkdir -p ${sdcard_p2}
 fi
 
 if [ ! -e /tmp/emmcboot ]
@@ -93,30 +99,22 @@ then
        mkdir -p /tmp/emmcboot
 fi
 
-umount ${sdcard} || true
-mount ${sdcard_dev}p1 ${sdcard} -t vfat || true
+mount ${sdcard_dev}p1 ${sdcard_p1} -t vfat || true
+mount ${sdcard_dev}p2 ${sdcard_p2} -t ext4 || true
 
 NOW=$(date +"%m-%d-%Y %H:%M:%S")
 
 unpack_resume_flag_up () {
 	echo "Upgrade resume flag up!"
-	echo "Upgrade started at: $NOW">>${sdcard}/unpack_resume_autorun.flag
+	echo "Upgrade started at: $NOW">>${sdcard_p1}/unpack_resume_autorun.flag
 }
-
-#echo "Unpacking eMMC image.."
-
-#if [ ! -e ${sdcard}/tmp/ ]
-#then
-#       mkdir -p ${sdcard}/tmp/
-#fi
 
 if [ ! -e  $image_filename_upgrade ]
 then
 	echo "Image not found: $image_filename_upgrade.. exit!"
-#	rm ${sdcard}/unpack_resume_autorun.flag
-	if [ -e ${sdcard}/unpack_resume_autorun.flag ]
+	if [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
 	then
-		rm ${sdcard}/unpack_resume_autorun.flag || true
+		rm ${sdcard_p1}/unpack_resume_autorun.flag || true
 	fi
 
 	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
@@ -128,7 +126,7 @@ fi
 #echo "Run with $1 $2"
 
 stage=0
-counter_file=${sdcard}/unpack_stage.ini
+counter_file=${sdcard_p1}/unpack_stage.ini
 
 incriment_stage_counter () {
 	# Incriment and display restart counter
@@ -147,7 +145,7 @@ incriment_stage_counter () {
 
 reset_stage_counter () {
 	echo "Resetting stage counter."
-	echo 1 > ${sdcard}/unpack_stage.ini
+	echo 1 > ${sdcard_p1}/unpack_stage.ini
 	stage=1
 	echo "Unpacking stage: $stage"
 }
@@ -181,8 +179,8 @@ fi
 set_sdcard_uEnv () {
 	echo copying coupling uEng.txt
 	mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
-	cp /sdcard/uEnv.txt /tmp/emmcboot/
-	sh /sdcard/replace_uEnv.txt.sh /tmp/emmcboot || true
+	cp /sdcard_p1/uEnv.txt /tmp/emmcboot/
+	sh /sdcard_p1/replace_uEnv.txt.sh /tmp/emmcboot || true
 	uEnvPath=/tmp/emmcboot
 
 	cp ${uEnvPath}/uEnv.txt ${uEnvPath}/uEnv.org.txt
@@ -196,8 +194,8 @@ set_sdcard_uEnv () {
 update_uenv () {
 	echo copying coupling uEng.txt
 	mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
-	cp /sdcard/uEnv.txt /tmp/emmcboot/
-	sh /sdcard/replace_uEnv.txt.sh /tmp/emmcboot || true
+	cp /sdcard_p1/uEnv.txt /tmp/emmcboot/
+	sh /sdcard_p1/replace_uEnv.txt.sh /tmp/emmcboot || true
 	sync
 	sleep 5
 	umount /tmp/emmcboot || true
@@ -231,9 +229,9 @@ incriment_stage_counter
 echo "Finished.. byebye!"
 echo "Upgrade resume flag down!"
 
-if [ -e ${sdcard}/unpack_resume_autorun.flag ]
+if [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
 then
-	rm ${sdcard}/unpack_resume_autorun.flag || true
+	rm ${sdcard_p1}/unpack_resume_autorun.flag || true
 fi
 
 sync
@@ -241,13 +239,13 @@ sync
 echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 
 upgrade_autorun_flag_up () {
-	echo "Autorun scripts after boot.. requested on $NOW" > ${sdcard}/upgrade_autorun.flag
+	echo "Autorun scripts after boot.. requested on $NOW" > ${sdcard_p1}/upgrade_autorun.flag
 }
 
 upgrade_autorun_flag_down () {
-	if [ -e ${sdcard}/upgrade_autorun.flag ] 
+	if [ -e ${sdcard_p1}/upgrade_autorun.flag ] 
 	then
-		rm ${sdcard}/upgrade_autorun.flag || true
+		rm ${sdcard_p1}/upgrade_autorun.flag || true
 	fi
 }
 

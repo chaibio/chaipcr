@@ -2,11 +2,11 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
   '$scope',
   'ExperimentLoader',
   'canvas',
-  '$modal',
+  '$uibModal',
   'alerts',
   'expName',
   '$rootScope',
-  function($scope, ExperimentLoader, canvas, $modal, alerts, expName, $rootScope) {
+  function($scope, ExperimentLoader, canvas, $uibModal, alerts, expName, $rootScope) {
 
     var that = this;
     $scope.stage = {};
@@ -104,7 +104,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
     $scope.showMessage = function(message) {
 
       $scope.warningMessage = message;
-      $scope.modal = $modal.open({
+      $scope.modal = $uibModal.open({
         scope: $scope,
         templateUrl: 'app/views/modal-warning.html',
         windowClass: 'small-modal'

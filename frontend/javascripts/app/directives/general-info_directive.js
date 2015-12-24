@@ -1,12 +1,12 @@
 window.ChaiBioTech.ngApp.directive('general', [
   'ExperimentLoader',
   '$timeout',
-  '$modal',
+  '$uibModal',
   'alerts',
   'popupStatus',
   '$rootScope',
 
-  function (ExperimentLoader, $timeout, $modal, alerts, popupStatus, $rootScope) {
+  function (ExperimentLoader, $timeout, $uibModal, alerts, popupStatus, $rootScope) {
 
     return {
       restric: 'EA',
