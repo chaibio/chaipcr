@@ -2,10 +2,10 @@
 
 window.App.controller 'SoftwareUpdateCtrl', [
   '$scope'
-  '$modal'
-  '$modalInstance'
+  '$uibModal'
+  '$uibModalInstance'
   'Device'
-  ($scope, $modal, $modalInstance, Device) ->
+  ($scope, $uibModal, $uibModalInstance, Device) ->
 
     # $scope.update = {'upgrade':{'version':'1.0.1','release_date':null,'brief_description':'this is the brief description','full_description':'this is the full description'}}
     $scope.content = 'checking_for_updates'
@@ -37,7 +37,7 @@ window.App.controller 'SoftwareUpdateCtrl', [
       cloudCheckPromise.catch (resp) ->
         console.log resp
         window.alert('Unable to check for updates!');
-        $modalInstance.dismiss()
+        $uibModalInstance.dismiss()
 
     $scope.doUpdate = ->
       $scope.content = 'update_in_progress'

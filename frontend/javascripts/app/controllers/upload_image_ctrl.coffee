@@ -1,7 +1,7 @@
 window.App.controller 'UploadImageCtrl', [
   '$scope'
-  'Upload'
-  ($scope, Upload) ->
+  'Device'
+  ($scope, Device) ->
 
     successCB = (resp) ->
       $scope.uploading = false
@@ -10,6 +10,7 @@ window.App.controller 'UploadImageCtrl', [
     errorCB = (resp) ->
       $scope.uploading = false
       alert('Error upload! Please check browser console for details.');
+      console.log resp
 
     progressCB = (evt) ->
       progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
@@ -17,11 +18,6 @@ window.App.controller 'UploadImageCtrl', [
 
     $scope.upload = (file) ->
       $scope.uploading = true
-      uploadPromise = Upload.upload
-        url: '/device/upload_software_update'
-        data:
-          data: file
-
-      uploadPromise.then successCB, errorCB, progressCB
+      Device.uploadImage(file).then successCB, errorCB, progressCB
 
 ]

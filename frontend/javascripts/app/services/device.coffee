@@ -5,17 +5,15 @@ window.App.service 'Device', [
   '$http'
   '$q'
   'host'
-  ($http, $q, host) ->
+  'Upload'
+  ($http, $q, host, Upload) ->
 
     class Device
 
       version_info = null
 
       checkForUpdate: ->
-        # $http.get('/device/software_update')
-        def = $q.defer()
-        def.reject()
-        def.promise
+        $http.get('/device/software_update')
 
       checkCloudUpdate: ->
         $http.get("http://update.chaibio.com/device/software_update", {headers: {'Content-Type': 'text/plain'}})
@@ -36,6 +34,15 @@ window.App.service 'Device', [
 
       updateSoftware: ->
         return $http.post("#{host}\:8000/device/update_software") # "#{host}\:8000/status"
+
+      uploadImage: (file) ->
+        Upload.upload
+          url: "#{host}\:8000/device/upload_software_update"
+          method: 'POST'
+          data:
+            data: file
+          headers:
+            'Content-Type': 'multipart/form-data'
 
     return new Device
 

@@ -2,9 +2,9 @@
  .controller 'UserSettingsCtrl', [
    '$scope'
    '$window'
-   '$modal'
+   '$uibModal'
    'User'
-   ($scope, $window, $modal, User) ->
+   ($scope, $window, $uibModal, User) ->
 
      angular.element('body').addClass 'modal-form'
      $scope.$on '$destroy', ->
@@ -50,7 +50,7 @@
          User.remove(id).then fetchUsers
 
      $scope.openAddUserModal = ->
-       $scope.modal = $modal.open
+       $scope.modal = $uibModal.open
          scope: $scope
          templateUrl: 'app/views/user/modal-add-user.html'
 
