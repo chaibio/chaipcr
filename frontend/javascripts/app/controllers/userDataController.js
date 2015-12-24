@@ -37,11 +37,16 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
       });
     };
 
-    $scope.update = function() {
+    $scope.update = function(from) {
       $scope.resetPassStatus = false;
       var format = {'user': $scope.userData};
       userService.updateUser($scope.id, format).then(function(data) {
-        $state.transitionTo('settings.usermanagement', {}, { reload: true });
+        if($state.is("settings.current-user")) {
+          $state.transitionTo('settings.root', {}, { reload: true });
+        } else {
+          $state.transitionTo('settings.usermanagement', {}, { reload: true });
+        }
+
       });
     };
 
