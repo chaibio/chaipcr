@@ -11,6 +11,8 @@ window.ChaiBioTech.ngApp.controller('newUserController', [
     $scope.resetPassStatus = true;
     $scope.userData.password = "";
     $scope.userData.password_confirmation = "";
+    $scope.isAdmin = false;
+    $scope.allowEditPassword = $scope.allowButtons = true;
 
     $scope.update = function() { // This method actually saves and create a new user
 
@@ -20,5 +22,16 @@ window.ChaiBioTech.ngApp.controller('newUserController', [
         $state.transitionTo('settings.usermanagement', {}, { reload: true });
       });
     };
+
+    $scope.currentLogin = function() {
+      userService.findUSer("current").
+        then(function(data) {
+          if(data.user.role === "admin") {
+            $scope.isAdmin = true;
+          }
+        });
+    };
+    
+    $scope.currentLogin();
   }
 ]);

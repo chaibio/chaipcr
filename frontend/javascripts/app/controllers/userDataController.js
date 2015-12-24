@@ -11,6 +11,7 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
     $scope.resetPassStatus = false;
     $scope.userData.password = "";
     $scope.userData.password_confirmation = "";
+    $scope.isAdmin = $scope.allowEditPassword = $scope.allowButtons = false;
 
     $scope.getUserData = function() {
       if(isNaN($scope.id)) {
@@ -21,6 +22,16 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
           $scope.id = data.user.id;
           $scope.userData = data.user;
         });
+    };
+
+    $scope.currentLogin = function() {
+      userService.findUSer("current").
+        then(function(data) {
+          if(data.user.role === "admin") {
+            $scope.isAdmin = $scope.allowEditPassword = $scope.allowButtons = true;
+          }
+        });
+
     };
 
     $scope.resetPass = function() {
@@ -58,5 +69,6 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
     };
 
     $scope.getUserData();
+    $scope.currentLogin();
   }
 ]);

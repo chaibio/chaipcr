@@ -9,7 +9,6 @@ window.ChaiBioTech.ngApp.service 'User', [
     @currentUser = -> user
 
     @save = (user) ->
-      console.log user
       deferred = $q.defer()
       $http.post '/users',
         user: user
