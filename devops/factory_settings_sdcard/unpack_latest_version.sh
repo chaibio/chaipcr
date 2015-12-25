@@ -84,6 +84,30 @@ then
 	image_filename_upgrade="${sdcard_p1}/factory_settings.img.gz"
 fi
 
+mount | grep ${eMMC}p1
+if [ $? -gt 0 ]
+then
+	umount ${eMMC}p1
+fi
+
+mount | grep ${eMMC}p2
+if [ $? -gt 0 ]
+then
+	umount ${eMMC}p2
+fi
+
+mount | grep ${eMMC}p3
+if [ $? -gt 0 ]
+then
+	umount ${eMMC}p3
+fi
+
+mount | grep ${eMMC}p4
+if [ $? -gt 0 ]
+then
+	umount ${eMMC}p4
+fi
+
 if [ ! -e ${sdcard_p1} ]
 then
        mkdir -p ${sdcard_p1}
@@ -201,30 +225,31 @@ update_uenv () {
 	umount /tmp/emmcboot || true
 }
 
-if [ -e $image_filename_boot ]
-then
+#if [ -e $image_filename_boot ]
+#then
 	# needs to add a uEnv to swtich things to sdcard
-	echo "Freeup boot during the backup process"
+	echo "Freeup boot partition during the backup process"
 	mkfs.vfat ${eMMC}p1 -n boot
 	incriment_stage_counter
-fi
+#fi
 
 if [ "$1" = "factorysettings" ]
 then
        	write_data_image
-	incriment_stage_counter	
+	incriment_stage_counter
 fi
 
-	write_rootfs_image
-	incriment_stage_counter	
+write_rootfs_image
+incriment_stage_counter	
 
-        write_boot_image
-	incriment_stage_counter	
-	update_uenv
-	incriment_stage_counter
+write_boot_image
+incriment_stage_counter
 
 update_uenv
 incriment_stage_counter
+
+#update_uenv
+#incriment_stage_counter
 
 echo "Finished.. byebye!"
 echo "Upgrade resume flag down!"

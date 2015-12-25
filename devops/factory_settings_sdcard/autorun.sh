@@ -196,6 +196,7 @@ then
 	else
 		echo "Cannot update partition table at  $eMMC! restarting!"
 		echo Write Perm Partition > ${sdcard_p1}/write_perm_partition.flag
+		sync
 		reboot
 		exit
 	fi
