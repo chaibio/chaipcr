@@ -66,7 +66,7 @@ void HeatBlock::setTargetTemperature(double targetTemperature, double rampRate) 
     if (targetTemperature < minTargetTemperature() || targetTemperature > maxTargetTemperature())
     {
         std::stringstream string;
-        string << "HeatBlock::setTargetTemperature - target temperature should be in range from " << minTargetTemperature() << " to " << maxTargetTemperature();
+        string << "Requested heat block temperature outside limits of " << minTargetTemperature() << '-' << maxTargetTemperature() << " C";
 
         throw std::out_of_range(string.str());
     }

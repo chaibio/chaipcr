@@ -15,21 +15,21 @@ PWMPin::PWMPin(const string& pwmDevicePath) {
         dutyFile.open(pwmDevicePath + "/duty", ofstream::out);
     }
     catch (const exception&) {
-        throw system_error(errno, generic_category(), "PWMPin::PWMPin - open file (" + pwmDevicePath + "/duty)");
+        throw system_error(errno, generic_category(), "Unexpected PWM error: unable to open pin (" + pwmDevicePath + "/duty) -");
     }
 
     try {
         periodFile.open(pwmDevicePath + "/period", ofstream::out);
     }
     catch (const exception&) {
-        throw system_error(errno, generic_category(), "PWMPin::PWMPin - open file (" + pwmDevicePath + "/period)");
+        throw system_error(errno, generic_category(), "Unexpected PWM error: unable to open pin (" + pwmDevicePath + "/period) -");
     }
 
     try {
         polarityFile.open(pwmDevicePath + "/polarity", ofstream::out);
     }
     catch (const exception&) {
-        throw system_error(errno, generic_category(), "PWMPin::PWMPin - open file (" + pwmDevicePath + "/polarity)");
+        throw system_error(errno, generic_category(), "Unexpected PWM error: unable to open pin (" + pwmDevicePath + "/polarity) -");
     }
 }
 

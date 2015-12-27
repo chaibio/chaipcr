@@ -1,4 +1,5 @@
 #include <sstream>
+#include <cctype>
 
 #include "exceptions.h"
 #include "thermistor.h"
@@ -9,6 +10,7 @@ TemperatureController::TemperatureController(Settings settings)
 {
     _enableMode = false;
 
+    _name = settings.name;
     _thermistor = settings.thermistor;
     _pidController = settings.pidController;
     _pidResult = 0;
@@ -56,7 +58,7 @@ void TemperatureController::setTargetTemperature(double temperature)
     if (temperature < _minTargetTemp || temperature > _maxTargetTemp)
     {
         std::stringstream string;
-        string << "TemperatureController::setTargetTemperature - target temperature should be in range from " << _minTargetTemp << " to " << _maxTargetTemp;
+        string << "Requested " << _name << " temperature outside limits of " << _minTargetTemp << '-' << _maxTargetTemp << " C";
 
         throw std::out_of_range(string.str());
     }
@@ -79,12 +81,21 @@ void TemperatureController::process()
 
 void TemperatureController::computePid(double currentTemperature)
 {
-    if (currentTemperature < _minTempThreshold || currentTemperature > _maxTempThreshold)
+    if (currentTemperature < _minTempThreshold)
     {
-        std::stringstream stream;
-        stream << "TemperatureController::computePid - current temperature (" << currentTemperature << ") exceeds limits (" << _minTempThreshold << '/' << _maxTempThreshold << ')';
+        std::string name = _name;
+        name.at(0) = std::toupper(name.at(0));
 
-        throw TemperatureLimitError(stream.str());
+        std::stringstream stream;
+        stream << name << " temperature of " << currentTemperature << " C below limit of " << _minTempThreshold << " C";
+    }
+    else if (currentTemperature > _maxTempThreshold)
+    {
+        std::string name = _name;
+        name.at(0) = std::toupper(name.at(0));
+
+        std::stringstream stream;
+        stream << name << " temperature of " << currentTemperature << " C above limit of " << _minTempThreshold << " C";
     }
 
     if (_targetTemperature < _minTargetTemp)
