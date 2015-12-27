@@ -83,9 +83,10 @@ ActiveRecord::Schema.define(version: 20151227202328) do
   end
 
   create_table "ramps", force: true do |t|
-    t.decimal "rate",         precision: 11, scale: 8,                 null: false, comment: "degrees C/s, set to 100 for max"
+    t.decimal "rate",                           precision: 11, scale: 8,                 null: false, comment: "degrees C/s, set to 100 for max"
     t.integer "next_step_id"
-    t.boolean "collect_data",                          default: false
+    t.boolean "collect_data",                                            default: false
+    t.integer "excitation_intensity", limit: 3
   end
 
   add_index "ramps", ["next_step_id"], name: "index_ramps_on_next_step_id", unique: true, using: :btree
@@ -116,17 +117,17 @@ ActiveRecord::Schema.define(version: 20151227202328) do
 
   create_table "steps", force: true do |t|
     t.string   "name"
-    t.decimal  "temperature",                 precision: 4, scale: 1,                 null: false, comment: "degrees C"
-    t.integer  "hold_time",                                                           null: false, comment: "in seconds, 0 means infinite"
-    t.integer  "order_number",                                        default: 0,     null: false, comment: "the order of the step in the cycle, starting with 0, and continguous"
-    t.integer  "stage_id",                                                            null: false
+    t.decimal  "temperature",                    precision: 4, scale: 1,                 null: false, comment: "degrees C"
+    t.integer  "hold_time",                                                              null: false, comment: "in seconds, 0 means infinite"
+    t.integer  "order_number",                                           default: 0,     null: false, comment: "the order of the step in the cycle, starting with 0, and continguous"
+    t.integer  "stage_id",                                                               null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "collect_data",                                        default: false
-    t.decimal  "delta_temperature",           precision: 4, scale: 2, default: 0.0
-    t.integer  "delta_duration_s",                                    default: 0
-    t.boolean  "pause",                                               default: false
-    t.integer  "intensity",         limit: 3
+    t.boolean  "collect_data",                                           default: false
+    t.decimal  "delta_temperature",              precision: 4, scale: 2, default: 0.0
+    t.integer  "delta_duration_s",                                       default: 0
+    t.boolean  "pause",                                                  default: false
+    t.integer  "excitation_intensity", limit: 3
   end
 
   add_index "steps", ["stage_id", "order_number"], name: "index_steps_on_stage_id_and_order_number", unique: true, using: :btree
