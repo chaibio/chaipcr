@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151202070118) do
+ActiveRecord::Schema.define(version: 20151227202328) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -116,16 +116,17 @@ ActiveRecord::Schema.define(version: 20151202070118) do
 
   create_table "steps", force: true do |t|
     t.string   "name"
-    t.decimal  "temperature",       precision: 4, scale: 1,                 null: false, comment: "degrees C"
-    t.integer  "hold_time",                                                 null: false, comment: "in seconds, 0 means infinite"
-    t.integer  "order_number",                              default: 0,     null: false, comment: "the order of the step in the cycle, starting with 0, and continguous"
-    t.integer  "stage_id",                                                  null: false
+    t.decimal  "temperature",                 precision: 4, scale: 1,                 null: false, comment: "degrees C"
+    t.integer  "hold_time",                                                           null: false, comment: "in seconds, 0 means infinite"
+    t.integer  "order_number",                                        default: 0,     null: false, comment: "the order of the step in the cycle, starting with 0, and continguous"
+    t.integer  "stage_id",                                                            null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "collect_data",                              default: false
-    t.decimal  "delta_temperature", precision: 4, scale: 2, default: 0.0
-    t.integer  "delta_duration_s",                          default: 0
-    t.boolean  "pause",                                     default: false
+    t.boolean  "collect_data",                                        default: false
+    t.decimal  "delta_temperature",           precision: 4, scale: 2, default: 0.0
+    t.integer  "delta_duration_s",                                    default: 0
+    t.boolean  "pause",                                               default: false
+    t.integer  "intensity",         limit: 3
   end
 
   add_index "steps", ["stage_id", "order_number"], name: "index_steps_on_stage_id_and_order_number", unique: true, using: :btree
