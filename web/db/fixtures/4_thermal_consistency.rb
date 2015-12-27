@@ -26,14 +26,14 @@ end
 
 ramp = Ramp.seed(:next_step_id)  do |r|
   r.next_step_id = 10
-  r.rate = 3.0
+  r.rate = 1.0
 end
 
 Step.seed(:stage_id, :order_number) do |s|
   s.id = 10
   s.name = "Prepare melt"
   s.temperature = 72
-  s.hold_time = 1
+  s.hold_time = 15
   s.order_number = 0
   s.stage_id = 4
   s.collect_data = false
