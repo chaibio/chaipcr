@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  #before_filter :ensure_authenticated_user, :except => :create
+  before_filter :ensure_authenticated_user, :except => :create
 
   respond_to :json
 
@@ -85,6 +85,7 @@ class UsersController < ApplicationController
   end
 
   def authorized?
-    current_user.admin?
+    logger.info "**** #{request.method}"
+    request.method == "GET" or current_user.admin?
   end
 end
