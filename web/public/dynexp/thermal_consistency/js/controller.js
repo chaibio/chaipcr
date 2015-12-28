@@ -59,7 +59,7 @@
       $scope.analyzeExperiment = function () {
         $scope.analyzing = true
         if (!$scope.analyzedExp) {
-          getExperiment($scope.experiment.id, function (exp) {
+          getExperiment($stateParams.id, function (exp) {
             if (exp.completion_status === 'success') {
               Experiment.analyze($stateParams.id).then(function (resp) {
                 $scope.analyzedExp = resp.data;
