@@ -56,7 +56,6 @@
             $scope.analyzedExp = resp.data;
             $scope.tm_values = TestInProgressService.getTmValues($scope.analyzedExp);
             console.log($scope.tm_values);
-
           });
         }
       };
