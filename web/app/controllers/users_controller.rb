@@ -85,7 +85,6 @@ class UsersController < ApplicationController
   end
 
   def authorized?
-    logger.info "**** #{request.method}"
-    request.method == "GET" or current_user.admin?
+    request.method == "GET" || current_user.admin? || (params[:action] == "update" && current_user.id == params[:id].to_i)
   end
 end

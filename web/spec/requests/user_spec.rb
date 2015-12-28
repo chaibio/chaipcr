@@ -122,6 +122,25 @@ describe "User" do
       expect(response).to be_success
     end
     
+    it "not admin successful" do
+      test_user = create_test_user
+      post '/login', { email: test_user.email, password: test_user.password }
+      params = { user: {password: "secret", password_confirmation: "secret"} }
+      put "/users/#{test_user.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      expect(response).to be_success
+      post '/login', { email: "test@test.com", password: "secret" }
+      expect(response).to be_success
+    end
+    
+    it "not admin not allowed to edit other users" do
+      test_user = create_test_user
+      post '/login', { email: test_user.email, password: test_user.password }
+      test_user2 = create_test_user2
+      params = { user: {password: "secret", password_confirmation: "secret"} }
+      put "/users/#{test_user2.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      response.response_code.should == 401
+    end
+    
   end
   
   describe "#authentication_token" do
