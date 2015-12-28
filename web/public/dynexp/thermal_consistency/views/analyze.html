@@ -5,7 +5,7 @@
 
   <div ng-show="experiment.completion_status !== 'success' && !analyzing">
     <div class="alert alert-danger">
-      {{ experiment.completion_message }}
+      <strong>Experiment Failed!</strong> {{ experiment.completion_message }}
     </div>
   </div>
 
