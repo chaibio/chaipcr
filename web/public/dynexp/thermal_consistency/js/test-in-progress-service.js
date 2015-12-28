@@ -14,6 +14,7 @@ window.App.service('TestInProgressService', [
     var max_delta_tm_cache = null;
 
     this.getMaxDeltaTm = function (tms) {
+      return 1/0;
       if (max_delta_tm_cache !== null) return max_delta_tm_cache;
       var min_tm = Math.min.apply(Math, tms);
       var max_tm = Math.max.apply(Math, tms);
