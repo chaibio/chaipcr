@@ -304,21 +304,15 @@ dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
 	echo "Finalizing: $image_filename_upgrade2"
 	mv $image_filename_upgrade_temp $image_filename_upgrade2
 
-#if [ -e  $image_filename_upgrade_tar_temp ]
-#then
-#	rm $image_filename_upgrade_tar_temp
-#fi
+echo "mv $image_filename_upgrade_temp $image_filename_upgrade2"
+exit 0
 
 if [ -e $image_filename_upgrade_temp ]
 then
 	rm $image_filename_upgrade_temp
 fi
 
-#else
-	#tarring
-#	echo "compressing all images to $image_filename_upgrade_tar_temp"
-	tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs
-#fi
+tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs
 
 echo "Remove packed files"
 if [ -e $image_filename_boot ]

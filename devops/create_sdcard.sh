@@ -10,10 +10,12 @@ input_dir=$current_folder
 BASEDIR=$(dirname $0)
 
 print_usage_exit () {
-	echo "	Usage: create_sdcard.sh <image folder> <block device>"
-	echo "		<image folder>: the folder with factory and upgrade images"
-	echo "		under <image folder>/p1 and <image folder>/p2."
-	echo "		<block device>: SDCard output Block device."
+	echo ""
+	echo "Usage: create_sdcard.sh <image folder> <block device>"
+	echo "	<image folder>: the folder with factory and upgrade images"
+	echo "	under <image folder>/p1 and <image folder>/p2."
+	echo "	<block device>: SDCard output Block device."
+	echo ""
 	exit 1
 }
 
@@ -45,7 +47,7 @@ else
 			cp -r $BASEDIR/factory_settings_sdcard/* $input_dir/p1
 		else
 			echo "Cann't create path: $1"
-			exit 1
+			print_usage_exit
 		fi
 	fi
 fi
@@ -53,7 +55,7 @@ fi
 if [ -z $2 ]
 then
 	echo "No output device path given. Exit!"
-	exit 1
+	print_usage_exit
 else
 	output_device=$2
 	if [ -e $2 ]
@@ -65,19 +67,19 @@ fi
 if [ ! -e ${input_dir}/p1 ]
 then
 	echo "Can't find input folder: ${input_dir}/p1"
-	exit 1
+	print_usage_exit
 fi
 
 if [ ! -e ${input_dir}/p2 ]
 then
 	echo "Can't find input folder: ${input_dir}/p2"
-	exit 1
+	print_usage_exit
 fi
 
 if [ ! -e ${output_device} ]
 then
-	echo "Output device not found: ${input_dir}"
-	exit 1
+	echo "Output device not found: ${output_device}"
+	print_usage_exit
 fi
 
 image_filename_upgrade1="${input_dir}/p2/upgrade.img.gz"
@@ -86,13 +88,13 @@ image_filename_upgrade2="${input_dir}/p1/factory_settings.img.gz"
 if [ ! -e $image_filename_upgrade1 ]
 then
 	echo "Can't find input image: $image_filename_upgrade1"
-	exit 1
+	print_usage_exit
 fi
 
 if [ ! -e $image_filename_upgrade2 ]
 then
 	echo "Can't find input image: $image_filename_upgrade2"
-	exit 1
+	print_usage_exit
 fi
 
 if [ -z $2 ]
@@ -115,7 +117,7 @@ then
 	print_usage_exit
 fi
 
-if [[ "${output_device}" =~ "/dev/" ]]
+if [[ ! "${output_device}" =~ "/dev/" ]]
 then
 	echo "Block device should start with /dev."
 	print_usage_exit
@@ -127,16 +129,23 @@ then
 	print_usage_exit
 fi
 
-mount ${output_device} > /dev/zero
-if [ $? -eq 0 ]
-then
-	echo "File system is already mounted: ${output_device}"
-	lsblk
-	exit 1
-fi
+#mount ${output_device}1 > /dev/zero
+#if [ $? -eq 0 ]
+#then
+#	echo "File system is already mounted: ${output_device}"
+#	lsblk
+#	print_usage_exit
+#fi
 
-echo "About to repartition the block device: ${output_device}.. press CTRL+C to stop the operatin."
+lsblk
+echo "About to repartition the block device: ${output_device}.."
+echo "Press CTRL+C to stop the operatin now."
+
 sleep 10
+
+echo "Unmounting..."
+umount ${output_device}1 > /dev/zero
+umount ${output_device}2 > /dev/zero
 
 echo "Partitioning.."
 dd if=/dev/zero of=${output_device} bs=1M count=16
@@ -150,22 +159,62 @@ __EOF__
 blockdev --flushbufs ${output_device}
 
 echo "Formating..."
-mkfs.vfat -F 16 ${output_device}1 -n factory
+mkfs.vfat ${output_device}1 -n factory
+if [ $? -gt 0 ]
+then
+	echo "Can't format ${output_device}1"
+	print_usage_exit
+fi
+
 mkfs.ext4 ${output_device}2 -L upgrade
+if [ $? -gt 0 ]
+then
+	echo "Can't format ${output_device}2"
+	print_usage_exit
+fi
+
+sync
 
 lsblk
 
 echo "Copying.."
+
 mkdir -p /tmp/copy_mount_point
+sync
+
 mount ${output_device}1 /tmp/copy_mount_point
-cp -r $input_dir/p1/* /tmp/copy_mount_point
+if [ $? -gt 0 ]
+then
+	echo "Can't mount ${output_device}1"
+	print_usage_exit
+fi
+
+#echo "cp -r $input_dir/p1/* /tmp/copy_mount_point/"
+cp -r $input_dir/p1/am335x-boneblack.dtb /tmp/copy_mount_point/
+cp -r $input_dir/p1/* /tmp/copy_mount_point/
+
 sync
 umount /tmp/copy_mount_point
+if [ $? -gt 0 ]
+then
+	echo "Can't unmount ${output_device}1"
+	print_usage_exit
+fi
 
 mount ${output_device}2 /tmp/copy_mount_point
-cp -r $input_dir/p2/* /tmp/copy_mount_point
+if [ $? -gt 0 ]
+then
+	echo "Can't mount ${output_device}2"
+	print_usage_exit
+fi
+cp -r $input_dir/p2/* /tmp/copy_mount_point/
 sync
 umount /tmp/copy_mount_point
+if [ $? -gt 0 ]
+then
+	echo "Can't unmount ${output_device}2"
+	print_usage_exit
+fi
 rm -r /tmp/copy_mount_point
 
 exit 0
