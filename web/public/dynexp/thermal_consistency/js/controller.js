@@ -18,6 +18,13 @@
       $scope.isFinite = isFinite;
       $('.content').addClass('analyze');
 
+      function getExperiment(exp_id, cb) {
+        TestInProgressService.getExperiment(exp_id).then(function (exp) {
+          $scope.experiment = exp;
+          if(cb) cb(exp);
+        });
+      }
+
       for (var i=0; i < 8; i ++) {
         $scope.loop.push(i);
       }
@@ -36,9 +43,7 @@
         $scope.timeRemaining = TestInProgressService.timeRemaining(data);
 
         if (data.experiment_controller.expriment && !$scope.experiment) {
-          TestInProgressService.getExperiment(data.experiment_controller.expriment.id).then(function (exp) {
-            $scope.experiment = exp;
-          });
+          getExperiment(data.experiment_controller.expriment.id);
         }
 
         if($scope.state === 'idle' && $scope.old_state !=='idle') {
@@ -52,11 +57,19 @@
 
 
       $scope.analyzeExperiment = function () {
+        $scope.analyzing = true
         if (!$scope.analyzedExp) {
-          Experiment.analyze($stateParams.id).then(function (resp) {
-            $scope.analyzedExp = resp.data;
-            $scope.tm_values = TestInProgressService.getTmValues($scope.analyzedExp);
-            console.log($scope.tm_values);
+          getExperiment($scope.experiment.id, function (exp) {
+            if (exp.completion_status === 'success') {
+              Experiment.analyze($stateParams.id).then(function (resp) {
+                $scope.analyzedExp = resp.data;
+                $scope.tm_values = TestInProgressService.getTmValues($scope.analyzedExp);
+                $scope.analyzing = false;
+              });
+            }
+            else {
+              $scope.analyzing = false;
+            }
           });
         }
       };
