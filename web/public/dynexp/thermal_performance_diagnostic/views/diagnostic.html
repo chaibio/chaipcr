@@ -178,8 +178,11 @@
       </div>
     </div>
 
-    <div class="alert alert-danger" ng-show="experiment.completed_at && experiment.completion_status !== 'success'">
-      <strong>Experiment Failed!</strong> {{experiment.completion_message}}
+    <div class="content text-center" ng-show="experiment.completed_at && experiment.completion_status !== 'success'">
+      <h1>Experiment Failed!</h1>
+      <div class="alert alert-danger">
+        {{experiment.completion_message}}
+      </div>
     </div>
 
     <div class="text-center" style="padding: 70px 0;">
