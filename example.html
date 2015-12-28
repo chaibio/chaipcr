@@ -1,0 +1,10 @@
+<form enctype="multipart/form-data" action="http://localhost:3000/youraction" method="POST">
+	Type metadata in json:<br />
+	<input type="text" id="txt" name="upgrademetadata" size="100" value="{'image_url'='http://update.chaibio.com/downloads/image.rsync', 'software_version'='1.0.1','software_checksum'='adfaf',
+'release_date'='2015-01-12 17:00:00 UTC','brief_description'='This is the brief description','full_description'='This is the full description'}"> <br />
+	
+	Send this file: <br /> 
+	<input name="upgradefile" type="file" /><br />
+	
+	<input type="submit" value="Send File" />
+</form>

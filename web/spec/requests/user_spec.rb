@@ -107,6 +107,23 @@ describe "User" do
     end
   end
     
+  describe "#edit user" do
+    before(:each) do
+      admin_user = create_admin_user
+      post '/login', { email: admin_user.email, password: admin_user.password }
+    end
+    
+    it "successful" do
+      params = { user: {name: "test", email: "test@test.com", password: "secret", password_confirmation: "secret"} }
+      test_user = create_test_user
+      put "/users/#{test_user.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      expect(response).to be_success            # test for the 200 status-code
+      post '/login', { email: "test@test.com", password: "secret" }
+      expect(response).to be_success
+    end
+    
+  end
+  
   describe "#authentication_token" do
     before(:each) do
       admin_user = create_admin_user
