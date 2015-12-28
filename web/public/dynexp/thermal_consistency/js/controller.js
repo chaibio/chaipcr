@@ -15,6 +15,7 @@
       $scope.cancel = false;
       $scope.loop = [];
       $scope.CONSTANTS = CONSTANTS;
+      $scope.isFinite = isFinite;
       $('.content').addClass('analyze');
 
       for (var i=0; i < 8; i ++) {
@@ -131,7 +132,8 @@
 
       $scope.maxDeltaTm = function () {
         if (!$scope.tm_values) return 0;
-        return TestInProgressService.getMaxDeltaTm($scope.tm_values);
+        var max_delta_tm = TestInProgressService.getMaxDeltaTm($scope.tm_values);
+        return max_delta_tm;
       };
 
     }
