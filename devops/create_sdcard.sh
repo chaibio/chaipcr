@@ -5,19 +5,27 @@ if ! id | grep -q root; then
 	exit 1
 fi
 
-temp="/tmp/image_creator"
-eMMC=/dev/md2
-
 current_folder=$(pwd)
 input_dir=$current_folder
 BASEDIR=$(dirname $0)
 
-#echo "current dir $current_folder"
+print_usage_exit () {
+	echo "	Usage: create_sdcard.sh <image folder> <block device>"
+	echo "		<image folder>: the folder with factory and upgrade images"
+	echo "		under <image folder>/p1 and <image folder>/p2."
+	echo "		<block device>: SDCard output Block device."
+	exit 1
+}
+
+if [ "$1" = "man" ]
+then
+	print_usage_exit
+fi
 
 if [ -z $1 ]
 then
-	echo "No images path given.. assuming current directory: $current_folder"
-	input_dir=$current_folder
+	echo "No images path given."
+	print_usage_exit
 else
 	input_dir=$1
 	if [ -e $1 ]
@@ -87,7 +95,37 @@ then
 	exit 1
 fi
 
-output_device=/dev/sdb
+if [ -z $2 ]
+then
+	echo "Block device not entered."
+	print_usage_exit
+fi
+
+if [ ! -b $2 ]
+then
+	echo "Entered is not a block device: $2"
+	print_usage_exit
+fi
+
+output_device=$2
+
+if [ ! -e ${output_device} ]
+then
+	echo "Block device not found: ${output_device}"
+	print_usage_exit
+fi
+
+if [[ "${output_device}" =~ "/dev/" ]]
+then
+	echo "Block device should start with /dev."
+	print_usage_exit
+fi
+
+if [[ "${output_device}" =~ "/dev/sda" ]]
+then
+	echo "Block device should not be /dev/sda."
+	print_usage_exit
+fi
 
 mount ${output_device} > /dev/zero
 if [ $? -eq 0 ]
@@ -96,6 +134,9 @@ then
 	lsblk
 	exit 1
 fi
+
+echo "About to repartition the block device: ${output_device}.. press CTRL+C to stop the operatin."
+sleep 10
 
 echo "Partitioning.."
 dd if=/dev/zero of=${output_device} bs=1M count=16
