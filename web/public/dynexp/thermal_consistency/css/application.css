@@ -39,7 +39,7 @@ button:hover,
 
 button.red,
 .button.red {
-    background: #E02127;
+    background: #FF0000;
     border-color: transparent;
     color: #fff;
 }
@@ -174,4 +174,10 @@ p.step{
 
 .page-layout .content.analyze {
     width: 1024px;
+}
+.text-success{
+    color: #0CE433;
+}
+.text-danger {
+    color: #FF0000;
 }
