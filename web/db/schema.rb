@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151227202328) do
+ActiveRecord::Schema.define(version: 20151228092803) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -158,6 +158,7 @@ ActiveRecord::Schema.define(version: 20151227202328) do
     t.datetime "release_date",      null: false
     t.text     "brief_description"
     t.text     "full_description"
+    t.string   "password"
   end
 
   create_table "user_tokens", force: true do |t|

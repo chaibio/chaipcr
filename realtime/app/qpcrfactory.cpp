@@ -49,6 +49,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(ADCController::ConsumersLis
     settings.minTempThreshold = kHeatBlockLowTempShutdownThreshold;
     settings.maxTempThreshold = kHeatBlockHighTempShutdownThreshold;
 
+    settings.name = "heat hlock 1";
     settings.pidController = new PIDController(heatBlockPIDSchedule, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax, SinglePoleRecursiveFilter(cutoffFrequency));
     settings.thermistor.reset(new SteinhartHartThermistorC0135(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                                           kUSSensorJThermistorC0Coefficient, kUSSensorJThermistorC1Coefficient,
@@ -57,6 +58,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(ADCController::ConsumersLis
     HeatBlockZoneController *zone1 = new HeatBlockZoneController(settings, kHeatBlockZone1PWMPath, kHeatBlockZone1PWMPeriodNs, kHeadBlockZone1HeatPin, kHeadBlockZone1CoolPin);
     consumers[ADCController::EReadZone1Singular] = settings.thermistor;
 
+    settings.name = "heat hlock 2";
     settings.pidController = new PIDController(heatBlockPIDSchedule, kHeatBlockZonesPIDMin, kHeatBlockZonesPIDMax, SinglePoleRecursiveFilter(cutoffFrequency));
     settings.thermistor.reset(new SteinhartHartThermistorC0135(kHeatBlockThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits,
                                                           kUSSensorJThermistorC0Coefficient, kUSSensorJThermistorC1Coefficient,
@@ -71,6 +73,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(ADCController::ConsumersLis
 shared_ptr<IControl> QPCRFactory::constructLid(ADCController::ConsumersList &consumer) {
     TemperatureController::Settings settings;
 
+    settings.name = "lid";
     settings.thermistor.reset(new BetaThermistor(kLidThermistorVoltageDividerResistanceOhms, kLTC2444ADCBits, kLidThermistorBetaCoefficient, kLidThermistorT0Resistance, kLidThermistorT0));
     settings.minTargetTemp = kLidMinTargetTemp;
     settings.maxTargetTemp = kLidMaxTargetTemp;
@@ -90,6 +93,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatSink() {
                                                           kQTICurveZThermistorC0Coefficient, kQTICurveZThermistorC1Coefficient,
                                                           kQTICurveZThermistorC2Coefficient, kQTICurveZThermistorC3Coefficient));
 
+    settings.name = "heat sink";
     settings.minTargetTemp = kHeatSinkMinTargetTemp;
     settings.maxTargetTemp = kHeatSinkMaxTargetTemp;
     settings.minTempThreshold = kHeatSinkLowTempShutdownThreshold;

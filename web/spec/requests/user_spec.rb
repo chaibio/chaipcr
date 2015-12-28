@@ -107,6 +107,42 @@ describe "User" do
     end
   end
     
+  describe "#edit user" do
+    before(:each) do
+      admin_user = create_admin_user
+      post '/login', { email: admin_user.email, password: admin_user.password }
+    end
+    
+    it "successful" do
+      params = { user: {name: "test", email: "test@test.com", password: "secret", password_confirmation: "secret"} }
+      test_user = create_test_user
+      put "/users/#{test_user.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      expect(response).to be_success            # test for the 200 status-code
+      post '/login', { email: "test@test.com", password: "secret" }
+      expect(response).to be_success
+    end
+    
+    it "not admin successful" do
+      test_user = create_test_user
+      post '/login', { email: test_user.email, password: test_user.password }
+      params = { user: {password: "secret", password_confirmation: "secret"} }
+      put "/users/#{test_user.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      expect(response).to be_success
+      post '/login', { email: "test@test.com", password: "secret" }
+      expect(response).to be_success
+    end
+    
+    it "not admin not allowed to edit other users" do
+      test_user = create_test_user
+      post '/login', { email: test_user.email, password: test_user.password }
+      test_user2 = create_test_user2
+      params = { user: {password: "secret", password_confirmation: "secret"} }
+      put "/users/#{test_user2.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      response.response_code.should == 401
+    end
+    
+  end
+  
   describe "#authentication_token" do
     before(:each) do
       admin_user = create_admin_user

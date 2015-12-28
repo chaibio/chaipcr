@@ -2,6 +2,8 @@
 #include "spi.h"
 #include "ledcontroller.h"
 
+#include <sstream>
+
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -32,10 +34,20 @@ LEDController::~LEDController() {
 void LEDController::setIntensity(double onCurrentMilliamps) {
 	//verify current
     if (onCurrentMilliamps < kMinLEDCurrent)
-		throw InvalidArgument("onCurrent too low");
+    {
+        std::stringstream stream;
+        stream << "Requested LED intensity of " << onCurrentMilliamps << " exceeds limit of " << kMinLEDCurrent;
+
+        throw InvalidArgument(stream.str().c_str());
+    }
     double avgCurrentMilliamps = onCurrentMilliamps * _dutyCyclePercentage / 100;
     if (avgCurrentMilliamps > 30 || onCurrentMilliamps > 100)
-		throw InvalidArgument("onCurrent too high");
+    {
+        std::stringstream stream;
+        stream << "Requested LED intensity of " << onCurrentMilliamps << " exceeds limit of " << 100;
+
+        throw InvalidArgument(stream.str().c_str());
+    }
 	
 	//calculate 
     double rIref = 1.24 / (onCurrentMilliamps / 1000) * 31.5; //reference resistance for TLC5940

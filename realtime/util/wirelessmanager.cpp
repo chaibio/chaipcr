@@ -23,7 +23,7 @@ WirelessManager::WirelessManager(const std::string &interfaceName)
     _connectionEventFd = eventfd(0, EFD_NONBLOCK);
 
     if (_connectionEventFd == -1)
-        throw std::system_error(errno, std::generic_category(), "WirelessManager::WirelessManager - unable to create event fd:");
+        throw std::system_error(errno, std::generic_category(), "Wireless manager: unable to create event fd -");
 
     _interfaceName = interfaceName;
     _connectionThreadState = Idle;

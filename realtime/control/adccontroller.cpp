@@ -104,7 +104,7 @@ void ADCController::process() {
                 value = _ltc2444->readSingleEndedChannel(7, kThermistorOversamplingRate);
                 break;
             default:
-                throw std::logic_error("ADCController::process - unknown adc state");
+                throw std::logic_error("Unexpected error: ADCController::process - unknown adc state");
             }
 
             try {

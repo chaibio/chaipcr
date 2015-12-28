@@ -28,7 +28,7 @@ InterfaceSettingsMap readInterfaceSettings(const std::string &filePath)
     std::fstream file(filePath);
 
     if (!file.is_open())
-        throw std::system_error(errno, std::generic_category(), "NetworkInterfaces::readInterfaceSettings - unable to open file:");
+        throw std::system_error(errno, std::generic_category(), "Network error: unable to read file " + filePath + " -");
 
     std::map<std::string, InterfaceSettings> interfaces;
     InterfaceSettings currentInterface;
@@ -77,7 +77,7 @@ InterfaceSettings readInterfaceSettings(const std::string &filePath, const std::
     std::fstream file(filePath);
 
     if (!file.is_open())
-        throw std::system_error(errno, std::generic_category(), "NetworkInterfaces::readInterfaceSettings - unable to open file:");
+        throw std::system_error(errno, std::generic_category(), "Network error: unable to read file " + filePath + " -");
 
     InterfaceSettings interface;
 
@@ -125,7 +125,7 @@ void writeInterfaceSettings(const std::string &filePath, const InterfaceSettings
     std::fstream file(filePath);
 
     if (!file.is_open())
-        throw std::system_error(errno, std::generic_category(), "NetworkInterfaces::writeInterfaceSettings - unable to open file:");
+        throw std::system_error(errno, std::generic_category(), "Network error: unable to write file " + filePath + " -");
 
     std::string content;
     std::string line;
@@ -202,7 +202,7 @@ InterfaceState getInterfaceState(const std::string &interfaceName)
         freeifaddrs(interfaces);
     }
     else
-        throw std::system_error(errno, std::generic_category(), "NetworkInterfaces::getInterfaceState - unable to get interfaces:");
+        throw std::system_error(errno, std::generic_category(), "Network error: unable to read interfaces -");
 
     return state;
 }

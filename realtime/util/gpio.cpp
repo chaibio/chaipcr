@@ -69,7 +69,7 @@ GPIO& GPIO::operator= (GPIO &&other) {
 	
 GPIO::Value GPIO::value() const {
     if (pinNumber_ == UINT_MAX)
-        throw GPIOError("GPIO is moved");
+        throw GPIOError("Unexpected error: GPIO was moved");
 
 	ostringstream filePath;
 	ifstream valueFile;
@@ -96,7 +96,7 @@ GPIO::Value GPIO::value() const {
 
 void GPIO::setValue(Value value, bool checkValue) {
     if (pinNumber_ == UINT_MAX)
-        throw GPIOError("GPIO is moved");
+        throw GPIOError("Unexpected error: GPIO was moved");
 
     if (checkValue && value == savedValue_)
         return;
@@ -188,7 +188,7 @@ void GPIO::stopWaitinigValue() {
 
 void GPIO::setDirection(Direction direction) {
     if (pinNumber_ == UINT_MAX)
-        throw GPIOError("GPIO is moved");
+        throw GPIOError("Unexpected error: GPIO was moved");
 
 	ostringstream filePath;
 	ofstream directionFile;

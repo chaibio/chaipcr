@@ -71,6 +71,10 @@ module FactoryHelper
     User.create(:name=>"test", :email=>"test@test.com", :password=>"changeme", :password_confirmation=>"changeme")
   end
   
+  def create_test_user2
+    User.create(:name=>"test2", :email=>"test2@test.com", :password=>"changeme", :password_confirmation=>"changeme")
+  end
+  
   def create_fluorescence_data(experiment)
     FluorescenceDatum.create(:step_id=>1, :well_num=>0, :cycle_num=>1, :experiment_id=>experiment.id, :fluorescence_value=>50)
     FluorescenceDatum.create(:step_id=>2, :well_num=>0, :cycle_num=>1, :experiment_id=>experiment.id, :fluorescence_value=>100)

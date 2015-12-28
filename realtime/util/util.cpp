@@ -134,14 +134,14 @@ bool watchProcess(const std::string &command, int eventFd, std::function<void(co
         if (pid != -1 && status == 0)
             return true;
         else
-            throw std::runtime_error("Util::watchProcess - unknown error occured upon watching a process.");
+            throw std::runtime_error("Unknown error with subprocess - " + command);
     }
     else
     {
         kill(pid, SIGTERM);
 
         if (fdArray[1].revents == 0)
-            throw std::runtime_error("Util::watchProcess - unknown error occured upon watching a process.");
+            throw std::runtime_error("Unknown error with subprocess - " + command);
         else
             return false;
     }

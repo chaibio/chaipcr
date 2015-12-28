@@ -236,14 +236,11 @@ void ExperimentController::stop(const std::string &errorMessage)
         HeatBlockInstance::getInstance()->setEnableMode(false);
         OpticsInstance::getInstance()->setCollectData(false);
 
-        if (_experiment.id() != -1)
-        {
-            _experiment.setCompletionStatus(Experiment::Failed);
-            _experiment.setCompletionMessage(errorMessage);
-            _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
+        _experiment.setCompletionStatus(Experiment::Failed);
+        _experiment.setCompletionMessage(errorMessage);
+        _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
 
-            _dbControl->completeExperiment(_experiment);
-        }
+        _dbControl->completeExperiment(_experiment);
 
         _machineState = IdleMachineState;
         _thermalState = IdleThermalState;

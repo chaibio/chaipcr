@@ -19,6 +19,8 @@ public:
 
         std::shared_ptr<Thermistor> thermistor;
 
+        std::string name;
+
         double minTargetTemp;
         double maxTargetTemp;
         double minTempThreshold;
@@ -62,6 +64,8 @@ protected:
     std::shared_ptr<Thermistor> _thermistor;
 
 private:
+    std::string _name;
+
     PIDController *_pidController;
     bool _pidState;
     double _pidResult;

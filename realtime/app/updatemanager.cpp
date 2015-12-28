@@ -47,7 +47,7 @@ UpdateManager::UpdateManager(std::shared_ptr<DBControl> dbControl):
     _downloadEventFd = eventfd(0, EFD_NONBLOCK);
 
     if (_downloadEventFd == -1)
-        throw std::system_error(errno, std::generic_category(), "UpdateManager::UpdateManager - unable to create event fd:");
+        throw std::system_error(errno, std::generic_category(), "Software update manager: unable to create event fd -");
 
     _dbControl = dbControl;
     _httpClient = new Poco::Net::HTTPClientSession(kUpdateHost);

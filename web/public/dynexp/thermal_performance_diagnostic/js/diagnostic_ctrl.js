@@ -129,7 +129,7 @@
             }
             if (resp.experiment.started_at && resp.experiment.completed_at) {
               fetchTempLogs();
-              analyzeExperiment();
+              if (resp.experiment.completion_status === 'success') analyzeExperiment();
               Status.stopSync();
             }
           });
@@ -137,9 +137,9 @@
         if (newState === 'idle' && oldState !== 'idle' && $params.id) {
           stopPolling();
           Status.stopSync();
-          analyzeExperiment();
           getExperiment(function(resp) {
             $scope.experiment = resp.experiment;
+            if($scope.experiment.completion_status === 'success') analyzeExperiment();
           });
         }
       });

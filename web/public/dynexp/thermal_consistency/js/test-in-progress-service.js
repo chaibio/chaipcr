@@ -11,11 +11,14 @@ window.App.service('TestInProgressService', [
     holding = false;
     experimentQues = {};
     isFetchingExp = false;
+    var max_delta_tm_cache = null;
 
     this.getMaxDeltaTm = function (tms) {
+      if (max_delta_tm_cache !== null) return max_delta_tm_cache;
       var min_tm = Math.min.apply(Math, tms);
       var max_tm = Math.max.apply(Math, tms);
-      return max_tm - min_tm;
+      max_delta_tm_cache = max_tm - min_tm;
+      return max_delta_tm_cache;
     };
 
     this.getTmValues = function (analyze_data) {
