@@ -174,12 +174,12 @@ fi
 
 if [ -e $image_filename_upgrade1 ]
 then
-	rm $image_filename_upgrade
+	rm $image_filename_upgrade1
 fi
 
 if [ -e $image_filename_upgrade2 ]
 then
-	rm $image_filename_upgrade
+	rm $image_filename_upgrade2
 fi
 
 echo "Copying eMMC partitions at $eMMC"
