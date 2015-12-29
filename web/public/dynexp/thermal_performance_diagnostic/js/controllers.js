@@ -31,7 +31,7 @@
             }
             var scope = $rootScope.$new();
             scope.message = {
-              title: 'Error',
+              title: "Experiment can't be started",
               body: error
             };
             $uibModal.open({
