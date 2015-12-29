@@ -30,12 +30,12 @@
         "temperature": "31.599",
         "fanDrive": "0"
     },
-    "experimentController":
+    "experiment_controller":
     {
         "machine":
         {
-            "state": "LidHeating",
-            "thermal_state": "Heating"
+            "state": "lid_heating",
+            "thermal_state": "heating"
         },
         "expriment":
         {

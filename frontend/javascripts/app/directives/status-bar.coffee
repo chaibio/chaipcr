@@ -13,12 +13,9 @@ window.App.directive 'statusBar', [
     link: ($scope, elem, attrs) ->
       #console.log $scope, "awesome"
 
-      $scope.$on 'dataLoaded', ->
-        $scope.$watch 'experimentId', (newVal, oldVal) ->
-          $scope.experimentId = newVal
-          console.log $scope
-          return
-        return
+      # $scope.$on 'dataLoaded', ->
+      $scope.$watch 'experimentId', (newVal, oldVal) ->
+        $scope.experimentId = newVal
 
       $scope.show = ->
         if attrs.experimentId then ($scope.experimentId and $scope.status) else $scope.status
@@ -70,7 +67,7 @@ window.App.directive 'statusBar', [
         Experiment.getExperimentDuration($scope.experiment)
 
       $scope.startExperiment = ->
-        Experiment.startExperiment($scope.experiment.id).then ->
+        Experiment.startExperiment($scope.experimentId).then ->
           $rootScope.$broadcast 'experiment:started', $scope.experimentId
 
       $scope.stopExperiment = ->

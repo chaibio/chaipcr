@@ -34,7 +34,7 @@ var connection = mysql.createConnection({
 var status_idle = require('./status-idle.json');
 var status_lid_heating = require('./status-lid-heating.json');
 var status_running = require('./status-running.json');
-var STATUSES = ['Idle', 'LidHeating', 'Running', 'Paused', 'Complete'];
+var STATUSES = ['idle', 'lid_heating', 'running', 'paused', 'complete'];
 var experiment_id = null;
 var lastLog = null;
 var data = status_idle;
@@ -143,26 +143,26 @@ app.get('/status', function (req, res, next) {
 
 app.post('/control/start', function (req, res, next) {
   data = status_lid_heating;
-  data.experimentController.expriment.id = req.payload.experimentId;
-  startExperiment(req.payload.experimentId);
-  experiment_id = req.payload.experimentId;
+  data.experiment_controller.expriment.id = req.payload.experiment_id;
+  startExperiment(req.payload.experiment_id);
+  experiment_id = req.payload.experiment_id;
   setTimeout(function () {
-    data.experimentController.machine.state = 'Running';
-    data.experimentController.machine.thermal_state = 'Holding';
+    data.experiment_controller.machine.state = 'running';
+    data.experiment_controller.machine.thermal_state = 'holding';
     autoupdateLogs();
 
     setTimeout(function () {
       data.optics.collectData = true;
-      data.experimentController.expriment.step.name = "Step 2";
-      data.experimentController.expriment.step.number = "2";
+      data.experiment_controller.expriment.step.name = "Step 2";
+      data.experiment_controller.expriment.step.number = "2";
     }, 3000);
 
     setTimeout(function () {
       data.optics.collectData = true;
-      data.experimentController.expriment.step.name = "Step 2";
-      data.experimentController.expriment.step.number = "2";
+      data.experiment_controller.expriment.step.name = "Step 2";
+      data.experiment_controller.expriment.step.number = "2";
       setTimeout(function () {
-        data.experimentController.expriment.stage.cycle = "40";
+        data.experiment_controller.expriment.stage.cycle = "40";
       }, 3000);
     }, 5000);
 
