@@ -25,11 +25,14 @@
             });
           });
           startPromise.catch(function (err) {
-            console.log(err);
+            var error = 'Unable to start experiment!';
+            if (err.data.status) {
+              if(err.data.status.error) error = err.data.status.error;
+            }
             var scope = $rootScope.$new();
             scope.message = {
               title: 'Error',
-              body: 'Unable to start experiment!'
+              body: error
             };
             $uibModal.open({
               templateUrl: './views/modal-error.html',
