@@ -48,7 +48,9 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
       });
     };
 
-    $scope.update = function(from) {
+    $scope.update = function(form) {
+      //$scope.processForm();
+      console.log(form.userName.$error);
       $scope.resetPassStatus = false;
       var format = {'user': $scope.userData};
       userService.updateUser($scope.id, format).then(function(data) {

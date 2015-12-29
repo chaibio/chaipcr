@@ -11,6 +11,14 @@ window.App.directive 'statusBar', [
       experimentId: '=?'
     templateUrl: 'app/views/directives/status-bar.html'
     link: ($scope, elem, attrs) ->
+      #console.log $scope, "awesome"
+
+      $scope.$on 'dataLoaded', ->
+        $scope.$watch 'experimentId', (newVal, oldVal) ->
+          $scope.experimentId = newVal
+          console.log $scope
+          return
+        return
 
       $scope.show = ->
         if attrs.experimentId then ($scope.experimentId and $scope.status) else $scope.status

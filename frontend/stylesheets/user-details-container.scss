@@ -1,10 +1,19 @@
 .user-details-container {
 
   font-family: "dinot-regular";
+
   .p-caption {
     color: black;
     font-weight: bold;
+    font-family: "dinot-bold";
+    padding-top: 25px;
   }
+  .error-text {
+    font-size: 14px;
+    font-family: "dinot-regular";
+    color: red;
+  }
+
   .button {
     font-family: "dinot-bold";
     font-size: 16px;
@@ -86,6 +95,8 @@
       background-color: white;
     }
   }
-
-
+}
+.error-text {
+  font-size: 14px;
+  font-family: "dinot-regular";
 }
