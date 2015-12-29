@@ -30,12 +30,12 @@
         "temperature": "31.599",
         "fanDrive": "0"
     },
-    "experimentController":
+    "experiment_controller":
     {
         "machine":
         {
-            "state": "Running",
-            "thermal_state": "Holding"
+            "state": "running",
+            "thermal_state": "holding"
         },
         "expriment":
         {
