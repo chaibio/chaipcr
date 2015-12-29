@@ -64,12 +64,12 @@ _EOF_
 
 #UUID=$(lsblk -no UUID /dev/mmcblk1p2)
 UUID=$(blkid /dev/mmcblk1p2 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
-if [ $? -eq 1 ]
+if [ -z $UUID ]
 then
 	echo "/dev/mmcblk1 is not a valid block device"
 	UUID=$(lsblk -no UUID /dev/mmcblk0p2)
 #	echo "UUID for /dev/mmcblk0p2 is $UUID"
-	if [ $? -eq 1 ]
+	if [ -z $UUID ]
 	then
 #		echo $?
  # 	  echo "UUID for /dev/mmcblk0p2 is $UUID"
