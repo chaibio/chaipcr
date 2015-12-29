@@ -9,7 +9,7 @@
     <div class="field">
       <div class="name-field">
         <p class="p-caption">NAME</p>
-        <input type="text" class="text-class" name="userName" ng-model="userData.name" required/>
+        <input type="text" class="text-class" name="userName" ng-model="userData.name" required />
         <div ng-show="editUser.$submitted || editUser.userName.$touched">
           <p ng-show="editUser.userName.$error.required" class="error-text">Cannot be left blank</p>
       </div>
@@ -17,8 +17,11 @@
 
       <div class="email-field">
         <p class="p-caption">E-Mail</p>
-        <input type="text" class="text-class" ng-model="userData.email">
-        <p class="error-text">Error</p>
+        <input type="email" class="text-class" name="emailField" ng-model="userData.email" required>
+        <div ng-show="editUser.$submitted || editUser.emailField.$touched">
+          <p ng-show="editUser.emailField.$error.required" class="error-text">Cannot be left blank</p>
+          <p ng-show="editUser.emailField.$error.email" class="error-text">Invalid e-mail</p>
+      </div>
       </div>
       <div ng-if="allowEditPassword" class="email-field">
         <p class="p-caption">Password</p>
@@ -26,13 +29,16 @@
         <div class="edit-pass-container" ng-if="resetPassStatus">
           <div class="name-field">
             <p class="p-caption">Enter New Password</p>
-            <input type="password" ng-model="userData.password" placeholder="Alphanumeric only" class="text-class">
+            <input type="password" ng-keyup="passError = userData.password !== userData.password_confirmation" ng-model="userData.password" name="password" required placeholder="Alphanumeric only" class="text-class">
           </div>
           <div class="name-field">
             <p class="p-caption">Confirm Password</p>
-            <input type="password" ng-model="userData.password_confirmation" placeholder="Retype exactly as above" class="text-class">
+            <input type="password" ng-keyup="passError = userData.password !== userData.password_confirmation"  ng-model="userData.password_confirmation" name="confirmPassword" required placeholder="Retype exactly as above" class="text-class">
           </div>
-          <p class="error-text">Error</p>
+          <div ng-show="editUser.$submitted || editUser.password.$touched">
+            <p ng-show="editUser.confirmPassword.$error.required || editUSer.password.$error.required" class="error-text">Cannot be left blank</p>
+            <p ng-show="passError" class="error-text">Please confirm Password</p>
+        </div>
         </div>
       </div>
     </div>
