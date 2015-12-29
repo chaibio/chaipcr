@@ -4,7 +4,8 @@
   var App = window.App = angular.module('ThermalDiagnosticApp', [
     'ui.router',
     'ngResource',
-    'http-auth-interceptor'
+    'http-auth-interceptor',
+    'ui.bootstrap'
   ]);
 
   App.value('host', 'http://'+window.location.hostname);
@@ -25,32 +26,6 @@
         url: '/thermal-performance-diagnostic/:id',
         templateUrl: './views/diagnostic.html'
       });
-
-    }
-  ]);
-
-  App.controller('DiagnosticInitCtrl', [
-    '$scope',
-    'Experiment',
-    '$state',
-    function ($scope, Experiment, $state) {
-
-      $scope.proceed = function () {
-        var exp;
-        exp = new Experiment({
-          experiment: {
-            guid: 'thermal_performance_diagnostic'
-          }
-        });
-        exp.$save().then(function(resp) {
-          $scope.experiment = resp.experiment;
-          Experiment.startExperiment(resp.experiment.id).then(function() {
-            $state.go('diagnostic', {
-              id: resp.experiment.id
-            });
-          });
-        });
-      };
 
     }
   ]);
