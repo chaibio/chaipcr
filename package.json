@@ -21,6 +21,7 @@
     "gulp-cssnano": "^2.0.0",
     "gulp-hash-filename": "^1.0.1",
     "gulp-html-minifier": "^0.1.6",
+    "gulp-jshint": "^2.0.0",
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.5.4",
     "gulp-sass": "^2.0.4",
@@ -28,6 +29,7 @@
     "gulp-uglify": "^1.4.0",
     "gulp-util": "^3.0.6",
     "gulp-watch": "^4.3.5",
+    "jshint": "^2.8.0",
     "require-dir": "^0.3.0",
     "shelljs": "^0.5.3"
   },

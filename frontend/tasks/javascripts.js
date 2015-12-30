@@ -3,6 +3,7 @@ var templateCache = require('gulp-angular-templatecache');
 var htmlmin = require('gulp-html-minifier');
 var concat = require('gulp-concat');
 var coffee = require('gulp-coffee');
+var jshint = require('gulp-jshint');
 var babel = require('gulp-babel');
 var rename = require('gulp-rename');
 var replace = require('gulp-replace');
@@ -126,7 +127,14 @@ gulp.task('copy-js-to-tmp', ['clean-js', 'templates'], function () {
          .pipe(gulp.dest('.tmp/js'));
 });
 
-gulp.task('concat-js', ['clean-js', 'coffee', 'es6', 'copy-js-to-tmp', 'templates'], function () {
+gulp.task('jslint', ['clean-js', 'coffee', 'es6', 'copy-js-to-tmp', 'templates'], function () {
+
+  return gulp.src('./frontend/javascripts/app/**/*.js')
+         .pipe(jshint())
+         .pipe(jshint.reporter('default'));
+});
+
+gulp.task('concat-js', ['clean-js', 'coffee', 'es6', 'copy-js-to-tmp', 'templates', 'jslint'], function () {
   var files = vendorFiles.concat(appFiles);
 
   for (var i = files.length - 1; i >= 0; i--) {
