@@ -20,12 +20,17 @@ public:
     inline void setCollectData(bool collectData) {_collectData = collectData;}
     inline double collectData() const {return _collectData;}
 
+    inline void setExcitationIntensity(double intensity) {_excitationIntensity = intensity;}
+    inline double excitationIntensity() const {return _excitationIntensity;}
+
 private:
     int _id;
 
     double _rate;
 
     bool _collectData;
+
+    double _excitationIntensity;
 };
 
 #endif // RAMP_H

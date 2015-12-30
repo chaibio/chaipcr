@@ -300,6 +300,9 @@ std::vector<Step> DBControl::getSteps(int stageId)
         if (it->get_indicator("pause") != soci::i_null)
             step.setPauseState(it->get<int>("pause"));
 
+        if (it->get_indicator("excitation_intensity") != soci::i_null)
+            step.setExcitationIntensity(it->get<double>("excitation_intensity"));
+
         if (step.name().empty())
         {
             std::stringstream stream;
@@ -341,6 +344,9 @@ Ramp* DBControl::getRamp(int stepId)
 
     if (result.get_indicator("collect_data") != soci::i_null)
         ramp->setCollectData(result.get<int>("collect_data"));
+
+    if (result.get_indicator("excitation_intensity") != soci::i_null)
+        ramp->setExcitationIntensity(result.get<double>("excitation_intensity"));
 
     return ramp;
 }
