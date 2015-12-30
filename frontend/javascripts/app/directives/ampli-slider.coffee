@@ -8,7 +8,7 @@ window.App.directive('ampliSlider', [
     templateUrl: 'app/views/directives/ampli-slider.html'
     link: ($scope, elem, attrs, ngModel) ->
 
-      ngModel.$setViewValue 1
+      ngModel.$setViewValue 0
 
       held = false
       oldX = 0
