@@ -32,33 +32,42 @@ LEDController::~LEDController() {
 }
 	
 void LEDController::setIntensity(double onCurrentMilliamps) {
-	//verify current
-    if (onCurrentMilliamps < kMinLEDCurrent)
+    if (_intensity == onCurrentMilliamps)
+        return;
+
+    if (onCurrentMilliamps > 0)
     {
-        std::stringstream stream;
-        stream << "Requested LED intensity of " << onCurrentMilliamps << " exceeds limit of " << kMinLEDCurrent;
+        if (onCurrentMilliamps < kMinLEDCurrent)
+        {
+            std::stringstream stream;
+            stream << "Requested LED intensity of " << onCurrentMilliamps << " below limit of " << kMinLEDCurrent;
 
-        throw InvalidArgument(stream.str().c_str());
+            throw InvalidArgument(stream.str().c_str());
+        }
+
+        double avgCurrentMilliamps = onCurrentMilliamps * _dutyCyclePercentage / 100;
+
+        if (avgCurrentMilliamps > kMaxAverageLEDCurrent || onCurrentMilliamps > kMaxInstantaneousLEDCurrent)
+        {
+            std::stringstream stream;
+            stream << "Requested LED intensity of " << onCurrentMilliamps << " above limit of " << kMaxInstantaneousLEDCurrent;
+
+            throw InvalidArgument(stream.str().c_str());
+        }
+
+        //calculate
+        double rIref = 1.24 / (onCurrentMilliamps / 1000) * 31.5; //reference resistance for TLC5940
+        int rN = (rIref - 75) * 256 / 5000;
+        char txBuf[] = {0, static_cast<uint8_t>(rN)};
+
+        //send resistance
+        _potCSPin.setValue(GPIO::kLow);
+        _spiPort->setMode(0);
+        _spiPort->readBytes(NULL, txBuf, sizeof(txBuf), 1000000);
+        _potCSPin.setValue(GPIO::kHigh);
     }
-    double avgCurrentMilliamps = onCurrentMilliamps * _dutyCyclePercentage / 100;
-    if (avgCurrentMilliamps > 30 || onCurrentMilliamps > 100)
-    {
-        std::stringstream stream;
-        stream << "Requested LED intensity of " << onCurrentMilliamps << " exceeds limit of " << 100;
-
-        throw InvalidArgument(stream.str().c_str());
-    }
-	
-	//calculate 
-    double rIref = 1.24 / (onCurrentMilliamps / 1000) * 31.5; //reference resistance for TLC5940
-    int rN = (rIref - 75) * 256 / 5000;
-    char txBuf[] = {0, static_cast<uint8_t>(rN)};
-
-    //send resistance
-    _potCSPin.setValue(GPIO::kLow);
-    _spiPort->setMode(0);
-    _spiPort->readBytes(NULL, txBuf, sizeof(txBuf), 1000000);
-    _potCSPin.setValue(GPIO::kHigh);
+    else
+        disableLEDs();
 
     _intensity = onCurrentMilliamps;
 }

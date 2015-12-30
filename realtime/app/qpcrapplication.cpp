@@ -38,6 +38,11 @@ void QPCRApplication::stopExperiment(const string &message) {
     _experimentController->stop(message);
 }
 
+int QPCRApplication::getUserId(const std::string &token) const
+{
+    _dbControl->getUserId(token);
+}
+
 void QPCRApplication::initialize(Application&) {
     _workState = false;
 

@@ -1,4 +1,5 @@
 #include "step.h"
+#include "constants.h"
 
 Step::Step(int id)
 {
@@ -10,6 +11,7 @@ Step::Step(int id)
     _deltaTemperature = 0;
     _deltaDuration = 0;
     _pauseState = false;
+    _excitationIntensity = kDefaultLEDCurrent;
 }
 
 Step::Step(const Step &other)
@@ -23,6 +25,7 @@ Step::Step(const Step &other)
     setDeltaTemperature(other.deltaTemperature());
     setDeltaDuration(other.deltaDuration());
     setPauseState(other.pauseState());
+    setExcitationIntensity(other.excitationIntensity());
 }
 
 Step::Step(Step &&other)
@@ -36,6 +39,7 @@ Step::Step(Step &&other)
     _deltaTemperature = other._deltaTemperature;
     _deltaDuration = other._deltaDuration;
     _pauseState = other._pauseState;
+    _excitationIntensity = other._excitationIntensity;
 
     other._id = -1;
     other._temperature = 0;
@@ -45,6 +49,7 @@ Step::Step(Step &&other)
     other._deltaTemperature = 0;
     other._deltaDuration = 0;
     other._pauseState = false;
+    other._excitationIntensity = kDefaultLEDCurrent;
 }
 
 Step::~Step()
@@ -63,6 +68,7 @@ Step& Step::operator= (const Step &other)
     setDeltaTemperature(other.deltaTemperature());
     setDeltaDuration(other.deltaDuration());
     setPauseState(other.pauseState());
+    setExcitationIntensity(other.excitationIntensity());
 
     return *this;
 }
@@ -78,6 +84,7 @@ Step& Step::operator= (Step &&other)
     _deltaTemperature = other._deltaTemperature;
     _deltaDuration = other._deltaDuration;
     _pauseState = other._pauseState;
+    _excitationIntensity = other._excitationIntensity;
 
     other._id = -1;
     other._temperature = 0;
@@ -87,6 +94,7 @@ Step& Step::operator= (Step &&other)
     other._deltaTemperature = 0;
     other._deltaDuration = 0;
     other._pauseState = false;
+    other._excitationIntensity = kDefaultLEDCurrent;
 
     return *this;
 }

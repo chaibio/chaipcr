@@ -42,6 +42,9 @@ public:
     inline void setPauseState(bool state) {_pauseState = state;}
     inline bool pauseState() const {return _pauseState;}
 
+    inline void setExcitationIntensity(double intensity) {_excitationIntensity = intensity;}
+    inline double excitationIntensity() const {return _excitationIntensity;}
+
 private:
     int _id;
 
@@ -57,6 +60,8 @@ private:
     time_t _deltaDuration;
 
     bool _pauseState;
+
+    double _excitationIntensity;
 };
 
 #endif // STEP_H
