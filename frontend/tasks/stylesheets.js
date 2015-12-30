@@ -2,7 +2,7 @@ var gulp = require('gulp');
 var del = require('del');
 var sass = require('gulp-sass');
 var concat = require('gulp-concat');
-var minifyCss = require('gulp-cssnano');
+var cssnano = require('gulp-cssnano');
 var rename = require('gulp-rename');
 var replace = require('gulp-replace');
 var makeHash = require('./helpers').makeHash;
@@ -65,7 +65,7 @@ gulp.task('hash-css', ['concat-css'], function () {
 
 gulp.task('minify-css', ['concat-css', 'hash-css'], function () {
   return gulp.src('.tmp/css/'+applicationCSS+'.css')
-         .pipe(minifyCss({keepSpecialComments: 0}))
+         .pipe(cssnano({keepSpecialComments: 0}))
          .pipe(gulp.dest('.tmp/css'))
 });
 

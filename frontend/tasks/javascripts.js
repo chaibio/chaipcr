@@ -3,6 +3,7 @@ var templateCache = require('gulp-angular-templatecache');
 var htmlmin = require('gulp-html-minifier');
 var concat = require('gulp-concat');
 var coffee = require('gulp-coffee');
+var babel = require('gulp-babel');
 var rename = require('gulp-rename');
 var replace = require('gulp-replace');
 var uglify = require('gulp-uglify');
@@ -62,6 +63,7 @@ var appFiles = [
 
 function _renameJS (path) {
   path.basename = path.basename.replace('.js.coffee', '');
+  path.basename = path.basename.replace('.js.es6', '');
   path.basename = path.basename.replace('.js', '');
   path.extname  = '.js';
 }
@@ -91,6 +93,17 @@ gulp.task('coffee', ['clean-js'], function () {
          .on('error', gutil.log);
 });
 
+gulp.task('es6', ['clean-js'], function () {
+  return gulp.src(['frontend/javascripts/**/*.es6'])
+        .pipe(babel({
+          presets: ['es2015']
+        }))
+        .on('error', swallowError)
+        .pipe(rename(_renameJS))
+        .pipe(gulp.dest('.tmp/js'))
+        .on('error', gutil.log);
+});
+
 gulp.task('templates', function () {
   return gulp.src(['./frontend/javascripts/**/*.html'])
     .pipe(htmlmin({
@@ -113,7 +126,7 @@ gulp.task('copy-js-to-tmp', ['clean-js', 'templates'], function () {
          .pipe(gulp.dest('.tmp/js'));
 });
 
-gulp.task('concat-js', ['clean-js', 'coffee', 'copy-js-to-tmp', 'templates'], function () {
+gulp.task('concat-js', ['clean-js', 'coffee', 'es6', 'copy-js-to-tmp', 'templates'], function () {
   var files = vendorFiles.concat(appFiles);
 
   for (var i = files.length - 1; i >= 0; i--) {
