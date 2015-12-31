@@ -62,10 +62,11 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
 
       $scope.passError = ($scope.userData.password !== $scope.userData.password_confirmation);
       if(form.$valid && ! $scope.passError) {
-        $scope.resetPassStatus = false;
+
         var format = {'user': $scope.userData};
         userService.updateUser($scope.id, format)
         .then(function(data) {
+          $scope.resetPassStatus = false;
           if($state.is("settings.current-user")) {
             $state.transitionTo('settings.root', {}, { reload: true });
           } else {
