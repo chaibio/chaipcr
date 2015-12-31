@@ -13,6 +13,8 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
     $scope.userData.password = "";
     $scope.userData.password_confirmation = "";
     $scope.isAdmin = $scope.allowEditPassword = $scope.allowButtons = $scope.passError = false;
+    $scope.cancelButton = true;
+    $scope.deleteButton = true;
     $scope.emailAlreadtTaken = false;
 
     $scope.getUserData = function() {
@@ -31,6 +33,12 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
         then(function(data) {
           if(data.user.role === "admin") {
             $scope.isAdmin = $scope.allowEditPassword = $scope.allowButtons = true;
+          }
+          if($state.is("settings.current-user")) {
+            console.log("okay Inside");
+            $scope.isAdmin = false;
+            $scope.allowEditPassword = $scope.allowButtons = true;
+            $scope.deleteButton = false;
           }
         });
 
