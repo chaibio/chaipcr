@@ -59,7 +59,7 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
     };
 
     $scope.update = function(form) {
-
+      console.log(form);
       $scope.passError = ($scope.userData.password !== $scope.userData.password_confirmation);
       if(form.$valid && ! $scope.passError) {
 
@@ -74,10 +74,15 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
           }
 
         }, function(err) {
-            userFormErrors.handleError($scope, err);
+          console.log("bingo", form);
+            userFormErrors.handleError($scope, err, form);
+
         });
       }
+    };
 
+    $scope.emailKeyDown = function(form) {
+      form.emailField.$setValidity('emailAlreadtTaken', true);
     };
 
     $scope.deleteMessage = function() {

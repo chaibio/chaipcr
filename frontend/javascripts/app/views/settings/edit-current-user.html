@@ -4,8 +4,8 @@
 
   <div class="left">
     <h2 class="underlined">EDIT LOGGED IN USER<span class="close" ui-sref="settings.root">&times;</span></h2>
-    <!--<ng-include src="'app/views/settings/user-details.html'"></ng-include> -->
-    <div class="user-details-container">
+    <ng-include src="'app/views/settings/user-details.html'"></ng-include>
+    <!--<div class="user-details-container">
       <form name="editUser" ng-submit="update(editUser)" novalidate>
         <div ng-if="isAdmin" class="admin-access">
           <div class="admin-toggle">
@@ -24,11 +24,11 @@
 
           <div class="email-field">
             <p class="p-caption">E-Mail</p>
-            <input type="email" ng-keydown="emailAlreadtTaken=false" class="text-class" name="emailField" ng-model="userData.email" required>
+            <input type="email" ng-keydown="emailKeyDown(editUser)" class="text-class" name="emailField" ng-model="userData.email" required>
             <div ng-show="editUser.$submitted || editUser.emailField.$touched">
               <p ng-show="editUser.emailField.$error.required" class="error-text">Cannot be left blank</p>
               <p ng-show="editUser.emailField.$error.email" class="error-text">Invalid e-mail</p>
-              <p ng-show="emailAlreadtTaken" class="error-text">Email already taken</p>
+              <p ng-show="editUser.emailField.$error.emailAlreadtTaken" class="error-text">Email already taken</p>
           </div>
           </div>
           <div ng-if="allowEditPassword" class="email-field">
@@ -56,17 +56,16 @@
         </div>
         <div class="action-buttons" ng-if="allowButtons">
           <div class="button-containers">
-            <button ng-if="deleteButton" class="button first-button" ng-if="! resetPassStatus" ng-click="deleteMessage()">DELETE USER</button>
+            <button class="button first-button" ng-if="! resetPassStatus" ng-click="deleteMessage()">DELETE USER</button>
           </div>
           <div class="button-containers second-spacing">
-            <button ng-if="cancelButton" class="button second-button" ui-sref="settings.root">CANCEL</button>
+            <button class="button second-button" ui-sref="settings.usermanagement">CANCEL</button>
           </div>
           <div class="button-containers">
             <input type="submit" value="SAVE CHANGES" class="third-button" />
           </div>
         </div>
       </form>
-    </div>
-
+    </div> -->
   </div>
 </div>

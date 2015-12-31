@@ -32,11 +32,15 @@ window.ChaiBioTech.ngApp.controller('newUserController', [
         }, function(err) {
           console.log("there is some issue", err, userFormErrors);
           var problem = err.user;
-          userFormErrors.handleError($scope, problem);
+          userFormErrors.handleError($scope, problem, form);
         });
       }
     };
 
+    $scope.emailKeyDown = function(form) {
+      form.emailField.$setValidity('emailAlreadtTaken', true);
+    };
+    
     $scope.currentLogin = function() {
       userService.findUSer("current").
         then(function(data) {
