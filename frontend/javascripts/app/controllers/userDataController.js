@@ -4,7 +4,8 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
   'User',
   '$state',
   '$uibModal',
-  function($scope, $stateParams, userService, $state, $uibModal) {
+  'userFormErrors',
+  function($scope, $stateParams, userService, $state, $uibModal, userFormErrors) {
 
     $scope.id = $stateParams.id || 'current';
     $scope.userData = {};
@@ -64,13 +65,7 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
           }
 
         }, function(err) {
-            console.log("There is some issue", err.errors);
-            for(var errKey in err.errors) {
-              if(errKey === 'email') {
-                $scope.emailAlreadtTaken = true;
-              }
-              break;
-            }
+            userFormErrors.handleError($scope, err);
         });
       }
 

@@ -51,12 +51,11 @@
     $httpProvider.interceptors.push(['$rootScope', '$q', 'httpBuffer', function($rootScope, $q, httpBuffer) {
       return {
         responseError: function(rejection) {
-          var config = rejection.config || {};
-          if (!config.ignoreAuthModule) {
+          if (!rejection.config.ignoreAuthModule) {
             switch (rejection.status) {
               case 401:
                 var deferred = $q.defer();
-                httpBuffer.append(config, deferred);
+                httpBuffer.append(rejection.config, deferred);
                 $rootScope.$broadcast('event:auth-loginRequired', rejection);
                 return deferred.promise;
               case 403:

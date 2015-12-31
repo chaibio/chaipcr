@@ -84,9 +84,6 @@ public:
 
     void toggleTempLogs(bool temperatureLogsState, bool debugTemperatureLogsState);
 
-    //void updateSettings(const Settings &settings);
-    int getUserId(const std::string &token) const;
-
 private:
     void run();
     void complete();

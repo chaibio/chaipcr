@@ -53,6 +53,8 @@ public:
 
     void stopExperiment(const std::string &message);
 
+    int getUserId(const std::string &token) const;
+
 protected:
 	//from ServerApplication
     void initialize(Poco::Util::Application &self);

@@ -16,7 +16,7 @@
 #include "updateuploadhandler.h"
 
 #include "qpcrrequesthandlerfactory.h"
-#include "experimentcontroller.h"
+#include "qpcrapplication.h"
 
 using namespace std;
 using namespace Poco;
@@ -166,7 +166,7 @@ bool QPCRRequestHandlerFactory::checkUserAuthorization(string token)
         return true;
     else
     {
-        id = ExperimentController::getInstance()->getUserId(token);
+        id = qpcrApp.getUserId(token);
 
         if (id != -1)
         {

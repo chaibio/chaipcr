@@ -43,7 +43,7 @@
     </span>
     <span class="controls-container">
       <span class="control" ng-show="state === 'idle' && experiment" experiment-id="experiment.id" duplicate-experiment>DUPLICATE EXPERIMENT</span>
-      <span class="control" ng-show="!experiment.started_at && experiment.id" ng-class="{'disabled': experiment.started_at}" ng-click="startExperiment()">BEGIN EXPERIMENT</span>
+      <span class="control" ng-show="!experiment.started_at && experiment.id && state === 'idle'" ng-class="{'disabled': experiment.started_at}" ng-click="startExperiment()">BEGIN EXPERIMENT</span>
       <span class="control" ng-show="state === 'paused'" ng-click="resumeExperiment()">
         <img src="/images/status-resume-btn.png">
         RESUME

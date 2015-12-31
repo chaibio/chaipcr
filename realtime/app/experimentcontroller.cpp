@@ -8,6 +8,7 @@
 #include "pcrincludes.h"
 #include "dbincludes.h"
 #include "maincontrollers.h"
+#include "ledcontroller.h"
 #include "experimentcontroller.h"
 #include "qpcrapplication.h"
 
@@ -109,6 +110,8 @@ void ExperimentController::run()
 
         _machineState = RunningMachineState;
         _thermalState = HeatBlockInstance::getInstance()->temperature() < _experiment.protocol()->currentStep()->temperature() ? HeatingThermalState : CoolingThermalState;
+
+        OpticsInstance::getInstance()->getLedController()->setIntensity(_experiment.protocol()->currentRamp()->excitationIntensity());
 
         HeatBlockInstance::getInstance()->setTargetTemperature(_experiment.protocol()->currentStep()->temperature(), _experiment.protocol()->currentRamp()->rate());
         HeatBlockInstance::getInstance()->enableStepProcessing();
@@ -278,6 +281,8 @@ void ExperimentController::rampFinished()
 
             OpticsInstance::getInstance()->setCollectData(_experiment.protocol()->currentStep()->collectData(), false);
         }
+
+        OpticsInstance::getInstance()->getLedController()->setIntensity(_experiment.protocol()->currentStep()->excitationIntensity());
     }
 }
 
@@ -372,6 +377,8 @@ void ExperimentController::holdStepCallback(Poco::Timer &)
             }
 
             _thermalState = HeatBlockInstance::getInstance()->temperature() < temperature ? HeatingThermalState : CoolingThermalState;
+
+            OpticsInstance::getInstance()->getLedController()->setIntensity(stage->currentRamp()->excitationIntensity());
 
             HeatBlockInstance::getInstance()->setTargetTemperature(temperature, stage->currentRamp()->rate());
             HeatBlockInstance::getInstance()->enableStepProcessing();
@@ -514,17 +521,4 @@ void ExperimentController::calculateEstimatedDuration()
         Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
         _experiment.setEstimatedDuration(std::round(duration / 1000));
     }
-}
-
-/*void ExperimentController::updateSettings(const Settings &settings)
-{
-    if (settings.isDebugModeDirty())
-        _settings->setDebugMode(settings.debugMode());
-
-    _dbControl->updateSettings(settings);
-}*/
-
-int ExperimentController::getUserId(const std::string &token) const
-{
-    return _dbControl->getUserId(token);
 }

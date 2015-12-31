@@ -2,7 +2,7 @@ var gulp = require('gulp');
 var del = require('del');
 var sass = require('gulp-sass');
 var concat = require('gulp-concat');
-var minifyCss = require('gulp-minify-css');
+var cssnano = require('gulp-cssnano');
 var rename = require('gulp-rename');
 var replace = require('gulp-replace');
 var makeHash = require('./helpers').makeHash;
@@ -52,8 +52,8 @@ gulp.task('concat-css', ['copy-css-tmp', 'sass'], function () {
 
 gulp.task('hash-css', ['concat-css'], function () {
 
-  // var hash = makeHash();
-  var hash = '031a8120906bfcf9fa6281587c5be3';
+  var hash = process.env.hash || makeHash();
+  // var hash = '031a8120906bfcf9fa6281587c5be3';
 
   return gulp.src('.tmp/css/'+applicationTmpCSS+'.css')
          .pipe(rename(function (path) {
@@ -65,7 +65,7 @@ gulp.task('hash-css', ['concat-css'], function () {
 
 gulp.task('minify-css', ['concat-css', 'hash-css'], function () {
   return gulp.src('.tmp/css/'+applicationCSS+'.css')
-         .pipe(minifyCss({keepSpecialComments: 0}))
+         .pipe(cssnano({keepSpecialComments: 0}))
          .pipe(gulp.dest('.tmp/css'))
 });
 

@@ -23,6 +23,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
     Experiment.get(id: $stateParams.id).$promise.then (data) ->
       maxCycle = helper.getMaxExperimentCycle data.experiment
+      $scope.maxCycle = maxCycle
       $scope.chartConfig.axes.x.ticks = helper.Xticks maxCycle
       $scope.chartConfig.axes.x.max = maxCycle
       $scope.experiment = data.experiment

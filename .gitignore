@@ -35,6 +35,6 @@ Debug
 /.tmp/
 /web/public/fonts/
 /web/public/images/
-/web/public/javascripts/
-/web/public/stylesheets/
+/web/public/javascripts/**/*.js
+/web/public/stylesheets/**/*.css
 build/*

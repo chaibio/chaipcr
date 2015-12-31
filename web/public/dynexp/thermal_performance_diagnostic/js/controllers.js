@@ -1,6 +1,50 @@
 (function () {
 
 
+  App.controller('DiagnosticInitCtrl', [
+    '$scope',
+    'Experiment',
+    '$state',
+    '$uibModal',
+    '$rootScope',
+    function ($scope, Experiment, $state, $uibModal, $rootScope) {
+
+      $scope.proceed = function () {
+        var exp;
+        exp = new Experiment({
+          experiment: {
+            guid: 'thermal_performance_diagnostic'
+          }
+        });
+        exp.$save().then(function(resp) {
+          $scope.experiment = resp.experiment;
+          var startPromise = Experiment.startExperiment(resp.experiment.id)
+          startPromise.then(function() {
+            $state.go('diagnostic', {
+              id: resp.experiment.id
+            });
+          });
+          startPromise.catch(function (err) {
+            var error = 'Unable to start experiment!';
+            if (err.data.status) {
+              if(err.data.status.error) error = err.data.status.error;
+            }
+            var scope = $rootScope.$new();
+            scope.message = {
+              title: "Experiment can't be started",
+              body: error
+            };
+            $uibModal.open({
+              templateUrl: './views/modal-error.html',
+              scope: scope
+            });
+          });
+        });
+      };
+
+    }
+  ]);
+
   App.controller('DiagnosticWizardCtrl', [
     '$scope', 'Experiment', 'Status', '$interval', 'DiagnosticWizardService', '$stateParams', '$state', 'CONSTANTS',
     function ($scope, Experiment, Status, $interval, DiagnosticWizardService, $params, $state, CONSTANTS) {
