@@ -12,6 +12,7 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
     $scope.userData.password = "";
     $scope.userData.password_confirmation = "";
     $scope.isAdmin = $scope.allowEditPassword = $scope.allowButtons = $scope.passError = false;
+    $scope.emailAlreadtTaken = false;
 
     $scope.getUserData = function() {
       if(isNaN($scope.id)) {
@@ -49,18 +50,27 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
     };
 
     $scope.update = function(form) {
-      
-      $scope.passError = $scope.userData.password !== $scope.userData.password_confirmation;
+
+      $scope.passError = ($scope.userData.password !== $scope.userData.password_confirmation);
       if(form.$valid && ! $scope.passError) {
         $scope.resetPassStatus = false;
         var format = {'user': $scope.userData};
-        userService.updateUser($scope.id, format).then(function(data) {
+        userService.updateUser($scope.id, format)
+        .then(function(data) {
           if($state.is("settings.current-user")) {
             $state.transitionTo('settings.root', {}, { reload: true });
           } else {
             $state.transitionTo('settings.usermanagement', {}, { reload: true });
           }
 
+        }, function(err) {
+            console.log("There is some issue", err.errors);
+            for(var errKey in err.errors) {
+              if(errKey === 'email') {
+                $scope.emailAlreadtTaken = true;
+              }
+              break;
+            }
         });
       }
 

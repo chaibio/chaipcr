@@ -31,10 +31,13 @@ window.ChaiBioTech.ngApp.service 'User', [
       deferred.promise
 
     @updateUser = (id, data)->
-      console.log data
       deferred = $q.defer()
-      $http.put("/users/#{id}", data).then (resp) ->
-        deferred.resolve resp.data
+      $http.put("/users/#{id}", data)
+        .then (resp) ->
+          deferred.resolve resp.data.user
+
+        .catch (resp) ->
+          deferred.reject resp.data.user
 
       deferred.promise;
 

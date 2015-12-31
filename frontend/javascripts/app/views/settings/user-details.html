@@ -17,10 +17,11 @@
 
       <div class="email-field">
         <p class="p-caption">E-Mail</p>
-        <input type="email" class="text-class" name="emailField" ng-model="userData.email" required>
+        <input type="email" ng-keydown="emailAlreadtTaken=false" class="text-class" name="emailField" ng-model="userData.email" required>
         <div ng-show="editUser.$submitted || editUser.emailField.$touched">
           <p ng-show="editUser.emailField.$error.required" class="error-text">Cannot be left blank</p>
           <p ng-show="editUser.emailField.$error.email" class="error-text">Invalid e-mail</p>
+          <p ng-show="emailAlreadtTaken" class="error-text">Email already taken</p>
       </div>
       </div>
       <div ng-if="allowEditPassword" class="email-field">
