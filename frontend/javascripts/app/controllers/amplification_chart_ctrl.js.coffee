@@ -62,10 +62,11 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         Experiment.getFluorescenceData($stateParams.id)
         .success (data) ->
           return if !data.fluorescence_data
-          data.min_cycle = 1
-          data.max_cycle = data.total_cycles
+          return if data.fluorescence_data.length is 0
           FLUORESCENCE_DATA_CACHE = angular.copy data
           $scope.fluorescence_data = data
+          data.min_cycle = $scope.chartConfig.axes.x.min || 1
+          data.max_cycle = $scope.chartConfig.axes.x.max || data.total_cycles
           updateChartData(data)
           updateButtonCts()
           hasData = true
@@ -108,12 +109,13 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       wRatio = num_cycle_to_show / $scope.maxCycle
       scrollbar_width = $('#ampli-scrollbar').css('width').replace 'px', ''
       $('#ampli-scrollbar .scrollbar').css(width: (scrollbar_width * wRatio) + 'px')
-      $rootScope.$broadcast 'scrollbar:width:changed'
 
       $scope.fluorescence_data = helper.moveData FLUORESCENCE_DATA_CACHE.fluorescence_data, num_cycle_to_show, $scope.ampli_scroll, $scope.maxCycle
       updateChartData($scope.fluorescence_data)
 
-    $scope.$watch 'ampli_zoom', moveData
+    $scope.$watch 'ampli_zoom', ->
+      $rootScope.$broadcast 'scrollbar:width:changed'
+      moveData()
     $scope.$watch 'ampli_scroll', moveData
 
 
