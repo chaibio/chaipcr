@@ -35,6 +35,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
 
     @neutralizeData = (fluorescence_data) ->
+      fluorescence_data = angular.copy fluorescence_data
       neutralized_baseline_data = []
       neutralized_background_data = []
 
@@ -89,15 +90,15 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
       return if max_baseline > max_background then max_baseline else max_background
 
-    @Xticks = (max)->
+    @Xticks = (min, max)->
       num_ticks = 10
       ticks = []
-      if max < num_ticks
-        for i in [1..max] by 1
+      if max - min < num_ticks
+        for i in [min..max] by 1
           ticks.push i
       else
-        chunkSize = Math.floor(max/num_ticks)
-        for i in [1..max] by chunkSize
+        chunkSize = Math.floor((max-min)/num_ticks)
+        for i in [min..max] by chunkSize
           ticks.push i
         ticks.push max if max % num_ticks isnt 0
 
@@ -122,6 +123,24 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         '#13A350'
       ]
 
+    @moveData = (data, zoom, scroll, max_cycle) ->
+      data = angular.copy data
+      scroll = if scroll < 0 then 0 else scroll
+      scroll =if scroll > 1 then 1 else scroll
+
+      if scroll is 'FULL'
+        cycle_start = 1
+        cycle_end = angular.copy max_cycle
+      else
+        cycle_start = Math.floor(scroll * (max_cycle-(1+zoom)) ) + 1
+        cycle_end = cycle_start + zoom
+
+      new_data = _.select data, (datum) ->
+        datum.cycle_num >= cycle_start and datum.cycle_num <= cycle_end
+
+      min_cycle: cycle_start
+      max_cycle: cycle_end
+      fluorescence_data: new_data
 
     return
 ]

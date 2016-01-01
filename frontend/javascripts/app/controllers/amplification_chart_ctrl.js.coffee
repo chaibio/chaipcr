@@ -5,7 +5,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
   'AmplificationChartHelper'
   'Status'
   'expName'
-  ($scope, $stateParams, Experiment, helper, Status, expName) ->
+  '$rootScope'
+  ($scope, $stateParams, Experiment, helper, Status, expName, $rootScope) ->
 
     hasData = false
     fetching = false
@@ -16,6 +17,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
     $scope.log_linear = 'log'
     $scope.COLORS = helper.COLORS
     $scope.fluorescence_data = null
+    FLUORESCENCE_DATA_CACHE = null
     $scope.baseline_subtraction = true
 
     $scope.$on 'expName:Updated', ->
@@ -45,27 +47,26 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       if ((state is 'idle' and $scope.experiment?.completed_at and !hasData) or
       (state is 'idle' and oldState isnt state) or
       (state is 'running' and (oldStep isnt newStep or !oldStep) and data.optics.collect_data and oldData.optics.collect_data is 'true') )
-        updateFluorescenceData()
+        fetchFluorescenceData()
 
     $scope.$watch ->
       $scope.RunExperimentCtrl.chart
     , (val) ->
       if val is 'amplification'
-        updateFluorescenceData()
+        fetchFluorescenceData()
 
-    updateFluorescenceData = ->
+    fetchFluorescenceData = ->
       return if $scope.RunExperimentCtrl.chart isnt 'amplification'
       if !fetching
         fetching = true
         Experiment.getFluorescenceData($stateParams.id)
         .success (data) ->
           return if !data.fluorescence_data
+          data.min_cycle = 1
+          data.max_cycle = data.total_cycles
+          FLUORESCENCE_DATA_CACHE = angular.copy data
           $scope.fluorescence_data = data
-          $scope.chartConfig.axes.x.max = $scope.fluorescence_data.total_cycles
-          $scope.chartConfig.axes.x.ticks = helper.Xticks $scope.fluorescence_data.total_cycles
-          $scope.chartConfig.axes.y.max = helper.getMaxCalibration $scope.fluorescence_data.fluorescence_data
-          $scope.neutralizeData = helper.neutralizeData $scope.fluorescence_data.fluorescence_data, $scope.baseline_subtraction
-          updateChartData()
+          updateChartData(data)
           updateButtonCts()
           hasData = true
 
@@ -73,12 +74,17 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           fetching = false
 
     updateButtonCts = ->
-      for ct, i in $scope.fluorescence_data.ct
+      for ct, i in FLUORESCENCE_DATA_CACHE.ct
         $scope.wellButtons["well_#{i}"].ct = ct
 
-    updateChartData = ->
-      return if !$scope.neutralizeData
-      $scope.data = $scope.neutralizeData["#{if $scope.baseline_subtraction then 'baseline' else 'background'}"]
+    updateChartData = (data) ->
+      return if !data
+      $scope.chartConfig.axes.x.min = data.min_cycle
+      $scope.chartConfig.axes.x.max = data.max_cycle
+      $scope.chartConfig.axes.x.ticks = helper.Xticks data.min_cycle, data.max_cycle
+      $scope.chartConfig.axes.y.max = helper.getMaxCalibration data.fluorescence_data
+      neutralizedData = helper.neutralizeData data.fluorescence_data
+      $scope.data = neutralizedData["#{if $scope.baseline_subtraction then 'baseline' else 'background'}"]
 
 
     $scope.$watch 'wellButtons', (buttons) ->
@@ -93,6 +99,22 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             thickness: '3px'
 
     $scope.$watch 'baseline_subtraction', (val) ->
-      updateChartData()
+      updateChartData($scope.fluorescence_data)
+
+    moveData = ->
+      cycle_num = $scope.ampli_zoom
+      return if !angular.isNumber(cycle_num) or !FLUORESCENCE_DATA_CACHE or !$scope.maxCycle
+      num_cycle_to_show = $scope.maxCycle - cycle_num
+      wRatio = num_cycle_to_show / $scope.maxCycle
+      scrollbar_width = $('#ampli-scrollbar').css('width').replace 'px', ''
+      $('#ampli-scrollbar .scrollbar').css(width: (scrollbar_width * wRatio) + 'px')
+      $rootScope.$broadcast 'scrollbar:width:changed'
+
+      $scope.fluorescence_data = helper.moveData FLUORESCENCE_DATA_CACHE.fluorescence_data, num_cycle_to_show, $scope.ampli_scroll, $scope.maxCycle
+      updateChartData($scope.fluorescence_data)
+
+    $scope.$watch 'ampli_zoom', moveData
+    $scope.$watch 'ampli_scroll', moveData
+
 
 ]
