@@ -26,7 +26,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
     Experiment.get(id: $stateParams.id).$promise.then (data) ->
       maxCycle = helper.getMaxExperimentCycle data.experiment
       $scope.maxCycle = maxCycle
-      $scope.chartConfig.axes.x.ticks = helper.Xticks maxCycle
+      $scope.chartConfig.axes.x.ticks = helper.Xticks 1, maxCycle
       $scope.chartConfig.axes.x.max = maxCycle
       $scope.experiment = data.experiment
       return
@@ -67,7 +67,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.fluorescence_data = data
           data.min_cycle = $scope.chartConfig.axes.x.min || 1
           data.max_cycle = $scope.chartConfig.axes.x.max || data.total_cycles
-          updateChartData(data)
+          updateChartData(data) if !$scope.data or $scope.data?.length is 1
           updateButtonCts()
           hasData = true
 
@@ -114,8 +114,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       updateChartData($scope.fluorescence_data)
 
     $scope.$watch 'ampli_zoom', ->
-      $rootScope.$broadcast 'scrollbar:width:changed'
       moveData()
+      $rootScope.$broadcast 'scrollbar:width:changed'
+
     $scope.$watch 'ampli_scroll', moveData
 
 

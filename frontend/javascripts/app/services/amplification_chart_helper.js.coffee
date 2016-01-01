@@ -62,8 +62,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
 
 
-    @paddData = ->
-      paddData = cycle_num: 0
+    @paddData = (cycle_num = 0) ->
+      paddData = cycle_num: cycle_num
       for i in [0..15] by 1
         paddData["well_#{i}"] = 0
 
@@ -89,6 +89,13 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       max_background = Math.max.apply Math, calibs
 
       return if max_baseline > max_background then max_baseline else max_background
+
+    @getMaxCycleFromFluorescence = (fluorescence_data) ->
+      cycles = []
+      for datum in [0...fluorescence_data.length] by 1
+        cycles.push parseInt(datum.cycle_num)
+
+      return Math.max.apply Math, cycles
 
     @Xticks = (min, max)->
       num_ticks = 10
@@ -124,19 +131,27 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       ]
 
     @moveData = (data, zoom, scroll, max_cycle) ->
+      console.log "zoom: #{zoom}"
       data = angular.copy data
       scroll = if scroll < 0 then 0 else scroll
       scroll =if scroll > 1 then 1 else scroll
 
-      if scroll is 'FULL'
+      if zoom is max_cycle
         cycle_start = 1
         cycle_end = angular.copy max_cycle
+
       else
-        cycle_start = Math.floor(scroll * (max_cycle-(1+zoom)) ) + 1
-        cycle_end = cycle_start + zoom
+        # max_cycle_from_fluo = @getMaxCycleFromFluorescence data
+        # console.log "max_cycle_from_fluo: #{max_cycle_from_fluo}"
+        # max_cycle = if max_cycle_from_fluo < max_cycle then max_cycle_from_fluo else max_cycle
+
+        cycle_start = Math.floor(scroll * (max_cycle - zoom) ) + 1
+        cycle_end = cycle_start + zoom - 1
 
       new_data = _.select data, (datum) ->
         datum.cycle_num >= cycle_start and datum.cycle_num <= cycle_end
+
+      new_data = if new_data.length > 0 then new_data else [@paddData(cycle_start)]
 
       min_cycle: cycle_start
       max_cycle: cycle_end
