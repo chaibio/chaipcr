@@ -78,7 +78,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
       Math.max.apply Math, cycles
 
-    @getMaxCalibration = (fluorescence_data, is_baseline) ->
+    @getMaxCalibration = (fluorescence_data) ->
       calibs = _.map fluorescence_data, (datum) ->
         datum['baseline_subtracted_value']
 
@@ -141,10 +141,6 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         cycle_end = angular.copy max_cycle
 
       else
-        # max_cycle_from_fluo = @getMaxCycleFromFluorescence data
-        # console.log "max_cycle_from_fluo: #{max_cycle_from_fluo}"
-        # max_cycle = if max_cycle_from_fluo < max_cycle then max_cycle_from_fluo else max_cycle
-
         cycle_start = Math.floor(scroll * (max_cycle - zoom) ) + 1
         cycle_end = cycle_start + zoom - 1
 

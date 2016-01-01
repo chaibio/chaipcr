@@ -12,12 +12,12 @@ window.App.directive('ampliSlider', [
 
       hasInit = false
       CYCLES = 0
+      ngModel.$setViewValue 0
 
       init = ->
         hasInit = true
 
         CYCLES = $scope.cycles-2
-        ngModel.$setViewValue 0
 
         held = false
         oldX = 0

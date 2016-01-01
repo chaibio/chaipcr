@@ -65,9 +65,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           return if data.fluorescence_data.length is 0
           FLUORESCENCE_DATA_CACHE = angular.copy data
           $scope.fluorescence_data = data
-          data.min_cycle = $scope.chartConfig.axes.x.min || 1
-          data.max_cycle = $scope.chartConfig.axes.x.max || data.total_cycles
-          updateChartData(data) if !$scope.data or $scope.data?.length is 1
+          # data.min_cycle = $scope.chartConfig.axes.x.min || 1
+          # data.max_cycle = $scope.chartConfig.axes.x.max || data.total_cycles
+          # updateChartData(data) if !$scope.data or $scope.data?.length is 1
+          moveData()
           updateButtonCts()
           hasData = true
 
