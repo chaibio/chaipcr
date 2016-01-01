@@ -4,7 +4,8 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
   'User',
   '$state',
   '$uibModal',
-  function($scope, $stateParams, userService, $state, $uibModal) {
+  'userFormErrors',
+  function($scope, $stateParams, userService, $state, $uibModal, userFormErrors) {
 
     $scope.id = $stateParams.id || 'current';
     $scope.userData = {};
@@ -12,6 +13,9 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
     $scope.userData.password = "";
     $scope.userData.password_confirmation = "";
     $scope.isAdmin = $scope.allowEditPassword = $scope.allowButtons = $scope.passError = false;
+    $scope.cancelButton = true;
+    $scope.deleteButton = true;
+    $scope.emailAlreadtTaken = false;
 
     $scope.getUserData = function() {
       if(isNaN($scope.id)) {
@@ -29,6 +33,12 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
         then(function(data) {
           if(data.user.role === "admin") {
             $scope.isAdmin = $scope.allowEditPassword = $scope.allowButtons = true;
+          }
+          if($state.is("settings.current-user")) {
+            console.log("okay Inside");
+            $scope.isAdmin = false;
+            $scope.allowEditPassword = $scope.allowButtons = true;
+            $scope.deleteButton = false;
           }
         });
 
@@ -49,21 +59,30 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
     };
 
     $scope.update = function(form) {
-      
-      $scope.passError = $scope.userData.password !== $scope.userData.password_confirmation;
+      console.log(form);
+      $scope.passError = ($scope.userData.password !== $scope.userData.password_confirmation);
       if(form.$valid && ! $scope.passError) {
-        $scope.resetPassStatus = false;
+
         var format = {'user': $scope.userData};
-        userService.updateUser($scope.id, format).then(function(data) {
+        userService.updateUser($scope.id, format)
+        .then(function(data) {
+          $scope.resetPassStatus = false;
           if($state.is("settings.current-user")) {
             $state.transitionTo('settings.root', {}, { reload: true });
           } else {
             $state.transitionTo('settings.usermanagement', {}, { reload: true });
           }
 
+        }, function(err) {
+          console.log("bingo", form);
+            userFormErrors.handleError($scope, err, form);
+
         });
       }
+    };
 
+    $scope.emailKeyDown = function(form) {
+      form.emailField.$setValidity('emailAlreadtTaken', true);
     };
 
     $scope.deleteMessage = function() {

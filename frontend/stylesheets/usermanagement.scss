@@ -129,6 +129,14 @@
             border-right: none;
             border-bottom: 1px solid lightgray;
           }
+          
+          input.ng-invalid.ng-touched {
+            width: 260px;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-bottom: 2px solid red;
+          }
           .email-field {
             .button {
               width: 260px;

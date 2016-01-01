@@ -2,7 +2,7 @@ window.ChaiBioTech.ngApp.directive('allowAdminToggle', [
   function() {
     return {
       restric: 'EA',
-      replace: true,
+      replace: false,
       templateUrl: 'app/views/directives/gather-data-toggle.html',
 
       scope: {
@@ -16,26 +16,24 @@ window.ChaiBioTech.ngApp.directive('allowAdminToggle', [
           scope.configureSwitch(val);
         });
 
-        $(elem).click(function(evt) {
-
-          scope.configureSwitch(!scope.data);
+        scope.clickHandler = function() {
           scope.sendData();
-        });
+        };
 
         scope.configureSwitch = function(val) {
 
           if(val === "admin") {
-            $(scope.dragElem).parent().css("background-color", "#8dc63f");
-            $(scope.dragElem).children().css("background-color", "#8dc63f");
-            $(scope.dragElem).animate({
+            angular.element(scope.dragElem).parent().css("background-color", "#8dc63f");
+            angular.element(scope.dragElem).children().css("background-color", "#8dc63f");
+            angular.element(scope.dragElem).animate({
               left: "11"
-            }, 100);
+            }, 50);
           } else {
-            $(scope.dragElem).parent().css("background-color", "#bbbbbb");
-            $(scope.dragElem).children().css("background-color", "#bbbbbb");
-            $(scope.dragElem).animate({
+            angular.element(scope.dragElem).parent().css("background-color", "#bbbbbb");
+            angular.element(scope.dragElem).children().css("background-color", "#bbbbbb");
+            angular.element(scope.dragElem).animate({
               left: "1"
-            }, 100);
+            }, 50);
           }
 
         };
@@ -64,7 +62,7 @@ window.ChaiBioTech.ngApp.directive('allowAdminToggle', [
           //scope.$parent['update']();
         };
 
-        scope.dragElem = $(elem).find(".outer-circle").draggable({
+        scope.dragElem = angular.element(elem).find(".outer-circle").draggable({
           containment: "parent",
           axis: "x",
 

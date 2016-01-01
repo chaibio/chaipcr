@@ -1,43 +1,71 @@
-<div class="usermanagement-container-current" ng-controller="userDataController">
+<div class="usermanagement-container-current">
   <version-info></version-info>
   <div class="usermanagement-container-backdrop" ui-sref="settings.root"></div>
 
   <div class="left">
     <h2 class="underlined">EDIT LOGGED IN USER<span class="close" ui-sref="settings.root">&times;</span></h2>
-    <!--<ng-include src="'app/views/settings/user-details.html'"></ng-include> -->
-    <div class="user-details-container">
-      <div class="field">
-        <div class="name-field">
-          <p class="p-caption">NAME</p>
-          <input type="text" class="text-class"ng-model="userData.name" >
+    <ng-include src="'app/views/settings/user-details.html'"></ng-include>
+    <!--<div class="user-details-container">
+      <form name="editUser" ng-submit="update(editUser)" novalidate>
+        <div ng-if="isAdmin" class="admin-access">
+          <div class="admin-toggle">
+            <allow-admin-toggle data="userData.role"></allow-admin-toggle>
+          </div>
+          <div class="allow-admin-text">ALLOW ADMIN ACCESS</div>
         </div>
-        <div class="email-field">
-          <p class="p-caption">E-Mail</p>
-          <input type="text" class="text-class" ng-model="userData.email">
-        </div>
-        <div class="email-field">
-          <p class="p-caption">Password</p>
-          <button ng-if="! resetPassStatus" class="button" ng-click="resetPass()">RESET PASSWORD</button>
-          <div class="edit-pass-container" ng-if="resetPassStatus">
-            <div class="name-field">
-              <p class="p-caption">Enter New Password</p>
-              <input type="password" ng-model="userData.password" placeholder="Alphanumeric only" class="text-class">
+        <div class="field">
+          <div class="name-field">
+            <p class="p-caption">NAME</p>
+            <input type="text" class="text-class" name="userName" ng-model="userData.name" required />
+            <div ng-show="editUser.$submitted || editUser.userName.$touched">
+              <p ng-show="editUser.userName.$error.required" class="error-text">Cannot be left blank</p>
+          </div>
+          </div>
+
+          <div class="email-field">
+            <p class="p-caption">E-Mail</p>
+            <input type="email" ng-keydown="emailKeyDown(editUser)" class="text-class" name="emailField" ng-model="userData.email" required>
+            <div ng-show="editUser.$submitted || editUser.emailField.$touched">
+              <p ng-show="editUser.emailField.$error.required" class="error-text">Cannot be left blank</p>
+              <p ng-show="editUser.emailField.$error.email" class="error-text">Invalid e-mail</p>
+              <p ng-show="editUser.emailField.$error.emailAlreadtTaken" class="error-text">Email already taken</p>
+          </div>
+          </div>
+          <div ng-if="allowEditPassword" class="email-field">
+            <p class="p-caption">Password</p>
+            <button ng-if="! resetPassStatus" class="button" ng-click="resetPass()">RESET PASSWORD</button>
+            <div class="edit-pass-container" ng-if="resetPassStatus">
+              <div class="name-field">
+                <p class="p-caption">Enter New Password</p>
+                <input type="password" ng-minlength="4" ng-keyup="passError = userData.password !== userData.password_confirmation" ng-model="userData.password" name="password" required placeholder="Alphanumeric only" class="text-class">
+              </div>
+              <div ng-show="editUser.$submitted || editUser.password.$touched">
+                <span class="error-text" ng-show="editUser.password.$error.minlength">Too short, minimum 4 characters required</span>
+              </div>
+              <div class="name-field">
+                <p class="p-caption">Confirm Password</p>
+                <input type="password" ng-minlength="4" ng-keyup="passError = userData.password !== userData.password_confirmation"  ng-model="userData.password_confirmation" name="confirmPassword" required placeholder="Retype exactly as above" class="text-class">
+              </div>
+              <div ng-show="editUser.$submitted || editUser.password.$touched">
+                <p ng-show="editUser.confirmPassword.$error.required || editUSer.password.$error.required" class="error-text">Cannot be left blank</p>
+                <p ng-show="passError" class="error-text">Please confirm Password</p>
+                <p ng-show="editUser.confirmPassword.$error.minlength" class="error-text">Too short, minimum 4 characters required</p>
             </div>
-            <div class="name-field">
-              <p class="p-caption">Confirm Password</p>
-              <input type="password" ng-model="userData.password_confirmation" placeholder="Retype exactly as above" class="text-class">
             </div>
           </div>
         </div>
-      </div>
-      <div class="action-buttons">
-        <div class="button-containers second-spacing">
-          <button class="button second-button" ui-sref="settings">CANCEL</button>
+        <div class="action-buttons" ng-if="allowButtons">
+          <div class="button-containers">
+            <button class="button first-button" ng-if="! resetPassStatus" ng-click="deleteMessage()">DELETE USER</button>
+          </div>
+          <div class="button-containers second-spacing">
+            <button class="button second-button" ui-sref="settings.usermanagement">CANCEL</button>
+          </div>
+          <div class="button-containers">
+            <input type="submit" value="SAVE CHANGES" class="third-button" />
+          </div>
         </div>
-        <div class="button-containers">
-          <button class="third-button" ng-click="update()">SAVE CHANGES</button>
-        </div>
-      </div>
-    </div
+      </form>
+    </div> -->
   </div>
 </div>
