@@ -16,6 +16,7 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
     $scope.cancelButton = true;
     $scope.deleteButton = true;
     $scope.emailAlreadtTaken = false;
+    $scope.editable = false;
 
     $scope.getUserData = function() {
       if(isNaN($scope.id)) {
@@ -35,11 +36,12 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
             $scope.isAdmin = $scope.allowEditPassword = $scope.allowButtons = true;
           }
           if($state.is("settings.current-user")) {
-            console.log("okay Inside");
             $scope.isAdmin = false;
             $scope.allowEditPassword = $scope.allowButtons = true;
             $scope.deleteButton = false;
           }
+          $scope.editable = $scope.isAdmin || $state.is("settings.current-user");
+          console.log($scope.editable, $scope.isAdmin, $state.is("settings.current-user"));
         });
 
     };
@@ -104,5 +106,6 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
 
     $scope.getUserData();
     $scope.currentLogin();
+
   }
 ]);

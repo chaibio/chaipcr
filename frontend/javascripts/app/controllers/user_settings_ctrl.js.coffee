@@ -21,16 +21,15 @@
        User.fetch().then (users) ->
          $scope.users = users
 
-     fetchUsers()
-
      $scope.currentUser = User.currentUser()
 
      User.getCurrent().then (data) ->
        $scope.loggedInUser = data.data.user
-       console.log data.data.user
+       console.log $scope.loggedInUser
 
      $scope.user = {}
-
+     fetchUsers()
+     
      $scope.changeUser = (index)->
        $scope.selectedUser = $scope.users[index].user;
        User.selectedUSer = $scope.users[index].user;

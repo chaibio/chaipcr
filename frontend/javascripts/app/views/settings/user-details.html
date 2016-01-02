@@ -9,7 +9,7 @@
     <div class="field">
       <div class="name-field">
         <p class="p-caption">NAME</p>
-        <input type="text" class="text-class" name="userName" ng-model="userData.name" required />
+        <input ng-readonly="!editable" type="text" class="text-class" name="userName" ng-model="userData.name" required />
         <div ng-show="editUser.$submitted || editUser.userName.$touched">
           <p ng-show="editUser.userName.$error.required" class="error-text">Cannot be left blank</p>
       </div>
@@ -17,7 +17,7 @@
 
       <div class="email-field">
         <p class="p-caption">E-Mail</p>
-        <input type="email" ng-keydown="emailKeyDown(editUser)" class="text-class" name="emailField" ng-model="userData.email" required>
+        <input ng-readonly="!editable" type="email" ng-keydown="emailKeyDown(editUser)" class="text-class" name="emailField" ng-model="userData.email" required>
         <div ng-show="editUser.$submitted || editUser.emailField.$touched">
           <p ng-show="editUser.emailField.$error.required" class="error-text">Cannot be left blank</p>
           <p ng-show="editUser.emailField.$error.email" class="error-text">Invalid e-mail</p>
@@ -43,7 +43,7 @@
             <p ng-show="editUser.confirmPassword.$error.required || editUSer.password.$error.required" class="error-text">Cannot be left blank</p>
             <p ng-show="editUser.confirmPassword.$error.confirmPassword" class="error-text">Please confirm Password</p>
             <p ng-show="editUser.confirmPassword.$error.minlength" class="error-text">Too short, minimum 4 characters required</p>
-        
+
         </div>
       </div>
     </div>

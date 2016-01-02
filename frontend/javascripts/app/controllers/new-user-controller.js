@@ -40,6 +40,16 @@ window.ChaiBioTech.ngApp.controller('newUserController', [
     $scope.emailKeyDown = function(form) {
       form.emailField.$setValidity('emailAlreadtTaken', true);
     };
+
+    $scope.comparePass = function(form) {
+      if($scope.userData.password !== $scope.userData.password_confirmation) {
+        form.password.$setValidity('confirmPassword', false);
+        form.confirmPassword.$setValidity('confirmPassword', false);
+      } else if($scope.userData.password === $scope.userData.password_confirmation){
+        form.password.$setValidity('confirmPassword', true);
+        form.confirmPassword.$setValidity('confirmPassword', true);
+      }
+    };
     
     $scope.currentLogin = function() {
       userService.findUSer("current").
