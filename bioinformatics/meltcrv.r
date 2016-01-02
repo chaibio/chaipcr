@@ -4,6 +4,7 @@
 # function: get melting curve data and output it for plotting as well as Tm
 process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
                        exp_id, stage_id, calib_id, # for selecting data to analyze
+                       mc_plot=FALSE, # whether to plot melting curve data
                        verbose=FALSE, 
                        show_running_time=FALSE, # option to show time cost to run this function
                        ... # options to pass onto `mc_tm_pw`
@@ -17,7 +18,7 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
                              exp_id, stage_id, calib_id, 
                              verbose, 
                              show_running_time)
-    mc_out <- mc_tm_all(mc_calib, show_running_time, ...)
+    mc_out <- mc_tm_all(mc_calib, mc_plot, show_running_time, ...)
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]
@@ -110,14 +111,14 @@ mc_tm_pw <- function(mt_pw,
 
 
 # function: output melting curve data and Tm for all the wells
-mc_tm_all <- function(mc_calib, show_running_time=FALSE, 
+mc_tm_all <- function(mc_calib, mc_plot=FALSE, show_running_time=FALSE, 
                       ...) { # options to pass onto `mc_tm_pw`
     
     # start counting for running time
     func_name <- 'mc_tm_all'
     start_time <- proc.time()[['elapsed']]
     
-    mt_ori <- meltcurve(mc_calib) # using qpcR function `meltcurve`
+    mt_ori <- meltcurve(mc_calib, plot=mc_plot) # using qpcR function `meltcurve`
     mt_out <- lapply(mt_ori, FUN=mc_tm_pw, ...)
     names(mt_out) <- colnames(mc_calib)[seq(2, dim(mc_calib)[2], by=2)]
     
