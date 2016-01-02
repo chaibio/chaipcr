@@ -1,3 +1,5 @@
+# customized by Xiaoqing Rong-Mullins 2015-11-16
+
 meltcurve <- function(
 data, 
 temps = NULL, 
@@ -41,6 +43,10 @@ cut.Area = 0,
     
   ### iterate over all samples  
   for (i in 1:ncol(TEMPS)) {
+    
+    # xqrm: start counting for running time
+    start_time_for <- proc.time()[['elapsed']]
+    
     cat(NAMES[i], "\n")
     TEMP <- TEMPS[, i]
     FLUO <- FLUOS[, i]      
@@ -125,7 +131,12 @@ cut.Area = 0,
     outLIST[[i]] <- RES
     
     cat("\n\n")
-  }
+    
+    # xqrm: report time cost for this function
+    end_time_for <- proc.time()[['elapsed']]
+    message('iteration ', i, ' took ', round(end_time_for - start_time_for, 2), ' seconds.\n')
+    
+  } # xqrm: end: for loop
     
   ### plotting setup and x-y-y plot
   if (plot) {    
