@@ -18,6 +18,10 @@ plot.Area = TRUE,
 cut.Area = 0,
 ...)
 {
+  # xqrm: start counting for running time
+  func_name <- 'meltcurve'
+  start_time <- proc.time()[['elapsed']]
+  
   options(warn = -1)
   if (is.null(temps)) temps <- seq(from = 1, to = ncol(data), by = 2) 
   if (is.null(fluos)) fluos <- seq(from = 2, to = ncol(data), by = 2)
@@ -161,6 +165,10 @@ cut.Area = 0,
     }
   }   
          
+  # xqrm: report time cost for this function
+  end_time <- proc.time()[['elapsed']]
+  message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
+  
   return(outLIST)           
 }
 
