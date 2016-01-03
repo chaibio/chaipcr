@@ -30,7 +30,7 @@ LEDController::LEDController(shared_ptr<SPIPort> spiPort,unsigned int potCSPin,
 LEDController::~LEDController() {
 	
 }
-	
+
 void LEDController::setIntensity(double onCurrentMilliamps) {
     if (_intensity == onCurrentMilliamps)
         return;

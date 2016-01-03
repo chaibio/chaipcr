@@ -352,7 +352,7 @@ Ramp* DBControl::getRamp(int stepId)
 
     if (result.get_indicator("excitation_intensity") != soci::i_null)
     {
-        if (result.get_properties("lid_temperature").get_data_type() == soci::dt_double)
+        if (result.get_properties("excitation_intensity").get_data_type() == soci::dt_double)
             ramp->setExcitationIntensity(result.get<double>("excitation_intensity"));
         else
             ramp->setExcitationIntensity(result.get<int>("excitation_intensity"));
