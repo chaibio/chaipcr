@@ -53,12 +53,6 @@ else
 		then
 			echo "Path created: $2"
 			BASEDIR=$(dirname $0)
-			echo copying card contents from $BASEDIR/factory_settings_sdcard/ to $output_dir/p1
-			if [ ! -e ${output_dir}/p1 ]
-			then
-				mkdir -p ${output_dir}/p1
-			fi
-			cp -r $BASEDIR/factory_settings_sdcard/* $output_dir/p1
 		else
 			echo "Cann't create path: $2"
 			exit 1
@@ -75,6 +69,9 @@ if [ ! -e ${output_dir}/p2 ]
 then
 	mkdir -p ${output_dir}/p2
 fi
+
+echo copying card contents from $BASEDIR/factory_settings_sdcard/ to $output_dir/p1
+cp -r $BASEDIR/factory_settings_sdcard/* $output_dir/p1
 
 image_filename_upgrade="${temp}/eMMC.img"
 image_filename_upgrade1="$sdcard/eMMC_part1.img"
