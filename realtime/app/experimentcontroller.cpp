@@ -111,8 +111,6 @@ void ExperimentController::run()
         _machineState = RunningMachineState;
         _thermalState = HeatBlockInstance::getInstance()->temperature() < _experiment.protocol()->currentStep()->temperature() ? HeatingThermalState : CoolingThermalState;
 
-        OpticsInstance::getInstance()->getLedController()->setIntensity(_experiment.protocol()->currentRamp()->excitationIntensity());
-
         HeatBlockInstance::getInstance()->setTargetTemperature(_experiment.protocol()->currentStep()->temperature(), _experiment.protocol()->currentRamp()->rate());
         HeatBlockInstance::getInstance()->enableStepProcessing();
         HeatBlockInstance::getInstance()->setEnableMode(true);
@@ -127,6 +125,8 @@ void ExperimentController::run()
                 _meltCurveTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::meltCurveCallback));
             }
         }
+
+        OpticsInstance::getInstance()->getLedController()->setIntensity(_experiment.protocol()->currentRamp()->excitationIntensity());
     }
 
     calculateEstimatedDuration();
