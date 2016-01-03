@@ -99,8 +99,28 @@ fi
 sync
 echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 
+alldone () {
+	if [ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] ; then
+		echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+		echo default-on > /sys/class/leds/beaglebone\:green\:usr1/trigger
+		echo default-on > /sys/class/leds/beaglebone\:green\:usr2/trigger
+		echo default-on > /sys/class/leds/beaglebone\:green\:usr3/trigger
+	fi
+
+	echo "Done!"
+
+	echo "Halt..."
+	sync
+	
+	halt -d 5
+	sleep 180
+	exit 0
+}
+
+
 if [ -e $image_filename_upgrade1 ]
 then
+	alldone
 	exit 0
 fi
 
