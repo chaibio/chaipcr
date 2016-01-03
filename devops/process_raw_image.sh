@@ -304,8 +304,8 @@ dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
 	echo "Finalizing: $image_filename_upgrade2"
 	mv $image_filename_upgrade_temp $image_filename_upgrade2
 
-echo "mv $image_filename_upgrade_temp $image_filename_upgrade2"
-exit 0
+#echo "mv $image_filename_upgrade_temp $image_filename_upgrade2"
+#exit 0
 
 if [ -e $image_filename_upgrade_temp ]
 then
