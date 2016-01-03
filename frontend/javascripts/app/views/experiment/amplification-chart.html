@@ -48,7 +48,7 @@
         <div>
           <div class="vertical-text">RELATIVE FLUORESCENCE UNITS</div>
           <div class="chart-container">
-            <linechart data="data" options="chartConfig" width="700" height="300"></linechart>
+            <linechart data="data" options="chartConfig" width="700" height="300" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks"></linechart>
           </div>
           <div class="text-center num-cycle-text">NUMBER OF CYCLES</div>
 
@@ -63,7 +63,7 @@
                 </div>
               </div>
               <div class="col-md-6 ampli-scrollbar-container">
-                <scrollbar ng-model="ampli_scroll"></scrollbar>
+                <scrollbar ng-model="ampli_scroll" id="ampli-scrollbar"></scrollbar>
               </div>
             </div>
           </div>

@@ -1,3 +1,5 @@
+# customized by Xiaoqing Rong-Mullins 2015-11-16
+
 meltcurve <- function(
 data, 
 temps = NULL, 
@@ -16,6 +18,10 @@ plot.Area = TRUE,
 cut.Area = 0,
 ...)
 {
+  # xqrm: start counting for running time
+  func_name <- 'meltcurve'
+  start_time <- proc.time()[['elapsed']]
+  
   options(warn = -1)
   if (is.null(temps)) temps <- seq(from = 1, to = ncol(data), by = 2) 
   if (is.null(fluos)) fluos <- seq(from = 2, to = ncol(data), by = 2)
@@ -41,6 +47,10 @@ cut.Area = 0,
     
   ### iterate over all samples  
   for (i in 1:ncol(TEMPS)) {
+    
+    # xqrm: start counting for running time
+    start_time_for <- proc.time()[['elapsed']]
+    
     cat(NAMES[i], "\n")
     TEMP <- TEMPS[, i]
     FLUO <- FLUOS[, i]      
@@ -125,7 +135,12 @@ cut.Area = 0,
     outLIST[[i]] <- RES
     
     cat("\n\n")
-  }
+    
+    # xqrm: report time cost for this function
+    end_time_for <- proc.time()[['elapsed']]
+    message('iteration ', i, ' took ', round(end_time_for - start_time_for, 2), ' seconds.\n')
+    
+  } # xqrm: end: for loop
     
   ### plotting setup and x-y-y plot
   if (plot) {    
@@ -150,6 +165,10 @@ cut.Area = 0,
     }
   }   
          
+  # xqrm: report time cost for this function
+  end_time <- proc.time()[['elapsed']]
+  message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
+  
   return(outLIST)           
 }
 

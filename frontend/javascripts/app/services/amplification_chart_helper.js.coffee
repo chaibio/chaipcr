@@ -35,6 +35,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
 
     @neutralizeData = (fluorescence_data) ->
+      fluorescence_data = angular.copy fluorescence_data
       neutralized_baseline_data = []
       neutralized_background_data = []
 
@@ -61,8 +62,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
 
 
-    @paddData = ->
-      paddData = cycle_num: 0
+    @paddData = (cycle_num = 0) ->
+      paddData = cycle_num: cycle_num
       for i in [0..15] by 1
         paddData["well_#{i}"] = 0
 
@@ -77,7 +78,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
       Math.max.apply Math, cycles
 
-    @getMaxCalibration = (fluorescence_data, is_baseline) ->
+    @getMaxCalibration = (fluorescence_data) ->
       calibs = _.map fluorescence_data, (datum) ->
         datum['baseline_subtracted_value']
 
@@ -89,15 +90,22 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
       return if max_baseline > max_background then max_baseline else max_background
 
-    @Xticks = (max)->
+    @getMaxCycleFromFluorescence = (fluorescence_data) ->
+      cycles = []
+      for datum in [0...fluorescence_data.length] by 1
+        cycles.push parseInt(datum.cycle_num)
+
+      return Math.max.apply Math, cycles
+
+    @Xticks = (min, max)->
       num_ticks = 10
       ticks = []
-      if max < num_ticks
-        for i in [1..max] by 1
+      if max - min < num_ticks
+        for i in [min..max] by 1
           ticks.push i
       else
-        chunkSize = Math.floor(max/num_ticks)
-        for i in [1..max] by chunkSize
+        chunkSize = Math.floor((max-min)/num_ticks)
+        for i in [min..max] by chunkSize
           ticks.push i
         ticks.push max if max % num_ticks isnt 0
 
@@ -122,6 +130,28 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         '#13A350'
       ]
 
+    @moveData = (data, zoom, scroll, max_cycle) ->
+      console.log "zoom: #{zoom}"
+      data = angular.copy data
+      scroll = if scroll < 0 then 0 else scroll
+      scroll =if scroll > 1 then 1 else scroll
+
+      if zoom is max_cycle
+        cycle_start = 1
+        cycle_end = angular.copy max_cycle
+
+      else
+        cycle_start = Math.floor(scroll * (max_cycle - zoom) ) + 1
+        cycle_end = cycle_start + zoom - 1
+
+      new_data = _.select data, (datum) ->
+        datum.cycle_num >= cycle_start and datum.cycle_num <= cycle_end
+
+      new_data = if new_data.length > 0 then new_data else [@paddData(cycle_start)]
+
+      min_cycle: cycle_start
+      max_cycle: cycle_end
+      fluorescence_data: new_data
 
     return
 ]

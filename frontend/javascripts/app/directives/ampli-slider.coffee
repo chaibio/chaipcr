@@ -12,12 +12,12 @@ window.App.directive('ampliSlider', [
 
       hasInit = false
       CYCLES = 0
+      ngModel.$setViewValue 0
 
       init = ->
         hasInit = true
 
         CYCLES = $scope.cycles-2
-        ngModel.$setViewValue 0
 
         held = false
         oldX = 0
@@ -25,14 +25,13 @@ window.App.directive('ampliSlider', [
         newX = 0
         slider_offset = elem.find('.slider-holder-offset')
         slider_width = elem.css('width').replace /px/, ''
-        calibration_width = slider_width / (CYCLES)
+        calibration_width = slider_width / CYCLES
 
         getOffsetWidth = ->
           slider_offset.css('width').replace('px', '')
 
         updateModel = (num_cycle) ->
-          console.log num_cycle
-          ngModel.$setViewValue(num_cycle);
+          ngModel.$setViewValue(num_cycle)
           $scope.$apply()
 
         elem.on 'mousedown', (e) ->
@@ -48,7 +47,7 @@ window.App.directive('ampliSlider', [
           wRatio = newWidth / slider_width
           wRatio = if wRatio < 0 then 0 else wRatio
           wRatio = if wRatio > 1 then 1 else wRatio
-          cycle = Math.floor(wRatio * (CYCLES))
+          cycle = Math.floor(wRatio * CYCLES)
           w = cycle * calibration_width
           slider_offset.css('width', w + 'px')
           updateModel cycle
