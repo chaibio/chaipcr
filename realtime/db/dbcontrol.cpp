@@ -302,7 +302,7 @@ std::vector<Step> DBControl::getSteps(int stageId)
 
         if (it->get_indicator("excitation_intensity") != soci::i_null)
         {
-            if (it->get_properties("lid_temperature").get_data_type() == soci::dt_double)
+            if (it->get_properties("excitation_intensity").get_data_type() == soci::dt_double)
                 step.setExcitationIntensity(it->get<double>("excitation_intensity"));
             else
                 step.setExcitationIntensity(it->get<int>("excitation_intensity"));
