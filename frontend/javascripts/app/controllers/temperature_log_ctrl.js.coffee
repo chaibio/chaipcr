@@ -169,6 +169,14 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         data = helper.updateData $scope.temperatureLogsCache, $scope.temperatureLogs, $scope.resolution, $scope.scrollState
         $scope.updateChart data
 
+
+
+    $scope.$watch ->
+      $scope.RunExperimentCtrl.chart
+    , (val) ->
+      if val is 'temperature-logs'
+        updateFunc()
+
     $scope.$watch 'widthPercent', ->
       if $scope.widthPercent is 1 and $scope.isCurrentExperiment
         $scope.autoUpdateTemperatureLogs()
@@ -198,7 +206,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       $scope.data = helper.toN3LineChart(temperature_logs)
 
     updateFunc = ->
-      return if $scope.RunExperimentCtrl.chart is 'amplification'
+      return if $scope.RunExperimentCtrl.chart isnt 'temperature-logs'
       Experiment
       .getTemperatureData($stateParams.id, resolution: 1000)
       .success (data) ->
