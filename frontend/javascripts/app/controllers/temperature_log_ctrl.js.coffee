@@ -162,7 +162,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       $scope.temperatureLogs = averagedLogs
 
     $scope.updateResolution = =>
-      if $scope.temperatureLogsCache?.length > 0
+      if $scope.temperatureLogsCache?.length > 0 and $scope.RunExperimentCtrl.chart is 'temperature-logs'
         $scope.resizeTemperatureLogs()
         $scope.updateScrollWidth()
         $scope.updateDragScrollWidthAttr()

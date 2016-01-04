@@ -119,10 +119,11 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.fluorescence_data = helper.moveData FLUORESCENCE_DATA_CACHE.fluorescence_data, num_cycle_to_show, $scope.ampli_scroll, $scope.maxCycle
       updateChartData($scope.fluorescence_data)
 
-    $scope.$watch 'ampli_zoom', ->
-      moveData()
-      updateDragScrollWidth()
-      $rootScope.$broadcast 'scrollbar:width:changed'
+    $scope.$watch 'ampli_zoom', (zoom) ->
+      if FLUORESCENCE_DATA_CACHE?.fluorescence_data
+        moveData()
+        updateDragScrollWidth()
+        $rootScope.$broadcast 'scrollbar:width:changed'
 
     $scope.$watch 'ampli_scroll', (val) ->
       moveData()
