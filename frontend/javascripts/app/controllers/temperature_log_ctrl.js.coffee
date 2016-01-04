@@ -13,7 +13,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
     hasStatusData = false
     hasExperiment = false
     hasInit = false
-    dragScroll = angular.element('.chart-drag-scroll')
+    dragScroll = angular.element('#temp-logs-drag-scroll')
     $scope.loading = true
     $scope.options = helper.chartConfig
     $scope.data = []
@@ -130,7 +130,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       $scope.options.axes.y.max = max_scale
 
     $scope.updateDragScrollWidthAttr = ->
-      dragScrollWidth = dragScroll.css('width').replace 'px', ''
+      dragScrollWidth = dragScroll.width()
       w = ($scope.greatest_elapsed_time / 1000) / $scope.resolution * dragScrollWidth
       dragScroll.attr 'width', Math.round w
 
