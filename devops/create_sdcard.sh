@@ -144,32 +144,42 @@ echo "Press CTRL+C to stop the operatin now."
 sleep 10
 
 echo "Unmounting..."
-umount ${output_device}1 > /dev/zero
-umount ${output_device}2 > /dev/zero
+output_device_p1=${output_device}1
+output_device_p2=${output_device}2
+if [[ "${output_device}" =~ "/dev/mmc" ]]
+then
+	output_device_p1=${output_device}p1
+	output_device_p2=${output_device}p2
+fi
+
+echo "SDCard partitions are at: $output_device_p1, and $output_device_p2."
+
+umount $output_device_p1 > /dev/zero
+umount $output_device_p2 > /dev/zero
 
 echo "Partitioning.."
 dd if=/dev/zero of=${output_device} bs=1M count=16
 blockdev --flushbufs ${output_device}
 
-LC_ALL=C sfdisk --force --in-order --Linux --unit M "${output_device}" <<-__EOF__
-1,2048,0xe,*
+LC_ALL=C sfdisk --force --Linux "${output_device}" <<-__EOF__
+1,4194304,0xe,*
 ,,,-
 __EOF__
 
 blockdev --flushbufs ${output_device}
 
 echo "Formating..."
-mkfs.vfat ${output_device}1 -n factory
+mkfs.vfat $output_device_p1 -n factory
 if [ $? -gt 0 ]
 then
-	echo "Can't format ${output_device}1"
+	echo "Can't format ${output_device_p1}"
 	print_usage_exit
 fi
 
-mkfs.ext4 ${output_device}2 -L upgrade
+mkfs.ext4 $output_device_p2 -L upgrade
 if [ $? -gt 0 ]
 then
-	echo "Can't format ${output_device}2"
+	echo "Can't format ${output_device_p2}"
 	print_usage_exit
 fi
 
@@ -182,10 +192,10 @@ echo "Copying.."
 mkdir -p /tmp/copy_mount_point
 sync
 
-mount ${output_device}1 /tmp/copy_mount_point
+mount ${output_device_p1} /tmp/copy_mount_point
 if [ $? -gt 0 ]
 then
-	echo "Can't mount ${output_device}1"
+	echo "Can't mount ${output_device_p1}"
 	print_usage_exit
 fi
 
@@ -197,14 +207,14 @@ sync
 umount /tmp/copy_mount_point
 if [ $? -gt 0 ]
 then
-	echo "Can't unmount ${output_device}1"
+	echo "Can't unmount ${output_device_p1}"
 	print_usage_exit
 fi
 
-mount ${output_device}2 /tmp/copy_mount_point
+mount ${output_device_p2} /tmp/copy_mount_point
 if [ $? -gt 0 ]
 then
-	echo "Can't mount ${output_device}2"
+	echo "Can't mount ${output_device_p2}"
 	print_usage_exit
 fi
 cp -r $input_dir/p2/* /tmp/copy_mount_point/
@@ -212,7 +222,7 @@ sync
 umount /tmp/copy_mount_point
 if [ $? -gt 0 ]
 then
-	echo "Can't unmount ${output_device}2"
+	echo "Can't unmount ${output_device_p2}"
 	print_usage_exit
 fi
 rm -r /tmp/copy_mount_point

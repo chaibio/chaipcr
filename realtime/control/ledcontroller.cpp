@@ -3,6 +3,7 @@
 #include "ledcontroller.h"
 
 #include <sstream>
+#include <limits>
 
 using namespace std;
 
@@ -15,6 +16,8 @@ LEDController::LEDController(shared_ptr<SPIPort> spiPort,unsigned int potCSPin,
     _ledXLATPin(ledXLATPin, GPIO::kOutput),
     _ledGSPin(26, GPIO::kOutput),
     _ledBlankPWM(ledBlankPWMPath) {
+
+    _lastLedNumber = std::numeric_limits<unsigned>::max();
 
     _dutyCyclePercentage.store(dutyCyclePercentage);
 
@@ -30,7 +33,7 @@ LEDController::LEDController(shared_ptr<SPIPort> spiPort,unsigned int potCSPin,
 LEDController::~LEDController() {
 	
 }
-	
+
 void LEDController::setIntensity(double onCurrentMilliamps) {
     if (_intensity == onCurrentMilliamps)
         return;
@@ -65,34 +68,45 @@ void LEDController::setIntensity(double onCurrentMilliamps) {
         _spiPort->setMode(0);
         _spiPort->readBytes(NULL, txBuf, sizeof(txBuf), 1000000);
         _potCSPin.setValue(GPIO::kHigh);
+
+        if (_lastLedNumber != std::numeric_limits<unsigned>::max())
+            activateLED(_lastLedNumber);
     }
     else
-        disableLEDs();
+        disableLEDs(false);
 
     _intensity = onCurrentMilliamps;
 }
 
 void LEDController::activateLED(unsigned int ledNumber) {
-    uint16_t intensities[16] = {0};
-    intensities[15 - (ledNumber - 1)] = 0xFFF;
+    _lastLedNumber = ledNumber;
 
-	uint8_t packedIntensities[24];
+    if (_intensity > 0)
+    {
+        uint16_t intensities[16] = {0};
+        intensities[15 - (ledNumber - 1)] = 0xFFF;
 
-	for (int i = 0; i < 16; i += 2) {
-		uint16_t val1 = intensities[i];
-		uint16_t val2 = intensities[i+1];
+        uint8_t packedIntensities[24];
 
-		int packIndex = i * 3 / 2;
-		packedIntensities[packIndex] = val1 >> 4;
-        packedIntensities[packIndex + 1] = (val1 & 0x000F) << 4 | (val2 & 0x0F00) >> 8;
-		packedIntensities[packIndex + 2] = val2 & 0x00FF;
-	}    
-    sendLEDGrayscaleValues(packedIntensities);
+        for (int i = 0; i < 16; i += 2) {
+            uint16_t val1 = intensities[i];
+            uint16_t val2 = intensities[i+1];
+
+            int packIndex = i * 3 / 2;
+            packedIntensities[packIndex] = val1 >> 4;
+            packedIntensities[packIndex + 1] = (val1 & 0x000F) << 4 | (val2 & 0x0F00) >> 8;
+            packedIntensities[packIndex + 2] = val2 & 0x00FF;
+        }
+        sendLEDGrayscaleValues(packedIntensities);
+    }
 }
 
-void LEDController::disableLEDs() {
+void LEDController::disableLEDs(bool clearLastLed) {
     uint8_t packedIntensities[24] = {0};
     sendLEDGrayscaleValues(packedIntensities);
+
+    if (clearLastLed)
+        _lastLedNumber = std::numeric_limits<unsigned>::max();
 }
 	
 // --- private member functions ------------------------------------------------

@@ -1,3 +1,4 @@
+
 #!/bin/sh
 
 #exit
@@ -147,8 +148,8 @@ then
 	exit
 fi
 
-if [ ! -e ${sdcard}/factory_settings.img.gz ]
-then
+#if [ ! -e ${sdcard}/factory_settings.img.gz ]
+#then
 	echo "Creating factory settings images! Copying from eMMC at $eMMC to sdcard at $sdcard_dev!"
 	sh /sdcard/pack_latest_Version.sh || true
 	sync
@@ -156,7 +157,7 @@ then
 	echo timer > /sys/class/leds/beaglebone\:green\:usr1/trigger
 	alldone
 	exit 0
-fi
+#fi
 
 echo "eMMC Grabber: all done!"
 sync

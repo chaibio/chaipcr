@@ -18,14 +18,18 @@ public:
     void setIntensity(double onCurrentMilliamps);
     inline double intensity() const { return _intensity; }
     void activateLED(unsigned int ledNumber);
-    void disableLEDs();
+    inline void disableLEDs() { disableLEDs(true); }
 
 private:
+    void disableLEDs(bool clearLastLed);
+
     void sendLEDGrayscaleValues(const uint8_t (&values)[24]);
 	
 private:
     std::atomic<float> _dutyCyclePercentage;
     double _intensity;
+
+    unsigned _lastLedNumber;
 	
 	//components
     std::shared_ptr<SPIPort> _spiPort;

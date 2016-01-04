@@ -50,6 +50,8 @@ module FactoryHelper
   
   def run_experiment(experiment)
     experiment.calibration_id = 1
+    experiment.started_at = 10.seconds.ago
+    experiment.completed_at = Time.new
     experiment.save
   end
   

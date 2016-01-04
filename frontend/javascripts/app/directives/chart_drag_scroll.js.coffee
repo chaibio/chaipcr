@@ -9,7 +9,7 @@ window.ChaiBioTech.ngApp.directive 'chartDragScroll', [
       held = false
       pageX = 0
       oldVal = 0
-      elemWith = elem.css('width').replace /px/, ''
+      elemWith = 0
       $scope.show = false
       $document = ($window).$(document)
 
@@ -17,11 +17,13 @@ window.ChaiBioTech.ngApp.directive 'chartDragScroll', [
         parseInt(elem.attr 'width')
 
       $document.on 'mousedown', (e) ->
-        if e.target.tagName is 'rect'
+        target_id = $(e.target).closest('.linechart').first().data 'drag-scroll'
+        if e.target.tagName is 'rect' and target_id is attrs.id
           held = true
           oldVal = ngModel.$viewValue
           pageX = e.pageX
           TextSelection.disable()
+          elemWith = elem.width()
 
       $document.on 'mousemove', (e) ->
         if held and (oldVal isnt 'FULL')

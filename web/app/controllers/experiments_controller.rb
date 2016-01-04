@@ -112,22 +112,66 @@ class ExperimentsController < ApplicationController
   def fluorescence_data
     if @experiment
       if @experiment.ran?
-        @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
-        if !@first_stage_collect_data.blank?
-          if FluorescenceDatum.new_data_generated?(@experiment.id, @first_stage_collect_data.id)
-            begin
-               @amplification_data, @ct = retrieve_amplification_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id)
-            rescue => e
-               render :json=>{:errors=>e}, :status => 500
-               return
+        if params[:step_id] == nil && params[:ramp_id] == nil
+          @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
+          if !@first_stage_collect_data.blank?
+            if FluorescenceDatum.new_data_generated?(@experiment.id, @first_stage_collect_data.id)
+              begin
+                 @amplification_data, @ct = retrieve_amplification_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id)
+              rescue => e
+                 render :json=>{:errors=>e}, :status => 500
+                 return
+              end
+              #update cache
+              AmplificationDatum.import @amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value]
+              AmplificationCurve.import @ct.each_with_index.map {|ct,well_num| AmplificationCurve.new(:experiment_id=>@experiment.id, :stage_id=>@first_stage_collect_data.id, :well_num=>well_num, :ct=>ct)}, :on_duplicate_key_update => [:ct]
+            else #cached
+              @amplification_data = AmplificationDatum.where(:experiment_id=>@experiment.id, :stage_id=>@first_stage_collect_data.id)
+              @ct = AmplificationCurve.where(:experiment_id=>@experiment.id, :stage_id=>@first_stage_collect_data.id).order(:well_num).select(:ct).map{|r| r.ct}
             end
-            #update cache
-            AmplificationDatum.import @amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value]
-            AmplificationCurve.import @ct.each_with_index.map {|ct,well_num| AmplificationCurve.new(:experiment_id=>@experiment.id, :stage_id=>@first_stage_collect_data.id, :well_num=>well_num, :ct=>ct)}, :on_duplicate_key_update => [:ct]
-          else #cached
-            @amplification_data = AmplificationDatum.where(:experiment_id=>@experiment.id, :stage_id=>@first_stage_collect_data.id)
-            @ct = AmplificationCurve.where(:experiment_id=>@experiment.id, :stage_id=>@first_stage_collect_data.id).order(:well_num).select(:ct).map{|r| r.ct}
           end
+        else
+          #construct OR clause
+          conditions = String.new
+          wheres = Array.new
+          if params[:step_id]
+            conditions << " OR " unless conditions.length == 0
+            conditions << "step_id IN (?)"
+            wheres << params[:step_id].map(&:to_i)
+          end
+          if params[:ramp_id]
+            conditions << " OR " unless conditions.length == 0
+            conditions << "ramp_id IN (?)"
+            wheres << params[:ramp_id].map(&:to_i)
+          end
+          wheres.insert(0, conditions)
+          #query to database
+          @fluorescence_data = FluorescenceDatum.where("experiment_id=?",@experiment.id).where(wheres).order("step_id, ramp_id, cycle_num, well_num")
+          #group data
+          keyname = nil
+          key = nil
+          datalist = nil
+          @amplification_data_group = Array.new
+          @fluorescence_data.each do |data|
+            if data.step_id != nil && data.step_id != key
+              @amplification_data_group << OpenStruct.new(keyname=>key, :data=>datalist) if key != nil
+              key = data.step_id
+              keyname = :step_id
+              datalist = [data]
+            elsif data.ramp_id != nil && data.ramp_id != key
+              @amplification_data_group << OpenStruct.new(keyname=>key, :data=>datalist) if key != nil
+              key = data.ramp_id
+              keyname = :ramp_id
+              datalist = [data]
+            else
+              datalist << data
+            end
+          end
+          @amplification_data_group << OpenStruct.new(keyname=>key, :data=>datalist) if key != nil
+          respond_to do |format|
+            format.json { render "amplification_data_group", :status => :ok}
+          end
+          return
         end
       else
         @amplification_data = []
@@ -301,7 +345,7 @@ class ExperimentsController < ApplicationController
       (1...background_subtracted_results.length).each do |well_num|
         if background_subtracted_results[well_num].is_a? Array
           (0...background_subtracted_results[well_num].length).each do |cycle_num|
-            amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num-1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_results[well_num][cycle_num], :baseline_subtracted_value=>baseline_subtracted_results[cycle_num, well_num-1])
+            amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num-1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_results[well_num][cycle_num], :baseline_subtracted_value=>(baseline_subtracted_results.is_a? Array)? baseline_subtracted_results[well_num-1][cycle_num] : baseline_subtracted_results[0][cycle_num, well_num-1])
           end
         else
           amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num-1, :cycle_num=>1, :background_subtracted_value=>background_subtracted_results[well_num], :baseline_subtracted_value=>baseline_subtracted_results[well_num-1])
