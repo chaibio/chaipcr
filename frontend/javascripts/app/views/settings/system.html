@@ -1,0 +1,26 @@
+<div class="maintainance-container">
+  <version-info></version-info>
+  <div class="maintainance-container-backdrop" ui-sref="settings.root">
+  </div>
+  <div class="wizards-container">
+    <h2 class="underlined">SYSTEM SETTINGS <span class="close" ui-sref="settings.root">&times;</span></h2>
+
+    <h3 class="wizard-header"></h3>
+    <div class="wizard">
+      <h3>Software update status</h3>
+      <p>  <h2>{{ data.software.version + (update_available === 'unavailable' ? ' (Latest)' : '') }}</h2></p>
+      <a href="" class="button">CHECK FOR UPDATES</a>
+      <a href="" class="button">UPLOAD DISK IMAGE</a>
+    </div>
+
+    <h3 class="wizard-header">Anonymously share system info <br />with Chai for diagnostics</h3>
+    <div class="wizard">
+      <!-- <h3>Thermal Performance</h3> -->
+      <p>Secrely share anonymized data about<br /> your Open qPCR for future hardware hardware and software updates.</p>
+      <h3 class="wizard-header">SHARE MY INFO</h3>
+    </div>
+
+    <support-access></support-access>
+
+  </div>
+</div>
