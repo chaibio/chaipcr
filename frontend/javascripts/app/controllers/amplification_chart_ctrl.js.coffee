@@ -62,13 +62,13 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         fetching = true
         Experiment.getFluorescenceData($stateParams.id)
         .success (data) ->
+          hasData = true
           return if !data.fluorescence_data
           return if data.fluorescence_data.length is 0
           FLUORESCENCE_DATA_CACHE = angular.copy data
           $scope.fluorescence_data = data
           moveData()
           updateButtonCts()
-          hasData = true
 
         .finally ->
           fetching = false
