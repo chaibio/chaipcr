@@ -130,7 +130,8 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       $scope.options.axes.y.max = max_scale
 
     $scope.updateDragScrollWidthAttr = ->
-      dragScrollWidth = dragScroll.width()
+      svg = dragScroll.find('svg')
+      dragScrollWidth = svg.width() - svg.find('g.y.axis').first()[0].getBBox().width
       w = ($scope.greatest_elapsed_time / 1000) / $scope.resolution * dragScrollWidth
       dragScroll.attr 'width', Math.round w
 
