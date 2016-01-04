@@ -21,6 +21,7 @@ window.ChaiBioTech.ngApp.controller('newUserController', [
     $scope.passError = false;
     $scope.passLengthError = false;
     $scope.emailAlreadtTaken = false;
+    $scope.editable = true;
 
     $scope.update = function(form) { // This method actually saves and create a new user
       //console.log("bingo123", $scope.userData);
@@ -50,7 +51,7 @@ window.ChaiBioTech.ngApp.controller('newUserController', [
         form.confirmPassword.$setValidity('confirmPassword', true);
       }
     };
-    
+
     $scope.currentLogin = function() {
       userService.findUSer("current").
         then(function(data) {
