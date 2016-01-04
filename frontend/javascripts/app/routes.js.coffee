@@ -33,9 +33,17 @@ window.ChaiBioTech.ngApp
         url: '/'
         template: '<version-info></version-info>'
 
-      .state 'settings.maintainance',
-        url: '/maintainance'
-        templateUrl: 'app/views/settings/maintainance.html'
+      .state 'settings.system',
+        url: '/system'
+        templateUrl: 'app/views/settings/system.html'
+
+      .state 'settings.diagnostics',
+        url: '/diagnostics'
+        templateUrl: 'app/views/settings/diagnostics.html'
+
+      .state 'settings.calibration',
+        url: '/calibration'
+        templateUrl: 'app/views/settings/calibration.html'
 
       .state 'settings.usermanagement',
         url: '/usermanagement'

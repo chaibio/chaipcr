@@ -32,14 +32,23 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
     $scope.currentLogin = function() {
       userService.findUSer("current").
         then(function(data) {
+
           if(data.user.role === "admin") {
             $scope.isAdmin = $scope.allowEditPassword = $scope.allowButtons = true;
           }
+
           if($state.is("settings.current-user")) {
             $scope.isAdmin = false;
             $scope.allowEditPassword = $scope.allowButtons = true;
             $scope.deleteButton = false;
           }
+
+          if($state.is('settings.usermanagement.user') && data.user.id === $scope.id) {
+              $scope.isAdmin = false;
+              $scope.allowEditPassword = $scope.allowButtons = true;
+              $scope.deleteButton = false;
+          }
+
           $scope.editable = $scope.isAdmin || $state.is("settings.current-user");
           console.log($scope.editable, $scope.isAdmin, $state.is("settings.current-user"));
         });
