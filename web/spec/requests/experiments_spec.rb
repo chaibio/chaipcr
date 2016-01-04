@@ -144,6 +144,16 @@ describe "Experiments API" do
 #    json[3]["fluorescence_datum"]["fluorescence_value"].should == 15
   end
   
+  it "list fluorescence data per step id" do    
+    experiment = create_experiment("test1")
+    run_experiment(experiment)
+    create_fluorescence_data(experiment)
+    get "/experiments/#{experiment.id}/fluorescence_data?step_id[]=1&step_id[]=2", { :format => 'json' }
+    expect(response).to be_success
+    print response.body
+    json = JSON.parse(response.body)
+  end
+  
   it "export" do
     experiment = create_experiment("test1")
     run_experiment(experiment)
