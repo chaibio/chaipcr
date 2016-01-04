@@ -137,12 +137,12 @@ class ExperimentsController < ApplicationController
           if params[:step_id]
             conditions << " OR " unless conditions.length == 0
             conditions << "step_id IN (?)"
-            wheres << params[:step_id].map(&:to_i))
+            wheres << params[:step_id].map(&:to_i)
           end
           if params[:ramp_id]
             conditions << " OR " unless conditions.length == 0
             conditions << "ramp_id IN (?)"
-            wheres << params[:ramp_id].map(&:to_i))
+            wheres << params[:ramp_id].map(&:to_i)
           end
           wheres.insert(0, conditions)
           #query to database
