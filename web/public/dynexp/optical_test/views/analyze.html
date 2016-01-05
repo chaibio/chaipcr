@@ -1,5 +1,5 @@
 <div class="intro" ng-init="analyzeExperiment()">
-  <h2> Thermal Consistency Test Results</h2>
+  <h2> Optical Test Results</h2>
 
   <h4 class="text-center" ng-show="!experiment.completion_status && analyzing"><b>Analyzing Results...</b></h4>
 
@@ -11,46 +11,46 @@
 
   <div class="row" ng-show="experiment.completion_status === 'success' && !analyzing">
     <div class="col-md-6">
-      <table class="table table-bordered" ng-show="tm_values">
+      <table class="table table-bordered">
         <thead>
           <tr>
             <th>Well</th>
-            <th>Tm</th>
-            <th>Fluo @72 C</th>
+            <th>Baseline</th>
+            <th>Execution</th>
+            <th>Result</th>
           </tr>
         </thead>
         <tbody>
           <tr ng-repeat="i in loop">
             <td>{{i+1}}</td>
-            <td ng-show="tm_values[i]" ng-class="{'text-success': tm_values[i] >= CONSTANTS.MIN_TM_VAL && tm_values[i] <= CONSTANTS.MAX_TM_VAL, 'text-danger': tm_values[i] < CONSTANTS.MIN_TM_VAL || tm_values[i] > CONSTANTS.MAX_TM_VAL}">
-              {{ tm_values[i] | round:2 }}
-            </td>
-            <td class="text-danger" ng-show="!tm_values[i]">FAIL</td>
-            <td ng-class="{'text-success': analyzedExp['72c_fluorescence'][i] >= CONSTANTS.MIN_FLUORESCENCE_VAL, 'text-danger': analyzedExp['72c_fluorescence'][i] < CONSTANTS.MIN_FLUORESCENCE_VAL}">
-              {{ analyzedExp['72c_fluorescence'][i]  | commaSeparated }}
+            <td>{{analyzedExp[i].baseline.fluorescence_value}}</td>
+            <td>{{analyzedExp[i].excitation.fluorescence_value}}</td>
+            <td>
+              <span class="text-success" ng-show="getResult(analyzedExp[i])">PASS</span>
+              <span class="text-danger" ng-show="!getResult(analyzedExp[i])">FAIL</span>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
     <div class="col-md-6">
-      <table class="table table-bordered" ng-show="tm_values">
+      <table class="table table-bordered">
         <thead>
           <tr>
             <th>Well</th>
-            <th>Tm</th>
-            <th>Fluo @72 C</th>
+            <th>Baseline</th>
+            <th>Execution</th>
+            <th>Result</th>
           </tr>
         </thead>
         <tbody>
           <tr ng-repeat="i in loop">
-            <td>{{i+9}}</td>
-            <td ng-show="tm_values[i+8]" ng-class="{'text-success': tm_values[i+8] >= CONSTANTS.MIN_TM_VAL && tm_values[i+8] <= CONSTANTS.MAX_TM_VAL, 'text-danger': tm_values[i+8] < CONSTANTS.MIN_TM_VAL || tm_values[i+8] > CONSTANTS.MAX_TM_VAL || !tm_values[i+8]}">
-              {{ tm_values[i+8] | round:2 }}
-            </td>
-            <td class="text-danger" ng-show="!tm_values[i+8]">FAIL</td>
-            <td ng-class="{'text-success': analyzedExp['72c_fluorescence'][i+8] >= CONSTANTS.MIN_FLUORESCENCE_VAL, 'text-danger': analyzedExp['72c_fluorescence'][i+8] < CONSTANTS.MIN_FLUORESCENCE_VAL}">
-              {{ analyzedExp['72c_fluorescence'][i+8]  | commaSeparated }}
+            <td>{{i+8}}</td>
+            <td>{{analyzedExp[i+8].baseline.fluorescence_value}}</td>
+            <td>{{analyzedExp[i+8].excitation.fluorescence_value}}</td>
+            <td>
+              <span class="text-success" ng-show="getResult(analyzedExp[i+9])">PASS</span>
+              <span class="text-danger" ng-show="!getResult(analyzedExp[i+9])">FAIL</span>
             </td>
           </tr>
         </tbody>

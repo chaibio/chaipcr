@@ -56,7 +56,7 @@
         var q = '';
         for (var i = 0; i < step_ids.length; i++) {
           if (i > 0) q = q + '&';
-          q = q + 'step_id=' +step_ids[i];
+          q = q + 'step_id[]=' +step_ids[i];
         }
         return $http.get('/experiments/'+exp_id+'/fluorescence_data?'+q);
       }

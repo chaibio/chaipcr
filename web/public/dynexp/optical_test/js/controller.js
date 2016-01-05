@@ -7,13 +7,11 @@
     '$stateParams',
     'Status',
     'TestInProgressService',
-    'host',
-    '$http',
     'CONSTANTS',
-    function AppController ($scope, $window, Experiment, $state, $stateParams, Status, TestInProgressService, host, $http, CONSTANTS) {
+    'Helper',
+    function AppController ($scope, $window, Experiment, $state, $stateParams, Status, TestInProgressService, CONSTANTS, Helper) {
 
       $scope.cancel = false;
-      $scope.loop = [];
       $scope.CONSTANTS = CONSTANTS;
       $scope.isFinite = isFinite;
       $('.content').addClass('analyze');
@@ -25,6 +23,7 @@
         });
       }
 
+      $scope.loop = [];
       for (var i=0; i < 8; i ++) {
         $scope.loop.push(i);
       }
@@ -62,8 +61,7 @@
           getExperiment($stateParams.id, function (exp) {
             if (exp.completion_status === 'success') {
               Experiment.getSteps($stateParams.id, [12, 13]).then(function (resp) {
-                console.log(resp);
-                $scope.analyzedExp = resp.data;
+                $scope.analyzedExp = Helper.getBaselineAndExcitation(resp.data.fluorescence_data);
                 $scope.analyzing = false;
               });
             }
@@ -147,6 +145,11 @@
         if (!$scope.tm_values) return 0;
         var max_delta_tm = TestInProgressService.getMaxDeltaTm($scope.tm_values);
         return max_delta_tm;
+      };
+
+      $scope.getResult = function (obj) {
+        if(!obj) return false;
+        return Helper.getResult(obj.baseline.fluorescence_value, obj.excitation.fluorescence_value);
       };
 
     }

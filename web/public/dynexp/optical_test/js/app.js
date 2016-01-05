@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  var App = window.App = angular.module('ThermalConsistency', [
+  var App = window.App = angular.module('OpticalTest', [
     'ui.router',
     'ngResource',
     'http-auth-interceptor',
