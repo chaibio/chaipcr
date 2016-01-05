@@ -94,6 +94,7 @@ Qpcrctl::Application.routes.draw do
       get 'baseline_subtracted_ct_data'
       get 'export'
       get 'analyze'
+      get 'status'
     end
   end
 

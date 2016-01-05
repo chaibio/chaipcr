@@ -316,6 +316,19 @@ class ExperimentsController < ApplicationController
     end
   end
   
+  api :GET, "/experiments/:id/status", "status of the machine"
+  def status
+    url = URI.parse("localhost:8000/status?access_token=#{token}")
+    begin
+      response = Net::HTTP.get_response(url)
+      json = JSON.parse(response)
+      render :json=>json
+    rescue  => e
+      render json: {errors: "reatime server port 8000 cannot be reached: #{e}"}, status: 500
+      return
+    end
+  end
+  
   protected
   
   def get_experiment
@@ -345,7 +358,7 @@ class ExperimentsController < ApplicationController
       (1...background_subtracted_results.length).each do |well_num|
         if background_subtracted_results[well_num].is_a? Array
           (0...background_subtracted_results[well_num].length).each do |cycle_num|
-            amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num-1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_results[well_num][cycle_num], :baseline_subtracted_value=>(baseline_subtracted_results.is_a? Array)? baseline_subtracted_results[well_num-1][cycle_num] : baseline_subtracted_results[0][cycle_num, well_num-1])
+            amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num-1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_results[well_num][cycle_num], :baseline_subtracted_value=>(baseline_subtracted_results.is_a? Array)? baseline_subtracted_results[well_num-1][cycle_num] : baseline_subtracted_results[cycle_num, well_num-1])
           end
         else
           amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num-1, :cycle_num=>1, :background_subtracted_value=>background_subtracted_results[well_num], :baseline_subtracted_value=>baseline_subtracted_results[well_num-1])
