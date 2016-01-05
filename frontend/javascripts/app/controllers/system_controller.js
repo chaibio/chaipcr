@@ -9,6 +9,7 @@ window.ChaiBioTech.ngApp.controller('systemController', [
         $scope.data = resp;
       }, function(noData) {
         console.log(noData);
+        // This is dummy data, to local checking. Will be removed.
         $scope.data = {"serial_number":"1234789127894212",
         "model_number":"M2342JA",
         "processor_architecture":"armv7l",
