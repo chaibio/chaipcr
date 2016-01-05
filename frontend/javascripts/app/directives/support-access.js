@@ -10,10 +10,6 @@ window.ChaiBioTech.ngApp.directive('supportAccess', [
 
       link: function(scope, elem, attr) {
 
-        $(elem).find(".button").click(function() {
-          scope.getAccess();
-        });
-
         scope.getAccess = function() {
 
           supportAccessService.accessSupport()
