@@ -3,6 +3,12 @@
 echo "Enter remote password: "
 read remote_password
 
+if [ -z $remote_password ]
+then
+	echo "Password can't be empty!"
+	exit
+fi
+
 rm -rf ./web/log
 rsync --delete --rsh="sshpass -p $remote_password ssh -l root" -a ./web "$1:/root/chaipcr/"
 rsync --delete --rsh="sshpass -p $remote_password ssh -l root" -a ./browser "$1:/root/chaipcr/"
