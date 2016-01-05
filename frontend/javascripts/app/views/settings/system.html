@@ -1,4 +1,4 @@
-<div class="system-container">
+<div class="system-container" ng-controller="systemController">
   <version-info></version-info>
   <div class="maintainance-container-backdrop" ui-sref="settings.root">
   </div>
@@ -8,8 +8,8 @@
     <h3 class="wizard-header"></h3>
     <div class="wizard">
       <h3>Software Update Status</h3>
-      <p>  <h2>{{ data.software.version + (update_available === 'unavailable' ? ' (Latest)' : '') }}</h2></p>
-      <button class="green-button">CHECK FOR UPDATES</button>
+      <p ng-if="data.software.version">v{{ data.software.version + " installed"}}</p>
+      <button ng-click="checkUpdate()" class="green-button">CHECK FOR UPDATES</button>
       <button class="normal-button">UPLOAD DISK IMAGE</button>
     </div>
 
