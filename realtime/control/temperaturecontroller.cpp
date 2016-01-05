@@ -88,6 +88,8 @@ void TemperatureController::computePid(double currentTemperature)
 
         std::stringstream stream;
         stream << name << " temperature of " << currentTemperature << " C below limit of " << _minTempThreshold << " C";
+
+        throw TemperatureLimitError(stream.str());
     }
     else if (currentTemperature > _maxTempThreshold)
     {
@@ -96,6 +98,8 @@ void TemperatureController::computePid(double currentTemperature)
 
         std::stringstream stream;
         stream << name << " temperature of " << currentTemperature << " C above limit of " << _minTempThreshold << " C";
+
+        throw TemperatureLimitError(stream.str());
     }
 
     if (_targetTemperature < _minTargetTemp)

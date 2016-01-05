@@ -17,6 +17,7 @@ LEDController::LEDController(shared_ptr<SPIPort> spiPort,unsigned int potCSPin,
     _ledGSPin(26, GPIO::kOutput),
     _ledBlankPWM(ledBlankPWMPath) {
 
+    _intensity = 0;
     _lastLedNumber = std::numeric_limits<unsigned>::max();
 
     _dutyCyclePercentage.store(dutyCyclePercentage);
