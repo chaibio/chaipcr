@@ -66,7 +66,7 @@ diff -Nur ./rc.local ../rc.updated/rc.local
 +}
 +
 +check_corruption () {
-+	check_script=/root/chaipcr/deploy/check_sdcard.sh
++	check_script=/root/chaipcr/deploy/device/check_sdcard.sh
 +	if [ -e $check_script ]
 +	then
 +		echo "Corruption test started!" >> $log_file
