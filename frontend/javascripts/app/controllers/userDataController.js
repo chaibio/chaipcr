@@ -100,6 +100,7 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
     };
 
     $scope.comparePass = function(form) {
+      console.log(form);
       if($scope.userData.password !== $scope.userData.password_confirmation) {
         form.password.$setValidity('confirmPassword', false);
         form.confirmPassword.$setValidity('confirmPassword', false);
