@@ -130,7 +130,8 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       $scope.options.axes.y.max = max_scale
 
     $scope.updateDragScrollWidthAttr = ->
-      dragScrollWidth = dragScroll.width()
+      svg = dragScroll.find('svg')
+      dragScrollWidth = svg.width() - svg.find('g.y.axis').first()[0].getBBox().width
       w = ($scope.greatest_elapsed_time / 1000) / $scope.resolution * dragScrollWidth
       dragScroll.attr 'width', Math.round w
 
@@ -161,12 +162,20 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       $scope.temperatureLogs = averagedLogs
 
     $scope.updateResolution = =>
-      if $scope.temperatureLogsCache?.length > 0
+      if $scope.temperatureLogsCache?.length > 0 and $scope.RunExperimentCtrl.chart is 'temperature-logs'
         $scope.resizeTemperatureLogs()
         $scope.updateScrollWidth()
         $scope.updateDragScrollWidthAttr()
         data = helper.updateData $scope.temperatureLogsCache, $scope.temperatureLogs, $scope.resolution, $scope.scrollState
         $scope.updateChart data
+
+
+
+    $scope.$watch ->
+      $scope.RunExperimentCtrl.chart
+    , (val) ->
+      if val is 'temperature-logs'
+        updateFunc()
 
     $scope.$watch 'widthPercent', ->
       if $scope.widthPercent is 1 and $scope.isCurrentExperiment
@@ -197,7 +206,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       $scope.data = helper.toN3LineChart(temperature_logs)
 
     updateFunc = ->
-      return if $scope.RunExperimentCtrl.chart is 'amplification'
+      return if $scope.RunExperimentCtrl.chart isnt 'temperature-logs'
       Experiment
       .getTemperatureData($stateParams.id, resolution: 1000)
       .success (data) ->

@@ -131,7 +131,6 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       ]
 
     @moveData = (data, zoom, scroll, max_cycle) ->
-      console.log "zoom: #{zoom}"
       data = angular.copy data
       scroll = if scroll < 0 then 0 else scroll
       scroll =if scroll > 1 then 1 else scroll

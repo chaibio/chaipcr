@@ -24,7 +24,7 @@ window.App.directive('ampliSlider', [
         oldWidth = 0
         newX = 0
         slider_offset = elem.find('.slider-holder-offset')
-        slider_width = elem.css('width').replace /px/, ''
+        slider_width = 0
         calibration_width = slider_width / CYCLES
 
         getOffsetWidth = ->
@@ -39,6 +39,8 @@ window.App.directive('ampliSlider', [
           oldX = e.pageX
           oldWidth = getOffsetWidth()
           TextSelection.disable()
+          slider_width = elem.width()
+          calibration_width = slider_width / CYCLES
 
         $window.$(document).on 'mousemove', (e) ->
           return if !held

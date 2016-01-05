@@ -10,6 +10,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
     hasData = false
     fetching = false
+    drag_scroll = $('#ampli-drag-scroll')
     $scope.chartConfig = helper.chartConfig()
     $scope.chartConfig.axes.x.ticks = helper.Xticks $stateParams.max_cycle || 1
     $scope.chartConfig.axes.x.max = $stateParams.max_cycle || 1
@@ -61,16 +62,13 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         fetching = true
         Experiment.getFluorescenceData($stateParams.id)
         .success (data) ->
+          hasData = true
           return if !data.fluorescence_data
           return if data.fluorescence_data.length is 0
           FLUORESCENCE_DATA_CACHE = angular.copy data
           $scope.fluorescence_data = data
-          # data.min_cycle = $scope.chartConfig.axes.x.min || 1
-          # data.max_cycle = $scope.chartConfig.axes.x.max || data.total_cycles
-          # updateChartData(data) if !$scope.data or $scope.data?.length is 1
           moveData()
           updateButtonCts()
-          hasData = true
 
         .finally ->
           fetching = false
@@ -78,6 +76,14 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
     updateButtonCts = ->
       for ct, i in FLUORESCENCE_DATA_CACHE.ct
         $scope.wellButtons["well_#{i}"].ct = ct
+
+    updateDragScrollWidth = ->
+      svg = drag_scroll.find('svg')
+      drag_scroll_width = svg.width() - svg.find('g.y.axis').first()[0].getBBox().width
+      num_cycle_to_show = $scope.maxCycle - $scope.ampli_zoom
+      width_per_cycle = drag_scroll_width/num_cycle_to_show
+      w = width_per_cycle * $scope.maxCycle
+      drag_scroll.attr 'width', Math.round w
 
     updateChartData = (data) ->
       return if !data
@@ -104,21 +110,23 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       updateChartData($scope.fluorescence_data)
 
     moveData = ->
-      cycle_num = $scope.ampli_zoom
-      return if !angular.isNumber(cycle_num) or !FLUORESCENCE_DATA_CACHE or !$scope.maxCycle
-      num_cycle_to_show = $scope.maxCycle - cycle_num
+      return if !angular.isNumber($scope.ampli_zoom) or !FLUORESCENCE_DATA_CACHE or !$scope.maxCycle
+      num_cycle_to_show = $scope.maxCycle - $scope.ampli_zoom
       wRatio = num_cycle_to_show / $scope.maxCycle
-      scrollbar_width = $('#ampli-scrollbar').css('width').replace 'px', ''
+      scrollbar_width = $('#ampli-scrollbar').width()
       $('#ampli-scrollbar .scrollbar').css(width: (scrollbar_width * wRatio) + 'px')
 
       $scope.fluorescence_data = helper.moveData FLUORESCENCE_DATA_CACHE.fluorescence_data, num_cycle_to_show, $scope.ampli_scroll, $scope.maxCycle
       updateChartData($scope.fluorescence_data)
 
-    $scope.$watch 'ampli_zoom', ->
-      moveData()
-      $rootScope.$broadcast 'scrollbar:width:changed'
+    $scope.$watch 'ampli_zoom', (zoom) ->
+      if FLUORESCENCE_DATA_CACHE?.fluorescence_data
+        moveData()
+        updateDragScrollWidth()
+        $rootScope.$broadcast 'scrollbar:width:changed'
 
-    $scope.$watch 'ampli_scroll', moveData
+    $scope.$watch 'ampli_scroll', (val) ->
+      moveData()
 
 
 ]
