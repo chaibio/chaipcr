@@ -1,0 +1,44 @@
+.status-bar {
+  background: #333;
+  color: #fff;
+  font-family: 'Open Sans';
+  font-size: 10px;
+  font-weight: bold;
+  height: 34px;
+  text-transform: uppercase; }
+  .status-bar * {
+    display: inline-block; }
+  .status-bar .normal {
+    font-weight: normal; }
+  .status-bar .experiment-result {
+    display: inline-block;
+    padding: 10px 20px; }
+    .status-bar .experiment-result.success {
+      background: #0CE433; }
+    .status-bar .experiment-result.failed {
+      background: #FF0000; }
+  .status-bar .completion-message {
+    padding-left: 10px; }
+  .status-bar .running-info, .status-bar .idle-state {
+    margin-left: 20px;
+    padding: 10px 0; }
+    .status-bar .running-info .machine-state, .status-bar .running-info .time-remaining, .status-bar .running-info .temp-info, .status-bar .idle-state .machine-state, .status-bar .idle-state .time-remaining, .status-bar .idle-state .temp-info {
+      padding-left: 10px; }
+    .status-bar .running-info .holding, .status-bar .idle-state .holding {
+      border-bottom: 1px solid #0CE433; }
+  .status-bar .controls-container {
+    float: right;
+    padding: 10px;
+    padding-right: 20px;
+    text-align: right;
+    margin-right: -5px; }
+  .status-bar .control {
+    cursor: pointer;
+    padding: 0 5px; }
+    .status-bar .control.disabled {
+      color: #C5C5C5; }
+    .status-bar .control img {
+      width: 15px;
+      height: 15px;
+      vertical-align: middle;
+      margin-top: -3px; }

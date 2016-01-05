@@ -1,0 +1,32 @@
+<div class="step-3">
+  <!-- <p class="step"><b>STEP 3</b>/6</p> -->
+  <h2>Data Collection</h2>
+
+  <div class="machine-heating-icon">
+    <img src="./images/machine-idle.png" class="machine-idle">
+    <img src="./images/lid-heating.png" style=" opacity: {{ lidHeatPercentage() | round:3 }}" class="lid-heating">
+    <img src="./images/block-heating.png" style="opacity: {{ blockHeatPercentage() | round:3 }}" class="block-heating">
+  </div>
+
+  <div class="text-center">
+    <p class="wait">PLEASE WAIT:</p>
+    <p class="heating" ng-show="state === 'lid_heating'">
+      The lid is heating to <b>{{experiment.protocol.lid_temperature | round: 1}}&deg;</b>C <br>
+    </p>
+    <p class="note" ng-show="state === 'lid_heating'">
+      This will take about one minute
+    </p>
+    <p class="heating" ng-show="state === 'running'">
+      Warming the instrument at <b>{{getBlockHeat() | round: 1}}&deg;</b>C <br>
+    </p>
+    <p class="note" ng-show="state === 'running'">
+      Estimated remaining time <b>{{ timeRemaining | secondsDisplay: 'display2'}}</b>
+    </p>
+    <p class="dont-open">
+      Please don't open the machine during this step.
+    </p>
+
+    <button class="button" ng-click="cancel=true" ng-show="!cancel">CANCEL</button>
+    <button class="button red" ng-show="cancel" ng-click="cancelExperiment()">CONFIRM CANCEL</button>
+  </div>
+</div>
