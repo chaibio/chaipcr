@@ -1,123 +1,3 @@
-diff -Nur ./check_sdcard.sh ../rc.updated/check_sdcard.sh
---- ./check_sdcard.sh	1970-01-01 02:00:00.000000000 +0200
-+++ ../rc.updated/check_sdcard.sh	2015-12-25 10:43:37.813177966 +0200
-@@ -0,0 +1,116 @@
-+#!/bin/bash
-+
-+if ! id | grep -q root; then
-+	echo "must be run as root"
-+	exit 1
-+fi
-+
-+if [ -e /dev/mmcblk1p4 ] ; then
-+	sdcard_dev="/dev/mmcblk0"
-+	eMMC="/dev/mmcblk1"
-+fi
-+
-+if [ -e /dev/mmcblk0p4 ] ; then
-+	sdcard_dev="/dev/mmcblk1"
-+	eMMC="/dev/mmcblk0"
-+fi
-+
-+if [ ! -e "${eMMC}p4" ]
-+then
-+        echo "Proper partitionned eMMC not found!"
-+	exit 1
-+fi
-+
-+all_done () {
-+	if [ -e /tmp/checked_partition/write_test.txt ]
-+	then
-+		rm /tmp/checked_partition/write_test.txt
-+	fi
-+
-+	umount /tmp/checked_partition
-+	if [ -e /tmp/checked_partition ]
-+	then
-+		rm -r /tmp/checked_partition
-+		if [ $? -gt 0 ]
-+		then
-+			echo Cannt remove /tmp/checked_partition !
-+		fi
-+	fi
-+}
-+
-+end_error () {
-+	all_done
-+
-+	echo "Trying to format ${sdcard_dev}p2"
-+	umount ${sdcard_dev}p2 || true
-+	umount ${sdcard_dev}p2 || true
-+	mkfs.ext4 ${sdcard_dev}p2 -L UPGRADE
-+
-+	if [ $? -eq 0 ]
-+	then
-+		echo "Partition formated successfully."
-+		if [ -e /sdcard/upgrade ]
-+		then
-+			mount ${sdcard_dev}p2 /sdcard/upgrade -t ext4
-+			if [ $? -eq 0 ]
-+			then
-+				echo "Partition remounted successfully to /sdcard/upgrade"
-+			else
-+				echo "Error remounting to /sdcard/upgrade/"
-+			fi
-+		fi
-+
-+		exit 0
-+	else
-+		echo "Error formating ${sdcard_dev}p2"
-+	fi
-+
-+	exit 1
-+}
-+
-+if [ ! -e /tmp/checked_partition ]
-+then
-+	mkdir -p /tmp/checked_partition
-+
-+	if [ $? -gt 0 ]
-+	then
-+		echo "Cannt create folder /tmp/checked_partition"
-+		end_error
-+	fi
-+fi
-+
-+# todo check for mounting and unmound if mounted!
-+mount ${sdcard_dev}p2 /tmp/checked_partition
-+if [ $? -gt 0 ]
-+then
-+	echo "Cannt mount to /tmp/checked_partition"
-+	end_error
-+fi
-+
-+NOW=$(date +"%m-%d-%Y %H:%M:%S")
-+
-+echo $NOW>/tmp/checked_partition/write_test.txt
-+if [ $? -gt 0 ]
-+then
-+	echo "Cannt write to /tmp/checked_partition"
-+	end_error
-+fi
-+
-+read_text=$(cat /tmp/checked_partition/write_test.txt)
-+if [ $? -gt 0 ]
-+then
-+	echo "Cannt read from /tmp/checked_partition/write_test.txt"
-+	end_error
-+fi
-+
-+if [ "$NOW" = "$read_text" ]
-+then
-+	echo "Partition is read/write OK.. exit."
-+else
-+	echo "Error reading from /tmp/checked_partition/write_test.txt.. wrote text: $NOW, read text: $read_text"
-+	end_error
-+fi
-+
-+all_done
-+
-+exit 0
 diff -Nur ./rc.local ../rc.updated/rc.local
 --- ./rc.local	2015-12-25 10:43:32.529177668 +0200
 +++ ../rc.updated/rc.local	2015-12-25 10:43:37.809177966 +0200
@@ -186,9 +66,15 @@ diff -Nur ./rc.local ../rc.updated/rc.local
 +}
 +
 +check_corruption () {
-+	echo "Corruption test started!" >> $log_file
-+	sh /etc/check_sdcard.sh >> $log_file || true
-+	echo "Corruption test result: $?" >> $log_file
++	check_script=/root/chaipcr/deploy/check_sdcard.sh
++	if [ -e $check_script ]
++	then
++		echo "Corruption test started!" >> $log_file
++		sh $check_script >> $log_file || true
++		echo "Corruption test result: $?" >> $log_file
++	else
++		echo "Can't find $check_script"
++	fi
 +}
 +
 +#check_corruption
