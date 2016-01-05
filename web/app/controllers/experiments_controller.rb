@@ -1,5 +1,6 @@
 require 'zip'
 require 'rserve'
+require "net/http"
 
 class ExperimentsController < ApplicationController
   include ParamsHelper
@@ -313,19 +314,6 @@ class ExperimentsController < ApplicationController
       render :json=>json
     else
       render :json=>{:errors=>"experiment not found"}, :status => :not_found
-    end
-  end
-  
-  api :GET, "/experiments/:id/status", "status of the machine"
-  def status
-    url = URI.parse("localhost:8000/status?access_token=#{token}")
-    begin
-      response = Net::HTTP.get_response(url)
-      json = JSON.parse(response)
-      render :json=>json
-    rescue  => e
-      render json: {errors: "reatime server port 8000 cannot be reached: #{e}"}, status: 500
-      return
     end
   end
   
