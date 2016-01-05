@@ -5,7 +5,7 @@ class DevicesController < ApplicationController
   
   skip_before_action :verify_authenticity_token, :except=>[:root_password]
   before_filter :allow_cors, :except=>[:root_password]
-  before_filter :ensure_authenticated_user, :only=>[:show, :capabilities, :enable_support_access]
+  before_filter :ensure_authenticated_user, :except=>[:update, :mac_address, :software_update]
   
   respond_to :json
   
