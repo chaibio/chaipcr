@@ -72,6 +72,7 @@ Qpcrctl::Application.routes.draw do
   resource :device, only: [:show, :update] do
     get 'mac_address'
     get 'software_update'
+    get 'status'
     put 'root_password'
     post 'enable_support_access'
   end
@@ -94,7 +95,6 @@ Qpcrctl::Application.routes.draw do
       get 'baseline_subtracted_ct_data'
       get 'export'
       get 'analyze'
-      get 'status'
     end
   end
 

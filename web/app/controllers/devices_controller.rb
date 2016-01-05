@@ -70,6 +70,19 @@ class DevicesController < ApplicationController
     render json: result_hash.to_json, status: :ok
   end
   
+  api :GET, "/device/status", "status of the machine"
+  def status
+    url = URI.parse("http://localhost:8000/status?access_token=#{token}")
+    begin
+      response = Net::HTTP.get_response(url)
+      json = JSON.parse(response)
+      render :json=>json
+    rescue  => e
+      render json: {errors: "reatime server port 8000 cannot be reached: #{e}"}, status: 500
+      return
+    end
+  end
+  
   api :PUT, "/device/root_password", "Set root password"
   param :password, String, :desc => "password to set", :required=>true
   def root_password
