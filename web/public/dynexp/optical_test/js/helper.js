@@ -21,7 +21,6 @@
             excitation: excitation.data[i]
           });
         }
-        console.log(new_data);
         return new_data;
       };
 
