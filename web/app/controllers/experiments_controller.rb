@@ -1,6 +1,5 @@
 require 'zip'
 require 'rserve'
-require "net/http"
 
 class ExperimentsController < ApplicationController
   include ParamsHelper
