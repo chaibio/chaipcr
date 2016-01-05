@@ -23,6 +23,9 @@ class DevicesController < ApplicationController
       File.open(DEVICE_FILE_PATH, 'w+') { |file| file.write(params[:data]) }
       `passwd -d root`
       User.delete_all
+      Experiment.joins(:experiment_definition).where("experiment_type != ?", ExperimentDefinition::TYPE_DIAGNOSTIC).each do |e|
+        e.destroy
+      end
       render json: {response: "Device is programmed successfully"}, status: :ok
     else
       render json: {errors: "Device is already serialized"}, status: 405
