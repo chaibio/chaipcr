@@ -34,16 +34,17 @@
           </div>
           <div ng-show="editUser.$submitted || editUser.password.$touched">
             <span class="error-text" ng-show="editUser.password.$error.minlength">Too short, minimum 4 characters required</span>
+            <p ng-show="editUSer.password.$error.required" class="error-text">Cannot be left blank</p>
           </div>
           <div class="name-field">
             <p class="p-caption">Confirm Password</p>
             <input type="password" ng-minlength="4" ng-keyup="comparePass(editUser)"  ng-model="userData.password_confirmation" name="confirmPassword" required placeholder="Retype exactly as above" class="text-class">
           </div>
-            <div ng-show="editUser.$submitted || editUser.password.$touched || editUser.confirmPassword.$touched">
-              <p ng-show="editUser.confirmPassword.$error.required || editUSer.password.$error.required" class="error-text">Cannot be left blank</p>
+            <div ng-show="editUser.$submitted || editUser.confirmPassword.$touched">
               <p ng-show="editUser.confirmPassword.$error.confirmPassword" class="error-text">Please confirm password</p>
+              <p ng-show="editUser.confirmPassword.$error.required || editUSer.password.$error.required" class="error-text">Cannot be left blank</p>
               <p ng-show="editUser.confirmPassword.$error.minlength" class="error-text">Too short, minimum 4 characters required</p>
-          </div>
+            </div>
         </div>
       </div>
     </div>
