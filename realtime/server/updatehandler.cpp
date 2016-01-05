@@ -48,24 +48,28 @@ void UpdateHandler::processData(const boost::property_tree::ptree &requestPt, bo
             {
                 setStatus(Poco::Net::HTTPResponse::HTTP_BAD_GATEWAY);
                 setErrorString("Error");
+
+                JsonHandler::processData(requestPt, responsePt);
             }
         }
         else
         {
             setStatus(Poco::Net::HTTPResponse::HTTP_GATEWAY_TIMEOUT);
             setErrorString("Timeout");
+
+            JsonHandler::processData(requestPt, responsePt);
         }
 
         break;
 
     case Update:
-        if (updateManager->update())
-            JsonHandler::processData(requestPt, responsePt);
-        else
+        if (!updateManager->update())
         {
             setStatus(Poco::Net::HTTPResponse::HTTP_PRECONDITION_FAILED);
             setErrorString("Update is not available");
         }
+
+        JsonHandler::processData(requestPt, responsePt);
 
         break;
 
