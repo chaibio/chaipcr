@@ -1,6 +1,6 @@
 <div class="user-details-container">
   <form name="editUser" ng-submit="update(editUser)" novalidate>
-    <div ng-if="isAdmin" class="admin-access">
+    <div ng-if="allowToggleAdmin" class="admin-access">
       <div class="admin-toggle">
         <allow-admin-toggle data="userData.role"></allow-admin-toggle>
       </div>
