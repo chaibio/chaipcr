@@ -1,7 +1,7 @@
 @import 'colors.css.scss';
 
 
-.maintainance-container {
+.system-container {
 
   color: #000;
 
@@ -67,31 +67,26 @@
         font-family: 'dinot';
       }
 
-      .button {
+      .normal-button {
+
+        font-family: "dinot-bold";
+        font-size: 16px;
         width: 100%;
         margin-top: 10px;
         margin-bottom: 10px;
-      }
-      .button {
         width: 260px;
-        //border-width: 2px;
+        border-width: 2px;
+        background-color: white;
+        border: 2px solid grey;
       }
-      .button:hover {
+
+      .normal-button:hover {
         color: white;
-        border: none;
+        border: 2px solid black;
+        background-color: black;
         //border-width: 2px;
       }
-      .first-button {
-        border-color: lightcoral;
-        color: red;
-      }
-      .second-spacing {
-        margin-top: 25px;
-        margin-bottom: 7px;
-      }
-      .second-button {
-        border-color: grey;
-      }
+
       .green-button {
         font-family: "dinot-bold";
         font-size: 16px;

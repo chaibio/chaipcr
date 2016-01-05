@@ -224,6 +224,7 @@ class ExperimentsController < ApplicationController
             begin
               amplification_data, ct = retrieve_amplification_data(@experiment.id, first_stage_collect_data.id, @experiment.calibration_id)
             rescue => e
+              logger.error("export amplification data failed: #{e}")
             end
           end
           
@@ -257,6 +258,7 @@ class ExperimentsController < ApplicationController
             begin
               melt_curve_data = retrieve_melt_curve_data(@experiment.id, first_stage_meltcurve_data.id, @experiment.calibration_id)
             rescue => e
+              logger.error("export melt curve data failed: #{e}")
             end
           end
           
@@ -327,7 +329,7 @@ class ExperimentsController < ApplicationController
     connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
     begin
-      results = connection.eval("get_amplification_data('#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibration_id})")
+      results = connection.eval("tryCatchError(get_amplification_data, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibration_id})")
     rescue  => e
       logger.error("Rserve error: #{e}")
       kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
@@ -340,12 +342,13 @@ class ExperimentsController < ApplicationController
     results = results.to_ruby
     amplification_data = []
     if !results.blank?
+      raise results["message"] if !results["message"].blank? #catched error
       background_subtracted_results = results[0]
       baseline_subtracted_results = results[1][0]
       (1...background_subtracted_results.length).each do |well_num|
         if background_subtracted_results[well_num].is_a? Array
           (0...background_subtracted_results[well_num].length).each do |cycle_num|
-            amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num-1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_results[well_num][cycle_num], :baseline_subtracted_value=>(baseline_subtracted_results.is_a? Array)? baseline_subtracted_results[well_num-1][cycle_num] : baseline_subtracted_results[0][cycle_num, well_num-1])
+            amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num-1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_results[well_num][cycle_num], :baseline_subtracted_value=>(baseline_subtracted_results.is_a? Array)? baseline_subtracted_results[well_num-1][cycle_num] : baseline_subtracted_results[cycle_num, well_num-1])
           end
         else
           amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num-1, :cycle_num=>1, :background_subtracted_value=>background_subtracted_results[well_num], :baseline_subtracted_value=>baseline_subtracted_results[well_num-1])
@@ -362,7 +365,7 @@ class ExperimentsController < ApplicationController
     connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
     begin
-      results = connection.eval("process_mc('#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibration_id})")
+      results = connection.eval("tryCatchError(process_mc, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibration_id})")
     rescue  => e
       logger.error("Rserve error: #{e}")
       kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
@@ -375,6 +378,7 @@ class ExperimentsController < ApplicationController
     results = results.to_ruby
     melt_curve_data = []
     if !results.blank?
+      raise results["message"] if !results["message"].blank? #catched error
       results.each_index do |i|
         results_per_well = results[i]
         hash = OpenStruct.new({:well_num=>i, :temperature=>results_per_well[0][0], :fluorescence_data=>results_per_well[0][1], :derivative=>results_per_well[0][2], :tm=>results_per_well[1][0], :area=>results_per_well[1][1]})

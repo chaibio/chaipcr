@@ -120,8 +120,8 @@ const long kUpdateInterval = 4 * 60 * 60 * 1000;
 const std::string kUpdateHost = "update.chaibio.com";
 const std::string kUpdatesUrl = "http://update.chaibio.com/device/software_update";
 const std::string kUpdatePassword = "chai";
-const std::string kUpdateFilePath = "/sdcard/upgrade-rootfs.img.gz";
-const std::string kUpdateScriptPath = "/sdcard/update_software_image.sh";
+const std::string kUpdateFilePath = "/sdcard/upgrade/upgrade.img.gz";
+const std::string kUpdateScriptPath = "/sdcard/factory/perform_upgrade.sh";
 
 //Network settings
 const std::string kNetworkInterfacesFile = "/etc/network/interfaces";

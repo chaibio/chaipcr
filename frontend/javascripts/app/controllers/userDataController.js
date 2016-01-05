@@ -17,6 +17,7 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
     $scope.deleteButton = true;
     $scope.emailAlreadtTaken = false;
     $scope.editable = false;
+    $scope.allowToggleAdmin = false;
 
     $scope.getUserData = function() {
       if(isNaN($scope.id)) {
@@ -35,22 +36,28 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
 
           if(data.user.role === "admin") {
             $scope.isAdmin = $scope.allowEditPassword = $scope.allowButtons = true;
+            $scope.editable = true;
+            $scope.allowToggleAdmin = true;
           }
 
           if($state.is("settings.current-user")) {
-            $scope.isAdmin = false;
+            $scope.isAdmin = true;
             $scope.allowEditPassword = $scope.allowButtons = true;
             $scope.deleteButton = false;
+            $scope.editable = true;
+            $scope.allowToggleAdmin = false;
           }
 
           if($state.is('settings.usermanagement.user') && data.user.id === $scope.id) {
-              $scope.isAdmin = false;
+              $scope.isAdmin = true;
               $scope.allowEditPassword = $scope.allowButtons = true;
               $scope.deleteButton = false;
+              $scope.editable = true;
+              $scope.allowToggleAdmin = false;
           }
 
-          $scope.editable = $scope.isAdmin || $state.is("settings.current-user");
-          console.log($scope.editable, $scope.isAdmin, $state.is("settings.current-user"));
+          //$scope.editable = $scope.isAdmin || $state.is("settings.current-user");
+          //console.log($scope.editable, $scope.isAdmin, $state.is("settings.current-user"));
         });
 
     };
@@ -93,6 +100,7 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
     };
 
     $scope.comparePass = function(form) {
+      console.log(form);
       if($scope.userData.password !== $scope.userData.password_confirmation) {
         form.password.$setValidity('confirmPassword', false);
         form.confirmPassword.$setValidity('confirmPassword', false);

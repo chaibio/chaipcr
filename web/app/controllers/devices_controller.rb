@@ -5,7 +5,7 @@ class DevicesController < ApplicationController
   
   skip_before_action :verify_authenticity_token, :except=>[:root_password]
   before_filter :allow_cors, :except=>[:root_password]
-  before_filter :ensure_authenticated_user, :only=>[:show, :capabilities, :enable_support_access]
+  before_filter :ensure_authenticated_user, :except=>[:update, :mac_address, :software_update]
   
   respond_to :json
   
@@ -23,6 +23,9 @@ class DevicesController < ApplicationController
       File.open(DEVICE_FILE_PATH, 'w+') { |file| file.write(params[:data]) }
       `passwd -d root`
       User.delete_all
+      Experiment.joins(:experiment_definition).where("experiment_type != ?", ExperimentDefinition::TYPE_DIAGNOSTIC).each do |e|
+        e.destroy
+      end
       render json: {response: "Device is programmed successfully"}, status: :ok
     else
       render json: {errors: "Device is already serialized"}, status: 405
@@ -68,6 +71,17 @@ class DevicesController < ApplicationController
     result_hash["capabilities"] = device_hash["capabilities"]
     result_hash["thermal"] = configuration_hash["thermal"]
     render json: result_hash.to_json, status: :ok
+  end
+  
+  api :GET, "/device/status", "status of the machine"
+  def status
+    url = URI.parse("http://localhost:8000/status?access_token=#{token}")
+    begin
+      response = Net::HTTP.get_response(url)
+      render :json=>response.body, :status=>response.code
+    rescue  => e
+      render json: {errors: "reatime server port 8000 cannot be reached: #{e}"}, status: 500
+    end
   end
   
   api :PUT, "/device/root_password", "Set root password"

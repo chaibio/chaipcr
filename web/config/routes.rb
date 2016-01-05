@@ -72,6 +72,7 @@ Qpcrctl::Application.routes.draw do
   resource :device, only: [:show, :update] do
     get 'mac_address'
     get 'software_update'
+    get 'status'
     put 'root_password'
     post 'enable_support_access'
   end

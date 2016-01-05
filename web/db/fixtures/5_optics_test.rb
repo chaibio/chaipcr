@@ -29,7 +29,7 @@ end
 
 protocol = Protocol.seed(:experiment_definition_id) do |s|
   s.id = 4
-  s.lid_temperature = 30
+  s.lid_temperature = 10
   s.experiment_definition_id = 4
 end
 

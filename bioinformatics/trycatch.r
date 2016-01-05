@@ -1,6 +1,6 @@
-# return_err
+# tryCatchError
 
-return_err <- function(func, ...) {
+tryCatchError <- function(func, ...) {
     return(tryCatch(func(...), error=function(e) e))
     }
 
