@@ -52,7 +52,7 @@ gulp.task('concat-css', ['copy-css-tmp', 'sass'], function () {
 
 gulp.task('hash-css', ['concat-css'], function () {
 
-  var hash = process.env.hash || makeHash();
+  var hash = process.env.csshash || makeHash();
   // var hash = '031a8120906bfcf9fa6281587c5be3';
 
   return gulp.src('.tmp/css/'+applicationTmpCSS+'.css')
@@ -91,7 +91,7 @@ gulp.task('css:deploy', ['copy-fonts-and-images', 'set-css-deploy', 'clean-css',
 // NOTE: Make sure VPN is connected and sshpass is installed on your system
 // Usage:
 //
-//       host=10.0.2.199 hash=fcf0da2a986a77c49089c356075f71 user=root password=chaipcr gulp css:upload
+//       host=10.0.2.199 csshash=fcf0da2a986a77c49089c356075f71 user=root password=chaipcr gulp css:upload
 //
 // where hash is the remote hash of application-[hash].js file
 var shell = require('shelljs');
@@ -100,7 +100,7 @@ gulp.task('css:upload', ['minify-css'], function (done) {
   var user = process.env.user || 'root';
   var password = process.env.password || 'chaipcr';
   var file = '.tmp/css/'+applicationCSS+'.css';
-  var _hash_ = process.env.hash || '031a8120906bfcf9fa6281587c5be3';
+  var _hash_ = process.env.csshash || '031a8120906bfcf9fa6281587c5be3';
   var remote_file = '/root/chaipcr/web/public/stylesheets/application-'+_hash_+'.css';
   var command = 'sshpass -p \''+password+'\' scp '+file+' '+user+'@'+host+':'+remote_file;
   console.log('Running: \n' + command.replace(password, '*******'));
