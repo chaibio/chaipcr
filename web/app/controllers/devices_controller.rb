@@ -75,11 +75,9 @@ class DevicesController < ApplicationController
     url = URI.parse("http://localhost:8000/status?access_token=#{token}")
     begin
       response = Net::HTTP.get_response(url)
-      json = JSON.parse(response)
-      render :json=>json
+      render :json=>JSON.parse(response.body), :status=>response.code
     rescue  => e
       render json: {errors: "reatime server port 8000 cannot be reached: #{e}"}, status: 500
-      return
     end
   end
   
