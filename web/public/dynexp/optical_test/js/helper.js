@@ -17,8 +17,8 @@
 
         for (var i=0; i < 16; i++) {
           new_data.push({
-            baseline: baseline.data[i],
-            excitation: excitation.data[i]
+            baseline: baseline? baseline.data[i] : {},
+            excitation: excitation? excitation.data[i] : {}
           });
         }
         return new_data;
