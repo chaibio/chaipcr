@@ -593,11 +593,11 @@ void DBControl::updateUpgrade(const Upgrade &upgrade)
     std::vector<soci::statement> statements;
     std::lock_guard<std::mutex> lock(_writeMutex);
 
-    statements.emplace_back((_writeSession->prepare << "INSERT INTO upgrades(id, version, checksum, release_date, brief_description, full_description) VALUES("
-                             "1, :version, :checksum, :release_date, :brief_description, :full_description) ON DUPLICATE KEY UPDATE "
-                             "version = :version, checksum = :checksum, release_date = :release_date, brief_description = :brief_description, full_description = :full_description",
-                             soci::use(upgrade.version()), soci::use(upgrade.checksum()), soci::use(upgrade.releaseDate()), soci::use(upgrade.briefDescription()), soci::use(upgrade.fullDescription()),
-                             soci::use(upgrade.version()), soci::use(upgrade.checksum()), soci::use(upgrade.releaseDate()), soci::use(upgrade.briefDescription()), soci::use(upgrade.fullDescription())));
+    statements.emplace_back((_writeSession->prepare << "INSERT INTO upgrades(id, version, checksum, release_date, brief_description, full_description, password) VALUES("
+                             "1, :version, :checksum, :release_date, :brief_description, :full_description, :password) ON DUPLICATE KEY UPDATE "
+                             "version = :version, checksum = :checksum, release_date = :release_date, brief_description = :brief_description, full_description = :full_description, password = :password",
+                             soci::use(upgrade.version()), soci::use(upgrade.checksum()), soci::use(upgrade.releaseDate()), soci::use(upgrade.briefDescription()), soci::use(upgrade.fullDescription()), soci::use(upgrade.password()),
+                             soci::use(upgrade.version()), soci::use(upgrade.checksum()), soci::use(upgrade.releaseDate()), soci::use(upgrade.briefDescription()), soci::use(upgrade.fullDescription()), soci::use(upgrade.password())));
 
     write(statements);
 }

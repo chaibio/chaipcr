@@ -26,12 +26,16 @@ public:
     inline void setFullDescription(const std::string &fullDescription) { _fullDescription = fullDescription; }
     inline const std::string& fullDescription() const { return _fullDescription; }
 
+    inline void setPassword(const std::string &password) { _password = password; }
+    inline const std::string& password() const { return _password; }
+
 private:
     std::string _version;
     std::string _checksum;
     boost::posix_time::ptime _releaseDate;
     std::string _briefDescription;
     std::string _fullDescription;
+    std::string _password;
 };
 
 #endif // UPGRADE_H

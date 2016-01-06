@@ -38,29 +38,34 @@ public:
 
     bool update();
 
-    void download(std::istream &dataStream);
+    void upload(std::istream &dataStream);
     void stopDownload();
 
 private:
     void checkUpdateCallback();
 
-    void downlaod(std::string imageUrl, std::string checksum);
-    bool downlaod(const std::string &imageUrl);
+    void downlaod(std::string imageUrl, std::string checksum, std::string apiPassword);
+    bool downlaod(const std::string &imageUrl, const std::string &apiPassword);
 
     bool checkFileChecksum(const std::string &checksum);
+
+    bool checkMountPoint();
+    bool checkSdcard();
 
 private:
     std::shared_ptr<DBControl> _dbControl;
     Poco::Net::HTTPClientSession *_httpClient;
 
     Poco::Util::Timer *_updateTimer;
-    Poco::Event _updateEvent;
 
     std::atomic<UpdateState> _updateState;
 
     std::recursive_mutex _downloadMutex;
     std::thread _downloadThread;
     int _downloadEventFd;
+
+    Poco::Event _updateEvent;
+    Poco::Event _uploadEvent;
 };
 
 #endif // UPDATEMANAGER_H

@@ -12,7 +12,7 @@ UpdateUploadHandler::UpdateUploadHandler()
 
 void UpdateUploadHandler::processRequest(Poco::Net::HTTPServerRequest &request)
 {
-    qpcrApp.updateManager()->download(request.stream());
+    qpcrApp.updateManager()->upload(request.stream());
     qpcrApp.updateManager()->update();
 }
 
