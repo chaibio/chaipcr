@@ -1,9 +1,11 @@
 window.App.directive 'statusBar', [
   'Experiment'
+  '$state'
   'Status'
   'TestInProgressHelper'
-  '$rootScope'
-  (Experiment, Status, TestInProgressHelper, $rootScope) ->
+  '$rootScope',
+  'AmplificationChartHelper',
+  (Experiment, $state, Status, TestInProgressHelper, $rootScope, AmplificationChartHelper) ->
 
     restrict: 'EA'
     replace: true
@@ -69,6 +71,9 @@ window.App.directive 'statusBar', [
       $scope.startExperiment = ->
         Experiment.startExperiment($scope.experimentId).then ->
           $rootScope.$broadcast 'experiment:started', $scope.experimentId
+          if $state.is('edit-protocol')
+            max_cycle = AmplificationChartHelper.getMaxExperimentCycle($scope.experiment)
+            $state.go('run-experiment', {'id': $scope.experimentId, 'chart': 'amplification', 'max_cycle': max_cycle})
 
       $scope.stopExperiment = ->
         Experiment.stopExperiment($scope.experiment.id)
