@@ -7,7 +7,31 @@
     '$state',
     '$uibModal',
     '$rootScope',
-    function ($scope, Experiment, $state, $uibModal, $rootScope) {
+    'DeviceInfo',
+    function ($scope, Experiment, $state, $uibModal, $rootScope, DeviceInfo) {
+
+      $scope.checkMachineStatus = function() {
+
+        DeviceInfo.getInfo().then(function(data) {
+          // Incase connected
+        }, function(err) {
+          // Error
+          if(err.status === 500) {
+            console.log(err);
+            var scope = $rootScope.$new();
+            scope.message = {
+              title: "Cant connect to machine.",
+              body: err.data.errors || "Error"
+            };
+
+            $uibModal.open({
+              templateUrl: './views/modal-error.html',
+              scope: scope
+            });
+          }
+
+        });
+      };
 
       $scope.proceed = function () {
         var exp;
@@ -16,32 +40,40 @@
             guid: 'thermal_performance_diagnostic'
           }
         });
+
         exp.$save().then(function(resp) {
           $scope.experiment = resp.experiment;
-          var startPromise = Experiment.startExperiment(resp.experiment.id)
+
+          var startPromise = Experiment.startExperiment(resp.experiment.id);
+
           startPromise.then(function() {
             $state.go('diagnostic', {
               id: resp.experiment.id
             });
           });
+
           startPromise.catch(function (err) {
             var error = 'Unable to start experiment!';
             if (err.data.status) {
               if(err.data.status.error) error = err.data.status.error;
             }
+
             var scope = $rootScope.$new();
             scope.message = {
               title: "Experiment can't be started",
               body: error
             };
+
             $uibModal.open({
               templateUrl: './views/modal-error.html',
               scope: scope
             });
+
           });
         });
       };
 
+      $scope.checkMachineStatus();
     }
   ]);
 
@@ -79,7 +111,7 @@
             fetchingTemps = false;
           });
         }
-      };
+      }
 
       function updateData (old, data) {
         animate(angular.copy(temperatureLogs), angular.copy(data));
@@ -123,11 +155,11 @@
 
       function pollTemperatures () {
         if (!tempPoll) tempPoll = $interval(fetchTempLogs, 1000);
-      };
+      }
       function stopPolling () {
         $interval.cancel(tempPoll);
         tempPoll = null;
-      };
+      }
       function getExperiment (cb) {
         if (!$params.id) return;
         cb = cb || angular.noop;
@@ -136,14 +168,14 @@
         }).$promise.then(function(resp) {
           return cb(resp);
         });
-      };
+      }
       function analyzeExperiment () {
         if (!$scope.analyzedExp) {
           Experiment.analyze($params.id).then(function (resp) {
             $scope.analyzedExp = resp.data;
           });
         }
-      };
+      }
 
       $scope.$watch(function() {
         return Status.getData();
@@ -159,11 +191,11 @@
           return;
         }
         newState = data.experiment_controller.machine.state;
-        oldState = oldData != null ? (ref = oldData.experiment_controller) != null ? (ref1 = ref.machine) != null ? ref1.state : void 0 : void 0 : void 0;
+        oldState = oldData !== null ? (ref = oldData.experiment_controller) !== null ? (ref1 = ref.machine) !== null ? ref1.state : void 0 : void 0 : void 0;
         $scope.status = newState === 'running' ? data.experiment_controller.machine.thermal_state : newState;
-        $scope.heat_block_temp = data.heat_block.temperature
-        $scope.lid_temp = data.lid.temperature
-        if (data.experiment_controller.expriment) $scope.elapsedTime = data.experiment_controller.expriment.run_duration
+        $scope.heat_block_temp = data.heat_block.temperature;
+        $scope.lid_temp = data.lid.temperature;
+        if (data.experiment_controller.expriment) $scope.elapsedTime = data.experiment_controller.expriment.run_duration;
 
         if (!$scope.experiment) {
           getExperiment(function(resp) {

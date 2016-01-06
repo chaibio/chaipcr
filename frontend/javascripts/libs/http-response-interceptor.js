@@ -7,17 +7,13 @@
  */
 (function () {
 
-  var responceInterceptor = angular.module('http-response-interceptor', []);
-
-
-
-  //console.log($httpProvider);
-  responceInterceptor.config(['$httpProvider',
-  function($httpProvider) {
-      //$httpProvider.Interceptors.push('interceptorFactory');
-      //console.log($httpProvider, interceptorFactory);
-    }
+  var responceInterceptor = window.responceInterceptor = angular.module('http-response-interceptor', [
+    'ui.router',
+    'ngResource',
+    'http-auth-interceptor',
+    'angularMoment'
   ]);
+
 
   responceInterceptor.factory('interceptorFactory', [
     function() {
@@ -29,4 +25,9 @@
     }
   ]);
 
+  responceInterceptor.config(['$httpProvider',
+  function($httpProvider) {
+      //$httpProvider.interceptors.push('interceptorFactory');
+    }
+  ]);
 })();
