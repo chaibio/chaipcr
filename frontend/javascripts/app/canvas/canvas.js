@@ -13,12 +13,12 @@ window.ChaiBioTech.ngApp.factory('canvas', [
   'constants',
   'circleManager',
   'dots',
-
+  'interceptorFactory',
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
-    moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots) {
+    moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory) {
 
     this.init = function(model) {
-      console.log(model);
+      console.log(model, interceptorFactory);
       this.model = model.protocol;
       this.$scope = model;
       this.allStepViews = [];

@@ -38,6 +38,7 @@ var vendorFiles = [
   'libs/n3-line-chart.js',
   'libs/ng-focus-on.js',
   'libs/http-auth-interceptor.js',
+  'libs/http-response-interceptor.js',
   'libs/jstorage.js',
   'libs/spin.min.js',
   'libs/ladda.min.js',
