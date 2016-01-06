@@ -96,7 +96,7 @@ modlist <- function(
         #FLUO <- baseline(cyc = CYCLES, fluo = FLUO, model = NULL, baseline = baseline, # ori
         
         # xqrm
-        blmod <- NULL # baseline subtraction is not thru 'parm', thus no sigmoid model to output
+        blmod <- NA # baseline subtraction is not thru 'parm', thus no sigmoid model to output
         
         # xqrm
         if (baseline_looped == "none") {
@@ -157,7 +157,6 @@ modlist <- function(
           # line 117: fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent=FALSE) # xqrm
           # line 120: if (baseline == "parm") { #fitOBJ <- baseline(model = fitOBJ, baseline = baseline)
           baseline_looped <- fallback
-          blmod <- NULL # baseline subtraction is not thru 'parm', thus no sigmoid model to output
           message('Baseline subtraction method falls back from \'parm\' to \'', fallback, '\', since sigmoid fitting failed for amplifcation data before baseline subtraction.')
           next }
         

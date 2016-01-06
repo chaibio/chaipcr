@@ -82,11 +82,12 @@ get_amp_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for conne
 
 # function: extract coefficients as a matrix from a modlist object
 modlist_coef <- function(modLIST, coef_cols) {
-    coef_mtx <- do.call(cbind, lapply(modLIST, 
+    coef_list <- lapply(modLIST, 
         function(item) {
-            coefs <- coef(item)
+            if (is.na(item)) coefs <- NA else coefs <- coef(item)
             if (is.null(coefs)) coefs <- NA
-            return(coefs) })) # coefficients of sigmoid-fitted models
+            return(coefs) }) # coefficients of sigmoid-fitted models
+    coef_mtx <- do.call(cbind, coef_list) # coefficients of sigmoid-fitted models
     colnames(coef_mtx) <- coef_cols
     return(coef_mtx)
     }
