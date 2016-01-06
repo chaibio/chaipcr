@@ -1,6 +1,6 @@
 diff -ur ./rc.local ../updated/rc.local
 --- ./rc.local	2016-01-06 04:05:53.621352432 +0200
-+++ ../updated/rc.local	2016-01-06 04:06:57.409356037 +0200
++++ ../updated/rc.local	2016-01-06 04:21:05.701403975 +0200
 @@ -11,4 +11,145 @@
  #
  # By default this script does nothing.
@@ -99,7 +99,7 @@ diff -ur ./rc.local ../updated/rc.local
 +}
 +
 +network_watchdog &
-+NOW=$(date "%m-%d-%Y %H:%M:%s")
++NOW=$(date +"%m-%d-%Y %H:%M:%S")
 +log_file="/var/log/life_age.log"
 +
 +echo Restarting! >> $log_file
