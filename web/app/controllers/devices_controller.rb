@@ -21,9 +21,8 @@ class DevicesController < ApplicationController
   def update
     if !File.exists?(DEVICE_FILE_PATH)
       File.open(DEVICE_FILE_PATH, 'w+') { |file| file.write(params[:data]) }
-      `passwd -d root`
       User.delete_all
-      Experiment.joins(:experiment_definition).where("experiment_type != ?", ExperimentDefinition::TYPE_DIAGNOSTIC).each do |e|
+      Experiment.joins(:experiment_definition).where("experiment_type != ? and experiments.id != 1", ExperimentDefinition::TYPE_DIAGNOSTIC).each do |e|
         e.destroy
       end
       render json: {response: "Device is programmed successfully"}, status: :ok
