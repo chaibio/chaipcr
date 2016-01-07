@@ -9,19 +9,13 @@ window.App.controller 'SoftwareUpdateCtrl', [
   '$state'
   ($scope, $uibModal, $uibModalInstance, Device, $window, $state) ->
 
-    # $scope.update = {'upgrade':{'version':'1.0.1','release_date':null,'brief_description':'this is the brief description','full_description':'this is the full description'}}
-    $scope.content = 'checking_for_updates'
     updatePromise = null
 
-    checkForUpdatePromise = Device.checkForUpdate()
-    checkForUpdatePromise.then (data) ->
-      if data.version
-        $scope.content = 'update_available'
-        $scope.new_update = data
-      else
-        $scope.content = 'update_unavailable'
+    if $scope.data.version
+      $scope.content = 'update_available'
+      $scope.new_update = $scope.data
 
-    checkForUpdatePromise.catch ->
+    if $scope.error
       $scope.content = 'unable_to_update'
 
     $scope.doUpdate = ->

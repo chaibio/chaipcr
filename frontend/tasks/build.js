@@ -29,8 +29,8 @@ gulp.task('deploy', ['css:deploy', 'js:deploy', 'copy-fonts-and-images'], functi
   var password = process.env.remote_password || 'chaipcr';
   var command = "remote_password=" + password + " ./deploy.sh " + host;
 
-  console.log('\tRunning command: ' + command.replace(password, '*******'));
-  console.log('\t\nPress Ctrl+C to cancel deploy.sh\n');
+  console.log('Running command: ' + command.replace(password, '*******'));
+  console.log('\nPress Ctrl+C to cancel deploy.sh\n');
   shell.exec(command, {async:true, silent: false}, function () {
     console.info('\n\ngulp deploy options:\n');
     console.info('\tcsshash= hash of existing remote css (will replace remote file)\n');

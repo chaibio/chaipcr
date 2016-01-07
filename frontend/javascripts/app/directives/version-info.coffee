@@ -1,8 +1,9 @@
 window.App.directive 'versionInfo', [
   'Device'
   'Status'
-  'SoftwareUpdater'
-  (Device, Status, SoftwareUpdater) ->
+  '$rootScope'
+  '$uibModal'
+  (Device, Status, $rootScope, $uibModal) ->
     restrict: 'EA'
     replace: true
     scope:
@@ -22,8 +23,32 @@ window.App.directive 'versionInfo', [
         Device.updateSoftware()
 
       $scope.checkForUpdates = ->
-        $scope.checkedUpdate = true
-        SoftwareUpdater.checkForUpdate()
+        $scope.checking_update = true
+        scope = $rootScope.$new()
+        scope.data = {}
+
+        modalConfig =
+          templateUrl: 'app/views/directives/update-software/modal-software-update.html'
+          controller: 'SoftwareUpdateCtrl'
+          scope: scope
+          openedClass: 'modal-software-update-open'
+          keyboard: false
+          backdrop: 'static'
+
+        checkPromise = Device.checkForUpdate()
+        checkPromise.then (data) ->
+          if data.version
+            scope.data = data
+            $uibModal.open modalConfig
+
+        checkPromise.catch ->
+          scope.error = true
+          $uibModal.open modalConfig
+
+        checkPromise.finally ->
+          $scope.checking_update = false
+          $scope.checkedUpdate = true
+
 
 
 ]
