@@ -149,7 +149,7 @@ gulp.task('concat-js', ['clean-js', 'coffee', 'es6', 'copy-js-to-tmp', 'template
 });
 
 gulp.task('hash-js', ['concat-js'], function () {
-  var hash = process.env.jshash || _makeHash();
+  var hash = process.env.jshash || '19a06cc94d11d2e154e5d3e4494a80';
 
   return gulp.src('.tmp/js/'+applicationTmpJS+'.js')
          .pipe(rename(function (path) {
@@ -210,7 +210,7 @@ gulp.task('js:upload', ['uglify'], function (done) {
   var user = process.env.user || 'root';
   var password = process.env.password || 'chaipcr';
   var file = '.tmp/js/'+applicationJS+'.js';
-  var _hash_ = process.env.jshash || 'fcf0da2a986a77c49089c356075f71';
+  var _hash_ = process.env.jshash || '19a06cc94d11d2e154e5d3e4494a80';
   var remote_file = '/root/chaipcr/web/public/javascripts/application-'+_hash_+'.js';
   var command = 'sshpass -p \''+password+'\' scp '+file+' '+user+'@'+host+':'+remote_file;
   console.log('Running: \n' + command.replace(password, '*******'));

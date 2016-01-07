@@ -1,6 +1,4 @@
 
-
-
 window.App.service 'Device', [
   '$http'
   '$q'
