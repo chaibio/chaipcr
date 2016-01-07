@@ -13,10 +13,10 @@ window.App.service 'Device', [
       version_info = null
 
       checkForUpdate: ->
-        def = $q.defer()
-        # $http.get('/device/software_update')
-        def.reject()
-        def.promise
+        # def = $q.defer()
+        $http.get('/device/software_update')
+        # def.reject()
+        # def.promise
 
       checkCloudUpdate: ->
         $http.get("http://update.chaibio.com/device/software_update")
