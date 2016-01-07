@@ -9,6 +9,7 @@ Restart=on-failure
 StartLimitBurst=0
 StartLimitInterval=0
 Type=forking
+TimeoutSec=180
 
 [Install]
 WantedBy=multi-user.target
