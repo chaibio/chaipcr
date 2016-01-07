@@ -54,18 +54,6 @@
 .diagnostic-wizard .temp-label b {
     font-weight: 800;
 }
-
-.diagnostic-wizard button,
-.diagnostic-wizard .errorButton {
-    background: #fff;
-    border: 1px solid #999999;
-    color: #999999;
-    margin-top: 70px;
-    margin-bottom: 50px;
-    padding: 5px 50px;
-    text-decoration: none;
-}
-
 .diagnostic-wizard button,
 .diagnostic-wizard .button {
     background: #fff;
@@ -82,7 +70,6 @@
     border-color: transparent;
     color: #fff;
 }
-
 .diagnostic-wizard .info-container {
     margin-top: 100px;
 }

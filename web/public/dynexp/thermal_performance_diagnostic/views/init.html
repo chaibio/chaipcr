@@ -12,7 +12,7 @@
     </div>
   </div>
 
-  <div class="content text-center">
+  <div class="content text-center" ng-controller="DiagnosticInitCtrl">
 
     <div class="intro-text-container">
       <h2>Thermal Performance Diagnostic</h2>
@@ -24,10 +24,12 @@
       </p>
 
       <p>
-        Before continuing, remove all tubes from your Open qPCR, and ensure the lid is closed.egrgergree
+        Before continuing, remove all tubes from your Open qPCR, and ensure the lid is closed.
       </p>
+
+      <button class="button" ng-click="proceed()">CONTINUE</button>
       <a href="/" class="button">CANCEL</a>
-      <button ng-disabled="error" ng-class="{errorButton: error}"  ng-click="proceed()">BEGIN</button>
+
     </div>
 
   </div>
