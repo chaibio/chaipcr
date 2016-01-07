@@ -206,7 +206,7 @@ gulp.task('js:deploy', ['set-js-deploy', 'uglify', 'markup-js-link'], function (
 // where hash is the remote hash of application-[hash].js file
 var shell = require('shelljs');
 gulp.task('js:upload', ['uglify'], function (done) {
-  var host = process.env.host || '10.0.2.199';
+  var host = process.env.host || '10.0.2.175';
   var user = process.env.user || 'root';
   var password = process.env.password || 'chaipcr';
   var file = '.tmp/js/'+applicationJS+'.js';

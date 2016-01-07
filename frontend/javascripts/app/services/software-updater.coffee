@@ -11,6 +11,8 @@ window.App.service 'SoftwareUpdater', [
         templateUrl: 'app/views/directives/update-software/modal-software-update.html'
         controller: 'SoftwareUpdateCtrl'
         openedClass: 'modal-software-update-open'
+        keyboard: false
+        backdrop: 'static'
 
     # @init = ->
     #   Status.startSync()

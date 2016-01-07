@@ -24,7 +24,8 @@ window.App.controller 'SoftwareUpdateCtrl', [
       cloudCheckPromise.then (resp) ->
         console.log resp
         cloudInfo = resp.data
-        Device.getVersion().then (device) ->
+        devideCheckPromise = Device.getVersion()
+        devideCheckPromise.then (device) ->
           if cloudInfo.software_version isnt device.software.version
             $scope.content = 'update_available'
             $scope.new_update =
@@ -37,6 +38,9 @@ window.App.controller 'SoftwareUpdateCtrl', [
 
           else
             $scope.content = 'update_unavailable'
+
+        devideCheckPromise.catch (err) ->
+          $scope.content = 'unable_to_update'
 
       cloudCheckPromise.catch (resp) ->
         console.log resp
