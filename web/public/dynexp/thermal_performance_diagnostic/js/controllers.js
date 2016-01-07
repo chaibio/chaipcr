@@ -78,7 +78,14 @@
   ]);
 
   App.controller('DiagnosticWizardCtrl', [
-    '$scope', 'Experiment', 'Status', '$interval', 'DiagnosticWizardService', '$stateParams', '$state', 'CONSTANTS',
+    '$scope',
+    'Experiment',
+    'Status',
+    '$interval',
+    'DiagnosticWizardService',
+    '$stateParams',
+    '$state',
+    'CONSTANTS',
     function ($scope, Experiment, Status, $interval, DiagnosticWizardService, $params, $state, CONSTANTS) {
 
       Status.startSync();

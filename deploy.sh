@@ -1,12 +1,15 @@
 #!/bin/bash
 
-echo "Enter remote password: "
-read remote_password
-
-if [ -z $remote_password ]
+if [ ! -n "$remote_password" ]
 then
-	echo "Password can't be empty!"
-	exit
+  echo "Enter remote password: "
+  read remote_password
+
+  if [ -z $remote_password ]
+  then
+    echo "Password can't be empty!"
+    exit
+  fi
 fi
 
 rm -rf ./web/log

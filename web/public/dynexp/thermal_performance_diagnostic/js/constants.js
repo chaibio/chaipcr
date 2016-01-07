@@ -1,4 +1,5 @@
 (function () {
+
   App.value('CONSTANTS', {
 
     HEATING: {
