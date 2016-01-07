@@ -38,6 +38,16 @@ fi
 sdcard_p1="/sdcard/p1"
 sdcard_p2="/sdcard/p2"
 
+	if [ ! -e ${sdcard_p1} ]
+	then
+	       mkdir -p ${sdcard_p1}
+	fi
+
+	if [ ! -e ${sdcard_p2} ]
+	then
+	       mkdir -p ${sdcard_p2}
+	fi
+
 mount ${sdcard_dev}p1 ${sdcard_p1} -t vfat || true
 mount ${sdcard_dev}p2 ${sdcard_p2} -t ext4 || true
 
@@ -68,6 +78,29 @@ alldone () {
 
 flush_cache () {
 	sync
+}
+
+write_pt_image () {
+	echo "Writing partition table image!"
+
+	image_filename_prfx="upgrade"
+	image_filename_rootfs="$image_filename_prfx-rootfs.img.gz" 
+	image_filename_data="$image_filename_prfx-data.img.gz"
+	image_filename_boot="$image_filename_prfx-boot.img.gz"
+	image_filename_pt="$image_filename_prfx-pt.img.gz"
+
+#	image_filename_upgrade="${sdcard_p2}/upgrade.img.gz"
+
+#	if [ "$1" = "factorysettings" ]
+#	then
+		image_filename_upgrade="${sdcard_p1}/factory_settings.img.gz"
+#	fi
+
+	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+        tar xOf $image_filename_upgrade $image_filename_pt | gunzip -c | dd of=${eMMC} bs=16M
+	flush_cache_mounted
+	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+	echo "Done writing partition table image!"
 }
 
 repartition_drive () {
