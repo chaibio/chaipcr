@@ -4,7 +4,7 @@ require 'rserve'
 class ExperimentsController < ApplicationController
   include ParamsHelper
   
-  before_filter :ensure_authenticated_user
+  #before_filter :ensure_authenticated_user
   before_filter :get_experiment, :except => [:index, :create, :copy]
   
   respond_to :json
@@ -119,7 +119,7 @@ class ExperimentsController < ApplicationController
               begin
                  @amplification_data, @ct = retrieve_amplification_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id)
               rescue => e
-                 render :json=>{:errors=>e}, :status => 500
+                 render :json=>{:errors=>e.to_s}, :status => 500
                  return
               end
               #update cache
@@ -196,7 +196,7 @@ class ExperimentsController < ApplicationController
           begin
             @melt_curve_data = retrieve_melt_curve_data(@experiment.id, @first_stage_meltcurve_data.id, @experiment.calibration_id)
           rescue => e
-            render :json=>{:errors=>e}, :status => 500
+            render :json=>{:errors=>e.to_s}, :status => 500
             return
           end
         end
@@ -303,16 +303,23 @@ class ExperimentsController < ApplicationController
       connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
       begin
         connection.eval("source(\"#{Rails.configuration.dynamic_file_path}/#{@experiment.experiment_definition.guid}/analyze.R\")")
-        response = connection.eval("analyze('#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{@experiment.id}, #{@experiment.calibration_id})").to_ruby
+        response = connection.eval("tryCatchError(analyze, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{@experiment.id}, #{@experiment.calibration_id})").to_ruby
       rescue  => e
         logger.error("Rserve error: #{e}")
         kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
         render :json=>{:errors=>"Internal Server Error (#{e})"}, :status => 500
+        return
       ensure
         connection.close
       end
-      json = JSON.parse(response)
-      render :json=>json
+      if response.is_a? String
+        render :json=>response
+      elsif response && !response["message"].blank?
+        render :json=>{:errors=>response["message"]}, :status => 500
+      else
+        render :json=>{:errors=>"R code response is not json: #{response}"}, :status => 500
+      end
+      return
     else
       render :json=>{:errors=>"experiment not found"}, :status => :not_found
     end
