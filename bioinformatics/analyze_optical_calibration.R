@@ -28,7 +28,7 @@ analyze_optical_calibration <- function(
         valid <- TRUE
         err <- NULL }
     
-    result2 <- list('valid'=unbox(valid), 'error_message'=unbox(err)) # `unbox` so atomic elements not returned as array in JSON
+    result2 <- list('valid'=valid, 'error_message'=err) # `unbox` so atomic elements not returned as array in JSON
     
     if (out_json) result2 <- toJSON(result2)
     
