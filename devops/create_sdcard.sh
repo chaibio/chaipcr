@@ -161,7 +161,7 @@ echo "Partitioning.."
 dd if=/dev/zero of=${output_device} bs=1M count=16
 blockdev --flushbufs ${output_device}
 
-LC_ALL=C sfdisk --force --Linux "${output_device}" <<-__EOF__
+LC_ALL=C sfdisk --force -uS --Linux "${output_device}" <<-__EOF__
 1,4194304,0xe,*
 ,,,-
 __EOF__
