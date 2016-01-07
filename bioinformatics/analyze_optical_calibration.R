@@ -22,8 +22,8 @@ analyze_optical_calibration <- function(
 
     if (class(result1) == 'try-error') {
         valid <- FALSE
-#        err <- 'Fluorescein calibrator was less fluorescent than water in some wells. Please retry with new fluorescein calibrator.' # solution 1
-        err <-  geterrmessage()
+        err <- 'Fluorescein calibrator was less fluorescent than water in some wells. Please retry with new fluorescein calibrator.' # solution 1
+#        err <-  geterrmessage()
     } else {
         valid <- TRUE
         err <- NULL }
