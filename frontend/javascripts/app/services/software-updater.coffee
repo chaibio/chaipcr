@@ -7,6 +7,8 @@ window.App.service 'SoftwareUpdater', [
   (Status, Device, $rootScope, $uibModal, $window) ->
 
     @checkForUpdate = ->
+      # checkUpdatePromise = Device.checkForUpdate()
+
       checkUpdateModal = $uibModal.open
         templateUrl: 'app/views/directives/update-software/modal-software-update.html'
         controller: 'SoftwareUpdateCtrl'
