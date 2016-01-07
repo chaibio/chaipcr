@@ -24,10 +24,10 @@
       </p>
 
       <p>
-        Before continuing, remove all tubes from your Open qPCR, and ensure the lid is closed.
+        Before continuing, remove all tubes from your Open qPCR, and ensure the lid is closed.egrgergree
       </p>
       <a href="/" class="button">CANCEL</a>
-      <button class="button" ng-click="proceed()">BEGIN</button>
+      <button ng-disabled="error" ng-class="{errorButton: error}"  ng-click="proceed()">BEGIN</button>
     </div>
 
   </div>

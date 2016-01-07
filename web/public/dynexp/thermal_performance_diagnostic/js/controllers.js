@@ -12,8 +12,11 @@
 
       $scope.checkMachineStatus = function() {
 
+        $scope.error = true;
+
         DeviceInfo.getInfo().then(function(data) {
           // Incase connected
+          $scope.error = false;
         }, function(err) {
           // Error
           if(err.status === 500) {
@@ -74,6 +77,7 @@
       };
 
       $scope.checkMachineStatus();
+      //$scope.error = false; 
     }
   ]);
 
