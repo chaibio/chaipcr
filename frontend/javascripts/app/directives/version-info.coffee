@@ -11,7 +11,17 @@ window.App.directive 'versionInfo', [
     templateUrl: 'app/views/directives/version-info.html'
     link: ($scope, elem, attrs) ->
 
-      $scope.update_available = data?.device?.update_available || 'unavailable'
+      $scope.update_available = 'unavailable'
+
+      $scope.$watch ->
+        Status.getData()
+      , (data) ->
+        status = data?.device?.update_available || 'unknown'
+        if status is 'unknown'
+          Device.checkForUpdate().then (status) ->
+            $scope.update_available = status
+        else
+          $scope.update_available = status
 
       Device.getVersion(true).then (resp) ->
         $scope.data = resp
