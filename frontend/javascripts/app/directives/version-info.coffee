@@ -51,7 +51,6 @@ window.App.directive 'versionInfo', [
 
         checkPromise.finally ->
           $scope.checking_update = false
-          $scope.checkedUpdate = true
 
 
 
