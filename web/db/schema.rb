@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151228092803) do
+ActiveRecord::Schema.define(version: 20160108185035) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -153,12 +153,13 @@ ActiveRecord::Schema.define(version: 20151228092803) do
   add_index "temperature_logs", ["experiment_id", "elapsed_time"], name: "index_temperature_logs_on_experiment_id_and_elapsed_time", unique: true, using: :btree
 
   create_table "upgrades", force: true do |t|
-    t.string   "version",           null: false
-    t.string   "checksum",          null: false
-    t.datetime "release_date",      null: false
+    t.string   "version",                           null: false
+    t.string   "checksum",                          null: false
+    t.datetime "release_date",                      null: false
     t.text     "brief_description"
     t.text     "full_description"
     t.string   "password"
+    t.boolean  "downloaded",        default: false
   end
 
   create_table "user_tokens", force: true do |t|
