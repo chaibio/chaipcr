@@ -19,7 +19,7 @@
     <button class="update-button text" ng-show="update_available === 'unavailable' && checkedUpdate && !checking_update">
       Software Up To Date
     </button>
-    <button class="update-button" ng-show="update_available === 'available' && !checking_update" ng-click="openUpdateModal()">
+    <button class="update-button" ng-show="update_available === 'available' && !checking_update" ng-click="checkForUpdates()">
       SOFTWARE UPDATE AVAILABLE
     </button>
     <button class="update-button text" ng-show="update_available === 'downloading' && !checking_update">
