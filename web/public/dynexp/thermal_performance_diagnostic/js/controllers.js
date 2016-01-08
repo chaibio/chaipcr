@@ -13,6 +13,7 @@
 
       $scope.error = true;
       $scope.modal = null;
+      $scope.timeout = null;
 
       $scope.checkMachineStatus = function() {
 
@@ -51,7 +52,7 @@
           }
         });
 
-        $timeout($scope.checkMachineStatus, 1000);
+        $scope.timeout = $timeout($scope.checkMachineStatus, 1000);
       };
 
       $scope.proceed = function () {
@@ -63,6 +64,7 @@
         });
 
         exp.$save().then(function(resp) {
+          $timeout.cancel($scope.timeout);
           $scope.experiment = resp.experiment;
 
           var startPromise = Experiment.startExperiment(resp.experiment.id);
