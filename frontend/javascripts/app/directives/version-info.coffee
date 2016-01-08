@@ -11,10 +11,7 @@ window.App.directive 'versionInfo', [
     templateUrl: 'app/views/directives/version-info.html'
     link: ($scope, elem, attrs) ->
 
-      $scope.$watch ->
-        Status.getData()
-      , (data) ->
-        $scope.update_available = data?.device?.update_available
+      $scope.update_available = data?.device?.update_available || 'unavailable'
 
       Device.getVersion(true).then (resp) ->
         $scope.data = resp
@@ -22,28 +19,28 @@ window.App.directive 'versionInfo', [
       $scope.updateSoftware = ->
         Device.updateSoftware()
 
-      $scope.checkForUpdates = ->
-        $scope.checking_update = true
-        scope = $rootScope.$new()
-        scope.data = {}
-
-        modalConfig =
+      $scope.openUpdateModal = ->
+        $uibModal.open
           templateUrl: 'app/views/directives/update-software/modal-software-update.html'
           controller: 'SoftwareUpdateCtrl'
-          scope: scope
           openedClass: 'modal-software-update-open'
           keyboard: false
           backdrop: 'static'
 
+      $scope.checkForUpdates = ->
+        $scope.checking_update = true
+
         checkPromise = Device.checkForUpdate()
-        checkPromise.then (data) ->
-          if data.version
-            scope.data = data
-            $uibModal.open modalConfig
+        checkPromise.then (is_available) ->
+          $scope.update_available = is_available
+          $scope.checkedUpdate = true
+          if is_available is 'available'
+            $scope.openUpdateModal()
 
         checkPromise.catch ->
-          scope.error = true
-          $uibModal.open modalConfig
+          alert 'Unable to check for update!'
+          $scope.update_available = 'unavailable'
+          $scope.checkedUpdate = false
 
         checkPromise.finally ->
           $scope.checking_update = false

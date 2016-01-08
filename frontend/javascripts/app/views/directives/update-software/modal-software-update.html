@@ -1,13 +1,13 @@
 <div>
-  <!-- checking for new updates -->
-  <div class="modal-software-update" ng-show="content === 'checking_for_updates'">
+
+  <div class="modal-software-update" ng-show="loading">
     <h1>
-      Checking available updates <ellipsis-animated></ellipsis-animated>
+      Loaing update information <ellipsis-animated></ellipsis-animated>
     </h1>
   </div>
 
   <!-- new software update is available -->
-  <div class="modal-software-update" ng-show="content === 'update_available'">
+  <div class="modal-software-update" ng-show="content === 'update_available' && !loading">
     <div class="text-right">
       <a class="close" ng-click="$dismiss()">&times;</a>
     </div>
@@ -45,11 +45,6 @@
     </div>
   </div>
 
-  <!-- software is up to date -->
-  <div class="modal-software-update" ng-show="content === 'update_unavailable'">
-    <h1 class="text-green">Software is up to date.</h1>
-  </div>
-
   <!-- update is in progress -->
   <div class="modal-software-update" ng-show="content === 'update_in_progress'">
     <h1>
@@ -59,17 +54,6 @@
     <p class="text-gray">
       This will take approximately 30 minutes. Your device will reboot when complete.
     </p>
-  </div>
-
-  <!-- unable to update -->
-  <div class="modal-software-update text-danger" ng-show="content === 'unable_to_update'">
-    <div class="text-right">
-      <span class="close" ng-click="$dismiss()">&times;</span>
-    </div>
-    <div class="text-center">
-      <h1>Error!</h1>
-      <p>Unable to check for updates. We are sorry for this.</p>
-    </div>
   </div>
 
 

@@ -10,24 +10,14 @@ window.App.controller 'SoftwareUpdateCtrl', [
   ($scope, $uibModal, $uibModalInstance, Device, $window, $state) ->
 
     updatePromise = null
+    $scope.content = 'update_available'
 
-    if $scope.data.version
-      $scope.content = 'update_available'
-      $scope.new_update = $scope.data
-
-    if $scope.error
-      $scope.content = 'unable_to_update'
+    Device.getUpdateInfo().then (data) ->
+      $scope.new_update = data
 
     $scope.doUpdate = ->
       $scope.content = 'update_in_progress'
-
-      updatePromise = Device.updateSoftware()
-
-      updatePromise.then ->
-        $scope.data.updating = 'complete'
-
-      updatePromise.catch ->
-        $scope.data.updating = 'failed'
+      Device.updateSoftware()
 
     $scope.downloadUpdate = ->
       $state.go 'upload-image'

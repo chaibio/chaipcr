@@ -25,7 +25,10 @@ gulp.task('debug', ['css:debug', 'js:debug', 'copy-fonts-and-images'], function 
 gulp.task('deploy', ['css:deploy', 'js:deploy', 'copy-fonts-and-images'], function (done) {
   console.log('\n\t--- DONE DEPLOY BUILD ---\n');
 
-  var host = process.env.host || '10.0.2.180';
+  var host = process.env.host;
+  if(!host) {
+    return done();
+  }
   var password = process.env.remote_password || 'chaipcr';
   var command = "remote_password=" + password + " ./deploy.sh " + host;
 
@@ -41,6 +44,7 @@ gulp.task('deploy', ['css:deploy', 'js:deploy', 'copy-fonts-and-images'], functi
     console.info('\tExample: csshash=e4967a23c76ea10339d8f2fc0b57b0 jshash=e4967a23c76ea10339d8f2fc0b57b0 host=10.0.2.180 remote_password=chaipcr gulp deploy\n\n');
     done();
   });
+
 });
 
 gulp.task('default', ['debug']);
