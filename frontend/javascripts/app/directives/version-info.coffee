@@ -17,10 +17,7 @@ window.App.directive 'versionInfo', [
         Status.getData()
       , (data) ->
         status = data?.device?.update_available || 'unknown'
-        if status is 'unknown'
-          Device.checkForUpdate().then (status) ->
-            $scope.update_available = status
-        else
+        if status isnt 'unknown'
           $scope.update_available = status
 
       Device.getVersion(true).then (resp) ->
