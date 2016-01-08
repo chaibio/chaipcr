@@ -135,7 +135,7 @@ gulp.task('jslint', ['clean-js', 'coffee', 'es6', 'copy-js-to-tmp', 'templates']
          .pipe(jshint.reporter('default'));
 });
 
-gulp.task('concat-js', ['clean-js', 'coffee', 'es6', 'copy-js-to-tmp', 'templates', 'jslint'], function () {
+gulp.task('concat-js', ['clean-js', 'coffee', 'copy-js-to-tmp', 'templates'], function () {
   var files = vendorFiles.concat(appFiles);
 
   for (var i = files.length - 1; i >= 0; i--) {
@@ -149,7 +149,7 @@ gulp.task('concat-js', ['clean-js', 'coffee', 'es6', 'copy-js-to-tmp', 'template
 });
 
 gulp.task('hash-js', ['concat-js'], function () {
-  var hash = process.env.jshash || '19a06cc94d11d2e154e5d3e4494a80';
+  var hash = process.env.jshash || _makeHash();
 
   return gulp.src('.tmp/js/'+applicationTmpJS+'.js')
          .pipe(rename(function (path) {

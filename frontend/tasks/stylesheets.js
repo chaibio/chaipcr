@@ -52,8 +52,7 @@ gulp.task('concat-css', ['copy-css-tmp', 'sass'], function () {
 
 gulp.task('hash-css', ['concat-css'], function () {
 
-  var hash = process.env.csshash || 'e4967a23c76ea10339d8f2fc0b57b0';
-  // var hash = '031a8120906bfcf9fa6281587c5be3';
+  var hash = process.env.csshash || makeHash();
 
   return gulp.src('.tmp/css/'+applicationTmpCSS+'.css')
          .pipe(rename(function (path) {

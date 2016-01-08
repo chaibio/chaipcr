@@ -51,6 +51,35 @@
         }
       }
 
+      .upload-form {
+        padding: 20px;
+        padding-top: 0;
+
+        a:hover {
+          background: transparent;
+          text-decoration: none;
+        }
+
+        .close {
+          margin-right: -10px;
+        }
+
+        .progressbar-container {
+          padding: 0 50px;
+
+          .upload-progressbar {
+            background-image: url("/images/light-blue-sprite.jpg");
+            background-repeat: no-repeat;
+            box-shadow: none;
+            border: 1px solid #cceffc;
+            color: #000;
+            height: 28px;
+            padding: 2px 10px;
+            text-align: left;
+          }
+        }
+      }
+
       .buttons-container {
         text-align: center;
         padding: 30px 0 30px 0;
@@ -85,6 +114,13 @@
           border: none;
           padding-top: 5px;
           padding-bottom: 5px;
+        }
+
+        &.disabled {
+          background: $lightgray;
+          color: #fff;
+          padding: 5px 0;
+          border: none;
         }
       }
 

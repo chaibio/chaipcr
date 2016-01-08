@@ -1,5 +1,11 @@
 var express = require('express');
 var app = express();
+var multer = require('multer');
+var bodyParser = require('body-parser');
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(multer({dest:'./node_modules/'}).single());
 
 app.use(function (req, res, next) {
   res.setHeader('Content-Type', 'text/json');
@@ -8,20 +14,6 @@ app.use(function (req, res, next) {
   next();
 });
 
-function rawBody(req, res, next) {
-  var body;
-  req.setEncoding('utf8');
-  body = '';
-  req.on('data', function(chunk) {
-    body += chunk;
-  });
-  req.on('end', function(){
-    if (body !== '') req.payload = JSON.parse(body);
-    next();
-  });
-}
-
-app.use(rawBody);
 
 var mysql      = require('mysql');
 var connection = mysql.createConnection({
@@ -185,4 +177,14 @@ app.post('/control/stop', function (req, res, next) {
   res.send(true);
 });
 
+app.post('/device/upload_software_update', function (req, res, next) {
+  res.send(true);
+});
+
+
+app.options('*',function (req, res, next) {
+  res.send('CORS OPTIONS HERE');
+});
+
 app.listen(8000);
+

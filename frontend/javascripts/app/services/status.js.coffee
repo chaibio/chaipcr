@@ -9,12 +9,15 @@ window.ChaiBioTech.ngApp
   ($http, $q, host, $interval, $timeout) ->
 
     data = null
+    isUp = true
     @interval = null
     @listenersCount = 0
     @fetching = false
     @timeoutPromise = null
 
     @getData = -> data
+
+    @isUp = -> isUp
 
     @fetch = ->
       deferred = $q.defer()
@@ -26,11 +29,13 @@ window.ChaiBioTech.ngApp
         , 10000
         $http.get("#{host}\:8000/status")
         .success (resp) =>
+          isUp = true
           data = resp
           deferred.resolve data
 
         .error (resp) ->
           deferred.reject(resp)
+          isUp = false
 
         .finally =>
           $timeout.cancel @timeoutPromise

@@ -53,12 +53,19 @@ window.App.service 'Device', [
         deferred.promise
 
       getUpdateInfo: ->
+        checkCloudInfo = (deferred) ->
+          cloudPromise = $http.get("http://update.chaibio.com/device/software_update")
+          cloudPromise.then (resp) ->
+            deferred.resolve resp.data
+          cloudPromise.catch (err) ->
+            deferred.reject err
+
         deferred = $q.defer()
         infoPromise = $http.get('/device/software_update')
         infoPromise.then (resp) ->
           deferred.resolve resp.data.upgrade
         infoPromise.catch (err) ->
-          deferred.reject err
+          checkCloudInfo deferred
 
         deferred.promise
 
@@ -83,6 +90,7 @@ window.App.service 'Device', [
         Upload.upload
           url: "#{host}\:8000/device/upload_software_update"
           method: 'POST'
+          'Content-Type': 'multipart/form-data'
           data: file
 
     return new Device

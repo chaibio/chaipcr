@@ -45,13 +45,11 @@ window.App.directive 'versionInfo', [
             $scope.openUpdateModal()
 
         checkPromise.catch ->
-          alert 'Unable to check for update!'
+          alert 'Error while checking update!'
           $scope.update_available = 'unavailable'
           $scope.checkedUpdate = false
 
         checkPromise.finally ->
           $scope.checking_update = false
-
-
 
 ]
