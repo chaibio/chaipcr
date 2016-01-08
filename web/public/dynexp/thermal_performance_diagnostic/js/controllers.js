@@ -8,29 +8,51 @@
     '$uibModal',
     '$rootScope',
     'DeviceInfo',
-    function ($scope, Experiment, $state, $uibModal, $rootScope, DeviceInfo) {
+    '$timeout',
+    function ($scope, Experiment, $state, $uibModal, $rootScope, DeviceInfo, $timeout) {
+
+      $scope.error = true;
+      $scope.modal = null;
+      $scope.timeout = null;
 
       $scope.checkMachineStatus = function() {
 
-        DeviceInfo.getInfo().then(function(data) {
+        DeviceInfo.getInfo($scope.check).then(function(deviceStatus) {
           // Incase connected
-        }, function(err) {
-          // Error
-          if(err.status === 500) {
-            console.log(err);
-            var scope = $rootScope.$new();
-            scope.message = {
-              title: "Cant connect to machine.",
-              body: err.data.errors || "Error"
-            };
-
-            $uibModal.open({
-              templateUrl: './views/modal-error.html',
-              scope: scope
-            });
+          if($scope.modal) {
+              $scope.modal.close();
+              $scope.modal = null;
           }
 
+          if(deviceStatus.data.optics.lidOpen === "true" || deviceStatus.data.optics.lidOpen === true) { // lid is open
+            $scope.error = true;
+            $scope.lidMessage = "Close hardware lid to begin.";
+          } else {
+            $scope.error = false;
+          }
+        }, function(err) {
+          // Error
+          $scope.error = true;
+          $scope.lidMessage = "Cant connect to machine.";
+
+          if(err.status === 500) {
+
+            if(! $scope.modal) {
+              var scope = $rootScope.$new();
+              scope.message = {
+                title: "Cant connect to machine.",
+                body: err.data.errors || "Error"
+              };
+
+              $scope.modal = $uibModal.open({
+                templateUrl: './views/modal-error.html',
+                scope: scope
+              });
+            }
+          }
         });
+
+        $scope.timeout = $timeout($scope.checkMachineStatus, 1000);
       };
 
       $scope.proceed = function () {
@@ -42,6 +64,7 @@
         });
 
         exp.$save().then(function(resp) {
+          $timeout.cancel($scope.timeout);
           $scope.experiment = resp.experiment;
 
           var startPromise = Experiment.startExperiment(resp.experiment.id);

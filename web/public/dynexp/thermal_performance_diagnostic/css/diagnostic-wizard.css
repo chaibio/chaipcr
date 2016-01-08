@@ -55,12 +55,21 @@
     font-weight: 800;
 }
 .diagnostic-wizard button,
+.diagnostic-wizard .errorButton {
+    background: #fff;
+    border: 1px solid #999;
+    color: #999;
+    margin-top: 60px;
+    padding: 5px 50px;
+    text-decoration: none;
+}
+
+.diagnostic-wizard button,
 .diagnostic-wizard .button {
     background: #fff;
     border: 1px solid #333;
     color: #000;
-    margin-top: 70px;
-    margin-bottom: 50px;
+    margin-top: 60px;
     padding: 5px 50px;
     text-decoration: none;
 }
@@ -109,4 +118,13 @@
     color: gray;
     font-size: 10px;
     height: 20px;
+}
+
+.diagnostic-wizard .errorMessage {
+  display: block;
+  width: 500px;
+  margin: 0 auto;
+  color: #999;
+  font-size: 17px;
+  margin-top: 15px;
 }
