@@ -235,7 +235,7 @@ void UpdateManager::checkUpdateCallback()
         upgrade.setReleaseDate(Util::parseIsoTime(ptree.get<std::string>("release_date")));
         upgrade.setPassword(ptree.get<std::string>("password"));
 
-        imageUrl = ptree.get<std::string>("image_url");
+        imageUrl = ptree.get<std::string>("image_rsync_url");
 
         _dbControl->updateUpgrade(upgrade);
     }
