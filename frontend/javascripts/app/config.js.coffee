@@ -3,12 +3,9 @@ window.ChaiBioTech.ngApp
   '$rootScope'
   '$state'
   '$window'
-  'SoftwareUpdater'
-  ($rootScope, $state, $window, SoftwareUpdater) ->
+  ($rootScope, $state, $window) ->
 
     $rootScope.title = "ChaiBioTech"
-
-    # SoftwareUpdater.init()
 
     $rootScope.$on '$stateChangeSuccess', (e, toState, params, fromState) ->
       if fromState.name isnt toState.name

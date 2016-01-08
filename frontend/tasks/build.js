@@ -6,9 +6,8 @@ var shell = require('shelljs');
 gulp.task('watch', function () {
 
   watch([
-    './frontend/**/*',
-    '!./frontend/.tmp/**/*',
-    '!./frontend/tasks/**/*',
+    './frontend/javascripts/**/*',
+    './frontend/stylesheets/**/*',
   ], batch(function (events, done) {
       gulp.start('debug', done);
   }));

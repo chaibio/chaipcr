@@ -28,7 +28,7 @@ window.App.directive 'versionInfo', [
 
       $scope.openUpdateModal = ->
         $uibModal.open
-          templateUrl: 'app/views/directives/update-software/modal-software-update.html'
+          templateUrl: 'app/views/settings/modal-software-update.html'
           controller: 'SoftwareUpdateCtrl'
           openedClass: 'modal-software-update-open'
           keyboard: false
