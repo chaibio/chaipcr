@@ -1,11 +1,9 @@
 var express = require('express');
 var app = express();
-var multer = require('multer');
 var bodyParser = require('body-parser');
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({type: 'multipart/form-data'}));
 app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(multer({dest:'./node_modules/'}).single());
 
 app.use(function (req, res, next) {
   res.setHeader('Content-Type', 'text/json');
@@ -135,28 +133,13 @@ app.get('/status', function (req, res, next) {
 
 app.post('/control/start', function (req, res, next) {
   data = status_lid_heating;
-  data.experiment_controller.expriment.id = req.payload.experiment_id;
-  startExperiment(req.payload.experiment_id);
-  experiment_id = req.payload.experiment_id;
+  data.experiment_controller.expriment.id = req.body.experiment_id;
+  startExperiment(req.body.experiment_id);
+  experiment_id = req.body.experiment_id;
   setTimeout(function () {
     data.experiment_controller.machine.state = 'running';
     data.experiment_controller.machine.thermal_state = 'holding';
     autoupdateLogs();
-
-    setTimeout(function () {
-      data.optics.collectData = true;
-      data.experiment_controller.expriment.step.name = "Step 2";
-      data.experiment_controller.expriment.step.number = "2";
-    }, 3000);
-
-    setTimeout(function () {
-      data.optics.collectData = true;
-      data.experiment_controller.expriment.step.name = "Step 2";
-      data.experiment_controller.expriment.step.number = "2";
-      setTimeout(function () {
-        data.experiment_controller.expriment.stage.cycle = "40";
-      }, 3000);
-    }, 5000);
 
   }, 3000);
 

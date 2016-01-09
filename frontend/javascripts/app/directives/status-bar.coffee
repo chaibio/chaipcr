@@ -14,9 +14,6 @@ window.App.directive 'statusBar', [
     templateUrl: 'app/views/directives/status-bar.html'
     link: ($scope, elem, attrs) ->
 
-      $scope.$watch 'experimentId', (newVal, oldVal) ->
-        $scope.experimentId = newVal
-
       $scope.show = ->
         if attrs.experimentId then ($scope.experimentId and $scope.status) else $scope.status
 
@@ -63,6 +60,7 @@ window.App.directive 'statusBar', [
         Experiment.getExperimentDuration($scope.experiment)
 
       $scope.startExperiment = ->
+        $scope.experiment.started_at = true
         Experiment.startExperiment($scope.experimentId).then ->
           $rootScope.$broadcast 'experiment:started', $scope.experimentId
           if $state.is('edit-protocol')
