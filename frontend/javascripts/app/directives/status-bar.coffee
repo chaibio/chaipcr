@@ -14,11 +14,18 @@ window.App.directive 'statusBar', [
     templateUrl: 'app/views/directives/status-bar.html'
     link: ($scope, elem, attrs) ->
 
+      experiment_id = null
+
+      $scope.$watch 'experimentId', (id) ->
+        return if !angular.isNumber id
+        experiment_id = id
+
       $scope.show = ->
-        if attrs.experimentId then ($scope.experimentId and $scope.status) else $scope.status
+        if attrs.experimentId then (experiment_id and $scope.status) else $scope.status
 
       getExperiment = (cb) ->
-        TestInProgressHelper.getExperiment($scope.experimentId).then (experiment) ->
+        return if !experiment_id
+        TestInProgressHelper.getExperiment(experiment_id).then (experiment) ->
           cb experiment
 
       $scope.$watch 'experimentId', (id) ->
@@ -37,7 +44,7 @@ window.App.directive 'statusBar', [
         $scope.thermal_state = data.experiment_controller.machine.thermal_state
         $scope.oldState = oldData?.experiment_controller?.machine?.state || 'NONE'
 
-        if ((($scope.oldState isnt $scope.state or !$scope.experiment))) and $scope.experimentId
+        if ((($scope.oldState isnt $scope.state or !$scope.experiment))) and experiment_id
           getExperiment (exp) ->
             $scope.experiment = exp
             $scope.status = data
@@ -48,8 +55,8 @@ window.App.directive 'statusBar', [
 
         $scope.timeRemaining = TestInProgressHelper.timeRemaining(data)
 
-        if ($scope.state is 'running' and !$scope.experimentId and data.experiment_controller?.expriment?.id)
-          $scope.experimentId = data.experiment_controller.expriment.id
+        if ($scope.state isnt 'idle' and !experiment_id and data.experiment_controller?.expriment?.id)
+          experiment_id = data.experiment_controller.expriment.id
           getExperiment (exp) ->
             $scope.experiment = exp
 
@@ -60,14 +67,14 @@ window.App.directive 'statusBar', [
         Experiment.getExperimentDuration($scope.experiment)
 
       $scope.startExperiment = ->
-        Experiment.startExperiment($scope.experimentId).then ->
+        Experiment.startExperiment(experiment_id).then ->
           $scope.experiment.started_at = true
           getExperiment (exp) ->
             $scope.experiment = exp
-            $rootScope.$broadcast 'experiment:started', $scope.experimentId
+            $rootScope.$broadcast 'experiment:started', experiment_id
             if $state.is('edit-protocol')
               max_cycle = AmplificationChartHelper.getMaxExperimentCycle($scope.experiment)
-              $state.go('run-experiment', {'id': $scope.experimentId, 'chart': 'amplification', 'max_cycle': max_cycle})
+              $state.go('run-experiment', {'id': experiment_id, 'chart': 'amplification', 'max_cycle': max_cycle})
 
       $scope.stopExperiment = ->
         Experiment.stopExperiment($scope.experiment.id)
