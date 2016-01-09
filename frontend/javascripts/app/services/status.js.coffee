@@ -10,10 +10,10 @@ window.ChaiBioTech.ngApp
 
     data = null
     isUp = true
-    @interval = null
+    fetchInterval = null
     @listenersCount = 0
-    @fetching = false
-    @timeoutPromise = null
+    fetching = false
+    timeoutPromise = null
 
     @getData = -> data
 
@@ -21,11 +21,11 @@ window.ChaiBioTech.ngApp
 
     @fetch = ->
       deferred = $q.defer()
-      if !@fetching
-        @fetching = true
-        @timeoutPromise = $timeout =>
-          @fetching = false
-          @timeoutPromise = null
+      if !fetching
+        fetching = true
+        timeoutPromise = $timeout =>
+          fetching = false
+          timeoutPromise = null
         , 10000
         $http.get("#{host}\:8000/status")
         .success (resp) =>
@@ -34,13 +34,14 @@ window.ChaiBioTech.ngApp
           deferred.resolve data
 
         .error (resp) ->
+          console.log resp
           deferred.reject(resp)
           isUp = false
 
         .finally =>
-          $timeout.cancel @timeoutPromise
-          @timeoutPromise = null
-          @fetching = false
+          $timeout.cancel timeoutPromise
+          timeoutPromise = null
+          fetching = false
 
       else
         deferred.resolve data
@@ -48,18 +49,9 @@ window.ChaiBioTech.ngApp
       deferred.promise
 
     @startSync = ->
-      if !@fetching then @fetch()
-      if !@interval
-        @interval = $interval @fetch, 1000
-
-    @stopSync = ->
-      # @listenersCount -= 1
-
-      # if @listenersCount is 0
-      #   $interval.cancel @interval
-      #   @interval = null
-
-    @startSync()
+      if !fetching then @fetch()
+      if !fetchInterval
+        fetchInterval = $interval @fetch, 1000
 
     return
 

@@ -38,6 +38,7 @@
         border-width: 5px;
         padding-top: 9px;
         opacity: 1;
+        color: #000;
       }
 
       .ct {
@@ -45,25 +46,6 @@
         display: inline-block;
         position: relative;
         margin-top: 8px; // <-- should be removed if show 2 cts
-
-        .dot {
-          border-radius: 10px;
-          width: 5px;
-          height: 5px;
-          display: inline-block;
-          vertical-align: middle;
-        }
-
-        &.ct-1 {
-          .dot {
-            background: #dedede;
-          }
-        }
-        // &.ct-2 {
-        //   .dot {
-        //     background: $gray;
-        //   }
-        // }
 
         .text {
           display: inline-block;

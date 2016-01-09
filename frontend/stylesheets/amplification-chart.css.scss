@@ -220,37 +220,47 @@
           border-right: 1px solid lighten($gray, 15%);
         }
       }
-      td {
-        border-left: 1px solid lighten($lightgray, 15%);
-        border-bottom: 1px solid lighten($lightgray, 15%);
-        color: $lightgray;
-        font-family: 'dinot';
-        font-size: 15px;
-        padding: 10px 15px;
+      
+      tr {
+        td {
+          border-left: 1px solid lighten($lightgray, 15%);
+          border-bottom: 1px solid lighten($lightgray, 15%);
+          color: $lightgray;
+          font-family: 'dinot';
+          font-size: 15px;
+          padding: 10px 15px;
 
-        &:first-of-type {
-          color: $gray;
-          font-weight: bold;
+          &:first-of-type {
+            color: $gray;
+            font-weight: bold;
+          }
+
+          &:last-of-type {
+            border-right: 1px solid lighten($lightgray, 15%);
+          }
+
+          .dot {
+            border-radius: 100px;
+            display: inline-block;
+            height: 10px;
+            margin-right: 10px;
+            vertical-align: middle;
+            width: 10px;
+          }
+
+          .text {
+            display: inline-block;
+            vertical-align: middle;
+          }
         }
 
-        &:last-of-type {
-          border-right: 1px solid lighten($lightgray, 15%);
-        }
-
-        .dot {
-          border-radius: 100px;
-          display: inline-block;
-          height: 10px;
-          margin-right: 10px;
-          vertical-align: middle;
-          width: 10px;
-        }
-
-        .text {
-          display: inline-block;
-          vertical-align: middle;
+        &.selected {
+          td {
+            color: #000;
+          }
         }
       }
+
     }
   }
 
