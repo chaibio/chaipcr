@@ -8,9 +8,9 @@
       this.getInfo = function(no) {
         var deferred = $q.defer();
         $http.get('/device/status').then(function(data) {
-          /*data.data.optics.lidOpen = "true";
+          /*data.data.optics.lid_open = "true";
           if(no > 15 && no < 30) {
-            data.data.optics.lidOpen = "false";
+            data.data.optics.lid_open = "false";
           }*/
           deferred.resolve(data);
         }, function(err) {
