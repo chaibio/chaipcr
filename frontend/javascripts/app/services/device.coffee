@@ -1,12 +1,3 @@
-    # from cloud info to
-    # new_update =
-    #   is_offline: true
-    #   image_url: cloudInfo.image_url
-    #   brief_description: cloudInfo.brief_description
-    #   full_description: cloudInfo.full_description
-    #   release_date: cloudInfo.release_date
-    #   version: cloudInfo.software_version
-
 
 window.App.service 'Device', [
   '$http'
@@ -14,7 +5,8 @@ window.App.service 'Device', [
   'host'
   'Upload'
   'Status'
-  ($http, $q, host, Upload, Status) ->
+  '$uibModal'
+  ($http, $q, host, Upload, Status, $uibModal) ->
 
     class Device
 
@@ -82,6 +74,14 @@ window.App.service 'Device', [
             deferred.reject resp
 
         return deferred.promise
+
+      openUpdateModal: ->
+        $uibModal.open
+          templateUrl: 'app/views/settings/modal-software-update.html'
+          controller: 'SoftwareUpdateCtrl'
+          openedClass: 'modal-software-update-open'
+          keyboard: false
+          backdrop: 'static'
 
       updateSoftware: ->
         return $http.post("#{host}\:8000/device/update_software")

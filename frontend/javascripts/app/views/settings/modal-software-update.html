@@ -1,9 +1,14 @@
 <div class="modal-software-update">
 
   <!-- loading -->
-  <h1 ng-show="loading">
-    Loaing update information <ellipsis-animated></ellipsis-animated>
-  </h1>
+  <div ng-show="loading" style="padding-bottom: 20px;">
+    <div class="text-right">
+      <a class="close" ng-click="$dismiss()">&times;</a>
+    </div>
+    <h1>
+      Loaing update information <ellipsis-animated></ellipsis-animated>
+    </h1>
+  </div>
 
   <!-- new software update is available -->
   <div ng-show="content === 'update_available' && !loading">
