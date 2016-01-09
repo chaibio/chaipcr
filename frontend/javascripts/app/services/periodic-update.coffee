@@ -30,15 +30,15 @@ window.App.service 'PeriodicUpdate', [
       periodicUpdateCheck: ->
         periodic_update_interval = $interval @periodicUpdateCheck, UPDATE_INTERVAL_DURATION if periodic_update_interval is null
         console.log "software_update_modal_instance: #{software_update_modal_instance}"
+        console.log "is open modal: #{if software_update_modal_instance then true else false}"
         return if software_update_modal_instance isnt null
 
         console.log 'periodicUpdateCheck...'
         Device.checkForUpdate().then (is_available) ->
           $.jStorage.set 'periodic_update_last_checked', moment().format()
-          if is_available is 'available'
+          if is_available is 'available' and !software_update_modal_instance
             console.log 'opening update modal..'
             software_update_modal_instance = Device.openUpdateModal()
-            console.log software_update_modal_instance
             software_update_modal_instance.result.finally ->
               console.log 'update modal closed...'
               software_update_modal_instance = null
