@@ -89,7 +89,7 @@ diff -ur ./rc.local ../updated/rc.local
 +                then
 +                        echo "Network watchdog: No network found!"
 +	                sleep 5
-+                        dhclient eth0 || :
++                        dhclient eth0 -1 || :
 +                else
 +                        echo "Network watchdog.. Network found: $ip_address"
 +			sleep 10
