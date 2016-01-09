@@ -11,6 +11,9 @@ window.App.service 'Device', [
     class Device
 
       version_info = null
+      is_offline = false
+
+      isOffline: -> is_offline
 
       checkForUpdate: ->
 
@@ -20,6 +23,7 @@ window.App.service 'Device', [
             cloudInfo = resp.data
             deviceCheckPromise = @getVersion()
             deviceCheckPromise.then (device) ->
+              is_offline = true
               if cloudInfo.software_version isnt device.software.version
                 deferred.resolve 'available'
               else
@@ -36,10 +40,13 @@ window.App.service 'Device', [
         localCheckPromise.then ->
           status = (Status.getData()?.device?.update_available) || 'unknown'
           if status is 'unknown'
+            is_offline = true
             checkCloudUpdate deferred
           else
+            is_offline = false
             deferred.resolve status
         localCheckPromise.catch =>
+          is_offline = true
           checkCloudUpdate deferred
 
         deferred.promise
@@ -53,11 +60,15 @@ window.App.service 'Device', [
             deferred.reject err
 
         deferred = $q.defer()
-        infoPromise = $http.get('/device/software_update')
-        infoPromise.then (resp) ->
-          deferred.resolve resp.data.upgrade
-        infoPromise.catch (err) ->
+
+        if @isOffline()
           checkCloudInfo deferred
+        else
+          infoPromise = $http.get('/device/software_update')
+          infoPromise.then (resp) =>
+            deferred.resolve resp.data.upgrade
+          infoPromise.catch (err) ->
+            checkCloudInfo deferred
 
         deferred.promise
 
