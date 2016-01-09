@@ -2,7 +2,7 @@ window.App.service 'PeriodicUpdate', [
   '$interval'
   '$timeout'
   'Device'
-  ($interval, '$timeout', Device) ->
+  ($interval, $timeout, Device) ->
     class PeriodicUpdate
 
 
