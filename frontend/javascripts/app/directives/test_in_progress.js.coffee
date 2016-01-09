@@ -14,9 +14,6 @@ window.ChaiBioTech.ngApp
     templateUrl: 'app/views/directives/test-in-progress.html'
     link: ($scope, elem) ->
 
-      Status.startSync()
-      elem.on '$destroy', ->
-        Status.stopSync()
       $scope.completionStatus = null
       $scope.is_holding = false
 

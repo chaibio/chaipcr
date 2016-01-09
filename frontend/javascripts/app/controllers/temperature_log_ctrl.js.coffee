@@ -25,9 +25,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
     $scope.$on 'expName:Updated', ->
       $scope.experiment?.name = expName.name
 
-    Status.startSync()
     $scope.$on '$destroy', ->
-      Status.stopSync()
       $scope.stopInterval()
 
     getExperiment = ->

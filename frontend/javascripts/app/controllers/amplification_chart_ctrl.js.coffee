@@ -30,11 +30,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.chartConfig.axes.x.ticks = helper.Xticks 1, maxCycle
       $scope.chartConfig.axes.x.max = maxCycle
       $scope.experiment = data.experiment
-      return
-
-    Status.startSync()
-    $scope.$on '$destroy', ->
-      Status.stopSync()
 
     $scope.$watch ->
       Status.getData()

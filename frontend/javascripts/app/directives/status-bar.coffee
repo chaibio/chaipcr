@@ -13,9 +13,7 @@ window.App.directive 'statusBar', [
       experimentId: '=?'
     templateUrl: 'app/views/directives/status-bar.html'
     link: ($scope, elem, attrs) ->
-      #console.log $scope, "awesome"
 
-      # $scope.$on 'dataLoaded', ->
       $scope.$watch 'experimentId', (newVal, oldVal) ->
         $scope.experimentId = newVal
 
@@ -32,10 +30,6 @@ window.App.directive 'statusBar', [
           $scope.experiment = exp
 
       $scope.is_holding = false
-
-      Status.startSync()
-      elem.on '$destroy', ->
-        Status.stopSync()
 
       $scope.$watch ->
         Status.getData()

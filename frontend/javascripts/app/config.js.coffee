@@ -3,9 +3,12 @@ window.ChaiBioTech.ngApp
   '$rootScope'
   '$state'
   '$window'
-  ($rootScope, $state, $window) ->
+  'Status'
+  ($rootScope, $state, $window, Status) ->
 
     $rootScope.title = "ChaiBioTech"
+
+    Status.startSync()
 
     $rootScope.$on '$stateChangeSuccess', (e, toState, params, fromState) ->
       if fromState.name isnt toState.name

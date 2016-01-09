@@ -31,9 +31,6 @@ window.ChaiBioTech.ngApp
           getExperiment $scope.init
 
       $scope.init = ->
-        Status.startSync()
-        elem.on '$destroy', ->
-          Status.stopSync()
 
         $scope.$watch ->
           Status.getData()
