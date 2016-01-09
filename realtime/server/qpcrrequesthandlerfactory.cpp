@@ -35,12 +35,7 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
 
         if (!requestPath.empty())
         {
-            string method = request.getMethod();
-
-            if (method == "OPTIONS" && request.has("Access-Control-Request-Method"))
-                method = request.get("Access-Control-Request-Method");
-
-            if (method == "GET")
+            if (request.getMethod() == "GET")
             {
                 if (requestPath.size() >= 2 && requestPath.at(0) == "network")
                 {
@@ -50,27 +45,29 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
                         return new NetworkManagerHandler(requestPath.at(1), NetworkManagerHandler::WifiScan);
                 }
             }
-            else if (method == "PUT")
+            else if (request.getMethod() == "PUT")
             {
                 if (requestPath.size() == 2 && requestPath.at(0) == "network")
                     return new NetworkManagerHandler(requestPath.at(1), NetworkManagerHandler::SetSettings);
             }
-            else if (method == "POST" && requestPath.size() == 3)
+            else if (request.getMethod() == "POST" && requestPath.size() == 3)
             {
                 if (requestPath.at(2) == "connect")
                     return new NetworkManagerHandler(requestPath.at(1), NetworkManagerHandler::WifiConnect);
                 else if (requestPath.at(2) == "disconnect")
                     return new NetworkManagerHandler(requestPath.at(1), NetworkManagerHandler::WifiDisconnect);
             }
+            else if (request.getMethod() == "OPTIONS")
+                return new HTTPCodeHandler(HTTPResponse::HTTP_OK);
 
             if (checkUserAuthorization(request))
             {
-                if (method == "GET")
+                if (request.getMethod() == "GET")
                 {
                     if (requestPath.at(0) == "status")
                         return new StatusHandler();
                 }
-                else if (method == "PUT")
+                else if (request.getMethod() == "PUT")
                 {
                     if (requestPath.at(0) == "test_control")
                         return new TestControlHandler();
@@ -79,7 +76,7 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
                     else if (requestPath.at(0) == "log_data")
                         return new LogDataHandler();
                 }
-                else if (method == "POST")
+                else if (request.getMethod() == "POST")
                 {
                     if (requestPath.size() == 2)
                     {
