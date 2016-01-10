@@ -56,7 +56,7 @@ rebootx () {
         then
 		mount ${sdcard_dev}p1 ${sdcard_p1} -t vfat || true
 	fi
-	if [ ! -e ${sdcard_p1}/rebootx.sh ]
+	if [ -e ${sdcard_p1}/rebootx.sh ]
 	then
 		sh ${sdcard_p1}/rebootx.sh 120
 		umount ${sdcard_p1}
@@ -288,8 +288,8 @@ sync
 
 sleep 5
 
-umount ${sdcard_p1} > /dev/null || true 
-umount ${sdcard_p2} > /dev/null || true 
+umount ${sdcard_p1} > /dev/null || true
+umount ${sdcard_p2} > /dev/null || true
 
 alldone
 
