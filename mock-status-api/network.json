@@ -1,7 +1,5 @@
 {
-    "interface": "eth0",
-    "settings":
-    {
-        "type": "dhcp"
-    }
+  "state": {
+    "address": "192.168.10.180"
+  }
 }

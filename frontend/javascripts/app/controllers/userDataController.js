@@ -114,7 +114,9 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
       form.emailField.$setValidity('emailAlreadtTaken', true);
     };
 
-    $scope.deleteMessage = function() {
+    $scope.deleteMessage = function(e) {
+
+      e.preventDefault(); // To prevent form being submitted.
       $scope.uiModal = $uibModal.open({
         templateUrl: 'app/views/settings/delete-user.html',
         scope: $scope,
