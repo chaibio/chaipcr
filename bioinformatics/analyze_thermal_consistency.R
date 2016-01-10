@@ -29,7 +29,7 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
                         show_running_time, 
                         ...)
     
-    names(mc_w72c) <- c('mc_out', '72c_fluorescence')
+    names(mc_w72c) <- c('mc_tm', '72c_fluorescence')
     
     if (out_json) mc_w72c <- toJSON(mc_w72c)
     
