@@ -66,11 +66,11 @@ Qpcrctl::Application.routes.draw do
   post '/login', :to => 'sessions#create'
   post '/logout', :to => 'sessions#destroy'
 
-  match 'device/mac_address', to: 'devices#mac_address', via: [:options]
-  match 'device', to: 'devices#show', via: [:options]
+  match '/device', to: 'devices#empty', via: [:options]
+  match '/device/*path', to: 'devices#empty', via: [:options]
   get 'capabilities', to: "devices#capabilities"
   resource :device, only: [:show, :update] do
-    get 'mac_address'
+    get 'serial_start'
     get 'software_update'
     get 'status'
     put 'root_password'

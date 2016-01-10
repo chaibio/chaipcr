@@ -5,7 +5,7 @@ class DevicesController < ApplicationController
   
   skip_before_action :verify_authenticity_token, :except=>[:root_password]
   before_filter :allow_cors, :except=>[:root_password]
-  before_filter :ensure_authenticated_user, :except=>[:update, :mac_address, :software_update]
+  before_filter :ensure_authenticated_user, :except=>[:serial_start, :update, :software_update, :empty]
   
   respond_to :json
   
@@ -18,17 +18,8 @@ class DevicesController < ApplicationController
   DEVICE_FILE_PATH  = "/perm/device.json"
   CONFIGURATION_FILE_PATH = "/root/configuration.json"
   
-  def update
-    if !File.exists?(DEVICE_FILE_PATH)
-      File.open(DEVICE_FILE_PATH, 'w+') { |file| file.write(params[:data]) }
-      User.delete_all
-      Experiment.joins(:experiment_definition).where("experiment_type != ? and experiments.id != 1", ExperimentDefinition::TYPE_DIAGNOSTIC).each do |e|
-        e.destroy
-      end
-      render json: {response: "Device is programmed successfully"}, status: :ok
-    else
-      render json: {errors: "Device is already serialized"}, status: 405
-    end 
+  def empty
+     render :nothing => true
   end
   
   api :GET, "/device", "return device specific information"
@@ -37,7 +28,7 @@ class DevicesController < ApplicationController
     ==response json format
     ===serial_number
     serial number of the device
-    ===model_numberloclalo
+    ===model_number
     hardware model number of the device 
     ===processor_architecture
     device processor architecture
@@ -90,17 +81,36 @@ class DevicesController < ApplicationController
     render json: {response: "Root password is set properly"}, status: :ok
   end
    
-  def mac_address
+  def serial_start
     if !File.exists?(DEVICE_FILE_PATH)
       mac = retrieve_mac
-      if !mac.blank?
-        render json: {mac: mac}
-      else
+      configuration_file = File.read(CONFIGURATION_FILE_PATH)
+      if !mac.blank? && configuration_file
+        configuration_hash = JSON.parse(configuration_file)
+        render json: {mac: mac, software_version:configuration_hash["software"]["version"]}
+      elsif mac.blank?
         render json: {errors: "Device mac address not found"}, status: 500
+      else
+        render json: {errors: "Device configuration file is not found"}, status: 500
       end
     else
-      render json: {errors: "Device is already serialized"}, status: 401
+      device_file = File.read(DEVICE_FILE_PATH)
+      device_hash = JSON.parse(device_file)
+      render json: {errors: "Device is already serialized (serial number = #{device_hash["serial_number"]})"}, status: 405
     end
+  end
+  
+  def update
+    if !File.exists?(DEVICE_FILE_PATH)
+      File.open(DEVICE_FILE_PATH, 'w+') { |file| file.write(JSON.pretty_generate(params.except(:controller, :action))) }
+      User.delete_all
+      Experiment.joins(:experiment_definition).where("experiment_type != ? and experiments.id != 1", ExperimentDefinition::TYPE_DIAGNOSTIC).select('experiments.*').each do |e|
+        e.destroy
+      end
+      render json: {response: "Device is programmed successfully"}, status: :ok
+    else
+      render json: {errors: "Device is already serialized"}, status: 405
+    end 
   end
   
   api :GET, "/device/software_update", "query the software update meta data"
@@ -172,17 +182,20 @@ class DevicesController < ApplicationController
     #run ngrok
     system("/root/ngrok tcp -log=stdout 22 > /dev/null &")
     
-    sleep(1.0)
-    
-    #get tunnel_url
-    begin
-      response = Net::HTTP.get_response(URI.parse("http://localhost:4040/api/tunnels"))
-    rescue  => e
+    response = nil
+    sleep_until(10) {
+      begin
+        response = Net::HTTP.get_response(URI.parse("http://localhost:4040/api/tunnels"))
+        return true
+      rescue  => e
+        return false
+      end
+    }
+  
+    if response == nil
       render json: {errors: "ngrok is not running: #{e}"}, status: 500
       return
-    end
-    
-    if response.code.to_i != 200 
+    elsif response.code.to_i != 200 
       render json: {errors: "ngrok api/tunnels returns error ()#{response.code}): #{response.body}"}, status: 500
       return
     end
@@ -228,7 +241,13 @@ class DevicesController < ApplicationController
     headers["Access-Control-Allow-Methods"] = "GET,PUT,POST,OPTIONS"
     headers["Access-Control-Allow-Headers"] = "*"
     headers["Access-Control-Max-Age"] = "1728000"
-    head(:ok) if request.request_method == "OPTIONS"
+  end
+  
+  def sleep_until(time)
+    time.times do
+      break if block_given? && yield
+      sleep(1)
+    end
   end
   
 end
