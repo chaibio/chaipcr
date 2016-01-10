@@ -34,9 +34,8 @@ window.ChaiBioTech.ngApp
           deferred.resolve data
 
         .error (resp) ->
-          console.log resp
           deferred.reject(resp)
-          isUp = false
+          isUp = if resp is null then false else true
 
         .finally =>
           $timeout.cancel timeoutPromise

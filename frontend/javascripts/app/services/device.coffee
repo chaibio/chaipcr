@@ -1,12 +1,3 @@
-    # from cloud info to
-    # new_update =
-    #   is_offline: true
-    #   image_url: cloudInfo.image_url
-    #   brief_description: cloudInfo.brief_description
-    #   full_description: cloudInfo.full_description
-    #   release_date: cloudInfo.release_date
-    #   version: cloudInfo.software_version
-
 
 window.App.service 'Device', [
   '$http'
@@ -14,11 +5,15 @@ window.App.service 'Device', [
   'host'
   'Upload'
   'Status'
-  ($http, $q, host, Upload, Status) ->
+  '$uibModal'
+  ($http, $q, host, Upload, Status, $uibModal) ->
 
     class Device
 
       version_info = null
+      is_offline = false
+
+      isOffline: -> is_offline
 
       checkForUpdate: ->
 
@@ -28,6 +23,7 @@ window.App.service 'Device', [
             cloudInfo = resp.data
             deviceCheckPromise = @getVersion()
             deviceCheckPromise.then (device) ->
+              is_offline = true
               if cloudInfo.software_version isnt device.software.version
                 deferred.resolve 'available'
               else
@@ -44,10 +40,13 @@ window.App.service 'Device', [
         localCheckPromise.then ->
           status = (Status.getData()?.device?.update_available) || 'unknown'
           if status is 'unknown'
+            is_offline = true
             checkCloudUpdate deferred
           else
+            is_offline = false
             deferred.resolve status
         localCheckPromise.catch =>
+          is_offline = true
           checkCloudUpdate deferred
 
         deferred.promise
@@ -61,11 +60,15 @@ window.App.service 'Device', [
             deferred.reject err
 
         deferred = $q.defer()
-        infoPromise = $http.get('/device/software_update')
-        infoPromise.then (resp) ->
-          deferred.resolve resp.data.upgrade
-        infoPromise.catch (err) ->
+
+        if @isOffline()
           checkCloudInfo deferred
+        else
+          infoPromise = $http.get('/device/software_update')
+          infoPromise.then (resp) =>
+            deferred.resolve resp.data.upgrade
+          infoPromise.catch (err) ->
+            checkCloudInfo deferred
 
         deferred.promise
 
@@ -82,6 +85,14 @@ window.App.service 'Device', [
             deferred.reject resp
 
         return deferred.promise
+
+      openUpdateModal: ->
+        $uibModal.open
+          templateUrl: 'app/views/settings/modal-software-update.html'
+          controller: 'SoftwareUpdateCtrl'
+          openedClass: 'modal-software-update-open'
+          keyboard: false
+          backdrop: 'static'
 
       updateSoftware: ->
         return $http.post("#{host}\:8000/device/update_software")

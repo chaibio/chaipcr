@@ -2,8 +2,7 @@ window.App.directive 'versionInfo', [
   'Device'
   'Status'
   '$rootScope'
-  '$uibModal'
-  (Device, Status, $rootScope, $uibModal) ->
+  (Device, Status, $rootScope) ->
     restrict: 'EA'
     replace: true
     scope:
@@ -27,12 +26,7 @@ window.App.directive 'versionInfo', [
         Device.updateSoftware()
 
       $scope.openUpdateModal = ->
-        $uibModal.open
-          templateUrl: 'app/views/settings/modal-software-update.html'
-          controller: 'SoftwareUpdateCtrl'
-          openedClass: 'modal-software-update-open'
-          keyboard: false
-          backdrop: 'static'
+        Device.openUpdateModal()
 
       $scope.checkForUpdates = ->
         $scope.checking_update = true

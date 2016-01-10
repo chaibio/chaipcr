@@ -4,11 +4,13 @@ window.ChaiBioTech.ngApp
   '$state'
   '$window'
   'Status'
-  ($rootScope, $state, $window, Status) ->
+  'PeriodicUpdate'
+  ($rootScope, $state, $window, Status, PeriodicUpdate) ->
 
     $rootScope.title = "ChaiBioTech"
 
     Status.startSync()
+    PeriodicUpdate.init()
 
     $rootScope.$on '$stateChangeSuccess', (e, toState, params, fromState) ->
       if fromState.name isnt toState.name
@@ -20,6 +22,7 @@ window.ChaiBioTech.ngApp
       $window.document.cookie = 'authentication_token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
       $.jStorage.deleteKey 'authToken'
       $window.location.assign '/'
+
 
 ]
 
