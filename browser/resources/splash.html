@@ -21,15 +21,19 @@ $(document).ready(function(){
 	var interval = setInterval(function () {
 		console.log("Checking ... !");
 		checkConnection();
-	}, 30000);
+	}, 10000);
 
 	var checkConnection = function() {
 		$.get("http://localhost:8000/network/eth0")
 			.done(function(data) {
-				$("#ip").text("IP: " + data.state.address);
+				if(data.state) {
+					$("#ip").text("IP: " + data.state.address);
+				} else {
+					$("#ip").text("No ethernet connection.")
+				}
 			})
 			.fail(function() {
-				$("#ip").text("No ethernet connection.")
+				$("#ip").text("No ethernet connection.");
 			});
 	}
 

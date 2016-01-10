@@ -1,0 +1,7 @@
+{
+    "interface": "eth0",
+    "settings":
+    {
+        "type": "dhcp"
+    }
+}
