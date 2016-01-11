@@ -186,9 +186,9 @@ class DevicesController < ApplicationController
     sleep_until(10) {
       begin
         response = Net::HTTP.get_response(URI.parse("http://localhost:4040/api/tunnels"))
-        return true
+        true
       rescue  => e
-        return false
+        false
       end
     }
   
