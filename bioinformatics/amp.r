@@ -110,7 +110,7 @@ get_ct_eff <- function(mod_ori, type, cp, num_cycles) {
         
         if (  is.null(stopCode) || is.null(b) 
             || stopCode != 1 || b > 0
-            || (!is.na(ct) & ct == num_cycles)) {
+            || (!is.na(ct) && ct == num_cycles)) {
           ct_eff['ct', i] <- NA }
         }
     
