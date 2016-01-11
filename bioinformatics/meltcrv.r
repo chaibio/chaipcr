@@ -39,6 +39,7 @@ get_mc_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connec
     func_name <- 'get_mc_calib'
     start_time <- proc.time()[['elapsed']]
     
+    message('get_mc_calib')
     message('db: ', db_name)
     db_conn <- dbConnect(RMySQL::MySQL(), 
                          user=db_usr, 

@@ -40,6 +40,7 @@ get_amp_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for conne
     func_name <- 'get_amp_calib'
     start_time <- proc.time()[['elapsed']]
     
+    message('get_amp_calib') # Xia Hong
     message('db: ', db_name)
     db_conn <- dbConnect(RMySQL::MySQL(), 
                          user=db_usr, 
