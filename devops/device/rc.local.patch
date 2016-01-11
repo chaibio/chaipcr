@@ -87,11 +87,11 @@ diff -ur ./rc.local ../updated/rc.local
 +                ip_address=$(ifconfig eth0 | grep 'inet addr:') || :
 +                if [ -z "$ip_address" ]
 +                then
-+                        echo "Network watchdog: No network found!"
++#                        echo "Network watchdog: No network found!"
 +	                sleep 5
 +                        dhclient eth0 -1 || :
 +                else
-+                        echo "Network watchdog.. Network found: $ip_address"
++#                        echo "Network watchdog.. Network found: $ip_address"
 +			sleep 10
 +                fi
 +        done

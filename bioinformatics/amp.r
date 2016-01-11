@@ -40,6 +40,7 @@ get_amp_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for conne
     func_name <- 'get_amp_calib'
     start_time <- proc.time()[['elapsed']]
     
+    message('get_amp_calib') # Xia Hong
     message('db: ', db_name)
     db_conn <- dbConnect(RMySQL::MySQL(), 
                          user=db_usr, 
@@ -90,6 +91,34 @@ modlist_coef <- function(modLIST, coef_cols) {
     coef_mtx <- do.call(cbind, coef_list) # coefficients of sigmoid-fitted models
     colnames(coef_mtx) <- coef_cols
     return(coef_mtx)
+    }
+
+
+# function: get Ct and amplification efficiency values
+get_ct_eff <- function(mod_ori, type, cp, num_cycles) {
+    
+    ct_eff_raw <- getPar(mod_ori, type=type, cp=cp)
+    
+    ct_eff <- ct_eff_raw
+    
+    for (i in 1:num_wells) {
+        
+        mod <- mod_ori[[i]]
+        stopCode <- mod$convInfo$stopCode
+        b <- coef(mod)[['b']]
+        
+        ct <- ct_eff['ct', i]
+        
+        if (  is.null(stopCode) || is.null(b) 
+            || stopCode != 1 || b > 0
+            || (!is.na(ct) && ct == num_cycles)) {
+          ct_eff['ct', i] <- NA }
+        }
+    
+    rownames(ct_eff) <- rownames(ct_eff_raw)
+    colnames(ct_eff) <- colnames(ct_eff_raw)
+    
+    return(ct_eff)
     }
 
 
@@ -152,14 +181,7 @@ baseline_ct <- function(amp_calib,
     # bl_corrected <- NULL
     
     # threshold cycle and amplification efficiency
-    ct_eff_raw <- getPar(mod_ori, type=type, cp=cp)
-    ct_eff <- do.call(cbind, alply(ct_eff_raw, .margins=2, 
-                                   .fun=function(col1) {
-                                       ct <- col1['ct']
-                                       ct_adj <- if (!is.na(ct) & ct == nrow(amp_calib)) NA else ct
-                                       c(ct_adj, col1['eff']) }))
-    rownames(ct_eff) <- rownames(ct_eff_raw)
-    colnames(ct_eff) <- colnames(ct_eff_raw)
+    ct_eff <- get_ct_eff(mod_ori, type=type, cp=cp, num_cycles=nrow(amp_calib))
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]

@@ -51,6 +51,22 @@ sdcard_p2="/sdcard/p2"
 mount ${sdcard_dev}p1 ${sdcard_p1} -t vfat || true
 mount ${sdcard_dev}p2 ${sdcard_p2} -t ext4 || true
 
+rebootx () {
+        if [ ! -e ${sdcard_p1}/rebootx.sh ]
+        then
+		mount ${sdcard_dev}p1 ${sdcard_p1} -t vfat || true
+	fi
+	if [ -e ${sdcard_p1}/rebootx.sh ]
+	then
+		sh ${sdcard_p1}/rebootx.sh 120
+		umount ${sdcard_p1}
+		exit 0
+	fi
+
+	echo "rebootx is not accessible"
+	reboot
+}
+
 flush_cache () {
 	sync
 }
@@ -73,7 +89,7 @@ alldone () {
 	echo "Rebooting..."
 	sync
 
-	reboot
+	rebootx
 }
 
 flush_cache () {
@@ -93,7 +109,7 @@ write_pt_image () {
 
 #	if [ "$1" = "factorysettings" ]
 #	then
-		image_filename_upgrade="${sdcard_p1}/factory_settings.img.gz"
+	image_filename_upgrade="${sdcard_p1}/factory_settings.img.gz"
 #	fi
 
 	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
@@ -199,7 +215,7 @@ then
                 stop_packing_restarting
                 echo Rebooting
 #                exit 0
-                reboot
+                rebootx
         fi
 
         echo "Resuming eMMC unpacking"
@@ -208,8 +224,8 @@ then
         if [ $result -eq 1 ]
         then
                 echo Error unpacking eMMC, restarting...
-#                exit 0
-                reboot
+#               exit 0
+                rebootx
         fi
 
         update_uenv
@@ -230,7 +246,7 @@ then
 		echo "Cannot update partition table at  $eMMC! restarting!"
 		echo Write Perm Partition > ${sdcard_p1}/write_perm_partition.flag
 		sync
-		reboot
+		rebootx
 		exit
 	fi
 else
@@ -272,9 +288,9 @@ sync
 
 sleep 5
 
-umount ${sdcard_p1} > /dev/null || true 
-umount ${sdcard_p2} > /dev/null || true 
+umount ${sdcard_p1} > /dev/null || true
+umount ${sdcard_p2} > /dev/null || true
 
 alldone
 
-reboot
+rebootx

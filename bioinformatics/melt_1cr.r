@@ -23,6 +23,7 @@ melt_1cr <- function(floor_temp,
     
     # get melting curve data for all the temperatures as well as Tm
     mc_out <- mc_tm_all(mc_calib, mc_plot, show_running_time, ...)
+    mc_tm <- lapply(mc_out, function(element) element$tm)
     
     # For each well, average the calibrated fluorescence values for the temperatures 72-73C
     mc_cols <- colnames(mc_calib)
@@ -40,7 +41,7 @@ melt_1cr <- function(floor_temp,
                        function(i) mean(mc_calib[tempsl_1cr[[i]], fluo_cols[i]]))
     names(fluo_1cr) <- fluo_cols
     
-    mc_w1cr <- list('mc_out'=mc_out, '1cr_fluorescence'=fluo_1cr)
+    mc_w1cr <- list('mc_tm'=mc_tm, '1cr_fluorescence'=fluo_1cr)
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]

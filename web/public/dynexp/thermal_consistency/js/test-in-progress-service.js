@@ -24,8 +24,10 @@ window.App.service('TestInProgressService', [
     this.getTmValues = function (analyze_data) {
       var tms = [];
       for (var i=0; i< 16; i++) {
-        if(analyze_data.mc_out['fluo_'+i].tm.length > 0) {
-          tms.push(analyze_data.mc_out['fluo_'+i].tm[0].Tm);
+        if(analyze_data.mc_tm['fluo_'+i].length > 0) {
+          tms.push(analyze_data.mc_tm['fluo_'+i][0].Tm);
+        } else {
+        	tms.push(null);
         }
       }
       return tms;

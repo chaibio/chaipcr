@@ -188,7 +188,7 @@ fi
 
 if [ $stage -lt 2 ]
 then
-	reset_stage_counter 
+	reset_stage_counter
 	incriment_stage_counter
 fi
 
@@ -203,8 +203,8 @@ fi
 set_sdcard_uEnv () {
 	echo copying coupling uEng.txt
 	mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
-	cp /sdcard_p1/uEnv.txt /tmp/emmcboot/
-	sh /sdcard_p1/replace_uEnv.txt.sh /tmp/emmcboot || true
+	cp ${sdcard_p1}/uEnv.txt /tmp/emmcboot/
+	sh ${sdcard_p1}/replace_uEnv.txt.sh /tmp/emmcboot || true
 	uEnvPath=/tmp/emmcboot
 
 	cp ${uEnvPath}/uEnv.txt ${uEnvPath}/uEnv.org.txt
@@ -218,8 +218,8 @@ set_sdcard_uEnv () {
 update_uenv () {
 	echo copying coupling uEng.txt
 	mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
-	cp /sdcard_p1/uEnv.txt /tmp/emmcboot/
-	sh /sdcard_p1/replace_uEnv.txt.sh /tmp/emmcboot || true
+	cp ${sdcard_p1}/uEnv.txt /tmp/emmcboot/
+	sh ${sdcard_p1}/replace_uEnv.txt.sh /tmp/emmcboot || true
 	sync
 	sleep 5
 	umount /tmp/emmcboot || true
@@ -229,7 +229,12 @@ update_uenv () {
 #then
 	# needs to add a uEnv to swtich things to sdcard
 	echo "Freeup boot partition during the backup process"
-	mkfs.vfat ${eMMC}p1 -n boot
+	#mkfs.vfat ${eMMC}p1 -n boot
+	mount ${eMMC}p1 /tmp/emmcboot
+	rm -r /tmp/emmcboot/*
+	sync
+	sleep 3
+	umount /tmp/emmcboot
 	incriment_stage_counter
 #fi
 
@@ -240,7 +245,7 @@ then
 fi
 
 write_rootfs_image
-incriment_stage_counter	
+incriment_stage_counter
 
 write_boot_image
 incriment_stage_counter
@@ -273,18 +278,5 @@ upgrade_autorun_flag_down () {
 		rm ${sdcard_p1}/upgrade_autorun.flag || true
 	fi
 }
-
-exit 0
-
-if [ $# -eq 0 ]
-then
-	upgrade_autorun_flag_down
-	reboot
-fi
-
-if [ "$1" != "factorysettings" ]
-then
-	upgrade_autorun_flag_down
-fi
 
 exit 0
