@@ -183,10 +183,21 @@ class DevicesController < ApplicationController
     system("/root/ngrok tcp -log=stdout 22 > /dev/null &")
     
     response = nil
+    tunnel_url = nil
     sleep_until(10) {
       begin
         response = Net::HTTP.get_response(URI.parse("http://localhost:4040/api/tunnels"))
-        true
+        if response.code.to_i == 200
+          json_response = JSON.parse(response.body)
+          if json_response["tunnels"].blank? || json_response["tunnels"][0].blank? || json_response["tunnels"][0]["public_url"].blank?
+            false
+          else
+            tunnel_url = json_response["tunnels"][0]["public_url"]
+            true
+          end
+        else
+          false
+        end 
       rescue  => e
         false
       end
@@ -195,17 +206,8 @@ class DevicesController < ApplicationController
     if response == nil
       render json: {errors: "ngrok is not running: #{e}"}, status: 500
       return
-    elsif response.code.to_i != 200 
+    elsif tunnel_url.blank?
       render json: {errors: "ngrok api/tunnels returns error ()#{response.code}): #{response.body}"}, status: 500
-      return
-    end
-    
-    json_response = JSON.parse(response.body)
-    tunnel_url = json_response["tunnels"][0]["public_url"]
-    logger.info("tunnel_url=#{tunnel_url}")
-    
-    if tunnel_url.blank?
-      render json: {errors: "tunnel_url is not found"}, status: 500
       return
     end
     
