@@ -1,0 +1,21 @@
+<div class="usermanagement-container" ng-controller="NetworkSettingController">
+
+  <div class="left">
+    <h2 class="underlined">CHOOSE NETWORK<span class="close" ui-sref="settings.root">&times;</span></h2>
+
+    <div class="user-data">
+      <ul>
+        <li ng-repeat="wifiNetwork in wifiNetworks">
+          <a ui-sref="settings.usermanagement.user({id: '{{user.user.id}}'})" ui-sref-active="highlite">{{user.user.name}}<span ng-if="user.user.role=='admin'" class="if-admin">, Admin</span></a>
+          <!--<a ng-click="removeUser(user.user.id)" class="btn-remove" ng-if="user.user.id !== currentUser.id"></a>-->
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="right">
+    <h2 class="underlined">USER DETAILS<span class="close" ui-sref="settings.root">&times;</span></h2>
+    <div class="user-details" ui-view>
+      <p>Select a User in the center column to see details.</p>
+    </div>
+  </div>
+</div>

@@ -64,6 +64,10 @@ window.ChaiBioTech.ngApp
         templateUrl: 'app/views/settings/user-details.html'
         controller: 'userDataController'
 
+      .state 'settings.networkmanagement',
+        url: '/networkmanagement'
+        templateUrl: 'app/views/settings/networkmanagement.html'
+
       .state 'edit-protocol',
         url: '/edit-protocol/:id'
         templateUrl: 'app/views/skelton.html'

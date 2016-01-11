@@ -50,7 +50,7 @@
     </div>
     <div class="action-buttons" ng-if="allowButtons">
       <div class="button-containers">
-        <button class="button first-button" ng-if="deleteButton" ng-click="deleteMessage($event)">DELETE USER</button>
+        <button class="button first-button" ng-if="deleteButton" ng-click="deleteMessage(); $event.preventDefault()">DELETE USER</button>
       </div>
       <div class="button-containers second-spacing">
         <button class="button second-button" ui-sref="settings.usermanagement">CANCEL</button>
