@@ -45,7 +45,8 @@ public:
     Settings getSettings();
     void updateSettings(const Settings &settings);
 
-    void updateUpgrade(const Upgrade &upgrade);
+    bool updateUpgrade(const Upgrade &upgrade);
+    void setUpgradeDownloaded(bool state);
 
     int getUserId(const std::string &token);
 

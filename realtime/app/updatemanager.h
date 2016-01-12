@@ -1,6 +1,8 @@
 #ifndef UPDATEMANAGER_H
 #define UPDATEMANAGER_H
 
+#include "upgrade.h"
+
 #include <memory>
 #include <atomic>
 #include <thread>
@@ -42,12 +44,10 @@ public:
     void stopDownload();
 
 private:
-    void checkUpdateCallback();
+    void checkUpdateCallback(bool checkHash);
 
-    void downlaod(std::string imageUrl, std::string checksum, std::string apiPassword);
+    void downlaod(Upgrade upgrade);
     bool downlaod(const std::string &imageUrl, const std::string &apiPassword);
-
-    bool checkFileChecksum(const std::string &checksum);
 
     bool checkMountPoint();
     bool checkSdcard();
