@@ -12,7 +12,8 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
     verbose=FALSE, 
     out_json=TRUE, 
     show_running_time=FALSE, 
-    ... # options to pass onto `mc_tm_pw`
+    qt_prob=0.1, max_normd_qtv=0.9, # passed onto `mc_tm_pw`, different than default
+    ... # more options to pass onto `mc_tm_pw`
     )
 {
     # hard-coded arguments
