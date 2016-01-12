@@ -89,7 +89,11 @@ mc_tm_pw <- function(mt_pw,
                      top_N=4, # top number of Tm peaks to report
                      min_frac_report=0.1 # minimum area fraction of the Tm peak to be reported in regards to the largest real Tm peak
                      ) { # per well
-
+    
+    # to test
+    #message('qt_prob: ', qt_prob)
+    #message('max_normd_qtv: ', max_normd_qtv)
+    
     mc <- mt_pw[, c('Temp', 'Fluo', 'df.dT')]
     
     raw_tm <- na.omit(mt_pw[, c('Tm', 'Area')])
