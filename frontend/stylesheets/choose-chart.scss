@@ -1,0 +1,45 @@
+.modal-content {
+  .chart-chooser {
+    width: 560px;
+    height: 435px;
+    background-color: white;
+    padding-top: 1px;
+
+    .chart-content {
+      width: 530px;
+      height: 395px;
+      margin: 20px 15px 20px 15px;
+
+      .chart-header-section {
+        height: 38px;
+        width: 100%;
+        border-bottom: solid 2px black;
+
+        .chart-caption {
+          font-family: "dinot-bold";
+          font-size: 24px;
+          width: 60%;
+          float: left;
+        }
+
+        .close-container {
+          float: right;
+          width: 20px;
+          height: 20px;
+
+          .close-modal {
+            color: grey;
+            font-size: 24px;
+          }
+          .close-modal:hover {
+            cursor: pointer;
+            color: red;
+            background-color: white;
+            text-decoration: none;
+          }
+        }
+      }
+    }
+  }
+
+}

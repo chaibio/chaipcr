@@ -17,7 +17,7 @@
         <div class="curve-header">
           <span class="curve-title">
           Amplification Curve
-          <img class="arrow-down" src="/images/arrow-down.png">
+          <img class="arrow-down" src="/images/arrow-down.png" ng-click="RunExperimentCtrl.changeChartTypeModal()">
           </span>
           <span class="log-checkboxes">
           <span class="checkbox-item" ng-click="log_linear = 'log'" ng-class="{checked:log_linear === 'log', unchecked: log_linear !== 'log'}">
