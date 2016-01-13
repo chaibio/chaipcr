@@ -1,0 +1,32 @@
+{
+    "scan_result":
+    [
+        {
+            "ssid": "ATT992"
+        },
+        {
+            "ssid": "Chai"
+        },
+        {
+            "ssid": "ChaiGuest"
+        },
+        {
+            "ssid": "STIWIFI24"
+        },
+        {
+            "ssid": "Chai Test Net"
+        },
+        {
+            "ssid": "Analatom"
+        },
+        {
+            "ssid": "Sonic-005"
+        },
+        {
+            "ssid": "ATT4241"
+        },
+        {
+            "ssid": "gback"
+        }
+    ]
+}

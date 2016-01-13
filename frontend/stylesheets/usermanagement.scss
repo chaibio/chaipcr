@@ -74,6 +74,25 @@
       //padding-top: 25px;
     }
   }
+
+  .wifi-control {
+    padding: 10px 0px 10px 28px;
+    font-family: "dinot-bold";
+    height: 35px;
+    .wifi-caption {
+      float: left;
+    }
+    .wifi-changer {
+      float: left;
+      width: 50px;
+      height: 30px;
+      margin-left: 10px;
+      padding-top: 5px;
+    }
+  }
+  .bold-letter {
+    font-family: "dinot-bold";
+  }
 }
 
 .usermanagement-container-current {

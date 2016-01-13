@@ -5,8 +5,14 @@
 
     <div class="user-data">
       <ul>
+        <li>
+          <a class="bold-letter" ui-sref="settings.networkmanagement.wifi({name: 'ethernet'})" ui-sref-active="highlite">ETHERNET</a>
+        </li>
+      </ul>
+      <div class="wifi-control"><div class="wifi-caption">WIFI </div> <div class="wifi-changer"><wifi-toggle data="admin"></wifi-toggle></div></div>
+      <ul>
         <li ng-repeat="wifiNetwork in wifiNetworks">
-          <a ui-sref="settings.usermanagement.user({id: '{{user.user.id}}'})" ui-sref-active="highlite">{{user.user.name}}<span ng-if="user.user.role=='admin'" class="if-admin">, Admin</span></a>
+          <a ui-sref="settings.networkmanagement.wifi({name: '{{wifiNetwork.ssid | spaceToUnderscore}}'})" ui-sref-active="highlite">{{wifiNetwork.ssid}}</a>
           <!--<a ng-click="removeUser(user.user.id)" class="btn-remove" ng-if="user.user.id !== currentUser.id"></a>-->
         </li>
       </ul>

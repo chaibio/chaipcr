@@ -25,6 +25,7 @@ var status_idle = require('./status-idle.json');
 var status_lid_heating = require('./status-lid-heating.json');
 var status_running = require('./status-running.json');
 var network = require('./network.json');
+var wifi_networks = require('./wifi-networks.json');
 var STATUSES = ['idle', 'lid_heating', 'running', 'paused', 'complete'];
 var experiment_id = null;
 var lastLog = null;
@@ -134,6 +135,10 @@ app.get('/status', function (req, res, next) {
 
 app.get('/network/eth0', function (req, res, next) {
   res.send(network);
+});
+
+app.get('/network/wlan0/scan', function(req, res, next) {
+  res.send(wifi_networks);
 });
 
 app.post('/control/start', function (req, res, next) {

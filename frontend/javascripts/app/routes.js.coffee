@@ -68,6 +68,11 @@ window.ChaiBioTech.ngApp
         url: '/networkmanagement'
         templateUrl: 'app/views/settings/networkmanagement.html'
 
+      .state 'settings.networkmanagement.wifi',
+        url: '/:name'
+        templateUrl: 'app/views/settings/networkmanagement.html'
+
+
       .state 'edit-protocol',
         url: '/edit-protocol/:id'
         templateUrl: 'app/views/skelton.html'
