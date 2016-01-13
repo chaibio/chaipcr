@@ -29,6 +29,9 @@ public:
     inline void setPassword(const std::string &password) { _password = password; }
     inline const std::string& password() const { return _password; }
 
+    inline void setImageUrl(const std::string &imageUrl) { _imageUrl = imageUrl; }
+    inline const std::string& imageUrl() const { return _imageUrl; }
+
 private:
     std::string _version;
     std::string _checksum;
@@ -36,6 +39,8 @@ private:
     std::string _briefDescription;
     std::string _fullDescription;
     std::string _password;
+
+    std::string _imageUrl;
 };
 
 #endif // UPGRADE_H

@@ -1,5 +1,6 @@
 #include "util.h"
 
+#include <fstream>
 #include <sstream>
 #include <system_error>
 
@@ -145,6 +146,22 @@ bool watchProcess(const std::string &command, int eventFd, std::function<void(co
         else
             return false;
     }
+}
+
+bool getFileChecksum(const std::string &filePath, int eventFd, std::string &checksum)
+{
+    std::ofstream file(filePath.c_str());
+    if (file.is_open())
+    {
+        file.close();
+
+        std::stringstream stream;
+        stream << "sha256sum " << filePath;
+
+        return Util::watchProcess(stream.str(), eventFd, [&checksum](const char buffer[]){ std::stringstream stream; stream << buffer; checksum.clear(); stream >> checksum; });
+    }
+    else
+        return true;
 }
 
 }

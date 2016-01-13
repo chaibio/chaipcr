@@ -175,7 +175,7 @@ reset_uenv () {
 	sync
 #exit
  	umount /tmp/emmcboot
-	rm -r /tmp/emmcboot
+	rm -r /tmp/emmcboot || true
         echo "Done returning to gpio 72 check version"
 }
 
@@ -184,12 +184,12 @@ stop_packing_restarting ()
 	reset_uenv
 	if [ -e ${sdcard_p1}/pack_resume_autorun.flag ]
 	then
-        	rm ${sdcard_p1}/pack_resume_autorun.flag
+        	rm ${sdcard_p1}/pack_resume_autorun.flag || true
 	fi
 
 	if [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
 	then
-        	rm ${sdcard_p1}/unpack_resume_autorun.flag
+        	rm ${sdcard_p1}/unpack_resume_autorun.flag || true
 	fi
 }
 
@@ -244,7 +244,8 @@ then
 		echo "Done partitioning $eMMC!"
 	else
 		echo "Cannot update partition table at  $eMMC! restarting!"
-		echo Write Perm Partition > ${sdcard_p1}/write_perm_partition.flag
+		echo "Write Perm Partition" > ${sdcard_p1}/write_perm_partition.flag
+
 		sync
 		rebootx
 		exit
@@ -273,10 +274,10 @@ then
 	if [ -e ${sdcard_p2}/upgrade.img.gz ]
 	then
 		# todo check mkfs.ext4
-		rm ${sdcard_p1}/write_perm_partition.flag
+		rm ${sdcard_p1}/write_perm_partition.flag || true
 		mkdir -p /tmp/perm
 		mount ${eMMC}p4 /tmp/perm -t ext4
-		rm -r /tmp/perm/*
+		rm -r /tmp/perm/* || true
 		echo "Done formatting /perm partition"
 		umount /tmp/perm/
 		echo "Done formatting /perm partition"

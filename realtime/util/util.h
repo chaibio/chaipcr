@@ -14,6 +14,8 @@ boost::posix_time::ptime parseIsoTime(const std::string &str);
 
 bool watchProcess(const std::string &command, int eventFd, std::function<void(const char[1024])> readCallback);
 
+bool getFileChecksum(const std::string &filePath, int eventFd, std::string &checksum);
+
 }
 
 #endif // UTIL_H

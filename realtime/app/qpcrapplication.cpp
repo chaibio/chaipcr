@@ -40,7 +40,7 @@ void QPCRApplication::stopExperiment(const string &message) {
 
 int QPCRApplication::getUserId(const std::string &token) const
 {
-    _dbControl->getUserId(token);
+    return _dbControl->getUserId(token);
 }
 
 void QPCRApplication::initialize(Application&) {

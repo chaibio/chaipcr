@@ -70,7 +70,7 @@ void UpdateManager::startChecking()
 {
     stopChecking();
 
-    _updateTimer->schedule(Poco::Util::TimerTask::Ptr(new CheckTimerTask(std::bind(&UpdateManager::checkUpdateCallback, this), _updateEvent)), 0, kUpdateInterval);
+    _updateTimer->schedule(Poco::Util::TimerTask::Ptr(new CheckTimerTask(std::bind(&UpdateManager::checkUpdateCallback, this, true), _updateEvent)), 3 * 60 * 1000, kUpdateInterval);
 }
 
 void UpdateManager::stopChecking(bool wait)
@@ -80,7 +80,10 @@ void UpdateManager::stopChecking(bool wait)
 
 bool UpdateManager::checkUpdate()
 {
-    Poco::Util::TimerTask::Ptr task(new CheckTimerTask(std::bind(&UpdateManager::checkUpdateCallback, this), _updateEvent));
+    if (_updateState == Available)
+        return true;
+
+    Poco::Util::TimerTask::Ptr task(new CheckTimerTask(std::bind(&UpdateManager::checkUpdateCallback, this, false), _updateEvent));
 
     _updateEvent.reset();
     _updateTimer->schedule(task, Poco::Timestamp(0));
@@ -123,49 +126,60 @@ void UpdateManager::upload(std::istream &dataStream)
 
     if (state != Updating && state != ManualDownloading)
     {
-        _uploadEvent.reset();
-
-        lock.unlock();
-
-        if (checkMountPoint() && checkSdcard())
+        try
         {
-            uint64_t i = 0;
-            std::ofstream file(kUpdateFilePath.c_str(), std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
+            _uploadEvent.reset();
 
-            if (file.is_open())
+            lock.unlock();
+
+            if (checkMountPoint() && checkSdcard())
             {
-                char buffer[DOWNLOAD_BUFFER_SIZE];
+                _dbControl->setUpgradeDownloaded(false);
 
-                while (dataStream.good() && file.good())
+                uint64_t i = 0;
+                std::ofstream file(kUpdateFilePath.c_str(), std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
+
+                if (file.is_open())
                 {
-                    std::fill(std::begin(buffer), std::end(buffer), 0);
+                    char buffer[DOWNLOAD_BUFFER_SIZE];
 
-                    dataStream.read(buffer, DOWNLOAD_BUFFER_SIZE);
+                    while (dataStream.good() && file.good())
+                    {
+                        std::fill(std::begin(buffer), std::end(buffer), 0);
 
-                    if (dataStream.gcount() > 0)
-                        file.write(buffer, dataStream.gcount());
+                        dataStream.read(buffer, DOWNLOAD_BUFFER_SIZE);
 
-                    read(_downloadEventFd, &i, sizeof(i));
-                    if (i > 0)
-                        break;
+                        if (dataStream.gcount() > 0)
+                            file.write(buffer, dataStream.gcount());
+
+                        read(_downloadEventFd, &i, sizeof(i));
+                        if (i > 0)
+                            break;
+                    }
+
+                    if (dataStream.eof())
+                        _updateState = Available;
+                    else
+                        _updateState = Unknown;
                 }
-
-                if (dataStream.eof())
-                    _updateState = Available;
                 else
+                {
+                    std::cout << "UpdateManager::upload - unable to open file " << kUpdateFilePath << ": " << std::strerror(errno) << '\n';
+
                     _updateState = Unknown;
+                }
             }
             else
-            {
-                std::cout << "UpdateManager::upload - unable to open file " << kUpdateFilePath << ": " << std::strerror(errno) << '\n';
-
                 _updateState = Unknown;
-            }
-        }
-        else
-            _updateState = Unknown;
 
-        _uploadEvent.set();
+            _uploadEvent.set();
+        }
+        catch (const std::exception &ex)
+        {
+            std::cout << "UpdateManager::upload - exception: " << ex.what() << '\n';
+
+            _updateState = Unknown;
+        }
     }
     else if (state != ManualDownloading)
     {
@@ -207,12 +221,11 @@ void UpdateManager::stopDownload()
     }
 }
 
-void UpdateManager::checkUpdateCallback()
+void UpdateManager::checkUpdateCallback(bool checkHash)
 {
     stopDownload();
 
     Upgrade upgrade;
-    std::string imageUrl;
     UpdateState state = _updateState;
 
     if (state == ManualDownloading || state == Updating)
@@ -234,10 +247,20 @@ void UpdateManager::checkUpdateCallback()
         upgrade.setFullDescription(ptree.get<std::string>("full_description"));
         upgrade.setReleaseDate(Util::parseIsoTime(ptree.get<std::string>("release_date")));
         upgrade.setPassword(ptree.get<std::string>("password"));
+        upgrade.setImageUrl(ptree.get<std::string>("image_rsync_url"));
 
-        imageUrl = ptree.get<std::string>("image_rsync_url");
+        if (!_dbControl->updateUpgrade(upgrade))
+        {
+            std::string sum;
 
-        _dbControl->updateUpgrade(upgrade);
+            if (!checkHash || (Util::getFileChecksum(kUpdateFilePath, _downloadEventFd, sum) && sum == upgrade.checksum()))
+            {
+                _updateState.compare_exchange_strong(state, Available);
+                return;
+            }
+            else
+                _updateState.compare_exchange_strong(state, Unknown);
+        }
     }
     catch (const std::exception &ex)
     {
@@ -254,20 +277,25 @@ void UpdateManager::checkUpdateCallback()
         std::lock_guard<std::recursive_mutex> lock(_downloadMutex);
 
         if (_updateState.compare_exchange_strong(state, Downloading))
-            _downloadThread = std::thread(static_cast<void(UpdateManager::*)(std::string,std::string,std::string)>(&UpdateManager::downlaod), this, imageUrl, upgrade.checksum(), upgrade.password());
+            _downloadThread = std::thread(static_cast<void(UpdateManager::*)(Upgrade)>(&UpdateManager::downlaod), this, upgrade);
     }
     else
         _updateState.compare_exchange_strong(state, Unavailable);
 }
 
-void UpdateManager::downlaod(std::string imageUrl, std::string checksum, std::string apiPassword)
+void UpdateManager::downlaod(Upgrade upgrade)
 {
     _updateState = Downloading;
 
     try
     {
-        if (checkMountPoint() && checkSdcard() && downlaod(imageUrl, apiPassword) && checkFileChecksum(checksum))
+        std::string sum;
+
+        if (checkMountPoint() && checkSdcard() && downlaod(upgrade.imageUrl(), upgrade.password()) && Util::getFileChecksum(kUpdateFilePath, _downloadEventFd, sum) && sum == upgrade.checksum())
+        {
+            _dbControl->setUpgradeDownloaded(true);
             _updateState = Available;
+        }
         else
             _updateState = Unknown;
     }
@@ -287,46 +315,17 @@ bool UpdateManager::downlaod(const std::string &imageUrl, const std::string &api
     return Util::watchProcess(stream.str(), _downloadEventFd, [](const char buffer[]){ std::cout << "UpdateManager::downlaod - rsync: " << buffer << '\n'; });
 }
 
-bool UpdateManager::checkFileChecksum(const std::string &checksum)
-{
-    std::stringstream stream;
-    stream << "sha256sum " << kUpdateFilePath;
-
-    std::string sum;
-
-    if (Util::watchProcess(stream.str(), _downloadEventFd, [&sum](const char buffer[]){ std::stringstream stream; stream << buffer; sum.clear(); stream >> sum; }))
-        return checksum == sum;
-    else
-        return false;
-}
-
 bool UpdateManager::checkMountPoint()
 {
     std::string output;
 
-    try
-    {
-        if (Util::watchProcess("cat /etc/mtab | grep " + kUpdateMountPoint, _downloadEventFd, [&output](const char buffer[]){ output = buffer; }))
-            return output.find(kUpdateMountPoint) != std::string::npos;
-        else
-            return false;
-    }
-    catch (...)
-    {
+    if (Util::watchProcess("cat /etc/mtab | grep " + kUpdateMountPoint, _downloadEventFd, [&output](const char buffer[]){ output = buffer; }))
+        return output.find(kUpdateMountPoint) != std::string::npos;
+    else
         return false;
-    }
 }
 
 bool UpdateManager::checkSdcard()
 {
-    try
-    {
-        return Util::watchProcess(kCheckSdcardPath, _downloadEventFd, [](const char buffer[]){ std::cout << "UpdateManager::checkSdcard - check_sdcard: " << buffer << '\n'; });
-    }
-    catch (const std::exception &ex)
-    {
-        std::cout << "UpdateManager::checkSdcard - exception: " << ex.what() << '\n';
-
-        return false;
-    }
+    return Util::watchProcess(kCheckSdcardPath, _downloadEventFd, [](const char buffer[]){ std::cout << "UpdateManager::checkSdcard - check_sdcard: " << buffer << '\n'; });
 }

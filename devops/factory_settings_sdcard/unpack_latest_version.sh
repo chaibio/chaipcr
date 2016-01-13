@@ -231,7 +231,7 @@ update_uenv () {
 	echo "Freeup boot partition during the backup process"
 	#mkfs.vfat ${eMMC}p1 -n boot
 	mount ${eMMC}p1 /tmp/emmcboot
-	rm -r /tmp/emmcboot/*
+	rm /tmp/emmcboot/* || true
 	sync
 	sleep 3
 	umount /tmp/emmcboot

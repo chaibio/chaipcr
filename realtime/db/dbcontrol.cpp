@@ -588,16 +588,40 @@ void DBControl::updateSettings(const Settings &settings)
     write(statements);
 }
 
-void DBControl::updateUpgrade(const Upgrade &upgrade)
+bool DBControl::updateUpgrade(const Upgrade &upgrade)
+{
+    {
+        int downloaded = 0;
+        std::lock_guard<std::mutex> lock(_readMutex);
+
+        *_readSession << "SELECT downloaded FROM upgrades WHERE version = \'" << upgrade.version() << '\'', soci::into(downloaded);
+
+        if (downloaded)
+            return false;
+    }
+
+    {
+        std::vector<soci::statement> statements;
+        std::lock_guard<std::mutex> lock(_writeMutex);
+
+        statements.emplace_back((_writeSession->prepare << "INSERT INTO upgrades(id, version, checksum, release_date, brief_description, full_description, password, downloaded) VALUES("
+                                 "1, :version, :checksum, :release_date, :brief_description, :full_description, :password, 0) ON DUPLICATE KEY UPDATE "
+                                 "version = :version, checksum = :checksum, release_date = :release_date, brief_description = :brief_description, full_description = :full_description, password = :password, downloaded = 0",
+                                 soci::use(upgrade.version()), soci::use(upgrade.checksum()), soci::use(upgrade.releaseDate()), soci::use(upgrade.briefDescription()), soci::use(upgrade.fullDescription()), soci::use(upgrade.password()),
+                                 soci::use(upgrade.version()), soci::use(upgrade.checksum()), soci::use(upgrade.releaseDate()), soci::use(upgrade.briefDescription()), soci::use(upgrade.fullDescription()), soci::use(upgrade.password())));
+
+        write(statements);
+    }
+
+    return true;
+}
+
+void DBControl::setUpgradeDownloaded(bool state)
 {
     std::vector<soci::statement> statements;
     std::lock_guard<std::mutex> lock(_writeMutex);
 
-    statements.emplace_back((_writeSession->prepare << "INSERT INTO upgrades(id, version, checksum, release_date, brief_description, full_description, password) VALUES("
-                             "1, :version, :checksum, :release_date, :brief_description, :full_description, :password) ON DUPLICATE KEY UPDATE "
-                             "version = :version, checksum = :checksum, release_date = :release_date, brief_description = :brief_description, full_description = :full_description, password = :password",
-                             soci::use(upgrade.version()), soci::use(upgrade.checksum()), soci::use(upgrade.releaseDate()), soci::use(upgrade.briefDescription()), soci::use(upgrade.fullDescription()), soci::use(upgrade.password()),
-                             soci::use(upgrade.version()), soci::use(upgrade.checksum()), soci::use(upgrade.releaseDate()), soci::use(upgrade.briefDescription()), soci::use(upgrade.fullDescription()), soci::use(upgrade.password())));
+    statements.emplace_back((_writeSession->prepare << "UPDATE upgrades SET downloaded = :downloaded", soci::use(state ? 1 : 0)));
 
     write(statements);
 }

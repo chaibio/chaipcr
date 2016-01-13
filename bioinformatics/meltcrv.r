@@ -84,12 +84,16 @@ get_mc_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connec
 
 # function: extract melting curve data and Tm for each well
 mc_tm_pw <- function(mt_pw, 
-                     qt_prob=0.8, # quantile probability point for normalized df/dT (range 0-1)
-                     max_normd_qtv=0.5, # maximum normalized df/dT values (range 0-1) at the quantile probablity point
+                     qt_prob=0.7, # quantile probability point for normalized df/dT (range 0-1)
+                     max_normd_qtv=0.6, # maximum normalized df/dT values (range 0-1) at the quantile probablity point
                      top_N=4, # top number of Tm peaks to report
                      min_frac_report=0.1 # minimum area fraction of the Tm peak to be reported in regards to the largest real Tm peak
                      ) { # per well
-
+    
+    # to test
+    #message('qt_prob: ', qt_prob)
+    #message('max_normd_qtv: ', max_normd_qtv)
+    
     mc <- mt_pw[, c('Temp', 'Fluo', 'df.dT')]
     
     raw_tm <- na.omit(mt_pw[, c('Tm', 'Area')])
@@ -100,7 +104,7 @@ mc_tm_pw <- function(mt_pw,
     dfdT_normd <- (mc$df.dT - range_dfdT[1]) / (range_dfdT[2] - range_dfdT[1])
     # range_dfdT[1] == min(mc$df.dT). range_dfdT[2] == max(mc$df.dT).
     
-    if (  quantile(dfdT_normd[1:summit_pos],                qt_prob) <= max_normd_qtv
+    if (  quantile(dfdT_normd[1:summit_pos],                  qt_prob) <= max_normd_qtv
         & quantile(dfdT_normd[summit_pos:length(dfdT_normd)], qt_prob) <= max_normd_qtv) {
         tm_sorted <- raw_tm[order(-raw_tm$Area),]
         tm_topN <- na.omit(tm_sorted[1:top_N,])
