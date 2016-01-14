@@ -1,5 +1,7 @@
 #!/bin/bash
 
+BASEDIR=$(dirname $0)
+
 if ! id | grep -q root; then
 	echo "must be run as root"
 	exit 0
@@ -20,6 +22,8 @@ then
         echo "Proper eMMC partitionining not found!"
 	exit 1
 fi
+
+BASEDIR=$(dirname $0)
 
 echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
 sdcard="/sdcard"
@@ -59,6 +63,7 @@ echo "Restarting to packing eMMC image.."
 
 echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 
-reboot
+
+sh $BASEDIR/rebootx.sh
 
 exit 0
