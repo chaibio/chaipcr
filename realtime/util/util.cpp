@@ -150,7 +150,7 @@ bool watchProcess(const std::string &command, int eventFd, std::function<void(co
 
 bool getFileChecksum(const std::string &filePath, int eventFd, std::string &checksum)
 {
-    std::ofstream file(filePath.c_str());
+    std::ifstream file(filePath.c_str());
     if (file.is_open())
     {
         file.close();
