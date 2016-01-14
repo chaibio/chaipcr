@@ -6,6 +6,7 @@ window.ChaiBioTech.ngApp.controller 'RunExperimentCtrl', [
   '$uibModal'
   ($scope, $stateParams, $state, Experiment, $uibModal) ->
     @chart = $stateParams.chart
+    $scope.chart = $stateParams.chart
 
     Experiment.get(id: $stateParams.id).$promise.then (data) ->
       Experiment.setCurrentExperiment data.experiment
@@ -14,6 +15,9 @@ window.ChaiBioTech.ngApp.controller 'RunExperimentCtrl', [
     @changeChart = (chart) ->
       $state.go 'run-experiment', {id: $stateParams.id, chart: chart}, notify: false
       @chart = chart
+      $scope.chart = chart
+      if $scope.uiModal
+        $scope.uiModal.close()
 
     @changeChartTypeModal = ->
       $scope.uiModal = $uibModal.open({
