@@ -65,7 +65,8 @@ optic_calib <- function(fluo, db_conn, calib_id, verbose=FALSE, show_running_tim
     end_time <- proc.time()[['elapsed']]
     if (show_running_time) message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
     
-    return(fluo_calib)
+    return(list('fluo_calib'=fluo_calib, 
+                'signal_water_diff' = scaling_factor * signal_water_diff))
 }
 
 
