@@ -7,7 +7,7 @@ window.ChaiBioTech.ngApp.controller 'RunExperimentCtrl', [
   ($scope, $stateParams, $state, Experiment, $uibModal) ->
     @chart = $stateParams.chart
     $scope.chart = $stateParams.chart
-
+    $scope.hover= "";
     Experiment.get(id: $stateParams.id).$promise.then (data) ->
       Experiment.setCurrentExperiment data.experiment
       $scope.experiment = data.experiment

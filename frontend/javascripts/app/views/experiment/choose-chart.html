@@ -6,45 +6,13 @@
     </div>
     <div class="charts-container">
 
-      <div class="chart-box">
-        <div class="chart-image-container">
-          <div class="chart-current-container">
-            <div ng-if="chart == 'standard'" class="chart-current">Current Selection</div>
-          </div>
-          <img class="chart-image" ng-src="/images/standard-curve.png">
-        </div>
-        <div class="chart-name-container">Standard Curve</div>
-      </div>
 
-      <div class="chart-box second" ng-click="RunExperimentCtrl.changeChart('amplification')">
-        <div class="chart-image-container">
-          <div class="chart-current-container">
-            <div ng-if="chart == 'amplification'" class="chart-current">Current Selection</div>
-          </div>
-          <img class="chart-image" ng-src="/images/amplification-curve.png">
-        </div>
-        <div class="chart-name-container">Amplification Curve</div>
-      </div>
+      <chart-type name="Standard Curve" image="standard-curve" type="standard" current="{{chart}}"></chart-type>
+      <chart-type ng-click="RunExperimentCtrl.changeChart('amplification')" name="Amplification Curve" second="true" image="amplification-curve" current="{{chart}}" type="amplification"></chart-type>
 
-      <div class="chart-box" ng-click="RunExperimentCtrl.changeChart('temperature-logs')">
-        <div class="chart-image-container">
-          <div class="chart-current-container">
-            <div ng-if="chart == 'temperature-logs'" class="chart-current">Current Selection</div>
-          </div>
-          <img class="chart-image" ng-src="/images/thermal-profile.png">
-        </div>
-        <div class="chart-name-container">Thermal Profile</div>
-      </div>
+      <chart-type ng-click="RunExperimentCtrl.changeChart('temperature-logs')" type="temperature-logs" name="Thermal Profile" image="thermal-profile" current="{{chart}}"></chart-type>
 
-      <div class="chart-box second">
-        <div class="chart-image-container">
-          <div class="chart-current-container">
-            <div ng-if="chart == 'melt'" class="chart-current">Current Selection</div>
-          </div>
-          <img class="chart-image" ng-src="/images/melt-curve.png">
-        </div>
-        <div class="chart-name-container">Melt Curve</div>
-      </div>
+      <chart-type name="Melt Curve" second="true" image="melt-curve" type="melt" current="{{chart}}"></chart-type>
 
     </div>
   </div>

@@ -1,0 +1,9 @@
+<div ng-class="{'chart-box': true, 'second': second}" ng-mouseover="hover='hover'" ng-mouseleave="hover=''">
+  <div ng-class="{'chart-image-container': !hover, 'chart-image-container-hover': hover == 'hover'}">
+    <div class="chart-current-container" >
+      <div ng-if="type == current" class="chart-current">Current Selection</div>
+    </div>
+    <img class="chart-image" ng-src="/images/{{image}}.png">
+  </div>
+  <div class="chart-name-container">{{name}}</div>
+</div>
