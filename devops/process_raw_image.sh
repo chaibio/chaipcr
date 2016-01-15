@@ -136,23 +136,20 @@ fi
 image_filename_folder="${temp}"
 
 image_filename_prfx="upgrade"
-image_filename_rootfs="$image_filename_prfx-rootfs.img.gz" 
+image_filename_rootfs="$image_filename_prfx-rootfs.img.gz"
 image_filename_data="$image_filename_prfx-data.img.gz"
 image_filename_boot="$image_filename_prfx-boot.img.gz"
 image_filename_pt="$image_filename_prfx-pt.img.gz"
 
-#image_filename_upgrade_tar_temp="${temp}/temp.tar"
+checksums_filename="$image_filename_prfx-checksums.txt"
+
 image_filename_upgrade_temp="${temp}/temp.tar.gz"
 image_filename_upgrade1="${output_dir}/p2/upgrade.img.gz"
 
-echo "SDCard: $sdcard" #current_folder"
+echo "SDCard: $sdcard"
 cd ${temp}
 
-#if [ "$1" = "factorysettings" ]
-#then	
-#	echo "Factory settings image creation"
 image_filename_upgrade2="${output_dir}/p1/factory_settings.img.gz"
-#fi
 
 echo "Packing eMMC image.."
 
@@ -184,6 +181,8 @@ sync
 echo "Packing up partition table to: $image_filename_pt"
 dd  if=${eMMC} bs=16M count=1 | gzip -c > $image_filename_pt
 
+echo "Chaibio Checksum File">$checksums_filename
+md5sum $image_filename_pt>>$checksums_filename
 sleep 2
 sync
 
@@ -219,29 +218,8 @@ else
 	sync &
 	sleep 5
 
-	if [ $result -eq 0 ]
-	then
-		dd if=/dev/zero of=/tmp/emmc/big_zero_file2.bin bs=16M> /dev/null
-		result=$?
-		sync &
-		sleep 5
-	fi
-	if [ $result -eq 0 ]
-	then
-		dd if=/dev/zero of=/tmp/emmc/big_zero_file3.bin bs=16M count=30> /dev/null
-		result=$?
-		sync &
-		sleep 5
-	fi
-	if [ $result -eq 0 ]
-	then
-		dd if=/dev/zero of=/tmp/emmc/big_zero_file4.bin bs=16M> /dev/null
-		sync &
-		sleep 10
-	fi
-
 	sync
-	echo "Removing zeros files"
+	echo "Removing zeros file"
 	rm /tmp/emmc/big_zero_file*
 	sync &
 	sleep 10
@@ -251,20 +229,18 @@ fi
 
 echo "Packing up binaries partition to: $image_filename_rootfs"
 dd  if=${eMMC}p2 bs=16M | gzip -c > $image_filename_rootfs
+md5sum $image_filename_rootfs>>$checksums_filename
 
 sleep 5
 sync
 
 echo "Packing up boot partition to: $image_filename_boot"
 dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
+md5sum $image_filename_boot>>$checksums_filename
 
-#if [ "$1" = "factorysettings" ]
-#then
-	echo "Data partition: $data_partition"
-#	umount /tmp/emmc>/dev/null || true
-	mount $data_partition /tmp/emmc -t ext4
-
-	retval=$?
+echo "Data partition: $data_partition"
+mount $data_partition /tmp/emmc -t ext4
+retval=$?
 
 	if [ $retval -ne 0 ]; then
 	    echo "Error mounting data partition! Error($retval)"
@@ -286,10 +262,12 @@ dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
 
 	echo "Packing up data partition to: $image_filename_data"
 	dd  if=${eMMC}p3 bs=16M | gzip -c > $image_filename_data
+	md5sum $image_filename_data>>$checksums_filename
 
 	#tarring
 #	echo "compressing all images to $image_filename_upgrade_tar_temp"
-	tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_data $image_filename_rootfs
+	tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_data $image_filename_rootfs $checksums_filename
+
 
 	if [ -e $image_filename_data ]
 	then
@@ -309,7 +287,7 @@ then
 	rm $image_filename_upgrade_temp
 fi
 
-tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs
+tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $checksums_filename
 
 echo "Remove packed files"
 if [ -e $image_filename_boot ]
