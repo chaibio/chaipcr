@@ -58,7 +58,7 @@ void TemperatureController::setTargetTemperature(double temperature)
     if (temperature < _minTargetTemp || temperature > _maxTargetTemp)
     {
         std::stringstream string;
-        string << "Requested " << _name << " temperature outside limits of " << _minTargetTemp << '-' << _maxTargetTemp << " C";
+        string << "Requested " << _name << " temperature (" << temperature << " C) outside limits of " << _minTargetTemp << '-' << _maxTargetTemp << " C";
 
         throw std::out_of_range(string.str());
     }
