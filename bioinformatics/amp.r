@@ -113,15 +113,12 @@ get_ct_eff <- function(ac_mtx, signal_water_diff,
     for (i in 1:num_wells) {
         
         ac_calib_ratio <- ac_calib_ratios[i]
-        message('ac_calib_ratio_min: ', ac_calib_ratio_min)
-        message('ac_calib_ratio: ', ac_calib_ratio)
         
         mod <- mod_ori[[i]]
         stopCode <- mod$convInfo$stopCode
         b <- coef(mod)[['b']]
         
         ct <- ct_eff['ct', i]
-        message('Ct before adj: ', ct)
         
         if (   ac_calib_ratio < ac_calib_ratio_min 
             || is.null(stopCode) || is.null(b) 
@@ -129,7 +126,6 @@ get_ct_eff <- function(ac_mtx, signal_water_diff,
             || (!is.na(ct) && ct == num_cycles)) {
           ct_eff['ct', i] <- NA }
         
-        message('ct after adj: ', ct_eff['ct', i])
         }
     
     rownames(ct_eff) <- rownames(ct_eff_raw)
@@ -152,7 +148,6 @@ baseline_ct <- function(amp_calib,
     
     ac_mtx <- amp_calib$ac_mtx
     signal_water_diff <- amp_calib$signal_water_diff
-    print(signal_water_diff)
     
     if (dim(ac_mtx)[1] <= 2) {
         message('Two or fewer cycles of fluorescence data are available. Baseline subtraction and calculation of Ct and amplification efficiency cannot be performed.')
