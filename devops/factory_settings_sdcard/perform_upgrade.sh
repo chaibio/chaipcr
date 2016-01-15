@@ -23,8 +23,8 @@ fi
 
 verify_checksum () {
         image_filename_upgrade1="/sdcard/upgrade/upgrade.img.gz"
-        image_filename_upgrade1="~/tmp2out/p2/upgrade.img.gz"
-	image_filename_upgrade1="/home/mahammad/tmp2out/p2/upgrade.img.gz"
+#       image_filename_upgrade1="~/tmp2out/p2/upgrade.img.gz"
+#	image_filename_upgrade1="/home/mahammad/tmp2out/p2/upgrade.img.gz"
 
 #	ls -ahl  $image_filename_upgrade1
 
@@ -42,7 +42,7 @@ verify_checksum () {
 	checksums_filename="$image_filename_prfx-checksums.txt"
 
 	check_sum=$( tar xOf $image_filename_upgrade1 $checksums_filename )
-	if [ -z $check_sum ]
+	if [ -z "$check_sum" ]
 	then
 		echo "Incompatable upgrade image: No checksum file found!"
 		exit 4
@@ -83,14 +83,11 @@ verify_checksum () {
 	done
 }
 
-verify_checksum
 BASEDIR=$(dirname $0)
 
 echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
 echo "Verifying.."
 verify_checksum
-
-sdcard="/sdcard"
 
 set_sdcard_uEnv () {
 	cp ${uEnvPath}/uEnv.txt ${uEnvPath}/uEnv.org.txt
@@ -104,9 +101,13 @@ reset_sdcard_uEnv () {
 }
 
 uEnvPath=/tmp/uEnvPath
-mkdir -p ${uEnvPath} > /dev/null
 
-umount ${uEnvPath} > /dev/null
+if [ ! -e "$uEnvPath" ]
+then
+	mkdir -p ${uEnvPath} > /dev/null
+fi
+
+#umount ${uEnvPath} > /dev/null
 mount ${eMMC}p1 ${uEnvPath} -t vfat
 set_sdcard_uEnv
 umount ${uEnvPath}> /dev/null
@@ -123,8 +124,6 @@ echo "1">${uEnvPath}/unpack_stage.ini
 umount ${uEnvPath}
 
 echo "Restarting to packing eMMC image.."
-#reboot
-
 echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 sh $BASEDIR/rebootx.sh
 
