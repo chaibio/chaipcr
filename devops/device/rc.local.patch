@@ -106,7 +106,7 @@ diff -ur ./rc.local ../updated/rc.local
 +echo $NOW >>  $log_file
 +echo Mounting partitions! >> $log_file
 +
-+check_upgrade_autorun &
++#check_upgrade_autorun &
 +
 +if [ -e /data ]
 +then
