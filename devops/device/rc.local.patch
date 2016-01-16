@@ -50,7 +50,7 @@ diff -ur ./rc.local ../updated/rc.local
 +        		echo "Upgrade autorun flag found up" >> $log_file
 +			cd /root/chaipcr/web || : >> $log_file
 +			echo "changed folder to $(pwd).. executing migrate..." >> $log_file
-+			bundle exec rake db:migrate || :>> $log_file
++			RAILS_ENV=production bundle exec rake db:migrate || : >> $log_file
 +			echo "Execution result: $?, now executing seed_fu..." >> $log_file
 +			bundle exec rake db:seed_fu || :>> $log_file
 +			echo "Execution result $?, done executing scripts!" >> $log_file
