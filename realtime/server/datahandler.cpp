@@ -27,8 +27,9 @@ void DataHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
         response.setStatusAndReason(getStatus(), Poco::Net::HTTPServerResponse::getReasonForStatus(getStatus()));
 
         //CORS
+        response.add("Access-Control-Allow-Methods", "POST, PUT, OPTIONS");
         response.add("Access-Control-Allow-Origin", "*");
-        response.add("Access-Control-Allow-Headers", "X-Requested-With, X-Prototype-Version, X-CSRF-Token, Authorization");
+        response.add("Access-Control-Allow-Headers", "Content-Type");
 
         processResponse(response);
     }
