@@ -204,7 +204,7 @@ set_sdcard_uEnv () {
 	echo copying coupling uEng.txt
 	mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
 	cp ${sdcard_p1}/uEnv.txt /tmp/emmcboot/
-	sh ${sdcard_p1}/replace_uEnv.txt.sh /tmp/emmcboot || true
+	sh ${sdcard_p1}/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
 	uEnvPath=/tmp/emmcboot
 
 	cp ${uEnvPath}/uEnv.txt ${uEnvPath}/uEnv.org.txt
@@ -219,7 +219,7 @@ update_uenv () {
 	echo copying coupling uEng.txt
 	mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
 	cp ${sdcard_p1}/uEnv.txt /tmp/emmcboot/
-	sh ${sdcard_p1}/replace_uEnv.txt.sh /tmp/emmcboot || true
+	sh ${sdcard_p1}/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
 	sync
 	sleep 5
 	umount /tmp/emmcboot || true

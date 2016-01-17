@@ -65,17 +65,19 @@ then
 	mkdir -p ${output_dir}/p1
 fi
 
-if [ ! -e ${output_dir}/p2 ]
+if [ ! -e ${output_dir}/p2/scripts/ ]
 then
-	mkdir -p ${output_dir}/p2
+	mkdir -p ${output_dir}/p2/scripts/
 fi
 
 echo copying card contents from $BASEDIR/factory_settings_sdcard/ to $output_dir/p1
 cp -r $BASEDIR/factory_settings_sdcard/* $output_dir/p1
+cp $BASEDIR/factory_settings_sdcard/scripts/* $output_dir/p2/scripts/
 
 image_filename_upgrade="${temp}/eMMC.img"
 image_filename_upgrade1="$sdcard/eMMC_part1.img"
 image_filename_upgrade2="$sdcard/eMMC_part2.img"
+upgrade_scripts="scripts"
 
 echo "Packing eMMC image.."
 
@@ -84,8 +86,10 @@ then
 	echo "$temp: exists!"
 #	rm -r "$temp/">/dev/null
 else
-	mkdir -p ${temp}
+	mkdir -p ${temp}/$upgrade_scripts
 fi
+
+cp $BASEDIR/factory_settings_sdcard/scripts/* $temp/$upgrade_scripts
 
 if [ ! -e $image_filename_upgrade1 ]
 then
@@ -178,7 +182,7 @@ fi
 
 echo "Copying eMMC partitions at $eMMC"
 sync
-echo "Packing up partition table to: $image_filename_pt"
+echo "Packing partition table to: $image_filename_pt"
 dd  if=${eMMC} bs=16M count=1 | gzip -c > $image_filename_pt
 
 echo "Chaibio Checksum File">$checksums_filename
@@ -227,16 +231,28 @@ else
 	umount /tmp/emmc > /dev/null || true
 fi
 
-echo "Packing up binaries partition to: $image_filename_rootfs"
+echo "Packing binaries partition to: $image_filename_rootfs"
 dd  if=${eMMC}p2 bs=16M | gzip -c > $image_filename_rootfs
 md5sum $image_filename_rootfs>>$checksums_filename
 
 sleep 5
 sync
 
-echo "Packing up boot partition to: $image_filename_boot"
+echo "Packing boot partition to: $image_filename_boot"
 dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
 md5sum $image_filename_boot>>$checksums_filename
+
+#create scripts folder inside the tar
+if [ ! -e $upgrade_scripts ]
+then
+	mkdir -p $upgrade_scripts/
+fi
+
+#cp $BASEDIR/factory_settings_sdcard/scripts/* $upgrade_scripts/
+#echo "cp $BASEDIR/factory_settings_sdcard/scripts/* $upgrade_scripts/"
+#echo "${pwd}"
+#exit
+
 
 echo "Data partition: $data_partition"
 mount $data_partition /tmp/emmc -t ext4
@@ -260,7 +276,7 @@ retval=$?
 		umount /tmp/emmc > /dev/null || true
 	fi
 
-	echo "Packing up data partition to: $image_filename_data"
+	echo "Packing data partition to: $image_filename_data"
 	dd  if=${eMMC}p3 bs=16M | gzip -c > $image_filename_data
 	md5sum $image_filename_data>>$checksums_filename
 
@@ -287,7 +303,7 @@ then
 	rm $image_filename_upgrade_temp
 fi
 
-tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $checksums_filename
+tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $checksums_filename $upgrade_scripts
 
 echo "Remove packed files"
 if [ -e $image_filename_boot ]
