@@ -106,6 +106,9 @@ fi
 unmount_all () {
 	if [ -e /dev/md2 ]
 	then
+		sync
+		sleep 2
+		fuser -m /dev/md2* --all -u -v -k
 		mdadm --stop /dev/md2
 	fi
 	losetup -d /dev/loop2
