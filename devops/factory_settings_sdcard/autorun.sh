@@ -38,15 +38,15 @@ fi
 sdcard_p1="/sdcard/p1"
 sdcard_p2="/sdcard/p2"
 
-	if [ ! -e ${sdcard_p1} ]
-	then
-	       mkdir -p ${sdcard_p1}
-	fi
+if [ ! -e ${sdcard_p1} ]
+then
+       mkdir -p ${sdcard_p1}
+fi
 
-	if [ ! -e ${sdcard_p2} ]
-	then
-	       mkdir -p ${sdcard_p2}
-	fi
+if [ ! -e ${sdcard_p2} ]
+then
+       mkdir -p ${sdcard_p2}
+fi
 
 mount ${sdcard_dev}p1 ${sdcard_p1} -t vfat || true
 mount ${sdcard_dev}p2 ${sdcard_p2} -t ext4 || true
@@ -117,12 +117,7 @@ write_pt_image () {
 	image_filename_boot="$image_filename_prfx-boot.img.gz"
 	image_filename_pt="$image_filename_prfx-pt.img.gz"
 
-#	image_filename_upgrade="${sdcard_p2}/upgrade.img.gz"
-
-#	if [ "$1" = "factorysettings" ]
-#	then
 	image_filename_upgrade="${sdcard_p1}/factory_settings.img.gz"
-#	fi
 
 	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
         tar xOf $image_filename_upgrade $image_filename_pt | gunzip -c | dd of=${eMMC} bs=16M
@@ -166,7 +161,16 @@ update_uenv () {
 	fi
 	mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
 	cp /sdcard/p1/uEnv.txt /tmp/emmcboot/
-	sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+	if [ $1 -eq 2 ]
+	then
+		if [ -e /sdcard/p2/scripts/replace_uEnv.txt.sh
+			sh /sdcard/p2/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+		else
+			sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+		fi
+	else
+		sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+	fi
 	sync
 	sleep 5
 	umount /tmp/emmcboot || true
@@ -231,7 +235,14 @@ then
         fi
 
         echo "Resuming eMMC unpacking"
- 	sh ${sdcard_p1}/scripts/unpack_latest_version.sh noreboot $counter || true
+
+	if [ -e ${sdcard_p2}/scripts/unpack_latest_version.sh ]
+	then
+		sh ${sdcard_p2}/scripts/unpack_latest_version.sh noreboot $counter || true
+	else
+	 	sh ${sdcard_p1}/scripts/unpack_latest_version.sh noreboot $counter || true
+	fi
+
         result=$?
         if [ $result -eq 1 ]
         then
@@ -240,7 +251,7 @@ then
                 rebootx
         fi
 
-        update_uenv
+        update_uenv 2
         stop_packing_restarting
         alldone
         exit
@@ -278,7 +289,7 @@ else
 	exit
 fi
 
-update_uenv
+update_uenv 1
 
 if [ -e ${sdcard_p1}/write_perm_partition.flag ]
 then
