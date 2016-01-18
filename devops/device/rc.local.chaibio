@@ -1,0 +1,149 @@
+diff -ur ./rc.local ../updated/rc.local
+--- ./rc.local	2016-01-06 04:05:53.621352432 +0200
++++ ../updated/rc.local	2016-01-06 04:21:05.701403975 +0200
+@@ -11,4 +11,145 @@
+ #
+ # By default this script does nothing.
+ 
++check_upgrade_autorun () {
++	sdcard_dev=""
++	if [ -e /dev/mmcblk0p4 ]
++	then
++        	sdcard_dev=/dev/mmcblk1
++	elif [ -e /dev/mmcblk1p4 ]
++	then
++		sdcard_dev=/dev/mmcblk0
++	else
++		echo "No SDCard found!" >> $log_file
++		return 1
++	fi
++
++	if [ -z ${sdcard_dev} ]
++	then
++		echo "No SDCard found! Cannot find ${sdcard_dev}" >> $log_file
++		return 1
++	fi
++
++	if [ -e ${sdcard_dev} ]
++	then
++		echo "SDCard block device found at $sdcard_dev" >> $log_file
++
++		sdcard=/sdcard
++		if [ ! -e ${sdcard}/factory ]
++		then
++			mkdir -p ${sdcard}/factory>/dev/null || true
++			mkdir -p ${sdcard}/upgrade>/dev/null || true
++		fi
++
++		mount ${sdcard_dev}p1 ${sdcard}/factory>/dev/null || true
++		mount ${sdcard_dev}p2 ${sdcard}/upgrade>/dev/null || true
++
++		if [ $? -gt 0 ]
++		then
++			echo "Second SDCard partition not found.. old version? ${sdcard}p2"  >> $log_file
++		fi
++
++		echo "Checking for flag file: ${sdcard}/factory/upgrade_autorun.flag"  >> $log_file
++
++		if [ -e ${sdcard}/factory/upgrade_autorun.flag ]
++		then
++        		echo "Upgrade autorun flag found up" >> $log_file
++			cd /root/chaipcr/web || : >> $log_file
++			echo "changed folder to $(pwd).. executing migrate..." >> $log_file
++			RAILS_ENV=production bundle exec rake db:migrate || : >> $log_file
++			echo "Execution result: $?, now executing seed_fu..." >> $log_file
++			bundle exec rake db:seed_fu || :>> $log_file
++			echo "Execution result $?, done executing scripts!" >> $log_file
++        		rm ${sdcard}/factory/upgrade_autorun.flag
++	        	echo "Upgrade autorun flag down" >> $log_file
++		else
++			echo "No autorun flag found!" >> $log_file
++		fi
++
++		return 0
++	fi
++	return 1
++}
++
++check_corruption () {
++	check_script=/root/chaipcr/deploy/device/check_sdcard.sh
++	if [ -e $check_script ]
++	then
++		echo "Corruption test started!" >> $log_file
++		sh $check_script >> $log_file || true
++		echo "Corruption test result: $?" >> $log_file
++	else
++		echo "Can't find $check_script"
++	fi
++}
++
++#check_corruption
++#exit 0
++
++network_watchdog() {
++        echo "Network watchdog: Starting"
++        while [ 1 ]
++        do
++                ip_address=$(ifconfig eth0 | grep 'inet addr:') || :
++                if [ -z "$ip_address" ]
++                then
++#                        echo "Network watchdog: No network found!"
++	                sleep 5
++                        dhclient eth0 -1 || :
++                else
++#                        echo "Network watchdog.. Network found: $ip_address"
++			sleep 10
++                fi
++        done
++	echo "Network watchdog: Exit!"
++}
++
++network_watchdog &
++NOW=$(date +"%m-%d-%Y %H:%M:%S")
++log_file="/var/log/life_age.log"
++
++echo Restarting! >> $log_file
++echo $NOW >>  $log_file
++echo Mounting partitions! >> $log_file
++
++#check_upgrade_autorun &
++
++if [ -e /data ]
++then
++        echo "/data folder found!"
++else
++        mkdir /data
++fi
++
++if [ -e /dev/mmcblk0p3 ]
++then
++        mount /dev/mmcblk0p3 /data
++elif [ -e /dev/mmcblk1p3 ]
++then
++        mount /dev/mmcblk1p3 /data
++else
++        echo "Unknown condition"
++fi
++
++if [ -e /perm ]
++then
++        echo "/perm folder found!"
++else
++        mkdir /perm
++fi
++
++if [ -e /dev/mmcblk0p4 ]
++then
++        mount /dev/mmcblk0p4 /perm
++elif [ -e /dev/mmcblk1p4 ]
++then
++        mount /dev/mmcblk1p4 /perm
++fi
++
++check_corruption || true
++
++check_upgrade_autorun &
++
++echo "Autorun script done!" >> $log_file
++
+ exit 0
