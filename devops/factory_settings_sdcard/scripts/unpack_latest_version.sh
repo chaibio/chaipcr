@@ -204,7 +204,19 @@ set_sdcard_uEnv () {
 	echo copying coupling uEng.txt
 	mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
 	cp ${sdcard_p1}/uEnv.txt /tmp/emmcboot/
-	sh ${sdcard_p1}/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+
+	if [ $1 -eq 2 ]
+	then
+		if [ -e /sdcard/p2/scripts/replace_uEnv.txt.sh ]
+		then
+			sh /sdcard/p2/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+		else
+			sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+		fi
+	else
+		sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+	fi
+
 	uEnvPath=/tmp/emmcboot
 
 	cp ${uEnvPath}/uEnv.txt ${uEnvPath}/uEnv.org.txt
@@ -219,24 +231,32 @@ update_uenv () {
 	echo copying coupling uEng.txt
 	mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
 	cp ${sdcard_p1}/uEnv.txt /tmp/emmcboot/
-	sh ${sdcard_p1}/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+
+	if [ $1 -eq 2 ]
+	then
+		if [ -e /sdcard/p2/scripts/replace_uEnv.txt.sh ]
+		then
+			sh /sdcard/p2/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+		else
+			sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+		fi
+	else
+		sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+	fi
+
 	sync
 	sleep 5
 	umount /tmp/emmcboot || true
 }
 
-#if [ -e $image_filename_boot ]
-#then
-	# needs to add a uEnv to swtich things to sdcard
-	echo "Freeup boot partition during the backup process"
-	#mkfs.vfat ${eMMC}p1 -n boot
-	mount ${eMMC}p1 /tmp/emmcboot
-	rm /tmp/emmcboot/* || true
-	sync
-	sleep 3
-	umount /tmp/emmcboot
-	incriment_stage_counter
-#fi
+# needs to add a uEnv to swtich things to sdcard
+echo "Freeup boot partition during the backup process"
+mount ${eMMC}p1 /tmp/emmcboot
+rm /tmp/emmcboot/* || true
+sync
+sleep 3
+umount /tmp/emmcboot
+incriment_stage_counter
 
 if [ "$1" = "factorysettings" ]
 then
@@ -258,9 +278,6 @@ else
 fi
 
 incriment_stage_counter
-
-#update_uenv
-#incriment_stage_counter
 
 echo "Finished.. byebye!"
 echo "Upgrade resume flag down!"
