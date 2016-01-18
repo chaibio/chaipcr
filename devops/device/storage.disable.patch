@@ -1,21 +1,12 @@
 diff -ur ./am335x_evm.sh ../disable/am335x_evm.sh
 --- ./am335x_evm.sh	2016-01-18 19:14:19.335478480 +0200
-+++ ../disable/am335x_evm.sh	2016-01-18 19:43:19.243576806 +0200
-@@ -131,7 +131,7 @@
- 
- g_network="iSerialNumber=${SERIAL_NUMBER} iManufacturer=${manufacturer} iProduct=${PRODUCT} host_addr=${cpsw_1_mac} dev_addr=${dev_mac}"
- usb_image_file="/var/local/usb_mass_storage.img"
-- 
-+
- #If image file is found, use it for g_multi
- if [ -f ${usb_image_file} ] ; then
- 	modprobe g_multi file=${usb_image_file} cdrom=0 ro=0 stall=0 removable=1 nofua=1 ${g_network} || true
++++ ../disable/am335x_evm.sh	2016-01-18 22:25:02.852125176 +0200
 @@ -146,7 +146,7 @@
  	fi
  else
  	boot_drive="${root_drive%?}1"
 -	modprobe g_multi file=${boot_drive} cdrom=0 ro=0 stall=0 removable=1 nofua=1 ${g_network} || true
-+	modprobe g_multi nofua=1 ${g_network} || true
++	modprobe g_ether ${g_network} || true
  fi
  
  sleep 3
