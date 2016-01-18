@@ -163,7 +163,7 @@ update_uenv () {
 	cp /sdcard/p1/uEnv.txt /tmp/emmcboot/
 	if [ $1 -eq 2 ]
 	then
-		if [ -e /sdcard/p2/scripts/replace_uEnv.txt.sh
+		if [ -e /sdcard/p2/scripts/replace_uEnv.txt.sh ]
 			sh /sdcard/p2/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
 		else
 			sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true

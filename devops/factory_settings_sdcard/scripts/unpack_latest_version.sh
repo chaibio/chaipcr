@@ -250,7 +250,13 @@ incriment_stage_counter
 write_boot_image
 incriment_stage_counter
 
-update_uenv
+if [ "$1" = "factorysettings" ]
+then
+	update_uenv
+else
+	update_uenv 2
+fi
+
 incriment_stage_counter
 
 #update_uenv
