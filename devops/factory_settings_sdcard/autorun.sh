@@ -52,14 +52,26 @@ mount ${sdcard_dev}p1 ${sdcard_p1} -t vfat || true
 mount ${sdcard_dev}p2 ${sdcard_p2} -t ext4 || true
 
 rebootx () {
-        if [ ! -e ${sdcard_p1}/rebootx.sh ]
+	#try to call rebootx from the upgrade partition first.
+	if [ ! -e ${sdcard_p2}/scripts/rebootx.sh ]
+        then
+                mount ${sdcard_dev}p2 ${sdcard_p2} || true
+        fi
+        if [ -e ${sdcard_p2}/scripts/rebootx.sh ]
+        then
+                sh ${sdcard_p2}/scripts/rebootx.sh 120
+                umount ${sdcard_p2}
+                exit 0
+        fi
+
+        if [ ! -e ${sdcard_p1}/scripts/rebootx.sh ]
         then
 		mount ${sdcard_dev}p1 ${sdcard_p1} -t vfat || true
 	fi
-	if [ -e ${sdcard_p1}/rebootx.sh ]
+	if [ -e ${sdcard_p1}/scripts/rebootx.sh ]
 	then
-		sh ${sdcard_p1}/rebootx.sh 120
-		umount ${sdcard_p1}
+		sh ${sdcard_p1}/scripts/rebootx.sh 120
+		umount ${sdcard_p1} || true
 		exit 0
 	fi
 
@@ -154,7 +166,7 @@ update_uenv () {
 	fi
 	mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
 	cp /sdcard/p1/uEnv.txt /tmp/emmcboot/
-	sh /sdcard/p1/replace_uEnv.txt.sh /tmp/emmcboot || true
+	sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
 	sync
 	sleep 5
 	umount /tmp/emmcboot || true
@@ -219,7 +231,7 @@ then
         fi
 
         echo "Resuming eMMC unpacking"
- 	sh ${sdcard_p1}/unpack_latest_version.sh noreboot $counter || true
+ 	sh ${sdcard_p1}/scripts/unpack_latest_version.sh noreboot $counter || true
         result=$?
         if [ $result -eq 1 ]
         then
@@ -255,7 +267,7 @@ else
 fi
 
 echo "Restoring system from sdcard at $sdcard_dev to eMMC at $eMMC!"
-sh ${sdcard_p1}/unpack_latest_version.sh factorysettings $counter || true
+sh ${sdcard_p1}/scripts/unpack_latest_version.sh factorysettings $counter || true
 
 if [ -e "${eMMC}p4" ]
 then
