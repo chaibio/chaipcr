@@ -7,7 +7,9 @@ window.ChaiBioTech.ngApp.controller 'RunExperimentCtrl', [
   ($scope, $stateParams, $state, Experiment, $uibModal) ->
     @chart = $stateParams.chart
     $scope.chart = $stateParams.chart
-    $scope.hover= "";
+    $scope.hover= ""
+    $scope.noofCharts = 3
+
     Experiment.get(id: $stateParams.id).$promise.then (data) ->
       Experiment.setCurrentExperiment data.experiment
       $scope.experiment = data.experiment
@@ -20,9 +22,16 @@ window.ChaiBioTech.ngApp.controller 'RunExperimentCtrl', [
         $scope.uiModal.close()
 
     @changeChartTypeModal = ->
+      if $scope.noofCharts < 4
+        templateUrl = 'app/views/experiment/choose-chart-3.html'
+      else
+        templateUrl = 'app/views/experiment/choose-chart.html'
+
+
       $scope.uiModal = $uibModal.open({
-        templateUrl: 'app/views/experiment/choose-chart.html',
+        templateUrl: templateUrl,
         scope: $scope,
+        windowClass: 'modal-1-row'
       });
 
 ]

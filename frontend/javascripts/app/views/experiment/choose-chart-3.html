@@ -1,15 +1,14 @@
-<div class="chart-chooser">
+<div class="chart-chooser-3">
   <div class="chart-content">
     <div class="chart-header-section">
       <div class="chart-caption">Choose a Chart</div>
       <div class="close-container"><a class="close-modal" ng-click="uiModal.close()">×</a></div>
     </div>
     <div class="charts-container">
-
       <chart-type ng-click="RunExperimentCtrl.changeChart('amplification')" name="Amplification Curve" image="amplification-curve" current="{{chart}}" type="amplification"></chart-type>
       <!--<chart-type name="Standard Curve" image="standard-curve" second="true" type="standard" current="{{chart}}"></chart-type> -->
       <chart-type name="Melt Curve" image="melt-curve" second="true" type="melt" current="{{chart}}"></chart-type>
-      <chart-type ng-click="RunExperimentCtrl.changeChart('temperature-logs')" type="temperature-logs" name="Thermal Profile" image="thermal-profile" current="{{chart}}"></chart-type>
+      <chart-type ng-click="RunExperimentCtrl.changeChart('temperature-logs')" second="true" type="temperature-logs" name="Thermal Profile" image="thermal-profile" current="{{chart}}"></chart-type>
 
     </div>
   </div>
