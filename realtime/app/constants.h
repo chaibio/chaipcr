@@ -107,7 +107,7 @@ const double kHeatSinkPIDMax = 0;
 const unsigned int kBeagleboneADCBits = 12;
 
 //App
-const std::string kDeviceFilePath = "/root/device.json";
+const std::string kDeviceFilePath = "/perm/device.josn";
 const std::string kConfigurationFilePath = "/root/configuration.json";
 
 const long kAppSignalInterval = 50 * 1000 * 1000; //Nanosec
