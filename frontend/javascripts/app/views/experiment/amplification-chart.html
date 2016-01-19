@@ -15,9 +15,9 @@
     <div class="content">
       <div class="chart-section">
         <div class="curve-header">
-          <span class="curve-title">
-          Amplification Curve
-          <img class="arrow-down" src="/images/arrow-down.png" ng-click="RunExperimentCtrl.changeChartTypeModal()">
+          <span class="curve-title" ng-click="RunExperimentCtrl.changeChartTypeModal()">
+            Amplification Curve
+            <img class="arrow-down" src="/images/arrow-down.png">
           </span>
           <span class="log-checkboxes">
           <span class="checkbox-item" ng-click="log_linear = 'log'" ng-class="{checked:log_linear === 'log', unchecked: log_linear !== 'log'}">
@@ -70,7 +70,7 @@
 
 
           <div class="choose-chart">
-            <div class="choose-chart-heading">
+            <!--<div class="choose-chart-heading">
               CHOOSE CHART
             </div>
             <div class="row">
@@ -80,7 +80,7 @@
               <div class="col-md-4">
                 <div class="chart-type-option" ng-click="RunExperimentCtrl.changeChart('temperature-logs')">Thermal Profile</div>
               </div>
-            </div>
+            </div> -->
             <amplification-well-switch ng-model="wellButtons"></amplification-well-switch>
           </div>
         </div>

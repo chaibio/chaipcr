@@ -11,6 +11,41 @@
 #
 # By default this script does nothing.
 
+run_migrate_on_upgrade () {
+	echo "Checking for flag file: ${sdcard}/factory/upgrade_autorun.flag"
+	if [ -e ${sdcard}/factory/upgrade_autorun.flag ]
+	then
+       		echo "Upgrade autorun flag found up"
+		cd /root/chaipcr/web || :
+		echo "changed folder to $(pwd).. executing migrate..."
+		mysqladmin status | grep Uptime
+		sql_running=$?
+		while [ $sql_running -eq 1 ]
+		do
+			echo mysql server not up yet... waiting 10 seconds!.. the following is mysql status:
+			mysqladmin status
+
+			sleep 10
+			mysqladmin status | grep Uptime
+			sql_running=$?
+		done
+
+		echo mysql server is running
+		RAILS_ENV=production bundle exec rake db:migrate || :
+		echo "Execution result: $?, now executing seed_fu..."
+		RAILS_ENV=production bundle exec rake db:seed_fu || :
+		echo "Execution result $?, done executing scripts!"
+       		rm ${sdcard}/factory/upgrade_autorun.flag
+        	echo "Upgrade autorun flag down"
+	else
+		echo "No autorun flag found!"
+	fi
+}
+
+run_migrate_on_upgrade_logged () {
+	run_migrate_on_upgrade >> $log_file 2>&1
+}
+
 check_upgrade_autorun () {
 	sdcard_dev=""
 	if [ -e /dev/mmcblk0p4 ]
@@ -49,22 +84,7 @@ check_upgrade_autorun () {
 			echo "Second SDCard partition not found.. old version? ${sdcard}p2"  >> $log_file
 		fi
 
-		echo "Checking for flag file: ${sdcard}/factory/upgrade_autorun.flag"  >> $log_file
-
-		if [ -e ${sdcard}/factory/upgrade_autorun.flag ]
-		then
-        		echo "Upgrade autorun flag found up" >> $log_file
-			cd /root/chaipcr/web || : >> $log_file
-			echo "changed folder to $(pwd).. executing migrate..." >> $log_file
-			RAILS_ENV=production bundle exec rake db:migrate || : >> $log_file
-			echo "Execution result: $?, now executing seed_fu..." >> $log_file
-			RAILS_ENV=production bundle exec rake db:seed_fu || : >> $log_file
-			echo "Execution result $?, done executing scripts!" >> $log_file
-        		rm ${sdcard}/factory/upgrade_autorun.flag
-	        	echo "Upgrade autorun flag down" >> $log_file
-		else
-			echo "No autorun flag found!" >> $log_file
-		fi
+		run_migrate_on_upgrade_logged &
 
 		return 0
 	fi
@@ -72,13 +92,10 @@ check_upgrade_autorun () {
 }
 
 check_corruption () {
-	echo "Corruption test started!" >> $log_file
-	sh /etc/check_sdcard.sh >> $log_file || true
-	echo "Corruption test result: $?" >> $log_file
+	echo "Corruption test started!"
+	sh $BASEDIR/check_sdcard.sh || true
+	echo "Corruption test result: $?"
 }
-
-#check_corruption
-#exit 0
 
 network_watchdog() {
         echo "Network watchdog: Starting"
@@ -97,6 +114,8 @@ network_watchdog() {
         done
 	echo "Network watchdog: Exit!"
 }
+
+BASEDIR=$(dirname $0)
 
 network_watchdog &
 NOW=$(date +"%m-%d-%Y %H:%M:%s")
@@ -140,7 +159,7 @@ then
         mount /dev/mmcblk1p4 /perm
 fi
 
-check_corruption || true
+check_corruption >> $log_file || true
 
 check_upgrade_autorun &
 

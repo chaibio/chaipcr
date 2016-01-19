@@ -63,15 +63,25 @@ void UpdateHandler::processData(const boost::property_tree::ptree &requestPt, bo
         break;
 
     case Update:
-        if (!updateManager->update())
+    {
+        try
+        {
+            if (!updateManager->update())
+            {
+                setStatus(Poco::Net::HTTPResponse::HTTP_PRECONDITION_FAILED);
+                setErrorString("Update is not available");
+            }
+        }
+        catch (const std::exception &ex)
         {
             setStatus(Poco::Net::HTTPResponse::HTTP_PRECONDITION_FAILED);
-            setErrorString("Update is not available");
+            setErrorString(ex.what());
         }
 
         JsonHandler::processData(requestPt, responsePt);
 
         break;
+    }
 
     default:
         setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);

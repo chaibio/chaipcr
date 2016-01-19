@@ -24,7 +24,7 @@ window.App.service 'Device', [
             deviceCheckPromise = @getVersion()
             deviceCheckPromise.then (device) ->
               is_offline = true
-              if cloudInfo.software_version isnt device.software.version
+              if cloudInfo.software_version isnt device.software?.version?
                 deferred.resolve 'available'
               else
                 deferred.resolve 'unavailable'
