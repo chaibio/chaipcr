@@ -1,4 +1,5 @@
 require "net/http"
+require 'digest/md5'
 
 class DevicesController < ApplicationController
   include ParamsHelper
@@ -38,28 +39,42 @@ class DevicesController < ApplicationController
     current software platform
   EOS
   def show
+    begin
       device_file = File.read(DEVICE_FILE_PATH)
-      device_hash = JSON.parse(device_file)
+      device_hash = JSON.parse(device_file) if device_file
       configuration_file = File.read(CONFIGURATION_FILE_PATH)
       configuration_hash = JSON.parse(configuration_file)
-      result_hash = Hash.new
+    rescue  => e
+    end
+    result_hash = Hash.new
+    if device_hash
       result_hash["serial_number"] = device_hash["serial_number"]
       result_hash["model_number"] = device_hash["model_number"]
       result_hash["processor_architecture"] = device_hash["processor_architecture"]
+    end
+    if configuration_hash
       result_hash["software"] = configuration_hash["software"]
-      render json: result_hash.to_json, status: :ok
+    end
+    render json: result_hash.to_json, status: :ok
   end
   
   api :GET, "/capabilities", "return device capabilities"
   example "{'capabilities':{'plate':{'rows':2,'columns':8,'min_volume_ul':5,'max_volume_ul':100},'optics':{'excitation_channels':[{'begin_wavelength':462,'end_wavelength':490}],'emission_channels':[{'begin_wavelength':510,'end_wavelength':700}]},'storage':{'microsd_size_gb':8,'emmc_size_gb':4}},'thermal':{'lid':{'max_temp_c':120},'block':{'min_temp_c':4,'max_temp_c':100}}}"
   def capabilities
-    device_file = File.read(DEVICE_FILE_PATH)
-    device_hash = JSON.parse(device_file)
-    configuration_file = File.read(CONFIGURATION_FILE_PATH)
-    configuration_hash = JSON.parse(configuration_file)
+    begin
+      device_file = File.read(DEVICE_FILE_PATH)
+      device_hash = JSON.parse(device_file) if device_file
+      configuration_file = File.read(CONFIGURATION_FILE_PATH)
+      configuration_hash = JSON.parse(configuration_file)
+    rescue  => e
+    end
     result_hash = Hash.new
-    result_hash["capabilities"] = device_hash["capabilities"]
-    result_hash["thermal"] = configuration_hash["thermal"]
+    if device_hash
+      result_hash["capabilities"] = device_hash["capabilities"]
+    end
+    if configuration_hash
+      result_hash["thermal"] = configuration_hash["thermal"]
+    end
     render json: result_hash.to_json, status: :ok
   end
   
@@ -107,6 +122,8 @@ class DevicesController < ApplicationController
       Experiment.joins(:experiment_definition).where("experiment_type != ? and experiments.id != 1", ExperimentDefinition::TYPE_DIAGNOSTIC).select('experiments.*').each do |e|
         e.destroy
       end
+      serialmd5 = Digest::MD5.hexdigest(params[:serial_number])
+      system("printf '#{serialmd5}\n#{serialmd5}\n' | passwd")
       render json: {response: "Device is programmed successfully"}, status: :ok
     else
       render json: {errors: "Device is already serialized"}, status: 405
