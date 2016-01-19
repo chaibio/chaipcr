@@ -22,9 +22,9 @@ then
 fi
 
 verify_checksum () {
-        image_filename_upgrade1="/sdcard/upgrade/upgrade.img.gz"
-#       image_filename_upgrade1="~/tmp2out/p2/upgrade.img.gz"
-#	image_filename_upgrade1="/home/mahammad/tmp2out/p2/upgrade.img.gz"
+        image_filename_upgrade1="/sdcard/upgrade/upgrade.img.tar"
+#       image_filename_upgrade1="~/tmp2out/p2/upgrade.img.tar"
+#	image_filename_upgrade1="/home/mahammad/tmp2out/p2/upgrade.img.tar"
 
 #	ls -ahl  $image_filename_upgrade1
 

@@ -112,12 +112,12 @@ write_pt_image () {
 	echo "Writing partition table image!"
 
 	image_filename_prfx="upgrade"
-	image_filename_rootfs="$image_filename_prfx-rootfs.img.gz" 
+	image_filename_rootfs="$image_filename_prfx-rootfs.img.gz"
 	image_filename_data="$image_filename_prfx-data.img.gz"
 	image_filename_boot="$image_filename_prfx-boot.img.gz"
 	image_filename_pt="$image_filename_prfx-pt.img.gz"
 
-	image_filename_upgrade="${sdcard_p1}/factory_settings.img.gz"
+	image_filename_upgrade="${sdcard_p1}/factory_settings.img.tar"
 
 	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
         tar xOf $image_filename_upgrade $image_filename_pt | gunzip -c | dd of=${eMMC} bs=16M
@@ -295,7 +295,7 @@ update_uenv 1
 if [ -e ${sdcard_p1}/write_perm_partition.flag ]
 then
 	echo "eMMC Flasher: writing to /perm partition (to format)"
-	if [ -e ${sdcard_p2}/upgrade.img.gz ]
+	if [ -e ${sdcard_p2}/upgrade.img.tar ]
 	then
 		# todo check mkfs.ext4
 		rm ${sdcard_p1}/write_perm_partition.flag || true

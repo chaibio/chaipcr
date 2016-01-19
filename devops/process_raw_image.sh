@@ -150,13 +150,13 @@ image_filename_pt="$image_filename_prfx-pt.img.gz"
 
 checksums_filename="$image_filename_prfx-checksums.txt"
 
-image_filename_upgrade_temp="${temp}/temp.tar.gz"
-image_filename_upgrade1="${output_dir}/p2/upgrade.img.gz"
+image_filename_upgrade_temp="${temp}/temp.tar"
+image_filename_upgrade1="${output_dir}/p2/upgrade.img.tar"
 
 echo "SDCard: $sdcard"
 cd ${temp}
 
-image_filename_upgrade2="${output_dir}/p1/factory_settings.img.gz"
+image_filename_upgrade2="${output_dir}/p1/factory_settings.img.tar"
 
 echo "Packing eMMC image.."
 

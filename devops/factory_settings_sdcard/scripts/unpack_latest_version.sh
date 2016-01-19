@@ -72,16 +72,16 @@ sdcard_p1="/sdcard/p1"
 sdcard_p2="/sdcard/p2"
 
 image_filename_prfx="upgrade"
-image_filename_rootfs="$image_filename_prfx-rootfs.img.gz" 
+image_filename_rootfs="$image_filename_prfx-rootfs.img.gz"
 image_filename_data="$image_filename_prfx-data.img.gz"
 image_filename_boot="$image_filename_prfx-boot.img.gz"
 image_filename_pt="$image_filename_prfx-pt.img.gz"
 
-image_filename_upgrade="${sdcard_p2}/upgrade.img.gz"
+image_filename_upgrade="${sdcard_p2}/upgrade.img.tar"
 
 if [ "$1" = "factorysettings" ]
 then
-	image_filename_upgrade="${sdcard_p1}/factory_settings.img.gz"
+	image_filename_upgrade="${sdcard_p1}/factory_settings.img.tar"
 fi
 
 mount | grep ${eMMC}p1

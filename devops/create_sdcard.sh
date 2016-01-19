@@ -82,8 +82,8 @@ then
 	print_usage_exit
 fi
 
-image_filename_upgrade1="${input_dir}/p2/upgrade.img.gz"
-image_filename_upgrade2="${input_dir}/p1/factory_settings.img.gz"
+image_filename_upgrade1="${input_dir}/p2/upgrade.img.tar"
+image_filename_upgrade2="${input_dir}/p1/factory_settings.img.tar"
 
 if [ ! -e $image_filename_upgrade1 ]
 then
