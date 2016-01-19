@@ -18,15 +18,15 @@ run_migrate_on_upgrade () {
        		echo "Upgrade autorun flag found up"
 		cd /root/chaipcr/web || :
 		echo "changed folder to $(pwd).. executing migrate..."
-		/etc/init.d/mysql status | grep running
+		mysqladmin status | grep Uptime
 		sql_running=$?
 		while [ $sql_running -eq 1 ]
 		do
 			echo mysql server not up yet... waiting 10 seconds!.. the following is mysql status:
-			/etc/init.d/mysql status
+			mysqladmin status
 
 			sleep 10
-			/etc/init.d/mysql status | grep running
+			mysqladmin status | grep Uptime
 			sql_running=$?
 		done
 
