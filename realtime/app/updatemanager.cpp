@@ -110,6 +110,10 @@ bool UpdateManager::update()
     {
         try
         {
+            Poco::File dir(kUpdateFolder);
+            if (dir.exists())
+                dir.remove();
+
             if (!Util::watchProcess("tar xf " + kUpdateFilePath + " --directory \"" + kUpdateFolder + "\"", _downloadEventFd,
                                     [](const char buffer[]){ std::cout << "UpdateManager::update - tar: " << buffer << '\n'; }))
                 return false; //This will happen only if the app is getting closed
