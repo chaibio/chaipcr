@@ -42,10 +42,13 @@ class DevicesController < ApplicationController
     begin
       device_file = File.read(DEVICE_FILE_PATH)
       device_hash = JSON.parse(device_file) if device_file
-      configuration_file = File.read(CONFIGURATION_FILE_PATH)
-      configuration_hash = JSON.parse(configuration_file)
     rescue  => e
-    end
+    end 
+    begin
+      configuration_file = File.read(CONFIGURATION_FILE_PATH)
+      configuration_hash = JSON.parse(configuration_file) if configuration_file
+    rescue  => e
+    end 
     result_hash = Hash.new
     if device_hash
       result_hash["serial_number"] = device_hash["serial_number"]
@@ -64,10 +67,13 @@ class DevicesController < ApplicationController
     begin
       device_file = File.read(DEVICE_FILE_PATH)
       device_hash = JSON.parse(device_file) if device_file
-      configuration_file = File.read(CONFIGURATION_FILE_PATH)
-      configuration_hash = JSON.parse(configuration_file)
     rescue  => e
     end
+    begin
+      configuration_file = File.read(CONFIGURATION_FILE_PATH)
+      configuration_hash = JSON.parse(configuration_file) if configuration_file
+    rescue  => e
+    end 
     result_hash = Hash.new
     if device_hash
       result_hash["capabilities"] = device_hash["capabilities"]
