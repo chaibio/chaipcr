@@ -39,32 +39,42 @@ class DevicesController < ApplicationController
     current software platform
   EOS
   def show
+    begin
       device_file = File.read(DEVICE_FILE_PATH)
       device_hash = JSON.parse(device_file) if device_file
       configuration_file = File.read(CONFIGURATION_FILE_PATH)
       configuration_hash = JSON.parse(configuration_file)
-      result_hash = Hash.new
-      if device_hash
-        result_hash["serial_number"] = device_hash["serial_number"]
-        result_hash["model_number"] = device_hash["model_number"]
-        result_hash["processor_architecture"] = device_hash["processor_architecture"]
-      end
+    rescue  => e
+    end
+    result_hash = Hash.new
+    if device_hash
+      result_hash["serial_number"] = device_hash["serial_number"]
+      result_hash["model_number"] = device_hash["model_number"]
+      result_hash["processor_architecture"] = device_hash["processor_architecture"]
+    end
+    if configuration_hash
       result_hash["software"] = configuration_hash["software"]
-      render json: result_hash.to_json, status: :ok
+    end
+    render json: result_hash.to_json, status: :ok
   end
   
   api :GET, "/capabilities", "return device capabilities"
   example "{'capabilities':{'plate':{'rows':2,'columns':8,'min_volume_ul':5,'max_volume_ul':100},'optics':{'excitation_channels':[{'begin_wavelength':462,'end_wavelength':490}],'emission_channels':[{'begin_wavelength':510,'end_wavelength':700}]},'storage':{'microsd_size_gb':8,'emmc_size_gb':4}},'thermal':{'lid':{'max_temp_c':120},'block':{'min_temp_c':4,'max_temp_c':100}}}"
   def capabilities
-    device_file = File.read(DEVICE_FILE_PATH)
-    device_hash = JSON.parse(device_file) if device_file
-    configuration_file = File.read(CONFIGURATION_FILE_PATH)
-    configuration_hash = JSON.parse(configuration_file)
+    begin
+      device_file = File.read(DEVICE_FILE_PATH)
+      device_hash = JSON.parse(device_file) if device_file
+      configuration_file = File.read(CONFIGURATION_FILE_PATH)
+      configuration_hash = JSON.parse(configuration_file)
+    rescue  => e
+    end
     result_hash = Hash.new
     if device_hash
       result_hash["capabilities"] = device_hash["capabilities"]
     end
-    result_hash["thermal"] = configuration_hash["thermal"]
+    if configuration_hash
+      result_hash["thermal"] = configuration_hash["thermal"]
+    end
     render json: result_hash.to_json, status: :ok
   end
   
