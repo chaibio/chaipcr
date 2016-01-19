@@ -112,7 +112,7 @@ bool UpdateManager::update()
         {
             Poco::File dir(kUpdateFolder);
             if (dir.exists())
-                dir.remove();
+                dir.remove(true);
 
             if (!Util::watchProcess("tar xf " + kUpdateFilePath + " --directory \"" + kUpdateFolder + "\"", _downloadEventFd,
                                     [](const char buffer[]){ std::cout << "UpdateManager::update - tar: " << buffer << '\n'; }))
