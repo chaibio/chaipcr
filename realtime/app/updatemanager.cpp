@@ -108,6 +108,19 @@ bool UpdateManager::update()
 
     if (_updateState.compare_exchange_strong(state, Updating))
     {
+        try
+        {
+            if (!Util::watchProcess("tar xf " + kUpdateFilePath + " --directory \"" + kUpdateFolder + "\"", _downloadEventFd,
+                                    [](const char buffer[]){ std::cout << "UpdateManager::update - tar: " << buffer << '\n'; }))
+                return false; //This will happen only if the app is getting closed
+        }
+        catch (...)
+        {
+            _updateState = Unknown;
+
+            throw std::runtime_error("Unknown error occurred during extracting an upgrade archive");
+        }
+
         system(kUpdateScriptPath.c_str());
 
         return true;
