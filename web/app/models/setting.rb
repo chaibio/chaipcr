@@ -13,7 +13,11 @@ class Setting < ActiveRecord::Base
   def self.calibration_id
     instance.calibration_id
   end
-    
+
+  def self.software_release_variant
+    instance.software_release_variant
+  end
+      
   def self.time_valid
     instance.time_valid
   end

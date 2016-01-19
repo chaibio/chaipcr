@@ -58,6 +58,8 @@ class DevicesController < ApplicationController
     if configuration_hash
       result_hash["software"] = configuration_hash["software"]
     end
+    result_hash["software_release_variant"] = Setting.software_release_variant
+    
     render json: result_hash.to_json, status: :ok
   end
   

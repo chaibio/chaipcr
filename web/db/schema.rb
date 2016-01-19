@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160108185035) do
+ActiveRecord::Schema.define(version: 20160119074520) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -92,13 +92,14 @@ ActiveRecord::Schema.define(version: 20160108185035) do
   add_index "ramps", ["next_step_id"], name: "index_ramps_on_next_step_id", unique: true, using: :btree
 
   create_table "settings", force: true do |t|
-    t.boolean "debug",          default: false
+    t.boolean "debug",                    default: false
     t.string  "time_zone"
     t.string  "wifi_ssid"
     t.string  "wifi_password"
-    t.boolean "wifi_enabled",   default: true
+    t.boolean "wifi_enabled",             default: true
     t.integer "calibration_id"
-    t.boolean "time_valid",     default: true
+    t.boolean "time_valid",               default: true
+    t.string  "software_release_variant", default: "stable", null: false
   end
 
   create_table "stages", force: true do |t|
