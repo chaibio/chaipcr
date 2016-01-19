@@ -70,9 +70,9 @@ uenvcmdusb=run loadusbfiles; run usbargs; bootz ${loadaddr} ${initrd_addr}:${ini
 uenvcmdmmc=echo "*** Boot button Unpressed..!!"; run loadfiles; run mmcargs; bootz ${loadaddr} ${initrd_addr}:${initrd_size} ${fdtaddr}
 uenvcmdsdcard=echo "*** Boot button pressed..!!"; bootpart=0:1;bootdir=;fdtaddr=0x81FF0000;optargs=quiet capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN;load mmc 0 ${loadaddr} uImage;run loadfdt;setenv bootargs console=${console} ${optargs};bootm ${loadaddr} - ${fdtaddr}
 uenvcmd= if gpio input 72; then run uenvcmdsdcard; else run uenvcmdmmc; fi
-
+shutdown_usb_power=i2c dev 0;i2c mw 0x24 1 0xec
 
 #
 
 
-uenvcmd=run uenvcmdsdcard 
+uenvcmd=run shutdown_usb_power;run uenvcmdsdcard 

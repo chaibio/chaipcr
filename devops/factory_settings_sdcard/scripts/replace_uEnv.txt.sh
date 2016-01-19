@@ -4,7 +4,7 @@ boot=/boot/uboot
 if [ $# -gt 0 ]
 then
 	boot=$1
-	
+
 fi
 echo "Boot partition path is: $boot"
 if [ ! -e $boot ]
@@ -112,7 +112,7 @@ usb_kernel_file=vmlinuz
 loadusbkernel=load usb 0:1 \${loadaddr} /boot/\${usb_kernel_file}
 loadusbinitrd=load usb 0:1 \${initrd_addr} /boot/\${initrd_file}; setenv initrd_size \${filesize}
 loadusbfdt=load usb 0:1 \${fdtaddr} /boot/dtbs/3.8.13-bone69/\${fdtfile}
-
+shutdown_usb_power=i2c dev 0;i2c mw 0x24 1 0xec
 loadusbfiles=run loadusbkernel; run loadusbinitrd; run loadusbfdt
 usbroot=/dev/sda1 ro rootwait
 usbargs=setenv bootargs console=tty0 console=\${console} \${optargs} \${cape_disable} \${cape_enable} \${kms_force_mode} root=\${usbroot} rootfstype=\${mmcrootfstype} 
@@ -123,7 +123,7 @@ uenvcmdusb=run loadusbfiles; run usbargs; bootz \${loadaddr} \${initrd_addr}:\${
 
 uenvcmdmmc=echo "*** Boot button Unpressed..!!"; run loadfiles; run mmcargs; bootz \${loadaddr} \${initrd_addr}:\${initrd_size} \${fdtaddr}
 uenvcmdsdcard=echo "*** Boot button pressed..!!"; bootpart=0:1;bootdir=;fdtaddr=0x81FF0000;optargs=quiet capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN;load mmc 0 \${loadaddr} uImage;run loadfdt;setenv bootargs console=\${console} \${optargs};bootm \${loadaddr} - \${fdtaddr}
-uenvcmd= if gpio input 72; then run uenvcmdsdcard; else run uenvcmdmmc; fi
+uenvcmd=run shutdown_usb_power;if gpio input 72; then run uenvcmdsdcard; else run uenvcmdmmc; fi
 
 
 # Updated: $NOW
@@ -136,7 +136,7 @@ echo "uEnv.txt done updating"
 cp $uEnv $uEnvSDCard
 cp $uEnv $uEnv72Check
 echo " " >> $uEnvSDCard
-echo "uenvcmd=run uenvcmdsdcard" >> $uEnvSDCard
+echo "uenvcmd=run shutdown_usb_power;run uenvcmdsdcard" >> $uEnvSDCard
 echo "#" >> $uEnvSDCard
 
 echo "SDCard version of uEnv.txt done updating"
