@@ -1,5 +1,6 @@
 require "net/http"
 require 'digest/md5'
+require 'json'
 
 class DevicesController < ApplicationController
   include ParamsHelper
@@ -125,12 +126,15 @@ class DevicesController < ApplicationController
   
   def update
     if !File.exists?(DEVICE_FILE_PATH)
-      File.open(DEVICE_FILE_PATH, 'w+') { |file| file.write(JSON.pretty_generate(params.except(:controller, :action))) }
+      device_data = request.body.read
+      device_hash = JSON.parse(device_data)
+
+      File.open(DEVICE_FILE_PATH, 'w+') { |file| file.write(device_data) }
       User.delete_all
       Experiment.joins(:experiment_definition).where("experiment_type != ? and experiments.id != 1", ExperimentDefinition::TYPE_DIAGNOSTIC).select('experiments.*').each do |e|
         e.destroy
       end
-      serialmd5 = Digest::MD5.hexdigest(params[:serial_number])
+      serialmd5 = Digest::MD5.hexdigest(device_hash["serial_number"])
       system("printf '#{serialmd5}\n#{serialmd5}\n' | passwd")
       render json: {response: "Device is programmed successfully"}, status: :ok
     else
