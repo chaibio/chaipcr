@@ -108,6 +108,23 @@ bool UpdateManager::update()
 
     if (_updateState.compare_exchange_strong(state, Updating))
     {
+        try
+        {
+            Poco::File dir(kUpdateFolder);
+            if (dir.exists())
+                dir.remove(true);
+
+            if (!Util::watchProcess("tar xf " + kUpdateFilePath + " --directory \"" + "/sdcard/upgrade" + "\" scripts", _downloadEventFd,
+                                    [](const char buffer[]){ std::cout << "UpdateManager::update - tar: " << buffer << '\n'; }))
+                return false; //This will happen only if the app is getting closed
+        }
+        catch (...)
+        {
+            _updateState = Unknown;
+
+            throw std::runtime_error("Unknown error occurred during extracting an upgrade archive");
+        }
+
         system(kUpdateScriptPath.c_str());
 
         return true;

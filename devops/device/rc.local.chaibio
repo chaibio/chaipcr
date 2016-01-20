@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 #
 # rc.local
 #
@@ -18,15 +18,22 @@ run_migrate_on_upgrade () {
        		echo "Upgrade autorun flag found up"
 		cd /root/chaipcr/web || :
 		echo "changed folder to $(pwd).. executing migrate..."
-		mysqladmin status | grep Uptime
+		/etc/init.d/mysql status | grep running
 		sql_running=$?
+		if [ $sql_running -eq 1 ]
+		then
+			echo Trying to start MySQL service
+			sleep 5
+			service mysql start
+		fi
+		/etc/init.d/mysql status | grep running
+		sql_running=$?
+
 		while [ $sql_running -eq 1 ]
 		do
-			echo mysql server not up yet... waiting 10 seconds!.. the following is mysql status:
-			mysqladmin status
-
+			echo mysql server not up yet... waiting 10 seconds!
 			sleep 10
-			mysqladmin status | grep Uptime
+			/etc/init.d/mysql status | grep running
 			sql_running=$?
 		done
 
@@ -84,10 +91,11 @@ check_upgrade_autorun () {
 			echo "Second SDCard partition not found.. old version? ${sdcard}p2"  >> $log_file
 		fi
 
-		run_migrate_on_upgrade_logged &
-
 		return 0
 	fi
+
+	run_migrate_on_upgrade_logged
+
 	return 1
 }
 

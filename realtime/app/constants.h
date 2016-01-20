@@ -107,7 +107,7 @@ const double kHeatSinkPIDMax = 0;
 const unsigned int kBeagleboneADCBits = 12;
 
 //App
-const std::string kDeviceFilePath = "/root/device.json";
+const std::string kDeviceFilePath = "/perm/device.json";
 const std::string kConfigurationFilePath = "/root/configuration.json";
 
 const long kAppSignalInterval = 50 * 1000 * 1000; //Nanosec
@@ -120,7 +120,8 @@ const long kUpdateInterval = 4 * 60 * 60 * 1000;
 const std::string kUpdateHost = "update.chaibio.com";
 const std::string kUpdatesUrl = "http://update.chaibio.com/device/software_update";
 const std::string kUpdateFilePath = "/sdcard/upgrade/upgrade.img.tar";
-const std::string kUpdateScriptPath = "/sdcard/factory/perform_upgrade.sh";
+const std::string kUpdateFolder = "/sdcard/upgrade/scripts";
+const std::string kUpdateScriptPath = "/sdcard/upgrade/scripts/perform_upgrade.sh";
 
 const std::string kUpdateMountPoint = "/sdcard/upgrade";
 const std::string kCheckSdcardPath = "/root/chaipcr/deploy/device/check_sdcard.sh";
