@@ -10,8 +10,14 @@
     'host',
     '$http',
     'CONSTANTS',
-    function AppController ($scope, $window, Experiment, $state, $stateParams, Status, TestInProgressService, host, $http, CONSTANTS) {
+    'DeviceInfo',
+    '$timeout',
+    '$rootScope',
+    '$uibModal',
+    function AppController ($scope, $window, Experiment, $state, $stateParams, Status, TestInProgressService,
+      host, $http, CONSTANTS, DeviceInfo, $timeout, $rootScope, $uibModal) {
 
+      $scope.error = true;
       $scope.cancel = false;
       $scope.loop = [];
       $scope.CONSTANTS = CONSTANTS;
@@ -56,8 +62,50 @@
       }, true);
 
 
+      $scope.checkMachineStatus = function() {
+
+        DeviceInfo.getInfo($scope.check).then(function(deviceStatus) {
+          // Incase connected
+          if($scope.modal) {
+              $scope.modal.close();
+              $scope.modal = null;
+          }
+
+          if(deviceStatus.data.optics.lid_open === "true" || deviceStatus.data.optics.lid_open === true) { // lid is open
+            $scope.error = true;
+            $scope.lidMessage = "Close lid to begin.";
+          } else {
+            $scope.error = false;
+          }
+        }, function(err) {
+          // Error
+          $scope.error = true;
+          $scope.lidMessage = "Cant connect to machine.";
+
+          if(err.status === 500) {
+
+            if(! $scope.modal) {
+              var scope = $rootScope.$new();
+              scope.message = {
+                title: "Cant connect to machine.",
+                body: err.data.errors || "Error"
+              };
+
+              $scope.modal = $uibModal.open({
+                templateUrl: './views/modal-error.html',
+                scope: scope
+              });
+            }
+          }
+        });
+
+        $scope.timeout = $timeout($scope.checkMachineStatus, 1000);
+      };
+
+      $scope.checkMachineStatus();
+
       $scope.analyzeExperiment = function () {
-        $scope.analyzing = true
+        $scope.analyzing = true;
         if (!$scope.analyzedExp) {
           getExperiment($stateParams.id, function (exp) {
             if (exp.completion_status === 'success') {

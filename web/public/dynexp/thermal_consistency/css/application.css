@@ -43,9 +43,29 @@ button.red,
     border-color: transparent;
     color: #fff;
 }
+.errorButton {
+    background: #fff;
+    border: 1px solid #999;
+    color: #999;
+    margin-top: 60px;
+    padding: 5px 50px;
+    text-decoration: none;
+}
+.errorButton:hover {
+  text-decoration: none;
+  color: #999;
+}
 p.step{
     text-align: left;
     margin-bottom: 0px;
+}
+
+.errorMessage {
+  display: block;
+  width: 500px;
+  margin: 0 auto;
+  color: #999;
+  font-size: 17px;
 }
 
 .instruction {
