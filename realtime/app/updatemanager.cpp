@@ -125,15 +125,22 @@ bool UpdateManager::update()
             throw std::runtime_error("Unknown error occurred during extracting an upgrade archive");
         }
 
+        std::string message;
+
         try
         {
-            Util::watchProcess(kUpdateScriptPath, [](const char buffer[]){ std::cout << "UpdateManager::update - perform_upgrade: " << buffer << '\n'; });
+            Util::watchProcess(kUpdateScriptPath, [&message](const char buffer[])
+            {
+                std::cout << "UpdateManager::update - perform_upgrade: " << buffer << '\n';
+
+                message += buffer;
+            });
         }
         catch (...)
         {
             _updateState = Unknown;
 
-            throw std::runtime_error("Unable to perform upgrade");
+            throw std::runtime_error("Unable to perform upgrade:\n" + message);
         }
 
         return true;
