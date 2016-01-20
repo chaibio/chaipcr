@@ -122,6 +122,7 @@
           experiment: {guid: 'optical_cal'}
         });
         exp.$save().then(function (resp) {
+          $timeout.cancel($scope.timeout);
           Experiment.startExperiment(resp.experiment.id).then(function () {
             $scope.experiment = resp.experiment;
             $state.go('step-3');

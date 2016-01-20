@@ -148,6 +148,7 @@
           experiment: {guid: 'thermal_consistency'}
         });
         exp.$save().then(function (resp) {
+          $timeout.cancel($scope.timeout);
           Experiment.startExperiment(resp.experiment.id).then(function () {
             $scope.experiment = resp.experiment;
             $state.go('exp-running');
