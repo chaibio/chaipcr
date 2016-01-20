@@ -24,6 +24,7 @@
         font-weight: bold;
         font-size: 30px;
         width: 70%;
+        cursor: pointer;
 
         img {
           display: inline-block;
@@ -220,7 +221,7 @@
           border-right: 1px solid lighten($gray, 15%);
         }
       }
-      
+
       tr {
         td {
           border-left: 1px solid lighten($lightgray, 15%);
