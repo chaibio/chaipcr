@@ -23,8 +23,8 @@ run_migrate_on_upgrade () {
 		if [ $sql_running -eq 1 ]
 		then
 			echo Trying to start MySQL service
-			sleep 5
-			service mysql start
+			sleep 10
+#			service mysql start
 		fi
 		/etc/init.d/mysql status | grep running
 		sql_running=$?
