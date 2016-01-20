@@ -62,23 +62,26 @@ cape_disable=capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN
 _EOF_
 
 
-#UUID=$(lsblk -no UUID /dev/mmcblk1p2)
 UUID=$(blkid /dev/mmcblk1p2 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
+UUID_p3=$(blkid /dev/mmcblk1p3 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
+UUID_p4=$(blkid /dev/mmcblk1p4 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
 if [ -z $UUID ]
 then
 	echo "/dev/mmcblk1 is not a valid block device"
 	UUID=$(lsblk -no UUID /dev/mmcblk0p2)
-#	echo "UUID for /dev/mmcblk0p2 is $UUID"
+	UUID_p3=$(blkid /dev/mmcblk0p3 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
+	UUID_p4=$(blkid /dev/mmcblk0p4 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
+
 	if [ -z $UUID ]
 	then
-#		echo $?
- # 	  echo "UUID for /dev/mmcblk0p2 is $UUID"
 		echo "Cann't find a booting root!"
 		exit 0
 	fi
 fi
 
 echo "Root fs Block device found at $UUID"
+echo "/data partition found at $UUID_p3"
+echo "/perm partition found at $UUID_p4"
 
 #exit
 
@@ -141,3 +144,44 @@ echo "#" >> $uEnvSDCard
 
 echo "SDCard version of uEnv.txt done updating"
 
+if [ -z $UUID_p3 ]
+then
+	echo "Cann't find UUID for /data partition!"
+	exit 0
+fi
+
+if [ -z $UUID_p4 ]
+then
+	echo "Cann't find UUID for /perm partition!"
+	exit 0
+fi
+
+echo "Adding automount for /data and /perm"
+fstab="/etc/fstab"
+fstab_new="/etc/fstab_new"
+if [ -e $fstab_new ]
+then
+	rm $fstab_new
+fi
+
+while IFS= read -r var
+do
+	if [[ "$var" =~ "/perm" ]]
+	then
+		echo "Removing /perm line from fstab..."
+		continue
+	fi
+        if [[ "$var" =~ "/data" ]]
+        then
+                echo "Removing /data line from fstab..."
+                continue
+        fi
+	echo "$var"
+	echo $var >> $fstab_new
+done < "$fstab"
+
+echo "UUID=$UUID_p3  /data   ext4    rw,auto,user,errors=remount-ro  0  0" >> $fstab_new
+echo "UUID=$UUID_p4  /perm   ext4    rw,auto,user,errors=remount-ro  0  0" >> $fstab_new
+
+cp $fstab "${fstab}.save"
+cp $fstab_new $fstab

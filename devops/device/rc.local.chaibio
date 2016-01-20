@@ -85,17 +85,16 @@ check_upgrade_autorun () {
 
 		mount ${sdcard_dev}p1 ${sdcard}/factory>/dev/null || true
 		mount ${sdcard_dev}p2 ${sdcard}/upgrade>/dev/null || true
-
 		if [ $? -gt 0 ]
 		then
 			echo "Second SDCard partition not found.. old version? ${sdcard}p2"  >> $log_file
 		fi
 
+		run_migrate_on_upgrade_logged
 		return 0
 	fi
 
 	run_migrate_on_upgrade_logged
-
 	return 1
 }
 
@@ -141,17 +140,6 @@ then
 else
         mkdir /data
 fi
-
-if [ -e /dev/mmcblk0p3 ]
-then
-        mount /dev/mmcblk0p3 /data
-elif [ -e /dev/mmcblk1p3 ]
-then
-        mount /dev/mmcblk1p3 /data
-else
-        echo "Unknown condition"
-fi
-
 if [ -e /perm ]
 then
         echo "/perm folder found!"
@@ -159,18 +147,31 @@ else
         mkdir /perm
 fi
 
-if [ -e /dev/mmcblk0p4 ]
+is_mounted=$(mount | grep /data)
+
+if [ -z "$is_mounted" ]
 then
-        mount /dev/mmcblk0p4 /perm
-elif [ -e /dev/mmcblk1p4 ]
-then
-        mount /dev/mmcblk1p4 /perm
+	if [ -e /dev/mmcblk0p3 ]
+	then
+        	mount /dev/mmcblk0p3 /data
+	elif [ -e /dev/mmcblk1p3 ]
+	then
+        	mount /dev/mmcblk1p3 /data
+	else
+        	echo "Unknown condition"
+	fi
+
+	if [ -e /dev/mmcblk0p4 ]
+	then
+        	mount /dev/mmcblk0p4 /perm
+	elif [ -e /dev/mmcblk1p4 ]
+	then
+	        mount /dev/mmcblk1p4 /perm
+	fi
 fi
 
 check_corruption >> $log_file || true
-
 check_upgrade_autorun &
-
 echo "Autorun script done!" >> $log_file
 
 exit 0
