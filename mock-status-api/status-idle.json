@@ -22,7 +22,7 @@
     {
         "intensity": "60",
         "collectData": "false",
-        "lid_open": "false",
+        "lid_open": "true",
         "photodiodeValue": "1"
     },
     "heatSink":
