@@ -2,7 +2,7 @@
 
 if ! id | grep -q root; then
 	echo "must be run as root"
-	exit 0
+	exit 5
 fi
 
 if [ -e /dev/mmcblk1p4 ] ; then
