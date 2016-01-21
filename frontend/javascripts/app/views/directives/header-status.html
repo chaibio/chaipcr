@@ -25,9 +25,10 @@
     <div class="col-md-7 text-right" ng-show="state !== 'idle'">
       <div class="message">
         in progress...
-        <strong>
+        <strong ng-show="state !== 'lid_heating'">
           {{timeRemaining | secondsDisplay: 'display2'}} remaining
         </strong>
+        <strong ng-show="state === 'lid_heating'">estimating time remaining</strong>
       </div>
     </div>
 

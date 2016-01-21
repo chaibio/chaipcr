@@ -60,7 +60,7 @@ window.App.directive 'headerStatus', [
 
         if $scope.state isnt 'idle' and $scope.state isnt 'complete'
           $scope.backgroundStyle =
-            'background-size': "#{Math.round($scope.timePercentage) || 0}% 100%";
+            'background-size': "#{$scope.timePercentage || 0}% 100%";
         else
           $scope.backgroundStyle = {}
 
