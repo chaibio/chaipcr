@@ -17,11 +17,12 @@ window.App.controller 'SoftwareUpdateCtrl', [
     $scope.loading = true
     $scope.content = 'update_available'
 
-    Device.getUpdateInfo().then (data) ->
-      if data
-        data.version = data.version || data.software_version
-        $scope.new_update = data
-        $scope.loading = false
+    if Device.direct_upload isnt true
+      Device.getUpdateInfo().then (data) ->
+        if data
+          data.version = data.version || data.software_version
+          $scope.new_update = data
+          $scope.loading = false
 
     $scope.doUpdate = ->
       $scope.content = 'update_in_progress'

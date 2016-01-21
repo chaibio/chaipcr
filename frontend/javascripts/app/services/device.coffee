@@ -12,11 +12,12 @@ window.App.service 'Device', [
 
       version_info = null
       is_offline = false
+      @direct_upload = false
 
       isOffline: -> is_offline
 
       checkForUpdate: ->
-
+        @direct_upload = false
         checkCloudUpdate = (deferred) =>
           cloudCheckPromise = $http.get("http://update.chaibio.com/device/software_update")
           cloudCheckPromise.then (resp) =>
@@ -87,6 +88,7 @@ window.App.service 'Device', [
         return deferred.promise
 
       openUploadModal: ->
+        @direct_upload = true;
         $uibModal.open
           templateUrl: 'app/views/settings/modal-software-image-upload.html'
           controller: 'SoftwareUpdateCtrl'
@@ -95,6 +97,7 @@ window.App.service 'Device', [
           backdrop: 'static'
 
       openUpdateModal: ->
+        @direct_upload = false
         $uibModal.open
           templateUrl: 'app/views/settings/modal-software-update.html'
           controller: 'SoftwareUpdateCtrl'
