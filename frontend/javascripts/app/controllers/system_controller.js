@@ -28,7 +28,13 @@ window.ChaiBioTech.ngApp.controller('systemController', [
     });
 
     $scope.openUpdateModal = function() {
-      Device.openUpdateModal();
+      //Device.getUpdateInfo().then(function() {
+        Device.openUpdateModal();
+      //});
+
+    };
+    $scope.openUploadModal = function() {
+      Device.openUploadModal();
     };
 
     $scope.checkUpdate = function() {

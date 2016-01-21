@@ -1,0 +1,49 @@
+<div class="modal-software-update">
+<!-- upload form -->
+<div class="upload-form">
+  <div class="text-right">
+    <a class="close" ng-click="$dismiss()">&times;</a>
+  </div>
+  <h1 class="text-center">UPLOAD DISK IMAGE</h1>
+  <p class="text-center text-gray">
+    Files are roughly 1.5GB and may take time to upload.
+  </p>
+  <p>
+    <b>
+      After updating, your hardware will reboot. This process takes about 30 minutes and the screen may be blank throughout. Please do not power cycle the hardware during this process.
+    </b>
+  </p>
+  <p class="text-center">
+    <a href="#" class="text-blue"><b>Need help?</b></a>
+  </p>
+  <div class="buttons-container">
+    <div ng-show="uploading">
+      <div class="progressbar-container">
+        <div class="upload-progressbar" style="background-size: {{percent_upload}}% 100%">
+          <b>UPLOADING:</b>
+          {{file.name}}
+        </div>
+      </div>
+      <button class="button" ng-show="uploading" ng-click="cancelUpload()">
+        CANCEL
+      </button>
+    </div>
+    <div ng-show="!uploading">
+      <div ng-show="file.name">
+        <span ng-show="!upload_error">{{file.name}}</span>
+        <span ng-show="upload_error" class="text-red">
+          An error occured while uploading software image. Please try again.
+        </span>
+      </div>
+      <button class="button" ngf-select="imageSelected($file)">
+        BROWSE FILES
+      </button>
+    </div>
+    <div>
+      <button class="button" ng-class="{'button-green': (file || uploading), 'disabled': !file}" ng-click="doUpload()">
+        INSTALL NOW
+      </button>
+    </div>
+  </div>
+</div>
+</div>

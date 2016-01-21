@@ -86,6 +86,14 @@ window.App.service 'Device', [
 
         return deferred.promise
 
+      openUploadModal: ->
+        $uibModal.open
+          templateUrl: 'app/views/settings/modal-software-image-upload.html'
+          controller: 'SoftwareUpdateCtrl'
+          openedClass: 'modal-software-update-open'
+          keyboard: false
+          backdrop: 'static'
+
       openUpdateModal: ->
         $uibModal.open
           templateUrl: 'app/views/settings/modal-software-update.html'
