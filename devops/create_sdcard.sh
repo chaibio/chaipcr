@@ -176,7 +176,7 @@ then
 	print_usage_exit
 fi
 
-mkfs.ext4 $output_device_p2 -L upgrade
+mkfs.ext4 $output_device_p2 -L upgrade -F -F
 if [ $? -gt 0 ]
 then
 	echo "Can't format ${output_device_p2}"
@@ -226,5 +226,8 @@ then
 	print_usage_exit
 fi
 rm -r /tmp/copy_mount_point
+
+
+echo "All done.."
 
 exit 0

@@ -245,7 +245,7 @@ sleep 5
 sync
 
 echo "Packing perm partition to: $image_filename_perm"
-mkfs.ext4 ${eMMC}p4 -q -L perm
+mkfs.ext4 ${eMMC}p4 -q -L perm -F -F
 dd  if=${eMMC}p4 bs=16M | gzip -c > $image_filename_perm
 md5sum $image_filename_perm>>$checksums_filename
 
