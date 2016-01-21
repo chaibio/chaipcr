@@ -40,6 +40,99 @@ boost::posix_time::ptime parseIsoTime(const std::string &str)
     return boost::posix_time::ptime(boost::gregorian::date(year, month, day), boost::posix_time::time_duration(hours, minutes, seconds));
 }
 
+void watchProcess(const std::string &command, std::function<void(const char[1024])> readCallback)
+{
+    int processPipes[2] = {-1};
+
+    if (pipe2(processPipes, O_CLOEXEC) == -1)
+        throw std::system_error(errno, std::generic_category(), "Util::watchProcess - unable to create pipes:");
+
+    pid_t pid = vfork();
+
+    if (pid == -1)
+    {
+        close(processPipes[0]);
+        close(processPipes[1]);
+
+        throw std::system_error(errno, std::generic_category(), "Util::watchProcess - unable to fork:");
+    }
+
+    if (pid == 0) //Child process
+    {
+        if (processPipes[1] != fileno(stdout))
+        {
+            dup2(processPipes[1], fileno(stdout));
+            close(processPipes[1]);
+        }
+
+        close(processPipes[0]);
+
+        setpriority(PRIO_PROCESS, getpid(), 20);
+
+        execl("/bin/sh", "sh", "-c", command.c_str(), NULL);
+        _exit(127);
+
+        //It will never reach this line
+    }
+
+    close(processPipes[1]);
+
+    bool processFinished = false;
+
+    pollfd fdArray[1];
+    fdArray[0].fd = processPipes[0];
+    fdArray[0].events = POLLIN | POLLPRI;
+    fdArray[0].revents = 0;
+
+    while (poll(fdArray, 1, -1) > 0)
+    {
+        if (fdArray[0].revents > 0)
+        {
+            if (fdArray[0].revents & POLLIN || fdArray[0].revents & POLLPRI)
+            {
+                char buffer[1024];
+                memset(buffer, 0, 1024);
+
+                while (read(fdArray[0].fd, buffer, 1023) == 1023)
+                {
+                    readCallback(buffer);
+                    memset(buffer, 0, 1024);
+                }
+
+                readCallback(buffer);
+            }
+            else if (fdArray[0].revents & POLLHUP)
+            {
+                processFinished = true;
+                break;
+            }
+            else if (fdArray[0].revents & POLLNVAL || fdArray[0].revents & POLLERR)
+                break;
+        }
+
+        fdArray[0].revents = 0;
+    }
+
+    close(processPipes[0]);
+
+    if (processFinished)
+    {
+        int status = -1;
+        pid = waitpid(pid, &status, 0);
+
+        if (pid != -1 && status == 0)
+            return;
+        else
+            throw std::runtime_error("Unknown error with subprocess - " + command);
+    }
+    else
+    {
+        kill(pid, SIGTERM);
+
+        throw std::runtime_error("Unknown error with subprocess - " + command);
+    }
+}
+
 bool watchProcess(const std::string &command, int eventFd, std::function<void(const char[1024])> readCallback)
 {
     int processPipes[2] = {-1};

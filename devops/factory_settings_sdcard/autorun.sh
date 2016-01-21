@@ -60,7 +60,7 @@ rebootx () {
         if [ -e ${sdcard_p2}/scripts/rebootx.sh ]
         then
                 sh ${sdcard_p2}/scripts/rebootx.sh 120
-                umount ${sdcard_p2}
+                umount ${sdcard_p2} || true
                 exit 0
         fi
 
@@ -77,6 +77,7 @@ rebootx () {
 
 	echo "rebootx is not accessible"
 	reboot
+	exit 0
 }
 
 flush_cache () {
@@ -102,6 +103,7 @@ alldone () {
 	sync
 
 	rebootx
+	exit 0
 }
 
 flush_cache () {
@@ -139,6 +141,25 @@ repartition_drive () {
 	echo "Partitioned!"
 }
 
+format_perm () {
+       echo "Writing partition table image!"
+
+        image_filename_prfx="upgrade"
+        image_filename_rootfs="$image_filename_prfx-rootfs.img.gz"
+        image_filename_perm="$image_filename_prfx-perm.img.gz"
+        image_filename_boot="$image_filename_prfx-boot.img.gz"
+        image_filename_pt="$image_filename_prfx-pt.img.gz"
+
+        image_filename_upgrade="${sdcard_p1}/factory_settings.img.tar"
+
+        echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+        tar xOf $image_filename_upgrade $image_filename_perm | gunzip -c | dd of=${eMMC}p4 bs=16M
+
+        flush_cache_mounted
+        echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+        echo "Done writing empty /perm partition!"
+}
+
 partition_drive () {
 	flush_cache
 
@@ -160,7 +181,9 @@ update_uenv () {
 	      mkdir -p /tmp/emmcboot
 	fi
 	mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
-	cp /sdcard/p1/uEnv.txt /tmp/emmcboot/
+	cp /sdcard/p1/uEnv.txt /tmp/emmcboot/ || true
+	cp /mnt/uEnv.72check.txt /mnt/uEnv.txt || true
+
 	if [ $1 -eq 2 ]
 	then
 		if [ -e /sdcard/p2/scripts/replace_uEnv.txt.sh ]
@@ -179,19 +202,20 @@ update_uenv () {
 
 reset_uenv () {
 	echo "resetting uEnv!"
-	cp ${sdcard_p1}/uEnv.72check.txt ${sdcard_p1}/uEnv.txt
+	cp ${sdcard_p1}/uEnv.72check.txt ${sdcard_p1}/uEnv.txt || true
+        cp /mnt/uEnv.72check.txt /mnt/uEnv.txt || true
 
 	if [ ! -e /tmp/emmcboot ]
 	then
 	        mkdir -p /tmp/emmcboot
 	fi
 
-        mount ${eMMC}p1 /tmp/emmcboot -t vfat
+        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
 
-	cp /tmp/emmcboot/uEnv.72check.txt /tmp/emmcboot/uEnv.txt
+	cp /tmp/emmcboot/uEnv.72check.txt /tmp/emmcboot/uEnv.txt || true
 	sync
 #exit
- 	umount /tmp/emmcboot
+ 	umount /tmp/emmcboot || true
 	rm -r /tmp/emmcboot || true
         echo "Done returning to gpio 72 check version"
 }
@@ -233,6 +257,7 @@ then
                 echo Rebooting
 #                exit 0
                 rebootx
+		exit 0
         fi
 
         echo "Resuming eMMC unpacking"
@@ -250,6 +275,7 @@ then
                 echo Error unpacking eMMC, restarting...
 #               exit 0
                 rebootx
+		exit 0
         fi
 
         update_uenv 2
@@ -266,6 +292,7 @@ then
 	if [ -e ${eMMC}p4 ]
 	then
 		echo "Done partitioning $eMMC!"
+	        echo "Write Perm Partition" > ${sdcard_p1}/write_perm_partition$
 	else
 		echo "Cannot update partition table at  $eMMC! restarting!"
 		echo "Write Perm Partition" > ${sdcard_p1}/write_perm_partition.flag
@@ -290,24 +317,17 @@ else
 	exit
 fi
 
-update_uenv 1
-
 if [ -e ${sdcard_p1}/write_perm_partition.flag ]
 then
 	echo "eMMC Flasher: writing to /perm partition (to format)"
-	if [ -e ${sdcard_p2}/upgrade.img.tar ]
-	then
-		# todo check mkfs.ext4
-		rm ${sdcard_p1}/write_perm_partition.flag || true
-		mkdir -p /tmp/perm
-		mount ${eMMC}p4 /tmp/perm -t ext4
-		rm -r /tmp/perm/* || true
-		echo "Done formatting /perm partition"
-		umount /tmp/perm/
-		echo "Done formatting /perm partition"
-	fi
+	format_perm
+	rm ${sdcard_p1}/write_perm_partition.flag || true
+	echo "Done formatting /perm partition"
 fi
 
+update_uenv 1
+
+stop_packing_restarting
 echo "eMMC Flasher: all done!"
 sync
 
@@ -319,3 +339,6 @@ umount ${sdcard_p2} > /dev/null || true
 alldone
 
 rebootx
+
+exit 0
+

@@ -146,6 +146,8 @@ image_filename_prfx="upgrade"
 image_filename_rootfs="$image_filename_prfx-rootfs.img.gz"
 image_filename_data="$image_filename_prfx-data.img.gz"
 image_filename_boot="$image_filename_prfx-boot.img.gz"
+image_filename_perm="$image_filename_prfx-perm.img.gz"
+
 image_filename_pt="$image_filename_prfx-pt.img.gz"
 
 checksums_filename="$image_filename_prfx-checksums.txt"
@@ -200,6 +202,7 @@ fi
 
 rootfs_partition=${eMMC}p2
 data_partition=${eMMC}p3
+perm_partition=${eMMC}p4
 
 if [ ! -e $rootfs_partition ]
 then
@@ -240,6 +243,11 @@ md5sum $image_filename_rootfs>>$checksums_filename
 
 sleep 5
 sync
+
+cho "Packing perm partition to: $image_filename_perm"
+mkfs.ext4 ${eMMC}p4
+dd  if=${eMMC}p4 bs=16M | gzip -c > $image_filename_perm
+md5sum $image_filename_perm>>$checksums_filename
 
 echo "Packing boot partition to: $image_filename_boot"
 dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
@@ -285,7 +293,7 @@ retval=$?
 
 	#tarring
 #	echo "compressing all images to $image_filename_upgrade_tar_temp"
-	tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_data $image_filename_rootfs $checksums_filename
+	tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_data $image_filename_rootfs  $image_filename_perm $checksums_filename
 
 
 	if [ -e $image_filename_data ]
@@ -306,7 +314,7 @@ then
 	rm $image_filename_upgrade_temp
 fi
 
-tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $checksums_filename $upgrade_scripts
+tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $image_filename_perm $checksums_filename $upgrade_scripts
 
 echo "Remove packed files"
 if [ -e $image_filename_boot ]

@@ -5,7 +5,8 @@
     'ui.router',
     'ngResource',
     'http-auth-interceptor',
-    'angularMoment'
+    'angularMoment',
+    'ui.bootstrap'
   ]);
 
   App.value('host', 'http://'+window.location.hostname);

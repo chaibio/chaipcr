@@ -110,7 +110,11 @@ bool UpdateManager::update()
     {
         try
         {
-            if (!Util::watchProcess("tar xf " + kUpdateFilePath + " --directory \"" + kUpdateFolder + "\"", _downloadEventFd,
+            Poco::File dir(kUpdateFolder);
+            if (dir.exists())
+                dir.remove(true);
+
+            if (!Util::watchProcess("tar xf " + kUpdateFilePath + " --directory " + kUpdateFolder + " scripts", _downloadEventFd,
                                     [](const char buffer[]){ std::cout << "UpdateManager::update - tar: " << buffer << '\n'; }))
                 return false; //This will happen only if the app is getting closed
         }
@@ -121,7 +125,30 @@ bool UpdateManager::update()
             throw std::runtime_error("Unknown error occurred during extracting an upgrade archive");
         }
 
-        system(kUpdateScriptPath.c_str());
+        try
+        {
+            Poco::File file(kUpdateScriptOutputPath);
+            if (file.exists())
+                file.remove();
+
+            Util::watchProcess(kUpdateScriptPath + ' ' + kUpdateScriptOutputPath, [](const char buffer[]) { std::cout << "UpdateManager::update - perform_upgrade: " << buffer << '\n'; });
+        }
+        catch (...)
+        {
+            _updateState = Unknown;
+
+            std::string message;
+            std::ifstream file(kUpdateScriptOutputPath);
+
+            if (file.is_open())
+            {
+                std::getline(file, message);
+
+                throw std::runtime_error(message);
+            }
+            else
+                throw std::runtime_error("Unknown error occured during upgrade");
+        }
 
         return true;
     }

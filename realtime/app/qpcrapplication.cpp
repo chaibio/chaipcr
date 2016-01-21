@@ -38,6 +38,11 @@ void QPCRApplication::stopExperiment(const string &message) {
     _experimentController->stop(message);
 }
 
+bool QPCRApplication::isMachinePaused() const
+{
+    return _experimentController->machineState() == ExperimentController::PausedMachineState;
+}
+
 int QPCRApplication::getUserId(const std::string &token) const
 {
     return _dbControl->getUserId(token);

@@ -53,6 +53,7 @@ public:
 
     void stopExperiment(const std::string &message);
 
+    bool isMachinePaused() const;
     int getUserId(const std::string &token) const;
 
 protected:

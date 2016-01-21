@@ -8,9 +8,15 @@
     'TestInProgressService',
     'host',
     '$http',
-    function OpticalCalibrationCtrl ($scope, $window, Experiment, $state, Status, TestInProgressService, host, $http) {
+    'DeviceInfo',
+    '$timeout',
+    '$uibModal',
+    '$rootScope',
+    function OpticalCalibrationCtrl ($scope, $window, Experiment, $state, Status, TestInProgressService,
+      host, $http, DeviceInfo, $timeout, $uibModal, $rootScope) {
 
       $scope.cancel = false;
+      $scope.error = true;
 
       $scope.$watch(function () {
         return Status.getData();
@@ -48,6 +54,48 @@
         }
       }, true);
 
+      $scope.checkMachineStatus = function() {
+
+        DeviceInfo.getInfo($scope.check).then(function(deviceStatus) {
+          // Incase connected
+          if($scope.modal) {
+              $scope.modal.close();
+              $scope.modal = null;
+          }
+
+          if(deviceStatus.data.optics.lid_open === "true" || deviceStatus.data.optics.lid_open === true) { // lid is open
+            $scope.error = true;
+            $scope.lidMessage = "Close lid to begin.";
+          } else {
+            $scope.error = false;
+          }
+        }, function(err) {
+          // Error
+          $scope.error = true;
+          $scope.lidMessage = "Cant connect to machine.";
+
+          if(err.status === 500) {
+
+            if(! $scope.modal) {
+              var scope = $rootScope.$new();
+              scope.message = {
+                title: "Cant connect to machine.",
+                body: err.data.errors || "Error"
+              };
+
+              $scope.modal = $uibModal.open({
+                templateUrl: './views/modal-error.html',
+                scope: scope
+              });
+            }
+          }
+        });
+
+        $scope.timeout = $timeout($scope.checkMachineStatus, 1000);
+      };
+
+      $scope.checkMachineStatus();
+
       $scope.lidHeatPercentage = function () {
         if (!$scope.experiment) return 0;
         if (!$scope.data) return 0;
@@ -67,13 +115,14 @@
         if (!$scope.experiment.protocol.stages[0].stage.steps[0]) return;
         if (!$scope.currentStep()) return;
         return $scope.currentStep().temperature;
-      }
+      };
 
       $scope.createExperiment = function () {
         var exp = new Experiment({
           experiment: {guid: 'optical_cal'}
         });
         exp.$save().then(function (resp) {
+          $timeout.cancel($scope.timeout);
           Experiment.startExperiment(resp.experiment.id).then(function () {
             $scope.experiment = resp.experiment;
             $state.go('step-3');

@@ -1,8 +1,10 @@
 window.ChaiBioTech.ngApp.controller('systemController', [
   'Device',
   '$scope',
-  function(Device, $scope) {
+  'Status',
+  function(Device, $scope, Status) {
 
+    $scope.update_available = 'unavailable';
     $scope.getVersionSoft = function() {
       Device.getVersion(true).then(function(resp) {
         console.log(resp);
@@ -17,12 +19,41 @@ window.ChaiBioTech.ngApp.controller('systemController', [
       });
     };
 
+    $scope.$watch(function(){
+      return Status.getData();
+      }, function(data) {
+        status = (data && data.device) ? data.device.update_available : 'unknown';
+        if(status !== 'unknown')
+          $scope.update_available = status;
+    });
+
+    $scope.openUpdateModal = function() {
+      Device.openUpdateModal();
+    };
+    
+    $scope.openUploadModal = function() {
+      Device.openUploadModal();
+    };
+
     $scope.checkUpdate = function() {
 
-      Device.checkForUpdate().then(function(data) {
-        console.log(data);
-      }, function(noData) {
-        console.log(noData);
+      var checkPromise;
+      $scope.checking_update = true;
+      checkPromise = Device.checkForUpdate();
+      checkPromise.then(function(is_available) {
+        $scope.update_available = is_available;
+        $scope.checkedUpdate = true;
+        if (is_available === 'available') {
+          $scope.openUpdateModal();
+        }
+      });
+      checkPromise["catch"](function() {
+        alert('Error while checking update!');
+        $scope.update_available = 'unavailable';
+         $scope.checkedUpdate = false;
+      });
+      return checkPromise["finally"](function() {
+        $scope.checking_update = false;
       });
     };
 

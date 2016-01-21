@@ -1,8 +1,17 @@
 #!/bin/bash
 
+exit_with_message () {
+	echo "UPGRADE: $1"
+	if [ ! -z "$3" ]
+	then
+		echo Writing results to $3
+		echo "$1" >> $3
+	fi
+	exit $2
+}
+
 if ! id | grep -q root; then
-	echo "must be run as root"
-	exit 0
+	exit_with_message "must be run as root" 5 $1
 fi
 
 if [ -e /dev/mmcblk1p4 ] ; then
@@ -17,8 +26,7 @@ fi
 
 if [ ! -e "${eMMC}p4" ]
 then
-        echo "Proper eMMC partitionining not found!"
-	exit 1
+        exit_with_message "Proper eMMC partitionining not found!" 1 $1
 fi
 
 verify_checksum () {
@@ -30,8 +38,7 @@ verify_checksum () {
 
 	if [ ! -e $image_filename_upgrade1 ]
 	then
-		echo "Upgrade image not found!"
-		exit 2
+		exit_with_message "Upgrade image not found!" 2 $1
 	fi
 
 	image_filename_prfx="upgrade"
@@ -44,8 +51,7 @@ verify_checksum () {
 	check_sum=$( tar xOf $image_filename_upgrade1 $checksums_filename )
 	if [ -z "$check_sum" ]
 	then
-		echo "Incompatable upgrade image: No checksum file found!"
-		exit 4
+		exit_with_message "Incompatable upgrade image: No checksum file found!" 4 $1
 	fi
 	echo "Checksums: $check_sum"
 
@@ -77,8 +83,7 @@ verify_checksum () {
 		then
 			echo "Checksum ok!"
 		else
-			echo "Checksum error!"
-			exit 6
+			exit_with_message "Checksum error!" 6 $1
 		fi
 	done
 }
@@ -127,4 +132,6 @@ echo "Restarting to packing eMMC image.."
 echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 sh $BASEDIR/rebootx.sh
 
-exit 0
+exit_with_message Success 0 $1
+
+
