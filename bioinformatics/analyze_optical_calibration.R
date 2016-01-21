@@ -18,17 +18,19 @@ analyze_optical_calibration <- function(
                          port=db_port, 
                          dbname=db_name)
     
-    result1 <- try(prep_optic_calib(db_conn, exp_id, verbose))
+    result1 <- tryCatch(prep_optic_calib(db_conn, exp_id, verbose), error=function(e) e)
     
-    if (class(result1) == 'try-error') {
+    if ('error' %in% class(result1)) {
         valid <- FALSE
         #err <- 'Fluorescein calibrator was less fluorescent than water in some wells. Please retry with new fluorescein calibrator.' # solution 1
-        err <- as.character(result1) # solution 2 as string
+        err_msg <- result1$message # solution 2 as string
+        err_details <- as.character(result1)
     } else {
         valid <- TRUE
-        err <- NULL }
+        err_msg <- NULL
+        err_details <- NULL }
     
-    result2 <- list('valid'=unbox(valid), 'error_message'=unbox(err)) # `unbox` so atomic elements not returned as array in JSON
+    result2 <- list('valid'=unbox(valid), 'error_message'=unbox(err_msg), 'error_details'=unbox(err_details)) # `unbox` so atomic elements not returned as array in JSON
     
     if (out_json) result2 <- toJSON(result2)
     
