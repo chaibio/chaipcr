@@ -141,6 +141,25 @@ repartition_drive () {
 	echo "Partitioned!"
 }
 
+format_perm () {
+       echo "Writing partition table image!"
+
+        image_filename_prfx="upgrade"
+        image_filename_rootfs="$image_filename_prfx-rootfs.img.gz"
+        image_filename_perm="$image_filename_prfx-perm.img.gz"
+        image_filename_boot="$image_filename_prfx-boot.img.gz"
+        image_filename_pt="$image_filename_prfx-pt.img.gz"
+
+        image_filename_upgrade="${sdcard_p1}/factory_settings.img.tar"
+
+        echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+        tar xOf $image_filename_upgrade $image_filename_perm | gunzip -c | dd of=${eMMC}p4 bs=16M
+
+        flush_cache_mounted
+        echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+        echo "Done writing empty /perm partition!"
+}
+
 partition_drive () {
 	flush_cache
 
@@ -273,6 +292,7 @@ then
 	if [ -e ${eMMC}p4 ]
 	then
 		echo "Done partitioning $eMMC!"
+	        echo "Write Perm Partition" > ${sdcard_p1}/write_perm_partition$
 	else
 		echo "Cannot update partition table at  $eMMC! restarting!"
 		echo "Write Perm Partition" > ${sdcard_p1}/write_perm_partition.flag
@@ -297,23 +317,18 @@ else
 	exit
 fi
 
-update_uenv 1
-
 if [ -e ${sdcard_p1}/write_perm_partition.flag ]
 then
 	echo "eMMC Flasher: writing to /perm partition (to format)"
 	if [ -e ${sdcard_p2}/upgrade.img.tar ]
 	then
-		# todo check mkfs.ext4
+		format_perm
 		rm ${sdcard_p1}/write_perm_partition.flag || true
-		mkdir -p /tmp/perm
-		mount ${eMMC}p4 /tmp/perm -t ext4 || true
-		rm -r /tmp/perm/* || true
-		echo "Done formatting /perm partition"
-		umount /tmp/perm/ || true
 		echo "Done formatting /perm partition"
 	fi
 fi
+
+update_uenv 1
 
 stop_packing_restarting
 echo "eMMC Flasher: all done!"
