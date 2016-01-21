@@ -122,6 +122,7 @@ const std::string kUpdatesUrl = "http://update.chaibio.com/device/software_updat
 const std::string kUpdateFilePath = "/sdcard/upgrade/upgrade.img.tar";
 const std::string kUpdateFolder = "/sdcard/upgrade";
 const std::string kUpdateScriptPath = "/sdcard/upgrade/scripts/perform_upgrade.sh";
+const std::string kUpdateScriptOutputPath = "/root/chaipcr/perform_upgrade_output.txt";
 
 const std::string kUpdateMountPoint = "/sdcard/upgrade";
 const std::string kCheckSdcardPath = "/root/chaipcr/deploy/device/check_sdcard.sh";
