@@ -40,7 +40,7 @@
         "expriment":
         {
             "id": null,
-            "run_duration": "0",
+            "run_duration": "100",
             "estimated_duration": "508",
             "paused_duration": "0",
             "name": "New Experiment New Experiment New Experiment New Experiment New Experiment New Experiment New Experiment New experimentController",

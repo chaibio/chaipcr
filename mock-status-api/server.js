@@ -130,6 +130,7 @@ function autoupdateLogs() {
 }
 
 app.get('/status', function (req, res, next) {
+  data.lid = {open: false}
   res.send(data);
 });
 

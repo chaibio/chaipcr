@@ -41,6 +41,7 @@ window.App.directive 'headerStatus', [
       , (data, oldData) ->
         return if !data
         return if !data.experiment_controller
+        $scope.statusData = data
         $scope.state = data.experiment_controller.machine.state
         $scope.thermal_state = data.experiment_controller.machine.thermal_state
         $scope.oldState = oldData?.experiment_controller?.machine?.state || 'NONE'
@@ -55,6 +56,7 @@ window.App.directive 'headerStatus', [
           $scope.is_holding = TestInProgressHelper.set_holding(data, $scope.experiment)
 
         $scope.timeRemaining = TestInProgressHelper.timeRemaining(data)
+        $scope.timePercentage = TestInProgressHelper.timePercentage(data)
 
         if ($scope.state isnt 'idle' and !experiment_id and data.experiment_controller?.expriment?.id)
           experiment_id = data.experiment_controller.expriment.id

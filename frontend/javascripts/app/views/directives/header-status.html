@@ -1,7 +1,34 @@
-<div class="header-status">
+<div class="header-status" ng-class="{'in-progress': state !== 'idle'}" style="background-size: {{timePercentage || 0}}% 100%;">
   <!-- only part of the header that is customizable -->
-  <ng-transclude></ng-transclude>
-  
-  <div ng-show="experiment.id && experiment.name">{{experiment.name}}</div>
+
+  <div class="row">
+    <div class="col-md-1" ng-transclude>
+    </div>
+    <div class="col-md-4 exp-name">
+      <div ng-show="experiment.id && experiment.name">{{experiment.name}}</div>
+    </div>
+    <!-- begin is valid -->
+    <div class="col-md-7 text-right" ng-show="state === 'idle' && !experiment.started_at && !experiment.completed_at && !statusData.lid.open">
+      <button class="button-header begin" ng-click="startExperiment()">
+        <b>BEGIN EXPERIMENT</b>
+      </button>
+    </div>
+
+    <!-- begin is invalid -->
+    <div class="col-md-7 text-right" ng-show="state === 'idle' && !experiment.started_at && !experiment.completed_at && statusData.lid.open">
+      <div class="message">Cannot begin experiment while lid is open</div>
+      <button class="button-header begin disabled">
+        <b>BEGIN EXPERIMENT</b>
+      </button>
+    </div>
+    <!-- experiment in progress -->
+    <div class="col-md-7 text-right" ng-show="state !== 'idle'">
+      <div class="message">
+        in progress...
+        <strong>
+          {{timeRemaining | secondsDisplay: 'display2'}} remaining
+        </strong>
+      </div>
+  </div>
 
 </div>
