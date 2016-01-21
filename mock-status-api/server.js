@@ -134,6 +134,10 @@ app.get('/status', function (req, res, next) {
   res.send(data);
 });
 
+app.post('/device/check_for_updates', function (req, res, next) {
+  res.send(data);
+});
+
 app.get('/network/eth0', function (req, res, next) {
   res.send(network);
 });

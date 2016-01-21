@@ -37,8 +37,11 @@ window.App.service 'Device', [
 
         deferred = $q.defer()
         localCheckPromise = $http.post("#{host}\:8000/device/check_for_updates")
-        localCheckPromise.then ->
-          status = (Status.getData()?.device?.update_available) || 'unknown'
+        localCheckPromise.then (resp) ->
+          console.log resp
+          console.log Status.getData()
+          status = (Status.getData()?.device?.update_available) || resp.data?.device?.update_available || 'unknown'
+          console.log "status: #{status}"
           if status is 'unknown'
             is_offline = true
             checkCloudUpdate deferred

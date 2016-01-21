@@ -1,4 +1,7 @@
 {
+    "device": {
+        "update_available": "downloading"
+    },
     "heatblock":
     {
         "zone1":
