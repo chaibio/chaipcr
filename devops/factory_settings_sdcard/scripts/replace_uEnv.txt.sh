@@ -65,13 +65,14 @@ _EOF_
 UUID=$(blkid /dev/mmcblk1p2 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
 UUID_p3=$(blkid /dev/mmcblk1p3 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
 UUID_p4=$(blkid /dev/mmcblk1p4 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
+EMMC=/dev/mmcblk1p2
 if [ -z $UUID ]
 then
 	echo "/dev/mmcblk1 is not a valid block device"
 	UUID=$(lsblk -no UUID /dev/mmcblk0p2)
 	UUID_p3=$(blkid /dev/mmcblk0p3 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
 	UUID_p4=$(blkid /dev/mmcblk0p4 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
-
+        EMMC=/dev/mmcblk1p2
 	if [ -z $UUID ]
 	then
 		echo "Cann't find a booting root!"
@@ -157,8 +158,15 @@ then
 fi
 
 echo "Adding automount for /data and /perm"
-fstab="/etc/fstab"
-fstab_new="/etc/fstab_new"
+rootfs="/tmp/emmcrootfs"
+if [ ! -e $rootfs ]
+then
+	mkdir -p $rootfs
+fi
+
+mount $EMMC $rootfs
+fstab="$rootfs/etc/fstab"
+fstab_new="$rootfs/etc/fstab_new"
 if [ -e $fstab_new ]
 then
 	rm $fstab_new
@@ -166,14 +174,14 @@ fi
 
 while IFS= read -r var
 do
-	if [[ "$var" =~ "/perm" ]]
+	if test "${var#*/perm}" != "$var" #[[ "$var" == *perm* ]]
 	then
-		echo "Removing /perm line from fstab..."
+		echo "Removing perm line from fstab..."
 		continue
 	fi
-        if [[ "$var" =~ "/data" ]]
+        if test "${var#*/data}" != "$var" #[[ "$var" == *"data"* ]]
         then
-                echo "Removing /data line from fstab..."
+                echo "Removing data line from fstab..."
                 continue
         fi
 	echo "$var"
@@ -185,3 +193,6 @@ echo "UUID=$UUID_p4  /perm   ext4    rw,auto,user,errors=remount-ro  0  0" >> $f
 
 cp $fstab "${fstab}.save"
 cp $fstab_new $fstab
+sync
+umount $rootfs || true
+rm -r $rootfs || true
