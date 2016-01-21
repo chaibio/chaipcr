@@ -320,12 +320,9 @@ fi
 if [ -e ${sdcard_p1}/write_perm_partition.flag ]
 then
 	echo "eMMC Flasher: writing to /perm partition (to format)"
-	if [ -e ${sdcard_p2}/upgrade.img.tar ]
-	then
-		format_perm
-		rm ${sdcard_p1}/write_perm_partition.flag || true
-		echo "Done formatting /perm partition"
-	fi
+	format_perm
+	rm ${sdcard_p1}/write_perm_partition.flag || true
+	echo "Done formatting /perm partition"
 fi
 
 update_uenv 1
