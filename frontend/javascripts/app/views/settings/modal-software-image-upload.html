@@ -46,4 +46,22 @@
     </div>
   </div>
 </div>
+
+<!-- update is in progress -->
+<div ng-show="content === 'update_in_progress'">
+  <h1>
+    <img src="/images/loading.gif">
+    Update in Progress
+  </h1>
+  <p class="text-gray">
+    This will take approximately 30 minutes. Your device will reboot when complete.
+  </p>
+</div>
+<!-- Update complete -->
+<div ng-show="content === 'update_complete'" class="text-center">
+  <h1>Upgrade complete!</h1>
+  <button class="button button-green" ng-click="$dismiss()">
+    DONE
+  </button>
+</div>
 </div>
