@@ -9,7 +9,26 @@
     <div class="wizard">
       <h3>Software Update Status</h3>
       <p ng-if="data.software.version">v{{ data.software.version + " installed"}}</p>
-      <button ng-click="checkUpdate()" class="green-button">CHECK FOR UPDATES</button>
+      <!--<button ng-click="checkUpdate()" class="green-button">CHECK FOR UPDATES</button> -->
+      <button class="green-button" ng-show="update_available === 'unavailable' && !checkedUpdate && !checking_update" ng-click="checkUpdate()">
+        CHECK FOR UPDATES
+      </button>
+      <button class="green-button text" ng-show="update_available === 'unavailable' && checkedUpdate && !checking_update">
+        Software Up To Date
+      </button>
+      <button class="green-button" ng-show="update_available === 'available' && !checking_update" ng-click="openUpdateModal()">
+        SOFTWARE UPDATE AVAILABLE
+      </button>
+      <button class="green-button text" ng-show="update_available === 'downloading' && !checking_update">
+        DOWNLOADING SOFTWARE UPDATE
+        <ellipsis-animated>
+        <ellipsis-animated/>
+      </button>
+      <button class="green-button text" ng-show="checking_update">
+        Checking for available updates
+        <ellipsis-animated>
+        <ellipsis-animated/>
+      </button>
       <button class="normal-button">UPLOAD DISK IMAGE</button>
     </div>
 
