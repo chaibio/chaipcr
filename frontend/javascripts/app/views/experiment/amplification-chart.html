@@ -1,6 +1,15 @@
 <div class="amplification-chart-state-active">
   <div class="page-layout" ng-controller="AmplificationChartCtrl" ng-show="experiment">
-    <div class="header">
+    <header-status experiment-id="experiment.id">
+      <div class="stripes-and-name" toggle-sidemenu>
+        <div class="stripes">
+          <div class="stripe"></div>
+          <div class="stripe"></div>
+          <div class="stripe"></div>
+        </div>
+      </div>
+    </header-status>
+    <!-- <div class="header">
       <div class="stripes-and-name">
         <a toggle-sidemenu>
           <div class="stripes">
@@ -11,7 +20,7 @@
         </a>
         <div class="name-container truncate">{{experiment.name}}</div>
       </div>
-    </div>
+    </div> -->
     <div class="content">
       <div class="chart-section">
         <div class="curve-header">

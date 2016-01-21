@@ -126,6 +126,7 @@ function incrementLog (cb) {
 
 function autoupdateLogs() {
   incrementLog();
+  data.experiment_controller.expriment.run_duration = data.experiment_controller.expriment.run_duration*1+1;
   intrvl = setTimeout(autoupdateLogs, 1000);
 }
 

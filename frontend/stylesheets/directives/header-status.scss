@@ -12,15 +12,31 @@
     background-image: url('/images/header-progress-bg.png');
     background-repeat: no-repeat;
     background-size: 0% 100%;
-    -webkit-transition: background-size 1s;
-    transition: background-size 1s;
+    -webkit-transition: background-size 3s;
+    transition: background-size 3s;
     .message {
       display: inline-block;
-      margin-top: 15px;
+      margin-top: 16px;
+    }
+  }
 
-      strong {
+  &.complete {
+    background-image: url('/images/header-complete.png');
+    background-size: auto 100%;
+    .message {
+      display: inline-block;
+      margin-top: 13px;
+      .failed {
+        background-color: #e02127;
         color: #fff;
+        margin-right: 10px;
+        padding: 2px 5px;
+        font-weight: bold;
       }
+    }
+    .button-header {
+      background-color: #000;
+      border: 1px solid #fff;
     }
   }
 
@@ -31,11 +47,6 @@
 
   .col-md-1 {
     padding-right: 0;
-  }
-  .col-md-4 {
-    padding-left: 0;
-    margin-left: -30px;
-    margin-right: 30px;
   }
 
   .stripes {
@@ -51,6 +62,9 @@
   }
 
   .exp-name {
+    padding-left: 0;
+    margin-left: -30px;
+    margin-right: 30px;
     margin-top: 10px;
     font-family: "Fun City";
     font-size: 17px;
@@ -58,18 +72,26 @@
 
   .message {
     display: inline;
+    font-size: 12px;
     padding-right: 10px;
-    color: #ccc;
+    color: #fff;
     text-transform: uppercase;
+
+    * {
+      color: #fff;
+    }
   }
 
   .button-header {
+    cursor: pointer;
+    display: inline-block;
     margin-top: 10px;
     padding-top: 5px;
     padding-bottom: 5px;
     font-size: 12px;
     font-family: 'dinot';
     width: 170px;
+    text-align: center;
 
     &.begin {
       border: 1px solid #fff;

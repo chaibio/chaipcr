@@ -1,4 +1,4 @@
-<div class="header-status" ng-class="{'in-progress': state !== 'idle'}" style="background-size: {{timePercentage || 0}}% 100%;">
+<div class="header-status" ng-class="{'in-progress': state !== 'idle', 'complete': experiment.completed_at}" ng-style="backgroundStyle">
   <!-- only part of the header that is customizable -->
 
   <div class="row">
@@ -29,6 +29,23 @@
           {{timeRemaining | secondsDisplay: 'display2'}} remaining
         </strong>
       </div>
-  </div>
+    </div>
 
+    <!-- experiment completed successfully -->
+    <div class="col-md-7 text-right" ng-show="state === 'idle' && experiment.completed_at">
+      <div class="message">
+        <span ng-show="experiment.completion_status === 'success'">completed</span>
+        <span ng-show="experiment.completion_status !== 'success'">
+          <span class="failed">failed</span>
+          <span ng-show="experiment.completion_status === 'aborted'">user cancelled</span>
+          <span ng-show="experiment.completion_status !== 'aborted'">{{experiment.completion_message}}</span>
+        </span>
+        <strong >{{experiment.completed_at|date:'MMM. dd yyyy, hh:mm:ss'}}</strong>
+      </div>
+      <button class="button-header" duplicate-experiment experiment-id="experiment.id">
+        <b>DUPLICATE EXPERIMENT</b>
+      </button>
+    </div>
+
+  </div>
 </div>

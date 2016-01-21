@@ -58,6 +58,12 @@ window.App.directive 'headerStatus', [
         $scope.timeRemaining = TestInProgressHelper.timeRemaining(data)
         $scope.timePercentage = TestInProgressHelper.timePercentage(data)
 
+        if $scope.state isnt 'idle' and $scope.state isnt 'complete'
+          $scope.backgroundStyle =
+            'background-size': "#{Math.round($scope.timePercentage) || 0}% 100%";
+        else
+          $scope.backgroundStyle = {}
+
         if ($scope.state isnt 'idle' and !experiment_id and data.experiment_controller?.expriment?.id)
           experiment_id = data.experiment_controller.expriment.id
           getExperiment (exp) ->

@@ -88,6 +88,7 @@ window.ChaiBioTech.ngApp.service 'TestInProgressHelper', [
       exp = data.experiment_controller.expriment
       time = exp.run_duration/(exp.estimated_duration*1+exp.paused_duration*1)
       if time < 0 then time = 0
+      if time > 1 then time = 1
       return time*100
 
     return
