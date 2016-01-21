@@ -39,16 +39,21 @@ window.App.service 'Device', [
         deferred = $q.defer()
         localCheckPromise = $http.post("#{host}\:8000/device/check_for_updates")
         localCheckPromise.then (resp) ->
+          console.log "/check_for_updates"
           console.log resp
-          console.log Status.getData()
-          status = (Status.getData()?.device?.update_available) || resp.data?.device?.update_available || 'unknown'
-          console.log "status: #{status}"
-          if status is 'unknown'
-            is_offline = true
+
+          Status.fetch()
+          .then (resp) ->
+            status = resp?.device?.update_available || 'unknown'
+            if status is 'unknown'
+              is_offline = true
+              checkCloudUpdate deferred
+            else
+              is_offline = false
+              deferred.resolve status
+          .catch ->
             checkCloudUpdate deferred
-          else
-            is_offline = false
-            deferred.resolve status
+
         localCheckPromise.catch =>
           is_offline = true
           checkCloudUpdate deferred
@@ -115,7 +120,7 @@ window.App.service 'Device', [
         Upload.upload
           url: "#{host}\:8000/device/upload_software_update"
           method: 'POST'
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': file.type
           data: file
 
     return new Device

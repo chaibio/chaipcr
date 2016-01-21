@@ -14,6 +14,7 @@ window.ChaiBioTech.ngApp
     @listenersCount = 0
     fetching = false
     timeoutPromise = null
+    ques = []
 
     @getData = -> data
 
@@ -21,29 +22,28 @@ window.ChaiBioTech.ngApp
 
     @fetch = ->
       deferred = $q.defer()
-      if !fetching
-        fetching = true
-        timeoutPromise = $timeout =>
-          fetching = false
-          timeoutPromise = null
-        , 10000
-        $http.get("#{host}\:8000/status")
-        .success (resp) =>
-          isUp = true
-          data = resp
-          deferred.resolve data
+      ques.push deferred
 
-        .error (resp) ->
-          deferred.reject(resp)
-          isUp = if resp is null then false else true
+      timeoutPromise = $timeout =>
+        timeoutPromise = null
+      , 10000
+      $http.get("#{host}\:8000/status")
+      .success (resp) =>
+        isUp = true
+        data = resp
 
-        .finally =>
-          $timeout.cancel timeoutPromise
-          timeoutPromise = null
-          fetching = false
+        for def in ques by 1
+          def.resolve data
 
-      else
-        deferred.resolve data
+      .error (resp) ->
+        isUp = if resp is null then false else true
+        for def in ques by 1
+          def.reject(resp)
+
+      .finally =>
+        $timeout.cancel timeoutPromise
+        timeoutPromise = null
+        ques = []
 
       deferred.promise
 
