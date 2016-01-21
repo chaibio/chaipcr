@@ -24,6 +24,9 @@ window.ChaiBioTech.ngApp
       deferred = $q.defer()
       ques.push deferred
 
+      return deferred.promise if fetching
+      fetching = true
+
       timeoutPromise = $timeout =>
         timeoutPromise = null
       , 10000
@@ -43,6 +46,7 @@ window.ChaiBioTech.ngApp
       .finally =>
         $timeout.cancel timeoutPromise
         timeoutPromise = null
+        fetching = false
         ques = []
 
       deferred.promise
