@@ -1,0 +1,51 @@
+<div class="header-status" ng-class="{'in-progress': state !== 'idle', 'complete': experiment.completed_at}" ng-style="backgroundStyle">
+  <!-- only part of the header that is customizable -->
+
+  <div class="row">
+    <div class="col-md-1" ng-transclude>
+    </div>
+    <div class="col-md-4 exp-name">
+      <div ng-show="experiment.id && experiment.name">{{experiment.name}}</div>
+    </div>
+    <!-- begin is valid -->
+    <div class="col-md-7 text-right" ng-show="state === 'idle' && !experiment.started_at && !experiment.completed_at && !statusData.lid.open">
+      <button class="button-header begin" ng-click="startExperiment()">
+        <b>BEGIN EXPERIMENT</b>
+      </button>
+    </div>
+
+    <!-- begin is invalid -->
+    <div class="col-md-7 text-right" ng-show="state === 'idle' && !experiment.started_at && !experiment.completed_at && statusData.lid.open">
+      <div class="message">Cannot begin experiment while lid is open</div>
+      <button class="button-header begin disabled">
+        <b>BEGIN EXPERIMENT</b>
+      </button>
+    </div>
+    <!-- experiment in progress -->
+    <div class="col-md-7 text-right" ng-show="state !== 'idle'">
+      <div class="message">
+        in progress...
+        <strong>
+          {{timeRemaining | secondsDisplay: 'display2'}} remaining
+        </strong>
+      </div>
+    </div>
+
+    <!-- experiment completed successfully -->
+    <div class="col-md-7 text-right" ng-show="state === 'idle' && experiment.completed_at">
+      <div class="message">
+        <span ng-show="experiment.completion_status === 'success'">completed</span>
+        <span ng-show="experiment.completion_status !== 'success'">
+          <span class="failed">failed</span>
+          <span ng-show="experiment.completion_status === 'aborted'">user cancelled</span>
+          <span ng-show="experiment.completion_status !== 'aborted'">{{experiment.completion_message}}</span>
+        </span>
+        <strong >{{experiment.completed_at|date:'MMM. dd yyyy, hh:mm:ss'}}</strong>
+      </div>
+      <button class="button-header" duplicate-experiment experiment-id="experiment.id">
+        <b>DUPLICATE EXPERIMENT</b>
+      </button>
+    </div>
+
+  </div>
+</div>

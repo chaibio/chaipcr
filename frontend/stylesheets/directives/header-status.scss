@@ -1,0 +1,108 @@
+@import '../colors.css.scss';
+
+.header-status {
+  height: 50px;
+  background: $gray;
+  color: #fff;
+  padding-left: 30px;
+  padding-right: 30px;
+
+  &.in-progress {
+    background-color: #5D8329;
+    background-image: url('/images/header-progress-bg.png');
+    background-repeat: no-repeat;
+    background-size: 0% 100%;
+    -webkit-transition: background-size 3s;
+    transition: background-size 3s;
+    .message {
+      display: inline-block;
+      margin-top: 16px;
+    }
+  }
+
+  &.complete {
+    background-image: url('/images/header-complete.png');
+    background-size: auto 100%;
+    .message {
+      display: inline-block;
+      margin-top: 13px;
+      .failed {
+        background-color: #e02127;
+        color: #fff;
+        margin-right: 10px;
+        padding: 2px 5px;
+        font-weight: bold;
+      }
+    }
+    .button-header {
+      background-color: #000;
+      border: 1px solid #fff;
+    }
+  }
+
+  .row {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .col-md-1 {
+    padding-right: 0;
+  }
+
+  .stripes {
+    cursor: pointer;
+    margin-top: 18px;
+
+    .stripe {
+      height: 2px;
+      width: 16px;
+      margin-bottom: 2px;
+      background-color: #ccc;
+    }
+  }
+
+  .exp-name {
+    padding-left: 0;
+    margin-left: -30px;
+    margin-right: 30px;
+    margin-top: 10px;
+    font-family: "Fun City";
+    font-size: 17px;
+  }
+
+  .message {
+    display: inline;
+    font-size: 12px;
+    padding-right: 10px;
+    color: #fff;
+    text-transform: uppercase;
+
+    * {
+      color: #fff;
+    }
+  }
+
+  .button-header {
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 12px;
+    font-family: 'dinot';
+    width: 170px;
+    text-align: center;
+
+    &.begin {
+      border: 1px solid #fff;
+      background-color: $gray;
+      color: #fff;
+
+      &.disabled {
+        border: 1px solid #aaa;
+        color: #aaa;
+        cursor: not-allowed;
+      }
+    }
+  }
+}

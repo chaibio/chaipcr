@@ -2,7 +2,18 @@
   <div class="edit-stage-step-container" ng-controller="StageStepCtrl">
     <div class="top-half noselect">
       <!-- Top part -->
-      <div class="name-on-top">
+
+      <header-status experiment-id="protocol.id">
+        <div class="stripes" toggle-sidemenu>
+          <div class="stripe"></div>
+          <div class="stripe"></div>
+          <div class="stripe"></div>
+        </div>
+      </header-status>
+
+
+
+      <!-- <div class="name-on-top">
         <div class="stripe-container">
           <div class="stripes">
             <a toggle-sidemenu>
@@ -16,13 +27,12 @@
           {{protocol.name}}
         </div>
         <div class="where-m-I">
-          <!-- This is going to be a directive -->
           <scroll-on-top ng-if="showScrollbar" width="{{scrollWidth}}" left="{{scrollLeft}}"></scroll-on-top>
         </div>
         <div ng-if="false" class="undo-container">
           <button id="undo-action">UNDO</button>
         </div>
-      </div>
+      </div> -->
       <!-- Top part End-->
       <!-- Canvas Part -->
       <div class="canvas-containing">

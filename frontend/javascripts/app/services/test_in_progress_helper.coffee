@@ -76,10 +76,20 @@ window.ChaiBioTech.ngApp.service 'TestInProgressHelper', [
         exp = data.experiment_controller.expriment
         time = (exp.estimated_duration*1+exp.paused_duration*1)-exp.run_duration*1
         if time < 0 then time = 0
-
         time
       else
         0
+
+    @timePercentage = (data) ->
+      return 0 if !data
+      return 0 if !data.experiment_controller
+      return 0 if data.experiment_controller.machine.state is 'idle'
+      timeRemaining = @timeRemaining data
+      exp = data.experiment_controller.expriment
+      time = exp.run_duration/(exp.estimated_duration*1+exp.paused_duration*1)
+      if time < 0 then time = 0
+      if time > 1 then time = 1
+      return time*100
 
     return
 ]
