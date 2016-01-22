@@ -25,7 +25,7 @@ window.App.service 'Device', [
             deviceCheckPromise = @getVersion()
             deviceCheckPromise.then (device) ->
               is_offline = true
-              if cloudInfo.software_version isnt device.software?.version?
+              if cloudInfo.software_version isnt device.software?.version
                 deferred.resolve 'available'
               else
                 deferred.resolve 'unavailable'
@@ -120,8 +120,9 @@ window.App.service 'Device', [
         Upload.upload
           url: "#{host}\:8000/device/upload_software_update"
           method: 'POST'
-          'Content-Type': file.type
-          data: file
+          'Content-Type': 'multipart/form-data'
+          data:
+            upgradefile: file
 
     return new Device
 
