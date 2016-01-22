@@ -53,6 +53,7 @@ class DevicesController < ApplicationController
     result_hash = Hash.new
     if device_hash
       result_hash["serial_number"] = device_hash["serial_number"]
+      result_hash["device_signature"] = device_hash["device_signature"]
       result_hash["model_number"] = device_hash["model_number"]
       result_hash["processor_architecture"] = device_hash["processor_architecture"]
     end
