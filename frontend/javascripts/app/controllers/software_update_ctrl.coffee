@@ -38,7 +38,7 @@ window.App.controller 'SoftwareUpdateCtrl', [
       _file = file
       $scope.upload_error = false
       $scope.file =
-        name: file.name
+        name: file.name.substring(0, 24)+'...'
 
     $scope.doUpload = ->
       return if !$scope.file
