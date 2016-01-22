@@ -36,10 +36,16 @@ void DataHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
     catch (const std::exception &ex)
     {
         std::cout << "DataHandler::handleRequest - " << ex.what() << '\n';
+
+        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, Poco::Net::HTTPServerResponse::getReasonForStatus(getStatus()));
+        response.send().flush();
     }
     catch (...)
     {
         std::cout << "DataHandler::handleRequest - unknown error\n";
+
+        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, Poco::Net::HTTPServerResponse::getReasonForStatus(getStatus()));
+        response.send().flush();
     }
 }
 

@@ -156,8 +156,6 @@ bool UpdateManager::update()
     return false;
 }
 
-#include <Poco/Net/MultipartReader.h>
-
 void UpdateManager::upload(std::istream &dataStream)
 {
     std::unique_lock<std::recursive_mutex> lock(_downloadMutex);
