@@ -49,6 +49,25 @@ run_migrate_on_upgrade () {
 	fi
 }
 
+mysql_watchdog () {
+	while true
+	do
+		/etc/init.d/mysql status | grep running
+		sql_running=$?
+		if [ $sql_running -eq 1 ]
+		then
+			echo MySql found down... Trying to restart MySQL service!
+			service mysql restart
+			sleep 100
+		fi
+		sleep 300
+	done
+}
+
+mysql_watchdog_logged () {
+	mysql_watchdog >> $log_file 2>&1
+}
+
 run_migrate_on_upgrade_logged () {
 	run_migrate_on_upgrade >> $log_file 2>&1
 }
@@ -172,6 +191,7 @@ fi
 
 check_corruption >> $log_file || true
 check_upgrade_autorun &
+mysql_watchdog_logged &
 echo "Autorun script done!" >> $log_file
 
 exit 0
