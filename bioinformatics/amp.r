@@ -13,7 +13,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     fallback <- 'lin'
     maxiter <- 20
     maxfev <- 10000
-    ac_calib_ratio_min <- 0.1
+    min_ac_max <- 10
     type <- 'curve'
     cp <- 'cpD2'
     
@@ -24,7 +24,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
                                show_running_time)
     baseline_calib <- baseline_ct(amp_calib, model, baselin, basecyc, fallback, 
                                   maxiter, maxfev, 
-                                  ac_calib_ratio_min, 
+                                  min_ac_max, 
                                   type, cp, 
                                   show_running_time)
     return (list('background_subtracted'=amp_calib, 'baseline_subtracted'=baseline_calib['bl_corrected'], 'ct'=baseline_calib['ct_eff']))
@@ -98,13 +98,15 @@ modlist_coef <- function(modLIST, coef_cols) {
 
 
 # function: get Ct and amplification efficiency values
-get_ct_eff <- function(ac_mtx, signal_water_diff, 
+get_ct_eff <- function(ac_mtx, 
+                       # signal_water_diff, 
                        mod_ori, 
-                       ac_calib_ratio_min, 
+                       min_ac_max, 
                        type, cp, 
                        num_cycles) {
     
-    ac_calib_ratios <- unlist(alply(ac_mtx, .margins=2, max))[2:ncol(ac_mtx)] / signal_water_diff
+    ac_maxs <- unlist(alply(ac_mtx, .margins=2, max))[2:ncol(ac_mtx)] / scaling_factor
+    # ac_calib_ratios <- unlist(alply(ac_mtx, .margins=2, max))[2:ncol(ac_mtx)] / signal_water_diff
     
     ct_eff_raw <- getPar(mod_ori, type=type, cp=cp)
     
@@ -112,7 +114,9 @@ get_ct_eff <- function(ac_mtx, signal_water_diff,
     
     for (i in 1:num_wells) {
         
-        ac_calib_ratio <- ac_calib_ratios[i]
+        ac_max <- ac_maxs[i]
+        # ac_calib_ratio <- ac_calib_ratios[i]
+        # message('ac_max ', i, ': ', ac_max) # for testing
         
         mod <- mod_ori[[i]]
         stopCode <- mod$convInfo$stopCode
@@ -120,7 +124,8 @@ get_ct_eff <- function(ac_mtx, signal_water_diff,
         
         ct <- ct_eff['ct', i]
         
-        if (   ac_calib_ratio < ac_calib_ratio_min 
+        if (   ac_max < min_ac_max 
+            #  ac_calib_ratio < ac_calib_ratio_min 
             || is.null(stopCode) || is.null(b) 
             || stopCode != 1 || b > 0
             || (!is.na(ct) && ct == num_cycles)) {
@@ -141,7 +146,7 @@ baseline_ct <- function(amp_calib,
                         # baselin = c('none', 'mean', 'median', 'lin', 'quad', 'parm').
                         # fallback = c('none', 'mean', 'median', 'lin', 'quad'). only valid when baselin = 'parm'
                         maxiter, maxfev, # control parameters for `nlsLM` in `pcrfit`
-                        ac_calib_ratio_min, # get_ct_eff parameter to control Ct reporting
+                        min_ac_max, # get_ct_eff parameter to control Ct reporting
                         type, cp, # getPar parameters
                         show_running_time=FALSE # option to show time cost to run this function
                         ) {
@@ -197,9 +202,10 @@ baseline_ct <- function(amp_calib,
     # bl_corrected <- NULL
     
     # threshold cycle and amplification efficiency
-    ct_eff <- get_ct_eff(ac_mtx, signal_water_diff, 
+    ct_eff <- get_ct_eff(ac_mtx, 
+                         # signal_water_diff, 
                          mod_ori, 
-                         ac_calib_ratio_min=ac_calib_ratio_min, 
+                         min_ac_max=min_ac_max, 
                          type=type, cp=cp, 
                          num_cycles=nrow(ac_mtx))
     
