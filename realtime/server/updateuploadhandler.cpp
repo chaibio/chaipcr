@@ -2,6 +2,8 @@
 #include "qpcrapplication.h"
 #include "updatemanager.h"
 
+#include <Poco/Net/MultipartReader.h>
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
@@ -12,8 +14,17 @@ UpdateUploadHandler::UpdateUploadHandler()
 
 void UpdateUploadHandler::processRequest(Poco::Net::HTTPServerRequest &request)
 {
-    qpcrApp.updateManager()->upload(request.stream());
-    qpcrApp.updateManager()->update();
+    std::istream &stream = request.stream();
+    Poco::Net::MultipartReader reader(stream);
+
+    if (reader.hasNextPart())
+    {
+        Poco::Net::MessageHeader message;
+        reader.nextPart(message);
+
+        qpcrApp.updateManager()->upload(reader.stream());
+        qpcrApp.updateManager()->update();
+    }
 }
 
 void UpdateUploadHandler::processResponse(Poco::Net::HTTPServerResponse &response)

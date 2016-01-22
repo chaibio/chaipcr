@@ -19,6 +19,12 @@ void JsonHandler::processRequest(Poco::Net::HTTPServerRequest &request)
 {
     boost::property_tree::ptree requestPt;
 
+    if (getStatus() != Poco::Net::HTTPResponse::HTTP_OK)
+    {
+        JsonHandler::processData(requestPt, _responsePt);
+        return;
+    }
+
     try
     {
         if (request.getContentLength() > 0)
