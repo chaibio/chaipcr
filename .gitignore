@@ -38,3 +38,4 @@ Debug
 /web/public/javascripts/**/*.js
 /web/public/stylesheets/**/*.css
 build/*
+/uploads/
