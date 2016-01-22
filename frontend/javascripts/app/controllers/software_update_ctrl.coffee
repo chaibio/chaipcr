@@ -16,6 +16,7 @@ window.App.controller 'SoftwareUpdateCtrl', [
     uploadPromise = null
     $scope.loading = true
     $scope.content = 'update_available'
+    _file = null
 
     if Device.direct_upload isnt true
       Device.getUpdateInfo().then (data) ->
@@ -33,12 +34,11 @@ window.App.controller 'SoftwareUpdateCtrl', [
       $scope.content = 'upload_form'
 
     $scope.imageSelected = (file) ->
-      $scope.file = file
-
-    $scope.cancelUpload = ->
-      uploadPromise.abort() if uploadPromise
-      uploadPromise = null
-      $scope.uploading = false
+      return if !file
+      _file = file
+      $scope.upload_error = false
+      $scope.file =
+        name: file.name
 
     $scope.doUpload = ->
       return if !$scope.file
@@ -62,7 +62,17 @@ window.App.controller 'SoftwareUpdateCtrl', [
 
       $scope.uploading = true
       $scope.percent_upload = 0;
-      uploadPromise = Device.uploadImage($scope.file).then successCB, errorCB, progressCB
+      uploadPromise = Device.uploadImage(_file)
+      .success(successCB)
+      .error( errorCB)
+      .progress( progressCB)
+      .xhr (xhr) ->
+        $scope.cancelUpload = ->
+          xhr.abort()
+          uploadPromise = null
+          _file = null
+          $scope.file = null
+          $scope.uploading = false
 
 
 ]

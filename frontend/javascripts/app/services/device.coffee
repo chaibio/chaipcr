@@ -70,7 +70,8 @@ window.App.service 'Device', [
 
         deferred = $q.defer()
 
-        if @isOffline()
+        # if @isOffline()
+        if true # force off line to download
           checkCloudInfo deferred
         else
           infoPromise = $http.get('/device/software_update')
