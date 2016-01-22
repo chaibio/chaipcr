@@ -7,11 +7,10 @@ window.ChaiBioTech.ngApp
     templateUrl: 'app/views/directives/amplification-chart-button.html'
     link: ($scope, elem, attrs, ngModel) ->
 
-      $scope.$watch ->
+      $scope.$watchCollection ->
         ngModel.$modelValue
       , (newVal) ->
         $scope.updateUI() if newVal
-      , true
 
       $scope.updateUI = ->
         $scope.selected = ngModel.$modelValue.selected
