@@ -19,16 +19,7 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
 
     $scope.editExpNameMode = false
 
-    # $scope.expTypes = [
-    #   {text: 'END POINT'}
-    #   {text: 'PRESENCE/ABSENSE'}
-    #   {text: 'GENOTYPING'}
-    #   {text: 'QUANTIFICATION'}
-    # ]
-
-    $scope.$watch ->
-      Status.getData()
-    , (data) ->
+    $scope.$on 'status:data:updated', (e, data) ->
       if parseInt(data?.experiment_controller?.expriment?.id) is parseInt($stateParams.id)
         $scope.experiment.started_at = data.experiment_controller.expriment.started_at
         $scope.experiment.completed_at = data.experiment_controller.expriment.completed_at

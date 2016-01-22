@@ -1,4 +1,4 @@
-<div class="header-status" ng-class="{'in-progress': state !== 'idle', 'complete': experiment.completed_at}" ng-style="backgroundStyle">
+<div class="header-status" ng-class="{'in-progress': state && state !== 'idle', 'complete': experiment && experiment.completed_at}" ng-style="backgroundStyle">
   <!-- only part of the header that is customizable -->
 
   <div class="row">
@@ -8,7 +8,7 @@
       <div ng-show="experiment.id && experiment.name">{{experiment.name}}</div>
     </div>
     <!-- begin is valid -->
-    <div class="col-md-7 text-right" ng-show="state === 'idle' && !experiment.started_at && !experiment.completed_at && !statusData.lid.open">
+    <div class="col-md-7 text-right" ng-show="experiment.id && state === 'idle' && !experiment.started_at && !experiment.completed_at && !statusData.lid.open">
       <button class="button-header begin" ng-click="startExperiment()">
         <b>BEGIN EXPERIMENT</b>
       </button>

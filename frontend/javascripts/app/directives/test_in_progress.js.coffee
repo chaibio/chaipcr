@@ -32,9 +32,7 @@ window.ChaiBioTech.ngApp
 
       if Status.getData() then updateData Status.getData()
 
-      $scope.$watch ->
-        Status.getData()
-      , (data) ->
+      $scope.$on 'status:data:updated', (e, data) ->
         updateData data
         updateIsHolding data
         $scope.timeRemaining = TestInProgressHelper.timeRemaining(data)

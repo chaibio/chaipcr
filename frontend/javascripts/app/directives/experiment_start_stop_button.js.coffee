@@ -32,9 +32,7 @@ window.ChaiBioTech.ngApp
 
       $scope.init = ->
 
-        $scope.$watch ->
-          Status.getData()
-        , (val) ->
+        $scope.$on 'status:data:updated', (e, val) ->
           $scope.data = val
           $scope.state = val?.experiment_controller?.machine.state
           TestInProgressHelper.set_holding(val, $scope.experiment)
@@ -43,12 +41,9 @@ window.ChaiBioTech.ngApp
           if val?.experiment_controller?.expriment?.id and !experiment_id
             experiment_id = val.experiment_controller.expriment.id
 
-        , true
-
         $scope.$watch 'data.experiment_controller.machine.state', (newState, oldState) ->
           if (newState isnt oldState) and (newState is 'idle')
             getExperiment()
-
 
       $scope.startExperiment = (expId) ->
         Experiment.startExperiment(expId).then ->

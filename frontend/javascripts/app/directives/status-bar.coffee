@@ -35,9 +35,7 @@ window.App.directive 'statusBar', [
 
       $scope.is_holding = false
 
-      $scope.$watch ->
-        Status.getData()
-      , (data, oldData) ->
+      $scope.$on 'status:data:updated', (e, data, oldData) ->
         return if !data
         return if !data.experiment_controller
         $scope.state = data.experiment_controller.machine.state

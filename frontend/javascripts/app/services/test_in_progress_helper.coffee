@@ -13,9 +13,7 @@ window.ChaiBioTech.ngApp.service 'TestInProgressHelper', [
     experimentQues = {}
     isFetchingExp = false
 
-    $rootScope.$watch =>
-      Status.getData()
-    , (data) =>
+    $rootScope.$on 'status:data:updated', (e, data) =>
       status = data
       @set_holding status, experiment
 

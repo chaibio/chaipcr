@@ -6,7 +6,8 @@ window.ChaiBioTech.ngApp
   'host'
   '$interval'
   '$timeout'
-  ($http, $q, host, $interval, $timeout) ->
+  '$rootScope'
+  ($http, $q, host, $interval, $timeout, $rootScope) ->
 
     data = null
     isUp = true
@@ -33,10 +34,11 @@ window.ChaiBioTech.ngApp
       $http.get("#{host}\:8000/status")
       .success (resp) =>
         isUp = true
+        oldData = angular.copy data
         data = resp
-
         for def in ques by 1
           def.resolve data
+        $rootScope.$broadcast 'status:data:updated', data, oldData
 
       .error (resp) ->
         isUp = if resp is null then false else true

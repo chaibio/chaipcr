@@ -31,14 +31,13 @@ window.App.directive 'headerStatus', [
 
       $scope.$watch 'experimentId', (id) ->
         return if !id
+        experiment_id = id
         getExperiment (exp) ->
           $scope.experiment = exp
 
       $scope.is_holding = false
 
-      $scope.$watch ->
-        Status.getData()
-      , (data, oldData) ->
+      $scope.$on 'status:data:updated', (e, data, oldData) ->
         return if !data
         return if !data.experiment_controller
         $scope.statusData = data

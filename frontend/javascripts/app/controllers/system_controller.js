@@ -19,12 +19,10 @@ window.ChaiBioTech.ngApp.controller('systemController', [
       });
     };
 
-    $scope.$watch(function(){
-      return Status.getData();
-      }, function(data) {
-        status = (data && data.device) ? data.device.update_available : 'unknown';
-        if(status !== 'unknown')
-          $scope.update_available = status;
+    $scope.$on('status:data:updated', function (e, data) {
+      status = (data && data.device) ? data.device.update_available : 'unknown';
+      if(status !== 'unknown')
+        $scope.update_available = status;
     });
 
     $scope.openUpdateModal = function() {

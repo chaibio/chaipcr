@@ -36,9 +36,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
     getExperiment()
 
-    $scope.$watch ->
-      Status.getData()
-    , (val) ->
+    $scope.$on 'status:data:updated', (e, val) ->
       if val
         hasStatusData = true
         $scope.isCurrentExperiment = parseInt(val.experiment_controller?.expriment?.id) is parseInt($stateParams.id)
