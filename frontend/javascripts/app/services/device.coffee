@@ -38,20 +38,23 @@ window.App.service 'Device', [
         deferred = $q.defer()
         localCheckPromise = $http.post("#{host}\:8000/device/check_for_updates")
         localCheckPromise.then (resp) ->
-          console.log "/check_for_updates"
-          console.log resp
 
-          Status.fetch()
-          .then (resp) ->
-            status = resp?.device?.update_available || 'unknown'
-            if status is 'unknown'
-              is_offline = true
+          status = resp?.data?.device?.update_available || 'unknown'
+
+          if status is 'unknown'
+            Status.fetch()
+            .then (resp) ->
+              status = resp?.device?.update_available || 'unknown'
+              if status is 'unknown'
+                is_offline = true
+                checkCloudUpdate deferred
+              else
+                is_offline = false
+                deferred.resolve status
+            .catch ->
               checkCloudUpdate deferred
-            else
-              is_offline = false
-              deferred.resolve status
-          .catch ->
-            checkCloudUpdate deferred
+          else
+            deferred.resolve status
 
         localCheckPromise.catch =>
           is_offline = true
@@ -70,12 +73,14 @@ window.App.service 'Device', [
         deferred = $q.defer()
 
         if @isOffline()
-        # if true # force off line to download
           checkCloudInfo deferred
         else
           infoPromise = $http.get('/device/software_update')
           infoPromise.then (resp) =>
-            deferred.resolve resp.data.upgrade
+            if resp.data?.upgrade
+              deferred.resolve resp.data.upgrade
+            else
+              checkCloudInfo deferred
           infoPromise.catch (err) ->
             checkCloudInfo deferred
 
