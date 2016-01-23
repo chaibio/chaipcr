@@ -110,7 +110,7 @@ bool UpdateManager::update()
     {
         try
         {
-            Poco::File dir(kUpdateFolder);
+            Poco::File dir(kUpdateFolder + "/scripts");
             if (dir.exists())
                 dir.remove(true);
 
