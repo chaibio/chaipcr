@@ -186,7 +186,7 @@ fi
 
 check_corruption >> $log_file || true
 check_upgrade_autorun &
-mysql_watchdog_logged &
+#mysql_watchdog_logged &
 echo "Autorun script done!" >> $log_file
 
 exit 0
