@@ -1,4 +1,3 @@
-
 window.App.service 'Device', [
   '$http'
   '$q'
@@ -25,7 +24,7 @@ window.App.service 'Device', [
             deviceCheckPromise = @getVersion()
             deviceCheckPromise.then (device) ->
               is_offline = true
-              if cloudInfo.software_version isnt device.software?.version?
+              if cloudInfo.software_version isnt device.software?.version
                 deferred.resolve 'available'
               else
                 deferred.resolve 'unavailable'
@@ -38,14 +37,22 @@ window.App.service 'Device', [
 
         deferred = $q.defer()
         localCheckPromise = $http.post("#{host}\:8000/device/check_for_updates")
-        localCheckPromise.then ->
-          status = (Status.getData()?.device?.update_available) || 'unknown'
-          if status is 'unknown'
-            is_offline = true
+        localCheckPromise.then (resp) ->
+          console.log "/check_for_updates"
+          console.log resp
+
+          Status.fetch()
+          .then (resp) ->
+            status = resp?.device?.update_available || 'unknown'
+            if status is 'unknown'
+              is_offline = true
+              checkCloudUpdate deferred
+            else
+              is_offline = false
+              deferred.resolve status
+          .catch ->
             checkCloudUpdate deferred
-          else
-            is_offline = false
-            deferred.resolve status
+
         localCheckPromise.catch =>
           is_offline = true
           checkCloudUpdate deferred
@@ -63,6 +70,7 @@ window.App.service 'Device', [
         deferred = $q.defer()
 
         if @isOffline()
+        # if true # force off line to download
           checkCloudInfo deferred
         else
           infoPromise = $http.get('/device/software_update')
@@ -112,7 +120,9 @@ window.App.service 'Device', [
         Upload.upload
           url: "#{host}\:8000/device/upload_software_update"
           method: 'POST'
-          data: file
+          'Content-Type': 'multipart/form-data'
+          data:
+            upgradefile: file
 
     return new Device
 

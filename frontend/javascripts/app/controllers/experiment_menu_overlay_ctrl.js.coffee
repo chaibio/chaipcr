@@ -29,9 +29,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
 
     getExperiment()
 
-    $scope.$watch ->
-      Status.getData()
-    , (data, oldData) ->
+    $scope.$on 'status:data:updated', (e, data, oldData) ->
       state = data?.experiment_controller?.machine?.state
       oldState = oldData?.experiment_controller?.machine?.state
       getExperiment() if state isnt oldState

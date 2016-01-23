@@ -31,9 +31,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.chartConfig.axes.x.max = maxCycle
       $scope.experiment = data.experiment
 
-    $scope.$watch ->
-      Status.getData()
-    , (data, oldData) ->
+    $scope.$on 'status:data:updated', (e, data, oldData) ->
       newStep = parseInt(data?.experiment_controller?.expriment?.step?.number) || null
       oldStep = parseInt(oldData?.experiment_controller?.expriment?.step?.number) || null
       state = data?.experiment_controller?.machine?.state
@@ -90,7 +88,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.data = neutralizedData["#{if $scope.baseline_subtraction then 'baseline' else 'background'}"]
 
 
-    $scope.$watch 'wellButtons', (buttons) ->
+    $scope.$watchCollection 'wellButtons', (buttons) ->
       buttons = buttons || {}
       $scope.chartConfig.series = []
 

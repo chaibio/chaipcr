@@ -18,7 +18,7 @@ window.App.service 'PeriodicUpdate', [
         if last_checked
           last_checked = moment(last_checked)
         else
-          last_checked = now.subtract(UPDATE_INTERVAL_DURATION.add(1, 'day'))
+          last_checked = now.subtract(UPDATE_INTERVAL_DURATION.add(1, 'days'))
 
         next_check = last_checked.add(UPDATE_INTERVAL_DURATION)
         if  next_check.isSame(now) or now.isAfter(next_check)

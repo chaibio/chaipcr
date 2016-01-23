@@ -39,7 +39,7 @@ void Optics::process()
     {
         toggleCollectData();
 
-        if (_lidOpen)
+        if (_lidOpen && !qpcrApp.isMachinePaused())
             qpcrApp.stopExperiment("Lid opened during run");
     }
 }

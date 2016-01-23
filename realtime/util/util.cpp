@@ -232,7 +232,7 @@ bool watchProcess(const std::string &command, int eventFd, std::function<void(co
     }
     else
     {
-        kill(pid, SIGTERM);
+        kill(pid, SIGKILL);
 
         if (fdArray[1].revents == 0)
             throw std::runtime_error("Unknown error with subprocess - " + command);

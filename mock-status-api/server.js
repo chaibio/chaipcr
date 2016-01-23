@@ -1,8 +1,19 @@
 var express = require('express');
-var app = express();
 var bodyParser = require('body-parser');
+var multer  =   require('multer');
+var app = express();
 
-app.use(bodyParser.json({type: 'multipart/form-data'}));
+var storage =   multer.diskStorage({
+  destination: function (req, file, callback) {
+    callback(null, './uploads');
+  },
+  filename: function (req, file, callback) {
+    callback(null, file.fieldname);
+  }
+});
+var upload = multer({ dest : './uploads'}).single('upgradefile');
+
+app.use(bodyParser.json({limit: '50gb'}));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(function (req, res, next) {
@@ -126,10 +137,16 @@ function incrementLog (cb) {
 
 function autoupdateLogs() {
   incrementLog();
+  data.experiment_controller.expriment.run_duration = data.experiment_controller.expriment.run_duration*1+1;
   intrvl = setTimeout(autoupdateLogs, 1000);
 }
 
 app.get('/status', function (req, res, next) {
+  data.lid = {open: false}
+  res.send(data);
+});
+
+app.post('/device/check_for_updates', function (req, res, next) {
   res.send(data);
 });
 
@@ -170,8 +187,10 @@ app.post('/control/stop', function (req, res, next) {
   res.send(true);
 });
 
-app.post('/device/upload_software_update', function (req, res, next) {
-  res.send(true);
+app.post('/device/upload_software_update', upload,function (req, res, next) {
+  // setTimeout(function () {
+  //   res.sendStatus(200)
+  // }, 1000);
 });
 
 

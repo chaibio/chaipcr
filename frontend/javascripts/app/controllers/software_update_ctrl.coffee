@@ -1,5 +1,3 @@
-# software update modal controller
-
 window.App.controller 'SoftwareUpdateCtrl', [
   '$scope'
   '$uibModal'
@@ -10,15 +8,13 @@ window.App.controller 'SoftwareUpdateCtrl', [
   'Upload'
   '$timeout'
   '$interval'
-  'Status',
-  'host',
-  ($scope, $uibModal, $uibModalInstance, Device, $window, $state, Upload, $timeout, $interval, Status, host) ->
+  'Status'
+  ($scope, $uibModal, $uibModalInstance, Device, $window, $state, Upload, $timeout, $interval, Status) ->
 
     uploadPromise = null
     $scope.loading = true
     $scope.content = 'update_available'
-    upFile = null
-    $scope.file_name = ""
+    _file = null
 
     if Device.direct_upload isnt true
       Device.getUpdateInfo().then (data) ->
@@ -36,20 +32,14 @@ window.App.controller 'SoftwareUpdateCtrl', [
       $scope.content = 'upload_form'
 
     $scope.imageSelected = (file) ->
-      upFile = file
-      $scope.uploading = false
-      $scope.upload_error = false;
-      $scope.file_name = file.name;
-      $scope.file = true
+      return if !file
+      _file = file
+      $scope.upload_error = false
+      $scope.file =
+        name: file.name.substring(0, 24)+'...'
 
-
-    $scope.cancelUpload = ->
-      uploadPromise.abort() if uploadPromise
-      uploadPromise = null
-      $scope.uploading = false
-
-    $scope.doUpload = (file)->
-      return if !upFile
+    $scope.doUpload = ->
+      return if !$scope.file
       errorCB = (err) ->
         $scope.upload_error = true
         $scope.uploading = false
@@ -70,7 +60,17 @@ window.App.controller 'SoftwareUpdateCtrl', [
 
       $scope.uploading = true
       $scope.percent_upload = 0;
-      uploadPromise = Device.uploadImage(upFile).then successCB, errorCB, progressCB
+      uploadPromise = Device.uploadImage(_file)
+      .success(successCB)
+      .error( errorCB)
+      .progress( progressCB)
+      .xhr (xhr) ->
+        $scope.cancelUpload = ->
+          xhr.abort()
+          uploadPromise = null
+          _file = null
+          $scope.file = null
+          $scope.uploading = false
 
 
 ]

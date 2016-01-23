@@ -1,4 +1,7 @@
 {
+    "device": {
+        "update_available": "unknown"
+    },
     "heatblock":
     {
         "zone1":

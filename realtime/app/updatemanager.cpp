@@ -125,22 +125,29 @@ bool UpdateManager::update()
             throw std::runtime_error("Unknown error occurred during extracting an upgrade archive");
         }
 
-        std::string message;
-
         try
         {
-            Util::watchProcess(kUpdateScriptPath, [&message](const char buffer[])
-            {
-                std::cout << "UpdateManager::update - perform_upgrade: " << buffer << '\n';
+            Poco::File file(kUpdateScriptOutputPath);
+            if (file.exists())
+                file.remove();
 
-                message += buffer;
-            });
+            Util::watchProcess(kUpdateScriptPath + ' ' + kUpdateScriptOutputPath, [](const char buffer[]) { std::cout << "UpdateManager::update - perform_upgrade: " << buffer << '\n'; });
         }
         catch (...)
         {
             _updateState = Unknown;
 
-            throw std::runtime_error("Unable to perform upgrade:\n" + message);
+            std::string message;
+            std::ifstream file(kUpdateScriptOutputPath);
+
+            if (file.is_open())
+            {
+                std::getline(file, message);
+
+                throw std::runtime_error(message);
+            }
+            else
+                throw std::runtime_error("Unknown error occured during upgrade");
         }
 
         return true;

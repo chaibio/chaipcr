@@ -12,9 +12,7 @@ window.App.directive 'versionInfo', [
 
       $scope.update_available = 'unavailable'
 
-      $scope.$watch ->
-        Status.getData()
-      , (data) ->
+      $scope.$on 'status:data:updated', (e, data) ->
         status = data?.device?.update_available || 'unknown'
         if status isnt 'unknown'
           $scope.update_available = status

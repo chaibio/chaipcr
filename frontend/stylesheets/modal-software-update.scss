@@ -76,6 +76,8 @@
             height: 28px;
             padding: 2px 10px;
             text-align: left;
+            word-break: break-all;
+            overflow: ellipsis;
           }
         }
       }

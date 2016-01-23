@@ -1,4 +1,4 @@
-window.App.directive 'statusBar', [
+window.App.directive 'headerStatus', [
   'Experiment'
   '$state'
   'Status'
@@ -9,9 +9,10 @@ window.App.directive 'statusBar', [
 
     restrict: 'EA'
     replace: true
+    transclude: true
     scope:
       experimentId: '=?'
-    templateUrl: 'app/views/directives/status-bar.html'
+    templateUrl: 'app/views/directives/header-status.html'
     link: ($scope, elem, attrs) ->
 
       experiment_id = null
@@ -30,6 +31,7 @@ window.App.directive 'statusBar', [
 
       $scope.$watch 'experimentId', (id) ->
         return if !id
+        experiment_id = id
         getExperiment (exp) ->
           $scope.experiment = exp
 
@@ -38,6 +40,7 @@ window.App.directive 'statusBar', [
       $scope.$on 'status:data:updated', (e, data, oldData) ->
         return if !data
         return if !data.experiment_controller
+        $scope.statusData = data
         $scope.state = data.experiment_controller.machine.state
         $scope.thermal_state = data.experiment_controller.machine.thermal_state
         $scope.oldState = oldData?.experiment_controller?.machine?.state || 'NONE'
@@ -52,6 +55,13 @@ window.App.directive 'statusBar', [
           $scope.is_holding = TestInProgressHelper.set_holding(data, $scope.experiment)
 
         $scope.timeRemaining = TestInProgressHelper.timeRemaining(data)
+        $scope.timePercentage = TestInProgressHelper.timePercentage(data)
+
+        if $scope.state isnt 'idle' and $scope.state isnt 'complete'
+          $scope.backgroundStyle =
+            'background-size': "#{$scope.timePercentage || 0}% 100%";
+        else
+          $scope.backgroundStyle = {}
 
         if ($scope.state isnt 'idle' and !experiment_id and data.experiment_controller?.expriment?.id)
           experiment_id = data.experiment_controller.expriment.id

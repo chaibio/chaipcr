@@ -11,6 +11,9 @@ public:
 protected:
     void processRequest(Poco::Net::HTTPServerRequest &request);
     void processResponse(Poco::Net::HTTPServerResponse &response);
+
+private:
+    std::string _errorMessage;
 };
 
 #endif // UPDATEUPLOADHANDLER_H
