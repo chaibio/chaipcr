@@ -112,7 +112,6 @@ window.App.service 'Device', [
         Upload.upload
           url: "#{host}\:8000/device/upload_software_update"
           method: 'POST'
-          'Content-Type': 'multipart/form-data'
           data: file
 
     return new Device

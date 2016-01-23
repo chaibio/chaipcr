@@ -10,12 +10,15 @@ window.App.controller 'SoftwareUpdateCtrl', [
   'Upload'
   '$timeout'
   '$interval'
-  'Status'
-  ($scope, $uibModal, $uibModalInstance, Device, $window, $state, Upload, $timeout, $interval, Status) ->
+  'Status',
+  'host',
+  ($scope, $uibModal, $uibModalInstance, Device, $window, $state, Upload, $timeout, $interval, Status, host) ->
 
     uploadPromise = null
     $scope.loading = true
     $scope.content = 'update_available'
+    upFile = null
+    $scope.file_name = ""
 
     if Device.direct_upload isnt true
       Device.getUpdateInfo().then (data) ->
@@ -33,15 +36,20 @@ window.App.controller 'SoftwareUpdateCtrl', [
       $scope.content = 'upload_form'
 
     $scope.imageSelected = (file) ->
-      $scope.file = file
+      upFile = file
+      $scope.uploading = false
+      $scope.upload_error = false;
+      $scope.file_name = file.name;
+      $scope.file = true
+
 
     $scope.cancelUpload = ->
       uploadPromise.abort() if uploadPromise
       uploadPromise = null
       $scope.uploading = false
 
-    $scope.doUpload = ->
-      return if !$scope.file
+    $scope.doUpload = (file)->
+      return if !upFile
       errorCB = (err) ->
         $scope.upload_error = true
         $scope.uploading = false
@@ -62,7 +70,7 @@ window.App.controller 'SoftwareUpdateCtrl', [
 
       $scope.uploading = true
       $scope.percent_upload = 0;
-      uploadPromise = Device.uploadImage($scope.file).then successCB, errorCB, progressCB
+      uploadPromise = Device.uploadImage(upFile).then successCB, errorCB, progressCB
 
 
 ]

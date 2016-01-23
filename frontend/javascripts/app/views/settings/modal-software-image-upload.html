@@ -29,8 +29,8 @@
       </button>
     </div>
     <div ng-show="!uploading">
-      <div ng-show="file.name">
-        <span ng-show="!upload_error">{{file.name}}</span>
+      <div ng-show="file_name">
+        <span ng-show="!upload_error">{{file_name}}</span>
         <span ng-show="upload_error" class="text-red">
           An error occured while uploading software image. Please try again.
         </span>
@@ -40,7 +40,7 @@
       </button>
     </div>
     <div>
-      <button class="button" ng-class="{'button-green': (file || uploading), 'disabled': !file}" ng-click="doUpload()">
+      <button class="button" ng-class="{'button-green': (file || uploading), 'disabled': !file}" ng-click="doUpload($file)">
         INSTALL NOW
       </button>
     </div>
