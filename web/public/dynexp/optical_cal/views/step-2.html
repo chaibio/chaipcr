@@ -22,8 +22,11 @@
 
   <div class="text-center">
     <a ng-click="cancel=true" class="button" ng-show="!cancel">CANCEL</a>
-    <a href="/#/user/settings" class="button red" ng-show="cancel">CONFIRM CANCEL</a>
-    <a class="button" ng-show="!cancel" ng-click="createExperiment()">NEXT</a>
+    <a href="/" class="button red" ng-show="cancel">CONFIRM CANCEL</a>
+
+    <button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ng-click="createExperiment()">NEXT</button>
+    <span ng-if="error" ng-class="{errorMessage: error}">{{lidMessage}}</span>
+
   </div>
 
 </div>
