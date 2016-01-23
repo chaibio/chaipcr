@@ -21,12 +21,23 @@ window.ChaiBioTech.ngApp.directive('chartType', [
         scope.$watch('hover', function(newVal, oldVal) {
 
           if(newVal == 'hover') {
-            scope.image = scope.image + '-hover';
+            scope.image = scope.originalImage + '-hover';
           } else {
-            scope.image = scope.originalImage;
+            scope.selectedCheck(scope.current);
           }
         });
 
+        scope.$watch('current', function(newVal) {
+          scope.selectedCheck(newVal);
+        });
+
+        scope.selectedCheck = function(newVal) {
+          if(newVal == scope.type) {
+            scope.image = scope.originalImage + '-selected';
+          } else {
+            scope.image = scope.originalImage;
+          }
+        };
       }
     };
   }
