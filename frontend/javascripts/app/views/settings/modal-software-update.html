@@ -15,7 +15,7 @@
     <div class="text-right">
       <a class="close" ng-click="$dismiss()">&times;</a>
     </div>
-    <h1>SOFTWARE UPDATE READY TO INSTALL</h1>
+    <h1>SOFTWARE UPDATE AVAILABLE</h1>
     <p class="text-center text-gray">v.{{new_update.version}}, {{new_update.release_date | date: 'MMM d, yyyy'}}</p>
     <div class="update-details-container">
       <p>
@@ -29,8 +29,11 @@
           {{new_update.full_description}}
         </p>
         <p>
-          <b>
+          <b ng-show="!new_update.image_http_url">
             After updating, your hardware will reboot. This process takes about 30 minutes and the screen may be blank throughout. Please do not power cycle the hardware during this process.
+          </b>
+          <b ng-show="new_update.image_http_url">
+            Your Open qPCR is offline. To update your Open qPCR's software, you must download an update image to your computer, and then upload it to Open qPCR.
           </b>
         </p>
       </div>
@@ -41,7 +44,12 @@
     <div class="buttons-container">
       <div>
         <button class="button button-green" ng-click="doUpdate()" ng-show="!new_update.image_http_url">INSTALL NOW</button>
+      </div>
+      <div>
         <button class="button button-green" ng-click="downloadUpdate()" ng-show="new_update.image_http_url">DOWNLOAD IMAGE</button>
+      </div>
+      <div>
+        <button class="button" ng-show="new_update.image_http_url" ng-click="content='upload_form'" ngf-select="imageSelected($file)">BROWSE & INSTALL</button>
       </div>
       <div>
         <button class="button" ng-click="$dismiss()">REMIND ME LATER</button>
