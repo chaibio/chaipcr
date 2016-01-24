@@ -30,6 +30,7 @@ window.ChaiBioTech.ngApp
 
       timeoutPromise = $timeout =>
         timeoutPromise = null
+        fetching = false
       , 10000
       $http.get("#{host}\:8000/status")
       .success (resp) =>
