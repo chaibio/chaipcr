@@ -41,14 +41,18 @@
         if (!$scope.isCollectingData() && ($state.current.name === 'step-3-reading') ) {
           $state.go('step-4');
         }
-        if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle' || $state.current.name === 'step-5')) {
+        // if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle' || $state.current.name === 'step-5')) {
+        if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle')) {
           // experiment is complete
           TestInProgressService.getExperiment($scope.experiment.id).then(function (exp) {
             $scope.experiment = exp;
-            if( exp.completion_status !== 'success') return;
-            Experiment.analyze(exp.id).then(function (resp) {
-              $scope.result = resp.data;
+            if( exp.completion_status !== 'success') {
               $state.go('step-6');
+              return;
+            }
+            Experiment.analyze(exp.id).then(function (resp) {
+              $state.go('step-6');
+              $scope.result = resp.data;
               if(resp.data.valid) $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
             });
           });
@@ -141,7 +145,7 @@
 
       $scope.cancelExperiment = function () {
         Experiment.stopExperiment($scope.experiment_id).then(function () {
-          var redirect = '/#/user/settings/';
+          var redirect = '/#/settings/';
           $window.location = redirect;
         });
       };
