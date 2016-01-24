@@ -18,10 +18,14 @@ window.App.controller 'SoftwareUpdateCtrl', [
 
     if Device.direct_upload isnt true
       Device.getUpdateInfo().then (data) ->
-        if data
-          data.version = data.version || data.software_version
-          $scope.new_update = data
-          $scope.loading = false
+        Status.fetch().then (resp) ->
+          status = resp?.device?.update_available || 'unknown'
+          if status is 'available'
+            delete data.image_http_url
+          if data
+            data.version = data.version || data.software_version
+            $scope.new_update = data
+            $scope.loading = false
 
     $scope.doUpdate = ->
       $scope.content = 'update_in_progress'
