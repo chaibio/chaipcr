@@ -43,10 +43,13 @@
         }
         if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle' || $state.current.name === 'step-5')) {
           // experiment is complete
-          Experiment.analyze($scope.experiment.id).then(function (resp) {
-            $scope.result = resp.data;
-            $state.go('step-6');
-            if(resp.data.valid) $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
+          Experiment.getExperiment($scope.experiment.id).then(function (exp) {
+            if( exp.completion_status !== 'success') return;
+            Experiment.analyze(exp.id).then(function (resp) {
+              $scope.result = resp.data;
+              $state.go('step-6');
+              if(resp.data.valid) $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
+            });
           });
         }
         if ($state.current.name === 'step-3' || $state.current.name === 'step-3-reading') {
