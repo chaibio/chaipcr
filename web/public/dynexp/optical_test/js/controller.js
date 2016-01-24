@@ -107,6 +107,7 @@
         $scope.analyzing = true;
         if (!$scope.analyzedExp) {
           getExperiment($stateParams.id, function (exp) {
+            $scope.experiment = exp;
             if (exp.completion_status === 'success') {
               Experiment.getSteps($stateParams.id, [12, 13]).then(function (resp) {
                 $scope.analyzedExp = Helper.getBaselineAndExcitation(resp.data.fluorescence_data);
@@ -155,7 +156,7 @@
 
       $scope.cancelExperiment = function () {
         Experiment.stopExperiment($scope.experiment_id).then(function () {
-          var redirect = '/#/user/settings';
+          var redirect = '/#/user/settings/';
           $window.location = redirect;
         });
       };

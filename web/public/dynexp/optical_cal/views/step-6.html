@@ -1,4 +1,4 @@
-<div class="step-6" ng-show="result.valid">
+<div class="step-6" ng-show="experiment.completion_status === 'success'">
   <p class="step"><b>STEP 6</b>/6</p>
   <h2>Calibration Complete</h2>
 
@@ -16,7 +16,7 @@
   </div>
 </div>
 
-<div class="step-6" ng-show="!result.valid">
+<div class="step-6" ng-show="experiment.completion_status !== 'success'">
   <p class="step"><b>STEP 6</b>/6</p>
   <h2>Calibration Failed</h2>
 
@@ -25,9 +25,8 @@
   </div>
 
   <div class="text-center">
-    <!-- <p class="wait">CALIBRATION FAILED</p> -->
     <p class="heating">
-      {{result.error_message}}
+      {{experiment.completion_message}}
     </p>
 
     <a href="/#/settings/" class="button">OKAY</a>

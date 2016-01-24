@@ -158,7 +158,7 @@
 
       $scope.cancelExperiment = function () {
         Experiment.stopExperiment($scope.experiment_id).then(function () {
-          var redirect = '/#/user/settings';
+          var redirect = '/#/user/settings/';
           $window.location = redirect;
         });
       };
