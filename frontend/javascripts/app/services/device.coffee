@@ -63,27 +63,12 @@ window.App.service 'Device', [
         deferred.promise
 
       getUpdateInfo: ->
-        checkCloudInfo = (deferred) ->
-          cloudPromise = $http.get("http://update.chaibio.com/device/software_update")
-          cloudPromise.then (resp) ->
-            deferred.resolve resp.data
-          cloudPromise.catch (err) ->
-            deferred.reject err
-
         deferred = $q.defer()
-
-        if @isOffline()
-          checkCloudInfo deferred
-        else
-          infoPromise = $http.get('/device/software_update')
-          infoPromise.then (resp) =>
-            if resp.data?.upgrade
-              deferred.resolve resp.data.upgrade
-            else
-              checkCloudInfo deferred
-          infoPromise.catch (err) ->
-            checkCloudInfo deferred
-
+        cloudPromise = $http.get("http://update.chaibio.com/device/software_update")
+        cloudPromise.then (resp) ->
+          deferred.resolve resp.data
+        cloudPromise.catch (err) ->
+          deferred.reject err
         deferred.promise
 
       getVersion: (cache = false) ->
