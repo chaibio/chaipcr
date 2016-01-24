@@ -2,7 +2,8 @@ window.App.service 'PeriodicUpdate', [
   '$interval'
   '$timeout'
   'Device'
-  ($interval, $timeout, Device) ->
+  'Status'
+  ($interval, $timeout, Device, Status) ->
     class PeriodicUpdate
 
 
@@ -34,7 +35,8 @@ window.App.service 'PeriodicUpdate', [
         return if software_update_modal_instance isnt null
 
         console.log 'periodicUpdateCheck...'
-        Device.checkForUpdate().then (is_available) ->
+        Status.fetch().then (resp) ->
+          is_available = resp?.device?.update_available || 'unknown'
           $.jStorage.set 'periodic_update_last_checked', moment().format()
           if is_available is 'available' and !software_update_modal_instance
             console.log 'opening update modal..'
