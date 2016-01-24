@@ -43,7 +43,7 @@
         }
         if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle' || $state.current.name === 'step-5')) {
           // experiment is complete
-          Experiment.getExperiment($scope.experiment.id).then(function (exp) {
+          TestInProgressService.getExperiment($scope.experiment.id).then(function (exp) {
             if( exp.completion_status !== 'success') return;
             Experiment.analyze(exp.id).then(function (resp) {
               $scope.result = resp.data;
