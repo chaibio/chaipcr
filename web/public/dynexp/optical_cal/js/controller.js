@@ -16,7 +16,40 @@
       host, $http, DeviceInfo, $timeout, $uibModal, $rootScope) {
 
       $scope.cancel = false;
-      $scope.error = true;
+      $scope.error = false;
+
+      $scope.$on('$stateChangeSuccess', function(evt, currentState) {
+
+          switch (currentState.name) {
+
+            case "step-2":
+              if(! $scope.timeout) {
+                $scope.error = true;
+                $scope.checkMachineStatus();
+              }
+            break;
+
+            case "step-3":
+              $timeout.cancel($scope.timeout);
+            break;
+
+            case "step-4":
+              if(! $scope.timeout) {
+                $scope.error = true;
+                $scope.checkMachineStatus();
+              }
+            break;
+
+            case "step-5":
+              $timeout.cancel($scope.timeout);
+            break;
+
+            default:
+
+              $timeout.cancel($scope.timeout);
+              $scope.error = $scope.timeout = false;
+          }
+      });
 
       $scope.$watch(function () {
         return Status.getData();
@@ -101,8 +134,6 @@
 
         $scope.timeout = $timeout($scope.checkMachineStatus, 1000);
       };
-
-      $scope.checkMachineStatus();
 
       $scope.lidHeatPercentage = function () {
         if (!$scope.experiment) return 0;
