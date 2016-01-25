@@ -21,7 +21,7 @@ window.App.controller 'SoftwareUpdateCtrl', [
         Status.fetch().then (resp) ->
           status = resp?.device?.update_available || 'unknown'
           if status is 'available'
-            delete data.image_http_url #remove image url so it wont display "download image"
+            delete data.image_http_url #remove image url so it wont display "download image" modal
           if data
             data.version = data.version || data.software_version
             $scope.new_update = data
@@ -45,7 +45,7 @@ window.App.controller 'SoftwareUpdateCtrl', [
     $scope.doUpload = ->
       return if !$scope.file
       errorCB = (err) ->
-        $scope.upload_error = true
+        $scope.upload_error = err?.status?.error || 'An error occured while uploading software image. Please try again.'
         $scope.uploading = false
 
       progressCB = (evt) ->

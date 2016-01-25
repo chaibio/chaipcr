@@ -101,7 +101,7 @@
         <div ng-show="file.name">
           <span ng-show="!upload_error">{{file.name}}</span>
           <span ng-show="upload_error" class="text-red">
-            An error occured while uploading software image. Please try again.
+            {{upload_error}}
           </span>
         </div>
         <button class="button" ngf-select="imageSelected($file)">
