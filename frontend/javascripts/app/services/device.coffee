@@ -72,17 +72,22 @@ window.App.service 'Device', [
 
         deferred = $q.defer()
 
-        if @isOffline()
-          checkCloudInfo deferred
-        else
-          infoPromise = $http.get('/device/software_update')
-          infoPromise.then (resp) =>
-            if resp.data?.upgrade
-              deferred.resolve resp.data.upgrade
-            else
-              checkCloudInfo deferred
-          infoPromise.catch (err) ->
+        Status.fetch()
+        .then (resp) ->
+          status = resp?.device?.update_available || 'unknown'
+          if status is 'unknown'
             checkCloudInfo deferred
+          else
+            infoPromise = $http.get('/device/software_update')
+            infoPromise.then (resp) =>
+              if resp.data?.upgrade
+                deferred.resolve resp.data.upgrade
+              else
+                checkCloudInfo deferred
+            infoPromise.catch (err) ->
+              checkCloudInfo deferred
+        .catch ->
+          checkCloudInfo deferred
 
         deferred.promise
 
