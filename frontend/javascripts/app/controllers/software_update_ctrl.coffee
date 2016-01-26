@@ -58,16 +58,20 @@ window.App.controller 'SoftwareUpdateCtrl', [
       progressCB = (evt) ->
         $scope.percent_upload = parseInt(100.0 * evt.loaded / evt.total);
 
-      successCB = ->
-        $scope.content = 'update_in_progress'
-        $timeout ->
-          isUpInterval = $interval ->
-            if Status.isUp()
-              $scope.content = 'update_complete'
-              $interval.cancel isUpInterval
-          , 1000
+      successCB = (resp) ->
+        if resp.status.status is true
+          $scope.content = 'update_in_progress'
+          $timeout ->
+            isUpInterval = $interval ->
+              if Status.isUp()
+                $scope.content = 'update_complete'
+                $interval.cancel isUpInterval
+            , 1000
 
-        , 60 * 1000
+          , 60 * 1000
+        else
+          $scope.upload_error = err?.status?.error || 'An error occured while uploading software image. Please try again.'
+          $scope.uploading = false
 
       $scope.uploading = true
       $scope.percent_upload = 0;
