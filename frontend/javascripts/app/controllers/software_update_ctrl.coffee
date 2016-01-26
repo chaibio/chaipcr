@@ -20,8 +20,9 @@ window.App.controller 'SoftwareUpdateCtrl', [
       Device.getUpdateInfo().then (data) ->
         Status.fetch().then (resp) ->
           status = resp?.device?.update_available || 'unknown'
+          # status = 'unknown'
           if status is 'available'
-            delete data.image_http_url #remove image url so it wont display "download image"
+            delete data.image_http_url #remove image url so it wont display "download image" modal
           if data
             data.version = data.version || data.software_version
             $scope.new_update = data
@@ -39,13 +40,19 @@ window.App.controller 'SoftwareUpdateCtrl', [
       return if !file
       _file = file
       $scope.upload_error = false
+      _filename = file.name
+      name_length = 30
+      if file.name.length > name_length
+        ext_index = _filename.lastIndexOf('.')
+        ext = _filename.substring(ext_index, _filename.length)
+        _filename = _filename.substring(0, name_length-ext.length-2)+'..'+ext
       $scope.file =
-        name: file.name.substring(0, 24)+'...'
+        name: _filename
 
     $scope.doUpload = ->
       return if !$scope.file
       errorCB = (err) ->
-        $scope.upload_error = true
+        $scope.upload_error = err?.status?.error || 'An error occured while uploading software image. Please try again.'
         $scope.uploading = false
 
       progressCB = (evt) ->

@@ -27,7 +27,9 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
                                   min_ac_max, 
                                   type, cp, 
                                   show_running_time)
-    return (list('background_subtracted'=amp_calib, 'baseline_subtracted'=baseline_calib['bl_corrected'], 'ct'=baseline_calib['ct_eff']))
+    return (list('background_subtracted'=amp_calib[['ac_mtx']], # Xiaoqing Rong-Mullins: retrieve unnamed element
+                 'baseline_subtracted'=baseline_calib['bl_corrected'], 'ct'=baseline_calib['ct_eff'] # Xia Hong: retrieve named elements
+                 ))
     }
 
 

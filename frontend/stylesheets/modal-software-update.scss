@@ -78,6 +78,8 @@
             text-align: left;
             word-break: break-all;
             overflow: ellipsis;
+            -webkit-transition: background-size 0.5s;
+            transition: background-size 0.5s;
           }
         }
       }
