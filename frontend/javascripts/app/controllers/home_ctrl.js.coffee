@@ -7,7 +7,8 @@ window.ChaiBioTech.ngApp
   '$uibModal'
   '$timeout'
   '$state'
-  ($scope, Experiment, $window, $uibModal, $timeout, $state) ->
+  'User'
+  ($scope, Experiment, $window, $uibModal, $timeout, $state, User) ->
 
     angular.element('body').addClass 'modal-form'
     $scope.$on '$destroy', ->
@@ -15,6 +16,9 @@ window.ChaiBioTech.ngApp
 
     $scope.experiments = null
     $scope.deleteMode = false
+
+    User.getCurrent().then (resp) ->
+      $scope.user = resp.data.user
 
     @fetchExperiments = ->
       Experiment.query (experiments) ->

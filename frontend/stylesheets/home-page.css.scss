@@ -14,10 +14,43 @@
 
   .home-page-left-wing {
     float: left;
-    width: 632px;
+    width: 671px;
     height: 400px; //Just for now;
 
     .left-wing-content {
+      padding-left: 82px;
+      padding-top: 52px;
+    }
+
+    .home-page-welcome {
+      font-family: "dinot-bold";
+      font-size: 40px;
+      padding-left: 90px;
+      padding-top: 55px;
+      padding-bottom: 15px;
+    }
+
+    .home-page-circle {
+      width: 112px;
+      height: 112px;
+      margin-left: 200px;
+      border-radius: 90px;
+      border: 4px solid black;
+      background-image: url("/images/logo.png");
+      background-repeat: no-repeat;
+      background-position: 15px 15px;
+      padding-bottom: 10px;
+    }
+
+    .home-page-sign-out {
+      color: #00ADEE;
+      font-size: 12px;
+      font-family: "dinot-bold";
+      padding-left: 230px;
+      padding-top: 5px;
+      cursor: pointer;
+    }
+  /*  .left-wing-content {
       width: 442px;
       margin-top: 61px;
       margin-left: 75px;
@@ -146,12 +179,12 @@
 
         }
       }
-    }
+    } */
   }
   // Right Side of the home page
   .home-page-right-wing {
     float: left;
-    width: 341px;
+    width: 353px;
     padding-top: 54px;
 
     // Previous Experiment List Starts Here
