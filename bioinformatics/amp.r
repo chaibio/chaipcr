@@ -11,7 +11,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     baselin <- 'parm'
     basecyc <- 3:6 # 1:5 gave poor baseline subtraction results for non-sigmoid shaped data when using 'lin'
     fallback <- 'lin'
-    maxiter <- 20
+    maxiter <- 200
     maxfev <- 10000
     min_ac_max <- 10
     type <- 'curve'
@@ -112,33 +112,55 @@ get_ct_eff <- function(ac_mtx,
     
     ct_eff_raw <- getPar(mod_ori, type=type, cp=cp)
     
-    ct_eff <- ct_eff_raw
+    finIters <- list()
+    adj_reasons <- list()
+    ct_eff_adj <- ct_eff_raw
     
     for (i in 1:num_wells) {
         
         ac_max <- ac_maxs[i]
         # ac_calib_ratio <- ac_calib_ratios[i]
-        # message('ac_max ', i, ': ', ac_max) # for testing
         
         mod <- mod_ori[[i]]
+        finIters[[i]] <- mod$convInfo$finIter
         stopCode <- mod$convInfo$stopCode
         b <- coef(mod)[['b']]
         
-        ct <- ct_eff['ct', i]
+        ct <- ct_eff_adj['ct', i]
         
-        if (   ac_max < min_ac_max 
-            #  ac_calib_ratio < ac_calib_ratio_min 
-            || is.null(stopCode) || is.null(b) 
-            || stopCode != 1 || b > 0
-            || (!is.na(ct) && ct == num_cycles)) {
-          ct_eff['ct', i] <- NA }
+        if        (ac_max < min_ac_max) {
+            adj_reasons[[i]] <- paste('ac_max < min_ac_max. ac_max == ', ac_max, '. min_ac_max ==', min_ac_max, 
+                                      sep='')
+        } else if (is.null(b)) {
+            adj_reasons[[i]] <- 'is.null(b)'
+        } else if (b > 0) {
+            adj_reasons[[i]] <- 'b > 0'
+        } else if (is.null(stopCode)) {
+            adj_reasons[[i]] <- 'is.null(stopCode)'
+        } else if (stopCode != 1) {
+            adj_reasons[[i]] <- paste('stopCode ==', stopCode)
+        } else if (!is.na(ct) && ct == num_cycles) {
+            adj_reasons[[i]] <- 'ct == num_cycles'
+        } else {
+            adj_reasons[[i]] <- 'none' }
+        
+        if (adj_reasons[[i]] != 'none') ct_eff_adj['ct', i] <- NA 
         
         }
     
-    rownames(ct_eff) <- rownames(ct_eff_raw)
-    colnames(ct_eff) <- colnames(ct_eff_raw)
+    names(ac_maxs) <- colnames(ct_eff_raw)
     
-    return(ct_eff)
+    finIters <- unlist(finIters)
+    names(finIters) <- colnames(ct_eff_raw)
+    
+    names(adj_reasons) <- colnames(ct_eff_raw)
+    
+    rownames(ct_eff_adj) <- rownames(ct_eff_raw)
+    colnames(ct_eff_adj) <- colnames(ct_eff_raw)
+    
+    return(list(
+                'ac_maxs'=ac_maxs, 'raw'=ct_eff_raw, 'finIters'=finIters, 'reasons'=adj_reasons, # for debugging
+                'adj'=ct_eff_adj))
     }
 
 
@@ -147,7 +169,7 @@ baseline_ct <- function(amp_calib,
                         model, baselin, basecyc, fallback, # modlist parameters. 
                         # baselin = c('none', 'mean', 'median', 'lin', 'quad', 'parm').
                         # fallback = c('none', 'mean', 'median', 'lin', 'quad'). only valid when baselin = 'parm'
-                        maxiter, maxfev, # control parameters for `nlsLM` in `pcrfit`
+                        maxiter, maxfev, # control parameters for `nlsLM` in `pcrfit`. !!!! Note: `maxiter` sometimes affect finIter in a weird way: e.g. for the same well, finIter == 17 when maxiter == 200, finIter == 30 when maxiter == 30, finIter == 100 when maxiter == 100
                         min_ac_max, # get_ct_eff parameter to control Ct reporting
                         type, cp, # getPar parameters
                         show_running_time=FALSE # option to show time cost to run this function
@@ -219,7 +241,9 @@ baseline_ct <- function(amp_calib,
                 'mod_ori'=mod_ori, 
                 # 'bl_info'=bl_info, # removed for performance
                 'fluoa'=fluoa, 'bl_coefs'=blmods_cm, 'fluo_blmods'=fluo_blmods, 
-                'bl_corrected'=bl_corrected, 'coefficients'=mod_ori_cm, 'ct_eff'=ct_eff))
+                'bl_corrected'=bl_corrected, 'coefficients'=mod_ori_cm, 
+                'ac_maxs'=ct_eff[['ac_maxs']], 'finIters'=ct_eff[['finIters']], 'adj_reasons'=ct_eff[['reasons']], 'ct_eff_raw'=ct_eff[['raw']], # outputs from `get_ct_eff` for debugging
+                'ct_eff'=ct_eff[['adj']] ))
     }
 
 
