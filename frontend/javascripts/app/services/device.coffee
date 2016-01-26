@@ -108,7 +108,7 @@ window.App.service 'Device', [
       openUploadModal: ->
         @direct_upload = true;
         $uibModal.open
-          templateUrl: 'app/views/settings/modal-software-image-upload.html'
+          templateUrl: 'app/views/settings/modal-software-update.html'
           controller: 'SoftwareUpdateCtrl'
           openedClass: 'modal-software-update-open'
           keyboard: false

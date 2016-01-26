@@ -27,6 +27,8 @@ window.App.controller 'SoftwareUpdateCtrl', [
             data.version = data.version || data.software_version
             $scope.new_update = data
             $scope.loading = false
+    else
+      $scope.content = 'upload_form'
 
     $scope.doUpdate = ->
       $scope.content = 'update_in_progress'
