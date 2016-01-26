@@ -12,11 +12,11 @@ window.App.controller 'SoftwareUpdateCtrl', [
   ($scope, $uibModal, $uibModalInstance, Device, $window, $state, Upload, $timeout, $interval, Status) ->
 
     uploadPromise = null
-    $scope.loading = true
-    $scope.content = 'update_available'
     _file = null
 
     if Device.direct_upload isnt true
+      $scope.content = 'update_available'
+      $scope.loading = true
       Device.getUpdateInfo().then (data) ->
         Status.fetch().then (resp) ->
           status = resp?.device?.update_available || 'unknown'
