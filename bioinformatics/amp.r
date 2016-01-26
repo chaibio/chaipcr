@@ -11,7 +11,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     baselin <- 'parm'
     basecyc <- 3:6 # 1:5 gave poor baseline subtraction results for non-sigmoid shaped data when using 'lin'
     fallback <- 'lin'
-    maxiter <- 200
+    maxiter <- 500
     maxfev <- 10000
     min_ac_max <- 0
     type <- 'curve'
