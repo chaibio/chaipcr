@@ -13,7 +13,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     fallback <- 'lin'
     maxiter <- 200
     maxfev <- 10000
-    min_ac_max <- 10
+    min_ac_max <- 0
     type <- 'curve'
     cp <- 'cpD2'
     
@@ -122,9 +122,12 @@ get_ct_eff <- function(ac_mtx,
         # ac_calib_ratio <- ac_calib_ratios[i]
         
         mod <- mod_ori[[i]]
-        finIters[[i]] <- mod$convInfo$finIter
         stopCode <- mod$convInfo$stopCode
         b <- coef(mod)[['b']]
+        
+        # `finIters[[i]]` <- NULL will not create element i for `finIters`
+        finIter <- mod$convInfo$finIter
+        if (is.null(finIter)) finIters[[i]] <- NA else finIters[[i]] <- finIter
         
         ct <- ct_eff_adj['ct', i]
         
