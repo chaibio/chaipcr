@@ -8,7 +8,7 @@
 
   .status-bar {
     position: absolute;
-    bottom: -50px;
+    top: 728px;
     width: 1024px;
   }
 
@@ -18,7 +18,7 @@
     //height: 400px; //Just for now;
 
     .left-wing-content {
-      
+
     }
 
     .home-page-logo {
@@ -44,6 +44,10 @@
       background-repeat: no-repeat;
       background-position: 15px 15px;
       padding-bottom: 10px;
+    }
+
+    .home-page-circle:hover {
+      border: 4px solid orange;
     }
 
     .home-page-sign-out {
@@ -225,10 +229,85 @@
   .home-page-right-wing {
     float: left;
     width: 353px;
-    padding-top: 54px;
+    height: 728px;
+
+    .home-page-exp-header-container {
+      width: 100%;
+      height: 64px;
+      background-color: #333;
+    }
+    .home-page-recent-exp {
+      width: 75%;
+      height: 100%;
+      font-family: "dinot-bold";
+      font-size: 20px;
+      color: white;
+      text-align: center;
+      line-height: 64px;
+      float: left;
+    }
+    .home-page-edit-exp {
+      width: 25%;
+      height: 100%;
+      font-family: "dinot-bold";
+      font-size: 12px;
+      color: white;
+      text-align: center;
+      cursor: pointer;
+      float: left;
+      padding-top: 26px;
+    }
+
+    .home-page-exp-container {
+      border-left: 1px solid #e6e6e6;
+      width: 100%;
+      height: 664px;
+      overflow: scroll;
+      border-right: 1px solid #e6e6e6;
+    }
+    .home-page-exp-tile {
+      width: 100%;
+      height: 60px;
+      background-color: #fbfbfb;
+      border-bottom: 1px solid #e6e6e6;
+
+      .home-page-tile-text {
+        width: 75%;
+        height: 100%;
+        float: left;
+        padding-top: 10px;
+
+        .home-page-exp-name {
+          font-size: 16px;
+          font-family: "dinot-bold";
+          margin-left: 18px;
+          cursor: pointer;
+        }
+        .home-page-exp-created-at {
+          color: #545454;
+          font-size: 16px;
+          font-family: "dinot-regular";
+          margin-left: 18px;
+        }
+      }
+
+      .home-page-circle-container {
+        width: 25%;
+        height: 100%;
+        float: left;
+
+        .home-page-exp-circle {
+          width: 14px;
+          height: 14px;
+          background-color: #04a0d9;
+          border-radius: 90px;
+          margin: 23px auto;
+        }
+      }
+    }
 
     // Previous Experiment List Starts Here
-    .previous-experiment-container {
+    /*.previous-experiment-container {
 
       .previous-experiment-heading {
         border-bottom: solid 1px #001827;
@@ -414,6 +493,6 @@
         }
 
       }
-    }
+    }*/
   }
 }

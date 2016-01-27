@@ -17,79 +17,32 @@
        <div class="home-page-go-settings-container">
          <button class="home-page-go-settings-button" ui-sref="settings.root">VIEW SETTINGS</button>
        </div>
-
      </div>
-      <!--<div class="left-wing-content">
-         <div class="home-page-logo">
-            <img src="/images/logo.png">
-         </div>
-         <div class="home-page-menu">
-            <div class="menu-content">
-               <div class="menu-heading">
-                  <div class="welcome-text simplifica">
-                     WELCOME,
-                  </div>
-                  <div class="logout-text">
-                     <a class="sansa" logout>SIGN OUT</a>
-                  </div>
-               </div>
-               <div class="menu-items">
-                  <div class="NEWEXPERIMENT menu-item-bounce">
-                     <div class="simplifica">
-                        <div class="first-row">
-                           <div class="menu-item-image">
-                           </div>
-                           <div class="menu-item-text" ng-click="HomeCtrl.newExperiment()">
-                              NEW EXPERIMENT
-                           </div>
-                        </div>
-                        <div class="second-row">
-                           <div class="hand-container">
-                              <div class="hand"></div>
-                           </div>
-                        </div>
-                     </div>
-                  </div> -->
-                  <!-- <div class="menu-item RUNA KIT">
-                     <div class="simplifica">
-                        <div class="first-row">
-                           <div class="menu-item-image">
-                           </div>
-                           <div class="menu-item-text">
-                              RUN A KIT
-                           </div>
-                        </div>
-                        <div class="second-row">
-                           <div class="hand-container">
-                              <div class="hand"></div>
-                           </div>
-                        </div>
-                     </div>
-                  </div> -->
-                <!--  <div class="menu-item SETTINGS">
-                     <div class="simplifica">
-                        <div class="first-row">
-                           <div class="menu-item-image">
-                           </div>
-                           <div ui-sref="settings.root" class="menu-item-text" style="font-weight: normal;">
-                              SETTINGS
-                           </div>
-                        </div>
-                        <div class="second-row">
-                           <div class="hand-container">
-                              <div class="hand" style="display: none;"></div>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </div> -->
    </div>
+   <!-- End of Left side of the home page -->
    <!-- Right side of the home page -->
    <div class="home-page-right-wing">
-      <div>
+     <div class="home-page-exp-header-container">
+       <div class="home-page-recent-exp">RECENT EXPERIMENTS</div>
+       <div class="home-page-edit-exp">EDIT</div>
+     </div>
+
+     <div class="loading" ng-show="experiments === null">Loading ......! <img src="/images/loading.gif"></div>
+     <p ng-show="experiments !== null && experiments.length === 0"><i>No experiments yet.</i></p>
+
+     <div class="home-page-exp-container" ng-show="experiments !== null && experiments.length !== 0">
+       <div  ng-repeat="exp in experiments | orderBy:'experiment.created_at':true" class="home-page-exp-tile">
+         <div class="home-page-tile-text">
+           <span class="home-page-exp-name" ng-click="HomeCtrl.openExperiment(exp.experiment)">{{exp.experiment.name}}</span> <br/>
+           <span class="home-page-exp-created-at" ng-show="!exp.experiment.started_at">Created {{exp.experiment.created_at | amCalendar}}</span>
+           <span class="home-page-exp-created-at" ng-show="exp.experiment.started_at">Run {{exp.experiment.started_at | amCalendar}}</span>
+         </div>
+         <div class="home-page-circle-container">
+           <div class="home-page-exp-circle"></div>
+         </div>
+       </div>
+     </div>
+      <!--<div>
          <div class="previous-experiment-container">
             <div class="previous-experiment-heading">
                <div class="text sansa">PREVIOUS EXPERIMENTS</div>
@@ -142,7 +95,7 @@
                </div>
             </div>
          </div>
-      </div>
+      </div> -->
    </div>
    <status-bar></status-bar>
 </div>
