@@ -63,12 +63,32 @@ window.App.service 'Device', [
         deferred.promise
 
       getUpdateInfo: ->
+        checkCloudInfo = (deferred) ->
+          cloudPromise = $http.get("http://update.chaibio.com/device/software_update")
+          cloudPromise.then (resp) ->
+            deferred.resolve resp.data
+          cloudPromise.catch (err) ->
+            deferred.reject err
+
         deferred = $q.defer()
-        cloudPromise = $http.get("http://update.chaibio.com/device/software_update")
-        cloudPromise.then (resp) ->
-          deferred.resolve resp.data
-        cloudPromise.catch (err) ->
-          deferred.reject err
+
+        Status.fetch()
+        .then (resp) ->
+          status = resp?.device?.update_available || 'unknown'
+          if status is 'unknown'
+            checkCloudInfo deferred
+          else
+            infoPromise = $http.get('/device/software_update')
+            infoPromise.then (resp) =>
+              if resp.data?.upgrade
+                deferred.resolve resp.data.upgrade
+              else
+                checkCloudInfo deferred
+            infoPromise.catch (err) ->
+              checkCloudInfo deferred
+        .catch ->
+          checkCloudInfo deferred
+
         deferred.promise
 
       getVersion: (cache = false) ->
@@ -88,7 +108,7 @@ window.App.service 'Device', [
       openUploadModal: ->
         @direct_upload = true;
         $uibModal.open
-          templateUrl: 'app/views/settings/modal-software-image-upload.html'
+          templateUrl: 'app/views/settings/modal-software-update.html'
           controller: 'SoftwareUpdateCtrl'
           openedClass: 'modal-software-update-open'
           keyboard: false

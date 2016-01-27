@@ -28,24 +28,25 @@ window.App.service 'PeriodicUpdate', [
           duration = next_check.diff(now)
           $timeout @periodicUpdateCheck, duration
 
+      openUpdateModal = (status) ->
+        if !software_update_modal_instance
+          software_update_modal_instance = Device.openUpdateModal()
+          software_update_modal_instance.result.finally ->
+            software_update_modal_instance = null
+
       periodicUpdateCheck: ->
-        periodic_update_interval = $interval @periodicUpdateCheck, UPDATE_INTERVAL_DURATION if periodic_update_interval is null
-        console.log "software_update_modal_instance: #{software_update_modal_instance}"
-        console.log "is open modal: #{if software_update_modal_instance then true else false}"
+        periodic_update_interval = $interval @periodicUpdateCheck, UPDATE_INTERVAL_DURATION if !periodic_update_interval
         return if software_update_modal_instance isnt null
+        $.jStorage.set 'periodic_update_last_checked', moment().format()
 
-        console.log 'periodicUpdateCheck...'
         Status.fetch().then (resp) ->
-          is_available = resp?.device?.update_available || 'unknown'
-          $.jStorage.set 'periodic_update_last_checked', moment().format()
-          if is_available is 'available' and !software_update_modal_instance
-            console.log 'opening update modal..'
-            software_update_modal_instance = Device.openUpdateModal()
-            software_update_modal_instance.result.finally ->
-              console.log 'update modal closed...'
-              software_update_modal_instance = null
-
-
+          status = resp?.device?.update_available || 'unknown'
+          if status is 'unknown'
+            Device.checkForUpdate().then (resp) ->
+              status = resp?.device?.update_available || 'unknown'
+              openUpdateModal(status) if status is 'available'
+          else
+            openUpdateModal(status) if status is 'available'
 
     new PeriodicUpdate()
 

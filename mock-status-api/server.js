@@ -188,9 +188,12 @@ app.post('/control/stop', function (req, res, next) {
 });
 
 app.post('/device/upload_software_update', upload,function (req, res, next) {
-  // setTimeout(function () {
-  //   res.sendStatus(200)
-  // }, 1000);
+  res.status(422).json({
+    status: {
+      status: false,
+      error: 'Hello world'
+    }
+  });
 });
 
 
