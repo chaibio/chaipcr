@@ -15,17 +15,21 @@
   .home-page-left-wing {
     float: left;
     width: 671px;
-    height: 400px; //Just for now;
+    //height: 400px; //Just for now;
 
     .left-wing-content {
-      padding-left: 82px;
-      padding-top: 52px;
+      
+    }
+
+    .home-page-logo {
+      margin-left: 82px;
+      margin-top: 52px;
     }
 
     .home-page-welcome {
       font-family: "dinot-bold";
       font-size: 40px;
-      padding-left: 90px;
+      text-align: center;
       padding-top: 55px;
       padding-bottom: 15px;
     }
@@ -33,7 +37,7 @@
     .home-page-circle {
       width: 112px;
       height: 112px;
-      margin-left: 200px;
+      margin: 0 auto;
       border-radius: 90px;
       border: 4px solid black;
       background-image: url("/images/logo.png");
@@ -46,10 +50,46 @@
       color: #00ADEE;
       font-size: 12px;
       font-family: "dinot-bold";
-      padding-left: 230px;
+      text-align: center;
       padding-top: 5px;
       cursor: pointer;
     }
+    .home-page-new-exp-container {
+      width: 340px;
+      height: 50px;
+      margin: 80px auto 0 auto;
+    }
+    .home-page-new-exp-button {
+      width: 340px;
+      height: 50px;
+      font-family: "dinot-bold";
+      border: 2px solid #8dc63f;
+      background-color: #8dc63f;
+      color: white;
+      font-size: 20px;
+    }
+    .home-page-new-exp-button:hover {
+      background-color: white;
+      color: black;
+    }
+    .home-page-go-settings-container {
+      width:200px;
+      height: 35px;
+      margin: 20px auto 0 auto;
+    }
+    .home-page-go-settings-button {
+      width:200px;
+      height: 35px;
+      font-family: "dinot-bold";
+      border: 2px solid #555555;
+      background-color: white;
+    }
+    .home-page-go-settings-button:hover {
+      color: white;
+      background-color: black;
+      border: none;
+    }
+
   /*  .left-wing-content {
       width: 442px;
       margin-top: 61px;
