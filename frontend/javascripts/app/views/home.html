@@ -24,11 +24,11 @@
    <div class="home-page-right-wing">
      <div class="home-page-exp-header-container">
        <div class="home-page-recent-exp">RECENT EXPERIMENTS</div>
-       <div class="home-page-edit-exp">EDIT</div>
+       <div ng-class="{'home-page-edit-exp': !deleteMode, 'home-page-edit-exp-active': deleteMode}" ng-click="deleteMode = !deleteMode">EDIT</div>
      </div>
 
-     <div class="loading" ng-show="experiments === null">Loading ......! <img src="/images/loading.gif"></div>
-     <p ng-show="experiments !== null && experiments.length === 0"><i>No experiments yet.</i></p>
+     <div class="loading home-page-exp-messages" ng-show="experiments === null">Loading&nbsp;<ellipsis-animated><ellipsis-animated/></div>
+     <p class="home-page-exp-messages" ng-show="experiments !== null && experiments.length === 0">No experiments yet.</p>
 
      <div class="home-page-exp-container" ng-show="experiments !== null && experiments.length !== 0">
        <div  ng-repeat="exp in experiments | orderBy:'experiment.created_at':true" class="home-page-exp-tile">
