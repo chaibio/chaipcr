@@ -1,8 +1,8 @@
-(function () {
+(function() {
   var app = angular.module('global.service', []);
   app.service('GlobalService', [
     '$http',
-    function GlobalService ($http) {
+    function GlobalService($http) {
 
       var self = this;
       var holding = false;
@@ -51,6 +51,41 @@
         } else {
           return 0;
         }
+      };
+      this.getExperimentSteps = function(exp) {
+        var stages = exp.protocol.stages;
+        var steps = [];
+
+        for (var i = 0; i < stages.length; i++) {
+          var stage = stages[i].stage;
+          var _steps = stage.steps;
+
+          for (var ii = 0; ii < _steps.length; ii++) {
+            steps.push(_steps[ii].step);
+          }
+        }
+        return steps;
+      };
+
+      this.getMaxDeltaTm = function(tms) {
+        if (max_delta_tm_cache !== null) return max_delta_tm_cache;
+        var min_tm = Math.min.apply(Math, tms);
+        var max_tm = Math.max.apply(Math, tms);
+        max_delta_tm_cache = max_tm - min_tm;
+        return max_delta_tm_cache;
+      };
+
+
+      this.getTmValues = function(analyze_data) {
+        var tms = [];
+        for (var i = 0; i < 16; i++) {
+          if (analyze_data.mc_tm['fluo_' + i].length > 0) {
+            tms.push(analyze_data.mc_tm['fluo_' + i][0].Tm);
+          } else {
+            tms.push(null);
+          }
+        }
+        return tms;
       };
 
     }

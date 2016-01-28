@@ -6,8 +6,6 @@
   </p>
 
   <div class="text-center">
-    <a ng-click="cancel=true" class="button" ng-show="!cancel">CANCEL</a>
-    <a href="/#/settings/" class="button red" ng-show="cancel">CONFIRM CANCEL</a>
     <button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ng-click="createExperiment()">BEGIN</button>
     <span ng-if="error" ng-class="{errorMessage: error}">{{lidMessage}}</span>
 

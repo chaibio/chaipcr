@@ -73,6 +73,9 @@
           return fetchInterval = $interval(this.fetch, 1000);
         }
       };
+      this.stopSync = function () {
+        $interval.cancel(fetchInterval);
+      };
     }
   ]);
 

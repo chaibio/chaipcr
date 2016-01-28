@@ -15,6 +15,10 @@
       $scope.modal = null;
       $scope.timeout = null;
 
+      $scope.stopExperiment = function () {
+        window.location.assign('/#/settings/');
+      };
+
       $scope.checkMachineStatus = function() {
 
         DeviceInfo.getInfo($scope.check).then(function(deviceStatus) {
@@ -56,22 +60,16 @@
       };
 
       $scope.proceed = function () {
-        var exp;
-        exp = new Experiment({
-          experiment: {
-            guid: 'thermal_performance_diagnostic'
-          }
-        });
 
-        exp.$save().then(function(resp) {
+        Experiment.create({guid: 'thermal_performance_diagnostic'}).then(function(resp) {
           $timeout.cancel($scope.timeout);
-          $scope.experiment = resp.experiment;
+          $scope.experiment = resp.data.experiment;
 
-          var startPromise = Experiment.startExperiment(resp.experiment.id);
+          var startPromise = Experiment.startExperiment(resp.data.experiment.id);
 
           startPromise.then(function() {
             $state.go('diagnostic', {
-              id: resp.experiment.id
+              id: resp.data.experiment.id
             });
           });
 
@@ -111,9 +109,7 @@
     'CONSTANTS',
     function ($scope, Experiment, Status, $interval, DiagnosticWizardService, $params, $state, CONSTANTS) {
 
-      Status.startSync();
       $scope.$on('$destroy', function() {
-        Status.stopSync();
         stopPolling();
         cancelAnimation();
       });
@@ -193,10 +189,8 @@
       function getExperiment (cb) {
         if (!$params.id) return;
         cb = cb || angular.noop;
-        return Experiment.get({
-          id: $params.id
-        }).$promise.then(function(resp) {
-          return cb(resp);
+        return Experiment.get($params.id).then(function(resp) {
+          return cb(resp.data);
         });
       }
       function analyzeExperiment () {
@@ -254,7 +248,7 @@
         Experiment.stopExperiment({
           id: $scope.experiment.id
         }).then(function() {
-          window.location.assign('/');
+          window.location.assign('/#/settings/');
         });
       };
     }

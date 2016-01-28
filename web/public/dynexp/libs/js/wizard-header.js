@@ -25,7 +25,7 @@
           if (!oldData) return;
           if (!data) return;
           $scope.status = data.experiment_controller.machine.state;
-          if ($scope.status !== oldData.experiment_controller.machine.state && $scope.experimentId) {
+          if (($scope.status !== oldData.experiment_controller.machine.state || !$scope.experiment) && $scope.experimentId) {
             getExperiment();
           }
         });

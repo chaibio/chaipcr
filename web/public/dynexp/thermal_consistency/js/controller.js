@@ -6,7 +6,7 @@
     '$state',
     '$stateParams',
     'Status',
-    'TestInProgressService',
+    'GlobalService',
     'host',
     '$http',
     'CONSTANTS',
@@ -14,7 +14,7 @@
     '$timeout',
     '$rootScope',
     '$uibModal',
-    function AppController ($scope, $window, Experiment, $state, $stateParams, Status, TestInProgressService,
+    function AppController ($scope, $window, Experiment, $state, $stateParams, Status, GlobalService,
       host, $http, CONSTANTS, DeviceInfo, $timeout, $rootScope, $uibModal) {
 
       $scope.error = true;
@@ -25,9 +25,9 @@
       $('.content').addClass('analyze');
 
       function getExperiment(exp_id, cb) {
-        TestInProgressService.getExperiment(exp_id).then(function (exp) {
-          $scope.experiment = exp;
-          if(cb) cb(exp);
+        Experiment.get(exp_id).then(function (resp) {
+          $scope.experiment = resp.data.experiment;
+          if(cb) cb(resp.data.experiment);
         });
       }
 
@@ -46,7 +46,7 @@
         $scope.data = data;
         $scope.state = data.experiment_controller.machine.state;
         $scope.old_state = oldData.experiment_controller.machine.state;
-        $scope.timeRemaining = TestInProgressService.timeRemaining(data);
+        $scope.timeRemaining = GlobalService.timeRemaining(data);
 
         if (data.experiment_controller.expriment && !$scope.experiment) {
           getExperiment(data.experiment_controller.expriment.id);
@@ -111,7 +111,7 @@
             if (exp.completion_status === 'success') {
               Experiment.analyze($stateParams.id).then(function (resp) {
                 $scope.analyzedExp = resp.data;
-                $scope.tm_values = TestInProgressService.getTmValues($scope.analyzedExp);
+                $scope.tm_values = GlobalService.getTmValues($scope.analyzedExp);
                 $scope.analyzing = false;
               });
             }
@@ -144,13 +144,10 @@
       };
 
       $scope.createExperiment = function () {
-        var exp = new Experiment({
-          experiment: {guid: 'thermal_consistency'}
-        });
-        exp.$save().then(function (resp) {
+        Experiment.create({guid: 'thermal_consistency'}).then(function (resp) {
           $timeout.cancel($scope.timeout);
-          Experiment.startExperiment(resp.experiment.id).then(function () {
-            $scope.experiment = resp.experiment;
+          Experiment.startExperiment(resp.data.experiment.id).then(function () {
+            $scope.experiment = resp.data.experiment;
             $state.go('exp-running');
           });
         });
@@ -176,7 +173,7 @@
         if (!$scope.data.experiment_controller.expriment) return;
         var step_id = parseInt($scope.data.experiment_controller.expriment.step.id);
         if (!step_id) return;
-        var steps = TestInProgressService.getExperimentSteps($scope.experiment);
+        var steps = GlobalService.getExperimentSteps($scope.experiment);
         return _.find(steps, {id: step_id});
 
       };
@@ -194,7 +191,7 @@
 
       $scope.maxDeltaTm = function () {
         if (!$scope.tm_values) return 0;
-        var max_delta_tm = TestInProgressService.getMaxDeltaTm($scope.tm_values);
+        var max_delta_tm = GlobalService.getMaxDeltaTm($scope.tm_values);
         return max_delta_tm;
       };
 

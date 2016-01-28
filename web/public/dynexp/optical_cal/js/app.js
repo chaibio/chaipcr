@@ -11,6 +11,7 @@
     'status.service',
     'global.service',
     'experiment.service',
+    'auth',
   ]);
 
   App.value('host', 'http://'+window.location.hostname);
