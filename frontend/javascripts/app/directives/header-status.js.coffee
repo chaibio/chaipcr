@@ -90,4 +90,11 @@ window.App.directive 'headerStatus', [
       $scope.resumeExperiment = ->
         Experiment.resumeExperiment($scope.experiment.id)
 
+      $scope.expName = ->
+        NAME_LENGTH = 19
+        return if !$scope.experiment
+        return $scope.experiment.name if $scope.experiment.name.length <= NAME_LENGTH
+        return $scope.experiment.name.substring(0, NAME_LENGTH-2)+'...'
+
+
 ]

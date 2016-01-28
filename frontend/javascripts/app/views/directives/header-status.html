@@ -4,8 +4,8 @@
   <div class="row">
     <div class="col-md-1" ng-transclude>
     </div>
-    <div class="col-md-4 exp-name">
-      <div ng-show="experiment.id && experiment.name">{{experiment.name}}</div>
+    <div class="col-md-4 exp-name" title="{{experiment.name|uppercase}}">
+      <div ng-show="experiment.id && experiment.name">{{expName()}}</div>
     </div>
     <!-- begin is valid -->
     <div class="col-md-7 text-right" ng-show="experiment.id && state === 'idle' && !experiment.started_at && !experiment.completed_at && !statusData.lid.open">
