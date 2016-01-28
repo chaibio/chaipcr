@@ -25,8 +25,11 @@
   </div>
 
   <div class="text-center">
-    <p class="heating">
+    <p class="heating" ng-show="experiment.completion_message">
       {{experiment.completion_message}}
+    </p>
+    <p class="heating" ng-show="result.error_message">
+      {{result.error_message}}
     </p>
 
     <a href="/#/settings/" class="button">OKAY</a>
