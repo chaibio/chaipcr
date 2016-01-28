@@ -8,15 +8,15 @@
       <div ng-show="experiment.id && experiment.name">{{expName()}}</div>
     </div>
     <!-- begin is valid -->
-    <div class="col-md-7 text-right" ng-show="experiment.id && state === 'idle' && !experiment.started_at && !experiment.completed_at && !statusData.lid.open">
+    <div class="col-md-7 text-right" ng-show="experiment.id && state === 'idle' && !experiment.started_at && !experiment.completed_at && !(statusData.optics.lid_open==='true')">
       <button class="button-header begin" ng-click="startExperiment()">
         <b>BEGIN EXPERIMENT</b>
       </button>
     </div>
 
     <!-- begin is invalid -->
-    <div class="col-md-7 text-right" ng-show="state === 'idle' && !experiment.started_at && !experiment.completed_at && statusData.lid.open">
-      <div class="message">Cannot begin experiment while lid is open</div>
+    <div class="col-md-7 text-right" ng-show="state === 'idle' && !experiment.started_at && !experiment.completed_at && (statusData.optics.lid_open==='true')">
+      <div class="message">LID IS OPEN</div>
       <button class="button-header begin disabled">
         <b>BEGIN EXPERIMENT</b>
       </button>
