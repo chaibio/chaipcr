@@ -1,0 +1,13 @@
+<div class="header-status">
+  <div class="header-status-padding">
+    <div class="row">
+      <div class="col-md-6 exp-name" ng-transclude></div>
+      <div class="col-md-6 controls text-right" ng-show="!experiment.completed_at">
+        <div class="button-header" ng-show="!confirm" ng-click="confirm=true">{{cancelText}}</div>
+
+        <span class="message" ng-show="confirm">Are you sure?</span>
+        <div class="button-header cancel" ng-show="confirm" ng-click="doCancel()">YES, CANCEL</div>
+      </div>
+    </div>
+  </div>
+</div>
