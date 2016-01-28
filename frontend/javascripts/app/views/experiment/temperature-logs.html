@@ -1,7 +1,7 @@
   <div class="temperatureLog-state-active">
     <div class="page-layout run-experiment" ng-controller="TemperatureLogCtrl">
       <!-- header -->
-      <div class="header">
+      <!-- <div class="header">
         <div class="row">
           <div class="col-sm-8">
             <div class="stripes-and-name">
@@ -51,28 +51,24 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
       <!-- content -->
       <div class="content">
         <div class="temperature-log-chart">
-          <div class="panel panel-primary">
-            <div class="panel-heading">Temperature Plot</div>
-            <div class="panel-body" ng-show="!experiment || loading">
-              <h3 class="text-center">Loading...</h3>
+          <div ng-show="!experiment || loading">
+            <h3 class="text-center">Loading...</h3>
+          </div>
+          <div ng-show="experiment && !loading">
+            <div class="vertical-text">Temperature</div>
+            <div class="chart-container" id="temp-logs-drag-scroll" chart-drag-scroll ng-model="scrollState">
+              <linechart data="data" options="options" width="800" height="450" ng-if="RunExperimentCtrl.chart === 'temperature-logs'"></linechart>
             </div>
-            <div class="panel-body" ng-show="experiment && !loading">
-              <div class="vertical-text">Temperature</div>
-              <div class="chart-container" id="temp-logs-drag-scroll" chart-drag-scroll ng-model="scrollState">
-                <linechart data="data" options="options" width="800" height="450" ng-if="RunExperimentCtrl.chart === 'temperature-logs'"></linechart>
-              </div>
-              <div class="scrollbar-container">
-              </div>
-              <div class="text-center">Time</div>
+            <div class="scrollbar-container">
             </div>
+            <div class="text-center">Time</div>
           </div>
         </div>
-        <hr>
-        <div class="row">
+        <!-- <div class="row">
           <div class="col-md-8">
             <div class="choose-chart">
               <div class="choose-chart-heading">
@@ -96,7 +92,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
 
       </div>
     </div>
