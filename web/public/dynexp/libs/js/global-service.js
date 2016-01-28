@@ -9,10 +9,6 @@
 
       self.baseUrl = "http://" + window.location.hostname;
 
-      self.getExperiment = function (id) {
-        return $http.get(self.baseUrl+"/experiments/"+id);
-      };
-
       self.isHolding = function(data, experiment) {
         var duration, stages, state, steps;
         if (!experiment) {

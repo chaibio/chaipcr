@@ -2,19 +2,19 @@
 
   var app = window.HeaderStatus = angular.module('wizard.header', [
     'status.service',
-    'global.service'
+    'experiment.service'
   ]);
 
   app.directive('wizardHeader', [
     'Status',
     '$rootScope',
-    'GlobalService',
-    function (Status, $rootScope, GlobalService) {
+    'Experiment',
+    function (Status, $rootScope, Experiment) {
 
       function linkFunc ($scope, elem, attrs) {
 
         function getExperiment () {
-          GlobalService.getExperiment($scope.experimentId).then(function (resp) {
+          Experiment.get($scope.experimentId).then(function (resp) {
             $scope.experiment = resp.data.experiment;
           });
         }

@@ -10,6 +10,7 @@
     'wizard.header',
     'status.service',
     'global.service',
+    'experiment.service',
   ]);
 
   App.value('host', 'http://'+window.location.hostname);

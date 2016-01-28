@@ -64,7 +64,7 @@
         $scope.timeRemaining = GlobalService.timeRemaining(data);
 
         if (data.experiment_controller.expriment && !$scope.experiment) {
-          GlobalService.getExperiment(data.experiment_controller.expriment.id).then(function (resp) {
+          Experiment.get(data.experiment_controller.expriment.id).then(function (resp) {
             $scope.experiment = resp.data.experiment;
           });
         }
@@ -77,7 +77,7 @@
         // if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle' || $state.current.name === 'step-5')) {
         if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle')) {
           // experiment is complete
-          GlobalService.getExperiment($scope.experiment.id).then(function (resp) {
+          Experiment.get($scope.experiment.id).then(function (resp) {
             $scope.experiment = resp.data.experiment;
             if( $scope.experiment.completion_status !== 'success') {
               $state.go('step-6');
@@ -157,12 +157,9 @@
       };
 
       $scope.createExperiment = function () {
-        var exp = new Experiment({
-          experiment: {guid: 'optical_cal'}
-        });
-        exp.$save().then(function (resp) {
-          Experiment.startExperiment(resp.experiment.id).then(function () {
-            $scope.experiment = resp.experiment;
+        Experiment.create({guid: 'optical_cal'}).then(function (resp) {
+          Experiment.startExperiment(resp.data.experiment.id).then(function () {
+            $scope.experiment = resp.data.experiment;
             $state.go('step-3');
           });
         });
