@@ -58,13 +58,17 @@ void HeatSink::processOutput()
 {
 }
 
-void HeatSink::readADCPin(Poco::Timer &/*timer*/) {
+void HeatSink::readADCPin(Poco::Timer &/*timer*/)
+{
     try
     {
         _thermistor->setADCValue(_adcPin.readValue());
     }
-    catch (const TemperatureLimitError &ex)
+    catch (const std::exception &ex)
     {
+        if (std::string("basic_filebuf::underflow error reading the file") == ex.what())
+            return;
+
         qpcrApp.stopExperiment(ex.what());
     }
     catch (...)

@@ -295,11 +295,15 @@ void UpdateManager::checkUpdateCallback(bool checkHash)
 
             if (!checkHash || (Util::getFileChecksum(kUpdateFilePath, _downloadEventFd, sum) && sum == upgrade.checksum()))
             {
-                _updateState.compare_exchange_strong(state, Available);
+                if (qpcrApp.settings().configuration.version != upgrade.version())
+                    _updateState.compare_exchange_strong(state, Available);
+                else
+                    _updateState.compare_exchange_strong(state, Unavailable);
+
                 return;
             }
-            else
-                _updateState.compare_exchange_strong(state, Unknown);
+            else if (_updateState.compare_exchange_strong(state, Unknown))
+                state = Unknown;
         }
     }
     catch (const std::exception &ex)
