@@ -2,7 +2,7 @@
 
   <div class="status-bar" ng-show="!show()"></div>
 
-  <div class="status-bar" ng-show="show()">
+  <div class="status-bar SH" ng-show="show()">
     <span class="experiment-result" ng-show="experiment.completed_at && !is_holding" ng-class="experiment.completion_status === 'success' ? 'success' : 'failed'" ng-show="experiment.completed_at">
       <span ng-show="experiment.completion_status === 'success'">EXPERIMENT COMPLETE</span>
       <span ng-show="experiment.completion_status !== 'success'">EXPERIMENT FAILED</span>

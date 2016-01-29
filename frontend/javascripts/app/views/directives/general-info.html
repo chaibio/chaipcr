@@ -1,24 +1,24 @@
 <!-- See general-info.scss -->
 <div class="general-info-container">
-  <div class="bottom-step-no">{{fabricStep.ordealStatus | preZero}}</div>
-  <div class="bottom-no-of-stages">{{fabricStep.parentStage.parent.allStepViews.length | preZero: ' /'}}</div>
+  <div class="bottom-step-no H2">{{fabricStep.ordealStatus | preZero}}</div>
+  <div class="bottom-no-of-stages H3R">{{fabricStep.parentStage.parent.allStepViews.length | preZero: ' /'}}</div>
 
   <div class="bottom-name-of-step-stage" ng-click="clickOnField('stepNameShow', 'edit-step-name')">
-    <span class="bottom-name-of-step-span"  ng-class="{visible: stepNameShow}">{{(step.name | uppercase) || (fabricStep.stepNameText | uppercase)}}</span>
-    <input type="text" class="edit-step-name" on-enter ng-blur="saveStepName()" ng-model="step.name" ng-show="stepNameShow">
+    <span class="bottom-name-of-step-span H2"  ng-class="{visible: stepNameShow}">{{(step.name | uppercase) || (fabricStep.stepNameText | uppercase)}}</span>
+    <input type="text" class="edit-step-name H2" on-enter ng-blur="saveStepName()" ng-model="step.name" ng-show="stepNameShow">
   </div>
-  <div class="bottom-stage-name" ng-class="{visible: stepNameShow}">{{stage.name}}</div>
+  <div class="bottom-stage-name H3R" ng-class="{visible: stepNameShow}">{{stage.name}}</div>
 
   <div class="bottom-step-no-cycle-container">
-    <div class="bottom-step-no-cycle" ng-show="showCycling">
-    <span class="bottom-step-no-cycle-span" ng-show="!stageNoCycleShow" ng-click="clickOnField('stageNoCycleShow', 'bottom-step-no-cycle-edit')">{{stage.num_cycles}}</span>
-    <input type="text" class="bottom-step-no-cycle-edit" on-enter ng-blur="saveCycle()" numbers-only="numbers-only" ng-show="stageNoCycleShow" ng-model="stage.num_cycles">
+    <div class="bottom-step-no-cycle H2" ng-show="showCycling">
+      <span class="bottom-step-no-cycle-span" ng-show="!stageNoCycleShow" ng-click="clickOnField('stageNoCycleShow', 'bottom-step-no-cycle-edit')">{{stage.num_cycles}}</span>
+      <input type="text" class="bottom-step-no-cycle-edit" on-enter ng-blur="saveCycle()" numbers-only="numbers-only" ng-show="stageNoCycleShow" ng-model="stage.num_cycles">
     </div>
-    <div class="bottom-step-x" ng-show="!stageNoCycleShow && showCycling">x</div>
-    <div class="bottom-cycles-and-dots" ng-show="!stageNoCycleShow && showCycling">Cycles</div>
+    <div class="bottom-step-x B1B" ng-show="!stageNoCycleShow && showCycling">x</div>
+    <div class="bottom-cycles-and-dots H3R" ng-show="!stageNoCycleShow && showCycling">Cycles</div>
   </div>
 
-  <div class="bottom-gather-data">
+  <div class="bottom-gather-data SH">
     <span class=bottom-gather-data-text>GATHER DATA</span>
     <div class="bottom-gather-data-step"><gather-data-toggle data="step.collect_data" call="changeDuringStep"></gather-data-toggle></div><span>STEP</span>
     <div class="bottom-gather-data-ramp"><gather-data-toggle data="step.ramp.collect_data" call="changeDuringRamp"></gather-data-toggle></div><span>RAMP</span>

@@ -49,8 +49,6 @@
           width: 468px;
           height: 48px;
           color: white;
-          font-family: "Fun City";
-          font-size: 16px;
           padding-top: 9px;
         }
 
@@ -86,8 +84,6 @@
             background-color: #323232;
             border-width: 1px;
             border-color: white;
-            font-size: 12px;
-            font-family: "dinot";
             color: white;
           }
         }
@@ -112,7 +108,6 @@
     height: 320px;
     background-color: white;
     position: relative;
-    font-family: "dinot";
 
     .unselectOverlay {
       width: 1024px;
@@ -173,13 +168,8 @@
         position: absolute;
         top: 0px;
         left: 901px;
-        padding-top: 17px;
+        padding-top: 22px;
 
-        span {
-          font-family: "dinot";
-          font-weight: 300;
-          font-size: 20px;
-        }
       }
 
       .data-boxes-container {
@@ -221,9 +211,7 @@
         .name-board {
           height: 50px;
           color: black;
-          font-size: 12px;
           padding-top: 23px;
-          font-family: "dinot-bold";
           border-bottom-style: solid;
           border-bottom-width: 1px;
           border-bottom-color: black;
@@ -256,13 +244,11 @@
         }
           .big_button {
 
-            font-family: "dinot-bold";
             width: 263px;
             background-color: white;
             height: 30px;
             border: 1px solid black;
             margin-bottom: 17px;
-            font-size: 12px;
             font-weight: 100;
           }
 
@@ -279,12 +265,10 @@
           }
 
           .small-button {
-            font-family: "dinot-bold";
             width: 120px;
             background-color: white;
             height: 30px;
             border: 1px solid black;
-            font-size: 12px;
             font-weight: 100;
           }
           .smallButtonEdit {
@@ -317,9 +301,6 @@
         border-bottom-color: #cdcdcd;
 
         .caption-part {
-
-          font-family: "dinot-regular";
-          font-size: 16px;
           height: 47px;
           width: 140px;
           float: left;
@@ -327,8 +308,6 @@
           position: relative;
 
           .capsule {
-
-            font-family: "dinot";
             position: absolute;
             float: right;
             top: 20px;
@@ -401,11 +380,8 @@
           height: 47px;
           width: 122px;
           float: right;
-          font-family: "dinot";
-          font-weight: bold;
-          font-size: 16px;
           text-align: right;
-          padding-top: 16px;
+          padding-top: 12px;
           position: relative;
         }
 
@@ -418,15 +394,12 @@
           height: 47px;
           width: 95px;
           float: right;
-          font-family: "dinot";
-          font-weight: bold;
-          font-size: 16px;
           text-align: right;
           padding-top: 16px;
           position: relative;
 
           .small-s {
-              //font-size: 30px;
+            //font-size: 30px;
           }
 
           .time-part {
