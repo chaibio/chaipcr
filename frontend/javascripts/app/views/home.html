@@ -1,7 +1,20 @@
 <div class="home-page-wrapper">
    <!-- Left side of the home page -->
    <div class="home-page-left-wing">
-     <div class="left-wing-content">
+     <div class="home-page-new-logo"></div>
+     <div class="home-page-welcome HBIG">Welcome, {{user.name}}</div>
+
+     <div class="home-page-new-exp-container">
+       <button class="home-page-new-exp-button H2" ng-click="HomeCtrl.newExperiment()">CREATE A NEW EXPERIMENT</button>
+     </div>
+     <div class="home-page-go-settings-container">
+       <button class="home-page-small-button SH" ui-sref="settings.root">SETTINGS</button>
+     </div>
+     <div class="home-page-logout-container">
+       <button class="home-page-small-button SH" logout>SIGN OUT</button>
+     </div>
+     <div class="home-page-link-container B2">Join the communty at <a target="_blank" href="http://chaibio.com/">www.chaibio.com</a></div>
+     <!--<div class="left-wing-content">
        <div class="home-page-logo">
           <img src="/images/logo.png">
        </div>
@@ -17,7 +30,7 @@
        <div class="home-page-go-settings-container">
          <button class="home-page-go-settings-button" ui-sref="settings.root">VIEW SETTINGS</button>
        </div>
-     </div>
+     </div> -->
    </div>
    <!-- End of Left side of the home page -->
    <!-- Right side of the home page -->

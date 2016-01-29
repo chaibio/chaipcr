@@ -20,8 +20,65 @@
     .left-wing-content {
 
     }
+    .home-page-new-logo {
+      width: 292px;
+      height: 180px;
+      background-image: url("/images/new-logo.png");
+      margin: 60px auto 0 auto;
+    }
+    .home-page-welcome {
+      width: 100%;
+      text-align: center;
+      margin-top: 85px;
+    }
+    .home-page-new-exp-container {
+      width: 340px;
+      height: 50px;
+      margin: 30px auto 0 auto;
+    }
+    .home-page-new-exp-button {
+      width: 340px;
+      height: 50px;
+      border: 2px solid #8dc63f;
+      background-color: #8dc63f;
+      color: white;
+    }
+    .home-page-new-exp-button:hover {
+      background-color: white;
+      color: black;
+    }
 
-    .home-page-logo {
+    .home-page-go-settings-container {
+      width:170px;
+      height: 35px;
+      margin: 25px auto 0 auto;
+    }
+    .home-page-logout-container {
+      width:170px;
+      height: 35px;
+      margin: 14px auto 0 auto;
+    }
+    .home-page-small-button {
+      width:170px;
+      height: 35px;
+      border: 2px solid #555555;
+      background-color: white;
+    }
+    .home-page-small-button:hover {
+      color: white;
+      background-color: black;
+      border: none;
+    }
+    .home-page-link-container {
+      text-align: center;
+      margin-top: 125px;
+
+      a {
+        color: #00ADEE;
+      }
+    }
+    // ///////// ////// ////////// /////////// /////////
+    /*.home-page-logo {
       margin-left: 82px;
       margin-top: 52px;
     }
@@ -92,7 +149,7 @@
       color: white;
       background-color: black;
       border: none;
-    }
+    } */
 
   /*  .left-wing-content {
       width: 442px;
