@@ -1,5 +1,14 @@
 <div ng-controller="RunExperimentCtrl as RunExperimentCtrl">
   <div menu-overlay sidemenu-template="app/views/experiment/left-menu.html">
+    <header-status experiment-id="experiment.id">
+      <div class="stripes-and-name" toggle-sidemenu>
+        <div class="stripes">
+          <div class="stripe"></div>
+          <div class="stripe"></div>
+          <div class="stripe"></div>
+        </div>
+      </div>
+    </header-status>
     <div ng-show="RunExperimentCtrl.chart === 'amplification'" ng-include src="'app/views/experiment/amplification-chart.html'">
     </div>
     <div ng-show="RunExperimentCtrl.chart === 'temperature-logs'" ng-include src="'app/views/experiment/temperature-logs.html'">

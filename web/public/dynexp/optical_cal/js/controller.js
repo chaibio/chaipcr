@@ -5,14 +5,14 @@
     'Experiment',
     '$state',
     'Status',
-    'TestInProgressService',
+    'GlobalService',
     'host',
     '$http',
     'DeviceInfo',
     '$timeout',
     '$uibModal',
     '$rootScope',
-    function OpticalCalibrationCtrl ($scope, $window, Experiment, $state, Status, TestInProgressService,
+    function OpticalCalibrationCtrl ($scope, $window, Experiment, $state, Status, GlobalService,
       host, $http, DeviceInfo, $timeout, $uibModal, $rootScope) {
 
       $scope.cancel = false;
@@ -61,11 +61,11 @@
 
         $scope.data = data;
         $scope.state = data.experiment_controller.machine.state;
-        $scope.timeRemaining = TestInProgressService.timeRemaining(data);
+        $scope.timeRemaining = GlobalService.timeRemaining(data);
 
         if (data.experiment_controller.expriment && !$scope.experiment) {
-          TestInProgressService.getExperiment(data.experiment_controller.expriment.id).then(function (exp) {
-            $scope.experiment = exp;
+          Experiment.get(data.experiment_controller.expriment.id).then(function (resp) {
+            $scope.experiment = resp.data.experiment;
           });
         }
         if ($scope.isCollectingData() && $state.current.name === 'step-3') {
@@ -77,13 +77,13 @@
         // if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle' || $state.current.name === 'step-5')) {
         if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle')) {
           // experiment is complete
-          TestInProgressService.getExperiment($scope.experiment.id).then(function (exp) {
-            $scope.experiment = exp;
-            if( exp.completion_status !== 'success') {
+          Experiment.get($scope.experiment.id).then(function (resp) {
+            $scope.experiment = resp.data.experiment;
+            if( $scope.experiment.completion_status !== 'success') {
               $state.go('step-6');
               return;
             }
-            Experiment.analyze(exp.id).then(function (resp) {
+            Experiment.analyze($scope.experiment.id).then(function (resp) {
               $state.go('step-6');
               $scope.result = resp.data;
               if(resp.data.valid) $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
@@ -157,12 +157,9 @@
       };
 
       $scope.createExperiment = function () {
-        var exp = new Experiment({
-          experiment: {guid: 'optical_cal'}
-        });
-        exp.$save().then(function (resp) {
-          Experiment.startExperiment(resp.experiment.id).then(function () {
-            $scope.experiment = resp.experiment;
+        Experiment.create({guid: 'optical_cal'}).then(function (resp) {
+          Experiment.startExperiment(resp.data.experiment.id).then(function () {
+            $scope.experiment = resp.data.experiment;
             $state.go('step-3');
           });
         });

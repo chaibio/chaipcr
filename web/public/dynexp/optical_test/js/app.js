@@ -6,8 +6,16 @@
     'ngResource',
     'http-auth-interceptor',
     'angularMoment',
-    'ui.bootstrap'
+    'ui.bootstrap',
+    'status.service',
+    'global.service',
+    'wizard.header',
+    'auth',
   ]);
+
+  App.run(['Status', function (Status) {
+    Status.startSync();
+  }]);
 
   App.value('host', 'http://' + window.location.hostname);
 

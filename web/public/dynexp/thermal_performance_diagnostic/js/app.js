@@ -5,10 +5,19 @@
     'ui.router',
     'ngResource',
     'http-auth-interceptor',
-    'ui.bootstrap'
+    'ui.bootstrap',
+    'auth',
+    'global.service',
+    'status.service',
+    'experiment.service',
+    'wizard.header',
   ]);
 
   App.value('host', 'http://'+window.location.hostname);
+
+  App.run(['Status', function (Status) {
+    Status.startSync();
+  }]);
 
   App.config([
     '$stateProvider',

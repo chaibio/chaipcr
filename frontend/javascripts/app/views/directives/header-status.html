@@ -1,28 +1,44 @@
 <div class="header-status" ng-class="{'in-progress': state && state !== 'idle', 'complete': experiment && experiment.completed_at}" ng-style="backgroundStyle">
-  <!-- only part of the header that is customizable -->
 
-  <div class="row">
-    <div class="col-md-1" ng-transclude>
-    </div>
-    <div class="col-md-4 exp-name x">
-      <div ng-show="experiment.id && experiment.name">{{experiment.name}}</div>
-    </div>
     <!-- begin is valid -->
-    <div class="col-md-7 text-right" ng-show="experiment.id && state === 'idle' && !experiment.started_at && !experiment.completed_at && !statusData.lid.open">
+  <div class="row" ng-show="experiment.id && state === 'idle' && !experiment.started_at && !experiment.completed_at && !(statusData.optics.lid_open==='true')">
+    <div class="col-md-1 menu" ng-transclude>
+    </div>
+
+    <div class="col-md-7 exp-name x" title="{{experiment.name|uppercase}}">
+      <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
+    </div>
+
+    <div class="col-md-4 controls text-right">
       <button class="button-header begin" ng-click="startExperiment()">
         <b>BEGIN EXPERIMENT</b>
       </button>
     </div>
+  </div>
 
     <!-- begin is invalid -->
-    <div class="col-md-7 text-right" ng-show="state === 'idle' && !experiment.started_at && !experiment.completed_at && statusData.lid.open">
-      <div class="message">Cannot begin experiment while lid is open</div>
+  <div class="row" ng-show="state === 'idle' && !experiment.started_at && !experiment.completed_at && (statusData.optics.lid_open==='true')">
+    <div class="col-md-1 menu" ng-transclude>
+    </div>
+    <div class="col-md-7 exp-name" title="{{experiment.name|uppercase}}">
+      <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
+    </div>
+    <div class="col-md-4 controls text-right">
+      <div class="message">LID IS OPEN</div>
       <button class="button-header begin disabled">
         <b>BEGIN EXPERIMENT</b>
       </button>
     </div>
+  </div>
+
     <!-- experiment in progress -->
-    <div class="col-md-7 text-right" ng-show="state !== 'idle'">
+  <div class="row" ng-show="state !== 'idle'">
+    <div class="col-md-1 menu" ng-transclude>
+    </div>
+    <div class="col-md-7 exp-name" title="{{experiment.name|uppercase}}">
+      <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
+    </div>
+    <div class="col-md-4 controls text-right">
       <div class="message">
         in progress...
         <strong ng-show="state !== 'lid_heating'">
@@ -31,9 +47,16 @@
         <strong ng-show="state === 'lid_heating'">estimating time remaining</strong>
       </div>
     </div>
+  </div>
 
     <!-- experiment completed successfully -->
-    <div class="col-md-7 text-right" ng-show="state === 'idle' && experiment.completed_at">
+  <div class="row" ng-show="state === 'idle' && experiment.completed_at">
+    <div class="col-md-1 menu" ng-transclude>
+    </div>
+    <div class="col-md-4 exp-name" title="{{experiment.name|uppercase}}">
+      <div ng-show="experiment.id && experiment.name">{{expName(20)}}</div>
+    </div>
+    <div class="col-md-7 controls text-right">
       <div class="message">
         <span ng-show="experiment.completion_status === 'success'">completed</span>
         <span ng-show="experiment.completion_status !== 'success'">
@@ -47,6 +70,13 @@
         <b>DUPLICATE EXPERIMENT</b>
       </button>
     </div>
-
   </div>
+<<<<<<< HEAD
 </div>
+=======
+
+</div>
+
+
+
+>>>>>>> 7c0c787f5d90708abdd03a3f068b6de765f37787
