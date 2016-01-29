@@ -29,7 +29,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       $scope.stopInterval()
 
     getExperiment = ->
-      Experiment.get id: $stateParams.id, (data) ->
+      Experiment.get(id: $stateParams.id).then (data) ->
         $scope.experiment = data.experiment
         hasExperiment = true
         $scope.init()
