@@ -52,21 +52,9 @@ window.App.directive 'statusBar', [
           getExperiment (exp) ->
             $scope.experiment = exp
 
-      , true
-
       $scope.getDuration = ->
         return 0 if !$scope?.experiment?.completed_at
         Experiment.getExperimentDuration($scope.experiment)
-
-      $scope.startExperiment = ->
-        Experiment.startExperiment(experiment_id).then ->
-          $scope.experiment.started_at = true
-          getExperiment (exp) ->
-            $scope.experiment = exp
-            $rootScope.$broadcast 'experiment:started', experiment_id
-            if $state.is('edit-protocol')
-              max_cycle = AmplificationChartHelper.getMaxExperimentCycle($scope.experiment)
-              $state.go('run-experiment', {'id': experiment_id, 'chart': 'amplification', 'max_cycle': max_cycle})
 
       $scope.stopExperiment = ->
         Experiment.stopExperiment($scope.experiment.id)

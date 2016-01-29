@@ -21,7 +21,7 @@
       <span ng-show="experiment.id && !experiment.started_at">{{experiment.name}} <span class="normal">is valid and ready to run</span></span>
     </span>
     <span class="running-info" ng-show="state !== 'idle'">
-      Experiment in progress
+      in progress: <span class="experiment-name">{{experiment.name}}</span>
       <span class="machine-state">
         <span class="holding">
           <span ng-show="state === 'lid_heating'">heating lid</span>
@@ -49,11 +49,11 @@
         <img src="/images/status-resume-btn.png">
         RESUME
       </span>
-      <span class="control" ng-show="(experiment.started_at) && (!experiment.completed_at || is_holding) && state !== 'idle' " ng-click="stopExperiment()">
+      <div class="control" ng-show="(experiment.started_at) && (!experiment.completed_at || is_holding) && state !== 'idle' " ng-click="stopExperiment()">
         <img src="/images/status-bar-stop-btn.png">
         <span ng-show="!is_holding">STOP EXPERIMENT</span>
         <span ng-show="is_holding">END HOLD</span>
-      </span>
+      </div>
     </span>
   </div>
 </div>
