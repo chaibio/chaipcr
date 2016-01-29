@@ -3,15 +3,40 @@ window.ChaiBioTech.ngApp
 .service 'Experiment', [
   '$resource'
   '$http'
+  '$q'
   'host'
-  ($resource, $http, host) ->
+  ($resource, $http, $q, host) ->
 
     currentExperiment = null
+    ques = {}
 
     self = $resource('/experiments/:id', {id: '@id'}, {
       'update':
         method: 'PUT'
     })
+
+    self.get = (obj) ->
+      ques["exp_#{obj.id}"] = ques["exp_#{obj.id}"] || []
+      deferred = $q.defer()
+      ques["exp_#{obj.id}"].push deferred
+
+      console.log console.log ques
+
+      return deferred.promise if ques["exp_#{obj.id}"].length > 1 #there is already pending request for this experiment, wait for it
+
+      $http.get("/experiments/#{obj.id}")
+      .then (resp) ->
+        for def in ques["exp_#{obj.id}"] by 1
+          def.resolve resp.data
+        console.log "resolved exp que: #{resp.data.experiment.id}"
+      .catch (resp) ->
+        for def in ques["exp_#{obj.id}"] by 1
+          def.reject resp
+
+      .finally ->
+        delete ques["exp_#{obj.id}"]
+
+      return deferred.promise
 
     self.setCurrentExperiment = (exp) ->
       currentExperiment = exp

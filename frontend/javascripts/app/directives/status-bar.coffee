@@ -19,8 +19,8 @@ window.App.directive 'statusBar', [
 
       getExperiment = (cb) ->
         return if !experiment_id
-        TestInProgressHelper.getExperiment(experiment_id).then (experiment) ->
-          cb experiment
+        Experiment.get(id: experiment_id).then (data) ->
+          cb data.experiment
 
       $scope.$watch 'experimentId', (id) ->
         return if !id
