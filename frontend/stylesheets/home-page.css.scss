@@ -9,6 +9,7 @@
   .status-bar {
     position: absolute;
     top: 728px;
+    left: 0px;
     width: 1024px;
   }
 
@@ -85,8 +86,6 @@
     height: 728px;
 
     .home-page-exp-messages {
-      font-family: "dinot-bold";
-      font-size: 16px;
       text-align: center;
       padding-top: 10px;
     }
@@ -96,37 +95,38 @@
       background-color: #333;
     }
     .home-page-recent-exp {
-      width: 75%;
+      width: 60%;
       height: 100%;
-      font-family: "dinot-bold";
-      font-size: 20px;
       color: white;
       text-align: center;
       line-height: 64px;
       float: left;
     }
-    .home-page-edit-exp {
-      width: 25%;
+    .home-page-edit-exp-container {
+      width: 40%;
       height: 100%;
-      font-family: "dinot-bold";
-      font-size: 12px;
       color: white;
       text-align: center;
       cursor: pointer;
       float: left;
-      padding-top: 26px;
-    }
 
-    .home-page-edit-exp-active {
-      width: 25%;
-      height: 100%;
-      font-family: "dinot-bold";
-      font-size: 12px;
-      color: red;
-      text-align: center;
-      cursor: pointer;
-      float: left;
-      padding-top: 26px;
+      .home-page-edit-button {
+        width: 80px;
+        height: 30px;
+        background-color: black;
+        border: 2px solid grey;
+      }
+      .home-page-edit-button-active {
+        width: 80px;
+        height: 30px;
+        background-color: white;
+        color: black;
+        border: 2px solid white;
+      }
+      .space-edit-button {
+        margin: 16px 32px 0 0;
+        float: right;
+      }
     }
 
     .home-page-exp-container {
@@ -134,17 +134,17 @@
       width: 100%;
       height: 664px;
       overflow: scroll;
-      border-right: 1px solid #e6e6e6;
+      //border-right: 1px solid #e6e6e6;
     }
 
     .home-page-exp-tile {
       width: 100%;
       height: 60px;
+      position: relative;
 
       .home-page-tile-text {
         width: 100%;
         height: 100%;
-        float: left;
         padding-top: 10px;
         border-bottom: 1px solid #e6e6e6;
         background-color: #fbfbfb;
@@ -164,17 +164,42 @@
         border-bottom: 1px solid black;
         cursor: pointer;
       }
-      .home-page-circle-container {
-        width: 25%;
-        height: 100%;
-        float: left;
 
-        .home-page-exp-circle {
-          width: 14px;
-          height: 14px;
-          background-color: #04a0d9;
-          border-radius: 90px;
-          margin: 23px auto;
+
+      .home-page-del {
+        width: 140px;
+        height: 100%;
+        position: absolute;
+        top: 0px;
+        left: 282px;
+        border-bottom: 1px solid #DF217F;
+        cursor: pointer;
+        z-index: 100;
+
+        .home-page-bin {
+          width: 70px;
+          height: 100%;
+          background-color: #df2227;
+          color: #df2227;
+          background-position: center;
+          background-image: url("/images/bin.png");
+          background-repeat: no-repeat;
+          float: left;
+          text-align: center;
+          padding-top: 18px;
+          span {
+            color: white;
+            padding-left: 40px;
+          }
+        }
+        .home-page-del-okay {
+          width: 70px;
+          height: 100%;
+          background-color: #c30506;
+          color: white;
+          float: left;
+          text-align: center;
+          padding-top: 16px;
         }
       }
     }
