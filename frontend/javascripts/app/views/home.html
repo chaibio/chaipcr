@@ -14,29 +14,12 @@
        <button class="home-page-small-button SH" logout>SIGN OUT</button>
      </div>
      <div class="home-page-link-container B2">Join the communty at <a target="_blank" href="http://chaibio.com/">www.chaibio.com</a></div>
-     <!--<div class="left-wing-content">
-       <div class="home-page-logo">
-          <img src="/images/logo.png">
-       </div>
-       <div class="home-page-welcome">
-         Welcome, {{user.name}}
-       </div>
-       <div class="home-page-circle"></div>
-       <div class="home-page-sign-out" logout >SIGN OUT</div>
-       <div class="home-page-new-exp-container">
-         <button class="home-page-new-exp-button" ng-click="HomeCtrl.newExperiment()">CREATE A NEW EXPERIMENT</button>
-       </div>
-
-       <div class="home-page-go-settings-container">
-         <button class="home-page-go-settings-button" ui-sref="settings.root">VIEW SETTINGS</button>
-       </div>
-     </div> -->
    </div>
    <!-- End of Left side of the home page -->
    <!-- Right side of the home page -->
    <div class="home-page-right-wing">
      <div class="home-page-exp-header-container">
-       <div class="home-page-recent-exp">RECENT EXPERIMENTS</div>
+       <div class="home-page-recent-exp">EXPERIMENTS</div>
        <div ng-class="{'home-page-edit-exp': !deleteMode, 'home-page-edit-exp-active': deleteMode}" ng-click="deleteMode = !deleteMode">EDIT</div>
      </div>
 
@@ -45,13 +28,10 @@
 
      <div class="home-page-exp-container" ng-show="experiments !== null && experiments.length !== 0">
        <div  ng-repeat="exp in experiments | orderBy:'experiment.created_at':true" class="home-page-exp-tile">
-         <div class="home-page-tile-text">
-           <span class="home-page-exp-name" ng-click="HomeCtrl.openExperiment(exp.experiment)">{{exp.experiment.name}}</span> <br/>
-           <span class="home-page-exp-created-at" ng-show="!exp.experiment.started_at">Created {{exp.experiment.created_at | amCalendar}}</span>
-           <span class="home-page-exp-created-at" ng-show="exp.experiment.started_at">Run {{exp.experiment.started_at | amCalendar}}</span>
-         </div>
-         <div class="home-page-circle-container">
-           <div class="home-page-exp-circle"></div>
+         <div class="home-page-tile-text" ng-click="HomeCtrl.openExperiment(exp.experiment)">
+           <span class="home-page-exp-name B1B">{{exp.experiment.name}}</span> <br/>
+           <span class="home-page-exp-created-at B1" ng-show="!exp.experiment.started_at">Created {{exp.experiment.created_at | amCalendar}}</span>
+           <span class="home-page-exp-created-at B1" ng-show="exp.experiment.started_at">Run {{exp.experiment.started_at | amCalendar}}</span>
          </div>
        </div>
      </div>
