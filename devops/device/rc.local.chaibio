@@ -33,9 +33,10 @@ run_migrate_on_upgrade () {
 		done
 
 		echo mysql server is running
-		RAILS_ENV=production bundle exec rake db:migrate || :
+
+		RAILS_ENV=production /usr/local/bin/bundle exec /usr/local/bin/rake db:migrate || :
 		echo "Execution result: $?, now executing seed_fu..."
-		RAILS_ENV=production bundle exec rake db:seed_fu || :
+		RAILS_ENV=production /usr/local/bin/bundle exec /usr/local/bin/rake db:seed_fu || :
 		echo "Execution result $?, done executing scripts!"
        		rm ${sdcard}/factory/upgrade_autorun.flag
         	echo "Upgrade autorun flag down"
