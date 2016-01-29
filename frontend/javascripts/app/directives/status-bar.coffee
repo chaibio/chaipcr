@@ -9,19 +9,13 @@ window.App.directive 'statusBar', [
 
     restrict: 'EA'
     replace: true
-    scope:
-      experimentId: '=?'
     templateUrl: 'app/views/directives/status-bar.html'
     link: ($scope, elem, attrs) ->
 
       experiment_id = null
 
-      $scope.$watch 'experimentId', (id) ->
-        return if !angular.isNumber id
-        experiment_id = id
-
       $scope.show = ->
-        if attrs.experimentId then (experiment_id and $scope.status) else $scope.status
+        !!$scope.status
 
       getExperiment = (cb) ->
         return if !experiment_id

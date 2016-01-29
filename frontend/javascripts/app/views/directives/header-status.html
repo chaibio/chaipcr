@@ -18,7 +18,7 @@
   <div class="row" ng-show="state === 'idle' && !experiment.started_at && !experiment.completed_at && (statusData.optics.lid_open==='true')">
     <div class="col-md-1 menu" ng-transclude>
     </div>
-    <div class="col-md-7 exp-name" title="{{experiment.name|uppercase}}">
+    <div class="col-md-7 exp-name x" title="{{experiment.name|uppercase}}">
       <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
     </div>
     <div class="col-md-4 controls text-right">
@@ -33,7 +33,7 @@
   <div class="row" ng-show="state !== 'idle'">
     <div class="col-md-1 menu" ng-transclude>
     </div>
-    <div class="col-md-7 exp-name" title="{{experiment.name|uppercase}}">
+    <div class="col-md-7 exp-name x" title="{{experiment.name|uppercase}}">
       <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
     </div>
     <div class="col-md-4 controls text-right">
@@ -51,7 +51,7 @@
   <div class="row" ng-show="state === 'idle' && experiment.completed_at">
     <div class="col-md-1 menu" ng-transclude>
     </div>
-    <div class="col-md-4 exp-name" title="{{experiment.name|uppercase}}">
+    <div class="col-md-4 exp-name x" title="{{experiment.name|uppercase}}">
       <div ng-show="experiment.id && experiment.name">{{expName(20)}}</div>
     </div>
     <div class="col-md-7 controls text-right">

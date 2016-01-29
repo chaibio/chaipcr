@@ -44,10 +44,11 @@
     <span class="controls-container">
       <!-- <span class="control" ng-show="state === 'idle' && experiment" experiment-id="experiment.id" duplicate-experiment>DUPLICATE EXPERIMENT</span>
       <span class="control" ng-show="!experiment.started_at && experiment.id && state === 'idle'" ng-class="{'disabled': experiment.started_at}" ng-click="startExperiment()">BEGIN EXPERIMENT</span>
+      -->
       <span class="control" ng-show="state === 'paused'" ng-click="resumeExperiment()">
         <img src="/images/status-resume-btn.png">
         RESUME
-      </span> -->
+      </span>
       <span class="control" ng-show="(experiment.started_at) && (!experiment.completed_at || is_holding) && state !== 'idle' " ng-click="stopExperiment()">
         <img src="/images/status-bar-stop-btn.png">
         <span ng-show="!is_holding">STOP EXPERIMENT</span>
