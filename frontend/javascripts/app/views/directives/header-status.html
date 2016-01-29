@@ -4,11 +4,9 @@
   <div class="row" ng-show="experiment.id && state === 'idle' && !experiment.started_at && !experiment.completed_at && !(statusData.optics.lid_open==='true')">
     <div class="col-md-1 menu" ng-transclude>
     </div>
-
     <div class="col-md-7 exp-name x" title="{{experiment.name|uppercase}}">
       <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
     </div>
-
     <div class="col-md-4 controls text-right">
       <button class="button-header begin" ng-click="startExperiment()">
         <b>BEGIN EXPERIMENT</b>
@@ -71,12 +69,5 @@
       </button>
     </div>
   </div>
-<<<<<<< HEAD
-</div>
-=======
 
 </div>
-
-
-
->>>>>>> 7c0c787f5d90708abdd03a3f068b6de765f37787
