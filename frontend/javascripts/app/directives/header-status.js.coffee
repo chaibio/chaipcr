@@ -26,8 +26,8 @@ window.App.directive 'headerStatus', [
 
       getExperiment = (cb) ->
         return if !experiment_id
-        TestInProgressHelper.getExperiment(experiment_id).then (experiment) ->
-          cb experiment
+        Experiment.get(id: experiment_id).then (resp) ->
+          cb resp.experiment if cb
 
       $scope.$watch 'experimentId', (id) ->
         return if !id

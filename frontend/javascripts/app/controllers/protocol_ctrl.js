@@ -7,7 +7,7 @@ window.ChaiBioTech.ngApp.controller('ProtocolCtrl', [
   function($scope, ExperimentLoader, $stateParams, canvas, Experiment) {
 
     $scope.params = $stateParams;
-    Experiment.get({id: $stateParams.id}).$promise.then(function (data) {
+    Experiment.get({id: $stateParams.id}).then(function (data) {
       Experiment.setCurrentExperiment(data.experiment);
     });
 

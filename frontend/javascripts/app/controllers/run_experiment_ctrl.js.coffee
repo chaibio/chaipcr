@@ -41,7 +41,7 @@ window.ChaiBioTech.ngApp.controller 'RunExperimentCtrl', [
       });
 
 
-    Experiment.get(id: $stateParams.id).$promise.then (data) ->
+    Experiment.get(id: $stateParams.id).then (data) ->
       Experiment.setCurrentExperiment data.experiment
       $scope.experiment = data.experiment
       if $scope.getMeltCurve()

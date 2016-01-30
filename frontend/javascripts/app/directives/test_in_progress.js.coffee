@@ -23,10 +23,10 @@ window.ChaiBioTech.ngApp
       updateData = (data) ->
 
         if (!$scope.completionStatus and (data?.experiment_controller?.machine.state is 'idle' or data?.experiment_controller?.machine.state is 'complete') or !$scope.experiment) and $scope.experimentId
-          TestInProgressHelper.getExperiment($scope.experimentId).then (experiment) ->
+          Experiment.get(id: $scope.experimentId).then (resp) ->
             $scope.data = data
-            $scope.completionStatus = experiment.completion_status
-            $scope.experiment = experiment
+            $scope.completionStatus = resp.experiment.completion_status
+            $scope.experiment = resp.experiment
         else
           $scope.data = data
 

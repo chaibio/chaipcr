@@ -13,11 +13,13 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
 
       var delay, that = this;
       delay = $q.defer();
-      Experiment.get({'id': $stateParams.id}, function(data) {
+      Experiment.get({'id': $stateParams.id})
+      .then(function(data) {
         that.protocol = data.experiment;
         //$rootScope.$broadcast("dataLoaded");
         delay.resolve(data);
-      }, function() {
+      })
+      .catch(function() {
         delay.reject('Cant bring the data');
       });
 

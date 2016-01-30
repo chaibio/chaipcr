@@ -17,32 +17,6 @@ window.ChaiBioTech.ngApp.service 'TestInProgressHelper', [
       status = data
       @set_holding status, experiment
 
-    @getExperiment = (id) ->
-      deferred = $q.defer()
-      experimentQues["exp_id_#{id}"] = experimentQues["exp_id_#{id}"] || []
-      experimentQues["exp_id_#{id}"].push deferred
-
-      if !isFetchingExp
-        isFetchingExp = true
-        fetchPromise = Experiment.get(id: id).$promise
-        fetchPromise.then (resp) =>
-          @set_holding status, experiment
-          experimentQues["exp_id_#{resp.experiment.id}"] = experimentQues["exp_id_#{resp.experiment.id}"] || []
-          for def in experimentQues["exp_id_#{resp.experiment.id}"] by 1
-            experiment = resp.experiment
-            def.resolve experiment
-
-        fetchPromise.catch (err) ->
-          for def in experimentQues by 1
-            def.reject err
-            experiment = null
-
-        fetchPromise.finally ->
-          isFetchingExp = false
-          experimentQues["exp_id_#{id}"] = []
-
-      deferred.promise
-
     @is_holding = -> holding
 
     @set_holding = (data, experiment) ->

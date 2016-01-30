@@ -3,9 +3,13 @@
 .status-bar {
   background: $gray;
   color: #fff;
-  height: 34px;
-  // margin-top: 20px;
+  height: 37px;
   text-transform: uppercase;
+
+  .experiment-name {
+    cursor: pointer;
+    border-bottom: 2px solid #fff;
+  }
 
   * {
     display: inline-block;
@@ -46,15 +50,13 @@
 
   .controls-container {
     float: right;
-    padding: 10px;
-    padding-right: 20px;
     text-align: right;
     margin-right: -5px;
   }
 
   .control {
     cursor: pointer;
-    padding: 0 5px;
+    padding: 10px 25px;
 
     &.disabled {
       color: $lightgray;

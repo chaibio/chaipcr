@@ -17,7 +17,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
       $scope.maxCycle = num
 
     getExperiment = ->
-      Experiment.get(id: $stateParams.id).$promise.then (data) ->
+      Experiment.get(id: $stateParams.id).then (data) ->
         if !data.experiment.started_at and !data.experiment.completed_at
           $scope.status = 'NOT_STARTED'
         if data.experiment.started_at and !data.experiment.completed_at
