@@ -35,10 +35,11 @@
            <span class="home-page-exp-created-at B1" ng-show="!exp.experiment.started_at">Created {{exp.experiment.created_at | amCalendar}}</span>
            <span class="home-page-exp-created-at B1" ng-show="exp.experiment.started_at">Run {{exp.experiment.started_at | amCalendar}}</span>
          </div>
-         <div ng-show="deleteMode" class="home-page-del SH">
+         <!--<div ng-show="deleteMode" class="home-page-del SH">
            <div class="home-page-bin" ng-click="deleteClicked = !deleteClicked"> <span ng-show="deleteClicked" class="H2">?</span></div>
            <div class="home-page-del-okay H3" ng-click="">OK</div>
-         </div>
+         </div> -->
+         <delete-mode mode="deleteMode" experiment="{{exp}}" delete-exp="HomeCtrl.deleteExperiment(exp)"></delete-mode>
        </div>
      </div>
       <!--<div>

@@ -202,7 +202,28 @@
           float: left;
           text-align: center;
           padding-top: 16px;
+          -webkit-user-select: none;
+          user-select: none;
         }
+      }
+      @keyframes my_animation {
+        to{ left: 352px; }
+      }
+
+      .home-page-del {
+        -webkit-transition:all linear 0.3s;
+        transition:all linear 0.3s;
+      }
+
+      .home-page-del.ng-hide {
+        -webkit-animation:0.5s my_animation;
+        -moz-animation:0.5s my_animation;
+        -o-animation:0.5s my_animation;
+        animation: 0.5s my_animation;
+        animation-delay: .3s;
+      }
+      .home-page-del.ng-hide {
+        left: 282px;
       }
     }
 
