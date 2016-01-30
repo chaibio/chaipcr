@@ -190,6 +190,8 @@
           span {
             color: white;
             padding-left: 40px;
+            -webkit-user-select: none;
+            user-select: none;
           }
         }
         .home-page-del-okay {
