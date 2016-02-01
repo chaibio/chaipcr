@@ -85,6 +85,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.chartConfig.axes.x.ticks = helper.Xticks data.min_cycle, data.max_cycle
       $scope.chartConfig.axes.y.max = helper.getMaxCalibration data.fluorescence_data
       neutralizedData = helper.neutralizeData data.fluorescence_data
+      console.log neutralizedData
       $scope.data = neutralizedData["#{if $scope.baseline_subtraction then 'baseline' else 'background'}"]
 
 

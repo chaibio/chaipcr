@@ -3,9 +3,10 @@ window.App.directive 'headerStatus', [
   '$state'
   'Status'
   'TestInProgressHelper'
-  '$rootScope',
-  'AmplificationChartHelper',
-  (Experiment, $state, Status, TestInProgressHelper, $rootScope, AmplificationChartHelper) ->
+  '$rootScope'
+  'expName'
+  'AmplificationChartHelper'
+  (Experiment, $state, Status, TestInProgressHelper, $rootScope, expName, AmplificationChartHelper) ->
 
     restrict: 'EA'
     replace: true
@@ -17,10 +18,6 @@ window.App.directive 'headerStatus', [
 
       experiment_id = null
 
-      $scope.$watch 'experimentId', (id) ->
-        return if !angular.isNumber id
-        experiment_id = id
-
       $scope.show = ->
         if attrs.experimentId then (experiment_id and $scope.status) else $scope.status
 
@@ -28,12 +25,6 @@ window.App.directive 'headerStatus', [
         return if !experiment_id
         Experiment.get(id: experiment_id).then (resp) ->
           cb resp.experiment if cb
-
-      $scope.$watch 'experimentId', (id) ->
-        return if !id
-        experiment_id = id
-        getExperiment (exp) ->
-          $scope.experiment = exp
 
       $scope.is_holding = false
 
@@ -44,6 +35,7 @@ window.App.directive 'headerStatus', [
         $scope.state = data.experiment_controller.machine.state
         $scope.thermal_state = data.experiment_controller.machine.thermal_state
         $scope.oldState = oldData?.experiment_controller?.machine?.state || 'NONE'
+        $scope.isCurrentExp = parseInt(data.experiment_controller.expriment?.id) is parseInt(experiment_id)
 
         if ((($scope.oldState isnt $scope.state or !$scope.experiment))) and experiment_id
           getExperiment (exp) ->
@@ -57,18 +49,11 @@ window.App.directive 'headerStatus', [
         $scope.timeRemaining = TestInProgressHelper.timeRemaining(data)
         $scope.timePercentage = TestInProgressHelper.timePercentage(data)
 
-        if $scope.state isnt 'idle' and $scope.state isnt 'complete'
+        if $scope.state isnt 'idle' and $scope.state isnt 'complete' and $scope.isCurrentExp
           $scope.backgroundStyle =
             'background-size': "#{$scope.timePercentage || 0}% 100%";
         else
           $scope.backgroundStyle = {}
-
-        if ($scope.state isnt 'idle' and !experiment_id and data.experiment_controller?.expriment?.id)
-          experiment_id = data.experiment_controller.expriment.id
-          getExperiment (exp) ->
-            $scope.experiment = exp
-
-      , true
 
       $scope.getDuration = ->
         return 0 if !$scope?.experiment?.completed_at
@@ -96,5 +81,12 @@ window.App.directive 'headerStatus', [
         return $scope.experiment.name if $scope.experiment.name.length <= NAME_LENGTH
         return $scope.experiment.name.substring(0, NAME_LENGTH-2)+'...'
 
+      $scope.$on 'expName:Updated', ->
+        $scope.experiment?.name = expName.name
 
+      $scope.$watch 'experimentId', (id) ->
+        return if !id
+        experiment_id = id
+        getExperiment (exp) ->
+          $scope.experiment = exp
 ]
