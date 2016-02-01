@@ -23,13 +23,13 @@
     <span class="running-info" ng-show="state !== 'idle'">
       in progress:
       <span class="experiment-name" ui-sref="run-experiment({id: footer_experiment.id, chart: 'amplification'})">{{footer_experiment.name}}</span>
-      <span class="machine-state">
+<!--       <span class="machine-state">
         <span class="holding">
           <span ng-show="state === 'lid_heating'">heating lid</span>
           <span ng-show="state === 'paused'">paused</span>
           <span ng-show="state === 'running'">{{thermal_state}}</span>
         </span>
-      </span>
+      </span> -->
       <span class="time-remaining" ng-show="state === 'running' || is_holding">
           TIME REMAINING:
           <span ng-show="!is_holding">{{timeRemaining | secondsDisplay: 'display2'}}</span>

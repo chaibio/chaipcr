@@ -177,6 +177,7 @@ app.post('/control/start', function (req, res, next) {
 
 function stop () {
   completeExperiment(experiment_id);
+  data.experiment_controller.expriment.run_duration = 0;
   data = status_idle;
   lastLog = null;
   clearTimeout(intrvl);
