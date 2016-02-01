@@ -8,7 +8,8 @@ window.ChaiBioTech.ngApp
   '$timeout'
   '$state'
   'User'
-  ($scope, Experiment, $window, $uibModal, $timeout, $state, User) ->
+  'Status'
+  ($scope, Experiment, $window, $uibModal, $timeout, $state, User, Status) ->
 
     angular.element('body').addClass 'modal-form'
     $scope.$on '$destroy', ->
@@ -50,6 +51,10 @@ window.ChaiBioTech.ngApp
         data.del = false
 
     @openExperiment = (exp) ->
+      state = Status.getData();
+      if state.experiment_controller.state == 'running' and exp.id == experiment_controller.expriment.id?
+        $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
+      
       if exp.started_at isnt null
         $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
       else
