@@ -52,9 +52,11 @@ window.ChaiBioTech.ngApp
 
     @openExperiment = (exp) ->
       state = Status.getData();
-      if state.experiment_controller.state == 'running' and exp.id == experiment_controller.expriment.id?
+      #state.experiment_controller.machine.state = 'running'
+      #state.experiment_controller.expriment = 'id' : 95
+      if state.experiment_controller.machine.state == 'running' and exp.id == state.experiment_controller.expriment.id
         $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
-      
+
       if exp.started_at isnt null
         $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
       else
