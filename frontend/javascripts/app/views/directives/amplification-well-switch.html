@@ -3,16 +3,16 @@
   <table class="on-off-buttons">
     <tr>
       <td></td>
-      <td ng-repeat="i in loop" class="number" ng-bind="i+1"></td>
+      <td ng-repeat="i in loop" class="number B2" ng-bind="i+1"></td>
     </tr>
     <tr>
-      <td class="number">A</td>
+      <td class="number B2">A</td>
       <td ng-repeat="i in loop">
         <amplification-circle-button ng-model="buttons['well_'+$index]"></amplification-circle-button>
       </td>
     </tr>
     <tr>
-      <td class="number">B</td>
+      <td class="number B2">B</td>
       <td ng-repeat="i in loop">
         <amplification-circle-button ng-model="buttons['well_'+($index+8)]"></amplification-circle-button>
       </td>

@@ -15,11 +15,11 @@
     <div class="content">
       <div class="chart-section">
         <div class="curve-header">
-          <span class="curve-title" ng-click="RunExperimentCtrl.changeChartTypeModal()">
+          <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()">
             Amplification Curve
             <img class="arrow-down" src="/images/arrow-down.png">
           </span>
-          <span class="log-checkboxes">
+          <span class="log-checkboxes SH">
             <span class="checkbox-item" ng-click="log_linear = 'log'" ng-class="{checked:log_linear === 'log', unchecked: log_linear !== 'log'}">
               <span class="checkbox-icon">
                 <span class="inner"></span>
@@ -34,7 +34,7 @@
             </span>
           </span>
         </div>
-        <div class="subheader-switches">
+        <div class="subheader-switches SH">
           <div class="item-switch">
             <switch ng-model="baseline_subtraction"></switch>
             <label>BASELINE SUBTRACTION</label>
@@ -46,17 +46,17 @@
           </div>
         </div>
         <div>
-          <div class="vertical-text">RELATIVE FLUORESCENCE UNITS</div>
+          <div class="vertical-text SH">RELATIVE FLUORESCENCE UNITS</div>
           <div class="chart-container" id="ampli-drag-scroll" chart-drag-scroll ng-model="ampli_scroll">
             <linechart class="linechart" data-drag-scroll="ampli-drag-scroll" data="data" options="chartConfig" width="700" height="300" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks"></linechart>
           </div>
-          <div class="text-center num-cycle-text">NUMBER OF CYCLES</div>
+          <div class="text-center num-cycle-text SH">CYCLES NUMBER</div>
 
           <div class="ampli-zoom-scroll-container">
             <div class="row">
               <div class="col-md-6">
                 <div class="zoom-container">
-                  <div class="zoom-text">
+                  <div class="zoom-text SH">
                     <b>ZOOM</b>
                   </div>
                   <ampli-slider ng-model="ampli_zoom" cycles="maxCycle"></ampli-slider>
@@ -89,12 +89,12 @@
         <table>
           <tbody>
             <tr>
-              <th>Well</th>
-              <th>Type</th>
-              <th>Ct</th>
+              <th class="B1">WELL</th>
+              <th class="B1">TYPE</th>
+              <th class="B1">CT</th>
             </tr>
             <tr ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" ng-class="{selected: (wellButtons['well_'+i].selected)}">
-              <td>
+              <td class="B1">
                 <span class="dot" style="background-color: {{wellButtons['well_'+i].color}}"></span>
                 <span class="text">
                   <span ng-show="i < 8">
@@ -105,8 +105,8 @@
                   </span>
                 </span>
               </td>
-              <td>Sample</td>
-              <td>
+              <td class="B1">Sample</td>
+              <td class="B1">
                 <span ng-show="wellButtons['well_'+i].ct > 0">{{(wellButtons['well_'+i].ct) | round:2}}</span>
               </td>
             </tr>
