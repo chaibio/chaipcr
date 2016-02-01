@@ -1,5 +1,6 @@
 window.ChaiBioTech.ngApp.directive('deleteMode', [
-  function() {
+  'HomePageDelete',
+  function(HomePageDelete) {
     return {
       restric: 'EA',
       replace: true,
@@ -22,13 +23,19 @@ window.ChaiBioTech.ngApp.directive('deleteMode', [
         scope.deleteClickedHandle = function() {
 
           scope.deleteClicked = !scope.deleteClicked;
-          var left = angular.element(elem).position().left;
+          HomePageDelete.deactiveate(scope, elem);
 
           if(scope.deleteClicked) {
-            angular.element(elem).css("left", (left - 70) + "px");
+            angular.element(elem).css("left", 212 + "px");
+            angular.element('.home-page-active-del-identifier').css("left", 282 + "px")
+              .removeClass('home-page-active-del-identifier');
+            angular.element(elem).addClass('home-page-active-del-identifier');
           } else {
-            angular.element(elem).css("left", (left + 70) + "px");
+            angular.element(elem).css("left", 282 + "px")
+              .removeClass('home-page-active-del-identifier');
           }
+
+          HomePageDelete.activeDelete = scope;
         };
 
         scope.reset = function() {
