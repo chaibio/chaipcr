@@ -13,6 +13,7 @@ window.ChaiBioTech.ngApp.directive('deleteMode', [
 
       link: function(scope, elem, attr) {
         scope.deleteClicked = false;
+        var identifierClass = 'home-page-active-del-identifier';
 
         scope.$watch('deleteMode', function(newVal, oldVal) {
           if(newVal === false && scope.deleteClicked) {
@@ -26,21 +27,20 @@ window.ChaiBioTech.ngApp.directive('deleteMode', [
           HomePageDelete.deactiveate(scope, elem);
 
           if(scope.deleteClicked) {
-            angular.element(elem).css("left", 212 + "px");
-            angular.element('.home-page-active-del-identifier').css("left", 282 + "px")
-              .removeClass('home-page-active-del-identifier');
-            angular.element(elem).addClass('home-page-active-del-identifier');
+            angular.element(elem).parent()
+              .addClass(identifierClass);
+            angular.element(HomePageDelete.activeDeleteElem).parent()
+              .removeClass(identifierClass);
+            HomePageDelete.activeDeleteElem = elem;
           } else {
-            angular.element(elem).css("left", 282 + "px")
-              .removeClass('home-page-active-del-identifier');
+            angular.element(elem).parent().removeClass(identifierClass);
           }
 
           HomePageDelete.activeDelete = scope;
         };
 
         scope.reset = function() {
-          var left = angular.element(elem).position().left;
-          angular.element(elem).css("left", (left + 70) + "px");
+          angular.element(elem).parent().removeClass(identifierClass);
           scope.deleteClicked = false;
         };
 

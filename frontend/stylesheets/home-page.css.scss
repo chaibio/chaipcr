@@ -134,13 +134,15 @@
       width: 100%;
       height: 664px;
       overflow: scroll;
-      //border-right: 1px solid #e6e6e6;
+      position: relative;
     }
 
     .home-page-exp-tile {
       width: 100%;
       height: 60px;
+      width: 423px;
       position: relative;
+      left: 0px;
 
       .home-page-tile-text {
         width: 100%;
@@ -206,29 +208,45 @@
           user-select: none;
         }
       }
-      @keyframes my_animation {
-        to{ left: 352px; }
-      }
 
-      .home-page-del {
-        -webkit-transition:all linear 0.3s;
-        transition:all linear 0.3s;
+      @keyframes my_hide {
+        from{left: 282px;}
+        to{ left: 352px;}
+      }
+      @-webkit-keyframes my_hide {
+        from{left: 282px;}
+        to{ left: 352px;}
       }
 
       .home-page-del.ng-hide {
-        -webkit-animation:0.5s my_animation;
-        -moz-animation:0.5s my_animation;
-        -o-animation:0.5s my_animation;
-        animation: 0.5s my_animation;
-        animation-delay: .3s;
-      }
-      .home-page-del.ng-hide {
-        left: 282px;
+        animation-name: my_hide;
+        animation-duration: 0.3s;
       }
     }
+
+    .home-page-exp-tile {
+      -webkit-transition:all linear 0.3s;
+      transition:all linear 0.3s;
+    }
+
+    @keyframes my_animation {
+      from{left: 0px;}
+      to{ left: -70px;}
+    }
+    @-webkit-keyframes my_animation {
+      from{left: 0px;}
+      to{ left: -70px;}
+    }
+
     .home-page-active-del-identifier {
-
+      animation-name: my_animation;
+      animation-duration: 0.5s;
+      left: -70px;
     }
+
+    //.home-page-active-del-identifier {
+
+    //}
     // Previous Experiment List Starts Here
     /*.previous-experiment-container {
 

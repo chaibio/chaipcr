@@ -2,6 +2,7 @@ window.ChaiBioTech.ngApp.service('HomePageDelete', [
 
   function() {
     this.activeDelete = null;
+    this.activeDeleteElem = null;
 
     this.deactiveate = function(currentScope) {
 
@@ -10,6 +11,7 @@ window.ChaiBioTech.ngApp.service('HomePageDelete', [
           this.activeDelete.deleteClicked = false;
         } else if(currentScope.$id === this.activeDelete.$id) {
           this.activeDelete = null;
+          this.activeDeleteElem = null;
         }
       }
 
