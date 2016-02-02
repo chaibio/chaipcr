@@ -1,8 +1,19 @@
 window.ChaiBioTech.ngApp.service('HomePageDelete', [
+  '$window',
+  function($window) {
+    this.activeDelete = false;
+    this.activeDeleteElem = false;
+    var _this = this;
 
-  function() {
-    this.activeDelete = null;
-    this.activeDeleteElem = null;
+    angular.element($window).click(function(evt) {
+      if(_this.activeDelete && evt.target.className !== 'home-page-bin') {
+        _this.disableActiveDelete();
+        //_this.activeDelete = false;
+        //console.log("wow123");
+        angular.element(_this.activeDeleteElem).parent()
+          .removeClass('home-page-active-del-identifier');
+      }
+    });
 
     this.deactiveate = function(currentScope) {
 
@@ -10,11 +21,15 @@ window.ChaiBioTech.ngApp.service('HomePageDelete', [
         if(currentScope.$id !== this.activeDelete.$id) {
           this.activeDelete.deleteClicked = false;
         } else if(currentScope.$id === this.activeDelete.$id) {
-          this.activeDelete = null;
-          this.activeDeleteElem = null;
+          this.activeDelete = false;
+          this.activeDeleteElem = false;
         }
       }
 
+    };
+
+    this.disableActiveDelete = function() {
+      this.activeDelete.deleteClicked = false;
     };
   }
 ]);

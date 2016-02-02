@@ -9,7 +9,8 @@ window.ChaiBioTech.ngApp
   '$state'
   'User'
   'Status'
-  ($scope, Experiment, $window, $uibModal, $timeout, $state, User, Status) ->
+  'HomePageDelete',
+  ($scope, Experiment, $window, $uibModal, $timeout, $state, User, Status, HomePageDelete) ->
 
     angular.element('body').addClass 'modal-form'
     $scope.$on '$destroy', ->
@@ -51,16 +52,15 @@ window.ChaiBioTech.ngApp
         data.del = false
 
     @openExperiment = (exp) ->
-      state = Status.getData();
-      #state.experiment_controller.machine.state = 'running'
-      #state.experiment_controller.expriment = 'id' : 95
-      if state.experiment_controller.machine.state == 'running' and exp.id == state.experiment_controller.expriment.id
-        $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
+      if not HomePageDelete.activeDelete
+        state = Status.getData();
+        if state.experiment_controller.machine.state == 'running' and exp.id == state.experiment_controller.expriment.id
+          $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
 
-      if exp.started_at isnt null
-        $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
-      else
-        $state.go 'edit-protocol', {id: exp.id}
+        if exp.started_at isnt null
+          $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
+        else
+          $state.go 'edit-protocol', {id: exp.id}
 
 
     return
