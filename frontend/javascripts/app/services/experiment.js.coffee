@@ -20,15 +20,12 @@ window.ChaiBioTech.ngApp
       deferred = $q.defer()
       ques["exp_#{obj.id}"].push deferred
 
-      console.log console.log ques
-
       return deferred.promise if ques["exp_#{obj.id}"].length > 1 #there is already pending request for this experiment, wait for it
 
       $http.get("/experiments/#{obj.id}")
       .then (resp) ->
         for def in ques["exp_#{obj.id}"] by 1
           def.resolve resp.data
-        console.log "resolved exp que: #{resp.data.experiment.id}"
       .catch (resp) ->
         for def in ques["exp_#{obj.id}"] by 1
           def.reject resp

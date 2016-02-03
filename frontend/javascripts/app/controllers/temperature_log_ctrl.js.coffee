@@ -49,7 +49,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
     $scope.init = ->
 
-      return if !hasStatusData or !hasExperiment or hasInit
+      return if !hasStatusData or !hasExperiment or hasInit or $scope.RunExperimentCtrl.chart isnt 'temperature-logs'
       hasInit = true
 
       $scope.isCurrentExperiment = false
@@ -203,6 +203,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
     updateFunc = ->
       return if $scope.RunExperimentCtrl.chart isnt 'temperature-logs'
+      console.log 'temperatureLogs call here'
       Experiment
       .getTemperatureData($stateParams.id, resolution: 1000)
       .success (data) ->
