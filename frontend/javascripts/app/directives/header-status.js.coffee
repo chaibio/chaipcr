@@ -17,6 +17,7 @@ window.App.directive 'headerStatus', [
     link: ($scope, elem, attrs) ->
 
       experiment_id = null
+      $scope.loading = true
 
       $scope.show = ->
         if attrs.experimentId then (experiment_id and $scope.status) else $scope.status
