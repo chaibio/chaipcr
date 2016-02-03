@@ -8,8 +8,6 @@ window.ChaiBioTech.ngApp.service('HomePageDelete', [
     angular.element($window).click(function(evt) {
       if(_this.activeDelete && evt.target.className !== 'home-page-bin') {
         _this.disableActiveDelete();
-        //_this.activeDelete = false;
-        //console.log("wow123");
         angular.element(_this.activeDeleteElem).parent()
           .removeClass('home-page-active-del-identifier');
       }
