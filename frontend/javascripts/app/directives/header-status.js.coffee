@@ -23,7 +23,9 @@ window.App.directive 'headerStatus', [
 
       getExperiment = (cb) ->
         return if !experiment_id
+        $scope.loading = true
         Experiment.get(id: experiment_id).then (resp) ->
+          $scope.loading = false
           cb resp.experiment if cb
 
       $scope.is_holding = false

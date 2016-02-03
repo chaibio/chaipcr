@@ -10,6 +10,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
   ($scope, $stateParams, Experiment, helper, Status, expName, $rootScope, $timeout) ->
 
     hasData = false
+    hasInit = false
     fetching = false
     drag_scroll = $('#ampli-drag-scroll')
     $scope.chartConfig = helper.chartConfig()
@@ -39,33 +40,38 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       oldState = oldData?.experiment_controller?.machine?.state
       isCurrentExp = parseInt(data?.experiment_controller?.expriment?.id) is parseInt($stateParams.id)
 
-      if ((state is 'idle' and $scope.experiment?.completed_at and !hasData) or
+      if ((state is 'idle' and !!$scope.experiment?.completed_at and !hasData) or
       (state is 'idle' and oldState isnt state) or
       (state is 'running' and (oldStep isnt newStep or !oldStep) and data.optics.collect_data and oldData.optics.collect_data is 'true') )
-        $timeout fetchFluorescenceData, 1500
+        fetchFluorescenceData()
 
     $scope.$watch ->
       $scope.RunExperimentCtrl.chart
     , (val) ->
-      if val is 'amplification' and !hasData
+      if val is 'amplification' and hasInit
         fetchFluorescenceData()
 
     fetchFluorescenceData = ->
       return if $scope.RunExperimentCtrl.chart isnt 'amplification'
+      console.log 'fetching getF luorescenceData...'
       if !fetching
         fetching = true
-        Experiment.getFluorescenceData($stateParams.id)
-        .success (data) ->
-          hasData = true
-          return if !data.fluorescence_data
-          return if data.fluorescence_data.length is 0
-          FLUORESCENCE_DATA_CACHE = angular.copy data
-          $scope.fluorescence_data = data
-          moveData()
-          updateButtonCts()
+        hasInit = true
 
-        .finally ->
-          fetching = false
+        $timeout ->
+          Experiment.getFluorescenceData($stateParams.id)
+          .success (data) ->
+            hasData = true
+            return if !data.fluorescence_data
+            return if data.fluorescence_data.length is 0
+            FLUORESCENCE_DATA_CACHE = angular.copy data
+            $scope.fluorescence_data = data
+            moveData()
+            updateButtonCts()
+
+          .finally ->
+            fetching = false
+        , 1500
 
     updateButtonCts = ->
       for ct, i in FLUORESCENCE_DATA_CACHE.ct
@@ -86,7 +92,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.chartConfig.axes.x.ticks = helper.Xticks data.min_cycle, data.max_cycle
       $scope.chartConfig.axes.y.max = helper.getMaxCalibration data.fluorescence_data
       neutralizedData = helper.neutralizeData data.fluorescence_data
-      console.log neutralizedData
       $scope.data = neutralizedData["#{if $scope.baseline_subtraction then 'baseline' else 'background'}"]
 
 
