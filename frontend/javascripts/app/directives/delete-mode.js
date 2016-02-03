@@ -16,7 +16,7 @@ window.ChaiBioTech.ngApp.directive('deleteMode', [
         var identifierClass = 'home-page-active-del-identifier';
 
         scope.$watch('deleteMode', function(newVal, oldVal) {
-          HomePageDelete.activeDelete = newVal;
+
           if(newVal === false && scope.deleteClicked) {
             scope.reset();
           }
@@ -41,8 +41,9 @@ window.ChaiBioTech.ngApp.directive('deleteMode', [
         };
 
         scope.reset = function() {
-          angular.element(elem).parent().removeClass(identifierClass);
           scope.deleteClicked = false;
+          HomePageDelete.activeDelete = HomePageDelete.activeDeleteElem = false;
+          angular.element(elem).parent().removeClass(identifierClass);
         };
 
         scope.tryDeletion = function() {
