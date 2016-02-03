@@ -185,7 +185,8 @@
           background-color: #df2227;
           color: #df2227;
           background-position: center;
-          background-image: url("/images/bin.png");
+          background-image: url("/images/trash.svg");
+          background-size: 24px 26px;
           background-repeat: no-repeat;
           float: left;
           text-align: center;
@@ -201,12 +202,11 @@
           width: 72px;
           height: 100%;
           background-color: #c30506;
-          color: white;
+          background-position: center;
+          background-image: url("/images/ok.svg");
+          background-size: 26px 28px;
+          background-repeat: no-repeat;
           float: left;
-          text-align: center;
-          padding-top: 16px;
-          -webkit-user-select: none;
-          user-select: none;
         }
       }
 
@@ -244,197 +244,5 @@
       animation-duration: 0.5s;
       left: -72px;
     }
-
-    //.home-page-active-del-identifier {
-
-    //}
-    // Previous Experiment List Starts Here
-    /*.previous-experiment-container {
-
-      .previous-experiment-heading {
-        border-bottom: solid 1px #001827;
-        height: 20px;
-
-        .text {
-          float: left;
-          width: 200px;
-          font-size: 14px;
-        }
-        .dots {
-          float: right;
-          color: $red;
-          font-weight: bold;
-          font-size: 14px;
-          cursor: pointer;
-        }
-      }
-      .all-experiments {
-        height: 680px;
-        overflow: scroll;
-        padding-top: 21px;
-
-        .individual-experiment {
-          height: 72px;
-
-          .first-row {
-            height: 30px;
-
-            a:hover {
-              color: #000;
-              background-color: white;
-            }
-            div {
-              float: left;
-            }
-            .image {
-              border: 7px solid $gray;
-              border-radius: 100%;
-              color: #fff;
-              width: 30px;
-              height: 30px;
-            }
-            .cross-image {
-              display: none;
-            }
-            .dotordate {
-              float: right;
-              height: 30px;
-              width: 50px;
-              font-size: 9px;
-              text-align: center;
-              color: #00aeef;
-            }
-            .ball {
-              width: 8px;
-              height: 8px;
-              background-color: #898989;
-              -webkit-border-radius: 50%;
-              -moz-border-radius: 50%;
-              border-radius: 50%;
-              margin-top: 8px;
-              margin-left: 10px;
-            }
-            .image-red {
-              background-image: url('/images/smallredO.png');
-              width: 30px;
-              height: 30px;
-            }
-            .text {
-              margin-left: 15px;
-              margin-top: -4px;
-              margin-bottom: -10px;
-              cursor: pointer;
-
-              a {
-                display: block;
-                width: 200px;
-              }
-            }
-          }
-          .second-row {
-            height: 42px;
-
-            div {
-              float: left;
-            }
-            .hand-container {
-              width: 45px;
-              height: 42px;
-
-              .hand {
-                width: 6px;
-                min-height: 32px;
-                background-color: #00aeef;
-                margin-left: 12px;
-                margin-top: 5px;
-                cursor: pointer;
-              }
-            }
-            .dotor {
-              float: right;
-              height: 30px;
-              width: 50px;
-            }
-            .ball {
-              width: 8px;
-              height: 8px;
-              background-color: #898989;
-              -webkit-border-radius: 50%;
-              -moz-border-radius: 50%;
-              border-radius: 50%;
-              margin-top: 5px;
-              margin-left: 10px;
-            }
-            .more-info {
-              font-size: 14px;
-              width: 230px;
-            }
-          }
-          .confirm-box {
-            position: relative;
-            display: none;
-            height: 45px;
-            width: 250px;
-            z-index: 100;
-            top: -70px;
-            left: 43px;
-            background-color: white;
-            text-align: center;
-            font-size: 14px;
-            -webkit-border-radius: 5px;
-            -moz-border-radius: 5px;
-            border-radius: 5px;
-            border: solid 1px #a61300;
-            font-size: 14px;
-
-            button {
-              font-size: 12px;
-              width: 40px;
-              height: 22px;
-              margin-top: 2px;
-            }
-
-            .no-delete {
-              color: #00aeef;
-            }
-            .yes-delete {
-              color: #a61300;
-            }
-          }
-
-          &.del {
-            .first-row,
-            .second-row {
-              visibility: hidden;
-            }
-            .confirm-box {
-              display: block;
-            }
-          }
-
-        }
-
-        &.delete-mode {
-          .individual-experiment {
-            .first-row {
-              .image {
-                border: 2px solid red;
-                color: red;
-                cursor: pointer;
-                font-size: 25px;
-                line-height: 1.1;
-                text-align: center;
-              }
-            }
-            .second-row {
-              .hand {
-                background-color: $darkred;
-              }
-            }
-          }
-        }
-
-      }
-    }*/
   }
 }
