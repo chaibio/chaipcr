@@ -7,7 +7,7 @@
     <div class="col-md-7 exp-name x" title="{{experiment.name|uppercase}}">
       <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
     </div>
-    <div class="col-md-4 controls text-right">
+    <div class="col-md-4 controls SHR text-right">
       <button class="button-header begin" ng-click="startExperiment()">
         <b>BEGIN EXPERIMENT</b>
       </button>
@@ -21,7 +21,7 @@
     <div class="col-md-7 exp-name x" title="{{experiment.name|uppercase}}">
       <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
     </div>
-    <div class="col-md-4 controls text-right">
+    <div class="col-md-4 controls SHR text-right">
       <div class="message">LID IS OPEN</div>
       <button class="button-header begin disabled">
         <b>BEGIN EXPERIMENT</b>
@@ -36,7 +36,7 @@
     <div class="col-md-7 exp-name x" title="{{experiment.name|uppercase}}">
       <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
     </div>
-    <div class="col-md-4 controls text-right">
+    <div class="col-md-4 controls SHR text-right">
       <div class="message">
         in progress...
         <strong ng-show="state !== 'lid_heating'">
@@ -54,7 +54,7 @@
     <div class="col-md-4 exp-name x" title="{{experiment.name|uppercase}}">
       <div ng-show="experiment.id && experiment.name">{{expName(20)}}</div>
     </div>
-    <div class="col-md-7 controls text-right">
+    <div class="col-md-7 controls SHR text-right">
       <div class="message">
         <span ng-show="experiment.completion_status === 'success'">completed</span>
         <span ng-show="experiment.completion_status !== 'success'">
