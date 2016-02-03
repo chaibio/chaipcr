@@ -6,7 +6,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
   'Status'
   'expName'
   '$rootScope'
-  ($scope, $stateParams, Experiment, helper, Status, expName, $rootScope) ->
+  '$timeout'
+  ($scope, $stateParams, Experiment, helper, Status, expName, $rootScope, $timeout) ->
 
     hasData = false
     fetching = false
@@ -41,7 +42,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       if ((state is 'idle' and $scope.experiment?.completed_at and !hasData) or
       (state is 'idle' and oldState isnt state) or
       (state is 'running' and (oldStep isnt newStep or !oldStep) and data.optics.collect_data and oldData.optics.collect_data is 'true') )
-        fetchFluorescenceData()
+        $timeout fetchFluorescenceData, 1500
 
     $scope.$watch ->
       $scope.RunExperimentCtrl.chart

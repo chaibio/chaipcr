@@ -1,7 +1,7 @@
 <div class="header-status" ng-class="{'in-progress': state && state !== 'idle' && isCurrentExp, 'complete': experiment && experiment.completed_at}" ng-style="backgroundStyle">
 
     <!-- begin is valid -->
-  <div class="row" ng-show="experiment.id && !experiment.started_at && !experiment.completed_at && !(statusData.optics.lid_open==='true')">
+  <div class="row" ng-show="experiment.id && !experiment.started_at && !experiment.completed_at && !(statusData.optics.lid_open==='true')&& state==='idle'">
     <div class="col-md-1 menu" ng-transclude>
     </div>
     <div class="col-md-7 exp-name x" title="{{experiment.name|uppercase}}">
@@ -14,7 +14,7 @@
     </div>
   </div>
 
-    <!-- begin is invalid -->
+    <!-- begin is invalid LID IS OPEN -->
   <div class="row" ng-show="!experiment.started_at && !experiment.completed_at && (statusData.optics.lid_open==='true')">
     <div class="col-md-1 menu" ng-transclude>
     </div>
@@ -23,6 +23,24 @@
     </div>
     <div class="col-md-4 controls SHR text-right">
       <div class="message">LID IS OPEN</div>
+      <button class="button-header begin disabled">
+        <b>BEGIN EXPERIMENT</b>
+      </button>
+    </div>
+  </div>
+
+    <!-- begin is invalid ANOTHER EXP RUNNING -->
+  <div class="row" ng-show="!experiment.started_at && !experiment.completed_at && (state !== 'idle')">
+    <div class="col-md-1 menu" ng-transclude>
+    </div>
+    <div class="col-md-5 exp-name x" title="{{experiment.name|uppercase}}">
+      <div ng-show="experiment.id && experiment.name">{{expName(27)}}</div>
+    </div>
+    <div class="col-md-6 controls SHR text-right">
+      <div class="message">
+        ANOTHER EXPERIMENT IS RUNNING
+        <strong style="cursor: pointer" ui-sref="run-experiment({id: statusData.experiment_controller.expriment.id, chart: 'amplification'})">VIEW NOW</strong>
+      </div>
       <button class="button-header begin disabled">
         <b>BEGIN EXPERIMENT</b>
       </button>
