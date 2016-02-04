@@ -149,20 +149,25 @@ GPIO::Value GPIO::waitValue(Value value) {
 
         if (poll(fdArray, 2, -1) > 0) {
             if (fdArray[0].revents > 0) { //If was some operation on GPIO
-                read(waitingFd_, buffer, sizeof(buffer)-1);
-                lseek(waitingFd_, 0, SEEK_SET);
+                if (fdArray[0].revents | POLLIN || fdArray[0].revents | POLLPRI) {
+                    read(waitingFd_, buffer, sizeof(buffer)-1);
+                    lseek(waitingFd_, 0, SEEK_SET);
 
-                switch (buffer[0]) {
-                case '0':
-                    value = savedValue_ = kLow;
-                    break;
+                    switch (buffer[0]) {
+                    case '0':
+                        value = savedValue_ = kLow;
+                        break;
 
-                case '1':
-                    value = savedValue_ = kHigh;
-                    break;
+                    case '1':
+                        value = savedValue_ = kHigh;
+                        break;
 
-                default:
-                    throw GPIOError("Unexpected GPIO value");
+                    default:
+                        throw GPIOError("Unexpected GPIO value");
+                    }
+                }
+                else { //Some error
+                    value = value == kHigh ? kLow : kHigh;
                 }
             }
             else { //If was some operatio on stopWaitinigFd_
