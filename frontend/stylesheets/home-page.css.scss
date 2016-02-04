@@ -74,10 +74,13 @@
     }
     .home-page-link-container {
       text-align: center;
-      margin-top: 100px;
+      margin-top: 92px;
       img {
         width: 90px;
         height: 25px;
+      }
+      div {
+        margin-top: 10px;
       }
       a {
         color: #00ADEE;
@@ -169,7 +172,7 @@
 
       .home-page-tile-text-hover {
         background-color: #cceffc;
-        border-bottom: 1px solid black;
+        border-bottom: 2px solid black;
         cursor: pointer;
       }
 

@@ -52,8 +52,7 @@ window.ChaiBioTech.ngApp
         data.del = false
 
     @openExperiment = (exp) ->
-      console.log HomePageDelete.activeDelete
-      if not HomePageDelete.activeDelete
+      if not $scope.deleteMode
         state = Status.getData();
         if state.experiment_controller.machine.state == 'running' and exp.id == state.experiment_controller.expriment.id
           $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
