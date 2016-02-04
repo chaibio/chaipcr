@@ -55,6 +55,9 @@ window.ChaiBioTech.ngApp
     self.getFluorescenceData = (expId) ->
       $http.get("/experiments/#{expId}/fluorescence_data")
 
+    self.getMeltCurveData = (expId) ->
+      $http.get("/experiments/#{expId}/melt_curve_data")
+
     self.duplicate = (expId, data) ->
       $http.post "/experiments/#{expId}/copy", data
 
