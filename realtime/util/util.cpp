@@ -59,6 +59,8 @@ void watchProcess(const std::string &command, std::function<void(const char[1024
 
     if (pid == 0) //Child process
     {
+        setpgrp();
+
         if (processPipes[1] != fileno(stdout))
         {
             dup2(processPipes[1], fileno(stdout));
@@ -127,7 +129,7 @@ void watchProcess(const std::string &command, std::function<void(const char[1024
     }
     else
     {
-        kill(pid, SIGTERM);
+        killpg(getpgid(pid), SIGTERM);
 
         throw std::runtime_error("Unknown error with subprocess - " + command);
     }
@@ -152,6 +154,8 @@ bool watchProcess(const std::string &command, int eventFd, std::function<void(co
 
     if (pid == 0) //Child process
     {
+        setpgrp();
+
         if (processPipes[1] != fileno(stdout))
         {
             dup2(processPipes[1], fileno(stdout));
@@ -232,7 +236,7 @@ bool watchProcess(const std::string &command, int eventFd, std::function<void(co
     }
     else
     {
-        kill(pid, SIGKILL);
+        killpg(getpgid(pid), SIGTERM);
 
         if (fdArray[1].revents == 0)
             throw std::runtime_error("Unknown error with subprocess - " + command);
