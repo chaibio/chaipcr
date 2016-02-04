@@ -6,14 +6,14 @@ window.ChaiBioTech.ngApp.controller 'RunExperimentCtrl', [
   '$uibModal'
   ($scope, $stateParams, $state, Experiment, $uibModal) ->
     @chart = $stateParams.chart
-    $scope.chart = $stateParams.chart
+    # $scope.chart = $stateParams.chart
     $scope.hover= ""
     $scope.noofCharts = 2
     $scope.meltCurveChart = false; #if the experiment has a melt curve stage
 
     $scope.getMeltCurve = () ->
       stages = $scope.experiment.protocol.stages
-      return stages.some((val) => return val.stage.name == "Melt Curve Stage")
+      return stages.some((val) => val.stage.name is "Melt Curve Stage")
 
     @changeChart = (chart) ->
       $state.go 'run-experiment', {id: $stateParams.id, chart: chart}, notify: false
