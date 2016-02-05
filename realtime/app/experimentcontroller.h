@@ -70,8 +70,8 @@ public:
     ExperimentController(std::shared_ptr<DBControl> dbControl);
     ~ExperimentController();
 
-    MachineState machineState() const;
-    ThermalState thermalState() const;
+    inline MachineState machineState() const { return _machineState; }
+    inline ThermalState thermalState() const { return _thermalState; }
     Experiment experiment() const;
 
     inline const LogsSettings& settings() const { return _settings; }
@@ -103,8 +103,8 @@ private:
 
 private:
     mutable Poco::RWLock *_machineMutex;
-    MachineState _machineState;
-    ThermalState _thermalState;
+    std::atomic<MachineState> _machineState;
+    std::atomic<ThermalState> _thermalState;
 
     std::shared_ptr<DBControl> _dbControl;
     Experiment _experiment;

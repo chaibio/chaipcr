@@ -42,18 +42,6 @@ ExperimentController::~ExperimentController()
     delete _machineMutex;
 }
 
-ExperimentController::MachineState ExperimentController::machineState() const
-{
-    Poco::RWLock::ScopedReadLock lock(*_machineMutex);
-    return _machineState;
-}
-
-ExperimentController::ThermalState ExperimentController::thermalState() const
-{
-    Poco::RWLock::ScopedReadLock lock(*_machineMutex);
-    return _thermalState;
-}
-
 Experiment ExperimentController::experiment() const
 {
     Poco::RWLock::ScopedReadLock lock(*_machineMutex);
