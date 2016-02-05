@@ -14,9 +14,9 @@
 
 
   <!-- <div ng-if="false" class="header-status" ng-class="{'in-progress': state && state !== 'idle' && isCurrentExp, 'complete': experiment && experiment.completed_at}" ng-style="backgroundStyle"> -->
-  <div ng-if="!loading" class="header-status" ng-class="{'in-progress': state && state !== 'idle' && isCurrentExp, 'complete': experiment && experiment.completed_at}" ng-style="backgroundStyle">
+  <div ng-if="!loading" class="header-status" ng-class="{'in-progress': state && state !== 'idle' && isCurrentExp, 'complete': experiment && (experiment.completed_at || (experiment.started_at && state==='idle') )}" ng-style="backgroundStyle">
 
-      <!-- begin is valid -->
+    <!-- begin is valid -->
     <div class="row" ng-show="experiment.id && !experiment.started_at && !experiment.completed_at && !(statusData.optics.lid_open==='true')&& state==='idle'">
       <div class="col-md-1 menu" ng-transclude>
       </div>
@@ -97,6 +97,24 @@
             <span ng-show="experiment.completion_status !== 'aborted'">{{experiment.completion_message}}</span>
           </span>
           <strong >{{experiment.completed_at|date:'MMM. dd yyyy, hh:mm:ss'}}</strong>
+        </div>
+        <button class="button-header" duplicate-experiment experiment-id="experiment.id">
+          <b>DUPLICATE EXPERIMENT</b>
+        </button>
+      </div>
+    </div>
+
+      <!-- experiment has been started and not completed -->
+    <div class="row" ng-show="experiment && experiment.started_at && !experiment.completed_at && state==='idle'">
+      <div class="col-md-1 menu" ng-transclude>
+      </div>
+      <div class="col-md-4 exp-name x" title="{{experiment.name|uppercase}}">
+        <div ng-show="experiment.id && experiment.name">{{expName(20)}}</div>
+      </div>
+      <div class="col-md-7 controls SHR text-right">
+        <div class="message">
+          <span class="failed">failed</span>
+          User cancelled
         </div>
         <button class="button-header" duplicate-experiment experiment-id="experiment.id">
           <b>DUPLICATE EXPERIMENT</b>

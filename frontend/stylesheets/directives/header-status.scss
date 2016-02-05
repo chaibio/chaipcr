@@ -50,6 +50,13 @@
     * {
       color: #fff;
     }
+    .failed {
+      background-color: #e02127;
+      color: #fff;
+      margin-right: 10px;
+      padding: 2px 5px;
+      font-weight: bold;
+    }
   }
 
   .button-header {
@@ -91,13 +98,6 @@
     .message {
       display: inline-block;
       margin-top: 13px;
-      .failed {
-        background-color: #e02127;
-        color: #fff;
-        margin-right: 10px;
-        padding: 2px 5px;
-        font-weight: bold;
-      }
     }
     .button-header {
       background-color: #000;

@@ -1,0 +1,24 @@
+<div class="content melt-curve" ng-controller="MeltCurveCtrl">
+  <div class="chart-section">
+    <div class="curve-header">
+      <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()">
+        Melt Curve
+        <img class="arrow-down" src="/images/arrow-down.png">
+      </span>
+      <span class="log-checkboxes SH">
+        <span class="checkbox-item" ng-click="curve_type = 'derivative'" ng-class="{checked:curve_type === 'derivative', unchecked: curve_type !== 'derivative'}">
+          <span class="checkbox-icon">
+            <span class="inner"></span>
+          </span>
+          DERIVATIVE
+        </span>
+        <span class="checkbox-item" ng-click="curve_type = 'normalized'" ng-class="{checked:curve_type === 'normalized', unchecked: curve_type !== 'normalized'}">
+          <span class="checkbox-icon">
+            <span class="inner"></span>
+          </span>
+          NORMALIZED
+        </span>
+      </span>
+    </div>
+  </div>
+</div>

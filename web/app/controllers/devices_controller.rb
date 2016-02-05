@@ -137,6 +137,7 @@ class DevicesController < ApplicationController
       end
       serialmd5 = Digest::MD5.hexdigest(device_hash["serial_number"])
       system("printf '#{serialmd5}\n#{serialmd5}\n' | passwd")
+      system("sync")
       render json: {response: "Device is programmed successfully"}, status: :ok
     else
       render json: {errors: "Device is already serialized"}, status: 405
