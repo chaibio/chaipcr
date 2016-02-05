@@ -1,5 +1,5 @@
 <div ng-show="deleteMode" class="home-page-del SH">
-  <div class="home-page-bin" ng-click="deleteClickedHandle()">
+  <div ng-class="{'home-page-bin': !running, 'home-page-bin-not': running}" ng-click="deleteClickedHandle()">
     <span ng-show="deleteClicked" class="H2">?</span>
   </div>
   <div class="home-page-del-okay H3" ng-click="tryDeletion()"></div>

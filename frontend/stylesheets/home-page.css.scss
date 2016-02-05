@@ -184,16 +184,16 @@
         top: 0px;
         left: 280px;
         border-bottom: 1px solid #DF217F;
-        cursor: pointer;
         z-index: 100;
 
         .home-page-bin {
           width: 72px;
           height: 100%;
           background-color: #df2227;
+          cursor: pointer;
           color: #df2227;
-          background-position: center;
           background-image: url("/images/trash.svg");
+          background-position: center;
           background-size: 24px 26px;
           background-repeat: no-repeat;
           float: left;
@@ -206,9 +206,30 @@
             user-select: none;
           }
         }
+        .home-page-bin-not {
+          width: 72px;
+          height: 100%;
+          background-color: #df2227;
+          color: #df2227;
+          background-image: url("/images/not-active-trash.png");
+          background-position: center;
+          background-size: 24px 26px;
+          background-repeat: no-repeat;
+          float: left;
+          text-align: center;
+          padding-top: 18px;
+          span {
+            color: white;
+            padding-left: 40px;
+            -webkit-user-select: none;
+            user-select: none;
+          }
+        }
+        
         .home-page-del-okay {
           width: 72px;
           height: 100%;
+          cursor: pointer;
           background-color: #c30506;
           background-position: center;
           background-image: url("/images/ok.svg");
@@ -216,6 +237,14 @@
           background-repeat: no-repeat;
           float: left;
         }
+      }
+
+      .trash-active {
+        background-image: url("/images/trash.svg");
+        cursor: pointer;
+      }
+      .trash-not-active {
+        background-image: url("/images/not-active-trash.png");
       }
 
       @keyframes my_hide {
