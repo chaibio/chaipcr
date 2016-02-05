@@ -211,6 +211,7 @@
           height: 100%;
           background-color: #df2227;
           color: #df2227;
+          cursor: not-allowed;
           background-image: url("/images/not-active-trash.png");
           background-position: center;
           background-size: 24px 26px;
@@ -225,7 +226,7 @@
             user-select: none;
           }
         }
-        
+
         .home-page-del-okay {
           width: 72px;
           height: 100%;
