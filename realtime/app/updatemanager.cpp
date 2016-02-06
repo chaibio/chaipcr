@@ -263,8 +263,6 @@ void UpdateManager::stopDownload()
 
 void UpdateManager::checkUpdateCallback(bool checkHash)
 {
-    stopDownload();
-
     Upgrade upgrade;
     UpdateState state = _updateState;
 
@@ -289,21 +287,31 @@ void UpdateManager::checkUpdateCallback(bool checkHash)
         upgrade.setPassword(ptree.get<std::string>("password"));
         upgrade.setImageUrl(ptree.get<std::string>("image_rsync_url"));
 
-        if (!_dbControl->updateUpgrade(upgrade))
+        bool isCurrent = false;
+        bool downloaded = false;
+
+        _dbControl->updateUpgrade(upgrade, isCurrent, downloaded);
+
+        if (isCurrent)
         {
-            std::string sum;
-
-            if (!checkHash || (Util::getFileChecksum(kUpdateFilePath, _downloadEventFd, sum) && sum == upgrade.checksum()))
+            if (downloaded)
             {
-                if (qpcrApp.settings().configuration.version != upgrade.version())
-                    _updateState.compare_exchange_strong(state, Available);
-                else
-                    _updateState.compare_exchange_strong(state, Unavailable);
+                std::string sum;
 
-                return;
+                if (!checkHash || (Util::getFileChecksum(kUpdateFilePath, _downloadEventFd, sum) && sum == upgrade.checksum()))
+                {
+                    if (qpcrApp.settings().configuration.version != upgrade.version())
+                        _updateState.compare_exchange_strong(state, Available);
+                    else
+                        _updateState.compare_exchange_strong(state, Unavailable);
+
+                    return;
+                }
+                else if (_updateState.compare_exchange_strong(state, Unknown))
+                    state = Unknown;
             }
-            else if (_updateState.compare_exchange_strong(state, Unknown))
-                state = Unknown;
+            else if (state == Downloading)
+                return;
         }
     }
     catch (const std::exception &ex)
@@ -311,14 +319,22 @@ void UpdateManager::checkUpdateCallback(bool checkHash)
         std::cout << "UpdateManager::checkUpdateCallback - " << ex.what() << '\n';
 
         _httpClient->reset();
-        _updateState.compare_exchange_strong(state, Unknown);
+
+        if (state != Downloading)
+            _updateState.compare_exchange_strong(state, Unknown);
 
         return;
     }
 
+    std::lock_guard<std::recursive_mutex> lock(_downloadMutex);
+
+    state = _updateState;
+    if (state == ManualDownloading || state == Updating)
+        return;
+
     if (qpcrApp.settings().configuration.version != upgrade.version())
     {
-        std::lock_guard<std::recursive_mutex> lock(_downloadMutex);
+        stopDownload();
 
         if (_updateState.compare_exchange_strong(state, Downloading))
             _downloadThread = std::thread(static_cast<void(UpdateManager::*)(Upgrade)>(&UpdateManager::downlaod), this, upgrade);
