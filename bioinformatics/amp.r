@@ -27,9 +27,15 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
                                   min_ac_max, 
                                   type, cp, 
                                   show_running_time)
-    return (list('background_subtracted'=amp_calib[['ac_mtx']], # Xiaoqing Rong-Mullins: retrieve unnamed element
-                 'baseline_subtracted'=baseline_calib['bl_corrected'], 'ct'=baseline_calib['ct_eff'] # Xia Hong: retrieve named elements
-                 ))
+    
+    output <- list('background_subtracted'=amp_calib[['ac_mtx']], 
+                   'baseline_subtracted'=baseline_calib[['bl_corrected']], 
+                   'ct'=baseline_calib[['ct_eff']] 
+                   )
+    # temporary
+    output <- lapply(output, function(ele) array(ele, dim=c(1, dim(ele)), dimname=list('1', rownames(ele), colnames(ele)))) # temporary: constructing 3-D array with 1st dimension as channel with one count '1'.
+    
+    return(output)
     }
 
 
@@ -76,7 +82,8 @@ get_amp_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for conne
     calib_out <- optic_calib(fluo_cast[,2:(num_wells+1)], db_conn, calib_id, verbose, show_running_time)
     ac_mtx <- cbind(fluo_cast[, 'cycle_num'], calib_out$fluo_calib)
     colnames(ac_mtx)[1] <- 'cycle_num'
-    amp_calib <- list('ac_mtx'=ac_mtx, 'signal_water_diff'=calib_out$signal_water_diff)
+    amp_calib <- list('ac_mtx'=as.matrix(ac_mtx), # change data frame to matrix for ease of constructing array
+                      'signal_water_diff'=calib_out$signal_water_diff)
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]
