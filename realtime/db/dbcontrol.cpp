@@ -588,16 +588,24 @@ void DBControl::updateSettings(const Settings &settings)
     write(statements);
 }
 
-bool DBControl::updateUpgrade(const Upgrade &upgrade)
+void DBControl::updateUpgrade(const Upgrade &upgrade,  bool &isCurrent, bool &downloaded)
 {
+    isCurrent = false;
+    downloaded = false;
+
     {
-        int downloaded = 0;
+        int tmpDownloaded = 0;
         std::lock_guard<std::mutex> lock(_readMutex);
 
-        *_readSession << "SELECT downloaded FROM upgrades WHERE version = \'" << upgrade.version() << '\'', soci::into(downloaded);
+        *_readSession << "SELECT downloaded FROM upgrades WHERE version = \'" << upgrade.version() << '\'', soci::into(tmpDownloaded);
 
-        if (downloaded)
-            return false;
+        if (_readSession->got_data())
+        {
+            isCurrent = true;
+            downloaded = tmpDownloaded;
+
+            return;
+        }
     }
 
     {
@@ -612,8 +620,6 @@ bool DBControl::updateUpgrade(const Upgrade &upgrade)
 
         write(statements);
     }
-
-    return true;
 }
 
 void DBControl::setUpgradeDownloaded(bool state)
