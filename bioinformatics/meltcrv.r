@@ -123,7 +123,9 @@ mc_tm_all <- function(mc_calib, mc_plot=FALSE, show_running_time=FALSE,
     func_name <- 'mc_tm_all'
     start_time <- proc.time()[['elapsed']]
     
-    mt_ori <- meltcurve(mc_calib, plot=mc_plot) # using qpcR function `meltcurve`
+    mt_ori <- meltcurve(mc_calib, 
+                        span.smooth=0.2, span.peaks=51, 
+                        plot=mc_plot) # using qpcR function `meltcurve`
     mt_out <- lapply(mt_ori, FUN=mc_tm_pw, ...)
     names(mt_out) <- colnames(mc_calib)[seq(2, dim(mc_calib)[2], by=2)]
     
