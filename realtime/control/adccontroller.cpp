@@ -7,6 +7,7 @@
 #include "adccontroller.h"
 #include "qpcrapplication.h"
 #include "experimentcontroller.h"
+#include "logger.h"
 
 using namespace std;
 
@@ -34,6 +35,8 @@ ADCController::~ADCController() {
 }
 
 void ADCController::process() {
+    Poco::LogStream logStream(Logger::get());
+
     setMaxRealtimePriority();
 
     _ltc2444->readSingleEndedChannel(0, kThermistorOversamplingRate); //start first read
@@ -65,7 +68,7 @@ void ADCController::process() {
                     loopStarted();
                 }
                 catch (const TemperatureLimitError &ex) {
-                    std::cout << "ADCController::process - loop start exception: " << ex.what() << '\n';
+                    logStream << "ADCController::process - loop start exception: " << ex.what() << std::endl;
 
                     qpcrApp.stopExperiment(ex.what());
                 }
@@ -85,7 +88,7 @@ void ADCController::process() {
                     repeatFrequencyLastTime = boost::chrono::high_resolution_clock::now();
                 }
                 //else
-                //    std::cout << "ADCController::process - ADC measurements could not be completed in scheduled time\n";
+                //    logStream << "ADCController::process - ADC measurements could not be completed in scheduled time" << std::endl;
             }
 
             //schedule conversion for next state, retrieve previous conversion value
@@ -115,7 +118,7 @@ void ADCController::process() {
                     _consumers[_currentConversionState]->setADCValue(value, _currentChannel);
             }
             catch (const TemperatureLimitError &ex) {
-                std::cout << "ADCController::process - consumer exception: " << ex.what() << '\n';
+                logStream << "ADCController::process - consumer exception: " << ex.what() << std::endl;
 
                 qpcrApp.stopExperiment(ex.what());
             }

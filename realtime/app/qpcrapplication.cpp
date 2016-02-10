@@ -19,6 +19,7 @@
 #include "timechecker.h"
 #include "settings.h"
 #include "updatemanager.h"
+#include "logger.h"
 
 using namespace std;
 using namespace Poco::Net;
@@ -48,10 +49,36 @@ int QPCRApplication::getUserId(const std::string &token) const
     return _dbControl->getUserId(token);
 }
 
+void QPCRApplication::defineOptions(OptionSet &options)
+{
+    options.addOption(Option("enable_log_file", "flog", "enables log files", false, "path", true));
+
+    ServerApplication::defineOptions(options);
+}
+
+void QPCRApplication::handleOption(const string &name, const string &value)
+{
+    ServerApplication::handleOption(name, value);
+
+    if (name == "enable_log_file")
+    {
+        Logger::setup(kAppLogName, value);
+
+        setLogger(Logger::get());
+    }
+}
+
 void QPCRApplication::initialize(Application&) {
     _workState = false;
 
     try {
+        if (!Logger::isSetup())
+        {
+            Logger::setup(kAppLogName);
+
+            setLogger(Logger::get());
+        }
+
         readDeviceFile();
         readConfigurationFile();
 
@@ -87,6 +114,7 @@ int QPCRApplication::main(const vector<string>&) {
     HTTPServerParams *params = new HTTPServerParams;
     QPCRServerSocket socket(kHttpServerPort);
     HTTPServer server(new QPCRRequestHandlerFactory, socket, params);
+    Poco::LogStream logStream(Logger::get());
 
     try
     {
@@ -119,7 +147,7 @@ int QPCRApplication::main(const vector<string>&) {
     }
     catch (const exception &ex)
     {
-        cout << "Exception occured: " << ex.what() << '\n';
+        logStream << "Exception occured: " << ex.what() << std::endl;
 
         params->setKeepAlive(false);
         server.stopAll(true);
@@ -133,7 +161,7 @@ int QPCRApplication::main(const vector<string>&) {
     }
     catch (...)
     {
-        cout << "Unknown exception occured\n";
+        logStream << "Unknown exception occured" << std::endl;
 
         params->setKeepAlive(false);
         server.stopAll(true);
@@ -149,6 +177,8 @@ int QPCRApplication::main(const vector<string>&) {
 
 void QPCRApplication::readDeviceFile()
 {
+    Poco::Logger &logger = Poco::Logger::get(kAppLogName);
+    Poco::LogStream stream(logger);
     std::ifstream deviceFile(kDeviceFilePath);
 
     if (deviceFile.is_open())
@@ -164,11 +194,13 @@ void QPCRApplication::readDeviceFile()
             _settings.device.opticsChannels = 1;
     }
     else
-        std::cout << "QPCRApplication::readDeviceFile - unable to read device file: " << std::strerror(errno) << '\n';
+        stream << "QPCRApplication::readDeviceFile - unable to read device file: " << std::strerror(errno) << std::endl;
 }
 
 void QPCRApplication::readConfigurationFile()
 {
+    Poco::Logger &logger = Poco::Logger::get(kAppLogName);
+    Poco::LogStream stream(logger);
     std::ifstream deviceFile(kConfigurationFilePath);
 
     if (deviceFile.is_open())
@@ -179,7 +211,7 @@ void QPCRApplication::readConfigurationFile()
         _settings.configuration.version = ptree.get<std::string>("software.version");
     }
     else
-        std::cout << "QPCRApplication::readConfigurationFile - unable to read configuration file: " << std::strerror(errno) << '\n';
+        stream << "QPCRApplication::readConfigurationFile - unable to read configuration file: " << std::strerror(errno) << std::endl;
 }
 
 void QPCRApplication::initSignals() {

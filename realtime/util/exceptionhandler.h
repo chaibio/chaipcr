@@ -1,6 +1,8 @@
 #ifndef EXCEPTIONHANDLER_H
 #define EXCEPTIONHANDLER_H
 
+#include "logger.h"
+
 #include <cstdio>
 #include <cstring>
 #include <dlfcn.h>
@@ -23,10 +25,12 @@ void __cxa_throw(void *exception, void *info, void (*destination)(void *)) {
 
     if (!strstr(buffer[1], "libPocoNet.so")) //To ignore annoying internal Poco exceptions
     {
-        printf("Catched an exception (%s). Backtrace:\n", reinterpret_cast<std::exception*>(exception)->what());
+        Poco::LogStream logStream(Logger::get());
+
+        logStream << "Catched an exception (" << reinterpret_cast<std::exception*>(exception)->what() << "). Backtrace:" << std::endl;
 
         for (int i = 0; i < size; ++i)
-            printf("%s\n", buffer[i]);
+            logStream << buffer[i] << std::endl;
     }
 
     free(buffer);

@@ -2,6 +2,7 @@
 #include "sociincludes.h"
 #include "qpcrapplication.h"
 #include "experimentcontroller.h"
+#include "logger.h"
 
 #include <Poco/Timer.h>
 
@@ -140,7 +141,7 @@ bool DBControl::getExperimentDefination(Experiment &experiment)
 
         if (!gotData || result.get_indicator("id") == soci::i_null)
         {
-            std::cout << "DBControl::getExperimentDefination - unable to find experiment with definationId " << experiment.definationId() << '\n';
+            Poco::LogStream(Logger::get()) << "DBControl::getExperimentDefination - unable to find experiment with definationId " << experiment.definationId() << std::endl;
 
             experiment.setDefinationId(-1);
 

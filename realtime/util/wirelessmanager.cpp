@@ -2,6 +2,7 @@
 #include "networkinterfaces.h"
 #include "constants.h"
 #include "util.h"
+#include "logger.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -85,7 +86,7 @@ std::string WirelessManager::getCurrentSsid() const
         iw_sockets_close(iwSocket);
     }
     else
-        std::cout << "WirelessManager::getCurrentSsid - unable to open socket: " << std::strerror(errno) << '\n';
+        APP_LOGGER << "WirelessManager::getCurrentSsid - unable to open socket: " << std::strerror(errno) << std::endl;
 
     return ssid;
 }
@@ -145,7 +146,7 @@ void WirelessManager::_connect()
     }
     catch (const std::exception &ex)
     {
-        std::cout << "WirelessManager::_connect - exception occured:" << ex.what() << '\n';
+        APP_LOGGER << "WirelessManager::_connect - exception occured:" << ex.what() << std::endl;
 
         _connectionStatus = ConnectionError;
     }
@@ -153,10 +154,12 @@ void WirelessManager::_connect()
 
 void WirelessManager::ifup()
 {
+    Poco::LogStream logStream(Logger::get());
+
     std::stringstream stream;
     stream << "ifup " << _interfaceName;
 
-    if (Util::watchProcess(stream.str(), _connectionEventFd, [](const char buffer[]){ std::cout << "WirelessManager::ifup - ifup:" << buffer << '\n'; }))
+    if (Util::watchProcess(stream.str(), _connectionEventFd, [&logStream](const char buffer[]){ logStream << "WirelessManager::ifup - ifup:" << buffer << std::endl; }))
     {
         NetworkInterfaces::InterfaceState state = NetworkInterfaces::getInterfaceState(_interfaceName);
 
@@ -205,7 +208,7 @@ void WirelessManager::checkInterfaceStatus()
             else if (showRangeError)
             {
                 showRangeError = false;
-                std::cout << "WirelessManager::checkInterfaceStatus - unable to get interface range info: " << std::strerror(errno) << '\n';
+                APP_LOGGER << "WirelessManager::checkInterfaceStatus - unable to get interface range info: " << std::strerror(errno) << std::endl;
             }
 
             sleep(1);
@@ -214,7 +217,7 @@ void WirelessManager::checkInterfaceStatus()
         iw_sockets_close(iwSocket);
     }
     else
-        std::cout << "WirelessManager::checkInterfaceStatus - unable to open iw socket: " << std::strerror(errno) << '\n';
+        APP_LOGGER << "WirelessManager::checkInterfaceStatus - unable to open iw socket: " << std::strerror(errno) << std::endl;
 
     _interfaceStatusThreadStatus = Idle;
 }
@@ -264,5 +267,5 @@ void WirelessManager::scan(int iwSocket, const iw_range &range)
         }
     }
     else
-        std::cout << "WirelessManager::scan - unable to scan interface: " << std::strerror(errno) << '\n';
+        APP_LOGGER << "WirelessManager::scan - unable to scan interface: " << std::strerror(errno) << std::endl;
 }

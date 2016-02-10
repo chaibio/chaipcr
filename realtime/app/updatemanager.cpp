@@ -4,6 +4,7 @@
 #include "upgrade.h"
 #include "qpcrapplication.h"
 #include "util.h"
+#include "logger.h"
 
 #include <iostream>
 #include <fstream>
@@ -104,6 +105,7 @@ bool UpdateManager::checkUpdate()
 
 bool UpdateManager::update()
 {
+    Poco::LogStream logStream(Logger::get());
     UpdateState state = Available;
 
     if (_updateState.compare_exchange_strong(state, Updating))
@@ -115,7 +117,7 @@ bool UpdateManager::update()
                 dir.remove(true);
 
             if (!Util::watchProcess("tar xf " + kUpdateFilePath + " --directory " + kUpdateFolder + " scripts", _downloadEventFd,
-                                    [](const char buffer[]){ std::cout << "UpdateManager::update - tar: " << buffer << '\n'; }))
+                                    [&logStream](const char buffer[]){ logStream << "UpdateManager::update - tar: " << buffer << std::endl; }))
                 return false; //This will happen only if the app is getting closed
         }
         catch (...)
@@ -131,7 +133,7 @@ bool UpdateManager::update()
             if (file.exists())
                 file.remove();
 
-            Util::watchProcess(kUpdateScriptPath + ' ' + kUpdateScriptOutputPath, [](const char buffer[]) { std::cout << "UpdateManager::update - perform_upgrade: " << buffer << '\n'; });
+            Util::watchProcess(kUpdateScriptPath + ' ' + kUpdateScriptOutputPath, [&](const char buffer[]) { logStream << "UpdateManager::update - perform_upgrade: " << buffer << std::endl; });
         }
         catch (...)
         {
@@ -204,7 +206,7 @@ void UpdateManager::upload(std::istream &dataStream)
                 }
                 else
                 {
-                    std::cout << "UpdateManager::upload - unable to open file " << kUpdateFilePath << ": " << std::strerror(errno) << '\n';
+                    APP_LOGGER << "UpdateManager::upload - unable to open file " << kUpdateFilePath << ": " << std::strerror(errno) << std::endl;
 
                     _updateState = Unknown;
                 }
@@ -216,7 +218,7 @@ void UpdateManager::upload(std::istream &dataStream)
         }
         catch (const std::exception &ex)
         {
-            std::cout << "UpdateManager::upload - exception: " << ex.what() << '\n';
+            APP_LOGGER << "UpdateManager::upload - exception: " << ex.what() << std::endl;
 
             _updateState = Unknown;
         }
@@ -316,7 +318,7 @@ void UpdateManager::checkUpdateCallback(bool checkHash)
     }
     catch (const std::exception &ex)
     {
-        std::cout << "UpdateManager::checkUpdateCallback - " << ex.what() << '\n';
+        APP_LOGGER << "UpdateManager::checkUpdateCallback - " << ex.what() << std::endl;
 
         _httpClient->reset();
 
@@ -361,7 +363,7 @@ void UpdateManager::downlaod(Upgrade upgrade)
     }
     catch (const std::exception &ex)
     {
-        std::cout << "UpdateManager::downlaod - " << ex.what() << '\n';
+        APP_LOGGER << "UpdateManager::downlaod - " << ex.what() << std::endl;
 
         _updateState = Unknown;
     }
@@ -369,10 +371,12 @@ void UpdateManager::downlaod(Upgrade upgrade)
 
 bool UpdateManager::downlaod(const std::string &imageUrl, const std::string &apiPassword)
 {
+    Poco::LogStream logStream(Logger::get());
+
     std::stringstream stream;
     stream << "sshpass -p \'" << apiPassword << "\' rsync -a --checksum --no-whole-file --inplace " << imageUrl << " " << kUpdateFilePath;
 
-    return Util::watchProcess(stream.str(), _downloadEventFd, [](const char buffer[]){ std::cout << "UpdateManager::downlaod - rsync: " << buffer << '\n'; });
+    return Util::watchProcess(stream.str(), _downloadEventFd, [&logStream](const char buffer[]){ logStream << "UpdateManager::downlaod - rsync: " << buffer << std::endl; });
 }
 
 bool UpdateManager::checkMountPoint()
@@ -387,5 +391,7 @@ bool UpdateManager::checkMountPoint()
 
 bool UpdateManager::checkSdcard()
 {
-    return Util::watchProcess(kCheckSdcardPath, _downloadEventFd, [](const char buffer[]){ std::cout << "UpdateManager::checkSdcard - check_sdcard: " << buffer << '\n'; });
+    Poco::LogStream logStream(Logger::get());
+
+    return Util::watchProcess(kCheckSdcardPath, _downloadEventFd, [&logStream](const char buffer[]){ logStream << "UpdateManager::checkSdcard - check_sdcard: " << buffer << std::endl; });
 }

@@ -1,4 +1,5 @@
 #include "timechecker.h"
+#include "logger.h"
 
 #include <iostream>
 #include <fstream>
@@ -58,7 +59,7 @@ void TimeChecker::timeCheckCallback(Poco::Timer &/*timer*/)
             }
         }
         else
-            std::cout << "TimeChecker::timeCheckCallback - unable to create pipe: " << std::strerror(errno) << '\n';
+            APP_LOGGER << "TimeChecker::timeCheckCallback - unable to create pipe: " << std::strerror(errno) << std::endl;
     }
     else
         saveCurrentTime();
@@ -73,7 +74,7 @@ void TimeChecker::saveCurrentTime()
     if (file.is_open())
         file << boost::chrono::duration_cast<boost::chrono::seconds>(boost::chrono::system_clock::now().time_since_epoch()).count();
     else
-        std::cout << "TimeChecker::saveCurrentTime - unable to open file: " << std::strerror(errno) << '\n';
+        APP_LOGGER << "TimeChecker::saveCurrentTime - unable to open file: " << std::strerror(errno) << std::endl;
 }
 
 boost::chrono::seconds TimeChecker::getSavedTime() const
@@ -84,7 +85,7 @@ boost::chrono::seconds TimeChecker::getSavedTime() const
     if (file.is_open())
         file >> count;
     else
-        std::cout << "TimeChecker::getSavedTime - unable to open file: " << std::strerror(errno) << '\n';
+        APP_LOGGER << "TimeChecker::getSavedTime - unable to open file: " << std::strerror(errno) << std::endl;
 
     return boost::chrono::seconds(count);
 }

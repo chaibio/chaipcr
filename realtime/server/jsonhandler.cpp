@@ -1,4 +1,5 @@
 #include "jsonhandler.h"
+#include "logger.h"
 
 #include <iostream>
 
@@ -34,7 +35,7 @@ void JsonHandler::processRequest(Poco::Net::HTTPServerRequest &request)
     }
     catch (const std::exception &ex)
     {
-        std::cout << "JsonHandler::processRequest - error: " << ex.what() << '\n';
+        APP_LOGGER << "JsonHandler::processRequest - error: " << ex.what() << std::endl;
 
         _responsePt.clear();
 
@@ -44,7 +45,7 @@ void JsonHandler::processRequest(Poco::Net::HTTPServerRequest &request)
     }
     catch (...)
     {
-        std::cout << "JsonHandler::processRequest - unknown error\n";
+        APP_LOGGER << "JsonHandler::processRequest - unknown error" << std::endl;
 
         _responsePt.clear();
 

@@ -107,6 +107,8 @@ const double kHeatSinkPIDMax = 0;
 const unsigned int kBeagleboneADCBits = 12;
 
 //App
+const std::string kAppLogName = "QPCRApplication";
+
 const std::string kDeviceFilePath = "/perm/device.json";
 const std::string kConfigurationFilePath = "/root/configuration.json";
 
