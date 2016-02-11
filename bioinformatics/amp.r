@@ -277,8 +277,11 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
                       exp_id, stage_id, calib_id)
     
     fluorescence_data <- dbGetQuery(db_conn, 'SELECT * from fluorescence_data')
+    
     channels <- unique(fluorescence_data[,'channel'])
     names(channels) <- channels
+    
+    if (length(channels) == 1) dcv <- FALSE
     
     amp_calib_mtch <- process_mtch(channels, get_amp_calib, 
                                    db_conn, 
@@ -287,7 +290,9 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
                                    show_running_time)
     
     amp_calib_mtch_bych <- amp_calib_mtch[['pre_consoli']]
+    
     amp_calib_array <- amp_calib_mtch[['post_consoli']][['ac_mtx']]
+    
     bg_sub <- amp_calib_array
     
     if (dcv) {
