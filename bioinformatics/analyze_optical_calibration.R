@@ -3,22 +3,9 @@
 
 library(jsonlite)
 
-analyze_optical_calibration <- function(
-    db_usr, db_pwd, db_host, db_port, db_name, 
-    exp_id, 
-    calib_id=NULL, # not used
-    verbose=FALSE, 
-    out_json=TRUE) 
-{
-    message('db: ', db_name)
-    db_conn <- dbConnect(RMySQL::MySQL(), 
-                         user=db_usr, 
-                         password=db_pwd, 
-                         host=db_host, 
-                         port=db_port, 
-                         dbname=db_name)
+check_optic_calib <- function(channel, db_conn, exp_id, verbose) {
     
-    result1 <- tryCatch(prep_optic_calib(db_conn, exp_id, verbose), error=function(e) e)
+    result1 <- tryCatch(prep_optic_calib(db_conn, exp_id, channel, verbose), error=function(e) e)
     
     if ('error' %in% class(result1)) {
         valid <- FALSE
@@ -30,11 +17,30 @@ analyze_optical_calibration <- function(
         err_msg <- NULL
         err_details <- NULL }
     
-    result2 <- list('valid'=unbox(valid), 'error_message'=unbox(err_msg), 'error_details'=unbox(err_details)) # `unbox` so atomic elements not returned as array in JSON
-    
-    if (out_json) result2 <- toJSON(result2)
+    result2 <- list('valid'=valid, 'error_message'=err_msg, 'error_details'=err_details)
     
     return(result2)
     #return(toJSON(result2))
+    }
+
+
+analyze_optical_calibration <- function(
+    db_usr, db_pwd, db_host, db_port, db_name, 
+    exp_id, 
+    calib_id=NULL, # not used
+    channels=c(1,2), 
+    verbose=FALSE, 
+    out_json=TRUE) 
+{
+    db_conn <- db_etc(db_usr, db_pwd, db_host, db_port, db_name, 
+                      exp_id, stage_id=NULL, calib_id)
+    
+    names(channels) <- channels
+    
+    result <- process_mtch(channels, check_optic_calib, db_conn, exp_id, verbose)
+    
+    if (out_json) result <- toJSON(result)
+    
+    return(result[['post_consoli']])
 }
 
