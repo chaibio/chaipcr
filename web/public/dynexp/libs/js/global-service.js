@@ -6,6 +6,7 @@
 
       var self = this;
       var holding = false;
+      var max_delta_tm_cache = null;
 
       self.baseUrl = "http://" + window.location.hostname;
 

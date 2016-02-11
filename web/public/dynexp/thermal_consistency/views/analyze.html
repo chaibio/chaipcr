@@ -1,7 +1,7 @@
 <div class="intro" ng-init="analyzeExperiment()">
   <h2> Thermal Consistency Test Results</h2>
 
-  <h4 class="text-center" ng-show="!experiment.completion_status && analyzing"><b>Analyzing Results...</b></h4>
+  <h4 class="text-center" ng-show="!experiment.completion_status && analyzing && !!tm_values"><b>Analyzing Results...</b></h4>
 
   <div ng-show="experiment.completion_status !== 'success' && !analyzing">
     <div class="alert alert-danger">
@@ -9,9 +9,9 @@
     </div>
   </div>
 
-  <div class="row" ng-show="experiment.completion_status === 'success' && !analyzing">
+  <div class="row" ng-show="experiment.completion_status === 'success' && !analyzing && !!tm_values">
     <div class="col-md-6">
-      <table class="table table-bordered" ng-show="tm_values">
+      <table class="table table-bordered">
         <thead>
           <tr>
             <th>Well</th>
@@ -34,7 +34,7 @@
       </table>
     </div>
     <div class="col-md-6">
-      <table class="table table-bordered" ng-show="tm_values">
+      <table class="table table-bordered">
         <thead>
           <tr>
             <th>Well</th>
@@ -57,6 +57,8 @@
       </table>
     </div>
   </div>
+
+  <div class="text-center text-red" ng-show="error">{{error}}</div>
 
   <h3 class="text-center" ng-show="tm_values" ng-class="{'text-success': maxDeltaTm() < CONSTANTS.MAX_DELTA_TM_VAL, 'text-danger': maxDeltaTm() >= CONSTANTS.MAX_DELTA_TM_VAL || !isFinite(maxDeltaTm())}">
     Max ΔTm: {{maxDeltaTm() | round:2}} &deg;C

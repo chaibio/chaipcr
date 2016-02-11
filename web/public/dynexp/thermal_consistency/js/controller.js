@@ -109,10 +109,14 @@
         if (!$scope.analyzedExp) {
           getExperiment($stateParams.id, function (exp) {
             if (exp.completion_status === 'success') {
-              Experiment.analyze($stateParams.id).then(function (resp) {
+              Experiment.analyze($stateParams.id)
+              .then(function (resp) {
                 $scope.analyzedExp = resp.data;
                 $scope.tm_values = GlobalService.getTmValues($scope.analyzedExp);
                 $scope.analyzing = false;
+              })
+              .catch(function () {
+                $scope.error = "An error occured while trying to analyze the experiment results.";
               });
             }
             else {
