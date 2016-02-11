@@ -2,7 +2,6 @@
 
   <!-- loading -->
   <div class="header-status" ng-if="loading">
-  <!-- <div class="header-status" ng-if="true"> -->
     <div class="row">
       <div class="col-md-1 menu" ng-transclude>
       </div>
@@ -12,8 +11,6 @@
     </div>
   </div>
 
-
-  <!-- <div ng-if="false" class="header-status" ng-class="{'in-progress': state && state !== 'idle' && isCurrentExp, 'complete': experiment && experiment.completed_at}" ng-style="backgroundStyle"> -->
   <div ng-if="!loading" class="header-status" ng-class="{'in-progress': state && state !== 'idle' && isCurrentExp, 'complete': experiment && (experiment.completed_at || (experiment.started_at && state==='idle') )}" ng-style="backgroundStyle">
 
     <!-- begin is valid -->
