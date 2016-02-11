@@ -70,5 +70,41 @@
 
   }
 
+  .ampli-zoom-scroll-container {
+    margin-top: 50px;
+    padding-left: 50px;
+    padding-right: 50px;
+
+    .zoom-container {
+
+      .zoom-text {
+        display: inline-block;
+        width: 20%;
+        vertical-align: middle;
+      }
+      .ampli-slider {
+        display: inline-block;
+        width: 80%;
+        vertical-align: middle;
+      }
+    }
+
+    .ampli-scrollbar-container {
+      .scrollbar-container {
+        height: 5px;
+        border-radius: 10px;
+        margin-top: -2px;
+        position: relative;
+        top: 11.5px;
+        background: #ccc;
+
+        .scrollbar {
+          border-radius: 10px;
+        }
+      }
+    }
+
+  }
+
 
 }

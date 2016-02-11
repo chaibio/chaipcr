@@ -1,24 +1,41 @@
 <div class="content melt-curve" ng-controller="MeltCurveCtrl">
+  <div class="curve-header">
+    <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()">
+      Melt Curve
+      <img class="arrow-down" src="/images/arrow-down.png">
+    </span>
+    <span class="log-checkboxes SH">
+      <span class="checkbox-item" ng-click="curve_type = 'derivative'" ng-class="{checked:curve_type === 'derivative', unchecked: curve_type !== 'derivative'}">
+        <span class="checkbox-icon">
+          <span class="inner"></span>
+        </span>
+        DERIVATIVE
+      </span>
+      <span class="checkbox-item" ng-click="curve_type = 'normalized'" ng-class="{checked:curve_type === 'normalized', unchecked: curve_type !== 'normalized'}">
+        <span class="checkbox-icon">
+          <span class="inner"></span>
+        </span>
+        NORMALIZED
+      </span>
+    </span>
+  </div>
   <div class="chart-section">
-    <div class="curve-header">
-      <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()">
-        Melt Curve
-        <img class="arrow-down" src="/images/arrow-down.png">
-      </span>
-      <span class="log-checkboxes SH">
-        <span class="checkbox-item" ng-click="curve_type = 'derivative'" ng-class="{checked:curve_type === 'derivative', unchecked: curve_type !== 'derivative'}">
-          <span class="checkbox-icon">
-            <span class="inner"></span>
-          </span>
-          DERIVATIVE
-        </span>
-        <span class="checkbox-item" ng-click="curve_type = 'normalized'" ng-class="{checked:curve_type === 'normalized', unchecked: curve_type !== 'normalized'}">
-          <span class="checkbox-icon">
-            <span class="inner"></span>
-          </span>
-          NORMALIZED
-        </span>
-      </span>
+    <div style="width: 100%; height: 500px; background: gray;"></div>
+
+    <div class="ampli-zoom-scroll-container">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="zoom-container">
+            <div class="zoom-text SH">
+              <b>ZOOM</b>
+            </div>
+            <ampli-slider ng-model="ampli_zoom" range="maxCycle"></ampli-slider>
+          </div>
+        </div>
+        <div class="col-md-6 ampli-scrollbar-container">
+          <scrollbar ng-model="ampli_scroll" id="ampli-scrollbar"></scrollbar>
+        </div>
+      </div>
     </div>
   </div>
 </div>
