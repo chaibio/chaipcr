@@ -1,49 +1,12 @@
 # amp
 
-# function by Xia Hong
-get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
-                                   exp_id, stage_id, calib_id, # for selecting data to analyze
-                                   verbose=FALSE, 
-                                   show_running_time=FALSE # option to show time cost to run this function
-                                   ) {
-    # baseline_ct
-    model <- l4
-    baselin <- 'parm'
-    basecyc <- 3:6 # 1:5 gave poor baseline subtraction results for non-sigmoid shaped data when using 'lin'
-    fallback <- 'lin'
-    maxiter <- 500
-    maxfev <- 10000
-    min_ac_max <- 0
-    type <- 'curve'
-    cp <- 'cpD2'
-    
-    # use functions
-    amp_calib <- get_amp_calib(db_usr, db_pwd, db_host, db_port, db_name, 
-                               exp_id, stage_id, calib_id, 
-                               verbose, 
-                               show_running_time)
-    baseline_calib <- baseline_ct(amp_calib, model, baselin, basecyc, fallback, 
-                                  maxiter, maxfev, 
-                                  min_ac_max, 
-                                  type, cp, 
-                                  show_running_time)
-    
-    output <- list('background_subtracted'=amp_calib[['ac_mtx']], 
-                   'baseline_subtracted'=baseline_calib[['bl_corrected']], 
-                   'ct'=baseline_calib[['ct_eff']] 
-                   )
-    # temporary
-    output <- lapply(output, function(ele) array(ele, dim=c(1, dim(ele)), dimname=list('1', rownames(ele), colnames(ele)))) # temporary: constructing 3-D array with 1st dimension as channel with one count '1'.
-    
-    return(output)
-    }
 
-
-# function: get amplification data from MySQL database and perform water calibration 
-get_amp_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
+# function: get amplification data from MySQL database; perform water calibration.
+get_amp_calib <- function(channel, # as 1st argument for iteration by channel
+                          db_conn, 
                           exp_id, stage_id, calib_id, # for selecting data to analyze
-                          verbose=FALSE, 
-                          show_running_time=FALSE # option to show time cost to run this function
+                          verbose, 
+                          show_running_time # option to show time cost to run this function
                           ) {
     
     # start counting for running time
@@ -51,26 +14,15 @@ get_amp_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for conne
     start_time <- proc.time()[['elapsed']]
     
     message('get_amp_calib') # Xia Hong
-    message('db: ', db_name)
-    db_conn <- dbConnect(RMySQL::MySQL(), 
-                         user=db_usr, 
-                         password=db_pwd, 
-                         host=db_host, 
-                         port=db_port, 
-                         dbname=db_name)
-    
-    message('experiment_id: ', exp_id)
-    message('stage_id: ', stage_id)
-    message('calibration_id: ', calib_id)
     
     # get fluorescence data for amplification
-    fluo_qry <- sprintf('SELECT step_id, fluorescence_value, well_num, cycle_num, ramp_id 
+    fluo_qry <- sprintf('SELECT step_id, fluorescence_value, well_num, cycle_num, ramp_id, channel 
                             FROM fluorescence_data 
                             LEFT JOIN ramps ON fluorescence_data.ramp_id = ramps.id
                             INNER JOIN steps ON fluorescence_data.step_id = steps.id OR steps.id = ramps.next_step_id 
-                            WHERE fluorescence_data.experiment_id=%d AND steps.stage_id=%d 
+                            WHERE fluorescence_data.experiment_id=%d AND steps.stage_id=%d AND fluorescence_data.channel=%d 
                             ORDER BY well_num, cycle_num',
-                            exp_id, stage_id)
+                            exp_id, stage_id, as.numeric(channel))
     fluo_sel <- dbGetQuery(db_conn, fluo_qry)
     
     # cast fluo_sel into a pivot table organized by cycle_num (row label) and well_num (column label), average the data from all the available steps/ramps for each well and cycle
@@ -78,12 +30,12 @@ get_amp_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for conne
                      measure.vars='fluorescence_value')
     fluo_cast <- dcast(fluo_mlt, cycle_num ~ well_num, mean)
     
-    # get calibration data
-    calib_out <- optic_calib(fluo_cast[,2:(num_wells+1)], db_conn, calib_id, verbose, show_running_time)
-    ac_mtx <- cbind(fluo_cast[, 'cycle_num'], calib_out$fluo_calib)
+    # get optical-calibrated data.
+    calibd <- optic_calib(fluo_cast[,2:(num_wells+1)], db_conn, calib_id, channel, verbose, show_running_time)$fluo_calib
+    ac_mtx <- cbind(fluo_cast[, 'cycle_num'], calibd)
     colnames(ac_mtx)[1] <- 'cycle_num'
     amp_calib <- list('ac_mtx'=as.matrix(ac_mtx), # change data frame to matrix for ease of constructing array
-                      'signal_water_diff'=calib_out$signal_water_diff)
+                      'signal_water_diff'=calibd$signal_water_diff)
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]
@@ -117,7 +69,11 @@ get_ct_eff <- function(ac_mtx,
     ac_maxs <- unlist(alply(ac_mtx, .margins=2, max))[2:ncol(ac_mtx)] / scaling_factor
     # ac_calib_ratios <- unlist(alply(ac_mtx, .margins=2, max))[2:ncol(ac_mtx)] / signal_water_diff
     
+    well_names <- colnames(ac_mtx)[2:ncol(ac_mtx)]
+    
     ct_eff_raw <- getPar(mod_ori, type=type, cp=cp)
+    tagged_colnames <- colnames(ct_eff_raw)
+    colnames(ct_eff_raw) <- well_names
     
     finIters <- list()
     adj_reasons <- list()
@@ -158,19 +114,20 @@ get_ct_eff <- function(ac_mtx,
         
         }
     
-    names(ac_maxs) <- colnames(ct_eff_raw)
+    names(ac_maxs) <- well_names
     
     finIters <- unlist(finIters)
-    names(finIters) <- colnames(ct_eff_raw)
+    names(finIters) <- well_names
     
-    names(adj_reasons) <- colnames(ct_eff_raw)
+    names(adj_reasons) <- well_names
     
     rownames(ct_eff_adj) <- rownames(ct_eff_raw)
-    colnames(ct_eff_adj) <- colnames(ct_eff_raw)
+    colnames(ct_eff_adj) <- well_names
     
-    return(list(
+    return(list('adj'=ct_eff_adj, 
                 'ac_maxs'=ac_maxs, 'raw'=ct_eff_raw, 'finIters'=finIters, 'reasons'=adj_reasons, # for debugging
-                'adj'=ct_eff_adj))
+                'tagged_colnames'=tagged_colnames
+                ))
     }
 
 
@@ -182,7 +139,7 @@ baseline_ct <- function(amp_calib,
                         maxiter, maxfev, # control parameters for `nlsLM` in `pcrfit`. !!!! Note: `maxiter` sometimes affect finIter in a weird way: e.g. for the same well, finIter == 17 when maxiter == 200, finIter == 30 when maxiter == 30, finIter == 100 when maxiter == 100
                         min_ac_max, # get_ct_eff parameter to control Ct reporting
                         type, cp, # getPar parameters
-                        show_running_time=FALSE # option to show time cost to run this function
+                        show_running_time # option to show time cost to run this function
                         ) {
     
     ac_mtx <- amp_calib$ac_mtx
@@ -252,8 +209,118 @@ baseline_ct <- function(amp_calib,
                 # 'bl_info'=bl_info, # removed for performance
                 'fluoa'=fluoa, 'bl_coefs'=blmods_cm, 'fluo_blmods'=fluo_blmods, 
                 'bl_corrected'=bl_corrected, 'coefficients'=mod_ori_cm, 
-                'ac_maxs'=ct_eff[['ac_maxs']], 'finIters'=ct_eff[['finIters']], 'adj_reasons'=ct_eff[['reasons']], 'ct_eff_raw'=ct_eff[['raw']], # outputs from `get_ct_eff` for debugging
+                'ac_maxs'=ct_eff[['ac_maxs']], 'finIters'=ct_eff[['finIters']], 'adj_reasons'=ct_eff[['reasons']], 'ct_eff_raw'=ct_eff[['raw']], 'ct_eff_tagged_colnames'=ct_eff[['tagged_colnames']], # outputs from `get_ct_eff` for debugging
                 'ct_eff'=ct_eff[['adj']] ))
+    }
+
+
+# function: process amplification data for one channel
+amp_1ch <- function(channel, 
+                    db_conn, 
+                    exp_id, stage_id, calib_id, 
+                    verbose, show_running_time 
+                    ) {
+    
+    # baseline_ct
+    model <- l4
+    baselin <- 'parm'
+    basecyc <- 3:6 # 1:5 gave poor baseline subtraction results for non-sigmoid shaped data when using 'lin'
+    fallback <- 'lin'
+    maxiter <- 500
+    maxfev <- 10000
+    min_ac_max <- 0
+    type <- 'curve'
+    cp <- 'cpD2'
+    
+    amp_calib <- get_amp_calib(db_conn, 
+                               exp_id, stage_id, calib_id, channel, 
+                               verbose, 
+                               show_running_time)
+    #print(amp_calib[['ac_mtx']])
+    fc_ct <- baseline_ct(amp_calib, model, baselin, basecyc, fallback, 
+                         maxiter, maxfev, 
+                         min_ac_max, 
+                         type, cp, 
+                         show_running_time)
+    
+    downstream <- list('background_subtracted'=amp_calib[['ac_mtx']], 
+                       'baseline_subtracted'=fc_ct[['bl_corrected']], 
+                       'ct'=fc_ct[['ct_eff']] 
+                       )
+    
+    result <- c(downstream, fc_ct)
+    
+    return(result)
+    }
+
+
+# top level function called by external codes
+get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
+                                   exp_id, stage_id, calib_id, # for selecting data to analyze
+                                   dcv=TRUE, # logical, whether to perform multi-channel deconvolution
+                                   verbose=FALSE, 
+                                   show_running_time=FALSE # option to show time cost to run this function
+                                   ) {
+    
+    # baseline_ct
+    model <- l4
+    baselin <- 'parm'
+    basecyc <- 3:6 # 1:5 gave poor baseline subtraction results for non-sigmoid shaped data when using 'lin'
+    fallback <- 'lin'
+    maxiter <- 500
+    maxfev <- 10000
+    min_ac_max <- 0
+    type <- 'curve'
+    cp <- 'cpD2'
+    
+    db_conn <- db_etc(db_usr, db_pwd, db_host, db_port, db_name, 
+                      exp_id, stage_id, calib_id)
+    
+    fluorescence_data <- dbGetQuery(db_conn, 'SELECT * from fluorescence_data')
+    
+    channels <- unique(fluorescence_data[,'channel'])
+    names(channels) <- channels
+    
+    if (length(channels) == 1) dcv <- FALSE
+    
+    amp_calib_mtch <- process_mtch(channels, get_amp_calib, 
+                                   db_conn, 
+                                   exp_id, stage_id, calib_id, 
+                                   verbose, 
+                                   show_running_time)
+    
+    amp_calib_mtch_bych <- amp_calib_mtch[['pre_consoli']]
+    
+    amp_calib_array <- amp_calib_mtch[['post_consoli']][['ac_mtx']]
+    
+    bg_sub <- amp_calib_array
+    
+    if (dcv) {
+        aca_dim3 <- dim(amp_calib_array)[3]
+        ac2dcv <- amp_calib_array[,,2:aca_dim3]
+        dcvd_array <- deconv(ac2dcv, k_list_bywell)
+        for (channel in channels) {
+            dcvd_mtx_per_channel <- dcvd_array[as.character(channel),,]
+            amp_calib_mtch_bych[[as.character(channel)]][['ac_mtx']][,2:aca_dim3] <- dcvd_mtx_per_channel
+            bg_sub[as.character(channel),,2:aca_dim3] <- dcvd_mtx_per_channel }}
+    
+    baseline_ct_mtch <- process_mtch(amp_calib_mtch_bych, baseline_ct, 
+                                     model, baselin, basecyc, fallback, 
+                                     maxiter, maxfev, 
+                                     min_ac_max, 
+                                     type, cp, 
+                                     show_running_time)[['post_consoli']]
+    
+    downstream <- list('background_subtracted'=bg_sub, 
+                       'baseline_subtracted'=baseline_ct_mtch[['bl_corrected']], 
+                       'ct'=baseline_ct_mtch[['ct_eff']], 
+                       'pre_dcv_bg_sub'=amp_calib_array 
+                       )
+    
+    result_mtch <- c(downstream, baseline_ct_mtch)
+    result_mtch[['fluorescence_data']] <- fluorescence_data
+    
+    return(result_mtch)
     }
 
 
