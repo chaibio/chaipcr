@@ -31,7 +31,7 @@ get_amp_calib <- function(channel, # as 1st argument for iteration by channel
     fluo_cast <- dcast(fluo_mlt, cycle_num ~ well_num, mean)
     
     # get optical-calibrated data.
-    calibd <- optic_calib(fluo_cast[,2:(num_wells+1)], db_conn, calib_id, channel, verbose, show_running_time)$fluo_calib
+    calibd <- optic_calib(fluo_cast[,2:(num_wells+1)], db_conn, calib_id, channel, verbose, show_running_time)$fluo_calib # column cycle_num is included, because adply automatically create a column at index 1 of output from rownames of input array (1st argument)
     ac_mtx <- cbind(fluo_cast[, 'cycle_num'], calibd)
     colnames(ac_mtx)[1] <- 'cycle_num'
     amp_calib <- list('ac_mtx'=as.matrix(ac_mtx), # change data frame to matrix for ease of constructing array
@@ -211,46 +211,6 @@ baseline_ct <- function(amp_calib,
                 'bl_corrected'=bl_corrected, 'coefficients'=mod_ori_cm, 
                 'ac_maxs'=ct_eff[['ac_maxs']], 'finIters'=ct_eff[['finIters']], 'adj_reasons'=ct_eff[['reasons']], 'ct_eff_raw'=ct_eff[['raw']], 'ct_eff_tagged_colnames'=ct_eff[['tagged_colnames']], # outputs from `get_ct_eff` for debugging
                 'ct_eff'=ct_eff[['adj']] ))
-    }
-
-
-# function: process amplification data for one channel
-amp_1ch <- function(channel, 
-                    db_conn, 
-                    exp_id, stage_id, calib_id, 
-                    verbose, show_running_time 
-                    ) {
-    
-    # baseline_ct
-    model <- l4
-    baselin <- 'parm'
-    basecyc <- 3:6 # 1:5 gave poor baseline subtraction results for non-sigmoid shaped data when using 'lin'
-    fallback <- 'lin'
-    maxiter <- 500
-    maxfev <- 10000
-    min_ac_max <- 0
-    type <- 'curve'
-    cp <- 'cpD2'
-    
-    amp_calib <- get_amp_calib(db_conn, 
-                               exp_id, stage_id, calib_id, channel, 
-                               verbose, 
-                               show_running_time)
-    #print(amp_calib[['ac_mtx']])
-    fc_ct <- baseline_ct(amp_calib, model, baselin, basecyc, fallback, 
-                         maxiter, maxfev, 
-                         min_ac_max, 
-                         type, cp, 
-                         show_running_time)
-    
-    downstream <- list('background_subtracted'=amp_calib[['ac_mtx']], 
-                       'baseline_subtracted'=fc_ct[['bl_corrected']], 
-                       'ct'=fc_ct[['ct_eff']] 
-                       )
-    
-    result <- c(downstream, fc_ct)
-    
-    return(result)
     }
 
 

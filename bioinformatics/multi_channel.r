@@ -22,7 +22,7 @@ consolidate_rlc_per_element <- function(result_ele_name, result_list_by_channel)
 
 # function: run qPCR functions on multi-channel fluorescence data and output consolidated results. original matrix will become 3-D array, original string or list will be come list.
 process_mtch <- function( 
-                         iterable_by_channel, # must be a named list or vector, where names are channels, to be inherited by result_list_by_channel
+                         iterable_by_channel, # must be a named list or vector, where names are channels to be inherited by result_list_by_channel
                          func, 
                          ...) {
     
