@@ -161,15 +161,17 @@ gulp.task('hash-js', ['concat-js'], function () {
 });
 
 gulp.task('uglify', ['concat-js', 'hash-js'], function () {
-  var shouldStripDebug = (process.env.stripdebug === 'false')? false : true;
+  var isDebug = (process.env.debug === 'true')? true : false;
   var stream = gulp.src('.tmp/js/'+applicationJS+'.js');
 
-  stream.pipe(uglify())
-  .on('error', swallowError);
+  if(!isDebug) {
+    stream.pipe(uglify())
+          .on('error', swallowError);
+  }
 
-  if(shouldStripDebug) {
+  if(!isDebug) {
     stream.pipe(stripDebug())
-    .on('error', swallowError);
+          .on('error', swallowError);
   }
 
   stream.pipe(gulp.dest('.tmp/js'));

@@ -6,8 +6,14 @@ App.controller 'MeltCurveCtrl', [
 
     $scope.curve_type = 'derivative'
 
-    Experiment.getMeltCurveData($stateParams.id).then (resp) ->
-      $scope.meltCurveData = resp.data;
-      console.log resp.data
+    console.log 'here'
+
+    getMeltCurveData = (cb) ->
+      Experiment.getMeltCurveData($stateParams.id).then (resp) ->
+        $scope.meltCurveData = resp.data
+        console.log resp.data
+        cb(resp.data) if !!cb
+
+    # getMeltCurveData()
 
 ]

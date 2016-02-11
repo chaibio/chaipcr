@@ -6,7 +6,7 @@ window.App.directive('ampliSlider', [
     replace: true
     require: 'ngModel'
     scope:
-      cycles: '='
+      cycles: '=range'
     templateUrl: 'app/views/directives/ampli-slider.html'
     link: ($scope, elem, attrs, ngModel) ->
 

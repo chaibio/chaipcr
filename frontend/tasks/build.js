@@ -39,8 +39,9 @@ gulp.task('deploy', ['css:deploy', 'js:deploy', 'copy-fonts-and-images'], functi
     console.info('\tjshash= hash of existing remote js (will replace remote file)\n');
     console.info('\tremote_password= password to be passed to ./deploy.sh script, default `chaipcr`\n');
     console.info('\thost= IP address of remote host, default `10.0.2.180`\n');
-    console.info('\tstripdebug= true/false whether to remove console.log statements or not, default `true`\n');
+    console.info('\tdebug= true/false whether to remove console.log statements and minimize, default `true`\n');
     console.info('\tExample: csshash=e4967a23c76ea10339d8f2fc0b57b0 jshash=e4967a23c76ea10339d8f2fc0b57b0 host=10.0.2.180 remote_password=chaipcr gulp deploy\n\n');
+    console.info('Done.');
     done();
   });
 
