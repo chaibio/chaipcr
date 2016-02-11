@@ -37,5 +37,6 @@ Debug
 /web/public/images/
 /web/public/javascripts/**/*.js
 /web/public/stylesheets/**/*.css
+/web/public/experiments/
 build/*
 /uploads/
