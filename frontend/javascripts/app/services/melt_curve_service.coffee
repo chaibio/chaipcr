@@ -42,9 +42,14 @@ App.service 'MeltCurveService', [
 
     self.XTicks = (min, max) ->
       ticks = []
-      for i in [min..max] by 1
-        ticks.push i
-      return ticks
+      calib = 10
+      diff = max - min
+      if diff <= calib
+        for i in [min..max] by 1
+          ticks.push i
+        return ticks
+      else
+        return calib
     # end ticks
 
     self.parseData = (data) ->
