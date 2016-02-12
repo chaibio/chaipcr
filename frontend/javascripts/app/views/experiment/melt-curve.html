@@ -1,53 +1,55 @@
-<div class="content results-charts" ng-controller="MeltCurveCtrl">
+<div class="melt-curve-chart">
+  <div class="content results-charts" ng-controller="MeltCurveCtrl">
 
-  <div class="curve-header">
-    <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()">
-      Melt Curve
-      <img class="arrow-down" src="/images/arrow-down.png">
-    </span>
-    <span class="log-checkboxes SH">
-      <span class="checkbox-item" ng-click="curve_type = 'derivative'" ng-class="{checked:curve_type === 'derivative', unchecked: curve_type !== 'derivative'}">
-        <span class="checkbox-icon">
-          <span class="inner"></span>
-        </span>
-        DERIVATIVE
+    <div class="curve-header">
+      <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()">
+        Melt Curve
+        <img class="arrow-down" src="/images/arrow-down.png">
       </span>
-      <span class="checkbox-item" ng-click="curve_type = 'normalized'" ng-class="{checked:curve_type === 'normalized', unchecked: curve_type !== 'normalized'}">
-        <span class="checkbox-icon">
-          <span class="inner"></span>
+      <span class="log-checkboxes SH">
+        <span class="checkbox-item" ng-click="curve_type = 'derivative'" ng-class="{checked:curve_type === 'derivative', unchecked: curve_type !== 'derivative'}">
+          <span class="checkbox-icon">
+            <span class="inner"></span>
+          </span>
+          DERIVATIVE
         </span>
-        NORMALIZED
+        <span class="checkbox-item" ng-click="curve_type = 'normalized'" ng-class="{checked:curve_type === 'normalized', unchecked: curve_type !== 'normalized'}">
+          <span class="checkbox-icon">
+            <span class="inner"></span>
+          </span>
+          NORMALIZED
+        </span>
       </span>
-    </span>
-  </div>
-
-
-  <div class="chart-section">
-
-  <div>
-    <div class="vertical-text SH">
-      <span ng-show="curve_type === 'derivative'">DERIVATIVE REPORTER</span>
     </div>
-    <div class="chart-container" id="ampli-drag-scroll" chart-drag-scroll ng-model="ampli_scroll">
-      <linechart class="linechart" data-drag-scroll="ampli-drag-scroll" data="data" options="chartConfig" width="1024" height="400" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks"></linechart>
-    </div>
-    <div class="text-center num-cycle-text SH">TEMPERATURE (&deg;C)</div>
 
-    <div class="ampli-zoom-scroll-container">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="zoom-container">
-            <div class="zoom-text SH">
-              <b>ZOOM</b>
+
+    <div class="chart-section">
+
+    <div>
+      <div class="vertical-text SH">
+        <span ng-show="curve_type === 'derivative'">DERIVATIVE REPORTER</span>
+      </div>
+      <div class="chart-container" id="meltcurve-drag-scroll" chart-drag-scroll ng-model="melt_curve_scroll">
+        <linechartv2 style="width: 100%; height: 400px;" data-drag-scroll="meltcurve-drag-scroll" data="data" options="chartConfig" width="1024" height="400" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks"></linechartv2>
+      </div>
+      <div class="text-center x-axis-text SH">TEMPERATURE (&deg;C)</div>
+
+      <div class="zoom-scroll-container">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="zoom-container">
+              <div class="zoom-text SH">
+                <b>ZOOM</b>
+              </div>
+              <ampli-slider ng-model="melt_curve_zoom" range="maxCycle"></ampli-slider>
             </div>
-            <ampli-slider ng-model="ampli_zoom" range="maxCycle"></ampli-slider>
           </div>
-        </div>
-        <div class="col-md-6 ampli-scrollbar-container">
-          <scrollbar ng-model="ampli_scroll" id="ampli-scrollbar"></scrollbar>
+          <div class="col-md-6 ampli-scrollbar-container">
+            <scrollbar ng-model="melt_curve_scroll" id="ampli-scrollbar"></scrollbar>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+  </div>
 </div>

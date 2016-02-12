@@ -89,7 +89,6 @@
   .chart-container {
     margin-left: 15px;
     margin-bottom: -35px;
-    width: 700px;
   }
 
   .axis .tick text {
@@ -97,11 +96,12 @@
     font-size: 10px;
   }
 
-  .num-cycle-text {
+  .x-axis-text {
     // font-family: 'Open Sans';
     // font-size: 10px;
     // font-weight: bold;
-    margin-bottom: -15px;
+    // margin-bottom: -15px;
+    margin-top: 15px;
   }
 
 
