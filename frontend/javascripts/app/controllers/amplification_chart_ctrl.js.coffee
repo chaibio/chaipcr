@@ -53,7 +53,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
     fetchFluorescenceData = ->
       return if $scope.RunExperimentCtrl.chart isnt 'amplification'
-      console.log 'fetching getF luorescenceData...'
       if !fetching
         fetching = true
         hasInit = true

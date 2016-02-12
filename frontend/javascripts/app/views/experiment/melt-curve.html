@@ -1,4 +1,5 @@
-<div class="content melt-curve" ng-controller="MeltCurveCtrl">
+<div class="content results-charts" ng-controller="MeltCurveCtrl">
+
   <div class="curve-header">
     <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()">
       Melt Curve
@@ -19,8 +20,18 @@
       </span>
     </span>
   </div>
+
+
   <div class="chart-section">
-    <div style="width: 100%; height: 500px; background: gray;"></div>
+
+  <div>
+    <div class="vertical-text SH">
+      <span ng-show="curve_type === 'derivative'">DERIVATIVE REPORTER</span>
+    </div>
+    <div class="chart-container" id="ampli-drag-scroll" chart-drag-scroll ng-model="ampli_scroll">
+      <linechart class="linechart" data-drag-scroll="ampli-drag-scroll" data="data" options="chartConfig" width="1024" height="400" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks"></linechart>
+    </div>
+    <div class="text-center num-cycle-text SH">TEMPERATURE (&deg;C)</div>
 
     <div class="ampli-zoom-scroll-container">
       <div class="row">
@@ -38,4 +49,5 @@
       </div>
     </div>
   </div>
+</div>
 </div>
