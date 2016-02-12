@@ -4,12 +4,12 @@ App.service 'MeltCurveService', [
     self = @
 
 
-    self.chartConfig = ->
+    self.chartConfig = (type) ->
       series = []
       for i in [0..15] by 1
         series.push
           axis: 'y'
-          key: 'derivative'
+          key: type
           dataset: "well_#{i}"
           color: AmplificationChartHelper.COLORS[i]
           type: 'line'
@@ -29,11 +29,10 @@ App.service 'MeltCurveService', [
           #   "#{$filter('round')(y/1000, 1)}k"
       margin:
         left: 70
-        right: 70
+        right: 0
 
       series: series
       tooltipHook: (items) ->
-        console.log items
         rows = []
         for item in items by 1
           rows.push
@@ -68,6 +67,7 @@ App.service 'MeltCurveService', [
           datasets["well_#{i}"].push
             temperature: temp
             derivative: data[i].derivative[ii]
+            normalized: data[i].fluorescence_data[ii]
 
       return datasets
     # end parseData

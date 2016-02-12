@@ -7,7 +7,8 @@ App.controller 'MeltCurveCtrl', [
   ($scope, Experiment, $stateParams, MeltCurveService, $timeout) ->
 
     $scope.curve_type = 'derivative'
-    $scope.chartConfig = MeltCurveService.chartConfig()
+    $scope.chartConfigDerivative = MeltCurveService.chartConfig('derivative')
+    $scope.chartConfigNormalized = MeltCurveService.chartConfig('normalized')
     $scope.loading = null
 
     getMeltCurveData = (cb) ->
@@ -24,14 +25,20 @@ App.controller 'MeltCurveCtrl', [
         $scope.experiment = data.experiment
         cb(data.experiment) if !!cb
 
+    updateConfigs = (opts) ->
+      $scope.chartConfigDerivative = _.defaultsDeep angular.copy(opts), $scope.chartConfigDerivative
+      $scope.chartConfigNormalized = _.defaultsDeep angular.copy(opts), $scope.chartConfigNormalized
+
     getExperiment (exp) ->
       getMeltCurveData (data) ->
         temp_range = MeltCurveService.getTempRange(data.melt_curve_data)
-        $scope.chartConfig.axes.x.min = temp_range.min
-        $scope.chartConfig.axes.x.max = temp_range.max
-        $scope.chartConfig.axes.x.ticks = MeltCurveService.XTicks(temp_range.min, temp_range.max)
-        console.log $scope.chartConfig
+        updateConfigs
+          axes:
+            x:
+              min: temp_range.min
+              max: temp_range.max
+              ticks: MeltCurveService.XTicks(temp_range.min, temp_range.max)
+
         $scope.data = MeltCurveService.parseData data.melt_curve_data
-        # console.log $scope.data
 
 ]
