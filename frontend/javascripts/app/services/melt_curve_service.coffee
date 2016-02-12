@@ -14,30 +14,36 @@ App.service 'MeltCurveService', [
           color: AmplificationChartHelper.COLORS[i]
           type: 'line'
           id: "well_#{i}"
+          label: "well-#{i+1}"
 
       axes:
         x:
           min: 1
           key: 'temperature'
           ticks: 8
-          ticksFormatter: (x) ->
-            parseInt(x).toFixed(2)
+          tickFormat: (x) ->
+            return "#{x}°C"
         y:
           ticks: 10
-          # ticksFormatter: (y) ->
+          # ticksFormat: (y) ->
           #   "#{$filter('round')(y/1000, 1)}k"
       margin:
         left: 70
         right: 70
 
       series: series
-      # lineMode: 'basis'
-      # thickness: '2px'
-      # tension: 0.7
-      # tooltipHook: -> false
-      # drawLegend: false
-      # drawDots: false
-      # hideOverflow: false
+      tooltipHook: (items) ->
+        console.log items
+        rows = []
+        for item in items by 1
+          rows.push
+            label: item.series.label
+            value: "#{item.row.y1}"
+            id: item.series.id
+            color: item.series.color
+
+        abscissas: "#{item.row.x.toFixed(2)} °C"
+        rows: rows
     # end chartConfig
 
     self.XTicks = (min, max) ->
