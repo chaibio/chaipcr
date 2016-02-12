@@ -8,12 +8,14 @@ App.controller 'MeltCurveCtrl', [
 
     $scope.curve_type = 'derivative'
     $scope.chartConfig = MeltCurveService.chartConfig()
+    $scope.loading = null
 
     getMeltCurveData = (cb) ->
+      $scope.loading = true
       $timeout ->
-        Experiment.getMeltCurveData($stateParams.id).then (resp) ->
-          $scope.meltCurveData = resp.data
-          console.log resp.data
+        Experiment.getMeltCurveData($stateParams.id)
+        .then (resp) ->
+          $scope.loading = false
           cb(resp.data) if !!cb
       , 1500
 

@@ -3,6 +3,27 @@
 
 .melt-curve-chart {
 
+  .loading {
+    margin-top: 100px;
+    margin-bottom: 100px;
+  }
+
+  .chart-section {
+    margin-bottom: 70px;
+  }
+
+  .chart-container {
+    height: 400px;
+  }
+
+  .chart-legend {
+    display: none;
+  }
+
+  .x-axis-text {
+    margin-top: 40px;
+  }
+
   .zoom-scroll-container {
     margin-top: 20px;
   }
