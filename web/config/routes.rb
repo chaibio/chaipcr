@@ -73,6 +73,7 @@ Qpcrctl::Application.routes.draw do
     get 'serial_start'
     get 'software_update'
     get 'status'
+    put 'clean'
     put 'root_password'
     post 'enable_support_access'
   end

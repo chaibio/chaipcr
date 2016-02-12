@@ -7,7 +7,7 @@ class DevicesController < ApplicationController
   
   skip_before_action :verify_authenticity_token, :except=>[:root_password]
   before_filter :allow_cors, :except=>[:root_password]
-  before_filter :ensure_authenticated_user, :except=>[:serial_start, :update, :software_update, :empty]
+  before_filter :ensure_authenticated_user, :except=>[:serial_start, :update, :clean, :software_update, :empty]
   
   respond_to :json
   
@@ -107,41 +107,73 @@ class DevicesController < ApplicationController
   end
    
   def serial_start
-    if !File.exists?(DEVICE_FILE_PATH)
-      mac = retrieve_mac
-      configuration_file = File.read(CONFIGURATION_FILE_PATH)
-      if !mac.blank? && configuration_file
-        configuration_hash = JSON.parse(configuration_file)
-        render json: {mac: mac, software_version:configuration_hash["software"]["version"]}
-      elsif mac.blank?
-        render json: {errors: "Device mac address not found"}, status: 500
-      else
-        render json: {errors: "Device configuration file is not found"}, status: 500
-      end
-    else
+    if File.exists?(DEVICE_FILE_PATH)
       device_file = File.read(DEVICE_FILE_PATH)
       device_hash = JSON.parse(device_file)
-      render json: {errors: "Device is already serialized (serial number = #{device_hash["serial_number"]})"}, status: 405
+      if device_hash["serial_number"].blank?
+        mac = retrieve_mac
+        configuration_file = File.read(CONFIGURATION_FILE_PATH)
+        if !mac.blank? && configuration_file
+          configuration_hash = JSON.parse(configuration_file)
+          logger.info(device_hash)
+          render json: {mac: mac, software_version:configuration_hash["software"]["version"], configuration_id:device_hash["configuration_id"]}
+        elsif mac.blank?
+          render json: {errors: "Device mac address not found"}, status: 500
+        else
+          render json: {errors: "Device configuration file is not found"}, status: 500
+        end
+      else
+        render json: {errors: "Device is already serialized (serial number = #{device_hash["serial_number"]})"}, status: 405
+      end
+    else
+      render json: {errors: "Device is not configured"}, status: 405
     end
   end
   
   def update
-    if !File.exists?(DEVICE_FILE_PATH)
-      device_data = request.body.read
-      device_hash = JSON.parse(device_data)
-
-      File.open(DEVICE_FILE_PATH, 'w+') { |file| file.write(device_data) }
-      User.delete_all
-      Experiment.joins(:experiment_definition).where("experiment_type != ? and experiments.id != 1", ExperimentDefinition::TYPE_DIAGNOSTIC).select('experiments.*').each do |e|
-        e.destroy
+    if File.exists?(DEVICE_FILE_PATH)
+      device_file = File.read(DEVICE_FILE_PATH)
+      device_hash = JSON.parse(device_file)
+      if !device_hash["serial_number"].blank?
+        render json: {errors: "Device is already serialized (serial number = #{device_hash["serial_number"]})"}, status: 405
+        return
       end
-      serialmd5 = Digest::MD5.hexdigest(device_hash["serial_number"])
-      system("printf '#{serialmd5}\n#{serialmd5}\n' | passwd")
-      system("sync")
-      render json: {response: "Device is programmed successfully"}, status: :ok
+    end
+
+    device_data = request.body.read
+    
+    begin
+      device_hash = JSON.parse(device_data)
+    rescue  => e
+      render json: {errors: "not valid json file"}, status: 400
+      return
+    end
+    
+    begin
+      File.open(DEVICE_FILE_PATH, 'w+') { |file| file.write(device_data) }
+    rescue  => e
+      render json: {errors: "Write to #{DEVICE_FILE_PATH} failed: #{e}"}, status: 400
+      return
+    end
+    
+    erase_data(device_hash)
+    render json: {response: "Device is programmed successfully"}, status: :ok
+  end
+  
+  def clean
+    begin
+      device_file = File.read(DEVICE_FILE_PATH)
+      device_hash = JSON.parse(device_file) if device_file
+    rescue  => e
+      render json: {errors: "Device file is not found or corrupted"}, status: 500
+      return
+    end
+    if !device_hash["device_signature"].blank? && device_hash["device_signature"] == params["signature"]
+      erase_data(device_hash)
+      render json: {response: "Device is cleaned successfully"}, status: :ok
     else
-      render json: {errors: "Device is already serialized"}, status: 405
-    end 
+      render json: {errors: "Device cannot be cleaned because device signature doesn't match"}, status: 400
+    end
   end
   
   api :GET, "/device/software_update", "query the software update meta data"
@@ -262,9 +294,21 @@ class DevicesController < ApplicationController
   
   private
   
+  def erase_data(device_hash)
+    User.delete_all
+    Experiment.joins(:experiment_definition).where("experiment_type != ? and experiments.id != 1", ExperimentDefinition::TYPE_DIAGNOSTIC).select('experiments.*').each do |e|
+      e.destroy
+    end
+    if device_hash && !device_hash["serial_number"].blank?
+      serialmd5 = Digest::MD5.hexdigest(device_hash["serial_number"])
+      system("printf '#{serialmd5}\n#{serialmd5}\n' | passwd")
+    end
+    system("sync")
+  end
+  
   def retrieve_mac
     str = `ifconfig eth0 | grep HWaddr`
-#    str = "eth0      Link encap:Ethernet  HWaddr 54:4a:16:c0:7e:28 "
+#    str = "eth0      Link encap:Ethernet  HWaddr 54:4a:16:c0:7e:31 "
     re = %r/([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}/
     return re.match(str).to_s.strip
   end
