@@ -29,16 +29,19 @@ App.controller 'MeltCurveCtrl', [
       $scope.chartConfigDerivative = _.defaultsDeep angular.copy(opts), $scope.chartConfigDerivative
       $scope.chartConfigNormalized = _.defaultsDeep angular.copy(opts), $scope.chartConfigNormalized
 
-    getExperiment (exp) ->
-      getMeltCurveData (data) ->
-        temp_range = MeltCurveService.getTempRange(data.melt_curve_data)
-        updateConfigs
-          axes:
-            x:
-              min: temp_range.min
-              max: temp_range.max
-              ticks: MeltCurveService.XTicks(temp_range.min, temp_range.max)
+    $scope.$watch 'RunExperimentCtrl.chart', (chart) ->
+      if chart is 'melt-curve' and !$scope.data
+        console.log 'here'
+        getExperiment (exp) ->
+          getMeltCurveData (data) ->
+            temp_range = MeltCurveService.getTempRange(data.melt_curve_data)
+            updateConfigs
+              axes:
+                x:
+                  min: temp_range.min
+                  max: temp_range.max
+                  ticks: MeltCurveService.XTicks(temp_range.min, temp_range.max)
 
-        $scope.data = MeltCurveService.parseData data.melt_curve_data
+            $scope.data = MeltCurveService.parseData data.melt_curve_data
 
 ]
