@@ -1,11 +1,44 @@
 @import "./colors.css.scss";
 
-$sidemenu_width: 450px;
+$sidemenu_width: 352px;
 
 .menu-overlay-layout {
   width: 1024px;
   -webkit-transition: margin 0.3s; /* Safari */
   transition: margin 0.3s;
+
+
+  .side-menu-header-container {
+    width: 100%;
+    height: 50px;
+    background-color: #000;
+
+    .common {
+      color: white;
+    }
+
+    .text-container {
+      @extend .common;
+      width: 75%;
+      height: 100%;
+      float: left;
+      padding-left: 30px;
+      padding-top: 13px;
+      cursor: alias;
+    }
+    .close-container {
+      @extend .common;
+      width: 25%;
+      height: 100%;
+      float: left;
+      padding-top: 13px;
+      text-align: center;
+      .close-side-menu {
+        cursor: pointer;
+        @extend .common;
+      }
+    }
+  }
 
   .page-wrapper {
     margin-right: 0;
@@ -36,7 +69,7 @@ $sidemenu_width: 450px;
   }
 
   .sidemenu {
-    background-color: #001827;
+    background-color: white;
     float: left;
     min-height: 768px;
     position: relative;

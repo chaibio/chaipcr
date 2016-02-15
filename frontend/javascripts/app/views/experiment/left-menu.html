@@ -1,5 +1,9 @@
 <div ng-controller="ExperimentMenuOverlayCtrl">
-
+  <div class="side-menu-header-container">
+    <div class="text-container x" ui-sref="home">&lt; BACK TO HOME</div>
+    <div class="close-container x"><span class="close-side-menu x" toggle-sidemenu>x</span></div>
+  </div>
+<!--
   <div class="menu-overlay-menu">
     <div class="long-tail-container">
       <div class="long-tail"></div>
@@ -30,7 +34,7 @@
           <span ng-show="status === 'RUNNING' || status === 'COMPLETED'">VIEW PROTOCOL</span>
         </a>
       </div>
-    </div>
+    </div> -->
     <!-- <div class="menu-overlay-menu-item">
       <div class="tail-container">
         <div class="tail">
@@ -41,7 +45,7 @@
         <a href="#/plate-setup/1">PLATE SETUP</a>
       </div>
     </div> -->
-    <div class="menu-overlay-menu-item special" ng-show="status">
+  <!--  <div class="menu-overlay-menu-item special" ng-show="status">
       <div class="tail-container">
         <div class="tail">
         </div>
@@ -74,5 +78,5 @@
   </div>
 
   <test-in-progress></test-in-progress>
-
+-->
 </div>
