@@ -18,6 +18,9 @@ App.controller 'MeltCurveCtrl', [
         .then (resp) ->
           $scope.loading = false
           cb(resp.data) if !!cb
+        .catch ->
+          $scope.loading = false
+          $scope.error = 'Unable to retrieve melt curve data.'
       , 1500
 
     getExperiment = (cb) ->
@@ -31,7 +34,6 @@ App.controller 'MeltCurveCtrl', [
 
     $scope.$watch 'RunExperimentCtrl.chart', (chart) ->
       if chart is 'melt-curve' and !$scope.data
-        console.log 'here'
         getExperiment (exp) ->
           getMeltCurveData (data) ->
             temp_range = MeltCurveService.getTempRange(data.melt_curve_data)

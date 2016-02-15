@@ -45,7 +45,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         max_cycle = if datum.cycle_num > max_cycle then datum.cycle_num else max_cycle
 
       for i in [1..max_cycle] by 1
-        data_by_cycle = _.select fluorescence_data, (datum) ->
+        data_by_cycle = _.filter fluorescence_data, (datum) ->
           datum.cycle_num is i
 
         baseline_data = cycle_num: i
@@ -143,7 +143,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         cycle_start = Math.floor(scroll * (max_cycle - zoom) ) + 1
         cycle_end = cycle_start + zoom - 1
 
-      new_data = _.select data, (datum) ->
+      new_data = _.filter data, (datum) ->
         datum.cycle_num >= cycle_start and datum.cycle_num <= cycle_end
 
       new_data = if new_data.length > 0 then new_data else [@paddData(cycle_start)]

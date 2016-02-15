@@ -42,6 +42,10 @@
       <strong>Loading melt curve data<ellipsis-animated></ellipsis-animated></strong>
     </div>
 
+    <div class="text-center text-red loading" ng-show="error && !loading">
+      {{error}}
+    </div>
+
     <div ng-show="data">
       <div class="vertical-text SH">
         <span ng-show="curve_type === 'derivative'">DERIVATIVE REPORTER</span>
