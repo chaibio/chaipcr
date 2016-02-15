@@ -51,6 +51,12 @@ window.ChaiBioTech.ngApp
         $window.alert resp.data.experiment?.errors?.base || 'Unable to delete experiment.'
         data.del = false
 
+    @expName = (exp_name, truncate_length) ->
+      NAME_LENGTH = parseInt(truncate_length)
+      return if !exp_name
+      return exp_name if exp_name.length <= NAME_LENGTH
+      return exp_name.substring(0, NAME_LENGTH-2)+'...'
+
     @openExperiment = (exp) ->
       if not $scope.deleteMode
         state = Status.getData();
