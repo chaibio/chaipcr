@@ -2,11 +2,24 @@
   <div class="content results-charts" ng-controller="MeltCurveCtrl">
 
     <div class="curve-header">
-      <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()">
-        Melt Curve
-        <img class="arrow-down" src="/images/arrow-down.png">
-      </span>
-      <span class="log-checkboxes SH">
+      <div class="row">
+        <div class="col-sm-6">
+          <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()">
+            Melt Curve
+            <img class="arrow-down" src="/images/arrow-down.png">
+          </span>
+        </div>
+        <div class="col-sm-6">
+          <div class="plot-type-buttons">
+            <div class="plot-type-text SHR">PLOT TYPE</div>
+            <div class="buttons-wrapper SH">
+              <div class="button" ng-click="curve_type='derivative'" ng-class="{'selected': curve_type==='derivative'}">DERIVATIVE</div>
+              <div class="button" ng-click="curve_type='normalized'" ng-class="{'selected': curve_type==='normalized'}">NORMALIZED</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- <span class="plot-type-checkboxes SH">
         <span class="checkbox-item" ng-click="curve_type = 'derivative'" ng-class="{checked:curve_type === 'derivative', unchecked: curve_type !== 'derivative'}">
           <span class="checkbox-icon">
             <span class="inner"></span>
@@ -19,7 +32,7 @@
           </span>
           NORMALIZED
         </span>
-      </span>
+      </span> -->
     </div>
 
 
@@ -27,6 +40,10 @@
 
     <div class="text-center loading" ng-show="!data && loading">
       <strong>Loading melt curve data<ellipsis-animated></ellipsis-animated></strong>
+    </div>
+
+    <div class="text-center text-red loading" ng-show="error && !loading">
+      {{error}}
     </div>
 
     <div ng-show="data">

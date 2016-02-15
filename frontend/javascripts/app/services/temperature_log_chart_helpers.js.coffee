@@ -70,7 +70,7 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogChartHelpers', [
 
         right_et = left_et + (resolution*1000)
 
-        data = _.select temperatureLogs, (temp_log) ->
+        data = _.filter temperatureLogs, (temp_log) ->
           et = temp_log.temperature_log.elapsed_time
           et >= left_et and et <= right_et
 

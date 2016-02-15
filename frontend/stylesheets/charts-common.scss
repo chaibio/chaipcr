@@ -7,6 +7,11 @@
     border-bottom: 3px solid $gray;
     padding-bottom: 10px;
 
+    .row {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
     .curve-title {
       display: inline-block;
       width: 70%;
@@ -19,7 +24,7 @@
       }
     }
 
-    .log-checkboxes {
+    .plot-type-checkboxes {
       margin-bottom: -10px;
 
       .checkbox-item {
@@ -65,6 +70,40 @@
           }
         }
 
+      }
+    }
+
+    .plot-type-buttons {
+      margin-top: -10px;
+      $plot_type_buttons_btn_width: 100px;
+      $plot_type_buttons_border_width: 1px;
+
+      float: right;
+      width: ($plot_type_buttons_btn_width*2)+($plot_type_buttons_border_width*2);
+      .plot-type-text {
+        text-align: center;
+      }
+
+      .buttons-wrapper {
+        border: $plot_type_buttons_border_width solid #000;
+        text-align: right;
+      }
+
+      .button {
+        width: $plot_type_buttons_btn_width;
+        display: inline-block;
+        text-align: center;
+        border-radius: 0;
+        border:none;
+
+        &:hover {
+          background: none;
+        }
+
+        &.selected {
+          background-color: $green;
+          color: #fff;
+        }
       }
     }
 
