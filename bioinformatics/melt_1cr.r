@@ -2,9 +2,8 @@
 
 melt_1cr <- function(floor_temp, 
                      db_usr, db_pwd, db_host, db_port, db_name, 
-                     exp_id, 
-                     stage_id, 
-                     calib_id, 
+                     exp_id, stage_id, calib_id, channel, 
+                     dcv=TRUE, # logical, whether to perform multi-channel deconvolution
                      mc_plot=FALSE, 
                      verbose=FALSE, 
                      show_running_time=FALSE,
@@ -15,33 +14,35 @@ melt_1cr <- function(floor_temp,
     func_name <- 'melt_1cr'
     start_time <- proc.time()[['elapsed']]
     
-    # get calibrated melting curve data
-    mc_calib <- get_mc_calib(db_usr, db_pwd, db_host, db_port, db_name, 
-                             exp_id, stage_id, calib_id, 
-                             verbose, 
-                             show_running_time)
+    mc_out <- process_mc(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
+                         exp_id, stage_id, calib_id, # for selecting data to analyze
+                         dcv, mc_plot, verbose, show_running_time, ...)
     
-    # get melting curve data for all the temperatures as well as Tm
-    mc_out <- mc_tm_all(mc_calib, mc_plot, show_running_time, ...)
-    mc_tm <- lapply(mc_out, function(element) element$tm)
+    mc_tm <- lapply(mc_out[['mc_bywell']], 
+                    function(channel_ele) lapply(channel_ele, 
+                                                 function(well_ele) well_ele[['tm']]))
     
     # For each well, average the calibrated fluorescence values for the temperatures 72-73C
-    mc_cols <- colnames(mc_calib)
+    mc_cols <- colnames(mc_out[['fc_wT']][[1]])
     temp_cols <- mc_cols[grepl('temp', mc_cols)]
     fluo_cols <- mc_cols[grepl('fluo', mc_cols)]
     if (length(temp_cols) != length(fluo_cols)) {
         stop('Number of temperature columns is not equal to number of fluorescence columns.') }
-    tempsl_1cr <- alply(mc_calib[,temp_cols], .margins=2, 
-                        .fun=function(temps_pw) {
-                            tempsl <- temps_pw >= floor_temp & temps_pw < floor_temp + 1
-                            tempsl[is.na(tempsl)] <- FALSE
-                            return(tempsl)
-                            })
-    fluo_1cr <- sapply(1:length(fluo_cols), 
-                       function(i) mean(mc_calib[tempsl_1cr[[i]], fluo_cols[i]]))
-    names(fluo_1cr) <- fluo_cols
     
-    mc_w1cr <- list('mc_tm'=mc_tm, '1cr_fluorescence'=fluo_1cr)
+    fluo_1cr <- lapply(mc_out[['fc_wT']], function(channel_ele) {
+        tempsl_1cr_pch <- alply(channel_ele[,temp_cols], .margins=2, 
+            .fun=function(temps_pw) {
+                tempsl <- temps_pw >= floor_temp & temps_pw < floor_temp + 1
+                tempsl[is.na(tempsl)] <- FALSE
+                return(tempsl)
+                })
+        fluo_1cr_pch <- sapply(1:length(fluo_cols), 
+                           function(i) mean(channel_ele[tempsl_1cr_pch[[i]], fluo_cols[i]]))
+        names(fluo_1cr_pch) <- fluo_cols
+        return(fluo_1cr_pch)
+        })
+    
+    mc_w1cr <- list('mc_tm'=mc_tm, '1cr_fluorescence'=fluo_1cr) # each element is a list whose each element represents a channel
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]
