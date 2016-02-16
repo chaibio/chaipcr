@@ -40,6 +40,101 @@ $sidemenu_width: 352px;
     }
   }
 
+  .side-menu-content-container {
+    width: 100%;
+    height: 718px;
+    padding-left: 35px;
+    padding-right: 50px;
+
+    .side-menu-name-container {
+      height: 156px;
+      border-bottom: 2px black solid;
+      .side-menu-exp-name {
+        height: 80%;
+        padding-top: 25px;
+        font-size: 30px;
+      }
+      .side-menu-exp-status {
+        height: 20%;
+        color: #999;
+      }
+    }
+
+    .side-menu-menu-container {
+      padding-top: 20px;
+      .success {
+        height: 30px;
+        background-color: #8dc63f;
+        color: white;
+        width: 110px;
+        border: none;
+        position: absolute;
+        top: 0px;
+        left: 157px;
+      }
+
+      .run-exp {
+        position: relative;
+      }
+      .side-menu-menu-item {
+        width: 100%;
+        height: 30px;
+        cursor: pointer;
+        &:hover {
+          color: #00AEEF;
+        }
+        div {
+          padding-top: 4px;
+        }
+      }
+      /*ul {
+        display: block;
+
+        li {
+          padding: 0;
+          //height: 30px;
+          //padding-top: 10px;
+          //cursor: pointer;
+          a {
+            text-decoration: none;
+            display: block;
+            padding: 10px 0px 10px 0px;
+            cursor: pointer;
+            color: black;
+            &:hover {
+              background-color: white;
+              color: #00AEEF;
+            }
+            .success {
+              height: 30px;
+              background-color: #8dc63f;
+              color: white;
+              width: 110px;
+              border: none;
+            }
+          }
+
+        }
+      }*/
+    }
+    .side-menu-button-container {
+      width: 100%;
+      height: 31px;
+      //background-color: green;
+      margin-top: 30px;
+      .second-button {
+        margin-left: -5px;
+      }
+      .side-menu-button {
+        width: 131px;
+        height: 30px;
+        background-color: white;
+        border: 1px solid black;
+        outline: none;
+      }
+    }
+  }
+
   .page-wrapper {
     margin-right: 0;
     -webkit-transition: margin 0.3s; /* Safari */

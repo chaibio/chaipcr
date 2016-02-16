@@ -3,6 +3,39 @@
     <div class="text-container x" ui-sref="home">&lt; BACK TO HOME</div>
     <div class="close-container x"><span class="close-side-menu x" toggle-sidemenu>x</span></div>
   </div>
+  <div class="side-menu-content-container">
+    <div class="side-menu-name-container">
+      <div class="side-menu-exp-name x">{{exp.name | truncate:20}}</div>
+      <div ng-if="status == 'COMPLETED'" class="side-menu-exp-status B2">{{runStatus}}{{exp.started_at | amCalendar}}</div>
+      <div ng-if="status != 'COMPLETED'" class="side-menu-exp-status B1">{{runStatus}}</div>
+    </div>
+    <div class="side-menu-menu-container">
+      <div class="side-menu-menu-item">
+        <div class="B1B">EXPERIMENT PROPERTIES</div>
+      </div>
+      <div class="side-menu-menu-item">
+        <div class="B1B" ui-sref="edit-protocol({id: params.id})" toggle-sidemenu>
+          <span ng-show="status === 'NOT_STARTED'">EDIT PROTOCOL</span>
+          <span ng-show="status === 'RUNNING' || status === 'COMPLETED'">VIEW PROTOCOL</span>
+        </div>
+      </div>
+      <div class="side-menu-menu-item">
+        <div class="B1B">PLATE SETUP</div>
+      </div>
+      <div class="side-menu-menu-item run-exp">
+        <div class="B1B" ng-click="runReady = !runReady">
+          <span ng-show="status === 'NOT_STARTED'">RUN EXPERIMENT</span>
+          <span ng-show="status === 'RUNNING'">EXPERIMENT STATUS</span>
+          <span ng-show="status === 'COMPLETED'">VIEW RESULTS</span>
+        </div>
+        <button ng-show="runReady && status === 'NOT_STARTED'" ui-sref="run-experiment({id: params.id, chart: 'amplification', max_cycle: maxCycle})" toggle-sidemenu class="B1 success">CONFIRM</button>
+      </div>
+    </div>
+    <div class="side-menu-button-container">
+      <button class="side-menu-button SH" export-experiment experiment-id="params.id">EXPORT</button>
+      <button class="side-menu-button SH second-button" ng-click="deleteExperiment(params.id)">DELETE</button>
+    </div>
+  </div>
 <!--
   <div class="menu-overlay-menu">
     <div class="long-tail-container">
