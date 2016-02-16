@@ -22,6 +22,7 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
     # passed onto `mc_tm_pw`, different than default
     qt_prob <- 0.1
     max_normd_qtv <- 0.9
+    channel <- '1'
     
     mc_w72c <- melt_1cr(floor_temp, 
                         db_usr, db_pwd, db_host, db_port, db_name, 
@@ -35,9 +36,11 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
     
     names(mc_w72c) <- c('mc_tm', '72c_fluorescence')
     
-    if (out_json) mc_w72c <- toJSON(mc_w72c)
+    mc_w72c_simplified <- lapply(mc_w72c, function(ele) ele[[as.character(channel)]])
     
-    return(mc_w72c)
-    #return(toJSON(mc_w72c))
+    if (out_json) mc_w72c_simplified <- toJSON(mc_w72c_simplified)
+    
+    return(mc_w72c_simplified)
+    #return(toJSON(mc_w72c_simplified))
 }
 
