@@ -122,13 +122,12 @@ usbroot=/dev/sda1 ro rootwait
 usbargs=setenv bootargs console=tty0 console=\${console} \${optargs} \${cape_disable} \${cape_enable} \${kms_force_mode} root=\${usbroot} rootfstype=\${mmcrootfstype} 
 uenvcmdusb=run loadusbfiles; run usbargs; bootz \${loadaddr} \${initrd_addr}:\${initrd_size} \${fdtaddr}
 
-#uenvcmd=usb start; if test -e usb 0:1 /boot/${usb_kernel_file}; then run uenvcmdusb; else run uenvcmdmmc; fi
-#uenvcmd= if gpio input 72; then usb start; if test -e usb 0:1 /boot/\${usb_kernel_file}; then echo "USB loaded";  run uenvcmdusb; else echo "MMC loaded"; run uenvcmdmmc; fi; else echo "MMC loaded"; run uenvcmdmmc; fi
-
+s2pressed=0
 uenvcmdmmc=echo "*** Boot button Unpressed..!!"; run loadfiles; run mmcargs; bootz \${loadaddr} \${initrd_addr}:\${initrd_size} \${fdtaddr}
-uenvcmdsdcard=echo "*** Boot button pressed..!!"; bootpart=0:1;bootdir=;fdtaddr=0x81FF0000;optargs=quiet capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN;load mmc 0 \${loadaddr} uImage;run loadfdt;setenv bootargs console=\${console} \${optargs};bootm \${loadaddr} - \${fdtaddr}
-uenvcmd=run shutdown_usb_power;if gpio input 72; then run uenvcmdsdcard; else run uenvcmdmmc; fi
+uenvcmdsdcard=bootpart=0:1;bootdir=;fdtaddr=0x81FF0000;optargs=quiet capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN;load mmc 0 ${loadaddr} uImage;run loadfdt;setenv bootargs console=${console} ${optargs} s2pressed=${s2pressed};bootm ${loadaddr} - ${fdtaddr}
+uenvcmdsdcard_s2pressed=echo "*** Boot button pressed..!!"; setenv s2pressed 1; run uenvcmdsdcard
 
+uenvcmd=run shutdown_usb_power;if gpio input 72; then run uenvcmdsdcard_s2pressed; else run uenvcmdmmc; fi
 
 # Updated: $NOW
 
@@ -140,7 +139,7 @@ echo "uEnv.txt done updating"
 cp $uEnv $uEnvSDCard
 cp $uEnv $uEnv72Check
 echo " " >> $uEnvSDCard
-echo "uenvcmd=run shutdown_usb_power;run uenvcmdsdcard" >> $uEnvSDCard
+echo "uenvcmd=run shutdown_usb_power;if gpio input 72; then run uenvcmdsdcard_s2pressed; else run uenvcmdsdcard; fi" >> $uEnvSDCard
 echo "#" >> $uEnvSDCard
 
 echo "SDCard version of uEnv.txt done updating"

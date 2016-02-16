@@ -175,6 +175,7 @@ partition_drive () {
 }
 
 update_uenv () {
+# first param =2 in case of upgrade.. =1 for factory settings.
 	echo copying coupling uEng.txt
 	if [ ! -e /tmp/emmcboot ]
 	then
@@ -243,8 +244,17 @@ incriment_restart_counter () {
 	echo "Restart counter: $counter"
 }
 
+cat /proc/cmdline | grep s2pressed=1 > /dev/null
+s2pressed=$?
+if [ $s2pressed -eq 0 ]
+then
+        echo "Boot button pressed"
+else
+        echo "Boot button not pressed"
+fi
+
 counter=2
-if [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
+if [ $s2pressed -eq 0 ] && [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
 then
         echo "Resume eMMC unpacking flag found up"
         incriment_restart_counter
@@ -279,6 +289,8 @@ then
         stop_packing_restarting
         alldone
         exit
+else
+	echo "Performing factory settings recovery.."
 fi
 
 isValidPermGeometry () {
