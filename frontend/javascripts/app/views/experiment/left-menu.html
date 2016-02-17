@@ -24,11 +24,12 @@
       </div>
       <div class="side-menu-menu-item run-exp">
         <div class="B1B" ng-click="runReady = !runReady">
-          <span ng-show="status === 'NOT_STARTED'">RUN EXPERIMENT</span>
-          <span ng-show="status === 'RUNNING'">EXPERIMENT STATUS</span>
+          <span ng-class="{'lid-open': lidOpen}" ng-show="status === 'NOT_STARTED'">RUN EXPERIMENT</span>
+          <span class="B2 lid-open-message" ng-show="lidOpen && status === 'NOT_STARTED'"><br>Hardware lid is open</span>
+          <span ng-show="status === 'RUNNING'" ui-sref="run-experiment({id: params.id, chart: 'amplification', max_cycle: maxCycle})">EXPERIMENT STATUS</span>
           <span ng-show="status === 'COMPLETED'">VIEW RESULTS</span>
         </div>
-        <button ng-show="runReady && status === 'NOT_STARTED'" ui-sref="run-experiment({id: params.id, chart: 'amplification', max_cycle: maxCycle})" toggle-sidemenu class="B1 success">CONFIRM</button>
+        <button ng-show="runReady && status === 'NOT_STARTED' && !lidOpen" ui-sref="run-experiment({id: params.id, chart: 'amplification', max_cycle: maxCycle})" toggle-sidemenu class="B1 success">CONFIRM</button>
       </div>
     </div>
     <div class="side-menu-button-container">

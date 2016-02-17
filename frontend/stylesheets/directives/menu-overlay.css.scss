@@ -1,6 +1,5 @@
 @import "./colors.css.scss";
 
-
 $sidemenu_width: 352px;
 .menu-overlay-layout {
   width: 1024px;
@@ -41,7 +40,7 @@ $sidemenu_width: 352px;
         left: 334px;
         @extend .common;
         &.sub-menu-open {
-          left: 700px;
+          left: 685px;
         }
       }
 
@@ -93,6 +92,12 @@ $sidemenu_width: 352px;
         }
         div {
           padding-top: 4px;
+        }
+        .lid-open {
+          color: #999;
+        }
+        .lid-open-message {
+          color: #999;
         }
       }
       /*ul {
