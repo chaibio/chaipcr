@@ -33,11 +33,8 @@ num_wells <<- 16
 scaling_factor <<- 9e5
 
 # optical calibration (oc)
-oc_water_step_id <<- 74 # used: 2, 74.
-oc_signal_step_ids <<- list('1'=76, '2'=76) # names are channels (int in database) as characters. used: 4, list('1'=76, '2'=76).
-# # for testing array output of get_amplification_data
-# oc_water_step_id <<- 2
-# oc_signal_step_id <<- 4
+oc_water_step_id <<- 2
+oc_signal_step_ids <<- list('1'=4, '2'=4) # names are channels (int in database) as characters. When step_id is the same for different channels, it means the same dye is used to calibrate different channels, i.e. its signal in each channel is used to calibrate the respective channel.
 
 # color compensation / multi-channel deconvolution
 dcv_target_step_ids <- list('1'=76, '2'=78) # the steps where target dye used for each channel

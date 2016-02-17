@@ -1,38 +1,12 @@
 # meltcrv
 
 
-# function: get melting curve data and output it for plotting as well as Tm
-process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
-                       exp_id, stage_id, calib_id, # for selecting data to analyze
-                       mc_plot=FALSE, # whether to plot melting curve data
-                       verbose=FALSE, 
-                       show_running_time=FALSE, # option to show time cost to run this function
-                       ... # options to pass onto `mc_tm_pw`
-                       ) {
-    
-    # start counting for running time
-    func_name <- 'process_mc'
-    start_time <- proc.time()[['elapsed']]
-    
-    mc_calib <- get_mc_calib(db_usr, db_pwd, db_host, db_port, db_name, 
-                             exp_id, stage_id, calib_id, 
-                             verbose, 
-                             show_running_time)
-    mc_out <- mc_tm_all(mc_calib, mc_plot, show_running_time, ...)
-    
-    # report time cost for this function
-    end_time <- proc.time()[['elapsed']]
-    if (show_running_time) message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
-    
-    return(mc_out)
-    }
-
-
 # function: get melting curve data from MySQL database and perform water calibration
-get_mc_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
+get_mc_calib <- function(channel, 
+                         db_conn, 
                          exp_id, stage_id, calib_id, # for selecting data to analyze
-                         verbose=FALSE, 
-                         show_running_time=FALSE # option to show time cost to run this function
+                         verbose, 
+                         show_running_time # option to show time cost to run this function
                          ) {
     
     # start counting for running time
@@ -40,39 +14,33 @@ get_mc_calib <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connec
     start_time <- proc.time()[['elapsed']]
     
     message('get_mc_calib')
-    message('db: ', db_name)
-    db_conn <- dbConnect(RMySQL::MySQL(), 
-                         user=db_usr, 
-                         password=db_pwd, 
-                         host=db_host, 
-                         port=db_port, 
-                         dbname=db_name)
-    
-    message('experiment_id: ', exp_id)
-    message('stage_id: ', stage_id)
-    message('calibration_id: ', calib_id)
     
     # get fluorescence data for melting curve
     fluo_qry <- sprintf('SELECT id, stage_id, well_num, temperature, fluorescence_value, experiment_id 
                             FROM melt_curve_data 
-                            WHERE experiment_id=%d AND stage_id=%d 
+                            WHERE experiment_id=%d AND stage_id=%d AND channel=%d 
                             ORDER BY well_num, temperature',
-                            exp_id, stage_id)
+                            exp_id, stage_id, as.numeric(channel))
     fluo_sel <- dbGetQuery(db_conn, fluo_qry)
     
     # split temperature and fluo data by well_num
     tf_list <- split(fluo_sel[, c('temperature', 'fluorescence_value')], fluo_sel$well_num)
+    
     # add NA to the end if not enough data
     max_len <- max(sapply(tf_list, function(tf) dim(tf)[1]))
     tf_ladj <- lapply(tf_list, function(tf) rbind(as.matrix(tf), matrix(NA, nrow=(max_len-dim(tf)[1]), ncol=2)))
+    
     # water calibration
     fluo_mtx <- do.call(cbind, lapply(tf_ladj, function(tf) tf[, 'fluorescence_value']))
-    fluo_calib <- optic_calib(fluo_mtx, db_conn, calib_id, verbose, show_running_time)$fluo_calib[,2:(num_wells+1)]
+    fluo_calib <- optic_calib(fluo_mtx, db_conn, calib_id, channel, verbose, show_running_time)$fluo_calib[,2:(num_wells+1)] # indice 2:(num_wells+1) were added 1, due to adply in optic_calib, which automatically add a column at index 1 of output from rownames of input array (1st argument)
+    
     # combine temperature and fluo data
     fluo_calib_list <- alply(fluo_calib, .margins=2, .fun=function(col1) col1)
-    mc_calib <- do.call(cbind, lapply(1:num_wells, function(well_num) cbind(tf_ladj[[well_num]][, 'temperature'], 
+    fc_wT <- do.call(cbind, lapply(1:num_wells, function(well_num) cbind(tf_ladj[[well_num]][, 'temperature'], 
                                                                             fluo_calib_list[[well_num]])))
-    colnames(mc_calib) <- paste(rep(c('temp', 'fluo'), times=num_wells), rep(unique(fluo_sel$well_num), each=2), sep='_')
+    colnames(fc_wT) <- paste(rep(c('temp', 'fluo'), times=num_wells), rep(unique(fluo_sel$well_num), each=2), sep='_')
+    
+    mc_calib <- list('fluo_calib'=fluo_calib, 'fc_wT'=fc_wT)
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]
@@ -116,18 +84,18 @@ mc_tm_pw <- function(mt_pw,
 
 
 # function: output melting curve data and Tm for all the wells
-mc_tm_all <- function(mc_calib, mc_plot=FALSE, show_running_time=FALSE, 
+mc_tm_all <- function(fc_wT, mc_plot, show_running_time, 
                       ...) { # options to pass onto `mc_tm_pw`
     
     # start counting for running time
     func_name <- 'mc_tm_all'
     start_time <- proc.time()[['elapsed']]
     
-    mt_ori <- meltcurve(mc_calib, 
-                        span.smooth=0.2, span.peaks=51, 
+    mt_ori <- meltcurve(fc_wT, 
+                        span.smooth=0.2, span.peaks=51, # default: span.smooth=0.05, span.peaks=51.
                         plot=mc_plot) # using qpcR function `meltcurve`
     mt_out <- lapply(mt_ori, FUN=mc_tm_pw, ...)
-    names(mt_out) <- colnames(mc_calib)[seq(2, dim(mc_calib)[2], by=2)]
+    names(mt_out) <- colnames(fc_wT)[seq(2, dim(fc_wT)[2], by=2)]
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]
@@ -136,6 +104,66 @@ mc_tm_all <- function(mc_calib, mc_plot=FALSE, show_running_time=FALSE,
     # Return a named list whose length is number of wells. 
     # The name of each element is in the format of `paste('fluo', well_name, sep='_')`
     return(mt_out)
+    }
+
+
+# function: get melting curve data and output it for plotting as well as Tm
+process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
+                       exp_id, stage_id, calib_id, # for selecting data to analyze
+                       dcv=TRUE, # logical, whether to perform multi-channel deconvolution
+                       mc_plot=FALSE, # whether to plot melting curve data
+                       verbose=FALSE, 
+                       show_running_time=FALSE, # option to show time cost to run this function
+                       ... # options to pass onto `mc_tm_pw`
+                       ) {
+    
+    # start counting for running time
+    func_name <- 'process_mc'
+    start_time <- proc.time()[['elapsed']]
+    
+    db_conn <- db_etc(db_usr, db_pwd, db_host, db_port, db_name, 
+                      exp_id, stage_id, calib_id)
+    
+    melt_curve_data <- dbGetQuery(db_conn, 'SELECT * from melt_curve_data')
+    
+    channels <- unique(melt_curve_data[,'channel'])
+    names(channels) <- channels
+    
+    if (length(channels) == 1) dcv <- FALSE
+    
+    mc_calib_mtch <- process_mtch(channels, get_mc_calib, 
+                                  db_conn, 
+                                  exp_id, stage_id, calib_id, 
+                                  verbose, 
+                                  show_running_time)
+    
+    mc_calib_mtch_bych <- mc_calib_mtch[['pre_consoli']]
+    pre_dcv_fc_wT_bych <- lapply(channels, function(channel) mc_calib_mtch_bych[[as.character(channel)]][['fc_wT']]) # `pre_dcv_fc_wT_bych` inherit channels as names from `channels`
+    fc_wT_bych <- pre_dcv_fc_wT_bych
+    
+    mc_calib_array <- mc_calib_mtch[['post_consoli']][['fluo_calib']]
+    
+    if (dcv) {
+        dcvd_array <- deconv(mc_calib_array, k_list_bywell)
+        fc_wT_colnames <- colnames(fc_wT_bych[[1]])
+        fluo_colnames <- fc_wT_colnames[grepl('fluo_', fc_wT_colnames)]
+        for (channel in channels) {
+            dcvd_mtx_per_channel <- dcvd_array[as.character(channel),,]
+            fc_wT_bych[[as.character(channel)]][,fluo_colnames] <- dcvd_mtx_per_channel }}
+    
+    mc_out_pp <- process_mtch(fc_wT_bych, mc_tm_all, mc_plot, show_running_time, ...)
+    
+    mc_out <- list( # each element is a list whose each element represents a channel
+                   'mc_bywell'=mc_out_pp[['pre_consoli']], # each channel element is a list whose each element is a well
+                   'fc_wT'=fc_wT_bych, 'pre_dcv_fc_wT'=pre_dcv_fc_wT_bych # each channel element of fc_wT or pre_dcv_fc_wT_bych is a matrix formatted as input for `meltcurve` by qpcR, where columns are alternating 'temp' and 'fluo'.
+                )
+    mc_out[['melt_curve_data']] <- melt_curve_data
+    
+    # report time cost for this function
+    end_time <- proc.time()[['elapsed']]
+    if (show_running_time) message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
+    
+    return(mc_out)
     }
 
 
