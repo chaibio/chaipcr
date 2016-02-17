@@ -7,6 +7,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
   'Status'
   ($scope, $stateParams, Experiment, $state, AmplificationChartHelper, Status) ->
     $scope.params = $stateParams
+    $scope.lidOpen = false
 
     $scope.deleteExperiment = ->
       exp = new Experiment id: $stateParams.id
@@ -34,6 +35,8 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
     getExperiment()
 
     $scope.$on 'status:data:updated', (e, data, oldData) ->
+      #data.lid.open = true
+      $scope.lidOpen = data?.lid?.open
       state = data?.experiment_controller?.machine?.state
       oldState = oldData?.experiment_controller?.machine?.state
       getExperiment() if state isnt oldState

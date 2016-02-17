@@ -105,11 +105,11 @@ class ExperimentsController < ApplicationController
     end
   end
 
-  api :GET, "/experiments/:id/fluorescence_data", "Retrieve fluorescence data"
-  example "{'total_cycles':40,'ct':['1.0',null,'1.28','20.19','1.0','20.83','20.21','19.23','21.02','15.33','15.11','15.14','15.21','14.67','14.97',null],
-  'fluorescence_data':[{'baseline_subtracted_value':1.4299,'background_subtracted_value':1.234,'well_num':1,'cycle_num':1},
-                        {'baseline_subtracted_value':1.4299,'background_subtracted_value':1.234,'well_num':2,'cycle_num':1}]}"
-  def fluorescence_data
+  api :GET, "/experiments/:id/amplification_data", "Retrieve amplification data"
+  example "{'total_cycles':40,
+            'amplification_data':[['channel', 'well_num', 'cycle_num', 'background_substracted_value', 'baseline_Substracted_value'], [1, 1, 1, 25488, -2003], [1, 1, 2, 53984, -409]],
+            'ct':[['channel', 'well_num', 'ct'], [1, 1, 12.11], [1, 2, 15.77], [1, 3, null]]}"
+  def amplification_data
     if @experiment
       if @experiment.ran?
         if params[:step_id] == nil && params[:ramp_id] == nil
@@ -177,6 +177,8 @@ class ExperimentsController < ApplicationController
         @amplification_data = []
         @ct = []
       end
+    
+      @amplification_data = [["channel","well_num","cycle_num","background_substracted_value", "baseline_Substracted_value"]]+@amplification_data.map {|data| [data.channel,data.well_num,data.cycle_num,data.background_subtracted_value,data.baseline_subtracted_value]}
       respond_to do |format|
         format.json { render "amplification_data", :status => :ok}
       end
@@ -351,18 +353,24 @@ class ExperimentsController < ApplicationController
     if !results.blank?
       raise results["message"] if !results["message"].blank? #catched error
       background_subtracted_results = results[0]
-      baseline_subtracted_results = results[1][0]
+      baseline_subtracted_results = results[1]
       (1...background_subtracted_results.length).each do |well_num|
         if background_subtracted_results[well_num].is_a? Array
           (0...background_subtracted_results[well_num].length).each do |cycle_num|
-            amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num-1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_results[well_num][cycle_num], :baseline_subtracted_value=>(baseline_subtracted_results.is_a? Array)? baseline_subtracted_results[well_num-1][cycle_num] : baseline_subtracted_results[cycle_num, well_num-1])
+            (0..1).each do |channel|
+#              amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num-1, :cycle_num=>cycle_num+1, :channel=>channel, :background_subtracted_value=>background_subtracted_results[well_num][cycle_num][channel], :baseline_subtracted_value=>(baseline_subtracted_results[channel].is_a? Array)? baseline_subtracted_results[channel][well_num-1][cycle_num] : baseline_subtracted_results[channel][cycle_num, well_num-1])
+              amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num, :cycle_num=>cycle_num+1, :channel=>channel+1, :background_subtracted_value=>background_subtracted_results[well_num][cycle_num][channel], :baseline_subtracted_value=>(baseline_subtracted_results[well_num-1].length == 2)? baseline_subtracted_results[well_num-1][channel][cycle_num] : baseline_subtracted_results[well_num-1][cycle_num][channel])
+            end
           end
         else
-          amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num-1, :cycle_num=>1, :background_subtracted_value=>background_subtracted_results[well_num], :baseline_subtracted_value=>baseline_subtracted_results[well_num-1])
+          (0..1).each do |channel|
+            amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :well_num=>well_num, :cycle_num=>1, :channel=>channel+1, :background_subtracted_value=>background_subtracted_results[well_num][channel], :baseline_subtracted_value=>baseline_subtracted_results[channel][well_num-1])
+          end
         end
       end
-      ct = results[2][0].row(0)
-    end 
+      amplification_data.sort_by!{|x| [x.channel,x.well_num,x.cycle_num]}
+      ct = [] #results[2].row(0)
+    end
     logger.info("Rails code time #{Time.now-start_time}")
     return amplification_data, ct
   end
