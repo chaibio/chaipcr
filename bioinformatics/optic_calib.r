@@ -1,5 +1,10 @@
 # calib
 
+# step ids for calibration data
+oc_water_step_id <<- 2
+oc_signal_step_id <<- 4
+
+
 # function: check whether the data in optical calibration experiment is valid; if yes, prepare calibration data
 
 prep_optic_calib <- function(db_conn, calib_id, channel, verbose=FALSE) {

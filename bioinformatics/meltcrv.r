@@ -144,7 +144,7 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
     mc_calib_array <- mc_calib_mtch[['post_consoli']][['fluo_calib']]
     
     if (dcv) {
-        dcvd_array <- deconv(mc_calib_array, k_list_bywell)
+        dcvd_array <- deconv(mc_calib_array, k)
         fc_wT_colnames <- colnames(fc_wT_bych[[1]])
         fluo_colnames <- fc_wT_colnames[grepl('fluo_', fc_wT_colnames)]
         for (channel in channels) {

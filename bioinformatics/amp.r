@@ -136,7 +136,7 @@ baseline_ct <- function(amp_calib,
                         model, baselin, basecyc, fallback, # modlist parameters. 
                         # baselin = c('none', 'mean', 'median', 'lin', 'quad', 'parm').
                         # fallback = c('none', 'mean', 'median', 'lin', 'quad'). only valid when baselin = 'parm'
-                        maxiter, maxfev, # control parameters for `nlsLM` in `pcrfit`. !!!! Note: `maxiter` sometimes affect finIter in a weird way: e.g. for the same well, finIter == 17 when maxiter == 200, finIter == 30 when maxiter == 30, finIter == 100 when maxiter == 100
+                        maxiter, maxfev, # control parameters for `nlsLM` in `pcrfit`. !!!! Note: `maxiter` sometimes affect finIter in a weird way: e.g. for the same well, finIter == 17 when maxiter == 200, finIter == 30 when maxiter == 30, finIter == 100 when maxiter == 100; maxiter affect fitting strategy?
                         min_ac_max, # get_ct_eff parameter to control Ct reporting
                         type, cp, # getPar parameters
                         show_running_time # option to show time cost to run this function
@@ -258,7 +258,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     if (dcv) {
         aca_dim3 <- dim(amp_calib_array)[3]
         ac2dcv <- amp_calib_array[,,2:aca_dim3]
-        dcvd_array <- deconv(ac2dcv, k_list_bywell)
+        dcvd_array <- deconv(ac2dcv, k)
         for (channel in channels) {
             dcvd_mtx_per_channel <- dcvd_array[as.character(channel),,]
             amp_calib_mtch_bych[[as.character(channel)]][['ac_mtx']][,2:aca_dim3] <- dcvd_mtx_per_channel
