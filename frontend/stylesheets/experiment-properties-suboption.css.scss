@@ -1,7 +1,15 @@
 @import "./colors.css.scss";
 
 .experiment-properties-subtoption {
-  padding: 0px 20px;
+
+  form {
+    padding: 0px 20px;
+  }
+  .header {
+      width: 100%;
+      height: 50px;
+      background-color: #000;
+  }
 
   .heading {
     margin-top: 35px;

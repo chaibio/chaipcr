@@ -1,12 +1,11 @@
 @import "./colors.css.scss";
 
-$sidemenu_width: 352px;
 
+$sidemenu_width: 352px;
 .menu-overlay-layout {
   width: 1024px;
   -webkit-transition: margin 0.3s; /* Safari */
   transition: margin 0.3s;
-
 
   .side-menu-header-container {
     width: 100%;
@@ -33,10 +32,19 @@ $sidemenu_width: 352px;
       float: left;
       padding-top: 13px;
       text-align: center;
+
       .close-side-menu {
         cursor: pointer;
+        position: fixed;
+        -webkit-transition: left .5s; /* Safari */
+        transition: left .5s;
+        left: 334px;
         @extend .common;
+        &.sub-menu-open {
+          left: 700px;
+        }
       }
+
     }
   }
 
