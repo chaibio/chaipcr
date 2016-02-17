@@ -53,7 +53,7 @@ window.ChaiBioTech.ngApp
           resolution: opts.resolution
 
     self.getFluorescenceData = (expId) ->
-      $http.get("/experiments/#{expId}/fluorescence_data")
+      $http.get("/experiments/#{expId}/amplification_data")
 
     self.getMeltCurveData = (expId) ->
       $http.get("/experiments/#{expId}/melt_curve_data")

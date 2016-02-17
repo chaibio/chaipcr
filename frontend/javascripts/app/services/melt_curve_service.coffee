@@ -37,7 +37,7 @@ App.service 'MeltCurveService', [
         for item in items by 1
           rows.push
             label: item.series.label
-            value: "#{item.row.y1}"
+            value: "#{item.row.y1.toFixed(2)}"
             id: item.series.id
             color: item.series.color
 
