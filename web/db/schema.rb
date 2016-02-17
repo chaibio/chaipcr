@@ -11,27 +11,29 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160119074520) do
+ActiveRecord::Schema.define(version: 20160217071210) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
     t.integer "stage_id"
     t.integer "well_num"
-    t.decimal "ct",            precision: 5, scale: 2
+    t.decimal "ct",                      precision: 5, scale: 2
+    t.integer "channel",       limit: 1,                         default: 1, null: false
   end
 
-  add_index "amplification_curves", ["experiment_id", "stage_id", "well_num"], name: "index_amplification_curves_by_exp_chan_stage_well", unique: true, using: :btree
+  add_index "amplification_curves", ["experiment_id", "stage_id", "well_num", "channel"], name: "index_amplification_curves_by_exp_chan_stage_well_channel", unique: true, using: :btree
 
   create_table "amplification_data", force: true do |t|
     t.integer "experiment_id"
     t.integer "stage_id"
-    t.integer "well_num",                    comment: "0-15"
-    t.integer "cycle_num",                   comment: "0-15"
+    t.integer "well_num",                                                       comment: "0-15"
+    t.integer "cycle_num",                                                      comment: "0-15"
     t.integer "background_subtracted_value"
     t.integer "baseline_subtracted_value"
+    t.integer "channel",                     limit: 1, default: 1, null: false
   end
 
-  add_index "amplification_data", ["experiment_id", "stage_id", "cycle_num", "well_num"], name: "index_amplification_data_by_exp_chan_stage_cycle_well", unique: true, using: :btree
+  add_index "amplification_data", ["experiment_id", "stage_id", "cycle_num", "well_num", "channel"], name: "index_amplification_data_by_exp_chan_stage_cycle_well_channel", unique: true, using: :btree
 
   create_table "experiment_definitions", force: true do |t|
     t.string "name",            null: false
