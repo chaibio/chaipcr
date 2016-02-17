@@ -12,7 +12,9 @@ window.App.directive 'statusBar', [
     templateUrl: 'app/views/directives/status-bar.html'
     link: ($scope, elem, attrs) ->
 
+
       experiment_id = null
+      $scope.truncate = Experiment.truncateName
 
       $scope.show = ->
         if $scope.state isnt 'idle' then (!!$scope.status and !!$scope.footer_experiment) else !!$scope.status
