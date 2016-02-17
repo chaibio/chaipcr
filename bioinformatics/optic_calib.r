@@ -13,7 +13,7 @@ prep_optic_calib <- function(db_conn, calib_id, channel, verbose=FALSE) {
                                     FROM fluorescence_data 
                                     WHERE experiment_id=%d AND step_id=%d AND channel=%d 
                                     ORDER BY well_num', 
-                                    calib_id, oc_signal_step_ids[[as.character(channel)]], as.numeric(channel))
+                                    calib_id, oc_signal_step_id, as.numeric(channel))
     
     calib_water  <- dbGetQuery(db_conn, calib_water_qry)
     calib_signal <- dbGetQuery(db_conn, calib_signal_qry)
@@ -54,7 +54,11 @@ optic_calib <- function(fluo, db_conn, calib_id, channel, verbose=FALSE, show_ru
     calib_data <- prep_optic_calib(db_conn, calib_id, channel, verbose)
     
     if (!(calib_data$num_calib_wells == num_wells)) {
-        stop('number of calibration wells is not equal to user-defined number of wells') }
+        stop('number of calibration wells (', 
+             calib_data$num_calib_wells, 
+             ') is not equal to user-defined number of wells (', 
+             num_wells, 
+             ').') }
     
     # perform calibration
     signal_water_diff <- calib_data$calib_signal_fluo - calib_data$calib_water_fluo
