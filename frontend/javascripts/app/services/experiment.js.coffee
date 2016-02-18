@@ -53,7 +53,7 @@ window.ChaiBioTech.ngApp
           resolution: opts.resolution
 
     self.getFluorescenceData = (expId) ->
-      $http.get("/experiments/#{expId}/fluorescence_data")
+      $http.get("/experiments/#{expId}/amplification_data")
 
     self.getMeltCurveData = (expId) ->
       $http.get("/experiments/#{expId}/melt_curve_data")
@@ -77,6 +77,12 @@ window.ChaiBioTech.ngApp
       (end.getTime() - start.getTime())/1000;
       # 10
       # end.subtract(start).seconds()
+
+    self.truncateName = (name, truncate_length) ->
+      NAME_LENGTH = parseInt(truncate_length)
+      return if !name
+      return name if name.length <= NAME_LENGTH
+      return name.substring(0, NAME_LENGTH-2)+'...'
 
     return self
 

@@ -254,7 +254,7 @@ else
 fi
 
 counter=2
-if [ $s2pressed -eq 0 ] && [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
+if [ $s2pressed -ne 0 ] && [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
 then
         echo "Resume eMMC unpacking flag found up"
         incriment_restart_counter

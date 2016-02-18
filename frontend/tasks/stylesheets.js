@@ -64,7 +64,7 @@ gulp.task('hash-css', ['concat-css'], function () {
 
 gulp.task('minify-css', ['concat-css', 'hash-css'], function () {
   return gulp.src('.tmp/css/'+applicationCSS+'.css')
-         .pipe(cssnano({keepSpecialComments: 0}))
+         .pipe(cssnano({discardComments: {removeAll: true}}))
          .pipe(gulp.dest('.tmp/css'))
 });
 

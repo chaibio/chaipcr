@@ -24,20 +24,13 @@ dpds <- dpds[dpds != 'depend.r']
 dummy <- lapply(dpds, source) # recursively load all the files that ends with '.R' or '.r'
 
 load('qpcR/sysdata.rda')
-load('k_list_bywell.RData') # load hard-coded deconvolution matrix
+load('k.RData') # load hard-coded deconvolution matrix
 
 
 # set constants
 
 num_wells <<- 16
 scaling_factor <<- 9e5
-
-# optical calibration (oc)
-oc_water_step_id <<- 2
-oc_signal_step_ids <<- list('1'=4, '2'=4) # names are channels (int in database) as characters. When step_id is the same for different channels, it means the same dye is used to calibrate different channels, i.e. its signal in each channel is used to calibrate the respective channel.
-
-# color compensation / multi-channel deconvolution
-dcv_target_step_ids <- list('1'=76, '2'=78) # the steps where target dye used for each channel
 
 
 # function: connect to MySQL database; message about data selection
