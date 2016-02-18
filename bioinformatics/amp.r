@@ -103,8 +103,8 @@ get_ct_eff <- function(ac_mtx,
             adj_reasons[[i]] <- 'b > 0'
         } else if (is.null(stopCode)) {
             adj_reasons[[i]] <- 'is.null(stopCode)'
-        } else if (stopCode != 1) {
-            adj_reasons[[i]] <- paste('stopCode ==', stopCode)
+        } else if (stopCode == -1) {
+            adj_reasons[[i]] <- 'Number of iterations has reached `maxiter`'
         } else if (!is.na(ct) && ct == num_cycles) {
             adj_reasons[[i]] <- 'ct == num_cycles'
         } else {
