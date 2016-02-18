@@ -35,7 +35,7 @@
      <div class="home-page-exp-container" ng-show="experiments !== null && experiments.length !== 0">
        <div  ng-repeat="exp in experiments | orderBy:'experiment.created_at':true" class="home-page-exp-tile">
          <div ng-mouseover="mouseOver = true" ng-mouseleave="mouseOver = false" ng-class="{'home-page-tile-text': true, 'home-page-tile-text-hover': mouseOver && !deleteMode}" ng-click="HomeCtrl.openExperiment(exp.experiment)">
-           <span class="home-page-exp-name B1B">{{exp.experiment.name | truncate:48}}</span> <br/>
+           <span class="home-page-exp-name B1B">{{exp.experiment.name | truncate:40}}</span> <br/>
            <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at">Created {{exp.experiment.created_at | amCalendar}}</span>
            <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at">Run {{exp.experiment.started_at | amCalendar}}</span>
            <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && !exp.experiment.completed_at">IN PROGRESS&nbsp;<ellipsis-animated><ellipsis-animated/></span>
