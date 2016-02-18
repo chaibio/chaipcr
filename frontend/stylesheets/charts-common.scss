@@ -1,7 +1,6 @@
 @import './colors.css.scss';
 
 .results-charts {
-  padding-top: 20px;
 
   .curve-header {
     border-bottom: 3px solid $gray;
@@ -143,7 +142,7 @@
   }
 
 
-  .ampli-zoom-scroll-container {
+  .zoom-scroll-container {
     margin-top: 50px;
     padding-left: 50px;
     padding-right: 50px;

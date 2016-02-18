@@ -99,6 +99,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
             $scope.options.axes.x.ticks.push i*60
 
       $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
+      console.log $scope.resolution
       $scope.updateResolution()
 
     $scope.zoomIn = ->
@@ -109,6 +110,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         delete $scope.options.axes.x.max
         delete $scope.options.axes.x.min
         $scope.options.axes.x.ticks = 8
+      console.log $scope.resolution
 
     $scope.updateYScale = ->
       scales = _.map $scope.temperatureLogsCache, (temp_log) ->
@@ -142,7 +144,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       else
         $scope.widthPercent = 1
 
-      angular.element('.scrollbar').css width: "#{$scope.widthPercent*100}%"
+      angular.element('#temp-logs-scrollbar .scrollbar').css width: "#{$scope.widthPercent*100}%"
       $rootScope.$broadcast 'scrollbar:width:changed'
 
     $scope.resizeTemperatureLogs = ->
@@ -189,6 +191,15 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         else
           $scope.stopInterval()
 
+    $scope.$watch 'resolutionOptionsIndexChange', (index, oldIndex) ->
+      return if index is oldIndex
+      if index > oldIndex
+        console.log 'zoomIn'
+        $scope.zoomIn()
+      else
+        console.log 'zoomOut'
+        $scope.zoomOut()
+
     $scope.$on 'experiment:started', (e, expId) ->
       if parseInt(expId) is parseInt($stateParams.id)
         if $scope.temperatureLogsCache.length is 0
@@ -205,11 +216,9 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
     updateFunc = ->
       return if $scope.RunExperimentCtrl.chart isnt 'temperature-logs'
-      console.log 'temperatureLogs call here'
       Experiment
       .getTemperatureData($stateParams.id, resolution: 1000)
       .then (data) ->
-
         if data.length > 0
           $scope.temperatureLogsCache = angular.copy data
           $scope.temperatureLogs = angular.copy data

@@ -1,17 +1,5 @@
 <div class="amplification-chart-state-active">
   <div class="page-layout" ng-controller="AmplificationChartCtrl" ng-show="experiment">
-    <!-- <div class="header">
-      <div class="stripes-and-name">
-        <a toggle-sidemenu>
-          <div class="stripes">
-            <div class="stripe"></div>
-            <div class="stripe"></div>
-            <div class="stripe"></div>
-          </div>
-        </a>
-        <div class="name-container truncate">{{experiment.name}}</div>
-      </div>
-    </div> -->
     <div class="content">
       <div class="chart-section">
         <div class="curve-header">
@@ -70,21 +58,11 @@
 
 
           <div class="choose-chart">
-            <!--<div class="choose-chart-heading">
-              CHOOSE CHART
-            </div>
-            <div class="row">
-              <div class="col-md-4">
-                <div class="chart-type-option">Amplification Chart</div>
-              </div>
-              <div class="col-md-4">
-                <div class="chart-type-option" ng-click="RunExperimentCtrl.changeChart('temperature-logs')">Thermal Profile</div>
-              </div>
-            </div> -->
             <amplification-well-switch ng-model="wellButtons"></amplification-well-switch>
           </div>
         </div>
       </div>
+
       <div class="table-container">
         <table>
           <tbody>

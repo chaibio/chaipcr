@@ -10,15 +10,11 @@ window.App.directive('ampliSlider', [
     templateUrl: 'app/views/directives/ampli-slider.html'
     link: ($scope, elem, attrs, ngModel) ->
 
-      hasInit = false
       CYCLES = 0
       ngModel.$setViewValue 0
 
       init = ->
-        hasInit = true
-
         CYCLES = $scope.cycles-2
-
         held = false
         oldX = 0
         oldWidth = 0
@@ -35,6 +31,7 @@ window.App.directive('ampliSlider', [
           $scope.$apply()
 
         elem.on 'mousedown', (e) ->
+          CYCLES = $scope.cycles-2
           held = true
           oldX = e.pageX
           oldWidth = getOffsetWidth()
@@ -49,9 +46,9 @@ window.App.directive('ampliSlider', [
           wRatio = newWidth / slider_width
           wRatio = if wRatio < 0 then 0 else wRatio
           wRatio = if wRatio > 1 then 1 else wRatio
-          cycle = Math.floor(wRatio * CYCLES)
-          w = cycle * calibration_width
-          slider_offset.css('width', w + 'px')
+          cycle = Math.round(wRatio * CYCLES)
+          slider_offset_width = cycle * calibration_width
+          slider_offset.css('width', slider_offset_width + 'px')
           updateModel cycle
 
         $window.$(document).on 'mouseup', (e) ->
@@ -59,6 +56,6 @@ window.App.directive('ampliSlider', [
           TextSelection.enable()
 
       $scope.$watch 'cycles', (cycles) ->
-        init() if cycles and !hasInit
+        init() if !!cycles
 
 ]);
