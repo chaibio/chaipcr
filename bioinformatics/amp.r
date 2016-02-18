@@ -234,7 +234,7 @@ baseline_ct <- function(amp_calib,
 get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
                                    exp_id, stage_id, calib_id, # for selecting data to analyze
                                    dcv=TRUE, # logical, whether to perform multi-channel deconvolution
-                                   verbose=FALSE, 
+                                   extra_output=FALSE, 
                                    show_running_time=FALSE # option to show time cost to run this function
                                    ) {
     
@@ -260,10 +260,12 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     
     if (length(channels) == 1) dcv <- FALSE
     
-    amp_calib_mtch <- process_mtch(channels, get_amp_calib, 
+    amp_calib_mtch <- process_mtch(channels, 
+                                   matrix2array=TRUE, 
+                                   func=get_amp_calib, 
                                    db_conn, 
                                    exp_id, stage_id, calib_id, 
-                                   verbose, 
+                                   verbose=extra_output, 
                                    show_running_time)
     
     amp_calib_mtch_bych <- amp_calib_mtch[['pre_consoli']]
@@ -281,22 +283,27 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
             amp_calib_mtch_bych[[as.character(channel)]][['ac_mtx']][,2:aca_dim3] <- dcvd_mtx_per_channel
             bg_sub[as.character(channel),,2:aca_dim3] <- dcvd_mtx_per_channel }}
     
-    baseline_ct_mtch <- process_mtch(amp_calib_mtch_bych, baseline_ct, 
+    baseline_ct_mtch <- process_mtch(amp_calib_mtch_bych, 
+                                     matrix2array=FALSE, 
+                                     func=baseline_ct, 
                                      model, baselin, basecyc, fallback, 
                                      maxiter, maxfev, 
                                      # min_ac_max, 
                                      max_cv, 
                                      type, cp, 
                                      show_running_time)[['post_consoli']]
+    baseline_ct_mtch[['pre_dcv_bg_sub']] <- amp_calib_array
     
     downstream <- list('background_subtracted'=bg_sub, 
                        'baseline_subtracted'=baseline_ct_mtch[['bl_corrected']], 
                        'ct'=baseline_ct_mtch[['ct_eff']], 
-                       'pre_dcv_bg_sub'=amp_calib_array 
+                       'coefficients'=baseline_ct_mtch[['coefficients']]
                        )
     
-    result_mtch <- c(downstream, baseline_ct_mtch)
-    result_mtch[['fluorescence_data']] <- fluorescence_data
+    if (extra_output) {
+        result_mtch <- c(downstream, baseline_ct_mtch)
+        result_mtch[['fluorescence_data']] <- fluorescence_data
+    } else result_mtch <- downstream
     
     return(result_mtch)
     }
