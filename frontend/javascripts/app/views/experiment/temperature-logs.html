@@ -5,7 +5,7 @@
           <div class="row">
             <div class="col-sm-8">
               <span class="curve-title" ng-click="RunExperimentCtrl.changeChartTypeModal()">
-                Temperature Profile
+                Thermal Profile
                 <img class="arrow-down" src="/images/arrow-down.png">
               </span>
             </div>
@@ -53,7 +53,7 @@
           <div ng-show="experiment && !loading">
             <div class="vertical-text">Temperature</div>
             <div class="chart-container" id="temp-logs-drag-scroll" chart-drag-scroll ng-model="scrollState">
-              <linechart data="data" options="options" width="800" height="450" ng-if="RunExperimentCtrl.chart === 'temperature-logs'"></linechart>
+              <linechart ng-if="RunExperiment.chart==='temperature-logs'" data="data" options="options" width="800" height="450" ng-if="RunExperimentCtrl.chart === 'temperature-logs'"></linechart>
             </div>
             <div class="scrollbar-container">
             </div>
