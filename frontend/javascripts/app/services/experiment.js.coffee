@@ -73,10 +73,7 @@ window.ChaiBioTech.ngApp
     self.getExperimentDuration = (exp) ->
       start = new Date(exp.started_at)
       end = new Date(exp.completed_at)
-      # console.log end
       (end.getTime() - start.getTime())/1000;
-      # 10
-      # end.subtract(start).seconds()
 
     self.truncateName = (name, truncate_length) ->
       NAME_LENGTH = parseInt(truncate_length)
