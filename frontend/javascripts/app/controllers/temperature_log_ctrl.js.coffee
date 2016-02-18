@@ -65,7 +65,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
       Experiment
       .getTemperatureData($stateParams.id, resolution: 1000)
-      .success (data) =>
+      .then (data) =>
         $scope.loading = false
         if data.length > 0
           $scope.temperatureLogsCache = angular.copy data
@@ -208,7 +208,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       console.log 'temperatureLogs call here'
       Experiment
       .getTemperatureData($stateParams.id, resolution: 1000)
-      .success (data) ->
+      .then (data) ->
 
         if data.length > 0
           $scope.temperatureLogsCache = angular.copy data
