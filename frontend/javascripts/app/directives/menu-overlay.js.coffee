@@ -20,8 +20,9 @@ window.ChaiBioTech.ngApp.directive 'menuOverlay', [
       compiled = $compile(sidemenu)($scope.$parent)
       sidemenuContainer = elem.find('#sidemenu-content')
       sidemenuContainer.html compiled
-      
+
       $rootScope.$on 'sidemenu:toggle', ->
+        
         if $scope.sideMenuOptionsOpen
           template = $templateCache.get subMenuTemplate
           compiled = $compile(template)($scope.$parent)
