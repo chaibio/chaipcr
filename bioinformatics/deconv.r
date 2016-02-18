@@ -43,6 +43,16 @@ deconv <- function(array2dcv, # dim1 must be channel, dim3 must be well
     
     k_inv <- solve(k)
     
+    a2d_dim1 <- dim(array2dcv)[1]
+    a2d_dim2 <- dim(array2dcv)[2]
+    a2d_dim3 <- dim(array2dcv)[3]
+    a2d_dimnames <- dimnames(array2dcv)
+    
+    # if data only has 1 cycle (amplification) or 1 temperature point (melt curve)
+    if (is.na(a2d_dim3)) array2dcv <- array(c(array2dcv), 
+                                            dim=c(a2d_dim1, 1, a2d_dim2), 
+                                            dimnames=list(a2d_dimnames[[1]], '1', a2d_dimnames[[2]]))
+    
     dcvd_by_dim2_well <- lapply(1:dim(array2dcv)[2], 
         function(dim2_i) do.call(cbind, lapply(1:dim(array2dcv)[3], 
             function(well_i) k_inv %*% array2dcv[,dim2_i,well_i]))) # dim2 is cycle_num for amp and temperature for melt curve
