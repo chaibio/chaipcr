@@ -370,7 +370,7 @@ class ExperimentsController < ApplicationController
            end
          end
          ct_results = results[2][channel]
-         (0...ct_results.column_count()).each do |well_num|
+         (0...ct_results.column_size).each do |well_num|
            cts << AmplificationCurve.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>channel+1, :well_num=>well_num+1, :ct=>ct_results[0,well_num])
          end
       end
