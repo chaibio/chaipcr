@@ -86,7 +86,14 @@
             Experiment.analyze($scope.experiment.id).then(function (resp) {
               $state.go('step-6');
               $scope.result = resp.data;
-              if(resp.data.valid) $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
+              $scope.valid = true;
+              for (var i = resp.data.valid.length - 1; i >= 0; i--) {
+                if (resp.data.valid[i] === false) {
+                  $scope.valid = false;
+                  break;
+                }
+              }
+              if($scope.valid) $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
             });
           });
         }
