@@ -7,7 +7,7 @@ node :amplification_data do
 end
  
 node :ct do
-  @ct
+  @cts
 end
 
 

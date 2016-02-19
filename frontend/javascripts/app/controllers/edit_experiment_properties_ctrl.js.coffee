@@ -56,7 +56,7 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
       promise = Experiment.update({id: $scope.experiment.id}, experiment: $scope.experiment).$promise
 
       promise.then ->
-        $scope.success = "Experiment name updated successfully"
+        $scope.success = "Experiment name updated."
         expName.updateName($scope.experiment.name)
 
       promise.catch (resp) ->
@@ -71,7 +71,7 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
       promise = Protocol.update data
 
       promise.success ->
-        $scope.success = "Protocol lid temperature updated successfully"
+        $scope.success = "Lid temperature updated."
 
       promise.catch (resp) ->
         $scope.errors = resp.data.errors

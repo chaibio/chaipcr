@@ -4,15 +4,21 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
   'Experiment'
   '$state'
   'AmplificationChartHelper'
-  'Status'
-  ($scope, $stateParams, Experiment, $state, AmplificationChartHelper, Status) ->
+  'Status',
+  '$timeout'
+  '$rootScope'
+  ($scope, $stateParams, Experiment, $state, AmplificationChartHelper, Status, $timeout, $rootScope) ->
     $scope.params = $stateParams
     $scope.lidOpen = false
+    $scope.showProperties = false;
 
     $scope.deleteExperiment = ->
       exp = new Experiment id: $stateParams.id
       exp.$delete id: $stateParams.id, ->
         $state.go 'home'
+
+    $scope.$watch 'showProperties', (val) ->
+      $scope.showHide = if val then 'HIDE' else 'SHOW'
 
     $scope.$on 'cycle:number:updated', (e, num) ->
       $scope.maxCycle = num
@@ -33,6 +39,10 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
         $scope.maxCycle = AmplificationChartHelper.getMaxExperimentCycle data.experiment
 
     getExperiment()
+
+    $rootScope.$on 'sidemenu:toggle', ->
+      if $scope.showProperties and angular.element('.sidemenu').width() > 100
+        $scope.showProperties = false
 
     $scope.$on 'status:data:updated', (e, data, oldData) ->
       #data.lid.open = true

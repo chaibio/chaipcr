@@ -22,36 +22,12 @@ window.ChaiBioTech.ngApp.directive 'menuOverlay', [
       sidemenuContainer.html compiled
 
       $rootScope.$on 'sidemenu:toggle', ->
-        
-        if $scope.sideMenuOptionsOpen
-          template = $templateCache.get subMenuTemplate
-          compiled = $compile(template)($scope.$parent)
-          arrow = elem.find('.arrow-right')
-          $rootScope.$broadcast('submenu:toggle', compiled, elem)
-          $rootScope.$apply()
-        else
-          sidemenuContainer.css minHeight: elem.find('.page-wrapper').height()
-
-          $scope.sideMenuOpen = !$scope.sideMenuOpen
-
-
-        # also close the submenu
-        if !$scope.sideMenuOpen
-          $scope.sideMenuOptionsOpen = false
-          elem.find('.menu-overlay-menu-item').removeClass 'active'
-
+        sidemenuContainer.css minHeight: elem.find('.page-wrapper').height()
+        $scope.sideMenuOpen = !$scope.sideMenuOpen
 
       $rootScope.$on 'submenu:toggle', (e, html, subOption) ->
         $scope.sideMenuOptionsOpen = !$scope.sideMenuOptionsOpen
-        elem.find('#submenu').html html
-        closeButton = angular.element(".close-side-menu")
-        if $scope.sideMenuOptionsOpen
-          subOption.addClass('active')
-          closeButton.addClass("sub-menu-open")
-        else
-          subOption.removeClass('active')
-          closeButton.removeClass("sub-menu-open")
-
+        elem.find('#new-sub-menu').html html
 
 
 ]

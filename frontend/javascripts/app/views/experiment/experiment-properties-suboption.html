@@ -1,31 +1,30 @@
 <div ng-controller="EditExperimentPropertiesCtrl" class="experiment-properties-subtoption">
-  <div class="header"></div>
   <form name="expForm" ng-show="experiment">
-      <div class="text-center"  ng-show="success">
-        <span class="help-block">
+      <div class="text-center message-container">
+        <span  ng-show="success" class="help-block">
           <span class="text-success">{{success}}</span>
         </span>
       </div>
-      <div class="text-center" style="padding-top: 20px;" ng-show="errors">
+      <div ng-show="errors">
         <span class="help-block">
           <span class="text-danger">{{errors}}</span>
         </span>
       </div>
-      <div class="heading">
+      <div class="heading SH">
         EXPERIMENT NAME
       </div>
       <div class="exp-name-container">
-        <span class="exp-name simplifica truncate" ng-show="!editExpNameMode">
+        <span class="exp-name B1 truncate" ng-show="!editExpNameMode">
           {{experiment.name}}
         </span>
-        <input type="text" class="exp-name simplifica" ng-model="experiment.name" ng-show="editExpNameMode" ng-blur="saveExperiment()" focus-on="editExpNameMode">
-        <span class="action" ng-click="focusExpName()" ng-show="!editExpNameMode">EDIT</span>
+        <input type="text" class="exp-name B1" ng-model="experiment.name" ng-show="editExpNameMode" ng-blur="saveExperiment()" focus-on="editExpNameMode">
+        <span class="action SH" ng-click="focusExpName()" ng-show="!editExpNameMode">EDIT</span>
       </div>
-      <div class="heading">
+      <div class="heading SH">
         LID TEMPERATURE
       </div>
       <div class="exp-name-container">
-        <span class="exp-name simplifica truncate" ng-show="!editLidTempMode">
+        <span class="exp-name B1 truncate" ng-show="!editLidTempMode">
           {{ (experiment.protocol.lid_temperature) | degreeCelcius }}
         </span>
 
@@ -33,14 +32,14 @@
           type="text"
           name="lidTemp"
           ng-pattern="/^[0-9]+((\.[0-9]+)?)$/"
-          class="exp-name simplifica"
+          class="exp-name B1"
           ng-model="experiment.protocol.lid_temperature"
           ng-show="editLidTempMode"
           ng-blur="updateProtocol(experiment.protocol)"
           on-key-enter="updateProtocol(experiment.protocol)"
           focus-on="editLidTempMode">
 
-        <span class="action" ng-click="focusLidTemp()" ng-show="!editLidTempMode && (!experiment.started_at)">EDIT</span>
+        <span class="action SH" ng-click="focusLidTemp()" ng-show="!editLidTempMode && (!experiment.started_at)">EDIT</span>
         <span class="help-block" ng-show="expForm.lidTemp.$error.pattern">
           <span class="text-danger">Must be a valid number.</span>
         </span>
