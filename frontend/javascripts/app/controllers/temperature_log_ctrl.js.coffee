@@ -99,7 +99,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
             $scope.options.axes.x.ticks.push i*60
 
       $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
-      console.log $scope.resolution
+      # console.log $scope.resolution
       $scope.updateResolution()
 
     $scope.zoomIn = ->
@@ -110,7 +110,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         delete $scope.options.axes.x.max
         delete $scope.options.axes.x.min
         $scope.options.axes.x.ticks = 8
-      console.log $scope.resolution
+      # console.log $scope.resolution
 
     $scope.updateYScale = ->
       scales = _.map $scope.temperatureLogsCache, (temp_log) ->
@@ -149,8 +149,9 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
     $scope.resizeTemperatureLogs = ->
       resolution = $scope.resolution
-      if $scope.resolution> $scope.greatest_elapsed_time/1000 then resolution = $scope.greatest_elapsed_time/1000
+      if resolution > $scope.greatest_elapsed_time/1000 then resolution = $scope.greatest_elapsed_time/1000
       chunkSize = Math.round resolution / $scope.calibration
+      chunkSize = if chunkSize > 0 then chunkSize else 1
       temperature_logs = angular.copy $scope.temperatureLogsCache
       chunked = _.chunk temperature_logs, chunkSize
       averagedLogs = _.map chunked, (chunk) ->
