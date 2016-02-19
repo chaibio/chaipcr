@@ -253,7 +253,13 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     db_conn <- db_etc(db_usr, db_pwd, db_host, db_port, db_name, 
                       exp_id, stage_id, calib_id)
     
-    fluorescence_data <- dbGetQuery(db_conn, 'SELECT * from fluorescence_data')
+    fd_qry <- sprintf('SELECT * FROM fluorescence_data 
+                           LEFT JOIN ramps ON fluorescence_data.ramp_id = ramps.id
+                           INNER JOIN steps ON fluorescence_data.step_id = steps.id OR steps.id = ramps.next_step_id 
+                           WHERE fluorescence_data.experiment_id=%d AND steps.stage_id=%d
+                           ORDER BY well_num, cycle_num, channel',
+                           exp_id, stage_id)
+    fluorescence_data <- dbGetQuery(db_conn, fd_qry)
     
     channels <- unique(fluorescence_data[,'channel'])
     names(channels) <- channels
@@ -293,6 +299,8 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
                                      type, cp, 
                                      show_running_time)[['post_consoli']]
     baseline_ct_mtch[['pre_dcv_bg_sub']] <- amp_calib_array
+    
+    bg_sub <- lapply(channels, function(channel) bg_sub[channel,,]) # for list instead of array output
     
     downstream <- list('background_subtracted'=bg_sub, 
                        'baseline_subtracted'=baseline_ct_mtch[['bl_corrected']], 
