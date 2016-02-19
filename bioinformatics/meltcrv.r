@@ -112,7 +112,7 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
                        exp_id, stage_id, calib_id, # for selecting data to analyze
                        dcv=TRUE, # logical, whether to perform multi-channel deconvolution
                        mc_plot=FALSE, # whether to plot melting curve data
-                       verbose=FALSE, 
+                       extra_output=FALSE, 
                        show_running_time=FALSE, # option to show time cost to run this function
                        ... # options to pass onto `mc_tm_pw`
                        ) {
@@ -131,10 +131,12 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
     
     if (length(channels) == 1) dcv <- FALSE
     
-    mc_calib_mtch <- process_mtch(channels, get_mc_calib, 
+    mc_calib_mtch <- process_mtch(channels, 
+                                  matrix2array=TRUE, 
+                                  func=get_mc_calib, 
                                   db_conn, 
                                   exp_id, stage_id, calib_id, 
-                                  verbose, 
+                                  verbose=extra_output, 
                                   show_running_time)
     
     mc_calib_mtch_bych <- mc_calib_mtch[['pre_consoli']]
@@ -151,13 +153,19 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
             dcvd_mtx_per_channel <- dcvd_array[as.character(channel),,]
             fc_wT_bych[[as.character(channel)]][,fluo_colnames] <- dcvd_mtx_per_channel }}
     
-    mc_out_pp <- process_mtch(fc_wT_bych, mc_tm_all, mc_plot, show_running_time, ...)
+    mc_out_pp <- process_mtch(fc_wT_bych, 
+                              matrix2array=FALSE, # doesn't matter because no original output was matrix
+                              func=mc_tm_all, 
+                              mc_plot, show_running_time, ...)
     
-    mc_out <- list( # each element is a list whose each element represents a channel
-                   'mc_bywell'=mc_out_pp[['pre_consoli']], # each channel element is a list whose each element is a well
-                   'fc_wT'=fc_wT_bych, 'pre_dcv_fc_wT'=pre_dcv_fc_wT_bych # each channel element of fc_wT or pre_dcv_fc_wT_bych is a matrix formatted as input for `meltcurve` by qpcR, where columns are alternating 'temp' and 'fluo'.
-                )
-    mc_out[['melt_curve_data']] <- melt_curve_data
+    message(extra_output)
+    if (extra_output) {
+        mc_out <- list( # each element is a list whose each element represents a channel
+                       'mc_bywell'=mc_out_pp[['pre_consoli']], # each channel element is a list whose each element is a well
+                       'fc_wT'=fc_wT_bych, 'pre_dcv_fc_wT'=pre_dcv_fc_wT_bych # each channel element of fc_wT or pre_dcv_fc_wT_bych is a matrix formatted as input for `meltcurve` by qpcR, where columns are alternating 'temp' and 'fluo'.
+                    )
+        mc_out[['melt_curve_data']] <- melt_curve_data
+    } else mc_out <- mc_out_pp[['pre_consoli']]
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]
