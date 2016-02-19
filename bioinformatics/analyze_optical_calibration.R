@@ -10,9 +10,9 @@ check_optic_calib <- function(channel, db_conn, calib_exp_id) {
     if ('error' %in% class(result1)) {
         valid <- FALSE
         #err <- 'Fluorescein calibrator was less fluorescent than water in some wells. Please retry with new fluorescein calibrator.' # solution 1
-        error_message <- paste('Invalid calibration in Channel ', channel, 
-                         ', well ',  strsplit(result1$message, 'Details: ')[[1]][1], 
-                         sep='')
+        error_message <- paste('Invalid calibration in Channel ', channel, ', ', 
+                               strsplit(result1$message, 'Details: ')[[1]][1], 
+                               sep='')
         error_details <- paste('Channel ', channel, '. ', 
                              as.character(result1), 
                              sep='')

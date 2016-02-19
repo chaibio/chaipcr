@@ -38,10 +38,9 @@ prep_optic_calib <- function(db_conn, calib_id, channel) {
     calib_invalid_vec <- (calib_signal_fluo - calib_water_fluo <= 0)
     if (any(calib_invalid_vec)) {
         ci_well_nums_str <- paste(paste(well_nums[calib_invalid_vec], collapse=', '), '. ', sep='')
-        stop(paste(ci_well_nums_str, 
+        stop(paste('fluorescence value of water is greater than that of dye in the following well(s) - ', ci_well_nums_str, 
                    'Details: ',
                        'Invalid calibration. ', 
-                       'Fluorescence value of water is greater than that of dye in the following well(s): ', ci_well_nums_str, 
                        'Please perform a new optical calibration experiment. ', 
                    sep='')
              ) }
