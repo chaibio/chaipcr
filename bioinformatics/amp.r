@@ -5,7 +5,6 @@
 get_amp_calib <- function(channel, # as 1st argument for iteration by channel
                           db_conn, 
                           exp_id, stage_id, calib_id, # for selecting data to analyze
-                          verbose, 
                           show_running_time # option to show time cost to run this function
                           ) {
     
@@ -31,7 +30,7 @@ get_amp_calib <- function(channel, # as 1st argument for iteration by channel
     fluo_cast <- dcast(fluo_mlt, cycle_num ~ well_num, mean)
     
     # get optical-calibrated data.
-    calibd <- optic_calib(fluo_cast[,2:(num_wells+1)], db_conn, calib_id, channel, verbose, show_running_time)$fluo_calib # column cycle_num is included, because adply automatically create a column at index 1 of output from rownames of input array (1st argument)
+    calibd <- optic_calib(fluo_cast[,2:(num_wells+1)], db_conn, calib_id, channel, show_running_time)$fluo_calib # column cycle_num is included, because adply automatically create a column at index 1 of output from rownames of input array (1st argument)
     ac_mtx <- cbind(fluo_cast[, 'cycle_num'], calibd)
     colnames(ac_mtx)[1] <- 'cycle_num'
     amp_calib <- list('ac_mtx'=as.matrix(ac_mtx), # change data frame to matrix for ease of constructing array
@@ -93,8 +92,7 @@ get_ct_eff <- function(
         stopCode <- mod$convInfo$stopCode
         b <- coef(mod)[['b']]
         
-        cv <- sigma(mod) / mean(bl_corrected[,i]) # residual coefficient of variance, i.e. residual standard error of fitted amplification curve divided by mean fluo over all cycles for each well
-        if (is.null(cv)) cv <- NA
+        cv <- tryCatch(sigma(mod) / mean(bl_corrected[,i]), error=function(e) NA) # residual coefficient of variance, i.e. residual standard error of fitted amplification curve divided by mean fluo over all cycles for each well
         cvs[i] <- cv
         
         # `finIters[[i]]` <- NULL will not create element i for `finIters`
@@ -107,7 +105,7 @@ get_ct_eff <- function(
             # adj_reasons[[i]] <- paste('ac_max < min_ac_max. ac_max == ', ac_max, '. min_ac_max ==', min_ac_max, 
                                       # sep='')
         if        (is.na(cv)) {
-            adj_reasons[[i]] <- 'is.null(cv_ori)'
+            adj_reasons[[i]] <- 'error on sigma'
         } else if (cv > max_cv) {
             adj_reasons[[i]] <- paste('cv > max_cv. cv == ', cv, '. max_cv == ', max_cv, 
                                      sep='')
@@ -225,7 +223,8 @@ baseline_ct <- function(amp_calib,
                 # 'bl_info'=bl_info, # removed for performance
                 'fluoa'=fluoa, 'bl_coefs'=blmods_cm, 'fluo_blmods'=fluo_blmods, 
                 'bl_corrected'=bl_corrected, 'coefficients'=mod_ori_cm, 
-                'ac_maxs'=ct_eff[['ac_maxs']], 'finIters'=ct_eff[['finIters']], 'adj_reasons'=ct_eff[['reasons']], 'ct_eff_raw'=ct_eff[['raw']], 'ct_eff_tagged_colnames'=ct_eff[['tagged_colnames']], # outputs from `get_ct_eff` for debugging
+                # 'ac_maxs'=ct_eff[['ac_maxs']], 
+                'cvs'=ct_eff[['cvs']], 'finIters'=ct_eff[['finIters']], 'adj_reasons'=ct_eff[['reasons']], 'ct_eff_raw'=ct_eff[['raw']], 'ct_eff_tagged_colnames'=ct_eff[['tagged_colnames']], # outputs from `get_ct_eff` for debugging
                 'ct_eff'=ct_eff[['adj']] ))
     }
 
@@ -271,7 +270,6 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
                                    func=get_amp_calib, 
                                    db_conn, 
                                    exp_id, stage_id, calib_id, 
-                                   verbose=extra_output, 
                                    show_running_time)
     
     amp_calib_mtch_bych <- amp_calib_mtch[['pre_consoli']]
