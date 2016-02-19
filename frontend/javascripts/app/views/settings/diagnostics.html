@@ -19,8 +19,8 @@
       <a href="/dynexp/thermal_consistency/index.html" class="button">RUN NOW</a>
     </div>
 		
-    <h3 class="wizard-header">Optical Test</h3>
-    <div class="wizard">
+    <h3 class="wizard-header" ng-show="!is_dual_channel">Optical Test</h3>
+    <div class="wizard" ng-show="!is_dual_channel">
       <!-- <h3>Thermal Performance</h3> -->
       <p>Tests functionality of fluorescence detection optics</p>
       <a href="/dynexp/optical_test/index.html" class="button">RUN NOW</a>

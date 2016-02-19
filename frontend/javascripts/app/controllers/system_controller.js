@@ -4,6 +4,7 @@ window.ChaiBioTech.ngApp.controller('systemController', [
   'Status',
   function(Device, $scope, Status) {
 
+    $scope.is_dual_channel = false;
     $scope.update_available = 'unavailable';
     $scope.getVersionSoft = function() {
       Device.getVersion(true).then(function(resp) {
@@ -18,6 +19,15 @@ window.ChaiBioTech.ngApp.controller('systemController', [
         "software":{"version":"1.0.0","platform":"S0100"}};
       });
     };
+
+    Device.getCapabilities().then(function (resp) {
+      if (!resp.data.capabilities) return;
+      if (!resp.data.capabilities.optics) return;
+      if (!resp.data.capabilities.optics.emission_channels) return;
+      if (!angular.isArray(resp.data.capabilities.optics.emission_channels)) return;
+      if (resp.data.capabilities.optics.emission_channels.length !== 2) return;
+      $scope.is_dual_channel = true;
+    });
 
     $scope.$on('status:data:updated', function (e, data) {
       status = (data && data.device) ? data.device.update_available : 'unknown';

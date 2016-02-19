@@ -15,6 +15,9 @@ window.App.service 'Device', [
 
       isOffline: -> is_offline
 
+      getCapabilities: ->
+        $http.get '/capabilities'
+
       checkForUpdate: ->
         @direct_upload = false
         checkCloudUpdate = (deferred) =>
