@@ -14,7 +14,7 @@ window.App.directive('ampliSlider', [
       ngModel.$setViewValue 0
 
       init = ->
-        CYCLES = $scope.cycles-2
+        CYCLES = $scope.cycles
         held = false
         oldX = 0
         oldWidth = 0
@@ -31,7 +31,7 @@ window.App.directive('ampliSlider', [
           $scope.$apply()
 
         elem.on 'mousedown', (e) ->
-          CYCLES = $scope.cycles-2
+          CYCLES = $scope.cycles
           held = true
           oldX = e.pageX
           oldWidth = getOffsetWidth()

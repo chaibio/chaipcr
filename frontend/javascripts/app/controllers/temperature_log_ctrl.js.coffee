@@ -250,23 +250,29 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
     $scope.initResolutionOptions = ->
       $scope.resolutionOptions = []
-      options = [
-        30
-        60
-        60 * 2
-        60 * 3
-        60 * 5
-        60 * 10
-        60 * 20
-        60 * 30
-        60 * 60
-        60 * 60 * 24
-      ]
+      zoom_calibration = 10
 
-      for opt in options
-        if opt < $scope.greatest_elapsed_time/1000
-          $scope.resolutionOptions.push opt
+      zoom_denomination = $scope.greatest_elapsed_time / 1000 / zoom_calibration
 
-      $scope.resolutionOptions.push Math.floor $scope.greatest_elapsed_time/1000
+      for zoom in [1..zoom_calibration] by 1
+        $scope.resolutionOptions.push Math.floor(zoom*zoom_denomination)
+      # options = [
+      #   30
+      #   60
+      #   60 * 2
+      #   60 * 3
+      #   60 * 5
+      #   60 * 10
+      #   60 * 20
+      #   60 * 30
+      #   60 * 60
+      #   60 * 60 * 24
+      # ]
+
+      # for opt in options
+      #   if opt < $scope.greatest_elapsed_time/1000
+      #     $scope.resolutionOptions.push opt
+
+      # $scope.resolutionOptions.push Math.floor $scope.greatest_elapsed_time/1000
 
 ]

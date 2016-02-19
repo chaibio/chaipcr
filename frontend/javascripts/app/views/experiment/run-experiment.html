@@ -9,11 +9,13 @@
         </div>
       </div>
     </header-status>
-    <div ng-show="RunExperimentCtrl.chart === 'amplification'" ng-include src="'app/views/experiment/amplification-chart.html'">
-    </div>
-    <div ng-show="RunExperimentCtrl.chart === 'temperature-logs'" ng-include src="'app/views/experiment/temperature-logs.html'">
-    </div>
-    <div ng-show="RunExperimentCtrl.chart === 'melt-curve'" ng-include src="'app/views/experiment/melt-curve.html'">
+    <div class="chart-screens-container">
+      <div ng-show="RunExperimentCtrl.chart === 'amplification'" ng-include src="'app/views/experiment/amplification-chart.html'">
+      </div>
+      <div ng-show="RunExperimentCtrl.chart === 'temperature-logs'" ng-include src="'app/views/experiment/temperature-logs.html'">
+      </div>
+      <div ng-show="RunExperimentCtrl.chart === 'melt-curve'" ng-include src="'app/views/experiment/melt-curve.html'">
+      </div>
     </div>
     <status-bar experiment-id="experiment.id"></status-bar>
   </div>
