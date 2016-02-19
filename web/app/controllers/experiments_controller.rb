@@ -116,12 +116,12 @@ class ExperimentsController < ApplicationController
           @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
           if !@first_stage_collect_data.blank?
             if FluorescenceDatum.new_data_generated?(@experiment.id, @first_stage_collect_data.id)
-              begin
+           #   begin
                  @amplification_data, @cts = retrieve_amplification_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id)
-              rescue => e
-                 render :json=>{:errors=>e.to_s}, :status => 500
-                 return
-              end
+          #    rescue => e
+          #       render :json=>{:errors=>e.to_s}, :status => 500
+          #       return
+          #    end
               #update cache
               AmplificationDatum.import @amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value]
               AmplificationCurve.import @cts, :on_duplicate_key_update => [:ct]
@@ -178,8 +178,8 @@ class ExperimentsController < ApplicationController
         @cts = []
       end
     
-      @amplification_data = [["channel","well_num","cycle_num","background_substracted_value", "baseline_Substracted_value"]]+@amplification_data.map {|data| [data.channel,data.well_num,data.cycle_num,data.background_subtracted_value,data.baseline_subtracted_value]}
-      @cts = [["channel","well_num","ct"]]+@cts.map {|ct| [ct.channel,ct.well_num,ct.ct]}
+      @amplification_data = [["channel","well_num","cycle_num","background_substracted_value", "baseline_Substracted_value"]]+@amplification_data.map {|data| [data.channel,data.well_num,data.cycle_num,data.background_subtracted_value,data.baseline_subtracted_value]} if @amplification_data
+      @cts = [["channel","well_num","ct"]]+@cts.map {|ct| [ct.channel,ct.well_num,ct.ct]} if @cts
       respond_to do |format|
         format.json { render "amplification_data", :status => :ok}
       end
@@ -225,14 +225,14 @@ class ExperimentsController < ApplicationController
           first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
           if first_stage_collect_data
             begin
-              amplification_data, ct = retrieve_amplification_data(@experiment.id, first_stage_collect_data.id, @experiment.calibration_id)
+              amplification_data, cts = retrieve_amplification_data(@experiment.id, first_stage_collect_data.id, @experiment.calibration_id)
             rescue => e
               logger.error("export amplification data failed: #{e}")
             end
           end
           
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/amplification.csv")
-          columns = ["well_num", "cycle_num"]
+          columns = ["channel", "well_num", "cycle_num"]
           csv_string = CSV.generate do |csv|
             csv << ["baseline_subtracted_value", "background_subtracted_value"]+columns
             if amplification_data
@@ -245,12 +245,10 @@ class ExperimentsController < ApplicationController
           
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/ct.csv")
           csv_string = CSV.generate do |csv|
-            csv << ["well_num", "ct"];
-            if ct
-              i = 0
-              ct.each do |e|
-                csv << [i, e]
-                i += 1
+            csv << ["channel", "well_num", "ct"];
+            if cts
+              cts.each do |ct|
+                csv << [ct.channel, ct.well_num, ct.ct]
               end
             end
           end
@@ -266,13 +264,13 @@ class ExperimentsController < ApplicationController
           end
           
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_data.csv")
-          columns = ["well_num", "temperature", "fluorescence_data", "derivative"]
+          columns = ["channel", "well_num", "temperature", "fluorescence_data", "derivative"]
           csv_string = CSV.generate do |csv|
             csv << columns
             if melt_curve_data
               melt_curve_data.each do |data|
                 data.temperature.each_index do |index|
-                  csv << [data.well_num, data.temperature[index], data.fluorescence_data[index], data.derivative[index]]
+                  csv << [data.channel, data.well_num, data.temperature[index], data.fluorescence_data[index], data.derivative[index]]
                 end
               end
             end
@@ -280,14 +278,14 @@ class ExperimentsController < ApplicationController
           out.write csv_string
           
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_analysis.csv")
-          columns = ["well_num", "Tm1", "Tm2", "Tm3", "Tm4", "area1", "area2", "area3", "area4"]
+          columns = ["channel", "well_num", "Tm1", "Tm2", "Tm3", "Tm4", "area1", "area2", "area3", "area4"]
           csv_string = CSV.generate do |csv|
             csv << columns
             if melt_curve_data
               melt_curve_data.each do |data|
                 tm_arr = (data.tm.is_a?Array)? [data.tm[0], data.tm[1], data.tm[2], data.tm[3]] : [data.tm, nil, nil, nil]
                 area_arr = (data.area.is_a?Array)? [data.area[0], data.area[1], data.area[2], data.area[3]] : [data.area, nil, nil, nil]
-                csv << [data.well_num]+tm_arr+area_arr
+                csv << [data.channel, data.well_num]+tm_arr+area_arr
               end
             end
           end
@@ -354,15 +352,15 @@ class ExperimentsController < ApplicationController
     cts = []
     if !results.blank?
       raise results["message"] if !results["message"].blank? #catched error
-      (0..1).each do |channel|
+      (0...results[0].length).each do |channel|
          background_subtracted_results = results[0][channel]
          baseline_subtracted_results = results[1][channel]
          if background_subtracted_results.is_a? Array
            num_cycles = 1
            num_wells = background_subtracted_results.length-1
          else
-           num_cycles = background_subtracted_results.row_count()
-           num_wells = background_subtracted_results.column_count()-1
+           num_cycles = background_subtracted_results.row_size
+           num_wells = background_subtracted_results.column_size-1
          end
          (0...num_wells).each do |well_num|
            (0...num_cycles).each do |cycle_num|
@@ -401,10 +399,12 @@ class ExperimentsController < ApplicationController
     melt_curve_data = []
     if !results.blank?
       raise results["message"] if !results["message"].blank? #catched error
-      results.each_index do |i|
-        results_per_well = results[i]
-        hash = OpenStruct.new({:well_num=>i, :temperature=>results_per_well[0][0], :fluorescence_data=>results_per_well[0][1], :derivative=>results_per_well[0][2], :tm=>results_per_well[1][0], :area=>results_per_well[1][1]})
-        melt_curve_data << hash
+      (0...results.length).each do |channel|
+        results[channel].each_index do |i|
+          results_per_well = results[channel][i]
+          hash = OpenStruct.new({:channel=>channel+1, :well_num=>i+1, :temperature=>results_per_well[0][0], :fluorescence_data=>results_per_well[0][1], :derivative=>results_per_well[0][2], :tm=>results_per_well[1][0], :area=>results_per_well[1][1]})
+          melt_curve_data << hash
+        end
       end
     end 
     logger.info("Rails code time #{Time.now-start_time}")
