@@ -20,15 +20,6 @@ window.ChaiBioTech.ngApp.controller('systemController', [
       });
     };
 
-    Device.getCapabilities().then(function (resp) {
-      if (!resp.data.capabilities) return;
-      if (!resp.data.capabilities.optics) return;
-      if (!resp.data.capabilities.optics.emission_channels) return;
-      if (!angular.isArray(resp.data.capabilities.optics.emission_channels)) return;
-      if (resp.data.capabilities.optics.emission_channels.length !== 2) return;
-      $scope.is_dual_channel = true;
-    });
-
     $scope.$on('status:data:updated', function (e, data) {
       status = (data && data.device) ? data.device.update_available : 'unknown';
       if(status !== 'unknown')
