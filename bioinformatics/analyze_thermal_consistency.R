@@ -10,7 +10,6 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
     calib_id, 
     dcv=TRUE, 
     mc_plot=FALSE, 
-    verbose=FALSE, 
     out_json=TRUE, 
     show_running_time=FALSE, 
     ... # options to pass onto `mc_tm_pw`
@@ -29,7 +28,6 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
                         exp_id, stage_id, calib_id, channel, 
                         dcv, 
                         mc_plot, 
-                        verbose, 
                         show_running_time, 
                         qt_prob=qt_prob, max_normd_qtv=max_normd_qtv, # passed onto `mc_tm_pw`, different than default
                         ...)

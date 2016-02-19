@@ -5,7 +5,6 @@
 get_mc_calib <- function(channel, 
                          db_conn, 
                          exp_id, stage_id, calib_id, # for selecting data to analyze
-                         verbose, 
                          show_running_time # option to show time cost to run this function
                          ) {
     
@@ -32,7 +31,7 @@ get_mc_calib <- function(channel,
     
     # water calibration
     fluo_mtx <- do.call(cbind, lapply(tf_ladj, function(tf) tf[, 'fluorescence_value']))
-    fluo_calib <- optic_calib(fluo_mtx, db_conn, calib_id, channel, verbose, show_running_time)$fluo_calib[,2:(num_wells+1)] # indice 2:(num_wells+1) were added 1, due to adply in optic_calib, which automatically add a column at index 1 of output from rownames of input array (1st argument)
+    fluo_calib <- optic_calib(fluo_mtx, db_conn, calib_id, channel, show_running_time)$fluo_calib[,2:(num_wells+1)] # indice 2:(num_wells+1) were added 1, due to adply in optic_calib, which automatically add a column at index 1 of output from rownames of input array (1st argument)
     
     # combine temperature and fluo data
     fluo_calib_list <- alply(fluo_calib, .margins=2, .fun=function(col1) col1)
@@ -136,7 +135,6 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
                                   func=get_mc_calib, 
                                   db_conn, 
                                   exp_id, stage_id, calib_id, 
-                                  verbose=extra_output, 
                                   show_running_time)
     
     mc_calib_mtch_bych <- mc_calib_mtch[['pre_consoli']]

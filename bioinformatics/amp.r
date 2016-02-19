@@ -5,7 +5,6 @@
 get_amp_calib <- function(channel, # as 1st argument for iteration by channel
                           db_conn, 
                           exp_id, stage_id, calib_id, # for selecting data to analyze
-                          verbose, 
                           show_running_time # option to show time cost to run this function
                           ) {
     
@@ -31,7 +30,7 @@ get_amp_calib <- function(channel, # as 1st argument for iteration by channel
     fluo_cast <- dcast(fluo_mlt, cycle_num ~ well_num, mean)
     
     # get optical-calibrated data.
-    calibd <- optic_calib(fluo_cast[,2:(num_wells+1)], db_conn, calib_id, channel, verbose, show_running_time)$fluo_calib # column cycle_num is included, because adply automatically create a column at index 1 of output from rownames of input array (1st argument)
+    calibd <- optic_calib(fluo_cast[,2:(num_wells+1)], db_conn, calib_id, channel, show_running_time)$fluo_calib # column cycle_num is included, because adply automatically create a column at index 1 of output from rownames of input array (1st argument)
     ac_mtx <- cbind(fluo_cast[, 'cycle_num'], calibd)
     colnames(ac_mtx)[1] <- 'cycle_num'
     amp_calib <- list('ac_mtx'=as.matrix(ac_mtx), # change data frame to matrix for ease of constructing array
@@ -271,7 +270,6 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
                                    func=get_amp_calib, 
                                    db_conn, 
                                    exp_id, stage_id, calib_id, 
-                                   verbose=extra_output, 
                                    show_running_time)
     
     amp_calib_mtch_bych <- amp_calib_mtch[['pre_consoli']]
