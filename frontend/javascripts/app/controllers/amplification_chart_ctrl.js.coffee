@@ -77,7 +77,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.wellButtons["well_#{i}"].ct = ct
 
     updateDragScrollWidth = ->
+      return if $scope.RunExperimentCtrl.chart isnt 'amplification'
       svg = drag_scroll.find('svg')
+      return if svg.length is 0
       drag_scroll_width = svg.width() - svg.find('g.y.axis').first()[0].getBBox().width
       num_cycle_to_show = $scope.maxCycle - $scope.ampli_zoom
       width_per_cycle = drag_scroll_width/num_cycle_to_show

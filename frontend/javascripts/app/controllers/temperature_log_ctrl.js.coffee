@@ -65,7 +65,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
       Experiment
       .getTemperatureData($stateParams.id, resolution: 1000)
-      .success (data) =>
+      .then (data) =>
         $scope.loading = false
         if data.length > 0
           $scope.temperatureLogsCache = angular.copy data
@@ -99,6 +99,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
             $scope.options.axes.x.ticks.push i*60
 
       $scope.resolution = $scope.resolutionOptions[$scope.resolutionOptionsIndex]
+      # console.log $scope.resolution
       $scope.updateResolution()
 
     $scope.zoomIn = ->
@@ -109,6 +110,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         delete $scope.options.axes.x.max
         delete $scope.options.axes.x.min
         $scope.options.axes.x.ticks = 8
+      # console.log $scope.resolution
 
     $scope.updateYScale = ->
       scales = _.map $scope.temperatureLogsCache, (temp_log) ->
@@ -126,7 +128,9 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       $scope.options.axes.y.max = max_scale
 
     $scope.updateDragScrollWidthAttr = ->
+      return if $scope.RunExperimentCtrl.chart isnt 'temperature-logs'
       svg = dragScroll.find('svg')
+      return if svg.length is 0
       dragScrollWidth = svg.width() - svg.find('g.y.axis').first()[0].getBBox().width
       w = ($scope.greatest_elapsed_time / 1000) / $scope.resolution * dragScrollWidth
       dragScroll.attr 'width', Math.round w
@@ -140,13 +144,14 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       else
         $scope.widthPercent = 1
 
-      angular.element('.scrollbar').css width: "#{$scope.widthPercent*100}%"
+      angular.element('#temp-logs-scrollbar .scrollbar').css width: "#{$scope.widthPercent*100}%"
       $rootScope.$broadcast 'scrollbar:width:changed'
 
     $scope.resizeTemperatureLogs = ->
       resolution = $scope.resolution
-      if $scope.resolution> $scope.greatest_elapsed_time/1000 then resolution = $scope.greatest_elapsed_time/1000
+      if resolution > $scope.greatest_elapsed_time/1000 then resolution = $scope.greatest_elapsed_time/1000
       chunkSize = Math.round resolution / $scope.calibration
+      chunkSize = if chunkSize > 0 then chunkSize else 1
       temperature_logs = angular.copy $scope.temperatureLogsCache
       chunked = _.chunk temperature_logs, chunkSize
       averagedLogs = _.map chunked, (chunk) ->
@@ -187,6 +192,15 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         else
           $scope.stopInterval()
 
+    $scope.$watch 'resolutionOptionsIndexChange', (index, oldIndex) ->
+      return if index is oldIndex
+      if index > oldIndex
+        console.log 'zoomIn'
+        $scope.zoomIn()
+      else
+        console.log 'zoomOut'
+        $scope.zoomOut()
+
     $scope.$on 'experiment:started', (e, expId) ->
       if parseInt(expId) is parseInt($stateParams.id)
         if $scope.temperatureLogsCache.length is 0
@@ -203,11 +217,9 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
     updateFunc = ->
       return if $scope.RunExperimentCtrl.chart isnt 'temperature-logs'
-      console.log 'temperatureLogs call here'
       Experiment
       .getTemperatureData($stateParams.id, resolution: 1000)
-      .success (data) ->
-
+      .then (data) ->
         if data.length > 0
           $scope.temperatureLogsCache = angular.copy data
           $scope.temperatureLogs = angular.copy data
@@ -238,23 +250,29 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
     $scope.initResolutionOptions = ->
       $scope.resolutionOptions = []
-      options = [
-        30
-        60
-        60 * 2
-        60 * 3
-        60 * 5
-        60 * 10
-        60 * 20
-        60 * 30
-        60 * 60
-        60 * 60 * 24
-      ]
+      zoom_calibration = 10
 
-      for opt in options
-        if opt < $scope.greatest_elapsed_time/1000
-          $scope.resolutionOptions.push opt
+      zoom_denomination = $scope.greatest_elapsed_time / 1000 / zoom_calibration
 
-      $scope.resolutionOptions.push Math.floor $scope.greatest_elapsed_time/1000
+      for zoom in [1..zoom_calibration] by 1
+        $scope.resolutionOptions.push Math.floor(zoom*zoom_denomination)
+      # options = [
+      #   30
+      #   60
+      #   60 * 2
+      #   60 * 3
+      #   60 * 5
+      #   60 * 10
+      #   60 * 20
+      #   60 * 30
+      #   60 * 60
+      #   60 * 60 * 24
+      # ]
+
+      # for opt in options
+      #   if opt < $scope.greatest_elapsed_time/1000
+      #     $scope.resolutionOptions.push opt
+
+      # $scope.resolutionOptions.push Math.floor $scope.greatest_elapsed_time/1000
 
 ]

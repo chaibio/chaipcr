@@ -1,17 +1,5 @@
 <div class="amplification-chart-state-active">
   <div class="page-layout" ng-controller="AmplificationChartCtrl" ng-show="experiment">
-    <!-- <div class="header">
-      <div class="stripes-and-name">
-        <a toggle-sidemenu>
-          <div class="stripes">
-            <div class="stripe"></div>
-            <div class="stripe"></div>
-            <div class="stripe"></div>
-          </div>
-        </a>
-        <div class="name-container truncate">{{experiment.name}}</div>
-      </div>
-    </div> -->
     <div class="content">
       <div class="chart-section">
         <div class="curve-header">
@@ -48,7 +36,7 @@
         <div>
           <div class="vertical-text SH">RELATIVE FLUORESCENCE UNITS</div>
           <div class="chart-container" id="ampli-drag-scroll" chart-drag-scroll ng-model="ampli_scroll">
-            <linechart class="linechart" data-drag-scroll="ampli-drag-scroll" data="data" options="chartConfig" width="700" height="300" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks"></linechart>
+            <linechart ng-if="RunExperimentCtrl.chart==='amplification'" class="linechart" data-drag-scroll="ampli-drag-scroll" data="data" options="chartConfig" width="700" height="300" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks"></linechart>
           </div>
           <div class="text-center num-cycle-text SH">CYCLES NUMBER</div>
 
@@ -59,7 +47,7 @@
                   <div class="zoom-text SH">
                     <b>ZOOM</b>
                   </div>
-                  <ampli-slider ng-model="ampli_zoom" range="maxCycle"></ampli-slider>
+                  <ampli-slider ng-model="ampli_zoom" range="maxCycle-2"></ampli-slider>
                 </div>
               </div>
               <div class="col-md-6 ampli-scrollbar-container">
@@ -70,21 +58,11 @@
 
 
           <div class="choose-chart">
-            <!--<div class="choose-chart-heading">
-              CHOOSE CHART
-            </div>
-            <div class="row">
-              <div class="col-md-4">
-                <div class="chart-type-option">Amplification Chart</div>
-              </div>
-              <div class="col-md-4">
-                <div class="chart-type-option" ng-click="RunExperimentCtrl.changeChart('temperature-logs')">Thermal Profile</div>
-              </div>
-            </div> -->
             <amplification-well-switch ng-model="wellButtons"></amplification-well-switch>
           </div>
         </div>
       </div>
+
       <div class="table-container">
         <table>
           <tbody>

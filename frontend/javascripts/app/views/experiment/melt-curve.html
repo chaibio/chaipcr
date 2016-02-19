@@ -51,8 +51,9 @@
         <span ng-show="curve_type === 'derivative'">DERIVATIVE REPORTER</span>
         <span ng-show="curve_type === 'normalized'">NORMALIZED REPORTER</span>
       </div>
-      <div class="chart-container" id="meltcurve-drag-scroll" chart-drag-scroll ng-model="melt_curve_scroll">
-        <linechartv2 ng-show="curve_type==='derivative'" data-drag-scroll="meltcurve-drag-scroll" data="data" options="chartConfigDerivative" width="1024" height="400" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks"></linechartv2>
+      <div ng-if="RunExperimentCtrl.chart==='melt-curve' || !!data" class="chart-container" id="meltcurve-drag-scroll" chart-drag-scroll ng-model="melt_curve_scroll">
+        <linechartv2 ng-show="curve_type==='derivative'"
+         data-drag-scroll="meltcurve-drag-scroll" data="data" options="chartConfigDerivative" width="1024" height="400" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks"></linechartv2>
         <linechartv2 ng-show="curve_type==='normalized'" data-drag-scroll="meltcurve-drag-scroll" data="data" options="chartConfigNormalized" width="1024" height="400" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks"></linechartv2>
       </div>
       <!-- <div class="text-center x-axis-text SH">TEMPERATURE (&deg;C)</div> -->

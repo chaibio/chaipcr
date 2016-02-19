@@ -1,63 +1,39 @@
-  <div class="temperatureLog-state-active">
+  <div class="temperatureLog-state-active results-charts">
     <div class="page-layout run-experiment" ng-controller="TemperatureLogCtrl">
       <div class="content">
         <div class="curve-header">
           <div class="row">
-            <div class="col-sm-8">
-              <span class="curve-title" ng-click="RunExperimentCtrl.changeChartTypeModal()">
-                Temperature Profile
+            <div class="col-sm-4">
+              <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()">
+                Thermal Profile
                 <img class="arrow-down" src="/images/arrow-down.png">
               </span>
             </div>
-            <div class="col-sm-4">
-              <div class="row scrollbars-container">
-                <div class="col-sm-6 time-scrollbar-container">
-                  <div class="row">
-                    <div class="col-sm-4">
-                      <div class="text">SCROLL</div>
-                    </div>
-                    <div class="col-sm-8">
-                      <div class="scroll-container">
-                        <scrollbar ng-model="scrollState"></scrollbar>
-                      </div>
-                    </div>
+            <div class="col-sm-8">
+              <div class="row zoom-scroll-container SHR">
+                <div class="col-sm-6">
+                  <div class="zoom-container">
+                    <div class="zoom-text">ZOOM</div>
+                    <ampli-slider ng-model="resolutionOptionsIndexChange" range="resolutionOptions.length"></ampli-slider>
                   </div>
                 </div>
-                <div class="col-sm-6">
-                  <div class="row">
-                    <div class="zoom-container">
-                      <div class="col-sm-4">
-                        <div class="text">ZOOM</div>
-                      </div>
-                      <div class="col-sm-6 zoom-buttons">
-                        <div class="row">
-                          <div class="col-sm-6">
-                            <div class="zoom-button noselect" ng-click="zoomOut()">-</div>
-                          </div>
-                          <div class="col-sm-6">
-                            <div class="zoom-button noselect" ng-click="zoomIn()">+</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                <div class="col-sm-6 zoom-container">
+                  <scrollbar id="temp-logs-scrollbar" ng-model="scrollState"></scrollbar>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div class="temperature-log-chart">
-          <div ng-show="!experiment || loading">
-            <h3 class="text-center">Loading...</h3>
+          <div class="text-center loading" ng-show="!experiment || loading">
+            <strong>Loading melt curve data<ellipsis-animated></ellipsis-animated></strong>
           </div>
           <div ng-show="experiment && !loading">
-            <div class="vertical-text">Temperature</div>
+            <div class="vertical-text SH">Temperature (&deg;C)</div>
             <div class="chart-container" id="temp-logs-drag-scroll" chart-drag-scroll ng-model="scrollState">
-              <linechart data="data" options="options" width="800" height="450" ng-if="RunExperimentCtrl.chart === 'temperature-logs'"></linechart>
+              <linechart ng-if="RunExperimentCtrl.chart==='temperature-logs'" data="data" options="options" width="1024" height="450" ng-if="RunExperimentCtrl.chart === 'temperature-logs'"></linechart>
             </div>
-            <div class="scrollbar-container">
-            </div>
-            <div class="text-center">Time</div>
+            <div class="text-center SH">Time</div>
           </div>
         </div>
 

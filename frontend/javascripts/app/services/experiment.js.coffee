@@ -41,16 +41,33 @@ window.ChaiBioTech.ngApp
     self.getCurrentExperiment = ->
       currentExperiment
 
+    tempLogsQues = []
     self.getTemperatureData = (expId, opts = {}) ->
 
       opts.starttime = opts.starttime || 0
       opts.resolution = opts.resolution || 1000
+      deferred = $q.defer()
+      tempLogsQues.push deferred
+      return deferred.promise if fetchingTempLogs
 
-      $http.get "/experiments/#{expId}/temperature_data",
+      fetchingTempLogs = true
+      promise = $http.get "/experiments/#{expId}/temperature_data",
         params:
           starttime: opts.starttime
           endtime: opts.endtime
           resolution: opts.resolution
+
+      promise.then (resp) ->
+        for def in tempLogsQues by 1
+          def.resolve resp.data
+      promise.catch (err) ->
+        for def in tempLogsQues by 1
+          def.reject err
+      promise.finally ->
+        fetchingTempLogs = false
+        tempLogsQues = []
+
+      return deferred.promise
 
     self.getFluorescenceData = (expId) ->
       $http.get("/experiments/#{expId}/amplification_data")
@@ -73,10 +90,7 @@ window.ChaiBioTech.ngApp
     self.getExperimentDuration = (exp) ->
       start = new Date(exp.started_at)
       end = new Date(exp.completed_at)
-      # console.log end
       (end.getTime() - start.getTime())/1000;
-      # 10
-      # end.subtract(start).seconds()
 
     self.truncateName = (name, truncate_length) ->
       NAME_LENGTH = parseInt(truncate_length)

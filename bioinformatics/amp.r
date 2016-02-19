@@ -59,52 +59,66 @@ modlist_coef <- function(modLIST, coef_cols) {
 
 
 # function: get Ct and amplification efficiency values
-get_ct_eff <- function(ac_mtx, 
+get_ct_eff <- function(
+                       bl_corrected, 
+                       # ac_mtx, 
                        # signal_water_diff, 
                        mod_ori, 
-                       min_ac_max, 
+                       # min_ac_max, # the threshold which maximum (fluo value / scaling factor) of the well needs to exceed, for Ct to be reported as actual value instead of NA
+                       max_cv, # maximum residual coefficient of variance, for Ct to be reported as actual value instead of NA
                        type, cp, 
                        num_cycles) {
     
-    ac_maxs <- unlist(alply(ac_mtx, .margins=2, max))[2:ncol(ac_mtx)] / scaling_factor
+    # ac_maxs <- unlist(alply(ac_mtx, .margins=2, max))[2:ncol(ac_mtx)] / scaling_factor
     # ac_calib_ratios <- unlist(alply(ac_mtx, .margins=2, max))[2:ncol(ac_mtx)] / signal_water_diff
+    # well_names <- colnames(ac_mtx)[2:ncol(ac_mtx)]
     
-    well_names <- colnames(ac_mtx)[2:ncol(ac_mtx)]
+    well_names <- colnames(bl_corrected)
     
     ct_eff_raw <- getPar(mod_ori, type=type, cp=cp)
     tagged_colnames <- colnames(ct_eff_raw)
     colnames(ct_eff_raw) <- well_names
     
-    finIters <- list()
-    adj_reasons <- list()
+    cvs <- c()
+    finIters <- c()
+    adj_reasons <- list() # c() isn't pretty for view
     ct_eff_adj <- ct_eff_raw
     
     for (i in 1:num_wells) {
         
-        ac_max <- ac_maxs[i]
+        # ac_max <- ac_maxs[i]
         # ac_calib_ratio <- ac_calib_ratios[i]
         
         mod <- mod_ori[[i]]
         stopCode <- mod$convInfo$stopCode
         b <- coef(mod)[['b']]
         
+        cv <- sigma(mod) / mean(bl_corrected[,i]) # residual coefficient of variance, i.e. residual standard error of fitted amplification curve divided by mean fluo over all cycles for each well
+        if (is.null(cv)) cv <- NA
+        cvs[i] <- cv
+        
         # `finIters[[i]]` <- NULL will not create element i for `finIters`
         finIter <- mod$convInfo$finIter
-        if (is.null(finIter)) finIters[[i]] <- NA else finIters[[i]] <- finIter
+        if (is.null(finIter)) finIters[i] <- NA else finIters[i] <- finIter
         
         ct <- ct_eff_adj['ct', i]
         
-        if        (ac_max < min_ac_max) {
-            adj_reasons[[i]] <- paste('ac_max < min_ac_max. ac_max == ', ac_max, '. min_ac_max ==', min_ac_max, 
-                                      sep='')
+        # if        (ac_max < min_ac_max) {
+            # adj_reasons[[i]] <- paste('ac_max < min_ac_max. ac_max == ', ac_max, '. min_ac_max ==', min_ac_max, 
+                                      # sep='')
+        if        (is.na(cv)) {
+            adj_reasons[[i]] <- 'is.null(cv_ori)'
+        } else if (cv > max_cv) {
+            adj_reasons[[i]] <- paste('cv > max_cv. cv == ', cv, '. max_cv == ', max_cv, 
+                                     sep='')
         } else if (is.null(b)) {
             adj_reasons[[i]] <- 'is.null(b)'
         } else if (b > 0) {
             adj_reasons[[i]] <- 'b > 0'
         } else if (is.null(stopCode)) {
             adj_reasons[[i]] <- 'is.null(stopCode)'
-        } else if (stopCode != 1) {
-            adj_reasons[[i]] <- paste('stopCode ==', stopCode)
+        # } else if (stopCode == -1) { # may not be accurate enough
+            # adj_reasons[[i]] <- 'Number of iterations has reached `maxiter`'
         } else if (!is.na(ct) && ct == num_cycles) {
             adj_reasons[[i]] <- 'ct == num_cycles'
         } else {
@@ -114,18 +128,18 @@ get_ct_eff <- function(ac_mtx,
         
         }
     
-    names(ac_maxs) <- well_names
+    # names(ac_maxs) <- well_names
     
-    finIters <- unlist(finIters)
+    names(cvs) <- well_names
     names(finIters) <- well_names
-    
     names(adj_reasons) <- well_names
     
     rownames(ct_eff_adj) <- rownames(ct_eff_raw)
     colnames(ct_eff_adj) <- well_names
     
     return(list('adj'=ct_eff_adj, 
-                'ac_maxs'=ac_maxs, 'raw'=ct_eff_raw, 'finIters'=finIters, 'reasons'=adj_reasons, # for debugging
+                # 'ac_maxs'=ac_maxs, 
+                'raw'=ct_eff_raw, 'cvs'=cvs, 'finIters'=finIters, 'reasons'=adj_reasons, # for debugging
                 'tagged_colnames'=tagged_colnames
                 ))
     }
@@ -137,7 +151,8 @@ baseline_ct <- function(amp_calib,
                         # baselin = c('none', 'mean', 'median', 'lin', 'quad', 'parm').
                         # fallback = c('none', 'mean', 'median', 'lin', 'quad'). only valid when baselin = 'parm'
                         maxiter, maxfev, # control parameters for `nlsLM` in `pcrfit`. !!!! Note: `maxiter` sometimes affect finIter in a weird way: e.g. for the same well, finIter == 17 when maxiter == 200, finIter == 30 when maxiter == 30, finIter == 100 when maxiter == 100; maxiter affect fitting strategy?
-                        min_ac_max, # get_ct_eff parameter to control Ct reporting
+                        # min_ac_max, # get_ct_eff parameter to control Ct reporting
+                        max_cv, # get_ct_eff parameter to control Ct reporting
                         type, cp, # getPar parameters
                         show_running_time # option to show time cost to run this function
                         ) {
@@ -193,10 +208,11 @@ baseline_ct <- function(amp_calib,
     # bl_corrected <- NULL
     
     # threshold cycle and amplification efficiency
-    ct_eff <- get_ct_eff(ac_mtx, 
+    ct_eff <- get_ct_eff(bl_corrected, 
                          # signal_water_diff, 
                          mod_ori, 
-                         min_ac_max=min_ac_max, 
+                         # min_ac_max=min_ac_max, 
+                         max_cv=max_cv, 
                          type=type, cp=cp, 
                          num_cycles=nrow(ac_mtx))
     
@@ -218,7 +234,7 @@ baseline_ct <- function(amp_calib,
 get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
                                    exp_id, stage_id, calib_id, # for selecting data to analyze
                                    dcv=TRUE, # logical, whether to perform multi-channel deconvolution
-                                   verbose=FALSE, 
+                                   extra_output=FALSE, 
                                    show_running_time=FALSE # option to show time cost to run this function
                                    ) {
     
@@ -229,24 +245,33 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     fallback <- 'lin'
     maxiter <- 500
     maxfev <- 10000
-    min_ac_max <- 0
+    # min_ac_max <- 0
+    max_cv <- 0.1
     type <- 'curve'
     cp <- 'cpD2'
     
     db_conn <- db_etc(db_usr, db_pwd, db_host, db_port, db_name, 
                       exp_id, stage_id, calib_id)
     
-    fluorescence_data <- dbGetQuery(db_conn, 'SELECT * from fluorescence_data')
+    fd_qry <- sprintf('SELECT * FROM fluorescence_data 
+                           LEFT JOIN ramps ON fluorescence_data.ramp_id = ramps.id
+                           INNER JOIN steps ON fluorescence_data.step_id = steps.id OR steps.id = ramps.next_step_id 
+                           WHERE fluorescence_data.experiment_id=%d AND steps.stage_id=%d
+                           ORDER BY well_num, cycle_num, channel',
+                           exp_id, stage_id)
+    fluorescence_data <- dbGetQuery(db_conn, fd_qry)
     
     channels <- unique(fluorescence_data[,'channel'])
     names(channels) <- channels
     
     if (length(channels) == 1) dcv <- FALSE
     
-    amp_calib_mtch <- process_mtch(channels, get_amp_calib, 
+    amp_calib_mtch <- process_mtch(channels, 
+                                   matrix2array=TRUE, 
+                                   func=get_amp_calib, 
                                    db_conn, 
                                    exp_id, stage_id, calib_id, 
-                                   verbose, 
+                                   verbose=extra_output, 
                                    show_running_time)
     
     amp_calib_mtch_bych <- amp_calib_mtch[['pre_consoli']]
@@ -264,21 +289,29 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
             amp_calib_mtch_bych[[as.character(channel)]][['ac_mtx']][,2:aca_dim3] <- dcvd_mtx_per_channel
             bg_sub[as.character(channel),,2:aca_dim3] <- dcvd_mtx_per_channel }}
     
-    baseline_ct_mtch <- process_mtch(amp_calib_mtch_bych, baseline_ct, 
+    baseline_ct_mtch <- process_mtch(amp_calib_mtch_bych, 
+                                     matrix2array=FALSE, 
+                                     func=baseline_ct, 
                                      model, baselin, basecyc, fallback, 
                                      maxiter, maxfev, 
-                                     min_ac_max, 
+                                     # min_ac_max, 
+                                     max_cv, 
                                      type, cp, 
                                      show_running_time)[['post_consoli']]
+    baseline_ct_mtch[['pre_dcv_bg_sub']] <- amp_calib_array
+    
+    bg_sub <- lapply(channels, function(channel) bg_sub[channel,,]) # for list instead of array output
     
     downstream <- list('background_subtracted'=bg_sub, 
                        'baseline_subtracted'=baseline_ct_mtch[['bl_corrected']], 
                        'ct'=baseline_ct_mtch[['ct_eff']], 
-                       'pre_dcv_bg_sub'=amp_calib_array 
+                       'coefficients'=baseline_ct_mtch[['coefficients']]
                        )
     
-    result_mtch <- c(downstream, baseline_ct_mtch)
-    result_mtch[['fluorescence_data']] <- fluorescence_data
+    if (extra_output) {
+        result_mtch <- c(downstream, baseline_ct_mtch)
+        result_mtch[['fluorescence_data']] <- fluorescence_data
+    } else result_mtch <- downstream
     
     return(result_mtch)
     }

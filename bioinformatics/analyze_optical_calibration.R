@@ -43,7 +43,10 @@ analyze_optical_calibration <- function(
     channels <- unique(calib_exp_data[,'channel'])
     names(channels) <- channels
     
-    result_lists <- process_mtch(channels, check_optic_calib, db_conn, calib_exp_id, verbose)[['post_consoli']]
+    result_lists <- process_mtch(channels, 
+                                 matrix2array=FALSE, # doesn't matter because no original output was matrix
+                                 func=check_optic_calib, 
+                                 db_conn, calib_exp_id, verbose)[['post_consoli']]
     result <- lapply(result_lists, 
                      function(out_ele) paste(sapply(channels, 
                                                     function(channel) paste('Channel ', channel, '. ', out_ele[[channel]],
