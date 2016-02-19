@@ -93,8 +93,7 @@ get_ct_eff <- function(
         stopCode <- mod$convInfo$stopCode
         b <- coef(mod)[['b']]
         
-        cv <- sigma(mod) / mean(bl_corrected[,i]) # residual coefficient of variance, i.e. residual standard error of fitted amplification curve divided by mean fluo over all cycles for each well
-        if (is.null(cv)) cv <- NA
+        cv <- tryCatch(sigma(mod) / mean(bl_corrected[,i]), error=function(e) NA) # residual coefficient of variance, i.e. residual standard error of fitted amplification curve divided by mean fluo over all cycles for each well
         cvs[i] <- cv
         
         # `finIters[[i]]` <- NULL will not create element i for `finIters`
@@ -107,7 +106,7 @@ get_ct_eff <- function(
             # adj_reasons[[i]] <- paste('ac_max < min_ac_max. ac_max == ', ac_max, '. min_ac_max ==', min_ac_max, 
                                       # sep='')
         if        (is.na(cv)) {
-            adj_reasons[[i]] <- 'is.null(cv_ori)'
+            adj_reasons[[i]] <- 'error on sigma'
         } else if (cv > max_cv) {
             adj_reasons[[i]] <- paste('cv > max_cv. cv == ', cv, '. max_cv == ', max_cv, 
                                      sep='')
@@ -225,7 +224,8 @@ baseline_ct <- function(amp_calib,
                 # 'bl_info'=bl_info, # removed for performance
                 'fluoa'=fluoa, 'bl_coefs'=blmods_cm, 'fluo_blmods'=fluo_blmods, 
                 'bl_corrected'=bl_corrected, 'coefficients'=mod_ori_cm, 
-                'ac_maxs'=ct_eff[['ac_maxs']], 'finIters'=ct_eff[['finIters']], 'adj_reasons'=ct_eff[['reasons']], 'ct_eff_raw'=ct_eff[['raw']], 'ct_eff_tagged_colnames'=ct_eff[['tagged_colnames']], # outputs from `get_ct_eff` for debugging
+                # 'ac_maxs'=ct_eff[['ac_maxs']], 
+                'cvs'=ct_eff[['cvs']], 'finIters'=ct_eff[['finIters']], 'adj_reasons'=ct_eff[['reasons']], 'ct_eff_raw'=ct_eff[['raw']], 'ct_eff_tagged_colnames'=ct_eff[['tagged_colnames']], # outputs from `get_ct_eff` for debugging
                 'ct_eff'=ct_eff[['adj']] ))
     }
 
