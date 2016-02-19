@@ -4,7 +4,7 @@ require 'rserve'
 class ExperimentsController < ApplicationController
   include ParamsHelper
   
-  #before_filter :ensure_authenticated_user
+  before_filter :ensure_authenticated_user
   before_filter :get_experiment, :except => [:index, :create, :copy]
   
   respond_to :json
@@ -116,12 +116,12 @@ class ExperimentsController < ApplicationController
           @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
           if !@first_stage_collect_data.blank?
             if FluorescenceDatum.new_data_generated?(@experiment.id, @first_stage_collect_data.id)
-           #   begin
+              begin
                  @amplification_data, @cts = retrieve_amplification_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id)
-          #    rescue => e
-          #       render :json=>{:errors=>e.to_s}, :status => 500
-          #       return
-          #    end
+              rescue => e
+                 render :json=>{:errors=>e.to_s}, :status => 500
+                 return
+              end
               #update cache
               AmplificationDatum.import @amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value]
               AmplificationCurve.import @cts, :on_duplicate_key_update => [:ct]
@@ -178,8 +178,8 @@ class ExperimentsController < ApplicationController
         @cts = []
       end
     
-      @amplification_data = [["channel","well_num","cycle_num","background_substracted_value", "baseline_Substracted_value"]]+@amplification_data.map {|data| [data.channel,data.well_num,data.cycle_num,data.background_subtracted_value,data.baseline_subtracted_value]} if @amplification_data
-      @cts = [["channel","well_num","ct"]]+@cts.map {|ct| [ct.channel,ct.well_num,ct.ct]} if @cts
+      @amplification_data = (!@amplification_data.blank?)? [["channel","well_num","cycle_num","background_substracted_value", "baseline_Substracted_value"]]+@amplification_data.map {|data| [data.channel,data.well_num,data.cycle_num,data.background_subtracted_value,data.baseline_subtracted_value]} : nil
+      @cts = (!@cts.blank?)? [["channel","well_num","ct"]]+@cts.map {|ct| [ct.channel,ct.well_num,ct.ct]} : nil
       respond_to do |format|
         format.json { render "amplification_data", :status => :ok}
       end
