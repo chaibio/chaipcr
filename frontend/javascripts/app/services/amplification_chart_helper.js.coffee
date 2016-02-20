@@ -3,24 +3,24 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
   '$filter'
   (SecondsDisplay, $filter) ->
 
-    @chartSeries = (type, is_dual_channel) ->
-      channels_count = if is_dual_channel then 2 else 1
-      series = []
-      for channel_i in [1..channels_count] by 1
-        for well_i in [0..15] by 1
+    # @chartSeries = (type, is_dual_channel) ->
+    #   channels_count = if is_dual_channel then 2 else 1
+    #   series = []
+    #   for channel_i in [1..channels_count] by 1
+    #     for well_i in [0..15] by 1
 
-          label = if channels_count is 1 then "well_#{well_i}: " else "channel_#{channel_i}, well_#{well_i}: "
+    #       label = if channels_count is 1 then "well_#{well_i}: " else "channel_#{channel_i}, well_#{well_i}: "
 
-          series.push
-            axis: 'y'
-            dataset: "channel_#{channel_i}"
-            key: "well_#{well_i}_#{type}"
-            color: @COLORS[well_i]
-            # type: ['line']
-            id: "channel_#{channel_i}_well_#{well_i}"
-            label: label
+    #       series.push
+    #         axis: 'y'
+    #         dataset: "channel_#{channel_i}"
+    #         key: "well_#{well_i}_#{type}"
+    #         color: @COLORS[well_i]
+    #         # type: ['line']
+    #         id: "channel_#{channel_i}_well_#{well_i}"
+    #         label: label
 
-      return series
+    #   return series
 
     @chartConfig = ->
       axes:
@@ -68,7 +68,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       for channel_i in [1..channels_count] by 1
         channel_datasets["channel_#{channel_i}"] = []
         channel_data = _.filter amplification_data, (datum) ->
-          datum[0] is 1
+          datum[0] is channel_i
         for cycle_i in [1..max_cycle] by 1
           data_by_cycle = _.filter channel_data, (datum) ->
             datum[2] is cycle_i
@@ -115,12 +115,12 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
       return (Math.max.apply Math, calibs)
 
-    @getMaxCycleFromAmplification = (amplification_data) ->
-      cycles = []
-      for datum in [0...amplification_data.length] by 1
-        cycles.push parseInt(datum[2])
+    # @getMaxCycleFromAmplification = (amplification_data) ->
+    #   cycles = []
+    #   for datum in [0...amplification_data.length] by 1
+    #     cycles.push parseInt(datum[2])
 
-      return Math.max.apply Math, cycles
+    #   return Math.max.apply Math, cycles
 
     @Xticks = (min, max)->
       num_ticks = 10

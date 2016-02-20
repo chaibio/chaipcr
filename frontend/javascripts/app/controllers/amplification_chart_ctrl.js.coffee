@@ -128,7 +128,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                 axis: 'y'
                 dataset: "channel_#{ch_i}"
                 key: "well_#{i}_#{subtraction_type}"
-                label: if $scope.is_dual_channel then "channel_#{ch_i}, well_#{i}: " else "well_#{i}: "
+                label: if $scope.is_dual_channel then "channel_#{ch_i}, well_#{i+1}: " else "well_#{i+1}: "
                 color: buttons["well_#{i}"].color
 
       $scope.$watchCollection 'wellButtons', updateSeries
