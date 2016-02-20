@@ -1817,7 +1817,8 @@ var n3Charts;
                     .delay(delay)
                     .ease(ease);
             };
-            Transition.defaultDuration = 250;
+            // Transition.defaultDuration = 250;
+            Transition.defaultDuration = 0;
             return Transition;
         })(Factory.BaseFactory);
         Factory.Transition = Transition;
