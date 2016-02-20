@@ -20,31 +20,49 @@
       color: gray;
     }
     .circle {
+      $size: 70px;
+      $paddingTop: 14px;
       border-width: 3px;
       border-radius: 100px;
       border-style: solid;
       cursor: pointer;
       font-size: 10px;
       line-height: 1.5;
-      height: 60px;
       margin: 5px;
-      padding-top: 11px;
-      text-align: center;
-      width: 60px;
+      padding-top: $paddingTop;
+      height: $size;
+      width: $size;
       opacity: 0.5;
 
       &.selected {
         border-width: 5px;
-        padding-top: 9px;
+        padding-top: $paddingTop - 2px;
         opacity: 1;
         color: #000;
       }
 
       .ct {
-
-        // display: inline-block;
         position: relative;
-        // margin-top: 8px; // <-- should be removed if show 2 cts
+
+        .dot {
+          $size: 5px;
+          display: inline-block;
+          border-radius: 90px;
+          width: $size;
+          height: $size;
+        }
+
+        &.ct-1 {
+          .dot {
+            background-color: $lightgray;
+          }
+        }
+
+        &.ct-2 {
+          .dot {
+            background-color: gray;
+          }
+        }
 
         .text {
           display: inline-block;
