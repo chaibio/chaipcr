@@ -70,8 +70,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               return if data.amplification_data.length is 0
               data.amplification_data.shift()
               data.ct.shift()
+              data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
               AMPLI_DATA_CACHE = angular.copy data
-              $scope.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
+              $scope.amplification_data = angular.copy AMPLI_DATA_CACHE.amplification_data
               moveData()
               updateButtonCts()
 
@@ -89,7 +90,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         return if $scope.RunExperimentCtrl.chart isnt 'amplification'
         svg = drag_scroll.find('svg')
         return if svg.length is 0
-        drag_scroll_width = svg.width() - svg.find('g.y-axis').first()[0].getBBox().width
+        drag_scroll_width = svg.width() - svg.find('g.y-axis').first()[0].getBBox().width*2
         num_cycle_to_show = $scope.maxCycle - $scope.ampli_zoom
         width_per_cycle = drag_scroll_width/num_cycle_to_show
         w = width_per_cycle * $scope.maxCycle
@@ -102,10 +103,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.chartConfig.axes.x.ticks = helper.Xticks data.min_cycle, data.max_cycle
         $scope.chartConfig.axes.y.max = helper.getMaxCalibration AMPLI_DATA_CACHE.amplification_data
         $scope.chartConfig.series = helper.chartSeries((if $scope.baseline_subtraction then 'baseline' else 'background'), $scope.is_dual_channel)
-        console.log $scope.chartConfig
         $scope.data = data.amplification_data
-
-        # $scope.data = neutralizedData["#{if $scope.baseline_subtraction then 'baseline' else 'background'}"]
 
 
       # $scope.$watchCollection 'wellButtons', (buttons) ->
@@ -129,8 +127,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         scrollbar_width = $('#ampli-scrollbar').width()
         $('#ampli-scrollbar .scrollbar').css(width: (scrollbar_width * wRatio) + 'px')
 
-        new_data = helper.moveData $scope.amplification_data, num_cycle_to_show, $scope.ampli_scroll, $scope.maxCycle
-        updateChartData(new_data)
+        $scope.amplification_data = helper.moveData AMPLI_DATA_CACHE.amplification_data, num_cycle_to_show, $scope.ampli_scroll, $scope.maxCycle
+        updateChartData($scope.amplification_data)
 
       $scope.$watch 'ampli_zoom', (zoom) ->
         if AMPLI_DATA_CACHE?.amplification_data
