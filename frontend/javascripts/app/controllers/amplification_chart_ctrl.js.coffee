@@ -108,16 +108,22 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         console.log $scope.chartConfig
 
 
-      # $scope.$watchCollection 'wellButtons', (buttons) ->
-      #   buttons = buttons || {}
-      #   $scope.chartConfig.series = []
+      $scope.$watchCollection 'wellButtons', (buttons) ->
+        buttons = buttons || {}
+        $scope.chartConfig.series = []
+        subtraction_type = if $scope.baseline_subtraction then 'baseline' else 'background'
+        channel_count = if $scope.is_dual_channel then 2 else 1
 
-      #   for i in [0..15] by 1
-      #     if buttons["well_#{i}"]?.selected
-      #       $scope.chartConfig.series.push
-      #         y: "well_#{i}"
-      #         color: buttons["well_#{i}"].color
-      #         thickness: '3px'
+        for ch_i in [1..channel_count] by 1
+          for i in [0..15] by 1
+            if buttons["well_#{i}"]?.selected
+              $scope.chartConfig.series.push
+                axis: 'y'
+                dataset: "channel_#{ch_i}"
+                key: "well_#{i}_#{subtraction_type}"
+                color: buttons["well_#{i}"].color
+
+        console.log $scope.chartConfig.series
 
       $scope.$watch 'baseline_subtraction', (val) ->
         updateChartData($scope.amplification_data)
