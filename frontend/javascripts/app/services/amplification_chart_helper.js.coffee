@@ -113,7 +113,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         calibs = _.map amplification_data, (datum) ->
           datum[3]
 
-      return (Math.max.apply Math, calibs) + 100
+      return (Math.max.apply Math, calibs)
 
     @getMaxCycleFromAmplification = (amplification_data) ->
       cycles = []

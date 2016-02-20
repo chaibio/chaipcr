@@ -111,13 +111,12 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.chartConfig.axes.x.min = data.min_cycle
         $scope.chartConfig.axes.x.max = data.max_cycle
         $scope.chartConfig.axes.x.ticks = helper.Xticks data.min_cycle, data.max_cycle
-        $scope.chartConfig.axes.y.max = if subtraction_type is 'baseline' then MAX_BASELINE_AMPLIFICATION else MAX_BACKGROUND_AMPLIFICATION
+        # $scope.chartConfig.axes.y.max = if subtraction_type is 'baseline' then MAX_BASELINE_AMPLIFICATION else MAX_BACKGROUND_AMPLIFICATION
         $scope.data = data.amplification_data
         console.log $scope.data
 
-
-      $scope.$watchCollection 'wellButtons', (buttons) ->
-        buttons = buttons || {}
+      updateSeries = (buttons) ->
+        buttons = buttons || $scope.wellButtons || {}
         $scope.chartConfig.series = []
         subtraction_type = if $scope.baseline_subtraction then 'baseline' else 'background'
         channel_count = if $scope.is_dual_channel then 2 else 1
@@ -132,8 +131,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                 label: if $scope.is_dual_channel then "channel_#{ch_i}, well_#{i}: " else "well_#{i}: "
                 color: buttons["well_#{i}"].color
 
-      $scope.$watch 'baseline_subtraction', (val) ->
-        updateChartData($scope.amplification_data)
+      $scope.$watchCollection 'wellButtons', updateSeries
 
       moveData = ->
         return if !angular.isNumber($scope.ampli_zoom) or !AMPLI_DATA_CACHE or !$scope.maxCycle
@@ -153,6 +151,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       $scope.$watch 'ampli_scroll', (val) ->
         moveData()
+
+      $scope.$watch 'baseline_subtraction', (val) ->
+        moveData()
+        updateSeries()
 
 
 ]
