@@ -22,9 +22,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
       return series
 
-    @chartConfig = (is_dual_channel = false) ->
-      channels_count = if is_dual_channel then 2 else 1
-
+    @chartConfig = ->
       axes:
         x:
           min: 1
@@ -35,13 +33,9 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         y:
           ticks: 10
       margin:
-        top: 0
-        bottom: 0
-        left: 100
-        right: 0
-      grid:
-        x: false
-        y: false
+        top: 10
+        left: 80
+        right: 5
 
       series: []
       # tooltipHook: (items) ->

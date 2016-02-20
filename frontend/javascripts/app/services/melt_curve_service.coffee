@@ -18,7 +18,6 @@ App.service 'MeltCurveService', [
 
       axes:
         x:
-          min: 1
           key: 'temperature'
           ticks: 8
           tickFormat: (x) ->
@@ -30,6 +29,8 @@ App.service 'MeltCurveService', [
         right: 0
 
       series: series
+    # end chart config
+
       tooltipHook: (items) ->
         rows = []
         for item in items by 1
