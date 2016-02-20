@@ -40,3 +40,4 @@ Debug
 /web/public/experiments/
 build/*
 /uploads/
+capabilities

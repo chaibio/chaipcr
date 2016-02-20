@@ -56,7 +56,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.RunExperimentCtrl.chart
       , (val) ->
         if val is 'amplification' and hasInit
-          moveData()
           fetchFluorescenceData()
 
       fetchFluorescenceData = ->
@@ -130,6 +129,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                 axis: 'y'
                 dataset: "channel_#{ch_i}"
                 key: "well_#{i}_#{subtraction_type}"
+                label: if $scope.is_dual_channel then "channel_#{ch_i}, well_#{i}: " else "well_#{i}: "
                 color: buttons["well_#{i}"].color
 
       $scope.$watch 'baseline_subtraction', (val) ->

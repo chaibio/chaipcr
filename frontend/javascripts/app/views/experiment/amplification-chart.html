@@ -36,7 +36,7 @@
         <div>
           <div class="vertical-text SH">RELATIVE FLUORESCENCE UNITS</div>
           <div class="chart-container" id="ampli-drag-scroll" chart-drag-scroll ng-model="ampli_scroll">
-            <linechartv2 ng-if="RunExperimentCtrl.chart==='amplification' && !!data" data-drag-scroll="ampli-drag-scroll" data="data" options="chartConfig"></linechartv2>
+            <linechartv2 ng-if="!!data" data-drag-scroll="ampli-drag-scroll" data="data" options="chartConfig"></linechartv2>
           </div>
           <div class="text-center num-cycle-text SH">CYCLES NUMBER</div>
           <div class="ampli-zoom-scroll-container">
