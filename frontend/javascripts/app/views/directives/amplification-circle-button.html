@@ -1,0 +1,7 @@
+<div class="circle noselect B2" ng-click="toggleState()" ng-style="style" ng-class="{selected: selected}">
+  <div class="ct ct-1">
+    <span class="text" ng-show="ct[0] > 0">Ct: <b>{{ ct[0] | round: 1}}</b></span>
+    <span class="text" ng-show="ct[0] === 0 || !(ct[0])">Ct</span>
+  </div>
+  <br>
+</div>

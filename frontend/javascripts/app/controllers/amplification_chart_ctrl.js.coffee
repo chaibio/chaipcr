@@ -20,8 +20,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.chartConfig = helper.chartConfig(is_dual_channel)
       $scope.chartConfig.axes.x.ticks = helper.Xticks $stateParams.max_cycle || 1
       $scope.chartConfig.axes.x.max = $stateParams.max_cycle || 1
-      console.log $scope.chartConfig
-      $scope.data = [helper.paddData()]
+      $scope.data = helper.paddData()
+      console.log $scope.data
       $scope.log_linear = 'log'
       $scope.COLORS = helper.COLORS
       $scope.amplification_data = null
@@ -56,9 +56,11 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.RunExperimentCtrl.chart
       , (val) ->
         if val is 'amplification' and hasInit
+          moveData()
           fetchFluorescenceData()
 
       fetchFluorescenceData = ->
+        # return
         return if $scope.RunExperimentCtrl.chart isnt 'amplification'
         if !fetching
           fetching = true
@@ -66,7 +68,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
           $timeout ->
             Experiment.getAmplificationData($stateParams.id)
-            .success (data) ->
+            .then (resp) ->
+              data = resp.data
               hasData = true
               return if !data.amplification_data
               return if data.amplification_data.length is 0
@@ -86,9 +89,12 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       updateButtonCts = ->
         # channel_count = if $scope.is_dual_channel then 2 else 1
-        # for well_i in [0..15] by 1
-        #   $scope.wellButtons["well_#{well_i}"].ct = _.filter AMPLI_DATA_CACHE.ct, (ct) ->
-        #     ct[1] is
+        for well_i in [0..15] by 1
+          cts = _.filter AMPLI_DATA_CACHE.ct, (ct) ->
+            ct[1] is well_i+1
+          $scope.wellButtons["well_#{well_i}"].ct = [cts[0][2]]
+          $scope.wellButtons["well_#{well_i}"].ct.push cts[1][2] if cts[1]
+            # [ct[0][2], ct[1]?[2]]
 
       updateDragScrollWidth = ->
         return if $scope.RunExperimentCtrl.chart isnt 'amplification'
@@ -107,8 +113,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.chartConfig.axes.x.max = data.max_cycle
         $scope.chartConfig.axes.x.ticks = helper.Xticks data.min_cycle, data.max_cycle
         $scope.chartConfig.axes.y.max = if subtraction_type is 'baseline' then MAX_BASELINE_AMPLIFICATION else MAX_BACKGROUND_AMPLIFICATION
-        $scope.chartConfig.series = helper.chartSeries(subtraction_type, $scope.is_dual_channel)
         $scope.data = data.amplification_data
+        console.log $scope.data
 
 
       $scope.$watchCollection 'wellButtons', (buttons) ->
@@ -125,8 +131,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                 dataset: "channel_#{ch_i}"
                 key: "well_#{i}_#{subtraction_type}"
                 color: buttons["well_#{i}"].color
-
-        console.log $scope.chartConfig.series
 
       $scope.$watch 'baseline_subtraction', (val) ->
         updateChartData($scope.amplification_data)

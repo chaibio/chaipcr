@@ -4,7 +4,7 @@ window.ChaiBioTech.ngApp
     restrict: 'EA'
     require: 'ngModel'
     replace: true
-    templateUrl: 'app/views/directives/amplification-chart-button.html'
+    templateUrl: 'app/views/directives/amplification-circle-button.html'
     link: ($scope, elem, attrs, ngModel) ->
 
       $scope.$watchCollection ->
@@ -15,7 +15,7 @@ window.ChaiBioTech.ngApp
       $scope.updateUI = ->
         $scope.selected = ngModel.$modelValue.selected
         $scope.color = ngModel.$modelValue.color || 'gray'
-        $scope.ct = ngModel.$modelValue.ct || 0;
+        $scope.ct = ngModel.$modelValue.ct
 
         $scope.style =
           borderColor: $scope.color

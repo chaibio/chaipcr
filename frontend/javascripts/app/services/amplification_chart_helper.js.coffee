@@ -86,14 +86,14 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
       return channel_datasets
 
-    @paddData = (cycle_num = 0) ->
+    @paddData = (cycle_num = 1) ->
       paddData = cycle_num: cycle_num
       for i in [0..15] by 1
         paddData["well_#{i}_baseline"] = 0
         paddData["well_#{i}_background"] = 0
 
-      channel_1: paddData
-      channel_2: paddData
+      channel_1: [paddData]
+      channel_2: [paddData]
 
     @getMaxExperimentCycle = (exp) ->
       stages = exp.protocol.stages || []

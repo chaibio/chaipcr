@@ -11,15 +11,15 @@
             <span class="checkbox-item" ng-click="log_linear = 'log'" ng-class="{checked:log_linear === 'log', unchecked: log_linear !== 'log'}">
               <span class="checkbox-icon">
                 <span class="inner"></span>
-              </span>
-              LOG.
-            </span>
-            <span class="checkbox-item" ng-click="log_linear = 'linear'" ng-class="{checked:log_linear === 'linear', unchecked: log_linear !== 'linear'}">
+          </span>
+          LOG.
+          </span>
+          <span class="checkbox-item" ng-click="log_linear = 'linear'" ng-class="{checked:log_linear === 'linear', unchecked: log_linear !== 'linear'}">
               <span class="checkbox-icon">
                 <span class="inner"></span>
-              </span>
-              LINEAR
-            </span>
+          </span>
+          LINEAR
+          </span>
           </span>
         </div>
         <div class="subheader-switches SH">
@@ -39,7 +39,6 @@
             <linechartv2 ng-if="RunExperimentCtrl.chart==='amplification' && !!data" data-drag-scroll="ampli-drag-scroll" data="data" options="chartConfig"></linechartv2>
           </div>
           <div class="text-center num-cycle-text SH">CYCLES NUMBER</div>
-
           <div class="ampli-zoom-scroll-container">
             <div class="row">
               <div class="col-md-6">
@@ -55,21 +54,22 @@
               </div>
             </div>
           </div>
-
-
           <div class="choose-chart">
             <amplification-well-switch ng-model="wellButtons"></amplification-well-switch>
           </div>
         </div>
       </div>
-
       <div class="table-container">
         <table>
           <tbody>
             <tr>
-              <th class="B1">WELL</th>
-              <th class="B1">TYPE</th>
-              <th class="B1">CT</th>
+              <th class="B1">Well</th>
+              <th class="B1">Type</th>
+              <th class="B1">
+                <span ng-if="is_dual_channel">Ct. Ch1</span>
+                <span ng-if="!is_dual_channel">Ct</span>
+              </th>
+              <th class="B1" ng-if="is_dual_channel">Ct. Ch2</th>
             </tr>
             <tr ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" ng-class="{selected: (wellButtons['well_'+i].selected)}">
               <td class="B1">
@@ -78,14 +78,21 @@
                   <span ng-show="i < 8">
                     A{{i+1}}
                   </span>
-                  <span ng-show="i > 7">
+                <span ng-show="i > 7">
                     B{{i-7}}
                   </span>
                 </span>
               </td>
               <td class="B1">Sample</td>
               <td class="B1">
-                <span ng-show="wellButtons['well_'+i].ct > 0">{{(wellButtons['well_'+i].ct) | round:2}}</span>
+                <span ng-show="wellButtons['well_'+i].ct[0] > 0">
+                  {{(wellButtons['well_'+i].ct[0]) | round:2}}
+                </span>
+              </td>
+              <td class="B1" ng-if="is_dual_channel">
+                <span ng-show="wellButtons['well_'+i].ct[1] > 0">
+                  {{(wellButtons['well_'+i].ct[1]) | round:2}}
+                </span>
               </td>
             </tr>
           </tbody>

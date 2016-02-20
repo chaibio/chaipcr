@@ -12,7 +12,7 @@
   .chart-section {
     display: inline-block;
     padding-right: 50px;
-    width: 700px;
+    width: 1024px-340px; //340px width of table in the right
     vertical-align: top;
 
     .curve-header {
@@ -221,7 +221,7 @@
     display: inline-block;
     margin-top: -20px;
     margin-bottom: -4px;
-    width: 324px;
+    width: 340px;
 
     table {
       width: 100%;
