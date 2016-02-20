@@ -25,8 +25,6 @@ App.service 'MeltCurveService', [
             return "#{x}°C"
         y:
           ticks: 10
-          # ticksFormat: (y) ->
-          #   "#{$filter('round')(y/1000, 1)}k"
       margin:
         left: 70
         right: 0

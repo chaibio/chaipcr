@@ -11,12 +11,27 @@ window.App.service 'Device', [
 
       version_info = null
       is_offline = false
+      capabilities = null
       @direct_upload = false
 
       isOffline: -> is_offline
 
       getCapabilities: ->
-        $http.get '/capabilities'
+        deferred = $q.defer()
+        if capabilities isnt null
+          deferred.resolve capabilities
+        else
+          $http.get('/capabilities').then (resp) ->
+            capabilities = resp
+            deferred.resolve resp
+
+        return deferred.promise
+
+      isDualChannel: ->
+        deferred = $q.defer()
+        @getCapabilities().then (resp) ->
+          deferred.resolve resp.data.capabilities?.optics?.emission_channels?.length is 2
+        return deferred.promise
 
       checkForUpdate: ->
         @direct_upload = false

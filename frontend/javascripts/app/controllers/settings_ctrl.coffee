@@ -13,14 +13,9 @@ window.App.controller 'SettingsCtrl', [
       if data.software_release_variant == "beta"
         $scope.isBeta = true
 
-    Device.getCapabilities()
+    Device.isDualChannel()
     .then (resp) ->
-      return if (!resp.data.capabilities)
-      return if (!resp.data.capabilities.optics)
-      return if (!resp.data.capabilities.optics.emission_channels)
-      return if (!angular.isArray(resp.data.capabilities.optics.emission_channels))
-      return if (resp.data.capabilities.optics.emission_channels.length isnt 2)
-      $scope.is_dual_channel = true
+      $scope.is_dual_channel = resp
 
     backdrop = $('.maintainance-backdrop')
     backdrop.css('height', $('.wizards-container').height())

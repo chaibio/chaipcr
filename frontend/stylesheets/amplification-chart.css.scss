@@ -152,9 +152,14 @@
     }
 
     .chart-container {
-      margin-left: 15px;
-      margin-bottom: -35px;
-      width: 700px;
+      margin-left: 30px;
+      // margin-bottom: -35px;
+      width: 700px - 17px;
+      height: 400px;
+    }
+
+    .chart-legend {
+      display: none;
     }
 
     .axis .tick text {
@@ -162,11 +167,16 @@
       font-size: 10px;
     }
 
+    .axis.y2-axis {
+      display: none;
+    }
+
     .num-cycle-text {
       // font-family: 'Open Sans';
       // font-size: 10px;
       // font-weight: bold;
-      margin-bottom: -15px;
+      margin-bottom: -30px;
+      // margin-top: 40px;
     }
 
     .ampli-zoom-scroll-container {

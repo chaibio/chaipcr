@@ -69,7 +69,7 @@ window.ChaiBioTech.ngApp
 
       return deferred.promise
 
-    self.getFluorescenceData = (expId) ->
+    self.getAmplificationData = (expId) ->
       $http.get("/experiments/#{expId}/amplification_data")
 
     self.getMeltCurveData = (expId) ->

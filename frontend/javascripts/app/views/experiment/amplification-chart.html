@@ -36,7 +36,7 @@
         <div>
           <div class="vertical-text SH">RELATIVE FLUORESCENCE UNITS</div>
           <div class="chart-container" id="ampli-drag-scroll" chart-drag-scroll ng-model="ampli_scroll">
-            <linechart ng-if="RunExperimentCtrl.chart==='amplification'" class="linechart" data-drag-scroll="ampli-drag-scroll" data="data" options="chartConfig" width="700" height="300" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks"></linechart>
+            <linechartv2 ng-if="RunExperimentCtrl.chart==='amplification'" data-drag-scroll="ampli-drag-scroll" data="data" options="chartConfig" width="700" height="300" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks"></linechartv2>
           </div>
           <div class="text-center num-cycle-text SH">CYCLES NUMBER</div>
 
