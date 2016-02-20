@@ -23,7 +23,6 @@ window.ChaiBioTech.ngApp
       $.jStorage.deleteKey 'authToken'
       $window.location.assign '/'
 
-
 ]
 
 .config [

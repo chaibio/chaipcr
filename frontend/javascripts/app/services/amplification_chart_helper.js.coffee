@@ -16,7 +16,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
             dataset: "channel_#{channel_i}"
             key: "well_#{well_i}_#{type}"
             color: @COLORS[well_i]
-            type: 'line'
+            # type: ['line']
             id: "channel_#{channel_i}_well_#{well_i}"
             label: label
 
@@ -35,6 +35,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         y:
           ticks: 10
       margin:
+        top: 0
+        bottom: 0
         left: 100
         right: 0
       grid:
@@ -108,18 +110,16 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
       Math.max.apply Math, cycles
 
-    @getMaxCalibration = (amplification_data) ->
-      calibs = _.map amplification_data, (datum) ->
-        datum[4]
+    @getMaxCalibration = (amplification_data, type) ->
+      calibs = null
+      if type is 'baseline'
+        calibs = _.map amplification_data, (datum) ->
+          datum[4]
+      else
+        calibs = _.map amplification_data, (datum) ->
+          datum[3]
 
-      max_baseline = Math.max.apply Math, calibs
-
-      calibs = _.map amplification_data, (datum) ->
-        datum[3]
-
-      max_background = Math.max.apply Math, calibs
-
-      return if max_baseline > max_background then max_baseline else max_background
+      return Math.max.apply Math, calibs
 
     @getMaxCycleFromAmplification = (amplification_data) ->
       cycles = []
@@ -140,6 +140,14 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           ticks.push i
         ticks.push max if max % num_ticks isnt 0
 
+      return ticks
+
+    @Yticks = (max) ->
+      ticks = []
+      num_ticks = 10
+      denom = max/num_ticks
+      for i in [0..10]
+        ticks.push i*denom
       return ticks
 
     @COLORS = [

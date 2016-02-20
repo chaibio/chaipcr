@@ -33,6 +33,12 @@ window.App.service 'Device', [
           deferred.resolve resp.data.capabilities?.optics?.emission_channels?.length is 2
         return deferred.promise
 
+      channelCount: ->
+        deferred = $q.defer()
+        @getCapabilities().then (resp) ->
+          deferred.resolve resp.data.capabilities?.optics?.emission_channels?.length || 1
+        return deferred.promise
+
       checkForUpdate: ->
         @direct_upload = false
         checkCloudUpdate = (deferred) =>
