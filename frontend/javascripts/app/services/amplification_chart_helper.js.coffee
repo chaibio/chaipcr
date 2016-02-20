@@ -105,7 +105,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       Math.max.apply Math, cycles
 
     @getMaxCalibration = (amplification_data, type) ->
-      calibs = null
+      calibs = []
       if type is 'baseline'
         calibs = _.map amplification_data, (datum) ->
           datum[4]
@@ -136,13 +136,13 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
       return ticks
 
-    @Yticks = (max) ->
-      ticks = []
-      num_ticks = 10
-      denom = max/num_ticks
-      for i in [0..10]
-        ticks.push i*denom
-      return ticks
+    # @Yticks = (max) ->
+    #   ticks = []
+    #   num_ticks = 10
+    #   denom = max/num_ticks
+    #   for i in [0..10]
+    #     ticks.push i*denom
+    #   return ticks
 
     @COLORS = [
         '#04A0D9'
