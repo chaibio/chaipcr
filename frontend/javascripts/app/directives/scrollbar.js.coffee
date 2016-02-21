@@ -5,6 +5,8 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
     restrict: 'E'
     replace: true
     templateUrl: 'app/views/directives/scrollbar.html'
+    scope:
+      defaultValue: '='
     require: 'ngModel'
     link: ($scope, elem, attr, ngModel) ->
 
@@ -23,7 +25,7 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
       $scope.$on 'scrollbar:width:changed', (e) ->
 
         if getSpaceWidth() > 0 and ngModel.$viewValue is 'FULL'
-          ngModel.$setViewValue 1
+          ngModel.$setViewValue( $scope.defaultValue || 0)
 
         if ngModel.$viewValue >= 1
           updateMargin getElemWidth() - getScrollBarWidth()
