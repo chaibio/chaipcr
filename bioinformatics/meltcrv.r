@@ -123,7 +123,12 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
     db_conn <- db_etc(db_usr, db_pwd, db_host, db_port, db_name, 
                       exp_id, stage_id, calib_id)
     
-    melt_curve_data <- dbGetQuery(db_conn, 'SELECT * from melt_curve_data')
+    mcd_qry <- sprintf('SELECT channel
+                           FROM melt_curve_data 
+                           WHERE experiment_id=%d AND stage_id=%d
+                           ORDER BY well_num, temperature',
+                           exp_id, stage_id)
+    melt_curve_data <- dbGetQuery(db_conn, mcd_qry)
     
     channels <- unique(melt_curve_data[,'channel'])
     names(channels) <- channels
@@ -161,7 +166,7 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
                        'mc_bywell'=mc_out_pp[['pre_consoli']], # each channel element is a list whose each element is a well
                        'fc_wT'=fc_wT_bych, 'pre_dcv_fc_wT'=pre_dcv_fc_wT_bych # each channel element of fc_wT or pre_dcv_fc_wT_bych is a matrix formatted as input for `meltcurve` by qpcR, where columns are alternating 'temp' and 'fluo'.
                     )
-        mc_out[['melt_curve_data']] <- melt_curve_data
+        # mc_out[['melt_curve_data']] <- melt_curve_data # maybe too big for beaglebone to handle
     } else mc_out <- mc_out_pp[['pre_consoli']]
     
     # report time cost for this function

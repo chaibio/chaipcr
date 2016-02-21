@@ -15,7 +15,7 @@ melt_1cr <- function(floor_temp,
     
     mc_out <- process_mc(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
                          exp_id, stage_id, calib_id, # for selecting data to analyze
-                         dcv, mc_plot, show_running_time, ...)
+                         dcv, mc_plot, extra_output=TRUE, show_running_time, ...)
     
     mc_tm <- lapply(mc_out[['mc_bywell']], 
                     function(channel_ele) lapply(channel_ele, 
