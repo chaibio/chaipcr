@@ -4,7 +4,7 @@
 
   .curve-header {
     border-bottom: 3px solid $gray;
-    padding-bottom: 10px;
+    padding-bottom: 3px;
 
     .row {
       margin-top: 0;
@@ -73,7 +73,7 @@
     }
 
     .plot-type-buttons {
-      margin-top: -10px;
+      margin-top: -5px;
       $plot_type_buttons_btn_width: 100px;
       $plot_type_buttons_border_width: 1px;
 
@@ -94,6 +94,9 @@
         text-align: center;
         border-radius: 0;
         border:none;
+        padding: 0px;
+        padding-top: 2px;
+        padding-bottom: 3px;
 
         &:hover {
           background: none;

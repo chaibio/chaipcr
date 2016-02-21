@@ -26,9 +26,11 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.COLORS = helper.COLORS
       $scope.amplification_data = null
       AMPLI_DATA_CACHE = null
-      MAX_BACKGROUND_AMPLIFICATION = 0
-      MAX_BASELINE_AMPLIFICATION = 0
+      # MAX_BACKGROUND_AMPLIFICATION = 0
+      # MAX_BASELINE_AMPLIFICATION = 0
       $scope.baseline_subtraction = true
+      $scope.curve_type = 'log'
+      $scope.color_by = 'well'
 
       $scope.$on 'expName:Updated', ->
         $scope.experiment?.name = expName.name
@@ -74,8 +76,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               return if data.amplification_data.length is 0
               data.amplification_data.shift()
               data.ct.shift()
-              MAX_BACKGROUND_AMPLIFICATION = helper.getMaxCalibration(data.amplification_data, 'background')
-              MAX_BASELINE_AMPLIFICATION = helper.getMaxCalibration(data.amplification_data, 'baseline')
+              # MAX_BACKGROUND_AMPLIFICATION = helper.getMaxCalibration(data.amplification_data, 'background')
+              # MAX_BASELINE_AMPLIFICATION = helper.getMaxCalibration(data.amplification_data, 'baseline')
               data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
               AMPLI_DATA_CACHE = angular.copy data
               $scope.amplification_data = angular.copy AMPLI_DATA_CACHE.amplification_data

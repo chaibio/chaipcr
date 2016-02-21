@@ -1,8 +1,40 @@
-<div class="amplification-chart-state-active">
+<div class="amplification-chart-state-active results-charts">
   <div class="page-layout" ng-controller="AmplificationChartCtrl" ng-show="experiment">
     <div class="content">
       <div class="chart-section">
         <div class="curve-header">
+          <div class="row">
+            <div class="col-sm-7 curve-name">
+              <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()">
+                Amplification Curve
+                <img class="arrow-down" src="/images/arrow-down.png">
+              </span>
+            </div>
+            <div class="col-sm-5 ampli-toggles">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="plot-type-buttons">
+                    <div class="plot-type-text SHR">COLOR BY</div>
+                    <div class="buttons-wrapper SH">
+                      <div class="button" ng-click="color_by='well'" ng-class="{'selected': color_by==='well'}">WELL</div>
+                      <div class="button" ng-click="color_by='channel'" ng-class="{'selected': color_by==='channel'}">CHANNEL</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="plot-type-buttons">
+                    <div class="plot-type-text SHR">PLOT TYPE</div>
+                    <div class="buttons-wrapper SH">
+                      <div class="button" ng-click="curve_type='log'" ng-class="{'selected': curve_type==='log'}">LOG</div>
+                      <div class="button" ng-click="curve_type='linear'" ng-class="{'selected': curve_type==='linear'}">LINEAR</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="curve-header">
           <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()">
             Amplification Curve
             <img class="arrow-down" src="/images/arrow-down.png">
@@ -21,7 +53,7 @@
           LINEAR
           </span>
           </span>
-        </div>
+        </div> -->
         <div class="subheader-switches SH">
           <div class="item-switch">
             <switch ng-model="baseline_subtraction"></switch>
