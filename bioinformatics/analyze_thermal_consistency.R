@@ -8,7 +8,7 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
     exp_id, 
     #stage_id, # hard-coded inside of the function
     calib_id, 
-    dcv=TRUE, 
+    dcv=FALSE, 
     mc_plot=FALSE, 
     out_json=TRUE, 
     show_running_time=FALSE, 

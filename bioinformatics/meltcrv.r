@@ -156,7 +156,6 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
                               func=mc_tm_all, 
                               mc_plot, show_running_time, ...)
     
-    message(extra_output)
     if (extra_output) {
         mc_out <- list( # each element is a list whose each element represents a channel
                        'mc_bywell'=mc_out_pp[['pre_consoli']], # each channel element is a list whose each element is a well
