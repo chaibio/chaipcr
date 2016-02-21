@@ -39,7 +39,8 @@ get_mc_calib <- function(channel,
                                                                             fluo_calib_list[[well_num]])))
     colnames(fc_wT) <- paste(rep(c('temp', 'fluo'), times=num_wells), rep(unique(fluo_sel$well_num), each=2), sep='_')
     
-    mc_calib <- list('fluo_calib'=fluo_calib, 'fc_wT'=fc_wT)
+    mc_calib <- list('fluo_calib'=as.matrix(fluo_calib),  # change data frame to matrix for ease of constructing array
+                     'fc_wT'=fc_wT)
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]
