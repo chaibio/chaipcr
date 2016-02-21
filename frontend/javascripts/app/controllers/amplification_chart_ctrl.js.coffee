@@ -21,15 +21,11 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.chartConfig.axes.x.ticks = helper.Xticks $stateParams.max_cycle || 1
       $scope.chartConfig.axes.x.max = $stateParams.max_cycle || 1
       $scope.data = helper.paddData()
-      console.log $scope.data
-      $scope.log_linear = 'log'
       $scope.COLORS = helper.COLORS
       $scope.amplification_data = null
       AMPLI_DATA_CACHE = null
-      # MAX_BACKGROUND_AMPLIFICATION = 0
-      # MAX_BASELINE_AMPLIFICATION = 0
       $scope.baseline_subtraction = true
-      $scope.curve_type = 'log'
+      $scope.curve_type = 'linear'
       $scope.color_by = 'well'
 
       $scope.$on 'expName:Updated', ->
@@ -70,8 +66,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               return if data.amplification_data.length is 0
               data.amplification_data.shift()
               data.ct.shift()
-              # MAX_BACKGROUND_AMPLIFICATION = helper.getMaxCalibration(data.amplification_data, 'background')
-              # MAX_BASELINE_AMPLIFICATION = helper.getMaxCalibration(data.amplification_data, 'baseline')
               data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
               AMPLI_DATA_CACHE = angular.copy data
               $scope.amplification_data = angular.copy AMPLI_DATA_CACHE.amplification_data
@@ -152,6 +146,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         moveData()
         updateSeries()
 
+      $scope.$watch 'curve_type', (type) ->
+        $scope.chartConfig.axes.y.type = type
 
       $scope.$watch ->
         $scope.RunExperimentCtrl.chart
