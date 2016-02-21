@@ -3,24 +3,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
   '$filter'
   (SecondsDisplay, $filter) ->
 
-    # @chartSeries = (type, is_dual_channel) ->
-    #   channels_count = if is_dual_channel then 2 else 1
-    #   series = []
-    #   for channel_i in [1..channels_count] by 1
-    #     for well_i in [0..15] by 1
-
-    #       label = if channels_count is 1 then "well_#{well_i}: " else "channel_#{channel_i}, well_#{well_i}: "
-
-    #       series.push
-    #         axis: 'y'
-    #         dataset: "channel_#{channel_i}"
-    #         key: "well_#{well_i}_#{type}"
-    #         color: @COLORS[well_i]
-    #         # type: ['line']
-    #         id: "channel_#{channel_i}_well_#{well_i}"
-    #         label: label
-
-    #   return series
+    FLOOR_VALUE = 0.1
 
     @chartConfig = ->
       axes:
@@ -80,8 +63,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         channel_datasets["channel_#{channel_i}"] = _.map channel_datasets["channel_#{channel_i}"], (datum) ->
           pt = cycle_num: datum[0][2]
           for y_item, i in datum by 1
-            pt["well_#{i}_background"] = y_item[3]
-            pt["well_#{i}_baseline"] = y_item[4]
+            pt["well_#{i}_background"] = if y_item[3] > 0 then y_item[3] else FLOOR_VALUE
+            pt["well_#{i}_baseline"] = if y_item[4] > 0 then y_item[4] else FLOOR_VALUE
 
           return pt
 
