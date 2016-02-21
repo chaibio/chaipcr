@@ -54,12 +54,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         (state is 'running' and (oldStep isnt newStep or !oldStep) and data.optics.collect_data and oldData?.optics.collect_data is 'true')
           fetchFluorescenceData()
 
-      $scope.$watch ->
-        $scope.RunExperimentCtrl.chart
-      , (val) ->
-        if val is 'amplification' and !hasInit
-          fetchFluorescenceData()
-
       fetchFluorescenceData = ->
         # return
         return if $scope.RunExperimentCtrl.chart isnt 'amplification'
@@ -158,5 +152,13 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         moveData()
         updateSeries()
 
+
+      $scope.$watch ->
+        $scope.RunExperimentCtrl.chart
+      , (val) ->
+        if val is 'amplification' and !hasInit
+          fetchFluorescenceData()
+        else
+          moveData()
 
 ]
