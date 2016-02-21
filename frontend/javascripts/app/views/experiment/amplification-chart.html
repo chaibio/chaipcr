@@ -12,7 +12,7 @@
             </div>
             <div class="col-sm-5 ampli-toggles">
               <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-6" ng-show="is_dual_channel">
                   <div class="plot-type-buttons">
                     <div class="plot-type-text SHR">COLOR BY</div>
                     <div class="buttons-wrapper SH">
@@ -21,7 +21,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-md-6">
+                <div ng-class="{'col-md-6': is_dual_channel, 'col-md-12': !is_dual_channel}">
                   <div class="plot-type-buttons">
                     <div class="plot-type-text SHR">PLOT TYPE</div>
                     <div class="buttons-wrapper SH">
@@ -87,7 +87,7 @@
             </div>
           </div>
           <div class="choose-chart">
-            <amplification-well-switch ng-model="wellButtons"></amplification-well-switch>
+            <amplification-well-switch ng-model="wellButtons" color-by="color_by"></amplification-well-switch>
           </div>
         </div>
       </div>
@@ -97,15 +97,15 @@
             <tr>
               <th class="B1">Well</th>
               <th class="B1">Type</th>
-              <th class="B1">
+              <th class="B1" ng-class="{'channel-1': color_by === 'channel'}">
                 <span ng-if="is_dual_channel">Ct. Ch1</span>
                 <span ng-if="!is_dual_channel">Ct</span>
               </th>
-              <th class="B1" ng-if="is_dual_channel">Ct. Ch2</th>
+              <th class="B1" ng-class="{'channel-2': color_by === 'channel'}" ng-if="is_dual_channel">Ct. Ch2</th>
             </tr>
             <tr ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" ng-class="{selected: (wellButtons['well_'+i].selected)}">
-              <td class="B1">
-                <span class="dot" style="background-color: {{wellButtons['well_'+i].color}}"></span>
+              <td class="B1" ng-class="{'text-center': color_by==='channel'}">
+                <span ng-if="color_by==='well'" class="dot" style="background-color: {{wellButtons['well_'+i].color}}"></span>
                 <span class="text">
                   <span ng-show="i < 8">
                     A{{i+1}}
