@@ -38,17 +38,18 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         right: 5
 
       series: []
-      # tooltipHook: (items) ->
-      #   rows = []
-      #   for item in items by 1
-      #     rows.push
-      #       label: item.series.label
-      #       value: "#{item.row.y1}"
-      #       id: item.series.id
-      #       color: item.series.color
 
-      #   abscissas: "#{item.row.x}"
-      #   rows: rows
+      tooltipHook: (items) ->
+        rows = []
+        for item in items by 1
+          rows.push
+            label: item.series.label
+            value: "#{item.row.y1}"
+            id: item.series.id
+            color: item.series.color
+
+        abscissas: "CYCLE: #{item.row.x}"
+        rows: rows
 
     # end chartConfig
 

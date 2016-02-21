@@ -21,22 +21,23 @@
     }
     .circle {
       $size: 70px;
-      $paddingTop: 14px;
-      border-width: 3px;
+      $padding_top: 15px;
+      $border_width: 3px;
+      border-width: $border_width;
       border-radius: 100px;
       border-style: solid;
       cursor: pointer;
       font-size: 10px;
       line-height: 1.5;
       margin: 5px;
-      padding-top: $paddingTop;
+      padding-top: $padding_top;
       height: $size;
       width: $size;
       opacity: 0.5;
 
       &.selected {
-        border-width: 5px;
-        padding-top: $paddingTop - 2px;
+        border-width: $border_width + 2px;
+        padding-top: $padding_top - 2px;
         opacity: 1;
         color: #000;
       }
