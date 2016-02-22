@@ -82,7 +82,9 @@ window.App.directive 'headerStatus', [
         return Experiment.truncateName($scope.experiment.name, truncate_length)
 
       $scope.viewError = ->
-        err = message: $scope.experiment.completion_message
+        err =
+          message: $scope.experiment.completion_message
+          date: $scope.experiment.completed_at
         ModalError.open err
 
       $scope.$on 'expName:Updated', ->
