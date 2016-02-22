@@ -49,10 +49,16 @@
         <img src="/images/status-resume-btn.png">
         RESUME
       </span>
-      <div class="control" ng-show="(footer_experiment.started_at) && (!footer_experiment.completed_at || is_holding) && state !== 'idle' " ng-click="stopExperiment()">
+      <div class="control" ng-show="(footer_experiment.started_at) && (!footer_experiment.completed_at || is_holding) && state !== 'idle' && !stop_confirm_show" ng-click="stopConfirm()">
         <img src="/images/status-bar-stop-btn.png">
         <span ng-show="!is_holding">STOP EXPERIMENT</span>
         <span ng-show="is_holding">END HOLD</span>
+      </div>
+      <div ng-click="stopExperiment()" class="control stop-confirm" ng-show="(footer_experiment.started_at) && (!footer_experiment.completed_at || is_holding) && state !== 'idle' && stop_confirm_show">
+        <input type="text" id="focus-listner-placeholder" ng-blur="inputBlur()">
+        <img src="/images/status-bar-stop-confirm-btn.png">
+        <span ng-show="!is_holding">CONFIRM STOP</span>
+        <span ng-show="is_holding">CONFIRM END HOLD</span>
       </div>
     </span>
   </div>
