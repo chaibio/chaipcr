@@ -51,8 +51,32 @@ $sidemenu_width: 352px;
       border-bottom: 2px black solid;
       .side-menu-exp-name {
         height: 80%;
-        padding-top: 25px;
-        font-size: 30px;
+        //font-size: 30px;
+        .exp-name-container {
+          height: 80px;
+          padding-top: 15px;
+          span {
+            font-size: 24px;
+            cursor: auto;
+          }
+          input {
+            font-size: 24px;
+            background: transparent;
+            margin-top: 0px;
+            padding: 0px;
+            width: 100%;
+            border: none;
+            outline: none;
+          }
+        }
+        .message-container {
+          .help-block {
+            .text-success {
+              color: #07CE0A;
+            }
+          }
+        }
+
       }
       .side-menu-exp-status {
         height: 20%;
@@ -112,7 +136,7 @@ $sidemenu_width: 352px;
           transition: height .5s, opacity .3s;
         }
         &.ng-show {
-          height: 180px;
+          height: 120px;
           opacity: 1;
           transition: height .5s, opacity 2s;
         }

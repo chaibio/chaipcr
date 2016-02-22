@@ -6,7 +6,8 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
   'expName',
   'Protocol'
   'Status'
-  ($scope, focus, Experiment, $stateParams, expName, Protocol, Status) ->
+  '$timeout'
+  ($scope, focus, Experiment, $stateParams, expName, Protocol, Status, $timeout) ->
 
     if !Experiment.getCurrentExperiment()
       Experiment.get {id: $stateParams.id}, (data) ->
@@ -51,13 +52,16 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
       $scope.editExpNameMode = false
       $scope.editLidTempMode = false
 
-    $scope.saveExperiment = ->
+    $scope.saveExperiment = (exp)->
       return if $scope.expForm.$invalid
-      promise = Experiment.update({id: $scope.experiment.id}, experiment: $scope.experiment).$promise
+      promise = Experiment.update({id: exp.id}, experiment: exp).$promise
 
       promise.then ->
         $scope.success = "Experiment name updated."
-        expName.updateName($scope.experiment.name)
+        expName.updateName(exp.name)
+        $timeout (() ->
+          $scope.success = ""
+          ), 2000
 
       promise.catch (resp) ->
         $scope.errors = resp.data.errors

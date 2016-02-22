@@ -5,7 +5,37 @@
   </div>
   <div class="side-menu-content-container">
     <div class="side-menu-name-container">
-      <div class="side-menu-exp-name H1">{{exp.name | truncate:20}}</div>
+      <div class="side-menu-exp-name H1" ng-controller="EditExperimentPropertiesCtrl">
+        <form name="expForm">
+
+          <div class="exp-name-container">
+            <span class="exp-name H1 truncate" ng-click="focusExpName()" ng-show="!editExpNameMode">
+              {{exp.name | truncate:20}}
+            </span>
+            <input
+              type="text"
+              class="exp-name H1"
+              required
+              ng-model="exp.name"
+              ng-show="editExpNameMode"
+              ng-blur="saveExperiment(exp)"
+              on-key-enter="saveExperiment(exp)"
+              focus-on="editExpNameMode">
+          </div>
+
+            <div class="text-center message-container">
+              <span  ng-show="success" class="help-block B1">
+                <span class="text-success">{{success}}</span>
+              </span>
+            </div>
+            <div ng-show="errors">
+              <span class="help-block B1">
+                <span class="text-danger">{{errors}}</span>
+              </span>
+            </div>
+
+          </form>
+      </div>
       <div ng-if="status == 'COMPLETED'" class="side-menu-exp-status B2">{{runStatus}}{{exp.started_at | amCalendar}}</div>
       <div ng-if="status != 'COMPLETED'" class="side-menu-exp-status B1">{{runStatus}}</div>
     </div>

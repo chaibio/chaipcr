@@ -11,20 +11,10 @@
         </span>
       </div>
       <div class="heading SH">
-        EXPERIMENT NAME
-      </div>
-      <div class="exp-name-container">
-        <span class="exp-name B1 truncate" ng-show="!editExpNameMode">
-          {{experiment.name}}
-        </span>
-        <input type="text" class="exp-name B1" ng-model="experiment.name" ng-show="editExpNameMode" ng-blur="saveExperiment()" focus-on="editExpNameMode">
-        <span class="action SH" ng-click="focusExpName()" ng-show="!editExpNameMode">EDIT</span>
-      </div>
-      <div class="heading SH">
         LID TEMPERATURE
       </div>
       <div class="exp-name-container">
-        <span class="exp-name B1 truncate" ng-show="!editLidTempMode">
+        <span class="exp-name B1 truncate" ng-click="focusLidTemp()" ng-show="!editLidTempMode">
           {{ (experiment.protocol.lid_temperature) | degreeCelcius }}
         </span>
 
@@ -39,7 +29,6 @@
           on-key-enter="updateProtocol(experiment.protocol)"
           focus-on="editLidTempMode">
 
-        <span class="action SH" ng-click="focusLidTemp()" ng-show="!editLidTempMode && (!experiment.started_at)">EDIT</span>
         <span class="help-block" ng-show="expForm.lidTemp.$error.pattern">
           <span class="text-danger">Must be a valid number.</span>
         </span>
