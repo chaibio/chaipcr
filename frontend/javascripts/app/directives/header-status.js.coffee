@@ -5,8 +5,8 @@ window.App.directive 'headerStatus', [
   'TestInProgressHelper'
   '$rootScope'
   'expName'
-  'AmplificationChartHelper'
-  (Experiment, $state, Status, TestInProgressHelper, $rootScope, expName, AmplificationChartHelper) ->
+  'ModalError'
+  (Experiment, $state, Status, TestInProgressHelper, $rootScope, expName, ModalError) ->
 
     restrict: 'EA'
     replace: true
@@ -69,7 +69,7 @@ window.App.directive 'headerStatus', [
             $scope.experiment = exp
             $rootScope.$broadcast 'experiment:started', experiment_id
             if $state.is('edit-protocol')
-              max_cycle = AmplificationChartHelper.getMaxExperimentCycle($scope.experiment)
+              max_cycle = Experiment.getMaxExperimentCycle($scope.experiment)
               $state.go('run-experiment', {'id': experiment_id, 'chart': 'amplification', 'max_cycle': max_cycle})
 
       $scope.stopExperiment = ->
@@ -80,6 +80,10 @@ window.App.directive 'headerStatus', [
 
       $scope.expName = (truncate_length) ->
         return Experiment.truncateName($scope.experiment.name, truncate_length)
+
+      $scope.viewError = ->
+        err = message: $scope.experiment.completion_message
+        ModalError.open err
 
       $scope.$on 'expName:Updated', ->
         $scope.experiment?.name = expName.name

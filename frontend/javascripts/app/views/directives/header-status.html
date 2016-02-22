@@ -90,10 +90,15 @@
           <span ng-show="experiment.completion_status === 'success'">completed</span>
           <span ng-show="experiment.completion_status !== 'success'">
             <span class="failed">failed</span>
-            <span ng-show="experiment.completion_status === 'aborted'">user cancelled</span>
-            <span ng-show="experiment.completion_status !== 'aborted'">{{experiment.completion_message}}</span>
+            <span ng-show="experiment.completion_status === 'aborted'">
+              user cancelled
+              <strong >{{experiment.completed_at|date:'MMM. dd yyyy, hh:mm:ss'}}</strong>
+            </span>
+            <span ng-show="experiment.completion_status !== 'aborted'">
+              AN ERROR OCCURED
+              <strong style="cursor: pointer" ng-click="viewError()">VIEW DETAILS</strong>
+            </span>
           </span>
-          <strong >{{experiment.completed_at|date:'MMM. dd yyyy, hh:mm:ss'}}</strong>
         </div>
         <button class="button-header" duplicate-experiment experiment-id="experiment.id">
           <b>DUPLICATE EXPERIMENT</b>
