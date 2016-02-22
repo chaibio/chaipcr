@@ -103,7 +103,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.chartConfig.axes.x.ticks = helper.Xticks data.min_cycle, data.max_cycle
         # $scope.chartConfig.axes.y.max = if subtraction_type is 'baseline' then MAX_BASELINE_AMPLIFICATION else MAX_BACKGROUND_AMPLIFICATION
         $scope.data = data.amplification_data
-        console.log $scope.data
 
       updateSeries = (buttons) ->
         buttons = buttons || $scope.wellButtons || {}
@@ -120,8 +119,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                 key: "well_#{i}_#{subtraction_type}"
                 label: if ($scope.is_dual_channel and $scope.color_by is 'well') then "channel_#{ch_i}, well_#{i+1}: " else "well_#{i+1}: "
                 color: if ($scope.color_by is 'well') then buttons["well_#{i}"].color else (if ch_i is 1 then '#00AEEF' else '#8FC742')
-
-      $scope.$watchCollection 'wellButtons', updateSeries
+                interpolation: {mode: 'cardinal', tension: 0.7}
 
       moveData = ->
         return if !angular.isNumber($scope.ampli_zoom) or !AMPLI_DATA_CACHE or !$scope.maxCycle
@@ -148,6 +146,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       $scope.$watch 'curve_type', (type) ->
         $scope.chartConfig.axes.y.type = type
+
+      $scope.$watchCollection 'wellButtons', updateSeries
 
       $scope.$watch ->
         $scope.RunExperimentCtrl.chart

@@ -14,6 +14,7 @@ module.exports = {
 
   swallowError: function swallowError (err) {
     gutil.log(err);
+    gutil.beep();
     this.emit('end');
   }
 

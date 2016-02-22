@@ -15,6 +15,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
             return parseInt(x)
         y:
           ticks: 10
+
       margin:
         top: 10
         left: 80
