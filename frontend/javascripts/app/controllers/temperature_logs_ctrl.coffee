@@ -12,6 +12,7 @@ App.controller 'TemperatureLogCtrl', [
 
     $scope.options = TemperatureLogService.chartConfig
     greatest_elapsed_time = 0
+    orig_greatest_elapsed_time = 0
     $scope.resolution = 0
 
     getExperiment = (cb) ->
@@ -27,16 +28,20 @@ App.controller 'TemperatureLogCtrl', [
         widthPercent = if widthPercent > 1 then 1 else (if widthPercent < 0 then 0 else widthPercent)
         widthPercent = if widthPercent < 0.1 then 0.1 else widthPercent
         angular.element('#temp-logs-scrollbar .scrollbar').css width: "#{widthPercent*100}%"
-        $rootScope.$broadcast 'scrollbar:width:changed'
+        $rootScope.$broadcast 'scrollbar:width:changed', 'temp-logs-scrollbar'
 
       fetchTemperatureLogs = ->
-        Experiment.getTemperatureData($stateParams.id)
+        Experiment.getTemperatureData($stateParams.id, starttime: orig_greatest_elapsed_time*1000)
         .then (data) ->
           return if !data
           return if data.length is 0
-          greatest_elapsed_time = Math.ceil(data[data.length-1].temperature_log.elapsed_time/1000)
+          orig_greatest_elapsed_time = data[data.length-1].temperature_log.elapsed_time/1000
+          greatest_elapsed_time = Math.ceil(orig_greatest_elapsed_time)
           greatest_elapsed_time = if greatest_elapsed_time < 5*60 then 60*5 else greatest_elapsed_time
-          $scope.data = TemperatureLogService.parseData(data)
+          $scope.data = $scope.data || {dataset: []}
+          new_data = TemperatureLogService.parseData(data)
+          $scope.data.dataset = $scope.data.dataset.concat(new_data.dataset)
+          console.log $scope.data
           updateResolutionOptions()
           moveData()
 

@@ -20,15 +20,16 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
       xDiff = 0
 
       scrollbar = elem.find('.scrollbar')
-
       # respond to change in scrollbar width
-      $scope.$on 'scrollbar:width:changed', (e) ->
+      $scope.$on 'scrollbar:width:changed', (e, id, percent) ->
+
+        return if id isnt attr.id
 
         if getSpaceWidth() > 0 and ngModel.$viewValue is 'FULL'
           ngModel.$setViewValue( $scope.defaultValue || 0)
 
         if ngModel.$viewValue >= 1
-          updateMargin getElemWidth() - getScrollBarWidth()
+          updateMargin(getElemWidth() - getScrollBarWidth())
 
         spaceWidth = getSpaceWidth()
         if spaceWidth > 0
@@ -39,22 +40,30 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
           updateMargin newMargin
 
         if !ngModel.$viewValue
-          ngModel.$setViewValue 'FULL'
+          ngModel.$setViewValue($scope.defaultValue || 'FULL')
 
-      $scope.$watch ->
-        ngModel.$viewValue
-      , (val, oldVal) ->
-        if val isnt oldVal and val isnt 'FULL' and !held
-          val = parseFloat(val) || 0
-          val = if (val > 1) then 1 else val
-          val = if (val < 0) then 0 else val
 
-          if angular.isNumber val
+        if Math.abs(getElemWidth() - getScrollBarWidth()) < 2
+          console.log 'EQUAL!!'
+          updateMargin(0)
 
-            ngModel.$setViewValue val
+        console.log ngModel.$viewValue
 
-            newMargin = spaceWidth*val
-            updateMargin newMargin
+      # $scope.$watch ->
+      #   ngModel.$viewValue
+      # , (val, oldVal) ->
+      #   if val isnt oldVal and val isnt 'FULL' and !held
+      #     val = parseFloat(val) || 0
+      #     val = if (val > 1) then 1 else val
+      #     val = if (val < 0) then 0 else val
+
+      #     if angular.isNumber val
+
+      #       ngModel.$setViewValue val
+
+      #       newMargin = spaceWidth*val
+
+      #       updateMargin(newMargin)
 
       getMarginLeft = ->
         parseInt scrollbar.css('marginLeft').replace /px/, ''

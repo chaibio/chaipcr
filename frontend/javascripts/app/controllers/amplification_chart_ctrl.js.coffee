@@ -130,6 +130,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         wRatio = num_cycle_to_show / $scope.maxCycle
         scrollbar_width = $('#ampli-scrollbar').width()
         $('#ampli-scrollbar .scrollbar').css(width: (scrollbar_width * wRatio) + 'px')
+        $rootScope.$broadcast 'scrollbar:width:changed', 'ampli-scrollbar'
 
         $scope.amplification_data = helper.moveData AMPLI_DATA_CACHE.amplification_data, num_cycle_to_show, $scope.ampli_scroll, $scope.maxCycle
         updateChartData($scope.amplification_data)
