@@ -98,6 +98,15 @@ window.ChaiBioTech.ngApp
       return name if name.length <= NAME_LENGTH
       return name.substring(0, NAME_LENGTH-2)+'...'
 
+    self.getMaxExperimentCycle = (exp) ->
+      stages = exp.protocol.stages || []
+      cycles = []
+
+      for stage in stages by 1
+        cycles.push stage.stage.num_cycles
+
+      Math.max.apply Math, cycles
+
     return self
 
 ]

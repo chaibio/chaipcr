@@ -3,9 +3,8 @@ window.App.directive 'statusBar', [
   '$state'
   'Status'
   'TestInProgressHelper'
-  '$rootScope',
-  'AmplificationChartHelper',
-  (Experiment, $state, Status, TestInProgressHelper, $rootScope, AmplificationChartHelper) ->
+  '$timeout'
+  (Experiment, $state, Status, TestInProgressHelper, $timeout) ->
 
     restrict: 'EA'
     replace: true
@@ -14,6 +13,9 @@ window.App.directive 'statusBar', [
 
 
       experiment_id = null
+      $document = angular.element(document)
+      inputFocus = elem.find('input')
+      stopping = false
       $scope.truncate = Experiment.truncateName
 
       $scope.show = ->
@@ -59,11 +61,25 @@ window.App.directive 'statusBar', [
         Experiment.getExperimentDuration($scope.footer_experiment)
 
       $scope.stopExperiment = ->
+        stopping = true
         Experiment.stopExperiment($scope.footer_experiment.id)
         .then ->
           $scope.footer_experiment = null
+        .finally ->
+          stopping = false
 
       $scope.resumeExperiment = ->
         Experiment.resumeExperiment($scope.footer_experiment.id)
+
+      $scope.stopConfirm = ->
+        $scope.stop_confirm_show = true
+        $timeout ->
+          inputFocus.focus()
+
+      $scope.inputBlur = ->
+        $timeout ->
+          $scope.stop_confirm_show = false if !stopping
+        , 250
+
 
 ]

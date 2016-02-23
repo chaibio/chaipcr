@@ -1,0 +1,31 @@
+@import '../colors.css.scss';
+
+.modal-error-window {
+
+  .modal-dialog {
+    width: 600px;
+  }
+
+  .close-wrapper {
+    text-align: right;
+
+    .close {
+      float: none;
+      color: #fff;
+      margin-right: -15px;
+      margin-top: -15px;
+      font-weight: lighter;
+      opacity: 1;
+    }
+  }
+
+  .modal-content {
+    background-color: $gray;
+    text-align: center;
+    padding: 20px;
+
+    * {
+      color: #fff;
+    }
+  }
+}

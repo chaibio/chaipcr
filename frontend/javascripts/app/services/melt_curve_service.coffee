@@ -14,7 +14,7 @@ App.service 'MeltCurveService', [
           color: AmplificationChartHelper.COLORS[i]
           type: 'line'
           id: "well_#{i}"
-          label: "well-#{i+1}"
+          label: "well_#{i+1}: "
 
       axes:
         x:

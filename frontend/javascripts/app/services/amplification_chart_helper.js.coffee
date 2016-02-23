@@ -1,7 +1,8 @@
 window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
   'SecondsDisplay'
   '$filter'
-  (SecondsDisplay, $filter) ->
+  'Experiment'
+  (SecondsDisplay, $filter, Experiment) ->
 
     FLOOR_VALUE = 0.1
 
@@ -20,6 +21,9 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         top: 10
         left: 80
         right: 5
+      grid:
+        x: false
+        y: false
 
       series: []
 
@@ -80,14 +84,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       channel_1: [paddData]
       channel_2: [paddData]
 
-    @getMaxExperimentCycle = (exp) ->
-      stages = exp.protocol.stages || []
-      cycles = []
-
-      for stage in stages by 1
-        cycles.push stage.stage.num_cycles
-
-      Math.max.apply Math, cycles
+    @getMaxExperimentCycle = Experiment.getMaxExperimentCycle
 
     @getMaxCalibration = (amplification_data, type) ->
       calibs = []

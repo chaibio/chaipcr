@@ -36,7 +36,7 @@
         return $http.get('/experiments/' + id);
       }
       self.getFluorescenceData = function(expId) {
-        return $http.get("/experiments/" + expId + "/fluorescence_data");
+        return $http.get("/experiments/" + expId + "/amplification_data");
       };
       self.create = function(exp) {
         return $http.post("/experiments", {
@@ -67,7 +67,7 @@
           if (i > 0) q = q + '&';
           q = q + 'step_id[]=' + step_ids[i];
         }
-        return $http.get('/experiments/' + exp_id + '/fluorescence_data?' + q);
+        return $http.get('/experiments/' + exp_id + '/amplification_data?' + q);
       }
 
       self.getTemperatureData = function(expId, opts) {
