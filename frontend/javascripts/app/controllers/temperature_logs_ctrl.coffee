@@ -32,7 +32,7 @@ App.controller 'TemperatureLogCtrl', [
         $rootScope.$broadcast 'scrollbar:width:changed', 'temp-logs-scrollbar'
 
       fetchTemperatureLogs = ->
-        Experiment.getTemperatureData($stateParams.id, starttime: (orig_greatest_elapsed_time+1)*1000)
+        Experiment.getTemperatureData($stateParams.id, starttime: Math.floor(orig_greatest_elapsed_time+1)*1000)
         .then (data) ->
           return if !data
           return if data.length is 0
@@ -83,8 +83,8 @@ App.controller 'TemperatureLogCtrl', [
       $scope.$on 'status:data:updated', (e, val) ->
         if val
           $scope.scrollState = $scope.scrollState || 'FULL'
-          $scope.isCurrentExperiment = parseInt(val.experiment_controller?.expriment?.id) is parseInt($stateParams.id)
-          if $scope.isCurrentExperiment and ($scope.scrollState >= 1 || $scope.scrollState is 'FULL' || greatest_elapsed_time <= 5*60) and (val.experiment_controller?.machine.state is 'lid_heating' || val.experiment_controller?.machine.state is 'running')
+          isCurrentExperiment = parseInt(val.experiment_controller?.expriment?.id) is parseInt($stateParams.id)
+          if isCurrentExperiment and ($scope.scrollState >= 1 || $scope.scrollState is 'FULL' || greatest_elapsed_time <= 5*60 || ($scope.resolutionIndex is 0)) and (val.experiment_controller?.machine.state is 'lid_heating' || val.experiment_controller?.machine.state is 'running')
             $scope.autoUpdateTemperatureLogs()
           else
             $scope.stopInterval()
