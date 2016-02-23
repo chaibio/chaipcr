@@ -137,6 +137,17 @@
     margin-bottom: -35px;
   }
 
+  .line-series {
+    path {
+      stroke-width: 3px !important;
+    }
+  }
+  .dot-series {
+    circle {
+      stroke-width: 3px !important;
+    }
+    }
+
   .axis .tick text {
     font-family: "dinot-regular";
     font-size: 10px;

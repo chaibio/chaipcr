@@ -25,6 +25,7 @@ App.controller 'TemperatureLogCtrl', [
       updateScrollWidth = ->
         widthPercent = $scope.resolution/greatest_elapsed_time
         widthPercent = if widthPercent > 1 then 1 else (if widthPercent < 0 then 0 else widthPercent)
+        widthPercent = if widthPercent < 0.1 then 0.1 else widthPercent
         angular.element('#temp-logs-scrollbar .scrollbar').css width: "#{widthPercent*100}%"
         $rootScope.$broadcast 'scrollbar:width:changed'
 
@@ -33,7 +34,7 @@ App.controller 'TemperatureLogCtrl', [
         .then (data) ->
           return if !data
           return if data.length is 0
-          greatest_elapsed_time = data[data.length-1].temperature_log.elapsed_time/1000
+          greatest_elapsed_time = Math.ceil(data[data.length-1].temperature_log.elapsed_time/1000)
           greatest_elapsed_time = if greatest_elapsed_time < 5*60 then 60*5 else greatest_elapsed_time
           $scope.data = TemperatureLogService.parseData(data)
           updateResolutionOptions()
@@ -41,14 +42,18 @@ App.controller 'TemperatureLogCtrl', [
 
       updateResolutionOptions = ->
         $scope.resolutionOptions = []
-        zoom_calibration = 10
-        zoom_denomination = greatest_elapsed_time / zoom_calibration
-        if greatest_elapsed_time < 60*5
-          $scope.resolutionOptions.push(60*5)
+        zoom_calibration = 30 # 30s
+        zoom_denomination = greatest_elapsed_time / (greatest_elapsed_time / zoom_calibration)
+        # if greatest_elapsed_time < 60*5
+        #   $scope.resolutionOptions.push(60*5)
+
+        $scope.resolutionOptions.push greatest_elapsed_time
 
         for zoom in [zoom_calibration..1] by -1
-          $scope.resolutionOptions.push(parseFloat((zoom*zoom_denomination).toFixed(2)) )
+          $scope.resolutionOptions.push(zoom*zoom_denomination)
 
+
+        console.log $scope.resolutionOptions
         updateCurrentResolution()
         updateScrollWidth()
 
@@ -59,14 +64,13 @@ App.controller 'TemperatureLogCtrl', [
         opts = opts || {}
         $scope.options.axes.x.min = opts.min_x || 0
         $scope.options.axes.x.max = opts.max_x || 0
+        # $scope.options.axes.y.max = if opts.max_x then (if opts.max_x <=120 then 120 else opts.max_x) else 120
         $timeout ->
           $scope.$broadcast '$reload:n3:charts'
         , 500
 
       moveData = ->
-        console.log 'moveData'
         newConfig = TemperatureLogService.moveData(greatest_elapsed_time, $scope.resolution, $scope.scrollState)
-        console.log newConfig
         updateChart(newConfig)
 
       $scope.$on 'status:data:updated', (e, val) ->
@@ -91,12 +95,14 @@ App.controller 'TemperatureLogCtrl', [
         TemperatureLogService.legend
 
       $scope.$watch 'resolutionIndex', ->
-        return if !$scope.resolutionOptions or $scope.resolutionOptions.length is 0
+        return if !$scope.resolutionOptions or $scope.resolutionOptions.length is 0 or !$scope.data
         updateCurrentResolution()
         updateScrollWidth()
         moveData()
+        # console.log $scope.resolution
 
       $scope.$watch 'scrollState', ->
+        return if !$scope.resolutionOptions or $scope.resolutionOptions.length is 0 or !$scope.data
         moveData()
 
       $scope.$watch ->

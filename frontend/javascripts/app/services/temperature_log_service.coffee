@@ -28,8 +28,8 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
         x: false
         y: false
       series: [
-        {thickness: '5px',axis: 'y', dataset: 'dataset', key: 'heat_block_zone_temp', label: 'Heat Block: ', interpolation: {mode: 'linear'}, color: 'steelblue'},
-        {thickness: '5px',axis: 'y', dataset: 'dataset', key: 'lid_temp', label: 'Lid: ', interpolation: {mode: 'linear'}, color: 'lightsteelblue'}
+        {thickness: '5px',axis: 'y', dataset: 'dataset', key: 'heat_block_zone_temp', label: 'Heat Block: ', interpolation: {mode: 'linear'}, color: '#00AEEF'},
+        {thickness: '5px',axis: 'y', dataset: 'dataset', key: 'lid_temp', label: 'Lid: ', interpolation: {mode: 'linear'}, color: '#C5C5C5'}
       ]
       tooltipHook: (domain) =>
         @legend =
@@ -41,13 +41,11 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
 
     @moveData = (greatest_elapsed_time, resolution, scrollState) ->
       FIVE_MINS = 60*5
-      # greatest_elapsed_time = if greatest_elapsed_time < FIVE_MINS then FIVE_MINS else greatest_elapsed_time
       scroll = (if scrollState is 'FULL' then 1 else (if scrollState < 0 then 0 else (if scrollState > 1 then 1 else scrollState)))
       left_et_limit = (greatest_elapsed_time - resolution)*scroll
       right_et_limit = (left_et_limit + resolution)
 
       min_x: left_et_limit
-      # max_x: if greatest_elapsed_time < FIVE_MINS then (FIVE_MINS) else right_et_limit
       max_x: right_et_limit
 
     @parseData = (temperature_logs) ->
