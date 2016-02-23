@@ -2514,7 +2514,7 @@ var n3Charts;
                     };
                 };
                 var resizeCb = debounce(function (event) {
-                    console.log(event);
+                    // console.log(event);
                     var rect = element[0].parentElement.getBoundingClientRect();
                     scope.elementDimensions.height = rect.height;
                     scope.elementDimensions.width = rect.width;

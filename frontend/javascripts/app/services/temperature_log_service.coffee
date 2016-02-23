@@ -11,7 +11,6 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
           min: 0
           tickFormat: (t) ->
             SecondsDisplay.display2 t
-          # max: 60 * 5
         },
         y: {
           min: 0
@@ -72,27 +71,11 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
 
       dataset: tmp_logs
 
-    # @mergeNewData = (newTemperatureLogs, oldTemperaturelogs) ->
-    #   newTemperatureLogs = newTemperatureLogs || []
-    #   oldTemperaturelogs = oldTemperaturelogs || []
-    #   return if newTemperatureLogs.length is 0
-    #   return newTemperatureLogs if oldTemperaturelogs.length is 0
-
-    #   newData = []
-    #   insertionStartIndex = 0
-    #   minNewElapsedTime = newTemperatureLogs[1].temperature_log.elapsed_time
-    #   minOldElapsedTime = newTemperatureLogs[0].temperature_log.elapsed_time
-
-    #   return oldTemperaturelogs.concat(newTemperatureLogs) if minNewElapsedTime > minOldElapsedTime
-
-    #   for datum, i in oldTemperaturelogs by 1
-    #     if datum.temperature_log.elapsed_time > minNewElapsedTime
-    #       newData.concat oldTemperaturelogs.slice 0, i-1
-    #       newData.concat newTemperatureLogs
-    #       newData.concat oldTemperaturelogs.slice i, oldTemperaturelogs.length-1
-    #       break
-
-    #   newData
+    @getGreatestElapsedTime = (temperature_logs) ->
+      max = 0
+      for datum in temperature_logs by 1
+        max = if datum.temperature_log.elapsed_time > max then datum.temperature_log.elapsed_time else max
+      return max
 
     return
 ]
