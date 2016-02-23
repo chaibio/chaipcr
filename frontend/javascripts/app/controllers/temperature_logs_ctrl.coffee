@@ -58,6 +58,9 @@ App.controller 'TemperatureLogCtrl', [
         updateCurrentResolution()
         updateScrollWidth()
 
+      # calibrateDataByResolution = ->
+        
+
       updateCurrentResolution = ->
         $scope.resolution = $scope.resolutionOptions[$scope.resolutionIndex || 0]
 

@@ -86,5 +86,8 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
         max = if datum.temperature_log.elapsed_time > max then datum.temperature_log.elapsed_time else max
       return max
 
+    @optimizeDataByResolution = (data, resolution, greatest_elapsed_time) ->
+      
+
     return
 ]
