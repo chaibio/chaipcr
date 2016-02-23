@@ -12,7 +12,7 @@ App.controller 'TemperatureLogCtrl', [
 
     $scope.options = TemperatureLogService.chartConfig
     greatest_elapsed_time = 0
-    orig_greatest_elapsed_time = 0
+    orig_greatest_elapsed_time = -1
     $scope.resolution = 0
 
     getExperiment = (cb) ->
@@ -31,7 +31,7 @@ App.controller 'TemperatureLogCtrl', [
         $rootScope.$broadcast 'scrollbar:width:changed', 'temp-logs-scrollbar'
 
       fetchTemperatureLogs = ->
-        Experiment.getTemperatureData($stateParams.id, starttime: orig_greatest_elapsed_time*1000)
+        Experiment.getTemperatureData($stateParams.id, starttime: (orig_greatest_elapsed_time+1)*1000)
         .then (data) ->
           return if !data
           return if data.length is 0
@@ -42,6 +42,7 @@ App.controller 'TemperatureLogCtrl', [
           new_data = TemperatureLogService.parseData(data)
           $scope.options.axes.y.max = if new_data.max_y > $scope.options.axes.y.max then new_data.max_y else $scope.options.axes.y.max
           $scope.data.dataset = $scope.data.dataset.concat(new_data.dataset)
+          $scope.data.dataset = TemperatureLogService.reorderData($scope.data.dataset)
           updateResolutionOptions()
           moveData()
 

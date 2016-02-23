@@ -28,8 +28,8 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
         x: false
         y: false
       series: [
-        {thickness: '5px',axis: 'y', dataset: 'dataset', key: 'heat_block_zone_temp', label: 'Heat Block: ', interpolation: {mode: 'cardinal'}, color: '#00AEEF'},
-        {thickness: '5px',axis: 'y', dataset: 'dataset', key: 'lid_temp', label: 'Lid: ', interpolation: {mode: 'cardinal'}, color: '#C5C5C5'}
+        {thickness: '5px',axis: 'y', dataset: 'dataset', interpolation: {mode: 'cardinal', tension: 0.7}, key: 'heat_block_zone_temp', label: 'Heat Block: ', color: '#00AEEF'},
+        {thickness: '5px',axis: 'y', dataset: 'dataset', interpolation: {mode: 'cardinal', tension: 0.7}, key: 'lid_temp', label: 'Lid: ', color: '#C5C5C5'}
       ]
       tooltipHook: (domain) =>
         @legend =
@@ -76,6 +76,9 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
 
       dataset: tmp_logs
       max_y: max_y
+
+    @reorderData = (temperature_logs) ->
+      tmp_logs = _.orderBy angular.copy(temperature_logs), ['elapsed_time'], ['asc']
 
     @getGreatestElapsedTime = (temperature_logs) ->
       max = 0
