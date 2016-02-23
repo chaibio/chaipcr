@@ -156,6 +156,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         if val is 'amplification' and !hasInit
           fetchFluorescenceData()
         else
-          moveData()
+          $scope.$broadcast '$reload:n3:charts'
 
 ]

@@ -13,13 +13,12 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
         },
         y: {
           min: 0
-          # max: 0
         }
       },
       margin: {
         top: 20
         left: 50
-        right: 0
+        right: 30
       },
       grid:
         x: false
@@ -30,15 +29,14 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
       ]
 
     @moveData = (greatest_elapsed_time, resolution, scrollState) ->
-      console.log "resolution: #{resolution}"
-      console.log "scrollState: #{scrollState}"
-      greatest_elapsed_time = if greatest_elapsed_time < 60*5 then 60*5 else greatest_elapsed_time
+      scrollState = scrollState || 'FULL'
+      FIVE_MINS = 60*5
       scroll = (if scrollState is 'FULL' then 1 else (if scrollState < 0 then 0 else (if scrollState > 1 then 1 else scrollState)))
       left_et_limit = (greatest_elapsed_time - resolution)*scroll
       right_et_limit = (left_et_limit + resolution)
 
       min_x: left_et_limit
-      max_x: right_et_limit
+      max_x: if greatest_elapsed_time < FIVE_MINS then FIVE_MINS else right_et_limit
 
     @parseData = (temperature_logs) ->
 
@@ -64,27 +62,27 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
 
       dataset: tmp_logs
 
-    @mergeNewData = (newTemperatureLogs, oldTemperaturelogs) ->
-      newTemperatureLogs = newTemperatureLogs || []
-      oldTemperaturelogs = oldTemperaturelogs || []
-      return if newTemperatureLogs.length is 0
-      return newTemperatureLogs if oldTemperaturelogs.length is 0
+    # @mergeNewData = (newTemperatureLogs, oldTemperaturelogs) ->
+    #   newTemperatureLogs = newTemperatureLogs || []
+    #   oldTemperaturelogs = oldTemperaturelogs || []
+    #   return if newTemperatureLogs.length is 0
+    #   return newTemperatureLogs if oldTemperaturelogs.length is 0
 
-      newData = []
-      insertionStartIndex = 0
-      minNewElapsedTime = newTemperatureLogs[1].temperature_log.elapsed_time
-      minOldElapsedTime = newTemperatureLogs[0].temperature_log.elapsed_time
+    #   newData = []
+    #   insertionStartIndex = 0
+    #   minNewElapsedTime = newTemperatureLogs[1].temperature_log.elapsed_time
+    #   minOldElapsedTime = newTemperatureLogs[0].temperature_log.elapsed_time
 
-      return oldTemperaturelogs.concat(newTemperatureLogs) if minNewElapsedTime > minOldElapsedTime
+    #   return oldTemperaturelogs.concat(newTemperatureLogs) if minNewElapsedTime > minOldElapsedTime
 
-      for datum, i in oldTemperaturelogs by 1
-        if datum.temperature_log.elapsed_time > minNewElapsedTime
-          newData.concat oldTemperaturelogs.slice 0, i-1
-          newData.concat newTemperatureLogs
-          newData.concat oldTemperaturelogs.slice i, oldTemperaturelogs.length-1
-          break
+    #   for datum, i in oldTemperaturelogs by 1
+    #     if datum.temperature_log.elapsed_time > minNewElapsedTime
+    #       newData.concat oldTemperaturelogs.slice 0, i-1
+    #       newData.concat newTemperatureLogs
+    #       newData.concat oldTemperaturelogs.slice i, oldTemperaturelogs.length-1
+    #       break
 
-      newData
+    #   newData
 
     return
 ]

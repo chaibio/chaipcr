@@ -38,7 +38,7 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
           newMargin = spaceWidth * ngModel.$viewValue
           updateMargin newMargin
 
-        else
+        if !ngModel.$viewValue
           ngModel.$setViewValue 'FULL'
 
       $scope.$watch ->
