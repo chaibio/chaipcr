@@ -70,42 +70,18 @@ end
 
 waterstep_defaults = { step_id: 2, fluorescence_value: 1, cycle_num: 1, experiment_id: 1 }
 
-FluorescenceDatum.seed(:experiment_id,:step_id,:well_num,
-  waterstep_defaults.merge(well_num: 0),
-  waterstep_defaults.merge(well_num: 1),
-  waterstep_defaults.merge(well_num: 2),
-  waterstep_defaults.merge(well_num: 3),
-  waterstep_defaults.merge(well_num: 4),
-  waterstep_defaults.merge(well_num: 5),
-  waterstep_defaults.merge(well_num: 6),
-  waterstep_defaults.merge(well_num: 7),
-  waterstep_defaults.merge(well_num: 8),
-  waterstep_defaults.merge(well_num: 9),
-  waterstep_defaults.merge(well_num: 10),
-  waterstep_defaults.merge(well_num: 11),
-  waterstep_defaults.merge(well_num: 12),
-  waterstep_defaults.merge(well_num: 13),
-  waterstep_defaults.merge(well_num: 14),
-  waterstep_defaults.merge(well_num: 15)
+FluorescenceDatum.seed(:experiment_id,:step_id,:well_num,:channel,
+*(0...16).map {|num| waterstep_defaults.merge(channel: 1, well_num: num)}
+)
+FluorescenceDatum.seed(:experiment_id,:step_id,:well_num,:channel,
+*(0...16).map {|num| waterstep_defaults.merge(channel: 2, well_num: num)}
 )
 
 signalstep_defaults = { step_id: 4, fluorescence_value: 100, cycle_num: 1, experiment_id: 1 }
 
-FluorescenceDatum.seed(:experiment_id,:step_id,:well_num,
-  signalstep_defaults.merge(well_num: 0),
-  signalstep_defaults.merge(well_num: 1),
-  signalstep_defaults.merge(well_num: 2),
-  signalstep_defaults.merge(well_num: 3),
-  signalstep_defaults.merge(well_num: 4),
-  signalstep_defaults.merge(well_num: 5),
-  signalstep_defaults.merge(well_num: 6),
-  signalstep_defaults.merge(well_num: 7),
-  signalstep_defaults.merge(well_num: 8),
-  signalstep_defaults.merge(well_num: 9),
-  signalstep_defaults.merge(well_num: 10),
-  signalstep_defaults.merge(well_num: 11),
-  signalstep_defaults.merge(well_num: 12),
-  signalstep_defaults.merge(well_num: 13),
-  signalstep_defaults.merge(well_num: 14),
-  signalstep_defaults.merge(well_num: 15)
+FluorescenceDatum.seed(:experiment_id,:step_id,:well_num,:channel,
+*(0...16).map {|num| signalstep_defaults.merge(channel: 1, well_num: num)}
+)
+FluorescenceDatum.seed(:experiment_id,:step_id,:well_num,:channel,
+*(0...16).map {|num| signalstep_defaults.merge(channel: 2, well_num: num)}
 )

@@ -5,7 +5,37 @@
   </div>
   <div class="side-menu-content-container">
     <div class="side-menu-name-container">
-      <div class="side-menu-exp-name H1">{{exp.name | truncate:20}}</div>
+      <div class="side-menu-exp-name H1" ng-controller="EditExperimentPropertiesCtrl">
+        <form name="expForm">
+
+          <div class="exp-name-container">
+            <span class="exp-name H1 truncate" ng-click="focusExpName()" ng-show="!editExpNameMode">
+              {{exp.name | truncate:20}}
+            </span>
+            <input
+              type="text"
+              class="exp-name H1"
+              required
+              ng-model="exp.name"
+              ng-show="editExpNameMode"
+              ng-blur="saveExperiment(exp)"
+              on-key-enter="saveExperiment(exp)"
+              focus-on="editExpNameMode">
+          </div>
+
+            <div class="text-center message-container">
+              <span  ng-show="success" class="help-block B1">
+                <span class="text-success">{{success}}</span>
+              </span>
+            </div>
+            <div ng-show="errors">
+              <span class="help-block B1">
+                <span class="text-danger">{{errors}}</span>
+              </span>
+            </div>
+
+          </form>
+      </div>
       <div ng-if="status == 'COMPLETED'" class="side-menu-exp-status B2">{{runStatus}}{{exp.started_at | amCalendar}}</div>
       <div ng-if="status != 'COMPLETED'" class="side-menu-exp-status B1">{{runStatus}}</div>
     </div>
@@ -31,7 +61,7 @@
           <span ng-class="{'lid-open': lidOpen}" ng-show="status === 'NOT_STARTED'">RUN EXPERIMENT</span>
           <span class="B2 lid-open-message" ng-show="lidOpen && status === 'NOT_STARTED'"><br>Hardware lid is open</span>
           <span ng-show="status === 'RUNNING'" ui-sref="run-experiment({id: params.id, chart: 'amplification', max_cycle: maxCycle})">EXPERIMENT STATUS</span>
-          <span ng-show="status === 'COMPLETED'">VIEW RESULTS</span>
+          <span ng-show="status === 'COMPLETED'" ui-sref="run-experiment({id: params.id, chart: 'amplification', max_cycle: maxCycle})">VIEW RESULTS</span>
         </div>
         <button ng-show="runReady && status === 'NOT_STARTED' && !lidOpen" ui-sref="run-experiment({id: params.id, chart: 'amplification', max_cycle: maxCycle})" toggle-sidemenu class="B1 success">CONFIRM</button>
       </div>
