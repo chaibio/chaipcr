@@ -8,10 +8,17 @@
     margin-right: -65px;
   }
 
-
-  $marginTop: 230px;
-  .vertical-text {
-    margin-top: $marginTop;
-    margin-bottom: -$marginTop;
+  .chart-container {
+    height: 400px;
   }
+
+  .chart-legend {
+    display: none;
+  }
+
+  // $marginTop: 230px;
+  // .vertical-text {
+  //   margin-top: $marginTop;
+  //   margin-bottom: -$marginTop;
+  // }
 }

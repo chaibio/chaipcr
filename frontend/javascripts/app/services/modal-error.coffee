@@ -1,7 +1,7 @@
 App.service 'ModalError', [
-  '$modal'
+  '$uibModal'
   '$rootScope'
-  ($modal, $rootScope) ->
+  ($uibModal, $rootScope) ->
 
     self = @
     $scope = $rootScope.$new()
@@ -11,7 +11,7 @@ App.service 'ModalError', [
       $scope.message = err.message
       $scope.date = err.date
 
-      $modal.open
+      $uibModal.open
         templateUrl: 'app/views/directives/error-modal.html'
         scope: $scope
         windowClass: 'modal-error-window'

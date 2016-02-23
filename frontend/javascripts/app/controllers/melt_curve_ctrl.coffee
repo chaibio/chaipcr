@@ -34,6 +34,7 @@ App.controller 'MeltCurveCtrl', [
 
     $scope.$watch 'RunExperimentCtrl.chart', (chart) ->
       if chart is 'melt-curve' and !$scope.data
+        console.log 'here!1'
         getExperiment (exp) ->
           getMeltCurveData (data) ->
             temp_range = MeltCurveService.getTempRange(data.melt_curve_data)
@@ -45,5 +46,14 @@ App.controller 'MeltCurveCtrl', [
                   ticks: MeltCurveService.XTicks(temp_range.min, temp_range.max)
 
             $scope.data = MeltCurveService.parseData data.melt_curve_data
+            $scope.$broadcast '$reload:n3:charts'
+
+    $scope.$watch ->
+      $scope.RunExperimentCtrl.chart
+    , (chart) ->
+      if chart is 'temperature-logs'
+        $timeout ->
+          $scope.$broadcast '$reload:n3:charts'
+        , 500
 
 ]

@@ -9,7 +9,6 @@ window.App = window.ChaiBioTech.ngApp = angular.module 'ChaiBioTech', [
   'uiSwitch'
   'ngResource'
   'angularMoment'
-  'n3-line-chart'
   'n3-line-chart-v2'
   'focusOn'
   'http-auth-interceptor'

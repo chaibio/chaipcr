@@ -103,6 +103,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.chartConfig.axes.x.ticks = helper.Xticks data.min_cycle, data.max_cycle
         # $scope.chartConfig.axes.y.max = if subtraction_type is 'baseline' then MAX_BASELINE_AMPLIFICATION else MAX_BACKGROUND_AMPLIFICATION
         $scope.data = data.amplification_data
+        $scope.$broadcast '$reload:n3:charts'
 
       updateSeries = (buttons) ->
         buttons = buttons || $scope.wellButtons || {}

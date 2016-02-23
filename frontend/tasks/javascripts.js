@@ -35,7 +35,6 @@ var vendorFiles = [
   'libs/lodash.min.js',
   'libs/fabric.js',
   'libs/d3.js',
-  'libs/n3-line-chart.js',
   'libs/n3-line-chart-v2.js',
   'libs/ng-focus-on.js',
   'libs/http-auth-interceptor.js',

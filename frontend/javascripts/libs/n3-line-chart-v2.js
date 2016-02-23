@@ -2514,6 +2514,7 @@ var n3Charts;
                     };
                 };
                 var resizeCb = debounce(function (event) {
+                    console.log(event);
                     var rect = element[0].parentElement.getBoundingClientRect();
                     scope.elementDimensions.height = rect.height;
                     scope.elementDimensions.width = rect.width;
@@ -2529,6 +2530,7 @@ var n3Charts;
                 scope.$watch('elementDimensions', function () {
                     eventMgr.trigger('resize', element[0].parentElement);
                 }, true);
+                scope.$on('$reload:n3:charts', resizeCb)
                 // Trigger the destroy event
                 scope.$on('$destroy', function () {
                     eventMgr.trigger('destroy');
