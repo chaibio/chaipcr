@@ -14,6 +14,7 @@ App.controller 'TemperatureLogCtrl', [
     greatest_elapsed_time = 0
     orig_greatest_elapsed_time = -1
     $scope.resolution = 0
+    TEMPERATURE_LOGS_CACHE = []
 
     getExperiment = (cb) ->
       Experiment.get(id: $stateParams.id)
@@ -41,8 +42,9 @@ App.controller 'TemperatureLogCtrl', [
           $scope.data = $scope.data || {dataset: []}
           new_data = TemperatureLogService.parseData(data)
           $scope.options.axes.y.max = if new_data.max_y > $scope.options.axes.y.max then new_data.max_y else $scope.options.axes.y.max
-          $scope.data.dataset = $scope.data.dataset.concat(new_data.dataset)
-          $scope.data.dataset = TemperatureLogService.reorderData($scope.data.dataset)
+          TEMPERATURE_LOGS_CACHE = TEMPERATURE_LOGS_CACHE.concat(new_data.dataset)
+          TEMPERATURE_LOGS_CACHE = TemperatureLogService.reorderData(TEMPERATURE_LOGS_CACHE)
+          optimizeDataByResolution()
           updateResolutionOptions()
           moveData()
 
@@ -58,8 +60,9 @@ App.controller 'TemperatureLogCtrl', [
         updateCurrentResolution()
         updateScrollWidth()
 
-      # calibrateDataByResolution = ->
-        
+      optimizeDataByResolution = ->
+        optimizedData = TemperatureLogService.optimizeDataByResolution(TEMPERATURE_LOGS_CACHE, $scope.resolution, orig_greatest_elapsed_time)
+        $scope.data = {dataset: optimizedData}
 
       updateCurrentResolution = ->
         $scope.resolution = $scope.resolutionOptions[$scope.resolutionIndex || 0]
@@ -102,6 +105,7 @@ App.controller 'TemperatureLogCtrl', [
         return if !$scope.resolutionOptions or $scope.resolutionOptions.length is 0 or !$scope.data
         updateCurrentResolution()
         updateScrollWidth()
+        optimizeDataByResolution()
         moveData()
         # console.log $scope.resolution
 
