@@ -44,7 +44,7 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
 
 
         if Math.abs(getElemWidth() - getScrollBarWidth()) < 2
-          console.log 'EQUAL!!'
+          # console.log 'EQUAL!!'
           updateMargin(0)
 
         console.log ngModel.$viewValue

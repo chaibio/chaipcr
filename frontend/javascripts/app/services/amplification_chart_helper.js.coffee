@@ -148,7 +148,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
     @moveData = (data, zoom, scroll, max_cycle) ->
       data = angular.copy data
       scroll = if scroll < 0 then 0 else scroll
-      scroll =if scroll > 1 then 1 else scroll
+      scroll = if scroll > 1 then 1 else scroll
+      scroll = if scroll is 'FULL' then 0 else scroll
 
       if zoom is max_cycle
         cycle_start = 1
@@ -157,11 +158,6 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       else
         cycle_start = Math.floor(scroll * (max_cycle - zoom) ) + 1
         cycle_end = cycle_start + zoom - 1
-
-      # new_data = _.filter data, (datum) ->
-      #   datum.cycle_num >= cycle_start and datum.cycle_num <= cycle_end
-
-      # new_data = if new_data.length > 0 then new_data else @paddData(cycle_start)
 
       min_cycle: cycle_start
       max_cycle: cycle_end

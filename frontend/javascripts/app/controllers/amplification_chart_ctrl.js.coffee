@@ -133,6 +133,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $rootScope.$broadcast 'scrollbar:width:changed', 'ampli-scrollbar'
 
         $scope.amplification_data = helper.moveData AMPLI_DATA_CACHE.amplification_data, num_cycle_to_show, $scope.ampli_scroll, $scope.maxCycle
+        console.log $scope.amplification_data
         updateChartData($scope.amplification_data)
 
       $scope.$watch 'ampli_zoom', (zoom) ->
