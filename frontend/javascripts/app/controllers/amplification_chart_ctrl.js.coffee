@@ -156,6 +156,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         if val is 'amplification' and !hasInit
           fetchFluorescenceData()
         else
-          $scope.$broadcast '$reload:n3:charts'
+          $timeout ->
+            $scope.$broadcast '$reload:n3:charts'
+          , 1000
 
 ]

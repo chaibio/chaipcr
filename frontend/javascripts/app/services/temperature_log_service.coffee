@@ -13,6 +13,8 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
         },
         y: {
           min: 0
+          tickFormat: (t) ->
+            "#{t}°C"
         }
       },
       margin: {
@@ -24,8 +26,8 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
         x: false
         y: false
       series: [
-        {thickness: '5px',axis: 'y', dataset: 'dataset', key: 'heat_block_zone_temp', interpolation: {mode: 'cardinal', tension: 0.7}, color: 'steelblue'},
-        {thickness: '5px',axis: 'y', dataset: 'dataset', key: 'lid_temp', interpolation: {mode: 'cardinal', tension: 0.7}, color: 'lightsteelblue'}
+        {thickness: '5px',axis: 'y', dataset: 'dataset', key: 'heat_block_zone_temp', label: 'Heat Block: ', interpolation: {mode: 'cardinal', tension: 0.7}, color: 'steelblue'},
+        {thickness: '5px',axis: 'y', dataset: 'dataset', key: 'lid_temp', label: 'Lid: ', interpolation: {mode: 'cardinal', tension: 0.7}, color: 'lightsteelblue'}
       ]
 
     @moveData = (greatest_elapsed_time, resolution, scrollState) ->

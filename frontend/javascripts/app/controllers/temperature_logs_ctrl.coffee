@@ -69,8 +69,6 @@ App.controller 'TemperatureLogCtrl', [
 
       $scope.$on 'status:data:updated', (e, val) ->
         if val
-          # console.log "$scope.scrollState#{$scope.}"
-          console.log "$scope.scrollState#{$scope.scrollState}"
           $scope.scrollState = $scope.scrollState || 'FULL'
           $scope.isCurrentExperiment = parseInt(val.experiment_controller?.expriment?.id) is parseInt($stateParams.id)
           if $scope.isCurrentExperiment and ($scope.scrollState >= 1 || $scope.scrollState is 'FULL' || greatest_elapsed_time <= 5*60) and (val.experiment_controller?.machine.state is 'lid_heating' || val.experiment_controller?.machine.state is 'running')
@@ -104,8 +102,8 @@ App.controller 'TemperatureLogCtrl', [
             fetchTemperatureLogs()
           else
             $timeout ->
-              $scope.$broadcast '$reload:n3:charts'
-            , 500
+              $rootScope.$broadcast '$reload:n3:charts'
+            , 1000
 
     getExperiment ->
       init()
