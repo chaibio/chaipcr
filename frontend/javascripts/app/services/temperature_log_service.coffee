@@ -1,6 +1,8 @@
 window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
   'SecondsDisplay'
-  (SecondsDisplay) ->
+  '$rootScope'
+  (SecondsDisplay, $rootScope) ->
+    @legend = {}
     @chartConfig =
       axes: {
         x: {
@@ -26,9 +28,16 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
         x: false
         y: false
       series: [
-        {thickness: '5px',axis: 'y', dataset: 'dataset', key: 'heat_block_zone_temp', label: 'Heat Block: ', interpolation: {mode: 'cardinal', tension: 0.7}, color: 'steelblue'},
-        {thickness: '5px',axis: 'y', dataset: 'dataset', key: 'lid_temp', label: 'Lid: ', interpolation: {mode: 'cardinal', tension: 0.7}, color: 'lightsteelblue'}
+        {thickness: '5px',axis: 'y', dataset: 'dataset', key: 'heat_block_zone_temp', label: 'Heat Block: ', interpolation: {mode: 'linear'}, color: 'steelblue'},
+        {thickness: '5px',axis: 'y', dataset: 'dataset', key: 'lid_temp', label: 'Lid: ', interpolation: {mode: 'linear'}, color: 'lightsteelblue'}
       ]
+      tooltipHook: (domain) =>
+        @legend =
+          time: SecondsDisplay.display2(domain[0].row.x)
+          heat_block: "#{domain[0].row.y1}°C"
+          lid: "#{domain[1].row.y1}°C"
+        $rootScope.$apply()
+        return false
 
     @moveData = (greatest_elapsed_time, resolution, scrollState) ->
       FIVE_MINS = 60*5

@@ -85,6 +85,9 @@ App.controller 'TemperatureLogCtrl', [
         $interval.cancel $scope.updateInterval if $scope.updateInterval
         $scope.updateInterval = null
 
+      $scope.getLegend = ->
+        TemperatureLogService.legend
+
       $scope.$watch 'resolutionIndex', ->
         return if !$scope.resolutionOptions or $scope.resolutionOptions.length is 0
         updateCurrentResolution()

@@ -29,7 +29,7 @@
             <strong>Loading temperature logs<ellipsis-animated></ellipsis-animated></strong>
           </div>
           <div ng-show="experiment && data">
-            <div class="vertical-text SH">Temperature (&deg;C)</div>
+            <div class="vertical-text B1B">Temperature (&deg;C)</div>
             <div class="chart-container" id="temp-logs-drag-scroll" chart-drag-scroll ng-model="scrollState">
               <linechartv2
                 ng-if="!!data && RunExperimentCtrl.chart==='temperature-logs'"
@@ -37,10 +37,26 @@
                 options="options">
               </linechartv2 >
             </div>
-            <div class="text-center abscissa-text SH">Time</div>
+            <div class="text-center abscissa-text B1B">Time</div>
           </div>
-          <div class="indicators-container">
-            
+          <div class="indicators-group B1B">
+            <div class="row">
+              <div class="item-indicator">
+                <span class="dot"></span>
+                <strong>Time:</strong>
+                <span class="B1">{{getLegend().time}}</span>
+              </div>
+              <div class="item-indicator">
+                <span class="dot"></span>
+                <strong>Heat Block:</strong>
+                <span class="B1">{{getLegend().heat_block}}</span>
+              </div>
+              <div class="item-indicator">
+                <span class="dot"></span>
+                <strong>Lid:</strong>
+                <span class="B1">{{getLegend().lid}}</span>
+              </div>
+            </div>
           </div>
         </div>
 
