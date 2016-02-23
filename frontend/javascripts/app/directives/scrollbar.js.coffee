@@ -47,8 +47,6 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
           # console.log 'EQUAL!!'
           updateMargin(0)
 
-        console.log ngModel.$viewValue
-
       # $scope.$watch ->
       #   ngModel.$viewValue
       # , (val, oldVal) ->
