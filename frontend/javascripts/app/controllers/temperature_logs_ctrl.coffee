@@ -59,7 +59,9 @@ App.controller 'TemperatureLogCtrl', [
         opts = opts || {}
         $scope.options.axes.x.min = opts.min_x || 0
         $scope.options.axes.x.max = opts.max_x || 0
-        $scope.$broadcast '$reload:n3:charts'
+        $timeout ->
+          $scope.$broadcast '$reload:n3:charts'
+        , 500
 
       moveData = ->
         console.log 'moveData'
