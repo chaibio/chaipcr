@@ -76,6 +76,9 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
 
       promise.success ->
         $scope.success = "Lid temperature updated."
+        $timeout (() ->
+          $scope.success = ""
+          ), 2000
 
       promise.catch (resp) ->
         $scope.errors = resp.data.errors
