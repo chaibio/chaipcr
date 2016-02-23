@@ -34,6 +34,7 @@ App.controller 'TemperatureLogCtrl', [
           return if !data
           return if data.length is 0
           greatest_elapsed_time = data[data.length-1].temperature_log.elapsed_time/1000
+          greatest_elapsed_time = if greatest_elapsed_time < 5*60 then 60*5 else greatest_elapsed_time
           $scope.data = TemperatureLogService.parseData(data)
           updateResolutionOptions()
           moveData()
@@ -42,10 +43,17 @@ App.controller 'TemperatureLogCtrl', [
         $scope.resolutionOptions = []
         zoom_calibration = 10
         zoom_denomination = greatest_elapsed_time / zoom_calibration
+        if greatest_elapsed_time < 60*5
+          $scope.resolutionOptions.push(60*5)
+
         for zoom in [zoom_calibration..1] by -1
           $scope.resolutionOptions.push(parseFloat((zoom*zoom_denomination).toFixed(2)) )
+
         updateCurrentResolution()
         updateScrollWidth()
+
+      updateCurrentResolution = ->
+        $scope.resolution = $scope.resolutionOptions[$scope.resolutionIndex || 0]
 
       updateChart = (opts) ->
         opts = opts || {}
@@ -59,15 +67,13 @@ App.controller 'TemperatureLogCtrl', [
         console.log newConfig
         updateChart(newConfig)
 
-      updateCurrentResolution = ->
-        $scope.resolution = $scope.resolutionOptions[$scope.resolutionIndex || 0]
-
       $scope.$on 'status:data:updated', (e, val) ->
         if val
           # console.log "$scope.scrollState#{$scope.}"
           console.log "$scope.scrollState#{$scope.scrollState}"
+          $scope.scrollState = $scope.scrollState || 'FULL'
           $scope.isCurrentExperiment = parseInt(val.experiment_controller?.expriment?.id) is parseInt($stateParams.id)
-          if $scope.isCurrentExperiment and ($scope.scrollState >= 1 || $scope.scrollState is 'FULL') and (val.experiment_controller?.machine.state is 'lid_heating' || val.experiment_controller?.machine.state is 'running')
+          if $scope.isCurrentExperiment and ($scope.scrollState >= 1 || $scope.scrollState is 'FULL' || greatest_elapsed_time <= 5*60) and (val.experiment_controller?.machine.state is 'lid_heating' || val.experiment_controller?.machine.state is 'running')
             $scope.autoUpdateTemperatureLogs()
           else
             $scope.stopInterval()
