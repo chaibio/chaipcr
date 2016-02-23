@@ -40,6 +40,7 @@ App.controller 'TemperatureLogCtrl', [
           greatest_elapsed_time = if greatest_elapsed_time < 5*60 then 60*5 else greatest_elapsed_time
           $scope.data = $scope.data || {dataset: []}
           new_data = TemperatureLogService.parseData(data)
+          $scope.options.axes.y.max = if new_data.max_y > $scope.options.axes.y.max then new_data.max_y else $scope.options.axes.y.max
           $scope.data.dataset = $scope.data.dataset.concat(new_data.dataset)
           updateResolutionOptions()
           moveData()

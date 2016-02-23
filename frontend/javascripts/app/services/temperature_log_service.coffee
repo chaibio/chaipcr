@@ -14,6 +14,7 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
         },
         y: {
           min: 0
+          max: 120
           tickFormat: (t) ->
             "#{t}°C"
         }
@@ -27,8 +28,8 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
         x: false
         y: false
       series: [
-        {thickness: '5px',axis: 'y', dataset: 'dataset', key: 'heat_block_zone_temp', label: 'Heat Block: ', interpolation: {mode: 'linear'}, color: '#00AEEF'},
-        {thickness: '5px',axis: 'y', dataset: 'dataset', key: 'lid_temp', label: 'Lid: ', interpolation: {mode: 'linear'}, color: '#C5C5C5'}
+        {thickness: '5px',axis: 'y', dataset: 'dataset', key: 'heat_block_zone_temp', label: 'Heat Block: ', interpolation: {mode: 'cardinal'}, color: '#00AEEF'},
+        {thickness: '5px',axis: 'y', dataset: 'dataset', key: 'lid_temp', label: 'Lid: ', interpolation: {mode: 'cardinal'}, color: '#C5C5C5'}
       ]
       tooltipHook: (domain) =>
         @legend =
@@ -52,24 +53,29 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
       temperature_logs = temperature_logs || []
 
       tmp_logs = []
+      max_y = 0
 
       for temp_log in temperature_logs by 1
         et = temp_log.temperature_log.elapsed_time/1000
 
         # get heat_block_zone_temp average
-        hbz = (parseFloat(temp_log.temperature_log.heat_block_zone_1_temp)+ parseFloat(temp_log.temperature_log.heat_block_zone_2_temp))/2
+        heat_block_temp = (parseFloat(temp_log.temperature_log.heat_block_zone_1_temp)+ parseFloat(temp_log.temperature_log.heat_block_zone_2_temp))/2
         # round to nearest hundreth
-        hbz = Math.ceil(hbz*100)/100
+        heat_block_temp = Math.round(heat_block_temp*100)/100
 
         lid_temp = parseFloat temp_log.temperature_log.lid_temp
 
         tmp_logs.push({
           elapsed_time: et
-          heat_block_zone_temp: hbz
+          heat_block_zone_temp: heat_block_temp
           lid_temp: lid_temp
         })
 
+        max_y = if heat_block_temp > max_y then heat_block_temp else max_y
+        max_y = if lid_temp > max_y then lid_temp else max_y
+
       dataset: tmp_logs
+      max_y: max_y
 
     @getGreatestElapsedTime = (temperature_logs) ->
       max = 0
