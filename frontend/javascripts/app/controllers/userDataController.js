@@ -77,7 +77,7 @@ window.ChaiBioTech.ngApp.controller('userDataController', [
     };
 
     $scope.update = function(form) {
-      console.log(form);
+      //console.log(form);
       $scope.passError = ($scope.userData.password !== $scope.userData.password_confirmation);
       if(form.$valid && ! $scope.passError) {
 
