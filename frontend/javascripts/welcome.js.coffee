@@ -1,4 +1,3 @@
-
 App = angular.module 'WelcomeApp', []
 
 App.config ['$httpProvider', ($httpProvider) ->
