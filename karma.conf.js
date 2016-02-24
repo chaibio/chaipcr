@@ -20,8 +20,7 @@ module.exports = function(config) {
       'frontend/javascripts/libs/angular-ui-router.js',
       'frontend/javascripts/libs/angular-mock.js',
       './web/public/javascripts/*.js',
-      'frontend/javascripts/tests/**/*.js',
-      //'app/view*/**/*.js'
+      'frontend/javascripts/tests/**/*.js'
     ],
 
 

@@ -9,7 +9,6 @@ describe("Testing userDataController", function() {
   })
 );
 
-  var x = 1;
   it("ChaiBioTech should have userDataController", function() {
     expect(ChaiBioTech.userDataController).not.toBe(null);
   });
