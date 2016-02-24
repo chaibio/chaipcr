@@ -37,10 +37,6 @@
     </div>
   </div>
 
-  <div class="content">
-    <!-- experiment complete -->
-    <div ng-include="'./views/analyze-success.html'" ng-if="experiment && experiment.completed_at && experiment.completion_status === 'success' "></div>
-    <!-- experiment failed -->
-    <div ng-include="'./views/analyze-failed.html'" ng-if="experiment && experiment.completed_at && experiment.completion_status !== 'success' "></div>
-  </div>
+  <!-- experiment complete -->
+  <div class="content" ng-include="'./views/analyze.html'" ng-if="experiment && experiment.completed_at && experiment.completion_status === 'success'"></div>
 </div>
