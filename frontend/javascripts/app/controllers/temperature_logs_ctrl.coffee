@@ -32,6 +32,7 @@ App.controller 'TemperatureLogCtrl', [
         $rootScope.$broadcast 'scrollbar:width:changed', 'temp-logs-scrollbar'
 
       fetchTemperatureLogs = ->
+        return if $scope.RunExperimentCtrl.chart isnt 'temperature-logs'
         Experiment.getTemperatureData($stateParams.id, starttime: Math.floor(orig_greatest_elapsed_time+1)*1000)
         .then (data) ->
           return if !data

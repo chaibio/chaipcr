@@ -41,6 +41,9 @@ window.ChaiBioTech.ngApp
     self.getCurrentExperiment = ->
       currentExperiment
 
+    self.analyze = (id) ->
+      $http.get("/experiments/#{id}/analyze")
+
     tempLogsQues = []
     self.getTemperatureData = (expId, opts = {}) ->
 

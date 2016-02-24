@@ -58,8 +58,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           hasInit = true
 
           $timeout ->
-            Experiment.getAmplificationData($stateParams.id)
+            Experiment
+            .getAmplificationData($stateParams.id)
             .then (resp) ->
+              $scope.error = null
               data = resp.data
               hasData = true
               return if !data.amplification_data
@@ -71,6 +73,13 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               $scope.amplification_data = angular.copy AMPLI_DATA_CACHE.amplification_data
               moveData()
               updateButtonCts()
+
+            .catch ->
+              Experiment.analyze($scope.experiment.id)
+              .then (resp) ->
+                $scope.error = resp.data?.errors || 'Unknown error occured'
+              .catch ->
+                $scope.error = 'Unknown error occured.'
 
             .finally ->
               fetching = false
