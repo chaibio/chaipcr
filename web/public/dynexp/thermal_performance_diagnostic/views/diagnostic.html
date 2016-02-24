@@ -39,4 +39,16 @@
 
   <!-- experiment complete -->
   <div class="content" ng-include="'./views/analyze.html'" ng-if="experiment && experiment.completed_at && experiment.completion_status === 'success'"></div>
+
+  <!-- experiment failed -->
+  <div class="content text-center" ng-show="experiment.completed_at && experiment.completion_status !== 'success'">
+    <h2 class="text-danger">Diagnostic Failed</h2>
+    <div class="alert alert-danger">
+      {{experiment.completion_message}}
+    </div>
+  </div>
+  <!-- dismiss button -->
+  <div ng-show="!!experiment.completed_at" class="text-center" style="padding: 70px 0;">
+    <a href="/#/settings/" class="button">CLOSE</a>
+  </div>
 </div>
