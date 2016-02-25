@@ -127,7 +127,7 @@ class ExperimentsController < ApplicationController
               AmplificationCurve.import @cts, :on_duplicate_key_update => [:ct]
             else #cached
               @amplification_data = AmplificationDatum.where(:experiment_id=>@experiment.id, :stage_id=>@first_stage_collect_data.id).order(:channel, :well_num, :cycle_num)
-              @cts = AmplificationCurve.where(:experiment_id=>@experiment.id, :stage_id=>@first_stage_collect_data.id).order(:channel, :well_num, :cycle_num)
+              @cts = AmplificationCurve.where(:experiment_id=>@experiment.id, :stage_id=>@first_stage_collect_data.id).order(:channel, :well_num)
             end
           end
         else
