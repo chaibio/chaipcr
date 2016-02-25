@@ -126,8 +126,8 @@ class ExperimentsController < ApplicationController
               AmplificationDatum.import @amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value]
               AmplificationCurve.import @cts, :on_duplicate_key_update => [:ct]
             else #cached
-              @amplification_data = AmplificationDatum.where(:experiment_id=>@experiment.id, :stage_id=>@first_stage_collect_data.id)
-              @cts = AmplificationCurve.where(:experiment_id=>@experiment.id, :stage_id=>@first_stage_collect_data.id).order(:well_num).select(:ct).map{|r| r.ct}
+              @amplification_data = AmplificationDatum.where(:experiment_id=>@experiment.id, :stage_id=>@first_stage_collect_data.id).order(:channel, :well_num, :cycle_num)
+              @cts = AmplificationCurve.where(:experiment_id=>@experiment.id, :stage_id=>@first_stage_collect_data.id).order(:channel, :well_num, :cycle_num)
             end
           end
         else
