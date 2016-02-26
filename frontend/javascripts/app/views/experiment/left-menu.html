@@ -42,10 +42,10 @@
     <div class="side-menu-menu-container">
       <div class="side-menu-menu-item">
         <div class="B1B">EXPERIMENT PROPERTIES
-          <span sidemenu-suboption menu-template="app/views/experiment/experiment-properties-suboption.html" ng-click="showProperties=!showProperties" class="sidemenu-show-text">{{showHide}}</span></div>
+          <span ng-click="showProperties=!showProperties" class="sidemenu-show-text">{{showHide}}</span></div>
       </div>
-      <div id="new-sub-menu" ng-show="showProperties" ng-class="{'sidemenu-property-container': true, 'ng-show':showProperties}">
-        Properties come here .. !
+      <div ng-controller="EditExperimentPropertiesCtrl" id="new-sub-menu" ng-show="showProperties" ng-class="{'sidemenu-property-container': true, 'ng-show':showProperties}">
+        <ng-include src="'app/views/experiment/experiment-properties-suboption.html'"></ng-include>
       </div>
       <div class="side-menu-menu-item">
         <div class="B1B" ui-sref="edit-protocol({id: params.id})" toggle-sidemenu>

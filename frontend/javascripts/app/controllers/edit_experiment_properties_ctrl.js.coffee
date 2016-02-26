@@ -20,6 +20,13 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
 
     $scope.editExpNameMode = false
 
+    getData = ->
+      Experiment.get(id: $stateParams.id).then (data) ->
+        $scope.experiment = data.experiment
+        $scope.experimentOrig = angular.copy data.experiment
+
+    getData()
+
     $scope.$on 'status:data:updated', (e, data) ->
       if parseInt(data?.experiment_controller?.expriment?.id) is parseInt($stateParams.id)
         $scope.experiment.started_at = data.experiment_controller.expriment.started_at
@@ -70,8 +77,12 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
       promise.finally ->
         $scope.editModeOff()
 
-    $scope.updateProtocol = (data) ->
-      return if $scope.expForm.lidTemp.$invalid
+    $scope.updateProtocol = (data, expForm) ->
+      if expForm.lidTemp.$invalid
+        $scope.experiment.protocol.lid_temperature = $scope.experimentOrig.protocol.lid_temperature
+        $scope.editModeOff()
+        return
+
       promise = Protocol.update data
 
       promise.success ->
