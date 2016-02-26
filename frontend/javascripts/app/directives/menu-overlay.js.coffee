@@ -26,9 +26,9 @@ window.ChaiBioTech.ngApp.directive 'menuOverlay', [
         #sidemenuContainer.css minHeight: elem.find('.page-wrapper').height()
         $scope.sideMenuOpen = !$scope.sideMenuOpen
 
-      $rootScope.$on 'submenu:toggle', (e, html, subOption) ->
-        $scope.sideMenuOptionsOpen = !$scope.sideMenuOptionsOpen
-        elem.find('#new-sub-menu').html html
+      #$rootScope.$on 'submenu:toggle', (e, html, subOption) ->
+        #$scope.sideMenuOptionsOpen = !$scope.sideMenuOptionsOpen
+        #elem.find('#new-sub-menu').html html
 
 
 ]
