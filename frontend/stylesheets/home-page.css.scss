@@ -239,6 +239,10 @@
           background-repeat: no-repeat;
           float: left;
         }
+        &.ng-hide {
+          left: 352px;
+          transition: left .3s;
+        }
       }
 
       .trash-active {
@@ -247,20 +251,6 @@
       }
       .trash-not-active {
         background-image: url("/images/not-active-trash.png");
-      }
-
-      @keyframes my_hide {
-        from{left: 280px;}
-        to{ left: 352px;}
-      }
-      @-webkit-keyframes my_hide {
-        from{left: 280px;}
-        to{ left: 352px;}
-      }
-
-      .home-page-del.ng-hide {
-        animation-name: my_hide;
-        animation-duration: 0.3s;
       }
     }
 
