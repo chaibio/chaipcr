@@ -80,7 +80,6 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
     $scope.updateProtocol = (data, expForm) ->
       if expForm.lidTemp.$invalid
         $scope.experiment.protocol.lid_temperature = $scope.experimentOrig.protocol.lid_temperature
-        $scope.editModeOff()
         return
 
       promise = Protocol.update data
@@ -97,4 +96,5 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
 
       promise.finally ->
         $scope.editModeOff()
+
 ]
