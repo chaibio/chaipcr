@@ -21,8 +21,7 @@
       </div>
       <div class="side-menu-menu-item">
         <div class="B1B" ui-sref="edit-protocol({id: params.id})" toggle-sidemenu>
-          <span ng-show="status === 'NOT_STARTED'">EDIT PROTOCOL</span>
-          <span ng-show="status === 'RUNNING' || status === 'COMPLETED'">VIEW PROTOCOL</span>
+          <protocol-item state="{{status}}"></protocol-item>
         </div>
       </div>
       <div class="side-menu-menu-item">
