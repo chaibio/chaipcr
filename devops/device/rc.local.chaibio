@@ -119,27 +119,62 @@ check_corruption () {
 	echo "Corruption test result: $?"
 }
 
-network_watchdog() {
-        echo "Network watchdog: Starting"
+network_watchdog_interface() {
+	iface=$1
+	echo check loop starting for $iface
+
         while [ 1 ]
         do
-                ip_address=$(ifconfig eth0 | grep 'inet addr:') || :
+                ip_address=$(ifconfig $iface | grep 'inet addr:') || :
                 if [ -z "$ip_address" ]
                 then
-#                        echo "Network watchdog: No network found!"
-	                sleep 10
-                        dhclient eth0 || :
+                        echo "Network watchdog: No network found!"
+			pkill -9 /sbin/dhclient
+			lfile=/var/lib/dhcp/dhclient.$iface.leases 
+			rm $lfile
+			cmd="dhclient -1 -4 -d -v $iface -lf $lfile"
+			echo calling $cmd
+			$cmd
+			sleep 3
                 else
-#                        echo "Network watchdog.. Network found: $ip_address"
-			sleep 30
+                        echo "Network watchdog.. Network found: $ip_address"
+			sleep 20
                 fi
         done
 	echo "Network watchdog: Exit!"
 }
 
+network_watchdog_interfaces() {
+while true
+do
+        read interface
+        if [ -z $interface ]
+        then
+#               echo Empty if $interface
+                return
+        fi
+
+        #echo "Network watchdog for interface: $interface"
+        if [[ $interface =~ 'lo'.* ]] || [[ $interface =~ 'usb'.* ]]
+        then
+                echo Invalid interface $interface
+                continue
+        fi
+        echo "Network watchdog for interface: $interface"
+	network_watchdog_interface $interface &
+done
+}
+
+network_watchdog() {
+        echo "Network watchdog: Starting"
+	pkill -9 dhclient
+        ls /sys/class/net/ | network_watchdog_interfaces
+}
+
 BASEDIR=$(dirname $0)
 
-network_watchdog &
+network_watchdog >> /dev/null 2>&1
+
 NOW=$(date +"%m-%d-%Y %H:%M:%s")
 log_file="/var/log/life_age.log"
 
