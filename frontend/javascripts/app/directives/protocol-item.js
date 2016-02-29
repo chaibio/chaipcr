@@ -5,7 +5,7 @@ window.ChaiBioTech.ngApp.directive('protocolItem', [
       scope: {
         state: '@state'
       },
-      template: '<span>{{message}}</span>',
+      templateUrl: 'app/views/directives/protocol-item.html',
       link: function(scope, elem) {
         scope.message = "";
         scope.$watch('state', function(data) {

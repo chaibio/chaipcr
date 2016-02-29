@@ -21,7 +21,7 @@ module.exports = function(config) {
       'frontend/javascripts/libs/angular-mock.js',
       './web/public/javascripts/*.js',
       'frontend/javascripts/tests/**/*.js',
-      'frontend/javascripts/app/views/**/*.html'
+      //'frontend/javascripts/app/views/**/*.html'
     ],
 
 
@@ -33,10 +33,11 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'frontend/javascripts/app/views/**/*.html': ['ng-html2js']
+      //'frontend/javascripts/app/views/**/*.html': ['ng-html2js'],
+      './web/public/javascripts/*.js': ['coverage']
     },
 
-    ngHtml2JsPreprocessor: {
+    /*ngHtml2JsPreprocessor: {
       // strip this from the file path
       stripPrefix: 'base/',
       // prepend this to the
@@ -50,12 +51,32 @@ module.exports = function(config) {
       // setting this option will create only a single module that contains templates
       // from all the files, so you can load them all with module('foo')
       moduleName: 'foo'
+    },*/
+
+    coverageReporter: {
+      type : 'html',
+      dir : 'frontend/coverage/'
     },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['spec'],
+    reporters: ['spec', 'coverage', 'html'],
+
+    htmlReporter: {
+      outputDir: 'frontend/karma/', // where to put the reports
+      templatePath: null, // set if you moved jasmine_template.html
+      focusOnFailures: true, // reports show failures on start
+      namedFiles: false, // name files instead of creating sub-directories
+      pageTitle: null, // page title for reports; browser info by default
+      urlFriendlyName: false, // simply replaces spaces with _ for files/dirs
+      reportName: 'report-summary-filename', // report summary filename; browser info by default
+
+
+      // experimental
+      preserveDescribeNesting: false, // folded suites stay folded
+      foldAll: false, // reports start folded (only with preserveDescribeNesting)
+    },
 
     specReporter: {
         maxLogLines: 5,         // limit number of lines logged per test
@@ -91,7 +112,9 @@ module.exports = function(config) {
             //'karma-firefox-launcher',
             'karma-jasmine',
             //'karma-junit-reporter',
-            'karma-spec-reporter'
+            'karma-spec-reporter',
+            'karma-coverage',
+            'karma-html-reporter'
             ],
 
     // Continuous Integration mode

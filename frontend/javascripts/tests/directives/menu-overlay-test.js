@@ -16,7 +16,7 @@ describe("Testing menu overlay [Shows up when we enable side menu]", function() 
     var elem = $compile(elem)($rootScope);
     //$rootScope.$apply();
     var elemScope = elem.isolateScope();
-    console.log(elemScope);
+    //console.log(elemScope);
   });
 
 });
