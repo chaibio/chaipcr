@@ -17,8 +17,9 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
       exp.$delete id: $stateParams.id, ->
         $state.go 'home'
 
-    $scope.$watch 'showProperties', (val) ->
-      $scope.showHide = if val then 'HIDE' else 'SHOW'
+    $scope.$watch (()->
+      $scope.showProperties), (val) ->
+        $scope.showHide = if val then 'HIDE' else 'SHOW'
 
     $scope.$on 'cycle:number:updated', (e, num) ->
       $scope.maxCycle = num
