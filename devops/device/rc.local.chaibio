@@ -129,7 +129,8 @@ network_watchdog_interface() {
                 if [ -z "$ip_address" ]
                 then
                         echo "Network watchdog: No network found!"
-			pkill -9 /sbin/dhclient
+			ps -ef | grep /sbin/dhclient | grep -v grep | awk '{print $2}' | xargs kill -9
+#pkill -9 /sbin/dhclient
 			lfile=/var/lib/dhcp/dhclient.$iface.leases 
 			rm $lfile
 			cmd="dhclient -1 -4 -d -v $iface -lf $lfile"
