@@ -94,7 +94,7 @@ body { background-color: #eeeeee; padding: 0; margin: 5px; overflow-y: scroll; }
 </head>
 
 <body id="HTMLReporter" class="html-reporter showDetails">
-<h1>Tested in Chrome 48.0.2564 (Mac OS X 10.11.1) on Mon Feb 29 2016</h1>
+<h1>Tested in Chrome 48.0.2564 (Mac OS X 10.11.1) on Tue Mar 01 2016</h1>
 
 <div class="alert">
 
@@ -182,8 +182,10 @@ body { background-color: #eeeeee; padding: 0; margin: 5px; overflow-y: scroll; }
   <div class="specDetail failed">
     <span class="description">Checking the behaviour of menu overlay controller Checks the functionality of show hide</span>
     <div class="stackTrace">
-      <div class="resultMessage">TypeError: e.cookies is not a function
-    at m (http://localhost:9876/base/frontend/javascripts/libs/angular.js?57c3cbc78474073ccbccc4f9984563ecf30eb779:82:293)
+      <div class="resultMessage">Error: Unexpected request: GET /experiments/undefined
+No more request expected
+    at $httpBackend (http://localhost:9876/base/frontend/javascripts/libs/angular-mock.js?475df020e2e649e6f0239f7fabda387393c0c7df:1226:9)
+    at m (http://localhost:9876/base/frontend/javascripts/libs/angular.js?57c3cbc78474073ccbccc4f9984563ecf30eb779:82:385)
     at f (http://localhost:9876/base/frontend/javascripts/libs/angular.js?57c3cbc78474073ccbccc4f9984563ecf30eb779:80:105)
     at http://localhost:9876/base/frontend/javascripts/libs/angular.js?57c3cbc78474073ccbccc4f9984563ecf30eb779:112:20
     at l.$eval (http://localhost:9876/base/frontend/javascripts/libs/angular.js?57c3cbc78474073ccbccc4f9984563ecf30eb779:125:305)
