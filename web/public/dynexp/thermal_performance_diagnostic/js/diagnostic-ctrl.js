@@ -147,13 +147,13 @@
         }
       });
 
-      $scope.stopExperiment = function() {
-        Experiment.stopExperiment({
-          id: $scope.experiment.id
-        }).then(function() {
-          window.location.assign('/#/settings/');
-        });
-      };
+      // $scope.stopExperiment = function() {
+      //   Experiment.stopExperiment({
+      //     id: $scope.experiment.id
+      //   }).then(function() {
+      //     window.location.assign('/#/settings/');
+      //   });
+      // };
     }
   ]);
 
