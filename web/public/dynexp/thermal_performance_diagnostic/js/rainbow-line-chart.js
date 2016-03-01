@@ -25,6 +25,7 @@
           var minX = 0;
           var margin = 10;
           var prev_data_points = [];
+          var old_data = [];
 
           var rainbow = new Rainbow;
           rainbow.setSpectrum('#00AEEF', 'blue', 'violet', 'red');
@@ -105,6 +106,7 @@
             if (!$scope.data) return;
             if ($scope.data.length === 0) return;
             makeChart($scope.data)
+            old_data = angular.copy($scope.data);
           });
 
         }
