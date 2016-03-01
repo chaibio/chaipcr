@@ -101,18 +101,12 @@
             }
           };
 
-          $scope.$watch('maxX', function () {
+          $scope.$on('update:rainbow:chart', function () {
             if (!$scope.data) return;
-            makeChart($scope.data);
+            if ($scope.data.length === 0) return;
+            makeChart($scope.data)
           });
 
-          $scope.$watch('data', function(data, oldVal) {
-            if (!data) return;
-            if (data.length === 0) return;
-            if (data === oldVal) return;
-            makeChart(data);
-
-          }, false);
         }
       };
     }

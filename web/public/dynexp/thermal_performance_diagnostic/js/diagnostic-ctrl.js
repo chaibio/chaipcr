@@ -23,17 +23,16 @@
       var temperatureLogs = [];
       var tempPoll = null;
       var animation;
-      var oldData;
 
       function fetchTempLogs () {
         if(!fetchingTemps) {
           fetchingTemps = true;
           var last_elapsed_time = temperatureLogs[temperatureLogs.length-1]? temperatureLogs[temperatureLogs.length-1].temperature_log.elapsed_time : 0;
-          Experiment.getTemperatureData($scope.experiment.id, {starttime: last_elapsed_time}).then(function(resp) {
+          Experiment.getTemperatureData($scope.experiment.id, {starttime: last_elapsed_time})
+          .then(function(resp) {
             if (resp.data.length === 0) return;
             var data = resp.data;
-            updateData(oldData, angular.copy(data));
-            oldData = resp.data;
+            updateData(angular.copy(data));
           })
           .finally(function () {
             fetchingTemps = false;
@@ -41,7 +40,7 @@
         }
       }
 
-      function updateData (old, data) {
+      function updateData (data) {
         animate(angular.copy(temperatureLogs), angular.copy(data));
         temperatureLogs = temperatureLogs.concat(data);
         $scope.lidTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getLidTemps();
@@ -70,8 +69,9 @@
             cancelAnimation();
           }
 
-          if ($scope.max_x/1000 > 30) $scope.min_x += x_increment;
+          if ($scope.max_x/1000 > 30) $scope.min_x = $scope.min_x*1 + x_increment*1;
           $scope.max_x += x_increment;
+          $scope.$broadcast('update:rainbow:chart');
           calibration_index ++;
         }, duration/calibration);
 
