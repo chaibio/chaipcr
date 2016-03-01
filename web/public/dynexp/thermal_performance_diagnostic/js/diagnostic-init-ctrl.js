@@ -14,9 +14,9 @@
       $scope.modal = null;
       $scope.timeout = null;
 
-      // $scope.stopExperiment = function () {
-      //   window.location.assign('/#/settings/');
-      // };
+      $scope.stopExperiment = function () {
+        window.location.assign('/#/settings/');
+      };
 
       $scope.checkMachineStatus = function() {
 
