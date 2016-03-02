@@ -24,7 +24,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
     $scope.$on 'cycle:number:updated', (e, num) ->
       $scope.maxCycle = num
 
-    getExperiment = ->
+    $scope.getExperiment = ->
       Experiment.get(id: $stateParams.id).then (data) ->
         $scope.exp = data.experiment
         if !data.experiment.started_at and !data.experiment.completed_at
@@ -39,17 +39,16 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
 
         $scope.maxCycle = AmplificationChartHelper.getMaxExperimentCycle data.experiment
 
-    getExperiment()
+    $scope.getExperiment()
 
     $rootScope.$on 'sidemenu:toggle', ->
       if $scope.showProperties and angular.element('.sidemenu').width() > 100
         $scope.showProperties = false
 
     $scope.$on 'status:data:updated', (e, data, oldData) ->
-      #data.lid.open = true
       $scope.lidOpen = data?.lid?.open
       state = data?.experiment_controller?.machine?.state
       oldState = oldData?.experiment_controller?.machine?.state
-      getExperiment() if state isnt oldState
+      $scope.getExperiment() if state isnt oldState
 
 ])

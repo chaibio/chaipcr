@@ -93,20 +93,17 @@ body { background-color: #eeeeee; padding: 0; margin: 5px; overflow-y: scroll; }
 </style>
 </head>
 
-<body id="HTMLReporter" class="html-reporter showDetails">
-<h1>Tested in Chrome 48.0.2564 (Mac OS X 10.11.1) on Tue Mar 01 2016</h1>
+<body id="HTMLReporter" class="html-reporter">
+<h1>Tested in Chrome 48.0.2564 (Mac OS X 10.11.1) on Wed Mar 02 2016</h1>
 
 <div class="alert">
 
 
-<!-- <span class="failingAlert bar">Failed 1 specs</span> -->
-<span class="failingAlert bar"><span class="fold-buttons"><a href="#" onclick="fold();">Fold</a> | 
-  <a href="#" onclick="unfold();">Unfold</a></span>9 specs, 1 failed, 0 pending</span>
-<span class="resultsMenu bar">
-<a class="summaryMenuItem" onclick="showSummary();" href="#">Spec List<a>|<a 
-   class="detailsMenuItem" onclick="showFailures();" href="#">Failures</a>
-</span>
 
+  
+  <span class="passingAlert bar"><span class="fold-buttons"><a href="#" onclick="fold();">Fold</a> | 
+  <a href="#" onclick="unfold();">Unfold</a></span>11 specs, 0 failed, 0 pending</span>
+  
 
 
 </div>
@@ -117,15 +114,23 @@ body { background-color: #eeeeee; padding: 0; margin: 5px; overflow-y: scroll; }
   
   
   
-    <div class="suite failed">
+    <div class="suite passed">
       <span class="description">Checking the behaviour of menu overlay controller</span>
     
       <div class="specSummary passed">
       <span class="description">ChaiBioTech should have ExperimentMenuOverlayCtrl</span>
       </div>
     
-      <div class="specSummary failed">
-      <span class="description">Checks the functionality of show hide</span>
+      <div class="specSummary passed">
+      <span class="description">Checks the functionality of show hide, Setting showProperties = true should set HIDE</span>
+      </div>
+    
+      <div class="specSummary passed">
+      <span class="description">Checks the functionality of show hide, Setting showProperties = false should set SHOW</span>
+      </div>
+    
+      <div class="specSummary passed">
+      <span class="description">Checks the functionality of getExperiment() Method</span>
       </div>
     
     </div>
@@ -178,23 +183,6 @@ body { background-color: #eeeeee; padding: 0; margin: 5px; overflow-y: scroll; }
 
 <div id="details">
   
-  
-  <div class="specDetail failed">
-    <span class="description">Checking the behaviour of menu overlay controller Checks the functionality of show hide</span>
-    <div class="stackTrace">
-      <div class="resultMessage">Error: Unexpected request: GET /experiments/undefined
-No more request expected
-    at $httpBackend (http://localhost:9876/base/frontend/javascripts/libs/angular-mock.js?475df020e2e649e6f0239f7fabda387393c0c7df:1226:9)
-    at m (http://localhost:9876/base/frontend/javascripts/libs/angular.js?57c3cbc78474073ccbccc4f9984563ecf30eb779:82:385)
-    at f (http://localhost:9876/base/frontend/javascripts/libs/angular.js?57c3cbc78474073ccbccc4f9984563ecf30eb779:80:105)
-    at http://localhost:9876/base/frontend/javascripts/libs/angular.js?57c3cbc78474073ccbccc4f9984563ecf30eb779:112:20
-    at l.$eval (http://localhost:9876/base/frontend/javascripts/libs/angular.js?57c3cbc78474073ccbccc4f9984563ecf30eb779:125:305)
-    at l.$digest (http://localhost:9876/base/frontend/javascripts/libs/angular.js?57c3cbc78474073ccbccc4f9984563ecf30eb779:122:398)
-    at Object.&lt;anonymous&gt; (http://localhost:9876/base/frontend/javascripts/tests/controllers/experiment-menu-overlay-test.js?2d0f564763a13f4f8bcccd61049ac77765988cac:28:12)</div>
-    </div>
-  </div>
-  
-  
 </div>
 
 <script>
@@ -206,7 +194,7 @@ document.body.onkeypress = function (e) {
   switch (e.keyCode) {
     case 102: toggleFold(); break;
     case 49: showSummary(); break;
-    case 50: showFailures(); break;
+    
   }
 };
 
