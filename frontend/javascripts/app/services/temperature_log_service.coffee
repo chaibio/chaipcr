@@ -87,8 +87,6 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
       return max
 
     @optimizeDataByResolution = (data, resolution, greatest_elapsed_time) ->
-      console.log 'optimizeDataByResolution'
-      console.log data.length
       calibration = 300
       if resolution > greatest_elapsed_time then resolution = greatest_elapsed_time
       chunkSize = Math.round(resolution / calibration)
@@ -96,12 +94,23 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
       temperature_logs = angular.copy data
       chunked = _.chunk temperature_logs, chunkSize
       averagedLogs = _.map chunked, (chunk) ->
-        i = Math.floor(chunk.length/2)
-        return chunk[i]
+        total_lid = 0
+        total_heat_block = 0
+        total_elapsed_time = 0
+
+        for c in chunk by 1
+          total_lid += c.lid_temp
+          total_heat_block += c.heat_block_zone_temp
+          total_elapsed_time += c.elapsed_time
+
+        return {
+          elapsed_time: total_elapsed_time/chunk.length
+          lid_temp: total_lid/chunk.length
+          heat_block_zone_temp: total_heat_block/chunk.length
+        }
 
       averagedLogs.unshift temperature_logs[0]
       averagedLogs.push temperature_logs[temperature_logs.length-1]
-      console.log averagedLogs.length
       return averagedLogs
 
     return

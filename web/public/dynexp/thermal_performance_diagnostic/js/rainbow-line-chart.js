@@ -25,6 +25,7 @@
           var minX = 0;
           var margin = 10;
           var prev_data_points = [];
+          var old_data = [];
 
           var rainbow = new Rainbow;
           rainbow.setSpectrum('#00AEEF', 'blue', 'violet', 'red');
@@ -101,18 +102,13 @@
             }
           };
 
-          $scope.$watch('maxX', function () {
+          $scope.$on('update:rainbow:chart', function () {
             if (!$scope.data) return;
-            makeChart($scope.data);
+            if ($scope.data.length === 0) return;
+            makeChart($scope.data)
+            old_data = angular.copy($scope.data);
           });
 
-          $scope.$watch('data', function(data, oldVal) {
-            if (!data) return;
-            if (data.length === 0) return;
-            if (data === oldVal) return;
-            makeChart(data);
-
-          }, false);
         }
       };
     }
