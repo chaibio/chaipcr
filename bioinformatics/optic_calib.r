@@ -2,7 +2,7 @@
 
 # step ids for calibration data
 oc_water_step_id <<- 2
-oc_signal_step_id <<- 4
+oc_signal_step_ids <<- c('1'=4, '2'=4)
 
 
 # function: check whether the data in optical calibration experiment is valid; if yes, prepare calibration data
@@ -18,7 +18,7 @@ prep_optic_calib <- function(db_conn, calib_id, channel) {
                                     FROM fluorescence_data 
                                     WHERE experiment_id=%d AND step_id=%d AND channel=%d 
                                     ORDER BY well_num', 
-                                    calib_id, oc_signal_step_id, as.numeric(channel))
+                                    calib_id, oc_signal_step_ids[as.character(channel)], as.numeric(channel))
     
     calib_water  <- dbGetQuery(db_conn, calib_water_qry)
     calib_signal <- dbGetQuery(db_conn, calib_signal_qry)
@@ -71,14 +71,14 @@ optic_calib <- function(fluo, db_conn, calib_id, channel, show_running_time=FALS
     # perform calibration
     signal_water_diff <- calib_data$calib_signal_fluo - calib_data$calib_water_fluo
     fluo_calib <- adply(fluo, .margins=1, 
-                        function(row1) scaling_factor * (row1 - calib_data$calib_water_fluo) / signal_water_diff) # adply automatically create a column at index 1 of output from rownames of input array (1st argument)
+                        function(row1) scaling_factors[as.character(channel)] * (row1 - calib_data$calib_water_fluo) / signal_water_diff) # adply automatically create a column at index 1 of output from rownames of input array (1st argument)
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]
     if (show_running_time) message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
     
     return(list('fluo_calib'=fluo_calib, 
-                'signal_water_diff' = scaling_factor * signal_water_diff))
+                'signal_water_diff' = scaling_factors[as.character(channel)] * signal_water_diff))
 }
 
 
