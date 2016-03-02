@@ -59,7 +59,7 @@ modlist_coef <- function(modLIST, coef_cols) {
 
 # function: get Ct and amplification efficiency values
 get_ct_eff <- function(
-                       bl_corrected, 
+                       bl_corrected, # used to calculate residual coefficient of variance (rcv), not as input for Ct determination
                        # ac_mtx, 
                        # signal_water_diff, 
                        mod_ori, 
@@ -205,8 +205,15 @@ baseline_ct <- function(amp_calib,
     # bl_info <- NULL
     # bl_corrected <- NULL
     
+    # normalize bl_corrected so the median fluorescence values in basecyc (basecyc_medians) for all the wells in each channel are adjusted to the median of original basecyc_medians
+    basecyc_medians <- unlist(alply(bl_corrected, .margins=2, 
+                                    .fun=function(col1) median(col1[basecyc])))
+    bm_adjm <- basecyc_medians - median(basecyc_medians)
+    bl_normd <- do.call(rbind, alply(bl_corrected, .margins=1,
+                                     .fun=function(row1) row1 - bm_adjm))
+    
     # threshold cycle and amplification efficiency
-    ct_eff <- get_ct_eff(bl_corrected, 
+    ct_eff <- get_ct_eff(bl_corrected, # has to be consistent with mod_ori, therefore can't be bl_normd
                          # signal_water_diff, 
                          mod_ori, 
                          # min_ac_max=min_ac_max, 
@@ -222,7 +229,7 @@ baseline_ct <- function(amp_calib,
                 'mod_ori'=mod_ori, 
                 # 'bl_info'=bl_info, # removed for performance
                 'fluoa'=fluoa, 'bl_coefs'=blmods_cm, 'fluo_blmods'=fluo_blmods, 
-                'bl_corrected'=bl_corrected, 'coefficients'=mod_ori_cm, 
+                'bl_corrected'=bl_corrected, 'bl_normd'=bl_normd, 'coefficients'=mod_ori_cm, 
                 # 'ac_maxs'=ct_eff[['ac_maxs']], 
                 'rcvs'=ct_eff[['rcvs']], 'finIters'=ct_eff[['finIters']], 'adj_reasons'=ct_eff[['reasons']], 'ct_eff_raw'=ct_eff[['raw']], 'ct_eff_tagged_colnames'=ct_eff[['tagged_colnames']], # outputs from `get_ct_eff` for debugging
                 'ct_eff'=ct_eff[['adj']] ))
@@ -233,6 +240,7 @@ baseline_ct <- function(amp_calib,
 get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
                                    exp_id, stage_id, calib_id, # for selecting data to analyze
                                    dcv=TRUE, # logical, whether to perform multi-channel deconvolution
+                                   # basecyc, cp, # extra parameters that are currently hard-coded but may become user-defined later
                                    extra_output=FALSE, 
                                    show_running_time=FALSE # option to show time cost to run this function
                                    ) {
@@ -301,7 +309,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     bg_sub <- lapply(channels, function(channel) bg_sub[channel,,]) # for list instead of array output
     
     downstream <- list('background_subtracted'=bg_sub, 
-                       'baseline_subtracted'=baseline_ct_mtch[['bl_corrected']], 
+                       'baseline_subtracted'=baseline_ct_mtch[['bl_normd']], 
                        'ct'=baseline_ct_mtch[['ct_eff']], 
                        'coefficients'=baseline_ct_mtch[['coefficients']]
                        )
