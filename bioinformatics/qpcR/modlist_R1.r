@@ -72,10 +72,10 @@ modlist <- function(
   
   # xrqm
   # bl_list <- list()
-  fluo_add_list <- list()
+  fluo_add_list <- list() # fluo value after addition to adjust negative values for baseline 'parm'
   blmod_list <- list()
   blcor_list <- list()
-    
+  
   for (i in 1:ncol(allFLUO)) {
     
     # xqrm: start counting for running time
@@ -152,12 +152,16 @@ modlist <- function(
       if (baseline_looped == "parm") { #fitOBJ <- baseline(model = fitOBJ, baseline = baseline) # ori
         
         # xqrm: if baseline == 'parm' (model automatically not NULL) and sigmoid fitting of pre-subtracted amplifcation data fails (determined by 'modlist_R1.r')
-        if (class(fitOBJ) == 'try-error') {
+        if (class(fitOBJ) == 'try-error') { # sigmoid fitting failed
         # reference in 'modlist_R1.r': 
           # line 117: fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent=FALSE) # xqrm
           # line 120: if (baseline == "parm") { #fitOBJ <- baseline(model = fitOBJ, baseline = baseline)
           baseline_looped <- fallback
           message('Baseline subtraction method falls back from \'parm\' to \'', fallback, '\', since sigmoid fitting failed for amplifcation data before baseline subtraction.')
+          next }
+        if (coef(fitOBJ)[['b']] > 0) { # fitted curve is downward
+          baseline_looped <- fallback
+          message('Baseline subtraction method falls back from \'parm\' to \'', fallback, '\', due to the downward trend of the fitted sigmoid curve on amplifcation data before baseline subtraction.')
           next }
         
         # xqrm
