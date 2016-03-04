@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('gatherDataGroup', [
+angular.module("canvasApp").factory('gatherDataGroup', [
   function() {
     return function(objs, parent) {
 

@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('gatherDataGroupOnScroll', [
+angular.module("canvasApp").factory('gatherDataGroupOnScroll', [
   function() {
     return function(objs, parent) {
       return new fabric.Group(objs, {

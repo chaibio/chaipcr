@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('gatherDataCircleOnScroll', [
+angular.module("canvasApp").factory('gatherDataCircleOnScroll', [
   function() {
     return function() {
       return new fabric.Circle({

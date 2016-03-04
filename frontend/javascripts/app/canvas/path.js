@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('path', [
+angular.module("canvasApp").factory('path', [
   'constants',
   function(constants) {
     return function(parent) {

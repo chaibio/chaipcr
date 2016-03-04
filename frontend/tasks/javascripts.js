@@ -47,10 +47,12 @@ var vendorFiles = [
   'libs/ellipsis-animated.js',
   'libs/ng-file-upload-shim.js',
   'libs/ng-file-upload.js',
+
 ];
 var appFiles = [
   'welcome.js',
   'login.js',
+  'app/canvas-app.js',
   'app/app.js',
   'app/config.js',
   'app/routes.js',

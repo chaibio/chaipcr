@@ -29,7 +29,7 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
         });
 
         scope.manageAction = function() {
-          console.log("bingo");
+
           if(scope.state === "NOT_STARTED") {
             scope.runReady = !scope.runReady;
           } else {

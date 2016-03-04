@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('stepTemperature', [
+angular.module("canvasApp").factory('stepTemperature', [
   function() {
     return function(model, parent) {
 

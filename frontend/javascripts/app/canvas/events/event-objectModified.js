@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('objectModified', [
+angular.module("canvasApp").factory('objectModified', [
   'ExperimentLoader',
   'previouslySelected',
   'previouslyHoverd',

@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.directive('actions', [
+angular.module("canvasApp").directive('actions', [
   'ExperimentLoader',
   '$timeout',
   'canvas',

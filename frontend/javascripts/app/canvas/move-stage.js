@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('moveStageRect', [
+angular.module("canvasApp").factory('moveStageRect', [
   'ExperimentLoader',
 
   function(ExperimentLoader) {

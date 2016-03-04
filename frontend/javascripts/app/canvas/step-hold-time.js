@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('stepHoldTime', [
+angular.module("canvasApp").factory('stepHoldTime', [
   function() {
     return function(model, parent) {
 

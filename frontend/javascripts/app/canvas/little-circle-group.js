@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('littleCircleGroup', [
+angular.module("canvasApp").factory('littleCircleGroup', [
   function() {
     return function(littleCircles, parent) {
       return new fabric.Group(littleCircles, {

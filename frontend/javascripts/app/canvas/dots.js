@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('dots', [
+angular.module("canvasApp").factory('dots', [
 
   function() {
 

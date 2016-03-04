@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('moveStepRect', [
+angular.module("canvasApp").factory('moveStepRect', [
   'ExperimentLoader',
   'previouslySelected',
   'circleManager',

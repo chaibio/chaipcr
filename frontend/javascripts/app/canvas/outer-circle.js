@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('outerCircle', [
+angular.module("canvasApp").factory('outerCircle', [
   function() {
     return function() {
       return new fabric.Circle({

@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('stageGraphics', [
+angular.module("canvasApp").factory('stageGraphics', [
   'dots',
   function(dots) {
 

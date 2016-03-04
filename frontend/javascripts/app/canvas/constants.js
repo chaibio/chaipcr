@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('constants', [
+angular.module("canvasApp").factory('constants', [
   function() {
     var originalStepHeight = 200, tempBarHeight = 18;
     return {

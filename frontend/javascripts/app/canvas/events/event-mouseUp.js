@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('mouseUp', [
+angular.module("canvasApp").factory('mouseUp', [
   'ExperimentLoader',
   'previouslySelected',
   'previouslyHoverd',

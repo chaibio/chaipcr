@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('circleGroup', [
+angular.module("canvasApp").factory('circleGroup', [
   'constants',
   function(constants) {
     return function(circles, parent) {

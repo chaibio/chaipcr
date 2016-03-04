@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('circle', [
+angular.module("canvasApp").factory('circle', [
   'ExperimentLoader',
   '$rootScope',
   'constants',

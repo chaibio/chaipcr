@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('stage', [
+angular.module("canvasApp").factory('stage', [
   'ExperimentLoader',
   '$rootScope',
   'step',

@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.service('previouslySelected', [
+angular.module("canvasApp").service('previouslySelected', [
   function() {
     this.step = null;
   }

@@ -4,7 +4,7 @@
     handler for individual object. So the approch is different from DOM
     all the events are send from canvas and we check if the event has particular target.
   ***************************************/
-window.ChaiBioTech.ngApp.factory('events', [
+angular.module("canvasApp").factory('events', [
   'ExperimentLoader',
   'previouslySelected',
   'popupStatus',
@@ -24,7 +24,7 @@ window.ChaiBioTech.ngApp.factory('events', [
     mouseOver, mouseOut, mouseDown, objectMoving, objectModified, mouseMove, mouseUp, htmlEvents,
     circleManager) {
     return function(C, $scope) {
-
+      //console.log(window.canvasApp, 222);
       this.canvas = C.canvas;
       this.startDrag = 0; // beginning position of dragging
       this.mouseDown = false;

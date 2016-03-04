@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('pauseStepOnScrollGroup', [
+angular.module("canvasApp").factory('pauseStepOnScrollGroup', [
   function() {
     return function(objs, parent) {
       return new fabric.Group(objs, {

@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('pauseStepCircleOnScroll', [
+angular.module("canvasApp").factory('pauseStepCircleOnScroll', [
   function() {
     return function() {
       return new fabric.Circle({

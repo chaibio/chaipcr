@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('htmlEvents', [
+angular.module("canvasApp").factory('htmlEvents', [
   'ExperimentLoader',
   'previouslySelected',
   'previouslyHoverd',

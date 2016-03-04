@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('stepDataGroup', [
+angular.module("canvasApp").factory('stepDataGroup', [
   function() {
     return function(dataArray, parent) {
       return new fabric.Group(dataArray, {

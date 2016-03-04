@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.service('stepEvents',[
+angular.module("canvasApp").service('stepEvents',[
   'stageGraphics',
   'stepGraphics',
   function(stageGraphics, stepGraphics) {

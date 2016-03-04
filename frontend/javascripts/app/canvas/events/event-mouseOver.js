@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.factory('mouseOver', [
+angular.module("canvasApp").factory('mouseOver', [
   'ExperimentLoader',
   'previouslySelected',
   'previouslyHoverd',
@@ -11,7 +11,7 @@ window.ChaiBioTech.ngApp.factory('mouseOver', [
       this.canvas.on("mouse:over", function(evt) {
 
         if(! evt.target) return false;
-        
+
         switch(evt.target.name) {
 
           case "stepGroup":

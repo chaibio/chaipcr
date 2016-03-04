@@ -16,5 +16,6 @@ window.App = window.ChaiBioTech.ngApp = angular.module 'ChaiBioTech', [
   'ngAnimate'
   'angular-ladda'
   'ellipsisAnimated'
-  'ngFileUpload'
+  'ngFileUpload',
+  'canvasApp'
 ]

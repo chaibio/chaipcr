@@ -1,4 +1,4 @@
-window.ChaiBioTech.ngApp.service('previouslyHoverd', [
+angular.module("canvasApp").service('previouslyHoverd', [
   function() {
     this.circle = null;
   }
