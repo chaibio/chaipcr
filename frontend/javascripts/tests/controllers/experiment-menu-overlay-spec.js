@@ -67,4 +67,5 @@ describe("Checking the behaviour of menu overlay controller", function() {
     expect(Experiment.get).toHaveBeenCalled();
 
   });
+  
 });

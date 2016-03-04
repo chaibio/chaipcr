@@ -1,0 +1,5 @@
+<div class="B1B">
+  <span class="exp-message" ng-class="{'lid-open': lidOpen}" ng-click="manageAction()">{{message}}</span>
+  <span class="B2 lid-open-message" ng-if="lidOpen && state === 'NOT_STARTED'"><br>Hardware lid is open</span>
+  <button ng-show="runReady && state === 'NOT_STARTED' && !lidOpen" ng-click="startExp()" toggle-sidemenu class="B1 success">CONFIRM</button>
+</div>

@@ -93,17 +93,20 @@ body { background-color: #eeeeee; padding: 0; margin: 5px; overflow-y: scroll; }
 </style>
 </head>
 
-<body id="HTMLReporter" class="html-reporter">
-<h1>Tested in Chrome 48.0.2564 (Mac OS X 10.11.1) on Wed Mar 02 2016</h1>
+<body id="HTMLReporter" class="html-reporter showDetails">
+<h1>Tested in Chrome 48.0.2564 (Mac OS X 10.11.1) on Thu Mar 03 2016</h1>
 
 <div class="alert">
 
 
+<!-- <span class="failingAlert bar">Failed 1 specs</span> -->
+<span class="failingAlert bar"><span class="fold-buttons"><a href="#" onclick="fold();">Fold</a> | 
+  <a href="#" onclick="unfold();">Unfold</a></span>16 specs, 1 failed, 0 pending</span>
+<span class="resultsMenu bar">
+<a class="summaryMenuItem" onclick="showSummary();" href="#">Spec List<a>|<a 
+   class="detailsMenuItem" onclick="showFailures();" href="#">Failures</a>
+</span>
 
-  
-  <span class="passingAlert bar"><span class="fold-buttons"><a href="#" onclick="fold();">Fold</a> | 
-  <a href="#" onclick="unfold();">Unfold</a></span>11 specs, 0 failed, 0 pending</span>
-  
 
 
 </div>
@@ -148,6 +151,31 @@ body { background-color: #eeeeee; padding: 0; margin: 5px; overflow-y: scroll; }
     
     </div>
   
+    <div class="suite failed">
+      <span class="description">Test RUN/VIEW item directive, which shows up in left menu</span>
+    
+      <div class="specSummary passed">
+      <span class="description">passing NOT_STARTED should show RUN EXPERIMENT</span>
+      </div>
+    
+      <div class="specSummary passed">
+      <span class="description">passing COMPLETED should show VIEW RESULT</span>
+      </div>
+    
+      <div class="specSummary passed">
+      <span class="description">passing RUNNING should show EXPERIMENT STATUS</span>
+      </div>
+    
+      <div class="specSummary passed">
+      <span class="description">if lid is open show additional message 'Hardware lid is open'</span>
+      </div>
+    
+      <div class="specSummary failed">
+      <span class="description">Checks if the click on .exp-message calls manageAction() method</span>
+      </div>
+    
+    </div>
+  
     <div class="suite passed">
       <span class="description">Testing menu overlay [Shows up when we enable side menu]</span>
     
@@ -183,6 +211,16 @@ body { background-color: #eeeeee; padding: 0; margin: 5px; overflow-y: scroll; }
 
 <div id="details">
   
+  
+  <div class="specDetail failed">
+    <span class="description">Test RUN/VIEW item directive, which shows up in left menu Checks if the click on .exp-message calls manageAction() method</span>
+    <div class="stackTrace">
+      <div class="resultMessage">TypeError: compiled.find(...).click is not a function
+    at Object.&lt;anonymous&gt; (http://localhost:9876/base/frontend/javascripts/tests/directives/experiment-item-spec.js?bf3d2146900c35287335d5ac7a75989cb84c0b49:64:35)</div>
+    </div>
+  </div>
+  
+  
 </div>
 
 <script>
@@ -194,7 +232,7 @@ document.body.onkeypress = function (e) {
   switch (e.keyCode) {
     case 102: toggleFold(); break;
     case 49: showSummary(); break;
-    
+    case 50: showFailures(); break;
   }
 };
 
