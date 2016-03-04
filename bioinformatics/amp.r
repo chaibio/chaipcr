@@ -59,12 +59,12 @@ modlist_coef <- function(modLIST, coef_cols) {
 
 # function: get Ct and amplification efficiency values
 get_ct_eff <- function(
-                       bl_corrected, # used to calculate residual coefficient of variance (rcv), not as input for Ct determination
+                       bl_corrected, # used to calculate rsem and rser, not as input for Ct determination
                        # ac_mtx, 
                        # signal_water_diff, 
                        mod_ori, 
                        # min_ac_max, # the threshold which maximum (fluo value / scaling factor) of the well needs to exceed, for Ct to be reported as actual value instead of NA
-                       max_rcv, # maximum residual coefficient of variance, for Ct to be reported as actual value instead of NA
+                       max_rsem, max_rser, # maximum residual standard error divided by absolute value of mean or range, for Ct to be reported as actual value instead of NA
                        type, cp, 
                        num_cycles) {
     
@@ -78,7 +78,8 @@ get_ct_eff <- function(
     tagged_colnames <- colnames(ct_eff_raw)
     colnames(ct_eff_raw) <- well_names
     
-    rcvs <- c()
+    rsems <- c()
+    rsers <- c()
     finIters <- c()
     adj_reasons <- list() # c() isn't pretty for view
     ct_eff_adj <- ct_eff_raw
@@ -92,8 +93,11 @@ get_ct_eff <- function(
         stopCode <- mod$convInfo$stopCode
         b <- coef(mod)[['b']]
         
-        rcv <- tryCatch(sigma(mod) / mean(bl_corrected[,i]), error=function(e) NA) # residual coefficient of variance, i.e. residual standard error of fitted amplification curve divided by mean fluo over all cycles for each well
-        rcvs[i] <- rcv
+        rse <- tryCatch(sigma(mod), error=function(e) NA) # residual standard error of fitted amplification curve
+        rsem <- rse / abs(mean(bl_corrected[,i])) # divided by absolute value of mean fluo over all cycles for each well
+        rsems[i] <- rsem
+        rser <- rse / diff(range(bl_corrected[,i])) # divided by fluo range over all cycles for each well
+        rsers[i] <- rser
         
         # `finIters[[i]]` <- NULL will not create element i for `finIters`
         finIter <- mod$convInfo$finIter
@@ -104,11 +108,11 @@ get_ct_eff <- function(
         # if        (ac_max < min_ac_max) {
             # adj_reasons[[i]] <- paste('ac_max < min_ac_max. ac_max == ', ac_max, '. min_ac_max ==', min_ac_max, 
                                       # sep='')
-        if        (is.na(rcv)) {
+        if        (is.na(rse)) {
             adj_reasons[[i]] <- 'error on sigma'
-        } else if (rcv > max_rcv) {
-            adj_reasons[[i]] <- paste('rcv > max_rcv. rcv == ', rcv, '. max_rcv == ', max_rcv, 
-                                     sep='')
+        } else if (rsem > max_rsem & rser > max_rser) {
+            adj_reasons[[i]] <- paste('rsem > max_rsem & rser > max_rser. rsem == ', rsem, '. max_rsem == ', max_rsem, '. rser == ', rser, '. max_rser == ', max_rser, 
+                                      sep='')
         } else if (is.null(b)) {
             adj_reasons[[i]] <- 'is.null(b)'
         } else if (b > 0) {
@@ -128,7 +132,8 @@ get_ct_eff <- function(
     
     # names(ac_maxs) <- well_names
     
-    names(rcvs) <- well_names
+    names(rsems) <- well_names
+    names(rsers) <- well_names
     names(finIters) <- well_names
     names(adj_reasons) <- well_names
     
@@ -137,7 +142,7 @@ get_ct_eff <- function(
     
     return(list('adj'=ct_eff_adj, 
                 # 'ac_maxs'=ac_maxs, 
-                'raw'=ct_eff_raw, 'rcvs'=rcvs, 'finIters'=finIters, 'reasons'=adj_reasons, # for debugging
+                'raw'=ct_eff_raw, 'rsems'=rsems, 'rsers'=rsers, 'finIters'=finIters, 'reasons'=adj_reasons, # for debugging
                 'tagged_colnames'=tagged_colnames
                 ))
     }
@@ -150,7 +155,7 @@ baseline_ct <- function(amp_calib,
                         # fallback = c('none', 'mean', 'median', 'lin', 'quad'). only valid when baselin = 'parm'
                         maxiter, maxfev, # control parameters for `nlsLM` in `pcrfit`. !!!! Note: `maxiter` sometimes affect finIter in a weird way: e.g. for the same well, finIter == 17 when maxiter == 200, finIter == 30 when maxiter == 30, finIter == 100 when maxiter == 100; maxiter affect fitting strategy?
                         # min_ac_max, # get_ct_eff parameter to control Ct reporting
-                        max_rcv, # get_ct_eff parameter to control Ct reporting
+                        max_rsem, max_rser, # get_ct_eff parameter to control Ct reporting
                         type, cp, # getPar parameters
                         show_running_time # option to show time cost to run this function
                         ) {
@@ -217,7 +222,7 @@ baseline_ct <- function(amp_calib,
                          # signal_water_diff, 
                          mod_ori, 
                          # min_ac_max=min_ac_max, 
-                         max_rcv=max_rcv, 
+                         max_rsem=max_rsem, max_rser=max_rser, 
                          type=type, cp=cp, 
                          num_cycles=nrow(ac_mtx))
     
@@ -232,7 +237,7 @@ baseline_ct <- function(amp_calib,
                 'bl_corrected'=bl_corrected, 'coefficients'=mod_ori_cm, 
                 # 'bl_normd'=bl_normd, 
                 # 'ac_maxs'=ct_eff[['ac_maxs']], 
-                'rcvs'=ct_eff[['rcvs']], 'finIters'=ct_eff[['finIters']], 'adj_reasons'=ct_eff[['reasons']], 'ct_eff_raw'=ct_eff[['raw']], 'ct_eff_tagged_colnames'=ct_eff[['tagged_colnames']], # outputs from `get_ct_eff` for debugging
+                'rsems'=ct_eff[['rsems']], 'rsers'=ct_eff[['rsers']], 'finIters'=ct_eff[['finIters']], 'adj_reasons'=ct_eff[['reasons']], 'ct_eff_raw'=ct_eff[['raw']], 'ct_eff_tagged_colnames'=ct_eff[['tagged_colnames']], # outputs from `get_ct_eff` for debugging
                 'ct_eff'=ct_eff[['adj']] ))
     }
 
@@ -250,11 +255,12 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     model <- l4
     baselin <- 'parm'
     basecyc <- 3:6 # 1:5 gave poor baseline subtraction results for non-sigmoid shaped data when using 'lin'
-    fallback <- 'lin'
+    fallback <- 'median'
     maxiter <- 500
     maxfev <- 10000
     # min_ac_max <- 0
-    max_rcv <- 0.1
+    max_rsem <- 0.1
+    max_rser <- 0.025
     type <- 'curve'
     cp <- 'cpD2'
     
@@ -302,7 +308,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
                                      model, baselin, basecyc, fallback, 
                                      maxiter, maxfev, 
                                      # min_ac_max, 
-                                     max_rcv, 
+                                     max_rsem, max_rser, 
                                      type, cp, 
                                      show_running_time)[['post_consoli']]
     baseline_ct_mtch[['pre_dcv_bg_sub']] <- amp_calib_array
