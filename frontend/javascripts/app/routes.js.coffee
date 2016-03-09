@@ -75,7 +75,7 @@ window.ChaiBioTech.ngApp
 
       .state 'edit-protocol',
         url: '/edit-protocol/:id'
-        templateUrl: 'app/views/skelton.html'
+        templateUrl: 'app/views/edit-protocol.html'
         controller: 'ProtocolCtrl'
 
       .state 'run-experiment',
