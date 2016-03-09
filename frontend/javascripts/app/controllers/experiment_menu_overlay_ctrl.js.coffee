@@ -35,7 +35,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
           $scope.runStatus = 'Currently running.'
         if data.experiment.started_at and data.experiment.completed_at
           $scope.status = 'COMPLETED'
-          $scope.runStatus = 'Run at:'
+          $scope.runStatus = 'Run on:'
 
         $scope.maxCycle = AmplificationChartHelper.getMaxExperimentCycle data.experiment
 

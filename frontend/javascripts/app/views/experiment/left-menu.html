@@ -6,7 +6,7 @@
 
   <div class="side-menu-content-container">
     <div class="side-menu-name-container">
-      <edit-exp-name></edit-exp-name>
+      <edit-exp-name status="status"></edit-exp-name>
       <div ng-if="status == 'COMPLETED'" class="side-menu-exp-status B2">{{runStatus}}{{exp.started_at | amCalendar}}</div>
       <div ng-if="status != 'COMPLETED'" class="side-menu-exp-status B1">{{runStatus}}</div>
     </div>
@@ -24,9 +24,9 @@
           <protocol-item state="{{status}}"></protocol-item>
         </div>
       </div>
-      <div class="side-menu-menu-item">
+      <!--<div class="side-menu-menu-item">
         <div class="B1B">PLATE SETUP</div>
-      </div>
+      </div> -->
       <div class="side-menu-menu-item run-exp">
         <experiment-item state-val="{{status}}" lid-open="lidOpen" max-cycle="maxCycle"></experiment-item>
     </div>

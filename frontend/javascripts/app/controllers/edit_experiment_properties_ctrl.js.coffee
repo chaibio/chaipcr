@@ -21,10 +21,18 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
     $scope.editExpNameMode = false
 
     getData = ->
-
       Experiment.get(id: $stateParams.id).then (data) ->
         $scope.experiment = data.experiment
         $scope.experimentOrig = angular.copy data.experiment
+        if !data.experiment.started_at and !data.experiment.completed_at
+          $scope.status = 'NOT_STARTED'
+          $scope.runStatus = 'Not run yet.'
+        if data.experiment.started_at and !data.experiment.completed_at
+          $scope.status = 'RUNNING'
+          $scope.runStatus = 'Currently running.'
+        if data.experiment.started_at and data.experiment.completed_at
+          $scope.status = 'COMPLETED'
+          $scope.runStatus = 'Run on:'
 
     getData()
 
@@ -42,19 +50,20 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
       $scope.selectedType = type
 
     $scope.focusExpName = ->
-      $scope.removeMessages()
-      $scope.editExpNameMode = true
-      focus('editExpNameMode')
-
+      if $scope.status == "NOT_STARTED"
+        $scope.removeMessages()
+        $scope.editExpNameMode = true
+        focus('editExpNameMode')
 
     $scope.focusLidTemp = ->
-      $scope.removeMessages()
-      if $scope.experiment?.started_at
-        $scope.errors = "Experiment has been run."
-        return
+      if $scope.status == "NOT_STARTED"
+        $scope.removeMessages()
+        if $scope.experiment?.started_at
+          $scope.errors = "Experiment has been run."
+          return
 
-      $scope.editLidTempMode = true
-      focus('editLidTempMode')
+        $scope.editLidTempMode = true
+        focus('editLidTempMode')
 
     $scope.editModeOff = ->
       $scope.editExpNameMode = false
