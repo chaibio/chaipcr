@@ -72,12 +72,14 @@ mc_tm_pw <- function(mt_pw,
     dfdT_normd <- (mc$df.dT - range_dfdT[1]) / (range_dfdT[2] - range_dfdT[1])
     # range_dfdT[1] == min(mc$df.dT). range_dfdT[2] == max(mc$df.dT).
     
-    if (  quantile(dfdT_normd[1:summit_pos],                  qt_prob) <= max_normd_qtv
-        & quantile(dfdT_normd[summit_pos:length(dfdT_normd)], qt_prob) <= max_normd_qtv) {
+    if (dim(raw_tm)[1] == 0 ||
+        (  quantile(dfdT_normd[1:summit_pos],                  qt_prob) > max_normd_qtv
+         & quantile(dfdT_normd[summit_pos:length(dfdT_normd)], qt_prob) > max_normd_qtv)) {
+        tm <- raw_tm[FALSE,]
+    } else {
         tm_sorted <- raw_tm[order(-raw_tm$Area),]
         tm_topN <- na.omit(tm_sorted[1:top_N,])
-        tm <- tm_topN[tm_topN$Area >= tm_topN[1, 'Area'] * min_frac_report,]
-    } else tm <- raw_tm[FALSE,]
+        tm <- tm_topN[tm_topN$Area >= tm_topN[1, 'Area'] * min_frac_report,] }
     
     return(list('mc'=mc, 'tm'=tm, 'raw_tm'=raw_tm))
     }
@@ -129,9 +131,9 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
                            WHERE experiment_id=%d AND stage_id=%d
                            ORDER BY well_num, temperature',
                            exp_id, stage_id)
-    melt_curve_data <- dbGetQuery(db_conn, mcd_qry)
+    mcd_channel <- dbGetQuery(db_conn, mcd_qry)
     
-    channels <- unique(melt_curve_data[,'channel'])
+    channels <- unique(mcd_channel[,'channel'])
     names(channels) <- channels
     
     if (length(channels) == 1) dcv <- FALSE
@@ -167,7 +169,6 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
                        'mc_bywell'=mc_out_pp[['pre_consoli']], # each channel element is a list whose each element is a well
                        'fc_wT'=fc_wT_bych, 'pre_dcv_fc_wT'=pre_dcv_fc_wT_bych # each channel element of fc_wT or pre_dcv_fc_wT_bych is a matrix formatted as input for `meltcurve` by qpcR, where columns are alternating 'temp' and 'fluo'.
                     )
-        # mc_out[['melt_curve_data']] <- melt_curve_data # maybe too big for beaglebone to handle
     } else mc_out <- mc_out_pp[['pre_consoli']]
     
     # report time cost for this function
