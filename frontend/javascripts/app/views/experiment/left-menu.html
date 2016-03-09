@@ -1,4 +1,4 @@
-<div ng-controller="ExperimentMenuOverlayCtrl">
+<div id="sidemenu-content">
   <div class="side-menu-header-container">
     <div class="text-container x" ui-sref="home">&lt; BACK TO HOME</div>
     <div class="close-container x"><span class="close-side-menu x" toggle-sidemenu>x</span></div>
@@ -6,7 +6,7 @@
 
   <div class="side-menu-content-container">
     <div class="side-menu-name-container">
-      <ng-include src="'app/views/experiment/experiment-properties-name.html'"></ng-include>
+      <edit-exp-name></edit-exp-name>
       <div ng-if="status == 'COMPLETED'" class="side-menu-exp-status B2">{{runStatus}}{{exp.started_at | amCalendar}}</div>
       <div ng-if="status != 'COMPLETED'" class="side-menu-exp-status B1">{{runStatus}}</div>
     </div>
@@ -16,8 +16,8 @@
           <span ng-click="showProperties=!showProperties" class="sidemenu-show-text">{{showHide}}</span>
         </div>
       </div>
-      <div  id="new-sub-menu" ng-show="showProperties" ng-class="{'sidemenu-property-container': true, 'ng-show':showProperties}">
-        <ng-include src="'app/views/experiment/experiment-properties-suboption.html'"></ng-include>
+      <div id="new-sub-menu" ng-show="showProperties" ng-class="{'sidemenu-property-container': true, 'ng-show':showProperties}">
+        <edit-lid-temp></edit-lid-temp>
       </div>
       <div class="side-menu-menu-item">
         <div class="B1B" ui-sref="edit-protocol({id: params.id})" toggle-sidemenu>
@@ -34,5 +34,6 @@
       <button class="side-menu-button SH" export-experiment experiment-id="params.id">EXPORT</button>
       <button class="side-menu-button SH second-button" ng-click="deleteExperiment(params.id)">DELETE</button>
     </div>
+  </div>
   </div>
 </div>

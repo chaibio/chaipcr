@@ -1,6 +1,6 @@
 <div class="menu-overlay-layout" ng-class="{'sidemenu-open': sideMenuOpen, 'submenu-open': sideMenuOptionsOpen}">
   <div id="sidemenu" class="sidemenu" escape-menu ng-show="sideMenuOpen">
-    <div id="sidemenu-content" ng-include src="'app/views/experiment/left-menu.html'"></div>
+    <left-menu></left-menu>    
   </div>
   <div class="page-wrapper" >
     <div class="page-container" ng-transclude></div>

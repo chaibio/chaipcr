@@ -2,8 +2,8 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
   '$scope'
   'focus'
   'Experiment'
-  '$stateParams',
-  'expName',
+  '$stateParams'
+  'expName'
   'Protocol'
   'Status'
   '$timeout'
@@ -21,6 +21,7 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
     $scope.editExpNameMode = false
 
     getData = ->
+
       Experiment.get(id: $stateParams.id).then (data) ->
         $scope.experiment = data.experiment
         $scope.experimentOrig = angular.copy data.experiment
@@ -33,7 +34,7 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
         $scope.experiment.completed_at = data.experiment_controller.expriment.completed_at
 
     $scope.removeMessages = ->
-      $scope.success = null
+      $scope.successLid = $scope.successName = null
       $scope.errors = null
 
 
@@ -61,13 +62,13 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
 
     $scope.saveExperiment = (exp)->
       return if $scope.expForm.$invalid
-      promise = Experiment.update({id: exp.id}, experiment: exp).$promise
+      promise = Experiment.update({id: $scope.experiment.id}, experiment: $scope.experiment).$promise
 
       promise.then ->
-        $scope.success = "Experiment name updated."
-        expName.updateName(exp.name)
+        $scope.successName = "Experiment name updated."
+        expName.updateName($scope.experiment.name)
         $timeout (() ->
-          $scope.success = ""
+          $scope.successName = null
           ), 2000
 
       promise.catch (resp) ->
@@ -85,9 +86,9 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
       promise = Protocol.update data
 
       promise.success ->
-        $scope.success = "Lid temperature updated."
+        $scope.successLid = "Lid temperature updated."
         $timeout (() ->
-          $scope.success = ""
+          $scope.successLid = null
           ), 2000
 
       promise.catch (resp) ->

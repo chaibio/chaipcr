@@ -1,8 +1,8 @@
-<div class="experiment-properties-subtoption" ng-controller="EditExperimentPropertiesCtrl">
+<div class="experiment-properties-subtoption">
   <form name="expForm" ng-show="experiment">
       <div class="text-center message-container">
-        <span  ng-show="success" class="help-block">
-          <span class="text-success">{{success}}</span>
+        <span  ng-show="successLid" class="help-block">
+          <span class="text-success">{{successLid}}</span>
         </span>
       </div>
 
@@ -38,5 +38,5 @@
   <div ng-show="!experiment">
     <img src="/images/loading.gif"> Loading ...
   </div>
-  
+
 </div>

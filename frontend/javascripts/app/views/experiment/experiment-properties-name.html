@@ -1,17 +1,17 @@
-<div class="side-menu-exp-name H1" ng-controller="EditExperimentPropertiesCtrl">
+<div class="side-menu-exp-name H1">
   <form name="expForm">
 
     <div class="exp-name-container">
       <span class="exp-name H1 truncate" ng-click="focusExpName()" ng-show="!editExpNameMode">
-        {{exp.name | truncate:20}}
+        {{experiment.name | truncate:20}}
       </span>
-      <input type="text" class="exp-name H1" required ng-model="exp.name" ng-show="editExpNameMode" ng-blur="saveExperiment(exp)"
+      <input type="text" class="exp-name H1" required ng-model="experiment.name" ng-show="editExpNameMode" ng-blur="saveExperiment()"
         on-key-enter="saveExperiment(exp)" focus-on="editExpNameMode">
     </div>
 
     <div class="text-center message-container">
-      <span  ng-show="success" class="help-block B1">
-        <span class="text-success">{{success}}</span>
+      <span  ng-show="successName" class="help-block B1">
+        <span class="text-success">{{successName}}</span>
       </span>
     </div>
     <div ng-show="errors">
