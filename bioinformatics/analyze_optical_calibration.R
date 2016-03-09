@@ -14,8 +14,8 @@ check_optic_calib <- function(channel, db_conn, calib_exp_id) {
                                strsplit(result1$message, 'Details: ')[[1]][1], 
                                sep='')
         error_details <- paste('Channel ', channel, '. ', 
-                             as.character(result1), 
-                             sep='')
+                               as.character(result1), 
+                               sep='')
     } else {
         valid <- TRUE
         error_message <- NULL

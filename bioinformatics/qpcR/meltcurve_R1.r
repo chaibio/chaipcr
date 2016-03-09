@@ -84,6 +84,7 @@ cut.Area = 0,
       if (inherits(RES, "try-error")) RES <- NA
     }   
     
+    
     ### calculation of peak area by 'peakArea'
     tempDATA <- RES$Temp
     meltDATA <- RES$Fluo
@@ -94,38 +95,43 @@ cut.Area = 0,
     baseLIST <- vector("list", length = length(TMs))     
 
     if (calc.Area) {
-      for (k in 1:length(TMs)) {
-        WHICH <- which(tempDATA > TMs[k] - Tm.border[1] & tempDATA < TMs[k] + Tm.border[2])
-        X <- tempDATA[WHICH]
-        Y <- derivDATA[WHICH]           
-        PEAKAREA <- try(peakArea(X, Y), silent = TRUE)
-        if (!inherits(PEAKAREA, "try-error")) {
-          PA[k] <- PEAKAREA$area
-          BL <- PEAKAREA$baseline
-        } else PA[k] <- BL <- NA     
-        
-        baseLIST[[k]] <- cbind.na(Temp = X, baseline = BL)                           
-      }         
-      
-      ### remove TMs if peak area < cutoff
-      SEL <- which(PA < cut.Area | is.na(PA))
-      if (length(SEL) > 0) {
-        PA <- delete(PA, SEL, fill = TRUE)
-        BL <- NA
-        RES$Tm <- delete(RES$Tm, SEL, fill = TRUE)
-      }           
-        
-      ### attach peak area values
-      RES <- cbind.na(RES, Area = PA)      
-      
-      ### attach baseline area values to
-      ### the corresponding temperature values
-      RES <- cbind.na(RES, baseline = NA)
-      for (m in 1:length(baseLIST)) {
-        MATCH <- match(baseLIST[[m]][, 1], RES$Temp)
-        RES$baseline[MATCH] <- baseLIST[[m]][, 2]       
-      }        
     
+      if (length(TMs) == 0) { # xqrm
+        RES <- cbind.na(RES, Area=NA, baseline=NA) # xqrm
+        
+      } else { # xqrm
+        for (k in 1:length(TMs)) {
+          WHICH <- which(tempDATA > TMs[k] - Tm.border[1] & tempDATA < TMs[k] + Tm.border[2])
+          X <- tempDATA[WHICH]
+          Y <- derivDATA[WHICH]           
+          PEAKAREA <- try(peakArea(X, Y), silent = TRUE)
+          if (!inherits(PEAKAREA, "try-error")) {
+            PA[k] <- PEAKAREA$area
+            BL <- PEAKAREA$baseline
+          } else PA[k] <- BL <- NA     
+          
+          baseLIST[[k]] <- cbind.na(Temp = X, baseline = BL)                           
+        }         
+        
+        ### remove TMs if peak area < cutoff
+        SEL <- which(PA < cut.Area | is.na(PA))
+        if (length(SEL) > 0) {
+          PA <- delete(PA, SEL, fill = TRUE)
+          BL <- NA
+          RES$Tm <- delete(RES$Tm, SEL, fill = TRUE)
+        }           
+          
+        ### attach peak area values
+        RES <- cbind.na(RES, Area = PA)      
+        
+        ### attach baseline area values to
+        ### the corresponding temperature values
+        RES <- cbind.na(RES, baseline = NA)
+        for (m in 1:length(baseLIST)) {
+          MATCH <- match(baseLIST[[m]][, 1], RES$Temp)
+          RES$baseline[MATCH] <- baseLIST[[m]][, 2]       
+        }        
+      }
     }  
     
     ### flag meltcurve as 'failed' if all peak areas < cut.Area

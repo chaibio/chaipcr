@@ -762,6 +762,8 @@ Tm.opt = NULL)
   if (inherits(PEAKS, "try-error")) return()
   TMs <- seqTEMP[PEAKS]
   TMs <- TMs[!is.na(TMs)]
+  if (length(TMs) == 0) TMs <- NA # xqrm
+  
   
   ### calculate difference to Tm.opt if given
   ### by residual sum-of-squares
