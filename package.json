@@ -30,10 +30,13 @@
     "gulp-util": "^3.0.6",
     "gulp-watch": "^4.3.5",
     "jshint": "^2.8.0",
+    "karma": "^0.13.22",
     "karma-chrome-launcher": "^0.2.2",
+    "karma-coffee-preprocessor": "^0.3.0",
     "karma-coverage": "^0.5.3",
     "karma-html-reporter": "^0.2.7",
     "karma-jasmine": "^0.3.7",
+    "karma-ng-html2js-preprocessor": "^0.2.1",
     "karma-spec-reporter": "0.0.24",
     "require-dir": "^0.3.0",
     "shelljs": "^0.5.3"

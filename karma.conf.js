@@ -1,6 +1,8 @@
 // Karma configuration
 // Generated on Tue Feb 23 2016 14:36:27 GMT+0530 (IST)
 
+FILES = require('./karma-files')
+
 module.exports = function(config) {
   config.set({
 
@@ -15,14 +17,15 @@ module.exports = function(config) {
 
 
     // list of files / patterns to load in the browser
-    files: [
-      'frontend/javascripts/libs/angular.js',
-      'frontend/javascripts/libs/angular-ui-router.js',
-      'frontend/javascripts/libs/angular-mock.js',
-      './web/public/javascripts/*.js',
-      'frontend/javascripts/tests/**/*.js',
-      //'frontend/javascripts/app/views/**/*.html'
-    ],
+    files: FILES.all,
+    // files: [
+    //   'frontend/javascripts/libs/angular.js',
+    //   'frontend/javascripts/libs/angular-ui-router.js',
+    //   'frontend/javascripts/libs/angular-mock.js',
+    //   './web/public/javascripts/*.js',
+    //   'frontend/javascripts/tests/**/*.js',
+    //   //'frontend/javascripts/app/views/**/*.html'
+    // ],
 
 
     // list of files to exclude
@@ -33,29 +36,45 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      //'frontend/javascripts/app/views/**/*.html': ['ng-html2js'],
-      //'./web/public/javascripts/*.js': ['coverage']
+      'frontend/javascripts/**/*.html': ['ng-html2js'],
+      'frontend/javascripts/**/*.coffee': ['coffee'],
+      'frontend/javascripts/app/**/*.{js,coffee}': ['coverage'],
+      'frontend/javascripts/login.js.coffee': ['coverage'],
+      'frontend/javascripts/welcome.js.coffee': ['coverage'],
     },
 
-    /*ngHtml2JsPreprocessor: {
+    ngHtml2JsPreprocessor: {
       // strip this from the file path
-      stripPrefix: 'base/',
+      stripPrefix: 'frontend/javascripts/',
       // prepend this to the
-      prependPrefix: 'served/',
+      // prependPrefix: 'served/',
 
       // or define a custom transform function
-      cacheIdFromPath: function(filepath) {
-        return cacheId;
-      },
+      // cacheIdFromPath: function(filepath) {
+      //   console.log(filepath)
+      //   return filepath;
+      //   // return cacheId;
+      // },
 
       // setting this option will create only a single module that contains templates
       // from all the files, so you can load them all with module('foo')
-      moduleName: 'foo'
-    },*/
+      moduleName: 'templates'
+    },    
+    coffeePreprocessor: {
+      // options passed to the coffee compiler
+      options: {
+        bare: true,
+        sourceMap: false
+      },
+      // transforming the filenames
+      transformPath: function(path) {
+        return path.replace(/\.coffee$/, '.js')
+      }
+    },
 
     coverageReporter: {
       type : 'html',
-      dir : 'frontend/coverage/'
+      dir : 'frontend/tests/coverage/'
     },
 
     // test results reporter to use
@@ -64,13 +83,13 @@ module.exports = function(config) {
     reporters: ['spec', 'coverage', 'html'],
 
     htmlReporter: {
-      outputDir: 'frontend/karma/', // where to put the reports
+      outputDir: 'frontend/tests/reports/', // where to put the reports
       templatePath: null, // set if you moved jasmine_template.html
       focusOnFailures: true, // reports show failures on start
       namedFiles: false, // name files instead of creating sub-directories
       pageTitle: null, // page title for reports; browser info by default
       urlFriendlyName: false, // simply replaces spaces with _ for files/dirs
-      reportName: 'report-summary-filename', // report summary filename; browser info by default
+      // reportName: 'report-summary-filename', // report summary filename; browser info by default
 
 
       // experimental
@@ -108,6 +127,8 @@ module.exports = function(config) {
     browsers: ['Chrome'],
 
     plugins : [
+            'karma-ng-html2js-preprocessor',
+            'karma-coffee-preprocessor',
             'karma-chrome-launcher',
             //'karma-firefox-launcher',
             'karma-jasmine',
@@ -119,7 +140,7 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false,
+    singleRun: true,
 
     // Concurrency level
     // how many browser should be started simultaneous

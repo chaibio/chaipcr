@@ -41,3 +41,4 @@ Debug
 build/*
 /uploads/
 capabilities
+frontend/tests
