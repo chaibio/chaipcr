@@ -28,7 +28,7 @@ class ExperimentDefinition < ActiveRecord::Base
   end
 
   def protocol_params=(params)
-    self.protocol = create_protocol(params)
+    self.protocol = create_protocol(params) if new_record?
   end
   
   protected
