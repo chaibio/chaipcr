@@ -37,7 +37,7 @@ module.exports = function(config) {
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
       'frontend/javascripts/**/*.html': ['ng-html2js'],
-      'frontend/javascripts/**/*.coffee': ['coffee'],
+      '**/*.coffee': ['coffee'],
       'frontend/javascripts/app/**/*.{js,coffee}': ['coverage'],
       'frontend/javascripts/login.js.coffee': ['coverage'],
       'frontend/javascripts/welcome.js.coffee': ['coverage'],
