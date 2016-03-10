@@ -52,8 +52,8 @@ get_mc_calib <- function(channel,
 
 # function: extract melting curve data and Tm for each well
 mc_tm_pw <- function(mt_pw, 
-                     qt_prob=0.7, # quantile probability point for normalized df/dT (range 0-1)
-                     max_normd_qtv=0.6, # maximum normalized df/dT values (range 0-1) at the quantile probablity point
+                     qt_prob=0.7, # quantile probability point for normalized -df/dT (range 0-1)
+                     max_normd_qtv=0.6, # maximum normalized -df/dT values (range 0-1) at the quantile probablity point
                      top_N=4, # top number of Tm peaks to report
                      min_frac_report=0.1 # minimum area fraction of the Tm peak to be reported in regards to the largest real Tm peak
                      ) { # per well
@@ -62,19 +62,22 @@ mc_tm_pw <- function(mt_pw,
     #message('qt_prob: ', qt_prob)
     #message('max_normd_qtv: ', max_normd_qtv)
     
-    mc <- mt_pw[, c('Temp', 'Fluo', 'df.dT')]
+    Fluo_ori <- mt_pw[,'Fluo']
+    Fluo_normd <- Fluo_ori - min(Fluo_ori)
+    mc <- cbind(mt_pw[,'Temp'], Fluo_normd, mt_pw[,'df.dT']) # `mc` is a matrix instead of data frame, therefore can't used mc$
+    colnames(mc) <- c('Temp', 'Fluo', 'df.dT')
     
     raw_tm <- na.omit(mt_pw[, c('Tm', 'Area')])
     
-    range_dfdT <- range(mc$df.dT)
-    #summit_pos <- which.max(mc$df.dT) # original: invalid when df/dT very high at the beginning of melt curve
-    summit_pos <- which(mc$Temp == raw_tm[which.max(raw_tm$Area), 'Tm']) # postion in df/dT curve corresponding to Tm peak of largest area.
-    dfdT_normd <- (mc$df.dT - range_dfdT[1]) / (range_dfdT[2] - range_dfdT[1])
-    # range_dfdT[1] == min(mc$df.dT). range_dfdT[2] == max(mc$df.dT).
+    range_dfdT <- range(mc[,'df.dT'])
+    #summit_pos <- which.max(mc[,'df.dT']) # original: invalid when -df/dT very high at the beginning of melt curve
+    summit_pos <- which(mc[,'Temp'] == raw_tm[which.max(raw_tm$Area), 'Tm']) # postion in -df/dT curve corresponding to Tm peak of largest area.
+    dfdT_normd <- (mc[,'df.dT'] - range_dfdT[1]) / (range_dfdT[2] - range_dfdT[1])
+    # range_dfdT[1] == min(mc[,'df.dT']). range_dfdT[2] == max(mc[,'-df.dT']).
     
     if (dim(raw_tm)[1] == 0 ||
-        (  quantile(dfdT_normd[1:summit_pos],                  qt_prob) > max_normd_qtv
-         & quantile(dfdT_normd[summit_pos:length(dfdT_normd)], qt_prob) > max_normd_qtv)) {
+        (   quantile(dfdT_normd[1:summit_pos],                  qt_prob) > max_normd_qtv
+         || quantile(dfdT_normd[summit_pos:length(dfdT_normd)], qt_prob) > max_normd_qtv)) {
         tm <- raw_tm[FALSE,]
     } else {
         tm_sorted <- raw_tm[order(-raw_tm$Area),]
