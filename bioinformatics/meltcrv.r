@@ -64,8 +64,9 @@ mc_tm_pw <- function(mt_pw,
     
     Fluo_ori <- mt_pw[,'Fluo']
     Fluo_normd <- Fluo_ori - min(Fluo_ori)
-    mc <- cbind(mt_pw[,'Temp'], Fluo_normd, mt_pw[,'df.dT']) # `mc` is a matrix instead of data frame, therefore can't used mc$
+    mc <- cbind(mt_pw[,'Temp'], Fluo_normd, mt_pw[,'df.dT'])
     colnames(mc) <- c('Temp', 'Fluo', 'df.dT')
+    mc <- as.data.frame(mc) # ensure proper plotting
     
     raw_tm <- na.omit(mt_pw[, c('Tm', 'Area')])
     
