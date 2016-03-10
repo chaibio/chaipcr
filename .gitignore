@@ -41,4 +41,5 @@ Debug
 build/*
 /uploads/
 capabilities
-frontend/tests
+frontend/tests/coverage
+frontend/tests/reports

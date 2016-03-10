@@ -17,7 +17,7 @@ module.exports = function(config) {
 
 
     // list of files / patterns to load in the browser
-    files: FILES.all,
+    files: FILES,
     // files: [
     //   'frontend/javascripts/libs/angular.js',
     //   'frontend/javascripts/libs/angular-ui-router.js',
@@ -63,7 +63,7 @@ module.exports = function(config) {
     coffeePreprocessor: {
       // options passed to the coffee compiler
       options: {
-        bare: true,
+        bare: false,
         sourceMap: false
       },
       // transforming the filenames
