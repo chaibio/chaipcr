@@ -31,11 +31,6 @@ fi
 
 verify_checksum () {
         image_filename_upgrade1="/sdcard/upgrade/upgrade.img.tar"
-#       image_filename_upgrade1="~/tmp2out/p2/upgrade.img.tar"
-#	image_filename_upgrade1="/home/mahammad/tmp2out/p2/upgrade.img.tar"
-
-#	ls -ahl  $image_filename_upgrade1
-
 	if [ ! -e $image_filename_upgrade1 ]
 	then
 		exit_with_message "Upgrade image not found!" 2 $1
@@ -56,23 +51,6 @@ verify_checksum () {
 	echo "Checksums: $check_sum"
 
 	files_tocheck=( "$image_filename_pt" "$image_filename_boot" "$image_filename_rootfs" )
-#	fileItemString=$(echo $check_sum |tr "\n" " ")
-#	fileItemArray=($fileItemString)
-
-#	Length=${#fileItemArray[@]}
-#	echo "Length=$Length"
-#	if [ $Length -lt 11 ]
-#	then
-#		echo "Incompatable upgrade image: Checksum file not found"
-#		exit 4
-#	fi
-
-#	check_sum1="${fileItemArray[3]}"
-#	echo "pt checksum: $check_sum1"
-#	for itm in "${fileItemArray[@]}"
-#	do
-#		echo "- $itm"
-#	done
 
 	for fl in "${files_tocheck[@]}"
 	do
@@ -130,6 +108,13 @@ umount ${uEnvPath}
 
 echo "Restarting to packing eMMC image.."
 echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+
+if [ -e /data/.tmp/shadow.backup ]
+then
+	rm /data/.tmp/shadow.backup
+fi
+cp /etc/shadow /data/.tmp/shadow.backup
+
 sh $BASEDIR/rebootx.sh
 
 exit_with_message Success 0 $1
