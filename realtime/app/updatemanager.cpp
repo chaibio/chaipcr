@@ -310,7 +310,11 @@ void UpdateManager::checkUpdateCallback(bool checkHash)
                     return;
                 }
                 else if (_updateState.compare_exchange_strong(state, Unknown))
+                {
                     state = Unknown;
+
+                    _dbControl->setUpgradeDownloaded(false);
+                }
             }
             else if (state == Downloading)
                 return;
@@ -355,8 +359,8 @@ void UpdateManager::downlaod(Upgrade upgrade)
 
         if (checkMountPoint() && checkSdcard() && downlaod(upgrade.imageUrl(), upgrade.password()) && Util::getFileChecksum(kUpdateFilePath, _downloadEventFd, sum) && sum == upgrade.checksum())
         {
-            _dbControl->setUpgradeDownloaded(true);
             _updateState = Available;
+            _dbControl->setUpgradeDownloaded(true);
         }
         else
             _updateState = Unknown;
