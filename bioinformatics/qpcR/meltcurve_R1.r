@@ -104,12 +104,12 @@ cut.Area = 0,
       span_smooth <- span_smooth_factor * max_temp_interval
       
       # # to test
-      message('central_fluo_temp: ', central_fluo_temp)
+      # message('central_fluo_temp: ', central_fluo_temp)
       # print(trend_mtx)
       # print(trend_positive)
       # print(cbind(trend_starts, trend_ends))
       # print(temp_intervals)
-       message('max_temp_interval: ', max_temp_interval)
+      # message('max_temp_interval: ', max_temp_interval)
       
       }
     
