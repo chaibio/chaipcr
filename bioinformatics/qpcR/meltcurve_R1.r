@@ -6,7 +6,10 @@ temps = NULL,
 fluos = NULL, 
 window = NULL, 
 norm = FALSE, 
-span.smooth = 0.05, 
+temp_shoulder = NULL, # xqrm
+# span.smooth = 0.05, # ori
+span_smooth_factor = NULL, # xqrm
+span_smooth_default = NULL, # xqrm
 span.peaks = 51,
 is.deriv = FALSE, 
 Tm.opt = NULL, 
@@ -39,8 +42,10 @@ cut.Area = 0,
     SM.seq <- seq(0, 0.2, by = 0.01)
     SP.seq <- seq(11, 201, by = 10)
     GRID <- expand.grid(SM.seq, SP.seq)      
+    GRID_not_determined <- FALSE # xqrm
   } else 
-    GRID <- matrix(c(span.smooth, span.peaks), nrow = 1) 
+    #GRID <- matrix(c(span.smooth, span.peaks), nrow = 1) # ori
+    GRID_not_determined <- TRUE # xqrm
     
   ### create output list
   outLIST <- vector("list", length = ncol(TEMPS))   
@@ -64,6 +69,53 @@ cut.Area = 0,
     
     ### optionally normalize fluo values
     if (norm) FLUO <- rescale(FLUO, 0, 1)    
+    
+    
+    # start: xqrm: determine span_smooth
+    
+    len1 <- length(TEMP)
+    central_fluo_temp = TEMP[order(FLUO)[as.integer(len1 / 2)]] # the temperature for approximately median fluo value
+    considered_indices <- which(TEMP >= central_fluo_temp - temp_shoulder & TEMP <= central_fluo_temp + temp_shoulder)
+    considered_temp <- TEMP[considered_indices]
+    considered_fluo <- FLUO[considered_indices]
+    
+    len2 <- length(considered_indices)
+    trend_mtx <- as.data.frame(cbind(1:len2, 
+                                     considered_temp, c(considered_temp[2:len2], NA), 
+                                     considered_fluo, c(considered_fluo[2:len2], NA)))
+    colnames(trend_mtx) <- c('count', 'TEMP', 'TEMP_next', 'FLUO', 'FLUO_next')
+    trend_mtx[,'TEMP_diff'] <- trend_mtx[,'TEMP_next'] - trend_mtx[,'TEMP']
+    trend_mtx[,'FLUO_diff'] <- trend_mtx[,'FLUO_next'] - trend_mtx[,'FLUO']
+    
+    trend_positive <- trend_mtx[trend_mtx[,'FLUO_diff'] > 0,]
+    
+    if (all(is.na(trend_positive))) {
+      span_smooth <- span_smooth_default
+    } else {
+      len3 <- dim(trend_positive)[1]
+      trend_positive[,'count_diff'] <- c(trend_positive[2:len3, 'count'], NA) - trend_positive[,'count']
+      trend_seps <- which(trend_positive[,'count_diff'] > 1)
+      trend_starts <- c(1, trend_seps + 1)
+      trend_ends <- c(trend_seps, len3 - 2)
+      
+      len4 <- length(trend_seps) + 1
+      temp_intervals <- sapply(1:len4, function(i) sum(trend_positive[trend_starts[i]:trend_ends[i], 'TEMP_diff'])) # temperature intervals where fluo value increases
+      max_temp_interval <- max(temp_intervals)
+      span_smooth <- span_smooth_factor * max_temp_interval
+      
+      # # to test
+      message('central_fluo_temp: ', central_fluo_temp)
+      # print(trend_mtx)
+      # print(trend_positive)
+      # print(cbind(trend_starts, trend_ends))
+      # print(temp_intervals)
+       message('max_temp_interval: ', max_temp_interval)
+      
+      }
+    
+    if (GRID_not_determined) GRID <- matrix(c(span_smooth, span.peaks), nrow = 1)
+    
+    # end: xqrm: determine span_smooth
     
     ### define result matrix 
     resMAT <- matrix(nrow = nrow(GRID), ncol = 3)

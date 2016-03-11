@@ -52,7 +52,7 @@ get_mc_calib <- function(channel,
 
 # function: extract melting curve data and Tm for each well
 mc_tm_pw <- function(mt_pw, 
-                     qt_prob=0.7, # quantile probability point for normalized -df/dT (range 0-1)
+                     qt_prob=0.64, # quantile probability point for normalized -df/dT (range 0-1)
                      max_normd_qtv=0.6, # maximum normalized -df/dT values (range 0-1) at the quantile probablity point
                      top_N=4, # top number of Tm peaks to report
                      min_frac_report=0.1 # minimum area fraction of the Tm peak to be reported in regards to the largest real Tm peak
@@ -98,7 +98,10 @@ mc_tm_all <- function(fc_wT, mc_plot, show_running_time,
     start_time <- proc.time()[['elapsed']]
     
     mt_ori <- meltcurve(fc_wT, 
-                        span.smooth=0.2, span.peaks=51, # default: span.smooth=0.05, span.peaks=51.
+                        temp_shoulder=2, # xqrm
+                        span_smooth_factor=0.35, # xqrm
+                        span_smooth_default=0.05, # xqrm
+                        span.peaks=51, # default 51.
                         plot=mc_plot) # using qpcR function `meltcurve`
     mt_out <- lapply(mt_ori, FUN=mc_tm_pw, ...)
     names(mt_out) <- colnames(fc_wT)[seq(2, dim(fc_wT)[2], by=2)]
