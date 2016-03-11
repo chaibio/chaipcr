@@ -259,8 +259,8 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     maxiter <- 500
     maxfev <- 10000
     # min_ac_max <- 0
-    max_rsem <- 0.1
-    max_rser <- 0.025
+    max_rsem <- 1.2
+    max_rser <- 0.3
     type <- 'curve'
     cp <- 'cpD2'
     

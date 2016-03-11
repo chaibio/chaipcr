@@ -65,16 +65,16 @@ mc_tm_pw <- function(mt_pw,
     Fluo_ori <- mt_pw[,'Fluo']
     Fluo_normd <- Fluo_ori - min(Fluo_ori)
     mc <- cbind(mt_pw[,'Temp'], Fluo_normd, mt_pw[,'df.dT'])
-    colnames(mc) <- c('Temp', 'Fluo', 'df.dT')
+    colnames(mc) <- c('Temp', 'Fluo', '-df/dT')
     mc <- as.data.frame(mc) # ensure proper plotting
     
     raw_tm <- na.omit(mt_pw[, c('Tm', 'Area')])
     
-    range_dfdT <- range(mc[,'df.dT'])
-    #summit_pos <- which.max(mc[,'df.dT']) # original: invalid when -df/dT very high at the beginning of melt curve
+    range_dfdT <- range(mc[,'-df/dT'])
+    #summit_pos <- which.max(mc[,'-df/dT']) # original: invalid when -df/dT very high at the beginning of melt curve
     summit_pos <- which(mc[,'Temp'] == raw_tm[which.max(raw_tm$Area), 'Tm']) # postion in -df/dT curve corresponding to Tm peak of largest area.
-    dfdT_normd <- (mc[,'df.dT'] - range_dfdT[1]) / (range_dfdT[2] - range_dfdT[1])
-    # range_dfdT[1] == min(mc[,'df.dT']). range_dfdT[2] == max(mc[,'-df.dT']).
+    dfdT_normd <- (mc[,'-df/dT'] - range_dfdT[1]) / (range_dfdT[2] - range_dfdT[1])
+    # range_dfdT[1] == min(mc[,'-df/dT']). range_dfdT[2] == max(mc[,'-df/dT']).
     
     if (dim(raw_tm)[1] == 0 ||
         (   quantile(dfdT_normd[1:summit_pos],                  qt_prob) > max_normd_qtv
