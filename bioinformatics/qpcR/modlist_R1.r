@@ -151,18 +151,35 @@ modlist <- function(
       ## version 1.4-0: baselining with 'c' parameter using 'baseline' function
       if (baseline_looped == "parm") { #fitOBJ <- baseline(model = fitOBJ, baseline = baseline) # ori
         
-        # xqrm: if baseline == 'parm' (model automatically not NULL) and sigmoid fitting of pre-subtracted amplifcation data fails (determined by 'modlist_R1.r')
-        if (class(fitOBJ) == 'try-error') { # sigmoid fitting failed
-        # reference in 'modlist_R1.r': 
-          # line 117: fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent=FALSE) # xqrm
-          # line 120: if (baseline == "parm") { #fitOBJ <- baseline(model = fitOBJ, baseline = baseline)
+        # if baseline == 'parm' (model automatically not NULL) and sigmoid fitting of pre-subtracted amplifcation data fails (determined by 'modlist_R1.r')
+        
+        # xqrm
+        ori_dist2x <- median(FLUO) # define original distance to x-axis as the median of FLUO values across all the cycles
+        fallback_conditions <- c(
+                                 'fitting_failed' = (inherits(fitOBJ, "try-error")), # sigmoid fitting failed. class(fitOBJ) == 'try-error'
+                                 'b > 0' = try(coef(fitOBJ)[['b']] > 0), # fitted curve is downward
+                                 'bad c' = try(abs(ori_dist2x - coef(fitOBJ)[['c']]) >= abs(ori_dist2x)) # subtracting 'c' from fluo values moved the curve further away from x-axis
+                                 )
+        
+        # xqrm
+        if (any(fallback_conditions)) {
+          
           baseline_looped <- fallback
-          message('Baseline subtraction method falls back from \'parm\' to \'', fallback, '\', since sigmoid fitting failed for amplifcation data before baseline subtraction.')
+          message('Baseline subtraction method falls back from \'parm\' to \'', fallback, '\'.')
+          message('Fallback reason:')
+          
+          if (fallback_conditions['fitting_failed']) {
+            # reference in 'modlist_R1.r': 
+              # line 117: fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent=FALSE) # xqrm
+              # line 120: if (baseline == "parm") { #fitOBJ <- baseline(model = fitOBJ, baseline = baseline)
+            message('Sigmoid fitting failed for amplifcation data before baseline subtraction.') 
+          } else if (fallback_conditions['b > 0']) {
+            message('There is a downward trend for the fitted sigmoid curve on amplifcation data before baseline subtraction.')
+          } else if (fallback_conditions['bad c']) {
+            message('Subtracting \'c\' from fluo values moved the curve further away from x-axis.') }
+          
           next }
-        if (coef(fitOBJ)[['b']] > 0) { # fitted curve is downward
-          baseline_looped <- fallback
-          message('Baseline subtraction method falls back from \'parm\' to \'', fallback, '\', due to the downward trend of the fitted sigmoid curve on amplifcation data before baseline subtraction.')
-          next }
+        
         
         # xqrm
         blmod <- fitOBJ
