@@ -34,21 +34,21 @@
             return fetching = false;
           };
         })(this), 10000);
-        $http.get(host + "\:8000/status").success((function(_this) {
+        $http.get(host + "\:8000/status").then((function(_this) {
           return function(resp) {
             var def, i, len, oldData;
             isUp = true;
             oldData = angular.copy(data);
-            data = resp;
+            data = resp.data;
             for (i = 0, len = ques.length; i < len; i += 1) {
               def = ques[i];
               def.resolve(data);
             }
             return $rootScope.$broadcast('status:data:updated', data, oldData);
           };
-        })(this)).error(function(resp) {
+        })(this)).catch(function(resp) {
           var def, i, len, results;
-          isUp = resp === null ? false : true;
+          isUp = resp.status === 0 ? false : true;
           results = [];
           for (i = 0, len = ques.length; i < len; i += 1) {
             def = ques[i];

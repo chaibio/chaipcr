@@ -1,0 +1,50 @@
+<div class="intro">
+  <h2>Optical Test</h2>
+
+  <p>
+    The optical test verifies the proper functioning of the dual channel Open qPCR's optical system.
+  </p>
+
+  <div class="mini-description">
+    <div class="row text-left">
+      <div class="col-md-3">
+        <b class="section-title">DURATION</b>
+        <br>
+        ~5 minutes
+      </div>
+      <div class="col-md-9">
+        <b class="section-title">MATERIALS REQUIRED</b>
+        <table>
+          <tbody>
+            <tr>
+              <td>6x</td>
+              <td><b>8-well PCR strips</b></td>
+            </tr>
+            <tr>
+              <td>200uL</td>
+              <td><b>Water</b> [25uL/tube]</td>
+            </tr>
+            <tr>
+              <td>200uL</td>
+              <td><b>3 uM FAM</b> [25uL/tube]</td>
+            </tr>
+            <tr>
+              <td>200uL</td>
+              <td><b>uL 3 uM HEX</b> [25uL/tube]</td>
+            </tr>
+          </tbody>
+        </table>
+        <span class="note">
+          *It is important to pipette the caliration solution from the same stock tube. If the solution is pipetted from different stock tubes, the stock solution  should first be mixed.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center">
+    <button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ng-click="createExperiment()">BEGIN</button>
+    <span ng-if="error" ng-class="{errorMessage: error}">{{lidMessage}}</span>
+
+  </div>
+
+</div>

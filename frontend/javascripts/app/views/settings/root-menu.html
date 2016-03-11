@@ -15,42 +15,42 @@
   </div>
   <div class="content">
     <!--<div class="row content-row"> -->
-      <div class="col-md-4 left-menu-container">
-        <h2 class="underlined">
+    <div class="col-md-4 left-menu-container">
+      <h2 class="underlined">
           ACTIVE USER
         </h2>
-        <div class="user-container">
-          <h2>{{user.name}}</h2>
-          <h3 ng-show="user.role === 'admin'">Admin</h3>
-          <div class="buttons-container">
-            <button class="button" logout>LOG OUT</button>
-            <button ui-sref="settings.current-user" class="button">EDIT</button>
-          </div>
+      <div class="user-container">
+        <h2>{{user.name}}</h2>
+        <h3 ng-show="user.role === 'admin'">Admin</h3>
+        <div class="buttons-container">
+          <button class="button" logout>LOG OUT</button>
+          <button ui-sref="settings.current-user" class="button">EDIT</button>
         </div>
-        <ul>
-          <li>
-            <a ui-sref="settings.usermanagement" ui-sref-active="active">MANAGE USERS</a>
-          </li>
-          <li ng-if="isBeta">
-            <a ui-sref-active="active" ui-sref="settings.networkmanagement">NETWORK SETTINGS</a>
-          </li>
-          <li>
-            <a ui-sref-active="active" ui-sref="settings.diagnostics">DIAGNOSTICS</a>
-          </li>
-          <li>
-            <a ui-sref-active="active" ui-sref="settings.calibration">CALIBRATION</a>
-          </li>
-          <li>
-            <a ui-sref="settings.system" ui-sref-active="active">SYSTEM</a>
-          </li>
-        </ul>
-        <return-home></return-home>
       </div>
-      <div class="col-md-8 device-info-container" ui-view>
-      </div>
+      <ul>
+        <li>
+          <a ui-sref="settings.usermanagement" ui-sref-active="active">MANAGE USERS</a>
+        </li>
+        <li ng-if="isBeta">
+          <a ui-sref-active="active" ui-sref="settings.networkmanagement">NETWORK SETTINGS</a>
+        </li>
+        <li>
+          <a ui-sref-active="active" ui-sref="settings.diagnostics">DIAGNOSTICS</a>
+        </li>
+        <li>
+          <a ui-sref-active="active" ui-sref="settings.calibration">CALIBRATION</a>
+        </li>
+        <li>
+          <a ui-sref="settings.system" ui-sref-active="active">SYSTEM</a>
+        </li>
+      </ul>
+      <return-home></return-home>
+    </div>
+    <div class="col-md-8 device-info-container" ui-view>
+    </div>
     <!--</div> -->
   </div>
-<!--   <div class="content">
+  <!--   <div class="content">
     <div class="row">
       <div class="col-md-12 text-center">
         <ul>

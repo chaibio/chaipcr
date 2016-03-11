@@ -4,27 +4,24 @@
   </div>
   <div class="wizards-container">
     <h2 class="underlined">CHOOSE A PROCEDURE <span class="close" ui-sref="settings.root">&times;</span></h2>
-
     <h3 class="wizard-header">DIAGNOSTICS</h3>
     <div class="wizard">
       <h3>Thermal Performance</h3>
       <p>Tests block heating & cooling performance; lid heating</p>
       <a href="/dynexp/thermal_performance_diagnostic/index.html" class="button">RUN NOW</a>
     </div>
-
     <h3 class="wizard-header">Thermal Uniformity</h3>
     <div class="wizard">
       <!-- <h3>Thermal Performance</h3> -->
       <p>Tests well-to-well variances in temperature</p>
       <a href="/dynexp/thermal_consistency/index.html" class="button">RUN NOW</a>
     </div>
-		
-    <h3 class="wizard-header" ng-show="!is_dual_channel">Optical Test</h3>
-    <div class="wizard" ng-show="!is_dual_channel">
+    <h3 class="wizard-header">Optical Test</h3>
+    <div class="wizard">
       <!-- <h3>Thermal Performance</h3> -->
       <p>Tests functionality of fluorescence detection optics</p>
-      <a href="/dynexp/optical_test/index.html" class="button">RUN NOW</a>
+      <a href="/dynexp/optical_test_single_channel/index.html" class="button" ng-if="!is_dual_channel">RUN NOW</a>
+      <a href="/dynexp/optical_test_dual_channel/index.html" class="button" ng-if="is_dual_channel">RUN NOW</a>
     </div>
-
   </div>
 </div>
