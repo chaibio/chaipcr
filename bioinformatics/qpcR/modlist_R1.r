@@ -156,7 +156,7 @@ modlist <- function(
         # xqrm
         ori_dist2x <- median(FLUO) # define original distance to x-axis as the median of FLUO values across all the cycles
         fallback_conditions <- c(
-                                 'fitting_failed' = (inherits(fitOBJ, "try-error")), # sigmoid fitting failed. class(fitOBJ) == 'try-error'
+                                 'fitting_failed' = (inherits(fitOBJ, "try-error")), # sigmoid fitting failed. `class(fitOBJ) == 'try-error'` was evaluated element-wise therefore cannot be used here.
                                  'b > 0' = try(coef(fitOBJ)[['b']] > 0), # fitted curve is downward
                                  'bad c' = try(abs(ori_dist2x - coef(fitOBJ)[['c']]) >= abs(ori_dist2x)) # subtracting 'c' from fluo values moved the curve further away from x-axis
                                  )
