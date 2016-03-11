@@ -7,15 +7,15 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
   'expName'
   '$rootScope'
   '$timeout'
+  '$interval'
   'Device'
-  ($scope, $stateParams, Experiment, helper, Status, expName, $rootScope, $timeout, Device) ->
+  ($scope, $stateParams, Experiment, helper, Status, expName, $rootScope, $timeout, $interval, Device) ->
 
     Device.isDualChannel().then (is_dual_channel) ->
       $scope.is_dual_channel = is_dual_channel
 
       hasData = false
       hasInit = false
-      fetching = false
       drag_scroll = $('#ampli-drag-scroll')
       $scope.chartConfig = helper.chartConfig(is_dual_channel)
       $scope.chartConfig.axes.x.ticks = helper.Xticks $stateParams.max_cycle || 1
@@ -27,6 +27,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.baseline_subtraction = true
       $scope.curve_type = 'linear'
       $scope.color_by = 'well'
+      $scope.retrying = false
+      $scope.retry = 0
+      $scope.fetching = false
 
       $scope.$on 'expName:Updated', ->
         $scope.experiment?.name = expName.name
@@ -48,51 +51,71 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         if (state is 'idle' and !!$scope.experiment?.completed_at and !hasData) or
         (state is 'idle' and oldState isnt state) or
         (state is 'running' and (oldStep isnt newStep or !oldStep) and data.optics.collect_data and oldData?.optics.collect_data is 'true')
-          fetchFluorescenceData()
+          return if $scope.retrying
+          if !hasInit
+            $timeout fetchFluorescenceData, 1500
+          else
+            fetchFluorescenceData()
+
+      retry = ->
+        $scope.retrying = true
+        $scope.retry = 10
+        retryInterval = $interval ->
+          $scope.retry = $scope.retry - 1
+          if $scope.retry is 0
+            $interval.cancel(retryInterval)
+            $scope.retrying = false
+            fetchFluorescenceData()
+        , 1000
 
       fetchFluorescenceData = ->
-        # return
-        return if $scope.RunExperimentCtrl.chart isnt 'amplification'
-        if !fetching
-          fetching = true
+        gofetch = true
+        gofetch = false if $scope.fetching
+        gofetch = false if $scope.RunExperimentCtrl.chart isnt 'amplification'
+        gofetch = false if $scope.retrying
+
+        if gofetch
           hasInit = true
+          $scope.fetching = true
 
-          $timeout ->
-            Experiment
-            .getAmplificationData($stateParams.id)
-            .then (resp) ->
-              $scope.error = null
-              data = resp.data
-              hasData = true
-              return if !data.amplification_data
-              return if data.amplification_data.length is 0
-              data.amplification_data.shift()
-              data.ct.shift()
-              data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
-              AMPLI_DATA_CACHE = angular.copy data
-              $scope.amplification_data = angular.copy AMPLI_DATA_CACHE.amplification_data
-              moveData()
-              updateButtonCts()
+          Experiment
+          .getAmplificationData($stateParams.id)
+          .then (resp) ->
+            $scope.fetching = false
+            $scope.error = null
+            data = resp.data
+            hasData = true
+            return if !data.amplification_data
+            return if data.amplification_data.length is 0
+            data.amplification_data.shift()
+            data.ct.shift()
+            data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
+            AMPLI_DATA_CACHE = angular.copy data
+            $scope.amplification_data = angular.copy(AMPLI_DATA_CACHE.amplification_data)
+            moveData()
+            updateButtonCts()
 
-            .catch ->
-              Experiment.analyze($scope.experiment.id)
-              .then (resp) ->
-                $scope.error = resp.data?.errors || 'Unknown error occured'
-              .catch ->
-                $scope.error = 'Unknown error occured.'
-
-            .finally ->
-              fetching = false
-          , 1500
+          .catch ->
+            return if $scope.retrying
+            $scope.error = 'Internal Server Error'
+            # Experiment.analyze($scope.experiment.id)
+            # .then (resp) ->
+            #   console.log 'done analyze'
+            #   $scope.error = resp.data?.errors || err_msg
+            # .catch ->
+            #   console.log 'error analyze'
+            #   $scope.error = err_msg
+            # .finally ->
+            #   console.log 'finally analyze'
+            $scope.fetching = false
+            retry()
 
       updateButtonCts = ->
-        # channel_count = if $scope.is_dual_channel then 2 else 1
         for well_i in [0..15] by 1
           cts = _.filter AMPLI_DATA_CACHE.ct, (ct) ->
             ct[1] is well_i+1
           $scope.wellButtons["well_#{well_i}"].ct = [cts[0][2]]
           $scope.wellButtons["well_#{well_i}"].ct.push cts[1][2] if cts[1]
-            # [ct[0][2], ct[1]?[2]]
 
       updateDragScrollWidth = ->
         return if $scope.RunExperimentCtrl.chart isnt 'amplification'

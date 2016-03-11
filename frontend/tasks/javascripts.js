@@ -163,16 +163,13 @@ gulp.task('hash-js', ['concat-js'], function () {
 });
 
 gulp.task('uglify', ['concat-js', 'hash-js'], function () {
-  var isDebug = (process.env.debug === 'true')? true : false;
+  var isDebug = process.env.debug === 'true';
   var stream = gulp.src('.tmp/js/'+applicationJS+'.js');
 
   if(!isDebug) {
     stream.pipe(uglify())
-          .on('error', swallowError);
-  }
-
-  if(!isDebug) {
-    stream.pipe(stripDebug())
+          .on('error', swallowError)
+          .pipe(stripDebug())
           .on('error', swallowError);
   }
 

@@ -1,0 +1,8 @@
+@import './colors.css.scss';
+
+.loading-blue {
+  border: 7px solid $blue;
+  border-radius: 100px;
+  height: 60px;
+  width: 60px;
+}

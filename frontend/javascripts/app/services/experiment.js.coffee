@@ -42,6 +42,7 @@ window.ChaiBioTech.ngApp
       currentExperiment
 
     self.analyze = (id) ->
+      console.log 'anayling ....'
       $http.get("/experiments/#{id}/analyze")
 
     tempLogsQues = []

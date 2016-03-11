@@ -68,10 +68,17 @@
         <div>
           <div class="vertical-text SH">RELATIVE FLUORESCENCE UNITS</div>
           <div class="chart-container" id="ampli-drag-scroll" chart-drag-scroll ng-model="ampli_scroll">
-            <div class="chart-error B1"  ng-show="error">
+            <div class="chart-error B1"  ng-show="retrying && !fetching">
+            <!-- <div class="chart-error B1"  ng-show="false"> -->
               <strong class="text-black">Unable to load chart data</strong>
               <p ng-bind="error"></p>
-              Retrying <ellipsis-animated></ellipsis-animated>
+              Retrying in {{retry}} seconds<ellipsis-animated></ellipsis-animated>
+            </div>
+            <div class="loading-blue-container" ng-show="fetching">
+            <!-- <div class="loading-blue-container" ng-show="true"> -->
+              <div class="loading-blue"></div>
+              <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
+              <p class="B2">Typically takes 30-60 seconds</p>
             </div>
             <linechartv2 ng-if="!!data && RunExperimentCtrl.chart==='amplification'" data-drag-scroll="ampli-drag-scroll" data="data" options="chartConfig"></linechartv2>
           </div>
