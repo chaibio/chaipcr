@@ -6,7 +6,7 @@ temps = NULL,
 fluos = NULL, 
 window = NULL, 
 norm = FALSE, 
-temp_shoulder = NULL, # xqrm
+temp_1side = NULL, # xqrm
 # span.smooth = 0.05, # ori
 span_smooth_factor = NULL, # xqrm
 span_smooth_default = NULL, # xqrm
@@ -73,16 +73,50 @@ cut.Area = 0,
     
     # start: xqrm: determine span_smooth
     
-    len1 <- length(TEMP)
-    central_fluo_temp = TEMP[order(FLUO)[as.integer(len1 / 2)]] # the temperature for approximately median fluo value
-    considered_indices <- which(TEMP >= central_fluo_temp - temp_shoulder & TEMP <= central_fluo_temp + temp_shoulder)
-    considered_temp <- TEMP[considered_indices]
-    considered_fluo <- FLUO[considered_indices]
+    # start: find the data region considered (csdd) for choosing span_smooth
     
-    len2 <- length(considered_indices)
+    len1 <- length(TEMP)
+    
+    # # method 1: median fluo value => corresponding central_fluo_temp => 2 * temp_1side centered at central_fluo_temp
+    # central_fluo_temp = TEMP[order(FLUO)[as.integer(len1 / 2)]] # the temperature for approximately median fluo value
+    # csdd_indices <- which(TEMP >= central_fluo_temp - temp_1side & TEMP <= central_fluo_temp + temp_1side)
+    # # message('central_fluo_temp: ', central_fluo_temp) # to test
+    
+    # start: method 2: find the region of length 2 * temp_1side showing the largest fluo difference between start and end
+    
+    temp_step <- diff(range(na.omit(TEMP))) / len1 # assume temperature step is about constant
+    num_csdd_steps_1side <- as.integer(temp_1side / temp_step)
+    
+    fluo_ranges <- list()
+    fluo_diffs <- list()
+    
+    for (i1 in 1:len1) {
+      
+      fluo_start <- i1 - num_csdd_steps_1side
+      if (fluo_start < 1) fluo_start <- 1
+      
+      fluo_end <- i1 + num_csdd_steps_1side
+      if (fluo_end > len1) fluo_end <- len1
+      
+      fluo_ranges[[i1]] <- fluo_start:fluo_end
+      fluo_diffs[[i1]] <- FLUO[fluo_start] - FLUO[fluo_end]
+      }
+    
+    csdd_central_index <- which.max(unlist(fluo_diffs))
+    # message('TEMP[csdd_central_index]: ', TEMP[csdd_central_index]) # to test
+    csdd_indices <- fluo_ranges[[csdd_central_index]]
+    
+    # end: method 2
+    
+    csdd_temp <- TEMP[csdd_indices]
+    csdd_fluo <- FLUO[csdd_indices]
+    
+    # end: find...
+    
+    len2 <- length(csdd_indices)
     trend_mtx <- as.data.frame(cbind(1:len2, 
-                                     considered_temp, c(considered_temp[2:len2], NA), 
-                                     considered_fluo, c(considered_fluo[2:len2], NA)))
+                                     csdd_temp, c(csdd_temp[2:len2], NA), 
+                                     csdd_fluo, c(csdd_fluo[2:len2], NA)))
     colnames(trend_mtx) <- c('count', 'TEMP', 'TEMP_next', 'FLUO', 'FLUO_next')
     trend_mtx[,'TEMP_diff'] <- trend_mtx[,'TEMP_next'] - trend_mtx[,'TEMP']
     trend_mtx[,'FLUO_diff'] <- trend_mtx[,'FLUO_next'] - trend_mtx[,'FLUO']
@@ -104,7 +138,6 @@ cut.Area = 0,
       span_smooth <- span_smooth_factor * max_temp_interval
       
       # # to test
-      # message('central_fluo_temp: ', central_fluo_temp)
       # print(trend_mtx)
       # print(trend_positive)
       # print(cbind(trend_starts, trend_ends))

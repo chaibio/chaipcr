@@ -98,8 +98,8 @@ mc_tm_all <- function(fc_wT, mc_plot, show_running_time,
     start_time <- proc.time()[['elapsed']]
     
     mt_ori <- meltcurve(fc_wT, 
-                        temp_shoulder=2, # xqrm
-                        span_smooth_factor=0.35, # xqrm
+                        temp_1side=2, # xqrm
+                        span_smooth_factor=0.5, # xqrm
                         span_smooth_default=0.05, # xqrm
                         span.peaks=51, # default 51.
                         plot=mc_plot) # using qpcR function `meltcurve`
