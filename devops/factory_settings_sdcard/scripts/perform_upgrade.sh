@@ -112,6 +112,8 @@ echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 if [ -e /data/.tmp/shadow.backup ]
 then
 	rm /data/.tmp/shadow.backup
+else
+	mkdir -p /data/.tmp/
 fi
 cp /etc/shadow /data/.tmp/shadow.backup
 
