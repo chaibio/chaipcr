@@ -1,24 +1,12 @@
-html,
-body,
-#container,
-.page-layout{
-  height: 100%;
-}
-
 #container {
   width: 1024px;
   margin: 0 auto;
 }
 
-.page-layout {
-  height: 100%;
-}
-
 .page-layout .row {
   margin: 0;
   margin-right: -15px;
-  margin-left: -15px;
-}
+  margin-left: -15px; }
 
 .page-layout .header {
   width: 100%;
@@ -54,9 +42,6 @@ body,
   padding-top: 20px;
   width: 550px;
   margin: 0 auto;
-  min-height: 100%;
-  margin-top: -71px;
-  padding-top: 71px;
 }
 
 a {

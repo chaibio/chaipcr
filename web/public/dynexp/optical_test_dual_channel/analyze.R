@@ -1,1 +1,1 @@
-analyze <- analyze_thermal_consistency
+analyze <- analyze_optical_calibration

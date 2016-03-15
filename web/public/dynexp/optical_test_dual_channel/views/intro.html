@@ -2,7 +2,7 @@
   <h2>Optical Test</h2>
 
   <p>
-    The optical test verifies the proper functioning of the dual channel Open qPCR's optical system.
+    The optical test verifies the proper functioning of the dual channel Open qPCR's optical system
   </p>
 
   <div class="mini-description">
@@ -22,27 +22,23 @@
             </tr>
             <tr>
               <td>200uL</td>
-              <td><b>Water</b> [25uL/tube]</td>
+              <td><b>3 uM FAM</b> (25 uL/tube)</td>
             </tr>
             <tr>
               <td>200uL</td>
-              <td><b>3 uM FAM</b> [25uL/tube]</td>
-            </tr>
-            <tr>
-              <td>200uL</td>
-              <td><b>uL 3 uM HEX</b> [25uL/tube]</td>
+              <td><b>3 uM HEX</b> (2 uL/tube)</td>
             </tr>
           </tbody>
         </table>
-        <span class="note">
+        <!-- <span class="note">
           *It is important to pipette the caliration solution from the same stock tube. If the solution is pipetted from different stock tubes, the stock solution  should first be mixed.
-        </span>
+        </span> -->
       </div>
     </div>
   </div>
 
   <div class="text-center">
-    <button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ng-click="createExperiment()">BEGIN</button>
+    <button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ui-sref="step-1">BEGIN</button>
     <span ng-if="error" ng-class="{errorMessage: error}">{{lidMessage}}</span>
 
   </div>

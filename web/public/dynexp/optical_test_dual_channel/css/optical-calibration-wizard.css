@@ -1,4 +1,4 @@
-html, body {
+body {
     font-family: 'Dinot';
     color: #000;
 }
@@ -39,7 +39,7 @@ button:hover,
 
 button.red,
 .button.red {
-    background: #FF0000;
+    background: #E02127;
     border-color: transparent;
     color: #fff;
 }
@@ -55,7 +55,6 @@ button.red,
     color: #999;
     text-decoration: none;
 }
-
 p.step{
     text-align: left;
     margin-bottom: 0px;
@@ -69,6 +68,24 @@ p.step{
     color: #333;
 }
 
+/*tubes container sulotion label*/
+.tubes-container .solution-label img {
+    display: inline-block;
+    margin: 0 5px;
+    margin-right: 10px;
+    vertical-align: middle;
+    height: 20px;
+}
+
+.tubes-container .solution-label span {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.tubes-container img.tubes {
+    margin-top: 10px;
+    width: 150px;
+}
 
 /*intro page*/
 .intro h2 {
@@ -96,6 +113,29 @@ p.step{
 .intro .mini-description .note{
     color: #777;
     font-size: 12px;
+}
+
+/*step 1*/
+
+.row.tubes-container{
+    margin: 0;
+    margin-top: 30px;
+}
+.tubes-container .col-md-4{
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.step-1 .tubes-container .col-md-6:last-of-type {
+    padding-left: 50px;
+}
+
+/*step 2 & 4*/
+.step-2 .machine-icon-container img,
+.step-4 .machine-icon-container img {
+    width: 230px;
+    margin-left: 45px;
+    display: block;
 }
 
 /*step 3*/
@@ -183,16 +223,6 @@ p.step{
 }
 .step-6 p.heating {
     margin-top: 20px;
-}
-
-.page-layout .content.analyze {
-    width: 1024px;
-}
-.text-success{
-    color: #0CE433;
-}
-.text-danger {
-    color: #FF0000;
 }
 .errorMessage {
   display: block;

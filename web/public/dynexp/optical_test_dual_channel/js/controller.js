@@ -1,38 +1,55 @@
 (function () {
-  window.App.controller('AppController', [
+  window.App.controller('OpticalCalibrationCtrl', [
     '$scope',
     '$window',
     'Experiment',
     '$state',
-    '$stateParams',
     'Status',
     'GlobalService',
-    'CONSTANTS',
-    'Helper',
+    'host',
+    '$http',
     'DeviceInfo',
-    '$interval',
+    '$timeout',
     '$uibModal',
     '$rootScope',
-    function AppController ($scope, $window, Experiment, $state, $stateParams, Status, GlobalService,
-      CONSTANTS, Helper, DeviceInfo, $interval, $uibModal, $rootScope) {
+    function OpticalCalibrationCtrl ($scope, $window, Experiment, $state, Status, GlobalService,
+      host, $http, DeviceInfo, $timeout, $uibModal, $rootScope) {
 
-      $scope.error = true;
       $scope.cancel = false;
-      $scope.CONSTANTS = CONSTANTS;
-      $scope.isFinite = isFinite;
-      $('.content').addClass('analyze');
+      $scope.error = false;
 
-      function getExperiment(exp_id, cb) {
-        Experiment.get(exp_id).then(function (resp) {
-          $scope.experiment = resp.data.experiment;
-          if(cb) cb(resp.data.experiment);
-        });
-      }
+      $scope.$on('$stateChangeSuccess', function(evt, currentState) {
 
-      $scope.loop = [];
-      for (var i=0; i < 8; i ++) {
-        $scope.loop.push(i);
-      }
+          switch (currentState.name) {
+
+            case "step-2":
+              if(! $scope.timeout) {
+                $scope.error = true;
+                $scope.checkMachineStatus();
+              }
+            break;
+
+            case "step-3":
+              $timeout.cancel($scope.timeout);
+            break;
+
+            case "step-4":
+              if(! $scope.timeout) {
+                $scope.error = true;
+                $scope.checkMachineStatus();
+              }
+            break;
+
+            case "step-5":
+              $timeout.cancel($scope.timeout);
+            break;
+
+            default:
+
+              $timeout.cancel($scope.timeout);
+              $scope.error = $scope.timeout = false;
+          }
+      });
 
       $scope.$watch(function () {
         return Status.getData();
@@ -44,40 +61,63 @@
 
         $scope.data = data;
         $scope.state = data.experiment_controller.machine.state;
-        $scope.old_state = oldData.experiment_controller.machine.state;
         $scope.timeRemaining = GlobalService.timeRemaining(data);
 
         if (data.experiment_controller.expriment && !$scope.experiment) {
-          getExperiment(data.experiment_controller.expriment.id);
+          Experiment.get(data.experiment_controller.expriment.id).then(function (resp) {
+            $scope.experiment = resp.data.experiment;
+          });
         }
-
-        if($scope.state === 'idle' && $scope.old_state !=='idle') {
-          // exp complete
-          $state.go('analyze', {id: $scope.experiment.id});
+        if ($scope.isCollectingData() && $state.current.name === 'step-3') {
+          $state.go('step-3-reading');
         }
-
-        if ($state.current.name === 'analyze') Status.stopSync();
-
+        if (!$scope.isCollectingData() && ($state.current.name === 'step-3-reading') ) {
+          $state.go('step-4');
+        }
+        // if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle' || $state.current.name === 'step-5')) {
+        if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle')) {
+          // experiment is complete
+          Experiment.get($scope.experiment.id).then(function (resp) {
+            $scope.experiment = resp.data.experiment;
+            if( $scope.experiment.completion_status !== 'success') {
+              $state.go('step-6');
+              return;
+            }
+            Experiment.analyze($scope.experiment.id).then(function (resp) {
+              $state.go('step-6');
+              $scope.result = resp.data;
+              $scope.valid = true;
+              for (var i = resp.data.valid.length - 1; i >= 0; i--) {
+                if (resp.data.valid[i] === false) {
+                  $scope.valid = false;
+                  break;
+                }
+              }
+              if($scope.valid) $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
+            });
+          });
+        }
+        if ($state.current.name === 'step-3' || $state.current.name === 'step-3-reading') {
+          $scope.timeRemaining  = ($scope.timeRemaining - $scope.finalStepHoldTime());
+        }
       }, true);
 
+      $scope.checkMachineStatus = function() {
 
-      function fetchStatus () {
-        Status.fetch()
-        .then(function(data) {
+        DeviceInfo.getInfo($scope.check).then(function(deviceStatus) {
           // Incase connected
           if($scope.modal) {
               $scope.modal.close();
               $scope.modal = null;
           }
 
-          if(data.optics.lid_open === "true" || data.optics.lid_open === true) { // lid is open
+          if(deviceStatus.data.optics.lid_open === "true" || deviceStatus.data.optics.lid_open === true) { // lid is open
             $scope.error = true;
             $scope.lidMessage = "Close lid to begin.";
           } else {
             $scope.error = false;
           }
-        })
-        .catch(function(err) {
+        }, function(err) {
           // Error
           $scope.error = true;
           $scope.lidMessage = "Cant connect to machine.";
@@ -98,26 +138,8 @@
             }
           }
         });
-      };
 
-      statusInterval = $interval(fetchStatus, 1000);
-
-      $scope.analyzeExperiment = function () {
-        $scope.analyzing = true;
-        if (!$scope.analyzedExp) {
-          getExperiment($stateParams.id, function (exp) {
-            $scope.experiment = exp;
-            if (exp.completion_status === 'success') {
-              Experiment.getSteps($stateParams.id, [12, 13]).then(function (resp) {
-                $scope.analyzedExp = Helper.getBaselineAndExcitation(resp.data.fluorescence_data);
-                $scope.analyzing = false;
-              });
-            }
-            else {
-              $scope.analyzing = false;
-            }
-          });
-        }
+        $scope.timeout = $timeout($scope.checkMachineStatus, 1000);
       };
 
       $scope.lidHeatPercentage = function () {
@@ -142,11 +164,17 @@
       };
 
       $scope.createExperiment = function () {
-        Experiment.create({guid: 'optics_test'}).then(function (resp) {
+        Experiment.create({guid: 'dual_channel_optics_test'}).then(function (resp) {
           Experiment.startExperiment(resp.data.experiment.id).then(function () {
             $scope.experiment = resp.data.experiment;
-            $state.go('exp-running');
+            $state.go('step-3');
           });
+        });
+      };
+
+      $scope.resumeExperiment = function () {
+        Experiment.resumeExperiment().then(function () {
+          $state.go('step-5');
         });
       };
 
@@ -170,8 +198,7 @@
         if (!$scope.data.experiment_controller.expriment) return;
         var step_id = parseInt($scope.data.experiment_controller.expriment.step.id);
         if (!step_id) return;
-        var steps = GlobalService.getExperimentSteps($scope.experiment);
-        return _.find(steps, {id: step_id});
+        return $scope.experiment.protocol.stages[0].stage.steps[step_id-1].step;
 
       };
 
@@ -184,17 +211,7 @@
         var step_id = parseInt($scope.data.experiment_controller.expriment.step.id);
         var steps = $scope.experiment.protocol.stages[0].stage.steps;
         return steps[steps.length-1].step.hold_time;
-      };
 
-      $scope.maxDeltaTm = function () {
-        if (!$scope.tm_values) return 0;
-        var max_delta_tm = GlobalService.getMaxDeltaTm($scope.tm_values);
-        return max_delta_tm;
-      };
-
-      $scope.getResult = function (obj) {
-        if(!obj) return false;
-        return Helper.getResult(obj.baseline.fluorescence_value, obj.excitation.fluorescence_value);
       };
 
     }

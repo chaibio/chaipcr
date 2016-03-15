@@ -1,21 +1,19 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="OpticalTest">
+<html lang="en" ng-app="OpticalCalibrationApp">
 <head>
   <meta charset="UTF-8">
-  <title>Optical Test</title>
+  <title>Optical Calibration</title>
   <link rel="stylesheet" href="../libs/css/bootstrap.css">
-  <link rel="stylesheet" href="../libs/css/fonts.css">
   <link rel="stylesheet" href="../libs/css/wizard-header.css">
+  <link rel="stylesheet" href="./css/fonts.css">
   <link rel="stylesheet" href="./css/page-layout.css">
-  <link rel="stylesheet" href="./css/application.css">
+  <link rel="stylesheet" href="./css/optical-calibration-wizard.css">
   <link rel="stylesheet" href="./css/image-rotate.css">
 </head>
-<body class="optical-calibration" ng-controller="AppController">
+<body class="optical-calibration" ng-controller="OpticalCalibrationCtrl">
   <div id="container">
-    <div class="page-layout" wow="wow">
-    <wizard-header experiment-id="experiment.id" on-cancel="cancelExperiment()" cancel-text="cancel test">
-      optical test
-    </wizard-header>
+    <div class="page-layout">
+    <wizard-header experiment-id="experiment.id" on-cancel="cancelExperiment()" cancel-text="CANCEL CALIBRATION">OPTICAL CALIBRATION</wizard-header>
     <div class="content" ui-view></div>
     </div>
   </div>
@@ -29,8 +27,8 @@
   <script type="text/javascript" src="../libs/js/jstorage.js"></script>
   <script type="text/javascript" src="../libs/js/moment.js"></script>
   <script type="text/javascript" src="../libs/js/angular-moment.min.js"></script>
-  <script type="text/javascript" src="../libs/js/status.js"></script>
   <script type="text/javascript" src="../libs/js/global-service.js"></script>
+  <script type="text/javascript" src="../libs/js/status.js"></script>
   <script type="text/javascript" src="../libs/js/wizard-header.js"></script>
   <script type="text/javascript" src="../libs/js/experiment.js"></script>
   <script type="text/javascript" src="../libs/js/auth.js"></script>
@@ -39,9 +37,8 @@
   <script type="text/javascript" src="./js/controller.js"></script>
   <script type="text/javascript" src="./js/seconds-display.js"></script>
   <script type="text/javascript" src="./js/degree-celcius.js"></script>
-  <script type="text/javascript" src="./js/number-format.js"></script>
+  <script type="text/javascript" src="./js/round.js"></script>
   <script type="text/javascript" src="./js/DeviceInfo.js"></script>
-  <script type="text/javascript" src="./js/helper.js"></script>
-  <script type="text/javascript" src="./js/constants.js"></script>
+  <script type="text/javascript" src="./js/test-in-progress-service.js"></script>
 </body>
 </html>
