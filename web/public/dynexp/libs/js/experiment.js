@@ -5,10 +5,12 @@
   App.service('Experiment', [
     '$http',
     'GlobalService',
-    function($http, GlobalService) {
+    '$q',
+    function($http, GlobalService, $q) {
       var currentExperiment, self;
       currentExperiment = null;
       var host = GlobalService.baseUrl;
+      var ques = {};
 
       self = this;
 
@@ -33,7 +35,29 @@
         });
       };
       self.get = function(id) {
-        return $http.get('/experiments/' + id);
+        var deferred = $q.defer();
+        ques['exp_'+id] = ques['exp_'+id] || [];
+        ques['exp_'+id].push(deferred);
+
+        if (ques['exp_'+id].length === 1)
+          $http.get('/experiments/' + id)
+          .then(function (resp) {
+            for (var i = ques['exp_'+id].length - 1; i >= 0; i--) {
+              var deferred = ques['exp_'+id][i];
+              deferred.resolve(resp);
+            }
+          })
+          .catch(function (resp) {
+            for (var i = ques['exp_'+id].length - 1; i >= 0; i--) {
+              var deferred = ques['exp_'+id][i];
+              deferred.reject(resp);
+            }
+          })
+          .finally(function () {
+            delete ques['exp_'+id];
+          });
+
+        return deferred.promise;
       }
       self.getFluorescenceData = function(expId) {
         return $http.get("/experiments/" + expId + "/amplification_data");

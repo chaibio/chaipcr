@@ -1,11 +1,11 @@
 <div class="step-4">
-  <p class="step"><b>STEP 4</b>/6</p>
-  <h2>Insert Solution Strips</h2>
+  <p class="step"><b>STEP 4</b>/7</p>
+  <h2>Insert FAM Strips</h2>
 
   <div class="row tubes-container">
     <div class="col-md-6">
       <div class="solution-label">
-        <span><b>2</b>x 8-well PCR Strips, Solution</span>
+        <span><b>2</b>x 8-well FAM Strips</span>
       </div>
       <img src="./images/tubes-green.png" class="tubes">
     </div>
@@ -16,14 +16,12 @@
 
   <div class="instruction">
     <b class="top-text">NEXT:</b> <BR>
-    Load the 2 strips of <b>Open qPCR Calibration Solution</b>. <br>
-    Ensure the <b>lid height</b> is properly adjusted, and hit <b>Next</b> to continue.
+    Load the 2 strips of <b>3 uM FAM Solution</b>.
   </div>
 
   <div class="text-center">
 
     <button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ng-click="resumeExperiment()">NEXT</button>
-    <span ng-if="error" ng-class="{errorMessage: error}">{{lidMessage}}</span>
   </div>
 
 </div>

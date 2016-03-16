@@ -9,14 +9,6 @@
   <link rel="stylesheet" href="./css/page-layout.css">
   <link rel="stylesheet" href="./css/optical-calibration-wizard.css">
   <link rel="stylesheet" href="./css/image-rotate.css">
-</head>
-<body class="optical-calibration" ng-controller="OpticalCalibrationCtrl">
-  <div id="container">
-    <div class="page-layout">
-    <wizard-header experiment-id="experiment.id" on-cancel="cancelExperiment()" cancel-text="CANCEL CALIBRATION">OPTICAL CALIBRATION</wizard-header>
-    <div class="content" ui-view></div>
-    </div>
-  </div>
   <script type="text/javascript" src="../libs/js/jquery.js"></script>
   <script type="text/javascript" src="../libs/js/lodash.js"></script>
   <script type="text/javascript" src="../libs/js/angular.js"></script>
@@ -38,7 +30,20 @@
   <script type="text/javascript" src="./js/seconds-display.js"></script>
   <script type="text/javascript" src="./js/degree-celcius.js"></script>
   <script type="text/javascript" src="./js/round.js"></script>
-  <script type="text/javascript" src="./js/DeviceInfo.js"></script>
   <script type="text/javascript" src="./js/test-in-progress-service.js"></script>
+  <script type="text/javascript" src="./js/constants.js"></script>
+</head>
+<body class="optical-calibration" ng-controller="OpticalCalibrationCtrl">
+  <div id="container">
+    <div class="page-layout">
+    <wizard-header experiment-id="experiment.id" on-cancel="cancelExperiment()" cancel-text="CANCEL TEST">OPTICAL TEST</wizard-header>
+    <div class="content">
+      <div ui-view></div>
+      <div class="text-center" ng-if="!!error" ng-class="{errorMessage: !!error}"> 
+        {{error}}
+      </div>
+    </div>
+    </div>
+  </div>
 </body>
 </html>

@@ -5,40 +5,44 @@
     '$urlRouterProvider',
     function ($stateProvider, $urlRouterProvider) {
 
-      $urlRouterProvider.otherwise('introduction');
+      $urlRouterProvider.otherwise('/introduction');
 
       $stateProvider
-      .state('introduction', {
+      .state('page-1', {
         url: '/introduction',
-        templateUrl: './views/intro.html'
+        templateUrl: './views/page-1.html'
       })
-      .state('step-1', {
+      .state('page-2', {
         url: '/step-1',
-        templateUrl: './views/step-1.html'
+        templateUrl: './views/page-2.html'
       })
-      .state('step-2', {
+      .state('page-3', {
         url: '/step-2',
-        templateUrl: './views/step-2.html'
+        templateUrl: './views/page-3.html'
       })
-      .state('step-3', {
+      .state('page-4', {
         url: '/step-3',
-        templateUrl: './views/step-3.html'
+        templateUrl: './views/page-4.html'
       })
-      .state('step-3-reading', {
-        url: '/step-3-reading-data',
-        templateUrl: './views/step-3-reading.html'
-      })
-      .state('step-4', {
+      .state('page-5', {
         url: '/step-4',
-        templateUrl: './views/step-4.html'
+        templateUrl: './views/page-5.html'
       })
-      .state('step-5', {
+      .state('page-6', {
         url: '/step-5',
-        templateUrl: './views/step-5.html'
+        templateUrl: './views/page-6.html'
       })
-      .state('step-6', {
+      .state('page-7', {
         url: '/step-6',
-        templateUrl: './views/step-6.html'
+        templateUrl: './views/page-7.html'
+      })
+      .state('page-8', {
+        url: '/step-7',
+        templateUrl: './views/page-8.html'
+      })
+      .state('page-9', {
+        url: '/analyze',
+        templateUrl: './views/page-9.html'
       });
 
     }

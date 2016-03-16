@@ -2,7 +2,7 @@
   <h2>Optical Test</h2>
 
   <p>
-    The optical test verifies the proper functioning of the dual channel Open qPCR's optical system
+    The optical test verifies the proper functioning of the dual channel Open qPCR's optical system.
   </p>
 
   <div class="mini-description">
@@ -38,9 +38,7 @@
   </div>
 
   <div class="text-center">
-    <button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ui-sref="step-1">BEGIN</button>
-    <span ng-if="error" ng-class="{errorMessage: error}">{{lidMessage}}</span>
-
+    <button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ng-click="next()">BEGIN</button>
   </div>
 
 </div>

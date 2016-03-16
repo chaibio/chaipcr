@@ -228,6 +228,6 @@ p.step{
   display: block;
   width: 500px;
   margin: 0 auto;
-  color: #999;
+  color: red;
   font-size: 17px;
 }

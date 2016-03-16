@@ -44,7 +44,7 @@
               def = ques[i];
               def.resolve(data);
             }
-            return $rootScope.$broadcast('status:data:updated', data, oldData);
+            $rootScope.$broadcast('status:data:updated', data, oldData);
           };
         })(this)).catch(function(resp) {
           var def, i, len, results;
@@ -54,7 +54,7 @@
             def = ques[i];
             results.push(def.reject(resp));
           }
-          return results;
+          $rootScope.$broadcast('status:data:error', resp);
         })["finally"]((function(_this) {
           return function() {
             $timeout.cancel(timeoutPromise);

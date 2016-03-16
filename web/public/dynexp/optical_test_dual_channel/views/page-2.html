@@ -1,5 +1,5 @@
 <div class="step-1">
-  <p class="step"><b>STEP 1</b>/6</p>
+  <p class="step"><b>STEP 1</b>/7</p>
   <h2>Prepare the Tubes</h2>
 
   <div class="row tubes-container">
@@ -32,8 +32,7 @@
   </div>
 
   <div class="text-center">
-    <button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ui-sref="step-2">NEXT</button>
-    <span ng-if="error" ng-class="{errorMessage: error}">{{lidMessage}}</span>
+    <button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ng-click="next()">NEXT</button>
   </div>
 
 </div>
