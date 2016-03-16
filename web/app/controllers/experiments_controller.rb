@@ -231,13 +231,19 @@ class ExperimentsController < ApplicationController
             end
           end
           
+          fluorescence_data = FluorescenceDatum.data(@experiment.id, first_stage_collect_data.id)
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/amplification.csv")
           columns = ["channel", "well_num", "cycle_num"]
+          fluorescence_index = 0
           csv_string = CSV.generate do |csv|
-            csv << ["baseline_subtracted_value", "background_subtracted_value"]+columns
+            csv << ["baseline_subtracted_value", "background_subtracted_value", "fluorescence_value"]+columns
             if amplification_data
               amplification_data.each do |data|
-                csv << [data.baseline_subtracted_value, data.background_subtracted_value]+data.attributes.values_at(*columns)
+                fluorescence_value = (fluorescence_data[fluorescence_index].channel == data.channel && 
+                                      fluorescence_data[fluorescence_index].well_num+1 == data.well_num && 
+                                      fluorescence_data[fluorescence_index].cycle_num == data.cycle_num)? fluorescence_data[fluorescence_index].fluorescence_value : nil
+                csv << [data.baseline_subtracted_value, data.background_subtracted_value, fluorescence_value]+data.attributes.values_at(*columns)
+                fluorescence_index += 1
               end
             end
           end
