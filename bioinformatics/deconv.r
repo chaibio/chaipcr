@@ -4,7 +4,7 @@
 # function: get cross-over constant matrix k
 get_k <- function(
                   db_conn, # MySQL database connection
-                  dcv_exp_id, # deconvolution experiment id, i.e. the data in this experiment is for constructing deconvolution matrix
+                  dcv_exp_ids, # deconvolution experiment ids, i.e. the data in these experiments are for constructing deconvolution matrix. a named list (by channel) where each element is the experiment id using the target dye of each channel
                   dcv_target_step_ids, # a named list (by channel) where each element is the step id using the target dye of each channel
                   calib_id # calibration experiment id associated with the deconvolution experiment
                   ) { 
@@ -15,9 +15,10 @@ get_k <- function(
     k_mtx <- do.call(cbind, lapply(channels, function(channel) { 
         k_qry <- sprintf('SELECT fluorescence_value, well_num, channel 
                               FROM fluorescence_data 
-                              WHERE experiment_id=%d AND step_id=%d 
+                              WHERE experiment_id=%d AND step_id=%d AND cycle_num=1 
                               ORDER BY well_num, channel', 
-                              dcv_exp_id, dcv_target_step_ids[[as.character(channel)]])
+                              dcv_exp_ids[[as.character(channel)]], 
+                              dcv_target_step_ids[[as.character(channel)]])
         k_data_1dye <- dbGetQuery(db_conn, k_qry)
         k_data_1dye_bych <- lapply(channels, function(channel) k_data_1dye[k_data_1dye[,'channel'] == channel,])
         k_mean_vec_1dye <- sapply(channels, 
@@ -43,6 +44,8 @@ deconv <- function(array2dcv, # dim1 must be channel, dim3 must be well
     
     k_inv <- solve(k)
     
+    array2dcv <<- array2dcv # test
+    
     a2d_dim1 <- dim(array2dcv)[1]
     a2d_dim2 <- dim(array2dcv)[2]
     a2d_dim3 <- dim(array2dcv)[3]
@@ -60,6 +63,10 @@ deconv <- function(array2dcv, # dim1 must be channel, dim3 must be well
     dcvd_array <- array(NA, dim(array2dcv))
     for (dim2_i in 1:dim(array2dcv)[2]) dcvd_array[,dim2_i,] <- dcvd_by_dim2_well[[dim2_i]]
     dimnames(dcvd_array) <- dimnames(array2dcv)
+    
+    # scale by channel to adjust for different fluorescence excitation strengths among dyes
+    for (channel in dimnames(dcvd_array)[1]) {
+        dcvd_array[channel,,] <- dcvd_array[channel,,] * scaling_factors_deconv[channel] }
     
     return(dcvd_array)
     }

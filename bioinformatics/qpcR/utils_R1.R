@@ -1121,7 +1121,40 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
     #if (inherits(newMODEL, "try-error")) return() # ori
   }
   
-  BASE <- BASE * basefac  
+  # xqrm
+  if (baseline == 'auto_lin') {
+    
+    if (class(model) == 'try-error') {
+      basecyc_last <- length(fluo)
+    } else { 
+      # start: borrowed from 'efficiency.R'
+      EFFobj <- eff(model)
+      SEQ <- EFFobj$eff.x
+      D2seq <- model$MODEL$d2(SEQ, coef(model))
+      if (all(is.na(D2seq))) { # may be due to numeric overflow
+        basecyc_last <- length(fluo)
+      } else {
+        D2seq[!is.finite(D2seq)] <- NA # remove Inf's that mimicked maximum values
+        maxD2 <- which.max(D2seq)
+        cycmaxD2 <- SEQ[maxD2]
+        # end: borrowed from 'efficiency.R'
+        basecyc_last <- floor(cycmaxD2)
+        if (basecyc_last <= 5) basecyc_last <- length(fluo)
+      }
+    }
+    
+    message(sprintf('auto_lin: cycles 1:%d were used for baseline subtraction.', basecyc_last))
+    basecyc_auto <- 1:basecyc_last
+    
+    # borrowed from `if (baseline == "lin")`
+    fluo2 <- fluo[basecyc_auto]
+    cyc2 <- cyc[basecyc_auto]
+    LM <- lm(fluo2 ~ cyc2)
+    BASE <- predict(LM, newdata = data.frame(cyc2 = cyc))    
+    
+  }
+  
+  BASE <- BASE * basefac
   
   #if (baseline != "parm") return(fluo - BASE) else return(newMODEL) # ori
   return(fluo - BASE) # xqrm

@@ -71,14 +71,14 @@ optic_calib <- function(fluo, db_conn, calib_id, channel, show_running_time=FALS
     # perform calibration
     signal_water_diff <- calib_data$calib_signal_fluo - calib_data$calib_water_fluo
     fluo_calib <- adply(fluo, .margins=1, 
-                        function(row1) scaling_factors[as.character(channel)] * (row1 - calib_data$calib_water_fluo) / signal_water_diff) # adply automatically create a column at index 1 of output from rownames of input array (1st argument)
+                        function(row1) scaling_factor_optic_calib * (row1 - calib_data$calib_water_fluo) / signal_water_diff) # adply automatically create a column at index 1 of output from rownames of input array (1st argument)
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]
     if (show_running_time) message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
     
     return(list('fluo_calib'=fluo_calib, 
-                'signal_water_diff' = scaling_factors[as.character(channel)] * signal_water_diff))
+                'signal_water_diff' = scaling_factor_optic_calib * signal_water_diff))
 }
 
 

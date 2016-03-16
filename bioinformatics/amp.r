@@ -253,9 +253,9 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     
     # baseline_ct
     model <- l4
-    baselin <- 'parm'
-    basecyc <- 3:6 # 1:5 gave poor baseline subtraction results for non-sigmoid shaped data when using 'lin'
-    fallback <- 'median'
+    baselin <- 'parm' # used: 'auto_lin', 'lin', 'parm'
+    basecyc <- 3:6 # used: 15:20, 10:15, 3:6, 1:5 (gave poor baseline subtraction results for non-sigmoid shaped data when using 'lin')
+    fallback <- 'median' # used: 'auto_lin', 'lin', 'median'
     maxiter <- 500
     maxfev <- 10000
     # min_ac_max <- 0

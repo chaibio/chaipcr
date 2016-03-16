@@ -30,7 +30,8 @@ load('k.RData') # load hard-coded deconvolution matrix
 # set constants
 
 num_wells <<- 16
-scaling_factors <<- c('1'=1e5, '2'=2e5)
+scaling_factor_optic_calib <- 1e5 # used 9e5
+scaling_factors_deconv <<- c('1'=1, '2'=2)
 
 
 # function: connect to MySQL database; message about data selection

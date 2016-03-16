@@ -12,7 +12,7 @@ modlist <- function(
   exclude = NULL,
   labels = NULL, 
   norm = FALSE,
-  baseline = c("none", "mean", "median", "lin", "quad", "parm"),
+  baseline = c("none", "mean", "median", "lin", "quad", "parm", "auto_lin"),
   basecyc = 1:8,
   basefac = 1,
   smooth = NULL, 
@@ -21,7 +21,7 @@ modlist <- function(
   opt = FALSE,
   optPAR = list(sig.level = 0.05, crit = "ftest"),
   verbose = TRUE,
-  fallback = c("none", "mean", "median", "lin", "quad"), # xqrm
+  fallback = NULL, # xqrm
   ...
 )
 {
@@ -101,6 +101,10 @@ modlist <- function(
         # xqrm
         if (baseline_looped == "none") {
           FLUO <- FLUO_ori
+        } else if (baseline_looped == "auto_lin") {
+          FLUO <- baseline(cyc = CYCLES, fluo = FLUO_ori, 
+                           model = try(pcrfit(cbind(CYCLES, FLUO_ori), 1, 2, model, verbose = FALSE, ...), silent=FALSE), 
+                           baseline = baseline_looped, basefac = basefac)
         } else {
           FLUO <- baseline(cyc = CYCLES, fluo = FLUO_ori, model = NULL, baseline = baseline_looped, # xqrm
                            basecyc = basecyc, basefac = basefac) }
