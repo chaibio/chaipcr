@@ -49,11 +49,11 @@ void Optics::setADCValue(unsigned int adcValue, std::size_t channel)
     {
         std::lock_guard<std::mutex> lock(_adcMutex);
 
-        _adcValue = {(adcValue >> 7), channel}; //convert positive range of signed 24 bit ADC value to 16 bit unsigned value
+        _adcValue = {adcValue, channel}; //convert positive range of signed 24 bit ADC value to 16 bit unsigned value
         _adcCondition.notify_all();
     }
 
-    _lastAdcValues[channel] = (adcValue >> 7);
+    _lastAdcValues[channel] = adcValue;
 }
 
 void Optics::setCollectData(bool state, bool isMeltCurve)
