@@ -95,6 +95,10 @@ $sidemenu_width: 352px;
         position: absolute;
         top: 0px;
         left: 157px;
+        &.ng-hide {
+          opacity: 0;
+          transition: opacity .1s;
+        }
       }
 
       .run-exp {
