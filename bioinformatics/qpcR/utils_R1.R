@@ -1124,7 +1124,7 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
   # xqrm
   if (baseline == 'auto_lin') {
     
-    if (class(model) == 'try-error') {
+    if (class(model) == 'try-error' || coef(model)[['b']] > 0) {
       basecyc_last <- length(fluo)
     } else { 
       # start: borrowed from 'efficiency.R'
