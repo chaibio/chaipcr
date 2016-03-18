@@ -38,10 +38,10 @@ describe("Test RUN/VIEW item directive, which shows up in left menu", function()
     var compiledScope = compiled.isolateScope();
     expect(compiledScope.message).toBe("EXPERIMENT STATUS");
     expect(compiledScope.runReady).toBeFalsy();
-    expect(angular.element(compiled).html()).not.toContain("Hardware lid is open");
+    expect(angular.element(compiled).html()).not.toContain("Lid is open");
   });
 
-  it("if lid is open show additional message 'Hardware lid is open'", function () {
+  it("if lid is open show additional message 'Lid is open'", function () {
 
     var elem = angular.element('<experiment-item state-val="RUNNING" lid-open="false"></experiment-item>');
     var compiled = compile(elem)(scope);
@@ -50,7 +50,7 @@ describe("Test RUN/VIEW item directive, which shows up in left menu", function()
     compiledScope.lidOpen = true;
     compiledScope.state = "NOT_STARTED";
     scope.$digest();
-    expect(angular.element(compiled).html()).toContain("Hardware lid is open");
+    expect(angular.element(compiled).html()).toContain("Lid is open");
   });
 
   it("Checks if the click on .exp-message calls manageAction() method", function() {

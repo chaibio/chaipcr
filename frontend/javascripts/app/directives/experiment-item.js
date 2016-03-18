@@ -22,7 +22,6 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
         scope.expID = $stateParams.id;
 
         scope.$watch('state', function(val) {
-          console.log(val, "sdfsdfsdf");
           if(val) {
             if(scope.state === "NOT_STARTED") {
               scope.message = "RUN EXPERIMENT";

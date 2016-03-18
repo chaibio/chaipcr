@@ -63,9 +63,9 @@ describe("Checking the behaviour of menu overlay controller", function() {
     $scope.getExperiment();
     $scope.$digest();
     expect($scope.status).toEqual('COMPLETED');
-    expect($scope.runStatus).toEqual('Run at:');
+    expect($scope.runStatus).toEqual('Run on:');
     expect(Experiment.get).toHaveBeenCalled();
 
   });
-  
+
 });
