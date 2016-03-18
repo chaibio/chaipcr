@@ -3,7 +3,8 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
   '$stateParams',
   '$rootScope',
   'Status',
-  function($state, $stateParams, $rootScope, Status){
+  'Experiment',
+  function($state, $stateParams, $rootScope, Status, Experiment){
     return {
       restrict: 'EA',
       replace: true,
@@ -11,7 +12,8 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
         state: '@stateVal',
         lidOpen: '=lidOpen',
         maxCycle: '=maxCycle',
-        showProp: '=showProp'
+        showProp: '=showProp',
+        experiment: "=exp"
       },
       templateUrl: "app/views/directives/experiment-item.html",
 
@@ -38,6 +40,7 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
         });
 
         scope.manageAction = function() {
+          //console.log($state);
           if(scope.state === "NOT_STARTED" && !scope.lidOpen) {
             scope.runReady = !scope.runReady;
           } else if(!scope.lidOpen){
@@ -46,7 +49,14 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
         };
 
         scope.startExp = function() {
-          $state.go('run-experiment', {id: $stateParams.id, chart: 'amplification', max_cycle: scope.maxCycle});
+          Experiment.startExperiment($stateParams.id).then(function(data) {
+            $rootScope.$broadcast('experiment:started', $stateParams.id);
+            if($state.is('edit-protocol')) {
+              var max_cycle = Experiment.getMaxExperimentCycle(scope.experiment);
+              $state.go('run-experiment', {'id': $stateParams.id, 'chart': 'amplification', 'max_cycle': max_cycle});
+            }
+          });
+          //$state.go('run-experiment', {id: $stateParams.id, chart: 'amplification', max_cycle: scope.maxCycle});
         };
 
       }

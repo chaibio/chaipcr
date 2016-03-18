@@ -10,8 +10,9 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
   ($scope, $stateParams, Experiment, $state, AmplificationChartHelper, Status, $timeout, $rootScope) ->
     $scope.params = $stateParams
     $scope.lidOpen = false
-    $scope.showProperties = false;
-    $scope.status = null;
+    $scope.showProperties = false
+    $scope.status = null
+    $scope.exp = null
 
     $scope.deleteExperiment = ->
       exp = new Experiment id: $stateParams.id
@@ -28,6 +29,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
     $scope.getExperiment = ->
       Experiment.get(id: $stateParams.id).then (data) ->
         $scope.exp = data.experiment
+        #console.log "sdsfsfdsfsdfdsfds", $scope.exp
         if !data.experiment.started_at and !data.experiment.completed_at
           $scope.status = 'NOT_STARTED'
           $scope.runStatus = 'Not run yet.'

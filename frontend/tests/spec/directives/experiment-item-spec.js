@@ -2,15 +2,18 @@ describe("Test RUN/VIEW item directive, which shows up in left menu", function()
 
   beforeEach(module('ChaiBioTech'));
 
-  var scope, controllerService, httpMock, compile, templateCache, state;
+  var scope, controllerService, httpMock, compile, templateCache, state, rootScope, Exp;
 
-  beforeEach(inject(function ($rootScope, $httpBackend, $compile, $templateCache, $state) {
+  beforeEach(inject(function ($rootScope, $httpBackend, $compile, $templateCache, $state, Experiment) {
     scope = $rootScope.$new();
+    rootScope = $rootScope;
     httpMock = $httpBackend;
     compile = $compile;
     templateCache = $templateCache;
+    Exp = Experiment;
     state = $state;
     httpMock.expectGET("http://localhost:8000/status").respond("NOTHING");
+    httpMock.expectPOST("http://localhost:8000/control/start").respond("NOTHING");
   }));
 
   it("passing NOT_STARTED should show RUN EXPERIMENT", function () {
@@ -94,13 +97,21 @@ describe("Test RUN/VIEW item directive, which shows up in left menu", function()
     var compiledScope = compiled.isolateScope();
     spyOn(compiledScope, "manageAction").and.callThrough();
     spyOn(compiledScope, "startExp").and.callThrough();
-    spyOn(state, 'go');
+    spyOn(Exp, 'startExperiment').and.callThrough();
+    spyOn(rootScope, '$broadcast').and.callThrough();
+    spyOn(Exp, "getMaxExperimentCycle").and.callThrough();
+    //state.go("")
+    //spyOn(state, 'go');
+    //console.log(state);
+    state.go("edit-protocol");
     compiled.find(".exp-message").click();
     scope.$digest();
     expect(compiledScope.runReady).toEqual(true);
     expect(compiledScope.manageAction).toHaveBeenCalled();
     compiled.find(".success").click();
     expect(compiledScope.startExp).toHaveBeenCalled();
-    expect(state.go).toHaveBeenCalled();
+    expect(rootScope.$broadcast).toHaveBeenCalled();
+    expect(Exp.startExperiment).toHaveBeenCalled();
+    //expect(Exp.getMaxExperimentCycle).toHaveBeenCalled();
   });
 });
