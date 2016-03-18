@@ -2,7 +2,8 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
   '$state',
   '$stateParams',
   '$rootScope',
-  function($state, $stateParams, $rootScope){
+  'Status',
+  function($state, $stateParams, $rootScope, Status){
     return {
       restrict: 'EA',
       replace: true,
@@ -13,12 +14,15 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
         showProp: '=showProp'
       },
       templateUrl: "app/views/directives/experiment-item.html",
+
       link: function(scope, elem) {
 
         scope.runReady = false;
+
         scope.expID = $stateParams.id;
 
         scope.$watch('state', function(val) {
+          console.log(val, "sdfsdfsdf");
           if(val) {
             if(scope.state === "NOT_STARTED") {
               scope.message = "RUN EXPERIMENT";
@@ -35,10 +39,9 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
         });
 
         scope.manageAction = function() {
-
           if(scope.state === "NOT_STARTED" && !scope.lidOpen) {
             scope.runReady = !scope.runReady;
-          } else {
+          } else if(!scope.lidOpen){
             $state.go('run-experiment', {id: $stateParams.id, chart: 'amplification', max_cycle: scope.maxCycle});
           }
         };
@@ -46,7 +49,7 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
         scope.startExp = function() {
           $state.go('run-experiment', {id: $stateParams.id, chart: 'amplification', max_cycle: scope.maxCycle});
         };
-        
+
       }
     };
   }

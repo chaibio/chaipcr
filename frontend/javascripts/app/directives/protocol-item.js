@@ -8,6 +8,7 @@ window.ChaiBioTech.ngApp.directive('protocolItem', [
       templateUrl: 'app/views/directives/protocol-item.html',
       link: function(scope, elem) {
         scope.message = "";
+
         scope.$watch('state', function(data) {
           if(data) {
             if(scope.state === 'NOT_STARTED') {
