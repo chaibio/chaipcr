@@ -27,9 +27,9 @@ boost::posix_time::ptime parseIsoTime(const std::string &str)
 
     stream >> year;
     stream.ignore();
-    stream >> day;
-    stream.ignore();
     stream >> month;
+    stream.ignore();
+    stream >> day;
     stream.ignore();
     stream >> hours;
     stream.ignore();
