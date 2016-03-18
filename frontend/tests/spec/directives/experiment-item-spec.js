@@ -2,13 +2,14 @@ describe("Test RUN/VIEW item directive, which shows up in left menu", function()
 
   beforeEach(module('ChaiBioTech'));
 
-  var scope, controllerService, httpMock, compile, templateCache;
+  var scope, controllerService, httpMock, compile, templateCache, state;
 
-  beforeEach(inject(function ($rootScope, $httpBackend, $compile, $templateCache) {
+  beforeEach(inject(function ($rootScope, $httpBackend, $compile, $templateCache, $state) {
     scope = $rootScope.$new();
     httpMock = $httpBackend;
     compile = $compile;
     templateCache = $templateCache;
+    state = $state;
     httpMock.expectGET("http://localhost:8000/status").respond("NOTHING");
   }));
 
@@ -66,5 +67,40 @@ describe("Test RUN/VIEW item directive, which shows up in left menu", function()
     expect(compiledScope.runReady).toEqual(true);
     expect(compiledScope.manageAction).toHaveBeenCalled();
 
+  });
+
+  it("Checks if the click on .exp-message calls manageAction() method and redirects", function() {
+
+    var elem = angular.element('<experiment-item state-val="RUNNING" lid-open="false"></experiment-item>');
+    var compiled = compile(elem)(scope);
+    scope.$digest();
+
+    var compiledScope = compiled.isolateScope();
+    spyOn(compiledScope, "manageAction").and.callThrough();
+    spyOn(state, 'go');
+    compiled.find(".exp-message").click();
+    scope.$digest();
+    expect(compiledScope.manageAction).toHaveBeenCalled();
+    expect(state.go).toHaveBeenCalled();
+  });
+
+
+  it("Checks if the click on CONFIRM calls startExp() method", function() {
+
+    var elem = angular.element('<experiment-item state-val="NOT_STARTED" lid-open="false"></experiment-item>');
+    var compiled = compile(elem)(scope);
+    scope.$digest();
+
+    var compiledScope = compiled.isolateScope();
+    spyOn(compiledScope, "manageAction").and.callThrough();
+    spyOn(compiledScope, "startExp").and.callThrough();
+    spyOn(state, 'go');
+    compiled.find(".exp-message").click();
+    scope.$digest();
+    expect(compiledScope.runReady).toEqual(true);
+    expect(compiledScope.manageAction).toHaveBeenCalled();
+    compiled.find(".success").click();
+    expect(compiledScope.startExp).toHaveBeenCalled();
+    expect(state.go).toHaveBeenCalled();
   });
 });

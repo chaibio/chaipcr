@@ -11,6 +11,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
     $scope.params = $stateParams
     $scope.lidOpen = false
     $scope.showProperties = false;
+    $scope.status = null;
 
     $scope.deleteExperiment = ->
       exp = new Experiment id: $stateParams.id
