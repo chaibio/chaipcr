@@ -5,7 +5,7 @@ window.ChaiBioTech.ngApp.directive("editLidTemp", [
       restric: 'E',
       bindToController: true,
 
-      templateUrl: "app/views/experiment/experiment-properties-suboption.html",
+      templateUrl: "app/views/experiment/experiment-properties-lid-temp.html",
       controller: 'EditExperimentPropertiesCtrl',
 
       link: function($scope, elem) {

@@ -50,6 +50,7 @@ window.ChaiBioTech.ngApp.controller 'EditExperimentPropertiesCtrl', [
       $scope.selectedType = type
 
     $scope.focusExpName = ->
+      
       if $scope.status == "NOT_STARTED"
         $scope.removeMessages()
         $scope.editExpNameMode = true
