@@ -29,7 +29,6 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
     $scope.getExperiment = ->
       Experiment.get(id: $stateParams.id).then (data) ->
         $scope.exp = data.experiment
-        #console.log "sdsfsfdsfsdfdsfds", $scope.exp
         if !data.experiment.started_at and !data.experiment.completed_at
           $scope.status = 'NOT_STARTED'
           $scope.runStatus = 'Not run yet.'

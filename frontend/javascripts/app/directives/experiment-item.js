@@ -40,7 +40,7 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
         });
 
         scope.manageAction = function() {
-          //console.log($state);
+
           if(scope.state === "NOT_STARTED" && !scope.lidOpen) {
             scope.runReady = !scope.runReady;
           } else if(!scope.lidOpen){
@@ -56,7 +56,6 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
               $state.go('run-experiment', {'id': $stateParams.id, 'chart': 'amplification', 'max_cycle': max_cycle});
             }
           });
-          //$state.go('run-experiment', {id: $stateParams.id, chart: 'amplification', max_cycle: scope.maxCycle});
         };
 
       }

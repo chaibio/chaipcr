@@ -2,7 +2,7 @@ describe("Test RUN/VIEW item directive, which shows up in left menu", function()
 
   beforeEach(module('ChaiBioTech'));
 
-  var scope, controllerService, httpMock, compile, templateCache, state, rootScope, Exp;
+  var scope, controllerService, httpMock, compile, templateCache, state, rootScope, Experiment;
 
   beforeEach(inject(function ($rootScope, $httpBackend, $compile, $templateCache, $state, Experiment) {
     scope = $rootScope.$new();
@@ -12,8 +12,10 @@ describe("Test RUN/VIEW item directive, which shows up in left menu", function()
     templateCache = $templateCache;
     Exp = Experiment;
     state = $state;
+    state.go("edit-protocol");
     httpMock.expectGET("http://localhost:8000/status").respond("NOTHING");
-    httpMock.expectPOST("http://localhost:8000/control/start").respond("NOTHING");
+    httpMock.expectPOST("http://localhost:8000/control/start").respond({});
+
   }));
 
   it("passing NOT_STARTED should show RUN EXPERIMENT", function () {
@@ -93,25 +95,28 @@ describe("Test RUN/VIEW item directive, which shows up in left menu", function()
     var elem = angular.element('<experiment-item state-val="NOT_STARTED" lid-open="false"></experiment-item>');
     var compiled = compile(elem)(scope);
     scope.$digest();
-
     var compiledScope = compiled.isolateScope();
+
     spyOn(compiledScope, "manageAction").and.callThrough();
     spyOn(compiledScope, "startExp").and.callThrough();
     spyOn(Exp, 'startExperiment').and.callThrough();
     spyOn(rootScope, '$broadcast').and.callThrough();
     spyOn(Exp, "getMaxExperimentCycle").and.callThrough();
-    //state.go("")
-    //spyOn(state, 'go');
-    //console.log(state);
-    state.go("edit-protocol");
+    spyOn(state, 'go');
+
     compiled.find(".exp-message").click();
     scope.$digest();
+
     expect(compiledScope.runReady).toEqual(true);
     expect(compiledScope.manageAction).toHaveBeenCalled();
+
     compiled.find(".success").click();
+    httpMock.flush();
+
     expect(compiledScope.startExp).toHaveBeenCalled();
-    expect(rootScope.$broadcast).toHaveBeenCalled();
     expect(Exp.startExperiment).toHaveBeenCalled();
-    //expect(Exp.getMaxExperimentCycle).toHaveBeenCalled();
+    expect(Exp.getMaxExperimentCycle).toHaveBeenCalled();
+    expect(rootScope.$broadcast).toHaveBeenCalled();
+    expect(state.go).toHaveBeenCalled();
   });
 });
