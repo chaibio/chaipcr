@@ -17,9 +17,7 @@ angular.module("canvasApp").factory('stepTemperature', [
           top : this.parent.top + 10,
           left: this.parent.left - 15,
           fontFamily: "dinot-bold",
-          selectable: false,
-          //editable: true
-          //fontWeight: "800"
+          selectable: false
         });
 
       };
