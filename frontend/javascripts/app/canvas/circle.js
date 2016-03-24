@@ -68,7 +68,8 @@ angular.module("canvasApp").factory('circle', [
 
         this.getLeft();
         this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
-        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
+        //this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
+        //this.temperatureData.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
         this.gatherDataDuringRampGroup.set({"left": this.left}).setCoords();
       };
 
@@ -289,13 +290,13 @@ angular.module("canvasApp").factory('circle', [
 
         if(state && this.big) {
           this.pauseStepOnScrollGroup.setVisible(true);
-          this.holdTime.setVisible(false);
+          this.holdTimeData.setVisible(false);
         } else if(state) {
-          this.holdTime.setVisible(false);
+          this.holdTimeData.setVisible(false);
           this.applyPauseChanges();
         } else {
           this.pauseStepOnScrollGroup.setVisible(false);
-          //this.holdTime.setVisible(true);
+          this.holdTimeData.setVisible(true);
         }
       };
 
