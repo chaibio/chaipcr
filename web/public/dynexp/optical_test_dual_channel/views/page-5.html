@@ -21,7 +21,7 @@
 
   <div class="text-center">
 
-    <button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ng-click="resumeExperiment()">NEXT</button>
+    <button ng-show="!cancel" ng-disabled="getErrors().length > 0" ng-class="{errorButton: getErrors().length > 0}" ng-click="resumeExperiment()">NEXT</button>
   </div>
 
 </div>
