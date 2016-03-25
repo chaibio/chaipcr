@@ -15,11 +15,6 @@
     function OpticalCalibrationCtrl($scope, $window, Experiment, $state, Status, GlobalService, Constants,
       host, $http, $interval, $uibModal, $rootScope) {
 
-      var ERRORS = {
-        OFFLINE: "Can't connect to the machine.",
-        "CANT_CREATE_EXPERIMENT": "Can't create experiment.",
-        "CANT_START_EXPERIMENT": "Can't start experiment."
-      };
       var checkMachineStatusInterval = null;
       var errorModal = null;
       var pages = [
@@ -33,6 +28,9 @@
         'page-8',
         'page-9',
       ];
+
+      var ERROR_TYPES = ['OFFLINE', 'CANT_CREATE_EXPERIMENT', 'CANT_START_EXPERIMENT', 'LID_OPEN', 'UNKNOWN_ERROR'];
+      $scope.errors = {};
 
       $scope.$on('status:data:updated', function(e, data, oldData) {
         if (!data) return;
@@ -72,27 +70,24 @@
           // experiment is complete
           Experiment.get($scope.experiment.id).then(function(resp) {
             $scope.experiment = resp.data.experiment;
-            if ($scope.experiment.completion_status !== 'success') {
-              $state.go('page-9');
-              return;
-            }
-            Experiment.analyze($scope.experiment.id)
-            .then(function(resp) {
-              $state.go('page-9');
-              $scope.result = resp.data;
-              $scope.valid = true;
-              for (var i = resp.data.valid.length - 1; i >= 0; i--) {
-                if (resp.data.valid[i] === false) {
-                  $scope.valid = false;
-                  break;
-                }
-              }
-              if ($scope.valid) $http.put(host + '/settings', { settings: { "calibration_id": $scope.experiment.id } });
-            })
-            .catch(function (resp) {
-              $scope.error = resp.data.errors;
-              $state.go('page-9');
-            });
+            $state.go('page-9');
+            // Experiment.analyze($scope.experiment.id)
+            // .then(function(resp) {
+            //   $state.go('page-9');
+            //   $scope.result = resp.data;
+            //   $scope.valid = true;
+            //   for (var i = resp.data.valid.length - 1; i >= 0; i--) {
+            //     if (resp.data.valid[i] === false) {
+            //       $scope.valid = false;
+            //       break;
+            //     }
+            //   }
+            //   if ($scope.valid) $http.put(host + '/settings', { settings: { "calibration_id": $scope.experiment.id } });
+            // })
+            // .catch(function (resp) {
+            //   $scope.error = resp.data.errors;
+            //   $state.go('page-9');
+            // });
           });
         }
       });
@@ -108,17 +103,19 @@
               errorModal = null;
             }
 
-            if ($scope.error === ERRORS.OFFLINE) {
-              $scope.error = null;
+            if ($scope.errors['OFFLINE']) {
+              delete $scope.errors['OFFLINE'];
             }
 
             if (deviceStatus.optics.lid_open === "true" || deviceStatus.optics.lid_open === true) { // lid is open
-              $scope.error = "Close lid to begin.";
+              $scope.errors.LID_OPEN = "Close lid to begin.";
+            } else {
+              delete $scope.errors['LID_OPEN'];
             }
           })
           .catch(function(err) {
             // Error
-            $scope.error = ERRORS.OFFLINE;
+            $scope.errors['OFFLINE'] = "Can't connect to the machine.";
 
             if (err.status === 500) {
 
@@ -172,16 +169,15 @@
             Experiment.startExperiment(resp.data.experiment.id)
               .then(function() {
                 $scope.experiment = resp.data.experiment;
-                $scope.error = null;
+                $scope.errors = {};
                 $scope.next();
               })
               .catch(function(resp) {
-                var error = ERRORS.CANT_START_EXPERIMENT;
-                $scope.error = resp.data ? (resp.data.status ? (resp.data.status.error) : error) : error;
+                $scope.errors.CANT_START_EXPERIMENT = "Can't start experiment.";
               });
           })
           .catch(function(err) {
-            $scope.error = ERRORS.CANT_CREATE_EXPERIMENT;
+            $scope.errors.CANT_CREATE_EXPERIMENT = "Unable to create experiment.";
           });
       };
 
@@ -225,6 +221,15 @@
 
         var steps = $scope.experiment.protocol.stages[0].stage.steps;
         return steps[steps.length - 1].step.hold_time || 0;
+      };
+
+      $scope.getErrors = function () {
+        var errors = [];
+        for (var i = ERROR_TYPES.length - 1; i >= 0; i--) {
+          if($scope.errors[ERROR_TYPES[i]])
+            errors.push($scope.errors[ERROR_TYPES[i]]);
+        }
+        return errors;
       };
 
     }

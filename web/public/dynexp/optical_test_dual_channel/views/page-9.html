@@ -1,15 +1,13 @@
-<div class="intro">
+<div class="intro" ng-controller="AnalyzeCtrl">
   <h2> Optical Test Results</h2>
 
-  <h4 class="text-center" ng-show="!experiment.completion_status && analyzing"><b>Analyzing Results...</b></h4>
-
-  <div ng-show="experiment.completion_status !== 'success' && !analyzing">
+  <div ng-show="experiment.completion_status !== 'success'">
     <div class="alert alert-danger">
       <strong>Experiment Failed!</strong> {{ experiment.completion_message }}
     </div>
   </div>
 
-  <div class="row" ng-show="experiment.completion_status === 'success' && !analyzing && !!analyzedExp">
+  <div class="row" ng-show="experiment.completion_status === 'success'">
     <div class="col-md-6">
       <table class="table table-bordered">
         <thead>
@@ -23,11 +21,11 @@
         <tbody>
           <tr ng-repeat="i in loop">
             <td>{{i+1}}</td>
-            <td>{{analyzedExp[i].baseline.fluorescence_value}}</td>
-            <td>{{analyzedExp[i].excitation.fluorescence_value}}</td>
+            <td>xxx</td>
+            <td>xxx</td>
             <td>
-              <span class="text-success" ng-show="getResult(analyzedExp[i])">PASS</span>
-              <span class="text-danger" ng-show="!getResult(analyzedExp[i])">FAIL</span>
+              <span class="text-success" ng-show="true">PASS</span>
+              <span class="text-danger" ng-show="false">FAIL</span>
             </td>
           </tr>
         </tbody>
@@ -51,8 +49,8 @@
             <td>{{analyzedExp[i+8].baseline.fluorescence_value}}</td>
             <td>{{analyzedExp[i+8].excitation.fluorescence_value}}</td>
             <td>
-              <span class="text-success" ng-show="getResult(analyzedExp[i+8])">PASS</span>
-              <span class="text-danger" ng-show="!getResult(analyzedExp[i+8])">FAIL</span>
+              <span class="text-success" ng-show="true">PASS</span>
+              <span class="text-danger" ng-show="false">FAIL</span>
             </td>
           </tr>
         </tbody>
@@ -60,7 +58,7 @@
     </div>
   </div>
 
-  <div class="text-center" ng-show="analyzedExp">
+  <div class="text-center">
     <a href="/#/settings/" class="button">CONTINUE</a>
   </div>
 
