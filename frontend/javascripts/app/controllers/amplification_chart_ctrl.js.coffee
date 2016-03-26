@@ -17,7 +17,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       hasData = false
       hasInit = false
       drag_scroll = $('#ampli-drag-scroll')
-      $scope.chartConfig = helper.chartConfig(is_dual_channel)
+      $scope.chartConfig = helper.chartConfig($scope.is_dual_channel)
       $scope.chartConfig.axes.x.ticks = helper.Xticks $stateParams.max_cycle || 1
       $scope.chartConfig.axes.x.max = $stateParams.max_cycle || 1
       $scope.data = helper.paddData()

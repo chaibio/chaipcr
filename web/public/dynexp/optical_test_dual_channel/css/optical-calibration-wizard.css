@@ -71,7 +71,7 @@ p.step{
 /*tubes container sulotion label*/
 .tubes-container .solution-label img {
     display: inline-block;
-    margin: 0 5px;
+    margin: 0;
     margin-right: 10px;
     vertical-align: middle;
     height: 20px;
