@@ -19,60 +19,34 @@
           </div>
         </div>
       </div>
-      <!-- <span class="plot-type-checkboxes SH">
-        <span class="checkbox-item" ng-click="curve_type = 'derivative'" ng-class="{checked:curve_type === 'derivative', unchecked: curve_type !== 'derivative'}">
-          <span class="checkbox-icon">
-            <span class="inner"></span>
-          </span>
-          DERIVATIVE
-        </span>
-        <span class="checkbox-item" ng-click="curve_type = 'normalized'" ng-class="{checked:curve_type === 'normalized', unchecked: curve_type !== 'normalized'}">
-          <span class="checkbox-icon">
-            <span class="inner"></span>
-          </span>
-          NORMALIZED
-        </span>
-      </span> -->
     </div>
-
 
     <div class="chart-section">
-
-    <div class="text-center loading SH" ng-show="!data && loading">
-      <strong>Loading melt curve data. This will take around 5 mins<ellipsis-animated></ellipsis-animated></strong>
-    </div>
-
-    <div class="text-center text-red loading" ng-show="error && !loading">
-      {{error}}
-    </div>
-
-    <div ng-show="data">
-      <div class="vertical-text SH">
-        <span ng-show="curve_type === 'derivative'">DERIVATIVE REPORTER</span>
-        <span ng-show="curve_type === 'normalized'">NORMALIZED REPORTER</span>
+      <div class="text-center text-red loading" ng-show="error && !loading">
+        {{error}}
       </div>
-      <div ng-if="RunExperimentCtrl.chart==='melt-curve' || !!data" class="chart-container" id="meltcurve-drag-scroll" chart-drag-scroll ng-model="melt_curve_scroll">
-        <linechartv2 ng-show="curve_type==='derivative'"
-         data-drag-scroll="meltcurve-drag-scroll" data="data" options="chartConfigDerivative" width="1024" height="400" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks"></linechartv2>
-        <linechartv2 ng-show="curve_type==='normalized'" data-drag-scroll="meltcurve-drag-scroll" data="data" options="chartConfigNormalized" width="1024" height="400" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks"></linechartv2>
-      </div>
-      <!-- <div class="text-center x-axis-text SH">TEMPERATURE (&deg;C)</div> -->
-
-      <!-- <div class="zoom-scroll-container">
-        <div class="row">
-          <div class="col-md-6">
-            <div class="zoom-container">
-              <div class="zoom-text SH">
-                <b>ZOOM</b>
-              </div>
-              <ampli-slider ng-model="melt_curve_zoom" range="maxCycle"></ampli-slider>
-            </div>
+      <div>
+        <div class="vertical-text SH">
+          <span ng-show="curve_type === 'derivative'">DERIVATIVE REPORTER</span>
+          <span ng-show="curve_type === 'normalized'">NORMALIZED REPORTER</span>
+        </div>
+        <div ng-if="RunExperimentCtrl.chart==='melt-curve' || !!data" class="chart-container" id="meltcurve-drag-scroll" chart-drag-scroll ng-model="melt_curve_scroll">
+      
+          <div class="loading-blue-container" ng-show="!data && loading">
+          <!-- <div class="loading-blue-container" ng-show="true"> -->
+            <div class="loading-blue"></div>
+            <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
+            <p class="B2">May take a minute</p>
           </div>
-          <div class="col-md-6 ampli-scrollbar-container">
-            <scrollbar ng-model="melt_curve_scroll" id="ampli-scrollbar"></scrollbar>
+
+          <div ng-show="!!data">
+            <linechartv2 ng-show="curve_type==='derivative'"
+             data-drag-scroll="meltcurve-drag-scroll" data="data" options="chartConfigDerivative" width="1024" height="400" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks">
+            </linechartv2>
+            <linechartv2 ng-show="curve_type==='normalized'" data-drag-scroll="meltcurve-drag-scroll" data="data" options="chartConfigNormalized" width="1024" height="400" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks">
+            </linechartv2>
           </div>
         </div>
-      </div> -->
 
       </div>
     </div>
