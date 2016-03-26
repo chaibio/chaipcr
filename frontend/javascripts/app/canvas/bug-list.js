@@ -2,3 +2,5 @@
 // near to the gather data bubble , hold time is misplaced.
 
 // 2)  when cycling stage has only one step, next stage overlaps cycle no
+
+// 3) http://jsfiddle.net/srshah23/3pwb2404/2/
