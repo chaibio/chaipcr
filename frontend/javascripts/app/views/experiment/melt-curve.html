@@ -39,7 +39,7 @@
             <p class="B2">May take a minute</p>
           </div>
 
-          <div ng-show="!!data">
+          <div ng-show="!!data" class="charts">
             <linechartv2 ng-show="curve_type==='derivative'"
              data-drag-scroll="meltcurve-drag-scroll" data="data" options="chartConfigDerivative" width="1024" height="400" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks">
             </linechartv2>

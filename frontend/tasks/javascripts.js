@@ -47,6 +47,7 @@ var vendorFiles = [
   'libs/ellipsis-animated.js',
   'libs/ng-file-upload-shim.js',
   'libs/ng-file-upload.js',
+  'libs/ng-webworker.js',
 
 ];
 var appFiles = [
@@ -167,7 +168,11 @@ gulp.task('uglify', ['concat-js', 'hash-js'], function () {
   var stream = gulp.src('.tmp/js/'+applicationJS+'.js');
 
   if(!isDebug) {
-    stream.pipe(uglify())
+    stream.pipe(uglify({
+      mangle: {
+        except: ['notify', 'complete', '_transferable_']
+      }
+    }))
           .on('error', swallowError)
           .pipe(stripDebug())
           .on('error', swallowError);

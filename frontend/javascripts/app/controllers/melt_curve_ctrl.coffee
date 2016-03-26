@@ -16,7 +16,6 @@ App.controller 'MeltCurveCtrl', [
       $timeout ->
         Experiment.getMeltCurveData($stateParams.id)
         .then (resp) ->
-          $scope.loading = false
           cb(resp.data) if !!cb
         .catch ->
           $scope.loading = false
@@ -45,7 +44,9 @@ App.controller 'MeltCurveCtrl', [
                   max: temp_range.max
                   ticks: MeltCurveService.XTicks(temp_range.min, temp_range.max)
 
-            $scope.data = MeltCurveService.parseData data.melt_curve_data
+            MeltCurveService.parseData data.melt_curve_data, (data) ->
+              $scope.loading = false
+              $scope.data = data
             $scope.$broadcast '$reload:n3:charts'
 
     $scope.$watch ->
