@@ -259,7 +259,8 @@ then
         echo "Resume eMMC unpacking flag found up"
         incriment_restart_counter
 
-        if [ "$counter" -ge 7 ]
+# was limited to 7 trails only.. if [ "$counter" -ge 7 ]
+	if [ false ]
         then
                 echo Restart counter exceeded 7.. quitting upgrade operation
                 stop_packing_restarting
@@ -301,19 +302,19 @@ isValidPermGeometry () {
 		return 1
 	fi
 	result=1
-	
+
 	start=$(hdparm -g ${eMMC}p4 | awk -F 'start =' '{print $2}')
 	if [ -z $start ]
 	then
 		echo No valid geometry found.
 		return 1
 	fi
-	
+
 	echo partition starts at $start
 	if [ $start -eq 7649280 ]
 	then
 		echo "Partition geometery is compatible."
-		result=0	
+		result=0
 	else
 		echo "Partition geometery is not compatible."
 		return 1
@@ -366,7 +367,7 @@ then
 	if [ $isValidGeoResult -eq 0 ]
 	then
 		echo Partition geometery is now valid.. formatting...
-		format_perm		
+		format_perm
 	else
 		echo geometery still not valid for /perm partition.
 	fi
