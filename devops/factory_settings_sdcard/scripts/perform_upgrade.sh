@@ -109,14 +109,6 @@ umount ${uEnvPath}
 echo "Restarting to packing eMMC image.."
 echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 
-if [ -e /data/.tmp/shadow.backup ]
-then
-	rm /data/.tmp/shadow.backup
-else
-	mkdir -p /data/.tmp/
-fi
-cp /etc/shadow /data/.tmp/shadow.backup
-
 sh $BASEDIR/rebootx.sh
 
 exit_with_message Success 0 $1
