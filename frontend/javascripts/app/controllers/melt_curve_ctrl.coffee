@@ -47,7 +47,10 @@ App.controller 'MeltCurveCtrl', [
             MeltCurveService.parseData data.melt_curve_data, (data) ->
               $scope.loading = false
               $scope.data = data
-            $scope.$broadcast '$reload:n3:charts'
+
+              $timeout ->
+                $scope.$broadcast '$reload:n3:charts'
+              , 1500
 
     $scope.$watch ->
       $scope.RunExperimentCtrl.chart
@@ -55,6 +58,6 @@ App.controller 'MeltCurveCtrl', [
       if chart is 'temperature-logs'
         $timeout ->
           $scope.$broadcast '$reload:n3:charts'
-        , 500
+        , 3000
 
 ]
