@@ -14,7 +14,7 @@ angular.module("canvasApp").factory('stepHoldTime', [
           fill: 'black',
           fontSize: 20,
           top : this.parent.top + 10,
-          left: this.parent.left + 75,
+          left: this.parent.left + 40,
           fontFamily: "dinot",
           //fontWeight: 'normal',
           selectable: false

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160217071210) do
+ActiveRecord::Schema.define(version: 20160328065404) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"

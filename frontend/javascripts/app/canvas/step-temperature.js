@@ -15,12 +15,10 @@ angular.module("canvasApp").factory('stepTemperature', [
           fill: 'black',
           fontSize: 20,
           top : this.parent.top + 10,
-          left: this.parent.left + 15,
+          left: this.parent.left - 15,
           fontFamily: "dinot-bold",
-          editable: true,
-          hasControls: false,
-          hasBorders: false,
-          hoverCursor: 'context-menu'
+          selectable: false,
+          //fontWeight: "800"
         });
 
       };

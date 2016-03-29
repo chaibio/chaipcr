@@ -68,8 +68,7 @@ angular.module("canvasApp").factory('circle', [
 
         this.getLeft();
         this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
-        //this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
-        //this.temperatureData.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
+        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
         this.gatherDataDuringRampGroup.set({"left": this.left}).setCoords();
       };
 
@@ -116,9 +115,8 @@ angular.module("canvasApp").factory('circle', [
       ********************************************/
       this.getCircle = function() {
 
-        //this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
-        this.canvas.add(this.temperatureData);
-        this.canvas.add(this.holdTimeData);
+        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
+        this.canvas.add(this.stepDataGroup);
 
         this.gatherDataCircleOnScroll = new gatherDataCircleOnScroll();
         this.gatherDataOnScroll = new gatherDataGroupOnScroll(
@@ -174,7 +172,7 @@ angular.module("canvasApp").factory('circle', [
         var holdTimeText = this.parent.holdDuration || this.model.hold_time;
 
         if(parseInt(holdTimeText) === 0) {
-          this.holdTimeData.text = "∞";
+          this.holdTime.text = "∞";
         }
       };
 
@@ -188,7 +186,7 @@ angular.module("canvasApp").factory('circle', [
           holdTimeMinute = "0" + holdTimeMinute;
         }
 
-        this.holdTimeData.text = holdTimeHour + ":" + holdTimeMinute;
+        this.holdTime.text = holdTimeHour + ":" + holdTimeMinute;
       };
 
       this.render = function() {
@@ -206,13 +204,10 @@ angular.module("canvasApp").factory('circle', [
             )
           ], this);
 
-        /*this.stepDataGroup = new stepDataGroup([
+        this.stepDataGroup = new stepDataGroup([
             this.temperature = new stepTemperature(this.model, this),
             this.holdTime = new stepHoldTime(this.model, this)
           ], this);
-          */
-          this.temperatureData = new stepTemperature(this.model, this);
-          this.holdTimeData = new stepHoldTime(this.model, this);
       };
 
       this.makeItBig = function() {
@@ -248,7 +243,7 @@ angular.module("canvasApp").factory('circle', [
         this.circle.setRadius(11);
         this.circle.setStrokeWidth(8);
         this.outerCircle.setStroke(null);
-        //this.stepDataGroup.setVisible(true);
+        this.stepDataGroup.setVisible(true);
         this.littleCircleGroup.visible = false;
 
         if(this.model.collect_data) {
@@ -290,13 +285,13 @@ angular.module("canvasApp").factory('circle', [
 
         if(state && this.big) {
           this.pauseStepOnScrollGroup.setVisible(true);
-          this.holdTimeData.setVisible(false);
+          this.holdTime.setVisible(false);
         } else if(state) {
-          this.holdTimeData.setVisible(false);
+          this.holdTime.setVisible(false);
           this.applyPauseChanges();
         } else {
           this.pauseStepOnScrollGroup.setVisible(false);
-          this.holdTimeData.setVisible(true);
+          this.holdTime.setVisible(true);
         }
       };
 
@@ -312,7 +307,7 @@ angular.module("canvasApp").factory('circle', [
           targetCircleGroup.setTop(this.scrollLength);
           this.manageRampLineMovement(left, this.scrollLength, targetCircleGroup);
         } else {
-          //this.stepDataGroup.setTop(top + 48);
+          this.stepDataGroup.setTop(top + 48);
           this.manageRampLineMovement(left, top, targetCircleGroup);
         }
       };
@@ -357,7 +352,7 @@ angular.module("canvasApp").factory('circle', [
         }
 
         dynamicTemp = Math.abs(dynamicTemp).toFixed(1);
-        this.temperatureData.text = String(dynamicTemp + "º");
+        this.temperature.text = String(dynamicTemp + "º");
         this.model.temperature = String(dynamicTemp);
       };
 

@@ -36,7 +36,7 @@ angular.module("canvasApp").directive('actions', [
 
             if(scope.fabricStep) {
 
-              if(scope.fabricStep.circle.holdTimeData.text === "∞") {
+              if(scope.fabricStep.circle.holdTime.text === "∞") {
                 scope.infiniteHoldStep = scope.infiniteHoldStage = true;
                 return true;
               }
@@ -56,7 +56,7 @@ angular.module("canvasApp").directive('actions', [
         scope.containInfiniteStep = function(stage) {
 
           var lastStep = stage.childSteps[stage.childSteps.length - 1];
-          if(lastStep.circle.holdTimeData.text === "∞") {
+          if(lastStep.circle.holdTime.text === "∞") {
             return true;
           }
           return false;
