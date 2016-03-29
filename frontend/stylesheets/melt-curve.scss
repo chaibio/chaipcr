@@ -9,7 +9,15 @@
   }
 
   .chart-container {
-    height: 400px;
+
+    .loading-blue-container {
+      left: 560px;
+      top: 220px;
+    }
+  
+    .charts {
+      height: 400px;
+    }
   }
 
   .chart-legend {

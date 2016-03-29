@@ -1,8 +1,8 @@
 App.service 'MeltCurveService', [
   'AmplificationChartHelper'
-  (AmplificationChartHelper) ->
+  'Webworker'
+  (AmplificationChartHelper, Webworker) ->
     self = @
-
 
     self.chartConfig = (type) ->
       series = []
@@ -56,7 +56,7 @@ App.service 'MeltCurveService', [
         return calib
     # end ticks
 
-    self.parseData = (data) ->
+    parseData = (data) ->
       datasets = {}
 
       for well, i in data by 1
@@ -69,8 +69,12 @@ App.service 'MeltCurveService', [
             normalized: data[i].fluorescence_data[ii]
 
       return datasets
-    # end parseData
 
+    self.parseData = (data, cb) ->
+      parser = Webworker.create(parseData);
+      parser.run(data).then (result) ->
+        cb(result)
+    # end parseData
 
     self.getTempRange = (data) ->
       temps = []

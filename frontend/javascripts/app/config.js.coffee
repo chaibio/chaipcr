@@ -27,9 +27,14 @@ window.ChaiBioTech.ngApp
 
 .config [
   'laddaProvider'
-  (laddaProvider) ->
+  'WebworkerProvider'
+  (laddaProvider, WebworkerProvider) ->
     laddaProvider.setOption
       style: 'expand-right'
+
+    WebworkerProvider.setHelperPath("/worker_wrapper.js")
+    WebworkerProvider.setUseHelper(false)
+    WebworkerProvider.setTransferOwnership(true)
 ]
 
 .value 'host', "http://#{window.location.hostname}"

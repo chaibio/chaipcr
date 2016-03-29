@@ -310,17 +310,4 @@ else
 	upgrade_autorun_flag_up
 fi
 
-if [ "$1" != "factorysettings" ]
-then
-	mkdir -p /tmp/data
-	mount ${eMMC}p3 /tmp/data
-	if [ -e /tmp/data/.tmp/shadow.backup ]
-	then
-		mkdir -p /tmp/rootfs
-		mount ${eMMC}p2 /tmp/rootfs
-		mv /tmp/data/.tmp/shadow.backup /tmp/rootfs/etc/shadow
-		rm -r /tmp/data/.tmp
-	fi
-fi
-
 exit 0
