@@ -307,7 +307,7 @@ angular.module("canvasApp").factory('circle', [
           targetCircleGroup.setTop(this.scrollLength);
           this.manageRampLineMovement(left, this.scrollLength, targetCircleGroup);
         } else {
-          this.stepDataGroup.setTop(top + 48);
+          this.stepDataGroup.setTop(top + 48).setCoords();
           this.manageRampLineMovement(left, top, targetCircleGroup);
         }
       };

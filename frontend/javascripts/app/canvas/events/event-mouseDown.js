@@ -27,6 +27,13 @@ angular.module("canvasApp").factory('mouseDown', [
 
         switch(evt.target.name)  {
 
+          case "stepDataGroup":
+            //console.log("clicked", evt);
+            var click = evt.e;
+            var target = evt.target;
+            console.log(click.clientX, target.left - 40, evt);
+            //mechanism to know where did we click on temp or hold time.
+          break;
           case "stepGroup":
 
             me = evt.target.me;

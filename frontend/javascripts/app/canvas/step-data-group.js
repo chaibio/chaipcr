@@ -7,7 +7,8 @@ angular.module("canvasApp").factory('stepDataGroup', [
         originX: "center",
         originY: "center",
         selectable: false,
-        evented: false,
+        name: "stepDataGroup",
+        evented: true,
       });
     };
   }
