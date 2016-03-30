@@ -40,7 +40,7 @@ window.ChaiBioTech.ngApp.directive('temperature', [
         };
 
         scope.save = function() {
-
+          console.log("saving ...... !");
           scope.edit = false;
           if(! isNaN(scope.hidden) && editValue !== Number(scope.hidden)) {
 

@@ -10,7 +10,7 @@ window.ChaiBioTech.ngApp.directive('temp', [
         unit: "@",
         reading: '=',
         delta: '=',
-        action: '&' // Learn how to pass value in this scenario
+        action: '&'
       },
       templateUrl: 'app/views/directives/temp-time.html',
       transclude: true,

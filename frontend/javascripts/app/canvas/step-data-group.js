@@ -9,6 +9,7 @@ angular.module("canvasApp").factory('stepDataGroup', [
         selectable: false,
         name: "stepDataGroup",
         evented: true,
+        parentCircle: parent,
       });
     };
   }

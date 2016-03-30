@@ -11,19 +11,24 @@ angular.module("canvasApp").factory('stepTemperature', [
         var temp = parseFloat(this.stepData.temperature);
         temp = (temp < 100) ? temp.toFixed(1) : temp;
 
-        this.text = new fabric.Text(temp +"º", {
+        this.text = new fabric.IText(temp +"º", {
           fill: 'black',
           fontSize: 20,
           top : this.parent.top + 10,
           left: this.parent.left - 15,
           fontFamily: "dinot-bold",
           selectable: false,
-          //fontWeight: "800"
+          hasBorder: false
         });
 
       };
 
       this.render();
+
+      this.text.on('editing:exited', function() {
+        parent.createNewStepDataGroup();
+      });
+
       return this.text;
     };
   }

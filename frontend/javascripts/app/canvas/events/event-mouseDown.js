@@ -16,7 +16,6 @@ angular.module("canvasApp").factory('mouseDown', [
     this.init = function(C, $scope, that) {
       // that originally points to event. Refer event.js
       var me;
-
       this.canvas.on("mouse:down", function(evt) {
 
         if(! evt.target) {
@@ -28,11 +27,19 @@ angular.module("canvasApp").factory('mouseDown', [
         switch(evt.target.name)  {
 
           case "stepDataGroup":
-            //console.log("clicked", evt);
             var click = evt.e;
             var target = evt.target;
-            console.log(click.clientX, target.left - 40, evt);
-            //mechanism to know where did we click on temp or hold time.
+            var stepDataGroupLeft = target.left - 40;
+            that.selectStep(target.parentCircle);
+            if(click.clientX > stepDataGroupLeft && click.clientX < (stepDataGroupLeft + 60)) {
+              var group = target.parentCircle.stepDataGroup;
+              var items = group._objects;
+              unHookGroup(group, items);
+              startEditing(target.parentCircle.temperature);
+            } else {
+              console.log("clicked on holdTime");
+            }
+
           break;
           case "stepGroup":
 
@@ -87,7 +94,27 @@ angular.module("canvasApp").factory('mouseDown', [
         }
 
       });
+
+      unHookGroup = function(group, items) {
+
+        group._restoreObjectsState();
+        C.canvas.remove(group);
+        for(var i = 0; i < items.length; i++) {
+          C.canvas.add(items[i]);
+        }
+        C.canvas.renderAll();
+      };
+
+      startEditing = function(tempText) {
+        C.canvas.setActiveObject(tempText);
+        tempText.enterEditing();
+        tempText.selectAll();
+      };
+
     };
+
+
+
     return this;
   }
 ]);
