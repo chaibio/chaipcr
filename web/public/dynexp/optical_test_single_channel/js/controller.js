@@ -109,7 +109,7 @@
           getExperiment($stateParams.id, function (exp) {
             $scope.experiment = exp;
             if (exp.completion_status === 'success') {
-              Experiment.getSteps($stateParams.id, [12, 13]).then(function (resp) {
+              Experiment.getStepsData($stateParams.id, [12, 13]).then(function (resp) {
                 $scope.analyzedExp = Helper.getBaselineAndExcitation(resp.data.fluorescence_data);
                 $scope.analyzing = false;
               });

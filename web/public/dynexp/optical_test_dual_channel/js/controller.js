@@ -51,7 +51,7 @@
 
         if ($scope.state === 'paused') {
           var pausedPages = ['page-4', 'page-6', 'page-8'];
-          if (pausedPages.indexOf($state.current.name) >= 0) {
+          if (pausedPages.indexOf($state.current.name) !== -1) {
             $scope.next();
           }
         }
@@ -62,32 +62,11 @@
           });
         }
 
-        // if ($scope.isCollectingData() && $state.current.name === 'page-3') {
-        //   $state.go('page-4');
-        // }
-
         if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle')) {
           // experiment is complete
           Experiment.get($scope.experiment.id).then(function(resp) {
             $scope.experiment = resp.data.experiment;
-            $state.go('page-9');
-            // Experiment.analyze($scope.experiment.id)
-            // .then(function(resp) {
-            //   $state.go('page-9');
-            //   $scope.result = resp.data;
-            //   $scope.valid = true;
-            //   for (var i = resp.data.valid.length - 1; i >= 0; i--) {
-            //     if (resp.data.valid[i] === false) {
-            //       $scope.valid = false;
-            //       break;
-            //     }
-            //   }
-            //   if ($scope.valid) $http.put(host + '/settings', { settings: { "calibration_id": $scope.experiment.id } });
-            // })
-            // .catch(function (resp) {
-            //   $scope.error = resp.data.errors;
-            //   $state.go('page-9');
-            // });
+            $state.go('page-9', {id: $scope.experiment.id});
           });
         }
       });
@@ -160,7 +139,11 @@
 
       $scope.next = function() {
         var pageIndex = pages.indexOf($state.current.name);
-        $state.go(pages[pageIndex + 1]);
+        var params = {};
+        if( pageIndex === (pages.length - 1))
+          params.id = $scope.experiment.id;
+
+        $state.go(pages[pageIndex + 1], params);
       };
 
       $scope.createExperiment = function() {

@@ -41,7 +41,7 @@
         templateUrl: './views/page-8.html'
       })
       .state('page-9', {
-        url: '/analyze',
+        url: '/analyze/:id',
         templateUrl: './views/page-9.html'
       });
 
