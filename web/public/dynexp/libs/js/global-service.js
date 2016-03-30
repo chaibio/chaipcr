@@ -35,19 +35,22 @@
         return holding;
       };
       self.timeRemaining = function(data) {
-        var exp, time;
+        var exp, time, prev;
         if (!data) {
           return 0;
         }
         if (!data.experiment_controller) {
           return 0;
         }
+        if (prev === 0) 
+          return 0;
         if (data.experiment_controller.machine.state === 'running') {
           exp = data.experiment_controller.expriment;
           time = (exp.estimated_duration * 1 + exp.paused_duration * 1) - exp.run_duration * 1;
           if (time < 0) {
             time = 0;
           }
+          prev = time;
           return time;
         } else {
           return 0;

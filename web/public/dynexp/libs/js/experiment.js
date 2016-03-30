@@ -85,7 +85,7 @@
         return $http.get("/experiments/" + id + "/analyze");
       };
 
-      self.getSteps = function(exp_id, step_ids) {
+      self.getStepsData = function(exp_id, step_ids) {
         var q = '';
         for (var i = 0; i < step_ids.length; i++) {
           if (i > 0) q = q + '&';
