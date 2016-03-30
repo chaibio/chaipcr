@@ -70,7 +70,7 @@
               $scope.modal = null;
           }
 
-          if(deviceStatus.data.optics.lid_open === "true" || deviceStatus.data.optics.lid_open === true) { // lid is open
+          if(deviceStatus.data.optics.lid_open === "true" || deviceStatus.data.lid.open === true) { // lid is open
             $scope.error = true;
             $scope.lidMessage = "Close lid to begin.";
           } else {

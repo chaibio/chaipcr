@@ -20,7 +20,7 @@ describe("Here we check the hit escape button and left-menu disappear", function
     expect(scope.registerEscape).toBeFalsy();
   });
 
-  it("Should check the initial conf", function() {
+  it("Should check if hitting escape key $broadcast", function() {
     var elem = angular.element('<p escape-menu ></p>');
     var compiled = compile(elem)(scope);
     scope.$digest();
