@@ -1,6 +1,7 @@
 angular.module("canvasApp").factory('stepTemperature', [
-  function() {
-    return function(model, parent) {
+  'editMode',
+  function(editMode) {
+    return function(model, parent, $scope) {
 
       this.model = model;
       this.parent = parent;
@@ -11,19 +12,30 @@ angular.module("canvasApp").factory('stepTemperature', [
         var temp = parseFloat(this.stepData.temperature);
         temp = (temp < 100) ? temp.toFixed(1) : temp;
 
-        this.text = new fabric.Text(temp +"º", {
+        this.text = new fabric.IText(temp +"º", {
           fill: 'black',
           fontSize: 20,
           top : this.parent.top + 10,
           left: this.parent.left - 15,
           fontFamily: "dinot-bold",
           selectable: false,
-          //fontWeight: "800"
+          hasBorder: false
         });
 
       };
 
       this.render();
+
+      this.text.on('editing:exited', function() {
+
+        // Apply value from here.
+        //console.log($scope);
+        //$scope.step.temperature = 10; //it works.
+        //$scope.applyFrom
+        editMode.tempActive = true;
+        parent.createNewStepDataGroup();
+      });
+
       return this.text;
     };
   }

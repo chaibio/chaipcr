@@ -18,7 +18,7 @@ angular.module("canvasApp").factory('canvas', [
     moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory) {
 
     this.init = function(model) {
-      console.log(model, interceptorFactory);
+      
       this.model = model.protocol;
       this.$scope = model;
       this.allStepViews = [];

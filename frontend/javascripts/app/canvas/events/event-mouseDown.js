@@ -4,8 +4,8 @@ angular.module("canvasApp").factory('mouseDown', [
   'previouslyHoverd',
   'scrollService',
   'circleManager',
-
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager) {
+  'editMode',
+  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager, editMode) {
 
     /**************************************
         what happens when click is happening in canvas.
@@ -16,7 +16,6 @@ angular.module("canvasApp").factory('mouseDown', [
     this.init = function(C, $scope, that) {
       // that originally points to event. Refer event.js
       var me;
-
       this.canvas.on("mouse:down", function(evt) {
 
         if(! evt.target) {
@@ -27,6 +26,22 @@ angular.module("canvasApp").factory('mouseDown', [
 
         switch(evt.target.name)  {
 
+          case "stepDataGroup":
+            var click = evt.e;
+            var target = evt.target;
+            var stepDataGroupLeft = target.left - 40;
+            that.selectStep(target.parentCircle);
+            if(click.clientX > stepDataGroupLeft && click.clientX < (stepDataGroupLeft + 60)) {
+              editMode.tempActive = true;
+              var group = target.parentCircle.stepDataGroup;
+              var items = group._objects;
+              unHookGroup(group, items);
+              startEditing(target.parentCircle.temperature);
+            } else {
+              console.log("clicked on holdTime");
+            }
+
+          break;
           case "stepGroup":
 
             me = evt.target.me;
@@ -80,7 +95,27 @@ angular.module("canvasApp").factory('mouseDown', [
         }
 
       });
+
+      unHookGroup = function(group, items) {
+
+        group._restoreObjectsState();
+        C.canvas.remove(group);
+        for(var i = 0; i < items.length; i++) {
+          C.canvas.add(items[i]);
+        }
+        C.canvas.renderAll();
+      };
+
+      startEditing = function(tempText) {
+        C.canvas.setActiveObject(tempText);
+        tempText.enterEditing();
+        tempText.selectAll();
+      };
+
     };
+
+
+
     return this;
   }
 ]);

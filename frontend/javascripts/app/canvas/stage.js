@@ -54,7 +54,7 @@ angular.module("canvasApp").factory('stage', [
         this.moveAllStepsAndStages();
         // Now insert new step;
         var start = currentStep.index;
-        var newStep = new step(data.step, this, start);
+        var newStep = new step(data.step, this, start, $scope);
         newStep.name = "I am created";
         newStep.render();
         newStep.ordealStatus = currentStep.ordealStatus;
@@ -252,7 +252,7 @@ angular.module("canvasApp").factory('stage', [
         // We use reduce here so that Linking is easy here, because reduce retain the previous value which we return.
         this.model.steps.reduce(function(tempStep, STEP, stepIndex) {
 
-          stepView = new step(STEP.step, that, stepIndex);
+          stepView = new step(STEP.step, that, stepIndex, $scope);
 
           if(tempStep) {
             tempStep.nextStep = stepView;

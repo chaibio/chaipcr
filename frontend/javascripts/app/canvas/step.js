@@ -8,7 +8,7 @@ angular.module("canvasApp").factory('step', [
 
   function(ExperimentLoader, $rootScope, circle, previouslySelected, stepGraphics, constants) {
 
-    return function(model, parentStage, index) {
+    return function(model, parentStage, index, $scope) {
 
       this.model = model;
       this.parentStage = parentStage;
@@ -99,7 +99,7 @@ angular.module("canvasApp").factory('step', [
 
       this.addCircle = function() {
 
-        this.circle = new circle(this.model, this);
+        this.circle = new circle(this.model, this, $scope);
         this.circle.getLeft()
           .getTop()
           .getUniqueId()

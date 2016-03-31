@@ -23,7 +23,7 @@ angular.module("canvasApp").factory('circle', [
     centerCircle, littleCircleGroup, circleMaker, stepDataGroup, stepTemperature, stepHoldTime,
     gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle, previouslySelected,
     pauseStepOnScrollGroup, pauseStepCircleOnScroll) {
-    return function(model, parentStep) {
+    return function(model, parentStep, $scope) {
 
       this.model = model;
       this.parent = parentStep;
@@ -205,9 +205,27 @@ angular.module("canvasApp").factory('circle', [
           ], this);
 
         this.stepDataGroup = new stepDataGroup([
-            this.temperature = new stepTemperature(this.model, this),
-            this.holdTime = new stepHoldTime(this.model, this)
+            this.temperature = new stepTemperature(this.model, this, $scope),
+            this.holdTime = new stepHoldTime(this.model, this, $scope)
           ], this);
+
+      };
+
+      this.createNewStepDataGroup = function() {
+
+        this.canvas.remove(this.temperature);
+        this.canvas.remove(this.holdTime);
+
+        delete(this.temperature);
+        delete(this.holdTime);
+
+        this.stepDataGroup = new stepDataGroup([
+          this.temperature = new stepTemperature(this.model, this, $scope),
+          this.holdTime = new stepHoldTime(this.model, this, $scope)
+          ], this);
+
+        this.canvas.add(this.stepDataGroup);
+        this.canvas.renderAll();
       };
 
       this.makeItBig = function() {
@@ -307,7 +325,7 @@ angular.module("canvasApp").factory('circle', [
           targetCircleGroup.setTop(this.scrollLength);
           this.manageRampLineMovement(left, this.scrollLength, targetCircleGroup);
         } else {
-          this.stepDataGroup.setTop(top + 48);
+          this.stepDataGroup.setTop(top + 48).setCoords();
           this.manageRampLineMovement(left, top, targetCircleGroup);
         }
       };
