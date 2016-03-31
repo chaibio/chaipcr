@@ -1,5 +1,6 @@
 angular.module("canvasApp").factory('stepTemperature', [
-  function() {
+  'editMode',
+  function(editMode) {
     return function(model, parent) {
 
       this.model = model;
@@ -26,6 +27,7 @@ angular.module("canvasApp").factory('stepTemperature', [
       this.render();
 
       this.text.on('editing:exited', function() {
+        console.log(editMode);
         parent.createNewStepDataGroup();
       });
 

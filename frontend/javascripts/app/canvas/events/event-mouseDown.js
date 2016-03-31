@@ -4,8 +4,8 @@ angular.module("canvasApp").factory('mouseDown', [
   'previouslyHoverd',
   'scrollService',
   'circleManager',
-
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager) {
+  'editMode',
+  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager, editMode) {
 
     /**************************************
         what happens when click is happening in canvas.
@@ -32,6 +32,7 @@ angular.module("canvasApp").factory('mouseDown', [
             var stepDataGroupLeft = target.left - 40;
             that.selectStep(target.parentCircle);
             if(click.clientX > stepDataGroupLeft && click.clientX < (stepDataGroupLeft + 60)) {
+              editMode.tempActive = true;
               var group = target.parentCircle.stepDataGroup;
               var items = group._objects;
               unHookGroup(group, items);

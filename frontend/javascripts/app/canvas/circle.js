@@ -212,10 +212,13 @@ angular.module("canvasApp").factory('circle', [
       };
 
       this.createNewStepDataGroup = function() {
+
         this.canvas.remove(this.temperature);
         this.canvas.remove(this.holdTime);
+
         delete(this.temperature);
         delete(this.holdTime);
+
         this.stepDataGroup = new stepDataGroup([
           this.temperature = new stepTemperature(this.model, this),
           this.holdTime = new stepHoldTime(this.model, this)
