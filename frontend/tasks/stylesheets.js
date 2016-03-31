@@ -63,9 +63,12 @@ gulp.task('hash-css', ['concat-css'], function () {
 });
 
 gulp.task('minify-css', ['concat-css', 'hash-css'], function () {
-  return gulp.src('.tmp/css/'+applicationCSS+'.css')
-         .pipe(cssnano({discardComments: {removeAll: true}}))
-         .pipe(gulp.dest('.tmp/css'))
+  var stream = gulp.src('.tmp/css/'+applicationCSS+'.css');
+  if (process.env.debug !== 'true') {
+    stream.pipe(cssnano({discardComments: {removeAll: true}}));
+  }
+  stream.pipe(gulp.dest('.tmp/css'));
+  return stream;
 });
 
 gulp.task('markup-css-link', ['hash-css'], function () {

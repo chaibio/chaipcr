@@ -4,8 +4,15 @@ App.service 'MeltCurveService', [
   (AmplificationChartHelper, Webworker) ->
     self = @
 
+    self.defaultData = ->
+      datasets = {}
+      for i in [0..15] by 1
+        datasets["well_#{i}"] = []
+      return datasets
+
     self.chartConfig = (type) ->
       series = []
+      # for i in [0..1] by 1
       for i in [0..15] by 1
         series.push
           axis: 'y'
@@ -28,8 +35,11 @@ App.service 'MeltCurveService', [
         left: 70
         right: 0
 
+      grid:
+        x: false
+        y: false
+
       series: series
-    # end chart config
 
       tooltipHook: (items) ->
         rows = []
@@ -72,8 +82,7 @@ App.service 'MeltCurveService', [
 
     self.parseData = (data, cb) ->
       parser = Webworker.create(parseData);
-      parser.run(data).then (result) ->
-        cb(result)
+      return parser.run(data)
     # end parseData
 
     self.getTempRange = (data) ->

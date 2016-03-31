@@ -10,6 +10,9 @@ App.controller 'MeltCurveCtrl', [
     $scope.chartConfigDerivative = MeltCurveService.chartConfig('derivative')
     $scope.chartConfigNormalized = MeltCurveService.chartConfig('normalized')
     $scope.loading = null
+    $scope.data = MeltCurveService.defaultData()
+    has_data = false
+    DATA = null
 
     getMeltCurveData = (cb) ->
       $scope.loading = true
@@ -31,11 +34,15 @@ App.controller 'MeltCurveCtrl', [
       $scope.chartConfigDerivative = _.defaultsDeep angular.copy(opts), $scope.chartConfigDerivative
       $scope.chartConfigNormalized = _.defaultsDeep angular.copy(opts), $scope.chartConfigNormalized
 
+    updateZoomRange = (min, max) ->
+      $scope.zoom_range = max - min - 2
+      console.log "$scope.zoom_range: #{$scope.zoom_range}"
+
     $scope.$watch 'RunExperimentCtrl.chart', (chart) ->
-      if chart is 'melt-curve' and !$scope.data
-        console.log 'here!1'
+      if chart is 'melt-curve' and !has_data
         getExperiment (exp) ->
           getMeltCurveData (data) ->
+            console.log 'melt curve data loaded'
             temp_range = MeltCurveService.getTempRange(data.melt_curve_data)
             updateConfigs
               axes:
@@ -44,9 +51,14 @@ App.controller 'MeltCurveCtrl', [
                   max: temp_range.max
                   ticks: MeltCurveService.XTicks(temp_range.min, temp_range.max)
 
-            MeltCurveService.parseData data.melt_curve_data, (data) ->
+            updateZoomRange(temp_range.min, temp_range.max)
+
+            MeltCurveService.parseData(data.melt_curve_data).then (data) ->
+              has_data = true
               $scope.loading = false
               $scope.data = data
+              DATA = angular.copy(data)
+              console.log 'parsed melt curve data '
 
               $timeout ->
                 $scope.$broadcast '$reload:n3:charts'
@@ -59,5 +71,10 @@ App.controller 'MeltCurveCtrl', [
         $timeout ->
           $scope.$broadcast '$reload:n3:charts'
         , 3000
+
+    $scope.$watch ->
+      $scope.mc_zoom
+    , (val) ->
+      console.log val
 
 ]

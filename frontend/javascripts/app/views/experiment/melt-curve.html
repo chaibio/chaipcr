@@ -1,5 +1,5 @@
-<div class="melt-curve-chart">
-  <div class="content results-charts" ng-controller="MeltCurveCtrl">
+<div class="melt-curve-chart" ng-controller="MeltCurveCtrl">
+  <div class="content results-charts">
 
     <div class="curve-header">
       <div class="row">
@@ -30,21 +30,38 @@
           <span ng-show="curve_type === 'derivative'">DERIVATIVE REPORTER</span>
           <span ng-show="curve_type === 'normalized'">NORMALIZED REPORTER</span>
         </div>
-        <div ng-if="RunExperimentCtrl.chart==='melt-curve' || !!data" class="chart-container" id="meltcurve-drag-scroll" chart-drag-scroll ng-model="melt_curve_scroll">
-      
-          <div class="loading-blue-container" ng-show="!data && loading">
+        <div class="chart-container">
+
+          <div class="loading-blue-container" ng-show="!has_data && loading">
           <!-- <div class="loading-blue-container" ng-show="true"> -->
             <div class="loading-blue"></div>
             <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
             <p class="B2">May take a minute</p>
           </div>
 
-          <div ng-show="!!data" class="charts">
+          <div class="charts" ng-if="RunExperimentCtrl.chart==='melt-curve' || has_data">
             <linechartv2 ng-show="curve_type==='derivative'"
-             data-drag-scroll="meltcurve-drag-scroll" data="data" options="chartConfigDerivative" width="1024" height="400" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks">
+             data-drag-scroll="meltcurve-drag-scroll" data="data" options="chartConfigDerivative" width="1024" height="400">
             </linechartv2>
-            <linechartv2 ng-show="curve_type==='normalized'" data-drag-scroll="meltcurve-drag-scroll" data="data" options="chartConfigNormalized" width="1024" height="400" ng-show="chartConfig.axes.x.max && chartConfig.axes.x.min && chartConfig.axes.x.ticks">
+            <linechartv2 ng-show="curve_type==='normalized'" data="data" options="chartConfigNormalized" width="1024" height="400">
             </linechartv2>
+
+          </div>
+
+          <div class="ampli-zoom-scroll-container">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="zoom-container">
+                  <div class="zoom-text SH">
+                    <b>ZOOM</b>
+                  </div>
+                  <ampli-slider ng-model="mc_zoom" range="zoom_range"></ampli-slider>
+                </div>
+              </div>
+              <div class="col-md-6 ampli-scrollbar-container">
+                <scrollbar ng-model="mc_scroll" id="melt-curve-scrollbar"></scrollbar>
+              </div>
+            </div>
           </div>
         </div>
 

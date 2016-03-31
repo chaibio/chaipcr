@@ -14,10 +14,46 @@
       left: 560px;
       top: 220px;
     }
-  
+
     .charts {
       height: 400px;
     }
+  }
+
+  .ampli-zoom-scroll-container {
+    margin-top: 50px;
+    padding-left: 50px;
+    padding-right: 50px;
+
+    .zoom-container {
+
+      .zoom-text {
+        display: inline-block;
+        width: 20%;
+        vertical-align: middle;
+      }
+      .ampli-slider {
+        display: inline-block;
+        width: 80%;
+        vertical-align: middle;
+      }
+    }
+
+    .ampli-scrollbar-container {
+      .scrollbar-container {
+        height: 5px;
+        border-radius: 10px;
+        margin-top: -5px;
+        position: relative;
+        top: 11.5px;
+        background: #ccc;
+
+        .scrollbar {
+          border-radius: 10px;
+        }
+      }
+    }
+
   }
 
   .chart-legend {
