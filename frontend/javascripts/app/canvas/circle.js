@@ -23,8 +23,8 @@ angular.module("canvasApp").factory('circle', [
     centerCircle, littleCircleGroup, circleMaker, stepDataGroup, stepTemperature, stepHoldTime,
     gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle, previouslySelected,
     pauseStepOnScrollGroup, pauseStepCircleOnScroll) {
-    return function(model, parentStep) {
-      console.log(model);
+    return function(model, parentStep, $scope) {
+
       this.model = model;
       this.parent = parentStep;
       this.canvas = parentStep.canvas;
@@ -205,8 +205,8 @@ angular.module("canvasApp").factory('circle', [
           ], this);
 
         this.stepDataGroup = new stepDataGroup([
-            this.temperature = new stepTemperature(this.model, this),
-            this.holdTime = new stepHoldTime(this.model, this)
+            this.temperature = new stepTemperature(this.model, this, $scope),
+            this.holdTime = new stepHoldTime(this.model, this, $scope)
           ], this);
 
       };
@@ -220,8 +220,8 @@ angular.module("canvasApp").factory('circle', [
         delete(this.holdTime);
 
         this.stepDataGroup = new stepDataGroup([
-          this.temperature = new stepTemperature(this.model, this),
-          this.holdTime = new stepHoldTime(this.model, this)
+          this.temperature = new stepTemperature(this.model, this, $scope),
+          this.holdTime = new stepHoldTime(this.model, this, $scope)
           ], this);
 
         this.canvas.add(this.stepDataGroup);

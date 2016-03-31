@@ -1,7 +1,7 @@
 angular.module("canvasApp").factory('stepTemperature', [
   'editMode',
   function(editMode) {
-    return function(model, parent) {
+    return function(model, parent, $scope) {
 
       this.model = model;
       this.parent = parent;
@@ -27,7 +27,12 @@ angular.module("canvasApp").factory('stepTemperature', [
       this.render();
 
       this.text.on('editing:exited', function() {
-        console.log(editMode);
+
+        // Apply value from here.
+        //console.log($scope);
+        //$scope.step.temperature = 10; //it works.
+        //$scope.applyFrom
+        editMode.tempActive = true;
         parent.createNewStepDataGroup();
       });
 
