@@ -29,15 +29,19 @@ angular.module("canvasApp").factory('stepTemperature', [
 
       this.text.on('editing:exited', function() {
 
-        // Apply value from here.
-        //console.log($scope);
-        $scope.step.temperature = 10; //it works.
-        //$scope.applyFrom
+        console.log(this.text.replace("º", ""));
+        $scope.step.temperature = parseFloat(this.text.replace("º", "")); //it works.
         ExperimentLoader.changeTemperature($scope).then(function(data) {
-          console.log(data);
+          //console.log(data);
         });
-        editMode.tempActive = true;
+
+        editMode.tempActive = false;
+        parent.model.temperature = $scope.step.temperature;
+
+        parent.circleGroup.top = parent.getTop().top;
         parent.createNewStepDataGroup();
+        parent.manageDrag(parent.circleGroup);
+        parent.circleGroup.setCoords();
         parent.canvas.renderAll();
       });
 

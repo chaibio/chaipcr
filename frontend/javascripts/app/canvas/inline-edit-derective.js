@@ -9,7 +9,7 @@ angular.module("canvasApp").directive('inlineEdit', [
 
         angular.element(window).on('keydown', function(evt) {
           if(editMode.tempActive) {
-            console.log(canvas.$scope);
+            console.log(evt);
           }
           //evt.preventDefault();
         });
