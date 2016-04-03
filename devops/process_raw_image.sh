@@ -7,6 +7,76 @@ fi
 
 temp="/tmp/image_creator"
 eMMC=/dev/md2
+
+boot_partition=${eMMC}p1
+rootfs_partition=${eMMC}p2
+
+data_partition=${eMMC}p3
+perm_partition=${eMMC}p4
+
+#tooling
+loopdev=/dev/loop2
+mdsumtool=md5sum
+
+mdsumdir=$(whereis $mdsumtool)
+echo md5dir : $mdsumdir
+
+if [ -z "$mdsumdir" ]
+then
+	echo $mdsumtool not found.
+	apt-get -y install mdadm
+fi
+
+mdsumdir=$(whereis $mdsumtool)
+echo "md5dir: $mdsumdir"
+
+if [ -z "$mdsumdir" ]
+then
+	echo "$mdsumtool not found (2)."
+	mdsumtool='md5 -r'
+	mdsumdir=$(whereis $mdsumtool)
+	echo tool: $mdsumdir
+	if [ -z "$mdsumdir" ]
+	then
+		echo "can't find md5sum"
+		exit 1
+	else
+		echo using md5 instead of md5sum
+	fi
+else
+	echo $mdsumtool found.
+fi
+
+mkfsext4tooldir=$(whereis mkfs.ext4)
+echo mkfs.ext4 : $mkfsext4tooldir
+
+if [ ! -z "$mkfsext4tooldir" ]
+then
+	echo mkfs.ext4 found at $mkfsext4tooldir
+else
+	echo mkfs.ext4 not found. Looking for its port..
+	mkfsext4tooldir=$(brew --prefix e2fsprogs)/sbin/mkfs.ext4
+	echo looking for $mkfsext4tooldir
+	if [ -e "$mkfsext4tooldir" ]
+	then
+        	echo mkfs.ext4 found at $mkfsext4tooldir
+      	else
+		echo "mkfs.ext4 port is not installed.. installing mkfs.ext4 port.."
+		chown -R root /usr/local/bin/brew
+		brew install e2fsprogs
+
+		#echo mkfs tools installed.
+
+		if [ -e "$mkfsext4tooldir" ]
+       		then
+                	echo mkfs.ext4 installed to $mkfsext4tooldir
+        	else
+     	           	echo "Failed installing mkfs.ext4 port.."
+                	exit 1
+        	fi
+	fi
+fi
+
 sdcard="."
 current_folder=$(pwd)
 output_dir=$current_folder
@@ -111,10 +181,20 @@ unmount_all () {
 		fuser -m /dev/md2* --all -u -v -k
 		mdadm --stop /dev/md2
 	fi
-	losetup -d /dev/loop2
+	if [ -e /dev/loop2 ]
+	then
+		losetup -d /dev/loop2
+	fi
+	if [[ "$loopdev_tool" =~ "hdiutil" ]]
+	then
+		echo hdiutil found
+		hdiutil detach $loopdev
+	else
+		echo hdiutil not found
+	fi
 }
 
-echo "Processing eMMC image: $eMMC"
+echo "Concatinating eMMC image parts"
 cat $image_filename_upgrade1 $image_filename_upgrade2 > $image_filename_upgrade
 if [ $? -gt 0 ]
 then
@@ -124,21 +204,50 @@ then
 fi
 
 echo Extracting partitions...
-losetup /dev/loop2 $image_filename_upgrade
-if [ $? -gt 0 ]
+loopdev_tool=$(whereis losetup)
+if [ -z "$loopdev_tool" ]
 then
-	echo "Error creating a block device for $image_filename_upgrade!"
-	unmount_all
-	exit 1
+        loopdev_tool=$(whereis hdiutil)
+        if [ -z "$loopdev_tool" ]
+        then
+                echo loop device mounting tool not found! Please install hdiutil or losetup.
+                exit 1
+        else
+                # Mac support!
+                devname=$(hdiutil attach $image_filename_upgrade | egrep -o '/dev/disk[0-9]+ ')
+                devname=${devname%% }
+		devname=${devname## }
+		echo "Image file mounted.. device: $devname"
+                if [ -z "$devname" ]
+                then
+                        echo Error mounting image file
+                        exit 1
+                fi
+                eMMC=$devname
+                boot_partition=${eMMC}s1
+                rootfs_partition=${eMMC}s2
+                data_partition=${eMMC}s3
+                perm_partition=${eMMC}s4
+        fi
+else
+        loopdev=/dev/loop2
+        losetup $loopdev $image_filename_upgrade
+        if [ $? -gt 0 ]
+        then
+                echo "Error creating a block device for $image_filename_upgrade!"
+                unmount_all
+                exit 1
+        fi
+        mdadm --build --level=0 --force --raid-devices=1 /dev/md2 /dev/loop2
+        if [ $? -gt 0 ]
+        then
+                echo "Error mapping partitions for $image_filename_upgrade!"
+                unmount_all
+                exit 1
+        fi
 fi
 
-mdadm --build --level=0 --force --raid-devices=1 /dev/md2 /dev/loop2
-if [ $? -gt 0 ]
-then
-	echo "Error mapping partitions for $image_filename_upgrade!"
-	unmount_all
-	exit 1
-fi
+#exit 0
 
 image_filename_folder="${temp}"
 
@@ -187,11 +296,11 @@ fi
 
 echo "Copying eMMC partitions at $eMMC"
 sync
-echo "Packing partition table to: $image_filename_pt"
-dd  if=${eMMC} bs=16M count=1 | gzip -c > $image_filename_pt
+echo "Packing partition table from: ${eMMC} to: $image_filename_pt"
+dd  if=${eMMC} bs=16777216 count=1 | gzip -c > $image_filename_pt
 
 echo "Chaibio Checksum File">$checksums_filename
-md5sum $image_filename_pt>>$checksums_filename
+$mdsumtool $image_filename_pt>>$checksums_filename
 sleep 2
 sync
 
@@ -200,9 +309,10 @@ then
 	mkdir -p /tmp/emmc
 fi
 
-rootfs_partition=${eMMC}p2
-data_partition=${eMMC}p3
-perm_partition=${eMMC}p4
+#boot_partition=${eMMC}p1
+#rootfs_partition=${eMMC}p2
+#data_partition=${eMMC}p3
+#perm_partition=${eMMC}p4
 
 if [ ! -e $rootfs_partition ]
 then
@@ -220,10 +330,10 @@ mount $rootfs_partition /tmp/emmc -t ext4
 retval=$?
 
 if [ $retval -ne 0 ]; then
-    echo "Error mounting rootfs partition! Error($retval)"
+    echo "Error mounting rootfs partition. Error($retval)"
 else
 	echo "Zeroing rootfs partition"
-	dd if=/dev/zero of=/tmp/emmc/big_zero_file1.bin bs=16M > /dev/null
+	dd if=/dev/zero of=/tmp/emmc/big_zero_file1.bin bs=16777216 > /dev/null
 	result=$?
 	sync &
 	sleep 5
@@ -238,20 +348,20 @@ else
 fi
 
 echo "Packing binaries partition to: $image_filename_rootfs"
-dd  if=${eMMC}p2 bs=16M | gzip -c > $image_filename_rootfs
-md5sum $image_filename_rootfs>>$checksums_filename
+dd  if=$rootfs_partition bs=16777216 | gzip -c > $image_filename_rootfs
+$mdsumtool $image_filename_rootfs>>$checksums_filename
 
 sleep 5
 sync
 
 echo "Packing perm partition to: $image_filename_perm"
-mkfs.ext4 ${eMMC}p4 -q -L perm -F -F
-dd  if=${eMMC}p4 bs=16M | gzip -c > $image_filename_perm
-md5sum $image_filename_perm>>$checksums_filename
+$mkfsext4tooldir $perm_partition -q -L perm -F -F
+dd  if=$perm_partition bs=16777216 | gzip -c > $image_filename_perm
+$mdsumtool $image_filename_perm>>$checksums_filename
 
 echo "Packing boot partition to: $image_filename_boot"
-dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
-md5sum $image_filename_boot>>$checksums_filename
+dd  if=$boot_partition bs=16777216 | gzip -c > $image_filename_boot
+$mdsumtool $image_filename_boot>>$checksums_filename
 
 #create scripts folder inside the tar
 if [ ! -e $upgrade_scripts ]
@@ -288,8 +398,8 @@ retval=$?
 	fi
 
 	echo "Packing data partition to: $image_filename_data"
-	dd  if=${eMMC}p3 bs=16M | gzip -c > $image_filename_data
-	md5sum $image_filename_data>>$checksums_filename
+	dd  if=$data_partition bs=16777216 | gzip -c > $image_filename_data
+	$mdsumtool $image_filename_data>>$checksums_filename
 
 	#tarring
 #	echo "compressing all images to $image_filename_upgrade_tar_temp"
