@@ -192,6 +192,9 @@ void QPCRApplication::readDeviceFile()
             _settings.device.opticsChannels = array.get().size();
         else
             _settings.device.opticsChannels = 1;
+
+        _settings.device.serialNumber = ptree.get<std::string>("serial_number");
+        _settings.device.modelNumber = ptree.get<std::string>("model_number");
     }
     else
         stream << "QPCRApplication::readDeviceFile - unable to read device file: " << std::strerror(errno) << std::endl;
@@ -209,6 +212,7 @@ void QPCRApplication::readConfigurationFile()
         boost::property_tree::read_json(deviceFile, ptree);
 
         _settings.configuration.version = ptree.get<std::string>("software.version");
+        _settings.configuration.platform = ptree.get<std::string>("software.platform");
     }
     else
         stream << "QPCRApplication::readConfigurationFile - unable to read configuration file: " << std::strerror(errno) << std::endl;

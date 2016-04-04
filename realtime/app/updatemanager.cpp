@@ -17,6 +17,7 @@
 #include <boost/property_tree/json_parser.hpp>
 
 #include <Poco/File.h>
+#include <Poco/URI.h>
 #include <Poco/Util/Timer.h>
 #include <Poco/Util/TimerTaskAdapter.h>
 #include <Poco/Net/HTTPRequest.h>
@@ -273,7 +274,11 @@ void UpdateManager::checkUpdateCallback(bool checkHash)
 
     try
     {
-        Poco::Net::HTTPRequest request("GET", kUpdatesUrl);
+        Poco::URI uri(kUpdatesUrl);
+        uri.setQueryParameters({ {"v", "1"}, {"model_number", qpcrApp.settings().device.modelNumber}, {"software_version", qpcrApp.settings().configuration.version},
+                                 {"software_platform", qpcrApp.settings().configuration.platform}, {"serial_number", qpcrApp.settings().device.serialNumber} });
+
+        Poco::Net::HTTPRequest request("GET", uri.toString());
         Poco::Net::HTTPResponse response;
 
         _httpClient->sendRequest(request);

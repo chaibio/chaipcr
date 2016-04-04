@@ -30,12 +30,16 @@ public:
 
         public:
             std::size_t opticsChannels;
+
+            std::string serialNumber;
+            std::string modelNumber;
         }device;
 
         class Configuration
         {
         public:
             std::string version;
+            std::string platform;
         }configuration;
     };
 
