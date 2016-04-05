@@ -92,6 +92,16 @@ modlist <- function(
     while (TRUE) { # xqrm
       
       ## version 1.4-0: baselining with first cycles using 'baseline' function
+      
+      # xqrm: adjust fluorescence value if no value in FLUO_ori > 0, so lm.fit won't fail on '0 (non-NA) cases'
+      if (all(FLUO_ori <= 0)) {
+        addition <- -min(FLUO_ori)
+        FLUO_ori <- FLUO_ori + addition
+        message('\nFluorescence values are all negative, added ', 
+                round(addition, 2), 
+                ' before baseline subtraction.')
+        }
+      
       #if (baseline != "none" & baseline != "parm") { # ori
       if (baseline_looped != "parm") { # xqrm
         #FLUO <- baseline(cyc = CYCLES, fluo = FLUO, model = NULL, baseline = baseline, # ori
@@ -130,14 +140,7 @@ modlist <- function(
       ## changing magnitude
       if (factor != 1) FLUO <- FLUO * factor                
       
-      # xqrm: when baseline == "parm", adjust fluorescence value if no value in FLUO > 0, so lm.fit won't fail on '0 (non-NA) cases'
-      if (baseline == "parm" & all(FLUO <= 0)) {
-        addition <- -min(FLUO)
-        FLUO <- FLUO + addition
-        message('\nFluorescence values are all negative, added ', 
-                round(addition, 2), 
-                ' before baseline subtraction by \'parm\'.')
-        }
+      # xqrm
       fluo_add_list[[i]] <- FLUO
       
       ## fit model
