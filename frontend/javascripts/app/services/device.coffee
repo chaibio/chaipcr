@@ -87,31 +87,33 @@ window.App.service 'Device', [
         deferred.promise
 
       getUpdateInfo: ->
-        checkCloudInfo = (deferred) ->
-          cloudPromise = $http.get("http://update.chaibio.com/device/software_update")
-          cloudPromise.then (resp) ->
-            deferred.resolve resp.data
-          cloudPromise.catch (err) ->
-            deferred.reject err
-
         deferred = $q.defer()
+        @getVersion(true).then (v) ->
+          console.log v
+          checkCloudInfo = (deferred) ->
+            cloudPromise = $http.get("http://update.chaibio.com/device/software_update?v=1&model_number=#{v.model_number}&software_version=#{v.software.version}&software_platform=#{v.software.platform}&serial_number=#{v.serial_number}")
+            cloudPromise.then (resp) ->
+              deferred.resolve resp.data
+            cloudPromise.catch (err) ->
+              deferred.reject err
 
-        Status.fetch()
-        .then (resp) ->
-          status = resp?.device?.update_available || 'unknown'
-          if status is 'unknown'
-            checkCloudInfo deferred
-          else
-            infoPromise = $http.get('/device/software_update')
-            infoPromise.then (resp) =>
-              if resp.data?.upgrade
-                deferred.resolve resp.data.upgrade
-              else
-                checkCloudInfo deferred
-            infoPromise.catch (err) ->
+
+          Status.fetch()
+          .then (resp) ->
+            status = resp?.device?.update_available || 'unknown'
+            if status is 'unknown'
               checkCloudInfo deferred
-        .catch ->
-          checkCloudInfo deferred
+            else
+              infoPromise = $http.get("/device/software_update?v=1&model_number=#{v.model_number}&software_version=#{v.software.version}&software_platform=#{v.software.platform}&serial_number=#{v.serial_number}")
+              infoPromise.then (resp) =>
+                if resp.data?.upgrade
+                  deferred.resolve resp.data.upgrade
+                else
+                  checkCloudInfo deferred
+              infoPromise.catch (err) ->
+                checkCloudInfo deferred
+          .catch ->
+            checkCloudInfo deferred
 
         deferred.promise
 
