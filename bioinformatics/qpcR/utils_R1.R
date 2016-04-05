@@ -1076,6 +1076,34 @@ smoothit <- function(x, selfun, pars)
 baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
                      baseline = NULL, basecyc = NULL, basefac = NULL)
 { 
+  # xqrm
+  if (grepl('^auto_', baseline)) {
+    
+    if (class(model) == 'try-error' || coef(model)[['b']] > 0) {
+      basecyc_last <- length(fluo)
+    } else { 
+      # start: borrowed from 'efficiency.R'
+      EFFobj <- eff(model)
+      SEQ <- EFFobj$eff.x
+      D2seq <- model$MODEL$d2(SEQ, coef(model))
+      if (all(is.na(D2seq))) { # may be due to numeric overflow
+        basecyc_last <- length(fluo)
+      } else {
+        D2seq[!is.finite(D2seq)] <- NA # remove Inf's that mimicked maximum values
+        maxD2 <- which.max(D2seq)
+        cycmaxD2 <- SEQ[maxD2]
+        # end: borrowed from 'efficiency.R'
+        basecyc_last <- floor(cycmaxD2)
+        if (basecyc_last <= 5) basecyc_last <- length(fluo)
+      }
+    }
+    
+    message(sprintf('%s: cycles 1:%d were used for baseline subtraction.', baseline, basecyc_last))
+    baseline <- substring(baseline, 6)
+    basecyc <- 1:basecyc_last
+    
+  }
+  
   if (is.numeric(baseline) & length(baseline == 1)) BASE <- baseline
   if (baseline == "mean") BASE <- mean(fluo[basecyc], na.rm = TRUE) 
   if (baseline == "median") BASE <- median(fluo[basecyc], na.rm = TRUE) 
@@ -1119,39 +1147,6 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
     newMODEL <- tryCatch(pcrfit(cyc = 1, fluo = 2, data = newDATA, model = model$MODEL), error=err_NA) # xqrm: use the same model as sigmoid fitting of amplification curve
     return(list('newMODEL'=newMODEL, 'blcor'=blcor))
     #if (inherits(newMODEL, "try-error")) return() # ori
-  }
-  
-  # xqrm
-  if (baseline == 'auto_lin') {
-    
-    if (class(model) == 'try-error' || coef(model)[['b']] > 0) {
-      basecyc_last <- length(fluo)
-    } else { 
-      # start: borrowed from 'efficiency.R'
-      EFFobj <- eff(model)
-      SEQ <- EFFobj$eff.x
-      D2seq <- model$MODEL$d2(SEQ, coef(model))
-      if (all(is.na(D2seq))) { # may be due to numeric overflow
-        basecyc_last <- length(fluo)
-      } else {
-        D2seq[!is.finite(D2seq)] <- NA # remove Inf's that mimicked maximum values
-        maxD2 <- which.max(D2seq)
-        cycmaxD2 <- SEQ[maxD2]
-        # end: borrowed from 'efficiency.R'
-        basecyc_last <- floor(cycmaxD2)
-        if (basecyc_last <= 5) basecyc_last <- length(fluo)
-      }
-    }
-    
-    message(sprintf('auto_lin: cycles 1:%d were used for baseline subtraction.', basecyc_last))
-    basecyc_auto <- 1:basecyc_last
-    
-    # borrowed from `if (baseline == "lin")`
-    fluo2 <- fluo[basecyc_auto]
-    cyc2 <- cyc[basecyc_auto]
-    LM <- lm(fluo2 ~ cyc2)
-    BASE <- predict(LM, newdata = data.frame(cyc2 = cyc))    
-    
   }
   
   BASE <- BASE * basefac

@@ -12,7 +12,8 @@ modlist <- function(
   exclude = NULL,
   labels = NULL, 
   norm = FALSE,
-  baseline = c("none", "mean", "median", "lin", "quad", "parm", "auto_lin"),
+  # baseline = c("none", "mean", "median", "lin", "quad", "parm"), # ori
+  baseline, # xqrm
   basecyc = 1:8,
   basefac = 1,
   smooth = NULL, 
@@ -33,7 +34,7 @@ modlist <- function(
   
   options(expressions = 50000)  
   remove <- match.arg(remove) 
-  if (!is.numeric(baseline)) baseline <- match.arg(baseline)  
+  # if (!is.numeric(baseline)) baseline <- match.arg(baseline) # ori
   
   ## convert from single fit 
   if (class(x)[1] == "pcrfit") {
@@ -101,7 +102,7 @@ modlist <- function(
         # xqrm
         if (baseline_looped == "none") {
           FLUO <- FLUO_ori
-        } else if (baseline_looped == "auto_lin") {
+        } else if (grepl('^auto_', baseline_looped)) {
           FLUO <- baseline(cyc = CYCLES, fluo = FLUO_ori, 
                            model = try(pcrfit(cbind(CYCLES, FLUO_ori), 1, 2, model, verbose = FALSE, ...), silent=FALSE), 
                            baseline = baseline_looped, basefac = basefac)
