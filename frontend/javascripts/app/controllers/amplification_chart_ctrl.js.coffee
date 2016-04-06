@@ -42,20 +42,24 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.experiment = data.experiment
 
       $scope.$on 'status:data:updated', (e, data, oldData) ->
-        newStep = parseInt(data?.experiment_controller?.expriment?.step?.number) || null
-        oldStep = parseInt(oldData?.experiment_controller?.expriment?.step?.number) || null
+        # newStep = parseInt(data?.experiment_controller?.expriment?.step?.number) || null
+        # oldStep = parseInt(oldData?.experiment_controller?.expriment?.step?.number) || null
         state = data?.experiment_controller?.machine?.state
         oldState = oldData?.experiment_controller?.machine?.state
         isCurrentExp = parseInt(data?.experiment_controller?.expriment?.id) is parseInt($stateParams.id)
+        oldCycle = oldData?.experiment_controller?.expriment?.stage?.cycle
+        cycle = data?.experiment_controller?.expriment?.stage?.cycle
 
         if (state is 'idle' and !!$scope.experiment?.completed_at and !hasData) or
         (state is 'idle' and oldState isnt state) or
-        (state is 'running' and (oldStep isnt newStep or !oldStep) and data.optics.collect_data and oldData?.optics.collect_data is 'true')
+        # (state is 'running' and (oldStep isnt newStep or !oldStep) and data.optics.collect_data and oldData?.optics.collect_data is 'true')
+        (state is 'running' and cycle isnt oldCycle)
           return if $scope.retrying
           if !hasInit
             $timeout fetchFluorescenceData, 1500
           else
             fetchFluorescenceData()
+
 
       retry = ->
         $scope.retrying = true
@@ -75,6 +79,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         gofetch = false if $scope.retrying
 
         if gofetch
+          console.log 'fetching amplification data'
           hasInit = true
           $scope.fetching = true
 
@@ -85,6 +90,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             $scope.error = null
             data = resp.data
             hasData = true
+            $scope.hasData = true
             return if !data.amplification_data
             return if data.amplification_data.length is 0
             data.amplification_data.shift()
@@ -98,15 +104,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           .catch ->
             return if $scope.retrying
             $scope.error = 'Internal Server Error'
-            # Experiment.analyze($scope.experiment.id)
-            # .then (resp) ->
-            #   console.log 'done analyze'
-            #   $scope.error = resp.data?.errors || err_msg
-            # .catch ->
-            #   console.log 'error analyze'
-            #   $scope.error = err_msg
-            # .finally ->
-            #   console.log 'finally analyze'
             $scope.fetching = false
             retry()
 
@@ -165,7 +162,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $rootScope.$broadcast 'scrollbar:width:changed', 'ampli-scrollbar'
 
         $scope.amplification_data = helper.moveData AMPLI_DATA_CACHE.amplification_data, num_cycle_to_show, $scope.ampli_scroll, $scope.maxCycle
-        console.log $scope.amplification_data
         updateChartData($scope.amplification_data)
 
       $scope.$watch 'ampli_zoom', (zoom) ->
