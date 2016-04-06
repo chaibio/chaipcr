@@ -36,7 +36,6 @@ LIBS += -lsoci_mysql
 LIBS += -lboost_system
 LIBS += -lboost_chrono
 
-LIBS += -liw
 LIBS += -ldl
 LIBS += -lrt
 

@@ -86,7 +86,7 @@ void QPCRApplication::initialize(Application&) {
 
         _dbControl.reset(new DBControl());
         _experimentController = ExperimentController::createInstance(_dbControl);
-        _wirelessManager.reset(new WirelessManager("wlan0"));
+        _wirelessManager.reset(new WirelessManager());
         _timeChecker.reset(new TimeChecker());
         _updateManager.reset(new UpdateManager(_dbControl));
 

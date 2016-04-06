@@ -23,6 +23,27 @@ std::string InterfaceSettings::toString() const
     return stream.str();
 }
 
+std::vector<std::string> getAllInterfaces()
+{
+    std::vector<std::string> interfaces;
+    ifaddrs *addresses = nullptr;
+
+    if (getifaddrs(&addresses) == 0)
+    {
+        for (ifaddrs *address = addresses; address; address = address->ifa_next)
+        {
+            if (address->ifa_addr && address->ifa_addr->sa_family == AF_PACKET)
+                interfaces.emplace_back(address->ifa_name);
+        }
+
+        freeifaddrs(addresses);
+    }
+    else
+        throw std::system_error(errno, std::generic_category(), "Network error: unable to read interfaces -");
+
+    return interfaces;
+}
+
 InterfaceSettingsMap readInterfaceSettings(const std::string &filePath)
 {
     std::fstream file(filePath);
@@ -181,28 +202,31 @@ InterfaceState getInterfaceState(const std::string &interfaceName)
 {
     InterfaceState state;
 
-    ifaddrs *interfaces = nullptr;
-
-    if (getifaddrs(&interfaces) == 0)
+    if (!interfaceName.empty())
     {
-        for (ifaddrs *interface = interfaces; interface; interface = interface->ifa_next)
+        ifaddrs *interfaces = nullptr;
+
+        if (getifaddrs(&interfaces) == 0)
         {
-            if (interface->ifa_name == interfaceName && reinterpret_cast<sockaddr_in*>(interface->ifa_addr)->sin_family == AF_INET)
+            for (ifaddrs *interface = interfaces; interface; interface = interface->ifa_next)
             {
-                state.interface = interfaceName;
-                state.flags = interface->ifa_flags;
-                state.address = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_addr)->sin_addr);
-                state.maskAddress = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_netmask)->sin_addr);
-                state.broadcastAddress = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_broadaddr)->sin_addr);
+                if (interface->ifa_name == interfaceName && reinterpret_cast<sockaddr_in*>(interface->ifa_addr)->sin_family == AF_INET)
+                {
+                    state.interface = interfaceName;
+                    state.flags = interface->ifa_flags;
+                    state.address = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_addr)->sin_addr);
+                    state.maskAddress = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_netmask)->sin_addr);
+                    state.broadcastAddress = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_broadaddr)->sin_addr);
 
-                break;
+                    break;
+                }
             }
-        }
 
-        freeifaddrs(interfaces);
+            freeifaddrs(interfaces);
+        }
+        else
+            throw std::system_error(errno, std::generic_category(), "Network error: unable to read interfaces -");
     }
-    else
-        throw std::system_error(errno, std::generic_category(), "Network error: unable to read interfaces -");
 
     return state;
 }
