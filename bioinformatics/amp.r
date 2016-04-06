@@ -253,7 +253,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     
     # baseline_ct
     model <- l4
-    baselin <- 'auto_lin' # used: 'auto_lin', 'lin', 'parm'
+    baselin <- 'auto_median' # used: 'auto_lin', 'lin', 'parm'
     basecyc <- 3:6 # will be overwritten if (grepl('^auto_', baseline)). used: 15:20, 10:15, 3:6, 1:5 (gave poor baseline subtraction results for non-sigmoid shaped data when using 'lin')
     fallback <- 'median' # used: 'auto_lin', 'lin', 'median'
     maxiter <- 500
@@ -286,6 +286,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
                                    db_conn, 
                                    exp_id, stage_id, calib_id, 
                                    show_running_time)
+    dbDisconnect(db_conn)
     
     amp_calib_mtch_bych <- amp_calib_mtch[['pre_consoli']]
     
