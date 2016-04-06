@@ -27,11 +27,14 @@ public:
             Wpa2Ecryption
         };
 
-        ScanResult(): encryption(NoEncryption) {}
+        ScanResult(): encryption(NoEncryption), quality(0), siganlLevel(0) {}
 
     public:
         std::string ssid;
         Encryption encryption;
+
+        unsigned quality;
+        int siganlLevel;
     };
 
     enum ConnectionStatus

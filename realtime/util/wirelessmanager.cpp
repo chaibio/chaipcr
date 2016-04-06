@@ -253,6 +253,17 @@ bool WirelessManager::scan(const std::string &interface)
                 else if (line.find("WPA2") != std::string::npos)
                     result.encryption = ScanResult::Wpa2Ecryption;
             }
+            else if (line.find("Quality=") != std::string::npos)
+            {
+                std::string str = line.substr(line.find("Quality=") + 8);
+                std::stringstream stream(str);
+
+                stream >> result.quality;
+
+                std::getline(stream, str, '='); //Skip "/100  Signal level="
+
+                stream >> result.siganlLevel;
+            }
         }
 
         if (!result.ssid.empty())

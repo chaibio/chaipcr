@@ -151,6 +151,8 @@ void NetworkManagerHandler::wifiScan(boost::property_tree::ptree &responsePt)
     {
         boost::property_tree::ptree ptree;
         ptree.put("ssid", result.ssid);
+        ptree.put("quality", result.quality);
+        ptree.put("siganl_level", result.siganlLevel);
 
         switch (result.encryption)
         {
