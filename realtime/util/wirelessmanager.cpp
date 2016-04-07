@@ -13,20 +13,18 @@
 #include <stdexcept>
 #include <system_error>
 
-#include <iwlib.h>
 #include <unistd.h>
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <sys/eventfd.h>
 
-WirelessManager::WirelessManager(const std::string &interfaceName)
+WirelessManager::WirelessManager()
 {
     _connectionEventFd = eventfd(0, EFD_NONBLOCK);
 
     if (_connectionEventFd == -1)
         throw std::system_error(errno, std::generic_category(), "Wireless manager: unable to create event fd -");
 
-    _interfaceName = interfaceName;
     _connectionThreadState = Idle;
     _connectionStatus = NotConnected;
 
@@ -46,56 +44,60 @@ WirelessManager::~WirelessManager()
     }
 }
 
+std::string WirelessManager::interfaceName() const
+{
+    Poco::RWLock::ScopedReadLock lock(_interfaceNameMutex);
+
+    return _interfaceName;
+}
+
 void WirelessManager::connect()
 {
-    std::lock_guard<std::recursive_mutex> lock(_commandsMutex);
+    if (!interfaceName().empty())
+    {
+        std::lock_guard<std::recursive_mutex> lock(_commandsMutex);
 
-    stopCommands();
+        stopCommands();
 
-    _connectionThreadState = Working;
-    _connectionThread = std::thread(&WirelessManager::_connect, this);
+        _connectionThreadState = Working;
+        _connectionThread = std::thread(&WirelessManager::_connect, this);
+    }
 }
 
 void WirelessManager::shutdown()
 {
-    std::lock_guard<std::recursive_mutex> lock(_commandsMutex);
+    if (!interfaceName().empty())
+    {
+        std::lock_guard<std::recursive_mutex> lock(_commandsMutex);
 
-    stopCommands();
+        stopCommands();
 
-    _shutdownThread = std::thread(&WirelessManager::ifdown, this);
+        _shutdownThread = std::thread(&WirelessManager::ifdown, this);
+    }
 }
 
 std::string WirelessManager::getCurrentSsid() const
 {
     std::string ssid;
-    int iwSocket = iw_sockets_open();
+    std::string interface = interfaceName();
 
-    if (iwSocket != -1)
-    {
-        char buffer[IW_ESSID_MAX_SIZE + 2];
-        memset(buffer, 0, sizeof(buffer));
-
-        iwreq req;
-        req.u.essid.pointer = buffer;
-        req.u.essid.length = IW_ESSID_MAX_SIZE + 2;
-        req.u.essid.flags = 0;
-
-        if (iw_get_ext(iwSocket, _interfaceName.c_str(), SIOCGIWESSID, &req) == 0)
-            ssid = buffer;
-
-        iw_sockets_close(iwSocket);
-    }
-    else
-        APP_LOGGER << "WirelessManager::getCurrentSsid - unable to open socket: " << std::strerror(errno) << std::endl;
+    if (!interface.empty())
+        Util::watchProcess("iwgetid -r " + interface, [&ssid](const char buffer[]){ ssid = buffer; });
 
     return ssid;
 }
 
-std::vector<std::string> WirelessManager::scanResult() const
+std::vector<WirelessManager::ScanResult> WirelessManager::scanResult() const
 {
-    std::lock_guard<std::mutex> lock(_scanResultMutex);
+    Poco::RWLock::ScopedReadLock lock(_scanResultMutex);
 
     return _scanResult;
+}
+
+void WirelessManager::setInterfaceName(const std::string &name)
+{
+    Poco::RWLock::ScopedWriteLock lock(_interfaceNameMutex);
+    _interfaceName = name;
 }
 
 void WirelessManager::stopCommands()
@@ -123,8 +125,10 @@ void WirelessManager::_connect()
 {
     try
     {
-        if (if_nametoindex(_interfaceName.c_str()) == 0)
-            throw std::system_error(errno, std::generic_category(), "WirelessManager::_connect - unable to get interface index (" + _interfaceName + "):");
+        std::string interface = interfaceName();
+
+        if (if_nametoindex(interface.c_str()) == 0)
+            throw std::system_error(errno, std::generic_category(), "WirelessManager::_connect - unable to get interface index (" + interface + "):");
 
         if (_connectionThreadState != Working)
         {
@@ -154,14 +158,15 @@ void WirelessManager::_connect()
 
 void WirelessManager::ifup()
 {
+    std::string interface = interfaceName();
     Poco::LogStream logStream(Logger::get());
 
     std::stringstream stream;
-    stream << "ifup " << _interfaceName;
+    stream << "ifup " << interface;
 
     if (Util::watchProcess(stream.str(), _connectionEventFd, [&logStream](const char buffer[]){ logStream << "WirelessManager::ifup - ifup:" << buffer << std::endl; }))
     {
-        NetworkInterfaces::InterfaceState state = NetworkInterfaces::getInterfaceState(_interfaceName);
+        NetworkInterfaces::InterfaceState state = NetworkInterfaces::getInterfaceState(interface);
 
         if (state.isEmpty() || !(state.flags & IFF_UP))
             _connectionStatus = ConnectionError;
@@ -172,59 +177,116 @@ void WirelessManager::ifup()
 
 void WirelessManager::ifdown()
 {
-    NetworkInterfaces::ifdown(_interfaceName);
+    NetworkInterfaces::ifdown(interfaceName());
 
     _connectionStatus = NotConnected;
 }
 
 void WirelessManager::checkInterfaceStatus()
 {
-    int iwSocket = iw_sockets_open();
-    bool showRangeError = true;
-
-    if (iwSocket != -1)
+    while (_interfaceStatusThreadStatus == Working)
     {
-        iwrange range;
+        std::string interface = interfaceName();
 
-        while (_interfaceStatusThreadStatus == Working)
+        if (interface.empty() || if_nametoindex(interface.c_str()) == 0)
         {
-            if (iw_get_range_info(iwSocket, _interfaceName.c_str(), &range) == 0)
+            setInterfaceName("");
+
+            for (const std::string &i: NetworkInterfaces::getAllInterfaces())
             {
-                showRangeError = true;
+                if (scan(i))
+                {
+                    setInterfaceName(i);
 
-                if (_interfaceStatusThreadStatus != Working)
                     break;
-
-                checkConnection();
-
-                if (_interfaceStatusThreadStatus != Working)
-                    break;
-
-                scan(iwSocket, range);
-
-                if (_interfaceStatusThreadStatus != Working)
-                    break;
+                }
             }
-            else if (showRangeError)
-            {
-                showRangeError = false;
-                APP_LOGGER << "WirelessManager::checkInterfaceStatus - unable to get interface range info: " << std::strerror(errno) << std::endl;
-            }
-
-            sleep(1);
         }
+        else
+            scan(interface);
 
-        iw_sockets_close(iwSocket);
+        checkConnection();
+
+        sleep(1);
     }
-    else
-        APP_LOGGER << "WirelessManager::checkInterfaceStatus - unable to open iw socket: " << std::strerror(errno) << std::endl;
 
     _interfaceStatusThreadStatus = Idle;
 }
 
+bool WirelessManager::scan(const std::string &interface)
+{
+    try
+    {
+        std::stringstream stream;
+
+        Util::watchProcess("iwlist " + interface + " scan", [&stream](const char buffer[]){ stream << buffer; });
+
+        std::vector<ScanResult> resultList;
+        ScanResult result;
+
+        while (stream.good())
+        {
+            std::string line;
+            std::getline(stream, line);
+
+            if (line.find("Cell ") != std::string::npos)
+            {
+                if (!result.ssid.empty())
+                    resultList.emplace_back(result);
+
+                result = ScanResult();
+            }
+            else if (line.find("ESSID:") != std::string::npos)
+            {
+                result.ssid = line.substr(line.find("ESSID:") + 7); //Skip ESSID:"
+                result.ssid.resize(result.ssid.size() - 1); //Skil " at the end
+            }
+            else if (line.find("Encryption key:") != std::string::npos)
+            {
+                if (line.find(":on") != std::string::npos)
+                    result.encryption = ScanResult::WepEncryption; //Assume that encryption is wep for now
+            }
+            else if (line.find("IE: ") != std::string::npos)
+            {
+                if (line.find("WPA Version 1") != std::string::npos)
+                    result.encryption = ScanResult::Wpa1Ecryption;
+                else if (line.find("WPA2") != std::string::npos)
+                    result.encryption = ScanResult::Wpa2Ecryption;
+            }
+            else if (line.find("Quality=") != std::string::npos)
+            {
+                std::string str = line.substr(line.find("Quality=") + 8);
+                std::stringstream stream(str);
+
+                stream >> result.quality;
+
+                std::getline(stream, str, '='); //Skip "/100  Signal level="
+
+                stream >> result.siganlLevel;
+            }
+        }
+
+        if (!result.ssid.empty())
+            resultList.emplace_back(result);
+
+        {
+            Poco::RWLock::ScopedWriteLock lock(_scanResultMutex);
+            _scanResult = std::move(resultList);
+        }
+    }
+    catch (const std::exception &ex)
+    {
+        APP_LOGGER << "WirelessManager::scan - unable to scan a network interface (" << interface << "): " << ex.what() << std::endl;
+
+        return false;
+    }
+
+    return true;
+}
+
 void WirelessManager::checkConnection()
 {
-    NetworkInterfaces::InterfaceState state = NetworkInterfaces::getInterfaceState(_interfaceName);
+    NetworkInterfaces::InterfaceState state = NetworkInterfaces::getInterfaceState(interfaceName());
 
     if (!state.isEmpty())
     {
@@ -243,29 +305,4 @@ void WirelessManager::checkConnection()
                 _connectionStatus = NotConnected;
         }
     }
-}
-
-void WirelessManager::scan(int iwSocket, const iw_range &range)
-{
-    wireless_scan_head scanHead;
-
-    if (iw_scan(iwSocket, const_cast<char*>(_interfaceName.c_str()), range.we_version_compiled, &scanHead) == 0) //For some reason in iw_scan they forgot to put const
-    {
-        std::vector<std::string> result;
-
-        for (wireless_scan *scanResult = scanHead.result; scanResult; scanResult = scanResult->next)
-        {
-            std::string ssid(scanResult->b.essid);
-
-            if (!ssid.empty())
-                result.emplace_back(std::move(ssid));
-        }
-
-        {
-            std::lock_guard<std::mutex> lock(_scanResultMutex);
-            _scanResult = std::move(result);
-        }
-    }
-    else
-        APP_LOGGER << "WirelessManager::scan - unable to scan interface: " << std::strerror(errno) << std::endl;
 }

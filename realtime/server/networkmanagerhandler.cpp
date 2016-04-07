@@ -12,6 +12,21 @@ NetworkManagerHandler::NetworkManagerHandler(const std::string &interfaceName, O
 
 void NetworkManagerHandler::processData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt)
 {
+    if (_interfaceName == "wlan")
+    {
+        if (qpcrApp.wirelessManager()->interfaceName().empty())
+        {
+            setStatus(Poco::Net::HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
+            setErrorString("No WIFI interface is present");
+
+            JsonHandler::processData(requestPt, responsePt);
+
+            return;
+        }
+
+        _interfaceName = qpcrApp.wirelessManager()->interfaceName();
+    }
+
     switch (_type)
     {
     case GetStat:
@@ -129,13 +144,34 @@ void NetworkManagerHandler::setSettings(const boost::property_tree::ptree &reque
 
 void NetworkManagerHandler::wifiScan(boost::property_tree::ptree &responsePt)
 {
-    std::vector<std::string> scanResult = qpcrApp.wirelessManager()->scanResult();
+    std::vector<WirelessManager::ScanResult> scanResult = qpcrApp.wirelessManager()->scanResult();
     boost::property_tree::ptree array;
 
-    for (const std::string &ssid: scanResult)
+    for (const WirelessManager::ScanResult &result: scanResult)
     {
         boost::property_tree::ptree ptree;
-        ptree.put("ssid", ssid);
+        ptree.put("ssid", result.ssid);
+        ptree.put("quality", result.quality);
+        ptree.put("siganl_level", result.siganlLevel);
+
+        switch (result.encryption)
+        {
+        case WirelessManager::ScanResult::WepEncryption:
+            ptree.put("encryption", "wep");
+            break;
+
+        case WirelessManager::ScanResult::Wpa1Ecryption:
+            ptree.put("encryption", "wpa1");
+            break;
+
+        case WirelessManager::ScanResult::Wpa2Ecryption:
+            ptree.put("encryption", "wpa2");
+            break;
+
+        default:
+            ptree.put("encryption", "none");
+            break;
+        }
 
         array.push_back(std::make_pair("", ptree));
     }
