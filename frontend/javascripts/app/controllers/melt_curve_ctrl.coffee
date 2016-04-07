@@ -12,7 +12,7 @@ App.controller 'MeltCurveCtrl', [
     $scope.loading = null
     $scope.data = MeltCurveService.defaultData()
     has_data = false
-    DATA = null
+    PARSED_DATA = null
 
     getMeltCurveData = (cb) ->
       $scope.loading = true
@@ -35,8 +35,12 @@ App.controller 'MeltCurveCtrl', [
       $scope.chartConfigNormalized = _.defaultsDeep angular.copy(opts), $scope.chartConfigNormalized
 
     updateZoomRange = (min, max) ->
-      $scope.zoom_range = max - min - 2
+      $scope.zoom_range = max - min
       console.log "$scope.zoom_range: #{$scope.zoom_range}"
+
+    updateResolutionOptions = (data, range) ->
+      MeltCurveService.optimizeForEachResolution(data, range).then (result) ->
+        console.log result
 
     $scope.$watch 'RunExperimentCtrl.chart', (chart) ->
       if chart is 'melt-curve' and !has_data
@@ -57,8 +61,8 @@ App.controller 'MeltCurveCtrl', [
               has_data = true
               $scope.loading = false
               $scope.data = data
-              DATA = angular.copy(data)
-              console.log 'parsed melt curve data '
+              PARSED_DATA = angular.copy(data)
+              updateResolutionOptions(data, $scope.zoom_range)
 
               $timeout ->
                 $scope.$broadcast '$reload:n3:charts'

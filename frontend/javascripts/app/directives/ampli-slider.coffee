@@ -27,7 +27,7 @@ window.App.directive('ampliSlider', [
           slider_offset.css('width').replace('px', '')
 
         updateModel = (num_cycle) ->
-          ngModel.$setViewValue(num_cycle)
+          ngModel.$setViewValue(num_cycle) if num_cycle isnt ngModel.$modelValue
           $scope.$apply()
 
         elem.on 'mousedown', (e) ->
