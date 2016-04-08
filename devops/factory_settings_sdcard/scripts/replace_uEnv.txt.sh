@@ -201,20 +201,4 @@ umount $rootfs || true
 rm -r $rootfs || true
 echo fstab updated
 
-# moving password file to /data partition
-if [ ! -e /data ]
-then
-	mkdir /data
-fi
-
-mount UUID=$UUID_p3 /data
-cp /etc/shadow /data/shadow
-if [ -L /etc/shadow ]; then
-        echo "Shadow file was moved before"
-        exit 0
-fi
-
-ln -s -f /data/shadow /etc/shadow
-echo shadow file moved to /data parition.
-
 exit 0
