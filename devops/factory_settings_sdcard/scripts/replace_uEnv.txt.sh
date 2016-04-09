@@ -76,7 +76,7 @@ then
 	UUID=$(lsblk -no UUID /dev/mmcblk0p2)
 	UUID_p3=$(blkid /dev/mmcblk0p3 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
 	UUID_p4=$(blkid /dev/mmcblk0p4 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
-        EMMC=/dev/mmcblk1p2
+        EMMC=/dev/mmcblk0p2
 	if [ -z $UUID ]
 	then
 		echo "Cann't find a booting root!"
