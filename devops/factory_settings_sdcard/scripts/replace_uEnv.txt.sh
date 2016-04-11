@@ -76,7 +76,7 @@ then
 	UUID=$(lsblk -no UUID /dev/mmcblk0p2)
 	UUID_p3=$(blkid /dev/mmcblk0p3 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
 	UUID_p4=$(blkid /dev/mmcblk0p4 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
-        EMMC=/dev/mmcblk1p2
+        EMMC=/dev/mmcblk0p2
 	if [ -z $UUID ]
 	then
 		echo "Cann't find a booting root!"
@@ -200,21 +200,5 @@ sync
 umount $rootfs || true
 rm -r $rootfs || true
 echo fstab updated
-
-# moving password file to /data partition
-if [ ! -e /data ]
-then
-	mkdir /data
-fi
-
-mount UUID=$UUID_p3 /data
-cp /etc/shadow /data/shadow
-if [ -L /etc/shadow ]; then
-        echo "Shadow file was moved before"
-        exit 0
-fi
-
-ln -s -f /data/shadow /etc/shadow
-echo shadow file moved to /data parition.
 
 exit 0

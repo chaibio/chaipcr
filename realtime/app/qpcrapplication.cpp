@@ -86,7 +86,7 @@ void QPCRApplication::initialize(Application&) {
 
         _dbControl.reset(new DBControl());
         _experimentController = ExperimentController::createInstance(_dbControl);
-        _wirelessManager.reset(new WirelessManager("wlan0"));
+        _wirelessManager.reset(new WirelessManager());
         _timeChecker.reset(new TimeChecker());
         _updateManager.reset(new UpdateManager(_dbControl));
 
@@ -192,6 +192,16 @@ void QPCRApplication::readDeviceFile()
             _settings.device.opticsChannels = array.get().size();
         else
             _settings.device.opticsChannels = 1;
+
+        boost::property_tree::ptree::const_assoc_iterator it = ptree.find("serial_number");
+
+        if (it != ptree.not_found())
+            _settings.device.serialNumber = it->second.get_value<std::string>();
+
+        it = ptree.find("model_number");
+
+        if (it != ptree.not_found())
+            _settings.device.modelNumber = it->second.get_value<std::string>();
     }
     else
         stream << "QPCRApplication::readDeviceFile - unable to read device file: " << std::strerror(errno) << std::endl;
@@ -207,8 +217,20 @@ void QPCRApplication::readConfigurationFile()
     {
         boost::property_tree::ptree ptree;
         boost::property_tree::read_json(deviceFile, ptree);
+        boost::property_tree::ptree::const_assoc_iterator softwareIt = ptree.find("software");
 
-        _settings.configuration.version = ptree.get<std::string>("software.version");
+        if (softwareIt != ptree.not_found())
+        {
+            boost::property_tree::ptree::const_assoc_iterator it = softwareIt->second.find("version");
+
+            if (it != softwareIt->second.not_found())
+                _settings.configuration.version = it->second.get_value<std::string>();
+
+            it = softwareIt->second.find("platform");
+
+            if (it != softwareIt->second.not_found())
+                _settings.configuration.platform = it->second.get_value<std::string>();
+        }
     }
     else
         stream << "QPCRApplication::readConfigurationFile - unable to read configuration file: " << std::strerror(errno) << std::endl;

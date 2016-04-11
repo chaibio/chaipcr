@@ -4,7 +4,8 @@
 # function: get melting curve data from MySQL database and perform water calibration
 get_mc_calib <- function(channel, 
                          db_conn, 
-                         exp_id, stage_id, calib_id, # for selecting data to analyze
+                         exp_id, stage_id, # for selecting data to analyze
+                         oc_data, 
                          show_running_time # option to show time cost to run this function
                          ) {
     
@@ -22,6 +23,8 @@ get_mc_calib <- function(channel,
                             exp_id, stage_id, as.numeric(channel))
     fluo_sel <- dbGetQuery(db_conn, fluo_qry)
     
+    num_wells <- length(unique(fluo_sel[,'well_num']))
+    
     # split temperature and fluo data by well_num
     tf_list <- split(fluo_sel[, c('temperature', 'fluorescence_value')], fluo_sel$well_num)
     
@@ -31,7 +34,7 @@ get_mc_calib <- function(channel,
     
     # water calibration
     fluo_mtx <- do.call(cbind, lapply(tf_ladj, function(tf) tf[, 'fluorescence_value']))
-    fluo_calib <- optic_calib(fluo_mtx, db_conn, calib_id, channel, show_running_time)$fluo_calib[,2:(num_wells+1)] # indice 2:(num_wells+1) were added 1, due to adply in optic_calib, which automatically add a column at index 1 of output from rownames of input array (1st argument)
+    fluo_calib <- optic_calib(fluo_mtx, oc_data, channel, show_running_time)$fluo_calib[,2:(num_wells+1)] # indice 2:(num_wells+1) were added 1, due to adply in optic_calib, which automatically add a column at index 1 of output from rownames of input array (1st argument)
     
     # combine temperature and fluo data
     fluo_calib_list <- alply(fluo_calib, .margins=2, .fun=function(col1) col1)
@@ -119,6 +122,7 @@ mc_tm_all <- function(fc_wT, mc_plot, show_running_time,
 # function: get melting curve data and output it for plotting as well as Tm
 process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
                        exp_id, stage_id, calib_id, # for selecting data to analyze
+                       dye_in='FAM', dyes_2bfild=NULL, 
                        dcv=TRUE, # logical, whether to perform multi-channel deconvolution
                        mc_plot=FALSE, # whether to plot melting curve data
                        extra_output=FALSE, 
@@ -145,12 +149,16 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
     
     if (length(channels) == 1) dcv <- FALSE
     
+    oc_data <- prep_optic_calib(db_conn, calib_id, dye_in, dyes_2bfild)
+    
     mc_calib_mtch <- process_mtch(channels, 
                                   matrix2array=TRUE, 
                                   func=get_mc_calib, 
                                   db_conn, 
-                                  exp_id, stage_id, calib_id, 
+                                  exp_id, stage_id, 
+                                  oc_data, 
                                   show_running_time)
+    dbDisconnect(db_conn)
     
     mc_calib_mtch_bych <- mc_calib_mtch[['pre_consoli']]
     pre_dcv_fc_wT_bych <- lapply(channels, function(channel) mc_calib_mtch_bych[[as.character(channel)]][['fc_wT']]) # `pre_dcv_fc_wT_bych` inherit channels as names from `channels`
@@ -159,7 +167,7 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
     mc_calib_array <- mc_calib_mtch[['post_consoli']][['fluo_calib']]
     
     if (dcv) {
-        dcvd_array <- deconv(mc_calib_array, k)
+        dcvd_array <- deconv(mc_calib_array, k_list[['k_inv_array']])
         fc_wT_colnames <- colnames(fc_wT_bych[[1]])
         fluo_colnames <- fc_wT_colnames[grepl('fluo_', fc_wT_colnames)]
         for (channel in channels) {

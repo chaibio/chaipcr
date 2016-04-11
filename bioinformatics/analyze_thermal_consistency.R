@@ -8,6 +8,7 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
     exp_id, 
     #stage_id, # hard-coded inside of the function
     calib_id, 
+    dye_in='FAM', dyes_2bfild=NULL, 
     dcv=FALSE, 
     mc_plot=FALSE, 
     out_json=TRUE, 
@@ -26,6 +27,7 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
     mc_w72c <- melt_1cr(floor_temp, 
                         db_usr, db_pwd, db_host, db_port, db_name, 
                         exp_id, stage_id, calib_id, channel, 
+                        dye_in, dyes_2bfild, 
                         dcv, 
                         mc_plot, 
                         show_running_time, 

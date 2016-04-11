@@ -7,7 +7,7 @@
       var self = this;
 
       self.getResult = function(baseline, excitation) {
-        return (excitation >= CONSTANTS.MIN_EXCITATION_FLUORESCENCE) && (excitation / baseline >= CONSTANTS.MIN_EXCITATION_FLUORESCENCE_MULTIPLE)
+        return (excitation >= CONSTANTS.MIN_EXCITATION_FLUORESCENCE) && (excitation / baseline >= CONSTANTS.MIN_EXCITATION_FLUORESCENCE_MULTIPLE) && (excitation <= CONSTANTS.MAX_EXCITATION)
       };
 
       self.getBaselineAndExcitation = function(data) {

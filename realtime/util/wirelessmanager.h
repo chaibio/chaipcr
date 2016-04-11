@@ -9,11 +9,34 @@
 
 #include <boost/noncopyable.hpp>
 
+#include <Poco/RWLock.h>
+
 struct iw_range;
 
 class WirelessManager : boost::noncopyable
 {
 public:
+    class ScanResult
+    {
+    public:
+        enum Encryption
+        {
+            NoEncryption,
+            WepEncryption,
+            Wpa1Ecryption,
+            Wpa2Ecryption
+        };
+
+        ScanResult(): encryption(NoEncryption), quality(0), siganlLevel(0) {}
+
+    public:
+        std::string ssid;
+        Encryption encryption;
+
+        unsigned quality;
+        int siganlLevel;
+    };
+
     enum ConnectionStatus
     {
         NotConnected,
@@ -23,21 +46,23 @@ public:
         Connected
     };
 
-    WirelessManager(const std::string &interfaceName);
+    WirelessManager();
     ~WirelessManager();
 
-    inline const std::string& interfaceName() const noexcept { return _interfaceName; }
+    std::string interfaceName() const;
 
     void connect();
     void shutdown();
 
     std::string getCurrentSsid() const;
 
-    std::vector<std::string> scanResult() const;
+    std::vector<ScanResult> scanResult() const;
 
     inline ConnectionStatus connectionStatus() const noexcept { return _connectionStatus; }
 
 private:
+    void setInterfaceName(const std::string &name);
+
     void stopCommands();
 
     void _connect();
@@ -47,7 +72,7 @@ private:
 
     void checkInterfaceStatus(); //perform scan and check if it is connected
     void checkConnection();
-    void scan(int iwSocket, const iw_range &range);
+    bool scan(const std::string &interface);
 
 private:
     enum OperationState
@@ -58,6 +83,7 @@ private:
     };
 
     std::string _interfaceName;
+    mutable Poco::RWLock _interfaceNameMutex;
 
     std::recursive_mutex _commandsMutex;
 
@@ -72,8 +98,8 @@ private:
 
     std::atomic<ConnectionStatus> _connectionStatus;
 
-    std::vector<std::string> _scanResult;
-    mutable std::mutex _scanResultMutex;
+    std::vector<ScanResult> _scanResult;
+    mutable Poco::RWLock _scanResultMutex;
 };
 
 #endif // WIRELESSMANAGER_H

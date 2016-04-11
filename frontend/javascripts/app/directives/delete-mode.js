@@ -28,7 +28,7 @@ window.ChaiBioTech.ngApp.directive('deleteMode', [
         scope.$watch('experiment', function(newVal, oldVal) {
           if(newVal) {
             scope.running = (newVal.started_at || false) && !(newVal.completed_at || false);
-            console.log(scope.running, newVal.started_at, newVal.completed_at);
+            // console.log(scope.running, newVal.started_at, newVal.completed_at);
           }
         });
 

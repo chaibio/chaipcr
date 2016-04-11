@@ -260,7 +260,7 @@ then
         incriment_restart_counter
 
 # was limited to 7 trails only.. if [ "$counter" -ge 7 ]
-	if [ false ]
+	if false
         then
                 echo Restart counter exceeded 7.. quitting upgrade operation
                 stop_packing_restarting

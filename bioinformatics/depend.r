@@ -1,7 +1,9 @@
-# load dependencies for 'amp.r' and 'meltcrv.r'
+# load dependencies
 
+# Assumptions. (1) Data from every channel present in the data table should be used; i.e. if a channel is not used to collect data, it should be absent in the data table. (2) Names of `oc_signal_step_ids` are the same as names of calib_id[['signal']] and as channels present in the signal data of the calibration experiment.
 
 # load libraries
+library(jsonlite)
 library(plyr)
 #library(qpcR)
 library(reshape2)
@@ -19,19 +21,20 @@ library(DBI)
 
 #setwd(Sys.getenv('RWORKDIR')) # Xia Hong
 
-dpds <- dir(pattern='\\.[Rr]$', recursive=TRUE)
-dpds <- dpds[dpds != 'depend.r']
-dummy <- lapply(dpds, source) # recursively load all the files that ends with '.R' or '.r'
+scripts <- list.files(pattern='\\.[Rr]$', recursive=TRUE)
+scripts <- scripts[scripts != 'depend.r']
+for (script in scripts) source(script) # recursively load all the files that ends with '.R' or '.r'
 
-load('qpcR/sysdata.rda')
-load('k.RData') # load hard-coded deconvolution matrix
+data_fns <- list.files(pattern='\\.(rda)|(RData)$', recursive=TRUE)
+for (data_fn in data_fns) load(data_fn)
 
 
 # set constants
 
-num_wells <<- 16
-scaling_factor_optic_calib <- 1e5 # used 9e5
-scaling_factors_deconv <<- c('1'=1, '2'=2)
+# num_wells <- 16
+
+scaling_factor_optic_calib <- 3.7 # used: 9e5, 1e5, 1.2e6, 3
+scaling_factors_deconv <- c('1'=1, '2'=5.6) # used: c('1'=1, '2'=1, 2, 3.5, 8, 7, 5.6)
 
 
 # function: connect to MySQL database; message about data selection

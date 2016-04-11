@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ -z $(which sshpass) ]
+then
+	echo installing sshpass
+	sudo apt-get install -y sshpass
+fi
+
 if [ ! -n "$remote_password" ]
 then
   echo "Enter remote password: "

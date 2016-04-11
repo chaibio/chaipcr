@@ -12,7 +12,8 @@ modlist <- function(
   exclude = NULL,
   labels = NULL, 
   norm = FALSE,
-  baseline = c("none", "mean", "median", "lin", "quad", "parm", "auto_lin"),
+  # baseline = c("none", "mean", "median", "lin", "quad", "parm"), # ori
+  baseline, # xqrm
   basecyc = 1:8,
   basefac = 1,
   smooth = NULL, 
@@ -33,7 +34,7 @@ modlist <- function(
   
   options(expressions = 50000)  
   remove <- match.arg(remove) 
-  if (!is.numeric(baseline)) baseline <- match.arg(baseline)  
+  # if (!is.numeric(baseline)) baseline <- match.arg(baseline) # ori
   
   ## convert from single fit 
   if (class(x)[1] == "pcrfit") {
@@ -91,6 +92,16 @@ modlist <- function(
     while (TRUE) { # xqrm
       
       ## version 1.4-0: baselining with first cycles using 'baseline' function
+      
+      # xqrm: adjust fluorescence value if no value in FLUO_ori > 0, so lm.fit won't fail on '0 (non-NA) cases'
+      if (all(FLUO_ori <= 0)) {
+        addition <- -min(FLUO_ori)
+        FLUO_ori <- FLUO_ori + addition
+        message('\nFluorescence values are all negative, added ', 
+                round(addition, 2), 
+                ' before baseline subtraction.')
+        }
+      
       #if (baseline != "none" & baseline != "parm") { # ori
       if (baseline_looped != "parm") { # xqrm
         #FLUO <- baseline(cyc = CYCLES, fluo = FLUO, model = NULL, baseline = baseline, # ori
@@ -101,7 +112,7 @@ modlist <- function(
         # xqrm
         if (baseline_looped == "none") {
           FLUO <- FLUO_ori
-        } else if (baseline_looped == "auto_lin") {
+        } else if (grepl('^auto_', baseline_looped)) {
           FLUO <- baseline(cyc = CYCLES, fluo = FLUO_ori, 
                            model = try(pcrfit(cbind(CYCLES, FLUO_ori), 1, 2, model, verbose = FALSE, ...), silent=FALSE), 
                            baseline = baseline_looped, basefac = basefac)
@@ -129,14 +140,7 @@ modlist <- function(
       ## changing magnitude
       if (factor != 1) FLUO <- FLUO * factor                
       
-      # xqrm: when baseline == "parm", adjust fluorescence value if no value in FLUO > 0, so lm.fit won't fail on '0 (non-NA) cases'
-      if (baseline == "parm" & all(FLUO <= 0)) {
-        addition <- -min(FLUO)
-        FLUO <- FLUO + addition
-        message('\nFluorescence values are all negative, added ', 
-                round(addition, 2), 
-                ' before baseline subtraction by \'parm\'.')
-        }
+      # xqrm
       fluo_add_list[[i]] <- FLUO
       
       ## fit model

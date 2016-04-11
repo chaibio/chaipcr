@@ -1,6 +1,7 @@
 #ifndef NETWORKCONFIGURATOR_H
 #define NETWORKCONFIGURATOR_H
 
+#include <vector>
 #include <string>
 #include <map>
 
@@ -38,6 +39,8 @@ namespace NetworkInterfaces
     };
 
     typedef std::map<std::string, NetworkInterfaces::InterfaceSettings> InterfaceSettingsMap;
+
+    std::vector<std::string> getAllInterfaces();
 
     InterfaceSettingsMap readInterfaceSettings(const std::string &filePath);
     InterfaceSettings readInterfaceSettings(const std::string &filePath, const std::string &interfaceName);
