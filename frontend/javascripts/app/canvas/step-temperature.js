@@ -27,12 +27,11 @@ angular.module("canvasApp").factory('stepTemperature', [
 
       this.render();
 
-      this.text.on('editing:exited', function() {
+      this.text.on('text:editing:exited', function() {
 
-        console.log(this.text.replace("º", ""));
-        $scope.step.temperature = parseFloat(this.text.replace("º", "")); //it works.
+        $scope.step.temperature = parseFloat(this.text.replace("º", "")) || 0;
         ExperimentLoader.changeTemperature($scope).then(function(data) {
-          //console.log(data);
+          console.log("saved", data);
         });
 
         editMode.tempActive = false;

@@ -120,16 +120,11 @@ angular.module("canvasApp").factory('mouseDown', [
         var Myobj = that.canvas.getActiveObject(), textOriginal = Myobj.getText();
 
         if(textOriginal.search(/\n/) !== -1) {
-          console.log("Enter hitt");
+          Myobj.text = textOriginal.replace(/(\n)/gm, "");
+          previouslySelected.circle.temperature.trigger('text:editing:exited');
         }
-        //var textRevised = textOriginal.replace(/(\r\n|\n|\r)/gm,"");
-        Myobj.set({ text: textOriginal.replace(/(\r\n|\n|\r)/gm,"") });
-        previouslySelected.circle.temperature.trigger('editing:exited');
-        //console.log(evt);
-
       });
     };
-
 
     return this;
   }
