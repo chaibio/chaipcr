@@ -298,13 +298,19 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     
     amp_calib_mtch_bych <- amp_calib_mtch[['pre_consoli']]
     
-    amp_calib_array <- amp_calib_mtch[['post_consoli']][['ac_mtx']]
+    amp_calib_array <<- amp_calib_mtch[['post_consoli']][['ac_mtx']]
     
     rbbs <- amp_calib_array # right before baseline subtraction
     
     if (dcv) {
+        # ac2dcv: when 1 %in% dim(amp_calib_array), `ac2dcv <- amp_calib_array[,,2:aca_dim3]` will result in reduced dimensions in ac2dcv
         aca_dim3 <- dim(amp_calib_array)[3]
-        ac2dcv <- amp_calib_array[,,2:aca_dim3]
+        ac2dcv_dim <- dim(amp_calib_array) - c(0,0,1)
+        ac2dcv_dimnames <- dimnames(amp_calib_array)
+        ac2dcv_dimnames[[3]] <- ac2dcv_dimnames[[3]][2:aca_dim3]
+        ac2dcv <- array(NA, dim=ac2dcv_dim, dimnames=ac2dcv_dimnames)
+        ac2dcv[,,] <- amp_calib_array[,,2:aca_dim3]
+        # end: ac2dcv
         dcvd_array <- deconv(ac2dcv, k_list[['k_inv_array']])
         for (channel in channels) {
             dcvd_mtx_per_channel <- dcvd_array[as.character(channel),,]
