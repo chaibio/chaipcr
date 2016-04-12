@@ -32,7 +32,7 @@ angular.module("canvasApp").factory('mouseDown', [
             getP = that.canvas.getPointer(evt.e);
 
             that.selectStep(target.parentCircle);
-            
+
             if(getP.x > stepDataGroupLeft && getP.x < (stepDataGroupLeft + 45)) {
               editMode.tempActive = true;
               var group = target.parentCircle.stepDataGroup;
@@ -114,8 +114,21 @@ angular.module("canvasApp").factory('mouseDown', [
         tempText.selectAll();
       };
 
-    };
 
+      this.canvas.on('text:changed', function(evt) {
+
+        var Myobj = that.canvas.getActiveObject(), textOriginal = Myobj.getText();
+
+        if(textOriginal.search(/\n/) !== -1) {
+          console.log("Enter hitt");
+        }
+        //var textRevised = textOriginal.replace(/(\r\n|\n|\r)/gm,"");
+        Myobj.set({ text: textOriginal.replace(/(\r\n|\n|\r)/gm,"") });
+        previouslySelected.circle.temperature.trigger('editing:exited');
+        //console.log(evt);
+
+      });
+    };
 
 
     return this;
