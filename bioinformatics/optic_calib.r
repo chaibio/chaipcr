@@ -183,13 +183,13 @@ prep_optic_calib <- function(db_conn, calib_id_s, dye_in='FAM', dyes_2bfild=NULL
         water_calib_id <- calib_id_s[['water']]
         signal_calib_id_s <- calib_id_s[['signal']] }
     
-    calib_water_list <<- get_calib_data(water_calib_id, oc_water_step_id, db_conn, NULL)
-    channels_in_water <- rownames(calib_water_list)
+    calib_water_list <- get_calib_data(water_calib_id, oc_water_step_id, db_conn, NULL)
+    channels_in_water <- names(calib_water_list)
     check_subset(list('set'=channels_in_water, 'description'='Input water channels'), dye2chst_ccsl)
     names(channels_in_water) <- channels_in_water
     
-    calib_signal_list <<- get_calib_data(signal_calib_id_s, oc_signal_step_ids, db_conn, 'channel')
-    channels_in_signal <- rownames(calib_signal_list)
+    calib_signal_list <- get_calib_data(signal_calib_id_s, oc_signal_step_ids, db_conn, 'channel')
+    channels_in_signal <- names(calib_signal_list)
     check_subset(list('set'=channels_in_signal, 'description'='Input signal channels'), dye2chst_ccsl)
     names(channels_in_signal) <- channels_in_signal
     
@@ -202,22 +202,19 @@ prep_optic_calib <- function(db_conn, calib_id_s, dye_in='FAM', dyes_2bfild=NULL
     
     # check whether signal > water
     calib_invalid_msg_vec <- NULL
+    well_names <- names(calib_water_list[[1]])
+    stop_msgs <- c()
     for (channel_in_signal in channels_in_signal) {
         calib_invalid_vec <- (calib_signal_list[[channel_in_signal]] - calib_water_list[[channel_in_signal]] <= 0)
         if (any(calib_invalid_vec)) {
-            ci_well_nums_str <- paste(paste(well_nums[calib_invalid_vec], collapse=', '), '. ', sep='')
-            stop_msg <- paste(
-                              sprintf('Invalid calibration data in channel %s: ', channel_in_signal), 
-                              'fluorescence value of water is greater than that of dye in the following well(s) - ', ci_well_nums_str, 
-                              sep='')
-            calib_invalid_msg_vec[channel_in_signal] <- stop_msg
+            ci_well_nums_str <- paste(paste(well_names[calib_invalid_vec], collapse=', '), '. ', sep='')
+            stop_msgs[channel_in_signal] <- paste(
+                                                  sprintf('Invalid calibration data in channel %s: ', channel_in_signal), 
+                                                  'fluorescence value of water is greater than or equal to that of dye in the following well(s) - ', ci_well_nums_str, 
+                                                  sep='')
             } }
-    if (length(calib_invalid_msg_vec) > 0) {
-        stop(paste(
-                   paste(calib_invalid_msg_vec, collapse='\n'), 
-                         'Details: ', 
-                             'Invalid calibration. ', 
-                             'Please perform a new optical calibration experiment. ', )) }
+    if (length(stop_msgs) > 0) {
+        stop(paste(stop_msgs, collapse='\n')) }
     
     if (length(dyes_2bfild) > 0) { # extrapolate calibration data for missing channels
         
