@@ -28,12 +28,12 @@ angular.module("canvasApp").factory('mouseDown', [
 
           case "stepDataGroup":
 
-            var click = evt.e;
-            var target = evt.target;
-            var stepDataGroupLeft = target.left ;//- 40;
-            console.log("stepDataGroup", click.clientX, target.left, evt);
+            var click = evt.e, target = evt.target, stepDataGroupLeft = target.left - 46,
+            getP = that.canvas.getPointer(evt.e);
+
             that.selectStep(target.parentCircle);
-            if(click.clientX > stepDataGroupLeft && click.clientX < (stepDataGroupLeft + 60)) {
+            
+            if(getP.x > stepDataGroupLeft && getP.x < (stepDataGroupLeft + 45)) {
               editMode.tempActive = true;
               var group = target.parentCircle.stepDataGroup;
               var items = group._objects;
