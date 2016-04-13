@@ -8,6 +8,8 @@ angular.module("canvasApp").factory('stepTemperature', [
       this.parent = parent;
       this.canvas = parent.canvas;
       this.stepData = this.model;
+      //this.lockUpdate = false;
+      var that = this;
 
       this.render = function() {
         var temp = parseFloat(this.stepData.temperature);
@@ -27,23 +29,37 @@ angular.module("canvasApp").factory('stepTemperature', [
 
       this.render();
 
-      this.text.on('text:editing:exited', function() {
 
-        $scope.step.temperature = parseFloat(this.text.replace("º", "")) || 0;
+
+      this.text.on('text:editing:exited', function() {
+        console.log("block 1");
+        if(editMode.tempActive) {
+          that.postEdit();
+        }
+
+      });
+
+      this.text.on('editing:exited', function() {
+        console.log("block 2");
+        if(editMode.tempActive) {
+          that.postEdit();
+        }
+      });
+
+      this.postEdit = function() {
+
+        editMode.tempActive = false;
+        $scope.step.temperature = parseFloat(this.text.text.replace("º", "")) || 0;
         ExperimentLoader.changeTemperature($scope).then(function(data) {
           console.log("saved", data);
         });
-
-        editMode.tempActive = false;
         parent.model.temperature = $scope.step.temperature;
-
         parent.circleGroup.top = parent.getTop().top;
         parent.createNewStepDataGroup();
         parent.manageDrag(parent.circleGroup);
         parent.circleGroup.setCoords();
         parent.canvas.renderAll();
-      });
-
+      };
       return this.text;
     };
   }
