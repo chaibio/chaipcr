@@ -1,8 +1,8 @@
 # calib
 
-# # old default: step ids for calibration data
-# oc_water_step_id <- 2
-# oc_signal_step_ids <- c('1'=4, '2'=4)
+# old default: step ids for calibration data
+oc_water_step_id <- 2
+oc_signal_step_ids <- c('1'=4, '2'=4)
 
 # # default: preset calibration experiment(s) # not set up yet
 # preset_calib_id <- 1
