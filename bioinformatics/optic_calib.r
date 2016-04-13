@@ -1,8 +1,8 @@
 # calib
 
-# default: step ids for calibration data
-oc_water_step_id <- 2
-oc_signal_step_ids <- c('1'=4, '2'=4)
+# # old default: step ids for calibration data
+# oc_water_step_id <- 2
+# oc_signal_step_ids <- c('1'=4, '2'=4)
 
 # # default: preset calibration experiment(s) # not set up yet
 # preset_calib_id <- 1
@@ -176,12 +176,26 @@ get_calib_data <- function(calib_id_s, step_id_s,
 
 prep_optic_calib <- function(db_conn, calib_id_s, dye_in='FAM', dyes_2bfild=NULL) {
     
-    if (length(calib_id_s) == 1) {
+    length_calib_id_s <- length(calib_id_s)
+    if (length_calib_id_s == 1) { # `calib_id_s` is an integer
         water_calib_id <- calib_id_s
         signal_calib_id_s <- calib_id_s
-    } else if (length(calib_id_s) == 2) { # for testing with different experiments for calibration
-        water_calib_id <- calib_id_s[['water']]
-        signal_calib_id_s <- calib_id_s[['signal']] }
+    } else { # calib_id_s is a list with > 1 elements
+        calib_id_s_names <- names(calib_id_s)
+        if (calib_id_s_names[2] == 'signal') { # xqrm format
+            water_calib_id <- calib_id_s[['water']]
+            signal_calib_id_s <- calib_id_s[['signal']] 
+        } else { # chai format: "list(water=list(calibration_id=..., step_id=...), channel_1=list(calibration_id=..., step_id=...), channel_2=list(calibration_id=...", step_id=...)"
+            water_cs_list <- calib_id_s[['water']]
+            water_calib_id <- water_cs_list[['calibration_id']]
+            oc_water_step_id <- water_cs_list[['step_id']]
+            ci_channel_is <- calib_id_s_names[2:length_calib_id_s]
+            names(ci_channel_is) <- sapply(calib_id_s_names[2:length_calib_id_s], 
+                                           function(calib_id_s_name) strsplit(calib_id_s_name, split='_')[[1]][2])
+            signal_calib_id_s  <- sapply(ci_channel_is, 
+                                         function(ci_channel_i) calib_id_s[[ci_channel_i]][['calibration_id']])
+            oc_signal_step_ids <- sapply(ci_channel_is, 
+                                         function(ci_channel_i) calib_id_s[[ci_channel_i]][['step_id']]) }}
     
     calib_water_list <- get_calib_data(water_calib_id, oc_water_step_id, db_conn, NULL)
     channels_in_water <- names(calib_water_list)

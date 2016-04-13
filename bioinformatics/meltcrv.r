@@ -137,17 +137,24 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
     db_conn <- db_etc(db_usr, db_pwd, db_host, db_port, db_name, 
                       exp_id, stage_id, calib_id)
     
-    mcd_qry <- sprintf('SELECT channel
-                           FROM melt_curve_data 
-                           WHERE experiment_id=%d AND stage_id=%d
-                           ORDER BY well_num, temperature',
-                           exp_id, stage_id)
-    mcd_channel <- dbGetQuery(db_conn, mcd_qry)
+    # { # process all available channels
+    # mcd_qry <- sprintf('SELECT channel
+                           # FROM melt_curve_data 
+                           # WHERE experiment_id=%d AND stage_id=%d
+                           # ORDER BY well_num, temperature',
+                           # exp_id, stage_id)
+    # mcd_channel <- dbGetQuery(db_conn, mcd_qry)
     
-    channels <- unique(mcd_channel[,'channel'])
-    names(channels) <- channels
+    # channels <- unique(mcd_channel[,'channel'])
+    # names(channels) <- channels
     
-    if (length(channels) == 1) dcv <- FALSE
+    # if (length(channels) == 1) dcv <- FALSE
+    # }
+    
+    { # process only channel 1
+    channels <- c('1'='1')
+    dcv <- FALSE
+    }
     
     oc_data <- prep_optic_calib(db_conn, calib_id, dye_in, dyes_2bfild)
     
