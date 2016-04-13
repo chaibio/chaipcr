@@ -38,7 +38,7 @@ angular.module("canvasApp").factory('mouseDown', [
               var group = target.parentCircle.stepDataGroup;
               var items = group._objects;
               unHookGroup(group, items);
-              startEditing(target.parentCircle.temperature);
+              startEditingTemperature(target.parentCircle.temperature);
             } else {
               console.log("clicked on holdTime");
             }
@@ -108,22 +108,12 @@ angular.module("canvasApp").factory('mouseDown', [
         C.canvas.renderAll();
       };
 
-      startEditing = function(tempText) {
+      startEditingTemperature = function(tempText) {
         C.canvas.setActiveObject(tempText);
         tempText.enterEditing();
         tempText.selectAll();
       };
 
-
-      this.canvas.on('text:changed', function(evt) {
-
-        var Myobj = that.canvas.getActiveObject(), textOriginal = Myobj.getText();
-
-        if(textOriginal.search(/\n/) !== -1) {
-          Myobj.text = textOriginal.replace(/(\n)/gm, "");
-          previouslySelected.circle.temperature.trigger('text:editing:exited');
-        }
-      });
     };
 
     return this;

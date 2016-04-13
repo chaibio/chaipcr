@@ -8,7 +8,6 @@ angular.module("canvasApp").factory('stepTemperature', [
       this.parent = parent;
       this.canvas = parent.canvas;
       this.stepData = this.model;
-      //this.lockUpdate = false;
       var that = this;
 
       this.render = function() {
@@ -29,10 +28,10 @@ angular.module("canvasApp").factory('stepTemperature', [
 
       this.render();
 
-
-
       this.text.on('text:editing:exited', function() {
-        console.log("block 1");
+        // This block is executed when we hit enter.
+        // This condition is a tricky one. When we hit enter text:editing:exited and editing:exited are called and
+        // we dont need to execute twice. So in the first call, whichever it is editMode.tempActive is made false.
         if(editMode.tempActive) {
           that.postEdit();
         }
@@ -40,7 +39,7 @@ angular.module("canvasApp").factory('stepTemperature', [
       });
 
       this.text.on('editing:exited', function() {
-        console.log("block 2");
+        // This block works when we click somewhere else after enabling inline edit.
         if(editMode.tempActive) {
           that.postEdit();
         }
@@ -49,7 +48,9 @@ angular.module("canvasApp").factory('stepTemperature', [
       this.postEdit = function() {
 
         editMode.tempActive = false;
-        $scope.step.temperature = parseFloat(this.text.text.replace("º", "")) || 0;
+        var tempFloat = Math.abs(parseFloat(this.text.text.replace("º", ""))) || $scope.step.temperature;
+        $scope.step.temperature = (tempFloat > 100) ? 100.0 :  tempFloat;
+
         ExperimentLoader.changeTemperature($scope).then(function(data) {
           console.log("saved", data);
         });

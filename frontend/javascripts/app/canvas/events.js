@@ -19,10 +19,10 @@ angular.module("canvasApp").factory('events', [
   'mouseUp',
   'htmlEvents',
   'circleManager',
-
+  'textChanged',
   function(ExperimentLoader, previouslySelected, popupStatus, previouslyHoverd, scrollService,
     mouseOver, mouseOut, mouseDown, objectMoving, objectModified, mouseMove, mouseUp, htmlEvents,
-    circleManager) {
+    circleManager, textChanged) {
     return function(C, $scope) {
       //console.log(window.canvasApp, 222);
       this.canvas = C.canvas;
@@ -33,7 +33,7 @@ angular.module("canvasApp").factory('events', [
       this.moveStepActive = false;
       var that = this;
 
-      // Initiate all events
+      // Initiate all events // you may pass this instead of that.
       mouseOver.init.call(this, C, $scope, that);
       mouseOut.init.call(this, C, $scope, that);
       mouseDown.init.call(this, C, $scope, that);
@@ -42,6 +42,8 @@ angular.module("canvasApp").factory('events', [
 
       objectMoving.init.call(this, C, $scope, that);
       objectModified.init.call(this, C, $scope, that);
+
+      textChanged.init.call(this, C, $scope, that);
 
       htmlEvents.init.call(this, C, $scope, that);
 
