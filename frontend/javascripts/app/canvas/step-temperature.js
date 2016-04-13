@@ -21,7 +21,8 @@ angular.module("canvasApp").factory('stepTemperature', [
           left: this.parent.left - 15,
           fontFamily: "dinot-bold",
           selectable: false,
-          hasBorder: false
+          hasBorder: false,
+          type: "temperatureDisplay"
         });
 
       };
