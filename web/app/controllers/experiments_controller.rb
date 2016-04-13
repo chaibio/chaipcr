@@ -232,12 +232,13 @@ class ExperimentsController < ApplicationController
           end
           
           fluorescence_data = FluorescenceDatum.data(@experiment.id, first_stage_collect_data.id)
-          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/amplification.csv")
-          columns = ["channel", "well_num", "cycle_num"]
-          fluorescence_index = 0
-          csv_string = CSV.generate do |csv|
-            csv << ["baseline_subtracted_value", "background_subtracted_value", "fluorescence_value"]+columns
-            if amplification_data
+          
+          if amplification_data
+            out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/amplification.csv")
+            columns = ["channel", "well_num", "cycle_num"]
+            fluorescence_index = 0
+            csv_string = CSV.generate do |csv|
+              csv << ["baseline_subtracted_value", "background_subtracted_value", "fluorescence_value"]+columns
               amplification_data.each do |data|
                 fluorescence_value = (fluorescence_data[fluorescence_index].channel == data.channel && 
                                       fluorescence_data[fluorescence_index].well_num+1 == data.well_num && 
@@ -246,19 +247,19 @@ class ExperimentsController < ApplicationController
                 fluorescence_index += 1
               end
             end
+            out.write csv_string
           end
-          out.write csv_string
-          
-          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/ct.csv")
-          csv_string = CSV.generate do |csv|
-            csv << ["channel", "well_num", "ct"];
-            if cts
+
+          if cts            
+            out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/ct.csv")
+            csv_string = CSV.generate do |csv|
+              csv << ["channel", "well_num", "ct"];
               cts.each do |ct|
                 csv << [ct.channel, ct.well_num, ct.ct]
               end
             end
+            out.write csv_string
           end
-          out.write csv_string
           
           first_stage_meltcurve_data = Stage.joins(:protocol).where(["experiment_definition_id=? and stage_type='meltcurve'", @experiment.experiment_definition_id]).first
           if first_stage_meltcurve_data
@@ -268,35 +269,34 @@ class ExperimentsController < ApplicationController
               logger.error("export melt curve data failed: #{e}")
             end
           end
-          
-          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_data.csv")
-          columns = ["channel", "well_num", "temperature", "fluorescence_data", "derivative"]
-          csv_string = CSV.generate do |csv|
-            csv << columns
-            if melt_curve_data
+
+          if melt_curve_data          
+            out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_data.csv")
+            columns = ["channel", "well_num", "temperature", "fluorescence_data", "derivative"]
+            csv_string = CSV.generate do |csv|
+              csv << columns
               melt_curve_data.each do |data|
                 data.temperature.each_index do |index|
                   csv << [data.channel, data.well_num, data.temperature[index], data.fluorescence_data[index], data.derivative[index]]
                 end
               end
             end
-          end
-          out.write csv_string
+            
+            out.write csv_string
           
-          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_analysis.csv")
-          columns = ["channel", "well_num", "Tm1", "Tm2", "Tm3", "Tm4", "area1", "area2", "area3", "area4"]
-          csv_string = CSV.generate do |csv|
-            csv << columns
-            if melt_curve_data
+            out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_analysis.csv")
+            columns = ["channel", "well_num", "Tm1", "Tm2", "Tm3", "Tm4", "area1", "area2", "area3", "area4"]
+            csv_string = CSV.generate do |csv|
+              csv << columns
               melt_curve_data.each do |data|
                 tm_arr = (data.tm.is_a?Array)? [data.tm[0], data.tm[1], data.tm[2], data.tm[3]] : [data.tm, nil, nil, nil]
                 area_arr = (data.area.is_a?Array)? [data.area[0], data.area[1], data.area[2], data.area[3]] : [data.area, nil, nil, nil]
                 csv << [data.channel, data.well_num]+tm_arr+area_arr
               end
             end
+            
+            out.write csv_string
           end
-          out.write csv_string
-          
         end
         buffer.rewind
         send_data buffer.sysread
@@ -310,7 +310,7 @@ class ExperimentsController < ApplicationController
       connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
       begin
         connection.eval("source(\"#{Rails.configuration.dynamic_file_path}/#{@experiment.experiment_definition.guid}/analyze.R\")")
-        response = connection.eval("tryCatchError(analyze, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{@experiment.id}, #{@experiment.calibration_id})").to_ruby
+        response = connection.eval("tryCatchError(analyze, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{@experiment.id}, #{calibrate_info(@experiment.calibration_id)})").to_ruby
       rescue  => e
         logger.error("Rserve error: #{e}")
         kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
@@ -343,7 +343,7 @@ class ExperimentsController < ApplicationController
     connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
     begin
-      results = connection.eval("tryCatchError(get_amplification_data, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibration_id})")
+      results = connection.eval("tryCatchError(get_amplification_data, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibrate_info(calibration_id)})")
     rescue  => e
       logger.error("Rserve error: #{e}")
       kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
@@ -391,7 +391,7 @@ class ExperimentsController < ApplicationController
     connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
     begin
-      results = connection.eval("tryCatchError(process_mc, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibration_id})")
+      results = connection.eval("tryCatchError(process_mc, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibrate_info(calibration_id)})")
     rescue  => e
       logger.error("Rserve error: #{e}")
       kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
@@ -415,6 +415,23 @@ class ExperimentsController < ApplicationController
     end 
     logger.info("Rails code time #{Time.now-start_time}")
     return melt_curve_data
+  end
+  
+  def calibrate_info(calibration_id)
+    protocol = Protocol.includes(:stages).where("protocols.experiment_definition_id=(SELECT experiment_definition_id from experiments where experiments.id=#{calibration_id} LIMIT 1)").first
+    if protocol && protocol.stages[0]
+      step_water = protocol.stages[0].steps[1].id
+      step_channel_1 = protocol.stages[0].steps[3].id
+      if Device.dual_channel?
+        step_channel_2 = (protocol.stages[0].steps.length > 5)? protocol.stages[0].steps[5].id : protocol.stages[0].steps[3].id
+      else
+        step_channel_2 = nil
+      end
+      result = "list(water=list(calibration_id=#{calibration_id},step_id=#{step_water}), channel_1=list(calibration_id=#{calibration_id},step_id=#{step_channel_1}) \
+              #{(step_channel_2)? ", channel_2=list(calibration_id="+calibration_id.to_s+",step_id="+step_channel_2.to_s+")" : ""})"
+    end
+    logger.info ("********#{result}")
+    result
   end
   
 end
