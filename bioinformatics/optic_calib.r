@@ -62,17 +62,17 @@ oc_signal_step_ids <- c('1'=4, '2'=4)
 { # FAM, JOE
 
 # # 0.1 ml new factory. FAM 115, JOE 117.
-# # calib_id_ <- list('water'=114, 'signal'=c('1'=115, '2'=116))
+# # calib_id_ <- list('water'=114, 'signal'=c('1'=115, '2'=117))
 # oc_water_step_id <- 264
 # oc_signal_step_ids <- c('1'=266, '2'=270)
 
 # # 0.2 ml. FAM 119, JOE 121.
-# # calib_id_ <- list('water'=118, 'signal'=c('1'=119, '2'=120))
+# # calib_id_ <- list('water'=118, 'signal'=c('1'=119, '2'=121))
 # oc_water_step_id <- 272
 # oc_signal_step_ids <- c('1'=274, '2'=278)
 
 # # 0.1 ml new user. FAM 123, JOE 125.
-# # calib_id_ <- list('water'=122, 'signal'=c('1'=123, '2'=124))
+# # calib_id_ <- list('water'=122, 'signal'=c('1'=123, '2'=125))
 # oc_water_step_id <- 280
 # oc_signal_step_ids <- c('1'=282, '2'=286)
 }
@@ -113,7 +113,7 @@ check_subset <- function(list_small, list_big) {
     }
 
 
-# function: get calibration signal data for one channel
+# function: get calibration data
 get_calib_data <- function(calib_id_s, step_id_s, 
                            db_conn, 
                            calib_id_name_type=c('dye', 'channel')) {
