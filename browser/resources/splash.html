@@ -26,17 +26,33 @@ $(document).ready(function(){
 		$.get("http://localhost:8000/network/eth0")
 			.done(function(data) {
 				if(data.state) {
-					$("#ip").text("IP: " + data.state.address);
+					$("#ip-address").text("IP ADDRESS: " + data.state.address);
 				} else {
-					$("#ip").text("No ethernet connection.")
+					$("#ip-address").text("No ethernet connection.")
 				}
 			})
 			.fail(function() {
-				$("#ip").text("No ethernet connection.");
+				$("#ip-address").text("No ethernet connection.");
 			});
 	}
 
 	checkConnection();
+
+	var getDevice = function() {
+		$.get("http://localhost:8000/device")
+		.done(function(data) {
+			if(data.software.version) {
+				$("#version").text("V. " + data.software.version);
+			}
+			if(data.serial_number) {
+				$("#serial").text("SERIAL: " + data.software.version);
+			}
+		})
+		.fail(function() {
+
+		});
+	}
+	getDevice();
 });
 //-->
 </script>
@@ -47,6 +63,9 @@ $(document).ready(function(){
 	<img src="images/openqpcr_logo_dark.svg">
 </div>
 <div id="ip">
+	<span id="ip-address"></span>
+	<span id="version"></span>
+	<span id="serial"></span>
 </div>
 </body>
 

@@ -18,7 +18,15 @@ body {
 	width: 99%;
 	height: 100px;
 	position: absolute;
-	top: 380px;
+	bottom: 0px;
 	color: white;
-	text-align: center;
+}
+#ip-address {
+	padding-left: 60px;
+}
+#version {
+	padding-left: 300px;
+}
+#serial {
+	padding-left: 100px;
 }

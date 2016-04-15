@@ -57,7 +57,7 @@ angular.module("canvasApp").factory('stepHoldTime', [
       });
 
       this.postEdit = function() {
-
+        // There is some issues for, saving new hold_time for infinite hold, make sure uts corrected when new design comes.
         editMode.holdActive = false;
         $scope.step.hold_time = $scope.convertToMinute(this.text.text) || $scope.step.hold_time;
 

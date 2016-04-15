@@ -37,6 +37,7 @@ var status_lid_heating = require('./status-lid-heating.json');
 var status_running = require('./status-running.json');
 var network = require('./network.json');
 var wifi_networks = require('./wifi-networks.json');
+var device = require('./device.json');
 var STATUSES = ['idle', 'lid_heating', 'running', 'paused', 'complete'];
 var experiment_id = null;
 var lastLog = null;
@@ -142,8 +143,11 @@ function autoupdateLogs() {
 }
 
 app.get('/status', function (req, res, next) {
-  data.lid = {open: false}
+  data.lid = {open: false};
   res.send(data);
+});
+app.get('/device', function(req, res, next) {
+  res.send(device);
 });
 
 app.post('/device/check_for_updates', function (req, res, next) {
