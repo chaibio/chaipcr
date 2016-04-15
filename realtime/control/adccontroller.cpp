@@ -37,6 +37,7 @@ ADCController::~ADCController() {
 void ADCController::process() {
     Poco::LogStream logStream(Logger::get());
 
+    setThreadName("ADCController");
     setMaxRealtimePriority();
 
     _ltc2444->readSingleEndedChannel(0, kThermistorOversamplingRate); //start first read
@@ -127,7 +128,14 @@ void ADCController::process() {
             _currentChannel = channel;
         }
     }
+    catch (const std::exception &ex) {
+        logStream << "ADCController::process - exception: " << ex.what() << std::endl;
+
+        qpcrApp.setException(std::current_exception());
+    }
     catch (...) {
+        logStream << "ADCController::process - unknown exception" << std::endl;
+
         qpcrApp.setException(std::current_exception());
     }
 }

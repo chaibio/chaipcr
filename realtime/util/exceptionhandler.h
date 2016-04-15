@@ -3,8 +3,9 @@
 
 #include "logger.h"
 
+#include <string>
+#include <typeinfo>
 #include <cstdio>
-#include <cstring>
 #include <dlfcn.h>
 #include <execinfo.h>
 
@@ -18,8 +19,41 @@ extern "C" {
 
 typedef void (*ThrowHandler)(void*,void*,void(*)(void*));
 
-void __cxa_throw(void *exception, void *info, void (*destination)(void *)) {
-    void *trace[BACKTRACE_SIZE];
+bool ignore_exception(void *exception, void *info)
+{
+    if (reinterpret_cast<std::type_info*>(info)->before(typeid(std::exception)))
+    {
+        std::string message = reinterpret_cast<std::exception*>(exception)->what();
+
+        return message == "Net Exception" || //Poco internal exception
+                (message.find("iwlist") != std::string::npos && message.find("list") != std::string::npos); //Wifi scan attempts on non wifi interfaces. They might be too many to have them in the log file
+    }
+
+    return false;
+}
+
+void __cxa_throw(void *exception, void *info, void (*destination)(void *))
+{
+    if (!ignore_exception(exception, info))
+    {
+        void *trace[BACKTRACE_SIZE];
+        int size = backtrace(trace, BACKTRACE_SIZE);
+        char **buffer = backtrace_symbols(trace, size);
+
+        Poco::LogStream logStream(Logger::get());
+
+        if (reinterpret_cast<std::type_info*>(info)->before(typeid(std::exception)))
+            logStream << "Catched an exception (" << reinterpret_cast<std::exception*>(exception)->what() << "). Backtrace:" << std::endl;
+        else
+            logStream << "Catched an unknown exception. Backtrace:" << std::endl;
+
+        for (int i = 0; i < size; ++i)
+            logStream << buffer[i] << std::endl;
+
+        free(buffer);
+    }
+
+    /*void *trace[BACKTRACE_SIZE];
     int size = backtrace(trace, BACKTRACE_SIZE);
     char **buffer = backtrace_symbols(trace, size);
 
@@ -33,7 +67,7 @@ void __cxa_throw(void *exception, void *info, void (*destination)(void *)) {
             logStream << buffer[i] << std::endl;
     }
 
-    free(buffer);
+    free(buffer);*/
 
     static ThrowHandler handler __attribute__ ((noreturn)) = (ThrowHandler)dlsym(RTLD_NEXT, "__cxa_throw");
     handler(exception, info, destination);
