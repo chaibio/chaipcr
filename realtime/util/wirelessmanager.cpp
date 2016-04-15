@@ -274,10 +274,8 @@ bool WirelessManager::scan(const std::string &interface)
             _scanResult = std::move(resultList);
         }
     }
-    catch (const std::exception &ex)
+    catch (...)
     {
-        APP_LOGGER << "WirelessManager::scan - unable to scan a network interface (" << interface << "): " << ex.what() << std::endl;
-
         return false;
     }
 

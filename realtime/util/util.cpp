@@ -40,19 +40,31 @@ boost::posix_time::ptime parseIsoTime(const std::string &str)
     return boost::posix_time::ptime(boost::gregorian::date(year, month, day), boost::posix_time::time_duration(hours, minutes, seconds));
 }
 
-void watchProcess(const std::string &command, std::function<void(const char[1024])> readCallback)
+void watchProcess(const std::string &command, std::function<void(const char[1024])> outCallback, std::function<void(const char[1024])> errorCallback)
 {
-    int processPipes[2] = {-1};
+    int outPipes[2] = {-1};
+    int errorPipes[2] = {-1};
 
-    if (pipe2(processPipes, O_CLOEXEC) == -1)
-        throw std::system_error(errno, std::generic_category(), "Util::watchProcess - unable to create pipes:");
+    if (pipe2(outPipes, O_CLOEXEC) == -1)
+        throw std::system_error(errno, std::generic_category(), "Util::watchProcess - unable to create out pipes:");
+
+    if (pipe2(errorPipes, O_CLOEXEC) == -1)
+    {
+        close(outPipes[0]);
+        close(outPipes[1]);
+
+        throw std::system_error(errno, std::generic_category(), "Util::watchProcess - unable to create error pipes:");
+    }
 
     pid_t pid = vfork();
 
     if (pid == -1)
     {
-        close(processPipes[0]);
-        close(processPipes[1]);
+        close(outPipes[0]);
+        close(outPipes[1]);
+
+        close(errorPipes[0]);
+        close(errorPipes[1]);
 
         throw std::system_error(errno, std::generic_category(), "Util::watchProcess - unable to fork:");
     }
@@ -61,13 +73,20 @@ void watchProcess(const std::string &command, std::function<void(const char[1024
     {
         setpgrp();
 
-        if (processPipes[1] != fileno(stdout))
+        if (outPipes[1] != fileno(stdout))
         {
-            dup2(processPipes[1], fileno(stdout));
-            close(processPipes[1]);
+            dup2(outPipes[1], fileno(stdout));
+            close(outPipes[1]);
         }
 
-        close(processPipes[0]);
+        if (errorPipes[1] != fileno(stderr))
+        {
+            dup2(errorPipes[1], fileno(stderr));
+            close(errorPipes[1]);
+        }
+
+        close(outPipes[0]);
+        close(errorPipes[0]);
 
         setpriority(PRIO_PROCESS, getpid(), 20);
 
@@ -77,16 +96,21 @@ void watchProcess(const std::string &command, std::function<void(const char[1024
         //It will never reach this line
     }
 
-    close(processPipes[1]);
+    close(outPipes[1]);
+    close(errorPipes[1]);
 
     bool processFinished = false;
 
-    pollfd fdArray[1];
-    fdArray[0].fd = processPipes[0];
+    pollfd fdArray[2];
+    fdArray[0].fd = outPipes[0];
     fdArray[0].events = POLLIN | POLLPRI;
     fdArray[0].revents = 0;
 
-    while (poll(fdArray, 1, -1) > 0)
+    fdArray[1].fd = errorPipes[0];
+    fdArray[1].events = POLLIN | POLLPRI;
+    fdArray[1].revents = 0;
+
+    while (poll(fdArray, 2, -1) > 0)
     {
         if (fdArray[0].revents > 0)
         {
@@ -97,11 +121,11 @@ void watchProcess(const std::string &command, std::function<void(const char[1024
 
                 while (read(fdArray[0].fd, buffer, 1023) == 1023)
                 {
-                    readCallback(buffer);
+                    outCallback(buffer);
                     memset(buffer, 0, 1024);
                 }
 
-                readCallback(buffer);
+                outCallback(buffer);
             }
             else if (fdArray[0].revents & POLLHUP)
             {
@@ -112,10 +136,32 @@ void watchProcess(const std::string &command, std::function<void(const char[1024
                 break;
         }
 
+        if (fdArray[1].revents > 0)
+        {
+            if (fdArray[1].revents & POLLIN || fdArray[1].revents & POLLPRI)
+            {
+                char buffer[1024];
+                memset(buffer, 0, 1024);
+
+                while (read(fdArray[1].fd, buffer, 1023) == 1023)
+                {
+                    if (errorCallback)
+                        errorCallback(buffer);
+
+                    memset(buffer, 0, 1024);
+                }
+
+                if (errorCallback)
+                    errorCallback(buffer);
+            }
+        }
+
         fdArray[0].revents = 0;
+        fdArray[1].revents = 0;
     }
 
-    close(processPipes[0]);
+    close(outPipes[0]);
+    close(errorPipes[0]);
 
     if (processFinished)
     {
@@ -135,19 +181,31 @@ void watchProcess(const std::string &command, std::function<void(const char[1024
     }
 }
 
-bool watchProcess(const std::string &command, int eventFd, std::function<void(const char[1024])> readCallback)
+bool watchProcess(const std::string &command, int eventFd, std::function<void(const char[1024])> outCallback, std::function<void(const char[1024])> errorCallback)
 {
-    int processPipes[2] = {-1};
+    int outPipes[2] = {-1};
+    int errorPipes[2] = {-1};
 
-    if (pipe2(processPipes, O_CLOEXEC) == -1)
-        throw std::system_error(errno, std::generic_category(), "Util::watchProcess - unable to create pipes:");
+    if (pipe2(outPipes, O_CLOEXEC) == -1)
+        throw std::system_error(errno, std::generic_category(), "Util::watchProcess - unable to create out pipes:");
+
+    if (pipe2(errorPipes, O_CLOEXEC) == -1)
+    {
+        close(outPipes[0]);
+        close(outPipes[1]);
+
+        throw std::system_error(errno, std::generic_category(), "Util::watchProcess - unable to create error pipes:");
+    }
 
     pid_t pid = vfork();
 
     if (pid == -1)
     {
-        close(processPipes[0]);
-        close(processPipes[1]);
+        close(outPipes[0]);
+        close(outPipes[1]);
+
+        close(errorPipes[0]);
+        close(errorPipes[1]);
 
         throw std::system_error(errno, std::generic_category(), "Util::watchProcess - unable to fork:");
     }
@@ -156,13 +214,20 @@ bool watchProcess(const std::string &command, int eventFd, std::function<void(co
     {
         setpgrp();
 
-        if (processPipes[1] != fileno(stdout))
+        if (outPipes[1] != fileno(stdout))
         {
-            dup2(processPipes[1], fileno(stdout));
-            close(processPipes[1]);
+            dup2(outPipes[1], fileno(stdout));
+            close(outPipes[1]);
         }
 
-        close(processPipes[0]);
+        if (errorPipes[1] != fileno(stderr))
+        {
+            dup2(errorPipes[1], fileno(stderr));
+            close(errorPipes[1]);
+        }
+
+        close(outPipes[0]);
+        close(errorPipes[0]);
 
         setpriority(PRIO_PROCESS, getpid(), 20);
 
@@ -172,20 +237,25 @@ bool watchProcess(const std::string &command, int eventFd, std::function<void(co
         //It will never reach this line
     }
 
-    close(processPipes[1]);
+    close(outPipes[1]);
+    close(errorPipes[1]);
 
     bool processFinished = false;
 
-    pollfd fdArray[2];
-    fdArray[0].fd = processPipes[0];
+    pollfd fdArray[3];
+    fdArray[0].fd = outPipes[0];
     fdArray[0].events = POLLIN | POLLPRI;
     fdArray[0].revents = 0;
 
-    fdArray[1].fd = eventFd;
+    fdArray[1].fd = errorPipes[0];
     fdArray[1].events = POLLIN | POLLPRI;
     fdArray[1].revents = 0;
 
-    while (poll(fdArray, 2, -1) > 0)
+    fdArray[2].fd = eventFd;
+    fdArray[2].events = POLLIN | POLLPRI;
+    fdArray[2].revents = 0;
+
+    while (poll(fdArray, 3, -1) > 0)
     {
         if (fdArray[0].revents > 0)
         {
@@ -196,11 +266,11 @@ bool watchProcess(const std::string &command, int eventFd, std::function<void(co
 
                 while (read(fdArray[0].fd, buffer, 1023) == 1023)
                 {
-                    readCallback(buffer);
+                    outCallback(buffer);
                     memset(buffer, 0, 1024);
                 }
 
-                readCallback(buffer);
+                outCallback(buffer);
             }
             else if (fdArray[0].revents & POLLHUP)
             {
@@ -210,7 +280,28 @@ bool watchProcess(const std::string &command, int eventFd, std::function<void(co
             else if (fdArray[0].revents & POLLNVAL || fdArray[0].revents & POLLERR)
                 break;
         }
-        else
+
+        if (fdArray[1].revents > 0)
+        {
+            if (fdArray[1].revents & POLLIN || fdArray[1].revents & POLLPRI)
+            {
+                char buffer[1024];
+                memset(buffer, 0, 1024);
+
+                while (read(fdArray[1].fd, buffer, 1023) == 1023)
+                {
+                    if (errorCallback)
+                        errorCallback(buffer);
+
+                    memset(buffer, 0, 1024);
+                }
+
+                if (errorCallback)
+                    errorCallback(buffer);
+            }
+        }
+
+        if (fdArray[2].revents > 0)
         {
             uint64_t i = 0;
             read(eventFd, &i, sizeof(i));
@@ -220,9 +311,11 @@ bool watchProcess(const std::string &command, int eventFd, std::function<void(co
 
         fdArray[0].revents = 0;
         fdArray[1].revents = 0;
+        fdArray[2].revents = 0;
     }
 
-    close(processPipes[0]);
+    close(outPipes[0]);
+    close(errorPipes[0]);
 
     if (processFinished)
     {
