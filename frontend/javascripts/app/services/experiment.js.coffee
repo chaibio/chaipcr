@@ -77,7 +77,8 @@ window.ChaiBioTech.ngApp
       $http.get("/experiments/#{expId}/amplification_data")
 
     self.getMeltCurveData = (expId) ->
-      $http.get("/experiments/#{expId}/melt_curve_data")
+      # $http.get("/experiments/#{expId}/melt_curve_data")
+      $http.get("/test_melt_curve_data.json")
 
     self.duplicate = (expId, data) ->
       $http.post "/experiments/#{expId}/copy", data
