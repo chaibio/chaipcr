@@ -7,7 +7,7 @@
   @font-face {
     font-family: "dinot-regular";
     font-weight: 300;
-    src: url("/fonts/dinot/DINOT-Regular.otf");
+    src: url("fonts/dinot/DINOT-Regular.otf");
   }
 
   html {
@@ -23,6 +23,49 @@
 
   #img-container {
     margin-top: 11%;
+    position: relative;
+  }
+  .spinner {
+    margin: 0 auto;
+    width: 70px;
+    position: relative;
+    top: 200px;
+  }
+
+  .spinner > div {
+    width: 18px;
+    height: 18px;
+    background-color: #FFF;
+
+    border-radius: 100%;
+    display: inline-block;
+    -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+    animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+  }
+
+  .spinner .bounce1 {
+    -webkit-animation-delay: -0.32s;
+    animation-delay: -0.32s;
+  }
+
+  .spinner .bounce2 {
+    -webkit-animation-delay: -0.16s;
+    animation-delay: -0.16s;
+  }
+
+  @-webkit-keyframes sk-bouncedelay {
+    0%, 80%, 100% { -webkit-transform: scale(0) }
+    40% { -webkit-transform: scale(1.0) }
+  }
+
+  @keyframes sk-bouncedelay {
+    0%, 80%, 100% {
+      -webkit-transform: scale(0);
+      transform: scale(0);
+    } 40% {
+      -webkit-transform: scale(1.0);
+      transform: scale(1.0);
+    }
   }
 
   #main-text {
@@ -43,90 +86,95 @@
   </style>
   <script type="text/javascript" language="javascript">
 
-  var ref = window.location.href; // here we find the url of the page.
-  console.log("Coming from", ref);
+    var ref = window.location.href; // here we find the url of the page.
+    console.log("Coming from", ref);
 
-  var look = function(data) {
-    //console.log(data); Do Nothing here
-  };
-
-  var ajax = {};
-    ajax.x = function() {
-      if (typeof XMLHttpRequest !== 'undefined') {
-          return new XMLHttpRequest();
-      }
-      var versions = [
-          "MSXML2.XmlHttp.6.0",
-          "MSXML2.XmlHttp.5.0",
-          "MSXML2.XmlHttp.4.0",
-          "MSXML2.XmlHttp.3.0",
-          "MSXML2.XmlHttp.2.0",
-          "Microsoft.XmlHttp"
-      ];
-
-      var xhr;
-      for(var i = 0; i < versions.length; i++) {
-          try {
-              xhr = new ActiveXObject(versions[i]);
-              break;
-          } catch (e) {
-          }
-      }
-      return xhr;
+    var look = function(data) {
+      //console.log(data); Do Nothing here
     };
 
-    ajax.send = function(url, callback, method, data, sync) {
-      var x = ajax.x();
-      x.open(method, url, sync);
-      x.onreadystatechange = function() {
-
-        if(x.status === 502) { // .
-          // Do nothing
-        } else {
-          console.log("Machine is ready");
-          //location.href = ref; // Tell the browser to reload the page
-          //console.log(ref);
-          location.reload();
+    var ajax = {};
+      ajax.x = function() {
+        if (typeof XMLHttpRequest !== 'undefined') {
+            return new XMLHttpRequest();
         }
+        var versions = [
+            "MSXML2.XmlHttp.6.0",
+            "MSXML2.XmlHttp.5.0",
+            "MSXML2.XmlHttp.4.0",
+            "MSXML2.XmlHttp.3.0",
+            "MSXML2.XmlHttp.2.0",
+            "Microsoft.XmlHttp"
+        ];
 
-        if (x.readyState == 4) {
-          //callback(x.responseText);
+        var xhr;
+        for(var i = 0; i < versions.length; i++) {
+            try {
+                xhr = new ActiveXObject(versions[i]);
+                break;
+            } catch (e) {
+            }
         }
+        return xhr;
       };
-      if (method == 'POST') {
-          x.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-      }
-      x.send(data);
-    };
 
-    var timeout = setInterval(function() {
-      ajax.send(ref, look, "GET", "", true);
-    }, 1000);
+      ajax.send = function(url, callback, method, data, sync) {
+        var x = ajax.x();
+        x.open(method, url, sync);
+        x.onreadystatechange = function() {
 
-    //ajax.send(ref, look, "GET", "", true);
-    /*ajax.get = function(url, data, callback, sync) {
-      var query = [];
-      for (var key in data) {
-          query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
-      }
-      ajax.send(url + (query.length ? '?' + query.join('&') : ''), callback, 'GET', null, sync)
-    };
+          if(x.status === 502) { // .
+            // Do nothing
+          } else {
+            console.log("Machine is ready");
+            //location.href = ref; // Tell the browser to reload the page
+            //console.log(ref);
+            location.reload();
+          }
 
-    ajax.post = function(url, data, callback, sync) {
-      var query = [];
-      for (var key in data) {
-          query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
-      }
-      ajax.send(url, callback, 'POST', query.join('&'), sync)
-    };
+          if (x.readyState == 4) {
+            //callback(x.responseText);
+          }
+        };
+        if (method == 'POST') {
+            x.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        }
+        x.send(data);
+      };
 
-    ajax.send(ref, look, "GET", "", true);*/
+      var timeout = setInterval(function() {
+        ajax.send(ref, look, "GET", "", true);
+      }, 1000);
+
+      //ajax.send(ref, look, "GET", "", true);
+      /*ajax.get = function(url, data, callback, sync) {
+        var query = [];
+        for (var key in data) {
+            query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+        }
+        ajax.send(url + (query.length ? '?' + query.join('&') : ''), callback, 'GET', null, sync)
+      };
+
+      ajax.post = function(url, data, callback, sync) {
+        var query = [];
+        for (var key in data) {
+            query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+        }
+        ajax.send(url, callback, 'POST', query.join('&'), sync)
+      };
+
+      ajax.send(ref, look, "GET", "", true);*/
 
   </script>
 </head>
 
 <body>
   <div id="img-container">
+    <div class="spinner">
+      <div class="bounce1"></div>
+      <div class="bounce2"></div>
+      <div class="bounce3"></div>
+    </div>
     <img src="white-pcr-over-orange.png">
   </div>
 
