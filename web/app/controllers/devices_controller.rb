@@ -14,11 +14,6 @@ class DevicesController < ApplicationController
   resource_description { 
     formats ['json']
   }
-
-  #DEVICE_FILE_PATH  = "/Users/xia/chaipcr/device/device.json"
-  #CONFIGURATION_FILE_PATH  = "/Users/xia/chaipcr/device/configuration.json"
-  DEVICE_FILE_PATH  = "/perm/device.json"
-  CONFIGURATION_FILE_PATH = "/root/configuration.json"
   
   def empty
      render :nothing => true
@@ -40,25 +35,15 @@ class DevicesController < ApplicationController
     current software platform
   EOS
   def show
-    begin
-      device_file = File.read(DEVICE_FILE_PATH)
-      device_hash = JSON.parse(device_file) if device_file
-    rescue  => e
-    end 
-    begin
-      configuration_file = File.read(CONFIGURATION_FILE_PATH)
-      configuration_hash = JSON.parse(configuration_file) if configuration_file
-    rescue  => e
-    end 
     result_hash = Hash.new
-    if device_hash
-      result_hash["serial_number"] = device_hash["serial_number"]
-      result_hash["device_signature"] = device_hash["device_signature"]
-      result_hash["model_number"] = device_hash["model_number"]
-      result_hash["processor_architecture"] = device_hash["processor_architecture"]
+    if Device.valid?
+      result_hash["serial_number"] = Device.serial_number
+      result_hash["device_signature"] = Device.device_signature
+      result_hash["model_number"] = Device.model_number
+      result_hash["processor_architecture"] = Device.processor_architecture
     end
-    if configuration_hash
-      result_hash["software"] = configuration_hash["software"]
+    if DeviceConfiguration.valid?
+      result_hash["software"] = DeviceConfiguration.software
     end
     result_hash["software_release_variant"] = Setting.software_release_variant
     
@@ -68,22 +53,12 @@ class DevicesController < ApplicationController
   api :GET, "/capabilities", "return device capabilities"
   example "{'capabilities':{'plate':{'rows':2,'columns':8,'min_volume_ul':5,'max_volume_ul':100},'optics':{'excitation_channels':[{'begin_wavelength':462,'end_wavelength':490}],'emission_channels':[{'begin_wavelength':510,'end_wavelength':700}]},'storage':{'microsd_size_gb':8,'emmc_size_gb':4}},'thermal':{'lid':{'max_temp_c':120},'block':{'min_temp_c':4,'max_temp_c':100}}}"
   def capabilities
-    begin
-      device_file = File.read(DEVICE_FILE_PATH)
-      device_hash = JSON.parse(device_file) if device_file
-    rescue  => e
-    end
-    begin
-      configuration_file = File.read(CONFIGURATION_FILE_PATH)
-      configuration_hash = JSON.parse(configuration_file) if configuration_file
-    rescue  => e
-    end 
     result_hash = Hash.new
-    if device_hash
-      result_hash["capabilities"] = device_hash["capabilities"]
+    if Device.valid?
+      result_hash["capabilities"] = Device.capabilities
     end
-    if configuration_hash
-      result_hash["thermal"] = configuration_hash["thermal"]
+    if DeviceConfiguration.valid?
+      result_hash["thermal"] = DeviceConfiguration.thermal
     end
     render json: result_hash.to_json, status: :ok
   end
@@ -107,23 +82,18 @@ class DevicesController < ApplicationController
   end
    
   def serial_start
-    if File.exists?(DEVICE_FILE_PATH)
-      device_file = File.read(DEVICE_FILE_PATH)
-      device_hash = JSON.parse(device_file)
-      if device_hash["serial_number"].blank?
+    if Device.exists?
+      if Device.serial_number.blank?
         mac = retrieve_mac
-        configuration_file = File.read(CONFIGURATION_FILE_PATH)
-        if !mac.blank? && configuration_file
-          configuration_hash = JSON.parse(configuration_file)
-          logger.info(device_hash)
-          render json: {mac: mac, software_version:configuration_hash["software"]["version"], configuration_id:device_hash["configuration_id"]}
+        if !mac.blank?
+          render json: {mac: mac, software_version: DeviceConfiguration.software_version, configuration_id: Device.configuration_id}
         elsif mac.blank?
           render json: {errors: "Device mac address not found"}, status: 500
         else
           render json: {errors: "Device configuration file is not found"}, status: 500
         end
       else
-        render json: {errors: "Device is already serialized (serial number = #{device_hash["serial_number"]})"}, status: 405
+        render json: {errors: "Device is already serialized (serial number = #{Device.serial_number})"}, status: 405
       end
     else
       render json: {errors: "Device is not configured"}, status: 405
@@ -131,45 +101,31 @@ class DevicesController < ApplicationController
   end
   
   def update
-    if File.exists?(DEVICE_FILE_PATH)
-      device_file = File.read(DEVICE_FILE_PATH)
-      device_hash = JSON.parse(device_file)
-      if !device_hash["serial_number"].blank?
-        render json: {errors: "Device is already serialized (serial number = #{device_hash["serial_number"]})"}, status: 405
+    if Device.exists?
+      if !Device.serial_number.blank?
+        render json: {errors: "Device is already serialized (serial number = #{Device.serial_number})"}, status: 405
         return
       end
     end
 
-    device_data = request.body.read
-    
-    begin
-      device_hash = JSON.parse(device_data)
-    rescue  => e
-      render json: {errors: "not valid json file"}, status: 400
+    error = Device.write(request.body.read)
+    if !error.blank?
+      render json: {errors: error}, status: 400
       return
     end
     
-    begin
-      File.open(DEVICE_FILE_PATH, 'w+') { |file| file.write(device_data) }
-    rescue  => e
-      render json: {errors: "Write to #{DEVICE_FILE_PATH} failed: #{e}"}, status: 400
-      return
-    end
-    
-    erase_data(device_hash)
+    erase_data
+
     render json: {response: "Device is programmed successfully"}, status: :ok
   end
   
   def clean
-    begin
-      device_file = File.read(DEVICE_FILE_PATH)
-      device_hash = JSON.parse(device_file) if device_file
-    rescue  => e
+    if !Device.valid?
       render json: {errors: "Device file is not found or corrupted"}, status: 500
       return
     end
-    if !device_hash["device_signature"].blank? && device_hash["device_signature"] == params["signature"]
-      erase_data(device_hash)
+    if !Device.device_signature.blank? && Device.device_signature == params["signature"]
+      erase_data
       render json: {response: "Device is cleaned successfully"}, status: :ok
     else
       render json: {errors: "Device cannot be cleaned because device signature doesn't match"}, status: 400
@@ -181,11 +137,8 @@ class DevicesController < ApplicationController
   def software_update
     @upgrade = Upgrade.first
     if @upgrade
-      configuration_file = File.read(CONFIGURATION_FILE_PATH)
-      configuration_hash = JSON.parse(configuration_file)
-      logger.info(configuration_hash)
       #no upgrade available if the upgrade version is the same as current software version
-      @upgrade = nil if @upgrade.version == configuration_hash["software"]["version"]
+      @upgrade = nil if @upgrade.version == DeviceConfiguration.software_version
     end
     respond_to do |format|
       format.json { render "software_update", :status => :ok}
@@ -194,16 +147,12 @@ class DevicesController < ApplicationController
   
   api :POST, "/device/enable_support_access", "enable remote support access"
   def enable_support_access
-    device_file = File.read(DEVICE_FILE_PATH)
-    device_hash = JSON.parse(device_file)
-    configuration_file = File.read(CONFIGURATION_FILE_PATH)
-    configuration_hash = JSON.parse(configuration_file)
     query_hash = Hash.new
     query_hash[:v] = 1
-    query_hash[:model_number] = device_hash["model_number"]
-    query_hash[:software_version] = configuration_hash["software"]["version"]
-    query_hash[:software_platform] = configuration_hash["software"]["platform"]
-    query_hash[:serial_number] = device_hash["serial_number"]
+    query_hash[:model_number] = Device.model_number
+    query_hash[:software_version] = DeviceConfiguration.software_version
+    query_hash[:software_platform] = DeviceConfiguration.software["platform"]
+    query_hash[:serial_number] = Device.serial_number
     #query_hash[:device_signature]
     
     #query cloud server for auth_token and ssh keys
@@ -277,7 +226,7 @@ class DevicesController < ApplicationController
     #post to cloud server
     begin
       uri = URI.parse("#{CLOUD_SERVER}/device/establish_support_tunnel")
-      response = Net::HTTP.post_form(uri, 'serial' => device_hash["serial_number"], 'url' => tunnel_url)
+      response = Net::HTTP.post_form(uri, 'serial' => Device.serial_number, 'url' => tunnel_url)
     rescue => e
       render json: {errors: "chai cloud server #{CLOUD_SERVER} cannot be reached: #{e}"}, status: 500
       return
@@ -294,13 +243,13 @@ class DevicesController < ApplicationController
   
   private
   
-  def erase_data(device_hash)
+  def erase_data
     User.delete_all
     Experiment.joins(:experiment_definition).where("experiment_type != ? and experiments.id != 1", ExperimentDefinition::TYPE_DIAGNOSTIC).select('experiments.*').each do |e|
       e.destroy
     end
-    if device_hash && !device_hash["serial_number"].blank?
-      serialmd5 = Digest::MD5.hexdigest(device_hash["serial_number"])
+    if !Device.serial_number.blank?
+      serialmd5 = Digest::MD5.hexdigest(Device.serial_number)
       system("printf '#{serialmd5}\n#{serialmd5}\n' | passwd")
     end
     system("sync")
@@ -308,7 +257,7 @@ class DevicesController < ApplicationController
   
   def retrieve_mac
     str = `ifconfig eth0 | grep HWaddr`
-#    str = "eth0      Link encap:Ethernet  HWaddr 54:4a:16:c0:7e:31 "
+  #  str = "eth0      Link encap:Ethernet  HWaddr 54:4a:16:c0:7e:38 "
     re = %r/([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}/
     return re.match(str).to_s.strip
   end

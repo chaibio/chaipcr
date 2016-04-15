@@ -18,23 +18,28 @@ perm_partition=${eMMC}p4
 loopdev=/dev/loop2
 mdsumtool=md5sum
 
-mdsumdir=$(whereis $mdsumtool)
+mdsumdir=$(which $mdsumtool)
 echo md5dir : $mdsumdir
 
-if [ -z "$mdsumdir" ]
+mdadmtool=mdadm
+mdadmdir=$(which $mdadmtool)
+
+if [ -z "$mdadmdir" ]
 then
-	echo $mdsumtool not found.
+	echo $mdadmtool not found.
 	apt-get -y install mdadm
+else
+	echo mdadm tool dir: $mdadmdir
 fi
 
-mdsumdir=$(whereis $mdsumtool)
+mdsumdir=$(which $mdsumtool)
 echo "md5dir: $mdsumdir"
 
 if [ -z "$mdsumdir" ]
 then
 	echo "$mdsumtool not found (2)."
 	mdsumtool='md5 -r'
-	mdsumdir=$(whereis $mdsumtool)
+	mdsumdir=$(which $mdsumtool)
 	echo tool: $mdsumdir
 	if [ -z "$mdsumdir" ]
 	then
@@ -47,7 +52,7 @@ else
 	echo $mdsumtool found.
 fi
 
-mkfsext4tooldir=$(whereis mkfs.ext4)
+mkfsext4tooldir=$(which mkfs.ext4)
 echo mkfs.ext4 : $mkfsext4tooldir
 
 if [ ! -z "$mkfsext4tooldir" ]
@@ -204,10 +209,10 @@ then
 fi
 
 echo Extracting partitions...
-loopdev_tool=$(whereis losetup)
+loopdev_tool=$(which losetup)
 if [ -z "$loopdev_tool" ]
 then
-        loopdev_tool=$(whereis hdiutil)
+        loopdev_tool=$(which hdiutil)
         if [ -z "$loopdev_tool" ]
         then
                 echo loop device mounting tool not found! Please install hdiutil or losetup.

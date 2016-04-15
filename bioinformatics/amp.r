@@ -4,7 +4,8 @@
 # function: get amplification data from MySQL database; perform water calibration.
 get_amp_calib <- function(channel, # as 1st argument for iteration by channel
                           db_conn, 
-                          exp_id, stage_id, calib_id, # for selecting data to analyze
+                          exp_id, stage_id, # for selecting data to analyze
+                          oc_data, # optical calibration data
                           show_running_time # option to show time cost to run this function
                           ) {
     
@@ -30,7 +31,8 @@ get_amp_calib <- function(channel, # as 1st argument for iteration by channel
     fluo_cast <- dcast(fluo_mlt, cycle_num ~ well_num, mean)
     
     # get optical-calibrated data.
-    calibd <- optic_calib(fluo_cast[,2:(num_wells+1)], db_conn, calib_id, channel, show_running_time)$fluo_calib # column cycle_num is included, because adply automatically create a column at index 1 of output from rownames of input array (1st argument)
+    num_wells <- length(unique(fluo_sel[,'well_num']))
+    calibd <- optic_calib(fluo_cast[,2:(num_wells+1)], oc_data, channel, show_running_time)$fluo_calib # column cycle_num is included, because adply automatically create a column at index 1 of output from rownames of input array (1st argument)
     ac_mtx <- cbind(fluo_cast[, 'cycle_num'], calibd)
     colnames(ac_mtx)[1] <- 'cycle_num'
     amp_calib <- list('ac_mtx'=as.matrix(ac_mtx), # change data frame to matrix for ease of constructing array
@@ -73,6 +75,7 @@ get_ct_eff <- function(
     # well_names <- colnames(ac_mtx)[2:ncol(ac_mtx)]
     
     well_names <- colnames(bl_corrected)
+    num_wells <- length(well_names)
     
     ct_eff_raw <- getPar(mod_ori, type=type, cp=cp)
     tagged_colnames <- colnames(ct_eff_raw)
@@ -165,6 +168,7 @@ baseline_ct <- function(amp_calib,
     
     if (dim(ac_mtx)[1] <= 2) {
         message('Two or fewer cycles of fluorescence data are available. Baseline subtraction and calculation of Ct and amplification efficiency cannot be performed.')
+        num_wells <- dim(ac_mtx)[2] - 1
         ct_eff <- matrix(NA, nrow=2, ncol=num_wells, 
                          dimnames=list(c('ct', 'eff'), colnames(ac_mtx)[2:(num_wells+1)]))
         return(list('bl_corrected'=ac_mtx[,2:(num_wells+1)], 'ct_eff'=ct_eff))
@@ -245,6 +249,7 @@ baseline_ct <- function(amp_calib,
 # top level function called by external codes
 get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
                                    exp_id, stage_id, calib_id, # for selecting data to analyze
+                                   dye_in='FAM', dyes_2bfild=NULL, # fill missing channels in calibration experiment(s) using preset calibration experiments
                                    dcv=TRUE, # logical, whether to perform multi-channel deconvolution
                                    # basecyc, cp, # extra parameters that are currently hard-coded but may become user-defined later
                                    extra_output=FALSE, 
@@ -280,28 +285,37 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     
     if (length(channels) == 1) dcv <- FALSE
     
+    oc_data <- prep_optic_calib(db_conn, calib_id, dye_in, dyes_2bfild)
+    
     amp_calib_mtch <- process_mtch(channels, 
                                    matrix2array=TRUE, 
                                    func=get_amp_calib, 
                                    db_conn, 
-                                   exp_id, stage_id, calib_id, 
+                                   exp_id, stage_id, 
+                                   oc_data, 
                                    show_running_time)
     dbDisconnect(db_conn)
     
     amp_calib_mtch_bych <- amp_calib_mtch[['pre_consoli']]
     
-    amp_calib_array <- amp_calib_mtch[['post_consoli']][['ac_mtx']]
+    amp_calib_array <<- amp_calib_mtch[['post_consoli']][['ac_mtx']]
     
-    bg_sub <- amp_calib_array
+    rbbs <- amp_calib_array # right before baseline subtraction
     
     if (dcv) {
+        # ac2dcv: when 1 %in% dim(amp_calib_array), `ac2dcv <- amp_calib_array[,,2:aca_dim3]` will result in reduced dimensions in ac2dcv
         aca_dim3 <- dim(amp_calib_array)[3]
-        ac2dcv <- amp_calib_array[,,2:aca_dim3]
+        ac2dcv_dim <- dim(amp_calib_array) - c(0,0,1)
+        ac2dcv_dimnames <- dimnames(amp_calib_array)
+        ac2dcv_dimnames[[3]] <- ac2dcv_dimnames[[3]][2:aca_dim3]
+        ac2dcv <- array(NA, dim=ac2dcv_dim, dimnames=ac2dcv_dimnames)
+        ac2dcv[,,] <- amp_calib_array[,,2:aca_dim3]
+        # end: ac2dcv
         dcvd_array <- deconv(ac2dcv, k_list[['k_inv_array']])
         for (channel in channels) {
             dcvd_mtx_per_channel <- dcvd_array[as.character(channel),,]
             amp_calib_mtch_bych[[as.character(channel)]][['ac_mtx']][,2:aca_dim3] <- dcvd_mtx_per_channel
-            bg_sub[as.character(channel),,2:aca_dim3] <- dcvd_mtx_per_channel }}
+            rbbs[as.character(channel),,2:aca_dim3] <- dcvd_mtx_per_channel }}
     
     baseline_ct_mtch <- process_mtch(amp_calib_mtch_bych, 
                                      matrix2array=FALSE, 
@@ -314,17 +328,17 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
                                      show_running_time)[['post_consoli']]
     baseline_ct_mtch[['pre_dcv_bg_sub']] <- amp_calib_array
     
-    bg_sub <- lapply(channels, function(channel) bg_sub[channel,,]) # for list instead of array output
+    rbbs <- lapply(channels, function(channel) rbbs[channel,,]) # for list instead of array output
     
-    downstream <- list('background_subtracted'=bg_sub, 
+    downstream <- list('rbbs'=rbbs, 
                        'baseline_subtracted'=baseline_ct_mtch[['bl_corrected']], 
                        'ct'=baseline_ct_mtch[['ct_eff']], 
                        'coefficients'=baseline_ct_mtch[['coefficients']]
                        )
     
     if (extra_output) {
-        result_mtch <- c(downstream, baseline_ct_mtch)
-        result_mtch[['fluorescence_data']] <- fluorescence_data
+        result_mtch <- c(downstream, baseline_ct_mtch,
+                         list('fluorescence_data'=fluorescence_data, 'oc_data'=oc_data))
     } else result_mtch <- downstream
     
     return(result_mtch)

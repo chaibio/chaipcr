@@ -27,21 +27,24 @@ angular.module("canvasApp").factory('mouseDown', [
         switch(evt.target.name)  {
 
           case "stepDataGroup":
-            var click = evt.e;
-            var target = evt.target;
-            var stepDataGroupLeft = target.left - 40;
+
+            var click = evt.e, target = evt.target, stepDataGroupLeft = target.left - 46,
+            getP = that.canvas.getPointer(evt.e);
             that.selectStep(target.parentCircle);
-            if(click.clientX > stepDataGroupLeft && click.clientX < (stepDataGroupLeft + 60)) {
+
+            var group = target.parentCircle.stepDataGroup;
+            var items = group._objects;
+            unHookGroup(group, items);
+            if(getP.x > stepDataGroupLeft && getP.x < (stepDataGroupLeft + 45)) {
               editMode.tempActive = true;
-              var group = target.parentCircle.stepDataGroup;
-              var items = group._objects;
-              unHookGroup(group, items);
               startEditing(target.parentCircle.temperature);
             } else {
-              console.log("clicked on holdTime");
+              editMode.holdActive = true;
+              startEditing(target.parentCircle.holdTime);
             }
 
           break;
+
           case "stepGroup":
 
             me = evt.target.me;
@@ -106,15 +109,13 @@ angular.module("canvasApp").factory('mouseDown', [
         C.canvas.renderAll();
       };
 
-      startEditing = function(tempText) {
-        C.canvas.setActiveObject(tempText);
-        tempText.enterEditing();
-        tempText.selectAll();
+      startEditing = function(textToBeEdited) {
+        C.canvas.setActiveObject(textToBeEdited);
+        textToBeEdited.enterEditing();
+        textToBeEdited.selectAll();
       };
 
     };
-
-
 
     return this;
   }

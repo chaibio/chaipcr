@@ -6,21 +6,19 @@
 #include "optics.h"
 #include "maincontrollers.h"
 #include "qpcrapplication.h"
-
-using namespace std;
-using namespace Poco;
+#include "util.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Optics
-Optics::Optics(unsigned int lidSensePin, shared_ptr<LEDController> ledController, MUX &&photoDiodeMux)
+Optics::Optics(unsigned int lidSensePin, std::shared_ptr<LEDController> ledController, MUX &&photoDiodeMux)
     :_ledController(ledController),
      _lidSensePin(lidSensePin, GPIO::kInput),
-     _photodiodeMux(move(photoDiodeMux))
+     _photodiodeMux(std::move(photoDiodeMux))
 {
     _lidOpen = false;
     _collectData = false;
     _meltCurveCollection = false;
-    _collectDataTimer = new Timer;
+    _collectDataTimer = new Poco::Timer;
     _wellNumber = 0;
     _adcValue = {0, 0};
 
@@ -97,15 +95,20 @@ void Optics::toggleCollectData()
         {
             _collectDataTimer->setStartInterval(kFluorescenceDataCollectionDelayTimeMs);
             _collectDataTimer->setPeriodicInterval(kFluorescenceDataCollectionDelayTimeMs);
-            _collectDataTimer->start(TimerCallback<Optics>(*this, &Optics::collectDataCallback));
+            _collectDataTimer->start(Poco::TimerCallback<Optics>(*this, &Optics::collectDataCallback));
         }
     }
     else
     {
+        bool collect = _collectData;
+        _collectData = false;
+
         _adcCondition.notify_all();
         _collectDataTimer->stop();
         _collectDataTimer->setPeriodicInterval(0);
         _ledController->disableLEDs();
+
+        _collectData = collect;
     }
 }
 
@@ -162,13 +165,10 @@ void Optics::collectDataCallback(Poco::Timer &timer)
                 std::size_t i = 0;
                 for (std::vector<unsigned long> &channel: adcValues)
                 {
-                    unsigned int adc = 0;
-
-                    for (unsigned long value: channel)
-                        adc += value;
+                    unsigned int value = std::round(Util::median(channel.begin(), channel.end()));
 
                     std::lock_guard<std::mutex> meltCurveDataLock(_meltCurveDataMutex);
-                    _meltCurveData.emplace_back(adc / kADCReadsPerOpticalMeasurement, temperature, _wellNumber, i);
+                    _meltCurveData.emplace_back(value, temperature, _wellNumber, i);
 
                     ++i;
                 }

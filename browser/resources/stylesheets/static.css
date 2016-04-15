@@ -1,4 +1,29 @@
+@font-face {
+  font-family: "dinot";
+  font-weight: normal;
+  src: url("/fonts/DINOT-Light.otf");
+}
+
+@font-face {
+  font-family: "dinot";
+  font-weight: 300;
+  src: url("/fonts/DINOT-Medium.otf");
+}
+
+@font-face {
+  font-family: "dinot-regular";
+  font-weight: 300;
+  src: url("../fonts/DINOT-Regular.otf");
+}
+
+@font-face {
+  font-family: "dinot-bold";
+  src: url("/fonts/DINOT-Bold.otf");
+}
+
+
 body {
+	font-family: "dinot-regular";
 	background-color: black;
 }
 
@@ -18,7 +43,15 @@ body {
 	width: 99%;
 	height: 100px;
 	position: absolute;
-	top: 380px;
+	bottom: 0px;
 	color: white;
-	text-align: center;
+}
+#ip-address {
+	padding-left: 6%;
+}
+#version {
+	padding-left: 30%;
+}
+#serial {
+	padding-left: 10%;
 }

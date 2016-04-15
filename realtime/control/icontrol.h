@@ -4,6 +4,7 @@
 #include <thread>
 #include <functional>
 #include <thread>
+#include <string>
 
 class IControl
 {
@@ -30,6 +31,11 @@ public:
         params.__sched_priority = sched_get_priority_max(SCHED_FIFO);
 
         pthread_setschedparam(native_handle(), SCHED_FIFO, &params);
+    }
+
+    void setThreadName(const std::string &name)
+    {
+        pthread_setname_np(native_handle(), name.c_str());
     }
 
 protected:

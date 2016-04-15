@@ -3,6 +3,7 @@
 melt_1cr <- function(floor_temp, 
                      db_usr, db_pwd, db_host, db_port, db_name, 
                      exp_id, stage_id, calib_id, channel, 
+                     dye_in='FAM', dyes_2bfild=NULL, 
                      dcv=TRUE, # logical, whether to perform multi-channel deconvolution
                      mc_plot=FALSE, 
                      show_running_time=FALSE,
@@ -15,6 +16,7 @@ melt_1cr <- function(floor_temp,
     
     mc_out <- process_mc(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
                          exp_id, stage_id, calib_id, # for selecting data to analyze
+                         dye_in, dyes_2bfild, 
                          dcv, mc_plot, extra_output=TRUE, show_running_time, ...)
     
     mc_tm <- lapply(mc_out[['mc_bywell']], 

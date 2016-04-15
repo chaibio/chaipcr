@@ -43,6 +43,8 @@ DBControl::~DBControl()
 
 void DBControl::process()
 {
+    setThreadName("DBControl");
+
     std::vector<std::string> queries;
 
     _writeThreadState = true;

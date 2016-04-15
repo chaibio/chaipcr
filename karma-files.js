@@ -38,6 +38,7 @@ JS_VENDOR_FILES = _file_path_prepend([
   'javascripts/libs/ellipsis-animated.js',
   'javascripts/libs/ng-file-upload-shim.js',
   'javascripts/libs/ng-file-upload.js',
+  'javascripts/libs/ng-webworker.js'
 ]);
 
 JS_APP_FILES = _file_path_prepend([
@@ -61,4 +62,3 @@ TEST_FILES = _file_path_prepend([
 
 
 module.exports = JS_VENDOR_FILES.concat(JS_APP_FILES).concat(TEST_FILES);
-
