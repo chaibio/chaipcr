@@ -37,7 +37,7 @@ angular.module("canvasApp").factory('stepHoldTime', [
       };
 
       this.render();
-
+      
       this.text.on('text:editing:exited', function() {
 
         // This block is executed when we hit enter.
