@@ -19,6 +19,8 @@ describe("see if its working", function() {
 
       }
     };
+
+    spyOn(Canvas, "loadImages");
     Canvas.init(model);
 
     expect(Canvas.editStageStatus).toBeFalsy();
@@ -38,6 +40,7 @@ describe("see if its working", function() {
 
     expect(Canvas.imageobjects).toEqual(jasmine.any(Object));
     expect(Canvas.dotCordiantes).toEqual(jasmine.any(Object));
-    //console.log(Canvas);
+
+    expect(Canvas.loadImages).toHaveBeenCalled();
   });
 });
