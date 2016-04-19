@@ -54,16 +54,16 @@ App.service 'MeltCurveService', [
         rows: rows
     # end chartConfig
 
-    self.XTicks = (min, max) ->
-      ticks = []
-      calib = 10
-      diff = max - min
-      if diff <= calib
-        for i in [min..max] by 1
-          ticks.push i
-        return ticks
-      else
-        return calib
+    # self.XTicks = (min, max) ->
+    #   ticks = []
+    #   calib = 10
+    #   diff = max - min
+    #   if diff <= calib
+    #     for i in [min..max] by 1
+    #       ticks.push i
+    #     return ticks
+    #   else
+    #     return calib
     # end ticks
 
     self.parseData = (data, cb) ->
@@ -103,7 +103,7 @@ App.service 'MeltCurveService', [
       return if !mc_data
       console.log resolution
 
-      calibration_dp = 300
+      calibration_dp = 200
       chunkSize = Math.round( resolution / calibration_dp )
       chunkSize = if chunkSize > 0 then chunkSize else 1
       console.log "chunkSize: #{chunkSize}"
@@ -140,15 +140,50 @@ App.service 'MeltCurveService', [
 
       return new_data
 
-    self.getTempRange = (data) ->
-      temps = []
-      for d in data[0].temperature by 1
-        temps.push d
+    self.moveData = (data, data_length, resolution, scrollbar) ->
+      scrollbar = scrollbar || 0
+      scrollbar = if scrollbar < 0 then 0 else scrollbar
+      scrollbar = if scrollbar > 1 then 1 else scrollbar
+      mc_data = angular.copy(data)
+      new_data = {}
+      data_span = Math.round((resolution/data_length) * mc_data['well_0'].length)
+      start = (mc_data['well_0'].length - data_span) * scrollbar
+      # start = (data_length - resolution) * scrollbar
+      end = start + data_span
+      start = Math.floor(start)
+      end = Math.ceil(end)
+      for i in [0..15] by 1
+        new_data["well_#{i}"] = mc_data["well_#{i}"].slice(start, end)
 
-      min_temp = Math.min.apply(Math, temps)
-      max_temp = Math.max.apply(Math, temps)
+      return new_data
 
-      return {min: min_temp, max: max_temp}
+    self.getYExtrems = (data, chart_type) ->
+      console.log "chart_type: #{chart_type}"
+      data_length = data['well_0'].length
+      console.log "data_length: #{data_length}"
+      min = 0
+      max = 0
+
+      for i in [0...data_length] by 1
+        for ii in [0..15] by 1
+          val = data["well_#{ii}"][i][chart_type]
+          min = if val < min then val else min
+          max = if val > max then val else max
+
+      return {
+        min: min
+        max: max
+      }
+
+    # self.getTempRange = (data) ->
+    #   temps = []
+    #   for d in data[0].temperature by 1
+    #     temps.push d
+
+    #   min_temp = Math.min.apply(Math, temps)
+    #   max_temp = Math.max.apply(Math, temps)
+
+    #   return {min: min_temp, max: max_temp}
     # end getTempRange
 
     return self

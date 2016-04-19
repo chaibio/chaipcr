@@ -40,10 +40,10 @@
           </div>
 
           <div class="charts" ng-if="RunExperimentCtrl.chart==='melt-curve' || has_data">
-            <linechartv2 ng-show="curve_type==='derivative'"
-             data-drag-scroll="meltcurve-drag-scroll" data="data" options="chartConfigDerivative" width="1024" height="400">
+            <linechartv2 ng-if="curve_type==='derivative'"
+             data-drag-scroll="meltcurve-drag-scroll" data="$parent.data" options="$parent.chartConfigDerivative" width="1024" height="400">
             </linechartv2>
-            <linechartv2 ng-show="curve_type==='normalized'" data="data" options="chartConfigNormalized" width="1024" height="400">
+            <linechartv2 ng-if="curve_type==='normalized'" data="$parent.data" options="$parent.chartConfigNormalized" width="1024" height="400">
             </linechartv2>
 
           </div>
