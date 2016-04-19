@@ -78,19 +78,23 @@ App.controller 'MeltCurveCtrl', [
             console.log data
 
             MeltCurveService.parseData(data.melt_curve_data).then (data) ->
-              y_extrems = MeltCurveService.getYExtrems(data, $scope.curve_type)
-              console.log y_extrems
-              updateConfigs
-                axes:
-                  y:
-                    min: y_extrems.min
-                    max: y_extrems.max
+              $scope.data = data
 
-              has_data = true
-              $scope.loading = false
-              PARSED_DATA = angular.copy(data)
-              updateResolutionOptions(data)
-              changeResolution()
+              $timeout ->
+                y_extrems = MeltCurveService.getYExtrems(data, $scope.curve_type)
+                console.log y_extrems
+                updateConfigs
+                  axes:
+                    y:
+                      min: y_extrems.min
+                      max: y_extrems.max
+
+                has_data = true
+                $scope.loading = false
+                PARSED_DATA = angular.copy(data)
+                updateResolutionOptions(data)
+                changeResolution()
+              , 1000
 
     $scope.$watch ->
       $scope.curve_type
