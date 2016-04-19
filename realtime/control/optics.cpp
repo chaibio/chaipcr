@@ -165,7 +165,7 @@ void Optics::collectDataCallback(Poco::Timer &timer)
                 std::size_t i = 0;
                 for (std::vector<unsigned long> &channel: adcValues)
                 {
-                    unsigned int value = std::round(Util::median(channel.begin(), channel.end()));
+                    unsigned int value = std::round(Util::average(channel.begin(), channel.end()));
 
                     std::lock_guard<std::mutex> meltCurveDataLock(_meltCurveDataMutex);
                     _meltCurveData.emplace_back(value, temperature, _wellNumber, i);
