@@ -51,7 +51,6 @@ App.controller 'MeltCurveCtrl', [
       # console.log OPTIMIZED_DATA
 
     changeResolution = ->
-      # $scope.data = OPTIMIZED_DATA[$scope.mc_zoom]
       updateScrollBarWidth()
       moveData()
       # data = MeltCurveService.optimizeForResolution(PARSED_DATA, resolution)
@@ -69,6 +68,7 @@ App.controller 'MeltCurveCtrl', [
       resolution = $scope.resolutionOptions[$scope.mc_zoom]
       data_length = PARSED_DATA['well_0'].length
       $scope.data = MeltCurveService.moveData(data, data_length, resolution, $scope.mc_scroll)
+      console.log "data_length: #{$scope.data.well_0.length}"
 
     $scope.$watch 'RunExperimentCtrl.chart', (chart) ->
       if chart is 'melt-curve' and !has_data
@@ -119,7 +119,6 @@ App.controller 'MeltCurveCtrl', [
       Math.round($scope.mc_scroll*100) / 100
       # $scope.mc_scroll
     , (val, oldVal) ->
-      console.log val
       return if val == oldVal
       return if !PARSED_DATA
       moveData()

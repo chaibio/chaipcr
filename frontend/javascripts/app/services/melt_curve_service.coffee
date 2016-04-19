@@ -54,18 +54,6 @@ App.service 'MeltCurveService', [
         rows: rows
     # end chartConfig
 
-    # self.XTicks = (min, max) ->
-    #   ticks = []
-    #   calib = 10
-    #   diff = max - min
-    #   if diff <= calib
-    #     for i in [min..max] by 1
-    #       ticks.push i
-    #     return ticks
-    #   else
-    #     return calib
-    # end ticks
-
     self.parseData = (data, cb) ->
 
       parseData = (data) ->
@@ -107,10 +95,7 @@ App.service 'MeltCurveService', [
       chunkSize = Math.round( resolution / calibration_dp )
       chunkSize = if chunkSize > 0 then chunkSize else 1
       console.log "chunkSize: #{chunkSize}"
-
       new_data = {}
-
-       # _.map mc_data, (well_data) ->
 
       for well_i in [0..15] by 1
         new_data["well_#{well_i}"] = []
@@ -136,7 +121,6 @@ App.service 'MeltCurveService', [
 
         new_data["well_#{well_i}"].unshift well_data[0]
         new_data["well_#{well_i}"].push well_data[well_data.length-1]
-        # new_data["well_#{well_i}"].push(averaged_data)
 
       return new_data
 
@@ -148,7 +132,6 @@ App.service 'MeltCurveService', [
       new_data = {}
       data_span = Math.round((resolution/data_length) * mc_data['well_0'].length)
       start = (mc_data['well_0'].length - data_span) * scrollbar
-      # start = (data_length - resolution) * scrollbar
       end = start + data_span
       start = Math.floor(start)
       end = Math.ceil(end)
@@ -174,17 +157,6 @@ App.service 'MeltCurveService', [
         min: min
         max: max
       }
-
-    # self.getTempRange = (data) ->
-    #   temps = []
-    #   for d in data[0].temperature by 1
-    #     temps.push d
-
-    #   min_temp = Math.min.apply(Math, temps)
-    #   max_temp = Math.max.apply(Math, temps)
-
-    #   return {min: min_temp, max: max_temp}
-    # end getTempRange
 
     return self
 
