@@ -22,6 +22,7 @@ App.service 'MeltCurveService', [
           type: 'line'
           id: "well_#{i}"
           label: "well_#{i+1}: "
+          interpolation: {mode: 'cardinal', tension: 0.7}
 
       axes:
         x:
