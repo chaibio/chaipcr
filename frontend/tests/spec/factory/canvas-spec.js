@@ -1,4 +1,4 @@
-describe("see if its working", function() {
+describe("Resting canvas.js", function() {
 
   beforeEach(module("ChaiBioTech"));
 
@@ -6,7 +6,7 @@ describe("see if its working", function() {
 
   var Canvas;
 
-
+  // Here Canvas refer to the applications canvas area and canvas refers actuall fabricjs canvas.
   beforeEach(inject(function(_canvas_) {
     //console.log(_canvas_, "bimmmmmmm");
     Canvas = _canvas_;
@@ -42,5 +42,25 @@ describe("see if its working", function() {
     expect(Canvas.dotCordiantes).toEqual(jasmine.any(Object));
 
     expect(Canvas.loadImages).toHaveBeenCalled();
+  });
+
+  it("setDefaultWidthHeight method should set the width of the canvas", function() {
+
+    //spyOn(Canvas.canvas, "setHeight");
+    var model = {
+      "protocol": {
+
+      }
+    };
+    Canvas.init(model);
+    spyOn(Canvas.canvas, "setHeight");
+    spyOn(Canvas.canvas, "renderAll");
+    spyOn(Canvas.canvas, "setWidth");
+
+    Canvas.setDefaultWidthHeight();
+    expect(Canvas.canvas.setHeight).toHaveBeenCalledWith(400);
+    expect(Canvas.canvas.renderAll).toHaveBeenCalled();
+    expect(Canvas.canvas.setWidth).toHaveBeenCalled();
+    expect(Canvas.allStageViews.length).toEqual(jasmine.any(Number));
   });
 });
