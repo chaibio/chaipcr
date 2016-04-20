@@ -229,9 +229,8 @@ class ExperimentsController < ApplicationController
             rescue => e
               logger.error("export amplification data failed: #{e}")
             end
+            fluorescence_data = FluorescenceDatum.data(@experiment.id, first_stage_collect_data.id)
           end
-          
-          fluorescence_data = FluorescenceDatum.data(@experiment.id, first_stage_collect_data.id)
           
           if amplification_data
             out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/amplification.csv")
