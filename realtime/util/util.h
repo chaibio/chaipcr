@@ -23,6 +23,10 @@ inline double median(Iterator begin, Iterator end)
     return size % 2 != 0 ? *it : (*(it - 1) + *it) / 2;
 }
 
+template <typename Iterator>
+inline double average(Iterator begin, Iterator end)
+{ return std::accumulate(begin, end, 0) / static_cast<double>(std::distance(begin, end)); }
+
 boost::posix_time::ptime parseIsoTime(const std::string &str);
 
 void watchProcess(const std::string &command, std::function<void(const char[1024])> outCallback, std::function<void(const char[1024])> errorCallback = std::function<void(const char[1024])>());
