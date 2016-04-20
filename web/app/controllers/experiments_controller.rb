@@ -239,9 +239,13 @@ class ExperimentsController < ApplicationController
             csv_string = CSV.generate do |csv|
               csv << ["baseline_subtracted_value", "background_subtracted_value", "fluorescence_value"]+columns
               amplification_data.each do |data|
-                fluorescence_value = (fluorescence_data[fluorescence_index].channel == data.channel && 
-                                      fluorescence_data[fluorescence_index].well_num+1 == data.well_num && 
-                                      fluorescence_data[fluorescence_index].cycle_num == data.cycle_num)? fluorescence_data[fluorescence_index].fluorescence_value : nil
+                while (fluorescence_index < fluorescence_data.length && 
+                      !(fluorescence_data[fluorescence_index].channel == data.channel && 
+                        fluorescence_data[fluorescence_index].well_num+1 == data.well_num && 
+                        fluorescence_data[fluorescence_index].cycle_num == data.cycle_num)) do
+                      fluorescence_index += 1
+                end
+                fluorescence_value = (fluorescence_index < fluorescence_data.length)? fluorescence_data[fluorescence_index].fluorescence_value : nil
                 csv << [data.baseline_subtracted_value, data.background_subtracted_value, fluorescence_value]+data.attributes.values_at(*columns)
                 fluorescence_index += 1
               end
