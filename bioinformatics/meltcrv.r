@@ -102,8 +102,8 @@ mc_tm_all <- function(fc_wT, mc_plot, show_running_time,
     
     mt_ori <- meltcurve(fc_wT, 
                         temp_1side=2, # xqrm
-                        span_smooth_factor=0.5, # xqrm
-                        span_smooth_default=0.05, # xqrm
+                        span_smooth_factor=7.2, # xqrm
+                        span_smooth_default=0.05, # xqrm. qpcR default 0.05. used: 0.05, 0.1, 0.15, 0.2
                         span.peaks=51, # default 51.
                         plot=mc_plot) # using qpcR function `meltcurve`
     mt_out <- lapply(mt_ori, FUN=mc_tm_pw, ...)
@@ -137,7 +137,7 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
     db_conn <- db_etc(db_usr, db_pwd, db_host, db_port, db_name, 
                       exp_id, stage_id, calib_id)
     
-    # { # process all available channels
+    # { # pre-deconvolution, process all available channels
     # mcd_qry <- sprintf('SELECT channel
                            # FROM melt_curve_data 
                            # WHERE experiment_id=%d AND stage_id=%d
@@ -151,10 +151,9 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
     # if (length(channels) == 1) dcv <- FALSE
     # }
     
-    { # process only channel 1
+    # pre-deconvolution, process only channel 1
     channels <- c('1'='1')
     dcv <- FALSE
-    }
     
     oc_data <- prep_optic_calib(db_conn, calib_id, dye_in, dyes_2bfild)
     
@@ -174,12 +173,19 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
     mc_calib_array <- mc_calib_mtch[['post_consoli']][['fluo_calib']]
     
     if (dcv) {
-        dcvd_array <- deconv(mc_calib_array, k_list[['k_inv_array']])
+        k_inv_array <- k_list[['k_inv_array']]
+        # k_inv_array[,,] <- rep(c(1, 0, 1, 0), times=16) # addition with flexible ratio instead of deconvolution
+        dcvd_array <- deconv(mc_calib_array, k_inv_array)
         fc_wT_colnames <- colnames(fc_wT_bych[[1]])
         fluo_colnames <- fc_wT_colnames[grepl('fluo_', fc_wT_colnames)]
         for (channel in channels) {
             dcvd_mtx_per_channel <- dcvd_array[as.character(channel),,]
             fc_wT_bych[[as.character(channel)]][,fluo_colnames] <- dcvd_mtx_per_channel }}
+    
+    # post-deconvolution, process for only 1 channel
+    # fc_wT_bych <- fc_wT_bych[1] # channel 1
+    # fc_wT_bych <- fc_wT_bych[2] # channel 2
+    
     
     mc_out_pp <- process_mtch(fc_wT_bych, 
                               matrix2array=FALSE, # doesn't matter because no original output was matrix
@@ -190,7 +196,7 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
         mc_out <- list( # each element is a list whose each element represents a channel
                        'mc_bywell'=mc_out_pp[['pre_consoli']], # each channel element is a list whose each element is a well
                        'fc_wT'=fc_wT_bych, 'pre_dcv_fc_wT'=pre_dcv_fc_wT_bych # each channel element of fc_wT or pre_dcv_fc_wT_bych is a matrix formatted as input for `meltcurve` by qpcR, where columns are alternating 'temp' and 'fluo'.
-                    )
+                       )
     } else mc_out <- mc_out_pp[['pre_consoli']]
     
     # report time cost for this function

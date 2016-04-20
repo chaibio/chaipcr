@@ -6,12 +6,14 @@ get_k <- function(
                   db_conn, # MySQL database connection
                   dcv_exp_ids, # deconvolution experiment ids, i.e. the data in these experiments are for constructing deconvolution matrix. a named vector (by channel) where each element is the experiment id using the target dye of each channel
                   dcv_target_step_ids, # a named vector (by channel) where each element is the step id using the target dye of each channel
-                  calib_id, # calibration experiment id associated with the deconvolution experiment
+                  calib_id, # calibration experiment id(s) associated with the deconvolution experiment
                   well_proc='dim3' # options: 'mean', 'dim3'.
                   ) { 
     
     channels <- names(dcv_target_step_ids)
     names(channels) <- channels
+    
+    oc_data <- prep_optic_calib(db_conn, calib_id, dyes_2bfild=NULL)
     
     k_list_bydy <- lapply(channels, function(channel) { 
         k_qry <- sprintf('SELECT fluorescence_value, well_num, channel 
@@ -28,7 +30,7 @@ get_k <- function(
                                       k_data_1dye_1ch <- k_data_1dye_bych[[channel]][,'fluorescence_value']
                                       kd11_mtx <- matrix(k_data_1dye_1ch, 
                                                          nrow=1, ncol=length(k_data_1dye_1ch))
-                                      kd11_calibd <- optic_calib(kd11_mtx, db_conn, calib_id, channel)[['fluo_calib']]
+                                      kd11_calibd <- optic_calib(kd11_mtx, oc_data, channel)[['fluo_calib']]
                                       fluo_kc <- kd11_calibd[,2:ncol(kd11_calibd)]
                                       names(fluo_kc) <- unique(k_data_1dye[,'well_num'])
                                       return(fluo_kc)
@@ -74,8 +76,6 @@ get_k <- function(
 # multi-channel deconvolution
 deconv <- function(array2dcv, # dim1 must be channel, dim3 must be well; dim2 is cycle for amplification and temperature point for melting curve
                    k_inv_array ) {
-    
-    array2dcv <<- array2dcv # test
     
     a2d_dim1 <- dim(array2dcv)[1]
     a2d_dim2 <- dim(array2dcv)[2]

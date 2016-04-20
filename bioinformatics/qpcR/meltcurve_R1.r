@@ -84,7 +84,8 @@ cut.Area = 0,
     
     # start: method 2: find the region of length 2 * temp_1side showing the largest fluo difference between start and end
     
-    temp_step <- diff(range(na.omit(TEMP))) / len1 # assume temperature step is about constant
+    temp_span <- diff(range(na.omit(TEMP)))
+    temp_step <- temp_span / len1 # assume temperature step is about constant
     num_csdd_steps_1side <- as.integer(temp_1side / temp_step)
     
     fluo_ranges <- list()
@@ -125,7 +126,9 @@ cut.Area = 0,
     
     if (all(is.na(trend_positive))) {
       span_smooth <- span_smooth_default
+      message('Use `span_smooth_default` ', span_smooth_default)
     } else {
+      message('Fluorescence increase with temperature increase was detected.')
       len3 <- dim(trend_positive)[1]
       trend_positive[,'count_diff'] <- c(trend_positive[2:len3, 'count'], NA) - trend_positive[,'count']
       trend_seps <- which(trend_positive[,'count_diff'] > 1)
@@ -135,7 +138,14 @@ cut.Area = 0,
       len4 <- length(trend_seps) + 1
       temp_intervals <- sapply(1:len4, function(i) sum(trend_positive[trend_starts[i]:trend_ends[i], 'TEMP_diff'])) # temperature intervals where fluo value increases
       max_temp_interval <- max(temp_intervals)
-      span_smooth <- span_smooth_factor * max_temp_interval
+      span_smooth_product <- span_smooth_factor * max_temp_interval / temp_span
+      if (span_smooth_product > span_smooth_default) {
+        span_smooth <- span_smooth_product
+        message(sprintf('`span_smooth` was selected as %f.', span_smooth))
+      } else {
+        span_smooth <- span_smooth_default
+        message(sprintf('`span_smooth_product` %f < `span_smooth_default`, use `span_smooth_default` %f.',
+                        span_smooth_product, span_smooth)) }
       
       # # to test
       # print(trend_mtx)
@@ -188,7 +198,7 @@ cut.Area = 0,
         for (k in 1:length(TMs)) {
           WHICH <- which(tempDATA > TMs[k] - Tm.border[1] & tempDATA < TMs[k] + Tm.border[2])
           X <- tempDATA[WHICH]
-          Y <- derivDATA[WHICH]           
+          Y <- derivDATA[WHICH]
           PEAKAREA <- try(peakArea(X, Y), silent = TRUE)
           if (!inherits(PEAKAREA, "try-error")) {
             PA[k] <- PEAKAREA$area
@@ -207,7 +217,7 @@ cut.Area = 0,
         }           
           
         ### attach peak area values
-        RES <- cbind.na(RES, Area = PA)      
+        RES <- cbind.na(RES, Area = PA)
         
         ### attach baseline area values to
         ### the corresponding temperature values
