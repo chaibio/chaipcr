@@ -25,6 +25,8 @@
 body {
 	font-family: "dinot-regular";
 	background-color: black;
+  width: 800px;
+  height: 480px;
 }
 
 #splash {
