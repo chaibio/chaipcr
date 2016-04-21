@@ -19,6 +19,11 @@ App.controller 'LoginCtrl', [
     $scope.$on 'destroy', ->
       angular.element('body').removeClass('login-state-active')
 
+    @getSoftwareData = () ->
+      console.log "finding ..... !"
+
+    @getSoftwareData()
+
     $scope.user =
       role: 'admin'
 

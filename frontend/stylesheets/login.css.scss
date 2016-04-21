@@ -1,18 +1,20 @@
 // Login page
 .login-state-active {
-  background-color: #ff8102;
+  background-color: #fff;
 }
 .login-wrapper {
-  background-color: #ff8102;
-  min-height: 768px;
-
+  background: linear-gradient(to bottom right, #ff8502, #ff6302);
+  margin: 0px auto;
+  width: 1024px;
+  height: 768px;
+  position: relative;
 
   .login-box {
-    height: 364px;
-    width: 500px;
+    height: 290px;
+    width: 400px;
     background-color: white;
     position: absolute;
-    top: 0;
+    top: 0px;
     bottom: 0;
     left: 0;
     right: 0;
@@ -24,56 +26,51 @@
     }
 
     .title-field {
-      padding-top: 26px;
+      padding-top: 31px;
     }
     .login-section {
-      width: 430px;
+      width: 400px;
       height: 108px;
       margin: 0 auto;
       text-align: center;
 
       .login-field {
-        width: 430px;
-        height: 57px;
-        border-bottom: 1px solid #cbcbcb;
+        width: 321px;
+        border-bottom: 2px solid #cbcbcb;
+        margin: 0 auto;
       }
-
+      .second {
+        margin-top: 20px;
+      }
       .login-field-text {
         display: inline-block;
-        margin-top: 31px;
         margin-left: -7px;
-        color: #585858;
-        font-size: 18px;
+        color: #404040;
+        font-size: 12px;
         width: 60px;
+        font-family: "dinot-bold"
       }
 
       .login-text-field {
-
         display: inline-block;
-        margin-left: 10px;
-
-        margin-top: 25px;
         border: solid 1px white;
-        width: 350px;
-
+        width: 255px;
         font-size: 16px;
         outline: none;
       }
 
       .login-button {
-
-        width: 240px;
-        height: 40px;
+        width: 196px;
+        height: 37px;
         margin: 0 auto;
         background-color: black;
         border: none;
         color: white;
         font-size: 13px;
         font-weight: 400;
-        margin-top: 33px;
+        margin-top: 7px;
       }
       .login-trouble {
-
         color: #00aeef;
         font-size: 9px;
         margin-top: 20px;
