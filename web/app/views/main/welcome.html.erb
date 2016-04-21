@@ -1,9 +1,10 @@
 
 <div class="welcome-page" ng-controller="WelcomeCtrl">
   <div class="container-fluid">
-    <div class="row">
+    <div class="row top-container">
       <div class="col-sm-8 col-sm-offset-2">
         <img src="/images/logo-qpcr-large.png" alt="" class="logo">
+        <span class="version-data">Version {{software_version}}</span>
       </div>
     </div>
     <div class="row">
@@ -14,6 +15,10 @@
         </div>
         <div class="welcome-subtitle">
           Please create an account to get started.
+        </div>
+
+        <div class="serial-container">
+          <span class="serial-data" ng-if="software_version">Serial#:&nbsp;{{serial_number}}</span>
         </div>
       </div>
       <div class="col-sm-6">

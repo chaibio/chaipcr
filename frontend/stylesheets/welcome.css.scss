@@ -12,6 +12,9 @@
     margin-bottom: 70px;
   }
 
+  .top-container {
+    position: relative;
+  }
   .welcome-title {
     color: $orange;
     font-family: 'Fun City', sans-serif;
@@ -21,7 +24,21 @@
     padding-top: 50px;
     text-align: center;
   }
-
+  .version-data {
+    position: relative;
+    top: -83px;
+    left: 569px;
+    color: rgba(64, 64, 55, 0.63);
+    font-size: 12px;
+  }
+  .serial-container {
+    text-align: center;
+    margin-top: 275px;
+    width: 100%;
+    color: rgba(64, 64, 55, 0.63);
+    font-size: 12px;
+    font-family: "dinot-regular";
+  }
   .welcome-subtitle {
     color: $gray;
     padding-top: 20px;
