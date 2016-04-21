@@ -4,6 +4,7 @@
     <div class="login-box">
       <div class="login-section title-field">
         <img src="/images/login_logo.png">
+        <span class="version-data">Software Version {{software_version}}</span>
       </div>
       <div class="login-section">
         <div class="login-field">
@@ -23,8 +24,14 @@
           <button type="submit" class="login-button" id="login-button" ng-click="login(user)">Sign In</button>
         </div>
       </div>
+
+      <div class="serial-container">
+        <span class="serial-data" ng-if="software_version">Serial:&nbsp;{{software_version}}</span>
+      </div>
     </div>
+
   </form>
+
 </div>
 
 <script type="text/javascript">

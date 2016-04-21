@@ -14,13 +14,21 @@ App.controller 'LoginCtrl', [
   ($scope, $http, $window, $rootScope) ->
 
     $rootScope.pageTitle = "ChaiPCR | Login"
-
+    $scope.software_version = "1.0"
+    
     angular.element('body').addClass('login-state-active')
     $scope.$on 'destroy', ->
       angular.element('body').removeClass('login-state-active')
 
     @getSoftwareData = () ->
       console.log "finding ..... !"
+      $http.get("http://localhost:8000/device").then((device) ->
+          if device.data?.serial_number?
+            $scope.serial_number = device.data.serial_number
+
+          if device.data?.software?.version?
+            $scope.software_version = device.data.software.version
+        )
 
     @getSoftwareData()
 

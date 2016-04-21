@@ -20,6 +20,15 @@
     right: 0;
     margin: auto;
 
+    .serial-container {
+      position: absolute;
+      top: 428px;
+      text-align: center;
+      width: 100%;
+      font-size: 12px;
+      font-family: "dinot-regular";
+    }
+
     .err-message {
       margin-top: 12px;
       margin-bottom: -12px;
@@ -33,6 +42,17 @@
       height: 108px;
       margin: 0 auto;
       text-align: center;
+      position: relative;
+
+      .version-data {
+        position: absolute;
+        font-size: 10px;
+        font-family: "dinot-regular";
+        color: #404040;
+        width: 130px;
+        top: 68px;
+        right: 55px;
+      }
 
       .login-field {
         width: 321px;
@@ -78,6 +98,5 @@
         cursor: pointer;
       }
     }
-
   }
 }
