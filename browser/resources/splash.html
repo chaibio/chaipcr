@@ -26,7 +26,9 @@ $(document).ready(function(){
 		$.get("http://localhost:8000/network/eth0")
 			.done(function(data) {
 				if(data.state) {
-					$("#ip-address").text("IP ADDRESS: " + data.state.address);
+					//$("#ip-address").text("IP ADDRESS: " + data.state.address);
+					$(".ip-text").text("IP ADDRESS: ");
+					$(".ip-value").text(data.state.address);
 				} else {
 					$("#ip-address").text("No ethernet connection.")
 				}
@@ -42,10 +44,12 @@ $(document).ready(function(){
 		$.get("http://localhost:8000/device")
 		.done(function(data) {
 			if(data.software.version) {
-				$("#version").text("V. " + data.software.version);
+				$(".version-text").text("V. ");
+				$(".version-value").text(data.software.version);
 			}
 			if(data.serial_number) {
-				$("#serial").text("SERIAL: " + data.software.version);
+				$(".serial-text").text("SERIAL: ");
+				$(".serial-value").text(data.serial_number);
 			}
 		})
 		.fail(function() {
@@ -63,9 +67,18 @@ $(document).ready(function(){
 	<img src="images/openqpcr_logo_dark.svg">
 </div>
 <div id="ip">
-	<span id="ip-address"></span>
-	<span id="version"></span>
-	<span id="serial"></span>
+	<span id="ip-address">
+		<span class="span-text ip-text"></span>
+		<span class="span-value ip-value"></span>
+	</span>
+	<span id="version">
+		<span class="span-text version-text"></span>
+		<span class="span-value version-value"></span>
+	</span>
+	<span id="serial">
+		<span class="span-text serial-text"></span>
+		<span class="span-value serial-value"></span>
+	</span>
 </div>
 </body>
 

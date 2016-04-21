@@ -18,7 +18,7 @@
 
 @font-face {
   font-family: "dinot-bold";
-  src: url("/fonts/DINOT-Bold.otf");
+  src: url("../fonts/DINOT-Bold.otf");
 }
 
 
@@ -29,7 +29,7 @@ body {
 
 #splash {
 	position: absolute;
-	top: 33%;
+	top: 30%;
 	margin-left: auto;
 	margin-right: auto;
 	width: 99%;
@@ -48,10 +48,21 @@ body {
 }
 #ip-address {
 	padding-left: 6%;
+  color: #a6a6a6;
 }
 #version {
 	padding-left: 30%;
+  color: #a6a6a6;
 }
 #serial {
 	padding-left: 10%;
+  color: #a6a6a6;
+}
+.span-text {
+  font-family: "dinot-bold";
+  font-size: 18px;
+}
+.span-value {
+  font-family: "dinot-regular";
+  font-size: 18px;
 }
