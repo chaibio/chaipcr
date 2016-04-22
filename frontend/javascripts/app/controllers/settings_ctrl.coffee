@@ -4,7 +4,7 @@ window.App.controller 'SettingsCtrl', [
   'Device'
   ($scope, User, Device) ->
 
-    $scope.isBeta = false
+    $scope.isBeta = true
 
     User.getCurrent().then (resp) ->
       $scope.user = resp.data.user
