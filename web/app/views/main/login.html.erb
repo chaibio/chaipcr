@@ -4,7 +4,7 @@
     <div class="login-box">
       <div class="login-section title-field">
         <img src="/images/login_logo.png">
-        <span class="version-data">Software Version {{software_version}}</span>
+        <span ng-if="software_version" class="version-data">Version {{software_version}}</span>
       </div>
       <div class="login-section">
         <div class="login-field">
@@ -26,7 +26,7 @@
       </div>
 
       <div class="serial-container">
-        <span class="serial-data" ng-if="software_version">Serial#:&nbsp;{{serial_number}}</span>
+        <span class="serial-data" ng-if="serial_number">Serial#:&nbsp;{{serial_number}}</span>
       </div>
     </div>
 
