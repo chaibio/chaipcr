@@ -1,32 +1,40 @@
 {
-    "scan_result":
-    [
+    "scan_result": [
         {
-            "ssid": "ATT992"
+            "ssid": "Chai Guest",
+            "quality": "100",
+            "siganl_level": "-57",
+            "encryption": "wpa2"
         },
         {
-            "ssid": "Chai"
+            "ssid": "ATT4241",
+            "quality": "85",
+            "siganl_level": "-73",
+            "encryption": "wep"
         },
         {
-            "ssid": "ChaiGuest"
+            "ssid": "Chai",
+            "quality": "96",
+            "siganl_level": "-58",
+            "encryption": ""
         },
         {
-            "ssid": "STIWIFI24"
+            "ssid": "STIWIFI24",
+            "quality": "96",
+            "siganl_level": "-63",
+            "encryption": "wpa2"
         },
         {
-            "ssid": "Chai Test Net"
+            "ssid": "Chai Test Net",
+            "quality": "96",
+            "siganl_level": "-47",
+            "encryption": "wpa2"
         },
         {
-            "ssid": "Analatom"
-        },
-        {
-            "ssid": "Sonic-005"
-        },
-        {
-            "ssid": "ATT4241"
-        },
-        {
-            "ssid": "gback"
+            "ssid": "Analatom",
+            "quality": "96",
+            "siganl_level": "-66",
+            "encryption": "wpa2"
         }
     ]
 }
