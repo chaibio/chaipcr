@@ -158,7 +158,7 @@ app.get('/network/eth0', function (req, res, next) {
   res.send(network);
 });
 
-app.get('/network/wlan0/scan', function(req, res, next) {
+app.get('/network/wlan/scan', function(req, res, next) {
   res.send(wifi_networks);
 });
 

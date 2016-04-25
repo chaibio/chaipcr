@@ -70,7 +70,7 @@ window.ChaiBioTech.ngApp
 
       .state 'settings.networkmanagement.wifi',
         url: '/:name'
-        templateUrl: 'app/views/settings/networkmanagement.html'
+        templateUrl: 'app/views/settings/network-details.html'
 
 
       .state 'edit-protocol',

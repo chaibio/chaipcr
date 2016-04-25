@@ -6,7 +6,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
 
     this.getWifiNetworks = function() {
       var delay = $q.defer();
-      $http.get(host + ':8000/network/wlan0/scan').then(function(data) {
+      $http.get(host + ':8000/network/wlan/scan').then(function(data) {
         delay.resolve(data);
       }, function(err) {
         delay.reject(err);
@@ -16,7 +16,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
 
     this.getSettings = function() {
       var delay = $q.defer();
-      $http.get(host + ':8000/network/wlan0').then(function(data) {
+      $http.get(host + ':8000/network/wlan').then(function(data) {
         delay.resolve(data);
       }, function(err) {
         delay.reject(err);

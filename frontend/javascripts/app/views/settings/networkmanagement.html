@@ -12,14 +12,19 @@
       <div class="wifi-control"><div class="wifi-caption">WIFI </div> <div class="wifi-changer"><wifi-toggle data="admin"></wifi-toggle></div></div>
       <ul>
         <li ng-repeat="wifiNetwork in wifiNetworks">
-          <a ui-sref="settings.networkmanagement.wifi({name: '{{wifiNetwork.ssid | spaceToUnderscore}}'})" ui-sref-active="highlite">{{wifiNetwork.ssid}}</a>
+          <a ui-sref="settings.networkmanagement.wifi({name: '{{wifiNetwork.ssid | spaceToUnderscore}}'})" ui-sref-active="highlite">{{wifiNetwork.ssid}} <div class="lock">
+            <div class="lock-rect">
+              <div class="lock-latch"></div>
+            </div>
+          </div>
+          </a>
           <!--<a ng-click="removeUser(user.user.id)" class="btn-remove" ng-if="user.user.id !== currentUser.id"></a>-->
         </li>
       </ul>
     </div>
   </div>
   <div class="right">
-    <h2 class="underlined">USER DETAILS<span class="close" ui-sref="settings.root">&times;</span></h2>
+    <h2 class="underlined">NETWORK DETAILS<span class="close" ui-sref="settings.root">&times;</span></h2>
     <div class="user-details" ui-view>
       <p>Select a User in the center column to see details.</p>
     </div>
