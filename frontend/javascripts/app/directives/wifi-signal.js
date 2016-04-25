@@ -1,7 +1,7 @@
-angular.module('ChaiBioTech').directive('wifiLock', [
+angular.module('ChaiBioTech').directive('wifiSignal', [
   function() {
     return {
-      templateUrl: 'app/views/directives/wifi-lock.html',
+      templateUrl: 'app/views/directives/wifi-signal.html',
       restric: 'E',
       //replace: true,
 

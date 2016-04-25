@@ -14,13 +14,7 @@
         <li ng-repeat="wifiNetwork in wifiNetworks">
           <a ui-sref="settings.networkmanagement.wifi({name: '{{wifiNetwork.ssid | spaceToUnderscore}}'})" ui-sref-active="highlite">{{wifiNetwork.ssid}}
             <wifi-lock></wifi-lock>
-
-          <div class='wifi'>
-              <div class='arc1 show'></div>
-              <div class='arc2 show'></div>
-              <div class='arc3 show'></div>
-              <div class="center"></div>
-          </div>
+            <wifi-signal></wifi-signal>
           </a>
           <!--<a ng-click="removeUser(user.user.id)" class="btn-remove" ng-if="user.user.id !== currentUser.id"></a>-->
         </li>
