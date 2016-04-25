@@ -1,46 +1,45 @@
 .wifi {
-  width: 76px;
   height: 0px;
-  background-color: black;
   position: relative;
-  top: 30px;
-}
-.arc1 {
-  width: 60px;
-  height: 60px;
-}
-.arc2 {
-  width: 40px;
-  height: 40px;
-}
-.arc3 {
-  width: 20px;
-  height: 20px;
-}
-.center {
-  width: 7px;
-  height: 7px;
-  background-color: #40B30B;
-  border-radius: 100%;
-  position: absolute;
-  top: -8px;
-  left: 0px;
-  bottom: 0px;
-  right: 0px;
-  margin: auto;
-}
-.show {
-  background-color: transparent;
-  border:5px solid transparent;
-  border-top-color: #40B30B;
-  border-radius:100%;
+  top: 5px;
+  left: 100px;
 
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  bottom: 0px;
-  right: 0px;
-  margin: auto;
+  .arc1 {
+    width: 30px;
+    height:30px;
+  }
+  .arc2 {
+    width: 40px;
+    height: 40px;
+  }
+  .arc3 {
+    width: 20px;
+    height: 20px;
+  }
+  .center {
+    width: 5px;
+    height: 5px;
+    background-color: grey;
+    border-radius: 100%;
+    position: absolute;
+    top: -5px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    margin: auto;
+  }
+  .show {
+    background-color: transparent;
+    border:3px solid transparent;
+    border-top-color: grey;
+    border-radius:100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    margin: auto;
+  }
 }
 
 .lock {
@@ -52,7 +51,6 @@
 .lock-rect {
   width: 18px;
   height: 14px;
-  //margin-top: 16px;
   background-color: grey;
   position: absolute;
   border-radius: 2px;
