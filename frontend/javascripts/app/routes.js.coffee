@@ -72,7 +72,6 @@ window.ChaiBioTech.ngApp
         url: '/:name'
         templateUrl: 'app/views/settings/network-details.html'
 
-
       .state 'edit-protocol',
         url: '/edit-protocol/:id'
         templateUrl: 'app/views/edit-protocol.html'

@@ -1,6 +1,7 @@
 angular.module('ChaiBioTech').directive('wifiLock', [
   '$rootScope',
-  function($rootScope) {
+  '$state',
+  function($rootScope, $state) {
     return {
       templateUrl: 'app/views/directives/wifi-lock.html',
       restric: 'E',
@@ -11,20 +12,26 @@ angular.module('ChaiBioTech').directive('wifiLock', [
       },
 
       link: function(scope, element, attr) {
-        scope.$on('$stateChangeStart', function(event, toState, toParams) {
-          //console.log(toState, toParams);
-          if(toParams.name === scope.ssid) {
-            //angular.element(element).addClass("selected");
+
+        if($state.is('settings.networkmanagement.wifi')) {
+          if($state.params.name === scope.ssid) {
             scope.selected = true;
-            console.log("clciked", element);
+          } else {
+            scope.selected = false;
+          }
+        }
+
+        scope.$on('$stateChangeStart', function(event, toState, toParams) {
+
+          if(toParams.name === scope.ssid) {
+            scope.selected = true;
           } else {
             scope.selected = false;
           }
         });
-        //console.log("voila");
+
         scope.$watch("encryption", function(val) {
           if(scope.encryption === "") {
-            console.log("bingo");
             angular.element(element).hide();
           }
         });
