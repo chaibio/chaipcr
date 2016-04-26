@@ -1,0 +1,27 @@
+<div class="step-2">
+  <p class="step"><b>STEP 2</b>/8</p>
+  <h2>Insert Water Strips</h2>
+
+  <div class="row tubes-container">
+    <div class="col-md-6">
+      <div class="solution-label">
+        <span><b>2</b>x 8-well PCR Strips, Water</span>
+      </div>
+      <img src="./images/tubes-blue.png" class="tubes">
+    </div>
+    <div class="col-md-6 machine-icon-container">
+      <img src="./images/machine-idle.png" alt="">
+    </div>
+  </div>
+
+  <div class="instruction">
+    <b class="top-text">NEXT:</b> <BR>
+    Load the 2 strips of water into the <b>Open qPCR</b>. <br>
+    Ensure the <b>lid height</b> is properly adjusted, and hit <b>Next</b> to continue.
+  </div>
+
+  <div class="text-center">
+    <button ng-show="!cancel" ng-disabled="getErrors().length > 0" ng-class="{errorButton: getErrors().length > 0}" ng-click="createExperiment()">NEXT</button>
+  </div>
+
+</div>
