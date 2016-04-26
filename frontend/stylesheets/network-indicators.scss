@@ -5,21 +5,20 @@
   left: 100px;
 
   .arc1 {
-    width: 30px;
-    height:30px;
+    width: 40px;
+    height:40px;
   }
   .arc2 {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
   }
   .arc3 {
     width: 20px;
     height: 20px;
   }
-  .center {
+  .arc4 {
     width: 5px;
     height: 5px;
-    background-color: grey;
     border-radius: 100%;
     position: absolute;
     top: -5px;
@@ -27,6 +26,9 @@
     bottom: 0px;
     right: 0px;
     margin: auto;
+  }
+  .ch {
+    background-color: grey;
   }
   .show {
     background-color: transparent;
@@ -70,4 +72,18 @@
 }
 .lock-latch-selected {
   border: 2px solid #FFF;
+}
+
+.arc4.signal-ready {
+  background-color: #00AEEF;
+}
+.show.signal-ready {
+  border-top-color: #00AEEF;
+}
+
+.show.wifi-selected {
+  border-top-color: #FFF;
+}
+.ch.wifi-selected {
+  background-color: white;
 }

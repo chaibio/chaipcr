@@ -14,25 +14,25 @@
         },
         {
             "ssid": "Chai",
-            "quality": "96",
+            "quality": "70",
             "siganl_level": "-58",
             "encryption": ""
         },
         {
             "ssid": "STIWIFI24",
-            "quality": "96",
+            "quality": "60",
             "siganl_level": "-63",
             "encryption": "wpa2"
         },
         {
             "ssid": "Chai Test Net",
-            "quality": "96",
+            "quality": "15",
             "siganl_level": "-47",
             "encryption": "wpa2"
         },
         {
             "ssid": "Analatom",
-            "quality": "96",
+            "quality": "10",
             "siganl_level": "-66",
             "encryption": "wpa2"
         }

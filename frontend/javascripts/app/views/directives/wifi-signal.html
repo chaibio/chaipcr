@@ -1,6 +1,6 @@
 <div class='wifi'>
-    <div class='arc1 show'></div>
-    <div class='arc2 show'></div>
-    <div class='arc3 show'></div>
-    <div class="center"></div>
+  <div class='arc1 show' ng-class="{'signal-ready': arc1Signal && !selected, 'wifi-selected': arc1Signal && selected}"></div>
+  <div class='arc2 show' ng-class="{'signal-ready': arc2Signal && !selected, 'wifi-selected': arc2Signal && selected}"></div>
+  <div class='arc3 show' ng-class="{'signal-ready': arc3Signal && !selected, 'wifi-selected': arc3Signal && selected}"></div>
+  <div class="arc4 ch"      ng-class="{'signal-ready': arc4signal && !selected, 'wifi-selected': arc4Signal && selected}"></div>
 </div>
