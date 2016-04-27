@@ -155,11 +155,15 @@ app.post('/device/check_for_updates', function (req, res, next) {
 });
 
 app.get('/network/eth0', function (req, res, next) {
-  res.send(network);
+  res.send(network); // here change to ethernet
 });
 
 app.get('/network/wlan/scan', function(req, res, next) {
   res.send(wifi_networks);
+});
+
+app.get('/network/wlan', function(req, res, next) {
+  res.send(network);
 });
 
 app.post('/control/start', function (req, res, next) {

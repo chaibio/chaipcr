@@ -1,0 +1,89 @@
+.network-details-container {
+
+  .pass-info {
+    padding-top: 9px;
+
+    .pass-heading {
+      font-family: "dinot-bold";
+      font-size: 16px;
+    }
+
+    .pass-text {
+      font-family: "dinot-regular";
+      font-size: 16px;
+    }
+  }
+
+  .connect-area {
+    padding-top: 30px;
+
+    .ssid-text {
+      font-family: "dinot-bold";
+      font-size: 14px;
+    }
+    .ssid-val {
+      font-family: "dinot-regular";
+      font-size: 14px;
+    }
+
+    .password-label {
+      font-family: "dinot-bold";
+      font-size: 14;
+      padding-top: 20px;
+    }
+    input.text-class {
+      width: 260px;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      border-bottom: 1px solid lightgray;
+    }
+  }
+
+  .connection-error {
+    height: 60px;
+    padding-top: 20px;
+    color: red;
+
+    .connection-error-text {
+      font-family: "dinot-regular";
+      font-size: 16px;
+    }
+  }
+
+  .button-container {
+    padding-top: 20px;
+
+    .green-button {
+      font-family: "dinot-bold";
+      font-size: 16px;
+      color: white;
+      background-color: #8dc63f;
+      border: 1px solid white;
+      width: 260px;
+      height: 32px;
+    }
+    .green-button:hover {
+      color: black;
+      border: 2px solid #8dc63f;
+      background-color: white;
+    }
+    .spacer {
+      height: 10px;
+    }
+    .button {
+      width: 260px;
+      border-width: 2px;
+    }
+    .button:hover {
+      color: white;
+      border: none;
+      //border-width: 2px;
+    }
+    .second-button {
+      font-family: "dinot-bold";
+      font-size: 16px;
+      border-color: grey;
+    }
+  }
+}

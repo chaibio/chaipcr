@@ -22,18 +22,18 @@
     border-radius: 100%;
     position: absolute;
     top: -5px;
-    left: 0px;
+    left: 1px;
     bottom: 0px;
     right: 0px;
     margin: auto;
   }
   .ch {
-    background-color: grey;
+    background-color: #333;
   }
   .show {
     background-color: transparent;
     border:3px solid transparent;
-    border-top-color: grey;
+    border-top-color: #333;
     border-radius:100%;
     position: absolute;
     top: 0px;
@@ -53,7 +53,7 @@
 .lock-rect {
   width: 18px;
   height: 14px;
-  background-color: grey;
+  background-color: #333;
   position: absolute;
   border-radius: 2px;
 }
@@ -61,7 +61,7 @@
 .lock-latch {
   width: 12px;
   height: 12px;
-  border: 2px solid grey;
+  border: 2px solid #333;
   position: absolute;
   border-radius: 11px;
   top: -8px;

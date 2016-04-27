@@ -1,5 +1,15 @@
 {
-  "state": {
-    "address": "192.168.10.180"
-  }
+    "interface": "wlan1",
+    "state": {
+        "flags": "69699",
+        "address": "10.0.3.38",
+        "maskAddress": "255.255.255.0",
+        "broadcastAddress": "10.0.3.255",
+        "status": "connected"
+    },
+    "settings": {
+        "type": "dhcp",
+        "wpa-psk": "\"polymerase\"",
+        "wpa-ssid": "\"Chai Guest\""
+    }
 }

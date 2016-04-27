@@ -1,5 +1,6 @@
 angular.module('ChaiBioTech').directive('wifiSignal', [
-  function() {
+  '$state',
+  function($state) {
     return {
       templateUrl: 'app/views/directives/wifi-signal.html',
       restric: 'E',
@@ -16,6 +17,14 @@ angular.module('ChaiBioTech').directive('wifiSignal', [
         scope.arc2Signal = false;
         scope.arc1Signal = false;
         scope.selected = false;
+
+        if($state.is('settings.networkmanagement.wifi')) {
+          if($state.params.name === scope.ssid) {
+            scope.selected = true;
+          } else {
+            scope.selected = false;
+          }
+        }
 
         scope.$on('$stateChangeStart', function(event, toState, toParams) {
 
