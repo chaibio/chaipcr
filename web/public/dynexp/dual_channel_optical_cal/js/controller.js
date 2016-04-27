@@ -59,16 +59,17 @@
           }
         }
 
-        if (data.experiment_controller.expriment && !$scope.experiment) {
-          Experiment.get(data.experiment_controller.expriment.id).then(function(resp) {
-            $scope.experiment = resp.data.experiment;
-          });
-        }
+        // if (data.experiment_controller.expriment && !$scope.experiment) {
+        //   Experiment.get(data.experiment_controller.expriment.id).then(function(resp) {
+        //     $scope.experiment = resp.data.experiment;
+        //   });
+        // }
 
-        this_exp_id = $scope.experiment? $scope.experiment.id : null;
-        running_exp_id = oldData.experiment_controller.expriment? deviceStatus.experiment_controller.expriment.id : null;
+        var this_exp_id = $scope.experiment? $scope.experiment.id : null;
+        var running_exp_id = oldData.experiment_controller.expriment? oldData.experiment_controller.expriment.id : null;
+        var is_current_exp = parseInt(this_exp_id) === parseInt(running_exp_id) && (running_exp_id !== null);
 
-        if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle') && parseInt(this_exp_id) === parseInt(running_exp_id) && running_exp_id !== null ) {
+        if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle') &&  is_current_exp) {
           // experiment is complete
           Experiment.get($scope.experiment.id).then(function (resp) {
             $scope.experiment = resp.data.experiment;
@@ -111,10 +112,11 @@
               errorModal = null;
             }
 
-            this_exp_id = $scope.experiment? $scope.experiment.id : null;
-            running_exp_id = deviceStatus.experiment_controller.expriment? deviceStatus.experiment_controller.expriment.id : null;
+            var this_exp_id = $scope.experiment? $scope.experiment.id : null;
+            var running_exp_id = deviceStatus.experiment_controller.expriment? deviceStatus.experiment_controller.expriment.id : null;
+            var is_current_exp = (running_exp_id !== null) && parseInt(this_exp_id) === parseInt(running_exp_id);
 
-            if (deviceStatus.experiment_controller.machine.state !== 'idle' && running_exp_id !== null && this_exp_id !== running_exp_id) {
+            if (deviceStatus.experiment_controller.machine.state !== 'idle' && !is_current_exp) {
               $scope.errors['ANOTHER_EXPERIMENT_RUNNING'] = "Another experiment is running.";
             } else {
               delete $scope.errors['ANOTHER_EXPERIMENT_RUNNING'];
