@@ -9,47 +9,73 @@
     'host',
     '$http',
     'DeviceInfo',
-    '$timeout',
+    '$interval',
     '$uibModal',
     '$rootScope',
     function OpticalCalibrationCtrl ($scope, $window, Experiment, $state, Status, GlobalService,
-      host, $http, DeviceInfo, $timeout, $uibModal, $rootScope) {
+      host, $http, DeviceInfo, $interval, $uibModal, $rootScope) {
 
-      $scope.cancel = false;
-      $scope.error = false;
 
-      $scope.$on('$stateChangeSuccess', function(evt, currentState) {
+      var ERROR_TYPES = ['OFFLINE', 'CANT_CREATE_EXPERIMENT', 'CANT_START_EXPERIMENT', 'LID_OPEN', 'UNKNOWN_ERROR', 'ANOTHER_EXPERIMENT_RUNNING'];
+      var checkMachineStatusInterval = null;
+      var errorModal = null;
+      $scope.cancel = false
+      $scope.errors = {}
 
-          switch (currentState.name) {
+      function checkMachineStatus() {
+        Status
+          .fetch()
+          .then(function(deviceStatus) {
+            // In case connected
 
-            case "step-2":
-              if(! $scope.timeout) {
-                $scope.error = true;
-                $scope.checkMachineStatus();
+            if (errorModal) {
+              errorModal.close();
+              errorModal = null;
+            }
+
+            var this_exp_id = $scope.experiment? $scope.experiment.id : null;
+            var running_exp_id = deviceStatus.experiment_controller.expriment? deviceStatus.experiment_controller.expriment.id : null;
+            var is_current_exp = (parseInt(this_exp_id) === parseInt(running_exp_id)) && (running_exp_id !== null);
+
+            if (deviceStatus.experiment_controller.machine.state !== 'idle' && running_exp_id !== null && !is_current_exp ) {
+              $scope.errors['ANOTHER_EXPERIMENT_RUNNING'] = "Another experiment is running.";
+            } else {
+              delete $scope.errors['ANOTHER_EXPERIMENT_RUNNING'];
+            }
+
+            if ($scope.errors['OFFLINE']) {
+              delete $scope.errors['OFFLINE'];
+            }
+
+            if (deviceStatus.optics.lid_open === "true" || deviceStatus.optics.lid_open === true) { // lid is open
+              $scope.errors.LID_OPEN = "Close lid to begin.";
+            } else {
+              delete $scope.errors['LID_OPEN'];
+            }
+          })
+          .catch(function(err) {
+            // Error
+            $scope.errors['OFFLINE'] = "Can't connect to the machine.";
+
+            if (err.status === 500) {
+
+              if (!errorModal) {
+                var scope = $rootScope.$new();
+                scope.message = {
+                  title: "Cant connect to machine.",
+                  body: err.data.errors || "Error"
+                };
+
+                errorModal = $uibModal.open({
+                  templateUrl: './views/modal-error.html',
+                  scope: scope
+                });
               }
-            break;
+            }
+          });
+      }
 
-            case "step-3":
-              $timeout.cancel($scope.timeout);
-            break;
-
-            case "step-4":
-              if(! $scope.timeout) {
-                $scope.error = true;
-                $scope.checkMachineStatus();
-              }
-            break;
-
-            case "step-5":
-              $timeout.cancel($scope.timeout);
-            break;
-
-            default:
-
-              $timeout.cancel($scope.timeout);
-              $scope.error = $scope.timeout = false;
-          }
-      });
+      checkMachineStatusInterval = $interval(checkMachineStatus, 1000);
 
       $scope.$watch(function () {
         return Status.getData();
@@ -63,19 +89,19 @@
         $scope.state = data.experiment_controller.machine.state;
         $scope.timeRemaining = GlobalService.timeRemaining(data);
 
-        if (data.experiment_controller.expriment && !$scope.experiment) {
-          Experiment.get(data.experiment_controller.expriment.id).then(function (resp) {
-            $scope.experiment = resp.data.experiment;
-          });
-        }
         if ($scope.isCollectingData() && $state.current.name === 'step-3') {
           $state.go('step-3-reading');
         }
         if (!$scope.isCollectingData() && ($state.current.name === 'step-3-reading') ) {
           $state.go('step-4');
         }
+
+        var this_exp_id = $scope.experiment? $scope.experiment.id : null;
+        var running_exp_id = oldData.experiment_controller.expriment? oldData.experiment_controller.expriment.id : null;
+        var is_current_exp = (parseInt(this_exp_id) === parseInt(running_exp_id)) && (running_exp_id !== null);
+
         // if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle' || $state.current.name === 'step-5')) {
-        if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle')) {
+        if($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle') && is_current_exp ) {
           // experiment is complete
           Experiment.get($scope.experiment.id).then(function (resp) {
             $scope.experiment = resp.data.experiment;
@@ -101,46 +127,6 @@
           $scope.timeRemaining  = ($scope.timeRemaining - $scope.finalStepHoldTime());
         }
       }, true);
-
-      $scope.checkMachineStatus = function() {
-
-        DeviceInfo.getInfo($scope.check).then(function(deviceStatus) {
-          // Incase connected
-          if($scope.modal) {
-              $scope.modal.close();
-              $scope.modal = null;
-          }
-
-          if(deviceStatus.data.optics.lid_open === "true" || deviceStatus.data.lid.open === true) { // lid is open
-            $scope.error = true;
-            $scope.lidMessage = "Close lid to begin.";
-          } else {
-            $scope.error = false;
-          }
-        }, function(err) {
-          // Error
-          $scope.error = true;
-          $scope.lidMessage = "Cant connect to machine.";
-
-          if(err.status === 500) {
-
-            if(! $scope.modal) {
-              var scope = $rootScope.$new();
-              scope.message = {
-                title: "Cant connect to machine.",
-                body: err.data.errors || "Error"
-              };
-
-              $scope.modal = $uibModal.open({
-                templateUrl: './views/modal-error.html',
-                scope: scope
-              });
-            }
-          }
-        });
-
-        $scope.timeout = $timeout($scope.checkMachineStatus, 1000);
-      };
 
       $scope.lidHeatPercentage = function () {
         if (!$scope.experiment) return 0;
@@ -212,6 +198,15 @@
         var steps = $scope.experiment.protocol.stages[0].stage.steps;
         return steps[steps.length-1].step.hold_time;
 
+      };
+
+      $scope.getErrors = function () {
+        var errors = [];
+        for (var i = ERROR_TYPES.length - 1; i >= 0; i--) {
+          if($scope.errors[ERROR_TYPES[i]])
+            errors.push($scope.errors[ERROR_TYPES[i]]);
+        }
+        return errors;
       };
 
     }

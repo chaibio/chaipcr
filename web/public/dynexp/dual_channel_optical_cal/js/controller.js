@@ -65,7 +65,10 @@
           });
         }
 
-        if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle')) {
+        this_exp_id = $scope.experiment? $scope.experiment.id : null;
+        running_exp_id = oldData.experiment_controller.expriment? deviceStatus.experiment_controller.expriment.id : null;
+
+        if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle') && parseInt(this_exp_id) === parseInt(running_exp_id) && running_exp_id !== null ) {
           // experiment is complete
           Experiment.get($scope.experiment.id).then(function (resp) {
             $scope.experiment = resp.data.experiment;
@@ -108,8 +111,10 @@
               errorModal = null;
             }
 
-            if (deviceStatus.experiment_controller.machine.state !== 'idle'
-                && parseInt($scope.experiment.id) !== parseInt(deviceStatus.experiment_controller.expriment.id) ) {
+            this_exp_id = $scope.experiment? $scope.experiment.id : null;
+            running_exp_id = deviceStatus.experiment_controller.expriment? deviceStatus.experiment_controller.expriment.id : null;
+
+            if (deviceStatus.experiment_controller.machine.state !== 'idle' && running_exp_id !== null && this_exp_id !== running_exp_id) {
               $scope.errors['ANOTHER_EXPERIMENT_RUNNING'] = "Another experiment is running.";
             } else {
               delete $scope.errors['ANOTHER_EXPERIMENT_RUNNING'];
