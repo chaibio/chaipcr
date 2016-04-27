@@ -11,7 +11,6 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     $scope.findWifiNetworks = function() {
 
       NetworkSettingsService.getWifiNetworks().then(function(result) {
-        //console.log(result.data.scan_result);
         if(result.data) {
           $scope.wifiNetworks = result.data.scan_result;
         }
