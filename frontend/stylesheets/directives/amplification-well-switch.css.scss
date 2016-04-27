@@ -71,6 +71,12 @@
         }
 
       }
+
+      &.single-channel {
+        .ct {
+          margin-top: 8px;
+        }
+      }
     }
 
   }

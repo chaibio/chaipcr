@@ -1,10 +1,10 @@
-<div class="circle noselect B2" ng-click="toggleState()" ng-style="style" ng-class="{selected: selected, 'text-center': !ct[0] && !ct[1]}">
+<div class="circle noselect B2" ng-click="toggleState()" ng-style="style" ng-class="{selected: selected, 'text-center': !ct[0] && !ct[1], 'single-channel': !is_dual_channel}">
   <div class="ct ct-1">
     <span class="dot"></span>
     <span class="text" ng-show="ct[0] > 0">Ct: <b>{{ ct[0] | round: 1}}</b></span>
     <span class="text" ng-show="ct[0] === 0 || !(ct[0])">Ct</span>
   </div>
-  <div class="ct ct-2">
+  <div class="ct ct-2" ng-show="is_dual_channel">
     <span class="dot"></span>
     <span class="text" ng-show="ct[1] > 0">Ct: <b>{{ ct[1] | round: 1}}</b></span>
     <span class="text" ng-show="ct[1] === 0 || !(ct[1])">Ct</span>
