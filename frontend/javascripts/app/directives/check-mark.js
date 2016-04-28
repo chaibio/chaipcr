@@ -12,7 +12,7 @@ angular.module('ChaiBioTech').directive("checkMark", [
         ssid: "@ssid"
       },
       link: function(scope, elem, attrs) {
-
+        angular.element(elem).hide();
         scope.connected = false;
         scope.selected = false;
 
@@ -43,9 +43,6 @@ angular.module('ChaiBioTech').directive("checkMark", [
             angular.element(elem).hide();
           }
         });
-
-
-
       }
 
     };

@@ -13,12 +13,10 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     //console.log($state, NetworkSettingsService.connectedWifiNetwork);
     if(NetworkSettingsService.connectedWifiNetwork.settings) {
       $scope.connectedSsid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"].replace(new RegExp('"', "g"), "");
-      if($state.params.name === $scope.connectedSsid) {
-        console.log("I am connected");
+      if($state.params.name.replace(new RegExp('_', "g"), " ") === $scope.connectedSsid) {
         $scope.IamConnected = true;
       }
     }
-
-
+    // Now work on refresh, when we refresh IamConnected is false
   }
 ]);
