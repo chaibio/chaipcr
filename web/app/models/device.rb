@@ -13,7 +13,7 @@ class Device
   end
   
   def self.dual_channel?
-    device_hash["emission_channels"] && device_hash["emission_channels"].length == 2
+    device_hash["capabilities"] && device_hash["capabilities"]["optics"] && device_hash["capabilities"]["optics"]["emission_channels"] && device_hash["capabilities"]["optics"]["emission_channels"].length == 2
   end
   
   def self.method_missing(mid, *args)
