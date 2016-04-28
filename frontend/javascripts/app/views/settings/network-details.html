@@ -1,28 +1,30 @@
 <div class="network-details-container" ng-controller="selectedNetwork">
+
   <h2 class="underlined">{{name}} Settings<span class="close" ui-sref="settings.networkmanagement">&times;</span></h2>
-  <div class="pass-info">
-    <div class="pass-heading">PASSWORD REQUIRED</div>
-    <div class="pass-text">Please enter your password to connect</div>
-  </div>
-
-  <div class="connect-area">
-    <div class="ssid-text">Ssid</div>
-    <div class="ssid-val">{{name}}</div>
-
-    <div class="password-label">Password</div>
-    <div class="password-input-container">
-      <input type="password" class="text-class" placeholder="{{name}} password">
+  <div ng-if="! IamConnected">
+    <div class="pass-info">
+      <div class="pass-heading">PASSWORD REQUIRED</div>
+      <div class="pass-text">Please enter your password to connect</div>
     </div>
-  </div>
 
-  <div class="connection-error">
-    <span ng-if="authentication_error"class="connection-error-text">Monkeys broke in and stole everything. Couldn't connect</span>
-  </div>
+    <div class="connect-area">
+      <div class="ssid-text">Ssid</div>
+      <div class="ssid-val">{{name}}</div>
 
-  <div class="button-container">
-    <input type="button" class="green-button" value="{{buttonValue}}">
-    <div class="spacer">&nbsp;</div>
-    <button class="button second-button" ui-sref="settings.networkmanagement">CANCEL</button>
-  </div>
+      <div class="password-label">Password</div>
+      <div class="password-input-container">
+        <input type="password" class="text-class" placeholder="{{name}} password">
+      </div>
+    </div>
+
+    <div class="connection-error">
+      <span ng-if="authentication_error"class="connection-error-text">Monkeys broke in and stole everything. Couldn't connect</span>
+    </div>
+
+    <div class="button-container">
+      <input type="button" class="green-button" value="{{buttonValue}}">
+      <div class="spacer">&nbsp;</div>
+      <button class="button second-button" ui-sref="settings.networkmanagement">CANCEL</button>
+    </div>
   </div>
 </div>

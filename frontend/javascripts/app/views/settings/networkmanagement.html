@@ -12,11 +12,8 @@
       <div class="wifi-control"><div class="wifi-caption">WIFI </div> <div class="wifi-changer"><wifi-toggle data="admin"></wifi-toggle></div></div>
       <ul>
         <li ng-repeat="wifiNetwork in wifiNetworks">
-          <div class="check-mark-container adjust-check-mark">
-            <div class="vertical"></div>
-            <div class="horizontal"></div>
-          </div>
 
+          <check-mark current-network="currentNetwork" ssid="{{wifiNetwork.ssid}}"></check-mark>
           <a ui-sref="settings.networkmanagement.wifi({name: '{{wifiNetwork.ssid | spaceToUnderscore}}'})" ui-sref-active="highlite">{{wifiNetwork.ssid}}
             <wifi-lock encryption="{{wifiNetwork.encryption}}" ssid="{{wifiNetwork.ssid | spaceToUnderscore}}"></wifi-lock>
             <wifi-signal ssid="{{wifiNetwork.ssid | spaceToUnderscore}}" quality="{{wifiNetwork.quality}}"></wifi-signal>

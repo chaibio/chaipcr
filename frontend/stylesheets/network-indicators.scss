@@ -90,15 +90,13 @@
 
 .check-mark-container {
   width: 24px;
-  height: 15px;
-  //background-color: #00AEEF;
   position: relative;
 
   .vertical {
     width: 2px;
     height: 7px;
     position: absolute;
-    background-color: #FFF;
+    //background-color: #FFF;
     left: 3px;
     top: 6px;
     border-radius: 3px;
@@ -108,15 +106,22 @@
   .horizontal {
     width: 18px;
     height: 2px;
-    background-color: #FFF;
+    //background-color: #FFF;
     position: absolute;
     top: 5px;
     left: 3px;
     transform: rotate(-42deg);
     border-radius: 3px;
   }
+  .background {
+    background-color: #000;
+  }
+}
+
+.check-selected {
+  background-color: #FFF !important;
 }
 .adjust-check-mark {
-  top: 29px;
+  top: 12px;
   left: 3px;
 }
