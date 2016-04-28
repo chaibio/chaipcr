@@ -82,6 +82,8 @@ oc_signal_step_ids <- c('1'=4, '2'=4)
 
 { # mapping from factory to user dye data
 
+# db_name_ <- '20160406_chaipcr'
+
 preset_calib_ids <- list('water'=114, 
                          'signal'=c('FAM'=115, 'HEX'=116, 'JOE'=117))
 dye2chst <- list( # mapping from dye to channel and step_id.
@@ -209,13 +211,12 @@ prep_optic_calib <- function(db_conn, calib_id_s, dye_in='FAM', dyes_2bfild=NULL
     
     
     # check data length
-    water_lengths <- sapply(calib_water_list, function(ele) length(ele))
-    signal_lengths <- sapply(calib_signal_list, function(ele) length(ele))
+    water_lengths <- sapply(calib_water_list, length)
+    signal_lengths <- sapply(calib_signal_list, length)
     if (length(unique(c(water_lengths, signal_lengths))) > 1) {
         stop(sprintf('data length not equal across all the channels and/or between water and signal. water: %s. signal: %s', paste(water_lengths, collapse=', '), paste(signal_lengths, collapse=', '))) }
     
     # check whether signal > water
-    calib_invalid_msg_vec <- NULL
     well_names <- names(calib_water_list[[1]])
     stop_msgs <- c()
     for (channel_in_signal in channels_in_signal) {

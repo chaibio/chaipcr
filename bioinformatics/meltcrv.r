@@ -140,8 +140,7 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
     # { # pre-deconvolution, process all available channels
     # mcd_qry <- sprintf('SELECT channel
                            # FROM melt_curve_data 
-                           # WHERE experiment_id=%d AND stage_id=%d
-                           # ORDER BY well_num, temperature',
+                           # WHERE experiment_id=%d AND stage_id=%d',
                            # exp_id, stage_id)
     # mcd_channel <- dbGetQuery(db_conn, mcd_qry)
     

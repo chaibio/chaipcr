@@ -5,15 +5,15 @@ library(jsonlite)
 
 analyze_optical_calibration <- function(
     db_usr, db_pwd, db_host, db_port, db_name, 
-    calib_exp_id, 
-    calib_id=NULL, # not used
+    calib_exp_id, # not used for computation
+    calib_info, # really used
     dye_in='FAM', dyes_2bfild=NULL, 
     out_json=TRUE) 
 {
     db_conn <- db_etc(db_usr, db_pwd, db_host, db_port, db_name, 
-                      calib_exp_id, stage_id=NULL, calib_id)
+                      calib_exp_id, stage_id=NULL, calib_info)
     
-    result1 <- tryCatch(prep_optic_calib(db_conn, calib_exp_id, dye_in, dyes_2bfild), error=function(e) e)
+    result1 <- tryCatch(prep_optic_calib(db_conn, calib_info, dye_in, dyes_2bfild), error=function(e) e)
     
     if ('error' %in% class(result1)) {
         valid <- FALSE
