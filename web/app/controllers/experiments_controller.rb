@@ -423,13 +423,17 @@ class ExperimentsController < ApplicationController
   def calibrate_info(calibration_id)
     protocol = Protocol.includes(:stages).where("protocols.experiment_definition_id=(SELECT experiment_definition_id from experiments where experiments.id=#{calibration_id} LIMIT 1)").first
     if protocol && protocol.stages[0]
-      step_water = protocol.stages[0].steps[1].id
-      step_channel_1 = protocol.stages[0].steps[3].id
+      water_index = protocol.stages[0].steps.find_index{|item| item.name == "Water"}
+      step_water = (!water_index.nil?)? protocol.stages[0].steps[water_index].id : nil
       if Device.dual_channel?
-        step_channel_2 = (protocol.stages[0].steps.length > 5)? protocol.stages[0].steps[5].id : protocol.stages[0].steps[3].id
+        channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "FAM"}
+        channel_2_index = protocol.stages[0].steps.find_index{|item| item.name == "HEX"}
       else
-        step_channel_2 = nil
+        channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "Signal"}
+        channel_2_index = nil
       end
+      step_channel_1 = (!channel_1_index.nil?)? protocol.stages[0].steps[channel_1_index].id : nil
+      step_channel_2 = (!channel_2_index.nil?)? protocol.stages[0].steps[channel_2_index].id : nil
       result = "list(water=list(calibration_id=#{calibration_id},step_id=#{step_water}), channel_1=list(calibration_id=#{calibration_id},step_id=#{step_channel_1}) \
               #{(step_channel_2)? ", channel_2=list(calibration_id="+calibration_id.to_s+",step_id="+step_channel_2.to_s+")" : ""})"
     end
