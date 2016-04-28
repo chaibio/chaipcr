@@ -87,3 +87,36 @@
 .ch.wifi-selected {
   background-color: white;
 }
+
+.check-mark-container {
+  width: 24px;
+  height: 15px;
+  //background-color: #00AEEF;
+  position: relative;
+
+  .vertical {
+    width: 2px;
+    height: 7px;
+    position: absolute;
+    background-color: #FFF;
+    left: 3px;
+    top: 6px;
+    border-radius: 3px;
+    transform: rotate(-47deg);
+  }
+
+  .horizontal {
+    width: 18px;
+    height: 2px;
+    background-color: #FFF;
+    position: absolute;
+    top: 5px;
+    left: 3px;
+    transform: rotate(-42deg);
+    border-radius: 3px;
+  }
+}
+.adjust-check-mark {
+  top: 29px;
+  left: 3px;
+}
