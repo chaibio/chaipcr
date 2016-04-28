@@ -21,9 +21,7 @@
   </div>
 
   <div class="text-center">
-    <button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ng-click="createExperiment()">NEXT</button>
-    <span ng-if="error" ng-class="{errorMessage: error}">{{lidMessage}}</span>
-
+    <button ng-show="!cancel" ng-disabled="getErrors().length > 0" ng-class="{errorButton: (getErrors().length > 0) }" ng-click="createExperiment()">NEXT</button>
   </div>
 
 </div>
