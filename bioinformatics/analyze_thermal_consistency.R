@@ -38,6 +38,21 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
     
     mc_w72c_simplified <- lapply(mc_w72c, function(ele) ele[[as.character(channel)]])
     
+    top1_Tms <- sapply(mc_w72c_simplified[['mc_tm']], function(ele) ele[1, 'Tm'])
+    min_Tm <- min(top1_Tms)
+    max_Tm <- max(top1_Tms)
+    delta_Tm <- max_Tm - min_Tm
+    min_72c_fluo <- min(mc_w72c_simplified[['72c_fluorescence']])
+    
+    valid_boxed <- list(
+        'MIN_TM' = list(min_Tm, min_Tm >= 77), 
+        'MAX_TM' = list(max_Tm, max_Tm <= 81), 
+        'MAX_DELTA_TM' = list(delta_Tm, delta_Tm <= 2),
+        'MIN_FLUORESCENCE' = list(min_72c_fluo, min_72c_fluo >= 8000000))
+    valid_unboxed <- lapply(valid_boxed, function(ele1) lapply(ele1, function(ele2) unbox(ele2)))
+    
+    mc_w72c_simplified[['valid']] <- valid_unboxed
+    
     if (out_json) mc_w72c_simplified <- toJSON(mc_w72c_simplified)
     
     return(mc_w72c_simplified)
