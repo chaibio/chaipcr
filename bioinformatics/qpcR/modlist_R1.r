@@ -96,7 +96,7 @@ modlist <- function(
       # xqrm: adjust fluorescence value if no value in FLUO_ori > 0, so lm.fit won't fail on '0 (non-NA) cases'
       if (all(FLUO_ori <= 0)) {
         addition <- -min(FLUO_ori)
-        FLUO_ori <- FLUO_ori + addition
+        FLUO_ori <- FLUO_ori + addition # for design flaw in (sigmoid)model$ssFct
         message('\nFluorescence values are all negative, added ', 
                 round(addition, 2), 
                 ' before baseline subtraction.')
@@ -121,7 +121,9 @@ modlist <- function(
           # method 2
           fitting_not_done <- TRUE
           FLUO_4blfit <- FLUO_ori
-          min_FLUO_ori <- min(FLUO_ori)
+          fo_uniq <- unique(FLUO_ori)
+          min2nd_fo <- fo_uniq[order(fo_uniq)[2]] # min(FLUO_ori) will be 0 after addition upon all negative fluo values
+          amf <- abs(min2nd_fo) # absolute value of 2nd minimal FLUO_ori value
           # # method 2.1
           # ssVals <- model$ssFct(CYCLES, FLUO_ori)
           # start_list <- as.list(ssVals)
@@ -129,8 +131,8 @@ modlist <- function(
             fitted_model <- tryCatch(pcrfit(cbind(CYCLES, FLUO_4blfit), 1, 2, model, verbose = FALSE, ...), 
                                      error=err_e)
             if ('error' %in% class(fitted_model) && fitted_model$message == 'singular gradient matrix at initial parameter estimates') {
-                message('Fitting for baseline failed, re-fitting with fluorescence values minus ', min_FLUO_ori)
-                FLUO_4blfit <- FLUO_4blfit - min_FLUO_ori
+                message('Fitting for baseline failed, re-fitting with fluorescence values plus ', amf)
+                FLUO_4blfit <- FLUO_4blfit + amf # attempt to alleiviate problem caused by design flaw in model$ssFct where only positive fluo values are used to initiate coefficients 'b' and 'e'
                 # # method 2.1
                 # message('fitting again...')
                 # ssVals['c'] <- ssVals['c'] - min(FLUO_ori) # resulted in fitted `coef(model)[['b']] > 0`
