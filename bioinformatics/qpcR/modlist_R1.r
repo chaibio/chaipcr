@@ -113,8 +113,32 @@ modlist <- function(
         if (baseline_looped == "none") {
           FLUO <- FLUO_ori
         } else if (grepl('^auto_', baseline_looped)) {
+          # # method 1
+          # start_list <- NULL # method 1.1
+          # # start_list <- as.list(rnorm(length(model$parname))) # method 1.2
+          # fitted_model <- tryCatch(pcrfit(cbind(CYCLES, FLUO_ori), 1, 2, model, start = start_list, verbose = FALSE, ...), 
+                                   # error=err_e)
+          # method 2
+          fitting_not_done <- TRUE
+          FLUO_4blfit <- FLUO_ori
+          min_FLUO_ori <- min(FLUO_ori)
+          # # method 2.1
+          # ssVals <- model$ssFct(CYCLES, FLUO_ori)
+          # start_list <- as.list(ssVals)
+          while (fitting_not_done) {
+            fitted_model <- tryCatch(pcrfit(cbind(CYCLES, FLUO_4blfit), 1, 2, model, verbose = FALSE, ...), 
+                                     error=err_e)
+            if ('error' %in% class(fitted_model) && fitted_model$message == 'singular gradient matrix at initial parameter estimates') {
+                message('Fitting for baseline failed, re-fitting with fluorescence values minus ', min_FLUO_ori)
+                FLUO_4blfit <- FLUO_4blfit - min_FLUO_ori
+                # # method 2.1
+                # message('fitting again...')
+                # ssVals['c'] <- ssVals['c'] - min(FLUO_ori) # resulted in fitted `coef(model)[['b']] > 0`
+                # start_list <- as.list(ssVals)
+            } else fitting_not_done <- FALSE }
+          # end: methods
           FLUO <- baseline(cyc = CYCLES, fluo = FLUO_ori, 
-                           model = try(pcrfit(cbind(CYCLES, FLUO_ori), 1, 2, model, verbose = FALSE, ...), silent=FALSE), 
+                           model = fitted_model, 
                            baseline = baseline_looped, basefac = basefac)
         } else {
           FLUO <- baseline(cyc = CYCLES, fluo = FLUO_ori, model = NULL, baseline = baseline_looped, # xqrm
