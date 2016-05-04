@@ -6,6 +6,13 @@ library(jsonlite)
 deltaTSetPoint <- 1
 highTemperature <- 95
 lowTemperature <- 50
+# xqrm
+MIN_AVG_RAMP_RATE <- 2
+MAX_TOTAL_TIME <- 22.5
+MAX_BLOCK_DELTA <- 2
+MIN_HEATING_RATE <- 1
+MAX_TIME_TO_HEAT <- 90
+
 
 analyze_thermal_performance_diagnostic <- function(db_usr, db_pwd, db_host, db_port, db_name, experiment_id, calibration_id){
     #load chaipcr database
@@ -61,18 +68,18 @@ analyze_thermal_performance_diagnostic <- function(db_usr, db_pwd, db_host, db_p
     
     boxed_results <- list(
         Heating=list(
-            AvgRampRate=list(Heating_AvgRampRate, Heating_AvgRampRate >= 2), 
-            TotalTime=list(Heating_TotalTime, Heating_TotalTime <= 22.5), 
-            MaxBlockDeltaT=list(Heating_MaxBlockDeltaT, Heating_MaxBlockDeltaT <= 2)
+            AvgRampRate=list(Heating_AvgRampRate, Heating_AvgRampRate >= MIN_AVG_RAMP_RATE), 
+            TotalTime=list(Heating_TotalTime, Heating_TotalTime <= MAX_TOTAL_TIME), 
+            MaxBlockDeltaT=list(Heating_MaxBlockDeltaT, Heating_MaxBlockDeltaT <= MAX_BLOCK_DELTA)
             ),
         Cooling=list(
-            AvgRampRate=list(Cooling_AvgRampRate, Cooling_AvgRampRate >= 2), 
-            TotalTime=list(Cooling_TotalTime, Cooling_TotalTime <= 22.5), 
-            MaxBlockDeltaT=list(Cooling_MaxBlockDeltaT, Cooling_MaxBlockDeltaT <= 2)
+            AvgRampRate=list(Cooling_AvgRampRate, Cooling_AvgRampRate >= MIN_AVG_RAMP_RATE), 
+            TotalTime=list(Cooling_TotalTime, Cooling_TotalTime <= MAX_TOTAL_TIME), 
+            MaxBlockDeltaT=list(Cooling_MaxBlockDeltaT, Cooling_MaxBlockDeltaT <= MAX_BLOCK_DELTA)
             ),
         Lid=list(
-            HeatingRate=list(Lid_HeatingRate, Lid_HeatingRate >= 1), 
-            TotalTime=list(Lid_TotalTime, Lid_TotalTime <= 90)
+            HeatingRate=list(Lid_HeatingRate, Lid_HeatingRate >= MIN_HEATING_RATE), 
+            TotalTime=list(Lid_TotalTime, Lid_TotalTime <= MAX_TIME_TO_HEAT)
             )
         )
     
