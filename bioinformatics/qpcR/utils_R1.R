@@ -1087,8 +1087,11 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
   if (grepl('^auto_', baseline)) {
     if (baseline == 'auto_lin') mspsp <- TRUE
     if (bl_fitting_failed || coef_b_gt_0) {
-      if (bl_fitting_failed) message('Sigmoid fitting for baseline subtraction failed.')
-      if (coef_b_gt_0) message('Fitted sigmoid model has coefficient \'b\' > 0.')
+      if (bl_fitting_failed) {
+        message('Sigmoid fitting for baseline subtraction failed.')
+      } else if (coef_b_gt_0) {
+        message('Fitted sigmoid model has coefficient \'b\' > 0.')
+      }
       message('Using all the cycles as baseline.')
       basecyc_last <- length(fluo)
       mspsp <- FALSE

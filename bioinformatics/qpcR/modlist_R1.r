@@ -121,6 +121,7 @@ modlist <- function(
           # method 2
           fitting_not_done <- TRUE
           FLUO_4blfit <- FLUO_ori
+          i_rf <- 0
           fo_uniq <- unique(FLUO_ori)
           min2nd_fo <- fo_uniq[order(fo_uniq)[2]] # min(FLUO_ori) will be 0 after addition upon all negative fluo values
           amf <- abs(min2nd_fo) # absolute value of 2nd minimal FLUO_ori value
@@ -131,7 +132,13 @@ modlist <- function(
             fitted_model <- tryCatch(pcrfit(cbind(CYCLES, FLUO_4blfit), 1, 2, model, verbose = FALSE, ...), 
                                      error=err_e)
             if ('error' %in% class(fitted_model) && fitted_model$message == 'singular gradient matrix at initial parameter estimates') {
-                message('Fitting for baseline failed, re-fitting with fluorescence values plus ', amf)
+                if (i_rf >= 10) {
+                    message('Re-fitted 10 times, quit with error as model.')
+                    break}
+                i_rf <- i_rf + 1
+                message(sprintf(
+                    'Fitting for baseline failed, re-fitting iteration %i with fluorescence values plus %f * %i', 
+                    i_rf, amf, i_rf))
                 FLUO_4blfit <- FLUO_4blfit + amf # attempt to alleiviate problem caused by design flaw in model$ssFct where only positive fluo values are used to initiate coefficients 'b' and 'e'
                 # # method 2.1
                 # message('fitting again...')
@@ -180,7 +187,7 @@ modlist <- function(
       t1 <- Sys.time() # time
       fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent=FALSE)
       td <- Sys.time() - t1 # time
-      message('First sigmoid fitting took ', round(as.numeric(td), digits=2), ' seconds. (prior to baseline subtraction for \'parm\', after for other options)') # time
+      message('First sigmoid fitting took ', round(as.numeric(td), digits=2), ' seconds. (prior to baseline subtraction for \'auto_*\' and \'parm\', after for other options)') # time
       
       ## version 1.4-0: baselining with 'c' parameter using 'baseline' function
       if (baseline_looped == "parm") { #fitOBJ <- baseline(model = fitOBJ, baseline = baseline) # ori
