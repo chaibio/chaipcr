@@ -750,7 +750,8 @@ Tm.opt = NULL)
   SPLFN <- try(splinefun(TEMP, FLUO), silent = TRUE)
   if (inherits(SPLFN, "try-error")) return()
   seqTEMP <- seq(min(TEMP, na.rm = TRUE), max(TEMP, na.rm = TRUE), length.out = 10 * length(TEMP))
-  meltDATA <- cbind(meltDATA, Fluo = SPLFN(seqTEMP))
+  # meltDATA <- cbind(meltDATA, Fluo = SPLFN(seqTEMP)) # ori
+  meltDATA <- cbind(meltDATA, Fluo = supsmu(seqTEMP, SPLFN(seqTEMP), span = span.smooth)$y) # xqrm: smooth raw fluo
   tempDATA <- cbind(tempDATA, Temp = seqTEMP)
   if (!is.deriv) derivVEC <- SPLFN(seqTEMP, deriv = 1) else derivVEC <- -SPLFN(seqTEMP, deriv = 0)
   SMOOTH <-  try(supsmu(seqTEMP, derivVEC, span = span.smooth), silent = TRUE)
@@ -1074,24 +1075,41 @@ smoothit <- function(x, selfun, pars)
 # customized by Xiaoqing Rong-Mullins. 2015-10-27.
 # all the ', silent = FALSE' were added by xqrm
 baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
-                     baseline = NULL, basecyc = NULL, basefac = NULL)
+                     baseline = NULL, basecyc = NULL, basefac = NULL,
+                     plateau_offset=2 # xqrm: to ensure the junction to plateau is smooth
+                     )
 { 
   # xqrm
+  mspsp <- FALSE # make sure plateau slope positive
+  class_model <- class(model)
+  bl_fitting_failed <- 'error' %in% class_model || class_model == 'try-error'
+  coef_b_gt_0 <- coef(model)[['b']] > 0
   if (grepl('^auto_', baseline)) {
-    
-    if (class(model) == 'try-error' || coef(model)[['b']] > 0) {
+    if (baseline == 'auto_lin') mspsp <- TRUE
+    if (bl_fitting_failed || coef_b_gt_0) {
+      if (bl_fitting_failed) {
+        message('Sigmoid fitting for baseline subtraction failed.')
+      } else if (coef_b_gt_0) {
+        message('Fitted sigmoid model has coefficient \'b\' > 0.')
+      }
+      message('Using all the cycles as baseline.')
       basecyc_last <- length(fluo)
+      mspsp <- FALSE
     } else { 
       # start: borrowed from 'efficiency.R'
       EFFobj <- eff(model)
       SEQ <- EFFobj$eff.x
       D2seq <- model$MODEL$d2(SEQ, coef(model))
       if (all(is.na(D2seq))) { # may be due to numeric overflow
+        message('All the values in `D2seq` are NA, using all the cycles as baseline.')
         basecyc_last <- length(fluo)
       } else {
         D2seq[!is.finite(D2seq)] <- NA # remove Inf's that mimicked maximum values
         maxD2 <- which.max(D2seq)
         cycmaxD2 <- SEQ[maxD2]
+        # mspsp
+        minD2 <- which.min(D2seq)
+        cycminD2 <- SEQ[minD2]
         # end: borrowed from 'efficiency.R'
         basecyc_last <- floor(cycmaxD2)
         if (basecyc_last <= 5) basecyc_last <- length(fluo)
@@ -1113,7 +1131,25 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
     cyc2 <- cyc[basecyc]
     LM <- lm(fluo2 ~ cyc2)
     BASE <- predict(LM, newdata = data.frame(cyc2 = cyc))    
-  }
+    # xqrm
+    # if (FALSE) { # testing
+    if (mspsp) {
+      plateau_cyc_1st <- ceiling(cycminD2)
+      if (plateau_cyc_1st > basecyc_last && plateau_cyc_1st < length(fluo)-plateau_offset) { # otherwise no need to adjust plateau
+        plateau_cycs1 <- plateau_cyc_1st:length(fluo)
+        fluo_pc <- fluo[plateau_cycs1]
+        cyc_pc <- cyc[plateau_cycs1]
+        plateau_lm <- lm(fluo_pc ~ cyc_pc)
+        if (coef(plateau_lm)[2] < coef(LM)[2]) { # if plateau slope is less than baseline slope
+          plateau_cyc_osth <- plateau_cyc_1st + plateau_offset # os=offset
+          message(sprintf('Baseline subtraction was performed using a different linear model on plateau (cycles %d:%d) than on the rest of the curve, to keep plateau slope positive.', plateau_cyc_osth, length(fluo)))
+          plateau_cycs_os <- plateau_cyc_osth:length(fluo)
+          BASE[plateau_cycs_os] <- (  predict(plateau_lm, data.frame('cyc_pc'=plateau_cycs_os)) 
+                                    - fluo[plateau_cycs_os] + predict(LM, data.frame('cyc2'=plateau_cyc_1st)))
+          }
+        }
+      }
+    }
   
   if (baseline == "quad") {
     fluo2 <- fluo[basecyc]
@@ -1130,7 +1166,7 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
     # newDATA[, 2] <- newDATA[, 2] - BASE
     
     # xqrm
-    if (class(model) == 'try-error') {
+    if (bl_fitting_failed) {
     # reference in 'modlist_R1.r': 
       # line 103: fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent=FALSE) # xqrm
       # line 106: if (baseline == "parm") { fitOBJ <- baseline(model = fitOBJ, baseline = baseline)
@@ -1165,8 +1201,12 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
 
 
 # xqrm
+# error handling
 err_NA <- function(e) {
     print(e)
     return(NA) }
+err_e <- function(e) {
+    print(e)
+    return(e) }
 
 

@@ -4,9 +4,10 @@
 # function: get melting curve data from MySQL database and perform water calibration
 get_mc_calib <- function(channel, 
                          db_conn, 
-                         exp_id, stage_id, # for selecting data to analyze
+                         exp_id, stage_id,
                          oc_data, 
-                         show_running_time # option to show time cost to run this function
+                         max_temp, 
+                         show_running_time
                          ) {
     
     # start counting for running time
@@ -18,9 +19,9 @@ get_mc_calib <- function(channel,
     # get fluorescence data for melting curve
     fluo_qry <- sprintf('SELECT id, stage_id, well_num, temperature, fluorescence_value, experiment_id 
                             FROM melt_curve_data 
-                            WHERE experiment_id=%d AND stage_id=%d AND channel=%d 
+                            WHERE experiment_id=%d AND stage_id=%d AND channel=%d AND temperature <= %f
                             ORDER BY well_num, temperature',
-                            exp_id, stage_id, as.numeric(channel))
+                            exp_id, stage_id, as.numeric(channel), max_temp)
     fluo_sel <- dbGetQuery(db_conn, fluo_qry)
     
     num_wells <- length(unique(fluo_sel[,'well_num']))
@@ -124,6 +125,7 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
                        exp_id, stage_id, calib_id, # for selecting data to analyze
                        dye_in='FAM', dyes_2bfild=NULL, 
                        dcv=TRUE, # logical, whether to perform multi-channel deconvolution
+                       max_temp=1000, # analyze only the data with temperature lower than this
                        mc_plot=FALSE, # whether to plot melting curve data
                        extra_output=FALSE, 
                        show_running_time=FALSE, # option to show time cost to run this function
@@ -136,6 +138,7 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
     
     db_conn <- db_etc(db_usr, db_pwd, db_host, db_port, db_name, 
                       exp_id, stage_id, calib_id)
+    message('max_temp: ', max_temp)
     
     # { # pre-deconvolution, process all available channels
     # mcd_qry <- sprintf('SELECT channel
@@ -162,6 +165,7 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
                                   db_conn, 
                                   exp_id, stage_id, 
                                   oc_data, 
+                                  max_temp, 
                                   show_running_time)
     dbDisconnect(db_conn)
     

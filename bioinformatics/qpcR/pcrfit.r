@@ -67,6 +67,9 @@ verbose = TRUE,
   DATA <- as.data.frame(cbind(Cycles = CYC, Fluo = FLUO))  
       
   ## make nlsModel using 'nlsLM' from package 'minpack.lm'
+  # # xqrm
+  # message('fluo max: ', max(FLUO), '. fluo_min: ', min(FLUO))
+  # message('ssVal: ', paste(ssVal, collapse=','))
   NLS <- nlsLM(as.formula(model$expr), data = DATA, start = as.list(ssVal), model = TRUE, 
               algorithm = "LM", control = control, weights = WEIGHTS, ...)
      

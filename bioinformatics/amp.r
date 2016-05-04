@@ -6,6 +6,7 @@ get_amp_calib <- function(channel, # as 1st argument for iteration by channel
                           db_conn, 
                           exp_id, stage_id, # for selecting data to analyze
                           oc_data, # optical calibration data
+                          max_cycle, # number of cycles to analyze
                           show_running_time # option to show time cost to run this function
                           ) {
     
@@ -20,9 +21,13 @@ get_amp_calib <- function(channel, # as 1st argument for iteration by channel
                             FROM fluorescence_data 
                             LEFT JOIN ramps ON fluorescence_data.ramp_id = ramps.id
                             INNER JOIN steps ON fluorescence_data.step_id = steps.id OR steps.id = ramps.next_step_id 
-                            WHERE fluorescence_data.experiment_id=%d AND steps.stage_id=%d AND fluorescence_data.channel=%d 
+                            WHERE 
+                                fluorescence_data.experiment_id=%d AND 
+                                steps.stage_id=%d AND 
+                                fluorescence_data.channel=%d AND
+                                cycle_num <= %d
                             ORDER BY well_num, cycle_num',
-                            exp_id, stage_id, as.numeric(channel))
+                            exp_id, stage_id, as.numeric(channel), max_cycle)
     fluo_sel <- dbGetQuery(db_conn, fluo_qry)
     
     # cast fluo_sel into a pivot table organized by cycle_num (row label) and well_num (column label), average the data from all the available steps/ramps for each well and cycle
@@ -36,6 +41,7 @@ get_amp_calib <- function(channel, # as 1st argument for iteration by channel
     ac_mtx <- cbind(fluo_cast[, 'cycle_num'], calibd)
     colnames(ac_mtx)[1] <- 'cycle_num'
     amp_calib <- list('ac_mtx'=as.matrix(ac_mtx), # change data frame to matrix for ease of constructing array
+                      'fluo_cast'=fluo_cast, 
                       'signal_water_diff'=calibd$signal_water_diff)
     
     # report time cost for this function
@@ -198,7 +204,7 @@ baseline_ct <- function(amp_calib,
                                       sapply(1:num_cycles, model$fct, blmods_cm[,well_name])))
       colnames(fluo_blmods) <- well_names
     } else {
-      fluoa <- NULL
+      fluoa <- ac_mtx
       blmods <- NULL
       blmods_cm <- NULL
       fluo_blmods <- NULL
@@ -252,6 +258,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
                                    dye_in='FAM', dyes_2bfild=NULL, # fill missing channels in calibration experiment(s) using preset calibration experiments
                                    dcv=TRUE, # logical, whether to perform multi-channel deconvolution
                                    # basecyc, cp, # extra parameters that are currently hard-coded but may become user-defined later
+                                   max_cycle=1000, # maximum cycles to analyze
                                    extra_output=FALSE, 
                                    show_running_time=FALSE # option to show time cost to run this function
                                    ) {
@@ -271,6 +278,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     
     db_conn <- db_etc(db_usr, db_pwd, db_host, db_port, db_name, 
                       exp_id, stage_id, calib_id)
+    message('max_cycle: ', max_cycle)
     
     fd_qry <- sprintf('SELECT * FROM fluorescence_data 
                            LEFT JOIN ramps ON fluorescence_data.ramp_id = ramps.id
@@ -293,13 +301,14 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
                                    db_conn, 
                                    exp_id, stage_id, 
                                    oc_data, 
+                                   max_cycle,
                                    show_running_time)
     dbDisconnect(db_conn)
     
+    # get data out of `amp_calib_mtch`
+    amp_raw <- amp_calib_mtch[['post_consoli']][['fluo_cast']]
     amp_calib_mtch_bych <- amp_calib_mtch[['pre_consoli']]
-    
-    amp_calib_array <<- amp_calib_mtch[['post_consoli']][['ac_mtx']]
-    
+    amp_calib_array <- amp_calib_mtch[['post_consoli']][['ac_mtx']]
     rbbs <- amp_calib_array # right before baseline subtraction
     
     if (dcv) {
@@ -338,7 +347,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     
     if (extra_output) {
         result_mtch <- c(downstream, baseline_ct_mtch,
-                         list('fluorescence_data'=fluorescence_data, 'oc_data'=oc_data))
+                         list('amp_raw'=amp_raw, 'oc_data'=oc_data))
     } else result_mtch <- downstream
     
     return(result_mtch)

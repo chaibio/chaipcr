@@ -96,7 +96,7 @@ modlist <- function(
       # xqrm: adjust fluorescence value if no value in FLUO_ori > 0, so lm.fit won't fail on '0 (non-NA) cases'
       if (all(FLUO_ori <= 0)) {
         addition <- -min(FLUO_ori)
-        FLUO_ori <- FLUO_ori + addition
+        FLUO_ori <- FLUO_ori + addition # for design flaw in (sigmoid)model$ssFct
         message('\nFluorescence values are all negative, added ', 
                 round(addition, 2), 
                 ' before baseline subtraction.')
@@ -113,8 +113,44 @@ modlist <- function(
         if (baseline_looped == "none") {
           FLUO <- FLUO_ori
         } else if (grepl('^auto_', baseline_looped)) {
+          # # method 1
+          # start_list <- NULL # method 1.1
+          # # start_list <- as.list(rnorm(length(model$parname))) # method 1.2
+          # fitted_model <- tryCatch(pcrfit(cbind(CYCLES, FLUO_ori), 1, 2, model, start = start_list, verbose = FALSE, ...), 
+                                   # error=err_e)
+          # method 2
+          fitting_not_done <- TRUE
+          FLUO_4blfit <- FLUO_ori
+          i_rf <- 0
+          fo_uniq <- unique(FLUO_ori)
+          min2nd_fo <- fo_uniq[order(fo_uniq)[2]] # min(FLUO_ori) will be 0 after addition upon all negative fluo values
+          amf <- abs(min2nd_fo) # absolute value of 2nd minimal FLUO_ori value
+          # # method 2.1
+          # ssVals <- model$ssFct(CYCLES, FLUO_ori)
+          # start_list <- as.list(ssVals)
+          while (fitting_not_done) {
+            fitted_model <- tryCatch(pcrfit(cbind(CYCLES, FLUO_4blfit), 1, 2, model, verbose = FALSE, ...), 
+                                     error=err_e)
+            if ('error' %in% class(fitted_model) && 
+                fitted_model$message %in% c(
+                    'singular gradient matrix at initial parameter estimates',
+                    'Non-finite (or null) value for a parameter specified!')) {
+                if (i_rf >= 10) {
+                    message('Re-fitted 10 times, quit with error as model.')
+                    break}
+                i_rf <- i_rf + 1
+                message(sprintf(
+                    'Fitting for baseline failed, re-fitting iteration %i with fluorescence values plus %f * %i', 
+                    i_rf, amf, i_rf))
+                FLUO_4blfit <- FLUO_4blfit + amf # attempt to alleiviate problem caused by design flaw in model$ssFct where only positive fluo values are used to initiate coefficients 'b' and 'e'
+                # # method 2.1
+                # message('fitting again...')
+                # ssVals['c'] <- ssVals['c'] - min(FLUO_ori) # resulted in fitted `coef(model)[['b']] > 0`
+                # start_list <- as.list(ssVals)
+            } else fitting_not_done <- FALSE }
+          # end: methods
           FLUO <- baseline(cyc = CYCLES, fluo = FLUO_ori, 
-                           model = try(pcrfit(cbind(CYCLES, FLUO_ori), 1, 2, model, verbose = FALSE, ...), silent=FALSE), 
+                           model = fitted_model, 
                            baseline = baseline_looped, basefac = basefac)
         } else {
           FLUO <- baseline(cyc = CYCLES, fluo = FLUO_ori, model = NULL, baseline = baseline_looped, # xqrm
@@ -154,7 +190,7 @@ modlist <- function(
       t1 <- Sys.time() # time
       fitOBJ <- try(pcrfit(DATA, 1, 2, model, verbose = FALSE, ...), silent=FALSE)
       td <- Sys.time() - t1 # time
-      message('First sigmoid fitting took ', round(as.numeric(td), digits=2), ' seconds. (prior to baseline subtraction for \'parm\', after for other options)') # time
+      message('First sigmoid fitting took ', round(as.numeric(td), digits=2), ' seconds. (prior to baseline subtraction for \'auto_*\' and \'parm\', after for other options)') # time
       
       ## version 1.4-0: baselining with 'c' parameter using 'baseline' function
       if (baseline_looped == "parm") { #fitOBJ <- baseline(model = fitOBJ, baseline = baseline) # ori
