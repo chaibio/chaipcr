@@ -46,9 +46,6 @@
           return 0;
         if (data.experiment_controller.machine.state !== 'idle') {
           exp = data.experiment_controller.expriment;
-          console.log('estimated_duration: '+ exp.estimated_duration);
-          console.log('paused_duration: '+ exp.paused_duration);
-          console.log('run_duration: '+ exp.run_duration);
           time = (exp.estimated_duration * 1 + exp.paused_duration * 1) - (exp.run_duration * 1);
           if (time < 0) {
             time = 0;

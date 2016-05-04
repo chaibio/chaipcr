@@ -100,6 +100,7 @@
         if (!$scope.analyzedExp) {
           Experiment.analyze($params.id).then(function (resp) {
             $scope.analyzedExp = resp.data;
+            console.log($scope.analyzedExp);
           });
         }
       }
