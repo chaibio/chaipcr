@@ -20,8 +20,10 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.getSettings = function() {
       var delay = $q.defer();
       $http.get(host + ':8000/network/wlan').then(function(result) {
-        that.connectedWifiNetwork = result.data;
-        $rootScope.$broadcast("new_wifi_connected");
+        if(result.data.settings) {
+          that.connectedWifiNetwork = result.data;
+          $rootScope.$broadcast("new_wifi_connected");
+        }
         delay.resolve(result);
       }, function(err) {
         delay.reject(err);
@@ -30,9 +32,15 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       return delay.promise;
     };
 
-    this.connectWifi = function() {
-      console.log("dddd dddd dddd");
+    this.connectWifi = function(data) {
+      var delay = $q.defer();
+      $http.put(host + ':8000/network/wlan', data).then(function(result) {
+        delay.resolve(result);
+      }, function(err) {
+        delay.reject(err);
+      });
 
+      return delay.promise;
     };
   }
 ]);

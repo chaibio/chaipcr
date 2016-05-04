@@ -12,10 +12,11 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     $scope.authentication_error = false;
     $scope.credentials = {
       'wpa-ssid': $scope.name,
-      'wpa-psk': ""
+      'wpa-psk': "",
+      'type': "dhcp"
     };
     //console.log($state, NetworkSettingsService.connectedWifiNetwork);
-    if(NetworkSettingsService.connectedWifiNetwork.settings) {
+    if(NetworkSettingsService.connectedWifiNetwork.settings && NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"]) {
       $scope.connectedSsid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"].replace(new RegExp('"', "g"), "");
       if($state.params.name.replace(new RegExp('_', "g"), " ") === $scope.connectedSsid) {
         $scope.IamConnected = true;
@@ -23,8 +24,11 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     }
 
     $scope.connectWifi = function() {
-      console.log($scope.credentials);
-      //NetworkSettingsService.connectWifi();
+      NetworkSettingsService.connectWifi($scope.credentials).then(function(data) {
+        console.log(data);
+      }, function(err) {
+        console.log(err);
+      });
     };
     // Now work on refresh, when we refresh IamConnected is false
   }
