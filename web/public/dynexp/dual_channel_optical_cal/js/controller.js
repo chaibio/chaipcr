@@ -41,13 +41,14 @@
         $scope.data = data;
         $scope.state = data.experiment_controller.machine.state;
         $scope.timeRemaining = GlobalService.timeRemaining(data);
+        $scope.isWarmingUp = data.experiment_controller.expriment? (data.experiment_controller.expriment.step.name === 'Warm Up') : false
 
-        if ($scope.isCollectingData()) {
-          if ($state.current.name === 'page-4')
-            $scope.timeRemaining = $scope.timeRemaining - Constants.PAGE_4_HOLDING_TIME;
-          if ($state.current.name === 'page-6')
-            $scope.timeRemaining = $scope.timeRemaining - Constants.PAGE_6_HOLDING_TIME;
-        }
+        // if ($scope.isCollectingData()) {
+        //   if ($state.current.name === 'page-4')
+        //     $scope.timeRemaining = $scope.timeRemaining - Constants.PAGE_4_HOLDING_TIME;
+        //   if ($state.current.name === 'page-6')
+        //     $scope.timeRemaining = $scope.timeRemaining - Constants.PAGE_6_HOLDING_TIME;
+        // }
 
         if ($scope.state === 'paused') {
           var pausedPages = ['page-4', 'page-6', 'page-8'];
@@ -59,11 +60,14 @@
           }
         }
 
-        // if (data.experiment_controller.expriment && !$scope.experiment) {
-        //   Experiment.get(data.experiment_controller.expriment.id).then(function(resp) {
-        //     $scope.experiment = resp.data.experiment;
-        //   });
-        // }
+        if (data.experiment_controller.expriment &&
+          !$scope.experiment &&
+          data.experiment_controller.expriment.name === 'Dual Channel Optical Calibration') {
+
+          Experiment.get(data.experiment_controller.expriment.id).then(function(resp) {
+            $scope.experiment = resp.data.experiment;
+          });
+        }
 
         var this_exp_id = $scope.experiment? $scope.experiment.id : null;
         var running_exp_id = oldData.experiment_controller.expriment? oldData.experiment_controller.expriment.id : null;
