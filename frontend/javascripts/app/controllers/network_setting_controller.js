@@ -17,6 +17,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
 
       });
     };
+    
     $scope.getSettings = function() {
         NetworkSettingsService.getSettings().then(function(result) {
           console.log(result);

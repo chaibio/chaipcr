@@ -1,7 +1,7 @@
 <div class="network-details-container" ng-controller="selectedNetwork">
 
   <h2 class="underlined">{{name}} Settings<span class="close" ui-sref="settings.networkmanagement">&times;</span></h2>
-  <div ng-if="! IamConnected">
+  <form ng-if="! IamConnected" name="connectWifiNetwork" nonvalidate ng-submit="connectWifi()">
     <div class="pass-info">
       <div class="pass-heading">PASSWORD REQUIRED</div>
       <div class="pass-text">Please enter your password to connect</div>
@@ -13,7 +13,10 @@
 
       <div class="password-label">Password</div>
       <div class="password-input-container">
-        <input type="password" class="text-class" placeholder="{{name}} password">
+        <input type="password" name="wpa_key" class="text-class" required placeholder="{{name}} password" ng-model="credentials['wpa-psk']">
+        <div ng-show="connectWifiNetwork.wpa_key.$touched">
+          <span ng-show="connectWifiNetwork.wpa_key.$error.required" class="connection-error-text">Cannot left blank ..</span>
+        </div>
       </div>
     </div>
 
@@ -22,9 +25,9 @@
     </div>
 
     <div class="button-container">
-      <input type="button" class="green-button" value="{{buttonValue}}">
+      <input type="submit" class="green-button" value="{{buttonValue}}">
       <div class="spacer">&nbsp;</div>
       <button class="button second-button" ui-sref="settings.networkmanagement">CANCEL</button>
     </div>
-  </div>
+  </form>
 </div>

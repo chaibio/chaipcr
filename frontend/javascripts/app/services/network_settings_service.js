@@ -29,5 +29,10 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
 
       return delay.promise;
     };
+
+    this.connectWifi = function() {
+      console.log("dddd dddd dddd");
+
+    };
   }
 ]);

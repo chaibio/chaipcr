@@ -40,15 +40,17 @@
     }
   }
 
+  .connection-error-text {
+    font-family: "dinot-regular";
+    font-size: 16px;
+    color: red;
+  }
+  
   .connection-error {
     height: 60px;
     padding-top: 20px;
     color: red;
 
-    .connection-error-text {
-      font-family: "dinot-regular";
-      font-size: 16px;
-    }
   }
 
   .button-container {
