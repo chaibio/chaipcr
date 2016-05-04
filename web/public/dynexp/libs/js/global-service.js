@@ -83,8 +83,8 @@
       this.getTmValues = function(analyze_data) {
         var tms = [];
         for (var i = 0; i < 16; i++) {
-          if (analyze_data.mc_tm['fluo_' + i].length > 0) {
-            tms.push(analyze_data.mc_tm['fluo_' + i][0].Tm);
+          if (analyze_data.tm_check['fluo_' + i].length > 0) {
+            tms.push(analyze_data.tm_check['fluo_' + i].Tm);
           } else {
             tms.push(null);
           }

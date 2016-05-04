@@ -115,8 +115,8 @@
                 $scope.tm_values = GlobalService.getTmValues($scope.analyzedExp);
                 $scope.analyzing = false;
               })
-              .catch(function () {
-                $scope.error = "An error occured while trying to analyze the experiment results.";
+              .catch(function (resp) {
+                $scope.custom_error = resp.data.errors || "An error occured while trying to analyze the experiment results.";
               });
             }
             else {

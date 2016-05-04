@@ -22,12 +22,12 @@
         <tbody>
           <tr ng-repeat="i in loop">
             <td>{{i+1}}</td>
-            <td ng-show="tm_values[i]" ng-class="{'text-success': tm_values[i] >= CONSTANTS.MIN_TM_VAL && tm_values[i] <= CONSTANTS.MAX_TM_VAL, 'text-danger': tm_values[i] < CONSTANTS.MIN_TM_VAL || tm_values[i] > CONSTANTS.MAX_TM_VAL}">
-              {{ tm_values[i] | round:2 }}
+            <td ng-show="tm_values[i]" ng-class="(tm_values[i][1] ? 'text-success': 'text-danger')">
+              {{ tm_values[i][0] | round:2 }}
             </td>
-            <td class="text-danger" ng-show="!tm_values[i]">FAIL</td>
-            <td ng-class="{'text-success': analyzedExp['72c_fluorescence'][i] >= CONSTANTS.MIN_FLUORESCENCE_VAL, 'text-danger': analyzedExp['72c_fluorescence'][i] < CONSTANTS.MIN_FLUORESCENCE_VAL}">
-              {{ analyzedExp['72c_fluorescence'][i]  | commaSeparated }}
+            <td ng-show="!tm_values[i][1]" class="text-danger">FAIL</td>
+            <td ng-class="(analyzedExp['72c_fluorescence'][i][1] ? 'text-success': 'text-danger')">
+              {{ analyzedExp['72c_fluorescence'][i][0]  | commaSeparated }}
             </td>
           </tr>
         </tbody>
@@ -44,13 +44,13 @@
         </thead>
         <tbody>
           <tr ng-repeat="i in loop">
-            <td>{{i+9}}</td>
-            <td ng-show="tm_values[i+8]" ng-class="{'text-success': tm_values[i+8] >= CONSTANTS.MIN_TM_VAL && tm_values[i+8] <= CONSTANTS.MAX_TM_VAL, 'text-danger': tm_values[i+8] < CONSTANTS.MIN_TM_VAL || tm_values[i+8] > CONSTANTS.MAX_TM_VAL || !tm_values[i+8]}">
-              {{ tm_values[i+8] | round:2 }}
+            <td>{{i+1}}</td>
+            <td ng-show="tm_values[i+8]" ng-class="(tm_values[i+8][1] ? 'text-success': 'text-danger')">
+              {{ tm_values[i+8][0] | round:2 }}
             </td>
-            <td class="text-danger" ng-show="!tm_values[i+8]">FAIL</td>
-            <td ng-class="{'text-success': analyzedExp['72c_fluorescence'][i+8] >= CONSTANTS.MIN_FLUORESCENCE_VAL, 'text-danger': analyzedExp['72c_fluorescence'][i+8] < CONSTANTS.MIN_FLUORESCENCE_VAL}">
-              {{ analyzedExp['72c_fluorescence'][i+8]  | commaSeparated }}
+            <td ng-show="!tm_values[i+8][1]" class="text-danger">FAIL</td>
+            <td ng-class="(analyzedExp['72c_fluorescence'][i+8][1] ? 'text-success': 'text-danger')">
+              {{ analyzedExp['72c_fluorescence'][i+8][0]  | commaSeparated }}
             </td>
           </tr>
         </tbody>
@@ -58,13 +58,13 @@
     </div>
   </div>
 
-  <div class="text-center text-red" ng-show="error">{{error}}</div>
+  <div class="text-center text-danger" ng-show="custom_error">{{custom_error}}</div>
 
-  <h3 class="text-center" ng-show="tm_values" ng-class="{'text-success': maxDeltaTm() < CONSTANTS.MAX_DELTA_TM_VAL, 'text-danger': maxDeltaTm() >= CONSTANTS.MAX_DELTA_TM_VAL || !isFinite(maxDeltaTm())}">
-    Max ΔTm: {{maxDeltaTm() | round:2}} &deg;C
+  <h3 class="text-center" ng-show="tm_values" ng-class="(analyzedExp['delta_Tm'][1] ? 'text-success':'text-danger')">
+    Max ΔTm: {{analyzedExp['delta_Tm'][0] | round:2}} &deg;C
   </h3>
 
-  <div class="text-center" ng-show="tm_values">
+  <div class="text-center">
     <a href="/#/settings/" class="button">OKAY</a>
   </div>
 
