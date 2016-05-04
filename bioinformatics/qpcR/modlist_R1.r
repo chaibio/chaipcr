@@ -131,7 +131,10 @@ modlist <- function(
           while (fitting_not_done) {
             fitted_model <- tryCatch(pcrfit(cbind(CYCLES, FLUO_4blfit), 1, 2, model, verbose = FALSE, ...), 
                                      error=err_e)
-            if ('error' %in% class(fitted_model) && fitted_model$message == 'singular gradient matrix at initial parameter estimates') {
+            if ('error' %in% class(fitted_model) && 
+                fitted_model$message %in% c(
+                    'singular gradient matrix at initial parameter estimates',
+                    'Non-finite (or null) value for a parameter specified!')) {
                 if (i_rf >= 10) {
                     message('Re-fitted 10 times, quit with error as model.')
                     break}
