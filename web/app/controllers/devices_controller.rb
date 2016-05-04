@@ -248,6 +248,7 @@ class DevicesController < ApplicationController
     Experiment.joins(:experiment_definition).where("experiment_type != ? and experiments.id != 1", ExperimentDefinition::TYPE_DIAGNOSTIC).select('experiments.*').each do |e|
       e.destroy
     end
+    Setting.update_all("calibration_id=1")
     if !Device.serial_number.blank?
       serialmd5 = Digest::MD5.hexdigest(Device.serial_number)
       system("printf '#{serialmd5}\n#{serialmd5}\n' | passwd")
