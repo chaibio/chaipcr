@@ -2,9 +2,10 @@
 
 melt_1cr <- function(floor_temp, 
                      db_usr, db_pwd, db_host, db_port, db_name, 
-                     exp_id, stage_id, calib_id, channel, 
+                     exp_id, stage_id, calib_info, channel, 
                      dye_in='FAM', dyes_2bfild=NULL, 
                      dcv=TRUE, # logical, whether to perform multi-channel deconvolution
+                     max_temp=1000.1, 
                      mc_plot=FALSE, 
                      show_running_time=FALSE,
                      ... # options to pass onto `mc_tm_pw`
@@ -15,9 +16,9 @@ melt_1cr <- function(floor_temp,
     start_time <- proc.time()[['elapsed']]
     
     mc_out <- process_mc(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
-                         exp_id, stage_id, calib_id, # for selecting data to analyze
+                         exp_id, stage_id, calib_info, # for selecting data to analyze
                          dye_in, dyes_2bfild, 
-                         dcv, mc_plot, extra_output=TRUE, show_running_time, ...)
+                         dcv, max_temp, mc_plot, extra_output=TRUE, show_running_time, ...)
     
     mc_tm <- lapply(mc_out[['mc_bywell']], 
                     function(channel_ele) lapply(channel_ele, 

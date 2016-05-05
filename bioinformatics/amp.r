@@ -254,7 +254,7 @@ baseline_ct <- function(amp_calib,
 
 # top level function called by external codes
 get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
-                                   exp_id, stage_id, calib_id, # for selecting data to analyze
+                                   exp_id, stage_id, calib_info, # for selecting data to analyze
                                    dye_in='FAM', dyes_2bfild=NULL, # fill missing channels in calibration experiment(s) using preset calibration experiments
                                    dcv=TRUE, # logical, whether to perform multi-channel deconvolution
                                    # basecyc, cp, # extra parameters that are currently hard-coded but may become user-defined later
@@ -277,7 +277,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     cp <- 'cpD2'
     
     db_conn <- db_etc(db_usr, db_pwd, db_host, db_port, db_name, 
-                      exp_id, stage_id, calib_id)
+                      exp_id, stage_id, calib_info)
     message('max_cycle: ', max_cycle)
     
     fd_qry <- sprintf('SELECT * FROM fluorescence_data 
@@ -293,7 +293,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     
     if (length(channels) == 1) dcv <- FALSE
     
-    oc_data <- prep_optic_calib(db_conn, calib_id, dye_in, dyes_2bfild)
+    oc_data <- prep_optic_calib(db_conn, calib_info, dye_in, dyes_2bfild)
     
     amp_calib_mtch <- process_mtch(channels, 
                                    matrix2array=TRUE, 
