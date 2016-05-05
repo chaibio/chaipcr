@@ -129,9 +129,7 @@ InterfaceSettings readInterfaceSettings(const std::string &filePath, const std::
         }
         else if (!interface.interface.empty() && (line.substr(0, 4) == std::string("    ") || line.at(0) == '\t'))
         {
-            if (line.substr(0, 4) == std::string("    "))
-                line = line.substr(4);
-            else
+            while (line.front() == ' ')
                 line = line.substr(1);
 
             interface.arguments[line.substr(0, line.find(' '))] = line.substr(line.find(' ') + 1);

@@ -123,7 +123,10 @@ void NetworkManagerHandler::setSettings(const boost::property_tree::ptree &reque
         settings.type = requestPt.get<std::string>("type");
 
         for (boost::property_tree::ptree::const_iterator it = requestPt.begin(); it != requestPt.end(); ++it)
-            settings.arguments[it->first] = it->second.get_value<std::string>();
+        {
+            if (it->first != "type")
+                settings.arguments[it->first] = it->second.get_value<std::string>();
+        }
 
         NetworkInterfaces::writeInterfaceSettings(kNetworkInterfacesFile, settings);
 
