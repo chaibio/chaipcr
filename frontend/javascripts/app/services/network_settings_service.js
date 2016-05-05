@@ -35,6 +35,9 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.connectWifi = function(data) {
       var delay = $q.defer();
       $http.put(host + ':8000/network/wlan', data).then(function(result) {
+        $http.post(host + ':8000/network/wlan/connect').then(function(result) {
+          console.log("connected");
+        });
         delay.resolve(result);
       }, function(err) {
         delay.reject(err);
