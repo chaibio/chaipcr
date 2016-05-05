@@ -21,7 +21,8 @@ App.controller 'LoginCtrl', [
       angular.element('body').removeClass('login-state-active')
 
     @getSoftwareData = () ->
-      $http.get("http://localhost:8000/device").then((device) ->
+      host = "http://#{window.location.hostname}"
+      $http.get(host + ":80/device").then((device) ->
           if device.data?.serial_number?
             $scope.serial_number = device.data.serial_number
 
