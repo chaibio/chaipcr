@@ -25,6 +25,8 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
 
     $scope.connectWifi = function() {
       NetworkSettingsService.connectWifi($scope.credentials).then(function(data) {
+        NetworkSettingsService.getSettings();
+        $state.go('settings.networkmanagement');
         console.log(data);
       }, function(err) {
         console.log(err);
