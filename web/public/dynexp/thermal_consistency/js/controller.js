@@ -112,7 +112,7 @@
               Experiment.analyze($stateParams.id)
               .then(function (resp) {
                 $scope.analyzedExp = resp.data;
-                $scope.tm_values = GlobalService.getTmValues($scope.analyzedExp);
+                $scope.tm_values = GlobalService.getTmValues(resp.data);
                 $scope.analyzing = false;
               })
               .catch(function (resp) {

@@ -26,8 +26,8 @@
               {{ tm_values[i][0] | round:2 }}
             </td>
             <td ng-show="!tm_values[i][1]" class="text-danger">FAIL</td>
-            <td ng-class="(analyzedExp['72c_fluorescence'][i][1] ? 'text-success': 'text-danger')">
-              {{ analyzedExp['72c_fluorescence'][i][0]  | commaSeparated }}
+            <td ng-class="(analyzedExp['72c_fluorescence']['fluo_'+i][1] ? 'text-success': 'text-danger')">
+              {{ analyzedExp['72c_fluorescence']['fluo_'+i][0]  | commaSeparated }}
             </td>
           </tr>
         </tbody>
@@ -45,12 +45,12 @@
         <tbody>
           <tr ng-repeat="i in loop">
             <td>{{i+1}}</td>
-            <td ng-show="tm_values[i+8]" ng-class="(tm_values[i+8][1] ? 'text-success': 'text-danger')">
+            <td ng-show="tm_values[(i+8)]" ng-class="(tm_values[i+8][1] ? 'text-success': 'text-danger')">
               {{ tm_values[i+8][0] | round:2 }}
             </td>
             <td ng-show="!tm_values[i+8][1]" class="text-danger">FAIL</td>
-            <td ng-class="(analyzedExp['72c_fluorescence'][i+8][1] ? 'text-success': 'text-danger')">
-              {{ analyzedExp['72c_fluorescence'][i+8][0]  | commaSeparated }}
+            <td ng-class="(analyzedExp['72c_fluorescence']['fluo_'+(i+8)][1] ? 'text-success': 'text-danger')">
+              {{ analyzedExp['72c_fluorescence']['fluo_'+(i+8)][0]  | commaSeparated }}
             </td>
           </tr>
         </tbody>
