@@ -34,13 +34,17 @@ angular.module('ChaiBioTech').directive("checkMark", [
           scope.setSelected(toParams.name, _ssid);
         });
 
-        scope.$on("new_wifi_connected", function() {
-          var connectedNetworkSsid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"].replace(new RegExp('"', 'g'), "");
-          if(connectedNetworkSsid === scope.ssid) {
-            angular.element(elem).show();
-            scope.connected = true;
-          } else {
-            angular.element(elem).hide();
+        scope.$on("new_wifi_result", function() {
+          if(NetworkSettingsService.connectedWifiNetwork.state.status === "connected") {
+
+            var connectedNetworkSsid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"].replace(new RegExp('"', 'g'), "");
+            console.log("wow", NetworkSettingsService, connectedNetworkSsid, scope.ssid);
+            if(connectedNetworkSsid === scope.ssid) {
+              angular.element(elem).show();
+              scope.connected = true;
+            } else {
+              angular.element(elem).hide();
+            }
           }
         });
       }

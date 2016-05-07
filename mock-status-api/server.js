@@ -19,6 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(function (req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', "PUT, GET, POST, DELETE, OPTIONS");
   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, X-Prototype-Version, X-CSRF-Token, Content-Type, Authorization');
   next();
 });
@@ -142,6 +143,22 @@ function autoupdateLogs() {
   intrvl = setTimeout(autoupdateLogs, 1000);
 }
 
+var defaultSelected = {
+    "interface": "wlan1",
+    "state": {
+        "flags": "69699",
+        "address": "10.0.3.38",
+        "maskAddress": "255.255.255.0",
+        "broadcastAddress": "10.0.3.255",
+        "status": "connected"
+    },
+    "settings": {
+        "type": "dhcp",
+        "wpa-psk": "\"polymerase\"",
+        "wpa-ssid": "\"Chai Guest\""
+    }
+}, currentSelectedNetwork = null;
+
 app.get('/status', function (req, res, next) {
   data.lid = {open: false};
   res.send(data);
@@ -163,7 +180,28 @@ app.get('/network/wlan/scan', function(req, res, next) {
 });
 
 app.get('/network/wlan', function(req, res, next) {
-  res.send(network);
+
+  if(currentSelectedNetwork === null) {
+      res.send(defaultSelected);
+  } else {
+    res.send(currentSelectedNetwork);
+  }
+});
+
+app.put('/network/wlan', function(req, res, next) {
+  currentSelectedNetwork = { "interface": "wlan1",
+                      "settings": {
+                          "type": "dhcp",
+                          "wpa-psk": "456",
+                          "wpa-ssid": "STIWIFI24"
+                      },
+                      "state": {
+                          "status": "authentication_error"
+                      }
+                    };
+  res.send({
+    "state": true
+  });
 });
 
 app.post('/control/start', function (req, res, next) {
