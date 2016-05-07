@@ -45,7 +45,7 @@
     font-size: 16px;
     color: red;
   }
-  
+
   .connection-error {
     height: 60px;
     padding-top: 20px;
@@ -87,5 +87,62 @@
       font-size: 16px;
       border-color: grey;
     }
+  }
+
+  // If its already connected network
+  .set-mode {
+    height: 30px;
+    margin-top: 15px;
+
+    .set-mode-toggle {
+      float: left;
+      width: 30px;
+      height: 20px;
+      //margin-left: 10px;
+      padding-top: 5px;
+    }
+    span {
+      font-family: "dinot-bold";
+      font-size: 16px;
+    }
+  }
+
+  .settings-text-container {
+    height: 30px;
+    margin-top: 15px;
+    span {
+      font-family: "dinot-bold";
+      font-size: 16px;
+    }
+    .locked {
+      font-family: "dinot-bold";
+      font-size: 12px;
+      color: grey;
+    }
+  }
+  .network-parameter-container {
+    height: 60px;
+    width: 90%;
+    border-bottom: 1px solid #CCC;
+
+    .network-parameter-text-container {
+      float: left;
+      width: 50%;
+      padding-top: 20px;
+      span {
+        font-family: "dinot-regular";
+        font-size: 16px;
+        padding-top: 10px;
+      }
+    }
+    .network-parameter-data-container {
+      float: left;
+      width: 50%;
+    }
+  }
+
+  .connected-button-container {
+    margin-top: 60px;
+    padding-left: 14px;
   }
 }

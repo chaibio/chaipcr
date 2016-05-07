@@ -13,7 +13,7 @@
 
       <div class="password-label">Password</div>
       <div class="password-input-container">
-        <input type="password" name="wpa_key" class="text-class" required placeholder="{{name}} password" ng-model="credentials['wpa-psk']">
+        <input type="password" autofocus="" name="wpa_key" class="text-class" required placeholder="{{name}} password" ng-model="credentials['wpa-psk']">
         <div ng-show="connectWifiNetwork.wpa_key.$touched">
           <span ng-show="connectWifiNetwork.wpa_key.$error.required" class="connection-error-text">Cannot left blank ..</span>
         </div>
@@ -21,7 +21,7 @@
     </div>
 
     <div class="connection-error">
-      <span ng-if="authentication_error"class="connection-error-text">Monkeys broke in and stole everything. Couldn't connect</span>
+      <span class="connection-error-text">{{statusMessage}}</span>
     </div>
 
     <div class="button-container">
@@ -29,5 +29,38 @@
       <div class="spacer">&nbsp;</div>
       <button class="button second-button" ui-sref="settings.networkmanagement">CANCEL</button>
     </div>
+  </form>
+
+  <form ng-if="IamConnected" name="connectedWifiDetails" nonvalidate>
+    <div class="set-mode">
+      <div class="set-mode-toggle"><wifi-toggle data="admin"></wifi-toggle></div><span>SET AUTOMATICALLY</span></div>
+      <div class="settings-text-container">
+        <span>CURRENT SETTINGS</span> <span class="locked">LOCKED</span>
+      </div>
+
+      <div class="network-parameter-container">
+        <div class="network-parameter-text-container"><span>IP Address</span></div>
+        <div class="network-parameter-data-container"></div>
+      </div>
+      <div class="network-parameter-container">
+        <div class="network-parameter-text-container"><span>Subnet Mask</span></div>
+        <div class="network-parameter-data-container"></div>
+      </div>
+      <div class="network-parameter-container">
+        <div class="network-parameter-text-container"><span>Router</span></div>
+        <div class="network-parameter-data-container"></div>
+      </div>
+      <div class="network-parameter-container">
+        <div class="network-parameter-text-container"><span>Gateway IP</span></div>
+        <div class="network-parameter-data-container"></div>
+      </div>
+      <div class="network-parameter-container">
+        <div class="network-parameter-text-container"><span>DNS Server</span></div>
+        <div class="network-parameter-data-container"></div>
+      </div>
+
+      <div class="connected-button-container button-container">
+        <input type="submit" class="green-button" value="SAVE CHANGES">
+      </div>
   </form>
 </div>

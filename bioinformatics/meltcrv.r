@@ -122,10 +122,10 @@ mc_tm_all <- function(fc_wT, mc_plot, show_running_time,
 
 # function: get melting curve data and output it for plotting as well as Tm
 process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
-                       exp_id, stage_id, calib_id, # for selecting data to analyze
+                       exp_id, stage_id, calib_info, # for selecting data to analyze
                        dye_in='FAM', dyes_2bfild=NULL, 
                        dcv=TRUE, # logical, whether to perform multi-channel deconvolution
-                       max_temp=1000, # analyze only the data with temperature lower than this
+                       max_temp=1000.1, # analyze only the data with temperature lower than this
                        mc_plot=FALSE, # whether to plot melting curve data
                        extra_output=FALSE, 
                        show_running_time=FALSE, # option to show time cost to run this function
@@ -137,7 +137,7 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
     start_time <- proc.time()[['elapsed']]
     
     db_conn <- db_etc(db_usr, db_pwd, db_host, db_port, db_name, 
-                      exp_id, stage_id, calib_id)
+                      exp_id, stage_id, calib_info)
     message('max_temp: ', max_temp)
     
     # { # pre-deconvolution, process all available channels
@@ -157,7 +157,7 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
     channels <- c('1'='1')
     dcv <- FALSE
     
-    oc_data <- prep_optic_calib(db_conn, calib_id, dye_in, dyes_2bfild)
+    oc_data <- prep_optic_calib(db_conn, calib_info, dye_in, dyes_2bfild)
     
     mc_calib_mtch <- process_mtch(channels, 
                                   matrix2array=TRUE, 

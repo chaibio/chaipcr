@@ -3,13 +3,21 @@
 
 library(jsonlite)
 
+# constants
+MIN_FLUORESCENCE_VAL <- 8000000
+MIN_TM_VAL <- 77
+MAX_TM_VAL <- 81
+MAX_DELTA_TM_VAL <- 2
+
+
 analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the function
     db_usr, db_pwd, db_host, db_port, db_name, 
     exp_id, 
     #stage_id, # hard-coded inside of the function
-    calib_id, 
+    calib_info, 
     dye_in='FAM', dyes_2bfild=NULL, 
     dcv=FALSE, 
+    max_temp=1000.1, 
     mc_plot=FALSE, 
     out_json=TRUE, 
     show_running_time=FALSE, 
@@ -28,9 +36,10 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
     
     mc_w72c <- melt_1cr(floor_temp, 
                         db_usr, db_pwd, db_host, db_port, db_name, 
-                        exp_id, stage_id, calib_id, channel, 
+                        exp_id, stage_id, calib_info, channel, 
                         dye_in, dyes_2bfild, 
                         dcv, 
+                        max_temp, 
                         mc_plot, 
                         show_running_time, 
                         qt_prob=qt_prob, max_normd_qtv=max_normd_qtv, # passed onto `mc_tm_pw`, different than default
@@ -50,16 +59,16 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
         top1_Tm <- top1_Tm_Area[['Tm']]
         if (top1_Tm < min_Tm) min_Tm <- top1_Tm
         if (top1_Tm > max_Tm) max_Tm <- top1_Tm
-        top1_Tm_Area[['Tm']] <- list(unbox(top1_Tm), unbox(top1_Tm >= 77 && top1_Tm <= 81))
+        top1_Tm_Area[['Tm']] <- list(unbox(top1_Tm), unbox(top1_Tm >= MIN_TM_VAL && top1_Tm <= MAX_TM_VAL))
         top1_Tm_Area[['Area']] <- unbox(top1_Tm_Area[['Area']])
         mc_w72c_out[['tm_check']][[well_name]] <- top1_Tm_Area
         
         fluo_72c <- mc_w72c_simplified[['1cr_fluorescence']][well_name]
-        mc_w72c_out[['72c_fluorescence']][[well_name]] <- list(unbox(fluo_72c), unbox(fluo_72c >= 8000000))
+        mc_w72c_out[['72c_fluorescence']][[well_name]] <- list(unbox(fluo_72c), unbox(fluo_72c >= MIN_FLUORESCENCE_VAL))
         }
     
     delta_Tm <- max_Tm - min_Tm
-    mc_w72c_out[['delta_Tm']] <- list(unbox(delta_Tm), unbox(delta_Tm <= 2))
+    mc_w72c_out[['delta_Tm']] <- list(unbox(delta_Tm), unbox(delta_Tm <= MAX_DELTA_TM_VAL))
     
     if (out_json) mc_w72c_out <- toJSON(mc_w72c_out)
     
