@@ -327,7 +327,7 @@ fi
 
 if [ ! -e $data_partition ]
 then
-        echo "Data file system partition not found: $rootfs_partition"
+        echo "Data file system partition not found: $data_partition, backuped eMMC was not 4 partitions."
 	exit 1
 fi
 
