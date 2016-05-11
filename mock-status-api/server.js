@@ -196,7 +196,11 @@ app.put('/network/wlan', function(req, res, next) {
                           "wpa-ssid": "STIWIFI24"
                       },
                       "state": {
-                          "status": "authentication_error"
+                        "flags": "69699",
+                        "address": "10.0.3.38",
+                        "maskAddress": "255.255.255.0",
+                        "broadcastAddress": "10.0.3.255",
+                        "status": "connected"
                       }
                     };
   res.send({

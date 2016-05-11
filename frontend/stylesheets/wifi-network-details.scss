@@ -127,7 +127,7 @@
 
     .network-parameter-text-container {
       float: left;
-      width: 50%;
+      width: 33%;
       padding-top: 20px;
       span {
         font-family: "dinot-regular";
@@ -137,7 +137,15 @@
     }
     .network-parameter-data-container {
       float: left;
-      width: 50%;
+      width: 65%;
+      height: 100%;
+      span {
+        display: block;
+        margin-top: 20px;
+        font-family: "dinot-bold";
+        font-size: 16px;
+        margin-left: 10px;
+      }
     }
   }
 

@@ -11,7 +11,9 @@ angular.module('ChaiBioTech').directive("checkMark", [
         currentNetwork: "=currentNetwork",
         ssid: "@ssid"
       },
+
       link: function(scope, elem, attrs) {
+
         angular.element(elem).hide();
         scope.connected = false;
         scope.selected = false;
@@ -35,7 +37,11 @@ angular.module('ChaiBioTech').directive("checkMark", [
         });
 
         scope.$on("new_wifi_result", function() {
-          if(NetworkSettingsService.connectedWifiNetwork.state.status === "connected") {
+          scope.verify();
+        });
+
+        scope.verify = function() {
+          if(NetworkSettingsService.connectedWifiNetwork.state && NetworkSettingsService.connectedWifiNetwork.state.status === "connected") {
 
             var connectedNetworkSsid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"].replace(new RegExp('"', 'g'), "");
             console.log("wow", NetworkSettingsService, connectedNetworkSsid, scope.ssid);
@@ -46,7 +52,9 @@ angular.module('ChaiBioTech').directive("checkMark", [
               angular.element(elem).hide();
             }
           }
-        });
+        };
+
+        scope.verify();
       }
 
     };

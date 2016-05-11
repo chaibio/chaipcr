@@ -10,6 +10,7 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     $scope.buttonValue = "CONNECT";
     $scope.IamConnected = false;
     $scope.statusMessage = "";
+    $scope.connectedWifiNetwork = {};
 
     $scope.$on('new_wifi_result', function() {
 
@@ -31,7 +32,9 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
       $scope.connectedSsid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"].replace(new RegExp('"', "g"), "");
       if($state.params.name.replace(new RegExp('_', "g"), " ") === $scope.connectedSsid) {
         if(NetworkSettingsService.connectedWifiNetwork.state.status === "connected") {
+          $scope.connectedWifiNetwork = NetworkSettingsService.connectedWifiNetwork;
           $scope.IamConnected = true;
+          console.log($scope.connectedWifiNetwork);
         }
       }
     }

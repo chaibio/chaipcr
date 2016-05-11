@@ -5,12 +5,14 @@ window.ChaiBioTech.ngApp
   '$window'
   'Status'
   'PeriodicUpdate'
-  ($rootScope, $state, $window, Status, PeriodicUpdate) ->
+  'NetworkSettingsService'
+  ($rootScope, $state, $window, Status, PeriodicUpdate, NetworkSettingsService) ->
 
     $rootScope.title = "ChaiBioTech"
 
     Status.startSync()
     PeriodicUpdate.init()
+    NetworkSettingsService.getSettings();
 
     $rootScope.$on '$stateChangeSuccess', (e, toState, params, fromState) ->
       if fromState.name isnt toState.name
