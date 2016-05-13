@@ -100,10 +100,13 @@ void Optics::toggleCollectData()
     }
     else
     {
-        bool collect = _collectData;
-        _collectData = false;
+        bool collect = _collectData.exchange(false);
 
-        _adcCondition.notify_all();
+        {
+            std::unique_lock<std::mutex> lock(_adcMutex);
+            _adcCondition.notify_all();
+        }
+
         _collectDataTimer->stop();
         _collectDataTimer->setPeriodicInterval(0);
         _ledController->disableLEDs();
@@ -125,25 +128,30 @@ void Optics::collectDataCallback(Poco::Timer &timer)
 
             while (doneChannels < adcValues.size())
             {
-                _adcCondition.wait(lock);
-
-                std::vector<unsigned long> &channel = adcValues.at(_adcValue.second);
-
-                if (channel.size() < kADCReadsPerOpticalMeasurement)
+                if (_collectData)
                 {
-                    channel.emplace_back(_adcValue.first);
+                    _adcCondition.wait(lock);
 
-                    if (channel.size() == kADCReadsPerOpticalMeasurement)
-                        ++doneChannels;
+                    std::vector<unsigned long> &channel = adcValues.at(_adcValue.second);
+
+                    if (channel.size() < kADCReadsPerOpticalMeasurement)
+                    {
+                        channel.emplace_back(_adcValue.first);
+
+                        if (channel.size() == kADCReadsPerOpticalMeasurement)
+                            ++doneChannels;
+                    }
+
+                    if (!_collectData)
+                        break;
                 }
-
-                if (!_collectData)
-                {
-                    adcValues.clear();
+                else
                     break;
-                }
             }
         }
+
+        if (!_collectData)
+            adcValues.clear();
 
         if (!adcValues.empty())
         {
@@ -182,7 +190,8 @@ void Optics::collectDataCallback(Poco::Timer &timer)
         _ledController->activateLED(kWellToLedMappingList.at(_wellNumber));
         _photodiodeMux.setChannel(_wellNumber);
 
-        timer.restart(timer.getPeriodicInterval());
+        if (_collectData)
+            timer.restart(timer.getPeriodicInterval());
     }
     catch (...)
     {

@@ -25,7 +25,7 @@ bool ignore_exception(void *exception, void *info)
     {
         std::string message = reinterpret_cast<std::exception*>(exception)->what();
 
-        return message == "Net Exception" || //Poco internal exception
+        return message == "Net Exception" || message == "No message received" || //Poco internal exceptions
                 (message.find("iwlist") != std::string::npos && message.find("list") != std::string::npos); //Wifi scan attempts on non wifi interfaces. They might be too many to have them in the log file
     }
 
