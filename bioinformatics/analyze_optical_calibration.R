@@ -10,8 +10,13 @@ analyze_optical_calibration <- function(
     dye_in='FAM', dyes_2bfild=NULL, 
     out_json=TRUE) 
 {
-    db_conn <- db_etc(db_usr, db_pwd, db_host, db_port, db_name, 
-                      calib_exp_id, stage_id=NULL, calib_info)
+    ci_valid <- tryCatch(calib_info, error=err_e)
+    if ('error' %in% class(ci_valid)) stop('Calibration info is not valid.')
+    
+    db_etc_out <- db_etc(
+        db_usr, db_pwd, db_host, db_port, db_name, 
+        calib_exp_id, stage_id=NULL, calib_info)
+    db_conn <- db_etc_out[['db_conn']]
     
     result1 <- tryCatch(prep_optic_calib(db_conn, calib_info, dye_in, dyes_2bfild), error=function(e) e)
     

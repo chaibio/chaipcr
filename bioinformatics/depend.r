@@ -39,7 +39,7 @@ scaling_factors_deconv <- c('1'=1, '2'=5.6) # used: c('1'=1, '2'=1, 2, 3.5, 8, 7
 
 # function: connect to MySQL database; message about data selection
 db_etc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
-                   exp_id, stage_id, calib_id # for selecting data to analyze
+                   exp_id, stage_id, calib_info # for selecting data to analyze
                    ) {
     
     message('db: ', db_name)
@@ -50,11 +50,28 @@ db_etc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting t
                          port=db_port, 
                          dbname=db_name)
     
+    # check whether `calib_info` is valid; if not, find calibration 'experiment_id' in MySQL database and assumes water 'step_id'=2, signal 'step_id'=4, using FAM to calibrate both channel 1 and channel 2.
+    ci_valid <- tryCatch(calib_info, error=err_e)
+    if ('error' %in% class(ci_valid)) {
+        calib_id <- as.numeric(dbGetQuery(
+            db_conn, 
+            sprintf('SELECT calibration_id FROM experiments WHERE id=%i', exp_id) ))
+        calib_info <- list('water'=list('calibration_id'=calib_id, 'step_id'=2))
+        calib_qry <- sprintf('SELECT channel FROM fluorescence_data WHERE experiment_id=%i', calib_id)
+        calib_channels <- unique(dbGetQuery(db_conn, calib_qry)[,'channel'])
+        for (calib_channel in calib_channels) {
+            calib_info[[paste('channel', calib_channel, sep='_')]] <- list('calibration_id'=calib_id, 'step_id'=4) }
+        }
+    
     message('experiment_id: ', exp_id)
     message('stage_id: ', stage_id)
-    message('calibration_id: ', calib_id)
+    message('calibration_info: ', calib_info)
     
-    return(db_conn)
+    return(list('db_conn'=db_conn, 'calib_info'=calib_info))
     }
+
+
+
+
 
 

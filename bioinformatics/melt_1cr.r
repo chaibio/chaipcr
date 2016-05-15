@@ -2,7 +2,7 @@
 
 melt_1cr <- function(floor_temp, 
                      db_usr, db_pwd, db_host, db_port, db_name, 
-                     exp_id, stage_id, calib_info, channel, 
+                     exp_id, stage_id, calib_info, 
                      dye_in='FAM', dyes_2bfild=NULL, 
                      dcv=TRUE, # logical, whether to perform multi-channel deconvolution
                      max_temp=1000.1, 

@@ -32,11 +32,14 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
     max_normd_qtv <- 0.9
     channel <- '1'
     
+    # for (item in as.list(match.call())) message(item) # func(...)
+    message('1. calib_info_exists: ', exists('calib_info'))
+    
     # process the data from only one channel
     
     mc_w72c <- melt_1cr(floor_temp, 
                         db_usr, db_pwd, db_host, db_port, db_name, 
-                        exp_id, stage_id, calib_info, channel, 
+                        exp_id, stage_id, calib_info, 
                         dye_in, dyes_2bfild, 
                         dcv, 
                         max_temp, 
