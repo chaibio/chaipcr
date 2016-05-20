@@ -102,7 +102,8 @@ get_ct_eff <- function(
         stopCode <- mod$convInfo$stopCode
         b <- coef(mod)[['b']]
         
-        rse <- tryCatch(sigma(mod), error=function(e) NA) # residual standard error of fitted amplification curve
+        rse <- tryCatch(sigma(mod), error=err_NA) # residual standard error of fitted amplification curve
+        if (length(rse) == 0) rse <- NA # class(mod) == 'pcrfit' instead of c('pcrfit', 'nls')
         rsem <- rse / abs(mean(bl_corrected[,i])) # divided by absolute value of mean fluo over all cycles for each well
         rsems[i] <- rsem
         rser <- rse / diff(range(bl_corrected[,i])) # divided by fluo range over all cycles for each well

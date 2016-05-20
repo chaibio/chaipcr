@@ -1085,6 +1085,7 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
   bl_fitting_failed <- 'error' %in% class_model || class_model == 'try-error'
   coef_b_gt_0 <- coef(model)[['b']] > 0
   if (grepl('^auto_', baseline)) {
+    basecyc_1st <- 1
     if (baseline == 'auto_lin') mspsp <- TRUE
     if (bl_fitting_failed || coef_b_gt_0) {
       if (bl_fitting_failed) {
@@ -1104,21 +1105,52 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
         message('All the values in `D2seq` are NA, using all the cycles as baseline.')
         basecyc_last <- length(fluo)
       } else {
+        
         D2seq[!is.finite(D2seq)] <- NA # remove Inf's that mimicked maximum values
+        
+        min_fluo_cyc <- which.min(fluo)
+        message(sprintf('Cycle with the minimum fluo value: %i.', min_fluo_cyc))
+        min_fluo_index_in_SEQ <- which.min(abs(SEQ - min_fluo_cyc))
+        
+        # basecyc_1st
+        if (min_fluo_cyc == 1) {
+          message('Use Cycle 1 as `basecyc_1st`.')
+        } else {
+          D2seq_left2mf <- D2seq[1:(min_fluo_index_in_SEQ-1)] # left to min_fluo
+          if (all(D2seq_left2mf < D2seq[min_fluo_index_in_SEQ])) {
+            message('Second derivative values for cycles left to minimum fluo are all less than that at minimum fluo, use 1st cycle as `basecyc_1st`.')
+            basecyc_1st <- 1
+          } else {
+            message('Some second derivative value(s) in cycles left to minimum fluo >= that at minimum fluo, use the cycle at the maximum of them as `basecyc_1st`.')
+            basecyc_1st <- floor(SEQ[which.max(D2seq_left2mf)])
+            if (basecyc_1st == 0) {
+              message('Adjust cycle 0 to 1.')
+              basecyc_1st <- 1 } } }
+        
+        # basecyc_last
         maxD2 <- which.max(D2seq)
         cycmaxD2 <- SEQ[maxD2]
+        if (maxD2 == min_fluo_index_in_SEQ) {
+          message('Maximum second derivative coincides with minimum fluo, use this cycle as `basecyc_last`.')
+          basecyc_last <- floor(cycmaxD2)
+        } else {
+          message('Use the floor of the cycle at the maximum second derivative right to minimum fluo as `basecyc_last`.')
+          D2seq_right2mf <- D2seq[(min_fluo_index_in_SEQ + 1) : length(SEQ)] # right to min_fluo
+          basecyc_last <- floor(SEQ[which.max(D2seq_right2mf) + min_fluo_index_in_SEQ]) }
+        
         # mspsp
         minD2 <- which.min(D2seq)
         cycminD2 <- SEQ[minD2]
+        
         # end: borrowed from 'efficiency.R'
-        basecyc_last <- floor(cycmaxD2)
-        if (basecyc_last <= 5) basecyc_last <- length(fluo)
+        
       }
+    
     }
     
-    message(sprintf('%s: cycles 1:%d were used for baseline subtraction.', baseline, basecyc_last))
+    message(sprintf('%s: cycles %i:%i were used for baseline subtraction.', baseline, basecyc_1st, basecyc_last))
     baseline <- substring(baseline, 6)
-    basecyc <- 1:basecyc_last
+    basecyc <- basecyc_1st:basecyc_last
     
   }
   
