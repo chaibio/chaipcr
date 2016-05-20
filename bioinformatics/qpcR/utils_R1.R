@@ -1111,32 +1111,41 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
         min_fluo_cyc <- which.min(fluo)
         message(sprintf('Cycle with the minimum fluo value: %i.', min_fluo_cyc))
         min_fluo_index_in_SEQ <- which.min(abs(SEQ - min_fluo_cyc))
-        
-        # basecyc_1st
-        if (min_fluo_cyc == 1) {
-          message('Use Cycle 1 as `basecyc_1st`.')
+        if (is.na(D2seq[min_fluo_index_in_SEQ])) {
+            message('Second derivative at minimum fluo is +/-inf, use all the cycles as baseline.')
+            basecyc_last <- length(fluo)
         } else {
-          D2seq_left2mf <- D2seq[1:(min_fluo_index_in_SEQ-1)] # left to min_fluo
-          if (all(D2seq_left2mf < D2seq[min_fluo_index_in_SEQ])) {
-            message('Second derivative values for cycles left to minimum fluo are all less than that at minimum fluo, use 1st cycle as `basecyc_1st`.')
-            basecyc_1st <- 1
+          # basecyc_1st
+          if (min_fluo_cyc == 1) {
+            message('Use Cycle 1 as `basecyc_1st`.')
           } else {
-            message('Some second derivative value(s) in cycles left to minimum fluo >= that at minimum fluo, use the cycle at the maximum of them as `basecyc_1st`.')
-            basecyc_1st <- floor(SEQ[which.max(D2seq_left2mf)])
-            if (basecyc_1st == 0) {
-              message('Adjust cycle 0 to 1.')
-              basecyc_1st <- 1 } } }
-        
-        # basecyc_last
-        maxD2 <- which.max(D2seq)
-        cycmaxD2 <- SEQ[maxD2]
-        if (maxD2 == min_fluo_index_in_SEQ) {
-          message('Maximum second derivative coincides with minimum fluo, use this cycle as `basecyc_last`.')
-          basecyc_last <- floor(cycmaxD2)
-        } else {
-          message('Use the floor of the cycle at the maximum second derivative right to minimum fluo as `basecyc_last`.')
-          D2seq_right2mf <- D2seq[(min_fluo_index_in_SEQ + 1) : length(SEQ)] # right to min_fluo
-          basecyc_last <- floor(SEQ[which.max(D2seq_right2mf) + min_fluo_index_in_SEQ]) }
+            D2seq_left2mf <- D2seq[1:(min_fluo_index_in_SEQ-1)] # left to min_fluo
+            if (all(D2seq_left2mf < D2seq[min_fluo_index_in_SEQ])) {
+              message('Second derivative values for cycles left to minimum fluo are all less than that at minimum fluo, use 1st cycle as `basecyc_1st`.')
+              basecyc_1st <- 1
+            } else {
+              message('Some second derivative value(s) in cycles left to minimum fluo >= that at minimum fluo, use the cycle at the maximum of them as `basecyc_1st`.')
+              basecyc_1st <- floor(SEQ[which.max(D2seq_left2mf)])
+              if (basecyc_1st == 0) {
+                message('Adjust cycle 0 to 1.')
+                basecyc_1st <- 1 } } }
+          
+          # basecyc_last
+          if (min_fluo_cyc == length(fluo)) {
+            message('The last cycle has the minmum fluo value, use it as `basecyc_last`.')
+            basecyc_last <- length(fluo)
+          } else {
+            maxD2 <- which.max(D2seq)
+            cycmaxD2 <- SEQ[maxD2]
+            if (maxD2 == min_fluo_index_in_SEQ) {
+              message('Maximum second derivative coincides with minimum fluo, use this cycle as `basecyc_last`.')
+              basecyc_last <- floor(cycmaxD2)
+            } else {
+              message('Use the floor of the cycle at the maximum second derivative right to minimum fluo as `basecyc_last`.')
+              D2seq_right2mf <- D2seq[(min_fluo_index_in_SEQ + 1) : length(SEQ)] # right to min_fluo
+              basecyc_last <- floor(SEQ[which.max(D2seq_right2mf) + min_fluo_index_in_SEQ]) }
+          }
+        }
         
         # mspsp
         minD2 <- which.min(D2seq)
