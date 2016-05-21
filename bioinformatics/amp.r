@@ -67,13 +67,14 @@ modlist_coef <- function(modLIST, coef_cols) {
 
 # function: get Ct and amplification efficiency values
 get_ct_eff <- function(
-                       bl_corrected, # used to calculate rsem and rser, not as input for Ct determination
+                       bl_corrected, # used to calculate rsem and rser, also as input for Ct determination
                        # ac_mtx, 
                        # signal_water_diff, 
                        mod_ori, 
                        # min_ac_max, # the threshold which maximum (fluo value / scaling factor) of the well needs to exceed, for Ct to be reported as actual value instead of NA
-                       max_rsem, max_rser, # maximum residual standard error divided by absolute value of mean or range, for Ct to be reported as actual value instead of NA
                        type, cp, 
+                       max_rsem, max_rser, # maximum residual standard error divided by absolute value of mean or range, for Ct to be reported as actual value instead of NA
+                       fluo_thresh, 
                        num_cycles) {
     
     # ac_maxs <- unlist(alply(ac_mtx, .margins=2, max))[2:ncol(ac_mtx)] / scaling_factor
@@ -109,6 +110,8 @@ get_ct_eff <- function(
         rser <- rse / diff(range(bl_corrected[,i])) # divided by fluo range over all cycles for each well
         rsers[i] <- rser
         
+        max_blsub_fluo <- max(bl_corrected[,i])
+        
         # `finIters[[i]]` <- NULL will not create element i for `finIters`
         finIter <- mod$convInfo$finIter
         if (is.null(finIter)) finIters[i] <- NA else finIters[i] <- finIter
@@ -121,8 +124,7 @@ get_ct_eff <- function(
         if        (is.na(rse)) {
             adj_reasons[[i]] <- 'error on sigma'
         } else if (rsem > max_rsem & rser > max_rser) {
-            adj_reasons[[i]] <- paste('rsem > max_rsem & rser > max_rser. rsem == ', rsem, '. max_rsem == ', max_rsem, '. rser == ', rser, '. max_rser == ', max_rser, 
-                                      sep='')
+            adj_reasons[[i]] <- sprintf('rsem > max_rsem & rser > max_rser. rsem == %f. max_rsem == %f. rser == %f. max_rser == %f. ', rsem, max_rsem, rser, max_rser)
         } else if (is.null(b)) {
             adj_reasons[[i]] <- 'is.null(b)'
         } else if (b > 0) {
@@ -131,6 +133,8 @@ get_ct_eff <- function(
             adj_reasons[[i]] <- 'is.null(stopCode)'
         # } else if (stopCode == -1) { # may not be accurate enough
             # adj_reasons[[i]] <- 'Number of iterations has reached `maxiter`'
+        } else if (max_blsub_fluo < fluo_thresh) {
+            adj_reasons[[i]] <- sprintf('max bl_corrected fluo %f <= fluo_thresh %f', max_blsub_fluo, fluo_thresh)
         } else if (!is.na(ct) && ct == num_cycles) {
             adj_reasons[[i]] <- 'ct == num_cycles'
         } else {
@@ -160,13 +164,14 @@ get_ct_eff <- function(
 
 # function: baseline subtraction and Ct
 baseline_ct <- function(amp_calib, 
+                        maxiter, maxfev, # control parameters for `nlsLM` in `pcrfit`. !!!! Note: `maxiter` sometimes affect finIter in a weird way: e.g. for the same well, finIter == 17 when maxiter == 200, finIter == 30 when maxiter == 30, finIter == 100 when maxiter == 100; maxiter affect fitting strategy?
                         model, baselin, basecyc, fallback, # modlist parameters. 
                         # baselin = c('none', 'mean', 'median', 'lin', 'quad', 'parm').
                         # fallback = c('none', 'mean', 'median', 'lin', 'quad'). only valid when baselin = 'parm'
-                        maxiter, maxfev, # control parameters for `nlsLM` in `pcrfit`. !!!! Note: `maxiter` sometimes affect finIter in a weird way: e.g. for the same well, finIter == 17 when maxiter == 200, finIter == 30 when maxiter == 30, finIter == 100 when maxiter == 100; maxiter affect fitting strategy?
+                        type, cp, # getPar parameters
                         # min_ac_max, # get_ct_eff parameter to control Ct reporting
                         max_rsem, max_rser, # get_ct_eff parameter to control Ct reporting
-                        type, cp, # getPar parameters
+                        fluo_thresh, 
                         show_running_time # option to show time cost to run this function
                         ) {
     
@@ -232,9 +237,10 @@ baseline_ct <- function(amp_calib,
     ct_eff <- get_ct_eff(bl_corrected, # has to be consistent with mod_ori, therefore can't be bl_normd
                          # signal_water_diff, 
                          mod_ori, 
+                         type=type, cp=cp, 
                          # min_ac_max=min_ac_max, 
                          max_rsem=max_rsem, max_rser=max_rser, 
-                         type=type, cp=cp, 
+                         fluo_thresh=fluo_thresh, 
                          num_cycles=nrow(ac_mtx))
     
     # report time cost for this function
@@ -256,6 +262,7 @@ baseline_ct <- function(amp_calib,
 # top level function called by external codes
 get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
                                    exp_id, stage_id, calib_info, # for selecting data to analyze
+                                   fluo_thresh=10500, # used: 10500
                                    dye_in='FAM', dyes_2bfild=NULL, # fill missing channels in calibration experiment(s) using preset calibration experiments
                                    dcv=TRUE, # logical, whether to perform multi-channel deconvolution
                                    # basecyc, cp, # extra parameters that are currently hard-coded but may become user-defined later
@@ -271,11 +278,11 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     fallback <- 'median' # used: 'auto_lin', 'lin', 'median'
     maxiter <- 500
     maxfev <- 10000
+    type <- 'curve'
+    cp <- 'cpD2'
     # min_ac_max <- 0
     max_rsem <- 1.2 # used: 0.1
     max_rser <- 0.3 # used: 0.025
-    type <- 'curve'
-    cp <- 'cpD2'
     
     db_etc_out <- db_etc(
         db_usr, db_pwd, db_host, db_port, db_name, 
@@ -334,11 +341,12 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     baseline_ct_mtch <- process_mtch(amp_calib_mtch_bych, 
                                      matrix2array=FALSE, 
                                      func=baseline_ct, 
-                                     model, baselin, basecyc, fallback, 
                                      maxiter, maxfev, 
+                                     model, baselin, basecyc, fallback, 
+                                     type, cp, 
                                      # min_ac_max, 
                                      max_rsem, max_rser, 
-                                     type, cp, 
+                                     fluo_thresh, 
                                      show_running_time)[['post_consoli']]
     baseline_ct_mtch[['pre_dcv_bg_sub']] <- amp_calib_array
     
