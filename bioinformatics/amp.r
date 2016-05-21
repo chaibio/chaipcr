@@ -133,7 +133,7 @@ get_ct_eff <- function(
             adj_reasons[[i]] <- 'is.null(stopCode)'
         # } else if (stopCode == -1) { # may not be accurate enough
             # adj_reasons[[i]] <- 'Number of iterations has reached `maxiter`'
-        } else if (max_blsub_fluo < fluo_thresh) {
+        } else if (max_blsub_fluo <= fluo_thresh) {
             adj_reasons[[i]] <- sprintf('max bl_corrected fluo %f <= fluo_thresh %f', max_blsub_fluo, fluo_thresh)
         } else if (!is.na(ct) && ct == num_cycles) {
             adj_reasons[[i]] <- 'ct == num_cycles'
