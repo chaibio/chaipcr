@@ -426,8 +426,13 @@ class ExperimentsController < ApplicationController
       water_index = protocol.stages[0].steps.find_index{|item| item.name == "Water"}
       step_water = (!water_index.nil?)? protocol.stages[0].steps[water_index].id : nil
       if Device.dual_channel?
-        channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "FAM"}
-        channel_2_index = protocol.stages[0].steps.find_index{|item| item.name == "HEX"}
+        if calibration_id == 1
+          channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "Signal"}
+          channel_2_index = channel_1_index
+        else
+          channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "FAM"}
+          channel_2_index = protocol.stages[0].steps.find_index{|item| item.name == "HEX"}
+        end
       else
         channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "Signal"}
         channel_2_index = nil
