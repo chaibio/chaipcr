@@ -22,7 +22,7 @@ App.controller 'LoginCtrl', [
 
     @getSoftwareData = () ->
       host = "http://#{window.location.hostname}"
-      $http.get(host + ":8000/device").then((device) ->
+      $http.get('/device').then((device) ->
           if device.data?.serial_number?
             $scope.serial_number = device.data.serial_number
 
