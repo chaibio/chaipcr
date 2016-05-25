@@ -18,8 +18,7 @@ App.controller 'WelcomeCtrl', [
       role: 'admin'
 
     @getSoftwareData = () ->
-      console.log "Finding"
-      $http.get("http://localhost:8000/device").then((device) ->
+      $http.get("/device").then((device) ->
           if device.data?.serial_number?
             $scope.serial_number = device.data.serial_number
 

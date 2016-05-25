@@ -4,7 +4,7 @@
     <div class="row top-container">
       <div class="col-sm-8 col-sm-offset-2">
         <img src="/images/logo-qpcr-large.png" alt="" class="logo">
-        <span class="version-data">Version {{software_version}}</span>
+        <span class="version-data" ng-if="software_version">Version {{software_version}}</span>
       </div>
     </div>
     <div class="row">
@@ -18,7 +18,7 @@
         </div>
 
         <div class="serial-container">
-          <span class="serial-data" ng-if="software_version">Serial#:&nbsp;{{serial_number}}</span>
+          <span class="serial-data" ng-if="serial_number">Serial#:&nbsp;{{serial_number}}</span>
         </div>
       </div>
       <div class="col-sm-6">
