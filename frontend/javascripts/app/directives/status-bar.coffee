@@ -56,6 +56,10 @@ window.App.directive 'statusBar', [
           getExperiment (exp) ->
             $scope.footer_experiment = exp
 
+        if $scope.state is 'idle' and $scope.oldState isnt 'idle'
+          $scope.footer_experiment = null
+          experiment_id = null
+
       $scope.getDuration = ->
         return 0 if !$scope?.experiment?.completed_at
         Experiment.getExperimentDuration($scope.footer_experiment)
@@ -65,6 +69,7 @@ window.App.directive 'statusBar', [
         Experiment.stopExperiment($scope.footer_experiment.id)
         .then ->
           $scope.footer_experiment = null
+          $scope.stop_confirm_show = false
         .finally ->
           stopping = false
 
