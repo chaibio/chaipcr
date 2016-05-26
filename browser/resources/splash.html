@@ -29,14 +29,19 @@ $(document).ready(function(){
 			.done(function(data) {
 				if(data.state) {
 					//$("#ip-address").text("IP ADDRESS: " + data.state.address);
-					$(".ip-text").text("IP ADDRESS: ");
-					$(".ip-value").text(data.state.address);
+					$(".span-message").hide();
+					$(".ip-text").show().text("IP ADDRESS: ");
+					$(".ip-value").show().text(data.state.address);
 				} else {
-					$("#ip-address").text("No ethernet connection.")
+					$(".ip-text").hide();
+					$(".ip-value").hide();
+					$(".span-message").show().text("No ethernet connection.")
 				}
 			})
 			.fail(function() {
-				$("#ip-address").text("No ethernet connection.");
+				$(".ip-text").hide();
+				$(".ip-value").hide();
+				$(".span-message").show().text("No ethernet connection.");
 			});
 	}
 
@@ -93,6 +98,7 @@ $(document).ready(function(){
 	<span id="ip-address">
 		<span class="span-text ip-text"></span>
 		<span class="span-value ip-value"></span>
+		<span class="span-message"></span>
 	</span>
 	<span id="version">
 		<span class="span-text version-text"></span>
