@@ -22,6 +22,8 @@ $(document).ready(function(){
 		checkConnection();
 	}, 10000);
 
+
+
 	var checkConnection = function() {
 		$.get("http://localhost:8000/network/eth0")
 			.done(function(data) {
@@ -46,6 +48,7 @@ $(document).ready(function(){
 			if(data.software.version) {
 				$(".version-text").text("V. ");
 				$(".version-value").text(data.software.version);
+				clearInterval(insure);
 			}
 			if(data.serial_number) {
 				$(".serial-text").text("SERIAL: ");
@@ -68,8 +71,15 @@ $(document).ready(function(){
 			//that.set("statusData", data);
 			//that.trigger("data-updated");
 			});
-	*/}
+	*/
+	}
+
 	getDevice();
+
+	var insure = setInterval(function () {
+		getDevice();
+	}, 10000);
+
 });
 //-->
 </script>

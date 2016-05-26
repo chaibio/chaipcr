@@ -27,6 +27,7 @@ body {
 	background-color: black;
   width: 800px;
   height: 480px;
+  overflow: hidden;
 }
 
 #splash {
