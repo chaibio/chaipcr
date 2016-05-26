@@ -201,3 +201,7 @@ p.step{
 .text-danger {
     color: #FF0000;
 }
+
+.padd-top-50 {
+    padding-top: 50px;
+}

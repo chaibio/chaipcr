@@ -1,7 +1,10 @@
 <div class="intro" ng-init="analyzeExperiment()">
   <h2> Thermal Consistency Test Results</h2>
 
-  <h4 class="text-center" ng-show="!experiment.completion_status && analyzing && !!tm_values"><b>Analyzing Results...</b></h4>
+  <h4 class="text-center padd-top-50" ng-show="!experiment.completion_status || analyzing || !tm_values">
+    <img src="/dynexp/libs/images/loading.gif">
+    <b>Analyzing Results</b>
+  </h4>
 
   <div ng-show="experiment.completion_status !== 'success' && !analyzing">
     <div class="alert alert-danger">
@@ -43,7 +46,7 @@
         </thead>
         <tbody>
           <tr ng-repeat="i in loop">
-            <td>{{i+1}}</td>
+            <td>{{ (i+1+8) }}</td>
             <td ng-class="(tm_values[i+8][1] ? 'text-success': 'text-danger')">
               {{ tm_values[i+8][0] | round:2 }}
             </td>
@@ -62,7 +65,7 @@
     Max ΔTm: {{analyzedExp['delta_Tm'][0] | round:2}} &deg;C
   </h3>
 
-  <div class="text-center">
+  <div class="text-center" ng-if="!analyzing && !!tm_values">
     <a href="/#/settings/" class="button">OKAY</a>
   </div>
 
