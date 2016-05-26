@@ -41,7 +41,7 @@ $(document).ready(function(){
 	checkConnection();
 
 	var getDevice = function() {
-		$.get("http://localhost/device")
+		$.get("http://localhost:80/device")
 		.done(function(data) {
 			if(data.software.version) {
 				$(".version-text").text("V. ");
@@ -55,7 +55,20 @@ $(document).ready(function(){
 		.fail(function() {
 
 		});
-	}
+
+		/*$.ajax({
+			url: "http://localhost/device",
+			contentType: 'application/json',
+			type: 'GET',
+			dataType: 'jsonp',
+			jsonpCallback: 'updateRecordDisplay'
+			})
+			.done(function(data) {
+				console.log(data);
+			//that.set("statusData", data);
+			//that.trigger("data-updated");
+			});
+	*/}
 	getDevice();
 });
 //-->
