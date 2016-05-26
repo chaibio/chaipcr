@@ -50,22 +50,35 @@ body {
 	color: white;
 }
 #ip-address {
-	padding-left: 6%;
+  width: 40%;
+  float: left;
   color: #a6a6a6;
 }
 #version {
-	padding-left: 30%;
+  width: 20%;
+  float: left;
   color: #a6a6a6;
+  text-align: right;
 }
 #serial {
-	padding-left: 10%;
+	width: 35%;
+  float: left;
   color: #a6a6a6;
 }
 .span-text {
+  padding-left: 50px;
   font-family: "dinot-bold";
   font-size: 18px;
 }
 .span-value {
   font-family: "dinot-regular";
   font-size: 18px;
+}
+.ip-message{
+  font-family: "dinot-bold";
+  font-size: 18px;
+}
+
+.span-message {
+  padding-left: 50px;
 }

@@ -56,7 +56,6 @@ $(document).ready(function(){
 				clearInterval(insure);
 			}
 			if(data.serial_number) {
-				$(".serial-text").text("SERIAL: ");
 				$(".serial-value").text(data.serial_number);
 			}
 		})
@@ -95,20 +94,19 @@ $(document).ready(function(){
 	<img src="images/openqpcr_logo_dark.svg">
 </div>
 <div id="ip">
-	<span id="ip-address">
+	<div id="ip-address">
 		<span class="span-text ip-text"></span>
 		<span class="span-value ip-value"></span>
-		<span class="span-message"></span>
-	</span>
-	<span id="version">
-		<span class="span-text version-text"></span>
+		<span class="span-message ip-message"></span>
+	</div>
+	<div id="version">
+		<span class="span-text version-text">&nbsp;</span>
 		<span class="span-value version-value"></span>
-	</span>
-	<span id="serial">
-		<span class="span-text serial-text"></span>
+	</div>
+	<div id="serial">
+		<span class="span-text serial-text">SERIAL:</span>
 		<span class="span-value serial-value"></span>
-	</span>
+	</div>
 </div>
 </body>
-
 </html>
