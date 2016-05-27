@@ -1,7 +1,8 @@
 <div class="intro" ng-init="analyzeExperiment()">
   <h2> Thermal Consistency Test Results</h2>
 
-  <h4 class="text-center padd-top-50" ng-show="!experiment.completion_status || analyzing || !tm_values">
+  <h4 class="text-center padd-top-50"
+      ng-show="!experiment.completion_status || analyzing || (experiment.completion_status === 'success' && !tm_values)">
     <img src="/dynexp/libs/images/loading.gif">
     <b>Analyzing Results</b>
   </h4>
