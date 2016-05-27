@@ -84,13 +84,26 @@ class DevicesController < ApplicationController
   def serial_start
     if Device.exists?
       if Device.serial_number.blank?
-        mac = retrieve_mac
-        if !mac.blank?
-          render json: {mac: mac, software_version: DeviceConfiguration.software_version, configuration_id: Device.configuration_id}
-        elsif mac.blank?
-          render json: {errors: "Device mac address not found"}, status: 500
+        # make sure all the diagnostic experiments are passed
+        @experiments = Experiment.includes(:experiment_definition).where(id: Experiment.select("MAX(experiments.id)").includes(:experiment_definition).where("experiment_definitions.experiment_type = ? AND experiments.completion_status != ?", ExperimentDefinition::TYPE_DIAGNOSTIC, "aborted").group("experiment_definitions.id"))
+        passed_diagnostics = Array.new
+        for experiment in @experiments
+          if experiment.completion_status == "success" && experiment.analyze_status == "success"
+            passed_diagnostics << experiment.experiment_definition.guid
+          end
+        end
+        notpassed_diagnostics = ExperimentDefinition.diagnostic_guids - (passed_diagnostics & ExperimentDefinition.diagnostic_guids);
+        if !notpassed_diagnostics.empty?
+          render json: {errors: "You have to pass (#{notpassed_diagnostics.join(",")}) diagnostics"}, status: 500
         else
-          render json: {errors: "Device configuration file is not found"}, status: 500
+          mac = retrieve_mac
+          if !mac.blank?
+            render json: {mac: mac, software_version: DeviceConfiguration.software_version, configuration_id: Device.configuration_id}
+          elsif mac.blank?
+            render json: {errors: "Device mac address not found"}, status: 500
+          else
+            render json: {errors: "Device configuration file is not found"}, status: 500
+          end
         end
       else
         render json: {errors: "Device is already serialized (serial number = #{Device.serial_number})"}, status: 405

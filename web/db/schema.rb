@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160328065404) do
+ActiveRecord::Schema.define(version: 20160527073919) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -53,6 +53,7 @@ ActiveRecord::Schema.define(version: 20160328065404) do
     t.integer  "experiment_definition_id"
     t.integer  "calibration_id"
     t.boolean  "time_valid",               default: true
+    t.string   "analyze_status"
   end
 
   create_table "fluorescence_data", id: false, force: true do |t|

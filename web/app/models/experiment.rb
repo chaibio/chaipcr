@@ -64,6 +64,10 @@ class Experiment < ActiveRecord::Base
     return !started_at.nil? && completed_at.nil?
   end
   
+  def diagnostic?
+    experiment_definition.type == ExperimentDefinition::TYPE_DIAGNOSTIC
+  end
+  
   def name
     experiment_definition.name
   end

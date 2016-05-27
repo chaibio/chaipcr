@@ -33,10 +33,10 @@ protocol = Protocol.seed(:experiment_definition_id) do |s|
   s.experiment_definition_id = 4
 end
 
-ExperimentDefinition.seed(:guid) do |s|
+ExperimentDefinition.seed(:id) do |s|
   s.id = 4
   s.name = "Optical Test"
-  s.guid = "optics_test"
+  s.guid = "optical_test_single_channel"
   s.experiment_type = ExperimentDefinition::TYPE_DIAGNOSTIC
   s.protocol = protocol.first
 end

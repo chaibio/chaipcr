@@ -5,6 +5,9 @@ class ExperimentDefinition < ActiveRecord::Base
   TYPE_DIAGNOSTIC  = "diagnostic"
   TYPE_CALIBRATION  = "calibration"
   
+  DIAGNOSTICS_SINGLE_CHANNEL = ["thermal_performance_diagnostic", "thermal_consistency", "optical_test_single_channel"]
+  DIAGNOSTICS_DUAL_CHANNEL = ["thermal_performance_diagnostic", "thermal_consistency", "optical_test_dual_channel"]
+  
   DEFAULT_PROTOCOL = {lid_temperature:110, stages:[
                       {stage:{stage_type:"holding",steps:[{step:{name:"Initial Denaturing",temperature:95,hold_time:180}}]}},
                       {stage:{stage_type:"cycling",steps:[{step:{name:"Denature",temperature:95,hold_time:30}},{step:{name:"Anneal",temperature:60,hold_time:30,collect_data:true}}]}}]}
@@ -17,6 +20,10 @@ class ExperimentDefinition < ActiveRecord::Base
     end
   end
   
+  def self.diagnostic_guids
+    (Device.dual_channel?)? DIAGNOSTICS_DUAL_CHANNEL : DIAGNOSTICS_SINGLE_CHANNEL
+  end
+      
   def copy(params)
     new_experiment_definition = ExperimentDefinition.new({:name=>(!params.blank?)? params[:name] : "Copy of #{name}", :experiment_type=>experiment_type})
     new_experiment_definition.protocol = protocol.copy
