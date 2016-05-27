@@ -147,7 +147,7 @@
       };
 
       $scope.createExperiment = function() {
-        Experiment.create({ guid: 'dual_channel_optics_test' })
+        Experiment.create({ guid: 'optical_test_dual_channel' })
           .then(function(resp) {
             Experiment.startExperiment(resp.data.experiment.id)
               .then(function() {
