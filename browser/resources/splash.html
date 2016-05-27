@@ -48,7 +48,7 @@ $(document).ready(function(){
 	checkConnection();
 
 	var getDevice = function() {
-		$.get("http://localhost:80/device")
+		$.get("http://localhost:8000/device")
 		.done(function(data) {
 			if(data.software.version) {
 				$(".version-text").text("V. ");
@@ -100,8 +100,14 @@ $(document).ready(function(){
 		<span class="span-message ip-message"></span>
 	</div>
 	<div id="version">
-		<span class="span-text version-text">&nbsp;</span>
-		<span class="span-value version-value"></span>
+		<span class="span-text version-text">Loading</span>
+		<span class="span-value version-value">
+			<div class="spinner">
+	      <div class="bounce1"></div>
+	      <div class="bounce2"></div>
+	      <div class="bounce3"></div>
+	    </div>
+		</span>
 	</div>
 	<div id="serial">
 		<span class="span-text serial-text">SERIAL:</span>
