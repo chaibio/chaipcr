@@ -94,7 +94,7 @@ class DevicesController < ApplicationController
         end
         notpassed_diagnostics = ExperimentDefinition.diagnostic_guids - (passed_diagnostics & ExperimentDefinition.diagnostic_guids);
         if !notpassed_diagnostics.empty?
-          render json: {errors: "You have to pass (#{notpassed_diagnostics.join(",")}) diagnostics"}, status: 500
+          render json: {errors: "You have to pass (#{notpassed_diagnostics.join(",")}) diagnostics"}, status: 405
         else
           mac = retrieve_mac
           if !mac.blank?
