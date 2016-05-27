@@ -49,32 +49,51 @@ body {
 	bottom: 0px;
 	color: white;
 }
+
 #ip-address {
   width: 40%;
   float: left;
   color: #a6a6a6;
 }
+
 #version {
   width: 20%;
   float: left;
   color: #a6a6a6;
+}
+
+.version-text {
+  font-family: "dinot-bold";
+  font-size: 18px;
+  width: 75%;
+  float: left;
   text-align: right;
 }
+
+.version-value {
+  float: left;
+  text-align: right;
+  width: 25%;
+}
+
 #serial {
 	width: 35%;
   float: left;
   color: #a6a6a6;
 }
+
 .span-text {
   padding-left: 50px;
   font-family: "dinot-bold";
   font-size: 18px;
 }
+
 .span-value {
   font-family: "dinot-regular";
   font-size: 18px;
 }
-.ip-message{
+
+.ip-message {
   font-family: "dinot-bold";
   font-size: 18px;
 }
@@ -84,15 +103,11 @@ body {
 }
 
 .spinner {
-  margin: 0 auto;
-  width: 70px;
-  position: relative;
-  top: 200px;
 }
 
 .spinner > div {
-  width: 18px;
-  height: 18px;
+  width: 8px;
+  height: 8px;
   background-color: #FFF;
 
   border-radius: 100%;
@@ -109,4 +124,19 @@ body {
 .spinner .bounce2 {
   -webkit-animation-delay: -0.16s;
   animation-delay: -0.16s;
+}
+
+@-webkit-keyframes sk-bouncedelay {
+  0%, 80%, 100% { -webkit-transform: scale(0) }
+  40% { -webkit-transform: scale(1.0) }
+}
+
+@keyframes sk-bouncedelay {
+  0%, 80%, 100% {
+    -webkit-transform: scale(0);
+    transform: scale(0);
+  } 40% {
+    -webkit-transform: scale(1.0);
+    transform: scale(1.0);
+  }
 }

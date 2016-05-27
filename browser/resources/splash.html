@@ -47,35 +47,29 @@ $(document).ready(function(){
 
 	checkConnection();
 
+	var shown = false;
 	var getDevice = function() {
-		$.get("http://localhost:8000/device")
+		$.get("http://localhost:80/device")
 		.done(function(data) {
 			if(data.software.version) {
-				$(".version-text").text("V. ");
-				$(".version-value").text(data.software.version);
-				clearInterval(insure);
+				$(".version-text").text("V. ").show();
+				$(".version-value").text(data.software.version).show();
+				//clearInterval(insure); // Now we keep looking if we have connection.
 			}
 			if(data.serial_number) {
-				$(".serial-value").text(data.serial_number);
+				$(".serial-value").text(data.serial_number).show();
+				$(".serial-text").text("SERIAL:").show();
 			}
+			shown = true;
 		})
 		.fail(function() {
-
+			if(shown) {
+				$(".serial-value").hide();
+				$(".serial-text").hide();
+				$(".version-text").text("Server Failure.");
+				$(".version-value").hide();
+			}
 		});
-
-		/*$.ajax({
-			url: "http://localhost/device",
-			contentType: 'application/json',
-			type: 'GET',
-			dataType: 'jsonp',
-			jsonpCallback: 'updateRecordDisplay'
-			})
-			.done(function(data) {
-				console.log(data);
-			//that.set("statusData", data);
-			//that.trigger("data-updated");
-			});
-	*/
 	}
 
 	getDevice();
@@ -100,17 +94,17 @@ $(document).ready(function(){
 		<span class="span-message ip-message"></span>
 	</div>
 	<div id="version">
-		<span class="span-text version-text">Loading</span>
-		<span class="span-value version-value">
+		<div class="version-text">Loading</div>
+		<div class="version-value span-value">
 			<div class="spinner">
 	      <div class="bounce1"></div>
 	      <div class="bounce2"></div>
 	      <div class="bounce3"></div>
 	    </div>
-		</span>
+		</div>
 	</div>
 	<div id="serial">
-		<span class="span-text serial-text">SERIAL:</span>
+		<span class="span-text serial-text"></span>
 		<span class="span-value serial-value"></span>
 	</div>
 </div>
