@@ -16,10 +16,10 @@
           <input type="password" id="pass" placeholder="Enter Password" class="login-text-field" ng-model="user.password">
         </div>
       </div>
-      <p class="text-danger text-center err-message" ng-show="errors">
-        {{errors}}
-      </p>
       <div class="login-section">
+        <p class="text-danger text-center err-message" >
+          &nbsp;{{errors}}
+        </p>
         <div class="login-bitton-container">
           <button type="submit" class="login-button" id="login-button" ng-click="login(user)">Sign In</button>
         </div>
