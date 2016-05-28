@@ -17,145 +17,150 @@
  * limitations under the License.
  */
 
-@font-face {
-  font-family: "dinot";
-  font-weight: normal;
-  src: url("/fonts/DINOT-Light.otf");
-}
+ @font-face {
+   font-family: "dinot";
+   font-weight: normal;
+   src: url("/fonts/DINOT-Light.otf");
+ }
 
-@font-face {
-  font-family: "dinot";
-  font-weight: 300;
-  src: url("/fonts/DINOT-Medium.otf");
-}
+ @font-face {
+   font-family: "dinot";
+   font-weight: 300;
+   src: url("/fonts/DINOT-Medium.otf");
+ }
 
-@font-face {
-  font-family: "dinot-regular";
-  font-weight: 300;
-  src: url("../fonts/DINOT-Regular.otf");
-}
+ @font-face {
+   font-family: "dinot-regular";
+   font-weight: 300;
+   src: url("../fonts/DINOT-Regular.otf");
+ }
 
-@font-face {
-  font-family: "dinot-bold";
-  src: url("../fonts/DINOT-Bold.otf");
-}
+ @font-face {
+   font-family: "dinot-bold";
+   src: url("../fonts/DINOT-Bold.otf");
+ }
 
 
-body {
-	font-family: "dinot-regular";
-	background-color: black;
-  width: 800px;
-  height: 480px;
-  overflow: hidden;
-}
+ body {
+ 	font-family: "dinot-regular";
+ 	background-color: black;
+   width: 800px;
+   height: 480px;
+   overflow: hidden;
+ }
 
-#splash {
-	position: absolute;
-	top: 30%;
-	margin-left: auto;
-	margin-right: auto;
-	width: 99%;
-}
+ #splash {
+ 	position: absolute;
+ 	top: 30%;
+ 	margin-left: auto;
+ 	margin-right: auto;
+ 	width: 99%;
+ }
 
-#splash img {
-	width: 100%;
-}
+ #splash img {
+ 	width: 100%;
+ }
 
-#ip {
-	width: 99%;
-	height: 100px;
-	position: absolute;
-	bottom: 0px;
-	color: white;
-}
+ #ip {
+ 	width: 99%;
+ 	height: 100px;
+ 	position: absolute;
+ 	bottom: 0px;
+ 	color: white;
+ }
 
-#ip-address {
-  width: 40%;
-  float: left;
-  color: #a6a6a6;
-}
+ #ip-address {
+   width: 40%;
+   float: left;
+   color: #a6a6a6;
+ }
 
-#version {
-  width: 20%;
-  float: left;
-  color: #a6a6a6;
-}
+ #version {
+   width: 20%;
+   float: left;
+   color: #a6a6a6;
+ }
 
-.version-text {
-  font-family: "dinot-bold";
-  font-size: 18px;
-  width: 75%;
-  float: left;
-  text-align: right;
-}
+ .version-text {
+   font-family: "dinot-bold";
+   font-size: 18px;
+   width: 75%;
+   float: left;
+   text-align: right;
+ }
 
-.version-value {
-  float: left;
-  text-align: right;
-  width: 25%;
-}
+ .spacer {
+   float: left;
+   width: 5%;
+   height: 100%;
+ }
 
-#serial {
-	width: 35%;
-  float: left;
-  color: #a6a6a6;
-}
+ .version-value {
+   float: left;
+   width: 20%;
+ }
 
-.span-text {
-  padding-left: 50px;
-  font-family: "dinot-bold";
-  font-size: 18px;
-}
+ #serial {
+ 	width: 35%;
+   float: left;
+   color: #a6a6a6;
+ }
 
-.span-value {
-  font-family: "dinot-regular";
-  font-size: 18px;
-}
+ .span-text {
+   padding-left: 50px;
+   font-family: "dinot-bold";
+   font-size: 18px;
+ }
 
-.ip-message {
-  font-family: "dinot-bold";
-  font-size: 18px;
-}
+ .span-value {
+   font-family: "dinot-regular";
+   font-size: 18px;
+ }
 
-.span-message {
-  padding-left: 50px;
-}
+ .ip-message {
+   font-family: "dinot-bold";
+   font-size: 18px;
+ }
 
-.spinner {
-}
+ .span-message {
+   padding-left: 50px;
+ }
 
-.spinner > div {
-  width: 8px;
-  height: 8px;
-  background-color: #FFF;
+ .spinner {
+ }
 
-  border-radius: 100%;
-  display: inline-block;
-  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-}
+ .spinner > div {
+   width: 4px;
+   height: 4px;
+   background-color: #FFF;
 
-.spinner .bounce1 {
-  -webkit-animation-delay: -0.32s;
-  animation-delay: -0.32s;
-}
+   border-radius: 100%;
+   display: inline-block;
+   -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+   animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+ }
 
-.spinner .bounce2 {
-  -webkit-animation-delay: -0.16s;
-  animation-delay: -0.16s;
-}
+ .spinner .bounce1 {
+   -webkit-animation-delay: -0.32s;
+   animation-delay: -0.32s;
+ }
 
-@-webkit-keyframes sk-bouncedelay {
-  0%, 80%, 100% { -webkit-transform: scale(0) }
-  40% { -webkit-transform: scale(1.0) }
-}
+ .spinner .bounce2 {
+   -webkit-animation-delay: -0.16s;
+   animation-delay: -0.16s;
+ }
 
-@keyframes sk-bouncedelay {
-  0%, 80%, 100% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
-  } 40% {
-    -webkit-transform: scale(1.0);
-    transform: scale(1.0);
-  }
-}
+ @-webkit-keyframes sk-bouncedelay {
+   0%, 80%, 100% { -webkit-transform: scale(0) }
+   40% { -webkit-transform: scale(1.0) }
+ }
+
+ @keyframes sk-bouncedelay {
+   0%, 80%, 100% {
+     -webkit-transform: scale(0);
+     transform: scale(0);
+   } 40% {
+     -webkit-transform: scale(1.0);
+     transform: scale(1.0);
+   }
+ }

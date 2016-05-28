@@ -53,13 +53,13 @@ $(document).ready(function(){
 				} else {
 					$(".ip-text").hide();
 					$(".ip-value").hide();
-					$(".span-message").show().text("No ethernet connection.")
+					$(".span-message").show().text("No ethernet connection")
 				}
 			})
 			.fail(function() {
 				$(".ip-text").hide();
 				$(".ip-value").hide();
-				$(".span-message").show().text("No ethernet connection.");
+				$(".span-message").show().text("No ethernet connection");
 			});
 	}
 
@@ -70,7 +70,7 @@ $(document).ready(function(){
 		$.get("http://localhost:80/device")
 		.done(function(data) {
 			if(data.software.version) {
-				$(".version-text").text("V. ").show();
+				$(".version-text").text("V.   ").show();
 				$(".version-value").text(data.software.version).show();
 				//clearInterval(insure); // Now we keep looking if we have connection.
 			}
@@ -84,7 +84,7 @@ $(document).ready(function(){
 			if(shown) {
 				$(".serial-value").hide();
 				$(".serial-text").hide();
-				$(".version-text").text("Server Failure.");
+				$(".version-text").text("Server Failure");
 				$(".version-value").hide();
 			}
 		});
@@ -112,7 +112,8 @@ $(document).ready(function(){
 		<span class="span-message ip-message"></span>
 	</div>
 	<div id="version">
-		<div class="version-text">Loading</div>
+		<div class="version-text">Booting</div>
+		<div class="spacer">&nbsp;</div>
 		<div class="version-value span-value">
 			<div class="spinner">
 	      <div class="bounce1"></div>
