@@ -32,9 +32,6 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
     max_normd_qtv <- 0.9
     channel <- '1'
     
-    # for (item in as.list(match.call())) message(item) # func(...)
-    message('1. calib_info_exists: ', exists('calib_info'))
-    
     # process the data from only one channel
     
     mc_w72c <- melt_1cr(floor_temp, 
@@ -60,9 +57,13 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
         
         top1_Tm_Area <- as.list(mc_w72c_simplified[['mc_tm']][[well_name]][1,])
         top1_Tm <- top1_Tm_Area[['Tm']]
-        if (top1_Tm < min_Tm) min_Tm <- top1_Tm
-        if (top1_Tm > max_Tm) max_Tm <- top1_Tm
-        top1_Tm_Area[['Tm']] <- list(unbox(top1_Tm), unbox(top1_Tm >= MIN_TM_VAL && top1_Tm <= MAX_TM_VAL))
+        if (is.na(top1_Tm)) {
+            Tm_bool <- FALSE
+        } else {
+            if (top1_Tm < min_Tm) min_Tm <- top1_Tm
+            if (top1_Tm > max_Tm) max_Tm <- top1_Tm
+            Tm_bool <- top1_Tm >= MIN_TM_VAL && top1_Tm <= MAX_TM_VAL }
+        top1_Tm_Area[['Tm']] <- list(unbox(top1_Tm), unbox(Tm_bool))
         top1_Tm_Area[['Area']] <- unbox(top1_Tm_Area[['Area']])
         mc_w72c_out[['tm_check']][[well_name]] <- top1_Tm_Area
         

@@ -2,6 +2,9 @@
 
 # Assumptions. (1) Data from every channel present in the data table should be used; i.e. if a channel is not used to collect data, it should be absent in the data table. (2) Names of `oc_signal_step_ids` are the same as names of calib_id[['signal']] and as channels present in the signal data of the calibration experiment.
 
+library(compiler)
+enableJIT(3)
+
 # load libraries
 library(jsonlite)
 library(plyr)
@@ -50,7 +53,7 @@ db_etc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting t
                          port=db_port, 
                          dbname=db_name)
     
-    # check whether `calib_info` is valid; if not, find calibration 'experiment_id' in MySQL database and assumes water 'step_id'=2, signal 'step_id'=4, using FAM to calibrate both channel 1 and channel 2.
+    # check whether `calib_info` is valid; if not, use `exp_id` to find calibration 'experiment_id' in MySQL database and assumes water 'step_id'=2, signal 'step_id'=4, using FAM to calibrate  all the channels.
     ci_valid <- tryCatch(calib_info, error=err_e)
     if ('error' %in% class(ci_valid)) {
         calib_id <- as.numeric(dbGetQuery(
