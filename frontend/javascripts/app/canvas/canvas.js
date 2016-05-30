@@ -131,7 +131,9 @@ angular.module("canvasApp").factory('canvas', [
         stepEvents.init(this.$scope, this.canvas, this);
 
         this.stepIndicator = moveStepRect.getMoveStepRect(this);
+        this.stageIndicator = moveStageRect.getMoveStageRect(this);
         this.canvas.add(this.stepIndicator);
+        this.canvas.add(this.stageIndicator);
         this.addMoveDots();
     };
 
