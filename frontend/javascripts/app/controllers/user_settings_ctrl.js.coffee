@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ###
- window.ChaiBioTech.ngApp
+window.ChaiBioTech.ngApp
  .controller 'UserSettingsCtrl', [
    '$scope'
    '$window'
@@ -47,7 +47,7 @@ limitations under the License.
 
      $scope.user = {}
      fetchUsers()
-     
+
      $scope.changeUser = (index)->
        $scope.selectedUser = $scope.users[index].user;
        User.selectedUSer = $scope.users[index].user;
