@@ -32,44 +32,31 @@ angular.module("canvasApp").factory('moveStageRect', [
         this.endPosition = 0;
 
         var smallCircle = new fabric.Circle({
-          radius: 6, fill: '#FFB300', stroke: "black", strokeWidth: 3, selectable: false,
-          left: 48, top: 298, originX: 'center', originY: 'center',
+          radius: 6, fill: 'white', stroke: "black", strokeWidth: 2, selectable: false,
+          left: 69, top: 390, originX: 'center', originY: 'center',
         });
 
         var smallCircleTop = new fabric.Circle({
-          radius: 5, fill: 'black', selectable: false, left: 48, top: 13, originX: 'center', originY: 'center',
+          fill: '#FFB300', radius: 6, strokeWidth: 3, selectable: false, stroke: "black",
+          left: 69, top: 64, originX: 'center', originY: 'center',
         });
 
-        var temperatureText = new fabric.Text(
-          "20º", {
-            fill: 'black',  fontSize: 20, selectable: false, originX: 'left', originY: 'top',
-            top: 9, left: 1, fontFamily: "dinot-bold"
+        var stageNmae = new fabric.Text(
+          "STAGE 2", {
+            fill: 'black',  fontSize: 12, selectable: false, originX: 'left', originY: 'top',
+            top: 15, left: 35, fontFamily: "dinot-bold"
           }
         );
 
-        var holdTimeText = new fabric.Text(
-          "0:05", {
-            fill: 'black',  fontSize: 20, selectable: false, originX: 'left', originY: 'top',
-            top: 9, left: 59, fontFamily: "dinot"
+        var stageType = new fabric.Text(
+          "HOLDING", {
+            fill: 'black',  fontSize: 12, selectable: false, originX: 'left', originY: 'top',
+            top: 30, left: 35, fontFamily: "dinot-regular"
           }
         );
 
-        var indexText = new fabric.Text(
-          "02", {
-            fill: 'black',  fontSize: 16, selectable: false, originX: 'left', originY: 'top',
-            top: 30, left: 17, fontFamily: "dinot-bold"
-          }
-        );
-
-        var placeText= new fabric.Text(
-          "01/01", {
-            fill: 'black',  fontSize: 16, selectable: false, originX: 'left', originY: 'top',
-            top: 30, left: 42, fontFamily: "dinot"
-          }
-        );
-
-        var verticalLine = new fabric.Line([0, 0, 0, 276],{
-          left: 47,
+        var verticalLine = new fabric.Line([0, 0, 0, 336],{
+          left: 68,
           top: 58,
           stroke: 'black',
           strokeWidth: 2,
@@ -84,14 +71,14 @@ angular.module("canvasApp").factory('moveStageRect', [
           fill: null, width: 135, left: 0, top: 0, height: 372, selectable: false, me: this, rx: 1,
         });
 
-        /*me.imageobjects["drag-footer-image.png"].originX = "left";
-        me.imageobjects["drag-footer-image.png"].originY = "top";
-        me.imageobjects["drag-footer-image.png"].top = 52;
-        me.imageobjects["drag-footer-image.png"].left = 9;*/
+        me.imageobjects["drag-stage-image.png"].originX = "left";
+        me.imageobjects["drag-stage-image.png"].originY = "top";
+        me.imageobjects["drag-stage-image.png"].top = 15;
+        me.imageobjects["drag-stage-image.png"].left = 14;
 
         indicatorRectangle = new fabric.Group([
-          rect, temperatureText, holdTimeText, indexText, placeText,
-          //me.imageobjects["drag-footer-image.png"],
+          rect, stageNmae, stageType, //holdTimeText, indexText, placeText,
+          me.imageobjects["drag-stage-image.png"],
 
         ],
           {
@@ -102,7 +89,7 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         this.indicator = new fabric.Group([coverRect, indicatorRectangle, verticalLine, smallCircle, smallCircleTop], {
           originX: "left", originY: "top", left: 38, top: 0, height: 372, width: 135, selectable: true,
-          lockMovementY: true, hasControls: false, visible: false, hasBorders: false, name: "dragStageGroup"
+          lockMovementY: true, hasControls: false, visible: true, hasBorders: false, name: "dragStageGroup"
         });
 
         return this.indicator;

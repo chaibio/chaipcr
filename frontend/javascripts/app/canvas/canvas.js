@@ -57,7 +57,8 @@ angular.module("canvasApp").factory('canvas', [
         "pause-middle.png",
         "close.png",
         "drag-footer-image.png",
-        "move-step-on.png"
+        "move-step-on.png",
+        "drag-stage-image.png"
       ];
 
       this.imageLocation = "/images/";
