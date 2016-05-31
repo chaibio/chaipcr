@@ -103,7 +103,6 @@ angular.module("canvasApp").factory('moveStageRect', [
         };
 
         this.indicator.changePlacing = function(place) {
-          //this.setLeft(10);
           this.setVisible(true);
         };
 

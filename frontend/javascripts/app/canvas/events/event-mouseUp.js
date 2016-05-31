@@ -49,6 +49,14 @@ angular.module("canvasApp").factory('mouseUp', [
           C.canvas.renderAll();
         }
 
+        if(that.moveStageActive) {
+          if(that.mouseDownPos === evt.e.clientX) {
+            // process movement here
+          }
+          C.stageIndicator.setVisible(false);
+          that.moveStageActive = false;
+          C.canvas.renderAll();
+        }
       });
     };
     return this;
