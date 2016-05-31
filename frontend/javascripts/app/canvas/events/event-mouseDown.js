@@ -99,8 +99,11 @@ angular.module("canvasApp").factory('mouseDown', [
           break;
 
           case "moveStage":
-            console.log("wow");
+            console.log("wow", evt.target);
             that.canvas.moveCursor = "move";
+            C.stageIndicator.init();
+            C.stageIndicator.changePlacing(evt.target);
+            C.stageIndicator.changeText(evt.target.parent);
             // Move other stages
             // Shrink this stage
 

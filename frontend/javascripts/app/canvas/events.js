@@ -125,22 +125,6 @@ angular.module("canvasApp").factory('events', [
          C.moveLimit = lastStep.left + 3;
       };
 
-      this.onTheMoveDragGroup = function(dragging) {
-
-        C.stepIndicator.setLeft(dragging.left);
-        C.stepIndicator.setCoords();
-        /*var indicator = dragging;
-        if(indicator.left < 35) {
-          indicator.setLeft(35);
-        } else if(indicator.left > C.moveLimit) {
-          indicator.setLeft(C.moveLimit);
-        } else {
-          indicator.setLeft(dragging.left);
-          indicator.setCoords();
-          indicator.onTheMove(C);
-        }*/
-      };
-
       this.footerMouseOver = function(indicate, me, moveElement) {
 
         indicate.changeText(me.parentStage.index, me.index);

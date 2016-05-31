@@ -154,7 +154,12 @@ angular.module("canvasApp").factory('moveStepRect', [
 
       };
 
+      this.indicator.onTheMoveDragGroup = function(dragging) {
 
+        this.setLeft(dragging.left);
+        this.setCoords();
+      };
+      
       this.indicator.onTheMove = function(C) {
 
         C.allStepViews.some(function(step, index) {

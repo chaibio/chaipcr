@@ -41,7 +41,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           left: 69, top: 64, originX: 'center', originY: 'center',
         });
 
-        var stageNmae = new fabric.Text(
+        var stageName = new fabric.Text(
           "STAGE 2", {
             fill: 'black',  fontSize: 12, selectable: false, originX: 'left', originY: 'top',
             top: 15, left: 35, fontFamily: "dinot-bold"
@@ -77,7 +77,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         me.imageobjects["drag-stage-image.png"].left = 14;
 
         indicatorRectangle = new fabric.Group([
-          rect, stageNmae, stageType, //holdTimeText, indexText, placeText,
+          rect, stageName, stageType, //holdTimeText, indexText, placeText,
           me.imageobjects["drag-stage-image.png"],
 
         ],
@@ -89,8 +89,29 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         this.indicator = new fabric.Group([coverRect, indicatorRectangle, verticalLine, smallCircle, smallCircleTop], {
           originX: "left", originY: "top", left: 38, top: 0, height: 372, width: 135, selectable: true,
-          lockMovementY: true, hasControls: false, visible: true, hasBorders: false, name: "dragStageGroup"
+          lockMovementY: true, hasControls: false, visible: false, hasBorders: false, name: "dragStageGroup"
         });
+
+
+        this.indicator.init = function() {
+          console.log("okay started");
+        };
+
+        this.indicator.onTheMoveDragGroup = function(dragging) {
+            this.setLeft(dragging.left);
+            this.setCoords();
+        };
+
+        this.indicator.changePlacing = function(place) {
+          //this.setLeft(10);
+          this.setVisible(true);
+        };
+
+        this.indicator.changeText = function(stage) {
+
+          stageName.setText(stage.stageCaption.text);
+          stageType.setText(stage.model.stage_type.toUpperCase());
+        };
 
         return this.indicator;
       },
