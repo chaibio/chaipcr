@@ -105,7 +105,7 @@ angular.module("canvasApp").factory('mouseDown', [
             that.canvas.moveCursor = "move";
             that.calculateMoveLimit("stage");
 
-            C.stageIndicator.init();
+            C.stageIndicator.init(evt.target.parent);
             C.stageIndicator.changePlacing(evt.target);
             C.stageIndicator.changeText(evt.target.parent);
             C.canvas.bringToFront(C.stageIndicator);

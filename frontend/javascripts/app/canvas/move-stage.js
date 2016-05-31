@@ -56,11 +56,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         );
 
         var verticalLine = new fabric.Line([0, 0, 0, 336],{
-          left: 68,
-          top: 58,
-          stroke: 'black',
-          strokeWidth: 2,
-          originX: 'left', originY: 'top',
+          left: 68, top: 58, stroke: 'black', strokeWidth: 2, originX: 'left', originY: 'top',
         });
 
         var rect = new fabric.Rect({
@@ -77,9 +73,8 @@ angular.module("canvasApp").factory('moveStageRect', [
         me.imageobjects["drag-stage-image.png"].left = 14;
 
         indicatorRectangle = new fabric.Group([
-          rect, stageName, stageType, //holdTimeText, indexText, placeText,
+          rect, stageName, stageType,
           me.imageobjects["drag-stage-image.png"],
-
         ],
           {
             originX: "left", originY: "top", left: 0, top: 0, height: 72, selectable: true, lockMovementY: true, hasControls: false,
@@ -93,8 +88,8 @@ angular.module("canvasApp").factory('moveStageRect', [
         });
 
 
-        this.indicator.init = function() {
-          console.log("okay started");
+        this.indicator.init = function(stage) {
+          this.draggedStage = stage;
         };
 
         this.indicator.onTheMoveDragGroup = function(dragging) {
@@ -110,6 +105,14 @@ angular.module("canvasApp").factory('moveStageRect', [
 
           stageName.setText(stage.stageCaption.text);
           stageType.setText(stage.model.stage_type.toUpperCase());
+        };
+
+        this.indicator.onTheMove = function(C) {
+          // Here we hit test the movement of the MOVING STAGE
+        }
+
+        this.indicator.processMovement = function() {
+          // Process movement here
         };
 
         return this.indicator;
