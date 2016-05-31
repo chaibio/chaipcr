@@ -50,6 +50,7 @@ angular.module("canvasApp").factory('events', [
       this.mouseDownPos = 0;
       this.mouseUpPos = 0;
       this.moveStepActive = false;
+      this.moveStageActive = false;
       var that = this;
 
       // Initiate all events // you may pass this instead of that.

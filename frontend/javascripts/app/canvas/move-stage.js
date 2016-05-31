@@ -98,7 +98,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         };
 
         this.indicator.onTheMoveDragGroup = function(dragging) {
-            this.setLeft(dragging.left);
+            this.setLeft(dragging.left - 1);
             this.setCoords();
         };
 

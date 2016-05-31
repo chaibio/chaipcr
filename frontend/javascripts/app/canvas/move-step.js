@@ -159,7 +159,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.setLeft(dragging.left);
         this.setCoords();
       };
-      
+
       this.indicator.onTheMove = function(C) {
 
         C.allStepViews.some(function(step, index) {

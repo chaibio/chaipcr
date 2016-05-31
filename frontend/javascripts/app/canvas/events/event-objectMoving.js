@@ -46,21 +46,24 @@ angular.module("canvasApp").factory('objectMoving', [
 
           case "moveStep":
             if(evt.target.left < 35) {
-              evt.target.setLeft(35);
-              C.stepIndicator.onTheMoveDragGroup(evt.target);
+
             } else if(evt.target.left > C.moveLimit) {
               evt.target.setLeft(C.moveLimit);
-              C.stepIndicator.onTheMoveDragGroup(evt.target);
             } else {
-              C.stepIndicator.onTheMoveDragGroup(evt.target);
               C.stepIndicator.onTheMove(C);
             }
+            C.stepIndicator.onTheMoveDragGroup(evt.target);
 
           break;
 
           case "moveStage":
-            //console.log("moving");
-            C.stageIndicator.onTheMoveDragGroup(evt.target);
+          if(evt.target.left < 35) {
+            evt.target.setLeft(35);
+          } else if(evt.target.left > C.moveLimit) {
+            console.log(C.moveLimit);
+            evt.target.setLeft(C.moveLimit);
+          }
+          C.stageIndicator.onTheMoveDragGroup(evt.target);
           break;
         }
       });
