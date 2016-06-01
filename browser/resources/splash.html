@@ -26,77 +26,7 @@
 <script src="javascripts/main.js" type="text/javascript"></script>
 <script type="text/javascript" language="javascript">
 <!--
-$(document).ready(function(){
 
-	// This part was written to align the image and no more used.
-	/*setTimeout(function() {
-		$('#splash').center()
-	}, 1);
-    $(window).bind('resize', function() {
-        $('#splash').center({transition:0});
-    });*/
-
-	var interval = setInterval(function () {
-		checkConnection();
-	}, 10000);
-
-
-
-	var checkConnection = function() {
-		$.get("http://localhost:8000/network/eth0")
-			.done(function(data) {
-				if(data.state) {
-					//$("#ip-address").text("IP ADDRESS: " + data.state.address);
-					$(".span-message").hide();
-					$(".ip-text").show().text("IP ADDRESS: ");
-					$(".ip-value").show().text(data.state.address);
-				} else {
-					$(".ip-text").hide();
-					$(".ip-value").hide();
-					$(".span-message").show().text("No ethernet connection")
-				}
-			})
-			.fail(function() {
-				$(".ip-text").hide();
-				$(".ip-value").hide();
-				$(".span-message").show().text("No ethernet connection");
-			});
-	}
-
-	checkConnection();
-
-	var shown = false;
-	var getDevice = function() {
-		$.get("http://localhost:80/device")
-		.done(function(data) {
-			if(data.software.version) {
-				$(".version-text").text("V.   ").show();
-				$(".version-value").text(data.software.version).show();
-				//clearInterval(insure); // Now we keep looking if we have connection.
-			}
-			if(data.serial_number) {
-				$(".serial-value").text(data.serial_number).show();
-				$(".serial-text").text("SERIAL:").show();
-			}
-			shown = true;
-		})
-		.fail(function() {
-			if(shown) {
-				$(".serial-value").hide();
-				$(".serial-text").hide();
-				$(".version-text").text("Server Failure");
-				$(".version-value").hide();
-			}
-		});
-	}
-
-	getDevice();
-
-	var insure = setInterval(function () {
-		getDevice();
-	}, 10000);
-
-});
 //-->
 </script>
 </head>

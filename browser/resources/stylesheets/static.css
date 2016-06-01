@@ -84,7 +84,7 @@
  .version-text {
    font-family: "dinot-bold";
    font-size: 18px;
-   width: 75%;
+   width: 80%;
    float: left;
    text-align: right;
  }
@@ -97,7 +97,7 @@
 
  .version-value {
    float: left;
-   width: 20%;
+   width: 15%;
  }
 
  #serial {
