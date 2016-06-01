@@ -453,6 +453,7 @@ class ExperimentsController < ApplicationController
         else
           channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "FAM"}
           channel_2_index = protocol.stages[0].steps.find_index{|item| item.name == "HEX"}
+          baseline_index = protocol.stages[0].steps.find_index{|item| item.name == "Baseline"}
         end
       else
         channel_1_index = protocol.stages[0].steps.find_index{|item| item.name == "Signal"}
@@ -460,8 +461,10 @@ class ExperimentsController < ApplicationController
       end
       step_channel_1 = (!channel_1_index.nil?)? protocol.stages[0].steps[channel_1_index].id : nil
       step_channel_2 = (!channel_2_index.nil?)? protocol.stages[0].steps[channel_2_index].id : nil
+      step_baseline = (!baseline_index.nil?)? protocol.stages[0].steps[baseline_index].id : nil
       result = "list(water=list(calibration_id=#{calibration_id},step_id=#{step_water}), channel_1=list(calibration_id=#{calibration_id},step_id=#{step_channel_1}) \
-              #{(step_channel_2)? ", channel_2=list(calibration_id="+calibration_id.to_s+",step_id="+step_channel_2.to_s+")" : ""})"
+              #{(step_channel_2)? ", channel_2=list(calibration_id="+calibration_id.to_s+",step_id="+step_channel_2.to_s+")" : ""} \
+              #{(step_baseline)? ", baseline=list(calibration_id="+calibration_id.to_s+",step_id="+step_baseline.to_s+")" : ""})"
     end
     logger.info ("********#{result}")
     result

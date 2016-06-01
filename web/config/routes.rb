@@ -76,6 +76,7 @@ Qpcrctl::Application.routes.draw do
     put 'clean'
     put 'root_password'
     post 'enable_support_access'
+    get 'export_database'
   end
   
   resource :settings, only: [:update, :show]

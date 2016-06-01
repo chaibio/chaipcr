@@ -30,6 +30,10 @@ class Device
     !device_hash.blank?
   end
   
+  def self.serialized?
+    !device_hash["serial_number"].blank?
+  end
+  
   def self.dual_channel?
     device_hash["capabilities"] && device_hash["capabilities"]["optics"] && device_hash["capabilities"]["optics"]["emission_channels"] && device_hash["capabilities"]["optics"]["emission_channels"].length == 2
   end
@@ -52,6 +56,15 @@ class Device
     end
     
     return nil
+  end
+  
+  def self.unserialized!
+    device_hash["serial_number"] = nil
+    begin
+      File.open(DEVICE_FILE_PATH, 'w+') { |file| file.write(JSON.pretty_generate(device_hash)) }
+    rescue  => e
+      return "Write to #{DEVICE_FILE_PATH} failed: #{e}"
+    end
   end
   
   protected

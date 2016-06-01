@@ -163,6 +163,19 @@ class DevicesController < ApplicationController
     end
   end
   
+  def unserialized
+    if !Device.valid?
+      render json: {errors: "Device file is not found or corrupted"}, status: 500
+      return
+    end
+    if !Device.device_signature.blank? && Device.device_signature == params["signature"]
+      Device.unserialized!
+      render json: {response: "Device is unserialized"}, status: :ok
+    else
+      render json: {errors: "Device cannot be unserialized because device signature doesn't match"}, status: 400
+    end
+  end
+  
   api :GET, "/device/software_update", "query the software update meta data"
   example "{'upgrade':{'version':'1.0.1','release_date':null,'brief_description':'this is the brief description','full_description':'this is the full description'}}"
   def software_update
@@ -271,7 +284,17 @@ class DevicesController < ApplicationController
     render :nothing=>true, :status=>:ok
   end
     
-  
+  api :GET, "/device/export_database", "export to chaipcr.sql.gz"
+  def export_database
+    config   = Rails.configuration.database_configuration
+    dumpfile = "/tmp/chaipcr.sql.gz"
+    system("mysqldump -u #{config[Rails.env]["username"]} #{(config[Rails.env]["password"])? "-p"+config[Rails.env]["password"] : ""} chaipcr | gzip > #{dumpfile}")
+    until File.exist?(dumpfile)
+      sleep 1
+    end
+    send_file(dumpfile)
+  end
+    
   private
   
   def erase_data
