@@ -25,7 +25,7 @@ class DevicesController < ApplicationController
   
   skip_before_action :verify_authenticity_token, :except=>[:root_password]
   before_filter :allow_cors, :except=>[:root_password]
-  #before_filter :ensure_authenticated_user, :except=>[:show, :serial_start, :update, :clean, :software_update, :empty]
+  before_filter :ensure_authenticated_user, :except=>[:show, :serial_start, :update, :clean, :software_update, :empty]
   
   respond_to :json
   
