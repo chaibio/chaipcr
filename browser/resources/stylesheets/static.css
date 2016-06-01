@@ -84,14 +84,14 @@
  .version-text {
    font-family: "dinot-bold";
    font-size: 18px;
-   width: 80%;
+   width: 78%;
    float: left;
    text-align: right;
  }
 
  .spacer {
    float: left;
-   width: 5%;
+   width: 2%;
    height: 100%;
  }
 
@@ -132,7 +132,7 @@
  .spinner > div {
    width: 4px;
    height: 4px;
-   background-color: #FFF;
+   background-color: #a6a6a6;
 
    border-radius: 100%;
    display: inline-block;

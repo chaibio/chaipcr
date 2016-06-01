@@ -43,7 +43,7 @@ $(document).ready(function(){
 
 
 	var checkConnection = function() {
-		$.get("http://localhost:80/network/eth0")
+		$.get("http://localhost:8000/network/eth0")
 			.done(function(data) {
 				if(data.state) {
 					//$("#ip-address").text("IP ADDRESS: " + data.state.address);
@@ -67,10 +67,10 @@ $(document).ready(function(){
 
 	var shown = false;
 	var getDevice = function() {
-		$.get("http://localhost:8000/device")
+		$.get("http://localhost:80/device")
 		.done(function(data) {
 			if(data.software.version) {
-				$(".version-text").text("V.").show();
+				$(".version-text").text("V.   ").show();
 				$(".version-value").text(data.software.version).show();
 				//clearInterval(insure); // Now we keep looking if we have connection.
 			}
