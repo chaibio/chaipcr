@@ -1,5 +1,14 @@
 var gutil = require('gulp-util');
 
+var fs = require('fs'),
+    path = require('path');
+
+function getDirectories(srcpath) {
+  return fs.readdirSync(srcpath).filter(function(file) {
+    return fs.statSync(path.join(srcpath, file)).isDirectory();
+  });
+}
+
 module.exports = {
   makeHash: function _makeHash() {
       var text = "";
@@ -16,6 +25,8 @@ module.exports = {
     gutil.log(err);
     gutil.beep();
     this.emit('end');
-  }
+  },
+
+  getDirectories: getDirectories
 
 };

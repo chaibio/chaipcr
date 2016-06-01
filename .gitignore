@@ -43,3 +43,4 @@ build/*
 capabilities
 frontend/tests/coverage
 frontend/tests/reports
+web/public/dynexp/outputs

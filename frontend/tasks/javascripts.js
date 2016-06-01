@@ -138,7 +138,7 @@ gulp.task('jslint', ['clean-js', 'coffee', 'es6', 'copy-js-to-tmp', 'templates']
          .pipe(jshint.reporter('default'));
 });
 
-gulp.task('concat-js', ['clean-js', 'coffee', 'copy-js-to-tmp', 'templates'], function () {
+gulp.task('concat-js', ['clean-js', 'coffee', 'copy-js-to-tmp', 'templates', 'dynamicexp:relink'], function () {
   var files = vendorFiles.concat(appFiles);
 
   for (var i = files.length - 1; i >= 0; i--) {
