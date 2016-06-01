@@ -83,7 +83,7 @@ class Experiment < ActiveRecord::Base
   end
   
   def diagnostic?
-    experiment_definition.type == ExperimentDefinition::TYPE_DIAGNOSTIC
+    experiment_definition.experiment_type == ExperimentDefinition::TYPE_DIAGNOSTIC
   end
   
   def name
