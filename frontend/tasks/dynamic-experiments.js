@@ -4,8 +4,7 @@ var replace = require('gulp-replace');
 var del = require('del');
 var helpers = require('./helpers.js')
 var hashes_cache = {};
-var experiments = helpers.getDirectories('./web/public/dynexp').filter(function (path) {return path !== 'outputs'});
-console.log(experiments);
+var experiments = helpers.getDirectories('./web/public/dynexp').filter(function (path) {return path !== 'outputs'; });
 
 function _rehash (path) {
   for (var i=0; i < experiments.length; i ++) {
@@ -34,14 +33,18 @@ gulp.task('dynamicexp:init_hashes', function (done) {
 });
 
 gulp.task('dynamicexp:rehash', ['dynamicexp:clean_old', 'dynamicexp:init_hashes'], function () {
-  console.log(hashes_cache);
   return gulp.src('./web/public/dynexp/**/*.!(R)')
               .pipe(rename(_rehash))
+              .pipe(gulp.dest('web/public/dynexp/outputs'));
+});
+
+gulp.task('dynamicexp:relink_libs', ['dynamicexp:clean_old', 'dynamicexp:init_hashes', 'dynamicexp:rehash'], function () {
+  return gulp.src('web/public/dynexp/outputs/**/*.{js,html,css}')
               .pipe(replace('../libs', '../'+hashes_cache.libs))
               .pipe(gulp.dest('web/public/dynexp/outputs'));
 });
 
-gulp.task('dynamicexp:relink', ['dynamicexp:clean_old', 'dynamicexp:rehash', 'templates'], function () {
+gulp.task('dynamicexp:relink', ['dynamicexp:clean_old', 'dynamicexp:rehash', 'dynamicexp:relink_libs', 'templates'], function () {
   var stream = gulp.src('.tmp/js/templates.js');
 
   for (var i=0; i < experiments.length; i++) {
