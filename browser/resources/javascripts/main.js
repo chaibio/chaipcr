@@ -70,7 +70,7 @@ $(document).ready(function(){
 		$.get("http://localhost:8000/device")
 		.done(function(data) {
 			if(data.software.version) {
-				$(".version-text").text("V.   ").show();
+				$(".version-text").text("V.").show();
 				$(".version-value").text(data.software.version).show();
 				//clearInterval(insure); // Now we keep looking if we have connection.
 			}
