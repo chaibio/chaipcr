@@ -35,6 +35,10 @@ class User < ActiveRecord::Base
     self.count == 0
   end
   
+  def self.create_factory_user!
+    self.create(:role=>ROLE_ADMIN, :name=>"Factory", :email=>"factory@factory.com", :password=>"factory", :password_confirmation=>"factory")
+  end
+  
   def admin?
     self.role == ROLE_ADMIN
   end
