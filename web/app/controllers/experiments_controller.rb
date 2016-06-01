@@ -342,7 +342,7 @@ class ExperimentsController < ApplicationController
       end
       if response.is_a? String
         if @experiment.diagnostic?
-          Experiment.update_attributes(:analyze_status=>(response.include?("false"))? "failed" : "success")
+          @experiment.update_attributes(:analyze_status=>(response.include?("false"))? "failed" : "success")
         end
         render :json=>response
       elsif response && !response["message"].blank?
