@@ -43,7 +43,7 @@ $(document).ready(function(){
 
 
 	var checkConnection = function() {
-		$.get("http://localhost:8000/network/eth0")
+		$.get("http://localhost:80/network/eth0")
 			.done(function(data) {
 				if(data.state) {
 					//$("#ip-address").text("IP ADDRESS: " + data.state.address);
