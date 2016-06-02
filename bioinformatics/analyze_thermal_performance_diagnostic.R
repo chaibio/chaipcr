@@ -7,11 +7,11 @@ deltaTSetPoint <- 1
 highTemperature <- 95
 lowTemperature <- 50
 # xqrm
-MIN_AVG_RAMP_RATE <- 2
-MAX_TOTAL_TIME <- 22.5
-MAX_BLOCK_DELTA <- 2
-MIN_HEATING_RATE <- 1
-MAX_TIME_TO_HEAT <- 90
+MIN_AVG_RAMP_RATE <- 2 # C/s
+MAX_TOTAL_TIME <- 22.5e3 # ms
+MAX_BLOCK_DELTA <- 2 # C
+MIN_HEATING_RATE <- 1 # C/s
+MAX_TIME_TO_HEAT <- 90e3 # ms
 
 
 analyze_thermal_performance_diagnostic <- function(db_usr, db_pwd, db_host, db_port, db_name, experiment_id, calibration_id){
