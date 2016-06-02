@@ -25,7 +25,7 @@ class DevicesController < ApplicationController
   
   skip_before_action :verify_authenticity_token, :except=>[:root_password]
   before_filter :allow_cors, :except=>[:root_password]
-  before_filter :ensure_authenticated_user, :except=>[:show, :serial_start, :update, :clean, :software_update, :empty]
+  before_filter :ensure_authenticated_user, :except=>[:show, :serial_start, :update, :clean, :unserialize, :software_update, :empty]
   
   respond_to :json
   
@@ -103,16 +103,26 @@ class DevicesController < ApplicationController
     if Device.exists?
       if Device.serial_number.blank?
         # make sure all the diagnostic experiments are passed
-        @experiments = Experiment.includes(:experiment_definition).where(id: Experiment.select("MAX(experiments.id)").includes(:experiment_definition).where("experiment_definitions.experiment_type = ? AND experiments.completion_status != ?", ExperimentDefinition::TYPE_DIAGNOSTIC, "aborted").group("experiment_definitions.id"))
+        @experiments = Experiment.includes(:experiment_definition).where(id: Experiment.select("MAX(experiments.id)").joins(:experiment_definition).where("experiment_definitions.experiment_type = ? AND experiments.completion_status != ?", ExperimentDefinition::TYPE_DIAGNOSTIC, "aborted").group("experiment_definitions.id"))
         passed_diagnostics = Array.new
         for experiment in @experiments
           if experiment.completion_status == "success" && experiment.analyze_status == "success"
             passed_diagnostics << experiment.experiment_definition.guid
           end
         end
-        notpassed_diagnostics = ExperimentDefinition.diagnostic_guids - (passed_diagnostics & ExperimentDefinition.diagnostic_guids);
-        if !notpassed_diagnostics.empty?
-          render json: {errors: "You have to pass (#{notpassed_diagnostics.join(",")}) diagnostics"}, status: 405
+        if (passed_diagnostics & ExperimentDefinition.diagnostic_guids).count != ExperimentDefinition.diagnostic_guids.count
+          result = "<table style='width: 400px; color: black;'><tr><th>Test</th><th>Status</th></tr>"
+          for test_guid in ExperimentDefinition.diagnostic_guids
+            experiment_index = @experiments.index{|experiment| experiment.experiment_definition.guid == test_guid}
+            if experiment_index == nil
+              status = "Not performed"
+            else
+              status = (@experiments[experiment_index].completion_status == "success" && @experiments[experiment_index].analyze_status == "success")? "Pass" : "Fail"
+            end
+            result += "<tr><td>#{test_guid}</td><td style='color:#{(status == "Pass")? "green" : "red"}'>#{status}</td></tr>"
+          end
+          result += "</table>"
+          render json: {errors: "<p>Unable to serialize device: diagnostics not yet passed. Current status:</p>#{result}"}, status: 405
         else
           mac = retrieve_mac
           if !mac.blank?
@@ -163,7 +173,7 @@ class DevicesController < ApplicationController
     end
   end
   
-  def unserialized
+  def unserialize
     if !Device.valid?
       render json: {errors: "Device file is not found or corrupted"}, status: 500
       return

@@ -20,7 +20,7 @@
 
 wait_and_reboot () {
 	sync &
-	sleep 2
+	sleep 10
 	reboot
 }
 
