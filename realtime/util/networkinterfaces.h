@@ -54,6 +54,7 @@ namespace NetworkInterfaces
         std::string address;
         std::string maskAddress;
         std::string broadcastAddress;
+        std::string macAddress;
     };
 
     typedef std::map<std::string, NetworkInterfaces::InterfaceSettings> InterfaceSettingsMap;
