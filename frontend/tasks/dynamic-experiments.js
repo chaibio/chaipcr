@@ -19,9 +19,9 @@ function _rehash (path) {
 
 
 gulp.task('dynamicexp:clean_old', function(done) {
-  del(['web/public/dynexp/outputs/']).then(paths =>{
-      done();
-    });
+  del(['web/public/dynexp/outputs/']).then(function () {
+    done();
+  });
 });
 
 gulp.task('dynamicexp:init_hashes', function (done) {
