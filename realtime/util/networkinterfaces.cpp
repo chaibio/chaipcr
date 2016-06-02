@@ -21,12 +21,21 @@
 
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 #include <system_error>
 
+#include <cstring>
+
+#include <unistd.h>
 #include <ifaddrs.h>
 #include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <net/if.h>
+
+std::string getMacAddress(const std::string &interface);
 
 namespace NetworkInterfaces
 {
@@ -225,18 +234,29 @@ InterfaceState getInterfaceState(const std::string &interfaceName)
 
         if (getifaddrs(&interfaces) == 0)
         {
-            for (ifaddrs *interface = interfaces; interface; interface = interface->ifa_next)
+            try
             {
-                if (interface->ifa_name == interfaceName && reinterpret_cast<sockaddr_in*>(interface->ifa_addr)->sin_family == AF_INET)
+                for (ifaddrs *interface = interfaces; interface; interface = interface->ifa_next)
                 {
-                    state.interface = interfaceName;
-                    state.flags = interface->ifa_flags;
-                    state.address = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_addr)->sin_addr);
-                    state.maskAddress = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_netmask)->sin_addr);
-                    state.broadcastAddress = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_broadaddr)->sin_addr);
+                    if (interface->ifa_name == interfaceName && reinterpret_cast<sockaddr_in*>(interface->ifa_addr)->sin_family == AF_INET)
+                    {
+                        state.interface = interfaceName;
+                        state.flags = interface->ifa_flags;
+                        state.address = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_addr)->sin_addr);
+                        state.maskAddress = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_netmask)->sin_addr);
+                        state.broadcastAddress = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_broadaddr)->sin_addr);
+                        state.macAddress = getMacAddress(interfaceName);
 
-                    break;
+
+                        break;
+                    }
                 }
+            }
+            catch (...)
+            {
+                freeifaddrs(interfaces);
+
+                throw;
             }
 
             freeifaddrs(interfaces);
@@ -248,4 +268,38 @@ InterfaceState getInterfaceState(const std::string &interfaceName)
     return state;
 }
 
+}
+
+std::string getMacAddress(const std::string &interface)
+{
+    int socket = ::socket(PF_INET, SOCK_DGRAM, 0);
+
+    if (socket == -1)
+        throw std::system_error(errno, std::generic_category(), "Network error: unable to open a device socket -");
+
+    ifreq request;
+    memset(&request, 0, sizeof(request));
+    strcpy(request.ifr_name, interface.c_str());
+
+    if (ioctl(socket, SIOCGIFHWADDR, &request) == -1)
+    {
+        close(socket);
+
+        throw std::system_error(errno, std::generic_category(), "Network error: unable to get a hardware address of an interface \"" + interface + "\" -");
+    }
+
+    close(socket);
+
+    std::stringstream stream;
+    stream << std::hex << std::setfill('0');
+
+    for (int i = 0; i < 6; ++i)
+    {
+        stream << std::setw(2) << static_cast<unsigned int>(static_cast<unsigned char>(request.ifr_hwaddr.sa_data[i]));
+
+        if (i < 5)
+            stream << ':';
+    }
+
+    return stream.str();
 }

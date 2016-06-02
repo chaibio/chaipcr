@@ -94,6 +94,7 @@ void NetworkManagerHandler::getStat(boost::property_tree::ptree &responsePt)
         responsePt.put("state.address", state.address);
         responsePt.put("state.maskAddress", state.maskAddress);
         responsePt.put("state.broadcastAddress", state.broadcastAddress);
+        responsePt.put("state.macAddress", state.macAddress);
     }
 
     if (!settings.isEmpty())
