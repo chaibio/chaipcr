@@ -59,7 +59,7 @@ class Device
   end
   
   def self.unserialized!
-    device_hash["serial_number"] = nil
+    device_hash.delete("serial_number")
     begin
       File.open(DEVICE_FILE_PATH, 'w+') { |file| file.write(JSON.pretty_generate(device_hash)) }
     rescue  => e

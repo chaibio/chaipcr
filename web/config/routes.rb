@@ -74,6 +74,7 @@ Qpcrctl::Application.routes.draw do
     get 'software_update'
     get 'status'
     put 'clean'
+    put 'unserialize'
     put 'root_password'
     post 'enable_support_access'
     get 'export_database'
