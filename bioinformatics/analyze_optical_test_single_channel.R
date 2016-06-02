@@ -15,26 +15,28 @@ analyze_optical_test_single_channel <- function(
     exp_id
     ) {
     
-    db_conn <- db_etc(db_usr, db_pwd, db_host, db_port, db_name, 
-                      exp_id, stage_id=NULL, calib_info=NULL)
+    db_etc_out <- db_etc(
+        db_usr, db_pwd, db_host, db_port, db_name, 
+        exp_id, stage_id=NULL, calib_info=NULL)
+    db_conn <- db_etc_out[['db_conn']]
     
     step_ids <- c(baseline_step_id, excitation_step_id)
     
     ot_list <- lapply(
         step_ids,
         function(step_id) {
-            ot_qry <- sprintf('
-                SELECT fluorescence_value
+            ot_qry <- sprintf(
+                'SELECT fluorescence_value
                     FROM fluorescence_data
                     WHERE experiment_id=%i AND step_id=%i AND cycle_num=1
-                    ORDER BY well_num
-                ', exp_id, step_id)
+                    ORDER BY well_num', 
+                exp_id, step_id)
             as.numeric(dbGetQuery(db_conn, ot_qry)[,1])
             })
     
     names(ot_list) <- step_ids
     
-    # assuming the 2 elements of `ot_list` are the same in length
+    # assuming the 2 elements of `ot_list` are the same in length (number of wells)
     results <- lapply(
         1:length(ot_list[[1]]),
         function(well_i) {

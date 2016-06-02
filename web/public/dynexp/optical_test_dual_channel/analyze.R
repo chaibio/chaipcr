@@ -1,1 +1,1 @@
-analyze <- analyze_optical_calibration
+analyze <- analyze_optical_test_dual_channel
