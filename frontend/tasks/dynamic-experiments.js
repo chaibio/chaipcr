@@ -38,10 +38,16 @@ gulp.task('dynamicexp:rehash', ['dynamicexp:clean_old', 'dynamicexp:init_hashes'
               .pipe(gulp.dest('web/public/dynexp/outputs'));
 });
 
-gulp.task('dynamicexp:relink_libs', ['dynamicexp:clean_old', 'dynamicexp:init_hashes', 'dynamicexp:rehash'], function () {
-  return gulp.src('web/public/dynexp/outputs/**/*.{js,html,css}')
-              .pipe(replace('../libs', '../'+hashes_cache.libs))
-              .pipe(gulp.dest('web/public/dynexp/outputs'));
+gulp.task('dynamicexp:relink_libs', ['dynamicexp:clean_old', 'dynamicexp:init_hashes', 'dynamicexp:rehash'], function() {
+    var stream = gulp.src('web/public/dynexp/outputs/**/*.{js,html,css}');
+
+    for (var i = 0; i < experiments.length; i++) {
+        stream = stream
+            .pipe(replace('../' + experiments[i], '../' + hashes_cache[experiments[i]]))
+            .pipe(replace('dynexp/' + experiments[i], 'dynexp/outputs/' + hashes_cache[experiments[i]]))
+    }
+
+    return stream.pipe(gulp.dest('web/public/dynexp/outputs'));
 });
 
 gulp.task('dynamicexp:relink', ['dynamicexp:clean_old', 'dynamicexp:rehash', 'dynamicexp:relink_libs', 'templates'], function () {
