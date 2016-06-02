@@ -10,49 +10,39 @@
       $scope.loop = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
       $scope.analyzing = true;
 
-      getStepIds = function (experiment) {
-        var steps = GlobalService.getExperimentSteps(experiment);
-        steps = _.filter(steps, function (step) {
-          return step.name !== 'Swap';
-        });
-        return _.map(steps, function (step) {
-          return step.id;
-        });
-      }
+      $scope.isPassed = function () {
+        $scope.data = $scope.data || [];
+        var passed = true;
+        var valid;
 
-      mutateResponseData = function (data) {
-        var newData = [];
-        for (var i=0; i<data.length; i++) {
-          var stepData = data[i].data;
-          var dataArr = [];
-          for (var ii=0; ii<stepData.length; ii++) {
-            dataArr.push(stepData[ii].fluorescence_value);
+        for (var i = $scope.data.length - 1; i >= 0; i--) {
+          var datum = $scope.data[i];
+          valid = datum.baseline[0][1] && datum.baseline[1][1];
+          valid = valid && datum.water[0][1] && datum.water[1][1];
+          valid = valid && datum.FAM[0][1] && datum.FAM[1][1];
+          valid = valid && datum.HEX[0][1] && datum.HEX[1][1];
+
+          if(!valid) {
+            break;
           }
-          newData.push(dataArr);
         }
-        return newData;
-      };
 
-      $scope.isPassed = function (baseline, water, fam, hex) {
-        var pass = true;
-        pass = baseline >= Constants.BASELINE.MIN && baseline >= Constants.BASELINE.MAX;
-        pass = pass && water >= Constants.WATER.MIN && water >= Constants.WATER.MAX;
-        pass = pass && fam >= Constants.FAM.MIN && fam >= Constants.FAM.MAX;
-        pass = pass && hex >= Constants.HEX.MIN && hex >= Constants.HEX.MAX;
-        return pass;
+        return valid;
       };
 
       Experiment.get($stateParams.id)
       .then(function (resp) {
         $scope.experiment = resp.data.experiment;
-        Experiment.getStepsData($scope.experiment.id, getStepIds($scope.experiment))
+        Experiment.analyze($scope.experiment.id)
         .then(function (resp) {
-          $scope.data = mutateResponseData(resp.data.fluorescence_data);
-          console.log($scope.data);
+          $scope.data = resp.data.optical_data;
+          $scope.analyzing = false;
+        })
+        .catch(function () {
           $scope.analyzing = false;
         });
       });
 
-    } 
+    }
    ]);
 }).call(window);

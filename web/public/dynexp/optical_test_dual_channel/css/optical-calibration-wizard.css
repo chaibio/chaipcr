@@ -231,3 +231,7 @@ p.step{
   color: red;
   font-size: 17px;
 }
+
+.page-9 table thead tr th {
+    text-align: center;
+}

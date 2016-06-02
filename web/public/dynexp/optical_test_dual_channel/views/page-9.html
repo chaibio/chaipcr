@@ -1,8 +1,12 @@
-<div class="intro" ng-controller="AnalyzeCtrl">
+<div class="intro page-9" ng-controller="AnalyzeCtrl">
 
-  <h2 class="text-center"> Optical Test Results</h2>
+  <h2 class="text-center text-success" ng-show="experiment.completion_status === 'success' && !analyzing && isPassed()">Optical Test Passed</h2>
+  <h2 class="text-center text-danger" ng-show="(!isPassed() || experiment.completion_status !== 'success') && !analyzing">Optical Test Failed</h2>
 
-  <h4 class="text-center" ng-show="analyzing"><b>Analyzing Results...</b></h4>
+  <h4 class="text-center" ng-show="analyzing">
+    <img src="../libs/images/loading.gif">
+    <b>Analyzing Results...</b>
+  </h4>
 
   <div ng-show="experiment.completion_status !== 'success' && !analyzing">
     <div class="alert alert-danger">
@@ -11,34 +15,44 @@
   </div>
 
   <div ng-show="experiment.completion_status === 'success' && !analyzing">
-    <table class="table table-bordered">
-      <thead>
+    <table class="table table-bordered table-striped">
+      <thead class="text-center">
         <tr>
           <th>Well</th>
-          <th>Baseline</th>
-          <th>Water</th>
-          <th>FAM</th>
-          <th>HEX</th>
-          <th>Result</th>
+          <th colspan="2">Baseline</th>
+          <th colspan="2">Water</th>
+          <th colspan="2">FAM</th>
+          <th colspan="2">HEX</th>
         </tr>
       </thead>
       <tbody>
+        <tr>
+          <td></td>
+          <td>Ch 1</td>
+          <td>Ch 2</td>
+          <td>Ch 1</td>
+          <td>Ch 2</td>
+          <td>Ch 1</td>
+          <td>Ch 2</td>
+          <td>Ch 1</td>
+          <td>Ch 2</td>
+        </tr>
         <tr ng-repeat="i in loop">
           <td>{{i+1}}</td>
-          <td>{{data[0][i]}}</td>
-          <td>{{data[1][i]}}</td>
-          <td>{{data[2][i]}}</td>
-          <td>{{data[3][i]}}</td>
-          <td>
-            <span class="text-success" ng-show="isPassed(data[0][i], data[1][i], data[2][i], data[3][i])">PASS</span>
-            <span class="text-danger" ng-show="isPassed(data[0][i], data[1][i], data[2][i], data[3][i]) === false">FAIL</span>
-          </td>
+          <td ng-class="(data[i].baseline[0][1]? 'text-success': 'text-danger')">{{ data[i].baseline[0][0] }}</td>
+          <td ng-class="(data[i].baseline[1][1]? 'text-success': 'text-danger')">{{ data[i].baseline[1][0] }}</td>
+          <td ng-class="(data[i].water[0][1]? 'text-success': 'text-danger')">{{ data[i].water[0][0] }}</td>
+          <td ng-class="(data[i].water[1][1]? 'text-success': 'text-danger')">{{ data[i].water[1][0] }}</td>
+          <td ng-class="(data[i].FAM[0][1]? 'text-success': 'text-danger')">{{ data[i].FAM[0][0] }}</td>
+          <td ng-class="(data[i].FAM[1][1]? 'text-success': 'text-danger')">{{ data[i].FAM[1][0] }}</td>
+          <td ng-class="(data[i].HEX[0][1]? 'text-success': 'text-danger')">{{ data[i].HEX[0][0] }}</td>
+          <td ng-class="(data[i].HEX[1][1]? 'text-success': 'text-danger')">{{ data[i].HEX[1][0] }}</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <div class="text-center">
+  <div class="text-center" ng-show="!analyzing">
     <a href="/#/settings/" class="button">CONTINUE</a>
   </div>
 
