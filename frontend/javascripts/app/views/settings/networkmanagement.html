@@ -25,12 +25,20 @@
       <ul>
         <li>
           <a class="bold-letter" ui-sref="settings.networkmanagement.wifi({name: 'ethernet'})" ui-sref-active="highlite">ETHERNET</a>
+          <span class="mac-address-span">MAC ADDRESS:</span>
         </li>
       </ul>
-      <div class="wifi-control"><div class="wifi-caption">WIFI </div> <div class="wifi-changer"><wifi-toggle data="admin"></wifi-toggle></div></div>
+      <div class="wifi-control">
+        <div class="wifi-caption">WIFI </div>
+        <div class="wifi-changer">
+          <wifi-toggle data="admin"></wifi-toggle>
+        </div>
+      </div>
+
+      <div class="mac-cover"><span class="mac-address-span">MAC ADDRESS:</span></div>
+
       <ul>
         <li ng-repeat="wifiNetwork in wifiNetworks">
-
           <check-mark current-network="currentNetwork" ssid="{{wifiNetwork.ssid}}"></check-mark>
           <a ui-sref="settings.networkmanagement.wifi({name: '{{wifiNetwork.ssid | spaceToUnderscore}}'})" ui-sref-active="highlite">{{wifiNetwork.ssid}}
             <wifi-lock encryption="{{wifiNetwork.encryption}}" ssid="{{wifiNetwork.ssid | spaceToUnderscore}}"></wifi-lock>

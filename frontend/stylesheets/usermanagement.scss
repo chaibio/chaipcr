@@ -79,11 +79,20 @@
     }
   }
 
-  .wifi-control {
-    padding: 10px 0px 10px 28px;
+  .mac-address-span {
+    padding-left: 28px;
+    font-size: 14px;
     font-family: "dinot-bold";
-    height: 35px;
+    color: #999;
+  }
+
+  .wifi-control {
+    //padding: 10px 0px 10px 28px;
+    margin-top: 40px;
+    font-family: "dinot-bold";
+    height: 30px;
     .wifi-caption {
+      margin-left: 28px;
       float: left;
     }
     .wifi-changer {
@@ -93,6 +102,12 @@
       margin-left: 10px;
       padding-top: 5px;
     }
+  }
+
+  .mac-cover {
+    width: 100%;
+    //height: 100px;
+    margin-bottom: 40px;
   }
   .bold-letter {
     font-family: "dinot-bold";
