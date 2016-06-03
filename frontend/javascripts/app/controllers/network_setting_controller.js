@@ -60,5 +60,6 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     $scope.findWifiNetworks();
     $scope.getSettings();
     NetworkSettingsService.getEtherNetStatus();
+    $scope.curreWifiSettings = NetworkSettingsService.connectedWifiNetwork;
   }
 ]);
