@@ -26,6 +26,16 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
   function($scope, $stateParams, User, $state, NetworkSettingsService) {
 
     $scope.wifiNetworks = {};
+    $scope.curreWifiSettings = {};
+    $scope.ethernetSettings = {};
+
+    $scope.$on('new_wifi_result', function() {
+      $scope.curreWifiSettings = NetworkSettingsService.connectedWifiNetwork;
+    });
+
+    $scope.$on('ethernet_detected', function() {
+      $scope.ethernetSettings = NetworkSettingsService.connectedEthernet;
+    });
 
     $scope.findWifiNetworks = function() {
       console.log("called up");
@@ -49,6 +59,6 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
 
     $scope.findWifiNetworks();
     $scope.getSettings();
-
+    NetworkSettingsService.getEtherNetStatus();
   }
 ]);

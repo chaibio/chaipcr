@@ -25,7 +25,7 @@
       <ul>
         <li>
           <a class="bold-letter" ui-sref="settings.networkmanagement.wifi({name: 'ethernet'})" ui-sref-active="highlite">ETHERNET</a>
-          <span class="mac-address-span">MAC ADDRESS:</span>
+          <span ng-if="ethernetSettings.state.macAddress" class="mac-address-span">MAC ADDRESS:<span> {{ethernetSettings.state.macAddress}}</span></span>
         </li>
       </ul>
       <div class="wifi-control">
@@ -35,7 +35,7 @@
         </div>
       </div>
 
-      <div class="mac-cover"><span class="mac-address-span">MAC ADDRESS:</span></div>
+      <div class="mac-cover"><span ng-if="curreWifiSettings.state.macAddress" class="mac-address-span">MAC ADDRESS:<span> {{curreWifiSettings.state.macAddress}}</span></span></div>
 
       <ul>
         <li ng-repeat="wifiNetwork in wifiNetworks">

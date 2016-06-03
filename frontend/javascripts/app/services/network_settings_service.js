@@ -27,6 +27,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
   function($rootScope, $http, $q, host, $interval, Webworker) {
     var that = this;
     this.connectedWifiNetwork = {};
+    this.connectedEthernet = {};
 
     this.getWifiNetworks = function() {
       var delay = $q.defer();
@@ -39,7 +40,6 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     };
 
     this.getSettings = function() {
-      //console.log(Webworker);
       var delay = $q.defer();
       var ssid = null, connectionStatus = null;
 
@@ -69,7 +69,13 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       return delay.promise;
     };
 
-    //this.getSettings();
+    this.getEtherNetStatus = function() {
+        var delay = $q.defer();
+        $http.get(host + ':8000/network/eth0').then(function(ethernet) {
+          that.connectedEthernet = ethernet.data;
+          $rootScope.$broadcast("ethernet_detected");
+        });
+    };
 
     this.connectWifi = function(data) {
       var delay = $q.defer();

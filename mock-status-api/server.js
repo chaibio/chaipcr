@@ -39,6 +39,7 @@ var status_running = require('./status-running.json');
 var network = require('./network.json');
 var wifi_networks = require('./wifi-networks.json');
 var device = require('./device.json');
+var ethernet = require('./ethernet.json');
 var STATUSES = ['idle', 'lid_heating', 'running', 'paused', 'complete'];
 var experiment_id = null;
 var lastLog = null;
@@ -150,6 +151,7 @@ var defaultSelected = {
         "address": "10.0.3.38",
         "maskAddress": "255.255.255.0",
         "broadcastAddress": "10.0.3.255",
+        "macAddress": "74:da:38:41:b7:ac",
         "status": "connected"
     },
     "settings": {
@@ -172,7 +174,7 @@ app.post('/device/check_for_updates', function (req, res, next) {
 });
 
 app.get('/network/eth0', function (req, res, next) {
-  res.send(network); // here change to ethernet
+  res.send(ethernet); // here change to ethernet
 });
 
 app.get('/network/wlan/scan', function(req, res, next) {

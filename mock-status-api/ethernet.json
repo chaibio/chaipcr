@@ -1,0 +1,15 @@
+{
+    "interface": "eth0",
+    "state":
+    {
+        "flags": "69699",
+        "address": "10.0.2.200",
+        "maskAddress": "255.255.255.0",
+        "broadcastAddress": "10.0.2.255",
+        "macAddress": "54:4a:16:c0:7e:28"
+    },
+    "settings":
+    {
+        "type": "dhcp"
+    }
+}
