@@ -200,6 +200,7 @@ app.put('/network/wlan', function(req, res, next) {
                         "address": "10.0.3.38",
                         "maskAddress": "255.255.255.0",
                         "broadcastAddress": "10.0.3.255",
+                        "macAddress": "74:da:38:41:b7:ac",
                         "status": "connected"
                       }
                     };
