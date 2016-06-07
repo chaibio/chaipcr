@@ -18,14 +18,15 @@
  */
 
 window.ChaiBioTech.ngApp.directive('wifiToggle', [
-  function() {
+  'NetworkSettingsService',
+  function(NetworkSettingsService) {
     return {
       restric: 'EA',
       replace: false,
       templateUrl: 'app/views/directives/gather-data-toggle.html',
 
       scope: {
-        data: '=data'
+        data: '=wirelessStatus'
       },
 
       link: function(scope, elem, attr) {
@@ -41,7 +42,7 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
 
         scope.configureSwitch = function(val) {
 
-          if(val === "admin") {
+          if(val) {
             angular.element(scope.dragElem).parent().css("background-color", "#8dc63f");
             angular.element(scope.dragElem).children().css("background-color", "#8dc63f");
             angular.element(scope.dragElem).animate({
@@ -72,13 +73,11 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
 
         scope.sendData = function() {
 
-          if(scope.data === "admin") {
-            scope.data = "default";
+          if(scope.data) {
+            scope.data = !scope.data;
           } else {
-            scope.data = "admin";
+            scope.data = true;
           }
-          //scope.data = !scope.data;
-          //scope.$parent['update']();
         };
 
         scope.dragElem = angular.element(elem).find(".outer-circle").draggable({

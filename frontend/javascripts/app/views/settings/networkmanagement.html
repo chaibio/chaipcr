@@ -31,11 +31,14 @@
       <div class="wifi-control">
         <div class="wifi-caption">WIFI </div>
         <div class="wifi-changer">
-          <wifi-toggle data="admin"></wifi-toggle>
+          <wifi-toggle wireless-status="wifiNetworkStatus"></wifi-toggle>
         </div>
       </div>
 
-      <div class="mac-cover"><span ng-if="curreWifiSettings.state.macAddress" class="mac-address-span">MAC ADDRESS:<span> {{curreWifiSettings.state.macAddress}}</span></span></div>
+      <div class="mac-cover no-wifi">
+        <span ng-if="curreWifiSettings.state.macAddress" class="mac-address-span">MAC ADDRESS:<span> {{curreWifiSettings.state.macAddress}}</span></span>
+        <span ng-if="wirelessError" class="mac-address-span">No wifi adapter</span>
+      </div>
 
       <ul>
         <li ng-repeat="wifiNetwork in wifiNetworks">
