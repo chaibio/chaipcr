@@ -70,9 +70,10 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
         //NetworkSettingsService.getSettings();
     };
 
-    //$scope.getSettings();
+    $scope.getSettings();
     NetworkSettingsService.getEtherNetStatus();
     $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork;
     $scope.findWifiNetworks();
+
   }
 ]);
