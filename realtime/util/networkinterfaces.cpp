@@ -238,17 +238,23 @@ InterfaceState getInterfaceState(const std::string &interfaceName)
             {
                 for (ifaddrs *interface = interfaces; interface; interface = interface->ifa_next)
                 {
-                    if (interface->ifa_name == interfaceName && reinterpret_cast<sockaddr_in*>(interface->ifa_addr)->sin_family == AF_INET)
+                    if (interface->ifa_name == interfaceName)
                     {
                         state.interface = interfaceName;
-                        state.flags = interface->ifa_flags;
-                        state.address = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_addr)->sin_addr);
-                        state.maskAddress = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_netmask)->sin_addr);
-                        state.broadcastAddress = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_broadaddr)->sin_addr);
                         state.macAddress = getMacAddress(interfaceName);
 
+                        if (reinterpret_cast<sockaddr_in*>(interface->ifa_addr)->sin_family == AF_INET)
+                        {
+                            state.flags = interface->ifa_flags;
+                            state.address = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_addr)->sin_addr);
+                            state.maskAddress = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_netmask)->sin_addr);
+                            state.broadcastAddress = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_broadaddr)->sin_addr);
+                            state.addressState = true;
 
-                        break;
+                            break;
+                        }
+                        else
+                            state.addressState = false;
                     }
                 }
             }

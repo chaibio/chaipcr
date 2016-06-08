@@ -42,9 +42,10 @@ namespace NetworkInterfaces
     class InterfaceState
     {
     public:
-        InterfaceState(): flags(0) {}
+        InterfaceState(): flags(0), addressState(false) {}
 
         inline bool isEmpty() const noexcept { return interface.empty(); }
+        inline bool hasAddress() const noexcept { return addressState; }
 
     public:
         std::string interface;
@@ -55,6 +56,8 @@ namespace NetworkInterfaces
         std::string maskAddress;
         std::string broadcastAddress;
         std::string macAddress;
+
+        bool addressState;
     };
 
     typedef std::map<std::string, NetworkInterfaces::InterfaceSettings> InterfaceSettingsMap;

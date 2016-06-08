@@ -90,11 +90,15 @@ void NetworkManagerHandler::getStat(boost::property_tree::ptree &responsePt)
 
     if (!state.isEmpty())
     {
-        responsePt.put("state.flags", state.flags);
-        responsePt.put("state.address", state.address);
-        responsePt.put("state.maskAddress", state.maskAddress);
-        responsePt.put("state.broadcastAddress", state.broadcastAddress);
         responsePt.put("state.macAddress", state.macAddress);
+
+        if (state.hasAddress())
+        {
+            responsePt.put("state.flags", state.flags);
+            responsePt.put("state.address", state.address);
+            responsePt.put("state.maskAddress", state.maskAddress);
+            responsePt.put("state.broadcastAddress", state.broadcastAddress);
+        }
     }
 
     if (!settings.isEmpty())
