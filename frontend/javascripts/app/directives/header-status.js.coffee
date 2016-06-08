@@ -70,9 +70,10 @@ window.App.directive 'headerStatus', [
         $scope.timeRemaining = TestInProgressHelper.timeRemaining(data)
         $scope.timePercentage = TestInProgressHelper.timePercentage(data)
 
+        #in progress
         if $scope.state isnt 'idle' and $scope.state isnt 'complete' and $scope.isCurrentExp
           $scope.backgroundStyle =
-            'background-size': "#{$scope.timePercentage || 0}% 100%";
+            background: "-webkit-linear-gradient(left,  #64b027 0%,#c6e35f #{$scope.timePercentage || 0}%,#5d8329 #{$scope.timePercentage || 0}%,#5d8329 100%)"
         else
           $scope.backgroundStyle = {}
 
@@ -113,4 +114,5 @@ window.App.directive 'headerStatus', [
         experiment_id = id
         getExperiment (exp) ->
           $scope.experiment = exp
+
 ]

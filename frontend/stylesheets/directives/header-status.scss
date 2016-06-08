@@ -82,10 +82,17 @@
   }
 
   &.in-progress {
-    background-color: #5D8329;
-    background-image: url('/images/header-progress-bg.png');
-    background-repeat: no-repeat;
-    background-size: 0% 100%;
+    // background-color: #5D8329;
+    // background-image: url('/images/header-progress-bg.png');
+    // background-repeat: no-repeat;
+    // background-size: 0% 100%;
+
+/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#64b027+0,c6e35f+46,5d8329+46,5d8329+100 */
+background: -moz-linear-gradient(left,  #64b027 0%, #c6e35f 46%, #5d8329 46%, #5d8329 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(left,  #64b027 0%,#c6e35f 46%,#5d8329 46%,#5d8329 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to right,  #64b027 0%,#c6e35f 46%,#5d8329 46%,#5d8329 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+
+
     .message {
       display: inline-block;
       margin-top: 16px;
