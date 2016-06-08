@@ -51,23 +51,26 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
 
           that.wirelessError = false;
           if(result.data.settings) {
-
-            if(ssid === null && connectionStatus === null) {
+            that.connectedWifiNetwork = result.data;
+            console.log(result.data, result.data.state.status)
+            /*if(ssid === null && connectionStatus === null) {
               ssid = result.data.settings["wpa-ssid"];
               that.connectionStatus = connectionStatus = result.data.state.status;
               that.connectedWifiNetwork = result.data;
               $rootScope.$broadcast("new_wifi_result");
               return;
-            }
+            }*/
             if(ssid !== result.data.settings["wpa-ssid"] || connectionStatus !== result.data.state.status) {
               ssid = result.data.settings["wpa-ssid"];
               that.connectionStatus = connectionStatus = result.data.state.status;
-              that.connectedWifiNetwork = result.data;
               $rootScope.$broadcast("new_wifi_result");
             }
           }
         }, function(err) {
           // in case error May be no wireless interface
+          ssid = null, connectionStatus = null;
+          that.connectedWifiNetwork = {};
+          that.connectionStatus = "";
           that.wirelessError = true;
           that.wirelessErrorData = err.data.status;
           $rootScope.$broadcast("wifi_adapter_error");
@@ -76,7 +79,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       //return delay.promise;
     };
 
-    getInitialStatus = function() {
+    this.getInitialStatus = function() {
       var delay = $q.defer();
       $http.get(host + ':8000/network/wlan').then(function(result) {
         delay.resolve(result);

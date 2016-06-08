@@ -35,6 +35,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
 
     $scope.$on('new_wifi_result', function() {
       $scope.wifiNetworkStatus = true;
+      $scope.wirelessError = false;
       $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork;
     });
 
@@ -62,11 +63,13 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     };
 
     $scope.getSettings = function() {
-        NetworkSettingsService.getInitialStatus().then(function(result) {
-          $scope.wifiNetworkStatus = true;
-        }, function(err) {
-          $scope.wifiNetworkStatus = false;
-        });
+
+      NetworkSettingsService.getInitialStatus().then(function(result) {
+        $scope.wifiNetworkStatus = true;
+        $scope.currentNetwork = result.data;
+      }, function(err) {
+        $scope.wifiNetworkStatus = false;
+      });
     };
 
     $scope.getSettings();

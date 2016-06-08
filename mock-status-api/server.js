@@ -183,37 +183,36 @@ app.get('/network/wlan/scan', function(req, res, next) {
 
 app.get('/network/wlan', function(req, res, next) {
 
-  /*if(currentSelectedNetwork === null) {
+  if(currentSelectedNetwork === null) {
       res.send(defaultSelected);
   } else {
     res.send(currentSelectedNetwork);
-  }*/
-  res.status(405).send({
+  }
+  /*res.status(405).send({
             "status":
             {
                 "status": "false",
                 "error": "No WIFI interface is present"
             }
           }
-        );
+        );*/
 });
 
 app.put('/network/wlan', function(req, res, next) {
-  currentSelectedNetwork = { "interface": "wlan1",
-                      "settings": {
-                          "type": "dhcp",
-                          "wpa-psk": "456",
-                          "wpa-ssid": "STIWIFI24"
-                      },
-                      "state": {
-                        "flags": "69699",
-                        "address": "10.0.3.38",
-                        "maskAddress": "255.255.255.0",
-                        "broadcastAddress": "10.0.3.255",
-                        "macAddress": "74:da:38:41:b7:ac",
-                        "status": "connected"
-                      }
-                    };
+  currentSelectedNetwork = {
+    "interface": "wlan1",
+    "settings":
+    {
+        "type": "dhcp",
+        "wpa-psk": "hgfh",
+        "wpa-ssid": "Chai Guest"
+    },
+    "state":
+    {
+        "status": "not_connected"
+    }
+};
+
   res.send({
     "state": true
   });
