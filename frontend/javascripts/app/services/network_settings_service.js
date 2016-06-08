@@ -43,7 +43,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     };
 
     this.getSettings = function() {
-      var delay = $q.defer();
+      //var delay = $q.defer();
       var ssid = null, connectionStatus = null;
 
       $interval(function() {
@@ -73,6 +73,16 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
           $rootScope.$broadcast("wifi_adapter_error");
         });
       }, 3000);
+      //return delay.promise;
+    };
+
+    getInitialStatus = function() {
+      var delay = $q.defer();
+      $http.get(host + ':8000/network/wlan').then(function(result) {
+        delay.resolve(result);
+      }, function(err) {
+        delay.reject(err);
+      });
       return delay.promise;
     };
 
