@@ -209,6 +209,7 @@ app.put('/network/wlan', function(req, res, next) {
     },
     "state":
     {
+        "macAddress": "74:da:38:41:b7:ac",
         "status": "not_connected"
     }
 };

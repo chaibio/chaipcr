@@ -19,7 +19,8 @@
 
 window.ChaiBioTech.ngApp.directive('wifiToggle', [
   'NetworkSettingsService',
-  function(NetworkSettingsService) {
+  '$rootScope',
+  function(NetworkSettingsService, $rootScope) {
     return {
       restric: 'EA',
       replace: false,
@@ -48,7 +49,8 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
             angular.element(scope.dragElem).animate({
               left: "11"
             }, 50);
-          } else {
+          } else if(val === false){
+            $rootScope.$broadcast("wfif_turned_off");
             angular.element(scope.dragElem).parent().css("background-color", "#bbbbbb");
             angular.element(scope.dragElem).children().css("background-color", "#bbbbbb");
             angular.element(scope.dragElem).animate({

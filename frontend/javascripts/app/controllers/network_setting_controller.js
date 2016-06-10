@@ -51,6 +51,11 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       $scope.currentWifiSettings = {};
     });
 
+    $rootScope.$on('wfif_turned_off', function() {
+      console.log("wfif_turned_off");
+      $scope.wifiNetworks = {};
+    });
+
     $scope.findWifiNetworks = function() {
       if(! NetworkSettingsService.wirelessError) {
         NetworkSettingsService.getWifiNetworks().then(function(result) {
