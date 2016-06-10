@@ -180,22 +180,31 @@ app.get('/network/eth0', function (req, res, next) {
 app.get('/network/wlan/scan', function(req, res, next) {
   res.send(wifi_networks);
 });
+app.post('/network/wlan/connect', function(req, res, next) {
+  res.send({
+    "state": true
+  });
+});
+
+app.post('/network/wlan/disconnect', function(req, res, next) {
+  res.send(true);
+});
 
 app.get('/network/wlan', function(req, res, next) {
 
-  if(currentSelectedNetwork === null) {
+  /*if(currentSelectedNetwork === null) {
       res.send(defaultSelected);
   } else {
     res.send(currentSelectedNetwork);
-  }
-  /*res.status(405).send({
+  }*/
+  res.status(405).send({
             "status":
             {
                 "status": "false",
                 "error": "No WIFI interface is present"
             }
           }
-        );*/
+        );
 });
 
 app.put('/network/wlan', function(req, res, next) {
@@ -256,6 +265,16 @@ app.post('/device/upload_software_update', upload,function (req, res, next) {
       error: 'Hello world'
     }
   });
+});
+
+app.post('/network/wlan/connect', function(req, res, next) {
+  res.send({
+    "state": true
+  });
+});
+
+app.post('/network/wlan/disconnect', function(req, res, next) {
+  res.send(true);
 });
 
 

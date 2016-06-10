@@ -62,21 +62,29 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     });
 
     $scope.turnOffWifi = function() {
-      $scope.wifiNetworks = {};
-      $scope.userSettings.wifiSwitchOn = false;
-      $.jStorage.set('userNetworkSettings', $scope.userSettings);
+
+      var stopped = NetworkSettingsService.stop();
+      stopped.then(function(result) {
+        $scope.wifiNetworks = $scope.currentWifiSettings = {};
+        $scope.userSettings = $.jStorage.get('userNetworkSettings');
+      }, function(err) {
+        console.log("Could not disconnect wifi", err);
+      });
     };
 
     $scope.turnOnWifi = function() {
 
-      $scope.userSettings.wifiSwitchOn = true;
-      $.jStorage.set('userNetworkSettings', $scope.userSettings);
-      $scope.userSettings = $.jStorage.get('userNetworkSettings');
-      NetworkSettingsService.restart();
-      $scope.init();
+      var started = NetworkSettingsService.restart();
+      started.then(function(result) {
+        $scope.userSettings = $.jStorage.get('userNetworkSettings');
+        $scope.init();
+      }, function(err) {
+        console.log("Could not connect wifi", err);
+      });
     };
 
     $scope.findWifiNetworks = function() {
+
       if(! NetworkSettingsService.wirelessError && $scope.userSettings.wifiSwitchOn) {
         NetworkSettingsService.getWifiNetworks()
         .then(function(result) {
@@ -88,13 +96,14 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     };
 
     var stop = $interval(function() {
+      
       if($state.is('settings.networkmanagement')) {
         $scope.findWifiNetworks();
       } else {
         $interval.cancel(stop);
         stop = null;
       }
-    }, 6000);
+    }, 10000);
 
     $scope.getSettings = function() {
       // We may need this method when we refresh right on this page.

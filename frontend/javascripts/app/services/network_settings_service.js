@@ -35,6 +35,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.userSettings = $.jStorage.get('userNetworkSettings');
 
     this.getWifiNetworks = function() {
+      
       var delay = $q.defer();
       $http.get(host + ':8000/network/wlan/scan').then(function(data) {
         delay.resolve(data);
@@ -97,15 +98,17 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     };
 
     this.getEtherNetStatus = function() {
-        var delay = $q.defer();
-        $http.get(host + ':8000/network/eth0')
-        .then(function(ethernet) {
-          that.connectedEthernet = ethernet.data;
-          $rootScope.$broadcast("ethernet_detected");
-        });
+
+      var delay = $q.defer();
+      $http.get(host + ':8000/network/eth0')
+      .then(function(ethernet) {
+        that.connectedEthernet = ethernet.data;
+        $rootScope.$broadcast("ethernet_detected");
+      });
     };
 
     this.connectWifi = function(data) {
+
       var delay = $q.defer();
       $http.put(host + ':8000/network/wlan', data)
       .then(function(result) {
@@ -119,10 +122,32 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
 
     this.stop = function() {
 
+      var delay = $q.defer();
+      $http.post(host + ':8000/network/wlan/disconnect')
+      .then(function(result) {
+        that.userSettings.wifiSwitchOn = false;
+        $.jStorage.set('userNetworkSettings', that.userSettings);
+        delay.resolve(result)
+      }, function(err) {
+        delay.reject(err);
+      });
+
+      return delay.promise;
     };
 
     this.restart = function() {
-      this.userSettings = $.jStorage.get('userNetworkSettings');
+
+      var delay = $q.defer();
+      $http.post(host + ':8000/network/wlan/connect')
+      .then(function(result) {
+        that.userSettings.wifiSwitchOn = true;
+        $.jStorage.set('userNetworkSettings', that.userSettings);
+        delay.resolve(result);
+      }, function(err) {
+        delay.reject(err);
+      });
+
+      return delay.promise;
     };
 
   }
