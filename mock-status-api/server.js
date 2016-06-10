@@ -180,6 +180,15 @@ app.get('/network/eth0', function (req, res, next) {
 app.get('/network/wlan/scan', function(req, res, next) {
   res.send(wifi_networks);
 });
+app.post('/network/wlan/connect', function(req, res, next) {
+  res.send({
+    "state": true
+  });
+});
+
+app.post('/network/wlan/disconnect', function(req, res, next) {
+  res.send(true);
+});
 
 app.get('/network/wlan', function(req, res, next) {
 
@@ -199,21 +208,21 @@ app.get('/network/wlan', function(req, res, next) {
 });
 
 app.put('/network/wlan', function(req, res, next) {
-  currentSelectedNetwork = { "interface": "wlan1",
-                      "settings": {
-                          "type": "dhcp",
-                          "wpa-psk": "456",
-                          "wpa-ssid": "STIWIFI24"
-                      },
-                      "state": {
-                        "flags": "69699",
-                        "address": "10.0.3.38",
-                        "maskAddress": "255.255.255.0",
-                        "broadcastAddress": "10.0.3.255",
-                        "macAddress": "74:da:38:41:b7:ac",
-                        "status": "connected"
-                      }
-                    };
+  currentSelectedNetwork = {
+    "interface": "wlan1",
+    "settings":
+    {
+        "type": "dhcp",
+        "wpa-psk": "hgfh",
+        "wpa-ssid": "Chai Guest"
+    },
+    "state":
+    {
+        "macAddress": "74:da:38:41:b7:ac",
+        "status": "not_connected"
+    }
+};
+
   res.send({
     "state": true
   });
@@ -256,6 +265,16 @@ app.post('/device/upload_software_update', upload,function (req, res, next) {
       error: 'Hello world'
     }
   });
+});
+
+app.post('/network/wlan/connect', function(req, res, next) {
+  res.send({
+    "state": true
+  });
+});
+
+app.post('/network/wlan/disconnect', function(req, res, next) {
+  res.send(true);
 });
 
 

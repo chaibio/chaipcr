@@ -24,17 +24,19 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
   'User',
   '$state',
   'NetworkSettingsService',
-  function($scope, $rootScope, $stateParams, User, $state, NetworkSettingsService) {
+  '$interval',
+  function($scope, $rootScope, $stateParams, User, $state, NetworkSettingsService, $interval) {
 
-    $scope.wifiNetworks = {};
-    $scope.currentWifiSettings = {};
-    $scope.ethernetSettings = {};
-    $scope.wirelessError = false;
-
-    $scope.wifiNetworkStatus = ""; // If network is on/off
+    $scope.wifiNetworks = {}; // All available wifi networks
+    $scope.currentWifiSettings = {}; // Current active wifi network [connected to]
+    $scope.ethernetSettings = {}; // Ethernet settings
+    $scope.wirelessError = false;  // Incase no wifi adapter is present in the machine
+    $scope.wifiNetworkStatus = null; // If network is on/off
+    $scope.userSettings = $.jStorage.get('userNetworkSettings');
 
     $scope.$on('new_wifi_result', function() {
       $scope.wifiNetworkStatus = true;
+      $scope.wirelessError = false;
       $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork;
     });
 
@@ -47,32 +49,85 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       $scope.wirelessError = true;
       $scope.wirelessErrorData = NetworkSettingsService.wirelessErrorData;
       $scope.wifiNetworks = {};
+      $scope.currentWifiSettings = {};
     });
 
+    $rootScope.$on('wfif_turned_off', function() {
+      $scope.wifiNetworkStatus = false;
+      $scope.turnOffWifi();
+    });
+
+    $rootScope.$on('wfif_turned_on', function() {
+      $scope.turnOnWifi();
+    });
+
+    $scope.turnOffWifi = function() {
+
+      var stopped = NetworkSettingsService.stop();
+      stopped.then(function(result) {
+        $scope.wifiNetworks = $scope.currentWifiSettings = {};
+        $scope.userSettings = $.jStorage.get('userNetworkSettings');
+      }, function(err) {
+        console.log("Could not disconnect wifi", err);
+      });
+    };
+
+    $scope.turnOnWifi = function() {
+
+      var started = NetworkSettingsService.restart();
+      started.then(function(result) {
+        $scope.userSettings = $.jStorage.get('userNetworkSettings');
+        $scope.init();
+      }, function(err) {
+        console.log("Could not connect wifi", err);
+      });
+    };
+
     $scope.findWifiNetworks = function() {
-      if(! NetworkSettingsService.wirelessError) {
-        NetworkSettingsService.getWifiNetworks().then(function(result) {
+
+      if(! NetworkSettingsService.wirelessError && $scope.userSettings.wifiSwitchOn) {
+        NetworkSettingsService.getWifiNetworks()
+        .then(function(result) {
           if(result.data) {
             $scope.wifiNetworks = result.data.scan_result;
           }
-
         });
       }
     };
 
+    var stop = $interval(function() {
+      
+      if($state.is('settings.networkmanagement')) {
+        $scope.findWifiNetworks();
+      } else {
+        $interval.cancel(stop);
+        stop = null;
+      }
+    }, 10000);
+
     $scope.getSettings = function() {
-        /*NetworkSettingsService.getSettings().then(function(result) {
-          console.log(result);
-          if(result.data.settings) {
-            $scope.currentNetwork = result.data;
-          }
-        });*/
-        //NetworkSettingsService.getSettings();
+      // We may need this method when we refresh right on this page.
+      if($scope.wifiNetworkStatus === null) {
+        NetworkSettingsService.getInitialStatus()
+        .then(function(result) {
+          $scope.wifiNetworkStatus = true;
+          $scope.currentNetwork = result.data;
+        }, function(err) {
+          $scope.wifiNetworkStatus = false;
+        });
+      }
     };
 
-    //$scope.getSettings();
-    NetworkSettingsService.getEtherNetStatus();
-    $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork;
-    $scope.findWifiNetworks();
+    $scope.init = function() {
+
+      if($scope.userSettings.wifiSwitchOn) {
+        $scope.getSettings();
+        $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork;
+        $scope.findWifiNetworks();
+      }
+      NetworkSettingsService.getEtherNetStatus();
+    };
+
+    $scope.init();
   }
 ]);
