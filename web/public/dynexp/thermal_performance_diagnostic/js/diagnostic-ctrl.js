@@ -5,11 +5,12 @@
     'Experiment',
     'Status',
     '$interval',
+    '$timeout',
     'DiagnosticWizardService',
     '$stateParams',
     '$state',
     'CONSTANTS',
-    function ($scope, Experiment, Status, $interval, DiagnosticWizardService, $params, $state, CONSTANTS) {
+    function ($scope, Experiment, Status, $interval, $timeout, DiagnosticWizardService, $params, $state, CONSTANTS) {
 
       $scope.$on('$destroy', function() {
         stopPolling();
@@ -43,8 +44,11 @@
       function updateData (data) {
         animate(angular.copy(temperatureLogs), angular.copy(data));
         temperatureLogs = temperatureLogs.concat(data);
-        $scope.lidTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getLidTemps();
-        $scope.blockTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getBlockTemps();
+
+        $timout(function () {
+          $scope.lidTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getLidTemps();
+          $scope.blockTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getBlockTemps();
+        }, 2500);
         // temperatureLogs = DiagnosticWizardService.temperatureLogs(temperatureLogs).getLast30seconds();
       }
 
