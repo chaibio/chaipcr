@@ -31,6 +31,7 @@
 
       var ERROR_TYPES = ['OFFLINE', 'CANT_CREATE_EXPERIMENT', 'CANT_START_EXPERIMENT', 'LID_OPEN', 'UNKNOWN_ERROR'];
       $scope.errors = {};
+      $scope.CONSTANTS = Constants;
 
       $scope.$on('status:data:updated', function(e, data, oldData) {
         if (!data) return;
@@ -42,16 +43,9 @@
         $scope.state = data.experiment_controller.machine.state;
         $scope.timeRemaining = GlobalService.timeRemaining(data);
 
-        if ($scope.isCollectingData()) {
-          if ($state.current.name === 'page-4')
-            $scope.timeRemaining = $scope.timeRemaining - Constants.PAGE_4_HOLDING_TIME;
-          if ($state.current.name === 'page-6')
-            $scope.timeRemaining = $scope.timeRemaining - Constants.PAGE_6_HOLDING_TIME;
-        }
-
         if ($scope.state === 'paused') {
           var pausedPages = ['page-4', 'page-6', 'page-8'];
-          if (pausedPages.indexOf($state.current.name) !== -1) {
+          if (pausedPages.indexOf($state.current.name) > -1) {
             $scope.next();
           }
         }

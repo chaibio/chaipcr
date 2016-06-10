@@ -5,6 +5,7 @@ var concat = require('gulp-concat');
 var cssnano = require('gulp-cssnano');
 var rename = require('gulp-rename');
 var replace = require('gulp-replace');
+var insert = require('gulp-insert');
 var makeHash = require('./helpers').makeHash;
 var applicationTmpCSS = 'application-tmp';
 var applicationDebugCss = 'application-debug';
@@ -36,12 +37,18 @@ gulp.task('sass', ['clean-css'], function () {
           includePaths: ['./frontend/stylesheets']
         })
         .on('error', sass.logError))
+        .pipe(insert.transform(function (contents, file) {
+          return '/* start of file: ' + file.history[0] + ' */\n' + contents + '\n/* end of file: ' + file.history[0] + ' */\n';
+        }))
         .pipe(gulp.dest('.tmp/css'));
 });
 
 gulp.task('copy-css-tmp', ['clean-css'], function () {
   return gulp.src('./frontend/stylesheets/**/*.css')
-         .pipe(gulp.dest('.tmp/css'));
+             .pipe(insert.transform(function (contents, file) {
+              return '/* start of file: ' + file.history[0] + ' */\n' + contents + '\n/* end of file: ' + file.history[0] + ' */\n';
+             }))
+             .pipe(gulp.dest('.tmp/css'));
 });
 
 gulp.task('concat-css', ['copy-css-tmp', 'sass'], function () {
