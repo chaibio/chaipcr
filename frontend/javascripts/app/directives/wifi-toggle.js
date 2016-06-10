@@ -44,6 +44,7 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
         scope.configureSwitch = function(val) {
 
           if(val) {
+            $rootScope.$broadcast("wfif_turned_on");
             angular.element(scope.dragElem).parent().css("background-color", "#8dc63f");
             angular.element(scope.dragElem).children().css("background-color", "#8dc63f");
             angular.element(scope.dragElem).animate({

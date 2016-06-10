@@ -25,12 +25,14 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
   '$interval',
   'Webworker',
   function($rootScope, $http, $q, host, $interval, Webworker) {
-    var that = this;
-    this.connectedWifiNetwork = {};
-    this.connectedEthernet = {};
-    this.wirelessError = false;
-    this.wirelessErrorData = {};
-    this.connectionStatus = "";
+
+    var that = this, ssid = null;
+    this.connectedWifiNetwork = {}; // If we have connected to a particular network
+    this.connectedEthernet = {}; // Ethernet which we are connected
+    this.wirelessError = false; // If we daont have a wireless connection
+    this.wirelessErrorData = {}; // Data from server while we dont have wifi network
+    this.connectionStatus = null; // Connection Status at the moment
+    this.userSettings = $.jStorage.get('userNetworkSettings');
 
     this.getWifiNetworks = function() {
       var delay = $q.defer();
@@ -43,37 +45,50 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     };
 
     this.getSettings = function() {
-      //var delay = $q.defer();
-      var ssid = null, connectionStatus = null;
 
       $interval(function() {
-        $http.get(host + ':8000/network/wlan').then(function(result) {
-          that.wirelessError = false;
-          if(result.data.settings) {
-            that.connectedWifiNetwork = result.data;
-            console.log(result.data, result.data.state.status)
-            if(ssid !== result.data.settings["wpa-ssid"] || connectionStatus !== result.data.state.status) {
-              ssid = result.data.settings["wpa-ssid"];
-              that.connectionStatus = connectionStatus = result.data.state.status;
-              $rootScope.$broadcast("new_wifi_result");
-            }
-          }
-        }, function(err) {
-          // in case error May be no wireless interface
-          ssid = null, connectionStatus = null;
-          that.connectedWifiNetwork = {};
-          that.connectionStatus = "";
-          that.wirelessError = true;
-          that.wirelessErrorData = err.data.status;
-          $rootScope.$broadcast("wifi_adapter_error");
-        });
+        if(that.userSettings.wifiSwitchOn) {
+          $http.get(host + ':8000/network/wlan')
+          .then(function(result) {
+            that.processData(result);
+          }, function(err) {
+            that.processOnError(err) // in case error ,May be no wireless interface
+          });
+        }
       }, 3000);
-      //return delay.promise;
+    };
+
+    this.processData = function(result) {
+
+      this.wirelessError = false;
+      if(result.data.settings) {
+        this.connectedWifiNetwork = result.data;
+        console.log(result.data, result.data.state.status)
+        var _ssid = result.data.settings["wpa-ssid"];
+        var _connectionStatus = result.data.state.status
+        if(ssid !== _ssid || this.connectionStatus !== _connectionStatus) {
+          ssid = _ssid
+          this.connectionStatus = _connectionStatus;
+          $rootScope.$broadcast("new_wifi_result");
+        }
+      }
+
+    };
+
+    this.processOnError = function(err) {
+
+      ssid = this.connectionStatus = null;
+      this.connectedWifiNetwork = {};
+      this.wirelessError = true;
+      this.wirelessErrorData = err.data.status;
+      $rootScope.$broadcast("wifi_adapter_error");
     };
 
     this.getInitialStatus = function() {
+
       var delay = $q.defer();
-      $http.get(host + ':8000/network/wlan').then(function(result) {
+      $http.get(host + ':8000/network/wlan')
+      .then(function(result) {
         delay.resolve(result);
       }, function(err) {
         delay.reject(err);
@@ -83,7 +98,8 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
 
     this.getEtherNetStatus = function() {
         var delay = $q.defer();
-        $http.get(host + ':8000/network/eth0').then(function(ethernet) {
+        $http.get(host + ':8000/network/eth0')
+        .then(function(ethernet) {
           that.connectedEthernet = ethernet.data;
           $rootScope.$broadcast("ethernet_detected");
         });
@@ -91,7 +107,8 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
 
     this.connectWifi = function(data) {
       var delay = $q.defer();
-      $http.put(host + ':8000/network/wlan', data).then(function(result) {
+      $http.put(host + ':8000/network/wlan', data)
+      .then(function(result) {
         delay.resolve(result);
       }, function(err) {
         delay.reject(err);
@@ -105,7 +122,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     };
 
     this.restart = function() {
-
+      this.userSettings = $.jStorage.get('userNetworkSettings');
     };
 
   }

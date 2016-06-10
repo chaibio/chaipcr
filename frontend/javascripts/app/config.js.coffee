@@ -32,6 +32,11 @@ window.ChaiBioTech.ngApp
     PeriodicUpdate.init()
     NetworkSettingsService.getSettings();
 
+    if not $.jStorage.get('userNetworkSettings')
+      userNetworkSettings =
+        wifiSwitchOn: true
+      $.jStorage.set('userNetworkSettings', userNetworkSettings)
+
     $rootScope.$on '$stateChangeSuccess', (e, toState, params, fromState) ->
       if fromState.name isnt toState.name
         body = angular.element('body')
