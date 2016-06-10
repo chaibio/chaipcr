@@ -45,10 +45,8 @@
         animate(angular.copy(temperatureLogs), angular.copy(data));
         temperatureLogs = temperatureLogs.concat(data);
 
-        $timout(function () {
-          $scope.lidTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getLidTemps();
-          $scope.blockTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getBlockTemps();
-        }, 2500);
+        $scope.lidTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getLidTemps();
+        $scope.blockTemps = DiagnosticWizardService.temperatureLogs(temperatureLogs).getBlockTemps();
         // temperatureLogs = DiagnosticWizardService.temperatureLogs(temperatureLogs).getLast30seconds();
       }
 
@@ -64,9 +62,8 @@
         $scope.max_x = $scope.max_x ||old[old.length-1].temperature_log.elapsed_time;
 
         var x_diff = (data[data.length-1].temperature_log.elapsed_time) - $scope.max_x;
-        var x_increment;
-        // x_increment = x_increment || x_diff/calibration;
-        x_increment = x_diff/calibration;
+        var x_increment = x_diff/calibration;
+        var old_max_x = $scope.max_x;
 
         animation = $interval(function () {
 
@@ -74,8 +71,13 @@
             cancelAnimation();
           }
 
-          if ($scope.max_x/1000 > 30) $scope.min_x = ($scope.min_x*1 + x_increment*1);
-          $scope.max_x += x_increment;
+          if ($scope.max_x/1000 > 30)
+            $scope.min_x = ($scope.min_x*1 + x_increment*1);
+          if ($scope.max_x - old_max_x < x_diff)
+            $scope.max_x += x_increment;
+
+          console.log($scope.max_x)
+
           $scope.$broadcast('update:rainbow:chart');
           calibration_index ++;
         }, duration/calibration);
@@ -125,8 +127,10 @@
         newState = data.experiment_controller.machine.state;
         oldState = oldData !== null ? (ref = oldData.experiment_controller) !== null ? (ref1 = ref.machine) !== null ? ref1.state : void 0 : void 0 : void 0;
         $scope.status = newState === 'running' ? data.experiment_controller.machine.thermal_state : newState;
-        $scope.heat_block_temp = data.heat_block.temperature;
-        $scope.lid_temp = data.lid.temperature;
+        $timeout(function () {
+          $scope.heat_block_temp = data.heat_block.temperature;
+          $scope.lid_temp = data.lid.temperature;
+        }, 2500);
         if (data.experiment_controller.expriment) $scope.elapsedTime = data.experiment_controller.expriment.run_duration;
 
         if (!$scope.experiment) {
@@ -159,6 +163,10 @@
           window.location.assign('/#/settings/');
         });
       };
+
+      getExperiment(function (resp) {
+        $scope.experiment = resp.experiment;
+      });
     }
   ]);
 

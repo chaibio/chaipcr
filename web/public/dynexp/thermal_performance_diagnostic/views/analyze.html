@@ -115,7 +115,7 @@
           <div class="info-title">Time to Heat:</div>
           <div class="info-details"><b>{{analyzedExp.Lid.TotalTime[0]/1000 | secondsDisplay:'display2'}}</b> s</div>
           <div class="img-button">
-            <img ng-src="{{ analyzedExp.Lid.TotalTime/1000[1] ? './images/diagnostic-wizard-check-button.png' : './images/diagnostic-wizard-x-button.png' }}">
+            <img ng-src="{{ analyzedExp.Lid.TotalTime[1] ? './images/diagnostic-wizard-check-button.png' : './images/diagnostic-wizard-x-button.png' }}">
           </div>
         </div>
         <div class="block-text">
