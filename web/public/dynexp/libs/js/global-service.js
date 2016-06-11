@@ -35,23 +35,17 @@
         return holding;
       };
       self.timeRemaining = function(data) {
-        var exp, time, prev;
+        var exp, time;
         if (!data) {
           return 0;
         }
         if (!data.experiment_controller) {
           return 0;
         }
-        if (prev === 0)
-          return 0;
         if (data.experiment_controller.machine.state !== 'idle') {
           exp = data.experiment_controller.expriment;
-          time = (exp.estimated_duration * 1 + exp.paused_duration * 1) - (exp.run_duration * 1);
-          if (time < 0) {
-            time = 0;
-          }
-          prev = time;
-          return time;
+          time = ((exp.estimated_duration*1) + (exp.paused_duration*1)) - (exp.run_duration*1);
+          return time < 0 ? 0 : time;
         } else {
           return 0;
         }
