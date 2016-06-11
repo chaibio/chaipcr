@@ -35,7 +35,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.userSettings = $.jStorage.get('userNetworkSettings');
 
     this.getWifiNetworks = function() {
-      
+
       var delay = $q.defer();
       $http.get(host + ':8000/network/wlan/scan').then(function(data) {
         delay.resolve(data);
@@ -125,6 +125,8 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       var delay = $q.defer();
       $http.post(host + ':8000/network/wlan/disconnect')
       .then(function(result) {
+        that.connectionStatus = ssid = null;
+        that.connectedWifiNetwork = {};
         that.userSettings.wifiSwitchOn = false;
         $.jStorage.set('userNetworkSettings', that.userSettings);
         delay.resolve(result)

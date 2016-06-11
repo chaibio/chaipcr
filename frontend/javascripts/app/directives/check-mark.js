@@ -60,16 +60,20 @@ angular.module('ChaiBioTech').directive("checkMark", [
         });
 
         scope.verify = function() {
-          if(NetworkSettingsService.connectedWifiNetwork.state && NetworkSettingsService.connectedWifiNetwork.state.status === "connected") {
 
-            var connectedNetworkSsid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"].replace(new RegExp('"', 'g'), "");
+          var state = NetworkSettingsService.connectedWifiNetwork.state;
+          if(state && state.status === "connected") {
+            var _ssid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"];
+            var connectedNetworkSsid = _ssid.replace(new RegExp('"', 'g'), "");
             if(connectedNetworkSsid === scope.ssid) {
               angular.element(elem).show();
               scope.connected = true;
             } else {
               angular.element(elem).hide();
             }
+            return;
           }
+          angular.element(elem).hide(); // If not connected, hide it.
         };
 
         scope.verify();

@@ -67,6 +67,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       stopped.then(function(result) {
         $scope.wifiNetworks = $scope.currentWifiSettings = {};
         $scope.userSettings = $.jStorage.get('userNetworkSettings');
+        $state.go('settings.networkmanagement');
       }, function(err) {
         console.log("Could not disconnect wifi", err);
       });
@@ -96,7 +97,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     };
 
     var stop = $interval(function() {
-      
+
       if($state.is('settings.networkmanagement')) {
         $scope.findWifiNetworks();
       } else {
