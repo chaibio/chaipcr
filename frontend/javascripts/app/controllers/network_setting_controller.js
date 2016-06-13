@@ -52,14 +52,15 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       $scope.currentWifiSettings = {};
     });
 
-    $rootScope.$on('wfif_turned_off', function() {
-      $scope.wifiNetworkStatus = false;
-      $scope.turnOffWifi();
-    });
+    $scope.$watch('wifiNetworkStatus', function(val) {
 
-    $rootScope.$on('wfif_turned_on', function() {
-      $scope.turnOnWifi();
-    });
+      if(val) {
+        $scope.turnOnWifi();
+        return;
+      }
+
+      $scope.turnOffWifi();
+    })
 
     $scope.turnOffWifi = function() {
 

@@ -44,14 +44,12 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
         scope.configureSwitch = function(val) {
 
           if(val) {
-            $rootScope.$broadcast("wfif_turned_on");
             angular.element(scope.dragElem).parent().css("background-color", "#8dc63f");
             angular.element(scope.dragElem).children().css("background-color", "#8dc63f");
             angular.element(scope.dragElem).animate({
               left: "11"
             }, 50);
-          } else if(val === false){
-            $rootScope.$broadcast("wfif_turned_off");
+          } else if(val === false) {
             angular.element(scope.dragElem).parent().css("background-color", "#bbbbbb");
             angular.element(scope.dragElem).children().css("background-color", "#bbbbbb");
             angular.element(scope.dragElem).animate({
