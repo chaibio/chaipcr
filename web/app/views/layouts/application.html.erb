@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title ng-bind="pageTitle || 'ChaiPCR'"></title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="/stylesheets/application-debug.css" media="all">
+  <link rel="shortcut icon" href="favicon.ico?v=4" />
+  <script type="text/javascript" src="/javascripts/application-debug.js"></script>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+
+  <div id="container" class="container-fluid">
+    <%= yield %>
+  </div>
+
+</body>
+</html>
