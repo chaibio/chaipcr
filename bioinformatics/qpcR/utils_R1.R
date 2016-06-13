@@ -1076,7 +1076,8 @@ smoothit <- function(x, selfun, pars)
 # all the ', silent = FALSE' were added by xqrm
 baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
                      baseline = NULL, basecyc = NULL, basefac = NULL,
-                     plateau_offset=2 # xqrm: to ensure the junction to plateau is smooth
+                     min_Ct, # xqrm
+                     plateau_offset = 2 # xqrm: to ensure the junction to plateau is smooth
                      )
 { 
   # xqrm
@@ -1109,8 +1110,16 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
         D2seq[!is.finite(D2seq)] <- NA # remove Inf's that mimicked maximum values
         
         min_fluo_cyc <- which.min(fluo)
-        message(sprintf('Cycle with the minimum fluo value: %i.', min_fluo_cyc))
+        if (min_fluo_cyc < min_Ct) {
+          message(sprintf(
+            'Cycle with the minimum fluo value %i is smaller than min_Ct %i. Search again in cycles >= min_Ct.', 
+            min_fluo_cyc, min_Ct))
+          fluo_mutated <- c(rep(max(fluo), times=min_Ct-1), fluo[min_Ct:length(fluo)])
+          min_fluo_cyc <- which.min(fluo_mutated)
+          }
+        message(sprintf('Cycle (>= min_Ct) with the minimum fluo value: %i.', min_fluo_cyc))
         min_fluo_index_in_SEQ <- which.min(abs(SEQ - min_fluo_cyc))
+        
         if (is.na(D2seq[min_fluo_index_in_SEQ])) {
             message('Second derivative at minimum fluo is +/-inf, use all the cycles as baseline.')
             basecyc_last <- length(fluo)

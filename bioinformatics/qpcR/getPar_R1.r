@@ -1,7 +1,12 @@
 # customized by Xiaoqing Rong-Mullins. 2015-10-29.
 # all the ', silent = FALSE' were added by xqrm
 
-getPar <- function(x, type = c("fit", "curve"), cp = "cpD2", eff = "sigfit", ...) 
+# getPar <- function(x, type = c("fit", "curve"), cp = "cpD2", eff = "sigfit", ...) # ori
+# xqrm
+getPar <- function(
+    x, type = c("fit", "curve"), cp = "cpD2", eff = "sigfit",
+    min_Ct,
+    ...) 
 {
   
   # xqrm: start counting for running time
@@ -50,8 +55,9 @@ getPar <- function(x, type = c("fit", "curve"), cp = "cpD2", eff = "sigfit", ...
     ## efficiency and threshold cycles  
     if (type == "curve") {
       outNAME <- switch(cp, "cpD2" = "cpD2", "cpD1" = "cpD1", "maxE" = "cpE", "expR" = "cpR", "Cy0" = "Cy0", "CQ" = "cpCQ", "maxRatio" = "cpMR", stop())
-      tempRES <- tryCatch(efficiency(tempMOD, plot = FALSE, type = cp, ...), 
+      # tempRES <- tryCatch(efficiency(tempMOD, plot = FALSE, type = cp, ...), # ori
                           #error = function(e) NA) # ori
+      tempRES <- tryCatch(efficiency(tempMOD, plot = FALSE, type = cp, min_Ct = min_Ct, ...), # xqrm
                           error = err_NA) # xqrm
       tempCT <- tryCatch(tempRES[[outNAME]], 
                          #error = function(e) NA) # ori

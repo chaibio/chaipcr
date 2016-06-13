@@ -5,6 +5,7 @@ type = "cpD2",
 thresh = NULL, 
 shift = 0, 
 amount = NULL,
+min_Ct, # xqrm
 ...) 
 {  
     if (!is.numeric(type)) type <- match.arg(type, c("cpD2", "cpD1", "maxE", "expR", "Cy0", "CQ", "maxRatio"))
@@ -30,7 +31,17 @@ amount = NULL,
     maxD1 <- which.max(D1seq)     
     maxD2 <- which.max(D2seq)      
     cycmaxD1 <- SEQ[maxD1]      
-    cycmaxD2 <- SEQ[maxD2]     
+    # cycmaxD2 <- SEQ[maxD2]     # ori
+    
+    # xqrm: minimum Ct cutoff for method(s) "cpD2"
+    cycs_ge_cutoff <- (SEQ >= min_Ct)
+    min_D2_value = na.omit(min(D2seq))
+    D2seq_mutated <- c(
+        rep(min_D2_value, times=sum(!cycs_ge_cutoff)),
+        D2seq[cycs_ge_cutoff])
+    maxD2_cyc_above_cutoff <- which.max(D2seq_mutated)
+    cycmaxD2 <- SEQ[maxD2_cyc_above_cutoff]
+    
     
     if (!is.null(thresh)) type <- "cpD2"        
     
