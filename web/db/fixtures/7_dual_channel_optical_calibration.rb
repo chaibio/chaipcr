@@ -1,4 +1,4 @@
-ExperimentDefinition.seed(:guid) do |s|
+experiment_definition = ExperimentDefinition.seed(:guid) do |s|
   s.name = "Dual Channel Optical Calibration"
   s.guid = "dual_channel_optical_cal"
   s.experiment_type = ExperimentDefinition::TYPE_CALIBRATION
@@ -12,3 +12,18 @@ ExperimentDefinition.seed(:guid) do |s|
      {step:{name:"HEX",temperature:65,hold_time:20,collect_data:true}}
    ]}}]}
 end
+
+# set the protocol lid temperature to 110
+protocol = Protocol.seed(:experiment_definition_id) do |s|
+  s.lid_temperature = 110
+  s.experiment_definition_id = experiment_definition[0].id
+end
+
+# remove the first Swap
+steps = Step.where("name=?  AND stage_id=?", "Swap", protocol[0].stages[0].id)
+
+if steps.length == 2
+  steps[0].destroy
+end
+
+
