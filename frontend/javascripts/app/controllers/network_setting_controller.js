@@ -1,4 +1,4 @@
-/*
+fa/*
  * Chai PCR - Software platform for Open qPCR and Chai's Real-Time PCR instruments.
  * For more information visit http://www.chaibio.com
  *
@@ -63,7 +63,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     })
 
     $scope.turnOffWifi = function() {
-
+      //Turns off wifi
       var stopped = NetworkSettingsService.stop();
       stopped.then(function(result) {
         $scope.wifiNetworks = $scope.currentWifiSettings = {};
@@ -75,7 +75,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     };
 
     $scope.turnOnWifi = function() {
-
+      //Turns on wifi
       var started = NetworkSettingsService.restart();
       started.then(function(result) {
         $scope.userSettings = $.jStorage.get('userNetworkSettings');
@@ -98,7 +98,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     };
 
     var stop = $interval(function() {
-
+      // Find all the available wifi networks in the vicinity
       if($state.is('settings.networkmanagement')) {
         $scope.findWifiNetworks();
       } else {
