@@ -27,7 +27,8 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
       templateUrl: 'app/views/directives/gather-data-toggle.html',
 
       scope: {
-        data: '=wirelessStatus'
+        data: '=wirelessStatus',
+        noDevice: '=noWifiAdapter'
       },
 
       link: function(scope, elem, attr) {
@@ -37,24 +38,32 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
           scope.configureSwitch(val);
         });
 
+        scope.$watch('noDevice', function(val, oldVal) {
+          if(val) {
+            scope.dragElem.draggable('disable');
+          }
+        });
+
         scope.clickHandler = function() {
           scope.sendData();
         };
 
         scope.configureSwitch = function(val) {
 
-          if(val) {
-            angular.element(scope.dragElem).parent().css("background-color", "#8dc63f");
-            angular.element(scope.dragElem).children().css("background-color", "#8dc63f");
-            angular.element(scope.dragElem).animate({
-              left: "11"
-            }, 50);
-          } else if(val === false) {
-            angular.element(scope.dragElem).parent().css("background-color", "#bbbbbb");
-            angular.element(scope.dragElem).children().css("background-color", "#bbbbbb");
-            angular.element(scope.dragElem).animate({
-              left: "1"
-            }, 50);
+          if(scope.noDevice === false) {
+            if(val) {
+              angular.element(scope.dragElem).parent().css("background-color", "#8dc63f");
+              angular.element(scope.dragElem).children().css("background-color", "#8dc63f");
+              angular.element(scope.dragElem).animate({
+                left: "11"
+              }, 50);
+            } else if(val === false) {
+              angular.element(scope.dragElem).parent().css("background-color", "#bbbbbb");
+              angular.element(scope.dragElem).children().css("background-color", "#bbbbbb");
+              angular.element(scope.dragElem).animate({
+                left: "1"
+              }, 50);
+            }
           }
 
         };
@@ -73,11 +82,12 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
         };
 
         scope.sendData = function() {
-
-          if(scope.data) {
-            scope.data = !scope.data;
-          } else {
-            scope.data = true;
+          if(scope.noDevice === false) {
+            if(scope.data) {
+              scope.data = !scope.data;
+            } else {
+              scope.data = true;
+            }
           }
         };
 

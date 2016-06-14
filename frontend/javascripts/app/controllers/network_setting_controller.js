@@ -45,22 +45,29 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     });
 
     $rootScope.$on('wifi_adapter_error', function() {
+      $scope.whenNoWifiAdapter();
+    });
+
+    $scope.whenNoWifiAdapter = function() {
+
       $scope.wifiNetworkStatus = false;
       $scope.wirelessError = true;
       $scope.wirelessErrorData = NetworkSettingsService.wirelessErrorData;
       $scope.wifiNetworks = {};
       $scope.currentWifiSettings = {};
-    });
+    };
 
     $scope.$watch('wifiNetworkStatus', function(val) {
 
-      if(val) {
-        $scope.turnOnWifi();
-        return;
-      }
+      if($scope.wirelessError === false) {
+        if(val) {
+          $scope.turnOnWifi();
+          return;
+        }
 
-      $scope.turnOffWifi();
-    })
+        $scope.turnOffWifi();
+      }
+    });
 
     $scope.turnOffWifi = function() {
       //Turns off wifi
@@ -121,6 +128,11 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     };
 
     $scope.init = function() {
+
+      if(NetworkSettingsService.wirelessError) {
+        $scope.whenNoWifiAdapter();
+        return;
+      }
 
       if($scope.userSettings.wifiSwitchOn) {
         $scope.getSettings();

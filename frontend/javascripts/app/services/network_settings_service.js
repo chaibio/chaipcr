@@ -48,7 +48,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.getSettings = function() {
 
       $interval(function() {
-        if(that.userSettings.wifiSwitchOn) {
+        if(that.userSettings.wifiSwitchOn && that.wirelessError === false) {
           $http.get(host + ':8000/network/wlan')
           .then(function(result) {
             that.processData(result);
@@ -121,7 +121,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     };
 
     this.stop = function() {
-
+      console.log("called up");
       var delay = $q.defer();
       $http.post(host + ':8000/network/wlan/disconnect')
       .then(function(result) {
@@ -152,5 +152,13 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       return delay.promise;
     };
 
+    var initialStatus = this.getInitialStatus();
+
+    initialStatus.then(function() {
+      console.log("Network is fine .. !");
+    }, function(err) {
+      console.log("No Wifi Interface .. !");
+      that.processOnError(err)
+    });
   }
 ]);
