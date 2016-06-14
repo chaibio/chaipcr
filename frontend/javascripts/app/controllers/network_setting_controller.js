@@ -1,4 +1,4 @@
-fa/*
+/*
  * Chai PCR - Software platform for Open qPCR and Chai's Real-Time PCR instruments.
  * For more information visit http://www.chaibio.com
  *
