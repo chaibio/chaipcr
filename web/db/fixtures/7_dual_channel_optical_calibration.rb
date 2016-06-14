@@ -22,7 +22,7 @@ end
 # remove the first Swap
 steps = Step.where("name=?  AND stage_id=?", "Swap", protocol[0].stages[0].id)
 
-if steps.length == 2
+if steps.length == 3
   steps[0].destroy
 end
 
