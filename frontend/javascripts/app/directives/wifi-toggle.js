@@ -33,6 +33,7 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
 
       link: function(scope, elem, attr) {
         scope.show = true;
+        scope.inProgress = false;
 
         scope.$watch("data", function(val, oldVal) {
           scope.configureSwitch(val);
@@ -44,28 +45,37 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
           }
         });
 
+        scope.$on('wifi_restarted', function() {
+            scope.inProgress = false;
+        });
+
+        scope.$on('wifi_stopped', function() {
+            scope.inProgress = false;
+        });
+
         scope.clickHandler = function() {
           scope.sendData();
         };
 
         scope.configureSwitch = function(val) {
 
-          if(scope.noDevice === false) {
+          if(scope.noDevice === false && scope.inProgress === false) {
             if(val) {
               angular.element(scope.dragElem).parent().css("background-color", "#8dc63f");
               angular.element(scope.dragElem).children().css("background-color", "#8dc63f");
               angular.element(scope.dragElem).animate({
                 left: "11"
               }, 50);
+              scope.inProgress = true;
             } else if(val === false) {
               angular.element(scope.dragElem).parent().css("background-color", "#bbbbbb");
               angular.element(scope.dragElem).children().css("background-color", "#bbbbbb");
               angular.element(scope.dragElem).animate({
                 left: "1"
               }, 50);
+              scope.inProgress = true;
             }
           }
-
         };
 
         scope.processMovement = function(pos, val) {
@@ -82,7 +92,7 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
         };
 
         scope.sendData = function() {
-          if(scope.noDevice === false) {
+          if(scope.noDevice === false && scope.inProgress === false) {
             if(scope.data) {
               scope.data = !scope.data;
             } else {
