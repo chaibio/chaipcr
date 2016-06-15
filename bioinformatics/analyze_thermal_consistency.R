@@ -87,8 +87,9 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
                        WHERE experiment_id=%d AND stage_id=%d',
                        exp_id, stage_id)
     mcd_channel <- dbGetQuery(db_conn, mcd_qry)
+    dbDisconnect(db_conn)
     channels <- unique(mcd_channel[,'channel'])
-    if (length(channels) > 1) mc_w72c_out <- mc_w72c_out[c(1,3)]
+    if (length(channels) > 1) mc_w72c_out <- mc_w72c_out[c(1,3)] # 'tm_check' and 'delta_Tm' only, no '72c_fluorescence'
     
     if (out_json) mc_w72c_out <- toJSON(mc_w72c_out)
     

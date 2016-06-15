@@ -750,11 +750,18 @@ dense_factor = 10 # xqrm
   ### cubic spline fitting and Friedman's Supersmoother
   ### on the first derivative curve
   # SPLFN <- try(splinefun(TEMP, FLUO), silent = TRUE) # ori
+  # xqrm: start
+  TEMP_na_omit <- na.omit(TEMP)
+  length_TEMP_na_omit <- length(TEMP_na_omit)
+  FLUO_smoothed <- supsmu(TEMP, FLUO, span = span.smooth / dense_factor)$y
+  length_FLUO_smoothed <- length(FLUO_smoothed)
+  length_spl <- min(length_TEMP_na_omit, length_FLUO_smoothed)
   SPLFN <- try(
     splinefun(
-      na.omit(TEMP), 
-      supsmu(TEMP, FLUO, span = span.smooth / dense_factor)$y), 
-    silent = FALSE) # xqrm
+      TEMP_na_omit[1:length_spl], 
+      FLUO_smoothed[1:length_spl] ), 
+    silent = FALSE)
+  # xqrm: end
   if (inherits(SPLFN, "try-error")) return()
   seqTEMP <- seq(
     min(TEMP, na.rm = TRUE), 
