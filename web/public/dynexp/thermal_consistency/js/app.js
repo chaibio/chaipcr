@@ -16,9 +16,7 @@
 
   App.run([
     'Status',
-    'GlobalService',
-    '$rootScope',
-    function (Status, GlobalService, $rootScope) {
+    function (Status) {
       Status.startSync();
     }
   ]);
