@@ -28,6 +28,10 @@ class UserToken < ActiveRecord::Base
      (!token.blank?)? Digest::SHA1.hexdigest(token) : nil
   end
   
+  def user
+    User.unscoped{ super }
+  end
+  
   def token
     return @token
   end
