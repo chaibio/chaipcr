@@ -38,25 +38,25 @@
         if (!oldData) return;
         if (!oldData.experiment_controller) return;
 
+        var old_step = oldData.experiment_controller.expriment? oldData.experiment_controller.expriment.step.name: null;
+        var new_step = data.experiment_controller.expriment? data.experiment_controller.expriment.step.name: null;
+
+        if (new_step !== old_step && data.experiment_controller.expriment) {
+          console.log('-------');
+          console.log(data.experiment_controller.expriment.step);
+          console.log('collect_data: ' + data.optics.collect_data);
+          console.log('state: ' + data.experiment_controller.machine.state);
+        }
+
         $scope.data = data;
         $scope.state = data.experiment_controller.machine.state;
         $scope.timeRemaining = GlobalService.timeRemaining(data);
-        $scope.isWarmingUp = data.experiment_controller.expriment? (data.experiment_controller.expriment.step.name === 'Warm Up') : false
-
-        // if ($scope.isCollectingData()) {
-        //   if ($state.current.name === 'page-4')
-        //     $scope.timeRemaining = $scope.timeRemaining - Constants.PAGE_4_HOLDING_TIME;
-        //   if ($state.current.name === 'page-6')
-        //     $scope.timeRemaining = $scope.timeRemaining - Constants.PAGE_6_HOLDING_TIME;
-        // }
+        $scope.isWarmingUp = data.experiment_controller.expriment? (data.experiment_controller.expriment.step.name === 'Warm Up') : false;
 
         if ($scope.state === 'paused') {
           var pausedPages = ['page-4', 'page-6', 'page-8'];
           if (pausedPages.indexOf($state.current.name) > -1) {
-            // if ($state.current.name === 'page-8')
-            //   Experiment.resumeExperiment()
-            // else
-              $scope.next();
+            $scope.next();
           }
         }
 
@@ -71,14 +71,13 @@
 
         var this_exp_id = $scope.experiment? $scope.experiment.id : null;
         var running_exp_id = oldData.experiment_controller.expriment? oldData.experiment_controller.expriment.id : null;
-        var is_current_exp = parseInt(this_exp_id) === parseInt(running_exp_id) && (running_exp_id !== null);
+        var is_current_exp = parseInt(this_exp_id) === parseInt(running_exp_id) && !!running_exp_id;
 
         if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle') &&  is_current_exp) {
           // experiment is complete
           Experiment.get($scope.experiment.id).then(function (resp) {
             $scope.experiment = resp.data.experiment;
-            var params = {id: $scope.experiment.id}
-            console.log(params);
+            var params = {id: $scope.experiment.id};
             if( $scope.experiment.completion_status !== 'success') {
               $state.go('page-9', params);
             }
@@ -196,7 +195,6 @@
             Experiment.startExperiment(resp.data.experiment.id)
               .then(function() {
                 $scope.experiment = resp.data.experiment;
-                console.log($scope.experiment);
                 $scope.errors = {};
                 $scope.next();
               })

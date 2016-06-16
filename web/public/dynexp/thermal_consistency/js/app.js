@@ -14,9 +14,14 @@
     'wizard.header',
   ]);
 
-  App.run(['Status', function (Status) {
-    Status.startSync();
-  }]);
+  App.run([
+    'Status',
+    'GlobalService',
+    '$rootScope',
+    function (Status, GlobalService, $rootScope) {
+      Status.startSync();
+    }
+  ]);
 
   App.value('host', 'http://' + window.location.hostname);
 
