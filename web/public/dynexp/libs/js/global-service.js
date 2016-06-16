@@ -8,6 +8,17 @@
       var holding = false;
       var max_delta_tm_cache = null;
 
+      self.isDualChannel = function (cb) {
+        $http.get('/capabilities')
+        .then(function (resp) {
+          var it_is = resp.data.capabilities.optics.emission_channels.length === 2;
+          cb(it_is);
+        })
+        .catch(function () {
+          cb(false);
+        });
+      };
+
       self.baseUrl = "http://" + window.location.hostname;
 
       self.isHolding = function(data, experiment) {
