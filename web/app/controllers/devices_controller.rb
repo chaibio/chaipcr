@@ -106,7 +106,7 @@ class DevicesController < ApplicationController
         @experiments = Experiment.includes(:experiment_definition).where(id: Experiment.select("MAX(experiments.id)").joins(:experiment_definition).where("experiment_definitions.experiment_type = ? AND experiments.completion_status != ?", ExperimentDefinition::TYPE_DIAGNOSTIC, "aborted").group("experiment_definitions.id"))
         passed_diagnostics = Array.new
         for experiment in @experiments
-          if experiment.completion_status == "success" && experiment.analyze_status == "success"
+          if experiment.diagnostic_passed?
             passed_diagnostics << experiment.experiment_definition.guid
           end
         end
@@ -117,7 +117,7 @@ class DevicesController < ApplicationController
             if experiment_index == nil
               status = "Not performed"
             else
-              status = (@experiments[experiment_index].completion_status == "success" && @experiments[experiment_index].analyze_status == "success")? "Pass" : "Fail"
+              status = (@experiments[experiment_index].diagnostic_passed?)? "Pass" : "Fail"
             end
             result += "<tr><td>#{test_guid}</td><td style='color:#{(status == "Pass")? "green" : "red"}'>#{status}</td></tr>"
           end
@@ -192,7 +192,7 @@ class DevicesController < ApplicationController
       return
     end
     if !Device.device_signature.blank? && Device.device_signature == params["signature"]
-       render json: {url: login_path(:token=>User.maintenance_user.token)}, status: :ok
+      render json: {url: login_path(:token=>User.maintenance_user.token)}, status: :ok
     else
       render json: {errors: "Device cannot be login because device signature doesn't match"}, status: 400
     end
