@@ -2,7 +2,7 @@
 <html lang="en" ng-app="OpticalCalibrationApp">
 <head>
   <meta charset="UTF-8">
-  <title>Optical Calibration</title>
+  <title>Optical Diagnostic</title>
   <link rel="stylesheet" href="../libs/css/bootstrap.css">
   <link rel="stylesheet" href="../libs/css/wizard-header.css">
   <link rel="stylesheet" href="./css/fonts.css">
@@ -37,7 +37,7 @@
 <body class="optical-calibration" ng-controller="OpticalCalibrationCtrl">
   <div id="container">
     <div class="page-layout">
-    <wizard-header experiment-id="experiment.id" on-cancel="cancelExperiment()" cancel-text="CANCEL TEST">OPTICAL TEST</wizard-header>
+    <wizard-header experiment-id="experiment.id" on-cancel="cancelExperiment()" cancel-text="CANCEL TEST">Optical Diagnostic</wizard-header>
     <div class="content">
       <div ui-view></div>
       <div class="text-center errorMessage" ng-if="getErrors().length > 0">

@@ -1,7 +1,7 @@
 <div class="intro page-9" ng-controller="AnalyzeCtrl">
 
-  <h2 class="text-center text-success" ng-show="experiment.completion_status === 'success' && !analyzing && isPassed()">Optical Test Passed</h2>
-  <h2 class="text-center text-danger" ng-show="(!isPassed() || experiment.completion_status !== 'success') && !analyzing">Optical Test Failed</h2>
+  <h2 class="text-center text-success" ng-show="experiment.completion_status === 'success' && !analyzing && isPassed()">Optical Diagnostic Passed</h2>
+  <h2 class="text-center text-danger" ng-show="(!isPassed() || experiment.completion_status !== 'success') && !analyzing">Optical Diagnostic Failed</h2>
 
   <h4 class="text-center" ng-show="analyzing">
     <img src="../libs/images/loading.gif">

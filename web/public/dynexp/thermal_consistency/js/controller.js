@@ -24,6 +24,10 @@
       $scope.isFinite = isFinite;
       $('.content').addClass('analyze');
 
+      GlobalService.isDualChannel(function (it_is) {
+        $scope.is_dual_channel = it_is;
+      });
+
       function getExperiment(exp_id, cb) {
         Experiment.get(exp_id).then(function (resp) {
           $scope.experiment = resp.data.experiment;

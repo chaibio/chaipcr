@@ -25,7 +25,7 @@ class DevicesController < ApplicationController
   
   skip_before_action :verify_authenticity_token, :except=>[:root_password]
   before_filter :allow_cors, :except=>[:root_password]
-  before_filter :ensure_authenticated_user, :except=>[:show, :serial_start, :update, :clean, :unserialize, :software_update, :empty]
+  before_filter :ensure_authenticated_user, :except=>[:show, :serial_start, :update, :clean, :unserialize, :login, :software_update, :empty]
   
   respond_to :json
   
@@ -106,7 +106,7 @@ class DevicesController < ApplicationController
         @experiments = Experiment.includes(:experiment_definition).where(id: Experiment.select("MAX(experiments.id)").joins(:experiment_definition).where("experiment_definitions.experiment_type = ? AND experiments.completion_status != ?", ExperimentDefinition::TYPE_DIAGNOSTIC, "aborted").group("experiment_definitions.id"))
         passed_diagnostics = Array.new
         for experiment in @experiments
-          if experiment.completion_status == "success" && experiment.analyze_status == "success"
+          if experiment.diagnostic_passed?
             passed_diagnostics << experiment.experiment_definition.guid
           end
         end
@@ -117,7 +117,7 @@ class DevicesController < ApplicationController
             if experiment_index == nil
               status = "Not performed"
             else
-              status = (@experiments[experiment_index].completion_status == "success" && @experiments[experiment_index].analyze_status == "success")? "Pass" : "Fail"
+              status = (@experiments[experiment_index].diagnostic_passed?)? "Pass" : "Fail"
             end
             result += "<tr><td>#{test_guid}</td><td style='color:#{(status == "Pass")? "green" : "red"}'>#{status}</td></tr>"
           end
@@ -183,6 +183,18 @@ class DevicesController < ApplicationController
       render json: {response: "Device is unserialized"}, status: :ok
     else
       render json: {errors: "Device cannot be unserialized because device signature doesn't match"}, status: 400
+    end
+  end
+
+  def login
+    if !Device.valid?
+      render json: {errors: "Device file is not found or corrupted"}, status: 500
+      return
+    end
+    if !Device.device_signature.blank? && Device.device_signature == params["signature"]
+      render json: {url: login_path(:token=>User.maintenance_user.token)}, status: :ok
+    else
+      render json: {errors: "Device cannot be login because device signature doesn't match"}, status: 400
     end
   end
   

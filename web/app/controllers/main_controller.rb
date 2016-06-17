@@ -38,7 +38,10 @@ class MainController < ApplicationController
 
   api :GET, "/login", "Show this page when there are users in the database and user is not logged in"
   def login
-    if !User.empty?
+    if !params[:token].blank?
+      cookies.permanent[:authentication_token] = params[:token]
+      redirect_to root_path
+    elsif !User.empty?
       render :login
     else
       redirect_to welcome_path
