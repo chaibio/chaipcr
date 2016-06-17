@@ -18,19 +18,20 @@
       var checkMachineStatusInterval = null;
       var errorModal = null;
       var pages = [
-        'page-1',
-        'page-2',
-        'page-3',
-        'page-4',
-        'page-5',
-        'page-6',
-        'page-7',
-        'page-8',
-        'page-9',
+        'intro',
+        'prepare-the-tubes',
+        'insert-water-strips',
+        'heating-and-reading-water',
+        'insert-fam-strips',
+        'reading-fam',
+        'insert-hex-strips',
+        'reading-hex',
+        'analyze',
       ];
 
       var ERROR_TYPES = ['OFFLINE', 'CANT_CREATE_EXPERIMENT', 'CANT_START_EXPERIMENT', 'LID_OPEN', 'UNKNOWN_ERROR', 'ANOTHER_EXPERIMENT_RUNNING'];
       $scope.errors = {};
+      $scope.Constants = Constants;
 
       $scope.$on('status:data:updated', function(e, data, oldData) {
         if (!data) return;
@@ -41,12 +42,12 @@
         var old_step = oldData.experiment_controller.expriment? oldData.experiment_controller.expriment.step.name: null;
         var new_step = data.experiment_controller.expriment? data.experiment_controller.expriment.step.name: null;
 
-        if (new_step !== old_step && data.experiment_controller.expriment) {
-          console.log('-------');
-          console.log(data.experiment_controller.expriment.step);
-          console.log('collect_data: ' + data.optics.collect_data);
-          console.log('state: ' + data.experiment_controller.machine.state);
-        }
+        // if (new_step !== old_step && data.experiment_controller.expriment) {
+        //   console.log('-------');
+        //   console.log(data.experiment_controller.expriment.step);
+        //   console.log('collect_data: ' + data.optics.collect_data);
+        //   console.log('state: ' + data.experiment_controller.machine.state);
+        // }
 
         $scope.data = data;
         $scope.state = data.experiment_controller.machine.state;
@@ -54,7 +55,7 @@
         $scope.isWarmingUp = data.experiment_controller.expriment? (data.experiment_controller.expriment.step.name === 'Warm Up') : false;
 
         if ($scope.state === 'paused') {
-          var pausedPages = ['page-4', 'page-6', 'page-8'];
+          var pausedPages = ['heating-and-reading-water', 'reading-fam', 'reading-hex'];
           if (pausedPages.indexOf($state.current.name) > -1) {
             $scope.next();
           }
@@ -79,12 +80,12 @@
             $scope.experiment = resp.data.experiment;
             var params = {id: $scope.experiment.id};
             if( $scope.experiment.completion_status !== 'success') {
-              $state.go('page-9', params);
+              $state.go('analyze', params);
             }
             else {
               Experiment.analyze($scope.experiment.id)
               .then(function (resp) {
-                $state.go('page-9', params);
+                $state.go('analyze', params);
                 $scope.result = resp.data;
                 $scope.valid = true;
                 for (var i = resp.data.valid.length - 1; i >= 0; i--) {
@@ -97,7 +98,7 @@
                   $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
               })
               .catch(function () {
-                $state.go('page-9', params);
+                $state.go('analyze', params);
               });
             }
           });
@@ -166,18 +167,23 @@
       };
 
       $scope.blockHeatPercentage = function() {
-        var blockHeat = $scope.getBlockHeat();
+        var blockHeat = $scope.getHeatBlockTemp();
         if (!blockHeat) return 0;
         if (!$scope.experiment) return 0;
         return ($scope.data.heat_block.temperature / blockHeat);
       };
 
-      $scope.getBlockHeat = function() {
-        if (!$scope.experiment) return;
-        if (!$scope.experiment.protocol.stages[0]) return;
-        if (!$scope.experiment.protocol.stages[0].stage.steps[0]) return;
-        if (!$scope.currentStep()) return;
-        return $scope.currentStep().temperature;
+      $scope.getHeatBlockTemp = function() {
+        if(!$scope.data) return 0;
+        if(!$scope.data.heat_block) return 0;
+        if(!$scope.data.heat_block.zone1) return 0;
+        if(!$scope.data.heat_block.zone2) return 0;
+        var temp = ($scope.data.heat_block.zone1.temperature*1 + $scope.data.heat_block.zone2.temperature*1) / 2;
+        var target = ($scope.data.heat_block.zone1.target_temperature*1 + $scope.data.heat_block.zone2.target_temperature*1) / 2;
+        return {
+          temperature: temp,
+          target: target
+        };
       };
 
       $scope.next = function() {

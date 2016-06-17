@@ -19,7 +19,7 @@
 </div>
 
 <div class="step-3" ng-show="isWarmingUp">
-  <p class="step"><b>STEP 4</b>/9</p>
+  <p class="step"><b>STEP 3</b>/9</p>
   <h2>Heating</h2>
 
   <div class="machine-heating-icon">
@@ -30,15 +30,12 @@
 
   <div class="text-center">
     <p class="wait">PLEASE WAIT:</p>
-    <p class="heating">
+    <p class="heating" ng-show="getHeatBlockTemp().target === 0">
       The lid is heating to <b>{{data.lid.target_temperature | round: 1}}&deg;</b>C <br>
     </p>
-    <!-- <p class="note">
-      This will take about one minute
-    </p> -->
-    <!-- <p class="heating" ng-show="state === 'running'">
-      Warming the instrument at <b>{{getBlockHeat() | round: 1}}&deg;</b>C <br>
-    </p> -->
+    <p class="heating" ng-show="getHeatBlockTemp().target > 0">
+      Warming heat block to <b>{{getHeatBlockTemp().target | round: 1}}&deg;</b>C <br>
+    </p>
     <p class="note" ng-show="state === 'running'">
       Estimated remaining time <b>{{ timeRemaining | secondsDisplay: 'display2'}}</b>
     </p>

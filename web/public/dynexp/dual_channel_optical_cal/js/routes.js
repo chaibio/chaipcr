@@ -5,44 +5,44 @@
     '$urlRouterProvider',
     function ($stateProvider, $urlRouterProvider) {
 
-      $urlRouterProvider.otherwise('/introduction');
+      $urlRouterProvider.otherwise('/intro');
 
       $stateProvider
-      .state('page-1', {
-        url: '/introduction',
-        templateUrl: './views/page-1.html'
+      .state('intro', {
+        url: '/intro',
+        templateUrl: './views/intro.html'
       })
-      .state('page-2', {
-        url: '/step-1',
-        templateUrl: './views/page-2.html'
+      .state('prepare-the-tubes', {
+        url: '/prepare-the-tubes',
+        templateUrl: './views/prepare-the-tubes.html'
       })
-      .state('page-3', {
-        url: '/step-2',
-        templateUrl: './views/page-3.html'
+      .state('insert-water-strips', {
+        url: '/insert-water-strips',
+        templateUrl: './views/insert-water-strips.html'
       })
-      .state('page-4', {
-        url: '/step-3',
-        templateUrl: './views/page-4.html'
+      .state('heating-and-reading-water', {
+        url: '/heating-and-reading-water',
+        templateUrl: './views/heating-and-reading-water.html'
       })
-      .state('page-5', {
-        url: '/step-4',
-        templateUrl: './views/page-5.html'
+      .state('insert-fam-strips', {
+        url: '/insert-fam-strips',
+        templateUrl: './views/insert-fam-strips.html'
       })
-      .state('page-6', {
-        url: '/step-5',
-        templateUrl: './views/page-6.html'
+      .state('reading-fam', {
+        url: '/reading-fam',
+        templateUrl: './views/reading-fam.html'
       })
-      .state('page-7', {
-        url: '/step-6',
-        templateUrl: './views/page-7.html'
+      .state('insert-hex-strips', {
+        url: '/insert-hex-strips',
+        templateUrl: './views/insert-hex-strips.html'
       })
-      .state('page-8', {
-        url: '/step-7',
-        templateUrl: './views/page-8.html'
+      .state('reading-hex', {
+        url: '/reading-hex',
+        templateUrl: './views/reading-hex.html'
       })
-      .state('page-9', {
+      .state('analyze', {
         url: '/analyze/:id',
-        templateUrl: './views/page-9.html'
+        templateUrl: './views/analyze.html'
       });
 
     }
