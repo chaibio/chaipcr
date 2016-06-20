@@ -1,10 +1,11 @@
-{
-  "serial_number":"T0003",
-  "device_signature":"ZjzGFBdWDYWqyg8ljSUKbLLCFEDCcL1UVWpkkS9euA3GZsMQ9CqV0VRjAmEsd-yx8U3S5Pr63YBkUOGcOm0HzlRlM4k7JLErxMfP-p966bPvJ9QLnf7Mfhky8v5JZrn_M9Mh-zQDkwjV3KXEBaNi3_nup_NxeXw2lgRrMKBOz4OxbKXOsfAriDmV75BnVTH656O44pWE9TzwBf_VQExIuTzE7WMq06BybSj0DaMbmJkJ8Hr-FEMucnXmC9qfmHahT_G4BmnAOZQmTAHB3sBSFqpYClVVeBV3I8bU-Et1UwvF-XSasEYNqZ0yOuZ6D5-FOgjJxyl-f4QxXAwCgIh2dYSIrbONJykup3xJk0Ob743pfkbD6buD71ubr4Qu77MerDiCbJiUXQaC7_HE5VHD9Kr-tNV-nQEu5490X91dWnL4SKxrY6cNNby2fAzbpxHAtiq5EYN7sjB_Ho0TyodRzhuXMROUMmxe-iYHhuJ1ZilBsnPXnKU8oDD0tAxZtMaOy_rE06aPP_EyBlqpz9cHmRITQOJVJJRs_P2rQe8hDrS9WTQBggYOnJvldn0HBzmDxEAqtZJROQ8p9HC7fiYAJE_YpstJ0Gic9mKUW7rppYQzSpmI10yGULzGrZ77Hc-3RktBwwX7N2bU1T2WCFaYc_5DO_jPPEK8YS58NS0ltQM=",
+{ 
+  "serial_number":null,
+  "device_signature":null,
   "model_number":"A1005",
   "processor_architecture":"armv7l",
   "software":{
-      "version":"1.0.1b","platform":"S0100"
+    "version":"1.0.3",
+    "platform":"S0100"
     },
-    "software_release_variant":"stable"
-  }
+  "software_release_variant":"stable"
+}
