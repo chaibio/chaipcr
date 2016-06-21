@@ -66,7 +66,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
         $scope.showProperties = false
 
     $scope.$on 'status:data:updated', (e, data, oldData) ->
-      $scope.lidOpen = data?.lid?.open
+      $scope.lidOpen = data?.optics?.lod_open
       state = data?.experiment_controller?.machine?.state
       oldState = oldData?.experiment_controller?.machine?.state
       $scope.getExperiment() if state isnt oldState
