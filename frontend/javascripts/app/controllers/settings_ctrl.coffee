@@ -28,6 +28,7 @@ window.App.controller 'SettingsCtrl', [
       $scope.user = resp.data.user
 
     Device.getVersion().then (data) ->
+      console.log data
       if data.software_release_variant == "beta"
         $scope.isBeta = true
 

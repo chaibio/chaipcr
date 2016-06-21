@@ -48,7 +48,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.getSettings = function() {
 
       $interval(function() {
-        if(that.userSettings.wifiSwitchOn) {
+        if(that.userSettings.wifiSwitchOn && that.wirelessError === false) {
           $http.get(host + ':8000/network/wlan')
           .then(function(result) {
             that.processData(result);
@@ -129,6 +129,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
         that.connectedWifiNetwork = {};
         that.userSettings.wifiSwitchOn = false;
         $.jStorage.set('userNetworkSettings', that.userSettings);
+        $rootScope.$broadcast("wifi_stopped");
         delay.resolve(result)
       }, function(err) {
         delay.reject(err);
@@ -144,6 +145,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       .then(function(result) {
         that.userSettings.wifiSwitchOn = true;
         $.jStorage.set('userNetworkSettings', that.userSettings);
+        $rootScope.$broadcast("wifi_restarted");
         delay.resolve(result);
       }, function(err) {
         delay.reject(err);
@@ -152,5 +154,13 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       return delay.promise;
     };
 
+    var initialStatus = this.getInitialStatus();
+
+    initialStatus.then(function() {
+      console.log("Network is fine .. !");
+    }, function(err) {
+      console.log("No Wifi Interface .. !");
+      that.processOnError(err)
+    });
   }
 ]);
