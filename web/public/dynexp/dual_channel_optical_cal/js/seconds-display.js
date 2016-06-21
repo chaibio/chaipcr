@@ -12,6 +12,7 @@ App.service('SecondsDisplay', [
   function ($window) {
     this.getSecondsComponents = function(secs) {
       var days, hours, mins, seconds;
+      secs = secs > 0 ? secs : 0;
       secs = Math.round(secs);
       mins = Math.floor(secs / 60);
       seconds = secs - mins * 60;

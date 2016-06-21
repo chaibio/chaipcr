@@ -1,5 +1,5 @@
-<div class="step-5" ng-show="!isWarmingUp">
-  <p class="step"><b>STEP 3</b>/9</p>
+<div class="step-5" ng-show="!isWarmingUp && data.optics.collect_data === 'true'">
+  <p class="step"><b>STEP 4</b>/9</p>
   <h2>Reading Fluorescence</h2>
   <div class="machine-icon">
     <img src="./images/machine-idle.png">
@@ -9,7 +9,7 @@
   <div class="text-center">
     <p class="wait">FLUORESCENCE MEASUREMENT IS NEARLY COMPLETE:</p>
     <p class="heating">
-      <span>Less than {{ timeRemaining | secondsDisplay: 'display4' }} remaining</span>
+      <span>Less than {{ timeRemaining - Constants.READING_WATER_OFFSET | secondsDisplay: 'display4' }} remaining</span>
     </p>
     <p class="dont-open">
       Please don't open the machine during this step.
@@ -37,7 +37,7 @@
       Warming heat block to <b>{{getHeatBlockTemp().target | round: 1}}&deg;</b>C <br>
     </p>
     <p class="note" ng-show="state === 'running'">
-      Estimated remaining time <b>{{ timeRemaining | secondsDisplay: 'display2'}}</b>
+      Estimated remaining time <b>{{ timeRemaining - Constants.HEATING_WATER_OFFSET | secondsDisplay: 'display2'}}</b>
     </p>
     <p class="dont-open">
       Please don't open the machine during this step.
