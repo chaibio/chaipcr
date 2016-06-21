@@ -738,7 +738,9 @@ FLUO = NULL,
 span.smooth = NULL,
 span.peaks = NULL,
 is.deriv = FALSE,
-Tm.opt = NULL)
+Tm.opt = NULL,
+dense_factor = 10 # xqrm
+)
 {
   ### set dataframes to zero
   meltDATA <- NULL
@@ -747,11 +749,27 @@ Tm.opt = NULL)
   
   ### cubic spline fitting and Friedman's Supersmoother
   ### on the first derivative curve
-  SPLFN <- try(splinefun(TEMP, FLUO), silent = TRUE)
+  # SPLFN <- try(splinefun(TEMP, FLUO), silent = TRUE) # ori
+  # xqrm: start
+  TEMP_na_omit <- na.omit(TEMP)
+  length_TEMP_na_omit <- length(TEMP_na_omit)
+  FLUO_smoothed <- supsmu(TEMP, FLUO, span = span.smooth / dense_factor)$y
+  length_FLUO_smoothed <- length(FLUO_smoothed)
+  length_spl <- min(length_TEMP_na_omit, length_FLUO_smoothed)
+  SPLFN <- try(
+    splinefun(
+      TEMP_na_omit[1:length_spl], 
+      FLUO_smoothed[1:length_spl] ), 
+    silent = FALSE)
+  # xqrm: end
   if (inherits(SPLFN, "try-error")) return()
-  seqTEMP <- seq(min(TEMP, na.rm = TRUE), max(TEMP, na.rm = TRUE), length.out = 10 * length(TEMP))
-  # meltDATA <- cbind(meltDATA, Fluo = SPLFN(seqTEMP)) # ori
-  meltDATA <- cbind(meltDATA, Fluo = supsmu(seqTEMP, SPLFN(seqTEMP), span = span.smooth)$y) # xqrm: smooth raw fluo
+  seqTEMP <- seq(
+    min(TEMP, na.rm = TRUE), 
+    max(TEMP, na.rm = TRUE), 
+    # length.out = 10 * length(TEMP)) # ori
+    length.out = dense_factor * length(TEMP)) # xqrm
+  meltDATA <- cbind(meltDATA, Fluo = SPLFN(seqTEMP)) # ori
+  # meltDATA <- cbind(meltDATA, Fluo = supsmu(seqTEMP, SPLFN(seqTEMP), span = span.smooth)$y) # xqrm: smooth raw fluo
   tempDATA <- cbind(tempDATA, Temp = seqTEMP)
   if (!is.deriv) derivVEC <- SPLFN(seqTEMP, deriv = 1) else derivVEC <- -SPLFN(seqTEMP, deriv = 0)
   SMOOTH <-  try(supsmu(seqTEMP, derivVEC, span = span.smooth), silent = TRUE)

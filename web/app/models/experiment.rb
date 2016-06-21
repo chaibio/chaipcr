@@ -86,6 +86,10 @@ class Experiment < ActiveRecord::Base
     experiment_definition.experiment_type == ExperimentDefinition::TYPE_DIAGNOSTIC
   end
   
+  def diagnostic_passed?
+    diagnostic? && completion_status == "success" && analyze_status == "success"
+  end
+  
   def name
     experiment_definition.name
   end

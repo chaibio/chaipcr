@@ -16,7 +16,9 @@ SNR_FAM_CH2_MAX <- 0.99
 SNR_HEX_CH1_MAX <- 0.70
 SNR_HEX_CH2_MIN <- 0.85
 
-WATER_MAX <- c(35000, 6000) # channel 1, channel 2
+# fluo values: channel 1, channel 2
+WATER_MAX <- c(35000, 6000)
+WATER_MIN <- c(2500, 800)
 
 
 # signal-to-noise ratio discriminants for each well
@@ -62,22 +64,6 @@ analyze_optical_test_dual_channel <- function(
     names(fluo_list) <- calib_labels
     
     
-    # FAM_1max <- max(fluo_list[['channel_1']][1,])
-    # FAM_1min <- min(fluo_list[['channel_1']][1,])
-    # FAM_2max <- max(fluo_list[['channel_1']][2,])
-    # HEX_2max <- max(fluo_list[['channel_2']][2,])
-    # HEX_2min <- min(fluo_list[['channel_2']][2,])
-    # HEX_1max <- max(fluo_list[['channel_2']][1,])
-    
-    # dye_list <<- list(
-        # 'channel_1' = (
-               # (FAM_1max - FAM_1min) / FAM_1max < FAM_MTMAX_1MAX_1MIN_1MAX
-            # && (FAM_1min - FAM_2max) / FAM_1min > FAM_MTMIN_1MIN_2MAX_1MIN ),
-        # 'channel_2' = (
-               # (HEX_2max - HEX_2min) / HEX_2max < HEX_MTMAX_2MAX_2MIN_2MAX
-            # && (HEX_2min - HEX_1max) / HEX_2min > HEX_MTMIN_2MIN_1MAX_2MIN ) )
-    
-    
     bool_list <- list()
     bool_mtx_dim <- c(num_channels, num_wells)
     
@@ -85,7 +71,9 @@ analyze_optical_test_dual_channel <- function(
     
     bool_list[['water']] <- do.call(rbind, lapply(
         1:num_channels, 
-        function(channel) fluo_list[['water']][channel,] < WATER_MAX[channel] ))
+        function(channel) {
+            fluos_wc <- fluo_list[['water']][channel,]
+            fluos_wc < WATER_MAX[channel] & fluos_wc > WATER_MIN[channel] }))
     
     for (calib_label in calib_labels_FAM_HEX) {
         bool_list[[calib_label]] <- do.call(cbind, lapply(
@@ -95,6 +83,7 @@ analyze_optical_test_dual_channel <- function(
                 water_fluo_2chs <- fluo_list[['water']][,well_i]
                 snr_2chs <- (signal_fluo_2chs - water_fluo_2chs) / signal_fluo_2chs # element-wise operations
                 dscrmnts_snr[[calib_label]](snr_2chs) } )) }
+    
     
     names(calib_labels) <- c('baseline', 'FAM', 'HEX', 'water')
     results <- lapply(

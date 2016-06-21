@@ -26,7 +26,10 @@ class User < ActiveRecord::Base
   
   ROLE_ADMIN    = "admin"
   ROLE_USER     = "user"
+  ROLE_MAINTENANCE = "maintenance"
 
+  default_scope { where("role != ?", ROLE_MAINTENANCE) }
+  
   before_create do |user|
     user.role = ROLE_USER if user.role.nil?
   end
@@ -39,8 +42,12 @@ class User < ActiveRecord::Base
     self.create(:role=>ROLE_ADMIN, :name=>"Factory", :email=>"factory@factory.com", :password=>"factory", :password_confirmation=>"factory")
   end
   
+  def self.maintenance_user
+    self.unscoped.where(:role=>ROLE_MAINTENANCE).first
+  end
+  
   def admin?
-    self.role == ROLE_ADMIN
+    self.role == ROLE_ADMIN || self.role == ROLE_MAINTENANCE
   end
   
   def role=(value)

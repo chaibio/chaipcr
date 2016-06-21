@@ -19,10 +19,11 @@ protocol = Protocol.seed(:experiment_definition_id) do |s|
   s.experiment_definition_id = experiment_definition[0].id
 end
 
-# remove the first Swap
+# In a previous version of this seed, there was an extra Swap step inserted between "Warm Up" and 
+# "Water". This has since been removed from the seed, and the below removes it on previously seeded
+# devices
 steps = Step.where("name=?  AND stage_id=?", "Swap", protocol[0].stages[0].id)
-
-if steps.length == 2
+if steps.length == 3
   steps[0].destroy
 end
 
