@@ -39,16 +39,6 @@
         if (!oldData) return;
         if (!oldData.experiment_controller) return;
 
-        var old_step = oldData.experiment_controller.expriment? oldData.experiment_controller.expriment.step.name: null;
-        var new_step = data.experiment_controller.expriment? data.experiment_controller.expriment.step.name: null;
-
-        // if (new_step !== old_step && data.experiment_controller.expriment) {
-        //   console.log('-------');
-        //   console.log(data.experiment_controller.expriment.step);
-        //   console.log('collect_data: ' + data.optics.collect_data);
-        //   console.log('state: ' + data.experiment_controller.machine.state);
-        // }
-
         $scope.data = data;
         $scope.state = data.experiment_controller.machine.state;
         $scope.timeRemaining = GlobalService.timeRemaining(data);
