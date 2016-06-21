@@ -60,11 +60,14 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
 
         scope.manageAction = function() {
 
-          if(scope.state === "NOT_STARTED" && !scope.lidOpen) {
+          if(scope.state === "NOT_STARTED" && scope.lidOpen === false) {
             scope.runReady = !scope.runReady;
-          } else if(!scope.lidOpen){
-            $state.go('run-experiment', {id: $stateParams.id, chart: 'amplification', max_cycle: scope.maxCycle});
+            return;
           }
+          if(scope.state === "NOT_STARTED" && scope.lidOpen === true) {
+            return;
+          }
+          $state.go('run-experiment', {id: $stateParams.id, chart: 'amplification', max_cycle: scope.maxCycle});
         };
 
         scope.startExp = function() {
