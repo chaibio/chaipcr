@@ -44,7 +44,7 @@ melt_1cr <- function(floor_temp,
         return(fluo_1cr_pch)
         })
     
-    mc_w1cr <- list('mc_tm'=mc_tm, '1cr_fluorescence'=fluo_1cr) # each element is a list whose each element represents a channel
+    mc_w1cr <- list('mc_tm'=mc_tm, '1cr_fluorescence'=fluo_1cr, 'num_channels'=mc_out[['num_channels']]) # each element is a list whose each element represents a channel
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]

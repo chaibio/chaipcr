@@ -144,16 +144,16 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
     
     message('max_temp: ', max_temp)
     
+    mcd_qry <- sprintf('SELECT channel
+                           FROM melt_curve_data 
+                           WHERE experiment_id=%d AND stage_id=%d',
+                           exp_id, stage_id)
+    mcd_channel <- dbGetQuery(db_conn, mcd_qry)
+    channels <- unique(mcd_channel[,'channel'])
+    num_channels <- length(channels)
+    
     # { # pre-deconvolution, process all available channels
-    # mcd_qry <- sprintf('SELECT channel
-                           # FROM melt_curve_data 
-                           # WHERE experiment_id=%d AND stage_id=%d',
-                           # exp_id, stage_id)
-    # mcd_channel <- dbGetQuery(db_conn, mcd_qry)
-    
-    # channels <- unique(mcd_channel[,'channel'])
     # names(channels) <- channels
-    
     # if (length(channels) == 1) dcv <- FALSE
     # }
     
@@ -202,6 +202,7 @@ process_mc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecti
     if (extra_output) {
         mc_out <- list( # each element is a list whose each element represents a channel
                        'mc_bywell'=mc_out_pp[['pre_consoli']], # each channel element is a list whose each element is a well
+                       'num_channels'=num_channels, 
                        'fc_wT'=fc_wT_bych, 'pre_dcv_fc_wT'=pre_dcv_fc_wT_bych # each channel element of fc_wT or pre_dcv_fc_wT_bych is a matrix formatted as input for `meltcurve` by qpcR, where columns are alternating 'temp' and 'fluo'.
                        )
     } else mc_out <- mc_out_pp[['pre_consoli']]

@@ -48,7 +48,7 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
     
     # names(mc_w72c) <- c('mc_tm', '72c_fluorescence')
     
-    mc_w72c_simplified <- lapply(mc_w72c, function(ele) ele[[as.character(channel)]])
+    mc_w72c_simplified <- lapply(mc_w72c[c('mc_tm', '1cr_fluorescence')], function(ele) ele[[as.character(channel)]])
     
     mc_w72c_out <- list('tm_check'=list(), '72c_fluorescence'=list())
     min_Tm <- 100
@@ -76,20 +76,7 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
     mc_w72c_out[['delta_Tm']] <- list(unbox(delta_Tm), unbox(delta_Tm <= MAX_DELTA_TM_VAL))
     
     # check whether the experiment is single-channel, if not, don't output '72c_fluorescence'
-    db_conn <- dbConnect(RMySQL::MySQL(), 
-                         user=db_usr, 
-                         password=db_pwd, 
-                         host=db_host, 
-                         port=db_port, 
-                         dbname=db_name)
-    mcd_qry <- sprintf('SELECT channel
-                       FROM melt_curve_data 
-                       WHERE experiment_id=%d AND stage_id=%d',
-                       exp_id, stage_id)
-    mcd_channel <- dbGetQuery(db_conn, mcd_qry)
-    dbDisconnect(db_conn)
-    channels <- unique(mcd_channel[,'channel'])
-    if (length(channels) > 1) mc_w72c_out <- mc_w72c_out[c(1,3)] # 'tm_check' and 'delta_Tm' only, no '72c_fluorescence'
+    if (mc_w72c['num_channels'] > 1) mc_w72c_out <- mc_w72c_out[c(1,3)] # 'tm_check' and 'delta_Tm' only, no '72c_fluorescence'
     
     if (out_json) mc_w72c_out <- toJSON(mc_w72c_out)
     
