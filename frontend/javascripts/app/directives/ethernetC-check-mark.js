@@ -27,58 +27,31 @@ angular.module('ChaiBioTech').directive("ethernetCheckMark", [
       replace: true,
       templateUrl: 'app/views/directives/check-mark.html',
       scope: {
-        currentNetwork: "=currentNetwork",
-        ssid: "@ssid"
+        networkName: "@name"
       },
 
       link: function(scope, elem, attrs) {
 
-        /*angular.element(elem).hide();
         scope.connected = false;
-        scope.selected = false;
+        angular.element(elem).hide();
 
-        scope.setSelected = function(myName, _ssid) {
-          if(myName === _ssid) {
-            scope.selected = true;
-          } else {
-            scope.selected = false;
-          }
-        };
-
-        if($state.is('settings.networkmanagement.wifi')) {
-          var _ssid = scope.ssid.replace(new RegExp(" ", "g"), "_");
-          scope.setSelected($state.params.name, _ssid);
-        }
-
-        scope.$on('$stateChangeStart', function(event, toState, toParams) {
-          var _ssid = scope.ssid.replace(new RegExp(" ", "g"), "_");
-          scope.setSelected(toParams.name, _ssid);
-        });
-
-        scope.$on("new_wifi_result", function() {
+        scope.$on('ethernet_detected', function() {
           scope.verify();
         });
 
         scope.verify = function() {
 
-          var state = NetworkSettingsService.connectedWifiNetwork.state;
-          if(state && state.status === "connected") {
-            var _ssid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"];
-            var connectedNetworkSsid = _ssid.replace(new RegExp('"', 'g'), "");
-            if(connectedNetworkSsid === scope.ssid) {
-              angular.element(elem).show();
-              scope.connected = true;
-            } else {
-              angular.element(elem).hide();
-            }
+          var ethernet = NetworkSettingsService.connectedEthernet;
+          if(ethernet.settings) {
+            scope.connected = true;
+            angular.element(elem).show();
             return;
           }
-          angular.element(elem).hide(); // If not connected, hide it.
+          angular.element(elem).hide();
         };
 
-        scope.verify();*/
+        scope.verify();
       }
-
     };
   }
 ]);

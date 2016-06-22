@@ -94,7 +94,6 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
           $scope.buttonValue = "CONNECT";
           $scope.statusMessage = "Monkeys broke in and stole everything. Couldn't connect";
           break;
-
       }
     };
 
