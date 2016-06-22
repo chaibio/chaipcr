@@ -29,15 +29,15 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     $scope.buttonValue = "CONNECT";
     $scope.IamConnected = false;
     $scope.statusMessage = "";
-    $scope.connectedWifiNetwork = {};
+    $scope.currentNetwork = {};
 
     $scope.$on('new_wifi_result', function() {
 
-      if(NetworkSettingsService.connectedWifiNetwork.state.status === "connected") {
+      if(NetworkSettingsService.currentNetwork.state.status === "connected") {
         $scope.statusMessage = "";
         $state.go('settings.networkmanagement');
       } else {
-        $scope.configureAsStatus(NetworkSettingsService.connectedWifiNetwork.state.status);
+        $scope.configureAsStatus(NetworkSettingsService.currentNetwork.state.status);
       }
     });
 
@@ -47,14 +47,23 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
       'type': "dhcp"
     };
 
-    if(NetworkSettingsService.connectedWifiNetwork.settings && NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"]) {
-      $scope.connectedSsid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"].replace(new RegExp('"', "g"), "");
+    var wifiConnection = NetworkSettingsService.connectedWifiNetwork;
+    if(wifiConnection.settings && wifiConnection.settings["wpa-ssid"]) {
+      $scope.connectedSsid = wifiConnection.settings["wpa-ssid"].replace(new RegExp('"', "g"), "");
       if($state.params.name.replace(new RegExp('_', "g"), " ") === $scope.connectedSsid) {
-        if(NetworkSettingsService.connectedWifiNetwork.state.status === "connected") {
-          $scope.connectedWifiNetwork = NetworkSettingsService.connectedWifiNetwork;
+        if(wifiConnection.state.status === "connected") {
+          $scope.currentNetwork = wifiConnection;
           $scope.IamConnected = true;
-          console.log($scope.connectedWifiNetwork);
+          console.log($scope.currentNetwork);
         }
+      }
+    }
+
+    var ethernetConnection = NetworkSettingsService.connectedEthernet;
+    if(ethernetConnection.state) {
+      if($state.params.name.replace(new RegExp('_', "g"), " ") === "ethernet") {
+        $scope.IamConnected = true;
+        $scope.currentNetwork = ethernetConnection;
       }
     }
 

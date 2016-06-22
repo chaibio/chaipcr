@@ -162,7 +162,6 @@ var defaultSelected = {
 }, currentSelectedNetwork = null;
 
 app.get('/status', function (req, res, next) {
-  data.lid = {open: false};
   res.send(data);
 });
 app.get('/device', function(req, res, next) {
@@ -192,19 +191,19 @@ app.post('/network/wlan/disconnect', function(req, res, next) {
 
 app.get('/network/wlan', function(req, res, next) {
 
-  /*if(currentSelectedNetwork === null) {
+  if(currentSelectedNetwork === null) {
       res.send(defaultSelected);
   } else {
     res.send(currentSelectedNetwork);
-  }*/
-  res.status(405).send({
+  }
+  /*res.status(405).send({
             "status":
             {
                 "status": "false",
                 "error": "No WIFI interface is present"
             }
           }
-        );
+        );*/
 });
 
 app.put('/network/wlan', function(req, res, next) {

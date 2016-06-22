@@ -129,6 +129,8 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
 
     $scope.init = function() {
 
+      NetworkSettingsService.getEtherNetStatus();
+
       if(NetworkSettingsService.wirelessError) {
         $scope.whenNoWifiAdapter();
         return;
@@ -139,7 +141,6 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
         $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork;
         $scope.findWifiNetworks();
       }
-      NetworkSettingsService.getEtherNetStatus();
     };
 
     $scope.init();

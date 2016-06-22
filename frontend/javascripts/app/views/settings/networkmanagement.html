@@ -24,6 +24,7 @@
     <div class="user-data">
       <ul>
         <li>
+          <ethernet-check-mark current-network="currentNetwork" ssid="{{wifiNetwork.ssid}}"></ethernet-check-mark>
           <a class="bold-letter" ui-sref="settings.networkmanagement.wifi({name: 'ethernet'})" ui-sref-active="highlite">ETHERNET</a>
           <span ng-if="ethernetSettings.state.macAddress" class="mac-address-span">MAC ADDRESS:<span> {{ethernetSettings.state.macAddress}}</span></span>
         </li>
