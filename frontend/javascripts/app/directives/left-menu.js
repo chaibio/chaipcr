@@ -18,8 +18,8 @@
  */
 
 window.ChaiBioTech.ngApp.directive('leftMenu', [
-
-  function() {
+  '$rootScope',
+  function($rootScope) {
     return {
 
       restric: "E",
@@ -30,7 +30,19 @@ window.ChaiBioTech.ngApp.directive('leftMenu', [
       controller: 'ExperimentMenuOverlayCtrl',
 
       link: function($scope, elem) {
-        
+
+        $scope.confirmStatus = false;
+
+        $scope.$on("runReady:true", function() {
+          $scope.confirmStatus = true;
+        });
+
+        angular.element(elem).click(function(e) {
+          if($scope.confirmStatus === true && e.target.innerHTML !== "RUN EXPERIMENT") {
+            $rootScope.$broadcast("runReady:false");
+            $scope.confirmStatus = false;
+          }
+        });
       }
     };
   }

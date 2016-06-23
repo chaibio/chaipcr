@@ -23,7 +23,8 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
   '$rootScope',
   'Status',
   'Experiment',
-  function($state, $stateParams, $rootScope, Status, Experiment){
+  '$rootScope',
+  function($state, $stateParams, $rootScope, Status, Experiment, $rootScope){
     return {
       restrict: 'EA',
       replace: true,
@@ -58,10 +59,21 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
           scope.runReady = false;
         });
 
+        // Incase user has confirm box shown and user clicks somewhere else in the sidemenu
+        $rootScope.$on("runReady:false", function() {
+          scope.$apply(function() { // only reason we apply it here, so that speeds up the action.
+            scope.runReady = false;
+          });
+
+        });
+
         scope.manageAction = function() {
 
           if(scope.state === "NOT_STARTED" && scope.lidOpen === false) {
             scope.runReady = !scope.runReady;
+            if(scope.runReady === true) {
+              $rootScope.$broadcast("runReady:true");
+            }
             return;
           }
           if(scope.state === "NOT_STARTED" && scope.lidOpen === true) {

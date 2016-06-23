@@ -20,5 +20,5 @@
   <span class="exp-message" ng-if="message == 'RUN EXPERIMENT'" ng-class="{'lid-open': lidOpen && message == 'RUN EXPERIMENT'}" ng-click="manageAction()">{{message}}</span>
   <span class="exp-message" ng-if="message != 'RUN EXPERIMENT'" ng-click="manageAction()" toggle-sidemenu>{{message}}</span>
   <span class="B2 lid-open-message" ng-if="lidOpen"><br>Lid is open</span>
-  <button ng-show="runReady" ng-click="startExp()" ng-class="{'ng-hide': !runReady}" toggle-sidemenu class="B1 success">CONFIRM</button>
+  <button ng-show="runReady" id="confirm-start-exp" ng-click="startExp()" ng-class="{'ng-hide': !runReady}" toggle-sidemenu class="B1 success">CONFIRM</button>
 </div>
