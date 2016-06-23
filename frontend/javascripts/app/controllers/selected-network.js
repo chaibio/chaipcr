@@ -54,7 +54,6 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
         if(wifiConnection.state.status === "connected") {
           $scope.currentNetwork = wifiConnection;
           $scope.IamConnected = true;
-          console.log($scope.currentNetwork);
         }
       }
     }
