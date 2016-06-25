@@ -290,8 +290,10 @@ baseline_ct <- function(amp_calib,
     ac_mtx <- amp_calib$ac_mtx
     signal_water_diff <- amp_calib$signal_water_diff
     
-    if (dim(ac_mtx)[1] <= 2) {
-        message('Two or fewer cycles of fluorescence data are available. Baseline subtraction and calculation of Ct and amplification efficiency cannot be performed.')
+    num_cycles <- dim(ac_mtx)[1]
+    
+    if (num_cycles < min_Ct) {
+        message(sprintf('Number of available cycles (%i) of fluorescence data is less than `min_Ct` (%i). Baseline subtraction and calculation of Ct and amplification efficiency are not performed.', num_cycles, min_Ct))
         num_wells <- dim(ac_mtx)[2] - 1
         ct_eff <- matrix(NA, nrow=2, ncol=num_wells, 
                          dimnames=list(c('ct', 'eff'), colnames(ac_mtx)[2:(num_wells+1)]))
