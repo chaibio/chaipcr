@@ -31,10 +31,12 @@ angular.module("canvasApp").factory('stepGraphics', [
       this.stepNameText = stepName;
       this.stepName = new fabric.Text(stepName, {
           fill: 'white',  fontSize: 12,  top : 20,  left: -1,  fontFamily: "dinot-regular",  selectable: false,
-          originX: 'left', originY: 'top'
+          originX: 'left', originY: 'top',
+          //shadow: 'rgba(0,0,0,0.4) 5px 5px 7px'
         }
       );
 
+      //this.stepName.setShadow(this.shadow);
       return this;
     };
 
@@ -103,15 +105,18 @@ angular.module("canvasApp").factory('stepGraphics', [
 
       this.deltaSymbol = this.autoDeltaStartCycle = new fabric.Text('Δ', {
           fill: 'white',  fontSize: 14,  top : 338,  left: 10,  fontFamily: "dinot",  selectable: false,
-          originX: 'left', originY: 'top', fontWeight: 'bold', visible: false
+          originX: 'left', originY: 'top', fontWeight: 'bold', visible: false,
+          shadow: 'rgba(0,0,0,0.4) 5px 5px 7px'
         }
       );
+
 
       this.autoDeltaTempTime = new fabric.Text('-0.15ºC, +5.0s', {
           fill: 'white',  fontSize: 12,  top : 0, left: 0,  fontFamily: "dinot-regular",  selectable: false,
           originX: 'left', originY: 'top'
         }
       );
+
       this.autoDeltaStartCycle = new fabric.Text('Start Cycle: 5', {
           fill: 'white',  fontSize: 12,  top : 15,  left: 0,  fontFamily: "dinot-bold",  selectable: false,
           originX: 'left', originY: 'top',
@@ -209,6 +214,7 @@ angular.module("canvasApp").factory('stepGraphics', [
         hasBoarders: false, name: "stepGroup",  me: this, originX: 'left', originY: 'top'
       });
     };
+
 
     return this;
   }

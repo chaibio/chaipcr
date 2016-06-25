@@ -39,6 +39,7 @@ angular.module("canvasApp").factory('step', [
       this.gatherDataDuringStep = this.model.collect_data;
       this.gatherDataDuringRamp = this.model.ramp.collect_data;
       this.shrinked = false;
+      this.shadowText = "0px 1px 2px rgba(0, 0, 0, 0.5)";
 
       this.setLeft = function() {
 
@@ -210,7 +211,20 @@ angular.module("canvasApp").factory('step', [
         this.canvas.add(this.hitPoint);
         this.canvas.add(this.closeImage);
         this.canvas.add(this.dots);
+
+        this.setShadows();
+
         this.addCircle();
+      };
+
+      this.setShadows = function() {
+
+        this.stepName.setShadow(this.shadowText);
+        this.deltaSymbol.setShadow(this.shadowText);
+        this.autoDeltaTempTime.setShadow(this.shadowText);
+        this.autoDeltaStartCycle.setShadow(this.shadowText);
+        this.numberingTextCurrent.setShadow(this.shadowText);
+        this.numberingTextTotal.setShadow(this.shadowText);
       };
 
       this.manageFooter = function(color) {

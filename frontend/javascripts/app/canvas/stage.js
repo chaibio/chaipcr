@@ -40,6 +40,7 @@ angular.module("canvasApp").factory('stage', [
       this.previousStage = this.nextStage = this.noOfCycles = null;
       this.insertMode = insert;
       this.shrinked = false;
+      this.shadowText = "0px 1px 2px rgba(0, 0, 0, 0.5)";
 
       this.setNewWidth = function(add) {
 
@@ -304,7 +305,16 @@ angular.module("canvasApp").factory('stage', [
           stageGraphics.createStageGroup.apply(this, [stageContents]);
           this.canvas.add(this.stageGroup);
           this.canvas.add(this.dots);
+
+          this.setShadows();
+
           this.addSteps();
+      };
+
+      this.setShadows = function() {
+
+        this.stageName.setShadow(this.shadowText);
+        this.stageCaption.setShadow(this.shadowText);
       };
 
       this.manageBordersOnSelection = function(color) {
