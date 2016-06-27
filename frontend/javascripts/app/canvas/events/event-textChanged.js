@@ -39,7 +39,6 @@ angular.module("canvasApp").factory('textChanged', [
 
         if(textOriginal.search(/\n/) !== -1) {
           Myobj.text = textOriginal.replace(/(\n)/gm, "");
-          console.log("bingo", Myobj.type);
           Myobj.trigger('text:editing:exited');
           C.canvas.renderAll();
         }

@@ -68,7 +68,15 @@ angular.module("canvasApp").factory('stepTemperature', [
       this.postEdit = function() {
 
         editMode.tempActive = false;
-        var tempFloat = Math.abs(parseFloat(this.text.text.replace("º", ""))) || $scope.step.temperature;
+        var tempFloat, tempNo = parseFloat(this.text.text.replace("º", ""));
+
+
+        if(tempNo === 0) {
+          tempFloat = 0;
+        } else {
+          tempFloat = Math.abs(parseFloat(this.text.text.replace("º", ""))) || $scope.step.temperature;
+        }
+
         $scope.step.temperature = (tempFloat > 100) ? 100.0 :  tempFloat;
 
         ExperimentLoader.changeTemperature($scope).then(function(data) {
