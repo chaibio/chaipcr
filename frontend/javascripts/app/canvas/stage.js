@@ -63,6 +63,11 @@ angular.module("canvasApp").factory('stage', [
         // Move stage to left ...!!
       };
 
+      this.addHitBlock = function() {
+
+        
+      };
+
       this.expand = function() {
 
         this.myWidth = this.myWidth + 64;

@@ -64,7 +64,6 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       this.wirelessError = false;
       if(result.data.settings) {
         this.connectedWifiNetwork = result.data;
-        console.log(result.data, result.data.state.status)
         var _ssid = result.data.settings["wpa-ssid"];
         var _connectionStatus = result.data.state.status
         if(ssid !== _ssid || this.connectionStatus !== _connectionStatus) {

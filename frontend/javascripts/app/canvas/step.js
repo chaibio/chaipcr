@@ -57,6 +57,7 @@ angular.module("canvasApp").factory('step', [
         this.hitPoint.setVisible(false); // This is important. If we dont hide hitPoint it couses unwanted step to be selected.
         this.moveOtherStepsInStage();
         this.parentStage.shrinkStage();
+        this.parentStage.addHitBlock(); // We need this to add stage , by noving a step to empty plce between stages.
       };
 
       this.moveOtherStepsInStage = function() {
