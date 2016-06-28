@@ -34,6 +34,8 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     $scope.wifiNetworkStatus = null; // If network is on/off
     $scope.userSettings = $.jStorage.get('userNetworkSettings');
 
+    NetworkSettingsService.getSettings();
+
     $scope.$on('new_wifi_result', function() {
       $scope.wifiNetworkStatus = true;
       $scope.wirelessError = false;

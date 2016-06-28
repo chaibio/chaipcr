@@ -33,8 +33,9 @@ angular.module("canvasApp").factory('canvas', [
   'circleManager',
   'dots',
   'interceptorFactory',
+  'stageHitBlock',
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
-    moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory) {
+    moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageHitBlock) {
 
     this.init = function(model) {
 
@@ -133,8 +134,10 @@ angular.module("canvasApp").factory('canvas', [
 
         this.stepIndicator = moveStepRect.getMoveStepRect(this);
         this.stageIndicator = moveStageRect.getMoveStageRect(this);
+        this.hitBlock = stageHitBlock.getStageHitBlock(this)
         this.canvas.add(this.stepIndicator);
         this.canvas.add(this.stageIndicator);
+        this.canvas.add(this.hitBlock);
         this.addMoveDots();
     };
 

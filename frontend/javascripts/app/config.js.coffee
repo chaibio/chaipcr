@@ -30,7 +30,6 @@ window.ChaiBioTech.ngApp
 
     Status.startSync()
     PeriodicUpdate.init()
-    NetworkSettingsService.getSettings();
 
     if not $.jStorage.get('userNetworkSettings')
       userNetworkSettings =

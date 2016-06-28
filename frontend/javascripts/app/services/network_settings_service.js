@@ -33,6 +33,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.wirelessErrorData = {}; // Data from server while we dont have wifi network
     this.connectionStatus = null; // Connection Status at the moment
     this.userSettings = $.jStorage.get('userNetworkSettings');
+    this.intervalKey = null;
 
     this.getWifiNetworks = function() {
 
@@ -46,8 +47,8 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     };
 
     this.getSettings = function() {
-
-      $interval(function() {
+      console.log("boomin");
+      this.intervalKey = $interval(function() {
         if(that.userSettings.wifiSwitchOn && that.wirelessError === false) {
           $http.get(host + ':8000/network/wlan')
           .then(function(result) {
@@ -160,6 +161,13 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     }, function(err) {
       console.log("No Wifi Interface .. !");
       that.processOnError(err)
+    });
+
+    $rootScope.$on("$stateChangeStart", function(event, toState) {
+        // If we are not in the network settings part, we dont have to query /network anymore 
+        if(toState.name !== "settings.networkmanagement" && toState.name !== "settings.networkmanagement.wifi") {
+          $interval.cancel(that.intervalKey);
+        }
     });
   }
 ]);
