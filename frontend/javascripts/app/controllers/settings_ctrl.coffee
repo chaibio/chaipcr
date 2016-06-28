@@ -23,7 +23,10 @@ window.App.controller 'SettingsCtrl', [
   ($scope, User, Device) ->
 
     $scope.isBeta = true
-
+	
+    Device.getVersion(true).then (resp) ->
+      $scope.has_serial_number = resp.serial_number
+	
     User.getCurrent().then (resp) ->
       $scope.user = resp.data.user
 
