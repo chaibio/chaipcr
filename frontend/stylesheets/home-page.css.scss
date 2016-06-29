@@ -165,6 +165,86 @@
           cursor: pointer;
           white-space: nowrap;
         }
+		
+		.text-scroll {
+		  position: absolute;
+		  white-space: nowrap;
+		  transform: translateX(0);
+		  transition: 8.5s;
+		}
+		.text-scroll:hover {
+		  transform: translateX(calc(300px - 100%));
+		}
+		
+		.container {
+		    overflow: hidden;
+    
+		    /* To make the width of the container exact. */
+		    -webkit-box-sizing: border-box;
+		    -moz-box-sizing: border-box;
+		    box-sizing: border-box;
+		}
+
+		.content {
+		    white-space: nowrap;
+		    position: relative;
+		    overflow: hidden;    /* Required to make ellipsis work */
+		    text-overflow: ellipsis;
+
+		    /* Starting transition */    
+		    left: 0%;
+		    width: 100%;
+    
+		    /* Tweak 'till your heart's content */
+		    -webkit-transition: left 3s, width 3s;
+		    -moz-transition: left 3s, width 3s;
+		    transition: left 3s, width 3s;
+		}
+		
+		.container:hover .content {
+		    /* This is not completely accurate. It resizes to 2x the current width. */
+		    left: -100%;
+		    width: 200%;
+		}
+		
+		.ovtrunc {
+		     
+		    white-space: nowrap;
+		   overflow: hidden;
+		    text-overflow: ellipsis;
+			padding-right: 15px;
+		    
+		}
+		
+		.t {
+		    white-space: nowrap;
+		    position: relative;
+		    overflow: hidden;   
+		    text-overflow: ellipsis;
+		    display: block;
+		    width: 100%;
+		}
+		.s {
+		  display: inline-block;
+		  width: 100%;
+		}
+		.t:hover, .s:hover {
+		  width: auto;
+		}
+		.s:hover .t { 
+		  animation: scroll 15s;
+		}
+		.f {
+		  width: 100px;
+		  background: red;
+		  overflow: hidden;
+		}
+		@keyframes scroll {
+		    0% {left: 0px;}
+		    100% {left: -100%;}                    /* Works in Chrome,Firefox, Opera and IE11 */
+		}
+		
+		
         .home-page-exp-created-at {
           color: #545454;
           margin-left: 18px;
