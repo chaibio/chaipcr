@@ -45,6 +45,36 @@ run_migrate_on_upgrade () {
 	fi
 }
 
+run_cleanup_user_tokens_every4hours () {
+	while true
+	do
+		echo Cleaning up every 4 hours.
+		sleep 14400
+		cd /root/chaipcr/web || :
+		RAILS_ENV=production bundle exec rake chaipcr:cleanup
+	done
+}
+
+run_clean_user_tokens () {
+	cd /root/chaipcr/web || :
+	echo "changed folder to $(pwd).. executing checking sql up status..."
+	mysqladmin status | grep Uptime
+	sql_running=$?
+	while [ $sql_running -eq 1 ]
+	do
+		echo "mysql server not up yet.. code $sql_running. waiting 10 seconds."
+		echo "MySql status:"
+		mysqladmin status
+		sleep 10
+		mysqladmin status | grep Uptime
+		sql_running=$?
+	done
+	echo mysql server is running.. executing rake chaipcr:startup
+	RAILS_ENV=production bundle exec rake chaipcr:startup || :
+	echo "Execution result: $?"
+	run_cleanup_user_tokens_every4hours &
+}
+
 mysql_watchdog () {
 	while true
 	do
@@ -223,7 +253,7 @@ fi
 
 check_corruption >> $log_file || true
 check_upgrade_autorun &
-#mysql_watchdog_logged &
+run_clean_user_tokens &
 echo "Autorun script done!" >> $log_file
 
 exit 0
