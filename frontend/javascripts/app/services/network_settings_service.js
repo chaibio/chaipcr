@@ -47,7 +47,6 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     };
 
     this.getSettings = function() {
-      console.log("boomin");
       this.intervalKey = $interval(function() {
         if(that.userSettings.wifiSwitchOn && that.wirelessError === false) {
           $http.get(host + ':8000/network/wlan')
@@ -154,6 +153,8 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       return delay.promise;
     };
 
+    //Taking a note on network status so that user see the result as soon as
+    //user comes to /settings/networkmanagement
     var initialStatus = this.getInitialStatus();
 
     initialStatus.then(function() {
@@ -163,8 +164,10 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       that.processOnError(err)
     });
 
+    //We need to make sure that, we call /network api only when we are in
+    // /settings/networkmanagement
     $rootScope.$on("$stateChangeStart", function(event, toState) {
-        // If we are not in the network settings part, we dont have to query /network anymore 
+        // If we are not in the network settings part, we dont have to query /network anymore
         if(toState.name !== "settings.networkmanagement" && toState.name !== "settings.networkmanagement.wifi") {
           $interval.cancel(that.intervalKey);
         }
