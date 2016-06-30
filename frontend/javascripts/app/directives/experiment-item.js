@@ -24,7 +24,8 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
   'Status',
   'Experiment',
   '$rootScope',
-  function($state, $stateParams, $rootScope, Status, Experiment, $rootScope){
+  '$timeout',		
+  function($state, $stateParams, $rootScope, Status, Experiment, $rootScope,$timeout){
     return {
       restrict: 'EA',
       replace: true,
@@ -40,21 +41,16 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
       link: function(scope, elem) {
 
         scope.runReady = false;
-        scope.buttonState = false;
         scope.expID = $stateParams.id;
 
-        scope.$watch('lidOpen', function(val) {
-
+       scope.$watch('lidOpen', function(val) {
           if(val !== null) {
-            if(val === true && scope.buttonState === true) {
-              scope.runReady = false;
-            }
-            if(val === false && scope.buttonState === true) {
-              scope.runReady = true;
-            }
+			if(val === true){
+				scope.runReady = false;
+			}
           }
         });
-
+		 
         scope.$watch('state', function(val) {
           if(val) {
             if(scope.state === "NOT_STARTED") {
@@ -67,27 +63,28 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
           }
         });
 
+        $rootScope.$on('lidOpen:true', function() {
+          scope.runReady = false;
+        });
+		
         $rootScope.$on('sidemenu:toggle', function() {
           scope.runReady = false;
-          scope.buttonState = false;
         });
 
         // Incase user has confirm box shown and user clicks somewhere else in the sidemenu
         $rootScope.$on("runReady:false", function() {
           scope.$apply(function() { // only reason we apply it here, so that speeds up the action.
             scope.runReady = false;
-            scope.buttonState = false;
           });
-        });
+	  });
+
 
         scope.manageAction = function() {
-
           if(scope.state === "NOT_STARTED" && scope.lidOpen === false) {
             scope.runReady = !scope.runReady;
             if(scope.runReady === true) {
-              scope.buttonState = true;
               $rootScope.$broadcast("runReady:true");
-            }
+			}
             return;
           }
           if(scope.state === "NOT_STARTED" && scope.lidOpen === true) {
@@ -95,7 +92,7 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
           }
           $state.go('run-experiment', {id: $stateParams.id, chart: 'amplification', max_cycle: scope.maxCycle});
         };
-
+		
         scope.startExp = function() {
           Experiment.startExperiment($stateParams.id).then(function(data) {
             $rootScope.$broadcast('experiment:started', $stateParams.id);
