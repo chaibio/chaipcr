@@ -40,8 +40,20 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
       link: function(scope, elem) {
 
         scope.runReady = false;
-
+        scope.buttonState = false;
         scope.expID = $stateParams.id;
+
+        scope.$watch('lidOpen', function(val) {
+
+          if(val !== null) {
+            if(val === true && scope.buttonState === true) {
+              scope.runReady = false;
+            }
+            if(val === false && scope.buttonState === true) {
+              scope.runReady = true;
+            }
+          }
+        });
 
         scope.$watch('state', function(val) {
           if(val) {
@@ -57,14 +69,15 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
 
         $rootScope.$on('sidemenu:toggle', function() {
           scope.runReady = false;
+          scope.buttonState = false;
         });
 
         // Incase user has confirm box shown and user clicks somewhere else in the sidemenu
         $rootScope.$on("runReady:false", function() {
           scope.$apply(function() { // only reason we apply it here, so that speeds up the action.
             scope.runReady = false;
+            scope.buttonState = false;
           });
-
         });
 
         scope.manageAction = function() {
@@ -72,6 +85,7 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
           if(scope.state === "NOT_STARTED" && scope.lidOpen === false) {
             scope.runReady = !scope.runReady;
             if(scope.runReady === true) {
+              scope.buttonState = true;
               $rootScope.$broadcast("runReady:true");
             }
             return;
