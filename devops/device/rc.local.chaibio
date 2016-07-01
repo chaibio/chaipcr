@@ -62,10 +62,10 @@ run_clean_user_tokens () {
 	sql_running=$?
 	while [ $sql_running -eq 1 ]
 	do
-		echo "mysql server not up yet.. code $sql_running. waiting 10 seconds."
+		echo "mysql server not up yet.. code $sql_running. waiting 5 seconds."
 		echo "MySql status:"
 		mysqladmin status
-		sleep 10
+		sleep 5
 		mysqladmin status | grep Uptime
 		sql_running=$?
 	done
