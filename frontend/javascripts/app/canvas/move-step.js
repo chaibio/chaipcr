@@ -162,10 +162,10 @@ angular.module("canvasApp").factory('moveStepRect', [
 
       this.indicator.onTheMove = function(C) {
 
-        if(this.intersectsWithObject(C.hitBlock)) {
+        /*if(this.intersectsWithObject(C.hitBlock)) {
           console.log("oye hit");
           return false;
-        }
+        }*/
 
         C.allStepViews.some(function(step, index) {
 

@@ -90,6 +90,7 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         this.indicator.init = function(stage) {
           this.draggedStage = stage;
+          this.stageBackUp = angular.extend({}, stage);
         };
 
         this.indicator.onTheMoveDragGroup = function(dragging) {

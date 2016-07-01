@@ -65,11 +65,25 @@ angular.module("canvasApp").factory('stage', [
 
       this.addHitBlock = function() {
 
-        this.parent.hitBlock.setLeft(this.left + this.myWidth + 48).setCoords();
-        this.parent.hitBlock.setVisible(true);
+        //this.parent.hitBlock.setLeft(this.left + this.myWidth + 48).setCoords();
+        //this.parent.hitBlock.setVisible(true);
 
         // Now we need to add some space after every stage so that, we can leave steps there create a new stage.
         // The problem right now we have is , we create space between step which is being moved and very next stage.
+      };
+
+      this.collapseStage = function() {
+        // Remove all content in the stage first
+        this.childSteps.forEach(function(step, index) {
+          this.deleteAllStepContents(step);
+        }, this);
+        this.deleteStageContents();
+        //this.wireStageNextAndPrevious();
+        // Bring other stages closer
+        if(this.nextStage) {
+          this.left = this.left - 100;
+          this.moveAllStepsAndStages(true);
+        }
       };
 
       this.expand = function() {
