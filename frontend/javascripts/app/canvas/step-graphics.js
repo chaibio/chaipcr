@@ -30,13 +30,9 @@ angular.module("canvasApp").factory('stepGraphics', [
 
       this.stepNameText = stepName;
       this.stepName = new fabric.Text(stepName, {
-          fill: 'white',  fontSize: 12,  top : 20,  left: -1,  fontFamily: "dinot-regular",  selectable: false,
-          originX: 'left', originY: 'top',
-          //shadow: 'rgba(0,0,0,0.4) 5px 5px 7px'
-        }
-      );
-
-      //this.stepName.setShadow(this.shadow);
+        fill: 'white',  fontSize: 12,  top : 20,  left: -1,  fontFamily: "dinot-regular",  selectable: false,
+        originX: 'left', originY: 'top',
+      });
       return this;
     };
 
@@ -214,8 +210,7 @@ angular.module("canvasApp").factory('stepGraphics', [
         hasBoarders: false, name: "stepGroup",  me: this, originX: 'left', originY: 'top'
       });
     };
-
-
+    
     return this;
   }
 ]);
