@@ -34,7 +34,7 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
           min: 0
           max: 120
           tickFormat: (t) ->
-            "#{t}°C"
+            "#{t} °C"
         }
       },
       margin: {
