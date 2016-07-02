@@ -153,7 +153,8 @@ bool UpdateManager::update()
             if (file.exists())
                 file.remove();
 
-            Util::watchProcess(kUpdateScriptPath + ' ' + kUpdateScriptOutputPath, [&](const char buffer[]) { logStream << "UpdateManager::update - perform_upgrade: " << buffer << std::endl; });
+            if (system((kUpdateScriptPath + ' ' + kUpdateScriptOutputPath).c_str()) != 0)
+                throw std::runtime_error("perform_upgrade error");
         }
         catch (...)
         {
