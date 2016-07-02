@@ -89,17 +89,20 @@ angular.module("canvasApp").factory('moveStageRect', [
 
 
         this.indicator.init = function(stage) {
+          this.setLeft(stage.left - 1).setCoords();
           this.draggedStage = stage;
           this.stageBackUp = angular.extend({}, stage);
+          this.setVisible(true);
         };
 
         this.indicator.onTheMoveDragGroup = function(dragging) {
-            this.setLeft(dragging.left - 1);
-            this.setCoords();
+          this.setLeft(dragging.left - 1).setCoords();
         };
 
         this.indicator.changePlacing = function(place) {
-          this.setVisible(true);
+
+          //this.setCoords();
+
         };
 
         this.indicator.changeText = function(stage) {

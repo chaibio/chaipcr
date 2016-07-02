@@ -83,6 +83,7 @@ angular.module("canvasApp").factory('stage', [
         if(this.nextStage) {
           this.left = this.left - 100;
           this.moveAllStepsAndStages(true);
+          
         }
       };
 
