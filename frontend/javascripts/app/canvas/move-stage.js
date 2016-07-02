@@ -113,6 +113,7 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         this.indicator.onTheMove = function(C) {
           // Here we hit test the movement of the MOVING STAGE
+          console.log("moving");
         }
 
         this.indicator.processMovement = function() {

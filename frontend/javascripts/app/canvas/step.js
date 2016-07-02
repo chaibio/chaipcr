@@ -40,6 +40,7 @@ angular.module("canvasApp").factory('step', [
       this.gatherDataDuringRamp = this.model.ramp.collect_data;
       this.shrinked = false;
       this.shadowText = "0px 1px 2px rgba(0, 0, 0, 0.5)";
+      this.visualComponents = {};
 
       this.setLeft = function() {
 
@@ -207,6 +208,13 @@ angular.module("canvasApp").factory('step', [
         stepGraphics.stepComponents.call(this);
 
         // Add all those components created.
+        this.visualComponents = {
+          'stepGroup': this.stepGroup,
+          'rampSpeedGroup': this.rampSpeedGroup,
+          'hitPoint': this.hitPoint,
+          'closeImage': this.closeImage,
+          'dots': this.dots
+        }
         this.canvas.add(this.stepGroup);
         this.canvas.add(this.rampSpeedGroup);
         this.canvas.add(this.hitPoint);

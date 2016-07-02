@@ -93,12 +93,21 @@ angular.module("canvasApp").factory('stageGraphics', [
       return this;
     };
 
+    this.createStageHitPoint = function() {
+
+      this.stageHitPoint = new fabric.Rect({
+        width: 2, height: 30, fill: '', left: this.left + 60, top: 5, selectable: false, name: "stageHitPoint",
+        originX: 'left', originY: 'top',
+      });
+      return this;
+    };
+
+
     this.createStageRect = function() {
 
       this.stageRect = new fabric.Rect({
           left: 0,  top: 0, fill: '#FFB300',  width: this.myWidth,  height: 400,  selectable: false
-        }
-      );
+        });
 
       return this;
     };
