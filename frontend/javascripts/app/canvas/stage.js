@@ -78,13 +78,17 @@ angular.module("canvasApp").factory('stage', [
           this.deleteAllStepContents(step);
         }, this);
         this.deleteStageContents();
-        //this.wireStageNextAndPrevious();
         // Bring other stages closer
         if(this.nextStage) {
-          this.left = this.left - 100;
+          this.myWidth = 136; // This is a trick, when we moveAllStepsAndStages we calculate the placin with myWidth, please refer getLeft() method
           this.moveAllStepsAndStages(true);
-          
+          var moveStart = this.childSteps[this.childSteps.length - 1].ordealStatus;
+          for(var j = moveStart; j < allSteps.length; j++) {
+            allSteps[j].circle.moveCircleWithStep();
+          }
         }
+
+        this.canvas.renderAll();
       };
 
       this.expand = function() {
