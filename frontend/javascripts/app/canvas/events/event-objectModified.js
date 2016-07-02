@@ -46,21 +46,19 @@ angular.module("canvasApp").factory('objectModified', [
 
             var indicate = evt.target;
             step = indicate.parent;
-            //step.commonFooterImage.setVisible(true);
             C.stepIndicator.endPosition = indicate.left;
             C.stepIndicator.processMovement(step, C);
             C.canvas.renderAll();
           break;
 
-          /*case "dragStageGroup":
+          case "moveStage":
 
-            var indicateStage = evt.target;
-            step = indicateStage.currentStep;
-            indicateStage.setVisible(false);
-            indicateStage.endPosition = indicateStage.left;
-            indicateStage.processMovement(step.parentStage, C);
+            var stageIndicator = evt.target;
+            var stage = stageIndicator.parent;
+            stageIndicator.setVisible(false);
+            C.stageIndicator.processMovement(stage, C);
             C.canvas.renderAll();
-          break;*/
+          break;
         }
       });
     };

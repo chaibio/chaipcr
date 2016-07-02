@@ -78,7 +78,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         ],
           {
             originX: "left", originY: "top", left: 0, top: 0, height: 72, selectable: true, lockMovementY: true, hasControls: false,
-            visible: true, hasBorders: false, name: "dragStepGroup"
+            visible: true, hasBorders: false, name: "dragStageRect"
           }
         );
 
@@ -113,11 +113,20 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         this.indicator.onTheMove = function(C) {
           // Here we hit test the movement of the MOVING STAGE
-          console.log("moving");
+          //console.log("moving", this);
+          C.allStageViews.some(function(stage, index) {
+
+            if(this.intersectsWithObject(stage.stageHitPoint) && this.currentHit !== index) {
+              this.currentDrop = stage;
+              this.currentHit = index;
+              console.log("found");
+            }
+          }, this);
         }
 
-        this.indicator.processMovement = function() {
+        this.indicator.processMovement = function(stage, C) {
           // Process movement here
+          console.log("Landed .... !");
         };
 
         return this.indicator;

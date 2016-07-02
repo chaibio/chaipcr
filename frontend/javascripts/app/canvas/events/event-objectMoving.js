@@ -57,12 +57,13 @@ angular.module("canvasApp").factory('objectMoving', [
           break;
 
           case "moveStage":
+
           if(evt.target.left < 35) {
             evt.target.setLeft(35);
           } else if(evt.target.left > C.moveLimit) {
             evt.target.setLeft(C.moveLimit);
           } else {
-            C.stepIndicator.onTheMove(C);
+            C.stageIndicator.onTheMove(C);
           }
           C.stageIndicator.onTheMoveDragGroup(evt.target);
           break;
