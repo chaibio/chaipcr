@@ -19,8 +19,8 @@
 
 angular.module("canvasApp").factory('moveStageRect', [
   'ExperimentLoader',
-
-  function(ExperimentLoader) {
+  'stage',
+  function(ExperimentLoader, stageDude) {
 
     return {
 
@@ -125,6 +125,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         }
 
         this.indicator.processMovement = function(stage, C) {
+          console.log();
           // Process movement here
           console.log("Landed .... !", this.currentHit, this.draggedStage.index);
           if(this.currentHit  > this.draggedStage.index) {
@@ -139,19 +140,30 @@ angular.module("canvasApp").factory('moveStageRect', [
             //console.log(C.allStageViews);
             C.allStageViews.splice(this.draggedStage.index, 1);
             //console.log(C.allStageViews);
-            C.allStageViews.splice(this.currentHit, 0, this.stageBackUp);
+            //C.allStageViews.splice(this.currentHit, 0, this.stageBackUp);
             //console.log(C.allStageViews);
-            var movedStage = C.allStageViews[this.currentHit];
-            movedStage.index = this.currentHit;
-            movedStage.nextStage = movedStage.previousStage = null;
-            
-            if(C.allStageViews[this.currentHit + 1]) {
-              movedStage.nextStage = C.allStageViews[this.currentHit + 1];
-              C.allStageViews[this.currentHit + 1].previousStage = movedStage;
-            }
-            movedStage.previousStage = C.allStageViews[this.currentHit - 1];
-            C.allStageViews[this.currentHit - 1].nextStage = movedStage;
-            console.log(movedStage);
+            //var movedStage = C.allStageViews[this.currentHit];
+            //movedStage.index = this.currentHit;
+            //movedStage.nextStage = movedStage.previousStage = null;
+
+            //if(C.allStageViews[this.currentHit + 1]) {
+              //movedStage.nextStage = C.allStageViews[this.currentHit + 1];
+              //C.allStageViews[this.currentHit + 1].previousStage = movedStage;
+            //}
+            //movedStage.previousStage = C.allStageViews[this.currentHit - 1];
+            //C.allStageViews[this.currentHit - 1].nextStage = movedStage;
+            //console.log(movedStage);
+            //C.addNewStage({"stage": movedStage.model}, movedStage.previousStage)
+            //var stageView = new stage(movedStage.model, C.canvas, C.allStepViews, this.currentHit, this, this.$scope, true);
+            var stageIndex = this.currentHit;
+            var model = this.draggedStage.model
+            console.log(model);
+            var stageView = new stageDude(model, C.canvas, C.allStepViews, stageIndex, C, C.$scope, true);
+            C.addNextandPrevious(this.currentDrop, stageView);
+            stageView.updateStageData(1);
+            C.allStageViews.splice(stageIndex, 0, stageView);
+            stageView.render();
+
           } else {
             console.log("ready to move forward", this.draggedStage.myWidth);
             this.currentDrop.myWidth = this.currentDrop.myWidth + this.draggedStage.myWidth;
