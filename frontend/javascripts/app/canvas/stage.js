@@ -81,12 +81,14 @@ angular.module("canvasApp").factory('stage', [
         this.deleteStageContents();
         // Bring other stages closer
         if(this.nextStage) {
-          this.myWidth = 136; // This is a trick, when we moveAllStepsAndStages we calculate the placin with myWidth, please refer getLeft() method
+          var width = this.myWidth;
+          this.myWidth = 136; // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
           this.moveAllStepsAndStages(true);
           var moveStart = this.childSteps[this.childSteps.length - 1].ordealStatus;
           for(var j = moveStart; j < allSteps.length; j++) {
             allSteps[j].circle.moveCircleWithStep();
           }
+          this.myWidth = width;
         }
         this.canvas.renderAll();
       };
@@ -197,26 +199,30 @@ angular.module("canvasApp").factory('stage', [
         currentStep.circle.removeContents();
       };
 
+      this.moveIndividualStageAndContents = function(stage, del) {
+
+        stage.nextStage.getLeft();
+        stage.nextStage.stageGroup.set({left: stage.nextStage.left }).setCoords();
+        stage.nextStage.dots.set({left: stage.nextStage.left + 3}).setCoords();
+        stage.nextStage.stageHitPoint.set({left: stage.nextStage.left + 60}).setCoords();
+        var thisStageSteps = stage.nextStage.childSteps, stepCount = thisStageSteps.length;
+
+        for(var i = 0; i < stepCount; i++ ) {
+          if(del === true) {
+            thisStageSteps[i].moveStep(-1, true);
+          } else {
+            thisStageSteps[i].moveStep(1, true);
+          }
+        }
+      };
+
       this.moveAllStepsAndStages = function(del) {
 
         var currentStage = this;
 
         while(currentStage.nextStage) {
 
-          currentStage.nextStage.getLeft();
-          currentStage.nextStage.stageGroup.set({left: currentStage.nextStage.left }).setCoords();
-          currentStage.nextStage.dots.set({left: currentStage.nextStage.left + 3}).setCoords();
-          currentStage.nextStage.stageHitPoint.set({left: currentStage.nextStage.left + 60}).setCoords();
-          var thisStageSteps = currentStage.nextStage.childSteps, stepCount = thisStageSteps.length;
-
-          for(var i = 0; i < stepCount; i++ ) {
-            if(del === true) {
-              thisStageSteps[i].moveStep(-1, true);
-            } else {
-              thisStageSteps[i].moveStep(1, true);
-            }
-
-          }
+          this.moveIndividualStageAndContents(currentStage, del)
 
           currentStage = currentStage.nextStage;
         }

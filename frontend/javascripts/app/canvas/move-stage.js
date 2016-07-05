@@ -126,7 +126,47 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         this.indicator.processMovement = function(stage, C) {
           // Process movement here
-          console.log("Landed .... !");
+          console.log("Landed .... !", this.currentHit, this.draggedStage.index);
+          if(this.currentHit  > this.draggedStage.index) {
+            console.log("ready to move back");
+            this.draggedStage.myWidth = 0;
+            var stage = this.draggedStage;
+            while(stage.index <= (this.currentHit - 1)) {
+              stage.moveIndividualStageAndContents(stage, false)
+              stage = stage.nextStage;
+            }
+            this.draggedStage.wireStageNextAndPrevious();
+            //console.log(C.allStageViews);
+            C.allStageViews.splice(this.draggedStage.index, 1);
+            //console.log(C.allStageViews);
+            C.allStageViews.splice(this.currentHit, 0, this.stageBackUp);
+            //console.log(C.allStageViews);
+            var movedStage = C.allStageViews[this.currentHit];
+            movedStage.index = this.currentHit;
+            movedStage.nextStage = movedStage.previousStage = null;
+            
+            if(C.allStageViews[this.currentHit + 1]) {
+              movedStage.nextStage = C.allStageViews[this.currentHit + 1];
+              C.allStageViews[this.currentHit + 1].previousStage = movedStage;
+            }
+            movedStage.previousStage = C.allStageViews[this.currentHit - 1];
+            C.allStageViews[this.currentHit - 1].nextStage = movedStage;
+            console.log(movedStage);
+          } else {
+            console.log("ready to move forward", this.draggedStage.myWidth);
+            this.currentDrop.myWidth = this.currentDrop.myWidth + this.draggedStage.myWidth;
+            this.draggedStage.myWidth = 0;
+            var stage = this.currentDrop;
+
+            while (stage.nextStage) {
+              stage.moveIndividualStageAndContents(stage, false)
+              stage = stage.nextStage;
+            }
+          }
+          C.allStepViews.forEach(function(step, index){
+            step.circle.moveCircleWithStep();
+          });
+          C.setDefaultWidthHeight();
         };
 
         return this.indicator;
