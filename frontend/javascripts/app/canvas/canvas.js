@@ -270,6 +270,18 @@ angular.module("canvasApp").factory('canvas', [
       this.setDefaultWidthHeight();
     };
 
+    this.correctNumbering = function() {
+      var oStatus = 1;
+      this.allStageViews.forEach(function(stage, index) {
+        stage.index = index;
+        stage.childSteps.forEach(function(step, index) {
+          step.index = index;
+          step.ordealStatus = oStatus;
+          oStatus = oStatus + 1;
+        });
+      });
+    };
+
     return this;
   }
 ]);
