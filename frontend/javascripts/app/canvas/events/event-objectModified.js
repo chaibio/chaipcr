@@ -22,7 +22,8 @@ angular.module("canvasApp").factory('objectModified', [
   'previouslySelected',
   'previouslyHoverd',
   'scrollService',
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService) {
+  'circleManager',
+  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager) {
 
     this.init = function(C, $scope, that) {
 
@@ -56,7 +57,7 @@ angular.module("canvasApp").factory('objectModified', [
             var stageIndicator = evt.target;
             var stage = stageIndicator.parent;
             stageIndicator.setVisible(false);
-            C.stageIndicator.processMovement(stage, C);
+            C.stageIndicator.processMovement(stage, C, circleManager);
             C.canvas.renderAll();
           break;
         }

@@ -124,7 +124,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           }, this);
         }
 
-        this.indicator.processMovement = function(stage, C) {
+        this.indicator.processMovement = function(stage, C, circleManager) {
           console.log();
           // Process movement here
           console.log("Landed .... !", this.currentHit, this.draggedStage.index);
@@ -136,24 +136,89 @@ angular.module("canvasApp").factory('moveStageRect', [
               stage.moveIndividualStageAndContents(stage, false)
               stage = stage.nextStage;
             }
+
             this.draggedStage.wireStageNextAndPrevious();
-            //console.log(C.allStageViews);
+
+
+            var stageIndex = this.currentDrop.index;
+
+            //console.log(stageIndex, ordealStatus);
+            var model = this.draggedStage.model
+            var stageView = new stageDude(model, C.canvas, C.allStepViews, 0, C, C.$scope, true);
+            //C.addNextandPrevious(this.currentDrop, stageView);
+            if(this.currentDrop.nextStage) {
+              console.log("boommm");
+              stageView.nextStage = this.currentDrop.nextStage;
+              this.currentDrop.nextStage = stageView;
+              //this.currentDrop.nextStage.previousStage = stageView;
+              stageView.nextStage.previousStage = stageView;
+            } else {
+              console.log("Bammmm .. !!");
+              stageView.previousStage = this.currentDrop;
+              this.currentDrop.nextStage = stageView;
+            }
+
+
+            console.log(this.currentDrop);
+            C.allStageViews.splice(stageIndex, 0, stageView);
+
             C.allStageViews.splice(this.draggedStage.index, 1);
+            C.correctNumbering();
+
+            //var ordealStatus = this.currentDrop.childSteps[this.currentDrop.childSteps.length - 1].ordealStatus;
+            //var childSteps = stageView.previousStage.childSteps;
+            //console.log(childSteps[childSteps.length - 1].ordealStatus);
+            stageView.updateStageData(1);
+            stageView.render();
+            C.configureStepsofNewStage(stageView, 1);
+            stageView.moveAllStepsAndStages(false);
+            //C.correctNumbering();
+
+            var test = C.allStageViews[0];
+            C.allStepViews = [];
+            while(test) {
+              test.childSteps.forEach(function(step, index) {
+                C.allStepViews.push(step);
+              });
+              console.log(test.childSteps[0].model.temperature);
+              test = test.nextStage;
+            }
+
+            C.allStepViews.forEach(function(step, index) {
+              console.log(step.model.temperature);
+            });
+
+
+            //C.correctNumbering();
+
+            circleManager.init(C);
+            circleManager.findAllCircles(C);
+            console.log(C.allStepViews);
+            circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
+            //console.log(stageView.previousStage.childSteps);
+            /*//console.log(C.allStageViews);
+            C.allStageViews.splice(this.draggedStage.index, 1);
+            C.correctNumbering();
             var ordealStatus = this.currentDrop.childSteps[this.currentDrop.childSteps.length - 1].ordealStatus;
-            //console.log(this.allStepViews);
-            //C.allStepViews.splice(this.draggedStage.childSteps[0].ordealStatus, this.draggedStage.childSteps.length);
-            //console.log(this.allStepViews);
-            var stageIndex = this.currentHit;
+
+            var stageIndex = this.currentDrop.index;
             var model = this.draggedStage.model
             var stageView = new stageDude(model, C.canvas, C.allStepViews, stageIndex, C, C.$scope, true);
             C.addNextandPrevious(this.currentDrop, stageView);
             stageView.updateStageData(1);
             C.allStageViews.splice(stageIndex, 0, stageView);
+            C.correctNumbering();
             stageView.render();
+            //C.allStepViews.splice(this.draggedStage.childSteps[0].ordealStatus, this.draggedStage.childSteps.length);
+            //C.correctNumbering();
             C.configureStepsofNewStage(stageView, ordealStatus);
-            console.log(C.allStepViews);
-            C.allStepViews.splice(this.draggedStage.childSteps[0].ordealStatus, this.draggedStage.childSteps.length);
-            console.log(C.allStepViews);
+            C.correctNumbering();
+            circleManager.findAllCircles(C);
+            circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
+
+            //console.log(C.allStepViews);
+            //C.allStepViews.splice(this.draggedStage.childSteps[0].ordealStatus, this.draggedStage.childSteps.length);
+            console.log(C.allStageViews, stageView); */
 
           } else {
             console.log("ready to move forward", this.draggedStage.myWidth);
@@ -167,7 +232,7 @@ angular.module("canvasApp").factory('moveStageRect', [
             }
           }
           C.allStepViews.forEach(function(step, index){
-            step.circle.moveCircleWithStep();
+            //step.circle.moveCircleWithStep();
           });
           C.setDefaultWidthHeight();
         };

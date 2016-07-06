@@ -77,6 +77,7 @@ angular.module("canvasApp").factory('canvas', [
 
       this.canvas.setHeight(400);
       var stageCount = this.allStageViews.length;
+      console.log("stageCount", stageCount);
       this.canvas.setWidth(
         (this.allStepViews.length * constants.stepWidth) +
         ((stageCount) * constants.newStageOffset) +
@@ -272,11 +273,14 @@ angular.module("canvasApp").factory('canvas', [
 
     this.correctNumbering = function() {
       var oStatus = 1;
+      this.allStepViews = [];
+      var that = this;
       this.allStageViews.forEach(function(stage, index) {
         stage.index = index;
         stage.childSteps.forEach(function(step, index) {
           step.index = index;
           step.ordealStatus = oStatus;
+          that.allStepViews.push(step);
           oStatus = oStatus + 1;
         });
       });
