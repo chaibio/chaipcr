@@ -22,7 +22,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
   'Experiment'
   (SecondsDisplay, $filter, Experiment) ->
 
-    FLOOR_VALUE = 0.1
+   # FLOOR_VALUE = 500
 
     @chartConfig = ->
       axes:
@@ -33,6 +33,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           tickFormat: (x) ->
             return parseInt(x)
         y:
+		  
           ticks: 10
 
       margin:
@@ -46,16 +47,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       series: []
 
       tooltipHook: (items) ->
-        rows = []
-        for item in items by 1
-          rows.push
-            label: item.series.label
-            value: "#{item.row.y1}"
-            id: item.series.id
-            color: item.series.color
-
-        abscissas: "CYCLE: #{item.row.x}"
-        rows: rows
+        return false
 
     # end chartConfig
 
@@ -86,8 +78,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         channel_datasets["channel_#{channel_i}"] = _.map channel_datasets["channel_#{channel_i}"], (datum) ->
           pt = cycle_num: datum[0][2]
           for y_item, i in datum by 1
-            pt["well_#{i}_background"] = if y_item[3] > 0 then y_item[3] else FLOOR_VALUE
-            pt["well_#{i}_baseline"] = if y_item[4] > 0 then y_item[4] else FLOOR_VALUE
+            pt["well_#{i}_background"] =  y_item[3] 
+            pt["well_#{i}_baseline"] =  y_item[4] 
 
           return pt
 

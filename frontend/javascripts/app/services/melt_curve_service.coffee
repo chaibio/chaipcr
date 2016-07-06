@@ -60,16 +60,7 @@ App.service 'MeltCurveService', [
         y: false
 
       tooltipHook: (items) ->
-        rows = []
-        for item in items by 1
-          rows.push
-            label: item.series.label
-            value: "#{item.row.y1.toFixed(2)}"
-            id: item.series.id
-            color: item.series.color
-
-        abscissas: "#{item.row.x.toFixed(2)} °C"
-        rows: rows
+        return false
     # end chartConfig
 
     self.parseData = (data, cb) ->
