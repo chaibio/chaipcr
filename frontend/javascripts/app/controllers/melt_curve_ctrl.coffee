@@ -181,6 +181,8 @@ App.controller 'MeltCurveChartCtrl', [
             min: y_extrems.min
             max: y_extrems.max
 
+      updateSeries()
+
       $timeout ->
         $scope.$broadcast '$reload:n3:charts'
       , 3000
