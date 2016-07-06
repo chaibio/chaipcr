@@ -150,4 +150,7 @@ const std::string kCheckSdcardPath = "/root/chaipcr/deploy/device/check_sdcard.s
 //Network settings
 const std::string kNetworkInterfacesFile = "/etc/network/interfaces";
 
+//Time checker
+const std::string kSavedTimePath = "/data/chaipcr_saved_time";
+
 #endif

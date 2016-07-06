@@ -19,6 +19,7 @@
 
 #include "timechecker.h"
 #include "logger.h"
+#include "constants.h"
 
 #include <iostream>
 #include <fstream>
@@ -88,7 +89,7 @@ void TimeChecker::timeCheckCallback(Poco::Timer &/*timer*/)
 
 void TimeChecker::saveCurrentTime()
 {
-    std::ofstream file("./qpcr_saved_time", std::ofstream::out | std::ofstream::trunc);
+    std::ofstream file(kSavedTimePath, std::ofstream::out | std::ofstream::trunc);
 
     if (file.is_open())
         file << boost::chrono::duration_cast<boost::chrono::seconds>(boost::chrono::system_clock::now().time_since_epoch()).count();
@@ -99,7 +100,7 @@ void TimeChecker::saveCurrentTime()
 boost::chrono::seconds TimeChecker::getSavedTime() const
 {
     boost::chrono::seconds::rep count = 0;
-    std::ifstream file("./qpcr_saved_time");
+    std::ifstream file(kSavedTimePath);
 
     if (file.is_open())
         file >> count;
