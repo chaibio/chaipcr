@@ -23,8 +23,12 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
     require: 'ngModel'
     scope:
       colorBy: '='
+      buttonLabelsNum: '=?' #numbe of labels in button
+      labelUnit: '=?'
     templateUrl: 'app/views/directives/amplification-well-switch.html'
     link: ($scope, elem, attrs, ngModel) ->
+
+      $scope.labelUnit = $scope.labelUnit || 'Ct'
 
       COLORS = AmplificationChartHelper.COLORS
 

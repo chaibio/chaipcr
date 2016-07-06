@@ -16,15 +16,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ###
-App.controller 'MeltCurveCtrl', [
+App.controller 'MeltCurveChartCtrl', [
   '$scope'
   'Experiment'
   '$stateParams'
   'MeltCurveService'
   '$timeout'
-  ($scope, Experiment, $stateParams, MeltCurveService, $timeout) ->
+  '$interval'
+  ($scope, Experiment, $stateParams, MeltCurveService, $timeout, $interval) ->
 
     $scope.curve_type = 'derivative'
+    $scope.color_by = 'well'
     $scope.chartConfigDerivative = MeltCurveService.chartConfig('derivative')
     $scope.chartConfigNormalized = MeltCurveService.chartConfig('normalized')
     $scope.loading = null
@@ -32,17 +34,40 @@ App.controller 'MeltCurveCtrl', [
     has_data = false
     PARSED_DATA = null
     OPTIMIZED_DATA = null
+    $scope.retrying = false
+    $scope.retry = 0
+    $scope.fetching = false
+
+
+    retry = ->
+      $scope.retrying = true
+      $scope.retry = 10
+      retryInterval = $interval ->
+        $scope.retry = $scope.retry - 1
+        if $scope.retry is 0
+          $interval.cancel(retryInterval)
+          $scope.retrying = false
+          getMeltCurveData()
+      , 1000
 
     getMeltCurveData = (cb) ->
-      $scope.loading = true
-      $timeout ->
-        Experiment.getMeltCurveData($stateParams.id)
-        .then (resp) ->
-          cb(resp.data) if !!cb
-        .catch ->
-          $scope.loading = false
-          $scope.error = 'Unable to retrieve melt curve data.'
-      , 1500
+      gofetch = true
+      gofetch = false if $scope.fetching
+      gofetch = false if $scope.RunExperimentCtrl.chart isnt 'melt-curve'
+      gofetch = false if $scope.retrying
+
+      if gofetch
+        $scope.fetching = true
+        $timeout ->
+          Experiment.getMeltCurveData($stateParams.id)
+          .then (resp) ->
+            cb(resp.data) if !!cb
+            $scope.fetching = false
+          .catch (resp) ->
+            $scope.fetching = false
+            $scope.error = if resp.data?.errors then resp.data.errors else 'Unable to retrieve melt curve data due to some error.'
+            retry()
+        , 1500
 
     getExperiment = (cb) ->
       Experiment.get(id: $stateParams.id).then (data) ->
@@ -68,6 +93,29 @@ App.controller 'MeltCurveCtrl', [
       OPTIMIZED_DATA = MeltCurveService.optimizeForEachResolution(PARSED_DATA, $scope.resolutionOptions)
       # console.log OPTIMIZED_DATA
 
+    updateButtonTms = (data) ->
+      # console.log data
+      for well_data, well_i in data.melt_curve_data by 1
+        console.log well_data
+        $scope.wellButtons["well_#{well_i}"].ct = [MeltCurveService.averagedTm(well_data.tm)]
+
+    updateSeries = (buttons) ->
+      buttons = buttons || $scope.wellButtons || {}
+      channel_count = if $scope.is_dual_channel then 2 else 1
+      chartConfig = if $scope.curve_type is 'derivative' then 'chartConfigDerivative' else 'chartConfigNormalized'
+
+      $scope[chartConfig].series = []
+
+      for i in [0..15] by 1
+        if buttons["well_#{i}"]?.selected
+          $scope[chartConfig].series.push
+            key: $scope.curve_type
+            axis: 'y'
+            dataset: "well_#{i}"
+            color: buttons["well_#{i}"].color
+            label: "well_#{i+1}: "
+            interpolation: {mode: 'cardinal', tension: 0.7}
+
     changeResolution = ->
       updateScrollBarWidth()
       moveData()
@@ -86,21 +134,18 @@ App.controller 'MeltCurveCtrl', [
       resolution = $scope.resolutionOptions[$scope.mc_zoom]
       data_length = PARSED_DATA['well_0'].length
       $scope.data = MeltCurveService.moveData(data, data_length, resolution, $scope.mc_scroll)
-      console.log "data_length: #{$scope.data.well_0.length}"
 
     $scope.$watch 'RunExperimentCtrl.chart', (chart) ->
       if chart is 'melt-curve' and !has_data
         getExperiment (exp) ->
           getMeltCurveData (data) ->
-            console.log 'melt curve data loaded'
-            console.log data
+            updateButtonTms(data)
 
             MeltCurveService.parseData(data.melt_curve_data).then (data) ->
               $scope.data = data
 
               $timeout ->
                 y_extrems = MeltCurveService.getYExtrems(data, $scope.curve_type)
-                console.log y_extrems
                 updateConfigs
                   axes:
                     y:
@@ -112,7 +157,16 @@ App.controller 'MeltCurveCtrl', [
                 PARSED_DATA = angular.copy(data)
                 updateResolutionOptions(data)
                 changeResolution()
+
+                $timeout ->
+                  $scope.$broadcast '$reload:n3:charts'
+                , 2000
+
               , 1000
+      else
+        $timeout ->
+          $scope.$broadcast '$reload:n3:charts'
+        , 500
 
     $scope.$watch ->
       $scope.curve_type
@@ -120,7 +174,7 @@ App.controller 'MeltCurveCtrl', [
       return if !PARSED_DATA
       return if $scope.RunExperimentCtrl.chart isnt 'melt-curve'
       y_extrems = MeltCurveService.getYExtrems(PARSED_DATA, type)
-      console.log y_extrems
+      console.log 'changed to curve chart!!!'
       updateConfigs
         axes:
           y:
@@ -136,6 +190,11 @@ App.controller 'MeltCurveCtrl', [
     , (val) ->
       return if !PARSED_DATA
       changeResolution()
+
+    $scope.$watchCollection 'wellButtons', (buttons) ->
+      return if !buttons
+      updateSeries(buttons)
+      console.log buttons
 
     $scope.$watch ->
       Math.round($scope.mc_scroll*100) / 100

@@ -16,56 +16,58 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<div class="melt-curve-chart" ng-controller="MeltCurveCtrl">
-  <div class="content results-charts">
-
-    <div class="curve-header">
-      <div class="row">
-        <div class="col-sm-6">
-          <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()">
-            Melt Curve
-            <img class="arrow-down" src="/images/arrow-down.png">
-          </span>
-        </div>
-        <div class="col-sm-6">
-          <div class="plot-type-buttons">
-            <div class="plot-type-text SHR">PLOT TYPE</div>
-            <div class="buttons-wrapper SH">
-              <div class="button" ng-click="curve_type='derivative'" ng-class="{'selected': curve_type==='derivative'}">DERIVATIVE</div>
-              <div class="button" ng-click="curve_type='normalized'" ng-class="{'selected': curve_type==='normalized'}">NORMALIZED</div>
+<div class="melt-curve-chart-state-active results-charts">
+  <div class="page-layout" ng-controller="MeltCurveChartCtrl" ng-show="experiment">
+    <div class="content">
+      <div class="chart-section">
+        <div class="curve-header">
+          <div class="row">
+            <div class="col-sm-6 curve-name">
+              <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()">
+                Melt Curve
+                <img class="arrow-down" src="/images/arrow-down.png">
+              </span>
+            </div>
+            <div class="col-sm-6 ampli-toggles">
+              <div class="plot-type-buttons">
+                <div class="plot-type-text SHR">PLOT TYPE</div>
+                <div class="buttons-wrapper SH">
+                  <div class="button" ng-click="curve_type='derivative'" ng-class="{'selected': curve_type==='derivative'}">DERIVATIVE</div>
+                  <div class="button" ng-click="curve_type='normalized'" ng-class="{'selected': curve_type==='normalized'}">NORMALIZED</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <div class="chart-section">
-      <div class="text-center text-red loading" ng-show="error && !loading">
-        {{error}}
-      </div>
-      <div>
-        <div class="vertical-text SH">
-          <span ng-show="curve_type === 'derivative'">DERIVATIVE REPORTER</span>
-          <span ng-show="curve_type === 'normalized'">NORMALIZED REPORTER</span>
-        </div>
-        <div class="chart-container">
-
-          <div class="loading-blue-container" ng-show="!has_data && loading">
-          <!-- <div class="loading-blue-container" ng-show="true"> -->
-            <div class="loading-blue"></div>
-            <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
-            <p class="B2">May take a minute</p>
+        <!-- <div class="subheader-switches SH">
+          <div class="item-switch">
+            <switch ng-model="baseline_subtraction"></switch>
+            <label>BASELINE SUBTRACTION</label>
           </div>
-
-          <div class="charts" ng-if="RunExperimentCtrl.chart==='melt-curve' || has_data">
-            <linechartv2 ng-if="curve_type==='derivative'"
-             data-drag-scroll="meltcurve-drag-scroll" data="$parent.data" options="$parent.chartConfigDerivative" width="1024" height="400">
-            </linechartv2>
-            <linechartv2 ng-if="curve_type==='normalized'" data="$parent.data" options="$parent.chartConfigNormalized" width="1024" height="400">
-            </linechartv2>
-
+        </div> -->
+        <div>
+          <div class="vertical-text SH">
+            <span ng-show="curve_type === 'derivative'">DERIVATIVE REPORTER</span>
+            <span ng-show="curve_type === 'normalized'">NORMALIZED REPORTER</span>
           </div>
-
+          <div class="chart-container" id="ampli-drag-scroll" chart-drag-scroll ng-model="ampli_scroll">
+            <div class="chart-error B1"  ng-show="retrying && !fetching">
+              <strong class="text-black">Unable to load chart data</strong>
+              <p ng-bind="error"></p>
+              Retrying in {{retry}} seconds<ellipsis-animated></ellipsis-animated>
+            </div>
+            <div class="loading-blue-container" ng-show="fetching && !hasData">
+              <div class="loading-blue"></div>
+              <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
+              <p class="B2">May take a minute</p>
+            </div>
+            <linechartv2 ng-if="curve_type==='derivative' && (RunExperimentCtrl.chart==='melt-curve' || has_data)"
+             data-drag-scroll="meltcurve-drag-scroll" data="data" options="chartConfigDerivative" width="1024" height="400">
+            </linechartv2>
+            <linechartv2 ng-if="curve_type==='normalized' && (RunExperimentCtrl.chart==='melt-curve' || has_data)" data="data" options="chartConfigNormalized" width="1024" height="400">
+            </linechartv2>
+          </div>
+          <!-- <div class="text-center num-cycle-text SH">CYCLES NUMBER</div> -->
           <div class="ampli-zoom-scroll-container">
             <div class="row">
               <div class="col-md-6">
@@ -80,9 +82,58 @@
                 <scrollbar ng-model="mc_scroll" id="melt-curve-scrollbar"></scrollbar>
               </div>
             </div>
+
+            <!-- <div class="zoom-container">
+              <div class="zoom-text SH">
+                <b>ZOOM</b>
+              </div>
+              <ampli-slider ng-model="mc_zoom" range="resolutionOptions.length - 1"></ampli-slider>
+            </div> -->
+          </div>
+          <div class="choose-chart">
+            <amplification-well-switch ng-model="wellButtons" color-by="color_by" button-labels-num="1" label-unit="'Tm'"></amplification-well-switch>
           </div>
         </div>
-
+      </div>
+      <div class="table-container">
+        <table>
+          <tbody>
+            <tr>
+              <th class="B1">Well</th>
+              <th class="B1">Type</th>
+              <th class="B1">Tm</th>
+            </tr>
+            <tr ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" ng-class="{selected: (wellButtons['well_'+i].selected)}">
+              <td class="B1" ng-class="{'text-center': color_by==='channel'}">
+                <span ng-if="color_by==='well'" class="dot" style="background-color: {{wellButtons['well_'+i].color}}"></span>
+                <span class="text">
+                  <span ng-show="i < 8">
+                    A{{i+1}}
+                  </span>
+                  <span ng-show="i > 7">
+                    B{{i-7}}
+                  </span>
+                </span>
+              </td>
+              <td class="B1">Sample</td>
+              <td class="B1">
+                <span ng-show="wellButtons['well_'+i].ct[0] !== null">
+                  {{wellButtons['well_'+i].ct[0] | round:1}}
+                </span>
+              </td>
+              <!-- <td class="B1">
+                <span ng-show="wellButtons['well_'+i].ct[0] > 0">
+                  {{(wellButtons['well_'+i].ct[0]) | round:2}}
+                </span>
+              </td>
+              <td class="B1" ng-if="is_dual_channel">
+                <span ng-show="wellButtons['well_'+i].ct[1] > 0">
+                  {{(wellButtons['well_'+i].ct[1]) | round:2}}
+                </span>
+              </td> -->
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

@@ -114,6 +114,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             data.amplification_data.shift()
             data.ct.shift()
             data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
+            console.log 'amplification data'
+            console.log data
             AMPLI_DATA_CACHE = angular.copy data
             $scope.amplification_data = angular.copy(AMPLI_DATA_CACHE.amplification_data)
             moveData()

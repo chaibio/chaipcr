@@ -1,71 +1,260 @@
 @import './colors.css.scss';
 
+.melt-curve-chart-state-active {
+  font-family: 'dinot';
 
-.melt-curve-chart {
-  padding-top: 20px;
-
-  .chart-section {
-    margin-bottom: 70px;
-  }
-
-  .chart-container {
-
-    .loading-blue-container {
-      left: 560px;
-      top: 220px;
-    }
-
-    .charts {
-      height: 400px;
+  .header {
+    .name-container {
+      width: 80%;
     }
   }
 
-  .ampli-zoom-scroll-container {
-    margin-top: 50px;
-    padding-left: 50px;
-    padding-right: 50px;
-
-    .zoom-container {
-
-      .zoom-text {
-        display: inline-block;
-        width: 20%;
-        vertical-align: middle;
-      }
-      .ampli-slider {
-        display: inline-block;
-        width: 80%;
-        vertical-align: middle;
-      }
-    }
-
-    .ampli-scrollbar-container {
-      .scrollbar-container {
-        height: 5px;
-        border-radius: 10px;
-        margin-top: -5px;
-        position: relative;
-        top: 11.5px;
-        background: #ccc;
-
-        .scrollbar {
-          border-radius: 10px;
+  .curve-header {
+    .plot-type-buttons {
+      // width: 142px !important;
+      .buttons-wrapper {
+        .button {
+          // width: 70px !important;
         }
       }
     }
 
+    .curve-name {
+      width: 55%;
+    }
+    .ampli-toggles {
+      width: 45%;
+
+      .col-md-6, .col-sm-6 {
+        padding-left: 0;
+        // padding-right: 0;
+
+        // &:last-of-type {
+        //   padding-right: 15px;
+        // }
+      }
+    }
   }
 
-  .chart-legend {
-    display: none;
+  // $chart_section_width: 1024px - 
+
+  .chart-section {
+    display: inline-block;
+    padding-right: 20px;
+    width: 684px; //340px width of table in the right
+    vertical-align: top;
+
+    $item_switch_gap: 70px;
+    .subheader-switches {
+      margin-top: 20px;
+      margin-left: -($item_switch_gap);
+
+      .item-switch {
+        display: inline-block;
+        margin-left: $item_switch_gap;
+
+        .switch {
+          height: 15px;
+          margin-top: -2px;
+          width: 31px;
+          vertical-align: middle;
+
+          small {
+            width: 15px;
+            height: 15px;
+            border-width: 4px;
+          }
+
+          &.checked {
+            small {
+              left: 16px;
+            }
+          }
+        }
+
+        &.auto {
+          .switch {
+            background: #BBB;
+            border-color: #BBB;
+          }
+          small {
+            background: #bbb;
+          }
+          .set-auto {
+            color: $gray;
+          }
+        }
+
+        label {
+          color: $gray;
+          display: inline-block;
+          margin-left: 15px;
+          font-weight: 700;
+        }
+        span.set-auto {
+          color: $blue;
+          cursor: pointer;
+          margin-left: 15px;
+        }
+      }
+    }
+
+    // $marginTop: 190px;
+    // .vertical-text {
+
+    //   transform: rotate(-90deg);
+    //   transform-origin: 20% 40%;
+    //   float: left;
+    //   // font-size: 10px;
+    //   // font-weight: bold;
+    //   margin-left: -26px;
+    //   margin-top: $marginTop;
+    //   margin-bottom: -$marginTop;
+
+    // }
+
+    .chart-container {
+      // margin-left: 30px;
+      // margin-bottom: -35px;
+      position: relative;
+      width: 650px;
+      height: 300px;
+    }
+
+    .chart-legend {
+      display: none;
+    }
+
+    .chart-error {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      padding-top: 100px;
+      padding-left: 150px;
+      padding-right: 50px;
+      text-align: center;
+    }
+
+    .loading-blue-container {
+      top: 70px;
+      margin-left: 270px;
+    }
+
+    .axis.y2-axis {
+      display: none;
+    }
+
+    .num-cycle-text {
+      margin-bottom: -30px;
+      margin-top: 40px;
+    }
+
+    .ampli-zoom-scroll-container {
+      margin-top: 50px;
+      padding-left: 50px;
+      padding-right: 50px;
+
+      .zoom-container {
+
+        .zoom-text {
+          display: inline-block;
+          width: 20%;
+          vertical-align: middle;
+        }
+        .ampli-slider {
+          display: inline-block;
+          width: 80%;
+          vertical-align: middle;
+        }
+      }
+
+      .ampli-scrollbar-container {
+        .scrollbar-container {
+          height: 5px;
+          border-radius: 10px;
+          margin-top: -5px;
+          position: relative;
+          top: 11.5px;
+          background: #ccc;
+
+          .scrollbar {
+            border-radius: 10px;
+          }
+        }
+      }
+
+    }
+
   }
 
-  .x-axis-text {
-    margin-top: 40px;
+  .table-container {
+    display: inline-block;
+    margin-top: -20px;
+    margin-bottom: -4px;
+    width: 340px;
+
+    table {
+      width: 100%;
+      // box-shadow: -1px 0px 1px $lightgray;
+
+      th {
+        background-color: lighten($gray, 15%);
+        border-left: 1px solid lighten($lightgray, 15%);
+        border-bottom: 1px solid lighten($lightgray, 15%);
+        color: #fff;
+        padding: 10px 15px;
+        &.channel-1 {
+          background-color: $blue;
+        }
+        &.channel-2 {
+          background-color: $green;
+        }
+      }
+
+      tr {
+        td {
+          border-left: 1px solid lighten($lightgray, 15%);
+          border-bottom: 1px solid lighten($lightgray, 15%);
+          color: $lightgray;
+          padding: 10px 15px;
+
+          &:first-of-type {
+            color: $gray;
+            font-weight: bold;
+          }
+
+          &:last-of-type {
+            // border-right: 1px solid lighten($lightgray, 15%);
+            border-right: none;
+          }
+
+          .dot {
+            border-radius: 100px;
+            display: inline-block;
+            height: 10px;
+            margin-right: 10px;
+            vertical-align: middle;
+            width: 10px;
+          }
+
+          .text {
+            display: inline-block;
+            vertical-align: middle;
+          }
+        }
+
+        &.selected {
+          td {
+            color: #000;
+          }
+        }
+      }
+
+    }
   }
 
-  .zoom-scroll-container {
-    margin-top: 20px;
+  .experiment-start-stop-buttons {
+    padding: 15px;
   }
-
 }

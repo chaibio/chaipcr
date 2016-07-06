@@ -42,6 +42,7 @@ App.service 'MeltCurveService', [
           label: "well_#{i+1}: "
           interpolation: {mode: 'cardinal', tension: 0.7}
 
+      series: series
       axes:
         x:
           key: 'temperature'
@@ -51,14 +52,12 @@ App.service 'MeltCurveService', [
         y:
           ticks: 10
       margin:
-        left: 70
-        right: 0
-
+        left: 50
+        right: 10
+        top: 50
       grid:
         x: false
         y: false
-
-      series: series
 
       tooltipHook: (items) ->
         rows = []
@@ -98,8 +97,6 @@ App.service 'MeltCurveService', [
     # end parseData
 
     self.optimizeForEachResolution = (mc_data, resolutions) ->
-      console.log mc_data
-      console.log resolutions
       data = []
       for res in resolutions by 1
         data.push(self.optimizeForResolution(angular.copy(mc_data), res))
@@ -108,12 +105,9 @@ App.service 'MeltCurveService', [
 
     self.optimizeForResolution = (mc_data, resolution) ->
       return if !mc_data
-      console.log resolution
-
       calibration_dp = 200
       chunkSize = Math.round( resolution / calibration_dp )
       chunkSize = if chunkSize > 0 then chunkSize else 1
-      console.log "chunkSize: #{chunkSize}"
       new_data = {}
 
       for well_i in [0..15] by 1
@@ -159,10 +153,15 @@ App.service 'MeltCurveService', [
 
       return new_data
 
+    self.averagedTm = (tms) ->
+      return null if !tms
+      total = 0
+      for tm in tms by 1
+        total = tm + total
+      return total/tms.length
+
     self.getYExtrems = (data, chart_type) ->
-      console.log "chart_type: #{chart_type}"
       data_length = data['well_0'].length
-      console.log "data_length: #{data_length}"
       min = 0
       max = 0
 
