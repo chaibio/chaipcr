@@ -34,7 +34,7 @@
 
 class LEDController;
 
-namespace Poco { class Timer; }
+namespace Poco { namespace Util { class Timer; class TimerTask; } }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Optics
@@ -85,7 +85,7 @@ public:
 
 private:
     void toggleCollectData();
-    void collectDataCallback(Poco::Timer &timer);
+    void collectDataCallback(Poco::Util::TimerTask &task);
 	
 private:
     std::shared_ptr<LEDController> _ledController;
@@ -98,7 +98,7 @@ private:
     std::condition_variable _adcCondition;
 
     std::atomic<bool> _collectData;
-    Poco::Timer *_collectDataTimer;
+    Poco::Util::Timer *_collectDataTimer;
     mutable std::recursive_mutex _collectDataMutex;
 
     unsigned int _wellNumber;

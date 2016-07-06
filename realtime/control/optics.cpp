@@ -17,7 +17,9 @@
 // limitations under the License.
 //
 
-#include <Poco/Timer.h>
+#include <Poco/Timestamp.h>
+#include <Poco/Util/Timer.h>
+#include <Poco/Util/TimerTaskAdapter.h>
 
 #include "pcrincludes.h"
 #include "pid.h"
@@ -37,11 +39,9 @@ Optics::Optics(unsigned int lidSensePin, std::shared_ptr<LEDController> ledContr
     _lidOpen = false;
     _collectData = false;
     _meltCurveCollection = false;
-    _collectDataTimer = new Poco::Timer;
+    _collectDataTimer = new Poco::Util::Timer();
     _wellNumber = 0;
     _adcValue = {0, 0};
-
-    _collectDataTimer->setPeriodicInterval(0);
 }
 
 Optics::~Optics()
@@ -110,12 +110,8 @@ void Optics::toggleCollectData()
 
     if (_collectData && !lidOpen())
     {
-        if (_collectDataTimer->getPeriodicInterval() == 0)
-        {
-            _collectDataTimer->setStartInterval(kFluorescenceDataCollectionDelayTimeMs);
-            _collectDataTimer->setPeriodicInterval(kFluorescenceDataCollectionDelayTimeMs);
-            _collectDataTimer->start(Poco::TimerCallback<Optics>(*this, &Optics::collectDataCallback));
-        }
+        _collectDataTimer->schedule(Poco::Util::TimerTask::Ptr(new Poco::Util::TimerTaskAdapter<Optics>(*this, &Optics::collectDataCallback)),
+                                    Poco::Timestamp() + (kFluorescenceDataCollectionDelayTimeMs * 1000));
     }
     else
     {
@@ -126,15 +122,14 @@ void Optics::toggleCollectData()
             _adcCondition.notify_all();
         }
 
-        _collectDataTimer->stop();
-        _collectDataTimer->setPeriodicInterval(0);
+        _collectDataTimer->cancel(true);
         _ledController->disableLEDs();
 
         _collectData = collect;
     }
 }
 
-void Optics::collectDataCallback(Poco::Timer &timer)
+void Optics::collectDataCallback(Poco::Util::TimerTask &task)
 {
     try
     {
@@ -210,7 +205,10 @@ void Optics::collectDataCallback(Poco::Timer &timer)
         _photodiodeMux.setChannel(_wellNumber);
 
         if (_collectData)
-            timer.restart(timer.getPeriodicInterval());
+        {
+            _collectDataTimer->schedule(Poco::Util::TimerTask::Ptr(new Poco::Util::TimerTaskAdapter<Optics>(*this, &Optics::collectDataCallback)),
+                                        Poco::Timestamp() + (kFluorescenceDataCollectionDelayTimeMs * 1000));
+        }
     }
     catch (...)
     {
