@@ -30,18 +30,34 @@ window.App.service 'Device', [
       version_info = null
       is_offline = false
       capabilities = null
+      is_fetching_capabilities = false
+      capabilities_que = [];
       @direct_upload = false
 
       isOffline: -> is_offline
 
       getCapabilities: ->
         deferred = $q.defer()
+        capabilities_que.push(deferred)
         if capabilities isnt null
-          deferred.resolve capabilities
+          for def in capabilities_que by 1
+            def.resolve capabilities
+          capabilities_que = []
         else
-          $http.get('/capabilities').then (resp) ->
-            capabilities = resp
-            deferred.resolve resp
+          if !is_fetching_capabilities
+            is_fetching_capabilities = true
+
+            $http.get('/capabilities')
+            .then (resp) ->
+              capabilities = resp
+              for def in capabilities_que by 1
+                def.resolve(resp)
+            .catch (resp) ->
+              for def in capabilities_que by 1
+                def.reject(resp)
+            .finally ->
+              capabilities_que = []
+              is_fetching_capabilities = false
 
         return deferred.promise
 
