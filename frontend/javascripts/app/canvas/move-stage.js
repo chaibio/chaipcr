@@ -128,48 +128,48 @@ angular.module("canvasApp").factory('moveStageRect', [
           // Process movement here
           // objects are corrected now looking for visual part.
           console.log("Landed .... !", this.currentHit, this.draggedStage.index);
+          var that = this;
           if(this.currentHit  > this.draggedStage.index) {
             console.log("ready to move back");
-            this.draggedStage.wireStageNextAndPrevious();
-            this.draggedStage.myWidth = 0;
-            var stage = this.draggedStage;
-
-            while(stage.index <= (this.currentHit - 1)) {
-              stage.moveIndividualStageAndContents(stage, true)
-              stage = stage.nextStage;
-              console.log(stage.left);
-            }
-            var stageIndex = this.currentDrop.index;
-            var model = this.draggedStage.model;
-            var stageView = new stageDude(model, C.canvas, C.allStepViews, stageIndex, C, C.$scope, true);
-
-            C.addNextandPrevious(this.currentDrop, stageView);
-
-            C.allStageViews.splice(stageIndex + 1, 0, stageView);
-            C.allStageViews.splice(this.draggedStage.index, 1);
-
-            stageView.updateStageData(1);
-            stageView.render();
-            C.configureStepsofNewStage(stageView, 0);
-            C.correctNumbering();
-            stageView.moveAllStepsAndStages();
-            circleManager.init(C)
-            circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
-            /********************Testing Ends****************************/
-
+            this.applyMovement(stage, C, circleManager, function() {
+              C.allStageViews.splice(that.draggedStage.index, 1);
+            });
           } else {
             console.log("ready to move forward", this.draggedStage.myWidth);
-            this.draggedStage.wireStageNextAndPrevious();
-            this.currentDrop.myWidth = this.currentDrop.myWidth + this.draggedStage.myWidth;
-            this.draggedStage.myWidth = 0;
-            var stage = this.currentDrop;
-
-            while (stage.nextStage) {
-              stage.moveIndividualStageAndContents(stage, true)
-              stage = stage.nextStage;
-            }
+            this.applyMovement(stage, C, circleManager, function() {
+              C.allStageViews.splice(that.draggedStage.index + 1, 1);
+            });
           }
         };
+
+        this.indicator.applyMovement = function(stage, C, circleManager, callBack) {
+
+          this.draggedStage.wireStageNextAndPrevious();
+          this.draggedStage.myWidth = 0;
+          var stage = this.draggedStage;
+
+          while(stage.index <= (this.currentHit - 1)) {
+            stage.moveIndividualStageAndContents(stage, true)
+            stage = stage.nextStage;
+          }
+
+          var stageIndex = this.currentDrop.index;
+          var model = this.draggedStage.model;
+          var stageView = new stageDude(model, C.canvas, C.allStepViews, stageIndex, C, C.$scope, true);
+
+          C.addNextandPrevious(this.currentDrop, stageView);
+          C.allStageViews.splice(stageIndex + 1, 0, stageView);
+          callBack();
+
+          stageView.updateStageData(1);
+          stageView.render();
+          C.configureStepsofNewStage(stageView, 0);
+          C.correctNumbering();
+          stageView.moveAllStepsAndStages();
+          circleManager.init(C)
+          circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
+        };
+
         return this.indicator;
       },
     };
