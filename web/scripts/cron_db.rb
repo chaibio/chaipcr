@@ -34,7 +34,7 @@ class CronDB
 	         @env = env
        	   @db = nil
            @conf = nil
-	         if env and (@conf = YAML.load_file("web/config/database.yml")[env])
+	         if env and (@conf = YAML.load_file("config/database.yml")[env])
              if Mysql2::Client.const_defined? :FOUND_ROWS
                @conf[:flags] = Mysql2::Client::FOUND_ROWS
              end
