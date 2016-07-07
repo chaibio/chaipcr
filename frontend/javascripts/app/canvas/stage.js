@@ -85,6 +85,7 @@ angular.module("canvasApp").factory('stage', [
           this.myWidth = 136; // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
           this.moveAllStepsAndStages(true);
           var moveStart = this.childSteps[this.childSteps.length - 1].ordealStatus;
+          allSteps = this.parent.allStepViews;
           for(var j = moveStart; j < allSteps.length; j++) {
             allSteps[j].circle.moveCircleWithStep();
           }
@@ -205,8 +206,8 @@ angular.module("canvasApp").factory('stage', [
         stage.nextStage.stageGroup.set({left: stage.nextStage.left }).setCoords();
         stage.nextStage.dots.set({left: stage.nextStage.left + 3}).setCoords();
         stage.nextStage.stageHitPoint.set({left: stage.nextStage.left + 60}).setCoords();
-        var thisStageSteps = stage.nextStage.childSteps, stepCount = thisStageSteps.length;
 
+        var thisStageSteps = stage.nextStage.childSteps, stepCount = thisStageSteps.length;
         for(var i = 0; i < stepCount; i++ ) {
           if(del === true) {
             thisStageSteps[i].moveStep(-1, true);

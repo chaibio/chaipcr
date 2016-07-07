@@ -263,7 +263,7 @@ angular.module("canvasApp").factory('canvas', [
       stageView.render();
       // configure steps;
       this.configureStepsofNewStage(stageView, ordealStatus);
-      circleManager.init(C)
+      circleManager.init(this);
       circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
 
       this.$scope.applyValues(stageView.childSteps[0].circle);

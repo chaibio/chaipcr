@@ -130,87 +130,48 @@ angular.module("canvasApp").factory('moveStageRect', [
           console.log("Landed .... !", this.currentHit, this.draggedStage.index);
           if(this.currentHit  > this.draggedStage.index) {
             console.log("ready to move back");
+            this.draggedStage.wireStageNextAndPrevious();
             this.draggedStage.myWidth = 0;
             var stage = this.draggedStage;
 
             while(stage.index <= (this.currentHit - 1)) {
-              stage.moveIndividualStageAndContents(stage, false)
+              stage.moveIndividualStageAndContents(stage, true)
               stage = stage.nextStage;
+              console.log(stage.left);
             }
-
-            this.draggedStage.wireStageNextAndPrevious();
             var stageIndex = this.currentDrop.index;
-            var model = this.draggedStage.model
+            var model = this.draggedStage.model;
             var stageView = new stageDude(model, C.canvas, C.allStepViews, stageIndex, C, C.$scope, true);
 
-            /*if(this.currentDrop.nextStage) {
-              stageView.nextStage = this.currentDrop.nextStage;
-              stageView.nextStage.previousStage = stageView;
-            }
-              stageView.previousStage = this.currentDrop;
-              this.currentDrop.nextStage = stageView;
-              */
             C.addNextandPrevious(this.currentDrop, stageView);
 
             C.allStageViews.splice(stageIndex + 1, 0, stageView);
             C.allStageViews.splice(this.draggedStage.index, 1);
-            //C.correctNumbering();
+
             stageView.updateStageData(1);
             stageView.render();
-            var ordealStatus = 0;
-            if(stageView.previousStage) {
-              ordealStatus = stageView.previousStage.childSteps[stageView.previousStage.childSteps.length - 1].ordealStatus
-            }
-            C.configureStepsofNewStage(stageView, ordealStatus);
+            C.configureStepsofNewStage(stageView, 0);
             C.correctNumbering();
-            /********************Testing****************************/
-            var test = C.allStageViews[0];
-            //C.allStepViews = [];
-            while(test) {
-              test.childSteps.forEach(function(step, index) {
-                //C.allStepViews.push(step);
-              });
-              console.log(test.childSteps[0].model.temperature);
-              test = test.nextStage;
-            }
-            console.log("/*****************************************************/");
-              C.allStageViews.forEach(function(stage, index) {
-                console.log(stage.childSteps[0].model.temperature);
-              });
-            console.log("/*****************************************************/");
-            C.correctNumbering();
-            C.allStepViews.forEach(function(step, index) {
-              console.log(step.model.temperature);
-            });
-
             stageView.moveAllStepsAndStages();
-            //C.allStepViews.length = 0;
             circleManager.init(C)
-            //console.log(circleManager.findAllCircles(C));
             circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
             /********************Testing Ends****************************/
 
           } else {
             console.log("ready to move forward", this.draggedStage.myWidth);
+            this.draggedStage.wireStageNextAndPrevious();
             this.currentDrop.myWidth = this.currentDrop.myWidth + this.draggedStage.myWidth;
             this.draggedStage.myWidth = 0;
             var stage = this.currentDrop;
 
             while (stage.nextStage) {
-              stage.moveIndividualStageAndContents(stage, false)
+              stage.moveIndividualStageAndContents(stage, true)
               stage = stage.nextStage;
             }
           }
-          C.allStepViews.forEach(function(step, index){
-            step.circle.moveCircleWithStep();
-          });
-          C.setDefaultWidthHeight();
         };
-
         return this.indicator;
       },
-
     };
   }
-]
-);
+]);
