@@ -168,6 +168,8 @@ angular.module("canvasApp").factory('moveStageRect', [
           stageView.moveAllStepsAndStages();
           circleManager.init(C)
           circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
+          C.$scope.applyValues(stageView.childSteps[0].circle);
+          stageView.childSteps[0].circle.manageClick(true);
         };
 
         return this.indicator;
