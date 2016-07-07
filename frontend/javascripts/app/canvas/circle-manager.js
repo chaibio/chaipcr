@@ -69,8 +69,7 @@ angular.module("canvasApp").factory('circleManager', [
       var tempCirc = null;
       this.findAllCirclesArray.length = 0;
 
-      this.findAllCirclesArray = this.allStepViews.map(function(step) {
-
+      this.findAllCirclesArray = this.allStepViews.map(function(step, index) {
         if(tempCirc) {
           step.circle.previous = tempCirc;
           tempCirc.next = step.circle;
