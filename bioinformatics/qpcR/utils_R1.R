@@ -791,6 +791,12 @@ dense_factor = 10 # xqrm
     RSS <- sum((Tm.opt - TMs)^2)
   } else RSS <- NA
   
+  # xqrm
+  tempDATA <- round(tempDATA, 2)
+  meltDATA <- round(meltDATA, 2)
+  derivDATA <- round(derivDATA, 2)
+  TMs <- round(TMs, 2)
+  
   ### return data
   outDATA <- data.frame.na(tempDATA, meltDATA, derivDATA, Pars = c(span.smooth, span.peaks), RSS, Tm = TMs)
   return(outDATA)

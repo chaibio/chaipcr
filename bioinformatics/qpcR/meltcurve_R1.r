@@ -217,7 +217,8 @@ cut.Area = 0,
         }           
           
         ### attach peak area values
-        RES <- cbind.na(RES, Area = PA)
+        # RES <- cbind.na(RES, Area = PA) # ori
+        RES <- cbind.na(RES, Area = round(PA, 2)) # xqrm
         
         ### attach baseline area values to
         ### the corresponding temperature values
