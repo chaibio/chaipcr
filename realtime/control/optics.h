@@ -52,11 +52,12 @@ public:
 
     struct MeltCurveData
     {
-        MeltCurveData(int32_t fluorescenceValue, double temperature, int wellId, std::size_t channel): fluorescenceValue(fluorescenceValue), temperature(temperature), wellId(wellId), channel(channel) {}
+        MeltCurveData(int32_t fluorescenceValue, double temperature, unsigned int wellId, std::size_t channel):
+            fluorescenceValue(fluorescenceValue), temperature(temperature), wellId(wellId), channel(channel) {}
 
         int32_t fluorescenceValue;
         double temperature;
-        int wellId;
+        unsigned int wellId;
         std::size_t channel;
     };
 

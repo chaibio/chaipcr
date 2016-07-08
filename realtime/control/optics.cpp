@@ -232,7 +232,7 @@ std::vector<Optics::FluorescenceData> Optics::getFluorescenceData()
             {
                 if (!it2->second.empty())
                 {
-                    data.emplace_back(std::accumulate(it2->second.begin(), it2->second.end(), 0) / it2->second.size(), it->first, it2->first);
+                    data.emplace_back(std::accumulate(it2->second.begin(), it2->second.end(), 0) / static_cast<int32_t>(it2->second.size()), it->first, it2->first);
 
                     it2->second.clear();
                 }
