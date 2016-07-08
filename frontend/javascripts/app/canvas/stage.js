@@ -41,6 +41,7 @@ angular.module("canvasApp").factory('stage', [
       this.insertMode = insert;
       this.shrinked = false;
       this.shadowText = "0px 1px 2px rgba(0, 0, 0, 0.5)";
+      this.visualComponents = {};
 
       this.setNewWidth = function(add) {
 
@@ -70,6 +71,27 @@ angular.module("canvasApp").factory('stage', [
 
         // Now we need to add some space after every stage so that, we can leave steps there create a new stage.
         // The problem right now we have is , we create space between step which is being moved and very next stage.
+      };
+
+      this.collapseStage = function() {
+        // Remove all content in the stage first
+        this.childSteps.forEach(function(step, index) {
+          this.deleteAllStepContents(step);
+        }, this);
+        this.deleteStageContents();
+        // Bring other stages closer
+        if(this.nextStage) {
+          var width = this.myWidth;
+          this.myWidth = 136; // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
+          this.moveAllStepsAndStages(true);
+          var moveStart = this.childSteps[this.childSteps.length - 1].ordealStatus;
+          allSteps = this.parent.allStepViews;
+          for(var j = moveStart; j < allSteps.length; j++) {
+            allSteps[j].circle.moveCircleWithStep();
+          }
+          this.myWidth = width;
+        }
+        this.canvas.renderAll();
       };
 
       this.expand = function() {
@@ -165,21 +187,34 @@ angular.module("canvasApp").factory('stage', [
 
       this.deleteStageContents = function() {
 
-        this.canvas.remove(this.stageGroup);
-        this.canvas.remove(this.dots);
-        this.canvas.remove(this.borderRight);
-
+        for(var component in this.visualComponents) {
+          this.canvas.remove(this.visualComponents[component]);
+        }
       };
 
       this.deleteAllStepContents = function(currentStep) {
 
-        this.canvas.remove(currentStep.stepGroup);
-        this.canvas.remove(currentStep.hitPoint);
-        this.canvas.remove(currentStep.closeImage);
-        this.canvas.remove(currentStep.dots);
-        this.canvas.remove(currentStep.rampSpeedGroup);
+        for(var component in currentStep.visualComponents) {
+          this.canvas.remove(currentStep.visualComponents[component]);
+        }
         currentStep.circle.removeContents();
+      };
 
+      this.moveIndividualStageAndContents = function(stage, del) {
+
+        stage.nextStage.getLeft();
+        stage.nextStage.stageGroup.set({left: stage.nextStage.left }).setCoords();
+        stage.nextStage.dots.set({left: stage.nextStage.left + 3}).setCoords();
+        stage.nextStage.stageHitPoint.set({left: stage.nextStage.left + 60}).setCoords();
+
+        var thisStageSteps = stage.nextStage.childSteps, stepCount = thisStageSteps.length;
+        for(var i = 0; i < stepCount; i++ ) {
+          if(del === true) {
+            thisStageSteps[i].moveStep(-1, true);
+          } else {
+            thisStageSteps[i].moveStep(1, true);
+          }
+        }
       };
 
       this.moveAllStepsAndStages = function(del) {
@@ -188,20 +223,7 @@ angular.module("canvasApp").factory('stage', [
 
         while(currentStage.nextStage) {
 
-          currentStage.nextStage.getLeft();
-          currentStage.nextStage.stageGroup.set({left: currentStage.nextStage.left }).setCoords();
-          currentStage.nextStage.dots.set({left: currentStage.nextStage.left + 3}).setCoords();
-
-          var thisStageSteps = currentStage.nextStage.childSteps, stepCount = thisStageSteps.length;
-
-          for(var i = 0; i < stepCount; i++ ) {
-            if(del === true) {
-              thisStageSteps[i].moveStep(-1, true);
-            } else {
-              thisStageSteps[i].moveStep(1, true);
-            }
-
-          }
+          this.moveIndividualStageAndContents(currentStage, del)
 
           currentStage = currentStage.nextStage;
         }
@@ -309,11 +331,21 @@ angular.module("canvasApp").factory('stage', [
           stageGraphics.createStageRect.call(this);
           stageGraphics.dotsOnStage.call(this);
           stageGraphics.stageHeader.call(this);
+          stageGraphics.createStageHitPoint.call(this);
 
           var stageContents = [this.stageRect, this.stageNameGroup, this.roof, this.border]; //this.dots
           stageGraphics.createStageGroup.apply(this, [stageContents]);
+
+          this.visualComponents = {
+            'stageGroup': this.stageGroup,
+            'dots': this.dots,
+            'stageHitPoint': this.stageHitPoint,
+            'borderRight': this.borderRight
+          };
+
           this.canvas.add(this.stageGroup);
           this.canvas.add(this.dots);
+          this.canvas.add(this.stageHitPoint);
 
           this.setShadows();
 

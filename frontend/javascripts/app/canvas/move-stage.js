@@ -19,8 +19,8 @@
 
 angular.module("canvasApp").factory('moveStageRect', [
   'ExperimentLoader',
-
-  function(ExperimentLoader) {
+  'stage',
+  function(ExperimentLoader, stageDude) {
 
     return {
 
@@ -78,7 +78,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         ],
           {
             originX: "left", originY: "top", left: 0, top: 0, height: 72, selectable: true, lockMovementY: true, hasControls: false,
-            visible: true, hasBorders: false, name: "dragStepGroup"
+            visible: true, hasBorders: false, name: "dragStageRect"
           }
         );
 
@@ -89,16 +89,20 @@ angular.module("canvasApp").factory('moveStageRect', [
 
 
         this.indicator.init = function(stage) {
+          this.setLeft(stage.left - 1).setCoords();
           this.draggedStage = stage;
+          this.stageBackUp = angular.extend({}, stage);
+          this.setVisible(true);
         };
 
         this.indicator.onTheMoveDragGroup = function(dragging) {
-            this.setLeft(dragging.left - 1);
-            this.setCoords();
+          this.setLeft(dragging.left - 1).setCoords();
         };
 
         this.indicator.changePlacing = function(place) {
-          this.setVisible(true);
+
+          //this.setCoords();
+
         };
 
         this.indicator.changeText = function(stage) {
@@ -109,16 +113,67 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         this.indicator.onTheMove = function(C) {
           // Here we hit test the movement of the MOVING STAGE
+          //console.log("moving", this);
+          C.allStageViews.some(function(stage, index) {
+
+            if(this.intersectsWithObject(stage.stageHitPoint) && this.currentHit !== index) {
+              this.currentDrop = stage;
+              this.currentHit = index;
+              console.log("found");
+            }
+          }, this);
         }
 
-        this.indicator.processMovement = function() {
+        this.indicator.processMovement = function(stage, C, circleManager) {
           // Process movement here
+          // objects are corrected now looking for visual part.
+          console.log("Landed .... !", this.currentHit, this.draggedStage.index);
+          var that = this;
+          if(this.currentHit  > this.draggedStage.index) {
+            console.log("ready to move back");
+            this.applyMovement(stage, C, circleManager, function() {
+              C.allStageViews.splice(that.draggedStage.index, 1);
+            });
+          } else {
+            console.log("ready to move forward", this.draggedStage.myWidth);
+            this.applyMovement(stage, C, circleManager, function() {
+              C.allStageViews.splice(that.draggedStage.index + 1, 1);
+            });
+          }
+        };
+
+        this.indicator.applyMovement = function(stage, C, circleManager, callBack) {
+
+          this.draggedStage.wireStageNextAndPrevious();
+          this.draggedStage.myWidth = 0;
+          var stage = this.draggedStage;
+
+          while(stage.index <= (this.currentHit - 1)) {
+            stage.moveIndividualStageAndContents(stage, true)
+            stage = stage.nextStage;
+          }
+
+          var stageIndex = this.currentDrop.index;
+          var model = this.draggedStage.model;
+          var stageView = new stageDude(model, C.canvas, C.allStepViews, stageIndex, C, C.$scope, true);
+
+          C.addNextandPrevious(this.currentDrop, stageView);
+          C.allStageViews.splice(stageIndex + 1, 0, stageView);
+          callBack();
+
+          stageView.updateStageData(1);
+          stageView.render();
+          C.configureStepsofNewStage(stageView, 0);
+          C.correctNumbering();
+          stageView.moveAllStepsAndStages();
+          circleManager.init(C)
+          circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
+          C.$scope.applyValues(stageView.childSteps[0].circle);
+          stageView.childSteps[0].circle.manageClick(true);
         };
 
         return this.indicator;
       },
-
     };
   }
-]
-);
+]);

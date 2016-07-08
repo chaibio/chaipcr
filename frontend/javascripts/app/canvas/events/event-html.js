@@ -33,7 +33,6 @@ angular.module("canvasApp").factory('htmlEvents', [
         if(popupStatus.popupStatusAddStage && evt.target.id != "add-stage") {
             angular.element('#add-stage').click();
         }
-
       });
 
       angular.element('.canvas-container, .canvasClass').mouseleave(function() {

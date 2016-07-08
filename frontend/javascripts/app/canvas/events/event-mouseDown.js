@@ -54,7 +54,7 @@ angular.module("canvasApp").factory('mouseDown', [
             var group = target.parentCircle.stepDataGroup;
             var items = group._objects;
             unHookGroup(group, items);
-            
+
             if(getP.x > stepDataGroupLeft && getP.x < (stepDataGroupLeft + 45)) {
               editMode.tempActive = true;
               startEditing(target.parentCircle.temperature);
@@ -80,7 +80,8 @@ angular.module("canvasApp").factory('mouseDown', [
           break;
 
           case "moveStep":
-
+            // Remember what we click and what we move is two different objects, once we click, rest of the graphics come by, So original reference point to ,
+            // the very thing we click. Not to the one we move. This applies to moveStage too.
             that.mouseDownPos = evt.e.clientX;
             C.stepIndicator.init(evt.target.parent);
             evt.target.parent.toggleComponents(false);
@@ -105,11 +106,14 @@ angular.module("canvasApp").factory('mouseDown', [
             that.moveStageActive = true;
             that.canvas.moveCursor = "move";
             that.calculateMoveLimit("stage");
+            circleManager.togglePaths(false); //put it back later
 
             C.stageIndicator.init(evt.target.parent);
-            C.stageIndicator.changePlacing(evt.target);
             C.stageIndicator.changeText(evt.target.parent);
             C.canvas.bringToFront(C.stageIndicator);
+            C.stageIndicator.changePlacing(evt.target);
+            evt.target.parent.collapseStage();
+            C.canvas.renderAll();
             // Move other stages
             // Shrink this stage
 

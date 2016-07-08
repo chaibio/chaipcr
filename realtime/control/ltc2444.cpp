@@ -68,8 +68,8 @@ uint32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, Overs
 
     spiPort_.readBytes(dataIn, dataOut, 4, kADCSPIFrequencyHz);
 
-    if ((dataIn[0] >> 4) & 1)
-        conversion = 0; //undervoltage
+    if (((dataIn[0] >> 5) & (dataIn[0] >> 4) & 1) || !((dataIn[0] >> 5) | (dataIn[0] >> 4) | 0) )
+        conversion = 0; //undervoltage or overvoltage
     else
         // convert to little endian and get only ADC result (bit28 down to bit 5)
         conversion = ((((uint32_t)dataIn[0])<<24|((uint32_t)dataIn[1])<<16|((uint32_t)dataIn[2])<<8|dataIn[3])&0x1FFFFFE0)>>5;

@@ -156,8 +156,7 @@ angular.module("canvasApp").factory('moveStepRect', [
 
       this.indicator.onTheMoveDragGroup = function(dragging) {
 
-        this.setLeft(dragging.left);
-        this.setCoords();
+        this.setLeft(dragging.left).setCoords();
       };
 
       this.indicator.onTheMove = function(C) {
@@ -166,7 +165,7 @@ angular.module("canvasApp").factory('moveStepRect', [
           console.log("oye hit");
           return false;
         }*/
-
+        console.log(this);
         C.allStepViews.some(function(step, index) {
 
           if(this.intersectsWithObject(step.hitPoint) && this.currentHit !== index) {
