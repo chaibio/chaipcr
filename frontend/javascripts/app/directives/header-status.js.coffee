@@ -29,13 +29,21 @@ window.App.directive 'headerStatus', [
     restrict: 'EA'
     replace: true
     transclude: true
+    controller: ($scope) ->
+      this.start_confirm_show = $scope.start_confirm_show
+      this.checkButtonStatus = () ->
+        if $scope.start_confirm_show
+          $scope.start_confirm_show = false
+          this.start_confirm_show = $scope.start_confirm_show
+
     scope:
       experimentId: '=?'
     templateUrl: 'app/views/directives/header-status.html'
-    link: ($scope, elem, attrs) ->
+    link: ($scope, elem, attrs, controller) ->
 
       experiment_id = null
       $scope.loading = true
+      $scope.start_confirm_show = false
 
       $scope.show = ->
         if attrs.experimentId then (experiment_id and $scope.status) else $scope.status
@@ -48,10 +56,10 @@ window.App.directive 'headerStatus', [
           cb resp.experiment if cb
 
       $scope.is_holding = false
-	  
+
 	 #$scope.$on 'start_confirm_show:false' ->
 		 # $scope.start_confirm_show = false
-	  	  
+
       $scope.$on 'status:data:updated', (e, data, oldData) ->
         return if !data
         return if !data.experiment_controller
@@ -93,10 +101,11 @@ window.App.directive 'headerStatus', [
             if $state.is('edit-protocol')
               max_cycle = Experiment.getMaxExperimentCycle($scope.experiment)
               $state.go('run-experiment', {'id': experiment_id, 'chart': 'amplification', 'max_cycle': max_cycle})
-			  
+
       $scope.startConfirm = ->
-        $scope.start_confirm_show = true	
-		
+        $scope.start_confirm_show = true
+        controller.start_confirm_show = $scope.start_confirm_show
+
       $scope.stopExperiment = ->
         Experiment.stopExperiment($scope.experiment.id)
 

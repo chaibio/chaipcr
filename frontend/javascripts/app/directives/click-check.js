@@ -17,25 +17,21 @@
  * limitations under the License.
  */
 
-window.ChaiBioTech.ngApp.directive('escapeMenu', [
+window.ChaiBioTech.ngApp.directive('clickCheck', [
   '$rootScope',
   function($rootScope) {
     return {
       restrict: 'A',
-      link: function($scope, elem) {
-        console.log("Bingo");
-        $scope.registerEscape = false;
-
+      require: '^headerStatus',
+      link: function($scope, elem, attrs, ctrl) {
         if(! $scope.registerEscape) {
-          $scope.registerEscape = angular.element(window).on('keyup', function(evt) {
-            console.log("it works !!!!!");
-            if(evt.keyCode === 27 && $scope.sideMenuOpen) {
-              $rootScope.$broadcast('sidemenu:toggle');
-              $scope.$apply();
+          $scope.registerEscape = angular.element('body').click(function(evt) {
+            if(evt.target.id !== 'start-experiment-button' && ctrl.start_confirm_show === true) {
+              console.log("inside");
+              ctrl.checkButtonStatus();
             }
           });
         }
-
       }
     };
   }

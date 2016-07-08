@@ -29,7 +29,6 @@ angular.module("canvasApp").factory('htmlEvents', [
     this.init = function(C, $scope, that) {
 
       angular.element('body').click(function(evt) {
-
         if(popupStatus.popupStatusAddStage && evt.target.id != "add-stage") {
             angular.element('#add-stage').click();
         }
