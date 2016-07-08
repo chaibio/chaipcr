@@ -310,8 +310,10 @@ class ExperimentsController < ApplicationController
             csv_string = CSV.generate do |csv|
               csv << columns
               melt_curve_data.each do |data|
-                tm_arr = (data.tm.is_a?Array)? [data.tm[0], data.tm[1], data.tm[2], data.tm[3]] : [data.tm, nil, nil, nil]
-                area_arr = (data.area.is_a?Array)? [data.area[0], data.area[1], data.area[2], data.area[3]] : [data.area, nil, nil, nil]
+                tm_arr = Array.new(4)
+                data.tm.each_index{|i| tm_arr[i] = data.tm[i]}
+                area_arr = Array.new(4)
+                data.area.each_index{|i| area_arr[i] = data.area[i]}
                 csv << [data.channel, data.well_num]+tm_arr+area_arr
               end
             end
@@ -432,7 +434,7 @@ class ExperimentsController < ApplicationController
       (0...results.length).each do |channel|
         results[channel].each_index do |i|
           results_per_well = results[channel][i]
-          hash = OpenStruct.new({:channel=>channel+1, :well_num=>i+1, :temperature=>results_per_well[0][0], :fluorescence_data=>results_per_well[0][1], :derivative=>results_per_well[0][2], :tm=>results_per_well[1][0], :area=>results_per_well[1][1]})
+          hash = OpenStruct.new({:channel=>channel+1, :well_num=>i+1, :temperature=>results_per_well[0][0], :fluorescence_data=>results_per_well[0][1], :derivative=>results_per_well[0][2], :tm=>(results_per_well[1][0].blank?)? [] : (results_per_well[1][0].is_a? Array)? results_per_well[1][0] : [results_per_well[1][0]], :area=>(results_per_well[1][1].blank?)? [] : (results_per_well[1][1].is_a? Array)? results_per_well[1][1] : [results_per_well[1][1]]})
           melt_curve_data << hash
         end
       end
