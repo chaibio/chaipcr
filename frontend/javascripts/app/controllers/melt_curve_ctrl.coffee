@@ -96,9 +96,10 @@ App.controller 'MeltCurveChartCtrl', [
     updateButtonTms = (data) ->
       # console.log data
       for well_data, well_i in data.melt_curve_data by 1
-        console.log well_data
+        console.log well_data.tm
         $scope.wellButtons["well_#{well_i}"].ct = [MeltCurveService.averagedTm(well_data.tm)]
-
+        
+		
     updateSeries = (buttons) ->
       buttons = buttons || $scope.wellButtons || {}
       channel_count = if $scope.is_dual_channel then 2 else 1
