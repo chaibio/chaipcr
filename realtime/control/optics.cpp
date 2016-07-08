@@ -61,12 +61,12 @@ void Optics::process()
     }
 }
 
-void Optics::setADCValue(unsigned int adcValue, std::size_t channel)
+void Optics::setADCValue(int32_t adcValue, std::size_t channel)
 {
     {
         std::lock_guard<std::mutex> lock(_adcMutex);
 
-        _adcValue = {adcValue, channel}; //convert positive range of signed 24 bit ADC value to 16 bit unsigned value
+        _adcValue = {adcValue, channel};
         _adcCondition.notify_all();
     }
 
@@ -133,7 +133,7 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &task)
 {
     try
     {
-        std::vector<std::vector<unsigned long>> adcValues;
+        std::vector<std::vector<int32_t>> adcValues;
         adcValues.resize(qpcrApp.settings().device.opticsChannels);
 
         {
@@ -146,7 +146,7 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &task)
                 {
                     _adcCondition.wait(lock);
 
-                    std::vector<unsigned long> &channel = adcValues.at(_adcValue.second);
+                    std::vector<int32_t> &channel = adcValues.at(_adcValue.second);
 
                     if (channel.size() < kADCReadsPerOpticalMeasurement)
                     {
@@ -172,9 +172,9 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &task)
             if (!_meltCurveCollection)
             {
                 std::size_t i = 0;
-                for (std::vector<unsigned long> &channel: adcValues)
+                for (std::vector<int32_t> &channel: adcValues)
                 {
-                    for (unsigned long value: channel)
+                    for (int32_t value: channel)
                         _fluorescenceData[_wellNumber][i].emplace_back(value);
 
                     ++i;
@@ -185,9 +185,9 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &task)
                 double temperature = HeatBlockInstance::getInstance()->temperature();
 
                 std::size_t i = 0;
-                for (std::vector<unsigned long> &channel: adcValues)
+                for (std::vector<int32_t> &channel: adcValues)
                 {
-                    unsigned int value = std::round(Util::average(channel.begin(), channel.end()));
+                    int32_t value = std::round(Util::average(channel.begin(), channel.end()));
 
                     std::lock_guard<std::mutex> meltCurveDataLock(_meltCurveDataMutex);
                     _meltCurveData.emplace_back(value, temperature, _wellNumber, i);
@@ -226,9 +226,9 @@ std::vector<Optics::FluorescenceData> Optics::getFluorescenceData()
         _collectData = false;
         toggleCollectData();
 
-        for (std::map<unsigned int, std::map<std::size_t, std::vector<unsigned long>>>::iterator it = _fluorescenceData.begin(); it != _fluorescenceData.end(); ++it)
+        for (std::map<unsigned int, std::map<std::size_t, std::vector<int32_t>>>::iterator it = _fluorescenceData.begin(); it != _fluorescenceData.end(); ++it)
         {
-            for (std::map<std::size_t, std::vector<unsigned long>>::iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2)
+            for (std::map<std::size_t, std::vector<int32_t>>::iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2)
             {
                 if (!it2->second.empty())
                 {

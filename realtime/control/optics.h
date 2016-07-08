@@ -43,18 +43,18 @@ class Optics : public IControl, public ADCConsumer
 public:
     struct FluorescenceData
     {
-        FluorescenceData(unsigned int value, unsigned int wellId, std::size_t channel): value(value), wellId(wellId), channel(channel) {}
+        FluorescenceData(int32_t value, unsigned int wellId, std::size_t channel): value(value), wellId(wellId), channel(channel) {}
 
-        unsigned long value;
+        int32_t value;
         unsigned int wellId;
         std::size_t channel;
     };
 
     struct MeltCurveData
     {
-        MeltCurveData(unsigned int fluorescenceValue, double temperature, int wellId, std::size_t channel): fluorescenceValue(fluorescenceValue), temperature(temperature), wellId(wellId), channel(channel) {}
+        MeltCurveData(int32_t fluorescenceValue, double temperature, int wellId, std::size_t channel): fluorescenceValue(fluorescenceValue), temperature(temperature), wellId(wellId), channel(channel) {}
 
-        unsigned int fluorescenceValue;
+        int32_t fluorescenceValue;
         double temperature;
         int wellId;
         std::size_t channel;
@@ -65,8 +65,8 @@ public:
 
     void process();
 
-    void setADCValue(unsigned int adcValue, std::size_t channel);
-    inline const std::map<std::size_t, std::atomic<unsigned long>>& lastAdcValues() const noexcept { return _lastAdcValues; }
+    void setADCValue(int32_t adcValue, std::size_t channel);
+    inline const std::map<std::size_t, std::atomic<int32_t>>& lastAdcValues() const noexcept { return _lastAdcValues; }
 	
 	//accessors
     inline bool lidOpen() const noexcept { return _lidOpen; }
@@ -93,7 +93,7 @@ private:
     std::atomic<bool> _lidOpen;
     GPIO _lidSensePin;
 
-    std::pair<unsigned long, std::size_t> _adcValue;
+    std::pair<int32_t, std::size_t> _adcValue;
     std::mutex _adcMutex;
     std::condition_variable _adcCondition;
 
@@ -102,7 +102,7 @@ private:
     mutable std::recursive_mutex _collectDataMutex;
 
     unsigned int _wellNumber;
-    std::map<unsigned int, std::map<std::size_t, std::vector<unsigned long>>> _fluorescenceData;
+    std::map<unsigned int, std::map<std::size_t, std::vector<int32_t>>> _fluorescenceData;
 
     std::atomic<bool> _meltCurveCollection;
     std::vector<MeltCurveData> _meltCurveData;
@@ -111,7 +111,7 @@ private:
     MUX _photodiodeMux;
 
     //Hardcode for testing
-    std::map<std::size_t, std::atomic<unsigned long>> _lastAdcValues; //Not thread safe
+    std::map<std::size_t, std::atomic<int32_t>> _lastAdcValues; //Not thread safe
 };
 
 #endif

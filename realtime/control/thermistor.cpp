@@ -29,14 +29,14 @@ Thermistor::Thermistor(unsigned int voltageDividerResistance, unsigned int adcBi
     _voltageDividerResistance {voltageDividerResistance} {
 }
 
-void Thermistor::setADCValue(unsigned int adcValue) {
+void Thermistor::setADCValue(int32_t adcValue) {
     double temp = temperatureForResistance((double)_voltageDividerResistance * adcValue / (_maxADCValue - adcValue));
 
     _temperature.store(temp);
     temperatureChanged(temp);
 }
 
-void Thermistor::setADCValues(unsigned int differentialADCValue, unsigned int singularADCValue) {
+void Thermistor::setADCValues(int32_t differentialADCValue, int32_t singularADCValue) {
     double temp = temperatureForResistance(2050 * (double)singularADCValue / differentialADCValue);
 
     _temperature.store(temp);

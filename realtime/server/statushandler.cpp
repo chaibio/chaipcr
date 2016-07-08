@@ -142,9 +142,9 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
             responsePt.put("optics.well_number", state == ExperimentController::RunningMachineState ? optics->wellNumber() : 0);
 
             boost::property_tree::ptree adcArray;
-            const std::map<std::size_t, std::atomic<unsigned long>> &adcValues = optics->lastAdcValues();
+            const std::map<std::size_t, std::atomic<int32_t>> &adcValues = optics->lastAdcValues();
 
-            for (std::map<std::size_t, std::atomic<unsigned long>>::const_iterator it = adcValues.begin(); it != adcValues.end(); ++it)
+            for (std::map<std::size_t, std::atomic<int32_t>>::const_iterator it = adcValues.begin(); it != adcValues.end(); ++it)
             {
                 boost::property_tree::ptree item;
                 item.put("", it->second);

@@ -46,13 +46,13 @@ ADCPin& ADCPin::operator= (const ADCPin &other)
     return *this;
 }
 
-double ADCPin::readValue() const {
+int32_t ADCPin::readValue() const {
     std::stringstream channelPath;
     channelPath << path() << "/in_voltage" << channel() << "_raw";
 
     std::ifstream channelFile(channelPath.str());
 
-    int value = 0;
+    int32_t value = 0;
     channelFile >> value;
     return value;
 }

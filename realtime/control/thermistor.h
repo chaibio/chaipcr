@@ -35,8 +35,8 @@ public:
     boost::signals2::lockfree_signal<void(double)> temperatureChanged;
 
     //ADCConsumer
-    void setADCValue(unsigned int adcValue);
-    void setADCValues(unsigned int differentialADCValue, unsigned int singularADCValue);
+    void setADCValue(int32_t adcValue);
+    void setADCValues(int32_t differentialADCValue, int32_t singularADCValue);
     void setADCValueMock(double adcValue);
 
 protected:
