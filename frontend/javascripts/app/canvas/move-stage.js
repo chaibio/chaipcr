@@ -123,7 +123,7 @@ angular.module("canvasApp").factory('moveStageRect', [
             }
           }, this);
         }
-
+        // things to do , Increase the hit are of stage so that we always hit, make sure change width as stages grow shrink;
         this.indicator.processMovement = function(stage, C, circleManager) {
           // Process movement here
           // objects are corrected now looking for visual part.

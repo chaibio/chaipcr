@@ -119,7 +119,7 @@ angular.module("canvasApp").factory('stage', [
 
         $scope.applyValues(newStep.circle);
         newStep.circle.manageClick(true);
-
+        stageGraphics.recalculateStageHitPoint.call(this);
         this.parent.setDefaultWidthHeight();
       };
 
@@ -153,6 +153,7 @@ angular.module("canvasApp").factory('stage', [
 
         $scope.applyValues(selected.circle);
         selected.circle.manageClick();
+        stageGraphics.recalculateStageHitPoint.call(this);
         this.parent.setDefaultWidthHeight();
       };
 
@@ -205,7 +206,7 @@ angular.module("canvasApp").factory('stage', [
         stage.nextStage.getLeft();
         stage.nextStage.stageGroup.set({left: stage.nextStage.left }).setCoords();
         stage.nextStage.dots.set({left: stage.nextStage.left + 3}).setCoords();
-        stage.nextStage.stageHitPoint.set({left: stage.nextStage.left + 60}).setCoords();
+        stage.nextStage.stageHitPoint.set({left: stage.nextStage.left + 30}).setCoords();
 
         var thisStageSteps = stage.nextStage.childSteps, stepCount = thisStageSteps.length;
         for(var i = 0; i < stepCount; i++ ) {
@@ -350,6 +351,7 @@ angular.module("canvasApp").factory('stage', [
           this.setShadows();
 
           this.addSteps();
+          stageGraphics.recalculateStageHitPoint.call(this);
       };
 
       this.setShadows = function() {
