@@ -48,7 +48,10 @@ window.App.directive 'headerStatus', [
           cb resp.experiment if cb
 
       $scope.is_holding = false
-
+	  
+	 #$scope.$on 'start_confirm_show:false' ->
+		 # $scope.start_confirm_show = false
+	  	  
       $scope.$on 'status:data:updated', (e, data, oldData) ->
         return if !data
         return if !data.experiment_controller
@@ -90,7 +93,10 @@ window.App.directive 'headerStatus', [
             if $state.is('edit-protocol')
               max_cycle = Experiment.getMaxExperimentCycle($scope.experiment)
               $state.go('run-experiment', {'id': experiment_id, 'chart': 'amplification', 'max_cycle': max_cycle})
-
+			  
+      $scope.startConfirm = ->
+        $scope.start_confirm_show = true	
+		
       $scope.stopExperiment = ->
         Experiment.stopExperiment($scope.experiment.id)
 

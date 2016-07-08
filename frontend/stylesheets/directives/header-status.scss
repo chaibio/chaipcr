@@ -80,6 +80,28 @@
       }
     }
   }
+  
+  .button-he {
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    width: 170px;
+    text-align: center;
+
+    &.begin {
+      border: 1px solid #fff;
+      background-color: #8dc63f;
+      color: #fff;
+
+      &.disabled {
+        border: 1px solid #aaa;
+        color: #aaa;
+        cursor: not-allowed;
+      }
+    }
+  }
 
   &.in-progress {
     // background-color: #5D8329;
@@ -108,6 +130,10 @@ background: linear-gradient(to right,  #64b027 0%,#c6e35f 46%,#5d8329 46%,#5d832
     }
     .button-header {
       background-color: #000;
+      border: 1px solid #fff;
+    }
+    .button-he{
+      background-color: #8dc63f;
       border: 1px solid #fff;
     }
   }
