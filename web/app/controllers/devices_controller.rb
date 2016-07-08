@@ -156,7 +156,9 @@ class DevicesController < ApplicationController
     end
     
     erase_data
-
+    
+    kill_process("realtime")
+    
     render json: {response: "Device is programmed successfully"}, status: :ok
   end
   
