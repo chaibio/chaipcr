@@ -22,20 +22,27 @@
 #include <Poco/SimpleFileChannel.h>
 #include <Poco/ConsoleChannel.h>
 #include <Poco/AsyncChannel.h>
+#include <Poco/FormattingChannel.h>
+#include <Poco/PatternFormatter.h>
 
 Poco::Logger* Logger::_logger = nullptr;
 
 void Logger::setup(const std::string &name)
 {
-    Poco::Logger::root().setChannel(new Poco::AsyncChannel(new Poco::ConsoleChannel()));
-
-    _logger = &Poco::Logger::get(name);
-    _logger->information("--------------------------------- Session started ---------------------------------");
+    setup(new Poco::ConsoleChannel(), name);
 }
 
 void Logger::setup(const std::string &name, const std::string &filePath)
 {
-    Poco::Logger::root().setChannel(new Poco::AsyncChannel(new Poco::SimpleFileChannel(filePath)));
+    setup(new Poco::SimpleFileChannel(filePath), name);
+}
+
+void Logger::setup(Poco::Channel *channel, const std::string &name)
+{
+    Poco::PatternFormatter *formatter = new Poco::PatternFormatter();
+    formatter->setProperty("pattern", "%Y-%m-%d %H:%M:%S: %t");
+
+    Poco::Logger::root().setChannel(new Poco::AsyncChannel(new Poco::FormattingChannel(formatter, channel)));
 
     _logger = &Poco::Logger::get(name);
     _logger->information("--------------------------------- Session started ---------------------------------");

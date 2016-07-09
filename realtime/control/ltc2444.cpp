@@ -21,6 +21,7 @@
 
 #include "pcrincludes.h"
 #include "ltc2444.h"
+#include "logger.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class LTC2444
@@ -69,7 +70,11 @@ int32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, Oversa
     spiPort_.readBytes(dataIn, dataOut, 4, kADCSPIFrequencyHz);
 
     if (((dataIn[0] >> 5) & (dataIn[0] >> 4) & 1) || !((dataIn[0] >> 5) | (dataIn[0] >> 4) | 0) )
+    {
         conversion = 0; //undervoltage or overvoltage
+
+        APP_LOGGER << "LTC2444::readADC - undervoltage or overvoltage occured" << std::endl;
+    }
     else{
         // convert to little endian and get only ADC result (bit28 down to bit 5)
         uint32_t sign_extend=0x00000000;
