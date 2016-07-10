@@ -97,7 +97,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         gofetch = false if $scope.retrying
 
         if gofetch
-          console.log 'fetching amplification data'
           hasInit = true
           $scope.fetching = true
 
@@ -168,7 +167,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               $scope.chartConfig.series.push
                 axis: 'y'
                 dataset: "channel_#{ch_i}"
-                key: "well_#{i}_#{subtraction_type}"
+                key: "well_#{i}_#{subtraction_type}#{if $scope.curve_type is 'log' then '_log' else ''}"
                 label: if ($scope.is_dual_channel and $scope.color_by is 'well') then "channel_#{ch_i}, well_#{i+1}: " else "well_#{i+1}: "
                 color: if ($scope.color_by is 'well') then buttons["well_#{i}"].color else (if ch_i is 1 then '#00AEEF' else '#8FC742')
                 interpolation: {mode: 'cardinal', tension: 0.7}
@@ -199,6 +198,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       $scope.$watch 'curve_type', (type) ->
         $scope.chartConfig.axes.y.type = type
+        updateSeries()
 
       $scope.$watchCollection 'wellButtons', updateSeries
 
