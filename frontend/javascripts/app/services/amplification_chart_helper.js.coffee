@@ -33,7 +33,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           tickFormat: (x) ->
             return parseInt(x)
         y:
-		  
+
           ticks: 10
 
       margin:
@@ -78,8 +78,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         channel_datasets["channel_#{channel_i}"] = _.map channel_datasets["channel_#{channel_i}"], (datum) ->
           pt = cycle_num: datum[0][2]
           for y_item, i in datum by 1
-            pt["well_#{i}_background"] =  y_item[3] 
-            pt["well_#{i}_baseline"] =  y_item[4] 
+            pt["well_#{i}_background"] =  y_item[3]
+            pt["well_#{i}_baseline"] =  y_item[4]
 
           return pt
 

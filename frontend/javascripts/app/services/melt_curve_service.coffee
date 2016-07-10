@@ -54,7 +54,7 @@ App.service 'MeltCurveService', [
       margin:
         left: 50
         right: 10
-        top: 50
+        top: 10
       grid:
         x: false
         y: false
@@ -145,8 +145,9 @@ App.service 'MeltCurveService', [
       return new_data
 
     self.averagedTm = (tms) ->
+      return null if !tms
       return null if !tms[0]
-      return tms
+      return tms[0]
 
     self.getYExtrems = (data, chart_type) ->
       data_length = data['well_0'].length
