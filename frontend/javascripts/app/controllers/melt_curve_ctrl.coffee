@@ -29,7 +29,6 @@ App.controller 'MeltCurveChartCtrl', [
     $scope.color_by = 'well'
     $scope.chartConfigDerivative = MeltCurveService.chartConfig('derivative')
     $scope.chartConfigNormalized = MeltCurveService.chartConfig('normalized')
-    $scope.loading = null
     $scope.data = MeltCurveService.defaultData()
     has_data = false
     PARSED_DATA = null
@@ -62,7 +61,7 @@ App.controller 'MeltCurveChartCtrl', [
           Experiment.getMeltCurveData($stateParams.id)
           .then (resp) ->
             cb(resp.data) if !!cb
-            $scope.fetching = false
+            console.log 'melt curve data loaded!!'
           .catch (resp) ->
             $scope.fetching = false
             $scope.error = if resp.data?.errors then resp.data.errors else 'Unable to retrieve melt curve data due to some error.'
@@ -85,18 +84,14 @@ App.controller 'MeltCurveChartCtrl', [
     updateResolutionOptions = (data) ->
       zoom_calibration = 10
       zoom_unit = Math.ceil(data['well_0'].length/zoom_calibration)
-      # zoom_unit = Math.ceil(zoom_unit)
       $scope.resolutionOptions = []
       for i in [zoom_calibration..1] by -1
         $scope.resolutionOptions.push(zoom_unit*i)
 
       OPTIMIZED_DATA = MeltCurveService.optimizeForEachResolution(PARSED_DATA, $scope.resolutionOptions)
-      # console.log OPTIMIZED_DATA
 
     updateButtonTms = (data) ->
-      # console.log data
       for well_data, well_i in data.melt_curve_data by 1
-        console.log well_data.tm
         $scope.wellButtons["well_#{well_i}"].ct = [MeltCurveService.averagedTm(well_data.tm)]
 
 
@@ -126,7 +121,6 @@ App.controller 'MeltCurveChartCtrl', [
 
     updateScrollBarWidth = ->
       scrollbar_width = $('#melt-curve-scrollbar').width()
-      # console.log "scroll width: #{scrollbar_width}"
       new_width = scrollbar_width * ((10 - $scope.mc_zoom)/10)
       $('#melt-curve-scrollbar .scrollbar').css('width', "#{new_width}px")
 
@@ -154,10 +148,13 @@ App.controller 'MeltCurveChartCtrl', [
                       max: y_extrems.max
 
                 has_data = true
-                $scope.loading = false
                 PARSED_DATA = angular.copy(data)
                 updateResolutionOptions(data)
                 changeResolution()
+                $timeout ->
+                  $scope.fetching = false
+                  console.log '$scope.fetching = false'
+                1000
 
                 $timeout ->
                   $scope.$broadcast '$reload:n3:charts'
@@ -175,7 +172,6 @@ App.controller 'MeltCurveChartCtrl', [
       return if !PARSED_DATA
       return if $scope.RunExperimentCtrl.chart isnt 'melt-curve'
       y_extrems = MeltCurveService.getYExtrems(PARSED_DATA, type)
-      console.log 'changed to curve chart!!!'
       updateConfigs
         axes:
           y:
@@ -186,7 +182,7 @@ App.controller 'MeltCurveChartCtrl', [
 
       $timeout ->
         $scope.$broadcast '$reload:n3:charts'
-      , 3000
+      , 1000
 
     $scope.$watch ->
       $scope.mc_zoom
@@ -197,7 +193,6 @@ App.controller 'MeltCurveChartCtrl', [
     $scope.$watchCollection 'wellButtons', (buttons) ->
       return if !buttons
       updateSeries(buttons)
-      console.log buttons
 
     $scope.$watch ->
       Math.round($scope.mc_scroll*100) / 100
