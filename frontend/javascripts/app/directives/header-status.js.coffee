@@ -29,13 +29,13 @@ window.App.directive 'headerStatus', [
     restrict: 'EA'
     replace: true
     transclude: true
-    controller: ($scope) ->
+    controller: ['$scope', ($scope) ->
       this.start_confirm_show = $scope.start_confirm_show
       this.checkButtonStatus = () ->
         if $scope.start_confirm_show
           $scope.start_confirm_show = false
           this.start_confirm_show = $scope.start_confirm_show
-
+        ]
     scope:
       experimentId: '=?'
     templateUrl: 'app/views/directives/header-status.html'
@@ -47,7 +47,7 @@ window.App.directive 'headerStatus', [
 
       $scope.show = ->
         if attrs.experimentId then (experiment_id and $scope.status) else $scope.status
-		
+
       getExperiment = (cb) ->
         return if !experiment_id
         $scope.loading = true
@@ -56,7 +56,7 @@ window.App.directive 'headerStatus', [
           cb resp.experiment if cb
 
       $scope.is_holding = false
-	  
+
       $scope.$on 'status:data:updated', (e, data, oldData) ->
         return if !data
         return if !data.experiment_controller
@@ -103,7 +103,7 @@ window.App.directive 'headerStatus', [
         $scope.start_confirm_show = true
         controller.start_confirm_show = $scope.start_confirm_show
 
-	  
+
       $scope.stopExperiment = ->
         Experiment.stopExperiment($scope.experiment.id)
 
