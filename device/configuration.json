@@ -11,5 +11,24 @@
 			"min_temp_c": 4,
 			"max_temp_c": 100
 		}
+	},
+
+	"bioinformatics": {
+		"baseline": {
+			"method": "auto_median"
+		},
+		
+		"cq_calling": {
+			"method": "Cy0",
+			"min_cq": 5,
+			"fluorescence_threshold": 10500,
+			"df_dc_threshold": 1280,
+			"d2f_dc2_threshold": 160
+		},
+		
+		"melt": {
+			"span_smooth_default": 0.05,
+			"span_smooth_factor": 7.2
+		}
 	}
 }
