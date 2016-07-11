@@ -98,16 +98,63 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
 
     @getMaxExperimentCycle = Experiment.getMaxExperimentCycle
 
-    @getMaxCalibration = (amplification_data, type) ->
-      calibs = []
-      if type is 'baseline'
-        calibs = _.map amplification_data, (datum) ->
-          datum[4]
-      else
-        calibs = _.map amplification_data, (datum) ->
-          datum[3]
+    @getMaxCalibrations = (amplification_data) ->
+      calibs_baseline = []
+      calibs_baseline = _.map amplification_data, (datum) ->
+        datum[4]
+      calibs_background = _.map amplification_data, (datum) ->
+        datum[3]
 
-      return (Math.max.apply Math, calibs)
+      return {
+        baseline: (Math.max.apply Math, calibs_baseline)
+        background: (Math.max.apply Math, calibs_background)
+      }
+
+    @toScientificNotation = (val, i) ->
+      base = 0
+      pow = 0
+      val_string = val.toString()
+      num = null
+      if val*1 < 1
+        val_spliced = val_string.split('.')
+        num = val_spliced[1]
+        num_length = num.length
+
+        for i in [0...num_length] by 1
+          n = num.charAt(i) * 1
+          if n > 0
+            base = n
+            pow = -1 * (i + 1)
+            break
+        return base + 'x10^' + pow
+      else
+        num_length = val_string.length
+        for i in [0...num_length] by 1
+          n = val_string.charAt(i) * 1
+          if n > 0
+            base = n
+            pow = num_length - (i + 1)
+            break
+        return base + 'x10^' + pow
+      return
+
+
+    @getLogViewYticks = (num) ->
+      num_length = num.toString().length
+      roundup = '1'
+      for i in [0...num_length] by 1
+        roundup = "#{roundup}0"
+
+      roundup = roundup*1
+
+      calibs = []
+      calib = 0.01
+
+      while calib <= roundup
+        calibs.push calib
+        calib = calib*10
+
+      return calibs
 
     # @getMaxCycleFromAmplification = (amplification_data) ->
     #   cycles = []
