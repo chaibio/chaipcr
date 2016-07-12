@@ -112,7 +112,7 @@ void ADCController::process() {
             }
 
             //schedule conversion for next state, retrieve previous conversion value
-            uint32_t value;
+            int32_t value = 0;
             switch (nextState) {
             case EReadZone1Singular:
                 value = _ltc2444->readSingleEndedChannel(0, kThermistorOversamplingRate);

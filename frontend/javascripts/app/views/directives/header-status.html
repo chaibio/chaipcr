@@ -16,7 +16,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<div>
+<div click-check>
 
   <!-- loading -->
   <div class="header-status" ng-if="loading">
@@ -39,8 +39,11 @@
         <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
       </div>
       <div class="col-md-4 controls SHR text-right">
-        <button class="button-header begin" ng-click="startExperiment()">
-          <b>BEGIN EXPERIMENT</b>
+        <button id="start-experiment-button"ng-show="!start_confirm_show" class="button-header begin" ng-click="startConfirm()">
+          START EXPERIMENT
+        </button>
+        <button  id="start-experiment-button" ng-show="start_confirm_show" class="button-he begin" ng-click="startExperiment()">
+          CONFIRM START
         </button>
       </div>
     </div>

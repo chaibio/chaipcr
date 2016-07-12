@@ -1,4 +1,5 @@
-/* * Chai PCR - Software platform for Open qPCR and Chai's Real-Time PCR instruments.
+/*
+ * Chai PCR - Software platform for Open qPCR and Chai's Real-Time PCR instruments.
  * For more information visit http://www.chaibio.com
  *
  * Copyright 2016 Chai Biotechnologies Inc. <info@chaibio.com>
@@ -16,32 +17,22 @@
  * limitations under the License.
  */
 
-#ifndef ADCPIN_H
-#define ADCPIN_H
-
-#include <string>
-
-class ADCPin
-{
-public:
-    ADCPin(const std::string &path, unsigned int channel = 0);
-    ADCPin(const ADCPin &other);
-
-    ADCPin& operator= (const ADCPin &other);
-
-    inline const std::string& path() const { return _path; }
-
-    inline unsigned int channel() const { return _channel; }
-    inline void setChannel(unsigned int channel) { _channel = channel; }
-
-    uint32_t readValue() const;
-
-private:
-    void changeMode();
-
-private:
-    std::string _path;
-    unsigned int _channel;
-};
-
-#endif // ADCPIN_H
+window.ChaiBioTech.ngApp.directive('clickCheck', [
+  '$rootScope',
+  function($rootScope) {
+    return {
+      restrict: 'A',
+      require: '^headerStatus',
+      link: function($scope, elem, attrs, ctrl) {
+        if(! $scope.registerEscape) {
+          $scope.registerEscape = angular.element('body').click(function(evt) {
+            if(evt.target.id !== 'start-experiment-button' && ctrl.start_confirm_show === true) {
+              console.log("inside");
+              ctrl.checkButtonStatus();
+            }
+          });
+        }
+      }
+    };
+  }
+]);

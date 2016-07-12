@@ -21,6 +21,7 @@
 
 #include "pcrincludes.h"
 #include "ltc2444.h"
+#include "logger.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class LTC2444
@@ -32,15 +33,15 @@ LTC2444::LTC2444(unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPin
 LTC2444::~LTC2444() {
 }
 
-uint32_t LTC2444::readSingleEndedChannel(uint8_t channel, OversamplingRatio oversamplingRate) {
+int32_t LTC2444::readSingleEndedChannel(uint8_t channel, OversamplingRatio oversamplingRate) {
     return readADC(channel, true, false, oversamplingRate);
 }
 
-uint32_t LTC2444::readDifferentialChannels(uint8_t lowerChannel, bool lowerChannelPositive, OversamplingRatio oversamplingRate) {
+int32_t LTC2444::readDifferentialChannels(uint8_t lowerChannel, bool lowerChannelPositive, OversamplingRatio oversamplingRate) {
     return readADC(lowerChannel / 2, false, lowerChannelPositive, oversamplingRate);
 }
 
-uint32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, OversamplingRatio oversamplingRate) {
+int32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, OversamplingRatio oversamplingRate) {
     uint32_t modeBits = (uint32_t)oversamplingRate << 1; //OSR3_OSR2_OSR1_OSR0_TWOX; TWOX = 0
 
 	//0xA000000 the first 3 bits here represents 101, based on the datasheet.
@@ -59,7 +60,7 @@ uint32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, Overs
     data |= modeBits << 19;
 	
 	//read conversion value and write the settings for the nex conversion via SPI.
-    uint32_t conversion;
+    int32_t conversion;
 	//convert data to big endian
 	dataOut[0] = (data>>24);
 	dataOut[1] = (data>>16);
@@ -69,11 +70,20 @@ uint32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, Overs
     spiPort_.readBytes(dataIn, dataOut, 4, kADCSPIFrequencyHz);
 
     if (((dataIn[0] >> 5) & (dataIn[0] >> 4) & 1) || !((dataIn[0] >> 5) | (dataIn[0] >> 4) | 0) )
+    {
         conversion = 0; //undervoltage or overvoltage
-    else
-        // convert to little endian and get only ADC result (bit28 down to bit 5)
-        conversion = ((((uint32_t)dataIn[0])<<24|((uint32_t)dataIn[1])<<16|((uint32_t)dataIn[2])<<8|dataIn[3])&0x1FFFFFE0)>>5;
 
+        APP_LOGGER << "LTC2444::readADC - undervoltage or overvoltage occured" << std::endl;
+    }
+    else{
+        // convert to little endian and get only ADC result (bit28 down to bit 5)
+        uint32_t sign_extend=0x00000000;
+        if ((dataIn[0]>>4) & 1){ //if MSB of the LTC2444 data is 1, extend the sign
+        	sign_extend=0xFF000000;
+        }
+        conversion = sign_extend | (((((uint32_t)dataIn[0])<<24|((uint32_t)dataIn[1])<<16|((uint32_t)dataIn[2])<<8|dataIn[3])&0x1FFFFFE0)>>5);
+    	
+    }
     return conversion;
 }
 

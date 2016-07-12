@@ -23,7 +23,7 @@ window.ChaiBioTech.ngApp.directive('escapeMenu', [
     return {
       restrict: 'A',
       link: function($scope, elem) {
-
+        console.log("Bingo");
         $scope.registerEscape = false;
 
         if(! $scope.registerEscape) {

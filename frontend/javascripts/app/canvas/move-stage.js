@@ -119,11 +119,10 @@ angular.module("canvasApp").factory('moveStageRect', [
             if(this.intersectsWithObject(stage.stageHitPoint) && this.currentHit !== index) {
               this.currentDrop = stage;
               this.currentHit = index;
-              console.log("found");
             }
           }, this);
-        }
-
+        };
+        // Now improve the code to handle simple click on stage move, Now we dont handle this event.
         this.indicator.processMovement = function(stage, C, circleManager) {
           // Process movement here
           // objects are corrected now looking for visual part.

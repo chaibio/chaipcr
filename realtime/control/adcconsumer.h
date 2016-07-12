@@ -23,10 +23,10 @@
 
 class ADCConsumer : public boost::noncopyable {
 public:
-    virtual void setADCValue(unsigned int /*adcValue*/) {}
-    virtual void setADCValue(unsigned int /*adcValue*/, std::size_t /*channel*/) {}
-    virtual void setADCValues(unsigned int /*differentialADCValue*/, unsigned int /*singularADCValue*/) {}
-    virtual void setADCValues(unsigned int /*differentialADCValue*/, unsigned int /*singularADCValue*/, std::size_t /*channel*/) {}
+    virtual void setADCValue(int32_t /*adcValue*/) {}
+    virtual void setADCValue(int32_t /*adcValue*/, std::size_t /*channel*/) {}
+    virtual void setADCValues(int32_t /*differentialADCValue*/, int32_t /*singularADCValue*/) {}
+    virtual void setADCValues(int32_t /*differentialADCValue*/, int32_t /*singularADCValue*/, std::size_t /*channel*/) {}
 
     virtual void setADCValueMock(double /*adcValue*/) {}
 };

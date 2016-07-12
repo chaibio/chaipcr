@@ -41,6 +41,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.data = helper.paddData()
       $scope.COLORS = helper.COLORS
       $scope.amplification_data = null
+      max_calibration = null
       AMPLI_DATA_CACHE = null
       $scope.baseline_subtraction = true
       $scope.curve_type = 'linear'
@@ -97,7 +98,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         gofetch = false if $scope.retrying
 
         if gofetch
-          console.log 'fetching amplification data'
           hasInit = true
           $scope.fetching = true
 
@@ -113,9 +113,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             return if data.amplification_data.length is 0
             data.amplification_data.shift()
             data.ct.shift()
+            max_calibration = helper.getMaxCalibrations(data.amplification_data)
             data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
-            console.log 'amplification data'
-            console.log data
+
             AMPLI_DATA_CACHE = angular.copy data
             $scope.amplification_data = angular.copy(AMPLI_DATA_CACHE.amplification_data)
             moveData()
@@ -150,7 +150,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.chartConfig.axes.x.min = data.min_cycle
         $scope.chartConfig.axes.x.max = data.max_cycle
         $scope.chartConfig.axes.x.ticks = helper.Xticks data.min_cycle, data.max_cycle
-        # $scope.chartConfig.axes.y.max = if subtraction_type is 'baseline' then MAX_BASELINE_AMPLIFICATION else MAX_BACKGROUND_AMPLIFICATION
+        if max_calibration isnt null
+          $scope.chartConfig.axes.y.max = if $scope.baseline_subtraction then max_calibration.baseline else max_calibration.background
+
         $scope.data = data.amplification_data
         $timeout ->
           $scope.$broadcast '$reload:n3:charts'
@@ -168,7 +170,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               $scope.chartConfig.series.push
                 axis: 'y'
                 dataset: "channel_#{ch_i}"
-                key: "well_#{i}_#{subtraction_type}"
+                key: "well_#{i}_#{subtraction_type}#{if $scope.curve_type is 'log' then '_log' else ''}"
                 label: if ($scope.is_dual_channel and $scope.color_by is 'well') then "channel_#{ch_i}, well_#{i+1}: " else "well_#{i+1}: "
                 color: if ($scope.color_by is 'well') then buttons["well_#{i}"].color else (if ch_i is 1 then '#00AEEF' else '#8FC742')
                 interpolation: {mode: 'cardinal', tension: 0.7}
@@ -197,8 +199,19 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         moveData()
         updateSeries()
 
+
       $scope.$watch 'curve_type', (type) ->
         $scope.chartConfig.axes.y.type = type
+        updateSeries()
+        if type is 'log'
+          subtraction_type = if $scope.baseline_subtraction then 'baseline' else 'background'
+          $scope.chartConfig.axes.y.ticks = helper.getLogViewYticks(max_calibration[subtraction_type])
+          $scope.chartConfig.axes.y.tickFormat = helper.toScientificNotation
+        else
+          $scope.chartConfig.axes.y.ticks = 10
+          delete $scope.chartConfig.axes.y.tickFormat
+
+        console.log $scope.chartConfig.axes.y
 
       $scope.$watchCollection 'wellButtons', updateSeries
 

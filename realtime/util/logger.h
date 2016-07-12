@@ -24,6 +24,8 @@
 #include <Poco/Logger.h>
 #include <Poco/LogStream.h>
 
+namespace Poco { class Channel; }
+
 class Logger
 {
 public:
@@ -32,6 +34,9 @@ public:
 
     static Poco::Logger& get() { return *_logger; }
     static bool isSetup() { return _logger; }
+
+private:
+    static void setup(Poco::Channel *channel, const std::string &name);
 
 private:
     static Poco::Logger *_logger;
