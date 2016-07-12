@@ -149,13 +149,19 @@ class DevicesController < ApplicationController
       end
     end
 
+    erase_data
+    
+    start_time = Time.now
     error = Device.write(request.body.read)
     if !error.blank?
       render json: {errors: error}, status: 400
       return
     end
+    logger.info "device write: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
     
-    erase_data
+    start_time = Time.now
+    system("sync")
+    logger.info "second sync: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
     
     kill_process("realtime")
     
@@ -322,16 +328,26 @@ class DevicesController < ApplicationController
   private
   
   def erase_data
+    start_time = Time.now
     User.delete_all
+    logger.info "erase_data User.delete_all: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
+    start_time = Time.now
     Experiment.joins(:experiment_definition).where("experiment_type != ? and experiments.id != 1", ExperimentDefinition::TYPE_DIAGNOSTIC).select('experiments.*').each do |e|
       e.destroy
     end
+    logger.info "erase_data experiments destroy: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
+    start_time = Time.now
     Setting.update_all("calibration_id=1")
+    logger.info "erase_data settings update: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
+    start_time = Time.now
     if !Device.serial_number.blank?
       serialmd5 = Digest::MD5.hexdigest(Device.serial_number)
       system("printf '#{serialmd5}\n#{serialmd5}\n' | passwd")
     end
+    logger.info "erase_data update password: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
+    start_time = Time.now
     system("sync")
+    logger.info "erase_data sync: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
   end
   
   def retrieve_mac
