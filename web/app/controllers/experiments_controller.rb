@@ -133,19 +133,11 @@ class ExperimentsController < ApplicationController
         if params[:step_id] == nil && params[:ramp_id] == nil
           @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
           if !@first_stage_collect_data.blank?
-            if FluorescenceDatum.new_data_generated?(@experiment.id, @first_stage_collect_data.id)
-              begin
-                 @amplification_data, @cts = retrieve_amplification_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id)
-              rescue => e
-                 render :json=>{:errors=>e.to_s}, :status => 500
-                 return
-              end
-              #update cache
-              AmplificationDatum.import @amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value]
-              AmplificationCurve.import @cts, :on_duplicate_key_update => [:ct]
-            else #cached
-              @amplification_data = AmplificationDatum.where(:experiment_id=>@experiment.id, :stage_id=>@first_stage_collect_data.id).order(:channel, :well_num, :cycle_num)
-              @cts = AmplificationCurve.where(:experiment_id=>@experiment.id, :stage_id=>@first_stage_collect_data.id).order(:channel, :well_num)
+            begin
+              @amplification_data, @cts = retrieve_amplification_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id)
+            rescue => e
+              render :json=>{:errors=>e.to_s}, :status => 500
+              return
             end
           end
         else
@@ -365,6 +357,19 @@ class ExperimentsController < ApplicationController
   end
   
   def retrieve_amplification_data(experiment_id, stage_id, calibration_id)
+    if FluorescenceDatum.new_data_generated?(experiment_id, stage_id)
+      amplification_data, cts = calculate_amplification_data(experiment_id, stage_id, calibration_id)
+      #update cache
+      AmplificationDatum.import amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value]
+      AmplificationCurve.import cts, :on_duplicate_key_update => [:ct]
+    else #cached
+      amplification_data = AmplificationDatum.where(:experiment_id=>experiment_id, :stage_id=>stage_id).order(:channel, :well_num, :cycle_num)
+      cts = AmplificationCurve.where(:experiment_id=>experiment_id, :stage_id=>stage_id).order(:channel, :well_num)
+    end
+    return amplification_data, cts
+  end  
+  
+  def calculate_amplification_data(experiment_id, stage_id, calibration_id)
     config   = Rails.configuration.database_configuration
     connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
