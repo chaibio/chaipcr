@@ -33,7 +33,10 @@ modlist <- function(
   
   # xqrm:
   num_cycles <- dim(x)[1]
-  pcrfit_weights <- c(rep(0, times=min_Ct-1), rep(1, times=dim(x)[1]-min_Ct+1))
+  if (num_cycles < min_Cq) {
+    pcrfit_weights <- rep(1, times=num_cycles)
+  } else {
+    pcrfit_weights <- c(rep(0, times=min_Cq-1), rep(1, times=dim(x)[1]-min_Cq+1)) }
   if (fallback == 'parm') stop('`fallback` cannot be \'parm\'.')
   
   options(expressions = 50000)  
