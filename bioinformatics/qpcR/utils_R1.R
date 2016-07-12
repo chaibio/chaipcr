@@ -795,7 +795,7 @@ dense_factor = 10 # xqrm
   tempDATA <- round(tempDATA, 2)
   meltDATA <- round(meltDATA, 2)
   derivDATA <- round(derivDATA, 2)
-  TMs <- round(TMs, 2)
+  TMs <- round(TMs, 3)
   
   ### return data
   outDATA <- data.frame.na(tempDATA, meltDATA, derivDATA, Pars = c(span.smooth, span.peaks), RSS, Tm = TMs)
