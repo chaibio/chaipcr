@@ -36,7 +36,7 @@ window.ChaiBioTech.ngApp
 
     $scope.experiments = null
     $scope.deleteMode = false
-	
+
 
     User.getCurrent().then (resp) ->
       $scope.user = resp.data.user
