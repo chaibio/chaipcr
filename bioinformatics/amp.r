@@ -10,6 +10,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
                                    dcv=TRUE, # logical, whether to perform multi-channel deconvolution
                                    # basecyc, cp, # extra parameters that are currently hard-coded but may become user-defined later
                                    max_cycle=1000, # maximum cycles to analyze
+                                   cp='cpD2', 
                                    extra_output=FALSE, 
                                    show_running_time=FALSE # option to show time cost to run this function
                                    ) {
@@ -22,7 +23,6 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
     basecyc <- 3:6 # will be overwritten if (grepl('^auto_', baseline)). used: 15:20, 10:15, 3:6, 1:5 (gave poor baseline subtraction results for non-sigmoid shaped data when using 'lin')
     fallback <- 'median' # used: 'auto_lin', 'lin', 'median'
     type <- 'curve'
-    cp <- 'cpD2'
     # min_ac_max <- 0
     max_rsem <- 1.2 # used: 0.1
     max_rser <- 0.3 # used: 0.025
