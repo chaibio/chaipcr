@@ -49,7 +49,6 @@ var vendorFiles = [
     'libs/ng-file-upload-shim.js',
     'libs/ng-file-upload.js',
     'libs/ng-webworker.js',
-    'libs/jquery.marquee.js'
 ];
 var appFiles = [
     'welcome.js',
