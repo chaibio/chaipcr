@@ -135,10 +135,10 @@
               <th class="B1">Well</th>
               <th class="B1">Type</th>
               <th class="B1" ng-class="{'channel-1': color_by === 'channel'}">
-                <span ng-if="is_dual_channel">Ct. Ch1</span>
-                <span ng-if="!is_dual_channel">Ct</span>
+                <span ng-if="is_dual_channel">Cq Ch1</span>
+                <span ng-if="!is_dual_channel">Cq</span>
               </th>
-              <th class="B1" ng-class="{'channel-2': color_by === 'channel'}" ng-if="is_dual_channel">Ct. Ch2</th>
+              <th class="B1" ng-class="{'channel-2': color_by === 'channel'}" ng-if="is_dual_channel">Cq Ch2</th>
             </tr>
             <tr ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" ng-class="{selected: (wellButtons['well_'+i].selected)}">
               <td class="B1" ng-class="{'text-center': color_by==='channel'}">
