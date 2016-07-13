@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160527073919) do
+ActiveRecord::Schema.define(version: 20160713040224) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -35,6 +35,20 @@ ActiveRecord::Schema.define(version: 20160527073919) do
 
   add_index "amplification_data", ["experiment_id", "stage_id", "cycle_num", "well_num", "channel"], name: "index_amplification_data_by_exp_chan_stage_cycle_well_channel", unique: true, using: :btree
 
+  create_table "cached_melt_curve_data", force: true do |t|
+    t.integer "experiment_id"
+    t.integer "stage_id"
+    t.integer "channel"
+    t.integer "well_num",                                comment: "1-16"
+    t.text    "temperature_text",       limit: 16777215
+    t.text    "fluorescence_data_text", limit: 16777215
+    t.text    "derivative_text",        limit: 16777215
+    t.text    "tm_text"
+    t.text    "area_text"
+  end
+
+  add_index "cached_melt_curve_data", ["experiment_id", "stage_id", "channel", "well_num"], name: "index_meltcurvedata_by_exp_stage_chan_well", unique: true, using: :btree
+
   create_table "experiment_definitions", force: true do |t|
     t.string "name",            null: false
     t.string "guid"
@@ -52,8 +66,9 @@ ActiveRecord::Schema.define(version: 20160527073919) do
     t.string   "completion_message"
     t.integer  "experiment_definition_id"
     t.integer  "calibration_id"
-    t.boolean  "time_valid",               default: true
+    t.boolean  "time_valid",                                       default: true
     t.string   "analyze_status"
+    t.decimal  "cached_temperature",       precision: 5, scale: 2
   end
 
   create_table "fluorescence_data", id: false, force: true do |t|

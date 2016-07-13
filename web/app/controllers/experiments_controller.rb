@@ -207,7 +207,7 @@ class ExperimentsController < ApplicationController
         @first_stage_meltcurve_data = Stage.joins(:protocol).where(["experiment_definition_id=? and stage_type='meltcurve'", @experiment.experiment_definition_id]).first
         if !@first_stage_meltcurve_data.blank?
           begin
-            @melt_curve_data = retrieve_melt_curve_data(@experiment.id, @first_stage_meltcurve_data.id, @experiment.calibration_id)
+            @melt_curve_data = retrieve_melt_curve_data(@experiment, @first_stage_meltcurve_data.id, @experiment.calibration_id)
           rescue => e
             render :json=>{:errors=>e.to_s}, :status => 500
             return
@@ -277,7 +277,7 @@ class ExperimentsController < ApplicationController
           first_stage_meltcurve_data = Stage.joins(:protocol).where(["experiment_definition_id=? and stage_type='meltcurve'", @experiment.experiment_definition_id]).first
           if first_stage_meltcurve_data
             begin
-              melt_curve_data = retrieve_melt_curve_data(@experiment.id, first_stage_meltcurve_data.id, @experiment.calibration_id)
+              melt_curve_data = retrieve_melt_curve_data(@experiment, first_stage_meltcurve_data.id, @experiment.calibration_id)
             rescue => e
               logger.error("export melt curve data failed: #{e}")
             end
@@ -417,7 +417,26 @@ class ExperimentsController < ApplicationController
     return amplification_data, cts
   end
   
-  def retrieve_melt_curve_data(experiment_id, stage_id, calibration_id)
+  def retrieve_melt_curve_data(experiment, stage_id, calibration_id)
+    new_data = MeltCurveDatum.new_data_generated?(experiment, stage_id)
+    if new_data
+      melt_curve_data = calculate_melt_curve_data(experiment.id, stage_id, calibration_id)
+      #update cache
+      CachedMeltCurveDatum.import melt_curve_data, :on_duplicate_key_update => [:temperature_text, :fluorescence_data_text, :derivative_text, :tm_text, :area_text]
+      #update cached_temperature
+      if melt_curve_data.last
+        cached_temperature = (experiment.running?)? melt_curve_data.last.temperature.last : new_data.temperature
+        if cached_temperature
+          experiment.update_attributes(:cached_temperature=>cached_temperature)
+        end
+      end
+    else #cached
+      melt_curve_data = CachedMeltCurveDatum.where(:experiment_id=>experiment.id, :stage_id=>stage_id).order(:channel, :well_num)
+    end
+    return melt_curve_data
+  end
+
+  def calculate_melt_curve_data(experiment_id, stage_id, calibration_id)
     config   = Rails.configuration.database_configuration
     connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
@@ -439,7 +458,7 @@ class ExperimentsController < ApplicationController
       (0...results.length).each do |channel|
         results[channel].each_index do |i|
           results_per_well = results[channel][i]
-          hash = OpenStruct.new({:channel=>channel+1, :well_num=>i+1, :temperature=>results_per_well[0][0], :fluorescence_data=>results_per_well[0][1], :derivative=>results_per_well[0][2], :tm=>(results_per_well[1][0].blank?)? [] : (results_per_well[1][0].is_a? Array)? results_per_well[1][0] : [results_per_well[1][0]], :area=>(results_per_well[1][1].blank?)? [] : (results_per_well[1][1].is_a? Array)? results_per_well[1][1] : [results_per_well[1][1]]})
+          hash = CachedMeltCurveDatum.new({:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>channel+1, :well_num=>i+1, :temperature=>results_per_well[0][0], :fluorescence_data=>results_per_well[0][1], :derivative=>results_per_well[0][2], :tm=>(results_per_well[1][0].blank?)? [] : (results_per_well[1][0].is_a? Array)? results_per_well[1][0] : [results_per_well[1][0]], :area=>(results_per_well[1][1].blank?)? [] : (results_per_well[1][1].is_a? Array)? results_per_well[1][1] : [results_per_well[1][1]]})
           melt_curve_data << hash
         end
       end
@@ -473,7 +492,6 @@ class ExperimentsController < ApplicationController
               #{(step_channel_2)? ", channel_2=list(calibration_id="+calibration_id.to_s+",step_id="+step_channel_2.to_s+")" : ""} \
               #{(step_baseline)? ", baseline=list(calibration_id="+calibration_id.to_s+",step_id="+step_baseline.to_s+")" : ""})"
     end
-    logger.info ("********#{result}")
     result
   end
   

@@ -16,23 +16,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-class MeltCurveDatum < ActiveRecord::Base
+class CachedMeltCurveDatum < ActiveRecord::Base
   belongs_to :experiment
-
-  def self.new_data_generated?(experiment, stage_id)
-    lastrow = where(["experiment_id=? AND stage_id=?", experiment.id, stage_id]).order("id DESC").select("temperature").first
-    if lastrow
-      if experiment.cached_temperature == nil
-        return lastrow
+  
+  ["temperature", "fluorescence_data", "derivative", "tm", "area"].each do |variable|
+    define_method("#{variable}") do
+      value = instance_variable_get("@#{variable}")
+      if value
+        return value
       else
-        if experiment.running?
-          return ((lastrow.temperature - experiment.cached_temperature).abs >= 1)? lastrow : nil
-        else #experiment completed
-          return (lastrow.temperature != experiment.cached_temperature)? lastrow : nil
-        end
+        value = read_attribute("#{variable}_text".to_sym)
+        return value.split(",").map {|v| v.to_f}
       end
-    else
-      return nil
-    end 
+    end
+    
+    define_method("#{variable}=") do |value|
+      instance_variable_set("@#{variable}", value)
+      write_attribute("#{variable}_text".to_sym, (value)? value.join(",") : "")
+    end  
   end
+
 end
