@@ -24,25 +24,34 @@ window.ChaiBioTech.ngApp.directive('chaiScroll', [
       scope: {
 
       },
+      compile: function(tElem, tAttr) {
+        return {
+          post: function($scope, elem, tAttr) {
+            console.log("this is post:", tAttr);
+            $scope.expName = tAttr.chaiScroll;
+            $scope.normalScroll = 8;
+            $scope.animationText = 'marquee '+ $scope.normalScroll +'s linear infinite';
+
+            if($scope.expName.length > 34) {
+              angular.element(elem)
+              .find('.marquee-target')
+              .addClass('marquee');
+
+
+              angular.element(elem)
+              .hover(function() {
+                angular.element(elem).find('.animating').css('animation', $scope.animationText);
+              }, function() {
+                angular.element(elem).find('.animating').css('animation', '');
+              });
+
+            }
+          }
+        };
+      },
+
       link: function($scope, elem, attr) {
-        $scope.expName = attr.chaiScroll;
-        $scope.normalScroll = 8;
-        $scope.animationText = 'marquee '+ $scope.normalScroll +'s linear infinite';
 
-        if($scope.expName.length > 34) {
-          angular.element(elem)
-          .find('.marquee-target')
-          .addClass('marquee');
-
-
-          angular.element(elem)
-          .hover(function() {
-            angular.element(elem).find('.animating').css('animation', $scope.animationText);
-          }, function() {
-            angular.element(elem).find('.animating').css('animation', '');
-          });
-
-        }
       }
     }
   }
