@@ -16,7 +16,7 @@ modlist <- function(
   baseline, # xqrm
   basecyc = 1:8,
   basefac = 1,
-  min_Cq, # xqrm
+  min_Ct, # xqrm
   fallback = NULL, # xqrm
   smooth = NULL, 
   smoothPAR = NULL, 
@@ -33,10 +33,10 @@ modlist <- function(
   
   # xqrm:
   num_cycles <- dim(x)[1]
-  if (num_cycles < min_Cq) {
+  if (num_cycles < min_Ct) {
     pcrfit_weights <- rep(1, times=num_cycles)
   } else {
-    pcrfit_weights <- c(rep(0, times=min_Cq-1), rep(1, times=dim(x)[1]-min_Cq+1)) }
+    pcrfit_weights <- c(rep(0, times=min_Ct-1), rep(1, times=dim(x)[1]-min_Ct+1)) }
   if (fallback == 'parm') stop('`fallback` cannot be \'parm\'.')
   
   options(expressions = 50000)  
