@@ -16,7 +16,7 @@ modlist <- function(
   baseline, # xqrm
   basecyc = 1:8,
   basefac = 1,
-  min_Ct, # xqrm
+  min_Cq, # xqrm
   fallback = NULL, # xqrm
   smooth = NULL, 
   smoothPAR = NULL, 
