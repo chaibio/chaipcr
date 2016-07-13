@@ -92,8 +92,8 @@ window.ChaiBioTech.ngApp.directive('modeToggle', [
           }
         });
 
-        scope.data = "auto";
-        scope.configureSwitch("auto");
+        //scope.data = "auto";
+        //scope.configureSwitch("auto");
       }
     };
   }

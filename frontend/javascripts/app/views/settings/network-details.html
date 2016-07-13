@@ -48,10 +48,11 @@
       <button class="button second-button" ui-sref="settings.networkmanagement">CANCEL</button>
     </div>
   </form>
-
+  <!-- So mode-toggle to communicate with controller, it has to be out of the form 'connectedWifiNetwork'-->
   <form ng-if="IamConnected" name="connectedWifiDetails" nonvalidate>
     <div class="set-mode">
-      <div class="set-mode-toggle"><mode-toggle data="auto"></mode-toggle></div><span>SET AUTOMATICALLY</span></div>
+      <div class="set-mode-toggle"><mode-toggle data="autoSetting"></mode-toggle></div><span>SET AUTOMATICALLY</span>
+    </div>
       <div class="settings-text-container">
         <span>CURRENT SETTINGS</span> <span class="locked">LOCKED</span>
       </div>

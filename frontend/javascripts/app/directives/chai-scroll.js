@@ -24,7 +24,7 @@ window.ChaiBioTech.ngApp.directive('chaiScroll', [
       scope: {
 
       },
-      compile: function(tElem, tAttr) {
+      compile: function(elem, tAttr) {
         return {
           post: function($scope, elem, tAttr) {
             console.log("this is post:", tAttr);

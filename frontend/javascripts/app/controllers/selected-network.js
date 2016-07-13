@@ -30,6 +30,11 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     $scope.IamConnected = false;
     $scope.statusMessage = "";
     $scope.currentNetwork = {};
+    $scope.autoSetting = "auto"; // This variable controls set auto/manual.
+
+    $scope.$watch('autoSetting', function(val, oldVal) {
+        console.log(val);
+    });
 
     $scope.$on('new_wifi_result', function() {
 
