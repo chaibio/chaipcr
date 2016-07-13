@@ -792,9 +792,9 @@ dense_factor = 10 # xqrm
   } else RSS <- NA
   
   # xqrm
-  tempDATA <- round(tempDATA, 2)
-  meltDATA <- round(meltDATA, 2)
-  derivDATA <- round(derivDATA, 2)
+  tempDATA <- round(tempDATA, 3)
+  meltDATA <- round(meltDATA, 3)
+  derivDATA <- round(derivDATA, 3)
   TMs <- round(TMs, 3)
   
   ### return data
