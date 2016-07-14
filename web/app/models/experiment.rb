@@ -64,6 +64,9 @@ class Experiment < ActiveRecord::Base
     TemperatureDebugLog.delete_all(:experiment_id => experiment.id)
     FluorescenceDatum.delete_all(:experiment_id => experiment.id)
     MeltCurveDatum.delete_all(:experiment_id => experiment.id)
+    AmplificationCurve.delete_all(:experiment_id => experiment.id)
+    AmplificationDatum.delete_all(:experiment_id => experiment.id)
+    CachedMeltCurveDatum.delete_all(:experiment_id => experiment.id)
   end
   
   def protocol
