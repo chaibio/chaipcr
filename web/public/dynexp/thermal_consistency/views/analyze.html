@@ -64,11 +64,15 @@
       </table>
     </div>
   </div>
+  
+  <div class="text-center" ng-if="!analyzing">
+    <a target="_blank" href="/#/experiments/{{experiment.id}}/run-experiment?chart=melt-curve">View Melt Curve</a>
+  </div>
 
   <h3 class="text-center" ng-show="tm_values" ng-class="(analyzedExp['delta_Tm'][1] ? 'text-success':'text-danger')">
     Max ΔTm: {{analyzedExp['delta_Tm'][0] | round:2}} &deg;C
   </h3>
-
+  
   <div class="text-center" ng-if="!analyzing">
     <a href="/#/settings/" class="button">OKAY</a>
   </div>
