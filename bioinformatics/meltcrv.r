@@ -179,7 +179,7 @@ mc_tm_pw <- function(
     
     range_dfdT <- range(mc[,'-df/dT'])
     #summit_pos <- which.max(mc[,'-df/dT']) # original: invalid when -df/dT very high at the beginning of melt curve
-    summit_pos <- which(mc[,'Temp'] == raw_tm[which.max(raw_tm$Area), 'Tm']) # postion in -df/dT curve corresponding to Tm peak of largest area.
+    summit_pos <- which.min(sapply(mc[,'Temp'], function(temp) abs(temp - raw_tm[which.max(raw_tm$Area), 'Tm']))) # which(mc[,'Temp'] == raw_tm[which.max(raw_tm$Area), 'Tm']) # exact equality doesn't work on beaglebone possibly due to rounding issues. # postion in -df/dT curve corresponding to Tm peak of largest area.
     dfdT_normd <- (mc[,'-df/dT'] - range_dfdT[1]) / (range_dfdT[2] - range_dfdT[1])
     # range_dfdT[1] == min(mc[,'-df/dT']). range_dfdT[2] == max(mc[,'-df/dT']).
     
