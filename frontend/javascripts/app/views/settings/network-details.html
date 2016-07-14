@@ -48,38 +48,38 @@
       <button class="button second-button" ui-sref="settings.networkmanagement">CANCEL</button>
     </div>
   </form>
-  <!-- So mode-toggle to communicate with controller, it has to be out of the form 'connectedWifiNetwork'-->
+  <!-- So mode-toggle to communicate with controller , it has to be out of the form 'connectedWifiNetwork'-->
+  <div class="set-mode" ng-show="IamConnected">
+    <div class="set-mode-toggle"><mode-toggle data="autoSetting"></mode-toggle></div><span>SET AUTOMATICALLY</span>
+  </div>
   <form ng-if="IamConnected" name="connectedWifiDetails" nonvalidate>
-    <div class="set-mode">
-      <div class="set-mode-toggle"><mode-toggle data="autoSetting"></mode-toggle></div><span>SET AUTOMATICALLY</span>
+    <div class="settings-text-container">
+      <span>CURRENT SETTINGS</span> <span class="locked">LOCKED</span>
     </div>
-      <div class="settings-text-container">
-        <span>CURRENT SETTINGS</span> <span class="locked">LOCKED</span>
-      </div>
 
-      <div class="network-parameter-container">
-        <div class="network-parameter-text-container"><span>IP Address</span></div>
-        <div class="network-parameter-data-container"><span>{{currentNetwork.state.address}}</span></div>
-      </div>
-      <div class="network-parameter-container">
-        <div class="network-parameter-text-container"><span>Subnet Mask</span></div>
-        <div class="network-parameter-data-container"><span>{{currentNetwork.state.maskAddress}}</span></div>
-      </div>
-      <div class="network-parameter-container">
-        <div class="network-parameter-text-container"><span>Router</span></div>
-        <div class="network-parameter-data-container"></div>
-      </div>
-      <div class="network-parameter-container">
-        <div class="network-parameter-text-container"><span>Gateway IP</span></div>
-        <div class="network-parameter-data-container"></div>
-      </div>
-      <div class="network-parameter-container">
-        <div class="network-parameter-text-container"><span>DNS Server</span></div>
-        <div class="network-parameter-data-container"></div>
-      </div>
+    <div class="network-parameter-container">
+      <div class="network-parameter-text-container"><span>IP Address</span></div>
+      <div class="network-parameter-data-container"><span>{{currentNetwork.state.address}}</span></div>
+    </div>
+    <div class="network-parameter-container">
+      <div class="network-parameter-text-container"><span>Subnet Mask</span></div>
+      <div class="network-parameter-data-container"><span>{{currentNetwork.state.maskAddress}}</span></div>
+    </div>
+    <div class="network-parameter-container">
+      <div class="network-parameter-text-container"><span>Router</span></div>
+      <div class="network-parameter-data-container"></div>
+    </div>
+    <div class="network-parameter-container">
+      <div class="network-parameter-text-container"><span>Gateway IP</span></div>
+      <div class="network-parameter-data-container"></div>
+    </div>
+    <div class="network-parameter-container">
+      <div class="network-parameter-text-container"><span>DNS Server</span></div>
+      <div class="network-parameter-data-container"></div>
+    </div>
 
-      <div class="connected-button-container button-container">
-        <input type="submit" class="green-button" value="SAVE CHANGES">
-      </div>
+    <div class="connected-button-container button-container">
+      <input type="submit" class="green-button" value="SAVE CHANGES">
+    </div>
   </form>
 </div>
