@@ -54,7 +54,7 @@
   </div>
   <form ng-if="IamConnected" name="connectedWifiDetails" nonvalidate>
     <div class="settings-text-container">
-      <span>CURRENT SETTINGS</span> <span class="locked">LOCKED</span>
+      <span>CURRENT SETTINGS</span> <span ng-show="autoSetting=='auto'" class="locked">LOCKED</span>
     </div>
 
     <div class="network-parameter-container">
@@ -65,10 +65,10 @@
       <div class="network-parameter-text-container"><span>Subnet Mask</span></div>
       <div class="network-parameter-data-container"><span>{{currentNetwork.state.maskAddress}}</span></div>
     </div>
-    <div class="network-parameter-container">
+    <!--<div class="network-parameter-container">
       <div class="network-parameter-text-container"><span>Router</span></div>
       <div class="network-parameter-data-container"></div>
-    </div>
+    </div> -->
     <div class="network-parameter-container">
       <div class="network-parameter-text-container"><span>Gateway IP</span></div>
       <div class="network-parameter-data-container"></div>
