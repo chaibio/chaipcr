@@ -52,16 +52,15 @@
      <p class="home-page-exp-messages B1B" ng-show="experiments !== null && experiments.length === 0">No experiments yet.</p>
      <div class="home-page-exp-container" ng-show="experiments !== null && experiments.length !== 0">
        <div  ng-repeat="exp in experiments | orderBy:'experiment.created_at':true" class="home-page-exp-tile">
-         <div chai-scroll="{{exp.experiment.name}}" ng-mouseenter="mouseOver = true" class="ovtrunc" ng-mouseleave="mouseOver = false" ng-class="{'home-page-tile-text': true, 'home-page-tile-text-hover': mouseOver && !deleteMode}" ng-click="HomeCtrl.openExperiment(exp.experiment)">
-           <div class="marquee-target">
-             <div class="animating home-page-exp-name B1B">{{exp.experiment.name}}</div>
-            </div>
-             <!--<div class="home-page-exp-name B1B"  data-toggle="tooltip" title="{{exp.experiment.name}}">
-               <div class="scroll-text">{{exp.experiment.name}}</div>
+         <div ng-mouseenter="mouseOver = true" class="home-page-tile-text" ng-mouseleave="mouseOver = false" ng-class="{'home-page-tile-text': true, 'home-page-tile-text-hover': mouseOver && !deleteMode}" ng-click="HomeCtrl.openExperiment(exp.experiment)" data-toggle="tooltip" title="{{exp.experiment.name}}">
+          <!-- <div class="marquee-target"> -->
+           <!--  <div class="home-page-exp-name B1B">{{exp.experiment.name}}</div> -->
+          <!--  </div> -->
+             <div class="home-page-exp-name B1B ovtrunc"  data-toggle="tooltip" title="{{exp.experiment.name}}">
+               {{exp.experiment.name}}
              </div>
-             <span class="home-page-exp-name B1B" ng-show="mouseOver" data-toggle="tooltip" title="{{exp.experiment.name}}">{{exp.experiment.name}}</span> <br/>-->
-             <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at">Created {{exp.experiment.created_at | amCalendar}}</span>
-             <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at">Run {{exp.experiment.started_at | amCalendar}}</span>
+             <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at">Created {{exp.experiment.created_at | amCalendar}}, #{{exp.experiment.id}}</span>
+             <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at">Run {{exp.experiment.started_at | amCalendar}}, #{{exp.experiment.id}}</span>
              <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && !exp.experiment.completed_at">IN PROGRESS&nbsp;<ellipsis-animated><ellipsis-animated/></span>
 
          </div>
