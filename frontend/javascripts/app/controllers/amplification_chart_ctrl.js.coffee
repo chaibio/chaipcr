@@ -43,6 +43,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.amplification_data = null
       max_calibration = null
       AMPLI_DATA_CACHE = null
+      retryInterval = null
       $scope.baseline_subtraction = true
       $scope.curve_type = 'linear'
       $scope.color_by = 'well'
@@ -230,5 +231,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $timeout ->
             $scope.$broadcast '$reload:n3:charts'
           , 1000
+
+      $scope.$on '$destroy', ->
+        $interval.cancel(retryInterval) if retryInterval
+
 
 ]
