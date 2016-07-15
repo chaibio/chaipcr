@@ -228,7 +228,8 @@ class ExperimentsController < ApplicationController
   def export
     respond_to do |format|
       format.zip {
-        buffer = Zip::OutputStream.write_buffer do |out|
+	      t = Tempfile.new("tmpexport_#{request.remote_ip}")
+        buffer = Zip::OutputStream.open(t.path) do |out|
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/temperature_log.csv")
           out.write TemperatureLog.as_csv(params[:id])
           
@@ -286,16 +287,12 @@ class ExperimentsController < ApplicationController
           if melt_curve_data          
             out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_data.csv")
             columns = ["channel", "well_num", "temperature", "fluorescence_data", "derivative"]
-            csv_string = CSV.generate do |csv|
-              csv << columns
-              melt_curve_data.each do |data|
-                data.temperature.each_index do |index|
-                  csv << [data.channel, data.well_num, data.temperature[index], data.fluorescence_data[index], data.derivative[index]]
-                end
+	          out.write columns.to_csv
+            melt_curve_data.each do |data|
+              data.temperature.each_index do |index|
+                out.write "#{data.channel}, #{data.well_num}, #{data.temperature[index]}, #{data.fluorescence_data[index]}, #{data.derivative[index]}\r\n"
               end
             end
-            
-            out.write csv_string
           
             out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_analysis.csv")
             columns = ["channel", "well_num", "Tm1", "Tm2", "Tm3", "Tm4", "area1", "area2", "area3", "area4"]
@@ -313,8 +310,8 @@ class ExperimentsController < ApplicationController
             out.write csv_string
           end
         end
-        buffer.rewind
-        send_data buffer.sysread
+	      send_file t.path, :type => 'application/zip', :disposition => 'attachment', :filename => "export.zip"
+        t.close
       }
     end
   end

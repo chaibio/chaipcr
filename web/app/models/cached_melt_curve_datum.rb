@@ -22,12 +22,12 @@ class CachedMeltCurveDatum < ActiveRecord::Base
   ["temperature", "fluorescence_data", "derivative", "tm", "area"].each do |variable|
     define_method("#{variable}") do
       value = instance_variable_get("@#{variable}")
-      if value
-        return value
-      else
+      if value.nil?
         value = read_attribute("#{variable}_text".to_sym)
-        return value.split(",").map {|v| v.to_f}
+        value = value.split(",").map {|v| v.to_f}
+        instance_variable_set("@#{variable}", value)
       end
+      return value
     end
     
     define_method("#{variable}=") do |value|
