@@ -31,6 +31,7 @@ App.controller 'MeltCurveChartCtrl', [
     $scope.chartConfigNormalized = MeltCurveService.chartConfig('normalized')
     $scope.data = MeltCurveService.defaultData()
     has_data = false
+    retryInterval = null
     PARSED_DATA = null
     OPTIMIZED_DATA = null
     $scope.retrying = false
@@ -201,5 +202,8 @@ App.controller 'MeltCurveChartCtrl', [
       return if val == oldVal
       return if !PARSED_DATA
       moveData()
+
+    $scope.$on '$destroy', ->
+      $interval.cancel(retryInterval) if retryInterval
 
 ]
