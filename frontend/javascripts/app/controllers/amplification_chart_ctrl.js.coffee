@@ -50,8 +50,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.retry = 0
       $scope.fetching = false
       $scope.channel_1 = true
-      $scope.channel_2 = true	
-	
+      $scope.channel_2 = if is_dual_channel then true else false
+
       $scope.$on 'expName:Updated', ->
         $scope.experiment?.name = expName.name
 
@@ -146,7 +146,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         w = width_per_cycle * $scope.maxCycle
         drag_scroll.attr 'width', Math.round w
 
-      updateChartData = (data) ->	  
+      updateChartData = (data) ->
         return if !data
         subtraction_type = if $scope.baseline_subtraction then 'baseline' else 'background'
         $scope.chartConfig.axes.x.min = data.min_cycle
@@ -156,7 +156,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.chartConfig.axes.y.max = if $scope.baseline_subtraction then max_calibration.baseline else max_calibration.background
 
         $scope.data = data.amplification_data
-        console.log $scope.data		
         $timeout ->
           $scope.$broadcast '$reload:n3:charts'
         , 500
@@ -167,7 +166,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         subtraction_type = if $scope.baseline_subtraction then 'baseline' else 'background'
         channel_count = if $scope.is_dual_channel then 2 else 1
         channel_end = if $scope.channel_1 && $scope.channel_2 then 2 else if $scope.channel_1 && !$scope.channel_2 then 1 else if !$scope.channel_1 && $scope.channel_2 then 2
-        channel_start = if $scope.channel_1 && $scope.channel_2 then 1 else if $scope.channel_1 && !$scope.channel_2 then 1 else if !$scope.channel_1 && $scope.channel_2 then 2		
+        channel_start = if $scope.channel_1 && $scope.channel_2 then 1 else if $scope.channel_1 && !$scope.channel_2 then 1 else if !$scope.channel_1 && $scope.channel_2 then 2
         for ch_i in [channel_start..channel_end] by 1
           for i in [0..15] by 1
             if buttons["well_#{i}"]?.selected
@@ -202,12 +201,12 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.$watch 'baseline_subtraction', (val) ->
         moveData()
         updateSeries()
-		
+
       $scope.$watch 'channel_1', (val) ->
-        updateSeries()		  		
+        updateSeries()
 
       $scope.$watch 'channel_2', (val) ->
-        updateSeries()		  
+        updateSeries()
 
       $scope.$watch 'curve_type', (type) ->
         $scope.chartConfig.axes.y.type = type
@@ -219,8 +218,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         else
           $scope.chartConfig.axes.y.ticks = 10
           delete $scope.chartConfig.axes.y.tickFormat
-
-        console.log $scope.chartConfig.axes.y
 
       $scope.$watchCollection 'wellButtons', updateSeries
 
