@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160713040224) do
+ActiveRecord::Schema.define(version: 20160715071912) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -68,7 +68,7 @@ ActiveRecord::Schema.define(version: 20160713040224) do
     t.integer  "calibration_id"
     t.boolean  "time_valid",                                       default: true
     t.string   "analyze_status"
-    t.decimal  "cached_temperature",       precision: 5, scale: 2
+    t.decimal  "cached_temperature",       precision: 7, scale: 4
   end
 
   create_table "fluorescence_data", id: false, force: true do |t|
@@ -87,7 +87,7 @@ ActiveRecord::Schema.define(version: 20160713040224) do
   create_table "melt_curve_data", force: true do |t|
     t.integer "stage_id",                                                         null: false
     t.integer "well_num",                                                         null: false, comment: "0-15"
-    t.decimal "temperature",                  precision: 5, scale: 2,                          comment: "degrees C"
+    t.decimal "temperature",                  precision: 7, scale: 4,                          comment: "degrees C"
     t.integer "fluorescence_value"
     t.integer "experiment_id"
     t.integer "channel",            limit: 1,                         default: 1, null: false
