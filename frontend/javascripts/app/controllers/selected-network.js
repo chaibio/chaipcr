@@ -102,5 +102,8 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
       }
     };
 
+    $scope.connectEthernet = function() {
+      console.log($scope);
+    };
   }
 ]);

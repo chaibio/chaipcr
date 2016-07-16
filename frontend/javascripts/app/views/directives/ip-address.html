@@ -1,6 +1,10 @@
-<div>
-  <ip-field field="1"></ip-field>
+<div class="ip-address">
+  <!--<ip-field field="1"></ip-field>
   <ip-field field="2"></ip-field>
   <ip-field field="3"></ip-field>
-  <ip-field field="4"></ip-field>
+  <ip-field field="4"></ip-field> -->
+  <input class="ip-field" type="number first" min="0" max="255" required="true" ng-model="splittedIP[0]">
+  <input class="ip-field" type="number second" min="0" max="255" required="true" ng-model="splittedIP[1]">
+  <input class="ip-field" type="number third" min="0" max="255" required="true" ng-model="splittedIP[2]">
+  <input class="ip-field" type="number fourth" min="0" max="255" required="true" ng-model="splittedIP[3]">
 </div>

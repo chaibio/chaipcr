@@ -23,8 +23,16 @@
        restric: 'A',
        templateUrl: 'app/views/directives/ip-address.html',
        replace: true,
+       scope: {
+         ip: '=value'
+       },
        link: function($scope, elem, attr) {
-
+         if($scope.ip) {
+           $scope.splittedIP = $scope.ip.split('.');
+           angular.element('.ip-field').blur(function(evt) {
+             $scope.ip = $scope.splittedIP.join('.');
+           });
+         }
        }
      };
    }
