@@ -32,18 +32,19 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     $scope.currentNetwork = {};
     $scope.IamConnected = false;
     $scope.autoSetting = "auto"; // This variable controls set auto/manual.
+    $scope.connectedSsid = "";
 
     $scope.$watch('autoSetting', function(val, oldVal) {
-        console.log(val);
+        //console.log(val, $scope);
     });
 
     $scope.$on('new_wifi_result', function() {
 
-      if(NetworkSettingsService.currentNetwork.state.status === "connected") {
+      if(NetworkSettingsService.connectedWifiNetwork.state.status === "connected") {
         $scope.statusMessage = "";
         $state.go('settings.networkmanagement');
       } else {
-        $scope.configureAsStatus(NetworkSettingsService.currentNetwork.state.status);
+        $scope.configureAsStatus(NetworkSettingsService.connectedWifiNetwork.state.status);
       }
     });
 

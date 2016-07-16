@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-window.ChaiBioTech.ngApp.directive('numbersOnly', [
+window.ChaiBioTech.ngApp.directive('ipNumber', [
   function(){
      return {
 
@@ -25,19 +25,23 @@ window.ChaiBioTech.ngApp.directive('numbersOnly', [
        restrict: 'A',
 
        link: function(scope, element, attrs, modelCtrl) {
-         console.log(modelCtrl);
-         modelCtrl.$parsers.push(function (inputValue) {
-            console.log(inputValue);
-             if (inputValue === undefined) return '';
-             var transformedInput = inputValue.replace(/[^0-9]/g, '');
-             // condition to limit transformed value below 1 million
-             transformedInput = (String(transformedInput).length >= 7) ? transformedInput.substr(0, 6) : transformedInput;
-             if (transformedInput != inputValue) {
-                modelCtrl.$setViewValue(transformedInput);
-                modelCtrl.$render();
-             }
 
-             return transformedInput;
+         modelCtrl.$parsers.push(function (inputValue) {
+           
+           if (inputValue === undefined) return '';
+           var transformedInput = inputValue.replace(/[^0-9]/g, '');
+
+           transformedInput = (String(transformedInput).length > 3) ? transformedInput.substr(0, 3) : transformedInput;
+           if(Number(transformedInput) > 255) {
+             transformedInput = transformedInput.substr(0,2);
+           }
+
+           if (transformedInput != inputValue) {
+              modelCtrl.$setViewValue(transformedInput);
+              modelCtrl.$render();
+           }
+
+           return transformedInput;
          });
        }
      };

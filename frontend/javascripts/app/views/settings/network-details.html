@@ -49,7 +49,7 @@
     </div>
   </form>
   <!-- Remember ng-if creates a new scope so we need to use parent-->
-  <div class="set-mode" ng-if="IamConnected">
+  <div class="set-mode" ng-if="IamConnected && name=='ethernet'">
     <div class="set-mode-toggle"><mode-toggle data="$parent.autoSetting"></mode-toggle></div><span>SET AUTOMATICALLY</span>
   </div>
   <form ng-if="IamConnected" name="connectedWifiDetails" nonvalidate ng-submit="connectEthernet()">
