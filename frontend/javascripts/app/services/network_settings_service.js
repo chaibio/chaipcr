@@ -34,11 +34,17 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.connectionStatus = null; // Connection Status at the moment
     this.userSettings = $.jStorage.get('userNetworkSettings');
     this.intervalKey = null;
+    this.listofAllWifi = {};
 
     this.getWifiNetworks = function() {
 
       var delay = $q.defer();
       $http.get(host + ':8000/network/wlan/scan').then(function(data) {
+        var listofAllWifi = {};
+        data.data.scan_result.forEach(function(info) {
+          that.listofAllWifi[info.ssid] = info;
+        });
+        console.log(that.listofAllWifi);
         delay.resolve(data);
       }, function(err) {
         delay.reject(err);

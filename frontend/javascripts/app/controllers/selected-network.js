@@ -30,10 +30,12 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     $scope.IamConnected = false;
     $scope.statusMessage = "";
     $scope.currentNetwork = {};
-    $scope.IamConnected = false;
     $scope.autoSetting = "auto"; // This variable controls set auto/manual.
     $scope.connectedSsid = "";
+    $scope.selectedWifiNow = NetworkSettingsService.listofAllWifi[$scope.name] || null; //
+    $scope.wifiNetworkType = null; // We have different settings for wep2 and wpa , so we need to look for the type of network.
 
+    //console.log($scope.selectedNow);
     $scope.$watch('autoSetting', function(val, oldVal) {
         //console.log(val, $scope);
     });
@@ -48,11 +50,24 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
       }
     });
 
-    $scope.credentials = {
-      'wpa-ssid': $scope.name,
-      'wpa-psk': "",
-      'type': "dhcp"
-    };
+    if($scope.selectedWifiNow) {
+
+      if($scope.selectedWifiNow.encryption === 'wpa2') {
+        $scope.wifiNetworkType = 'wpa2';
+        $scope.credentials = {
+          'wpa-ssid': $scope.name,
+          'wpa-psk': "",
+          'type': "dhcp"
+        };
+      } else if($scope.selectedWifiNow.encryption === 'wep') {
+        $scope.wifiNetworkType = 'wep';
+        $scope.credentials = {
+          'wireless_essid': $scope.name,
+          'wireless_key': "",
+          'type': "dhcp"
+        };
+      }
+    }
 
     var wifiConnection = NetworkSettingsService.connectedWifiNetwork;
     if(wifiConnection.settings && wifiConnection.settings["wpa-ssid"]) {
@@ -74,6 +89,7 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     }
 
     $scope.connectWifi = function() {
+      console.log($scope.credentials); // for checking later in 200.
       NetworkSettingsService.connectWifi($scope.credentials).then(function(data) {
         $scope.statusMessage = "";
         $scope.buttonValue = "CONNECTING";
