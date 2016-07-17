@@ -10,7 +10,7 @@ get_amplification_data <- function(db_usr, db_pwd, db_host, db_port, db_name, # 
                                    dcv=TRUE, # logical, whether to perform multi-channel deconvolution
                                    # basecyc, cp, # extra parameters that are currently hard-coded but may become user-defined later
                                    max_cycle=1000, # maximum cycles to analyze
-                                   cp='cpD2', 
+                                   cp='Cy0', 
                                    extra_output=FALSE, 
                                    show_running_time=FALSE # option to show time cost to run this function
                                    ) {
