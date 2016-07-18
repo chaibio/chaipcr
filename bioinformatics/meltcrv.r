@@ -173,7 +173,7 @@ mc_tm_pw <- function(
     Fluo_normd <- Fluo_ori - min(Fluo_ori)
     mc <- cbind(mt_pw[,'Temp'], Fluo_normd, mt_pw[,'df.dT'])
     colnames(mc) <- c('Temp', 'Fluo', '-df/dT')
-    mc <- as.data.frame(mc) # ensure proper plotting
+    mc <- as.data.frame(mc[seq(1, dim(mc)[1],10),]) # `as.data.frame` ensures proper plotting, select 1/10 sparse data points
     
     raw_tm <- na.omit(mt_pw[, c('Tm', 'Area')])
     
