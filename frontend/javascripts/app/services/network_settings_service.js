@@ -125,6 +125,19 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       return delay.promise;
     };
 
+    this.connectToEthernet = function(data) {
+
+      var delay = $q.defer();
+      $http.put(host + ':8000/network/eth0', data)
+      .then(function(result) {
+        delay.resolve(result);
+      }, function(err) {
+        delay.reject(err);
+      });
+
+      return delay.promise;
+    };
+
     this.stop = function() {
 
       var delay = $q.defer();

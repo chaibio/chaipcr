@@ -66,15 +66,15 @@
     <div class="network-parameter-container">
       <div class="network-parameter-text-container"><span>IP Address</span></div>
       <div class="network-parameter-data-container">
-        <span ng-show="autoSetting=='auto'">{{currentNetwork.state.address}}</span>
-        <ip-address ng-show="autoSetting=='manual'" value="currentNetwork.state.address"></ip-address>
+        <span ng-show="autoSetting=='auto'">{{editEthernetData.address}}</span>
+        <ip-address ng-show="autoSetting=='manual'" value="editEthernetData.address"></ip-address>
       </div>
     </div>
     <div class="network-parameter-container">
       <div class="network-parameter-text-container"><span>Subnet Mask</span></div>
       <div class="network-parameter-data-container">
-        <span ng-show="autoSetting=='auto'">{{currentNetwork.state.maskAddress}}</span>
-        <ip-address ng-show="autoSetting=='manual'" value="currentNetwork.state.maskAddress"></ip-address>
+        <span ng-show="autoSetting=='auto'">{{editEthernetData.maskAddress}}</span>
+        <ip-address ng-show="autoSetting=='manual'" value="editEthernetData.maskAddress"></ip-address>
       </div>
     </div>
     <!--<div class="network-parameter-container">
@@ -83,11 +83,17 @@
     </div> -->
     <div class="network-parameter-container">
       <div class="network-parameter-text-container"><span>Gateway IP</span></div>
-      <div class="network-parameter-data-container"><ip-address ng-show="autoSetting=='manual'"></ip-address></div>
+      <div class="network-parameter-data-container">
+        <span ng-show="autoSetting=='auto'">{{editEthernetData.gateway}}</span>
+        <ip-address ng-show="autoSetting=='manual'" value="editEthernetData.gateway"></ip-address>
+      </div>
     </div>
     <div class="network-parameter-container">
       <div class="network-parameter-text-container"><span>DNS Server</span></div>
-      <div class="network-parameter-data-container"><ip-address ng-show="autoSetting=='manual'"></ip-address></div>
+      <div class="network-parameter-data-container">
+        <span ng-show="autoSetting=='auto'">{{editEthernetData['dns-nameservers']}}</span>
+        <ip-address ng-show="autoSetting=='manual'" value="editEthernetData['dns-nameservers']"></ip-address>
+      </div>
     </div>
 
     <div class="connected-button-container button-container">
