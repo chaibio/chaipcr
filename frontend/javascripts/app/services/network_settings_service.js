@@ -59,7 +59,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
           .then(function(result) {
             that.processData(result);
           }, function(err) {
-            that.processOnError(err) // in case error ,May be no wireless interface
+            that.processOnError(err); // in case error ,May be no wireless interface
           });
         }
       }, 3000);
@@ -71,9 +71,9 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       if(result.data.settings) {
         this.connectedWifiNetwork = result.data;
         var _ssid = result.data.settings["wpa-ssid"];
-        var _connectionStatus = result.data.state.status
+        var _connectionStatus = result.data.state.status;
         if(ssid !== _ssid || this.connectionStatus !== _connectionStatus) {
-          ssid = _ssid
+          ssid = _ssid;
           this.connectionStatus = _connectionStatus;
           $rootScope.$broadcast("new_wifi_result");
         }
@@ -135,7 +135,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
         that.userSettings.wifiSwitchOn = false;
         $.jStorage.set('userNetworkSettings', that.userSettings);
         $rootScope.$broadcast("wifi_stopped");
-        delay.resolve(result)
+        delay.resolve(result);
       }, function(err) {
         delay.reject(err);
       });
@@ -167,7 +167,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       console.log("Network is fine .. !");
     }, function(err) {
       console.log("No Wifi Interface .. !");
-      that.processOnError(err)
+      that.processOnError(err);
     });
 
     //We need to make sure that, we call /network api only when we are in

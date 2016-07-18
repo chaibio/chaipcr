@@ -81,6 +81,7 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     }
 
     var ethernetConnection = NetworkSettingsService.connectedEthernet;
+    console.log(ethernetConnection);
     if(ethernetConnection.state) {
       if($state.params.name.replace(new RegExp('_', "g"), " ") === "ethernet") {
         $scope.IamConnected = true;
