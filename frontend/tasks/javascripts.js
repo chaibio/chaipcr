@@ -157,7 +157,7 @@ gulp.task('concat-js', ['clean-js', 'coffee', 'copy-js-to-tmp', 'templates', 'dy
 
 });
 
-gulp.task('hash-js', ['concat-js'], function() {
+gulp.task('hash-js', ['concat-js', 'dynamicexp:relink_thermal'], function() {
     var hash = process.env.jshash || _makeHash();
 
     return gulp.src('.tmp/js/' + applicationTmpJS + '.js')
