@@ -14,7 +14,7 @@ calib_labels_FAM_HEX <- c('channel_1', 'channel_2')
 SNR_FAM_CH1_MIN <- 0.75
 SNR_FAM_CH2_MAX <- 1
 SNR_HEX_CH1_MAX <- 0.70
-SNR_HEX_CH2_MIN <- 1
+SNR_HEX_CH2_MIN <- 0.85
 
 # fluo values: channel 1, channel 2
 WATER_MAX <- c(80000, 7500)
