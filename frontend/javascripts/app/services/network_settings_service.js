@@ -70,7 +70,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       this.wirelessError = false;
       if(result.data.settings) {
         this.connectedWifiNetwork = result.data;
-        var _ssid = result.data.settings["wpa-ssid"];
+        var _ssid = result.data.settings["wpa-ssid"] || result.data.settings.wireless_essid;
         var _connectionStatus = result.data.state.status;
         if(ssid !== _ssid || this.connectionStatus !== _connectionStatus) {
           ssid = _ssid;
