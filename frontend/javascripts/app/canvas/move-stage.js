@@ -141,14 +141,14 @@ angular.module("canvasApp").factory('moveStageRect', [
           }
         };
 
-        this.indicator.applyMovement = function(stage, C, circleManager, callBack) {
+        this.indicator.applyMovement = function(stage_, C, circleManager, callBack) {
 
           this.draggedStage.wireStageNextAndPrevious();
           this.draggedStage.myWidth = 0;
           var stage = this.draggedStage;
 
           while(stage.index <= (this.currentHit - 1)) {
-            stage.moveIndividualStageAndContents(stage, true)
+            stage.moveIndividualStageAndContents(stage, true);
             stage = stage.nextStage;
           }
 
@@ -165,7 +165,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           C.configureStepsofNewStage(stageView, 0);
           C.correctNumbering();
           stageView.moveAllStepsAndStages();
-          circleManager.init(C)
+          circleManager.init(C);
           circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
           C.$scope.applyValues(stageView.childSteps[0].circle);
           stageView.childSteps[0].circle.manageClick(true);

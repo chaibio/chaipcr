@@ -135,7 +135,7 @@ angular.module("canvasApp").factory('canvas', [
 
         this.stepIndicator = moveStepRect.getMoveStepRect(this);
         this.stageIndicator = moveStageRect.getMoveStageRect(this);
-        this.hitBlock = stageHitBlock.getStageHitBlock(this)
+        this.hitBlock = stageHitBlock.getStageHitBlock(this);
         this.canvas.add(this.stepIndicator);
         this.canvas.add(this.stageIndicator);
         this.canvas.add(this.hitBlock);
@@ -277,6 +277,7 @@ angular.module("canvasApp").factory('canvas', [
       var that = this;
       this.allStageViews.forEach(function(stage, index) {
         stage.index = index;
+        stage.stageCaption.setText("STAGE " + (index + 1) + ": " );
         stage.childSteps.forEach(function(step, index) {
           step.index = index;
           step.ordealStatus = oStatus;
