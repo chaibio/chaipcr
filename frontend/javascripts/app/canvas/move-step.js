@@ -93,7 +93,6 @@ angular.module("canvasApp").factory('moveStepRect', [
         indicatorRectangle = new fabric.Group([
           rect, temperatureText, holdTimeText, indexText, placeText,
           me.imageobjects["drag-footer-image.png"],
-
         ],
           {
             originX: "left", originY: "top", left: 0, top: 298, height: 72, selectable: true, lockMovementY: true, hasControls: false,

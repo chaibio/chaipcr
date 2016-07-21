@@ -93,6 +93,7 @@ angular.module("canvasApp").factory('mouseDown', [
             circleManager.togglePaths(false); //put it back later
             C.moveDots.setLeft(evt.target.parent.left + 16);
             evt.target.parent.shrinkStep();
+            evt.target.setVisible(false);
             C.moveDots.setVisible(true);
             C.canvas.bringToFront(C.moveDots);
             C.canvas.bringToFront(C.stepIndicator);
@@ -116,7 +117,6 @@ angular.module("canvasApp").factory('mouseDown', [
             C.canvas.renderAll();
             // Move other stages
             // Shrink this stage
-
 
           break;
 

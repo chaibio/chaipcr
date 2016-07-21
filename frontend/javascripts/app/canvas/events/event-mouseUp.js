@@ -40,6 +40,7 @@ angular.module("canvasApp").factory('mouseUp', [
 
         if(that.moveStepActive) {
           if(that.mouseDownPos === evt.e.clientX) {
+            console.log("its just a click ", evt.target);
             var indicate = evt.target;
             step = indicate.parent;
             C.stepIndicator.processMovement(step, C);
