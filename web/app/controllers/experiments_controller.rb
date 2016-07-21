@@ -33,6 +33,18 @@ class ExperimentsController < ApplicationController
   
   RSERVE_TIMEOUT  = 240
   
+  BackgroundTask = Struct.new(:action, :experiment_id, :complete_result) do
+    def completed?
+      complete_result != nil
+    end
+    
+    def match?(action, experiment_id)
+      return self.action == action && self.experiment_id == experiment_id
+    end
+  end
+  @@background_task = nil
+  @@background_last_task = nil
+  
   def_param_group :experiment do
     param :experiment, Hash, :desc => "Experiment Info", :required => true do
       param :name, String, :desc => "Name of the experiment", :required => false
@@ -134,11 +146,35 @@ class ExperimentsController < ApplicationController
           @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
           if !@first_stage_collect_data.blank?
             begin
-              @amplification_data, @cts = retrieve_amplification_data(@experiment.id, @first_stage_collect_data.id, @experiment.calibration_id)
+              task_submitted = background_calculate_amplification_data(@experiment, @first_stage_collect_data.id, @experiment.calibration_id)
             rescue => e
               render :json=>{:errors=>e.to_s}, :status => 500
               return
             end
+
+            if !stale?(etag: AmplificationDatum.maxid(@experiment.id, @first_stage_collect_data.id))
+              #render 304 Not Modified
+              return
+            end
+
+            @amplification_data = AmplificationDatum.retrieve(@experiment.id, @first_stage_collect_data.id)
+            @cts = AmplificationCurve.retrieve(@experiment.id, @first_stage_collect_data.id)
+
+            if @amplification_data.blank? && !task_submitted.nil?
+              #no data but background task is submitted
+              render :nothing => true, :status => (task_submitted)? 202 : 503
+              return
+            elsif @amplification_data && @amplification_data.last
+              #set etag
+              fresh_when(:etag => @amplification_data.last.id)
+              @partial = (@first_stage_collect_data.num_cycles > @amplification_data.last.cycle_num)
+            else
+              @partial = true
+            end
+          else
+            @amplification_data = []
+            @cts = []
+            @partial = false
           end
         else
           #construct OR clause
@@ -186,6 +222,7 @@ class ExperimentsController < ApplicationController
       else
         @amplification_data = []
         @cts = []
+        @partial = false
       end
     
       @amplification_data = (!@amplification_data.blank?)? [["channel","well_num","cycle_num","background_substracted_value", "baseline_Substracted_value"]]+@amplification_data.map {|data| [data.channel,data.well_num,data.cycle_num,data.background_subtracted_value,data.baseline_subtracted_value]} : nil
@@ -207,14 +244,35 @@ class ExperimentsController < ApplicationController
         @first_stage_meltcurve_data = Stage.joins(:protocol).where(["experiment_definition_id=? and stage_type='meltcurve'", @experiment.experiment_definition_id]).first
         if !@first_stage_meltcurve_data.blank?
           begin
-            @melt_curve_data = retrieve_melt_curve_data(@experiment, @first_stage_meltcurve_data.id, @experiment.calibration_id)
+            task_submitted = background_calculate_melt_curve_data(@experiment, @first_stage_meltcurve_data.id, @experiment.calibration_id)
           rescue => e
             render :json=>{:errors=>e.to_s}, :status => 500
             return
           end
+
+          if !stale?(etag: CachedMeltCurveDatum.maxid(@experiment.id, @first_stage_meltcurve_data.id))
+            #render 304 Not Modified
+            return
+          end
+
+          @melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment.id, @first_stage_meltcurve_data.id)
+
+          if @melt_curve_data.blank? && !task_submitted.nil?
+            #no data but background task is submitted
+            render :nothing => true, :status => (task_submitted)? 202 : 503
+            return
+          elsif @melt_curve_data && @melt_curve_data.last
+            #set etag
+            fresh_when(:etag => @melt_curve_data.last.id)
+          end
+          @partial = @experiment.running? || !MeltCurveDatum.new_data_generated?(@experiment, @first_stage_meltcurve_data.id).nil?
+        else
+          @melt_curve_data = []
+          @partial = false
         end
       else
         @melt_curve_data = []
+        @partial = false
       end
       respond_to do |format|
         format.json { render "melt_curve_data", :status => :ok}
@@ -223,97 +281,108 @@ class ExperimentsController < ApplicationController
       render :json=>{:errors=>"experiment not found"}, :status => :not_found
     end
   end
-    
-  api :GET, "/experiments/:id/export.zip", "zip temperature, amplification and meltcurv csv files"
+
+  api :GET, "/experiments/:id/export", "zip temperature, amplification and meltcurv csv files"
   def export
-    respond_to do |format|
-      format.zip {
-	      t = Tempfile.new("tmpexport_#{request.remote_ip}")
-        buffer = Zip::OutputStream.open(t.path) do |out|
-          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/temperature_log.csv")
-          out.write TemperatureLog.as_csv(params[:id])
-          
-          first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
-          if first_stage_collect_data
-            begin
-              amplification_data, cts = retrieve_amplification_data(@experiment.id, first_stage_collect_data.id, @experiment.calibration_id)
-            rescue => e
-              logger.error("export amplification data failed: #{e}")
-            end
-            fluorescence_data = FluorescenceDatum.data(@experiment.id, first_stage_collect_data.id)
+    t = Tempfile.new("tmpexport_#{request.remote_ip}")
+    buffer = Zip::OutputStream.open(t.path) do |out|
+      out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/temperature_log.csv")
+      out.write TemperatureLog.as_csv(params[:id])
+      
+      first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
+      if first_stage_collect_data
+        begin
+          task_submitted = background_calculate_amplification_data(@experiment, first_stage_collect_data.id, @experiment.calibration_id)
+          if task_submitted.nil? #cached
+            amplification_data = AmplificationDatum.retrieve(@experiment, first_stage_collect_data.id)
+            cts = AmplificationCurve.retrieve(@experiment, first_stage_collect_data.id)
+          else
+            t.close
+            render :nothing => true, :status => (task_submitted)? 202 : 503
+            return
           end
-          
-          if amplification_data
-            out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/amplification.csv")
-            columns = ["channel", "well_num", "cycle_num"]
-            fluorescence_index = 0
-            csv_string = CSV.generate do |csv|
-              csv << ["baseline_subtracted_value", "background_subtracted_value", "fluorescence_value"]+columns
-              amplification_data.each do |data|
-                while (fluorescence_index < fluorescence_data.length && 
-                      !(fluorescence_data[fluorescence_index].channel == data.channel && 
-                        fluorescence_data[fluorescence_index].well_num+1 == data.well_num && 
-                        fluorescence_data[fluorescence_index].cycle_num == data.cycle_num)) do
-                      fluorescence_index += 1
-                end
-                fluorescence_value = (fluorescence_index < fluorescence_data.length)? fluorescence_data[fluorescence_index].fluorescence_value : nil
-                csv << [data.baseline_subtracted_value, data.background_subtracted_value, fluorescence_value]+data.attributes.values_at(*columns)
-                fluorescence_index += 1
-              end
+        rescue => e
+          logger.error("export amplification data failed: #{e}")
+        end
+        fluorescence_data = FluorescenceDatum.data(@experiment.id, first_stage_collect_data.id)
+      end
+      
+      if amplification_data
+        out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/amplification.csv")
+        columns = ["channel", "well_num", "cycle_num"]
+        fluorescence_index = 0
+        csv_string = CSV.generate do |csv|
+          csv << ["baseline_subtracted_value", "background_subtracted_value", "fluorescence_value"]+columns
+          amplification_data.each do |data|
+            while (fluorescence_index < fluorescence_data.length && 
+                  !(fluorescence_data[fluorescence_index].channel == data.channel && 
+                    fluorescence_data[fluorescence_index].well_num+1 == data.well_num && 
+                    fluorescence_data[fluorescence_index].cycle_num == data.cycle_num)) do
+                  fluorescence_index += 1
             end
-            out.write csv_string
-          end
-
-          if cts            
-            out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/ct.csv")
-            csv_string = CSV.generate do |csv|
-              csv << ["channel", "well_num", "ct"];
-              cts.each do |ct|
-                csv << [ct.channel, ct.well_num, ct.ct]
-              end
-            end
-            out.write csv_string
-          end
-          
-          first_stage_meltcurve_data = Stage.joins(:protocol).where(["experiment_definition_id=? and stage_type='meltcurve'", @experiment.experiment_definition_id]).first
-          if first_stage_meltcurve_data
-            begin
-              melt_curve_data = retrieve_melt_curve_data(@experiment, first_stage_meltcurve_data.id, @experiment.calibration_id)
-            rescue => e
-              logger.error("export melt curve data failed: #{e}")
-            end
-          end
-
-          if melt_curve_data          
-            out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_data.csv")
-            columns = ["channel", "well_num", "temperature", "fluorescence_data", "derivative"]
-	          out.write columns.to_csv
-            melt_curve_data.each do |data|
-              data.temperature.each_index do |index|
-                out.write "#{data.channel}, #{data.well_num}, #{data.temperature[index]}, #{data.fluorescence_data[index]}, #{data.derivative[index]}\r\n"
-              end
-            end
-          
-            out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_analysis.csv")
-            columns = ["channel", "well_num", "Tm1", "Tm2", "Tm3", "Tm4", "area1", "area2", "area3", "area4"]
-            csv_string = CSV.generate do |csv|
-              csv << columns
-              melt_curve_data.each do |data|
-                tm_arr = Array.new(4)
-                data.tm.each_index{|i| tm_arr[i] = data.tm[i]}
-                area_arr = Array.new(4)
-                data.area.each_index{|i| area_arr[i] = data.area[i]}
-                csv << [data.channel, data.well_num]+tm_arr+area_arr
-              end
-            end
-            
-            out.write csv_string
+            fluorescence_value = (fluorescence_index < fluorescence_data.length)? fluorescence_data[fluorescence_index].fluorescence_value : nil
+            csv << [data.baseline_subtracted_value, data.background_subtracted_value, fluorescence_value]+data.attributes.values_at(*columns)
+            fluorescence_index += 1
           end
         end
-	      send_file t.path, :type => 'application/zip', :disposition => 'attachment', :filename => "export.zip"
-        t.close
-      }
+        out.write csv_string
+      end
+
+      if cts
+        out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/ct.csv")
+        csv_string = CSV.generate do |csv|
+          csv << ["channel", "well_num", "ct"];
+          cts.each do |ct|
+            csv << [ct.channel, ct.well_num, ct.ct]
+          end
+        end
+        out.write csv_string
+      end
+
+      first_stage_meltcurve_data = Stage.joins(:protocol).where(["experiment_definition_id=? and stage_type='meltcurve'", @experiment.experiment_definition_id]).first
+      if first_stage_meltcurve_data
+        begin
+          task_submitted = background_calculate_melt_curve_data(@experiment, first_stage_meltcurve_data.id, @experiment.calibration_id)
+          if task_submitted.nil? #cached
+            melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment.id, first_stage_meltcurve_data.id)
+          else
+            t.close
+            render :nothing => true, :status => (task_submitted)? 202 : 503
+            return
+          end
+        rescue => e
+          logger.error("export melt curve data failed: #{e}")
+        end
+      end
+
+      if melt_curve_data
+        out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_data.csv")
+        columns = ["channel", "well_num", "temperature", "fluorescence_data", "derivative"]
+        out.write columns.to_csv
+        melt_curve_data.each do |data|
+          data.temperature.each_index do |index|
+            out.write "#{data.channel}, #{data.well_num}, #{data.temperature[index]}, #{data.fluorescence_data[index]}, #{data.derivative[index]}\r\n"
+          end
+        end
+
+        out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_analysis.csv")
+        columns = ["channel", "well_num", "Tm1", "Tm2", "Tm3", "Tm4", "area1", "area2", "area3", "area4"]
+        csv_string = CSV.generate do |csv|
+          csv << columns
+          melt_curve_data.each do |data|
+            tm_arr = Array.new(4)
+            data.tm.each_index{|i| tm_arr[i] = data.tm[i]}
+            area_arr = Array.new(4)
+            data.area.each_index{|i| area_arr[i] = data.area[i]}
+            csv << [data.channel, data.well_num]+tm_arr+area_arr
+          end
+        end
+        
+        out.write csv_string
+      end
     end
+    send_file t.path, :type => 'application/zip', :disposition => 'attachment', :filename => "export.zip"
+    t.close
   end
   
   def analyze
@@ -353,20 +422,19 @@ class ExperimentsController < ApplicationController
     @experiment = Experiment.find_by_id(params[:id]) if @experiment.nil?
   end
   
-  def retrieve_amplification_data(experiment_id, stage_id, calibration_id)
-    if FluorescenceDatum.new_data_generated?(experiment_id, stage_id)
-      amplification_data, cts = calculate_amplification_data(experiment_id, stage_id, calibration_id)
+  def background_calculate_amplification_data(experiment, stage_id, calibration_id)
+    return nil if !FluorescenceDatum.new_data_generated?(experiment.id, stage_id)
+    return background("amplification", experiment.id) do
+      amplification_data, cts = calculate_amplification_data(experiment.id, stage_id, calibration_id)
       #update cache
       AmplificationDatum.import amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value]
       AmplificationCurve.import cts, :on_duplicate_key_update => [:ct]
-    else #cached
-      amplification_data = AmplificationDatum.where(:experiment_id=>experiment_id, :stage_id=>stage_id).order(:channel, :well_num, :cycle_num)
-      cts = AmplificationCurve.where(:experiment_id=>experiment_id, :stage_id=>stage_id).order(:channel, :well_num)
     end
-    return amplification_data, cts
-  end  
+  end
   
   def calculate_amplification_data(experiment_id, stage_id, calibration_id)
+   # sleep(10)
+  #  return  [AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>1, :well_num=>1, :cycle_num=>1, :background_subtracted_value=>1001, :baseline_subtracted_value=>102)], [AmplificationCurve.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>1, :well_num=>1, :ct=>10)]
     config   = Rails.configuration.database_configuration
     connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
@@ -413,10 +481,11 @@ class ExperimentsController < ApplicationController
     logger.info("Rails code time #{Time.now-start_time}")
     return amplification_data, cts
   end
-  
-  def retrieve_melt_curve_data(experiment, stage_id, calibration_id)
+
+  def background_calculate_melt_curve_data(experiment, stage_id, calibration_id)
     new_data = MeltCurveDatum.new_data_generated?(experiment, stage_id)
-    if new_data
+    return nil if new_data.nil?
+    return background("meltcurve", experiment.id) do
       melt_curve_data = calculate_melt_curve_data(experiment.id, stage_id, calibration_id)
       #update cache
       CachedMeltCurveDatum.import melt_curve_data, :on_duplicate_key_update => [:temperature_text, :fluorescence_data_text, :derivative_text, :tm_text, :area_text]
@@ -427,13 +496,13 @@ class ExperimentsController < ApplicationController
           experiment.update_attributes(:cached_temperature=>cached_temperature)
         end
       end
-    else #cached
-      melt_curve_data = CachedMeltCurveDatum.where(:experiment_id=>experiment.id, :stage_id=>stage_id).order(:channel, :well_num)
     end
-    return melt_curve_data
   end
-
+  
   def calculate_melt_curve_data(experiment_id, stage_id, calibration_id)
+  #  sleep(10)
+  #  return [CachedMeltCurveDatum.new({:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>1, :well_num=>1, :temperature=>[121,122], :fluorescence_data=>[1001, 1002], :derivative=>[3,4], :tm=>[1,2,3], :area=>[1,2,5]})]
+    
     config   = Rails.configuration.database_configuration
     connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
@@ -490,6 +559,32 @@ class ExperimentsController < ApplicationController
               #{(step_baseline)? ", baseline=list(calibration_id="+calibration_id.to_s+",step_id="+step_baseline.to_s+")" : ""})"
     end
     result
+  end
+  
+  def background(action, experiment_id, &block)
+    if @@background_last_task && @@background_last_task.match?(action, experiment_id)
+      error = @@background_last_task.complete_result
+      @@background_last_task = nil
+      raise error
+    elsif @@background_task == nil
+      @@background_task = BackgroundTask.new(action, experiment_id, nil)
+      Thread.new do
+        begin
+          yield
+        rescue => e
+          @@background_task.complete_result = e
+          @@background_last_task = @@background_task
+        ensure
+          ActiveRecord::Base.connection.close
+          @@background_task = nil
+        end
+      end
+      return true #background process is started
+    elsif @@background_task.action == action && @@background_task.experiment_id == experiment_id
+      return true #@@background_task process is still in progress
+    else
+      return false #there is already another background process, return resource unavailable
+    end
   end
   
 end

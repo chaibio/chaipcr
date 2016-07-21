@@ -18,5 +18,8 @@
 #
 class AmplificationCurve < ActiveRecord::Base
   belongs_to :experiment
-
+  
+  def self.retrieve(experiment_id, stage_id)
+    self.where(:experiment_id=>experiment_id, :stage_id=>stage_id).order(:channel, :well_num)
+  end
 end
