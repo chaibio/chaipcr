@@ -83,7 +83,9 @@ angular.module("canvasApp").factory('mouseDown', [
             // Remember what we click and what we move is two different objects, once we click, rest of the graphics come by, So original reference point to ,
             // the very thing we click. Not to the one we move. This applies to moveStage too.
             that.mouseDownPos = evt.e.clientX;
+            console.log("step = " , evt.target.parent );
             C.stepIndicator.init(evt.target.parent);
+
             evt.target.parent.toggleComponents(false);
             that.moveStepActive = true;
             that.canvas.moveCursor = "move";
