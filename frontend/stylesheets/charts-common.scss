@@ -78,7 +78,7 @@
       $plot_type_buttons_border_width: 1px;
 
       float: right;
-      width: ($plot_type_buttons_btn_width*2)+($plot_type_buttons_border_width*2);
+      width: ($plot_type_buttons_btn_width*2)+($plot_type_buttons_border_width*2)+1;
       .plot-type-text {
         text-align: center;
       }
@@ -89,7 +89,7 @@
       }
 
       .button {
-        width: $plot_type_buttons_btn_width;
+        width: $plot_type_buttons_btn_width + 0.1;
         display: inline-block;
         text-align: center;
         border-radius: 0;
@@ -176,10 +176,16 @@
         display: inline-block;
         width: 20%;
         vertical-align: middle;
+		font-weight: bold;
       }
       .ampli-slider {
         display: inline-block;
         width: 80%;
+        vertical-align: middle;
+      }
+      .ampli-slider-thermal {
+        display: inline-block;
+        width: 50%;
         vertical-align: middle;
       }
     }
