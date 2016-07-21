@@ -78,18 +78,19 @@
       $plot_type_buttons_border_width: 1px;
 
       float: right;
-      width: ($plot_type_buttons_btn_width*2)+($plot_type_buttons_border_width*2)+1;
+      width: ($plot_type_buttons_btn_width*2);
       .plot-type-text {
         text-align: center;
       }
 
       .buttons-wrapper {
-        border: $plot_type_buttons_border_width solid #000;
+        //border: $plot_type_buttons_border_width solid #000;
+		box-shadow: 0 0 0 1px;
         text-align: right;
       }
 
       .button {
-        width: $plot_type_buttons_btn_width + 0.1;
+        width: $plot_type_buttons_btn_width;
         display: inline-block;
         text-align: center;
         border-radius: 0;
