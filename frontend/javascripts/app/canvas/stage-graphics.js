@@ -88,7 +88,7 @@ angular.module("canvasApp").factory('stageGraphics', [
       var addUp = (editStageStatus) ? 26 : 1;
 
       this.stageNameGroup = new fabric.Group([this.stageCaption, this.stageName], {
-        originX: "left", originY: "top", selectable: true, top : 16, left: addUp,
+        originX: "left", originY: "top", selectable: true, top : 8, left: addUp,
       });
       return this;
     };
