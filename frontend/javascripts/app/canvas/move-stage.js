@@ -92,6 +92,16 @@ angular.module("canvasApp").factory('moveStageRect', [
           this.setLeft(stage.left - 1).setCoords();
           this.draggedStage = stage;
           this.stageBackUp = angular.extend({}, stage);
+
+          if(stage.nextStage) {
+            this.currentDrop = stage.nextStage;
+            this.currentHit = stage.nextStage.index;
+          } else if(stage.previousStage) {
+            this.currentDrop = stage.previousStage;
+            this.currentHit = stage.previousStage.index;
+          }
+
+
           this.setVisible(true);
         };
 
