@@ -149,7 +149,15 @@ angular.module("canvasApp").factory('moveStageRect', [
               C.allStageViews.splice(that.draggedStage.index + 1, 1);
             });
           }
-        };
+
+          var pre_id = (this.currentDrop) ? this.currentDrop.model.id : null;
+          //console.log(stage.model.id, pre_id);
+          ExperimentLoader.moveStage(stage.model.id, pre_id).then(function(dat) {
+            console.log("moved stage big time", dat);
+          }, function(err) {
+            console.log(err);
+          });
+      };
 
         this.indicator.applyMovement = function(stage_, C, circleManager, callBack) {
 
