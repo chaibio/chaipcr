@@ -6,6 +6,7 @@ temps = NULL,
 fluos = NULL, 
 window = NULL, 
 norm = FALSE, 
+auto_span_smooth = TRUE, # xqrm
 temp_1side = NULL, # xqrm
 # span.smooth = 0.05, # ori
 span_smooth_factor = NULL, # xqrm
@@ -73,87 +74,96 @@ cut.Area = 0,
     
     # start: xqrm: determine span_smooth
     
-    # start: find the data region considered (csdd) for choosing span_smooth
-    
-    len1 <- length(TEMP)
-    
-    # # method 1: median fluo value => corresponding central_fluo_temp => 2 * temp_1side centered at central_fluo_temp
-    # central_fluo_temp = TEMP[order(FLUO)[as.integer(len1 / 2)]] # the temperature for approximately median fluo value
-    # csdd_indices <- which(TEMP >= central_fluo_temp - temp_1side & TEMP <= central_fluo_temp + temp_1side)
-    # # message('central_fluo_temp: ', central_fluo_temp) # to test
-    
-    # start: method 2: find the region of length 2 * temp_1side showing the largest fluo difference between start and end
-    
-    temp_span <- diff(range(na.omit(TEMP)))
-    temp_step <- temp_span / len1 # assume temperature step is about constant
-    num_csdd_steps_1side <- as.integer(temp_1side / temp_step)
-    
-    fluo_ranges <- list()
-    fluo_diffs <- list()
-    
-    for (i1 in 1:len1) {
+    if (auto_span_smooth) {
       
-      fluo_start <- i1 - num_csdd_steps_1side
-      if (fluo_start < 1) fluo_start <- 1
+      message('Automatic selection of `span_smooth`...')
       
-      fluo_end <- i1 + num_csdd_steps_1side
-      if (fluo_end > len1) fluo_end <- len1
+      # start: find the data region considered (csdd) for choosing span_smooth
       
-      fluo_ranges[[i1]] <- fluo_start:fluo_end
-      fluo_diffs[[i1]] <- FLUO[fluo_start] - FLUO[fluo_end]
-      }
-    
-    csdd_central_index <- which.max(unlist(fluo_diffs))
-    # message('TEMP[csdd_central_index]: ', TEMP[csdd_central_index]) # to test
-    csdd_indices <- fluo_ranges[[csdd_central_index]]
-    
-    # end: method 2
-    
-    csdd_temp <- TEMP[csdd_indices]
-    csdd_fluo <- FLUO[csdd_indices]
-    
-    # end: find...
-    
-    len2 <- length(csdd_indices)
-    trend_mtx <- as.data.frame(cbind(1:len2, 
-                                     csdd_temp, c(csdd_temp[2:len2], NA), 
-                                     csdd_fluo, c(csdd_fluo[2:len2], NA)))
-    colnames(trend_mtx) <- c('count', 'TEMP', 'TEMP_next', 'FLUO', 'FLUO_next')
-    trend_mtx[,'TEMP_diff'] <- trend_mtx[,'TEMP_next'] - trend_mtx[,'TEMP']
-    trend_mtx[,'FLUO_diff'] <- trend_mtx[,'FLUO_next'] - trend_mtx[,'FLUO']
-    
-    trend_positive <- trend_mtx[trend_mtx[,'FLUO_diff'] > 0,]
-    
-    if (all(is.na(trend_positive))) {
-      span_smooth <- span_smooth_default
-      message('Use `span_smooth_default` ', span_smooth_default)
-    } else {
-      message('Fluorescence increase with temperature increase was detected.')
-      len3 <- dim(trend_positive)[1]
-      trend_positive[,'count_diff'] <- c(trend_positive[2:len3, 'count'], NA) - trend_positive[,'count']
-      trend_seps <- which(trend_positive[,'count_diff'] > 1)
-      trend_starts <- c(1, trend_seps + 1)
-      trend_ends <- c(trend_seps, len3 - 2)
+      len1 <- length(TEMP)
       
-      len4 <- length(trend_seps) + 1
-      temp_intervals <- sapply(1:len4, function(i) sum(trend_positive[trend_starts[i]:trend_ends[i], 'TEMP_diff'])) # temperature intervals where fluo value increases
-      max_temp_interval <- max(temp_intervals)
-      span_smooth_product <- span_smooth_factor * max_temp_interval / temp_span
-      if (span_smooth_product > span_smooth_default) {
-        span_smooth <- span_smooth_product
-        message(sprintf('`span_smooth` was selected as %f.', span_smooth))
-      } else {
+      # # method 1: median fluo value => corresponding central_fluo_temp => 2 * temp_1side centered at central_fluo_temp
+      # central_fluo_temp = TEMP[order(FLUO)[as.integer(len1 / 2)]] # the temperature for approximately median fluo value
+      # csdd_indices <- which(TEMP >= central_fluo_temp - temp_1side & TEMP <= central_fluo_temp + temp_1side)
+      # # message('central_fluo_temp: ', central_fluo_temp) # to test
+      
+      # start: method 2: find the region of length 2 * temp_1side showing the largest fluo difference between start and end
+      
+      temp_span <- diff(range(na.omit(TEMP)))
+      temp_step <- temp_span / len1 # assume temperature step is about constant
+      num_csdd_steps_1side <- as.integer(temp_1side / temp_step)
+      
+      fluo_ranges <- list()
+      fluo_diffs <- list()
+      
+      for (i1 in 1:len1) {
+        
+        fluo_start <- i1 - num_csdd_steps_1side
+        if (fluo_start < 1) fluo_start <- 1
+        
+        fluo_end <- i1 + num_csdd_steps_1side
+        if (fluo_end > len1) fluo_end <- len1
+        
+        fluo_ranges[[i1]] <- fluo_start:fluo_end
+        fluo_diffs[[i1]] <- FLUO[fluo_start] - FLUO[fluo_end]
+        }
+      
+      csdd_central_index <- which.max(unlist(fluo_diffs))
+      # message('TEMP[csdd_central_index]: ', TEMP[csdd_central_index]) # to test
+      csdd_indices <- fluo_ranges[[csdd_central_index]]
+      
+      # end: method 2
+      
+      csdd_temp <- TEMP[csdd_indices]
+      csdd_fluo <- FLUO[csdd_indices]
+      
+      # end: find...
+      
+      len2 <- length(csdd_indices)
+      trend_mtx <- as.data.frame(cbind(1:len2, 
+                                       csdd_temp, c(csdd_temp[2:len2], NA), 
+                                       csdd_fluo, c(csdd_fluo[2:len2], NA)))
+      colnames(trend_mtx) <- c('count', 'TEMP', 'TEMP_next', 'FLUO', 'FLUO_next')
+      trend_mtx[,'TEMP_diff'] <- trend_mtx[,'TEMP_next'] - trend_mtx[,'TEMP']
+      trend_mtx[,'FLUO_diff'] <- trend_mtx[,'FLUO_next'] - trend_mtx[,'FLUO']
+      
+      trend_positive <- trend_mtx[trend_mtx[,'FLUO_diff'] > 0,]
+      
+      if (all(is.na(trend_positive))) {
         span_smooth <- span_smooth_default
-        message(sprintf('`span_smooth_product` %f < `span_smooth_default`, use `span_smooth_default` %f.',
-                        span_smooth_product, span_smooth)) }
+        message('Use `span_smooth_default` ', span_smooth_default)
+      } else {
+        message('Fluorescence increase with temperature increase was detected.')
+        len3 <- dim(trend_positive)[1]
+        trend_positive[,'count_diff'] <- c(trend_positive[2:len3, 'count'], NA) - trend_positive[,'count']
+        trend_seps <- which(trend_positive[,'count_diff'] > 1)
+        trend_starts <- c(1, trend_seps + 1)
+        trend_ends <- c(trend_seps, len3 - 2)
+        
+        len4 <- length(trend_seps) + 1
+        temp_intervals <- sapply(1:len4, function(i) sum(trend_positive[trend_starts[i]:trend_ends[i], 'TEMP_diff'])) # temperature intervals where fluo value increases
+        max_temp_interval <- max(temp_intervals)
+        span_smooth_product <- span_smooth_factor * max_temp_interval / temp_span
+        if (span_smooth_product > span_smooth_default) {
+          span_smooth <- span_smooth_product
+          message(sprintf('`span_smooth` was selected as %f.', span_smooth))
+        } else {
+          span_smooth <- span_smooth_default
+          message(sprintf('`span_smooth_product` %f < `span_smooth_default`, use `span_smooth_default` %f.',
+                          span_smooth_product, span_smooth)) }
+        
+        # # to test
+        # print(trend_mtx)
+        # print(trend_positive)
+        # print(cbind(trend_starts, trend_ends))
+        # print(temp_intervals)
+        # message('max_temp_interval: ', max_temp_interval)
+        
+        }
       
-      # # to test
-      # print(trend_mtx)
-      # print(trend_positive)
-      # print(cbind(trend_starts, trend_ends))
-      # print(temp_intervals)
-      # message('max_temp_interval: ', max_temp_interval)
-      
+      } else {
+          span_smooth <- span_smooth_default
+          message(sprintf('No automatic selection of `span_smooth`, use `span_smooth_default` %f.', span_smooth_default))
       }
     
     if (GRID_not_determined) GRID <- matrix(c(span_smooth, span.peaks), nrow = 1)
