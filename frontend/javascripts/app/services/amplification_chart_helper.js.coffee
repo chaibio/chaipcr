@@ -111,7 +111,6 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       }
 
     @toScientificNotation = (val, i) ->
-      base = 0
       pow = 0
       val_string = val.toString()
       num = null
@@ -123,19 +122,17 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         for i in [0...num_length] by 1
           n = num.charAt(i) * 1
           if n > 0
-            base = n
             pow = -1 * (i + 1)
             break
-        return base + 'x10^' + pow
+        return '10^' + pow
       else
         num_length = val_string.length
         for i in [0...num_length] by 1
           n = val_string.charAt(i) * 1
           if n > 0
-            base = n
             pow = num_length - (i + 1)
             break
-        return base + 'x10^' + pow
+        return '10^' + pow
       return
 
 

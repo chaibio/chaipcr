@@ -166,9 +166,15 @@ network_watchdog_interface() {
                         echo "Network watchdog: No network found!"
 			ps -ef | grep /sbin/dhclient | grep -v grep | awk '{print $2}' | xargs kill -9
 #pkill -9 /sbin/dhclient
-			lfile=/var/lib/dhcp/dhclient.$iface.leases 
+			lfile=/var/lib/dhcp/dhclient.$iface.leases
 			rm $lfile
-			cmd="dhclient -1 -4 -d -v $iface -lf $lfile"
+			extras=""
+			if [[ $iface =~ 'wlan'.* ]]
+		        then
+	        	        echo adding extra params for interface $iface
+				extras="-cf /root/chaipcr/deploy/device/dhclient.wlan.conf"
+			fi
+			cmd="dhclient -1 -4 -d -v $iface -lf $lfile $extras"
 			echo calling $cmd
 			$cmd
 			sleep 3
@@ -191,7 +197,8 @@ do
         fi
 
         #echo "Network watchdog for interface: $interface"
-        if [[ $interface =~ 'lo'.* ]] || [[ $interface =~ 'usb'.* ]]
+        if [[ $interface =~ 'lo'.* ]]
+# || [[ $interface =~ 'usb'.* ]]
         then
                 echo Invalid interface $interface
                 continue

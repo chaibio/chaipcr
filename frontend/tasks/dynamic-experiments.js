@@ -50,8 +50,20 @@ gulp.task('dynamicexp:relink_libs', ['dynamicexp:clean_old', 'dynamicexp:init_ha
     return stream.pipe(gulp.dest('web/public/dynexp/outputs'));
 });
 
-gulp.task('dynamicexp:relink', ['dynamicexp:clean_old', 'dynamicexp:rehash', 'dynamicexp:relink_libs', 'templates'], function () {
+gulp.task('dynamicexp:relink', ['dynamicexp:clean_old', 'dynamicexp:init_hashes', 'dynamicexp:rehash', 'dynamicexp:relink_libs', 'templates'], function () {
   var stream = gulp.src('.tmp/js/templates.js');
+
+  for (var i=0; i < experiments.length; i++) {
+    var pattern = new RegExp('/dynexp/'+experiments[i]);
+    stream.pipe(replace(pattern, '/dynexp/outputs/'+hashes_cache[experiments[i]]));
+  }
+
+  return stream.pipe(gulp.dest('.tmp/js'));
+
+});
+
+gulp.task('dynamicexp:relink_thermal', ['concat-js'],  function () {
+  var stream = gulp.src('.tmp/js/*.js');
 
   for (var i=0; i < experiments.length; i++) {
     var pattern = new RegExp('/dynexp/'+experiments[i]);

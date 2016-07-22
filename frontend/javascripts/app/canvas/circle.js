@@ -252,7 +252,8 @@ angular.module("canvasApp").factory('circle', [
           if(this.model.collect_data) {
             this.circle.setFill("#ffb400;");
             this.gatherDataImageMiddle.setVisible(false);
-            this.gatherDataOnScroll.setVisible(true);
+            if(this.gatherDataOnScroll)
+              this.gatherDataOnScroll.setVisible(true);
           }
 
           if(this.model.pause) {

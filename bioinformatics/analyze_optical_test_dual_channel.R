@@ -12,13 +12,13 @@ calib_labels_FAM_HEX <- c('channel_1', 'channel_2')
 
 # bounds of signal-to-noise ratio (SNR)
 SNR_FAM_CH1_MIN <- 0.75
-SNR_FAM_CH2_MAX <- 0.99
+SNR_FAM_CH2_MAX <- 1
 SNR_HEX_CH1_MAX <- 0.70
 SNR_HEX_CH2_MIN <- 0.85
 
 # fluo values: channel 1, channel 2
-WATER_MAX <- c(35000, 6000)
-WATER_MIN <- c(2500, 800)
+WATER_MAX <- c(80000, 7500)
+WATER_MIN <- c(100, 50)
 
 
 # signal-to-noise ratio discriminants for each well

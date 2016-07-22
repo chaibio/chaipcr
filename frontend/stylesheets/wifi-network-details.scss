@@ -139,9 +139,9 @@
       float: left;
       width: 65%;
       height: 100%;
+      padding-top: 20px;
       span {
         display: block;
-        margin-top: 20px;
         font-family: "dinot-bold";
         font-size: 16px;
         margin-left: 10px;
@@ -153,4 +153,10 @@
     margin-top: 60px;
     padding-left: 14px;
   }
+}
+
+.ip-field {
+  width: 40px;
+  margin-right: 3px;
+  text-align: right;
 }

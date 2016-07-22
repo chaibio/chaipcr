@@ -12,6 +12,11 @@
     left: 0px;
     width: 1024px;
   }
+  
+  .experiment-links{
+	text-decoration: none;
+	color: inherit;
+  }
 
   .home-page-left-wing {
     float: left;
@@ -148,7 +153,7 @@
 
     .home-page-exp-tile {
       width: 100%;
-      height: 60px;
+      //height: 60px;
       //width: 423px;
       position: relative;
       left: 0px;
@@ -157,13 +162,14 @@
         width: 100%;
         height: 100%;
         padding-top: 10px;
+		padding-bottom: 10px;
         border-bottom: 1px solid #e6e6e6;
         background-color: #fbfbfb;
       }
         .home-page-exp-name {
           margin-left: 18px;
           cursor: pointer;
-          white-space: nowrap;
+          //white-space: nowrap;
           //width: 200px;
           //height: 20px;
           overflow: hidden;
@@ -212,10 +218,11 @@
 
 		.ovtrunc {
 
-		    white-space: nowrap;
-		   overflow: hidden;
-		    text-overflow: ellipsis;
+		    //white-space: nowrap;
+		   //overflow: hidden;
+		    //text-overflow: ellipsis;
 			padding-right: 15px;
+			word-wrap: break-word;
 
 		}
 
@@ -256,7 +263,7 @@
 
       .home-page-tile-text-hover {
         background-color: #cceffc;
-        border-bottom: 2px solid black;
+        border-bottom: 1px solid black;
         cursor: pointer;
       }
 

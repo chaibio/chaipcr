@@ -165,7 +165,7 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
     };
 
     this.changeTemperature = function($scope) {
-      
+
       var dataToBeSend = {'step':{'temperature': $scope.step.temperature}},
       url = "/steps/" + $scope.step.id,
       delay = $q.defer();

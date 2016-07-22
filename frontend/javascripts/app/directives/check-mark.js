@@ -63,7 +63,7 @@ angular.module('ChaiBioTech').directive("checkMark", [
 
           var state = NetworkSettingsService.connectedWifiNetwork.state;
           if(state && state.status === "connected") {
-            var _ssid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"];
+            var _ssid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"] || NetworkSettingsService.connectedWifiNetwork.settings.wireless_essid;
             var connectedNetworkSsid = _ssid.replace(new RegExp('"', 'g'), "");
             if(connectedNetworkSsid === scope.ssid) {
               angular.element(elem).show();

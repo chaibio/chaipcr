@@ -29,11 +29,17 @@
       <div class="ssid-text">SSID</div>
       <div class="ssid-val">{{name}}</div>
 
-      <div class="password-label">Password</div>
-      <div class="password-input-container">
+      <div ng-if="wifiNetworkType" class="password-label">Password</div>
+      <div ng-if="wifiNetworkType=='wpa2'"class="password-input-container">
         <input type="password" autofocus="" name="wpa_key" class="text-class" required placeholder="{{name}} password" ng-model="credentials['wpa-psk']">
         <div ng-show="connectWifiNetwork.wpa_key.$touched">
           <span ng-show="connectWifiNetwork.wpa_key.$error.required" class="connection-error-text">Cannot left blank ..</span>
+        </div>
+      </div>
+      <div ng-if="wifiNetworkType=='wep'"class="password-input-container">
+        <input type="password" autofocus="" name="wireless_key" class="text-class" required placeholder="{{name}} password" ng-model="credentials['wireless_key']">
+        <div ng-show="connectWifiNetwork.wireless_key.$touched">
+          <span ng-show="connectWifiNetwork.wireless_key.$error.required" class="connection-error-text">Cannot left blank ..</span>
         </div>
       </div>
     </div>
@@ -43,27 +49,33 @@
     </div>
 
     <div class="button-container">
-      <input type="submit" class="green-button" value="{{buttonValue}}">
+      <input ng-if="wifiNetworkType" type="submit" class="green-button" value="{{buttonValue}}">
       <div class="spacer">&nbsp;</div>
       <button class="button second-button" ui-sref="settings.networkmanagement">CANCEL</button>
     </div>
   </form>
-  <!-- So mode-toggle to communicate with controller , it has to be out of the form 'connectedWifiNetwork'-->
-  <div class="set-mode" ng-show="IamConnected">
-    <div class="set-mode-toggle"><mode-toggle data="autoSetting"></mode-toggle></div><span>SET AUTOMATICALLY</span>
+  <!-- Remember ng-if creates a new scope so we need to use parent-->
+  <div class="set-mode" ng-if="IamConnected && name=='ethernet'">
+    <div class="set-mode-toggle"><mode-toggle data="$parent.autoSetting"></mode-toggle></div><span>SET AUTOMATICALLY</span>
   </div>
-  <form ng-if="IamConnected" name="connectedWifiDetails" nonvalidate>
+  <form ng-if="IamConnected" name="connectedWifiDetails" nonvalidate ng-submit="connectEthernet()">
     <div class="settings-text-container">
       <span>CURRENT SETTINGS</span> <span ng-show="autoSetting=='auto'" class="locked">LOCKED</span>
     </div>
 
     <div class="network-parameter-container">
       <div class="network-parameter-text-container"><span>IP Address</span></div>
-      <div class="network-parameter-data-container"><span>{{currentNetwork.state.address}}</span></div>
+      <div class="network-parameter-data-container">
+        <span ng-show="autoSetting=='auto'">{{editEthernetData.address}}</span>
+        <ip-address ng-show="autoSetting=='manual'" value="editEthernetData.address"></ip-address>
+      </div>
     </div>
     <div class="network-parameter-container">
       <div class="network-parameter-text-container"><span>Subnet Mask</span></div>
-      <div class="network-parameter-data-container"><span>{{currentNetwork.state.maskAddress}}</span></div>
+      <div class="network-parameter-data-container">
+        <span ng-show="autoSetting=='auto'">{{editEthernetData.maskAddress}}</span>
+        <ip-address ng-show="autoSetting=='manual'" value="editEthernetData.maskAddress"></ip-address>
+      </div>
     </div>
     <!--<div class="network-parameter-container">
       <div class="network-parameter-text-container"><span>Router</span></div>
@@ -71,15 +83,21 @@
     </div> -->
     <div class="network-parameter-container">
       <div class="network-parameter-text-container"><span>Gateway IP</span></div>
-      <div class="network-parameter-data-container"></div>
+      <div class="network-parameter-data-container">
+        <span ng-show="autoSetting=='auto'">{{editEthernetData.gateway}}</span>
+        <ip-address ng-show="autoSetting=='manual'" value="editEthernetData.gateway"></ip-address>
+      </div>
     </div>
     <div class="network-parameter-container">
       <div class="network-parameter-text-container"><span>DNS Server</span></div>
-      <div class="network-parameter-data-container"></div>
+      <div class="network-parameter-data-container">
+        <span ng-show="autoSetting=='auto'">{{editEthernetData['dns-nameservers']}}</span>
+        <ip-address ng-show="autoSetting=='manual'" value="editEthernetData['dns-nameservers']"></ip-address>
+      </div>
     </div>
 
     <div class="connected-button-container button-container">
-      <input type="submit" class="green-button" value="SAVE CHANGES">
+      <input ng-show="autoSetting=='manual'" type="submit" class="green-button" value="SAVE CHANGES">
     </div>
   </form>
 </div>

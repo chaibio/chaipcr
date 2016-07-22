@@ -34,11 +34,17 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.connectionStatus = null; // Connection Status at the moment
     this.userSettings = $.jStorage.get('userNetworkSettings');
     this.intervalKey = null;
+    this.listofAllWifi = {};
 
     this.getWifiNetworks = function() {
 
       var delay = $q.defer();
       $http.get(host + ':8000/network/wlan/scan').then(function(data) {
+        var listofAllWifi = {};
+        data.data.scan_result.forEach(function(info) {
+          that.listofAllWifi[info.ssid] = info;
+        });
+        console.log(that.listofAllWifi);
         delay.resolve(data);
       }, function(err) {
         delay.reject(err);
@@ -53,7 +59,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
           .then(function(result) {
             that.processData(result);
           }, function(err) {
-            that.processOnError(err) // in case error ,May be no wireless interface
+            that.processOnError(err); // in case error ,May be no wireless interface
           });
         }
       }, 3000);
@@ -63,11 +69,12 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
 
       this.wirelessError = false;
       if(result.data.settings) {
+        console.log(result.data.settings.wireless_essid, 'wireless_essid');
         this.connectedWifiNetwork = result.data;
-        var _ssid = result.data.settings["wpa-ssid"];
-        var _connectionStatus = result.data.state.status
+        var _ssid = result.data.settings["wpa-ssid"] || result.data.settings.wireless_essid;
+        var _connectionStatus = result.data.state.status;
         if(ssid !== _ssid || this.connectionStatus !== _connectionStatus) {
-          ssid = _ssid
+          ssid = _ssid;
           this.connectionStatus = _connectionStatus;
           $rootScope.$broadcast("new_wifi_result");
         }
@@ -119,6 +126,19 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       return delay.promise;
     };
 
+    this.connectToEthernet = function(data) {
+
+      var delay = $q.defer();
+      $http.put(host + ':8000/network/eth0', data)
+      .then(function(result) {
+        delay.resolve(result);
+      }, function(err) {
+        delay.reject(err);
+      });
+
+      return delay.promise;
+    };
+
     this.stop = function() {
 
       var delay = $q.defer();
@@ -129,7 +149,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
         that.userSettings.wifiSwitchOn = false;
         $.jStorage.set('userNetworkSettings', that.userSettings);
         $rootScope.$broadcast("wifi_stopped");
-        delay.resolve(result)
+        delay.resolve(result);
       }, function(err) {
         delay.reject(err);
       });
@@ -161,7 +181,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       console.log("Network is fine .. !");
     }, function(err) {
       console.log("No Wifi Interface .. !");
-      that.processOnError(err)
+      that.processOnError(err);
     });
 
     //We need to make sure that, we call /network api only when we are in

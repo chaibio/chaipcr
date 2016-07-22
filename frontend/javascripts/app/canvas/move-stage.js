@@ -92,6 +92,16 @@ angular.module("canvasApp").factory('moveStageRect', [
           this.setLeft(stage.left - 1).setCoords();
           this.draggedStage = stage;
           this.stageBackUp = angular.extend({}, stage);
+
+          if(stage.nextStage) {
+            this.currentDrop = stage.nextStage;
+            this.currentHit = stage.nextStage.index;
+          } else if(stage.previousStage) {
+            this.currentDrop = stage.previousStage;
+            this.currentHit = stage.previousStage.index;
+          }
+
+
           this.setVisible(true);
         };
 
@@ -139,16 +149,24 @@ angular.module("canvasApp").factory('moveStageRect', [
               C.allStageViews.splice(that.draggedStage.index + 1, 1);
             });
           }
-        };
 
-        this.indicator.applyMovement = function(stage, C, circleManager, callBack) {
+          var pre_id = (this.currentDrop) ? this.currentDrop.model.id : null;
+          //console.log(stage.model.id, pre_id);
+          ExperimentLoader.moveStage(stage.model.id, pre_id).then(function(dat) {
+            console.log("moved stage big time", dat);
+          }, function(err) {
+            console.log(err);
+          });
+      };
+
+        this.indicator.applyMovement = function(stage_, C, circleManager, callBack) {
 
           this.draggedStage.wireStageNextAndPrevious();
           this.draggedStage.myWidth = 0;
           var stage = this.draggedStage;
 
           while(stage.index <= (this.currentHit - 1)) {
-            stage.moveIndividualStageAndContents(stage, true)
+            stage.moveIndividualStageAndContents(stage, true);
             stage = stage.nextStage;
           }
 
@@ -165,7 +183,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           C.configureStepsofNewStage(stageView, 0);
           C.correctNumbering();
           stageView.moveAllStepsAndStages();
-          circleManager.init(C)
+          circleManager.init(C);
           circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
           C.$scope.applyValues(stageView.childSteps[0].circle);
           stageView.childSteps[0].circle.manageClick(true);

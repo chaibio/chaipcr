@@ -22,7 +22,8 @@ angular.module("canvasApp").factory('mouseUp', [
   'previouslySelected',
   'previouslyHoverd',
   'scrollService',
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService) {
+  'circleManager',
+  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager) {
 
     this.init = function(C, $scope, that) {
 
@@ -39,9 +40,7 @@ angular.module("canvasApp").factory('mouseUp', [
 
         if(that.moveStepActive) {
           if(that.mouseDownPos === evt.e.clientX) {
-            var indicate = evt.target;
-            step = indicate.parent;
-            C.stepIndicator.processMovement(step, C);
+            console.log("its just a click ", evt.target);
           }
           C.moveDots.setVisible(false);
           C.stepIndicator.setVisible(false);
@@ -52,6 +51,9 @@ angular.module("canvasApp").factory('mouseUp', [
         if(that.moveStageActive) {
           if(that.mouseDownPos === evt.e.clientX) {
             // process movement here
+            console.log("its just a click we conclude it as we want to switch places");
+            var stage = evt.target.parent;
+            C.stageIndicator.processMovement(stage, C, circleManager);
           }
           C.stageIndicator.setVisible(false);
           that.moveStageActive = false;

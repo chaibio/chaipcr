@@ -93,7 +93,6 @@ angular.module("canvasApp").factory('moveStepRect', [
         indicatorRectangle = new fabric.Group([
           rect, temperatureText, holdTimeText, indexText, placeText,
           me.imageobjects["drag-footer-image.png"],
-
         ],
           {
             originX: "left", originY: "top", left: 0, top: 298, height: 72, selectable: true, lockMovementY: true, hasControls: false,
@@ -108,7 +107,11 @@ angular.module("canvasApp").factory('moveStepRect', [
 
       this.indicator.init = function(step) {
 
-          this.currentDrop = step;
+        console.log(step, "stepping");
+          if(step.nextStep) {
+            this.currentDrop = step;
+            this.currentHit = step.index;
+          }
       };
 
       this.indicator.changePlacing = function(footer) {
@@ -134,7 +137,7 @@ angular.module("canvasApp").factory('moveStepRect', [
           step.parentStage.expand();
           // Find the place where you left the moved step
           //var moveTarget = Math.floor((this.left + 60) / 120);
-          var targetStep = this.currentDrop.circle.parent;
+          var targetStep = this.currentDrop;
 
             var targetStage = targetStep.parentStage;
 
@@ -165,7 +168,7 @@ angular.module("canvasApp").factory('moveStepRect', [
           console.log("oye hit");
           return false;
         }*/
-        console.log(this);
+        //console.log(this);
         C.allStepViews.some(function(step, index) {
 
           if(this.intersectsWithObject(step.hitPoint) && this.currentHit !== index) {

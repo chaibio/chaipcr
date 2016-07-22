@@ -30,49 +30,46 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     $scope.IamConnected = false;
     $scope.statusMessage = "";
     $scope.currentNetwork = {};
-    $scope.IamConnected = false;
     $scope.autoSetting = "auto"; // This variable controls set auto/manual.
+    $scope.connectedSsid = "";
+    $scope.selectedWifiNow = NetworkSettingsService.listofAllWifi[$scope.name] || null; //
+    $scope.wifiNetworkType = null; // We have different settings for wep2 and wpa , so we need to look for the type of network.
+    $scope.editEthernetData = {};
 
     $scope.$watch('autoSetting', function(val, oldVal) {
-        console.log(val);
+        //console.log(val, $scope);
     });
 
     $scope.$on('new_wifi_result', function() {
 
-      if(NetworkSettingsService.currentNetwork.state.status === "connected") {
+      if(NetworkSettingsService.connectedWifiNetwork.state.status === "connected") {
         $scope.statusMessage = "";
         $state.go('settings.networkmanagement');
       } else {
-        $scope.configureAsStatus(NetworkSettingsService.currentNetwork.state.status);
+        $scope.configureAsStatus(NetworkSettingsService.connectedWifiNetwork.state.status);
       }
     });
 
-    $scope.credentials = {
-      'wpa-ssid': $scope.name,
-      'wpa-psk': "",
-      'type': "dhcp"
-    };
-
-    var wifiConnection = NetworkSettingsService.connectedWifiNetwork;
-    if(wifiConnection.settings && wifiConnection.settings["wpa-ssid"]) {
-      $scope.connectedSsid = wifiConnection.settings["wpa-ssid"].replace(new RegExp('"', "g"), "");
-      if($state.params.name.replace(new RegExp('_', "g"), " ") === $scope.connectedSsid) {
-        if(wifiConnection.state.status === "connected") {
-          $scope.currentNetwork = wifiConnection;
-          $scope.IamConnected = true;
+    $scope.updateConnectedWifi = function(key) {
+      console.log("boom", key);
+      // When our selected wifi network is the one which is connected already.
+      var wifiConnection = NetworkSettingsService.connectedWifiNetwork;
+      if(wifiConnection.settings && wifiConnection.settings[key]) {
+        $scope.connectedSsid = wifiConnection.settings[key].replace(new RegExp('"', "g"), "");
+        if($state.params.name.replace(new RegExp('_', "g"), " ") === $scope.connectedSsid) {
+          if(wifiConnection.state.status === "connected") {
+            $scope.currentNetwork = wifiConnection;
+            $scope.IamConnected = true;
+            $scope.editEthernetData = $scope.currentNetwork.state;
+            // We assign this so that, It shows data when we select
+            //a wifi network which is already being connected.
+          }
         }
       }
-    }
-
-    var ethernetConnection = NetworkSettingsService.connectedEthernet;
-    if(ethernetConnection.state) {
-      if($state.params.name.replace(new RegExp('_', "g"), " ") === "ethernet") {
-        $scope.IamConnected = true;
-        $scope.currentNetwork = ethernetConnection;
-      }
-    }
+    };
 
     $scope.connectWifi = function() {
+      console.log($scope.credentials); // for checking later in 200.
       NetworkSettingsService.connectWifi($scope.credentials).then(function(data) {
         $scope.statusMessage = "";
         $scope.buttonValue = "CONNECTING";
@@ -101,6 +98,56 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
           break;
       }
     };
+
+    $scope.connectEthernet = function() {
+      NetworkSettingsService.connectToEthernet($scope.editEthernetData).then(function(result) {
+        console.log("wow", result);
+      }, function(err) {
+        console.log(err);
+      });
+    };
+
+    if($scope.selectedWifiNow) { // if our selection is a wifi network.
+
+          if($scope.selectedWifiNow.encryption === 'wpa2') {
+            $scope.wifiNetworkType = 'wpa2';
+            $scope.credentials = {
+              'wpa-ssid': $scope.name,
+              'wpa-psk': "",
+              'type': "dhcp"
+            };
+            $scope.updateConnectedWifi('wpa-ssid');
+          } else if($scope.selectedWifiNow.encryption === 'wep') {
+            $scope.wifiNetworkType = 'wep';
+            $scope.credentials = {
+              'wireless_essid': $scope.name,
+              'wireless_key': "",
+              'type': "dhcp"
+            };
+            $scope.updateConnectedWifi('wireless_essid');
+          }
+
+    } else if($scope.selectedWifiNow === null && NetworkSettingsService.connectedEthernet.interface === 'eth0') { //If we selected an ethernet.
+          // Configuring values if selected network is Ethernet.
+          var ethernetConnection = NetworkSettingsService.connectedEthernet;
+          if(ethernetConnection.state) {
+            if($state.params.name.replace(new RegExp('_', "g"), " ") === "ethernet") {
+              $scope.IamConnected = true;
+              $scope.currentNetwork = ethernetConnection;
+            }
+          }
+          // Add dns server and gateway into object if they dont exist.
+          $scope.editEthernetData = $scope.currentNetwork.state;
+          $scope.editEthernetData.type = $scope.currentNetwork.settings.type;
+
+          if(! $scope.currentNetwork.state.gateway) {
+            $scope.editEthernetData.gateway = '0.0.0.0';
+          }
+
+          if(! $scope.currentNetwork.state['dns-nameservers']) {
+            $scope.editEthernetData['dns-nameservers'] = '0.0.0.0';
+          }
+    }
 
   }
 ]);
