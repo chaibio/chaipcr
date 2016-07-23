@@ -24,6 +24,7 @@
 #include "qpcrapplication.h"
 #include "util.h"
 #include "logger.h"
+#include "exceptions.h"
 
 #include <iostream>
 #include <fstream>
@@ -60,6 +61,16 @@ protected:
 private:
     std::function<void()> _runFunction;
     Poco::Event &_event;
+};
+
+class EventSetter
+{
+public:
+    EventSetter(Poco::Event &event): event(event) { event.reset(); }
+    ~EventSetter() { event.set(); }
+
+private:
+    Poco::Event &event;
 };
 
 UpdateManager::UpdateManager(std::shared_ptr<DBControl> dbControl):
@@ -130,6 +141,8 @@ bool UpdateManager::update()
 
     if (_updateState.compare_exchange_strong(state, Updating))
     {
+        std::string errorMessage;
+
         try
         {
             Poco::File dir(kUpdateFolder + "/scripts");
@@ -137,14 +150,19 @@ bool UpdateManager::update()
                 dir.remove(true);
 
             if (!Util::watchProcess("tar xf " + kUpdateFilePath + " --directory " + kUpdateFolder + " scripts", _downloadEventFd,
-                                    [&logStream](const char buffer[]){ logStream << "UpdateManager::update - tar: " << buffer << std::endl; }))
+                                    [&logStream](const char buffer[]){ logStream << "UpdateManager::update - tar (stdout): " << buffer << std::endl; },
+                                    [&logStream, &errorMessage](const char buffer[]){ logStream << "UpdateManager::update - tar (stderr): " << buffer << std::endl;
+                                                                                      errorMessage.append(buffer, buffer + 1024); }))
+            {
                 return false; //This will happen only if the app is getting closed
+            }
         }
         catch (...)
         {
-            _updateState = Unknown;
-
-            throw std::runtime_error("Unknown error occurred during extracting an upgrade archive");
+            if (errorMessage.find("This does not look like a tar archive") != std::string::npos)
+                setLastErrorAndThrow(ErrorInfo(ErrorInfo::InvalidImage, "Invalid upgrade image"));
+            else
+                setLastErrorAndThrow(ErrorInfo(ErrorInfo::UnknownError, "Unable to extract image"));
         }
 
         try
@@ -158,8 +176,6 @@ bool UpdateManager::update()
         }
         catch (...)
         {
-            _updateState = Unknown;
-
             std::string message;
             std::ifstream file(kUpdateScriptOutputPath);
 
@@ -167,10 +183,13 @@ bool UpdateManager::update()
             {
                 std::getline(file, message);
 
-                throw std::runtime_error(message);
+                if (message == "Incompatable upgrade image: No checksum file found!" || message == "Checksum error!")
+                    setLastErrorAndThrow(ErrorInfo(ErrorInfo::InvalidImage, "Invalid upgrade image"));
+                else
+                    setLastErrorAndThrow(ErrorInfo(ErrorInfo::UnknownError, message));
             }
             else
-                throw std::runtime_error("Unknown error occured during upgrade");
+                setLastErrorAndThrow(ErrorInfo(ErrorInfo::UnknownError, "Unknown upgrade error"));
         }
 
         return true;
@@ -191,57 +210,100 @@ void UpdateManager::upload(std::istream &dataStream)
     {
         try
         {
-            _uploadEvent.reset();
+            EventSetter eventSetter(_uploadEvent);
 
             lock.unlock();
 
-            if (checkMountPoint() && checkSdcard())
+            try
             {
-                _dbControl->setUpgradeDownloaded(false);
+                int result = checkMountPoint();
 
-                uint64_t i = 0;
-                std::ofstream file(kUpdateFilePath.c_str(), std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
-
-                if (file.is_open())
+                if (result == -1)
                 {
-                    char buffer[DOWNLOAD_BUFFER_SIZE];
-
-                    while (dataStream.good() && file.good())
-                    {
-                        std::fill(std::begin(buffer), std::end(buffer), 0);
-
-                        dataStream.read(buffer, DOWNLOAD_BUFFER_SIZE);
-
-                        if (dataStream.gcount() > 0)
-                            file.write(buffer, dataStream.gcount());
-
-                        read(_downloadEventFd, &i, sizeof(i));
-                        if (i > 0)
-                            break;
-                    }
-
-                    if (dataStream.eof())
-                        _updateState = Available;
-                    else
-                        _updateState = Unknown;
+                    setLastErrorAndThrow(ErrorInfo(ErrorInfo::UnknownError, "Unknown error (" + std::to_string(kUpdateMoundPointError) + ")"));
+                    return;
                 }
+                else if (result == 0)
+                {
+                    clearLastError(true);
+                    return;
+                }
+            }
+            catch (const std::exception &ex)
+            {
+                APP_LOGGER << "UpdateManager::upload - checkMountPoint: " << ex.what() << std::endl;
+
+                setLastErrorAndThrow(ErrorInfo(ErrorInfo::UnknownError, "Unknown error (" + std::to_string(kUpdateMoundPointError) + ")"));
+
+                return;
+            }
+
+            try
+            {
+                if (!checkSdcard())
+                {
+                    clearLastError(true);
+                    return;
+                }
+            }
+            catch (const std::exception &ex)
+            {
+                APP_LOGGER << "UpdateManager::upload - checkSdcard: " << ex.what() << std::endl;
+
+                setLastErrorAndThrow(ErrorInfo(ErrorInfo::UnknownError, "Unknown error (" + std::to_string(kUpdateSdcardError) + ")"));
+
+                return;
+            }
+
+            _dbControl->setUpgradeDownloaded(false);
+
+            uint64_t i = 0;
+            std::ofstream file(kUpdateFilePath.c_str(), std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
+
+            if (file.is_open())
+            {
+                char buffer[DOWNLOAD_BUFFER_SIZE];
+
+                while (dataStream.good() && file.good())
+                {
+                    std::fill(std::begin(buffer), std::end(buffer), 0);
+
+                    dataStream.read(buffer, DOWNLOAD_BUFFER_SIZE);
+
+                    if (dataStream.gcount() > 0)
+                        file.write(buffer, dataStream.gcount());
+
+                    read(_downloadEventFd, &i, sizeof(i));
+                    if (i > 0)
+                        break;
+                }
+
+                if (dataStream.eof())
+                    _updateState = Available;
                 else
                 {
-                    APP_LOGGER << "UpdateManager::upload - unable to open file " << kUpdateFilePath << ": " << std::strerror(errno) << std::endl;
-
                     _updateState = Unknown;
+
+                    if (!dataStream.good() || !file.good())
+                    {
+                        APP_LOGGER << "UpdateManager::upload - stream error" << std::endl;
+
+                        setLastErrorAndThrow(ErrorInfo(ErrorInfo::UplodFaild, "Upload failed"), false);
+                    }
                 }
             }
             else
-                _updateState = Unknown;
+            {
+                APP_LOGGER << "UpdateManager::upload - unable to open file " << kUpdateFilePath << ": " << std::strerror(errno) << std::endl;
 
-            _uploadEvent.set();
+                setLastErrorAndThrow(ErrorInfo(ErrorInfo::UnknownError, "Error opening image (" + std::to_string(errno) + ")"));
+            }
         }
         catch (const std::exception &ex)
         {
             APP_LOGGER << "UpdateManager::upload - exception: " << ex.what() << std::endl;
 
-            _updateState = Unknown;
+            setLastErrorAndThrow(ErrorInfo(ErrorInfo::UnknownError, "Unknown upload error"));
         }
     }
     else if (state != ManualDownloading)
@@ -282,6 +344,14 @@ void UpdateManager::stopDownload()
         UpdateState state = ManualDownloading;
         _updateState.compare_exchange_strong(state, Unknown); //In case the uploading thread has set the state
     }
+
+    clearLastError();
+}
+
+UpdateManager::ErrorInfo UpdateManager::lastError() const
+{
+    Poco::RWLock::ScopedReadLock lock(_errorMutex);
+    return _lastError;
 }
 
 void UpdateManager::checkUpdateCallback(bool checkHash)
@@ -292,6 +362,9 @@ void UpdateManager::checkUpdateCallback(bool checkHash)
     if (state == ManualDownloading || state == Updating)
         return;
 
+    Poco::Net::HTTPResponse response;
+    std::istream *responseStream = nullptr;
+
     try
     {
         Poco::URI uri(kUpdatesUrl);
@@ -299,12 +372,39 @@ void UpdateManager::checkUpdateCallback(bool checkHash)
                                  {"software_platform", qpcrApp.settings().configuration.platform}, {"serial_number", qpcrApp.settings().device.serialNumber} });
 
         Poco::Net::HTTPRequest request("GET", uri.toString());
-        Poco::Net::HTTPResponse response;
 
         _httpClient->sendRequest(request);
 
+        responseStream = &_httpClient->receiveResponse(response);
+    }
+    catch (const std::exception &ex)
+    {
+        APP_LOGGER << "UpdateManager::checkUpdateCallback - request: " << ex.what() << std::endl;
+
+        _httpClient->reset();
+
+        if (state != Downloading)
+            setLastError(ErrorInfo(ErrorInfo::NetworkError, "Unable to fetch update information"));
+
+        return;
+    }
+
+    if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK)
+    {
+        APP_LOGGER << "UpdateManager::checkUpdateCallback - response error: " << response.getStatus() << std::endl;
+
+        _httpClient->reset();
+
+        if (state != Downloading)
+            setLastError(ErrorInfo(ErrorInfo::NetworkError, "Unable to fetch update information"));
+
+        return;
+    }
+
+    try
+    {
         boost::property_tree::ptree ptree;
-        boost::property_tree::read_json(_httpClient->receiveResponse(response), ptree);
+        boost::property_tree::read_json(*responseStream, ptree);
 
         upgrade.setVersion(ptree.get<std::string>("software_version"));
         upgrade.setChecksum(ptree.get<std::string>("software_checksum"));
@@ -338,6 +438,8 @@ void UpdateManager::checkUpdateCallback(bool checkHash)
                 {
                     state = Unknown;
 
+                    clearLastError();
+
                     _dbControl->setUpgradeDownloaded(false);
                 }
             }
@@ -347,12 +449,10 @@ void UpdateManager::checkUpdateCallback(bool checkHash)
     }
     catch (const std::exception &ex)
     {
-        APP_LOGGER << "UpdateManager::checkUpdateCallback - " << ex.what() << std::endl;
-
-        _httpClient->reset();
+        APP_LOGGER << "UpdateManager::checkUpdateCallback - json/db: " << ex.what() << std::endl;
 
         if (state != Downloading)
-            _updateState.compare_exchange_strong(state, Unknown);
+            setLastError(ErrorInfo(ErrorInfo::UnknownError, "Unable to process update information"));
 
         return;
     }
@@ -380,21 +480,95 @@ void UpdateManager::downlaod(Upgrade upgrade)
 
     try
     {
+        int result = checkMountPoint();
+
+        if (result == -1)
+        {
+            setLastError(ErrorInfo(ErrorInfo::UnknownError, "Unknown error (" + std::to_string(kUpdateMoundPointError) + ")"));
+            return;
+        }
+        else if (result == 0)
+        {
+            clearLastError(true);
+            return;
+        }
+    }
+    catch (const std::exception &ex)
+    {
+        APP_LOGGER << "UpdateManager::downlaod - checkMountPoint: " << ex.what() << std::endl;
+
+        setLastError(ErrorInfo(ErrorInfo::UnknownError, "Unknown error (" + std::to_string(kUpdateMoundPointError) + ")"));
+
+        return;
+    }
+
+    try
+    {
+        if (!checkSdcard())
+        {
+            clearLastError(true);
+            return;
+        }
+    }
+    catch (const std::exception &ex)
+    {
+        APP_LOGGER << "UpdateManager::downlaod - checkSdcard: " << ex.what() << std::endl;
+
+        setLastError(ErrorInfo(ErrorInfo::UnknownError, "Unknown error (" + std::to_string(kUpdateSdcardError) + ")"));
+
+        return;
+    }
+
+    try
+    {
+        if (!downlaod(upgrade.imageUrl(), upgrade.password()))
+        {
+            clearLastError(true);
+            return;
+        }
+    }
+    catch (const ProcessError &ex)
+    {
+        APP_LOGGER << "UpdateManager::downlaod - rsync: " << ex.what() << std::endl;
+
+        if (ex.code() == 10)
+            setLastError(ErrorInfo(ErrorInfo::NetworkError, "Unable to download image"));
+        else
+            setLastError(ErrorInfo(ErrorInfo::UnknownError, "Unable to download image (" + std::to_string(ex.code()) + ")"));
+
+        return;
+    }
+    catch (const std::exception &ex)
+    {
+        APP_LOGGER << "UpdateManager::downlaod - downlaod: " << ex.what() << std::endl;
+
+        setLastError(ErrorInfo(ErrorInfo::UnknownError, "Unknown error (" + std::to_string(kUpdateDownloadError) + ")"));
+
+        return;
+    }
+
+    try
+    {
         std::string sum;
 
-        if (checkMountPoint() && checkSdcard() && downlaod(upgrade.imageUrl(), upgrade.password()) && Util::getFileChecksum(kUpdateFilePath, _downloadEventFd, sum) && sum == upgrade.checksum())
+        if (Util::getFileChecksum(kUpdateFilePath, _downloadEventFd, sum))
         {
-            _updateState = Available;
-            _dbControl->setUpgradeDownloaded(true);
+            if (sum == upgrade.checksum())
+            {
+                _updateState = Available;
+                _dbControl->setUpgradeDownloaded(true);
+            }
+            else
+                setLastError(ErrorInfo(ErrorInfo::InvalidImage, "Invalid image checksum"));
         }
         else
-            _updateState = Unknown;
+            clearLastError(true);
     }
     catch (const std::exception &ex)
     {
         APP_LOGGER << "UpdateManager::downlaod - " << ex.what() << std::endl;
 
-        _updateState = Unknown;
+        setLastError(ErrorInfo(ErrorInfo::UnknownError, "Unknown error (23)"));
     }
 }
 
@@ -405,22 +579,40 @@ bool UpdateManager::downlaod(const std::string &imageUrl, const std::string &api
     std::stringstream stream;
     stream << "sshpass -p \'" << apiPassword << "\' rsync -a --checksum --no-whole-file --inplace " << imageUrl << " " << kUpdateFilePath;
 
-    return Util::watchProcess(stream.str(), _downloadEventFd, [&logStream](const char buffer[]){ logStream << "UpdateManager::downlaod - rsync: " << buffer << std::endl; });
+    return Util::watchProcess(stream.str(), _downloadEventFd, [&logStream](const char buffer[]){ logStream << "UpdateManager::downlaod - rsync (stdout): " << buffer << std::endl; },
+                                                              [&logStream](const char buffer[]){ logStream << "UpdateManager::downlaod - rsync (stderr): " << buffer << std::endl; });
 }
 
-bool UpdateManager::checkMountPoint()
+int UpdateManager::checkMountPoint()
 {
     std::string output;
 
     if (Util::watchProcess("cat /etc/mtab | grep " + kUpdateMountPoint, _downloadEventFd, [&output](const char buffer[]){ output = buffer; }))
-        return output.find(kUpdateMountPoint) != std::string::npos;
+        return output.find(kUpdateMountPoint) != std::string::npos ? 1 : -1;
     else
-        return false;
+        return 0;
 }
 
 bool UpdateManager::checkSdcard()
 {
     Poco::LogStream logStream(Logger::get());
 
-    return Util::watchProcess(kCheckSdcardPath, _downloadEventFd, [&logStream](const char buffer[]){ logStream << "UpdateManager::checkSdcard - check_sdcard: " << buffer << std::endl; });
+    return Util::watchProcess(kCheckSdcardPath, _downloadEventFd, [&logStream](const char buffer[]){ logStream << "UpdateManager::checkSdcard - check_sdcard (stdout): " << buffer << std::endl; },
+                                                                  [&logStream](const char buffer[]){ logStream << "UpdateManager::checkSdcard - check_sdcard (stderr): " << buffer << std::endl; });
+}
+
+void UpdateManager::setLastErrorAndThrow(const ErrorInfo &error, bool setUnknownState)
+{
+    setLastError(error, setUnknownState);
+
+    throw UpdateException(error);
+}
+
+void UpdateManager::setLastError(const ErrorInfo &error, bool setUnknownState)
+{
+    if (setUnknownState)
+        _updateState = Unknown;
+
+    Poco::RWLock::ScopedWriteLock lock(_errorMutex);
+    _lastError = error;
 }

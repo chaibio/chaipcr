@@ -25,9 +25,10 @@
 #include <atomic>
 #include <thread>
 #include <mutex>
-#include <atomic>
+#include <stdexcept>
 
 #include <Poco/Event.h>
+#include <Poco/RWLock.h>
 
 namespace Poco { namespace Util { class Timer; } namespace Net { class HTTPClientSession; } }
 
@@ -46,6 +47,37 @@ public:
         Updating
     };
 
+    class ErrorInfo
+    {
+    public:
+        enum ErrorCode
+        {
+            NoError,
+            UnknownError,
+            InvalidImage,
+            UplodFaild,
+            NetworkError
+        };
+
+        ErrorInfo(): code(NoError) {}
+        ErrorInfo(ErrorCode code, const std::string &message): code(code), message(message) {}
+
+    public:
+        ErrorCode code;
+        std::string message;
+    };
+
+    class UpdateException : public std::runtime_error
+    {
+    public:
+        UpdateException(const ErrorInfo &error): std::runtime_error(error.message), error(error) {}
+
+        const char* what() const _GLIBCXX_USE_NOEXCEPT { return error.message.c_str(); }
+
+    public:
+        ErrorInfo error;
+    };
+
     UpdateManager(std::shared_ptr<DBControl> dbControl);
     ~UpdateManager();
 
@@ -61,14 +93,20 @@ public:
     void upload(std::istream &dataStream);
     void stopDownload();
 
+    ErrorInfo lastError() const;
+
 private:
     void checkUpdateCallback(bool checkHash);
 
     void downlaod(Upgrade upgrade);
     bool downlaod(const std::string &imageUrl, const std::string &apiPassword);
 
-    bool checkMountPoint();
+    int checkMountPoint();
     bool checkSdcard();
+
+    void setLastErrorAndThrow(const ErrorInfo &error, bool setUnknownState = true);
+    void setLastError(const ErrorInfo &error, bool setUnknownState = true);
+    inline void clearLastError(bool setUnknownState = false) { setLastError(ErrorInfo(), setUnknownState); }
 
 private:
     std::shared_ptr<DBControl> _dbControl;
@@ -84,6 +122,9 @@ private:
 
     Poco::Event _updateEvent;
     Poco::Event _uploadEvent;
+
+    mutable Poco::RWLock _errorMutex;
+    ErrorInfo _lastError;
 };
 
 #endif // UPDATEMANAGER_H

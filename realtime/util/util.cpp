@@ -18,6 +18,7 @@
 //
 
 #include "util.h"
+#include "exceptions.h"
 
 #include <fstream>
 #include <sstream>
@@ -187,10 +188,15 @@ void watchProcess(const std::string &command, std::function<void(const char[1024
         int status = -1;
         pid = waitpid(pid, &status, 0);
 
-        if (pid != -1 && status == 0)
-            return;
+        if (pid != -1)
+        {
+            if (status == 0)
+                return;
+            else
+                throw ProcessError(status, "Error in subprocess - " + command);
+        }
         else
-            throw std::runtime_error("Unknown error with subprocess - " + command);
+            throw std::system_error(errno, std::generic_category(), "Error with subprocess - " + command);
     }
     else
     {
@@ -338,19 +344,24 @@ bool watchProcess(const std::string &command, int eventFd, std::function<void(co
 
     if (processFinished)
     {
-        int status = -1;
+        int status = 0;
         pid = waitpid(pid, &status, 0);
 
-        if (pid != -1 && status == 0)
-            return true;
+        if (pid != -1)
+        {
+            if (status == 0)
+                return true;
+            else
+                throw ProcessError(status, "Error in subprocess - " + command);
+        }
         else
-            throw std::runtime_error("Unknown error with subprocess - " + command);
+            throw std::system_error(errno, std::generic_category(), "Error with subprocess - " + command);
     }
     else
     {
         killpg(getpgid(pid), SIGTERM);
 
-        if (fdArray[1].revents == 0)
+        if (fdArray[2].revents == 0)
             throw std::runtime_error("Unknown error with subprocess - " + command);
         else
             return false;

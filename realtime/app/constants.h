@@ -147,6 +147,10 @@ const std::string kUpdateScriptOutputPath = "/root/chaipcr/perform_upgrade_outpu
 const std::string kUpdateMountPoint = "/sdcard/upgrade";
 const std::string kCheckSdcardPath = "/root/chaipcr/deploy/device/check_sdcard.sh";
 
+const int kUpdateMoundPointError = 10000;
+const int kUpdateSdcardError = 10001;
+const int kUpdateDownloadError = 10002;
+
 //Network settings
 const std::string kNetworkInterfacesFile = "/etc/network/interfaces";
 

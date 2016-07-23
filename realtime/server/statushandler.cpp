@@ -182,6 +182,33 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
 
     default:
         responsePt.put("device.update_available", "unknown");
+
+        UpdateManager::ErrorInfo error = qpcrApp.updateManager()->lastError();
+
+        if (error.code != UpdateManager::ErrorInfo::NoError)
+        {
+            switch (error.code)
+            {
+            case UpdateManager::ErrorInfo::InvalidImage:
+                responsePt.put("device.update_error.code", "invalid_image");
+                break;
+
+            case UpdateManager::ErrorInfo::UplodFaild:
+                responsePt.put("device.update_error.code", "upload_failed");
+                break;
+
+            case UpdateManager::ErrorInfo::NetworkError:
+                responsePt.put("device.update_error.code", "network_error");
+                break;
+
+            default:
+                responsePt.put("device.update_error.code", "unknown_error");
+                break;
+            }
+
+            responsePt.put("device.update_error.message", error.message);
+        }
+
         break;
     }
 }
