@@ -109,8 +109,20 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         console.log(step, "stepping");
           if(step.nextStep) {
-            this.currentDrop = step;
+            this.currentDrop = step.nextStep;
+            this.currentHit = step.nextStep.index;
+          } else if(step.parentStage.nextStage) {
+            this.currentDrop = step.parentStage.nextStage.childSteps[0];
             this.currentHit = step.index;
+          } else {
+            console.log("I am last -- >");
+            if(step.previousStep) {
+              this.currentDrop = step.previousStep;
+              this.currentHit = step.previousStep.index;
+            } else if(step.parentStage.previousStage) {
+              this.currentDrop = step.parentStage.previousStage.childSteps[step.parentStage.previousStage.childSteps.length - 1];
+              this.currentHit = this.currentDrop.index;
+            }
           }
       };
 
@@ -131,7 +143,7 @@ angular.module("canvasApp").factory('moveStepRect', [
 
       this.indicator.processMovement = function(step, C) {
         // Make a clone of the step
-        //if(Math.abs(this.startPosition - this.endPosition) > 65) {
+        //if(Math.abs(this.startPosition - this.endPosition) > 65)
           var modelClone = $.extend({}, step.model);
           // We had shrinked the stage, Now we undo it.
           step.parentStage.expand();
@@ -149,7 +161,7 @@ angular.module("canvasApp").factory('moveStepRect', [
             };
 
             targetStage.addNewStep(data, targetStep);
-            console.log(modelClone.id, targetStep.model.id, targetStage.model.id);
+            // console.log(modelClone.id, targetStep.model.id, targetStage.model.id);
             ExperimentLoader.moveStep(modelClone.id, targetStep.model.id, targetStage.model.id)
               .then(function(data) {
                 console.log("Moved", data);

@@ -224,7 +224,7 @@ angular.module("canvasApp").factory('stage', [
 
         while(currentStage.nextStage) {
 
-          this.moveIndividualStageAndContents(currentStage, del)
+          this.moveIndividualStageAndContents(currentStage, del);
 
           currentStage = currentStage.nextStage;
         }
