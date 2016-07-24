@@ -59,6 +59,7 @@ App.controller 'MeltCurveChartCtrl', [
       gofetch = if !$scope.fetching and
                 $scope.RunExperimentCtrl.chart is 'melt-curve' and
                 !$scope.retrying then true else false
+
       console.log "gofetch = #{gofetch}"
 
       if gofetch
@@ -67,7 +68,10 @@ App.controller 'MeltCurveChartCtrl', [
           Experiment.getMeltCurveData($stateParams.id)
           .then (resp) ->
             console.log resp
-            cb(resp.data) if cb and resp.data?.melt_curve_data
+            if cb and resp.data?.melt_curve_data
+              cb(resp.data)
+            else
+              $scope.fetching = false
             if resp.status is 202 or resp.data?.partial
               retry()
           .catch (resp) ->
@@ -161,10 +165,10 @@ App.controller 'MeltCurveChartCtrl', [
           changeResolution()
 
           $scope.fetching = false
-          $timeout ->
-            $scope.fetching = false
-            console.log '$scope.fetching = false'
-          1000
+          $scope.hasData = has_data
+          console.log '$scope.fetching = false'
+          # $timeout ->
+          # 1000
 
           $timeout ->
             $scope.$broadcast '$reload:n3:charts'
