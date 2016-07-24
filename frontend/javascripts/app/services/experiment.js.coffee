@@ -27,6 +27,7 @@ window.ChaiBioTech.ngApp
 
     currentExperiment = null
     ques = {}
+    # getExpDeferred = null
 
     self = $resource('/experiments/:id', {id: '@id'}, {
       'update':
@@ -38,20 +39,51 @@ window.ChaiBioTech.ngApp
       deferred = $q.defer()
       ques["exp_#{obj.id}"].push deferred
 
-      return deferred.promise if ques["exp_#{obj.id}"].length > 1 #there is already pending request for this experiment, wait for it
+      console.log 'que:'
+      console.log ques["exp_#{obj.id}"]
+      console.log 'end que:'
 
-      $http.get("/experiments/#{obj.id}")
-      .then (resp) ->
-        for def in ques["exp_#{obj.id}"] by 1
-          def.resolve resp.data
-      .catch (resp) ->
-        for def in ques["exp_#{obj.id}"] by 1
-          def.reject resp
+      if ques["exp_#{obj.id}"].length > 1 and ques["exp_#{obj.id}"].length < 5 #there is already pending request for this experiment, wait for it
+        return deferred.promise
+      else
+        console.log 'getting experiment $http'
+        promise = $http.get("/experiments/#{obj.id}")
+        promise.then (resp) ->
+          console.log '$http then'
+          for def in ques["exp_#{obj.id}"] by 1
+            def.resolve resp.data
+          null
+        promise.catch (resp) ->
+          console.log '$http catch'
+          for def in ques["exp_#{obj.id}"] by 1
+            def.reject resp
+          null
 
-      .finally ->
-        delete ques["exp_#{obj.id}"]
+        promise.finally ->
+          console.log '$http finally'
+          delete ques["exp_#{obj.id}"]
+          ques = angular.copy(ques)
+          null
 
-      return deferred.promise
+        return deferred.promise
+
+    # self.get = (obj) ->
+    #   console.log "getExpDeferred: #{getExpDeferred}"
+    #   if getExpDeferred
+    #     return getExpDeferred.promise
+    #   else
+    #     getExpDeferred = $q.defer()
+    #     $http.get("/experiments/#{obj.id}")
+    #     .then (resp) ->
+    #       console.log "experiment loaded in experiment service !!!!"
+    #       getExpDeferred.resolve resp.data
+    #       getExpDeferred = null
+    #     .catch (resp) ->
+    #       getExpDeferred.reject resp
+    #       getExpDeferred = null
+
+    #     return getExpDeferred.promise
+
 
     self.setCurrentExperiment = (exp) ->
       currentExperiment = exp
@@ -122,7 +154,7 @@ window.ChaiBioTech.ngApp
       return name.substring(0, NAME_LENGTH-2)+'...'
 
     self.getMaxExperimentCycle = (exp) ->
-      return if !exp 
+      return if !exp
       stages = exp.protocol.stages || []
       cycles = []
 

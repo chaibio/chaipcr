@@ -51,20 +51,20 @@
             <span ng-show="curve_type === 'normalized'">NORMALIZED REPORTER</span>
           </div>
           <div class="chart-container" id="ampli-drag-scroll" chart-drag-scroll ng-model="ampli_scroll">
-            <div class="chart-error B1"  ng-show="retrying && !fetching">
+            <div class="chart-error B1"  ng-show="error">
               <strong class="text-black">Unable to load chart data</strong>
               <p ng-bind="error"></p>
               Retrying in {{retry}} seconds<ellipsis-animated></ellipsis-animated>
             </div>
-            <div class="loading-blue-container" ng-show="fetching && !hasData">
+            <div class="loading-blue-container" ng-show="(fetching || retrying) && !hasData && !error">
               <div class="loading-blue"></div>
               <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
               <p class="B2">May take a minute</p>
             </div>
-            <linechartv2 ng-if="curve_type==='derivative' && (RunExperimentCtrl.chart==='melt-curve' || has_data) && !fetching"
+            <linechartv2 ng-if="curve_type==='derivative' && (RunExperimentCtrl.chart==='melt-curve' || has_data) && !error"
              data-drag-scroll="meltcurve-drag-scroll" data="data" options="chartConfigDerivative" width="1024" height="400">
             </linechartv2>
-            <linechartv2 ng-if="curve_type==='normalized' && (RunExperimentCtrl.chart==='melt-curve' || has_data) && !fetching" data="data" options="chartConfigNormalized" width="1024" height="400">
+            <linechartv2 ng-if="curve_type==='normalized' && (RunExperimentCtrl.chart==='melt-curve' || has_data) && !error" data="data" options="chartConfigNormalized" width="1024" height="400">
             </linechartv2>
           </div>
           <!-- <div class="text-center num-cycle-text SH">CYCLES NUMBER</div> -->

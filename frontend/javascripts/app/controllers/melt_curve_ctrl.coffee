@@ -40,32 +40,40 @@ App.controller 'MeltCurveChartCtrl', [
 
 
     retry = ->
+      return if $scope.retrying
+      console.log 'retrying ...'
       $scope.retrying = true
       $scope.retry = 10
       retryInterval = $interval ->
         $scope.retry = $scope.retry - 1
+        console.log "in #{$scope.retry} seconds..."
         if $scope.retry is 0
           $interval.cancel(retryInterval)
+          $scope.error = null
           $scope.retrying = false
-          getMeltCurveData()
+          console.log 'getting melt_curve_data...'
+          getMeltCurveData(getMeltCurveDataCallBack)
       , 1000
 
     getMeltCurveData = (cb) ->
-      gofetch = true
-      gofetch = false if $scope.fetching
-      gofetch = false if $scope.RunExperimentCtrl.chart isnt 'melt-curve'
-      gofetch = false if $scope.retrying
+      gofetch = if !$scope.fetching and
+                $scope.RunExperimentCtrl.chart is 'melt-curve' and
+                !$scope.retrying then true else false
+      console.log "gofetch = #{gofetch}"
 
       if gofetch
         $scope.fetching = true
         $timeout ->
           Experiment.getMeltCurveData($stateParams.id)
           .then (resp) ->
-            cb(resp.data) if !!cb
-            console.log 'melt curve data loaded!!'
+            console.log resp
+            cb(resp.data) if cb and resp.data?.melt_curve_data
+            if resp.status is 202 or resp.data?.partial
+              retry()
           .catch (resp) ->
             $scope.fetching = false
-            $scope.error = if resp.data?.errors then resp.data.errors else 'Unable to retrieve melt curve data due to some error.'
+            if resp.status is 500
+              $scope.error = if resp.data?.errors then resp.data.errors else 'Unable to retrieve melt curve data due to some error.'
             retry()
         , 1500
 
@@ -131,37 +139,45 @@ App.controller 'MeltCurveChartCtrl', [
       data_length = PARSED_DATA['well_0'].length
       $scope.data = MeltCurveService.moveData(data, data_length, resolution, $scope.mc_scroll)
 
+    getMeltCurveDataCallBack = (data) ->
+      updateButtonTms(data)
+
+      MeltCurveService.parseData(data.melt_curve_data).then (data) ->
+        $scope.data = data
+        # has_data = true
+        # $scope.fetching = false
+
+        $timeout ->
+          y_extrems = MeltCurveService.getYExtrems(data, $scope.curve_type)
+          updateConfigs
+            axes:
+              y:
+                min: y_extrems.min
+                max: y_extrems.max
+
+          has_data = true
+          PARSED_DATA = angular.copy(data)
+          updateResolutionOptions(data)
+          changeResolution()
+
+          $scope.fetching = false
+          $timeout ->
+            $scope.fetching = false
+            console.log '$scope.fetching = false'
+          1000
+
+          $timeout ->
+            $scope.$broadcast '$reload:n3:charts'
+          , 2000
+
+        , 1000
+
     $scope.$watch 'RunExperimentCtrl.chart', (chart) ->
       if chart is 'melt-curve' and !has_data
+        console.log 'here!!!!'
+        console.log "has_data=#{has_data}"
         getExperiment (exp) ->
-          getMeltCurveData (data) ->
-            updateButtonTms(data)
-
-            MeltCurveService.parseData(data.melt_curve_data).then (data) ->
-              $scope.data = data
-
-              $timeout ->
-                y_extrems = MeltCurveService.getYExtrems(data, $scope.curve_type)
-                updateConfigs
-                  axes:
-                    y:
-                      min: y_extrems.min
-                      max: y_extrems.max
-
-                has_data = true
-                PARSED_DATA = angular.copy(data)
-                updateResolutionOptions(data)
-                changeResolution()
-                $timeout ->
-                  $scope.fetching = false
-                  console.log '$scope.fetching = false'
-                1000
-
-                $timeout ->
-                  $scope.$broadcast '$reload:n3:charts'
-                , 2000
-
-              , 1000
+          getMeltCurveData(getMeltCurveDataCallBack)
       else
         $timeout ->
           $scope.$broadcast '$reload:n3:charts'
