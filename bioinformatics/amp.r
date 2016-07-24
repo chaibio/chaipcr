@@ -10,6 +10,7 @@ get_amplification_data <- function(
     dcv=TRUE, # logical, whether to perform multi-channel deconvolution
     # basecyc, cp, # extra parameters that are currently hard-coded but may become user-defined later
     cp='Cy0', # used: 'cpD2', 'Cy0'
+    max_cycle=1000, # maximum cycles to analyze
     
     min_fluomax=4356, # 34.03 before 128x. to increase, make sure pass up min 4356.921178 (ip 223, exp 38, channel 1, well A2); to decrease, make sure suppress no up max
     min_D1max=472, # 3.016 before 128x. to increase, make sure pass up min , consider 386.688335 (ip 201, exp 148, channel 1, well B3, nD1max 0.006732); to decrease, make sure supress no up max 
