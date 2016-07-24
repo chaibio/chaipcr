@@ -1100,7 +1100,7 @@ smoothit <- function(x, selfun, pars)
 # all the ', silent = FALSE' were added by xqrm
 baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
                      baseline = NULL, basecyc = NULL, basefac = NULL,
-                     min_Ct, # xqrm
+                     min_reliable_cyc, # xqrm
                      plateau_offset = 2 # xqrm: to ensure the junction to plateau is smooth
                      )
 { 
@@ -1109,91 +1109,106 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
   class_model <- class(model)
   bl_fitting_failed <- 'error' %in% class_model || class_model == 'try-error'
   coef_b_gt_0 <- coef(model)[['b']] > 0
+  num_cycs <- length(fluo)
   if (grepl('^auto_', baseline)) {
-    basecyc_1st <- 1
-    if (baseline == 'auto_lin') mspsp <- TRUE
-    if (bl_fitting_failed || coef_b_gt_0) {
-      if (bl_fitting_failed) {
-        message('Sigmoid fitting for baseline subtraction failed.')
-      } else if (coef_b_gt_0) {
-        message('Fitted sigmoid model has coefficient \'b\' > 0.')
-      }
-      message('Using all the cycles as baseline.')
-      basecyc_last <- length(fluo)
-      mspsp <- FALSE
-    } else { 
-      # start: borrowed from 'efficiency.R'
-      EFFobj <- eff(model)
-      SEQ <- EFFobj$eff.x
-      D2seq <- model$MODEL$d2(SEQ, coef(model))
-      if (all(is.na(D2seq))) { # may be due to numeric overflow
-        message('All the values in `D2seq` are NA, using all the cycles as baseline.')
-        basecyc_last <- length(fluo)
-      } else {
-        
-        D2seq[!is.finite(D2seq)] <- NA # remove Inf's that mimicked maximum values
-        
-        min_fluo_cyc <- which.min(fluo)
-        if (min_fluo_cyc < min_Ct) {
-          message(sprintf(
-            'Cycle with the minimum fluo value %i is smaller than min_Ct %i. Search again in cycles >= min_Ct.', 
-            min_fluo_cyc, min_Ct))
-          fluo_mutated <- c(rep(max(fluo), times=min_Ct-1), fluo[min_Ct:length(fluo)])
-          min_fluo_cyc <- which.min(fluo_mutated)
-          }
-        message(sprintf('Cycle (>= min_Ct) with the minimum fluo value: %i.', min_fluo_cyc))
-        min_fluo_index_in_SEQ <- which.min(abs(SEQ - min_fluo_cyc))
-        
-        if (is.na(D2seq[min_fluo_index_in_SEQ])) {
-            message('Second derivative at minimum fluo is +/-inf, use all the cycles as baseline.')
-            basecyc_last <- length(fluo)
-        } else {
-          # basecyc_1st
-          if (min_fluo_cyc == 1) {
-            message('Use Cycle 1 as `basecyc_1st`.')
-          } else {
-            D2seq_left2mf <- D2seq[1:(min_fluo_index_in_SEQ-1)] # left to min_fluo
-            if (all(D2seq_left2mf < D2seq[min_fluo_index_in_SEQ])) {
-              message('Second derivative values for cycles left to minimum fluo are all less than that at minimum fluo, use 1st cycle as `basecyc_1st`.')
-              basecyc_1st <- 1
-            } else {
-              message('Some second derivative value(s) in cycles left to minimum fluo >= that at minimum fluo, use the cycle at the maximum of them as `basecyc_1st`.')
-              basecyc_1st <- floor(SEQ[which.max(D2seq_left2mf)])
-              if (basecyc_1st == 0) {
-                message('Adjust cycle 0 to 1.')
-                basecyc_1st <- 1 } } }
-          
-          # basecyc_last
-          if (min_fluo_cyc == length(fluo)) {
-            message('The last cycle has the minmum fluo value, use it as `basecyc_last`.')
-            basecyc_last <- length(fluo)
-          } else {
-            maxD2 <- which.max(D2seq)
-            cycmaxD2 <- SEQ[maxD2]
-            if (maxD2 == min_fluo_index_in_SEQ) {
-              message('Maximum second derivative coincides with minimum fluo, use this cycle as `basecyc_last`.')
-              basecyc_last <- floor(cycmaxD2)
-            } else {
-              message('Use the floor of the cycle at the maximum second derivative right to minimum fluo as `basecyc_last`.')
-              D2seq_right2mf <- D2seq[(min_fluo_index_in_SEQ + 1) : length(SEQ)] # right to min_fluo
-              basecyc_last <- floor(SEQ[which.max(D2seq_right2mf) + min_fluo_index_in_SEQ]) }
-          }
-        }
-        
-        # mspsp
-        minD2 <- which.min(D2seq)
-        cycminD2 <- SEQ[minD2]
-        
-        # end: borrowed from 'efficiency.R'
-        
-      }
-    
-    }
-    
-    message(sprintf('%s: cycles %i:%i were used for baseline subtraction.', baseline, basecyc_1st, basecyc_last))
     baseline <- substring(baseline, 6)
-    basecyc <- basecyc_1st:basecyc_last
-    
+    if (num_cycs <= min_reliable_cyc) {
+      basecyc <- 1:num_cycs
+    } else {
+      basecyc_1st <- min_reliable_cyc
+      if (baseline == 'auto_lin') mspsp <- TRUE
+      if (bl_fitting_failed || coef_b_gt_0) {
+        if (bl_fitting_failed) {
+          message('Sigmoid fitting for baseline subtraction failed.')
+        } else if (coef_b_gt_0) {
+          message('Fitted sigmoid model has coefficient \'b\' > 0.')
+        }
+        message('Using all the cycles >= `min_reliable_cyc` as baseline.')
+        basecyc_last <- num_cycs
+        mspsp <- FALSE
+      } else { 
+        # start: borrowed from 'efficiency.R'
+        EFFobj <- eff(model)
+        SEQ <- EFFobj$eff.x
+        D2seq <- model$MODEL$d2(SEQ, coef(model))
+        if (all(is.na(D2seq))) { # may be due to numeric overflow
+          message('All the values in `D2seq` are NA, using all the cycles as baseline.')
+          basecyc_last <- num_cycs
+        } else {
+          D2seq_finite <- is.finite(D2seq)
+          real_min_D2 <- min(D2seq[D2seq_finite])
+          fake_min_D2 <- real_min_D2 - 1
+          D2seq[!D2seq_finite] <- fake_min_D2 # substitute with `fake_min_D2` for Inf's that mimicked maximum values and NAs
+          
+          min_fluo_cyc <- which.min(fluo)
+          if (min_fluo_cyc < min_reliable_cyc) {
+            message(sprintf(
+              'Cycle with the minimum fluo value %d is smaller than min_reliable_cyc %d. Search again in cycles >= min_reliable_cyc.', 
+              min_fluo_cyc, min_reliable_cyc))
+            fluo_mutated <- c(rep(max(fluo), times=min_reliable_cyc-1), fluo[min_reliable_cyc:num_cycs])
+            min_fluo_cyc <- which.min(fluo_mutated)
+            }
+          message(sprintf('Cycle (>= min_reliable_cyc) with the minimum fluo value: %i.', min_fluo_cyc))
+          approx_min_fluo_index_in_SEQ <- which.min(abs(SEQ - min_fluo_cyc))
+          
+          if (is.na(D2seq[approx_min_fluo_index_in_SEQ])) {
+              message('Second derivative at minimum fluo is +/-inf, use all the cycles as baseline.')
+              basecyc_last <- num_cycs
+          } else {
+            # basecyc_1st
+            if (min_fluo_cyc == min_reliable_cyc) {
+              message('Use `min_reliable_cyc` as `basecyc_1st`.')
+            } else {
+              D2seq_left2mf <- D2seq[1:(approx_min_fluo_index_in_SEQ-1)] # left to min_fluo
+              if (all(D2seq_left2mf < D2seq[approx_min_fluo_index_in_SEQ])) {
+                message('Second derivative values for cycles left to minimum fluo are all less than that at minimum fluo, use `min_reliable_cyc` as `basecyc_1st`.')
+                basecyc_1st <- min_reliable_cyc
+              } else {
+                message('Some second derivative value(s) found in cycles left to minimum fluo >= that at minimum fluo, check the cycle with maximum second derivative among the cycles left to minimum fluo...')
+                basecyc_1st <- floor(SEQ[which.max(D2seq_left2mf)])
+                if (basecyc_1st < min_reliable_cyc) {
+                  message(sprintf('The cycle %f < `min_reliable_cyc`, use `min_reliable_cyc` as `basecyc_1st`.', basecyc_1st))
+                  basecyc_1st <- min_reliable_cyc
+                } else {
+                  message(sprintf('The cycle %f >= `min_reliable_cyc`, use the found cycle as `basecyc_1st`.', basecyc_1st)) } } }
+            
+            # basecyc_last
+            if (min_fluo_cyc == num_cycs) {
+              message('The last cycle has the minmum fluo value, use it as `basecyc_last`.')
+              basecyc_last <- num_cycs
+            } else if (approx_min_fluo_index_in_SEQ == length(SEQ)) {
+              message('`approx_min_fluo_index_in_SEQ == length(SEQ)`, use the last cycle as `basecyc_last`.')
+              basecyc_last <- num_cycs
+            } else {
+              maxD2 <- which.max(D2seq)
+              cycmaxD2 <- SEQ[maxD2]
+              if (maxD2 == approx_min_fluo_index_in_SEQ) {
+                message('Maximum second derivative coincides with minimum fluo, use this cycle as `basecyc_last`.')
+                basecyc_last <- floor(cycmaxD2)
+              } else {
+                message('Use the floor of the cycle at the maximum second derivative right to minimum fluo as `basecyc_last`.')
+                D2seq_right2mf <- D2seq[(approx_min_fluo_index_in_SEQ + 1) : length(SEQ)] # right to min_fluo
+                basecyc_last <- floor(SEQ[which.max(D2seq_right2mf) + approx_min_fluo_index_in_SEQ])
+                if (basecyc_last == min_reliable_cyc) {
+                  message(sprintf('Resulting `basecyc_last` equals `min_reliable_cyc` %d, suggesting curve may not be S-shaped, use the last cycle as `basecyc_last`.', min_reliable_cyc))
+                  basecyc_last <- num_cycs}
+              }
+            }
+          }
+          
+          # mspsp
+          minD2 <- which.min(D2seq)
+          cycminD2 <- SEQ[minD2]
+          
+          # end: borrowed from 'efficiency.R'
+          
+        }
+      
+      }
+      
+      message(sprintf('%s: cycles %i:%i were used for baseline subtraction.', baseline, basecyc_1st, basecyc_last))
+      basecyc <- basecyc_1st:basecyc_last
+    }
   }
   
   if (is.numeric(baseline) & length(baseline == 1)) BASE <- baseline
@@ -1275,6 +1290,7 @@ baseline <- function(cyc = NULL, fluo = NULL, model = NULL,
 
 
 # xqrm
+
 # error handling
 err_NA <- function(e) {
     print(e)
@@ -1282,5 +1298,26 @@ err_NA <- function(e) {
 err_e <- function(e) {
     print(e)
     return(e) }
+
+# search by which_func within min_reliable_cyc constraint (wmC)
+search_wmC <- function(cyc_vec, y_vec, which_func, min_reliable_cyc) {
+    target_idx <- which_func(y_vec)
+    if (cyc_vec[target_idx] < min_reliable_cyc) {
+        cyc_idc_ge <- (cyc_vec >= min_reliable_cyc)
+        if (all(is.na(y_vec[cyc_idc_ge]))) {
+            target_idx <- NA
+        } else {
+            num_cyc_idc_lt <- sum(!cyc_idc_ge)
+            min_y = na.omit(min(y_vec))
+            y_mutated <- c(
+                rep(min_y, times=num_cyc_idc_lt),
+                y_vec[cyc_idc_ge])
+            target_idx_above <- which_func(y_mutated)
+            if (target_idx_above > num_cyc_idc_lt + 1) target_idx <- target_idx_above }}
+    return(target_idx)
+    }
+
+
+#
 
 

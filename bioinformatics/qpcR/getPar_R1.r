@@ -5,7 +5,7 @@
 # xqrm
 getPar <- function(
     x, type = c("fit", "curve"), cp = "cpD2", eff = "sigfit",
-    min_Ct,
+    min_reliable_cyc,
     ...) 
 {
   
@@ -31,8 +31,14 @@ getPar <- function(
     RN <- na.omit(RN)
     NR = length(RN)
   } else {
-    RN <- c("ct", "eff")
-    NR = 2 
+    
+    # # ori
+    # RN <- c("ct", "eff")
+    # NR = 2
+    
+    # xqrm, for D1 and D2
+    RN <- c("cq", "eff", "D1max", "D2max", "cpD1", "cpD2")
+    NR <- 6
   }
   
   ## pre-allocate matrix
@@ -57,19 +63,25 @@ getPar <- function(
       outNAME <- switch(cp, "cpD2" = "cpD2", "cpD1" = "cpD1", "maxE" = "cpE", "expR" = "cpR", "Cy0" = "Cy0", "CQ" = "cpCQ", "maxRatio" = "cpMR", stop())
       # tempRES <- tryCatch(efficiency(tempMOD, plot = FALSE, type = cp, ...), # ori
                           #error = function(e) NA) # ori
-      tempRES <- tryCatch(efficiency(tempMOD, plot = FALSE, type = cp, min_Ct = min_Ct, ...), # xqrm
+      tempRES <- tryCatch(efficiency(tempMOD, plot = FALSE, type = cp, min_reliable_cyc = min_reliable_cyc, ...), # xqrm
                           error = err_NA) # xqrm
       tempCT <- tryCatch(tempRES[[outNAME]], 
                          #error = function(e) NA) # ori
                          error = err_NA) # xqrm
       RES[1, i] <- tempCT 
-      RES[2, i] <- switch(eff, "sigfit" =  if (!is.na(tempRES)) tempRES$eff else NA,
-                          "expfit" = tryCatch(expfit(tempMOD, plot = FALSE, ...)$eff, 
-                                              #error = function(e) NA), # ori
-                                              error = err_NA), # xqrm
-                          "sliwin" = tryCatch(sliwin(tempMOD, plot = FALSE, ...)$eff, 
-                                              #error = function(e) NA)) # ori
-                                              error = err_NA)) # xqrm
+      RES[2, i] <- switch(eff, 
+        "sigfit" =  if (!is.na(tempRES)) tempRES$eff else NA,
+        "expfit" = tryCatch(expfit(tempMOD, plot = FALSE, ...)$eff, 
+          #error = function(e) NA), # ori
+          error = err_NA), # xqrm
+        "sliwin" = tryCatch(sliwin(tempMOD, plot = FALSE, ...)$eff, 
+          #error = function(e) NA)) # ori
+          error = err_NA)) # xqrm
+      # xqrm
+      RES[3, i] <- tryCatch(tempRES[["D1max"]], error = err_NA)
+      RES[4, i] <- tryCatch(tempRES[["D2max"]], error = err_NA)
+      RES[5, i] <- tryCatch(tempRES[["cpD1"]], error = err_NA)
+      RES[6, i] <- tryCatch(tempRES[["cpD2"]], error = err_NA)
    }                       
   } 
   

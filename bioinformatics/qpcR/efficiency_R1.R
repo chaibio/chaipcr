@@ -5,7 +5,7 @@ type = "cpD2",
 thresh = NULL, 
 shift = 0, 
 amount = NULL,
-min_Ct, # xqrm
+min_reliable_cyc = 0, # xqrm. default value 0 for 'Cy0'
 ...) 
 {  
     if (!is.numeric(type)) type <- match.arg(type, c("cpD2", "cpD1", "maxE", "expR", "Cy0", "CQ", "maxRatio"))
@@ -28,20 +28,31 @@ min_Ct, # xqrm
     D2seq[!is.finite(D2seq)] <- NA    
     EFFseq <- EFFobj$eff.y        
        
-    maxD1 <- which.max(D1seq)     
-    maxD2 <- which.max(D2seq)      
-    cycmaxD1 <- SEQ[maxD1]      
-    # cycmaxD2 <- SEQ[maxD2]     # ori
+    # # ori
+    # maxD1 <- which.max(D1seq)     
+    # maxD2 <- which.max(D2seq)      
     
-    # xqrm: minimum Ct cutoff for method(s) "cpD2"
-    cycs_ge_cutoff <- (SEQ >= min_Ct)
-    min_D2_value = na.omit(min(D2seq))
-    D2seq_mutated <- c(
-        rep(min_D2_value, times=sum(!cycs_ge_cutoff)),
-        D2seq[cycs_ge_cutoff])
-    maxD2_cyc_above_cutoff <- which.max(D2seq_mutated)
-    cycmaxD2 <- SEQ[maxD2_cyc_above_cutoff]
+    # xqrm
+    maxD1 <- search_wmC(SEQ, D1seq, which.max, min_reliable_cyc)
+    maxD2 <- search_wmC(SEQ, D2seq, which.max, min_reliable_cyc)
+    if (is.na(maxD1)) {
+        D1max <- NA
+        cycmaxD1 <- NA
+    } else {
+        D1max <- D1seq[maxD1]
+        cycmaxD1 <- SEQ[maxD1]
+    }
+    if (is.na(maxD2)) {
+        D2max <- NA
+        cycmaxD2 <- NA
+    } else {
+        D2max <- D2seq[maxD2]
+        cycmaxD2 <- SEQ[maxD2]
+    }
     
+    # # ori
+    # cycmaxD1 <- SEQ[maxD1]      
+    # cycmaxD2 <- SEQ[maxD2]     
     
     if (!is.null(thresh)) type <- "cpD2"        
     
@@ -86,8 +97,13 @@ min_Ct, # xqrm
     
     ## Cy0
     if (type == "Cy0") {
-        Cy0reg <- Cy0(object, plot = FALSE) 
-        maxEFF <- EFFseq[(Cy0reg + shift - 1) * 100]
+        Cy0reg <- Cy0(object, plot = FALSE)
+        # start: xqrm
+        eff_idx <- (Cy0reg + shift - 1) * 100
+        if (eff_idx < 1) eff_idx <- 1
+        maxEFF <- EFFseq[eff_idx]
+        # end: xqrm
+        # maxEFF <- EFFseq[(Cy0reg + shift - 1) * 100] # ori
         if (shift != 0) shiftCyc <- Cy0reg + shift
         CYC <- Cy0reg + shift          
     } else Cy0reg <- NA
@@ -193,5 +209,7 @@ min_Ct, # xqrm
     return(list(eff = maxEFF, resVar = round(resVar(object), 8), AICc = AICc(object), AIC = AIC(object), 
         Rsq = Rsq(object), Rsq.ad = Rsq.ad(object), cpD1 = round(cycmaxD1, 2), cpD2 = round(cycmaxD2, 2), 
         cpE = round(cycmaxEFF, 2), cpR = round(cycEXP, 2), cpT = round(cycF, 2), Cy0 = round(Cy0reg, 2),
-        cpCQ = round(cycCQ, 2), cpMR = round(cycMR, 2), fluo = fluo, init1 = init1, init2 = init2, cf = CF))
+        cpCQ = round(cycCQ, 2), cpMR = round(cycMR, 2), fluo = fluo, init1 = init1, init2 = init2, cf = CF,
+        'D1max'=D1max, 'D2max'=D2max # xqrm
+        ))
 }

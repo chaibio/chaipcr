@@ -16,7 +16,7 @@ modlist <- function(
   baseline, # xqrm
   basecyc = 1:8,
   basefac = 1,
-  min_Ct, # xqrm
+  min_reliable_cyc, # xqrm
   fallback = NULL, # xqrm
   smooth = NULL, 
   smoothPAR = NULL, 
@@ -33,10 +33,10 @@ modlist <- function(
   
   # xqrm:
   num_cycles <- dim(x)[1]
-  if (num_cycles < min_Ct) {
+  if (num_cycles < min_reliable_cyc) {
     pcrfit_weights <- rep(1, times=num_cycles)
   } else {
-    pcrfit_weights <- c(rep(0, times=min_Ct-1), rep(1, times=dim(x)[1]-min_Ct+1)) }
+    pcrfit_weights <- c(rep(0, times=min_reliable_cyc-1), rep(1, times=dim(x)[1]-min_reliable_cyc+1)) }
   if (fallback == 'parm') stop('`fallback` cannot be \'parm\'.')
   
   options(expressions = 50000)  
@@ -160,11 +160,11 @@ modlist <- function(
           FLUO <- baseline(cyc = CYCLES, fluo = FLUO_ori, 
                            model = fitted_model, 
                            baseline = baseline_looped, basefac = basefac, 
-                           min_Ct = min_Ct)
+                           min_reliable_cyc = min_reliable_cyc)
         } else {
           FLUO <- baseline(cyc = CYCLES, fluo = FLUO_ori, model = NULL, baseline = baseline_looped, # xqrm
                            basecyc = basecyc, basefac = basefac, 
-                           min_Ct = min_Ct) } # xqrm
+                           min_reliable_cyc = min_reliable_cyc) } # xqrm
         # bl_out <- baseline(cyc = CYCLES, fluo = FLUO, model = NULL, baseline = baseline, 
                            # basecyc = basecyc, basefac = basefac)
         # FLUO <- bl_out[['bl_corrected']]
@@ -238,7 +238,7 @@ modlist <- function(
         # xqrm
         blmod <- fitOBJ
         t1 <- Sys.time() # time
-        bl_out <- baseline(model = fitOBJ, baseline = baseline_looped, min_Ct = min_Ct)
+        bl_out <- baseline(model = fitOBJ, baseline = baseline_looped, min_reliable_cyc = min_reliable_cyc)
         td <- Sys.time() - t1 # time
         message('Baseline subtraction with \'parm\' took ', round(as.numeric(td), digits=2), ' seconds.') # time
         fitOBJ <- bl_out[['newMODEL']]
