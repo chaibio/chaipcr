@@ -100,7 +100,7 @@
     </div>
 
       <!-- experiment completed successfully -->
-    <div class="row" ng-show="experiment.completed_at">
+    <div class="row" ng-show="experiment.completed_at && !(state !== 'idle' && isCurrentExp)">
       <div class="col-md-1 menu" ng-transclude>
       </div>
       <div class="col-md-4 exp-name x" title="{{experiment.name|uppercase}}">
