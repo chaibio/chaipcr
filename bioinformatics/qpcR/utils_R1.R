@@ -739,7 +739,7 @@ span.smooth = NULL,
 span.peaks = NULL,
 is.deriv = FALSE,
 Tm.opt = NULL,
-dense_factor = 10 # xqrm
+denser_factor = 10 # xqrm
 )
 {
   ### set dataframes to zero
@@ -753,32 +753,36 @@ dense_factor = 10 # xqrm
   # xqrm: start
   TEMP_na_omit <- na.omit(TEMP)
   length_TEMP_na_omit <- length(TEMP_na_omit)
-  FLUO_smoothed <- supsmu(TEMP, FLUO, span = span.smooth / dense_factor)$y
+  FLUO_smoothed <- supsmu(TEMP, FLUO, span = span.smooth / denser_factor)$y
   length_FLUO_smoothed <- length(FLUO_smoothed)
   length_spl <- min(length_TEMP_na_omit, length_FLUO_smoothed)
-  SPLFN <- try(
-    splinefun(
+  SPLFN <- splinefun(
       TEMP_na_omit[1:length_spl], 
-      FLUO_smoothed[1:length_spl] ), 
-    silent = FALSE)
+      FLUO_smoothed[1:length_spl] )
   # xqrm: end
-  if (inherits(SPLFN, "try-error")) return()
+  # if (inherits(SPLFN, "try-error")) return() # ori
   seqTEMP <- seq(
     min(TEMP, na.rm = TRUE), 
     max(TEMP, na.rm = TRUE), 
     # length.out = 10 * length(TEMP)) # ori
-    length.out = dense_factor * length(TEMP)) # xqrm
+    length.out = denser_factor * length(TEMP)) # xqrm
   meltDATA <- cbind(meltDATA, Fluo = SPLFN(seqTEMP)) # ori
   # meltDATA <- cbind(meltDATA, Fluo = supsmu(seqTEMP, SPLFN(seqTEMP), span = span.smooth)$y) # xqrm: smooth raw fluo
   tempDATA <- cbind(tempDATA, Temp = seqTEMP)
   if (!is.deriv) derivVEC <- SPLFN(seqTEMP, deriv = 1) else derivVEC <- -SPLFN(seqTEMP, deriv = 0)
-  SMOOTH <-  try(supsmu(seqTEMP, derivVEC, span = span.smooth), silent = TRUE)
-  if (inherits(SMOOTH, "try-error")) return()
-  derivDATA <- cbind(derivDATA, df.dT = -SMOOTH$y)
+  # SMOOTH <-  try(supsmu(seqTEMP, derivVEC, span = span.smooth), silent = TRUE) # ori
+  SMOOTH <- supsmu(seqTEMP, derivVEC, span = span.smooth) # xqrm
+  # derivDATA <- cbind(derivDATA, df.dT = -SMOOTH$y) # ori
+  # xqrm
+  deriv_smooth <- -SMOOTH$y
+  if (length(deriv_smooth) == 1) deriv_smooth <- rep(deriv_smooth, times=length(seqTEMP))
+  derivDATA <- cbind(derivDATA, df.dT = deriv_smooth)
   
   ### find peaks in first derivative data
-  PEAKS <- try(peaks(-SMOOTH$y, span = span.peaks)$x, silent = TRUE)
-  if (inherits(PEAKS, "try-error")) return()
+  # PEAKS <- try(peaks(-SMOOTH$y, span = span.peaks)$x, silent = TRUE) # ori
+  PEAKS <- try(peaks(-SMOOTH$y, span = span.peaks)$x, silent = FALSE) # xqrm
+  # if (inherits(PEAKS, "try-error")) return() # ori
+  if (inherits(PEAKS, "try-error")) TMs <- NA # xqrm
   TMs <- seqTEMP[PEAKS]
   TMs <- TMs[!is.na(TMs)]
   if (length(TMs) == 0) TMs <- NA # xqrm

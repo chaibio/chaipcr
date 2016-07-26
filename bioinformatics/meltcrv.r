@@ -8,9 +8,9 @@ process_mc <- function(
     dye_in='FAM', dyes_2bfild=NULL, 
     dcv=TRUE, # logical, whether to perform multi-channel deconvolution
     auto_span_smooth=FALSE, 
-    span_smooth_factor=7.2, 
     span_smooth_default=0.015, # qpcR default 0.05. used: 0.005, 0.01, 0.015, 0.02, 0.05, 0.1, 0.15, 0.2
-    max_temp=1000.1, # analyze only the data with temperature lower than this
+    span_smooth_factor=7.2, 
+    max_temp=1000, # analyze only the data with temperature lower than this
     mc_plot=FALSE, # whether to plot melting curve data
     extra_output=FALSE, 
     show_running_time=FALSE # option to show time cost to run this function
@@ -79,24 +79,24 @@ process_mc <- function(
     # fc_wT_bych <- fc_wT_bych[2] # channel 2
     
     
-    mc_out_pp <- process_mtch(
+    mc_out_pc <- process_mtch(
         fc_wT_bych, 
         matrix2array=FALSE, # doesn't matter because no original output was matrix
         func=mc_tm_all, 
         auto_span_smooth, 
-        span_smooth_factor, 
         span_smooth_default, 
+        span_smooth_factor, 
         mc_plot, 
         show_running_time
-        )
+        )[['pre_consoli']]
     
     if (extra_output) {
         mc_out <- list( # each element is a list whose each element represents a channel
-            'mc_bywell'=mc_out_pp[['pre_consoli']], # each channel element is a list whose each element is a well
+            'mc_bywell'=mc_out_pc, # each channel element is a list whose each element is a well
             'num_channels'=num_channels, 
             'fc_wT'=fc_wT_bych, 'pre_dcv_fc_wT'=pre_dcv_fc_wT_bych # each channel element of fc_wT or pre_dcv_fc_wT_bych is a matrix formatted as input for `meltcurve` by qpcR, where columns are alternating 'temp' and 'fluo'.
             )
-    } else mc_out <- mc_out_pp[['pre_consoli']]
+    } else mc_out <- mc_out_pc
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]
@@ -181,7 +181,8 @@ mc_tm_pw <- function(
     Fluo_normd <- Fluo_ori - min(Fluo_ori)
     mc <- cbind(mt_pw[,'Temp'], Fluo_normd, mt_pw[,'df.dT'])
     colnames(mc) <- c('Temp', 'Fluo', '-df/dT')
-    mc <- as.data.frame(mc[seq(1, dim(mc)[1],10),]) # `as.data.frame` ensures proper plotting, select 1/10 sparse data points
+    mc <- mc[c(seq(1, dim(mc)[1], 10), dim(mc)[1]),] # also include `dim(mc)[1]` to have at least 2 rows to maintain data frame format
+    # mc <- as.data.frame(mc[seq(1, dim(mc)[1], 10),]) # `as.data.frame` ensures proper plotting, select 1/10 sparse data points
     
     raw_tm <- na.omit(mt_pw[, c('Tm', 'Area')])
     
@@ -208,8 +209,8 @@ mc_tm_pw <- function(
 mc_tm_all <- function(
     fc_wT, 
     auto_span_smooth, 
-    span_smooth_factor, 
     span_smooth_default, 
+    span_smooth_factor, 
     mc_plot, 
     show_running_time, 
     ...) { # options to pass onto `mc_tm_pw`
@@ -222,8 +223,8 @@ mc_tm_all <- function(
         fc_wT, 
         temp_1side=2, # xqrm
         auto_span_smooth=auto_span_smooth, # xqrm
-        span_smooth_factor=span_smooth_factor, # xqrm
         span_smooth_default=span_smooth_default, # xqrm. 
+        span_smooth_factor=span_smooth_factor, # xqrm
         span.peaks=51, # default 51.
         plot=mc_plot) # using qpcR function `meltcurve`
     mt_out <- lapply(mt_ori, FUN=mc_tm_pw, ...)

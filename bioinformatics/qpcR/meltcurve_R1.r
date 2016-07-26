@@ -9,8 +9,8 @@ norm = FALSE,
 auto_span_smooth = TRUE, # xqrm
 temp_1side = NULL, # xqrm
 # span.smooth = 0.05, # ori
-span_smooth_factor = NULL, # xqrm
 span_smooth_default = NULL, # xqrm
+span_smooth_factor = NULL, # xqrm
 span.peaks = 51,
 is.deriv = FALSE, 
 Tm.opt = NULL, 
@@ -72,7 +72,7 @@ cut.Area = 0,
     if (norm) FLUO <- rescale(FLUO, 0, 1)    
     
     
-    # start: xqrm: determine span_smooth
+   # start: xqrm: determine span_smooth
     
     if (auto_span_smooth) {
       
