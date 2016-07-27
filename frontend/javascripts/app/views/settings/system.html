@@ -51,6 +51,13 @@
     </div>
 
     <support-access></support-access>
+	
+	<div class="wizard">
+	  <h3 class="wizard-header support-text">Export Database</h3>
+	  <p>Export System database to share with support staff. Usually takes about 15 seconds</p>
+      <button ng-show="!exporting" ng-click="export()" class="normal-button">Export</button>
+	  <button ng-show="exporting" ng-click="export()" class="normal-button">Exporting<ellipsis-animated><ellipsis-animated/></button>
+	</div>
 
   </div>
 </div>

@@ -66,6 +66,9 @@ window.App.service 'Device', [
         @getCapabilities().then (resp) ->
           deferred.resolve resp.data.capabilities?.optics?.emission_channels?.length is 2
         return deferred.promise
+		
+      exportDatabase: ->
+        $http.get("/device/export_database", responseType: 'arraybuffer')		  		
 
       channelCount: ->
         deferred = $q.defer()
