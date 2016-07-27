@@ -29,6 +29,7 @@
 #include <exception>
 #include <sstream>
 #include <fstream>
+#include <system_error>
 
 #include "pcrincludes.h"
 #include "gpio.h"
@@ -91,13 +92,27 @@ GPIO::Value GPIO::value() const {
         throw GPIOError("Unexpected error: GPIO was moved");
 
 	ostringstream filePath;
-	ifstream valueFile;
-	char buf[2];
-	
-	filePath << "/sys/class/gpio/gpio" << pinNumber_ << "/value";
-	valueFile.open(filePath.str());
-	valueFile >> buf;
-	valueFile.close();
+    filePath << "/sys/class/gpio/gpio" << pinNumber_ << "/value";
+
+    ifstream valueFile;
+    valueFile.exceptions(ofstream::failbit | ofstream::badbit);
+
+    try {
+        valueFile.open(filePath.str());
+    }
+    catch (...) {
+        throw std::system_error(errno, std::generic_category(), "Unable to open a gpio file (" + filePath.str() + ") -");
+    }
+
+    char buf[2];
+
+    try {
+        valueFile >> buf;
+        valueFile.close();
+    }
+    catch (...) {
+        throw std::system_error(errno, std::generic_category(), "Unable to read a gpio file (" + filePath.str() + ") -");
+    }
 	
 	switch (buf[0]) {
 	case '0':
@@ -113,34 +128,51 @@ GPIO::Value GPIO::value() const {
 	}
 }
 
-void GPIO::setValue(Value value, bool checkValue) {
+void GPIO::setValue(Value value, bool forceUpdate) {
     if (pinNumber_ == UINT_MAX)
         throw GPIOError("Unexpected error: GPIO was moved");
 
-    if (checkValue && value == savedValue_)
+    if (!forceUpdate && value == savedValue_)
         return;
 
 	if (direction_ != kOutput)
-		throw InvalidState("Attempt to set value of non-output GPIO pin");
+        throw InvalidState("Attempt to set a value to a non-output GPIO pin");
 	
-	ostringstream filePath;
-	ofstream valueFile;
-	
+    ostringstream filePath;
 	filePath << "/sys/class/gpio/gpio" << pinNumber_ << "/value";
-	valueFile.open(filePath.str());
+
+    ofstream valueFile;
+    valueFile.exceptions(ofstream::failbit | ofstream::badbit);
+
+    try {
+        valueFile.open(filePath.str());
+    }
+    catch (...) {
+        throw std::system_error(errno, std::generic_category(), "Unable to open a gpio file (" + filePath.str() + ") -");
+    }
 	
-	switch (value) {
-    case kInput:
-		valueFile << "0";
-		break;
-	
-	case kOutput:
-		valueFile << "1";
-		break;
-	
-	default:
-		throw invalid_argument("Invalid GPIO value");
-	}
+    try {
+        switch (value) {
+        case kInput:
+            valueFile << "0";
+            valueFile.flush();
+            break;
+
+        case kOutput:
+            valueFile << "1";
+            valueFile.flush();
+            break;
+
+        default:
+            throw invalid_argument("Invalid GPIO value");
+        }
+    }
+    catch (const invalid_argument &/*ex*/) {
+        throw;
+    }
+    catch (...) {
+        throw std::system_error(errno, std::generic_category(), "Unable to write into a gpio file (" + filePath.str() + ") -");
+    }
 	
 	valueFile.close();
     savedValue_ = value;
