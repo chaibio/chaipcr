@@ -154,6 +154,11 @@ angular.module("canvasApp").factory('stage', [
         $scope.applyValues(selected.circle);
         selected.circle.manageClick();
         stageGraphics.recalculateStageHitPoint.call(this);
+
+        if(this.parent.allStepViews.length === 1) {
+          this.parent.editStageMode(this.parent.editStageMode);
+        }
+        
         this.parent.setDefaultWidthHeight();
       };
 

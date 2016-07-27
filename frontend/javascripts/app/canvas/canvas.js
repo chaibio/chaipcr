@@ -179,7 +179,6 @@ angular.module("canvasApp").factory('canvas', [
     };
 
     this.editStageMode = function(status) {
-
       var add = (status) ? 25 : -25;
 
       if(status === true) {
@@ -191,18 +190,24 @@ angular.module("canvasApp").factory('canvas', [
         previouslySelected.circle.parent.parentStage.changeFillsAndStrokes("white", 2);
         this.editStageStatus = status; // This order editStageStatus is changed is important, because changeFillsAndStrokes()
       }
+      //console.log(this.allStageViews); Look for this issue. when there is only one stage and 2 steps allStageViews is undefined.
+      var stageCount = this.allStageViews.length;
+      var stepCount = this.allStepViews.length;
 
       this.allStageViews.forEach(function(stage, index) {
-        stage.dots.setVisible(status);
-        stage.stageNameGroup.left = stage.stageNameGroup.left + add;
+        if(stageCount > 1) {
+          stage.dots.setVisible(status);
+          stage.stageNameGroup.left = stage.stageNameGroup.left + add;
+        }
 
         stage.childSteps.forEach(function(step, index) {
-          step.closeImage.setVisible(status);
-          step.dots.setVisible(status);
+          if(stepCount > 1) {
+            step.closeImage.setVisible(status);
+            step.dots.setVisible(status);
+          }
 
           if(step.parentStage.model.auto_delta) {
             if(step.index === 0) {
-
               step.deltaSymbol.setVisible(!status);
             }
             step.deltaGroup.setVisible(!status);
