@@ -25,17 +25,47 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
   'Status',
   '$timeout'
   '$rootScope'
-  ($scope, $stateParams, Experiment, $state, AmplificationChartHelper, Status, $timeout, $rootScope) ->
+  '$http'  
+  ($scope, $stateParams, Experiment, $state, AmplificationChartHelper, Status, $timeout, $rootScope, $http) ->
     $scope.params = $stateParams
     $scope.lidOpen = false
     $scope.showProperties = false
     $scope.status = null
     $scope.exp = null
+    $scope.errorExport = false	
 
     $scope.deleteExperiment = ->
       exp = new Experiment id: $stateParams.id
       exp.$delete id: $stateParams.id, ->
         $state.go 'home'
+		
+    callAtTimeout = ->
+      $scope.exportExperiment()				
+		
+    $scope.exportExperiment = ->
+      $scope.errorExport = false		
+      id = $stateParams.id
+      url = "/experiments/"+$stateParams.id+"/export"	  		
+      $http.get(url, responseType: 'arraybuffer')
+      .success (resp,status) =>
+        if status == 202
+          $timeout callAtTimeout, 500	    				  
+        console.log status
+        if status!= 202		
+          blob = new Blob([resp], type: 'application/octet-stream')
+          link = document.createElement('a')
+          link.href = window.URL.createObjectURL(blob)
+          link.download = 'export.zip'
+          link.click()										
+	
+      .error (resp,status) =>
+        console.log status	    	  
+        if status == 503
+          $timeout callAtTimeout, 500
+        else
+          $scope.errorExport = true					  					  		  				  	        				
+		
+    	  		    		
 
     $scope.$watch (()->
       $scope.showProperties), (val) ->
@@ -62,8 +92,10 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
     $scope.getExperiment()
 
     $rootScope.$on 'sidemenu:toggle', ->
+      $scope.errorExport = false		
       if $scope.showProperties and angular.element('.sidemenu').width() > 100
         $scope.showProperties = false
+        #$scope.errorExport = false					
 
     $scope.$on 'status:data:updated', (e, data, oldData) ->
       $scope.lidOpen = if data?.optics?.lid_open == "true" then true else false
