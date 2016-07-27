@@ -29,69 +29,82 @@ class CronLogger
 end
 
 class CronDB
-       def initialize(env)
-	         @logger = CronLogger.new(env)
-	         @env = env
-       	   @db = nil
-           @conf = nil
-	         if env and (@conf = YAML.load_file("config/database.yml")[env])
-             if Mysql2::Client.const_defined? :FOUND_ROWS
-               @conf[:flags] = Mysql2::Client::FOUND_ROWS
-             end
-             #create mysql2
-             puts @conf
-             @db = Mysql2::Client.new(@conf.symbolize_keys)
- 	         else
-		         @logger.error("Your environment is not initialized: #{env if env}", nil)
-	         end
-       end
-
-       def close
-         if @db
-	         @db.close
+   CONFIGURATION_FILE_PATH = "/root/configuration.json"
+  
+   def initialize(env)
+       @logger = CronLogger.new(env)
+       @env = env
+   	   @db = nil
+       @conf = nil
+       if env and (@conf = YAML.load_file("config/database.yml")[env])
+         if Mysql2::Client.const_defined? :FOUND_ROWS
+           @conf[:flags] = Mysql2::Client::FOUND_ROWS
          end
+         #create mysql2
+         puts @conf
+         @db = Mysql2::Client.new(@conf.symbolize_keys)
+       else
+         @logger.error("Your environment is not initialized: #{env if env}", nil)
        end
+   end
 
-       def ok?
-       	   @db != nil
-       end
+   def close
+     if @db
+       @db.close
+     end
+   end
 
-       def conf
-           @conf
-       end
+   def ok?
+   	   @db != nil
+   end
 
-       def execute(cmd)
-           puts cmd
-           @db.query(cmd)
-       end
+   def conf
+       @conf
+   end
 
-       def optimize_tables
-       	   tables = @db.query("show tables")
-       	   @logger.info tables.count
-	         tables.each do |row|
-               optimize_query = "optimize table #{row.values.first}"
-	             puts optimize_query
-	             @db.query(optimize_query)
-	         end
-       end
+   def execute(cmd)
+       puts cmd
+       @db.query(cmd)
+   end
 
-       def clean_tokens
-       	   result = @db.query("DELETE FROM `user_tokens` WHERE expired_at < NOW() - INTERVAL 1 DAY")
-  	       @logger.info "RubyCron: Removed #{@db.affected_rows} tokens"
+   def optimize_tables
+   	   tables = @db.query("show tables")
+   	   @logger.info tables.count
+       tables.each do |row|
+           optimize_query = "optimize table #{row.values.first}"
+           puts optimize_query
+           @db.query(optimize_query)
        end
+   end
 
-       protected
+   def clean_tokens
+   	   result = @db.query("DELETE FROM `user_tokens` WHERE expired_at < NOW() - INTERVAL 1 DAY")
+       @logger.info "RubyCron: Removed #{@db.affected_rows} tokens"
+   end
 
-       def strip_non_words(string)
-         string_encoded = string.force_encoding(Encoding::ASCII_8BIT)
-         string_encoded.gsub!(/[^\p{Alnum}\p{Punct}]/, ' ') # non-word characters
-         string_reencoded = string_encoded.force_encoding("utf-8")
-         string_reencoded #return
-       end
-       
-       def truncate(text, length = 30, truncate_string = "...")
-           if text.nil? then return end
-           l = length - truncate_string.mb_chars.length
-           (text.mb_chars.length > length ? text.mb_chars[0...l] + truncate_string : text).to_s
-       end
+   def software_version
+     begin
+       configuration_file = File.read(CONFIGURATION_FILE_PATH)
+     rescue => e
+       @logger.error("File read error", e)
+       return nil
+     end
+     @configuration_hash = JSON.parse(configuration_file) if configuration_file
+     return (@configuration_hash && @configuration_hash["software"])? @configuration_hash["software"]["version"] : nil
+   end
+     
+   protected
+
+   def strip_non_words(string)
+     string_encoded = string.force_encoding(Encoding::ASCII_8BIT)
+     string_encoded.gsub!(/[^\p{Alnum}\p{Punct}]/, ' ') # non-word characters
+     string_reencoded = string_encoded.force_encoding("utf-8")
+     string_reencoded #return
+   end
+   
+   def truncate(text, length = 30, truncate_string = "...")
+       if text.nil? then return end
+       l = length - truncate_string.mb_chars.length
+       (text.mb_chars.length > length ? text.mb_chars[0...l] + truncate_string : text).to_s
+   end
 end

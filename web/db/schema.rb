@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160715071912) do
+ActiveRecord::Schema.define(version: 20160726053015) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -34,6 +34,13 @@ ActiveRecord::Schema.define(version: 20160715071912) do
   end
 
   add_index "amplification_data", ["experiment_id", "stage_id", "cycle_num", "well_num", "channel"], name: "index_amplification_data_by_exp_chan_stage_cycle_well_channel", unique: true, using: :btree
+
+  create_table "cached_analyze_data", force: true do |t|
+    t.integer "experiment_id"
+    t.text    "analyze_result", limit: 16777215
+  end
+
+  add_index "cached_analyze_data", ["experiment_id"], name: "index_cached_analyze_data_on_experiment_id", unique: true, using: :btree
 
   create_table "cached_melt_curve_data", force: true do |t|
     t.integer "experiment_id"
@@ -118,6 +125,8 @@ ActiveRecord::Schema.define(version: 20160715071912) do
     t.integer "calibration_id"
     t.boolean "time_valid",               default: true
     t.string  "software_release_variant", default: "stable", null: false
+    t.integer "power_cycles",             default: 0
+    t.string  "cached_version"
   end
 
   create_table "stages", force: true do |t|

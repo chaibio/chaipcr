@@ -146,7 +146,7 @@ class ExperimentsController < ApplicationController
           @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
           if !@first_stage_collect_data.blank?
             begin
-              task_submitted = background_calculate_amplification_data(@experiment, @first_stage_collect_data.id, @experiment.calibration_id)
+              task_submitted = background_calculate_amplification_data(@experiment, @first_stage_collect_data.id)
             rescue => e
               render :json=>{:errors=>e.to_s}, :status => 500
               return
@@ -244,7 +244,7 @@ class ExperimentsController < ApplicationController
         @first_stage_meltcurve_data = Stage.joins(:protocol).where(["experiment_definition_id=? and stage_type='meltcurve'", @experiment.experiment_definition_id]).first
         if !@first_stage_meltcurve_data.blank?
           begin
-            task_submitted = background_calculate_melt_curve_data(@experiment, @first_stage_meltcurve_data.id, @experiment.calibration_id)
+            task_submitted = background_calculate_melt_curve_data(@experiment, @first_stage_meltcurve_data.id)
           rescue => e
             render :json=>{:errors=>e.to_s}, :status => 500
             return
@@ -292,7 +292,7 @@ class ExperimentsController < ApplicationController
       first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
       if first_stage_collect_data
         begin
-          task_submitted = background_calculate_amplification_data(@experiment, first_stage_collect_data.id, @experiment.calibration_id)
+          task_submitted = background_calculate_amplification_data(@experiment, first_stage_collect_data.id)
           if task_submitted.nil? #cached
             amplification_data = AmplificationDatum.retrieve(@experiment, first_stage_collect_data.id)
             cts = AmplificationCurve.retrieve(@experiment, first_stage_collect_data.id)
@@ -342,7 +342,7 @@ class ExperimentsController < ApplicationController
       first_stage_meltcurve_data = Stage.joins(:protocol).where(["experiment_definition_id=? and stage_type='meltcurve'", @experiment.experiment_definition_id]).first
       if first_stage_meltcurve_data
         begin
-          task_submitted = background_calculate_melt_curve_data(@experiment, first_stage_meltcurve_data.id, @experiment.calibration_id)
+          task_submitted = background_calculate_melt_curve_data(@experiment, first_stage_meltcurve_data.id)
           if task_submitted.nil? #cached
             melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment.id, first_stage_meltcurve_data.id)
           else
@@ -387,30 +387,17 @@ class ExperimentsController < ApplicationController
   
   def analyze
     if @experiment && !@experiment.experiment_definition.guid.blank?
-      config   = Rails.configuration.database_configuration
-      connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
-      begin
-        connection.eval("source(\"#{Rails.configuration.dynamic_file_path}/#{@experiment.experiment_definition.guid}/analyze.R\")")
-        response = connection.eval("tryCatchError(analyze, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{@experiment.id}, #{calibrate_info(@experiment.calibration_id)})").to_ruby
-      rescue  => e
-        logger.error("Rserve error: #{e}")
-        kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
-        render :json=>{:errors=>"Internal Server Error (#{e})"}, :status => 500
-        return
-      ensure
-        connection.close
-      end
-      if response.is_a? String
-        if @experiment.diagnostic?
-          @experiment.update_attributes(:analyze_status=>(response.include?("false"))? "failed" : "success")
+      cached_data = CachedAnalyzeDatum.where(:experiment_id=>@experiment.id).first
+      if cached_data.nil? #no cache data found
+        begin
+          task_submitted = background_analyze_data(@experiment)
+          render :nothing => true, :status => (task_submitted)? 202 : 503
+        rescue  => e
+          render :json=>{:errors=>e}, :status => 500
         end
-        render :json=>response
-      elsif response && !response["message"].blank?
-        render :json=>{:errors=>response["message"]}, :status => 500
       else
-        render :json=>{:errors=>"R code response is not json: #{response}"}, :status => 500
+        render :json=>cached_data.analyze_result
       end
-      return
     else
       render :json=>{:errors=>"experiment not found"}, :status => :not_found
     end
@@ -422,13 +409,15 @@ class ExperimentsController < ApplicationController
     @experiment = Experiment.find_by_id(params[:id]) if @experiment.nil?
   end
   
-  def background_calculate_amplification_data(experiment, stage_id, calibration_id)
+  def background_calculate_amplification_data(experiment, stage_id)
     return nil if !FluorescenceDatum.new_data_generated?(experiment.id, stage_id)
     return background("amplification", experiment.id) do
-      amplification_data, cts = calculate_amplification_data(experiment.id, stage_id, calibration_id)
+      amplification_data, cts = calculate_amplification_data(experiment.id, stage_id, experiment.calibration_id)
       #update cache
       AmplificationDatum.import amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value]
       AmplificationCurve.import cts, :on_duplicate_key_update => [:ct]
+      #update cached version
+      Setting.update_all(["cached_version=?",DeviceConfiguration.software_version])
     end
   end
   
@@ -482,11 +471,11 @@ class ExperimentsController < ApplicationController
     return amplification_data, cts
   end
 
-  def background_calculate_melt_curve_data(experiment, stage_id, calibration_id)
+  def background_calculate_melt_curve_data(experiment, stage_id)
     new_data = MeltCurveDatum.new_data_generated?(experiment, stage_id)
     return nil if new_data.nil?
     return background("meltcurve", experiment.id) do
-      melt_curve_data = calculate_melt_curve_data(experiment.id, stage_id, calibration_id)
+      melt_curve_data = calculate_melt_curve_data(experiment.id, stage_id, experiment.calibration_id)
       #update cache
       CachedMeltCurveDatum.import melt_curve_data, :on_duplicate_key_update => [:temperature_text, :fluorescence_data_text, :derivative_text, :tm_text, :area_text]
       #update cached_temperature
@@ -496,6 +485,8 @@ class ExperimentsController < ApplicationController
           experiment.update_attributes(:cached_temperature=>cached_temperature)
         end
       end
+      #update cached version
+      Setting.update_all(["cached_version=?",DeviceConfiguration.software_version])
     end
   end
   
@@ -532,6 +523,34 @@ class ExperimentsController < ApplicationController
     logger.info("Rails code time #{Time.now-start_time}")
     return melt_curve_data
   end
+
+  def background_analyze_data(experiment)
+    background("analyze", experiment.id) do
+      config   = Rails.configuration.database_configuration
+      connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
+      begin
+        connection.eval("source(\"#{Rails.configuration.dynamic_file_path}/#{experiment.experiment_definition.guid}/analyze.R\")")
+        response = connection.eval("tryCatchError(analyze, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, #{calibrate_info(experiment.calibration_id)})").to_ruby
+        new_data = CachedAnalyzeDatum.new(:experiment_id=>experiment.id, :analyze_result=>response)
+      rescue  => e
+        logger.error("Rserve error: #{e}")
+        kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
+        raise e
+      ensure
+        connection.close
+      end
+      raise response["message"] if response && !response["message"].blank? #catched error
+
+      #update analyze status
+      if experiment.diagnostic?
+        experiment.update_attributes(:analyze_status=>(response.include?("false"))? "failed" : "success")
+      end
+      #update cache
+      CachedAnalyzeDatum.import [new_data], :on_duplicate_key_update => [:analyze_result]
+      #update cached version
+      Setting.update_all(["cached_version=?",DeviceConfiguration.software_version])
+    end
+  end
   
   def calibrate_info(calibration_id)
     protocol = Protocol.includes(:stages).where("protocols.experiment_definition_id=(SELECT experiment_definition_id from experiments where experiments.id=#{calibration_id} LIMIT 1)").first
@@ -560,7 +579,7 @@ class ExperimentsController < ApplicationController
     end
     result
   end
-  
+
   def background(action, experiment_id, &block)
     if @@background_last_task && @@background_last_task.match?(action, experiment_id)
       error = @@background_last_task.complete_result
@@ -572,6 +591,7 @@ class ExperimentsController < ApplicationController
         begin
           yield
         rescue => e
+          logger.error ("background task error: #{e}")
           @@background_task.complete_result = e
           @@background_last_task = @@background_task
         ensure
@@ -580,7 +600,7 @@ class ExperimentsController < ApplicationController
         end
       end
       return true #background process is started
-    elsif @@background_task.action == action && @@background_task.experiment_id == experiment_id
+    elsif @@background_task.match?(action, experiment_id)
       return true #@@background_task process is still in progress
     else
       return false #there is already another background process, return resource unavailable
