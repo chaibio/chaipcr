@@ -83,17 +83,23 @@ class CronDB
    end
 
    def software_version
-     begin
-       configuration_file = File.read(CONFIGURATION_FILE_PATH)
-     rescue => e
-       @logger.error("File read error", e)
-       return nil
-     end
-     @configuration_hash = JSON.parse(configuration_file) if configuration_file
-     return (@configuration_hash && @configuration_hash["software"])? @configuration_hash["software"]["version"] : nil
+     return (configuration_hash && configuration_hash["software"])? configuration_hash["software"]["version"] : nil
    end
      
    protected
+
+   def configuration_hash
+     if @configuration_hash == nil
+       begin
+         configuration_file = File.read(CONFIGURATION_FILE_PATH)
+       rescue => e
+         @logger.error("File read error", e)
+         return nil
+       end
+       @configuration_hash = JSON.parse(configuration_file) if configuration_file
+     end
+     @configuration_hash
+   end
 
    def strip_non_words(string)
      string_encoded = string.force_encoding(Encoding::ASCII_8BIT)
