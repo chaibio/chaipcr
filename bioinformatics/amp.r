@@ -204,6 +204,8 @@ get_amplification_data <- function(
                 'maxq_blsub_fluo'=maxq_blsub_fluo) )
     } else result_mtch <- downstream
     
+    check_obj2br(result_mtch)
+    
     return(result_mtch)
     }
 

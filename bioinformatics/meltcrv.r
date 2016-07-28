@@ -102,6 +102,8 @@ process_mc <- function(
     end_time <- proc.time()[['elapsed']]
     if (show_running_time) message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
     
+    check_obj2br(mc_out)
+    
     return(mc_out)
     }
 
@@ -181,8 +183,8 @@ mc_tm_pw <- function(
     Fluo_normd <- Fluo_ori - min(Fluo_ori)
     mc <- cbind(mt_pw[,'Temp'], Fluo_normd, mt_pw[,'df.dT'])
     colnames(mc) <- c('Temp', 'Fluo', '-df/dT')
-    mc <- mc[c(seq(1, dim(mc)[1], 10), dim(mc)[1]),] # also include `dim(mc)[1]` to have at least 2 rows to maintain data frame format
-    # mc <- as.data.frame(mc[seq(1, dim(mc)[1], 10),]) # `as.data.frame` ensures proper plotting, select 1/10 sparse data points
+    message('class(mc) before selection: ', class(mc))
+    mc <- as.data.frame(mc[c(seq(1, dim(mc)[1], 10), dim(mc)[1]),]) # select 1/10 sparse data points. also include `dim(mc)[1]` to have at least 2 rows to maintain data frame format. `as.data.frame` to ensure proper plotting.
     
     raw_tm <- na.omit(mt_pw[, c('Tm', 'Area')])
     

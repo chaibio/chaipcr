@@ -40,6 +40,13 @@ scaling_factor_optic_calib <- 3.7 # used: 9e5, 1e5, 1.2e6, 3
 scaling_factors_deconv <- c('1'=1, '2'=5.6) # used: c('1'=1, '2'=1, 2, 3.5, 8, 7, 5.6)
 
 
+# function: check object to be returned
+check_obj2br <- function(obj2br) {
+    message('returning non-null output: ', !is.null(obj2br))
+    for (obj_ele in obj2br) print(summary(obj2br))
+    }
+
+
 # function: connect to MySQL database; message about data selection
 db_etc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
                    exp_id, stage_id, calib_info # for selecting data to analyze
