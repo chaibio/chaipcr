@@ -183,7 +183,6 @@ mc_tm_pw <- function(
     Fluo_normd <- Fluo_ori - min(Fluo_ori)
     mc <- cbind(mt_pw[,'Temp'], Fluo_normd, mt_pw[,'df.dT'])
     colnames(mc) <- c('Temp', 'Fluo', '-df/dT')
-    message('class(mc) before selection: ', class(mc))
     mc <- as.data.frame(mc[c(seq(1, dim(mc)[1], 10), dim(mc)[1]),]) # select 1/10 sparse data points. also include `dim(mc)[1]` to have at least 2 rows to maintain data frame format. `as.data.frame` to ensure proper plotting.
     
     raw_tm <- na.omit(mt_pw[, c('Tm', 'Area')])
