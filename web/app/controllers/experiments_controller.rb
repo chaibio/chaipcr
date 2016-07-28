@@ -387,16 +387,24 @@ class ExperimentsController < ApplicationController
   
   def analyze
     if @experiment && !@experiment.experiment_definition.guid.blank?
-      cached_data = CachedAnalyzeDatum.where(:experiment_id=>@experiment.id).first
-      if cached_data.nil? #no cache data found
-        begin
-          task_submitted = background_analyze_data(@experiment)
-          render :nothing => true, :status => (task_submitted)? 202 : 503
-        rescue  => e
-          render :json=>{:errors=>e}, :status => 500
+      if @experiment.completion_status == "success"
+        cached_data = CachedAnalyzeDatum.where(:experiment_id=>@experiment.id).first
+        if cached_data.nil? #no cache data found
+          begin
+            task_submitted = background_analyze_data(@experiment)
+            render :nothing => true, :status => (task_submitted)? 202 : 503
+          rescue  => e
+            render :json=>{:errors=>e}, :status => 500
+          end
+        else
+          render :json=>cached_data.analyze_result
         end
+      elsif !@experiment.ran?
+        render :json=>{:errors=>"Please run the experiment before calling analyze"}, :status => 500
+      elsif !@experiment.running?
+        render :json=>{:errors=>"Please wait for the experiment to be completed before calling analyze"}, :status => 500
       else
-        render :json=>cached_data.analyze_result
+        render :json=>{:errors=>"experiment cannot be analyzed because it wasn't completed successfully (status=#{completion_status})"}, :status => 500
       end
     else
       render :json=>{:errors=>"experiment not found"}, :status => :not_found
@@ -416,8 +424,6 @@ class ExperimentsController < ApplicationController
       #update cache
       AmplificationDatum.import amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value]
       AmplificationCurve.import cts, :on_duplicate_key_update => [:ct]
-      #update cached version
-      Setting.update_all(["cached_version=?",DeviceConfiguration.software_version])
     end
   end
   
@@ -485,8 +491,6 @@ class ExperimentsController < ApplicationController
           experiment.update_attributes(:cached_temperature=>cached_temperature)
         end
       end
-      #update cached version
-      Setting.update_all(["cached_version=?",DeviceConfiguration.software_version])
     end
   end
   
@@ -547,8 +551,6 @@ class ExperimentsController < ApplicationController
       end
       #update cache
       CachedAnalyzeDatum.import [new_data], :on_duplicate_key_update => [:analyze_result]
-      #update cached version
-      Setting.update_all(["cached_version=?",DeviceConfiguration.software_version])
     end
   end
   

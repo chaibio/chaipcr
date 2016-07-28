@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160726053015) do
+ActiveRecord::Schema.define(version: 20160728065948) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -76,6 +76,7 @@ ActiveRecord::Schema.define(version: 20160726053015) do
     t.boolean  "time_valid",                                       default: true
     t.string   "analyze_status"
     t.decimal  "cached_temperature",       precision: 7, scale: 4
+    t.integer  "power_cycles"
   end
 
   create_table "fluorescence_data", id: false, force: true do |t|
@@ -126,7 +127,6 @@ ActiveRecord::Schema.define(version: 20160726053015) do
     t.boolean "time_valid",               default: true
     t.string  "software_release_variant", default: "stable", null: false
     t.integer "power_cycles",             default: 0
-    t.string  "cached_version"
   end
 
   create_table "stages", force: true do |t|

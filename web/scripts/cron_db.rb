@@ -82,6 +82,14 @@ class CronDB
        @logger.info "RubyCron: Removed #{@db.affected_rows} tokens"
    end
 
+   def clean_cache
+     @logger.info "clean cached data"
+     execute("DELETE FROM `amplification_curves`")
+     execute("DELETE FROM `amplification_data`")
+     execute("DELETE FROM `cached_melt_curve_data`")
+     execute("DELETE FROM `cached_analyze_data`")
+   end
+   
    def software_version
      return (configuration_hash && configuration_hash["software"])? configuration_hash["software"]["version"] : nil
    end
