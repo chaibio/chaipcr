@@ -156,9 +156,9 @@ angular.module("canvasApp").factory('stage', [
         stageGraphics.recalculateStageHitPoint.call(this);
 
         if(this.parent.allStepViews.length === 1) {
-          this.parent.editStageMode(this.parent.editStageMode);
+          this.parent.editStageMode(this.parent.editStageStatus);
         }
-        
+
         this.parent.setDefaultWidthHeight();
       };
 
