@@ -89,8 +89,8 @@ UpdateManager::UpdateManager(std::shared_ptr<DBControl> dbControl):
 
 UpdateManager::~UpdateManager()
 {
-    stopChecking(false);
     stopDownload();
+    stopChecking();
 
     delete _updateTimer;
     delete _httpClient;
@@ -136,7 +136,6 @@ bool UpdateManager::checkUpdate()
 
 bool UpdateManager::update()
 {
-    Poco::LogStream logStream(Logger::get());
     UpdateState state = Available;
 
     if (_updateState.compare_exchange_strong(state, Updating))
@@ -149,10 +148,12 @@ bool UpdateManager::update()
             if (dir.exists())
                 dir.remove(true);
 
+            LoggerStreams streams;
+
             if (!Util::watchProcess("tar xf " + kUpdateFilePath + " --directory " + kUpdateFolder + " scripts", _downloadEventFd,
-                                    [&logStream](const char buffer[]){ logStream << "UpdateManager::update - tar (stdout): " << buffer << std::endl; },
-                                    [&logStream, &errorMessage](const char buffer[]){ logStream << "UpdateManager::update - tar (stderr): " << buffer << std::endl;
-                                                                                      errorMessage.append(buffer, buffer + 1024); }))
+                                    [&streams](const char *buffer, std::size_t size){ streams.stream("UpdateManager::update - tar (stdout)").write(buffer, size); },
+                                    [&streams, &errorMessage](const char *buffer, std::size_t size){ streams.stream("UpdateManager::update - tar (stderr)").write(buffer, size);
+                                                                                                     errorMessage.append(buffer, buffer + size); }))
             {
                 return false; //This will happen only if the app is getting closed
             }
@@ -574,20 +575,21 @@ void UpdateManager::downlaod(Upgrade upgrade)
 
 bool UpdateManager::downlaod(const std::string &imageUrl, const std::string &apiPassword)
 {
-    Poco::LogStream logStream(Logger::get());
+    LoggerStreams streams;
 
     std::stringstream stream;
     stream << "sshpass -p \'" << apiPassword << "\' rsync -a --checksum --no-whole-file --inplace " << imageUrl << " " << kUpdateFilePath;
 
-    return Util::watchProcess(stream.str(), _downloadEventFd, [&logStream](const char buffer[]){ logStream << "UpdateManager::downlaod - rsync (stdout): " << buffer << std::endl; },
-                                                              [&logStream](const char buffer[]){ logStream << "UpdateManager::downlaod - rsync (stderr): " << buffer << std::endl; });
+    return Util::watchProcess(stream.str(), _downloadEventFd,
+                              [&streams](const char *buffer, std::size_t size){ streams.stream("UpdateManager::downlaod - rsync (stdout)").write(buffer, size); },
+                              [&streams](const char *buffer, std::size_t size){ streams.stream("UpdateManager::downlaod - rsync (stderr)").write(buffer, size); });
 }
 
 int UpdateManager::checkMountPoint()
 {
     std::string output;
 
-    if (Util::watchProcess("cat /etc/mtab | grep " + kUpdateMountPoint, _downloadEventFd, [&output](const char buffer[]){ output = buffer; }))
+    if (Util::watchProcess("cat /etc/mtab | grep " + kUpdateMountPoint, _downloadEventFd, [&output](const char *buffer, std::size_t size){ output.assign(buffer, size); }))
         return output.find(kUpdateMountPoint) != std::string::npos ? 1 : -1;
     else
         return 0;
@@ -595,10 +597,10 @@ int UpdateManager::checkMountPoint()
 
 bool UpdateManager::checkSdcard()
 {
-    Poco::LogStream logStream(Logger::get());
+    LoggerStreams streams;
 
-    return Util::watchProcess(kCheckSdcardPath, _downloadEventFd, [&logStream](const char buffer[]){ logStream << "UpdateManager::checkSdcard - check_sdcard (stdout): " << buffer << std::endl; },
-                                                                  [&logStream](const char buffer[]){ logStream << "UpdateManager::checkSdcard - check_sdcard (stderr): " << buffer << std::endl; });
+    return Util::watchProcess(kCheckSdcardPath, _downloadEventFd, [&streams](const char *buffer, std::size_t size){ streams.stream("UpdateManager::checkSdcard - check_sdcard (stdout)").write(buffer, size); },
+                                                                  [&streams](const char *buffer, std::size_t size){ streams.stream("UpdateManager::checkSdcard - check_sdcard (stderr)").write(buffer, size); });
 }
 
 void UpdateManager::setLastErrorAndThrow(const ErrorInfo &error, bool setUnknownState)

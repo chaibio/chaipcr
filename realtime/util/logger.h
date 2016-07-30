@@ -20,6 +20,8 @@
 #define LOGGER_H
 
 #include <string>
+#include <sstream>
+#include <map>
 
 #include <Poco/Logger.h>
 #include <Poco/LogStream.h>
@@ -40,6 +42,17 @@ private:
 
 private:
     static Poco::Logger *_logger;
+};
+
+class LoggerStreams
+{
+public:
+    ~LoggerStreams();
+
+    inline std::stringstream& stream(const std::string &key) { return _streams[key]; }
+
+private:
+    std::map<std::string, std::stringstream> _streams;
 };
 
 #define APP_LOGGER Poco::LogStream(Logger::get())
