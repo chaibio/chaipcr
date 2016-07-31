@@ -2,10 +2,13 @@ require "./scripts/cron_db.rb"
 
 class Startup < CronDB
   def run
-    result = @db.query("DELETE FROM `user_tokens`")
+    result = execute("DELETE FROM `user_tokens`")
     @logger.info "RubyCron: Remove #{@db.affected_rows} tokens"
-    @db.query("UPDATE experiments SET completed_at=NOW(),completion_status='FAILED',completion_message='Orphan experiment detected on startup' WHERE started_at is not NULL and completed_at is NULL")
+    
+    execute("UPDATE experiments SET completed_at=NOW(),completion_status='FAILED',completion_message='Orphan experiment detected on startup' WHERE started_at is not NULL and completed_at is NULL")
     @logger.info "RubyCron: Update #{@db.affected_rows} orphan experiments"
+    
+    execute("UPDATE settings SET power_cycles=power_cycles+1")
   end
 end
 

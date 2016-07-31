@@ -1,4 +1,4 @@
-User.seed_once(:role) do |s|
+User.unscoped.seed_once(:email) do |s|
   s.role = User::ROLE_MAINTENANCE
   s.name = "Maintenance"
   s.email = "maintenance@chaibio.com"
