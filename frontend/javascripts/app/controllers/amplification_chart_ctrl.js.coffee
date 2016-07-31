@@ -63,26 +63,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.chartConfig.axes.x.max = maxCycle
         $scope.experiment = data.experiment
 
-      $scope.$on 'status:data:updated', (e, data, oldData) ->
-        # newStep = parseInt(data?.experiment_controller?.expriment?.step?.number) || null
-        # oldStep = parseInt(oldData?.experiment_controller?.expriment?.step?.number) || null
-        state = data?.experiment_controller?.machine?.state
-        oldState = oldData?.experiment_controller?.machine?.state
-        isCurrentExp = parseInt(data?.experiment_controller?.expriment?.id) is parseInt($stateParams.id)
-        oldCycle = oldData?.experiment_controller?.expriment?.stage?.cycle
-        cycle = data?.experiment_controller?.expriment?.stage?.cycle
-
-        if (state is 'idle' and !!$scope.experiment?.completed_at and !hasData) or
-        (state is 'idle' and oldState isnt state) or
-        # (state is 'running' and (oldStep isnt newStep or !oldStep) and data.optics.collect_data and oldData?.optics.collect_data is 'true')
-        (state is 'running' and cycle isnt oldCycle)
-          return if $scope.retrying
-          if !hasInit
-            $timeout fetchFluorescenceData, 1500
-          else
-            fetchFluorescenceData()
-
-
       retry = ->
         $scope.retrying = true
         $scope.retry = 10
@@ -91,6 +71,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           if $scope.retry is 0
             $interval.cancel(retryInterval)
             $scope.retrying = false
+            $scope.error = null
             fetchFluorescenceData()
         , 1000
 
@@ -109,26 +90,32 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           .then (resp) ->
             $scope.fetching = false
             $scope.error = null
-            data = resp.data
-            hasData = true
-            $scope.hasData = true
-            return if !data.amplification_data
-            return if data.amplification_data.length is 0
-            data.amplification_data.shift()
-            data.ct.shift()
-            max_calibration = helper.getMaxCalibrations(data.amplification_data)
-            data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
+            if resp.data.amplification_data and resp.data.amplification_data?.length > 1
+              data = resp.data
+              hasData = true
+              $scope.hasData = true
+              data.amplification_data.shift()
+              data.ct.shift()
+              max_calibration = helper.getMaxCalibrations(data.amplification_data)
+              data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
 
-            AMPLI_DATA_CACHE = angular.copy data
-            $scope.amplification_data = angular.copy(AMPLI_DATA_CACHE.amplification_data)
-            moveData()
-            updateButtonCts()
+              AMPLI_DATA_CACHE = angular.copy data
+              $scope.amplification_data = angular.copy(AMPLI_DATA_CACHE.amplification_data)
+              moveData()
+              updateButtonCts()
 
-          .catch ->
+            if ((resp.data?.partial is true) or (resp.status is 202)) and !$scope.retrying
+              console.log resp
+              retry()
+
+          .catch (resp) ->
             return if $scope.retrying
-            $scope.error = 'Internal Server Error'
+            if resp.status is 500
+              $scope.error = 'Internal Server Error'
             $scope.fetching = false
             retry()
+
+      fetchFluorescenceData()
 
       updateButtonCts = ->
         for well_i in [0..15] by 1

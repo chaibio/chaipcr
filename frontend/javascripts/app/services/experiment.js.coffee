@@ -27,7 +27,6 @@ window.ChaiBioTech.ngApp
 
     currentExperiment = null
     ques = {}
-    # getExpDeferred = null
 
     self = $resource('/experiments/:id', {id: '@id'}, {
       'update':
@@ -50,40 +49,21 @@ window.ChaiBioTech.ngApp
         promise = $http.get("/experiments/#{obj.id}")
         promise.then (resp) ->
           console.log '$http then'
-          for def in ques["exp_#{obj.id}"] by 1
-            def.resolve resp.data
-          null
+          if ques["exp_#{obj.id}"]
+            for def in ques["exp_#{obj.id}"] by 1
+              def.resolve resp.data
         promise.catch (resp) ->
           console.log '$http catch'
-          for def in ques["exp_#{obj.id}"] by 1
-            def.reject resp
-          null
+          if ques["exp_#{obj.id}"]
+            for def in ques["exp_#{obj.id}"] by 1
+              def.reject resp
 
         promise.finally ->
           console.log '$http finally'
           delete ques["exp_#{obj.id}"]
           ques = angular.copy(ques)
-          null
 
         return deferred.promise
-
-    # self.get = (obj) ->
-    #   console.log "getExpDeferred: #{getExpDeferred}"
-    #   if getExpDeferred
-    #     return getExpDeferred.promise
-    #   else
-    #     getExpDeferred = $q.defer()
-    #     $http.get("/experiments/#{obj.id}")
-    #     .then (resp) ->
-    #       console.log "experiment loaded in experiment service !!!!"
-    #       getExpDeferred.resolve resp.data
-    #       getExpDeferred = null
-    #     .catch (resp) ->
-    #       getExpDeferred.reject resp
-    #       getExpDeferred = null
-
-    #     return getExpDeferred.promise
-
 
     self.setCurrentExperiment = (exp) ->
       currentExperiment = exp
