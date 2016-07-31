@@ -42,7 +42,7 @@ public:
     GPIO& operator= (GPIO &&other);
 	
     Value value() const;
-    void setValue(Value value, bool checkValue = false);
+    void setValue(Value value, bool forceUpdate = true);
 
     Value waitValue(Value value);
     void stopWaitinigValue();

@@ -78,6 +78,7 @@ void WirelessManager::connect()
 
         stopCommands();
 
+        _connectionStatus = Connecting;
         _connectionThreadState = Working;
         _connectionThread = std::thread(&WirelessManager::_connect, this);
     }
@@ -101,7 +102,7 @@ std::string WirelessManager::getCurrentSsid() const
     std::string interface = interfaceName();
 
     if (!interface.empty())
-        Util::watchProcess("iwgetid -r " + interface, [&ssid](const char buffer[]){ ssid = buffer; });
+        Util::watchProcess("iwgetid -r " + interface, [&ssid](const char *buffer, std::size_t size){ ssid.assign(buffer, size); });
 
     return ssid;
 }
@@ -163,6 +164,8 @@ void WirelessManager::_connect()
             return;
         }
 
+        _connectionStatus = Connecting;
+
         ifup();
 
         _connectionThreadState = Idle;
@@ -178,20 +181,16 @@ void WirelessManager::_connect()
 void WirelessManager::ifup()
 {
     std::string interface = interfaceName();
-    Poco::LogStream logStream(Logger::get());
+    LoggerStreams streams;
 
     std::stringstream stream;
     stream << "ifup " << interface;
 
-    if (Util::watchProcess(stream.str(), _connectionEventFd, [&logStream](const char buffer[]){ logStream << "WirelessManager::ifup - ifup:" << buffer << std::endl; }))
+    if (!Util::watchProcess(stream.str(), _connectionEventFd, [&streams](const char *buffer, std::size_t size){ streams.stream("WirelessManager::ifup - ifup (stdout)").write(buffer, size); },
+                                                             [&streams](const char *buffer, std::size_t size){ streams.stream("WirelessManager::ifup - ifup (stderr)").write(buffer, size); }))
     {
-        NetworkInterfaces::InterfaceState state = NetworkInterfaces::getInterfaceState(interface);
-
-        if (state.isEmpty() || !(state.flags & IFF_UP))
-            _connectionStatus = ConnectionError;
-    }
-    else
         _connectionStatus = NotConnected;
+    }
 }
 
 void WirelessManager::ifdown()
@@ -238,7 +237,7 @@ bool WirelessManager::scan(const std::string &interface)
     {
         std::stringstream stream;
 
-        Util::watchProcess("iwlist " + interface + " scan", [&stream](const char buffer[]){ stream << buffer; });
+        Util::watchProcess("iwlist " + interface + " scan", [&stream](const char *buffer, std::size_t size){ stream.write(buffer, size); });
 
         std::vector<ScanResult> resultList;
         ScanResult result;
@@ -309,7 +308,7 @@ void WirelessManager::checkConnection()
     {
         if (state.flags & IFF_UP)
         {
-            if (state.flags & IFF_RUNNING)
+            if (state.addressState)
                 _connectionStatus = Connected;
             else if (_connectionThreadState != Working && _connectionStatus == Connecting)
                 _connectionStatus = AuthenticationError;

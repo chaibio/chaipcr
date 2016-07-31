@@ -47,9 +47,13 @@ void UpdateUploadHandler::processRequest(Poco::Net::HTTPServerRequest &request)
             qpcrApp.updateManager()->update();
         }
     }
-    catch (const std::exception &ex)
+    catch (const UpdateManager::UpdateException &/*ex*/)
     {
         setStatus(Poco::Net::HTTPResponse::HTTP_PRECONDITION_FAILED);
+    }
+    catch (const std::exception &ex)
+    {
+        setStatus(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
 
         _errorMessage = ex.what();
     }
@@ -59,7 +63,7 @@ void UpdateUploadHandler::processResponse(Poco::Net::HTTPServerResponse &respons
 {
     boost::property_tree::ptree ptree;
 
-    if (getStatus() == Poco::Net::HTTPResponse::HTTP_OK)
+    if (getStatus() != Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR)
     {
         switch (qpcrApp.updateManager()->updateState())
         {
@@ -82,6 +86,33 @@ void UpdateUploadHandler::processResponse(Poco::Net::HTTPServerResponse &respons
 
         default:
             ptree.put("device.update_available", "unknown");
+
+            UpdateManager::ErrorInfo error = qpcrApp.updateManager()->lastError();
+
+            if (error.code != UpdateManager::ErrorInfo::NoError)
+            {
+                switch (error.code)
+                {
+                case UpdateManager::ErrorInfo::InvalidImage:
+                    ptree.put("device.update_error.code", "invalid_image");
+                    break;
+
+                case UpdateManager::ErrorInfo::UplodFaild:
+                    ptree.put("device.update_error.code", "upload_failed");
+                    break;
+
+                case UpdateManager::ErrorInfo::NetworkError:
+                    ptree.put("device.update_error.code", "network_error");
+                    break;
+
+                default:
+                    ptree.put("device.update_error.code", "unknown_error");
+                    break;
+                }
+
+                ptree.put("device.update_error.message", error.message);
+            }
+
             break;
         }
     }

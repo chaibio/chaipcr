@@ -47,4 +47,14 @@ public:
     TemperatureLimitError(const std::string &message);
 };
 
+class ProcessError : public std::runtime_error {
+public:
+    ProcessError(int code, const std::string &message): std::runtime_error(message) { _code = code; }
+
+    inline int code() const { return _code; }
+
+private:
+    int _code;
+};
+
 #endif

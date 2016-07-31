@@ -12,8 +12,8 @@
 # By default this script does nothing.
 
 run_migrate_on_upgrade () {
-	echo "Checking for flag file: ${sdcard}/factory/upgrade_autorun.flag"
-	if [ -e ${sdcard}/factory/upgrade_autorun.flag ]
+	echo "Checking for flag file: ${sdcard}/factory/upgrade_autorun.flag and ${sdcard}/upgrade/upgrade_autorun.flag"
+	if [ -e ${sdcard}/factory/upgrade_autorun.flag ] || [ -e ${sdcard}/upgrade/upgrade_autorun.flag ]
 	then
        		echo "Upgrade autorun flag found up"
 		cd /root/chaipcr/web || :
@@ -38,7 +38,17 @@ run_migrate_on_upgrade () {
 		echo "Execution result: $?, now executing seed_fu..."
 		RAILS_ENV=production /usr/local/bin/bundle exec /usr/local/bin/rake db:seed_fu || :
 		echo "Execution result $?, done executing scripts!"
-       		rm ${sdcard}/factory/upgrade_autorun.flag
+
+	        if [ -e ${sdcard}/factory/upgrade_autorun.flag ]
+        	then
+			mount -o remount,rw ${sdcard}/factory/ || :
+       			rm ${sdcard}/factory/upgrade_autorun.flag || :
+			sync
+			mount -o remount,ro ${sdcard}/factory/ || :
+		fi
+
+
+		rm ${sdcard}/upgrade/upgrade_autorun.flag || :
         	echo "Upgrade autorun flag down"
 	else
 		echo "No autorun flag found!"
@@ -133,7 +143,7 @@ check_upgrade_autorun () {
 			mkdir -p ${sdcard}/upgrade>/dev/null || true
 		fi
 
-		mount ${sdcard_dev}p1 ${sdcard}/factory>/dev/null || true
+		mount -o ro ${sdcard_dev}p1 ${sdcard}/factory>/dev/null || true
 		mount ${sdcard_dev}p2 ${sdcard}/upgrade>/dev/null || true
 		if [ $? -gt 0 ]
 		then
@@ -164,12 +174,19 @@ network_watchdog_interface() {
                 if [ -z "$ip_address" ]
                 then
                         echo "Network watchdog: No network found!"
-			ps -ef | grep /sbin/dhclient | grep -v grep | awk '{print $2}' | xargs kill -9
-#pkill -9 /sbin/dhclient
+			ps -ef | grep dhclient | grep -v grep | grep $iface
+                        result=$?
+                        if [ $result -eq 0 ]
+                        then
+                                echo killing previous $iface instance.
+                                ps -ef | grep dhclient | grep -v grep | grep $iface | awk '{print $2}' | xargs kill -9
+                        else
+                                echo no previous $iface connection found.
+                        fi
 			lfile=/var/lib/dhcp/dhclient.$iface.leases
 			rm $lfile
 			extras=""
-			if [[ $iface =~ 'wlan'.* ]]
+                        if echo "$iface" | grep -q "wlan"
 		        then
 	        	        echo adding extra params for interface $iface
 				extras="-cf /root/chaipcr/deploy/device/dhclient.wlan.conf"
@@ -197,8 +214,7 @@ do
         fi
 
         #echo "Network watchdog for interface: $interface"
-        if [[ $interface =~ 'lo'.* ]]
-# || [[ $interface =~ 'usb'.* ]]
+	if echo "$interface" | grep -q "lo"
         then
                 echo Invalid interface $interface
                 continue

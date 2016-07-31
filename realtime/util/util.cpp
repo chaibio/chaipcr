@@ -18,6 +18,7 @@
 //
 
 #include "util.h"
+#include "exceptions.h"
 
 #include <fstream>
 #include <sstream>
@@ -27,12 +28,15 @@
 
 #include <boost/date_time.hpp>
 
+#include <signal.h>
 #include <poll.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+
+#define WATCH_PROCESS_BUFFER_SIZE 4096
 
 namespace Util
 {
@@ -59,7 +63,7 @@ boost::posix_time::ptime parseIsoTime(const std::string &str)
     return boost::posix_time::ptime(boost::gregorian::date(year, month, day), boost::posix_time::time_duration(hours, minutes, seconds));
 }
 
-void watchProcess(const std::string &command, std::function<void(const char[1024])> outCallback, std::function<void(const char[1024])> errorCallback)
+void watchProcess(const std::string &command, WatchProcessCallback outCallback, WatchProcessCallback errorCallback)
 {
     int outPipes[2] = {-1};
     int errorPipes[2] = {-1};
@@ -108,6 +112,11 @@ void watchProcess(const std::string &command, std::function<void(const char[1024
         close(errorPipes[0]);
 
         setpriority(PRIO_PROCESS, getpid(), 20);
+
+        sigset_t signalSet;
+        sigemptyset(&signalSet);
+        sigprocmask(SIG_BLOCK, nullptr, &signalSet);
+        sigprocmask(SIG_UNBLOCK, &signalSet, nullptr);
 
         execl("/bin/sh", "sh", "-c", command.c_str(), NULL);
         _exit(127);
@@ -135,16 +144,20 @@ void watchProcess(const std::string &command, std::function<void(const char[1024
         {
             if (fdArray[0].revents & POLLIN || fdArray[0].revents & POLLPRI)
             {
-                char buffer[1024];
-                memset(buffer, 0, 1024);
+                char buffer[WATCH_PROCESS_BUFFER_SIZE];
+                memset(buffer, 0, WATCH_PROCESS_BUFFER_SIZE);
 
-                while (read(fdArray[0].fd, buffer, 1023) == 1023)
+                std::size_t size = 0;
+
+                while ((size = read(fdArray[0].fd, buffer, WATCH_PROCESS_BUFFER_SIZE)) == WATCH_PROCESS_BUFFER_SIZE)
                 {
-                    outCallback(buffer);
-                    memset(buffer, 0, 1024);
+                    outCallback(buffer, size);
+                    memset(buffer, 0, WATCH_PROCESS_BUFFER_SIZE);
+
+                    size = 0;
                 }
 
-                outCallback(buffer);
+                outCallback(buffer, size);
             }
             else if (fdArray[0].revents & POLLHUP)
             {
@@ -159,20 +172,31 @@ void watchProcess(const std::string &command, std::function<void(const char[1024
         {
             if (fdArray[1].revents & POLLIN || fdArray[1].revents & POLLPRI)
             {
-                char buffer[1024];
-                memset(buffer, 0, 1024);
+                char buffer[WATCH_PROCESS_BUFFER_SIZE];
+                memset(buffer, 0, WATCH_PROCESS_BUFFER_SIZE);
 
-                while (read(fdArray[1].fd, buffer, 1023) == 1023)
+                std::size_t size = 0;
+
+                while ((size = read(fdArray[1].fd, buffer, WATCH_PROCESS_BUFFER_SIZE)) == WATCH_PROCESS_BUFFER_SIZE)
                 {
                     if (errorCallback)
-                        errorCallback(buffer);
+                        errorCallback(buffer, size);
 
-                    memset(buffer, 0, 1024);
+                    memset(buffer, 0, WATCH_PROCESS_BUFFER_SIZE);
+
+                    size = 0;
                 }
 
                 if (errorCallback)
-                    errorCallback(buffer);
+                    errorCallback(buffer, size);
             }
+            else if (fdArray[1].revents & POLLHUP)
+            {
+                processFinished = true;
+                break;
+            }
+            else if (fdArray[1].revents & POLLNVAL || fdArray[1].revents & POLLERR)
+                break;
         }
 
         fdArray[0].revents = 0;
@@ -187,10 +211,15 @@ void watchProcess(const std::string &command, std::function<void(const char[1024
         int status = -1;
         pid = waitpid(pid, &status, 0);
 
-        if (pid != -1 && status == 0)
-            return;
+        if (pid != -1)
+        {
+            if (status == 0)
+                return;
+            else
+                throw ProcessError(status, "Error in subprocess - " + command);
+        }
         else
-            throw std::runtime_error("Unknown error with subprocess - " + command);
+            throw std::system_error(errno, std::generic_category(), "Error with subprocess - " + command);
     }
     else
     {
@@ -200,7 +229,7 @@ void watchProcess(const std::string &command, std::function<void(const char[1024
     }
 }
 
-bool watchProcess(const std::string &command, int eventFd, std::function<void(const char[1024])> outCallback, std::function<void(const char[1024])> errorCallback)
+bool watchProcess(const std::string &command, int eventFd, WatchProcessCallback outCallback, WatchProcessCallback errorCallback)
 {
     int outPipes[2] = {-1};
     int errorPipes[2] = {-1};
@@ -249,6 +278,11 @@ bool watchProcess(const std::string &command, int eventFd, std::function<void(co
         close(errorPipes[0]);
 
         setpriority(PRIO_PROCESS, getpid(), 20);
+
+        sigset_t signalSet;
+        sigemptyset(&signalSet);
+        sigprocmask(SIG_BLOCK, nullptr, &signalSet);
+        sigprocmask(SIG_UNBLOCK, &signalSet, nullptr);
 
         execl("/bin/sh", "sh", "-c", command.c_str(), NULL);
         _exit(127);
@@ -280,16 +314,21 @@ bool watchProcess(const std::string &command, int eventFd, std::function<void(co
         {
             if (fdArray[0].revents & POLLIN || fdArray[0].revents & POLLPRI)
             {
-                char buffer[1024];
-                memset(buffer, 0, 1024);
+                char buffer[WATCH_PROCESS_BUFFER_SIZE];
+                memset(buffer, 0, WATCH_PROCESS_BUFFER_SIZE);
 
-                while (read(fdArray[0].fd, buffer, 1023) == 1023)
+                std::size_t size = 0;
+
+                while ((size = read(fdArray[0].fd, buffer, WATCH_PROCESS_BUFFER_SIZE)) == WATCH_PROCESS_BUFFER_SIZE)
                 {
-                    outCallback(buffer);
-                    memset(buffer, 0, 1024);
+                    outCallback(buffer, size);
+                    memset(buffer, 0, WATCH_PROCESS_BUFFER_SIZE);
+
+                    size = 0;
                 }
 
-                outCallback(buffer);
+                if (size > 0)
+                    outCallback(buffer, size);
             }
             else if (fdArray[0].revents & POLLHUP)
             {
@@ -304,20 +343,31 @@ bool watchProcess(const std::string &command, int eventFd, std::function<void(co
         {
             if (fdArray[1].revents & POLLIN || fdArray[1].revents & POLLPRI)
             {
-                char buffer[1024];
-                memset(buffer, 0, 1024);
+                char buffer[WATCH_PROCESS_BUFFER_SIZE];
+                memset(buffer, 0, WATCH_PROCESS_BUFFER_SIZE);
 
-                while (read(fdArray[1].fd, buffer, 1023) == 1023)
+                std::size_t size = 0;
+
+                while ((size = read(fdArray[1].fd, buffer, WATCH_PROCESS_BUFFER_SIZE)) == WATCH_PROCESS_BUFFER_SIZE)
                 {
                     if (errorCallback)
-                        errorCallback(buffer);
+                        errorCallback(buffer, size);
 
-                    memset(buffer, 0, 1024);
+                    memset(buffer, 0, WATCH_PROCESS_BUFFER_SIZE);
+
+                    size = 0;
                 }
 
-                if (errorCallback)
-                    errorCallback(buffer);
+                if (errorCallback && size > 0)
+                    errorCallback(buffer, size);
             }
+            else if (fdArray[1].revents & POLLHUP)
+            {
+                processFinished = true;
+                break;
+            }
+            else if (fdArray[1].revents & POLLNVAL || fdArray[1].revents & POLLERR)
+                break;
         }
 
         if (fdArray[2].revents > 0)
@@ -338,19 +388,24 @@ bool watchProcess(const std::string &command, int eventFd, std::function<void(co
 
     if (processFinished)
     {
-        int status = -1;
+        int status = 0;
         pid = waitpid(pid, &status, 0);
 
-        if (pid != -1 && status == 0)
-            return true;
+        if (pid != -1)
+        {
+            if (status == 0)
+                return true;
+            else
+                throw ProcessError(status, "Error in subprocess - " + command);
+        }
         else
-            throw std::runtime_error("Unknown error with subprocess - " + command);
+            throw std::system_error(errno, std::generic_category(), "Error with subprocess - " + command);
     }
     else
     {
         killpg(getpgid(pid), SIGTERM);
 
-        if (fdArray[1].revents == 0)
+        if (fdArray[2].revents == 0)
             throw std::runtime_error("Unknown error with subprocess - " + command);
         else
             return false;
@@ -367,7 +422,7 @@ bool getFileChecksum(const std::string &filePath, int eventFd, std::string &chec
         std::stringstream stream;
         stream << "sha256sum " << filePath;
 
-        return Util::watchProcess(stream.str(), eventFd, [&checksum](const char buffer[]){ std::stringstream stream; stream << buffer; checksum.clear(); stream >> checksum; });
+        return Util::watchProcess(stream.str(), eventFd, [&checksum](const char *buffer, std::size_t size){ checksum.append(buffer, size); });
     }
     else
         return true;

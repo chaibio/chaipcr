@@ -35,40 +35,55 @@ void UpdateHandler::processData(const boost::property_tree::ptree &requestPt, bo
     case CheckUpdate:
         if (updateManager->checkUpdate())
         {
-            UpdateManager::UpdateState state = updateManager->updateState();
-
-            if (state != UpdateManager::Unknown)
+            switch (updateManager->updateState())
             {
-                switch (state)
+            case UpdateManager::Unavailable:
+                responsePt.put("device.update_available", "unavailable");
+                break;
+
+            case UpdateManager::Available:
+                responsePt.put("device.update_available", "available");
+                break;
+
+            case UpdateManager::Downloading:
+            case UpdateManager::ManualDownloading:
+                responsePt.put("device.update_available", "downloading");
+                break;
+
+            case UpdateManager::Updating:
+                responsePt.put("device.update_available", "updating");
+                break;
+
+            default:
+                responsePt.put("device.update_available", "unknown");
+
+                UpdateManager::ErrorInfo error = qpcrApp.updateManager()->lastError();
+
+                if (error.code != UpdateManager::ErrorInfo::NoError)
                 {
-                case UpdateManager::Unavailable:
-                    responsePt.put("device.update_available", "unavailable");
-                    break;
+                    switch (error.code)
+                    {
+                    case UpdateManager::ErrorInfo::InvalidImage:
+                        responsePt.put("device.update_error.code", "invalid_image");
+                        break;
 
-                case UpdateManager::Available:
-                    responsePt.put("device.update_available", "available");
-                    break;
+                    case UpdateManager::ErrorInfo::UplodFaild:
+                        responsePt.put("device.update_error.code", "upload_failed");
+                        break;
 
-                case UpdateManager::Downloading:
-                case UpdateManager::ManualDownloading:
-                    responsePt.put("device.update_available", "downloading");
-                    break;
+                    case UpdateManager::ErrorInfo::NetworkError:
+                        responsePt.put("device.update_error.code", "network_error");
+                        break;
 
-                case UpdateManager::Updating:
-                    responsePt.put("device.update_available", "updating");
-                    break;
+                    default:
+                        responsePt.put("device.update_error.code", "unknown_error");
+                        break;
+                    }
 
-                default:
-                    responsePt.put("device.update_available", "unknown");
-                    break;
+                    responsePt.put("device.update_error.message", error.message);
                 }
-            }
-            else
-            {
-                setStatus(Poco::Net::HTTPResponse::HTTP_BAD_GATEWAY);
-                setErrorString("Error");
 
-                JsonHandler::processData(requestPt, responsePt);
+                break;
             }
         }
         else
@@ -89,15 +104,42 @@ void UpdateHandler::processData(const boost::property_tree::ptree &requestPt, bo
             {
                 setStatus(Poco::Net::HTTPResponse::HTTP_PRECONDITION_FAILED);
                 setErrorString("Update is not available");
+
+                JsonHandler::processData(requestPt, responsePt);
             }
+        }
+        catch (const UpdateManager::UpdateException &ex)
+        {
+            setStatus(Poco::Net::HTTPResponse::HTTP_PRECONDITION_FAILED);
+
+            switch (ex.error.code)
+            {
+            case UpdateManager::ErrorInfo::InvalidImage:
+                responsePt.put("device.update_error.code", "invalid_image");
+                break;
+
+            case UpdateManager::ErrorInfo::UplodFaild:
+                responsePt.put("device.update_error.code", "upload_failed");
+                break;
+
+            case UpdateManager::ErrorInfo::NetworkError:
+                responsePt.put("device.update_error.code", "network_error");
+                break;
+
+            default:
+                responsePt.put("device.update_error.code", "unknown_error");
+                break;
+            }
+
+            responsePt.put("device.update_error.message", ex.error.message);
         }
         catch (const std::exception &ex)
         {
             setStatus(Poco::Net::HTTPResponse::HTTP_PRECONDITION_FAILED);
             setErrorString(ex.what());
-        }
 
-        JsonHandler::processData(requestPt, responsePt);
+            JsonHandler::processData(requestPt, responsePt);
+        }
 
         break;
     }

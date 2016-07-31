@@ -21,10 +21,14 @@ window.ChaiBioTech.ngApp.controller('systemController', [
   'Device',
   '$scope',
   'Status',
-  function(Device, $scope, Status) {
+  '$http',
+  '$window',
+  '$timeout',	
+  function(Device, $scope, Status, $http, $window, $timeout) {
 
     $scope.is_dual_channel = false;
     $scope.update_available = 'unavailable';
+    $scope.exporting = false;
     $scope.getVersionSoft = function() {
       Device.getVersion(true).then(function(resp) {
         console.log(resp);
@@ -52,6 +56,23 @@ window.ChaiBioTech.ngApp.controller('systemController', [
     $scope.openUploadModal = function() {
       Device.openUploadModal();
     };
+	
+	$scope.export = function(){
+    $scope.exporting=true;
+	debugger;
+		Device.exportDatabase().then(function(response) {
+		  var blob = new Blob([response.data],{type:'application/octet-stream'});
+		  var link = document.createElement('a');
+		  link.href = window.URL.createObjectURL(blob);
+		  link.download = "chaipcr.sql.zip";
+		  link.click();
+		  $scope.exporting = false;
+			console.log(response);
+		  }, function(response) {
+			  console.log(response);
+			  $scope.exporting = false;
+		  });		
+	};
 
     $scope.checkUpdate = function() {
 

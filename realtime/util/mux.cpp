@@ -50,7 +50,7 @@ MUX& MUX::operator =(MUX &&other) {
 
 void MUX::setChannel(int channel) {
     for(GPIO &muxControlPin : this->_muxControlPins) {
-        muxControlPin.setValue(static_cast<GPIO::Value>(channel&0x1), true);
+        muxControlPin.setValue(static_cast<GPIO::Value>(channel&0x1), false);
         channel>>=1;
     }
     _channel=channel;

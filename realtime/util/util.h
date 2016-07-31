@@ -29,6 +29,8 @@
 namespace Util
 {
 
+typedef std::function<void(const char*, std::size_t)> WatchProcessCallback;
+
 template <typename Iterator>
 inline double median(Iterator begin, Iterator end)
 {
@@ -47,8 +49,8 @@ inline double average(Iterator begin, Iterator end)
 
 boost::posix_time::ptime parseIsoTime(const std::string &str);
 
-void watchProcess(const std::string &command, std::function<void(const char[1024])> outCallback, std::function<void(const char[1024])> errorCallback = std::function<void(const char[1024])>());
-bool watchProcess(const std::string &command, int eventFd, std::function<void(const char[1024])> outCallback, std::function<void(const char[1024])> errorCallback = std::function<void(const char[1024])>());
+void watchProcess(const std::string &command, WatchProcessCallback outCallback, WatchProcessCallback errorCallback = WatchProcessCallback());
+bool watchProcess(const std::string &command, int eventFd, WatchProcessCallback outCallback, WatchProcessCallback errorCallback = WatchProcessCallback());
 
 bool getFileChecksum(const std::string &filePath, int eventFd, std::string &checksum);
 
