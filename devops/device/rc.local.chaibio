@@ -11,6 +11,16 @@
 #
 # By default this script does nothing.
 
+wait_for_migrate () {
+        echo "Checking for migrate script completation"
+        while [ -e ${sdcard}/factory/upgrade_autorun.flag ] || [ -e ${sdcard}/upgrade/upgrade_autorun.flag ]
+        do
+                echo "Still waiting for migrate script to finish ..."
+		sleep 5
+ 	done
+	echo migrate task done
+}
+
 run_migrate_on_upgrade () {
 	echo "Checking for flag file: ${sdcard}/factory/upgrade_autorun.flag and ${sdcard}/upgrade/upgrade_autorun.flag"
 	if [ -e ${sdcard}/factory/upgrade_autorun.flag ] || [ -e ${sdcard}/upgrade/upgrade_autorun.flag ]
@@ -32,12 +42,10 @@ run_migrate_on_upgrade () {
 			sql_running=$?
 		done
 
-		echo mysql server is running
+		echo mysql server is running.. calling upgrade.sh.
 
-		RAILS_ENV=production /usr/local/bin/bundle exec /usr/local/bin/rake db:migrate || :
-		echo "Execution result: $?, now executing seed_fu..."
-		RAILS_ENV=production /usr/local/bin/bundle exec /usr/local/bin/rake db:seed_fu || :
-		echo "Execution result $?, done executing scripts!"
+		RAILS_ENV=production /root/chaipcr/web/scripts/upgrade.sh >> /var/log/upgrade.log 2>&1 || :
+		echo "Execution done executing upgrade.sh!"
 
 	        if [ -e ${sdcard}/factory/upgrade_autorun.flag ]
         	then
@@ -49,13 +57,25 @@ run_migrate_on_upgrade () {
 
 
 		rm ${sdcard}/upgrade/upgrade_autorun.flag || :
-        	echo "Upgrade autorun flag down"
+        	echo "Upgrade autorun flag down.. setting up realtime service"
+		systemctl enable realtime.service
+		systemctl start realtime.service
 	else
 		echo "No autorun flag found!"
+		if systemctl status realtime.service | grep enable
+		then
+			systemctl enable realtime.service
+		fi
+		sleep 2
+                if systemctl status realtime.service | grep dead
+                then
+                        systemctl start realtime.service
+                fi
 	fi
 }
 
 run_cleanup_user_tokens_every4hours () {
+	wait_for_migrate
 	while true
 	do
 		echo Cleaning up every 4 hours.
