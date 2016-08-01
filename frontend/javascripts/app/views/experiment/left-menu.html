@@ -49,7 +49,8 @@
         <experiment-item show-prop="showProperties" exp="exp" state-val="{{status}}" lid-open="lidOpen" max-cycle="maxCycle"></experiment-item>
     </div>
     <div class="side-menu-button-container">
-      <button class="side-menu-button SH" ng-click="exportExperiment()" experiment-id="params.id">EXPORT</button>
+      <button ng-show="!exporting" class="side-menu-button SH" ng-click="exportExperiment()" experiment-id="params.id">EXPORT</button>
+	  <button ng-show="exporting" class="side-menu-button SH">EXPORTING<ellipsis-animated><ellipsis-animated/></button>
       <button class="side-menu-button SH second-button" ng-click="deleteExperiment(params.id)">DELETE</button>
 	  <span class="text-danger" ng-show="errorExport">Error exporting data. Please try again.</span>
     </div>

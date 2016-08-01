@@ -32,7 +32,8 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
     $scope.showProperties = false
     $scope.status = null
     $scope.exp = null
-    $scope.errorExport = false	
+    $scope.errorExport = false
+    $scope.exporting = false		
 
     $scope.deleteExperiment = ->
       exp = new Experiment id: $stateParams.id
@@ -43,7 +44,8 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
       $scope.exportExperiment()				
 		
     $scope.exportExperiment = ->
-      $scope.errorExport = false		
+      $scope.exporting = true		
+      $scope.errorExport = false	  		
       id = $stateParams.id
       url = "/experiments/"+$stateParams.id+"/export"	  		
       $http.get(url, responseType: 'arraybuffer')
@@ -56,14 +58,16 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
           link = document.createElement('a')
           link.href = window.URL.createObjectURL(blob)
           link.download = 'export.zip'
-          link.click()										
+          link.click()
+          $scope.exporting = false		  										
 	
       .error (resp,status) =>
         console.log status	    	  
         if status == 503
           $timeout callAtTimeout, 500
         else
-          $scope.errorExport = true					  					  		  				  	        				
+          $scope.exporting = false			
+          $scope.errorExport = true	  					  					  		  				  	        				
 		
     	  		    		
 
