@@ -28,7 +28,7 @@
 LTC2444::LTC2444(unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber) :
      csPin_(csPinNumber, GPIO::kOutput),
 	 spiPort_ (spiPort),
-     busyPin_ (busyPinNumber, GPIO::kInput, true){}
+     busyPin_ (busyPinNumber, GPIO::kInput, GPIO::kPoll){}
 
 LTC2444::~LTC2444() {
 }
@@ -92,9 +92,9 @@ bool LTC2444::busy(){
 }
 
 bool LTC2444::waitBusy() {
-    return busyPin_.waitValue(GPIO::kLow) == GPIO::kHigh;
+    return busyPin_.pollValue(GPIO::kLow) == GPIO::kHigh;
 }
 
 void LTC2444::stopWaitinigBusy() {
-    busyPin_.stopWaitinigValue();
+    busyPin_.cancelPolling();
 }
