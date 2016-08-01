@@ -57,7 +57,7 @@ public:
     Value value() const;
     void setValue(Value value, bool forceUpdate = true);
 
-    Value pollValue(Value value);
+    bool pollValue(Value expectedValue, Value &value); //Checks if GPIO has expectedValue before polling
     void cancelPolling();
 
 private:

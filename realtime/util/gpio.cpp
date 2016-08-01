@@ -202,21 +202,28 @@ void GPIO::setValue(Value value, bool forceUpdate)
         APP_LOGGER << "GPIO::setValue - Unable to change GPIO's (" << _pinNumber << ") value from " << _savedValue << " to " << value << std::endl;
 }
 
-GPIO::Value GPIO::pollValue(Value value)
+bool GPIO::pollValue(Value expectedValue, Value &value)
 {
     if (_pollFd == -1)
         throw std::logic_error("GPIO is not setup for polling");
 
     char buffer[sizeof(int64_t)];
-    read(_pollFd, buffer, sizeof(buffer) - 1);
-    lseek(_pollFd, 0, SEEK_SET);
 
-    if ((buffer[0] == '0' && value == kLow) || (buffer[0] == '1' && value == kHigh))
-        return value;
+    if (read(_pollFd, buffer, sizeof(buffer) - 1) == -1)
+        throw std::system_error(errno, std::generic_category(), "Unable to read GPIO:");
+
+    if (lseek(_pollFd, 0, SEEK_SET) == -1)
+        throw std::system_error(errno, std::generic_category(), "Unable to seek GPIO:");
+
+    if ((buffer[0] == '0' && expectedValue == kLow) || (buffer[0] == '1' && expectedValue == kHigh))
+    {
+        value = expectedValue;
+        return true;
+    }
 
     pollfd fdArray[2];
     fdArray[0].fd = _pollFd;
-    fdArray[0].events = POLLIN | POLLPRI;
+    fdArray[0].events = POLLPRI;
     fdArray[0].revents = 0;
 
     fdArray[1].fd = _cancelPollFd;
@@ -229,8 +236,11 @@ GPIO::Value GPIO::pollValue(Value value)
         {
             if (fdArray[0].revents | POLLIN || fdArray[0].revents | POLLPRI)
             {
-                read(_pollFd, buffer, sizeof(buffer) - 1);
-                lseek(_pollFd, 0, SEEK_SET);
+                if (read(_pollFd, buffer, sizeof(buffer) - 1) == -1)
+                    throw std::system_error(errno, std::generic_category(), "Unable to read GPIO:");
+
+                if (lseek(_pollFd, 0, SEEK_SET) == -1)
+                    throw std::system_error(errno, std::generic_category(), "Unable to seek GPIO:");
 
                 switch (buffer[0])
                 {
@@ -247,22 +257,18 @@ GPIO::Value GPIO::pollValue(Value value)
                 }
             }
             else
-            {
-                APP_LOGGER << "GPIO::pollValue - unexpected GPIO even occured" << std::endl;
-
-                value = value == kHigh ? kLow : kHigh;
-            }
+                throw std::runtime_error("Unexpected GPIO event occured");
         }
         else //Cancel
         {
             read(_cancelPollFd, buffer, sizeof(int64_t));
-            value = value == kHigh ? kLow : kHigh;
+            return false;
         }
     }
     else
         throw std::system_error(errno, std::generic_category(), "Unable to poll a pin (" + std::to_string(_pinNumber) + "):");
 
-    return value;
+    return true;
 }
 
 void GPIO::cancelPolling()
