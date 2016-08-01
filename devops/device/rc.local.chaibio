@@ -75,7 +75,6 @@ run_migrate_on_upgrade () {
 }
 
 run_cleanup_user_tokens_every4hours () {
-	wait_for_migrate
 	while true
 	do
 		echo Cleaning up every 4 hours.
@@ -87,6 +86,8 @@ run_cleanup_user_tokens_every4hours () {
 }
 
 run_clean_user_tokens () {
+	wait_for_migrate
+
 	echo "checking sql up status..."
 	mysqladmin status | grep Uptime
 	sql_running=$?
