@@ -158,11 +158,22 @@ angular.module("canvasApp").factory('moveStageRect', [
               C.allStageViews.splice(that.draggedStage.index + 1, 1);
             });
           } else {
-            this.currentDrop = stage.previousStage;
-            this.currentHit = stage.previousStage.index;
-            this.applyMovement(stage, C, circleManager, function() {
-              C.allStageViews.splice(that.draggedStage.index + 1, 1);
-            });
+
+            if(stage.previousStage) {
+              this.currentDrop = stage.previousStage;
+              this.currentHit = stage.previousStage.index;
+              this.applyMovement(stage, C, circleManager, function() {
+                C.allStageViews.splice(that.draggedStage.index + 1, 1);
+              });
+            } else {
+              this.currentDrop = stage.nextStage;
+              this.currentHit = stage.nextStage.index;
+              this.applyMovement(stage, C, circleManager, function() {
+                C.allStageViews.splice(that.draggedStage.index, 1);
+              });
+            }
+
+
           }
 
           var pre_id = (this.currentDrop) ? this.currentDrop.model.id : null;
