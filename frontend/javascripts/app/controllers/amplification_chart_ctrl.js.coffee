@@ -32,7 +32,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
     Device.isDualChannel().then (is_dual_channel) ->
       $scope.is_dual_channel = is_dual_channel
 
-      hasData = false
       hasInit = false
       drag_scroll = $('#ampli-drag-scroll')
       $scope.chartConfig = helper.chartConfig($scope.is_dual_channel)
@@ -90,11 +89,14 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           .then (resp) ->
             $scope.fetching = false
             $scope.error = null
-            # if resp.data.amplification_data and resp.data.amplification_data?.length > 1
-            if resp.status is 200
-              data = resp.data
-              hasData = true
+            if resp.status is 200 and resp.data?.partial
               $scope.hasData = true
+              $timeout ->
+                $scope.$broadcast '$reload:n3:charts'
+              , 1000
+            if resp.data.amplification_data and resp.data.amplification_data?.length > 1
+              $scope.hasData = true
+              data = resp.data
               data.amplification_data.shift()
               data.ct.shift()
               max_calibration = helper.getMaxCalibrations(data.amplification_data)
@@ -106,7 +108,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               updateButtonCts()
 
             if ((resp.data?.partial is true) or (resp.status is 202)) and !$scope.retrying
-              console.log resp
               retry()
 
           .catch (resp) ->
