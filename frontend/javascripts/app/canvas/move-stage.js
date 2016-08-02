@@ -69,6 +69,8 @@ angular.module("canvasApp").factory('moveStageRect', [
           fill: null, width: 135, left: 0, top: 0, height: 372, selectable: false, me: this, rx: 1,
         });
 
+
+
         me.imageobjects["drag-stage-image.png"].originX = "left";
         me.imageobjects["drag-stage-image.png"].originY = "top";
         me.imageobjects["drag-stage-image.png"].top = 15;
@@ -89,6 +91,10 @@ angular.module("canvasApp").factory('moveStageRect', [
           lockMovementY: true, hasControls: false, visible: false, hasBorders: false, name: "dragStageGroup"
         });
 
+        this.indicator.beacon = new fabric.Rect({
+          fill: 'black', width: 10, left: 0, top: 10, height: 10, selectable: false, me: this,
+          lockMovementY: true, hasControls: false, visible: true,
+        });
 
         this.indicator.init = function(stage) {
 
@@ -108,7 +114,13 @@ angular.module("canvasApp").factory('moveStageRect', [
         };
 
         this.indicator.onTheMoveDragGroup = function(dragging) {
+
           this.setLeft(dragging.left - 1).setCoords();
+          if(this.direction === "right") {
+            this.beacon.setLeft(dragging.left + 135).setCoords();
+          } else if(this.direction === "left") {
+            this.beacon.setLeft(dragging.left - 10).setCoords();
+          }
         };
 
         this.indicator.changePlacing = function(place) {
@@ -135,7 +147,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           this.currentLeft = movement.left;
           C.allStageViews.some(function(stage, index) {
 
-            if(this.intersectsWithObject(stage.stageHitPoint) && this.currentHit !== index) {
+            if(this.beacon.intersectsWithObject(stage.stageHitPoint) && this.draggedStage.index !== index) {
               this.currentDrop = stage;
               this.currentHit = index;
             }
@@ -179,7 +191,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           var pre_id = (this.currentDrop) ? this.currentDrop.model.id : null;
           //console.log(stage.model.id, pre_id);
           ExperimentLoader.moveStage(stage.model.id, pre_id).then(function(dat) {
-            console.log("moved stage big time", dat);
+            //console.log("moved stage big time", dat);
           }, function(err) {
             console.log(err);
           });

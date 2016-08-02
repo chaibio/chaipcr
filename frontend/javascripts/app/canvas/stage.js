@@ -78,6 +78,7 @@ angular.module("canvasApp").factory('stage', [
         this.childSteps.forEach(function(step, index) {
           this.deleteAllStepContents(step);
         }, this);
+        
         this.deleteStageContents();
         // Bring other stages closer
         if(this.nextStage) {
