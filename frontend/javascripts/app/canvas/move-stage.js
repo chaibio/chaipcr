@@ -92,7 +92,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         });
 
         this.indicator.beacon = new fabric.Rect({
-          fill: 'black', width: 10, left: 0, top: 10, height: 10, selectable: false, me: this,
+          fill: null, width: 10, left: 0, top: 10, height: 10, selectable: false, me: this,
           lockMovementY: true, hasControls: false, visible: true,
         });
 
