@@ -203,6 +203,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           subtraction_type = if $scope.baseline_subtraction then 'baseline' else 'background'
           $scope.chartConfig.axes.y.ticks = helper.getLogViewYticks(max_calibration[subtraction_type])
           $scope.chartConfig.axes.y.tickFormat = helper.toScientificNotation
+          $scope.chartConfig.axes.y.min = 10		  
         else
           $scope.chartConfig.axes.y.ticks = 10
           delete $scope.chartConfig.axes.y.tickFormat

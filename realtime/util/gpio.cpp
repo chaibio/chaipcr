@@ -17,290 +17,396 @@
 // limitations under the License.
 //
 
+#include "gpio.h"
+#include "exceptions.h"
+#include "logger.h"
+
+#include <limits>
+#include <system_error>
+#include <sstream>
+#include <cstring>
+
+#include <unistd.h>
 #include <fcntl.h>
 #include <poll.h>
-#include <unistd.h>
+#include <sys/stat.h>
 #include <sys/eventfd.h>
 
-#include <cstring>
-#include <climits>
-#include <cassert>
+GPIO::GPIO(unsigned int pinNumber, Direction direction, Type type)
+{
+    if (pinNumber == std::numeric_limits<unsigned int>::max())
+        std::logic_error("Invalid pin number");
 
-#include <exception>
-#include <sstream>
-#include <fstream>
-#include <system_error>
+    _pinNumber = pinNumber;
+    _type = type;
+    _pollFd = -1;
+    _cancelPollFd = -1;
+    _savedValue = kLow;
 
-#include "pcrincludes.h"
-#include "gpio.h"
-
-using namespace std;
-
-////////////////////////////////////////////////////////////////////////////////
-// Class GPIO
-GPIO::GPIO(unsigned int pinNumber, Direction direction, bool waitinigAvailable) :
-	pinNumber_(pinNumber) {
-	
-	exportPin();
+    exportPin();
     changeEdge();
-	setDirection(direction);
+    setDirection(direction);
 
-    if (waitinigAvailable)
-        setupWaiting();
-    else
-    {
-        waitingFd_ = -1;
-        stopWaitinigFd_ = -1;
-    }
-
-    savedValue_ = value();
+    if (type == kDirect)
+        setupStream();
+    else if (type == kPoll)
+        setupPoll();
 }
 
-GPIO::GPIO(GPIO &&other) {
-    pinNumber_ = other.pinNumber_;
-    direction_ = other.direction_;
-    savedValue_ = other.savedValue_;
-    waitingFd_ = other.waitingFd_;
-    stopWaitinigFd_ = other.stopWaitinigFd_;
+GPIO::GPIO(GPIO &&other)
+{
+    if (other._pinNumber == std::numeric_limits<unsigned int>::max())
+        std::logic_error("GPIO has already been moved");
 
-    other.pinNumber_ = UINT_MAX;
-    other.waitingFd_ = -1;
-    other.stopWaitinigFd_ = -1;
+    _pinNumber = other._pinNumber;
+    _direction = other._direction;
+    _type = other._type;
+    _pollFd = other._pollFd;
+    _cancelPollFd = other._cancelPollFd;
+
+    if (_type == kDirect) //The current version of the compiler does not support move for streams
+        setupStream();
+
+    other._pinNumber = std::numeric_limits<unsigned int>::max();
+    other._pinStream.close();
+    other._pollFd = -1;
+    other._cancelPollFd = -1;
 }
 
-GPIO::~GPIO() {
-    close(stopWaitinigFd_);
-    close(waitingFd_);
+GPIO::~GPIO()
+{
+    close(_pollFd);
+    close(_cancelPollFd);
 }
 
-GPIO& GPIO::operator= (GPIO &&other) {
-    pinNumber_ = other.pinNumber_;
-    direction_ = other.direction_;
-    savedValue_ = other.savedValue_;
-    waitingFd_ = other.waitingFd_;
-    stopWaitinigFd_ = other.stopWaitinigFd_;
+GPIO& GPIO::operator =(GPIO &&other)
+{
+    if (other._pinNumber == std::numeric_limits<unsigned int>::max())
+        std::logic_error("GPIO has already been moved");
 
-    other.pinNumber_ = UINT_MAX;
-    other.waitingFd_ = -1;
-    other.stopWaitinigFd_ = -1;
+    close(_pollFd);
+    close(_cancelPollFd);
+
+    _pinStream.close();
+
+    _pinNumber = other._pinNumber;
+    _direction = other._direction;
+    _type = other._type;
+    _pollFd = other._pollFd;
+    _cancelPollFd = other._cancelPollFd;
+    _savedValue = other._savedValue.load();
+
+    if (_type == kDirect) //The current version of the compiler does not support move for streams
+        setupStream();
+
+    other._pinNumber = std::numeric_limits<unsigned int>::max();
+    other._pinStream.close();
+    other._pollFd = -1;
+    other._cancelPollFd = -1;
 
     return *this;
 }
-	
-GPIO::Value GPIO::value() const {
-    if (pinNumber_ == UINT_MAX)
-        throw GPIOError("Unexpected error: GPIO was moved");
 
-	ostringstream filePath;
-    filePath << "/sys/class/gpio/gpio" << pinNumber_ << "/value";
+GPIO::Value GPIO::value() const
+{
+    if (_type != kDirect)
+        std::logic_error("GPIO is not setup for direct access");
 
-    ifstream valueFile;
-    valueFile.exceptions(ofstream::failbit | ofstream::badbit);
+    if (_pinNumber == std::numeric_limits<unsigned int>::max())
+        throw std::logic_error("GPIO has been moved");
 
-    try {
-        valueFile.open(filePath.str());
+    if (_direction == kOutput)
+        return _savedValue;
+
+    char buffer[2] = { 0, 0 };
+
+    {
+        std::lock_guard<std::mutex> lock(_pinStreamMutex);
+
+        try
+        {
+            _pinStream >> buffer;
+            _pinStream.clear();
+            _pinStream.seekg(0);
+        }
+        catch (...)
+        {
+            throw std::system_error(errno, std::generic_category(), "Unable to read a pin (" + std::to_string(_pinNumber) + "):");
+        }
     }
-    catch (...) {
-        throw std::system_error(errno, std::generic_category(), "Unable to open a gpio file (" + filePath.str() + ") -");
-    }
 
-    char buf[2];
+    switch (buffer[0])
+    {
+    case '0':
+        return kLow;
 
-    try {
-        valueFile >> buf;
-        valueFile.close();
+    case '1':
+        return kHigh;
+
+    default:
+        throw std::runtime_error("Unexpected GPIO value");
     }
-    catch (...) {
-        throw std::system_error(errno, std::generic_category(), "Unable to read a gpio file (" + filePath.str() + ") -");
-    }
-	
-	switch (buf[0]) {
-	case '0':
-        savedValue_ = kLow;
-		return kLow;
-	
-	case '1':
-        savedValue_ = kHigh;
-		return kHigh;
-		
-	default:
-		throw GPIOError("Unexpected GPIO value");
-	}
 }
 
-void GPIO::setValue(Value value, bool forceUpdate) {
-    if (pinNumber_ == UINT_MAX)
-        throw GPIOError("Unexpected error: GPIO was moved");
+void GPIO::setValue(Value value, bool forceUpdate)
+{
+    if (value != kLow || value != kHigh)
+        std::logic_error("Invalid GPIO value");
 
-    if (!forceUpdate && value == savedValue_)
+    if (_type != kDirect)
+        std::logic_error("GPIO is not setup for direct access");
+
+    if (_pinNumber == std::numeric_limits<unsigned int>::max())
+        throw std::logic_error("GPIO has been moved");
+
+    if (_direction != kOutput)
+        throw std::logic_error("Attempt to set a value to a non-output GPIO pin");
+
+    std::lock_guard<std::mutex> lock(_pinStreamMutex);
+
+    if (!forceUpdate && value == _savedValue)
         return;
 
-	if (direction_ != kOutput)
-        throw InvalidState("Attempt to set a value to a non-output GPIO pin");
-	
-    ostringstream filePath;
-	filePath << "/sys/class/gpio/gpio" << pinNumber_ << "/value";
+    char buffer[2] = { 0, 0 };
 
-    ofstream valueFile;
-    valueFile.exceptions(ofstream::failbit | ofstream::badbit);
+    try
+    {
+        _pinStream << value;
+        _pinStream.flush();
+        _pinStream.seekp(0);
 
-    try {
-        valueFile.open(filePath.str());
+        _pinStream >> buffer;
+        _pinStream.clear();
+        _pinStream.seekg(0);
     }
-    catch (...) {
-        throw std::system_error(errno, std::generic_category(), "Unable to open a gpio file (" + filePath.str() + ") -");
+    catch (...)
+    {
+        APP_LOGGER << "GPIO::setValue - Unable to change a pin (" << _pinNumber << "): " << std::strerror(errno) << std::endl;
     }
-	
-    try {
-        switch (value) {
+
+    switch (buffer[0])
+    {
+    case '0':
+        _savedValue = kLow;
+        break;
+
+    case '1':
+        _savedValue = kHigh;
+        break;
+
+    default:
+        throw std::runtime_error("Unexpected GPIO value");
+    }
+
+    if (value != _savedValue)
+        APP_LOGGER << "GPIO::setValue - Unable to change GPIO's (" << _pinNumber << ") value from " << _savedValue << " to " << value << std::endl;
+}
+
+bool GPIO::pollValue(Value expectedValue, Value &value)
+{
+    if (_pollFd == -1)
+        throw std::logic_error("GPIO is not setup for polling");
+
+    char buffer[sizeof(int64_t)];
+
+    if (read(_pollFd, buffer, sizeof(buffer) - 1) == -1)
+        throw std::system_error(errno, std::generic_category(), "Unable to read GPIO:");
+
+    if (lseek(_pollFd, 0, SEEK_SET) == -1)
+        throw std::system_error(errno, std::generic_category(), "Unable to seek GPIO:");
+
+    if ((buffer[0] == '0' && expectedValue == kLow) || (buffer[0] == '1' && expectedValue == kHigh))
+    {
+        value = expectedValue;
+        return true;
+    }
+
+    pollfd fdArray[2];
+    fdArray[0].fd = _pollFd;
+    fdArray[0].events = POLLPRI;
+    fdArray[0].revents = 0;
+
+    fdArray[1].fd = _cancelPollFd;
+    fdArray[1].events = POLLIN;
+    fdArray[1].revents = 0;
+
+    if (poll(fdArray, 2, -1) > 0)
+    {
+        if (fdArray[0].revents > 0) //GPIO event
+        {
+            if (fdArray[0].revents | POLLIN || fdArray[0].revents | POLLPRI)
+            {
+                if (read(_pollFd, buffer, sizeof(buffer) - 1) == -1)
+                    throw std::system_error(errno, std::generic_category(), "Unable to read GPIO:");
+
+                if (lseek(_pollFd, 0, SEEK_SET) == -1)
+                    throw std::system_error(errno, std::generic_category(), "Unable to seek GPIO:");
+
+                switch (buffer[0])
+                {
+                case '0':
+                    value = kLow;
+                    break;
+
+                case '1':
+                    value = kHigh;
+                    break;
+
+                default:
+                    throw std::runtime_error("Unexpected GPIO value");
+                }
+            }
+            else
+                throw std::runtime_error("Unexpected GPIO event occured");
+        }
+        else //Cancel
+        {
+            read(_cancelPollFd, buffer, sizeof(int64_t));
+            return false;
+        }
+    }
+    else
+        throw std::system_error(errno, std::generic_category(), "Unable to poll a pin (" + std::to_string(_pinNumber) + "):");
+
+    return true;
+}
+
+void GPIO::cancelPolling()
+{
+    if (_cancelPollFd != -1)
+    {
+        int64_t i = 1;
+        write(_cancelPollFd, &i, sizeof(i));
+    }
+}
+
+void GPIO::exportPin()
+{
+    try
+    {
+        std::ofstream exportFile;
+        exportFile.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+        exportFile.open("/sys/class/gpio/export");
+        exportFile << _pinNumber;
+    }
+    catch (...)
+    {
+        throw std::system_error(errno, std::generic_category(), "Unable to export a pin (" + std::to_string(_pinNumber) + "):");
+    }
+}
+
+void GPIO::changeEdge()
+{
+    try
+    {
+        std::ofstream edgeFile;
+        edgeFile.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+        edgeFile.open("/sys/class/gpio/gpio" + std::to_string(_pinNumber) + "/edge");
+        edgeFile << "both";
+    }
+    catch (...)
+    {
+        throw std::system_error(errno, std::generic_category(), "Unable to set the edge of a pin (" + std::to_string(_pinNumber) + "):");
+    }
+}
+
+void GPIO::setDirection(Direction direction)
+{
+    _direction = direction;
+
+    try
+    {
+        std::ofstream directionFile;
+        directionFile.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+        directionFile.open("/sys/class/gpio/gpio" + std::to_string(_pinNumber) + "/direction");
+
+        switch (direction)
+        {
         case kInput:
-            valueFile << "0";
-            valueFile.flush();
+            directionFile << "in";
             break;
 
         case kOutput:
-            valueFile << "1";
-            valueFile.flush();
+            directionFile << "out";
             break;
 
         default:
-            throw invalid_argument("Invalid GPIO value");
+            throw std::logic_error("Invalid GPIO direction");
         }
     }
-    catch (const invalid_argument &/*ex*/) {
+    catch (const std::logic_error &/*ex*/)
+    {
         throw;
     }
-    catch (...) {
-        throw std::system_error(errno, std::generic_category(), "Unable to write into a gpio file (" + filePath.str() + ") -");
-    }
-	
-	valueFile.close();
-    savedValue_ = value;
-}
-
-GPIO::Value GPIO::waitValue(Value value) {
-    if (waitingFd_ >= 0) {
-        char buffer[sizeof(int64_t)];
-        read(waitingFd_, buffer, sizeof(buffer)-1);
-        lseek(waitingFd_, 0, SEEK_SET);
-
-        if ((buffer[0] == '0' && value == kLow) || (buffer[0] == '1' && value == kHigh)) {
-            savedValue_ = value;
-            return value;
-        }
-
-        pollfd fdArray[2];
-        fdArray[0].fd = waitingFd_;
-        fdArray[0].events = POLLPRI;
-        fdArray[0].revents = 0;
-
-        fdArray[1].fd = stopWaitinigFd_;
-        fdArray[1].events = POLLIN;
-        fdArray[1].revents = 0;
-
-        if (poll(fdArray, 2, -1) > 0) {
-            if (fdArray[0].revents > 0) { //If was some operation on GPIO
-                if (fdArray[0].revents | POLLIN || fdArray[0].revents | POLLPRI) {
-                    read(waitingFd_, buffer, sizeof(buffer)-1);
-                    lseek(waitingFd_, 0, SEEK_SET);
-
-                    switch (buffer[0]) {
-                    case '0':
-                        value = savedValue_ = kLow;
-                        break;
-
-                    case '1':
-                        value = savedValue_ = kHigh;
-                        break;
-
-                    default:
-                        throw GPIOError("Unexpected GPIO value");
-                    }
-                }
-                else { //Some error
-                    value = value == kHigh ? kLow : kHigh;
-                }
-            }
-            else { //If was some operatio on stopWaitinigFd_
-                read(stopWaitinigFd_, buffer, sizeof(int64_t));
-                value = value == kHigh ? kLow : kHigh;
-            }
-        }
-        else
-            value = value == kHigh ? kLow : kHigh;
-    }
-    else
-        throw std::logic_error("GPIO is not setup for waiting");
-
-    return value;
-}
-
-void GPIO::stopWaitinigValue() {
-    if (stopWaitinigFd_ >= 0) {
-        int64_t i = 1;
-        write(stopWaitinigFd_, &i, sizeof(i));
+    catch (...)
+    {
+        throw std::system_error(errno, std::generic_category(), "Unable to set the direction of a pin (" + std::to_string(_pinNumber) + "):");
     }
 }
 
-void GPIO::setDirection(Direction direction) {
-    if (pinNumber_ == UINT_MAX)
-        throw GPIOError("Unexpected error: GPIO was moved");
+void GPIO::setupStream()
+{
+    try
+    {
+        _pinStream.exceptions(std::fstream::failbit | std::fstream::badbit);
+        _pinStream.open("/sys/class/gpio/gpio" + std::to_string(_pinNumber) + "/value");
+    }
+    catch (...)
+    {
+        throw std::system_error(errno, std::generic_category(), "Unable to open a pin (" + std::to_string(_pinNumber) + "):");
+    }
 
-	ostringstream filePath;
-	ofstream directionFile;
-	
-	filePath << "/sys/class/gpio/gpio" << pinNumber_ << "/direction";
-	directionFile.open(filePath.str());
-	
-	switch (direction) {
-	case kInput:
-		directionFile << "in";
-		break;
-	
-	case kOutput:
-		directionFile << "out";
-		break;
-	
-	default:
-		throw invalid_argument("Invalid direction");
-	}
-	
-	directionFile.close();
-	
-	direction_ = direction;
-}
+    char buffer[2] = { 0, 0 };
 
-void GPIO::setupWaiting() {
-    ostringstream filePath;
-    filePath << "/sys/class/gpio/gpio" << pinNumber_ << "/value";
+    try
+    {
+        _pinStream >> buffer;
+        _pinStream.clear();
+        _pinStream.seekg(0);
+    }
+    catch (...)
+    {
+        throw std::system_error(errno, std::generic_category(), "Unable to read a pin (" + std::to_string(_pinNumber) + "):");
+    }
 
-    waitingFd_ = open(filePath.str().c_str(), O_RDONLY | O_NONBLOCK);
-    stopWaitinigFd_ = eventfd(0, EFD_NONBLOCK);
-}
+    switch (buffer[0])
+    {
+    case '0':
+        _savedValue = kLow;
+        break;
 
-void GPIO::exportPin() {
-    if (pinNumber_ != UINT_MAX) {
-        ofstream exportFile;
-        exportFile.open("/sys/class/gpio/export");
-        exportFile << pinNumber_;
+    case '1':
+        _savedValue = kHigh;
+        break;
+
+    default:
+        throw std::runtime_error("Unexpected GPIO value");
     }
 }
 
-void GPIO::unexportPin() {
-    if (pinNumber_ != UINT_MAX) {
-        ofstream unexportFile;
-        unexportFile.open("/sys/class/gpio/unexport");
-        unexportFile << pinNumber_;
+void GPIO::setupPoll()
+{
+    std::stringstream filePath;
+    filePath << "/sys/class/gpio/gpio" << _pinNumber << "/value";
+
+    _pollFd = open(filePath.str().c_str(), O_RDONLY | O_NONBLOCK);
+
+    if (_pollFd == -1)
+        throw std::system_error(errno, std::generic_category(), "Unable to open a pin (" + std::to_string(_pinNumber) + "):");
+
+    _cancelPollFd = eventfd(0, EFD_NONBLOCK);
+
+    if (_cancelPollFd == -1)
+    {
+        close(_pollFd);
+
+        throw std::system_error(errno, std::generic_category(), "Unable to create an even fd:");
     }
 }
 
-void GPIO::changeEdge() {
-    if (pinNumber_ != UINT_MAX) {
-        ostringstream filePath;
-        filePath << "/sys/class/gpio/gpio" << pinNumber_ << "/edge";
-
-        ofstream edgeFile(filePath.str());
-        if (edgeFile.is_open())
-            edgeFile << "both";
-    }
+void GPIO::unexportPin()
+{
+    std::ofstream unexportFile;
+    unexportFile.open("/sys/class/gpio/unexport");
+    unexportFile << _pinNumber;
 }

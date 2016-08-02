@@ -28,7 +28,7 @@
 LTC2444::LTC2444(unsigned int csPinNumber, SPIPort spiPort, unsigned int busyPinNumber) :
      csPin_(csPinNumber, GPIO::kOutput),
 	 spiPort_ (spiPort),
-     busyPin_ (busyPinNumber, GPIO::kInput, true){}
+     busyPin_ (busyPinNumber, GPIO::kInput, GPIO::kPoll){}
 
 LTC2444::~LTC2444() {
 }
@@ -87,14 +87,22 @@ int32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, Oversa
     return conversion;
 }
 
-bool LTC2444::busy(){
-    return busyPin_.value() == GPIO::kHigh;
-}
-
 bool LTC2444::waitBusy() {
-    return busyPin_.waitValue(GPIO::kLow) == GPIO::kHigh;
+    try
+    {
+        GPIO::Value value = GPIO::kLow;
+
+        if (busyPin_.pollValue(GPIO::kLow, value))
+            return value == GPIO::kHigh;
+    }
+    catch (const std::exception &ex)
+    {
+        APP_LOGGER << "LTC2444::waitBusy - exception: " << ex.what() << std::endl;
+    }
+
+    return false;
 }
 
 void LTC2444::stopWaitinigBusy() {
-    busyPin_.stopWaitinigValue();
+    busyPin_.cancelPolling();
 }

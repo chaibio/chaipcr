@@ -276,6 +276,10 @@ image_filename_folder="${temp}"
 
 image_filename_prfx="upgrade"
 image_filename_rootfs="$image_filename_prfx-rootfs.img.gz"
+
+#realtime service is not active.
+image_upgrade_filename_rootfs="$image_filename_prfx-rootfs2.img.gz"
+
 image_filename_data="$image_filename_prfx-data.img.gz"
 image_filename_boot="$image_filename_prfx-boot.img.gz"
 image_filename_perm="$image_filename_prfx-perm.img.gz"
@@ -374,6 +378,23 @@ echo "Packing binaries partition to: $image_filename_rootfs"
 dd  if=$rootfs_partition bs=16777216 | gzip -c > $image_filename_rootfs
 $mdsumtool $image_filename_rootfs>>$checksums_filename
 
+mount $rootfs_partition /tmp/emmc -t ext4
+retval=$?
+
+if [ $retval -ne 0 ]; then
+    echo "Error mounting rootfs partition. Error($retval)"
+else
+	echo Disabling realtime service
+	rm /tmp/emmc/etc/systemd/system/multi-user.target.wants/realtime.service || :
+
+	sync
+	umount /tmp/emmc > /dev/null || true
+fi
+
+echo "Packing upgrade rootfs partition to: $image_upgrade_filename_rootfs"
+dd  if=$rootfs_partition bs=16777216 | gzip -c > $image_upgrade_filename_rootfs
+$mdsumtool $image_upgrade_filename_rootfs>>$checksums_filename
+
 sleep 5
 sync
 
@@ -391,12 +412,6 @@ if [ ! -e $upgrade_scripts ]
 then
 	mkdir -p $upgrade_scripts/
 fi
-
-#cp $BASEDIR/factory_settings_sdcard/scripts/* $upgrade_scripts/
-#echo "cp $BASEDIR/factory_settings_sdcard/scripts/* $upgrade_scripts/"
-#echo "${pwd}"
-#exit
-
 
 echo "Data partition: $data_partition"
 mount $data_partition /tmp/emmc -t ext4
@@ -428,7 +443,6 @@ retval=$?
 #	echo "compressing all images to $image_filename_upgrade_tar_temp"
 	tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_data $image_filename_rootfs  $image_filename_perm $checksums_filename
 
-
 	if [ -e $image_filename_data ]
 	then
 		rm $image_filename_data
@@ -439,13 +453,15 @@ retval=$?
 	echo "Finalizing: $image_filename_upgrade2"
 	mv $image_filename_upgrade_temp $image_filename_upgrade2
 
-#echo "mv $image_filename_upgrade_temp $image_filename_upgrade2"
-#exit 0
-
 if [ -e $image_filename_upgrade_temp ]
 then
 	rm $image_filename_upgrade_temp
 fi
+
+echo Packing upgrade image
+
+rm $image_filename_rootfs
+mv $image_upgrade_filename_rootfs $image_filename_rootfs
 
 tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $image_filename_perm $checksums_filename $upgrade_scripts
 
