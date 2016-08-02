@@ -30,6 +30,8 @@ angular.module("canvasApp").factory('moveStageRect', [
         this.currentDrop = null;
         this.startPosition = 0;
         this.endPosition = 0;
+        this.currentLeft = 0;
+        this.direction = null;
 
         var smallCircle = new fabric.Circle({
           radius: 6, fill: 'white', stroke: "black", strokeWidth: 2, selectable: false,
@@ -121,9 +123,16 @@ angular.module("canvasApp").factory('moveStageRect', [
           stageType.setText(stage.model.stage_type.toUpperCase());
         };
 
-        this.indicator.onTheMove = function(C) {
+        this.indicator.onTheMove = function(C, movement) {
           // Here we hit test the movement of the MOVING STAGE
           //console.log("moving", this);
+
+          if(movement.left > this.currentLeft && this.direction !== "right") {
+            this.direction = "right";
+          } else if(movement.left < this.currentLeft && this.direction !== "left") {
+            this.direction = "left";
+          }
+          this.currentLeft = movement.left;
           C.allStageViews.some(function(stage, index) {
 
             if(this.intersectsWithObject(stage.stageHitPoint) && this.currentHit !== index) {
