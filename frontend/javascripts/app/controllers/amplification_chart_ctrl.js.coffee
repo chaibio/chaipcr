@@ -90,7 +90,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           .then (resp) ->
             $scope.fetching = false
             $scope.error = null
-            if resp.data.amplification_data and resp.data.amplification_data?.length > 1
+            # if resp.data.amplification_data and resp.data.amplification_data?.length > 1
+            if resp.status is 200
               data = resp.data
               hasData = true
               $scope.hasData = true
