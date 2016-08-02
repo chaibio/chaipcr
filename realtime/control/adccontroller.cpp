@@ -71,6 +71,9 @@ void ADCController::process() {
             if (_ltc2444->waitBusy())
                 continue;
 
+            if (!_workState)
+                break;
+
             if (ExperimentController::getInstance()->machineState() == ExperimentController::IdleMachineState) {
                 timespec time;
                 time.tv_sec = 0;

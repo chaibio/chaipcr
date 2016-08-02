@@ -80,8 +80,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           for y_item, i in datum by 1
             pt["well_#{i}_background"] = y_item[3]
             pt["well_#{i}_baseline"] =  y_item[4]
-            pt["well_#{i}_background_log"] = if y_item[3] > 0 then y_item[3] else 0.01
-            pt["well_#{i}_baseline_log"] =  if y_item[4] > 0 then y_item[4] else 0.01
+            pt["well_#{i}_background_log"] = if y_item[3] > 0 then y_item[3] else 10
+            pt["well_#{i}_baseline_log"] =  if y_item[4] > 0 then y_item[4] else 10
 
           return pt
 
@@ -145,7 +145,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       roundup = roundup*1
 
       calibs = []
-      calib = 0.01
+      calib = 10
 
       while calib <= roundup
         calibs.push calib
