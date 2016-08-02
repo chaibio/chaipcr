@@ -91,16 +91,21 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             $scope.error = null
             if resp.status is 200 and resp.data?.partial
               $scope.hasData = true
+              $scope.data = helper.paddData()
+              delete $scope.chartConfig.axes.x.min
               $timeout ->
+                console.log 'reload ampli chart !!!!!'
                 $scope.$broadcast '$reload:n3:charts'
               , 1000
             if resp.data.amplification_data and resp.data.amplification_data?.length > 1
+              $scope.chartConfig.axes.x.min = 1
               $scope.hasData = true
               data = resp.data
               data.amplification_data.shift()
               data.ct.shift()
               max_calibration = helper.getMaxCalibrations(data.amplification_data)
               data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
+              console.log data.amplification_data
 
               AMPLI_DATA_CACHE = angular.copy data
               $scope.amplification_data = angular.copy(AMPLI_DATA_CACHE.amplification_data)
@@ -118,6 +123,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             retry()
 
       fetchFluorescenceData()
+
+      # $timeout ->
+      #   $scope.$broadcast '$reload:n3:charts'
+      # , 2000
 
       updateButtonCts = ->
         for well_i in [0..15] by 1
@@ -205,7 +214,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           subtraction_type = if $scope.baseline_subtraction then 'baseline' else 'background'
           $scope.chartConfig.axes.y.ticks = helper.getLogViewYticks(max_calibration[subtraction_type])
           $scope.chartConfig.axes.y.tickFormat = helper.toScientificNotation
-          $scope.chartConfig.axes.y.min = 10		  
+          $scope.chartConfig.axes.y.min = 10
         else
           $scope.chartConfig.axes.y.ticks = 10
           delete $scope.chartConfig.axes.y.tickFormat
@@ -214,10 +223,11 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       $scope.$watch ->
         $scope.RunExperimentCtrl.chart
-      , (val) ->
-        if val is 'amplification' and !hasInit
-          fetchFluorescenceData()
-        else
+      , (chart) ->
+        if chart is 'amplification'
+          if !hasInit
+            fetchFluorescenceData()
+
           $timeout ->
             $scope.$broadcast '$reload:n3:charts'
           , 1000

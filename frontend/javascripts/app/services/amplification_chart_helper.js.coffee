@@ -22,8 +22,6 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
   'Experiment'
   (SecondsDisplay, $filter, Experiment) ->
 
-   # FLOOR_VALUE = 500
-
     @chartConfig = ->
       axes:
         x:
@@ -92,6 +90,8 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       for i in [0..15] by 1
         paddData["well_#{i}_baseline"] = 0
         paddData["well_#{i}_background"] = 0
+        paddData["well_#{i}_background_log"] = 0
+        paddData["well_#{i}_baseline_log"] = 0
 
       channel_1: [paddData]
       channel_2: [paddData]

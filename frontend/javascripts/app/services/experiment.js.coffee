@@ -38,28 +38,20 @@ window.ChaiBioTech.ngApp
       deferred = $q.defer()
       ques["exp_#{obj.id}"].push deferred
 
-      console.log 'que:'
-      console.log ques["exp_#{obj.id}"]
-      console.log 'end que:'
-
       if ques["exp_#{obj.id}"].length > 1 and ques["exp_#{obj.id}"].length < 5 #there is already pending request for this experiment, wait for it
         return deferred.promise
       else
-        console.log 'getting experiment $http'
         promise = $http.get("/experiments/#{obj.id}")
         promise.then (resp) ->
-          console.log '$http then'
           if ques["exp_#{obj.id}"]
             for def in ques["exp_#{obj.id}"] by 1
               def.resolve resp.data
         promise.catch (resp) ->
-          console.log '$http catch'
           if ques["exp_#{obj.id}"]
             for def in ques["exp_#{obj.id}"] by 1
               def.reject resp
 
         promise.finally ->
-          console.log '$http finally'
           delete ques["exp_#{obj.id}"]
           ques = angular.copy(ques)
 
@@ -72,7 +64,6 @@ window.ChaiBioTech.ngApp
       currentExperiment
 
     self.analyze = (id) ->
-      console.log 'anayling ....'
       $http.get("/experiments/#{id}/analyze")
 
     tempLogsQues = []
