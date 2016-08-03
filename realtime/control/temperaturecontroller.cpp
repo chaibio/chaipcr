@@ -74,7 +74,7 @@ void TemperatureController::setEnableMode(bool enableMode)
 
 void TemperatureController::setTargetTemperature(double temperature)
 {
-    if (temperature < _minTargetTemp || temperature > _maxTargetTemp)
+    if (temperature < _minTargetTemp || temperature > _maxTargetTemp || std::isnan(temperature))
     {
         std::stringstream string;
         string << "Requested " << _name << " temperature (" << temperature << " C) outside limits of " << _minTargetTemp << '-' << _maxTargetTemp << " C";

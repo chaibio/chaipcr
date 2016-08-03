@@ -82,7 +82,7 @@ double HeatBlock::maxTargetTemperature() const {
 }
 
 void HeatBlock::setTargetTemperature(double targetTemperature, double rampRate) {
-    if (targetTemperature < minTargetTemperature() || targetTemperature > maxTargetTemperature())
+    if (targetTemperature < minTargetTemperature() || targetTemperature > maxTargetTemperature() || std::isnan(targetTemperature))
     {
         std::stringstream string;
         string << "Requested heat block temperature outside limits of " << minTargetTemperature() << '-' << maxTargetTemperature() << " C";
