@@ -39,9 +39,5 @@ class CachedMeltCurveDatum < ActiveRecord::Base
   def self.retrieve(experiment_id, stage_id)
     self.where(:experiment_id=>experiment_id, :stage_id=>stage_id).order(:channel, :well_num)
   end
-  
-  def self.maxid(experiment_id, stage_id)
-    self.where(:experiment_id=>experiment_id, :stage_id=>stage_id).maximum(:id)
-  end
 
 end

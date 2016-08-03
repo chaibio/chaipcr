@@ -250,7 +250,7 @@ class ExperimentsController < ApplicationController
             return
           end
 
-          if !stale?(etag: CachedMeltCurveDatum.maxid(@experiment.id, @first_stage_meltcurve_data.id))
+          if !@experiment.cached_temperature.nil? && !stale?(etag: @experiment.cached_temperature)
             #render 304 Not Modified
             return
           end
@@ -261,9 +261,9 @@ class ExperimentsController < ApplicationController
             #no data but background task is submitted
             render :nothing => true, :status => (task_submitted)? 202 : 503
             return
-          elsif @melt_curve_data && @melt_curve_data.last
+          elsif !@experiment.cached_temperature.nil?
             #set etag
-            fresh_when(:etag => @melt_curve_data.last.id)
+            fresh_when(:etag => @experiment.cached_temperature)
           end
           @partial = @experiment.running? || !MeltCurveDatum.new_data_generated?(@experiment, @first_stage_meltcurve_data.id).nil?
         else

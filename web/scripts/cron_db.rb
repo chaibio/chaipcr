@@ -88,6 +88,7 @@ class CronDB
      execute("DELETE FROM `amplification_data`")
      execute("DELETE FROM `cached_melt_curve_data`")
      execute("DELETE FROM `cached_analyze_data`")
+     execute("UPDATE experiments SET cached_temperature = NULL")
    end
    
    def software_version
