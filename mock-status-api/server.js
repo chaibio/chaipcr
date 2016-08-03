@@ -227,6 +227,12 @@ app.put('/network/wlan', function(req, res, next) {
   });
 });
 
+app.put('/network/eth0', function(req, res, next) {
+  res.send({
+    "state": true
+  });
+});
+
 app.post('/control/start', function (req, res, next) {
   data = status_lid_heating;
   data.experiment_controller.expriment.id = req.body.experiment_id;

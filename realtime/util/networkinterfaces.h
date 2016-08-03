@@ -73,6 +73,8 @@ namespace NetworkInterfaces
     void ifdown(const std::string &interfaceName);
 
     InterfaceState getInterfaceState(const std::string &interfaceName);
+
+    void removeLease(const std::string &interfaceName);
 }
 
 #endif // NETWORKCONFIGURATOR_H

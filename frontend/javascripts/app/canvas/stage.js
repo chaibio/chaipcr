@@ -78,6 +78,7 @@ angular.module("canvasApp").factory('stage', [
         this.childSteps.forEach(function(step, index) {
           this.deleteAllStepContents(step);
         }, this);
+        
         this.deleteStageContents();
         // Bring other stages closer
         if(this.nextStage) {
@@ -156,9 +157,9 @@ angular.module("canvasApp").factory('stage', [
         stageGraphics.recalculateStageHitPoint.call(this);
 
         if(this.parent.allStepViews.length === 1) {
-          this.parent.editStageMode(this.parent.editStageMode);
+          this.parent.editStageMode(this.parent.editStageStatus);
         }
-        
+
         this.parent.setDefaultWidthHeight();
       };
 

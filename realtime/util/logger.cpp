@@ -47,3 +47,23 @@ void Logger::setup(Poco::Channel *channel, const std::string &name)
     _logger = &Poco::Logger::get(name);
     _logger->information("--------------------------------- Session started ---------------------------------");
 }
+
+LoggerStreams::~LoggerStreams()
+{
+    Poco::LogStream logStream(Logger::get());
+
+    for (std::pair<const std::string, std::stringstream> &stream: _streams)
+    {
+        std::string entry;
+
+        while (stream.second.good())
+        {
+            std::getline(stream.second, entry);
+
+            if (!entry.empty())
+                logStream << stream.first << ": " << entry << '\n';
+        }
+
+        logStream.flush();
+    }
+}

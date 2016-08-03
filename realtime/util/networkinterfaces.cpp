@@ -18,6 +18,8 @@
 //
 
 #include "networkinterfaces.h"
+#include "util.h"
+#include "logger.h"
 
 #include <fstream>
 #include <sstream>
@@ -213,7 +215,10 @@ void ifup(const std::string &interfaceName)
     std::stringstream stream;
     stream << "ifup " << interfaceName;
 
-    system(stream.str().c_str());
+    LoggerStreams streams;
+
+    Util::watchProcess(stream.str(), [&interfaceName, &streams](const char *buffer, std::size_t size){ streams.stream("NetworkInterfaces::ifup - " + interfaceName + " (stdout)").write(buffer, size); },
+                                     [&interfaceName, &streams](const char *buffer, std::size_t size){ streams.stream("NetworkInterfaces::ifup - " + interfaceName + " (stderr)").write(buffer, size); });
 }
 
 void ifdown(const std::string &interfaceName)
@@ -221,7 +226,10 @@ void ifdown(const std::string &interfaceName)
     std::stringstream stream;
     stream << "ifdown " << interfaceName;
 
-    system(stream.str().c_str());
+    LoggerStreams streams;
+
+    Util::watchProcess(stream.str(), [&interfaceName, &streams](const char *buffer, std::size_t size){ streams.stream("NetworkInterfaces::ifdown - " + interfaceName + " (stdout)").write(buffer, size); },
+                                     [&interfaceName, &streams](const char *buffer, std::size_t size){ streams.stream("NetworkInterfaces::ifdown - " + interfaceName + " (stderr)").write(buffer, size); });
 }
 
 InterfaceState getInterfaceState(const std::string &interfaceName)
@@ -242,10 +250,10 @@ InterfaceState getInterfaceState(const std::string &interfaceName)
                     {
                         state.interface = interfaceName;
                         state.macAddress = getMacAddress(interfaceName);
+                        state.flags = interface->ifa_flags;
 
                         if (reinterpret_cast<sockaddr_in*>(interface->ifa_addr)->sin_family == AF_INET)
                         {
-                            state.flags = interface->ifa_flags;
                             state.address = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_addr)->sin_addr);
                             state.maskAddress = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_netmask)->sin_addr);
                             state.broadcastAddress = inet_ntoa(reinterpret_cast<sockaddr_in*>(interface->ifa_broadaddr)->sin_addr);
@@ -272,6 +280,11 @@ InterfaceState getInterfaceState(const std::string &interfaceName)
     }
 
     return state;
+}
+
+void removeLease(const std::string &interfaceName)
+{
+    std::remove(("/var/lib/dhcp/dhclient." + interfaceName + ".leases").c_str());
 }
 
 }

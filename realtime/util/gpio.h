@@ -19,53 +19,68 @@
 #ifndef _GPIO_H_
 #define _GPIO_H_
 
-////////////////////////////////////////////////////////////////////////////////
-// Class GPIO
-class GPIO {
-public:
-	enum Direction {
-		kInput = 0,
-		kOutput = 1
-	};
+#include <fstream>
+#include <mutex>
+#include <atomic>
 
-	enum Value {
-		kLow = 0,
-		kHigh = 1
-	};
-	
-    GPIO(unsigned int pinNumber, Direction direction, bool waitinigAvailable = false);
+class GPIO
+{
+public:
+    enum Direction {
+        kInput = 0,
+        kOutput = 1
+    };
+
+    enum Value {
+        kLow = 0,
+        kHigh = 1
+    };
+
+    enum Type
+    {
+        kDirect,
+        kPoll
+    };
+
+    GPIO(unsigned int pinNumber, Direction direction, Type type = kDirect);
     GPIO(const GPIO &other) = delete;
     GPIO(GPIO &&other);
-	~GPIO();
+    ~GPIO();
 
-    GPIO& operator= (const GPIO &other) = delete;
-    GPIO& operator= (GPIO &&other);
-	
+    GPIO& operator =(const GPIO &other) = delete;
+    GPIO& operator =(GPIO &&other);
+
+    inline unsigned int pinNumber() const { return _pinNumber; }
+    inline Direction direction() const { return _direction; }
+    inline Type type() const { return _type; }
+
     Value value() const;
     void setValue(Value value, bool forceUpdate = true);
 
-    Value waitValue(Value value);
-    void stopWaitinigValue();
-	
-	Direction direction() const { return direction_; }
-    void setDirection(Direction direction);
+    bool pollValue(Value expectedValue, Value &value); //Checks if GPIO has expectedValue before polling
+    void cancelPolling();
 
-    void setupWaiting();
-	
 private:
     void exportPin();
+    void changeEdge();
+    void setDirection(Direction direction);
+    void setupStream();
+    void setupPoll();
+
     void unexportPin();
 
-    void changeEdge();
-	
 private:
-	unsigned int pinNumber_; //BeagleBone GPIO Pin Number
-	Direction direction_;
+    unsigned int _pinNumber; //BeagleBone GPIO Pin Number
+    Direction _direction;
+    Type _type;
 
-    int waitingFd_;
-    int stopWaitinigFd_;
+    mutable std::fstream _pinStream;
+    mutable std::mutex _pinStreamMutex;
 
-    mutable Value savedValue_;
+    int _pollFd;
+    int _cancelPollFd;
+
+    std::atomic<Value> _savedValue;
 };
 
 #endif

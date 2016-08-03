@@ -47,7 +47,6 @@ public:
 
     int32_t readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, OversamplingRatio oversamplingRate);
 
-	bool busy();
     bool waitBusy();
     void stopWaitinigBusy();
 
