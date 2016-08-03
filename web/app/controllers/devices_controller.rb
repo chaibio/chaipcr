@@ -19,6 +19,7 @@
 require "net/http"
 require 'digest/md5'
 require 'json'
+require 'zip'
 
 class DevicesController < ApplicationController
   include ParamsHelper
@@ -314,15 +315,40 @@ class DevicesController < ApplicationController
     render :nothing=>true, :status=>:ok
   end
     
-  api :GET, "/device/export_database", "export to chaipcr.sql.gz"
+  api :GET, "/device/export_database", "export to exportdb.zip"
   def export_database
     config   = Rails.configuration.database_configuration
-    dumpfile = "/tmp/chaipcr.sql.gz"
-    system("mysqldump -u #{config[Rails.env]["username"]} #{(config[Rails.env]["password"])? "-p"+config[Rails.env]["password"] : ""} chaipcr | gzip > #{dumpfile}")
-    until File.exist?(dumpfile)
+    dbfile = "/tmp/chaipcr.sql"
+    system("mysqldump -u #{config[Rails.env]["username"]} #{(config[Rails.env]["password"])? "-p"+config[Rails.env]["password"] : ""} chaipcr > #{dbfile}")
+    until File.exist?(dbfile)
       sleep 1
     end
-    send_file(dumpfile)
+
+    t = Tempfile.new("tmpexportdb.zip")
+    logfiles = ["/var/log/realtime.log", "/var/log/realtime.log.1", "/var/log/syslog", "/var/log/syslog.1", "/var/log/daemon.log", "/var/log/daemon.log.1",
+                "/var/log/dmesg", "/var/log/dmesg.0", "/var/log/life_age.log", "/var/log/rails.log", "/var/log/rails.log.1", "/var/log/unicorn.log", "/var/log/unicorn.log.1",
+                "/sdcard/factory/booting.log", "/sdcard/upgrade/booting.log", "/var/log/upgrade.log"]
+    configfiles = ["/root/configuration.json", "/perm/device.json"]
+    begin
+      Zip::OutputStream.open(t) { |zos| }
+
+      Zip::File.open(t.path, Zip::File::CREATE) do |zipfile|
+        zipfile.add("db/"+File.basename(dbfile), dbfile)
+        [logfiles, configfiles].each do |files|
+          folder = (files == logfiles)? "logs" : "config"
+          files.each do |file_name|
+            if File.exist?(file_name)
+              zipfile.add("#{folder}/"+File.basename(file_name), file_name)
+            end
+          end
+        end
+      end
+
+      send_file t.path, :type => 'application/zip', :disposition => 'attachment', :filename => "exportdb.zip"
+    ensure
+      #Close and delete the temp file
+      t.close
+    end
   end
     
   private

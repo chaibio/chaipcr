@@ -285,104 +285,107 @@ class ExperimentsController < ApplicationController
   api :GET, "/experiments/:id/export", "zip temperature, amplification and meltcurv csv files"
   def export
     t = Tempfile.new("tmpexport_#{request.remote_ip}")
-    buffer = Zip::OutputStream.open(t.path) do |out|
-      out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/temperature_log.csv")
-      out.write TemperatureLog.as_csv(params[:id])
+    begin
+      Zip::OutputStream.open(t.path) do |out|
+        out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/temperature_log.csv")
+        out.write TemperatureLog.as_csv(params[:id])
       
-      first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
-      if first_stage_collect_data
-        begin
-          task_submitted = background_calculate_amplification_data(@experiment, first_stage_collect_data.id)
-          if task_submitted.nil? #cached
-            amplification_data = AmplificationDatum.retrieve(@experiment, first_stage_collect_data.id)
-            cts = AmplificationCurve.retrieve(@experiment, first_stage_collect_data.id)
-          else
-            t.close
-            render :nothing => true, :status => (task_submitted)? 202 : 503
-            return
-          end
-        rescue => e
-          logger.error("export amplification data failed: #{e}")
-        end
-        fluorescence_data = FluorescenceDatum.data(@experiment.id, first_stage_collect_data.id)
-      end
-      
-      if amplification_data
-        out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/amplification.csv")
-        columns = ["channel", "well_num", "cycle_num"]
-        fluorescence_index = 0
-        csv_string = CSV.generate do |csv|
-          csv << ["baseline_subtracted_value", "background_subtracted_value", "fluorescence_value"]+columns
-          amplification_data.each do |data|
-            while (fluorescence_index < fluorescence_data.length && 
-                  !(fluorescence_data[fluorescence_index].channel == data.channel && 
-                    fluorescence_data[fluorescence_index].well_num+1 == data.well_num && 
-                    fluorescence_data[fluorescence_index].cycle_num == data.cycle_num)) do
-                  fluorescence_index += 1
+        first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
+        if first_stage_collect_data
+          begin
+            task_submitted = background_calculate_amplification_data(@experiment, first_stage_collect_data.id)
+            if task_submitted.nil? #cached
+              amplification_data = AmplificationDatum.retrieve(@experiment, first_stage_collect_data.id)
+              cts = AmplificationCurve.retrieve(@experiment, first_stage_collect_data.id)
+            else
+              t.close
+              render :nothing => true, :status => (task_submitted)? 202 : 503
+              return
             end
-            fluorescence_value = (fluorescence_index < fluorescence_data.length)? fluorescence_data[fluorescence_index].fluorescence_value : nil
-            csv << [data.baseline_subtracted_value, data.background_subtracted_value, fluorescence_value]+data.attributes.values_at(*columns)
-            fluorescence_index += 1
+          rescue => e
+            logger.error("export amplification data failed: #{e}")
           end
+          fluorescence_data = FluorescenceDatum.data(@experiment.id, first_stage_collect_data.id)
         end
-        out.write csv_string
-      end
-
-      if cts
-        out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/ct.csv")
-        csv_string = CSV.generate do |csv|
-          csv << ["channel", "well_num", "ct"];
-          cts.each do |ct|
-            csv << [ct.channel, ct.well_num, ct.ct]
+      
+        if amplification_data
+          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/amplification.csv")
+          columns = ["channel", "well_num", "cycle_num"]
+          fluorescence_index = 0
+          csv_string = CSV.generate do |csv|
+            csv << ["baseline_subtracted_value", "background_subtracted_value", "fluorescence_value"]+columns
+            amplification_data.each do |data|
+              while (fluorescence_index < fluorescence_data.length && 
+                    !(fluorescence_data[fluorescence_index].channel == data.channel && 
+                      fluorescence_data[fluorescence_index].well_num+1 == data.well_num && 
+                      fluorescence_data[fluorescence_index].cycle_num == data.cycle_num)) do
+                    fluorescence_index += 1
+              end
+              fluorescence_value = (fluorescence_index < fluorescence_data.length)? fluorescence_data[fluorescence_index].fluorescence_value : nil
+              csv << [data.baseline_subtracted_value, data.background_subtracted_value, fluorescence_value]+data.attributes.values_at(*columns)
+              fluorescence_index += 1
+            end
           end
-        end
-        out.write csv_string
-      end
-
-      first_stage_meltcurve_data = Stage.joins(:protocol).where(["experiment_definition_id=? and stage_type='meltcurve'", @experiment.experiment_definition_id]).first
-      if first_stage_meltcurve_data
-        begin
-          task_submitted = background_calculate_melt_curve_data(@experiment, first_stage_meltcurve_data.id)
-          if task_submitted.nil? #cached
-            melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment.id, first_stage_meltcurve_data.id)
-          else
-            t.close
-            render :nothing => true, :status => (task_submitted)? 202 : 503
-            return
-          end
-        rescue => e
-          logger.error("export melt curve data failed: #{e}")
-        end
-      end
-
-      if melt_curve_data
-        out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_data.csv")
-        columns = ["channel", "well_num", "temperature", "fluorescence_data", "derivative"]
-        out.write columns.to_csv
-        melt_curve_data.each do |data|
-          data.temperature.each_index do |index|
-            out.write "#{data.channel}, #{data.well_num}, #{data.temperature[index]}, #{data.fluorescence_data[index]}, #{data.derivative[index]}\r\n"
-          end
+          out.write csv_string
         end
 
-        out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_analysis.csv")
-        columns = ["channel", "well_num", "Tm1", "Tm2", "Tm3", "Tm4", "area1", "area2", "area3", "area4"]
-        csv_string = CSV.generate do |csv|
-          csv << columns
+        if cts
+          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/ct.csv")
+          csv_string = CSV.generate do |csv|
+            csv << ["channel", "well_num", "ct"];
+            cts.each do |ct|
+              csv << [ct.channel, ct.well_num, ct.ct]
+            end
+          end
+          out.write csv_string
+        end
+
+        first_stage_meltcurve_data = Stage.joins(:protocol).where(["experiment_definition_id=? and stage_type='meltcurve'", @experiment.experiment_definition_id]).first
+        if first_stage_meltcurve_data
+          begin
+            task_submitted = background_calculate_melt_curve_data(@experiment, first_stage_meltcurve_data.id)
+            if task_submitted.nil? #cached
+              melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment.id, first_stage_meltcurve_data.id)
+            else
+              t.close
+              render :nothing => true, :status => (task_submitted)? 202 : 503
+              return
+            end
+          rescue => e
+            logger.error("export melt curve data failed: #{e}")
+          end
+        end
+
+        if melt_curve_data
+          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_data.csv")
+          columns = ["channel", "well_num", "temperature", "fluorescence_data", "derivative"]
+          out.write columns.to_csv
           melt_curve_data.each do |data|
-            tm_arr = Array.new(4)
-            data.tm.each_index{|i| tm_arr[i] = data.tm[i]}
-            area_arr = Array.new(4)
-            data.area.each_index{|i| area_arr[i] = data.area[i]}
-            csv << [data.channel, data.well_num]+tm_arr+area_arr
+            data.temperature.each_index do |index|
+              out.write "#{data.channel}, #{data.well_num}, #{data.temperature[index]}, #{data.fluorescence_data[index]}, #{data.derivative[index]}\r\n"
+            end
           end
-        end
+
+          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_analysis.csv")
+          columns = ["channel", "well_num", "Tm1", "Tm2", "Tm3", "Tm4", "area1", "area2", "area3", "area4"]
+          csv_string = CSV.generate do |csv|
+            csv << columns
+            melt_curve_data.each do |data|
+              tm_arr = Array.new(4)
+              data.tm.each_index{|i| tm_arr[i] = data.tm[i]}
+              area_arr = Array.new(4)
+              data.area.each_index{|i| area_arr[i] = data.area[i]}
+              csv << [data.channel, data.well_num]+tm_arr+area_arr
+            end
+          end
         
-        out.write csv_string
+          out.write csv_string
+        end
       end
+      send_file t.path, :type => 'application/zip', :disposition => 'attachment', :filename => "export.zip"
+    ensure
+      t.close
     end
-    send_file t.path, :type => 'application/zip', :disposition => 'attachment', :filename => "export.zip"
-    t.close
   end
   
   def analyze
