@@ -148,8 +148,14 @@ angular.module("canvasApp").factory('moveStageRect', [
           C.allStageViews.some(function(stage, index) {
 
             if(this.beacon.intersectsWithObject(stage.stageHitPointLeft) && this.draggedStage.index !== index) {
-              console.log(this.currentHit);
+              console.log(this.currentHit, "In");
 
+              this.currentDrop = stage;
+              this.currentHit = index;
+            }
+
+            if(this.beacon.intersectsWithObject(stage.stageHitPointRight) && this.draggedStage.index !== index) {
+              console.log(this.currentHit, "out");
               this.currentDrop = stage;
               this.currentHit = index;
             }
