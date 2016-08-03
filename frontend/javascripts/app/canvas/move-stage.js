@@ -58,7 +58,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         );
 
         var verticalLine = new fabric.Line([0, 0, 0, 336],{
-          left: 68, top: 58, stroke: 'black', strokeWidth: 2, originX: 'left', originY: 'top',
+          left: 68, top: 58, stroke: 'black', strokeWidth: 2, originX: 'left', originY: 'top', visible: false
         });
 
         var rect = new fabric.Rect({
@@ -76,7 +76,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         me.imageobjects["drag-stage-image.png"].top = 15;
         me.imageobjects["drag-stage-image.png"].left = 14;
 
-        indicatorRectangle = new fabric.Group([
+        var indicatorRectangle = new fabric.Group([
           rect, stageName, stageType,
           me.imageobjects["drag-stage-image.png"],
         ],
@@ -95,6 +95,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           fill: 'black', width: 10, left: 0, top: 10, height: 10, selectable: false, me: this,
           lockMovementY: true, hasControls: false, visible: true,
         });
+        this.indicator.verticalLine = verticalLine;
 
         this.indicator.init = function(stage) {
 
@@ -155,6 +156,9 @@ angular.module("canvasApp").factory('moveStageRect', [
               if(this.findInAndOut("left") === "OUT") {
                 //console.log("You must move right");
                 stage.moveToSide("right");
+                this.verticalLine.setVisible(true);
+              } else {
+                this.verticalLine.setVisible(false);
               }
               return true;
             }
@@ -166,6 +170,9 @@ angular.module("canvasApp").factory('moveStageRect', [
               if(this.findInAndOut("right") === "OUT") {
                 //console.log("You must move left");
                 stage.moveToSide("left");
+                this.verticalLine.setVisible(true);
+              } else {
+                this.verticalLine.setVisible(false);
               }
               return true;
             }
