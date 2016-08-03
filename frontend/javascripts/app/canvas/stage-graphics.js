@@ -96,12 +96,12 @@ angular.module("canvasApp").factory('stageGraphics', [
     this.createStageHitPoint = function() {
 
       this.stageHitPointLeft = new fabric.Rect({
-        width: 10, height: 10, fill: '', left: this.left + 10, top: 10, selectable: false, name: "stageHitPoint",
+        width: 10, height: 10, fill: '', left: this.left + 10, top: 10, selectable: false, name: "stageHitPointLeft",
         originX: 'left', originY: 'top', fill: 'black'
       });
 
       this.stageHitPointRight = new fabric.Rect({
-        width: 10, height: 10, fill: '', left: this.left + 10, top: 10, selectable: false, name: "stageHitPoint",
+        width: 10, height: 10, fill: '', left: (this.left + this.width) - 20, top: 10, selectable: false, name: "stageHitPointRight",
         originX: 'left', originY: 'top', fill: 'black'
       });
       return this;
@@ -111,7 +111,7 @@ angular.module("canvasApp").factory('stageGraphics', [
 
       //this.stageHitPoint.setWidth(this.myWidth - 60).setCoords();
       this.stageHitPointLeft.setLeft(this.left + 10).setCoords();
-      this.stageHitPointLeft.setLeft((this.left + this.myWidth) - 20).setCoords();
+      this.stageHitPointRight.setLeft((this.left + this.myWidth) - 20).setCoords();
     };
 
     this.createStageRect = function() {

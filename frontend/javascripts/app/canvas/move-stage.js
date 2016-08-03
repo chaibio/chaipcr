@@ -145,30 +145,36 @@ angular.module("canvasApp").factory('moveStageRect', [
             this.direction = "left";
           }
           this.currentLeft = movement.left;
+
           C.allStageViews.some(function(stage, index) {
 
             if(this.beacon.intersectsWithObject(stage.stageHitPointLeft) && this.draggedStage.index !== index) {
-
+              console.log("mango");
               this.currentDrop = stage;
               this.currentHit = index;
               if(this.findInAndOut("left") === "OUT") {
-                console.log("You must move");
+                //console.log("You must move right");
+                stage.moveToSide("right");
               }
+              return true;
             }
 
             if(this.beacon.intersectsWithObject(stage.stageHitPointRight) && this.draggedStage.index !== index) {
-
+              console.log("bingo");
               this.currentDrop = stage;
               this.currentHit = index;
               if(this.findInAndOut("right") === "OUT") {
-                console.log("You must move");
+                //console.log("You must move left");
+                stage.moveToSide("left");
               }
+              return true;
             }
+            return false;
           }, this);
         };
 
         this.indicator.findInAndOut = function(hitPointPosition) {
-
+          //console.log(hitPointPosition, this.direction);
           if(hitPointPosition === "left") {
             if(this.direction === "right") {
               this.going = "IN";
@@ -209,7 +215,7 @@ angular.module("canvasApp").factory('moveStageRect', [
               this.applyMovement(stage, C, circleManager, function() {
                 C.allStageViews.splice(that.draggedStage.index + 1, 1);
               });
-            } else {
+            } else if(stage.nextStage) {
               this.currentDrop = stage.nextStage;
               this.currentHit = stage.nextStage.index;
               this.applyMovement(stage, C, circleManager, function() {
