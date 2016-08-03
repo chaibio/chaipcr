@@ -82,13 +82,13 @@
     </div>
 
       <!-- experiment in progress -->
-    <div class="row" ng-show="state !== 'idle' && isCurrentExp">
+    <div class="row" ng-show="!experiment.completed_at && state !== 'idle' && isCurrentExp">
       <div class="col-md-1 menu" ng-transclude>
       </div>
-      <div class="col-md-6 exp-name x" title="{{experiment.name|uppercase}}">
+      <div class="col-md-7 exp-name x" title="{{experiment.name|uppercase}}">
         <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
       </div>
-      <div ng-show="!experiment.completed_at" class="col-md-4 controls SHR text-right">
+      <div class="col-md-4 controls SHR text-right">
         <div class="message">
           in progress...
           <strong ng-show="state !== 'lid_heating'">
@@ -97,12 +97,21 @@
           <strong ng-show="state === 'lid_heating'">estimating time remaining</strong>
         </div>
       </div>
-      <div ng-show="experiment.completed_at" class="col-md-5 controls SHR text-right">
-        <div class="message">
-          <strong>Experiment Complete, Holding Temperature of {{status.heat_block.temperature | round: 1}}&deg;C</strong>
-        </div>
+    </div>
+
+    <!-- experiment complete - final holding state -->
+  <div class="row" ng-show="experiment.completed_at && state !== 'idle' && isCurrentExp">
+    <div class="col-md-1 menu" ng-transclude>
+    </div>
+    <div class="col-md-6 exp-name x" title="{{experiment.name|uppercase}}">
+      <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
+    </div>
+    <div class="col-md-5 controls SHR text-right">
+      <div class="message">
+        <strong>Experiment Complete, Holding Temperature of {{status.heat_block.temperature | round: 1}}&deg;C</strong>
       </div>
     </div>
+  </div>
 
       <!-- experiment completed successfully -->
     <div class="row" ng-show="experiment.completed_at && !(state !== 'idle' && isCurrentExp)">
