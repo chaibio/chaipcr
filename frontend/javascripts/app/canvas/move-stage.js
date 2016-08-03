@@ -40,7 +40,7 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         var smallCircleTop = new fabric.Circle({
           fill: '#FFB300', radius: 6, strokeWidth: 3, selectable: false, stroke: "black",
-          left: 69, top: 64, originX: 'center', originY: 'center',
+          left: 69, top: 64, originX: 'center', originY: 'center'
         });
 
         var stageName = new fabric.Text(
@@ -58,7 +58,12 @@ angular.module("canvasApp").factory('moveStageRect', [
         );
 
         var verticalLine = new fabric.Line([0, 0, 0, 336],{
-          left: 68, top: 58, stroke: 'black', strokeWidth: 2, originX: 'left', originY: 'top', visible: false
+          left: 68, top: 58, stroke: 'black', strokeWidth: 2, originX: 'left', originY: 'top'
+        });
+
+        var vertical = new fabric.Group([verticalLine, smallCircleTop, smallCircle], {
+          originX: "left", originY: "top", left: 62, top: 56, selectable: true,
+          lockMovementY: true, hasControls: false, hasBorders: false, name: "vertica"
         });
 
         var rect = new fabric.Rect({
@@ -68,7 +73,6 @@ angular.module("canvasApp").factory('moveStageRect', [
         var coverRect = new fabric.Rect({
           fill: null, width: 135, left: 0, top: 0, height: 372, selectable: false, me: this, rx: 1,
         });
-
 
 
         me.imageobjects["drag-stage-image.png"].originX = "left";
@@ -86,16 +90,17 @@ angular.module("canvasApp").factory('moveStageRect', [
           }
         );
 
-        this.indicator = new fabric.Group([coverRect, indicatorRectangle, verticalLine, smallCircle, smallCircleTop], {
+        this.indicator = new fabric.Group([coverRect, indicatorRectangle, vertical], {
           originX: "left", originY: "top", left: 38, top: 0, height: 372, width: 135, selectable: true,
           lockMovementY: true, hasControls: false, visible: false, hasBorders: false, name: "dragStageGroup"
         });
 
+        // We may need two beacon, so that we have better control over where we move
         this.indicator.beacon = new fabric.Rect({
           fill: 'black', width: 10, left: 0, top: 10, height: 10, selectable: false, me: this,
           lockMovementY: true, hasControls: false, visible: true,
         });
-        this.indicator.verticalLine = verticalLine;
+        this.indicator.verticalLine = vertical;
 
         this.indicator.init = function(stage) {
 
