@@ -45,7 +45,7 @@ $(document).ready(function(){
 	var checkConnection = function() {
 		$.get("http://localhost:8000/network/eth0")
 			.done(function(data) {
-				if(data.state) {
+				if(data.state.address) {
 					//$("#ip-address").text("IP ADDRESS: " + data.state.address);
 					$(".span-message").hide();
 					$(".ip-text").show().text("IP ADDRESS: ");
