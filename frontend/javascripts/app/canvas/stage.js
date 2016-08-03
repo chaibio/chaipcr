@@ -78,7 +78,7 @@ angular.module("canvasApp").factory('stage', [
         this.childSteps.forEach(function(step, index) {
           this.deleteAllStepContents(step);
         }, this);
-        
+
         this.deleteStageContents();
         // Bring other stages closer
         if(this.nextStage) {
@@ -212,7 +212,8 @@ angular.module("canvasApp").factory('stage', [
         stage.nextStage.getLeft();
         stage.nextStage.stageGroup.set({left: stage.nextStage.left }).setCoords();
         stage.nextStage.dots.set({left: stage.nextStage.left + 3}).setCoords();
-        stage.nextStage.stageHitPoint.set({left: stage.nextStage.left + 30}).setCoords();
+        stage.nextStage.stageHitPointLeft.set({left: stage.nextStage.left + 10}).setCoords();
+        stage.nextStage.stageHitPointRight.set({left: (stage.nextStage.left + stage.nextStage.myWidth) -  20}).setCoords();
 
         var thisStageSteps = stage.nextStage.childSteps, stepCount = thisStageSteps.length;
         for(var i = 0; i < stepCount; i++ ) {
@@ -346,13 +347,15 @@ angular.module("canvasApp").factory('stage', [
           this.visualComponents = {
             'stageGroup': this.stageGroup,
             'dots': this.dots,
-            'stageHitPoint': this.stageHitPoint,
+            'stageHitPointLeft': this.stageHitPointLeft,
+            'stageHitPointRight': this.stageHitPointRight,
             'borderRight': this.borderRight
           };
 
           this.canvas.add(this.stageGroup);
           this.canvas.add(this.dots);
-          this.canvas.add(this.stageHitPoint);
+          this.canvas.add(this.stageHitPointLeft);
+          this.canvas.add(this.stageHitPointRight);
 
           this.setShadows();
 
