@@ -282,6 +282,11 @@ InterfaceState getInterfaceState(const std::string &interfaceName)
     return state;
 }
 
+void removeLease(const std::string &interfaceName)
+{
+    std::remove(("/var/lib/dhcp/dhclient." + interfaceName + ".leases").c_str());
+}
+
 }
 
 std::string getMacAddress(const std::string &interface)
