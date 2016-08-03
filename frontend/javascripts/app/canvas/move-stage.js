@@ -148,19 +148,43 @@ angular.module("canvasApp").factory('moveStageRect', [
           C.allStageViews.some(function(stage, index) {
 
             if(this.beacon.intersectsWithObject(stage.stageHitPointLeft) && this.draggedStage.index !== index) {
-              console.log(this.currentHit, "In");
 
               this.currentDrop = stage;
               this.currentHit = index;
+              if(this.findInAndOut("left") === "OUT") {
+                console.log("You must move");
+              }
             }
 
             if(this.beacon.intersectsWithObject(stage.stageHitPointRight) && this.draggedStage.index !== index) {
-              console.log(this.currentHit, "out");
+
               this.currentDrop = stage;
               this.currentHit = index;
+              if(this.findInAndOut("right") === "OUT") {
+                console.log("You must move");
+              }
             }
           }, this);
         };
+
+        this.indicator.findInAndOut = function(hitPointPosition) {
+
+          if(hitPointPosition === "left") {
+            if(this.direction === "right") {
+              this.going = "IN";
+            } else if(this.direction === "left") {
+              this.going = "OUT";
+            }
+          } else if(hitPointPosition === "right") {
+            if(this.direction === "right") {
+              this.going = "OUT";
+            } else if(this.direction === "left") {
+              this.going = "IN";
+            }
+          }
+          return this.going;
+        };
+
         // Now improve the code to handle simple click on stage move, Now we dont handle this event.
         this.indicator.processMovement = function(stage, C, circleManager) {
           // Process movement here
