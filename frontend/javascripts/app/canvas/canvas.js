@@ -280,6 +280,14 @@ angular.module("canvasApp").factory('canvas', [
       this.setDefaultWidthHeight();
     };
 
+    this.resetStageMovedDirection = function() {
+
+      this.allStageViews.forEach(function(stage, index) {
+        console.log("nulling");
+        stage.stageMovedDirection = null;
+      });
+    };
+
     this.correctNumbering = function() {
       var oStatus = 1;
       this.allStepViews = [];

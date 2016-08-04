@@ -97,12 +97,16 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         // We may need two beacon, so that we have better control over where we move
         this.indicator.beacon = new fabric.Rect({
-          fill: 'black', width: 10, left: 0, top: 10, height: 10, selectable: false, me: this,
-          lockMovementY: true, hasControls: false, visible: true,
+          fill: '', width: 10, left: 0, top: 10, height: 10, selectable: false, me: this,
+          lockMovementY: true, hasControls: false, visible: true,//fill: 'black',
         });
+
         this.indicator.verticalLine = vertical;
 
+
         this.indicator.init = function(stage) {
+
+          this.emptySpace = [null, null];
 
           this.setLeft(stage.left - 1).setCoords();
           this.draggedStage = stage;
@@ -114,6 +118,13 @@ angular.module("canvasApp").factory('moveStageRect', [
           } else if(stage.previousStage) {
             this.currentDrop = stage.previousStage;
             this.currentHit = stage.previousStage.index;
+          }
+
+          if(stage.nextStage) {
+            this.emptySpace[1] = stage.nextStage.index;
+          }
+          if(stage.previousStage) {
+            this.emptySpace[0] = stage.previousStage.index;
           }
 
           this.setVisible(true);
@@ -159,7 +170,6 @@ angular.module("canvasApp").factory('moveStageRect', [
               this.currentDrop = stage;
               this.currentHit = index;
               if(this.findInAndOut("left") === "OUT") {
-                //console.log("You must move right");
                 stage.moveToSide("right");
                 this.verticalLine.setVisible(true);
               } else {
@@ -169,11 +179,10 @@ angular.module("canvasApp").factory('moveStageRect', [
             }
 
             if(this.beacon.intersectsWithObject(stage.stageHitPointRight) && this.draggedStage.index !== index) {
-              console.log("bingo");
+
               this.currentDrop = stage;
               this.currentHit = index;
               if(this.findInAndOut("right") === "OUT") {
-                //console.log("You must move left");
                 stage.moveToSide("left");
                 this.verticalLine.setVisible(true);
               } else {
@@ -186,21 +195,24 @@ angular.module("canvasApp").factory('moveStageRect', [
         };
 
         this.indicator.findInAndOut = function(hitPointPosition) {
-          //console.log(hitPointPosition, this.direction);
+
           if(hitPointPosition === "left") {
             if(this.direction === "right") {
               this.going = "IN";
-            } else if(this.direction === "left") {
+            } else if(this.direction === "left" ) {
               this.going = "OUT";
+              return this.going;
             }
           } else if(hitPointPosition === "right") {
-            if(this.direction === "right") {
-              this.going = "OUT";
-            } else if(this.direction === "left") {
+            if(this.direction === "left") {
               this.going = "IN";
             }
+            if(this.direction === "right") {
+              this.going = "OUT";
+              return this.going;
+            }
           }
-          return this.going;
+
         };
 
         // Now improve the code to handle simple click on stage move, Now we dont handle this event.
@@ -234,8 +246,6 @@ angular.module("canvasApp").factory('moveStageRect', [
                 C.allStageViews.splice(that.draggedStage.index, 1);
               });
             }
-
-
           }
 
           var pre_id = (this.currentDrop) ? this.currentDrop.model.id : null;
@@ -245,6 +255,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           }, function(err) {
             console.log(err);
           });
+          C.resetStageMovedDirection();
       };
 
         this.indicator.applyMovement = function(stage_, C, circleManager, callBack) {

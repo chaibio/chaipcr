@@ -42,6 +42,7 @@ angular.module("canvasApp").factory('stage', [
       this.shrinked = false;
       this.shadowText = "0px 1px 2px rgba(0, 0, 0, 0.5)";
       this.visualComponents = {};
+      this.stageMovedDirection = null;
 
       this.setNewWidth = function(add) {
 
@@ -228,18 +229,43 @@ angular.module("canvasApp").factory('stage', [
       //This method is used when move stage hits at the hitPoint at the right side of the stage.
       this.moveToSide = function(direction) {
 
-        var moveCount = (direction === "left") ? -120 : 120;
-        this.stageGroup.set({left: this.left + moveCount }).setCoords();
-        this.dots.set({left: (this.left + moveCount ) + 3}).setCoords();
-        this.stageHitPointLeft.set({left: (this.left + moveCount ) + 10}).setCoords();
-        this.stageHitPointRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
-        this.left = this.left + moveCount ;
-        var thisStageSteps = this.childSteps, stepCount = thisStageSteps.length;
+        if(this.validMove(direction)) {
 
-        for(var i = 0; i < stepCount; i++ ) {
-          thisStageSteps[i].moveStep(1, true);
-          thisStageSteps[i].circle.moveCircleWithStep();
+          var moveCount = (direction === "left") ? -120 : 120;
+          this.stageGroup.set({left: this.left + moveCount }).setCoords();
+          this.dots.set({left: (this.left + moveCount ) + 3}).setCoords();
+          this.stageHitPointLeft.set({left: (this.left + moveCount ) + 10}).setCoords();
+          this.stageHitPointRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
+          this.left = this.left + moveCount ;
+          var thisStageSteps = this.childSteps, stepCount = thisStageSteps.length;
+
+          for(var i = 0; i < stepCount; i++ ) {
+            thisStageSteps[i].moveStep(1, true);
+            thisStageSteps[i].circle.moveCircleWithStep();
+          }
+          this.stageMovedDirection = direction; // !important
         }
+      };
+
+      this.validMove = function(direction) {
+
+        if(this.stageMovedDirection === null) {
+          console.log("null");
+          if(direction === "left") {
+            this.stageMovedDirection = "left";
+          } else {
+            this.stageMovedDirection = "right";
+          }
+        } else if(this.stageMovedDirection){ // if it has left or right value
+          if(this.stageMovedDirection === "left" && direction === "left") {
+            return false;
+          }
+          if(this.stageMovedDirection === "right" && direction === "right") {
+            return false;
+          }
+        }
+
+        return true;
       };
 
       this.moveAllStepsAndStages = function(del) {
