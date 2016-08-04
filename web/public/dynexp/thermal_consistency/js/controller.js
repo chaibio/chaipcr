@@ -115,13 +115,25 @@
             if (exp.completion_status === 'success') {
               Experiment.analyze($stateParams.id)
               .then(function (resp) {
+				console.log(resp);  
+				if(resp.status == 200){
                 $scope.analyzedExp = resp.data;
                 $scope.tm_values = GlobalService.getTmValues(resp.data);
                 $scope.analyzing = false;
+			    }
+				else if (resp.status == 202){
+				 $timeout($scope.analyzeExperiment, 1000);	
+				}
               })
               .catch(function (resp) {
+				  console.log(resp);
+				  if(resp.status == 500){
                 $scope.custom_error = resp.data.errors || "An error occured while trying to analyze the experiment results.";
                 $scope.analyzing = false;
+			 }
+			 else if(resp.status ==503){
+				 $timeout($scope.analyzeExperiment, 1000);
+			 }
               });
             }
             else {

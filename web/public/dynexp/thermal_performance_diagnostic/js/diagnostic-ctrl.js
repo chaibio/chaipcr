@@ -105,8 +105,20 @@
       function analyzeExperiment () {
         if (!$scope.analyzedExp) {
           Experiment.analyze($params.id).then(function (resp) {
+            if(resp.status == 200){
             $scope.analyzedExp = resp.data;
             console.log($scope.analyzedExp);
+          }
+          else if (resp.status == 202){
+          $timeout(analyzeExperiment, 1000);  
+         }
+          })
+          .catch(function (resp){
+            console.log(resp);
+            if(resp.status == 500){
+                $scope.custom_error = resp.data.errors || "An error occured while trying to analyze the experiment results.";
+                $scope.analyzedExp = " ";
+           }
           });
         }
       }

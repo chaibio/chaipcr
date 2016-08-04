@@ -12,8 +12,9 @@
     '$interval',
     '$uibModal',
     '$rootScope',
+    '$timeout',
     function OpticalCalibrationCtrl ($scope, $window, Experiment, $state, Status, GlobalService,
-      host, $http, DeviceInfo, $interval, $uibModal, $rootScope) {
+      host, $http, DeviceInfo, $interval, $uibModal, $rootScope, $timeout) {
 
 
       var ERROR_TYPES = ['OFFLINE', 'CANT_CREATE_EXPERIMENT', 'CANT_START_EXPERIMENT', 'LID_OPEN', 'UNKNOWN_ERROR', 'ANOTHER_EXPERIMENT_RUNNING'];
@@ -109,7 +110,8 @@
               $state.go('step-6');
               return;
             }
-            Experiment.analyze($scope.experiment.id).then(function (resp) {
+            $scope.analyzeExperiment();
+            /*Experiment.analyze($scope.experiment.id).then(function (resp) {
               $state.go('step-6');
               $scope.result = resp.data;
               $scope.valid = true;
@@ -120,13 +122,38 @@
                 }
               }
               if($scope.valid) $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
-            });
+            });*/
           });
         }
         if ($state.current.name === 'step-3' || $state.current.name === 'step-3-reading') {
           $scope.timeRemaining  = ($scope.timeRemaining - $scope.finalStepHoldTime());
         }
       }, true);
+
+      $scope.analyzeExperiment = function () {
+        Experiment.analyze($scope.experiment.id).then(function (resp) {
+          if(resp.status == 200){
+            $state.go('step-6');
+            $scope.result = resp.data;
+            $scope.valid = true;
+            for (var i = resp.data.valid.length - 1; i >= 0; i--) {
+              if (resp.data.valid[i] === false) {
+              $scope.valid = false;
+              break;
+            }
+          }
+          if($scope.valid) $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
+         }
+          if(resp.status == 202){
+            $timeout($scope.analyzeExperiment, 1000);
+          }
+        })
+        .catch(function (resp){
+          if(resp.status == 503){
+            $timeout($scope.analyzeExperiment, 1000);
+          }
+        });
+      };
 
       $scope.lidHeatPercentage = function () {
         if (!$scope.experiment) return 0;
