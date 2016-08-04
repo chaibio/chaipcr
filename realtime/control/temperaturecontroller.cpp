@@ -120,6 +120,16 @@ void TemperatureController::computePid(double currentTemperature)
 
         throw TemperatureLimitError(stream.str());
     }
+    else if (std::isnan(currentTemperature))
+    {
+        std::string name = _name;
+        name.at(0) = std::toupper(name.at(0));
+
+        std::stringstream stream;
+        stream << name << " temperature is NaN";
+
+        throw TemperatureLimitError(stream.str());
+    }
 
     if (_targetTemperature < _minTargetTemp)
         _targetTemperature = currentTemperature;
