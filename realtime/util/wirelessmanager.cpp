@@ -164,6 +164,8 @@ void WirelessManager::_connect()
             return;
         }
 
+        NetworkInterfaces::removeLease(interface);
+
         _connectionStatus = Connecting;
 
         ifup();
@@ -310,7 +312,7 @@ void WirelessManager::checkConnection()
         {
             if (state.addressState)
                 _connectionStatus = Connected;
-            else if (_connectionThreadState != Working && _connectionStatus == Connecting)
+            else if (_connectionThreadState != Working)
                 _connectionStatus = AuthenticationError;
         }
         else if (_connectionThreadState != Working)

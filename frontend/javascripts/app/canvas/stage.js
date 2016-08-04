@@ -42,6 +42,7 @@ angular.module("canvasApp").factory('stage', [
       this.shrinked = false;
       this.shadowText = "0px 1px 2px rgba(0, 0, 0, 0.5)";
       this.visualComponents = {};
+      this.stageMovedDirection = null;
 
       this.setNewWidth = function(add) {
 
@@ -78,6 +79,7 @@ angular.module("canvasApp").factory('stage', [
         this.childSteps.forEach(function(step, index) {
           this.deleteAllStepContents(step);
         }, this);
+
         this.deleteStageContents();
         // Bring other stages closer
         if(this.nextStage) {
@@ -156,9 +158,9 @@ angular.module("canvasApp").factory('stage', [
         stageGraphics.recalculateStageHitPoint.call(this);
 
         if(this.parent.allStepViews.length === 1) {
-          this.parent.editStageMode(this.parent.editStageMode);
+          this.parent.editStageMode(this.parent.editStageStatus);
         }
-        
+
         this.parent.setDefaultWidthHeight();
       };
 
@@ -211,7 +213,8 @@ angular.module("canvasApp").factory('stage', [
         stage.nextStage.getLeft();
         stage.nextStage.stageGroup.set({left: stage.nextStage.left }).setCoords();
         stage.nextStage.dots.set({left: stage.nextStage.left + 3}).setCoords();
-        stage.nextStage.stageHitPoint.set({left: stage.nextStage.left + 30}).setCoords();
+        stage.nextStage.stageHitPointLeft.set({left: stage.nextStage.left + 10}).setCoords();
+        stage.nextStage.stageHitPointRight.set({left: (stage.nextStage.left + stage.nextStage.myWidth) -  20}).setCoords();
 
         var thisStageSteps = stage.nextStage.childSteps, stepCount = thisStageSteps.length;
         for(var i = 0; i < stepCount; i++ ) {
@@ -221,6 +224,48 @@ angular.module("canvasApp").factory('stage', [
             thisStageSteps[i].moveStep(1, true);
           }
         }
+      };
+
+      //This method is used when move stage hits at the hitPoint at the right side of the stage.
+      this.moveToSide = function(direction) {
+
+        if(this.validMove(direction)) {
+
+          var moveCount = (direction === "left") ? -120 : 120;
+          this.stageGroup.set({left: this.left + moveCount }).setCoords();
+          this.dots.set({left: (this.left + moveCount ) + 3}).setCoords();
+          this.stageHitPointLeft.set({left: (this.left + moveCount ) + 10}).setCoords();
+          this.stageHitPointRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
+          this.left = this.left + moveCount ;
+          var thisStageSteps = this.childSteps, stepCount = thisStageSteps.length;
+
+          for(var i = 0; i < stepCount; i++ ) {
+            thisStageSteps[i].moveStep(1, true);
+            thisStageSteps[i].circle.moveCircleWithStep();
+          }
+          this.stageMovedDirection = direction; // !important
+        }
+      };
+
+      this.validMove = function(direction) {
+
+        if(this.stageMovedDirection === null) {
+          console.log("null");
+          if(direction === "left") {
+            this.stageMovedDirection = "left";
+          } else {
+            this.stageMovedDirection = "right";
+          }
+        } else if(this.stageMovedDirection){ // if it has left or right value
+          if(this.stageMovedDirection === "left" && direction === "left") {
+            return false;
+          }
+          if(this.stageMovedDirection === "right" && direction === "right") {
+            return false;
+          }
+        }
+
+        return true;
       };
 
       this.moveAllStepsAndStages = function(del) {
@@ -345,13 +390,15 @@ angular.module("canvasApp").factory('stage', [
           this.visualComponents = {
             'stageGroup': this.stageGroup,
             'dots': this.dots,
-            'stageHitPoint': this.stageHitPoint,
+            'stageHitPointLeft': this.stageHitPointLeft,
+            'stageHitPointRight': this.stageHitPointRight,
             'borderRight': this.borderRight
           };
 
           this.canvas.add(this.stageGroup);
           this.canvas.add(this.dots);
-          this.canvas.add(this.stageHitPoint);
+          this.canvas.add(this.stageHitPointLeft);
+          this.canvas.add(this.stageHitPointRight);
 
           this.setShadows();
 

@@ -141,8 +141,13 @@ then
        mkdir -p /tmp/emmcboot
 fi
 
-mount ${sdcard_dev}p1 ${sdcard_p1} -t vfat || true
-mount ${sdcard_dev}p2 ${sdcard_p2} -t ext4 || true
+if mount | grep ${sdcard_p1}                                             
+then                                                                     
+        echo "sdcard partitions mounted already!"                                              
+else                                                                                         
+        mount ${sdcard_dev}p1 ${sdcard_p1} -t vfat || true                                     
+        mount ${sdcard_dev}p2 ${sdcard_p2} -t ext4 || true                                     
+fi                                                                                             
 
 NOW=$(date +"%m-%d-%Y %H:%M:%S")
 
@@ -245,27 +250,32 @@ set_sdcard_uEnv () {
 	umount /tmp/emmcboot || true
 }
 
-update_uenv () {
-	echo copying coupling uEng.txt
-	mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
-	cp ${sdcard_p1}/uEnv.txt /tmp/emmcboot/
-
-	if [ $1 -eq 2 ]
-	then
-		if [ -e /sdcard/p2/scripts/replace_uEnv.txt.sh ]
-		then
-			sh /sdcard/p2/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
-		else
-			sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
-		fi
-	else
-		sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
-	fi
-
-	sync
-	sleep 5
-	umount /tmp/emmcboot || true
-}
+update_uenv () {                                                        
+# first param =2 in case of upgrade.. =1 for factory settings.                               
+        echo copying coupling uEng.txt                                                           
+        if [ ! -e /tmp/emmcboot ]                                                
+        then                                                                     
+              mkdir -p /tmp/emmcboot                                             
+        fi                                                                       
+        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true                            
+        cp /sdcard/p1/uEnv.txt /tmp/emmcboot/ || true                            
+        cp /mnt/uEnv.72check.txt /mnt/uEnv.txt || true                
+                                                              
+        if [ $1 -eq 2 ]                                             
+        then                                                                                     
+                if [ -e /sdcard/p2/scripts/replace_uEnv.txt.sh ]
+                then                                                     
+                        sh /sdcard/p2/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+                else                                                                   
+                        sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+                fi                                                                     
+        else                                                                           
+                sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true        
+        fi                                                                             
+        sync                                                                                     
+        sleep 5                                                                                  
+        umount /tmp/emmcboot || true                                                   
+}                                                                                      
 
 # needs to add a uEnv to swtich things to sdcard
 echo "Freeup boot partition during the backup process"

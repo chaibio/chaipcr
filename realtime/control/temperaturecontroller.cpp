@@ -74,7 +74,7 @@ void TemperatureController::setEnableMode(bool enableMode)
 
 void TemperatureController::setTargetTemperature(double temperature)
 {
-    if (temperature < _minTargetTemp || temperature > _maxTargetTemp)
+    if (temperature < _minTargetTemp || temperature > _maxTargetTemp || std::isnan(temperature))
     {
         std::stringstream string;
         string << "Requested " << _name << " temperature (" << temperature << " C) outside limits of " << _minTargetTemp << '-' << _maxTargetTemp << " C";
@@ -117,6 +117,16 @@ void TemperatureController::computePid(double currentTemperature)
 
         std::stringstream stream;
         stream << name << " temperature of " << currentTemperature << " C above limit of " << _minTempThreshold << " C";
+
+        throw TemperatureLimitError(stream.str());
+    }
+    else if (std::isnan(currentTemperature))
+    {
+        std::string name = _name;
+        name.at(0) = std::toupper(name.at(0));
+
+        std::stringstream stream;
+        stream << name << " temperature is NaN";
 
         throw TemperatureLimitError(stream.str());
     }

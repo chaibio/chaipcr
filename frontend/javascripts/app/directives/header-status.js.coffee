@@ -82,7 +82,10 @@ window.App.directive 'headerStatus', [
         if $scope.state isnt 'idle' and $scope.state isnt 'complete' and $scope.isCurrentExp
           $scope.backgroundStyle =
             background: "-webkit-linear-gradient(left,  #64b027 0%,#c6e35f #{$scope.timePercentage || 0}%,#5d8329 #{$scope.timePercentage || 0}%,#5d8329 100%)"
-        else
+        else if $scope.state is 'complete' and $scope.isCurrentExp
+          $scope.backgroundStyle =
+            background: "-webkit-linear-gradient(left,  #64b027 0%,#c6e35f 100%,#5d8329 100%,#5d8329 100%)"
+        else						
           $scope.backgroundStyle = {}
 
       $scope.getDuration = ->

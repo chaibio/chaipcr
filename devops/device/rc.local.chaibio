@@ -75,6 +75,7 @@ run_migrate_on_upgrade () {
 }
 
 run_cleanup_user_tokens_every4hours () {
+	wait_for_migrate
 	while true
 	do
 		echo Cleaning up every 4 hours.

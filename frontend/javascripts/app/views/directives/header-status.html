@@ -29,7 +29,7 @@
     </div>
   </div>
 
-  <div ng-if="!loading" class="header-status" ng-class="{'in-progress': state && state !== 'idle' && isCurrentExp, 'complete': experiment && (experiment.completed_at || (experiment.started_at && state==='idle') )}" ng-style="backgroundStyle">
+  <div ng-if="!loading" class="header-status" ng-class="{'in-progress': state && state !== 'idle' && isCurrentExp, 'complete': experiment && ((experiment.completed_at && !(state !== 'idle' && isCurrentExp)) || (experiment.started_at && state==='idle') )}" ng-style="backgroundStyle">
 
     <!-- begin is valid -->
     <div class="row" ng-show="experiment.id && !experiment.started_at && !experiment.completed_at && !(statusData.optics.lid_open==='true')&& state==='idle'">
@@ -82,7 +82,7 @@
     </div>
 
       <!-- experiment in progress -->
-    <div class="row" ng-show="state !== 'idle' && isCurrentExp">
+    <div class="row" ng-show="!experiment.completed_at && state !== 'idle' && isCurrentExp">
       <div class="col-md-1 menu" ng-transclude>
       </div>
       <div class="col-md-7 exp-name x" title="{{experiment.name|uppercase}}">
@@ -98,6 +98,20 @@
         </div>
       </div>
     </div>
+
+    <!-- experiment complete - final holding state -->
+  <div class="row" ng-show="experiment.completed_at && state !== 'idle' && isCurrentExp">
+    <div class="col-md-1 menu" ng-transclude>
+    </div>
+    <div class="col-md-6 exp-name x" title="{{experiment.name|uppercase}}">
+      <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
+    </div>
+    <div class="col-md-5 controls SHR text-right">
+      <div class="message">
+        <strong>Experiment Complete, Holding Temperature of {{status.heat_block.temperature | round: 1}}&deg;C</strong>
+      </div>
+    </div>
+  </div>
 
       <!-- experiment completed successfully -->
     <div class="row" ng-show="experiment.completed_at && !(state !== 'idle' && isCurrentExp)">
