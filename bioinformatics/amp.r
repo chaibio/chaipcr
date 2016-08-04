@@ -36,7 +36,7 @@ get_amplification_data <- function(
     # #                     single-       dual-
     # # before 128x    list(c(10, 1.25),  c(38.28, 2.73))
     
-    before_128x=FALSE,
+    before_128x=TRUE,
     
     extra_output=FALSE, 
     show_running_time=FALSE # option to show time cost to run this function
@@ -138,7 +138,7 @@ get_amplification_data <- function(
         }
         
         blsub_mtch_post <- list(
-            'bl_corrected'=lapply(channels, function(channel) amp_calib_array[channel,,2:aca_dim3]), 
+            'bl_corrected'=rbbs, 
             'coefficients'=coefficients_mtch)
         
         ce_mtch <- list('cq_eff_adj'=cq_eff_adj_mtch)
