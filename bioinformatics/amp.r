@@ -138,7 +138,7 @@ get_amplification_data <- function(
         }
         
         blsub_mtch_post <- list(
-            'bl_corrected'=rbbs, 
+            'bl_corrected'=lapply(rbbs, function(ele) ele[,2:ncol(ele)]), 
             'coefficients'=coefficients_mtch)
         
         ce_mtch <- list('cq_eff_adj'=cq_eff_adj_mtch)
