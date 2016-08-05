@@ -13,7 +13,8 @@ process_mc <- function(
     max_temp=1000, # analyze only the data with temperature lower than this
     mc_plot=FALSE, # whether to plot melting curve data
     extra_output=FALSE, 
-    show_running_time=FALSE # option to show time cost to run this function
+    show_running_time=FALSE, # option to show time cost to run this function
+    ... # arguments passed onto `mc_tm_pw`
     ) {
     
     # start counting for running time
@@ -87,7 +88,8 @@ process_mc <- function(
         span_smooth_default, 
         span_smooth_factor, 
         mc_plot, 
-        show_running_time
+        show_running_time,
+        ... # arguments passed onto `mc_tm_pw`
         )[['pre_consoli']]
     
     if (extra_output) {
