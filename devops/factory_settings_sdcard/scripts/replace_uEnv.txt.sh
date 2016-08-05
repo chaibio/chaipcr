@@ -83,8 +83,9 @@ cape_disable=capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN
 ##note: the eMMC flasher script relies on the next line
 _EOF_
 
-
 UUID=$(blkid /dev/mmcblk1p2 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
+UUID_p1=$(blkid /dev/mmcblk1p1 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
+UUID_p2=$(blkid /dev/mmcblk1p2 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
 UUID_p3=$(blkid /dev/mmcblk1p3 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
 UUID_p4=$(blkid /dev/mmcblk1p4 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
 EMMC=/dev/mmcblk1p2
@@ -92,6 +93,8 @@ if [ -z $UUID ]
 then
 	echo "/dev/mmcblk1 is not a valid block device"
 	UUID=$(lsblk -no UUID /dev/mmcblk0p2)
+	UUID_p1=$(blkid /dev/mmcblk0p1 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
+	UUID_p2=$(blkid /dev/mmcblk0p2 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
 	UUID_p3=$(blkid /dev/mmcblk0p3 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
 	UUID_p4=$(blkid /dev/mmcblk0p4 | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
         EMMC=/dev/mmcblk0p2
@@ -103,6 +106,9 @@ then
 fi
 
 echo "Root fs Block device found at $UUID"
+
+echo "/ partition found at $UUID_p2"
+echo "/boot/uboot partition found at $UUID_p1"
 echo "/data partition found at $UUID_p3"
 echo "/perm partition found at $UUID_p4"
 
@@ -166,6 +172,16 @@ echo "#" >> $uEnvSDCard
 
 echo "SDCard version of uEnv.txt done updating"
 
+if [ -z $UUID_p1 ]
+then
+	echo "Cann't find UUID for /boot/uboot partition!"
+	exit 0
+fi
+if [ -z $UUID_p2 ]
+then
+	echo "Cann't find UUID for / partition!"
+	exit 0
+fi
 if [ -z $UUID_p3 ]
 then
 	echo "Cann't find UUID for /data partition!"
@@ -205,9 +221,33 @@ do
                 echo "Removing data line from fstab..."
                 continue
         fi
+        if test "${var#*UUID=}" != "$var" #[[ "$var" == *"UUID"* ]]
+        then
+                echo "Removing UUID line from fstab..."
+                continue
+        fi
+        if test "${var#*debugfs}" != "$var" #[[ "$var" == *"debug"* ]]
+        then
+                echo "Removing debug line from fstab..."
+                continue
+        fi
+        if test "${var#*uboot}" != "$var" #[[ "$var" == *"uboot"* ]]
+        then
+                echo "Removing uboot line from fstab..."
+                continue
+        fi
+        if test "${var#*noatime}" != "$var" #[[ "$var" == *"noatime"* ]]
+        then
+                echo "Removing root line from fstab..."
+                continue
+        fi
 	echo "$var"
 	echo $var >> $fstab_new
 done < "$fstab"
+
+echo "UUID=$UUID_p2 / ext4 noatime,errors=remount-ro 0 1" >> $fstab_new
+echo "UUID=$UUID_p1 /boot/uboot auto defaults 0 0" >> $fstab_new
+echo "debugfs /sys/kernel/debug debugfs defaults 0 0" >> $fstab_new
 
 echo "UUID=$UUID_p3  /data   ext4    rw,auto,user,errors=remount-ro  0  0" >> $fstab_new
 echo "UUID=$UUID_p4  /perm   ext4    rw,auto,user,errors=remount-ro  0  0" >> $fstab_new
@@ -215,6 +255,7 @@ echo "UUID=$UUID_p4  /perm   ext4    rw,auto,user,errors=remount-ro  0  0" >> $f
 cp $fstab "${fstab}.save"
 cp $fstab_new $fstab
 sync
+
 umount $rootfs || true
 rm -r $rootfs || true
 echo fstab updated

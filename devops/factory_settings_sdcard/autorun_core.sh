@@ -182,42 +182,51 @@ partition_drive () {
 	flush_cache
 
 	echo "Unmounting!"
-	umount ${eMMC}p1 > /dev/null || true
-	umount ${eMMC}p2 > /dev/null || true
-	umount ${eMMC}p3 > /dev/null || true
-	umount ${eMMC}p4 > /dev/null || true
+	umount ${eMMC}p1 > /dev/null 2>&1 || true
+	umount ${eMMC}p2 > /dev/null 2>&1 || true
+	umount ${eMMC}p3 > /dev/null 2>&1 || true
+	umount ${eMMC}p4 > /dev/null 2>&1 || true
 
 	flush_cache
 	repartition_drive
 	flush_cache
 }
 
-update_uenv () {
-# first param =2 in case of upgrade.. =1 for factory settings.
-	echo copying coupling uEng.txt
-	if [ ! -e /tmp/emmcboot ]
-	then
-	      mkdir -p /tmp/emmcboot
-	fi
-	mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
-	cp /sdcard/p1/uEnv.txt /tmp/emmcboot/ || true
-	cp /mnt/uEnv.72check.txt /mnt/uEnv.txt || true
+update_uenv () {                                                        
+# first param =2 in case of upgrade.. =1 for factory settings.                               
+        echo copying coupling uEng.txt
+        if [ ! -e /tmp/emmcboot ]                                                
+        then                                                                     
+              mkdir -p /tmp/emmcboot                                             
+        fi
+		                                                                       
+        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true                            
+                                       
+	echo resetting to boot switch dependant uEnv                       
+        cp /sdcard/p1/uEnv.txt /tmp/emmcboot/ || true                            
+        cp /mnt/uEnv.72check.txt /mnt/uEnv.txt || true                
+        cp /sdcard/p1/uEnv.72check.txt /sdcard/p1/uEnv.txt || true                
+        cp /tmp/emmcboot/uEnv.72check.txt /tmp/emmcboot/uEnv.txt || true                            
 
-	if [ $1 -eq 2 ]
-	then
-		if [ -e /sdcard/p2/scripts/replace_uEnv.txt.sh ]
-		then
-			sh /sdcard/p2/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
-		else
-			sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
-		fi
-	else
-		sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
-	fi
-	sync
-	sleep 5
-	umount /tmp/emmcboot || true
-}
+        if [ $1 -eq 2 ]                                             
+        then                                                                                     
+                if [ -e /sdcard/p2/scripts/replace_uEnv.txt.sh ]
+                then
+			echo running upgrade version of replace_uEnv.txt.sh
+                        sh /sdcard/p2/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+                else
+			echo running factory settings version of replace_uEnv.txt.sh while performing upgrade.
+                        sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+                fi                                                                     
+        else                                                                           
+		echo running factory settings version of replace_uEnv.txt.sh
+                sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true        
+        fi                                                                             
+
+        sync                                                                                     
+        sleep 5                                                                                  
+        umount /tmp/emmcboot || true                                                   
+}                                                                                      
 
 reset_uenv () {
 	echo "resetting uEnv!"

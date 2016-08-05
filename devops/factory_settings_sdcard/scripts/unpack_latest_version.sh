@@ -99,7 +99,10 @@ image_filename_upgrade="${sdcard_p2}/upgrade.img.tar"
 
 if [ "$1" = "factorysettings" ]
 then
+	echo performing factory settings image
 	image_filename_upgrade="${sdcard_p1}/factory_settings.img.tar"
+else
+	echo performing upgrade
 fi
 
 mount | grep ${eMMC}p1
@@ -223,55 +226,37 @@ then
 	#reboot needs to set sdcard only
 fi
 
-set_sdcard_uEnv () {
-	echo copying coupling uEng.txt
-	mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
-	cp ${sdcard_p1}/uEnv.txt /tmp/emmcboot/
-
-	if [ $1 -eq 2 ]
-	then
-		if [ -e /sdcard/p2/scripts/replace_uEnv.txt.sh ]
-		then
-			sh /sdcard/p2/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
-		else
-			sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
-		fi
-	else
-		sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
-	fi
-
-	uEnvPath=/tmp/emmcboot
-
-	cp ${uEnvPath}/uEnv.txt ${uEnvPath}/uEnv.org.txt
-	cp ${uEnvPath}/uEnv.sdcard.txt ${uEnvPath}/uEnv.txt
-
-	sync
-	sleep 5
-	umount /tmp/emmcboot || true
-}
-
 update_uenv () {                                                        
 # first param =2 in case of upgrade.. =1 for factory settings.                               
         echo copying coupling uEng.txt                                                           
         if [ ! -e /tmp/emmcboot ]                                                
         then                                                                     
               mkdir -p /tmp/emmcboot                                             
-        fi                                                                       
+        fi
+		                                                                       
         mount ${eMMC}p1 /tmp/emmcboot -t vfat || true                            
+                                       
+	echo resetting to boot switch dependant uEnv                       
         cp /sdcard/p1/uEnv.txt /tmp/emmcboot/ || true                            
         cp /mnt/uEnv.72check.txt /mnt/uEnv.txt || true                
-                                                              
+        cp /sdcard/p1/uEnv.72check.txt /sdcard/p1/uEnv.txt || true                
+        cp /tmp/emmcboot/uEnv.72check.txt /tmp/emmcboot/uEnv.txt || true                            
+
         if [ $1 -eq 2 ]                                             
         then                                                                                     
                 if [ -e /sdcard/p2/scripts/replace_uEnv.txt.sh ]
-                then                                                     
+                then
+			echo running upgrade version of replace_uEnv.txt.sh
                         sh /sdcard/p2/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
-                else                                                                   
+                else
+			echo running factory settings version of replace_uEnv.txt.sh while performing upgrade.
                         sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
                 fi                                                                     
         else                                                                           
+		echo running factory settings version of replace_uEnv.txt.sh
                 sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true        
         fi                                                                             
+
         sync                                                                                     
         sleep 5                                                                                  
         umount /tmp/emmcboot || true                                                   
@@ -280,10 +265,10 @@ update_uenv () {
 # needs to add a uEnv to swtich things to sdcard
 echo "Freeup boot partition during the backup process"
 mount ${eMMC}p1 /tmp/emmcboot
-rm /tmp/emmcboot/* || true
+rm /tmp/emmcboot/* > /dev/null || true
 sync
 sleep 3
-umount /tmp/emmcboot
+umount /tmp/emmcboot || true
 incriment_stage_counter
 
 if [ "$1" = "factorysettings" ]
