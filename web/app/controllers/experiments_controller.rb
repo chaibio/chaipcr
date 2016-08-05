@@ -397,7 +397,7 @@ class ExperimentsController < ApplicationController
             task_submitted = background_analyze_data(@experiment)
             render :nothing => true, :status => (task_submitted)? 202 : 503
           rescue  => e
-            render :json=>{:errors=>e}, :status => 500
+            render :json=>{:errors=>e.to_s}, :status => 500
           end
         else
           render :json=>cached_data.analyze_result
