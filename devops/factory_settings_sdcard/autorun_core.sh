@@ -260,11 +260,21 @@ stop_packing_restarting ()
 	then
         	rm ${sdcard_p1}/unpack_resume_autorun.flag || true
 	fi
+
+	if [ -e ${sdcard_p2}/pack_resume_autorun.flag ]
+	then
+        	rm ${sdcard_p2}/pack_resume_autorun.flag || true
+	fi
+
+	if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ]
+	then
+        	rm ${sdcard_p2}/unpack_resume_autorun.flag || true
+	fi
 }
 
 incriment_restart_counter () {
 	# Incriment and display restart counter
-	counter_file=${sdcard_p1}/restart_counter.ini
+	counter_file=${sdcard_p2}/restart_counter.ini
 	counter_old=$(cat ${counter_file})
 	counter=$((counter_old+1))
 	echo $counter > $counter_file
@@ -281,7 +291,7 @@ else
 fi
 
 counter=2
-if [ $s2pressed -ne 0 ] && [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
+if [ $s2pressed -ne 0 ] && ( [ -e ${sdcard_p1}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] )
 then
         echo "Resume eMMC unpacking flag found up"
         incriment_restart_counter
@@ -408,7 +418,7 @@ then
 		echo "Done partitioning $eMMC!"
 	else
 		echo "Cannot update partition table at  $eMMC! restarting!"
-		echo "Write Perm Partition 2" > ${sdcard_p1}/write_perm_partition.flag
+		echo "Write Perm Partition 2" > ${sdcard_p2}/write_perm_partition.flag
 
 		sync
 		rebootx
@@ -430,11 +440,12 @@ else
 	exit
 fi
 
-if [ -e ${sdcard_p1}/write_perm_partition.flag ]
+if [ -e ${sdcard_p1}/write_perm_partition.flag ] || [ -e ${sdcard_p2}/write_perm_partition.flag ]
 then
 	echo "eMMC Flasher: writing to /perm partition (to format)"
 	format_perm
-	rm ${sdcard_p1}/write_perm_partition.flag || true
+	rm ${sdcard_p1}/write_perm_partition.flag > /dev/null 2>&1 || true
+	rm ${sdcard_p2}/write_perm_partition.flag > /dev/null 2>&1 || true
 	echo "Done formatting /perm partition"
 fi
 

@@ -26,6 +26,23 @@ then
 	NOW=$(date +"%m-%d-%Y %H:%M:%S")
 	log_file=/mnt/booting.log
 
+	mkdir /tmp/rw -p
+	if [ -e /dev/mmcblk0p3 ]
+	then
+        	eMMC=/dev/mmcblk0
+		sdcard_dev=/dev/mmcblk1
+		mount ${sdcard_dev}p2 /tmp/rw
+		log_file=/tmp/rw/booting.log
+	elif [ -e /dev/mmcblk1p3 ]
+	then
+       		eMMC=/dev/mmcblk1
+		sdcard_dev=/dev/mmcblk0
+		mount ${sdcard_dev}p2 /tmp/rw
+		log_file=/tmp/rw/booting.log
+	else
+       		echo "4 partitions eMMC not found!"
+	fi
+
 	echo "Logging boot to: $log_file.. timestamp: $NOW"
 	echo "==== New boot at: $NOW" >> $log_file
 	sh /mnt/autorun_core.sh  >> $log_file 2>&1

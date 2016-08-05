@@ -156,7 +156,7 @@ NOW=$(date +"%m-%d-%Y %H:%M:%S")
 
 unpack_resume_flag_up () {
 	echo "Upgrade resume flag up!"
-	echo "Upgrade started at: $NOW">>${sdcard_p1}/unpack_resume_autorun.flag
+	echo "Upgrade started at: $NOW">>${sdcard_p2}/unpack_resume_autorun.flag
 }
 
 if [ ! -e  $image_filename_upgrade ]
@@ -165,6 +165,11 @@ then
 	if [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
 	then
 		rm ${sdcard_p1}/unpack_resume_autorun.flag || true
+	fi
+
+	if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ]
+	then
+		rm ${sdcard_p2}/unpack_resume_autorun.flag || true
 	fi
 
 	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
@@ -176,7 +181,7 @@ fi
 #echo "Run with $1 $2"
 
 stage=0
-counter_file=${sdcard_p1}/unpack_stage.ini
+counter_file=${sdcard_p2}/unpack_stage.ini
 
 incriment_stage_counter () {
 	# Incriment and display restart counter
@@ -300,18 +305,27 @@ then
 	rm ${sdcard_p1}/unpack_resume_autorun.flag || true
 fi
 
+if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ]
+then
+	rm ${sdcard_p2}/unpack_resume_autorun.flag || true
+fi
+
 sync
 
 echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 
 upgrade_autorun_flag_up () {
-	echo "Autorun scripts after boot.. requested on $NOW" > ${sdcard_p1}/upgrade_autorun.flag
+	echo "Autorun scripts after boot.. requested on $NOW" > ${sdcard_p2}/upgrade_autorun.flag
 }
 
 upgrade_autorun_flag_down () {
 	if [ -e ${sdcard_p1}/upgrade_autorun.flag ]
 	then
 		rm ${sdcard_p1}/upgrade_autorun.flag || true
+	fi
+	if [ -e ${sdcard_p2}/upgrade_autorun.flag ]
+	then
+		rm ${sdcard_p2}/upgrade_autorun.flag || true
 	fi
 }
 
