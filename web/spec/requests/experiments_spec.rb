@@ -4,6 +4,9 @@ describe "Experiments API" do
   before(:each) do
     admin_user = create_admin_user
     post '/login', { email: admin_user.email, password: admin_user.password }
+    
+    Setting.where(:id=>1).update_all(:time_valid=>true)
+    Setting.instance.reload
   end
   
   it 'create experiment' do
@@ -172,8 +175,6 @@ describe "Experiments API" do
     json = JSON.parse(response.body)
     json["experiment"]["name"].should == "test"
     json["experiment"]["time_valid"].should == false
-    Setting.where(:id=>1).update_all(:time_valid=>true)
-    Setting.instance.reload
   end
   
   it "set calibration_id 1 for thermal consistency experiment" do
