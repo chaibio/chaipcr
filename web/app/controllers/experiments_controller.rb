@@ -546,7 +546,7 @@ class ExperimentsController < ApplicationController
       ensure
         connection.close
       end
-      raise response["message"] if response && !response["message"].blank? #catched error
+      raise response["message"] if response && response.is_a?(Hash) && !response["message"].blank? #catched error
 
       #update analyze status
       if experiment.diagnostic?
