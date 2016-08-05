@@ -15,12 +15,8 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
     exp_id, 
     #stage_id, # hard-coded inside of the function
     calib_info, 
-    dye_in='FAM', dyes_2bfild=NULL, 
     dcv=FALSE, 
-    max_temp=1000.1, 
-    mc_plot=FALSE, 
     out_json=TRUE, 
-    show_running_time=FALSE, 
     ... # options to pass onto `mc_tm_pw`
     )
 {
@@ -35,16 +31,13 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
     
     # process the data from only one channel
     
-    mc_w72c <- melt_1cr(floor_temp, 
-                        db_usr, db_pwd, db_host, db_port, db_name, 
-                        exp_id, stage_id, calib_info, 
-                        dye_in, dyes_2bfild, 
-                        dcv, 
-                        max_temp, 
-                        mc_plot, 
-                        show_running_time, 
-                        qt_prob=qt_prob, max_normd_qtv=max_normd_qtv, # passed onto `mc_tm_pw`, different than default
-                        ...)
+    mc_w72c <- melt_1cr(
+        floor_temp, 
+        db_usr, db_pwd, db_host, db_port, db_name, 
+        exp_id, stage_id, calib_info, 
+        dcv=dcv, extra_output=TRUE, 
+        qt_prob=qt_prob, max_normd_qtv=max_normd_qtv, # passed onto `mc_tm_pw`, different than default
+        ...)
     
     # names(mc_w72c) <- c('mc_tm', '72c_fluorescence')
     
@@ -76,7 +69,7 @@ analyze_thermal_consistency <- function(#floor_temp, # hard-coded inside of the 
     mc_w72c_out[['delta_Tm']] <- list(unbox(delta_Tm), unbox(delta_Tm <= MAX_DELTA_TM_VAL))
     
     # check whether the experiment is single-channel, if not, don't output '72c_fluorescence'
-    if (mc_w72c['num_channels'] > 1) mc_w72c_out <- mc_w72c_out[c(1,3)] # 'tm_check' and 'delta_Tm' only, no '72c_fluorescence'
+    if (mc_w72c[['num_channels']] > 1) mc_w72c_out <- mc_w72c_out[c(1,3)] # 'tm_check' and 'delta_Tm' only, no '72c_fluorescence'
     
     if (out_json) mc_w72c_out <- toJSON(mc_w72c_out)
     

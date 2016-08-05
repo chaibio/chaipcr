@@ -32,7 +32,7 @@ describe "User" do
         post "/users", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
         response.response_code.should == 401
         json = JSON.parse(response.body)
-        json["errors"].should == "sign up"      
+        json["errors"].should == "login in"
     end
   end
   

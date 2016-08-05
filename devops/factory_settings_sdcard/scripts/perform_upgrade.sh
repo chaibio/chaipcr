@@ -93,7 +93,9 @@ verify_checksum
 set_sdcard_uEnv () {
 	cp ${uEnvPath}/uEnv.txt ${uEnvPath}/uEnv.org.txt
 	cp ${uEnvPath}/uEnv.sdcard.txt ${uEnvPath}/uEnv.txt
+	sleep 3	
 	sync
+	sleep 2
 }
 
 reset_sdcard_uEnv () {
@@ -111,6 +113,7 @@ fi
 #umount ${uEnvPath} > /dev/null
 mount ${eMMC}p1 ${uEnvPath} -t vfat
 set_sdcard_uEnv
+sync
 umount ${uEnvPath}> /dev/null
 
 mount ${sdcard_dev}p1 ${uEnvPath} -t vfat
@@ -119,8 +122,11 @@ set_sdcard_uEnv
 NOW=$(date +"%m-%d-%Y %H:%M:%S")
 echo "Resume flag up at $NOW"
 echo "Upgrade started at: $NOW">${uEnvPath}/unpack_resume_autorun.flag
+echo "Upgrade initiated at: $NOW">${uEnvPath}/booting.log
 echo "1">${uEnvPath}/restart_counter.ini
 echo "1">${uEnvPath}/unpack_stage.ini
+sync
+sleep 3
 
 umount ${uEnvPath}
 
