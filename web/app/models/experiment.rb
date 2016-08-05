@@ -100,7 +100,7 @@ class Experiment < ActiveRecord::Base
   def calibration_id
     if experiment_definition.guid == "thermal_consistency"
       return 1
-    elsif experiment_definition.guid == "optical_cal" || experiment_definition.guid == "dual_channel_optical_cal" ||
+    elsif experiment_definition.guid == "optical_cal" || experiment_definition.guid == "dual_channel_optical_cal_v2" ||
           experiment_definition.guid == "optical_test_dual_channel"
       return self.id 
     else
