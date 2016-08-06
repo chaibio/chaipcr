@@ -12,12 +12,14 @@ excitation_step_id <- 13
 
 analyze_optical_test_single_channel <- function(
     db_usr, db_pwd, db_host, db_port, db_name, 
-    exp_id
+    exp_id, 
+    calib_info, # not used for testing
+    ... # to receive unused arguments
     ) {
     
     db_etc_out <- db_etc(
         db_usr, db_pwd, db_host, db_port, db_name, 
-        exp_id, stage_id=NULL, calib_info=NULL)
+        exp_id, stage_id=NULL, calib_info=calib_info)
     db_conn <- db_etc_out[['db_conn']]
     
     step_ids <- c(baseline_step_id, excitation_step_id)
