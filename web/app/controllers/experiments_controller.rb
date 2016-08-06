@@ -538,7 +538,7 @@ class ExperimentsController < ApplicationController
       begin
         connection.eval("source(\"#{Rails.configuration.dynamic_file_path}/#{experiment.experiment_definition.guid}/analyze.R\")")
         response = connection.eval("tryCatchError(analyze, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, #{calibrate_info(experiment.calibration_id)})").to_ruby
-        new_data = CachedAnalyzeDatum.new(:experiment_id=>experiment.id, :analyze_result=>response)
+        new_data = CachedAnalyzeDatum.new(:experiment_id=>experiment.id, :analyze_result=>response.to_s)
       rescue  => e
         logger.error("Rserve error: #{e}")
         kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
@@ -546,7 +546,7 @@ class ExperimentsController < ApplicationController
       ensure
         connection.close
       end
-      raise response["message"] if response && response.is_a?(Hash) && !response["message"].blank? #catched error
+      raise response["message"] if response && response.is_a?(Array) && !response["message"].blank? #catched error
 
       #update analyze status
       if experiment.diagnostic?
