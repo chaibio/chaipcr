@@ -281,7 +281,7 @@ optic_calib <- function(fluo, oc_data, channel, show_running_time=FALSE) {
     signal_water_diff <- oc_signal - oc_water
     swd_normd <- signal_water_diff / mean(signal_water_diff)
     fluo_calib <- adply(fluo, .margins=1, 
-                        function(row1) scaling_factor_optic_calib * (row1 - oc_water) / swd_normd) # adply automatically create a column at index 1 of output from rownames of input array (1st argument)
+                        function(row1) scaling_factor_optic_calib * (row1 - oc_water) / swd_normd) # if ist argument is a matrix (mc), adply automatically create a column at index 1 of output from rownames of input array (1st argument); else if 1st argument is data frame (amp), that column is not added.
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]

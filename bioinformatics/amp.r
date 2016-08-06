@@ -73,50 +73,65 @@ get_amplification_data <- function(
         min_D2max <- min_D2max / 128
         }
     
-    oc_data <- prep_optic_calib(db_conn, calib_info, dye_in, dyes_2bfild)
+    amp_raw_list <- lapply(channels, get_amp_raw, db_conn, exp_id, stage_id, max_cycle, show_running_time)
+    arl_ele1 <- amp_raw_list[[1]]
     
-    amp_calib_mtch <- process_mtch(
-        channels, 
-        matrix2array=TRUE, 
-        func=get_amp_calib, 
-        db_conn, 
-        exp_id, stage_id, 
-        oc_data, 
-        max_cycle,
-        show_running_time)
-    dbDisconnect(db_conn)
+    # amp_raw_mtch <- process_mtch(
+        # channels, 
+        # matrix2array=TRUE, 
+        # func=get_amp_raw, 
+        # db_conn, 
+        # exp_id, stage_id, 
+        # # oc_data, 
+        # max_cycle,
+        # show_running_time)
     
     # get data out of `amp_calib_mtch`
-    amp_raw <- amp_calib_mtch[['post_consoli']][['fluo_cast']]
-    amp_calib_mtch_bych <- amp_calib_mtch[['pre_consoli']]
-    amp_calib_array <- amp_calib_mtch[['post_consoli']][['ac_mtx']]
-    aca_dim3 <- dim(amp_calib_array)[3]
-    rbbs <- amp_calib_array # right before baseline subtraction
+    # amp_raw <- amp_raw_mtch[['post_consoli']][['fluo_cast']]
+    # amp_raw_mtch_bych <- amp_raw_mtch[['pre_consoli']]
+    # amp_calib_array <- amp_calib_mtch[['post_consoli']][['ac_mtx']]
+    # aca_dim3 <- dim(amp_calib_array)[3]
+    # rbbs <- amp_raw # right before baseline subtraction
     
     if (dcv) {
         # ac2dcv: when 1 %in% dim(amp_calib_array), `ac2dcv <- amp_calib_array[,,2:aca_dim3]` will result in reduced dimensions in ac2dcv
-        ac2dcv_dim <- dim(amp_calib_array) - c(0,0,1)
-        ac2dcv_dimnames <- dimnames(amp_calib_array)
-        ac2dcv_dimnames[[3]] <- ac2dcv_dimnames[[3]][2:aca_dim3]
+        aca_dim3 <- dim(arl_ele1)[2]
+        ac2dcv_dim <- c(num_channels, dim(arl_ele1) - c(0,1))
+        ac2dcv_dimnames <- list(channels, dimnames(arl_ele1)[[1]], dimnames(arl_ele1)[[2]][2:aca_dim3])
         ac2dcv <- array(NA, dim=ac2dcv_dim, dimnames=ac2dcv_dimnames)
-        ac2dcv[,,] <- amp_calib_array[,,2:aca_dim3]
+        for (channel in channels) ac2dcv[channel,,] <- as.matrix(amp_raw_list[[channel]][,2:aca_dim3])
         # end: ac2dcv
-        dcvd_array <- deconv(ac2dcv, k_list[['k_inv_array']])
-        for (channel in channels) {
-            dcvd_mtx_per_channel <- dcvd_array[as.character(channel),,]
-            amp_calib_mtch_bych[[as.character(channel)]][['ac_mtx']][,2:aca_dim3] <- dcvd_mtx_per_channel
-            rbbs[as.character(channel),,2:aca_dim3] <- dcvd_mtx_per_channel }}
+        dcvd_out <- deconv(ac2dcv, db_conn, calib_info)
+        rboc_mtch <- lapply(channels, function(channel) {
+            dcvd_1ch <- dcvd_out[['dcvd_array']][channel,,]
+            dcvd_1ch_wcyc <- cbind(amp_raw_list[[channel]][,1], dcvd_1ch)
+            colnames(dcvd_1ch_wcyc)[1] <- 'cycle_num'
+            return(dcvd_1ch_wcyc)
+        })
+        k_list_temp <- dcvd_out[['k_list_temp']]
+    } else {
+        rboc_mtch <- amp_raw_list
+        k_list_temp <- NULL
+    }
     
-    rbbs <- lapply(channels, function(channel) rbbs[channel,,]) # for list instead of array output
+    oc_data <- prep_optic_calib(db_conn, calib_info, dye_in, dyes_2bfild)
+    dbDisconnect(db_conn)
     
-    num_cycles <- dim(amp_calib_array)[2]
+    rbbs <- lapply(channels, function(channel) {
+        rboc_1ch <- as.matrix(rboc_mtch[[channel]])
+        rbbs_1ch <- optic_calib(rboc_1ch[,2:ncol(rboc_1ch)], oc_data, channel)$fluo_calib
+        colnames(rbbs_1ch)[1] <- 'cycle_num'
+        return(rbbs_1ch)
+    })
+    
+    num_cycles <- dim(arl_ele1)[1]
     
     if (num_cycles <= 2) {
         
         message(sprintf('Number of available cycles (%i) of fluorescence data is less than 2. Baseline subtraction and calculation of Cq and amplification efficiency are not performed.', num_cycles))
         
         num_wells <- aca_dim3 - 1
-        well_names <- dimnames(amp_calib_array)[[3]][2:aca_dim3]
+        well_names <- dimnames(amp_raw_array)[[3]][2:aca_dim3]
         
         coefficients_1ch <- matrix(
             NA, 
@@ -150,7 +165,7 @@ get_amplification_data <- function(
         if (min_reliable_cyc > num_cycles) mbf_cycles <- 1:num_cycles else mbf_cycles <- min_reliable_cyc:num_cycles # mbf = maxq_blsub_fluo
         
         blsub_mtch <- process_mtch(
-            amp_calib_mtch_bych, 
+            rbbs, 
             matrix2array=FALSE, 
             func=subtract_baseline, 
             maxiter, maxfev, 
@@ -198,9 +213,10 @@ get_amplification_data <- function(
         result_mtch <- c(
             downstream, blsub_mtch_post, ce_mtch, 
             list(
-                'amp_raw'=amp_raw, 
+                'amp_raw_list'=amp_raw_list, 
+                'dcvd_mtch'=rboc_mtch, 
+                'k_list_temp'=k_list_temp, 
                 'oc_data'=oc_data, 
-                'pre_dcv_bg_sub'=amp_calib_array, 
                 'maxq_blsub_fluo'=maxq_blsub_fluo) )
     } else result_mtch <- downstream
     
@@ -211,11 +227,11 @@ get_amplification_data <- function(
 
 
 # function: get amplification data from MySQL database; perform water calibration.
-get_amp_calib <- function(
+get_amp_raw <- function(
     channel, # as 1st argument for iteration by channel
     db_conn, 
     exp_id, stage_id, # for selecting data to analyze
-    oc_data, # optical calibration data
+    # oc_data, # optical calibration data
     max_cycle, # number of cycles to analyze
     show_running_time # option to show time cost to run this function
     ) {
@@ -224,7 +240,7 @@ get_amp_calib <- function(
     func_name <- 'get_amp_calib'
     start_time <- proc.time()[['elapsed']]
     
-    message('get_amp_calib') # Xia Hong
+    message('get_amp_raw') # Xia Hong
     
     # get fluorescence data for amplification
     fluo_qry <- sprintf(
@@ -249,19 +265,19 @@ get_amp_calib <- function(
     
     # get optical-calibrated data.
     num_wells <- length(unique(fluo_sel[,'well_num']))
-    calibd <- optic_calib(fluo_cast[,2:(num_wells+1)], oc_data, channel, show_running_time)$fluo_calib # column cycle_num is included, because adply automatically create a column at index 1 of output from rownames of input array (1st argument)
-    ac_mtx <- cbind(fluo_cast[, 'cycle_num'], calibd)
-    colnames(ac_mtx)[1] <- 'cycle_num'
-    amp_calib <- list(
-        'ac_mtx'=as.matrix(ac_mtx), # change data frame to matrix for ease of constructing array
-        'fluo_cast'=fluo_cast, 
-        'signal_water_diff'=calibd$signal_water_diff)
+    # calibd <- optic_calib(fluo_cast[,2:(num_wells+1)], oc_data, channel, show_running_time)$fluo_calib # column cycle_num is included, because adply automatically create a column at index 1 of output from rownames of input array (1st argument)
+    # ac_mtx <- cbind(fluo_cast[, 'cycle_num'], calibd)
+    # colnames(ac_mtx)[1] <- 'cycle_num'
+    # amp_data <- list(
+        # 'ac_mtx'=as.matrix(ac_mtx), # change data frame to matrix for ease of constructing array
+        # 'fluo_cast'=fluo_cast, 
+        # 'signal_water_diff'=calibd$signal_water_diff)
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]
     if (show_running_time) message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
     
-    return(amp_calib)
+    return(fluo_cast)
     }
 
 
@@ -282,7 +298,7 @@ modlist_coef <- function(modLIST, model, coef_cols) {
 # function: baseline subtraction
 
 subtract_baseline <- function(
-    amp_calib, 
+    ac_mtx, 
     maxiter, maxfev, # control parameters for `nlsLM` in `pcrfit`. !!!! Note: `maxiter` sometimes affect finIter in a weird way: e.g. for the same well, finIter == 17 when maxiter == 200, finIter == 30 when maxiter == 30, finIter == 100 when maxiter == 100; maxiter affect fitting strategy?
     model, baselin, basecyc, fallback, # modlist parameters. 
     # baselin = c('none', 'mean', 'median', 'lin', 'quad', 'parm').
@@ -291,9 +307,6 @@ subtract_baseline <- function(
     min_reliable_cyc, 
     show_running_time # option to show time cost to run this function
     ) {
-    
-    ac_mtx <- amp_calib$ac_mtx
-    signal_water_diff <- amp_calib$signal_water_diff
     
     num_cycles <- dim(ac_mtx)[1]
     
