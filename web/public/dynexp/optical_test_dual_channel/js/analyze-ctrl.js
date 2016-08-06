@@ -5,7 +5,8 @@
     'Constants',
     'Experiment',
     'GlobalService',
-    function ($scope, $stateParams, Constants, Experiment, GlobalService) {
+    '$timeout',
+    function ($scope, $stateParams, Constants, Experiment, GlobalService, $timeout) {
 
       $scope.loop = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
       $scope.analyzing = true;
@@ -30,18 +31,34 @@
         return valid;
       };
 
-      Experiment.get($stateParams.id)
-      .then(function (resp) {
-        $scope.experiment = resp.data.experiment;
-        Experiment.analyze($scope.experiment.id)
+      $scope.analyzeExperiment = function() {
+        Experiment.get($stateParams.id)
         .then(function (resp) {
-          $scope.data = resp.data.optical_data;
-          $scope.analyzing = false;
-        })
-        .catch(function () {
-          $scope.analyzing = false;
+          $scope.experiment = resp.data.experiment;
+          Experiment.analyze($scope.experiment.id)
+          .then(function (resp) {
+            if(resp.status == 200){
+              $scope.data = resp.data.optical_data;
+              $scope.analyzing = false;
+            }
+            else if (resp.status == 202) {
+              $timeout($scope.analyzeExperiment, 1000);
+            }
+          })
+          .catch(function (resp) {
+            if (resp.status == 500) {
+              $scope.analyzing = false;
+            }
+            else if (resp.status == 503) {
+              $timeout($scope.analyzeExperiment, 1000);
+            }
+          });
         });
-      });
+
+      };
+
+      $scope.analyzeExperiment();
+
 
     }
    ]);

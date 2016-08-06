@@ -12,8 +12,9 @@
     '$interval',
     '$uibModal',
     '$rootScope',
+    '$timeout',
     function OpticalCalibrationCtrl($scope, $window, Experiment, $state, Status, GlobalService, Constants,
-      host, $http, $interval, $uibModal, $rootScope) {
+      host, $http, $interval, $uibModal, $rootScope, $timeout) {
 
       var checkMachineStatusInterval = null;
       var errorModal = null;
@@ -32,6 +33,7 @@
       var ERROR_TYPES = ['OFFLINE', 'CANT_CREATE_EXPERIMENT', 'CANT_START_EXPERIMENT', 'LID_OPEN', 'UNKNOWN_ERROR', 'ANOTHER_EXPERIMENT_RUNNING'];
       $scope.errors = {};
       $scope.Constants = Constants;
+      var params;
 
       $scope.$on('status:data:updated', function(e, data, oldData) {
         if (!data) return;
@@ -42,7 +44,7 @@
         $scope.data = data;
         $scope.state = data.experiment_controller.machine.state;
         $scope.timeRemaining = GlobalService.timeRemaining(data);
-        $scope.isWarmingUp = data.experiment_controller.expriment? (data.experiment_controller.expriment.step.name === 'Warm Up') : false;
+        $scope.isWarmingUp = data.experiment_controller.expriment? ((data.experiment_controller.expriment.step.name === 'Warm Up 75')||(data.experiment_controller.expriment.step.name === 'Warm Water')) : false;
 
         if ($scope.state === 'paused') {
           var pausedPages = ['heating-and-reading-water', 'reading-fam', 'reading-hex'];
@@ -68,28 +70,13 @@
           // experiment is complete
           Experiment.get($scope.experiment.id).then(function (resp) {
             $scope.experiment = resp.data.experiment;
-            var params = {id: $scope.experiment.id};
+            params = {id: $scope.experiment.id};
             if( $scope.experiment.completion_status !== 'success') {
               $state.go('analyze', params);
             }
             else {
-              Experiment.analyze($scope.experiment.id)
-              .then(function (resp) {
-                $state.go('analyze', params);
-                $scope.result = resp.data;
-                $scope.valid = true;
-                for (var i = resp.data.valid.length - 1; i >= 0; i--) {
-                  if (resp.data.valid[i] === false) {
-                    $scope.valid = false;
-                    break;
-                  }
-                }
-                if($scope.valid)
-                  $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
-              })
-              .catch(function () {
-                $state.go('analyze', params);
-              });
+              $scope.analyzeExperiment();
+
             }
           });
         }
@@ -150,6 +137,38 @@
 
       checkMachineStatusInterval = $interval(checkMachineStatus, 1000);
 
+      $scope.analyzeExperiment = function () {
+        Experiment.analyze($scope.experiment.id)
+        .then(function (resp) {
+          if(resp.status == 202){
+            $timeout($scope.analyzeExperiment, 1000);
+          }
+          else {
+            $state.go('analyze', params);
+            $scope.result = resp.data;
+            $scope.valid = true;
+            for (var i = resp.data.valid.length - 1; i >= 0; i--) {
+              if (resp.data.valid[i] === false) {
+                $scope.valid = false;
+                break;
+              }
+            }
+            if($scope.valid)
+              $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
+          }
+
+        })
+        .catch(function (resp) {
+          if(resp.status == 503){
+            $timeout($scope.analyzeExperiment, 1000);
+          }
+          else{
+            $state.go('analyze', params);
+          }
+        });
+
+      }
+
       $scope.lidHeatPercentage = function() {
         if (!$scope.experiment) return 0;
         if (!$scope.data) return 0;
@@ -177,6 +196,7 @@
       };
 
       $scope.next = function() {
+        debugger;
         var pageIndex = pages.indexOf($state.current.name);
         var params = {};
         if( pageIndex === (pages.length - 1))

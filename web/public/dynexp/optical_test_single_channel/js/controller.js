@@ -109,10 +109,32 @@
           getExperiment($stateParams.id, function (exp) {
             $scope.experiment = exp;
             if (exp.completion_status === 'success') {
-              Experiment.getStepsData($stateParams.id, [12, 13]).then(function (resp) {
-                $scope.analyzedExp = Helper.getBaselineAndExcitation(resp.data.fluorescence_data);
-                $scope.analyzing = false;
+              Experiment.analyze($stateParams.id)
+              .then(function (resp) {
+                console.log(resp);
+                if(resp.status == 200){
+                  $scope.analyzedExp = resp.data;
+                  //$scope.tm_values = GlobalService.getTmValues(resp.data);
+                  $scope.analyzing = false;
+                }
+                else if (resp.status == 202){
+                  $timeout($scope.analyzeExperiment, 1000);
+                }
+              })
+              .catch(function (resp) {
+                console.log(resp);
+                if(resp.status == 500){
+                  $scope.custom_error = resp.data.errors || "An error occured while trying to analyze the experiment results.";
+                  $scope.analyzing = false;
+               }
+               else if(resp.status ==503){
+                 $timeout($scope.analyzeExperiment, 1000);
+               }
               });
+              //Experiment.getStepsData($stateParams.id, [12, 13]).then(function (resp) {
+                //$scope.analyzedExp = Helper.getBaselineAndExcitation(resp.data.fluorescence_data);
+                //$scope.analyzing = false;
+              //});
             }
             else {
               $scope.analyzing = false;
