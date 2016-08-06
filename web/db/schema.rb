@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160728065948) do
+ActiveRecord::Schema.define(version: 20160806001349) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -163,9 +163,11 @@ ActiveRecord::Schema.define(version: 20160728065948) do
   create_table "temperature_debug_logs", id: false, force: true do |t|
     t.integer "experiment_id"
     t.integer "elapsed_time",                                    comment: "in milliseconds"
-    t.decimal "lid_drive",               precision: 6, scale: 1
-    t.decimal "heat_block_zone_1_drive", precision: 6, scale: 1
-    t.decimal "heat_block_zone_2_drive", precision: 6, scale: 1
+    t.decimal "lid_drive",               precision: 5, scale: 4
+    t.decimal "heat_block_zone_1_drive", precision: 5, scale: 4
+    t.decimal "heat_block_zone_2_drive", precision: 5, scale: 4
+    t.decimal "heat_sink_temp",          precision: 5, scale: 2, comment: "degrees C"
+    t.decimal "heat_sink_drive",         precision: 5, scale: 4
   end
 
   add_index "temperature_debug_logs", ["experiment_id", "elapsed_time"], name: "index_temperature_debug_logs_on_experiment_id_and_elapsed_time", unique: true, using: :btree
