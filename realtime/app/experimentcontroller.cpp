@@ -473,6 +473,8 @@ void ExperimentController::addLogCallback(Poco::Timer &)
         log.setLidDrive(LidInstance::getInstance()->drive());
         log.setHeatBlockZone1Drive(HeatBlockInstance::getInstance()->zone1DriveValue());
         log.setHeatBlockZone2Drive(HeatBlockInstance::getInstance()->zone2DriveValue());
+        log.setHeatSinkTemperature(HeatSinkInstance::getInstance()->currentTemperature());
+        log.setHeatSinkDrive(HeatSinkInstance::getInstance()->fanDrive());
     }
 
     _logs.push_back(std::move(log));

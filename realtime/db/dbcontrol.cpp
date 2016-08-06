@@ -419,7 +419,7 @@ void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
     bool debugTempLogs = false;
 
     stream << "INSERT INTO temperature_logs(experiment_id, elapsed_time, lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp) VALUES";
-    stream2 << "INSERT INTO temperature_debug_logs(experiment_id, elapsed_time, lid_drive, heat_block_zone_1_drive, heat_block_zone_2_drive) VALUES";
+    stream2 << "INSERT INTO temperature_debug_logs(experiment_id, elapsed_time, lid_drive, heat_block_zone_1_drive, heat_block_zone_2_drive, heat_sink_temp, heat_sink_drive) VALUES";
 
     for (std::vector<TemperatureLog>::const_iterator it = logs.begin(); it != logs.end(); ++it)
     {
@@ -442,7 +442,8 @@ void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
             debugTempLogs = true;
 
             stream2 << "(" << it->experimentId() << "," << it->elapsedTime() << "," << ROUND(it->lidDrive()) << ","
-                   << ROUND(it->heatBlockZone1Drive()) << "," << ROUND(it->heatBlockZone2Drive()) << ")";
+                   << ROUND(it->heatBlockZone1Drive()) << "," << ROUND(it->heatBlockZone2Drive())
+                   << ROUND(it->heatSinkTemperature()) << "," << ROUND(it->heatSinkDrive()) << ")";
         }
     }
 

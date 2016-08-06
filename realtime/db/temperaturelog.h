@@ -67,6 +67,12 @@ public:
     inline double heatBlockZone2Drive() const { return _heatBlockZone2Drive; }
     inline void setHeatBlockZone2Drive(double drive) { _heatBlockZone2Drive = drive; }
 
+    inline double heatSinkTemperature() const { return _heatSinkTemperature; }
+    inline void setHeatSinkTemperature(double temperature) { _heatSinkTemperature = temperature; }
+
+    inline double heatSinkDrive() const { return _heatSinkDrive; }
+    inline void setHeatSinkDrive(double drive) { _heatSinkDrive = drive; }
+
 private:
     int _experimentId;
     long _elapsedTime;
@@ -80,6 +86,8 @@ private:
     double _lidDrive;
     double _heatBlockZone1Drive;
     double _heatBlockZone2Drive;
+    double _heatSinkTemperature;
+    double _heatSinkDrive;
 };
 
 #endif // TEMPERATURELOG_H
