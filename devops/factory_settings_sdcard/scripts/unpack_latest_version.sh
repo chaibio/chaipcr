@@ -144,13 +144,13 @@ then
        mkdir -p /tmp/emmcboot
 fi
 
-if mount | grep ${sdcard_p1}                                             
-then                                                                     
-        echo "sdcard partitions mounted already!"                                              
-else                                                                                         
-        mount ${sdcard_dev}p1 ${sdcard_p1} -t vfat || true                                     
-        mount ${sdcard_dev}p2 ${sdcard_p2} -t ext4 || true                                     
-fi                                                                                             
+if mount | grep ${sdcard_p1}
+then
+        echo "sdcard partitions mounted already!"
+else
+        mount ${sdcard_dev}p1 ${sdcard_p1} -t vfat || true
+        mount ${sdcard_dev}p2 ${sdcard_p2} -t ext4 || true
+fi
 
 NOW=$(date +"%m-%d-%Y %H:%M:%S")
 
@@ -200,7 +200,7 @@ incriment_stage_counter () {
 
 reset_stage_counter () {
 	echo "Resetting stage counter."
-	echo 1 > ${sdcard_p1}/unpack_stage.ini
+	echo 1 > ${sdcard_p2}/unpack_stage.ini
 	stage=1
 	echo "Unpacking stage: $stage"
 }
