@@ -118,7 +118,11 @@ umount ${uEnvPath}> /dev/null
 
 mount ${sdcard_dev}p1 ${uEnvPath} -t vfat
 set_sdcard_uEnv
+sync
+sleep 5
+umount ${uEnvPath}
 
+mount ${sdcard_dev}p2 ${uEnvPath}
 NOW=$(date +"%m-%d-%Y %H:%M:%S")
 echo "Resume flag up at $NOW"
 echo "Upgrade started at: $NOW">${uEnvPath}/unpack_resume_autorun.flag
@@ -126,7 +130,7 @@ echo "Upgrade initiated at: $NOW">${uEnvPath}/booting.log
 echo "1">${uEnvPath}/restart_counter.ini
 echo "1">${uEnvPath}/unpack_stage.ini
 sync
-sleep 3
+sleep 5
 
 umount ${uEnvPath}
 

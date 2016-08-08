@@ -246,7 +246,7 @@ do
 done < "$fstab"
 
 echo "UUID=$UUID_p2 / ext4 noatime,errors=remount-ro 0 1" >> $fstab_new
-echo "UUID=$UUID_p1 /boot/uboot auto defaults 0 0" >> $fstab_new
+echo "UUID=$UUID_p1 /boot/uboot auto ro,defaults 0 0" >> $fstab_new
 echo "debugfs /sys/kernel/debug debugfs defaults 0 0" >> $fstab_new
 
 echo "UUID=$UUID_p3  /data   ext4    rw,auto,user,errors=remount-ro  0  0" >> $fstab_new

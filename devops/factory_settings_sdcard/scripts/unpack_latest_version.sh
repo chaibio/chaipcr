@@ -144,19 +144,19 @@ then
        mkdir -p /tmp/emmcboot
 fi
 
-if mount | grep ${sdcard_p1}                                             
-then                                                                     
-        echo "sdcard partitions mounted already!"                                              
-else                                                                                         
-        mount ${sdcard_dev}p1 ${sdcard_p1} -t vfat || true                                     
-        mount ${sdcard_dev}p2 ${sdcard_p2} -t ext4 || true                                     
-fi                                                                                             
+if mount | grep ${sdcard_p1}
+then
+        echo "sdcard partitions mounted already!"
+else
+        mount ${sdcard_dev}p1 ${sdcard_p1} -t vfat || true
+        mount ${sdcard_dev}p2 ${sdcard_p2} -t ext4 || true
+fi
 
 NOW=$(date +"%m-%d-%Y %H:%M:%S")
 
 unpack_resume_flag_up () {
 	echo "Upgrade resume flag up!"
-	echo "Upgrade started at: $NOW">>${sdcard_p1}/unpack_resume_autorun.flag
+	echo "Upgrade started at: $NOW">>${sdcard_p2}/unpack_resume_autorun.flag
 }
 
 if [ ! -e  $image_filename_upgrade ]
@@ -165,6 +165,11 @@ then
 	if [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
 	then
 		rm ${sdcard_p1}/unpack_resume_autorun.flag || true
+	fi
+
+	if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ]
+	then
+		rm ${sdcard_p2}/unpack_resume_autorun.flag || true
 	fi
 
 	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
@@ -176,7 +181,7 @@ fi
 #echo "Run with $1 $2"
 
 stage=0
-counter_file=${sdcard_p1}/unpack_stage.ini
+counter_file=${sdcard_p2}/unpack_stage.ini
 
 incriment_stage_counter () {
 	# Incriment and display restart counter
@@ -195,7 +200,7 @@ incriment_stage_counter () {
 
 reset_stage_counter () {
 	echo "Resetting stage counter."
-	echo 1 > ${sdcard_p1}/unpack_stage.ini
+	echo 1 > ${sdcard_p2}/unpack_stage.ini
 	stage=1
 	echo "Unpacking stage: $stage"
 }
@@ -300,18 +305,27 @@ then
 	rm ${sdcard_p1}/unpack_resume_autorun.flag || true
 fi
 
+if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ]
+then
+	rm ${sdcard_p2}/unpack_resume_autorun.flag || true
+fi
+
 sync
 
 echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 
 upgrade_autorun_flag_up () {
-	echo "Autorun scripts after boot.. requested on $NOW" > ${sdcard_p1}/upgrade_autorun.flag
+	echo "Autorun scripts after boot.. requested on $NOW" > ${sdcard_p2}/upgrade_autorun.flag
 }
 
 upgrade_autorun_flag_down () {
 	if [ -e ${sdcard_p1}/upgrade_autorun.flag ]
 	then
 		rm ${sdcard_p1}/upgrade_autorun.flag || true
+	fi
+	if [ -e ${sdcard_p2}/upgrade_autorun.flag ]
+	then
+		rm ${sdcard_p2}/upgrade_autorun.flag || true
 	fi
 }
 
