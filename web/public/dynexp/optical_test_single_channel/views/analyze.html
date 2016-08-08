@@ -1,7 +1,7 @@
 <div class="intro" ng-init="analyzeExperiment()">
   <h2>Optical Diagnostic Results</h2>
 
-  <h4 class="text-center" ng-show="!experiment.completion_status && analyzing"><b>Analyzing Results...</b></h4>
+  <h4 class="text-center" ng-show="analyzing"><b>Analyzing Results...</b></h4>
 
   <div ng-show="experiment.completion_status !== 'success' && !analyzing">
     <div class="alert alert-danger">
@@ -23,8 +23,8 @@
         <tbody>
           <tr ng-repeat="i in loop">
             <td>{{i+1}}</td>
-            <td>{{analyzedExp[i].baseline.fluorescence_value}}</td>
-            <td>{{analyzedExp[i].excitation.fluorescence_value}}</td>
+            <td>{{analyzedExp[i].baseline}}</td>
+            <td>{{analyzedExp[i].excitation}}</td>
             <td>
               <span class="text-success" ng-show="getResult(analyzedExp[i])">PASS</span>
               <span class="text-danger" ng-show="!getResult(analyzedExp[i])">FAIL</span>
@@ -46,8 +46,8 @@
         <tbody>
           <tr ng-repeat="i in loop">
             <td>{{i+9}}</td>
-            <td>{{analyzedExp[i+8].baseline.fluorescence_value}}</td>
-            <td>{{analyzedExp[i+8].excitation.fluorescence_value}}</td>
+            <td>{{analyzedExp[i+8].baseline}}</td>
+            <td>{{analyzedExp[i+8].excitation}}</td>
             <td>
               <span class="text-success" ng-show="getResult(analyzedExp[i+8])">PASS</span>
               <span class="text-danger" ng-show="!getResult(analyzedExp[i+8])">FAIL</span>

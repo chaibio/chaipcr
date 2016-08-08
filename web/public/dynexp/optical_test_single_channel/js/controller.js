@@ -113,7 +113,7 @@
               .then(function (resp) {
                 console.log(resp);
                 if(resp.status == 200){
-                  $scope.analyzedExp = resp.data;
+                  $scope.analyzedExp = resp.data.optical_data;
                   //$scope.tm_values = GlobalService.getTmValues(resp.data);
                   $scope.analyzing = false;
                 }
@@ -217,7 +217,9 @@
 
       $scope.getResult = function (obj) {
         if(!obj) return false;
-        return Helper.getResult(obj.baseline.fluorescence_value, obj.excitation.fluorescence_value);
+        if(obj.valid) return true;
+        else return false;
+        //return Helper.getResult(obj.baseline.fluorescence_value, obj.excitation.fluorescence_value);
       };
 
     }
