@@ -442,7 +442,7 @@ void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
             debugTempLogs = true;
 
             stream2 << "(" << it->experimentId() << "," << it->elapsedTime() << "," << ROUND(it->lidDrive()) << ","
-                   << ROUND(it->heatBlockZone1Drive()) << "," << ROUND(it->heatBlockZone2Drive())
+                   << ROUND(it->heatBlockZone1Drive()) << "," << ROUND(it->heatBlockZone2Drive()) << ","
                    << ROUND(it->heatSinkTemperature()) << "," << ROUND(it->heatSinkDrive()) << ")";
         }
     }
