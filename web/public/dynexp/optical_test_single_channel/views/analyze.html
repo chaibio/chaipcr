@@ -9,6 +9,12 @@
     </div>
   </div>
 
+  <div ng-show="experiment.completion_status == 'success' && custom_error && !analyzing">
+    <div class="alert alert-danger">
+      <strong>Experiment Failed!</strong> {{ custom_error }}
+    </div>
+  </div>
+
   <div class="row" ng-show="experiment.completion_status === 'success' && !analyzing">
     <div class="col-md-6">
       <table class="table table-bordered">
