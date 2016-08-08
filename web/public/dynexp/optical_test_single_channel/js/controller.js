@@ -104,11 +104,12 @@
       $scope.checkMachineStatus();
 
       $scope.analyzeExperiment = function () {
-        $scope.analyzing = true;
+        //$scope.analyzing = true;
         if (!$scope.analyzedExp) {
           getExperiment($stateParams.id, function (exp) {
             $scope.experiment = exp;
             if (exp.completion_status === 'success') {
+              $scope.analyzing = true;
               Experiment.analyze($stateParams.id)
               .then(function (resp) {
                 console.log(resp);
