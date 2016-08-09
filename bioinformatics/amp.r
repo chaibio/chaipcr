@@ -119,7 +119,7 @@ get_amplification_data <- function(
     
     rbbs <- lapply(channels, function(channel) {
         rboc_1ch <- as.matrix(rboc_mtch[[channel]])
-        rbbs_1ch <- optic_calib(rboc_1ch[,2:ncol(rboc_1ch)], oc_data, channel)$fluo_calib
+        rbbs_1ch <- data.matrix(optic_calib(rboc_1ch[,2:ncol(rboc_1ch)], oc_data, channel)$fluo_calib) # convert data frame to a numeric matrix
         colnames(rbbs_1ch)[1] <- 'cycle_num'
         return(rbbs_1ch)
     })
