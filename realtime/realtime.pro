@@ -126,7 +126,6 @@ HEADERS += \
     db/settings.h \
     server/settingshandler.h \
     util/adcpin.h \
-    server/logdatahandler.h \
     util/exceptionhandler.h \
     control/test/adccontrollermock.h \
     util/lockfreesignal.h \
@@ -185,7 +184,6 @@ SOURCES += \
     util/filters.cpp \
     server/settingshandler.cpp \
     util/adcpin.cpp \
-    server/logdatahandler.cpp \
     control/test/adccontrollermock.cpp \
     server/httpcodehandler.cpp \
     util/wirelessmanager.cpp \

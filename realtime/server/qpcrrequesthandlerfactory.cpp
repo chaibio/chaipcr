@@ -29,7 +29,6 @@
 #include "statushandler.h"
 #include "controlhandler.h"
 #include "settingshandler.h"
-#include "logdatahandler.h"
 #include "networkmanagerhandler.h"
 #include "updatehandler.h"
 #include "updateuploadhandler.h"
@@ -92,8 +91,6 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
                         return new TestControlHandler();
                     else if (requestPath.at(0) == "settings")
                         return new SettingsHandler();
-                    else if (requestPath.at(0) == "log_data")
-                        return new LogDataHandler();
                 }
                 else if (request.getMethod() == "POST")
                 {

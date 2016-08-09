@@ -448,7 +448,7 @@ void ExperimentController::addLogCallback(Poco::Timer &)
 
     if (_machineState != IdleMachineState)
     {
-        log = TemperatureLog(_experiment.id(), true, _experiment.type() == Experiment::DiagnosticType || _settings.debugMode);
+        log = TemperatureLog(_experiment.id(), true, _settings.debugMode);
         log.setElapsedTime((boost::posix_time::microsec_clock::local_time() - _experiment.startedAt()).total_milliseconds());
 
         _machineMutex->unlock();
