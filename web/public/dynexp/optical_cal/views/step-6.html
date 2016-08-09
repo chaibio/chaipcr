@@ -33,6 +33,10 @@
       Experiment was aborted due to an unknown error.
     </p>
 
+    <p class="heating" ng-show="custom_error">
+      {{custom_error}}
+    </p>
+
     <p class="heating" ng-repeat="err_msg in result.error_message">
       {{err_msg}}
     </p>

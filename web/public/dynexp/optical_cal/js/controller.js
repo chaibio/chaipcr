@@ -101,6 +101,16 @@
         var running_exp_id = oldData.experiment_controller.expriment? oldData.experiment_controller.expriment.id : null;
         var is_current_exp = (parseInt(this_exp_id) === parseInt(running_exp_id)) && (running_exp_id !== null);
 
+        if($scope.state === 'idle' && (oldData.experiment_controller.machine.state === 'idle') && $state.current.name === 'step-3') {
+          Experiment.get($scope.experiment.id).then(function (resp) {
+            $scope.experiment = resp.data.experiment;
+            if( $scope.experiment.completion_status === 'failuire') {
+              $state.go('step-6');
+              return;
+            }
+          }
+        }
+
         // if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle' || $state.current.name === 'step-5')) {
         if($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle') && is_current_exp ) {
           // experiment is complete
@@ -151,6 +161,10 @@
         .catch(function (resp){
           if(resp.status == 503){
             $timeout($scope.analyzeExperiment, 1000);
+          }
+          else if (resp.status == 500){
+            $scope.valid = false;
+            $scope.custom_error = resp.data.errors || "An error occured while trying to analyze the experiment results.";
           }
         });
       };

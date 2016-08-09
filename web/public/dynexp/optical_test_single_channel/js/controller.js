@@ -56,6 +56,13 @@
           $state.go('analyze', {id: $scope.experiment.id});
         }
 
+        if($scope.state === 'idle' && $scope.old_state ==='idle' && $state.current.name === 'exp-running') {
+          getExperiment(data.experiment_controller.expriment.id);
+          if($scope.experiment.completion_status === 'failuire') {
+            $state.go('analyze', {id: $scope.experiment.id});
+          }
+        }
+
         if ($state.current.name === 'analyze') Status.stopSync();
 
       }, true);

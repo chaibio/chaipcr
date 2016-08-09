@@ -126,3 +126,9 @@
     </div>
   </div>
 </div>
+<div class="info-container" ng-show="!analyzedExp && custom_error">
+  <h2 class="text-danger">Diagnostic Failed</h2>
+  <div class="alert alert-danger">
+    {{custom_error}
+  </div>
+</div>

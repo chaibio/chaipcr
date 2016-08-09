@@ -110,15 +110,19 @@
             console.log($scope.analyzedExp);
           }
           else if (resp.status == 202){
-          $timeout(analyzeExperiment, 1000);  
+          $timeout(analyzeExperiment, 1000);
          }
           })
           .catch(function (resp){
             console.log(resp);
             if(resp.status == 500){
                 $scope.custom_error = resp.data.errors || "An error occured while trying to analyze the experiment results.";
-                $scope.analyzedExp = " ";
+                //$scope.analyzedExp = " ";
            }
+           else if (resp.status == 503){
+             $timeout(analyzeExperiment, 1000);
+           }
+
           });
         }
       }
@@ -164,6 +168,15 @@
           getExperiment(function(resp) {
             $scope.experiment = resp.experiment;
             if($scope.experiment.completion_status === 'success') analyzeExperiment();
+          });
+        }
+        if (newState === 'idle' && oldState == 'idle' && $params.id) {
+          getExperiment(function(resp) {
+            $scope.experiment = resp.experiment;
+            if($scope.experiment.completion_status === 'failuire') {
+              stopPolling();
+              Status.stopSync();
+            }
           });
         }
       });
