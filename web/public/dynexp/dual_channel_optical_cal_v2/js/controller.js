@@ -44,7 +44,7 @@
         $scope.data = data;
         $scope.state = data.experiment_controller.machine.state;
         $scope.timeRemaining = GlobalService.timeRemaining(data);
-        $scope.isWarmingUp = data.experiment_controller.expriment? ((data.experiment_controller.expriment.step.name === 'Warm Up 75')||(data.experiment_controller.expriment.step.name === 'Warm Water')) : false;
+        $scope.isWarmingUp = data.experiment_controller.expriment? ((data.experiment_controller.expriment.step.name === 'Warm Up 75')||(data.experiment_controller.expriment.step.name === 'Warm Water')||(data.experiment_controller.expriment.step.name === 'Warm FAM')||(data.experiment_controller.expriment.step.name === 'Warm HEX')) : false;
 
         if ($scope.state === 'paused') {
           var pausedPages = ['heating-and-reading-water', 'reading-fam', 'reading-hex'];
