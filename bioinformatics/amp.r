@@ -117,9 +117,13 @@ get_amplification_data <- function(
     oc_data <- prep_optic_calib(db_conn, calib_info, dye_in, dyes_2bfild)
     dbDisconnect(db_conn)
     
+    num_wells <- aca_dim3 - 1
+    
     rbbs <- lapply(channels, function(channel) {
         rboc_1ch <- as.matrix(rboc_mtch[[channel]])
-        rbbs_1ch <- data.matrix(optic_calib(rboc_1ch[,2:ncol(rboc_1ch)], oc_data, channel)$fluo_calib) # convert data frame to a numeric matrix
+        rbbs_1ch <- data.matrix(optic_calib(
+            matrix(rboc_1ch[,2:ncol(rboc_1ch)], ncol=num_wells), oc_data, channel)$fluo_calib
+        ) # convert data frame to a numeric matrix
         colnames(rbbs_1ch)[1] <- 'cycle_num'
         return(rbbs_1ch)
     })
@@ -130,7 +134,6 @@ get_amplification_data <- function(
         
         message(sprintf('Number of available cycles (%i) of fluorescence data is less than 2. Baseline subtraction and calculation of Cq and amplification efficiency are not performed.', num_cycles))
         
-        num_wells <- aca_dim3 - 1
         well_names <- dimnames(arl_ele1)[[2]][2:aca_dim3]
         
         coefficients_1ch <- matrix(
