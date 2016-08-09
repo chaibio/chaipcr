@@ -131,7 +131,7 @@ get_amplification_data <- function(
         message(sprintf('Number of available cycles (%i) of fluorescence data is less than 2. Baseline subtraction and calculation of Cq and amplification efficiency are not performed.', num_cycles))
         
         num_wells <- aca_dim3 - 1
-        well_names <- dimnames(amp_raw_array)[[3]][2:aca_dim3]
+        well_names <- dimnames(arl_ele1)[[2]][2:aca_dim3]
         
         coefficients_1ch <- matrix(
             NA, 
