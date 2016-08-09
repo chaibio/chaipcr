@@ -51,15 +51,45 @@ $(document).ready(function(){
 					$(".ip-text").show().text("IP ADDRESS: ");
 					$(".ip-value").show().text(data.state.address);
 				} else {
-					$(".ip-text").hide();
-					$(".ip-value").hide();
-					$(".span-message").show().text("No ethernet connection")
+          $.get("http://localhost:8000/network/wlan")
+            .done(function(data) {
+              if(data.state.address){
+                $(".span-message").hide();
+      					$(".ip-text").show().text("IP ADDRESS: ");
+      					$(".ip-value").show().text(data.state.address);
+              }
+              else{
+                $(".ip-text").hide();
+      					$(".ip-value").hide();
+      					$(".span-message").show().text("No network connection");
+              }
+            })
+            .fail(function() {
+      				$(".ip-text").hide();
+      				$(".ip-value").hide();
+      				$(".span-message").show().text("No network connection");
+      			});
 				}
 			})
 			.fail(function() {
-				$(".ip-text").hide();
-				$(".ip-value").hide();
-				$(".span-message").show().text("No ethernet connection");
+        $.get("http://localhost:8000/network/wlan")
+          .done(function(data) {
+            if(data.state.address){
+              $(".span-message").hide();
+              $(".ip-text").show().text("IP ADDRESS: ");
+              $(".ip-value").show().text(data.state.address);
+            }
+            else{
+              $(".ip-text").hide();
+              $(".ip-value").hide();
+              $(".span-message").show().text("No network connection");
+            }
+          })
+          .fail(function() {
+            $(".ip-text").hide();
+            $(".ip-value").hide();
+            $(".span-message").show().text("No network connection");
+          });
 			});
 	}
 
