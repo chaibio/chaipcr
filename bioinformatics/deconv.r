@@ -33,7 +33,7 @@ get_k <- function(
     
     if (well_proc == 'mean') {
         k <- as.matrix(do.call(cbind, lapply(channels, function(channel) {
-            k_data_1dye <- rowMeans(k_list_bydy[channel])
+            k_data_1dye <- rowMeans(k_list_bydy[[channel]])
             k_data_1dye / sum(k_data_1dye)
         })))
         colnames(k) <- dye_names
