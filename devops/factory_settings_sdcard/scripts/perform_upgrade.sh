@@ -93,7 +93,7 @@ verify_checksum
 set_sdcard_uEnv () {
 	cp ${uEnvPath}/uEnv.txt ${uEnvPath}/uEnv.org.txt
 	cp ${uEnvPath}/uEnv.sdcard.txt ${uEnvPath}/uEnv.txt
-	sleep 3	
+	sleep 3
 	sync
 	sleep 2
 }
@@ -134,6 +134,17 @@ sleep 5
 
 umount ${uEnvPath}
 
+uEnvPath=/boot/uboot
+mount -o remount,rw ${uEnvPath}
+set_sdcard_uEnv
+sync
+
+uEnvPath=/sdcard/factory
+mount -o remount,rw ${uEnvPath}
+set_sdcard_uEnv
+sync
+sleep 5
+
 echo "Restarting to packing eMMC image.."
 echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 
@@ -148,6 +159,6 @@ else
 fi
 cp /etc/shadow /data/.tmp/shadow.backup
 
-sh $BASEDIR/rebootx.sh
+#sh $BASEDIR/rebootx.sh
 
-exit_with_message Success 0 $1
+#exit_with_message Success 0 $1
