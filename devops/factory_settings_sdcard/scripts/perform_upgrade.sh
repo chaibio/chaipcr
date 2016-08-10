@@ -131,7 +131,6 @@ echo "1">${uEnvPath}/restart_counter.ini
 echo "1">${uEnvPath}/unpack_stage.ini
 sync
 sleep 5
-
 umount ${uEnvPath}
 
 uEnvPath=/boot/uboot
@@ -141,6 +140,32 @@ sync
 
 uEnvPath=/sdcard/factory
 mount -o remount,rw ${uEnvPath}
+
+echo "Checking if factory settings scripts should be upgraded..."
+version_file=/sdcard/factory/fs_Version.inf
+version_current=0
+if [ -e ${version_file} ]
+then
+	version_current=$(cat ${version_file})
+fi
+
+version_upgrade=0
+if [ -e /sdcard/upgrade/upgrade.img.tar ]
+then
+	version_upgrade=$(tar -xf /sdcard/upgrade/upgrade.img.tar factory-scripts/fs_version.inf --to-stdout)
+	echo current factory settings scripts version $version_current, upgrade image version is $version_upgrade
+	if [ $version_current -lt $version_upgrade ]
+	then
+		echo upgrading factory settings scripts
+		cd /sdcard/factory/
+		tar -xf /sdcard/upgrade/upgrade.img.tar factory-scripts
+		cp -r factory-scripts/* .
+		echo done extracting.
+	else
+		echo No factory settings partition upgrade needed
+	fi
+fi
+
 set_sdcard_uEnv
 sync
 sleep 5
@@ -157,8 +182,8 @@ else
 	        mkdir -p /data/.tmp/
 	fi
 fi
+
 cp /etc/shadow /data/.tmp/shadow.backup
 
-#sh $BASEDIR/rebootx.sh
-
-#exit_with_message Success 0 $1
+sh $BASEDIR/rebootx.sh
+exit_with_message Success 0 $1
