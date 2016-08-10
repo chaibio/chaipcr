@@ -26,25 +26,48 @@ then
 	NOW=$(date +"%m-%d-%Y %H:%M:%S")
 	log_file=/mnt/booting.log
 
-	mkdir /tmp/rw -p
+	mkdir /tmp/upgrade -p
 	if [ -e /dev/mmcblk0p3 ]
 	then
         	eMMC=/dev/mmcblk0
 		sdcard_dev=/dev/mmcblk1
-		mount ${sdcard_dev}p2 /tmp/rw
-		log_file=/tmp/rw/booting.log
+		mount ${sdcard_dev}p2 /tmp/upgrade
+		log_file=/tmp/upgrade/booting.log
 	elif [ -e /dev/mmcblk1p3 ]
 	then
        		eMMC=/dev/mmcblk1
 		sdcard_dev=/dev/mmcblk0
-		mount ${sdcard_dev}p2 /tmp/rw
-		log_file=/tmp/rw/booting.log
+		mount ${sdcard_dev}p2 /tmp/upgrade
+		log_file=/tmp/upgrade/booting.log
 	else
        		echo "4 partitions eMMC not found!"
 	fi
 
 	echo "Logging boot to: $log_file.. timestamp: $NOW"
 	echo "==== New boot at: $NOW" >> $log_file
+	echo "==== Checking if factory settings scripts should be upgraded" >> $log_file
+
+	version_file=/mnt/fs_Version.inf
+	version_current=0
+	if [ -e ${version_file} ]
+	then
+
+
+		version_current=$(cat ${version_file})
+	fi
+
+	version_upgrade=$(tar -xf /tmp/upgrade/upgrade.img.tar factory-scripts/fs_version.inf --to-stdout)
+	echo current factory settings scripts version $version_current, upgrade image version is $version_upgrade
+	echo current factory settings scripts version $version_current, upgrade image version is $version_upgrade  >> $log_file 2>&1
+	if [ $version_current -lt $version_upgrade ]
+	then
+		echo upgrading factory settings scripts  >> $log_file 2>&1
+		cd /mnt
+		tar -xf /tmp/upgrade/upgrade.img.tar factory-scripts
+		cp -r factory-scripts/* .
+		echo done extracting.  >> $log_file 2>&1
+	fi
+exit 0
 	sh /mnt/autorun_core.sh  >> $log_file 2>&1
 	result=$?
 	echo "Boot with logging complete!"
