@@ -250,10 +250,15 @@ angular.module("canvasApp").factory('stage', [
       this.validMove = function(direction) {
 
         if(this.stageMovedDirection === null) {
-          console.log("null");
           if(direction === "left") {
+            if(this.index === 0) { // For very first stage, It can't move further left.
+              return false;
+            }
             this.stageMovedDirection = "left";
-          } else {
+          } else if(direction === "right") {
+            if(this.index === (this.parent.allStageViews.length - 1)) { // Last stage can't move further right.
+              return false;
+            }
             this.stageMovedDirection = "right";
           }
         } else if(this.stageMovedDirection){ // if it has left or right value

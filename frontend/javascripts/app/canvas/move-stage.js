@@ -172,7 +172,7 @@ angular.module("canvasApp").factory('moveStageRect', [
               if(this.findInAndOut("left") === "OUT") {
                 stage.moveToSide("right");
                 this.verticalLine.setVisible(true);
-                //console.log("doom", stage.previousStage);
+
                 if(stage.previousStage) {
                   this.currentDrop = stage.previousStage;
                 } else {
