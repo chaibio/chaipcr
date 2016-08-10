@@ -171,15 +171,17 @@ image_filename_upgrade="${temp}/eMMC.img"
 image_filename_upgrade1="$sdcard/eMMC_part1.img"
 image_filename_upgrade2="$sdcard/eMMC_part2.img"
 upgrade_scripts="scripts"
+factory_scripts="factory-scripts"
+
 
 echo "Packing eMMC image.."
 
 if [ -e  ${temp} ]
 then
 	echo "$temp: exists!"
-#	rm -r "$temp/">/dev/null
 else
 	mkdir -p ${temp}/$upgrade_scripts
+	mkdir -p ${temp}/$factory_scripts
 fi
 
 cp $BASEDIR/factory_settings_sdcard/scripts/* $temp/$upgrade_scripts
@@ -363,7 +365,7 @@ else
 	rm /tmp/emmc/etc/systemd/system/multi-user.target.wants/realtime.service || :
 
 	echo "Zeroing rootfs partition"
-	dd if=/dev/zero of=/tmp/emmc/big_zero_file1.bin bs=16777216 > /dev/null
+	dd if=/dev/zero of=/tmp/emmc/big_zero_file1.bin bs=16777216 > /dev/null 2>&1
 	result=$?
 	sync &
 	sleep 5
@@ -414,6 +416,7 @@ $mdsumtool $image_filename_boot>>$checksums_filename
 if [ ! -e $upgrade_scripts ]
 then
 	mkdir -p $upgrade_scripts/
+	mkdir -p $factory_scripts/
 fi
 
 echo "Data partition: $data_partition"
@@ -424,7 +427,7 @@ retval=$?
 	    echo "Error mounting data partition! Error($retval)"
 	else
 		echo "Zeroing data partition"
-		dd if=/dev/zero of=/tmp/emmc/big_zero_file.bin > /dev/null
+		dd if=/dev/zero of=/tmp/emmc/big_zero_file.bin > /dev/null 2>&1
 		sync &
 		sleep 5
 		sync
@@ -466,7 +469,13 @@ echo Packing upgrade image
 rm $image_filename_rootfs
 mv $image_upgrade_filename_rootfs $image_filename_rootfs
 
-tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $image_filename_perm $checksums_filename $upgrade_scripts
+echo "packaging factory scripts in upgrade image."
+cp -r ${output_dir}/p1/* $temp/$factory_scripts
+
+#echo tar -cvf --exclude=$image_filename_upgrade2 $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $image_filename_perm $checksums_filename $upgrade_scripts $factory_scripts
+#echo $(pwd)
+
+tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $image_filename_perm $checksums_filename $upgrade_scripts $factory_scripts --exclude=factory_settings.img.tar
 
 echo "Remove packed files"
 if [ -e $image_filename_boot ]
