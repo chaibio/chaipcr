@@ -111,11 +111,12 @@ dye2chst_ccsl <- list('set'=dye2chst_channels, 'description'='all channels in th
 # function: check subset
 check_subset <- function(list_small, list_big) {
     if (!all(list_small[['set']] %in% list_big[['set']])) {
-        stop(sprintf('%s is not a subset of %s.', list_small[['description']], list_big[['description']])) }
+        stop(sprintf('%s is not a subset of %s.', list_small[['description']], list_big[['description']]))
     }
+}
 
 
-# function: get calibration data
+# function: get calibration data for adjusting well-to-well variation in absolute fluo values
 get_calib_data <- function(calib_id_s, step_id_s, 
                            db_conn, 
                            calib_id_name_type=c('dye', 'channel')) {
@@ -269,14 +270,16 @@ prep_optic_calib <- function(db_conn, calib_id_s, dye_in='FAM', dyes_2bfild=NULL
 
 # function: perform optical (water) calibration on fluo
 
-optic_calib <- function(fluo, oc_data, channel, show_running_time=FALSE) {
+optic_calib <- function(fluo, oc_data, channel, minus_water=FALSE, show_running_time=FALSE) {
     
     # start counting for running time
     func_name <- 'calib'
     start_time <- proc.time()[['elapsed']]
     
     # perform calibration
-    oc_water <- oc_data[['water']][as.character(channel),]
+    if (minus_water) {
+        oc_water <- oc_data[['water']][as.character(channel),]
+    } else oc_water <- 0
     oc_signal <- oc_data[['signal']][as.character(channel),]
     signal_water_diff <- oc_signal - oc_water
     swd_normd <- signal_water_diff / mean(signal_water_diff)
@@ -292,92 +295,103 @@ optic_calib <- function(fluo, oc_data, channel, show_running_time=FALSE) {
 }
 
 
+# function: get calibration data for all the steps and channels in a calibration experiment
+get_full_calib_data <- function(db_conn, calib_info) {
 
-################## old
+    calib_names <- names(calib_info)
+    channel_names <- calib_names[2:length(calib_names)]
+    channels <- sapply(channel_names, function(channel_name) strsplit(channel_name, '_')[[1]][2])
+    
+    # num_channels <- length(channels)
+    # names(channel_names) <- channels
+    
+    calib_list <- lapply(calib_info, function(calib_ele) {
+        calib_qry <- sprintf('
+            SELECT fluorescence_value, well_num, channel 
+                FROM fluorescence_data 
+                WHERE experiment_id=%d AND step_id=%d AND cycle_num=1 
+                ORDER BY well_num, channel
+            ', 
+            calib_ele[['calibration_id']], 
+            calib_ele[['step_id']]
+        )
+        calib_df <- dbGetQuery(db_conn, calib_qry)
+        calib_data <- do.call(rbind, lapply(
+            channels, 
+            function(channel) calib_df[calib_df[, 'channel'] == as.numeric(channel), 'fluorescence_value']
+        ))
+        colnames(calib_data) <- unique(calib_df[,'well_num'])
+        return(calib_data)
+    })
+    
+    return(calib_list)
 
-
-# # function: check whether the data in optical calibration experiment is valid; if yes, prepare calibration data
-
-# prep_optic_calib <- function(db_conn, calib_id, channel) {
-    
-    # if (length(calib_id) == 1) {
-        # water_calib_id <- calib_id
-        # signal_calib_id <- calib_id
-    # } else if (length(calib_id) == 2) { # for testing with different experiments for calibration
-        # water_calib_id <- calib_id[['water']]
-        # signal_calib_id <- calib_id[['signal']][as.character(channel)] }
-    
-    # calib_water_qry <-  sprintf('SELECT fluorescence_value, well_num 
-                                    # FROM fluorescence_data 
-                                    # WHERE experiment_id=%d AND step_id=%d AND channel=%d AND cycle_num=1
-                                    # ORDER BY well_num', 
-                                    # water_calib_id, oc_water_step_id, as.numeric(channel))
-    # calib_signal_qry <- sprintf('SELECT fluorescence_value, well_num 
-                                    # FROM fluorescence_data 
-                                    # WHERE experiment_id=%d AND step_id=%d AND channel=%d AND cycle_num=1
-                                    # ORDER BY well_num', 
-                                    # signal_calib_id, oc_signal_step_ids[as.character(channel)], as.numeric(channel))
-    
-    # calib_water  <- dbGetQuery(db_conn, calib_water_qry)
-    # calib_signal <- dbGetQuery(db_conn, calib_signal_qry)
-    
-    # dw <- dim(calib_water)
-    # ds <- dim(calib_signal)
-    
-    # well_nums <- calib_water[,'well_num']
-    
-    # if (!(all(dw == ds))) {
-        # stop(sprintf('dimensions of water and signal wells for calibration are not equal: calib_water(%i,%i) while calib_signal(%i,%i)', 
-                     # dw[1], dw[2], ds[1], ds[2])) }
-    
-    # calib_water_fluo <- t(calib_water[,'fluorescence_value'])
-    # calib_signal_fluo <- t(calib_signal[,'fluorescence_value'])
-    
-    # calib_invalid_vec <- (calib_signal_fluo - calib_water_fluo <= 0)
-    # if (any(calib_invalid_vec)) {
-        # ci_well_nums_str <- paste(paste(well_nums[calib_invalid_vec], collapse=', '), '. ', sep='')
-        # stop(paste('fluorescence value of water is greater than that of dye in the following well(s) - ', ci_well_nums_str, 
-                   # 'Details: ',
-                       # 'Invalid calibration. ', 
-                       # 'Please perform a new optical calibration experiment. ', 
-                   # sep='')
-             # ) }
-    
-    # return(list('num_calib_wells'=dw[1], 
-                # 'calib_water_fluo'=calib_water_fluo, 
-                # 'calib_signal_fluo'=calib_signal_fluo))
-# }
+}
 
 
-# # function: perform optical (water) calibration on fluo
-
-# optic_calib <- function(fluo, db_conn, calib_id, channel, show_running_time=FALSE) {
+# function: perform deconvolution and adjustment of well-to-well variation on calibration experiment 1 using the k matrix `wva_data` made from calibration expeirment 2
+calib_calib <- function(
+    db_conn_1, 
+    db_conn_2, 
+    calib_info_1, 
+    calib_info_2, 
+    dye_in='FAM', dyes_2bfild=NULL,
+    dye_names=c('FAM', 'HEX')
+) {
     
-    # # start counting for running time
-    # func_name <- 'calib'
-    # start_time <- proc.time()[['elapsed']]
+    full_calib_data_1 <- get_full_calib_data(db_conn_1, calib_info_1)
     
-    # calib_data <- prep_optic_calib(db_conn, calib_id, channel)
+    step_names <- names(full_calib_data_1)
+    dye_idc <- 2:length(step_names)
+    channel_names <- step_names[dye_idc]
+    channels <- sapply(channel_names, function(channel_name) strsplit(channel_name, '_')[[1]][2])
+    names(channels) <- channels
+    num_channels <- length(full_calib_data_1) - 1
     
-    # if (!(calib_data$num_calib_wells == num_wells)) {
-        # stop('number of calibration wells (', 
-             # calib_data$num_calib_wells, 
-             # ') is not equal to user-defined number of wells (', 
-             # num_wells, 
-             # ').') }
+    well_nums <- colnames(full_calib_data_1[[1]])
+    num_wells <- length(well_nums)
     
-    # # perform calibration
-    # signal_water_diff <<- calib_data$calib_signal_fluo - calib_data$calib_water_fluo
-    # swd_normd <<- signal_water_diff / mean(signal_water_diff)
-    # fluo_calib <- adply(fluo, .margins=1, 
-                        # function(row1) scaling_factor_optic_calib * (row1 - calib_data$calib_water_fluo) / swd_normd) # adply automatically create a column at index 1 of output from rownames of input array (1st argument)
+    ori_swvad_1 <- lapply(channels, function(channel)
+        array(NA, dim=c(length(step_names), num_wells), dimnames=list(step_names, well_nums))
+    ) # `full_calib_data_1` in the same format as `wvad_list`
+    ary2dcv_1 <- array(NA, dim=c(num_channels, length(step_names), num_wells), dimnames=list(channels, step_names, well_nums))
+    wva_data_2 <- prep_optic_calib(db_conn_2, calib_info_2, dye_in, dyes_2bfild)
     
-    # # report time cost for this function
-    # end_time <- proc.time()[['elapsed']]
-    # if (show_running_time) message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
+    for (channel_i in 1:num_channels) {
+        for (step_name in step_names) {
+            fcd1_unit <- full_calib_data_1[[step_name]][channel_names[channel_i],]
+            ori_swvad_1[[channels[channel_i]]][step_name,] <- fcd1_unit
+            ary2dcv_1[channels[channel_i], step_name,] <- fcd1_unit - wva_data_2[['water']][channels[channel_i],]
+        }
+    }
     
-    # return(list('fluo_calib'=fluo_calib, 
-                # 'signal_water_diff' = scaling_factor_optic_calib * swd_normd))
-# }
-
+    dcvd_out_1 <- deconv(ary2dcv_1, db_conn_2, calib_info_2)
+    dcvd_array_1 <- dcvd_out_1[['dcvd_array']]
+    
+    wvad_list_1 <- lapply(channels, function(channel) {
+        wva <- optic_calib(
+            matrix(dcvd_array_1[channel,,], ncol=num_wells), 
+            wva_data_2, 
+            channel,
+            minus_water=FALSE
+        )$fluo_calib[,2:(num_wells+1)]
+        rownames(wva) <- step_names
+        return(wva)
+    })
+    
+    if (length(dye_names) > 0) {
+        for (channel in channels) {
+            rownames(ori_swvad_1[[channel]])[dye_idc] <- dye_names
+            rownames(wvad_list_1[[channel]])[dye_idc] <- dye_names
+        }
+    }
+    
+    return(list(
+        'ori_swvad_1'=ori_swvad_1,
+        'ary2dcv_1'=ary2dcv_1,
+        'k_list_temp_2'=dcvd_out_1[['k_list_temp']],
+        'wva_data_2'=wva_data_2,
+        'wvad_list_1'=wvad_list_1
+    ))
+}
 

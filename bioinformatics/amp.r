@@ -74,61 +74,62 @@ get_amplification_data <- function(
         }
     
     amp_raw_list <- lapply(channels, get_amp_raw, db_conn, exp_id, stage_id, max_cycle, show_running_time)
+    
     arl_ele1 <- amp_raw_list[[1]]
+    num_cycles <- dim(arl_ele1)[1]
+    aca_dim3 <- dim(arl_ele1)[2]
+    num_wells <- aca_dim3 - 1
     
-    # amp_raw_mtch <- process_mtch(
-        # channels, 
-        # matrix2array=TRUE, 
-        # func=get_amp_raw, 
-        # db_conn, 
-        # exp_id, stage_id, 
-        # # oc_data, 
-        # max_cycle,
-        # show_running_time)
+    oc_data <- prep_optic_calib(db_conn, calib_info, dye_in, dyes_2bfild)
     
-    # get data out of `amp_calib_mtch`
-    # amp_raw <- amp_raw_mtch[['post_consoli']][['fluo_cast']]
-    # amp_raw_mtch_bych <- amp_raw_mtch[['pre_consoli']]
-    # amp_calib_array <- amp_calib_mtch[['post_consoli']][['ac_mtx']]
-    # aca_dim3 <- dim(amp_calib_array)[3]
-    # rbbs <- amp_raw # right before baseline subtraction
+    amp_raw_mw_list <- lapply(channels, function(channel) {
+        amp_raw_1ch <- amp_raw_list[[channel]]
+        amp_raw_mw_1ch <- cbind(
+            amp_raw_1ch[,1], 
+            do.call(rbind, lapply(1:num_cycles, function(cycle_num)
+                amp_raw_1ch[cycle_num, 2:aca_dim3] - oc_data[['water']][channel,]
+            ))
+        )
+        dimnames(amp_raw_mw_1ch) <- dimnames(amp_raw_1ch)
+        return(amp_raw_mw_1ch)
+    }) # mw = minus water
+    
+    
     
     if (dcv) {
         # ac2dcv: when 1 %in% dim(amp_calib_array), `ac2dcv <- amp_calib_array[,,2:aca_dim3]` will result in reduced dimensions in ac2dcv
-        aca_dim3 <- dim(arl_ele1)[2]
         ac2dcv_dim <- c(num_channels, dim(arl_ele1) - c(0,1))
         ac2dcv_dimnames <- list(channels, dimnames(arl_ele1)[[1]], dimnames(arl_ele1)[[2]][2:aca_dim3])
         ac2dcv <- array(NA, dim=ac2dcv_dim, dimnames=ac2dcv_dimnames)
-        for (channel in channels) ac2dcv[channel,,] <- as.matrix(amp_raw_list[[channel]][,2:aca_dim3])
+        for (channel in channels) ac2dcv[channel,,] <- as.matrix(amp_raw_mw_list[[channel]][,2:aca_dim3])
         # end: ac2dcv
         dcvd_out <- deconv(ac2dcv, db_conn, calib_info)
         rboc_mtch <- lapply(channels, function(channel) {
             dcvd_1ch <- dcvd_out[['dcvd_array']][channel,,]
-            dcvd_1ch_wcyc <- cbind(amp_raw_list[[channel]][,1], dcvd_1ch)
+            dcvd_1ch_wcyc <- cbind(amp_raw_mw_list[[channel]][,1], dcvd_1ch)
             colnames(dcvd_1ch_wcyc)[1] <- 'cycle_num'
             return(dcvd_1ch_wcyc)
         })
         k_list_temp <- dcvd_out[['k_list_temp']]
     } else {
-        rboc_mtch <- amp_raw_list
+        rboc_mtch <- amp_raw_mw_list
         k_list_temp <- NULL
     }
     
-    oc_data <- prep_optic_calib(db_conn, calib_info, dye_in, dyes_2bfild)
     dbDisconnect(db_conn)
-    
-    num_wells <- aca_dim3 - 1
     
     rbbs <- lapply(channels, function(channel) {
         rboc_1ch <- as.matrix(rboc_mtch[[channel]])
         rbbs_1ch <- data.matrix(optic_calib(
-            matrix(rboc_1ch[,2:ncol(rboc_1ch)], ncol=num_wells), oc_data, channel)$fluo_calib
+            matrix(rboc_1ch[,2:ncol(rboc_1ch)], ncol=num_wells), 
+            oc_data, channel, 
+            minus_water=FALSE, 
+            show_running_time
+        )$fluo_calib
         ) # convert data frame to a numeric matrix
         colnames(rbbs_1ch)[1] <- 'cycle_num'
         return(rbbs_1ch)
     })
-    
-    num_cycles <- dim(arl_ele1)[1]
     
     if (num_cycles <= 2) {
         
@@ -217,6 +218,7 @@ get_amplification_data <- function(
             downstream, blsub_mtch_post, ce_mtch, 
             list(
                 'amp_raw_list'=amp_raw_list, 
+                'amp_raw_mw_list'=amp_raw_mw_list, 
                 'dcvd_mtch'=rboc_mtch, 
                 'k_list_temp'=k_list_temp, 
                 'oc_data'=oc_data, 

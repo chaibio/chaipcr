@@ -8,40 +8,13 @@ get_k <- function(
     well_proc='dim3' # options: 'mean', 'dim3'.
     ) { 
     
-    # if (class(dcv_exp_info) == 'numeric') {
-        # dcv_exp_id <- dcv_exp_info
-        # dcv_exp_info <- list('water'=list('calibration_id'=dcv_exp_id, 'step_id'=2))
-        # dcv_exp_qry <- sprintf('SELECT channel FROM fluorescence_data WHERE experiment_id=%i', dcv_exp_id)
-        # dcv_exp_channels <- unique(dbGetQuery(db_conn, dcv_exp_qry)[,'channel'])
-        # for (dcv_exp_channel in dcv_exp_channels) {
-            # dcv_exp_info[[paste('channel', dcv_exp_channel, sep='_')]] <- list('calibration_id'=dcv_exp_id, 'step_id'=4)
-        # }
-    # }
-    
     dei_names <- names(dcv_exp_info)
     channel_names <- dei_names[2:length(dei_names)]
     channels <- sapply(channel_names, function(channel_name) strsplit(channel_name, '_')[[1]][2])
     num_channels <- length(channels)
     names(channel_names) <- channels
     
-    dcv_list <- lapply(dcv_exp_info, function(dei_ele) {
-        dcv_qry <- sprintf('
-            SELECT fluorescence_value, well_num, channel 
-                FROM fluorescence_data 
-                WHERE experiment_id=%d AND step_id=%d AND cycle_num=1 
-                ORDER BY well_num, channel
-            ', 
-            dei_ele[['calibration_id']], 
-            dei_ele[['step_id']]
-        )
-        dcv_df <- dbGetQuery(db_conn, dcv_qry)
-        dcv_data <- do.call(rbind, lapply(
-            channels, 
-            function(channel) dcv_df[dcv_df[, 'channel'] == as.numeric(channel), 'fluorescence_value']
-        ))
-        colnames(dcv_data) <- unique(dcv_df[,'well_num'])
-        return(dcv_data)
-    })
+    dcv_list <- get_full_calib_data(db_conn, dcv_exp_info)
     
     water_data <- dcv_list[['water']]
     well_nums <- colnames(water_data)
@@ -60,7 +33,7 @@ get_k <- function(
     
     if (well_proc == 'mean') {
         k <- as.matrix(do.call(cbind, lapply(channels, function(channel) {
-            k_data_1dye <-  rowMeans(k_list_bydy[channel])
+            k_data_1dye <- rowMeans(k_list_bydy[channel])
             k_data_1dye / sum(k_data_1dye)
         })))
         colnames(k) <- dye_names
@@ -158,7 +131,7 @@ deconv <- function(
     ) {
         k_list_temp <- k_list
     } else {
-        k_list_temp <<- get_k(db_conn, calib_info, 'dim3')
+        k_list_temp <- get_k(db_conn, calib_info, 'dim3')
     }
     
     k_inv_array = k_list_temp[['k_inv_array']]

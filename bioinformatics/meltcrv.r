@@ -146,7 +146,7 @@ get_mc_calib <- function(
     
     # water calibration
     fluo_mtx <- do.call(cbind, lapply(tf_ladj, function(tf) tf[, 'fluorescence_value']))
-    fluo_calib <- optic_calib(fluo_mtx, oc_data, channel, show_running_time)$fluo_calib[,2:(num_wells+1)] # indice 2:(num_wells+1) were added 1, due to adply in optic_calib, which automatically add a column at index 1 of output from rownames of input array (1st argument)
+    fluo_calib <- optic_calib(fluo_mtx, oc_data, channel, minus_water=TRUE, show_running_time)$fluo_calib[,2:(num_wells+1)] # indice 2:(num_wells+1) were added 1, due to adply in optic_calib, which automatically add a column at index 1 of output from rownames of input array (1st argument)
     
     # combine temperature and fluo data
     fluo_calib_list <- alply(fluo_calib, .margins=2, .fun=function(col1) col1)
