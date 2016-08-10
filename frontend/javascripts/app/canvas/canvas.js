@@ -233,12 +233,18 @@ angular.module("canvasApp").factory('canvas', [
 
     this.addNextandPrevious = function(currentStage, stageView) {
 
-      if(currentStage.nextStage) {
-        stageView.nextStage = currentStage.nextStage;
-        stageView.nextStage.previousStage = stageView;
+      if(currentStage) {
+        if(currentStage.nextStage) {
+          stageView.nextStage = currentStage.nextStage;
+          stageView.nextStage.previousStage = stageView;
+        }
+        currentStage.nextStage = stageView;
+        stageView.previousStage = currentStage;
+      } else if (! currentStage) { // if currentStage is null, It means we are inserting at very first
+        stageView.nextStage = this.allStageViews[0];
+        this.allStageViews[0].previousStage = stageView;
       }
-      currentStage.nextStage = stageView;
-      stageView.previousStage = currentStage;
+
     };
 
     this.configureStepsofNewStage = function(stageView, ordealStatus) {
