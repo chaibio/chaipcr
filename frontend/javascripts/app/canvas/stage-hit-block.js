@@ -15,6 +15,6 @@ angular.module("canvasApp").factory("stageHitBlock", [
 
         return this.hitBlock;
       },
-    }
+    };
   }
 ]);
