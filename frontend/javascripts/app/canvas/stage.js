@@ -254,10 +254,18 @@ angular.module("canvasApp").factory('stage', [
             if(this.index === 0) { // For very first stage, It can't move further left.
               return false;
             }
+            // look if we have space at left;
+            if(this.left - (this.previousStage.left + this.previousStage.myWidth) < 20) {
+              // Now see if we can omit the draggedStage to do this calculation.
+              return false;
+            }
             this.stageMovedDirection = "left";
           } else if(direction === "right") {
             if(this.index === (this.parent.allStageViews.length - 1)) { // Last stage can't move further right.
               return false;
+            }
+            if((this.previousStage.left) - (this.left + this.myWidth) < 20) {
+              //return false;
             }
             this.stageMovedDirection = "right";
           }
