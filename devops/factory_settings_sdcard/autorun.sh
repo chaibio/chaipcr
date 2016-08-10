@@ -51,8 +51,6 @@ then
 	version_current=0
 	if [ -e ${version_file} ]
 	then
-
-
 		version_current=$(cat ${version_file})
 	fi
 
@@ -67,7 +65,7 @@ then
 		cp -r factory-scripts/* .
 		echo done extracting.  >> $log_file 2>&1
 	fi
-exit 0
+
 	sh /mnt/autorun_core.sh  >> $log_file 2>&1
 	result=$?
 	echo "Boot with logging complete!"
