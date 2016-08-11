@@ -175,13 +175,16 @@ factory_scripts="factory-scripts"
 
 
 echo "Packing eMMC image.."
-
 if [ -e  ${temp} ]
 then
-	echo "$temp: exists!"
+        echo "$temp: exists!"
 else
-	mkdir -p ${temp}/$upgrade_scripts
-	mkdir -p ${temp}/$factory_scripts
+        mkdir -p ${temp}/$upgrade_scripts
+fi
+
+if [ ! -e  ${temp}/$factory_scripts ]
+then
+        mkdir -p ${temp}/$factory_scripts
 fi
 
 cp $BASEDIR/factory_settings_sdcard/scripts/* $temp/$upgrade_scripts
