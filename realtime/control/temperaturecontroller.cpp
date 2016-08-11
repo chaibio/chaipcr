@@ -116,7 +116,7 @@ void TemperatureController::computePid(double currentTemperature)
         name.at(0) = std::toupper(name.at(0));
 
         std::stringstream stream;
-        stream << name << " temperature of " << currentTemperature << " C above limit of " << _minTempThreshold << " C";
+        stream << name << " temperature of " << currentTemperature << " C above limit of " << _maxTempThreshold << " C";
 
         throw TemperatureLimitError(stream.str());
     }
