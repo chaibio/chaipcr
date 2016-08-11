@@ -49,19 +49,19 @@ $(document).ready(function(){
 					//$("#ip-address").text("IP ADDRESS: " + data.state.address);
 				  assignIp(data);
 				} else {
-          $.get("http://localhost:8000/network/wlan")
-            .done(function(data) {
-              if(data.state.address){
-                assignIp(data);
-              }
-              else{
+            $.get("http://localhost:8000/network/wlan")
+              .done(function(data) {
+                if(data.state.address){
+                  assignIp(data);
+                }
+                else{
+                  noConnection();
+                }
+              })
+              .fail(function() {
                 noConnection();
-              }
-            })
-            .fail(function() {
-              noConnection();
-      			});
-				}
+      			  });
+				  }
 			})
 			.fail(function() {
         $.get("http://localhost:8000/network/wlan")
