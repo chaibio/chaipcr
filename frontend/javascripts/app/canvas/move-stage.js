@@ -170,8 +170,8 @@ angular.module("canvasApp").factory('moveStageRect', [
               this.currentHit = index;
 
               if(this.findInAndOut("left") === "OUT") {
-                stage.moveToSide("right");
-                this.verticalLine.setVisible(true);
+                stage.moveToSide("right", this.verticalLine);
+                //this.verticalLine.setVisible(true);
 
                 if(stage.previousStage) {
                   this.currentDrop = stage.previousStage;
@@ -191,8 +191,8 @@ angular.module("canvasApp").factory('moveStageRect', [
               this.currentHit = index;
 
               if(this.findInAndOut("right") === "OUT") {
-                stage.moveToSide("left");
-                this.verticalLine.setVisible(true);
+                stage.moveToSide("left", this.verticalLine);
+                //this.verticalLine.setVisible(true);
               } else {
                 this.verticalLine.setVisible(false);
               }
