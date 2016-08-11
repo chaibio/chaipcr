@@ -17,16 +17,16 @@
  * limitations under the License.
  */
 
-jQuery.fn.center = function () {
-    this.css("position","absolute");
-    this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) +
-                                                $(window).scrollTop()) + "px");
-    this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) +
-                                                $(window).scrollLeft()) + "px");
-    return this;
+jQuery.fn.center = function() {
+	this.css("position", "absolute");
+	this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) +
+		$(window).scrollTop()) + "px");
+	this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) +
+		$(window).scrollLeft()) + "px");
+	return this;
 }
 
-$(document).ready(function(){
+$(document).ready(function() {
 
 	// This part was written to align the image and no more used.
 	/*setTimeout(function() {
@@ -36,7 +36,7 @@ $(document).ready(function(){
         $('#splash').center({transition:0});
     });*/
 
-	var interval = setInterval(function () {
+	var interval = setInterval(function() {
 		checkConnection();
 	}, 10000);
 
@@ -45,82 +45,80 @@ $(document).ready(function(){
 	var checkConnection = function() {
 		$.get("http://localhost:8000/network/eth0")
 			.done(function(data) {
-				if(data.state.address) {
+				if (data.state.address) {
 					//$("#ip-address").text("IP ADDRESS: " + data.state.address);
-				  assignIp(data);
+					assignIp(data);
 				} else {
-            $.get("http://localhost:8000/network/wlan")
-              .done(function(data) {
-                if(data.state.address){
-                  assignIp(data);
-                }
-                else{
-                  noConnection();
-                }
-              })
-              .fail(function() {
-                noConnection();
-      			  });
-				  }
+					$.get("http://localhost:8000/network/wlan")
+						.done(function(data) {
+							if (data.state.address) {
+								assignIp(data);
+							} else {
+								noConnection();
+							}
+						})
+						.fail(function() {
+							noConnection();
+						});
+				}
 			})
 			.fail(function() {
-        $.get("http://localhost:8000/network/wlan")
-          .done(function(data) {
-            if(data.state.address){
-              assignIp(data);
-            }
-            else{
-              noConnection();
-            }
-          })
-          .fail(function() {
-            noConnection();
-          });
+				$.get("http://localhost:8000/network/wlan")
+					.done(function(data) {
+						if (data.state.address) {
+							assignIp(data);
+						} else {
+							noConnection();
+						}
+					})
+					.fail(function() {
+						noConnection();
+					});
 			});
 	}
 
 	checkConnection();
 
-  var assignIp = function(data){
-    $(".span-message").hide();
-    $(".ip-text").show().text("IP ADDRESS: ");
-    $(".ip-value").show().text(data.state.address);
-  }
+	var assignIp = function(data) {
+		$(".span-message").hide();
+		$(".ip-text").show().text("IP ADDRESS: ");
+		$(".ip-value").show().text(data.state.address);
+	}
 
-  var noConnection = function(){
-    $(".ip-text").hide();
-    $(".ip-value").hide();
-    $(".span-message").show().text("No network connection");
-  }
+	var noConnection = function() {
+		$(".ip-text").hide();
+		$(".ip-value").hide();
+		$(".span-message").show().text("No network connection");
+	}
 
 	var shown = false;
 	var getDevice = function() {
 		$.get("http://localhost:80/device")
-		.done(function(data) {
-			if(data.software.version) {
-				$(".version-text").text("V.   ").show();
-				$(".version-value").text(data.software.version).show();
-				//clearInterval(insure); // Now we keep looking if we have connection.
-			}
-			if(data.serial_number) {
-				$(".serial-value").text(data.serial_number).show();
-				$(".serial-text").text("SERIAL:").show();
-			}
-			shown = true;
-		})
-		.fail(function() {
-			if(shown) {
-				$(".serial-value").hide();
-				$(".serial-text").hide();
-				$(".version-text").text("Server Failure");
-				$(".version-value").hide();
-			}
-		});
+			.done(function(data) {
+				if (data.software.version) {
+					$(".version-text").text("V.   ").show();
+					$(".version-value").text(data.software.version).show();
+					//clearInterval(insure); // Now we keep looking if we have connection.
+				}
+				if (data.serial_number) {
+					$(".serial-value").text(data.serial_number).show();
+					$(".serial-text").text("SERIAL:").show();
+				}
+				shown = true;
+			})
+			.fail(function() {
+				if (shown) {
+					$(".serial-value").hide();
+					$(".serial-text").hide();
+					$(".version-text").text("Server Failure");
+					$(".version-value").hide();
+				}
+			});
 	}
 
 	getDevice();
 
-	var insure = setInterval(function () {
+	var insure = setInterval(function() {
 		getDevice();
 	}, 10000);
 
