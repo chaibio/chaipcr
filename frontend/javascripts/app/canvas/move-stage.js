@@ -268,7 +268,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         // right now, it works for moving right.
         this.indicator.applyMovement = function(stage_, C, circleManager, callBack) {
 
-          this.draggedStage.wireStageNextAndPrevious();
+          //this.draggedStage.wireStageNextAndPrevious();
           this.draggedStage.myWidth = 0;
           var stage = this.draggedStage;
 

@@ -116,6 +116,7 @@ angular.module("canvasApp").factory('mouseDown', [
             C.canvas.bringToFront(C.stageIndicator);
             C.stageIndicator.changePlacing(evt.target);
             evt.target.parent.collapseStage();
+            evt.target.parent.wireStageNextAndPrevious();
             C.canvas.renderAll();
             // Move other stages
             // Shrink this stage
