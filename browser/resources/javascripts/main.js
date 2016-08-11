@@ -47,27 +47,19 @@ $(document).ready(function(){
 			.done(function(data) {
 				if(data.state.address) {
 					//$("#ip-address").text("IP ADDRESS: " + data.state.address);
-					$(".span-message").hide();
-					$(".ip-text").show().text("IP ADDRESS: ");
-					$(".ip-value").show().text(data.state.address);
+				  assignIp(data);
 				} else {
           $.get("http://localhost:8000/network/wlan")
             .done(function(data) {
               if(data.state.address){
-                $(".span-message").hide();
-      					$(".ip-text").show().text("IP ADDRESS: ");
-      					$(".ip-value").show().text(data.state.address);
+                assignIp(data);
               }
               else{
-                $(".ip-text").hide();
-      					$(".ip-value").hide();
-      					$(".span-message").show().text("No network connection");
+                noConnection();
               }
             })
             .fail(function() {
-      				$(".ip-text").hide();
-      				$(".ip-value").hide();
-      				$(".span-message").show().text("No network connection");
+              noConnection();
       			});
 				}
 			})
@@ -75,25 +67,31 @@ $(document).ready(function(){
         $.get("http://localhost:8000/network/wlan")
           .done(function(data) {
             if(data.state.address){
-              $(".span-message").hide();
-              $(".ip-text").show().text("IP ADDRESS: ");
-              $(".ip-value").show().text(data.state.address);
+              assignIp(data);
             }
             else{
-              $(".ip-text").hide();
-              $(".ip-value").hide();
-              $(".span-message").show().text("No network connection");
+              noConnection();
             }
           })
           .fail(function() {
-            $(".ip-text").hide();
-            $(".ip-value").hide();
-            $(".span-message").show().text("No network connection");
+            noConnection();
           });
 			});
 	}
 
 	checkConnection();
+
+  var assignIp = function(data){
+    $(".span-message").hide();
+    $(".ip-text").show().text("IP ADDRESS: ");
+    $(".ip-value").show().text(data.state.address);
+  }
+
+  var noConnection = function(){
+    $(".ip-text").hide();
+    $(".ip-value").hide();
+    $(".span-message").show().text("No network connection");
+  }
 
 	var shown = false;
 	var getDevice = function() {
