@@ -268,7 +268,12 @@ angular.module("canvasApp").factory('moveStageRect', [
         // right now, it works for moving right.
         this.indicator.applyMovement = function(stage_, C, circleManager, callBack) {
 
-          //this.draggedStage.wireStageNextAndPrevious();
+          /*Sometimes user moves left first and then move right,
+            leave the move stage over a stage and which has empty space in the left.
+            We move to side and move if it is valid so that when we re render there is no spacing. */
+          if(this.currentDrop) {
+            this.currentDrop.moveToSide("left");
+          }
           this.draggedStage.myWidth = 0;
           var stage = this.draggedStage;
 

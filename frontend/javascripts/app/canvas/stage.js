@@ -256,18 +256,18 @@ angular.module("canvasApp").factory('stage', [
               return false;
             }
             // look if we have space at left;
-            if(this.previousStage && this.left - (this.previousStage.left + this.previousStage.myWidth) < 20) {
+            if(this.previousStage && this.left - (this.previousStage.left + this.previousStage.myWidth) < 50) {
               return false;
             }
             this.stageMovedDirection = "left";
-            
+
           } else if(direction === "right") {
             // Last stage can't move further right.
             if(this.index === (this.parent.allStageViews.length - 1)) {
               return false;
             }
             // We move only if we have space in the right side.
-            if(this.nextStage && (this.nextStage.left) - (this.left + this.myWidth) < 20) {
+            if(this.nextStage && (this.nextStage.left) - (this.left + this.myWidth) < 50) {
               return false;
             }
             this.stageMovedDirection = "right";
