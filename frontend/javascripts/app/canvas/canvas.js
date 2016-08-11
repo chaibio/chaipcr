@@ -136,11 +136,13 @@ angular.module("canvasApp").factory('canvas', [
         this.stepIndicator = moveStepRect.getMoveStepRect(this);
         this.stageIndicator = moveStageRect.getMoveStageRect(this);
         this.beacon = this.stageIndicator.beacon;
+        this.emptySpace = this.stageIndicator.emptySpace;
         this.hitBlock = stageHitBlock.getStageHitBlock(this);
 
         this.canvas.add(this.stepIndicator);
         this.canvas.add(this.stageIndicator);
         this.canvas.add(this.beacon);
+        this.canvas.add(this.emptySpace);
         this.canvas.add(this.hitBlock);
         this.addMoveDots();
     };
