@@ -169,6 +169,7 @@ void WirelessManager::_connect()
         _connectionStatus = Connecting;
 
         ifup();
+        sleep(3);
 
         _connectionThreadState = Idle;
     }
