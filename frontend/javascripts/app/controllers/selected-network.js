@@ -90,11 +90,11 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
           break;
         case "connection_error":
           $scope.buttonValue = "CONNECT";
-          $scope.statusMessage = "Monkeys broke in and broke the cable. Couldn't connect";
+          $scope.statusMessage = "Unable to connect";
           break;
         case "authentication_error":
           $scope.buttonValue = "CONNECT";
-          $scope.statusMessage = "Monkeys broke in and stole everything. Couldn't connect";
+          $scope.statusMessage = "Authentication error";
           break;
       }
     };
