@@ -107,7 +107,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         this.indicator.init = function(stage) {
 
           this.setVisible(true);
-          this.spaceArray = [stage.left, stage.left + 120];
+          this.spaceArray = [stage.left - 10, stage.left + 160];
           this.setLeft(stage.left - 1).setCoords();
           this.draggedStage = stage;
           this.stageBackUp = angular.extend({}, stage);
@@ -186,7 +186,7 @@ angular.module("canvasApp").factory('moveStageRect', [
 
             return false;
           }, this);
-
+          console.log(this.beacon.left);
           if(this.beacon.left > this.spaceArray[0] && this.beacon.left < this.spaceArray[1]) {
             if(this.verticalLine.getVisible() === false) {
               this.verticalLine.setVisible(true);

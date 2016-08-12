@@ -84,7 +84,7 @@ angular.module("canvasApp").factory('stage', [
         // Bring other stages closer
         if(this.nextStage) {
           var width = this.myWidth;
-          this.myWidth = 136; // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
+          this.myWidth = 166; // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
           this.moveAllStepsAndStages(true);
           var moveStart = this.childSteps[this.childSteps.length - 1].ordealStatus;
           allSteps = this.parent.allStepViews;
@@ -231,7 +231,7 @@ angular.module("canvasApp").factory('stage', [
 
         if(this.validMove(direction)) {
 
-          var moveCount = (direction === "left") ? -120 : 120;
+          var moveCount = (direction === "left") ? -150 : 150;
           if(verticalLine) {
             verticalLine.setVisible(true);
           }
@@ -239,14 +239,19 @@ angular.module("canvasApp").factory('stage', [
 
           if(spaceArray) {
             if(direction === "right") {
-              spaceArray[0] = this.left;
-              spaceArray[1] = this.left + 120;
+              spaceArray[0] = this.left - 10;
+              spaceArray[1] = this.left + 160;
             } else if (direction === "left") {
-              spaceArray[0] = this.nextStage.left - 120;
-              spaceArray[1] = this.nextStage.left;
+              if(this.nextStage) {
+                spaceArray[0] = this.nextStage.left - 160;
+                spaceArray[1] = this.nextStage.left + 10;
+              } else {
+                spaceArray[0] = this.left + this.myWidth - 160;
+                spaceArray[1] = spaceArray[0] + 160;
+              }
             }
           }
-
+          console.log(spaceArray);
           this.dots.set({left: (this.left + moveCount ) + 3}).setCoords();
           this.stageHitPointLeft.set({left: (this.left + moveCount ) + 10}).setCoords();
           this.stageHitPointRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
