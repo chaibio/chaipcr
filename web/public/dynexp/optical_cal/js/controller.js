@@ -104,7 +104,7 @@
         if($scope.state === 'idle' && (oldData.experiment_controller.machine.state === 'idle') && $state.current.name === 'step-3') {
           Experiment.get($scope.experiment.id).then(function (resp) {
             $scope.experiment = resp.data.experiment;
-            if( $scope.experiment.completion_status === 'failuire') {
+            if( $scope.experiment.completion_status === 'failure') {
               $state.go('step-6');
               return;
             }

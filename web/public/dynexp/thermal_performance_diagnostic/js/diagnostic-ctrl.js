@@ -173,7 +173,7 @@
         if (newState === 'idle' && oldState == 'idle' && $params.id) {
           getExperiment(function(resp) {
             $scope.experiment = resp.experiment;
-            if($scope.experiment.completion_status === 'failuire') {
+            if($scope.experiment.completion_status === 'failure') {
               stopPolling();
               Status.stopSync();
             }
