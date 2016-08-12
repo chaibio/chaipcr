@@ -26,10 +26,12 @@ get_k <- function(
     dye_names <- paste('dye_', channels)
     
     k_inv_array <- array(
-        NA, 
+        0, 
         dim=c(num_channels, num_channels, num_wells), 
         dimnames=list(channels, dye_names, well_nums)
     )
+    
+    k_singular <- ''
     
     if (well_proc == 'mean') {
         k <- as.matrix(do.call(cbind, lapply(channels, function(channel) {
@@ -37,75 +39,40 @@ get_k <- function(
             k_data_1dye / sum(k_data_1dye)
         })))
         colnames(k) <- dye_names
-        for (well_num in well_nums) k_inv_array[,,well_num] <- solve(k)
+        k_inv <- tryCatch(solve(k), error=err_e)
+        if ('error' %in% class(k_inv)) {
+            k_singular <- c('Well mean K matrix is singular. ')
+        } else {
+            for (well_num in well_nums) {
+                k_inv_array[,,well_num] <- k_inv
+            }
+        }
         
     } else if (well_proc == 'dim3') {
         k <- k_inv_array
+        k_singular_vec <- c()
         for (well_num in well_nums) {
             k_mtx <- as.matrix(do.call(cbind, lapply(channels, function(channel) {
                 k_data_1dye <- k_list_bydy[[channel]][,well_num]
                 k_data_1dye / sum(k_data_1dye)
             })))
             k[,,well_num] <- k_mtx
-            k_inv_array[,,well_num] <- solve(k_mtx)
+            k_inv <- tryCatch(solve(k_mtx), error=err_e)
+            if ('error' %in% class(k_inv)) {
+                k_singular_vec <- c(k_singular_vec, well_num)
+            } else {
+                k_inv_array[,,well_num] <- k_inv
+            }
+        }
+        if (length(k_singular_vec) > 0) {
+            k_singular <- sprintf(
+                'Well-specific K matrix is singular for the following well(s): %s. ',
+                paste(k_singular_vec, collapse=', ')
+            )
         }
     }
     
-    # k_list_bydy <- lapply(channels, function(channel) {
-        # k_qry <- sprintf('SELECT fluorescence_value, well_num, channel 
-                              # FROM fluorescence_data 
-                              # WHERE experiment_id=%d AND step_id=%d AND cycle_num=1 
-                              # ORDER BY well_num, channel', 
-                              # dcv_exp_ids[as.character(channel)], 
-                              # dcv_target_step_ids[as.character(channel)])
-        # k_data_1dye <- dbGetQuery(db_conn, k_qry)
-        # k_data_1dye_bych <- lapply(channels, function(channel) k_data_1dye[k_data_1dye[,'channel'] == channel,])
-        # k_mtx_1dye <- do.call(rbind, 
-                              # lapply(channels, 
-                                  # function(channel) {
-                                      # k_data_1dye_1ch <- k_data_1dye_bych[[channel]][,'fluorescence_value']
-                                      # kd11_mtx <- matrix(k_data_1dye_1ch, 
-                                                         # nrow=1, ncol=length(k_data_1dye_1ch))
-                                      # if (!is.null(calib_id)) kd11_calibd <- optic_calib(kd11_mtx, oc_data, channel)[['fluo_calib']]
-                                      # fluo_kc <- kd11_calibd[,2:ncol(kd11_calibd)]
-                                      # names(fluo_kc) <- unique(k_data_1dye[,'well_num'])
-                                      # return(fluo_kc)
-                                      # })) # rows are channels, columns are wells
-        # })
-    
-    # dye_names <- paste('dye', channels, sep='_')
-    # well_names <- colnames(k_list_bydy[[1]])
-    
-    # k_inv_array <- array(NA, 
-                         # dim=c(length(dye_names), length(channels), length(well_names)),
-                         # dimnames=list(dye_names, channels, well_names))
-    
-    # if (well_proc == 'mean') {
-        # k <- do.call(cbind, 
-                     # lapply(k_list_bydy, 
-                            # function(k_mtx_1dye) {
-                                # k_mean_vec_1dye <- sapply(channels, function(channel) mean(as.numeric(k_mtx_1dye[channel,]))) # a named vector whose each channel element is the mean of optical-calibrated fluo values across all the wells
-                                # k_1dye <- k_mean_vec_1dye / sum(k_mean_vec_1dye) }))
-        # # rownames(k_out) <- channels # not necessary. rownames are inherited as channels
-        # colnames(k) <- dye_names
-        # # inverse of k
-        # k_inv_mtx <- solve(k)
-        # for (well_name in well_names) k_inv_array[,,well_name] <- k_inv_mtx
-    
-    # } else if (well_proc == 'dim3') {
-        # num_channels <- length(channels)
-        # k <- array(NA, 
-                   # dim=c(num_channels, num_channels, length(well_names)), 
-                   # dimnames=list(channels, dye_names, well_names))
-        # for (i in 1:num_channels) {
-            # for (well_name in well_names) {
-                # k_vec <- k_list_bydy[[i]][,well_name]
-                # k[,i,well_name] <- k_vec / sum(k_vec) }}
-        # # inverse of k
-        # for (well_name in well_names) k_inv_array[,,well_name] <- solve(k[,,well_name])
-        # }
-    
-    return(list('k'=k, 'k_inv_array'=k_inv_array))
+    return(list('k'=k, 'k_inv_array'=k_inv_array, 'k_singular'=k_singular))
     }
 
 

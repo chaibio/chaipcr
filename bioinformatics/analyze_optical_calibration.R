@@ -18,19 +18,41 @@ analyze_optical_calibration <- function(
         calib_exp_id, stage_id=NULL, calib_info)
     db_conn <- db_etc_out[['db_conn']]
     
-    result1 <- tryCatch(prep_optic_calib(db_conn, calib_info, dye_in, dyes_2bfild), error=function(e) e)
+    valid <- TRUE
+    err_msg_vec <- c()
+    err_dtls_vec <- c()
     
-    if ('error' %in% class(result1)) {
+    if (inherits(calib_info, 'list') && length(calib_info) >= 3) { # dual channel
+        result_k <- get_k(db_conn, calib_info, well_proc='dim3')
+        if (nchar(result_k[['k_singular']]) > 0) {
+            valid <- FALSE
+            #err <- 'Fluorescein calibrator was less fluorescent than water in some wells. Please retry with new fluorescein calibrator.' # solution 1
+            err_msg_vec <- c(err_msg_vec, result_k[['k_singular']])
+            err_dtls_vec <- c(err_dtls_vec, result_k[['k_singular']])
+        }
+    }
+    
+    result_oc <- tryCatch(prep_optic_calib(db_conn, calib_info, dye_in, dyes_2bfild), error=function(e) e)
+    if ('error' %in% class(result_oc)) {
         valid <- FALSE
         #err <- 'Fluorescein calibrator was less fluorescent than water in some wells. Please retry with new fluorescein calibrator.' # solution 1
-        error_message <- strsplit(result1$message, 'Details: ')[[1]][1]
-        error_details <- as.character(result1)
-    } else {
-        valid <- TRUE
-        error_message <- NULL
-        error_details <- NULL }
+        err_msg_vec <- c(err_msg_vec, strsplit(result_oc$message, 'Details: ')[[1]][1])
+        err_dtls_vec <- c(err_dtls_vec, as.character(result_oc))
+    }
     
-    result2 <- list('valid'=valid, 'error_message'=error_message, 'error_details'=error_details)
+    dbDisconnect(db_conn)
+    
+    error_message <- paste(err_msg_vec, collapse='')
+    error_details <- paste(err_dtls_vec, collapse='')
+    
+    if (nchar(error_message) == 0) error_message <- NULL
+    if (nchar(error_details) == 0) error_details <- NULL
+    
+    result2 <- list(
+        'valid'=valid, 
+        'error_message'=error_message, 
+        'error_details'=error_details
+    )
     
     if (out_json) result2 <- toJSON(result2)
     
