@@ -98,20 +98,16 @@ angular.module("canvasApp").factory('moveStageRect', [
         // We may need two beacon, so that we have better control over where we move
         this.indicator.beacon = new fabric.Rect({
           fill: '', width: 10, left: 0, top: 10, height: 10, selectable: false, me: this,
-          lockMovementY: true, hasControls: false, visible: true, fill: 'black',
+          lockMovementY: true, hasControls: false, visible: true, //fill: 'black',
         });
 
-        this.indicator.emptySpace = new fabric.Rect({
-          fill: '', width: 118, left: 0, top: 10, height: 10, selectable: false, me: this,
-          lockMovementY: true, hasControls: false, visible: true, fill: 'black',
-        });
         this.indicator.verticalLine = vertical;
 
 
         this.indicator.init = function(stage) {
 
-          //this.emptySpace = [null, null];
-
+          this.setVisible(true);
+          this.spaceArray = [stage.left, stage.left + 120];
           this.setLeft(stage.left - 1).setCoords();
           this.draggedStage = stage;
           this.stageBackUp = angular.extend({}, stage);
@@ -124,14 +120,6 @@ angular.module("canvasApp").factory('moveStageRect', [
             this.currentHit = stage.previousStage.index;
           }
 
-          if(stage.nextStage) {
-            //this.emptySpace[1] = stage.nextStage.index;
-          }
-          if(stage.previousStage) {
-            //this.emptySpace[0] = stage.previousStage.index;
-          }
-
-          this.setVisible(true);
         };
 
         this.indicator.onTheMoveDragGroup = function(dragging) {
@@ -174,17 +162,13 @@ angular.module("canvasApp").factory('moveStageRect', [
               this.currentHit = index;
 
               if(this.findInAndOut("left") === "OUT") {
-                stage.moveToSide("right", this.verticalLine, this.emptySpace);
-                //this.verticalLine.setVisible(true);
+                stage.moveToSide("right", this.verticalLine, this.spaceArray);
 
                 if(stage.previousStage) {
                   this.currentDrop = stage.previousStage;
                 } else {
                   this.currentDrop = null;
                 }
-
-              } else {
-                this.verticalLine.setVisible(false);
               }
               return true;
             }
@@ -195,16 +179,21 @@ angular.module("canvasApp").factory('moveStageRect', [
               this.currentHit = index;
 
               if(this.findInAndOut("right") === "OUT") {
-                stage.moveToSide("left", this.verticalLine, this.emptySpace);
-                //this.verticalLine.setVisible(true);
-              } else {
-                this.verticalLine.setVisible(false);
+                stage.moveToSide("left", this.verticalLine, this.spaceArray);
               }
               return true;
             }
 
             return false;
           }, this);
+
+          if(this.beacon.left > this.spaceArray[0] && this.beacon.left < this.spaceArray[1]) {
+            if(this.verticalLine.getVisible() === false) {
+              this.verticalLine.setVisible(true);
+            }
+          } else if(this.verticalLine.getVisible() === true) {
+            this.verticalLine.setVisible(false);
+          }
         };
 
         this.indicator.findInAndOut = function(hitPointPosition) {

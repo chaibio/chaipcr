@@ -227,7 +227,7 @@ angular.module("canvasApp").factory('stage', [
       };
 
       //This method is used when move stage hits at the hitPoint at the right side of the stage.
-      this.moveToSide = function(direction, verticalLine, emptySpace) {
+      this.moveToSide = function(direction, verticalLine, spaceArray) {
 
         if(this.validMove(direction)) {
 
@@ -237,11 +237,13 @@ angular.module("canvasApp").factory('stage', [
           }
           this.stageGroup.set({left: this.left + moveCount }).setCoords();
 
-          if(emptySpace) {
+          if(spaceArray) {
             if(direction === "right") {
-              emptySpace.set({left: this.left}).setCoords();
+              spaceArray[0] = this.left;
+              spaceArray[1] = this.left + 120;
             } else if (direction === "left") {
-              emptySpace.set({left: (this.left + moveCount) + this.myWidth + 10}).setCoords();
+              spaceArray[0] = this.nextStage.left - 120;
+              spaceArray[1] = this.nextStage.left;
             }
           }
 
