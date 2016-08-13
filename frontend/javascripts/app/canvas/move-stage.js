@@ -186,7 +186,7 @@ angular.module("canvasApp").factory('moveStageRect', [
 
             return false;
           }, this);
-          console.log(this.beacon.left);
+          //console.log(this.beacon.left);
           if(this.beacon.left > this.spaceArray[0] && this.beacon.left < this.spaceArray[1]) {
             if(this.verticalLine.getVisible() === false) {
               this.verticalLine.setVisible(true);
@@ -194,6 +194,8 @@ angular.module("canvasApp").factory('moveStageRect', [
           } else if(this.verticalLine.getVisible() === true) {
             this.verticalLine.setVisible(false);
           }
+
+          // Now work with scrolling as we move ..!
         };
 
         this.indicator.findInAndOut = function(hitPointPosition) {

@@ -79,7 +79,7 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     };
 
     $scope.configureAsStatus = function(status) {
-
+      console.log("dgegertere", status);
       switch (status) {
         case "not_connected":
           $scope.buttonValue = "CONNECT";
