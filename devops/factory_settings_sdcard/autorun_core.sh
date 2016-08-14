@@ -56,18 +56,20 @@ fi
 sdcard_p1="/sdcard/p1"
 sdcard_p2="/sdcard/p2"
 
-if [ ! -e ${sdcard_p1} ]
-then
-       mkdir -p ${sdcard_p1}
-fi
+mount_sdcard_partitions () {
+	if [ ! -e ${sdcard_p1} ]
+	then
+	       mkdir -p ${sdcard_p1}
+	fi
 
-if [ ! -e ${sdcard_p2} ]
-then
-       mkdir -p ${sdcard_p2}
-fi
+	if [ ! -e ${sdcard_p2} ]
+	then
+	       mkdir -p ${sdcard_p2}
+	fi
 
-mount ${sdcard_dev}p1 ${sdcard_p1} -t vfat || true
-mount ${sdcard_dev}p2 ${sdcard_p2} -t ext4 || true
+	mount ${sdcard_dev}p1 ${sdcard_p1} -t vfat || true
+	mount ${sdcard_dev}p2 ${sdcard_p2} -t ext4 || true
+}
 
 rebootx () {
 	#try to call rebootx from the upgrade partition first.
@@ -194,14 +196,19 @@ partition_drive () {
 
 update_uenv () {                                                        
 # first param =2 in case of upgrade.. =1 for factory settings.                               
-        echo copying coupling uEng.txt
+        echo resetting coupling uEng.txt
         if [ ! -e /tmp/emmcboot ]                                                
         then                                                                     
               mkdir -p /tmp/emmcboot                                             
         fi
-		                                                                       
-        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true                            
-                                       
+	sync
+	if mount | grep /tmp/emmcboot
+	then
+		echo /tmp/emmcboot already mounted!
+	else
+	        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true                            
+	fi
+                           
 	echo resetting to boot switch dependant uEnv                       
         cp /sdcard/p1/uEnv.txt /tmp/emmcboot/ || true                            
         cp /mnt/uEnv.72check.txt /mnt/uEnv.txt || true                
@@ -225,7 +232,11 @@ update_uenv () {
 
         sync                                                                                     
         sleep 5                                                                                  
-        umount /tmp/emmcboot || true                                                   
+	if mount | grep /tmp/emmcboot
+	then
+	        umount /tmp/emmcboot || true                                                   
+		rm -r /tmp/emmcboot || true
+	fi
 }                                                                                      
 
 reset_uenv () {
@@ -238,19 +249,88 @@ reset_uenv () {
 	        mkdir -p /tmp/emmcboot
 	fi
 
-        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
+#        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
+	if mount | grep /tmp/emmcboot
+	then
+		echo /tmp/emmcboot already mounted!
+	else
+	        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true                            
+	fi
 
 	cp /tmp/emmcboot/uEnv.72check.txt /tmp/emmcboot/uEnv.txt || true
 	sync
-#exit
- 	umount /tmp/emmcboot || true
-	rm -r /tmp/emmcboot || true
-        echo "Done returning to gpio 72 check version"
+	sleep 5
+
+	if mount | grep /tmp/emmcboot
+	then
+	        umount /tmp/emmcboot || true                                                   
+		rm -r /tmp/emmcboot || true
+	fi
+	echo "Done returning to gpio 72 check version"
+}
+
+files_verification () {
+	echo verifying $file1 and $file2
+
+	for a in 1 2 3 4 5
+	do
+		echo Checking uEnv updated successfully.. check# $a of 5
+
+		if cmp -s $file1 $file2
+		then
+			echo updating uEnv done.
+			break
+		fi
+	
+		sleep 10
+		umount ${sdcard_p1} > /dev/null || true
+		umount ${sdcard_p2} > /dev/null || true
+		mount_sdcard_partitions
+		update_uenv $1
+	done
+}
+
+reset_update_uenv_with_verification () {
+        echo updating and verifying uEnv
+        update_uenv $1
+
+        file1=/mnt/uEnv.txt
+        file2=/mnt/uEnv.72check.txt
+	files_verification $1
+
+	file1=/sdcard/p1/uEnv.txt
+	file2=/sdcard/p1/uEnv.72check.txt
+	files_verification $1
+
+        file1=/tmp/emmcboot/uEnv.txt
+        file2=/tmp/emmcboot/uEnv.72check.txt
+
+        if [ ! -e /tmp/emmcboot ]                                                
+        then                                                                     
+              mkdir -p /tmp/emmcboot                                             
+        fi
+	sync
+
+	if mount | grep /tmp/emmcboot
+	then
+		echo /tmp/emmcboot already mounted!
+	else
+	        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true                            
+	fi
+
+	files_verification $1
+
+	if mount | grep /tmp/emmcboot
+	then
+	        umount /tmp/emmcboot || true                                                   
+		rm -r /tmp/emmcboot || true
+	fi
 }
 
 stop_packing_restarting ()
 {
 	reset_uenv
+
 	if [ -e ${sdcard_p1}/pack_resume_autorun.flag ]
 	then
         	rm ${sdcard_p1}/pack_resume_autorun.flag || true
@@ -280,6 +360,8 @@ incriment_restart_counter () {
 	echo $counter > $counter_file
 	echo "Restart counter: $counter"
 }
+
+mount_sdcard_partitions
 
 cat /proc/cmdline | grep s2pressed=1 > /dev/null
 s2pressed=$?
@@ -323,8 +405,9 @@ then
 		exit 0
         fi
 
-        update_uenv 2
-        stop_packing_restarting
+#        update_uenv 2
+reset_update_uenv_with_verification 2 
+       stop_packing_restarting
         alldone
         exit
 else
@@ -449,7 +532,8 @@ then
 	echo "Done formatting /perm partition"
 fi
 
-update_uenv 1
+#update_uenv 1
+reset_update_uenv_with_verification 1
 
 stop_packing_restarting
 echo "eMMC Flasher: all done!"
