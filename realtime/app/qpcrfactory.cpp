@@ -117,7 +117,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatSink() {
     settings.maxTargetTemp = kHeatSinkMaxTargetTemp;
     settings.minTempThreshold = kHeatSinkLowTempShutdownThreshold;
     settings.maxTempThreshold = kHeatSinkHighTempShutdownThreshold;
-    settings.pidController = new PIDController({{100,0.2,10000,0.0}}, kHeatSinkPIDMin, kHeatSinkPIDMax, SinglePoleRecursiveFilter(5));
+    settings.pidController = new PIDController({{100,0.05,100,0.0}}, kHeatSinkPIDMin, kHeatSinkPIDMax, SinglePoleRecursiveFilter(5));
 
     return HeatSinkInstance::createInstance(settings, kHeatSinkFanControlPWMPath, kFanPWMPeriodNs, ADCPin(kADCPinPath, kHeatSinkThermistorADCPinChannel));
 }
