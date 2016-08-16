@@ -37,7 +37,7 @@
       </div>
 
       <div class="mac-cover no-wifi">
-        <span ng-if="currentWifiSettings.state.macAddress" class="mac-address-span">MAC ADDRESS:<span>{{currentWifiSettings.state.macAddress}}</span></span>
+        <span ng-if="currentWifiSettings.state.macAddress || currentNetwork.state.macAddress" class="mac-address-span">MAC ADDRESS:<span>{{currentWifiSettings.state.macAddress || currentNetwork.state.macAddress}}</span></span>
         <span ng-if="wirelessError" class="mac-address-span">No wifi adapter</span>
       </div>
 

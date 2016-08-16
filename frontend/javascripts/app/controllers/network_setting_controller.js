@@ -36,10 +36,12 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
 
     NetworkSettingsService.getSettings();
 
-    $scope.$on('new_wifi_result', function() {
+    $rootScope.$on('new_wifi_result', function() {
+      console.log("Instant");
       $scope.wifiNetworkStatus = true;
       $scope.wirelessError = false;
       $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork;
+      console.log(NetworkSettingsService.connectedWifiNetwork);
     });
 
     $scope.$on('ethernet_detected', function() {
