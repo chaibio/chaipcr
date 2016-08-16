@@ -37,6 +37,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         top: 10
         left: 80
         right: 5
+        bottom: 50
       grid:
         x: false
         y: false
@@ -53,8 +54,6 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
       amplification_data = angular.copy amplification_data
       channel_datasets = {}
       channels_count = if is_dual_channel then 2 else 1
-      neutralized_baseline_data = []
-      neutralized_background_data = []
 
       # get max cycle
       max_cycle = 0

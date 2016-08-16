@@ -109,7 +109,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
               AMPLI_DATA_CACHE = angular.copy data
               $scope.amplification_data = angular.copy(AMPLI_DATA_CACHE.amplification_data)
-              moveData()
+              # updateScrollBarWidth()
               updateButtonCts()
 
             if ((resp.data?.partial is true) or (resp.status is 202)) and !$scope.retrying
@@ -123,10 +123,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             retry()
 
       fetchFluorescenceData()
-
-      # $timeout ->
-      #   $scope.$broadcast '$reload:n3:charts'
-      # , 2000
 
       updateButtonCts = ->
         for well_i in [0..15] by 1
@@ -170,35 +166,45 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           for i in [0..15] by 1
             if buttons["well_#{i}"]?.selected
               $scope.chartConfig.series.push
-                axis: 'y'
+                # axis: 'y'
                 dataset: "channel_#{ch_i}"
-                key: "well_#{i}_#{subtraction_type}#{if $scope.curve_type is 'log' then '_log' else ''}"
+                # key: "well_#{i}_#{subtraction_type}#{if $scope.curve_type is 'log' then '_log' else ''}"
+                x: 'cycle_num'
+                y: "well_#{i}_#{subtraction_type}#{if $scope.curve_type is 'log' then '_log' else ''}"
                 label: if ($scope.is_dual_channel and $scope.color_by is 'well') then "channel_#{ch_i}, well_#{i+1}: " else "well_#{i+1}: "
                 color: if ($scope.color_by is 'well') then buttons["well_#{i}"].color else (if ch_i is 1 then '#00AEEF' else '#8FC742')
                 interpolation: {mode: 'cardinal', tension: 0.7}
 
-      moveData = ->
+      updateScrollBarWidth = ->
         return if !angular.isNumber($scope.ampli_zoom) or !AMPLI_DATA_CACHE or !$scope.maxCycle
         num_cycle_to_show = $scope.maxCycle - $scope.ampli_zoom
         wRatio = num_cycle_to_show / $scope.maxCycle
         scrollbar_width = $('#ampli-scrollbar').width()
-        $('#ampli-scrollbar .scrollbar').css(width: (scrollbar_width * wRatio) + 'px')
+        new_width = scrollbar_width * wRatio
+        new_width = if new_width > 10 then new_width else 10
+        $('#ampli-scrollbar .scrollbar').css(width: new_width + 'px')
         $rootScope.$broadcast 'scrollbar:width:changed', 'ampli-scrollbar'
 
-        $scope.amplification_data = helper.moveData AMPLI_DATA_CACHE.amplification_data, num_cycle_to_show, $scope.ampli_scroll, $scope.maxCycle
-        updateChartData($scope.amplification_data)
+        # $scope.amplification_data = helper.updateScrollBarWidth AMPLI_DATA_CACHE.amplification_data, num_cycle_to_show, $scope.ampli_scroll, $scope.maxCycle
+        # updateChartData($scope.amplification_data)
+
+      $scope.onZoom = (transform, w, h) ->
+        console.log transform, w, h
 
       $scope.$watch 'ampli_zoom', (zoom) ->
-        if AMPLI_DATA_CACHE?.amplification_data
-          moveData()
-          updateDragScrollWidth()
+        # if AMPLI_DATA_CACHE?.amplification_data
+        #   console.log(zoom);
+          updateScrollBarWidth()
+          $scope.ampli_zoom_percent = zoom/$scope.maxCycle
+          # updateDragScrollWidth()
+
           $rootScope.$broadcast 'scrollbar:width:changed'
 
-      $scope.$watch 'ampli_scroll', (val) ->
-        moveData()
+      # $scope.$watch 'ampli_scroll', (val) ->
+        # updateScrollBarWidth()
 
       $scope.$watch 'baseline_subtraction', (val) ->
-        moveData()
+        updateScrollBarWidth()
         updateSeries()
 
       $scope.$watch 'channel_1', (val) ->
