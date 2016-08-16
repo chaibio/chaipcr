@@ -150,10 +150,11 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         if max_calibration isnt null
           $scope.chartConfig.axes.y.max = if $scope.baseline_subtraction then max_calibration.baseline else max_calibration.background
 
-        $scope.data = data.amplification_data
-        $timeout ->
-          $scope.$broadcast '$reload:n3:charts'
-        , 500
+        # $scope.chartConfig.axes.y.scale = $scope.curve_type
+        # $scope.data = data.amplification_data
+        # $timeout ->
+        #   $scope.$broadcast '$reload:n3:charts'
+        # , 500
 
       updateSeries = (buttons) ->
         buttons = buttons || $scope.wellButtons || {}
@@ -186,7 +187,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $rootScope.$broadcast 'scrollbar:width:changed', 'ampli-scrollbar'
 
         # $scope.amplification_data = helper.updateScrollBarWidth AMPLI_DATA_CACHE.amplification_data, num_cycle_to_show, $scope.ampli_scroll, $scope.maxCycle
-        # updateChartData($scope.amplification_data)
+        updateChartData($scope.amplification_data)
 
       $scope.onZoom = (transform, w, h) ->
         console.log transform, w, h
@@ -214,7 +215,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         updateSeries()
 
       $scope.$watch 'curve_type', (type) ->
-        $scope.chartConfig.axes.y.type = type
+        # $scope.chartConfig.axes.y.type = type
+        $scope.chartConfig.axes.y.scale = type
         updateSeries()
         if type is 'log'
           subtraction_type = if $scope.baseline_subtraction then 'baseline' else 'background'

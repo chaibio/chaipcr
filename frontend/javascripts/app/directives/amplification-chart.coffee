@@ -22,10 +22,10 @@ angular.module("canvasApp").directive 'amplificationChart', [
 
           chart.onZoomAndPan($scope.onZoom())
 
-        $scope.$watch 'data', (data) ->
+        $scope.$watchCollection 'data', (data) ->
           initChart()
 
-        $scope.$watch 'config', (config) ->
+        $scope.$watchCollection 'config', (config) ->
           initChart()
 
         $scope.$watch 'scroll', (scroll) ->

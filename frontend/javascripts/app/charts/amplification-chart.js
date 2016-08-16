@@ -187,6 +187,8 @@
 
     function initChart(elem, data, config) {
 
+      console.log(config);
+
       Globals.data = data;
       Globals.config = config;
 
