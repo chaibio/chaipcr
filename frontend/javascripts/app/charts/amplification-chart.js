@@ -52,7 +52,6 @@
         .attr("d", line)
         .attr('stroke-width', 3/Globals.zoomTransform.k + 'px')
         .on('click', function(e, a, path) {
-          console.log(this);
           resetActivePath(Globals.zoomTransform.k);
           Globals.activePath = _path;
           _path.attr('stroke-width', 5 / Globals.zoomTransform.k + 'px');
@@ -147,8 +146,6 @@
       Globals.gY.call(Globals.yAxis.scale(transform.rescaleY(Globals.yScale)));
       Globals.zoomTransform = transform;
       updateLineStrokeWidthOnZoom(transform.k);
-      // circleFollowsMouse.call(Globals.mouseOverlay);
-      // circleFollowsMouse.call(Globals.chartSVG);
       if (Globals.circle) {
         Globals.circle.attr('r', 7 / Globals.zoomTransform.k + 'px')
       }
