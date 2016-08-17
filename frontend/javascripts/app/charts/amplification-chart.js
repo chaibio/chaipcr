@@ -5,27 +5,31 @@
   function AmplificationChart(elem, data, config) {
 
     // Global vars
-    var Globals = {
-      width: 0,
-      height: 0,
-      data: null,
-      config: null,
-      chartSVG: null,
-      viewSVG: null,
-      gX: null,
-      gY: null,
-      xAxis: null,
-      yAxis: null,
-      mouseOverlay: null,
-      activePath: null,
-      lines: null,
-      circle: null,
-      xScale: null,
-      yScale: null,
-      zooomBehavior: null,
-      zoomTransform: { k: 1, x: 0, y: 0 },
-      onZoomAndPan: null
-    };
+    var Globals = null;
+
+    function initGlobalVars() {
+      Globals = {
+        width: 0,
+        height: 0,
+        data: null,
+        config: null,
+        chartSVG: null,
+        viewSVG: null,
+        gX: null,
+        gY: null,
+        xAxis: null,
+        yAxis: null,
+        mouseOverlay: null,
+        activePath: null,
+        lines: null,
+        circle: null,
+        xScale: null,
+        yScale: null,
+        zooomBehavior: null,
+        zoomTransform: { k: 1, x: 0, y: 0 },
+        onZoomAndPan: null
+      };
+    }
 
     var superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹",
       formatPower = function(d) {
@@ -50,7 +54,7 @@
         .attr("stroke", line_config.color)
         .attr('fill', 'none')
         .attr("d", line)
-        .attr('stroke-width', 3/Globals.zoomTransform.k + 'px')
+        .attr('stroke-width', 3 / Globals.zoomTransform.k + 'px')
         .on('click', function(e, a, path) {
           resetActivePath(Globals.zoomTransform.k);
           Globals.activePath = _path;
@@ -68,7 +72,7 @@
       }
       Globals.lines = Globals.lines || [];
       // Globals.chartSVG.selectAll('.line').remove();
-      Globals.lines.forEach(function (line) {
+      Globals.lines.forEach(function(line) {
         line.remove();
       });
       Globals.lines = [];
@@ -112,7 +116,7 @@
 
     function updateLineStrokeWidthOnZoom(k) {
       Globals.lines.forEach(function(l) {
-        var strokeWidth = (l === Globals.activePath)? 5 : 3; //default stroke width
+        var strokeWidth = (l === Globals.activePath) ? 5 : 3; //default stroke width
         var strokeDiff = (strokeWidth * k) - strokeWidth;
         var newStrokeWidth = strokeWidth / k;
         l.attr('stroke-width', newStrokeWidth + 'px');
@@ -129,16 +133,16 @@
         transform.x = 0;
       }
 
-      if (transform.x + (Globals.width*transform.k) < Globals.width) {
-        transform.x = -(Globals.width*transform.k - Globals.width);
+      if (transform.x + (Globals.width * transform.k) < Globals.width) {
+        transform.x = -(Globals.width * transform.k - Globals.width);
       }
 
       if (transform.y > 0) {
         transform.y = 0;
       }
 
-      if (transform.y + (Globals.height*transform.k) < Globals.height) {
-        transform.y = -(Globals.height*transform.k - Globals.height);
+      if (transform.y + (Globals.height * transform.k) < Globals.height) {
+        transform.y = -(Globals.height * transform.k - Globals.height);
       }
 
       Globals.viewSVG.attr("transform", transform);
@@ -164,7 +168,8 @@
         xs.push(min_dataset_x);
       });
       return d3.min(xs, function(d) {
-        return d; });
+        return d;
+      });
     }
 
     function getMaxX() {
@@ -176,7 +181,8 @@
         xs.push(max_dataset_x);
       });
       return d3.max(xs, function(d) {
-        return d; });
+        return d;
+      });
     }
 
     function getMinY() {
@@ -188,7 +194,8 @@
         ys.push(min_dataset_y);
       });
       return d3.min(ys, function(d) {
-        return d; });
+        return d;
+      });
     }
 
     function getMaxY() {
@@ -200,15 +207,19 @@
         ys.push(max_dataset_y);
       });
       return d3.max(ys, function(d) {
-        return d; });
+        return d;
+      });
     }
 
-    function getScaleExtent () {
+    function getScaleExtent() {
       return getMaxX();
     }
 
     function initChart(elem, data, config) {
 
+      console.log(config.axes.y);
+
+      initGlobalVars();
       Globals.data = data;
       Globals.config = config;
 
@@ -330,47 +341,53 @@
         .attr('fill', Globals.activePath.attr('stroke'));
     }
 
-    this._getTransformXFromScroll = function (scroll) {
+    this._getTransformXFromScroll = function(scroll) {
       scroll = scroll < 0 ? 0 : (scroll > 1 ? 1 : scroll);
       var transform = this.getTransform();
-      var new_width = Globals.width*transform.k;
-      var transform_x = -((new_width-Globals.width)*scroll);
+      var new_width = Globals.width * transform.k;
+      var transform_x = -((new_width - Globals.width) * scroll);
       return transform_x;
     }
 
-    this.scroll = function scroll (scroll) { // scroll = {0..1}
+    this.scroll = function scroll(scroll) { // scroll = {0..1}
       var transform = this.getTransform();
       var transform_x = this._getTransformXFromScroll(scroll);
       var new_transform = d3.zoomIdentity.translate(transform_x, transform.y).scale(transform.k);
       Globals.chartSVG.call(Globals.zooomBehavior.transform, new_transform);
     };
 
-    this.onZoomAndPan = function (fn) {
+    this.onZoomAndPan = function(fn) {
       // fn will receive (transform, width, height)
       Globals.onZoomAndPan = fn;
     };
 
-    this.getTransform = function () {
+    this.getTransform = function() {
       return d3.zoomTransform(Globals.chartSVG.node());
     };
 
-    this.reset = function () {
+    this.reset = function() {
       Globals.chartSVG.call(Globals.zooomBehavior.transform, d3.zoomIdentity);
     };
 
-    this.zoomTo = function (zoom_percent) { // zoom_percent = {0..1}
+    this.zoomTo = function(zoom_percent) { // zoom_percent = {0..1}
       zoom_percent = zoom_percent || 0;
       zoom_percent = zoom_percent < 0 ? 0 : (zoom_percent > 1 ? 1 : zoom_percent);
-      var k = ((getScaleExtent() - 1)*zoom_percent) + 1;
+      var k = ((getScaleExtent() - 1) * zoom_percent) + 1;
       Globals.chartSVG.call(Globals.zooomBehavior.scaleTo, k);
     };
 
-    this.updateSeries = function (series) {
+    this.updateSeries = function(series) {
+      if (!Globals.data || ! Globals.config) { return; }
       Globals.config.series = series;
       drawLines();
     };
 
-    this.getScaleExtent = function () {
+    this.updateData = function (data) {
+      Globals.data = data;
+      drawLines();
+    };
+
+    this.getScaleExtent = function() {
       return getScaleExtent() || 1;
     };
 

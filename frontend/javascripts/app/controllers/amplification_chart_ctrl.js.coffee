@@ -44,7 +44,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       AMPLI_DATA_CACHE = null
       retryInterval = null
       $scope.baseline_subtraction = true
-      $scope.curve_type = 'linear'
+      $scope.curve_type = 'log'
       $scope.color_by = 'well'
       $scope.retrying = false
       $scope.retry = 0
@@ -95,12 +95,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             $scope.error = null
             if resp.status is 200 and resp.data?.partial
               $scope.hasData = true
-              $scope.data = helper.paddData()
+              $scope.amplification_data = helper.paddData()
               delete $scope.chartConfig.axes.x.min
-              $timeout ->
-                console.log 'reload ampli chart !!!!!'
-                $scope.$broadcast '$reload:n3:charts'
-              , 1000
             if resp.data.amplification_data and resp.data.amplification_data?.length > 1
               $scope.chartConfig.axes.x.min = 1
               $scope.hasData = true
@@ -222,14 +218,14 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         # $scope.chartConfig.axes.y.type = type
         $scope.chartConfig.axes.y.scale = type
         updateSeries()
-        if type is 'log'
-          subtraction_type = if $scope.baseline_subtraction then 'baseline' else 'background'
-          $scope.chartConfig.axes.y.ticks = helper.getLogViewYticks(max_calibration[subtraction_type])
-          $scope.chartConfig.axes.y.tickFormat = helper.toScientificNotation
-          $scope.chartConfig.axes.y.min = 10
-        else
-          $scope.chartConfig.axes.y.ticks = 10
-          delete $scope.chartConfig.axes.y.tickFormat
+        # if type is 'log'
+        #   subtraction_type = if $scope.baseline_subtraction then 'baseline' else 'background'
+        #   $scope.chartConfig.axes.y.ticks = helper.getLogViewYticks(max_calibration[subtraction_type])
+        #   $scope.chartConfig.axes.y.tickFormat = helper.toScientificNotation
+        #   $scope.chartConfig.axes.y.min = 10
+        # else
+        #   $scope.chartConfig.axes.y.ticks = 10
+        #   delete $scope.chartConfig.axes.y.tickFormat
 
       $scope.$watchCollection 'wellButtons', updateSeries
 
