@@ -44,7 +44,8 @@ analyze_optical_test_single_channel <- function(
         function(well_i) {
             baseline <- ot_list[[as.character(baseline_step_id)]][well_i]
             excitation <- ot_list[[as.character(excitation_step_id)]][well_i]
-            valid <- (excitation >= MIN_EXCITATION_FLUORESCENCE) && (baseline < MIN_EXCITATION_FLUORESCENCE) && (excitation <= MAX_EXCITATION)
+            # valid <- (excitation >= MIN_EXCITATION_FLUORESCENCE) && (excitation / baseline >= MIN_EXCITATION_FLUORESCENCE_MULTIPLE) && (excitation <= MAX_EXCITATION) # old
+            valid <- (excitation >= MIN_EXCITATION_FLUORESCENCE) && (baseline < MIN_EXCITATION_FLUORESCENCE) && (excitation <= MAX_EXCITATION) # Josh, 2016-08-15
             result <- list('baseline'=baseline, 'excitation'=excitation, 'valid'=valid)
             return(lapply(result, function(ele) unbox(ele)))
             })

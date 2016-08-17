@@ -13,12 +13,12 @@ calib_labels_FAM_HEX <- c('channel_1', 'channel_2')
 # bounds of signal-to-noise ratio (SNR)
 SNR_FAM_CH1_MIN <- 0.75
 SNR_FAM_CH2_MAX <- 1
-SNR_HEX_CH1_MAX <- 0.70
-SNR_HEX_CH2_MIN <- 0.85
+SNR_HEX_CH1_MAX <- 0.50
+SNR_HEX_CH2_MIN <- 0.88
 
 # fluo values: channel 1, channel 2
-WATER_MAX <- c(80000, 7500)
-WATER_MIN <- c(100, 50)
+WATER_MAX <- c(32000, 5000)
+WATER_MIN <- c(1000, -1000)
 
 
 # signal-to-noise ratio discriminants for each well
@@ -78,7 +78,7 @@ analyze_optical_test_dual_channel <- function(
     bool_list[['water']] <- do.call(rbind, lapply(
         1:num_channels, 
         function(channel) {
-            fluos_wc <- fluo_list[['water']][channel,]
+            fluos_wc <- fluo_list[['water']][channel,] - fluo_list[['baseline']][channel,]
             fluos_wc < WATER_MAX[channel] & fluos_wc > WATER_MIN[channel]
         }
     ))
@@ -88,8 +88,8 @@ analyze_optical_test_dual_channel <- function(
         bool_list[[calib_label]] <- do.call(cbind, lapply(
             1:num_wells, 
             function(well_i) {
-                signal_fluo_2chs <- fluo_list[[calib_label]][,well_i]
-                water_fluo_2chs <- fluo_list[['water']][,well_i]
+                signal_fluo_2chs <- fluo_list[[calib_label]][,well_i] - fluo_list[['baseline']][,well_i]
+                water_fluo_2chs <- fluo_list[['water']][,well_i] - fluo_list[['baseline']][,well_i]
                 snr_2chs <- (signal_fluo_2chs - water_fluo_2chs) / signal_fluo_2chs # element-wise operations
                 dscrmnts_snr[[calib_label]](snr_2chs)
             } 
@@ -112,7 +112,7 @@ analyze_optical_test_dual_channel <- function(
         )
     )
     
-    # FAM and HEX self-calibrated ratio test
+    # FAM and HEX self-calibrated ratio test. Baseline is not subtracted because it is not part of the calibration procedure.
     swd_list <- lapply(fluo_list[calib_labels_FAM_HEX],
         function(fluos_dye) do.call(rbind, lapply(1:num_channels,
             function(channel) fluos_dye[channel,] - fluo_list[['water']][channel,]
