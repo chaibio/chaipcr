@@ -49,7 +49,7 @@
     </div>
 
     <div class="button-container">
-      <button ng-if="wifiNetworkType" type="submit" class="green-button">{{buttonValue}}<ellipsis-animated ng-if="buttonValue=='CONNECTING'"></ellipsis-animated></button>
+      <button ng-if="wifiNetworkType" type="submit" ng-class="{'green-button': buttonValue!=='CONNECTING', 'connecting-button': buttonValue==='CONNECTING'}">{{buttonValue}}<ellipsis-animated ng-if="buttonValue=='CONNECTING'"></ellipsis-animated></button>
       <div class="spacer">&nbsp;</div>
       <button class="button second-button" ui-sref="settings.networkmanagement">CANCEL</button>
     </div>

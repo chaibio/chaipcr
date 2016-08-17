@@ -25,51 +25,56 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
   'Status',
   '$timeout'
   '$rootScope'
-  '$http'  
-  ($scope, $stateParams, Experiment, $state, AmplificationChartHelper, Status, $timeout, $rootScope, $http) ->
+  '$http'
+  '$window'
+  ($scope, $stateParams, Experiment, $state, AmplificationChartHelper, Status, $timeout, $rootScope, $http, $window) ->
     $scope.params = $stateParams
     $scope.lidOpen = false
     $scope.showProperties = false
     $scope.status = null
     $scope.exp = null
     $scope.errorExport = false
-    $scope.exporting = false		
+    $scope.exporting = false
 
     $scope.deleteExperiment = ->
       exp = new Experiment id: $stateParams.id
       exp.$delete id: $stateParams.id, ->
         $state.go 'home'
-		
+
     callAtTimeout = ->
-      $scope.exportExperiment()				
-		
+      $scope.exportExperiment()
+
     $scope.exportExperiment = ->
-      $scope.exporting = true		
-      $scope.errorExport = false	  		
+      $scope.exporting = true
+      $scope.errorExport = false
       id = $stateParams.id
-      url = "/experiments/"+$stateParams.id+"/export"	  		
+      url = "/experiments/"+$stateParams.id+"/export"
+      isChrome = !!window.chrome
       $http.get(url, responseType: 'arraybuffer')
       .success (resp,status) =>
         if status == 202
-          $timeout callAtTimeout, 500	    				  
+          $timeout callAtTimeout, 500
         console.log status
-        if status!= 202		
+        if status!= 202 && isChrome
           blob = new Blob([resp], type: 'application/octet-stream')
           link = document.createElement('a')
           link.href = window.URL.createObjectURL(blob)
           link.download = 'export.zip'
           link.click()
-          $scope.exporting = false		  										
-	
+          $scope.exporting = false
+        else if status!= 202 && !isChrome
+          $window.location.assign url
+          $scope.exporting = false
+
       .error (resp,status) =>
-        console.log status	    	  
+        console.log status
         if status == 503
           $timeout callAtTimeout, 500
         else
-          $scope.exporting = false			
-          $scope.errorExport = true	  					  					  		  				  	        				
-		
-    	  		    		
+          $scope.exporting = false
+          $scope.errorExport = true
+
+
 
     $scope.$watch (()->
       $scope.showProperties), (val) ->
@@ -96,10 +101,10 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
     $scope.getExperiment()
 
     $rootScope.$on 'sidemenu:toggle', ->
-      $scope.errorExport = false		
+      $scope.errorExport = false
       if $scope.showProperties and angular.element('.sidemenu').width() > 100
         $scope.showProperties = false
-        #$scope.errorExport = false					
+        #$scope.errorExport = false
 
     $scope.$on 'status:data:updated', (e, data, oldData) ->
       $scope.lidOpen = if data?.optics?.lid_open == "true" then true else false

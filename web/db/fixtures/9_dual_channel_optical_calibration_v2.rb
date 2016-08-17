@@ -4,14 +4,14 @@ experiment_definition = ExperimentDefinition.seed(:guid) do |s|
   s.experiment_type = ExperimentDefinition::TYPE_CALIBRATION
   s.protocol_params ={lid_temperature:110, stages:[
    {stage:{stage_type:"holding",steps:[
-     {step:{name:"Warm Up 75",temperature:75,hold_time:600}},
-     {step:{name:"Warm Water",temperature:60,hold_time:60}},
+     {step:{name:"Warm Up 75",temperature:75,hold_time:300}},
+     {step:{name:"Warm Water",temperature:60,hold_time:90}},
      {step:{name:"Water",temperature:60,hold_time:20,collect_data:true}},
      {step:{name:"Swap",temperature:60,hold_time:1,pause:true}},
-     {step:{name:"Warm FAM",temperature:60,hold_time:60}},
+     {step:{name:"Warm FAM",temperature:60,hold_time:90}},
      {step:{name:"FAM",temperature:60,hold_time:20,collect_data:true}},
-     {step:{name:"Swap",temperature:65,hold_time:1,pause:true}},
-     {step:{name:"Warm HEX",temperature:60,hold_time:60}},
+     {step:{name:"Swap",temperature:60,hold_time:1,pause:true}},
+     {step:{name:"Warm HEX",temperature:60,hold_time:90}},
      {step:{name:"HEX",temperature:60,hold_time:20,collect_data:true}}
    ]}}]}
 end

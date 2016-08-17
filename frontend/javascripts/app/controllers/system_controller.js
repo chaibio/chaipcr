@@ -23,7 +23,7 @@ window.ChaiBioTech.ngApp.controller('systemController', [
   'Status',
   '$http',
   '$window',
-  '$timeout',	
+  '$timeout',
   function(Device, $scope, Status, $http, $window, $timeout) {
 
     $scope.is_dual_channel = false;
@@ -56,22 +56,30 @@ window.ChaiBioTech.ngApp.controller('systemController', [
     $scope.openUploadModal = function() {
       Device.openUploadModal();
     };
-	
+
 	$scope.export = function(){
     $scope.exporting=true;
-	debugger;
+		var isChrome = !!window.chrome;
+		console.log(isChrome);
+	  debugger;
+		if(isChrome){
 		Device.exportDatabase().then(function(response) {
 		  var blob = new Blob([response.data],{type:'application/octet-stream'});
 		  var link = document.createElement('a');
 		  link.href = window.URL.createObjectURL(blob);
-		  link.download = "chaipcr.sql.zip";
+		  link.download = "exportdb.zip";
 		  link.click();
 		  $scope.exporting = false;
 			console.log(response);
 		  }, function(response) {
 			  console.log(response);
 			  $scope.exporting = false;
-		  });		
+		  });
+		}
+		else{
+			$scope.exporting=false;
+			$window.location.assign("/device/export_database");
+		}
 	};
 
     $scope.checkUpdate = function() {
@@ -80,6 +88,7 @@ window.ChaiBioTech.ngApp.controller('systemController', [
       $scope.checking_update = true;
       checkPromise = Device.checkForUpdate();
       checkPromise.then(function(is_available) {
+				console.log(is_available);
         $scope.update_available = is_available;
         $scope.checkedUpdate = true;
         if (is_available === 'available') {

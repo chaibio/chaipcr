@@ -92,10 +92,29 @@ verify_checksum
 
 set_sdcard_uEnv () {
 	cp ${uEnvPath}/uEnv.txt ${uEnvPath}/uEnv.org.txt
-	cp ${uEnvPath}/uEnv.sdcard.txt ${uEnvPath}/uEnv.txt
+#	cp ${uEnvPath}/uEnv.sdcard.txt ${uEnvPath}/uEnv.txt
+	sync
+	file1=${uEnvPath}/uEnv.sdcard.txt
+	file2=${uEnvPath}/uEnv.txt
+	cp $file1 $file2
+	echo verifying $file1 and $file2
+
+	for a in 1 2 3 4 5
+	do
+		echo Verify uEnv update.. check# $a of 5
+
+		if cmp -s $file1 $file2
+		then
+			echo updating uEnv done.
+			break
+		fi
+		cp $file1 $file2
+		sync
+		sleep 10
+	done
+
 	sleep 3
 	sync
-	sleep 2
 }
 
 reset_sdcard_uEnv () {
@@ -160,6 +179,9 @@ then
 		cd /sdcard/factory/
 		tar -xf /sdcard/upgrade/upgrade.img.tar factory-scripts
 		cp -r factory-scripts/* .
+		sync
+		sleep 3
+		rm -r factory-scripts
 		echo done extracting.
 	else
 		echo No factory settings partition upgrade needed
@@ -168,6 +190,7 @@ fi
 
 set_sdcard_uEnv
 sync
+
 sleep 5
 
 echo "Restarting to packing eMMC image.."
@@ -184,6 +207,7 @@ else
 fi
 
 cp /etc/shadow /data/.tmp/shadow.backup
+sync
 
 sh $BASEDIR/rebootx.sh
 exit_with_message Success 0 $1
