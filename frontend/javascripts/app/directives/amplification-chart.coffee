@@ -25,8 +25,9 @@ angular.module("canvasApp").directive 'amplificationChart', [
         $scope.$watchCollection 'data', (data) ->
           initChart()
 
-        $scope.$watchCollection 'config', (config) ->
-          initChart()
+        $scope.$watchCollection 'config.series', (series) ->
+          return if !chart
+          chart.updateSeries(series)
 
         $scope.$watch 'scroll', (scroll) ->
           return if !scroll or !chart

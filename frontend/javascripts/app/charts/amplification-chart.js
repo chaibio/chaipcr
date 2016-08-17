@@ -360,21 +360,12 @@
       zoom_percent = zoom_percent || 0;
       zoom_percent = zoom_percent < 0 ? 0 : (zoom_percent > 1 ? 1 : zoom_percent);
       var k = ((getScaleExtent() - 1)*zoom_percent) + 1;
-      // var current_transform = this.getTransform();
-      // var x = this._getTransformXFromScroll(scroll);
-      // var center_point_y = current_transform.y - (Globals.height/2);
-      // var end_point_y = -(current_transform.k*Globals.height);
-      // var ratio = center_point_y/end_point_y
-      // var new_end_point_y = -(k*Globals.height)
-      // var new_center_point_y = new_end_point_y * ratio
-      // var y = new_center_point_y + Globals.height/2;
-      // console.log('ratio: ' + ratio);
-      // console.log('new height: ' + new_end_point_y);
-      // console.log('new center_point_y: ' + new_center_point_y);
-      // console.log('new ratio: ' + new_center_point_y/new_end_point_y);
-      // var transform = d3.zoomIdentity.scale(k).translate(x, y);
-      // Globals.chartSVG.call(Globals.zooomBehavior.transform, transform);
       Globals.chartSVG.call(Globals.zooomBehavior.scaleTo, k);
+    };
+
+    this.updateSeries = function (series) {
+      Globals.config.series = series;
+      drawLines(series);
     };
 
     this.getScaleExtent = function () {

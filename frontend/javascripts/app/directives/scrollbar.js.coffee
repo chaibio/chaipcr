@@ -47,28 +47,13 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
           value = if (value > 1) then 1 else value
           value = if (value < 0) then 0 else value
 
-          # if angular.isNumber(value)
-            # newMargin = getSpaceWidth() * value
-            # updateMargin(newMargin)
-          # console.log val
-
           elem_width = getElemWidth()
           width_percent = val.width || ngModel.$viewValue.width || 1
           new_width = elem_width * width_percent
           new_width = if new_width >= 15 then new_width else 15
           scrollbar.css('width', "#{new_width}px")
           new_margin = (elem_width - new_width) * value
-          # console.log "new margin: #{new_margin}"
           updateMargin(new_margin)
-
-      # width_percent = {0..1}
-      # $scope.$watch 'width', (width_percent) ->
-      #   width_percent = width_percent || 1
-      #   new_width = getElemWidth() * width_percent
-      #   new_width = if new_width >= 15 then new_width else 15
-      #   scrollbar.css('width', "#{new_width}px")
-      #   new_margin = (getElemWidth() - new_width) * ngModel.$viewValue
-      #   updateMargin(new_margin)
 
       getMarginLeft = ->
         parseInt scrollbar.css('marginLeft').replace /px/, ''
