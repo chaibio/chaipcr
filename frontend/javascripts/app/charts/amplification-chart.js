@@ -50,8 +50,9 @@
         .attr("stroke", line_config.color)
         .attr('fill', 'none')
         .attr("d", line)
-        .attr('stroke-width', '3px')
+        .attr('stroke-width', 3/Globals.zoomTransform.k + 'px')
         .on('click', function(e, a, path) {
+          console.log(this);
           resetActivePath(Globals.zoomTransform.k);
           Globals.activePath = _path;
           _path.attr('stroke-width', 5 / Globals.zoomTransform.k + 'px');
@@ -66,9 +67,13 @@
       if (!series) {
         return;
       }
-      if (!Globals.lines) { Globals.lines = []; }
-
-      Globals.chartSVG.selectAll('.lines').remove()
+      Globals.lines = Globals.lines || [];
+      // Globals.chartSVG.selectAll('.line').remove();
+      Globals.lines.forEach(function (line) {
+        line.remove();
+      });
+      Globals.lines = [];
+      Globals.activePath = null;
 
       series.forEach(function(s, i) {
         makeLine(s);
@@ -142,7 +147,11 @@
       Globals.gY.call(Globals.yAxis.scale(transform.rescaleY(Globals.yScale)));
       Globals.zoomTransform = transform;
       updateLineStrokeWidthOnZoom(transform.k);
-      circleFollowsMouse.call(this);
+      // circleFollowsMouse.call(Globals.mouseOverlay);
+      // circleFollowsMouse.call(Globals.chartSVG);
+      if (Globals.circle) {
+        Globals.circle.attr('r', 7 / Globals.zoomTransform.k + 'px')
+      }
 
       if (Globals.onZoomAndPan) {
         Globals.onZoomAndPan(Globals.zoomTransform, Globals.width, Globals.height, getScaleExtent());
@@ -202,8 +211,6 @@
     }
 
     function initChart(elem, data, config) {
-
-      console.log(config);
 
       Globals.data = data;
       Globals.config = config;
@@ -286,8 +293,6 @@
       Globals.activePath = null;
       Globals.zooomBehavior.scaleExtent([1, getScaleExtent()]);
 
-      // Globals.zooomBehavior.xExtent(getMinX(), getMaxX());
-
     }
 
     function circleFollowsMouse() {
@@ -365,7 +370,7 @@
 
     this.updateSeries = function (series) {
       Globals.config.series = series;
-      drawLines(series);
+      drawLines();
     };
 
     this.getScaleExtent = function () {

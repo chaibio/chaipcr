@@ -109,7 +109,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               data.ct.shift()
               max_calibration = helper.getMaxCalibrations(data.amplification_data)
               data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
-              console.log data.amplification_data
 
               AMPLI_DATA_CACHE = angular.copy data
               $scope.amplification_data = angular.copy(AMPLI_DATA_CACHE.amplification_data)
