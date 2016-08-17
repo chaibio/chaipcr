@@ -121,6 +121,22 @@
       transform.y = transform.y || 0;
       transform.k = transform.k || 0;
 
+      if (transform.x > 0) {
+        transform.x = 0;
+      }
+
+      if (transform.x + (Globals.width*transform.k) < Globals.width) {
+        transform.x = -(Globals.width*transform.k - Globals.width);
+      }
+
+      if (transform.y > 0) {
+        transform.y = 0;
+      }
+
+      if (transform.y + (Globals.height*transform.k) < Globals.height) {
+        transform.y = -(Globals.height*transform.k - Globals.height);
+      }
+
       Globals.viewSVG.attr("transform", transform);
       Globals.gX.call(Globals.xAxis.scale(transform.rescaleX(Globals.xScale)));
       Globals.gY.call(Globals.yAxis.scale(transform.rescaleY(Globals.yScale)));
