@@ -33,8 +33,8 @@ angular.module("canvasApp").directive 'amplificationChart', [
           chart.scroll(scroll)
 
         $scope.$watch 'zoom', (zoom) ->
-          return if !zoom or !chart or !$scope.scroll
-          chart.zoomTo(zoom, $scope.scroll)
+          return if !zoom or !chart
+          chart.zoomTo(zoom)
 
 
     }

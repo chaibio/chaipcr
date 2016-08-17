@@ -24,7 +24,7 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
     replace: true
     templateUrl: 'app/views/directives/scrollbar.html'
     scope:
-      defaultValue: '='
+      state: '=' # [{0..1}, width]
     require: 'ngModel'
     link: ($scope, elem, attr, ngModel) ->
 
@@ -34,52 +34,41 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
       pageX = 0
       margin = 0
       spaceWidth = 0
-      scaleSize = 0
+      scrollbar_width = 0
       xDiff = 0
 
       scrollbar = elem.find('.scrollbar')
-      # respond to change in scrollbar width
-      $scope.$on 'scrollbar:width:changed', (e, id, percent) ->
 
-        return if id isnt attr.id
+      $scope.$watchCollection ->
+        ngModel.$viewValue
+      , (val, oldVal) ->
+        if (val?.value isnt oldVal?.value or val?.width isnt oldVal?.width) and !held
+          value = val.value*1 || ngModel.$viewValue.value || 0
+          value = if (value > 1) then 1 else value
+          value = if (value < 0) then 0 else value
 
-        if getSpaceWidth() > 0 and ngModel.$viewValue is 'FULL'
-          ngModel.$setViewValue( $scope.defaultValue || 0)
+          # if angular.isNumber(value)
+            # newMargin = getSpaceWidth() * value
+            # updateMargin(newMargin)
+          # console.log val
 
-        if ngModel.$viewValue >= 1
-          updateMargin(getElemWidth() - getScrollBarWidth())
+          elem_width = getElemWidth()
+          width_percent = val.width || ngModel.$viewValue.width || 1
+          new_width = elem_width * width_percent
+          new_width = if new_width >= 15 then new_width else 15
+          scrollbar.css('width', "#{new_width}px")
+          new_margin = (elem_width - new_width) * value
+          # console.log "new margin: #{new_margin}"
+          updateMargin(new_margin)
 
-        spaceWidth = getSpaceWidth()
-        if spaceWidth > 0
-          if !ngModel.$viewValue
-            ngModel.$setViewValue getMarginLeft()/spaceWidth
-
-          newMargin = spaceWidth * ngModel.$viewValue
-          updateMargin newMargin
-
-        if !ngModel.$viewValue
-          ngModel.$setViewValue($scope.defaultValue || 'FULL')
-
-
-        if Math.abs(getElemWidth() - getScrollBarWidth()) < 2
-          # console.log 'EQUAL!!'
-          updateMargin(0)
-
-      # $scope.$watch ->
-      #   ngModel.$viewValue
-      # , (val, oldVal) ->
-      #   if val isnt oldVal and val isnt 'FULL' and !held
-      #     val = parseFloat(val) || 0
-      #     val = if (val > 1) then 1 else val
-      #     val = if (val < 0) then 0 else val
-
-      #     if angular.isNumber val
-
-      #       ngModel.$setViewValue val
-
-      #       newMargin = spaceWidth*val
-
-      #       updateMargin(newMargin)
+      # width_percent = {0..1}
+      # $scope.$watch 'width', (width_percent) ->
+      #   width_percent = width_percent || 1
+      #   new_width = getElemWidth() * width_percent
+      #   new_width = if new_width >= 15 then new_width else 15
+      #   scrollbar.css('width', "#{new_width}px")
+      #   new_margin = (getElemWidth() - new_width) * ngModel.$viewValue
+      #   updateMargin(new_margin)
 
       getMarginLeft = ->
         parseInt scrollbar.css('marginLeft').replace /px/, ''
@@ -94,6 +83,7 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
         getElemWidth() - getScrollBarWidth()
 
       updateMargin = (newMargin) ->
+        spaceWidth = getSpaceWidth()
         if newMargin > spaceWidth then newMargin = spaceWidth
         if newMargin < 0 then newMargin = 0
         scrollbar.css marginLeft: "#{newMargin}px"
@@ -105,6 +95,8 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
 
         oldMargin = getMarginLeft()
         spaceWidth = getSpaceWidth()
+        scrollbar_width = getScrollBarWidth()
+
 
       $window.$(document).on 'mouseup', (e) ->
         held = false
@@ -115,10 +107,13 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
           xDiff = e.pageX - pageX
           newMargin = oldMargin + xDiff
 
-          updateMargin newMargin
+          updateMargin(newMargin)
 
           # avoid dividing with spaceWidth = 0, else result is NaN
           val = if spaceWidth > 0 then Math.round((newMargin)/spaceWidth*1000)/1000 else 0
-          ngModel.$setViewValue val
+          ngModel.$setViewValue({
+            value: val,
+            scrollbar_width
+          })
 
 ]

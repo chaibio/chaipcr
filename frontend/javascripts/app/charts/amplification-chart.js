@@ -145,7 +145,7 @@
       circleFollowsMouse.call(this);
 
       if (Globals.onZoomAndPan) {
-        Globals.onZoomAndPan(Globals.zoomTransform, Globals.width, Globals.height);
+        Globals.onZoomAndPan(Globals.zoomTransform, Globals.width, Globals.height, getScaleExtent());
       }
     }
 

@@ -51,6 +51,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.fetching = false
       $scope.channel_1 = true
       $scope.channel_2 = if is_dual_channel then true else false
+      $scope.ampli_zoom = {
+        value: 0
+        width: 0.2
+      }
 
       $scope.$on 'expName:Updated', ->
         $scope.experiment?.name = expName.name
@@ -180,32 +184,33 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         return if !angular.isNumber($scope.ampli_zoom) or !AMPLI_DATA_CACHE or !$scope.maxCycle
         num_cycle_to_show = $scope.maxCycle - $scope.ampli_zoom
         wRatio = num_cycle_to_show / $scope.maxCycle
-        scrollbar_width = $('#ampli-scrollbar').width()
-        new_width = scrollbar_width * wRatio
-        new_width = if new_width > 10 then new_width else 10
-        $('#ampli-scrollbar .scrollbar').css(width: new_width + 'px')
-        $rootScope.$broadcast 'scrollbar:width:changed', 'ampli-scrollbar'
+        $scope.scrollbar_width = wRatio;
+        # scrollbar_width = $('#ampli-scrollbar').width()
+        # new_width = scrollbar_width * wRatio
+        # new_width = if new_width > 10 then new_width else 10
+        # $('#ampli-scrollbar .scrollbar').css(width: new_width + 'px')
+        # $rootScope.$broadcast 'scrollbar:width:changed', 'ampli-scrollbar'
 
         # $scope.amplification_data = helper.updateScrollBarWidth AMPLI_DATA_CACHE.amplification_data, num_cycle_to_show, $scope.ampli_scroll, $scope.maxCycle
         updateChartData($scope.amplification_data)
 
-      $scope.onZoom = (transform, w, h) ->
-        console.log transform, w, h
+      $scope.onZoom = (transform, w, h, scale_extent) ->
+        # console.log transform, w, h, scale_extent
+        $scope.ampli_scroll = {
+          value: Math.abs(transform.x/(w*transform.k - w))
+          width: w/(w*transform.k)
+        }
+        $scope.ampli_zoom = {
+          value: (transform.k - 1)/ (scale_extent-1)
+          width: 0.2
+        }
 
-      $scope.$watch 'ampli_zoom', (zoom) ->
-        # if AMPLI_DATA_CACHE?.amplification_data
-        #   console.log(zoom);
-          updateScrollBarWidth()
-          $scope.ampli_zoom_percent = zoom/$scope.maxCycle
-          # updateDragScrollWidth()
+      $scope.$watchCollection 'ampli_scroll', (scroll_state) ->
 
-          $rootScope.$broadcast 'scrollbar:width:changed'
-
-      # $scope.$watch 'ampli_scroll', (val) ->
-        # updateScrollBarWidth()
 
       $scope.$watch 'baseline_subtraction', (val) ->
-        updateScrollBarWidth()
+        # updateScrollBarWidth()
+        updateChartData($scope.amplification_data)
         updateSeries()
 
       $scope.$watch 'channel_1', (val) ->
