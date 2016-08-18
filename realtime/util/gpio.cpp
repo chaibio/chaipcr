@@ -182,6 +182,7 @@ void GPIO::setValue(Value value, bool forceUpdate)
     catch (...)
     {
         APP_LOGGER << "GPIO::setValue - Unable to change a pin (" << _pinNumber << "): " << std::strerror(errno) << std::endl;
+        return;
     }
 
     switch (buffer[0])

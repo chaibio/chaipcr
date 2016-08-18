@@ -628,7 +628,8 @@ void DBControl::updateUpgrade(const Upgrade &upgrade,  bool &isCurrent, bool &do
             isCurrent = true;
             downloaded = tmpDownloaded;
 
-            return;
+            if (downloaded)
+                return;
         }
     }
 
