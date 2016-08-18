@@ -74,12 +74,14 @@
       font-family: "dinot-bold";
       font-size: 16px;
       color: white;
-      background-color: grey;
-      border: 1px solid white;
+      background-color: #C5C5C5;
+      border: none;
       width: 260px;
       height: 32px;
     }
-
+    .connecting-button:hover {
+      cursor: default;
+    }
     .spacer {
       height: 10px;
     }

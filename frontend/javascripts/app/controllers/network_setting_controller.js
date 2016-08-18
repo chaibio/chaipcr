@@ -31,13 +31,13 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     $scope.currentWifiSettings = {}; // Current active wifi network [connected to]
     $scope.ethernetSettings = {}; // Ethernet settings
     $scope.wirelessError = false;  // Incase no wifi adapter is present in the machine
-    $scope.wifiNetworkStatus = null; // If network is on/off
+
     $scope.userSettings = $.jStorage.get('userNetworkSettings');
+    $scope.wifiNetworkStatus = $scope.userSettings.wifiSwitchOn; // If network is on/off
 
     NetworkSettingsService.getSettings();
 
-    $scope.$on('new_wifi_result', function() {
-      $scope.wifiNetworkStatus = true;
+    $rootScope.$on('new_wifi_result', function() {
       $scope.wirelessError = false;
       $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork;
     });
@@ -62,12 +62,11 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     $scope.$watch('wifiNetworkStatus', function(val) {
 
       if($scope.wirelessError === false) {
-        if(val) {
+        if(val === true && $scope.userSettings.wifiSwitchOn === false) {
           $scope.turnOnWifi();
-          return;
+        } else if(val === false && $scope.userSettings.wifiSwitchOn === true) {
+          $scope.turnOffWifi();
         }
-
-        $scope.turnOffWifi();
       }
     });
 
@@ -117,10 +116,11 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     }, 10000);
 
     $scope.getSettings = function() {
-      // We may need this method when we refresh right on this page.
+      // We may need this method when we refresh right on this page. [Not used at this moment]
       if($scope.wifiNetworkStatus === null) {
         NetworkSettingsService.getInitialStatus()
         .then(function(result) {
+
           $scope.wifiNetworkStatus = true;
           $scope.currentNetwork = result.data;
         }, function(err) {
@@ -139,7 +139,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       }
 
       if($scope.userSettings.wifiSwitchOn) {
-        $scope.getSettings();
+        //$scope.getSettings();
         $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork;
         $scope.findWifiNetworks();
       }
