@@ -56,6 +56,9 @@ window.App.controller 'SoftwareUpdateCtrl', [
       $window.open($scope.new_update.image_http_url)
       $scope.content = 'upload_form'
 
+    $scope.done = ->
+      $window.location.reload()
+
     $scope.close = ->
       if $scope.uploading
         $scope.cancelUpload()
