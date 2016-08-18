@@ -37,13 +37,13 @@
       </div>
 
       <div class="mac-cover no-wifi">
-        <span ng-if="currentWifiSettings.state.macAddress || currentNetwork.state.macAddress" class="mac-address-span">MAC ADDRESS:<span>{{currentWifiSettings.state.macAddress || currentNetwork.state.macAddress}}</span></span>
+        <span ng-if="currentWifiSettings.state.macAddress" class="mac-address-span">MAC ADDRESS:<span>{{currentWifiSettings.state.macAddress}}</span></span>
         <span ng-if="wirelessError" class="mac-address-span">No wifi adapter</span>
       </div>
 
       <ul>
         <li ng-repeat="wifiNetwork in wifiNetworks">
-          <check-mark current-network="currentNetwork" ssid="{{wifiNetwork.ssid}}"></check-mark>
+          <check-mark current-network="currentWifiSettings" ssid="{{wifiNetwork.ssid}}"></check-mark>
           <a ui-sref="settings.networkmanagement.wifi({name: '{{wifiNetwork.ssid | spaceToUnderscore}}'})" ui-sref-active="highlite">{{wifiNetwork.ssid}}
             <wifi-lock encryption="{{wifiNetwork.encryption}}" ssid="{{wifiNetwork.ssid | spaceToUnderscore}}"></wifi-lock>
             <wifi-signal ssid="{{wifiNetwork.ssid | spaceToUnderscore}}" quality="{{wifiNetwork.quality}}"></wifi-signal>
