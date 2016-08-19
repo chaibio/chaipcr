@@ -6,9 +6,15 @@
 
     // Global vars
     var Globals = null;
+    // current supported axis interpolations
+    var INTERPOLATIONS = {
+      log: d3.scaleLog,
+      linear: d3.scaleLinear
+    };
 
     function initGlobalVars() {
       Globals = {
+        initializing: false,
         width: 0,
         height: 0,
         data: null,
@@ -39,6 +45,28 @@
       };
     // end global vars
 
+    function setActivePath(path) {
+      if (Globals.activePath) {
+        Globals.activePath.attr('stroke-width', 3 / Globals.zoomTransform.k + 'px');
+      }
+      var activePathConfig, activePathIndex;
+      // get config and index of active path
+      for (var i = Globals.config.series.length - 1; i >= 0; i--) {
+        var s = Globals.config.series[i];
+        if (s.color === path.attr('stroke')) {
+          activePathConfig = s;
+          activePathIndex = i;
+          break;
+        }
+      }
+      var newLine = makeLine(activePathConfig).attr('stroke-width', 5 / Globals.zoomTransform.k + 'px');
+      Globals.lines[activePathIndex] = newLine;
+      Globals.activePath = newLine;
+      makeCircle();
+      circleFollowsMouse.call(this);
+      path.remove();
+    }
+
     function makeLine(line_config) {
       var line = d3.line()
         .curve(d3.curveCardinal)
@@ -56,13 +84,11 @@
         .attr("d", line)
         .attr('stroke-width', 3 / Globals.zoomTransform.k + 'px')
         .on('click', function(e, a, path) {
-          resetActivePath(Globals.zoomTransform.k);
-          Globals.activePath = _path;
-          _path.attr('stroke-width', 5 / Globals.zoomTransform.k + 'px');
-          circleFollowsMouse.call(this);
+          setActivePath.call(this, _path);
         });
 
       Globals.lines.push(_path);
+      return _path;
     }
 
     function drawLines() {
@@ -83,13 +109,6 @@
       });
 
       makeCircle();
-    }
-
-    function resetActivePath(k) {
-      if (!Globals.activePath) {
-        return;
-      }
-      Globals.activePath.attr('stroke-width', 3 / k + 'px');
     }
 
     function getDataLength() {
@@ -149,9 +168,13 @@
       Globals.gX.call(Globals.xAxis.scale(transform.rescaleX(Globals.xScale)));
       Globals.gY.call(Globals.yAxis.scale(transform.rescaleY(Globals.yScale)));
       Globals.zoomTransform = transform;
+
       updateLineStrokeWidthOnZoom(transform.k);
+
       if (Globals.circle) {
-        Globals.circle.attr('r', 7 / Globals.zoomTransform.k + 'px')
+        Globals.circle
+          .attr('stroke-width', 2 / Globals.zoomTransform.k + 'px')
+          .attr('r', 7 / Globals.zoomTransform.k + 'px');
       }
 
       if (Globals.onZoomAndPan) {
@@ -215,34 +238,69 @@
       return getMaxX();
     }
 
+    function getYLogticks() {
+      var num = getMaxY();
+      var calib, calibs, i, j, num_length, ref, roundup;
+      num_length = num.toString().length;
+      roundup = '1';
+      for (i = j = 0, ref = num_length; j < ref; i = j += 1) {
+        roundup = roundup + "0";
+      }
+      roundup = roundup * 1;
+      calibs = [];
+      calib = 10;
+      while (calib <= roundup) {
+        calibs.push(calib);
+        calib = calib * 10;
+      }
+      return calibs;
+    };
+
+    function setYAxis() {
+
+      if (Globals.gY) {
+        Globals.gY.remove();
+      }
+
+      var svg = Globals.chartSVG.select('.chart-g');
+
+      var y_scale = Globals.config.axes.y.scale || 'linear';
+      Globals.yScale = INTERPOLATIONS[y_scale]()
+        .range([Globals.height, 0])
+        .domain([getMinY(), getMaxY()]);
+
+      Globals.yAxis = d3.axisLeft(Globals.yScale);
+
+      if (Globals.config.axes.y.scale === 'log') {
+        Globals.yAxis
+          .tickValues(getYLogticks())
+          .tickFormat(function(d) {
+            return '10' + formatPower(Math.round(Math.log(d) / Math.LN10));
+          });
+      }
+      Globals.gY = svg.append("g")
+        .attr("class", "axis y-axis")
+        .attr('fill', 'none')
+        .call(Globals.yAxis);
+    }
+
     function initChart(elem, data, config) {
 
-      console.log(config.axes.y);
-
       initGlobalVars();
+      Globals.initializing = true;
       Globals.data = data;
       Globals.config = config;
+      Globals.zooomBehavior = d3.zoom().on("zoom", zoomed);
 
       d3.select(elem).selectAll("*").remove();
 
       var width = Globals.width = elem.parentElement.offsetWidth - config.margin.left - config.margin.right;
       var height = Globals.height = elem.parentElement.offsetHeight - config.margin.top - config.margin.bottom;
 
-      // current supported scales
-      var scales = {
-        log: d3.scaleLog,
-        linear: d3.scaleLinear
-      };
-
       var x_scale = config.axes.x.scale || 'linear';
-      Globals.xScale = scales[x_scale]()
+      Globals.xScale = INTERPOLATIONS[x_scale]()
         .range([0, width]);
 
-      var y_scale = config.axes.y.scale || 'linear';
-      Globals.yScale = scales[y_scale]()
-        .range([height, 0]);
-
-      Globals.zooomBehavior = d3.zoom().on("zoom", zoomed);
 
       var chartSVG = Globals.chartSVG = d3.select(elem).append("svg")
         .attr("width", width + config.margin.left + config.margin.right)
@@ -251,10 +309,9 @@
 
       var svg = chartSVG.append("g")
         .attr("transform", "translate(" + config.margin.left + "," + config.margin.top + ")")
-        .attr('class', 'chart');
+        .attr('class', 'chart-g');
 
       Globals.xScale.domain([getMinX(), getMaxX()]);
-      Globals.yScale.domain([getMinY(), getMaxY()]);
 
       Globals.xAxis = d3.axisBottom(Globals.xScale);
       Globals.gX = svg.append("g")
@@ -262,25 +319,6 @@
         .attr('fill', 'none')
         .attr("transform", "translate(0," + (height) + ")")
         .call(Globals.xAxis);
-
-      Globals.yAxis = d3.axisLeft(Globals.yScale);
-
-      if (config.axes.y.scale === 'log') {
-        Globals.yAxis.ticks(10, function(d) {
-          var length = d.toString().length;
-          var dividend = '1';
-          for (var i = 1; i < length; i++) {
-            dividend = dividend + '0';
-          }
-          dividend = dividend * 1;
-          var significant_number = d / dividend;
-          return significant_number + 'x' + 10 + formatPower(Math.round(Math.log(d) / Math.LN10));
-        });
-      }
-      Globals.gY = svg.append("g")
-        .attr("class", "axis y-axis")
-        .attr('fill', 'none')
-        .call(Globals.yAxis);
 
       Globals.viewSVG = svg.append('svg')
         .attr('width', width)
@@ -296,10 +334,12 @@
         .attr('fill', 'transparent')
         .on('mousemove', circleFollowsMouse);
 
+      setYAxis();
       drawLines(config.series);
       makeCircle();
       Globals.activePath = null;
       Globals.zooomBehavior.scaleExtent([1, getScaleExtent()]);
+      Globals.initializing = false;
 
     }
 
@@ -377,14 +417,25 @@
     };
 
     this.updateSeries = function(series) {
-      if (!Globals.data || ! Globals.config) { return; }
-      Globals.config.series = series;
-      drawLines();
+      if (!Globals.initializing) {
+        Globals.config.series = series;
+        drawLines();
+      }
     };
 
-    this.updateData = function (data) {
-      Globals.data = data;
-      drawLines();
+    this.updateData = function(data) {
+      if (!Globals.initializing) {
+        Globals.data = data;
+        drawLines();
+      }
+    };
+
+    this.updateInterpolation = function(i) {
+      if (!Globals.initializing) {
+        Globals.config.axes.y.scale = i;
+        setYAxis();
+        drawLines();
+      }
     };
 
     this.getScaleExtent = function() {
