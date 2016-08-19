@@ -100,7 +100,8 @@ min_reliable_cyc = 0, # xqrm. default value 0 for 'Cy0'
         Cy0reg <- Cy0(object, plot = FALSE)
         # start: xqrm
         eff_idx <- (Cy0reg + shift - 1) * 100
-        if (eff_idx < 1) eff_idx <- 1
+        # if (eff_idx < 1) eff_idx <- 1
+        if (eff_idx < 1 || length(eff_idx) > 1) eff_idx <- 1
         maxEFF <- EFFseq[eff_idx]
         # end: xqrm
         # maxEFF <- EFFseq[(Cy0reg + shift - 1) * 100] # ori
