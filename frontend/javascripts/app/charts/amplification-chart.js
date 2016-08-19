@@ -14,7 +14,6 @@
 
     function initGlobalVars() {
       Globals = {
-        initializing: false,
         width: 0,
         height: 0,
         data: null,
@@ -287,7 +286,6 @@
     function initChart(elem, data, config) {
 
       initGlobalVars();
-      Globals.initializing = true;
       Globals.data = data;
       Globals.config = config;
       Globals.zooomBehavior = d3.zoom().on("zoom", zoomed);
@@ -339,7 +337,6 @@
       makeCircle();
       Globals.activePath = null;
       Globals.zooomBehavior.scaleExtent([1, getScaleExtent()]);
-      Globals.initializing = false;
 
     }
 
@@ -399,6 +396,13 @@
     this.onZoomAndPan = function(fn) {
       // fn will receive (transform, width, height)
       Globals.onZoomAndPan = fn;
+    };
+
+    this.getDimensions = function () {
+      return {
+        width: Globals.width,
+        height: Globals.height
+      };
     };
 
     this.getTransform = function() {
