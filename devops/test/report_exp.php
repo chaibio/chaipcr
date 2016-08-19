@@ -9,6 +9,9 @@ if($debug) echo "<br/>Is bulk is: $is_bulk<br/>And request is:" . $_REQUEST['isB
 
 $stamp = $_REQUEST['ts'];
 $deviceid = $_REQUEST['deviceid'];
+$ip = $_REQUEST['ip'];
+if(!$ip) $ip=' ';
+
 $c = $_REQUEST['c'];
 if(!$c) $c=-1;
 $msg="Test";
@@ -22,7 +25,7 @@ if($debug) printTime(90);
 
 $rec_index = 0;
 
-$query5 = "insert into $usertable (timest, deviceid, c, msg) VALUES ('$stamp', '$deviceid', '$c', '$msg' );";
+$query5 = "insert into $usertable (timest, deviceid, c, msg,ip) VALUES ('$stamp', '$deviceid', '$c', '$msg', '$ip' );";
 
 if($debug) echo "query5=$query5";
 
