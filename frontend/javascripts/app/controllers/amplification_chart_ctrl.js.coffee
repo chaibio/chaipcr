@@ -115,11 +115,12 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
           .catch (resp) ->
             console.log resp
-            return if $scope.retrying
             if resp.status is 500
-              $scope.error = 'Internal Server Error'
+              $scope.error = resp.statusText || 'Unknown error'
+              # $scope.error = true1\
               console.log '500 error!!'
             $scope.fetching = false
+            return if $scope.retrying
             retry()
 
       fetchFluorescenceData()

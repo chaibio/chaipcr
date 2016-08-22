@@ -99,7 +99,7 @@
               <p ng-bind="error"></p>
               Retrying in {{retry}} seconds<ellipsis-animated></ellipsis-animated>
             </div>
-            <div class="loading-blue-container" ng-show="(fetching || retrying) && !hasData && !error">
+            <div class="loading-blue-container" ng-show="(fetching || retrying) && !error">
             <!-- <div class="loading-blue-container" ng-show="true"> -->
               <div class="loading-blue"></div>
               <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
