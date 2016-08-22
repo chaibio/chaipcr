@@ -53,33 +53,36 @@
      <div class="home-page-exp-container" ng-show="experiments !== null && experiments.length !== 0">
        <div  ng-repeat="exp in experiments | orderBy:'experiment.created_at':true" class="ovtrunc home-page-exp-tile">
          <div ng-mouseenter="mouseOver = true" class="home-page-tile-text ovtrunc" ng-mouseleave="mouseOver = false" ng-class="{'home-page-tile-text': true, 'home-page-tile-text-hover': mouseOver && !deleteMode}" ng-click="HomeCtrl.openExperiment(exp.experiment)">
-          
+
 		  <!--<a ng-if="!exp.experiment.started_at" href="/#/experiments/{{exp.experiment.id}}/run-experiment?chart=amplification">-->
-			<a class="experiment-links" ng-show="!exp.experiment.started_at" href="/#/edit-protocol/{{exp.experiment.id}}">
+          <a class="experiment-links" ng-show="!exp.experiment.started_at" href="/#/edit-protocol/{{exp.experiment.id}}">
              <div class="home-page-exp-name B1B">
                {{exp.experiment.name}}
              </div>
-             <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at">Created {{exp.experiment.created_at | amCalendar}}, #{{exp.experiment.id}}</span>
-             <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at">Run {{exp.experiment.started_at | amCalendar}}, #{{exp.experiment.id}}</span> 
+             <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at && exp.experiment.time_valid">Created {{exp.experiment.created_at | amCalendar}}, #{{exp.experiment.id}}</span>
+             <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at && !exp.experiment.time_valid">Created , #{{exp.experiment.id}}</span>
+             <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && exp.experiment.time_valid">Run {{exp.experiment.started_at | amCalendar}}, #{{exp.experiment.id}}</span>
+             <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && !exp.experiment.time_valid">Run Previously, #{{exp.experiment.id}}</span>
              <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && !exp.experiment.completed_at">IN PROGRESS&nbsp;<ellipsis-animated><ellipsis-animated/></span>
-			 
-		 </a>
-		 
-		<a class="experiment-links" ng-show="exp.experiment.started_at" href="/#/experiments/{{exp.experiment.id}}/run-experiment?chart=amplification">
+
+          </a>
+
+          <a class="experiment-links" ng-show="exp.experiment.started_at" href="/#/experiments/{{exp.experiment.id}}/run-experiment?chart=amplification">
              <div class="home-page-exp-name B1B">
                {{exp.experiment.name}}
              </div>
-             <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at">Created {{exp.experiment.created_at | amCalendar}}, #{{exp.experiment.id}}</span>
-             <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at">Run {{exp.experiment.started_at | amCalendar}}, #{{exp.experiment.id}}</span> 
+             <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at && exp.experiment.time_valid">Created {{exp.experiment.created_at | amCalendar}}, #{{exp.experiment.id}}</span>
+             <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at && !exp.experiment.time_valid">Created , #{{exp.experiment.id}}</span>
+             <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && exp.experiment.time_valid">Run {{exp.experiment.started_at | amCalendar}}, #{{exp.experiment.id}}</span>
+             <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && !exp.experiment.time_valid">Run Previously, #{{exp.experiment.id}}</span>
              <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && !exp.experiment.completed_at">IN PROGRESS&nbsp;<ellipsis-animated><ellipsis-animated/></span>
-			 
-		 </a>
+          </a>
 
          </div>
-		 
+
          <delete-mode mode="deleteMode" experiment="exp.experiment" delete-exp="HomeCtrl.deleteExperiment(exp)"></delete-mode>
        </div>
-	   
+
      </div>
    </div>
 

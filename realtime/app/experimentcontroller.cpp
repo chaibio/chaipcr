@@ -176,8 +176,6 @@ void ExperimentController::complete()
 
         _dbControl->completeExperiment(_experiment);
     }
-
-    stopLogging();
 }
 
 void ExperimentController::stop()
@@ -226,9 +224,10 @@ void ExperimentController::stop()
         _experiment = Experiment();
     }
 
+    stopLogging();
+
     if (state != CompleteMachineState)
     {
-        stopLogging();
         _holdStepTimer->stop();
         _meltCurveTimer->stop();
     }

@@ -419,10 +419,17 @@ bool getFileChecksum(const std::string &filePath, int eventFd, std::string &chec
     {
         file.close();
 
-        std::stringstream stream;
+        std::stringstream stream, outStream;
         stream << "sha256sum " << filePath;
 
-        return Util::watchProcess(stream.str(), eventFd, [&checksum](const char *buffer, std::size_t size){ checksum.append(buffer, size); });
+        if (Util::watchProcess(stream.str(), eventFd, [&outStream](const char *buffer, std::size_t size){ outStream.write(buffer, size); }))
+        {
+            outStream >> checksum;
+
+            return true;
+        }
+
+        return false;
     }
     else
         return true;

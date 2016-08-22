@@ -499,6 +499,10 @@ get_cq_eff <- function(
         } else if (cq > cpD1 && cp == 'Cy0') { # fluo < 0 at `cpD1`, Cy0 will be invalid as Cq
             adj_reasons[[i]] <- 'cq > cpD1 && cp == Cy0'
         
+        } else if (is.na(D1max)) {
+            adj_reasons[[i]] <- 'is.na(D1max)'
+        } else if (is.na(D2max)) {
+            adj_reasons[[i]] <- 'is.na(D2max)'
         } else if (D1max < min_D1max) {
             adj_reasons[[i]] <- sprintf('D1max < min_D1max. D1max: %f. min_D1max: %f', D1max, min_D1max)
         } else if (D2max < min_D2max) {

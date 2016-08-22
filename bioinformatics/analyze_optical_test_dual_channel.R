@@ -78,7 +78,7 @@ analyze_optical_test_dual_channel <- function(
     bool_list[['water']] <- do.call(rbind, lapply(
         1:num_channels, 
         function(channel) {
-            fluos_wc <- fluo_list[['water']][channel,] - fluo_list[['baseline']][channel,]
+            fluos_wc <- fluo_list[['water']][channel,] # - fluo_list[['baseline']][channel,]
             fluos_wc < WATER_MAX[channel] & fluos_wc > WATER_MIN[channel]
         }
     ))

@@ -79,7 +79,7 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     };
 
     $scope.configureAsStatus = function(status) {
-      console.log("dgegertere", status);
+
       switch (status) {
         case "not_connected":
           $scope.buttonValue = "CONNECT";
@@ -101,7 +101,7 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
 
     $scope.connectEthernet = function() {
       NetworkSettingsService.connectToEthernet($scope.editEthernetData).then(function(result) {
-        console.log("wow", result);
+        console.log("ethernet connected", result);
       }, function(err) {
         console.log(err);
       });

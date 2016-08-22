@@ -108,7 +108,7 @@
               $state.go('step-6');
               return;
             }
-          }
+          });
         }
 
         // if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle' || $state.current.name === 'step-5')) {

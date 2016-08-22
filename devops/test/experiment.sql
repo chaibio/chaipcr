@@ -4,7 +4,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 68.178.143.41
--- Generation Time: Aug 04, 2016 at 08:08 AM
+-- Generation Time: Aug 18, 2016 at 06:26 PM
 -- Server version: 5.5.43
 -- PHP Version: 5.1.6
 
@@ -26,12 +26,13 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- Table structure for table `records`
 --
 
-CREATE TABLE `records` (
+CREATE TABLE IF NOT EXISTS `records` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ip',
   `timestmp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `c` varchar(200) NOT NULL,
   `deviceid` varchar(60) NOT NULL,
   `msg` varchar(240) NOT NULL,
   `timest` varchar(50) NOT NULL,
+  `ip` varchar(150) NOT NULL DEFAULT 'N/A',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=476 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1490 ;

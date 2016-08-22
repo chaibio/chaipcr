@@ -89,20 +89,19 @@
   <!-- upload form -->
   <div ng-show="content === 'upload_form'" class="upload-form">
     <div class="text-right">
-      <a class="close" ng-click="$dismiss()">&times;</a>
+      <a class="close" ng-click="close()">&times;</a>
     </div>
-    <h1 class="text-center">UPLOAD DISK IMAGE</h1>
+    <h1 class="text-center">UPLOAD SOFTWARE IMAGE</h1>
     <p class="text-center text-gray">
-      Files are roughly 1.5GB and may take time to upload.
+      Files are roughly 1GB and may take time to upload.
     </p>
     <p>
       <b>
-        After updating, your hardware will reboot. This process takes about 30 minutes and the screen may be blank throughout. Please do not power cycle the hardware during this process.
-      </b>
+        During the update process, your device will reboot. The screen will be blank for approximately 30 minutes as the device updates. Do not power off your device during this process. Once the update is complete, the screen will power on.</b>
     </p>
-    <p class="text-center">
+    <!--<p class="text-center">
       <a href="#" class="text-blue"><b>Need help?</b></a>
-    </p>
+    </p> -->
     <div class="buttons-container">
       <div ng-show="uploading">
         <div class="progressbar-container">
@@ -122,13 +121,20 @@
             {{upload_error}}
           </span>
         </div>
-        <button class="button" ngf-select="imageSelected($file)">
+        <button class="button" ng-show="!file" ngf-select="imageSelected($file)">
           BROWSE FILES
         </button>
+        <button class="button" ng-show="file" ngf-select="imageSelected($file)">
+          SELECT ALTERNATE IMAGE
+        </button>
+				<br>
+				<button class="button" ng-class="{'button-green': (file), 'disabled': (!file || uploading)}" ng-click="doUpload()">
+					UPLOAD IMAGE
+				</button>
       </div>
       <div>
-        <button class="button" ng-class="{'button-green': (file || uploading), 'disabled': !file}" ng-click="doUpload()">
-          INSTALL NOW
+        <button class="button" ng-show="uploading" ng-class="{'button-green': (file), 'disabled': (!file || uploading)}" ng-click="doUpload()">
+          UPLOADING<ellipsis-animated><ellipsis-animated/>
         </button>
       </div>
     </div>
@@ -137,7 +143,7 @@
   <!-- Update complete -->
   <div ng-show="content === 'update_complete'" class="text-center">
     <h1>Upgrade complete!</h1>
-    <button class="button button-green" ng-click="$dismiss()">
+    <button class="button button-green" ng-click="done()">
       DONE
     </button>
   </div>

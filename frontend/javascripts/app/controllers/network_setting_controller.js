@@ -31,51 +31,71 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     $scope.currentWifiSettings = {}; // Current active wifi network [connected to]
     $scope.ethernetSettings = {}; // Ethernet settings
     $scope.wirelessError = false;  // Incase no wifi adapter is present in the machine
-    $scope.wifiNetworkStatus = null; // If network is on/off
-    $scope.userSettings = $.jStorage.get('userNetworkSettings');
 
+    $scope.userSettings = $.jStorage.get('userNetworkSettings');
+    $scope.wifiNetworkStatus = $scope.userSettings.wifiSwitchOn; // If network is on/off
+
+    // Initiate wifi network service;
     NetworkSettingsService.getSettings();
 
-    $scope.$on('new_wifi_result', function() {
-      $scope.wifiNetworkStatus = true;
+    /**
+      'new_wifi_result' this event is fired up when new wifi status is sent from the
+      server.
+    */
+    $rootScope.$on('new_wifi_result', function() {
       $scope.wirelessError = false;
+      $scope.wifiNetworkStatus = $scope.userSettings.wifiSwitchOn;
       $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork;
     });
-
+    /**
+      'ethernet_detected' this event is fired up when ethernet is detected in the machine.
+    */
     $scope.$on('ethernet_detected', function() {
       $scope.ethernetSettings = NetworkSettingsService.connectedEthernet;
     });
-
+    /**
+      'wifi_adapter_error' this event is fired up when wifi adapter is not present or having some problem.
+    */
     $rootScope.$on('wifi_adapter_error', function() {
       $scope.whenNoWifiAdapter();
     });
-
-    $scope.whenNoWifiAdapter = function() {
-
-      $scope.wifiNetworkStatus = false;
-      $scope.wirelessError = true;
-      $scope.wirelessErrorData = NetworkSettingsService.wirelessErrorData;
-      $scope.wifiNetworks = {};
-      $scope.currentWifiSettings = {};
-    };
-
-    $scope.$watch('wifiNetworkStatus', function(val) {
+    /**
+      'wifiNetworkStatus' This watch is executed when wifiNetworkStatus is changed, This one is changed when
+      we toggle wifi on off switch. And to be executed switchStatus shouldbe inverse of the $scope.userSettings.wifiSwitchOn.
+      This is enforced so that we dont have to call turnOnWifi() or turnOffWifi() at the page load.
+    */
+    $scope.$watch('wifiNetworkStatus', function(switchStatus) {
 
       if($scope.wirelessError === false) {
-        if(val) {
+        if(switchStatus === true && $scope.userSettings.wifiSwitchOn === false) {
           $scope.turnOnWifi();
-          return;
+        } else if(switchStatus === false && $scope.userSettings.wifiSwitchOn === true) {
+          $scope.turnOffWifi();
         }
-
-        $scope.turnOffWifi();
       }
     });
 
+    /**
+      This function takes care of the things when there is no wifi adapter or wifi adapter is having some error.
+    */
+    $scope.whenNoWifiAdapter = function() {
+
+      $scope.wirelessError = true;
+      $scope.wifiNetworkStatus = false;
+      $scope.wirelessErrorData = NetworkSettingsService.wirelessErrorData;
+      $scope.wifiNetworks = $scope.currentWifiSettings = {};
+
+    };
+
+    /**
+      This methode turns off wifi, It empties wifiNetworks and currentWifiSettings, So that immediately
+      interface changes. It also reloads userSettings from localstorage.
+    */
     $scope.turnOffWifi = function() {
-      //Turns off wifi
+      
       var stopped = NetworkSettingsService.stop();
+      $scope.wifiNetworks = $scope.currentWifiSettings = {};
       stopped.then(function(result) {
-        $scope.wifiNetworks = $scope.currentWifiSettings = {};
         $scope.userSettings = $.jStorage.get('userNetworkSettings');
         $state.go('settings.networkmanagement');
       }, function(err) {
@@ -83,17 +103,25 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       });
     };
 
+    /**
+      This method starts the wifi, Then calls init() and brings the network data and reloads userSettings
+      from localstorage
+    */
     $scope.turnOnWifi = function() {
-      //Turns on wifi
+
       var started = NetworkSettingsService.restart();
       started.then(function(result) {
         $scope.userSettings = $.jStorage.get('userNetworkSettings');
         $scope.init();
       }, function(err) {
+        NetworkSettingsService.processOnError(err);
         console.log("Could not connect wifi", err);
       });
     };
 
+    /**
+      This method looks for all the wifi networks around the vicinity and add them to wifiNetworks
+    */
     $scope.findWifiNetworks = function() {
 
       if(! NetworkSettingsService.wirelessError && $scope.userSettings.wifiSwitchOn) {
@@ -106,8 +134,12 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       }
     };
 
+    /**
+      This part of the code look at the wifi networks around at every 10 second, There could be changes in the network.
+      Like change in signal stregth, some new networks or some networks may not be there.
+    */
     var stop = $interval(function() {
-      // Find all the available wifi networks in the vicinity
+
       if($state.is('settings.networkmanagement')) {
         $scope.findWifiNetworks();
       } else {
@@ -116,22 +148,12 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       }
     }, 10000);
 
-    $scope.getSettings = function() {
-      // We may need this method when we refresh right on this page.
-      if($scope.wifiNetworkStatus === null) {
-        NetworkSettingsService.getInitialStatus()
-        .then(function(result) {
-          $scope.wifiNetworkStatus = true;
-          $scope.currentNetwork = result.data;
-        }, function(err) {
-          $scope.wifiNetworkStatus = false;
-        });
-      }
-    };
-
+    /**
+      Initiate the primary things like ethernet status, wifiNetworkStatus and all the wifi networks around the room.
+    */
     $scope.init = function() {
-
-      NetworkSettingsService.getEtherNetStatus();
+      console.log("Initing");
+      NetworkSettingsService.getEthernetStatus();
 
       if(NetworkSettingsService.wirelessError) {
         $scope.whenNoWifiAdapter();
@@ -139,7 +161,6 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       }
 
       if($scope.userSettings.wifiSwitchOn) {
-        $scope.getSettings();
         $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork;
         $scope.findWifiNetworks();
       }

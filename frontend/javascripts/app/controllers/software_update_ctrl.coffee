@@ -56,6 +56,14 @@ window.App.controller 'SoftwareUpdateCtrl', [
       $window.open($scope.new_update.image_http_url)
       $scope.content = 'upload_form'
 
+    $scope.done = ->
+      $window.location.reload()
+
+    $scope.close = ->
+      if $scope.uploading
+        $scope.cancelUpload()
+      $uibModalInstance.close()
+
     $scope.imageSelected = (file) ->
       return if !file
       _file = file
@@ -71,6 +79,7 @@ window.App.controller 'SoftwareUpdateCtrl', [
 
     $scope.doUpload = ->
       return if !$scope.file
+      return if $scope.uploading
       errorCB = (err) ->
         $scope.upload_error = err?.status?.error || 'An error occured while uploading software image. Please try again.'
         $scope.uploading = false
