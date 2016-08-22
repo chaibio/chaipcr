@@ -27,7 +27,7 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
       templateUrl: 'app/views/directives/gather-data-toggle.html',
 
       scope: {
-        data: '=wirelessStatus',
+        wirelessStatus: '=wirelessStatus',
         noDevice: '=noWifiAdapter'
       },
 
@@ -37,11 +37,12 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
         // while one change is already in progress;
         scope.inProgress = false;
 
-        scope.$watch("data", function(val, oldVal) {
-          //scope.configureSwitch(val);
-          // here we need some re-work , we need dont have to look for inprogress for the very first time.
-          // but after that we need to look for inProgress.
-          // may be remove this watch right after we configure the switch 
+        var unregisterWatch = scope.$watch("wirelessStatus", function(stat, oldStat) {
+          if(stat) {
+            scope.configureSwitch(stat);
+            scope.inProgress = false; // We explicitly say it here because we dont have to look for inprogress for the very first time.
+            unregisterWatch();
+          }
         });
 
         scope.$watch('noDevice', function(device, oldVal) {
@@ -64,7 +65,7 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
 
         scope.configureSwitch = function(switchState) {
 
-          if(scope.noDevice === false /*&& scope.inProgress === false*/) {
+          if(scope.noDevice === false && scope.inProgress === false) {
             if(switchState === true && scope.inProgress === false) {
               scope.changeState("#8dc63f", "11");
               scope.inProgress = true;
@@ -94,20 +95,16 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
             $(this).css("left", "11px");
             val = true;
           }
-          if(val !== scope.data) {
+          if(val !== scope.wirelessStatus) {
             scope.sendData();
           }
         };
 
         scope.sendData = function() {
-          console.log(scope.inProgress);
+
           if(scope.noDevice === false && scope.inProgress === false) {
-            if(scope.data) {
-              scope.data = !scope.data;
-            } else {
-              scope.data = true;
-            }
-            scope.configureSwitch(scope.data);
+            scope.wirelessStatus = !scope.wirelessStatus;
+            scope.configureSwitch(scope.wirelessStatus);
           }
         };
 
