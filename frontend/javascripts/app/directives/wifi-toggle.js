@@ -45,9 +45,15 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
           }
         });
 
-        scope.$watch('noDevice', function(device, oldVal) {
-          if(device) {
+        scope.$watch('noDevice', function(deviceNotFound, oldVal) {
+          if(deviceNotFound) {
+            scope.changeState("#bbbbbb", "1");
             scope.dragElem.draggable('disable');
+          } else {
+            scope.dragElem.draggable('enable');
+            scope.inProgress = false;
+            scope.configureSwitch(scope.wirelessStatus);
+            scope.inProgress = false; // Restore the inProgress state, configureSwitch changes it to true.
           }
         });
 
@@ -59,17 +65,21 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
           scope.inProgress = false;
         });
 
+        $rootScope.$on('wifi_adapter_reconnected', function(data, wifiSwitch) {
+
+        });
+
         scope.clickHandler = function() {
           scope.sendData();
         };
 
         scope.configureSwitch = function(switchState) {
-
           if(scope.noDevice === false && scope.inProgress === false) {
-            if(switchState === true && scope.inProgress === false) {
+
+            if(switchState === true /*&& scope.inProgress === false*/) {
               scope.changeState("#8dc63f", "11");
               scope.inProgress = true;
-            } else if(switchState === false && scope.inProgress === false) {
+            } else if(switchState === false /*&& scope.inProgress === false*/) {
               scope.changeState("#bbbbbb", "1");
               scope.inProgress = true;
             }

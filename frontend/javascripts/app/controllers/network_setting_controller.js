@@ -43,6 +43,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       server.
     */
     $rootScope.$on('new_wifi_result', function() {
+
       $scope.wirelessError = false;
       $scope.wifiNetworkStatus = $scope.userSettings.wifiSwitchOn;
       $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork;
@@ -75,6 +76,12 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       }
     });
 
+    $rootScope.$on('wifi_adapter_reconnected', function() {
+      $scope.wifiNetworkStatus = true;
+      $scope.wirelessError = false;
+      $scope.init();
+    });
+
     /**
       This function takes care of the things when there is no wifi adapter or wifi adapter is having some error.
     */
@@ -92,7 +99,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       interface changes. It also reloads userSettings from localstorage.
     */
     $scope.turnOffWifi = function() {
-      
+
       var stopped = NetworkSettingsService.stop();
       $scope.wifiNetworks = $scope.currentWifiSettings = {};
       stopped.then(function(result) {

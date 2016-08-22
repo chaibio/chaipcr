@@ -74,7 +74,11 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
 
     this.processData = function(wlanOutput) {
       console.log("processing");
-      this.wirelessError = false;
+      if(this.wirelessError && wlanOutput.data.settings) {
+        console.log("No more error");
+        this.wirelessError = false;
+        $rootScope.$broadcast("wifi_adapter_reconnected", this.userSettings);
+      }
 
       if(wlanOutput.data.settings) {
 
