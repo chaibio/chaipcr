@@ -37,14 +37,13 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.chartConfig = helper.chartConfig($scope.is_dual_channel)
       $scope.chartConfig.axes.x.ticks = helper.Xticks $stateParams.max_cycle || 1
       $scope.chartConfig.axes.x.max = $stateParams.max_cycle || 1
-      $scope.data = helper.paddData()
+      $scope.amplification_data = helper.paddData()
       $scope.COLORS = helper.COLORS
-      $scope.amplification_data = null
       max_calibration = null
       AMPLI_DATA_CACHE = null
       retryInterval = null
       $scope.baseline_subtraction = true
-      $scope.curve_type = 'log'
+      $scope.curve_type = 'linear'
       $scope.color_by = 'well'
       $scope.retrying = false
       $scope.retry = 0
@@ -96,7 +95,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             if resp.status is 200 and resp.data?.partial
               $scope.hasData = true
               $scope.amplification_data = helper.paddData()
-              delete $scope.chartConfig.axes.x.min
+              # delete $scope.chartConfig.axes.x.min
             if resp.data.amplification_data and resp.data.amplification_data?.length > 1
               $scope.chartConfig.axes.x.min = 1
               $scope.hasData = true
@@ -115,9 +114,11 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               retry()
 
           .catch (resp) ->
+            console.log resp
             return if $scope.retrying
             if resp.status is 500
               $scope.error = 'Internal Server Error'
+              console.log '500 error!!'
             $scope.fetching = false
             retry()
 
@@ -130,30 +131,15 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.wellButtons["well_#{well_i}"].ct = [cts[0][2]]
           $scope.wellButtons["well_#{well_i}"].ct.push cts[1][2] if cts[1]
 
-      updateDragScrollWidth = ->
-        return if $scope.RunExperimentCtrl.chart isnt 'amplification'
-        svg = drag_scroll.find('svg')
-        return if svg.length is 0
-        drag_scroll_width = svg.width() - svg.find('g.y-axis').first()[0].getBBox().width*2
-        num_cycle_to_show = $scope.maxCycle - $scope.ampli_zoom
-        width_per_cycle = drag_scroll_width/num_cycle_to_show
-        w = width_per_cycle * $scope.maxCycle
-        drag_scroll.attr 'width', Math.round w
-
       updateChartData = (data) ->
-        return if !data
-        subtraction_type = if $scope.baseline_subtraction then 'baseline' else 'background'
-        $scope.chartConfig.axes.x.min = data.min_cycle
-        $scope.chartConfig.axes.x.max = data.max_cycle
-        $scope.chartConfig.axes.x.ticks = helper.Xticks data.min_cycle, data.max_cycle
-        if max_calibration isnt null
-          $scope.chartConfig.axes.y.max = if $scope.baseline_subtraction then max_calibration.baseline else max_calibration.background
 
-        # $scope.chartConfig.axes.y.scale = $scope.curve_type
-        # $scope.data = data.amplification_data
-        # $timeout ->
-        #   $scope.$broadcast '$reload:n3:charts'
-        # , 500
+        # return if !data
+        # subtraction_type = if $scope.baseline_subtraction then 'baseline' else 'background'
+        # $scope.chartConfig.axes.x.min = data.min_cycle
+        # $scope.chartConfig.axes.x.max = data.max_cycle
+        # $scope.chartConfig.axes.x.ticks = helper.Xticks data.min_cycle, data.max_cycle
+        # if max_calibration isnt null
+        #   $scope.chartConfig.axes.y.max = if $scope.baseline_subtraction then max_calibration.baseline else max_calibration.background
 
       updateSeries = (buttons) ->
         buttons = buttons || $scope.wellButtons || {}
@@ -175,19 +161,19 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                 color: if ($scope.color_by is 'well') then buttons["well_#{i}"].color else (if ch_i is 1 then '#00AEEF' else '#8FC742')
                 interpolation: {mode: 'cardinal', tension: 0.7}
 
-      updateScrollBarWidth = ->
-        return if !angular.isNumber($scope.ampli_zoom) or !AMPLI_DATA_CACHE or !$scope.maxCycle
-        num_cycle_to_show = $scope.maxCycle - $scope.ampli_zoom
-        wRatio = num_cycle_to_show / $scope.maxCycle
-        $scope.scrollbar_width = wRatio;
-        # scrollbar_width = $('#ampli-scrollbar').width()
-        # new_width = scrollbar_width * wRatio
-        # new_width = if new_width > 10 then new_width else 10
-        # $('#ampli-scrollbar .scrollbar').css(width: new_width + 'px')
-        # $rootScope.$broadcast 'scrollbar:width:changed', 'ampli-scrollbar'
+      # updateScrollBarWidth = ->
+      #   return if !angular.isNumber($scope.ampli_zoom) or !AMPLI_DATA_CACHE or !$scope.maxCycle
+      #   num_cycle_to_show = $scope.maxCycle - $scope.ampli_zoom
+      #   wRatio = num_cycle_to_show / $scope.maxCycle
+      #   $scope.scrollbar_width = wRatio;
+      #   # scrollbar_width = $('#ampli-scrollbar').width()
+      #   # new_width = scrollbar_width * wRatio
+      #   # new_width = if new_width > 10 then new_width else 10
+      #   # $('#ampli-scrollbar .scrollbar').css(width: new_width + 'px')
+      #   # $rootScope.$broadcast 'scrollbar:width:changed', 'ampli-scrollbar'
 
-        # $scope.amplification_data = helper.updateScrollBarWidth AMPLI_DATA_CACHE.amplification_data, num_cycle_to_show, $scope.ampli_scroll, $scope.maxCycle
-        updateChartData($scope.amplification_data)
+      #   # $scope.amplification_data = helper.updateScrollBarWidth AMPLI_DATA_CACHE.amplification_data, num_cycle_to_show, $scope.ampli_scroll, $scope.maxCycle
+      #   updateChartData($scope.amplification_data)
 
       $scope.onZoom = (transform, w, h, scale_extent) ->
         # console.log transform, w, h, scale_extent
@@ -200,7 +186,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           width: 0.2
         }
 
-      $scope.$watchCollection 'ampli_scroll', (scroll_state) ->
+      # $scope.$watchCollection 'ampli_scroll', (scroll_state) ->
 
 
       $scope.$watch 'baseline_subtraction', (val) ->
@@ -227,7 +213,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         #   $scope.chartConfig.axes.y.ticks = 10
         #   delete $scope.chartConfig.axes.y.tickFormat
 
-      $scope.$watchCollection 'wellButtons', updateSeries
+      $scope.$watchCollection 'wellButtons', ->
+        updateSeries()
 
       $scope.$watch ->
         $scope.RunExperimentCtrl.chart
@@ -235,10 +222,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         if chart is 'amplification'
           if !hasInit
             fetchFluorescenceData()
-
-          $timeout ->
-            $scope.$broadcast '$reload:n3:charts'
-          , 1000
 
       $scope.$on '$destroy', ->
         $interval.cancel(retryInterval) if retryInterval

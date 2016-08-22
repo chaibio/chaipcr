@@ -18,7 +18,7 @@ angular.module("canvasApp").directive 'amplificationChart', [
 
         initChart = ->
           return if !$scope.data or !$scope.config
-          chart = new $window.ChaiBioCharts.AmplificationChart(elem[0], $scope.data, $scope.config)
+          chart = new $window.ChaiBioCharts.BaseChart(elem[0], $scope.data, $scope.config)
           chart.onZoomAndPan($scope.onZoom())
           d = chart.getDimensions()
           $scope.onZoom()(chart.getTransform(), d.width, d.height, chart.getScaleExtent())
@@ -30,7 +30,6 @@ angular.module("canvasApp").directive 'amplificationChart', [
             chart.updateData(data)
 
         $scope.$watch 'config.axes.y.scale', (i) ->
-          console.log 'config.axes.y change'
           return if !chart
           chart.updateInterpolation(i)
 
@@ -42,7 +41,6 @@ angular.module("canvasApp").directive 'amplificationChart', [
 
         $scope.$watchCollection 'config.series', (series) ->
           return if !chart
-          console.log 'series change'
           chart.updateSeries(series)
 
         $scope.$watch 'scroll', (scroll) ->

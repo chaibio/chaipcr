@@ -2,7 +2,7 @@
 
   "use strict";
 
-  function AmplificationChart(elem, data, config) {
+  function BaseChart(elem, data, config) {
 
     // Global vars
     var Globals = null;
@@ -228,9 +228,10 @@
         });
         ys.push(max_dataset_y);
       });
-      return d3.max(ys, function(d) {
+      var max_y = d3.max(ys, function(d) {
         return d;
       });
+      return max_y || 0;
     }
 
     function getScaleExtent() {
@@ -238,7 +239,7 @@
     }
 
     function getYLogticks() {
-      var num = getMaxY();
+      var num = getMaxY() || 0;
       var calib, calibs, i, j, num_length, ref, roundup;
       num_length = num.toString().length;
       roundup = '1';
@@ -263,10 +264,13 @@
 
       var svg = Globals.chartSVG.select('.chart-g');
 
+      Globals.config.axes.y.min = Globals.config.axes.y.min || getMinY() || 0;
+      Globals.config.axes.y.max = Globals.config.axes.y.max || getMaxY() || 1;
+
       var y_scale = Globals.config.axes.y.scale || 'linear';
       Globals.yScale = INTERPOLATIONS[y_scale]()
         .range([Globals.height, 0])
-        .domain([getMinY(), getMaxY()]);
+        .domain([Globals.config.axes.y.min, Globals.config.axes.y.max]);
 
       Globals.yAxis = d3.axisLeft(Globals.yScale);
 
@@ -283,7 +287,38 @@
         .call(Globals.yAxis);
     }
 
+    function setXAxis() {
+
+      if (Globals.gX) {
+        Globals.gX.remove();
+      }
+
+      var intpol = config.axes.x.scale || 'linear';
+      var svg = Globals.chartSVG.select('.chart-g');
+
+      Globals.xScale = INTERPOLATIONS[intpol]()
+        .range([0, Globals.width]);
+
+      Globals.config.axes.x.min = Globals.config.axes.x.min || getMinX() || 0;
+      Globals.config.axes.x.max = Globals.config.axes.x.max || getMaxX() || 1;
+      Globals.xScale.domain([Globals.config.axes.x.min, Globals.config.axes.x.max]);
+
+      Globals.xAxis = d3.axisBottom(Globals.xScale);
+      if (Globals.config.axes.x.ticks) {
+        // Globals.xAxis.forceX(config.axes.x.min, config.axes.x.max);
+        Globals.xAxis.tickValues = Globals.config.axes.x.ticks;
+      }
+      Globals.gX = svg.append("g")
+        .attr("class", "axis x-axis")
+        .attr('fill', 'none')
+        .attr("transform", "translate(0," + (Globals.height) + ")")
+        .call(Globals.xAxis);
+    }
+
     function initChart(elem, data, config) {
+
+      console.log(data);
+      console.log(config);
 
       initGlobalVars();
       Globals.data = data;
@@ -295,9 +330,6 @@
       var width = Globals.width = elem.parentElement.offsetWidth - config.margin.left - config.margin.right;
       var height = Globals.height = elem.parentElement.offsetHeight - config.margin.top - config.margin.bottom;
 
-      var x_scale = config.axes.x.scale || 'linear';
-      Globals.xScale = INTERPOLATIONS[x_scale]()
-        .range([0, width]);
 
 
       var chartSVG = Globals.chartSVG = d3.select(elem).append("svg")
@@ -309,14 +341,6 @@
         .attr("transform", "translate(" + config.margin.left + "," + config.margin.top + ")")
         .attr('class', 'chart-g');
 
-      Globals.xScale.domain([getMinX(), getMaxX()]);
-
-      Globals.xAxis = d3.axisBottom(Globals.xScale);
-      Globals.gX = svg.append("g")
-        .attr("class", "axis x-axis")
-        .attr('fill', 'none')
-        .attr("transform", "translate(0," + (height) + ")")
-        .call(Globals.xAxis);
 
       Globals.viewSVG = svg.append('svg')
         .attr('width', width)
@@ -333,6 +357,7 @@
         .on('mousemove', circleFollowsMouse);
 
       setYAxis();
+      setXAxis();
       drawLines(config.series);
       makeCircle();
       Globals.activePath = null;
@@ -398,7 +423,7 @@
       Globals.onZoomAndPan = fn;
     };
 
-    this.getDimensions = function () {
+    this.getDimensions = function() {
       return {
         width: Globals.width,
         height: Globals.height
@@ -451,6 +476,6 @@
   }
 
   window.ChaiBioCharts = window.ChaiBioCharts || {};
-  window.ChaiBioCharts.AmplificationChart = AmplificationChart;
+  window.ChaiBioCharts.BaseChart = BaseChart;
 
 })();
