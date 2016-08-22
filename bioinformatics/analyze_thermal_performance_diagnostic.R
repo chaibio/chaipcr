@@ -43,7 +43,7 @@ analyze_thermal_performance_diagnostic <- function(db_usr, db_pwd, db_host, db_p
     apprxRampDownEndTime <- min(temperatureData[(temperatureData$heat_block_zone_average_temp<(lowTemperature+deltaTSetPoint)) & (temperatureData$elapsed_time>apprxRampDownStartTime),'elapsed_time'])
     #calculate the average ramp rate up and down in degrees C per second
     avgHeatBlockRampUpRate <- ((highTemperature-lowTemperature-2*deltaTSetPoint)*1000)/(apprxRampUpEndTime-apprxRampUpStartTime)
-    avgHeatBlockRampDownRate <- ((lowTemperature-highTemperature-2*deltaTSetPoint)*1000)/(apprxRampDownEndTime-apprxRampDownStartTime)
+    avgHeatBlockRampDownRate <- ((lowTemperature-highTemperature+2*deltaTSetPoint)*1000)/(apprxRampDownEndTime-apprxRampDownStartTime)
 
     #calculate maximum temperature difference between heat block zones during ramp up and down
     maxDeltaTRampUp <- max(abs(temperatureData[(temperatureData$elapsed_time>apprxRampUpStartTime) & (temperatureData$elapsed_time<apprxRampUpEndTime),'heat_block_zone_1_temp']-temperatureData[(temperatureData$elapsed_time>apprxRampUpStartTime) & (temperatureData$elapsed_time<apprxRampUpEndTime),'heat_block_zone_2_temp']))
