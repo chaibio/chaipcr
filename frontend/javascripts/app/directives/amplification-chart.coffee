@@ -1,7 +1,8 @@
 
 angular.module("canvasApp").directive 'amplificationChart', [
   '$window'
-  ($window) ->
+  '$timeout'
+  ($window, $timeout) ->
     return {
       restrict: 'EA'
       replace: true
@@ -25,7 +26,9 @@ angular.module("canvasApp").directive 'amplificationChart', [
 
         $scope.$watchCollection 'data', (data) ->
           if !chart
-            initChart()
+            $timeout ->
+              initChart()
+            , 500
           else
             chart.updateData(data)
 
