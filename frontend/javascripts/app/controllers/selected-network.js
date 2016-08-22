@@ -44,7 +44,9 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
 
       if(NetworkSettingsService.connectedWifiNetwork.state.status === "connected") {
         $scope.statusMessage = "";
-        $state.go('settings.networkmanagement');
+        $scope.currentNetwork = NetworkSettingsService.connectedWifiNetwork;
+        $scope.editEthernetData = $scope.currentNetwork.state;
+        $scope.IamConnected = true;
       } else {
         $scope.configureAsStatus(NetworkSettingsService.connectedWifiNetwork.state.status);
       }
@@ -59,8 +61,8 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
         if($state.params.name.replace(new RegExp('_', "g"), " ") === $scope.connectedSsid) {
           if(wifiConnection.state.status === "connected") {
             $scope.currentNetwork = wifiConnection;
-            $scope.IamConnected = true;
             $scope.editEthernetData = $scope.currentNetwork.state;
+            $scope.IamConnected = true;
             // We assign this so that, It shows data when we select
             //a wifi network which is already being connected.
           }
