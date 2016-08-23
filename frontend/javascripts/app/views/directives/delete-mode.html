@@ -20,5 +20,8 @@
   <div ng-class="{'home-page-bin': !running, 'home-page-bin-not': running}" ng-click="deleteClickedHandle()">
     <span ng-show="deleteClicked" class="H2">?</span>
   </div>
-  <div class="home-page-del-okay H3" ng-click="tryDeletion()"></div>
+  <div ng-show="!deleting" class="home-page-del-okay H3" ng-click="tryDeletion()"></div>
+  <div ng-show="deleting" class="home-page-del-okay-noimage H3">
+    <div class="loader"> </div>
+  </div>
 </div>
