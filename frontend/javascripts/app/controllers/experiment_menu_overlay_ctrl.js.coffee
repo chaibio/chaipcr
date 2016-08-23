@@ -50,31 +50,42 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
       id = $stateParams.id
       url = "/experiments/"+$stateParams.id+"/export"
       isChrome = !!window.chrome
-      $http.get(url, responseType: 'arraybuffer')
-      .success (resp,status) =>
-        if status == 202
-          $timeout callAtTimeout, 500
-        console.log status
-        if status!= 202 && isChrome
-          blob = new Blob([resp], type: 'application/octet-stream')
-          link = document.createElement('a')
-          link.href = window.URL.createObjectURL(blob)
-          link.download = 'export.zip'
-          link.click()
-          $scope.exporting = false
-        else if status!= 202 && !isChrome
-          $window.location.assign url
-          $scope.exporting = false
-
-      .error (resp,status) =>
-        console.log status
-        if status == 503
-          $timeout callAtTimeout, 500
-        else
-          $scope.exporting = false
-          $scope.errorExport = true
-
-
+      if isChrome
+        $http.get(url, responseType: 'arraybuffer')
+        .success (resp,status) =>
+          if status == 202
+            $timeout callAtTimeout, 500
+          console.log status
+          if status!= 202
+            blob = new Blob([resp], type: 'application/octet-stream')
+            link = document.createElement('a')
+            link.href = window.URL.createObjectURL(blob)
+            link.download = 'export.zip'
+            link.click()
+            $scope.exporting = false
+        .error (resp,status) =>
+          console.log status
+          if status == 503
+            $timeout callAtTimeout, 500
+          else
+            $scope.exporting = false
+            $scope.errorExport = true
+      else
+        $http.head(url)
+        .success (resp,status) =>
+          if status == 202
+            $timeout callAtTimeout, 500
+          console.log status
+          if status!= 202
+            $window.location.assign url
+            $scope.exporting = false
+        .error (resp,status) =>
+          console.log status
+          if status == 503
+            $timeout callAtTimeout, 500
+          else
+            $scope.exporting = false
+            $scope.errorExport = true
 
     $scope.$watch (()->
       $scope.showProperties), (val) ->
