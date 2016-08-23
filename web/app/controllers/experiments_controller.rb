@@ -295,8 +295,10 @@ class ExperimentsController < ApplicationController
           begin
             task_submitted = background_calculate_amplification_data(@experiment, first_stage_collect_data.id)
             if task_submitted.nil? #cached
-              amplification_data = AmplificationDatum.retrieve(@experiment, first_stage_collect_data.id)
-              cts = AmplificationCurve.retrieve(@experiment, first_stage_collect_data.id)
+              if request.method != "HEAD"
+                amplification_data = AmplificationDatum.retrieve(@experiment, first_stage_collect_data.id)
+                cts = AmplificationCurve.retrieve(@experiment, first_stage_collect_data.id)
+              end
             else
               t.close
               render :nothing => true, :status => (task_submitted)? 202 : 503
@@ -305,7 +307,9 @@ class ExperimentsController < ApplicationController
           rescue => e
             logger.error("export amplification data failed: #{e}")
           end
-          fluorescence_data = FluorescenceDatum.data(@experiment.id, first_stage_collect_data.id)
+          if request.method != "HEAD"
+            fluorescence_data = FluorescenceDatum.data(@experiment.id, first_stage_collect_data.id)
+          end
         end
       
         if amplification_data
@@ -345,7 +349,9 @@ class ExperimentsController < ApplicationController
           begin
             task_submitted = background_calculate_melt_curve_data(@experiment, first_stage_meltcurve_data.id)
             if task_submitted.nil? #cached
-              melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment.id, first_stage_meltcurve_data.id)
+              if request.method != "HEAD"
+                melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment.id, first_stage_meltcurve_data.id)
+              end
             else
               t.close
               render :nothing => true, :status => (task_submitted)? 202 : 503
