@@ -23,7 +23,7 @@
         <span ng-show="data.experiment_controller.machine.state === 'lid_heating' || data.experiment_controller.machine.state === 'running' || data.experiment_controller.machine.state === 'paused'">
           <span class="text-black" ng-show="!is_holding">TEST IN PROGRESS:</span>
           <span ng-show="!is_holding">
-            {{ data.experiment_controller.expriment.name }}
+            {{ data.experiment_controller.experiment.name }}
           </span>
         </span>
         <span ng-show="data.experiment_controller.machine.state === 'idle' && completionStatus === null">
@@ -46,8 +46,8 @@
         <div class="col-sm-6">
           <div class="caption">
             <span ng-show="data.experiment_controller.machine.state == 'running' || is_holding">
-              STAGE {{data.experiment_controller.expriment.stage.number}},
-              STEP {{data.experiment_controller.expriment.step.number}}
+              STAGE {{data.experiment_controller.experiment.stage.number}},
+              STEP {{data.experiment_controller.experiment.step.number}}
             </span>
             <span ng-show="data.experiment_controller.machine.state == 'lid_heating'">
               heating Lid

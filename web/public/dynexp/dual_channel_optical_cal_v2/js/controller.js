@@ -44,7 +44,7 @@
         $scope.data = data;
         $scope.state = data.experiment_controller.machine.state;
         $scope.timeRemaining = GlobalService.timeRemaining(data);
-        $scope.isWarmingUp = data.experiment_controller.expriment? ((data.experiment_controller.expriment.step.name === 'Warm Up 75')||(data.experiment_controller.expriment.step.name === 'Warm Water')||(data.experiment_controller.expriment.step.name === 'Warm FAM')||(data.experiment_controller.expriment.step.name === 'Warm HEX')) : false;
+        $scope.isWarmingUp = data.experiment_controller.experiment? ((data.experiment_controller.experiment.step.name === 'Warm Up 75')||(data.experiment_controller.experiment.step.name === 'Warm Water')||(data.experiment_controller.experiment.step.name === 'Warm FAM')||(data.experiment_controller.experiment.step.name === 'Warm HEX')) : false;
 
         if ($scope.state === 'paused') {
           var pausedPages = ['heating-and-reading-water', 'reading-fam', 'reading-hex'];
@@ -53,17 +53,17 @@
           }
         }
 
-        if (data.experiment_controller.expriment &&
+        if (data.experiment_controller.experiment &&
           !$scope.experiment &&
-          data.experiment_controller.expriment.name === 'Dual Channel Optical Calibration') {
+          data.experiment_controller.experiment.name === 'Dual Channel Optical Calibration') {
 
-          Experiment.get(data.experiment_controller.expriment.id).then(function(resp) {
+          Experiment.get(data.experiment_controller.experiment.id).then(function(resp) {
             $scope.experiment = resp.data.experiment;
           });
         }
 
         var this_exp_id = $scope.experiment? $scope.experiment.id : null;
-        var running_exp_id = oldData.experiment_controller.expriment? oldData.experiment_controller.expriment.id : null;
+        var running_exp_id = oldData.experiment_controller.experiment? oldData.experiment_controller.experiment.id : null;
         var is_current_exp = parseInt(this_exp_id) === parseInt(running_exp_id) && !!running_exp_id;
 
         if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle') &&  is_current_exp) {
@@ -94,7 +94,7 @@
             }
 
             var this_exp_id = $scope.experiment? $scope.experiment.id : null;
-            var running_exp_id = deviceStatus.experiment_controller.expriment? deviceStatus.experiment_controller.expriment.id : null;
+            var running_exp_id = deviceStatus.experiment_controller.experiment? deviceStatus.experiment_controller.experiment.id : null;
             var is_current_exp = (running_exp_id !== null) && parseInt(this_exp_id) === parseInt(running_exp_id);
 
             if (deviceStatus.experiment_controller.machine.state !== 'idle' && !is_current_exp) {
@@ -246,9 +246,9 @@
         if (!$scope.experiment) return;
         if (!$scope.data) return;
         if (!$scope.data.experiment_controller) return;
-        if (!$scope.data.experiment_controller.expriment) return;
-        // var step_id = parseInt($scope.data.experiment_controller.expriment.step.id);
-        var step_number = parseInt($scope.data.experiment_controller.expriment.step.number);
+        if (!$scope.data.experiment_controller.experiment) return;
+        // var step_id = parseInt($scope.data.experiment_controller.experiment.step.id);
+        var step_number = parseInt($scope.data.experiment_controller.experiment.step.number);
         return step_number;
         // if (!step_id) return;
         // return $scope.experiment.protocol.stages[0].stage.steps[step_id - 1].step;
@@ -259,7 +259,7 @@
         if (!$scope.experiment) return 0;
         if (!$scope.data) return 0;
         if (!$scope.data.experiment_controller) return 0;
-        if (!$scope.data.experiment_controller.expriment) return 0;
+        if (!$scope.data.experiment_controller.experiment) return 0;
 
         var steps = $scope.experiment.protocol.stages[0].stage.steps;
         return steps[steps.length - 1].step.hold_time || 0;

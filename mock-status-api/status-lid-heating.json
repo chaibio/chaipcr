@@ -40,7 +40,7 @@
             "state": "lid_heating",
             "thermal_state": "heating"
         },
-        "expriment":
+        "experiment":
         {
             "id": null,
             "run_duration": "100",

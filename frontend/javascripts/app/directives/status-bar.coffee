@@ -69,8 +69,8 @@ window.App.directive 'statusBar', [
 
         $scope.timeRemaining = TestInProgressHelper.timeRemaining(data)
 
-        if ($scope.state isnt 'idle' and !experiment_id and data.experiment_controller?.expriment?.id)
-          experiment_id = data.experiment_controller.expriment.id
+        if ($scope.state isnt 'idle' and !experiment_id and data.experiment_controller?.experiment?.id)
+          experiment_id = data.experiment_controller.experiment.id
           getExperiment (exp) ->
             $scope.footer_experiment = exp
 

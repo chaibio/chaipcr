@@ -79,7 +79,7 @@ window.ChaiBioTech.ngApp
     @openExperiment = (exp) ->
       if not $scope.deleteMode
         state = Status.getData();
-        if state.experiment_controller.machine.state == 'running' and exp.id == state.experiment_controller.expriment.id
+        if state.experiment_controller.machine.state == 'running' and exp.id == state.experiment_controller.experiment.id
           $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
 
         if exp.started_at isnt null

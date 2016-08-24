@@ -140,7 +140,7 @@
 
   function autoupdateLogs() {
     incrementLog();
-    data.experiment_controller.expriment.run_duration = data.experiment_controller.expriment.run_duration*1+1;
+    data.experiment_controller.experiment.run_duration = data.experiment_controller.experiment.run_duration*1+1;
     intrvl = setTimeout(autoupdateLogs, 1000);
   }
 
@@ -239,7 +239,7 @@
 
   app.post('/control/start', function (req, res, next) {
     data = status_lid_heating;
-    data.experiment_controller.expriment.id = req.body.experiment_id;
+    data.experiment_controller.experiment.id = req.body.experiment_id;
     startExperiment(req.body.experiment_id);
     experiment_id = req.body.experiment_id;
     setTimeout(function () {
@@ -256,7 +256,7 @@
 
   function stop () {
     completeExperiment(experiment_id);
-    data.experiment_controller.expriment.run_duration = 0;
+    data.experiment_controller.experiment.run_duration = 0;
     data = status_idle;
     lastLog = null;
     clearTimeout(intrvl);

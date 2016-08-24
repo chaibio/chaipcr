@@ -52,8 +52,8 @@
         $scope.old_state = oldData.experiment_controller.machine.state;
         $scope.timeRemaining = GlobalService.timeRemaining(data);
 
-        if (data.experiment_controller.expriment && !$scope.experiment) {
-          getExperiment(data.experiment_controller.expriment.id);
+        if (data.experiment_controller.experiment && !$scope.experiment) {
+          getExperiment(data.experiment_controller.experiment.id);
         }
 
         if($scope.state === 'idle' && $scope.old_state !=='idle') {
@@ -62,7 +62,7 @@
         }
 
         if($scope.state === 'idle' && $scope.old_state ==='idle' && $state.current.name === 'exp-running') {
-          getExperiment(data.experiment_controller.expriment.id);
+          getExperiment(data.experiment_controller.experiment.id);
           if($scope.experiment.completion_status === 'failure') {
             $state.go('analyze', {id: $scope.experiment.id});
           }
@@ -200,8 +200,8 @@
         if (!$scope.experiment) return;
         if (!$scope.data) return;
         if (!$scope.data.experiment_controller) return;
-        if (!$scope.data.experiment_controller.expriment) return;
-        var step_id = parseInt($scope.data.experiment_controller.expriment.step.id);
+        if (!$scope.data.experiment_controller.experiment) return;
+        var step_id = parseInt($scope.data.experiment_controller.experiment.step.id);
         if (!step_id) return;
         var steps = GlobalService.getExperimentSteps($scope.experiment);
         return _.find(steps, {id: step_id});
@@ -212,9 +212,9 @@
         if (!$scope.experiment) return 0;
         if (!$scope.data) return 0;
         if (!$scope.data.experiment_controller) return 0;
-        if (!$scope.data.experiment_controller.expriment) return 0;
+        if (!$scope.data.experiment_controller.experiment) return 0;
 
-        var step_id = parseInt($scope.data.experiment_controller.expriment.step.id);
+        var step_id = parseInt($scope.data.experiment_controller.experiment.step.id);
         var steps = $scope.experiment.protocol.stages[0].stage.steps;
         return steps[steps.length-1].step.hold_time;
       };

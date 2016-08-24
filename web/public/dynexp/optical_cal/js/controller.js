@@ -35,7 +35,7 @@
             }
 
             var this_exp_id = $scope.experiment? $scope.experiment.id : null;
-            var running_exp_id = deviceStatus.experiment_controller.expriment? deviceStatus.experiment_controller.expriment.id : null;
+            var running_exp_id = deviceStatus.experiment_controller.experiment? deviceStatus.experiment_controller.experiment.id : null;
             var is_current_exp = (parseInt(this_exp_id) === parseInt(running_exp_id)) && (running_exp_id !== null);
 
             if (deviceStatus.experiment_controller.machine.state !== 'idle' && running_exp_id !== null && !is_current_exp ) {
@@ -98,7 +98,7 @@
         }
 
         var this_exp_id = $scope.experiment? $scope.experiment.id : null;
-        var running_exp_id = oldData.experiment_controller.expriment? oldData.experiment_controller.expriment.id : null;
+        var running_exp_id = oldData.experiment_controller.experiment? oldData.experiment_controller.experiment.id : null;
         var is_current_exp = (parseInt(this_exp_id) === parseInt(running_exp_id)) && (running_exp_id !== null);
 
         if($scope.state === 'idle' && (oldData.experiment_controller.machine.state === 'idle') && $state.current.name === 'step-3') {
@@ -222,8 +222,8 @@
         if (!$scope.experiment) return;
         if (!$scope.data) return;
         if (!$scope.data.experiment_controller) return;
-        if (!$scope.data.experiment_controller.expriment) return;
-        var step_id = parseInt($scope.data.experiment_controller.expriment.step.id);
+        if (!$scope.data.experiment_controller.experiment) return;
+        var step_id = parseInt($scope.data.experiment_controller.experiment.step.id);
         if (!step_id) return;
         return $scope.experiment.protocol.stages[0].stage.steps[step_id-1].step;
 
@@ -233,9 +233,9 @@
         if (!$scope.experiment) return 0;
         if (!$scope.data) return 0;
         if (!$scope.data.experiment_controller) return 0;
-        if (!$scope.data.experiment_controller.expriment) return 0;
+        if (!$scope.data.experiment_controller.experiment) return 0;
 
-        var step_id = parseInt($scope.data.experiment_controller.expriment.step.id);
+        var step_id = parseInt($scope.data.experiment_controller.experiment.step.id);
         var steps = $scope.experiment.protocol.stages[0].stage.steps;
         return steps[steps.length-1].step.hold_time;
 

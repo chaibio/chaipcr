@@ -46,27 +46,27 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
 
         case ExperimentController::LidHeatingMachineState:
             responsePt.put("experiment_controller.machine.state", "lid_heating");
-            responsePt.put("experiment_controller.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
+            responsePt.put("experiment_controller.experiment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
             break;
 
         case ExperimentController::RunningMachineState:
             responsePt.put("experiment_controller.machine.state", "running");
-            responsePt.put("experiment_controller.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
-            responsePt.put("experiment_controller.expriment.estimated_duration", experiment.estimatedDuration());
-            responsePt.put("experiment_controller.expriment.paused_duration", experiment.pausedDuration());
+            responsePt.put("experiment_controller.experiment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
+            responsePt.put("experiment_controller.experiment.estimated_duration", experiment.estimatedDuration());
+            responsePt.put("experiment_controller.experiment.paused_duration", experiment.pausedDuration());
             break;
 
         case ExperimentController::PausedMachineState:
             responsePt.put("experiment_controller.machine.state", "paused");
-            responsePt.put("experiment_controller.expriment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
-            responsePt.put("experiment_controller.expriment.estimated_duration", experiment.estimatedDuration());
-            responsePt.put("experiment_controller.expriment.paused_duration", experiment.pausedDuration() +
+            responsePt.put("experiment_controller.experiment.run_duration", (boost::posix_time::microsec_clock::local_time() - experiment.startedAt()).total_seconds());
+            responsePt.put("experiment_controller.experiment.estimated_duration", experiment.estimatedDuration());
+            responsePt.put("experiment_controller.experiment.paused_duration", experiment.pausedDuration() +
                            (boost::posix_time::microsec_clock::local_time() - experiment.lastPauseTime()).total_seconds());
             break;
 
         case ExperimentController::CompleteMachineState:
             responsePt.put("experiment_controller.machine.state", "complete");
-            responsePt.put("experiment_controller.expriment.run_duration", (experiment.completedAt() - experiment.startedAt()).total_seconds());
+            responsePt.put("experiment_controller.experiment.run_duration", (experiment.completedAt() - experiment.startedAt()).total_seconds());
             break;
 
         default:
@@ -98,18 +98,18 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
         }
 
         if (experimentController->machineState() != ExperimentController::IdleMachineState) {
-            responsePt.put("experiment_controller.expriment.id", experiment.id());
-            responsePt.put("experiment_controller.expriment.name", experiment.name());
-            responsePt.put("experiment_controller.expriment.started_at", experiment.startedAt());
+            responsePt.put("experiment_controller.experiment.id", experiment.id());
+            responsePt.put("experiment_controller.experiment.name", experiment.name());
+            responsePt.put("experiment_controller.experiment.started_at", experiment.startedAt());
 
-            responsePt.put("experiment_controller.expriment.stage.id", experiment.protocol()->currentStage()->id());
-            responsePt.put("experiment_controller.expriment.stage.name", experiment.protocol()->currentStage()->name());
-            responsePt.put("experiment_controller.expriment.stage.number", experiment.protocol()->currentStage()->orderNumber() + 1);
-            responsePt.put("experiment_controller.expriment.stage.cycle", experiment.protocol()->currentStage()->currentCycle());
+            responsePt.put("experiment_controller.experiment.stage.id", experiment.protocol()->currentStage()->id());
+            responsePt.put("experiment_controller.experiment.stage.name", experiment.protocol()->currentStage()->name());
+            responsePt.put("experiment_controller.experiment.stage.number", experiment.protocol()->currentStage()->orderNumber() + 1);
+            responsePt.put("experiment_controller.experiment.stage.cycle", experiment.protocol()->currentStage()->currentCycle());
 
-            responsePt.put("experiment_controller.expriment.step.id", experiment.protocol()->currentStep()->id());
-            responsePt.put("experiment_controller.expriment.step.name", experiment.protocol()->currentStep()->name());
-            responsePt.put("experiment_controller.expriment.step.number", experiment.protocol()->currentStep()->orderNumber() + 1);
+            responsePt.put("experiment_controller.experiment.step.id", experiment.protocol()->currentStep()->id());
+            responsePt.put("experiment_controller.experiment.step.name", experiment.protocol()->currentStep()->name());
+            responsePt.put("experiment_controller.experiment.step.number", experiment.protocol()->currentStep()->orderNumber() + 1);
         }
 
         std::shared_ptr<HeatBlock> heatBlock = HeatBlockInstance::getInstance();

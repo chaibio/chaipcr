@@ -102,7 +102,7 @@ App.controller 'TemperatureLogCtrl', [
       $scope.$on 'status:data:updated', (e, val) ->
         if val
           $scope.scrollState = $scope.scrollState || 'FULL'
-          isCurrentExperiment = parseInt(val.experiment_controller?.expriment?.id) is parseInt($stateParams.id)
+          isCurrentExperiment = parseInt(val.experiment_controller?.experiment?.id) is parseInt($stateParams.id)
           if isCurrentExperiment and ($scope.scrollState >= 1 || $scope.scrollState is 'FULL' || greatest_elapsed_time <= 5*60 || ($scope.resolutionIndex is 0)) and (val.experiment_controller?.machine.state is 'lid_heating' || val.experiment_controller?.machine.state is 'running')
             $scope.autoUpdateTemperatureLogs()
           else
