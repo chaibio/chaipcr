@@ -151,8 +151,9 @@ class ExperimentsController < ApplicationController
               render :json=>{:errors=>e.to_s}, :status => 500
               return
             end
-
-            if !stale?(etag: AmplificationDatum.maxid(@experiment.id, @first_stage_collect_data.id))
+            
+            @partial = @experiment.running? || FluorescenceDatum.new_data_generated?(@experiment.id, @first_stage_collect_data.id)
+            if !stale?(etag: generate_etag(@partial, AmplificationDatum.maxid(@experiment.id, @first_stage_collect_data.id)))
               #render 304 Not Modified
               return
             end
@@ -166,10 +167,7 @@ class ExperimentsController < ApplicationController
               return
             elsif @amplification_data && @amplification_data.last
               #set etag
-              fresh_when(:etag => @amplification_data.last.id)
-              @partial = (@first_stage_collect_data.num_cycles > @amplification_data.last.cycle_num)
-            else
-              @partial = true
+              fresh_when(:etag => generate_etag(@partial, @amplification_data.last.id))
             end
           else
             @amplification_data = []
@@ -249,8 +247,9 @@ class ExperimentsController < ApplicationController
             render :json=>{:errors=>e.to_s}, :status => 500
             return
           end
-
-          if !@experiment.cached_temperature.nil? && !stale?(etag: @experiment.cached_temperature)
+          
+          @partial = @experiment.running? || MeltCurveDatum.new_data_generated?(@experiment, @first_stage_meltcurve_data.id) != nil
+          if !@experiment.cached_temperature.nil? && !stale?(etag: generate_etag(@partial, @experiment.cached_temperature))
             #render 304 Not Modified
             return
           end
@@ -263,9 +262,8 @@ class ExperimentsController < ApplicationController
             return
           elsif !@experiment.cached_temperature.nil?
             #set etag
-            fresh_when(:etag => @experiment.cached_temperature)
+            fresh_when(:etag => generate_etag(@partial, @experiment.cached_temperature))
           end
-          @partial = @experiment.running? || !MeltCurveDatum.new_data_generated?(@experiment, @first_stage_meltcurve_data.id).nil?
         else
           @melt_curve_data = []
           @partial = false
@@ -426,6 +424,10 @@ class ExperimentsController < ApplicationController
     @experiment = Experiment.find_by_id(params[:id]) if @experiment.nil?
   end
   
+  def generate_etag(partial, tag)
+    return "partial:#{partial} tag:#{tag}"
+  end
+ 
   def background_calculate_amplification_data(experiment, stage_id)
     return nil if !FluorescenceDatum.new_data_generated?(experiment.id, stage_id)
     return background("amplification", experiment.id) do
