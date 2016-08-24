@@ -17,20 +17,27 @@
 # limitations under the License.
 #
 class Setting < ActiveRecord::Base
+  @@setting = nil
+    
+  def self.instance
+    @@setting = Setting.first if @@setting == nil
+    return @@setting
+  end
+  
   def self.debug
-    self.first.debug
+    instance.debug
   end
 
   def self.calibration_id
-    self.first.calibration_id
+    instance.calibration_id
   end
 
   def self.software_release_variant
-    self.first.software_release_variant
+    instance.software_release_variant
   end
       
   def self.time_valid
-    self.first.time_valid
+    instance.time_valid
   end
   
   def time_zone_offset
