@@ -35,7 +35,9 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.userSettings = $.jStorage.get('userNetworkSettings');
     this.intervalKey = null;
     this.listofAllWifi = {};
-
+    this.wifiShutDownInProgress = false;
+    this.wifiRestartingInProgress = false;
+    
     this.getWifiNetworks = function() {
 
       var delay = $q.defer();

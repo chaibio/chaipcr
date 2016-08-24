@@ -25,7 +25,8 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
   '$state',
   'NetworkSettingsService',
   '$interval',
-  function($scope, $rootScope, $stateParams, User, $state, NetworkSettingsService, $interval) {
+  '$timeout',
+  function($scope, $rootScope, $stateParams, User, $state, NetworkSettingsService, $interval, $timeout) {
 
     $scope.wifiNetworks = {}; // All available wifi networks
     $scope.currentWifiSettings = {}; // Current active wifi network [connected to]
@@ -42,7 +43,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       'new_wifi_result' this event is fired up when new wifi status is sent from the
       server.
     */
-    $rootScope.$on('new_wifi_result', function() {
+    $scope.$on('new_wifi_result', function() {
 
       $scope.wirelessError = false;
       $scope.wifiNetworkStatus = $scope.userSettings.wifiSwitchOn;
@@ -76,12 +77,20 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       }
     });
 
-    $rootScope.$on('wifi_adapter_reconnected', function() {
+    $scope.$on('wifi_adapter_reconnected', function() {
       $scope.wifiNetworkStatus = true;
       $scope.wirelessError = false;
       $scope.init();
     });
 
+    $scope.$on('wifi_stopped', function() {
+      //console.log("wifi stopped");
+      //scope.inProgress = false;
+      console.log("nside controller,wifi stopped");
+      $timeout(function(){
+        $scope.wifiNetworks = $scope.currentWifiSettings = {};
+      }, 1000);
+    });
     /**
       This function takes care of the things when there is no wifi adapter or wifi adapter is having some error.
     */

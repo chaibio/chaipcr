@@ -32,6 +32,7 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
       },
 
       link: function(scope, elem, attr) {
+
         scope.show = true;
         // Keep track if a on/off wifi is in progress. We need this so that, It blocks another change
         // while one change is already in progress;
@@ -45,7 +46,18 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
           }
         });
 
+        scope.$watch('inProgress', function(progress) {
+          if(progress === true) {
+            console.log("inprogress true");
+            scope.dragElem.draggable('disable');
+          } else if(progress === false) {
+            console.log("inprogress false;");
+            scope.dragElem.draggable('enable');
+          }
+        });
+
         scope.$watch('noDevice', function(deviceNotFound, oldVal) {
+          console.log("deviceNotFound", deviceNotFound);
           if(deviceNotFound) {
             scope.changeState("#bbbbbb", "1");
             scope.dragElem.draggable('disable');
@@ -58,11 +70,14 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
         });
 
         scope.$on('wifi_restarted', function() {
+          console.log("wifi restarted");
           scope.inProgress = false;
         });
 
         scope.$on('wifi_stopped', function() {
+          console.log("wifi stopped");
           scope.inProgress = false;
+          scope.wirelessStatus = false; // Ensure that wirelessStatus is false;
         });
 
         $rootScope.$on('wifi_adapter_reconnected', function(data, wifiSwitch) {
@@ -70,22 +85,26 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
         });
 
         scope.clickHandler = function() {
-          scope.sendData();
+
+          if(scope.inProgress === false) {
+            console.log("Inside click handler");
+            scope.sendData();
+          }
         };
 
         scope.configureSwitch = function(switchState) {
-          if(scope.noDevice === false && scope.inProgress === false) {
-
-            if(switchState === true /*&& scope.inProgress === false*/) {
+          //if(scope.noDevice === false) {
+          console.log("configureSwitch", switchState);
+            if(switchState === true) {
               scope.changeState("#8dc63f", "11");
               scope.inProgress = true;
-            } else if(switchState === false /*&& scope.inProgress === false*/) {
+            } else if(switchState === false) {
               scope.changeState("#bbbbbb", "1");
               scope.inProgress = true;
             }
-            return;
-          }
-          scope.changeState("#bbbbbb", "1");
+            //return;
+          //}
+          //scope.changeState("#bbbbbb", "1");
         };
 
         scope.changeState = function(backgroundColor, left) {
@@ -112,10 +131,8 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
 
         scope.sendData = function() {
 
-          if(scope.noDevice === false && scope.inProgress === false) {
-            scope.wirelessStatus = !scope.wirelessStatus;
-            scope.configureSwitch(scope.wirelessStatus);
-          }
+          scope.wirelessStatus = ! scope.wirelessStatus;
+          scope.configureSwitch(scope.wirelessStatus);
         };
 
         scope.dragElem = angular.element(elem).find(".outer-circle").draggable({
