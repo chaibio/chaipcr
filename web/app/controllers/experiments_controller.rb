@@ -22,7 +22,7 @@ require 'rserve'
 class ExperimentsController < ApplicationController
   include ParamsHelper
   
-  before_filter :ensure_authenticated_user
+ # before_filter :ensure_authenticated_user
   before_filter :get_experiment, :except => [:index, :create, :copy]
   
   respond_to :json
@@ -135,14 +135,18 @@ class ExperimentsController < ApplicationController
     end
   end
 
-  api :GET, "/experiments/:id/amplification_data", "Retrieve amplification data"
-  example "{'total_cycles':40,
-            'amplification_data':[['channel', 'well_num', 'cycle_num', 'background_substracted_value', 'baseline_Substracted_value'], [1, 1, 1, 25488, -2003], [1, 1, 2, 53984, -409]],
-            'ct':[['channel', 'well_num', 'ct'], [1, 1, 12.11], [1, 2, 15.77], [1, 3, null]]}"
+  api :GET, "/experiments/:id/amplification_data?raw=false&background=true&baseline=true&cq=true", "Retrieve amplification data"
+  example "{'partial':false, 'total_cycles':40,
+            'amplification_data':[['channel', 'well_num', 'cycle_num', 'raw_value', 'background_substracted_value', 'baseline_substracted_value'], [1, 1, 1, 34576, 25488, -2003], [1, 1, 2, 53984, -409]],
+            'cq':[['channel', 'well_num', 'cq'], [1, 1, 12.11], [1, 2, 15.77], [1, 3, null]]}"
   def amplification_data
+    params[:raw] = false if params[:raw].nil?
+    params[:background] = true if params[:background].nil?
+    params[:baseline] = true if params[:baseline].nil?
+    params[:cq] = true if params[:cq].nil?
     if @experiment
       if @experiment.ran?
-        if params[:step_id] == nil && params[:ramp_id] == nil
+        if params[:background] == true || params[:baseline] == true || params[:cq] == true
           @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
           if !@first_stage_collect_data.blank?
             begin
@@ -176,23 +180,11 @@ class ExperimentsController < ApplicationController
             @cts = []
             @partial = false
           end
-        else
-          #construct OR clause
-          conditions = String.new
-          wheres = Array.new
-          if params[:step_id]
-            conditions << " OR " unless conditions.length == 0
-            conditions << "step_id IN (?)"
-            wheres << params[:step_id].map(&:to_i)
-          end
-          if params[:ramp_id]
-            conditions << " OR " unless conditions.length == 0
-            conditions << "ramp_id IN (?)"
-            wheres << params[:ramp_id].map(&:to_i)
-          end
-          wheres.insert(0, conditions)
+        end
+        
+        if params[:raw] == true
           #query to database
-          @fluorescence_data = FluorescenceDatum.where("experiment_id=?",@experiment.id).where(wheres).order("step_id, ramp_id, cycle_num, well_num")
+          @fluorescence_data = FluorescenceDatum.where("experiment_id=?",@experiment.id).where(wheres).order("step_id, ramp_id, channel, cycle_num, well_num")
           #group data
           keyname = nil
           key = nil
@@ -225,8 +217,8 @@ class ExperimentsController < ApplicationController
         @partial = false
       end
     
-      @amplification_data = (!@amplification_data.blank?)? [["channel","well_num","cycle_num","background_substracted_value", "baseline_Substracted_value"]]+@amplification_data.map {|data| [data.channel,data.well_num,data.cycle_num,data.background_subtracted_value,data.baseline_subtracted_value]} : nil
-      @cts = (!@cts.blank?)? [["channel","well_num","ct"]]+@cts.map {|ct| [ct.channel,ct.well_num,ct.ct]} : nil
+      @amplification_data = (!@amplification_data.blank?)? [["channel","well_num","cycle_num","background_substracted_value", "baseline_substracted_value"]]+@amplification_data.map {|data| [data.channel,data.well_num,data.cycle_num,data.background_subtracted_value,data.baseline_subtracted_value]} : nil
+      @cts = (!@cts.blank?)? [["channel","well_num","cq"]]+@cts.map {|ct| [ct.channel,ct.well_num,ct.ct]} : nil
       respond_to do |format|
         format.json { render "amplification_data", :status => :ok}
       end

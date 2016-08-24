@@ -10,7 +10,7 @@ node :amplification_data do
   @amplification_data
 end
  
-node :ct do
+node :cq do
   @cts
 end
 
