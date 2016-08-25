@@ -208,6 +208,9 @@
     }
 
     function getMinY() {
+      if (Globals.config.axes.y.min) {
+        return Globals.config.axes.y.min;
+      }
       var ys = [];
       Globals.config.series.forEach(function(s) {
         var min_dataset_y = d3.min(Globals.data[s.dataset], function(d) {
@@ -215,12 +218,16 @@
         });
         ys.push(min_dataset_y);
       });
-      return d3.min(ys, function(d) {
+      var min_y = d3.min(ys, function(d) {
         return d;
       });
+      return min_y || 0;
     }
 
     function getMaxY() {
+      if (Globals.config.axes.y.max) {
+        return Globals.config.axes.y.max;
+      }
       var ys = [];
       Globals.config.series.forEach(function(s) {
         var max_dataset_y = d3.max(Globals.data[s.dataset], function(d) {
@@ -231,7 +238,7 @@
       var max_y = d3.max(ys, function(d) {
         return d;
       });
-      return max_y || 0;
+      return max_y || 1;
     }
 
     function getScaleExtent() {
@@ -240,6 +247,7 @@
 
     function getYLogticks() {
       var num = getMaxY() || 0;
+      num = num + num * 0.2;
       var calib, calibs, i, j, num_length, ref, roundup;
       num_length = num.toString().length;
       roundup = '1';
@@ -264,13 +272,14 @@
 
       var svg = Globals.chartSVG.select('.chart-g');
 
-      Globals.config.axes.y.min = Globals.config.axes.y.min || getMinY() || 0;
-      Globals.config.axes.y.max = Globals.config.axes.y.max || getMaxY() || 1;
+      // add allowance for interpolation curves
+      var min = getMinY() - getMinY() * 0.2;
+      var max = getMaxY() + getMaxY() * 0.2;
 
       var y_scale = Globals.config.axes.y.scale || 'linear';
       Globals.yScale = INTERPOLATIONS[y_scale]()
         .range([Globals.height, 0])
-        .domain([Globals.config.axes.y.min, Globals.config.axes.y.max]);
+        .domain([min, max]);
 
       Globals.yAxis = d3.axisLeft(Globals.yScale);
 
@@ -299,9 +308,9 @@
       Globals.xScale = INTERPOLATIONS[intpol]()
         .range([0, Globals.width]);
 
-      Globals.config.axes.x.min = Globals.config.axes.x.min || getMinX() || 0;
-      Globals.config.axes.x.max = Globals.config.axes.x.max || getMaxX() || 1;
-      Globals.xScale.domain([Globals.config.axes.x.min, Globals.config.axes.x.max]);
+      var min = Globals.config.axes.x.min || getMinX() || 0;
+      var max = Globals.config.axes.x.max || getMaxX() || 1;
+      Globals.xScale.domain([min, max]);
 
       Globals.xAxis = d3.axisBottom(Globals.xScale);
       if (Globals.config.axes.x.ticks) {
@@ -317,9 +326,6 @@
 
     function initChart(elem, data, config) {
 
-      console.log(data);
-      console.log(config);
-
       initGlobalVars();
       Globals.data = data;
       Globals.config = config;
@@ -327,10 +333,13 @@
 
       d3.select(elem).selectAll("*").remove();
 
-      var width = Globals.width = elem.parentElement.offsetWidth - config.margin.left - config.margin.right;
-      var height = Globals.height = elem.parentElement.offsetHeight - config.margin.top - config.margin.bottom;
+      var width = 0;
+      var height = 0;
 
-
+      while (height <= 0 || width <= 0 || !width || !height) {
+        width = Globals.width = elem.parentElement.offsetWidth - config.margin.left - config.margin.right;
+        height = Globals.height = elem.parentElement.offsetHeight - config.margin.top - config.margin.bottom;
+      }
 
       var chartSVG = Globals.chartSVG = d3.select(elem).append("svg")
         .attr("width", width + config.margin.left + config.margin.right)
@@ -446,25 +455,22 @@
     };
 
     this.updateSeries = function(series) {
-      if (!Globals.initializing) {
-        Globals.config.series = series;
-        drawLines();
-      }
+      Globals.config.series = series;
+      setYAxis();
+      drawLines();
     };
 
     this.updateData = function(data) {
-      if (!Globals.initializing) {
-        Globals.data = data;
-        drawLines();
-      }
+      Globals.data = data;
+      setYAxis();
+      setXAxis();
+      drawLines();
     };
 
     this.updateInterpolation = function(i) {
-      if (!Globals.initializing) {
-        Globals.config.axes.y.scale = i;
-        setYAxis();
-        drawLines();
-      }
+      Globals.config.axes.y.scale = i;
+      setYAxis();
+      drawLines();
     };
 
     this.getScaleExtent = function() {

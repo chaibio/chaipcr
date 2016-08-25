@@ -16,6 +16,7 @@ angular.module("canvasApp").directive 'amplificationChart', [
       link: ($scope, elem, attrs) ->
 
         chart = null
+        changeVal = null;
 
         initChart = ->
           return if !$scope.data or !$scope.config
@@ -24,27 +25,35 @@ angular.module("canvasApp").directive 'amplificationChart', [
           d = chart.getDimensions()
           $scope.onZoom()(chart.getTransform(), d.width, d.height, chart.getScaleExtent())
 
-        $scope.$watchCollection 'data', (data) ->
+        # $scope.$watchCollection 'data', (data) ->
+        #   if !chart
+        #     initChart()
+        #   else
+        #     chart.updateData(data)
+
+        $scope.$watchCollection ->
+          return {
+            data: $scope.data,
+            y_axis: $scope.config?.axes?.y
+            x_axis: $scope.config?.axes?.x
+            series: $scope.config?.series
+          }
+        , (val, old_val) ->
           if !chart
-            $timeout ->
-              initChart()
-            , 500
+            initChart()
           else
-            chart.updateData(data)
+            if !angular.equals(val.data, old_val.data)
+              chart.updateData(val.data)
+            else if !angular.equals(val.series, old_val.series)
+              chart.updateSeries(val.series)
+            else if (val.y_axis.scale isnt old_val.y_axis.scale)
+              chart.updateInterpolation(val.y_axis.scale)
+            else
+              initChart()
 
-        $scope.$watch 'config.axes.y.scale', (i) ->
-          return if !chart
-          chart.updateInterpolation(i)
-
-        $scope.$watchCollection 'config.axes.x', ->
-          initChart()
-
-        $scope.$watchCollection 'config.margin', ->
-          initChart()
-
-        $scope.$watchCollection 'config.series', (series) ->
-          return if !chart
-          chart.updateSeries(series)
+        # $scope.$watchCollection 'config.series', (series) ->
+        #   return if !chart
+        #   chart.updateSeries(series)
 
         $scope.$watch 'scroll', (scroll) ->
           return if !scroll or !chart

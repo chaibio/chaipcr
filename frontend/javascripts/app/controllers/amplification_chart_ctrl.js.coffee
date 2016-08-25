@@ -153,14 +153,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           for i in [0..15] by 1
             if buttons["well_#{i}"]?.selected
               $scope.chartConfig.series.push
-                # axis: 'y'
                 dataset: "channel_#{ch_i}"
-                # key: "well_#{i}_#{subtraction_type}#{if $scope.curve_type is 'log' then '_log' else ''}"
                 x: 'cycle_num'
                 y: "well_#{i}_#{subtraction_type}#{if $scope.curve_type is 'log' then '_log' else ''}"
-                label: if ($scope.is_dual_channel and $scope.color_by is 'well') then "channel_#{ch_i}, well_#{i+1}: " else "well_#{i+1}: "
                 color: if ($scope.color_by is 'well') then buttons["well_#{i}"].color else (if ch_i is 1 then '#00AEEF' else '#8FC742')
-                interpolation: {mode: 'cardinal', tension: 0.7}
 
       # updateScrollBarWidth = ->
       #   return if !angular.isNumber($scope.ampli_zoom) or !AMPLI_DATA_CACHE or !$scope.maxCycle
@@ -192,7 +188,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       $scope.$watch 'baseline_subtraction', (val) ->
         # updateScrollBarWidth()
-        updateChartData($scope.amplification_data)
+        $scope.amplification_data = angular.copy($scope.amplification_data)
         updateSeries()
 
       $scope.$watch 'channel_1', (val) ->

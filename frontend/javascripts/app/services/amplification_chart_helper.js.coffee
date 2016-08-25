@@ -28,8 +28,6 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
           min: 1
           key: 'cycle_num'
           ticks: 8
-          tickFormat: (x) ->
-            return parseInt(x)
         y:
           ticks: 10
 
@@ -43,9 +41,6 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         y: false
 
       series: []
-
-      tooltipHook: (items) ->
-        return false
 
     # end chartConfig
 
