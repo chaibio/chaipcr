@@ -34,8 +34,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       hasInit = false
       drag_scroll = $('#ampli-drag-scroll')
-      $scope.chartConfig = helper.chartConfig($scope.is_dual_channel)
-      $scope.chartConfig.axes.x.ticks = helper.Xticks $stateParams.max_cycle || 1
+      $scope.chartConfig = helper.chartConfig()
+      # $scope.chartConfig.axes.x.ticks = helper.Xticks $stateParams.max_cycle || 1
       $scope.chartConfig.axes.x.max = $stateParams.max_cycle || 1
       $scope.amplification_data = helper.paddData()
       $scope.COLORS = helper.COLORS
@@ -61,7 +61,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       Experiment.get(id: $stateParams.id).then (data) ->
         maxCycle = helper.getMaxExperimentCycle data.experiment
         $scope.maxCycle = maxCycle
-        $scope.chartConfig.axes.x.ticks = helper.Xticks 1, maxCycle
+        console.log "maxCycle: #{maxCycle}"
+        # $scope.chartConfig.axes.x.ticks = helper.Xticks 1, maxCycle
         $scope.chartConfig.axes.x.max = maxCycle
         $scope.experiment = data.experiment
 
@@ -102,11 +103,11 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               data = resp.data
               data.amplification_data.shift()
               data.ct.shift()
-              max_calibration = helper.getMaxCalibrations(data.amplification_data)
+              # max_calibration = helper.getMaxCalibrations(data.amplification_data)
               data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
 
               AMPLI_DATA_CACHE = angular.copy data
-              $scope.amplification_data = angular.copy(AMPLI_DATA_CACHE.amplification_data)
+              $scope.amplification_data = data.amplification_data
               # updateScrollBarWidth()
               updateButtonCts()
 

@@ -163,6 +163,7 @@
         transform.y = -(Globals.height * transform.k - Globals.height);
       }
 
+      Globals.viewSVG = d3.select('.viewSVG');
       Globals.viewSVG.attr("transform", transform);
       Globals.gX.call(Globals.xAxis.scale(transform.rescaleX(Globals.xScale)));
       Globals.gY.call(Globals.yAxis.scale(transform.rescaleY(Globals.yScale)));
@@ -189,9 +190,10 @@
         });
         xs.push(min_dataset_x);
       });
-      return d3.min(xs, function(d) {
+      var min = d3.min(xs, function(d) {
         return d;
       });
+      return min || 0;
     }
 
     function getMaxX() {
@@ -202,9 +204,10 @@
         });
         xs.push(max_dataset_x);
       });
-      return d3.max(xs, function(d) {
+      var max = d3.max(xs, function(d) {
         return d;
       });
+      return max || 1;
     }
 
     function getMinY() {
@@ -246,7 +249,7 @@
     }
 
     function getYLogticks() {
-      var num = getMaxY() || 0;
+      var num = getMaxY();
       num = num + num * 0.2;
       var calib, calibs, i, j, num_length, ref, roundup;
       num_length = num.toString().length;
@@ -324,6 +327,13 @@
         .call(Globals.xAxis);
     }
 
+    function updateZoomScaleExtent () {
+      if (!Globals.zooomBehavior) {
+        return;
+      }
+      Globals.zooomBehavior.scaleExtent([1, getScaleExtent()]);
+    }
+
     function initChart(elem, data, config) {
 
       initGlobalVars();
@@ -370,7 +380,7 @@
       drawLines(config.series);
       makeCircle();
       Globals.activePath = null;
-      Globals.zooomBehavior.scaleExtent([1, getScaleExtent()]);
+      updateZoomScaleExtent()
 
     }
 
@@ -456,26 +466,28 @@
 
     this.updateSeries = function(series) {
       Globals.config.series = series;
-      setYAxis();
-      drawLines();
     };
 
     this.updateData = function(data) {
       Globals.data = data;
-      setYAxis();
-      setXAxis();
-      drawLines();
+      updateZoomScaleExtent();
+    };
+
+    this.updateConfig = function(config) {
+      Globals.config = config;
     };
 
     this.updateInterpolation = function(i) {
       Globals.config.axes.y.scale = i;
-      setYAxis();
-      drawLines();
     };
 
     this.getScaleExtent = function() {
       return getScaleExtent() || 1;
     };
+
+    this.setYAxis = setYAxis;
+    this.setXAxis = setXAxis;
+    this.drawLines = drawLines;
 
     initChart(elem, data, config);
 
