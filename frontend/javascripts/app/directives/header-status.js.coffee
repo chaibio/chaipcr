@@ -64,7 +64,7 @@ window.App.directive 'headerStatus', [
         $scope.state = data.experiment_controller.machine.state
         $scope.thermal_state = data.experiment_controller.machine.thermal_state
         $scope.oldState = oldData?.experiment_controller?.machine?.state || 'NONE'
-        $scope.isCurrentExp = parseInt(data.experiment_controller.expriment?.id) is parseInt(experiment_id)
+        $scope.isCurrentExp = parseInt(data.experiment_controller.experiment?.id) is parseInt(experiment_id)
 
         if ((($scope.oldState isnt $scope.state or !$scope.experiment))) and experiment_id
           getExperiment (exp) ->

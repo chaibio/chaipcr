@@ -147,7 +147,7 @@
           $scope.heat_block_temp = data.heat_block.temperature;
           $scope.lid_temp = data.lid.temperature;
         }, 2500);
-        if (data.experiment_controller.expriment) $scope.elapsedTime = data.experiment_controller.expriment.run_duration;
+        if (data.experiment_controller.experiment) $scope.elapsedTime = data.experiment_controller.experiment.run_duration;
 
         if (!$scope.experiment) {
           getExperiment(function(resp) {

@@ -40,7 +40,7 @@
             "state": "running",
             "thermal_state": "holding"
         },
-        "expriment":
+        "experiment":
         {
             "id": null,
             "run_duration": "1000",

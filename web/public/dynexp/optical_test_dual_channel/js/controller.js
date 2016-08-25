@@ -50,8 +50,8 @@
           }
         }
 
-        if (data.experiment_controller.expriment && !$scope.experiment) {
-          Experiment.get(data.experiment_controller.expriment.id).then(function(resp) {
+        if (data.experiment_controller.experiment && !$scope.experiment) {
+          Experiment.get(data.experiment_controller.experiment.id).then(function(resp) {
             $scope.experiment = resp.data.experiment;
           });
         }
@@ -181,9 +181,9 @@
         if (!$scope.experiment) return;
         if (!$scope.data) return;
         if (!$scope.data.experiment_controller) return;
-        if (!$scope.data.experiment_controller.expriment) return;
-        // var step_id = parseInt($scope.data.experiment_controller.expriment.step.id);
-        var step_number = parseInt($scope.data.experiment_controller.expriment.step.number);
+        if (!$scope.data.experiment_controller.experiment) return;
+        // var step_id = parseInt($scope.data.experiment_controller.experiment.step.id);
+        var step_number = parseInt($scope.data.experiment_controller.experiment.step.number);
         return step_number;
         // if (!step_id) return;
         // return $scope.experiment.protocol.stages[0].stage.steps[step_id - 1].step;
@@ -194,7 +194,7 @@
         if (!$scope.experiment) return 0;
         if (!$scope.data) return 0;
         if (!$scope.data.experiment_controller) return 0;
-        if (!$scope.data.experiment_controller.expriment) return 0;
+        if (!$scope.data.experiment_controller.experiment) return 0;
 
         var steps = $scope.experiment.protocol.stages[0].stage.steps;
         return steps[steps.length - 1].step.hold_time || 0;

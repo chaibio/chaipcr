@@ -57,7 +57,7 @@ window.ChaiBioTech.ngApp
 
       $scope.barWidth = ->
         if $scope.data and $scope.data.experiment_controller.machine.state is 'running'
-          exp = $scope.data.experiment_controller.expriment
+          exp = $scope.data.experiment_controller.experiment
           width = exp.run_duration/exp.estimated_duration
           if width > 1 then width = 1
 

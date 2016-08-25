@@ -99,7 +99,7 @@ window.App.service('TestInProgressService', [
         return 0;
       }
       if (data.experiment_controller.machine.state === 'running') {
-        exp = data.experiment_controller.expriment;
+        exp = data.experiment_controller.experiment;
         time = (exp.estimated_duration * 1 + exp.paused_duration * 1) - exp.run_duration * 1;
         if (time < 0) {
           time = 0;
