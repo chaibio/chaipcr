@@ -55,9 +55,9 @@ get_amplification_data <- function(
         'SELECT well_num, cycle_num, channel FROM fluorescence_data 
             LEFT JOIN ramps ON fluorescence_data.ramp_id = ramps.id
             INNER JOIN steps ON fluorescence_data.step_id = steps.id OR steps.id = ramps.next_step_id 
-            WHERE fluorescence_data.experiment_id=%d AND steps.stage_id=%d
+            WHERE fluorescence_data.experiment_id=%d AND steps.stage_id=%d AND cycle_num <= %d
             ORDER BY well_num, cycle_num, channel',
-        exp_id, stage_id)
+        exp_id, stage_id, max_cycle)
     fluorescence_data <- dbGetQuery(db_conn, fd_qry)
     
     well_nums <- unique(fluorescence_data[,'well_num'])
