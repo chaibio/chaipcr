@@ -52,13 +52,19 @@ get_amplification_data <- function(
     message('max_cycle: ', max_cycle)
     
     fd_qry <- sprintf(
-        'SELECT * FROM fluorescence_data 
+        'SELECT well_num, cycle_num, channel FROM fluorescence_data 
             LEFT JOIN ramps ON fluorescence_data.ramp_id = ramps.id
             INNER JOIN steps ON fluorescence_data.step_id = steps.id OR steps.id = ramps.next_step_id 
             WHERE fluorescence_data.experiment_id=%d AND steps.stage_id=%d
             ORDER BY well_num, cycle_num, channel',
         exp_id, stage_id)
     fluorescence_data <- dbGetQuery(db_conn, fd_qry)
+    
+    well_nums <- unique(fluorescence_data[,'well_num'])
+    num_wells <- length(well_nums)
+    
+    cycle_nums <- unique(fluorescence_data[,'cycle_num'])
+    num_cycles <- max_cycle <- length(cycle_nums)
     
     channels <- unique(fluorescence_data[,'channel'])
     names(channels) <- channels
@@ -76,9 +82,7 @@ get_amplification_data <- function(
     amp_raw_list <- lapply(channels, get_amp_raw, db_conn, exp_id, stage_id, max_cycle, show_running_time)
     
     arl_ele1 <- amp_raw_list[[1]]
-    num_cycles <- dim(arl_ele1)[1]
     aca_dim3 <- dim(arl_ele1)[2]
-    num_wells <- aca_dim3 - 1
     
     oc_data <- prep_optic_calib(db_conn, calib_info, dye_in, dyes_2bfild)
     
@@ -93,7 +97,6 @@ get_amplification_data <- function(
         dimnames(amp_raw_mw_1ch) <- dimnames(amp_raw_1ch)
         return(amp_raw_mw_1ch)
     }) # mw = minus water
-    
     
     
     if (dcv) {
@@ -259,7 +262,8 @@ get_amp_raw <- function(
                 fluorescence_data.channel=%d AND
                 cycle_num <= %d
             ORDER BY well_num, cycle_num',
-        exp_id, stage_id, as.numeric(channel), max_cycle)
+        exp_id, stage_id, as.numeric(channel), max_cycle
+    )
     fluo_sel <- dbGetQuery(db_conn, fluo_qry)
     
     # cast fluo_sel into a pivot table organized by cycle_num (row label) and well_num (column label), average the data from all the available steps/ramps for each well and cycle
