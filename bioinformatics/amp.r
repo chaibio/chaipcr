@@ -70,6 +70,8 @@ get_amplification_data <- function(
     names(channels) <- channels
     num_channels <- length(channels)
     
+    message(sprintf('num_wells %i, num_cycles %i, num_channels %i', num_wells, num_cycles, num_channels))
+    
     if (num_channels == 1) dcv <- FALSE
     
     # for 128x
