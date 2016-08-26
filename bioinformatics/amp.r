@@ -64,13 +64,13 @@ get_amplification_data <- function(
     num_wells <- length(well_nums)
     
     cycle_nums <- unique(fluorescence_data[,'cycle_num'])
-    num_cycles <- max_cycle <- length(cycle_nums)
+    num_cycles <- length(cycle_nums)
     
     channels <- unique(fluorescence_data[,'channel'])
     names(channels) <- channels
     num_channels <- length(channels)
     
-    message(sprintf('num_wells %i, num_cycles %i, num_channels %i', num_wells, num_cycles, num_channels))
+    message(sprintf('num_channels %i, num_wells %i, num_cycles %i', num_channels, num_wells, num_cycles))
     
     if (num_channels == 1) dcv <- FALSE
     
@@ -81,7 +81,7 @@ get_amplification_data <- function(
         min_D2max <- min_D2max / 128
         }
     
-    amp_raw_list <- lapply(channels, get_amp_raw, db_conn, exp_id, stage_id, max_cycle, show_running_time)
+    amp_raw_list <- lapply(channels, get_amp_raw, db_conn, exp_id, stage_id, num_cycles, show_running_time)
     
     arl_ele1 <- amp_raw_list[[1]]
     aca_dim3 <- dim(arl_ele1)[2]
@@ -267,6 +267,9 @@ get_amp_raw <- function(
         exp_id, stage_id, as.numeric(channel), max_cycle
     )
     fluo_sel <- dbGetQuery(db_conn, fluo_qry)
+    
+    data_dims <- sapply(c('well_num', 'cycle_num'), function(col_name) length(unique(fluo_sel[,col_name])))
+    message(sprintf('channel %i, num_wells %i, num_cycles %i', as.numeric(channel), data_dims[1], data_dims[2]))
     
     # cast fluo_sel into a pivot table organized by cycle_num (row label) and well_num (column label), average the data from all the available steps/ramps for each well and cycle
     fluo_mlt <- melt(
