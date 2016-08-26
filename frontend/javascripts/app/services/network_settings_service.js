@@ -37,7 +37,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.listofAllWifi = {};
     this.wifiShutDownInProgress = false;
     this.wifiRestartingInProgress = false;
-    
+
     this.getWifiNetworks = function() {
 
       var delay = $q.defer();
@@ -185,14 +185,17 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       return delay.promise;
     };
 
-
+    this.stopInterval = function() {
+      $interval.cancel(this.intervalKey);
+      this.intervalKey = null;
+    };
 
     // We need to make sure that, we call /network api only when we are in
     // /settings/networkmanagement
     $rootScope.$on("$stateChangeStart", function(event, toState) {
       // If we are not in the network settings part, we dont have to query /network anymore
       if(toState.name !== "settings.networkmanagement" && toState.name !== "settings.networkmanagement.wifi") {
-        $interval.cancel(that.intervalKey);
+        that.stopInterval();
       }
     });
   }

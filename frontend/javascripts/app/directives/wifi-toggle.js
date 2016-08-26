@@ -95,13 +95,13 @@ window.ChaiBioTech.ngApp.directive('wifiToggle', [
         scope.configureSwitch = function(switchState) {
           //if(scope.noDevice === false) {
           console.log("configureSwitch", switchState);
-            if(switchState === true) {
-              scope.changeState("#8dc63f", "11");
-              scope.inProgress = true;
-            } else if(switchState === false) {
-              scope.changeState("#bbbbbb", "1");
-              scope.inProgress = true;
-            }
+          if(switchState === true) {
+            scope.changeState("#8dc63f", "11");
+            scope.inProgress = true;
+          } else if(switchState === false) {
+            scope.changeState("#bbbbbb", "1");
+            scope.inProgress = true;
+          }
             //return;
           //}
           //scope.changeState("#bbbbbb", "1");

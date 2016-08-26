@@ -37,7 +37,9 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
     $scope.wifiNetworkStatus = $scope.userSettings.wifiSwitchOn; // If network is on/off
 
     // Initiate wifi network service;
-    NetworkSettingsService.getSettings();
+    if ($scope.userSettings.wifiSwitchOn) {
+      NetworkSettingsService.getSettings();
+    }
 
     /**
       'new_wifi_result' this event is fired up when new wifi status is sent from the
@@ -72,6 +74,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
         if(switchStatus === true && $scope.userSettings.wifiSwitchOn === false) {
           $scope.turnOnWifi();
         } else if(switchStatus === false && $scope.userSettings.wifiSwitchOn === true) {
+          NetworkSettingsService.stopInterval();
           $scope.turnOffWifi();
         }
       }
@@ -177,6 +180,9 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
       }
 
       if($scope.userSettings.wifiSwitchOn) {
+        if(NetworkSettingsService.intervalKey === null) {
+          NetworkSettingsService.getSettings();
+        }
         $scope.currentWifiSettings = NetworkSettingsService.connectedWifiNetwork;
         $scope.findWifiNetworks();
       }
