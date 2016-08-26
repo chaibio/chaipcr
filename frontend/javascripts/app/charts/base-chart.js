@@ -163,7 +163,6 @@
         transform.y = -(Globals.height * transform.k - Globals.height);
       }
 
-      Globals.viewSVG = d3.select('.viewSVG');
       Globals.viewSVG.attr("transform", transform);
       Globals.gX.call(Globals.xAxis.scale(transform.rescaleX(Globals.xScale)));
       Globals.gY.call(Globals.yAxis.scale(transform.rescaleY(Globals.yScale)));
@@ -343,13 +342,10 @@
 
       d3.select(elem).selectAll("*").remove();
 
-      var width = 0;
-      var height = 0;
+      var width = Globals.width = elem.parentElement.offsetWidth - config.margin.left - config.margin.right;
+      var height = Globals.height = elem.parentElement.offsetHeight - config.margin.top - config.margin.bottom;
 
-      while (height <= 0 || width <= 0 || !width || !height) {
-        width = Globals.width = elem.parentElement.offsetWidth - config.margin.left - config.margin.right;
-        height = Globals.height = elem.parentElement.offsetHeight - config.margin.top - config.margin.bottom;
-      }
+      console.log(width, height);
 
       var chartSVG = Globals.chartSVG = d3.select(elem).append("svg")
         .attr("width", width + config.margin.left + config.margin.right)
@@ -483,6 +479,11 @@
 
     this.getScaleExtent = function() {
       return getScaleExtent() || 1;
+    };
+
+    this.empty = function () {
+      console.log('empty');
+      d3.select(elem).selectAll('*').remove();
     };
 
     this.setYAxis = setYAxis;

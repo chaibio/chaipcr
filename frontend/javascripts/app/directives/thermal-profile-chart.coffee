@@ -1,5 +1,5 @@
 
-angular.module("canvasApp").directive 'amplificationChart', [
+angular.module("canvasApp").directive 'thermalProfileChart', [
   '$window'
   '$timeout'
   ($window, $timeout) ->
@@ -13,10 +13,13 @@ angular.module("canvasApp").directive 'amplificationChart', [
         scroll: '='
         zoom: '='
         onZoom: '&'
-        show: '='
+        show: '=' # must be object {}
       link: ($scope, elem, attrs) ->
 
         chart = null
+        changeVal = null;
+        $scope.chartControl = $scope.chartControl || {}
+        $scope.show = $scope.show || true
 
         initChart = ->
           return if !$scope.data or !$scope.config or !$scope.show
@@ -52,7 +55,7 @@ angular.module("canvasApp").directive 'amplificationChart', [
           chart.zoomTo(zoom)
 
         $scope.$watch 'show', (show) ->
-          console.log 'amplificationChart: initChart'
+          console.log 'tempchart: initChart'
           if !chart
             initChart()
 
