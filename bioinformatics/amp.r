@@ -57,8 +57,8 @@ get_amplification_data <- function(
             LEFT JOIN experiment_definitions ON experiments.experiment_definition_id = experiment_definitions.id
             LEFT JOIN protocols ON experiment_definitions.id = protocols.experiment_definition_id
             LEFT JOIN stages ON protocols.id = stages.protocol_id
-            LEFT JOIN steps on stages.id = steps.stage_id
-            LEFT JOIN ramps on steps.id = ramps.next_step_id
+            LEFT JOIN steps ON stages.id = steps.stage_id
+            LEFT JOIN ramps ON steps.id = ramps.next_step_id
         WHERE experiments.id = %i AND stages.id = %i
         ',
         exp_id, stage_id
@@ -70,9 +70,9 @@ get_amplification_data <- function(
     
     wcc_qry <- sprintf(
         'SELECT well_num, cycle_num, channel FROM fluorescence_data
-        WHERE experiment_id = %i AND step_id in (%s)
+        WHERE experiment_id = %i AND cycle_num <= %i
         ',
-        exp_id, paste(step_ids, collapse=',')
+        exp_id, max_cycle
     )
     wcc <- dbGetQuery(db_conn, wcc_qry)
     
@@ -99,8 +99,8 @@ get_amplification_data <- function(
     
     
     sr_list <- c(
-        lapply(step_ids, function(step_id) list('step', step_id)), 
-        lapply(ramp_ids, function(ramp_id) list('ramp', ramp_id))
+        lapply(step_ids, function(step_id) c('step', step_id)), 
+        lapply(ramp_ids, function(ramp_id) c('ramp', ramp_id))
     )
     result_sr <- list()
     
@@ -114,7 +114,7 @@ get_amplification_data <- function(
             get_amp_raw, 
             db_conn, 
             exp_id, 
-            sr_ele[[1]], sr_ele[[2]], 
+            sr_ele[1], sr_ele[2], 
             well_nums, cycle_nums, 
             show_running_time
         )
@@ -272,7 +272,7 @@ get_amplification_data <- function(
     
     dbDisconnect(db_conn)
     
-    check_obj2br(result_sr)
+    check_obj2br(result_sr, deeper=TRUE)
     
     return(result_sr)
     }
@@ -301,7 +301,7 @@ get_amp_raw <- function(
             FROM fluorescence_data 
             WHERE 
                 experiment_id=%i AND 
-                %s_id=%i AND 
+                %s_id=%s AND 
                 channel=%i AND
                 cycle_num <= %i
             ORDER BY well_num, cycle_num',
@@ -310,14 +310,16 @@ get_amp_raw <- function(
     
     fluo_sel <- dbGetQuery(db_conn, fluo_qry)
     
-    fluo_unstack <- cbind(cycle_nums, unstack(fluo_sel, fluorescence_value ~ well_num))
-    dimnames(fluo_unstack) <- list(cycle_nums, c('cycle_num', well_nums))
+    fluo_unstack <- unstack(fluo_sel, fluorescence_value ~ well_num)
+    if (length(cycle_nums) == 1) fluo_unstack <- t(fluo_unstack)
+    fluo_us_wcn <- cbind(cycle_nums, fluo_unstack)
+    dimnames(fluo_us_wcn) <- list(cycle_nums, c('cycle_num', well_nums))
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]
     if (show_running_time) message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
     
-    return(fluo_unstack)
+    return(fluo_us_wcn)
     }
 
 
