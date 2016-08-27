@@ -51,22 +51,38 @@ get_amplification_data <- function(
     
     message('max_cycle: ', max_cycle)
     
-    fd_qry <- sprintf(
-        'SELECT well_num, cycle_num, channel FROM fluorescence_data 
-            LEFT JOIN ramps ON fluorescence_data.ramp_id = ramps.id
-            INNER JOIN steps ON fluorescence_data.step_id = steps.id OR steps.id = ramps.next_step_id 
-            WHERE fluorescence_data.experiment_id=%d AND steps.stage_id=%d AND cycle_num <= %d
-            ORDER BY well_num, cycle_num, channel',
-        exp_id, stage_id, max_cycle)
-    fluorescence_data <- dbGetQuery(db_conn, fd_qry)
+    sr_qry <- sprintf(
+        'SELECT steps.id, steps.collect_data, ramps.id, ramps.collect_data FROM
+            experiments
+            LEFT JOIN experiment_definitions ON experiments.experiment_definition_id = experiment_definitions.id
+            LEFT JOIN protocols ON experiment_definitions.id = protocols.experiment_definition_id
+            LEFT JOIN stages ON protocols.id = stages.protocol_id
+            LEFT JOIN steps on stages.id = steps.stage_id
+            LEFT JOIN ramps on steps.id = ramps.next_step_id
+        WHERE experiments.id = %i AND stages.id = %i
+        ',
+        exp_id, stage_id
+    )
+    sr <- dbGetQuery(db_conn, sr_qry)
+    colnames(sr) <- c('step_id', 'step_collect_data', 'ramp_id', 'ramp_collect_data')
+    step_ids <- unique(sr[sr[,'step_collect_data'] == 1, 'step_id'])
+    ramp_ids <- unique(sr[sr[,'ramp_collect_data'] == 1, 'ramp_id'])
     
-    well_nums <- unique(fluorescence_data[,'well_num'])
+    wcc_qry <- sprintf(
+        'SELECT well_num, cycle_num, channel FROM fluorescence_data
+        WHERE experiment_id = %i AND step_id in (%s)
+        ',
+        exp_id, paste(step_ids, collapse=',')
+    )
+    wcc <- dbGetQuery(db_conn, wcc_qry)
+    
+    well_nums <- unique(wcc[,'well_num'])
     num_wells <- length(well_nums)
     
-    cycle_nums <- unique(fluorescence_data[,'cycle_num'])
+    cycle_nums <- unique(wcc[,'cycle_num'])
     num_cycles <- length(cycle_nums)
     
-    channels <- unique(fluorescence_data[,'channel'])
+    channels <- unique(wcc[,'channel'])
     names(channels) <- channels
     num_channels <- length(channels)
     
@@ -79,160 +95,186 @@ get_amplification_data <- function(
         min_fluomax <- min_fluomax / 128
         min_D1max <- min_D1max / 128
         min_D2max <- min_D2max / 128
-        }
-    
-    amp_raw_list <- lapply(channels, get_amp_raw, db_conn, exp_id, stage_id, num_cycles, show_running_time)
-    
-    arl_ele1 <- amp_raw_list[[1]]
-    aca_dim3 <- dim(arl_ele1)[2]
-    
-    oc_data <- prep_optic_calib(db_conn, calib_info, dye_in, dyes_2bfild)
-    
-    amp_raw_mw_list <- lapply(channels, function(channel) {
-        amp_raw_1ch <- amp_raw_list[[channel]]
-        amp_raw_mw_1ch <- cbind(
-            amp_raw_1ch[,1], 
-            do.call(rbind, lapply(1:num_cycles, function(cycle_num)
-                amp_raw_1ch[cycle_num, 2:aca_dim3] - oc_data[['water']][channel,]
-            ))
-        )
-        dimnames(amp_raw_mw_1ch) <- dimnames(amp_raw_1ch)
-        return(amp_raw_mw_1ch)
-    }) # mw = minus water
-    
-    
-    if (dcv) {
-        # ac2dcv: when 1 %in% dim(amp_calib_array), `ac2dcv <- amp_calib_array[,,2:aca_dim3]` will result in reduced dimensions in ac2dcv
-        ac2dcv_dim <- c(num_channels, dim(arl_ele1) - c(0,1))
-        ac2dcv_dimnames <- list(channels, dimnames(arl_ele1)[[1]], dimnames(arl_ele1)[[2]][2:aca_dim3])
-        ac2dcv <- array(NA, dim=ac2dcv_dim, dimnames=ac2dcv_dimnames)
-        for (channel in channels) ac2dcv[channel,,] <- as.matrix(amp_raw_mw_list[[channel]][,2:aca_dim3])
-        # end: ac2dcv
-        dcvd_out <- deconv(ac2dcv, db_conn, calib_info)
-        rboc_mtch <- lapply(channels, function(channel) {
-            dcvd_1ch <- dcvd_out[['dcvd_array']][channel,,]
-            dcvd_1ch_wcyc <- cbind(amp_raw_mw_list[[channel]][,1], dcvd_1ch)
-            colnames(dcvd_1ch_wcyc)[1] <- 'cycle_num'
-            return(dcvd_1ch_wcyc)
-        })
-        k_list_temp <- dcvd_out[['k_list_temp']]
-    } else {
-        rboc_mtch <- amp_raw_mw_list
-        k_list_temp <- NULL
     }
+    
+    
+    sr_list <- c(
+        lapply(step_ids, function(step_id) list('step', step_id)), 
+        lapply(ramp_ids, function(ramp_id) list('ramp', ramp_id))
+    )
+    result_sr <- list()
+    
+    for (sr_ele in sr_list) {
+        
+        sr <- sr_ele[1]
+        sr_id <- sr_ele[2]
+        
+        amp_raw_list <- lapply(
+            channels, 
+            get_amp_raw, 
+            db_conn, 
+            exp_id, 
+            sr_ele[[1]], sr_ele[[2]], 
+            well_nums, cycle_nums, 
+            show_running_time
+        )
+        
+        arl_ele1 <- amp_raw_list[[1]]
+        aca_dim3 <- dim(arl_ele1)[2]
+        
+        oc_data <- prep_optic_calib(db_conn, calib_info, dye_in, dyes_2bfild)
+        
+        amp_raw_mw_list <- lapply(channels, function(channel) {
+            amp_raw_1ch <- amp_raw_list[[channel]]
+            amp_raw_mw_1ch <- cbind(
+                amp_raw_1ch[,1], 
+                do.call(rbind, lapply(1:num_cycles, function(cycle_num)
+                    amp_raw_1ch[cycle_num, 2:aca_dim3] - oc_data[['water']][channel,]
+                ))
+            )
+            dimnames(amp_raw_mw_1ch) <- dimnames(amp_raw_1ch)
+            return(amp_raw_mw_1ch)
+        }) # mw = minus water
+        
+        
+        if (dcv) {
+            # ac2dcv: when 1 %in% dim(amp_calib_array), `ac2dcv <- amp_calib_array[,,2:aca_dim3]` will result in reduced dimensions in ac2dcv
+            ac2dcv_dim <- c(num_channels, dim(arl_ele1) - c(0,1))
+            ac2dcv_dimnames <- list(channels, dimnames(arl_ele1)[[1]], dimnames(arl_ele1)[[2]][2:aca_dim3])
+            ac2dcv <- array(NA, dim=ac2dcv_dim, dimnames=ac2dcv_dimnames)
+            for (channel in channels) ac2dcv[channel,,] <- as.matrix(amp_raw_mw_list[[channel]][,2:aca_dim3])
+            # end: ac2dcv
+            dcvd_out <- deconv(ac2dcv, db_conn, calib_info)
+            rboc_mtch <- lapply(channels, function(channel) {
+                dcvd_1ch <- dcvd_out[['dcvd_array']][channel,,]
+                dcvd_1ch_wcyc <- cbind(amp_raw_mw_list[[channel]][,1], dcvd_1ch)
+                colnames(dcvd_1ch_wcyc)[1] <- 'cycle_num'
+                return(dcvd_1ch_wcyc)
+            })
+            k_list_temp <- dcvd_out[['k_list_temp']]
+        } else {
+            rboc_mtch <- amp_raw_mw_list
+            k_list_temp <- NULL
+        }
+        
+        rbbs <- lapply(channels, function(channel) {
+            rboc_1ch <- as.matrix(rboc_mtch[[channel]])
+            rbbs_1ch <- data.matrix(optic_calib(
+                matrix(rboc_1ch[,2:ncol(rboc_1ch)], ncol=num_wells), 
+                oc_data, channel, 
+                minus_water=FALSE, 
+                show_running_time
+            )$fluo_calib
+            ) # convert data frame to a numeric matrix
+            colnames(rbbs_1ch)[1] <- 'cycle_num'
+            return(rbbs_1ch)
+        })
+        
+        if (num_cycles <= 2) {
+            
+            message(sprintf('Number of available cycles (%i) of fluorescence data is less than 2. Baseline subtraction and calculation of Cq and amplification efficiency are not performed.', num_cycles))
+            
+            well_names <- dimnames(arl_ele1)[[2]][2:aca_dim3]
+            
+            coefficients_1ch <- matrix(
+                NA, 
+                nrow = length(model[['parnames']]), 
+                ncol = num_wells, 
+                dimnames = list(model[['parnames']], well_names) )
+            coefficients_mtch <- list()
+            
+            cq_eff_adj_1ch <- matrix(
+                NA,
+                nrow = 2, 
+                ncol = num_wells, 
+                dimnames = list(c('cq', 'eff'), well_names) )
+            cq_eff_adj_mtch <- list()
+            
+            for (channel in channels) {
+                coefficients_mtch[[as.character(channel)]] <- coefficients_1ch
+                cq_eff_adj_mtch[[as.character(channel)]] <- cq_eff_adj_1ch
+            }
+            
+            blsub_mtch_post <- list(
+                'bl_corrected'=lapply(rbbs, function(ele) ele[,2:ncol(ele)]), 
+                'coefficients'=coefficients_mtch)
+            
+            ce_mtch <- list('cq_eff_adj'=cq_eff_adj_mtch)
+            
+            maxq_blsub_fluo <- NA
+        
+        } else {
+        
+            if (min_reliable_cyc > num_cycles) mbf_cycles <- 1:num_cycles else mbf_cycles <- min_reliable_cyc:num_cycles # mbf = maxq_blsub_fluo
+            
+            blsub_mtch <- process_mtch(
+                rbbs, 
+                matrix2array=FALSE, 
+                func=subtract_baseline, 
+                maxiter, maxfev, 
+                model, baselin, basecyc, fallback, 
+                type, cp, 
+                min_reliable_cyc, 
+                show_running_time)
+            blsub_mtch_pre <- blsub_mtch[['pre_consoli']]
+            blsub_mtch_post <- blsub_mtch[['post_consoli']]
+            
+            blsub4ce <- lapply(blsub_mtch_pre, function(ele) list(
+                'bl_corrected_mbf' = matrix( # `matrix` operation to ensure `bl_corrected_mbf` has two dimensions instead of one
+                    ele[['bl_corrected']][mbf_cycles,], 
+                    nrow=length(mbf_cycles), 
+                    dimnames = list(mbf_cycles, colnames(ele[['bl_corrected']])) ), 
+                'mod_ori'=ele[['mod_ori']] ))
+            mbf_fluos <- do.call(cbind, 
+                lapply(1:length(blsub4ce), function (channel_i) blsub4ce[[channel_i]][['bl_corrected_mbf']]))
+            maxq_blsub_fluo <- max(sapply(1:dim(mbf_fluos)[2], function(i) quantile(mbf_fluos[,i], qt_prob)))
+            
+            ce_mtch <- process_mtch(
+                blsub4ce, 
+                matrix2array=FALSE, 
+                func=get_cq_eff, 
+                num_cycles, 
+                maxq_blsub_fluo, 
+                type, cp, 
+                min_reliable_cyc, 
+                min_fluomax, 
+                min_D1max, min_D2max, 
+                min_fluo_ratio, 
+                min_nD1max, min_nD2max 
+                # max_cv_fluo_cq, 
+                # max_rsem, max_rser # maximum residual standard error divided by absolute value of mean or range, for Cq to be reported as actual value instead of NA
+                )[['post_consoli']]
+        }
+        
+        downstream <- list('rbbs'=rbbs, 
+                           'baseline_subtracted'=blsub_mtch_post[['bl_corrected']], 
+                           'cq'=ce_mtch[['cq_eff_adj']], 
+                           'coefficients'=blsub_mtch_post[['coefficients']]
+                           )
+        
+        if (extra_output) {
+            result_mtch <- c(
+                downstream, blsub_mtch_post, ce_mtch, 
+                list(
+                    'amp_raw_list'=amp_raw_list, 
+                    'amp_raw_mw_list'=amp_raw_mw_list, 
+                    'dcvd_mtch'=rboc_mtch, 
+                    'k_list_temp'=k_list_temp, 
+                    'oc_data'=oc_data, 
+                    'maxq_blsub_fluo'=maxq_blsub_fluo) )
+        } else result_mtch <- downstream
+        
+        
+        result_sr[[paste(sr_ele, collapse='_')]] <- result_mtch
+        
+    } # for
+    
     
     dbDisconnect(db_conn)
     
-    rbbs <- lapply(channels, function(channel) {
-        rboc_1ch <- as.matrix(rboc_mtch[[channel]])
-        rbbs_1ch <- data.matrix(optic_calib(
-            matrix(rboc_1ch[,2:ncol(rboc_1ch)], ncol=num_wells), 
-            oc_data, channel, 
-            minus_water=FALSE, 
-            show_running_time
-        )$fluo_calib
-        ) # convert data frame to a numeric matrix
-        colnames(rbbs_1ch)[1] <- 'cycle_num'
-        return(rbbs_1ch)
-    })
+    check_obj2br(result_sr)
     
-    if (num_cycles <= 2) {
-        
-        message(sprintf('Number of available cycles (%i) of fluorescence data is less than 2. Baseline subtraction and calculation of Cq and amplification efficiency are not performed.', num_cycles))
-        
-        well_names <- dimnames(arl_ele1)[[2]][2:aca_dim3]
-        
-        coefficients_1ch <- matrix(
-            NA, 
-            nrow = length(model[['parnames']]), 
-            ncol = num_wells, 
-            dimnames = list(model[['parnames']], well_names) )
-        coefficients_mtch <- list()
-        
-        cq_eff_adj_1ch <- matrix(
-            NA,
-            nrow = 2, 
-            ncol = num_wells, 
-            dimnames = list(c('cq', 'eff'), well_names) )
-        cq_eff_adj_mtch <- list()
-        
-        for (channel in channels) {
-            coefficients_mtch[[as.character(channel)]] <- coefficients_1ch
-            cq_eff_adj_mtch[[as.character(channel)]] <- cq_eff_adj_1ch
-        }
-        
-        blsub_mtch_post <- list(
-            'bl_corrected'=lapply(rbbs, function(ele) ele[,2:ncol(ele)]), 
-            'coefficients'=coefficients_mtch)
-        
-        ce_mtch <- list('cq_eff_adj'=cq_eff_adj_mtch)
-        
-        maxq_blsub_fluo <- NA
-    
-    } else {
-    
-        if (min_reliable_cyc > num_cycles) mbf_cycles <- 1:num_cycles else mbf_cycles <- min_reliable_cyc:num_cycles # mbf = maxq_blsub_fluo
-        
-        blsub_mtch <- process_mtch(
-            rbbs, 
-            matrix2array=FALSE, 
-            func=subtract_baseline, 
-            maxiter, maxfev, 
-            model, baselin, basecyc, fallback, 
-            type, cp, 
-            min_reliable_cyc, 
-            show_running_time)
-        blsub_mtch_pre <- blsub_mtch[['pre_consoli']]
-        blsub_mtch_post <- blsub_mtch[['post_consoli']]
-        
-        blsub4ce <- lapply(blsub_mtch_pre, function(ele) list(
-            'bl_corrected_mbf' = matrix( # `matrix` operation to ensure `bl_corrected_mbf` has two dimensions instead of one
-                ele[['bl_corrected']][mbf_cycles,], 
-                nrow=length(mbf_cycles), 
-                dimnames = list(mbf_cycles, colnames(ele[['bl_corrected']])) ), 
-            'mod_ori'=ele[['mod_ori']] ))
-        mbf_fluos <- do.call(cbind, 
-            lapply(1:length(blsub4ce), function (channel_i) blsub4ce[[channel_i]][['bl_corrected_mbf']]))
-        maxq_blsub_fluo <- max(sapply(1:dim(mbf_fluos)[2], function(i) quantile(mbf_fluos[,i], qt_prob)))
-        
-        ce_mtch <- process_mtch(
-            blsub4ce, 
-            matrix2array=FALSE, 
-            func=get_cq_eff, 
-            num_cycles, 
-            maxq_blsub_fluo, 
-            type, cp, 
-            min_reliable_cyc, 
-            min_fluomax, 
-            min_D1max, min_D2max, 
-            min_fluo_ratio, 
-            min_nD1max, min_nD2max 
-            # max_cv_fluo_cq, 
-            # max_rsem, max_rser # maximum residual standard error divided by absolute value of mean or range, for Cq to be reported as actual value instead of NA
-            )[['post_consoli']]
-    }
-    
-    downstream <- list('rbbs'=rbbs, 
-                       'baseline_subtracted'=blsub_mtch_post[['bl_corrected']], 
-                       'cq'=ce_mtch[['cq_eff_adj']], 
-                       'coefficients'=blsub_mtch_post[['coefficients']]
-                       )
-    
-    if (extra_output) {
-        result_mtch <- c(
-            downstream, blsub_mtch_post, ce_mtch, 
-            list(
-                'amp_raw_list'=amp_raw_list, 
-                'amp_raw_mw_list'=amp_raw_mw_list, 
-                'dcvd_mtch'=rboc_mtch, 
-                'k_list_temp'=k_list_temp, 
-                'oc_data'=oc_data, 
-                'maxq_blsub_fluo'=maxq_blsub_fluo) )
-    } else result_mtch <- downstream
-    
-    check_obj2br(result_mtch)
-    
-    return(result_mtch)
+    return(result_sr)
     }
 
 
@@ -240,9 +282,10 @@ get_amplification_data <- function(
 get_amp_raw <- function(
     channel, # as 1st argument for iteration by channel
     db_conn, 
-    exp_id, stage_id, # for selecting data to analyze
-    # oc_data, # optical calibration data
-    max_cycle, # number of cycles to analyze
+    exp_id, 
+    sr, # 'step' or 'ramp'
+    sr_id, 
+    well_nums, cycle_nums, 
     show_running_time # option to show time cost to run this function
     ) {
     
@@ -254,44 +297,27 @@ get_amp_raw <- function(
     
     # get fluorescence data for amplification
     fluo_qry <- sprintf(
-        'SELECT step_id, fluorescence_value, well_num, cycle_num, ramp_id, channel 
+        'SELECT fluorescence_value, well_num
             FROM fluorescence_data 
-            LEFT JOIN ramps ON fluorescence_data.ramp_id = ramps.id
-            INNER JOIN steps ON fluorescence_data.step_id = steps.id OR steps.id = ramps.next_step_id 
             WHERE 
-                fluorescence_data.experiment_id=%d AND 
-                steps.stage_id=%d AND 
-                fluorescence_data.channel=%d AND
-                cycle_num <= %d
+                experiment_id=%i AND 
+                %s_id=%i AND 
+                channel=%i AND
+                cycle_num <= %i
             ORDER BY well_num, cycle_num',
-        exp_id, stage_id, as.numeric(channel), max_cycle
+        exp_id, sr, sr_id, as.numeric(channel), max(cycle_nums)
     )
+    
     fluo_sel <- dbGetQuery(db_conn, fluo_qry)
     
-    data_dims <- sapply(c('well_num', 'cycle_num'), function(col_name) length(unique(fluo_sel[,col_name])))
-    message(sprintf('channel %i, num_wells %i, num_cycles %i', as.numeric(channel), data_dims[1], data_dims[2]))
-    
-    # cast fluo_sel into a pivot table organized by cycle_num (row label) and well_num (column label), average the data from all the available steps/ramps for each well and cycle
-    fluo_mlt <- melt(
-        fluo_sel, id.vars=c('step_id', 'well_num', 'cycle_num', 'ramp_id'), 
-        measure.vars='fluorescence_value')
-    fluo_cast <- dcast(fluo_mlt, cycle_num ~ well_num, mean)
-    
-    # get optical-calibrated data.
-    num_wells <- length(unique(fluo_sel[,'well_num']))
-    # calibd <- optic_calib(fluo_cast[,2:(num_wells+1)], oc_data, channel, show_running_time)$fluo_calib # column cycle_num is included, because adply automatically create a column at index 1 of output from rownames of input array (1st argument)
-    # ac_mtx <- cbind(fluo_cast[, 'cycle_num'], calibd)
-    # colnames(ac_mtx)[1] <- 'cycle_num'
-    # amp_data <- list(
-        # 'ac_mtx'=as.matrix(ac_mtx), # change data frame to matrix for ease of constructing array
-        # 'fluo_cast'=fluo_cast, 
-        # 'signal_water_diff'=calibd$signal_water_diff)
+    fluo_unstack <- cbind(cycle_nums, unstack(fluo_sel, fluorescence_value ~ well_num))
+    dimnames(fluo_unstack) <- list(cycle_nums, c('cycle_num', well_nums))
     
     # report time cost for this function
     end_time <- proc.time()[['elapsed']]
     if (show_running_time) message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
     
-    return(fluo_cast)
+    return(fluo_unstack)
     }
 
 
