@@ -30,7 +30,8 @@ window.ChaiBioTech.ngApp
 
     Status.startSync()
     PeriodicUpdate.init()
-
+    NetworkSettingsService.getReady();
+    
     if not $.jStorage.get('userNetworkSettings')
       userNetworkSettings =
         wifiSwitchOn: true
