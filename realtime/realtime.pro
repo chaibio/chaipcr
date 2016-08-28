@@ -141,7 +141,8 @@ HEADERS += \
     server/updatehandler.h \
     server/datahandler.h \
     server/updateuploadhandler.h \
-    util/logger.h
+    util/logger.h \
+    util/timercallback.h
 
 SOURCES += \
     app/pins.cpp \

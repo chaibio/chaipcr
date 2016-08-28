@@ -87,6 +87,12 @@ public:
     inline const boost::posix_time::ptime& lastPauseTime() const { return _lastPauseTime; }
     void setPauseTime(const boost::posix_time::ptime &time) { _lastPauseTime = time; }
 
+    inline bool isExtended() const { return _extendedState; }
+    inline void setExtended(bool state) { _extendedState = state; }
+
+    inline bool hasBeganStep() const { return _stepBeganState; }
+    inline void setStepBegan(bool state) { _stepBeganState = state; }
+
     void setProtocol(const Protocol &protocol);
     void setProtocol(Protocol &&protocol);
     void setProtocol(Protocol *protocol);
@@ -106,6 +112,9 @@ private:
     std::time_t _estimatedDuration;
     std::time_t _pausedDuration;
     boost::posix_time::ptime _lastPauseTime;
+
+    bool _extendedState;
+    bool _stepBeganState;
 
     Protocol *_protocol;
 };

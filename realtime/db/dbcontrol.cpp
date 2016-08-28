@@ -463,7 +463,7 @@ void DBControl::addFluorescenceData(const Experiment &experiment, const std::vec
     std::vector<std::string> queries;
     std::stringstream stream;
 
-    stream << "INSERT INTO fluorescence_data(experiment_id, step_id, ramp_id, fluorescence_value, well_num, channel, cycle_num) VALUES";
+    stream << "INSERT INTO fluorescence_data(experiment_id, step_id, ramp_id, baseline_value, fluorescence_value, well_num, channel, cycle_num) VALUES";
 
     for (std::vector<Optics::FluorescenceData>::const_iterator it = fluorescenceData.begin(); it != fluorescenceData.end(); ++it)
     {
@@ -474,7 +474,7 @@ void DBControl::addFluorescenceData(const Experiment &experiment, const std::vec
         else
             stream << "NULL,"  << experiment.protocol()->currentRamp()->id() << ",";
 
-        stream << it->value << "," << it->wellId << "," << (it->channel + 1) << "," << experiment.protocol()->currentStage()->currentCycle() << ")";
+        stream << it->baselineValue << "," << it->fluorescenceValue << "," << it->wellId << "," << (it->channel + 1) << "," << experiment.protocol()->currentStage()->currentCycle() << ")";
 
         if (it + 1 != fluorescenceData.end())
             stream << ",";
