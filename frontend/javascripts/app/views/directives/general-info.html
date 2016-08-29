@@ -38,7 +38,7 @@
 
   <div class="bottom-gather-data SH">
     <span class=bottom-gather-data-text>GATHER DATA</span>
-    <div class="bottom-gather-data-step"><gather-data-toggle data="step.collect_data" call="changeDuringStep"></gather-data-toggle></div><span>STEP</span>
+    <div class="bottom-gather-data-step"><gather-data-toggle data="step.collect_data" call="changeDuringStep" ih="infiniteHoldStep"></gather-data-toggle></div><span ng-class="{faded: infiniteHoldStep}">STEP</span>
     <div class="bottom-gather-data-ramp"><gather-data-toggle data="step.ramp.collect_data" call="changeDuringRamp"></gather-data-toggle></div><span>RAMP</span>
   </div>
 </div>

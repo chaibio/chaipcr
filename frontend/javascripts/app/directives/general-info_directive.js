@@ -47,7 +47,6 @@ window.ChaiBioTech.ngApp.directive('general', [
         scope.$on("dataLoaded", function() {
           // there is a slight delay for the controller to catch up so wait for it and load
           scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
-
           scope.$watch('popUp', function(newVal) {
             popupStatus.popupStatusGatherData = scope.popUp;
           });
@@ -60,12 +59,23 @@ window.ChaiBioTech.ngApp.directive('general', [
               scope.showCycling = false;
             }
           });
+
+          scope.$watch("fabricStep.circle.holdTime.text", function(holdTime) {
+            if(holdTime !== undefined) {
+              if(holdTime === "∞") {
+                scope.infiniteHoldStep = true;
+                scope.infiniteHoldStage = true;
+              } else {
+                scope.infiniteHoldStep = false;
+                scope.infiniteHoldStage = false;
+              }
+            }
+          });
         });
 
         // focusElement is the classname of the desired input box to be shown
         scope.clickOnField = function(field, focusElement) {
 
-          //console.log($('.edit-step-name').val(), focusElement);
           scope[field] = true;
           onClickValue = $('.' + focusElement).val();
 
