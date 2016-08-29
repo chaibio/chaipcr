@@ -4,8 +4,9 @@
 # top level function called by external codes
 get_amplification_data <- function(
     db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
-    exp_id, stage_id, calib_info, # for selecting data to analyze
-    sr_str_vec=c(), # element format: "step_21" (21 is the step_id), "ramp_11" (11 is the ramp_id)
+    exp_id, 
+    sr_named_list, # `list(step_id=xx)` or `list(ramp_id=xx)`
+    calib_info, # for selecting data to analyze
     min_reliable_cyc=5, # needs to be an integer >= 1
     dye_in='FAM', dyes_2bfild=NULL, # fill missing channels in calibration experiment(s) using preset calibration experiments
     dcv=TRUE, # logical, whether to perform multi-channel deconvolution
@@ -46,14 +47,15 @@ get_amplification_data <- function(
     
     db_etc_out <- db_etc(
         db_usr, db_pwd, db_host, db_port, db_name, 
-        exp_id, stage_id, calib_info)
+        exp_id, NULL, calib_info)
     db_conn <- db_etc_out[['db_conn']]
     calib_info <- db_etc_out[['calib_info']]
     
+    print(sr_named_list)
     message('max_cycle: ', max_cycle)
     
     
-    if (length(sr_str_vec) == 0) {
+    if (length(sr_named_list) == 0) {
         
         sr_qry <- sprintf(
             'SELECT steps.id, steps.collect_data, ramps.id, ramps.collect_data FROM
@@ -63,9 +65,9 @@ get_amplification_data <- function(
                 LEFT JOIN stages ON protocols.id = stages.protocol_id
                 LEFT JOIN steps ON stages.id = steps.stage_id
                 LEFT JOIN ramps ON steps.id = ramps.next_step_id
-            WHERE experiments.id = %i AND stages.id = %i
+            WHERE experiments.id = %i
             ',
-            exp_id, stage_id
+            exp_id
         )
         sr_df <- dbGetQuery(db_conn, sr_qry)
         colnames(sr_df) <- c('step_id', 'step_collect_data', 'ramp_id', 'ramp_collect_data')
@@ -76,20 +78,24 @@ get_amplification_data <- function(
             lapply(ramp_ids, function(ramp_id) c('ramp', ramp_id))
         )
         
-    } else {
-        sr_list <- strsplit(sr_str_vec, '_')
+    } else { # length(sr_named_list) == 1
+        sr_list <- list(c(strsplit(names(sr_named_list), '_')[[1]][1], sr_named_list[[1]]))
     }
     
     # find the latest step or ramp
-    sr_ids <- sapply(sr_list, function(sr) as.numeric(sr[2]))
-    max_step_id <- max(sr_ids)
-    msi_idc = which(sr_ids == max_step_id)
-    if (length(msi_idc) == 1) {
-        latest_idx <- msi_idc
-    } else { # length(max_idc) == 2
-        latest_idx <- which(sapply(sr_list, function(sr) sr[1] == "step" && sr[2] == max_step_id))
-    } # if length(min_idc) == 1
-    sr_latest <- sr_list[[latest_idx]]
+    if (length(sr_list) == 1) {
+        sr_latest <- sr_list[[1]]
+    } else {
+        sr_ids <- sapply(sr_list, function(sr) as.numeric(sr[2]))
+        max_step_id <- max(sr_ids)
+        msi_idc = which(sr_ids == max_step_id)
+        if (length(msi_idc) == 1) {
+            latest_idx <- msi_idc
+        } else { # length(max_idc) == 2
+            latest_idx <- which(sapply(sr_list, function(sr) sr[1] == "step" && sr[2] == max_step_id))
+        } # if length(min_idc) == 1
+        sr_latest <- sr_list[[latest_idx]]
+    }
     
     wcc_qry <- sprintf(
         'SELECT well_num, cycle_num, channel FROM fluorescence_data
@@ -291,9 +297,17 @@ get_amplification_data <- function(
     
     dbDisconnect(db_conn)
     
-    check_obj2br(result_sr, deeper=TRUE)
+    if (length(sr_named_list) == 1) {
+        result <- result_sr[[1]]
+        deeper <- FALSE
+    } else {
+        result <- result_sr
+        deeper <- TRUE
+    }
     
-    return(result_sr)
+    check_obj2br(result, deeper)
+    
+    return(result)
     }
 
 
