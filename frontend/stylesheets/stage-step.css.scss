@@ -268,13 +268,23 @@
             cursor: default;
           }
 
-          .small-button {
+          .small_button {
             width: 120px;
             background-color: white;
             height: 30px;
             border: 1px solid black;
             font-weight: 100;
           }
+          .small_button_disabled {
+            width: 120px;
+            background-color: white;
+            height: 30px;
+            border: 1px solid #cdcdcd;
+            font-weight: 100;
+            color: #cdcdcd;
+            cursor: default;
+          }
+
           .smallButtonEdit {
             background-color: black;
             color: white;
