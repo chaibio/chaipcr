@@ -51,6 +51,9 @@ void DataHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net
         response.add("Access-Control-Allow-Origin", "*");
         response.add("Access-Control-Allow-Headers", "Content-Type");
 
+        if (request.getMethod() == "GET")
+            response.add("Cache-Control", "no-store, must-revalidateExpires: 0");
+
         processResponse(response);
     }
     catch (const std::exception &ex)
