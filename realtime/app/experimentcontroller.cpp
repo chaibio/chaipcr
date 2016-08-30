@@ -588,14 +588,35 @@ void ExperimentController::calculateEstimatedDuration()
         std::time_t holdTime = stage->currentStepHoldTime();
         double temperature = stage->currentStepTemperature(HeatBlockInstance::getInstance()->minTargetTemperature(), HeatBlockInstance::getInstance()->maxTargetTemperature());
         double rate = stage->currentRamp()->rate();
+        double rampDuration = 0;
 
         rate = rate > 0 && rate <= kDurationCalcHeatBlockRampSpeed ? rate : kDurationCalcHeatBlockRampSpeed;
 
-        if (previousTargetTemp < temperature)
-            duration += (((temperature - previousTargetTemp) / rate) + holdTime) * 1000;
+        if (HeatBlockInstance::getInstance()->temperature() < stage->currentStep()->temperature())
+            rampDuration = (temperature - previousTargetTemp) / rate * 1000;
         else
-            duration += (((previousTargetTemp - temperature) / rate) + holdTime) * 1000;
+            rampDuration = (previousTargetTemp - temperature) / rate * 1000;
 
+        if (stage->type() != Stage::Meltcurve)
+        {
+            if (stage->currentRamp()->collectData())
+            {
+                double interval = std::round(rampDuration - kOpticalFluorescenceMeasurmentPeriodMs);
+
+                if (interval < 0)
+                    rampDuration += interval * -1;
+            }
+
+            if (stage->currentStep()->collectData() && holdTime > 0)
+            {
+                double interval = holdTime * 1000 - kOpticalFluorescenceMeasurmentPeriodMs;
+
+                if (interval < 0)
+                    duration += interval * -1;
+            }
+        }
+
+        duration += rampDuration + holdTime * 1000;
         previousTargetTemp = temperature;
     }
     while (experiment.protocol()->advanceNextStep());
