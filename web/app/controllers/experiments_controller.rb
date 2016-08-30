@@ -135,15 +135,28 @@ class ExperimentsController < ApplicationController
     end
   end
 
-  api :GET, "/experiments/:id/amplification_data", "Retrieve amplification data"
-  example "{'total_cycles':40,
+  api :GET, "/experiments/:id/amplification_data?raw=false&background=true&baseline=true&cq=true&step(ramp)_id=43", "Retrieve amplification data"
+  example "{'partial':false, 'total_cycles':40,
             'amplification_data':[['channel', 'well_num', 'cycle_num', 'background_substracted_value', 'baseline_Substracted_value'], [1, 1, 1, 25488, -2003], [1, 1, 2, 53984, -409]],
             'ct':[['channel', 'well_num', 'ct'], [1, 1, 12.11], [1, 2, 15.77], [1, 3, null]]}"
   def amplification_data
+    if params[:step_id].nil? && params[:ramp_id].nil?
+      #first step that collects data will be returned, if none of the steps can be found, first ramp that collect data will be returned
+      params[:raw] = false if params[:raw].nil?
+      params[:background] = true if params[:background].nil?
+      params[:baseline] = true if params[:baseline].nil?
+      params[:cq] = true if params[:cq].nil?
+    else #if step_id is specified, only raw data is returned
+      params[:raw] = true
+      params[:background] = false
+      params[:baseline] = false
+      params[:cq] = false
+    end
+    
     if @experiment
       if @experiment.ran?
-        if params[:step_id] == nil && params[:ramp_id] == nil
-          @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
+        @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
+        if params[:background] == true || params[:baseline] == true || params[:cq] == true
           if !@first_stage_collect_data.blank?
             begin
               task_submitted = background_calculate_amplification_data(@experiment, @first_stage_collect_data.id)
@@ -174,44 +187,30 @@ class ExperimentsController < ApplicationController
             @cts = []
             @partial = false
           end
-        else
+        end
+        
+        if params[:raw] == true
           #construct OR clause
           conditions = String.new
           wheres = Array.new
-          if params[:step_id]
-            conditions << " OR " unless conditions.length == 0
-            conditions << "step_id IN (?)"
-            wheres << params[:step_id].map(&:to_i)
-          end
-          if params[:ramp_id]
-            conditions << " OR " unless conditions.length == 0
-            conditions << "ramp_id IN (?)"
-            wheres << params[:ramp_id].map(&:to_i)
-          end
-          wheres.insert(0, conditions)
-          #query to database
-          @fluorescence_data = FluorescenceDatum.where("experiment_id=?",@experiment.id).where(wheres).order("step_id, ramp_id, cycle_num, well_num")
-          #group data
-          keyname = nil
-          key = nil
-          datalist = nil
-          @amplification_data_group = Array.new
-          @fluorescence_data.each do |data|
-            if data.step_id != nil && data.step_id != key
-              @amplification_data_group << OpenStruct.new(keyname=>key, :data=>datalist) if key != nil
-              key = data.step_id
-              keyname = :step_id
-              datalist = [data]
-            elsif data.ramp_id != nil && data.ramp_id != key
-              @amplification_data_group << OpenStruct.new(keyname=>key, :data=>datalist) if key != nil
-              key = data.ramp_id
-              keyname = :ramp_id
-              datalist = [data]
-            else
-              datalist << data
+          Constants::KEY_NAMES.each do |keyname|
+            keyvalue = params[keyname.to_sym]
+            if keyvalue
+              conditions << " OR " unless conditions.length == 0
+              conditions << "#{keyname} IN (?)"
+              if keyvalue.is_a? Array
+                wheres << keyvalue.map(&:to_i)
+              else
+                wheres << keyvalue.to_i
+              end
             end
           end
-          @amplification_data_group << OpenStruct.new(keyname=>key, :data=>datalist) if key != nil
+          wheres.insert(0, conditions)
+          #logger.info ("**********#{wheres.join(",")}")
+          #query to database
+          @fluorescence_data = FluorescenceDatum.where("experiment_id=?",@experiment.id).where(wheres).order("#{Constants::KEY_NAMES.join(", ")}, cycle_num, well_num")
+          @amplification_data_group = group_by_keynames(@fluorescence_data)
+          @partial = @experiment.running?
           respond_to do |format|
             format.json { render "amplification_data_group", :status => :ok}
           end
@@ -441,11 +440,25 @@ class ExperimentsController < ApplicationController
   def calculate_amplification_data(experiment_id, stage_id, calibration_id)
    # sleep(10)
   #  return  [AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>1, :well_num=>1, :cycle_num=>1, :background_subtracted_value=>1001, :baseline_subtracted_value=>102)], [AmplificationCurve.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>1, :well_num=>1, :ct=>10)]
+    step = Step.where(:stage_id=>stage_id, :collect_data=>true).order("steps.order_number").first
+    if step
+      sub_id = step.id
+      sub_type = "step"
+    else
+      ramp = Ramp.joins(:step).where(:stage_id=>stage_id, :collect_data=>true).order("ramps.order_number").first
+      if ramp
+        sub_id = ramp.id
+        sub_type = "ramp"
+      else
+        return nil, nil
+      end
+    end
+      
     config   = Rails.configuration.database_configuration
     connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
     begin
-      results = connection.eval("tryCatchError(get_amplification_data, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibrate_info(calibration_id)})")
+      results = connection.eval("tryCatchError(get_amplification_data, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, list(#{sub_type}_id=#{sub_id}), #{calibrate_info(calibration_id)})")
     rescue  => e
       logger.error("Rserve error: #{e}")
       kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
@@ -474,7 +487,7 @@ class ExperimentsController < ApplicationController
            (0...num_cycles).each do |cycle_num|
              background_subtracted_value = (background_subtracted_results.is_a? Array)? background_subtracted_results[well_num+1] : background_subtracted_results[cycle_num, well_num+1]
              baseline_subtracted_value = (baseline_subtracted_results.is_a? Array)? baseline_subtracted_results[well_num] : baseline_subtracted_results[cycle_num, well_num]
-             amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>channel+1, :well_num=>well_num+1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_value, :baseline_subtracted_value=>baseline_subtracted_value)
+             amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :sub_type=>sub_type, :sub_id=>sub_id, :channel=>channel+1, :well_num=>well_num+1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_value, :baseline_subtracted_value=>baseline_subtracted_value)
            end
          end
          ct_results = results[2][channel]
@@ -620,4 +633,26 @@ class ExperimentsController < ApplicationController
     end
   end
   
+  def group_by_keynames(data)
+    keyname = nil
+    key = nil
+    nodelist = nil
+    group = Array.new
+    
+    data.each do |node|
+      Constants::KEY_NAMES.each do |newkeyname|
+        newkeyname = newkeyname.to_sym
+        sub_id = node.send(newkeyname)
+        if sub_id != nil && sub_id != key
+          group << OpenStruct.new(keyname=>key, :data=>nodelist) if key != nil
+          keyname = newkeyname
+          key = sub_id
+          nodelist = []
+        end
+      end
+      nodelist << node
+    end
+    group << OpenStruct.new(keyname=>key, :data=>nodelist) if key != nil
+    return group
+  end
 end

@@ -19,6 +19,12 @@
 class AmplificationDatum < ActiveRecord::Base
   belongs_to :experiment
    
+  Constants::KEY_NAMES.each do |variable|
+    define_method("#{variable}") do
+      (sub_type == variable)? sub_id : nil
+    end
+  end
+  
   def self.retrieve(experiment_id, stage_id)
     self.where(:experiment_id=>experiment_id, :stage_id=>stage_id).order(:channel, :well_num, :cycle_num)
   end
