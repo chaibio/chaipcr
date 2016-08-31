@@ -21,9 +21,11 @@ class AmplificationDatum < ActiveRecord::Base
    
   Constants::KEY_NAMES.each do |variable|
     define_method("#{variable}") do
-      (sub_type == variable)? sub_id : nil
+      (sub_type + "_id" == variable)? sub_id : nil
     end
   end
+  
+  attr_accessor :fluorescence_value
   
   def self.retrieve(experiment_id, stage_id)
     self.where(:experiment_id=>experiment_id, :stage_id=>stage_id).order(:channel, :well_num, :cycle_num)
@@ -33,4 +35,9 @@ class AmplificationDatum < ActiveRecord::Base
     self.where(:experiment_id=>experiment_id, :stage_id=>stage_id).maximum(:id)
   end
 
+  def attributes
+    hash = super
+    hash["fluorescence_value"] = self.fluorescence_value
+    return hash
+  end
 end

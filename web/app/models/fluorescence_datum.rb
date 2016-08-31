@@ -19,20 +19,20 @@
 class FluorescenceDatum < ActiveRecord::Base
   belongs_to :experiment
   
+  scope :for_experiment, lambda {|experiment_id| where(["fluorescence_data.experiment_id=?", experiment_id]).order("fluorescence_data.channel, fluorescence_data.well_num, fluorescence_data.cycle_num")}
+  scope :for_stage, lambda {|stage_id| joins("LEFT JOIN ramps ON fluorescence_data.ramp_id = ramps.id INNER JOIN steps ON fluorescence_data.step_id = steps.id OR steps.id = ramps.next_step_id")
+                                       .where(["steps.stage_id=?", stage_id])
+                                       .order("steps.order_number")}
+  
   def self.new_data_generated?(experiment_id, stage_id)
-    data = joins("LEFT JOIN ramps ON fluorescence_data.ramp_id = ramps.id INNER JOIN steps ON fluorescence_data.step_id = steps.id OR steps.id = ramps.next_step_id 
-                  LEFT JOIN amplification_data ON amplification_data.stage_id = steps.stage_id AND amplification_data.experiment_id = fluorescence_data.experiment_id AND 
-                  amplification_data.well_num = fluorescence_data.well_num+1 AND amplification_data.cycle_num = fluorescence_data.cycle_num")
-           .where(["fluorescence_data.experiment_id=? AND steps.stage_id=?", experiment_id, stage_id])
-           .order("fluorescence_data.cycle_num DESC").select("fluorescence_data.*, background_subtracted_value").first
+    data = self.for_stage(stage_id).for_experiment(experiment_id).joins("LEFT JOIN amplification_data ON amplification_data.stage_id = steps.stage_id AND amplification_data.experiment_id = fluorescence_data.experiment_id AND amplification_data.well_num = fluorescence_data.well_num+1 AND amplification_data.cycle_num = fluorescence_data.cycle_num")
+            .reorder("fluorescence_data.cycle_num DESC").select("fluorescence_data.*, background_subtracted_value").first
     return data != nil && data.background_subtracted_value == nil 
   end
-
-  def self.data(experiment_id, stage_id)
-    data = joins("LEFT JOIN ramps ON fluorescence_data.ramp_id = ramps.id INNER JOIN steps ON fluorescence_data.step_id = steps.id OR steps.id = ramps.next_step_id")
-          .where(["fluorescence_data.experiment_id=? AND steps.stage_id=?", experiment_id, stage_id])
-          .order("fluorescence_data.channel, fluorescence_data.well_num, fluorescence_data.cycle_num")
-    return data
+  
+  def self.last_cycle(experiment_id, stage_id)
+    cycle_num = self.for_stage(stage_id).for_experiment(experiment_id).maximum(:cycle_num)
+    (cycle_num.nil?)? 0 : cycle_num
   end
-      
+  
 end

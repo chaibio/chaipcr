@@ -22,7 +22,7 @@ require 'rserve'
 class ExperimentsController < ApplicationController
   include ParamsHelper
   
-  before_filter :ensure_authenticated_user
+  #before_filter :ensure_authenticated_user
   before_filter :get_experiment, :except => [:index, :create, :copy]
   
   respond_to :json
@@ -135,11 +135,16 @@ class ExperimentsController < ApplicationController
     end
   end
 
-  api :GET, "/experiments/:id/amplification_data?raw=false&background=true&baseline=true&cq=true&step(ramp)_id=43", "Retrieve amplification data"
+  api :GET, "/experiments/:id/amplification_data?raw=false&background=true&baseline=true&cq=true&step_id[]=43&step_id[]=44", "Retrieve amplification data"
   example "{'partial':false, 'total_cycles':40,
-            'amplification_data':[['channel', 'well_num', 'cycle_num', 'background_substracted_value', 'baseline_Substracted_value'], [1, 1, 1, 25488, -2003], [1, 1, 2, 53984, -409]],
-            'ct':[['channel', 'well_num', 'ct'], [1, 1, 12.11], [1, 2, 15.77], [1, 3, null]]}"
+            'amplification_data':[['channel', 'well_num', 'cycle_num', 'background_subtracted_value', 'baseline_subtracted_value', 'fluorescence_value'], [1, 1, 1, 25488, -2003, 86], [1, 1, 2, 53984, -409, 85]],
+            'cq':[['channel', 'well_num', 'cq'], [1, 1, 12.11], [1, 2, 15.77], [1, 3, null]]}"
   def amplification_data
+    params[:raw] = params[:raw].to_bool if !params[:raw].nil?
+    params[:background] = params[:background].to_bool if !params[:background].nil?
+    params[:baseline] = params[:baseline].to_bool if !params[:baseline].nil?
+    params[:cq] = params[:cq].to_bool if !params[:cq].nil?
+    
     if params[:step_id].nil? && params[:ramp_id].nil?
       #first step that collects data will be returned, if none of the steps can be found, first ramp that collect data will be returned
       params[:raw] = false if params[:raw].nil?
@@ -156,8 +161,11 @@ class ExperimentsController < ApplicationController
     if @experiment
       if @experiment.ran?
         @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
-        if params[:background] == true || params[:baseline] == true || params[:cq] == true
-          if !@first_stage_collect_data.blank?
+        if !@first_stage_collect_data.blank?
+          last_cycle = FluorescenceDatum.last_cycle(@experiment.id, @first_stage_collect_data.id)
+          @partial = (@experiment.running? && last_cycle < @first_stage_collect_data.num_cycles)
+          analyze_required = params[:background] == true || params[:baseline] == true || params[:cq] == true
+          if analyze_required
             begin
               task_submitted = background_calculate_amplification_data(@experiment, @first_stage_collect_data.id)
             rescue => e
@@ -165,7 +173,10 @@ class ExperimentsController < ApplicationController
               return
             end
             
-            @partial = @experiment.running? || FluorescenceDatum.new_data_generated?(@experiment.id, @first_stage_collect_data.id)
+            if @partial == false
+              @partial = FluorescenceDatum.new_data_generated?(@experiment.id, @first_stage_collect_data.id)
+            end
+            
             if !stale?(etag: generate_etag(@partial, AmplificationDatum.maxid(@experiment.id, @first_stage_collect_data.id)))
               #render 304 Not Modified
               return
@@ -182,48 +193,74 @@ class ExperimentsController < ApplicationController
               #set etag
               fresh_when(:etag => generate_etag(@partial, @amplification_data.last.id))
             end
-          else
-            @amplification_data = []
-            @cts = []
-            @partial = false
+          end
+ 
+          if params[:raw] == true
+            if !analyze_required && !stale?(etag: generate_etag(@partial, last_cycle))
+              #render 304 Not Modified
+              return
+            end
+            
+            #construct OR clause
+            conditions = String.new
+            wheres = Array.new
+            Constants::KEY_NAMES.each do |keyname|
+              keyvalue = params[keyname.to_sym]
+              if keyvalue
+                conditions << " OR " unless conditions.length == 0
+                conditions << "#{keyname} IN (?)"
+                if keyvalue.is_a? Array
+                  wheres << keyvalue
+                else
+                  wheres << keyvalue.to_i
+                end
+              end
+            end
+            wheres.insert(0, conditions) if !conditions.blank?
+            #logger.info ("**********#{wheres.join(",")}")
+            #query to database
+            if !wheres.blank?
+              fluorescence_data = FluorescenceDatum.order(Constants::KEY_NAMES.join(", ")).for_experiment(@experiment.id).where(wheres)
+            else
+              fluorescence_data = FluorescenceDatum.for_stage(@first_stage_collect_data.id).for_experiment(@experiment.id)
+            end
+            
+            if !analyze_required
+              #set etag
+              fresh_when(:etag => generate_etag(@partial, fluorescence_data.last.cycle_num))
+            end
           end
         end
         
-        if params[:raw] == true
-          #construct OR clause
-          conditions = String.new
-          wheres = Array.new
-          Constants::KEY_NAMES.each do |keyname|
-            keyvalue = params[keyname.to_sym]
-            if keyvalue
-              conditions << " OR " unless conditions.length == 0
-              conditions << "#{keyname} IN (?)"
-              if keyvalue.is_a? Array
-                wheres << keyvalue.map(&:to_i)
-              else
-                wheres << keyvalue.to_i
-              end
+        if !@amplification_data.blank? 
+          if !fluorescence_data.blank?
+            #amplification_data only have one step
+            sub_type = (@amplification_data[0].sub_type + "_id").to_sym
+            sub_id = @amplification_data[0].send(sub_type)
+            fluorescence_offset = 0
+            while fluorescence_data[fluorescence_offset] && fluorescence_data[fluorescence_offset].send(sub_type) != sub_id do
+              fluorescence_offset += 1
+            end
+            @amplification_data.each_index do |i|
+              @amplification_data[i].fluorescence_value = fluorescence_data[fluorescence_offset+i].fluorescence_value
             end
           end
-          wheres.insert(0, conditions)
-          #logger.info ("**********#{wheres.join(",")}")
-          #query to database
-          @fluorescence_data = FluorescenceDatum.where("experiment_id=?",@experiment.id).where(wheres).order("#{Constants::KEY_NAMES.join(", ")}, cycle_num, well_num")
-          @amplification_data_group = group_by_keynames(@fluorescence_data)
-          @partial = @experiment.running?
-          respond_to do |format|
-            format.json { render "amplification_data_group", :status => :ok}
+        else
+          @amplification_data = fluorescence_data
+          fluorescence_data.each do |data|
+            data.well_num = data.well_num+1
           end
-          return
         end
-      else
-        @amplification_data = []
-        @cts = []
+        
+        attributes = []
+        attributes << "background_subtracted_value" if params[:background] == true
+        attributes << "baseline_subtracted_value" if params[:baseline] == true
+        attributes << "fluorescence_value" if params[:raw] == true
+        @amplification_data_group = group_by_keynames(@amplification_data, attributes, (params[:cq] == true)? @cts : nil)
+      else #experiment not run
         @partial = false
       end
     
-      @amplification_data = (!@amplification_data.blank?)? [["channel","well_num","cycle_num","background_substracted_value", "baseline_Substracted_value"]]+@amplification_data.map {|data| [data.channel,data.well_num,data.cycle_num,data.background_subtracted_value,data.baseline_subtracted_value]} : nil
-      @cts = (!@cts.blank?)? [["channel","well_num","ct"]]+@cts.map {|ct| [ct.channel,ct.well_num,ct.ct]} : nil
       respond_to do |format|
         format.json { render "amplification_data", :status => :ok}
       end
@@ -305,7 +342,7 @@ class ExperimentsController < ApplicationController
             logger.error("export amplification data failed: #{e}")
           end
           if request.method != "HEAD"
-            fluorescence_data = FluorescenceDatum.data(@experiment.id, first_stage_collect_data.id)
+            fluorescence_data = FluorescenceDatum.for_stage(first_stage_collect_data.id).for_experiment(@experiment.id)
           end
         end
       
@@ -633,26 +670,36 @@ class ExperimentsController < ApplicationController
     end
   end
   
-  def group_by_keynames(data)
+  def group_by_keynames(data, data_attributes, cqs)
     keyname = nil
     key = nil
-    nodelist = nil
+    data_array = nil
     group = Array.new
+    column_names = ["channel","well_num","cycle_num"]+data_attributes
     
     data.each do |node|
       Constants::KEY_NAMES.each do |newkeyname|
         newkeyname = newkeyname.to_sym
         sub_id = node.send(newkeyname)
         if sub_id != nil && sub_id != key
-          group << OpenStruct.new(keyname=>key, :data=>nodelist) if key != nil
+          group << OpenStruct.new(keyname=>key, :amplification_data=>data_array) if key != nil
           keyname = newkeyname
           key = sub_id
-          nodelist = []
+          data_array = []
+          data_array << column_names
         end
       end
-      nodelist << node
+      data_array << node.attributes.values_at(*column_names)
     end
-    group << OpenStruct.new(keyname=>key, :data=>nodelist) if key != nil
+
+    if key != nil
+      elem = OpenStruct.new(keyname=>key, :amplification_data=>data_array)
+      if !cqs.blank?
+        elem.cq = [["channel","well_num","cq"]]+cqs.map {|cq| [cq.channel,cq.well_num,cq.ct]} 
+      end
+      group << elem
+    end
+    
     return group
   end
 end
