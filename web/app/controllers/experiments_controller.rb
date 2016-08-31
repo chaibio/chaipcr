@@ -247,9 +247,6 @@ class ExperimentsController < ApplicationController
           end
         elsif !fluorescence_data.blank?
           @amplification_data = fluorescence_data
-          fluorescence_data.each do |data|
-            data.well_num = data.well_num+1
-          end
         end
         
         attributes = []
@@ -355,7 +352,7 @@ class ExperimentsController < ApplicationController
             amplification_data.each do |data|
               while (fluorescence_index < fluorescence_data.length && 
                     !(fluorescence_data[fluorescence_index].channel == data.channel && 
-                      fluorescence_data[fluorescence_index].well_num+1 == data.well_num && 
+                      fluorescence_data[fluorescence_index].well_num == data.well_num &&
                       fluorescence_data[fluorescence_index].cycle_num == data.cycle_num)) do
                     fluorescence_index += 1
               end

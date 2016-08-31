@@ -338,7 +338,11 @@ class DevicesController < ApplicationController
           folder = (files == logfiles)? "logs" : "config"
           files.each do |file_name|
             if File.exist?(file_name)
-              zipfile.add("#{folder}/"+File.basename(file_name), file_name)
+              basename  = File.basename(file_name)
+              if basename == "booting.log"
+                basename = File.dirname(filename).split('/').last+"_"+basename
+              end
+              zipfile.add("#{folder}/"+basename, file_name)
             end
           end
         end

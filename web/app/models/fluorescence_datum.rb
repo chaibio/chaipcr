@@ -35,4 +35,7 @@ class FluorescenceDatum < ActiveRecord::Base
     (cycle_num.nil?)? 0 : cycle_num
   end
   
+  def well_num
+    read_attribute(:well_num)+1
+  end
 end
