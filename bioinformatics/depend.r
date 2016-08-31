@@ -41,17 +41,25 @@ scaling_factors_deconv <- c('1'=1, '2'=5.6) # used: c('1'=1, '2'=1, 2, 3.5, 8, 7
 
 
 # function: check object to be returned
-check_obj2br <- function(obj2br) {
+check_obj2br <- function(obj2br, deeper=FALSE) {
     message('returning non-null output: ', !is.null(obj2br))
     for (ele_name in names(obj2br)) {
         message(ele_name, ':')
-        print(summary(obj2br[[ele_name]])) }
+        print(summary(obj2br[[ele_name]]))
+        if (deeper) {
+            ele <- obj2br[[ele_name]]
+            for (ele_name_deeper in names(ele)) {
+                message(ele_name_deeper, ':')
+                print(summary(ele[[ele_name_deeper]]))
+            }
+        }
     }
+}
 
 
 # function: connect to MySQL database; message about data selection
 db_etc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting to MySQL database
-                   exp_id, stage_id, calib_info # for selecting data to analyze
+                   exp_id, stage_id=NULL, calib_info # for selecting data to analyze
                    ) {
     
     message('db: ', db_name)
@@ -76,7 +84,7 @@ db_etc <- function(db_usr, db_pwd, db_host, db_port, db_name, # for connecting t
         }
     
     message('experiment_id: ', exp_id)
-    message('stage_id: ', stage_id)
+    if (!is.null('stage_id')) message('stage_id: ', stage_id)
     message('calibration_info: ', calib_info)
     
     return(list('db_conn'=db_conn, 'calib_info'=calib_info))

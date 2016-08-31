@@ -100,6 +100,11 @@ const int kLedBlankPwmDutyNs = 500000;
 const long kFluorescenceDataCollectionDelayTimeMs = 70;
 const int kADCReadsPerOpticalMeasurement = 5;
 const std::vector<int> kWellToLedMappingList = {4, 3, 2, 1, 16, 15, 14, 13, 5, 6, 7, 8, 9, 10, 11, 12};
+const int kOpticalMeasurementsPerCycle = 2;
+const int kBaselineMeasurementsPerCycle = 1;
+const int kOpticalMeasurementsBufferTimeMs = 250;
+const int kOpticalMeasurementDurationMs = kFluorescenceDataCollectionDelayTimeMs + 12 * kADCReadsPerOpticalMeasurement; //The magical number is X
+const int kOpticalFluorescenceMeasurmentPeriodMs = (kOpticalMeasurementsPerCycle + kBaselineMeasurementsPerCycle) * kOpticalMeasurementDurationMs * 16 + kOpticalMeasurementsBufferTimeMs;
 
 //Steps
 const double kPCRBeginStepTemperatureThreshold = 0.5;

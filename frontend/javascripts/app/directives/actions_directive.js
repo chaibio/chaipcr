@@ -83,7 +83,7 @@ angular.module("canvasApp").directive('actions', [
 
         scope.addStep = function() {
 
-          if(! scope.infiniteHold) {
+          if(! scope.infiniteHoldStep) {
             ExperimentLoader.addStep(scope)
               .then(function(data) {
                 console.log(data);
@@ -113,11 +113,13 @@ angular.module("canvasApp").directive('actions', [
 
         scope.addPause = function() {
 
-          scope.step.pause = ! scope.step.pause;
-          ExperimentLoader.changePause(scope)
-          .then(function(data) {
-            console.log("added", data);
-          });
+          if(! scope.infiniteHoldStep) {
+            scope.step.pause = ! scope.step.pause;
+            ExperimentLoader.changePause(scope)
+            .then(function(data) {
+              console.log("added", data);
+            });
+          }
         };
 
       }

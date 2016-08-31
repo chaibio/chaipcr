@@ -106,6 +106,7 @@ private:
     void run();
     void complete();
 
+    void fluorescenceDataCollected();
     void meltCurveCallback(Poco::Timer &timer);
 
     void rampFinished();
@@ -128,6 +129,7 @@ private:
     Experiment _experiment;
     LogsSettings _settings;
 
+    Poco::Timer *_fluorescenceTimer;
     Poco::Timer *_meltCurveTimer;
     Poco::Timer *_holdStepTimer;
     Poco::Timer *_logTimer;

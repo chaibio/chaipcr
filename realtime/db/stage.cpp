@@ -19,6 +19,7 @@
 
 #include "stagecomponent.h"
 #include "stage.h"
+#include "step.h"
 
 Stage::Stage(int id)
 {
@@ -197,4 +198,46 @@ Step* Stage::advanceNextStep()
 bool Stage::hasNextStep() const
 {
     return (_currentComponent != _components.end() && (_currentComponent + 1) != _components.end()) || (_cycleIteration + 1) <= _numCycles;
+}
+
+double Stage::currentStepTemperature(double min, double max) const
+{
+    Step *step = currentStep();
+
+    if (!step)
+        return 0;
+
+    double temperature = step->temperature();
+
+    if (autoDelta() && currentCycle() > autoDeltaStartCycle())
+    {
+        temperature += step->deltaTemperature() * (currentCycle() - autoDeltaStartCycle());
+
+        if (temperature < min)
+            temperature = min;
+        else if (temperature > max)
+            temperature = max;
+    }
+
+    return temperature;
+}
+
+std::time_t Stage::currentStepHoldTime() const
+{
+    Step *step = currentStep();
+
+    if (!step)
+        return 0;
+
+    std::time_t holdTime = step->holdTime();
+
+    if (autoDelta() && currentCycle() > autoDeltaStartCycle())
+    {
+        holdTime += step->deltaDuration() * (currentCycle() - autoDeltaStartCycle());
+
+        if (holdTime < 0)
+            holdTime = 0;
+    }
+
+    return holdTime;
 }

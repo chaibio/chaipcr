@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <atomic>
+#include <ctime>
 
 class StageComponent;
 class Step;
@@ -79,6 +80,9 @@ public:
     Ramp* currentRamp() const;
     Step* advanceNextStep();
     bool hasNextStep() const;
+
+    double currentStepTemperature(double min, double max) const;
+    std::time_t currentStepHoldTime() const;
 
 private:
     int _id;

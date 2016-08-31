@@ -31,6 +31,7 @@
 
       var ERROR_TYPES = ['OFFLINE', 'CANT_CREATE_EXPERIMENT', 'CANT_START_EXPERIMENT', 'LID_OPEN', 'UNKNOWN_ERROR'];
       $scope.errors = {};
+      $scope.created = false;
       $scope.CONSTANTS = Constants;
 
       $scope.$on('status:data:updated', function(e, data, oldData) {
@@ -141,21 +142,24 @@
       };
 
       $scope.createExperiment = function() {
-        Experiment.create({ guid: 'optical_test_dual_channel' })
-          .then(function(resp) {
-            Experiment.startExperiment(resp.data.experiment.id)
-              .then(function() {
-                $scope.experiment = resp.data.experiment;
-                $scope.errors = {};
-                $scope.next();
-              })
-              .catch(function(resp) {
-                $scope.errors.CANT_START_EXPERIMENT = "Can't start experiment.";
-              });
-          })
-          .catch(function(err) {
-            $scope.errors.CANT_CREATE_EXPERIMENT = "Unable to create experiment.";
-          });
+        if(!$scope.created){
+          Experiment.create({ guid: 'optical_test_dual_channel' })
+            .then(function(resp) {
+              Experiment.startExperiment(resp.data.experiment.id)
+                .then(function() {
+                  $scope.created = true;
+                  $scope.experiment = resp.data.experiment;
+                  $scope.errors = {};
+                  $scope.next();
+                })
+                .catch(function(resp) {
+                  $scope.errors.CANT_START_EXPERIMENT = "Can't start experiment.";
+                });
+            })
+            .catch(function(err) {
+              $scope.errors.CANT_CREATE_EXPERIMENT = "Unable to create experiment.";
+            });
+        }
       };
 
       $scope.resumeExperiment = function() {

@@ -37,7 +37,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.listofAllWifi = {};
     this.wifiShutDownInProgress = false;
     this.wifiRestartingInProgress = false;
-    
+    this.macAddress = null;
     this.getWifiNetworks = function() {
 
       var delay = $q.defer();
@@ -79,12 +79,16 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       if(this.wirelessError && wlanOutput.data.settings) {
         console.log("No more error");
         this.wirelessError = false;
-        $rootScope.$broadcast("wifi_adapter_reconnected", this.userSettings);
+        $rootScope.$broadcast("wifi_adapter_reconnected", wlanOutput.data);
       }
 
       if(wlanOutput.data.settings) {
 
         this.connectedWifiNetwork = wlanOutput.data;
+
+        if(this.macAddress === null) {
+          this.macAddress = wlanOutput.data.state.macAddress;
+        }
 
         var _ssid = wlanOutput.data.settings["wpa-ssid"] || wlanOutput.data.settings.wireless_essid;
         var _connectionStatus = wlanOutput.data.state.status;
@@ -109,6 +113,18 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       }
 
       $rootScope.$broadcast("wifi_adapter_error");
+    };
+
+    this.getReady = function() {
+
+      $http.get(host + ':8000/network/wlan')
+      .then(function(result) {
+        if(result.data.state.status) {
+          that.macAddress = result.data.state.macAddress;
+        }
+      }, function(err) {
+        that.processOnError(err); // in case error ,May be no wireless interface
+      });
     };
 
     this.getEthernetStatus = function() {
@@ -185,14 +201,17 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       return delay.promise;
     };
 
-
+    this.stopInterval = function() {
+      $interval.cancel(this.intervalKey);
+      this.intervalKey = null;
+    };
 
     // We need to make sure that, we call /network api only when we are in
     // /settings/networkmanagement
     $rootScope.$on("$stateChangeStart", function(event, toState) {
       // If we are not in the network settings part, we dont have to query /network anymore
       if(toState.name !== "settings.networkmanagement" && toState.name !== "settings.networkmanagement.wifi") {
-        $interval.cancel(that.intervalKey);
+        that.stopInterval();
       }
     });
   }

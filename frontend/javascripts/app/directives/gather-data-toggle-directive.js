@@ -26,27 +26,42 @@ window.ChaiBioTech.ngApp.directive('gatherDataToggle', [
 
       scope: {
         data: '=data',
-        call: "@"
+        call: "@",
+        infiniteHoldStep: '=ih'
       },
 
       link: function(scope, elem, attr) {
         scope.show = true;
         scope.$on("dataLoaded", function() {
+
           scope.$watch("data", function(val, oldVal) {
             scope.configureSwitch(val);
+          });
+
+          scope.$watch("infiniteHoldStep", function(infiniteHoldStepStatus) {
+            if(infiniteHoldStepStatus === true) {
+              scope.dragElem.draggable('disable');
+            } else if (infiniteHoldStepStatus === false) {
+              if(scope.dragElem.draggable("option", 'disabled')) {
+                scope.dragElem.draggable('enable');
+              }
+            }
           });
         });
 
         scope.clickHandler = function() {
 
-          scope.configureSwitch(!scope.data);
-          scope.sendData();
-        };
-        /*$(elem).click(function(evt) {
+          if(scope.call === "changeDuringStep") {
+            if(scope.infiniteHoldStep === false) {
+              scope.configureSwitch(!scope.data);
+              scope.sendData();
+            }
+          } else {
+            scope.configureSwitch(!scope.data);
+            scope.sendData();
+          }
 
-          scope.configureSwitch(!scope.data);
-          scope.sendData();
-        });*/
+        };
 
         scope.configureSwitch = function(val) {
 

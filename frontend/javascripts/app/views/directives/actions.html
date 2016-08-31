@@ -20,8 +20,8 @@
   <button ng-class="{big_button: !infiniteHoldStep, big_button_disabled: infiniteHoldStep, SH: true}" id="add-step" ng-click="addStep()">ADD STEP</button>
   <button ng-class="{big_button: !infiniteHoldStage, big_button_disabled: infiniteHoldStage, SH: true}" id="add-stage" ng-click="actionPopup = !actionPopup">ADD STAGE</button>
 
-  <button class="small-button SH" id="delete-step" ng-click="addPause()">{{pauseAction}} PAUSE</button>
+  <button ng-class="{small_button: !infiniteHoldStep, small_button_disabled: infiniteHoldStep, SH:true}" id="delete-step" ng-click="addPause()">{{pauseAction}} PAUSE</button>
 
-  <button class="small-button move-small-button SH" ng-class="{smallButtonEdit: editStageMode}" id="edit-stage" ng-click="editStage()">{{editStageText}}</button>
+  <button class="small_button move-small-button SH" ng-class="{smallButtonEdit: editStageMode}" id="edit-stage" ng-click="editStage()">{{editStageText}}</button>
 
 </div>

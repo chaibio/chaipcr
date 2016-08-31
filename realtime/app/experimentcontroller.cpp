@@ -30,6 +30,8 @@
 #include "ledcontroller.h"
 #include "experimentcontroller.h"
 #include "qpcrapplication.h"
+#include "timercallback.h"
+#include "logger.h"
 
 #define STORE_MELT_CURVE_DATA_INTERVAL 10 * 1000
 
@@ -39,6 +41,7 @@ ExperimentController::ExperimentController(std::shared_ptr<DBControl> dbControl)
     _machineState = IdleMachineState;
     _thermalState = IdleThermalState;
     _dbControl = dbControl;
+    _fluorescenceTimer = new Poco::Timer();
     _meltCurveTimer = new Poco::Timer();
     _holdStepTimer = new Poco::Timer();
     _logTimer = new Poco::Timer();
@@ -49,6 +52,8 @@ ExperimentController::ExperimentController(std::shared_ptr<DBControl> dbControl)
 
     HeatBlockInstance::getInstance()->rampFinished.connect(boost::bind(&ExperimentController::rampFinished, this));
     HeatBlockInstance::getInstance()->stepBegun.connect(boost::bind(&ExperimentController::stepBegun, this));
+
+    OpticsInstance::getInstance()->fluorescenceDataCollected.connect(boost::bind(&ExperimentController::fluorescenceDataCollected, this));
 }
 
 ExperimentController::~ExperimentController()
@@ -56,6 +61,7 @@ ExperimentController::~ExperimentController()
     stop();
 
     delete _logTimer;
+    delete _fluorescenceTimer;
     delete _meltCurveTimer;
     delete _holdStepTimer;
     delete _machineMutex;
@@ -124,12 +130,36 @@ void ExperimentController::run()
 
         if (_experiment.protocol()->currentRamp()->collectData())
         {
-            OpticsInstance::getInstance()->setCollectData(true, _experiment.protocol()->currentStage()->type() == Stage::Meltcurve);
-
             if (_experiment.protocol()->currentStage()->type() == Stage::Meltcurve)
             {
+                OpticsInstance::getInstance()->setCollectData(true, true);
+
                 _meltCurveTimer->setPeriodicInterval(STORE_MELT_CURVE_DATA_INTERVAL);
                 _meltCurveTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::meltCurveCallback));
+            }
+            else
+            {
+                double interval = 0;
+                double rate = _experiment.protocol()->currentRamp()->rate();
+
+                rate = rate > 0 && rate <= kDurationCalcHeatBlockRampSpeed ? rate : kDurationCalcHeatBlockRampSpeed;
+
+                if (HeatBlockInstance::getInstance()->temperature() < _experiment.protocol()->currentStep()->temperature())
+                    interval = (_experiment.protocol()->currentStep()->temperature() - HeatBlockInstance::getInstance()->temperature()) / rate;
+                else
+                    interval = (HeatBlockInstance::getInstance()->temperature() - _experiment.protocol()->currentStep()->temperature()) / rate;
+
+                interval = std::round(interval * 1000 - kOpticalFluorescenceMeasurmentPeriodMs);
+
+                if (interval > 0)
+                {
+                    _fluorescenceTimer->stop();
+                    _fluorescenceTimer->setStartInterval(interval);
+                    _fluorescenceTimer->setPeriodicInterval(0);
+                    _fluorescenceTimer->start(TimerCallback([](){ OpticsInstance::getInstance()->setCollectData(true); }));
+                }
+                else
+                    OpticsInstance::getInstance()->setCollectData(true);
             }
         }
 
@@ -176,6 +206,8 @@ void ExperimentController::complete()
 
         _dbControl->completeExperiment(_experiment);
     }
+
+    _meltCurveTimer->stop();
 }
 
 void ExperimentController::stop()
@@ -187,23 +219,6 @@ void ExperimentController::stop()
 
         if (_machineState == IdleMachineState)
             return;
-        else if (_machineState == CompleteMachineState && _experiment.protocol()->currentStage()->type() != Stage::Meltcurve)
-        {
-            //Check if it was infinite hold step
-            Stage *stage = _experiment.protocol()->currentStage();
-            std::time_t holdTime = stage->currentStep()->holdTime();
-
-            if (stage->autoDelta() && stage->currentCycle() > stage->autoDeltaStartCycle())
-            {
-                holdTime += stage->currentStep()->deltaDuration() * (stage->currentCycle() - stage->autoDeltaStartCycle());
-
-                if (holdTime < 0)
-                    holdTime = 0;
-            }
-
-            if (holdTime == 0)
-                _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->getFluorescenceData());
-        }
 
         LidInstance::getInstance()->setEnableMode(false);
         HeatBlockInstance::getInstance()->setEnableMode(false);
@@ -230,6 +245,7 @@ void ExperimentController::stop()
     {
         _holdStepTimer->stop();
         _meltCurveTimer->stop();
+        _fluorescenceTimer->stop();
     }
 }
 
@@ -257,8 +273,37 @@ void ExperimentController::stop(const std::string &errorMessage)
     }
 
     stopLogging();
+
     _holdStepTimer->stop();
     _meltCurveTimer->stop();
+    _fluorescenceTimer->stop();
+}
+
+void ExperimentController::fluorescenceDataCollected()
+{
+    bool beginStep = false;
+
+    {
+        Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
+
+        if (_machineState != RunningMachineState || !_experiment.isExtended())
+            return;
+
+        beginStep = _experiment.hasBeganStep();
+
+        _experiment.setExtended(false);
+        _experiment.setStepBegan(false);
+    }
+
+    if (_thermalState == HeatingThermalState || _thermalState == CoolingThermalState)
+    {
+        rampFinished();
+
+        if (beginStep)
+            stepBegun();
+    }
+    else if (_thermalState == HoldingThermalState)
+        holdStepCallback(*_holdStepTimer);
 }
 
 void ExperimentController::meltCurveCallback(Poco::Timer &)
@@ -273,20 +318,25 @@ void ExperimentController::rampFinished()
 {
     _meltCurveTimer->stop();
 
-    Poco::RWLock::ScopedReadLock lock(*_machineMutex);
+    Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
 
     if (_machineState == RunningMachineState)
     {
+        if (_experiment.protocol()->currentStage()->type() != Stage::Meltcurve && OpticsInstance::getInstance()->collectData())
+        {
+            APP_LOGGER << "ExperimentController::rampFinished - a ramp has finished before fluorescence data is collected. Extending the ramp" << std::endl;
+
+            _experiment.setExtended(true);
+
+            return;
+        }
+
         _thermalState = HoldingThermalState;
 
         if (_experiment.protocol()->currentStage()->type() == Stage::Meltcurve)
             _dbControl->addMeltCurveData(_experiment, OpticsInstance::getInstance()->getMeltCurveData());
         else
-        {
             _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->getFluorescenceData(), true);
-
-            OpticsInstance::getInstance()->setCollectData(_experiment.protocol()->currentStep()->collectData(), false);
-        }
 
         OpticsInstance::getInstance()->getLedController()->setIntensity(_experiment.protocol()->currentStep()->excitationIntensity());
     }
@@ -306,20 +356,36 @@ void ExperimentController::stepBegun()
 
         Stage *stage = _experiment.protocol()->currentStage();
 
+        if (stage->type() != Stage::Meltcurve && OpticsInstance::getInstance()->collectData())
+        {
+            APP_LOGGER << "ExperimentController::stepBegun - a step has begin before fluorescence data is collected. Waiting for an extended ramp to finish" << std::endl;
+
+            _experiment.setStepBegan(true);
+
+            return;
+        }
+
         if (!stage->currentStep()->pauseState())
         {
-            std::time_t holdTime = stage->currentStep()->holdTime();
-
-            if (stage->autoDelta() && stage->currentCycle() > stage->autoDeltaStartCycle())
-            {
-                holdTime += stage->currentStep()->deltaDuration() * (stage->currentCycle() - stage->autoDeltaStartCycle());
-
-                if (holdTime < 0)
-                    holdTime = 0;
-            }
+            std::time_t holdTime = stage->currentStepHoldTime();
 
             if (holdTime > 0 || _experiment.protocol()->hasNextStep())
             {
+                if (stage->currentStep()->collectData() && holdTime > 0)
+                {
+                    std::time_t interval = holdTime * 1000 - kOpticalFluorescenceMeasurmentPeriodMs;
+
+                    if (interval > 0)
+                    {
+                        _fluorescenceTimer->stop();
+                        _fluorescenceTimer->setStartInterval(interval);
+                        _fluorescenceTimer->setPeriodicInterval(0);
+                        _fluorescenceTimer->start(TimerCallback([](){ OpticsInstance::getInstance()->setCollectData(true); }));
+                    }
+                    else
+                        OpticsInstance::getInstance()->setCollectData(true);
+                }
+
                 _holdStepTimer->setStartInterval(holdTime * 1000);
                 _holdStepTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::holdStepCallback));
 
@@ -352,33 +418,58 @@ void ExperimentController::holdStepCallback(Poco::Timer &)
             return;
 
         if (_experiment.protocol()->currentStage()->type() != Stage::Meltcurve)
-            _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->getFluorescenceData());
+        {
+            if (!OpticsInstance::getInstance()->collectData())
+                _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->getFluorescenceData());
+            else
+            {
+                APP_LOGGER << "ExperimentController::holdStepCallback - a step has finished before fluorescence data is collected. Extending the step" << std::endl;
+
+                _experiment.setExtended(true);
+
+                return;
+            }
+        }
 
         if (_experiment.protocol()->hasNextStep())
         {
             _experiment.protocol()->advanceNextStep();
 
             Stage *stage = _experiment.protocol()->currentStage();
-            double temperature = stage->currentStep()->temperature();
-
-            if (stage->autoDelta() && stage->currentCycle() > stage->autoDeltaStartCycle())
-            {
-                temperature += stage->currentStep()->deltaTemperature() * (stage->currentCycle() - stage->autoDeltaStartCycle());
-
-                if (temperature < HeatBlockInstance::getInstance()->minTargetTemperature())
-                    temperature = HeatBlockInstance::getInstance()->minTargetTemperature();
-                else if (temperature > HeatBlockInstance::getInstance()->maxTargetTemperature())
-                    temperature = HeatBlockInstance::getInstance()->maxTargetTemperature();
-            }
+            double temperature = stage->currentStepTemperature(HeatBlockInstance::getInstance()->minTargetTemperature(), HeatBlockInstance::getInstance()->maxTargetTemperature());
 
             if (stage->currentRamp()->collectData())
             {
-                OpticsInstance::getInstance()->setCollectData(true, stage->type() == Stage::Meltcurve);
-
                 if (stage->type() == Stage::Meltcurve)
                 {
+                    OpticsInstance::getInstance()->setCollectData(true, true);
+
                     _meltCurveTimer->setPeriodicInterval(STORE_MELT_CURVE_DATA_INTERVAL);
                     _meltCurveTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::meltCurveCallback));
+                }
+                else
+                {
+                    double interval = 0;
+                    double rate = _experiment.protocol()->currentRamp()->rate();
+
+                    rate = rate > 0 && rate <= kDurationCalcHeatBlockRampSpeed ? rate : kDurationCalcHeatBlockRampSpeed;
+
+                    if (HeatBlockInstance::getInstance()->temperature() < _experiment.protocol()->currentStep()->temperature())
+                        interval = (_experiment.protocol()->currentStep()->temperature() - HeatBlockInstance::getInstance()->temperature()) / rate;
+                    else
+                        interval = (HeatBlockInstance::getInstance()->temperature() - _experiment.protocol()->currentStep()->temperature()) / rate;
+
+                    interval = std::round(interval * 1000 - kOpticalFluorescenceMeasurmentPeriodMs);
+
+                    if (interval > 0)
+                    {
+                        _fluorescenceTimer->stop();
+                        _fluorescenceTimer->setStartInterval(interval);
+                        _fluorescenceTimer->setPeriodicInterval(0);
+                        _fluorescenceTimer->start(TimerCallback([](){ OpticsInstance::getInstance()->setCollectData(true); }));
+                    }
+                    else
+                        OpticsInstance::getInstance()->setCollectData(true);
                 }
             }
 
@@ -494,33 +585,38 @@ void ExperimentController::calculateEstimatedDuration()
     do
     {
         Stage *stage = experiment.protocol()->currentStage();
-        std::time_t holdTime = stage->currentStep()->holdTime();
-
-        double temperature = stage->currentStep()->temperature();
-
-        if (stage->autoDelta() && stage->currentCycle() > stage->autoDeltaStartCycle())
-        {
-            holdTime += stage->currentStep()->deltaDuration() * (stage->currentCycle() - stage->autoDeltaStartCycle());
-
-            if (holdTime < 0)
-                holdTime = 0;
-
-            temperature += stage->currentStep()->deltaTemperature() * (stage->currentCycle() - stage->autoDeltaStartCycle());
-
-            if (temperature < HeatBlockInstance::getInstance()->minTargetTemperature())
-                temperature = HeatBlockInstance::getInstance()->minTargetTemperature();
-            else if (temperature > HeatBlockInstance::getInstance()->maxTargetTemperature())
-                temperature = HeatBlockInstance::getInstance()->maxTargetTemperature();
-        }
-
+        std::time_t holdTime = stage->currentStepHoldTime();
+        double temperature = stage->currentStepTemperature(HeatBlockInstance::getInstance()->minTargetTemperature(), HeatBlockInstance::getInstance()->maxTargetTemperature());
         double rate = stage->currentRamp()->rate();
+        double rampDuration = 0;
+
         rate = rate > 0 && rate <= kDurationCalcHeatBlockRampSpeed ? rate : kDurationCalcHeatBlockRampSpeed;
 
-        if (previousTargetTemp < temperature)
-            duration += (((temperature - previousTargetTemp) / rate) + holdTime) * 1000;
+        if (HeatBlockInstance::getInstance()->temperature() < stage->currentStep()->temperature())
+            rampDuration = (temperature - previousTargetTemp) / rate * 1000;
         else
-            duration += (((previousTargetTemp - temperature) / rate) + holdTime) * 1000;
+            rampDuration = (previousTargetTemp - temperature) / rate * 1000;
 
+        if (stage->type() != Stage::Meltcurve)
+        {
+            if (stage->currentRamp()->collectData())
+            {
+                double interval = std::round(rampDuration - kOpticalFluorescenceMeasurmentPeriodMs);
+
+                if (interval < 0)
+                    rampDuration += interval * -1;
+            }
+
+            if (stage->currentStep()->collectData() && holdTime > 0)
+            {
+                double interval = holdTime * 1000 - kOpticalFluorescenceMeasurmentPeriodMs;
+
+                if (interval < 0)
+                    duration += interval * -1;
+            }
+        }
+
+        duration += rampDuration + holdTime * 1000;
         previousTargetTemp = temperature;
     }
     while (experiment.protocol()->advanceNextStep());

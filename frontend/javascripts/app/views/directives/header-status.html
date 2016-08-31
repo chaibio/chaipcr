@@ -127,7 +127,7 @@
             <span class="failed">failed</span>
             <span ng-show="experiment.completion_status === 'aborted'">
               user cancelled
-              <strong >{{experiment.completed_at|date:'MMM. dd yyyy, hh:mm:ss'}}</strong>
+              <strong ng-show="experiment.time_valid" >{{experiment.completed_at|date:'MMM. dd yyyy, hh:mm:ss'}}</strong>
             </span>
             <span ng-show="experiment.completion_status !== 'aborted'">
               AN ERROR OCCURED

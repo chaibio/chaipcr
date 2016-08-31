@@ -21,9 +21,9 @@
 
 #include "icontrol.h"
 #include "adcconsumer.h"
-
 #include "gpio.h"
 #include "mux.h"
+#include "lockfreesignal.h"
 
 #include <map>
 #include <vector>
@@ -43,9 +43,12 @@ class Optics : public IControl, public ADCConsumer
 public:
     struct FluorescenceData
     {
-        FluorescenceData(int32_t value, unsigned int wellId, std::size_t channel): value(value), wellId(wellId), channel(channel) {}
+        FluorescenceData(int32_t baselineValue, int32_t fluorescenceValue, unsigned int wellId, std::size_t channel):
+            baselineValue(baselineValue), fluorescenceValue(fluorescenceValue), wellId(wellId), channel(channel) {}
 
-        int32_t value;
+        int32_t baselineValue;
+        int32_t fluorescenceValue;
+
         unsigned int wellId;
         std::size_t channel;
     };
@@ -78,17 +81,21 @@ public:
 
     inline unsigned wellNumber() const noexcept { return _wellNumber; } //Yes, it's used in multithreading. Yes, it isn't thread safe here. It's just for testing
 
-    inline std::shared_ptr<LEDController> getLedController() noexcept { return _ledController; }
-    inline MUX& getPhotodiodeMux() { return _photodiodeMux; }
+    inline std::shared_ptr<LEDController> getLedController() const noexcept { return _ledController; }
+    inline MUX& getPhotodiodeMux() noexcept { return _photodiodeMux; }
 
-    std::vector<FluorescenceData> getFluorescenceData();
+    std::vector<FluorescenceData> getFluorescenceData(bool clear = true);
     std::vector<MeltCurveData> getMeltCurveData(bool stopDataCollect = true);
 
+    boost::signals2::lockfree_signal<void()> fluorescenceDataCollected;
+
 private:
-    void toggleCollectData();
+    void toggleCollectData(bool waitStop = true);
     void collectDataCallback(Poco::Util::TimerTask &task);
 	
 private:
+    struct FluorescenceRoughData;
+
     std::shared_ptr<LEDController> _ledController;
 
     std::atomic<bool> _lidOpen;
@@ -103,7 +110,8 @@ private:
     mutable std::recursive_mutex _collectDataMutex;
 
     unsigned int _wellNumber;
-    std::map<unsigned int, std::map<std::size_t, std::vector<int32_t>>> _fluorescenceData;
+
+    std::map<unsigned int, std::map<std::size_t, FluorescenceRoughData>> _fluorescenceData;
 
     std::atomic<bool> _meltCurveCollection;
     std::vector<MeltCurveData> _meltCurveData;

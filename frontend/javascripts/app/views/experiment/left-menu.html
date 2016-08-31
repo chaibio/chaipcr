@@ -25,7 +25,8 @@
   <div class="side-menu-content-container">
     <div class="side-menu-name-container">
       <edit-exp-name status="status"></edit-exp-name>
-      <div ng-if="status == 'COMPLETED'" class="side-menu-exp-status B2">{{runStatus}}{{exp.started_at | amCalendar}}</div>
+      <div ng-if="status == 'COMPLETED'" ng-show="exp.time_valid" class="side-menu-exp-status B2">{{runStatus}}{{exp.started_at | amCalendar}}</div>
+      <div ng-if="status == 'COMPLETED'" ng-show="!exp.time_valid" class="side-menu-exp-status B2">Run previously</div>
       <div ng-if="status != 'COMPLETED'" class="side-menu-exp-status B1">{{runStatus}}</div>
     </div>
     <div class="side-menu-menu-container">

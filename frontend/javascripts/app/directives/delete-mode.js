@@ -34,7 +34,7 @@ window.ChaiBioTech.ngApp.directive('deleteMode', [
 
 				scope.deleteClicked = false;
 				scope.running = false;
-				scope.deleting = false
+				scope.deleting = false;
 
 				var identifierClass = 'home-page-active-del-identifier';
 
