@@ -55,6 +55,10 @@ angular.module("canvasApp").directive 'amplificationChart', [
           console.log 'amplificationChart: initChart'
           if !chart
             initChart()
+          else
+            dims = chart.getDimensions()
+            if dims.width <= 0 or dims.height <= 0 or !dims.width or !dims.height
+              initChart()
 
 
     }

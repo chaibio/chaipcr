@@ -55,9 +55,13 @@ angular.module("canvasApp").directive 'thermalProfileChart', [
           chart.zoomTo(zoom)
 
         $scope.$watch 'show', (show) ->
-          console.log 'tempchart: initChart'
+          console.log 'amplificationChart: initChart'
           if !chart
             initChart()
+          else
+            dims = chart.getDimensions()
+            if dims.width <= 0 or dims.height <= 0 or !dims.width or !dims.height
+              initChart()
 
 
     }

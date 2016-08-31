@@ -177,7 +177,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
           $timeout ->
             $scope.showAmpliChart = true
-          , 2000
+          , 1000
         else
           $scope.showAmpliChart = false
 
