@@ -35,7 +35,7 @@ var vendorFiles = [
     'libs/angular-moment.min.js',
     'libs/lodash.min.js',
     'libs/fabric.js',
-    'libs/d3.js',
+    'libs/d3.v4.min.js',
     'libs/n3-line-chart-v2.js',
     'libs/ng-focus-on.js',
     'libs/http-auth-interceptor.js',
@@ -53,6 +53,7 @@ var vendorFiles = [
 var appFiles = [
     'welcome.js',
     'login.js',
+    'app/charts/**/*.js',
     'app/canvas-app.js',
     'app/app.js',
     'app/config.js',
