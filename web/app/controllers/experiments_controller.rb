@@ -670,6 +670,8 @@ class ExperimentsController < ApplicationController
   end
   
   def group_by_keynames(data, data_attributes, cqs)
+    return nil if data.nil?
+    
     keyname = nil
     key = nil
     data_array = nil
