@@ -245,7 +245,7 @@ class ExperimentsController < ApplicationController
               @amplification_data[i].fluorescence_value = fluorescence_data[fluorescence_offset+i].fluorescence_value
             end
           end
-        else
+        elsif !fluorescence_data.blank?
           @amplification_data = fluorescence_data
           fluorescence_data.each do |data|
             data.well_num = data.well_num+1
