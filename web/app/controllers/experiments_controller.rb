@@ -235,11 +235,13 @@ class ExperimentsController < ApplicationController
         if !@amplification_data.blank? 
           if !fluorescence_data.blank?
             #amplification_data only have one step
-            sub_type = (@amplification_data[0].sub_type + "_id").to_sym
-            sub_id = @amplification_data[0].send(sub_type)
             fluorescence_offset = 0
-            while fluorescence_data[fluorescence_offset] && fluorescence_data[fluorescence_offset].send(sub_type) != sub_id do
-              fluorescence_offset += 1
+            if !@amplification_data[0].sub_type.nil?
+              sub_type = (@amplification_data[0].sub_type + "_id").to_sym
+              sub_id = @amplification_data[0].send(sub_type)
+              while fluorescence_offset < fluorescence_data.count && fluorescence_data[fluorescence_offset].send(sub_type) != sub_id do
+                fluorescence_offset += 1
+              end
             end
             @amplification_data.each_index do |i|
               @amplification_data[i].fluorescence_value = fluorescence_data[fluorescence_offset+i].fluorescence_value
