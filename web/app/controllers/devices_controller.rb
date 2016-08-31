@@ -340,7 +340,7 @@ class DevicesController < ApplicationController
             if File.exist?(file_name)
               basename  = File.basename(file_name)
               if basename == "booting.log"
-                basename = File.dirname(filename).split('/').last+"_"+basename
+                basename = File.dirname(file_name).split('/').last+"_"+basename
               end
               zipfile.add("#{folder}/"+basename, file_name)
             end
