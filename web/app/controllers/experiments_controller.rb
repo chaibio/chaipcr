@@ -22,7 +22,7 @@ require 'rserve'
 class ExperimentsController < ApplicationController
   include ParamsHelper
   
-  #before_filter :ensure_authenticated_user
+  before_filter :ensure_authenticated_user
   before_filter :get_experiment, :except => [:index, :create, :copy]
   
   respond_to :json
