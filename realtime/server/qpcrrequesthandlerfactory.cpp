@@ -23,6 +23,7 @@
 
 #include <utility>
 #include <boost/tokenizer.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "httpcodehandler.h"
 #include "testcontrolhandler.h"
@@ -32,6 +33,7 @@
 #include "networkmanagerhandler.h"
 #include "updatehandler.h"
 #include "updateuploadhandler.h"
+#include "changeexperimenthandler.h"
 
 #include "qpcrrequesthandlerfactory.h"
 #include "qpcrapplication.h"
@@ -49,7 +51,9 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
     try
     {
         vector<string> requestPath;
-        URI(request.getURI()).getPathSegments(requestPath);
+        URI uri(request.getURI());
+
+        uri.getPathSegments(requestPath);
 
         if (!requestPath.empty())
         {
@@ -91,6 +95,13 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
                         return new TestControlHandler();
                     else if (requestPath.at(0) == "settings")
                         return new SettingsHandler();
+                    else if (requestPath.at(0) == "stages")
+                    {
+                        if (uri.getHost() == "localhost" || uri.getHost() == "127.0.0.1")
+                            return new ChangeExperimentHandler(ChangeExperimentHandler::StageChange, boost::lexical_cast<int>(requestPath.at(1)));
+                        else
+                            return new JsonHandler(HTTPResponse::HTTP_UNAUTHORIZED, "Access denied");
+                    }
                 }
                 else if (request.getMethod() == "POST")
                 {

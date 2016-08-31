@@ -43,6 +43,7 @@ public:
     void setStages(std::vector<Stage> &&stages);
     void appendStage(const Stage &stage);
     void appendStage(Stage &&stage);
+    inline std::vector<Stage>& stages() {return _stages;}
     inline const std::vector<Stage>& stages() const {return _stages;}
 
     void resetCurrentStep();

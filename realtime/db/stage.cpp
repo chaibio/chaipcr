@@ -118,12 +118,6 @@ Stage& Stage::operator= (Stage &&other)
     return *this;
 }
 
-void Stage::setNumCycles(unsigned numCycles)
-{
-     _numCycles = numCycles;
-     _cycleIteration = 1;
-}
-
 void Stage::setComponents(const std::vector<StageComponent> &components)
 {
     _components = components;
