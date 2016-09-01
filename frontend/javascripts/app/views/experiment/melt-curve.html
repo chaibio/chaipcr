@@ -61,11 +61,12 @@
               <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
               <p class="B2">May take a minute</p>
             </div>
-            <linechartv2 ng-if="curve_type==='derivative' && (RunExperimentCtrl.chart==='melt-curve' || has_data) && !error"
+              <melt-curve-chart data="data" config="config" zoom="mc_zoom.value" on-zoom="onZoom" scroll="mc_scroll.value" show="showMeltCurveChart"></melt-curve-chart>
+<!--             <linechartv2 ng-if="curve_type==='derivative' && (RunExperimentCtrl.chart==='melt-curve' || has_data) && !error"
              data-drag-scroll="meltcurve-drag-scroll" data="data" options="chartConfigDerivative" width="1024" height="400">
             </linechartv2>
             <linechartv2 ng-if="curve_type==='normalized' && (RunExperimentCtrl.chart==='melt-curve' || has_data) && !error" data="data" options="chartConfigNormalized" width="1024" height="400">
-            </linechartv2>
+            </linechartv2> -->
           </div>
           <!-- <div class="text-center num-cycle-text SH">CYCLES NUMBER</div> -->
           <div class="ampli-zoom-scroll-container">
@@ -75,11 +76,12 @@
                   <div class="zoom-text SH">
                     <b>ZOOM</b>
                   </div>
-                  <ampli-slider ng-model="mc_zoom" range="resolutionOptions.length - 1"></ampli-slider>
+                  <!-- <ampli-slider ng-model="mc_zoom" range="resolutionOptions.length - 1"></ampli-slider> -->
+                  <scrollbar ng-model="mc_zoom"></scrollbar>
                 </div>
               </div>
               <div class="col-md-6 ampli-scrollbar-container">
-                <scrollbar ng-model="mc_scroll" id="melt-curve-scrollbar"></scrollbar>
+                <scrollbar ng-model="mc_scroll"></scrollbar>
               </div>
             </div>
 

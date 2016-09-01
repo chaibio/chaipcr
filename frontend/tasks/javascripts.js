@@ -11,6 +11,7 @@ var uglify = require('gulp-uglify');
 var insert = require('gulp-insert');
 var gutil = require('gulp-util');
 var stripDebug = require('gulp-strip-debug');
+var stripComment = require('gulp-strip-comments');
 var del = require('del');
 var _makeHash = require('./helpers').makeHash;
 var swallowError = require('./helpers').swallowError;
@@ -95,6 +96,7 @@ gulp.task('coffee', ['clean-js'], function() {
         .pipe(coffee())
         .on('error', swallowError)
         .pipe(rename(_renameJS))
+        .pipe(stripComment())
         .pipe(insert.transform(function(contents, file) {
           return '// start of file: ' + file.history[0] + '\n' + contents + '\n// end of file: ' + file.history[0] + '\n';
         }))
@@ -132,6 +134,7 @@ gulp.task('templates', function() {
 gulp.task('copy-js-to-tmp', ['clean-js', 'templates'], function() {
     return gulp.src(['frontend/javascripts/**/*.js'])
         .pipe(rename(_renameJS))
+        .pipe(stripComment())
         .pipe(insert.transform(function(contents, file) {
             return '// start of file: ' + file.history[0] + '\n' + contents + '\n// end of file: ' + file.history[0] + '\n';
         }))

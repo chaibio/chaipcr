@@ -1,5 +1,5 @@
 
-angular.module("canvasApp").directive 'amplificationChart', [
+window.App.directive 'amplificationChart', [
   '$window'
   '$timeout'
   ($window, $timeout) ->

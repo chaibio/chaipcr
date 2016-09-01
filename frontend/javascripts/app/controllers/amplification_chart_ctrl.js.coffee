@@ -115,7 +115,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             return if $scope.retrying
             retry()
 
-      fetchFluorescenceData()
+      # fetchFluorescenceData()
 
       updateButtonCts = ->
         for well_i in [0..15] by 1
@@ -172,7 +172,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.RunExperimentCtrl.chart
       , (chart) ->
         if chart is 'amplification'
-          if !hasInit
+          if !$scope.hasData
             fetchFluorescenceData()
 
           $timeout ->

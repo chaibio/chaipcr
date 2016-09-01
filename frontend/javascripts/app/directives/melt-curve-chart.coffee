@@ -1,5 +1,5 @@
 
-window.App.directive 'thermalProfileChart', [
+window.App.directive 'meltCurveChart', [
   '$window'
   '$timeout'
   ($window, $timeout) ->
@@ -13,13 +13,11 @@ window.App.directive 'thermalProfileChart', [
         scroll: '='
         zoom: '='
         onZoom: '&'
-        show: '=' # must be object {}
+        show: '='
       link: ($scope, elem, attrs) ->
 
         chart = null
-        changeVal = null;
-        $scope.chartControl = $scope.chartControl || {}
-        $scope.show = $scope.show || true
+        $scope.show = true
 
         initChart = ->
           return if !$scope.data or !$scope.config or !$scope.show
