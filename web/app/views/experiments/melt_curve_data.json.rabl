@@ -1,7 +1,7 @@
 object false
 
 node :partial do
-  @partial
+  (@partial)? true : false
 end
 
 child(@melt_curve_data, :root=>:melt_curve_data, :object_root=>false) do
