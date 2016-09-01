@@ -1,0 +1,20 @@
+{
+	"development": {
+  		"username": "root",
+		"password": "",
+		"host": "localhost",
+		"database": "chaipcr"
+	},
+	"production": {
+		"username": "root",
+		"password": "",
+		"host": "localhost",
+		"database": "chaipcr"
+	},
+	"pc_test": {
+  		"username": "root1",
+		"password": "pswd1",
+		"host": "localhost",
+		"database": "empty1"
+	}
+}
