@@ -68,6 +68,7 @@ angular.module("canvasApp").factory('stepTemperature', [
       this.postEdit = function() {
 
         editMode.tempActive = false;
+        editMode.currentActiveTemp = null;
         var tempFloat, tempNo = parseFloat(this.text.text.replace("º", ""));
 
 
