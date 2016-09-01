@@ -23,7 +23,8 @@ App.controller 'MeltCurveChartCtrl', [
   'MeltCurveService'
   '$timeout'
   '$interval'
-  ($scope, Experiment, $stateParams, MeltCurveService, $timeout, $interval) ->
+  '$rootScope'
+  ($scope, Experiment, $stateParams, MeltCurveService, $timeout, $interval, $rootScope) ->
 
     $scope.curve_type = 'derivative'
     $scope.color_by = 'well'
@@ -37,7 +38,19 @@ App.controller 'MeltCurveChartCtrl', [
     $scope.retrying = false
     $scope.retry = 0
     $scope.fetching = false
+    $scope.enterState = false
 
+
+    $scope.$on 'status:data:updated', (e, data, oldData) ->
+      return if !data
+      return if !data.experiment_controller
+      $scope.statusData = data
+      $scope.state = data.experiment_controller.machine.state
+      $scope.thermal_state = data.experiment_controller.machine.thermal_state
+      $scope.oldState = oldData?.experiment_controller?.machine?.state || 'NONE'
+      $scope.isCurrentExp = parseInt(data.experiment_controller.experiment?.id) is parseInt($stateParams.id)
+      if $scope.isCurrentExp is true
+        $scope.enterState = $scope.isCurrentExp
 
     retry = ->
       return if $scope.retrying
@@ -62,9 +75,11 @@ App.controller 'MeltCurveChartCtrl', [
         # $timeout ->
         Experiment.getMeltCurveData($stateParams.id)
         .then (resp) ->
-          if resp.data?.partial
+          if (resp.data?.partial and $scope.enterState) or (resp.status is 200 and !resp.data.partial)
             $scope.has_data = true
-          if cb and resp.data?.melt_curve_data
+          if resp.status is 200 and !resp.data.partial
+            $rootScope.$broadcast 'complete'
+          if (cb and resp.data?.melt_curve_data and $scope.enterState) or (cb and resp.data?.melt_curve_data and !resp.data.partial)
             cb(resp.data)
           else
             $scope.fetching = false
@@ -152,12 +167,12 @@ App.controller 'MeltCurveChartCtrl', [
               min: y_extrems.min
               max: y_extrems.max
 
-        has_data = true
+        #has_data = true
         PARSED_DATA = angular.copy(data)
         updateResolutionOptions(data)
         changeResolution()
 
-        $scope.fetching = false
+        #$scope.fetching = false
         # $scope.hasData = has_data
 
         $timeout ->
@@ -169,6 +184,9 @@ App.controller 'MeltCurveChartCtrl', [
     $scope.$watch 'RunExperimentCtrl.chart', (chart) ->
       if chart is 'melt-curve'
         if !has_data
+          $scope.enterState = false
+          $scope.has_data = false
+          $scope.data = MeltCurveService.defaultData()
           getExperiment (exp) ->
             getMeltCurveData(getMeltCurveDataCallBack)
 

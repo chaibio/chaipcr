@@ -51,9 +51,21 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.fetching = false
       $scope.channel_1 = true
       $scope.channel_2 = if is_dual_channel then true else false
+      $scope.enterState = false
 
       $scope.$on 'expName:Updated', ->
         $scope.experiment?.name = expName.name
+
+      $scope.$on 'status:data:updated', (e, data, oldData) ->
+        return if !data
+        return if !data.experiment_controller
+        $scope.statusData = data
+        $scope.state = data.experiment_controller.machine.state
+        $scope.thermal_state = data.experiment_controller.machine.thermal_state
+        $scope.oldState = oldData?.experiment_controller?.machine?.state || 'NONE'
+        $scope.isCurrentExp = parseInt(data.experiment_controller.experiment?.id) is parseInt($stateParams.id)
+        if $scope.isCurrentExp is true
+          $scope.enterState = $scope.isCurrentExp
 
       Experiment.get(id: $stateParams.id).then (data) ->
         maxCycle = helper.getMaxExperimentCycle data.experiment
@@ -61,6 +73,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.chartConfig.axes.x.ticks = helper.Xticks 1, maxCycle
         $scope.chartConfig.axes.x.max = maxCycle
         $scope.experiment = data.experiment
+
 
       retry = ->
         $scope.retrying = true
@@ -89,7 +102,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           .then (resp) ->
             $scope.fetching = false
             $scope.error = null
-            if resp.status is 200 and resp.data?.partial
+            if (resp.status is 200 and resp.data?.partial and $scope.enterState) or (resp.status is 200 and !resp.data.partial)
               $scope.hasData = true
               $scope.data = helper.paddData()
               delete $scope.chartConfig.axes.x.min
@@ -97,12 +110,14 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                 console.log 'reload ampli chart !!!!!'
                 $scope.$broadcast '$reload:n3:charts'
               , 1000
-            if resp.data.amplification_data and resp.data.amplification_data?.length > 1
+            if resp.status is 200 and !resp.data.partial
+              $rootScope.$broadcast 'complete'
+            if (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1 and $scope.enterState) or (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1 and !resp.data.partial)
               $scope.chartConfig.axes.x.min = 1
               $scope.hasData = true
-              data = resp.data
+              data = resp.data.steps[0]
               data.amplification_data.shift()
-              data.ct.shift()
+              data.cq.shift()
               max_calibration = helper.getMaxCalibrations(data.amplification_data)
               data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
               console.log data.amplification_data
@@ -124,13 +139,14 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       fetchFluorescenceData()
 
+
       # $timeout ->
       #   $scope.$broadcast '$reload:n3:charts'
       # , 2000
 
       updateButtonCts = ->
         for well_i in [0..15] by 1
-          cts = _.filter AMPLI_DATA_CACHE.ct, (ct) ->
+          cts = _.filter AMPLI_DATA_CACHE.cq, (ct) ->
             ct[1] is well_i+1
           $scope.wellButtons["well_#{well_i}"].ct = [cts[0][2]]
           $scope.wellButtons["well_#{well_i}"].ct.push cts[1][2] if cts[1]
@@ -225,8 +241,12 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.RunExperimentCtrl.chart
       , (chart) ->
         if chart is 'amplification'
-          if !hasInit
-            fetchFluorescenceData()
+          #if !hasInit
+          $scope.enterState = false
+          $scope.hasData = false
+          $scope.data = helper.paddData()
+          fetchFluorescenceData()
+
 
           $timeout ->
             $scope.$broadcast '$reload:n3:charts'
