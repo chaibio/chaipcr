@@ -56,7 +56,7 @@ window.App.directive 'headerStatus', [
 
       getExperiment = (cb) ->
         return if !experiment_id
-        $scope.loading = true
+        #$scope.loading = true
         Experiment.get(id: experiment_id).then (resp) ->
           $scope.loading = false
           cb resp.experiment if cb
@@ -111,6 +111,7 @@ window.App.directive 'headerStatus', [
       $scope.startExperiment = ->
         Experiment.startExperiment(experiment_id).then ->
           $scope.experiment.started_at = true
+          $scope.loading = true
           getExperiment (exp) ->
             $scope.experiment = exp
             $rootScope.$broadcast 'experiment:started', experiment_id
