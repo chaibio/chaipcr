@@ -235,21 +235,20 @@ class ExperimentsController < ApplicationController
         if !@amplification_data.blank? 
           if !fluorescence_data.blank?
             #amplification_data only have one step
-            sub_type = (@amplification_data[0].sub_type + "_id").to_sym
-            sub_id = @amplification_data[0].send(sub_type)
             fluorescence_offset = 0
-            while fluorescence_data[fluorescence_offset] && fluorescence_data[fluorescence_offset].send(sub_type) != sub_id do
-              fluorescence_offset += 1
+            if !@amplification_data[0].sub_type.nil?
+              sub_type = (@amplification_data[0].sub_type + "_id").to_sym
+              sub_id = @amplification_data[0].send(sub_type)
+              while fluorescence_offset < fluorescence_data.count && fluorescence_data[fluorescence_offset].send(sub_type) != sub_id do
+                fluorescence_offset += 1
+              end
             end
             @amplification_data.each_index do |i|
               @amplification_data[i].fluorescence_value = fluorescence_data[fluorescence_offset+i].fluorescence_value
             end
           end
-        else
+        elsif !fluorescence_data.blank?
           @amplification_data = fluorescence_data
-          fluorescence_data.each do |data|
-            data.well_num = data.well_num+1
-          end
         end
         
         attributes = []
@@ -257,8 +256,6 @@ class ExperimentsController < ApplicationController
         attributes << "baseline_subtracted_value" if params[:baseline] == true
         attributes << "fluorescence_value" if params[:raw] == true
         @amplification_data_group = group_by_keynames(@amplification_data, attributes, (params[:cq] == true)? @cts : nil)
-      else #experiment not run
-        @partial = false
       end
     
       respond_to do |format|
@@ -321,19 +318,21 @@ class ExperimentsController < ApplicationController
     t = Tempfile.new("tmpexport_#{request.remote_ip}")
     begin
       Zip::OutputStream.open(t.path) do |out|
-        out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/temperature_log.csv")
-        out.write TemperatureLog.as_csv(params[:id])
+        if request.method != "HEAD"
+          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/temperature_log.csv")
+          out.write TemperatureLog.as_csv(params[:id])
+        end
       
         first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
         if first_stage_collect_data
           begin
             task_submitted = background_calculate_amplification_data(@experiment, first_stage_collect_data.id)
-            if task_submitted.nil? #cached
-              if request.method != "HEAD"
-                amplification_data = AmplificationDatum.retrieve(@experiment, first_stage_collect_data.id)
-                cts = AmplificationCurve.retrieve(@experiment, first_stage_collect_data.id)
-              end
-            else
+            amplification_data = AmplificationDatum.retrieve(@experiment, first_stage_collect_data.id)
+            
+            if !task_submitted.nil? && (!@experiment.running? || amplification_data.blank?)
+              #background task is submitted 
+              #if experiment is finished, wait for the task to complete
+              #if amplification_data is empty, wait for the task to complete
               t.close
               render :nothing => true, :status => (task_submitted)? 202 : 503
               return
@@ -341,7 +340,11 @@ class ExperimentsController < ApplicationController
           rescue => e
             logger.error("export amplification data failed: #{e}")
           end
-          if request.method != "HEAD"
+          
+          if request.method == "HEAD"
+            amplification_data = nil
+          else
+            cts = AmplificationCurve.retrieve(@experiment, first_stage_collect_data.id)
             fluorescence_data = FluorescenceDatum.for_stage(first_stage_collect_data.id).for_experiment(@experiment.id)
           end
         end
@@ -355,7 +358,7 @@ class ExperimentsController < ApplicationController
             amplification_data.each do |data|
               while (fluorescence_index < fluorescence_data.length && 
                     !(fluorescence_data[fluorescence_index].channel == data.channel && 
-                      fluorescence_data[fluorescence_index].well_num+1 == data.well_num && 
+                      fluorescence_data[fluorescence_index].well_num == data.well_num &&
                       fluorescence_data[fluorescence_index].cycle_num == data.cycle_num)) do
                     fluorescence_index += 1
               end
@@ -368,9 +371,9 @@ class ExperimentsController < ApplicationController
         end
 
         if cts
-          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/ct.csv")
+          out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/cq.csv")
           csv_string = CSV.generate do |csv|
-            csv << ["channel", "well_num", "ct"];
+            csv << ["channel", "well_num", "cq"];
             cts.each do |ct|
               csv << [ct.channel, ct.well_num, ct.ct]
             end
@@ -382,17 +385,22 @@ class ExperimentsController < ApplicationController
         if first_stage_meltcurve_data
           begin
             task_submitted = background_calculate_melt_curve_data(@experiment, first_stage_meltcurve_data.id)
-            if task_submitted.nil? #cached
-              if request.method != "HEAD"
-                melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment.id, first_stage_meltcurve_data.id)
-              end
-            else
+            melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment.id, first_stage_meltcurve_data.id)
+            
+            if !task_submitted.nil? && (!@experiment.running? || melt_curve_data.blank?)
+              #background task is submitted
+              #if experiment is finished, wait for the task to complete
+              #if amplification_data is empty, wait for the task to complete
               t.close
               render :nothing => true, :status => (task_submitted)? 202 : 503
               return
             end
           rescue => e
             logger.error("export melt curve data failed: #{e}")
+          end
+          
+          if request.method == "HEAD"
+            melt_curve_data = nil
           end
         end
 
@@ -671,6 +679,8 @@ class ExperimentsController < ApplicationController
   end
   
   def group_by_keynames(data, data_attributes, cqs)
+    return nil if data.nil?
+    
     keyname = nil
     key = nil
     data_array = nil

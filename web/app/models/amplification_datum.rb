@@ -21,7 +21,7 @@ class AmplificationDatum < ActiveRecord::Base
    
   Constants::KEY_NAMES.each do |variable|
     define_method("#{variable}") do
-      (sub_type + "_id" == variable)? sub_id : nil
+      (!sub_type.nil? && "#{sub_type}_id" == variable)? sub_id : nil
     end
   end
   

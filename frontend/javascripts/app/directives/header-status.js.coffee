@@ -24,7 +24,8 @@ window.App.directive 'headerStatus', [
   '$rootScope'
   'expName'
   'ModalError'
-  (Experiment, $state, Status, TestInProgressHelper, $rootScope, expName, ModalError) ->
+  '$location'
+  (Experiment, $state, Status, TestInProgressHelper, $rootScope, expName, ModalError, $location) ->
 
     restrict: 'EA'
     replace: true
@@ -44,6 +45,11 @@ window.App.directive 'headerStatus', [
       experiment_id = null
       $scope.loading = true
       $scope.start_confirm_show = false
+      $scope.dataAnalysis = false
+      counter = 0
+      stringUrl = "run-experiment"
+      if ($location.path().indexOf(stringUrl) == -1)
+        $scope.dataAnalysis = true
 
       $scope.show = ->
         if attrs.experimentId then (experiment_id and $scope.status) else $scope.status
@@ -56,15 +62,20 @@ window.App.directive 'headerStatus', [
           cb resp.experiment if cb
 
       $scope.is_holding = false
+      $scope.enterState = false
 
       $scope.$on 'status:data:updated', (e, data, oldData) ->
         return if !data
         return if !data.experiment_controller
+        counter++
         $scope.statusData = data
         $scope.state = data.experiment_controller.machine.state
         $scope.thermal_state = data.experiment_controller.machine.thermal_state
         $scope.oldState = oldData?.experiment_controller?.machine?.state || 'NONE'
         $scope.isCurrentExp = parseInt(data.experiment_controller.experiment?.id) is parseInt(experiment_id)
+        if $scope.isCurrentExp is true
+          $scope.enterState = $scope.isCurrentExp
+        console.log $scope.enterState
 
         if ((($scope.oldState isnt $scope.state or !$scope.experiment))) and experiment_id
           getExperiment (exp) ->
@@ -85,8 +96,13 @@ window.App.directive 'headerStatus', [
         else if $scope.state is 'complete' and $scope.isCurrentExp
           $scope.backgroundStyle =
             background: "-webkit-linear-gradient(left,  #64b027 0%,#c6e35f 100%,#5d8329 100%,#5d8329 100%)"
-        else						
+        else if $scope.state is 'idle' and !$scope.dataAnalysis and $scope.enterState
+          $scope.backgroundStyle =
+            background: "-webkit-linear-gradient(left,  #64b027 0%,#c6e35f 100%,#5d8329 100%,#5d8329 100%)"
+        else
           $scope.backgroundStyle = {}
+
+
 
       $scope.getDuration = ->
         return 0 if !$scope?.experiment?.completed_at
@@ -124,6 +140,10 @@ window.App.directive 'headerStatus', [
 
       $scope.$on 'expName:Updated', ->
         $scope.experiment?.name = expName.name
+
+      $scope.$on 'complete', ->
+        $scope.dataAnalysis = true
+        console.log $scope.dataAnalysis
 
       $scope.$watch 'experimentId', (id) ->
         return if !id
