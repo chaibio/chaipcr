@@ -77,6 +77,7 @@ angular.module("canvasApp").factory('mouseDown', [
           case "controlCircleGroup":
 
             me = evt.target.me;
+            console.log(me.parent);
             that.selectStep(me);
             that.canvas.moveCursor = "ns-resize";
           break;

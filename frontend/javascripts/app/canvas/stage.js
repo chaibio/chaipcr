@@ -117,8 +117,10 @@ angular.module("canvasApp").factory('stage', [
         this.configureStep(newStep, start);
         this.parent.allStepViews.splice(currentStep.ordealStatus, 0, newStep);
 
+        //
+        this.parent.correctNumbering();
+        circleManager.init(fabricStage);
         circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
-
         $scope.applyValues(newStep.circle);
         newStep.circle.manageClick(true);
         stageGraphics.recalculateStageHitPoint.call(this);
@@ -138,7 +140,7 @@ angular.module("canvasApp").factory('stage', [
         this.childSteps.splice(start, 1);
         this.model.steps.splice(start, 1);
         this.parent.allStepViews.splice(ordealStatus - 1, 1);
-
+        //this.parent.correctNumbering();
         if(this.childSteps.length > 0) {
           this.configureStepForDelete(currentStep, start);
         } else { // if all the steps in the stages are deleted, We delete the stage itself.
@@ -151,6 +153,9 @@ angular.module("canvasApp").factory('stage', [
         }
         // true imply call is from delete section;
         this.moveAllStepsAndStages(true);
+        
+        this.parent.correctNumbering();
+        circleManager.init(fabricStage);
         circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
 
         $scope.applyValues(selected.circle);
