@@ -149,7 +149,7 @@
             </tr>
             <tr ng-repeat="i in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]" ng-class="{selected: (wellButtons['well_'+i].selected)}">
               <td class="B1" ng-class="{'text-center': color_by==='channel'}">
-                <span ng-if="color_by==='well'" class="dot" style="background-color: {{wellButtons['well_'+i].color}}"></span>
+                <span ng-if="color_by==='well'" class="dot" ng-attr-style="background-color: {{wellButtons['well_'+i].color}}"></span>
                 <span class="text">
                   <span ng-show="i < 8">
                     A{{i+1}}
