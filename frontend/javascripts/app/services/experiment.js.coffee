@@ -76,8 +76,8 @@ window.ChaiBioTech.ngApp
       return deferred.promise if fetchingTempLogs
 
       fetchingTempLogs = true
-      # promise = $http.get "/experiments/#{expId}/temperature_data",
-      promise = $http.get "/temperature_data.json",
+      promise = $http.get "/experiments/#{expId}/temperature_data",
+      # promise = $http.get "/temperature_data.json",
         params:
           starttime: opts.starttime
           endtime: opts.endtime
