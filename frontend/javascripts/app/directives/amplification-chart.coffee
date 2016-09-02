@@ -38,6 +38,7 @@ window.App.directive 'amplificationChart', [
           else
             chart.updateData($scope.data)
             chart.updateConfig($scope.config)
+            console.log "show: #{$scope.show}"
             if $scope.show
               chart.setYAxis()
               chart.setXAxis()

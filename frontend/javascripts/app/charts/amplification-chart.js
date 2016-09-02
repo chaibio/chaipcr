@@ -316,6 +316,7 @@
 
       var min = Globals.config.axes.x.min || getMinX() || 0;
       var max = Globals.config.axes.x.max || getMaxX() || 1;
+      console.log('max x: ' + max);
       Globals.xScale.domain([min, max]);
 
       Globals.xAxis = d3.axisBottom(Globals.xScale);
@@ -341,6 +342,9 @@
     }
 
     function initChart(elem, data, config) {
+
+      console.log(data);
+      console.log(config);
 
       initGlobalVars();
       Globals.data = data;
@@ -472,11 +476,15 @@
     };
 
     this.updateData = function(data) {
+      console.log('update data');
+      console.log(data);
       Globals.data = data;
       updateZoomScaleExtent();
     };
 
     this.updateConfig = function(config) {
+      console.log('set config:');
+      console.log(config);
       Globals.config = config;
     };
 

@@ -25,7 +25,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
   '$interval'
   'Device'
   '$timeout'
-  ($scope, $stateParams, Experiment, helper, expName, $interval, Device, $timeout) ->
+  '$rootScope'
+  ($scope, $stateParams, Experiment, helper, expName, $interval, Device, $timeout, $rootScope) ->
 
     Device.isDualChannel().then (is_dual_channel) ->
       $scope.is_dual_channel = is_dual_channel
@@ -56,9 +57,19 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       Experiment.get(id: $stateParams.id).then (data) ->
         maxCycle = helper.getMaxExperimentCycle(data.experiment)
-        $scope.maxCycle = maxCycle
         $scope.chartConfig.axes.x.max = maxCycle
         $scope.experiment = data.experiment
+
+      $scope.$on 'status:data:updated', (e, data, oldData) ->
+        return if !data
+        return if !data.experiment_controller
+        $scope.statusData = data
+        $scope.state = data.experiment_controller.machine.state
+        $scope.thermal_state = data.experiment_controller.machine.thermal_state
+        $scope.oldState = oldData?.experiment_controller?.machine?.state || 'NONE'
+        $scope.isCurrentExp = parseInt(data.experiment_controller.experiment?.id) is parseInt($stateParams.id)
+        if $scope.isCurrentExp is true
+          $scope.enterState = $scope.isCurrentExp
 
       retry = ->
         $scope.retrying = true
@@ -87,16 +98,19 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           .then (resp) ->
             $scope.fetching = false
             $scope.error = null
-            if resp.status is 200 and resp.data?.partial
+            if (resp.status is 200 and resp.data?.partial and $scope.enterState) or (resp.status is 200 and !resp.data.partial)
               $scope.hasData = true
               $scope.amplification_data = helper.paddData()
-            if resp.data.amplification_data and resp.data.amplification_data?.length > 1
+            if resp.status is 200 and !resp.data.partial
+              $rootScope.$broadcast 'complete'
+            if (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1 and $scope.enterState) or (resp.data.steps?[0].amplification_data and resp.data.steps?[0].amplification_data?.length > 1 and !resp.data.partial)
               $scope.chartConfig.axes.x.min = 1
               $scope.hasData = true
-              data = resp.data
+              data = resp.data.steps[0]
               data.amplification_data.shift()
-              data.ct.shift()
+              data.cq.shift()
               data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
+              console.log data
 
               AMPLI_DATA_CACHE = angular.copy data
               $scope.amplification_data = data.amplification_data
@@ -119,7 +133,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       updateButtonCts = ->
         for well_i in [0..15] by 1
-          cts = _.filter AMPLI_DATA_CACHE.ct, (ct) ->
+          cts = _.filter AMPLI_DATA_CACHE.cq, (ct) ->
             ct[1] is well_i+1
           $scope.wellButtons["well_#{well_i}"].ct = [cts[0][2]]
           $scope.wellButtons["well_#{well_i}"].ct.push cts[1][2] if cts[1]

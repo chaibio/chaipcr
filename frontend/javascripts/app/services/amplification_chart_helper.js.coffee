@@ -25,7 +25,7 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
     @chartConfig = ->
       axes:
         x:
-          min: 1
+          min: 0
           key: 'cycle_num'
           ticks: 8
         y:
@@ -36,9 +36,6 @@ window.ChaiBioTech.ngApp.service 'AmplificationChartHelper', [
         left: 80
         right: 5
         bottom: 50
-      grid:
-        x: false
-        y: false
 
       series: []
 
