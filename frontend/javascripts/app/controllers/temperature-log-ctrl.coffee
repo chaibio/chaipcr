@@ -20,6 +20,11 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       value: 0
       width: 0.2
     }
+    $scope.dataPointAt = {
+      elapsed_time: 0
+      heat_block_zone_temp: 0
+      lid_temp: 0
+    }
 
     $scope.data = dataset: []
 
@@ -62,6 +67,9 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         else
           stopInterval()
 
+    $scope.mouseMove = (data_point) ->
+      $scope.dataPointAt = data_point
+
     $scope.tempOnZoom = (transform, w, h, scale_extent) ->
       # console.log transform, w, h, scale_extent
       $scope.scrollState = {
@@ -72,8 +80,6 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         value: (transform.k - 1)/ (scale_extent-1)
         width: 0.2
       }
-
-      console.log $scope.zoomState.value
 
     $scope.$watch ->
       $scope.RunExperimentCtrl.chart

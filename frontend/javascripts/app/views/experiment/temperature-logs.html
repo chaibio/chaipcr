@@ -61,6 +61,7 @@
                 on-zoom="tempOnZoom"
                 zoom="zoomState.value"
                 scroll="scrollState.value"
+                on-mouse-move="mouseMove"
                 show="showChart"></thermal-profile-chart>
               <!-- <linechartv2
                 ng-if="!!data && RunExperimentCtrl.chart==='temperature-logs'"
@@ -76,17 +77,17 @@
               <div class="item-indicator">
                 <span class="dot"></span>
                 <strong>Time:</strong>
-                <span class="B1">{{getLegend().time}}</span>
+                <span class="B1">{{dataPointAt.elapsed_time | secondsDisplay:'display2'}}</span>
               </div>
               <div class="item-indicator">
                 <span class="dot"></span>
                 <strong>Heat Block:</strong>
-                <span class="B1">{{getLegend().heat_block | round:1}}&nbsp;&deg;C</span>
+                <span class="B1">{{dataPointAt.heat_block_zone_temp | round:1}}&nbsp;&deg;C</span>
               </div>
               <div class="item-indicator">
                 <span class="dot"></span>
                 <strong>Lid:</strong>
-                <span class="B1">{{getLegend().lid | round:1}}&nbsp;&deg;C</span>
+                <span class="B1">{{dataPointAt.lid_temp | round:1}}&nbsp;&deg;C</span>
               </div>
             </div>
           </div>

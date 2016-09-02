@@ -2,15 +2,15 @@
 
   "use strict";
 
-  function ThermalProfileChart(elem, data, config) {
+  function ThermalProfileChart($scope, elem, data, config) {
 
     // Global vars
     var Globals = null;
-    // current supported axis interpolations
-    // var INTERPOLATIONS = {
-    //   log: d3.scaleLog,
-    //   linear: d3.scaleLinear
-    // };
+    var bisectX = function(line_config) {
+      return d3.bisector(function(d) {
+        return d[line_config.x];
+      }).left;
+    }
 
     function initGlobalVars() {
       Globals = {
@@ -27,8 +27,10 @@
         mouseOverlay: null,
         lineStrokeWidth: 5,
         circleStrokeWidth: 2,
+        dashedLineStrokeWidth: 2,
         circleRadius: 7,
         circles: [],
+        dashedLine: null,
         lines: null,
         xScale: null,
         yScale: null,
@@ -69,22 +71,44 @@
     //   Globals.lines[activePathIndex] = newLine;
     //   Globals.activePath = newLine;
     //   makeCircle();
-    //   circleFollowsMouse.call(this);
+    //   followTheMouse.call(this);
     //   path.remove();
     // }
 
-    function makeCircleForLine(path, line_config) {
-      var c = Globals.chartSVG.append('circle')
+    function makeCircleForLine(line_config) {
+      var cx = Globals.data[line_config.dataset][0] ? Globals.data[line_config.dataset][0][line_config.x] : 0;
+      var cy = Globals.data[line_config.dataset][0] ? Globals.data[line_config.dataset][0][line_config.y] : 0;
+      var c = Globals.viewSVG.append('circle')
+        .attr('opacity', 0)
         .attr('r', Globals.circleRadius)
         .attr('fill', line_config.color)
         .attr('stroke', '#fff')
         .attr('stroke-width', Globals.circleStrokeWidth)
+        .attr('cx', cx)
+        .attr('cy', cy)
         .attr('class', 'mouse-indicator-circle');
       // .attr('transform', 'translate (50,50)');
 
-      // circleFollowsMouse(path, c).call(this);
+      // followTheMouse(path, c).call(this);
 
       Globals.circles.push(c);
+    }
+
+    function makeDashedLine() {
+      if (Globals.dashedLine) {
+        Globals.dashedLine.remove();
+      }
+      return Globals.viewSVG
+        .append("line")
+        .attr("opacity", 0)
+        .attr("x1", 10) //<<== change your code here
+        .attr("y1", 0)
+        .attr("x2", 10) //<<== and here
+        .attr("y2", Globals.height)
+        .attr("stroke-dasharray", '5, 5')
+        .attr("stroke-width", Globals.dashedLineStrokeWidth)
+        .attr("stroke", "#333")
+        .attr("fill", "none");
     }
 
     function makeTooltipSensorForLine(conf) {
@@ -94,7 +118,7 @@
         .attr("class", "tooltip-sensor")
         .attr("r", 3 / Globals.zoomTransform.k + 'px')
         .attr("stroke-width", Globals.lineStrokeWidth + 'px')
-        .attr("fill", conf.color)
+        .attr("fill", "transparent")
         .attr("cx", function(d) {
           return Globals.xScale(d[conf.x]);
         })
@@ -151,17 +175,42 @@
         line.remove();
       });
       Globals.lines = [];
-      Globals.chartSVG.selectAll('.tooltip-sensor').remove();
-      Globals.chartSVG.selectAll('.mouse-indicator-circle').remove();
       Globals.lines = [];
 
       series.forEach(function(line_config, i) {
-        var path = makeLine(line_config);
-        makeCircleForLine(path, line_config);
-        makeTooltipSensorForLine(line_config);
+        makeLine(line_config);
       });
 
-      // makeCircle();
+      Globals.dashedLine = makeDashedLine();
+      drawCircleTooltips();
+      setMouseOverlay();
+      // drawDataPointSensors();
+    }
+
+    function drawDataPointSensors() {
+      if (!Globals.config.series) {
+        return;
+      }
+      Globals.chartSVG.selectAll('.tooltip-sensor').remove();
+      Globals.config.series.forEach(function(line_config) {
+        makeTooltipSensorForLine(line_config);
+      });
+    }
+
+    function drawCircleTooltips() {
+      if (!Globals.config.series) {
+        return;
+      }
+      Globals.circles = Globals.circles || [];
+      Globals.circles.forEach(function(circle) {
+        circle.remove();
+      });
+      Globals.circles = [];
+      // Globals.chartSVG.selectAll('.mouse-indicator-circle').remove();
+      for (var i = 0; i < Globals.config.series.length; i++) {
+        var config = Globals.config.series[i];
+        makeCircleForLine(config);
+      }
     }
 
     function getDataLength() {
@@ -193,20 +242,25 @@
     //   });
     // }
 
-    function updateElementSizesOnZoom(k) {
+    function updateElementSizesOnZoom(transform) {
       Globals.lines.forEach(function(l) {
-        l.attr('stroke-width', (Globals.lineStrokeWidth / k) + 'px');
+        l.attr('stroke-width', (Globals.lineStrokeWidth / transform.k) + 'px');
       });
 
       Globals.circles.forEach(function(circle) {
         circle
-          .attr('transform', 'translate(0,0) scale(1)')
-          .attr('stroke-width', Globals.circleStrokeWidth / k + 'px')
-          .attr('r', Globals.circleRadius / k + 'px');
+        // .attr('transform', transform)
+          .attr('stroke-width', Globals.circleStrokeWidth / transform.k + 'px')
+          .attr('r', Globals.circleRadius / transform.k + 'px');
       });
 
       Globals.chartSVG.selectAll('.tooltip-sensor')
-        .attr('r', 3 / Globals.zoomTransform.k + 'px');
+        .attr('transform', transform)
+        .attr('r', 3 / transform.k + 'px');
+
+      Globals.dashedLine
+        .attr('stroke-dasharray', 5 / transform.k + "," + 5 / transform.k)
+        .attr('stroke-width', (Globals.dashedLineStrokeWidth / transform.k) + 'px');
     }
 
     function zoomed() {
@@ -236,10 +290,11 @@
       Globals.gY.call(Globals.yAxis.scale(transform.rescaleY(Globals.yScale)));
       Globals.zoomTransform = transform;
 
-      updateElementSizesOnZoom(transform.k);
+      updateElementSizesOnZoom(transform);
 
       if (Globals.onZoomAndPan) {
         Globals.onZoomAndPan(Globals.zoomTransform, Globals.width, Globals.height, getScaleExtent());
+        // $scope.$apply();
       }
     }
 
@@ -402,6 +457,20 @@
       Globals.zooomBehavior.scaleExtent([1, getScaleExtent()]);
     }
 
+    function setMouseOverlay() {
+
+      if (Globals.mouseOverlay) {
+        Globals.mouseOverlay.remove();
+      }
+
+      Globals.mouseOverlay = Globals.viewSVG.append('rect')
+        .attr('width', Globals.width)
+        .attr('height', Globals.height)
+        .attr('fill', 'transparent')
+        .on('mouseout', hideElementsOnMouseOut)
+        .on('mousemove', followTheMouse);
+    }
+
     function initChart(elem, data, config) {
 
       initGlobalVars();
@@ -434,25 +503,19 @@
         .attr('height', height)
         .attr('class', 'viewSVG');
 
-      Globals.mouseOverlay = Globals.viewSVG.append('rect')
-        .attr('width', width)
-        .attr('height', height)
-        .attr('fill', 'transparent')
-        .on('mousemove', circleFollowsMouse);
-
       setYAxis();
       setXAxis();
       drawLines();
-      // makeCircles();
-      updateZoomScaleExtent()
+      updateZoomScaleExtent();
+      setMouseOverlay();
 
     }
 
-    function circleFollowsMouse() {
+    function followTheMouse() {
       var x = d3.mouse(this)[0];
+      // var circles = Globals.chartSVG.selectAll('.mouse-indicator-circle');
 
       Globals.lines.forEach(function(path, i) {
-        console.log(path);
         var pathEl = path.node();
         var pathLength = pathEl.getTotalLength();
         var beginning = x,
@@ -476,12 +539,35 @@
         }
 
         Globals.circles[i]
-          // .attr("opacity", 1)
+          .attr('opacity', 1)
           .attr("cx", x)
           .attr("cy", pos.y);
-          // .attr('transform', 'translate(0,0) scale(1)')
-          // .attr('r', Globals.circleRadius / Globals.zoomTransform.k + 'px')
-          // .attr('stroke-width', Globals.circleStrokeWidth / Globals.zoomTransform.k + 'px');
+      });
+
+      Globals.dashedLine
+        .attr("opacity", 1)
+        .attr('x1', x)
+        .attr('x2', x);
+
+      // get data point at point x
+      var line_config = Globals.config.series[0];
+      var x0 = Globals.xScale.invert(x),
+        i = bisectX(line_config)(Globals.data[line_config.dataset], x0, 1),
+        d0 = Globals.data[line_config.dataset][i - 1],
+        d1 = Globals.data[line_config.dataset][i],
+        d = x0 - d0[line_config.x] > d1[line_config.x] - x0 ? d1 : d0;
+
+      if (Globals.onMouseMove) {
+        Globals.onMouseMove(d);
+        $scope.$apply();
+      }
+
+    }
+
+    function hideElementsOnMouseOut () {
+      Globals.dashedLine.attr('opacity', 0);
+      Globals.circles.forEach(function (circle) {
+        circle.attr('opacity', 0);
       });
     }
 
@@ -526,6 +612,10 @@
       var k = ((getScaleExtent() - 1) * zoom_percent) + 1;
       Globals.chartSVG.call(Globals.zooomBehavior.scaleTo, k);
     };
+
+    this.setMouseMoveListener = function (fn) {
+      Globals.onMouseMove = fn;
+    }
 
     this.updateSeries = function(series) {
       Globals.config.series = series;
