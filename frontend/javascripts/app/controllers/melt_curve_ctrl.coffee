@@ -172,7 +172,7 @@ App.controller 'MeltCurveChartCtrl', [
         updateResolutionOptions(data)
         changeResolution()
 
-        #$scope.fetching = false
+        $scope.fetching = false
         # $scope.hasData = has_data
 
         $timeout ->
@@ -183,7 +183,7 @@ App.controller 'MeltCurveChartCtrl', [
 
     $scope.$watch 'RunExperimentCtrl.chart', (chart) ->
       if chart is 'melt-curve'
-        if !has_data
+        #if !has_data
           $scope.enterState = false
           $scope.has_data = false
           $scope.data = MeltCurveService.defaultData()
