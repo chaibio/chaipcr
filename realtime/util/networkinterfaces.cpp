@@ -45,6 +45,10 @@ namespace NetworkInterfaces
 std::string InterfaceSettings::toString() const
 {
     std::stringstream stream;
+
+    if (autoConnect)
+        stream << "auto " << interface << '\n';
+
     stream << "iface " << interface << " inet " << type << '\n';
 
     for (std::map<std::string, std::string>::const_iterator it = arguments.begin(); it != arguments.end(); ++it)
@@ -194,6 +198,8 @@ void writeInterfaceSettings(const std::string &filePath, const InterfaceSettings
             else
                 skip = false;
         }
+        else if (line.find("auto " + interface.interface) != std::string::npos)
+            continue;
         else if (skip && !line.empty() && (line.substr(0, 4) == std::string("    ") || line.at(0) == '\t'))
             continue;
 
