@@ -57,9 +57,11 @@ angular.module("canvasApp").factory('mouseDown', [
 
             if(getP.x > stepDataGroupLeft && getP.x < (stepDataGroupLeft + 45)) {
               editMode.tempActive = true;
+              editMode.currentActiveTemp = target.parentCircle.temperature;
               startEditing(target.parentCircle.temperature);
             } else {
               editMode.holdActive = true;
+              editMode.currentActiveHold = target.parentCircle.holdTime;
               startEditing(target.parentCircle.holdTime);
             }
 

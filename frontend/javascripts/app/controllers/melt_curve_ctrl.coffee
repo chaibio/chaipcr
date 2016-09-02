@@ -159,8 +159,17 @@ App.controller 'MeltCurveChartCtrl', [
       $scope.RunExperimentCtrl.chart
     , (chart) ->
       if chart is 'melt-curve'
+# <<<<<<< HEAD
         if !$scope.hasData
           getMeltCurveData(getMeltCurveDataCallBack)
+          $scope.enterState = false
+          $scope.data = MeltCurveService.defaultData()
+          $scope.has_data = false
+# =======
+#         #if !has_data
+#           getExperiment (exp) ->
+#             getMeltCurveData(getMeltCurveDataCallBack)
+# >>>>>>> master
 
         $timeout ->
           $scope.showMeltCurveChart = true

@@ -552,11 +552,13 @@
     height: 111px;
     position: relative;
     left: 15px;
-    top: 12px;
+    top: 21px;
 
     button {
       margin-bottom: 3px;
       width: 150px;
+      background-color: white;
+      border: none;
     }
   }
 }

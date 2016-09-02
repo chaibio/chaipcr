@@ -28,6 +28,8 @@ namespace NetworkInterfaces
     class InterfaceSettings
     {
     public:
+        InterfaceSettings(): autoConnect(false) {}
+
         inline bool isEmpty() const noexcept { return interface.empty(); }
 
         std::string toString() const;
@@ -35,6 +37,7 @@ namespace NetworkInterfaces
     public:
         std::string interface;
         std::string type;
+        bool autoConnect;
 
         std::map<std::string, std::string> arguments;
     };

@@ -104,6 +104,7 @@ void NetworkManagerHandler::getStat(boost::property_tree::ptree &responsePt)
     if (!settings.isEmpty())
     {
         responsePt.put("settings.type", settings.type);
+        responsePt.put("settings.auto", settings.autoConnect);
 
         for (std::map<std::string, std::string>::const_iterator it = settings.arguments.begin(); it != settings.arguments.end(); ++it)
             responsePt.put("settings." + it->first, it->second);
@@ -145,6 +146,7 @@ void NetworkManagerHandler::setSettings(const boost::property_tree::ptree &reque
         NetworkInterfaces::InterfaceSettings settings;
         settings.interface = _interfaceName;
         settings.type = requestPt.get<std::string>("type");
+        settings.autoConnect = requestPt.get<bool>("auto", false);
 
         for (boost::property_tree::ptree::const_iterator it = requestPt.begin(); it != requestPt.end(); ++it)
         {

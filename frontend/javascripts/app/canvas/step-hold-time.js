@@ -56,7 +56,7 @@ angular.module("canvasApp").factory('stepHoldTime', [
       };
 
       this.render();
-      
+
       this.text.on('text:editing:exited', function() {
 
         // This block is executed when we hit enter.
@@ -78,6 +78,8 @@ angular.module("canvasApp").factory('stepHoldTime', [
       this.postEdit = function() {
         // There is some issues for, saving new hold_time for infinite hold, make sure uts corrected when new design comes.
         editMode.holdActive = false;
+        editMode.currentActiveHold = null;
+        
         $scope.step.hold_time = $scope.convertToMinute(this.text.text) || $scope.step.hold_time;
 
         if($scope.step.hold_time !== 0) { // If its zero server returns error , but make an exception for last step

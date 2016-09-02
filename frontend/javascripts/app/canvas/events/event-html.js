@@ -23,31 +23,42 @@ angular.module("canvasApp").factory('htmlEvents', [
   'previouslyHoverd',
   'scrollService',
   'popupStatus',
+  'editMode',
 
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, popupStatus) {
+  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, popupStatus, editMode) {
 
     this.init = function(C, $scope, that) {
 
       angular.element('body').click(function(evt) {
-        if(popupStatus.popupStatusAddStage && evt.target.id != "add-stage") {
+
+        if (popupStatus.popupStatusAddStage && evt.target.id != "add-stage") {
             angular.element('#add-stage').click();
         }
       });
 
       angular.element('.canvas-container, .canvasClass').mouseleave(function() {
 
-        if(C.editStageStatus === false) {
-            if(previouslyHoverd.step) {
+        if (C.editStageStatus === false) {
+            if (previouslyHoverd.step) {
               previouslyHoverd.step.closeImage.setVisible(false);
             }
             previouslyHoverd.step = null;
             C.canvas.renderAll();
         }
+
+        if (editMode.tempActive === true) {
+          editMode.currentActiveTemp.fire('text:editing:exited');
+        }
+
+        if (editMode.holdActive === true) {
+          editMode.currentActiveHold.fire('text:editing:exited');
+        }
+
       });
 
       angular.element('.canvas-containing').click(function(evt) {
 
-        if(evt.target == evt.currentTarget) {
+        if (evt.target == evt.currentTarget) {
           that.setSummaryMode();
         }
       });
