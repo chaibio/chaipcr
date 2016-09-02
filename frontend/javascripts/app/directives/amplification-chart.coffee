@@ -20,7 +20,7 @@ window.App.directive 'amplificationChart', [
 
         initChart = ->
           return if !$scope.data or !$scope.config or !$scope.show
-          chart = new $window.ChaiBioCharts.BaseChart(elem[0], $scope.data, $scope.config)
+          chart = new $window.ChaiBioCharts.AmplificationChart(elem[0], $scope.data, $scope.config)
           chart.onZoomAndPan($scope.onZoom())
           d = chart.getDimensions()
           $scope.onZoom()(chart.getTransform(), d.width, d.height, chart.getScaleExtent())

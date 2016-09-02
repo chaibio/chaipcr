@@ -2,7 +2,7 @@
 
   "use strict";
 
-  function BaseChart(elem, data, config) {
+  function MeltCurveChart(elem, data, config) {
 
     // Global vars
     var Globals = null;
@@ -502,6 +502,6 @@
   }
 
   window.ChaiBioCharts = window.ChaiBioCharts || {};
-  window.ChaiBioCharts.BaseChart = BaseChart;
+  window.ChaiBioCharts.MeltCurveChart = MeltCurveChart;
 
 })();
