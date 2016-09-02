@@ -37,26 +37,40 @@ namespace Poco { class Timer; class RWLock; }
 class ExperimentController : public Instance<ExperimentController>
 {
 public:
+    class LockedExperiment : public boost::noncopyable
+    {
+    public:
+        friend class ExperimentController;
+
+        LockedExperiment();
+        LockedExperiment(LockedExperiment &&other);
+        ~LockedExperiment();
+
+        LockedExperiment& operator= (LockedExperiment &&other);
+        Experiment& operator* () { return *_experiment; }
+        Experiment* operator-> () { return _experiment; }
+        operator bool() const { return isNull(); }
+
+        inline bool isNull() const { return _experiment && _mutex; }
+
+    private:
+        LockedExperiment(Experiment *experiment, Poco::RWLock *mutex);
+
+    private:
+        Experiment *_experiment;
+        Poco::RWLock *_mutex;
+    };
+
     class LogsSettings
     {
     public:
         LogsSettings()
         {
             debugMode = false;
-
-            temperatureLogsState = false;
-            debugTemperatureLogsState = false;
-
-            startTime = boost::posix_time::not_a_date_time;
         }
 
     public:
         std::atomic<bool> debugMode;
-
-        std::atomic<bool> temperatureLogsState;
-        std::atomic<bool> debugTemperatureLogsState;
-
-        boost::posix_time::ptime startTime;
     };
 
     enum MachineState
@@ -91,16 +105,15 @@ public:
     inline MachineState machineState() const { return _machineState; }
     inline ThermalState thermalState() const { return _thermalState; }
     Experiment experiment() const;
+    LockedExperiment lockedExperiment();
 
-    inline const LogsSettings& settings() const { return _settings; }
+    inline bool debugMode() const { return _settings.debugMode; }
     inline void setDebugMode(bool state) { _settings.debugMode = state; }
 
     StartingResult start(int experimentId);
     void resume();
     void stop();
     void stop(const std::string &errorMessage);
-
-    void toggleTempLogs(bool temperatureLogsState, bool debugTemperatureLogsState);
 
 private:
     void run();

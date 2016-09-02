@@ -57,6 +57,20 @@ describe Step do
         step.hold_time = 0
         step.save.should be_true
       end
+      
+      it "not allow to collect data on infinite hold step" do
+        step = Step.new(:stage_id=>@stage.id)
+        step.hold_time = 0
+        step.collect_data = true
+        step.save.should be_false
+      end
+      
+      it "not allow to collect data on pause step" do
+        step = Step.new(:stage_id=>@stage.id)
+        step.pause = true
+        step.collect_data = true
+        step.save.should be_false
+      end
     end
     
     describe "#destroy" do

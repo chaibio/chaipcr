@@ -35,6 +35,53 @@
 
 #define STORE_MELT_CURVE_DATA_INTERVAL 10 * 1000
 
+ExperimentController::LockedExperiment::LockedExperiment()
+    :LockedExperiment(nullptr, nullptr)
+{
+
+}
+
+ExperimentController::LockedExperiment::LockedExperiment(Experiment *experiment, Poco::RWLock *mutex)
+{
+    _experiment = experiment;
+    _mutex = mutex;
+
+    if (_experiment && _mutex)
+        _mutex->writeLock();
+}
+
+ExperimentController::LockedExperiment::LockedExperiment(LockedExperiment &&other)
+{
+    if (other._experiment && other._mutex)
+    {
+        _experiment = other._experiment;
+        _mutex = other._mutex;
+
+        other._experiment = nullptr;
+        other._mutex = nullptr;
+    }
+}
+
+ExperimentController::LockedExperiment::~LockedExperiment()
+{
+    if (_mutex)
+        _mutex->unlock();
+}
+
+ExperimentController::LockedExperiment& ExperimentController::LockedExperiment::operator =(LockedExperiment &&other)
+{
+    if (_mutex)
+        _mutex->unlock();
+
+    _experiment = other._experiment;
+    _mutex = other._mutex;
+
+    other._experiment = nullptr;
+    other._mutex = nullptr;
+
+    return *this;
+}
+
 ExperimentController::ExperimentController(std::shared_ptr<DBControl> dbControl)
 {
     _machineMutex = new Poco::RWLock;
@@ -73,6 +120,11 @@ Experiment ExperimentController::experiment() const
     return _experiment;
 }
 
+ExperimentController::LockedExperiment ExperimentController::lockedExperiment()
+{
+    return LockedExperiment(&_experiment, _machineMutex);
+}
+
 ExperimentController::StartingResult ExperimentController::start(int experimentId)
 {
     if (OpticsInstance::getInstance()->lidOpen())
@@ -94,9 +146,6 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
 
     {
         Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
-
-        _settings.temperatureLogsState = false;
-        _settings.debugTemperatureLogsState = false;
 
         LidInstance::getInstance()->setTargetTemperature(experiment.protocol()->lidTemperature());
 
@@ -503,52 +552,22 @@ void ExperimentController::stopLogging()
 {
     _logTimer->stop();
 
-    _settings.startTime = boost::posix_time::not_a_date_time;
-
     _dbControl->addTemperatureLog(_logs);
     _logs.clear();
-}
-
-void ExperimentController::toggleTempLogs(bool temperatureLogsState, bool debugTemperatureLogsState)
-{
-    _settings.temperatureLogsState = temperatureLogsState;
-    _settings.debugTemperatureLogsState = debugTemperatureLogsState;
-
-    if (machineState() == IdleMachineState)
-    {
-        if (_settings.temperatureLogsState || _settings.debugTemperatureLogsState)
-        {
-            if (_settings.startTime == boost::posix_time::not_a_date_time)
-            {
-                _settings.startTime = boost::posix_time::microsec_clock::universal_time();
-
-                startLogging();
-            }
-        }
-        else
-            stopLogging();
-    }
 }
 
 void ExperimentController::addLogCallback(Poco::Timer &)
 {
     TemperatureLog log;
 
-    _machineMutex->readLock();
-
-    if (_machineState != IdleMachineState)
     {
+        Poco::RWLock::ScopedReadLock lock(*_machineMutex);
+
+        if (_machineState == IdleMachineState)
+            return;
+
         log = TemperatureLog(_experiment.id(), true, _settings.debugMode);
         log.setElapsedTime((boost::posix_time::microsec_clock::local_time() - _experiment.startedAt()).total_milliseconds());
-
-        _machineMutex->unlock();
-    }
-    else
-    {
-        _machineMutex->unlock();
-
-        log = TemperatureLog(0, _settings.temperatureLogsState, _settings.debugTemperatureLogsState);
-        log.setElapsedTime((boost::posix_time::microsec_clock::universal_time() - _settings.startTime).total_milliseconds());
     }
 
     if (log.hasTemperatureInfo())

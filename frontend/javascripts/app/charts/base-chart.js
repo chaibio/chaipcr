@@ -285,6 +285,10 @@
 
       Globals.yAxis = d3.axisLeft(Globals.yScale);
 
+      if (Globals.config.axes.y.tickFormat) {
+        Globals.yAxis.tickFormat = Globals.config.axes.y.tickFormat;
+      }
+
       if (Globals.config.axes.y.scale === 'log') {
         Globals.yAxis
           .tickValues(getYLogticks())
@@ -316,8 +320,11 @@
 
       Globals.xAxis = d3.axisBottom(Globals.xScale);
       if (Globals.config.axes.x.ticks) {
-        // Globals.xAxis.forceX(config.axes.x.min, config.axes.x.max);
         Globals.xAxis.tickValues = Globals.config.axes.x.ticks;
+      }
+      if (Globals.config.axes.x.tickFormat) {
+        console.log(Globals.config.axes.x);
+        Globals.xAxis.tickFormat(Globals.config.axes.x.tickFormat);
       }
       Globals.gX = svg.append("g")
         .attr("class", "axis x-axis")

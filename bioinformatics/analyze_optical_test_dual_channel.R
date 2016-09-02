@@ -127,10 +127,10 @@ analyze_optical_test_dual_channel <- function(
             function(channel) swd_dye[channel,] / swd_normd[[channel]]
         ))
     )
-    ch12_ratios <- do.call(rbind, lapply(self_calib_list[calib_labels_FAM_HEX],
+    ch12_ratios <- lapply(self_calib_list[calib_labels_FAM_HEX],
         function(self_calib_dye) self_calib_dye[1,] / self_calib_dye[2,]
-    ))
-    rownames(ch12_ratios) <- c('FAM', 'HEX') # just for view, not necessary for JSON output
+    )
+    names(ch12_ratios) <- c('FAM', 'HEX')
     
     
     return(toJSON(list('optical_data'=results, 'Ch1:Ch2'=ch12_ratios)))

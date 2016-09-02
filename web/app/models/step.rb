@@ -128,5 +128,8 @@ class Step < ActiveRecord::Base
           end
       end
     end
+    if collect_data && (infinite_hold? || pause)
+      errors.add(:collect_data, "Cannot collect data on #{(infinite_hold?)? "infinite hold" : "pause"} step")
+    end
   end
 end

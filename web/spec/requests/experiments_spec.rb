@@ -6,7 +6,6 @@ describe "Experiments API" do
     post '/login', { email: admin_user.email, password: admin_user.password }
     
     Setting.where(:id=>1).update_all(:time_valid=>true)
-    Setting.instance.reload
   end
   
   it 'create experiment' do
@@ -167,8 +166,6 @@ describe "Experiments API" do
   
   it "set time_valid to false" do
     Setting.where(:id=>1).update_all(:time_valid=>false)
-    Setting.instance.reload
-    puts "time_valid=#{Setting.time_valid}"
     params = { experiment: {name: "test"} }
     post "/experiments", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
     expect(response).to be_success            # test for the 200 status-code

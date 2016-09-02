@@ -84,7 +84,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
 
         $timeout ->
           $scope.showChart = true
-        , 2000
+        , 1000
       else
         $scope.showChart = false
 

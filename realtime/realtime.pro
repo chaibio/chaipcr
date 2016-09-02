@@ -142,7 +142,8 @@ HEADERS += \
     server/datahandler.h \
     server/updateuploadhandler.h \
     util/logger.h \
-    util/timercallback.h
+    util/timercallback.h \
+    server/changeexperimenthandler.h
 
 SOURCES += \
     app/pins.cpp \
@@ -196,4 +197,5 @@ SOURCES += \
     server/updatehandler.cpp \
     server/datahandler.cpp \
     server/updateuploadhandler.cpp \
-    util/logger.cpp
+    util/logger.cpp \
+    server/changeexperimenthandler.cpp
