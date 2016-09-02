@@ -161,12 +161,17 @@ InterfaceSettings readInterfaceSettings(const std::string &filePath, const std::
             pos = line.find(' ', pos + 1) + 1;
             interface.type = line.substr(pos);
         }
-        else if (!interface.interface.empty() && (line.substr(0, 4) == std::string("    ") || line.at(0) == '\t'))
+        else if (!interface.interface.empty())
         {
-            while (line.front() == ' ')
-                line = line.substr(1);
+            if (line == "auto " + interface.interface)
+                interface.autoConnect = true;
+            else if ((line.substr(0, 4) == std::string("    ") || line.at(0) == '\t'))
+            {
+                while (line.front() == ' ')
+                    line = line.substr(1);
 
-            interface.arguments[line.substr(0, line.find(' '))] = line.substr(line.find(' ') + 1);
+                interface.arguments[line.substr(0, line.find(' '))] = line.substr(line.find(' ') + 1);
+            }
         }
     }
 
@@ -198,7 +203,7 @@ void writeInterfaceSettings(const std::string &filePath, const InterfaceSettings
             else
                 skip = false;
         }
-        else if (line.find("auto " + interface.interface) != std::string::npos)
+        else if (line == "auto " + interface.interface)
             continue;
         else if (skip && !line.empty() && (line.substr(0, 4) == std::string("    ") || line.at(0) == '\t'))
             continue;

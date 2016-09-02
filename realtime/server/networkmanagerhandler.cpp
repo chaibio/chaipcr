@@ -104,6 +104,7 @@ void NetworkManagerHandler::getStat(boost::property_tree::ptree &responsePt)
     if (!settings.isEmpty())
     {
         responsePt.put("settings.type", settings.type);
+        responsePt.put("settings.auto", settings.autoConnect);
 
         for (std::map<std::string, std::string>::const_iterator it = settings.arguments.begin(); it != settings.arguments.end(); ++it)
             responsePt.put("settings." + it->first, it->second);
