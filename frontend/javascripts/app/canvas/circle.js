@@ -394,13 +394,13 @@ angular.module("canvasApp").factory('circle', [
       };
 
       this.manageClick = function() {
-
+        //debugger;
         if(! this.big) {
           this.makeItBig();
           this.parent.parentStage.selectStage();
           this.parent.selectStep();
 
-          if(previouslySelected.circle) {
+          if(previouslySelected.circle && (previouslySelected.circle.model.id !== this.model.id)) {
             previouslySelected.circle.makeItSmall();
           }
 

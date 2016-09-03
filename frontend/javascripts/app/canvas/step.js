@@ -214,7 +214,7 @@ angular.module("canvasApp").factory('step', [
           'hitPoint': this.hitPoint,
           'closeImage': this.closeImage,
           'dots': this.dots
-        }
+        };
         this.canvas.add(this.stepGroup);
         this.canvas.add(this.rampSpeedGroup);
         this.canvas.add(this.hitPoint);
