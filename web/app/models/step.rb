@@ -23,6 +23,8 @@ class Step < ActiveRecord::Base
   belongs_to :stage
   has_one :ramp, foreign_key: "next_step_id", dependent: :destroy
   
+  scope :collect_data, lambda {|stage_id| where(:stage_id=>stage_id, :collect_data=>true).order("steps.order_number")}
+     
   ACCESSIBLE_ATTRS = [:name, :temperature, :hold_time, :collect_data, :pause, :delta_temperature, :delta_duration_s, :excitation_intensity]
   
   attr_accessor :destroyed_stage_id

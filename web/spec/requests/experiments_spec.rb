@@ -103,67 +103,6 @@ describe "Experiments API" do
     json.length.should eq(2)
   end
   
-  it "list all temperature data" do
-    experiment = create_experiment("test1")
-    run_experiment(experiment)
-    totallength = experiment.temperature_logs.length
-    get "/experiments/#{experiment.id}/temperature_data?starttime=0&resolution=1000", { :format => 'json' }
-    expect(response).to be_success
-    json = JSON.parse(response.body)
-    json.length.should eq(totallength)
-  end
-  
-  it "list temperature data every 2 second" do
-    experiment = create_experiment("test1")
-    run_experiment(experiment)
-    totallength = experiment.temperature_logs.length
-    get "/experiments/#{experiment.id}/temperature_data?starttime=0&resolution=2000", { :format => 'json' }
-    expect(response).to be_success
-    json = JSON.parse(response.body)
-    json.length.should eq((totallength+1)/2)
-  end
-  
-  it "list temperature data every 3 second" do
-    experiment = create_experiment("test1")
-    run_experiment(experiment)
-    totallength = experiment.temperature_logs.length
-    get "/experiments/#{experiment.id}/temperature_data?starttime=0&resolution=3000", { :format => 'json' }
-    expect(response).to be_success
-    json = JSON.parse(response.body)
-    json.length.should eq((totallength+2)/3)
-  end
-  
-  it "list amplification data" do    
-    experiment = create_experiment("test1")
-    run_experiment(experiment)
-    create_fluorescence_data(experiment)
-    get "/experiments/#{experiment.id}/amplification_data", { :format => 'json' }
-    expect(response).to be_success
-    json = JSON.parse(response.body)
-#    json[0]["fluorescence_datum"]["fluorescence_value"].should == 75
-#    json[1]["fluorescence_datum"]["fluorescence_value"].should == 50
-#    json[2]["fluorescence_datum"]["fluorescence_value"].should == 30
-#    json[3]["fluorescence_datum"]["fluorescence_value"].should == 15
-  end
-  
-  it "list amplification data per step id" do    
-    experiment = create_experiment("test1")
-    run_experiment(experiment)
-    create_fluorescence_data(experiment)
-    get "/experiments/#{experiment.id}/amplification_data?step_id[]=1&step_id[]=2", { :format => 'json' }
-    expect(response).to be_success
-    print response.body
-    json = JSON.parse(response.body)
-  end
-  
-  it "export" do
-    experiment = create_experiment("test1")
-    run_experiment(experiment)
-    create_fluorescence_data(experiment)
-    get "/experiments/#{experiment.id}/export.zip", { :format => 'zip' }
-    expect(response).to be_success
-  end
-  
   it "set time_valid to false" do
     Setting.where(:id=>1).update_all(:time_valid=>false)
     params = { experiment: {name: "test"} }
