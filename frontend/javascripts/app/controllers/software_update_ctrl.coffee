@@ -26,8 +26,8 @@ window.App.controller 'SoftwareUpdateCtrl', [
   'Upload'
   '$timeout'
   '$interval'
-  'Status'
-  ($scope, $uibModal, $uibModalInstance, Device, $window, $state, Upload, $timeout, $interval, Status) ->
+  'Status',
+  ($scope, $uibModal, $uibModalInstance, Device, $window, $state, Upload, $timeout, $interval, Status ) ->
 
     uploadPromise = null
     _file = null
@@ -51,6 +51,16 @@ window.App.controller 'SoftwareUpdateCtrl', [
     $scope.doUpdate = ->
       $scope.content = 'update_in_progress'
       Device.updateSoftware()
+      Status.startUpdateSync()
+      $timeout ->
+        isUpInterval = $interval ->
+          if Status.isUp()
+            $scope.content = 'update_complete'
+            $interval.cancel isUpInterval
+        , 1000
+
+      , 60 * 1000
+
 
     $scope.downloadUpdate = ->
       $window.open($scope.new_update.image_http_url)
@@ -80,6 +90,7 @@ window.App.controller 'SoftwareUpdateCtrl', [
     $scope.doUpload = ->
       return if !$scope.file
       return if $scope.uploading
+      #Status.startUpdateSync()
       errorCB = (err) ->
         $scope.upload_error = err?.status?.error || 'An error occured while uploading software image. Please try again.'
         $scope.uploading = false
@@ -89,6 +100,7 @@ window.App.controller 'SoftwareUpdateCtrl', [
 
       successCB = ->
         $scope.content = 'update_in_progress'
+        Status.startUpdateSync()
         $timeout ->
           isUpInterval = $interval ->
             if Status.isUp()
