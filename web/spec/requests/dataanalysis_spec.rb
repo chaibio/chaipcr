@@ -76,6 +76,28 @@ describe "DataAnalysis API" do
     response.response_code.should == 304
     #response.body should be_nil
   end
+
+  it "list amplification data raw" do    
+    experiment = create_experiment_for_data_analysis("dataanalysis")
+    run_experiment(experiment)
+    create_fluorescence_data(experiment, 0)
+    get "/experiments/#{experiment.id}/amplification_data?raw=true&background=false&baseline=false&cq=false", { :format => 'json' }
+    expect(response).to be_success
+    response.etag.should_not be_nil
+    stage = Stage.collect_data(experiment.experiment_definition_id).first
+    step = Step.collect_data(stage.id).first
+    json = JSON.parse(response.body)
+    json["partial"].should eq(false)
+    json["total_cycles"].should eq(stage.num_cycles)
+    json["steps"][0]["step_id"].should eq(step.id)
+    json["steps"][0]["amplification_data"].length.should == stage.num_cycles*16*2+1 #include header
+    json["steps"][0]["amplification_data"][0].join(",").should eq("channel,well_num,cycle_num,fluorescence_value")
+    json["steps"][0]["cq"].should be_nil
+  
+    #data cached  
+    get "/experiments/#{experiment.id}/amplification_data?raw=true&background=false&baseline=false&cq=false", { :format => 'json'}, { "If-None-Match" => response.etag }
+    response.response_code.should == 304
+  end
   
   it "list amplification data for error" do       
     experiment = create_experiment_for_data_analysis("dataanalysis")
@@ -100,29 +122,38 @@ describe "DataAnalysis API" do
     get "/experiments/#{experiment.id}/amplification_data", { :format => 'json' }
     response.response_code.should == 202
   end
-
-  it "list amplification data raw" do    
+  
+  it "list amplification data for two experiments" do
     experiment = create_experiment_for_data_analysis("dataanalysis")
     run_experiment(experiment)
-    create_fluorescence_data(experiment, 0)
-    get "/experiments/#{experiment.id}/amplification_data?raw=true&background=false&baseline=false&cq=false", { :format => 'json' }
-    expect(response).to be_success
-    response.etag.should_not be_nil
-    stage = Stage.collect_data(experiment.experiment_definition_id).first
-    step = Step.collect_data(stage.id).first
-    json = JSON.parse(response.body)
-    json["partial"].should eq(false)
-    json["total_cycles"].should eq(stage.num_cycles)
-    json["steps"][0]["step_id"].should eq(step.id)
-    json["steps"][0]["amplification_data"].length.should == stage.num_cycles*16*2+1 #include header
-    json["steps"][0]["amplification_data"][0].join(",").should eq("channel,well_num,cycle_num,fluorescence_value")
-    json["steps"][0]["cq"].should be_nil
-  
-    #data cached  
-    get "/experiments/#{experiment.id}/amplification_data?raw=true&background=false&baseline=false&cq=false", { :format => 'json'}, { "If-None-Match" => response.etag }
-    response.response_code.should == 304
-  end
-  
+    create_fluorescence_data(experiment, 10)
+    allow_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |experiment_id, stage_id, calibration_id|
+      experiment_id.should == experiment.id
+      calibration_id.should == experiment.calibration_id
+      sleep(1)
+      [[], []]
+    end
+    
+    #data processing
+    get "/experiments/#{experiment.id}/amplification_data", { :format => 'json' }
+    response.response_code.should == 202
+    
+    #2nd experiment
+    experiment2 = create_experiment_for_data_analysis("dataanalysis2")
+    run_experiment(experiment2)
+    create_fluorescence_data(experiment2, 10)
+        
+    get "/experiments/#{experiment2.id}/amplification_data", { :format => 'json' }
+    response.response_code.should == 503
+    
+    sleep(2)
+
+    #data available
+    stage, step = create_amplification_and_cq_data(experiment, 10)
+    get "/experiments/#{experiment.id}/amplification_data", { :format => 'json' }
+    response.response_code.should == 200
+  end  
+     
   it "list melt curve data with async calls" do       
     experiment = create_experiment_for_data_analysis("dataanalysis")
     run_experiment(experiment)
