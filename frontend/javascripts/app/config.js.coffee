@@ -46,7 +46,8 @@ window.ChaiBioTech.ngApp
     $rootScope.$on 'event:auth-loginRequired', (e, rejection)->
       $window.document.cookie = 'authentication_token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
       $.jStorage.deleteKey 'authToken'
-      $window.location.assign '/'
+      if !Status.isUpdating()
+        $window.location.assign '/'
 
 ]
 
@@ -60,6 +61,7 @@ window.ChaiBioTech.ngApp
     WebworkerProvider.setHelperPath("/worker_wrapper.js")
     WebworkerProvider.setUseHelper(false)
     WebworkerProvider.setTransferOwnership(true)
+
 ]
 
 .value 'host', "http://#{window.location.hostname}"

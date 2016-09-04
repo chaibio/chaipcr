@@ -160,7 +160,7 @@ class ExperimentsController < ApplicationController
     
     if @experiment
       if @experiment.ran?
-        @first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
+        @first_stage_collect_data = Stage.collect_data(@experiment.experiment_definition_id).first
         if !@first_stage_collect_data.blank?
           last_cycle = FluorescenceDatum.last_cycle(@experiment.id, @first_stage_collect_data.id)
           @partial = (@experiment.running? && last_cycle < @first_stage_collect_data.num_cycles)
@@ -189,7 +189,7 @@ class ExperimentsController < ApplicationController
               #no data but background task is submitted
               render :nothing => true, :status => (task_submitted)? 202 : 503
               return
-            elsif @amplification_data && @amplification_data.last
+            elsif !@amplification_data.blank?
               #set etag
               fresh_when(:etag => generate_etag(@partial, @amplification_data.last.id))
             end
@@ -225,7 +225,7 @@ class ExperimentsController < ApplicationController
               fluorescence_data = FluorescenceDatum.for_stage(@first_stage_collect_data.id).for_experiment(@experiment.id)
             end
             
-            if !analyze_required
+            if !analyze_required && !fluorescence_data.blank?
               #set etag
               fresh_when(:etag => generate_etag(@partial, fluorescence_data.last.cycle_num))
             end
@@ -256,10 +256,13 @@ class ExperimentsController < ApplicationController
         attributes << "baseline_subtracted_value" if params[:baseline] == true
         attributes << "fluorescence_value" if params[:raw] == true
         @amplification_data_group = group_by_keynames(@amplification_data, attributes, (params[:cq] == true)? @cts : nil)
-      end
+
     
-      respond_to do |format|
-        format.json { render "amplification_data", :status => :ok}
+        respond_to do |format|
+          format.json { render "amplification_data", :status => :ok}
+        end
+      else
+        render :json=>{:errors=>"experiment has not run yet"}, :status => 500
       end
     else
       render :json=>{:errors=>"experiment not found"}, :status => :not_found
@@ -272,7 +275,7 @@ class ExperimentsController < ApplicationController
   def melt_curve_data
     if @experiment
       if @experiment.ran?
-        @first_stage_meltcurve_data = Stage.joins(:protocol).where(["experiment_definition_id=? and stage_type='meltcurve'", @experiment.experiment_definition_id]).first
+        @first_stage_meltcurve_data = Stage.melt_curve(@experiment.experiment_definition_id).first
         if !@first_stage_meltcurve_data.blank?
           begin
             task_submitted = background_calculate_melt_curve_data(@experiment, @first_stage_meltcurve_data.id)
@@ -323,7 +326,7 @@ class ExperimentsController < ApplicationController
           out.write TemperatureLog.as_csv(params[:id])
         end
       
-        first_stage_collect_data = Stage.collect_data.where(["experiment_definition_id=?",@experiment.experiment_definition_id]).first
+        first_stage_collect_data = Stage.collect_data(@experiment.experiment_definition_id).first
         if first_stage_collect_data
           begin
             task_submitted = background_calculate_amplification_data(@experiment, first_stage_collect_data.id)
@@ -381,7 +384,7 @@ class ExperimentsController < ApplicationController
           out.write csv_string
         end
 
-        first_stage_meltcurve_data = Stage.joins(:protocol).where(["experiment_definition_id=? and stage_type='meltcurve'", @experiment.experiment_definition_id]).first
+        first_stage_meltcurve_data = Stage.melt_curve(@experiment.experiment_definition_id).first
         if first_stage_meltcurve_data
           begin
             task_submitted = background_calculate_melt_curve_data(@experiment, first_stage_meltcurve_data.id)
@@ -474,6 +477,7 @@ class ExperimentsController < ApplicationController
  
   def background_calculate_amplification_data(experiment, stage_id)
     return nil if !FluorescenceDatum.new_data_generated?(experiment.id, stage_id)
+    experiment.experiment_definition #load experiment_definition before go to background thread
     return background("amplification", experiment.id) do
       amplification_data, cts = calculate_amplification_data(experiment.id, stage_id, experiment.calibration_id)
       #update cache
@@ -485,12 +489,12 @@ class ExperimentsController < ApplicationController
   def calculate_amplification_data(experiment_id, stage_id, calibration_id)
    # sleep(10)
   #  return  [AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>1, :well_num=>1, :cycle_num=>1, :background_subtracted_value=>1001, :baseline_subtracted_value=>102)], [AmplificationCurve.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>1, :well_num=>1, :ct=>10)]
-    step = Step.where(:stage_id=>stage_id, :collect_data=>true).order("steps.order_number").first
+    step = Step.collect_data(stage_id).first
     if step
       sub_id = step.id
       sub_type = "step"
     else
-      ramp = Ramp.joins(:step).where(:stage_id=>stage_id, :collect_data=>true).order("ramps.order_number").first
+      ramp = Ramp.collect_data(stage_id).first
       if ramp
         sub_id = ramp.id
         sub_type = "ramp"

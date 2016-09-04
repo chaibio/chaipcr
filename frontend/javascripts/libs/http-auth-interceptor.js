@@ -55,10 +55,13 @@
           if (!config.ignoreAuthModule) {
             switch (rejection.status) {
               case 401:
-                var deferred = $q.defer();
-                httpBuffer.append(config, deferred);
+                //if(!Status.isUpdating()){
+                //var deferred = $q.defer();
+                //httpBuffer.append(config, deferred);
                 $rootScope.$broadcast('event:auth-loginRequired', rejection);
-                return deferred.promise;
+                break;
+                //return deferred.promise;
+              //}
               case 403:
                 $rootScope.$broadcast('event:auth-forbidden', rejection);
                 break;

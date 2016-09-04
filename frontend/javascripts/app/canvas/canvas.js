@@ -306,6 +306,7 @@ angular.module("canvasApp").factory('canvas', [
           step.ordealStatus = oStatus;
           that.allStepViews.push(step);
           oStatus = oStatus + 1;
+          console.log(step.model.temperature);
         });
       });
     };

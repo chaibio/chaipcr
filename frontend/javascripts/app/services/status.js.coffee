@@ -28,16 +28,22 @@ window.ChaiBioTech.ngApp
   ($http, $q, host, $interval, $timeout, $rootScope) ->
 
     data = null
-    isUp = true
+    isUp = false
+    isUpStart = false
+    isUpdating = false
     fetchInterval = null
+    fetchForUpdateInterval = null
     @listenersCount = 0
     fetching = false
+    fetchingForUpdate = false
     timeoutPromise = null
     ques = []
 
     @getData = -> data
 
     @isUp = -> isUp
+
+    @isUpdating = -> isUpdating
 
     @fetch = ->
       deferred = $q.defer()
@@ -52,7 +58,8 @@ window.ChaiBioTech.ngApp
       , 10000
       $http.get("#{host}\:8000/status")
       .success (resp) =>
-        isUp = true
+        #console .log isUp
+        #isUp = true
         oldData = angular.copy data
         data = resp
         for def in ques by 1
@@ -60,7 +67,7 @@ window.ChaiBioTech.ngApp
         $rootScope.$broadcast 'status:data:updated', data, oldData
 
       .error (resp) ->
-        isUp = if resp is null then false else true
+        #isUp = if resp is null then false else true
         for def in ques by 1
           def.reject(resp)
 
@@ -72,10 +79,30 @@ window.ChaiBioTech.ngApp
 
       deferred.promise
 
+    @fetchForUpdate = ->
+      isUpdating = true
+      $http.get("/experiments")
+      .success (resp) =>
+        console .log isUp
+        isUp = if isUpStart then true else false
+
+      .error (resp, status) ->
+        console.log status
+        isUpStart = true
+        isUp = if status == 401 then true else false
+
+      true
+
     @startSync = ->
       if !fetching then @fetch()
       if !fetchInterval
         fetchInterval = $interval @fetch, 1000
+
+
+    @startUpdateSync = ->
+      #if !fetchingForUpdate then @fetchForUpdate()
+      #if !fetchForUpdateInterval
+        fetchForUpdateInterval = $interval @fetchForUpdate, 1000
 
     return
 

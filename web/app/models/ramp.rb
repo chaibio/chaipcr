@@ -21,6 +21,8 @@ class Ramp < ActiveRecord::Base
   
   belongs_to :step, foreign_key: "next_step_id"
   
+  scope :collect_data, lambda {|stage_id| joins(:step).where(:stage_id=>stage_id, :collect_data=>true).order("ramps.order_number")}
+  
   ACCESSIBLE_ATTRS = [:rate, :collect_data]
   
   MAX_RATE   = 0

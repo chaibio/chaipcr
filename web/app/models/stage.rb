@@ -24,7 +24,8 @@ class Stage < ActiveRecord::Base
   has_many :steps, -> {order("order_number")}
   has_many :ramps, :through => :steps
   
-  scope :collect_data, -> { joins(:steps, :protocol).joins("LEFT OUTER JOIN ramps ON ramps.next_step_id = steps.id").where("stage_type ='#{TYPE_CYCLE}' AND (steps.collect_data=true OR ramps.collect_data=true)").order("stages.order_number")}
+  scope :collect_data, lambda {|experiment_definition_id| joins(:steps, :protocol).joins("LEFT OUTER JOIN ramps ON ramps.next_step_id = steps.id").where(["experiment_definition_id=? AND stage_type=? AND (steps.collect_data=true OR ramps.collect_data=true)", experiment_definition_id, TYPE_CYCLE]).order("stages.order_number")}
+  scope :melt_curve, lambda {|experiment_definition_id| joins(:protocol).where(["experiment_definition_id=? and stage_type=?", experiment_definition_id, TYPE_MELTCURVE])}
   
   validate :validate
   
