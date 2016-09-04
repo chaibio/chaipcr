@@ -32,7 +32,11 @@
         yScale: null,
         zooomBehavior: null,
         zoomTransform: { k: 1, x: 0, y: 0 },
-        onZoomAndPan: null
+        onZoomAndPan: null,
+        normalPathStrokeWidth: 2,
+        activePathStrokeWidth: 3,
+        circleRadius: 5,
+        circleStrokeWidth: 2
       };
     }
 
@@ -46,7 +50,7 @@
 
     function setActivePath(path) {
       if (Globals.activePath) {
-        Globals.activePath.attr('stroke-width', 3 / Globals.zoomTransform.k + 'px');
+        Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth / Globals.zoomTransform.k);
       }
       var activePathConfig, activePathIndex;
       // get config and index of active path
@@ -58,7 +62,7 @@
           break;
         }
       }
-      var newLine = makeLine(activePathConfig).attr('stroke-width', 5 / Globals.zoomTransform.k + 'px');
+      var newLine = makeLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth / Globals.zoomTransform.k);
       Globals.lines[activePathIndex] = newLine;
       Globals.activePath = newLine;
       makeCircle();
@@ -81,7 +85,7 @@
         .attr("stroke", line_config.color)
         .attr('fill', 'none')
         .attr("d", line)
-        .attr('stroke-width', 3 / Globals.zoomTransform.k + 'px')
+        .attr('stroke-width', Globals.normalPathStrokeWidth / Globals.zoomTransform.k)
         .on('click', function(e, a, path) {
           setActivePath.call(this, _path);
         });
@@ -125,19 +129,19 @@
       if (Globals.circle) { Globals.circle.remove(); }
       Globals.circle = Globals.viewSVG.append('circle')
         .attr('opacity', 0)
-        .attr('r', 7)
+        .attr('r', Globals.circleRadius / Globals.zoomTransform.k)
         .attr('fill', 'red')
         .attr('stroke', '#fff')
-        .attr('stroke-width', '2px')
+        .attr('stroke-width', Globals.circleStrokeWidth / Globals.zoomTransform.k)
         .attr('transform', 'translate (50,50)');
     }
 
     function updateLineStrokeWidthOnZoom(k) {
       Globals.lines.forEach(function(l) {
-        var strokeWidth = (l === Globals.activePath) ? 5 : 3; //default stroke width
+        var strokeWidth = (l === Globals.activePath) ? Globals.activePathStrokeWidth : Globals.normalPathStrokeWidth; //default stroke width
         var strokeDiff = (strokeWidth * k) - strokeWidth;
         var newStrokeWidth = strokeWidth / k;
-        l.attr('stroke-width', newStrokeWidth + 'px');
+        l.attr('stroke-width', newStrokeWidth);
       });
     }
 
@@ -172,8 +176,8 @@
 
       if (Globals.circle) {
         Globals.circle
-          .attr('stroke-width', 2 / Globals.zoomTransform.k + 'px')
-          .attr('r', 7 / Globals.zoomTransform.k + 'px');
+          .attr('stroke-width', Globals.circleStrokeWidth / Globals.zoomTransform.k)
+          .attr('r', Globals.circleRadius / Globals.zoomTransform.k);
       }
 
       if (Globals.onZoomAndPan) {
@@ -316,6 +320,7 @@
 
       var min = Globals.config.axes.x.min || getMinX() || 0;
       var max = Globals.config.axes.x.max || getMaxX() || 1;
+      console.log('max x: ' + max);
       Globals.xScale.domain([min, max]);
 
       Globals.xAxis = d3.axisBottom(Globals.xScale);
@@ -341,6 +346,9 @@
     }
 
     function initChart(elem, data, config) {
+
+      console.log(data);
+      console.log(config);
 
       initGlobalVars();
       Globals.data = data;
@@ -420,8 +428,6 @@
         .attr("cx", x)
         .attr("cy", pos.y)
         .attr('transform', 'translate(0,0) scale(1)')
-        .attr('r', 7 / Globals.zoomTransform.k + 'px')
-        .attr('stroke-width', 2 / Globals.zoomTransform.k + 'px')
         .attr('fill', Globals.activePath.attr('stroke'));
     }
 
@@ -472,11 +478,15 @@
     };
 
     this.updateData = function(data) {
+      console.log('update data');
+      console.log(data);
       Globals.data = data;
       updateZoomScaleExtent();
     };
 
     this.updateConfig = function(config) {
+      console.log('set config:');
+      console.log(config);
       Globals.config = config;
     };
 

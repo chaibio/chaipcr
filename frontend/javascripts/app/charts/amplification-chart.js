@@ -33,8 +33,10 @@
         zooomBehavior: null,
         zoomTransform: { k: 1, x: 0, y: 0 },
         onZoomAndPan: null,
-        normalPathStrokeWidth: 1,
-        activePathStrokeWidth: 2,
+        normalPathStrokeWidth: 2,
+        activePathStrokeWidth: 3,
+        circleRadius: 5,
+        circleStrokeWidth: 2
       };
     }
 
@@ -60,7 +62,7 @@
           break;
         }
       }
-      var newLine = makeLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth / Globals.zoomTransform.k + 'px');
+      var newLine = makeLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth / Globals.zoomTransform.k);
       Globals.lines[activePathIndex] = newLine;
       Globals.activePath = newLine;
       makeCircle();
@@ -127,10 +129,10 @@
       if (Globals.circle) { Globals.circle.remove(); }
       Globals.circle = Globals.viewSVG.append('circle')
         .attr('opacity', 0)
-        .attr('r', 7)
+        .attr('r', Globals.circleRadius / Globals.zoomTransform.k)
         .attr('fill', 'red')
         .attr('stroke', '#fff')
-        .attr('stroke-width', '2px')
+        .attr('stroke-width', Globals.circleStrokeWidth / Globals.zoomTransform.k)
         .attr('transform', 'translate (50,50)');
     }
 
@@ -174,8 +176,8 @@
 
       if (Globals.circle) {
         Globals.circle
-          .attr('stroke-width', 2 / Globals.zoomTransform.k + 'px')
-          .attr('r', 7 / Globals.zoomTransform.k + 'px');
+          .attr('stroke-width', Globals.circleStrokeWidth / Globals.zoomTransform.k)
+          .attr('r', Globals.circleRadius / Globals.zoomTransform.k);
       }
 
       if (Globals.onZoomAndPan) {
@@ -426,8 +428,6 @@
         .attr("cx", x)
         .attr("cy", pos.y)
         .attr('transform', 'translate(0,0) scale(1)')
-        .attr('r', 7 / Globals.zoomTransform.k + 'px')
-        .attr('stroke-width', 2 / Globals.zoomTransform.k + 'px')
         .attr('fill', Globals.activePath.attr('stroke'));
     }
 
