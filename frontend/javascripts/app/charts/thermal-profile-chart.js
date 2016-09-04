@@ -396,6 +396,7 @@
       Globals.zooomBehavior = d3.zoom()
                                 .on("start", function () {
                                   isZooming = true;
+                                  toggleCirclesVisibility(false);
                                 })
                                 .on("end", function () {
                                   isZooming = false;
@@ -445,6 +446,7 @@
 
     function followTheMouse() {
       if (isZooming) { return; }
+      toggleCirclesVisibility(true);
       var x = d3.mouse(this)[0];
 
       Globals.lines.forEach(function(path, i) {
