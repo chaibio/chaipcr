@@ -10,7 +10,8 @@
       return d3.bisector(function(d) {
         return d[line_config.x];
       }).left;
-    }
+    };
+    var isZooming = false;
 
     function initGlobalVars() {
       Globals = {
@@ -45,51 +46,15 @@
       };
     }
 
-    // var superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹",
-    //   formatPower = function(d) {
-    //     return (d + "").split("").map(function(c) {
-    //       return superscript[c];
-    //     }).join("");
-    //   };
-    // end global vars
-
-    // function setActivePath(path) {
-    //   if (Globals.activePath) {
-    //     Globals.activePath.attr('stroke-width', 3 / Globals.zoomTransform.k + 'px');
-    //   }
-    //   var activePathConfig, activePathIndex;
-    //   // get config and index of active path
-    //   for (var i = Globals.config.series.length - 1; i >= 0; i--) {
-    //     var s = Globals.config.series[i];
-    //     if (s.color === path.attr('stroke')) {
-    //       activePathConfig = s;
-    //       activePathIndex = i;
-    //       break;
-    //     }
-    //   }
-    //   var newLine = makeLine(activePathConfig).attr('stroke-width', 5 / Globals.zoomTransform.k + 'px');
-    //   Globals.lines[activePathIndex] = newLine;
-    //   Globals.activePath = newLine;
-    //   makeCircle();
-    //   followTheMouse.call(this);
-    //   path.remove();
-    // }
-
     function makeCircleForLine(line_config) {
-      var cx = Globals.data[line_config.dataset][0] ? Globals.data[line_config.dataset][0][line_config.x] : 0;
-      var cy = Globals.data[line_config.dataset][0] ? Globals.data[line_config.dataset][0][line_config.y] : 0;
       var c = Globals.viewSVG.append('circle')
+        .style('box-shadow', '10px 10px 5px #333')
         .attr('opacity', 0)
         .attr('r', Globals.circleRadius)
         .attr('fill', line_config.color)
         .attr('stroke', '#fff')
         .attr('stroke-width', Globals.circleStrokeWidth)
-        .attr('cx', cx)
-        .attr('cy', cy)
         .attr('class', 'mouse-indicator-circle');
-      // .attr('transform', 'translate (50,50)');
-
-      // followTheMouse(path, c).call(this);
 
       Globals.circles.push(c);
     }
@@ -101,44 +66,12 @@
       return Globals.viewSVG
         .append("line")
         .attr("opacity", 0)
-        .attr("x1", 10) //<<== change your code here
         .attr("y1", 0)
-        .attr("x2", 10) //<<== and here
         .attr("y2", Globals.height)
         .attr("stroke-dasharray", '5, 5')
         .attr("stroke-width", Globals.dashedLineStrokeWidth)
         .attr("stroke", "#333")
         .attr("fill", "none");
-    }
-
-    function makeTooltipSensorForLine(conf) {
-      Globals.viewSVG.selectAll("dot")
-        .data(Globals.data[conf.dataset])
-        .enter().append("circle")
-        .attr("class", "tooltip-sensor")
-        .attr("r", 3 / Globals.zoomTransform.k + 'px')
-        .attr("stroke-width", Globals.lineStrokeWidth + 'px')
-        .attr("fill", "transparent")
-        .attr("cx", function(d) {
-          return Globals.xScale(d[conf.x]);
-        })
-        .attr("cy", function(d) {
-          return Globals.yScale(d[conf.y]);
-        })
-        .on("mouseover", function(d) {
-          console.log(d);
-          // div.transition()
-          //   .duration(200)
-          //   .style("opacity", .9);
-          // div.html(formatTime(d.date) + "<br/>" + d.close)
-          //   .style("left", (d3.event.pageX) + "px")
-          //   .style("top", (d3.event.pageY - 28) + "px");
-        })
-        .on("mouseout", function(d) {
-          // div.transition()
-          //   .duration(500)
-          //   .style("opacity", 0);
-        });
     }
 
     function makeLine(line_config) {
@@ -157,9 +90,6 @@
         .attr('fill', 'none')
         .attr("d", line)
         .attr('stroke-width', Globals.lineStrokeWidth / Globals.zoomTransform.k + 'px');
-      // .on('click', function(e, a, path) {
-      //   setActivePath.call(this, _path);
-      // });
 
       Globals.lines.push(_path);
       return _path;
@@ -211,6 +141,7 @@
         var config = Globals.config.series[i];
         makeCircleForLine(config);
       }
+
     }
 
     function getDataLength() {
@@ -224,24 +155,6 @@
       return total / Globals.config.series.length;
     }
 
-    // function makeCircles() {
-    //   Globals.circles.forEach(function (circle) {
-    //     circle.remove();
-    //   });
-    //   Globals.circles = [];
-    //   Globals.series.forEach(function (line_config, i) {
-    //     var c = Globals.viewSVG.append('circle')
-    //       .attr('r', 7)
-    //       .attr('fill', line_config.color)
-    //       .attr('stroke', '#fff')
-    //       .attr('stroke-width', 2)
-    //       // .attr('transform', 'translate (50,50)');
-
-    //     Globals.circles.push(c);
-
-    //   });
-    // }
-
     function updateElementSizesOnZoom(transform) {
       Globals.lines.forEach(function(l) {
         l.attr('stroke-width', (Globals.lineStrokeWidth / transform.k) + 'px');
@@ -249,7 +162,6 @@
 
       Globals.circles.forEach(function(circle) {
         circle
-        // .attr('transform', transform)
           .attr('stroke-width', Globals.circleStrokeWidth / transform.k + 'px')
           .attr('r', Globals.circleRadius / transform.k + 'px');
       });
@@ -294,7 +206,6 @@
 
       if (Globals.onZoomAndPan) {
         Globals.onZoomAndPan(Globals.zoomTransform, Globals.width, Globals.height, getScaleExtent());
-        // $scope.$apply();
       }
     }
 
@@ -406,13 +317,6 @@
         Globals.yAxis.tickFormat = Globals.config.axes.y.tickFormat;
       }
 
-      // if (Globals.config.axes.y.scale === 'log') {
-      //   Globals.yAxis
-      //     .tickValues(getYLogticks())
-      //     .tickFormat(function(d) {
-      //       return '10' + formatPower(Math.round(Math.log(d) / Math.LN10));
-      //     });
-      // }
       Globals.gY = svg.append("g")
         .attr("class", "axis y-axis")
         .attr('fill', 'none')
@@ -425,7 +329,6 @@
         Globals.gX.remove();
       }
 
-      // var intpol = config.axes.x.scale || 'linear';
       var svg = Globals.chartSVG.select('.chart-g');
 
       Globals.xScale = d3.scaleLinear()
@@ -448,6 +351,15 @@
         .attr('fill', 'none')
         .attr("transform", "translate(0," + (Globals.height) + ")")
         .call(Globals.xAxis);
+
+      Globals.xAxisCircle = Globals.chartSVG.append('circle')
+        .style('box-shadow', '10px 10px 5px #333')
+        .attr('opacity', 0)
+        .attr('r', Globals.circleRadius)
+        .attr('fill', "#333")
+        .attr('stroke', '#fff')
+        .attr('stroke-width', Globals.circleStrokeWidth)
+        .attr('class', 'mouse-indicator-circle');
     }
 
     function updateZoomScaleExtent() {
@@ -467,7 +379,12 @@
         .attr('width', Globals.width)
         .attr('height', Globals.height)
         .attr('fill', 'transparent')
-        .on('mouseout', hideElementsOnMouseOut)
+        .on('mouseenter', function () {
+          toggleCirclesVisibility(true);
+        })
+        .on('mouseout', function () {
+          toggleCirclesVisibility(false);
+        })
         .on('mousemove', followTheMouse);
     }
 
@@ -476,19 +393,25 @@
       initGlobalVars();
       Globals.data = data;
       Globals.config = config;
-      Globals.zooomBehavior = d3.zoom().on("zoom", zoomed);
+      Globals.zooomBehavior = d3.zoom()
+                                .on("start", function () {
+                                  isZooming = true;
+                                })
+                                .on("end", function () {
+                                  isZooming = false;
+                                })
+                                .on("zoom", zoomed);
 
       d3.select(elem).selectAll("*").remove();
 
       var width = Globals.width = elem.parentElement.offsetWidth - config.margin.left - config.margin.right;
       var height = Globals.height = elem.parentElement.offsetHeight - config.margin.top - config.margin.bottom;
 
-      console.log(width, height);
-
       var chartSVG = Globals.chartSVG = d3.select(elem).append("svg")
         .attr("width", width + config.margin.left + config.margin.right)
         .attr("height", height + config.margin.top + config.margin.bottom)
         .call(Globals.zooomBehavior)
+        .on("mousemove", followMouseOnXAxis);
 
       var svg = chartSVG.append("g")
         .attr("transform", "translate(" + config.margin.left + "," + config.margin.top + ")")
@@ -511,9 +434,18 @@
 
     }
 
+    function followMouseOnXAxis() {
+
+          var x = d3.mouse(this)[0];
+
+          Globals.xAxisCircle
+              .attr("cx", x)
+              .attr("cy", Globals.height + Globals.config.margin.top);
+    }
+
     function followTheMouse() {
+      if (isZooming) { return; }
       var x = d3.mouse(this)[0];
-      // var circles = Globals.chartSVG.selectAll('.mouse-indicator-circle');
 
       Globals.lines.forEach(function(path, i) {
         var pathEl = path.node();
@@ -539,7 +471,6 @@
         }
 
         Globals.circles[i]
-          .attr('opacity', 1)
           .attr("cx", x)
           .attr("cy", pos.y);
       });
@@ -564,11 +495,13 @@
 
     }
 
-    function hideElementsOnMouseOut () {
-      Globals.dashedLine.attr('opacity', 0);
+    function toggleCirclesVisibility (show) {
+      var opacity = show? 1 : 0;
+      Globals.dashedLine.attr('opacity', opacity);
       Globals.circles.forEach(function (circle) {
-        circle.attr('opacity', 0);
+        circle.attr('opacity', opacity);
       });
+      Globals.xAxisCircle.attr('opacity', opacity);
     }
 
     this._getTransformXFromScroll = function(scroll) {
