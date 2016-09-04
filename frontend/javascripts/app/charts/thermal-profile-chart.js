@@ -50,10 +50,10 @@
       var c = Globals.viewSVG.append('circle')
         .style('box-shadow', '10px 10px 5px #333')
         .attr('opacity', 0)
-        .attr('r', Globals.circleRadius)
+        .attr('r', Globals.circleRadius / Globals.zoomTransform.k)
         .attr('fill', line_config.color)
         .attr('stroke', '#fff')
-        .attr('stroke-width', Globals.circleStrokeWidth)
+        .attr('stroke-width', Globals.circleStrokeWidth / Globals.zoomTransform.k)
         .attr('class', 'mouse-indicator-circle');
 
       Globals.circles.push(c);
@@ -63,13 +63,15 @@
       if (Globals.dashedLine) {
         Globals.dashedLine.remove();
       }
+      var dashStrokeWidth = Globals.dashedLineStrokeWidth / Globals.zoomTransform.k;
+      
       return Globals.viewSVG
         .append("line")
         .attr("opacity", 0)
         .attr("y1", 0)
         .attr("y2", Globals.height)
-        .attr("stroke-dasharray", '5, 5')
-        .attr("stroke-width", Globals.dashedLineStrokeWidth)
+        .attr("stroke-dasharray", dashStrokeWidth+','+dashStrokeWidth)
+        .attr("stroke-width", Globals.dashedLineStrokeWidth / Globals.zoomTransform.k)
         .attr("stroke", "#333")
         .attr("fill", "none");
     }
@@ -89,7 +91,7 @@
         .attr("stroke", line_config.color)
         .attr('fill', 'none')
         .attr("d", line)
-        .attr('stroke-width', Globals.lineStrokeWidth / Globals.zoomTransform.k + 'px');
+        .attr('stroke-width', Globals.lineStrokeWidth / Globals.zoomTransform.k);
 
       Globals.lines.push(_path);
       return _path;
@@ -136,7 +138,6 @@
         circle.remove();
       });
       Globals.circles = [];
-      // Globals.chartSVG.selectAll('.mouse-indicator-circle').remove();
       for (var i = 0; i < Globals.config.series.length; i++) {
         var config = Globals.config.series[i];
         makeCircleForLine(config);
@@ -327,6 +328,9 @@
 
       if (Globals.gX) {
         Globals.gX.remove();
+      }
+      if (Globals.xAxisCircle) {
+        Globals.xAxisCircle.remove();
       }
 
       var svg = Globals.chartSVG.select('.chart-g');
