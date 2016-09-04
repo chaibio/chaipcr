@@ -64,13 +64,13 @@
         Globals.dashedLine.remove();
       }
       var dashStrokeWidth = Globals.dashedLineStrokeWidth / Globals.zoomTransform.k;
-      
+
       return Globals.viewSVG
         .append("line")
         .attr("opacity", 0)
         .attr("y1", 0)
         .attr("y2", Globals.height)
-        .attr("stroke-dasharray", dashStrokeWidth+','+dashStrokeWidth)
+        .attr("stroke-dasharray", dashStrokeWidth + ',' + dashStrokeWidth)
         .attr("stroke-width", Globals.dashedLineStrokeWidth / Globals.zoomTransform.k)
         .attr("stroke", "#333")
         .attr("fill", "none");
@@ -211,29 +211,19 @@
     }
 
     function getMinX() {
-      var xs = [];
-      Globals.config.series.forEach(function(s) {
-        var min_dataset_x = d3.min(Globals.data[s.dataset], function(d) {
+      var min = d3.min(Globals.config.series, function(s) {
+        return d3.min(Globals.data[s.dataset], function(d) {
           return d[s.x];
         });
-        xs.push(min_dataset_x);
-      });
-      var min = d3.min(xs, function(d) {
-        return d;
       });
       return min || 0;
     }
 
     function getMaxX() {
-      var xs = [];
-      Globals.config.series.forEach(function(s) {
-        var max_dataset_x = d3.max(Globals.data[s.dataset], function(d) {
-          return (d[s.x]);
+      var max = d3.max(Globals.config.series, function(s) {
+        return d3.max(Globals.data[s.dataset], function(d) {
+          return d[s.x];
         });
-        xs.push(max_dataset_x);
-      });
-      var max = d3.max(xs, function(d) {
-        return d;
       });
       return max || 1;
     }
@@ -242,15 +232,10 @@
       if (Globals.config.axes.y.min) {
         return Globals.config.axes.y.min;
       }
-      var ys = [];
-      Globals.config.series.forEach(function(s) {
-        var min_dataset_y = d3.min(Globals.data[s.dataset], function(d) {
+      var min_y = d3.min(Globals.config.series, function(s) {
+        return d3.min(Globals.data[s.dataset], function(d) {
           return d[s.y];
         });
-        ys.push(min_dataset_y);
-      });
-      var min_y = d3.min(ys, function(d) {
-        return d;
       });
       return min_y || 0;
     }
@@ -259,15 +244,10 @@
       if (Globals.config.axes.y.max) {
         return Globals.config.axes.y.max;
       }
-      var ys = [];
-      Globals.config.series.forEach(function(s) {
-        var max_dataset_y = d3.max(Globals.data[s.dataset], function(d) {
+      var max_y = d3.max(Globals.config.series, function(s) {
+        return d3.max(Globals.data[s.dataset], function(d) {
           return d[s.y];
         });
-        ys.push(max_dataset_y);
-      });
-      var max_y = d3.max(ys, function(d) {
-        return d;
       });
       return max_y || 1;
     }
@@ -304,8 +284,12 @@
       var svg = Globals.chartSVG.select('.chart-g');
 
       // add allowance for interpolation curves
-      var min = getMinY() - getMinY() * 0.2;
-      var max = getMaxY() + getMaxY() * 0.2;
+      var max = getMaxY();
+      var min = getMinY();
+      var diff = max - min;
+      var allowance = diff * 0.05;
+      max += allowance;
+      min -= allowance;
 
       // var y_scale = Globals.config.axes.y.scale || 'linear';
       Globals.yScale = d3.scaleLinear()
@@ -315,7 +299,7 @@
       Globals.yAxis = d3.axisLeft(Globals.yScale);
 
       if (Globals.config.axes.y.tickFormat) {
-        Globals.yAxis.tickFormat = Globals.config.axes.y.tickFormat;
+        Globals.yAxis.tickFormat(Globals.config.axes.y.tickFormat);
       }
 
       Globals.gY = svg.append("g")
@@ -383,10 +367,10 @@
         .attr('width', Globals.width)
         .attr('height', Globals.height)
         .attr('fill', 'transparent')
-        .on('mouseenter', function () {
+        .on('mouseenter', function() {
           toggleCirclesVisibility(true);
         })
-        .on('mouseout', function () {
+        .on('mouseout', function() {
           toggleCirclesVisibility(false);
         })
         .on('mousemove', followTheMouse);
@@ -398,14 +382,14 @@
       Globals.data = data;
       Globals.config = config;
       Globals.zooomBehavior = d3.zoom()
-                                .on("start", function () {
-                                  isZooming = true;
-                                  toggleCirclesVisibility(false);
-                                })
-                                .on("end", function () {
-                                  isZooming = false;
-                                })
-                                .on("zoom", zoomed);
+        .on("start", function() {
+          isZooming = true;
+          toggleCirclesVisibility(false);
+        })
+        .on("end", function() {
+          isZooming = false;
+        })
+        .on("zoom", zoomed);
 
       d3.select(elem).selectAll("*").remove();
 
@@ -441,15 +425,17 @@
 
     function followMouseOnXAxis() {
 
-          var x = d3.mouse(this)[0];
+      var x = d3.mouse(this)[0];
 
-          Globals.xAxisCircle
-              .attr("cx", x)
-              .attr("cy", Globals.height + Globals.config.margin.top);
+      Globals.xAxisCircle
+        .attr("cx", x)
+        .attr("cy", Globals.height + Globals.config.margin.top);
     }
 
     function followTheMouse() {
-      if (isZooming) { return; }
+      if (isZooming) {
+        return;
+      }
       toggleCirclesVisibility(true);
       var x = d3.mouse(this)[0];
 
@@ -501,10 +487,10 @@
 
     }
 
-    function toggleCirclesVisibility (show) {
-      var opacity = show? 1 : 0;
+    function toggleCirclesVisibility(show) {
+      var opacity = show ? 1 : 0;
       Globals.dashedLine.attr('opacity', opacity);
-      Globals.circles.forEach(function (circle) {
+      Globals.circles.forEach(function(circle) {
         circle.attr('opacity', opacity);
       });
       Globals.xAxisCircle.attr('opacity', opacity);
@@ -552,7 +538,7 @@
       Globals.chartSVG.call(Globals.zooomBehavior.scaleTo, k);
     };
 
-    this.setMouseMoveListener = function (fn) {
+    this.setMouseMoveListener = function(fn) {
       Globals.onMouseMove = fn;
     }
 

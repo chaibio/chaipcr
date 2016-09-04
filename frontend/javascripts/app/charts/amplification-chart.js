@@ -31,7 +31,11 @@
         xScale: null,
         yScale: null,
         zooomBehavior: null,
-        zoomTransform: { k: 1, x: 0, y: 0 },
+        zoomTransform: {
+          k: 1,
+          x: 0,
+          y: 0
+        },
         onZoomAndPan: null,
         normalPathStrokeWidth: 2,
         activePathStrokeWidth: 3,
@@ -126,7 +130,9 @@
     }
 
     function makeCircle() {
-      if (Globals.circle) { Globals.circle.remove(); }
+      if (Globals.circle) {
+        Globals.circle.remove();
+      }
       Globals.circle = Globals.viewSVG.append('circle')
         .attr('opacity', 0)
         .attr('r', Globals.circleRadius / Globals.zoomTransform.k)
@@ -186,29 +192,19 @@
     }
 
     function getMinX() {
-      var xs = [];
-      Globals.config.series.forEach(function(s) {
-        var min_dataset_x = d3.min(Globals.data[s.dataset], function(d) {
+      var min = d3.min(Globals.config.series, function(s) {
+        return d3.min(Globals.data[s.dataset], function(d) {
           return d[s.x];
         });
-        xs.push(min_dataset_x);
-      });
-      var min = d3.min(xs, function(d) {
-        return d;
       });
       return min || 0;
     }
 
     function getMaxX() {
-      var xs = [];
-      Globals.config.series.forEach(function(s) {
-        var max_dataset_x = d3.max(Globals.data[s.dataset], function(d) {
-          return (d[s.x]);
+      var max = d3.max(Globals.config.series, function(s) {
+        return d3.max(Globals.data[s.dataset], function(d) {
+          return d[s.x];
         });
-        xs.push(max_dataset_x);
-      });
-      var max = d3.max(xs, function(d) {
-        return d;
       });
       return max || 1;
     }
@@ -217,15 +213,10 @@
       if (Globals.config.axes.y.min) {
         return Globals.config.axes.y.min;
       }
-      var ys = [];
-      Globals.config.series.forEach(function(s) {
-        var min_dataset_y = d3.min(Globals.data[s.dataset], function(d) {
+      var min_y = d3.min(Globals.config.series, function(s) {
+        return d3.min(Globals.data[s.dataset], function(d) {
           return d[s.y];
         });
-        ys.push(min_dataset_y);
-      });
-      var min_y = d3.min(ys, function(d) {
-        return d;
       });
       return min_y || 0;
     }
@@ -234,15 +225,10 @@
       if (Globals.config.axes.y.max) {
         return Globals.config.axes.y.max;
       }
-      var ys = [];
-      Globals.config.series.forEach(function(s) {
-        var max_dataset_y = d3.max(Globals.data[s.dataset], function(d) {
+      var max_y = d3.max(Globals.config.series, function(s) {
+        return d3.max(Globals.data[s.dataset], function(d) {
           return d[s.y];
         });
-        ys.push(max_dataset_y);
-      });
-      var max_y = d3.max(ys, function(d) {
-        return d;
       });
       return max_y || 1;
     }
@@ -272,25 +258,26 @@
 
     function setYAxis() {
 
-      if (Globals.gY) {
-        Globals.gY.remove();
-      }
+      Globals.chartSVG.selectAll('g.axis.y-axis').remove();
 
       var svg = Globals.chartSVG.select('.chart-g');
 
       // add allowance for interpolation curves
-      var min = getMinY() - getMinY() * 0.2;
-      var max = getMaxY() + getMaxY() * 0.2;
+      var max = getMaxY();
+      var min = getMinY();
+      var diff = max - min;
+      var allowance = diff * (Globals.config.axes.y.scale === 'log' ? 0.2 : 0.05);
+      max += allowance;
+      min -= allowance;
 
-      var y_scale = Globals.config.axes.y.scale || 'linear';
-      Globals.yScale = INTERPOLATIONS[y_scale]()
+      Globals.yScale = d3.scaleLinear()
         .range([Globals.height, 0])
         .domain([min, max]);
 
       Globals.yAxis = d3.axisLeft(Globals.yScale);
 
       if (Globals.config.axes.y.tickFormat) {
-        Globals.yAxis.tickFormat = Globals.config.axes.y.tickFormat;
+        Globals.yAxis.tickFormat(Globals.config.axes.y.tickFormat);
       }
 
       if (Globals.config.axes.y.scale === 'log') {
@@ -308,14 +295,11 @@
 
     function setXAxis() {
 
-      if (Globals.gX) {
-        Globals.gX.remove();
-      }
+      Globals.chartSVG.selectAll('g.axis.x-axis').remove();
 
-      var intpol = config.axes.x.scale || 'linear';
       var svg = Globals.chartSVG.select('.chart-g');
 
-      Globals.xScale = INTERPOLATIONS[intpol]()
+      Globals.xScale = d3.scaleLinear()
         .range([0, Globals.width]);
 
       var min = Globals.config.axes.x.min || getMinX() || 0;
@@ -338,7 +322,7 @@
         .call(Globals.xAxis);
     }
 
-    function updateZoomScaleExtent () {
+    function updateZoomScaleExtent() {
       if (!Globals.zooomBehavior) {
         return;
       }
@@ -498,7 +482,7 @@
       return getScaleExtent() || 1;
     };
 
-    this.empty = function () {
+    this.empty = function() {
       console.log('empty');
       d3.select(elem).selectAll('*').remove();
     };
