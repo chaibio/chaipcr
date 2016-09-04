@@ -32,7 +32,9 @@
         yScale: null,
         zooomBehavior: null,
         zoomTransform: { k: 1, x: 0, y: 0 },
-        onZoomAndPan: null
+        onZoomAndPan: null,
+        normalPathStrokeWidth: 1,
+        activePathStrokeWidth: 2,
       };
     }
 
@@ -46,7 +48,7 @@
 
     function setActivePath(path) {
       if (Globals.activePath) {
-        Globals.activePath.attr('stroke-width', 3 / Globals.zoomTransform.k + 'px');
+        Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth / Globals.zoomTransform.k);
       }
       var activePathConfig, activePathIndex;
       // get config and index of active path
@@ -58,7 +60,7 @@
           break;
         }
       }
-      var newLine = makeLine(activePathConfig).attr('stroke-width', 5 / Globals.zoomTransform.k + 'px');
+      var newLine = makeLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth / Globals.zoomTransform.k + 'px');
       Globals.lines[activePathIndex] = newLine;
       Globals.activePath = newLine;
       makeCircle();
@@ -81,7 +83,7 @@
         .attr("stroke", line_config.color)
         .attr('fill', 'none')
         .attr("d", line)
-        .attr('stroke-width', 3 / Globals.zoomTransform.k + 'px')
+        .attr('stroke-width', Globals.normalPathStrokeWidth / Globals.zoomTransform.k)
         .on('click', function(e, a, path) {
           setActivePath.call(this, _path);
         });
@@ -134,10 +136,10 @@
 
     function updateLineStrokeWidthOnZoom(k) {
       Globals.lines.forEach(function(l) {
-        var strokeWidth = (l === Globals.activePath) ? 5 : 3; //default stroke width
+        var strokeWidth = (l === Globals.activePath) ? Globals.activePathStrokeWidth : Globals.normalPathStrokeWidth; //default stroke width
         var strokeDiff = (strokeWidth * k) - strokeWidth;
         var newStrokeWidth = strokeWidth / k;
-        l.attr('stroke-width', newStrokeWidth + 'px');
+        l.attr('stroke-width', newStrokeWidth);
       });
     }
 
