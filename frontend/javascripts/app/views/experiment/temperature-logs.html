@@ -32,8 +32,8 @@
                 <div class="col-sm-6">
                   <div class="zoom-container">
                     <div class="zoom-text">ZOOM</div>
-                    <!-- <ampli-slider ng-model="resolutionIndex" range="resolutionOptions.length-1"></ampli-slider> -->
-                    <scrollbar ng-model="zoomState"></scrollbar>
+                    <ampli-slider ng-model="zoomState" range="20"></ampli-slider>
+                    <!-- <scrollbar ng-model="zoomState"></scrollbar> -->
                   </div>
                 </div>
                 <div class="col-sm-6 zoom-container">
@@ -59,7 +59,7 @@
                 data="data"
                 config="options"
                 on-zoom="tempOnZoom"
-                zoom="zoomState.value"
+                zoom="zoomState"
                 scroll="scrollState.value"
                 on-mouse-move="mouseMove"
                 show="showChart"></thermal-profile-chart>
