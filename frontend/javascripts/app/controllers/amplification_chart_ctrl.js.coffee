@@ -155,15 +155,11 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                 color: if ($scope.color_by is 'well') then buttons["well_#{i}"].color else (if ch_i is 1 then '#00AEEF' else '#8FC742')
 
       $scope.onZoom = (transform, w, h, scale_extent) ->
-        # console.log transform, w, h, scale_extent
         $scope.ampli_scroll = {
           value: Math.abs(transform.x/(w*transform.k - w))
           width: w/(w*transform.k)
         }
-        $scope.ampli_zoom = {
-          value: (transform.k - 1)/ (scale_extent-1)
-          width: 0.2
-        }
+        $scope.ampli_zoom = (transform.k - 1)/ (scale_extent-1)
 
 
       $scope.$watch 'baseline_subtraction', (val) ->

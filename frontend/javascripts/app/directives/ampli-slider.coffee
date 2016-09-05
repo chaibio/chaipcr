@@ -33,43 +33,43 @@ window.App.directive('ampliSlider', [
       slider_offset = elem.find('.slider-holder-offset')
       slider_holder = elem.find('.slider-holder')
       slider_width = 0
-      max_offset_width = 0
+      max_offset_width = elem.width()
 
       getOffsetWidth = ->
-        slider_offset.css('width').replace('px', '')
+        slider_offset.css('width').replace('px', '')*1
 
-      getHolderWidth = ->
-        slider_holder.css('width').replace('px', '')
-
-      getMaxOffsetWidth = ->
-        elem.width() - getHolderWidth()*1
-
-      updateModel = (num_cycle) ->
-        ngModel.$setViewValue(num_cycle) if num_cycle isnt ngModel.$modelValue
+      updateModel = (val) ->
+        ngModel.$setViewValue(val) if val isnt ngModel.$modelValue
         $scope.$apply()
 
-      $scope.$watch ->
-        ngModel.$viewValue
-      , (val) ->
-        return if !val
-        newWidth = val * getMaxOffsetWidth()
-        slider_offset.css('width', newWidth + 'px')
+
+      $scope.$watchCollection ->
+        val: ngModel.$modelValue
+      , (model) ->
+        val = model.val
+        return if !val or held
+        width_percent = Math.sqrt(-Math.pow(-val+1, 2)+1)
+        newWidth = width_percent * max_offset_width
+        slider_offset.css('width', "#{newWidth}px")
 
       elem.on 'mousedown', (e) ->
-        CYCLES = $scope.cycles
         held = true
         oldX = e.pageX
         oldWidth = getOffsetWidth()
         TextSelection.disable()
-        slider_width = elem.width()
-        max_offset_width = slider_width*1 - getHolderWidth()*1
+        max_offset_width = elem.width()
 
       $window.$(document).on 'mousemove', (e) ->
         return if !held
         toadd = (e.pageX - oldX)
         newWidth = (oldWidth*1 + toadd*1)
-        slider_offset.css('width', newWidth + 'px')
-        updateModel newWidth/max_offset_width
+        slider_offset.css('width', "#{newWidth}px")
+        x = newWidth/max_offset_width
+        if x < 0
+          updateModel(x)
+        else
+          y = -Math.sqrt(1-Math.pow(x, 2)) + 1
+          updateModel(y)
 
       $window.$(document).on 'mouseup', (e) ->
         held = false
