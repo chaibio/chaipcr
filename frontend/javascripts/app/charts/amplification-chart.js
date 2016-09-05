@@ -173,14 +173,6 @@
         transform.y = -(Globals.height * transform.k - Globals.height);
       }
 
-      if (transform.k < 1) {
-        if (Globals.onZoomAndPan) {
-          Globals.onZoomAndPan(Globals.zoomTransform, Globals.width, Globals.height, getScaleExtent());
-        }
-        return;
-      }
-
-
       Globals.viewSVG.attr("transform", transform);
       Globals.gX.call(Globals.xAxis.scale(transform.rescaleX(Globals.xScale)));
       Globals.gY.call(Globals.yAxis.scale(transform.rescaleY(Globals.yScale)));
@@ -334,7 +326,7 @@
       if (!Globals.zooomBehavior) {
         return;
       }
-      Globals.zooomBehavior.scaleExtent([0.01, getScaleExtent()]);
+      Globals.zooomBehavior.scaleExtent([1, getScaleExtent()]);
     }
 
     function initChart(elem, data, config) {

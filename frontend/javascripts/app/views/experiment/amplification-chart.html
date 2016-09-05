@@ -108,7 +108,9 @@
             <amplification-chart
               data="amplification_data"
               config="chartConfig"
-              ng-model="amplificaionChart"
+              zoom="ampli_zoom.value"
+              on-zoom="onZoom"
+              scroll="ampli_scroll.value"
               show="showAmpliChart"></amplification-chart>
             <!-- <linechartv2 ng-if="!!data && RunExperimentCtrl.chart==='amplification'" data-drag-scroll="ampli-drag-scroll" data="data" options="chartConfig"></linechartv2> -->
           </div>
@@ -120,11 +122,11 @@
                   <div class="zoom-text SH">
                     <b>ZOOM</b>
                   </div>
-                  <ampli-slider ng-model="amplificaionChart.zoom"></ampli-slider>
+                  <scrollbar ng-model="ampli_zoom"></scrollbar>
                 </div>
               </div>
               <div class="col-md-6 ampli-scrollbar-container">
-                <scrollbar ng-model="amplificaionChart.scroll.value"></scrollbar>
+                <scrollbar ng-model="ampli_scroll"></scrollbar>
               </div>
             </div>
           </div>
