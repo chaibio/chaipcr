@@ -474,11 +474,16 @@
 
       // get data point at point x
       var line_config = Globals.config.series[0];
-      var x0 = Globals.xScale.invert(x),
-        i = bisectX(line_config)(Globals.data[line_config.dataset], x0, 1),
-        d0 = Globals.data[line_config.dataset][i - 1],
-        d1 = Globals.data[line_config.dataset][i],
-        d = x0 - d0[line_config.x] > d1[line_config.x] - x0 ? d1 : d0;
+      var x0 = Globals.xScale.invert(x);
+      var i = bisectX(line_config)(Globals.data[line_config.dataset], x0, 1);
+      var d0 = Globals.data[line_config.dataset][i - 1];
+
+      if (!d0) {
+        return;
+      }
+
+      var d1 = Globals.data[line_config.dataset][i];
+      var d = x0 - d0[line_config.x] > d1[line_config.x] - x0 ? d1 : d0;
 
       if (Globals.onMouseMove) {
         Globals.onMouseMove(d);
