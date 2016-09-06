@@ -32,11 +32,12 @@
                 <div class="col-sm-6">
                   <div class="zoom-container">
                     <div class="zoom-text">ZOOM</div>
-                    <ampli-slider ng-model="resolutionIndex" range="resolutionOptions.length-1"></ampli-slider>
+                    <ampli-slider ng-model="zoomState" range="20"></ampli-slider>
+                    <!-- <scrollbar ng-model="zoomState"></scrollbar> -->
                   </div>
                 </div>
                 <div class="col-sm-6 zoom-container">
-                  <scrollbar id="temp-logs-scrollbar" ng-model="scrollState" default-value="1"></scrollbar>
+                  <scrollbar ng-model="scrollState"></scrollbar>
                 </div>
               </div>
             </div>
@@ -48,18 +49,26 @@
           </div> -->
           <div>
             <div class="vertical-text B1B">Temperature (&deg;C)</div>
-            <div class="chart-container" id="temp-logs-drag-scroll" chart-drag-scroll ng-model="scrollState">
-              <div class="loading-blue-container" ng-show="!experiment || !data">
+            <div class="chart-container">
+              <div class="loading-blue-container" ng-show="!experiment || !hasData">
                 <div class="loading-blue"></div>
                 <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
                 <p class="B2">May take a minute</p>
               </div>
-              <linechartv2
+              <thermal-profile-chart
+                data="data"
+                config="options"
+                on-zoom="tempOnZoom"
+                zoom="zoomState"
+                scroll="scrollState.value"
+                on-mouse-move="mouseMove"
+                show="showChart"></thermal-profile-chart>
+              <!-- <linechartv2
                 ng-if="!!data && RunExperimentCtrl.chart==='temperature-logs'"
                 ng-show="experiment && data"
                 data="data"
                 options="options">
-              </linechartv2 >
+              </linechartv2 > -->
             </div>
             <div class="text-center abscissa-text B1B">Time</div>
           </div>
@@ -68,17 +77,17 @@
               <div class="item-indicator">
                 <span class="dot"></span>
                 <strong>Time:</strong>
-                <span class="B1">{{getLegend().time}}</span>
+                <span class="B1">{{dataPointAt.elapsed_time | secondsDisplay:'display2'}}</span>
               </div>
               <div class="item-indicator">
                 <span class="dot"></span>
                 <strong>Heat Block:</strong>
-                <span class="B1">{{getLegend().heat_block | round:1}}&nbsp;&deg;C</span>
+                <span class="B1">{{dataPointAt.heat_block_zone_temp | round:1}}&nbsp;&deg;C</span>
               </div>
               <div class="item-indicator">
                 <span class="dot"></span>
                 <strong>Lid:</strong>
-                <span class="B1">{{getLegend().lid | round:1}}&nbsp;&deg;C</span>
+                <span class="B1">{{dataPointAt.lid_temp | round:1}}&nbsp;&deg;C</span>
               </div>
             </div>
           </div>

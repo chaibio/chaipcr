@@ -34,20 +34,22 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
           min: 0
           max: 120
           tickFormat: (t) ->
-            "#{t} °C"
+            t = t or 0
+            "#{t.toFixed(2)} °C"
         }
       },
       margin: {
         top: 20
         left: 50
         right: 30
+        bottom: 20
       },
       grid:
         x: false
         y: false
       series: [
-        {thickness: '5px',axis: 'y', dataset: 'dataset', interpolation: {mode: 'cardinal', tension: 0.7}, key: 'heat_block_zone_temp', label: 'Heat Block: ', color: '#00AEEF'},
-        {thickness: '5px',axis: 'y', dataset: 'dataset', interpolation: {mode: 'cardinal', tension: 0.7}, key: 'lid_temp', label: 'Lid: ', color: '#C5C5C5'}
+        {x: 'elapsed_time', dataset: 'dataset', y: 'heat_block_zone_temp', color: '#00AEEF'},
+        {x: 'elapsed_time', dataset: 'dataset', y: 'lid_temp', color: '#C5C5C5'}
       ]
       tooltipHook: (domain) =>
         @legend =

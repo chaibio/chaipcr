@@ -11,6 +11,7 @@ var uglify = require('gulp-uglify');
 var insert = require('gulp-insert');
 var gutil = require('gulp-util');
 var stripDebug = require('gulp-strip-debug');
+var stripComment = require('gulp-strip-comments');
 var del = require('del');
 var _makeHash = require('./helpers').makeHash;
 var swallowError = require('./helpers').swallowError;
@@ -35,8 +36,7 @@ var vendorFiles = [
     'libs/angular-moment.min.js',
     'libs/lodash.min.js',
     'libs/fabric.js',
-    'libs/d3.js',
-    'libs/n3-line-chart-v2.js',
+    'libs/d3.v4.min.js',
     'libs/ng-focus-on.js',
     'libs/http-auth-interceptor.js',
     'libs/http-response-interceptor.js',
@@ -53,6 +53,7 @@ var vendorFiles = [
 var appFiles = [
     'welcome.js',
     'login.js',
+    'app/charts/**/*.js',
     'app/canvas-app.js',
     'app/app.js',
     'app/config.js',
@@ -94,6 +95,7 @@ gulp.task('coffee', ['clean-js'], function() {
         .pipe(coffee())
         .on('error', swallowError)
         .pipe(rename(_renameJS))
+        .pipe(stripComment())
         .pipe(insert.transform(function(contents, file) {
           return '// start of file: ' + file.history[0] + '\n' + contents + '\n// end of file: ' + file.history[0] + '\n';
         }))
@@ -131,6 +133,7 @@ gulp.task('templates', function() {
 gulp.task('copy-js-to-tmp', ['clean-js', 'templates'], function() {
     return gulp.src(['frontend/javascripts/**/*.js'])
         .pipe(rename(_renameJS))
+        .pipe(stripComment())
         .pipe(insert.transform(function(contents, file) {
             return '// start of file: ' + file.history[0] + '\n' + contents + '\n// end of file: ' + file.history[0] + '\n';
         }))
