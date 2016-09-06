@@ -196,10 +196,7 @@ App.controller 'MeltCurveChartCtrl', [
         value: Math.abs(transform.x/(w*transform.k - w))
         width: w/(w*transform.k)
       }
-      $scope.mc_zoom = {
-        value: (transform.k - 1)/ (scale_extent-1)
-        width: 0.2
-      }
+      $scope.mc_zoom = (transform.k - 1)/ (scale_extent-1)
 
       # $timeout ->
       #   $scope.$broadcast '$reload:n3:charts'
