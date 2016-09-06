@@ -167,9 +167,13 @@ angular.module("canvasApp").factory('moveStageRect', [
                 // here is the problem, when we move to right side and bring back to its first position UI breaks.
                 // so make sure to update currentHit to right value in this scenario.
                 if(stage.previousStage) {
+                  console.log("Check point 1");
                   this.currentDrop = stage.previousStage;
+                  this.currentHit = this.draggedStage.index - 1;
                 } else {
+                  console.log("Check point 2");
                   this.currentDrop = null;
+                  this.currentHit = 0;
                 }
               }
               return true;
