@@ -86,11 +86,13 @@ angular.module("canvasApp").factory('stage', [
           var width = this.myWidth;
           this.myWidth = 166; // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
           this.moveAllStepsAndStages(true);
-          var moveStart = this.childSteps[this.childSteps.length - 1].ordealStatus;
-          allSteps = this.parent.allStepViews;
-          for(var j = moveStart; j < allSteps.length; j++) {
-            allSteps[j].circle.moveCircleWithStep();
+
+          var anchorCircle = this.nextStage.childSteps[0].circle;
+          while(anchorCircle) {
+            anchorCircle.moveCircleWithStep();
+            anchorCircle = anchorCircle.next;
           }
+          
           this.myWidth = width;
         }
         this.canvas.renderAll();
@@ -153,7 +155,7 @@ angular.module("canvasApp").factory('stage', [
         }
         // true imply call is from delete section;
         this.moveAllStepsAndStages(true);
-        
+
         this.parent.correctNumbering();
         circleManager.init(fabricStage);
         circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
