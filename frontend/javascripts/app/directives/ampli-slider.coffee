@@ -39,16 +39,18 @@ window.App.directive('ampliSlider', [
         slider_offset.css('width').replace('px', '')*1
 
       updateModel = (val) ->
-        ngModel.$setViewValue(val) if val isnt ngModel.$modelValue
+        ngModel.$setViewValue(val) if val isnt ngModel.$viewValue
         $scope.$apply()
 
+      # ngModel.$render = ->
 
-      $scope.$watchCollection ->
-        val: ngModel.$modelValue
-      , (model) ->
-        val = model.val
-        return if !val or held
+        # val = ngModel.$viewValue
+      $scope.$watch ->
+        ngModel.$viewValue
+      , (val) ->
+        return if !angular.isNumber(val) or held
         width_percent = Math.sqrt(-Math.pow(-val+1, 2)+1)
+        console.log "width_percent: #{width_percent}"
         newWidth = width_percent * max_offset_width
         slider_offset.css('width', "#{newWidth}px")
 
