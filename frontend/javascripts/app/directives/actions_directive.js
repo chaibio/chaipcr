@@ -72,6 +72,13 @@ angular.module("canvasApp").directive('actions', [
 
         });
 
+        scope.addStage_ = function() {
+
+          if(!scope.summaryMode) {
+            scope.actionPopup = ! scope.actionPopup;
+          }
+        };
+
         scope.containInfiniteStep = function(stage) {
 
           var lastStep = stage.childSteps[stage.childSteps.length - 1];

@@ -164,6 +164,8 @@ angular.module("canvasApp").factory('moveStageRect', [
               if(this.findInAndOut("left") === "OUT") {
                 stage.moveToSide("right", this.verticalLine, this.spaceArray);
 
+                // here is the problem, when we move to right side and bring back to its first position UI breaks.
+                // so make sure to update currentHit to right value in this scenario.
                 if(stage.previousStage) {
                   this.currentDrop = stage.previousStage;
                 } else {
