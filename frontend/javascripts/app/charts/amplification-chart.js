@@ -52,9 +52,16 @@
       };
     // end global vars
 
+    function hideCircle () {
+      if (Globals.circle) {
+        Globals.circle.attr('opacity', 0);
+      }
+    }
+
     function setActivePath(path) {
       if (Globals.activePath) {
-        Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth / Globals.zoomTransform.k);
+        // Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth / Globals.zoomTransform.k);
+        Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth);
       }
       var activePathConfig, activePathIndex;
       // get config and index of active path
@@ -66,7 +73,8 @@
           break;
         }
       }
-      var newLine = makeLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth / Globals.zoomTransform.k);
+      // var newLine = makeLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth / Globals.zoomTransform.k);
+      var newLine = makeLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth);
       Globals.lines[activePathIndex] = newLine;
       Globals.activePath = newLine;
       makeCircle();
@@ -92,7 +100,8 @@
         .attr('stroke-width', Globals.normalPathStrokeWidth / Globals.zoomTransform.k)
         .on('click', function(e, a, path) {
           setActivePath.call(this, _path);
-        });
+        })
+        .on('mousemove', circleFollowsMouse);
 
       Globals.lines.push(_path);
       return _path;
@@ -135,21 +144,23 @@
       }
       Globals.circle = Globals.viewSVG.append('circle')
         .attr('opacity', 0)
-        .attr('r', Globals.circleRadius / Globals.zoomTransform.k)
+        // .attr('r', Globals.circleRadius / Globals.zoomTransform.k)
+        .attr('r', Globals.circleRadius)
         .attr('fill', 'red')
         .attr('stroke', '#fff')
-        .attr('stroke-width', Globals.circleStrokeWidth / Globals.zoomTransform.k)
+        // .attr('stroke-width', Globals.circleStrokeWidth / Globals.zoomTransform.k)
+        .attr('stroke-width', Globals.circleStrokeWidth)
         .attr('transform', 'translate (50,50)');
     }
 
-    function updateLineStrokeWidthOnZoom(k) {
-      Globals.lines.forEach(function(l) {
-        var strokeWidth = (l === Globals.activePath) ? Globals.activePathStrokeWidth : Globals.normalPathStrokeWidth; //default stroke width
-        var strokeDiff = (strokeWidth * k) - strokeWidth;
-        var newStrokeWidth = strokeWidth / k;
-        l.attr('stroke-width', newStrokeWidth);
-      });
-    }
+    // function updateLineStrokeWidthOnZoom(k) {
+    //   Globals.lines.forEach(function(l) {
+    //     var strokeWidth = (l === Globals.activePath) ? Globals.activePathStrokeWidth : Globals.normalPathStrokeWidth; //default stroke width
+    //     var strokeDiff = (strokeWidth * k) - strokeWidth;
+    //     var newStrokeWidth = strokeWidth / k;
+    //     l.attr('stroke-width', newStrokeWidth);
+    //   });
+    // }
 
     function zoomed() {
       var transform = d3.event.transform;
@@ -178,13 +189,13 @@
       Globals.gY.call(Globals.yAxis.scale(transform.rescaleY(Globals.yScale)));
       Globals.zoomTransform = transform;
 
-      updateLineStrokeWidthOnZoom(transform.k);
+      // updateLineStrokeWidthOnZoom(transform.k);
 
-      if (Globals.circle) {
-        Globals.circle
-          .attr('stroke-width', Globals.circleStrokeWidth / Globals.zoomTransform.k)
-          .attr('r', Globals.circleRadius / Globals.zoomTransform.k);
-      }
+      // if (Globals.circle) {
+      //   Globals.circle
+      //     .attr('stroke-width', Globals.circleStrokeWidth / Globals.zoomTransform.k)
+      //     .attr('r', Globals.circleRadius / Globals.zoomTransform.k);
+      // }
 
       if (Globals.onZoomAndPan) {
         Globals.onZoomAndPan(Globals.zoomTransform, Globals.width, Globals.height, getScaleExtent());
@@ -368,7 +379,8 @@
         .attr('width', width)
         .attr('height', height)
         .attr('fill', 'transparent')
-        .on('mousemove', circleFollowsMouse);
+        .on('mousemove', circleFollowsMouse)
+        .on('mouseout', hideCircle);
 
       setYAxis();
       setXAxis();

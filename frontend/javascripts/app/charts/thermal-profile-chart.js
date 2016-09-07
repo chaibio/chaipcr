@@ -116,17 +116,6 @@
       Globals.dashedLine = makeDashedLine();
       drawCircleTooltips();
       setMouseOverlay();
-      // drawDataPointSensors();
-    }
-
-    function drawDataPointSensors() {
-      if (!Globals.config.series) {
-        return;
-      }
-      Globals.chartSVG.selectAll('.tooltip-sensor').remove();
-      Globals.config.series.forEach(function(line_config) {
-        makeTooltipSensorForLine(line_config);
-      });
     }
 
     function drawCircleTooltips() {
@@ -166,10 +155,6 @@
           .attr('stroke-width', Globals.circleStrokeWidth / transform.k + 'px')
           .attr('r', Globals.circleRadius / transform.k + 'px');
       });
-
-      Globals.chartSVG.selectAll('.tooltip-sensor')
-        .attr('transform', transform)
-        .attr('r', 3 / transform.k + 'px');
 
       Globals.dashedLine
         .attr('stroke-dasharray', 5 / transform.k + "," + 5 / transform.k)

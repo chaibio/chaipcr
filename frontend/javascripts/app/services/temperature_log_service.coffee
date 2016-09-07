@@ -35,7 +35,11 @@ window.ChaiBioTech.ngApp.service 'TemperatureLogService', [
           max: 120
           tickFormat: (t) ->
             t = t or 0
-            "#{t.toFixed(2)} °C"
+            t_string = t.toString().split('.')
+            if (t_string[1])
+              t = t.toFixed(2)
+            return "#{t} °C"
+
         }
       },
       margin: {

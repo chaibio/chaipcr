@@ -41,7 +41,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
         greatest_elapsed_time = if greatest_elapsed_time < 5*60 then 60*5 else greatest_elapsed_time
         # $scope.data = $scope.data || {dataset: []}
         new_data = TemperatureLogService.parseData(data)
-        # $scope.options.axes.y.max = if new_data.max_y > $scope.options.axes.y.max then new_data.max_y else $scope.options.axes.y.max
+        $scope.options.axes.y.max = if new_data.max_y > $scope.options.axes.y.max then new_data.max_y else $scope.options.axes.y.max
         TEMPERATURE_LOGS_CACHE = TEMPERATURE_LOGS_CACHE.concat(new_data.dataset)
         TEMPERATURE_LOGS_CACHE = TemperatureLogService.reorderData(TEMPERATURE_LOGS_CACHE)
         $scope.data = dataset: TEMPERATURE_LOGS_CACHE
