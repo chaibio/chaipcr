@@ -64,6 +64,11 @@ window.App.directive 'thermalProfileChart', [
             if dims.width <= 0 or dims.height <= 0 or !dims.width or !dims.height
               initChart()
 
+            if show
+              chart.setYAxis()
+              chart.setXAxis()
+              chart.drawLines()
+
 
     }
 ]

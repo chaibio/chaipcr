@@ -87,7 +87,8 @@
         .attr("stroke", line_config.color)
         .attr('fill', 'none')
         .attr("d", line)
-        .attr('stroke-width', Globals.normalPathStrokeWidth / Globals.zoomTransform.k)
+        // .attr('stroke-width', Globals.normalPathStrokeWidth / Globals.zoomTransform.k)
+        .attr('stroke-width', Globals.normalPathStrokeWidth)
         .on('click', function(e, a, path) {
           setActivePath.call(this, _path);
         })

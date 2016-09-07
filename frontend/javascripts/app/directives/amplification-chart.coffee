@@ -60,6 +60,11 @@ window.App.directive 'amplificationChart', [
             dims = chart.getDimensions()
             if dims.width <= 0 or dims.height <= 0 or !dims.width or !dims.height
               initChart()
+              
+            if $scope.show
+              chart.setYAxis()
+              chart.setXAxis()
+              chart.drawLines()
 
 
     }
