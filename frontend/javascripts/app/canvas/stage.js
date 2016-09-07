@@ -84,7 +84,7 @@ angular.module("canvasApp").factory('stage', [
         // Bring other stages closer
         if(this.nextStage) {
           var width = this.myWidth;
-          this.myWidth = 166; // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
+          this.myWidth = 134; // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
           this.moveAllStepsAndStages(true);
 
           var anchorCircle = this.nextStage.childSteps[0].circle;
@@ -92,7 +92,7 @@ angular.module("canvasApp").factory('stage', [
             anchorCircle.moveCircleWithStep();
             anchorCircle = anchorCircle.next;
           }
-          
+
           this.myWidth = width;
         }
         this.canvas.renderAll();
@@ -233,12 +233,12 @@ angular.module("canvasApp").factory('stage', [
         }
       };
 
-      //This method is used when move stage hits at the hitPoint at the right side of the stage.
+      //This method is used when move stage hits at the hitPoint at the side of the stage.
       this.moveToSide = function(direction, verticalLine, spaceArray) {
 
         if(this.validMove(direction)) {
 
-          var moveCount = (direction === "left") ? -150 : 150;
+          var moveCount = (direction === "left") ? -140 : 140;
           if(verticalLine) {
             verticalLine.setVisible(true);
           }
