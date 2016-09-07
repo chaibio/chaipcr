@@ -448,7 +448,7 @@
           pos;
 
         while (true) {
-          target = Math.floor((beginning + end) / 2);
+          target = Math.floor(((beginning + end) / 2) * 100) / 100;
           pos = pathEl.getPointAtLength(target);
           if ((target === end || target === beginning) && pos.x !== x) {
             break;
