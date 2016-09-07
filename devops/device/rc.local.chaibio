@@ -58,19 +58,8 @@ run_migrate_on_upgrade () {
 
 		rm ${sdcard}/upgrade/upgrade_autorun.flag || :
         	echo "Upgrade autorun flag down.. setting up realtime service"
-		systemctl enable realtime.service
-		systemctl start realtime.service
 	else
 		echo "No autorun flag found!"
-		if systemctl status realtime.service | grep enable
-		then
-			systemctl enable realtime.service
-		fi
-		sleep 2
-                if systemctl status realtime.service | grep dead
-                then
-                        systemctl start realtime.service
-                fi
 	fi
 }
 
@@ -82,7 +71,7 @@ run_cleanup_user_tokens_every4hours () {
 		sleep 14400
 		echo cleaning task due.
 		cd /root/chaipcr/web || :
-		RAILS_ENV=production ruby scripts/clean.rb
+		RAILS_ENV=production /usr/bin/ruby scripts/clean.rb
 	done
 }
 
@@ -107,9 +96,19 @@ run_clean_user_tokens () {
         echo "changed folder to $(pwd)"
 	echo date  is $(date)
 
-	RAILS_ENV=production ruby scripts/startup.rb || :
+	RAILS_ENV=production /usr/bin/ruby scripts/startup.rb || :
 	echo "Execution result: $?"
 	run_cleanup_user_tokens_every4hours &
+
+	if systemctl status realtime.service | grep enable
+	then
+		systemctl enable realtime.service
+	fi
+	sleep 2
+        if systemctl status realtime.service | grep dead
+        then
+        	systemctl start realtime.service
+	fi
 }
 
 mysql_watchdog () {
