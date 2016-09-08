@@ -53,7 +53,7 @@
       };
     // end global vars
 
-    function hideCircle () {
+    function hideCircle() {
       if (Globals.circle) {
         Globals.circle.attr('opacity', 0);
       }
