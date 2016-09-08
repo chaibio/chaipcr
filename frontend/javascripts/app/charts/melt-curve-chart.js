@@ -55,10 +55,11 @@
       }
       var activePathConfig, activePathIndex;
       // get config and index of active path
-      for (var i = Globals.config.series.length - 1; i >= 0; i--) {
-        var s = Globals.config.series[i];
-        if (s.color === path.attr('stroke')) {
-          activePathConfig = s;
+      // get config and index of active path
+      for (var i = Globals.lines.length - 1; i >= 0; i--) {
+        var l = Globals.lines[i];
+        if (l === path) {
+          activePathConfig = Globals.config.series[i];
           activePathIndex = i;
           break;
         }
@@ -94,7 +95,7 @@
         })
         .on('mousemove', circleFollowsMouse);
 
-      Globals.lines.push(_path);
+      // Globals.lines.push(_path);
       return _path;
     }
 
@@ -112,7 +113,7 @@
       Globals.activePath = null;
 
       series.forEach(function(s, i) {
-        makeLine(s);
+        Globals.lines.push(makeLine(s));
       });
 
       makeCircle();
