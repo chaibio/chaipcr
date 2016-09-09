@@ -20,7 +20,9 @@
 angular.module("canvasApp").factory('moveStageRect', [
   'ExperimentLoader',
   'stage',
-  function(ExperimentLoader, stageDude) {
+  'stageGraphics',
+
+  function(ExperimentLoader, stageDude, stageGraphics) {
 
     return {
 
@@ -316,6 +318,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           stageView.moveAllStepsAndStages();
           circleManager.init(C);
           circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
+          stageGraphics.stageHeader.call(stageView);
           C.$scope.applyValues(stageView.childSteps[0].circle);
           stageView.childSteps[0].circle.manageClick(true);
         };

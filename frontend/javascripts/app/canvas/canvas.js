@@ -34,8 +34,9 @@ angular.module("canvasApp").factory('canvas', [
   'dots',
   'interceptorFactory',
   'stageHitBlock',
+  'stageGraphics',
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
-    moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageHitBlock) {
+    moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageHitBlock, stageGraphics) {
 
     this.init = function(model) {
 
@@ -202,6 +203,11 @@ angular.module("canvasApp").factory('canvas', [
         //if(stageCount > 1) {
           stage.dots.setVisible(status);
           stage.stageNameGroup.left = stage.stageNameGroup.left + add;
+          if( status === true && stage.childSteps.length === 1) {
+            stage.shortenStageName();
+          } else if (status === false) {
+            stageGraphics.stageHeader.call(stage);
+          }
         //}
 
         stage.childSteps.forEach(function(step, index) {
@@ -260,6 +266,7 @@ angular.module("canvasApp").factory('canvas', [
 
     this.addNewStage = function(data, currentStage) {
       //move the stages, make space.
+      console.log("ADDING STAGE dgfdgdfgdfgdfgfdgfdgdfgdf gfdgfdgfdgfdg dfgfdgfd");
       var ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus;
       var originalWidth = currentStage.myWidth;
       var add = (data.stage.steps.length > 0) ? 128 + Math.floor(constants.newStageOffset / data.stage.steps.length) : 128;
@@ -280,7 +287,7 @@ angular.module("canvasApp").factory('canvas', [
       this.configureStepsofNewStage(stageView, ordealStatus);
       circleManager.init(this);
       circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
-
+      //stageGraphics.stageHeader.call(stageView);
       this.$scope.applyValues(stageView.childSteps[0].circle);
       stageView.childSteps[0].circle.manageClick(true);
       this.setDefaultWidthHeight();

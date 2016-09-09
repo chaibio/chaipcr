@@ -43,6 +43,7 @@ angular.module("canvasApp").factory('stage', [
       this.shadowText = "0px 1px 2px rgba(0, 0, 0, 0.5)";
       this.visualComponents = {};
       this.stageMovedDirection = null;
+      this.shortStageName = false;
 
       this.setNewWidth = function(add) {
 
@@ -123,6 +124,7 @@ angular.module("canvasApp").factory('stage', [
         this.parent.correctNumbering();
         circleManager.init(fabricStage);
         circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
+        stageGraphics.stageHeader.call(this);
         $scope.applyValues(newStep.circle);
         newStep.circle.manageClick(true);
         stageGraphics.recalculateStageHitPoint.call(this);
@@ -159,7 +161,7 @@ angular.module("canvasApp").factory('stage', [
         this.parent.correctNumbering();
         circleManager.init(fabricStage);
         circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
-
+        stageGraphics.stageHeader.call(this);
         $scope.applyValues(selected.circle);
         selected.circle.manageClick();
         stageGraphics.recalculateStageHitPoint.call(this);
@@ -376,6 +378,12 @@ angular.module("canvasApp").factory('stage', [
           newStep.previousStep = this.childSteps[newStep.index - 1];
           newStep.previousStep.nextStep = newStep;
         }
+      };
+
+      this.shortenStageName = function() {
+        var text = this.stageName.text.substr(0, 8);
+        this.stageName.setText(text);
+        this.shortStageName = true;
       };
 
       this.getLeft = function() {

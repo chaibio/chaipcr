@@ -51,9 +51,8 @@ angular.module("canvasApp").factory('stageGraphics', [
     };
 
     this.stageHeader = function() {
-
+      console.log("Inside");
       if(this.stageName) {
-
         var index = parseInt(this.index) + 1;
         var stageName = (this.model.name).toUpperCase().replace("STAGE", "");
         var text = (stageName).trim();
@@ -67,6 +66,13 @@ angular.module("canvasApp").factory('stageGraphics', [
 
         this.stageName.setText(text);
         this.stageName.setLeft(this.stageCaption.left + this.stageCaption.width);
+
+        if(this.parent.editStageStatus && this.childSteps.length === 1) {
+          console.log("Lets see");
+          this.shortenStageName();
+        } else {
+          this.shortStageName = false;
+        }
       }
     };
 
