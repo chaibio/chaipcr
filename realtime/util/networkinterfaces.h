@@ -22,6 +22,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <ctime>
 
 namespace NetworkInterfaces
 {
@@ -78,6 +79,8 @@ namespace NetworkInterfaces
     InterfaceState getInterfaceState(const std::string &interfaceName);
 
     void removeLease(const std::string &interfaceName);
+
+    std::time_t dhcpTimeout();
 }
 
 #endif // NETWORKCONFIGURATOR_H

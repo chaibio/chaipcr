@@ -115,6 +115,7 @@ private:
     std::atomic<OperationState> _interfaceStatusThreadStatus;
 
     std::atomic<ConnectionStatus> _connectionStatus;
+    std::atomic<std::time_t> _connectionTimeout;
 
     std::vector<ScanResult> _scanResult;
     mutable Poco::RWLock _scanResultMutex;

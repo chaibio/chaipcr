@@ -295,6 +295,34 @@ void removeLease(const std::string &interfaceName)
     std::remove(("/var/lib/dhcp/dhclient." + interfaceName + ".leases").c_str());
 }
 
+std::time_t dhcpTimeout()
+{
+    std::time_t timeout = 60; //60s is a default timeout according to man dhclient.conf
+    std::ifstream file("/etc/dhcp/dhclient.conf");
+
+    if (file.is_open())
+    {
+        while (file.good())
+        {
+            std::string entry;
+            std::getline(file, entry);
+
+            if (entry.find("timeout ") == 0)
+            {
+                std::stringstream stream;
+                stream << entry;
+
+                stream >> entry;
+                stream >> timeout;
+
+                break;
+            }
+        }
+    }
+
+    return timeout;
+}
+
 }
 
 std::string getMacAddress(const std::string &interface)

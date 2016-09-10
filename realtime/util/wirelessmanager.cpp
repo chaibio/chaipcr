@@ -46,6 +46,7 @@ WirelessManager::WirelessManager()
 
     _connectionThreadState = Idle;
     _connectionStatus = NotConnected;
+    _connectionTimeout = 0;
 
     _interfaceStatusThreadStatus = Working;
     _interfaceStatusThread = std::thread(&WirelessManager::checkInterfaceStatus, this);
@@ -169,8 +170,8 @@ void WirelessManager::_connect()
         _connectionStatus = Connecting;
 
         ifup();
-        sleep(3);
 
+        _connectionTimeout = std::time(nullptr) + NetworkInterfaces::dhcpTimeout();
         _connectionThreadState = Idle;
     }
     catch (const std::exception &ex)
@@ -309,16 +310,16 @@ void WirelessManager::checkConnection()
 
     if (!state.isEmpty())
     {
-        if (state.flags & IFF_UP)
+        if (state.flags & IFF_UP && state.addressState)
         {
-            if (state.addressState)
-                _connectionStatus = Connected;
-            else if (_connectionThreadState != Working)
-                _connectionStatus = AuthenticationError;
+            _connectionStatus = Connected;
+            _connectionTimeout = 0;
         }
-        else if (_connectionThreadState != Working)
+        else if (_connectionThreadState != Working && std::time(nullptr) > _connectionTimeout)
         {
-            if (_connectionStatus == Connecting)
+            if (state.flags & IFF_UP)
+                _connectionStatus = AuthenticationError;
+            else if (_connectionStatus == Connecting)
                 _connectionStatus = ConnectionError;
             else if (_connectionStatus != ConnectionError)
                 _connectionStatus = NotConnected;
