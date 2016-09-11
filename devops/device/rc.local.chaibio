@@ -109,6 +109,15 @@ run_clean_user_tokens () {
         then
         	systemctl start realtime.service
 	fi
+	if systemctl status r.service | grep enable
+	then
+		systemctl enable r.service
+	fi
+	sleep 2
+        if systemctl status r.service | grep dead
+        then
+        	systemctl start r.service
+	fi
 }
 
 mysql_watchdog () {

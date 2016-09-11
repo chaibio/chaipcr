@@ -366,6 +366,7 @@ if [ $retval -ne 0 ]; then
 else
 	echo Disabling realtime service
 	rm /tmp/emmc/etc/systemd/system/multi-user.target.wants/realtime.service || :
+	rm /tmp/emmc/etc/systemd/system/multi-user.target.wants/r.service || :
 
 	echo "Zeroing rootfs partition"
 	dd if=/dev/zero of=/tmp/emmc/big_zero_file1.bin bs=16777216 > /dev/null 2>&1
@@ -394,6 +395,7 @@ if [ $retval -ne 0 ]; then
 else
 	echo Disabling realtime service
 	rm /tmp/emmc/etc/systemd/system/multi-user.target.wants/realtime.service || :
+	rm /tmp/emmc/etc/systemd/system/multi-user.target.wants/r.service || :
 
 	sync
 	umount /tmp/emmc > /dev/null || true
