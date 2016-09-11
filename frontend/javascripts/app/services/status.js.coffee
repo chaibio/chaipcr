@@ -64,6 +64,10 @@ window.ChaiBioTech.ngApp
         data = resp
         for def in ques by 1
           def.resolve data
+
+        if data?.experiment_controller?.machine?.state is 'idle' and oldData?.experiment_controller?.machine?.state isnt 'idle'
+          $rootScope.$broadcast 'status:experiment:completed'
+
         $rootScope.$broadcast 'status:data:updated', data, oldData
 
       .error (resp) ->

@@ -41,6 +41,9 @@ window.ChaiBioTech.ngApp
     User.getCurrent().then (resp) ->
       $scope.user = resp.data.user
 
+    $scope.$on 'status:experiment:completed', =>
+      @fetchExperiments()
+
     @fetchExperiments = ->
       Experiment.query (experiments) ->
         $scope.experiments = experiments
