@@ -146,7 +146,7 @@ void NetworkManagerHandler::setSettings(const boost::property_tree::ptree &reque
         NetworkInterfaces::InterfaceSettings settings;
         settings.interface = _interfaceName;
         settings.type = requestPt.get<std::string>("type");
-        settings.autoConnect = requestPt.get<bool>("auto", false);
+        settings.autoConnect = requestPt.get<bool>("auto", true);
 
         for (boost::property_tree::ptree::const_iterator it = requestPt.begin(); it != requestPt.end(); ++it)
         {

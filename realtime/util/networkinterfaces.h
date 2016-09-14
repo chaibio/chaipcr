@@ -29,7 +29,7 @@ namespace NetworkInterfaces
     class InterfaceSettings
     {
     public:
-        InterfaceSettings(): autoConnect(false) {}
+        InterfaceSettings(): autoConnect(true) {}
 
         inline bool isEmpty() const noexcept { return interface.empty(); }
 
