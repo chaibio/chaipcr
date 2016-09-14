@@ -73,7 +73,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       retry = ->
         $scope.retrying = true
-        $scope.retry = 10
+        $scope.retry = 5
         retryInterval = $interval ->
           $scope.retry = $scope.retry - 1
           if $scope.retry is 0

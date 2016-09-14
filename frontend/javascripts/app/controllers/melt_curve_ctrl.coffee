@@ -42,7 +42,7 @@ App.controller 'MeltCurveChartCtrl', [
     retry = ->
       return if $scope.retrying
       $scope.retrying = true
-      $scope.retry = 10
+      $scope.retry = 5
       retryInterval = $interval ->
         $scope.retry = $scope.retry - 1
         if $scope.retry is 0
@@ -188,7 +188,7 @@ App.controller 'MeltCurveChartCtrl', [
       #       min: y_extrems.min
       #       max: y_extrems.max
 
-      updateSeries()  
+      updateSeries()
 
     $scope.onZoom = (transform, w, h, scale_extent) ->
       # console.log transform, w, h, scale_extent
