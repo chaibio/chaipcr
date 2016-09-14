@@ -97,6 +97,8 @@ private:
 
     double _minTempThreshold;
     double _maxTempThreshold;
+
+    bool _firstErrorState;
 };
 
 #endif // TEMPERATURECONTROLLER_H

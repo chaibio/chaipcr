@@ -28,7 +28,6 @@
 #include "maincontrollers.h"
 #include "qpcrapplication.h"
 #include "util.h"
-#include "logger.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class FluorescenceRoughData
@@ -81,13 +80,6 @@ void Optics::process()
 
 void Optics::setADCValue(int32_t adcValue, std::size_t channel)
 {
-    if (adcValue == 0)
-    {
-        APP_LOGGER << "Optics::setADCValue - adc value of a channel " << channel << " is 0. Skipping\n";
-
-        return;
-    }
-
     {
         std::lock_guard<std::mutex> lock(_adcMutex);
 

@@ -24,6 +24,7 @@
 #include "thermistor.h"
 #include "pid.h"
 #include "temperaturecontroller.h"
+#include "logger.h"
 
 TemperatureController::TemperatureController(Settings settings)
 {
@@ -38,6 +39,7 @@ TemperatureController::TemperatureController(Settings settings)
     _minTempThreshold = settings.minTempThreshold;
     _maxTempThreshold = settings.maxTempThreshold;
     _targetTemperature = _minTargetTemp - 1;
+    _firstErrorState = false;
 
     _thermistor->temperatureChanged.connect(boost::bind(&TemperatureController::computePid, this, _1));
 }
@@ -102,34 +104,69 @@ void TemperatureController::computePid(double currentTemperature)
 {
     if (currentTemperature < _minTempThreshold)
     {
-        std::string name = _name;
-        name.at(0) = std::toupper(name.at(0));
+        if (_firstErrorState)
+        {
+            std::string name = _name;
+            name.at(0) = std::toupper(name.at(0));
 
-        std::stringstream stream;
-        stream << name << " temperature of " << currentTemperature << " C below limit of " << _minTempThreshold << " C";
+            std::stringstream stream;
+            stream << name << " temperature of " << currentTemperature << " C below limit of " << _minTempThreshold << " C";
 
-        throw TemperatureLimitError(stream.str());
+            throw TemperatureLimitError(stream.str());
+        }
+        else
+        {
+            _firstErrorState = true;
+
+            APP_LOGGER << "TemperatureController::computePid - " << _name << " temperature of " << currentTemperature << " C below limit of " << _minTempThreshold << " C. Skipping.";
+
+            return;
+        }
     }
     else if (currentTemperature > _maxTempThreshold)
     {
-        std::string name = _name;
-        name.at(0) = std::toupper(name.at(0));
+        if (_firstErrorState)
+        {
+            std::string name = _name;
+            name.at(0) = std::toupper(name.at(0));
 
-        std::stringstream stream;
-        stream << name << " temperature of " << currentTemperature << " C above limit of " << _maxTempThreshold << " C";
+            std::stringstream stream;
+            stream << name << " temperature of " << currentTemperature << " C above limit of " << _maxTempThreshold << " C";
 
-        throw TemperatureLimitError(stream.str());
+            throw TemperatureLimitError(stream.str());
+        }
+        else
+        {
+            _firstErrorState = true;
+
+            APP_LOGGER << "TemperatureController::computePid - " << _name << " temperature of " << currentTemperature << " C above limit of " << _maxTempThreshold << " C. Skipping.";
+
+            return;
+        }
     }
     else if (std::isnan(currentTemperature))
     {
-        std::string name = _name;
-        name.at(0) = std::toupper(name.at(0));
+        if (_firstErrorState)
+        {
+            std::string name = _name;
+            name.at(0) = std::toupper(name.at(0));
 
-        std::stringstream stream;
-        stream << name << " temperature is NaN";
+            std::stringstream stream;
+            stream << name << " temperature is NaN";
 
-        throw TemperatureLimitError(stream.str());
+            throw TemperatureLimitError(stream.str());
+        }
+        else
+        {
+            _firstErrorState = true;
+
+            APP_LOGGER << "TemperatureController::computePid - " << _name << " temperature is NaN. Skipping.";
+
+            return;
+        }
     }
+
+    _firstErrorState = false;
 
     if (_targetTemperature < _minTargetTemp)
         _targetTemperature = currentTemperature;
