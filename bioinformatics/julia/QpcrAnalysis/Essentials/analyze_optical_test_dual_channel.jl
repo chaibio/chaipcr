@@ -28,8 +28,8 @@ end) # do i
 # analyze function
 ANALYZE_DICT["optical_test_dual_channel"] = function analyze_optical_test_dual_channel(
     db_conn::MySQL.MySQLHandle,
-    exp_id::Integer, # not used for computation
-    calib_info::Union{Integer,OrderedDict};
+    exp_id::Integer,
+    calib_info::Union{Integer,OrderedDict}; # keys: "baseline", "water", "channel_1", "channel_2". Each value's "calibration_id" value is the same as `exp_id`
     # start: arguments that might be passed by upstream code
     well_nums::AbstractVector=[],
     )
@@ -46,7 +46,7 @@ ANALYZE_DICT["optical_test_dual_channel"] = function analyze_optical_test_dual_c
 
     num_wells = length(fluo_well_nums)
 
-    old_calib_labels = ["baseline"; CALIB_LABELS_FAM_HEX; "water"]
+    old_calib_labels = ["baseline"; "water"; CALIB_LABELS_FAM_HEX]
 
     fluo_dict = OrderedDict(map(old_calib_labels) do calib_label
         calib_label => hcat(map(CHANNELS) do channel
@@ -81,7 +81,7 @@ ANALYZE_DICT["optical_test_dual_channel"] = function analyze_optical_test_dual_c
     end # for
 
     # organize "optical_data"
-    new_calib_labels = ["baseline", "FAM", "HEX", "water"]
+    new_calib_labels = ["baseline", "water", "FAM", "HEX"]
     optical_data = map(1:num_wells) do well_i
         OrderedDict(map(1:length(old_calib_labels)) do cl_i
             old_calib_label = old_calib_labels[cl_i]

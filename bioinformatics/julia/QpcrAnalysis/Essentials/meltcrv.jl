@@ -36,6 +36,8 @@ function process_mc(
         "max_tmprtr: $max_tmprtr"
     )
 
+    calib_info = ensure_ci(db_conn, calib_info, exp_id)
+
     mcd_qry_2b = "
         SELECT well_num, channel
             FROM melt_curve_data

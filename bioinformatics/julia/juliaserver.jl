@@ -12,7 +12,7 @@ http = HttpHandler() do req::Request, res::Response
 		nodes = split(req.resource,'/');
 		experiment_id = parse(Int,nodes[3])
 		action = nodes[4]
-		request_body = bytestring(req.data)
+		request_body = string(req.data)
 		# func = parse(action)
 		code = 0
 		# if isdefined(func)

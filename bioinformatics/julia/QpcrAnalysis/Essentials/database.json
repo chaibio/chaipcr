@@ -15,6 +15,6 @@
   		"username": "root1",
 		"password": "pswd1",
 		"host": "localhost",
-		"database": "empty1"
+		"database": "pc_test"
 	}
 }

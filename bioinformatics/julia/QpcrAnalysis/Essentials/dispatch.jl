@@ -1,9 +1,4 @@
 #
-#
-
-const calib_info_AIR = 0 # calib_info == ABSENT_IN_REQ. To conform with `calib_info::Union{Integer,OrderedDict}``
-const db_name_AIR = "" # db_name == ABSENT_IN_REQ
-
 
 function dispatch(action::AbstractString, request_body::AbstractString)
 
@@ -13,10 +8,10 @@ function dispatch(action::AbstractString, request_body::AbstractString)
     calib_info = "calibration_info" in keys_req_dict ? req_dict["calibration_info"] : calib_info_AIR
 
     db_name = "db_name" in keys_req_dict ? req_dict["db_name"] : db_name_AIR
-    db_conn = (db_name == db_name_AIR) ? db_conn_default : mysql_connect(
+    db_conn = "db_key" in keys_req_dict ? DB_CONN_DICT[req_dict["db_key"]] : ((db_name == db_name_AIR) ? DB_CONN_DICT["default"] : mysql_connect(
         req_dict["db_host"], req_dict["db_usr"], req_dict["db_pswd"], req_dict["db_name"]
-    )
-    println("non-default db_name: ", db_name)
+    ))
+    # println("non-default db_name: ", db_name)
 
     result = try
         if action == "amplification"
@@ -37,7 +32,8 @@ function dispatch(action::AbstractString, request_body::AbstractString)
             exp_id = req_dict["experiment_id"]
             stage_id = req_dict["stage_id"]
             process_mc(
-                db_conn, exp_id, stage_id, calib_info;
+                db_conn, exp_id, stage_id,
+                calib_info;
             )
         elseif action == "analyze"
             exp_info = req_dict["experiment_info"]
@@ -86,7 +82,8 @@ function args2reqb(
     ramp_id::Integer=0,
     min_reliable_cyc::Real=5,
     guid::AbstractString="",
-    wdb::Bool=false,
+    wdb::AbstractString="dflt", # "handle", "dflt", "connect"
+    db_key::AbstractString="default", # "default", "t1", "t2"
     db_host::AbstractString="localhost",
     db_usr::AbstractString="root",
     db_pswd::AbstractString="",
@@ -102,8 +99,8 @@ function args2reqb(
             reqb["step_id"] = step_id
         elseif ramp_id != 0
             reqb["ramp_id"] = ramp_id
-        else
-            println("No step_id or ramp_id will be specified.")
+        # else
+        #     println("No step_id or ramp_id will be specified.")
         end
     elseif action == "meltcurve"
         reqb["experiment_id"] = exp_id
@@ -117,11 +114,17 @@ function args2reqb(
         error("Unrecognized action.")
     end
 
-    if wdb
+    if wdb == "handle"
+        reqb["db_key"] = db_key
+    elseif wdb == "dflt"
+        nothing
+    elseif wdb == "connect"
         reqb["db_host"] = db_host
         reqb["db_usr"] = db_usr
         reqb["db_pswd"] = db_pswd
         reqb["db_name"] = db_name
+    else
+        error("`wdb` must be one of the following: \"handle\", \"dflt\", \"connect\".")
     end
 
     return json(reqb)

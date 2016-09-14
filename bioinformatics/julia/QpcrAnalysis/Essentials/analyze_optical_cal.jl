@@ -4,7 +4,7 @@
 # check JSON output in UI: http://:ip_address/experiments/:exp_id/analyze
 
 
-ANALYZE_DICT["optical_calibration"] = function optical_calibration(
+ANALYZE_DICT["optical_cal"] = function analyze_optical_cal(
     db_conn::MySQL.MySQLHandle,
     exp_id::Integer, # not used for computation
     calib_info::Union{Integer,OrderedDict}; # really used
@@ -23,7 +23,7 @@ ANALYZE_DICT["optical_calibration"] = function optical_calibration(
     )
 
     result = OrderedDict("valid"=>true)
-    err_msg_vec = Vector{ByteString}()
+    err_msg_vec = Vector{AbstractString}()
 
 
     # get_k

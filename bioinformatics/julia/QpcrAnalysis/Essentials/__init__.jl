@@ -1,15 +1,15 @@
 
-const JULIA_ENV = ENV["JULIA_ENV"]
-
-
 function __init__()
 
     # println("calling function __init__") # raised error when starting Julia REPL with "$sysimg_path.dll": "calling function __init__fatal: error thrown and no exception handler available."
 
-    global const db_info = JSON.parsefile("$MODULE_DIR/database.json", dicttype=OrderedDict)[JULIA_ENV]
-    global const db_conn_default = mysql_connect(db_info["host"], db_info["username"], db_info["password"], db_info["database"])
+    global const TEST_RESULTS = test(;
+        comprehensive=false,
+        debug=true,
+        verbose=false
+    )
 
-    trigger_compilation()
+    return nothing
 end
 
 
