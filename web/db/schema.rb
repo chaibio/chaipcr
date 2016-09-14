@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160830071040) do
+ActiveRecord::Schema.define(version: 20160901071514) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -54,6 +54,7 @@ ActiveRecord::Schema.define(version: 20160830071040) do
     t.text    "derivative_text",        limit: 16777215
     t.text    "tm_text"
     t.text    "area_text"
+    t.integer "ramp_id"
   end
 
   add_index "cached_melt_curve_data", ["experiment_id", "stage_id", "channel", "well_num"], name: "index_meltcurvedata_by_exp_stage_chan_well", unique: true, using: :btree
@@ -102,6 +103,7 @@ ActiveRecord::Schema.define(version: 20160830071040) do
     t.integer "fluorescence_value"
     t.integer "experiment_id"
     t.integer "channel",            limit: 1,                         default: 1, null: false
+    t.integer "ramp_id"
   end
 
   add_index "melt_curve_data", ["experiment_id", "stage_id", "well_num", "temperature"], name: "melt_curve_data_index", using: :btree
@@ -181,6 +183,10 @@ ActiveRecord::Schema.define(version: 20160830071040) do
     t.decimal "lid_temp",               precision: 5, scale: 2, comment: "degrees C"
     t.decimal "heat_block_zone_1_temp", precision: 5, scale: 2, comment: "degrees C"
     t.decimal "heat_block_zone_2_temp", precision: 5, scale: 2, comment: "degrees C"
+    t.integer "stage_id"
+    t.integer "cycle_num"
+    t.integer "step_id"
+    t.integer "ramp_id"
   end
 
   add_index "temperature_logs", ["experiment_id", "elapsed_time"], name: "index_temperature_logs_on_experiment_id_and_elapsed_time", unique: true, using: :btree
