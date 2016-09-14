@@ -24,6 +24,8 @@ function dcv_aw(
     aw_out_format::AbstractString="both" # "array", "dict", "both"
     )
 
+    calib_info = ensure_ci(db_conn, calib_info)
+
     wva_data, wva_well_nums = prep_adj_w2wvaf(db_conn, calib_info, well_nums_in_req, dye_in, dyes_2bfild)
 
     num_channels = length(channels)

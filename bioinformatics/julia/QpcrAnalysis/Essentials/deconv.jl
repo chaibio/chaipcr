@@ -25,7 +25,8 @@ function deconv(
 
     k_dict = (isa(calib_info, Integer) || begin
         step_ids = map(ci_value -> ci_value["step_id"], values(calib_info))
-        length(unique(step_ids)) < length(step_ids)
+        length_step_ids = length(step_ids)
+        length_step_ids <= 2 || length(unique(step_ids)) < length_step_ids
     end) ? K_DICT : get_k(db_conn, calib_info, well_nums) # use default `well_proc` value
 
     k_inv_vec = k_dict["k_inv_vec"]

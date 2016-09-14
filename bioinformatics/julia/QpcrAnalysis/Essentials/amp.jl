@@ -31,12 +31,12 @@ function process_amp(
         "max_cycle: $max_cycle"
     )
 
+    calib_info = ensure_ci(db_conn, calib_info, exp_id)
 
     if length(sr_vec) == 0
         sr_qry = "SELECT steps.id, steps.collect_data, ramps.id, ramps.collect_data
             FROM experiments
-            LEFT JOIN experiment_definitions ON experiments.experiment_definition_id = experiment_definitions.id
-            LEFT JOIN protocols ON experiment_definitions.id = protocols.experiment_definition_id
+            LEFT JOIN protocols ON experiments.experiment_definition_id = protocols.experiment_definition_id
             LEFT JOIN stages ON protocols.id = stages.protocol_id
             LEFT JOIN steps ON stages.id = steps.stage_id
             LEFT JOIN ramps ON steps.id = ramps.next_step_id
@@ -70,7 +70,7 @@ function process_amp(
         sr_latest = sr_vec[1]
     end
 
-    println(sr_latest)
+    print_v(println, verbose, sr_latest)
 
     fd_qry_2b = "
         SELECT cycle_num, well_num, channel
@@ -123,6 +123,7 @@ end # process_amp
 
 function get_amp_data(
     db_conn::MySQL.MySQLHandle,
+    col_name::AbstractString, # "fluorescence_value" or "baseline_value"
     exp_id::Integer,
     sr_ele::Tuple,
     cycle_nums::AbstractVector,
@@ -131,7 +132,7 @@ function get_amp_data(
     )
 
     # get fluorescence data for amplification
-    fluo_qry = "SELECT fluorescence_value
+    fluo_qry = "SELECT $col_name
         FROM fluorescence_data
         WHERE
             fluorescence_data.experiment_id= $exp_id AND
@@ -144,7 +145,7 @@ function get_amp_data(
     fluo_sel = mysql_execute(db_conn, fluo_qry)
 
     fluo_raw = reshape(
-        fluo_sel[:fluorescence_value],
+        fluo_sel[parse(col_name)],
         map(length, (cycle_nums, fluo_well_nums, channels))...
     )
 
@@ -422,7 +423,9 @@ function process_amp_1sr(
     )
 
     fr_ary3 = get_amp_data(
-        db_conn, exp_id, sr_ele,
+        db_conn,
+        "fluorescence_value", # "fluorescence_value" or "baseline_value"
+        exp_id, sr_ele,
         cycle_nums, fluo_well_nums, channels
     )
 

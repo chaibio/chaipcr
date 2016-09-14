@@ -1,13 +1,39 @@
 # constants and functions used by multiple types of analyses
 
 
+# constants
+
 const JSON_DIGITS = 3 # number of decimal points for floats in JSON output
+
+const JULIA_ENV = ENV["JULIA_ENV"]
+
+const DB_INFO = JSON.parsefile("$MODULE_DIR/database.json", dicttype=OrderedDict)[JULIA_ENV]
+
+const DB_CONN_DICT = OrderedDict(map([
+    ("default", DB_INFO["database"]),
+    ("t1", "test_1ch"),
+    ("t2", "test_2ch")
+]) do db_tuple
+    db_tuple[1] => mysql_connect(DB_INFO["host"], DB_INFO["username"], DB_INFO["password"], db_tuple[2])
+end) # do db_name
+
+# test_df = mysql_execute(DB_CONN_DICT["t1"], "select * from ramps") # doesn't raise error when starting Julia with "sys2_qa.dll"
+
+# ABSENT_IN_REQ values
+const calib_info_AIR = 0 # calib_info == ABSENT_IN_REQ. To conform with `calib_info::Union{Integer,OrderedDict}``
+const db_name_AIR = "" # db_name == ABSENT_IN_REQ
+
+
+
+
+# functions
 
 
 # function: check whether a value different from `calib_info_AIR` is passed onto `calib_info`; if not, use `exp_id` to find calibration "experiment_id" in MySQL database and assumes water "step_id"=2, signal "step_id"=4, using FAM to calibrate all the channels.
 function ensure_ci(
     db_conn::MySQL.MySQLHandle,
-    calib_info::Union{Integer,OrderedDict}=calib_info_AIR
+    calib_info::Union{Integer,OrderedDict}=calib_info_AIR,
+    exp_id::Integer=calib_info_AIR
     )
 
     if isa(calib_info, Integer)
@@ -21,16 +47,35 @@ function ensure_ci(
             calib_id = calib_info
         end
 
+        step_qry = "SELECT step_id FROM fluorescence_data WHERE experiment_id=$calib_id"
+        step_ids = sort(unique(mysql_execute(db_conn, step_qry)[:step_id]))
+
         calib_info = OrderedDict(
-            "water" => OrderedDict("calibration_id"=>calib_id, "step_id"=>2)
+            "water" => OrderedDict(
+                "calibration_id" => calib_id,
+                "step_id" => step_ids[1]
+            )
         )
 
-        calib_qry = "SELECT channel FROM fluorescence_data WHERE experiment_id=$calib_id"
-        calib_channels = unique(mysql_execute(db_conn, calib_qry)[:channel])
+        for i in 2:(length(step_ids))
+            calib_info["channel_$(i-1)"] = OrderedDict(
+                "calibration_id" => calib_id,
+                "step_id" => step_ids[i]
+            )
+        end # for
 
-        for calib_channel in calib_channels
-            calib_info["channel_$calib_channel"] = OrderedDict("calibration_id"=>calib_id, "step_id"=>4)
-        end
+        channel_qry = "SELECT channel FROM fluorescence_data WHERE experiment_id=$calib_id"
+        channels = sort(unique(mysql_execute(db_conn, channel_qry)[:channel]))
+
+        for channel in channels
+            channel_key = "channel_$channel"
+            if !(channel_key in keys(calib_info))
+                calib_info[channel_key] = OrderedDict(
+                    "calibration_id" => calib_id,
+                    "step_id" => step_ids[2]
+                )
+            end # if
+        end # for
 
     end # if isa(calib_info, Integer)
 

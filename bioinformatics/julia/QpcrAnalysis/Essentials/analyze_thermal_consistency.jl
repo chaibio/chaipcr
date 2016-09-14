@@ -35,7 +35,8 @@ ANALYZE_DICT["thermal_consistency"] = function thermal_consistency(
 
     mc_w72c = process_mc(
         db_conn,
-        exp_id, stage_id, calib_info;
+        exp_id, stage_id,
+        calib_info;
         well_nums=well_nums,
         auto_span_smooth=auto_span_smooth,
         span_smooth_default=span_smooth_default,

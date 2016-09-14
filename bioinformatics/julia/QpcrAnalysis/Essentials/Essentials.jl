@@ -1,8 +1,8 @@
 #
-
+# __precompile__() # need to manually add `__precompile__()` to "MySQL.jl". Something about package "MySQL" possibly make it not able to precompile, because the error occurs right before deprecation warning for MySQL is supposed to occur
 module Essentials
 
-using DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NLopt # In addition, "HttpServer" for "juliaserver.jl"
+using DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL #, NLopt # In addition, "HttpServer" for "juliaserver.jl"
 
 
 # Assumptions
@@ -22,7 +22,7 @@ using DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NLopt 
 
 const MODULE_NAME = "Essentials"
 
-const ANALYZE_DICT = OrderedDict{ByteString,Function}()
+const ANALYZE_DICT = OrderedDict{AbstractString,Function}()
 
 const LOAD_FROM_DIR = LOAD_PATH[find(LOAD_PATH) do path_
     isfile("$path_/$MODULE_NAME/$MODULE_NAME.jl")
