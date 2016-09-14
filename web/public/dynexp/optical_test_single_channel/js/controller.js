@@ -20,6 +20,7 @@
       $scope.cancel = false;
       $scope.CONSTANTS = CONSTANTS;
       $scope.isFinite = isFinite;
+      //$scope.custom_error = false;
       $('.content').addClass('analyze');
 
       function getExperiment(exp_id, cb) {
@@ -111,7 +112,7 @@
       $scope.checkMachineStatus();
 
       $scope.analyzeExperiment = function () {
-        //$scope.analyzing = true;
+        $scope.analyzing = true;
         if (!$scope.analyzedExp) {
           getExperiment($stateParams.id, function (exp) {
             $scope.experiment = exp;
