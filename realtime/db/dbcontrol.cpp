@@ -418,7 +418,7 @@ void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
     bool tempLogs = false;
     bool debugTempLogs = false;
 
-    stream << "INSERT INTO temperature_logs(experiment_id, elapsed_time, lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp) VALUES";
+    stream << "INSERT INTO temperature_logs(experiment_id, elapsed_time, lid_temp, heat_block_zone_1_temp, heat_block_zone_2_temp, stage_id, cycle_num, step_id, ramp_id) VALUES";
     stream2 << "INSERT INTO temperature_debug_logs(experiment_id, elapsed_time, lid_drive, heat_block_zone_1_drive, heat_block_zone_2_drive, heat_sink_temp, heat_sink_drive) VALUES";
 
     for (std::vector<TemperatureLog>::const_iterator it = logs.begin(); it != logs.end(); ++it)
@@ -430,8 +430,18 @@ void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
 
             tempLogs = true;
 
-            stream << "(" << it->experimentId() << "," << it->elapsedTime() << "," << ROUND(it->lidTemperature()) << ","
-                      << ROUND(it->heatBlockZone1Temperature()) << "," << ROUND(it->heatBlockZone2Temperature()) << ")";
+            stream << "(" << it->experimentId() << "," << it->elapsedTime() << "," << ROUND(it->lidTemperature()) << "," << ROUND(it->heatBlockZone1Temperature())
+                   << "," << ROUND(it->heatBlockZone2Temperature()) << "," << it->stageId() << "," << it->cycleNum() << ",";
+
+            if (it->stepId() != -1)
+                stream << it->stepId() << ",";
+            else
+                stream << "NULL,";
+
+            if (it->rampId() != -1)
+                stream << it->rampId() << ")";
+            else
+                stream << "NULL)";
         }
 
         if (it->hasDebugInfo())
@@ -493,12 +503,12 @@ void DBControl::addMeltCurveData(const Experiment &experiment, const std::vector
     std::vector<std::string> queries;
     std::stringstream stream;
 
-    stream << "INSERT INTO melt_curve_data(experiment_id, stage_id, well_num, temperature, fluorescence_value, channel) VALUES";
+    stream << "INSERT INTO melt_curve_data(experiment_id, stage_id, well_num, temperature, fluorescence_value, channel, ramp_id) VALUES";
 
     for (std::vector<Optics::MeltCurveData>::const_iterator it = meltCurveData.begin(); it != meltCurveData.end(); ++it)
     {
         stream << "(" << experiment.id() << "," << experiment.protocol()->currentStage()->id() << ","
-               << it->wellId << "," << it->temperature << "," << it->fluorescenceValue << "," << (it->channel + 1) << ")";
+               << it->wellId << "," << it->temperature << "," << it->fluorescenceValue << "," << (it->channel + 1) << "," << experiment.protocol()->currentRamp()->id() << ")";
 
         if (it + 1 != meltCurveData.end())
             stream << ",";

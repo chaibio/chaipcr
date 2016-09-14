@@ -566,7 +566,14 @@ void ExperimentController::addLogCallback(Poco::Timer &)
         if (_machineState == IdleMachineState)
             return;
 
-        log = TemperatureLog(_experiment.id(), true, _settings.debugMode);
+        log = TemperatureLog(_experiment.id(), _experiment.protocol()->currentStage()->id(), true, _settings.debugMode);
+
+        if (_thermalState == HoldingThermalState)
+            log.setStepId(_experiment.protocol()->currentStep()->id());
+        else
+            log.setStepId(_experiment.protocol()->currentRamp()->id());
+
+        log.setCycleNum(_experiment.protocol()->currentStage()->currentCycle());
         log.setElapsedTime((boost::posix_time::microsec_clock::local_time() - _experiment.startedAt()).total_milliseconds());
     }
 
