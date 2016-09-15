@@ -57,7 +57,6 @@ angular.module("canvasApp").factory('canvas', [
         "gather-data-image.png",
         "pause.png",
         "pause-middle.png",
-        "close.png",
         "drag-footer-image.png",
         "move-step-on.png",
         "drag-stage-image.png"

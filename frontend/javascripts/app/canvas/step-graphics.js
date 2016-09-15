@@ -51,17 +51,33 @@ angular.module("canvasApp").factory('stepGraphics', [
 
       var editStageStatus = this.parentStage.parent.editStageStatus;
 
-      this.closeImage = $.extend({}, this.parentStage.parent.imageobjects["close.png"]);
-      this.closeImage.visible = editStageStatus;
-      this.closeImage.originX = "left";
-      this.closeImage.originY = "top";
-      this.closeImage.left = this.left + 108;
-      this.closeImage.top = 79;
-      this.closeImage.name = "deleteStepButton";
-      this.closeImage.me = this;
-      this.closeImage.selectable = true;
-      this.closeImage.hasBorders = false;
-      this.closeImage.hasControls = false;
+      this.newCloseCircle = new fabric.Circle({
+        radius: 6,
+        stroke: 'rgb(166, 122, 40)',
+        originX: "center",
+        originY: "center",
+        fill: '#ffb400',
+        strokeWidth: 2,
+        selectable: false,
+        name: "newClose",
+      });
+
+      this.newCloseLine1 = new fabric.Line([-3, -3, 3, 3],{
+        stroke: 'rgb(166, 122, 40)',
+
+      });
+
+      this.newCloseLine2 = new fabric.Line([-3, -3, 3, 3],{
+        stroke: 'rgb(166, 122, 40)',
+        angle: 90,
+        originX: 'center',
+        originY: 'center',
+      });
+
+      this.closeImage = new fabric.Group([this.newCloseCircle, this.newCloseLine1, this.newCloseLine2], {
+        originX: "center", originY: "center", left: this.left + 116, top: 86, hasBorders: false, hasControls: false,
+        lockMovementY: true, lockMovementX: true, parent: this, visible: editStageStatus
+      });
 
       return this;
     };
@@ -210,7 +226,7 @@ angular.module("canvasApp").factory('stepGraphics', [
         hasBoarders: false, name: "stepGroup",  me: this, originX: 'left', originY: 'top'
       });
     };
-    
+
     return this;
   }
 ]);
