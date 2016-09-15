@@ -207,6 +207,13 @@ else
 fi
 
 cp /etc/shadow /data/.tmp/shadow.backup
+
+if [ -e /data/.tmp/dhclient.*.leases ]
+then
+	rm /data/.tmp/dhclient.*.leases
+fi
+
+cp /var/lib/dhcp/dhclient.*.leases /data/.tmp/
 sync
 
 sh $BASEDIR/rebootx.sh

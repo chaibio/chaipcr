@@ -214,7 +214,7 @@ network_watchdog_interface() {
                                 echo no previous $iface connection found.
                         fi
 			lfile=/var/lib/dhcp/dhclient.$iface.leases
-			rm $lfile
+#			rm $lfile
 			extras=""
                         if echo "$iface" | grep -q "wlan"
 		        then

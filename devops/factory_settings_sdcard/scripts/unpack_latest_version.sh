@@ -341,13 +341,17 @@ if [ "$1" != "factorysettings" ]
 then
 	mkdir -p /tmp/data
 	mount ${eMMC}p3 /tmp/data
-	if [ -e /tmp/data/.tmp/shadow.backup ]
+	if [ -e /tmp/data/.tmp/shadow.backup ] || [ -e /tmp/data/.tmp/dhclient.*.leases ]
 	then
 		mkdir -p /tmp/rootfs
 		mount ${eMMC}p2 /tmp/rootfs
-		mv /tmp/data/.tmp/shadow.backup /tmp/rootfs/etc/shadow
-		rm -r /tmp/data/.tmp
+		mv /tmp/data/.tmp/shadow.backup /tmp/rootfs/etc/shadow || true
+		mv /tmp/data/.tmp/dhclient.*.leases /tmp/rootfs/var/lib/dhcp/ || true
+		rm -r /tmp/data/.tmp || true
+		sync
+		umount /tmp/rootfs || true
 	fi
+	umount /tmp/data || true
 fi
 
 exit 0
