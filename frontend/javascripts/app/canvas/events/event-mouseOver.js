@@ -36,9 +36,23 @@ angular.module("canvasApp").factory('mouseOver', [
           case "stepGroup":
             me = evt.target.me;
             if(C.editStageStatus === false) {
-              me.closeImage.setVisible(true);
-              if(previouslyHoverd.step && previouslyHoverd.step.uniqueName !== me.uniqueName) {
-                previouslyHoverd.step.closeImage.setVisible(false);
+              me.closeImage.animate('opacity', 1, {
+                duration: 500,
+                onChange: C.canvas.renderAll.bind(C.canvas),
+                onComplete: function() {
+                  console.log('done');
+                }
+              });
+              //me.closeImage.setVisible(true);
+              if(previouslyHoverd.step) {
+                //previouslyHoverd.step.closeImage.setVisible(false);
+                previouslyHoverd.step.closeImage.animate('opacity', 0, {
+                  duration: 500,
+                  onChange: C.canvas.renderAll.bind(C.canvas),
+                  onComplete: function() {
+                    console.log('done');
+                  }
+                });
               }
               previouslyHoverd.step = me;
               C.canvas.renderAll();

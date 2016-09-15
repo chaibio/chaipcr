@@ -50,7 +50,7 @@ angular.module("canvasApp").factory('stepGraphics', [
     this.deleteButton = function() {
 
       var editStageStatus = this.parentStage.parent.editStageStatus;
-
+      var opacity = (editStageStatus) ? 1 : 0;
       this.newCloseCircle = new fabric.Circle({
         radius: 6,
         stroke: 'rgb(166, 122, 40)',
@@ -76,7 +76,7 @@ angular.module("canvasApp").factory('stepGraphics', [
 
       this.closeImage = new fabric.Group([this.newCloseCircle, this.newCloseLine1, this.newCloseLine2], {
         originX: "center", originY: "center", left: this.left + 116, top: 86, hasBorders: false, hasControls: false,
-        lockMovementY: true, lockMovementX: true, parent: this, visible: editStageStatus
+        lockMovementY: true, lockMovementX: true, parent: this, opacity: opacity, name: 'deleteStepButton', me: this
       });
 
       return this;

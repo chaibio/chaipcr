@@ -211,7 +211,7 @@ angular.module("canvasApp").factory('canvas', [
 
         stage.childSteps.forEach(function(step, index) {
           //if(stepCount > 1) {
-            step.closeImage.setVisible(status);
+            step.closeImage.setOpacity(status);
             step.dots.setVisible(status);
           //}
 
