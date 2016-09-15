@@ -1,5 +1,5 @@
 
-
+__precompile__()
 module QpcrAnalysis
 
 include("Essentials/Essentials.jl") # does the same thing as `using Basics` except not exportng any names
