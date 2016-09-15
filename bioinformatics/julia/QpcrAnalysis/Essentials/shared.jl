@@ -9,16 +9,6 @@ const JULIA_ENV = ENV["JULIA_ENV"]
 
 const DB_INFO = JSON.parsefile("$MODULE_DIR/database.json", dicttype=OrderedDict)[JULIA_ENV]
 
-const DB_CONN_DICT = OrderedDict(map([
-    ("default", DB_INFO["database"]),
-    ("t1", "test_1ch"),
-    ("t2", "test_2ch")
-]) do db_tuple
-    db_tuple[1] => mysql_connect(DB_INFO["host"], DB_INFO["username"], DB_INFO["password"], db_tuple[2])
-end) # do db_name
-
-# test_df = mysql_execute(DB_CONN_DICT["t1"], "select * from ramps") # doesn't raise error when starting Julia with "sys2_qa.dll"
-
 # ABSENT_IN_REQ values
 const calib_info_AIR = 0 # calib_info == ABSENT_IN_REQ. To conform with `calib_info::Union{Integer,OrderedDict}``
 const db_name_AIR = "" # db_name == ABSENT_IN_REQ

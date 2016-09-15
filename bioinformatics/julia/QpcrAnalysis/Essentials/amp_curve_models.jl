@@ -35,8 +35,8 @@ const MD_func_keys = ["f", "bl", "d1", "d2"] # when `num_fts > 1`, "d*" are part
 
 # `EMPTY_fp` for `func_pred_strs` and `funcs_pred`
 const EMPTY_fp = map(("", empty_func)) do empty_val
-    OrderedDict(map(MD_func_keys) do func_key # v0.4, `supertype` not defined, `typeof(some_function) == Function`
-    # OrderedDict{AbstractString,supertype(typeof(empty_val))}(map(MD_func_keys) do func_key # v0.5, `super` becomes `supertype`, `typeof(some_function) == #some_function AND supertype(typeof(some_function)) == Function`
+    # OrderedDict(map(MD_func_keys) do func_key # v0.4, `supertype` not defined, `typeof(some_function) == Function`
+    OrderedDict{AbstractString,supertype(typeof(empty_val))}(map(MD_func_keys) do func_key # v0.5, `super` becomes `supertype`, `typeof(some_function) == #some_function AND supertype(typeof(some_function)) == Function`
         func_key => empty_val
     end) # do func_key
 end # do empty_val
