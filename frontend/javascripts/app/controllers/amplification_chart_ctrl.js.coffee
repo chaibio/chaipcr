@@ -47,16 +47,14 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.channel_1 = true
       $scope.channel_2 = if is_dual_channel then true else false
       $scope.showAmpliChart = true
-      $scope.ampli_zoom = {
-        value: 0
-        width: 0.2
-      }
+      $scope.ampli_zoom = 0
 
       $scope.$on 'expName:Updated', ->
         $scope.experiment?.name = expName.name
 
       Experiment.get(id: $stateParams.id).then (data) ->
         maxCycle = helper.getMaxExperimentCycle(data.experiment)
+        console.log "max cycle: #{maxCycle}"
         $scope.chartConfig.axes.x.max = maxCycle
         $scope.experiment = data.experiment
 

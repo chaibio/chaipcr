@@ -59,7 +59,7 @@
       }
     }
 
-    function setActivePath(path) {
+    function setActivePath(path, mouse) {
       if (Globals.activePath) {
         // Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth / Globals.zoomTransform.k);
         Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth);
@@ -79,8 +79,18 @@
       Globals.lines[activePathIndex] = newLine;
       Globals.activePath = newLine;
       makeCircle();
-      circleFollowsMouse.call(this);
       path.remove();
+
+      if (Globals.circle) {
+        console.log(mouse);
+        Globals.circle
+          .attr("opacity", 1)
+          .attr("cx", mouse[0])
+          .attr("cy", mouse[1])
+          .attr('transform', 'translate(0,0) scale(1)')
+          .attr('fill', activePathConfig.color);
+      }
+
     }
 
     function makeLine(line_config) {
@@ -98,14 +108,12 @@
         .attr("stroke", line_config.color)
         .attr('fill', 'none')
         .attr("d", line)
-        // .attr('stroke-width', Globals.normalPathStrokeWidth / Globals.zoomTransform.k)
         .attr('stroke-width', Globals.normalPathStrokeWidth)
         .on('click', function(e, a, path) {
-          setActivePath.call(this, _path);
+          setActivePath.call(this, _path, d3.mouse(this));
         })
         .on('mousemove', circleFollowsMouse);
 
-      // Globals.lines.push(_path);
       return _path;
     }
 
@@ -152,7 +160,8 @@
         .attr('stroke', '#fff')
         // .attr('stroke-width', Globals.circleStrokeWidth / Globals.zoomTransform.k)
         .attr('stroke-width', Globals.circleStrokeWidth)
-        .attr('transform', 'translate (50,50)');
+        .attr('transform', 'translate (50,50)')
+        .on('mousemove', circleFollowsMouse);
     }
 
     // function updateLineStrokeWidthOnZoom(k) {
@@ -317,7 +326,6 @@
 
       var min = Globals.config.axes.x.min || getMinX() || 0;
       var max = Globals.config.axes.x.max || getMaxX() || 1;
-      console.log('max x: ' + max);
       Globals.xScale.domain([min, max]);
 
       Globals.xAxis = d3.axisBottom(Globals.xScale);
@@ -425,8 +433,7 @@
         .attr("opacity", 1)
         .attr("cx", x)
         .attr("cy", pos.y)
-        .attr('transform', 'translate(0,0) scale(1)')
-        .attr('fill', Globals.activePath.attr('stroke'));
+        .attr('transform', 'translate(0,0) scale(1)');
     }
 
     this._getTransformXFromScroll = function(scroll) {
