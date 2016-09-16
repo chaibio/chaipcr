@@ -578,7 +578,7 @@ bool UpdateManager::downlaod(const std::string &imageUrl, const std::string &api
     LoggerStreams streams;
 
     std::stringstream stream;
-    stream << "sshpass -p \'" << apiPassword << "\' rsync -a --checksum --no-whole-file --inplace " << imageUrl << " " << kUpdateFilePath;
+    stream << "sshpass -p \'" << apiPassword << "\' rsync -a --checksum --no-whole-file --timeout=180 --inplace " << imageUrl << " " << kUpdateFilePath;
 
     return Util::watchProcess(stream.str(), _downloadEventFd,
                               [&streams](const char *buffer, std::size_t size){ streams.stream("UpdateManager::downlaod - rsync (stdout)").write(buffer, size); },

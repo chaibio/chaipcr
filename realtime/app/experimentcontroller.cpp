@@ -503,10 +503,10 @@ void ExperimentController::holdStepCallback(Poco::Timer &)
 
                     rate = rate > 0 && rate <= kDurationCalcHeatBlockRampSpeed ? rate : kDurationCalcHeatBlockRampSpeed;
 
-                    if (HeatBlockInstance::getInstance()->temperature() < _experiment.protocol()->currentStep()->temperature())
-                        interval = (_experiment.protocol()->currentStep()->temperature() - HeatBlockInstance::getInstance()->temperature()) / rate;
+                    if (HeatBlockInstance::getInstance()->temperature() < temperature)
+                        interval = (temperature - HeatBlockInstance::getInstance()->temperature()) / rate;
                     else
-                        interval = (HeatBlockInstance::getInstance()->temperature() - _experiment.protocol()->currentStep()->temperature()) / rate;
+                        interval = (HeatBlockInstance::getInstance()->temperature() - temperature) / rate;
 
                     interval = std::round(interval * 1000 - kOpticalFluorescenceMeasurmentPeriodMs);
 
@@ -618,7 +618,7 @@ void ExperimentController::calculateEstimatedDuration()
 
         rate = rate > 0 && rate <= kDurationCalcHeatBlockRampSpeed ? rate : kDurationCalcHeatBlockRampSpeed;
 
-        if (HeatBlockInstance::getInstance()->temperature() < stage->currentStep()->temperature())
+        if (previousTargetTemp < temperature)
             rampDuration = (temperature - previousTargetTemp) / rate * 1000;
         else
             rampDuration = (previousTargetTemp - temperature) / rate * 1000;
