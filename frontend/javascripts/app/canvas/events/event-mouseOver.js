@@ -38,7 +38,7 @@ angular.module("canvasApp").factory('mouseOver', [
             me = evt.target.me;
             if(C.editStageStatus === false) {
               me.closeImage.animate('opacity', 1, {
-                duration: 500,
+                duration: 400,
                 onChange: C.canvas.renderAll.bind(C.canvas),
                 onComplete: function() {
                   console.log('done');
@@ -48,7 +48,7 @@ angular.module("canvasApp").factory('mouseOver', [
               if(previouslyHoverd.step && (me.model.id !== previouslyHoverd.step.model.id)) {
                 //previouslyHoverd.step.closeImage.setVisible(false);
                 previouslyHoverd.step.closeImage.animate('opacity', 0, {
-                  duration: 500,
+                  duration: 400,
                   onChange: C.canvas.renderAll.bind(C.canvas),
                   onComplete: function() {
                     console.log('done');
