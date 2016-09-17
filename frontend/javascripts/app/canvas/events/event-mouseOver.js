@@ -34,6 +34,7 @@ angular.module("canvasApp").factory('mouseOver', [
         switch(evt.target.name) {
 
           case "stepGroup":
+          console.log("hovered");
             me = evt.target.me;
             if(C.editStageStatus === false) {
               me.closeImage.animate('opacity', 1, {
@@ -44,7 +45,7 @@ angular.module("canvasApp").factory('mouseOver', [
                 }
               });
               //me.closeImage.setVisible(true);
-              if(previouslyHoverd.step) {
+              if(previouslyHoverd.step && (me.model.id !== previouslyHoverd.step.model.id)) {
                 //previouslyHoverd.step.closeImage.setVisible(false);
                 previouslyHoverd.step.closeImage.animate('opacity', 0, {
                   duration: 500,
