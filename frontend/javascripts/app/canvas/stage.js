@@ -215,14 +215,14 @@ angular.module("canvasApp").factory('stage', [
         stage.nextStage.stageHitPointLeft.set({left: stage.nextStage.left + 10}).setCoords();
         stage.nextStage.stageHitPointRight.set({left: (stage.nextStage.left + stage.nextStage.myWidth) -  20}).setCoords();
 
-        var thisStageSteps = stage.nextStage.childSteps, stepCount = thisStageSteps.length;
-        for(var i = 0; i < stepCount; i++ ) {
-          if(del === true) {
-            thisStageSteps[i].moveStep(-1, true);
-          } else {
-            thisStageSteps[i].moveStep(1, true);
+        stage.nextStage.childSteps.forEach(function(childStep, index) {
+          if (del === true) {
+            childStep.moveStep(-1, true);
+            return;
           }
-        }
+          childStep.moveStep(1, true);
+        });
+
       };
 
       //This method is used when move stage hits at the hitPoint at the side of the stage.
