@@ -362,11 +362,11 @@ mount $rootfs_partition /tmp/emmc -t ext4
 retval=$?
 
 if [ $retval -ne 0 ]; then
-    echo "Error mounting rootfs partition. Error($retval)"
+	echo "Error mounting rootfs partition. Error($retval)"
 else
 	echo Disabling realtime service
 	rm /tmp/emmc/etc/systemd/system/multi-user.target.wants/realtime.service || :
-	rm /tmp/emmc/etc/systemd/system/multi-user.target.wants/r.service || :
+	rm /tmp/emmc/etc/rc?.d/???unicorn || :
 
 	echo "Zeroing rootfs partition"
 	dd if=/dev/zero of=/tmp/emmc/big_zero_file1.bin bs=16777216 > /dev/null 2>&1
