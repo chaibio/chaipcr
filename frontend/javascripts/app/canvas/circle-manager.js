@@ -82,7 +82,7 @@ angular.module("canvasApp").factory('circleManager', [
     };
 
     this.reDrawCircles = function() {
-
+      console.log("redraw circle starts here");
       var tempCirc = null;
       this.drawCirclesArray.length = 0;
 
@@ -100,7 +100,7 @@ angular.module("canvasApp").factory('circleManager', [
         tempCirc = step.circle;
         return step.circle;
       }, this);
-
+      console.log("reDrawCircles ends here");
       return this.drawCirclesArray;
     };
 

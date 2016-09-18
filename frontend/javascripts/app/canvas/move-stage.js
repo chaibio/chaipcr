@@ -233,7 +233,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         // Need to correct movement, so that the moved stage fits in at right place ,
         // right now, it works for moving right.
         this.indicator.applyMovement = function(stage_, C, circleManager, callBack) {
-
+          console.log("Entering apply movement");
           /*Sometimes user moves left first and then move right,
             leave the move stage over a stage and which has empty space in the left.
             We move to side and move if it is valid so that when we re render there is no spacing. */
@@ -268,7 +268,9 @@ angular.module("canvasApp").factory('moveStageRect', [
           C.correctNumbering();
           stageView.moveAllStepsAndStages();
           circleManager.init(C);
+          console.log("starting circle");
           circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
+          console.log("Ending circle");
           stageGraphics.stageHeader.call(stageView);
           C.$scope.applyValues(stageView.childSteps[0].circle);
           stageView.childSteps[0].circle.manageClick(true);
