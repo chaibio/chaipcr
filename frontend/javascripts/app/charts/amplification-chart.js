@@ -82,7 +82,6 @@
       path.remove();
 
       if (Globals.circle) {
-        console.log(mouse);
         Globals.circle
           .attr("opacity", 1)
           .attr("cx", mouse[0])
@@ -91,6 +90,15 @@
           .attr('fill', activePathConfig.color);
       }
 
+    }
+
+    function unsetActivePath() {
+      if (!Globals.activePath) {
+        return;
+      }
+      hideCircle();
+      Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth);
+      Globals.activePath = null;
     }
 
     function makeLine(line_config) {
@@ -390,7 +398,8 @@
         .attr('height', height)
         .attr('fill', 'transparent')
         .on('mousemove', circleFollowsMouse)
-        .on('mouseout', hideCircle);
+        .on('mouseout', hideCircle)
+        .on('click', unsetActivePath);
 
       setYAxis();
       setXAxis();
