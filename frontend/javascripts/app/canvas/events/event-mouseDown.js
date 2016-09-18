@@ -116,14 +116,11 @@ angular.module("canvasApp").factory('mouseDown', [
             that.calculateMoveLimit("stage");
             circleManager.togglePaths(false); //put it back later
 
-            C.canvas.bringToFront(C.stageIndicator);
+
             var stage = evt.target.parent;
             stage.collapseStage();
+            C.canvas.bringToFront(C.stageIndicator);
             stage.wireStageNextAndPrevious();
-            C.canvas.renderAll();
-            // Move other stages
-            // Shrink this stage
-
           break;
 
           case "deleteStepButton":

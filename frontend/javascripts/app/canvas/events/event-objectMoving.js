@@ -65,7 +65,7 @@ angular.module("canvasApp").factory('objectMoving', [
           } else {
             C.stageIndicator.onTheMove(C, evt.target);
           }
-          C.stageIndicator.onTheMoveDragGroup(evt.target);
+          //C.stageIndicator.onTheMoveDragGroup(evt.target);
           break;
         }
       });
