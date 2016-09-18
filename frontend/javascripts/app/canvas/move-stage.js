@@ -109,15 +109,11 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         this.indicator.init = function(stage) {
 
-          //if(! this.canvasContaining) {
-            //this.canvasContaining = $('.canvas-containing');
-          //}
-
-          this.setVisible(true);
-          this.spaceArray = [stage.left - 10, stage.left + 160];
           this.setLeft(stage.left - 1).setCoords();
+          this.setVisible(true);
+
+          this.spaceArray = [stage.left - 10, stage.left + 160];
           this.draggedStage = stage;
-          this.stageBackUp = angular.extend({}, stage);
 
           if(stage.nextStage) {
             this.currentDrop = stage.nextStage;

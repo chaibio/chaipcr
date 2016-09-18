@@ -110,15 +110,16 @@ angular.module("canvasApp").factory('mouseDown', [
             that.mouseDownPos = evt.e.clientX;
             that.moveStageActive = true;
             that.canvas.moveCursor = "move";
-            that.calculateMoveLimit("stage");
-            circleManager.togglePaths(false); //put it back later
 
             C.stageIndicator.init(evt.target.parent);
             C.stageIndicator.changeText(evt.target.parent);
+            that.calculateMoveLimit("stage");
+            circleManager.togglePaths(false); //put it back later
+
             C.canvas.bringToFront(C.stageIndicator);
-            C.stageIndicator.changePlacing(evt.target);
-            evt.target.parent.collapseStage();
-            evt.target.parent.wireStageNextAndPrevious();
+            var stage = evt.target.parent;
+            stage.collapseStage();
+            stage.wireStageNextAndPrevious();
             C.canvas.renderAll();
             // Move other stages
             // Shrink this stage
