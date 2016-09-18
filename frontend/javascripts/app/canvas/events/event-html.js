@@ -42,7 +42,6 @@ angular.module("canvasApp").factory('htmlEvents', [
             if (previouslyHoverd.step) {
               previouslyHoverd.step.closeImage.setOpacity(false);
             }
-            previouslyHoverd.step = null;
             C.canvas.renderAll();
         }
 

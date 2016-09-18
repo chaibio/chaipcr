@@ -34,7 +34,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         this.endPosition = 0;
         this.currentLeft = 0;
         this.direction = null;
-        //this.canvasContaining = $('.canvas-containing');
+        this.beaconMove = 0;
 
         var smallCircle = new fabric.Circle({
           radius: 6, fill: 'white', stroke: "black", strokeWidth: 2, selectable: false,
@@ -109,15 +109,11 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         this.indicator.init = function(stage) {
 
-          //if(! this.canvasContaining) {
-            //this.canvasContaining = $('.canvas-containing');
-          //}
-
-          this.setVisible(true);
-          this.spaceArray = [stage.left - 10, stage.left + 160];
           this.setLeft(stage.left - 1).setCoords();
+          this.setVisible(true);
+
+          this.spaceArray = [stage.left - 10, stage.left + 160];
           this.draggedStage = stage;
-          this.stageBackUp = angular.extend({}, stage);
 
           if(stage.nextStage) {
             this.currentDrop = stage.nextStage;
@@ -129,22 +125,6 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         };
 
-        this.indicator.onTheMoveDragGroup = function(dragging) {
-
-          this.setLeft(dragging.left - 1).setCoords();
-          if(this.direction === "right") {
-            this.beacon.setLeft(dragging.left + 135).setCoords();
-          } else if(this.direction === "left") {
-            this.beacon.setLeft(dragging.left - 10).setCoords();
-          }
-        };
-
-        this.indicator.changePlacing = function(place) {
-
-          //this.setCoords();
-
-        };
-
         this.indicator.changeText = function(stage) {
 
           stageName.setText(stage.stageCaption.text);
@@ -153,19 +133,17 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         this.indicator.onTheMove = function(C, movement) {
           // Here we hit test the movement of the MOVING STAGE
-          /*console.log(movement.left, this.canvasContaining.scrollLeft());
-          if(movement.left > 890) {
-            var move = movement.left - 890;
-            this.canvasContaining.scrollLeft(move);
-            C.canvas.calcOffset();
-          }*/
-          //this.canvasContaining.scrollLeft(movement.left);
+          this.setLeft(movement.left - 1).setCoords();
+          this.beacon.setLeft(movement.left + this.beaconMove).setCoords();
 
           if(movement.left > this.currentLeft && this.direction !== "right") {
             this.direction = "right";
+            this.beaconMove = 135;
           } else if(movement.left < this.currentLeft && this.direction !== "left") {
             this.direction = "left";
+            this.beaconMove = -10;
           }
+
           this.currentLeft = movement.left;
 
           C.allStageViews.some(function(stage, index) {
@@ -175,38 +153,33 @@ angular.module("canvasApp").factory('moveStageRect', [
               this.currentDrop = stage;
               this.currentHit = index;
 
-              if(this.findInAndOut("left") === "OUT") {
+              if(this.direction === "left") {
                 stage.moveToSide("right", this.verticalLine, this.spaceArray);
 
-                // here is the problem, when we move to right side and bring back to its first position UI breaks.
-                // so make sure to update currentHit to right value in this scenario.
                 if(stage.previousStage) {
-                  console.log("Check point 1");
                   this.currentDrop = stage.previousStage;
                   this.currentHit = this.draggedStage.index - 1;
                 } else {
-                  console.log("Check point 2");
                   this.currentDrop = null;
                   this.currentHit = 0;
                 }
               }
               return true;
-            }
-
-            if(this.beacon.intersectsWithObject(stage.stageHitPointRight) && this.draggedStage.index !== index) {
+            } else if(this.beacon.intersectsWithObject(stage.stageHitPointRight) && this.draggedStage.index !== index) {
 
               this.currentDrop = stage;
               this.currentHit = index;
 
-              if(this.findInAndOut("right") === "OUT") {
+              if(this.direction === "right") {
                 stage.moveToSide("left", this.verticalLine, this.spaceArray);
               }
               return true;
             }
 
             return false;
+            // END OF SOME METHOD.
           }, this);
-          //console.log(this.beacon.left);
+
           if(this.beacon.left > this.spaceArray[0] && this.beacon.left < this.spaceArray[1]) {
             if(this.verticalLine.getVisible() === false) {
               this.verticalLine.setVisible(true);
@@ -214,29 +187,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           } else if(this.verticalLine.getVisible() === true) {
             this.verticalLine.setVisible(false);
           }
-
           // Now work with scrolling as we move ..!
-        };
-
-        this.indicator.findInAndOut = function(hitPointPosition) {
-
-          if(hitPointPosition === "left") {
-            if(this.direction === "right") {
-              this.going = "IN";
-            } else if(this.direction === "left" ) {
-              this.going = "OUT";
-              return this.going;
-            }
-          } else if(hitPointPosition === "right") {
-            if(this.direction === "left") {
-              this.going = "IN";
-            }
-            if(this.direction === "right") {
-              this.going = "OUT";
-              return this.going;
-            }
-          }
-
         };
 
         // Now improve the code to handle simple click on stage move, Now we dont handle this event.
@@ -282,7 +233,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         // Need to correct movement, so that the moved stage fits in at right place ,
         // right now, it works for moving right.
         this.indicator.applyMovement = function(stage_, C, circleManager, callBack) {
-
+          console.log("Entering apply movement");
           /*Sometimes user moves left first and then move right,
             leave the move stage over a stage and which has empty space in the left.
             We move to side and move if it is valid so that when we re render there is no spacing. */
@@ -317,7 +268,9 @@ angular.module("canvasApp").factory('moveStageRect', [
           C.correctNumbering();
           stageView.moveAllStepsAndStages();
           circleManager.init(C);
+          console.log("starting circle");
           circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
+          console.log("Ending circle");
           stageGraphics.stageHeader.call(stageView);
           C.$scope.applyValues(stageView.childSteps[0].circle);
           stageView.childSteps[0].circle.manageClick(true);

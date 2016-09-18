@@ -66,15 +66,6 @@ angular.module("canvasApp").factory('stage', [
         // Move stage to left ...!!
       };
 
-      this.addHitBlock = function() {
-
-        //this.parent.hitBlock.setLeft(this.left + this.myWidth + 48).setCoords();
-        //this.parent.hitBlock.setVisible(true);
-
-        // Now we need to add some space after every stage so that, we can leave steps there create a new stage.
-        // The problem right now we have is , we create space between step which is being moved and very next stage.
-      };
-
       this.collapseStage = function() {
         // Remove all content in the stage first
         this.childSteps.forEach(function(step, index) {
@@ -85,18 +76,11 @@ angular.module("canvasApp").factory('stage', [
         // Bring other stages closer
         if(this.nextStage) {
           var width = this.myWidth;
-          this.myWidth = 134; // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
+          // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
+          this.myWidth = 134;
           this.moveAllStepsAndStages(true);
-
-          var anchorCircle = this.nextStage.childSteps[0].circle;
-          while(anchorCircle) {
-            anchorCircle.moveCircleWithStep();
-            anchorCircle = anchorCircle.next;
-          }
-
           this.myWidth = width;
         }
-        this.canvas.renderAll();
       };
 
       this.expand = function() {
@@ -225,14 +209,16 @@ angular.module("canvasApp").factory('stage', [
         stage.nextStage.stageHitPointLeft.set({left: stage.nextStage.left + 10}).setCoords();
         stage.nextStage.stageHitPointRight.set({left: (stage.nextStage.left + stage.nextStage.myWidth) -  20}).setCoords();
 
-        var thisStageSteps = stage.nextStage.childSteps, stepCount = thisStageSteps.length;
-        for(var i = 0; i < stepCount; i++ ) {
-          if(del === true) {
-            thisStageSteps[i].moveStep(-1, true);
+        stage.nextStage.childSteps.forEach(function(childStep, index) {
+
+          if (del === true) {
+            childStep.moveStep(-1, true);
           } else {
-            thisStageSteps[i].moveStep(1, true);
+            childStep.moveStep(1, true);
           }
-        }
+          childStep.circle.moveCircleWithStep();
+        });
+
       };
 
       //This method is used when move stage hits at the hitPoint at the side of the stage.
@@ -241,9 +227,7 @@ angular.module("canvasApp").factory('stage', [
         if(this.validMove(direction)) {
 
           var moveCount = (direction === "left") ? -140 : 140;
-          if(verticalLine) {
-            verticalLine.setVisible(true);
-          }
+
           this.stageGroup.set({left: this.left + moveCount }).setCoords();
 
           if(spaceArray) {
@@ -260,17 +244,17 @@ angular.module("canvasApp").factory('stage', [
               }
             }
           }
-          console.log(spaceArray);
+
           this.dots.set({left: (this.left + moveCount ) + 3}).setCoords();
           this.stageHitPointLeft.set({left: (this.left + moveCount ) + 10}).setCoords();
           this.stageHitPointRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
-          this.left = this.left + moveCount ;
-          var thisStageSteps = this.childSteps, stepCount = thisStageSteps.length;
+          this.left = this.left + moveCount;
 
-          for(var i = 0; i < stepCount; i++ ) {
-            thisStageSteps[i].moveStep(1, true);
-            thisStageSteps[i].circle.moveCircleWithStep();
-          }
+          this.childSteps.forEach(function(step, index) {
+            step.moveStep(1, true);
+            step.circle.moveCircleWithStep();
+          });
+
           this.stageMovedDirection = direction; // !important
         }
       };

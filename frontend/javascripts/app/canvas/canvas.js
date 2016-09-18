@@ -182,6 +182,7 @@ angular.module("canvasApp").factory('canvas', [
     };
 
     this.editStageMode = function(status) {
+
       var add = (status) ? 25 : -25;
 
       if(status === true) {
@@ -193,38 +194,42 @@ angular.module("canvasApp").factory('canvas', [
         previouslySelected.circle.parent.parentStage.changeFillsAndStrokes("white", 2);
         this.editStageStatus = status; // This order editStageStatus is changed is important, because changeFillsAndStrokes()
       }
-      //console.log(this.allStageViews); // break the code later, into smaller functions, so that better integrate one stage one step scenario.
+
       // Rewrite part for one stage one step Scenario.
-      var stageCount = this.allStageViews.length;
-      var stepCount = this.allStepViews.length;
 
       this.allStageViews.forEach(function(stage, index) {
-        //if(stageCount > 1) {
-          stage.dots.setVisible(status);
-          stage.stageNameGroup.left = stage.stageNameGroup.left + add;
-          if( status === true && stage.childSteps.length === 1) {
-            stage.shortenStageName();
-          } else if (status === false) {
-            stageGraphics.stageHeader.call(stage);
-          }
-        //}
-
-        stage.childSteps.forEach(function(step, index) {
-          //if(stepCount > 1) {
-            step.closeImage.setOpacity(status);
-            step.dots.setVisible(status);
-          //}
-
-          if(step.parentStage.model.auto_delta) {
-            if(step.index === 0) {
-              step.deltaSymbol.setVisible(!status);
-            }
-            step.deltaGroup.setVisible(!status);
-          }
-
-        });
+        this.editStageModeStage(stage, add, status);
       }, this);
       this.canvas.renderAll();
+    };
+
+    this.editStageModeStage = function(stage, add, status) {
+
+      stage.dots.setVisible(status);
+      this.canvas.bringToFront(stage.dots);
+      stage.stageNameGroup.setLeft(stage.stageNameGroup.left + add);
+      if( status === true && stage.childSteps.length === 1 ) {
+        stage.shortenStageName();
+      } else if ( status === false ) {
+        stageGraphics.stageHeader.call(stage);
+      }
+
+      stage.childSteps.forEach(function(step, index) {
+        this.editStageModeStep(step, status);
+      }, this);
+    };
+
+    this.editStageModeStep = function(step, status) {
+      step.closeImage.setOpacity(status);
+      step.dots.setVisible(status).setCoords();
+
+
+      if( step.parentStage.model.auto_delta ) {
+        if( step.index === 0 ) {
+          step.deltaSymbol.setVisible(!status);
+        }
+        step.deltaGroup.setVisible(!status);
+      }
     };
 
     this.makeSpaceForNewStage = function(data, currentStage, add) {
