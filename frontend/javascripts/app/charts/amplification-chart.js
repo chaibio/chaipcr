@@ -444,9 +444,9 @@
       return transform_x;
     }
 
-    this.scroll = function scroll(scroll) { // scroll = {0..1}
+    this.scroll = function scroll(s) { // s = {0..1}
       var transform = this.getTransform();
-      var transform_x = this._getTransformXFromScroll(scroll);
+      var transform_x = this._getTransformXFromScroll(s);
       var new_transform = d3.zoomIdentity.translate(transform_x, transform.y).scale(transform.k);
       Globals.chartSVG.call(Globals.zooomBehavior.transform, new_transform);
     };
