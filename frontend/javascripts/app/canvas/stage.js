@@ -227,9 +227,7 @@ angular.module("canvasApp").factory('stage', [
         if(this.validMove(direction)) {
 
           var moveCount = (direction === "left") ? -140 : 140;
-          if(verticalLine) {
-            verticalLine.setVisible(true);
-          }
+
           this.stageGroup.set({left: this.left + moveCount }).setCoords();
 
           if(spaceArray) {
@@ -246,17 +244,17 @@ angular.module("canvasApp").factory('stage', [
               }
             }
           }
-          console.log(spaceArray);
+
           this.dots.set({left: (this.left + moveCount ) + 3}).setCoords();
           this.stageHitPointLeft.set({left: (this.left + moveCount ) + 10}).setCoords();
           this.stageHitPointRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
-          this.left = this.left + moveCount ;
-          var thisStageSteps = this.childSteps, stepCount = thisStageSteps.length;
+          this.left = this.left + moveCount;
 
-          for(var i = 0; i < stepCount; i++ ) {
-            thisStageSteps[i].moveStep(1, true);
-            thisStageSteps[i].circle.moveCircleWithStep();
-          }
+          this.childSteps.forEach(function(step, index) {
+            step.moveStep(1, true);
+            step.circle.moveCircleWithStep();
+          });
+
           this.stageMovedDirection = direction; // !important
         }
       };

@@ -153,7 +153,7 @@ angular.module("canvasApp").factory('moveStageRect', [
               this.currentDrop = stage;
               this.currentHit = index;
 
-              if(this.findInAndOut("left") === "OUT") {
+              if(this.direction === "left") {
                 stage.moveToSide("right", this.verticalLine, this.spaceArray);
 
                 if(stage.previousStage) {
@@ -170,12 +170,12 @@ angular.module("canvasApp").factory('moveStageRect', [
               this.currentDrop = stage;
               this.currentHit = index;
 
-              if(this.findInAndOut("right") === "OUT") {
+              if(this.direction === "right") {
                 stage.moveToSide("left", this.verticalLine, this.spaceArray);
               }
               return true;
             }
-            
+
             return false;
             // END OF SOME METHOD.
           }, this);
@@ -187,29 +187,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           } else if(this.verticalLine.getVisible() === true) {
             this.verticalLine.setVisible(false);
           }
-
           // Now work with scrolling as we move ..!
-        };
-
-        this.indicator.findInAndOut = function(hitPointPosition) {
-
-          if(hitPointPosition === "left") {
-            if(this.direction === "right") {
-              this.going = "IN";
-            } else if(this.direction === "left" ) {
-              this.going = "OUT";
-              return this.going;
-            }
-          } else if(hitPointPosition === "right") {
-            if(this.direction === "left") {
-              this.going = "IN";
-            }
-            if(this.direction === "right") {
-              this.going = "OUT";
-              return this.going;
-            }
-          }
-
         };
 
         // Now improve the code to handle simple click on stage move, Now we dont handle this event.
