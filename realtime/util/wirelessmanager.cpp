@@ -37,6 +37,8 @@
 #include <net/if.h>
 #include <sys/eventfd.h>
 
+#define CONNECTION_TIMEOUT_INTERVAL 10
+
 WirelessManager::WirelessManager()
 {
     _connectionEventFd = eventfd(0, EFD_NONBLOCK);
@@ -171,7 +173,7 @@ void WirelessManager::_connect()
 
         ifup();
 
-        _connectionTimeout = std::time(nullptr) + NetworkInterfaces::dhcpTimeout();
+        _connectionTimeout = std::time(nullptr) + NetworkInterfaces::dhcpTimeout() + CONNECTION_TIMEOUT_INTERVAL;
         _connectionThreadState = Idle;
     }
     catch (const std::exception &ex)
