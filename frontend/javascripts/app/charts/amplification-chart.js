@@ -20,6 +20,7 @@
         config: null,
         chartSVG: null,
         viewSVG: null,
+        box: null,
         gX: null,
         gY: null,
         xAxis: null,
@@ -90,6 +91,8 @@
           .attr('fill', activePathConfig.color);
       }
 
+      makeBox(activePathConfig, activePathIndex);
+
     }
 
     function unsetActivePath() {
@@ -99,6 +102,67 @@
       hideCircle();
       Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth);
       Globals.activePath = null;
+      Globals.box.attr('opacity', 0);
+    }
+
+    function makeBox(line_config, line_index) {
+
+      if (Globals.box) {
+        Globals.box.remove();
+      }
+
+      var headerHeight = 25;
+      var headerTextSize = 15;
+      var boxWidth = 150;
+      var bodyHeight = 100;
+      var boxMargin = {
+        top: 10,
+        left: 10
+      }
+
+      Globals.box = Globals.chartSVG.append('g')
+        .attr('stroke', '#333')
+        .attr('stroke-width', 0.2)
+        .attr('transform', 'translate(' + (boxMargin.left + Globals.config.margin.left) + ',' + (boxMargin.top + Globals.config.margin.top) + ')')
+        .attr('fill', '#fff')
+        .attr('width', boxWidth)
+        .attr('height', headerHeight + bodyHeight);
+
+      var boxHeader = Globals.box.append('rect')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('fill', line_config.color)
+        .attr('width', boxWidth)
+        .attr('height', headerHeight);
+
+      var headerText = Globals.box.append('text')
+        .attr('x', function() {
+          return boxWidth / 2;
+        })
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .attr("font-size", headerTextSize + 'px')
+        .attr("fill", "#fff")
+        .attr("stroke-width", 0)
+        .text(function() {
+          var wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', ];
+          return wells[line_index] + ', ' + (line_config.dataset === 'channel_1' ? 'Ch1' : 'Ch2');
+        })
+        .attr('font-weight', 700)
+        .attr('class', 'header-text');
+
+      headerText.attr('y', function() {
+        var textDims = headerText.node().getBBox();
+        return headerHeight/2 + (headerHeight-textDims.height)/2;
+      })
+
+      var boxBody = Globals.box.append('rect')
+        .attr('x', 0)
+        .attr('y', headerHeight)
+        .attr('fill', '#fff')
+        .attr('width', boxWidth)
+        .attr('height', bodyHeight);
+
     }
 
     function makeLine(line_config) {
