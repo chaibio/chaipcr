@@ -166,7 +166,7 @@
       var headerHeight = 25;
       var headerTextSize = 15;
       var valuesTextSize = 12;
-      var boxWidth = 150;
+      var boxWidth = 130;
       var bodyHeight = 70;
       var boxMargin = {
         top: 0,
