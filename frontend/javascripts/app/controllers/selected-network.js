@@ -48,7 +48,7 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
         $scope.currentNetwork = NetworkSettingsService.connectedWifiNetwork;
         $scope.editEthernetData = $scope.currentNetwork.state;
         $scope.connectedSsid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"] || NetworkSettingsService.connectedWifiNetwork.settings.wireless_essid;
-
+        $scope.connectedSsid.replace(new RegExp('"', "g"), "");
           if($state.params.name.replace(new RegExp('_', "g"), " ") === $scope.connectedSsid) {
             $scope.IamConnected = true;
           }
@@ -69,6 +69,8 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
             $scope.IamConnected = true;
             // We assign this so that, It shows data when we select
             //a wifi network which is already being connected.
+          } else if (wifiConnection.state.status === "connecting") {
+            $scope.buttonValue = "CONNECTING";
           }
         }
       }
@@ -116,6 +118,14 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     $scope.init = function() {
 
       if($scope.selectedWifiNow) { // if our selection is a wifi network.
+
+        if (NetworkSettingsService.connectedWifiNetwork && NetworkSettingsService.connectedWifiNetwork.state.status === "connecting") {
+          $scope.connectedSsid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"] || NetworkSettingsService.connectedWifiNetwork.settings.wireless_essid;
+          $scope.connectedSsid.replace(new RegExp('"', "g"), "");
+            if ($state.params.name.replace(new RegExp('_', "g"), " ") === $scope.connectedSsid) {
+              $scope.buttonValue = "CONNECTING";
+            }
+        }
 
         if($scope.selectedWifiNow.encryption === 'wpa2') {
           $scope.wifiNetworkType = 'wpa2';
