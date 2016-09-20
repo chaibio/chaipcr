@@ -136,9 +136,9 @@ class ExperimentsController < ApplicationController
   end
 
   api :GET, "/experiments/:id/amplification_data?raw=false&background=true&baseline=true&cq=true&step_id[]=43&step_id[]=44", "Retrieve amplification data"
-  example "{'partial':false, 'total_cycles':40,
+  example "{'partial':false, 'total_cycles':40, 'steps':['step_id':2,
             'amplification_data':[['channel', 'well_num', 'cycle_num', 'background_subtracted_value', 'baseline_subtracted_value', 'fluorescence_value'], [1, 1, 1, 25488, -2003, 86], [1, 1, 2, 53984, -409, 85]],
-            'cq':[['channel', 'well_num', 'cq'], [1, 1, 12.11], [1, 2, 15.77], [1, 3, null]]}"
+            'cq':[['channel', 'well_num', 'cq'], [1, 1, 12.11], [1, 2, 15.77], [1, 3, null]]]}"
   def amplification_data
     params[:raw] = params[:raw].to_bool if !params[:raw].nil?
     params[:background] = params[:background].to_bool if !params[:background].nil?
@@ -257,7 +257,6 @@ class ExperimentsController < ApplicationController
         attributes << "fluorescence_value" if params[:raw] == true
         @amplification_data_group = group_by_keynames(@amplification_data, attributes, (params[:cq] == true)? @cts : nil)
 
-    
         respond_to do |format|
           format.json { render "amplification_data", :status => :ok}
         end
@@ -269,47 +268,146 @@ class ExperimentsController < ApplicationController
     end
   end
   
-  api :GET, "/experiments/:id/melt_curve_data", "Retrieve melt curve data"
-  example "{'melt_curve_data':[{'well_num':0, 'temperature':[0,1,2,3,4,5], 'fluorescence_data':[0,1,2,3,4,5], 'derivative':[0,1,2,3,4,5], 'tm':[1,2,3], 'area':[2,4,5]},
-                               {'well_num':1, 'temperature':[0,1,2,3,4,5], 'fluorescence_data':[0,1,2,3,4,5], 'derivative':[0,1,2,3,4,5], 'tm':[1,2,3], 'area':[2,4,5]}]}"
+  api :GET, "/experiments/:id/melt_curve_data?raw=false&normalized=true&derivative=true&tm=true&ramp_id[]=43&ramp_id[]=44", "Retrieve melt curve data"
+  example "{'partial':false, 'ramps':['ramp_id':22,
+            'melt_curve_data':[{'well_num':1, 'temperature':[0,1,2,3,4,5], 'normalized_data':[0,1,2,3,4,5], 'derivative_data':[0,1,2,3,4,5], 'tm':[1,2,3], 'area':[2,4,5]},
+                               {'well_num':2, 'temperature':[0,1,2,3,4,5], 'normalized_data':[0,1,2,3,4,5], 'derivative_data':[0,1,2,3,4,5], 'tm':[1,2,3], 'area':[2,4,5]}]]}"
   def melt_curve_data
+    params[:raw] = params[:raw].to_bool if !params[:raw].nil?
+    params[:normalized] = params[:normalized].to_bool if !params[:normalized].nil?
+    params[:derivative] = params[:derivative].to_bool if !params[:derivative].nil?
+    params[:tm] = params[:tm].to_bool if !params[:tm].nil?
+    
+    if params[:ramp_id].nil?
+      #first step that collects data will be returned, if none of the steps can be found, first ramp that collect data will be returned
+      params[:raw] = false if params[:raw].nil?
+      params[:normalized] = true if params[:normalized].nil?
+      params[:derivative] = true if params[:derivative].nil?
+      params[:tm] = true if params[:tm].nil?
+    else #if ramp_id is specified, only raw data is returned
+      params[:raw] = true
+      params[:normalized] = false
+      params[:derivative] = false
+      params[:tm] = false
+    end
+    
     if @experiment
       if @experiment.ran?
         @first_stage_meltcurve_data = Stage.melt_curve(@experiment.experiment_definition_id).first
         if !@first_stage_meltcurve_data.blank?
-          begin
-            task_submitted = background_calculate_melt_curve_data(@experiment, @first_stage_meltcurve_data.id)
-          rescue => e
-            render :json=>{:errors=>e.to_s}, :status => 500
-            return
-          end
+          @partial = @experiment.running?
+          analyze_required = params[:normalized] == true || params[:derivative] == true || params[:tm] == true
+          if analyze_required
+            begin
+              task_submitted = background_calculate_melt_curve_data(@experiment, @first_stage_meltcurve_data.id)
+            rescue => e
+              render :json=>{:errors=>e.to_s}, :status => 500
+              return
+            end
+            
+            if @partial == false
+              @partial = MeltCurveDatum.new_data_generated?(@experiment, @first_stage_meltcurve_data.id) != nil
+            end
           
-          @partial = @experiment.running? || MeltCurveDatum.new_data_generated?(@experiment, @first_stage_meltcurve_data.id) != nil
-          if !@experiment.cached_temperature.nil? && !stale?(etag: generate_etag(@partial, @experiment.cached_temperature))
-            #render 304 Not Modified
-            return
-          end
+            if !@experiment.cached_temperature.nil? && !stale?(etag: generate_etag(@partial, @experiment.cached_temperature))
+              #render 304 Not Modified
+              return
+            end
 
-          @melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment.id, @first_stage_meltcurve_data.id)
+            @melt_curve_data = CachedMeltCurveDatum.retrieve(@experiment.id, @first_stage_meltcurve_data.id)
 
-          if @melt_curve_data.blank? && !task_submitted.nil?
-            #no data but background task is submitted
-            render :nothing => true, :status => (task_submitted)? 202 : 503
-            return
-          elsif !@experiment.cached_temperature.nil?
-            #set etag
-            fresh_when(:etag => generate_etag(@partial, @experiment.cached_temperature))
+            if @melt_curve_data.blank? && !task_submitted.nil?
+              #no data but background task is submitted
+              render :nothing => true, :status => (task_submitted)? 202 : 503
+              return
+            elsif !@experiment.cached_temperature.nil?
+              #set etag
+              fresh_when(:etag => generate_etag(@partial, @experiment.cached_temperature))
+            end
           end
-        else
-          @melt_curve_data = []
-          @partial = false
+ 
+          if params[:raw] == true
+            if !analyze_required && !stale?(etag: generate_etag(@partial, MeltCurveDatum.maxid(@experiment.id, @first_stage_meltcurve_data.id)))
+              #render 304 Not Modified
+              return
+            end
+            
+            #construct OR clause
+            conditions = String.new
+            wheres = Array.new
+            keyvalue = params[:ramp_id]
+            if keyvalue
+              conditions << " OR " unless conditions.length == 0
+              conditions << "ramp_id IN (?)"
+              if keyvalue.is_a? Array
+                wheres << keyvalue
+              else
+                wheres << keyvalue.to_i
+              end
+            end
+            wheres.insert(0, conditions) if !conditions.blank?
+            #logger.info ("**********#{wheres.join(",")}")
+            
+            #query to database
+            if !wheres.blank?
+              raw_data = MeltCurveDatum.for_experiment(@experiment.id).where(wheres).group_by_well.all
+            else
+              raw_data = MeltCurveDatum.for_stage(@first_stage_meltcurve_data.id).for_experiment(@experiment.id).group_by_well.all
+            end
+            
+            if !analyze_required && !raw_data.blank?
+              #set etag
+              max_id = raw_data.max_by(&:id).id
+              #logger.info("**************max_id=#{max_id}")
+              fresh_when(:etag => generate_etag(@partial, max_id))
+            end
+          end
+        end
+        
+        if !@melt_curve_data.blank? 
+          if !raw_data.blank?
+            #melt_curve_data only have one ramp
+            ramp_id = @melt_curve_data[0].ramp_id
+            fluorescence_offset = 0
+            while fluorescence_offset < raw_data.count && raw_data[fluorescence_offset].ramp_id != ramp_id do
+              fluorescence_offset += 1
+            end
+            @melt_curve_data.each_index do |i|
+              @melt_curve_data[i].fluorescence_data = raw_data[fluorescence_offset+i].fluorescence_data
+            end
+          end
+        elsif !raw_data.blank?
+          @melt_curve_data = raw_data
+        end
+        
+        if !@melt_curve_data.blank?
+          @melt_curve_data_group = []
+          melt_curve_data_hash = @melt_curve_data.group_by { |obj| obj.ramp_id }
+          melt_curve_data_hash.each do |ramp_id, data_array|
+            data_array.each do |data|
+              if params[:raw] == false && data.respond_to?(:fluorescence_data)
+                data.instance_eval 'undef :fluorescence_data'
+              end
+              if params[:normalized] == false && data.respond_to?(:normalized_data)
+                data.instance_eval 'undef :normalized_data'
+              end
+              if params[:derivative] == false && data.respond_to?(:derivative_data)
+                data.instance_eval 'undef :derivative_data'
+              end
+              if params[:tm] == false && data.respond_to?(:tm)
+                data.instance_eval 'undef :tm'
+                data.instance_eval 'undef :area'
+              end
+            end
+            @melt_curve_data_group << OpenStruct.new(:ramp_id=>ramp_id, :melt_curve_data=>data_array)
+          end
+        end
+        
+        respond_to do |format|
+          format.json { render "melt_curve_data", :status => :ok}
         end
       else
-        @melt_curve_data = []
-        @partial = false
-      end
-      respond_to do |format|
-        format.json { render "melt_curve_data", :status => :ok}
+        render :json=>{:errors=>"experiment has not run yet"}, :status => 500
       end
     else
       render :json=>{:errors=>"experiment not found"}, :status => :not_found
@@ -409,11 +507,11 @@ class ExperimentsController < ApplicationController
 
         if melt_curve_data
           out.put_next_entry("qpcr_experiment_#{(@experiment)? @experiment.name : "null"}/melt_curve_data.csv")
-          columns = ["channel", "well_num", "temperature", "fluorescence_data", "derivative"]
+          columns = ["channel", "well_num", "temperature", "normalized_data", "derivative_data"]
           out.write columns.to_csv
           melt_curve_data.each do |data|
             data.temperature.each_index do |index|
-              out.write "#{data.channel}, #{data.well_num}, #{data.temperature[index]}, #{data.fluorescence_data[index]}, #{data.derivative[index]}\r\n"
+              out.write "#{data.channel}, #{data.well_num}, #{data.temperature[index]}, #{data.normalized_data[index]}, #{data.derivative_data[index]}\r\n"
             end
           end
 
@@ -556,7 +654,7 @@ class ExperimentsController < ApplicationController
     return background("meltcurve", experiment.id) do
       melt_curve_data = calculate_melt_curve_data(experiment.id, stage_id, experiment.calibration_id)
       #update cache
-      CachedMeltCurveDatum.import melt_curve_data, :on_duplicate_key_update => [:temperature_text, :fluorescence_data_text, :derivative_text, :tm_text, :area_text]
+      CachedMeltCurveDatum.import melt_curve_data, :on_duplicate_key_update => [:temperature_text, :normalized_data_text, :derivative_data_text, :tm_text, :area_text]
       #update cached_temperature
       if melt_curve_data.last
         cached_temperature = (experiment.running?)? melt_curve_data.last.temperature.last : new_data.temperature
@@ -586,13 +684,14 @@ class ExperimentsController < ApplicationController
     logger.info("R code time #{Time.now-start_time}")
     start_time = Time.now
     results = results.to_ruby
+    ramp = Ramp.collect_data(stage_id).first
     melt_curve_data = []
     if !results.blank?
       raise results["message"] if !results["message"].blank? #catched error
       (0...results.length).each do |channel|
         results[channel].each_index do |i|
           results_per_well = results[channel][i]
-          hash = CachedMeltCurveDatum.new({:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>channel+1, :well_num=>i+1, :temperature=>results_per_well[0][0], :fluorescence_data=>results_per_well[0][1], :derivative=>results_per_well[0][2], :tm=>(results_per_well[1][0].blank?)? [] : (results_per_well[1][0].is_a? Array)? results_per_well[1][0] : [results_per_well[1][0]], :area=>(results_per_well[1][1].blank?)? [] : (results_per_well[1][1].is_a? Array)? results_per_well[1][1] : [results_per_well[1][1]]})
+          hash = CachedMeltCurveDatum.new({:experiment_id=>experiment_id, :stage_id=>stage_id, :ramp_id=>(ramp)? ramp.id : nil, :channel=>channel+1, :well_num=>i+1, :temperature=>results_per_well[0][0], :normalized_data=>results_per_well[0][1], :derivative_data=>results_per_well[0][2], :tm=>(results_per_well[1][0].blank?)? [] : (results_per_well[1][0].is_a? Array)? results_per_well[1][0] : [results_per_well[1][0]], :area=>(results_per_well[1][1].blank?)? [] : (results_per_well[1][1].is_a? Array)? results_per_well[1][1] : [results_per_well[1][1]]})
           melt_curve_data << hash
         end
       end

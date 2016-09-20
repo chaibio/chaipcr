@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160901071514) do
+ActiveRecord::Schema.define(version: 20160920092651) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -48,10 +48,10 @@ ActiveRecord::Schema.define(version: 20160901071514) do
     t.integer "experiment_id"
     t.integer "stage_id"
     t.integer "channel"
-    t.integer "well_num",                                comment: "1-16"
-    t.text    "temperature_text",       limit: 16777215
-    t.text    "fluorescence_data_text", limit: 16777215
-    t.text    "derivative_text",        limit: 16777215
+    t.integer "well_num",                              comment: "1-16"
+    t.text    "temperature_text",     limit: 16777215
+    t.text    "normalized_data_text", limit: 16777215
+    t.text    "derivative_data_text", limit: 16777215
     t.text    "tm_text"
     t.text    "area_text"
     t.integer "ramp_id"

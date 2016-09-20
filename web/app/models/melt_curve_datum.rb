@@ -19,8 +19,12 @@
 class MeltCurveDatum < ActiveRecord::Base
   belongs_to :experiment
 
+  scope :for_experiment, lambda {|experiment_id| where(["experiment_id=?", experiment_id])}
+  scope :for_stage, lambda {|stage_id| where(["stage_id=?", stage_id])}
+  scope :group_by_well, -> { select("experiment_id,ramp_id,channel,well_num,MAX(id) AS id,GROUP_CONCAT(temperature SEPARATOR ',') AS temperature,GROUP_CONCAT(fluorescence_value SEPARATOR ',') AS fluorescence_data").group("well_num").order("ramp_id, channel, well_num") }
+  
   def self.new_data_generated?(experiment, stage_id)
-    lastrow = where(["experiment_id=? AND stage_id=?", experiment.id, stage_id]).order("id DESC").select("temperature").first
+    lastrow = self.for_experiment(experiment.id).for_stage(stage_id).order("id DESC").select("temperature").first
     if lastrow
       if experiment.cached_temperature == nil
         return lastrow
@@ -34,5 +38,9 @@ class MeltCurveDatum < ActiveRecord::Base
     else
       return nil
     end 
+  end
+  
+  def self.maxid(experiment_id, stage_id)
+    self.for_experiment(experiment_id).for_stage(stage_id).maximum(:id)
   end
 end
