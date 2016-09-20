@@ -518,7 +518,8 @@
       Globals.gY = svg.append("g")
         .attr("class", "axis y-axis")
         .attr('fill', 'none')
-        .call(Globals.yAxis);
+        .call(Globals.yAxis)
+        .on('mouseenter', hideMouseIndicators);
     }
 
     function setXAxis() {
