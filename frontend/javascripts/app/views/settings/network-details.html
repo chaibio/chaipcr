@@ -58,6 +58,7 @@
   <div class="set-mode" ng-if="IamConnected && name=='ethernet'">
     <div class="set-mode-toggle"><mode-toggle data="$parent.autoSetting"></mode-toggle></div><span>SET AUTOMATICALLY</span>
   </div>
+
   <form ng-if="IamConnected" name="connectedWifiDetails" nonvalidate ng-submit="connectEthernet()">
     <div class="settings-text-container">
       <span>CURRENT SETTINGS</span> <span ng-show="autoSetting=='auto'" class="locked">LOCKED</span>
