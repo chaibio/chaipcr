@@ -376,21 +376,6 @@ class ExperimentsController < ApplicationController
               @melt_curve_data[i].fluorescence_data = raw_data[fluorescence_offset+i].fluorescence_data
             end
           end
-          @melt_curve_data.each do |data|
-            if params[:raw] == false
-              data.instance_eval 'undef :fluorescence_data'
-            end
-            if params[:normalized] == false
-              data.instance_eval 'undef :normalized_data'
-            end
-            if params[:derivative] == false
-              data.instance_eval 'undef :derivative_data'
-            end
-            if params[:tm] == false
-              data.instance_eval 'undef :tm'
-              data.instance_eval 'undef :area'
-            end
-          end
         elsif !raw_data.blank?
           @melt_curve_data = raw_data
         end
@@ -398,8 +383,23 @@ class ExperimentsController < ApplicationController
         if !@melt_curve_data.blank?
           @melt_curve_data_group = []
           melt_curve_data_hash = @melt_curve_data.group_by { |obj| obj.ramp_id }
-          melt_curve_data_hash.each do |x, y|
-            @melt_curve_data_group << OpenStruct.new(:ramp_id=>x, :melt_curve_data=>y)
+          melt_curve_data_hash.each do |ramp_id, data_array|
+            data_array.each do |data|
+              if params[:raw] == false && data.respond_to?(:fluorescence_data)
+                data.instance_eval 'undef :fluorescence_data'
+              end
+              if params[:normalized] == false && data.respond_to?(:normalized_data)
+                data.instance_eval 'undef :normalized_data'
+              end
+              if params[:derivative] == false && data.respond_to?(:derivative_data)
+                data.instance_eval 'undef :derivative_data'
+              end
+              if params[:tm] == false && data.respond_to?(:tm)
+                data.instance_eval 'undef :tm'
+                data.instance_eval 'undef :area'
+              end
+            end
+            @melt_curve_data_group << OpenStruct.new(:ramp_id=>ramp_id, :melt_curve_data=>data_array)
           end
         end
         
