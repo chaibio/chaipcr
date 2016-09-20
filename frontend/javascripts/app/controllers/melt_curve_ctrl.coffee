@@ -23,7 +23,8 @@ App.controller 'MeltCurveChartCtrl', [
   'MeltCurveService'
   '$timeout'
   '$interval'
-  ($scope, Experiment, $stateParams, MeltCurveService, $timeout, $interval) ->
+  '$rootScope'
+  ($scope, Experiment, $stateParams, MeltCurveService, $timeout, $interval, $rootScope) ->
 
     $scope.curve_type = 'derivative'
     $scope.color_by = 'well'
@@ -37,6 +38,17 @@ App.controller 'MeltCurveChartCtrl', [
     $scope.retrying = false
     $scope.retry = 0
     $scope.fetching = false
+
+    $scope.$on 'status:data:updated', (e, data, oldData) ->
+      return if !data
+      return if !data.experiment_controller
+      $scope.statusData = data
+      $scope.state = data.experiment_controller.machine.state
+      $scope.thermal_state = data.experiment_controller.machine.thermal_state
+      $scope.oldState = oldData?.experiment_controller?.machine?.state || 'NONE'
+      $scope.isCurrentExp = parseInt(data.experiment_controller.experiment?.id) is parseInt($stateParams.id)
+      if $scope.isCurrentExp is true
+        $scope.enterState = $scope.isCurrentExp
 
 
     retry = ->
@@ -62,9 +74,11 @@ App.controller 'MeltCurveChartCtrl', [
         # $timeout ->
         Experiment.getMeltCurveData($stateParams.id)
         .then (resp) ->
-          if resp.data?.partial
+          if (resp.data?.partial and $scope.enterState) or (!resp.data.partial)
             $scope.has_data = true
-          if cb and resp.data?.melt_curve_data
+          if !resp.data.partial
+            $rootScope.$broadcast 'complete'
+          if (cb and resp.data.ramps?[0].melt_curve_data and $scope.enterState) or (cb and resp.data.ramps?[0].melt_curve_data and !resp.data.partial )
             cb(resp.data)
           else
             $scope.fetching = false
@@ -97,7 +111,7 @@ App.controller 'MeltCurveChartCtrl', [
     #   OPTIMIZED_DATA = MeltCurveService.optimizeForEachResolution(PARSED_DATA, $scope.resolutionOptions)
 
     updateButtonTms = (data) ->
-      for well_data, well_i in data.melt_curve_data by 1
+      for well_data, well_i in data.ramps[0].melt_curve_data by 1
         $scope.wellButtons["well_#{well_i}"].ct = [MeltCurveService.averagedTm(well_data.tm)]
 
 
@@ -137,7 +151,7 @@ App.controller 'MeltCurveChartCtrl', [
     getMeltCurveDataCallBack = (data) ->
       updateButtonTms(data)
 
-      MeltCurveService.parseData(data.melt_curve_data).then (data) ->
+      MeltCurveService.parseData(data.ramps[0].melt_curve_data).then (data) ->
         $scope.data = data
         console.log data
         y_extrems = MeltCurveService.getYExtrems(data, $scope.curve_type)
