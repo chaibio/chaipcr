@@ -11,6 +11,11 @@
       log: d3.scaleLog,
       linear: d3.scaleLinear
     };
+    var bisectX = function(line_config) {
+      return d3.bisector(function(d) {
+        return d[line_config.x];
+      }).left;
+    };
 
     function initGlobalVars() {
       Globals = {
@@ -27,6 +32,7 @@
         yAxis: null,
         mouseOverlay: null,
         activePath: null,
+        activePathConfig: null,
         lines: null,
         // lineIndexes: null,
         circle: null,
@@ -60,13 +66,8 @@
       }
     }
 
-    function setActivePath(path, mouse) {
-      if (Globals.activePath) {
-        // Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth / Globals.zoomTransform.k);
-        Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth);
-      }
+    function getActivePathConfig(path) {
       var activePathConfig, activePathIndex;
-      // get config and index of active path
       for (var i = Globals.lines.length - 1; i >= 0; i--) {
         var l = Globals.lines[i];
         if (l === path) {
@@ -75,6 +76,20 @@
           break;
         }
       }
+      return {
+        config: activePathConfig,
+        index: activePathIndex,
+      };
+    }
+
+    function setActivePath(path, mouse) {
+      if (Globals.activePath) {
+        // Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth / Globals.zoomTransform.k);
+        Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth);
+      }
+      Globals.activePathConfig = getActivePathConfig(path);
+      var activePathConfig = Globals.activePathConfig.config;
+      var activePathIndex = Globals.activePathConfig.index;
       // var newLine = makeLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth / Globals.zoomTransform.k);
       var newLine = makeLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth);
       Globals.lines[activePathIndex] = newLine;
@@ -91,7 +106,14 @@
           .attr('fill', activePathConfig.color);
       }
 
-      makeBox(activePathConfig, activePathIndex);
+      // if (Globals.box) {
+      //   if (Globals.box.CqText && Globals.activePathConfig.config.cq) {
+      //     Globals.box.CqText.text('Cq: ' + Globals.activePathConfig.config.cq[activePathConfig.channel - 1]);
+      //   }
+      // }
+
+      makeBox(Globals.activePathConfig.config);
+      setBoxRFYAndCycleTexts(mouse[0]);
 
     }
 
@@ -101,41 +123,49 @@
       }
       hideCircle();
       Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth);
+      Globals.activePathConfig = null;
       Globals.activePath = null;
-      Globals.box.attr('opacity', 0);
+      // Globals.box.container.attr('opacity', 0);
+      if (Globals.box) {
+        Globals.box.container.remove();
+      }
     }
 
-    function makeBox(line_config, line_index) {
+    function makeBox(line_config) {
 
       if (Globals.box) {
-        Globals.box.remove();
+        Globals.box.container.remove();
       }
 
       var headerHeight = 25;
       var headerTextSize = 15;
+      var valuesTextSize = 12;
       var boxWidth = 150;
-      var bodyHeight = 100;
+      var bodyHeight = 70;
       var boxMargin = {
         top: 10,
         left: 10
       }
 
-      Globals.box = Globals.chartSVG.append('g')
+      Globals.box = {};
+
+      Globals.box.container = Globals.chartSVG.append('g')
         .attr('stroke', '#333')
         .attr('stroke-width', 0.2)
         .attr('transform', 'translate(' + (boxMargin.left + Globals.config.margin.left) + ',' + (boxMargin.top + Globals.config.margin.top) + ')')
         .attr('fill', '#fff')
         .attr('width', boxWidth)
-        .attr('height', headerHeight + bodyHeight);
+        .attr('height', headerHeight + bodyHeight)
+        .on('mousemove', circleFollowsMouse);
 
-      var boxHeader = Globals.box.append('rect')
-        .attr('x', 0)
-        .attr('y', 0)
+      Globals.box.header = Globals.box.container.append('rect')
+        // .attr('x', 0)
+        // .attr('y', 0)
         .attr('fill', line_config.color)
         .attr('width', boxWidth)
         .attr('height', headerHeight);
 
-      var headerText = Globals.box.append('text')
+      Globals.box.headerText = Globals.box.container.append('text')
         .attr('x', function() {
           return boxWidth / 2;
         })
@@ -145,24 +175,100 @@
         .attr("fill", "#fff")
         .attr("stroke-width", 0)
         .text(function() {
-          var wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', ];
-          return wells[line_index] + ', ' + (line_config.dataset === 'channel_1' ? 'Ch1' : 'Ch2');
+          var wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8'];
+          return wells[line_config.well] + ', ' + (line_config.dataset === 'channel_1' ? 'Ch1' : 'Ch2');
         })
         .attr('font-weight', 700)
         .attr('class', 'header-text');
 
-      headerText.attr('y', function() {
-        var textDims = headerText.node().getBBox();
-        return headerHeight/2 + (headerHeight-textDims.height)/2;
-      })
+      Globals.box.headerText.attr('y', function() {
+        var textDims = Globals.box.headerText.node().getBBox();
+        return headerHeight / 2 + (headerHeight - textDims.height) / 2;
+      });
 
-      var boxBody = Globals.box.append('rect')
-        .attr('x', 0)
+      Globals.box.body = Globals.box.container.append('rect')
         .attr('y', headerHeight)
         .attr('fill', '#fff')
         .attr('width', boxWidth)
         .attr('height', bodyHeight);
 
+      Globals.box.CqText = Globals.box.container.append('text')
+        // .attr("text-anchor", "middle")
+        // .attr("alignment-baseline", "middle")
+        .attr("font-size", headerTextSize + 'px')
+        .attr('fill', "#000")
+        .attr("font-weight", 700)
+        .attr('x', 10)
+        .attr('y', boxMargin.top + headerHeight + 10)
+        .text('Cq');
+
+      var ctTextDims = Globals.box.CqText.node().getBBox();
+
+      Globals.box.RFYTextLabel = Globals.box.container.append('text')
+        .attr("font-weight", 700)
+        .attr("font-size", valuesTextSize + 'px')
+        .attr('fill', "#000")
+        .attr('x', 10)
+        .attr('y', boxMargin.top + headerHeight + ctTextDims.height + 10)
+        .text('RFY');
+
+      var rfyLabelDims = Globals.box.RFYTextLabel.node().getBBox();
+
+      Globals.box.RFYTextValue = Globals.box.container.append('text')
+        .attr("font-size", valuesTextSize + 'px')
+        .attr('fill', "#000")
+        .attr('x', 10)
+        .attr('y', boxMargin.top + headerHeight + ctTextDims.height + rfyLabelDims.height + 10);
+
+      Globals.box.cycleTextLabel = Globals.box.container.append('text')
+        .attr("font-weight", 700)
+        .attr("font-size", valuesTextSize + 'px')
+        .attr('fill', "#000")
+        .attr('x', 70)
+        .attr('y', boxMargin.top + headerHeight + ctTextDims.height + 10)
+        .text('Cycle');
+
+      var cycleLabelDims = Globals.box.cycleTextLabel.node().getBBox();
+
+      Globals.box.cycleTextValue = Globals.box.container.append('text')
+        .attr("font-size", valuesTextSize + 'px')
+        .attr('fill', "#000")
+        .attr('x', 70)
+        .attr('y', boxMargin.top + headerHeight + cycleLabelDims.height + ctTextDims.height + 10);
+
+    }
+
+    function setBoxRFYAndCycleTexts(x) {
+      // get data point at point x
+      var line_config = Globals.activePathConfig.config;
+      var x0 = Globals.xScale.invert(x);
+      var i = bisectX(line_config)(Globals.data[line_config.dataset], x0, 1);
+      var d0 = Globals.data[line_config.dataset][i - 1];
+      if (!d0) {
+        return;
+      }
+
+      var d1 = Globals.data[line_config.dataset][i];
+      if (!d1) {
+        return;
+      }
+
+      var d = x0 - d0[line_config.x] > d1[line_config.x] - x0 ? d1 : d0;
+
+      if (Globals.box && Globals.activePath) {
+        var conf = Globals.activePathConfig;
+        if (Globals.box.RFYTextValue) {
+          Globals.box.RFYTextValue.text(d[Globals.config.series[conf.index].y]);
+        }
+        if (Globals.box.cycleTextValue) {
+          Globals.box.cycleTextValue.text(d[Globals.config.series[conf.index].x]);
+        }
+        if (Globals.box.CqText && Globals.activePathConfig.config.cq) {
+          var conf = Globals.activePathConfig.config;
+          var cqText = 'Cq: ' + (conf.cq[conf.channel - 1] || '');
+          Globals.box.CqText.text(cqText);
+        }
+      }
     }
 
     function makeLine(line_config) {
@@ -236,15 +342,6 @@
         .on('mousemove', circleFollowsMouse);
     }
 
-    // function updateLineStrokeWidthOnZoom(k) {
-    //   Globals.lines.forEach(function(l) {
-    //     var strokeWidth = (l === Globals.activePath) ? Globals.activePathStrokeWidth : Globals.normalPathStrokeWidth; //default stroke width
-    //     var strokeDiff = (strokeWidth * k) - strokeWidth;
-    //     var newStrokeWidth = strokeWidth / k;
-    //     l.attr('stroke-width', newStrokeWidth);
-    //   });
-    // }
-
     function zoomed() {
       var transform = d3.event.transform;
       transform.x = transform.x || 0;
@@ -271,14 +368,6 @@
       Globals.gX.call(Globals.xAxis.scale(transform.rescaleX(Globals.xScale)));
       Globals.gY.call(Globals.yAxis.scale(transform.rescaleY(Globals.yScale)));
       Globals.zoomTransform = transform;
-
-      // updateLineStrokeWidthOnZoom(transform.k);
-
-      // if (Globals.circle) {
-      //   Globals.circle
-      //     .attr('stroke-width', Globals.circleStrokeWidth / Globals.zoomTransform.k)
-      //     .attr('r', Globals.circleRadius / Globals.zoomTransform.k);
-      // }
 
       if (Globals.onZoomAndPan) {
         Globals.onZoomAndPan(Globals.zoomTransform, Globals.width, Globals.height, getScaleExtent());
@@ -507,6 +596,8 @@
         .attr("cx", x)
         .attr("cy", pos.y)
         .attr('transform', 'translate(0,0) scale(1)');
+
+      setBoxRFYAndCycleTexts(x);
     }
 
     this._getTransformXFromScroll = function(scroll) {

@@ -33,6 +33,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       hasInit = false
       $scope.chartConfig = helper.chartConfig()
+      $scope.chartConfig.channels = if is_dual_channel then 2 else 1
       $scope.chartConfig.axes.x.max = $stateParams.max_cycle || 1
       $scope.amplification_data = helper.paddData()
       $scope.COLORS = helper.COLORS
@@ -108,11 +109,11 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               data.amplification_data.shift()
               data.cq.shift()
               data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
-              console.log data
 
               AMPLI_DATA_CACHE = angular.copy data
               $scope.amplification_data = data.amplification_data
               updateButtonCts()
+              updateSeries()
 
             if ((resp.data?.partial is true) or (resp.status is 202)) and !$scope.retrying
               retry()
@@ -151,6 +152,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
                 x: 'cycle_num'
                 y: "well_#{i}_#{subtraction_type}#{if $scope.curve_type is 'log' then '_log' else ''}"
                 color: if ($scope.color_by is 'well') then buttons["well_#{i}"].color else (if ch_i is 1 then '#00AEEF' else '#8FC742')
+                cq: $scope.wellButtons["well_#{i}"]?.ct
+                well: i
+                channel: ch_i
 
       $scope.onZoom = (transform, w, h, scale_extent) ->
         $scope.ampli_scroll = {
