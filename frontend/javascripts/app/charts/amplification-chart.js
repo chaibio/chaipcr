@@ -63,12 +63,30 @@
       };
     // end global vars
 
-    function hideCircle() {
+    function hideMouseIndicators() {
       if (Globals.circle) {
         Globals.circle.attr('opacity', 0);
       }
       if (Globals.dashedLine) {
         Globals.dashedLine.attr('opacity', 0);
+      }
+      if (Globals.xAxisCircle) {
+        Globals.xAxisCircle.attr('opacity', 0);
+      }
+    }
+
+    function showMouseIndicators() {
+      if (!Globals.activePath) {
+        return;
+      }
+      if (Globals.circle) {
+        Globals.circle.attr('opacity', 1);
+      }
+      if (Globals.dashedLine) {
+        Globals.dashedLine.attr('opacity', 1);
+      }
+      if (Globals.xAxisCircle) {
+        Globals.xAxisCircle.attr('opacity', 1);
       }
     }
 
@@ -121,6 +139,7 @@
 
       makeBox(Globals.activePathConfig.config);
       setBoxRFYAndCycleTexts(mouse[0]);
+      showMouseIndicators();
 
     }
 
@@ -128,7 +147,7 @@
       if (!Globals.activePath) {
         return;
       }
-      hideCircle();
+      hideMouseIndicators();
       Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth);
       Globals.activePathConfig = null;
       Globals.activePath = null;
@@ -150,7 +169,7 @@
       var boxWidth = 150;
       var bodyHeight = 70;
       var boxMargin = {
-        top: 10,
+        top: 0,
         left: 10
       }
 
@@ -166,8 +185,6 @@
         .on('mousemove', circleFollowsMouse);
 
       Globals.box.header = Globals.box.container.append('rect')
-        // .attr('x', 0)
-        // .attr('y', 0)
         .attr('fill', line_config.color)
         .attr('width', boxWidth)
         .attr('height', headerHeight);
@@ -206,7 +223,7 @@
         .attr('fill', "#000")
         .attr("font-weight", 700)
         .attr('x', 10)
-        .attr('y', boxMargin.top + headerHeight + 10)
+        .attr('y', headerHeight + 20)
         .text('Cq');
 
       var ctTextDims = Globals.box.CqText.node().getBBox();
@@ -216,7 +233,7 @@
         .attr("font-size", valuesTextSize + 'px')
         .attr('fill', "#000")
         .attr('x', 10)
-        .attr('y', boxMargin.top + headerHeight + ctTextDims.height + 10)
+        .attr('y', headerHeight + ctTextDims.height + 20)
         .text('RFY');
 
       var rfyLabelDims = Globals.box.RFYTextLabel.node().getBBox();
@@ -225,14 +242,14 @@
         .attr("font-size", valuesTextSize + 'px')
         .attr('fill', "#000")
         .attr('x', 10)
-        .attr('y', boxMargin.top + headerHeight + ctTextDims.height + rfyLabelDims.height + 10);
+        .attr('y', headerHeight + ctTextDims.height + rfyLabelDims.height + 20);
 
       Globals.box.cycleTextLabel = Globals.box.container.append('text')
         .attr("font-weight", 700)
         .attr("font-size", valuesTextSize + 'px')
         .attr('fill', "#000")
         .attr('x', 70)
-        .attr('y', boxMargin.top + headerHeight + ctTextDims.height + 10)
+        .attr('y', headerHeight + ctTextDims.height + 20)
         .text('Cycle');
 
       var cycleLabelDims = Globals.box.cycleTextLabel.node().getBBox();
@@ -241,7 +258,7 @@
         .attr("font-size", valuesTextSize + 'px')
         .attr('fill', "#000")
         .attr('x', 70)
-        .attr('y', boxMargin.top + headerHeight + cycleLabelDims.height + ctTextDims.height + 10);
+        .attr('y', headerHeight + cycleLabelDims.height + ctTextDims.height + 20);
 
     }
 
@@ -297,7 +314,8 @@
         .on('click', function(e, a, path) {
           setActivePath.call(this, _path, d3.mouse(this));
         })
-        .on('mousemove', circleFollowsMouse);
+        .on('mousemove', circleFollowsMouse)
+        .on('mouseout', hideMouseIndicators);
 
       return _path;
     }
@@ -347,6 +365,7 @@
         // .attr('stroke-width', Globals.circleStrokeWidth / Globals.zoomTransform.k)
         .attr('stroke-width', Globals.circleStrokeWidth)
         .attr('transform', 'translate (50,50)')
+        .on('mouseout', hideMouseIndicators)
         .on('mousemove', circleFollowsMouse);
     }
 
@@ -363,7 +382,9 @@
         .attr("stroke-width", Globals.dashedLineStrokeWidth)
         .attr("stroke", "#333")
         .attr("fill", "none")
-        .on('mousemove', circleFollowsMouse);
+        .on('mousemove', circleFollowsMouse)
+        .on('mouseout', hideMouseIndicators)
+        .on('click', unsetActivePath);
     }
 
     function zoomed() {
@@ -527,13 +548,17 @@
         .attr("transform", "translate(0," + (Globals.height) + ")")
         .call(Globals.xAxis);
 
+      if (Globals.xAxisCircle) {
+        Globals.xAxisCircle.remove();
+      }
       Globals.xAxisCircle = Globals.chartSVG.append('circle')
         .attr('opacity', 0)
         .attr('r', Globals.circleRadius)
         .attr('fill', "#333")
         .attr('stroke', '#fff')
         .attr('stroke-width', Globals.circleStrokeWidth)
-        .attr('class', 'mouse-indicator-circle');
+        .attr('class', 'mouse-indicator-circle')
+        .on('mouseout', hideMouseIndicators);
     }
 
     function updateZoomScaleExtent() {
@@ -584,7 +609,8 @@
         .attr('height', height)
         .attr('fill', 'transparent')
         .on('mousemove', circleFollowsMouse)
-        .on('mouseout', hideCircle)
+        .on('mouseenter', showMouseIndicators)
+        .on('mouseout', hideMouseIndicators)
         .on('click', unsetActivePath);
 
       setYAxis();
@@ -607,6 +633,7 @@
 
     function circleFollowsMouse() {
       if (!Globals.activePath) {
+        hideMouseIndicators();
         return;
       }
       var x = d3.mouse(this)[0];
@@ -634,17 +661,18 @@
       }
 
       Globals.circle
-        .attr("opacity", 1)
+        // .attr("opacity", 1)
         .attr("cx", x)
         .attr("cy", pos.y)
         .attr('transform', 'translate(0,0) scale(1)');
 
       Globals.dashedLine
-        .attr("opacity", 1)
+        // .attr("opacity", 1)
         .attr('x1', x)
         .attr('x2', x);
 
       setBoxRFYAndCycleTexts(x);
+      showMouseIndicators();
     }
 
     this._getTransformXFromScroll = function(scroll) {
