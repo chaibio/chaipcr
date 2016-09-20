@@ -48,7 +48,6 @@
 
     function makeCircleForLine(line_config) {
       var c = Globals.viewSVG.append('circle')
-        .style('box-shadow', '10px 10px 5px #333')
         .attr('opacity', 0)
         .attr('r', Globals.circleRadius / Globals.zoomTransform.k)
         .attr('fill', line_config.color)

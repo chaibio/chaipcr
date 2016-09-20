@@ -47,6 +47,7 @@
         onZoomAndPan: null,
         normalPathStrokeWidth: 2,
         activePathStrokeWidth: 3,
+        dashedLineStrokeWidth: 2,
         circleRadius: 5,
         circleStrokeWidth: 2
       };
@@ -63,6 +64,9 @@
     function hideCircle() {
       if (Globals.circle) {
         Globals.circle.attr('opacity', 0);
+      }
+      if (Globals.dashedLine) {
+        Globals.dashedLine.attr('opacity', 0);
       }
     }
 
@@ -106,11 +110,12 @@
           .attr('fill', activePathConfig.color);
       }
 
-      // if (Globals.box) {
-      //   if (Globals.box.CqText && Globals.activePathConfig.config.cq) {
-      //     Globals.box.CqText.text('Cq: ' + Globals.activePathConfig.config.cq[activePathConfig.channel - 1]);
-      //   }
-      // }
+      if (Globals.dashedLine) {
+        Globals.dashedLine
+          .attr("opacity", 1)
+          .attr('x1', mouse[0])
+          .attr('x2', mouse[0]);
+      }
 
       makeBox(Globals.activePathConfig.config);
       setBoxRFYAndCycleTexts(mouse[0]);
@@ -308,10 +313,11 @@
       Globals.lines = [];
       Globals.activePath = null;
 
+      Globals.dashedLine = makeDashedLine();
+      
       series.forEach(function(s, i) {
         Globals.lines.push(makeLine(s));
       });
-
       makeCircle();
     }
 
@@ -339,6 +345,22 @@
         // .attr('stroke-width', Globals.circleStrokeWidth / Globals.zoomTransform.k)
         .attr('stroke-width', Globals.circleStrokeWidth)
         .attr('transform', 'translate (50,50)')
+        .on('mousemove', circleFollowsMouse);
+    }
+
+    function makeDashedLine() {
+      if (Globals.dashedLine) {
+        Globals.dashedLine.remove();
+      }
+
+      return Globals.viewSVG
+        .append("line")
+        .attr("y1", 0)
+        .attr("y2", Globals.height)
+        .attr("stroke-dasharray", Globals.dashedLineStrokeWidth + ',' + Globals.dashedLineStrokeWidth)
+        .attr("stroke-width", Globals.dashedLineStrokeWidth)
+        .attr("stroke", "#333")
+        .attr("fill", "none")
         .on('mousemove', circleFollowsMouse);
     }
 
@@ -596,6 +618,11 @@
         .attr("cx", x)
         .attr("cy", pos.y)
         .attr('transform', 'translate(0,0) scale(1)');
+
+      Globals.dashedLine
+        .attr("opacity", 1)
+        .attr('x1', x)
+        .attr('x2', x);
 
       setBoxRFYAndCycleTexts(x);
     }
