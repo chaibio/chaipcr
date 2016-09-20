@@ -137,7 +137,7 @@
           .attr('x2', mouse[0]);
       }
 
-      makeBox(Globals.activePathConfig.config);
+      drawBox(Globals.activePathConfig.config);
       setBoxRFYAndCycleTexts(mouse[0]);
       showMouseIndicators();
 
@@ -157,7 +157,7 @@
       }
     }
 
-    function makeBox(line_config) {
+    function drawBox(line_config) {
 
       if (Globals.box) {
         Globals.box.container.remove();
@@ -168,6 +168,7 @@
       var valuesTextSize = 12;
       var boxWidth = 130;
       var bodyHeight = 70;
+      var boxBorderWidth = 1;
       var boxMargin = {
         top: 0,
         left: 10
@@ -176,22 +177,28 @@
       Globals.box = {};
 
       Globals.box.container = Globals.chartSVG.append('g')
-        .attr('stroke', '#333')
-        .attr('stroke-width', 0.2)
+        .attr('stroke-width', 0)
         .attr('transform', 'translate(' + (boxMargin.left + Globals.config.margin.left) + ',' + (boxMargin.top + Globals.config.margin.top) + ')')
         .attr('fill', '#fff')
-        .attr('width', boxWidth)
-        .attr('height', headerHeight + bodyHeight)
+        // .attr('width', boxWidth)
+        // .attr('height', headerHeight + bodyHeight)
         .on('mousemove', circleFollowsMouse);
 
+      Globals.box.container.append('rect')
+        .attr('fill', "#ccc")
+        .attr('width', boxWidth + boxBorderWidth * 2)
+        .attr('height', bodyHeight + headerHeight + boxBorderWidth * 2);
+
       Globals.box.header = Globals.box.container.append('rect')
+        .attr('x', boxBorderWidth)
+        .attr('y', boxBorderWidth)
         .attr('fill', line_config.color)
         .attr('width', boxWidth)
         .attr('height', headerHeight);
 
       Globals.box.headerText = Globals.box.container.append('text')
         .attr('x', function() {
-          return boxWidth / 2;
+          return (boxWidth + boxBorderWidth * 2) / 2;
         })
         .attr("text-anchor", "middle")
         .attr("alignment-baseline", "middle")
@@ -207,23 +214,22 @@
 
       Globals.box.headerText.attr('y', function() {
         var textDims = Globals.box.headerText.node().getBBox();
-        return headerHeight / 2 + (headerHeight - textDims.height) / 2;
+        return (headerHeight / 2 + (headerHeight - textDims.height) / 2) + boxBorderWidth;
       });
 
       Globals.box.body = Globals.box.container.append('rect')
-        .attr('y', headerHeight)
+        .attr('x', boxBorderWidth)
+        .attr('y', headerHeight + boxBorderWidth)
         .attr('fill', '#fff')
         .attr('width', boxWidth)
         .attr('height', bodyHeight);
 
       Globals.box.CqText = Globals.box.container.append('text')
-        // .attr("text-anchor", "middle")
-        // .attr("alignment-baseline", "middle")
         .attr("font-size", headerTextSize + 'px')
         .attr('fill', "#000")
         .attr("font-weight", 700)
-        .attr('x', 10)
-        .attr('y', headerHeight + 20)
+        .attr('x', 10 + boxBorderWidth)
+        .attr('y', headerHeight + 20 + boxBorderWidth)
         .text('Cq');
 
       var ctTextDims = Globals.box.CqText.node().getBBox();
@@ -232,8 +238,8 @@
         .attr("font-weight", 700)
         .attr("font-size", valuesTextSize + 'px')
         .attr('fill', "#000")
-        .attr('x', 10)
-        .attr('y', headerHeight + ctTextDims.height + 20)
+        .attr('x', 10 + boxBorderWidth)
+        .attr('y', headerHeight + ctTextDims.height + 20 + boxBorderWidth)
         .text('RFY');
 
       var rfyLabelDims = Globals.box.RFYTextLabel.node().getBBox();
@@ -241,15 +247,15 @@
       Globals.box.RFYTextValue = Globals.box.container.append('text')
         .attr("font-size", valuesTextSize + 'px')
         .attr('fill', "#000")
-        .attr('x', 10)
-        .attr('y', headerHeight + ctTextDims.height + rfyLabelDims.height + 20);
+        .attr('x', 10 + boxBorderWidth)
+        .attr('y', headerHeight + ctTextDims.height + rfyLabelDims.height + 20 + boxBorderWidth);
 
       Globals.box.cycleTextLabel = Globals.box.container.append('text')
         .attr("font-weight", 700)
         .attr("font-size", valuesTextSize + 'px')
         .attr('fill', "#000")
-        .attr('x', 70)
-        .attr('y', headerHeight + ctTextDims.height + 20)
+        .attr('x', 70 + boxBorderWidth)
+        .attr('y', headerHeight + ctTextDims.height + 20 + boxBorderWidth)
         .text('Cycle');
 
       var cycleLabelDims = Globals.box.cycleTextLabel.node().getBBox();
@@ -257,8 +263,8 @@
       Globals.box.cycleTextValue = Globals.box.container.append('text')
         .attr("font-size", valuesTextSize + 'px')
         .attr('fill', "#000")
-        .attr('x', 70)
-        .attr('y', headerHeight + cycleLabelDims.height + ctTextDims.height + 20);
+        .attr('x', 70 + boxBorderWidth)
+        .attr('y', headerHeight + cycleLabelDims.height + ctTextDims.height + 20 + boxBorderWidth);
 
     }
 
