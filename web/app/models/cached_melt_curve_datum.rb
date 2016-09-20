@@ -19,7 +19,9 @@
 class CachedMeltCurveDatum < ActiveRecord::Base
   belongs_to :experiment
   
-  ["temperature", "fluorescence_data", "derivative", "tm", "area"].each do |variable|
+  attr_accessor :fluorescence_data
+  
+  ["temperature", "normalized_data", "derivative_data", "tm", "area"].each do |variable|
     define_method("#{variable}") do
       value = instance_variable_get("@#{variable}")
       if value.nil?
@@ -37,7 +39,7 @@ class CachedMeltCurveDatum < ActiveRecord::Base
   end
   
   def self.retrieve(experiment_id, stage_id)
-    self.where(:experiment_id=>experiment_id, :stage_id=>stage_id).order(:channel, :well_num)
+    self.where(:experiment_id=>experiment_id, :stage_id=>stage_id).order(:ramp_id, :channel, :well_num)
   end
 
 end
