@@ -326,7 +326,6 @@
         .call(Globals.xAxis);
 
       Globals.xAxisCircle = Globals.chartSVG.append('circle')
-        .style('box-shadow', '10px 10px 5px #333')
         .attr('opacity', 0)
         .attr('r', Globals.circleRadius)
         .attr('fill', "#333")

@@ -36,6 +36,8 @@
         lines: null,
         // lineIndexes: null,
         circle: null,
+        circleStrokeWidth: 2,
+        circleRadius: 7,
         xScale: null,
         yScale: null,
         zooomBehavior: null,
@@ -314,7 +316,7 @@
       Globals.activePath = null;
 
       Globals.dashedLine = makeDashedLine();
-      
+
       series.forEach(function(s, i) {
         Globals.lines.push(makeLine(s));
       });
@@ -524,6 +526,14 @@
         .attr('fill', 'none')
         .attr("transform", "translate(0," + (Globals.height) + ")")
         .call(Globals.xAxis);
+
+      Globals.xAxisCircle = Globals.chartSVG.append('circle')
+        .attr('opacity', 0)
+        .attr('r', Globals.circleRadius)
+        .attr('fill', "#333")
+        .attr('stroke', '#fff')
+        .attr('stroke-width', Globals.circleStrokeWidth)
+        .attr('class', 'mouse-indicator-circle');
     }
 
     function updateZoomScaleExtent() {
@@ -554,6 +564,7 @@
         .attr("width", width + config.margin.left + config.margin.right)
         .attr("height", height + config.margin.top + config.margin.bottom)
         .call(Globals.zooomBehavior)
+        .on("mousemove", followMouseOnXAxis);
 
       var svg = chartSVG.append("g")
         .attr("transform", "translate(" + config.margin.left + "," + config.margin.top + ")")
@@ -583,6 +594,15 @@
       Globals.activePath = null;
       updateZoomScaleExtent()
 
+    }
+
+    function followMouseOnXAxis() {
+
+      var x = d3.mouse(this)[0];
+
+      Globals.xAxisCircle
+        .attr("cx", x)
+        .attr("cy", Globals.height + Globals.config.margin.top);
     }
 
     function circleFollowsMouse() {
