@@ -70,8 +70,8 @@ App.service 'MeltCurveService', [
 
             datasets["well_#{i}"].push
               temperature: total_temp/16
-              derivative: data[i].derivative[ii]
-              normalized: data[i].fluorescence_data[ii]
+              derivative: data[i].derivative_data[ii]
+              normalized: data[i].normalized_data[ii]
 
         complete(datasets)
 
