@@ -6,11 +6,6 @@
 
     // Global vars
     var Globals = null;
-    // current supported axis interpolations
-    var INTERPOLATIONS = {
-      log: d3.scaleLog,
-      linear: d3.scaleLinear
-    };
     var bisectX = function(line_config) {
       return d3.bisector(function(d) {
         return d[line_config.x];
@@ -34,10 +29,7 @@
         activePath: null,
         activePathConfig: null,
         lines: null,
-        // lineIndexes: null,
         circle: null,
-        circleStrokeWidth: 2,
-        circleRadius: 7,
         xScale: null,
         yScale: null,
         zooomBehavior: null,
@@ -48,10 +40,13 @@
         },
         onZoomAndPan: null,
         normalPathStrokeWidth: 2,
-        activePathStrokeWidth: 3,
+        hoveredPathStrokeWidth: 3,
+        activePathStrokeWidth: 5,
         dashedLineStrokeWidth: 2,
-        circleRadius: 5,
-        circleStrokeWidth: 2
+        circleRadius: 6,
+        circleStrokeWidth: 2,
+        circleStrokeWidth: 2,
+        circleRadius: 7
       };
     }
 
@@ -180,8 +175,6 @@
         .attr('stroke-width', 0)
         .attr('transform', 'translate(' + (boxMargin.left + Globals.config.margin.left) + ',' + (boxMargin.top + Globals.config.margin.top) + ')')
         .attr('fill', '#fff')
-        // .attr('width', boxWidth)
-        // .attr('height', headerHeight + bodyHeight)
         .on('mousemove', circleFollowsMouse);
 
       Globals.box.container.append('rect')
@@ -310,6 +303,7 @@
         .y(function(d) {
           return Globals.yScale(d[line_config.y]);
         });
+      var trans;
       var _path = Globals.viewSVG.append("path")
         .datum(Globals.data[line_config.dataset])
         .attr("class", "line")
@@ -319,9 +313,25 @@
         .attr('stroke-width', Globals.normalPathStrokeWidth)
         .on('click', function(e, a, path) {
           setActivePath.call(this, _path, d3.mouse(this));
+          circleFollowsMouse();
         })
         .on('mousemove', circleFollowsMouse)
-        .on('mouseout', hideMouseIndicators);
+        .on('mouseenter', function() {
+          if (!Globals.activePath) {
+            trans = _path.transition().attr('stroke-width', Globals.hoveredPathStrokeWidth).duration(100).on('end', function() { trans = null });
+          }
+        })
+        .on('mouseout', function() {
+          hideMouseIndicators();
+          if (_path !== Globals.activePath) {
+            var p;
+            p = trans ? trans : _path;
+            p.transition().attr('stroke-width', Globals.normalPathStrokeWidth).duration(100).on('end', function() {
+              trans = null;
+            });
+
+          }
+        });
 
       return _path;
     }
@@ -339,12 +349,51 @@
       Globals.lines = [];
       Globals.activePath = null;
 
+      // var lastCirclePos, lastDashedLinePos, lastXAxisCirclePos;
+      // if (Globals.dashedLine && Globals.circle && Globals.xAxisCircle) {
+      //   lastDashedLinePos = {
+      //     x1: Globals.dashedLine.attr('x1'),
+      //     x2: Globals.dashedLine.attr('x2'),
+      //   };
+      //   lastCirclePos = {
+      //     x: Globals.circle.attr('cx'),
+      //     y: Globals.circle.attr('cy'),
+      //   };
+      //   lastXAxisCirclePos = {
+      //     x: Globals.xAxisCircle.attr('cx'),
+      //     y: Globals.xAxisCircle.attr('cy'),
+      //   };
+      // }
+
       Globals.dashedLine = makeDashedLine();
 
-      series.forEach(function(s, i) {
+      for (var i = 0; i < series.length; i++) {
+        var s = series[i];
         Globals.lines.push(makeLine(s));
-      });
-      makeCircle();
+      }
+
+
+      if (Globals.activePathConfig && Globals.circle) {
+        var m = [Globals.circle.attr('cx'), Globals.circle.attr('cy')];
+        var p = null;
+
+        makeCircle();
+
+        for (var i = 0; i < series.length; i++) {
+          var s = series[i];
+          if (s.well === Globals.activePathConfig.config.well && s.channel === Globals.activePathConfig.config.channel) {
+            p = Globals.lines[i];
+            break;
+          }
+        }
+        if (p) {
+          setActivePath(p, m);
+          showMouseIndicators();
+          // Globals.circle.attr('cx', lastCirclePos.x).attr('cy', lastCirclePos.y);
+          // Globals.dashedLine.attr('x1', lastDashedLinePos.x1).attr('x2', lastDashedLinePos.x2);
+          // Globals.xAxisCircle.attr('cx', lastXAxisCirclePos.x).attr('cy', lastXAxisCirclePos.y);
+        }
+      }
     }
 
     function getDataLength() {
@@ -359,29 +408,48 @@
     }
 
     function makeCircle() {
+      var lastPos;
       if (Globals.circle) {
+        lastPos = {
+          cx: Globals.circle.attr('cx'),
+          cy: Globals.circle.attr('cy'),
+        };
         Globals.circle.remove();
       }
       Globals.circle = Globals.viewSVG.append('circle')
         .attr('opacity', 0)
-        // .attr('r', Globals.circleRadius / Globals.zoomTransform.k)
         .attr('r', Globals.circleRadius)
-        .attr('fill', 'red')
         .attr('stroke', '#fff')
-        // .attr('stroke-width', Globals.circleStrokeWidth / Globals.zoomTransform.k)
         .attr('stroke-width', Globals.circleStrokeWidth)
         .attr('transform', 'translate (50,50)')
         .on('mouseout', hideMouseIndicators)
-        .on('mousemove', circleFollowsMouse);
+        .on('mousemove', circleFollowsMouse)
+        .on('click', function() {
+          unsetActivePath();
+          this.remove();
+        });
+      if (Globals.activePathConfig) {
+        Globals.circle.attr('fill', Globals.activePathConfig.config.color);
+      }
+      if (lastPos) {
+        Globals.circle.attr('cx', lastPos.cx);
+        Globals.circle.attr('cy', lastPos.cy);
+      }
     }
 
     function makeDashedLine() {
+      var lastPos;
       if (Globals.dashedLine) {
+        lastPos = {
+          x1: Globals.dashedLine.attr('x1'),
+          x2: Globals.dashedLine.attr('x2'),
+        };
         Globals.dashedLine.remove();
       }
 
-      return Globals.viewSVG
+      var dl = Globals.viewSVG
         .append("line")
+        .attr("opacity", 0)
         .attr("y1", 0)
         .attr("y2", Globals.height)
         .attr("stroke-dasharray", Globals.dashedLineStrokeWidth + ',' + Globals.dashedLineStrokeWidth)
@@ -391,6 +459,14 @@
         .on('mousemove', circleFollowsMouse)
         .on('mouseout', hideMouseIndicators)
         .on('click', unsetActivePath);
+
+      if (lastPos) {
+        dl.attr('x1', lastPos.x1);
+        dl.attr('x2', lastPos.x2);
+      }
+
+      return dl;
+
     }
 
     function zoomed() {
@@ -503,9 +579,11 @@
       var allowance = diff * (Globals.config.axes.y.scale === 'log' ? 0.2 : 0.05);
       max += allowance;
       min -= allowance;
+      min = Globals.config.axes.y.scale === 'log' ? 0.01 : min;
 
-      Globals.yScale = d3.scaleLinear()
-        .range([Globals.height, 0])
+      Globals.yScale = Globals.config.axes.y.scale === 'log' ? d3.scaleLog() : d3.scaleLinear();
+
+      Globals.yScale.range([Globals.height, 0])
         .domain([min, max]);
 
       Globals.yAxis = d3.axisLeft(Globals.yScale);
@@ -526,6 +604,10 @@
         .attr('fill', 'none')
         .call(Globals.yAxis)
         .on('mouseenter', hideMouseIndicators);
+
+      if (Globals.zoomTransform.rescaleY) {
+        Globals.gY.call(Globals.yAxis.scale(Globals.zoomTransform.rescaleY(Globals.yScale)));
+      }
     }
 
     function setXAxis() {
@@ -555,7 +637,12 @@
         .attr("transform", "translate(0," + (Globals.height) + ")")
         .call(Globals.xAxis);
 
+      var lastPos;
       if (Globals.xAxisCircle) {
+        lastPos = {
+          cx: Globals.xAxisCircle.attr('cx'),
+          cy: Globals.xAxisCircle.attr('cy'),
+        };
         Globals.xAxisCircle.remove();
       }
       Globals.xAxisCircle = Globals.chartSVG.append('circle')
@@ -566,6 +653,14 @@
         .attr('stroke-width', Globals.circleStrokeWidth)
         .attr('class', 'mouse-indicator-circle')
         .on('mouseout', hideMouseIndicators);
+      if (lastPos) {
+        Globals.xAxisCircle.attr('cx', lastPos.cx);
+        Globals.xAxisCircle.attr('cy', lastPos.cy);
+      }
+
+      if (Globals.zoomTransform.rescaleX) {
+        Globals.gX.call(Globals.xAxis.scale(Globals.zoomTransform.rescaleX(Globals.xScale)));
+      }
     }
 
     function updateZoomScaleExtent() {
@@ -595,8 +690,8 @@
       var chartSVG = Globals.chartSVG = d3.select(elem).append("svg")
         .attr("width", width + config.margin.left + config.margin.right)
         .attr("height", height + config.margin.top + config.margin.bottom)
-        .call(Globals.zooomBehavior)
-        .on("mousemove", followMouseOnXAxis);
+        .call(Globals.zooomBehavior);
+      // .on("mousemove", followMouseOnXAxis);
 
       var svg = chartSVG.append("g")
         .attr("transform", "translate(" + config.margin.left + "," + config.margin.top + ")")
@@ -629,21 +724,18 @@
 
     }
 
-    function followMouseOnXAxis() {
+    // function followMouseOnXAxis() {
 
-      var x = d3.mouse(this)[0];
-
-      Globals.xAxisCircle
-        .attr("cx", x)
-        .attr("cy", Globals.height + Globals.config.margin.top);
-    }
+    //   var x = d3.mouse(this)[0];
+    // }
 
     function circleFollowsMouse() {
       if (!Globals.activePath) {
         hideMouseIndicators();
         return;
       }
-      var x = d3.mouse(this)[0];
+      // var x = d3.mouse(this)[0];
+      var x = d3.mouse(Globals.mouseOverlay.node())[0];
 
       var pathEl = Globals.activePath.node();
       var pathLength = pathEl.getTotalLength();
@@ -667,19 +759,32 @@
         }
       }
 
-      Globals.circle
-        // .attr("opacity", 1)
-        .attr("cx", x)
-        .attr("cy", pos.y)
-        .attr('transform', 'translate(0,0) scale(1)');
+      var max_x = ((getMaxX() - 1) / (Globals.config.axes.x.max - 1)) * Globals.width;
 
-      Globals.dashedLine
-        // .attr("opacity", 1)
-        .attr('x1', x)
-        .attr('x2', x);
+      if (x > max_x) {
+        hideMouseIndicators();
+      } else {
+        Globals.circle
+          // .attr("opacity", 1)
+          .attr("cx", x)
+          .attr("cy", pos.y)
+          .attr('transform', 'translate(0,0) scale(1)');
 
-      setBoxRFYAndCycleTexts(x);
-      showMouseIndicators();
+        Globals.dashedLine
+          // .attr("opacity", 1)
+          .attr('x1', x)
+          .attr('x2', x);
+
+        Globals.xAxisCircle
+          .attr("cx", function() {
+            var m = d3.mouse(Globals.chartSVG.node());
+            return m[0];
+          })
+          .attr("cy", Globals.height + Globals.config.margin.top);
+
+        setBoxRFYAndCycleTexts(x);
+        showMouseIndicators();
+      }
     }
 
     this._getTransformXFromScroll = function(scroll) {
@@ -729,15 +834,11 @@
     };
 
     this.updateData = function(data) {
-      console.log('update data');
-      console.log(data);
       Globals.data = data;
       updateZoomScaleExtent();
     };
 
     this.updateConfig = function(config) {
-      console.log('set config:');
-      console.log(config);
       Globals.config = config;
     };
 
@@ -750,7 +851,6 @@
     };
 
     this.empty = function() {
-      console.log('empty');
       d3.select(elem).selectAll('*').remove();
     };
 

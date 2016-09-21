@@ -127,6 +127,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             $scope.fetching = false
             return if $scope.retrying
             retry()
+        else
+          retry()
 
       # fetchFluorescenceData()
 
@@ -184,8 +186,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.RunExperimentCtrl.chart
       , (chart) ->
         if chart is 'amplification'
-          if !$scope.hasData
-            fetchFluorescenceData()
+          # if !$scope.hasData
+          fetchFluorescenceData()
 
           $timeout ->
             $scope.showAmpliChart = true
