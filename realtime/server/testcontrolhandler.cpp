@@ -26,12 +26,14 @@ using namespace std;
 using namespace boost::property_tree;
 using namespace Poco::Net;
 
-void TestControlHandler::processData(const ptree &requestPt, ptree &)
+void TestControlHandler::processData(const ptree &requestPt, ptree &responsePt)
 {
     processOptics(requestPt);
     processLid(requestPt);
     processHeatSink(requestPt);
     processHeatBlock(requestPt);
+
+    JsonHandler::processData(requestPt, responsePt);
 }
 
 void TestControlHandler::processOptics(const ptree &requestPt)
@@ -75,7 +77,7 @@ void TestControlHandler::processLid(const ptree &requestPt)
         }
 
         if (lidDrive != requestPt.not_found())
-            lid->setOutput(lidDrive->second.get_value<double>());
+            lid->setOutput(lidDrive->second.get_value<double>() * -1);
     }
 }
 
@@ -96,7 +98,7 @@ void TestControlHandler::processHeatSink(const ptree &requestPt)
             if (ExperimentController::getInstance()->machineState() == ExperimentController::IdleMachineState)
                 heatSink->setEnableMode(false);
 
-            heatSink->setOutput(heatSinkDrive->second.get_value<double>());
+            heatSink->setOutput(heatSinkDrive->second.get_value<double>() * -1);
         }
     }
 }
