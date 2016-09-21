@@ -597,8 +597,8 @@
       var chartSVG = Globals.chartSVG = d3.select(elem).append("svg")
         .attr("width", width + config.margin.left + config.margin.right)
         .attr("height", height + config.margin.top + config.margin.bottom)
-        .call(Globals.zooomBehavior)
-        .on("mousemove", followMouseOnXAxis);
+        .call(Globals.zooomBehavior);
+        // .on("mousemove", followMouseOnXAxis);
 
       var svg = chartSVG.append("g")
         .attr("transform", "translate(" + config.margin.left + "," + config.margin.top + ")")
@@ -631,21 +631,18 @@
 
     }
 
-    function followMouseOnXAxis() {
+    // function followMouseOnXAxis() {
 
-      var x = d3.mouse(this)[0];
-
-      Globals.xAxisCircle
-        .attr("cx", x)
-        .attr("cy", Globals.height + Globals.config.margin.top);
-    }
+    //   var x = d3.mouse(this)[0];
+    // }
 
     function circleFollowsMouse() {
       if (!Globals.activePath) {
         hideMouseIndicators();
         return;
       }
-      var x = d3.mouse(this)[0];
+      // var x = d3.mouse(this)[0];
+      var x = d3.mouse(Globals.mouseOverlay.node())[0];
 
       var pathEl = Globals.activePath.node();
       var pathLength = pathEl.getTotalLength();
@@ -679,6 +676,13 @@
         // .attr("opacity", 1)
         .attr('x1', x)
         .attr('x2', x);
+
+      Globals.xAxisCircle
+        .attr("cx", function () {
+          var m = d3.mouse(Globals.chartSVG.node());
+          return m[0];
+        })
+        .attr("cy", Globals.height + Globals.config.margin.top);
 
       setBoxRFYAndCycleTexts(x);
       showMouseIndicators();
