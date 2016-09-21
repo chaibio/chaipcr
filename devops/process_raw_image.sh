@@ -282,7 +282,6 @@ image_filename_folder="${temp}"
 image_filename_prfx="upgrade"
 image_filename_rootfs="$image_filename_prfx-rootfs.img.gz"
 
-#realtime service is not active.
 image_upgrade_filename_rootfs="$image_filename_prfx-rootfs2.img.gz"
 
 image_filename_data="$image_filename_prfx-data.img.gz"
@@ -364,10 +363,6 @@ retval=$?
 if [ $retval -ne 0 ]; then
 	echo "Error mounting rootfs partition. Error($retval)"
 else
-	echo Disabling realtime service
-	rm /tmp/emmc/etc/systemd/system/multi-user.target.wants/realtime.service || :
-	rm /tmp/emmc/etc/rc?.d/???unicorn || :
-
 	echo "Zeroing rootfs partition"
 	dd if=/dev/zero of=/tmp/emmc/big_zero_file1.bin bs=16777216 > /dev/null 2>&1
 	result=$?
@@ -395,7 +390,7 @@ if [ $retval -ne 0 ]; then
 else
 	echo Disabling realtime service
 	rm /tmp/emmc/etc/systemd/system/multi-user.target.wants/realtime.service || :
-	rm /tmp/emmc/etc/systemd/system/multi-user.target.wants/r.service || :
+	rm /tmp/emmc/etc/rc?.d/???unicorn || :
 
 	sync
 	umount /tmp/emmc > /dev/null || true
