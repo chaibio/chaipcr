@@ -503,9 +503,11 @@
       var allowance = diff * (Globals.config.axes.y.scale === 'log' ? 0.2 : 0.05);
       max += allowance;
       min -= allowance;
+      min = Globals.config.axes.y.scale === 'log' ? 0.01 : min;
 
-      Globals.yScale = d3.scaleLinear()
-        .range([Globals.height, 0])
+      Globals.yScale = Globals.config.axes.y.scale === 'log' ? d3.scaleLog() : d3.scaleLinear();
+
+      Globals.yScale.range([Globals.height, 0])
         .domain([min, max]);
 
       Globals.yAxis = d3.axisLeft(Globals.yScale);
@@ -729,15 +731,11 @@
     };
 
     this.updateData = function(data) {
-      console.log('update data');
-      console.log(data);
       Globals.data = data;
       updateZoomScaleExtent();
     };
 
     this.updateConfig = function(config) {
-      console.log('set config:');
-      console.log(config);
       Globals.config = config;
     };
 
@@ -750,7 +748,6 @@
     };
 
     this.empty = function() {
-      console.log('empty');
       d3.select(elem).selectAll('*').remove();
     };
 
