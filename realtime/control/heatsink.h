@@ -33,12 +33,13 @@ public:
     ~HeatSink();
 
     Direction outputDirection() const;
+    void setOutput(double value);
+
     double fanDrive() const;
 
     void startADCReading();
 
 protected:
-    void setOutput(double value);
     void resetOutput();
     void processOutput();
 

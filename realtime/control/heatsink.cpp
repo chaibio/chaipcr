@@ -52,6 +52,11 @@ HeatSink::Direction HeatSink::outputDirection() const
     return ECool;
 }
 
+void HeatSink::setOutput(double value)
+{
+    _fan->setPWMDutyCycle(value * -1);
+}
+
 double HeatSink::fanDrive() const
 {
     return _fan->drive();
@@ -61,11 +66,6 @@ void HeatSink::startADCReading()
 {
     _adcTimer->setPeriodicInterval(kHeatSinkADCInterval);
     _adcTimer->start(Poco::TimerCallback<HeatSink>(*this, &HeatSink::readADCPin));
-}
-
-void HeatSink::setOutput(double value)
-{
-    _fan->setPWMDutyCycle(value * -1);
 }
 
 void HeatSink::resetOutput()

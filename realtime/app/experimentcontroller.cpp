@@ -155,6 +155,7 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
         _experiment = std::move(experiment);
 
         LidInstance::getInstance()->setEnableMode(true);
+        HeatSinkInstance::getInstance()->setEnableMode(true);
     }
 
     startLogging();

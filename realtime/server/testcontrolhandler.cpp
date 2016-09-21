@@ -19,7 +19,7 @@
 
 #include "pcrincludes.h"
 #include "controlincludes.h"
-
+#include "experimentcontroller.h"
 #include "testcontrolhandler.h"
 
 using namespace std;
@@ -86,9 +86,18 @@ void TestControlHandler::processHeatSink(const ptree &requestPt)
     if (heatSink)
     {
         ptree::const_assoc_iterator heatSinkTargetTemp = requestPt.find("heat_sink_target_temp");
+        ptree::const_assoc_iterator heatSinkDrive = requestPt.find("heat_sink_fan_drive");
 
         if (heatSinkTargetTemp != requestPt.not_found())
             heatSink->setTargetTemperature(heatSinkTargetTemp->second.get_value<double>());
+
+        if (heatSinkDrive != requestPt.not_found())
+        {
+            if (ExperimentController::getInstance()->machineState() == ExperimentController::IdleMachineState)
+                heatSink->setEnableMode(false);
+
+            heatSink->setOutput(heatSinkDrive->second.get_value<double>());
+        }
     }
 }
 
