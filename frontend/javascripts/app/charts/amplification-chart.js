@@ -315,7 +315,17 @@
           circleFollowsMouse();
         })
         .on('mousemove', circleFollowsMouse)
-        .on('mouseout', hideMouseIndicators);
+        .on('mouseenter', function() {
+          if (!Globals.activePath) {
+            _path.transition().attr('stroke-width', Globals.hoveredPathStrokeWidth).duration(100);
+          }
+        })
+        .on('mouseout', function() {
+          hideMouseIndicators();
+          if (_path !== Globals.activePath) {
+            _path.transition().attr('stroke-width', Globals.normalPathStrokeWidth).duration(100);
+          }
+        });
 
       return _path;
     }
