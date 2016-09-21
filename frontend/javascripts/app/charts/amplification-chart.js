@@ -40,10 +40,10 @@
         },
         onZoomAndPan: null,
         normalPathStrokeWidth: 2,
-        hoveredPathStrokeWidth: 4,
-        activePathStrokeWidth: 6,
+        hoveredPathStrokeWidth: 3,
+        activePathStrokeWidth: 5,
         dashedLineStrokeWidth: 2,
-        circleRadius: 7,
+        circleRadius: 6,
         circleStrokeWidth: 2,
         circleStrokeWidth: 2,
         circleRadius: 7
@@ -303,6 +303,7 @@
         .y(function(d) {
           return Globals.yScale(d[line_config.y]);
         });
+      var trans;
       var _path = Globals.viewSVG.append("path")
         .datum(Globals.data[line_config.dataset])
         .attr("class", "line")
@@ -317,13 +318,18 @@
         .on('mousemove', circleFollowsMouse)
         .on('mouseenter', function() {
           if (!Globals.activePath) {
-            _path.transition().attr('stroke-width', Globals.hoveredPathStrokeWidth).duration(100);
+            trans = _path.transition().attr('stroke-width', Globals.hoveredPathStrokeWidth).duration(100).on('end', function() { trans = null });
           }
         })
         .on('mouseout', function() {
           hideMouseIndicators();
           if (_path !== Globals.activePath) {
-            _path.transition().attr('stroke-width', Globals.normalPathStrokeWidth).duration(100);
+            var p;
+            p = trans ? trans : _path;
+            p.transition().attr('stroke-width', Globals.normalPathStrokeWidth).duration(100).on('end', function() {
+              trans = null;
+            });
+
           }
         });
 
