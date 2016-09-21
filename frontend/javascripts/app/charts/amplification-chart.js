@@ -433,6 +433,7 @@
 
       var dl = Globals.viewSVG
         .append("line")
+        .attr("opacity", 0)
         .attr("y1", 0)
         .attr("y2", Globals.height)
         .attr("stroke-dasharray", Globals.dashedLineStrokeWidth + ',' + Globals.dashedLineStrokeWidth)
@@ -742,11 +743,7 @@
         }
       }
 
-      var max_x = (getMaxX() / (Globals.config.axes.x.max - 1)) * Globals.width;
-      console.log('get max x: ' + getMaxX());
-      console.log('conf max x: ' + Globals.config.axes.x.max);
-      console.log('width: ' + Globals.width);
-      console.log('x: ' + x);
+      var max_x = ((getMaxX() - 1) / (Globals.config.axes.x.max - 1)) * Globals.width;
 
       if (x > max_x) {
         hideMouseIndicators();
