@@ -119,12 +119,16 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
 
       if($scope.selectedWifiNow) { // if our selection is a wifi network.
 
-        if (NetworkSettingsService.connectedWifiNetwork && NetworkSettingsService.connectedWifiNetwork.state.status === "connecting") {
-          $scope.connectedSsid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"] || NetworkSettingsService.connectedWifiNetwork.settings.wireless_essid;
-          $scope.connectedSsid.replace(new RegExp('"', "g"), "");
-            if ($state.params.name.replace(new RegExp('_', "g"), " ") === $scope.connectedSsid) {
-              $scope.buttonValue = "CONNECTING";
-            }
+        try {
+          if (NetworkSettingsService.connectedWifiNetwork && NetworkSettingsService.connectedWifiNetwork.state.status === "connecting") {
+            $scope.connectedSsid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"] || NetworkSettingsService.connectedWifiNetwork.settings.wireless_essid;
+            $scope.connectedSsid.replace(new RegExp('"', "g"), "");
+              if ($state.params.name.replace(new RegExp('_', "g"), " ") === $scope.connectedSsid) {
+                $scope.buttonValue = "CONNECTING";
+              }
+          }
+        } catch(err) {
+          console.log("connectedWifiNetwork yet to load");
         }
 
         if($scope.selectedWifiNow.encryption === 'wpa2') {

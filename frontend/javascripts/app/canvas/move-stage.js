@@ -228,7 +228,6 @@ angular.module("canvasApp").factory('moveStageRect', [
           }, function(err) {
             console.log(err);
           });
-          C.resetStageMovedDirection();
       };
         // Need to correct movement, so that the moved stage fits in at right place ,
         // right now, it works for moving right.

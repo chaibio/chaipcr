@@ -270,7 +270,6 @@ angular.module("canvasApp").factory('canvas', [
 
     this.addNewStage = function(data, currentStage) {
       //move the stages, make space.
-      console.log("ADDING STAGE dgfdgdfgdfgdfgfdgfdgdfgdf gfdgfdgfdgfdg dfgfdgfd");
       var ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus;
       var originalWidth = currentStage.myWidth;
       var add = (data.stage.steps.length > 0) ? 128 + Math.floor(constants.newStageOffset / data.stage.steps.length) : 128;
@@ -297,19 +296,12 @@ angular.module("canvasApp").factory('canvas', [
       this.setDefaultWidthHeight();
     };
 
-    this.resetStageMovedDirection = function() {
-
-      this.allStageViews.forEach(function(stage, index) {
-        console.log("nulling");
-        stage.stageMovedDirection = null;
-      });
-    };
-
     this.correctNumbering = function() {
       var oStatus = 1;
       this.allStepViews = [];
       var that = this;
       this.allStageViews.forEach(function(stage, index) {
+        stage.stageMovedDirection = null;
         stage.index = index;
         stage.stageCaption.setText("STAGE " + (index + 1) + ": " );
         stage.childSteps.forEach(function(step, index) {

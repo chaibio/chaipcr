@@ -41,6 +41,7 @@ angular.module("canvasApp").factory('circleManager', [
 
     };
 
+    // Instead of removing circle may be we should remove paths
     this.addRampLinesAndCircles = function(circles) {
 
       this.originalCanvas.allCircles = this.allCircles = circles || this.findAllCircles();
