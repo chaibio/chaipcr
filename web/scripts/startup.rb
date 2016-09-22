@@ -9,6 +9,9 @@ class Startup < CronDB
     @logger.info "RubyCron: Update #{@db.affected_rows} orphan experiments"
     
     execute("UPDATE settings SET power_cycles=power_cycles+1")
+
+    @logger.info "RubyCron: startup complete"
+    `touch /run/startup_complete.flag`
   end
 end
 
