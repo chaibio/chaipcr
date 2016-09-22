@@ -57,7 +57,7 @@ run_migrate_on_upgrade () {
 
 
 		rm ${sdcard}/upgrade/upgrade_autorun.flag || :
-        	echo "Upgrade autorun flag down.. setting up realtime service"
+        	echo "Upgrade autorun flag down.."
 	else
 		echo "No autorun flag found!"
 	fi
@@ -76,7 +76,7 @@ run_cleanup_user_tokens_every4hours () {
 }
 
 start_unicorn () {
-	echo starting up unicorn after upgrade
+	echo starting unicorn
 	cd /root/chaipcr/web
 	/usr/local/bin/bundle exec unicorn -c /root/chaipcr/web/config/unicorn.rb -E production -D || true
 }
@@ -103,33 +103,23 @@ run_clean_user_tokens () {
 	echo date  is $(date)
 
 	RAILS_ENV=production /usr/bin/ruby scripts/startup.rb || :
-	echo "Execution result: $?"
-	run_cleanup_user_tokens_every4hours &
+	echo "Startup script execution result: $?"
 
-	if systemctl status realtime.service | grep enable
-	then
-		systemctl enable realtime.service
-	fi
-	sleep 2
-        if systemctl status realtime.service | grep dead
-        then
-        	systemctl start realtime.service
-	fi
 	if [ -e /etc/rc1.d/K01unicorn ]
 	then
-		echo unicorn is set to start on startup
-	else
-		echo setting up unicorn to start on startup
-		/usr/sbin/update-rc.d unicorn defaults || true
-		update-rc.d unicorn start || true
-		sleep 2
-        	if  ps aux | grep unicorn | grep -v grep
-	        then
-			echo setting up unicorn to start on startup
-		else
-			start_unicorn &
-		fi
+		echo unicorn is set to start on startup.. removing autostart setup
+		/usr/sbin/update-rc.d unicorn remove || true
 	fi
+
+	if  ps aux | grep unicorn | grep -v grep
+        then
+		echo unicorn is running
+	else
+		echo starting unicorn
+		start_unicorn &
+	fi
+
+	run_cleanup_user_tokens_every4hours &
 }
 
 mysql_watchdog () {

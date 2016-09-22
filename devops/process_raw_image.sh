@@ -388,8 +388,7 @@ retval=$?
 if [ $retval -ne 0 ]; then
     echo "Error mounting rootfs partition. Error($retval)"
 else
-	echo Disabling realtime service
-	rm /tmp/emmc/etc/systemd/system/multi-user.target.wants/realtime.service || :
+	echo Disabling unicorn service
 	rm /tmp/emmc/etc/rc?.d/???unicorn || :
 
 	sync
