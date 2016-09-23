@@ -73,18 +73,6 @@ angular.module("canvasApp").factory('circleManager', [
     this.addRampLines = function() {
 
       var anchorCircle = this.originalCanvas.allStepViews[0].circle;
-      /*while(anchorCircle) {
-        //this.canvas.remove(anchorCircle.curve);
-        //anchorCircle.moveCircle();
-        //anchorCircle.curve.updatePosition();
-        console.log("okay", anchorCircle.model.temperature);
-        if(!anchorCircle.curve) {
-          anchorCircle.curve = new path(anchorCircle);
-          this.canvas.add(anchorCircle.curve);
-          this.canvas.bringToFront(anchorCircle);
-        }
-        anchorCircle = anchorCircle.next;
-      }*/
 
       var limit = this.allCircles.length;
 

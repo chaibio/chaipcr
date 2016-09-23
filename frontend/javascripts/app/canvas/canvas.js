@@ -310,11 +310,7 @@ angular.module("canvasApp").factory('canvas', [
         stage.stageCaption.setText("STAGE " + (index + 1) + ": " );
 
         stage.childSteps.forEach(function(step, index) {
-          if(step.circle) {
-            console.log("circlr sdf");
-          }
           if(tempCircle) {
-            console.log("Inside correctNumbering");
             tempCircle.next = step.circle;
             step.circle.previous = tempCircle;
           } else {
@@ -327,8 +323,8 @@ angular.module("canvasApp").factory('canvas', [
           that.allStepViews.push(step);
           oStatus = oStatus + 1;
         });
-
       });
+      tempCircle.next = null;
     };
 
     return this;

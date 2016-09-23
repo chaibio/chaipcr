@@ -272,8 +272,8 @@ angular.module("canvasApp").factory('moveStageRect', [
           circleManager.addRampLines();
           //console.log("Ending circle");
           stageGraphics.stageHeader.call(stageView);
-          //C.$scope.applyValues(stageView.childSteps[0].circle);
-          //stageView.childSteps[0].circle.manageClick(true);
+          C.$scope.applyValues(stageView.childSteps[0].circle);
+          stageView.childSteps[0].circle.manageClick(true);
         };
 
         return this.indicator;
