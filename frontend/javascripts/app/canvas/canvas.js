@@ -263,6 +263,10 @@ angular.module("canvasApp").factory('canvas', [
 
         step.ordealStatus = ordealStatus + 1;
         step.render();
+        //Important
+        step.circle.moveCircle();
+        step.circle.getCircle();
+        //
         this.allStepViews.splice(ordealStatus, 0, step);
         ordealStatus = ordealStatus + 1;
       }, this);
@@ -297,20 +301,33 @@ angular.module("canvasApp").factory('canvas', [
     };
 
     this.correctNumbering = function() {
-      var oStatus = 1;
+
+      var oStatus = 1, that = this, tempCircle = null;
       this.allStepViews = [];
-      var that = this;
       this.allStageViews.forEach(function(stage, index) {
         stage.stageMovedDirection = null;
         stage.index = index;
         stage.stageCaption.setText("STAGE " + (index + 1) + ": " );
+
         stage.childSteps.forEach(function(step, index) {
+          if(step.circle) {
+            console.log("circlr sdf");
+          }
+          if(tempCircle) {
+            console.log("Inside correctNumbering");
+            tempCircle.next = step.circle;
+            step.circle.previous = tempCircle;
+          } else {
+            step.circle.previous = null;
+          }
+
+          tempCircle = step.circle;
           step.index = index;
           step.ordealStatus = oStatus;
           that.allStepViews.push(step);
           oStatus = oStatus + 1;
-          console.log(step.model.temperature);
         });
+
       });
     };
 

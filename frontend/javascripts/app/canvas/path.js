@@ -88,6 +88,10 @@ angular.module("canvasApp").factory('path', [
 
         return midPointY;
       };
+
+      this.curve.reconfigure = function() {
+        console.log('Re- configuring');
+      };
       /*************************************************************************/
       return this.curve;
     };
