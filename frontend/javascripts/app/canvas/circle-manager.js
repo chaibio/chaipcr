@@ -33,12 +33,6 @@ angular.module("canvasApp").factory('circleManager', [
 
     this.togglePaths = function(toggle) {
 
-      /*this.allCircles.forEach(function(circle, index) {
-        if(circle.curve) {
-          circle.curve.setVisible(toggle);
-        }
-      }, this); */
-
       this.originalCanvas.allStepViews.forEach(function(step, index) {
         if(step.circle.curve) {
           step.circle.curve.setVisible(toggle);
@@ -92,7 +86,7 @@ angular.module("canvasApp").factory('circleManager', [
         this.canvas.bringToFront(step.circle.circleGroup);
 
         if(step.model.ramp.collect_data) {
-          step.circle.gatherDataDuringRampGroup.setVisible(true);  
+          step.circle.gatherDataDuringRampGroup.setVisible(true);
         }
         this.canvas.bringToFront(step.circle.gatherDataDuringRampGroup);
 

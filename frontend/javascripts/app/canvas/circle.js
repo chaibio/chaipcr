@@ -87,7 +87,7 @@ angular.module("canvasApp").factory('circle', [
         this.getLeft();
         this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
         this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
-        //this.gatherDataDuringRampGroup.set({"left": this.left}).setCoords();
+        this.gatherDataDuringRampGroup.set({"left": this.left}).setCoords();
       };
 
       this.setCenter = function(imgObj) {

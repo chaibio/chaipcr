@@ -104,6 +104,9 @@ angular.module("canvasApp").factory('step', [
         leftVal = {left: this.left + 16};
         this.dots.set(leftVal).setCoords();
 
+        leftVal = {left: this.left + 5};
+        this.rampSpeedGroup.set(leftVal).setCoords();
+        
         this.ordealStatus = this.ordealStatus + action;
         this.circle.getUniqueId();
 
