@@ -153,20 +153,6 @@ else
 	fi
 fi
 
-if [ ! -e ${output_dir}/p1 ]
-then
-	mkdir -p ${output_dir}/p1
-fi
-
-if [ ! -e ${output_dir}/p2/scripts/ ]
-then
-	mkdir -p ${output_dir}/p2/scripts/
-fi
-
-echo copying card contents from $BASEDIR/factory_settings_sdcard/ to $output_dir/p1
-cp -r $BASEDIR/factory_settings_sdcard/* $output_dir/p1
-cp $BASEDIR/factory_settings_sdcard/scripts/* $output_dir/p2/scripts/
-
 image_filename_upgrade="${temp}/eMMC.img"
 image_filename_upgrade1="$sdcard/eMMC_part1.img"
 image_filename_upgrade2="$sdcard/eMMC_part2.img"
@@ -203,17 +189,53 @@ unmount_all () {
 	then
 		echo hdiutil found
 		hdiutil detach $loopdev
-	else
-		echo hdiutil not found
 	fi
 }
 
 error_exit () {
 	echo "Error: $1... Tool will exit!"
 	unmount_all
-	rm -r $output_dir
+	if [ -e $output_dir ]
+	then
+		rm -r $output_dir
+	fi
 	exit 1
 }
+
+if [ ! -e ${output_dir}/p1 ]
+then
+	if mkdir -p ${output_dir}/p1
+	then
+		echo "${output_dir}/p1/scripts/ created successfully."
+	else
+		error_exit "Not able to create ${output_dir}/p1/scripts/"
+	fi
+fi
+
+if [ ! -e ${output_dir}/p2/scripts/ ]
+then
+	if mkdir -p ${output_dir}/p2/scripts/
+	then
+		echo "${output_dir}/p2/scripts/ created successfully."
+	else
+		error_exit "Not able to create ${output_dir}/p2/scripts/"
+	fi
+fi
+
+echo copying card contents from $BASEDIR/factory_settings_sdcard/ to $output_dir/p1
+if cp -r $BASEDIR/factory_settings_sdcard/* $output_dir/p1
+then
+	echo factory partition scripts copied.
+else
+	error_exit "Not able to copy factory settings first partition scripts"
+fi
+
+if cp $BASEDIR/factory_settings_sdcard/scripts/* $output_dir/p2/scripts/
+then
+	echo upgrade partition scripts copied.
+else
+	error_exit "Not able to copy factory settings upgrade partition script"
+fi
 
 if cp $BASEDIR/factory_settings_sdcard/scripts/* $temp/$upgrade_scripts
 then
@@ -392,13 +414,13 @@ else
 	error_exit "Cann't extract rootfs image!"
 fi
 
-if $mdsumtool $image_filename_rootfs>>$checksums_filename
+$mdsumtool $image_filename_rootfs>>$checksums_filename
+if [ $? -eq 0 ]
 then
 	echo rootfs partition checksum generatted.
 else
 	error_exit "rootfs partition checksum generation failed!"
 fi
-
 
 mount $rootfs_partition /tmp/emmc -t ext4
 retval=$?
