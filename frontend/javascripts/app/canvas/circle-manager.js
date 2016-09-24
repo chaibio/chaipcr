@@ -74,22 +74,28 @@ angular.module("canvasApp").factory('circleManager', [
 
       var anchorCircle = this.originalCanvas.allStepViews[0].circle;
 
-      var limit = this.allCircles.length;
+      var limit = this.originalCanvas.allStepViews.length;
 
       this.originalCanvas.allStepViews.forEach(function(step, index) {
 
         if(index < (limit - 1)) {
+
           if(! step.circle.curve) {
             step.circle.curve = new path(step.circle);
             this.canvas.add(step.circle.curve);
           } else {
             step.circle.curve.setVisible(true);
-
             this.canvas.bringToFront(step.circle.curve);
           }
         }
         step.circle.manageDrag(step.circle.circleGroup);
         this.canvas.bringToFront(step.circle.circleGroup);
+
+        if(step.model.ramp.collect_data) {
+          step.circle.gatherDataDuringRampGroup.setVisible(true);  
+        }
+        this.canvas.bringToFront(step.circle.gatherDataDuringRampGroup);
+
       }, this);
       this.canvas.renderAll();
     };
