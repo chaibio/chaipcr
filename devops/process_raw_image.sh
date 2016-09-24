@@ -187,20 +187,6 @@ then
         mkdir -p ${temp}/$factory_scripts
 fi
 
-cp $BASEDIR/factory_settings_sdcard/scripts/* $temp/$upgrade_scripts
-
-if [ ! -e $image_filename_upgrade1 ]
-then
-	echo "First image part not found: $image_filename_upgrade1"
-	exit 1
-fi
-
-if [ ! -e $image_filename_upgrade2 ]
-then
-	echo "Second image part not found: $image_filename_upgrade2"
-	exit 1
-fi
-
 unmount_all () {
 	if [ -e /dev/md2 ]
 	then
@@ -222,13 +208,36 @@ unmount_all () {
 	fi
 }
 
+error_exit () {
+	echo "Error: $1... Tool will exit!"
+	unmount_all
+	rm -r $output_dir
+	exit 1
+}
+
+if cp $BASEDIR/factory_settings_sdcard/scripts/* $temp/$upgrade_scripts
+then
+	echo scripts copied.
+else
+	error_exit "Not able to copy factory settings script"
+fi
+
+if [ ! -e $image_filename_upgrade1 ]
+then
+	error_exit "First image part not found: $image_filename_upgrade1"
+fi
+
+if [ ! -e $image_filename_upgrade2 ]
+then
+	error_exit "Second image part not found: $image_filename_upgrade2"
+fi
+
 echo "Concatinating eMMC image parts"
 cat $image_filename_upgrade1 $image_filename_upgrade2 > $image_filename_upgrade
+
 if [ $? -gt 0 ]
 then
-	echo "Error concatinating image parts!"
-	unmount_all
-	exit 1
+	error_exit "Error concatinating image parts!"
 fi
 
 echo Extracting partitions...
@@ -238,8 +247,7 @@ then
         loopdev_tool=$(which hdiutil)
         if [ -z "$loopdev_tool" ]
         then
-                echo loop device mounting tool not found! Please install hdiutil or losetup.
-                exit 1
+                error_exit "loop device mounting tool not found! Please install hdiutil or losetup."
         else
                 # Mac support!
                 devname=$(hdiutil attach $image_filename_upgrade | egrep -o '/dev/disk[0-9]+ ')
@@ -248,9 +256,9 @@ then
 		echo "Image file mounted.. device: $devname"
                 if [ -z "$devname" ]
                 then
-                        echo Error mounting image file
-                        exit 1
+                        error_exit "Error mounting image file"
                 fi
+
                 eMMC=$devname
                 boot_partition=${eMMC}s1
                 rootfs_partition=${eMMC}s2
@@ -262,20 +270,14 @@ else
         losetup $loopdev $image_filename_upgrade
         if [ $? -gt 0 ]
         then
-                echo "Error creating a block device for $image_filename_upgrade!"
-                unmount_all
-                exit 1
+                error_exit "Error creating a block device for $image_filename_upgrade!"
         fi
         mdadm --build --level=0 --force --raid-devices=1 /dev/md2 /dev/loop2
         if [ $? -gt 0 ]
         then
-                echo "Error mapping partitions for $image_filename_upgrade!"
-                unmount_all
-                exit 1
+                error_exit "Error mapping partitions for $image_filename_upgrade!"
         fi
 fi
-
-#exit 0
 
 image_filename_folder="${temp}"
 
@@ -296,7 +298,12 @@ image_filename_upgrade_temp="${temp}/temp.tar"
 image_filename_upgrade1="${output_dir}/p2/upgrade.img.tar"
 
 echo "SDCard: $sdcard"
-cd ${temp}
+if cd ${temp}
+then
+	echo directory changed.
+else
+	error_exit "Cann't switch to ${temp}"
+fi
 
 image_filename_upgrade2="${output_dir}/p1/factory_settings.img.tar"
 
@@ -304,11 +311,6 @@ echo "Packing eMMC image.."
 
 echo "Temp folder: $image_filename_folder"
 ls $image_filename_folder
-
-#if [ -e  $image_filename_upgrade_tar_temp ]
-#then
-#	rm $image_filename_upgrade_tar_temp
-#fi
 
 if [ -e $image_filename_upgrade_temp ]
 then
@@ -328,10 +330,21 @@ fi
 echo "Copying eMMC partitions at $eMMC"
 sync
 echo "Packing partition table from: ${eMMC} to: $image_filename_pt"
-dd  if=${eMMC} bs=16777216 count=1 | gzip -c > $image_filename_pt
+if dd  if=${eMMC} bs=16777216 count=1 | gzip -c > $image_filename_pt
+then
+	echo pt image extracted.
+else
+	error_exit "Cann't extract pt image!"
+fi
 
 echo "Chaibio Checksum File">$checksums_filename
-$mdsumtool $image_filename_pt>>$checksums_filename
+if $mdsumtool $image_filename_pt>>$checksums_filename
+then
+	echo partition table checksum generatted.
+else
+	error_exit "partition table checksum generation failed!"
+fi
+
 sleep 2
 sync
 
@@ -340,47 +353,52 @@ then
 	mkdir -p /tmp/emmc
 fi
 
-#boot_partition=${eMMC}p1
-#rootfs_partition=${eMMC}p2
-#data_partition=${eMMC}p3
-#perm_partition=${eMMC}p4
-
 if [ ! -e $rootfs_partition ]
 then
-        echo "Root file system partition not found: $rootfs_partition"
-	exit 1
+        error_exit "Root file system partition not found: $rootfs_partition"
 fi
 
 if [ ! -e $data_partition ]
 then
-        echo "Data file system partition not found: $data_partition, backuped eMMC was not 4 partitions."
-	exit 1
+        error_exit "Data file system partition not found: $data_partition, backuped eMMC was not 4 partitions."
 fi
 
-mount $rootfs_partition /tmp/emmc -t ext4
-retval=$?
-
-if [ $retval -ne 0 ]; then
-	echo "Error mounting rootfs partition. Error($retval)"
+if mount $rootfs_partition /tmp/emmc -t ext4
+then 
+	echo $rootfs_partition mounted!
 else
-	echo "Zeroing rootfs partition"
-	dd if=/dev/zero of=/tmp/emmc/big_zero_file1.bin bs=16777216 > /dev/null 2>&1
-	result=$?
-	sync &
-	sleep 5
-
-	sync
-	echo "Removing zeros file"
-	rm /tmp/emmc/big_zero_file*
-	sync &
-	sleep 10
-	sync
-	umount /tmp/emmc > /dev/null || true
+        error_exit "mounting $rootfs_partition failed."
 fi
+
+echo "Zeroing rootfs partition"
+dd if=/dev/zero of=/tmp/emmc/big_zero_file1.bin bs=16777216 > /dev/null 2>&1
+result=$?
+sync &
+sleep 5
+
+sync
+echo "Removing zeros file"
+rm /tmp/emmc/big_zero_file*
+sync &
+sleep 10
+sync
+umount /tmp/emmc > /dev/null || true
 
 echo "Packing binaries partition to: $image_filename_rootfs"
-dd  if=$rootfs_partition bs=16777216 | gzip -c > $image_filename_rootfs
-$mdsumtool $image_filename_rootfs>>$checksums_filename
+if dd  if=$rootfs_partition bs=16777216 | gzip -c > $image_filename_rootfs
+then
+	echo rootfs image extracted.
+else
+	error_exit "Cann't extract rootfs image!"
+fi
+
+if $mdsumtool $image_filename_rootfs>>$checksums_filename
+then
+	echo rootfs partition checksum generatted.
+else
+	error_exit "rootfs partition checksum generation failed!"
+fi
+
 
 mount $rootfs_partition /tmp/emmc -t ext4
 retval=$?
@@ -396,20 +414,51 @@ else
 fi
 
 echo "Packing upgrade rootfs partition to: $image_upgrade_filename_rootfs"
-dd  if=$rootfs_partition bs=16777216 | gzip -c > $image_upgrade_filename_rootfs
-$mdsumtool $image_upgrade_filename_rootfs>>$checksums_filename
+if dd  if=$rootfs_partition bs=16777216 | gzip -c > $image_upgrade_filename_rootfs
+then
+	echo upgrade rootfs image extracted.
+else
+	error_exit "Cann't extract upgrade rootfs image!"
+fi
+if $mdsumtool $image_upgrade_filename_rootfs>>$checksums_filename
+then
+	echo upgrade rootfs partition checksum generatted.
+else
+	error_exit "upgrade rootfs partition checksum generation failed!"
+fi
 
 sleep 5
 sync
 
 echo "Packing perm partition to: $image_filename_perm"
 $mkfsext4tooldir $perm_partition -q -L perm -F -F
-dd  if=$perm_partition bs=16777216 | gzip -c > $image_filename_perm
-$mdsumtool $image_filename_perm>>$checksums_filename
+if dd  if=$perm_partition bs=16777216 | gzip -c > $image_filename_perm
+then
+	echo perm image extracted.
+else
+	error_exit "Cann't extract perm image!"
+fi
+if $mdsumtool $image_filename_perm>>$checksums_filename
+then
+	echo perm partition checksum generatted.
+else
+	error_exit "perm partition checksum generation failed!"
+fi
 
 echo "Packing boot partition to: $image_filename_boot"
-dd  if=$boot_partition bs=16777216 | gzip -c > $image_filename_boot
-$mdsumtool $image_filename_boot>>$checksums_filename
+if dd  if=$boot_partition bs=16777216 | gzip -c > $image_filename_boot
+then
+	echo boot image extracted.
+else
+	error_exit "Cann't extract boot image!"
+fi
+
+if $mdsumtool $image_filename_boot>>$checksums_filename
+then
+	echo boot partition checksum generatted.
+else
+	error_exit "boot partition checksum generation failed!"
+fi
 
 #create scripts folder inside the tar
 if [ ! -e $upgrade_scripts ]
@@ -419,44 +468,63 @@ then
 fi
 
 echo "Data partition: $data_partition"
-mount $data_partition /tmp/emmc -t ext4
-retval=$?
+if mount $data_partition /tmp/emmc -t ext4
+then
+	echo $data_partition mounted!
+else
+	error_exit "mounting $data_partition failed!"
+fi
 
-	if [ $retval -ne 0 ]; then
-	    echo "Error mounting data partition! Error($retval)"
-	else
-		echo "Zeroing data partition"
-		dd if=/dev/zero of=/tmp/emmc/big_zero_file.bin > /dev/null 2>&1
-		sync &
-		sleep 5
-		sync
+echo "Zeroing data partition"
+dd if=/dev/zero of=/tmp/emmc/big_zero_file.bin > /dev/null 2>&1
+sync &
+sleep 5
+sync
+echo "Removing zeros file"
+rm /tmp/emmc/big_zero_file.bin
+sync &
+sleep 10
+sync
+umount /tmp/emmc > /dev/null || true
 
-		echo "Removing zeros file"
-		rm /tmp/emmc/big_zero_file.bin
-		sync &
-		sleep 10
-		sync
-
-		umount /tmp/emmc > /dev/null || true
-	fi
-
-	echo "Packing data partition to: $image_filename_data"
-	dd  if=$data_partition bs=16777216 | gzip -c > $image_filename_data
-	$mdsumtool $image_filename_data>>$checksums_filename
+echo "Packing data partition to: $image_filename_data"
+if dd  if=$data_partition bs=16777216 | gzip -c > $image_filename_data
+then
+	echo data image extracted.
+else
+	error_exit "Cann't extract data image!"
+fi
+if $mdsumtool $image_filename_data>>$checksums_filename
+then
+	echo data partition checksum generatted.
+else
+	error_exit "data partition checksum generation failed!"
+fi
 
 	#tarring
 #	echo "compressing all images to $image_filename_upgrade_tar_temp"
-	tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_data $image_filename_rootfs  $image_filename_perm $checksums_filename
+if	tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_data $image_filename_rootfs  $image_filename_perm $checksums_filename
+then
+	echo $image_filename_upgrade_temp generatted.
+else
+	error_exit "tarring $image_filename_upgrade_temp failed!"
+fi
 
-	if [ -e $image_filename_data ]
-	then
-		rm $image_filename_data
-	else
-       		echo "Data image not found: $image_filename_data"
-	fi
+if [ -e $image_filename_data ]
+then
+	rm $image_filename_data
+else
+	echo "Data image not found: $image_filename_data"
+fi
 
-	echo "Finalizing: $image_filename_upgrade2"
-	mv $image_filename_upgrade_temp $image_filename_upgrade2
+echo "Finalizing: $image_filename_upgrade2"
+if mv $image_filename_upgrade_temp $image_filename_upgrade2
+then
+	echo $image_filename_upgrade_temp moved to $image_filename_upgrade2
+else
+	error_exit "moving $image_filename_upgrade_temp to $image_filename_upgrade2 failed!"
+fi
+
 
 if [ -e $image_filename_upgrade_temp ]
 then
@@ -466,15 +534,22 @@ fi
 echo Packing upgrade image
 
 rm $image_filename_rootfs
-mv $image_upgrade_filename_rootfs $image_filename_rootfs
+if mv $image_upgrade_filename_rootfs $image_filename_rootfs
+then
+	echo $image_upgrade_filename_rootfs moved to $image_filename_rootfs
+else
+	error_exit "moving $image_upgrade_filename_rootfs to $image_filename_rootfs failed!"
+fi
 
 echo "packaging factory scripts in upgrade image."
 cp -r ${output_dir}/p1/* $temp/$factory_scripts
 
-#echo tar -cvf --exclude=$image_filename_upgrade2 $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $image_filename_perm $checksums_filename $upgrade_scripts $factory_scripts
-#echo $(pwd)
-
-tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $image_filename_perm $checksums_filename $upgrade_scripts $factory_scripts --exclude=factory_settings.img.tar
+if tar cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $image_filename_perm $checksums_filename $upgrade_scripts $factory_scripts --exclude=factory_settings.img.tar
+then
+	echo $image_filename_upgrade_temp generatted.
+else
+	error_exit "tarring $image_filename_upgrade_temp failed!"
+fi
 
 echo "Remove packed files"
 if [ -e $image_filename_boot ]
@@ -496,10 +571,20 @@ then
 	rm $image_filename_pt
 fi
 
-cd $current_folder
+if cd $current_folder
+then
+	echo switched to $current_folder
+else
+	error_exit "switching to $current_folder failed!"
+fi
 
 echo "Finalizing: $image_filename_upgrade1"
-mv $image_filename_upgrade_temp $image_filename_upgrade1
+if mv $image_filename_upgrade_temp $image_filename_upgrade1
+then
+	echo $image_filename_upgrade_temp moved to $image_filename_upgrade1
+else
+	error_exit "moving $image_filename_upgrade_temp to $image_filename_upgrade1 failed!"
+fi
 
 if [ -e ${sdcard}/pack_resume_autorun.flag ]
 then
@@ -510,11 +595,10 @@ sync
 unmount_all
 ls -ahl $output_dir/p1 $output_dir/p2
 
-echo "Finished.. byebye!"
-
 if [ -e $image_filename_upgrade1 ]
 then
+	echo "Finished.. byebye!"
 	exit 0
 fi
 
-exit 1
+error_exit "processing failed"
