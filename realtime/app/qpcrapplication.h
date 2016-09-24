@@ -87,6 +87,7 @@ protected:
     int main(const std::vector<std::string> &args);
 
 private:
+    void waitFlag();
     void readDeviceFile();
     void readConfigurationFile();
 

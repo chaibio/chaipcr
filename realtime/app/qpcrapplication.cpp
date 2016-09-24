@@ -17,6 +17,7 @@
 // limitations under the License.
 //
 
+#include <Poco/File.h>
 #include <Poco/Net/HTTPServer.h>
 
 #include <unistd.h>
@@ -91,6 +92,8 @@ void QPCRApplication::initialize(Application&) {
     _workState = false;
 
     try {
+        waitFlag();
+
         if (!Logger::isSetup())
         {
             Logger::setup(kAppLogName);
@@ -192,6 +195,12 @@ int QPCRApplication::main(const vector<string>&) {
 
         return EXIT_SOFTWARE;
     }
+}
+
+void QPCRApplication::waitFlag()
+{
+    while (!Poco::File(kStartupFlagFilePath).exists())
+        sleep(1);
 }
 
 void QPCRApplication::readDeviceFile()

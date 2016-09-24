@@ -38,6 +38,8 @@
 #include <net/if.h>
 
 std::string getMacAddress(const std::string &interface);
+std::string getInterfaceGateway(const std::string &interface);
+std::vector<std::string> readDnsServers();
 
 namespace NetworkInterfaces
 {
@@ -74,55 +76,6 @@ std::vector<std::string> getAllInterfaces()
     }
     else
         throw std::system_error(errno, std::generic_category(), "Network error: unable to read interfaces -");
-
-    return interfaces;
-}
-
-InterfaceSettingsMap readInterfaceSettings(const std::string &filePath)
-{
-    std::fstream file(filePath);
-
-    if (!file.is_open())
-        throw std::system_error(errno, std::generic_category(), "Network error: unable to read file " + filePath + " -");
-
-    std::map<std::string, InterfaceSettings> interfaces;
-    InterfaceSettings currentInterface;
-
-    while (file.good())
-    {
-        std::string line;
-        std::getline(file, line);
-
-        if (line.empty())
-            continue;
-
-        if (line.find("iface") == 0)
-        {
-            if (!currentInterface.interface.empty())
-            {
-                interfaces[currentInterface.interface] = currentInterface;
-                currentInterface = InterfaceSettings();
-            }
-
-            std::size_t pos = line.find(' ', 6);
-            currentInterface.interface = line.substr(6, pos - 6);
-
-            pos = line.find(' ', pos + 1) + 1;
-            currentInterface.type = line.substr(pos);
-        }
-        else if (!currentInterface.interface.empty() && (line.substr(0, 4) == std::string("    ") || line.at(0) == '\t'))
-        {
-            if (line.substr(0, 4) == std::string("    "))
-                line = line.substr(4);
-            else
-                line = line.substr(1);
-
-            currentInterface.arguments[line.substr(0, line.find(' '))] = line.substr(line.find(' ') + 1);
-        }
-    }
-
-    if (!currentInterface.interface.empty())
-        interfaces[currentInterface.interface] = currentInterface;
 
     return interfaces;
 }
@@ -171,6 +124,15 @@ InterfaceSettings readInterfaceSettings(const std::string &filePath, const std::
             interface.arguments[line.substr(0, line.find(' '))] = line.substr(line.find(' ') + 1);
         }
     }
+
+    for (const std::string &dns: readDnsServers())
+        interface.arguments["dns-nameservers"] += " " + dns;
+
+    if (interface.arguments.find("dns-nameservers") != interface.arguments.end() && interface.arguments["dns-nameservers"].at(0) == ' ')
+        interface.arguments["dns-nameservers"] = interface.arguments["dns-nameservers"].substr(1);
+
+    if (interface.type == "static" && interface.arguments.find("gateway") == interface.arguments.end())
+        interface.arguments["gateway"] = getInterfaceGateway(interface);
 
     return interface;
 }
@@ -357,4 +319,42 @@ std::string getMacAddress(const std::string &interface)
     }
 
     return stream.str();
+}
+
+std::string getInterfaceGateway(const std::string &interface)
+{
+    std::stringstream output;
+
+    watchProcess("route -n | grep " + interface, [&output](const char *buffer, std::size_t size){ output.write(buffer, size); });
+
+    std::string entry;
+    std::getline(output, entry);
+
+    output.str(std::string(entry.begin(), std::unique(entry.begin(), entry.end(), [](char l, char r){ return std::isspace(l) && std::isspace(r) && l == r; })));
+    output.clear();
+
+    std::getline(output, entry, ' '); //Skip destination
+    std::getline(output, entry, ' ');
+
+    return entry;
+}
+
+std::vector<std::string> readDnsServers()
+{
+    std::vector<std::string> servers;
+    std::ifstream file("/etc/resolv.conf");
+
+    if (file.is_open())
+    {
+        while (file.good())
+        {
+            std::string entry;
+            std::getline(file, entry);
+
+            if (entry.find("nameserver") == 0)
+                servers.emplace_back(entry.substr(11)); //Skip 'nameserver '
+        }
+    }
+
+    return servers;
 }

@@ -64,11 +64,8 @@ namespace NetworkInterfaces
         bool addressState;
     };
 
-    typedef std::map<std::string, NetworkInterfaces::InterfaceSettings> InterfaceSettingsMap;
-
     std::vector<std::string> getAllInterfaces();
 
-    InterfaceSettingsMap readInterfaceSettings(const std::string &filePath);
     InterfaceSettings readInterfaceSettings(const std::string &filePath, const std::string &interfaceName);
 
     void writeInterfaceSettings(const std::string &filePath, const InterfaceSettings &interface);
