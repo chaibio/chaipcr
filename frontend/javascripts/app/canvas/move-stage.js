@@ -266,10 +266,11 @@ angular.module("canvasApp").factory('moveStageRect', [
           C.configureStepsofNewStage(stageView, 0);
           C.correctNumbering();
           stageView.moveAllStepsAndStages();
-          circleManager.init(C);
-          console.log("starting circle");
-          circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
-          console.log("Ending circle");
+          //circleManager.init(C);
+          //console.log("starting circle");
+          //circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
+          circleManager.addRampLines();
+          //console.log("Ending circle");
           stageGraphics.stageHeader.call(stageView);
           C.$scope.applyValues(stageView.childSteps[0].circle);
           stageView.childSteps[0].circle.manageClick(true);

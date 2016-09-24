@@ -401,6 +401,7 @@ angular.module("canvasApp").factory('stage', [
             allSteps.push(stepView);
             stepView.ordealStatus = allSteps.length;
             stepView.render();
+            console.log("not insermode");
           }
 
           return stepView;
