@@ -104,10 +104,13 @@ angular.module("canvasApp").factory('stage', [
         this.configureStep(newStep, start);
         this.parent.allStepViews.splice(currentStep.ordealStatus, 0, newStep);
 
-        //
         this.parent.correctNumbering();
-        circleManager.init(fabricStage);
-        circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
+        newStep.circle.moveCircle();
+        newStep.circle.getCircle();
+
+        circleManager.addRampLines();
+        //circleManager.init(fabricStage);
+        //circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
         stageGraphics.stageHeader.call(this);
         $scope.applyValues(newStep.circle);
         newStep.circle.manageClick(true);
@@ -143,6 +146,7 @@ angular.module("canvasApp").factory('stage', [
         this.moveAllStepsAndStages(true);
 
         this.parent.correctNumbering();
+        //circleManager.addRampLines();
         circleManager.init(fabricStage);
         circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
         stageGraphics.stageHeader.call(this);
@@ -401,7 +405,6 @@ angular.module("canvasApp").factory('stage', [
             allSteps.push(stepView);
             stepView.ordealStatus = allSteps.length;
             stepView.render();
-            console.log("not insermode");
           }
 
           return stepView;

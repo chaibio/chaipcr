@@ -82,6 +82,7 @@ angular.module("canvasApp").factory('circleManager', [
             this.canvas.bringToFront(step.circle.curve);
           }
         }
+        step.circle.moveCircleWithStep();
         step.circle.manageDrag(step.circle.circleGroup);
         this.canvas.bringToFront(step.circle.circleGroup);
 

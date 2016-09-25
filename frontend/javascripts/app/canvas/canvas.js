@@ -293,10 +293,8 @@ angular.module("canvasApp").factory('canvas', [
       // configure steps;
       this.configureStepsofNewStage(stageView, ordealStatus);
       this.correctNumbering();
-      //circleManager.init(this);
-      //circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
       circleManager.addRampLines();
-      //stageGraphics.stageHeader.call(stageView);
+      stageGraphics.stageHeader.call(stageView);
       this.$scope.applyValues(stageView.childSteps[0].circle);
       stageView.childSteps[0].circle.manageClick(true);
       this.setDefaultWidthHeight();

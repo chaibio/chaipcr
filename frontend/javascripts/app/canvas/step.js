@@ -106,7 +106,7 @@ angular.module("canvasApp").factory('step', [
 
         leftVal = {left: this.left + 5};
         this.rampSpeedGroup.set(leftVal).setCoords();
-        
+
         this.ordealStatus = this.ordealStatus + action;
         this.circle.getUniqueId();
 
@@ -218,6 +218,7 @@ angular.module("canvasApp").factory('step', [
           'closeImage': this.closeImage,
           'dots': this.dots
         };
+
         this.canvas.add(this.stepGroup);
         this.canvas.add(this.rampSpeedGroup);
         this.canvas.add(this.hitPoint);
@@ -225,7 +226,6 @@ angular.module("canvasApp").factory('step', [
         this.canvas.add(this.dots);
 
         this.setShadows();
-
         this.addCircle();
       };
 
