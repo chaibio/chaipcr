@@ -196,15 +196,31 @@ angular.module("canvasApp").factory('canvas', [
       }
 
       // Rewrite part for one stage one step Scenario.
-
+      var count = this.allStageViews.length - 1;
       this.allStageViews.forEach(function(stage, index) {
-        this.editStageModeStage(stage, add, status);
+        this.editStageModeStage(stage, add, status, count, index);
       }, this);
       this.canvas.renderAll();
     };
 
-    this.editStageModeStage = function(stage, add, status) {
+    this.editStageModeStage = function(stage, add, status, count, stageIndex) {
 
+      if(stageIndex === count) {
+
+        var lastStep = stage.childSteps[stage.childSteps.length - 1];
+        if(parseInt(lastStep.circle.model.hold_time) !== 0) {
+          this.editModeStageChanges(stage, add, status);
+        }
+      } else {
+        this.editModeStageChanges(stage, add, status);
+      }
+
+      stage.childSteps.forEach(function(step, index) {
+        this.editStageModeStep(step, status);
+      }, this);
+    };
+
+    this.editModeStageChanges = function(stage, add, status) {
       stage.dots.setVisible(status);
       this.canvas.bringToFront(stage.dots);
       stage.stageNameGroup.setLeft(stage.stageNameGroup.left + add);
@@ -213,10 +229,6 @@ angular.module("canvasApp").factory('canvas', [
       } else if ( status === false ) {
         stageGraphics.stageHeader.call(stage);
       }
-
-      stage.childSteps.forEach(function(step, index) {
-        this.editStageModeStep(step, status);
-      }, this);
     };
 
     this.editStageModeStep = function(step, status) {

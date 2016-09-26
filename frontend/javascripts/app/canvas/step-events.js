@@ -68,7 +68,8 @@ angular.module("canvasApp").service('stepEvents',[
         var circle = $scope.fabricStep.circle;
         circle.changeHoldTime();
         //Check the last step. See if the last step has zero and put infinity in that case.
-        C.allCircles[C.allCircles.length - 1].doThingsForLast();
+        //C.allCircles[C.allCircles.length - 1].doThingsForLast();
+        C.allStepViews[C.allStepViews.length - 1].circle.doThingsForLast();
         canvas.renderAll();
       });
 

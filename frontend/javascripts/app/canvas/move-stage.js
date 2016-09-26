@@ -196,11 +196,31 @@ angular.module("canvasApp").factory('moveStageRect', [
           // objects are corrected now looking for visual part.
           console.log("Landed .... !: Dragged stage->", this.draggedStage.index, "current Hit ->", this.currentHit);
           var that = this;
+
           if(this.currentHit  > this.draggedStage.index) {
             // ready to move back
-            this.applyMovement(stage, C, circleManager, function() {
-              C.allStageViews.splice(that.draggedStage.index, 1);
-            });
+            var checkStep = that.draggedStage.nextStage.childSteps[that.draggedStage.nextStage.childSteps.length - 1];
+
+            if(parseInt(checkStep.circle.model.hold_time) === 0 && (checkStep.parentStage.index - 1) === that.draggedStage.index) {
+              if(stage.previousStage) {
+                this.currentDrop = stage.previousStage;
+                this.currentHit = stage.previousStage.index;
+                this.applyMovement(stage, C, circleManager, function() {
+                  C.allStageViews.splice(that.draggedStage.index + 1, 1);
+                });
+              } else if(stage.nextStage) {
+                this.currentDrop = stage.nextStage;
+                this.currentHit = stage.nextStage.index;
+                this.applyMovement(stage, C, circleManager, function() {
+                  C.allStageViews.splice(that.draggedStage.index, 1);
+                });
+              }
+            } else {
+              this.applyMovement(stage, C, circleManager, function() {
+                C.allStageViews.splice(that.draggedStage.index, 1);
+              });
+            }
+
           } else if(this.currentHit < this.draggedStage.index) {
             // ready to move forward
             this.applyMovement(stage, C, circleManager, function() {
@@ -271,9 +291,11 @@ angular.module("canvasApp").factory('moveStageRect', [
           //circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
           circleManager.addRampLines();
           //console.log("Ending circle");
+          C.allStepViews[C.allStepViews.length - 1].circle.doThingsForLast();
           stageGraphics.stageHeader.call(stageView);
           C.$scope.applyValues(stageView.childSteps[0].circle);
           stageView.childSteps[0].circle.manageClick(true);
+
         };
 
         return this.indicator;

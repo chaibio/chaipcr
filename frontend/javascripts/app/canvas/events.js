@@ -111,15 +111,25 @@ angular.module("canvasApp").factory('events', [
 
       };
 
+      this.calculateMoveLimitforStage = function() {
+
+        var lastStage = C.allStageViews[C.allStageViews.length - 1];
+        var lastStep = C.allStepViews[C.allStepViews.length - 1];
+        console.log("here");
+      };
+
       this.calculateMoveLimit = function(moveElement) {
 
         var lastStep = C.allStepViews[C.allStepViews.length - 1];
+        var lastStage = C.allStageViews[C.allStageViews.length - 1];
 
         if(lastStep.circle.holdTime.text === "∞") {
           if(moveElement === "step") {
             C.moveLimit = ((lastStep.left + 3) - 120);
+            return;
           } else if(moveElement === "stage") {
-            C.moveLimit = ((lastStep.parentStage.left + 3) - 120);
+            C.moveLimit = ((lastStage.left) - 140);
+            return;
           }
         }
 
