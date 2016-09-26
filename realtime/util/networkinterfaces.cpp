@@ -132,7 +132,7 @@ InterfaceSettings readInterfaceSettings(const std::string &filePath, const std::
         interface.arguments["dns-nameservers"] = interface.arguments["dns-nameservers"].substr(1);
 
     if (interface.type == "static" && interface.arguments.find("gateway") == interface.arguments.end())
-        interface.arguments["gateway"] = getInterfaceGateway(interface);
+        interface.arguments["gateway"] = getInterfaceGateway(interfaceName);
 
     return interface;
 }
@@ -325,7 +325,7 @@ std::string getInterfaceGateway(const std::string &interface)
 {
     std::stringstream output;
 
-    watchProcess("route -n | grep " + interface, [&output](const char *buffer, std::size_t size){ output.write(buffer, size); });
+    Util::watchProcess("route -n | grep " + interface, [&output](const char *buffer, std::size_t size){ output.write(buffer, size); });
 
     std::string entry;
     std::getline(output, entry);
