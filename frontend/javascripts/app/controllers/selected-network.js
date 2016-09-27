@@ -35,7 +35,8 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     $scope.connectedSsid = "";
     $scope.selectedWifiNow = NetworkSettingsService.listofAllWifi[$scope.name] || null; //
     $scope.wifiNetworkType = null; // We have different settings for wep2 and wpa , so we need to look for the type of network.
-    $scope.editEthernetData = {};
+    $scope.editEthernetData = {}; // this is used for wifi too, because right now we dont provide a way to edit wifi data of connected network, move to
+    // another variable when we provide that feture
 
     $scope.$watch('autoSetting', function(val, oldVal) {
       //console.log(val, $scope);
@@ -47,6 +48,7 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
         $scope.statusMessage = "";
         $scope.currentNetwork = NetworkSettingsService.connectedWifiNetwork;
         $scope.editEthernetData = $scope.currentNetwork.state;
+        $scope.editEthernetData.dns_nameservers = $scope.currentNetwork.settings['dns-nameservers'].split(" ")[0];
         $scope.connectedSsid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"] || NetworkSettingsService.connectedWifiNetwork.settings.wireless_essid;
         $scope.connectedSsid.replace(new RegExp('"', "g"), "");
           if($state.params.name.replace(new RegExp('_', "g"), " ") === $scope.connectedSsid) {
@@ -66,6 +68,7 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
           if(wifiConnection.state.status === "connected") {
             $scope.currentNetwork = wifiConnection;
             $scope.editEthernetData = $scope.currentNetwork.state;
+            $scope.editEthernetData.dns_nameservers = $scope.currentNetwork.settings['dns-nameservers'].split(" ")[0];
             $scope.IamConnected = true;
             // We assign this so that, It shows data when we select
             //a wifi network which is already being connected.
