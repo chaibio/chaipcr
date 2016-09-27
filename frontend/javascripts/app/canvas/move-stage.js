@@ -111,7 +111,8 @@ angular.module("canvasApp").factory('moveStageRect', [
 
           this.setLeft(stage.left - 1).setCoords();
           this.setVisible(true);
-
+          this.canvasContaining = $('.canvas-containing');
+          this.currentDragPos = 0;
           this.spaceArray = [stage.left - 10, stage.left + 160];
           this.draggedStage = stage;
 
@@ -145,7 +146,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           }
 
           this.currentLeft = movement.left;
-
+          this.checkMovingOffScreen(C, movement, this.direction);
           C.allStageViews.some(function(stage, index) {
 
             if(this.beacon.intersectsWithObject(stage.stageHitPointLeft) && this.draggedStage.index !== index) {
@@ -190,7 +191,20 @@ angular.module("canvasApp").factory('moveStageRect', [
           // Now work with scrolling as we move ..!
         };
 
-        // Now improve the code to handle simple click on stage move, Now we dont handle this event.
+        this.indicator.checkMovingOffScreen = function(C, movement, direction) {
+
+          if(direction === "right") {
+            if(movement.left - this.canvasContaining.scrollLeft() > 889) {
+              this.canvasContaining.scrollLeft(movement.left - 889);
+            }
+          } else if (direction === "left") {
+            var anchor = this.canvasContaining.scrollLeft();
+            if(anchor > movement.left) {
+              this.canvasContaining.scrollLeft((anchor - (anchor - movement.left)));
+            }
+          }
+        };
+
         this.indicator.processMovement = function(stage, C, circleManager) {
           // Process movement here
           // objects are corrected now looking for visual part.
