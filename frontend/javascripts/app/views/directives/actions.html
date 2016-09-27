@@ -20,7 +20,7 @@
   <button ng-class="{big_button: !infiniteHoldStep, big_button_disabled: infiniteHoldStep || summaryMode, SH: true}" id="add-step" ng-click="addStep()">ADD STEP</button>
   <button ng-class="{big_button: !infiniteHoldStage, big_button_disabled: infiniteHoldStage || summaryMode, SH: true}" id="add-stage" ng-click="addStage_()">ADD STAGE</button>
 
-  <button ng-class="{small_button: !infiniteHoldStep, small_button_disabled: infiniteHoldStep || summaryMode, SH:true}" id="delete-step" ng-click="addPause()">{{pauseAction}} PAUSE</button>
+  <button ng-class="{small_button: !infiniteHoldStep, small_button_disabled: infiniteHoldStep || summaryMode || fabricStep.model.collect_data, SH:true}" id="delete-step" ng-click="addPause()">{{pauseAction}} PAUSE</button>
 
   <button class="small_button move-small-button SH" ng-class="{smallButtonEdit: editStageMode, small_button_disabled: summaryMode}" id="edit-stage" ng-click="editStage()">{{editStageText}}</button>
 

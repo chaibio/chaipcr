@@ -34,14 +34,14 @@ angular.module("canvasApp").factory('mouseOver', [
         switch(evt.target.name) {
 
           case "stepGroup":
-          console.log("hovered");
+          //console.log("hovered");
             me = evt.target.me;
             if(C.editStageStatus === false) {
               me.closeImage.animate('opacity', 1, {
                 duration: 400,
                 onChange: C.canvas.renderAll.bind(C.canvas),
                 onComplete: function() {
-                  console.log('done');
+                  //console.log('done');
                 }
               });
               //me.closeImage.setVisible(true);
@@ -51,7 +51,7 @@ angular.module("canvasApp").factory('mouseOver', [
                   duration: 400,
                   onChange: C.canvas.renderAll.bind(C.canvas),
                   onComplete: function() {
-                    console.log('done');
+                    //console.log('done');
                   }
                 });
               }

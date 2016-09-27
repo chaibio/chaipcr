@@ -44,6 +44,7 @@ angular.module("canvasApp").directive('actions', [
           });
 
           scope.$watch('step.pause', function(pauseState) {
+
             if(pauseState) {
               scope.pauseAction = "REMOVE";
             } else {
@@ -52,7 +53,7 @@ angular.module("canvasApp").directive('actions', [
           });
 
           scope.$watch("step.id", function(newVal) {
-
+            console.log(scope);
             if(scope.fabricStep) {
 
               if(scope.fabricStep.circle.holdTime.text === "∞") {
