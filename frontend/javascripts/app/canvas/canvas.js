@@ -221,9 +221,16 @@ angular.module("canvasApp").factory('canvas', [
     };
 
     this.editModeStageChanges = function(stage, add, status) {
+
       stage.dots.setVisible(status);
       this.canvas.bringToFront(stage.dots);
-      stage.stageNameGroup.setLeft(stage.stageNameGroup.left + add);
+
+      if((stage.stageNameGroup + add) < stage.left) {
+        stage.stageNameGroup.setLeft(stage.left + 1);
+      } else {
+        stage.stageNameGroup.setLeft(stage.stageNameGroup.left + add);
+      }
+
       if( status === true && stage.childSteps.length === 1 ) {
         stage.shortenStageName();
       } else if ( status === false ) {
@@ -232,6 +239,7 @@ angular.module("canvasApp").factory('canvas', [
     };
 
     this.editStageModeStep = function(step, status) {
+
       step.closeImage.setOpacity(status);
       step.dots.setVisible(status).setCoords();
 

@@ -185,12 +185,20 @@ angular.module("canvasApp").factory('circle', [
         return this;
       };
 
-      this.doThingsForLast = function() {
+      this.doThingsForLast = function(newHold, oldHold) {
 
         var holdTimeText = this.parent.holdDuration || this.model.hold_time;
 
         if(parseInt(holdTimeText) === 0) {
           this.holdTime.text = "∞";
+          console.log(newHold, oldHold);
+          if(this.parent.parentStage.parent.editStageStatus === true && oldHold !== null){
+            this.parent.parentStage.parent.editModeStageChanges(this.parent.parentStage, -25, false);
+          }
+        } else {
+          if(oldHold !== null && oldHold === 0 && this.parent.parentStage.parent.editStageStatus === true) {
+            this.parent.parentStage.parent.editModeStageChanges(this.parent.parentStage, 25, true);
+          }
         }
       };
 
