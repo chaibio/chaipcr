@@ -296,13 +296,18 @@
 
     function makeLine(line_config) {
       var line = d3.line()
-        .curve(d3.curveCardinal)
+        .curve(d3.curveBasis)
         .x(function(d) {
           return Globals.xScale(d[line_config.x]);
         })
         .y(function(d) {
           return Globals.yScale(d[line_config.y]);
         });
+      if (Globals.config.axes.y.scale === 'log') {
+        line.defined(function (d) {
+          return d[line_config.y] >= 10;
+        });
+      }
       var trans;
       var _path = Globals.viewSVG.append("path")
         .datum(Globals.data[line_config.dataset])
@@ -342,28 +347,11 @@
         return;
       }
       Globals.lines = Globals.lines || [];
-      // Globals.chartSVG.selectAll('.line').remove();
       Globals.lines.forEach(function(line) {
         line.remove();
       });
       Globals.lines = [];
       Globals.activePath = null;
-
-      // var lastCirclePos, lastDashedLinePos, lastXAxisCirclePos;
-      // if (Globals.dashedLine && Globals.circle && Globals.xAxisCircle) {
-      //   lastDashedLinePos = {
-      //     x1: Globals.dashedLine.attr('x1'),
-      //     x2: Globals.dashedLine.attr('x2'),
-      //   };
-      //   lastCirclePos = {
-      //     x: Globals.circle.attr('cx'),
-      //     y: Globals.circle.attr('cy'),
-      //   };
-      //   lastXAxisCirclePos = {
-      //     x: Globals.xAxisCircle.attr('cx'),
-      //     y: Globals.xAxisCircle.attr('cy'),
-      //   };
-      // }
 
       Globals.dashedLine = makeDashedLine();
 
@@ -389,11 +377,9 @@
         if (p) {
           setActivePath(p, m);
           showMouseIndicators();
-          // Globals.circle.attr('cx', lastCirclePos.x).attr('cy', lastCirclePos.y);
-          // Globals.dashedLine.attr('x1', lastDashedLinePos.x1).attr('x2', lastDashedLinePos.x2);
-          // Globals.xAxisCircle.attr('cx', lastXAxisCirclePos.x).attr('cy', lastXAxisCirclePos.y);
         }
       }
+
     }
 
     function getDataLength() {
@@ -578,8 +564,8 @@
       var diff = max - min;
       var allowance = diff * (Globals.config.axes.y.scale === 'log' ? 0.2 : 0.05);
       max += allowance;
-      min -= allowance;
-      min = Globals.config.axes.y.scale === 'log' ? 0.01 : min;
+      // min -= allowance;
+      min = Globals.config.axes.y.scale === 'log' ? 5 : min - allowance;
 
       Globals.yScale = Globals.config.axes.y.scale === 'log' ? d3.scaleLog() : d3.scaleLinear();
 
@@ -691,7 +677,6 @@
         .attr("width", width + config.margin.left + config.margin.right)
         .attr("height", height + config.margin.top + config.margin.bottom)
         .call(Globals.zooomBehavior);
-      // .on("mousemove", followMouseOnXAxis);
 
       var svg = chartSVG.append("g")
         .attr("transform", "translate(" + config.margin.left + "," + config.margin.top + ")")
@@ -724,17 +709,11 @@
 
     }
 
-    // function followMouseOnXAxis() {
-
-    //   var x = d3.mouse(this)[0];
-    // }
-
     function circleFollowsMouse() {
       if (!Globals.activePath) {
         hideMouseIndicators();
         return;
       }
-      // var x = d3.mouse(this)[0];
       var x = d3.mouse(Globals.mouseOverlay.node())[0];
 
       var pathEl = Globals.activePath.node();
@@ -765,13 +744,11 @@
         hideMouseIndicators();
       } else {
         Globals.circle
-          // .attr("opacity", 1)
           .attr("cx", x)
           .attr("cy", pos.y)
           .attr('transform', 'translate(0,0) scale(1)');
 
         Globals.dashedLine
-          // .attr("opacity", 1)
           .attr('x1', x)
           .attr('x2', x);
 
