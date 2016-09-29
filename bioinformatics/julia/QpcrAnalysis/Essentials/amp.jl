@@ -10,6 +10,8 @@ function process_amp(
     # start: arguments that might be passed by upstream code
     well_nums::AbstractVector=[],
     min_reliable_cyc::Real=5,
+    cq_method::AbstractString="Cy0",
+    ct_fluos::AbstractVector=[],
     # end: arguments that might be passed by upstream code
     max_cycle::Integer=1000, # maximum temperature to analyze
     dcv::Bool=true, # logical, whether to perform multi-channel deconvolution
@@ -40,7 +42,9 @@ function process_amp(
             LEFT JOIN stages ON protocols.id = stages.protocol_id
             LEFT JOIN steps ON stages.id = steps.stage_id
             LEFT JOIN ramps ON steps.id = ramps.next_step_id
-            WHERE experiments.id = $exp_id
+            WHERE
+                experiments.id = $exp_id AND
+                stages.stage_type <> \'meltcurve\'
         "
         sr = mysql_execute(db_conn, sr_qry)
 
@@ -108,7 +112,7 @@ function process_amp(
             cycle_nums, fluo_well_nums, well_nums, channels,
             dcv,
             dye_in, dyes_2bfild,
-            min_reliable_cyc, kwdict_mbq,
+            min_reliable_cyc, cq_method, ct_fluos, kwdict_mbq,
             qt_prob_rc, kwdict_rc,
             out_format_1sr, json_digits, verbose
         )
@@ -167,6 +171,7 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
     denser_factor::Real=100,
 
     cq_method::AbstractString="Cy0",
+    ct_fluo::Real=NaN,
 
     verbose::Bool=false,
 
@@ -282,10 +287,19 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
     func_pred_f = MDs[sig_m_postbl].funcs_pred["f"]
     Cy0 = cyc_max_d1 - func_pred_f(cyc_max_d1, coefs_pb...) / max_d1
 
+    ct = try
+        MDs[sig_m_postbl].funcs_pred["inv"](ct_fluo, coefs_pb...)
+    catch err
+        if isa(err, DomainError)
+            NaN
+        end # if
+    end # try
+
     cyc_dict = OrderedDict(
         "cp_d1"=>cyc_max_d1,
         "cp_d2"=>cyc_max_d2,
-        "Cy0"=>Cy0
+        "Cy0"=>Cy0,
+        "ct"=>ct
     )
 
     func_pred_eff = function (cyc)
@@ -311,6 +325,11 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
     cq_raw = cyc_dict[cq_method]
     eff = eff_dict[cq_method]
 
+    cq_fluo = MDs[sig_m_postbl].funcs_pred["f"](
+        cq_raw <= 0 ? NaN : cq_raw,
+        coefs_pb...
+    )
+
     return OrderedDict(
         "fitted_prebl"=>fitted_prebl,
         "bl_notes"=>bl_notes,
@@ -325,6 +344,7 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
         "cq_raw"=>cq_raw,
         "cq"=>copy(cq_raw),
         "eff"=>eff,
+        "cq_fluo"=>cq_fluo
     )
 #
 
@@ -414,6 +434,8 @@ function process_amp_1sr(
     dcv::Bool, # logical, whether to perform multi-channel deconvolution
     dye_in::AbstractString, dyes_2bfild::AbstractVector,
     min_reliable_cyc::Real,
+    cq_method::AbstractString,
+    ct_fluos::AbstractVector,
     kwdict_mbq::Associative, # keyword arguments passed onto `mod_bl_q`
     qt_prob_rc::Real, # quantile probablity for fluo values per well
     kwdict_rc::Associative, # keyword arguments passed onto `report_cq`
@@ -455,10 +477,36 @@ function process_amp_1sr(
         full_dict["blsub_fluos"] = rbbs_ary3
         full_dict["cq"] = NaN_ary2
     else
+        if length(ct_fluos) == 0
+            if cq_method == "ct"
+                ct_fluos = map(1:num_channels) do channel_i
+                    mbq_ary1 = map(1:num_fluo_wells) do well_i
+                        mod_bl_q(
+                            rbbs_ary3[:, well_i, channel_i];
+                            min_reliable_cyc=min_reliable_cyc,
+                            cq_method="cp_d1",
+                            ct_fluo=NaN,
+                            kwdict_mbq...,
+                            verbose=verbose
+                        )
+                    end # do well_i
+                    fluos_useful = map(find(mbq_ary1) do mbq
+                        mbq["postbl_status"] == :Optimal
+                    end) do mbq_i # `end` for `do mbq`
+                        mbq_ary1[mbq_i]["cq_fluo"]
+                    end # do mbq_i
+                    median(fluos_useful)
+                end # do channel_i
+            else
+                ct_fluos = fill(NaN, 3)
+            end # if cq_method
+        end # length
         mbq_ary2 = [
             mod_bl_q(
                 rbbs_ary3[:, well_i, channel_i];
                 min_reliable_cyc=min_reliable_cyc,
+                cq_method=cq_method,
+                ct_fluo=ct_fluos[channel_i],
                 kwdict_mbq...,
                 verbose=verbose
             )
@@ -498,7 +546,9 @@ function process_amp_1sr(
             report_cq!(full_dict, well_i, channel_i; kwdict_rc...)
         end
 
-    end # if
+    end # if num_cycles <= 2
+
+    full_dict["ct_fluos"] = ct_fluos
 
     if endswith(out_format, "json")
         out_dict = OrderedDict(map(["rbbs_ary3", "blsub_fluos", "cq"]) do key

@@ -31,7 +31,7 @@ function empty_func(args...; kwargs...) end
 # function empty_func(arg1::Any=0, args...; kwargs...) end
 
 
-const MD_func_keys = ["f", "bl", "d1", "d2"] # when `num_fts > 1`, "d*" are partial derivatives in vector of length `num_fts`
+const MD_func_keys = ["f", "inv", "bl", "d1", "d2"] # when `num_fts > 1`, "d*" are partial derivatives in vector of length `num_fts`
 
 # `EMPTY_fp` for `func_pred_strs` and `funcs_pred`
 const EMPTY_fp = map(("", empty_func)) do empty_val
@@ -67,6 +67,7 @@ const MODEL_BASES = [ # vector of tuples
     end,
     OrderedDict(
         "f" => "c0 + c1 * _x",
+        "inv" => "(_x - c0) / c1",
         "bl" => "0",
         "d1" => "c1",
         "d2" => "0"
@@ -85,6 +86,7 @@ const MODEL_BASES = [ # vector of tuples
     end,
     OrderedDict(
         "f" => "c0 + c1 * _x1 + c2 * _x2",
+        "inv" => "0", # not applicable
         "bl" => "0",
         "d1" => "[c1, c2]",
         "d2" => "[0, 0]"
@@ -104,7 +106,8 @@ const MODEL_BASES = [ # vector of tuples
     function b4_func_init_coefs(
         X::AbstractVector,
         Y::AbstractVector,
-        epsilon::Real=0.001)
+        epsilon::Real=0.001
+        )
         Y_min, Y_min_idx = findmin(Y)
         c_ = Y_min - epsilon
         d_ = maximum(Y) + epsilon
@@ -118,6 +121,7 @@ const MODEL_BASES = [ # vector of tuples
     end,
     OrderedDict(
         "f" => "c_ + (d_ - c_) / (1 + exp(b_ * (_x - e_)))",
+        "inv" => "log((-d_ + _x) / (c_ - _x)) / b_ + e_",
         "bl" => "c_",
         "d1" =>
             "(b_ * (c_ - d_) * exp(b_ * (e_ + _x)))/(exp(b_ * e_) + exp(b_ * _x))^2",
@@ -151,6 +155,7 @@ const MODEL_BASES = [ # vector of tuples
     end,
     OrderedDict( # pred_strs
         "f" => "c_ + (d_ - c_) / (1 + exp(b_ * (log(_x) - log(e_))))",
+        "inv" => "((e_^b_ * (-d_ + _x))/(c_ - _x))^(1/b_)",
         "bl" => "c_",
         "d1" => "(b_ * (c_ - d_) * e_^b_ * _x^(-1 + b_)) / (e_^b_ + _x^b_)^2",
         "d2" =>
@@ -189,6 +194,7 @@ const MODEL_BASES = [ # vector of tuples
     OrderedDict( # pred_strs
         "f" =>
             "c_ + bl_k / (_x + bl_o) + (d_ - c_) / (1 + exp(b_ * (log(_x) - log(e_))))",
+        "inv" => "0", # not calculated yet
         "bl" => "c_ + bl_k / (_x + bl_o)",
         "d1" =>
             "-bl_k / (_x + bl_o)^2 + (b_ * (c_ - d_) * e_^b_ * _x^(-1 + b_)) / (e_^b_ + _x^b_)^2",
@@ -227,6 +233,7 @@ const MODEL_BASES = [ # vector of tuples
     OrderedDict( # pred_strs
         "f" =>
             "c_ + k1 * _x + (d_ - c_) / (1 + exp(b_ * (log(_x) - log(e_))))",
+        "inv" => "0", # not calculated yet
         "bl" => "c_ + k1 * _x",
         "d1" =>
             "k1 + (b_ * (c_ - d_) * e_^b_ * _x^(-1 + b_)) / (e_^b_ + _x^b_)^2",
@@ -266,6 +273,7 @@ const MODEL_BASES = [ # vector of tuples
     OrderedDict( # pred_strs
         "f" =>
             "c_ + k1 * _x + k2 * _x^2 + (d_ - c_) / (1 + exp(b_ * (log(_x) - log(e_))))",
+        "inv" => "0", # not calculated yet
         "bl" => "c_ + k1 * _x + k2 * _x^2",
         "d1" =>
             "k1 + 2 * k2 * _x + (b_ * (c_ - d_) * e_^b_ * _x^(-1 + b_)) / (e_^b_ + _x^b_)^2",
@@ -299,6 +307,7 @@ const MODEL_BASES = [ # vector of tuples
     end,
     OrderedDict( # pred_strs
         "f" => "c_ + (d_ - c_) / (1 + exp(b_ * (log(_x) - e_)))",
+        "inv" => "((exp(e_ * b_) * (-d_ + _x))/(c_ - _x))^(1/b_)",
         "bl" => "c_",
         "d1" => "(b_ * (c_ - d_) * exp(e_ * b_) * _x^(-1 + b_)) / (exp(e_ * b_) + _x^b_)^2",
         "d2" =>
@@ -337,6 +346,7 @@ const MODEL_BASES = [ # vector of tuples
     OrderedDict( # pred_strs
         "f" =>
             "c_ + bl_k / (_x + bl_o) + (d_ - c_) / (1 + exp(b_ * (log(_x) - e_)))",
+        "inv" => "0", # not calculated yet
         "bl" => "c_ + bl_k / (_x + bl_o)",
         "d1" =>
             "-bl_k / (_x + bl_o)^2 + (b_ * (c_ - d_) * exp(e_ * b_) * _x^(-1 + b_)) / (exp(e_ * b_) + _x^b_)^2",
@@ -375,6 +385,7 @@ const MODEL_BASES = [ # vector of tuples
     OrderedDict( # pred_strs
         "f" =>
             "c_ + k1 * _x + (d_ - c_) / (1 + exp(b_ * (log(_x) - log(e_))))",
+        "inv" => "0", # not calculated yet
         "bl" => "c_ + k1 * _x",
         "d1" =>
             "k1 + (b_ * (c_ - d_) * exp(e_ * b_) * _x^(-1 + b_)) / (exp(e_ * b_) + _x^b_)^2",
@@ -414,6 +425,7 @@ const MODEL_BASES = [ # vector of tuples
     OrderedDict( # pred_strs
         "f" =>
             "c_ + k1 * _x + k2 * _x^2 + (d_ - c_) / (1 + exp(b_ * (log(_x) - log(e_))))",
+        "inv" => "0", # not calculated yet
         "bl" => "c_ + k1 * _x + k2 * _x^2",
         "d1" =>
             "k1 + 2 * k2 * _x + (b_ * (c_ - d_) * exp(e_ * b_) * _x^(-1 + b_)) / (exp(e_ * b_) + _x^b_)^2",
@@ -430,7 +442,7 @@ function add_funcs_pred!(
     )
 
     _x_args_str = join(map(_x_str -> "$_x_str::Real", md._x_strs), ", ")
-    coefs_str = join(md.coef_strs, ", ")
+    coefs_str = join(map(str -> "$str::Real", md.coef_strs), ", ")
 
     for func_key in MD_func_keys
         func_name = "$(md.name)_$func_key"
