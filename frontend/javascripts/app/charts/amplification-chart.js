@@ -85,7 +85,7 @@
       }
     }
 
-    function getActivePathConfig(path) {
+    function getPathConfig(path) {
       var activePathConfig, activePathIndex;
       for (var i = Globals.lines.length - 1; i >= 0; i--) {
         var l = Globals.lines[i];
@@ -106,11 +106,11 @@
         // Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth / Globals.zoomTransform.k);
         Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth);
       }
-      Globals.activePathConfig = getActivePathConfig(path);
+      Globals.activePathConfig = getPathConfig(path);
       var activePathConfig = Globals.activePathConfig.config;
       var activePathIndex = Globals.activePathConfig.index;
-      // var newLine = makeLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth / Globals.zoomTransform.k);
-      var newLine = makeLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth);
+      // var newLine = makeColoredLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth / Globals.zoomTransform.k);
+      var newLine = makeColoredLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth);
       Globals.lines[activePathIndex] = newLine;
       Globals.activePath = newLine;
       makeCircle();
@@ -278,6 +278,12 @@
 
       var d = x0 - d0[line_config.x] > d1[line_config.x] - x0 ? d1 : d0;
 
+      // if (d[line_config.y] <= 10 && Globals.config.axes.y.scale === 'log') {
+      //   hideMouseIndicators();
+      // } else {
+      //   showMouseIndicators();
+      // }
+
       if (Globals.box && Globals.activePath) {
         var conf = Globals.activePathConfig;
         if (Globals.box.RFYTextValue) {
@@ -294,9 +300,31 @@
       }
     }
 
-    function makeLine(line_config) {
+    function makeGuidingLine(line_config) {
       var line = d3.line()
-        .curve(d3.curveBasis)
+        .curve(d3.curveMonotoneX)
+        .x(function(d) {
+          return Globals.xScale(d[line_config.x]);
+        })
+        .y(function(d) {
+          return Globals.yScale(d[line_config.y]);
+        });
+      var trans;
+      var _path = Globals.viewSVG.append("path")
+        .datum(Globals.data[line_config.dataset])
+        .attr("class", "line")
+        .attr("stroke", 'transparent')
+        .attr('fill', 'none')
+        .attr("d", line)
+        .attr('stroke-width', Globals.normalPathStrokeWidth)
+        .on('mousemove', circleFollowsMouse);
+
+      return _path;
+    }
+
+    function makeColoredLine(line_config) {
+      var line = d3.line()
+        .curve(d3.curveMonotoneX)
         .x(function(d) {
           return Globals.xScale(d[line_config.x]);
         })
@@ -304,8 +332,8 @@
           return Globals.yScale(d[line_config.y]);
         });
       if (Globals.config.axes.y.scale === 'log') {
-        line.defined(function (d) {
-          return d[line_config.y] >= 10;
+        line.defined(function(d) {
+          return d[line_config.y] > 10;
         });
       }
       var trans;
@@ -346,6 +374,14 @@
       if (!series) {
         return;
       }
+
+
+      Globals.guidingLines = Globals.guidingLines || [];
+      Globals.guidingLines.forEach(function(line) {
+        line.remove();
+      });
+      Globals.guidingLines = [];
+
       Globals.lines = Globals.lines || [];
       Globals.lines.forEach(function(line) {
         line.remove();
@@ -357,7 +393,12 @@
 
       for (var i = 0; i < series.length; i++) {
         var s = series[i];
-        Globals.lines.push(makeLine(s));
+        Globals.guidingLines.push(makeGuidingLine(s));
+      }
+
+      for (var i = 0; i < series.length; i++) {
+        var s = series[i];
+        Globals.lines.push(makeColoredLine(s));
       }
 
 
@@ -638,7 +679,8 @@
         .attr('stroke', '#fff')
         .attr('stroke-width', Globals.circleStrokeWidth)
         .attr('class', 'mouse-indicator-circle')
-        .on('mouseout', hideMouseIndicators);
+        .on('mouseout', hideMouseIndicators)
+        .on('mousemove', circleFollowsMouse);
       if (lastPos) {
         Globals.xAxisCircle.attr('cx', lastPos.cx);
         Globals.xAxisCircle.attr('cy', lastPos.cy);
@@ -716,7 +758,8 @@
       }
       var x = d3.mouse(Globals.mouseOverlay.node())[0];
 
-      var pathEl = Globals.activePath.node();
+      var pathEl = Globals.guidingLines[Globals.activePathConfig.index].node();
+      // var pathEl = Globals.activePath.node();
       var pathLength = pathEl.getTotalLength();
       var beginning = x,
         end = pathLength,
