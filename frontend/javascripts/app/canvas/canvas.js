@@ -222,18 +222,24 @@ angular.module("canvasApp").factory('canvas', [
 
     this.editModeStageChanges = function(stage, add, status) {
 
+      var leftVal = {};
       stage.dots.setVisible(status);
       this.canvas.bringToFront(stage.dots);
-
-      if((stage.stageNameGroup + add) < stage.left) {
-        stage.stageNameGroup.setLeft(stage.left + 1);
-      } else {
-        stage.stageNameGroup.setLeft(stage.stageNameGroup.left + add);
-      }
-
-      if( status === true && stage.childSteps.length === 1 ) {
-        stage.shortenStageName();
-      } else if ( status === false ) {
+      if(status === true) {
+        if(stage.stageNameGroup.moved !== "right") {
+          leftVal = {left: stage.stageNameGroup.left + 26};
+          stage.stageNameGroup.set(leftVal).setCoords();
+          stage.stageNameGroup.moved = "right";
+        }
+        if(stage.childSteps.length === 1) {
+          stage.shortenStageName();
+        }
+      } else if(status === false) {
+        if(stage.stageNameGroup.moved !== "left") {
+          leftVal = {left: stage.stageNameGroup.left - 26};
+          stage.stageNameGroup.set(leftVal).setCoords();
+          stage.stageNameGroup.moved = "left";
+        }
         stageGraphics.stageHeader.call(stage);
       }
     };

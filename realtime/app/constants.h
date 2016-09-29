@@ -45,7 +45,7 @@ const double kLidThermistorT0 = 298.15;             //kelvins
 const double kLidMinTargetTemp = 0;
 const double kLidMaxTargetTemp = 130;
 
-const double kLidLowTempShutdownThreshold = -20;
+const double kLidLowTempShutdownThreshold = -2;
 const double kLidHighTempShutdownThreshold = 140;
 
 const double kProgramStartLidTempThreshold = 2;
@@ -78,10 +78,10 @@ const unsigned long kHeatBlockZone2PWMPeriodNs = 50000;
 const double kHeatBlockZonesPIDMin = -1;
 const double kHeatBlockZonesPIDMax = 1;
 
-const double kHeatBlockZonesMinTargetTemp = -10;
+const double kHeatBlockZonesMinTargetTemp = 0;
 const double kHeatBlockZonesMaxTargetTemp = 105;
 
-const double kHeatBlockLowTempShutdownThreshold = -20;
+const double kHeatBlockLowTempShutdownThreshold = -5;
 const double kHeatBlockHighTempShutdownThreshold = 120;
 
 const double kMaxHeatBlockRampSpeed = 6.0;

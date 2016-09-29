@@ -21,6 +21,9 @@
 #include <Poco/Util/Timer.h>
 #include <Poco/Util/TimerTaskAdapter.h>
 
+#include <limits>
+#include <sstream>
+
 #include "pcrincludes.h"
 #include "pid.h"
 #include "ledcontroller.h"
@@ -28,6 +31,7 @@
 #include "maincontrollers.h"
 #include "qpcrapplication.h"
 #include "util.h"
+#include "logger.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class FluorescenceRoughData
@@ -59,6 +63,7 @@ Optics::Optics(unsigned int lidSensePin, std::shared_ptr<LEDController> ledContr
     _collectDataTimer = new Poco::Util::Timer();
     _wellNumber = 0;
     _adcValue = {0, 0};
+    _firstErrorState = false;
 }
 
 Optics::~Optics()
@@ -80,6 +85,27 @@ void Optics::process()
 
 void Optics::setADCValue(int32_t adcValue, std::size_t channel)
 {
+    if (adcValue == std::numeric_limits<int32_t>::max() || adcValue == std::numeric_limits<int32_t>::min())
+    {
+        if (_firstErrorState)
+        {
+            std::stringstream stream;
+            stream << "Invalid optical read (" << (adcValue == std::numeric_limits<int32_t>::max() ? 1 : 0) << ")";
+
+            throw std::runtime_error(stream.str());
+        }
+        else
+        {
+            _firstErrorState = true;
+
+            APP_LOGGER << "Optics::setADCValue - invalid adc value occured. Skipping";
+
+            return;
+        }
+    }
+
+    _firstErrorState = false;
+
     {
         std::lock_guard<std::mutex> lock(_adcMutex);
 

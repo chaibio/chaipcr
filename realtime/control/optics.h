@@ -119,6 +119,8 @@ private:
 
     MUX _photodiodeMux;
 
+    bool _firstErrorState;
+
     //Hardcode for testing
     std::map<std::size_t, std::atomic<int32_t>> _lastAdcValues; //Not thread safe
 };
