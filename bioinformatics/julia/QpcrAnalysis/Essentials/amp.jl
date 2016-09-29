@@ -551,7 +551,7 @@ function process_amp_1sr(
     full_dict["ct_fluos"] = ct_fluos
 
     if endswith(out_format, "json")
-        out_dict = OrderedDict(map(["rbbs_ary3", "blsub_fluos", "cq"]) do key
+        out_dict = OrderedDict(map(["rbbs_ary3", "blsub_fluos", "cq", "ct_fluos"]) do key
             key => round(full_dict[key], json_digits)
         end) # do key
     elseif out_format == "full"
