@@ -84,7 +84,7 @@ class DevicesController < ApplicationController
   
   api :GET, "/device/status", "status of the machine"
   def status
-    url = URI.parse("http://localhost:8000/status?access_token=#{token}")
+    url = URI.parse("http://localhost:8000/status?access_token=#{authentication_token}")
     begin
       response = Net::HTTP.get_response(url)
       render :json=>response.body, :status=>response.code
