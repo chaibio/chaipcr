@@ -1,0 +1,42 @@
+<div class="chart-chooser">
+  <div class="chart-content">
+    <div class="chart-header-section">
+      <div class="chart-caption">Choose a Chart</div>
+      <div class="close-container"><a class="close-modal" ng-click="$close()">×</a></div>
+    </div>
+    <div class="charts-container">
+
+      <div class="chart-box" ng-if="hasAmplification()" ng-click="changeChart('amplification')">
+        <div class="chart-image-container">
+          <div class="chart-current-container">
+            <div class="chart-current" ng-show="currentChart === 'amplification'">Current Selection</div>
+          </div>
+          <div class="img-placeholder ampli"></div>
+        </div>
+        <div class="chart-name-container">Amplification Curve</div>
+      </div>
+
+      <div class="chart-box" ng-if="hasMeltCurve()" ng-click="changeChart('melt-curve')">
+        <div class="chart-image-container">
+          <div class="chart-current-container">
+            <div class="chart-current" ng-show="currentChart === 'melt-curve'">Current Selection</div>
+          </div>
+          <div class="img-placeholder melt-curve"></div>
+        </div>
+        <div class="chart-name-container">Melt Curve</div>
+      </div>
+
+      <div class="chart-box" ng-click="changeChart('temperature-logs')">
+        <div class="chart-image-container">
+          <div class="chart-current-container">
+            <div class="chart-current" ng-show="currentChart === 'temperature-logs'">Current Selection</div>
+          </div>
+          <div class="img-placeholder thermal-profile"></div>
+        </div>
+        <div class="chart-name-container">Thermal Profile</div>
+      </div>
+
+
+    </div>
+  </div>
+</div>
