@@ -41,7 +41,7 @@ class SessionsController < ApplicationController
 
   api :POST, "/logout", "Logout"
   def destroy
-    user_token = UserToken.where(access_token: UserToken.digest(token)).first
+    user_token = UserToken.where(access_token: UserToken.digest(authentication_token)).first
     if user_token
       user_token.destroy
     end
