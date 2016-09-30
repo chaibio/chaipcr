@@ -36,6 +36,10 @@ app.factory 'AuthToken', [
   ->
     request: (config) ->
       access_token = $.jStorage.get('authToken', null)
+      if !access_token
+        re = new RegExp("authentication_token" + "=([^;]+)")
+        value = re.exec(document.cookie)
+        access_token = unescape(value[1])
       if access_token and config.url.indexOf('8000') >= 0
         config.url = "#{config.url}#{ if config.url.indexOf('&') < 0 then '?' else '&' }access_token=#{access_token}"
         # config.headers['Content-Type'] = 'multipart/form-data'
