@@ -85,7 +85,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       fetchFluorescenceData = ->
         gofetch = true
         gofetch = false if $scope.fetching
-        gofetch = false if $scope.RunExperimentCtrl.chart isnt 'amplification'
+        gofetch = false if $scope.$parent.chart isnt 'amplification'
         gofetch = false if $scope.retrying
 
         if gofetch
@@ -183,7 +183,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         updateSeries()
 
       $scope.$watch ->
-        $scope.RunExperimentCtrl.chart
+        $scope.$parent.chart
       , (chart) ->
         if chart is 'amplification'
           # if !$scope.hasData

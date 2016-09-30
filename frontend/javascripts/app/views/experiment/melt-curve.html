@@ -23,10 +23,15 @@
         <div class="curve-header">
           <div class="row">
             <div class="col-sm-6 curve-name">
-              <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()">
+
+              <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart">
                 Melt Curve
                 <img class="arrow-down" src="/images/arrow-down.png">
-              </span>
+              </chart-chooser>
+              <!-- <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()">
+                Melt Curve
+                <img class="arrow-down" src="/images/arrow-down.png">
+              </span> -->
             </div>
             <div class="col-sm-6 ampli-toggles">
               <div class="plot-type-buttons">

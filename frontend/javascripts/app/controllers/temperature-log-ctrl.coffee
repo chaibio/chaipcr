@@ -29,8 +29,8 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
     $scope.data = dataset: []
 
     fetchTemperatureLogs = ->
-      console.log "chart: #{$scope.RunExperimentCtrl.chart}"
-      return if $scope.RunExperimentCtrl.chart isnt 'temperature-logs'
+      console.log "chart: #{$scope.$parent.chart}"
+      return if $scope.$parent.chart isnt 'temperature-logs'
       Experiment.getTemperatureData($stateParams.id, starttime: Math.floor(orig_greatest_elapsed_time+1)*1000)
       .then (data) ->
         return if !data
@@ -79,7 +79,7 @@ window.ChaiBioTech.ngApp.controller 'TemperatureLogCtrl', [
       $scope.zoomState = (transform.k - 1)/ (scale_extent-1)
 
     $scope.$watch ->
-      $scope.RunExperimentCtrl.chart
+      $scope.$parent.chart
     , (chart) ->
       if chart is 'temperature-logs'
         if !$scope.hasData

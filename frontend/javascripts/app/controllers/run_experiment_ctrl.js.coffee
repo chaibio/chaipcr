@@ -21,50 +21,27 @@ window.ChaiBioTech.ngApp.controller 'RunExperimentCtrl', [
   '$stateParams'
   '$state'
   'Experiment'
-  '$uibModal'
-  ($scope, $stateParams, $state, Experiment, $uibModal) ->
-    @chart = $stateParams.chart
-    # $scope.chart = $stateParams.chart
-    $scope.hover= ""
-    $scope.noofCharts = 2
-    $scope.meltCurveChart = false; #if the experiment has a melt curve stage
+  'ChoosenChartService'
+  ($scope, $stateParams, $state, Experiment, ChoosenChartService) ->
+    $scope.chart = $stateParams.chart
 
-    $scope.getMeltCurve = () ->
-      stages = $scope.experiment.protocol.stages
-      return stages.some((val) => val.stage.name is "Melt Curve Stage")
-
-    @changeChart = (chart) ->
+    changeChart = (chart) ->
       $state.go 'run-experiment', {id: $stateParams.id, chart: chart}, notify: false
-      @chart = chart
       $scope.chart = chart
-      if $scope.uiModal
-        $scope.uiModal.close()
 
-    @changeChartTypeModal = ->
-
-      templateUrl = 'app/views/experiment/choose-chart.html'
-      windowClass = 'modal-4-charts'
-
-      if $scope.noofCharts == 3
-        templateUrl = 'app/views/experiment/choose-chart-3.html'
-        windowClass = 'modal-3-row'
-      else if $scope.noofCharts == 2
-        windowClass = 'modal-2-row'
-        templateUrl = 'app/views/experiment/choose-chart-3.html'
-
-      $scope.uiModal = $uibModal.open({
-        templateUrl: templateUrl,
-        scope: $scope,
-        windowClass: windowClass
-      });
+    ChoosenChartService.setCallback(changeChart)
 
 
     Experiment.get(id: $stateParams.id).then (data) ->
-      Experiment.setCurrentExperiment data.experiment
       $scope.experiment = data.experiment
-      if $scope.getMeltCurve()
-        $scope.meltCurveChart = true;
-        $scope.noofCharts = $scope.noofCharts + 1;
+
+      chart = null
+      chart = 'amplification' if Experiment.hasAmplificationCurve($scope.experiment)
+      chart = 'melt-curve' if Experiment.hasMeltCurve($scope.experiment) and !chart
+      chart = 'temperature-logs' if !chart
+
+      changeChart(chart)
+
 
 
 ]

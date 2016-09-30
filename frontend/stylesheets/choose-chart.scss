@@ -33,24 +33,20 @@
 
 .chart-content {
   margin: 20px 30px 0px 30px;
-
   .chart-header-section {
     height: 38px;
     width: 100%;
     border-bottom: solid 2px black;
-
     .chart-caption {
       font-family: "dinot-bold";
       font-size: 24px;
       width: 60%;
       float: left;
     }
-
     .close-container {
       float: right;
       width: 20px;
       height: 20px;
-
       .close-modal {
         color: grey;
         font-size: 24px;
@@ -62,7 +58,6 @@
         text-decoration: none;
       }
     }
-
   }
 }
 
@@ -70,11 +65,15 @@
   width: 100%;
   height: 90%;
   padding-top: 20px;
-
   .chart-box {
     width: 240px;
     height: 175px;
     float: left;
+    margin-left: 20px;
+
+    &:first-of-type {
+      margin-left: 0px;
+    }
 
     .chart-image-container {
       width: 240px;
@@ -83,17 +82,21 @@
       float: left;
       text-align: center;
       cursor: pointer;
+      .img-placeholder {
+        width: 184px;
+        height: 98px;
+        display: inline-block;
+        &.ampli {
+          background-image: url("/images/amplification-curve.png");
+        }
+        &.melt-curve {
+          background-image: url("/images/melt-curve.png");
+        }
+        &.thermal-profile {
+          background-image: url("/images/thermal-profile.png");
+        }
+      }
     }
-
-    .chart-image-container-hover {
-      width: 240px;
-      height: 115px;
-      background-color: white;
-      float: left;
-      text-align: center;
-      cursor: pointer;
-    }
-
     .chart-name-container {
       font-family: "dinot-regular";
       height: 30px;
@@ -101,11 +104,9 @@
       float: left;
       font-size: 16px;
     }
-
     .chart-current-container {
       width: 100%;
       height: 17px;
-
       .chart-current {
         width: 100%;
         height: 17px;
@@ -115,9 +116,24 @@
         font-family: "dinot-bold";
       }
     }
-
+    &:hover {
+      .chart-image-container {
+        background-color: #fff;
+        .img-placeholder {
+          &.ampli {
+            background-image: url("/images/amplification-curve-hover.png");
+          }
+          &.melt-curve {
+            background-image: url("/images/melt-curve-hover.png");
+          }
+          &.thermal-profile {
+            background-image: url("/images/thermal-profile-hover.png");
+          }
+        }
+      }
+    }
   }
-  .second {
-    margin-left: 20px;
-  }
+  // .second {
+  //   margin-left: 20px;
+  // }
 }

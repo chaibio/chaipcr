@@ -66,7 +66,7 @@ App.controller 'MeltCurveChartCtrl', [
 
     getMeltCurveData = (cb) ->
       gofetch = if !$scope.fetching and
-                $scope.RunExperimentCtrl.chart is 'melt-curve' and
+                $scope.$parent.chart is 'melt-curve' and
                 !$scope.retrying then true else false
 
       if gofetch
@@ -170,7 +170,7 @@ App.controller 'MeltCurveChartCtrl', [
         $scope.hasData = true
 
     $scope.$watch ->
-      $scope.RunExperimentCtrl.chart
+      $scope.$parent.chart
     , (chart) ->
       if chart is 'melt-curve'
 # <<<<<<< HEAD
@@ -194,7 +194,7 @@ App.controller 'MeltCurveChartCtrl', [
     $scope.$watch ->
       $scope.curve_type
     , (type) ->
-      return if $scope.RunExperimentCtrl.chart isnt 'melt-curve'
+      return if $scope.$parent.chart isnt 'melt-curve'
       # y_extrems = MeltCurveService.getYExtrems(PARSED_DATA, type)
       # updateConfigs
       #   axes:

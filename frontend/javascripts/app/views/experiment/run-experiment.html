@@ -16,7 +16,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<div ng-controller="RunExperimentCtrl as RunExperimentCtrl">
+<div ng-controller="RunExperimentCtrl">
   <div menu-overlay sidemenu-template="app/views/experiment/left-menu.html">
     <header-status experiment-id="experiment.id">
       <div class="stripes-and-name" toggle-sidemenu>
@@ -28,11 +28,11 @@
       </div>
     </header-status>
     <div class="chart-screens-container">
-      <div ng-show="RunExperimentCtrl.chart === 'amplification'" ng-include src="'app/views/experiment/amplification-chart.html'">
+      <div ng-show="chart === 'amplification'" ng-include src="'app/views/experiment/amplification-chart.html'">
       </div>
-      <div ng-show="RunExperimentCtrl.chart === 'temperature-logs'" ng-include src="'app/views/experiment/temperature-logs.html'">
+      <div ng-show="chart === 'temperature-logs'" ng-include src="'app/views/experiment/temperature-logs.html'">
       </div>
-      <div ng-show="RunExperimentCtrl.chart === 'melt-curve'" ng-include src="'app/views/experiment/melt-curve.html'">
+      <div ng-show="chart === 'melt-curve'" ng-include src="'app/views/experiment/melt-curve.html'">
       </div>
     </div>
     <status-bar experiment-id="experiment.id"></status-bar>

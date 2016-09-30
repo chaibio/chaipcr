@@ -119,6 +119,14 @@ window.ChaiBioTech.ngApp
       end = new Date(exp.completed_at)
       (end.getTime() - start.getTime())/1000;
 
+    self.hasAmplificationCurve = (exp) ->
+      stages = exp.protocol.stages
+      return stages.some((val) => val.stage.name is "Cycling Stage")
+
+    self.hasMeltCurve = (exp) ->
+      stages = exp.protocol.stages
+      return stages.some((val) => val.stage.name is "Melt Curve Stage")
+
     self.truncateName = (name, truncate_length) ->
       NAME_LENGTH = parseInt(truncate_length)
       return if !name

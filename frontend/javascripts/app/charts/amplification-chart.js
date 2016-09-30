@@ -317,7 +317,8 @@
         .attr('fill', 'none')
         .attr("d", line)
         .attr('stroke-width', Globals.normalPathStrokeWidth)
-        .on('mousemove', circleFollowsMouse);
+        .on('mousemove', circleFollowsMouse)
+        .on('click', unsetActivePath);
 
       return _path;
     }
