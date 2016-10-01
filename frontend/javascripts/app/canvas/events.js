@@ -71,7 +71,6 @@ angular.module("canvasApp").factory('events', [
       this.setSummaryMode = function() {
 
         if(C.editStageStatus === true) {
-          //C.editStageMode(false);
           angular.element('#edit-stage').click();
         }
 
