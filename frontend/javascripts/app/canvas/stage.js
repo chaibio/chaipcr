@@ -470,11 +470,12 @@ angular.module("canvasApp").factory('stage', [
               obj.setFill(color);
             }
           });
+          this.canvas.bringToFront(this.dots);
+          this.dots.setCoords();
         }
 
         this.stageName.setFill(color);
         this.stageCaption.setFill(color);
-
       };
 
       this.selectStage =  function() {

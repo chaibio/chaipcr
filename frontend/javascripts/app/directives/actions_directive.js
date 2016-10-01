@@ -109,11 +109,11 @@ angular.module("canvasApp").directive('actions', [
         };
 
         scope.editStage = function() {
-          if(! scope.summaryMode) {
-            scope.editStageMode = ! scope.editStageMode;
-            scope.editStageText = (scope.editStageMode) ? "DONE" : "EDIT STAGES";
-            canvas.editStageMode(scope.editStageMode);
-          }
+          
+          scope.editStageMode = ! scope.editStageMode;
+          scope.editStageText = (scope.editStageMode) ? "DONE" : "EDIT STAGES";
+          canvas.editStageMode(scope.editStageMode);
+
         };
 
         scope.addPause = function() {
