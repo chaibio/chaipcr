@@ -42,10 +42,14 @@ angular.module("canvasApp").factory('stageGraphics', [
     this.dotsOnStage = function() {
 
       var editStageStatus = this.parent.editStageStatus;
-
-      this.dots = new fabric.Group(dots.stageDots(), {
-        originX: "left", originY: "top", left: this.left + 3, top: 8, hasControls: false, width: 13, height: 12, visible: editStageStatus,
-        parent: this, name: "moveStage", lockMovementY: true, hasBorders: false
+      var supportRect = new fabric.Rect({
+        left: -2,  top: -2, fill: '',  width: 20,  height: 20,
+      });
+      var dotsArray = dots.stageDots();
+      dotsArray.push(supportRect);
+      this.dots = new fabric.Group(dotsArray, {
+        originX: "left", originY: "top", left: this.left, top: 6, hasControls: false, width: 22, height: 22, visible: editStageStatus,
+        parent: this, name: "moveStage", lockMovementY: true, hasBorders: false, selectable: true,
       });
       return this;
     };

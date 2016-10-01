@@ -466,7 +466,9 @@ angular.module("canvasApp").factory('stage', [
 
         if(this.parent.editStageStatus) {
           this.dots.forEachObject(function(obj) {
-            obj.setFill(color);
+            if(obj.name === "stageDot") {
+              obj.setFill(color);
+            }
           });
         }
 
