@@ -192,7 +192,7 @@ angular.module("canvasApp").factory('canvas', [
       } else {
         previouslySelected.circle.parent.manageFooter("white");
         previouslySelected.circle.parent.parentStage.changeFillsAndStrokes("white", 2);
-        this.editStageStatus = status; // This order editStageStatus is changed is important, because changeFillsAndStrokes()
+        this.editStageStatus = status; //This order editStageStatus is changed is important, because changeFillsAndStrokes()
       }
 
       // Rewrite part for one stage one step Scenario.

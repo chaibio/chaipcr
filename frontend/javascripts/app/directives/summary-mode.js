@@ -39,8 +39,6 @@ window.ChaiBioTech.ngApp.directive('summaryMode', [
               left: "0"
             }, 500);
 
-
-
           } else {
             ExperimentLoader.getExperiment()
               .then(function(data) {
@@ -55,7 +53,6 @@ window.ChaiBioTech.ngApp.directive('summaryMode', [
             $(".first-data-row").animate({
               left: "-=900"
             }, 500);
-
 
           }
         });
