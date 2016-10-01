@@ -372,6 +372,8 @@ else
         echo "Boot button not pressed"
 fi
 
+echo 1000 > /proc/sys/kernel/hung_task_timeout_secs
+
 counter=2
 if [ $s2pressed -ne 0 ] && ( [ -e ${sdcard_p1}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] )
 then

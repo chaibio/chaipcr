@@ -297,9 +297,6 @@ fi
 
 incriment_stage_counter
 
-echo "Finished.. byebye!"
-echo "Upgrade resume flag down!"
-
 if [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
 then
 	rm ${sdcard_p1}/unpack_resume_autorun.flag || true
@@ -310,12 +307,19 @@ then
 	rm ${sdcard_p2}/unpack_resume_autorun.flag || true
 fi
 
+echo "Finished.. byebye!"
+echo "Upgrade resume flag down!"
+
 sync
 
 echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 
 upgrade_autorun_flag_up () {
 	echo "Autorun scripts after boot.. requested on $NOW" > ${sdcard_p2}/upgrade_autorun.flag
+}
+
+change_root_password_flag_up () {
+	echo "change root password after boot.. requested on $NOW" > ${sdcard_p2}/change_root_password.flag
 }
 
 upgrade_autorun_flag_down () {
@@ -331,7 +335,8 @@ upgrade_autorun_flag_down () {
 
 if [ "$1" = "factorysettings" ]
 then
-    	echo "No migrate autorun for factory settings!"
+    	echo "Changing root password on next boot!"
+	change_root_password_flag_up
 else
 	echo "Adding migrate autorun flag"
 	upgrade_autorun_flag_up
