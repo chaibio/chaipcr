@@ -53,6 +53,7 @@ angular.module("canvasApp").service('stepEvents',[
       $scope.$watch('step.name', function(newVal, oldVal) {
 
         var step = $scope.fabricStep;
+
         if(step.model.name) {
           step.stepName.text = (step.model.name).charAt(0).toUpperCase() + (step.model.name).slice(1).toLowerCase();
         } else {

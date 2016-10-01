@@ -70,9 +70,17 @@ angular.module("canvasApp").factory('events', [
       // Methods
       this.setSummaryMode = function() {
 
+        if(C.editStageStatus === true) {
+          //C.editStageMode(false);
+          angular.element('#edit-stage').click();
+        }
+
         $scope.$apply(function() {
           $scope.summaryMode = true;
         });
+
+
+
         var circle = previouslySelected.circle;
         circle.parent.unSelectStep();
         circle.parent.parentStage.unSelectStage();
