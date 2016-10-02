@@ -60,6 +60,7 @@ angular.module("canvasApp").factory('stage', [
         this.myWidth = this.myWidth - 64;
         this.roof.setWidth(this.myWidth).setCoords();
         this.stageRect.setWidth(this.myWidth).setCoords();
+        //this.stageHitPointLowerRight.set({left: this.stageHitPointLowerRight.left - 64}).setCoords();
         // Befor actually move the step in process movement stage values.
         // Find next stageDots
         // Move all the steps in it to left.
@@ -212,6 +213,8 @@ angular.module("canvasApp").factory('stage', [
         stage.nextStage.dots.set({left: stage.nextStage.left + 3}).setCoords();
         stage.nextStage.stageHitPointLeft.set({left: stage.nextStage.left + 10}).setCoords();
         stage.nextStage.stageHitPointRight.set({left: (stage.nextStage.left + stage.nextStage.myWidth) -  20}).setCoords();
+        stage.nextStage.stageHitPointLowerLeft.set({left: stage.nextStage.left + 10}).setCoords();
+        stage.nextStage.stageHitPointLowerRight.set({left: (stage.nextStage.left + stage.nextStage.myWidth) -  20}).setCoords();
 
         stage.nextStage.childSteps.forEach(function(childStep, index) {
 
@@ -252,6 +255,8 @@ angular.module("canvasApp").factory('stage', [
           this.dots.set({left: (this.left + moveCount ) + 3}).setCoords();
           this.stageHitPointLeft.set({left: (this.left + moveCount ) + 10}).setCoords();
           this.stageHitPointRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
+          this.stageHitPointLowerLeft.set({left: (this.left + moveCount ) + 10}).setCoords();
+          this.stageHitPointLowerRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
           this.left = this.left + moveCount;
 
           this.childSteps.forEach(function(step, index) {
@@ -430,6 +435,8 @@ angular.module("canvasApp").factory('stage', [
             'dots': this.dots,
             'stageHitPointLeft': this.stageHitPointLeft,
             'stageHitPointRight': this.stageHitPointRight,
+            'stageHitPointLowerLeft': this.stageHitPointLowerLeft,
+            'stageHitPointLowerRight': this.stageHitPointLowerRight,
             'borderRight': this.borderRight
           };
 
@@ -437,6 +444,8 @@ angular.module("canvasApp").factory('stage', [
           this.canvas.add(this.dots);
           this.canvas.add(this.stageHitPointLeft);
           this.canvas.add(this.stageHitPointRight);
+          this.canvas.add(this.stageHitPointLowerLeft);
+          this.canvas.add(this.stageHitPointLowerRight);
 
           this.setShadows();
 
