@@ -351,9 +351,7 @@
         })
         .on('mousemove', circleFollowsMouse)
         .on('mouseenter', function() {
-          if (!Globals.activePath) {
-            trans = _path.transition().attr('stroke-width', Globals.hoveredPathStrokeWidth).duration(100).on('end', function() { trans = null });
-          }
+          trans = _path.transition().attr('stroke-width', Globals.hoveredPathStrokeWidth).duration(100).on('end', function() { trans = null });
         })
         .on('mouseout', function() {
           hideMouseIndicators();
