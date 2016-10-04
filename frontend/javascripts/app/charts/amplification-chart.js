@@ -175,7 +175,7 @@
         .attr('stroke-width', 0)
         .attr('transform', 'translate(' + (boxMargin.left + Globals.config.margin.left) + ',' + (boxMargin.top + Globals.config.margin.top) + ')')
         .attr('fill', '#fff')
-        .on('mousemove', circleFollowsMouse);
+        .on('mousemove', mouseMoveCb);
 
       Globals.box.container.append('rect')
         .attr('fill', "#ccc")
@@ -278,12 +278,6 @@
 
       var d = x0 - d0[line_config.x] > d1[line_config.x] - x0 ? d1 : d0;
 
-      // if (d[line_config.y] <= 10 && Globals.config.axes.y.scale === 'log') {
-      //   hideMouseIndicators();
-      // } else {
-      //   showMouseIndicators();
-      // }
-
       if (Globals.box && Globals.activePath) {
         var conf = Globals.activePathConfig;
         if (Globals.box.RFYTextValue) {
@@ -317,7 +311,7 @@
         .attr('fill', 'none')
         .attr("d", line)
         .attr('stroke-width', Globals.normalPathStrokeWidth)
-        .on('mousemove', circleFollowsMouse)
+        .on('mousemove', mouseMoveCb)
         .on('click', unsetActivePath);
 
       return _path;
@@ -347,22 +341,7 @@
         .attr('stroke-width', Globals.normalPathStrokeWidth)
         .on('click', function(e, a, path) {
           setActivePath.call(this, _path, d3.mouse(this));
-          circleFollowsMouse();
-        })
-        .on('mousemove', circleFollowsMouse)
-        .on('mouseenter', function() {
-          trans = _path.transition().attr('stroke-width', Globals.hoveredPathStrokeWidth).duration(100).on('end', function() { trans = null });
-        })
-        .on('mouseout', function() {
-          hideMouseIndicators();
-          if (_path !== Globals.activePath) {
-            var p;
-            p = trans ? trans : _path;
-            p.transition().attr('stroke-width', Globals.normalPathStrokeWidth).duration(100).on('end', function() {
-              trans = null;
-            });
-
-          }
+          mouseMoveCb();
         });
 
       return _path;
@@ -449,7 +428,7 @@
         .attr('stroke-width', Globals.circleStrokeWidth)
         .attr('transform', 'translate (50,50)')
         .on('mouseout', hideMouseIndicators)
-        .on('mousemove', circleFollowsMouse)
+        .on('mousemove', mouseMoveCb)
         .on('click', function() {
           unsetActivePath();
           this.remove();
@@ -482,7 +461,7 @@
         .attr("stroke-width", Globals.dashedLineStrokeWidth)
         .attr("stroke", "#333")
         .attr("fill", "none")
-        .on('mousemove', circleFollowsMouse)
+        .on('mousemove', mouseMoveCb)
         .on('mouseout', hideMouseIndicators)
         .on('click', unsetActivePath);
 
@@ -679,7 +658,7 @@
         .attr('stroke-width', Globals.circleStrokeWidth)
         .attr('class', 'mouse-indicator-circle')
         .on('mouseout', hideMouseIndicators)
-        .on('mousemove', circleFollowsMouse);
+        .on('mousemove', mouseMoveCb);
       if (lastPos) {
         Globals.xAxisCircle.attr('cx', lastPos.cx);
         Globals.xAxisCircle.attr('cy', lastPos.cy);
@@ -736,7 +715,7 @@
         .attr('width', width)
         .attr('height', height)
         .attr('fill', 'transparent')
-        .on('mousemove', circleFollowsMouse)
+        .on('mousemove', mouseMoveCb)
         .on('mouseenter', showMouseIndicators)
         .on('mouseout', hideMouseIndicators)
         .on('click', unsetActivePath);
@@ -750,14 +729,8 @@
 
     }
 
-    function circleFollowsMouse() {
-      if (!Globals.activePath) {
-        hideMouseIndicators();
-        return;
-      }
-      var x = d3.mouse(Globals.mouseOverlay.node())[0];
-
-      var pathEl = Globals.guidingLines[Globals.activePathConfig.index].node();
+    function getPathPositionByX(path, x) {
+      var pathEl = path.node();
       // var pathEl = Globals.activePath.node();
       var pathLength = pathEl.getTotalLength();
       var beginning = x,
@@ -780,6 +753,21 @@
         }
       }
 
+      return {
+        x: x,
+        y: pos.y
+      };
+
+    }
+
+    function mouseMoveCb() {
+      setHoveredLine();
+      if (!Globals.activePath) {
+        hideMouseIndicators();
+        return;
+      }
+      var x = d3.mouse(Globals.mouseOverlay.node())[0];
+      var pos = getPathPositionByX(Globals.guidingLines[Globals.activePathConfig.index], x);
       var max_x = ((getMaxX() - 1) / (Globals.config.axes.x.max - 1)) * Globals.width;
 
       if (x > max_x) {
@@ -803,6 +791,46 @@
 
         setBoxRFYAndCycleTexts(x);
         showMouseIndicators();
+      }
+
+
+    }
+
+    var prevClosestLine;
+
+    function setHoveredLine() {
+      var mouse = d3.mouse(Globals.mouseOverlay.node());
+      var mouseX = mouse[0];
+      var mouseY = mouse[1];
+      var closestLine = undefined;
+      var distances = [];
+      var lineIndex;
+      var maxDistance = 20 * Globals.zoomTransform.k;
+
+      for (lineIndex in Globals.lines) {
+        var pos = getPathPositionByX(Globals.lines[lineIndex], mouse[0]);
+        var distance = Math.abs(pos.y - mouseY);
+        distances.push(distance);
+
+        if (closestLine === undefined || distance < distances[closestLine]) {
+          closestLine = lineIndex;
+        }
+        if (distances[closestLine] > maxDistance) {
+          closestLine = undefined;
+        }
+        if (prevClosestLine !== closestLine) {
+          if (undefined !== prevClosestLine) {
+            if (Globals.lines[prevClosestLine] !== Globals.activePath) {
+              Globals.lines[prevClosestLine].attr('stroke-width', Globals.normalPathStrokeWidth);
+            }
+          }
+          if (undefined !== closestLine) {
+            if (Globals.lines[prevClosestLine] !== Globals.activePath) {
+              Globals.lines[closestLine].attr('stroke-width', Globals.hoveredPathStrokeWidth);
+            }
+          }
+          prevClosestLine = closestLine;
+        }
       }
     }
 
