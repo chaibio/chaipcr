@@ -23,9 +23,11 @@ function dispatch(action::AbstractString, request_body::AbstractString)
             else
                 sr_vec = []
             end
+            cq_method = "cq_method" in keys_req_dict ? req_dict["cq_method"] : "Cy0"
             process_amp( # can't use `return` to return within `try`
                 db_conn, exp_id, sr_vec, calib_info;
                 min_reliable_cyc=req_dict["min_ct"],
+                cq_method=cq_method,
                 out_sr_dict=false
             )
         elseif action == "meltcurve" # may need to change to process only 1-channel before deployed on bbb
@@ -82,6 +84,7 @@ function args2reqb(
     ramp_id::Integer=0,
     min_reliable_cyc::Real=5,
     guid::AbstractString="",
+    extra_args::OrderedDict=OrderedDict(),
     wdb::AbstractString="dflt", # "handle", "dflt", "connect"
     db_key::AbstractString="default", # "default", "t1", "t2"
     db_host::AbstractString="localhost",
@@ -112,6 +115,10 @@ function args2reqb(
         )
     else
         error("Unrecognized action.")
+    end
+
+    for key in keys(extra_args)
+        reqb[key] = extra_args[key]
     end
 
     if wdb == "handle"
