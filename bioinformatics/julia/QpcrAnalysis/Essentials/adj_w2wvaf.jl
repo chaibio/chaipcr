@@ -113,10 +113,8 @@ function get_wva_data(
         wva_vecs_byky = map(channels_in_df) do channel_in_df
             wva_vec = map(
                 AbstractFloat, # integer values may cause type issues for downstream computation
-                calib_df[
-                    get_bool_vec(channel_in_df, calib_df[:channel]),
-                    :fluorescence_value
-                ])
+                calib_df[calib_df[:channel] .== channel_in_df, :fluorescence_value]
+            )
             return wva_vec
         end # do channel_in_df
 

@@ -118,7 +118,7 @@ function get_full_calib_data(
             error("Experiment $exp_id, step $step_id: calibration data is not found for all the wells requested. ")
         end # if
         calib_data_1key_chwl = vcat(map(channels) do channel
-            transpose(calib_data_1key[get_bool_vec(channel, calib_data_1key[:channel]),:fluorescence_value])
+            transpose(calib_data_1key[calib_data_1key[:channel] .== channel, :fluorescence_value])
         end...) # do channel. return an array where rows indexed by channels and columns indexed by wells
 
         return calib_key => (calib_data_1key_chwl, calib_well_nums)

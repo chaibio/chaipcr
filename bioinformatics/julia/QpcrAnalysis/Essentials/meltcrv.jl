@@ -187,7 +187,7 @@ function get_mc_data(
     # split temperature and fluo data by well_num
     tf_df_vec = map(fluo_well_nums) do well_num
         fluo_sel[
-            get_bool_vec(well_num, fluo_sel[:well_num]),
+            fluo_sel[:well_num] .== well_num,
             [:temperature, :fluorescence_value]
         ]
     end # do well_num
@@ -290,9 +290,7 @@ function mc_tm_pw(
             fluo_css = vcat(fluos[css_idc], -Inf) # make sure the last element in `fluo_up_vec` is `false`, so that all the `fu_grp` will be pushed to `fu_grp_vec` as soon as `for` loop is done.
 
             # find the region(s) where fluorescence increase as temperature increase
-            fluo_up_vec = Vector{Bool}(map(1:len_css) do i
-                fluo_css[i] < fluo_css[i+1]
-            end)
+            fluo_up_vec = fluo_css[1:end-1] .< fluo_css[2:end]
             fu_grp_vec = Vector{Vector{Int}}() # fu_grp = fluo_up group
             fu_grp = Vector{Int}()
             grp_ongoing = false

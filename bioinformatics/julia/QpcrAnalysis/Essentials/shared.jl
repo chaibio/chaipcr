@@ -132,15 +132,6 @@ function dictvec2df(dict_keys::AbstractVector, dict_vec::AbstractVector) # `dict
 end
 
 
-# generate a boolean vector indicating whether each element of a collection in question is equal to the target value
-function get_bool_vec(target, collection)
-    Vector{Bool}(map(
-        element -> element == target,
-        collection
-    ))
-end
-
-
 function get_mysql_data_well(
     well_nums::AbstractVector, # must be sorted in ascending order
     qry_2b::AbstractString, # must select "well_num" column
