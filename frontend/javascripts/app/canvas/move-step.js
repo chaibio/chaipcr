@@ -31,6 +31,9 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.currentDrop = null;
         this.startPosition = 0;
         this.endPosition = 0;
+        this.currentLeft = 0;
+        this.direction = null;
+        this.beaconMove = 0;
 
         var smallCircle = new fabric.Circle({
           radius: 6, fill: '#FFB300', stroke: "black", strokeWidth: 3, selectable: false,
@@ -105,24 +108,29 @@ angular.module("canvasApp").factory('moveStepRect', [
           lockMovementY: true, hasControls: false, visible: false, hasBorders: false, name: "dragStepGroup"
         });
 
+        this.indicator.beacon = new fabric.Rect({
+          fill: '', width: 10, left: 0, top: 340, height: 10, selectable: false, me: this,
+          lockMovementY: true, hasControls: false, visible: true, fill: 'black',
+        });
+
       this.indicator.init = function(step) {
 
         console.log(step, "stepping");
-          if(step.nextStep) {
-            this.currentDrop = step.nextStep;
-            this.currentHit = step.nextStep.index;
-          } else if(step.parentStage.nextStage) {
-            this.currentDrop = step.parentStage.nextStage.childSteps[0];
-            this.currentHit = step.index;
-          } else {
-            console.log("I am last -- >");
-            if(step.previousStep) {
-              this.currentDrop = step.previousStep;
-              this.currentHit = step.previousStep.index;
-            } else if(step.parentStage.previousStage) {
-              this.currentDrop = step.parentStage.previousStage.childSteps[step.parentStage.previousStage.childSteps.length - 1];
-              this.currentHit = this.currentDrop.index;
-            }
+        if(step.nextStep) {
+          this.currentDrop = step.nextStep;
+          this.currentHit = step.nextStep.index;
+        } else if(step.parentStage.nextStage) {
+          this.currentDrop = step.parentStage.nextStage.childSteps[0];
+          this.currentHit = step.index;
+        } else {
+          console.log("I am last -- >");
+          if(step.previousStep) {
+            this.currentDrop = step.previousStep;
+            this.currentHit = step.previousStep.index;
+          } else if(step.parentStage.previousStage) {
+            this.currentDrop = step.parentStage.previousStage.childSteps[step.parentStage.previousStage.childSteps.length - 1];
+            this.currentHit = this.currentDrop.index;
+          }
           }
       };
 
@@ -151,36 +159,40 @@ angular.module("canvasApp").factory('moveStepRect', [
           //var moveTarget = Math.floor((this.left + 60) / 120);
           var targetStep = this.currentDrop;
 
-            var targetStage = targetStep.parentStage;
+          var targetStage = targetStep.parentStage;
 
-            // Delete the step, you moved
-            step.parentStage.deleteStep({}, step);
-            // add clone at the place
-            var data = {
-              step: modelClone
-            };
+          // Delete the step, you moved
+          step.parentStage.deleteStep({}, step);
+          // add clone at the place
+          var data = {
+            step: modelClone
+          };
 
-            targetStage.addNewStep(data, targetStep);
-            // console.log(modelClone.id, targetStep.model.id, targetStage.model.id);
-            ExperimentLoader.moveStep(modelClone.id, targetStep.model.id, targetStage.model.id)
-              .then(function(data) {
-                console.log("Moved", data);
-              });
+          targetStage.addNewStep(data, targetStep);
+          // console.log(modelClone.id, targetStep.model.id, targetStage.model.id);
+          ExperimentLoader.moveStep(modelClone.id, targetStep.model.id, targetStage.model.id)
+            .then(function(data) {
+              console.log("Moved", data);
+            });
 
       };
 
-      this.indicator.onTheMoveDragGroup = function(dragging) {
+      this.indicator.onTheMove = function(C, movement) {
 
-        this.setLeft(dragging.left).setCoords();
-      };
+        this.setLeft(movement.left).setCoords();
 
-      this.indicator.onTheMove = function(C) {
+        this.beacon.setLeft(movement.left + this.beaconMove).setCoords();
 
-        /*if(this.intersectsWithObject(C.hitBlock)) {
-          console.log("oye hit");
-          return false;
-        }*/
-        //console.log(this);
+        if(movement.left > this.currentLeft && this.direction !== "right") {
+          this.direction = "right";
+          this.beaconMove = 96;
+        } else if(movement.left < this.currentLeft && this.direction !== "left") {
+          this.direction = "left";
+          this.beaconMove = -10;
+        }
+
+        this.currentLeft = movement.left;
+
         C.allStepViews.some(function(step, index) {
 
           if(this.intersectsWithObject(step.hitPoint) && this.currentHit !== index) {
@@ -193,6 +205,10 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         }, this);
 
+        C.allStageViews.some(function(stage, index) {
+
+
+        }, this);
       };
 
       return this.indicator;

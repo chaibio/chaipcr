@@ -147,6 +147,7 @@ angular.module("canvasApp").factory('moveStageRect', [
 
           this.currentLeft = movement.left;
           this.checkMovingOffScreen(C, movement, this.direction);
+
           C.allStageViews.some(function(stage, index) {
 
             if(this.beacon.intersectsWithObject(stage.stageHitPointLeft) && this.draggedStage.index !== index) {
