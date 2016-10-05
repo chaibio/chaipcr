@@ -34,28 +34,21 @@ ANALYZE_DICT["thermal_performance_diagnostic"] = function analyze_thermal_perfor
     #calculate average ramp rates up and down of the heat block
 
     #first, calculate the time the heat block reaches the high temperature/also the time the ramp up ends and the ramp down starts
-    elapsed_times_high_temp = elapsed_times[find(hbzt_avg) do temp
-        temp > HIGH_TEMP_mDELTA
-    end] # do temp
+    elapsed_times_high_temp = elapsed_times[hbzt_avg .> HIGH_TEMP_mDELTA]
     apprxRampUpEndTime, apprxRampDownStartTime = extrema(elapsed_times_high_temp)
 
     #second, calculate the time the ramp up starts and the ramp down ends
-    elapsed_times_low_temp = elapsed_times[find(hbzt_avg) do temp
-        temp < LOW_TEMP_pDELTA
-    end] # do temp
+    elapsed_times_low_temp = elapsed_times[hbzt_avg .< LOW_TEMP_pDELTA]
     apprxRampDownEndTime, apprxRampUpStartTime = extrema(elapsed_times_low_temp)
 
+    hbzt_lower = hbzt_avg .< LOW_TEMP_pDELTA
     apprxRampDownEndTime = try
-        minimum(elapsed_times[find(1:num_dp) do i
-            hbzt_avg[i] < LOW_TEMP_pDELTA && elapsed_times[i] > apprxRampDownStartTime
-        end]) # do temp
+        minimum(elapsed_times[hbzt_lower & (elapsed_times .> apprxRampDownStartTime)])
     catch
         Inf
     end # try minimum
     apprxRampUpStartTime = try
-        maximum(elapsed_times[find(1:num_dp) do i
-            hbzt_avg[i] < LOW_TEMP_pDELTA && elapsed_times[i] < apprxRampUpEndTime
-        end]) # do temp
+        maximum(elapsed_times[hbzt_lower & (elapsed_times .< apprxRampUpEndTime)])
     catch
         -Inf
     end # try maximum

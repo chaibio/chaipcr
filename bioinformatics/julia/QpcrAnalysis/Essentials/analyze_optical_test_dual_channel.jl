@@ -51,10 +51,7 @@ ANALYZE_DICT["optical_test_dual_channel"] = function analyze_optical_test_dual_c
     fluo_dict = OrderedDict(map(old_calib_labels) do calib_label
         calib_label => hcat(map(CHANNELS) do channel
             fluo_data[
-                find(1:size(fluo_data)[1]) do i
-                    fluo_data[i, :step_id] == calib_info[calib_label]["step_id"] &&
-                    fluo_data[i, :channel] == channel
-                end, # do i
+                (fluo_data[:step_id] .== calib_info[calib_label]["step_id"]) & (fluo_data[:channel] .== channel),
                 :fluorescence_value
             ]
         end...) # do channel

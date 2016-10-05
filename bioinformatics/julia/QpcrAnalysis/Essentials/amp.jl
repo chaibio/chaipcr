@@ -49,8 +49,8 @@ function process_amp(
         "
         sr = mysql_execute(db_conn, sr_qry)
 
-        step_ids = unique(sr[find(val -> val==1, sr[:collect_data]), :id])
-        ramp_ids = unique(sr[find(val -> val==1, sr[:collect_data_1]), :id_1])
+        step_ids = unique(sr[sr[:collect_data] .== 1, :id])
+        ramp_ids = unique(sr[sr[:collect_data_1] .== 1, :id_1])
 
         sr_vec = vcat(
             map(step_id -> ("step", step_id), step_ids),
@@ -62,7 +62,7 @@ function process_amp(
     if out_sr_dict
         sr_ids = map(sr -> sr[2], sr_vec)
         max_step_id = maximum(sr_ids)
-        msi_idc = find(sr_id -> sr_id==max_step_id, sr_ids) # msi = max_step_id
+        msi_idc = find(sr_id -> sr_id == max_step_id, sr_ids) # msi = max_step_id
         if length(msi_idc) == 1
             latest_idx = msi_idc[1]
         else # length(max_idc) == 2
