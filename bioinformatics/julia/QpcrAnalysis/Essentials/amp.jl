@@ -275,6 +275,9 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
 
     coefs_pb = fitted_postbl["coefs"]
 
+    func_pred_f = MDs[sig_m_postbl].funcs_pred["f"]
+    blsub_fitted = func_pred_f(cycs, coefs_pb...)
+
     len_denser = length(cycs_denser)
 
     d1_pred = MDs[sig_m_postbl].funcs_pred["d1"](cycs_denser, coefs_pb...)
@@ -285,7 +288,6 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
     max_d2, idx_max_d2 = findmax(d2_pred)
     cyc_max_d2 = cycs_denser[idx_max_d2]
 
-    func_pred_f = MDs[sig_m_postbl].funcs_pred["f"]
     Cy0 = cyc_max_d1 - func_pred_f(cyc_max_d1, coefs_pb...) / max_d1
 
     ct = try
@@ -334,6 +336,7 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
         "fitted_postbl"=>fitted_postbl,
         "postbl_status"=>fitted_postbl["status"],
         "coefs"=>fitted_postbl["coefs"],
+        "blsub_fitted"=>blsub_fitted,
         "max_d1"=>max_d1,
         "max_d2"=>max_d2,
         "cyc_dict"=>cyc_dict,
@@ -474,7 +477,7 @@ function process_amp_1sr(
 
     if num_cycles <= 2
         print_v(println, verbose, "Number of cycles $num_cycles <= 2, baseline subtraction and Cq calculation will not be performed.")
-        full_dict["blsub_fluos"] = rbbs_ary3
+        full_dict["blsub_fluos"] = full_dict["blsub_fitted"] = rbbs_ary3
         full_dict["cq"] = NaN_ary2
     else
         if length(ct_fluos) == 0
@@ -532,10 +535,12 @@ function process_amp_1sr(
             ]
         end
 
-        full_dict["blsub_fluos"] = reshape(
-            cat(2, full_dict["blsub_fluos"]...), # 2-dim array of size (`num_cycles`, `num_wells * num_channels`)
-            size(fr_ary3)...
-        )
+        for key in ["blsub_fluos", "blsub_fitted"]
+            full_dict[key] = reshape(
+                cat(2, full_dict[key]...), # 2-dim array of size (`num_cycles`, `num_wells * num_channels`)
+                size(fr_ary3)...
+            )
+        end
 
         full_dict["qt_fluos"] = [
             quantile(full_dict["blsub_fluos"][:, well_i, channel_i], qt_prob_rc)
@@ -564,7 +569,7 @@ function process_amp_1sr(
     full_dict["ct_fluos"] = ct_fluos
 
     if endswith(out_format, "json")
-        out_dict = OrderedDict(map(["rbbs_ary3", "blsub_fluos", "cq", "ct_fluos"]) do key
+        out_dict = OrderedDict(map(["rbbs_ary3", "blsub_fluos", "blsub_fitted", "cq", "ct_fluos"]) do key
             key => round(full_dict[key], json_digits)
         end) # do key
     elseif out_format == "full"
