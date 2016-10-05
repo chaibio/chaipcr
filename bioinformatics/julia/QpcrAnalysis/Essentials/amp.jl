@@ -1,5 +1,6 @@
 # amplification analysis
 
+const Ct_VAL_DomainError = -100 # should be a value that cannot be obtained by normal calculation of Ct
 
 #
 function process_amp(
@@ -290,9 +291,7 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
     ct = try
         MDs[sig_m_postbl].funcs_pred["inv"](ct_fluo, coefs_pb...)
     catch err
-        if isa(err, DomainError)
-            NaN
-        end # if
+        isa(err, DomainError) ? Ct_VAL_DomainError : "unhandled error"
     end # try
 
     cyc_dict = OrderedDict(
@@ -308,9 +307,7 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
                 func_pred_f(cyc + epsilon, coefs_pb...)
             end...))
         catch err
-            if isa(err, DomainError)
-                NaN
-            end # if
+            isa(err, DomainError) ? NaN : "unhandled error"
         end # try
     end # function. needed because `Cy0` may not be in `cycs_denser`
 
@@ -387,6 +384,8 @@ function report_cq!(
         why_NaN = "postbl_status == :Error"
     elseif b_ > 0
         why_NaN = "b > 0"
+    elseif full_dict["cq_method"] == "ct" && cq_raw == Ct_VAL_DomainError
+        why_NaN = "DomainError when calculating Ct"
     elseif cq_raw <= 0.1 || cq_raw >= num_cycles
         why_NaN = "cq_raw <= 0.1 || cq_raw >= num_cycles"
     elseif max_d1 < min_max_d1
@@ -467,7 +466,8 @@ function process_amp_1sr(
         "wva_data"=>wva_data,
         "rbbs_ary3"=>rbbs_ary3,
         "fluo_well_nums"=>fluo_well_nums,
-        "channels"=>channels
+        "channels"=>channels,
+        "cq_method"=>cq_method
     )
 
     NaN_ary2 = fill(NaN, num_fluo_wells, num_channels)
@@ -490,9 +490,22 @@ function process_amp_1sr(
                             verbose=verbose
                         )
                     end # do well_i
-                    fluos_useful = map(find(mbq_ary1) do mbq
-                        mbq["postbl_status"] == :Optimal
-                    end) do mbq_i # `end` for `do mbq`
+
+                    # find `idc_useful`
+                    postbl_stata = map(mbq -> mbq["postbl_status"], mbq_ary1)
+                    idc_useful = find(postbl_stata) do postbl_status
+                        postbl_status == :Optimal
+                    end # do postbl_status
+                    if length(idc_useful) == 0
+                        idc_useful = find(postbl_stata) do postbl_status
+                            postbl_status == :UserLimit
+                        end # do postbl_status
+                        if length(idc_useful) == 0
+                            idc_useful = 1:length(postbl_status)
+                        end # if length(idc_useful)
+                    end # if length(idc_useful)
+
+                    fluos_useful = map(idc_useful) do mbq_i
                         mbq_ary1[mbq_i]["cq_fluo"]
                     end # do mbq_i
                     median(fluos_useful)
