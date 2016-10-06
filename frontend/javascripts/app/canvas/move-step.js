@@ -37,11 +37,11 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         var smallCircle = new fabric.Circle({
           radius: 6, fill: '#FFB300', stroke: "black", strokeWidth: 3, selectable: false,
-          left: 48, top: 298, originX: 'center', originY: 'center',
+          left: 48, top: 298, originX: 'center', originY: 'center', visible: false
         });
 
         var smallCircleTop = new fabric.Circle({
-          radius: 5, fill: 'black', selectable: false, left: 48, top: 13, originX: 'center', originY: 'center',
+          radius: 5, fill: 'black', selectable: false, left: 48, top: 13, originX: 'center', originY: 'center', visible: false
         });
 
         var temperatureText = new fabric.Text(
@@ -73,11 +73,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         );
 
         var verticalLine = new fabric.Line([0, 0, 0, 276],{
-          left: 47,
-          top: 16,
-          stroke: 'black',
-          strokeWidth: 2,
-          originX: 'left', originY: 'top',
+          left: 47, top: 16, stroke: 'black', strokeWidth: 2, originX: 'left', originY: 'top', visible: false
         });
 
         var rect = new fabric.Rect({
