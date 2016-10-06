@@ -110,7 +110,7 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         this.indicator.beacon = new fabric.Rect({
           fill: '', width: 10, left: 0, top: 340, height: 10, selectable: false, me: this,
-          lockMovementY: true, hasControls: false, visible: true, fill: 'black',
+          lockMovementY: true, hasControls: false, visible: true, //fill: 'black',
         });
 
       this.indicator.init = function(step) {
@@ -196,7 +196,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         C.allStepViews.some(function(step, index) {
 
           if(this.intersectsWithObject(step.hitPoint) && this.currentHit !== index) {
-              //step.circle.manageClick();
+
               this.currentDrop = step;
               this.currentHit = index;
               return true;
@@ -206,8 +206,11 @@ angular.module("canvasApp").factory('moveStepRect', [
         }, this);
 
         C.allStageViews.some(function(stage, index) {
-
-
+          if(this.beacon.intersectsWithObject(stage.stageHitPointLowerLeft)) {
+            console.log("hit left");
+          } else if(this.beacon.intersectsWithObject(stage.stageHitPointLowerRight)) {
+            console.log("hit right");
+          }
         }, this);
       };
 
