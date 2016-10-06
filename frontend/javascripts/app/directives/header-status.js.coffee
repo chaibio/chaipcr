@@ -63,6 +63,7 @@ window.App.directive 'headerStatus', [
 
       $scope.is_holding = false
       $scope.enterState = false
+      $scope.done = false
 
       $scope.$on 'status:data:updated', (e, data, oldData) ->
         return if !data
@@ -82,6 +83,8 @@ window.App.directive 'headerStatus', [
             $scope.experiment = exp
             $scope.status = data
             $scope.is_holding = TestInProgressHelper.set_holding(data, exp)
+            if $scope.state is 'idle'
+              $scope.done = true
         else
           $scope.status = data
           $scope.is_holding = TestInProgressHelper.set_holding(data, $scope.experiment)
