@@ -7,7 +7,8 @@ class AddFluorescenceDebugData < ActiveRecord::Migration
       t.integer "experiment_id"
       t.integer "ramp_id"
       t.integer "channel",            limit: 1, default: 1, null: false
-      t.string "adc_values"
+      t.string "optical_values"
+      t.string "baseline_values"
     end
     
     add_index "fluorescence_debug_data", ["experiment_id", "channel", "ramp_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_chan_ramp_cycle_well", unique: true, using: :btree
