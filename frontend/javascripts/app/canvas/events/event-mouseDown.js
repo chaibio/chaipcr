@@ -99,6 +99,7 @@ angular.module("canvasApp").factory('mouseDown', [
             evt.target.parent.shrinkStep();
             evt.target.setVisible(false);
             C.moveDots.setVisible(true);
+            C.moveDots.currentIndex = evt.target.parent.parentStage.index;
             C.canvas.bringToFront(C.moveDots);
             C.canvas.bringToFront(C.stepIndicator);
             C.canvas.renderAll();

@@ -44,16 +44,22 @@ angular.module("canvasApp").factory('step', [
 
       this.setLeft = function() {
 
+        if(this.previousStep && this.previousStep.shrinked === true) {
+          this.left = this.previousStep.left + 138;
+          return;
+        }
+
         this.left = this.parentStage.left + 3 + (parseInt(this.index) * this.myWidth);
         return this;
       };
 
       this.shrinkStep = function() {
+
         this.shrinked = true;
         this.myWidth = 45;
         this.stepRect.setWidth(45).setCoords();
         this.borderRight.setLeft(-18).setCoords();
-        leftVal = {left: this.left + (this.myWidth / 2)};
+        //leftVal = {left: this.left + (this.myWidth / 2)};
         //this.hitPoint.set(leftVal).setCoords();
         this.hitPoint.setVisible(false); // This is important. If we dont hide hitPoint it couses unwanted step to be selected.
         this.moveOtherStepsInStage();
@@ -91,6 +97,10 @@ angular.module("canvasApp").factory('step', [
           this.setLeft();
         }
 
+        if(this.shrinked === true) {
+          return;
+        }
+
         this.getUniqueName();
         var leftVal = {left: this.left};
         this.stepGroup.set(leftVal).setCoords();
@@ -109,6 +119,10 @@ angular.module("canvasApp").factory('step', [
 
         this.ordealStatus = this.ordealStatus + action;
         this.circle.getUniqueId();
+
+      };
+
+      this.specialMoveStep = function() {
 
       };
 

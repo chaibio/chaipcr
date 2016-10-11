@@ -111,6 +111,7 @@ angular.module("canvasApp").factory('moveStepRect', [
 
       this.indicator.init = function(step) {
 
+        this.spaceArray = [step.parentStage.left - 10, step.parentStage.left + 160];
         console.log(step, "stepping");
         if(step.nextStep) {
           this.currentDrop = step.nextStep;
@@ -204,8 +205,14 @@ angular.module("canvasApp").factory('moveStepRect', [
         C.allStageViews.some(function(stage, index) {
           if(this.beacon.intersectsWithObject(stage.stageHitPointLowerLeft)) {
             console.log("hit left");
+            if(this.direction === "left") {
+              stage.moveToSide("right", this.verticalLine, this.spaceArray, "STEP");
+            }
           } else if(this.beacon.intersectsWithObject(stage.stageHitPointLowerRight)) {
             console.log("hit right");
+            if(this.direction === "right") {
+              stage.moveToSide("left", this.verticalLine, this.spaceArray, "STEP");
+            }
           }
         }, this);
       };

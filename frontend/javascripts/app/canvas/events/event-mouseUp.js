@@ -43,6 +43,7 @@ angular.module("canvasApp").factory('mouseUp', [
             console.log("its just a click ", evt.target);
           }
           C.moveDots.setVisible(false);
+          C.moveDots.currentIndex = null;
           C.stepIndicator.setVisible(false);
           that.moveStepActive = false;
           C.canvas.renderAll();

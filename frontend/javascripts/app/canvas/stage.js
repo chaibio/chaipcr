@@ -229,12 +229,14 @@ angular.module("canvasApp").factory('stage', [
       };
 
       //This method is used when move stage hits at the hitPoint at the side of the stage.
-      this.moveToSide = function(direction, verticalLine, spaceArray) {
-
+      this.moveToSide = function(direction, verticalLine, spaceArray, type) {
+        console.log(direction);
         if(this.validMove(direction)) {
 
           var moveCount = (direction === "left") ? -140 : 140;
-
+          if(type === "STEP") {
+            moveCount = (direction === "left") ? -50 : 50;
+          }
           this.stageGroup.set({left: this.left + moveCount }).setCoords();
 
           if(spaceArray) {
@@ -258,11 +260,20 @@ angular.module("canvasApp").factory('stage', [
           this.stageHitPointLowerLeft.set({left: (this.left + moveCount ) + 10}).setCoords();
           this.stageHitPointLowerRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
           this.left = this.left + moveCount;
+          if(type === "STEP" && this.parent.moveDots.currentIndex === this.index) {
+            // Need rework here , Stage with a shrinked step is a special case;
+            this.childSteps.forEach(function(step, index) {
+              step.moveStep(1, true);
+              step.circle.moveCircleWithStep();
+            });
+            this.parent.moveDots.set({left: this.parent.moveDots.left + moveCount});
+          } else {
+            this.childSteps.forEach(function(step, index) {
+              step.moveStep(1, true);
+              step.circle.moveCircleWithStep();
+            });
+          }
 
-          this.childSteps.forEach(function(step, index) {
-            step.moveStep(1, true);
-            step.circle.moveCircleWithStep();
-          });
 
           this.stageMovedDirection = direction; // !important
         }
@@ -276,6 +287,7 @@ angular.module("canvasApp").factory('stage', [
             if(this.index === 0) {
               return false;
             }
+            console.log("sensing");
             // look if we have space at left;
             if(this.previousStage && this.left - (this.previousStage.left + this.previousStage.myWidth) < 50) {
               return false;
@@ -288,6 +300,7 @@ angular.module("canvasApp").factory('stage', [
               return false;
             }
             // We move only if we have space in the right side.
+            console.log(this.nextStage.left, this.left + this.myWidth);
             if(this.nextStage && (this.nextStage.left) - (this.left + this.myWidth) < 50) {
               return false;
             }
