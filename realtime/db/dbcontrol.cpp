@@ -476,7 +476,7 @@ void DBControl::addFluorescenceData(const Experiment &experiment, const std::vec
     bool hasDebugInfo = false;
 
     stream << "INSERT INTO fluorescence_data(experiment_id, step_id, ramp_id, baseline_value, fluorescence_value, well_num, channel, cycle_num) VALUES";
-    stream << "INSERT INTO fluorescence_debug_data(experiment_id, step_id, ramp_id, well_num, channel, cycle_num, baseline_values, optical_values) VALUES";
+    stream2 << "INSERT INTO fluorescence_debug_data(experiment_id, step_id, ramp_id, well_num, channel, cycle_num, baseline_values, optical_values) VALUES";
 
     for (std::vector<Optics::FluorescenceData>::const_iterator it = fluorescenceData.begin(); it != fluorescenceData.end(); ++it)
     {
