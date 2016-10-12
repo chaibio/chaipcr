@@ -44,11 +44,6 @@ angular.module("canvasApp").factory('step', [
 
       this.setLeft = function() {
 
-        if(this.previousStep && this.previousStep.shrinked === true) {
-          this.left = this.previousStep.left + 138;
-          return;
-        }
-
         this.left = this.parentStage.left + 3 + (parseInt(this.index) * this.myWidth);
         return this;
       };
@@ -97,10 +92,6 @@ angular.module("canvasApp").factory('step', [
           this.setLeft();
         }
 
-        if(this.shrinked === true) {
-          return;
-        }
-
         this.getUniqueName();
         var leftVal = {left: this.left};
         this.stepGroup.set(leftVal).setCoords();
@@ -123,6 +114,23 @@ angular.module("canvasApp").factory('step', [
       };
 
       this.specialMoveStep = function() {
+
+        if(this.previousStep) {
+          this.left = this.previousStep.left + this.previousStep.myWidth;
+          this.moveStep(1, false);
+          return;
+        }
+
+        this.moveStep(1, true);
+        /*if(this.shrinked === true) {
+          return;
+        }
+
+        if(this.previousStep && this.previousStep.shrinked === true) {
+          this.left = this.previousStep.left + 138;
+          //return;
+        }*/
+
 
       };
 

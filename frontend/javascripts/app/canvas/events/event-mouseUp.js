@@ -42,6 +42,7 @@ angular.module("canvasApp").factory('mouseUp', [
           if(that.mouseDownPos === evt.e.clientX) {
             console.log("its just a click ", evt.target);
           }
+          evt.target.parent.parentStage.shrinkedStage = false;
           C.moveDots.setVisible(false);
           C.moveDots.currentIndex = null;
           C.stepIndicator.setVisible(false);

@@ -44,7 +44,8 @@ angular.module("canvasApp").factory('stage', [
       this.visualComponents = {};
       this.stageMovedDirection = null;
       this.shortStageName = false;
-
+      this.shrinkedStage = false;
+      
       this.setNewWidth = function(add) {
 
         this.myWidth = this.myWidth + add;
@@ -263,7 +264,7 @@ angular.module("canvasApp").factory('stage', [
           if(type === "STEP" && this.parent.moveDots.currentIndex === this.index) {
             // Need rework here , Stage with a shrinked step is a special case;
             this.childSteps.forEach(function(step, index) {
-              step.moveStep(1, true);
+              step.specialMoveStep(1, false);
               step.circle.moveCircleWithStep();
             });
             this.parent.moveDots.set({left: this.parent.moveDots.left + moveCount});

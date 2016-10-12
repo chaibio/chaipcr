@@ -89,6 +89,7 @@ angular.module("canvasApp").factory('mouseDown', [
             C.stepIndicator.init(evt.target.parent);
 
             evt.target.parent.toggleComponents(false);
+            //evt.target.parent.parentStage.shrinkedStage = true;
             that.moveStepActive = true;
             that.canvas.moveCursor = "move";
             C.stepIndicator.changePlacing(evt.target);
