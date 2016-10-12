@@ -51,6 +51,9 @@ public:
 
         unsigned int wellId;
         std::size_t channel;
+
+        std::vector<int32_t> baselineData;
+        std::vector<int32_t> fluorescenceData;
     };
 
     struct MeltCurveData
@@ -84,7 +87,7 @@ public:
     inline std::shared_ptr<LEDController> getLedController() const noexcept { return _ledController; }
     inline MUX& getPhotodiodeMux() noexcept { return _photodiodeMux; }
 
-    std::vector<FluorescenceData> getFluorescenceData(bool clear = true);
+    std::vector<FluorescenceData> getFluorescenceData();
     std::vector<MeltCurveData> getMeltCurveData(bool stopDataCollect = true);
 
     boost::signals2::lockfree_signal<void()> fluorescenceDataCollected;

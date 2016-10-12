@@ -30,6 +30,7 @@
 #include "optics.h"
 #include "maincontrollers.h"
 #include "qpcrapplication.h"
+#include "experimentcontroller.h"
 #include "util.h"
 #include "logger.h"
 
@@ -283,9 +284,9 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &/*task*/)
     }
 }
 
-std::vector<Optics::FluorescenceData> Optics::getFluorescenceData(bool clear)
+std::vector<Optics::FluorescenceData> Optics::getFluorescenceData()
 {
-    std::vector<Optics::FluorescenceData> data;
+    std::vector<Optics::FluorescenceData> dataList;
     std::lock_guard<std::recursive_mutex> lock(_collectDataMutex);
 
     if (!_collectData)
@@ -293,14 +294,23 @@ std::vector<Optics::FluorescenceData> Optics::getFluorescenceData(bool clear)
         for (const std::pair<const unsigned int, std::map<std::size_t, FluorescenceRoughData>> &wellData: _fluorescenceData)
         {
             for (const std::pair<const std::size_t, FluorescenceRoughData> &channelData: wellData.second)
-                data.emplace_back(channelData.second.accumulateBaselineData(), channelData.second.accumulateFluorescenceData(), wellData.first, channelData.first);
+            {
+                FluorescenceData data(channelData.second.accumulateBaselineData(), channelData.second.accumulateFluorescenceData(), wellData.first, channelData.first);
+
+                if (ExperimentController::getInstance()->debugMode())
+                {
+                    data.fluorescenceData = channelData.second.fluorescenceData;
+                    data.baselineData = channelData.second.baselineData;
+                }
+
+                dataList.push_back(data);
+            }
         }
 
-        if (clear)
-            _fluorescenceData.clear();
+        _fluorescenceData.clear();
     }
 
-    return data;
+    return dataList;
 }
 
 std::vector<Optics::MeltCurveData> Optics::getMeltCurveData(bool stopDataCollect)

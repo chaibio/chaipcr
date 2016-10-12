@@ -471,9 +471,12 @@ void DBControl::addFluorescenceData(const Experiment &experiment, const std::vec
         return;
 
     std::vector<std::string> queries;
-    std::stringstream stream;
+    std::stringstream stream, stream2;
+
+    bool hasDebugInfo = false;
 
     stream << "INSERT INTO fluorescence_data(experiment_id, step_id, ramp_id, baseline_value, fluorescence_value, well_num, channel, cycle_num) VALUES";
+    stream << "INSERT INTO fluorescence_debug_data(experiment_id, step_id, ramp_id, well_num, channel, cycle_num, baseline_values, optical_values) VALUES";
 
     for (std::vector<Optics::FluorescenceData>::const_iterator it = fluorescenceData.begin(); it != fluorescenceData.end(); ++it)
     {
@@ -488,9 +491,49 @@ void DBControl::addFluorescenceData(const Experiment &experiment, const std::vec
 
         if (it + 1 != fluorescenceData.end())
             stream << ",";
+
+        if (!it->baselineData.empty() && !it->fluorescenceData.empty())
+        {
+            hasDebugInfo = true;
+
+            stream2 << "(" << experiment.id() << ",";
+
+            if (!isRamp)
+                stream2 << experiment.protocol()->currentStep()->id() << ",NULL,";
+            else
+                stream2 << "NULL,"  << experiment.protocol()->currentRamp()->id() << ",";
+
+            stream2 << it->wellId << "," << (it->channel + 1) << "," << experiment.protocol()->currentStage()->currentCycle() << ",\'";
+
+            for (std::vector<int32_t>::const_iterator it2 = it->baselineData.begin(); it2 != it->baselineData.end(); ++it2)
+            {
+                stream2 << *it2;
+
+                if (it2 + 1 != it->baselineData.end())
+                    stream2 << ",";
+            }
+
+            stream2 << "\',\'";
+
+            for (std::vector<int32_t>::const_iterator it2 = it->fluorescenceData.begin(); it2 != it->fluorescenceData.end(); ++it2)
+            {
+                stream2 << *it2;
+
+                if (it2 + 1 != it->fluorescenceData.end())
+                    stream2 << ",";
+            }
+
+            stream2 << "\')";
+
+            if (it + 1 != fluorescenceData.end())
+                stream2 << ",";
+        }
     }
 
     queries.emplace_back(std::move(stream.str()));
+
+    if (hasDebugInfo)
+        queries.emplace_back(std::move(stream2.str()));
 
     addWriteQueries(queries);
 }
