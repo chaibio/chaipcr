@@ -53,7 +53,7 @@ angular.module("canvasApp").factory('step', [
         this.shrinked = true;
         this.myWidth = 45;
         this.stepRect.setWidth(45).setCoords();
-        this.borderRight.setLeft(-18).setCoords();
+        this.borderRight.setLeft(-20).setCoords();
         //leftVal = {left: this.left + (this.myWidth / 2)};
         //this.hitPoint.set(leftVal).setCoords();
         this.hitPoint.setVisible(false); // This is important. If we dont hide hitPoint it couses unwanted step to be selected.

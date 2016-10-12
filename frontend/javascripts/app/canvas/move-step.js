@@ -109,6 +109,9 @@ angular.module("canvasApp").factory('moveStepRect', [
           lockMovementY: true, hasControls: false, visible: true, //fill: 'black',
         });
 
+      this.indicator.verticalLine = verticalLine;
+      this.indicator.smallCircleTop = smallCircleTop;
+      this.indicator.smallCircle = smallCircle;
       this.indicator.init = function(step) {
 
         this.spaceArray = [step.parentStage.left - 10, step.parentStage.left + 160];
@@ -215,6 +218,19 @@ angular.module("canvasApp").factory('moveStepRect', [
             }
           }
         }, this);
+
+        if(this.beacon.left > this.spaceArray[0] && this.beacon.left < this.spaceArray[1] + 80) {
+          if(this.verticalLine.getVisible() === false) {
+            this.verticalLine.setVisible(true);
+            this.smallCircleTop.setVisible(true);
+            this.smallCircle.setVisible(true);
+          }
+        } else if(this.verticalLine.getVisible() === true) {
+          this.verticalLine.setVisible(false);
+          this.smallCircleTop.setVisible(false);
+          this.smallCircle.setVisible(false);
+        }
+
       };
 
       return this.indicator;

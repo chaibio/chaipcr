@@ -45,7 +45,7 @@ angular.module("canvasApp").factory('stage', [
       this.stageMovedDirection = null;
       this.shortStageName = false;
       this.shrinkedStage = false;
-      
+
       this.setNewWidth = function(add) {
 
         this.myWidth = this.myWidth + add;
@@ -231,7 +231,7 @@ angular.module("canvasApp").factory('stage', [
 
       //This method is used when move stage hits at the hitPoint at the side of the stage.
       this.moveToSide = function(direction, verticalLine, spaceArray, type) {
-        console.log(direction);
+
         if(this.validMove(direction)) {
 
           var moveCount = (direction === "left") ? -140 : 140;
@@ -242,6 +242,7 @@ angular.module("canvasApp").factory('stage', [
 
           if(spaceArray) {
             if(direction === "right") {
+              console.log("You r right"); // Here we need a change in the addition if its a step
               spaceArray[0] = this.left - 10;
               spaceArray[1] = this.left + 160;
             } else if (direction === "left") {
