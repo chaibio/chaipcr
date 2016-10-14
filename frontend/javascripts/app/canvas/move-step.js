@@ -112,9 +112,10 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.verticalLine = verticalLine;
       this.indicator.smallCircleTop = smallCircleTop;
       this.indicator.smallCircle = smallCircle;
+
       this.indicator.init = function(step) {
 
-        this.spaceArray = [step.parentStage.left - 10, step.parentStage.left + 160];
+        this.spaceArray = [step.parentStage.left - 20, step.parentStage.left + 30];
         console.log(step, "stepping");
         if(step.nextStep) {
           this.currentDrop = step.nextStep;
@@ -150,6 +151,12 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
 
       this.indicator.processMovement = function(step, C) {
+
+        if(this.verticalLine.getVisible() === true) {
+          this.verticalLine.setVisible(false);
+          this.smallCircleTop.setVisible(false);
+          this.smallCircle.setVisible(false);
+        }
         // Make a clone of the step
         //if(Math.abs(this.startPosition - this.endPosition) > 65)
           var modelClone = $.extend({}, step.model);
@@ -178,10 +185,16 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
 
       this.indicator.onTheMove = function(C, movement) {
-
+        console.log("Hola");
         this.setLeft(movement.left).setCoords();
 
         this.beacon.setLeft(movement.left + this.beaconMove).setCoords();
+
+        if(this.verticalLine.getVisible() === false) {
+          this.verticalLine.setVisible(true);
+          this.smallCircleTop.setVisible(true);
+          this.smallCircle.setVisible(true);
+        }
 
         if(movement.left > this.currentLeft && this.direction !== "right") {
           this.direction = "right";
@@ -219,7 +232,7 @@ angular.module("canvasApp").factory('moveStepRect', [
           }
         }, this);
 
-        if(this.beacon.left > this.spaceArray[0] && this.beacon.left < this.spaceArray[1] + 80) {
+        /*if(this.beacon.left > this.spaceArray[0] && this.beacon.left < this.spaceArray[1]) {
           if(this.verticalLine.getVisible() === false) {
             this.verticalLine.setVisible(true);
             this.smallCircleTop.setVisible(true);
@@ -229,7 +242,7 @@ angular.module("canvasApp").factory('moveStepRect', [
           this.verticalLine.setVisible(false);
           this.smallCircleTop.setVisible(false);
           this.smallCircle.setVisible(false);
-        }
+        }*/
 
       };
 

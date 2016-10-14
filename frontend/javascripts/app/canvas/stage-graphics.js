@@ -116,12 +116,12 @@ angular.module("canvasApp").factory('stageGraphics', [
 
       this.stageHitPointLowerLeft = new fabric.Rect({
         width: 10, height: 10, fill: '', left: this.left + 10, top: 340, selectable: false, name: "stageHitPointLowerLeft",
-        originX: 'left', originY: 'top', //fill: 'black'
+        originX: 'left', originY: 'top', fill: 'black'
       });
 
       this.stageHitPointLowerRight = new fabric.Rect({
         width: 10, height: 10, fill: '', left: (this.left + this.width) - 20, top: 340, selectable: false, name: "stageHitPointLowerRight",
-        originX: 'left', originY: 'top', //fill: 'black'
+        originX: 'left', originY: 'top', fill: 'black'
       });
       return this;
     };

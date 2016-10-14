@@ -242,7 +242,6 @@ angular.module("canvasApp").factory('stage', [
 
           if(spaceArray) {
             if(direction === "right") {
-              console.log("You r right"); // Here we need a change in the addition if its a step
               spaceArray[0] = this.left - 10;
               spaceArray[1] = this.left + 160;
             } else if (direction === "left") {
@@ -250,8 +249,8 @@ angular.module("canvasApp").factory('stage', [
                 spaceArray[0] = this.nextStage.left - 160;
                 spaceArray[1] = this.nextStage.left + 10;
               } else {
-                spaceArray[0] = this.left + this.myWidth - 160;
-                spaceArray[1] = spaceArray[0] + 160;
+                spaceArray[0] = this.left + this.myWidth - 40;
+                spaceArray[1] = spaceArray[0] + 40;
               }
             }
           }
