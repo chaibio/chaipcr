@@ -59,6 +59,7 @@ angular.module("canvasApp").factory('stage', [
         console.log("okay Shrinking");
         this.shrinked = true;
         this.myWidth = this.myWidth - 64;
+        this.stageHitPointLowerRight.setLeft(this.stageHitPointLowerRight.left - 64).setCoords();
         this.roof.setWidth(this.myWidth).setCoords();
         this.stageRect.setWidth(this.myWidth).setCoords();
         //this.stageHitPointLowerRight.set({left: this.stageHitPointLowerRight.left - 64}).setCoords();
@@ -275,9 +276,10 @@ angular.module("canvasApp").factory('stage', [
             });
           }
 
-
           this.stageMovedDirection = direction; // !important
+          return "Valid Move";
         }
+        return null;
       };
 
       this.validMove = function(direction) {
@@ -288,7 +290,7 @@ angular.module("canvasApp").factory('stage', [
             if(this.index === 0) {
               return false;
             }
-            console.log("sensing");
+            //console.log("sensing");
             // look if we have space at left;
             if(this.previousStage && this.left - (this.previousStage.left + this.previousStage.myWidth) < 50) {
               return false;

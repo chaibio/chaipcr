@@ -185,7 +185,7 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
 
       this.indicator.onTheMove = function(C, movement) {
-        console.log("Hola");
+
         this.setLeft(movement.left).setCoords();
 
         this.beacon.setLeft(movement.left + this.beaconMove).setCoords();
@@ -222,6 +222,8 @@ angular.module("canvasApp").factory('moveStepRect', [
           if(this.beacon.intersectsWithObject(stage.stageHitPointLowerLeft)) {
             console.log("hit left");
             if(this.direction === "left") {
+              // Correct placing of lower left/right black dots
+              // make a mechanism to sense between two stages.
               stage.moveToSide("right", this.verticalLine, this.spaceArray, "STEP");
             }
           } else if(this.beacon.intersectsWithObject(stage.stageHitPointLowerRight)) {

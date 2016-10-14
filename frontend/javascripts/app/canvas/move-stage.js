@@ -157,7 +157,7 @@ angular.module("canvasApp").factory('moveStageRect', [
 
               if(this.direction === "left") {
                 stage.moveToSide("right", this.verticalLine, this.spaceArray);
-
+                
                 if(stage.previousStage) {
                   this.currentDrop = stage.previousStage;
                   this.currentHit = this.draggedStage.index - 1;
