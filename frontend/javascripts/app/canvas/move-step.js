@@ -108,7 +108,11 @@ angular.module("canvasApp").factory('moveStepRect', [
           fill: '', width: 10, left: 0, top: 340, height: 10, selectable: false, me: this,
           lockMovementY: true, hasControls: false, visible: true, //fill: 'black',
         });
-
+        // We may not need brick.
+        this.indicator.brick = new fabric.Rect({
+          fill: '', width: 20, left: 0, top: 340, height: 10, selectable: false, me: this,
+          lockMovementY: true, hasControls: false, visible: true, //fill: 'black',
+        });
       this.indicator.verticalLine = verticalLine;
       this.indicator.smallCircleTop = smallCircleTop;
       this.indicator.smallCircle = smallCircle;
@@ -166,6 +170,15 @@ angular.module("canvasApp").factory('moveStepRect', [
           //var moveTarget = Math.floor((this.left + 60) / 120);
           var targetStep = this.currentDrop;
 
+          if(targetStep.nextStep === null) {
+            if((this.left - (targetStep.stepGroup.left + 30)) > 25) {
+              console.log("Could be going for a new stage1");
+            }
+          } else if (targetStep.previousStep === null) {
+            if((targetStep.stepGroup.left - this.left) > 25) {
+              console.log("Could be going for a new stage2");
+            }
+          }
           var targetStage = targetStep.parentStage;
 
           // Delete the step, you moved
