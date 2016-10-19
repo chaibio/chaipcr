@@ -348,6 +348,7 @@
           if (_path !== Globals.activePath) {
             _path.attr('stroke-width', Globals.hoveredPathStrokeWidth);
           }
+          mouseMoveCb();
         })
         .on('mouseout', function(e, a, path) {
             _path.attr('stroke-width', Globals.normalPathStrokeWidth);
