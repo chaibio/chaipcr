@@ -19,6 +19,9 @@ window.App.directive 'amplificationChart', [
         chart = null
         oldState = null
 
+        isInterpolationChanged = (val, oldState) ->
+          return (oldState?.y_axis?.scale isnt val?.y_axis?.scale)
+
         isBaseBackroundChanged = (val, old_val) ->
           return false if (!val or !old_val)
           return false if !val.series
@@ -48,7 +51,7 @@ window.App.directive 'amplificationChart', [
               chart.setYAxis()
               chart.setXAxis()
               chart.drawLines()
-              if (oldState?.y_axis?.scale isnt val?.y_axis?.scale) or isBaseBackroundChanged(val, oldState)
+              if isInterpolationChanged(val, oldState) or isBaseBackroundChanged(val, oldState)
                 chart.zoomTo(0)
 
           oldState = angular.copy(val)
