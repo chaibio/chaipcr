@@ -17,6 +17,12 @@ window.App.directive 'amplificationChart', [
       link: ($scope, elem, attrs) ->
 
         chart = null
+        oldState = null
+
+        isBaseBackroundChanged = (val, old_val) ->
+          return false if (!val or !old_val)
+          return false if !val.series
+          return val.series[0].y isnt old_val.series[0].y
 
         initChart = ->
           return if !$scope.data or !$scope.config or !$scope.show
@@ -38,11 +44,14 @@ window.App.directive 'amplificationChart', [
           else
             chart.updateData($scope.data)
             chart.updateConfig($scope.config)
-            console.log "show: #{$scope.show}"
             if $scope.show
               chart.setYAxis()
               chart.setXAxis()
               chart.drawLines()
+              if (oldState?.y_axis?.scale isnt val?.y_axis?.scale) or isBaseBackroundChanged(val, oldState)
+                chart.zoomTo(0)
+
+          oldState = angular.copy(val)
 
         $scope.$watch 'scroll', (scroll) ->
           return if !scroll or !chart or !$scope.show
@@ -60,7 +69,7 @@ window.App.directive 'amplificationChart', [
             dims = chart.getDimensions()
             if dims.width <= 0 or dims.height <= 0 or !dims.width or !dims.height
               initChart()
-              
+
             if $scope.show
               chart.setYAxis()
               chart.setXAxis()
