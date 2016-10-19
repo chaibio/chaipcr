@@ -11,6 +11,7 @@
         return d[line_config.x];
       }).left;
     };
+    var prevClosestLineIndex;
 
     function initGlobalVars() {
       Globals = {
@@ -306,7 +307,7 @@
       var trans;
       var _path = Globals.viewSVG.append("path")
         .datum(Globals.data[line_config.dataset])
-        .attr("class", "line")
+        .attr("class", "guiding-line")
         .attr("stroke", 'transparent')
         .attr('fill', 'none')
         .attr("d", line)
@@ -334,7 +335,7 @@
       var trans;
       var _path = Globals.viewSVG.append("path")
         .datum(Globals.data[line_config.dataset])
-        .attr("class", "line")
+        .attr("class", "colored-line")
         .attr("stroke", line_config.color)
         .attr('fill', 'none')
         .attr("d", line)
@@ -342,7 +343,16 @@
         .on('click', function(e, a, path) {
           setActivePath.call(this, _path, d3.mouse(this));
           mouseMoveCb();
+        })
+        .on('mousemove', function(e, a, path) {
+          if (_path !== Globals.activePath) {
+            _path.attr('stroke-width', Globals.hoveredPathStrokeWidth);
+          }
+        })
+        .on('mouseout', function(e, a, path) {
+            _path.attr('stroke-width', Globals.normalPathStrokeWidth);
         });
+
 
       return _path;
     }
@@ -720,6 +730,10 @@
         .on('mouseout', hideMouseIndicators)
         .on('click', unsetActivePath);
 
+      // Globals.tempCircle = Globals.viewSVG.append('circle')
+      //   .attr('fill', 'red')
+      //   .attr('r', 5);
+
       setYAxis();
       setXAxis();
       drawLines(config.series);
@@ -796,40 +810,39 @@
 
     }
 
-    var prevClosestLine;
-
     function setHoveredLine() {
       var mouse = d3.mouse(Globals.mouseOverlay.node());
       var mouseX = mouse[0];
       var mouseY = mouse[1];
-      var closestLine = undefined;
+      var closestLineIndex = undefined;
       var distances = [];
       var lineIndex;
       var maxDistance = 20 * Globals.zoomTransform.k;
 
       for (lineIndex in Globals.lines) {
-        var pos = getPathPositionByX(Globals.lines[lineIndex], mouse[0]);
+        var pos = getPathPositionByX(Globals.lines[lineIndex], mouseX);
         var distance = Math.abs(pos.y - mouseY);
         distances.push(distance);
 
-        if (closestLine === undefined || distance < distances[closestLine]) {
-          closestLine = lineIndex;
+        if (closestLineIndex === undefined) {
+          closestLineIndex = lineIndex;
         }
-        if (distances[closestLine] > maxDistance) {
-          closestLine = undefined;
+        if (distance < distances[closestLineIndex]) {
+          closestLineIndex = lineIndex;
         }
-        if (prevClosestLine !== closestLine) {
-          if (undefined !== prevClosestLine) {
-            if (Globals.lines[prevClosestLine] !== Globals.activePath) {
-              Globals.lines[prevClosestLine].attr('stroke-width', Globals.normalPathStrokeWidth);
+        if (distances[closestLineIndex] > maxDistance) {
+          closestLineIndex = undefined;
+        }
+        if (prevClosestLineIndex !== closestLineIndex) {
+          if (prevClosestLineIndex !== undefined && Globals.lines[prevClosestLineIndex]) {
+            if (Globals.lines[prevClosestLineIndex] !== Globals.activePath) {
+              Globals.lines[prevClosestLineIndex].attr('stroke-width', Globals.normalPathStrokeWidth);
             }
           }
-          if (undefined !== closestLine) {
-            if (Globals.lines[prevClosestLine] !== Globals.activePath) {
-              Globals.lines[closestLine].attr('stroke-width', Globals.hoveredPathStrokeWidth);
-            }
+          if (closestLineIndex !== undefined) {
+            Globals.lines[closestLineIndex].attr('stroke-width', Globals.hoveredPathStrokeWidth);
           }
-          prevClosestLine = closestLine;
+          prevClosestLineIndex = closestLineIndex;
         }
       }
     }
