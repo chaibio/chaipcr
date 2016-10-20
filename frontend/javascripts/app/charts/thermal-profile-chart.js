@@ -407,7 +407,24 @@
 
     }
 
+    function hasData () {
+      if (!Globals.data) {
+        return false;
+      }
+      if (!Globals.data.dataset) {
+        return false;
+      }
+      if (Globals.data.dataset.length === 0) {
+        return false;
+      }
+      return true;
+    }
+
     function followMouseOnXAxis() {
+
+      if (!hasData()) {
+        return;
+      }
 
       var x = d3.mouse(this)[0];
 
@@ -417,7 +434,7 @@
     }
 
     function followTheMouse() {
-      if (isZooming) {
+      if (isZooming || !hasData()) {
         return;
       }
       toggleCirclesVisibility(true);
