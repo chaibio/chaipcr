@@ -25,6 +25,7 @@ window.App.directive 'amplificationChart', [
         isBaseBackroundChanged = (val, old_val) ->
           return false if (!val or !old_val)
           return false if !val.series
+          return false if !val.series[0]
           return val.series[0].y isnt old_val.series[0].y
 
         initChart = ->
