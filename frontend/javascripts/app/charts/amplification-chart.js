@@ -116,12 +116,13 @@
       Globals.activePath = newLine;
       makeCircle();
       path.remove();
+      var circleCoords = getPathPositionByX(path, mouse[0]);
 
       if (Globals.circle) {
         Globals.circle
           .attr("opacity", 1)
-          .attr("cx", mouse[0])
-          .attr("cy", mouse[1])
+          .attr("cx", circleCoords.x)
+          .attr("cy", circleCoords.y)
           .attr('transform', 'translate(0,0) scale(1)')
           .attr('fill', activePathConfig.color);
       }
@@ -347,11 +348,17 @@
         .on('mousemove', function(e, a, path) {
           if (_path !== Globals.activePath) {
             _path.attr('stroke-width', Globals.hoveredPathStrokeWidth);
+            Globals.hoveredLine = _path;
+            Globals.hovering = true;
           }
           mouseMoveCb();
         })
         .on('mouseout', function(e, a, path) {
+          if (_path !== Globals.activePath) {
             _path.attr('stroke-width', Globals.normalPathStrokeWidth);
+            // Globals.hoveredLine = null;
+            Globals.hovering = false;
+          }
         });
 
 
@@ -441,8 +448,12 @@
         .on('mouseout', hideMouseIndicators)
         .on('mousemove', mouseMoveCb)
         .on('click', function() {
-          unsetActivePath();
           this.remove();
+          unsetActivePath();
+          if (Globals.hoveredLine) {
+            var mouse = d3.mouse(Globals.mouseOverlay.node());
+            setActivePath(Globals.hoveredLine, mouse);
+          }
         });
       if (Globals.activePathConfig) {
         Globals.circle.attr('fill', Globals.activePathConfig.config.color);
@@ -474,7 +485,13 @@
         .attr("fill", "none")
         .on('mousemove', mouseMoveCb)
         .on('mouseout', hideMouseIndicators)
-        .on('click', unsetActivePath);
+        .on('click', function() {
+          unsetActivePath();
+          if (Globals.hoveredLine) {
+            var mouse = d3.mouse(Globals.mouseOverlay.node());
+            setActivePath(Globals.hoveredLine, mouse);
+          }
+        });
 
       if (lastPos) {
         dl.attr('x1', lastPos.x1);
@@ -729,11 +746,13 @@
         .on('mousemove', mouseMoveCb)
         .on('mouseenter', showMouseIndicators)
         .on('mouseout', hideMouseIndicators)
-        .on('click', unsetActivePath);
-
-      // Globals.tempCircle = Globals.viewSVG.append('circle')
-      //   .attr('fill', 'red')
-      //   .attr('r', 5);
+        .on('click', function() {
+          unsetActivePath();
+          if (Globals.hoveredLine) {
+            var mouse = d3.mouse(Globals.mouseOverlay.node());
+            setActivePath(Globals.hoveredLine, mouse);
+          }
+        });
 
       setYAxis();
       setXAxis();
@@ -833,15 +852,21 @@
         }
         if (distances[closestLineIndex] > maxDistance) {
           closestLineIndex = undefined;
+          Globals.hoveredLine = null;
         }
         if (prevClosestLineIndex !== closestLineIndex) {
           if (prevClosestLineIndex !== undefined && Globals.lines[prevClosestLineIndex]) {
-            if (Globals.lines[prevClosestLineIndex] !== Globals.activePath) {
+            if (Globals.lines[prevClosestLineIndex] !== Globals.activePath && Globals.lines[prevClosestLineIndex] !== Globals.hoveredLine && !Globals.hovering) {
               Globals.lines[prevClosestLineIndex].attr('stroke-width', Globals.normalPathStrokeWidth);
             }
+            if (!Globals.hovering && Globals.hoveredLine) {
+              Globals.hoveredLine.attr('stroke-width', Globals.normalPathStrokeWidth);
+              Globals.hoveredLine = null;
+            }
           }
-          if (closestLineIndex !== undefined) {
+          if (closestLineIndex !== undefined && !Globals.hovering && Globals.lines[closestLineIndex] !== Globals.activePath) {
             Globals.lines[closestLineIndex].attr('stroke-width', Globals.hoveredPathStrokeWidth);
+            Globals.hoveredLine = Globals.lines[closestLineIndex];
           }
           prevClosestLineIndex = closestLineIndex;
         }
