@@ -116,27 +116,11 @@
       Globals.activePath = newLine;
       makeCircle();
       path.remove();
-      var circleCoords = getPathPositionByX(path, mouse[0]);
-
-      if (Globals.circle) {
-        Globals.circle
-          .attr("opacity", 1)
-          .attr("cx", circleCoords.x)
-          .attr("cy", circleCoords.y)
-          .attr('transform', 'translate(0,0) scale(1)')
-          .attr('fill', activePathConfig.color);
-      }
-
-      if (Globals.dashedLine) {
-        Globals.dashedLine
-          .attr("opacity", 1)
-          .attr('x1', mouse[0])
-          .attr('x2', mouse[0]);
-      }
 
       drawBox(Globals.activePathConfig.config);
       setBoxRFYAndCycleTexts(mouse[0]);
       showMouseIndicators();
+      mouseMoveCb();
 
     }
 
