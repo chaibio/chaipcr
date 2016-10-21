@@ -163,37 +163,39 @@ angular.module("canvasApp").factory('moveStepRect', [
         }
         // Make a clone of the step
         //if(Math.abs(this.startPosition - this.endPosition) > 65)
-          var modelClone = $.extend({}, step.model);
-          // We had shrinked the stage, Now we undo it.
-          step.parentStage.expand();
-          // Find the place where you left the moved step
-          //var moveTarget = Math.floor((this.left + 60) / 120);
-          var targetStep = this.currentDrop;
+        var modelClone = $.extend({}, step.model);
+        // We had shrinked the stage, Now we undo it.
+        step.parentStage.expand();
+        // Find the place where you left the moved step
+        //var moveTarget = Math.floor((this.left + 60) / 120);
+        var targetStep = this.currentDrop;
 
-          if(targetStep.nextStep === null) {
-            if((this.left - (targetStep.stepGroup.left + 30)) > 25) {
-              console.log("Could be going for a new stage1");
-            }
-          } else if (targetStep.previousStep === null) {
-            if((targetStep.stepGroup.left - this.left) > 25) {
-              console.log("Could be going for a new stage2");
-            }
+        if(targetStep.nextStep === null) {
+          if((this.left - (targetStep.stepGroup.left + 30)) > 25) {
+            console.log("Could be going for a new stage1");
+            // make a stage as next spage.
           }
-          var targetStage = targetStep.parentStage;
+        } else if (targetStep.previousStep === null) {
+          if((targetStep.stepGroup.left - this.left) > 25) {
+            console.log("Could be going for a new stage2");
+            // Make stage as previous stage.
+          }
+        }
+        var targetStage = targetStep.parentStage;
 
-          // Delete the step, you moved
-          step.parentStage.deleteStep({}, step);
-          // add clone at the place
-          var data = {
-            step: modelClone
-          };
+        // Delete the step, you moved
+        step.parentStage.deleteStep({}, step);
+        // add clone at the place
+        var data = {
+          step: modelClone
+        };
 
-          targetStage.addNewStep(data, targetStep);
-          // console.log(modelClone.id, targetStep.model.id, targetStage.model.id);
-          ExperimentLoader.moveStep(modelClone.id, targetStep.model.id, targetStage.model.id)
-            .then(function(data) {
-              console.log("Moved", data);
-            });
+        targetStage.addNewStep(data, targetStep);
+        // console.log(modelClone.id, targetStep.model.id, targetStage.model.id);
+        ExperimentLoader.moveStep(modelClone.id, targetStep.model.id, targetStage.model.id)
+          .then(function(data) {
+            console.log("Moved", data);
+          });
 
       };
 
