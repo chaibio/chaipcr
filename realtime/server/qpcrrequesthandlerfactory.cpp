@@ -34,6 +34,7 @@
 #include "updatehandler.h"
 #include "updateuploadhandler.h"
 #include "changeexperimenthandler.h"
+#include "adcdebugreaderhandler.h"
 
 #include "qpcrrequesthandlerfactory.h"
 #include "qpcrapplication.h"
@@ -124,6 +125,11 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
                                 return new UpdateHandler(UpdateHandler::Update);
                             else if (requestPath.at(1) == "upload_software_update")
                                 return new UpdateUploadHandler();
+                        }
+                        else if (requestPath.at(0) == "test")
+                        {
+                            if (requestPath.at(1) == "log_adc_reads")
+                                return new ADCDebugReaderHandler();
                         }
                     }
                 }

@@ -18,6 +18,8 @@
 //
 
 #include <cassert>
+#include <cstdio>
+#include <fstream>
 #include <boost/chrono.hpp>
 
 #include "pcrincludes.h"
@@ -34,6 +36,71 @@ const LTC2444::OversamplingRatio kThermistorOversamplingRate = LTC2444::kOversam
 const LTC2444::OversamplingRatio kLIAOversamplingRate = LTC2444::kOversamplingRatio512;
 
 ////////////////////////////////////////////////////////////////////////////////
+//DebugReader
+void ADCController::DebugReader::start(size_t samplesCount) {
+    if (samplesCount > 0 && !isStarted()) {
+        _samplesCount = samplesCount;
+
+        _values[0].reserve(_samplesCount);
+        _values[1].reserve(_samplesCount);
+        _values[7].reserve(_samplesCount);
+
+        for (std::size_t i = 0; i < qpcrApp.settings().device.opticsChannels; ++i)
+            _values[kADCOpticsChannels.at(i)].reserve(_samplesCount);
+
+        _startState = true;
+    }
+}
+
+void ADCController::DebugReader::store(uint8_t channel, int32_t value) {
+    if (isStarted()) {
+        _values[channel].emplace_back(value);
+
+        finish();
+    }
+}
+
+void ADCController::DebugReader::finish() {
+    for (boost::unordered_map<uint8_t, std::vector<int32_t>>::iterator it = _values.begin(); it != _values.end(); ++it) {
+        if (it->second.size() != _samplesCount)
+            return;
+    }
+
+    std::fstream stream(kADCDebugReaderTmpPath.c_str(), std::fstream::out | std::fstream::trunc);
+
+    for (boost::unordered_map<uint8_t, std::vector<int32_t>>::iterator it = _values.begin(); it != _values.end(); ++it) {
+        stream << static_cast<unsigned>(it->first);
+
+        if (std::next(it) != _values.end()) {
+            stream << ',';
+        }
+    }
+
+    stream << '\n';
+
+    for (std::size_t i = 0; i < _samplesCount; ++i) {
+        for (boost::unordered_map<uint8_t, std::vector<int32_t>>::iterator it = _values.begin(); it != _values.end(); ++it) {
+            stream << it->second.at(i);
+
+            if (std::next(it) != _values.end()) {
+                stream << ',';
+            }
+        }
+
+        stream << '\n';
+    }
+
+    stream.flush();
+    stream.close();
+
+    std::remove(kADCDebugReaderSamplesPath.c_str());
+    std::rename(kADCDebugReaderTmpPath.c_str(), kADCDebugReaderSamplesPath.c_str());
+
+    _startState = false;
+    _samplesCount = 0;
+    _values.clear();
+}
+
 // Class ADCController
 ADCController::ADCController(ConsumersList &&consumers, unsigned int csPinNumber, SPIPort &&spiPort, unsigned int busyPinNumber):
     _consumers(std::move(consumers)) {
@@ -74,7 +141,7 @@ void ADCController::process() {
             if (!_workState)
                 break;
 
-            if (ExperimentController::getInstance()->machineState() == ExperimentController::IdleMachineState) {
+            if (ExperimentController::getInstance()->machineState() == ExperimentController::IdleMachineState && !_debugReader.isStarted()) {
                 timespec time;
                 time.tv_sec = 0;
                 time.tv_nsec = 5 * 1000 * 1000;
@@ -119,15 +186,23 @@ void ADCController::process() {
             switch (nextState) {
             case EReadZone1Singular:
                 value = _ltc2444->readSingleEndedChannel(0, kThermistorOversamplingRate);
+                _debugReader.store(0, value);
+
                 break;
             case EReadZone2Singular:
                 value = _ltc2444->readSingleEndedChannel(1, kThermistorOversamplingRate);
+                _debugReader.store(1, value);
+
                 break;
             case EReadLIA:
                 value = _ltc2444->readSingleEndedChannel(kADCOpticsChannels.at(channel), kLIAOversamplingRate);
+                _debugReader.store(kADCOpticsChannels.at(channel), value);
+
                 break;
             case EReadLid:
                 value = _ltc2444->readSingleEndedChannel(7, kThermistorOversamplingRate);
+                _debugReader.store(7, value);
+
                 break;
             default:
                 throw std::logic_error("Unexpected error: ADCController::process - unknown adc state");
@@ -165,6 +240,10 @@ void ADCController::process() {
 void ADCController::stop() {
     _workState = false;
     _ltc2444->stopWaitinigBusy();
+}
+
+void ADCController::startDebugReading(size_t samplesCount) {
+    _debugReader.start(samplesCount);
 }
 
 ADCController::ADCState ADCController::calcNextState(size_t &nextChannel) const {

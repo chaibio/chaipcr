@@ -27,6 +27,7 @@
 #include <memory>
 #include <atomic>
 #include <map>
+#include <boost/unordered_map.hpp>
 
 class LTC2444;
 class ADCConsumer;
@@ -51,6 +52,8 @@ public:
     void process();
     void stop();
 
+    void startDebugReading(std::size_t samplesCount);
+
     boost::signals2::lockfree_signal<void()> loopStarted;
 
 protected:
@@ -70,6 +73,27 @@ protected:
     std::vector<std::shared_ptr<ADCConsumer>> _zoneConsumers;
     std::shared_ptr<ADCConsumer> _liaConsumer;
     std::shared_ptr<ADCConsumer> _lidConsumer;
+
+private:
+    class DebugReader
+    {
+    public:
+        DebugReader(): _startState(false), _samplesCount(0) {}
+
+        inline bool isStarted() const { return _startState; }
+
+        void start(std::size_t samplesCount);
+        void store(uint8_t channel, int32_t value);
+
+    private:
+        void finish();
+
+    private:
+        std::atomic<bool> _startState;
+
+        std::size_t _samplesCount;
+        boost::unordered_map<uint8_t, std::vector<int32_t>> _values;
+    }_debugReader;
 };
 
 #endif
