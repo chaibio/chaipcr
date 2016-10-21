@@ -303,7 +303,6 @@ angular.module("canvasApp").factory('stage', [
               return false;
             }
             // We move only if we have space in the right side.
-            console.log(this.nextStage.left, this.left + this.myWidth);
             if(this.nextStage && (this.nextStage.left) - (this.left + this.myWidth) < 50) {
               return false;
             }
