@@ -101,11 +101,11 @@ angular.module("canvasApp").factory('moveStageRect', [
         // We may need two beacon, so that we have better control over where we move
         this.indicator.beacon = new fabric.Rect({
           fill: '', width: 10, left: 0, top: 10, height: 10, selectable: false, me: this,
-          lockMovementY: true, hasControls: false, visible: true, fill: 'black',
+          lockMovementY: true, hasControls: false, visible: true, //fill: 'black',
         });
 
         this.indicator.verticalLine = vertical;
-
+        this.indicator.verticalLine.setVisible(false);
 
         this.indicator.init = function(stage) {
           // rework on this part for smaller space...
@@ -113,7 +113,8 @@ angular.module("canvasApp").factory('moveStageRect', [
           this.setVisible(true);
           this.canvasContaining = $('.canvas-containing');
           this.currentDragPos = 0;
-          this.spaceArray = [stage.left - 10, stage.left + 160];
+          this.spaceArrayRight = [stage.left + stage.myWidth + 40, stage.left + stage.myWidth + 78];
+          this.spaceArrayLeft = [stage.left + stage.myWidth + 40, stage.left + stage.myWidth + 78];
           this.draggedStage = stage;
 
           if(stage.nextStage) {
@@ -123,7 +124,6 @@ angular.module("canvasApp").factory('moveStageRect', [
             this.currentDrop = stage.previousStage;
             this.currentHit = stage.previousStage.index;
           }
-
         };
 
         this.indicator.changeText = function(stage) {
@@ -156,7 +156,7 @@ angular.module("canvasApp").factory('moveStageRect', [
               this.currentHit = index;
 
               if(this.direction === "left") {
-                stage.moveToSide("right", this.verticalLine, this.spaceArray);
+                stage.moveToSide("right", this.verticalLine, this.spaceArrayRight, this.spaceArrayLeft);
 
                 if(stage.previousStage) {
                   this.currentDrop = stage.previousStage;
@@ -168,12 +168,11 @@ angular.module("canvasApp").factory('moveStageRect', [
               }
               return true;
             } else if(this.beacon.intersectsWithObject(stage.stageHitPointRight) && this.draggedStage.index !== index) {
-              console.log("HITTING");
               this.currentDrop = stage;
               this.currentHit = index;
 
               if(this.direction === "right") {
-                stage.moveToSide("left", this.verticalLine, this.spaceArray);
+                stage.moveToSide("left", this.verticalLine, this.spaceArrayRight, this.spaceArrayLeft);
               }
               return true;
             }
@@ -182,13 +181,32 @@ angular.module("canvasApp").factory('moveStageRect', [
             // END OF SOME METHOD.
           }, this);
 
-          if(this.beacon.left > this.spaceArray[0] && this.beacon.left < this.spaceArray[1]) {
+          if(this.direction === 'right') {
+            if(this.beacon.left > this.spaceArrayRight[0] && this.beacon.left < this.spaceArrayRight[1]) {
+              if(this.verticalLine.getVisible() === false) {
+                this.verticalLine.setVisible(true);
+              }
+            } else if(this.verticalLine.getVisible() === true) {
+              this.verticalLine.setVisible(false);
+            }
+          } else if(this.direction === 'left') {
+            if(this.beacon.left > this.spaceArrayLeft[0] && this.beacon.left < this.spaceArrayLeft[1]) {
+              if(this.verticalLine.getVisible() === false) {
+                this.verticalLine.setVisible(true);
+              }
+            } else if(this.verticalLine.getVisible() === true) {
+              this.verticalLine.setVisible(false);
+            }
+          }
+
+          /*if(this.beacon.left > this.spaceArray[0] && this.beacon.left < this.spaceArray[1]) {
             if(this.verticalLine.getVisible() === false) {
               this.verticalLine.setVisible(true);
             }
           } else if(this.verticalLine.getVisible() === true) {
             this.verticalLine.setVisible(false);
-          }
+          }*/
+
           // Now work with scrolling as we move ..!
         };
 
