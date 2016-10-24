@@ -80,7 +80,7 @@ angular.module("canvasApp").factory('stage', [
         if(this.nextStage) {
           var width = this.myWidth;
           // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
-          this.myWidth = 134;
+          this.myWidth = 30;
           this.moveAllStepsAndStages(true);
           this.myWidth = width;
         }
@@ -235,7 +235,8 @@ angular.module("canvasApp").factory('stage', [
 
         if(this.validMove(direction)) {
 
-          var moveCount = (direction === "left") ? -140 : 140;
+          var moveCount = (direction === "left") ? -30 : 30;
+
           if(type === "STEP") {
             moveCount = (direction === "left") ? -50 : 50;
           }
@@ -285,6 +286,7 @@ angular.module("canvasApp").factory('stage', [
       this.validMove = function(direction) {
 
         if(this.stageMovedDirection === null) {
+          console.log("INSIDE VALIDMOVE", direction);
           if(direction === "left") {
             // For very first stage, It can't move further left.
             if(this.index === 0) {
@@ -292,7 +294,7 @@ angular.module("canvasApp").factory('stage', [
             }
             //console.log("sensing");
             // look if we have space at left;
-            if(this.previousStage && this.left - (this.previousStage.left + this.previousStage.myWidth) < 50) {
+            if(this.previousStage && this.left - (this.previousStage.left + this.previousStage.myWidth) < 10) {
               return false;
             }
             this.stageMovedDirection = "left";
@@ -303,7 +305,7 @@ angular.module("canvasApp").factory('stage', [
               return false;
             }
             // We move only if we have space in the right side.
-            if(this.nextStage && (this.nextStage.left) - (this.left + this.myWidth) < 50) {
+            if(this.nextStage && (this.nextStage.left) - (this.left + this.myWidth) < 10) {
               return false;
             }
             this.stageMovedDirection = "right";

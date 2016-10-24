@@ -101,15 +101,15 @@ angular.module("canvasApp").factory('moveStageRect', [
         // We may need two beacon, so that we have better control over where we move
         this.indicator.beacon = new fabric.Rect({
           fill: '', width: 10, left: 0, top: 10, height: 10, selectable: false, me: this,
-          lockMovementY: true, hasControls: false, visible: true, //fill: 'black',
+          lockMovementY: true, hasControls: false, visible: true, fill: 'black',
         });
 
         this.indicator.verticalLine = vertical;
 
 
         this.indicator.init = function(stage) {
-
-          this.setLeft(stage.left - 1).setCoords();
+          // rework on this part for smaller space...
+          this.setLeft(stage.left - 50).setCoords();
           this.setVisible(true);
           this.canvasContaining = $('.canvas-containing');
           this.currentDragPos = 0;
@@ -134,15 +134,15 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         this.indicator.onTheMove = function(C, movement) {
           // Here we hit test the movement of the MOVING STAGE
-          this.setLeft(movement.left - 1).setCoords();
+          this.setLeft(movement.left - 50).setCoords();
           this.beacon.setLeft(movement.left + this.beaconMove).setCoords();
 
           if(movement.left > this.currentLeft && this.direction !== "right") {
             this.direction = "right";
-            this.beaconMove = 135;
+            this.beaconMove = 85;
           } else if(movement.left < this.currentLeft && this.direction !== "left") {
             this.direction = "left";
-            this.beaconMove = -10;
+            this.beaconMove = -60;
           }
 
           this.currentLeft = movement.left;
@@ -157,7 +157,7 @@ angular.module("canvasApp").factory('moveStageRect', [
 
               if(this.direction === "left") {
                 stage.moveToSide("right", this.verticalLine, this.spaceArray);
-                
+
                 if(stage.previousStage) {
                   this.currentDrop = stage.previousStage;
                   this.currentHit = this.draggedStage.index - 1;
@@ -168,7 +168,7 @@ angular.module("canvasApp").factory('moveStageRect', [
               }
               return true;
             } else if(this.beacon.intersectsWithObject(stage.stageHitPointRight) && this.draggedStage.index !== index) {
-
+              console.log("HITTING");
               this.currentDrop = stage;
               this.currentHit = index;
 
