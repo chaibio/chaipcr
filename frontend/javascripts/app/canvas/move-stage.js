@@ -99,13 +99,13 @@ angular.module("canvasApp").factory('moveStageRect', [
         });
 
         // We may need two beacon, so that we have better control over where we move
+
         this.indicator.beacon = new fabric.Rect({
           fill: '', width: 10, left: 0, top: 10, height: 10, selectable: false, me: this,
           lockMovementY: true, hasControls: false, visible: true, //fill: 'black',
         });
 
         this.indicator.verticalLine = vertical;
-        this.indicator.verticalLine.setVisible(false);
 
         this.indicator.init = function(stage) {
           // rework on this part for smaller space...
@@ -114,7 +114,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           this.canvasContaining = $('.canvas-containing');
           this.currentDragPos = 0;
           this.spaceArrayRight = [stage.left + stage.myWidth + 40, stage.left + stage.myWidth + 78];
-          this.spaceArrayLeft = [stage.left + stage.myWidth + 40, stage.left + stage.myWidth + 78];
+          this.spaceArrayLeft = [stage.left - 80, stage.left + 42];
           this.draggedStage = stage;
 
           if(stage.nextStage) {

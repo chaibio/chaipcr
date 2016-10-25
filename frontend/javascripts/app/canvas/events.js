@@ -135,12 +135,12 @@ angular.module("canvasApp").factory('events', [
             C.moveLimit = ((lastStep.left + 3) - 120);
             return;
           } else if(moveElement === "stage") {
-            C.moveLimit = ((lastStage.left) - 140);
+            C.moveLimit = ((lastStage.left) - 35);
             return;
           }
         }
 
-         C.moveLimit = lastStep.left + 3;
+         C.moveLimit = lastStep.left + 120;
       };
 
       this.footerMouseOver = function(indicate, me, moveElement) {

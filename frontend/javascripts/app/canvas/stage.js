@@ -246,8 +246,8 @@ angular.module("canvasApp").factory('stage', [
 
           if(spaceArrayRight && spaceArrayLeft) {
             if(direction === "right") {
-              spaceArrayLeft[0] = this.left - 78;
-              spaceArrayLeft[1] = this.left - 40;
+              spaceArrayLeft[0] = this.left - 82;
+              spaceArrayLeft[1] = this.left - 44;
 
               spaceArrayRight[0] = this.left + 60;
               spaceArrayRight[1] = this.left + 98;
