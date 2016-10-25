@@ -232,7 +232,14 @@ angular.module("canvasApp").factory('moveStageRect', [
 
           if(this.currentHit  > this.draggedStage.index) {
             // ready to move back
+            if(this.verticalLine.getVisible() === true) { // V have black line shown, this means the move stage has been released between two stages.
+              //this.currentHit = (this.currentHit - 1 >= 0) ? this.currentHit - 1 : 0;
+              if(this.currentDrop.previousStage) {
+                this.currentDrop = this.currentDrop.previousStage;
+              }
+            }
             var checkStep = that.draggedStage.nextStage.childSteps[that.draggedStage.nextStage.childSteps.length - 1];
+
 
             if(parseInt(checkStep.circle.model.hold_time) === 0 && (checkStep.parentStage.index - 1) === that.draggedStage.index) {
               if(stage.previousStage) {
