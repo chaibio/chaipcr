@@ -47,6 +47,7 @@ angular.module("canvasApp").factory('stageGraphics', [
       });
       var dotsArray = dots.stageDots();
       dotsArray.push(supportRect);
+
       this.dots = new fabric.Group(dotsArray, {
         originX: "left", originY: "top", left: this.left, top: 6, hasControls: false, width: 22, height: 22, visible: editStageStatus,
         parent: this, name: "moveStage", lockMovementY: true, hasBorders: false, selectable: true,

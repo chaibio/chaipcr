@@ -166,6 +166,10 @@ angular.module("canvasApp").factory('moveStageRect', [
                   this.currentHit = 0;
                 }
               }
+              if(this.direction === "right") {
+                this.currentDrop = stage.previousStage;
+                this.currentHit = index - 1;
+              }
               return true;
             } else if(this.beacon.intersectsWithObject(stage.stageHitPointRight) && this.draggedStage.index !== index) {
               this.currentDrop = stage;
@@ -232,12 +236,13 @@ angular.module("canvasApp").factory('moveStageRect', [
 
           if(this.currentHit  > this.draggedStage.index) {
             // ready to move back
-            if(this.verticalLine.getVisible() === true) { // V have black line shown, this means the move stage has been released between two stages.
+            /*if(this.direction !== null && this.verticalLine.getVisible() === true) { // V have black line shown, this means the move stage has been released between two stages.
               //this.currentHit = (this.currentHit - 1 >= 0) ? this.currentHit - 1 : 0;
               if(this.currentDrop.previousStage) {
-                this.currentDrop = this.currentDrop.previousStage;
+                //this.currentDrop = this.currentDrop.previousStage;
               }
-            }
+            }*/
+
             var checkStep = that.draggedStage.nextStage.childSteps[that.draggedStage.nextStage.childSteps.length - 1];
 
 
@@ -288,6 +293,8 @@ angular.module("canvasApp").factory('moveStageRect', [
           }, function(err) {
             console.log(err);
           });
+
+          this.direction = null;
       };
         // Need to correct movement, so that the moved stage fits in at right place ,
         // right now, it works for moving right.
@@ -296,16 +303,13 @@ angular.module("canvasApp").factory('moveStageRect', [
           /*Sometimes user moves left first and then move right,
             leave the move stage over a stage and which has empty space in the left.
             We move to side and move if it is valid so that when we re render there is no spacing. */
-          if(this.currentDrop) {
-            this.currentDrop.moveToSide("left", null, null);
-          }
-          this.draggedStage.myWidth = 0;
+          //this.draggedStage.myWidth = 0;
           var stage = this.draggedStage;
 
-          while(stage.index <= (this.currentHit - 1)) {
-            stage.moveIndividualStageAndContents(stage, true);
-            stage = stage.nextStage;
-          }
+          //while(stage.index <= (this.currentHit - 1)) {
+          //  stage.moveIndividualStageAndContents(stage, true);
+            //stage = stage.nextStage;
+          //}
 
           var stageIndex = (this.currentDrop) ? this.currentDrop.index : 0;
           var model = this.draggedStage.model;
@@ -326,11 +330,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           C.configureStepsofNewStage(stageView, 0);
           C.correctNumbering();
           stageView.moveAllStepsAndStages();
-          //circleManager.init(C);
-          //console.log("starting circle");
-          //circleManager.addRampLinesAndCircles(circleManager.reDrawCircles());
           circleManager.addRampLines();
-          //console.log("Ending circle");
           C.allStepViews[C.allStepViews.length - 1].circle.doThingsForLast(null, null);
           stageGraphics.stageHeader.call(stageView);
           C.$scope.applyValues(stageView.childSteps[0].circle);
@@ -338,6 +338,35 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         };
 
+        this.indicator.clickManager = function(stage_, C, circleManager) {
+          console.log("its a click");
+          var stage = this.draggedStage, stageIndex = 0, model;
+          if(stage.nextStage) {
+
+            stageIndex = stage.nextStage.index;
+            this.currentDrop = stage.nextStage;
+            this.currentDrop.moveToSide("left");
+          }
+          model = stage.model;
+          var stageView = new stageDude(model, C.canvas, C.allStepViews, stageIndex, C, C.$scope, true);
+          C.addNextandPrevious(this.currentDrop, stageView);
+          C.allStageViews.splice(stageIndex + 1, 0, stageView);
+          C.allStageViews.splice(this.draggedStage.index, 1);
+
+          stageView.updateStageData(1);
+          stageView.render();
+          C.configureStepsofNewStage(stageView, 0);
+          C.correctNumbering();
+          stageView.moveAllStepsAndStages();
+          circleManager.addRampLines();
+          C.allStepViews[C.allStepViews.length - 1].circle.doThingsForLast(null, null);
+          stageGraphics.stageHeader.call(stageView);
+          C.$scope.applyValues(stageView.childSteps[0].circle);
+          stageView.childSteps[0].circle.manageClick(true);
+          console.log(C.allStageViews);
+          C.canvas.remove(stage_.dots);
+
+        };
         return this.indicator;
       },
     };
