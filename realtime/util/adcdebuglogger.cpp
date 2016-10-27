@@ -72,7 +72,7 @@ void ADCDebugLogger::store(ADCController::ADCState state, std::int32_t value, st
     if (!isWorking())
         return;
 
-    if (_currentSmapleIt == _preSamples.end() || _currentSmapleIt->adcValues.size() == ADCController::EFinal + (qpcrApp.settings().device.opticsChannels - 1))
+    if (_currentSmapleIt == _preSamples.end() || _currentSmapleIt->adcValues.size() == ADCController::EFinal)
     {
         if (!_triggerState)
         {

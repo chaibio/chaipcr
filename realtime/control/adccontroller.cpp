@@ -123,12 +123,12 @@ void ADCController::process() {
             switch (nextState) {
             case EReadZone1Singular:
                 value = _ltc2444->readSingleEndedChannel(0, kThermistorOversamplingRate);
-                _debugLogger->store(_currentConversionState, value);
+                _debugLogger->store(_currentConversionState, value, _currentChannel);
                 break;
 
             case EReadZone2Singular:
                 value = _ltc2444->readSingleEndedChannel(1, kThermistorOversamplingRate);
-                _debugLogger->store(_currentConversionState, value);
+                _debugLogger->store(_currentConversionState, value, _currentChannel);
                 break;
 
             case EReadLIA:
@@ -138,7 +138,7 @@ void ADCController::process() {
 
             case EReadLid:
                 value = _ltc2444->readSingleEndedChannel(7, kThermistorOversamplingRate);
-                _debugLogger->store(_currentConversionState, value);
+                _debugLogger->store(_currentConversionState, value, _currentChannel);
                 break;
 
             default:
