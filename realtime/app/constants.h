@@ -59,7 +59,7 @@ const int kADCSPIFrequencyHz = 10000000; //10 MHz
 
 const std::vector<uint8_t> kADCOpticsChannels = { 6, 5 };
 
-const std::string kADCDebugReaderSamplesPath = "/tmp/adc_samples.csv";
+const std::string kADCDebugReaderSamplesPath = "/tmp/data_logger.csv";
 
 //thermistor & ADC params
 const unsigned int kLidThermistorVoltageDividerResistanceOhms = 33000;
