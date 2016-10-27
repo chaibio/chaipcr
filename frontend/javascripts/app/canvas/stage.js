@@ -400,7 +400,7 @@ angular.module("canvasApp").factory('stage', [
       };
 
       this.getLeft = function() {
-
+        
         if(this.previousStage) {
           this.left = this.previousStage.left + this.previousStage.myWidth + constants.newStageOffset;
         } else {
