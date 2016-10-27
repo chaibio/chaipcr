@@ -306,10 +306,10 @@ angular.module("canvasApp").factory('moveStageRect', [
           //this.draggedStage.myWidth = 0;
           var stage = this.draggedStage;
 
-          //while(stage.index <= (this.currentHit - 1)) {
-          //  stage.moveIndividualStageAndContents(stage, true);
-            //stage = stage.nextStage;
-          //}
+          while(stage.index <= (this.currentHit - 1)) {
+            stage.moveIndividualStageAndContents(stage, true);
+            stage = stage.nextStage;
+          }
 
           var stageIndex = (this.currentDrop) ? this.currentDrop.index : 0;
           var model = this.draggedStage.model;
@@ -324,6 +324,11 @@ angular.module("canvasApp").factory('moveStageRect', [
           }
 
           callBack();
+
+          this.moveStageGraphics(stageView, C, circleManager);
+          C.canvas.remove(stage_.dots);
+        };
+        this.indicator.moveStageGraphics = function(stageView, C, circleManager) {
 
           stageView.updateStageData(1);
           stageView.render();
@@ -341,31 +346,29 @@ angular.module("canvasApp").factory('moveStageRect', [
         this.indicator.clickManager = function(stage_, C, circleManager) {
           console.log("its a click");
           var stage = this.draggedStage, stageIndex = 0, model;
-          if(stage.nextStage) {
 
+          if(stage.nextStage) {
             stageIndex = stage.nextStage.index;
             this.currentDrop = stage.nextStage;
-            this.currentDrop.moveToSide("left");
-          }
+          } else if(stage.previousStage) {
+            stageIndex = stage.previousStage.index;
+            this.currentDrop = stage.previousStage;
+          } // here work out what if we dont have nextStage...
+          // Correct spacing after we process click, now stages leave a lot of space.
           model = stage.model;
           var stageView = new stageDude(model, C.canvas, C.allStepViews, stageIndex, C, C.$scope, true);
           C.addNextandPrevious(this.currentDrop, stageView);
           C.allStageViews.splice(stageIndex + 1, 0, stageView);
-          C.allStageViews.splice(this.draggedStage.index, 1);
 
-          stageView.updateStageData(1);
-          stageView.render();
-          C.configureStepsofNewStage(stageView, 0);
-          C.correctNumbering();
-          stageView.moveAllStepsAndStages();
-          circleManager.addRampLines();
-          C.allStepViews[C.allStepViews.length - 1].circle.doThingsForLast(null, null);
-          stageGraphics.stageHeader.call(stageView);
-          C.$scope.applyValues(stageView.childSteps[0].circle);
-          stageView.childSteps[0].circle.manageClick(true);
-          console.log(C.allStageViews);
-          C.canvas.remove(stage_.dots);
+          if(stage.nextStage) {
+            C.allStageViews.splice(this.draggedStage.index, 1);
+          } else { // We clicked on the last stage.
+            C.allStageViews.splice(C.allStageViews.length - 1, 1);
+          }
 
+          this.moveStageGraphics(stageView, C, circleManager);
+          C.canvas.remove(stage_.dots); // because this doesn't get deleted in collapseStage(), deleteStageContents(), this could be because a click is active on dots.
+          // So we delete it once we have click finished
         };
         return this.indicator;
       },
