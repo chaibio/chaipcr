@@ -30,9 +30,7 @@ MUX::MUX(vector<GPIO> &&muxControlPins) :
 
 MUX::MUX(MUX &&other) {
     _muxControlPins = move(other._muxControlPins);
-    _channel = other._channel;
-
-    other._channel = 0;
+    _channel = other._channel.exchange(0);
 }
 
 MUX::~MUX() {
@@ -41,9 +39,7 @@ MUX::~MUX() {
 
 MUX& MUX::operator =(MUX &&other) {
     _muxControlPins = move(other._muxControlPins);
-    _channel = other._channel;
-
-    other._channel = 0;
+    _channel = other._channel.exchange(0);
 
     return *this;
 }

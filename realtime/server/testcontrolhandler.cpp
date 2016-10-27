@@ -26,12 +26,38 @@ using namespace std;
 using namespace boost::property_tree;
 using namespace Poco::Net;
 
+TestControlHandler::TestControlHandler(Operation operation)
+{
+    _operation = operation;
+}
+
 void TestControlHandler::processData(const ptree &requestPt, ptree &responsePt)
 {
-    processOptics(requestPt);
-    processLid(requestPt);
-    processHeatSink(requestPt);
-    processHeatBlock(requestPt);
+    switch (_operation) {
+    case MachineSettings:
+        processOptics(requestPt);
+        processLid(requestPt);
+        processHeatSink(requestPt);
+        processHeatBlock(requestPt);
+        break;
+
+    case StartADCLogger:
+        ADCControllerInstance::getInstance()->startDebugLogger(requestPt.get<std::size_t>("pre_samples"), requestPt.get<std::size_t>("post_samples"));
+        break;
+
+    case StopADCLogger:
+        ADCControllerInstance::getInstance()->stopDebugLogger();
+        break;
+
+    case TriggerADCLogger:
+        ADCControllerInstance::getInstance()->triggetDebugLogger();
+        break;
+
+    default:
+        setStatus(Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
+        setErrorString("Unknown operation");
+        break;
+    }
 
     JsonHandler::processData(requestPt, responsePt);
 }

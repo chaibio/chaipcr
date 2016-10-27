@@ -20,6 +20,7 @@
 #define MUX_H
 
 #include <vector>
+#include <atomic>
 
 class GPIO;
 
@@ -41,6 +42,6 @@ private:
 private:
 
     std::vector<GPIO> _muxControlPins;
-    int _channel;
+    std::atomic<int> _channel;
 };
 #endif // MUX_H
