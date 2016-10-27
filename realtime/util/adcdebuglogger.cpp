@@ -111,12 +111,12 @@ void ADCDebugLogger::save()
         std::fstream stream((savePath + ".tmp").c_str(), std::fstream::out | std::fstream::trunc);
 
         stream << "time_offset,heat_block_1_drive,heat_block_2_drive,fan_drive,mux_channel,"
-               << "heat_block_1_temp,heat_block_2_temp,";
+               << "heat_block_1,heat_block_2,";
 
         for (std::size_t i = 0; i < qpcrApp.settings().device.opticsChannels; ++i)
             stream << "optics_" << i + 1 << ',';
 
-        stream << "lid_temp\n";
+        stream << "lid\n";
 
         boost::chrono::system_clock::time_point triggetPoint = postSamples.front().time;
 
@@ -131,7 +131,7 @@ void ADCDebugLogger::save()
                 {
                     stream << it2->second;
 
-                    if (std::next(it2) != it->second.end() && std::next(it) != sample.adcValues.end())
+                    if (std::next(it2) != it->second.end() || std::next(it) != sample.adcValues.end())
                         stream << ',';
                 }
             }
@@ -150,7 +150,7 @@ void ADCDebugLogger::save()
                 {
                     stream << it2->second;
 
-                    if (std::next(it2) != it->second.end() && std::next(it) != sample.adcValues.end())
+                    if (std::next(it2) != it->second.end() || std::next(it) != sample.adcValues.end())
                         stream << ',';
                 }
             }
@@ -161,7 +161,7 @@ void ADCDebugLogger::save()
         stream.flush();
         stream.close();
 
-        std::remove((savePath + ".tmp").c_str());
+        std::remove(savePath.c_str());
         std::rename((savePath + ".tmp").c_str(), savePath.c_str());
 
     }, _storeFile, std::move(_preSamples), std::move(_postSamples)).detach();
