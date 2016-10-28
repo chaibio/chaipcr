@@ -30,17 +30,13 @@ class MUX {
 public:
     MUX(std::vector<GPIO> &&muxControlPins);
     MUX(MUX &&other);
-    ~MUX();
 
     MUX& operator= (MUX &&other);
 
     void setChannel(int channel);   //channel is 0 to ....n
-    int getChannel();
+    inline int getChannel() const { return _channel; }
 
 private:
-
-private:
-
     std::vector<GPIO> _muxControlPins;
     std::atomic<int> _channel;
 };
