@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161010185830) do
+ActiveRecord::Schema.define(version: 20161028203341) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -118,6 +118,7 @@ ActiveRecord::Schema.define(version: 20161010185830) do
     t.integer "experiment_id"
     t.integer "channel",            limit: 1,                         default: 1, null: false
     t.integer "ramp_id"
+    t.string  "optical_values"
   end
 
   add_index "melt_curve_data", ["experiment_id", "stage_id", "well_num", "temperature"], name: "melt_curve_data_index", using: :btree
