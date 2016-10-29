@@ -485,9 +485,10 @@ function process_amp_1sr(
         "cq_method"=>cq_method
     )
 
-    if size(baseline_cyc_bounds) == (0,) || (size(baseline_cyc_bounds) == (2,) && eltype(baseline_cyc_bounds) <: Integer)
+    size_bcb = size(baseline_cyc_bounds)
+    if size_bcb == (0,) || (size_bcb == (2,) && size(baseline_cyc_bounds[1]) == ()) # can't use `eltype(baseline_cyc_bounds) <: Integer` because `JSON.parse("[1,2]")` results in `Any[1,2]` instead of `Int[1,2]`
         baseline_cyc_bounds = fill(baseline_cyc_bounds, num_fluo_wells, num_channels)
-    elseif size(baseline_cyc_bounds) == (num_fluo_wells, num_channels) && eltype(baseline_cyc_bounds) <: AbstractVector # final format of `baseline_cyc_bounds`
+    elseif size_bcb == (num_fluo_wells, num_channels) && eltype(baseline_cyc_bounds) <: AbstractVector # final format of `baseline_cyc_bounds`
         nothing
     else
         error("`baseline_cyc_bounds` is not in the right format.")
