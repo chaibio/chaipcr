@@ -234,16 +234,18 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &/*task*/)
             else
             {
                 double temperature = HeatBlockInstance::getInstance()->temperature();
+                bool debugMode = ExperimentController::getInstance()->debugMode();
 
                 std::size_t i = 0;
-                for (const std::vector<int32_t> &channel: adcValues)
+                for (std::vector<int32_t> &channel: adcValues)
                 {
-                    int32_t value = std::round(Util::average(channel.begin(), channel.end()));
+                    MeltCurveData data(std::round(Util::average(channel.begin(), channel.end())), temperature, _wellNumber, i++);
+
+                    if (debugMode)
+                        data.fluorescenceData = std::move(channel);
 
                     std::lock_guard<std::mutex> meltCurveDataLock(_meltCurveDataMutex);
-                    _meltCurveData.emplace_back(value, temperature, _wellNumber, i);
-
-                    ++i;
+                    _meltCurveData.emplace_back(std::move(data));
                 }
             }
         }
@@ -291,16 +293,16 @@ std::vector<Optics::FluorescenceData> Optics::getFluorescenceData()
 
     if (!_collectData)
     {
-        for (const std::pair<const unsigned int, std::map<std::size_t, FluorescenceRoughData>> &wellData: _fluorescenceData)
+        for (std::pair<const unsigned int, std::map<std::size_t, FluorescenceRoughData>> &wellData: _fluorescenceData)
         {
-            for (const std::pair<const std::size_t, FluorescenceRoughData> &channelData: wellData.second)
+            for (std::pair<const std::size_t, FluorescenceRoughData> &channelData: wellData.second)
             {
                 FluorescenceData data(channelData.second.accumulateBaselineData(), channelData.second.accumulateFluorescenceData(), wellData.first, channelData.first);
 
                 if (ExperimentController::getInstance()->debugMode())
                 {
-                    data.fluorescenceData = channelData.second.fluorescenceData;
-                    data.baselineData = channelData.second.baselineData;
+                    data.fluorescenceData = std::move(channelData.second.fluorescenceData);
+                    data.baselineData = std::move(channelData.second.baselineData);
                 }
 
                 dataList.push_back(data);

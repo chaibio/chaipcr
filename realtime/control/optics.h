@@ -61,10 +61,21 @@ public:
         MeltCurveData(int32_t fluorescenceValue, double temperature, unsigned int wellId, std::size_t channel):
             fluorescenceValue(fluorescenceValue), temperature(temperature), wellId(wellId), channel(channel) {}
 
+        MeltCurveData(MeltCurveData &&other)
+        {
+            fluorescenceValue = other.fluorescenceValue;
+            temperature = other.temperature;
+            wellId = other.wellId;
+            channel = other.channel;
+            fluorescenceData = std::move(other.fluorescenceData);
+        }
+
         int32_t fluorescenceValue;
         double temperature;
         unsigned int wellId;
         std::size_t channel;
+
+        std::vector<int32_t> fluorescenceData;
     };
 
     Optics(unsigned int lidSensePin, std::shared_ptr<LEDController> ledController, MUX &&photoDiodeMux);

@@ -546,12 +546,22 @@ void DBControl::addMeltCurveData(const Experiment &experiment, const std::vector
     std::vector<std::string> queries;
     std::stringstream stream;
 
-    stream << "INSERT INTO melt_curve_data(experiment_id, stage_id, well_num, temperature, fluorescence_value, channel, ramp_id) VALUES";
+    stream << "INSERT INTO melt_curve_data(experiment_id, stage_id, well_num, temperature, fluorescence_value, channel, ramp_id, optical_values) VALUES";
 
     for (std::vector<Optics::MeltCurveData>::const_iterator it = meltCurveData.begin(); it != meltCurveData.end(); ++it)
     {
         stream << "(" << experiment.id() << "," << experiment.protocol()->currentStage()->id() << ","
-               << it->wellId << "," << it->temperature << "," << it->fluorescenceValue << "," << (it->channel + 1) << "," << experiment.protocol()->currentRamp()->id() << ")";
+               << it->wellId << "," << it->temperature << "," << it->fluorescenceValue << "," << (it->channel + 1) << "," << experiment.protocol()->currentRamp()->id() << ",\'";
+
+        for (std::vector<int32_t>::const_iterator it2 = it->fluorescenceData.begin(); it2 != it->fluorescenceData.end(); ++it2)
+        {
+            stream << *it2;
+
+            if (it2 + 1 != it->fluorescenceData.end())
+                stream << ",";
+        }
+
+        stream << "\')";
 
         if (it + 1 != meltCurveData.end())
             stream << ",";
