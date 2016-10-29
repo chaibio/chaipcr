@@ -11,6 +11,7 @@ function process_amp(
     # start: arguments that might be passed by upstream code
     well_nums::AbstractVector=[],
     min_reliable_cyc::Real=5,
+    baseline_cyc_bounds::AbstractArray=[],
     cq_method::AbstractString="Cy0",
     ct_fluos::AbstractVector=[],
     # end: arguments that might be passed by upstream code
@@ -113,7 +114,7 @@ function process_amp(
             cycle_nums, fluo_well_nums, well_nums, channels,
             dcv,
             dye_in, dyes_2bfild,
-            min_reliable_cyc, cq_method, ct_fluos, kwdict_mbq,
+            min_reliable_cyc, baseline_cyc_bounds, cq_method, ct_fluos, kwdict_mbq,
             qt_prob_rc, kwdict_rc,
             out_format_1sr, json_digits, verbose
         )
@@ -164,6 +165,7 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
     fluos::AbstractVector;
 
     min_reliable_cyc::Real=5, # >= 1
+    baseline_cyc_bounds::AbstractVector=[],
 
     sig_m_prebl::AbstractString="l4_enl",
     bl_fallback_func::Function=median,
@@ -185,15 +187,17 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
     cycs = 1.0 * (1:num_cycles)
     cycs_denser = Array(colon(1, (num_cycles - 1) / denser_factor, num_cycles))
 
+    len_bcb = length(baseline_cyc_bounds)
+
     last_cyc_wt0 = round(min_reliable_cyc, RoundDown) - 1 # to determine weights (`wts`) for sigmoid fitting per `min_reliable_cyc`
 
-    if last_cyc_wt0 <= 1 || num_cycles < min_reliable_cyc
-        wts = ones(num_cycles)
-        fitted_prebl = EMPTY_fitted
-        baseline = bl_fallback_func(fluos)
-        bl_notes = ["last_cyc_wt0 <= 1 || num_cycles < min_reliable_cyc, fallback"]
+    # will remain the same `if len_bcb == 0 && (last_cyc_wt0 <= 1 || num_cycles < min_reliable_cyc)`
+    wts = ones(num_cycles)
+    fitted_prebl = EMPTY_fitted
+    baseline = bl_fallback_func(fluos)
+    bl_notes = ["last_cyc_wt0 <= 1 || num_cycles < min_reliable_cyc, fallback"]
 
-    else
+    if len_bcb == 0 && last_cyc_wt0 > 1 && num_cycles >= min_reliable_cyc
 
         wts = vcat(zeros(last_cyc_wt0), ones(num_cycles - last_cyc_wt0))
 
@@ -263,7 +267,14 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
 
         end # if bl_notes = ["sig"]
 
-    end # if last_cyc_wt0 <= 1
+    elseif len_bcb == 2
+        baseline = bl_fallback_func(fluos[colon(baseline_cyc_bounds...)])
+        bl_notes = ["User-defined"]
+
+    elseif !(len_bcb in [0, 2])
+        error("Length of `baseline_cyc_bounds` must be 0 or 2.")
+
+    end # if len_bcb
 
 
     blsub_fluos = fluos .- baseline
@@ -436,6 +447,7 @@ function process_amp_1sr(
     dcv::Bool, # logical, whether to perform multi-channel deconvolution
     dye_in::AbstractString, dyes_2bfild::AbstractVector,
     min_reliable_cyc::Real,
+    baseline_cyc_bounds::AbstractArray,
     cq_method::AbstractString,
     ct_fluos::AbstractVector,
     kwdict_mbq::Associative, # keyword arguments passed onto `mod_bl_q`
@@ -473,6 +485,14 @@ function process_amp_1sr(
         "cq_method"=>cq_method
     )
 
+    if size(baseline_cyc_bounds) == (0,) || (size(baseline_cyc_bounds) == (2,) && eltype(baseline_cyc_bounds) <: Integer)
+        baseline_cyc_bounds = fill(baseline_cyc_bounds, num_fluo_wells, num_channels)
+    elseif size(baseline_cyc_bounds) == (num_fluo_wells, num_channels) && eltype(baseline_cyc_bounds) <: AbstractVector # final format of `baseline_cyc_bounds`
+        nothing
+    else
+        error("`baseline_cyc_bounds` is not in the right format.")
+    end # if ndims
+
     NaN_ary2 = fill(NaN, num_fluo_wells, num_channels)
 
     if num_cycles <= 2
@@ -487,6 +507,7 @@ function process_amp_1sr(
                         mod_bl_q(
                             rbbs_ary3[:, well_i, channel_i];
                             min_reliable_cyc=min_reliable_cyc,
+                            baseline_cyc_bounds=baseline_cyc_bounds[well_i, channel_i],
                             cq_method="cp_d1",
                             ct_fluo=NaN,
                             kwdict_mbq...,
@@ -521,6 +542,7 @@ function process_amp_1sr(
             mod_bl_q(
                 rbbs_ary3[:, well_i, channel_i];
                 min_reliable_cyc=min_reliable_cyc,
+                baseline_cyc_bounds=baseline_cyc_bounds[well_i, channel_i],
                 cq_method=cq_method,
                 ct_fluo=ct_fluos[channel_i],
                 kwdict_mbq...,

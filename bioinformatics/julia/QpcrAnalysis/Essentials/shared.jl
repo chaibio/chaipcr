@@ -235,6 +235,31 @@ function print_v(print_func::Function, verbose::Bool, args...; kwargs...)
 end
 
 
+# repeat n times: take the output of an function and use it as the input for the same function
+function redo(func::Function, input, times::Integer, extra_args...)
+    output = input
+    while times > 0
+        output = func(output, extra_args...)
+        times -= 1
+    end
+    return output
+end
+
+
+# reshape a layered vector into a multi-dimension array, where outer layer is converted to higher dimension and each element has `num_layers_left` layers left.
+function reshape_lv(layered_vector::AbstractVector, num_layers_left::Integer=0)
+    md_array = copy(layered_vector) # safe in case `eltype(layered_vector) <: AbstractArray`
+    while redo(eltype, md_array, num_layers_left + 1) <: AbstractArray
+        md_array = reshape(
+            cat(2, md_array...),
+            length(md_array[1]),
+            size(md_array)...
+        )
+    end
+    return md_array
+end
+
+
 
 
 #
