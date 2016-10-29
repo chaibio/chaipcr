@@ -236,17 +236,17 @@ end
 
 
 # repeat n times: take the output of an function and use it as the input for the same function
-function redo(func::Function, input, times::Integer, extra_args...)
+function redo(func::Function, input, times::Integer, extra_args...; kwargs...)
     output = input
     while times > 0
-        output = func(output, extra_args...)
+        output = func(output, extra_args...; kwargs...)
         times -= 1
     end
     return output
 end
 
 
-# reshape a layered vector into a multi-dimension array, where outer layer is converted to higher dimension and each element has `num_layers_left` layers left.
+# reshape a layered vector into a multi-dimension array, where outer layer is converted to higher dimension and each element has `num_layers_left` layers left (e.g. each element is atomic / not an array when `num_layers_lift == 0`, a vector of atomic elements when `num_layers_lift == 1`, vector of vector of atomic elements when `num_layers_lift == 2`).
 function reshape_lv(layered_vector::AbstractVector, num_layers_left::Integer=0)
     md_array = copy(layered_vector) # safe in case `eltype(layered_vector) <: AbstractArray`
     while redo(eltype, md_array, num_layers_left + 1) <: AbstractArray
