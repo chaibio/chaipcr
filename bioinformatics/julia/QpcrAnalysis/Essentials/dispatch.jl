@@ -23,10 +23,12 @@ function dispatch(action::AbstractString, request_body::AbstractString)
             else
                 sr_vec = []
             end
+            baseline_cyc_bounds = "baseline_cyc_bounds" in keys_req_dict ? reshape_lv(req_dict["baseline_cyc_bounds"], 1) : []
             cq_method = "cq_method" in keys_req_dict ? req_dict["cq_method"] : "Cy0"
             process_amp( # can't use `return` to return within `try`
                 db_conn, exp_id, sr_vec, calib_info;
                 min_reliable_cyc=req_dict["min_ct"],
+                baseline_cyc_bounds=baseline_cyc_bounds,
                 cq_method=cq_method,
                 out_sr_dict=false
             )
@@ -83,6 +85,7 @@ function args2reqb(
     step_id::Integer=0,
     ramp_id::Integer=0,
     min_reliable_cyc::Real=5,
+    baseline_cyc_bounds::AbstractVector=[],
     guid::AbstractString="",
     extra_args::OrderedDict=OrderedDict(),
     wdb::AbstractString="dflt", # "handle", "dflt", "connect"
@@ -98,6 +101,7 @@ function args2reqb(
     if action == "amplification"
         reqb["experiment_id"] = exp_id
         reqb["min_ct"] = min_reliable_cyc
+        reqb["baseline_cyc_bounds"] = baseline_cyc_bounds
         if step_id != 0
             reqb["step_id"] = step_id
         elseif ramp_id != 0
