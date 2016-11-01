@@ -108,6 +108,11 @@ void ADCDebugLogger::save()
     //Order of ADC states here is hardcoded
     std::thread([](std::string savePath, std::vector<SampleData> preSamples, std::vector<SampleData> postSamples)
     {
+        sched_param params;
+        params.__sched_priority = sched_get_priority_max(SCHED_IDLE);
+
+        pthread_setschedparam(pthread_self(), SCHED_IDLE, &params);
+
         std::fstream stream((savePath + ".tmp").c_str(), std::fstream::out | std::fstream::trunc);
 
         stream << "time_offset,heat_block_1_drive,heat_block_2_drive,fan_drive,mux_channel,"
