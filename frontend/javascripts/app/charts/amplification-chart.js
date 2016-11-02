@@ -31,6 +31,7 @@
         activePathConfig: null,
         lines: null,
         circle: null,
+        whiteBorderLine: null,
         xScale: null,
         yScale: null,
         zooomBehavior: null,
@@ -109,6 +110,7 @@
       Globals.activePathConfig = getPathConfig(path);
       var activePathConfig = Globals.activePathConfig.config;
       var activePathIndex = Globals.activePathConfig.index;
+      makeWhiteBorderLine(activePathConfig);
       // var newLine = makeColoredLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth / Globals.zoomTransform.k);
       var newLine = makeColoredLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth);
       Globals.lines[activePathIndex] = newLine;
@@ -346,6 +348,35 @@
 
 
       return _path;
+    }
+
+    function makeWhiteBorderLine (line_config) {
+      if (Globals.whiteBorderLine) {
+        Globals.whiteBorderLine.remove();
+      }
+      var line = d3.line()
+        .curve(d3.curveMonotoneX)
+        .x(function(d) {
+          return Globals.xScale(d[line_config.x]);
+        })
+        .y(function(d) {
+          return Globals.yScale(d[line_config.y]);
+        });
+      if (Globals.config.axes.y.scale === 'log') {
+        line.defined(function(d) {
+          return d[line_config.y] > 10;
+        });
+      }
+      var trans;
+      var _path = Globals.viewSVG.append("path")
+        .datum(Globals.data[line_config.dataset])
+        .attr("class", "white-border-line")
+        .attr("stroke", "#fff")
+        .attr('fill', 'none')
+        .attr("d", line)
+        .attr('stroke-width', Globals.activePathStrokeWidth + 2);
+
+      Globals.whiteBorderLine = _path;
     }
 
     function drawLines() {
