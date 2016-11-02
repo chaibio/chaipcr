@@ -46,7 +46,6 @@
         dashedLineStrokeWidth: 2,
         circleRadius: 6,
         circleStrokeWidth: 2,
-        circleStrokeWidth: 2,
         circleRadius: 7
       };
     }
