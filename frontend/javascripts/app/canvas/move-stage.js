@@ -239,11 +239,14 @@ angular.module("canvasApp").factory('moveStageRect', [
           var that = this;
 
           if(this.currentHit  > this.draggedStage.index) {
+            console.log("Greater");
             // ready to move back
-            var checkStep = that.draggedStage.nextStage.childSteps[that.draggedStage.nextStage.childSteps.length - 1];
+            //var checkStep = that.draggedStage.nextStage.childSteps[that.draggedStage.nextStage.childSteps.length - 1];
 
+            //console.log("checkStep", checkStep);
 
-            if(parseInt(checkStep.circle.model.hold_time) === 0 && (checkStep.parentStage.index - 1) === that.draggedStage.index) {
+            /*if(parseInt(checkStep.circle.model.hold_time) === 0 && (checkStep.parentStage.index - 1) === that.draggedStage.index) {
+
               if(stage.previousStage) {
                 this.currentDrop = stage.previousStage;
                 this.currentHit = stage.previousStage.index;
@@ -257,19 +260,20 @@ angular.module("canvasApp").factory('moveStageRect', [
                   C.allStageViews.splice(that.draggedStage.index, 1);
                 });
               }
-            } else {
+            } else {*/
               this.applyMovement(stage, C, circleManager, function() {
                 C.allStageViews.splice(that.draggedStage.index, 1);
               });
-            }
+            //}
 
           } else if(this.currentHit < this.draggedStage.index) {
             // ready to move forward
+            console.log("Lesser");
             this.applyMovement(stage, C, circleManager, function() {
               C.allStageViews.splice(that.draggedStage.index + 1, 1);
             });
           } else {
-
+            console.log("Equal");
             if(stage.previousStage) {
               this.currentDrop = stage.previousStage;
               this.currentHit = stage.previousStage.index;
@@ -277,8 +281,9 @@ angular.module("canvasApp").factory('moveStageRect', [
                 C.allStageViews.splice(that.draggedStage.index + 1, 1);
               });
             } else if(stage.nextStage) {
-              this.currentDrop = stage.nextStage;
-              this.currentHit = stage.nextStage.index;
+              console.log("I have next");
+              //this.currentDrop = stage.nextStage;
+              //this.currentHit = stage.nextStage.index;
               this.applyMovement(stage, C, circleManager, function() {
                 C.allStageViews.splice(that.draggedStage.index, 1);
               });
