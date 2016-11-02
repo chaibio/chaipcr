@@ -131,6 +131,7 @@
       }
       hideMouseIndicators();
       Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth);
+      Globals.whiteBorderLine.remove();
       Globals.activePathConfig = null;
       Globals.activePath = null;
       // Globals.box.container.attr('opacity', 0);
