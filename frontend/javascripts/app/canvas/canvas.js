@@ -320,6 +320,7 @@ angular.module("canvasApp").factory('canvas', [
       stageView.updateStageData(1);
       this.allStageViews.splice(stageIndex, 0, stageView);
       stageView.render();
+      // configure steps;
       this.insertStageGraphics(stageView, ordealStatus, mode);
     };
 
@@ -333,7 +334,15 @@ angular.module("canvasApp").factory('canvas', [
 
       stageView.updateStageData(1);
       stageView.render();
-      this.insertStageGraphics(stageView, 0, mode);
+      this.insertStageGraphics(stageView, 0, "add_stage_at_beginning");
+      /*this.configureStepsofNewStage(stageView, 0);
+      this.correctNumbering();
+      stageView.moveAllStepsAndStages();
+      circleManager.addRampLines();
+      this.allStepViews[this.allStepViews.length - 1].circle.doThingsForLast(null, null);
+      stageGraphics.stageHeader.call(stageView);
+      this.$scope.applyValues(stageView.childSteps[0].circle);
+      stageView.childSteps[0].circle.manageClick(true);*/
     };
 
     this.insertStageGraphics = function(stageView, ordealStatus, mode) {
@@ -343,6 +352,8 @@ angular.module("canvasApp").factory('canvas', [
 
       if(mode === "move_stage_back_to_original") {
         this.allStageViews[0].moveAllStepsAndStages(false);
+      } else {
+        stageView.moveAllStepsAndStages(false);
       }
       circleManager.addRampLines();
       stageGraphics.stageHeader.call(stageView);
