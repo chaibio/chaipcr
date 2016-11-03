@@ -8,6 +8,7 @@ import paramiko
 import pandas as pd
 import numpy as np
 
+
 def _request2curl(req):
     """Convert python requests to curl syntax.
     
@@ -27,16 +28,16 @@ def _request2curl(req):
 def _check_par(name, value, _type=int, _min=None, _max=None, _list=None):
     """Check parameters."""
 
-    if not value or not isinstance(value, _type):
+    if not isinstance(value, _type):
         raise Exception('Value of parameter %s is not a valid %s.'%(name, _type))
 
-    if _list and value not in _list:
+    if _list != None and value not in _list:
         raise Exception('Value of parameter %s is not in the valid list %s.'%(name, _list))
 
-    if _min and value < _min:
+    if _min != None and value < _min:
         raise Exception('Value of parameter %s is less than the min value %s.'%(name, _min))
 
-    if _max and value > _max:
+    if _max != None and value > _max:
         raise Exception('Value of parameter %s is more than the max value %s.'%(name, _max))
 
 class ChaiDevice():
@@ -91,6 +92,7 @@ class ChaiDevice():
         except:
             raise Exception("Failed to establish REST connection to machine: '%s'"%self._config['host'] )
 
+
     def connect_ssh(self):
         """Connect to the device using ssh."""
         try:
@@ -103,6 +105,7 @@ class ChaiDevice():
 
         ret = self._rest_session.get(self._rest_prefix + '/device/status')
         return ret.json()
+
 
     def state(self):
 
@@ -122,6 +125,7 @@ class ChaiDevice():
         except:
             raise Exception('Failed to stop current experiment')
 
+
     def experiment_stop(self):
 
         ret = self._rest_session.post(self._rest_prefix + ':8000/control/stop')
@@ -134,6 +138,7 @@ class ChaiDevice():
         except:
             raise Exception('Failed to stop current experiment')
                 
+
     def experiment_delete(self, experiment_id=None):
 
         _check_par('experiment id', experiment_id, _type=int, _min=0)
@@ -144,6 +149,7 @@ class ChaiDevice():
             return True
         else:
             raise Exception('Failed to delete experiment id %d'%experiment_id)
+
 
     def experiment_copy(self, experiment_id=None):
         """Copy an existing experiment.
@@ -158,6 +164,7 @@ class ChaiDevice():
         except:
             raise Exception('Failed to copy experiment id %d'%experiment_id)
 
+
     def experiment_info(self, experiment_id=None):
         """Get status of an experiment."""
 
@@ -168,6 +175,7 @@ class ChaiDevice():
             return ret.json()
         except:
             raise Exception('Failed to get experiment id %d'%experiment_id)
+
 
     def experiment_loop(self, experiment_id=None, loop_cnt=100, poll_seconds=60, gap_minutes=5, stop_on_error=True, delete_loop_experiments=True):
         """Run the same experiment in a loop.
@@ -289,6 +297,7 @@ class ChaiDevice():
         except:
             raise Exception('Failed to load experiment')
 
+
     def test_control(self, item, value):
         """Access the test_control REST API."""
 
@@ -306,15 +315,6 @@ class ChaiDevice():
 
         return False
 
-    def start_dump(self, sample_cnt):
-
-        _check_par('sample count', sample_cnt, _min=1)
-
-        ret = self._rest_session.post(
-                self._rest_prefix + ':8000/test/log_adc_reads', 
-                headers={'Content-Type':'application/json'}, 
-                data=json.dumps({'num_samples':'%d'%sample_cnt})
-                )
 
     def ssh_command(self, command, stdin=None):
         """Execute a remote command over ssh.
@@ -391,31 +391,91 @@ class ChaiDevice():
                 ret.append([int(i) for i in self.status()['optics']['photodiode_value']])
             
             ret = pd.DataFrame(ret)
-            ret.columns = ['ch%d'%(i+1) for i in xrange(ret.columns.size)]
+            ret.columns = ['optics_%d'%(i+1) for i in xrange(ret.columns.size)]
 
             self.test_control("disable_leds",'')
 
         elif mode == 'dump':
-            self.ssh_command('rm -f /tmp/adc_samples.csv')
-            self.start_dump(cnt)
-            while True:
-                time.sleep(1)
-                ret = self.ssh_command('stat /tmp/adc_samples.csv')
-                if ret[0] == 0:
-                    # file exists
-                    time.sleep(1)
-                    break
+            self.data_logger_start(10, cnt-10)
+            ret = self.data_logger_trigger()
 
             self.test_control("disable_leds",'')
 
-            self.sftp_get('/tmp/adc_samples.csv', 'adc_samples.csv')
-
-            ret = pd.read_csv('adc_samples.csv', header=0)
-            # TODO - fix this for single channel
-            ret = ret[['5','7']]
-            ret.columns = ['ch1', 'ch2']
+            ret = ret[[c for c in list(ret.columns) if c.startswith('optics')]]
         else:
             raise Exception('Unknown mode: %s'%mode)
+
+        return ret
+
+
+    def data_logger_start(self, cnt_pre, cnt_post):
+        """Setup and start the data logger"""
+
+        _check_par('pre-trigger sample count', cnt_pre, int, 0)
+        _check_par('post-trigger sample count', cnt_post, int, 0)
+
+        ret = self._rest_session.post(
+                self._rest_prefix + ':8000/test/data_logger/start', 
+                headers={'Content-Type':'application/json'}, 
+                data=json.dumps({'pre_samples':'%d'%cnt_pre, 'post_samples':'%d'%cnt_post,})
+                )
+
+        try:
+            if ret.json()['status']['status'] == 'true':
+                return True
+            else:
+                return False
+        except:
+            raise Exception('Failed to start data logger')
+
+
+    def data_logger_stop(self):
+        """Stop the data logger"""
+
+        ret = self._rest_session.post(
+                self._rest_prefix + ':8000/test/data_logger/stop', 
+                headers={'Content-Type':'application/json'} 
+                )
+
+        try:
+            if ret.json()['status']['status'] == 'true':
+                return True
+            else:
+                return False
+        except:
+            raise Exception('Failed to stop data logger')
+
+
+    def data_logger_trigger(self):
+        """Retrieve the logger data"""
+
+        remote_output_file = '/tmp/data_logger.csv'
+        self.ssh_command('rm -f ' + remote_output_file)
+
+        ret = self._rest_session.post(
+                self._rest_prefix + ':8000/test/data_logger/trigger', 
+                headers={'Content-Type':'application/json'} 
+                )
+        try:
+            if ret.json()['status']['status'] != 'true':
+                return False
+        except:
+            raise Exception('Failed to trigger data logger')
+
+        ret = []
+
+        while True:
+            time.sleep(1)
+            ret = self.ssh_command('stat ' + remote_output_file)
+            if ret[0] == 0:
+                # file exists
+                time.sleep(1)
+                break
+
+        self.sftp_get(remote_output_file, 'data_logger.csv')
+
+        ret = pd.read_csv('data_logger.csv', header=0)
+        ret = ret.set_index(['time_offset'])
 
         return ret
 
