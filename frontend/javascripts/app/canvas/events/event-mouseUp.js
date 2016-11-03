@@ -63,7 +63,7 @@ angular.module("canvasApp").factory('mouseUp', [
             console.log("its just a click we conclude it as we want to switch places", stage);
             C.stageIndicator.clickManager(stage, C, circleManager);
           }
-          //C.stageIndicator.setVisible(false);
+          C.stageIndicator.setVisible(false);
           that.moveStageActive = false;
           C.canvas.renderAll();
         }

@@ -234,6 +234,32 @@ angular.module("canvasApp").factory('stage', [
 
       };
 
+      this.moveIndividualStageAndContentsSpecial = function(stage, del) {
+        if(!stage) {
+          return false;
+        }
+        stage.getLeft();
+        stage.stageGroup.set({left: stage.left }).setCoords();
+        stage.dots.set({left: stage.left + 3}).setCoords();
+        stage.stageHitPointLeft.set({left: stage.left + 10}).setCoords();
+        stage.stageHitPointRight.set({left: (stage.left + stage.myWidth) -  20}).setCoords();
+        stage.stageHitPointLowerLeft.set({left: stage.left + 10}).setCoords();
+        stage.stageHitPointLowerRight.set({left: (stage.left + stage.myWidth) -  20}).setCoords();
+
+        stage.moveStageRightPointerDetector.set({left: (stage.left + stage.myWidth) +  50}).setCoords();
+
+        stage.childSteps.forEach(function(childStep, index) {
+
+          if (del === true) {
+            childStep.moveStep(-1, true);
+          } else {
+            childStep.moveStep(1, true);
+          }
+          childStep.circle.moveCircleWithStep();
+        });
+
+      };
+
       //This method is used when move stage hits at the hitPoint at the side of the stage.
       this.moveToSide = function(direction, verticalLine, spaceArrayRight, spaceArrayLeft, type) {
 
