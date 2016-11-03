@@ -330,6 +330,14 @@ angular.module("canvasApp").factory('canvas', [
       this.setDefaultWidthHeight();
     };
 
+    this.addNewStageAtBeginning = function(stageToBeReplaced, data) {
+
+      var add = (data.stage.steps.length > 0) ? 128 + Math.floor(constants.newStageOffset / data.stage.steps.length) : 128;
+      //console.log(add);
+      // Make sure you dont have move stage/step functionality when there is only one stage
+      stageToBeReplaced.nextStage.left = (data.stage.steps.length * add) + 33;
+      stageToBeReplaced.nextStage.moveAllStepsAndStages(false);
+    };
     this.correctNumbering = function() {
 
       var oStatus = 1, that = this, tempCircle = null;

@@ -235,37 +235,24 @@ angular.module("canvasApp").factory('moveStageRect', [
           // 1) infinite hold has to be corrected while moving stage.
           // 2) processMovement has to be defrgged and simplified, Its complex.
           // May be we should splice the stage off from allStageViews right after we click on dots.
+          if(this.verticalLine.getVisible() === false) {
+            console.log("This is invalid");
+            var stageToBeReplaced = this.draggedStage;
+            this.backToOriginal(stageToBeReplaced, C, stage);
+            this.setVisible(false);
+            return true;
+          }
+
+          this.setVisible(false);
           console.log("Landed .... !: Dragged stage->", this.draggedStage.index, "current Hit ->", this.currentHit);
+
           var that = this;
 
           if(this.currentHit  > this.draggedStage.index) {
             console.log("Greater");
-            // ready to move back
-            //var checkStep = that.draggedStage.nextStage.childSteps[that.draggedStage.nextStage.childSteps.length - 1];
-
-            //console.log("checkStep", checkStep);
-
-            /*if(parseInt(checkStep.circle.model.hold_time) === 0 && (checkStep.parentStage.index - 1) === that.draggedStage.index) {
-
-              if(stage.previousStage) {
-                this.currentDrop = stage.previousStage;
-                this.currentHit = stage.previousStage.index;
-                this.applyMovement(stage, C, circleManager, function() {
-                  C.allStageViews.splice(that.draggedStage.index + 1, 1);
-                });
-              } else if(stage.nextStage) {
-                this.currentDrop = stage.nextStage;
-                this.currentHit = stage.nextStage.index;
-                this.applyMovement(stage, C, circleManager, function() {
-                  C.allStageViews.splice(that.draggedStage.index, 1);
-                });
-              }
-            } else {*/
               this.applyMovement(stage, C, circleManager, function() {
                 C.allStageViews.splice(that.draggedStage.index, 1);
               });
-            //}
-
           } else if(this.currentHit < this.draggedStage.index) {
             // ready to move forward
             console.log("Lesser");
@@ -297,6 +284,24 @@ angular.module("canvasApp").factory('moveStageRect', [
           });
 
           this.direction = null;
+      };
+
+      this.indicator.backToOriginal = function(stageToBeReplaced, C, stage_) {
+
+        var data;
+        data = {
+          stage: stageToBeReplaced.model
+        };
+
+
+        if(stageToBeReplaced.previousStage !== null) {
+          console.log("We have previous stage");
+          C.allStageViews.splice(stageToBeReplaced.index, 1);
+          C.addNewStage(data, stageToBeReplaced.previousStage); // Remember we used this method to insert a new stage [It cant be used to insert at the very beginning]
+        } else if(stageToBeReplaced.previousStage === null) {
+          C.addNewStageAtBeginning(stageToBeReplaced, data);
+        }
+        C.canvas.remove(stage_.dots);
       };
         // Need to correct movement, so that the moved stage fits in at right place ,
         // right now, it works for moving right.
