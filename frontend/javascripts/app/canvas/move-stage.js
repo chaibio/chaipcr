@@ -293,15 +293,14 @@ angular.module("canvasApp").factory('moveStageRect', [
           stage: stageToBeReplaced.model
         };
 
-
+        C.allStageViews.splice(stageToBeReplaced.index, 1);
         if(stageToBeReplaced.previousStage !== null) {
-          console.log("We have previous stage");
-          C.allStageViews.splice(stageToBeReplaced.index, 1);
-          C.addNewStage(data, stageToBeReplaced.previousStage); // Remember we used this method to insert a new stage [It cant be used to insert at the very beginning]
+          C.addNewStage(data, stageToBeReplaced.previousStage, "move_stage_back_to_original"); // Remember we used this method to insert a new stage [It cant be used to insert at the very beginning]
         } else if(stageToBeReplaced.previousStage === null) {
           C.addNewStageAtBeginning(stageToBeReplaced, data);
         }
         C.canvas.remove(stage_.dots);
+        C.canvas.renderAll();
       };
         // Need to correct movement, so that the moved stage fits in at right place ,
         // right now, it works for moving right.
@@ -313,10 +312,10 @@ angular.module("canvasApp").factory('moveStageRect', [
           //this.draggedStage.myWidth = 0;
           var stage = this.draggedStage;
 
-          while(stage.index <= (this.currentHit - 1)) {
-            stage.moveIndividualStageAndContents(stage, true);
-            stage = stage.nextStage;
-          }
+          //while(stage.index <= (this.currentHit - 1)) {
+            //stage.moveIndividualStageAndContents(stage, true);
+            //stage = stage.nextStage;
+          //}
 
           var stageIndex = (this.currentDrop) ? this.currentDrop.index : 0;
           var model = this.draggedStage.model;

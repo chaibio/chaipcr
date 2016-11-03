@@ -209,7 +209,9 @@ angular.module("canvasApp").factory('stage', [
       };
 
       this.moveIndividualStageAndContents = function(stage, del) {
-
+        if(!stage.nextStage) {
+          return false;
+        }
         stage.nextStage.getLeft();
         stage.nextStage.stageGroup.set({left: stage.nextStage.left }).setCoords();
         stage.nextStage.dots.set({left: stage.nextStage.left + 3}).setCoords();
@@ -400,7 +402,7 @@ angular.module("canvasApp").factory('stage', [
       };
 
       this.getLeft = function() {
-        
+
         if(this.previousStage) {
           this.left = this.previousStage.left + this.previousStage.myWidth + constants.newStageOffset;
         } else {

@@ -302,7 +302,7 @@ angular.module("canvasApp").factory('canvas', [
       }, this);
     };
 
-    this.addNewStage = function(data, currentStage) {
+    this.addNewStage = function(data, currentStage, mode) {
       //move the stages, make space.
       var ordealStatus = currentStage.childSteps[currentStage.childSteps.length - 1].ordealStatus;
       var originalWidth = currentStage.myWidth;
@@ -320,9 +320,30 @@ angular.module("canvasApp").factory('canvas', [
       stageView.updateStageData(1);
       this.allStageViews.splice(stageIndex, 0, stageView);
       stageView.render();
-      // configure steps;
+      this.insertStageGraphics(stageView, ordealStatus, mode);
+    };
+
+    this.addNewStageAtBeginning = function(stageToBeReplaced, data) {
+
+      var add = (data.stage.steps.length > 0) ? 128 + Math.floor(constants.newStageOffset / data.stage.steps.length) : 128;
+      var stageIndex = 0;
+      var stageView = new stage(data.stage, this.canvas, this.allStepViews, stageIndex, this, this.$scope, true);
+      this.addNextandPrevious(null, stageView);
+      this.allStageViews.splice(stageIndex, 0, stageView);
+
+      stageView.updateStageData(1);
+      stageView.render();
+      this.insertStageGraphics(stageView, 0, mode);
+    };
+
+    this.insertStageGraphics = function(stageView, ordealStatus, mode) {
+
       this.configureStepsofNewStage(stageView, ordealStatus);
       this.correctNumbering();
+
+      if(mode === "move_stage_back_to_original") {
+        this.allStageViews[0].moveAllStepsAndStages(false);
+      }
       circleManager.addRampLines();
       stageGraphics.stageHeader.call(stageView);
       this.$scope.applyValues(stageView.childSteps[0].circle);
@@ -330,14 +351,6 @@ angular.module("canvasApp").factory('canvas', [
       this.setDefaultWidthHeight();
     };
 
-    this.addNewStageAtBeginning = function(stageToBeReplaced, data) {
-
-      var add = (data.stage.steps.length > 0) ? 128 + Math.floor(constants.newStageOffset / data.stage.steps.length) : 128;
-      //console.log(add);
-      // Make sure you dont have move stage/step functionality when there is only one stage
-      stageToBeReplaced.nextStage.left = (data.stage.steps.length * add) + 33;
-      stageToBeReplaced.nextStage.moveAllStepsAndStages(false);
-    };
     this.correctNumbering = function() {
 
       var oStatus = 1, that = this, tempCircle = null;
