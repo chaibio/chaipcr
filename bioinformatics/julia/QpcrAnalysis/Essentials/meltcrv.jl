@@ -227,6 +227,9 @@ function mc_tm_pw(
     # input data
     tf_dict::OrderedDict; # temperature and fluorescence
 
+    # The maximum fraction of median temperature interval to be considered narrow
+    nti_frac::AbstractFloat=0.05,
+
     # smoothing -df/dt curve and if `smooth_fluo`, fluorescence curve too
     auto_span_smooth::Bool=true,
     span_css_tmprtr::Real=1, # css = choose `span_smooth`. fluorescence fluctuation with the temperature range of approximately `span_css_tmprtr * 2` is considered for choosing `span_smooth`
@@ -253,8 +256,12 @@ function mc_tm_pw(
     )
 
     # parse input data
-    tmprtrs = mutate_dups(tf_dict["tmprtrs"]) # duplication may cause spline interpolation failure by Dierckx
-    fluos = tf_dict["fluos"]
+    tmprtrs_ori = tf_dict["tmprtrs"]
+    tmprtr_intvls = vcat(tmprtrs_ori[2:end], Inf - tmprtrs_ori[end]) .- tmprtrs_ori
+    nti = nti_frac * median(tmprtr_intvls) # nti = narrow temperature interval
+    no_nti = find(tmprtr_intvl -> tmprtr_intvl > nti, tmprtr_intvls)
+    tmprtrs = mutate_dups(tmprtrs_ori[no_nti]) # duplication may cause spline interpolation failure by Dierckx
+    fluos = tf_dict["fluos"][no_nti]
 
     len_raw = length(tmprtrs)
 
