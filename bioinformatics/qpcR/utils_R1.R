@@ -739,6 +739,7 @@ span.smooth = NULL,
 span.peaks = NULL,
 is.deriv = FALSE,
 Tm.opt = NULL,
+nti_frac = 0.05, # xqrm
 denser_factor = 10 # xqrm
 )
 {
@@ -751,21 +752,27 @@ denser_factor = 10 # xqrm
   ### on the first derivative curve
   # SPLFN <- try(splinefun(TEMP, FLUO), silent = TRUE) # ori
   # xqrm: start
-  TEMP_na_omit <- na.omit(TEMP)
-  length_TEMP_na_omit <- length(TEMP_na_omit)
-  FLUO_smoothed <- supsmu(TEMP, FLUO, span = span.smooth / denser_factor)$y
-  length_FLUO_smoothed <- length(FLUO_smoothed)
-  length_spl <- min(length_TEMP_na_omit, length_FLUO_smoothed)
-  SPLFN <- splinefun(
-      TEMP_na_omit[1:length_spl], 
-      FLUO_smoothed[1:length_spl] )
-  # xqrm: end
+  not_na <- !is.na(TEMP)
+  sum_not_na <- sum(not_na)
+  TEMP_na_omit <- TEMP[not_na]
+  FLUO_na_omit <- FLUO[not_na]
+  tmprtr_intvls <- c(TEMP_na_omit[2:sum_not_na], Inf - TEMP_na_omit[sum_not_na]) - TEMP_na_omit
+  nti <- nti_frac * median(tmprtr_intvls) # nti = narrow temperature interval
+  no_nti <- tmprtr_intvls > nti
+  TEMP_no_nti <- TEMP_na_omit[no_nti]
+  FLUO_smoothed <- supsmu(TEMP_no_nti, FLUO[not_na][no_nti], span = span.smooth / denser_factor)$y
+  SPLFN <- splinefun(TEMP_no_nti, FLUO_smoothed)
   # if (inherits(SPLFN, "try-error")) return() # ori
-  seqTEMP <- seq(
-    min(TEMP, na.rm = TRUE), 
-    max(TEMP, na.rm = TRUE), 
+  # seqTEMP <- seq(
+    # min(TEMP, na.rm = TRUE), 
+    # max(TEMP, na.rm = TRUE), 
     # length.out = 10 * length(TEMP)) # ori
-    length.out = denser_factor * length(TEMP)) # xqrm
+  seqTEMP <- seq(
+    min(TEMP_no_nti, na.rm = TRUE), 
+    max(TEMP_no_nti, na.rm = TRUE), 
+    length.out = denser_factor * length(TEMP)
+  ) # xqrm
+  # xqrm: end
   meltDATA <- cbind(meltDATA, Fluo = SPLFN(seqTEMP)) # ori
   # meltDATA <- cbind(meltDATA, Fluo = supsmu(seqTEMP, SPLFN(seqTEMP), span = span.smooth)$y) # xqrm: smooth raw fluo
   tempDATA <- cbind(tempDATA, Temp = seqTEMP)
