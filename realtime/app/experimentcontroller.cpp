@@ -221,6 +221,9 @@ void ExperimentController::run()
 
 void ExperimentController::resume()
 {
+    if (OpticsInstance::getInstance()->lidOpen())
+        throw std::runtime_error("Lid is open");
+    
     {
         Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
 
