@@ -26,15 +26,10 @@ fi
 temp="/tmp/image_creator"
 eMMC=/dev/md2
 
-boot_partition=${eMMC}p1
-rootfs_partition=${eMMC}p2
-
-data_partition=${eMMC}p3
-perm_partition=${eMMC}p4
 fat_boot=false
 
 #tooling
-loopdev=/dev/loop2
+loopdev="/dev/loop1$((RANDOM%100))"
 mdsumtool=md5sum
 
 mdsumdir=$(which $mdsumtool)
@@ -62,7 +57,7 @@ then
 	echo tool: $mdsumdir
 	if [ -z "$mdsumdir" ]
 	then
-		echo "can't find md5sum"
+		echo "Cannot find md5sum"
 		exit 1
 	else
 		echo using md5 instead of md5sum
@@ -148,7 +143,7 @@ else
 			echo "Path created: $2"
 			BASEDIR=$(dirname $0)
 		else
-			echo "Cann't create path: $2"
+			echo "Cannot create path: $2"
 			exit 1
 		fi
 	fi
@@ -175,20 +170,24 @@ then
 fi
 
 unmount_all () {
-	if [ -e /dev/md2 ]
+	if [ -e $eMMC ]
 	then
 		sync
 		sleep 2
-		fuser -m /dev/md2* --all -u -v -k
-		mdadm --stop /dev/md2
+		fuser -m $eMMC* --all -u -v -k
+		mdadm --stop $eMMC
 	fi
-	if [ -e /dev/loop2 ]
+	if [ -e $loopdev ]
 	then
-		losetup -d /dev/loop2
+		losetup -d $loopdev
 	fi
-	if [ -e /dev/loop2 ]
+	if [ -e $loopdev ]
 	then
-		rm /dev/loop2
+		rm $loopdev
+	fi
+	if [ -e $loopdev ]
+	then
+		rm $loopdev
 	fi
 	if [[ "$loopdev_tool" =~ "hdiutil" ]]
 	then
@@ -291,7 +290,7 @@ then
                 rootfs_partition=${eMMC}s2
                 data_partition=${eMMC}s3
                 perm_partition=${eMMC}s4
-		if ! fat_boot
+		if ! $fat_boot
 		then
                 	boot_partition=${eMMC}s1
         	        rootfs_partition=${eMMC}s1
@@ -300,18 +299,71 @@ then
 		fi
         fi
 else
-        loopdev=/dev/loop2
-	echo "losetup $loopdev $image_filename_upgrade"
-        losetup $loopdev $image_filename_upgrade
-        if [ $? -gt 0 ]
+	loopdev_success=false
+	for (( i=1; i<=50; i++))
+	do
+		echo creating the loop device $loopdev
+
+		if [ -e $loopdev ]
+		then
+			echo $loopdev is taken.
+        	        loopdev="/dev/loop1$((RANDOM%100))"
+			continue
+		fi
+
+		echo "losetup $loopdev $image_filename_upgrade"
+	        losetup $loopdev $image_filename_upgrade
+
+        	if [ $? -gt 0 ]
+	        then
+        	        loopdev="/dev/loop1$((RANDOM%100))"
+			echo error creating loop device.. trying another.
+			continue
+		else
+			loopdev_success=true
+			break
+	        fi
+	done
+        if ! $loopdev_success
         then
                 error_exit "Error creating a block device for $image_filename_upgrade!"
         fi
-        mdadm --build --level=0 --force --raid-devices=1 /dev/md2 /dev/loop2
-        if [ $? -gt 0 ]
+	sleep 10
+	loopdev_success=false
+	for (( i=1; i<=50; i++))
+	do
+		echo creating the loop device MAPING $eMMC
+
+		if [ -e $eMMC ]
+		then
+			echo $eMMC is taken.
+        	        eMMC="/dev/md3$((RANDOM%100))"
+			continue
+		fi
+
+		echo "mdadm --build --level=0 --force --raid-devices=1 $eMMC $loopdev"
+        	mdadm --build --level=0 --force --raid-devices=1 $eMMC $loopdev
+
+        	if [ $? -gt 0 ]
+	        then
+        	        eMMC="/dev/md3$((RANDOM%100))"
+			echo error creating loop device.. trying another.
+			continue
+		else
+			loopdev_success=true
+			break
+	        fi
+	done
+        if ! $loopdev_success
         then
                 error_exit "Error mapping partitions for $image_filename_upgrade!"
         fi
+	sleep 10
+	boot_partition=${eMMC}p1
+	rootfs_partition=${eMMC}p2
+
+	data_partition=${eMMC}p3
+	perm_partition=${eMMC}p4
 fi
 
 image_filename_folder="${temp}"
@@ -324,7 +376,6 @@ image_upgrade_filename_rootfs="$image_filename_prfx-rootfs2.img.gz"
 image_filename_data="$image_filename_prfx-data.img.gz"
 image_filename_boot="$image_filename_prfx-boot.img.gz"
 image_filename_perm="$image_filename_prfx-perm.img.gz"
-
 image_filename_pt="$image_filename_prfx-pt.img.gz"
 
 checksums_filename="$image_filename_prfx-checksums.txt"
@@ -337,14 +388,14 @@ if cd ${temp}
 then
 	echo directory changed.
 else
-	error_exit "Cann't switch to ${temp}"
+	error_exit "Cannot switch to ${temp}"
 fi
 
 image_filename_upgrade2="${output_dir}/p1/factory_settings.img.tar"
 
 echo "Packing eMMC image.."
-
 echo "Temp folder: $image_filename_folder"
+
 ls $image_filename_folder
 
 if [ -e $image_filename_upgrade_temp ]
@@ -362,32 +413,33 @@ then
 	rm $image_filename_upgrade2
 fi
 
-
 if [ -e "${eMMC}p4" ]
 then
+   echo FAT booting partition!
    fat_boot=true
 else
+	echo checking "${eMMC}p3"
 	if [ -e "${eMMC}p3" ]
 	then
-	   fat_boot=false
-	   boot_partition=${eMMC}p1
-	   rootfs_partition=${eMMC}p1
-	   data_partition=${eMMC}p2
-	   perm_partition=${eMMC}p3
+	   	echo Combined booting partition.
+	   	fat_boot=false
+	   	boot_partition=${eMMC}p1
+	   	rootfs_partition=${eMMC}p1
+	   	data_partition=${eMMC}p2
+	   	perm_partition=${eMMC}p3
 	else
-		echo "Proper partitioing not found!"
-		exit 1
+		error_exit "Proper partitioning not found!"
 	fi
 fi
 
 echo "Copying eMMC partitions at $eMMC"
 sync
 echo "Packing partition table from: ${eMMC} to: $image_filename_pt"
-if dd  if=${eMMC} bs=16777216 count=1 | gzip -c > $image_filename_pt
+if dd if=${eMMC} bs=16777216 count=1 | gzip -c > $image_filename_pt
 then
 	echo pt image extracted.
 else
-	error_exit "Cann't extract pt image!"
+	error_exit "Cannot extract pt image from $eMMC!"
 fi
 
 echo "Chaibio Checksum File">$checksums_filename
@@ -442,7 +494,7 @@ if dd  if=$rootfs_partition bs=16777216 | gzip -c > $image_filename_rootfs
 then
 	echo rootfs image extracted.
 else
-	error_exit "Cann't extract rootfs image!"
+	error_exit "Cannot extract rootfs image!"
 fi
 
 echo "dbg: calling $mdsumtool $image_filename_rootfs>>$checksums_filename"
@@ -462,7 +514,7 @@ if [ $retval -ne 0 ]; then
     echo "Error mounting rootfs partition. Error($retval)"
 else
 	echo Disabling unicorn service
-	rm /tmp/emmc/etc/rc?.d/???unicorn || :
+	rm /tmp/emmc/etc/rc?.d/???unicorn > /dev/null 2>&1|| :
 
 	sync
 	umount /tmp/emmc > /dev/null || true
@@ -473,8 +525,9 @@ if dd  if=$rootfs_partition bs=16777216 | gzip -c > $image_upgrade_filename_root
 then
 	echo upgrade rootfs image extracted.
 else
-	error_exit "Cann't extract upgrade rootfs image!"
+	error_exit "Cannot extract upgrade rootfs image!"
 fi
+
 if $mdsumtool $image_upgrade_filename_rootfs>>$checksums_filename
 then
 	echo upgrade rootfs partition checksum generatted.
@@ -486,13 +539,14 @@ sleep 5
 sync
 
 echo "Packing perm partition to: $image_filename_perm"
-$mkfsext4tooldir $perm_partition -q -L perm -F -F
+$mkfsext4tooldir $perm_partition -q -L perm -F
 if dd  if=$perm_partition bs=16777216 | gzip -c > $image_filename_perm
 then
 	echo perm image extracted.
 else
-	error_exit "Cann't extract perm image!"
+	error_exit "Cannot extract perm image!"
 fi
+
 if $mdsumtool $image_filename_perm>>$checksums_filename
 then
 	echo perm partition checksum generatted.
@@ -501,18 +555,18 @@ else
 fi
 
 echo "Packing boot partition to: $image_filename_boot"
-if fat_boot
+if $fat_boot
 then
 	dd if=$boot_partition bs=16777216 | gzip -c > $image_filename_boot
 else
-	dd c=1 if=$boot_partition bs=16777216 | gzip -c > $image_filename_boot
+	dd count=1 if=$boot_partition bs=16777216 | gzip -c > $image_filename_boot
 fi
 
-if $?
+if [ $? -eq 0 ]
 then
 	echo boot image extracted.
 else
-	error_exit "Cann't extract boot image!"
+	error_exit "Cannot extract boot image!"
 fi
 
 if $mdsumtool $image_filename_boot>>$checksums_filename
@@ -554,8 +608,9 @@ if dd  if=$data_partition bs=16777216 | gzip -c > $image_filename_data
 then
 	echo data image extracted.
 else
-	error_exit "Cann't extract data image!"
+	error_exit "Cannot extract data image!"
 fi
+
 if $mdsumtool $image_filename_data>>$checksums_filename
 then
 	echo data partition checksum generatted.
@@ -563,8 +618,7 @@ else
 	error_exit "data partition checksum generation failed!"
 fi
 
-	#tarring
-#	echo "compressing all images to $image_filename_upgrade_tar_temp"
+#tarring
 if	tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_data $image_filename_rootfs  $image_filename_perm $checksums_filename
 then
 	echo $image_filename_upgrade_temp generatted.
@@ -586,7 +640,6 @@ then
 else
 	error_exit "moving $image_filename_upgrade_temp to $image_filename_upgrade2 failed!"
 fi
-
 
 if [ -e $image_filename_upgrade_temp ]
 then
@@ -650,7 +703,7 @@ fi
 
 if [ -e ${sdcard}/pack_resume_autorun.flag ]
 then
-	rm ${sdcard}/pack_resume_autorun.flag>/dev/null || true
+	rm ${sdcard}/pack_resume_autorun.flag > /dev/null || true
 fi
 
 sync
