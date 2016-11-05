@@ -113,6 +113,8 @@ uEnvSDCard=$boot/uEnv.sdcard.txt
 uEnv72Check=$boot/uEnv.72check.txt
 NOW=$(date +"%m-%d-%Y %H:%M:%S")
 
+cp $uEnv ${uEnv}.org --backup=numbered
+
 if $fat_boot
 then
 
@@ -195,7 +197,6 @@ uenvcmd=run shutdown_usb_power;if gpio input 72; then run uenvcmdsdcard_s2presse
 
 _EOF_
 
-
 else
 
 cat << _EOF_ > $uEnv
@@ -204,7 +205,7 @@ cat << _EOF_ > $uEnv
 
 uname_r=4.4.24-ti-rt-r58
 cmdline=coherent_pool=1M quiet cape_universal=enable
-uuid=3086d529-c23f-4edb-806a-f63ae41790aa
+uuid=${UUID}
 
 s2pressed=0
 shutdown_usb_power=i2c dev 0;i2c mw 0x24 1 0xec
@@ -223,9 +224,6 @@ _EOF_
 fi
 
 echo "uEnv.txt done updating"
-
-cp $uEnv ${uEnv}.org --backup=numbered
-
 cp $uEnv $uEnvSDCard
 cp $uEnv $uEnv72Check
 echo " " >> $uEnvSDCard
