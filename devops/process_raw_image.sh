@@ -31,6 +31,7 @@ rootfs_partition=${eMMC}p2
 
 data_partition=${eMMC}p3
 perm_partition=${eMMC}p4
+fat_boot=false
 
 #tooling
 loopdev=/dev/loop2
@@ -185,6 +186,10 @@ unmount_all () {
 	then
 		losetup -d /dev/loop2
 	fi
+	if [ -e /dev/loop2 ]
+	then
+		rm /dev/loop2
+	fi
 	if [[ "$loopdev_tool" =~ "hdiutil" ]]
 	then
 		echo hdiutil found
@@ -286,9 +291,17 @@ then
                 rootfs_partition=${eMMC}s2
                 data_partition=${eMMC}s3
                 perm_partition=${eMMC}s4
+		if ! fat_boot
+		then
+                	boot_partition=${eMMC}s1
+        	        rootfs_partition=${eMMC}s1
+	                data_partition=${eMMC}s2
+                	perm_partition=${eMMC}s3
+		fi
         fi
 else
         loopdev=/dev/loop2
+	echo "losetup $loopdev $image_filename_upgrade"
         losetup $loopdev $image_filename_upgrade
         if [ $? -gt 0 ]
         then
@@ -349,6 +362,24 @@ then
 	rm $image_filename_upgrade2
 fi
 
+
+if [ -e "${eMMC}p4" ]
+then
+   fat_boot=true
+else
+	if [ -e "${eMMC}p3" ]
+	then
+	   fat_boot=false
+	   boot_partition=${eMMC}p1
+	   rootfs_partition=${eMMC}p1
+	   data_partition=${eMMC}p2
+	   perm_partition=${eMMC}p3
+	else
+		echo "Proper partitioing not found!"
+		exit 1
+	fi
+fi
+
 echo "Copying eMMC partitions at $eMMC"
 sync
 echo "Packing partition table from: ${eMMC} to: $image_filename_pt"
@@ -406,13 +437,15 @@ sleep 10
 sync
 umount /tmp/emmc > /dev/null || true
 
-echo "Packing binaries partition to: $image_filename_rootfs"
+echo "Packing rootfs partition to: $image_filename_rootfs"
 if dd  if=$rootfs_partition bs=16777216 | gzip -c > $image_filename_rootfs
 then
 	echo rootfs image extracted.
 else
 	error_exit "Cann't extract rootfs image!"
 fi
+
+echo "dbg: calling $mdsumtool $image_filename_rootfs>>$checksums_filename"
 
 $mdsumtool $image_filename_rootfs>>$checksums_filename
 if [ $? -eq 0 ]
@@ -468,7 +501,14 @@ else
 fi
 
 echo "Packing boot partition to: $image_filename_boot"
-if dd  if=$boot_partition bs=16777216 | gzip -c > $image_filename_boot
+if fat_boot
+then
+	dd if=$boot_partition bs=16777216 | gzip -c > $image_filename_boot
+else
+	dd c=1 if=$boot_partition bs=16777216 | gzip -c > $image_filename_boot
+fi
+
+if $?
 then
 	echo boot image extracted.
 else
