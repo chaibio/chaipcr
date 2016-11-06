@@ -222,17 +222,8 @@
       }
 
       .ampli-scrollbar-container {
-        .scrollbar-container {
-          height: 5px;
-          border-radius: 10px;
-          margin-top: -5px;
-          position: relative;
-          top: 11.5px;
-          background: #ccc;
-
-          .scrollbar {
-            border-radius: 10px;
-          }
+        .scrollbar-directive{
+          margin-top: 8px;
         }
       }
 

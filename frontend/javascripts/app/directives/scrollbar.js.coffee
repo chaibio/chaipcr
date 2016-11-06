@@ -22,11 +22,15 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
   ($window, textSelection) ->
     restrict: 'E'
     replace: true
-    templateUrl: 'app/views/directives/scrollbar.html'
+    template: '<div class="scrollbar-directive"></div>'
     scope:
       state: '=' # [{0..1}, width]
     require: 'ngModel'
     link: ($scope, elem, attr, ngModel) ->
+
+      width = elem.width()
+      height = 5
+
 
       held = false
       oldMargin = 0;
@@ -36,8 +40,44 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
       spaceWidth = 0
       scrollbar_width = 0
       xDiff = 0
+      scrollbarBGClicked = false
 
-      scrollbar = elem.find('.scrollbar')
+      svg = d3.select(elem[0]).append('svg')
+                                .attr('width', width)
+                                .attr('height', height)
+
+      scrollbarBG = svg.append('rect')
+                          .attr('fill', '#ccc')
+                          .attr('width', width)
+                          .attr('height', height)
+                          .attr('rx', 2)
+                          .attr('ry', 2)
+                          .on 'mousedown', ->
+                            scrollbarBGClicked = true
+                            oldMargin = getMarginLeft()
+                            spaceWidth = getSpaceWidth()
+                            scrollbar_width = getScrollBarWidth()
+                          .on 'mouseup', ->
+                            if scrollbarBGClicked
+                              scrollbarBGClicked = false
+                              x = d3.mouse(this)[0]
+                              newMargin = x - (getScrollBarWidth()/2)
+
+                              updateMargin(newMargin)
+
+                              # avoid dividing with spaceWidth = 0, else result is NaN
+                              val = if spaceWidth > 0 then Math.round((newMargin)/spaceWidth*1000)/1000 else 0
+                              ngModel.$setViewValue({
+                                value: val,
+                                scrollbar_width
+                              })
+
+      scrollbarHandle = svg.append('rect')
+                          .attr('fill', '#555')
+                          .attr('width', width)
+                          .attr('height', height)
+                          .attr('rx', 2)
+                          .attr('ry', 2)
 
       $scope.$watchCollection ->
         ngModel.$viewValue
@@ -51,29 +91,29 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
           width_percent = val.width || ngModel.$viewValue.width || 1
           new_width = elem_width * width_percent
           new_width = if new_width >= 15 then new_width else 15
-          scrollbar.css('width', "#{new_width}px")
+          scrollbarHandle.attr('width', new_width)
           new_margin = (elem_width - new_width) * value
           updateMargin(new_margin)
 
       getMarginLeft = ->
-        parseInt scrollbar.css('marginLeft').replace /px/, ''
+        scrollbarHandle.attr('x') * 1
 
       getElemWidth = ->
-        parseInt elem.css('width').replace /px/, ''
+        width
 
       getScrollBarWidth = ->
-        parseInt scrollbar.css('width').replace /px/, ''
+        scrollbarHandle.attr('width') * 1
 
       getSpaceWidth = ->
-        getElemWidth() - getScrollBarWidth()
+        width - getScrollBarWidth()
 
       updateMargin = (newMargin) ->
         spaceWidth = getSpaceWidth()
         if newMargin > spaceWidth then newMargin = spaceWidth
         if newMargin < 0 then newMargin = 0
-        scrollbar.css marginLeft: "#{newMargin}px"
+        scrollbarHandle.attr('x', newMargin)
 
-      elem.on 'mousedown', (e) ->
+      $window.$(scrollbarHandle.node()).on 'mousedown', (e) ->
         held = true
         pageX = e.pageX
         textSelection.disable()
@@ -81,11 +121,6 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
         oldMargin = getMarginLeft()
         spaceWidth = getSpaceWidth()
         scrollbar_width = getScrollBarWidth()
-
-
-      $window.$(document).on 'mouseup', (e) ->
-        held = false
-        textSelection.enable()
 
       $window.$(document).on 'mousemove', (e) ->
         if held
@@ -100,5 +135,12 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
             value: val,
             scrollbar_width
           })
+
+
+      $window.$(document).on 'mouseup', (e) ->
+        if held
+          held = false
+          textSelection.enable()
+
 
 ]
