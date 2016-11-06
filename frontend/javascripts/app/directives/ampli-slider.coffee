@@ -24,7 +24,6 @@ window.App.directive('ampliSlider', [
     replace: true
     require: 'ngModel'
     template: '<div></div>'
-    # templateUrl: 'app/views/directives/ampli-slider.html'
     link: ($scope, elem, attrs, ngModel) ->
 
       width = elem.parent().width()
@@ -184,25 +183,5 @@ window.App.directive('ampliSlider', [
         if held
           held = false
           oldPageX = e.pageX
-
-      # $window.$(sliderBg.node())
-      # .on 'mousedown', (e) ->
-      #   oldHolderCX = circleHolder.attr('cx') * 1
-      #   oldHolderShadowCX = circleHolderShadow.attr('cx') * 1
-      #   oldOffsetWidth = sliderOffset.attr('width') * 1
-      # .on 'mouseup', (e) ->
-      #   toadd = (e.pageX - oldPageX) - (circleR/2)
-      #   oldPageX = e.pageX
-      #   moveBy(toadd)
-
-      # $window.$(sliderOffset.node())
-      # .on 'mousedown', (e) ->
-      #   oldHolderCX = circleHolder.attr('cx') * 1
-      #   oldHolderShadowCX = circleHolderShadow.attr('cx') * 1
-      #   oldOffsetWidth = sliderOffset.attr('width') * 1
-      # .on 'mouseup', (e) ->
-      #   toadd = (e.pageX - oldPageX) - (circleR/2)
-      #   oldPageX = e.pageX
-      #   moveBy(toadd)
 
 ]);
