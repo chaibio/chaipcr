@@ -26,19 +26,13 @@
               Thermal Profile
               <img class="arrow-down" src="/images/arrow-down.png">
             </chart-chooser>
-            <!-- <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()">
-                Thermal Profile
-                <img class="arrow-down" src="/images/arrow-down.png">
-              </span> -->
           </div>
           <div class="col-sm-8">
             <div class="row zoom-scroll-container SHR">
               <div class="col-sm-6">
                 <div class="zoom-container">
                   <div class="zoom-text">ZOOM</div>
-                  <div class="ampli-slider">
-                    <ampli-slider ng-model="zoomState"></ampli-slider>
-                  </div>
+                  <ampli-slider ng-model="zoomState"></ampli-slider>
                 </div>
               </div>
               <div class="col-sm-6 zoom-container">
@@ -49,9 +43,6 @@
         </div>
       </div>
       <div class="temperature-log-chart">
-        <!-- <div class="text-center SH loading" ng-show="!experiment || !data">
-            <strong>Loading temperature logs<ellipsis-animated></ellipsis-animated></strong>
-          </div> -->
         <div>
           <div class="vertical-text B1B">Temperature (&deg;C)</div>
           <div class="chart-container">
@@ -61,12 +52,6 @@
               <p class="B2">May take a minute</p>
             </div>
             <thermal-profile-chart data="data" config="options" on-zoom="tempOnZoom" zoom="zoomState" scroll="scrollState.value" on-mouse-move="mouseMove" show="showChart"></thermal-profile-chart>
-            <!-- <linechartv2
-                ng-if="!!data && RunExperimentCtrl.chart==='temperature-logs'"
-                ng-show="experiment && data"
-                data="data"
-                options="options">
-              </linechartv2 > -->
           </div>
           <div class="text-center abscissa-text B1B">Time</div>
         </div>

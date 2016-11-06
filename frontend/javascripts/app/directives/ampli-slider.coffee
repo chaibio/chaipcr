@@ -23,10 +23,10 @@ window.App.directive('ampliSlider', [
     restrict: 'E'
     replace: true
     require: 'ngModel'
-    template: '<div></div>'
+    template: '<div class="ampli-slider"></div>'
     link: ($scope, elem, attrs, ngModel) ->
 
-      width = elem.parent().width()
+      width = elem.width()
       height = 20
       barHeight = 5
       circleR = 7
