@@ -50,7 +50,6 @@ window.App.directive('ampliSlider', [
       $scope.$watch ->
         ngModel.$viewValue
       , (val) ->
-        console.log "val: #{val}"
         return if !angular.isNumber(val) or $window.isNaN(val) or held
         width_percent = Math.sqrt(-Math.pow(-val+1, 2)+1)
         newOffsetWidth = width_percent * (maxOffsetWidth - minOffsetWidth)
@@ -94,7 +93,7 @@ window.App.directive('ampliSlider', [
         circleHolderShadow.attr('cx', newHolderShadowCX)
         circleHolder.attr('cx', newHolderCX)
 
-        x = (newOffsetWidth - minOffsetWidth)/(maxOffsetWidth - minOffsetWidth)
+        x = ((oldOffsetWidth + px) - minOffsetWidth)/(maxOffsetWidth - minOffsetWidth)
         if x < 0
           updateModel(x)
         else
