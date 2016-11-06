@@ -11,6 +11,7 @@
 #
 # By default this script does nothing.
 
+
 wait_for_migrate () {
         echo "Checking for migrate script completation"
         while [ -e ${sdcard}/factory/upgrade_autorun.flag ] || [ -e ${sdcard}/upgrade/upgrade_autorun.flag ]
@@ -188,10 +189,10 @@ run_migrate_on_upgrade_logged () {
 
 check_upgrade_autorun () {
 	sdcard_dev=""
-	if [ -e /dev/mmcblk0p4 ]
+	if [ -e /dev/mmcblk0p3 ]
 	then
         	sdcard_dev=/dev/mmcblk1
-	elif [ -e /dev/mmcblk1p4 ]
+	elif [ -e /dev/mmcblk1p3 ]
 	then
 		sdcard_dev=/dev/mmcblk0
 	else
@@ -328,28 +329,43 @@ else
 fi
 
 is_mounted=$(mount | grep /data)
-
+echo "Mounting check is $is_mounted"
+fat_partition_exits=$(mount | grep /boot/uboot)
 if [ -z "$is_mounted" ]
 then
-	if [ -e /dev/mmcblk0p3 ]
+	if [ -z "$fat_partition_exits" ]
 	then
-        	mount /dev/mmcblk0p3 /data
-	elif [ -e /dev/mmcblk1p3 ]
-	then
-        	mount /dev/mmcblk1p3 /data
+        	if [ -e /dev/mmcblk1p3 ]
+	        then
+			mount /dev/mmcblk1p3 /perm
+                	mount /dev/mmcblk1p2 /data
+	        elif [ -e /dev/mmcblk0p3 ]
+        	then
+			mount /dev/mmcblk0p3 /perm
+	                mount /dev/mmcblk0p2 /data
+        	else
+                	echo "Unknown condition"
+	        fi
 	else
-        	echo "Unknown condition"
-	fi
+		if [ -e /dev/mmcblk0p3 ]
+		then	
+        		mount /dev/mmcblk0p3 /data
+		elif [ -e /dev/mmcblk1p3 ]
+		then
+        		mount /dev/mmcblk1p3 /data
+		else
+        		echo "Unknown condition"
+		fi
 
-	if [ -e /dev/mmcblk0p4 ]
-	then
-        	mount /dev/mmcblk0p4 /perm
-	elif [ -e /dev/mmcblk1p4 ]
-	then
-	        mount /dev/mmcblk1p4 /perm
+		if [ -e /dev/mmcblk0p4 ]
+		then
+	        	mount /dev/mmcblk0p4 /perm
+		elif [ -e /dev/mmcblk1p4 ]
+		then
+		        mount /dev/mmcblk1p4 /perm
+		fi
 	fi
 fi
-
 check_upgrade_autorun >> $log_file 2>&1 || true &
 network_watchdog >> /dev/null 2>&1 || true
 check_corruption >> $log_file 2>&1 || true
