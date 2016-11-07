@@ -89,8 +89,8 @@
         .attr("class", "line")
         .attr("stroke", line_config.color)
         .attr('fill', 'none')
-        // .attr('stroke-width', Globals.lineStrokeWidth / Globals.zoomTransform.k)
-        .attr('stroke-width', Globals.lineStrokeWidth)
+        .attr('stroke-width', Globals.lineStrokeWidth / Globals.zoomTransform.k)
+        // .attr('stroke-width', Globals.lineStrokeWidth)
         .attr("d", line);
 
       Globals.lines.push(_path);
