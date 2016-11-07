@@ -6,17 +6,8 @@
     margin-right: -65px;
 
     .scrollbar-container {
-      width: 80%;
-      height: 5px;
-      border-radius: 10px;
-      margin-top: -22px;
-      position: relative;
-      top: 11.5px;
-      background: #ccc;
-      display: inline-block;
-      vertical-align: middle;
-      .scrollbar {
-        border-radius: 10px;
+      .scrollbar-directive {
+        margin-top: 8px;
       }
     }
   }

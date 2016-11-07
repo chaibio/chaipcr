@@ -29,18 +29,29 @@ window.ChaiBioTech.ngApp.controller 'RunExperimentCtrl', [
       $state.go 'run-experiment', {id: $stateParams.id, chart: chart}, notify: false
       $scope.chart = chart
 
+    hasChart = (chart) ->
+      switch chart
+        when 'amplification'
+          return Experiment.hasAmplificationCurve($scope.experiment)
+        when 'melt-curve'
+          return Experiment.hasMeltCurve($scope.experiment)
+        when 'temperature-logs'
+          return true;
+        else
+          return false;
+
     ChoosenChartService.setCallback(changeChart)
 
 
     Experiment.get(id: $stateParams.id).then (data) ->
       $scope.experiment = data.experiment
 
-      chart = null
-      chart = 'amplification' if Experiment.hasAmplificationCurve($scope.experiment)
-      chart = 'melt-curve' if Experiment.hasMeltCurve($scope.experiment) and !chart
-      chart = 'temperature-logs' if !chart
-
-      changeChart(chart)
+      if !hasChart($scope.chart)
+        chart = null
+        chart = 'amplification' if Experiment.hasAmplificationCurve($scope.experiment)
+        chart = 'melt-curve' if Experiment.hasMeltCurve($scope.experiment) and !chart
+        chart = 'temperature-logs' if !chart
+        changeChart(chart)
 
 
 
