@@ -353,8 +353,8 @@ angular.module("canvasApp").factory('moveStageRect', [
         this.indicator.clickManager = function(stage_, C, circleManager) {
 
           var stage = this.draggedStage, stageIndex = 0, model, stageView;
-
-          if(stage.nextStage) {
+          this.backToOriginal(stage, C, stage_);
+          /*if(stage.nextStage) {
             stageIndex = stage.nextStage.index;
             this.currentDrop = stage.nextStage;
           } else if(stage.previousStage) {
@@ -376,7 +376,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           }
           this.moveStageGraphics(stageView, C, circleManager);
           C.canvas.remove(stage_.dots); // because this doesn't get deleted in collapseStage(), deleteStageContents(), this could be because a click is active on dots.
-          // So we delete it once we have click finished
+          // So we delete it once we have click finished */
         };
         return this.indicator;
       },
