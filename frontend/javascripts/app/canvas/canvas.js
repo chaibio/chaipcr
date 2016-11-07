@@ -355,7 +355,8 @@ angular.module("canvasApp").factory('canvas', [
         this.allStageViews[0].getLeft();
         this.allStageViews[0].moveAllStepsAndStages(false);
       } else {
-        stageView.moveAllStepsAndStages(false);
+        this.allStageViews[0].moveAllStepsAndStages(false);
+        //stageView.moveAllStepsAndStages(false);
       }
       circleManager.addRampLines();
       stageGraphics.stageHeader.call(stageView);

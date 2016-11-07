@@ -56,7 +56,7 @@ angular.module("canvasApp").factory('objectModified', [
 
             var stageIndicator = evt.target;
             var stage = stageIndicator.parent;
-            C.stageIndicator.processMovement(stage, C, circleManager);
+            //C.stageIndicator.processMovement(stage, C, circleManager);
             //stageIndicator.setVisible(false);
             C.canvas.renderAll();
           break;

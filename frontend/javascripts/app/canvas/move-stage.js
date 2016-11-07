@@ -299,7 +299,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         } else if(stageToBeReplaced.previousStage === null) {
           C.addNewStageAtBeginning(stageToBeReplaced, data);
         }
-        C.canvas.remove(stage_.dots);
+        //C.canvas.remove(stage_.dots);
         C.canvas.renderAll();
       };
         // Need to correct movement, so that the moved stage fits in at right place ,
@@ -342,7 +342,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           C.configureStepsofNewStage(stageView, 0);
           C.correctNumbering();
           // ->//
-          stageView.moveAllStepsAndStages();
+          C.allStageViews[0].moveAllStepsAndStages();
           circleManager.addRampLines();
           C.allStepViews[C.allStepViews.length - 1].circle.doThingsForLast(null, null);
           stageGraphics.stageHeader.call(stageView);
@@ -352,7 +352,6 @@ angular.module("canvasApp").factory('moveStageRect', [
         };
 
         this.indicator.clickManager = function(stage_, C, circleManager) {
-
           var stage = this.draggedStage, stageIndex = 0, model, stageView;
           this.backToOriginal(stage, C, stage_);
           /*if(stage.nextStage) {
