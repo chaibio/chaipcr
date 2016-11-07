@@ -245,10 +245,9 @@ angular.module("canvasApp").factory('stage', [
       };
 
       this.moveIndividualStageAndContentsSpecial = function(stage, del) {
-        if(!stage) {
-          return false;
-        }
+
         stage.getLeft();
+
         stage.stageGroup.set({left: stage.left }).setCoords();
         stage.dots.set({left: stage.left + 3}).setCoords();
         stage.stageHitPointLeft.set({left: stage.left + 10}).setCoords();
@@ -367,7 +366,7 @@ angular.module("canvasApp").factory('stage', [
 
         var currentStage = this;
 
-        while(currentStage.nextStage) {
+        while(currentStage) {
 
           this.moveIndividualStageAndContents(currentStage, del);
 
@@ -375,6 +374,17 @@ angular.module("canvasApp").factory('stage', [
         }
       };
 
+      this.moveAllStepsAndStagesSpecial = function(del) {
+
+        var currentStage = this;
+
+        while(currentStage) {
+
+          this.moveIndividualStageAndContentsSpecial(currentStage, del);
+
+          currentStage = currentStage.nextStage;
+        }
+      };
       this.updateStageData = function(action) {
 
           if(! this.previousStage && action === -1 && this.index === 1) {

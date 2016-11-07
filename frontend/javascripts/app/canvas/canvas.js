@@ -353,7 +353,7 @@ angular.module("canvasApp").factory('canvas', [
       if(mode === "move_stage_back_to_original") {
         console.log("YES ", mode);
         this.allStageViews[0].getLeft();
-        this.allStageViews[0].moveAllStepsAndStages(false);
+        this.allStageViews[0].moveAllStepsAndStagesSpecial(false);
       } else {
         this.allStageViews[0].moveAllStepsAndStages(false);
         //stageView.moveAllStepsAndStages(false);
