@@ -202,16 +202,6 @@ angular.module("canvasApp").factory('moveStageRect', [
               this.verticalLine.setVisible(false);
             }
           }
-
-          /*if(this.beacon.left > this.spaceArray[0] && this.beacon.left < this.spaceArray[1]) {
-            if(this.verticalLine.getVisible() === false) {
-              this.verticalLine.setVisible(true);
-            }
-          } else if(this.verticalLine.getVisible() === true) {
-            this.verticalLine.setVisible(false);
-          }*/
-
-          // Now work with scrolling as we move ..!
         };
 
         this.indicator.checkMovingOffScreen = function(C, movement, direction) {
@@ -299,23 +289,12 @@ angular.module("canvasApp").factory('moveStageRect', [
         } else if(stageToBeReplaced.previousStage === null) {
           C.addNewStageAtBeginning(stageToBeReplaced, data);
         }
-        //C.canvas.remove(stage_.dots);
         C.canvas.renderAll();
       };
-        // Need to correct movement, so that the moved stage fits in at right place ,
-        // right now, it works for moving right.
+
         this.indicator.applyMovement = function(stage_, C, circleManager, callBack) {
           console.log("Entering apply movement");
-          /*Sometimes user moves left first and then move right,
-            leave the move stage over a stage and which has empty space in the left.
-            We move to side and move if it is valid so that when we re render there is no spacing. */
-          //this.draggedStage.myWidth = 0;
           var stage = this.draggedStage;
-
-          //while(stage.index <= (this.currentHit - 1)) {
-            //stage.moveIndividualStageAndContents(stage, true);
-            //stage = stage.nextStage;
-          //}
 
           var stageIndex = (this.currentDrop) ? this.currentDrop.index : 0;
           var model = this.draggedStage.model;
@@ -341,8 +320,6 @@ angular.module("canvasApp").factory('moveStageRect', [
           stageView.render();
           C.configureStepsofNewStage(stageView, 0);
           C.correctNumbering();
-          // ->//
-          //C.allStageViews[0].getLeft();
           C.allStageViews[0].moveAllStepsAndStagesSpecial();
           circleManager.addRampLines();
           C.allStepViews[C.allStepViews.length - 1].circle.doThingsForLast(null, null);
@@ -355,29 +332,6 @@ angular.module("canvasApp").factory('moveStageRect', [
         this.indicator.clickManager = function(stage_, C, circleManager) {
           var stage = this.draggedStage, stageIndex = 0, model, stageView;
           this.backToOriginal(stage, C, stage_);
-          /*if(stage.nextStage) {
-            stageIndex = stage.nextStage.index;
-            this.currentDrop = stage.nextStage;
-          } else if(stage.previousStage) {
-            stageIndex = stage.previousStage.index;
-            this.currentDrop = stage.previousStage;
-          }
-
-          model = stage.model;
-          stageView = new stageDude(model, C.canvas, C.allStepViews, stageIndex, C, C.$scope, true);
-          C.addNextandPrevious(this.currentDrop, stageView);
-
-          C.allStageViews.splice(stageIndex + 1, 0, stageView);
-
-          if(stage.nextStage) {
-            C.allStageViews.splice(this.draggedStage.index, 1);
-            this.currentDrop.moveIndividualStageAndContents(stage, true);
-          } else { // if We clicked on the last stage.
-            C.allStageViews.splice(C.allStageViews.length - 1, 1);
-          }
-          this.moveStageGraphics(stageView, C, circleManager);
-          C.canvas.remove(stage_.dots); // because this doesn't get deleted in collapseStage(), deleteStageContents(), this could be because a click is active on dots.
-          // So we delete it once we have click finished */
         };
         return this.indicator;
       },

@@ -110,10 +110,12 @@ angular.module("canvasApp").factory('mouseDown', [
           case "moveStage":
 
             that.mouseDownPos = evt.e.clientX;
+
             that.moveStageActive = true;
             that.canvas.moveCursor = "move";
 
             C.stageIndicator.init(evt.target.parent);
+            that.stageIndicatorPosition = C.stageIndicator.left;
             C.stageIndicator.changeText(evt.target.parent);
 
             circleManager.togglePaths(false); //put it back later

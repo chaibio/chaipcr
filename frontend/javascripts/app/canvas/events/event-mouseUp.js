@@ -52,7 +52,9 @@ angular.module("canvasApp").factory('mouseUp', [
 
         if(that.moveStageActive) {
           var stage = evt.target.parent;
-          if(that.mouseDownPos === evt.e.clientX) {
+          var pos = C.stageIndicator.left;
+          console.log(that.stageIndicatorPosition, pos);
+          if(that.stageIndicatorPosition === pos) {
             console.log("its just a click we conclude it as we want to switch places", stage);
             C.stageIndicator.clickManager(stage, C, circleManager);
           } else {
