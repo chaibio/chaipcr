@@ -121,9 +121,9 @@ class ChaiDevice():
             if ret.json()['status']['status'] == 'true':
                 return True
             else:
-                return False
+                raise Exception('Failed to start current experiment')
         except:
-            raise Exception('Failed to stop current experiment')
+            raise Exception('Invalid reply from instrument')
 
 
     def experiment_stop(self):
@@ -134,9 +134,9 @@ class ChaiDevice():
             if ret.json()['status']['status'] == 'true':
                 return True
             else:
-                return False
+                raise Exception('Failed to stop current experiment')
         except:
-            raise Exception('Failed to stop current experiment')
+            raise Exception('Invalid reply from instrument')
                 
 
     def experiment_delete(self, experiment_id=None):
@@ -424,9 +424,9 @@ class ChaiDevice():
             if ret.json()['status']['status'] == 'true':
                 return True
             else:
-                return False
+                raise Exception('Failed to start data logger')
         except:
-            raise Exception('Failed to start data logger')
+            raise Exception('Invalid reply from instrument')
 
 
     def data_logger_stop(self):
@@ -441,9 +441,9 @@ class ChaiDevice():
             if ret.json()['status']['status'] == 'true':
                 return True
             else:
-                return False
+                raise Exception('Failed to stop data logger')
         except:
-            raise Exception('Failed to stop data logger')
+            raise Exception('Invalid reply from instrument')
 
 
     def data_logger_trigger(self):
@@ -458,9 +458,9 @@ class ChaiDevice():
                 )
         try:
             if ret.json()['status']['status'] != 'true':
-                return False
+                raise Exception('Failed to trigger data logger')
         except:
-            raise Exception('Failed to trigger data logger')
+            raise Exception('Invalid reply from instrument')
 
         ret = []
 
@@ -478,6 +478,16 @@ class ChaiDevice():
         ret = ret.set_index(['time_offset'])
 
         return ret
+
+    def experiment_data_log(self, template, sample_cnt, name = 'Test experiment'):
+        """Run experiment with data logger."""
+
+        exp_id = self.experiment_load(template, name)
+        self.experiment_start(exp_id)
+        self.data_logger_start(10, sample_cnt-10)
+        data = self.data_logger_trigger()
+        return (data, exp_id)
+
 
 def main():
     
