@@ -44,6 +44,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         ngModel.$setViewValue angular.copy val
 
       $scope.$watchCollection 'buttons', watchButtons
+
       $scope.$watch 'colorBy', (color_by) ->
         for i in [0..15] by 1
           $scope.buttons["well_#{i}"] = angular.copy $scope.buttons["well_#{i}"]

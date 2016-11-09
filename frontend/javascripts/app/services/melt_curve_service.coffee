@@ -69,9 +69,9 @@ App.service 'MeltCurveService', [
               total_temp += data[t].temperature[ii]
 
             datasets["well_#{i}"].push
-              temperature: total_temp/16
-              derivative: data[i].derivative_data[ii]
-              normalized: data[i].normalized_data[ii]
+              temperature: Math.round((total_temp / 16) * 100) / 100
+              derivative: Math.round(data[i].derivative_data[ii] * 100) / 100
+              normalized: Math.round(data[i].normalized_data[ii] * 100) / 100
 
         complete(datasets)
 
