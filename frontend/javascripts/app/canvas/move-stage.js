@@ -202,6 +202,9 @@ angular.module("canvasApp").factory('moveStageRect', [
               this.verticalLine.setVisible(false);
             }
           }
+
+
+
         };
 
         this.indicator.checkMovingOffScreen = function(C, movement, direction) {
@@ -239,7 +242,16 @@ angular.module("canvasApp").factory('moveStageRect', [
           var that = this;
 
           if(this.currentHit  > this.draggedStage.index) {
-            console.log("Greater");
+            console.log("Greater", this.currentDrop);
+            // Patch
+            var checkStage = this.draggedStage.nextStage;
+            if(checkStage.nextStage === null) {
+              var lastStep = checkStage.childSteps[checkStage.childSteps.length - 1];
+              if(lastStep.model.hold_time === 0) {
+                this.backToOriginal(this.draggedStage, C, stage);
+                return true;
+              }
+            }
               this.applyMovement(stage, C, circleManager, function() {
                 C.allStageViews.splice(that.draggedStage.index, 1);
               });
@@ -331,7 +343,7 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         this.indicator.clickManager = function(stage_, C, circleManager) {
           var stage = this.draggedStage, stageIndex = 0, model, stageView;
-          this.backToOriginal(stage, C, stage_);
+          this.backToOriginal(stage, C);
         };
         return this.indicator;
       },

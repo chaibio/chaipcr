@@ -135,7 +135,7 @@ angular.module("canvasApp").factory('events', [
             C.moveLimit = ((lastStep.left + 3) - 120);
             return;
           } else if(moveElement === "stage") {
-            C.moveLimit = ((lastStage.left) - 35);
+            C.moveLimit = ((lastStage.left) - 40);
             return;
           }
         }

@@ -194,7 +194,9 @@ angular.module("canvasApp").factory('stage', [
       };
 
       this.deleteStageContents = function() {
-
+        this.stageHitPointLeft.setVisible(false);
+        this.stageHitPointRight.setVisible(false);
+        
         for(var component in this.visualComponents) {
           if(component === "dots") {
             var items = this.dots._objects;
