@@ -191,15 +191,10 @@ angular.module("canvasApp").factory('circle', [
 
         if(parseInt(holdTimeText) === 0) {
           this.holdTime.text = "∞";
-          //console.log(newHold, oldHold);
           if(this.parent.parentStage.parent.editStageStatus === true && oldHold !== null){
-            //this.parent.parentStage.parent.editModeStageChanges(this.parent.parentStage, -25, false);
-            console.log("I am in this place");
             var lastStage = this.parent.parentStage;
             lastStage.dots.setVisible(false);
             this.canvas.bringToFront(lastStage.dots);
-            //lastStage.stageNameGroup.setLeft(lastStage.left);
-            //this.parent.parentStage.stageNameGroup.setLeft(lastStage.left + 1);
             this.parent.parentStage.parent.editModeStageChanges(this.parent.parentStage, -25, false);
             this.canvas.renderAll();
           }

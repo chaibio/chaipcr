@@ -62,7 +62,7 @@ angular.module("canvasApp").factory('stage', [
         this.stageHitPointLowerRight.setLeft(this.stageHitPointLowerRight.left - 64).setCoords();
         this.roof.setWidth(this.myWidth).setCoords();
         this.stageRect.setWidth(this.myWidth).setCoords();
-        //this.stageHitPointLowerRight.set({left: this.stageHitPointLowerRight.left - 64}).setCoords();
+        // this.stageHitPointLowerRight.set({left: this.stageHitPointLowerRight.left - 64}).setCoords();
         // Befor actually move the step in process movement stage values.
         // Find next stageDots
         // Move all the steps in it to left.

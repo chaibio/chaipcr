@@ -230,6 +230,7 @@ angular.module("canvasApp").factory('canvas', [
       stage.dots.setVisible(status);
       this.canvas.bringToFront(stage.dots);
       if(status === true) {
+
         if(stage.stageNameGroup.moved !== "right") {
           leftVal = {left: stage.stageNameGroup.left + 26};
           stage.stageNameGroup.set(leftVal).setCoords();
@@ -239,10 +240,10 @@ angular.module("canvasApp").factory('canvas', [
           stage.shortenStageName();
         }
       } else if(status === false) {
-        if(stage.stageNameGroup.moved !== "left") {
+        if(stage.stageNameGroup.moved === "right") {
           leftVal = {left: stage.stageNameGroup.left - 26};
           stage.stageNameGroup.set(leftVal).setCoords();
-          stage.stageNameGroup.moved = "left";
+          stage.stageNameGroup.moved = false;
         }
         stageGraphics.stageHeader.call(stage);
       }

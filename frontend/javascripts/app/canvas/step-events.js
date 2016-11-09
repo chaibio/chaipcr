@@ -88,7 +88,7 @@ angular.module("canvasApp").service('stepEvents',[
 
       $scope.$watch('step.ramp.collect_data', function(newVal, oldVal) {
 
-        if( $scope.fabricStep.index !== 0 || $scope.fabricStep.parentStage.index !== 0) {
+        if($scope.fabricStep.index !== 0 || $scope.fabricStep.parentStage.index !== 0) {
           //if its not the very first step
           var circle = $scope.fabricStep.circle;
           circle.gatherDataDuringRampGroup.setVisible(newVal);
