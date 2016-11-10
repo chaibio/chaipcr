@@ -47,7 +47,9 @@
         dashedLineStrokeWidth: 2,
         circleRadius: 6,
         circleStrokeWidth: 2,
-        circleRadius: 7
+        circleRadius: 7,
+        prevMouseOverlayMousePos: null,
+        prevChartSVGMousePos: null
       };
     }
 
@@ -64,12 +66,7 @@
       try {
         mouse = d3.mouse(node);
       } catch (e) {
-        if (Globals.activePathConfig && Globals.circle) {
-          Globals.circle.attr('transform', 'translate(0,0) scale(1)');
-          mouse = [Globals.circle.attr('cx') * 1, Globals.circle.attr('cy') * 1];
-        } else {
-          mouse = [0, 0];
-        }
+        return null;
       }
       return mouse;
     }
@@ -464,12 +461,7 @@
     }
 
     function makeCircle() {
-      var lastPos;
       if (Globals.circle) {
-        lastPos = {
-          cx: Globals.circle.attr('cx'),
-          cy: Globals.circle.attr('cy'),
-        };
         Globals.circle.remove();
       }
       Globals.circle = Globals.viewSVG.append('circle')
@@ -477,7 +469,6 @@
         .attr('r', Globals.circleRadius)
         .attr('stroke', '#fff')
         .attr('stroke-width', Globals.circleStrokeWidth)
-        .attr('transform', 'translate (50,50)')
         .on('mouseout', hideMouseIndicators)
         .on('mousemove', mouseMoveCb)
         .on('click', function() {
@@ -491,9 +482,10 @@
       if (Globals.activePathConfig) {
         Globals.circle.attr('fill', Globals.activePathConfig.config.color);
       }
-      if (lastPos) {
-        Globals.circle.attr('cx', lastPos.cx);
-        Globals.circle.attr('cy', lastPos.cy);
+      if (Globals.prevMouseOverlayMousePos) {
+        Globals.circle.attr('cx', Globals.prevMouseOverlayMousePos.x);
+        Globals.circle.attr('cy', Globals.prevMouseOverlayMousePos.y);
+        Globals.circle.attr('transform', 'translate(0,0) scale(1)');
       }
     }
 
@@ -835,12 +827,17 @@
     }
 
     function mouseMoveCb() {
+      var mouse = d3Mouse(Globals.mouseOverlay.node()) || Globals.prevMouseOverlayMousePos;
+      if (!mouse) {
+        return;
+      }
+      Globals.prevMouseOverlayMousePos = mouse;
       setHoveredLine();
       if (!Globals.activePath) {
         hideMouseIndicators();
         return;
       }
-      var x = d3Mouse(Globals.mouseOverlay.node())[0];
+      var x = mouse[0];
       var pos = getPathPositionByX(Globals.guidingLines[Globals.activePathConfig.index], x);
       var max_x = ((getMaxX() - 1) / (Globals.config.axes.x.max - 1)) * Globals.width;
 
@@ -859,6 +856,10 @@
         Globals.xAxisCircle
           .attr("cx", function() {
             var m = d3Mouse(Globals.chartSVG.node());
+            if (!m) {
+              m = Globals.prevChartSVGMousePos;
+            }
+            Globals.prevChartSVGMousePos = m;
             return m[0];
           })
           .attr("cy", Globals.height + Globals.config.margin.top);
@@ -870,7 +871,10 @@
     }
 
     function setHoveredLine() {
-      var mouse = d3Mouse(Globals.mouseOverlay.node());
+      var mouse = d3Mouse(Globals.mouseOverlay.node()) || Globals.prevMouseOverlayMousePos;
+      if (!mouse) {
+        return;
+      }
       var mouseX = mouse[0];
       var mouseY = mouse[1];
       var closestLineIndex = undefined;
