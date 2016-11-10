@@ -106,8 +106,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               $scope.chartConfig.axes.x.min = 1
               $scope.hasData = true
               data = resp.data.steps[0]
-              data.amplification_data.shift()
-              data.cq.shift()
+              data.amplification_data?.shift()
+              data.cq?.shift()
               data.amplification_data = helper.neutralizeData(data.amplification_data, $scope.is_dual_channel)
 
               AMPLI_DATA_CACHE = angular.copy data
@@ -122,15 +122,12 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             console.log resp
             if resp.status is 500
               $scope.error = resp.statusText || 'Unknown error'
-              # $scope.error = true1\
               console.log '500 error!!'
             $scope.fetching = false
             return if $scope.retrying
             retry()
         else
           retry()
-
-      # fetchFluorescenceData()
 
       updateButtonCts = ->
         for well_i in [0..15] by 1

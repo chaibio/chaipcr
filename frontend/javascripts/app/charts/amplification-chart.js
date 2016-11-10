@@ -59,6 +59,21 @@
       };
     // end global vars
 
+    function d3Mouse(node) {
+      var mouse;
+      try {
+        mouse = d3.mouse(node);
+      } catch (e) {
+        if (Globals.activePathConfig && Globals.circle) {
+          Globals.circle.attr('transform', 'translate(0,0) scale(1)');
+          mouse = [Globals.circle.attr('cx'), Globals.circle.attr('cy')];
+        } else {
+          mouse = [0, 0];
+        }
+      }
+      return mouse;
+    }
+
     function hideMouseIndicators() {
       if (Globals.circle) {
         Globals.circle.attr('opacity', 0);
@@ -328,7 +343,7 @@
         .attr("d", line)
         .attr('stroke-width', Globals.normalPathStrokeWidth)
         .on('click', function(e, a, path) {
-          setActivePath.call(this, _path, d3.mouse(this));
+          setActivePath.call(this, _path, d3Mouse(this));
           mouseMoveCb();
         })
         .on('mousemove', function(e, a, path) {
@@ -466,7 +481,7 @@
           this.remove();
           unsetActivePath();
           if (Globals.hoveredLine) {
-            var mouse = d3.mouse(Globals.mouseOverlay.node());
+            var mouse = d3Mouse(Globals.mouseOverlay.node());
             setActivePath(Globals.hoveredLine, mouse);
           }
         });
@@ -503,7 +518,7 @@
         .on('click', function() {
           unsetActivePath();
           if (Globals.hoveredLine) {
-            var mouse = d3.mouse(Globals.mouseOverlay.node());
+            var mouse = d3Mouse(Globals.mouseOverlay.node());
             setActivePath(Globals.hoveredLine, mouse);
           }
         });
@@ -764,7 +779,7 @@
         .on('click', function() {
           unsetActivePath();
           if (Globals.hoveredLine) {
-            var mouse = d3.mouse(Globals.mouseOverlay.node());
+            var mouse = d3Mouse(Globals.mouseOverlay.node());
             setActivePath(Globals.hoveredLine, mouse);
           }
         });
@@ -815,7 +830,7 @@
         hideMouseIndicators();
         return;
       }
-      var x = d3.mouse(Globals.mouseOverlay.node())[0];
+      var x = d3Mouse(Globals.mouseOverlay.node())[0];
       var pos = getPathPositionByX(Globals.guidingLines[Globals.activePathConfig.index], x);
       var max_x = ((getMaxX() - 1) / (Globals.config.axes.x.max - 1)) * Globals.width;
 
@@ -833,7 +848,7 @@
 
         Globals.xAxisCircle
           .attr("cx", function() {
-            var m = d3.mouse(Globals.chartSVG.node());
+            var m = d3Mouse(Globals.chartSVG.node());
             return m[0];
           })
           .attr("cy", Globals.height + Globals.config.margin.top);
@@ -846,7 +861,7 @@
     }
 
     function setHoveredLine() {
-      var mouse = d3.mouse(Globals.mouseOverlay.node());
+      var mouse = d3Mouse(Globals.mouseOverlay.node());
       var mouseX = mouse[0];
       var mouseY = mouse[1];
       var closestLineIndex = undefined;
