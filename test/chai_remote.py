@@ -4,7 +4,10 @@ import os
 import requests
 import json
 import time
+import pickle
 import paramiko
+import sshtunnel
+import MySQLdb
 import pandas as pd
 import numpy as np
 
@@ -177,7 +180,7 @@ class ChaiDevice():
             raise Exception('Failed to get experiment id %d'%experiment_id)
 
 
-    def experiment_loop(self, experiment_id=None, loop_cnt=100, poll_seconds=60, gap_minutes=5, stop_on_error=True, delete_loop_experiments=True):
+    def experiment_loop(self, experiment_id=None, loop_cnt=100, data_log_duration_s=None, poll_seconds=60, gap_minutes=5, stop_on_error=True, delete_loop_experiments=False):
         """Run the same experiment in a loop.
 
         Copies of the experiments are created, run and optionally deleted.
@@ -187,46 +190,38 @@ class ChaiDevice():
             raise Exception('Device is running an experiment')
 
         _check_par('experiment id', experiment_id, _type=int, _min=0)
+        _check_par('loop count', loop_cnt, _type=int, _min=1, _max=1000)
+        _check_par('poll seconds', poll_seconds, _type=int, _min=1, _max=3600)
+        _check_par('gap minutes', gap_minutes, _type=int, _min=0, _max=1440)
+        if data_log_duration_s != None:
+            _check_par('data log duration (seconds)', data_log_duration_s, _type=int, _min=1)
 
-        try:
-            int_loop_cnt = int(loop_cnt)
-            if int(loop_cnt) < 1 or int(loop_cnt) > 1000:
-                raise Exception('loop_cnt must be between 1 and 1000 (default 10)')
-        except:
-            raise Exception('Invalid loop_cnt')
+        data={}
 
-        try:
-            int_poll_seconds = int(poll_seconds)
-            if int(poll_seconds) < 1 or int(poll_seconds) > 3600:
-                raise Exception('poll_seconds must be between 1 and 3600 (default 60')
-        except:
-            raise Exception('Invalid poll_seconds')
-
-        try:
-            int_gap_minutes = int(gap_minutes)
-            if int(gap_minutes) < 0 or int(gap_minutes) > 1440:
-                raise Exception('gap_minutes must be between 0 and 1440 (default 5')
-        except:
-            raise Exception('Invalid gap_minutes')
-
-        for loop in xrange(1, int_loop_cnt+1):
+        for loop in xrange(1, loop_cnt+1):
 
             new_id = self.experiment_copy(experiment_id)
             print("Starting loop %d with experiment id %d"%(loop, new_id))
+            if data_log_duration_s != None:
+                self.data_logger_start(10, data_log_duration_s * 80 - 10)
             self.experiment_start(new_id)
             time.sleep(10)
             if self.state() == 'idle':
                 raise Exception('Failed to start loop %d for experiment id %d'%(loop, new_id))
 
+            if data_log_duration_s != None:
+                data[new_id] = self.data_logger_trigger(timeout_s = 2 * data_log_duration_s)
+                pickle.dump(data, open('data.back', 'w'))
+
             while True:
-                time.sleep(int_poll_seconds)
+                time.sleep(poll_seconds)
                 if self.state() == 'idle':
                     break;
             
             if stop_on_error and self.experiment_info(new_id)['experiment']['completion_status'] != 'success':
                 raise Exception('Loop %d for experiment id %d failed'%(loop, new_id))
 
-            time.sleep(int_gap_minutes * 60)
+            time.sleep(gap_minutes * 60)
 
             if delete_loop_experiments:
                 try:
@@ -240,6 +235,7 @@ class ChaiDevice():
             self.connect_rest()
 
         print("Finished %d loops for experiment id %d"%(loop, experiment_id))
+        return data
 
 
     def experiment_get_template(self, experiment_id=None):
@@ -335,6 +331,52 @@ class ChaiDevice():
         except:
             raise Exception('Failed to execute command: "%s"'%command)
 
+
+    def sql_command(self, command):
+        """Execute an sql command and return the results.
+        
+        The db connection is established over an ssh tunnel
+        """
+
+        try:
+            with sshtunnel.SSHTunnelForwarder(
+                    (self._config['host'], 22),
+                    ssh_username = self._config['ssh_user'],
+                    ssh_password = self._config['ssh_passwd'],
+                    remote_bind_address=('127.0.0.1', 3306),
+                    local_bind_address=('0.0.0.0', 8306)
+                ) as tunnel:
+                db = MySQLdb.connect(
+                        host = '127.0.0.1',
+                        port = 8306,
+                        user = 'root',
+                        passwd = '',
+                        db = 'chaipcr'
+                        )
+                data = pd.read_sql(command+';', con=db)
+                db.close()
+                return data
+                
+        except Exception as e:
+            raise Exception('Failed to access database')
+
+    def sql_get_data(self, table, experiment_id, channel, well=None):
+        """Get data for a specific experiment."""
+
+        _check_par('experiment id', experiment_id, _type=int, _min=0)
+        _check_par('channel', channel, _type=int, _min=1, _max=2)
+
+        well_string = ''
+        if well is not None:
+            _check_par('well number', well, _type=int, _min=0, _max=15)
+            well_string = 'and well_num = %d'%(int(well))
+
+        data = self.sql_command(
+                "select * from %s where experiment_id = %d and channel = %d %s"%(table, experiment_id, channel, well_string)
+               )
+        return data
+
+
     def sftp_get(self, remote_path, local_path):
         """Transfer a file from device."""
 
@@ -411,8 +453,8 @@ class ChaiDevice():
     def data_logger_start(self, cnt_pre, cnt_post):
         """Setup and start the data logger"""
 
-        _check_par('pre-trigger sample count', cnt_pre, int, 0)
-        _check_par('post-trigger sample count', cnt_post, int, 0)
+        _check_par('pre-trigger sample count', cnt_pre, int, _min = 0)
+        _check_par('post-trigger sample count', cnt_post, int, _min = 0)
 
         ret = self._rest_session.post(
                 self._rest_prefix + ':8000/test/data_logger/start', 
@@ -446,8 +488,11 @@ class ChaiDevice():
             raise Exception('Invalid reply from instrument')
 
 
-    def data_logger_trigger(self):
-        """Retrieve the logger data"""
+    def data_logger_trigger(self, timeout_s=None):
+        """Wait for logger data and retrieve it"""
+
+        if timeout_s != None:
+            _check_par('timeout (seconds)', timeout_s, int, _min=1)
 
         remote_output_file = '/tmp/data_logger.csv'
         self.ssh_command('rm -f ' + remote_output_file)
@@ -465,7 +510,13 @@ class ChaiDevice():
         ret = []
 
         while True:
-            time.sleep(1)
+            if timeout_s != None:
+                if timeout_s < 0:
+                    return False
+                else:
+                    timeout_s -= 10
+
+            time.sleep(10)
             ret = self.ssh_command('stat ' + remote_output_file)
             if ret[0] == 0:
                 # file exists
@@ -478,15 +529,6 @@ class ChaiDevice():
         ret = ret.set_index(['time_offset'])
 
         return ret
-
-    def experiment_data_log(self, template, sample_cnt, name = 'Test experiment'):
-        """Run experiment with data logger."""
-
-        exp_id = self.experiment_load(template, name)
-        self.experiment_start(exp_id)
-        self.data_logger_start(10, sample_cnt-10)
-        data = self.data_logger_trigger()
-        return (data, exp_id)
 
 
 def main():
