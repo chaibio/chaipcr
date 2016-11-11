@@ -416,6 +416,11 @@
             //font-size: 30px;
           }
 
+          .data-part-div {
+            //background-color: red;
+            position: relative;
+            top: -4px;
+          }
           .time-part {
             width: 95px;
             float: left;
@@ -460,8 +465,9 @@
             position: absolute;
             top: 10px;
             left: 0px;
-            background-color: black;
-            color: white;
+            //background-color: black;
+            //color: white;
+            text-align: right;
             font-weight: bold;
             border: none;
           }

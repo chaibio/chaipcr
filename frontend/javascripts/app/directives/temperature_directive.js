@@ -42,7 +42,7 @@ window.ChaiBioTech.ngApp.directive('temperature', [
         scope.$watch("reading", function(val) {
 
           if(angular.isDefined(scope.reading)) {
-
+            // These are values we are showing and hiding, not their state.
             scope.shown = Number(scope.reading);
             scope.hidden = Number(scope.reading);
           }
