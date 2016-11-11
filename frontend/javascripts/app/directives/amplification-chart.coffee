@@ -26,7 +26,7 @@ window.App.directive 'amplificationChart', [
           return false if (!val or !old_val)
           return false if !val.series
           return false if !val.series[0]
-          return val.series[0].y isnt old_val.series[0].y
+          return val.series[0].y isnt old_val.series[0]?.y
 
         initChart = ->
           return if !$scope.data or !$scope.config or !$scope.show
