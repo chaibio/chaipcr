@@ -391,7 +391,7 @@
         .attr("stroke", "#fff")
         .attr('fill', 'none')
         .attr("d", line)
-        .attr('stroke-width', Globals.activePathStrokeWidth + 1.5);
+        .attr('stroke-width', Globals.activePathStrokeWidth + 3);
 
       Globals.whiteBorderLine = _path;
     }
