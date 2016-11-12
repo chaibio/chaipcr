@@ -148,10 +148,15 @@ then
 	then
 		sdcard_image_file=$2
 		echo creating an sdcard image file at $sdcard_image_file
-		dd if=/dev/zero of=$sdcard_image_file bs=102M count=77
+		dd if=/dev/zero of=$sdcard_image_file bs=10240K count=740
 		echo sdcard image file created.. mounting it now..
 
-		loopdev=/dev/loop4
+		loopdev=$(losetup -f)
+		if [ $? -gt 0 ]
+                then
+                        echo "Error creating a block device for $sdcard_image_file! No free loop devices handle. Please restart PC."
+                        print_usage_exit
+                fi
 
 		loopdev_success=false
 		for (( i=1; i<=50; i++))
@@ -166,7 +171,7 @@ then
 			fi
 
 			echo "losetup $loopdev $sdcard_image_file"
-		        losetup $loopdev $sdcard_image_file	
+		        losetup $loopdev $sdcard_image_file
         		if [ $? -gt 0 ]
 		        then
 	        	        loopdev="/dev/loop4$((RANDOM%100))"
@@ -260,7 +265,7 @@ then
 		print_usage_exit
 	fi
 	blockdev --flushbufs ${output_device}
-	
+
 	LC_ALL=C sfdisk --force -uS --Linux "${output_device}" <<-__EOF__
 1,4194304,0xe,*
 ,,,-
@@ -327,10 +332,13 @@ then
 	print_usage_exit
 fi
 rm -r /tmp/copy_mount_point
-if [ $sdcard_image ] 
+if [ $sdcard_image ]
 then
 	losetup -d $loopdev
 	echo sdcard image file created at: $sdcard_image_file
+	echo compressing sdcard image file..
+        tar cfzv ${sdcard_image_file}.tgz $sdcard_image_file
+	echo sdcard image file compressed to: ${sdcard_image_file}.tgz
 fi
 
 echo "All done.."
