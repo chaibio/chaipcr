@@ -29,7 +29,7 @@ get_root_password () {
 		if [ ! -z $serial_number ]
 		then
 #			echo $serial_number
-			hashed_password=$(echo $serial_number | /usr/bin/md5sum | awk '{print $1}')
+			hashed_password=$(echo -n $serial_number | /usr/bin/md5sum | awk '{print $1}')
 			if [ ! -z $hashed_password ]
 			then
 				echo $hashed_password
