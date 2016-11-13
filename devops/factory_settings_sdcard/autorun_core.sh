@@ -518,7 +518,7 @@ sh ${sdcard_p1}/scripts/unpack_latest_version.sh factorysettings $counter || tru
 
 if [ -e "${eMMC}p4" ]
 then
-        echo "Perminant data partition found! bypassing repartitioning!"
+        echo "Permanent data partition found! bypassing repartitioning!"
 else
 	echo "Repartitioning needed!"
         alldone
