@@ -113,7 +113,12 @@ uEnvSDCard=$boot/uEnv.sdcard.txt
 uEnv72Check=$boot/uEnv.72check.txt
 NOW=$(date +"%m-%d-%Y %H:%M:%S")
 
-cp $uEnv ${uEnv}.org --backup=numbered
+if cp --help | grep numbered
+then
+	cp $uEnv ${uEnv}.org --backup=numbered
+else
+        cp $uEnv ${uEnv}.org
+fi
 
 if $fat_boot
 then
@@ -268,7 +273,13 @@ if [ -e $fstab_new ]
 then
 	rm $fstab_new
 fi
-cp $fstab ${fstab}.org --backup=numbered
+
+if cp --help | grep numbered
+then
+        cp $fstab ${fstab}.org --backup=numbered
+else
+        cp $fstab ${fstab}.org
+fi
 
 while IFS= read -r var
 do
