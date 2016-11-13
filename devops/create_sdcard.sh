@@ -41,7 +41,7 @@ print_usage_exit () {
 		umount /tmp/copy_mount_point > /dev/null 2>&1
 		rm -r /tmp/copy_mount_point
 	fi
-	if [ $sdcard_image ] 
+	if $sdcard_image
 	then
 		if [ -e $loopdev ]
 		then
@@ -257,7 +257,7 @@ umount $output_device_p1 > /dev/zero
 umount $output_device_p2 > /dev/zero
 
 echo "Partitioning.."
-if [ ! $sdcard_image ]
+if ! $sdcard_image
 then
 	if ! dd if=/dev/zero of=${output_device} bs=1M count=16
 	then
@@ -324,6 +324,7 @@ then
 	print_usage_exit
 fi
 cp -r $input_dir/p2/* /tmp/copy_mount_point/
+
 sync
 umount /tmp/copy_mount_point
 if [ $? -gt 0 ]
@@ -332,7 +333,8 @@ then
 	print_usage_exit
 fi
 rm -r /tmp/copy_mount_point
-if [ $sdcard_image ]
+
+if $sdcard_image
 then
 	losetup -d $loopdev
 	echo sdcard image file created at: $sdcard_image_file
