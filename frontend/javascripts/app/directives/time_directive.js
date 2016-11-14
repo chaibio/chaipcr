@@ -63,7 +63,7 @@ window.ChaiBioTech.ngApp.directive('time', [
           scope.edit = false;
           var newHoldTime = scope.$parent.convertToMinute(scope.hidden);
           editValue = scope.$parent.convertToMinute(editValue);
-          
+
           if((newHoldTime || newHoldTime === 0) && editValue !== newHoldTime) {
             scope.reading = newHoldTime;
             $timeout(function() {

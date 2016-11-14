@@ -53,16 +53,15 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
               scope.cbar = "C/";
               scope.s = "s";
             }
-
-            scope.hidden = scope.reading;
+            scope.shown = scope.reading;
           }
         });
 
 
         scope.editAndFocus = function(className) {
-          
+
           scope.edit = ! scope.edit;
-          editValue = Number(scope.hidden);
+          editValue = Number(scope.shown);
 
           $timeout(function() {
             $('.' + className).focus();
@@ -72,13 +71,13 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
         scope.save = function() {
 
           scope.edit = false;
-          if(! isNaN(scope.hidden) && Number(scope.hidden) < 1000) {
-            if(editValue !== Number(scope.hidden)) {
-              if(Number(scope.hidden) % 1 === 0) { // if the number enrered is an integer.
-                scope.reading = (Number(scope.hidden).toFixed(1));
-                scope.hidden = scope.reading;
+          if(! isNaN(scope.shown) && Number(scope.shown) < 1000) {
+            if(editValue !== Number(scope.shown)) {
+              if(Number(scope.shown) % 1 === 0) { // if the number enrered is an integer.
+                scope.reading = (Number(scope.shown).toFixed(1));
+                scope.shown = scope.reading;
               } else {
-                scope.reading = Number(scope.hidden);
+                scope.reading = Number(scope.shown);
               }
 
               $timeout(function() {
@@ -90,7 +89,7 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
             }
             return ;
           }
-          scope.hidden = scope.reading;
+          scope.shown = scope.reading;
           var warningMessage = alerts.rampSpeedWarning;
           scope.$parent.showMessage(warningMessage);
         };

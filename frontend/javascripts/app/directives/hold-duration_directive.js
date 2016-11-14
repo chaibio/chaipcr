@@ -41,7 +41,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
         scope.$watch("reading", function(val) {
 
           if(angular.isDefined(scope.reading)) {
-            scope.shown = scope.hidden = scope.$parent.timeFormating(scope.reading);
+            scope.shown = scope.$parent.timeFormating(scope.reading);
           }
         });
 
@@ -54,7 +54,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
         scope.editAndFocus = function(className) {
 
           if(scope.pause) {
-            editValue = scope.hidden;
+            editValue = scope.shown;
             scope.edit = ! scope.edit;
             $timeout(function() {
               $('.' + className).focus();
@@ -65,7 +65,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
         scope.save = function() {
 
           scope.edit = false;
-          var newHoldTime = scope.$parent.convertToMinute(scope.hidden);
+          var newHoldTime = scope.$parent.convertToMinute(scope.shown);
           editValue = scope.$parent.convertToMinute(editValue);
 
           if((newHoldTime || newHoldTime === 0) && editValue !== newHoldTime) {
@@ -77,7 +77,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
             });
 
           } else {
-            scope.hidden = scope.shown;
+            scope.shown = scope.shown;
           }
         };
       }
