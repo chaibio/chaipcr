@@ -37,59 +37,55 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
 
         scope.edit = false;
         scope.delta = true; // This is to prevent the directive become disabled, check delta in template, this is used for auto delta field
-        scope.cbar = "C/";
-        scope.s = "s";
         var editValue;
 
         scope.$watch("reading", function(val) {
 
           if(angular.isDefined(scope.reading)) {
-
-            if(Number(scope.reading) <= 0) {
-              scope.shown = "AUTO";
-              scope.cbar = scope.s = "";
-            } else {
-              scope.shown = scope.reading;
-              scope.cbar = "C/";
-              scope.s = "s";
-            }
-            scope.shown = scope.reading;
+            scope.configureData();
           }
         });
 
+        scope.configureData = function() {
+
+          if(Number(scope.reading) <= 0) {
+            scope.shown = "AUTO";
+          } else {
+            scope.shown = scope.reading + "C/s";
+          }
+          editValue = scope.shown;
+        };
+
 
         scope.editAndFocus = function(className) {
+          if(scope.shown === "AUTO") {
+            scope.shown = editValue = 0;
+          } else {
+            scope.shown = editValue = String(scope.shown).replace("C/s", "");
+          }
 
-          scope.edit = ! scope.edit;
-          editValue = Number(scope.shown);
-
-          $timeout(function() {
-            $('.' + className).focus();
-          });
         };
 
         scope.save = function() {
-
-          scope.edit = false;
+          console.log(scope.shown, editValue);
           if(! isNaN(scope.shown) && Number(scope.shown) < 1000) {
-            if(editValue !== Number(scope.shown)) {
-              if(Number(scope.shown) % 1 === 0) { // if the number enrered is an integer.
-                scope.reading = (Number(scope.shown).toFixed(1));
-                scope.shown = scope.reading;
-              } else {
-                scope.reading = Number(scope.shown);
-              }
+            if(editValue != Number(scope.shown)) {
+
+              scope.reading = (Number(scope.shown).toFixed(1));
+              scope.shown = scope.reading + "C/s";
+
 
               $timeout(function() {
                 ExperimentLoader.changeRampSpeed(scope.$parent).then(function(data) {
                   console.log(data);
                 });
               });
-
             }
+            scope.configureData();
             return ;
           }
-          scope.shown = scope.reading;
+
+          scope.configureData();
           var warningMessage = alerts.rampSpeedWarning;
           scope.$parent.showMessage(warningMessage);
         };

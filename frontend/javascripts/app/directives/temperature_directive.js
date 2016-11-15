@@ -42,27 +42,20 @@ window.ChaiBioTech.ngApp.directive('temperature', [
         scope.$watch("reading", function(val) {
 
           if(angular.isDefined(scope.reading)) {
-            // These are values we are showing and hiding, not their state.
-            scope.shown = Number(scope.reading);
+            scope.shown = Number(scope.reading).toFixed(1);
           }
         });
 
         scope.editAndFocus = function(className) {
 
-          scope.edit = ! scope.edit;
-          editValue = Number(scope.shown);
-
-          $timeout(function() {
-            $('.' + className).focus();
-          });
+          editValue = Number(scope.shown).toFixed(1);
         };
 
         scope.save = function() {
-          console.log("saving ...... !");
-          scope.edit = false;
+
           if(! isNaN(scope.shown) && editValue !== Number(scope.shown)) {
 
-            scope.reading = scope.shown;
+            scope.reading = Number(scope.shown).toFixed(1);
             $timeout(function() {
               ExperimentLoader.changeTemperature(scope.$parent).then(function(data) {
                 console.log(data);
@@ -70,7 +63,7 @@ window.ChaiBioTech.ngApp.directive('temperature', [
             });
 
           } else {
-            scope.shown = scope.shown = scope.reading;
+            scope.shown = Number(scope.reading).toFixed(1);
           }
         };
       }
