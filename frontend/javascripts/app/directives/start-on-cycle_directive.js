@@ -45,36 +45,32 @@ window.ChaiBioTech.ngApp.directive('startOnCycle', [
           if(angular.isDefined(scope.reading)) {
 
             scope.shown = Number(scope.reading);
-            scope.hidden = Number(scope.reading);
+            editValue = Number(scope.reading);
           }
         });
 
         scope.editAndFocus = function(className) {
 
           if(scope.delta) {
-            editValue = Number(this.hidden);
-            scope.edit = ! scope.edit;
-            $timeout(function() {
-              $('.' + className).focus();
-            });
+            editValue = Number(this.shown);
           }
         };
 
         scope.save = function() {
 
-          scope.edit = false;
-          if(! isNaN(scope.hidden)) {
+          if(! isNaN(scope.shown)) {
 
-            if(Number(scope.hidden) <= 0) {
+            if(Number(scope.shown) <= 0) {
 
-              scope.hidden = scope.shown;
+              scope.shown = 1;
               var warningMessage0 = alerts.startOnCycleMinimum;
               scope.$parent.showMessage(warningMessage0);
 
-            } else if(Number(scope.hidden) <= Number(scope.$parent.stage.num_cycles)) {
+            } else if(Number(scope.shown) <= Number(scope.$parent.stage.num_cycles)) {
 
-              if(editValue !== Number(scope.hidden)) {
-                scope.reading = scope.hidden;
+              scope.shown = parseInt(scope.shown);
+              if(editValue !== parseInt(scope.shown)) {
+                scope.reading = scope.shown;
                 $timeout(function() {
                   ExperimentLoader.changeStartOnCycle(scope.$parent).then(function(data) {
                     console.log(data);
@@ -84,21 +80,14 @@ window.ChaiBioTech.ngApp.directive('startOnCycle', [
 
             } else {
 
-              scope.hidden = scope.shown;
+              scope.shown = parseInt(editValue);
               var warningMessage1 = alerts.startOnCycleWarning;
               scope.$parent.showMessage(warningMessage1);
             }
 
           } else {
-
-            scope.hidden = scope.shown;
+            scope.shown = parseInt(editValue);
           }
-
-          /*scope.edit = false;
-          if(scope.reading <= scope.$parent.stage.num_cycles) {
-            ExperimentLoader.changeStartOnCycle(scope.$parent);
-          }*/
-
         };
       }
     };
