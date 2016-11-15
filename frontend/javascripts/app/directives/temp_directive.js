@@ -36,47 +36,42 @@ window.ChaiBioTech.ngApp.directive('temp', [
 
       link: function(scope, elem, attr) {
 
-        scope.edit = false;
         var editValue;
 
         scope.$watch("reading", function(val) {
 
           if(angular.isDefined(scope.reading)) {
-
-            scope.shown = Number(scope.reading);
-            scope.hidden = Number(scope.reading);
+            editValue = Number(scope.reading);
+            scope.shown = Number(scope.reading).toFixed(1) + "ºC";
           }
         });
 
         scope.editAndFocus = function(className) {
 
           if(scope.delta) {
-            editValue = Number(scope.hidden);
+            scope.shown = String(scope.shown).replace("ºC", "");
+            editValue = Number(scope.shown);
             scope.edit = ! scope.edit;
-            $timeout(function() {
-              $('.' + className).focus();
-            });
           }
         };
 
         scope.save = function() {
 
-          scope.edit = false;
-          if(! isNaN(scope.hidden)) {
-            if(editValue !== Number(scope.hidden)) {
-              scope.reading = scope.hidden;
+          if(! isNaN(scope.shown)) {
+            if(editValue !== Number(scope.shown)) {
+              scope.reading = scope.shown;
               $timeout(function() {
                 ExperimentLoader.changeDeltaTemperature(scope.$parent).then(function(data) {
                   console.log(data);
                 });
               });
+              return true;
             }
-
-          } else {
-            scope.shown = scope.hidden = scope.reading;
           }
+          //if(scope.shown.search("/ºC/") === -1) {
+            scope.shown = Number(scope.reading).toFixed(1) + "ºC";
+          //}
         };
-
       }
     };
   }

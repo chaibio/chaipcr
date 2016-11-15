@@ -36,7 +36,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
 
         scope.edit = false;
         scope.delta = false; // This is to prevent the directive become disabled, check delta in template, this is used for auto delta field
-        var editValue;
+        var editValue = null;
 
         scope.$watch("reading", function(val) {
 
@@ -66,7 +66,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
 
           scope.edit = false;
           var newHoldTime = scope.$parent.convertToMinute(scope.shown);
-          editValue = scope.$parent.convertToMinute(editValue);
+          //editValue = scope.$parent.convertToMinute(editValue);
 
           if((newHoldTime || newHoldTime === 0) && editValue !== newHoldTime) {
             scope.reading = newHoldTime;
@@ -75,10 +75,9 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
                 console.log(data);
               });
             });
-
-          } else {
-            scope.shown = scope.shown;
+            editValue = newHoldTime;
           }
+          scope.shown = scope.$parent.timeFormating(scope.reading);
         };
       }
     };

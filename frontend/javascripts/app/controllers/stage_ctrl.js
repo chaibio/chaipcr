@@ -78,7 +78,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
     };
 
     $scope.convertToMinute = function(deltaTime) {
-
+      
       var value = deltaTime.indexOf(":");
       if(value != -1) {
         var hr = deltaTime.substr(0, value);
