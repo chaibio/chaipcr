@@ -28,7 +28,8 @@ window.ChaiBioTech.ngApp.directive('temperature', [
         caption: "@",
         unit: "@",
         reading: '=',
-        action: '&' // Learn how to pass value in this scenario
+        action: '&', // Learn how to pass value in this scenario
+        helpText: "@"
       },
 
       templateUrl: 'app/views/directives/edit-value.html',

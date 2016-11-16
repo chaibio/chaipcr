@@ -28,7 +28,8 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
         caption: "@",
         unit: "@",
         reading: '=',
-        pause: '='
+        pause: '=',
+        helpText: "@"
       },
       templateUrl: 'app/views/directives/edit-value.html',
 
