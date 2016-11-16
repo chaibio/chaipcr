@@ -230,15 +230,15 @@ function prep_adj_w2wvaf(
     stop_msgs = Vector{AbstractString}()
     for channel_in_signal in channels_in_signal
         wva_invalid_idc = find(
-            signal_minus_water -> signal_minus_water <= 0, signal_data_dict[channel_in_signal] .- water_data_dict[channel_in_signal] )
+            signal_minus_water -> signal_minus_water <= 0, signal_data_dict[channel_in_signal] .- water_data_dict[channel_in_signal]
+        )
         if length(wva_invalid_idc) > 0
-            ci_well_nums_str = join(signal_well_nums[wva_invalid_idc], ", ")
+            failed_well_nums_str = join(signal_well_nums[wva_invalid_idc], ", ")
             push!(stop_msgs,
-                "Invalid well-to-well variation data in channel $channel_in_signal: fluorescence value of water is greater than or equal to that of dye in the following well(s) - $ci_well_nums_str. "
+                "Invalid well-to-well variation data in channel $channel_in_signal: fluorescence value of water is greater than or equal to that of dye in the following well(s) - $failed_well_nums_str. "
             )
         end # if
     end # for
-
     if (length(stop_msgs) > 0)
         error(join(stop_msgs, ""))
     end

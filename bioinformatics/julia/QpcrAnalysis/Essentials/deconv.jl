@@ -80,8 +80,39 @@ function get_k(
 
     k_dict_bydy = OrderedDict(map(cd_key_vec) do cd_key
         k_data_1dye, dcv_well_nums = dcv_data_dict[cd_key]
-        return (cd_key, k_data_1dye .- water_data)
+        return cd_key => k_data_1dye .- water_data
     end) # `dcv_well_nums` is not passed on because expected to be the same as `water_well_nums`, otherwise error will be raised by `get_full_calib_data`
+
+
+    # assuming `cd_key` (in the format of "channel_1", "channel_2", etc.) is the target channel of the dye, check whether the water-subtracted signal in target channel is greater than that in non-target channel for each well and each dye.
+
+    stop_msgs = Vector{AbstractString}()
+
+    channels = map(cd_key_vec) do cd_key
+        parse(Int, split(cd_key, "_")[2])
+    end
+
+    for target_channel_i in 1:length(channels)
+        signals = k_dict_bydy[cd_key_vec[target_channel_i]]
+        target_signals = signals[target_channel_i, :]
+        for non_target_channel_i in setdiff(channels, target_channel_i)
+            non_target_signals = signals[non_target_channel_i, :]
+            failed_idc = find(
+                target_minus_non_target -> target_minus_non_target <= 0, target_signals .- non_target_signals
+            )
+            if length(failed_idc) > 0
+                failed_well_nums_str = join(water_well_nums[failed_idc], ", ")
+                push!(stop_msgs,
+                    "Invalid deconvolution data for the dye targeting channel $target_channel_i: fluorescence value of non-target channel $non_target_channel_i is greater than or equal to that of target channel $target_channel_i in the following well(s) - $failed_well_nums_str. "
+                )
+            end # if
+        end # for non_target_channel_i
+    end # for channel_i
+
+    if (length(stop_msgs) > 0)
+        error(join(stop_msgs, ""))
+    end
+
 
     inv_note_pt1 = ""
     inv_note_pt2 = "K matrix is singular, using `pinv` instead of `inv` to compute inverse matrix of K. Deconvolution result may not be accurate. This may be caused by using the same or a similar set of solutions in the steps for different dyes. "

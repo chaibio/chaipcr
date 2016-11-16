@@ -38,7 +38,7 @@ ANALYZE_DICT["optical_cal"] = function analyze_optical_cal(
 
         if isa(result_k, Exception)
             err_msg = isa(result_k, ErrorException) ? result_k.msg : "$(string(result_k)). "
-            err_msg_vec = push!(err_msg_vec, "K matrix: $err_msg")
+            push!(err_msg_vec, "K matrix: $err_msg")
         else
             inv_note = result_k["inv_note"]
             if length(inv_note) > 0
