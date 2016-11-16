@@ -36,7 +36,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
 
         scope.edit = false;
         scope.delta = false; // This is to prevent the directive become disabled, check delta in template, this is used for auto delta field
-        var editValue = null;
+        var editValue = null, help_part = angular.element(elem).find(".help-part");
 
         scope.$watch("reading", function(val) {
 
@@ -56,9 +56,16 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
           if(scope.pause) {
             editValue = scope.$parent.convertToMinute(scope.shown);
           }
+          help_part.animate({
+            left: 100
+          }, 200);
         };
 
         scope.save = function() {
+
+          help_part.animate({
+            left: 0
+          }, 200);
 
           var newHoldTime = scope.$parent.convertToMinute(scope.shown);
 

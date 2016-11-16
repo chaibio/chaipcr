@@ -37,7 +37,7 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
 
         scope.edit = false;
         scope.delta = true; // This is to prevent the directive become disabled, check delta in template, this is used for auto delta field
-        var editValue;
+        var editValue, help_part = angular.element(elem).find(".help-part");
 
         scope.$watch("reading", function(val) {
 
@@ -64,10 +64,16 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
             scope.shown = editValue = String(scope.shown).replace("C/s", "");
           }
 
+          help_part.animate({
+            left: 100
+          }, 200);
         };
 
         scope.save = function() {
-          console.log(scope.shown, editValue);
+
+          help_part.animate({
+            left: 0
+          }, 200);
           if(! isNaN(scope.shown) && Number(scope.shown) < 1000) {
             if(editValue != Number(scope.shown)) {
 

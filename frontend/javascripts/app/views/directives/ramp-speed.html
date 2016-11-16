@@ -17,7 +17,8 @@
     limitations under the License.
 -->
 <div class="bottom-common-item" ng-class="{disabled: !delta, notDisabled: !delta}">
-  <div class="caption-part B1">{{caption}}</div>
+  <div class="caption-part B1"><div class="lift-for-help">{{caption}}</div></div>
+  <div class="help-part">[0-6 C/s]</div>
   <div class="data-part H3"><!--<span class="data-part-span" ng-show="!edit" ng-click="editAndFocus('data-part-edit-value')">{{shown}}&nbsp;{{cbar}}<span class="small-s">{{s}}</span></span>-->
     <input on-enter="edit = false" ng-click="editAndFocus('data-part-edit-value')" ng-blur="save()" ng-model="shown" class="data-part-edit-value" min="0" max="100"  type="text" value="{{shown}}">
   </div>

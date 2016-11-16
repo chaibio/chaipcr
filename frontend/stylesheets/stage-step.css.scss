@@ -313,6 +313,18 @@
         border-bottom-style: solid;
         border-bottom-width: 1px;
         border-bottom-color: #cdcdcd;
+        position: relative;
+        left: 0px;
+
+        .help-part {
+          font-size: 12px;
+          font-family: "dinot";
+          position: absolute;
+          left: 0px;
+          top: 20px;
+          z-index: 100;
+          color: #cdcdcd;
+        }
 
         .caption-part {
           height: 47px;
@@ -320,6 +332,12 @@
           float: left;
           padding-top: 16px;
           position: relative;
+
+          .lift-for-help {
+            position: absolute;
+            z-index: 110;
+            background-color: white;
+          }
 
           .capsule {
             position: absolute;
