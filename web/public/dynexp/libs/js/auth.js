@@ -8,6 +8,13 @@
         request: function(config) {
           var access_token;
           access_token = $.jStorage.get('authToken', null);
+					if(!access_token){
+						re = new RegExp("authentication_token" + "=([^;]+)");
+		        value = re.exec(document.cookie);
+						if(value){
+							access_token = unescape(value[1]);
+						}
+					}
           if (access_token && config.url.indexOf('8000') >= 0) {
             config.url = "" + config.url + (config.url.indexOf('&') < 0 ? '?' : '&') + "access_token=" + access_token;
             config.headers['Content-Type'] = 'text/plain';
