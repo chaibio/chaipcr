@@ -53,6 +53,8 @@ LEDController::LEDController(shared_ptr<SPIPort> spiPort,unsigned int potCSPin,
 LEDController::~LEDController() {
 	
 }
+const int kPotMinResistance = 75;
+const int kPotMaxResistance = 5000 + kPotMinResistance;
 
 void LEDController::setIntensity(double onCurrentMilliamps) {
     if (_intensity == onCurrentMilliamps)
@@ -68,9 +70,7 @@ void LEDController::setIntensity(double onCurrentMilliamps) {
             throw InvalidArgument(stream.str().c_str());
         }
 
-        double avgCurrentMilliamps = onCurrentMilliamps * _dutyCyclePercentage / 100;
-
-        if (avgCurrentMilliamps > kMaxAverageLEDCurrent || onCurrentMilliamps > kMaxInstantaneousLEDCurrent)
+        if (onCurrentMilliamps > kMaxInstantaneousLEDCurrent)
         {
             std::stringstream stream;
             stream << "Requested LED intensity of " << onCurrentMilliamps << " above limit of " << kMaxInstantaneousLEDCurrent;
@@ -78,9 +78,26 @@ void LEDController::setIntensity(double onCurrentMilliamps) {
             throw InvalidArgument(stream.str().c_str());
         }
 
+        double avgCurrentMilliamps = onCurrentMilliamps * _dutyCyclePercentage / 100;
+
+        if (avgCurrentMilliamps > kMaxAverageLEDCurrent)
+        {
+            std::stringstream stream;
+            stream << "Requested LED intensity of " << onCurrentMilliamps << " will exceed the max average current of " << kMaxAverageLEDCurrent;
+
+            throw InvalidArgument(stream.str().c_str());
+        }
+
         //calculate
         double rIref = 1.24 / (onCurrentMilliamps / 1000) * 31.5; //reference resistance for TLC5940
-        int rN = (rIref - 75) * 256 / 5000;
+        if (rIref > kPotMaxResistance || rIref < kPotMinResistance)
+        {
+            std::stringstream stream;
+            stream << "Requested LED intensity of " << onCurrentMilliamps << " requires a resistance outside the valid range of [ " << kPotMinResistance << ", " << kPotMaxResistance << " ]";
+
+            throw InvalidArgument(stream.str().c_str());
+        }
+        int rN = (rIref - kPotMinResistance) * 256 / (kPotMaxResistance - kPotMinResistance);
         char txBuf[] = {0, static_cast<uint8_t>(rN)};
 
         //send resistance
@@ -91,6 +108,8 @@ void LEDController::setIntensity(double onCurrentMilliamps) {
 
         if (_lastLedNumber != std::numeric_limits<unsigned>::max())
             activateLED(_lastLedNumber);
+        else
+            disableLEDs(false);
     }
     else
         disableLEDs(false);

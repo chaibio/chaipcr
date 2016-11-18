@@ -90,7 +90,7 @@ const double kMaxHeatBlockRampSpeed = 6.0;
 const double kDurationCalcHeatBlockRampSpeed = kMaxHeatBlockRampSpeed;
 
 //LED constants
-const int kMinLEDCurrent = 5; //mA
+const int kMinLEDCurrent = 8; //mA
 const int kDefaultLEDCurrent = 60; //mA
 const int kMaxInstantaneousLEDCurrent = 100;
 const int kMaxAverageLEDCurrent = 30;
