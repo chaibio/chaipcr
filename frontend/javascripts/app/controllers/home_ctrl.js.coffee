@@ -36,19 +36,25 @@ window.ChaiBioTech.ngApp
 
     $scope.experiments = null
     $scope.deleteMode = false
+    $scope.enterHome = true
 
 
     User.getCurrent().then (resp) ->
       $scope.user = resp.data.user
 
     $scope.$on 'status:experiment:completed', =>
-      @fetchExperiments()
+      if !$scope.enterHome
+        @fetchExperiments()
 
     @fetchExperiments = ->
       Experiment.query (experiments) ->
         $scope.experiments = experiments
 
-    @fetchExperiments()
+    if $scope.enterHome
+      @fetchExperiments()
+      $timeout ->
+        $scope.enterHome = false
+      , 1000
 
     @newExperiment = ->
       modalInstance = $uibModal.open
