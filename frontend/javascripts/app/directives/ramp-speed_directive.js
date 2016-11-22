@@ -29,9 +29,10 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
       scope: {
         caption: "@",
         unit: "@",
-        reading: '='
+        reading: '=',
+        helpText: "@"
       },
-      templateUrl: 'app/views/directives/ramp-speed.html',
+      templateUrl: 'app/views/directives/edit-value.html',
 
       link: function(scope, elem, attr) {
 
@@ -46,40 +47,53 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
           }
         });
 
+        scope.$watch("edit", function(editStatus) {
+
+          if(editStatus === true) {
+            help_part.animate({
+              left: 100
+            }, 200);
+          } else if(editStatus === false) {
+            help_part.animate({
+              left: 0
+            }, 200);
+          }
+        });
+
         scope.configureData = function() {
 
           if(Number(scope.reading) <= 0) {
             scope.shown = "AUTO";
+            scope.unit = false;
           } else {
-            scope.shown = scope.reading + "C/s";
+            scope.shown = scope.reading;
+            scope.unit = "C/s";
           }
           editValue = scope.shown;
         };
 
 
         scope.editAndFocus = function(className) {
+
+          scope.edit = true;
           if(scope.shown === "AUTO") {
-            scope.shown = editValue = 0;
+            scope.shown = editValue = Number(0).toFixed(1);
+            scope.unit = "C/s";
           } else {
-            scope.shown = editValue = String(scope.shown).replace("C/s", "");
+            scope.shown = editValue = Number(scope.shown).toFixed(1);
           }
 
-          help_part.animate({
-            left: 100
-          }, 200);
+
         };
 
         scope.save = function() {
 
-          help_part.animate({
-            left: 0
-          }, 200);
+          scope.edit = false;
+
           if(! isNaN(scope.shown) && Number(scope.shown) < 1000) {
             if(editValue != Number(scope.shown)) {
 
-              scope.reading = (Number(scope.shown).toFixed(1));
-              scope.shown = scope.reading + "C/s";
-
+              scope.shown = scope.reading = (Number(scope.shown).toFixed(1));
 
               $timeout(function() {
                 ExperimentLoader.changeRampSpeed(scope.$parent).then(function(data) {

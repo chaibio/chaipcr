@@ -36,27 +36,31 @@ window.ChaiBioTech.ngApp.directive('temp', [
 
       link: function(scope, elem, attr) {
 
-        var editValue;
+        scope.edit = false;
+        var editValue,
+        input_data_part = angular.element(elem).find(".input-data-part");
 
         scope.$watch("reading", function(val) {
 
           if(angular.isDefined(scope.reading)) {
             editValue = Number(scope.reading);
-            scope.shown = Number(scope.reading).toFixed(1) + "ºC";
+            scope.shown = Number(scope.reading).toFixed(1);
           }
         });
 
         scope.editAndFocus = function(className) {
 
           if(scope.delta) {
-            scope.shown = String(scope.shown).replace("ºC", "");
+            scope.shown = Number(scope.reading).toFixed(1);
             editValue = Number(scope.shown);
-            scope.edit = ! scope.edit;
+            scope.edit = true;
+            input_data_part.focus();
           }
         };
 
         scope.save = function() {
 
+          scope.edit = false;
           if(! isNaN(scope.shown)) {
             if(editValue !== Number(scope.shown)) {
               scope.reading = scope.shown;
@@ -68,9 +72,7 @@ window.ChaiBioTech.ngApp.directive('temp', [
               return true;
             }
           }
-          //if(scope.shown.search("/ºC/") === -1) {
-            scope.shown = Number(scope.reading).toFixed(1) + "ºC";
-          //}
+          scope.shown = Number(scope.reading).toFixed(1);
         };
       }
     };

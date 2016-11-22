@@ -462,51 +462,23 @@
             padding-left: 6px;
           }
 
-          /*.minute-part {
-            width: 40px;
-            float: left;
-
-            .minute-part-edit {
-              width: 40px;
-              position: relative;
-              background-color: black;
-              color: white;
-              height: 58px;
-              top: -67px;
-              border: none;
-              display: none;
-            }
-          }*/
-
           .input-data-part {
-
+            height: 27px;
+            position: absolute;
+            top: 10px;
+            left: 0px;
+            text-align: right;
+            font-weight: bold;
+            border: none;
+            outline: none;
           }
 
           .data-part-edit-value {
-            width: 70px;
-            height: 27px;
-            position: absolute;
-            top: 10px;
-            left: 0px;
-            //background-color: black;
-            //color: white;
-            text-align: right;
-            font-weight: bold;
-            border: none;
-            outline: none;
+            width: 65px;
           }
+
           .data-part-edit-value-no-unit {
             width: 95px;
-            height: 27px;
-            position: absolute;
-            top: 10px;
-            left: 0px;
-            //background-color: black;
-            //color: white;
-            text-align: right;
-            font-weight: bold;
-            border: none;
-            outline: none;
           }
           .unit-display {
             float: right;
