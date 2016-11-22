@@ -478,7 +478,24 @@
             }
           }*/
 
+          .input-data-part {
+
+          }
+
           .data-part-edit-value {
+            width: 70px;
+            height: 27px;
+            position: absolute;
+            top: 10px;
+            left: 0px;
+            //background-color: black;
+            //color: white;
+            text-align: right;
+            font-weight: bold;
+            border: none;
+            outline: none;
+          }
+          .data-part-edit-value-no-unit {
             width: 95px;
             height: 27px;
             position: absolute;
@@ -490,6 +507,11 @@
             font-weight: bold;
             border: none;
             outline: none;
+          }
+          .unit-display {
+            float: right;
+            position: relative;
+            top: -5px;
           }
         }
 

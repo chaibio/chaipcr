@@ -19,7 +19,15 @@
 <div class="bottom-common-item" ng-class="{disabled: !delta, notDisabled: !delta}">
   <div class="caption-part B1"><div class="lift-for-help">{{caption}}</div></div>
   <div class="help-part">{{helpText}}</div>
-  <div class="data-part H3"><!--<div class="data-part-div" ng-show="!edit" ng-click="editAndFocus('data-part-edit-value')">{{shown}}&nbsp;{{unit}}</div>-->
-    <input on-enter="edit = false" ng-blur="save()" ng-click="editAndFocus('data-part-edit-value')" ng-model="shown" class="data-part-edit-value" min="0" max="100"  type="text" value="{{shown}}">
+  <div class="data-part H3">
+    <input
+      class="input-data-part"
+      on-enter="edit = false"
+      ng-blur="save()"
+      ng-click="editAndFocus()"
+      ng-model="shown"
+      ng-class="{'data-part-edit-value': unit, 'data-part-edit-value-no-unit': !unit}"
+      min="0" max="100"  type="text" value="{{shown}}">
+    <div ng-if="unit" class="unit-display" ng-click="editAndFocus()">{{unit}}</div>
   </div>
 </div>
