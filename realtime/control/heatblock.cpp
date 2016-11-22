@@ -93,9 +93,13 @@ void HeatBlock::setTargetTemperature(double targetTemperature, double rampRate) 
     if (rampRate <= 0 || rampRate > _maxRampSpeed)
         rampRate = _maxRampSpeed;
 
-    _stepProcessingMutex.lock();
+    std::lock_guard<std::mutex> lock(_stepProcessingMutex);
     _ramp.set(targetTemperature, rampRate);
-    _stepProcessingMutex.unlock();
+}
+
+double HeatBlock::targetTemperature() const {
+    std::lock_guard<std::mutex> lock(_stepProcessingMutex);
+    return _ramp.targetTemperature();
 }
 
 void HeatBlock::calculateTemperature() {

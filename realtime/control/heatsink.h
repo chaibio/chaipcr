@@ -22,9 +22,14 @@
 #include "temperaturecontroller.h"
 #include "adcpin.h"
 
-class PWMControl;
+#include <atomic>
+#include <deque>
 
-namespace Poco { class Timer; }
+#include <Poco/Timer.h>
+#include <Poco/Util/Timer.h>
+#include <Poco/Util/TimerTask.h>
+
+class PWMControl;
 
 class HeatSink : public TemperatureController
 {
@@ -46,11 +51,18 @@ protected:
 private:
     void readADCPin(Poco::Timer &timer);
 
+    void nextFanStep(Poco::Util::TimerTask &/*task*/) { nextFanStep(); }
+    void nextFanStep();
+
 private:
     PWMControl *_fan;
 
     ADCPin _adcPin;
-    Poco::Timer *_adcTimer;
+    Poco::Timer _adcTimer;
+
+    Poco::Util::Timer _fanControlTimer;
+    std::atomic<bool> _fanControlState;
+    std::deque<std::pair<long, double>> _fanTransitionSteps;
 };
 
 #endif // HEATSINK_H

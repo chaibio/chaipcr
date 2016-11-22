@@ -22,30 +22,28 @@
 #include "pwm.h"
 #include "thermistor.h"
 #include "qpcrapplication.h"
+#include "maincontrollers.h"
 
-#include <Poco/Timer.h>
+#include <Poco/Util/TimerTaskAdapter.h>
 
 HeatSink::HeatSink(Settings settings, const std::string &fanPWMPath, unsigned long fanPWMPeriod, const ADCPin &adcPin)
     :TemperatureController(settings), _adcPin(adcPin)
 {
     _fan = new PWMControl(fanPWMPath, fanPWMPeriod);
-    _adcTimer = new Poco::Timer;
+    _fanControlState = false;
 
-    _fan->setPWMDutyCycle((unsigned long)0);
+    _fan->setPWMDutyCycle(static_cast<unsigned long>(0));
 
     resetOutput();
 }
 
 HeatSink::~HeatSink()
 {
-    _adcTimer->stop();
+    _adcTimer.stop();
+    _fanControlTimer.cancel(true);
 
     resetOutput();
-
-    delete _fan;
-    delete _adcTimer;
 }
-
 
 HeatSink::Direction HeatSink::outputDirection() const
 {
@@ -64,8 +62,8 @@ double HeatSink::fanDrive() const
 
 void HeatSink::startADCReading()
 {
-    _adcTimer->setPeriodicInterval(kHeatSinkADCInterval);
-    _adcTimer->start(Poco::TimerCallback<HeatSink>(*this, &HeatSink::readADCPin));
+    _adcTimer.setPeriodicInterval(kHeatSinkADCInterval);
+    _adcTimer.start(Poco::TimerCallback<HeatSink>(*this, &HeatSink::readADCPin));
 }
 
 void HeatSink::resetOutput()
@@ -75,6 +73,35 @@ void HeatSink::resetOutput()
 
 void HeatSink::processOutput()
 {
+    if (!pidState() && !_fanControlState)
+    {
+        double targetTemp = HeatBlockInstance::getInstance()->targetTemperature();
+        double nextDrive = 0.0;
+
+        if (targetTemp < 30.0)
+            nextDrive = 0.5;
+        else
+            nextDrive = 0.3;
+
+        double currentDrive = fanDrive();
+
+        if (currentDrive != nextDrive)
+        {
+            if (currentDrive == 0.0)
+                _fanTransitionSteps.emplace_back(2 * 1000 * 1000, -1.0);
+            else if (currentDrive == 0.3)
+                _fanTransitionSteps.emplace_back(1 * 1000 * 1000, -1.0);
+            else //0.5
+            {
+                _fanTransitionSteps.emplace_back(20 * 1000 * 1000, 0.0);
+                _fanTransitionSteps.emplace_back(2 * 1000 * 1000, -1.0);
+            }
+
+            _fanTransitionSteps.emplace_back(0, -nextDrive);
+
+            nextFanStep();
+        }
+    }
 }
 
 void HeatSink::readADCPin(Poco::Timer &/*timer*/)
@@ -94,4 +121,26 @@ void HeatSink::readADCPin(Poco::Timer &/*timer*/)
     {
         qpcrApp.setException(std::current_exception());
     }
+}
+
+void HeatSink::nextFanStep()
+{
+    if (!_fanTransitionSteps.empty())
+    {
+        std::pair<long, double> step = _fanTransitionSteps.front();
+        _fanTransitionSteps.pop_front();
+
+        setOutput(step.second);
+
+        if (step.first > 0)
+        {
+            _fanControlState = true;
+            _fanControlTimer.schedule(Poco::Util::TimerTask::Ptr(new Poco::Util::TimerTaskAdapter<HeatSink>(*this, static_cast<void(HeatSink::*)(Poco::Util::TimerTask&)>(&HeatSink::nextFanStep))),
+                                      Poco::Timestamp() + step.first);
+        }
+        else
+            _fanControlState = false;
+    }
+    else
+        _fanControlState = false;
 }

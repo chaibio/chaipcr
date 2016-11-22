@@ -155,7 +155,6 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
         _experiment = std::move(experiment);
 
         LidInstance::getInstance()->setEnableMode(true);
-        HeatSinkInstance::getInstance()->setEnableMode(true);
     }
 
     startLogging();
@@ -177,6 +176,8 @@ void ExperimentController::run()
         HeatBlockInstance::getInstance()->setTargetTemperature(_experiment.protocol()->currentStep()->temperature(), _experiment.protocol()->currentRamp()->rate());
         HeatBlockInstance::getInstance()->enableStepProcessing();
         HeatBlockInstance::getInstance()->setEnableMode(true);
+
+        HeatSinkInstance::getInstance()->setEnableMode(true, false);
 
         if (_experiment.protocol()->currentRamp()->collectData())
         {
@@ -274,6 +275,7 @@ void ExperimentController::stop()
             return;
 
         LidInstance::getInstance()->setEnableMode(false);
+        HeatSinkInstance::getInstance()->setEnableMode(false);
         HeatBlockInstance::getInstance()->setEnableMode(false);
         OpticsInstance::getInstance()->setCollectData(false);
 
@@ -311,6 +313,7 @@ void ExperimentController::stop(const std::string &errorMessage)
             return;
 
         LidInstance::getInstance()->setEnableMode(false);
+        HeatSinkInstance::getInstance()->setEnableMode(false);
         HeatBlockInstance::getInstance()->setEnableMode(false);
         OpticsInstance::getInstance()->setCollectData(false);
 

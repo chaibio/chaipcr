@@ -129,7 +129,7 @@ void QPCRFactory::setupMachine() {
 
     if (heatSink) {
         heatSink->setTargetTemperature(kHeatSinkTargetTemperature);
-        heatSink->setEnableMode(true);
+        //heatSink->setEnableMode(true);
     }
 
     if (adcController && heatBlock)

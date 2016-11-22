@@ -64,6 +64,8 @@ public:
     double maxTargetTemperature() const;
 
     void setTargetTemperature(double targetTemperature, double rampRate = 0);
+    double targetTemperature() const;
+
     void calculateTemperature();
     double zone1Temperature() const;
     double zone1TargetTemperature() const;
