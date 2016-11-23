@@ -33,6 +33,7 @@ window.ChaiBioTech.ngApp.directive('startOnCycle', [
         delta: '=',
         action: '&' // Learn how to pass value in this scenario
       },
+      transclude: true,
       templateUrl: 'app/views/directives/temp-time.html',
 
       link: function(scope, elem, attr) {
