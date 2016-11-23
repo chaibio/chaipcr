@@ -78,7 +78,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
     };
 
     $scope.convertToMinute = function(deltaTime) {
-      
+
       var value = deltaTime.indexOf(":");
       if(value != -1) {
         var hr = deltaTime.substr(0, value);
@@ -104,6 +104,46 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
       }
     };
 
+    $scope.convertToSeconds = function(durationString) {
+
+      var durationArray = durationString.split(":");
+      if(durationArray.length > 1) {
+        var tt = [0, 0, 0], len = durationArray.length, HH = 0, MM = 0, SS = 0;
+
+        if(durationArray[len - 1] && Number(durationArray[len - 1]) < 60) {
+          SS = Number(durationArray[len - 1]);
+        } else {
+          console.log("Plz verify seconds");
+          return false;
+        }
+
+        if(durationArray[len - 2] && Number(durationArray[len - 2]) < 60) {
+          MM = Number(durationArray[len - 2]);
+        } else {
+          console.log("Plz verify Minutes");
+          return false;
+        }
+
+        if(durationArray[len - 3]) {
+
+          if(Number(durationArray[len - 3]) < 9999) {
+            HH = Number(durationArray[len - 3]);
+          } else {
+            console.log("Plz verify Hours we support upto 9999");
+            return false;
+          }
+        }
+
+        return (HH * 3600) + (MM * 60) + SS;
+
+      } else if(!isNaN(durationString)) {
+        return durationString;
+      } else {
+        var warningMessage1 = alerts.nonDigit;
+        $scope.showMessage(warningMessage1);
+      }
+    };
+
     $scope.timeFormating = function(reading) {
 
       var mins = Number(reading);
@@ -120,6 +160,25 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
       return negative + hour + ":" + min;
     };
 
+    $scope.newTimeFormatting = function(reading) {
+
+      var negative = (reading < 0) ? "-" : "";
+      reading = Math.abs(reading);
+
+      var hour = Math.floor(reading / 3600);
+      hour = (hour < 10) ? "0" + hour : hour;
+
+      var noMin = reading % 3600;
+
+      var min = Math.floor(noMin / 60);
+      min = (min < 10) ? "0" + min : min;
+
+      var noSec = noMin % 60;
+      noSec = (noSec < 10) ? "0" + noSec : noSec;
+
+      return negative + hour + ":" + min + ":" + noSec;
+    };
+
     $scope.showMessage = function(message) {
 
       $scope.warningMessage = message;
@@ -131,6 +190,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
         //Custom size of this modal doesn't change any other modal in use
       });
     };
+
     $scope.tryVal = function() {
       console.log("all okay");
     };
