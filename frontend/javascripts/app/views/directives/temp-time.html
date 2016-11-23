@@ -19,10 +19,10 @@
 <div class="bottom-common-item" ng-class="{disabled: !delta, notDisabled: !delta}">
   <div class="caption-part B1">{{caption}} <div ng-show="showCapsule" class="capsule" ng-transclude></div></div>
   <div class="data-part H3">
+
     <input
-      ng-if="!delta"
-      readonly="true"
       class="input-data-part"
+      ng-readonly="!delta"
       ng-class="{'data-part-edit-value': unit, 'data-part-edit-value-no-unit': !unit}"
       on-enter="edit = false"
       ng-click="editAndFocus()"
@@ -30,16 +30,7 @@
       ng-model="shown"
       class="data-part-edit-value" min="0" max="100"  type="text" value="{{shown}}">
 
-      <input
-        ng-if="delta"
-        class="input-data-part"
-        ng-class="{'data-part-edit-value': unit, 'data-part-edit-value-no-unit': !unit}"
-        on-enter="edit = false"
-        ng-click="editAndFocus()"
-        ng-blur="save()"
-        ng-model="shown"
-        class="data-part-edit-value" min="0" max="100"  type="text" value="{{shown}}">
-      <div ng-if="unit" class="unit-display" ng-click="editAndFocus()">{{unit}}</div>
+    <div ng-if="unit" class="unit-display" ng-click="editAndFocus()">{{unit}}</div>
   </div>
 
 </div>

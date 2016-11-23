@@ -39,7 +39,7 @@ window.ChaiBioTech.ngApp.directive('time', [
 
         var editValue = null;
         scope.showCapsule = true;
-        
+
         scope.$watch("reading", function(val) {
 
           if(angular.isDefined(scope.reading)) {
@@ -57,7 +57,7 @@ window.ChaiBioTech.ngApp.directive('time', [
         scope.save = function() {
 
           var newHoldTime = scope.$parent.convertToMinute(scope.shown);
-
+          console.log("newHoldTime", newHoldTime, scope.shown);
           if((newHoldTime || newHoldTime === 0) && editValue != newHoldTime) {
             scope.reading = newHoldTime;
             $timeout(function() {
