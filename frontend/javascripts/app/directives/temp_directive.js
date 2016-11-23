@@ -37,6 +37,7 @@ window.ChaiBioTech.ngApp.directive('temp', [
       link: function(scope, elem, attr) {
 
         scope.edit = false;
+        scope.showCapsule = true;
         var editValue,
         input_data_part = angular.element(elem).find(".input-data-part");
 

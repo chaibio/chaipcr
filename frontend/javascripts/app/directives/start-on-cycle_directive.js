@@ -33,11 +33,12 @@ window.ChaiBioTech.ngApp.directive('startOnCycle', [
         delta: '=',
         action: '&' // Learn how to pass value in this scenario
       },
-      templateUrl: 'app/views/directives/edit-value.html',
+      templateUrl: 'app/views/directives/temp-time.html',
 
       link: function(scope, elem, attr) {
 
         scope.edit = false;
+        scope.showCapsule = false;
         var editValue;
 
         scope.$watch("reading", function(val) {

@@ -38,7 +38,8 @@ window.ChaiBioTech.ngApp.directive('time', [
       link: function(scope, elem, attr) {
 
         var editValue = null;
-
+        scope.showCapsule = true;
+        
         scope.$watch("reading", function(val) {
 
           if(angular.isDefined(scope.reading)) {
