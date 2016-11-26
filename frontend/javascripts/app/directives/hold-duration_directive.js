@@ -68,10 +68,8 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
 
         scope.editAndFocus = function(className) {
 
-          if(!scope.pause) {
-            scope.edit = true;
-            editValue = scope.$parent.convertToSeconds(scope.shown);
-          }
+          scope.edit = true;
+          editValue = scope.$parent.convertToSeconds(scope.shown);
         };
 
         scope.save = function() {
