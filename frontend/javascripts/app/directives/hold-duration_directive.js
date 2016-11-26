@@ -42,7 +42,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
         scope.$watch("reading", function(val) {
 
           if(angular.isDefined(scope.reading)) {
-            scope.shown = scope.$parent.timeFormating(scope.reading);
+            scope.shown = scope.$parent.newTimeFormatting(scope.reading);
           }
         });
 
@@ -52,24 +52,32 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
             scope.delta = scope.pause;
           }
         });
+
+        scope.$watch("edit", function(editStatus) {
+
+          if(editStatus === true) {
+            help_part.animate({
+              left: 100
+            }, 200);
+          } else if(editStatus === false) {
+            help_part.animate({
+              left: 0
+            }, 200);
+          }
+        });
+
         scope.editAndFocus = function(className) {
 
-          if(scope.pause) {
-            editValue = scope.$parent.convertToMinute(scope.shown);
+          if(!scope.pause) {
+            scope.edit = true;
+            editValue = scope.$parent.convertToSeconds(scope.shown);
           }
-          help_part.animate({
-            left: 100
-          }, 200);
         };
 
         scope.save = function() {
+          scope.edit = false;
+          var newHoldTime = scope.$parent.convertToSeconds(scope.shown);
 
-          help_part.animate({
-            left: 0
-          }, 200);
-
-          var newHoldTime = scope.$parent.convertToMinute(scope.shown);
-          
           if((newHoldTime || newHoldTime === 0) && editValue != newHoldTime) {
             scope.reading = newHoldTime;
             $timeout(function() {
@@ -79,7 +87,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
             });
             editValue = newHoldTime;
           }
-          scope.shown = scope.$parent.timeFormating(scope.reading);
+          scope.shown = scope.$parent.newTimeFormatting(scope.reading);
         };
       }
     };

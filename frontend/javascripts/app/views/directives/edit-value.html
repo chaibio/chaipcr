@@ -22,7 +22,8 @@
   <div class="data-part H3">
     <input
       class="input-data-part"
-      on-enter="edit = false"
+      ng-readonly="!delta"
+      on-enter="save()"
       ng-blur="save()"
       ng-click="editAndFocus()"
       ng-model="shown"

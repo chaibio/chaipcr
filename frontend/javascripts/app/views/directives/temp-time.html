@@ -24,7 +24,7 @@
       class="input-data-part"
       ng-readonly="!delta"
       ng-class="{'data-part-edit-value': unit, 'data-part-edit-value-no-unit': !unit}"
-      on-enter="edit = false"
+      on-enter="save()"
       ng-click="editAndFocus()"
       ng-blur="save()"
       ng-model="shown"

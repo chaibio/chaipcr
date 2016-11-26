@@ -107,6 +107,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
     $scope.convertToSeconds = function(durationString) {
 
       var durationArray = durationString.split(":");
+      
       if(durationArray.length > 1) {
         var tt = [0, 0, 0], len = durationArray.length, HH = 0, MM = 0, SS = 0;
 
