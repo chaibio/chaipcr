@@ -25,6 +25,7 @@
 #include "pid.h"
 #include "temperaturecontroller.h"
 #include "logger.h"
+#include "experimentcontroller.h"
 
 TemperatureController::TemperatureController(Settings settings)
 {
@@ -104,6 +105,9 @@ void TemperatureController::currentTemperatureChanged(double temperature)
 {
     if (temperature < _minTempThreshold)
     {
+        if (ExperimentController::getInstance()->machineState() == ExperimentController::IdleMachineState)
+            return;
+
         if (_firstErrorState)
         {
             std::string name = _name;
@@ -125,6 +129,9 @@ void TemperatureController::currentTemperatureChanged(double temperature)
     }
     else if (temperature > _maxTempThreshold)
     {
+        if (ExperimentController::getInstance()->machineState() == ExperimentController::IdleMachineState)
+            return;
+
         if (_firstErrorState)
         {
             std::string name = _name;
@@ -146,6 +153,9 @@ void TemperatureController::currentTemperatureChanged(double temperature)
     }
     else if (std::isnan(temperature))
     {
+        if (ExperimentController::getInstance()->machineState() == ExperimentController::IdleMachineState)
+            return;
+
         if (_firstErrorState)
         {
             std::string name = _name;
