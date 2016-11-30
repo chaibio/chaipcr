@@ -477,10 +477,20 @@
             width: 65px;
           }
 
+          .data-part-edit-value-ramp {
+            width: 56px;
+          }
+
           .data-part-edit-value-no-unit {
             width: 95px;
           }
           .unit-display {
+            float: right;
+            position: relative;
+            top: -5px;
+            left: -7px;
+          }
+          .unit-display-ramp {
             float: right;
             position: relative;
             top: -5px;

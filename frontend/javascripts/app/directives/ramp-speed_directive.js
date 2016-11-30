@@ -38,6 +38,8 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
 
         scope.edit = false;
         scope.delta = true; // This is to prevent the directive become disabled, check delta in template, this is used for auto delta field
+        scope.ramp = true;
+        
         var editValue, help_part = angular.element(elem).find(".help-part");
 
         scope.$watch("reading", function(val) {
@@ -67,7 +69,7 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
             scope.unit = false;
           } else {
             scope.shown = scope.reading;
-            scope.unit = "C/s";
+            scope.unit = "ºC/s";
           }
           editValue = scope.shown;
         };
@@ -78,7 +80,7 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
           scope.edit = true;
           if(scope.shown === "AUTO") {
             scope.shown = editValue = Number(0).toFixed(1);
-            scope.unit = "C/s";
+            scope.unit = "ºC/s";
           } else {
             scope.shown = editValue = Number(scope.shown).toFixed(1);
           }

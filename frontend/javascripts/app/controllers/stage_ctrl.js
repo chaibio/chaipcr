@@ -107,7 +107,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
     $scope.convertToSeconds = function(durationString) {
 
       var durationArray = durationString.split(":");
-      
+
       if(durationArray.length > 1) {
         var tt = [0, 0, 0], len = durationArray.length, HH = 0, MM = 0, SS = 0;
 
@@ -177,6 +177,9 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
       var noSec = noMin % 60;
       noSec = (noSec < 10) ? "0" + noSec : noSec;
 
+      if(hour === "00") {
+        return negative + min + ":" + noSec;
+      } 
       return negative + hour + ":" + min + ":" + noSec;
     };
 
