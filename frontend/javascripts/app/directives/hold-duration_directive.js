@@ -66,6 +66,10 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
           }
         });
 
+        scope.ifLastStep = function() {
+          return true;
+        };
+
         scope.editAndFocus = function(className) {
 
           scope.edit = true;
@@ -75,9 +79,13 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
         scope.save = function() {
           scope.edit = false;
           var newHoldTime = scope.$parent.convertToSeconds(scope.shown);
-
+          console.log(scope);
           if((newHoldTime || newHoldTime === 0) && editValue != newHoldTime) {
+            if(Number(scope.reading) === 0 && scope.ifLastStep()) {
+
+            }
             scope.reading = newHoldTime;
+
             $timeout(function() {
               ExperimentLoader.changeHoldDuration(scope.$parent).then(function(data) {
                 console.log(data);
