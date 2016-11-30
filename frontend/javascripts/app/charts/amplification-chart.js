@@ -45,7 +45,6 @@
         hoveredPathStrokeWidth: 3,
         activePathStrokeWidth: 5,
         dashedLineStrokeWidth: 2,
-        circleRadius: 6,
         circleStrokeWidth: 2,
         circleRadius: 7
       };
