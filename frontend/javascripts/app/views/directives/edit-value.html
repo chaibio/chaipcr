@@ -29,6 +29,6 @@
       ng-model="shown"
       ng-class="{'data-part-edit-value': unit, 'data-part-edit-value-no-unit': !unit}"
       min="0" max="100"  type="text" value="{{shown}}">
-    <div ng-if="unit" class="unit-display">{{unit}}</div>
+    <div ng-if="unit" ng-class="{'unit-display': temp, 'unit-display-ramp': ramp}">{{unit}}</div>
   </div>
 </div>
