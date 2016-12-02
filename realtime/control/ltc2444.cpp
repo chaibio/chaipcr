@@ -71,12 +71,12 @@ int32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, Oversa
     spiPort_.readBytes(dataIn, dataOut, 4, kADCSPIFrequencyHz);
 
     if ((dataIn[0] >> 5) & (dataIn[0] >> 4) & 1) {
-        APP_LOGGER << "LTC2444::readADC - overvoltage occured" << std::endl;
+        //APP_LOGGER << "LTC2444::readADC - overvoltage occured" << std::endl;
 
         conversion = std::numeric_limits<int32_t>::max();
     }
     else if (!((dataIn[0] >> 5) | (dataIn[0] >> 4) | 0)) {
-        APP_LOGGER << "LTC2444::readADC - undervoltage occured" << std::endl;
+        //APP_LOGGER << "LTC2444::readADC - undervoltage occured" << std::endl;
 
         conversion = std::numeric_limits<int32_t>::min();
     }
