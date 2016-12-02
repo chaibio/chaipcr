@@ -72,6 +72,7 @@ void TestControlHandler::processOptics(const ptree &requestPt)
         ptree::const_assoc_iterator activateLED = requestPt.find("activate_led");
         ptree::const_assoc_iterator disableLEDs = requestPt.find("disable_leds");
         ptree::const_assoc_iterator photodiodeMuxChannel = requestPt.find("photodiode_mux_channel");
+        ptree::const_assoc_iterator ledIntensityFine = requestPt.find("led_intensity_fine");
 
         if (ledIntensity != requestPt.not_found())
             optics->getLedController()->setIntensity(ledIntensity->second.get_value<double>());
@@ -84,6 +85,10 @@ void TestControlHandler::processOptics(const ptree &requestPt)
 
         if (photodiodeMuxChannel != requestPt.not_found())
             optics->getPhotodiodeMux().setChannel(photodiodeMuxChannel->second.get_value<int>());
+
+        if (ledIntensityFine != requestPt.not_found())
+            optics->getLedController()->setIntensityFine(ledIntensityFine->second.get_value<uint8_t>());
+
     }
 }
 
