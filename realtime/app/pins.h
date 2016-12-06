@@ -29,6 +29,7 @@ static const int kSPI0DataInSensePinNumber = 20;
 
 //LED GPIO pins
 static const int kLEDControlXLATPinNumber = 44;
+static const int kLEDControlGSPinNumber = 26;
 static const int kLEDDigiPotCSPinNumber = 65;
 
 static const int kLidSensePinNumber = 61;

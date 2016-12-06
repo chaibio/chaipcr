@@ -33,8 +33,9 @@ LEDController::LEDController(shared_ptr<SPIPort> spiPort,unsigned int potCSPin,
     _spiPort(spiPort),
     _potCSPin(potCSPin, GPIO::kOutput),
     _ledXLATPin(ledXLATPin, GPIO::kOutput),
-    _ledGSPin(26, GPIO::kOutput),
-    _ledBlankPWM(ledBlankPWMPath) {
+    _ledBlankPWM(ledBlankPWMPath),
+    _ledGSPin(kLEDControlGSPinNumber, GPIO::kOutput),
+    _intensityFine(16, 0x3F){
 
     _intensity = 0;
     _lastLedNumber = std::numeric_limits<unsigned>::max();
@@ -44,6 +45,7 @@ LEDController::LEDController(shared_ptr<SPIPort> spiPort,unsigned int potCSPin,
     disableLEDs();
     _ledBlankPWM.setPWM(kLedBlankPwmDutyNs, kLedBlankPwmPeriodNs, 0);
     setIntensity(kDefaultLEDCurrent);
+    sendLEDIntensityFineValues();
 
     _potCSPin.setValue(GPIO::kHigh);
     _ledXLATPin.setValue(GPIO::kLow);
@@ -138,6 +140,56 @@ void LEDController::activateLED(unsigned int ledNumber) {
         }
         sendLEDGrayscaleValues(packedIntensities);
     }
+
+    sendLEDIntensityFineValues();
+}
+
+void LEDController::setIntensityFine(uint8_t ledIntensity, unsigned int ledNumber){
+
+    if(ledIntensity > 0x3F){
+        std::stringstream stream;
+        stream << "Invalid intensity value: " << (int) ledIntensity;
+
+        throw InvalidArgument(stream.str().c_str());
+    }
+
+    if(ledNumber > 16){
+        std::stringstream stream;
+        stream << "Invalid LED number of " << ledNumber;
+
+        throw InvalidArgument(stream.str().c_str());
+    }
+
+    if(ledNumber < 1){
+        for(int i = 0; i < 16; i++){
+            _intensityFine[i] = ledIntensity;
+        }
+    }
+    else{
+        _intensityFine[ledNumber - 1] = ledIntensity;
+    }
+
+    sendLEDIntensityFineValues();
+
+}
+
+void LEDController::sendLEDIntensityFineValues(){
+
+    uint8_t packed_data[12] = {0};
+    for (int i = 15; i > 0; i -= 4) {
+        int pack_index = (15 - i) / 4 * 3;
+        packed_data[pack_index + 0] = ((_intensityFine[i-0] << 2 ) & 0xFC) | (( _intensityFine[i-1] >> 4) & 0x03 );
+        packed_data[pack_index + 1] = ((_intensityFine[i-1] << 4 ) & 0xF0) | (( _intensityFine[i-2] >> 2) & 0x0F );
+        packed_data[pack_index + 2] = ((_intensityFine[i-2] << 6 ) & 0xC0) | (( _intensityFine[i-3] >> 0) & 0x3F );
+    }
+
+    _ledGSPin.setValue(GPIO::kHigh);
+    _spiPort->setMode(0);
+    _spiPort->readBytes(NULL, (char*)packed_data, sizeof(packed_data), 1000000);
+    _ledXLATPin.setValue(GPIO::kHigh);
+    _ledXLATPin.setValue(GPIO::kLow);
+    _ledGSPin.setValue(GPIO::kLow);
+
 }
 
 void LEDController::disableLEDs(bool clearLastLed) {

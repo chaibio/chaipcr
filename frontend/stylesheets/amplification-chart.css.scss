@@ -36,7 +36,7 @@
     }
   }
 
-  // $chart_section_width: 1024px - 
+  // $chart_section_width: 1024px -
 
   .chart-section {
     display: inline-block;
@@ -97,11 +97,11 @@
           margin-left: 15px;
         }
       }
-	  
+
       .item-switch-channel {
         display: inline-block;
         margin-left: $item_switch_gap;
-		float: right;
+    float: right;
 
         .switch {
           height: 15px;
@@ -140,7 +140,7 @@
           display: inline-block;
           margin-left: 6px;
           font-weight: 700;
-		  padding-right: 18px;
+      padding-right: 18px;
         }
         span.set-auto {
           color: $blue;
@@ -218,12 +218,14 @@
           width: 80%;
           vertical-align: middle;
           background: transparent;
+          cursor: pointer;
         }
       }
 
       .ampli-scrollbar-container {
         .scrollbar-directive{
           margin-top: -1px;
+          cursor: pointer;
         }
       }
 
