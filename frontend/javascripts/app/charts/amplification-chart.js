@@ -366,7 +366,7 @@
       return _path;
     }
 
-    function makeWhiteBorderLine (line_config) {
+    function makeWhiteBorderLine(line_config) {
       if (Globals.whiteBorderLine) {
         Globals.whiteBorderLine.remove();
       }
@@ -749,17 +749,24 @@
       var width = Globals.width = elem.parentElement.offsetWidth - config.margin.left - config.margin.right;
       var height = Globals.height = elem.parentElement.offsetHeight - config.margin.top - config.margin.bottom;
 
-      console.log(width, height);
+      var chartSVG = Globals.chartSVG = d3.select(elem)
 
-      var chartSVG = Globals.chartSVG = d3.select(elem).append("svg")
-        .attr("width", width + config.margin.left + config.margin.right)
-        .attr("height", height + config.margin.top + config.margin.bottom)
+      // http://stackoverflow.com/questions/16265123/resize-svg-when-window-is-resized-in-d3-js
+      .append("div")
+        .classed("svg-container", true)
+        .append("svg")
+        //responsive SVG needs these 2 attributes and no width and height attr
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", "0 0 600 400")
+        //class to make it responsive
+        .classed("svg-content-responsive", true)
+        // .attr("width", width + config.margin.left + config.margin.right)
+        // .attr("height", height + config.margin.top + config.margin.bottom)
         .call(Globals.zooomBehavior);
 
       var svg = chartSVG.append("g")
         .attr("transform", "translate(" + config.margin.left + "," + config.margin.top + ")")
         .attr('class', 'chart-g');
-
 
       Globals.viewSVG = svg.append('svg')
         .attr('width', width)

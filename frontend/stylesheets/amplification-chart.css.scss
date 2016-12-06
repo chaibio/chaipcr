@@ -1,14 +1,11 @@
 @import './colors.css.scss';
-
 .amplification-chart-state-active {
   font-family: 'dinot';
-
   .header {
     .name-container {
       width: 80%;
     }
   }
-
   .curve-header {
     .plot-type-buttons {
       width: 140px !important;
@@ -18,60 +15,49 @@
         }
       }
     }
-
     .curve-name {
       width: 55%;
     }
     .ampli-toggles {
       width: 45%;
-
-      .col-md-6, .col-sm-6 {
+      .col-md-6,
+      .col-sm-6 {
         padding-left: 0;
         // padding-right: 0;
-
         // &:last-of-type {
         //   padding-right: 15px;
         // }
       }
     }
   }
-
-  // $chart_section_width: 1024px -
-
   .chart-section {
     display: inline-block;
     padding-right: 20px;
     width: 684px; //340px width of table in the right
     vertical-align: top;
-
     $item_switch_gap: 70px;
     .subheader-switches {
       margin-top: 20px;
       margin-left: -($item_switch_gap);
-
       .item-switch {
         display: inline-block;
         margin-left: $item_switch_gap;
-
         .switch {
           height: 15px;
           margin-top: -2px;
           width: 31px;
           vertical-align: middle;
-
           small {
             width: 15px;
             height: 15px;
             border-width: 4px;
           }
-
           &.checked {
             small {
               left: 16px;
             }
           }
         }
-
         &.auto {
           .switch {
             background: #BBB;
@@ -84,7 +70,6 @@
             color: $gray;
           }
         }
-
         label {
           color: $gray;
           display: inline-block;
@@ -97,31 +82,26 @@
           margin-left: 15px;
         }
       }
-
       .item-switch-channel {
         display: inline-block;
         margin-left: $item_switch_gap;
-    float: right;
-
+        float: right;
         .switch {
           height: 15px;
           margin-top: -2px;
           width: 31px;
           vertical-align: middle;
-
           small {
             width: 15px;
             height: 15px;
             border-width: 4px;
           }
-
           &.checked {
             small {
               left: 16px;
             }
           }
         }
-
         &.auto {
           .switch {
             background: #BBB;
@@ -134,13 +114,12 @@
             color: $gray;
           }
         }
-
         label {
           color: $gray;
           display: inline-block;
           margin-left: 6px;
           font-weight: 700;
-      padding-right: 18px;
+          padding-right: 18px;
         }
         span.set-auto {
           color: $blue;
@@ -149,10 +128,8 @@
         }
       }
     }
-
     // $marginTop: 190px;
     // .vertical-text {
-
     //   transform: rotate(-90deg);
     //   transform-origin: 20% 40%;
     //   float: left;
@@ -161,9 +138,7 @@
     //   margin-left: -26px;
     //   margin-top: $marginTop;
     //   margin-bottom: -$marginTop;
-
     // }
-
     .chart-container {
       // margin-left: 30px;
       // margin-bottom: -35px;
@@ -171,11 +146,9 @@
       width: 650px;
       height: 300px;
     }
-
     .chart-legend {
       display: none;
     }
-
     .chart-error {
       position: absolute;
       left: 0;
@@ -186,28 +159,22 @@
       padding-right: 50px;
       text-align: center;
     }
-
     .loading-blue-container {
       top: 70px;
       margin-left: 270px;
     }
-
     .axis.y2-axis {
       display: none;
     }
-
     .num-cycle-text {
       margin-bottom: -30px;
-      margin-top: 40px;
+      margin-top: 60px;
     }
-
     .ampli-zoom-scroll-container {
       margin-top: 50px;
       padding-left: 50px;
       padding-right: 50px;
-
       .zoom-container {
-
         .zoom-text {
           display: inline-block;
           width: 20%;
@@ -221,28 +188,22 @@
           cursor: pointer;
         }
       }
-
       .ampli-scrollbar-container {
-        .scrollbar-directive{
+        .scrollbar-directive {
           margin-top: -1px;
           cursor: pointer;
         }
       }
-
     }
-
   }
-
   .table-container {
     display: inline-block;
     margin-top: -20px;
     margin-bottom: -4px;
     width: 340px;
-
     table {
       width: 100%;
       // box-shadow: -1px 0px 1px $lightgray;
-
       th {
         background-color: lighten($gray, 15%);
         border-left: 1px solid lighten($lightgray, 15%);
@@ -256,24 +217,20 @@
           background-color: $green;
         }
       }
-
       tr {
         td {
           border-left: 1px solid lighten($lightgray, 15%);
           border-bottom: 1px solid lighten($lightgray, 15%);
           color: $lightgray;
           padding: 10px 15px;
-
           &:first-of-type {
             color: $gray;
             font-weight: bold;
           }
-
           &:last-of-type {
             // border-right: 1px solid lighten($lightgray, 15%);
             border-right: none;
           }
-
           .dot {
             border-radius: 100px;
             display: inline-block;
@@ -282,23 +239,19 @@
             vertical-align: middle;
             width: 10px;
           }
-
           .text {
             display: inline-block;
             vertical-align: middle;
           }
         }
-
         &.selected {
           td {
             color: #000;
           }
         }
       }
-
     }
   }
-
   .experiment-start-stop-buttons {
     padding: 15px;
   }
