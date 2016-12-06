@@ -50,6 +50,7 @@
       padding-right: 50px;
 
       .zoom-container {
+        cursor: pointer;
 
         .zoom-text {
           display: inline-block;
@@ -60,6 +61,7 @@
           display: inline-block;
           width: 80%;
           vertical-align: middle;
+          cursor: pointer;
         }
       }
 
