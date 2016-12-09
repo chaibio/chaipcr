@@ -30,10 +30,12 @@
       }
     }
   }
+
   .chart-section {
     display: inline-block;
     padding-right: 20px;
-    width: 684px; //340px width of table in the right
+    padding-left: 20px;
+    width: 65%;
     vertical-align: top;
     $item_switch_gap: 70px;
     .subheader-switches {
@@ -143,8 +145,10 @@
       // margin-left: 30px;
       // margin-bottom: -35px;
       position: relative;
-      width: 650px;
+      width: 100%;
+      padding-right: 20px;
       height: 300px;
+
     }
     .chart-legend {
       display: none;
@@ -200,7 +204,7 @@
     display: inline-block;
     margin-top: -20px;
     margin-bottom: -4px;
-    width: 340px;
+    width: 35%;
     table {
       width: 100%;
       // box-shadow: -1px 0px 1px $lightgray;

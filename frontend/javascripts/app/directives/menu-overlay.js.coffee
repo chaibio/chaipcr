@@ -20,7 +20,8 @@ window.ChaiBioTech.ngApp.directive 'menuOverlay', [
   '$rootScope'
   '$templateCache'
   '$compile'
-  ($rootScope, $templateCache, $compile) ->
+  '$window'
+  ($rootScope, $templateCache, $compile, $window) ->
 
     restrict: 'EA'
     transclude: true
@@ -35,4 +36,7 @@ window.ChaiBioTech.ngApp.directive 'menuOverlay', [
       $rootScope.$on 'sidemenu:toggle', ->
         $scope.sideMenuOpen = !$scope.sideMenuOpen
 
+
+      $($window).resize ->
+        console.log 'resizing'
 ]
