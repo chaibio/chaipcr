@@ -162,6 +162,15 @@ ExperimentController::StartingResult ExperimentController::start(int experimentI
     return Started;
 }
 
+
+void ExperimentController::shutdown()
+{
+    LidInstance::getInstance()->setEnableMode(false);
+    HeatSinkInstance::getInstance()->setEnableMode(false);
+    HeatBlockInstance::getInstance()->setEnableMode(false);
+    OpticsInstance::getInstance()->setCollectData(false);
+}
+
 void ExperimentController::run()
 {
     {
@@ -274,10 +283,7 @@ void ExperimentController::stop()
         if (_machineState == IdleMachineState)
             return;
 
-        LidInstance::getInstance()->setEnableMode(false);
-        HeatSinkInstance::getInstance()->setEnableMode(false);
-        HeatBlockInstance::getInstance()->setEnableMode(false);
-        OpticsInstance::getInstance()->setCollectData(false);
+        shutdown();
 
         if (_machineState != CompleteMachineState)
         {
@@ -312,10 +318,7 @@ void ExperimentController::stop(const std::string &errorMessage)
         if (_machineState == IdleMachineState)
             return;
 
-        LidInstance::getInstance()->setEnableMode(false);
-        HeatSinkInstance::getInstance()->setEnableMode(false);
-        HeatBlockInstance::getInstance()->setEnableMode(false);
-        OpticsInstance::getInstance()->setCollectData(false);
+        shutdown();
 
         _experiment.setCompletionStatus(Experiment::Failed);
         _experiment.setCompletionMessage(errorMessage);
@@ -333,6 +336,18 @@ void ExperimentController::stop(const std::string &errorMessage)
     _holdStepTimer->stop();
     _meltCurveTimer->stop();
     _fluorescenceTimer->stop();
+}
+
+bool ExperimentController::shutdown(MachineState checkState)
+{
+    Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
+
+    if (_machineState != checkState)
+        return false;
+
+    shutdown();
+
+    return true;
 }
 
 void ExperimentController::fluorescenceDataCollected()
