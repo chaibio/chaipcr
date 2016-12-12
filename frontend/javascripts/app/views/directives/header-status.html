@@ -21,9 +21,9 @@
   <!-- loading -->
   <div class="header-status" ng-if="loading">
     <div class="row">
-      <div class="col-md-1 menu" ng-transclude>
+      <div class="col-xs-1 menu" ng-transclude>
       </div>
-      <div class="col-md-11 loading B1">
+      <div class="col-xs-11 loading B1">
         <span class="message">Loading <ellipsis-animated></ellipsis-animated></span>
       </div>
     </div>
@@ -33,12 +33,12 @@
 
     <!-- begin is valid -->
     <div class="row" ng-show="experiment.id && !experiment.started_at && !experiment.completed_at && !(statusData.optics.lid_open==='true')&& state==='idle'">
-      <div class="col-md-1 menu" ng-transclude>
+      <div class="col-xs-1 menu" ng-transclude>
       </div>
-      <div class="col-md-7 exp-name x" title="{{experiment.name|uppercase}}">
+      <div class="col-xs-7 exp-name x" title="{{experiment.name|uppercase}}">
         <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
       </div>
-      <div class="col-md-4 controls SHR text-right">
+      <div class="col-xs-4 controls SHR text-right">
         <button id="start-experiment-button"ng-show="!start_confirm_show" class="button-header begin" ng-click="startConfirm()">
           START EXPERIMENT
         </button>
@@ -50,12 +50,12 @@
 
       <!-- begin is invalid LID IS OPEN -->
     <div class="row" ng-show="!experiment.started_at && !experiment.completed_at && (statusData.optics.lid_open==='true')">
-      <div class="col-md-1 menu" ng-transclude>
+      <div class="col-xs-1 menu" ng-transclude>
       </div>
-      <div class="col-md-7 exp-name x" title="{{experiment.name|uppercase}}">
+      <div class="col-xs-7 exp-name x" title="{{experiment.name|uppercase}}">
         <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
       </div>
-      <div class="col-md-4 controls SHR text-right">
+      <div class="col-xs-4 controls SHR text-right">
         <div class="message">LID IS OPEN</div>
         <button class="button-header begin disabled">
           <b>BEGIN EXPERIMENT</b>
@@ -65,12 +65,12 @@
 
       <!-- begin is invalid ANOTHER EXP RUNNING -->
     <div class="row" ng-show="!experiment.started_at && !experiment.completed_at && (state !== 'idle')">
-      <div class="col-md-1 menu" ng-transclude>
+      <div class="col-xs-1 menu" ng-transclude>
       </div>
-      <div class="col-md-5 exp-name x" title="{{experiment.name|uppercase}}">
+      <div class="col-xs-5 exp-name x" title="{{experiment.name|uppercase}}">
         <div ng-show="experiment.id && experiment.name">{{expName(27)}}</div>
       </div>
-      <div class="col-md-6 controls SHR text-right">
+      <div class="col-xs-6 controls SHR text-right">
         <div class="message">
           ANOTHER EXPERIMENT IS RUNNING
           <strong style="cursor: pointer" ui-sref="run-experiment({id: statusData.experiment_controller.experiment.id, chart: 'amplification'})">VIEW NOW</strong>
@@ -83,12 +83,12 @@
 
       <!-- experiment in progress -->
     <div class="row" ng-show="!experiment.completed_at && state !== 'idle' && isCurrentExp">
-      <div class="col-md-1 menu" ng-transclude>
+      <div class="col-xs-1 menu" ng-transclude>
       </div>
-      <div class="col-md-7 exp-name x" title="{{experiment.name|uppercase}}">
+      <div class="col-xs-7 exp-name x" title="{{experiment.name|uppercase}}">
         <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
       </div>
-      <div class="col-md-4 controls SHR text-right">
+      <div class="col-xs-4 controls SHR text-right">
         <div class="message">
           in progress...
           <strong ng-show="state !== 'lid_heating'">
@@ -101,12 +101,12 @@
 
     <!-- experiment complete - final holding state -->
   <div class="row" ng-show="experiment.completed_at && state !== 'idle' && isCurrentExp">
-    <div class="col-md-1 menu" ng-transclude>
+    <div class="col-xs-1 menu" ng-transclude>
     </div>
-    <div class="col-md-6 exp-name x" title="{{experiment.name|uppercase}}">
+    <div class="col-xs-6 exp-name x" title="{{experiment.name|uppercase}}">
       <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
     </div>
-    <div class="col-md-5 controls SHR text-right">
+    <div class="col-xs-5 controls SHR text-right">
       <div class="message" ng-show="!dataAnalysis">
         <strong>Analyzing<ellipsis-animated></ellipsis-animated>  &nbsp;Holding Temperature of {{status.heat_block.temperature | round: 1}} &deg;C</strong>
       </div>
@@ -118,12 +118,12 @@
 
   <!-- experiment complete - data analyzing -->
 <div class="row" ng-show="experiment.completed_at && !(state !== 'idle' && isCurrentExp) && !dataAnalysis && enterState">
-  <div class="col-md-1 menu" ng-transclude>
+  <div class="col-xs-1 menu" ng-transclude>
   </div>
-  <div class="col-md-7 exp-name x" title="{{experiment.name|uppercase}}">
+  <div class="col-xs-7 exp-name x" title="{{experiment.name|uppercase}}">
     <div ng-show="experiment.id && experiment.name">{{expName(32)}}</div>
   </div>
-  <div class="col-md-4 controls SHR text-right">
+  <div class="col-xs-4 controls SHR text-right">
     <div class="message">
       <strong>Run Complete, Analyzing<ellipsis-animated></ellipsis-animated></strong>
     </div>
@@ -132,12 +132,12 @@
 
       <!-- experiment completed successfully -->
     <div class="row" ng-show="experiment.completed_at && !(state !== 'idle' && isCurrentExp) && (dataAnalysis || !enterState)">
-      <div class="col-md-1 menu" ng-transclude>
+      <div class="col-xs-1 menu" ng-transclude>
       </div>
-      <div class="col-md-4 exp-name x" title="{{experiment.name|uppercase}}">
+      <div class="col-xs-4 exp-name x" title="{{experiment.name|uppercase}}">
         <div ng-show="experiment.id && experiment.name">{{expName(20)}}</div>
       </div>
-      <div class="col-md-7 controls SHR text-right">
+      <div class="col-xs-7 controls SHR text-right">
         <div class="message">
           <span ng-show="experiment.completion_status === 'success'">completed</span>
           <span ng-show="experiment.completion_status !== 'success'">
@@ -160,12 +160,12 @@
 
       <!-- experiment has been started and not completed -->
     <div class="row" ng-show="experiment && experiment.started_at && !experiment.completed_at && state==='idle' && (dataAnalysis || !enterState) && done">
-      <div class="col-md-1 menu" ng-transclude>
+      <div class="col-xs-1 menu" ng-transclude>
       </div>
-      <div class="col-md-4 exp-name x" title="{{experiment.name|uppercase}}">
+      <div class="col-xs-4 exp-name x" title="{{experiment.name|uppercase}}">
         <div ng-show="experiment.id && experiment.name">{{expName(20)}}</div>
       </div>
-      <div class="col-md-7 controls SHR text-right">
+      <div class="col-xs-7 controls SHR text-right">
         <div class="message">
           <span class="failed">failed</span>
           User cancelled
