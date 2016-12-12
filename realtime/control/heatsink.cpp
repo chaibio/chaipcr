@@ -68,6 +68,10 @@ void HeatSink::startADCReading()
 
 void HeatSink::resetOutput()
 {
+    _fanControlTimer.cancel(true);
+    _fanTransitionSteps.clear();
+    _fanControlState = false;
+
     setOutput(0);
 }
 
