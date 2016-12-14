@@ -196,7 +196,7 @@ angular.module("canvasApp").factory('stage', [
       this.deleteStageContents = function() {
         this.stageHitPointLeft.setVisible(false);
         this.stageHitPointRight.setVisible(false);
-        
+
         for(var component in this.visualComponents) {
           if(component === "dots") {
             var items = this.dots._objects;
@@ -278,9 +278,6 @@ angular.module("canvasApp").factory('stage', [
 
           var moveCount = (direction === "left") ? -30 : 30;
 
-          if(type === "STEP") {
-            moveCount = (direction === "left") ? -50 : 50;
-          }
           this.stageGroup.set({left: this.left + moveCount }).setCoords();
 
           if(spaceArrayRight && spaceArrayLeft) {
@@ -305,20 +302,12 @@ angular.module("canvasApp").factory('stage', [
           this.stageHitPointLowerLeft.set({left: (this.left + moveCount ) + 10}).setCoords();
           this.stageHitPointLowerRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
           this.left = this.left + moveCount;
-          if(type === "STEP" && this.parent.moveDots.currentIndex === this.index) {
-            // Need rework here , Stage with a shrinked step is a special case;
-            this.childSteps.forEach(function(step, index) {
-              step.specialMoveStep(1, false);
-              step.circle.moveCircleWithStep();
-            });
-            this.parent.moveDots.set({left: this.parent.moveDots.left + moveCount});
-          } else {
-            this.childSteps.forEach(function(step, index) {
-              step.moveStep(1, true);
-              step.circle.moveCircleWithStep();
-            });
-          }
 
+          this.childSteps.forEach(function(step, index) {
+            step.moveStep(1, true);
+            step.circle.moveCircleWithStep();
+          });
+          
           this.stageMovedDirection = direction; // !important
           return "Valid Move";
         }
