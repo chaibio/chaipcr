@@ -69,19 +69,28 @@
 
         if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle') &&  is_current_exp) {
           // experiment is complete
-          Experiment.get($scope.experiment.id).then(function (resp) {
-            $scope.experiment = resp.data.experiment;
+          checkExperimentStatus();
+
+        }
+      });
+
+      function checkExperimentStatus(){
+        Experiment.get($scope.experiment.id).then(function (resp) {
+          $scope.experiment = resp.data.experiment;
+          if($scope.experiment.completed_at){
             params = {id: $scope.experiment.id};
             if( $scope.experiment.completion_status !== 'success') {
               $state.go('analyze', params);
             }
             else {
               $scope.analyzeExperiment();
-
             }
-          });
-        }
-      });
+          }
+          else{
+            $timeout(checkExperimentStatus, 1000);
+          }
+        });
+      }
 
       function checkMachineStatus() {
         Status
