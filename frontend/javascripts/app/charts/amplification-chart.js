@@ -736,9 +736,6 @@
 
     function initChart(elem, data, config) {
 
-      console.log(data);
-      console.log(config);
-
       initGlobalVars();
       Globals.data = data;
       Globals.config = config;
@@ -749,7 +746,12 @@
       var width = Globals.width = elem.parentElement.offsetWidth - config.margin.left - config.margin.right;
       var height = Globals.height = elem.parentElement.offsetHeight - config.margin.top - config.margin.bottom;
 
-      console.log(width, height);
+      // if (width <= 0 || height <= 0 ) {
+      //   setTimeout(function () {
+      //     initChart(elem, data, config);
+      //   }, 1000);
+      //   return;
+      // }
 
       var chartSVG = Globals.chartSVG = d3.select(elem).append("svg")
         .attr("width", width + config.margin.left + config.margin.right)
@@ -931,6 +933,9 @@
     };
 
     this.getTransform = function() {
+      if (!Globals.chartSVG) {
+        return;
+      }
       return d3.zoomTransform(Globals.chartSVG.node());
     };
 
