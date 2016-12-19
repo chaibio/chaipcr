@@ -10,6 +10,7 @@ import sshtunnel
 import MySQLdb
 import pandas as pd
 import numpy as np
+from datetime import datetime
 
 
 def _request2curl(req):
@@ -120,12 +121,13 @@ class ChaiDevice():
         _check_par('experiment id', experiment_id, _type=int, _min=0)
 
         ret = self._rest_session.post(self._rest_prefix + ':8000/control/start', data='{"experiment_id":"%d"}'%experiment_id)
+        status = True
         try:
             if ret.json()['status']['status'] == 'true':
                 return True
             else:
-                raise Exception('Failed to start current experiment')
-        except:
+                raise Exception('Failed to start experiment %d. (%s)'%(experiment_id, ret.json()['status']['error']))
+        except KeyError:
             raise Exception('Invalid reply from instrument')
 
 
@@ -137,8 +139,8 @@ class ChaiDevice():
             if ret.json()['status']['status'] == 'true':
                 return True
             else:
-                raise Exception('Failed to stop current experiment')
-        except:
+                raise Exception('Failed to stop current experiment (%s)'%ret.json()['status']['error'])
+        except KeyError:
             raise Exception('Invalid reply from instrument')
                 
 
@@ -154,7 +156,7 @@ class ChaiDevice():
             raise Exception('Failed to delete experiment id %d'%experiment_id)
 
 
-    def experiment_copy(self, experiment_id=None):
+    def experiment_copy(self, experiment_id=None, name=None):
         """Copy an existing experiment.
 
         Returns the id of the new experiment.
@@ -162,10 +164,20 @@ class ChaiDevice():
         _check_par('experiment id', experiment_id, _type=int, _min=0)
 
         ret = self._rest_session.post(self._rest_prefix + '/experiments/%d/copy'%experiment_id)
+        new_experiment_id = -1
         try:
-            return int(ret.json()['experiment']['id'])
+            new_experiment_id = int(ret.json()['experiment']['id'])
         except:
             raise Exception('Failed to copy experiment id %d'%experiment_id)
+
+        if name:
+            ret = self._rest_session.put(
+                    self._rest_prefix + '/experiments/%d'%new_experiment_id,
+                    headers={'Content-Type':'application/json'}, 
+                    data=json.dumps({'experiment':{'name':name}})
+                    )
+
+        return new_experiment_id
 
 
     def experiment_info(self, experiment_id=None):
@@ -180,7 +192,15 @@ class ChaiDevice():
             raise Exception('Failed to get experiment id %d'%experiment_id)
 
 
-    def experiment_loop(self, experiment_id=None, loop_cnt=100, data_log_duration_s=None, poll_seconds=60, gap_minutes=5, stop_on_error=True, delete_loop_experiments=False):
+    def experiment_loop(
+                   self, 
+                   experiment_id=None, 
+                   loop_cnt=100, 
+                   data_log=False, data_log_duration_s=None, 
+                   poll_seconds=60, gap_minutes=1, 
+                   stop_on_error=True, 
+                   delete_loop_experiments=False
+                   ):
         """Run the same experiment in a loop.
 
         Copies of the experiments are created, run and optionally deleted.
@@ -193,30 +213,51 @@ class ChaiDevice():
         _check_par('loop count', loop_cnt, _type=int, _min=1, _max=1000)
         _check_par('poll seconds', poll_seconds, _type=int, _min=1, _max=3600)
         _check_par('gap minutes', gap_minutes, _type=int, _min=0, _max=1440)
-        if data_log_duration_s != None:
-            _check_par('data log duration (seconds)', data_log_duration_s, _type=int, _min=1)
+
+        exp_info = self.experiment_info(experiment_id)
+        if data_log:
+            if data_log_duration_s != None:
+                _check_par('data log duration (seconds)', data_log_duration_s, _type=int, _min=1)
+            else:
+                if exp_info['experiment']['completion_status'] != 'success':
+                    raise Exception("Template experiment did not complete successfully. Please specify the data_log_duration_s parameter")
+                try:
+                    start_time = datetime.strptime(exp_info['experiment']['started_at'], '%Y-%m-%dT%H:%M:%S.000Z')
+                    end_time = datetime.strptime(exp_info['experiment']['completed_at'], '%Y-%m-%dT%H:%M:%S.000Z')
+                except:
+                    raise Exception("Failed to detect experiment duration.")
+
+                duration = end_time - start_time
+                if duration.days != 0:
+                    raise Exception("Detected invalid experiment duration (days): %d"%duration.days)
+                if duration.seconds < 0 or duration.seconds > 12*3600:
+                    raise Exception("Detected invalid experiment duration (seconds): %d"%duration.seconds)
+                data_log_duration_s = duration.seconds + 60
 
         data={}
 
         for loop in xrange(1, loop_cnt+1):
 
-            new_id = self.experiment_copy(experiment_id)
+            new_id = self.experiment_copy(experiment_id, name = exp_info['experiment']['name'] + '_loop_%d'%loop)
             print("Starting loop %d with experiment id %d"%(loop, new_id))
-            if data_log_duration_s != None:
-                self.data_logger_start(10, data_log_duration_s * 80 - 10)
+
+            if data_log:
+                self.data_logger_start(int(1.2 * data_log_duration_s) * 80, 10)
+
             self.experiment_start(new_id)
             time.sleep(10)
             if self.state() == 'idle':
                 raise Exception('Failed to start loop %d for experiment id %d'%(loop, new_id))
 
-            if data_log_duration_s != None:
-                data[new_id] = self.data_logger_trigger(timeout_s = 2 * data_log_duration_s)
-                pickle.dump(data, open('data.back', 'w'))
-
             while True:
                 time.sleep(poll_seconds)
                 if self.state() == 'idle':
                     break;
+
+            if data_log:
+                data[new_id] = self.data_logger_trigger(timeout_s = 60)
+                self.data_logger_stop()
+                pickle.dump(data, open('data_%s'%self._config['host'], 'w'))
             
             if stop_on_error and self.experiment_info(new_id)['experiment']['completion_status'] != 'success':
                 raise Exception('Loop %d for experiment id %d failed'%(loop, new_id))
@@ -235,6 +276,7 @@ class ChaiDevice():
             self.connect_rest()
 
         print("Finished %d loops for experiment id %d"%(loop, experiment_id))
+
         return data
 
 
@@ -466,8 +508,8 @@ class ChaiDevice():
             if ret.json()['status']['status'] == 'true':
                 return True
             else:
-                raise Exception('Failed to start data logger')
-        except:
+                raise Exception('Failed to start data logger (%s)'%ret.json()['status']['error'])
+        except KeyError:
             raise Exception('Invalid reply from instrument')
 
 
@@ -483,8 +525,8 @@ class ChaiDevice():
             if ret.json()['status']['status'] == 'true':
                 return True
             else:
-                raise Exception('Failed to stop data logger')
-        except:
+                raise Exception('Failed to stop data logger (%s)'%ret.json()['status']['error'])
+        except KeyError:
             raise Exception('Invalid reply from instrument')
 
 
@@ -495,6 +537,7 @@ class ChaiDevice():
             _check_par('timeout (seconds)', timeout_s, int, _min=1)
 
         remote_output_file = '/tmp/data_logger.csv'
+        local_output_file = 'data.csv.%s'%self._config['host']
         self.ssh_command('rm -f ' + remote_output_file)
 
         ret = self._rest_session.post(
@@ -503,8 +546,8 @@ class ChaiDevice():
                 )
         try:
             if ret.json()['status']['status'] != 'true':
-                raise Exception('Failed to trigger data logger')
-        except:
+                raise Exception('Failed to trigger data logger (%s)'%ret.json()['status']['error'])
+        except KeyError:
             raise Exception('Invalid reply from instrument')
 
         ret = []
@@ -523,9 +566,9 @@ class ChaiDevice():
                 time.sleep(1)
                 break
 
-        self.sftp_get(remote_output_file, 'data_logger.csv')
+        self.sftp_get(remote_output_file, local_output_file)
 
-        ret = pd.read_csv('data_logger.csv', header=0)
+        ret = pd.read_csv(local_output_file, header=0)
         ret = ret.set_index(['time_offset'])
 
         return ret
