@@ -31,7 +31,7 @@
             </div>
             <div class="col-sm-5 ampli-toggles">
               <div class="row">
-                <div class="col-md-6" ng-show="is_dual_channel">
+                <div class="col-md-6 plot-type-buttons-col" ng-show="is_dual_channel">
                   <div class="plot-type-buttons">
                     <div class="plot-type-text SHR">COLOR BY</div>
                     <div class="buttons-wrapper SH">
@@ -40,7 +40,7 @@
                     </div>
                   </div>
                 </div>
-                <div ng-class="{'col-md-6': is_dual_channel, 'col-md-12': !is_dual_channel}">
+                <div ng-class="{'col-md-6 plot-type-buttons-col': is_dual_channel, 'col-md-12': !is_dual_channel}">
                   <div class="plot-type-buttons">
                     <div class="plot-type-text SHR">PLOT TYPE</div>
                     <div class="buttons-wrapper SH">
