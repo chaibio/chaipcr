@@ -54,7 +54,7 @@
 
         if($scope.state === 'idle' && $scope.old_state !=='idle') {
           // exp complete
-          $state.go('analyze', {id: $scope.experiment.id});
+          checkExperimentStatus();
         }
 
         if($scope.state === 'idle' && $scope.old_state ==='idle' && $state.current.name === 'exp-running') {
@@ -67,6 +67,18 @@
         if ($state.current.name === 'analyze') Status.stopSync();
 
       }, true);
+
+      function checkExperimentStatus(){
+        Experiment.get($scope.experiment.id).then(function (resp) {
+          $scope.experiment = resp.data.experiment;
+          if($scope.experiment.completed_at){
+            $state.go('analyze', {id: $scope.experiment.id});
+          }
+          else{
+            $timeout(checkExperimentStatus, 1000);
+          }
+        });
+      }
 
 
       $scope.checkMachineStatus = function() {

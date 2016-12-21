@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161028203341) do
+ActiveRecord::Schema.define(version: 20161220070207) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -107,8 +107,8 @@ ActiveRecord::Schema.define(version: 20161028203341) do
     t.string  "baseline_values"
   end
 
-  add_index "fluorescence_debug_data", ["experiment_id", "channel", "ramp_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_chan_ramp_cycle_well", unique: true, using: :btree
-  add_index "fluorescence_debug_data", ["experiment_id", "channel", "step_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_chan_step_cycle_well", unique: true, using: :btree
+  add_index "fluorescence_debug_data", ["experiment_id", "channel", "ramp_id", "cycle_num", "well_num"], name: "index_fluorescence_debug_data_by_exp_chan_ramp_cycle_well", unique: true, using: :btree
+  add_index "fluorescence_debug_data", ["experiment_id", "channel", "step_id", "cycle_num", "well_num"], name: "index_fluorescence_debug_data_by_exp_chan_step_cycle_well", unique: true, using: :btree
 
   create_table "melt_curve_data", force: true do |t|
     t.integer "stage_id",                                                         null: false

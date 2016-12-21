@@ -736,9 +736,6 @@
 
     function initChart(elem, data, config) {
 
-      console.log(data);
-      console.log(config);
-
       initGlobalVars();
       Globals.data = data;
       Globals.config = config;
@@ -928,6 +925,9 @@
     };
 
     this.getTransform = function() {
+      if (!Globals.chartSVG) {
+        return;
+      }
       return d3.zoomTransform(Globals.chartSVG.node());
     };
 

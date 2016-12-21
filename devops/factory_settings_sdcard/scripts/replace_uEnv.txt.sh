@@ -67,6 +67,7 @@ else
 	exit 1
 fi
 
+kernel_ver=$(uname -r);
 UUID=$(blkid $blockdev_rootfs | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
 UUID_p1=$(blkid  $blockdev_boot   | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
 UUID_p2=$(blkid  $blockdev_rootfs | awk -FUUID=\" '{print $2}' | awk -F\" '{print $1}')
@@ -82,6 +83,7 @@ fi
 
 echo "Rootfs Block device found at $UUID"
 
+echo "Kernel version is $kernel_ver"
 echo "/ partition found at $UUID_p2"
 echo "boot partition found at $UUID_p1"
 echo "/data partition found at $UUID_p3"
@@ -208,7 +210,7 @@ cat << _EOF_ > $uEnv
 
 #Docs: http://elinux.org/Beagleboard:U-boot_partitioning_layout_2.0
 
-uname_r=4.4.24-ti-rt-r58
+uname_r=${kernel_ver}
 cmdline=coherent_pool=1M quiet cape_universal=enable
 uuid=${UUID}
 
@@ -219,10 +221,10 @@ uenvcmdsdcard=bootpart=0:1;bootdir=;fdtaddr=0x81FF0000;optargs=quiet capemgr.dis
 uenvcmdsdcard_s2pressed=echo "*** Boot button pressed..!!"; setenv s2pressed 1; run uenvcmdsdcard
 
 #uenvcmd=run shutdown_usb_power;if gpio input 72; then run uenvcmdsdcard_s2pressed; else run uenvcmdmmc; fi
-printenv uenvcmd
-print uenvcmd
-print \$uenvcmd
-echo  "UEnvCMD is \$uenvcmd"
+#printenv uenvcmd
+#print uenvcmd
+#print \$uenvcmd
+#echo  "UEnvCMD is \$uenvcmd"
 
 # Updated: $NOW
 _EOF_

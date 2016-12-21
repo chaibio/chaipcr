@@ -156,6 +156,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.connectToEthernet = function(ethernetParams) {
 
       var delay = $q.defer();
+      ethernetParams.type = "static";
       $http.put(host + ':8000/network/eth0', ethernetParams)
       .then(function(result) {
         delay.resolve(result);

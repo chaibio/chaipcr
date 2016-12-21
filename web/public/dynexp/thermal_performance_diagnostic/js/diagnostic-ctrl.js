@@ -165,10 +165,8 @@
         if (newState === 'idle' && oldState !== 'idle' && $params.id) {
           stopPolling();
           Status.stopSync();
-          getExperiment(function(resp) {
-            $scope.experiment = resp.experiment;
-            if($scope.experiment.completion_status === 'success') analyzeExperiment();
-          });
+          checkExperimentStatus();
+
         }
         if (newState === 'idle' && oldState == 'idle' && $params.id) {
           getExperiment(function(resp) {
@@ -180,6 +178,20 @@
           });
         }
       });
+
+      function checkExperimentStatus(){
+        Experiment.get($scope.experiment.id).then(function (resp) {
+          $scope.experiment = resp.data.experiment;
+          if($scope.experiment.completed_at){
+            if($scope.experiment.completion_status === 'success') {
+              analyzeExperiment();
+            }
+          }
+          else{
+            $timeout(checkExperimentStatus, 1000);
+          }
+        });
+      }
 
       $scope.stopExperiment = function() {
         Experiment.stopExperiment({
