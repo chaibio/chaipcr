@@ -159,6 +159,9 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       ethernetParams.type = "static";
       $http.put(host + ':8000/network/eth0', ethernetParams)
       .then(function(result) {
+        console.log("New ethernet connection");
+        //result = ethernetParams;
+        console.log("data I need", result);
         delay.resolve(result);
       }, function(err) {
         delay.reject(err);

@@ -39,7 +39,10 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     // another variable when we provide that feture
 
     $scope.$watch('autoSetting', function(val, oldVal) {
-      //console.log(val, $scope);
+
+      if(val === "manual") {
+        $scope.buttonValue = "SAVE CHANGES";
+      }
     });
 
     $scope.$on('new_wifi_result', function() {
@@ -48,7 +51,9 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
         $scope.statusMessage = "";
         $scope.currentNetwork = NetworkSettingsService.connectedWifiNetwork;
         $scope.editEthernetData = $scope.currentNetwork.state;
-        $scope.editEthernetData.dns_nameservers = $scope.currentNetwork.settings['dns-nameservers'].split(" ")[0];
+        if($scope.currentNetwork.settings['dns-nameservers']) {
+          $scope.editEthernetData.dns_nameservers = $scope.currentNetwork.settings['dns-nameservers'].split(" ")[0];
+        }
         $scope.connectedSsid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"] || NetworkSettingsService.connectedWifiNetwork.settings.wireless_essid;
         $scope.connectedSsid.replace(new RegExp('"', "g"), "");
           if($state.params.name.replace(new RegExp('_', "g"), " ") === $scope.connectedSsid) {
@@ -68,7 +73,9 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
           if(wifiConnection.state.status === "connected") {
             $scope.currentNetwork = wifiConnection;
             $scope.editEthernetData = $scope.currentNetwork.state;
-            $scope.editEthernetData.dns_nameservers = $scope.currentNetwork.settings['dns-nameservers'].split(" ")[0];
+            if($scope.currentNetwork.settings['dns-nameservers']) {
+              $scope.editEthernetData.dns_nameservers = $scope.currentNetwork.settings['dns-nameservers'].split(" ")[0];
+            }
             $scope.IamConnected = true;
             // We assign this so that, It shows data when we select
             //a wifi network which is already being connected.
@@ -111,8 +118,12 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     };
 
     $scope.connectEthernet = function() {
+      $scope.statusMessage = "";
+      $scope.buttonValue = "CONNECTING";
       NetworkSettingsService.connectToEthernet($scope.editEthernetData).then(function(result) {
-        console.log("ethernet connected", result);
+        console.log(result);
+        $scope.editEthernetData = result;
+        $scope.autoSetting = "auto";
       }, function(err) {
         console.log(err);
       });
