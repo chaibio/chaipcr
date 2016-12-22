@@ -45,6 +45,12 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
       }
     });
 
+    $scope.$on('ethernet_detected', function() {
+      //$scope.ethernetSettings = NetworkSettingsService.connectedEthernet;
+      console.log("I am boosted");
+      $scope.init();
+    });
+
     $scope.$on('new_wifi_result', function() {
 
       if(NetworkSettingsService.connectedWifiNetwork.state.status === "connected") {
@@ -122,7 +128,7 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
       $scope.buttonValue = "CONNECTING";
       NetworkSettingsService.connectToEthernet($scope.editEthernetData).then(function(result) {
         console.log(result);
-        $scope.editEthernetData = result;
+        NetworkSettingsService.getEthernetStatus(); // Get the new ip details as soon as we connect to new ethernet.
         $scope.autoSetting = "auto";
       }, function(err) {
         console.log(err);
