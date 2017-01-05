@@ -150,7 +150,8 @@ void ADCController::process() {
                 if (_currentConversionState != EReadLIA)
                     _consumers[_currentConversionState]->setADCValue(value);
                 else
-                    _consumers[_currentConversionState]->setADCValue(value, _currentChannel);
+                    if (_currentChannel > 0)
+                        _consumers[_currentConversionState]->setADCValue(value, _currentChannel - 1);
             }
             catch (const TemperatureLimitError &ex) {
                 logStream << "ADCController::process - consumer exception: " << ex.what() << std::endl;
@@ -195,7 +196,7 @@ ADCController::ADCState ADCController::calcNextState(size_t &nextChannel) const 
     if (_currentConversionState == EReadLIA) {
         nextChannel = _currentChannel + 1;
 
-        if (nextChannel < qpcrApp.settings().device.opticsChannels)
+        if (nextChannel < 3) //qpcrApp.settings().device.opticsChannels)
             return _currentConversionState;
     }
 
