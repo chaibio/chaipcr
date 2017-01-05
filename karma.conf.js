@@ -1,7 +1,7 @@
 // Karma configuration
 // Generated on Tue Feb 23 2016 14:36:27 GMT+0530 (IST)
 
-FILES = require('./karma-files')
+FILES = require('./karma-files');
 
 module.exports = function(config) {
   config.set({
