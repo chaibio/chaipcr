@@ -135,7 +135,8 @@ void QPCRApplication::initialize(Application&) {
 int QPCRApplication::main(const vector<string>&) {
     HTTPServerParams *params = new HTTPServerParams;
     QPCRServerSocket socket(kHttpServerPort);
-    HTTPServer server(new QPCRRequestHandlerFactory, socket, params);
+    Poco::ThreadPool pool;
+    HTTPServer server(new QPCRRequestHandlerFactory, pool, socket, params);
     Poco::LogStream logStream(Logger::get());
 
     try
