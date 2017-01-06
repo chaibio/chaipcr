@@ -133,7 +133,8 @@ void ADCController::process() {
 
             case EReadLIA:
                 value = _ltc2444->readSingleEndedChannel(kADCOpticsChannels.at(channel), kLIAOversamplingRate);
-                _debugLogger->store(_currentConversionState, value, _currentChannel);
+                if (_currentChannel > 0)
+                    _debugLogger->store(_currentConversionState, value, _currentChannel - 1);
                 break;
 
             case EReadLid:
