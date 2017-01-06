@@ -57,7 +57,7 @@ const int kPIDDerivativeGainLimiter = 12;
 const int kADCRepeatFrequency = 80; // Hz
 const int kADCSPIFrequencyHz = 10000000; //10 MHz
 
-const std::vector<uint8_t> kADCOpticsChannels = { 6, 6, 5 };
+const std::vector<uint8_t> kADCOpticsChannels = { 6, 5 };
 
 const std::string kADCDebugReaderSamplesPath = "/tmp/data_logger.csv";
 

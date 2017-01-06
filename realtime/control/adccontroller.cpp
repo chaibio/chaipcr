@@ -133,7 +133,10 @@ void ADCController::process() {
                 break;
 
             case EReadLIA:
-                value = _ltc2444->readSingleEndedChannel(kADCOpticsChannels.at(channel), kLIAOversamplingRate);
+                if (_currentConversionState == EReadZone2Singular && nextState == EReadLIA && !_ignoreReading)
+                    value = _ltc2444->readSingleEndedChannel(kADCOpticsChannels.back(), kLIAOversamplingRate);
+                else
+                    value = _ltc2444->readSingleEndedChannel(kADCOpticsChannels.at(channel), kLIAOversamplingRate);
 
                 if (!_ignoreReading)
                     _debugLogger->store(_currentConversionState, value, _currentChannel);
