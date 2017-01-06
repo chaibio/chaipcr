@@ -79,6 +79,8 @@ protected:
 
 private:
     ADCDebugLogger *_debugLogger;
+
+    bool _ignoreReading;
 };
 
 #endif
