@@ -103,7 +103,7 @@
       for (var i = Globals.lines.length - 1; i >= 0; i--) {
         var l = Globals.lines[i];
         if (l === path) {
-          activePathConfig = Globals.config.series[i];
+          activePathConfig = getSelectedSeries()[i];
           activePathIndex = i;
           break;
         }
@@ -285,10 +285,10 @@
           Globals.box.RFYTextLabel.text(Globals.config.curve_type === 'normalized' ? 'RFU' : '-dF/dT');
         }
         if (Globals.box.RFYTextValue) {
-          Globals.box.RFYTextValue.text(d[Globals.config.series[conf.index].y]);
+          Globals.box.RFYTextValue.text(d[getSelectedSeries()[conf.index].y]);
         }
         if (Globals.box.cycleTextValue) {
-          Globals.box.cycleTextValue.text(d[Globals.config.series[conf.index].x]);
+          Globals.box.cycleTextValue.text(d[getSelectedSeries()[conf.index].x]);
         }
         if (Globals.box.TmText && Globals.activePathConfig.config.ct) {
           var cfg = Globals.activePathConfig.config;
@@ -397,7 +397,7 @@
     }
 
     function drawLines() {
-      var series = Globals.config.series;
+      var series = getSelectedSeries();
       if (!series) {
         return;
       }
@@ -451,13 +451,13 @@
 
     function getDataLength() {
       if (!Globals.config) return 0;
-      if (!Globals.config.series) return 0;
+      if (!getSelectedSeries()) return 0;
       if (!Globals.data) return 0;
       var total = 0;
-      Globals.config.series.forEach(function(s) {
+      getSelectedSeries().forEach(function(s) {
         total += Globals.data[s.dataset].length;
       });
-      return total / Globals.config.series.length;
+      return total / getSelectedSeries().length;
     }
 
     function makeCircle() {
@@ -560,7 +560,7 @@
     }
 
     function getMinX() {
-      var min = d3.min(Globals.config.series, function(s) {
+      var min = d3.min(getSelectedSeries(), function(s) {
         return d3.min(Globals.data[s.dataset], function(d) {
           return d[s.x];
         });
@@ -569,7 +569,7 @@
     }
 
     function getMaxX() {
-      var max = d3.max(Globals.config.series, function(s) {
+      var max = d3.max(getSelectedSeries(), function(s) {
         return d3.max(Globals.data[s.dataset], function(d) {
           return d[s.x];
         });
@@ -581,7 +581,7 @@
       if (Globals.config.axes.y.min) {
         return Globals.config.axes.y.min;
       }
-      var min_y = d3.min(Globals.config.series, function(s) {
+      var min_y = d3.min(getSelectedSeries(), function(s) {
         return d3.min(Globals.data[s.dataset], function(d) {
           return d[s.y];
         });
@@ -623,6 +623,12 @@
       }
       return calibs;
     };
+
+    function getSelectedSeries () {
+      return _.filter(Globals.config.series, function (s) {
+        return s.selected;
+      });
+    }
 
     function setYAxis() {
 
@@ -712,6 +718,7 @@
         .attr('class', 'mouse-indicator-circle')
         .on('mouseout', hideMouseIndicators)
         .on('mousemove', mouseMoveCb);
+
       if (lastPos) {
         Globals.xAxisCircle.attr('cx', lastPos.cx);
         Globals.xAxisCircle.attr('cy', lastPos.cy);
@@ -964,7 +971,7 @@
     };
 
     this.updateSeries = function(series) {
-      Globals.config.series = series;
+      getSelectedSeries() = series;
     };
 
     this.updateData = function(data) {
