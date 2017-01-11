@@ -131,7 +131,7 @@ InterfaceSettings readInterfaceSettings(const std::string &filePath, const std::
     if (interface.arguments.find("dns-nameservers") != interface.arguments.end() && interface.arguments["dns-nameservers"].at(0) == ' ')
         interface.arguments["dns-nameservers"] = interface.arguments["dns-nameservers"].substr(1);
 
-    if (interface.type == "static" && interface.arguments.find("gateway") == interface.arguments.end())
+    if (interface.arguments.find("gateway") == interface.arguments.end())
         interface.arguments["gateway"] = getInterfaceGateway(interfaceName);
 
     return interface;
