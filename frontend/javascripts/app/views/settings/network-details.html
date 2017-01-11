@@ -83,10 +83,10 @@
       <div class="network-parameter-text-container"><span>Router</span></div>
       <div class="network-parameter-data-container"></div>
     </div> -->
-    <div ng-show="autoSetting=='manual'" class="network-parameter-container">
+    <div class="network-parameter-container">
       <div class="network-parameter-text-container"><span>Gateway IP</span></div>
       <div class="network-parameter-data-container">
-      <!--  <span ng-show="autoSetting=='auto'">{{editEthernetData.gateway}}</span> -->
+       <span ng-show="autoSetting=='auto'">{{editEthernetData.gateway}}</span>
         <ip-address ng-show="autoSetting=='manual'" value="editEthernetData.gateway"></ip-address>
       </div>
     </div>
