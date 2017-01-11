@@ -24,14 +24,15 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
   '$state',
   'NetworkSettingsService',
   '$timeout',
-  function($scope, $stateParams, User, $state, NetworkSettingsService, $timeout) {
+  '$window',
+  function($scope, $stateParams, User, $state, NetworkSettingsService, $timeout, $window) {
 
     $scope.name = $state.params.name.replace(new RegExp("_", "g"), " ");
     $scope.buttonValue = "CONNECT";
     $scope.IamConnected = false;
     $scope.statusMessage = "";
     $scope.currentNetwork = {};
-    $scope.autoSetting = "auto"; // This variable controls set auto/manual.
+    $scope.autoSetting = ""; // This variable controls set auto/manual.
     $scope.connectedSsid = "";
     $scope.selectedWifiNow = NetworkSettingsService.listofAllWifi[$scope.name] || null; //
     $scope.wifiNetworkType = null; // We have different settings for wep2 and wpa , so we need to look for the type of network.
@@ -43,6 +44,11 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
       if(val === "manual") {
         $scope.buttonValue = "SAVE CHANGES";
       }
+
+      if(val === "auto" && $scope.currentNetwork.settings.type === "static"){
+        $scope.changeToAutomatic();
+      }
+
     });
 
     $scope.$on('ethernet_detected', function() {
@@ -133,7 +139,25 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
       }, function(err) {
         console.log(err);
       });
+      $timeout($scope.goToNewIp, 5000);
     };
+
+    $scope.goToNewIp = function(){
+      var url = 'http://' + $scope.editEthernetData.address;
+      $window.location.href = url;
+    }
+
+    $scope.changeToAutomatic = function (){
+      var ethernet ={};
+      ethernet.type = "dhcp";
+      NetworkSettingsService.changeToAutomatic(ethernet).then(function(result) {
+        console.log(result);
+        NetworkSettingsService.getEthernetStatus(); // Get the new ip details as soon as we connect to new ethernet.
+        $scope.autoSetting = "auto";
+      }, function(err) {
+        console.log(err);
+      });
+    }
 
     $scope.init = function() {
 
@@ -183,12 +207,25 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
         $scope.editEthernetData = $scope.currentNetwork.state;
         $scope.editEthernetData.type = $scope.currentNetwork.settings.type;
 
-        if(! $scope.currentNetwork.state.gateway) {
-          $scope.editEthernetData.gateway = '0.0.0.0';
+        if($scope.currentNetwork.settings.type == "static"){
+          $scope.autoSetting = "manual";
+        }
+        else{
+          $scope.autoSetting = "auto";
         }
 
-        if(! $scope.currentNetwork.state['dns-nameservers']) {
+        if(! $scope.currentNetwork.settings.gateway) {
+          $scope.editEthernetData.gateway = '0.0.0.0';
+        }
+        else{
+          $scope.editEthernetData.gateway = $scope.currentNetwork.settings.gateway;
+        }
+
+        if(! $scope.currentNetwork.settings['dns-nameservers']) {
           $scope.editEthernetData['dns-nameservers'] = '0.0.0.0';
+        }
+        else{
+          $scope.editEthernetData['dns-nameservers'] = $scope.currentNetwork.settings['dns-nameservers'].split(" ")[0];
         }
       } else {
         $timeout(function() {
