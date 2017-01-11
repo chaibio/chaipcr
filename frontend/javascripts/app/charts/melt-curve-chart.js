@@ -300,7 +300,7 @@
 
     function makeGuidingLine(line_config) {
       var line = d3.line()
-        .curve(d3.curveMonotoneX)
+        .curve(d3.curveBasis)
         .x(function(d) {
           return Globals.xScale(d[line_config.x]);
         })
@@ -323,7 +323,7 @@
 
     function makeColoredLine(line_config) {
       var line = d3.line()
-        .curve(d3.curveMonotoneX)
+        .curve(d3.curveBasis)
         .x(function(d) {
           return Globals.xScale(d[line_config.x]);
         })
@@ -372,7 +372,7 @@
         Globals.whiteBorderLine.remove();
       }
       var line = d3.line()
-        .curve(d3.curveMonotoneX)
+        .curve(d3.curveBasis)
         .x(function(d) {
           return Globals.xScale(d[line_config.x]);
         })

@@ -298,9 +298,13 @@
     }
 
     function makeGuidingLine(line_config) {
-      var line = d3.line()
-        .curve(d3.curveMonotoneX)
-        .x(function(d) {
+      var line = d3.line();
+      if (Globals.config.axes.y.scale === 'log') {
+        line.curve(d3.curveMonotoneX);
+      } else {
+        line.curve(d3.curveBasis);
+      }
+      line.x(function(d) {
           return Globals.xScale(d[line_config.x]);
         })
         .y(function(d) {
@@ -321,14 +325,19 @@
     }
 
     function makeColoredLine(line_config) {
-      var line = d3.line()
-        .curve(d3.curveMonotoneX)
-        .x(function(d) {
+      var line = d3.line();
+      if (Globals.config.axes.y.scale === 'log') {
+        line.curve(d3.curveMonotoneX);
+      } else {
+        line.curve(d3.curveBasis);
+      }
+      line.x(function(d) {
           return Globals.xScale(d[line_config.x]);
         })
         .y(function(d) {
           return Globals.yScale(d[line_config.y]);
         });
+
       if (Globals.config.axes.y.scale === 'log') {
         line.defined(function(d) {
           return d[line_config.y] > 10;
@@ -366,13 +375,17 @@
       return _path;
     }
 
-    function makeWhiteBorderLine (line_config) {
+    function makeWhiteBorderLine(line_config) {
       if (Globals.whiteBorderLine) {
         Globals.whiteBorderLine.remove();
       }
-      var line = d3.line()
-        .curve(d3.curveMonotoneX)
-        .x(function(d) {
+      var line = d3.line();
+      if (Globals.config.axes.y.scale === 'log') {
+        line.curve(d3.curveMonotoneX);
+      } else {
+        line.curve(d3.curveBasis);
+      }
+      line.x(function(d) {
           return Globals.xScale(d[line_config.x]);
         })
         .y(function(d) {
