@@ -38,7 +38,8 @@ public:
     enum Type
     {
         NoneType,
-        DiagnosticType
+        DiagnosticType,
+        CalibrationType
     };
 
     Experiment();

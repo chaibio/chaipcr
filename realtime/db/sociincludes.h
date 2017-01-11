@@ -163,6 +163,8 @@ struct type_conversion<Experiment::Type>
         {
             if (in == "diagnostic")
                 out = Experiment::DiagnosticType;
+            else if (in == "calibration")
+                out = Experiment::CalibrationType;
             else
                 out = Experiment::NoneType;
         }

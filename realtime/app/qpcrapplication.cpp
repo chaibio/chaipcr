@@ -231,6 +231,21 @@ void QPCRApplication::readDeviceFile()
 
         if (it != ptree.not_found())
             _settings.device.modelNumber = it->second.get_value<std::string>();
+
+        it = ptree.find("hardware_definition");
+
+        if (it != ptree.not_found())
+        {
+            for (const std::pair<const std::string, boost::property_tree::ptree> &item: it->second)
+            {
+                if (item.first == "001084")
+                {
+                    _settings.device.fanChange = true;
+                    break;
+                }
+            }
+        }
+
     }
     else
         stream << "QPCRApplication::readDeviceFile - unable to read device file: " << std::strerror(errno) << std::endl;
