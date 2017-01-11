@@ -2,7 +2,7 @@
 
 
 # scaling factors
-const SCALING_FACTORS_deconv = OrderedDict(1=>1.0, 2=>5.6) # used: OrderedDict(1 => 1, 2 => oneof(1, 2, 3.5, 8, 7, 5.6))
+const SCALING_FACTORS_deconv = OrderedDict(1=>1.0, 2=>4.2) # used: OrderedDict(1 => 1, 2 => oneof(1, 2, 3.5, 8, 7, 5.6, 4.2))
 const SCALING_FACTOR_adj_w2wvaf = 3.7 # used: 9e5, 1e5, 1.2e6, 3
 
 
