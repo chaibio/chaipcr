@@ -94,10 +94,21 @@
       width: 1024px;
       overflow-x: hidden;
       overflow-y: hidden;
+      position: relative;
 
       .canvasClass {
         width: 300px;
         height: 300px;
+      }
+      .canvas-loading {
+        width: 70px;
+        height: 30px;
+        font-weight: bold;
+        font-size: 14px;
+        font-family: "dinot";
+        margin: 0 auto;
+        position: relative;
+        top: -200px;
       }
     }
   }

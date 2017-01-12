@@ -1,4 +1,4 @@
-describe("Resting canvas.js", function() {
+describe("Testing canvas.js", function() {
 
   beforeEach(module("ChaiBioTech"));
 
