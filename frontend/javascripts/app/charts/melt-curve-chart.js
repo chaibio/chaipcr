@@ -45,7 +45,6 @@
         hoveredPathStrokeWidth: 3,
         activePathStrokeWidth: 5,
         dashedLineStrokeWidth: 2,
-        circleRadius: 6,
         circleStrokeWidth: 2,
         circleRadius: 7,
         prevMouseOverlayMousePos: null,
@@ -167,7 +166,7 @@
       var boxMargin = {
         top: 0,
         left: 10
-      }
+      };
 
       Globals.box = {};
 
@@ -397,7 +396,9 @@
     }
 
     function drawLines() {
-      var series = getSelectedSeries();
+      var series = getSelectedSeries(),
+          i,
+          s;
       if (!series) {
         return;
       }
@@ -417,13 +418,13 @@
 
       Globals.dashedLine = makeDashedLine();
 
-      for (var i = 0; i < series.length; i++) {
-        var s = series[i];
+      for (i = 0; i < series.length; i++) {
+        s = series[i];
         Globals.guidingLines.push(makeGuidingLine(s));
       }
 
-      for (var i = 0; i < series.length; i++) {
-        var s = series[i];
+      for (i = 0; i < series.length; i++) {
+        s = series[i];
         Globals.lines.push(makeColoredLine(s));
       }
 
@@ -434,8 +435,8 @@
 
         makeCircle();
 
-        for (var i = 0; i < series.length; i++) {
-          var s = series[i];
+        for (i = 0; i < series.length; i++) {
+          s = series[i];
           if (s.well === Globals.activePathConfig.config.well && s.channel === Globals.activePathConfig.config.channel) {
             p = Globals.lines[i];
             break;
@@ -622,7 +623,7 @@
         calib = calib * 10;
       }
       return calibs;
-    };
+    }
 
     function getSelectedSeries () {
       return _.filter(Globals.config.series, function (s) {
@@ -692,7 +693,6 @@
         Globals.xAxis.tickValues = Globals.config.axes.x.ticks;
       }
       if (Globals.config.axes.x.tickFormat) {
-        console.log(Globals.config.axes.x);
         Globals.xAxis.tickFormat(Globals.config.axes.x.tickFormat);
       }
       Globals.gX = svg.append("g")
@@ -796,7 +796,7 @@
       drawLines(config.series);
       makeCircle();
       Globals.activePath = null;
-      updateZoomScaleExtent()
+      updateZoomScaleExtent();
 
     }
 
@@ -889,7 +889,7 @@
       }
       var mouseX = mouse[0];
       var mouseY = mouse[1];
-      var closestLineIndex = undefined;
+      var closestLineIndex;
       var distances = [];
       var lineIndex;
       var maxDistance = 20 * Globals.zoomTransform.k;
@@ -934,7 +934,7 @@
       var new_width = Globals.width * transform.k;
       var transform_x = -((new_width - Globals.width) * scroll);
       return transform_x;
-    }
+    };
 
     this.scroll = function scroll(s) { // s = {0..1}
       var transform = this.getTransform();
@@ -971,7 +971,7 @@
     };
 
     this.updateSeries = function(series) {
-      getSelectedSeries() = series;
+      Globals.config.series = series;
     };
 
     this.updateData = function(data) {
