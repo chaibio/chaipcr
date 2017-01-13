@@ -67,7 +67,8 @@ angular.module("canvasApp").factory('canvas', [
       angular.element('.canvas-loading').hide();
       if(this.canvas) this.canvas.clear();
       this.canvas = new fabric.Canvas('canvas', {
-        backgroundColor: '#FFB300', selection: false, stateful: true
+        backgroundColor: '#FFB300', selection: false, stateful: true,
+        perPixelTargetFind: true, renderOnAddRemove: false, skipTargetFind: false,
       });
       circleManager.init(this);
       new events(this, this.$scope); // Fire the events;
