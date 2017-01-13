@@ -20,6 +20,7 @@
 #include "networkinterfaces.h"
 #include "util.h"
 #include "logger.h"
+#include "exceptions.h"
 
 #include <fstream>
 #include <sstream>
@@ -325,7 +326,12 @@ std::string getInterfaceGateway(const std::string &interface)
 {
     std::stringstream output;
 
-    Util::watchProcess("route -n | grep " + interface, [&output](const char *buffer, std::size_t size){ output.write(buffer, size); });
+    try {
+        Util::watchProcess("route -n | grep " + interface, [&output](const char *buffer, std::size_t size){ output.write(buffer, size); });
+    }
+    catch (const ProcessError &/*ex*/) { //Ignoring process errors because mostly they mean that the interface is not connected thus does not have a gateway address
+        return std::string();
+    }
 
     std::string entry;
     std::getline(output, entry);
