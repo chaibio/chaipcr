@@ -148,7 +148,7 @@ angular.module("canvasApp").factory('canvas', [
         this.canvas.add(this.stepBeacon);
         this.canvas.add(this.stepBrick);
         this.canvas.add(this.hitBlock);
-        this.addMoveDots();
+        //this.addMoveDots();
     };
 
     this.addMoveDots = function() {
@@ -230,6 +230,7 @@ angular.module("canvasApp").factory('canvas', [
 
       var leftVal = {};
       stage.dots.setVisible(status);
+      stage.dots.setCoords();
       this.canvas.bringToFront(stage.dots);
       if(status === true) {
 

@@ -42,15 +42,23 @@ angular.module("canvasApp").factory('stageGraphics', [
     this.dotsOnStage = function() {
 
       var editStageStatus = this.parent.editStageStatus;
-      var supportRect = new fabric.Rect({
+
+      /*var supportRect = new fabric.Rect({
         left: -2,  top: -2, fill: '',  width: 20,  height: 20,
-      });
+      });*/
       var dotsArray = dots.stageDots();
-      dotsArray.push(supportRect);
+      //dotsArray.push(supportRect);
+
+      this.dotsBackground = new fabric.Rect({
+        width: 15, height: 14, fill: '#FFB300', left: 0, top: -2, selectable: false,
+        originX: 'left', originY: 'top', //fill: 'black'
+      });
+
+      dotsArray.unshift(this.dotsBackground);
 
       this.dots = new fabric.Group(dotsArray, {
         originX: "left", originY: "top", left: this.left, top: 6, hasControls: false, width: 22, height: 22, visible: editStageStatus,
-        parent: this, name: "moveStage", lockMovementY: true, hasBorders: false, selectable: true,
+        parent: this, name: "moveStage", lockMovementY: true, hasBorders: false, selectable: true, backgroundColor: ''
       });
       return this;
     };
@@ -106,12 +114,12 @@ angular.module("canvasApp").factory('stageGraphics', [
     this.createStageHitPoint = function() {
 
       this.stageHitPointLeft = new fabric.Rect({
-        width: 10, height: 10, fill: '', left: this.left + 10, top: 10, selectable: false, name: "stageHitPointLeft",
+        width: 10, height: 200, fill: '', left: this.left + 10, top: 10, selectable: false, name: "stageHitPointLeft",
         originX: 'left', originY: 'top', //fill: 'black'
       });
 
       this.stageHitPointRight = new fabric.Rect({
-        width: 10, height: 10, fill: '', left: (this.left + this.width) - 20, top: 10, selectable: false, name: "stageHitPointRight",
+        width: 10, height: 200, fill: '', left: (this.left + this.width) - 20, top: 10, selectable: false, name: "stageHitPointRight",
         originX: 'left', originY: 'top', //fill: 'black'
       });
 
