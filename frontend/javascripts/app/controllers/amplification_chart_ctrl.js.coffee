@@ -182,7 +182,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.$parent.chart
       , (chart) ->
         if chart is 'amplification'
-          # if !$scope.hasData
           fetchFluorescenceData()
 
           $timeout ->
