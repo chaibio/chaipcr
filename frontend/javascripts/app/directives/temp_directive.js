@@ -20,7 +20,9 @@
 window.ChaiBioTech.ngApp.directive('temp', [
   'ExperimentLoader',
   '$timeout',
-  function(ExperimentLoader, $timeout) {
+  'alerts',
+  '$uibModal',
+  function(ExperimentLoader, $timeout, alerts, $uibModal) {
     return {
       restric: 'EA',
       replace: true,
@@ -59,10 +61,22 @@ window.ChaiBioTech.ngApp.directive('temp', [
           }
         };
 
+        scope.showMessage = function(message) {
+
+          scope.warningMessage = message;
+          scope.modal = $uibModal.open({
+            scope: scope,
+            templateUrl: 'app/views/modal-warning.html',
+            windowClass: 'small-modal'
+            // This is tricky , we used it here so that,
+            //Custom size of this modal doesn't change any other modal in use
+          });
+        };
+
         scope.save = function() {
 
           scope.edit = false;
-          if(! isNaN(scope.shown)) {
+          if(! isNaN(scope.shown) && Number(scope.shown) < 100 && Number(scope.shown) > -100) {
             if(editValue !== Number(scope.shown)) {
               scope.reading = scope.shown;
               $timeout(function() {
@@ -72,6 +86,8 @@ window.ChaiBioTech.ngApp.directive('temp', [
               });
               return true;
             }
+          } else {
+            scope.showMessage(alerts.autoDeltaTemp);
           }
           scope.shown = Number(scope.reading).toFixed(1);
         };

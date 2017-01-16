@@ -28,7 +28,8 @@ window.ChaiBioTech.ngApp.service('alerts', [
       startOnCycleMinimum: "The minimum value you can enter is 1 please input a value greater than zero.",
       rampSpeedWarning: "Please enter a valid integer value less than 1000.",
       holdDurationZeroWarning: "Plese enter a non zero value, Only last step with collect_data turned off, can be assigned with infinite hold.",
-      internalServerError: "There is an internal server error pleas re-load the page"
+      internalServerError: "There is an internal server error pleas re-load the page",
+      autoDeltaTemp: "Please enter a value in the range [-99 To 99]"
     };
   }
 ]);
