@@ -109,7 +109,7 @@ angular.module("canvasApp").directive('actions', [
         };
 
         scope.editStage = function() {
-          
+
           scope.editStageMode = ! scope.editStageMode;
           scope.editStageText = (scope.editStageMode) ? "DONE" : "EDIT STAGES";
           canvas.editStageMode(scope.editStageMode);
@@ -117,8 +117,8 @@ angular.module("canvasApp").directive('actions', [
         };
 
         scope.addPause = function() {
-
-          if(! scope.infiniteHoldStep && ! scope.summaryMode) {
+          
+          if(! scope.infiniteHoldStep && ! scope.summaryMode && ! scope.step.collect_data) {
             scope.step.pause = ! scope.step.pause;
             ExperimentLoader.changePause(scope)
             .then(function(data) {

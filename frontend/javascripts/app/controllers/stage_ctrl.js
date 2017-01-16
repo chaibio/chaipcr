@@ -25,7 +25,8 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
   'alerts',
   'expName',
   '$rootScope',
-  function($scope, ExperimentLoader, canvas, $uibModal, alerts, expName, $rootScope) {
+  '$window',
+  function($scope, ExperimentLoader, canvas, $uibModal, alerts, expName, $rootScope, $window) {
 
     var that = this;
     $scope.stage = {};
@@ -38,6 +39,29 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
     $scope.$watch("selected", function() {
       console.log("lets change val");
     });
+
+    $rootScope.$on('event:error-server', function() {
+      $scope.showMessageServerSide(alerts.internalServerError);
+    });
+
+    $scope.showMessageServerSide = function(message) {
+
+      $scope.warningMessage = message;
+      $scope.modal = $uibModal.open({
+        scope: $scope,
+        templateUrl: 'app/views/modal-error-warning.html',
+        windowClass: 'small-modal',
+        //controller: this,
+        // This is tricky , we used it here so that,
+        //Custom size of this modal doesn't change any other modal in use
+      });
+
+    };
+
+    $scope.reload = function() {
+      $window.location.reload();
+    };
+
 
     $scope.initiate = function() {
 
@@ -179,7 +203,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
 
       if(hour === "00") {
         return negative + min + ":" + noSec;
-      } 
+      }
       return negative + hour + ":" + min + ":" + noSec;
     };
 
