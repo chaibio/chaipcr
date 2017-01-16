@@ -140,14 +140,15 @@ gulp.task('copy-js-to-tmp', ['clean-js', 'templates'], function() {
         .pipe(gulp.dest('.tmp/js'));
 });
 
-gulp.task('jslint', ['clean-js', 'coffee', 'es6', 'copy-js-to-tmp', 'templates'], function() {
+// gulp.task('jslint', ['clean-js', 'coffee', 'es6', 'copy-js-to-tmp', 'templates'], function() {
+gulp.task('jslint', [], function() {
 
     return gulp.src('./frontend/javascripts/app/**/*.js')
         .pipe(jshint())
         .pipe(jshint.reporter('default'));
 });
 
-gulp.task('concat-js', ['clean-js', 'coffee', 'copy-js-to-tmp', 'templates', 'dynamicexp:relink'], function() {
+gulp.task('concat-js', ['jslint', 'clean-js', 'coffee', 'copy-js-to-tmp', 'templates', 'dynamicexp:relink'], function() {
     var files = vendorFiles.concat(appFiles);
 
     for (var i = files.length - 1; i >= 0; i--) {
