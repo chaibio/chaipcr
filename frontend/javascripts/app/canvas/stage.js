@@ -271,12 +271,40 @@ angular.module("canvasApp").factory('stage', [
 
       };
 
+      //
+      this.makeSurePreviousMovedLeft = function() {
+        var stage = this.previousStage;
+        while(stage) {
+          if(stage.stageMovedDirection !== "left") {
+            stage.moveToSide("left");
+          }
+          stage = stage.previousStage;
+        }
+      };
+      //
+      this.makeSureNextMovedRight = function() {
+        var stage = this.nextStage;
+        while(stage) {
+          if(stage.stageMovedDirection !== "right") {
+            stage.moveToSide("right");
+          }
+          stage = stage.nextStage;
+        }
+      };
+
       //This method is used when move stage hits at the hitPoint at the side of the stage.
-      this.moveToSide = function(direction, verticalLine, spaceArrayRight, spaceArrayLeft, type) {
+      this.moveToSide = function(direction, verticalLine, spaceArrayRight, spaceArrayLeft) {
 
         if(this.validMove(direction)) {
 
-          var moveCount = (direction === "left") ? -30 : 30;
+          var moveCount;
+          if(direction === "left") {
+            moveCount = -30;
+            this.makeSurePreviousMovedLeft();
+          } else if("right") {
+            moveCount = 30;
+            this.makeSureNextMovedRight();
+          }
 
           this.stageGroup.set({left: this.left + moveCount }).setCoords();
 
@@ -303,11 +331,13 @@ angular.module("canvasApp").factory('stage', [
           this.stageHitPointLowerRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
           this.left = this.left + moveCount;
 
+
+
           this.childSteps.forEach(function(step, index) {
             step.moveStep(1, true);
             step.circle.moveCircleWithStep();
           });
-          
+
           this.stageMovedDirection = direction; // !important
           return "Valid Move";
         }
@@ -323,7 +353,6 @@ angular.module("canvasApp").factory('stage', [
             if(this.index === 0) {
               return false;
             }
-            //console.log("sensing");
             // look if we have space at left;
             if(this.previousStage && this.left - (this.previousStage.left + this.previousStage.myWidth) < 10) {
               return false;
