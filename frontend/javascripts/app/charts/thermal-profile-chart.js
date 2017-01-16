@@ -508,7 +508,7 @@
       var new_width = Globals.width * transform.k;
       var transform_x = -((new_width - Globals.width) * scroll);
       return transform_x;
-    }
+    };
 
     this.scroll = function scroll(s) { // s = {0..1}
       var transform = this.getTransform();
@@ -546,7 +546,7 @@
 
     this.setMouseMoveListener = function(fn) {
       Globals.onMouseMove = fn;
-    }
+    };
 
     this.updateSeries = function(series) {
       Globals.config.series = series;

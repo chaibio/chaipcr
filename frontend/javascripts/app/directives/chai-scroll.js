@@ -53,6 +53,6 @@ window.ChaiBioTech.ngApp.directive('chaiScroll', [
       link: function($scope, elem, attr) {
 
       }
-    }
+    };
   }
 ]);

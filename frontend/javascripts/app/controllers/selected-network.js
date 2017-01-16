@@ -145,7 +145,7 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     $scope.goToNewIp = function(){
       var url = 'http://' + $scope.editEthernetData.address;
       $window.location.href = url;
-    }
+    };
 
     $scope.changeToAutomatic = function (){
       var ethernet ={};
@@ -157,7 +157,7 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
       }, function(err) {
         console.log(err);
       });
-    }
+    };
 
     $scope.init = function() {
 
