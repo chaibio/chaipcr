@@ -73,7 +73,9 @@ void DBControl::process()
         {
             {
                 std::unique_lock<std::mutex> lock(_writeQueueMutex);
-                _writeCondition.wait(lock);
+
+                if (_writeQueriesQueue.empty())
+                    _writeCondition.wait(lock);
 
                 queries = std::move(_writeQueriesQueue);
             }
@@ -84,7 +86,9 @@ void DBControl::process()
                 std::lock_guard<std::mutex> lock(_writeMutex);
 
                 for (const std::string &query: queries)
+                {
                     statements.emplace_back((_writeSession->prepare << query));
+                }
 
                 write(statements);
             }
@@ -775,10 +779,9 @@ void DBControl::addWriteQueries(std::vector<std::string> &queries)
 {
     if (!queries.empty())
     {
-        _writeQueueMutex.lock();
-        _writeQueriesQueue.insert(_writeQueriesQueue.end(), std::make_move_iterator(queries.begin()), std::make_move_iterator(queries.end()));
-        _writeQueueMutex.unlock();
+        std::lock_guard<std::mutex> lock(_writeQueueMutex);
 
+        _writeQueriesQueue.insert(_writeQueriesQueue.end(), std::make_move_iterator(queries.begin()), std::make_move_iterator(queries.end()));
         _writeCondition.notify_all();
     }
 }
