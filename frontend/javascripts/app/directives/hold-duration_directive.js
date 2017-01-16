@@ -116,8 +116,10 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
             } else {
               $timeout(function() {
                 scope.reading = newHoldTime;
-                ExperimentLoader.changeHoldDuration(scope.$parent).then(function(data) {
-                  console.log(data);
+                $timeout(function() {
+                  ExperimentLoader.changeHoldDuration(scope.$parent).then(function(data) {
+                    console.log(data, scope);
+                  });
                 });
               });
             }
