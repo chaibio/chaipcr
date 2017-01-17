@@ -39,7 +39,7 @@ angular.module("canvasApp").factory('canvas', [
     moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageHitBlock, stageGraphics) {
 
     this.init = function(model) {
-
+      
       this.model = model.protocol;
       this.$scope = model;
       this.allStepViews = [];
@@ -148,7 +148,7 @@ angular.module("canvasApp").factory('canvas', [
         this.canvas.add(this.stepBeacon);
         this.canvas.add(this.stepBrick);
         this.canvas.add(this.hitBlock);
-        this.addMoveDots();
+        this.addMoveDots(); // This is for movestep
     };
 
     this.addMoveDots = function() {
