@@ -22,16 +22,16 @@
       <div class="chart-section">
         <div class="curve-header">
           <div class="row">
-            <div class="col-sm-7 curve-name">
+            <div class="col-lg-5 col-md-6 col-sm-6 col-xs-6 curve-name">
               <!-- <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()"> -->
               <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart">
                 Amplification Curve
                 <img class="arrow-down" src="/images/arrow-down.png">
               </chart-chooser>
             </div>
-            <div class="col-sm-5 ampli-toggles">
+            <div class="col-lg-7 col-md-6 col-sm-6 col-xs-6 ampli-toggles">
               <div class="row">
-                <div class="col-md-6 plot-type-buttons-col" ng-show="is_dual_channel">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 plot-type-buttons-col" ng-show="is_dual_channel">
                   <div class="plot-type-buttons">
                     <div class="plot-type-text SHR">COLOR BY</div>
                     <div class="buttons-wrapper SH">
@@ -40,7 +40,7 @@
                     </div>
                   </div>
                 </div>
-                <div ng-class="{'col-md-6 plot-type-buttons-col': is_dual_channel, 'col-md-12': !is_dual_channel}">
+                <div ng-class="{'col-lg-6 col-md-6 col-sm-6 col-xs-6 plot-type-buttons-col': is_dual_channel, 'col-md-12': !is_dual_channel}">
                   <div class="plot-type-buttons">
                     <div class="plot-type-text SHR">PLOT TYPE</div>
                     <div class="buttons-wrapper SH">
@@ -85,7 +85,7 @@
           <div class="text-center num-cycle-text SH">CYCLE NUMBER</div>
           <div class="ampli-zoom-scroll-container">
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
                 <div class="zoom-container">
                   <div class="zoom-text SH">
                     <b>ZOOM</b>
@@ -93,7 +93,7 @@
                   <ampli-slider ng-model="ampli_zoom"></ampli-slider>
                 </div>
               </div>
-              <div class="col-md-6 ampli-scrollbar-container">
+              <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 ampli-scrollbar-container">
                 <scrollbar ng-model="ampli_scroll"></scrollbar>
               </div>
             </div>
