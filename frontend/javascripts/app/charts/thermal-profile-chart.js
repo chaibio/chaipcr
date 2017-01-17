@@ -379,7 +379,8 @@
       var width = Globals.width = elem.parentElement.offsetWidth - config.margin.left - config.margin.right;
       var height = Globals.height = elem.parentElement.offsetHeight - config.margin.top - config.margin.bottom;
 
-      var chartSVG = Globals.chartSVG = d3.select(elem).append("svg")
+      var chartSVG = Globals.chartSVG = d3.select(elem)
+        .append("svg")
         .attr("width", width + config.margin.left + config.margin.right)
         .attr("height", height + config.margin.top + config.margin.bottom)
         .call(Globals.zooomBehavior)
@@ -406,7 +407,7 @@
 
     }
 
-    function hasData () {
+    function hasData() {
       if (!Globals.data) {
         return false;
       }

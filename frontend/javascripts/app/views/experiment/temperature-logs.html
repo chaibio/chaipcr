@@ -21,13 +21,13 @@
     <div class="content">
       <div class="curve-header">
         <div class="row">
-          <div class="col-sm-4">
+          <div class="col-sm-4 chart-name">
             <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart">
               Thermal Profile
               <img class="arrow-down" src="/images/arrow-down.png">
             </chart-chooser>
           </div>
-          <div class="col-sm-8">
+          <div class="col-sm-8 chart-controls">
             <div class="row zoom-scroll-container SHR">
               <div class="col-sm-6">
                 <div class="zoom-container">
@@ -35,7 +35,7 @@
                   <ampli-slider ng-model="zoomState"></ampli-slider>
                 </div>
               </div>
-              <div class="col-sm-6 zoom-container">
+              <div class="col-sm-6 scroll-container">
                 <scrollbar ng-model="scrollState"></scrollbar>
               </div>
             </div>

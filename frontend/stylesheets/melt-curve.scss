@@ -6,12 +6,14 @@
   .chart-section {
     display: inline-block;
     padding-right: 20px;
-    width: 684px; //340px width of table in the right
+    padding-left: 20px;
+    width: 65%;
     vertical-align: top;
 
     .chart-container {
       position: relative;
-      width: 650px;
+      width: 100%;
+      padding-right: 20px;
       height: 300px;
     }
 
@@ -45,7 +47,7 @@
     }
 
     .ampli-zoom-scroll-container {
-      margin-top: 70px;
+      margin-top: 95px;
       padding-left: 50px;
       padding-right: 50px;
 
@@ -88,7 +90,7 @@
     display: inline-block;
     margin-top: -20px;
     margin-bottom: -4px;
-    width: 340px;
+    width: 35%;
 
     table {
       width: 100%;

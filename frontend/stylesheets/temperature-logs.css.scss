@@ -1,20 +1,58 @@
 @import "./colors.css.scss";
 .temperatureLog-state-active {
+  .content {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .curve-header {
+    .row {
+      margin-right: 0;
+      margin-left: 0;
+      .chart-name {
+        width: 30%;
+        // float: left;
+        padding-right: 0;
+        padding-left: 0;
+      }
+      .chart-controls {
+        width: 70%;
+        // float: left;
+        padding-right: 0;
+        padding-left: 0;
+      }
+    }
+
+    .zoom-text {
+      text-align: right;
+      padding-right: 15px;
+      vertical-align: baseline;
+    }
+  }
   padding-bottom: 20px;
   .zoom-scroll-container {
+    padding-left: 0;
+    padding-right: 0;
     margin-top: 15px;
-    margin-right: -65px;
-
+    margin-right: 0;
     .scrollbar-container {
       .scrollbar-directive {
         margin-top: 8px;
       }
     }
+
+    .zoom-container {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .scroll-container {
+      padding-left: 0;
+      padding-right: 0;
+    }
   }
   .chart-container {
     height: 400px;
     position: relative;
-
     path.domain {
       stroke-width: 2px;
     }

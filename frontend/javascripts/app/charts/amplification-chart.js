@@ -689,7 +689,6 @@
         .attr("transform", "translate(" + config.margin.left + "," + config.margin.top + ")")
         .attr('class', 'chart-g');
 
-
       Globals.viewSVG = svg.append('svg')
         .attr('width', width)
         .attr('height', height)
@@ -719,7 +718,6 @@
       makeCircle();
       Globals.activePath = null;
       updateZoomScaleExtent();
-
     }
 
     function getPathPositionByX(path, x) {
