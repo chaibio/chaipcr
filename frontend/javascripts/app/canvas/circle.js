@@ -207,13 +207,13 @@ angular.module("canvasApp").factory('circle', [
 
       this.changeHoldTime = function(new_hold) {
 
-        var duration = Number(this.model.hold_time);
+        /*var duration = Number(this.model.hold_time);
         var holdTimeHour = Math.floor(duration / 60);
         var holdTimeMinute = (duration % 60);
 
         if(holdTimeMinute < 10) {
           holdTimeMinute = "0" + holdTimeMinute;
-        }
+        }*/
 
         this.holdTime.text = new_hold;
       };

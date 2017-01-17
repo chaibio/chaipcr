@@ -51,6 +51,23 @@ window.ChaiBioTech.ngApp.directive('general', [
             popupStatus.popupStatusGatherData = scope.popUp;
           });
 
+          scope.$watch('step.id', function(new_id) {
+            scope.checkIfFirst();
+            if(scope.fabricStep) {
+              if(scope.fabricStep.previousStep === null && scope.fabricStep.parentStage.previousStage === null) {
+                scope.$broadcast("event:first-step-selected");
+              }
+
+              if(scope.fabricStep.nextStep === null && scope.fabricStep.parentStage.nextStage === null) {
+                scope.$broadcast("event:last-step-selected");
+              }
+            }
+          });
+
+          scope.checkIfFirst = function() {
+
+          };
+
           scope.$watch('stage.stage_type', function(newVal, oldVal) {
             if(newVal === "cycling") {
               scope.showCycling = true;
