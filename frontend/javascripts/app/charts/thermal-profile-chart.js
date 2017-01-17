@@ -258,7 +258,7 @@
         calib = calib * 10;
       }
       return calibs;
-    };
+    }
 
     function setYAxis() {
 
@@ -316,7 +316,6 @@
         Globals.xAxis.ticks(Globals.config.axes.x.ticks);
       }
       if (Globals.config.axes.x.tickFormat) {
-        console.log(Globals.config.axes.x);
         Globals.xAxis.tickFormat(Globals.config.axes.x.tickFormat);
       }
       Globals.gX = svg.append("g")
@@ -451,6 +450,7 @@
 
         while (true) {
           target = Math.floor(((beginning + end) / 2) * 100) / 100;
+          console.log('target: ' + target);
           pos = pathEl.getPointAtLength(target);
           if ((target === end || target === beginning) && pos.x !== x) {
             break;
@@ -509,7 +509,7 @@
       var new_width = Globals.width * transform.k;
       var transform_x = -((new_width - Globals.width) * scroll);
       return transform_x;
-    }
+    };
 
     this.scroll = function scroll(s) { // s = {0..1}
       var transform = this.getTransform();
@@ -547,7 +547,7 @@
 
     this.setMouseMoveListener = function(fn) {
       Globals.onMouseMove = fn;
-    }
+    };
 
     this.updateSeries = function(series) {
       Globals.config.series = series;

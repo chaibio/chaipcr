@@ -19,13 +19,20 @@
 
 window.ChaiBioTech.ngApp.controller('ProtocolCtrl', [
   '$scope',
+  '$rootScope',
   'ExperimentLoader',
   '$stateParams',
   'canvas',
   'Experiment',
-  function($scope, ExperimentLoader, $stateParams, canvas, Experiment) {
+  '$uibModal',
+  'alerts',
+  '$state',
+
+  function($scope, $rootScope, ExperimentLoader, $stateParams, canvas, Experiment, $uibModal, alerts, $state) {
 
     $scope.params = $stateParams;
+    $scope.modal = null;
+
     Experiment.get({id: $stateParams.id}).then(function (data) {
       Experiment.setCurrentExperiment(data.experiment);
     });
@@ -33,7 +40,7 @@ window.ChaiBioTech.ngApp.controller('ProtocolCtrl', [
     this.ExperimentLoader = function() {
       ExperimentLoader.getExperiment().then(function(data) {
         $scope.protocol = data.experiment;
-        canvas.init($scope);
+        //canvas.init($scope);
       });
     };
   }

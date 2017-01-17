@@ -26,8 +26,11 @@ window.ChaiBioTech.ngApp.service('alerts', [
       autoDeltaOnWrongStage: "You can't turn on auto delta on this stage. Please select a CYCLING STAGE to enable auto delat.",
       startOnCycleWarning: "The value you have entered is greater than the number of cycles set for this stage. Please enter a value lower than the number of cycles or increase the number of cycles for this stage.",
       startOnCycleMinimum: "The minimum value you can enter is 1 please input a value greater than zero.",
-      rampSpeedWarning: "Please enter a valid integer value less than 1000.",
-      holdDurationZeroWarning: "Plese enter a non zero value, Only last step can be assigned with infinite hold."
+      rampSpeedWarning: "Please enter a valid integer value in the range 0 - 6 .",
+      holdDurationZeroWarning: "Plese enter a non zero value, Only last step with collect_data turned off, can be assigned with infinite hold.",
+      holdDurationWarning: "Please a enter a value in the range 00:00 - 05:00",
+      internalServerError: "There is an internal server error pleas re-load the page",
+      autoDeltaTemp: "Please enter a value in the range [-99 To 99]"
     };
   }
 ]);

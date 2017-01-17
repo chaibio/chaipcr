@@ -101,7 +101,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
           if(!isNaN(newHoldTime) && scope.reading != newHoldTime) {
 
             if(Number(newHoldTime) === 0 ) {
-              if(scope.ifLastStep()) {
+              if(scope.ifLastStep() && ! scope.$parent.step.collect_data) {
                 scope.reading = newHoldTime;
                 $timeout(function() {
                   ExperimentLoader.changeHoldDuration(scope.$parent).then(function(data) {
@@ -116,8 +116,10 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
             } else {
               $timeout(function() {
                 scope.reading = newHoldTime;
-                ExperimentLoader.changeHoldDuration(scope.$parent).then(function(data) {
-                  console.log(data);
+                $timeout(function() {
+                  ExperimentLoader.changeHoldDuration(scope.$parent).then(function(data) {
+                    console.log(data, scope);
+                  });
                 });
               });
             }

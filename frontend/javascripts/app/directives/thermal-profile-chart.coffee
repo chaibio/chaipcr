@@ -56,7 +56,6 @@ window.App.directive 'thermalProfileChart', [
           chart.zoomTo(zoom)
 
         $scope.$watch 'show', (show) ->
-          console.log 'amplificationChart: initChart'
           if !chart
             initChart()
           else

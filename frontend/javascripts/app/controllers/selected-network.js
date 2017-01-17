@@ -32,7 +32,7 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     $scope.IamConnected = false;
     $scope.statusMessage = "";
     $scope.currentNetwork = {};
-    $scope.autoSetting = ""; // This variable controls set auto/manual.
+    $scope.autoSetting = "auto"; // This variable controls set auto/manual.
     $scope.connectedSsid = "";
     $scope.selectedWifiNow = NetworkSettingsService.listofAllWifi[$scope.name] || null; //
     $scope.wifiNetworkType = null; // We have different settings for wep2 and wpa , so we need to look for the type of network.
@@ -145,7 +145,7 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     $scope.goToNewIp = function(){
       var url = 'http://' + $scope.editEthernetData.address;
       $window.location.href = url;
-    }
+    };
 
     $scope.changeToAutomatic = function (){
       var ethernet ={};
@@ -157,7 +157,7 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
       }, function(err) {
         console.log(err);
       });
-    }
+    };
 
     $scope.init = function() {
 

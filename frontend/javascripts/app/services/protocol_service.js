@@ -237,7 +237,7 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
     };
 
     this.changeHoldDuration = function($scope) {
-
+      
       var dataToBeSend = {'step': {'hold_time': $scope.step.hold_time}},
       url = "/steps/" + $scope.step.id,
       delay = $q.defer();

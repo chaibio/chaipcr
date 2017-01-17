@@ -65,6 +65,15 @@
               case 403:
                 $rootScope.$broadcast('event:auth-forbidden', rejection);
                 break;
+
+              case 422:
+                console.log("Error happened");
+                $rootScope.$broadcast('event:error-server');
+                break;
+              case 500:
+                console.log("Internal server error");
+                $rootScope.$broadcast('event:error-server');
+                break;
             }
           }
           // otherwise, default behaviour

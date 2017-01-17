@@ -67,7 +67,9 @@ angular.module("canvasApp").service('stepEvents',[
       $scope.$watch('step.hold_time', function(newVal, oldVal) {
 
         var circle = $scope.fabricStep.circle;
-        circle.changeHoldTime();
+
+        var val = $scope.newTimeFormatting(newVal);
+        circle.changeHoldTime(val);
         //Check the last step. See if the last step has zero and put infinity in that case.
         //C.allCircles[C.allCircles.length - 1].doThingsForLast();
         if($scope.fabricStep.index === C.allStepViews[C.allStepViews.length - 1].index) {
