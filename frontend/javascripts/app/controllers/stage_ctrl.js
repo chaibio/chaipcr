@@ -68,7 +68,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
 
       ExperimentLoader.getExperiment()
         .then(function(data) {
-          console.log(data);
+
           //data.experiment.completed_at = data.experiment.completion_status = true;
           $scope.protocol = data.experiment;
           $scope.stage = ExperimentLoader.loadFirstStages();
