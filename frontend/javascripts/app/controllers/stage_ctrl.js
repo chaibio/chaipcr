@@ -31,6 +31,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
     var that = this;
     $scope.stage = {};
     $scope.step = {};
+    $scope.exp_completed = false;
 
     $scope.$on("expName:Updated", function() {
       $scope.protocol.name = expName.name;
@@ -67,6 +68,8 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
 
       ExperimentLoader.getExperiment()
         .then(function(data) {
+          console.log(data);
+          //data.experiment.completed_at = data.experiment.completion_status = true;
           $scope.protocol = data.experiment;
           $scope.stage = ExperimentLoader.loadFirstStages();
           $scope.step = ExperimentLoader.loadFirstStep();
@@ -77,6 +80,9 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
           $scope.scrollWidth = 0;
           $scope.scrollLeft = 0;
           $scope.$broadcast("dataLoaded");
+          if(data.experiment.completed_at && data.experiment.completion_status) {
+            $scope.exp_completed = true;
+          }
           //console.log("BINGOOOOO", $rootScope);
           canvas.init($scope);
         });
