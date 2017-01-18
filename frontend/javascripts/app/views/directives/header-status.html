@@ -159,8 +159,8 @@
     </div>
 
       <!-- experiment has been started and not completed -->
-    <div class="row" ng-show="experiment && experiment.started_at && !experiment.completed_at && state==='idle' && (dataAnalysis || !enterState) && done">
-      <div class="col-xs-1 menu" ng-transclude>
+    <div class="row" ng-show="experiment && experiment.started_at && !experiment.completed_at && state==='idle' && (dataAnalysis || !enterState)">
+      <div class="col-md-1 menu" ng-transclude>
       </div>
       <div class="col-xs-4 exp-name x" title="{{experiment.name|uppercase}}">
         <div ng-show="experiment.id && experiment.name">{{expName(20)}}</div>
@@ -168,7 +168,12 @@
       <div class="col-xs-7 controls SHR text-right">
         <div class="message">
           <span class="failed">failed</span>
-          User cancelled
+          <span ng-show="experiment.completion_status === 'aborted'">
+            User cancelled
+          </span>
+          <span ng-show="experiment.completion_status !== 'aborted'">
+            AN ERROR OCCURED
+          </span>
         </div>
         <button class="button-header" duplicate-experiment experiment-id="experiment.id">
           <b>DUPLICATE EXPERIMENT</b>
