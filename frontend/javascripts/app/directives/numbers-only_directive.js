@@ -25,9 +25,9 @@ window.ChaiBioTech.ngApp.directive('numbersOnly', [
        restrict: 'A',
 
        link: function(scope, element, attrs, modelCtrl) {
-         console.log(modelCtrl);
+         
          modelCtrl.$parsers.push(function (inputValue) {
-            console.log(inputValue);
+
              if (inputValue === undefined) return '';
              var transformedInput = inputValue.replace(/[^0-9]/g, '');
              // condition to limit transformed value below 1 million

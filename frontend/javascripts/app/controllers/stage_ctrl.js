@@ -37,7 +37,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
     });
 
     $scope.$watch("selected", function() {
-      console.log("lets change val");
+      //console.log("lets change val");
     });
 
     $rootScope.$on('event:error-server', function() {
