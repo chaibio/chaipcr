@@ -26,8 +26,8 @@
     <div class="wizard">
       <h3>Optical</h3>
       <p>Compensates for well-to-well variations in optical performance. Run whenever lid height is adjusted, or tube type is changed</p>
-      <a href="/dynexp/optical_cal/index.html" class="button" ng-show="!is_dual_channel">RUN NOW</a>
-      <a href="/dynexp/dual_channel_optical_cal_v2/index.html" class="button" ng-show="is_dual_channel">RUN NOW</a>
+      <a href="/dynexp/optical_cal/index.html" class="button" ng-class="{ 'disabled-button': anotherExperimentInProgress}" ng-show="!is_dual_channel">RUN NOW</a>
+      <a href="/dynexp/dual_channel_optical_cal_v2/index.html" class="button" ng-class="{ 'disabled-button': anotherExperimentInProgress}" ng-show="is_dual_channel">RUN NOW</a>
     </div>
 
   </div>
