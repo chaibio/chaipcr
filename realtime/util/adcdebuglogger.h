@@ -45,7 +45,7 @@ private:
         std::int8_t fanDrive;
         std::int8_t muxChannel;
         std::int8_t lidDrive;
-        std::uint32_t heatSinkAdcValue;
+        std::uint16_t heatSinkAdcValue;
     };
 
     std::string _storeFile;
