@@ -29,7 +29,11 @@ private:
     class SampleData
     {
     public:
-        SampleData(std::int8_t heatBlockZone1Drive, std::int8_t heatBlockZone2Drive, std::int8_t fanDrive, std::int8_t muxChannel);
+        SampleData();
+
+        void write(std::ostream &stream, const boost::chrono::system_clock::time_point &triggetPoint) const;
+
+        static void writeHeaders(std::ostream &stream);
 
     public:
         boost::chrono::system_clock::time_point time;
@@ -40,6 +44,8 @@ private:
         std::int8_t heatBlockZone2Drive;
         std::int8_t fanDrive;
         std::int8_t muxChannel;
+        std::int8_t lidDrive;
+        std::uint32_t heatSinkAdcValue;
     };
 
     std::string _storeFile;

@@ -44,6 +44,8 @@ public:
 
     void startADCReading();
 
+    inline int32_t adcValue() const { return _adcValue; }
+
 protected:
     void resetOutput();
     void processOutput();
@@ -59,6 +61,7 @@ private:
 
     ADCPin _adcPin;
     Poco::Timer _adcTimer;
+    std::atomic<uint32_t> _adcValue;
 
     Poco::Util::Timer _fanControlTimer;
     std::atomic<bool> _fanControlState;

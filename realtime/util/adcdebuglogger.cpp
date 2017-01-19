@@ -9,14 +9,45 @@
 #include <cstdio>
 #include <boost/chrono.hpp>
 
-ADCDebugLogger::SampleData::SampleData(std::int8_t heatBlockZone1Drive, std::int8_t heatBlockZone2Drive, std::int8_t fanDrive, std::int8_t muxChannel)
+ADCDebugLogger::SampleData::SampleData()
 {
     time = boost::chrono::system_clock::now();
 
-    this->heatBlockZone1Drive = heatBlockZone1Drive;
-    this->heatBlockZone2Drive = heatBlockZone2Drive;
-    this->fanDrive = fanDrive;
-    this->muxChannel = muxChannel;
+    heatBlockZone1Drive = HeatBlockInstance::getInstance()->zone1DriveValue() * 100;
+    heatBlockZone2Drive = HeatBlockInstance::getInstance()->zone2DriveValue() * 100;
+    fanDrive = HeatSinkInstance::getInstance()->fanDrive() * 100;
+    muxChannel = OpticsInstance::getInstance()->getPhotodiodeMux().getChannel();
+    lidDrive = LidInstance::getInstance()->drive() * 100;
+    heatSinkAdcValue = HeatSinkInstance::getInstance()->adcValue();
+}
+
+void ADCDebugLogger::SampleData::write(std::ostream &stream, const boost::chrono::system_clock::time_point &triggetPoint) const
+{
+    stream << boost::chrono::duration_cast<boost::chrono::milliseconds>(time - triggetPoint).count() << ',' << (heatBlockZone1Drive / 100.0)
+           << ',' << (heatBlockZone2Drive / 100.0) << ',' << (fanDrive / 100.0) << ',' << static_cast<int>(muxChannel) << ',' << (lidDrive / 100.0)
+           << ',' << heatSinkAdcValue << ',';
+
+    for (std::map<ADCController::ADCState, std::map<std::size_t, std::int32_t>>::const_iterator it = adcValues.begin(); it != adcValues.end(); ++it)
+    {
+        for (std::map<std::size_t, std::int32_t>::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2)
+        {
+            stream << it2->second;
+
+            if (std::next(it2) != it->second.end() || std::next(it) != adcValues.end())
+                stream << ',';
+        }
+    }
+}
+
+void ADCDebugLogger::SampleData::writeHeaders(std::ostream &stream)
+{
+    //Order of ADC states here is hardcoded
+    stream << "time_offset,heat_block_1_drive,heat_block_2_drive,fan_drive,mux_channel,lid_drive,heat_sink_adc,heat_block_1,heat_block_2,";
+
+    for (std::size_t i = 0; i < qpcrApp.settings().device.opticsChannels; ++i)
+        stream << "optics_" << i + 1 << ',';
+
+    stream << "lid";
 }
 
 ADCDebugLogger::ADCDebugLogger(const std::string &storeFile)
@@ -79,9 +110,7 @@ void ADCDebugLogger::store(ADCController::ADCState state, std::int32_t value, st
             if (_preSamples.size() == _preSamplesCount)
                 _preSamples.erase(_preSamples.begin());
 
-            _preSamples.emplace_back(HeatBlockInstance::getInstance()->zone1DriveValue() * 100, HeatBlockInstance::getInstance()->zone2DriveValue() * 100,
-                                     HeatSinkInstance::getInstance()->fanDrive() * 100, OpticsInstance::getInstance()->getPhotodiodeMux().getChannel());
-
+            _preSamples.emplace_back();
             _currentSmapleIt = std::prev(_preSamples.end());
         }
         else
@@ -92,9 +121,7 @@ void ADCDebugLogger::store(ADCController::ADCState state, std::int32_t value, st
                 return;
             }
 
-            _postSamples.emplace_back(HeatBlockInstance::getInstance()->zone1DriveValue() * 100, HeatBlockInstance::getInstance()->zone2DriveValue() * 100,
-                                      HeatSinkInstance::getInstance()->fanDrive() * 100, OpticsInstance::getInstance()->getPhotodiodeMux().getChannel());
-
+            _postSamples.emplace_back();
             _currentSmapleIt = std::prev(_postSamples.end());
         }
 
@@ -105,7 +132,6 @@ void ADCDebugLogger::store(ADCController::ADCState state, std::int32_t value, st
 
 void ADCDebugLogger::save()
 {
-    //Order of ADC states here is hardcoded
     std::thread([](std::string savePath, std::vector<SampleData> preSamples, std::vector<SampleData> postSamples)
     {
         sched_param params;
@@ -115,50 +141,22 @@ void ADCDebugLogger::save()
 
         std::fstream stream((savePath + ".tmp").c_str(), std::fstream::out | std::fstream::trunc);
 
-        stream << "time_offset,heat_block_1_drive,heat_block_2_drive,fan_drive,mux_channel,"
-               << "heat_block_1,heat_block_2,";
+        SampleData::writeHeaders(stream);
 
-        for (std::size_t i = 0; i < qpcrApp.settings().device.opticsChannels; ++i)
-            stream << "optics_" << i + 1 << ',';
-
-        stream << "lid\n";
+        stream << '\n';
 
         boost::chrono::system_clock::time_point triggetPoint = postSamples.front().time;
 
         for (const SampleData &sample: preSamples)
         {
-            stream << boost::chrono::duration_cast<boost::chrono::milliseconds>(sample.time - triggetPoint).count() << ',' << (sample.heatBlockZone1Drive / 100.0)
-                   << ',' << (sample.heatBlockZone2Drive / 100.0) << ',' << (sample.fanDrive / 100.0) << ',' << static_cast<int>(sample.muxChannel) << ',';
-
-            for (std::map<ADCController::ADCState, std::map<std::size_t, std::int32_t>>::const_iterator it = sample.adcValues.begin(); it != sample.adcValues.end(); ++it)
-            {
-                for (std::map<std::size_t, std::int32_t>::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2)
-                {
-                    stream << it2->second;
-
-                    if (std::next(it2) != it->second.end() || std::next(it) != sample.adcValues.end())
-                        stream << ',';
-                }
-            }
+            sample.write(stream, triggetPoint);
 
             stream << '\n';
         }
 
         for (const SampleData &sample: postSamples)
         {
-            stream << boost::chrono::duration_cast<boost::chrono::milliseconds>(sample.time - triggetPoint).count() << ',' << (sample.heatBlockZone1Drive / 100.0)
-                   << ',' << (sample.heatBlockZone2Drive / 100.0) << ',' << (sample.fanDrive / 100.0) << ',' << static_cast<int>(sample.muxChannel) << ',';
-
-            for (std::map<ADCController::ADCState, std::map<std::size_t, std::int32_t>>::const_iterator it = sample.adcValues.begin(); it != sample.adcValues.end(); ++it)
-            {
-                for (std::map<std::size_t, std::int32_t>::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2)
-                {
-                    stream << it2->second;
-
-                    if (std::next(it2) != it->second.end() || std::next(it) != sample.adcValues.end())
-                        stream << ',';
-                }
-            }
+            sample.write(stream, triggetPoint);
 
             stream << '\n';
         }
