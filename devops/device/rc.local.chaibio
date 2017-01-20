@@ -246,6 +246,13 @@ network_watchdog_interface() {
 
         while [ 1 ]
         do
+	        if grep "$iface" /var/lib/chaibio/network_watchdog_ignored_interfaces
+        	then
+                	echo Temprary ignoring the interface  $iface
+			sleep 60
+	                continue
+	        fi
+
                 ip_address=$(ifconfig $iface | grep 'inet addr:') || :
                 if [ -z "$ip_address" ]
                 then
