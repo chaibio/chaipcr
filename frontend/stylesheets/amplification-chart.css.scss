@@ -1,4 +1,151 @@
 @import './colors.css.scss';
+
+.modal-amplification {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1050; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content-amplification {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 750px;
+	height: 550px;
+	text-align: center;
+	font-family: 'dinot-Regular';
+	color: black !important;
+
+	.h3-baseline{
+		font-family: 'dinot-Bold';
+		color: black;
+		font-size: 20px;
+	}
+
+	.h3-cq{
+		color: black;
+		font-size: 20px;
+		margin-top: 10px;
+		font-weight: 300;
+		font-family: 'dinot';
+	}
+
+  .button{
+    border: 2px solid #787878;
+    background: #fff;
+    color: #333;
+    display: inline-block;
+    border-radius: 0;
+    font-weight: bold;
+    min-width: 150px;
+		margin-right: 15px;
+    margin-top: 10px;
+    padding: 6px 0;
+  }
+
+	.button:hover{
+		background: #8FC742;
+		color: white;
+		border: none;
+		height: 34px;
+	}
+
+  input {
+    border: 0;
+    outline: 0;
+    background: transparent;
+    width: 50px;
+  }
+  input[type="radio"]{
+    width: 20px;
+  }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+	label.radio-pcr {
+	content: "";
+	display: inline-block;
+	width: 11px;
+	height: 11px;
+	border-radius: 12px;
+	margin-right: 10px;
+	left: 0;
+	border: 2px solid white;
+  bottom: 1px;
+  box-shadow: 0 0 0 0.07em #000;
+}
+input[type='radio']:checked + label.radio-pcr {
+	background: #8FC742;
+	box-shadow: 0 0 0 0.07em #000;
+}
+
+label{
+	padding-top: 5px;
+	color: black;
+	font-size: 15px;
+}
+
+	.div-style{
+		text-align: left;
+		height: 275px;
+	}
+
+	.ct-label{
+		border-bottom:1px solid #ccc;
+		margin-left:25px;
+	}
+
+	.params-label{
+		border-bottom: 1px solid #ccc;
+		width: 170px;
+		text-align: left;
+
+		span{
+			width: 115px;
+			display: inline-block;
+		}
+	}
+
+	.by-label{
+		border-bottom: 1px solid #ccc;
+		margin-left: 5px;
+	}
+
+	.col-md-6{
+		text-align: left;
+		border-top: 1px solid black;
+		padding-left: 0;
+	}
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 .amplification-chart-state-active {
   font-family: 'dinot';
   .header {

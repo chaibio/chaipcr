@@ -1,20 +1,20 @@
 <!--
-    Chai PCR - Software platform for Open qPCR and Chai's Real-Time PCR instruments.
-    For more information visit http://www.chaibio.com
+Chai PCR - Software platform for Open qPCR and Chai's Real-Time PCR instruments.
+For more information visit http://www.chaibio.com
 
-    Copyright 2016 Chai Biotechnologies Inc. <info@chaibio.com>
+Copyright 2016 Chai Biotechnologies Inc. <info@chaibio.com>
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 -->
 <div class="amplification-chart-state-active results-charts">
   <div class="page-layout" ng-controller="AmplificationChartCtrl" ng-show="experiment">
@@ -53,10 +53,83 @@
             </div>
           </div>
         </div>
+        <div id="myModal" class="modal-amplification">
+          <!-- Modal content -->
+          <div class="modal-content-amplification">
+            <span class="close" ng-click="close()">×</span>
+            <h4 class="text-left">ADVANCED SETTINGS</h4>
+            <div class="col-md-8 div-style">
+              <h3 class="h3-baseline">Cq CALLING</h3>
+              <div class="col-md-6">
+                <h3 class="h3-cq">METHOD</h3>
+                <label>
+                  <input type="radio" id="cy0" ng-model="method.name" value="cy0" style="display:none">
+                  <label class="radio-pcr" for="cy0"></label>
+                  <span>Cy0</span>
+                </label><br/>
+                <label>
+                  <input type="radio" id="cpD2" ng-model="method.name" value="cpD2" style="display:none">
+                  <label class="radio-pcr" for="cpD2"></label>
+                  cpD2
+                </label><br/>
+              <!--  <label>
+                  <input type="radio" id="Ct" ng-model="method.name" value="Ct" style="display:none">
+                  <label class="radio-pcr" for="Ct"></label>
+                  Ct (Adjust Below)
+                </label><br/>
+                <label class="text-right ct-label">
+                  Min: <input ng-disabled="!(method.name == 'Ct')" type="text" placeholder="XX.XX" />
+                </label><br/>
+                <label class="text-right ct-label">
+                  Max: <input type="text" ng-disabled="!(method.name == 'Ct')" placeholder="XX.XX" />
+                </label> -->
+              </div>
+              <div class="col-md-6">
+                <h3 class="h3-cq">PARAMETERS</h3>
+                <label class="text-right params-label" ng-model="minFl" ng-mouseover="hover(minFl)" ng-mouseleave="hoverLeave()">
+                  <span>Min. Flouresence</span> <input type="text" style="text-align:right" numbers-only ng-model="flu"  placeholder="XX.XX" /></label><br/>
+                <label class="text-right params-label" ng-mouseover="hover(minCq)" ng-mouseleave="hoverLeave()">
+                  <span>Min Cq</span> <input style="text-align:right" type="text" placeholder="XX.XX" />
+                </label><br/>
+                <label class="text-right params-label">
+                  <span>Min dF/dc</span> <input style="text-align:right" type="text" placeholder="XX.XX" />
+                </label><br/>
+                <label class="text-right params-label">
+                  <span>Min d2F/dc</span> <input style="text-align:right" type="text" placeholder="XX.XX" />
+                </label>
+              </div>
+            </div>
+            <div class="col-md-4 div-style">
+              <h3 class="h3-baseline">BASELINE SUBTRACTION</h3>
+              <label>
+                <input type="radio" ng-model="baseline_sub" id="auto" value="auto" style="display:none">
+                <label class="radio-pcr" for="auto"></label>
+                <span>Auto</span>
+              </label><br/>
+              <label>
+                <input type="radio" ng-model="baseline_sub" id="cycles" value="cycles" style="display:none">
+                <label class="radio-pcr" for="cycles"></label>
+                <span>By Cycles</span>
+              </label><br/>
+              <label class="text-right ct-label">
+                <input type="text" placeholder="XX.XX" />
+              </label> <span> to </span>
+              <label class="text-right by-label">
+                <input type="text" placeholder="XX.XX" />
+              </label>
+            </div>
+            <br>
+            <h4>{{hoverName}}</h4>
+            <p>{{hoverDescription}}</p>
+            <button class="button" ng-click="close()">CANCEL</button>
+            <button class="button" ng-click="check()">APPLY</button>
+          </div>
+        </div>
         <div class="subheader-switches SH">
           <div class="item-switch">
             <switch ng-model="baseline_subtraction"></switch>
             <label>BASELINE SUBTRACTION</label>
+            <label ng-click="openOptionsModal()">Test</label>
           </div>
           <div class="item-switch-channel" ng-show="is_dual_channel">
             <label>CHOOSE CHANNEL:</label> &nbsp;
@@ -122,7 +195,7 @@
                   <span ng-show="i < 8">
                     A{{i+1}}
                   </span>
-                <span ng-show="i > 7">
+                  <span ng-show="i > 7">
                     B{{i-7}}
                   </span>
                 </span>

@@ -26,7 +26,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
   'Device'
   '$timeout'
   '$rootScope'
-  ($scope, $stateParams, Experiment, helper, expName, $interval, Device, $timeout, $rootScope) ->
+  ($scope, $stateParams, Experiment, helper, expName, $interval, Device, $timeout, $rootScope ) ->
 
     Device.isDualChannel().then (is_dual_channel) ->
       $scope.is_dual_channel = is_dual_channel
@@ -48,9 +48,44 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.channel_1 = true
       $scope.channel_2 = if is_dual_channel then true else false
       $scope.ampli_zoom = 0
+      $scope.showOptions = true
+      $scope.isError = false
+      $scope.method = {name: 'cy0'}
+      $scope.minFl = {name: 'Min. Flouresence', desciption:'This is a test description'}
+      $scope.minCq = {name: 'Min. Cq', desciption:'This is a test description'}
+      $scope.minDf = {name: 'Min. dF/dC', desciption:'This is a test description'}
+      $scope.minD2f = {name: 'Min. d2F/dC', desciption:'This is a test description'}
+      $scope.baseline_sub = 'auto'
+      $scope.hoverName = ''
+      $scope.hoverDescription = ''
+
+      modal = document.getElementById('myModal')
+      span = document.getElementsByClassName("close")[0]
 
       $scope.$on 'expName:Updated', ->
         $scope.experiment?.name = expName.name
+
+      $scope.openOptionsModal = ->
+        #$scope.showOptions = true
+        #Device.openOptionsModal()
+        modal.style.display = "block"
+
+      $scope.close = ->
+        modal.style.display = "none"
+
+      $scope.check = ->
+        $scope.close()
+        $scope.amplification_data = helper.paddData()
+        fetchFluorescenceData()
+
+      $scope.hover = (model) ->
+        $scope.hoverName = model.name
+        $scope.hoverDescription = model.desciption
+
+      $scope.hoverLeave = ->
+        $scope.hoverName = ''
+        $scope.hoverDescription = ''
+
 
       Experiment.get(id: $stateParams.id).then (data) ->
         maxCycle = helper.getMaxExperimentCycle(data.experiment)

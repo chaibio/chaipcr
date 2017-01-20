@@ -38,16 +38,27 @@ window.ChaiBioTech.ngApp
         $scope.selected = ngModel.$modelValue.selected
         $scope.color = ngModel.$modelValue.color || 'gray'
         $scope.ct = ngModel.$modelValue.ct
+        $scope.abc =
+          margin: '0px'
+          borderTopColor: $scope.color
 
         $scope.style =
-          borderColor: $scope.color
+          #borderColor: $scope.color
           paddingLeft: if (!ngModel.$modelValue.ct?[0] and !ngModel.$modelValue.ct?[1]) then '0px' else '10px'
+          paddingRight: if (!ngModel.$modelValue.ct?[0] and !ngModel.$modelValue.ct?[1]) then '0px' else '10px'
+
 
       $scope.toggleState = ->
         state =
           selected: !ngModel.$modelValue.selected || false
           color: ngModel.$modelValue.color || 'gray'
           ct: $scope.ct
+
+      #$(".test1").click = ->
+      #  isMouseDown = true
+      #  console.log "testing"
+      #  $(this).toggleState
+      #  false
 
         ngModel.$setViewValue state
         $scope.updateUI()
