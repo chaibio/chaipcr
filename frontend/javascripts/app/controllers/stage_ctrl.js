@@ -81,7 +81,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
           $scope.scrollLeft = 0;
           $scope.$broadcast("dataLoaded");
           //debugger;
-          var machine_data = Status.getData();
+          //var machine_data = Status.getData();
 
           if(data.experiment.started_at) {
             $scope.exp_completed = true;
