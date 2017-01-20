@@ -26,9 +26,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
   'expName',
   '$rootScope',
   '$window',
-  'Status',
-  '$stateParams',
-  function($scope, ExperimentLoader, canvas, $uibModal, alerts, expName, $rootScope, $window, Status, $stateParams) {
+  function($scope, ExperimentLoader, canvas, $uibModal, alerts, expName, $rootScope, $window) {
 
     var that = this;
     $scope.stage = {};
@@ -84,19 +82,26 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
           $scope.$broadcast("dataLoaded");
           //debugger;
           var machine_data = Status.getData();
-          if(data.experiment.completed_at && data.experiment.completion_status) {
+
+          if(data.experiment.started_at) {
             $scope.exp_completed = true;
-          } else if(data.experiment.started_at && ! data.experiment.completed_at){
-            if(machine_data.experiment_controller.machine && machine_data.experiment_controller.machine.state === 'idle') {
+          }
+          /*if(data.experiment.completed_at && data.experiment.completion_status) {
+            $scope.exp_completed = true;
+          } else if(data.experiment.started_at && ! data.experiment.completed_at) {
+            $scope.exp_completed = true;
+            /*if(machine_data.experiment_controller.machine && machine_data.experiment_controller.machine.state === 'idle') {
               $scope.exp_completed = true;
             }
-          } else {
+
             if(machine_data.experiment_controller.machine && machine_data.experiment_controller.machine.state !== 'idle') {
               if(machine_data.experiment_controller.experiment.id === $stateParams.id) {
                 $scope.exp_completed = true;
               }
             }
-          }
+          }*/
+
+
 
           //console.log("getData", Status.getData(), $stateParams);
 
