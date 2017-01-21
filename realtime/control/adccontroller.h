@@ -31,7 +31,7 @@
 
 class LTC2444;
 class ADCConsumer;
-class ADCDebugLogger;
+class BaseADCDebugLogger;
 
 // Class ADCController
 class ADCController : public IThreadControl
@@ -53,7 +53,7 @@ public:
     void process();
     void stop();
 
-    void startDebugLogger(std::size_t preSamplesCount, std::size_t postSamplesCount);
+    bool startDebugLogger(std::size_t preSamplesCount, std::size_t postSamplesCount);
     void stopDebugLogger();
     void triggetDebugLogger();
 
@@ -78,7 +78,7 @@ protected:
     std::shared_ptr<ADCConsumer> _lidConsumer;
 
 private:
-    ADCDebugLogger *_debugLogger;
+    BaseADCDebugLogger *_debugLogger;
 
     bool _ignoreReading;
 };
