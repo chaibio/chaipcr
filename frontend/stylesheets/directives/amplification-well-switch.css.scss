@@ -88,7 +88,9 @@
       background: #FECA40;
     }
     #selectableol .ui-selected {
-      background: #F39814; color: white;
+      //background: #F39814;
+      //color: white;
+      //border: 1px solid black;
     }
     #selectableol {
       list-style-type: none;
@@ -105,5 +107,7 @@
       font-size: 4em;
       text-align: center;
     }
-
+    hr {
+      border-top: 3px solid #eee;
+    }
   }

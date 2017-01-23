@@ -62,6 +62,10 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
           $scope.buttons["well_#{i}"].ct = ct if $scope.buttons["well_#{i}"]
 
 
-      $('#selectableol').selectable();
+      $('#selectableol').selectable(
+        'filter': 'li'
+        'selected': (evt, ui) ->
+          $(ui.selected).find('.circle').click()
+      );
 
 ]
