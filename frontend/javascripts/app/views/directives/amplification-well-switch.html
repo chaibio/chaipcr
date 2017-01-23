@@ -25,15 +25,30 @@
     </tr>
     <tr>
       <td class="number B2">A</td>
-      <td ng-repeat="i in loop">
+      <!--<td ng-repeat="i in loop">
         <amplification-circle-button ng-model="buttons['well_'+$index]"></amplification-circle-button>
+      </td> -->
+      <td colspan="8" rowspan="2">
+        <table class="">
+          <tr>
+            <td ng-repeat="i in loop">
+              <amplification-circle-button ng-model="buttons['well_'+$index]"></amplification-circle-button>
+            </td>
+          </tr>
+          <td ng-repeat="i in loop">
+            <amplification-circle-button ng-model="buttons['well_'+($index+8)]"></amplification-circle-button>
+          </td>
+          <tr>
+          </tr>
+        </table>
       </td>
+
     </tr>
     <tr>
       <td class="number B2">B</td>
-      <td ng-repeat="i in loop">
+      <!--<td ng-repeat="i in loop">
         <amplification-circle-button ng-model="buttons['well_'+($index+8)]"></amplification-circle-button>
-      </td>
+      </td> -->
     </tr>
   </table>
 </div>
