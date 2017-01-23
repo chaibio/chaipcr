@@ -84,19 +84,19 @@
     width: 100%;
     height: 170px;
 
-    #selectable .ui-selecting {
+    #selectableol .ui-selecting {
       background: #FECA40;
     }
-    #selectable .ui-selected {
+    #selectableol .ui-selected {
       background: #F39814; color: white;
     }
-    #selectable {
+    #selectableol {
       list-style-type: none;
       margin: 0;
       padding: 0;
       width: 100%;;
     }
-    #selectable li {
+    #selectableol li {
       margin: 3px;
       padding: 1px;
       float: left;
