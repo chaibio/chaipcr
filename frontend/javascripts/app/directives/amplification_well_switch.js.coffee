@@ -61,4 +61,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         for ct, i in cts by 1
           $scope.buttons["well_#{i}"].ct = ct if $scope.buttons["well_#{i}"]
 
+
+      $('.selectable-on-off-buttons').selectable();
+
 ]

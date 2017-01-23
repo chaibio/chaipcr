@@ -21,26 +21,36 @@
   <table class="on-off-buttons">
     <tr>
       <td></td>
-      <td ng-repeat="i in loop" class="number B2" ng-bind="i+1"></td>
+      <td style="width: 12.5%" ng-repeat="i in loop" class="number B2" ng-bind="i+1"></td>
     </tr>
     <tr>
       <td class="number B2">A</td>
       <!--<td ng-repeat="i in loop">
         <amplification-circle-button ng-model="buttons['well_'+$index]"></amplification-circle-button>
       </td> -->
-      <td colspan="8" rowspan="2">
-        <table class="">
+      <td colspan="8" rowspan="2" class="selectable-on-off-buttons">
+        <div class="selectable-container">
+          <ol id="selectable">
+            <li class="ui-widget-content" ng-repeat="i in loop">
+              <amplification-circle-button ng-model="buttons['well_'+$index]"></amplification-circle-button>
+            </li>
+            <li class="ui-widget-content" ng-repeat="i in loop">
+              <amplification-circle-button ng-model="buttons['well_'+($index+8)]"></amplification-circle-button>
+            </li>
+          </ol>
+        </div>
+        <!--<table >
           <tr>
-            <td ng-repeat="i in loop">
+            <td class="ui-widget-content" ng-repeat="i in loop">
               <amplification-circle-button ng-model="buttons['well_'+$index]"></amplification-circle-button>
             </td>
           </tr>
-          <td ng-repeat="i in loop">
+          <td class="ui-widget-content" ng-repeat="i in loop">
             <amplification-circle-button ng-model="buttons['well_'+($index+8)]"></amplification-circle-button>
           </td>
           <tr>
           </tr>
-        </table>
+        </table> !-->
       </td>
 
     </tr>
