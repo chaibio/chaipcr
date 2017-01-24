@@ -79,10 +79,10 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
 
           scope.edit = true;
           if(scope.shown === "AUTO") {
-            scope.shown = editValue = Number(0).toFixed(1);
+            scope.shown = editValue = Number(0);
             scope.unit = "ºC/s";
           } else {
-            scope.shown = editValue = Number(scope.shown).toFixed(1);
+            scope.shown = editValue = Number(scope.shown);
           }
 
 
@@ -92,10 +92,20 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
 
           scope.edit = false;
 
-          if(! isNaN(scope.shown) && Number(scope.shown) < 7 && Number(scope.shown) >= 0) {
+          var fractionLength  = (String(scope.shown).split('.')[1] || 0).length;
+
+          if(fractionLength > 5) {
+            console.log("Boom Limit exceeded", fractionLength);
+            scope.configureData();
+            var warningMessageLimitExceeded = alerts.rampSpeedWarningLimitExceeded;
+            scope.$parent.showMessage(warningMessageLimitExceeded);
+            return;
+
+          } else if(! isNaN(scope.shown) && Number(scope.shown) < 7 && Number(scope.shown) >= 0) {
+
             if(editValue != Number(scope.shown)) {
 
-              scope.shown = scope.reading = (Number(scope.shown).toFixed(1));
+              scope.shown = scope.reading = (Number(scope.shown));
 
               $timeout(function() {
                 ExperimentLoader.changeRampSpeed(scope.$parent).then(function(data) {
