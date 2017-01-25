@@ -36,16 +36,6 @@ angular.module("canvasApp").factory('moveStageRect', [
         this.direction = null;
         this.beaconMove = 0;
 
-        var smallCircle = new fabric.Circle({
-          radius: 6, fill: 'white', stroke: "black", strokeWidth: 2, selectable: false,
-          left: 69, top: 390, originX: 'center', originY: 'center',
-        });
-
-        var smallCircleTop = new fabric.Circle({
-          fill: '#FFB300', radius: 6, strokeWidth: 3, selectable: false, stroke: "black",
-          left: 69, top: 64, originX: 'center', originY: 'center'
-        });
-
         var stageName = new fabric.Text(
           "STAGE 2", {
             fill: 'black',  fontSize: 12, selectable: false, originX: 'left', originY: 'top',
@@ -59,6 +49,16 @@ angular.module("canvasApp").factory('moveStageRect', [
             top: 30, left: 35, fontFamily: "dinot-regular"
           }
         );
+        /*******************Vertical line*************************/
+        var smallCircle = new fabric.Circle({
+          radius: 6, fill: 'white', stroke: "black", strokeWidth: 2, selectable: false,
+          left: 69, top: 390, originX: 'center', originY: 'center',
+        });
+
+        var smallCircleTop = new fabric.Circle({
+          fill: '#FFB300', radius: 6, strokeWidth: 3, selectable: false, stroke: "black",
+          left: 69, top: 64, originX: 'center', originY: 'center'
+        });
 
         var verticalLine = new fabric.Line([0, 0, 0, 336],{
           left: 68, top: 58, stroke: 'black', strokeWidth: 2, originX: 'left', originY: 'top'
@@ -68,7 +68,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           originX: "left", originY: "top", left: 62, top: 56, selectable: true,
           lockMovementY: true, hasControls: false, hasBorders: false, name: "vertica"
         });
-
+        /********************************************/
         var rect = new fabric.Rect({
           fill: 'white', width: 135, left: 0, height: 58, selectable: false, name: "step", me: this, rx: 1,
         });
