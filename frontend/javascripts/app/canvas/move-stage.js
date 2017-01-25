@@ -93,7 +93,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           }
         );
 
-        this.indicator = new fabric.Group([coverRect, indicatorRectangle, vertical], {
+        this.indicator = new fabric.Group([coverRect, indicatorRectangle], {
           originX: "left", originY: "top", left: 38, top: 0, height: 372, width: 135, selectable: true,
           lockMovementY: true, hasControls: false, visible: false, hasBorders: false, name: "dragStageGroup"
         });
@@ -188,6 +188,17 @@ angular.module("canvasApp").factory('moveStageRect', [
           if(this.direction === 'right') {
             if(this.beacon.left > this.spaceArrayRight[0] && this.beacon.left < this.spaceArrayRight[1]) {
               if(this.verticalLine.getVisible() === false) {
+
+                if(this.currentDrop) {
+                  var verticalDropPosition = 0;
+                  if(this.currentDrop.nextStage) {
+                    verticalDropPosition = (this.currentDrop.left + this.currentDrop.myWidth + this.currentDrop.nextStage.left) / 2;
+                  } else {
+                    verticalDropPosition = this.currentDrop.left + this.currentDrop.myWidth + 20;
+                  }
+                  this.verticalLine.setLeft(verticalDropPosition - 5).setCoords();
+                }
+                C.canvas.bringToFront(this.verticalLine);
                 this.verticalLine.setVisible(true);
               }
             } else if(this.verticalLine.getVisible() === true) {
@@ -202,8 +213,6 @@ angular.module("canvasApp").factory('moveStageRect', [
               this.verticalLine.setVisible(false);
             }
           }
-
-
 
         };
 
