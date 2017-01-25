@@ -114,31 +114,28 @@
         // if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle' || $state.current.name === 'step-5')) {
         if($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle') && is_current_exp ) {
           // experiment is complete
-          Experiment.get($scope.experiment.id).then(function (resp) {
-            $scope.experiment = resp.data.experiment;
-            if( $scope.experiment.completion_status !== 'success') {
-              $state.go('step-6');
-              return;
-            }
-            $scope.analyzeExperiment();
-            /*Experiment.analyze($scope.experiment.id).then(function (resp) {
-              $state.go('step-6');
-              $scope.result = resp.data;
-              $scope.valid = true;
-              for (var i = resp.data.valid.length - 1; i >= 0; i--) {
-                if (resp.data.valid[i] === false) {
-                  $scope.valid = false;
-                  break;
-                }
-              }
-              if($scope.valid) $http.put(host + '/settings', {settings: {"calibration_id": $scope.experiment.id}});
-            });*/
-          });
+          checkExperimentStatus();
         }
         if ($state.current.name === 'step-3' || $state.current.name === 'step-3-reading') {
           $scope.timeRemaining  = ($scope.timeRemaining - $scope.finalStepHoldTime());
         }
       }, true);
+
+      function checkExperimentStatus(){
+        Experiment.get($scope.experiment.id).then(function (resp) {
+          $scope.experiment = resp.data.experiment;
+          if($scope.experiment.completed_at){
+            if( $scope.experiment.completion_status !== 'success') {
+              $state.go('step-6');
+              return;
+            }
+            $scope.analyzeExperiment();
+          }
+          else{
+            $timeout(checkExperimentStatus, 1000);
+          }
+        });
+      }
 
       $scope.analyzeExperiment = function () {
         Experiment.analyze($scope.experiment.id).then(function (resp) {

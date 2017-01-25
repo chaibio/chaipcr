@@ -63,6 +63,7 @@ class Experiment < ActiveRecord::Base
     TemperatureLog.delete_all(:experiment_id => experiment.id)
     TemperatureDebugLog.delete_all(:experiment_id => experiment.id)
     FluorescenceDatum.delete_all(:experiment_id => experiment.id)
+    FluorescenceDebugDatum.delete_all(:experiment_id => experiment.id)
     MeltCurveDatum.delete_all(:experiment_id => experiment.id)
     AmplificationCurve.delete_all(:experiment_id => experiment.id)
     AmplificationDatum.delete_all(:experiment_id => experiment.id)

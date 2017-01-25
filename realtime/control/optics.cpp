@@ -257,7 +257,9 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &/*task*/)
             _wellNumber = 0;
 
             //Assuming that other wells have the same amount of fluorescence data
-            if (!_meltCurveCollection && _fluorescenceData[0][0].fluorescenceData.size() == (kOpticalMeasurementsPerCycle * kADCReadsPerOpticalMeasurement))
+            if (!_meltCurveCollection && _fluorescenceData[0][0].fluorescenceData.size() ==
+                    ((ExperimentController::getInstance()->experiment().type() != Experiment::CalibrationType ? kOpticalMeasurementsPerCycle : kOpticalMeasurementsPerCalibrationCycle) *
+                     kADCReadsPerOpticalMeasurement))
             {
                 _collectData = false;
 

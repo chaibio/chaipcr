@@ -43,11 +43,12 @@
         if (!oldData.experiment_controller) return;
 
         $scope.data = data;
+        $scope.oldState = oldData.experiment_controller.machine.state;
         $scope.state = data.experiment_controller.machine.state;
         $scope.timeRemaining = GlobalService.timeRemaining(data);
         $scope.isWarmingUp = data.experiment_controller.experiment? ((data.experiment_controller.experiment.step.name === 'Warm Up 75')||(data.experiment_controller.experiment.step.name === 'Warm Water')||(data.experiment_controller.experiment.step.name === 'Warm FAM')||(data.experiment_controller.experiment.step.name === 'Warm HEX')) : false;
 
-        if ($scope.state === 'paused') {
+        if ($scope.state === 'paused' && $scope.oldState !== 'paused') {
           var pausedPages = ['heating-and-reading-water', 'reading-fam', 'reading-hex'];
           if (pausedPages.indexOf($state.current.name) > -1) {
             $scope.next();
@@ -69,19 +70,28 @@
 
         if ($scope.state === 'idle' && (oldData.experiment_controller.machine.state !== 'idle') &&  is_current_exp) {
           // experiment is complete
-          Experiment.get($scope.experiment.id).then(function (resp) {
-            $scope.experiment = resp.data.experiment;
+          checkExperimentStatus();
+
+        }
+      });
+
+      function checkExperimentStatus(){
+        Experiment.get($scope.experiment.id).then(function (resp) {
+          $scope.experiment = resp.data.experiment;
+          if($scope.experiment.completed_at){
             params = {id: $scope.experiment.id};
             if( $scope.experiment.completion_status !== 'success') {
               $state.go('analyze', params);
             }
             else {
               $scope.analyzeExperiment();
-
             }
-          });
-        }
-      });
+          }
+          else{
+            $timeout(checkExperimentStatus, 1000);
+          }
+        });
+      }
 
       function checkMachineStatus() {
         Status
@@ -197,7 +207,6 @@
       };
 
       $scope.next = function() {
-        debugger;
         var pageIndex = pages.indexOf($state.current.name);
         var params = {};
         if( pageIndex === (pages.length - 1))

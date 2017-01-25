@@ -104,15 +104,15 @@ App.controller 'MeltCurveChartCtrl', [
       $scope.config.curve_type = $scope.curve_type
 
       for i in [0..15] by 1
-        if buttons["well_#{i}"]?.selected
-          $scope.config.series.push
-            channel: 1
-            y: $scope.curve_type
-            x: 'temperature'
-            dataset: "well_#{i}"
-            color: buttons["well_#{i}"].color
-            ct: buttons["well_#{i}"].ct
-            well: i
+        $scope.config.series.push
+          selected: buttons["well_#{i}"]?.selected
+          channel: 1
+          y: $scope.curve_type
+          x: 'temperature'
+          dataset: "well_#{i}"
+          color: buttons["well_#{i}"]?.color
+          ct: buttons["well_#{i}"].ct
+          well: i
 
     getMeltCurveDataCallBack = (data) ->
       updateButtonTms(data)

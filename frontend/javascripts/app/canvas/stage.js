@@ -196,7 +196,7 @@ angular.module("canvasApp").factory('stage', [
       this.deleteStageContents = function() {
         this.stageHitPointLeft.setVisible(false);
         this.stageHitPointRight.setVisible(false);
-        
+
         for(var component in this.visualComponents) {
           if(component === "dots") {
             var items = this.dots._objects;
@@ -271,16 +271,41 @@ angular.module("canvasApp").factory('stage', [
 
       };
 
+      //
+      this.makeSurePreviousMovedLeft = function() {
+        var stage = this.previousStage;
+        while(stage) {
+          if(stage.stageMovedDirection !== "left") {
+            stage.moveToSide("left");
+          }
+          stage = stage.previousStage;
+        }
+      };
+      //
+      this.makeSureNextMovedRight = function() {
+        var stage = this.nextStage;
+        while(stage) {
+          if(stage.stageMovedDirection !== "right") {
+            stage.moveToSide("right");
+          }
+          stage = stage.nextStage;
+        }
+      };
+
       //This method is used when move stage hits at the hitPoint at the side of the stage.
-      this.moveToSide = function(direction, verticalLine, spaceArrayRight, spaceArrayLeft, type) {
+      this.moveToSide = function(direction, verticalLine, spaceArrayRight, spaceArrayLeft) {
 
         if(this.validMove(direction)) {
 
-          var moveCount = (direction === "left") ? -30 : 30;
-
-          if(type === "STEP") {
-            moveCount = (direction === "left") ? -50 : 50;
+          var moveCount;
+          if(direction === "left") {
+            moveCount = -30;
+            this.makeSurePreviousMovedLeft();
+          } else if("right") {
+            moveCount = 30;
+            this.makeSureNextMovedRight();
           }
+
           this.stageGroup.set({left: this.left + moveCount }).setCoords();
 
           if(spaceArrayRight && spaceArrayLeft) {
@@ -305,19 +330,13 @@ angular.module("canvasApp").factory('stage', [
           this.stageHitPointLowerLeft.set({left: (this.left + moveCount ) + 10}).setCoords();
           this.stageHitPointLowerRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
           this.left = this.left + moveCount;
-          if(type === "STEP" && this.parent.moveDots.currentIndex === this.index) {
-            // Need rework here , Stage with a shrinked step is a special case;
-            this.childSteps.forEach(function(step, index) {
-              step.specialMoveStep(1, false);
-              step.circle.moveCircleWithStep();
-            });
-            this.parent.moveDots.set({left: this.parent.moveDots.left + moveCount});
-          } else {
-            this.childSteps.forEach(function(step, index) {
-              step.moveStep(1, true);
-              step.circle.moveCircleWithStep();
-            });
-          }
+
+
+
+          this.childSteps.forEach(function(step, index) {
+            step.moveStep(1, true);
+            step.circle.moveCircleWithStep();
+          });
 
           this.stageMovedDirection = direction; // !important
           return "Valid Move";
@@ -334,7 +353,6 @@ angular.module("canvasApp").factory('stage', [
             if(this.index === 0) {
               return false;
             }
-            //console.log("sensing");
             // look if we have space at left;
             if(this.previousStage && this.left - (this.previousStage.left + this.previousStage.myWidth) < 10) {
               return false;

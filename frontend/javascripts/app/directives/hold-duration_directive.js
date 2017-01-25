@@ -20,7 +20,9 @@
 window.ChaiBioTech.ngApp.directive('holdDuration', [
   'ExperimentLoader',
   '$timeout',
-  function(ExperimentLoader, $timeout) {
+  'alerts',
+  '$uibModal',
+  function(ExperimentLoader, $timeout, alerts, $uibModal) {
     return {
       restric: 'EA',
       replace: true,
@@ -67,7 +69,9 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
         });
 
         scope.ifLastStep = function() {
-          return true;
+
+          var myCircle = scope.$parent.fabricStep.circle;
+          return myCircle.next === null;
         };
 
         scope.editAndFocus = function(className) {
@@ -76,21 +80,50 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
           editValue = scope.$parent.convertToSeconds(scope.shown);
         };
 
+        scope.showMessage = function(message) {
+
+          scope.warningMessage = message;
+          scope.modal = $uibModal.open({
+            scope: scope,
+            templateUrl: 'app/views/modal-warning.html',
+            windowClass: 'small-modal'
+            // This is tricky , we used it here so that,
+            //Custom size of this modal doesn't change any other modal in use
+          });
+        };
+
         scope.save = function() {
           scope.edit = false;
           var newHoldTime = scope.$parent.convertToSeconds(scope.shown);
-          console.log(scope);
-          if((newHoldTime || newHoldTime === 0) && editValue != newHoldTime) {
-            if(Number(scope.reading) === 0 && scope.ifLastStep()) {
 
-            }
-            scope.reading = newHoldTime;
+          console.log(newHoldTime, editValue);
+          /*if((newHoldTime || newHoldTime === 0) && editValue != newHoldTime) {*/
+          if(!isNaN(newHoldTime) && scope.reading != newHoldTime) {
 
-            $timeout(function() {
-              ExperimentLoader.changeHoldDuration(scope.$parent).then(function(data) {
-                console.log(data);
+            if(Number(newHoldTime) === 0 ) {
+              if(scope.ifLastStep() && ! scope.$parent.step.collect_data) {
+                scope.reading = newHoldTime;
+                $timeout(function() {
+                  ExperimentLoader.changeHoldDuration(scope.$parent).then(function(data) {
+                    console.log(data);
+                  });
+                });
+              } else {
+                //show message.
+                scope.showMessage(alerts.holdDurationZeroWarning);
+                console.log("show message");
+              }
+            } else {
+              $timeout(function() {
+                scope.reading = newHoldTime;
+                $timeout(function() {
+                  ExperimentLoader.changeHoldDuration(scope.$parent).then(function(data) {
+                    console.log(data, scope);
+                  });
+                });
               });
-            });
+            }
+
             editValue = newHoldTime;
           }
           scope.shown = scope.$parent.newTimeFormatting(scope.reading);

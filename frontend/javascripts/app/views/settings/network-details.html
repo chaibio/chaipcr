@@ -54,6 +54,7 @@
       <button class="button second-button" ui-sref="settings.networkmanagement">CANCEL</button>
     </div>
   </form>
+
   <!-- Remember ng-if creates a new scope so we need to use parent-->
   <div class="set-mode" ng-if="IamConnected && name=='ethernet'">
     <div class="set-mode-toggle"><mode-toggle data="$parent.autoSetting"></mode-toggle></div><span>SET AUTOMATICALLY</span>
@@ -85,7 +86,7 @@
     <div class="network-parameter-container">
       <div class="network-parameter-text-container"><span>Gateway IP</span></div>
       <div class="network-parameter-data-container">
-        <span ng-show="autoSetting=='auto'">{{editEthernetData.gateway}}</span>
+       <span ng-show="autoSetting=='auto'">{{editEthernetData.gateway}}</span>
         <ip-address ng-show="autoSetting=='manual'" value="editEthernetData.gateway"></ip-address>
       </div>
     </div>
@@ -98,7 +99,8 @@
     </div>
 
     <div class="connected-button-container button-container">
-      <input ng-show="autoSetting=='manual'" type="submit" class="green-button" value="SAVE CHANGES">
+      <!--<input ng-show="autoSetting=='manual'" type="submit" class="green-button" value="SAVE CHANGES"> -->
+      <button ng-if="autoSetting == 'manual'" type="submit" ng-class="{'green-button': buttonValue!=='CONNECTING', 'connecting-button': buttonValue==='CONNECTING'}">{{buttonValue}}<ellipsis-animated ng-if="buttonValue=='CONNECTING'"></ellipsis-animated></button>
     </div>
   </form>
 

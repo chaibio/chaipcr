@@ -47,7 +47,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.fetching = false
       $scope.channel_1 = true
       $scope.channel_2 = if is_dual_channel then true else false
-      $scope.showAmpliChart = true
       $scope.ampli_zoom = 0
 
       $scope.$on 'expName:Updated', ->
@@ -183,7 +182,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.$parent.chart
       , (chart) ->
         if chart is 'amplification'
-          # if !$scope.hasData
           fetchFluorescenceData()
 
           $timeout ->

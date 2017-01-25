@@ -94,10 +94,21 @@
       width: 1024px;
       overflow-x: hidden;
       overflow-y: hidden;
+      position: relative;
 
       .canvasClass {
         width: 300px;
         height: 300px;
+      }
+      .canvas-loading {
+        width: 70px;
+        height: 30px;
+        font-weight: bold;
+        font-size: 14px;
+        font-family: "dinot";
+        margin: 0 auto;
+        position: relative;
+        top: -200px;
       }
     }
   }
@@ -322,7 +333,7 @@
           position: absolute;
           left: 0px;
           top: 20px;
-          z-index: 100;
+          z-index: 89;
           color: #cdcdcd;
         }
 
@@ -335,7 +346,7 @@
 
           .lift-for-help {
             position: absolute;
-            z-index: 110;
+            z-index: 90;
             background-color: white;
           }
 

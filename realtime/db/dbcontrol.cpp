@@ -73,7 +73,9 @@ void DBControl::process()
         {
             {
                 std::unique_lock<std::mutex> lock(_writeQueueMutex);
-                _writeCondition.wait(lock);
+
+                if (_writeQueriesQueue.empty())
+                    _writeCondition.wait(lock);
 
                 queries = std::move(_writeQueriesQueue);
             }
@@ -84,7 +86,9 @@ void DBControl::process()
                 std::lock_guard<std::mutex> lock(_writeMutex);
 
                 for (const std::string &query: queries)
+                {
                     statements.emplace_back((_writeSession->prepare << query));
+                }
 
                 write(statements);
             }
@@ -397,13 +401,39 @@ void DBControl::startExperiment(const Experiment &experiment)
 
 void DBControl::completeExperiment(const Experiment &experiment)
 {
-    std::vector<soci::statement> statements;
-    std::unique_lock<std::mutex> lock(_writeMutex);
+    std::vector<std::string> queries;
+    std::stringstream stream;
 
-    statements.emplace_back((_writeSession->prepare << "UPDATE experiments SET completed_at = :completed_at, completion_status = :completion_status, completion_message = :completion_message, time_valid = (SELECT time_valid FROM settings) WHERE id = "
-                             << experiment.id(), soci::use(experiment.completedAt()), soci::use(experiment.completionStatus()), soci::use(experiment.completionMessage())));
+    stream << "UPDATE experiments SET completed_at = \'" << experiment.completedAt().date().year() << '-'
+           << std::setw(2) << std::setfill('0') << experiment.completedAt().date().month().as_number() << '-'
+           << std::setw(2) << std::setfill('0') << experiment.completedAt().date().day() << ' '
+           << std::setw(2) << std::setfill('0') << experiment.completedAt().time_of_day().hours() << ':'
+           << std::setw(2) << std::setfill('0') << experiment.completedAt().time_of_day().minutes() << ':'
+           << std::setw(2) << std::setfill('0') << experiment.completedAt().time_of_day().seconds() << "\', completion_status = \'";
 
-    write(statements);
+    switch (experiment.completionStatus())
+    {
+    case Experiment::Success:
+        stream << "success";
+        break;
+
+    case Experiment::Failed:
+        stream << "failed";
+        break;
+
+    case Experiment::Aborted:
+        stream << "aborted";
+        break;
+
+    default:
+        break;
+    }
+
+    stream << "\', completion_message = \'" << experiment.completionMessage() << "\', time_valid = (SELECT time_valid FROM settings) WHERE id = " << experiment.id();
+
+    queries.emplace_back(std::move(stream.str()));
+
+    addWriteQueries(queries);
 }
 
 void DBControl::addTemperatureLog(const std::vector<TemperatureLog> &logs)
@@ -749,10 +779,9 @@ void DBControl::addWriteQueries(std::vector<std::string> &queries)
 {
     if (!queries.empty())
     {
-        _writeQueueMutex.lock();
-        _writeQueriesQueue.insert(_writeQueriesQueue.end(), std::make_move_iterator(queries.begin()), std::make_move_iterator(queries.end()));
-        _writeQueueMutex.unlock();
+        std::lock_guard<std::mutex> lock(_writeQueueMutex);
 
+        _writeQueriesQueue.insert(_writeQueriesQueue.end(), std::make_move_iterator(queries.begin()), std::make_move_iterator(queries.end()));
         _writeCondition.notify_all();
     }
 }

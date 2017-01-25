@@ -138,6 +138,7 @@
     padding-left: 50px;
     padding-right: 50px;
     .zoom-container {
+      cursor: pointer;
       .zoom-text {
         display: inline-block;
         width: 20%;
@@ -148,6 +149,7 @@
         display: inline-block;
         width: 80%;
         vertical-align: middle;
+        cursor: pointer;
       }
       .ampli-slider-thermal {
         display: inline-block;
@@ -163,6 +165,7 @@
         position: relative;
         top: 11.5px;
         background: #ccc;
+        cursor: pointer;
         .scrollbar {
           border-radius: 10px;
         }

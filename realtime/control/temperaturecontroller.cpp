@@ -105,10 +105,9 @@ void TemperatureController::currentTemperatureChanged(double temperature)
 {
     if (temperature < _minTempThreshold)
     {
-        if (ExperimentController::getInstance()->machineState() == ExperimentController::IdleMachineState)
+        if (ExperimentController::getInstance()->shutdown(ExperimentController::IdleMachineState))
             return;
-
-        if (_firstErrorState)
+        else if (_firstErrorState)
         {
             std::string name = _name;
             name.at(0) = std::toupper(name.at(0));
@@ -129,10 +128,9 @@ void TemperatureController::currentTemperatureChanged(double temperature)
     }
     else if (temperature > _maxTempThreshold)
     {
-        if (ExperimentController::getInstance()->machineState() == ExperimentController::IdleMachineState)
+        if (ExperimentController::getInstance()->shutdown(ExperimentController::IdleMachineState))
             return;
-
-        if (_firstErrorState)
+        else if (_firstErrorState)
         {
             std::string name = _name;
             name.at(0) = std::toupper(name.at(0));
@@ -153,10 +151,9 @@ void TemperatureController::currentTemperatureChanged(double temperature)
     }
     else if (std::isnan(temperature))
     {
-        if (ExperimentController::getInstance()->machineState() == ExperimentController::IdleMachineState)
+        if (ExperimentController::getInstance()->shutdown(ExperimentController::IdleMachineState))
             return;
-
-        if (_firstErrorState)
+        else if (_firstErrorState)
         {
             std::string name = _name;
             name.at(0) = std::toupper(name.at(0));

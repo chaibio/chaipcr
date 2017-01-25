@@ -79,7 +79,7 @@ window.ChaiBioTech.ngApp.directive('deleteMode', [
 
 				scope.tryDeletion = function() {
 					scope.deleting = true;
-					debugger;
+					//debugger;
 					scope.deleteClicked = true;
 					//scope.deleting = true;
 					scope.deleteExp(scope.experiment);

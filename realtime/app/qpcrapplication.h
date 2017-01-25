@@ -44,13 +44,15 @@ public:
         class Device
         {
         public:
-            Device() { opticsChannels = 1; }
+            Device() { opticsChannels = 1; fanChange = false; }
 
         public:
             std::size_t opticsChannels;
 
             std::string serialNumber;
             std::string modelNumber;
+
+            bool fanChange;
         }device;
 
         class Configuration

@@ -25,7 +25,7 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
   'Experiment',
   '$rootScope',
   '$timeout',
-  function($state, $stateParams, $rootScope, Status, Experiment, $rootScope,$timeout){
+  function($state, $stateParams, $rootScope, Status, Experiment, $timeout){
     return {
       restrict: 'EA',
       replace: true,

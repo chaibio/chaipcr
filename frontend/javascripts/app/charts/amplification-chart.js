@@ -77,12 +77,6 @@
       if (Globals.circle) {
         Globals.circle.attr('opacity', 0);
       }
-      if (Globals.dashedLine) {
-        Globals.dashedLine.attr('opacity', 0);
-      }
-      if (Globals.xAxisCircle) {
-        Globals.xAxisCircle.attr('opacity', 0);
-      }
     }
 
     function showMouseIndicators() {
@@ -91,12 +85,6 @@
       }
       if (Globals.circle) {
         Globals.circle.attr('opacity', 1);
-      }
-      if (Globals.dashedLine) {
-        Globals.dashedLine.attr('opacity', 1);
-      }
-      if (Globals.xAxisCircle) {
-        Globals.xAxisCircle.attr('opacity', 1);
       }
     }
 
@@ -118,14 +106,12 @@
 
     function setActivePath(path, mouse) {
       if (Globals.activePath) {
-        // Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth / Globals.zoomTransform.k);
         Globals.activePath.attr('stroke-width', Globals.normalPathStrokeWidth);
       }
       Globals.activePathConfig = getPathConfig(path);
       var activePathConfig = Globals.activePathConfig.config;
       var activePathIndex = Globals.activePathConfig.index;
       makeWhiteBorderLine(activePathConfig);
-      // var newLine = makeColoredLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth / Globals.zoomTransform.k);
       var newLine = makeColoredLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth);
       Globals.lines[activePathIndex] = newLine;
       Globals.activePath = newLine;
@@ -148,7 +134,6 @@
       Globals.whiteBorderLine.remove();
       Globals.activePathConfig = null;
       Globals.activePath = null;
-      // Globals.box.container.attr('opacity', 0);
       if (Globals.box) {
         Globals.box.container.remove();
       }
@@ -169,7 +154,7 @@
       var boxMargin = {
         top: 0,
         left: 10
-      }
+      };
 
       Globals.box = {};
 
@@ -289,7 +274,7 @@
           Globals.box.cycleTextValue.text(d[Globals.config.series[conf.index].x]);
         }
         if (Globals.box.CqText && Globals.activePathConfig.config.cq) {
-          var conf = Globals.activePathConfig.config;
+          conf = Globals.activePathConfig.config;
           var cqText = 'Cq: ' + (conf.cq[conf.channel - 1] || '');
           Globals.box.CqText.text(cqText);
         }
@@ -297,9 +282,13 @@
     }
 
     function makeGuidingLine(line_config) {
-      var line = d3.line()
-        .curve(d3.curveMonotoneX)
-        .x(function(d) {
+      var line = d3.line();
+      if (Globals.config.axes.y.scale === 'log') {
+        line.curve(d3.curveMonotoneX);
+      } else {
+        line.curve(d3.curveBasis);
+      }
+      line.x(function(d) {
           return Globals.xScale(d[line_config.x]);
         })
         .y(function(d) {
@@ -320,14 +309,19 @@
     }
 
     function makeColoredLine(line_config) {
-      var line = d3.line()
-        .curve(d3.curveMonotoneX)
-        .x(function(d) {
+      var line = d3.line();
+      if (Globals.config.axes.y.scale === 'log') {
+        line.curve(d3.curveMonotoneX);
+      } else {
+        line.curve(d3.curveBasis);
+      }
+      line.x(function(d) {
           return Globals.xScale(d[line_config.x]);
         })
         .y(function(d) {
           return Globals.yScale(d[line_config.y]);
         });
+
       if (Globals.config.axes.y.scale === 'log') {
         line.defined(function(d) {
           return d[line_config.y] > 10;
@@ -356,7 +350,6 @@
         .on('mouseout', function(e, a, path) {
           if (_path !== Globals.activePath) {
             _path.attr('stroke-width', Globals.normalPathStrokeWidth);
-            // Globals.hoveredLine = null;
             Globals.hovering = false;
           }
         });
@@ -365,13 +358,17 @@
       return _path;
     }
 
-    function makeWhiteBorderLine (line_config) {
+    function makeWhiteBorderLine(line_config) {
       if (Globals.whiteBorderLine) {
         Globals.whiteBorderLine.remove();
       }
-      var line = d3.line()
-        .curve(d3.curveMonotoneX)
-        .x(function(d) {
+      var line = d3.line();
+      if (Globals.config.axes.y.scale === 'log') {
+        line.curve(d3.curveMonotoneX);
+      } else {
+        line.curve(d3.curveBasis);
+      }
+      line.x(function(d) {
           return Globals.xScale(d[line_config.x]);
         })
         .y(function(d) {
@@ -395,7 +392,9 @@
     }
 
     function drawLines() {
-      var series = Globals.config.series;
+      var series = Globals.config.series,
+          i,
+          s;
       if (!series) {
         return;
       }
@@ -414,15 +413,13 @@
       Globals.lines = [];
       Globals.activePath = null;
 
-      Globals.dashedLine = makeDashedLine();
-
-      for (var i = 0; i < series.length; i++) {
-        var s = series[i];
+      for (i = 0; i < series.length; i++) {
+        s = series[i];
         Globals.guidingLines.push(makeGuidingLine(s));
       }
 
-      for (var i = 0; i < series.length; i++) {
-        var s = series[i];
+      for (i = 0; i < series.length; i++) {
+        s = series[i];
         Globals.lines.push(makeColoredLine(s));
       }
 
@@ -433,8 +430,8 @@
 
         makeCircle();
 
-        for (var i = 0; i < series.length; i++) {
-          var s = series[i];
+        for (i = 0; i < series.length; i++) {
+          s = series[i];
           if (s.well === Globals.activePathConfig.config.well && s.channel === Globals.activePathConfig.config.channel) {
             p = Globals.lines[i];
             break;
@@ -491,44 +488,6 @@
         Globals.circle.attr('cx', lastPos.cx);
         Globals.circle.attr('cy', lastPos.cy);
       }
-    }
-
-    function makeDashedLine() {
-      var lastPos;
-      if (Globals.dashedLine) {
-        lastPos = {
-          x1: Globals.dashedLine.attr('x1'),
-          x2: Globals.dashedLine.attr('x2'),
-        };
-        Globals.dashedLine.remove();
-      }
-
-      var dl = Globals.viewSVG
-        .append("line")
-        .attr("opacity", 0)
-        .attr("y1", 0)
-        .attr("y2", Globals.height)
-        .attr("stroke-dasharray", Globals.dashedLineStrokeWidth + ',' + Globals.dashedLineStrokeWidth)
-        .attr("stroke-width", Globals.dashedLineStrokeWidth)
-        .attr("stroke", "#333")
-        .attr("fill", "none")
-        .on('mousemove', mouseMoveCb)
-        .on('mouseout', hideMouseIndicators)
-        .on('click', function() {
-          unsetActivePath();
-          if (Globals.hoveredLine) {
-            var mouse = d3Mouse(Globals.mouseOverlay.node());
-            setActivePath(Globals.hoveredLine, mouse);
-          }
-        });
-
-      if (lastPos) {
-        dl.attr('x1', lastPos.x1);
-        dl.attr('x2', lastPos.x2);
-      }
-
-      return dl;
-
     }
 
     function zoomed() {
@@ -626,7 +585,7 @@
         calib = calib * 10;
       }
       return calibs;
-    };
+    }
 
     function setYAxis() {
 
@@ -640,7 +599,6 @@
       var diff = max - min;
       var allowance = diff * (Globals.config.axes.y.scale === 'log' ? 0.2 : 0.05);
       max += allowance;
-      // min -= allowance;
       min = Globals.config.axes.y.scale === 'log' ? 5 : min - allowance;
 
       Globals.yScale = Globals.config.axes.y.scale === 'log' ? d3.scaleLog() : d3.scaleLinear();
@@ -690,7 +648,6 @@
         Globals.xAxis.tickValues = Globals.config.axes.x.ticks;
       }
       if (Globals.config.axes.x.tickFormat) {
-        console.log(Globals.config.axes.x);
         Globals.xAxis.tickFormat(Globals.config.axes.x.tickFormat);
       }
       Globals.gX = svg.append("g")
@@ -698,28 +655,6 @@
         .attr('fill', 'none')
         .attr("transform", "translate(0," + (Globals.height) + ")")
         .call(Globals.xAxis);
-
-      var lastPos;
-      if (Globals.xAxisCircle) {
-        lastPos = {
-          cx: Globals.xAxisCircle.attr('cx'),
-          cy: Globals.xAxisCircle.attr('cy'),
-        };
-        Globals.xAxisCircle.remove();
-      }
-      Globals.xAxisCircle = Globals.chartSVG.append('circle')
-        .attr('opacity', 0)
-        .attr('r', Globals.circleRadius)
-        .attr('fill', "#333")
-        .attr('stroke', '#fff')
-        .attr('stroke-width', Globals.circleStrokeWidth)
-        .attr('class', 'mouse-indicator-circle')
-        .on('mouseout', hideMouseIndicators)
-        .on('mousemove', mouseMoveCb);
-      if (lastPos) {
-        Globals.xAxisCircle.attr('cx', lastPos.cx);
-        Globals.xAxisCircle.attr('cy', lastPos.cy);
-      }
 
       if (Globals.zoomTransform.rescaleX) {
         Globals.gX.call(Globals.xAxis.scale(Globals.zoomTransform.rescaleX(Globals.xScale)));
@@ -735,9 +670,6 @@
 
     function initChart(elem, data, config) {
 
-      console.log(data);
-      console.log(config);
-
       initGlobalVars();
       Globals.data = data;
       Globals.config = config;
@@ -747,8 +679,6 @@
 
       var width = Globals.width = elem.parentElement.offsetWidth - config.margin.left - config.margin.right;
       var height = Globals.height = elem.parentElement.offsetHeight - config.margin.top - config.margin.bottom;
-
-      console.log(width, height);
 
       var chartSVG = Globals.chartSVG = d3.select(elem).append("svg")
         .attr("width", width + config.margin.left + config.margin.right)
@@ -788,13 +718,12 @@
       drawLines(config.series);
       makeCircle();
       Globals.activePath = null;
-      updateZoomScaleExtent()
+      updateZoomScaleExtent();
 
     }
 
     function getPathPositionByX(path, x) {
       var pathEl = path.node();
-      // var pathEl = Globals.activePath.node();
       var pathLength = pathEl.getTotalLength();
       var beginning = x,
         end = pathLength,
@@ -841,17 +770,6 @@
           .attr("cy", pos.y)
           .attr('transform', 'translate(0,0) scale(1)');
 
-        Globals.dashedLine
-          .attr('x1', x)
-          .attr('x2', x);
-
-        Globals.xAxisCircle
-          .attr("cx", function() {
-            var m = d3Mouse(Globals.chartSVG.node());
-            return m[0];
-          })
-          .attr("cy", Globals.height + Globals.config.margin.top);
-
         setBoxRFYAndCycleTexts(x);
         showMouseIndicators();
       }
@@ -863,7 +781,7 @@
       var mouse = d3Mouse(Globals.mouseOverlay.node());
       var mouseX = mouse[0];
       var mouseY = mouse[1];
-      var closestLineIndex = undefined;
+      var closestLineIndex;
       var distances = [];
       var lineIndex;
       var maxDistance = 20 * Globals.zoomTransform.k;
@@ -908,7 +826,7 @@
       var new_width = Globals.width * transform.k;
       var transform_x = -((new_width - Globals.width) * scroll);
       return transform_x;
-    }
+    };
 
     this.scroll = function scroll(s) { // s = {0..1}
       var transform = this.getTransform();
@@ -930,6 +848,9 @@
     };
 
     this.getTransform = function() {
+      if (!Globals.chartSVG) {
+        return;
+      }
       return d3.zoomTransform(Globals.chartSVG.node());
     };
 

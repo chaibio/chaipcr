@@ -68,6 +68,10 @@ void HeatSink::startADCReading()
 
 void HeatSink::resetOutput()
 {
+    _fanControlTimer.cancel(true);
+    _fanTransitionSteps.clear();
+    _fanControlState = false;
+
     setOutput(0);
 }
 
@@ -81,7 +85,7 @@ void HeatSink::processOutput()
         if (targetTemp < 30.0)
             nextDrive = 0.5;
         else
-            nextDrive = 0.3;
+            nextDrive = qpcrApp.settings().device.fanChange ? 0.2 : 0.3;
 
         double currentDrive = fanDrive();
 

@@ -24,7 +24,8 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
   '$state',
   'NetworkSettingsService',
   '$timeout',
-  function($scope, $stateParams, User, $state, NetworkSettingsService, $timeout) {
+  '$window',
+  function($scope, $stateParams, User, $state, NetworkSettingsService, $timeout, $window) {
 
     $scope.name = $state.params.name.replace(new RegExp("_", "g"), " ");
     $scope.buttonValue = "CONNECT";
@@ -39,7 +40,21 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     // another variable when we provide that feture
 
     $scope.$watch('autoSetting', function(val, oldVal) {
-      //console.log(val, $scope);
+
+      if(val === "manual") {
+        $scope.buttonValue = "SAVE CHANGES";
+      }
+
+      if(val === "auto" && $scope.currentNetwork.settings.type === "static"){
+        $scope.changeToAutomatic();
+      }
+
+    });
+
+    $scope.$on('ethernet_detected', function() {
+      //$scope.ethernetSettings = NetworkSettingsService.connectedEthernet;
+      console.log("I am boosted");
+      $scope.init();
     });
 
     $scope.$on('new_wifi_result', function() {
@@ -48,7 +63,9 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
         $scope.statusMessage = "";
         $scope.currentNetwork = NetworkSettingsService.connectedWifiNetwork;
         $scope.editEthernetData = $scope.currentNetwork.state;
-        $scope.editEthernetData.dns_nameservers = $scope.currentNetwork.settings['dns-nameservers'].split(" ")[0];
+        if($scope.currentNetwork.settings['dns-nameservers']) {
+          $scope.editEthernetData.dns_nameservers = $scope.currentNetwork.settings['dns-nameservers'].split(" ")[0];
+        }
         $scope.connectedSsid = NetworkSettingsService.connectedWifiNetwork.settings["wpa-ssid"] || NetworkSettingsService.connectedWifiNetwork.settings.wireless_essid;
         $scope.connectedSsid.replace(new RegExp('"', "g"), "");
           if($state.params.name.replace(new RegExp('_', "g"), " ") === $scope.connectedSsid) {
@@ -68,7 +85,9 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
           if(wifiConnection.state.status === "connected") {
             $scope.currentNetwork = wifiConnection;
             $scope.editEthernetData = $scope.currentNetwork.state;
-            $scope.editEthernetData.dns_nameservers = $scope.currentNetwork.settings['dns-nameservers'].split(" ")[0];
+            if($scope.currentNetwork.settings['dns-nameservers']) {
+              $scope.editEthernetData.dns_nameservers = $scope.currentNetwork.settings['dns-nameservers'].split(" ")[0];
+            }
             $scope.IamConnected = true;
             // We assign this so that, It shows data when we select
             //a wifi network which is already being connected.
@@ -111,8 +130,30 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
     };
 
     $scope.connectEthernet = function() {
+      $scope.statusMessage = "";
+      $scope.buttonValue = "CONNECTING";
       NetworkSettingsService.connectToEthernet($scope.editEthernetData).then(function(result) {
-        console.log("ethernet connected", result);
+        console.log(result);
+        NetworkSettingsService.getEthernetStatus(); // Get the new ip details as soon as we connect to new ethernet.
+        $scope.autoSetting = "auto";
+      }, function(err) {
+        console.log(err);
+      });
+      $timeout($scope.goToNewIp, 5000);
+    };
+
+    $scope.goToNewIp = function(){
+      var url = 'http://' + $scope.editEthernetData.address;
+      $window.location.href = url;
+    };
+
+    $scope.changeToAutomatic = function (){
+      var ethernet ={};
+      ethernet.type = "dhcp";
+      NetworkSettingsService.changeToAutomatic(ethernet).then(function(result) {
+        console.log(result);
+        NetworkSettingsService.getEthernetStatus(); // Get the new ip details as soon as we connect to new ethernet.
+        $scope.autoSetting = "auto";
       }, function(err) {
         console.log(err);
       });
@@ -166,12 +207,25 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
         $scope.editEthernetData = $scope.currentNetwork.state;
         $scope.editEthernetData.type = $scope.currentNetwork.settings.type;
 
-        if(! $scope.currentNetwork.state.gateway) {
-          $scope.editEthernetData.gateway = '0.0.0.0';
+        if($scope.currentNetwork.settings.type == "static"){
+          $scope.autoSetting = "manual";
+        }
+        else{
+          $scope.autoSetting = "auto";
         }
 
-        if(! $scope.currentNetwork.state['dns-nameservers']) {
+        if(! $scope.currentNetwork.settings.gateway) {
+          $scope.editEthernetData.gateway = '0.0.0.0';
+        }
+        else{
+          $scope.editEthernetData.gateway = $scope.currentNetwork.settings.gateway;
+        }
+
+        if(! $scope.currentNetwork.settings['dns-nameservers']) {
           $scope.editEthernetData['dns-nameservers'] = '0.0.0.0';
+        }
+        else{
+          $scope.editEthernetData['dns-nameservers'] = $scope.currentNetwork.settings['dns-nameservers'].split(" ")[0];
         }
       } else {
         $timeout(function() {

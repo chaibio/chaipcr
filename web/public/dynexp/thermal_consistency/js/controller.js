@@ -58,7 +58,7 @@
 
         if($scope.state === 'idle' && $scope.old_state !=='idle') {
           // exp complete
-          $state.go('analyze', {id: $scope.experiment.id});
+          checkExperimentStatus();
         }
 
         if($scope.state === 'idle' && $scope.old_state ==='idle' && $state.current.name === 'exp-running') {
@@ -73,6 +73,18 @@
         if ($state.current.name === 'analyze') Status.stopSync();
 
       }, true);
+
+      function checkExperimentStatus(){
+        Experiment.get($scope.experiment.id).then(function (resp) {
+          $scope.experiment = resp.data.experiment;
+          if($scope.experiment.completed_at){
+            $state.go('analyze', {id: $scope.experiment.id});
+          }
+          else{
+            $timeout(checkExperimentStatus, 1000);
+          }
+        });
+      }
 
 
       $scope.checkMachineStatus = function() {
@@ -124,25 +136,25 @@
             if (exp.completion_status === 'success') {
               Experiment.analyze($stateParams.id)
               .then(function (resp) {
-				        console.log(resp);
-				        if(resp.status == 200){
+                console.log(resp);
+                if(resp.status == 200){
                   $scope.analyzedExp = resp.data;
                   $scope.tm_values = GlobalService.getTmValues(resp.data);
                   $scope.analyzing = false;
-			          }
-				        else if (resp.status == 202){
-				          $timeout($scope.analyzeExperiment, 1000);
-				        }
+                }
+                else if (resp.status == 202){
+                  $timeout($scope.analyzeExperiment, 1000);
+                }
               })
               .catch(function (resp) {
-				        console.log(resp);
-				        if(resp.status == 500){
+                console.log(resp);
+                if(resp.status == 500){
                   $scope.custom_error = resp.data.errors || "An error occured while trying to analyze the experiment results.";
                   $scope.analyzing = false;
-			         }
-			         else if(resp.status ==503){
-				         $timeout($scope.analyzeExperiment, 1000);
-			         }
+               }
+               else if(resp.status ==503){
+                 $timeout($scope.analyzeExperiment, 1000);
+               }
               });
             }
                else {

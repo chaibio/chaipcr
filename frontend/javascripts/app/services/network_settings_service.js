@@ -156,13 +156,32 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.connectToEthernet = function(ethernetParams) {
 
       var delay = $q.defer();
+      ethernetParams.type = "static";
       $http.put(host + ':8000/network/eth0', ethernetParams)
       .then(function(result) {
+        console.log("New ethernet connection");
+        //result = ethernetParams;
+        console.log("data I need", result);
         delay.resolve(result);
       }, function(err) {
         delay.reject(err);
       });
 
+      return delay.promise;
+    };
+
+    this.changeToAutomatic = function(ethernet){
+      ethernet.type = "dhcp";
+      var delay = $q.defer();
+      $http.put(host + ':8000/network/eth0', ethernet)
+      .then(function(result) {
+        console.log("New ethernet connection");
+        //result = ethernetParams;
+        console.log("data I need", result);
+        delay.resolve(result);
+      }, function(err) {
+        delay.reject(err);
+      });
       return delay.promise;
     };
 

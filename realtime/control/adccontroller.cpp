@@ -43,6 +43,7 @@ ADCController::ADCController(ConsumersList &&consumers, unsigned int csPinNumber
     _currentChannel = 0;
     _workState = false;
     _debugLogger = new ADCDebugLogger(kADCDebugReaderSamplesPath);
+    _ignoreReading = false;
 
     _ltc2444 = new LTC2444(csPinNumber, std::move(spiPort), busyPinNumber);
 }
@@ -132,8 +133,15 @@ void ADCController::process() {
                 break;
 
             case EReadLIA:
-                value = _ltc2444->readSingleEndedChannel(kADCOpticsChannels.at(channel), kLIAOversamplingRate);
-                _debugLogger->store(_currentConversionState, value, _currentChannel);
+                if (_currentConversionState == EReadZone2Singular && nextState == EReadLIA && !_ignoreReading)
+                    //sample unused ADC input before the optical channels
+                    value = _ltc2444->readSingleEndedChannel(3, kLIAOversamplingRate);
+                else
+                    value = _ltc2444->readSingleEndedChannel(kADCOpticsChannels.at(channel), kLIAOversamplingRate);
+
+                if (!_ignoreReading)
+                    _debugLogger->store(_currentConversionState, value, _currentChannel);
+
                 break;
 
             case EReadLid:
@@ -146,17 +154,26 @@ void ADCController::process() {
             }
 
             try {
-                //process previous conversion value
-                if (_currentConversionState != EReadLIA)
-                    _consumers[_currentConversionState]->setADCValue(value);
-                else
-                    _consumers[_currentConversionState]->setADCValue(value, _currentChannel);
+                if (!_ignoreReading) {
+                    //process previous conversion value
+                    if (_currentConversionState != EReadLIA)
+                        _consumers[_currentConversionState]->setADCValue(value);
+                    else
+                        _consumers[_currentConversionState]->setADCValue(value, _currentChannel);
+                }
             }
             catch (const TemperatureLimitError &ex) {
                 logStream << "ADCController::process - consumer exception: " << ex.what() << std::endl;
 
                 qpcrApp.stopExperiment(ex.what());
             }
+
+            if (_currentConversionState == EReadZone2Singular && nextState == EReadLIA && !_ignoreReading) {
+                _ignoreReading = true;
+                continue;
+            }
+            else
+                _ignoreReading = false;
 
             _currentConversionState = nextState;
             _currentChannel = channel;

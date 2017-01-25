@@ -65,20 +65,23 @@ window.App.directive 'amplificationChart', [
           return if !zoom or !chart or !$scope.show
           chart.zoomTo(zoom)
 
-        $scope.$watch 'show', (show) ->
-          console.log 'amplificationChart: initChart'
-          if !chart
-            initChart()
-          else
-            dims = chart.getDimensions()
-            if dims.width <= 0 or dims.height <= 0 or !dims.width or !dims.height
-              initChart()
+        reinitChart = ->
+          initChart()
+          if !$scope.data or !$scope.config or !$scope.show
+            return $timeout(reinitChart, 500)
+          dims = chart.getDimensions()
+          console.log dims
+          if dims.width <= 0 or dims.height <= 0 or !dims.width or !dims.height
+            $timeout(reinitChart, 500)
 
+        $scope.$watch 'show', (show) ->
+          if !chart
+            reinitChart()
+          else
             if $scope.show
               chart.setYAxis()
               chart.setXAxis()
               chart.drawLines()
-
 
     }
 ]

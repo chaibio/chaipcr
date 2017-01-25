@@ -39,7 +39,7 @@ angular.module("canvasApp").factory('canvas', [
     moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageHitBlock, stageGraphics) {
 
     this.init = function(model) {
-
+      
       this.model = model.protocol;
       this.$scope = model;
       this.allStepViews = [];
@@ -64,9 +64,11 @@ angular.module("canvasApp").factory('canvas', [
 
       this.imageLocation = "/images/";
       this.imageobjects = {};
+      angular.element('.canvas-loading').hide();
       if(this.canvas) this.canvas.clear();
       this.canvas = new fabric.Canvas('canvas', {
-        backgroundColor: '#FFB300', selection: false, stateful: true
+        backgroundColor: '#FFB300', selection: false, stateful: true,
+        perPixelTargetFind: true, renderOnAddRemove: false, skipTargetFind: false,
       });
       circleManager.init(this);
       new events(this, this.$scope); // Fire the events;
@@ -146,7 +148,7 @@ angular.module("canvasApp").factory('canvas', [
         this.canvas.add(this.stepBeacon);
         this.canvas.add(this.stepBrick);
         this.canvas.add(this.hitBlock);
-        this.addMoveDots();
+        this.addMoveDots(); // This is for movestep
     };
 
     this.addMoveDots = function() {
@@ -228,6 +230,7 @@ angular.module("canvasApp").factory('canvas', [
 
       var leftVal = {};
       stage.dots.setVisible(status);
+      stage.dots.setCoords();
       this.canvas.bringToFront(stage.dots);
       if(status === true) {
 

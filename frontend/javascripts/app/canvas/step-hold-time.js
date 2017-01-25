@@ -28,15 +28,15 @@ angular.module("canvasApp").factory('stepHoldTime', [
       this.parent = parent;
       this.canvas = parent.canvas;
       var that = this;
-
+      
       this.formatHoldTime = function() {
 
-        var holdTimeHour = Math.floor(this.holdTime / 60);
+        /*var holdTimeHour = Math.floor(this.holdTime / 60);
         var holdTimeMinute = (this.holdTime % 60);
 
-        holdTimeMinute = (holdTimeMinute < 10) ? "0" + holdTimeMinute : holdTimeMinute;
+        holdTimeMinute = (holdTimeMinute < 10) ? "0" + holdTimeMinute : holdTimeMinute;*/
 
-        return holdTimeHour + ":" + holdTimeMinute;
+        return $scope.newTimeFormatting(this.model.hold_time);
       };
 
       this.render = function() {
@@ -79,7 +79,7 @@ angular.module("canvasApp").factory('stepHoldTime', [
         // There is some issues for, saving new hold_time for infinite hold, make sure uts corrected when new design comes.
         editMode.holdActive = false;
         editMode.currentActiveHold = null;
-        
+
         $scope.step.hold_time = $scope.convertToMinute(this.text.text) || $scope.step.hold_time;
 
         if($scope.step.hold_time !== 0) { // If its zero server returns error , but make an exception for last step

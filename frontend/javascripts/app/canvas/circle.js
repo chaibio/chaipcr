@@ -205,7 +205,7 @@ angular.module("canvasApp").factory('circle', [
         }
       };
 
-      this.changeHoldTime = function() {
+      this.changeHoldTime = function(new_hold) {
 
         var duration = Number(this.model.hold_time);
         var holdTimeHour = Math.floor(duration / 60);
@@ -215,7 +215,7 @@ angular.module("canvasApp").factory('circle', [
           holdTimeMinute = "0" + holdTimeMinute;
         }
 
-        this.holdTime.text = holdTimeHour + ":" + holdTimeMinute;
+        this.holdTime.text = new_hold;
       };
 
       this.render = function() {
