@@ -184,35 +184,8 @@ angular.module("canvasApp").factory('moveStageRect', [
             return false;
             // END OF SOME METHOD.
           }, this);
+          this.manageVerticalLine(C);
 
-          if(this.direction === 'right') {
-            if(this.beacon.left > this.spaceArrayRight[0] && this.beacon.left < this.spaceArrayRight[1]) {
-              if(this.verticalLine.getVisible() === false) {
-
-                if(this.currentDrop) {
-                  var verticalDropPosition = 0;
-                  if(this.currentDrop.nextStage) {
-                    verticalDropPosition = (this.currentDrop.left + this.currentDrop.myWidth + this.currentDrop.nextStage.left) / 2;
-                  } else {
-                    verticalDropPosition = this.currentDrop.left + this.currentDrop.myWidth + 20;
-                  }
-                  this.verticalLine.setLeft(verticalDropPosition - 5).setCoords();
-                }
-                C.canvas.bringToFront(this.verticalLine);
-                this.verticalLine.setVisible(true);
-              }
-            } else if(this.verticalLine.getVisible() === true) {
-              this.verticalLine.setVisible(false);
-            }
-          } else if(this.direction === 'left') {
-            if(this.beacon.left > this.spaceArrayLeft[0] && this.beacon.left < this.spaceArrayLeft[1]) {
-              if(this.verticalLine.getVisible() === false) {
-                this.verticalLine.setVisible(true);
-              }
-            } else if(this.verticalLine.getVisible() === true) {
-              this.verticalLine.setVisible(false);
-            }
-          }
 
         };
 
@@ -228,6 +201,55 @@ angular.module("canvasApp").factory('moveStageRect', [
               this.canvasContaining.scrollLeft((anchor - (anchor - movement.left)));
             }
           }
+        };
+
+        this.indicator.manageVerticalLine = function(C) {
+
+          if(this.direction === 'right') {
+            if(this.beacon.left > this.spaceArrayRight[0] && this.beacon.left < this.spaceArrayRight[1]) {
+              if(this.verticalLine.getVisible() === false) {
+
+                if(this.currentDrop) {
+                  var verticalDropPositionRight = 0;
+                  if(this.currentDrop.nextStage) {
+                    verticalDropPositionRight = (this.currentDrop.left + this.currentDrop.myWidth + this.currentDrop.nextStage.left) / 2;
+                  } else {
+                    console.log("I am in this place");
+                    verticalDropPositionRight = this.currentDrop.left + this.currentDrop.myWidth + 20;
+                  }
+                  this.verticalLine.setLeft(verticalDropPositionRight - 5).setCoords();
+                }
+                C.canvas.bringToFront(this.verticalLine);
+                this.verticalLine.setVisible(true);
+              }
+            } else if(this.verticalLine.getVisible() === true) {
+              this.verticalLine.setVisible(false);
+            }
+          } else if(this.direction === 'left') {
+            if(this.beacon.left > this.spaceArrayLeft[0] && this.beacon.left < this.spaceArrayLeft[1]) {
+              if(this.verticalLine.getVisible() === false) {
+                if(this.currentDrop) {
+                  console.log(this.currentDrop.index);
+                  var verticalDropPositionLeft = 0;
+                  if(this.currentDrop.previousStage) {
+                    //verticalDropPositionLeft = (this.currentDrop.left + this.currentDrop.myWidth + 20) ;
+                  } else {
+                    //verticalDropPositionLeft = this.currentDrop.left - 20;
+                    console.log("So m I");
+                  }
+                  //if(!this.currentDrop.previousStage) {
+                    //verticalDropPositionLeft = this.currentDrop.left - 20;
+
+                  //this.verticalLine.setLeft(verticalDropPositionLeft - 5).setCoords();
+                }
+                C.canvas.bringToFront(this.verticalLine);
+                this.verticalLine.setVisible(true);
+              }
+            } else if(this.verticalLine.getVisible() === true) {
+              this.verticalLine.setVisible(false);
+            }
+          }
+
         };
 
         this.indicator.processMovement = function(stage, C, circleManager) {
