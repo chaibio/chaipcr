@@ -42,8 +42,12 @@ ADCController::ADCController(ConsumersList &&consumers, unsigned int csPinNumber
     _currentConversionState = static_cast<ADCState>(0);
     _currentChannel = 0;
     _workState = false;
-    _debugLogger = new ADCDebugLogger(kADCDebugReaderSamplesPath);
     _ignoreReading = false;
+
+    if (qpcrApp.settings().device.opticsChannels == 1)
+        _debugLogger = new ADCDebugLogger<1>(kADCDebugReaderSamplesPath);
+    else
+        _debugLogger = new ADCDebugLogger<2>(kADCDebugReaderSamplesPath);
 
     _ltc2444 = new LTC2444(csPinNumber, std::move(spiPort), busyPinNumber);
 }
@@ -79,7 +83,7 @@ void ADCController::process() {
             if (!_workState)
                 break;
 
-            if (ExperimentController::getInstance()->machineState() == ExperimentController::IdleMachineState && !_debugLogger->isWorking()) {
+            if (ExperimentController::getInstance()->machineState() == ExperimentController::IdleMachineState && _debugLogger->workState() != BaseADCDebugLogger::WorkingState) {
                 timespec time;
                 time.tv_sec = 0;
                 time.tv_nsec = 5 * 1000 * 1000;
@@ -196,8 +200,8 @@ void ADCController::stop() {
     _ltc2444->stopWaitinigBusy();
 }
 
-void ADCController::startDebugLogger(std::size_t preSamplesCount, std::size_t postSamplesCount) {
-    _debugLogger->start(preSamplesCount, postSamplesCount);
+bool ADCController::startDebugLogger(std::size_t preSamplesCount, std::size_t postSamplesCount) {
+    return _debugLogger->start(preSamplesCount, postSamplesCount);
 }
 
 void ADCController::stopDebugLogger() {

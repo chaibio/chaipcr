@@ -112,7 +112,8 @@ void HeatSink::readADCPin(Poco::Timer &/*timer*/)
 {
     try
     {
-        _thermistor->setADCValue(_adcPin.readValue());
+        _adcValue = _adcPin.readValue();
+        _thermistor->setADCValue(_adcValue);
     }
     catch (const std::exception &ex)
     {

@@ -489,7 +489,8 @@
           }
 
           .data-part-edit-value-ramp {
-            width: 56px;
+            width: 75px;
+            left: -14px;
           }
 
           .data-part-edit-value-no-unit {
@@ -602,4 +603,11 @@
       border: none;
     }
   }
+}
+
+.exp_completed_overlay {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  height: 100%;
 }

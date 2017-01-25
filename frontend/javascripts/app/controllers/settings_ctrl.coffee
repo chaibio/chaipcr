@@ -23,10 +23,20 @@ window.App.controller 'SettingsCtrl', [
   ($scope, User, Device) ->
 
     $scope.isBeta = true
-	
+    $scope.anotherExperimentInProgress = false
+
+    $scope.$on 'status:data:updated', (e, data, oldData) ->
+      return if !data
+      return if !data.experiment_controller
+      $scope.state = data.experiment_controller.machine.state
+      if $scope.state isnt 'idle'
+        $scope.anotherExperimentInProgress = true
+      else
+        $scope.anotherExperimentInProgress = false
+
     Device.getVersion(true).then (resp) ->
       $scope.has_serial_number = resp.serial_number
-	
+
     User.getCurrent().then (resp) ->
       $scope.user = resp.data.user
 

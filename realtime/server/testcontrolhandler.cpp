@@ -42,7 +42,9 @@ void TestControlHandler::processData(const ptree &requestPt, ptree &responsePt)
         break;
 
     case StartADCLogger:
-        ADCControllerInstance::getInstance()->startDebugLogger(requestPt.get<std::size_t>("pre_samples"), requestPt.get<std::size_t>("post_samples"));
+        if (!ADCControllerInstance::getInstance()->startDebugLogger(requestPt.get<std::size_t>("pre_samples"), requestPt.get<std::size_t>("post_samples")))
+            responsePt.put("status.message", "The debug logger is currently saving. The new settings will be applied on the next iteration");
+
         break;
 
     case StopADCLogger:

@@ -117,7 +117,10 @@
           checkExperimentStatus();
         }
         if ($state.current.name === 'step-3' || $state.current.name === 'step-3-reading') {
-          $scope.timeRemaining  = ($scope.timeRemaining - $scope.finalStepHoldTime());
+          console.log($scope.timeRemaining);
+          if($scope.timeRemaining >= $scope.finalStepHoldTime()){
+            $scope.timeRemaining  = ($scope.timeRemaining - $scope.finalStepHoldTime());
+          }
         }
       }, true);
 
@@ -234,6 +237,7 @@
 
         var step_id = parseInt($scope.data.experiment_controller.experiment.step.id);
         var steps = $scope.experiment.protocol.stages[0].stage.steps;
+        console.log(steps[steps.length-1].step.hold_time);
         return steps[steps.length-1].step.hold_time;
 
       };

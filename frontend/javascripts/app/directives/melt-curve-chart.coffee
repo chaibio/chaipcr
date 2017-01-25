@@ -17,7 +17,6 @@ window.App.directive 'meltCurveChart', [
       link: ($scope, elem, attrs) ->
 
         chart = null
-        $scope.show = true
 
         initChart = ->
           return if !$scope.data or !$scope.config or !$scope.show
@@ -25,6 +24,9 @@ window.App.directive 'meltCurveChart', [
           chart.onZoomAndPan($scope.onZoom())
           d = chart.getDimensions()
           $scope.onZoom()(chart.getTransform(), d.width, d.height, chart.getScaleExtent())
+
+        $($window).resize ->
+          initChart()
 
         $scope.$watchCollection ($scope) ->
           return {

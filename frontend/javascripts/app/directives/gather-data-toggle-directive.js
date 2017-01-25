@@ -108,7 +108,7 @@ window.ChaiBioTech.ngApp.directive('gatherDataToggle', [
         };
 
         scope.sendData = function() {
-
+          
           scope.data = !scope.data;
           scope.$parent[scope.call]();
         };

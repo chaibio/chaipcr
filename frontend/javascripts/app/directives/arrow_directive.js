@@ -51,6 +51,17 @@ window.ChaiBioTech.ngApp.directive('arrow', [
             circle = step.parentStage.nextStage.childSteps[0].circle;
             circle.manageClick();
             scope.applyValuesFromOutSide(circle);
+          } else {
+
+            var lstStage = step.parentStage;
+            while(lstStage.previousStage !== null) {
+              lstStage = lstStage.previousStage;
+            }
+
+            circle = lstStage.childSteps[0].circle;
+            circle.manageClick();
+            scope.applyValues(circle);
+            angular.element(".canvas-containing").scrollLeft(0);
           }
         };
 
@@ -66,6 +77,15 @@ window.ChaiBioTech.ngApp.directive('arrow', [
             circle = stage.childSteps[stage.childSteps.length - 1].circle;
             circle.manageClick();
             scope.applyValuesFromOutSide(circle);
+          } else {
+            var frstStage = step.parentStage;
+            while(frstStage.nextStage !== null) {
+              frstStage = frstStage.nextStage;
+            }
+            circle = frstStage.childSteps[frstStage.childSteps.length - 1].circle;
+            circle.manageClick();
+            scope.applyValues(circle);
+            angular.element(".canvas-containing").scrollLeft(9999); // 9999 is some big value, so that we are automatically scrolled to the end of the canvas.
           }
         };
 

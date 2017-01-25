@@ -53,6 +53,7 @@
       <div class="canvas-containing">
           <canvas class="canvasClass" id="canvas"></canvas>
           <div class="canvas-loading">LOADING <ellipsis-animated></ellipsis-animated></div>
+          <div class="exp_completed_overlay" ng-show="exp_completed"></div>
       </div>
     </div>
     <!-- Canvas Part End-->
@@ -123,6 +124,7 @@
 
       </div>
       <stage-type-popup ng-show="actionPopup && !infiniteHoldStage"></stage-type-popup>
+      <div class="exp_completed_overlay" ng-show="exp_completed"></div>
       </div>
       <arrow class="next" action="next" ng-click="arrowClicked()"></arrow>
 

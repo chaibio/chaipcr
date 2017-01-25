@@ -2,7 +2,7 @@
 
 $sidemenu_width: 352px;
 .menu-overlay-layout {
-  width: 1024px;
+  width: 100%;
   -webkit-transition: margin 0.3s; /* Safari */
   transition: margin 0.3s;
 
@@ -393,7 +393,7 @@ $sidemenu_width: 352px;
     left: 0;
     float: left;
     min-height: 500px;
-    width: 1024px;
+    width: 100%;
     white-space: normal;
 
     .page-container {
