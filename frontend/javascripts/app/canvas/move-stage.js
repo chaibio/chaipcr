@@ -111,6 +111,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           // rework on this part for smaller space...
           this.setLeft(stage.left - 50).setCoords();
           this.setVisible(true);
+          this.lastHitLeft = null;
           this.canvasContaining = $('.canvas-containing');
           this.currentDragPos = 0;
           this.spaceArrayRight = [stage.left + stage.myWidth + 40, stage.left + stage.myWidth + 78];
@@ -157,6 +158,7 @@ angular.module("canvasApp").factory('moveStageRect', [
 
               if(this.direction === "left") {
                 stage.moveToSide("right", this.verticalLine, this.spaceArrayRight, this.spaceArrayLeft);
+                this.lastHitLeft = stage;
 
                 if(stage.previousStage) {
                   this.currentDrop = stage.previousStage;
@@ -203,8 +205,8 @@ angular.module("canvasApp").factory('moveStageRect', [
           }
         };
 
-        this.indicator.manageVerticalLine = function(C) {
-
+        this.indicator.manageVerticalLine = function(C, lastHitLeft) {
+          //console.log(lastHitLeft.index);
           if(this.direction === 'right') {
             if(this.beacon.left > this.spaceArrayRight[0] && this.beacon.left < this.spaceArrayRight[1]) {
               if(this.verticalLine.getVisible() === false) {
@@ -228,19 +230,20 @@ angular.module("canvasApp").factory('moveStageRect', [
           } else if(this.direction === 'left') {
             if(this.beacon.left > this.spaceArrayLeft[0] && this.beacon.left < this.spaceArrayLeft[1]) {
               if(this.verticalLine.getVisible() === false) {
-                if(this.currentDrop) {
-                  console.log(this.currentDrop.index);
+                if(this.lastHitLeft) {
+                  console.log("bingo", this.lastHitLeft.left);
+                  /*console.log(this.currentDrop.index);
                   var verticalDropPositionLeft = 0;
                   if(this.currentDrop.previousStage) {
-                    //verticalDropPositionLeft = (this.currentDrop.left + this.currentDrop.myWidth + 20) ;
+                    verticalDropPositionLeft = (this.currentDrop.left + this.currentDrop.myWidth + 20) ;
                   } else {
                     //verticalDropPositionLeft = this.currentDrop.left - 20;
                     console.log("So m I");
                   }
                   //if(!this.currentDrop.previousStage) {
-                    //verticalDropPositionLeft = this.currentDrop.left - 20;
+                    //verticalDropPositionLeft = this.currentDrop.left - 20;*/
 
-                  //this.verticalLine.setLeft(verticalDropPositionLeft - 5).setCoords();
+                  this.verticalLine.setLeft(this.lastHitLeft.left - 5).setCoords();
                 }
                 C.canvas.bringToFront(this.verticalLine);
                 this.verticalLine.setVisible(true);
