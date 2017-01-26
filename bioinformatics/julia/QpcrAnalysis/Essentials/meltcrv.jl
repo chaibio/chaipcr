@@ -246,7 +246,7 @@ function mc_tm_pw(
 
     # filter Tm peaks
     qt_prob_flTm::Real=0.64, # quantile probability point for normalized -df/dT (range 0-1)
-    max_normd_qtv::Real=0.6, # maximum normalized -df/dt values (range 0-1) at the quantile probablity point
+    max_normd_qtv::Real=0.601, # maximum normalized -df/dt values (range 0-1) at the quantile probablity point
     top_N::Integer=4, # top number of Tm peaks to report
     min_frac_report::Real=0.1, # minimum area fraction of the Tm peak to be reported in regards to the largest real Tm peak
 
@@ -408,28 +408,38 @@ function mc_tm_pw(
 
         # filter for real Tm peaks and against those due to random fluctuation. fltd = filtered
         Ta_fltd = EMPTY_Ta # 0x2 Array. On another note, 2x0 Array `Ta_raw[:, 1:0]` raised error upon `json`.
+        Ta_reported_keywords = ["No", ">"]
         if len_Tms > 0
             area_i = 2
             areas_raw = Ta_raw[:, area_i]
             ndrv_normd = (ndrv - minimum(ndrv)) / (maximum(ndrv) - minimum(ndrv))
             top1_Tm_idx = summit_idc[indmax(areas_raw)]
-            if maximum(map((1:top1_Tm_idx, top1_Tm_idx:len_denser)) do idc
-                quantile(ndrv_normd[idc], qt_prob_flTm)
-            end) < max_normd_qtv
+            larger_normd_qtv_of_two_sides = maximum(
+                map((1:top1_Tm_idx, top1_Tm_idx:len_denser)) do idc
+                    quantile(ndrv_normd[idc], qt_prob_flTm)
+                end
+            )
+            if larger_normd_qtv_of_two_sides <= max_normd_qtv
+                Ta_reported_keywords = ["Yes", "<="]
                 idc_sb_area = sortperm(areas_raw, rev=true) # idc_sb = indice sorted by
                 idc_topN = idc_sb_area[1:min(top_N,len_Tms)]
                 fltd_idc = find(idc_topN) do idx_topN
                     areas_raw[idx_topN] >= areas_raw[idc_topN[1]] * min_frac_report
                 end # do idx_topN
                 Ta_fltd = Ta_raw[idc_topN[fltd_idc], :]
-            end
-        end
+            end # if larger...
+        end # if len_Tms > 0
 
     end # if shorter_length_raw <= 3 ... else
 
     mc = round(mc_raw, json_digits)
 
-    return OrderedDict("mc"=>mc, "Ta_fltd"=>Ta_fltd, "Ta_raw"=>Ta_raw)
+    return OrderedDict(
+        "mc"=>mc,
+        "Ta_fltd"=>Ta_fltd,
+        "Ta_raw"=>Ta_raw,
+        "Ta_reported" => "$(Ta_reported_keywords[1]). The larger normalized quantile value of the left and right sides of the summit on the negative derivative curve $larger_normd_qtv_of_two_sides $(Ta_reported_keywords[2]) `max_normd_qtv` $max_normd_qtv."
+    )
 
 end # mc_tm_pw
 
