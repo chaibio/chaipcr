@@ -521,13 +521,13 @@ function add_func_fit!( # vco = variable constraints objective
     end
 
     residual_str = "($func_str_replaced - $Y_str[i])"
-    iter_str = "i in 1:length($(X_strs[1]))" # assuming X and Y have the same length
+    iter_str = "for i in 1:length($(X_strs[1]))" # assuming X and Y have the same length
 
     if obj_algrt == "RSS"
-        obj_expr_str = "sum{wts[i] * $residual_str^2, $iter_str}"
+        obj_expr_str = "sum(wts[i] * $residual_str^2 $iter_str)"
         # sumabs2(map(eval(x_symbol) -> eval(func_expr), X) .- Y)
     elseif obj_algrt == "l1_norm"
-        obj_expr_str = "sum{abs($residual_str), $iter_str}" # `abs()` may cause "Ipopt finished with status Restoration_Faild"
+        obj_expr_str = "sum(abs($residual_str) $iter_str)" # `abs()` may cause "Ipopt finished with status Restoration_Faild"
     end
 
     obj_str = "$obj_macro_str(jmp_model, $sense, $obj_expr_str)"
