@@ -23,6 +23,7 @@
 #include "lockfreesignal.h"
 
 #include <atomic>
+#include <functional>
 
 // Class Thermistor
 class Thermistor: public ADCConsumer {
@@ -32,12 +33,14 @@ public:
 	
 	//accessors
     inline double temperature() const { return _temperature; }
-    boost::signals2::lockfree_signal<void(double)> temperatureChanged;
 
     //ADCConsumer
     void setADCValue(int32_t adcValue);
     void setADCValues(int32_t differentialADCValue, int32_t singularADCValue);
     void setADCValueMock(double adcValue);
+
+    template <typename Callback>
+    void setTemperatureChangeCallback(Callback callback) { _temperatureChangeCallback = callback; }
 
 protected:
     virtual double temperatureForResistance(double resistanceOhms) = 0;
@@ -47,6 +50,8 @@ private:
 
     const unsigned int _maxADCValue;
     const unsigned int _voltageDividerResistance;
+
+    std::function<void(double)> _temperatureChangeCallback;
 };
 
 class SteinhartHartThermistorC0123: public Thermistor {

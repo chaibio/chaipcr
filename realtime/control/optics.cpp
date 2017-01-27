@@ -63,7 +63,7 @@ Optics::Optics(unsigned int lidSensePin, std::shared_ptr<LEDController> ledContr
     _meltCurveCollection = false;
     _collectDataTimer = new Poco::Util::Timer();
     _wellNumber = 0;
-    _adcValue = {0, 0};
+    _adcState = false;
     _firstErrorState = false;
 }
 
@@ -106,15 +106,21 @@ void Optics::setADCValue(int32_t adcValue, std::size_t channel)
     }
 
     _firstErrorState = false;
+    _lastAdcValues[channel] = adcValue;
 
+    if (_adcState)
     {
-        std::lock_guard<std::mutex> lock(_adcMutex);
+        _adcValues.at(channel).emplace_back(adcValue);
 
-        _adcValue = {adcValue, channel};
+        for (const std::vector<std::int32_t> &adcChannel: _adcValues)
+        {
+            if (adcChannel.size() < kADCReadsPerOpticalMeasurement)
+                return;
+        }
+
+        _adcState = false;
         _adcCondition.notify_all();
     }
-
-    _lastAdcValues[channel] = adcValue;
 }
 
 void Optics::setCollectData(bool state, bool isMeltCurve)
@@ -163,11 +169,8 @@ void Optics::toggleCollectData(bool waitStop)
     {
         bool collect = _collectData.exchange(false);
 
-        {
-            std::unique_lock<std::mutex> lock(_adcMutex);
-            _adcCondition.notify_all();
-        }
-
+        _adcState = false;
+        _adcCondition.notify_all();
         _collectDataTimer->cancel(waitStop);
         _ledController->disableLEDs();
 
@@ -179,46 +182,28 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &/*task*/)
 {
     try
     {
-        std::vector<std::vector<int32_t>> adcValues;
-        adcValues.resize(qpcrApp.settings().device.opticsChannels);
+        Util::NullMutex mutex;
+        std::unique_lock<Util::NullMutex> lock(mutex);
 
-        {
-            std::size_t doneChannels = 0;
-            std::unique_lock<std::mutex> lock(_adcMutex);
+        _adcValues.clear();
+        _adcValues.resize(qpcrApp.settings().device.opticsChannels);
 
-            while (doneChannels < adcValues.size())
-            {
-                if (_collectData)
-                {
-                    _adcCondition.wait(lock);
+        for (std::vector<std::int32_t> &channel: _adcValues)
+            channel.reserve(kADCReadsPerOpticalMeasurement);
 
-                    std::vector<int32_t> &channel = adcValues.at(_adcValue.second);
-
-                    if (channel.size() < kADCReadsPerOpticalMeasurement)
-                    {
-                        channel.emplace_back(_adcValue.first);
-
-                        if (channel.size() == kADCReadsPerOpticalMeasurement)
-                            ++doneChannels;
-                    }
-
-                    if (!_collectData)
-                        break;
-                }
-                else
-                    break;
-            }
-        }
+        _adcState = true;
+        _adcCondition.wait(lock);
+        _adcState = false;
 
         if (!_collectData)
-            adcValues.clear();
+            _adcValues.clear();
 
-        if (!adcValues.empty())
+        if (!_adcValues.empty())
         {
             if (!_meltCurveCollection)
             {
                 std::size_t i = 0;
-                for (std::vector<int32_t> &channel: adcValues)
+                for (std::vector<int32_t> &channel: _adcValues)
                 {
                     for (int32_t value: channel)
                     {
@@ -237,7 +222,7 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &/*task*/)
                 bool debugMode = ExperimentController::getInstance()->debugMode();
 
                 std::size_t i = 0;
-                for (std::vector<int32_t> &channel: adcValues)
+                for (std::vector<int32_t> &channel: _adcValues)
                 {
                     MeltCurveData data(std::round(Util::average(channel.begin(), channel.end())), temperature, _wellNumber, i++);
 

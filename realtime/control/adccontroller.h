@@ -23,11 +23,11 @@
 #include "spi.h"
 #include "lockfreesignal.h"
 
+#include <array>
 #include <vector>
 #include <memory>
 #include <atomic>
 #include <map>
-#include <boost/unordered_map.hpp>
 
 class LTC2444;
 class ADCConsumer;
@@ -45,7 +45,7 @@ public:
         EFinal
     };
 
-    typedef std::map<ADCState, std::shared_ptr<ADCConsumer>> ConsumersList;
+    typedef std::array<std::shared_ptr<ADCConsumer>, EFinal> ConsumersList;
 
     ADCController(ConsumersList &&consumers, unsigned int csPinNumber, SPIPort &&spiPort, unsigned int busyPinNumber);
 	~ADCController();
@@ -73,7 +73,6 @@ protected:
 
     ConsumersList _consumers;
 
-    std::vector<std::shared_ptr<ADCConsumer>> _zoneConsumers;
     std::shared_ptr<ADCConsumer> _liaConsumer;
     std::shared_ptr<ADCConsumer> _lidConsumer;
 

@@ -115,9 +115,9 @@ private:
     std::atomic<bool> _lidOpen;
     GPIO _lidSensePin;
 
-    std::pair<int32_t, std::size_t> _adcValue;
-    std::mutex _adcMutex;
-    std::condition_variable _adcCondition;
+    std::vector<std::vector<int32_t>> _adcValues;
+    std::atomic<bool> _adcState;
+    std::condition_variable_any _adcCondition;
 
     std::atomic<bool> _collectData;
     Poco::Util::Timer *_collectDataTimer;
