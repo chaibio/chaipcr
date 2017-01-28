@@ -53,7 +53,11 @@ angular.module("canvasApp").factory('mouseDown', [
 
             var group = target.parentCircle.stepDataGroup;
             var items = group._objects;
-            unHookGroup(group, items);
+            var removeIndex = items.length - 1; // We have a rectangle mask in stepDataGroup, which we dont want to add when
+            // editmode is active. so delete it before we add , so we send removeIndex. In this case rectangle mask is the
+            // last element in the array.
+            
+            unHookGroup(group, items, removeIndex);
 
             if(getP.x > stepDataGroupLeft && getP.x < (stepDataGroupLeft + 45)) {
               editMode.tempActive = true;
@@ -142,11 +146,15 @@ angular.module("canvasApp").factory('mouseDown', [
 
       });
 
-      unHookGroup = function(group, items) {
+      unHookGroup = function(group, items, index_to_remove) {
 
         group._restoreObjectsState();
         C.canvas.remove(group);
-        for(var i = 0; i < items.length; i++) {
+
+        if(index_to_remove) {
+          C.canvas.remove(items[index_to_remove]);
+        }
+        for(var i = 0; i < items.length - 1; i++) {
           C.canvas.add(items[i]);
         }
         C.canvas.renderAll();
