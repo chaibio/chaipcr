@@ -112,6 +112,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           this.setLeft(stage.left - 50).setCoords();
           this.setVisible(true);
           this.lastHitLeft = null;
+          this.lastHitRight = null;
           this.canvasContaining = $('.canvas-containing');
           this.currentDragPos = 0;
           this.spaceArrayRight = [stage.left + stage.myWidth + 40, stage.left + stage.myWidth + 78];
@@ -179,6 +180,7 @@ angular.module("canvasApp").factory('moveStageRect', [
 
               if(this.direction === "right") {
                 stage.moveToSide("left", this.verticalLine, this.spaceArrayRight, this.spaceArrayLeft);
+                this.lastHitRight = stage;
               }
               return true;
             }
@@ -211,18 +213,20 @@ angular.module("canvasApp").factory('moveStageRect', [
             if(this.beacon.left > this.spaceArrayRight[0] && this.beacon.left < this.spaceArrayRight[1]) {
               if(this.verticalLine.getVisible() === false) {
 
-                if(this.currentDrop) {
-                  var verticalDropPositionRight = 0;
+                if(this.lastHitRight) {
+                  var verticalDropPositionRight = this.currentDrop.left + this.currentDrop.myWidth + 20;
                   if(this.currentDrop.nextStage) {
                     verticalDropPositionRight = (this.currentDrop.left + this.currentDrop.myWidth + this.currentDrop.nextStage.left) / 2;
-                  } else {
+                  } /*else {
                     console.log("I am in this place");
                     verticalDropPositionRight = this.currentDrop.left + this.currentDrop.myWidth + 20;
-                  }
+                  } */
                   this.verticalLine.setLeft(verticalDropPositionRight - 5).setCoords();
+                  C.canvas.bringToFront(this.verticalLine);
+                  this.verticalLine.setVisible(true);
+                  this.lastHitRight = null;
                 }
-                C.canvas.bringToFront(this.verticalLine);
-                this.verticalLine.setVisible(true);
+
               }
             } else if(this.verticalLine.getVisible() === true) {
               this.verticalLine.setVisible(false);
@@ -315,6 +319,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           });
 
           this.direction = null;
+          this.verticalLine.setVisible(false);
       };
 
       this.indicator.backToOriginal = function(stageToBeReplaced, C, stage_) {
@@ -334,6 +339,7 @@ angular.module("canvasApp").factory('moveStageRect', [
       };
 
         this.indicator.applyMovement = function(stage_, C, circleManager, callBack) {
+
           console.log("Entering apply movement");
           var stage = this.draggedStage;
 
