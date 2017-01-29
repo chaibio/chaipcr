@@ -66,7 +66,7 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         var vertical = new fabric.Group([verticalLine, smallCircleTop, smallCircle], {
           originX: "left", originY: "top", left: 62, top: 56, selectable: true,
-          lockMovementY: true, hasControls: false, hasBorders: false, name: "vertica"
+          lockMovementY: true, hasControls: false, hasBorders: false, name: "vertica", visible: false
         });
         /********************************************/
         var rect = new fabric.Rect({
@@ -232,21 +232,16 @@ angular.module("canvasApp").factory('moveStageRect', [
               if(this.verticalLine.getVisible() === false) {
                 if(this.lastHitLeft) {
                   console.log("bingo", this.lastHitLeft.left);
-                  /*console.log(this.currentDrop.index);
-                  var verticalDropPositionLeft = 0;
-                  if(this.currentDrop.previousStage) {
-                    verticalDropPositionLeft = (this.currentDrop.left + this.currentDrop.myWidth + 20) ;
-                  } else {
-                    //verticalDropPositionLeft = this.currentDrop.left - 20;
-                    console.log("So m I");
+                  var verticalDropPositionLeft = this.lastHitLeft.left - 20;
+                  if(this.lastHitLeft.previousStage) {
+                    verticalDropPositionLeft = ((this.lastHitLeft.previousStage.left + this.lastHitLeft.previousStage.myWidth + this.lastHitLeft.left) / 2) - 5;
                   }
-                  //if(!this.currentDrop.previousStage) {
-                    //verticalDropPositionLeft = this.currentDrop.left - 20;*/
-
-                  this.verticalLine.setLeft(this.lastHitLeft.left - 5).setCoords();
+                  this.verticalLine.setLeft(verticalDropPositionLeft).setCoords();
+                  C.canvas.bringToFront(this.verticalLine);
+                  this.verticalLine.setVisible(true);
+                  this.lastHitLeft = null;
                 }
-                C.canvas.bringToFront(this.verticalLine);
-                this.verticalLine.setVisible(true);
+
               }
             } else if(this.verticalLine.getVisible() === true) {
               this.verticalLine.setVisible(false);
