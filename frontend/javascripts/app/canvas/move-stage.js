@@ -110,21 +110,24 @@ angular.module("canvasApp").factory('moveStageRect', [
         this.indicator.init = function(stage, C) {
           // rework on this part for smaller space...
           this.setLeft(stage.left - 50).setCoords();
+          C.canvas.bringToFront(this);
           this.setVisible(true);
 
           this.canvasContaining = $('.canvas-containing');
           this.currentDragPos = 0;
-          this.spaceArrayRight = [stage.left + 40, stage.left + 78];
+          this.spaceArrayRight = [stage.left + 30, stage.left + 90];
           this.spaceArrayLeft = [stage.left - 82, stage.left - 44];
           this.currentDrop = null;
           this.currentHit = 0;
 
+          C.canvas.bringToFront(this.verticalLine);
           this.verticalLine.setLeft(stage.left + 5).setCoords();
+
           this.verticalLine.setVisible(true);
           C.canvas.bringToFront(this.verticalLine);
 
           this.draggedStage = stage;
-          
+
           if(stage.previousStage) {
               this.currentDrop = stage.previousStage;
               this.currentHit = stage.previousStage.index;

@@ -123,8 +123,9 @@ angular.module("canvasApp").factory('mouseDown', [
             var stage = evt.target.parent;
             stage.collapseStage();
             that.calculateMoveLimit("stage");
-            C.canvas.bringToFront(C.stageIndicator);
+            //C.canvas.bringToFront(C.stageIndicator);
             stage.wireStageNextAndPrevious();
+            C.canvas.renderAll();
           break;
 
           case "deleteStepButton":
