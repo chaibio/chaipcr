@@ -69,7 +69,7 @@ void ADCDebugLogger<Channels>::store(ADCController::ADCState state, int32_t valu
 
         bool triggerState = _triggerState;
 
-        if (_currentSampleIt == _preSamples.end() || _currentSampleIt->adcValuesSize == (ADCController::EFinal + Channels))
+        if (_currentSampleIt == _preSamples.end() || _currentSampleIt->adcValuesSize == (ADCController::EFinal + Channels - 1))
         {
             if (!triggerState)
             {
@@ -107,7 +107,7 @@ void ADCDebugLogger<Channels>::store(ADCController::ADCState state, int32_t valu
 
         ++_currentSampleIt->adcValuesSize;
 
-        if (triggerState && _currentSampleIt->adcValuesSize == (ADCController::EFinal + Channels) && _postSamples.size() == _postSamplesCount)
+        if (triggerState && _currentSampleIt->adcValuesSize == (ADCController::EFinal + Channels - 1) && _postSamples.size() == _postSamplesCount)
             save();
     }
 }
