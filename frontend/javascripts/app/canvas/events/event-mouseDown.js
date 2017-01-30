@@ -114,7 +114,7 @@ angular.module("canvasApp").factory('mouseDown', [
             that.moveStageActive = true;
             that.canvas.moveCursor = "move";
 
-            C.stageIndicator.init(evt.target.parent);
+            C.stageIndicator.init(evt.target.parent, C);
             that.stageIndicatorPosition = C.stageIndicator.left;
             C.stageIndicator.changeText(evt.target.parent);
 
