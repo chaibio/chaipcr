@@ -111,8 +111,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           // rework on this part for smaller space...
           this.setLeft(stage.left - 50).setCoords();
           this.setVisible(true);
-          this.lastHitLeft = null;
-          this.lastHitRight = null;
+
           this.canvasContaining = $('.canvas-containing');
           this.currentDragPos = 0;
           this.spaceArrayRight = [stage.left + stage.myWidth + 40, stage.left + stage.myWidth + 78];
@@ -159,7 +158,6 @@ angular.module("canvasApp").factory('moveStageRect', [
 
               if(this.direction === "left") {
                 stage.moveToSide("right", this.verticalLine, this.spaceArrayRight, this.spaceArrayLeft);
-                this.lastHitLeft = stage;
 
                 if(stage.previousStage) {
                   this.currentDrop = stage.previousStage;
@@ -180,7 +178,6 @@ angular.module("canvasApp").factory('moveStageRect', [
 
               if(this.direction === "right") {
                 stage.moveToSide("left", this.verticalLine, this.spaceArrayRight, this.spaceArrayLeft);
-                this.lastHitRight = stage;
               }
               return true;
             }
@@ -207,26 +204,18 @@ angular.module("canvasApp").factory('moveStageRect', [
           }
         };
 
-        this.indicator.manageVerticalLine = function(C, lastHitLeft) {
-          //console.log(lastHitLeft.index);
+        this.indicator.manageVerticalLine = function(C) {
+          // break this methid into two methods.
           if(this.direction === 'right') {
             if(this.beacon.left > this.spaceArrayRight[0] && this.beacon.left < this.spaceArrayRight[1]) {
               if(this.verticalLine.getVisible() === false) {
-
-                if(this.lastHitRight) {
-                  var verticalDropPositionRight = this.currentDrop.left + this.currentDrop.myWidth + 20;
-                  if(this.currentDrop.nextStage) {
-                    verticalDropPositionRight = (this.currentDrop.left + this.currentDrop.myWidth + this.currentDrop.nextStage.left) / 2;
-                  } /*else {
-                    console.log("I am in this place");
-                    verticalDropPositionRight = this.currentDrop.left + this.currentDrop.myWidth + 20;
-                  } */
-                  this.verticalLine.setLeft(verticalDropPositionRight - 5).setCoords();
+                var verticalDropPositionRight = 0;
+                if(this.currentDrop) {
+                  verticalDropPositionRight = this.currentDrop.left + this.currentDrop.myWidth + 13;
                   C.canvas.bringToFront(this.verticalLine);
+                  this.verticalLine.setLeft(verticalDropPositionRight).setCoords();
                   this.verticalLine.setVisible(true);
-                  this.lastHitRight = null;
                 }
-
               }
             } else if(this.verticalLine.getVisible() === true) {
               this.verticalLine.setVisible(false);
@@ -234,18 +223,15 @@ angular.module("canvasApp").factory('moveStageRect', [
           } else if(this.direction === 'left') {
             if(this.beacon.left > this.spaceArrayLeft[0] && this.beacon.left < this.spaceArrayLeft[1]) {
               if(this.verticalLine.getVisible() === false) {
-                if(this.lastHitLeft) {
-                  console.log("bingo", this.lastHitLeft.left);
-                  var verticalDropPositionLeft = this.lastHitLeft.left - 20;
-                  if(this.lastHitLeft.previousStage) {
-                    verticalDropPositionLeft = ((this.lastHitLeft.previousStage.left + this.lastHitLeft.previousStage.myWidth + this.lastHitLeft.left) / 2) - 5;
-                  }
-                  this.verticalLine.setLeft(verticalDropPositionLeft).setCoords();
-                  C.canvas.bringToFront(this.verticalLine);
-                  this.verticalLine.setVisible(true);
-                  this.lastHitLeft = null;
+                var verticalDropPositionLeft = 0;
+                if(this.currentDrop) {
+                  verticalDropPositionLeft = this.currentDrop.left + this.currentDrop.myWidth + 13;
+                } else {
+                  verticalDropPositionLeft = C.allStageViews[0].left - 20;
                 }
-
+                C.canvas.bringToFront(this.verticalLine);
+                this.verticalLine.setVisible(true);
+                this.verticalLine.setLeft(verticalDropPositionLeft).setCoords();
               }
             } else if(this.verticalLine.getVisible() === true) {
               this.verticalLine.setVisible(false);
@@ -255,12 +241,8 @@ angular.module("canvasApp").factory('moveStageRect', [
         };
 
         this.indicator.processMovement = function(stage, C, circleManager) {
-          // Process movement here
-          // objects are corrected now looking for visual part.
 
-          // 1) infinite hold has to be corrected while moving stage.
-          // 2) processMovement has to be defrgged and simplified, Its complex.
-          // May be we should splice the stage off from allStageViews right after we click on dots.
+          // defrag and simplify this method.
           if(this.verticalLine.getVisible() === false) {
             console.log("This is invalid");
             var stageToBeReplaced = this.draggedStage;
@@ -297,6 +279,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           } else {
             console.log("Equal");
             if(stage.previousStage) {
+              console.log("I have previous");
               this.currentDrop = stage.previousStage;
               this.currentHit = stage.previousStage.index;
               this.applyMovement(stage, C, circleManager, function() {
@@ -306,9 +289,16 @@ angular.module("canvasApp").factory('moveStageRect', [
               console.log("I have next");
               //this.currentDrop = stage.nextStage;
               //this.currentHit = stage.nextStage.index;
-              this.applyMovement(stage, C, circleManager, function() {
-                C.allStageViews.splice(that.draggedStage.index, 1);
-              });
+              if(this.draggedStage.index === 0) {
+                // This is a special case when we drag very first stage back to first place.
+                var firstStageFix = this.draggedStage;
+                this.backToOriginal(firstStageFix, C, stage);
+                this.setVisible(false);
+              } else {
+                this.applyMovement(stage, C, circleManager, function() {
+                  C.allStageViews.splice(that.draggedStage.index, 1);
+                });
+              }
             }
           }
 

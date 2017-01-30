@@ -331,8 +331,6 @@ angular.module("canvasApp").factory('stage', [
           this.stageHitPointLowerRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
           this.left = this.left + moveCount;
 
-
-
           this.childSteps.forEach(function(step, index) {
             step.moveStep(1, true);
             step.circle.moveCircleWithStep();
