@@ -258,19 +258,15 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         this.indicator.processMovement = function(stage, C, circleManager) {
 
-          // defrag and simplify this method.
           if(this.verticalLine.getVisible() === false) {
-            console.log("This is invalid");
+            console.log("This is invalid Move, Moving back.");
             this.backToOriginal(stage, C);
-            this.setVisible(false);
-            return true;
+          } else {
+            this.applyMovement(stage, C, circleManager, null);
           }
 
-          this.setVisible(false);
           console.log("Landed .... !: Dragged stage->", this.draggedStage.index);
-
-          var that = this;
-          this.applyMovement(stage, C, circleManager, null);
+          this.setVisible(false);
           this.direction = null;
           this.verticalLine.setVisible(false);
       };
@@ -306,8 +302,6 @@ angular.module("canvasApp").factory('moveStageRect', [
           } else {
             C.allStageViews.splice(stageIndex + 1, 0, stageView);
           }
-
-          //callBack();
 
           this.moveStageGraphics(stageView, C, circleManager);
           C.canvas.remove(stage_.dots);
