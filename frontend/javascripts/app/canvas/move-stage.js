@@ -158,13 +158,14 @@ angular.module("canvasApp").factory('moveStageRect', [
 
           C.allStageViews.some(function(stage, index) {
 
-            if(this.beacon.intersectsWithObject(stage.stageHitPointLeft) && this.draggedStage.index !== index) {
+            if(this.beacon.intersectsWithObject(stage.stageHitPointLeft)) {
 
               this.currentDrop = stage;
               this.currentHit = index;
 
               if(this.direction === "left") {
-                stage.moveToSide("right", this.verticalLine, this.spaceArrayRight, this.spaceArrayLeft);
+                console.log("moveToSide hittt Left");
+                stage.moveToSide("right", this.spaceArrayRight, this.spaceArrayLeft, this.draggedStage);
 
                 if(stage.previousStage) {
                   this.currentDrop = stage.previousStage;
@@ -179,12 +180,12 @@ angular.module("canvasApp").factory('moveStageRect', [
                 this.currentHit = index - 1;
               }
               return true;
-            } else if(this.beacon.intersectsWithObject(stage.stageHitPointRight) && this.draggedStage.index !== index) {
+            } else if(this.beacon.intersectsWithObject(stage.stageHitPointRight)) {
               this.currentDrop = stage;
               this.currentHit = index;
-
+              console.log("hittt Right");
               if(this.direction === "right") {
-                stage.moveToSide("left", this.verticalLine, this.spaceArrayRight, this.spaceArrayLeft);
+                stage.moveToSide("left", this.spaceArrayRight, this.spaceArrayLeft, this.draggedStage);
               }
               return true;
             }
@@ -281,9 +282,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           console.log("Landed .... !: Dragged stage->", this.draggedStage.index, "current Hit ->", this.currentHit);
 
           var that = this;
-
-          var stageToBeReplaced = this.draggedStage;
-          this.backToOriginal(stageToBeReplaced, C, stage);
+          this.applyMovement(stage, C, circleManager, null);
           /*if(this.currentHit  > this.draggedStage.index) {
             console.log("Greater", this.currentDrop);
             // Patch
@@ -374,7 +373,7 @@ angular.module("canvasApp").factory('moveStageRect', [
             C.allStageViews.splice(stageIndex + 1, 0, stageView);
           }
 
-          callBack();
+          //callBack();
 
           this.moveStageGraphics(stageView, C, circleManager);
           C.canvas.remove(stage_.dots);

@@ -194,6 +194,7 @@ angular.module("canvasApp").factory('stage', [
       };
 
       this.deleteStageContents = function() {
+
         this.stageHitPointLeft.setVisible(false);
         this.stageHitPointRight.setVisible(false);
 
@@ -272,38 +273,39 @@ angular.module("canvasApp").factory('stage', [
       };
 
       //
-      this.makeSurePreviousMovedLeft = function() {
+      this.makeSurePreviousMovedLeft = function(draggedStage) {
         var stage = this.previousStage;
         while(stage) {
           if(stage.stageMovedDirection !== "left") {
-            stage.moveToSide("left");
+            console.log("Looking");
+            stage.moveToSide("left", null, null, draggedStage);
           }
           stage = stage.previousStage;
         }
       };
       //
-      this.makeSureNextMovedRight = function() {
+      this.makeSureNextMovedRight = function(draggedStage) {
         var stage = this.nextStage;
         while(stage) {
           if(stage.stageMovedDirection !== "right") {
-            stage.moveToSide("right");
+            stage.moveToSide("right", null, null, draggedStage);
           }
           stage = stage.nextStage;
         }
       };
 
       //This method is used when move stage hits at the hitPoint at the side of the stage.
-      this.moveToSide = function(direction, verticalLine, spaceArrayRight, spaceArrayLeft) {
+      this.moveToSide = function(direction, spaceArrayRight, spaceArrayLeft, draggedStage) {
 
-        if(this.validMove(direction)) {
+        if(this.validMove(direction, draggedStage)) {
 
           var moveCount;
           if(direction === "left") {
             moveCount = -30;
-            this.makeSurePreviousMovedLeft();
+            this.makeSurePreviousMovedLeft(draggedStage);
           } else if("right") {
             moveCount = 30;
-            this.makeSureNextMovedRight();
+            this.makeSureNextMovedRight(draggedStage);
           }
 
           this.stageGroup.set({left: this.left + moveCount }).setCoords();
@@ -342,14 +344,17 @@ angular.module("canvasApp").factory('stage', [
         return null;
       };
 
-      this.validMove = function(direction) {
+      this.validMove = function(direction, draggedStage) {
 
         if(this.stageMovedDirection === null) {
 
           if(direction === "left") {
             // For very first stage, It can't move further left.
-            if(this.index === 0) {
-              return false;
+            if(this.previousStage === null) {
+              //return false;
+              if(draggedStage.index !== 0) {
+                return false;
+              }
             }
             // look if we have space at left;
             if(this.previousStage && this.left - (this.previousStage.left + this.previousStage.myWidth) < 10) {
@@ -358,8 +363,14 @@ angular.module("canvasApp").factory('stage', [
             this.stageMovedDirection = "left";
 
           } else if(direction === "right") {
-            // Last stage can't move further right.
-            if(this.index === (this.parent.allStageViews.length - 1)) {
+            
+            if(this.nextStage === null) {
+
+              if(draggedStage.index === this.parent.allStageViews.length) {
+                // For the very first time, we need to move only if we dragged the very last stage.
+                this.stageMovedDirection = "right";
+                return true;
+              }
               return false;
             }
             // We move only if we have space in the right side.
