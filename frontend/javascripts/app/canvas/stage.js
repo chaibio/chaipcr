@@ -585,6 +585,20 @@ angular.module("canvasApp").factory('stage', [
         this.manageBordersOnSelection("#cc6c00");
       };
 
+      this.removeFromStagesArray = function() {
+
+
+        this.parent.allStageViews.splice(this.index, 1);
+
+        var length = this.parent.allStageViews.length;
+
+        for( i = this.index;  i < length; i++) {
+          this.parent.allStageViews[i].index = i;
+        }
+        console.log(this.index, this.parent.allStageViews);
+        //debugger;
+      };
+
       this.unSelectStage = function() {
 
         var previousSelectedStage = previouslySelected.circle.parent.parentStage;

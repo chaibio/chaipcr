@@ -282,7 +282,9 @@ angular.module("canvasApp").factory('moveStageRect', [
 
           var that = this;
 
-          if(this.currentHit  > this.draggedStage.index) {
+          var stageToBeReplaced = this.draggedStage;
+          this.backToOriginal(stageToBeReplaced, C, stage);
+          /*if(this.currentHit  > this.draggedStage.index) {
             console.log("Greater", this.currentDrop);
             // Patch
             var checkStage = this.draggedStage.nextStage;
@@ -332,7 +334,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           ExperimentLoader.moveStage(stage.model.id, pre_id).then(function(dat) {
           }, function(err) {
             console.log(err);
-          });
+          }); */
 
           this.direction = null;
           this.verticalLine.setVisible(false);
@@ -346,6 +348,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         };
 
         C.allStageViews.splice(stageToBeReplaced.index, 1);
+
         if(stageToBeReplaced.previousStage !== null) {
           C.addNewStage(data, stageToBeReplaced.previousStage, "move_stage_back_to_original"); // Remember we used this method to insert a new stage [It cant be used to insert at the very beginning]
         } else if(stageToBeReplaced.previousStage === null) {

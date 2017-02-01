@@ -125,6 +125,7 @@ angular.module("canvasApp").factory('mouseDown', [
             that.calculateMoveLimit("stage");
             //C.canvas.bringToFront(C.stageIndicator);
             stage.wireStageNextAndPrevious();
+            stage.removeFromStagesArray();
             C.canvas.renderAll();
           break;
 
