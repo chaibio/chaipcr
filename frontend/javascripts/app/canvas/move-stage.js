@@ -256,9 +256,6 @@ angular.module("canvasApp").factory('moveStageRect', [
                   this.verticalLine.setVisible(true);
                   this.verticalLine.setLeft(verticalDropPositionLeft).setCoords();
                 }
-                /*C.canvas.bringToFront(this.verticalLine);
-                this.verticalLine.setVisible(true);
-                this.verticalLine.setLeft(verticalDropPositionLeft).setCoords();*/
               }
             } else if(this.verticalLine.getVisible() === true) {
               this.verticalLine.setVisible(false);
@@ -272,7 +269,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           // defrag and simplify this method.
           if(this.verticalLine.getVisible() === false) {
             console.log("This is invalid");
-            var stageToBeReplaced = this.draggedStage;
+            var stageToBeReplaced = stage;
             this.backToOriginal(stageToBeReplaced, C, stage);
             this.setVisible(false);
             return true;
@@ -345,8 +342,6 @@ angular.module("canvasApp").factory('moveStageRect', [
         data = {
           stage: stageToBeReplaced.model
         };
-
-        C.allStageViews.splice(stageToBeReplaced.index, 1);
 
         if(stageToBeReplaced.previousStage !== null) {
           C.addNewStage(data, stageToBeReplaced.previousStage, "move_stage_back_to_original"); // Remember we used this method to insert a new stage [It cant be used to insert at the very beginning]
