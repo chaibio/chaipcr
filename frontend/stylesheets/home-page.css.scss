@@ -10,7 +10,8 @@
 		position: absolute;
 		top: 731px;
 		left: 0px;
-		width: 1024px;
+		//width: 1024px;
+		width: 100%;
 	}
 
 	.experiment-links {
@@ -20,7 +21,9 @@
 
 	.home-page-left-wing {
 		float: left;
-		width: 671px;
+		width: 60%;
+		//min-height: calc(100vh - 30px);
+		//width: 671px;
 		//height: 400px; //Just for now;
 
 		.left-wing-content {
@@ -96,7 +99,8 @@
 	// Right Side of the home page
 	.home-page-right-wing {
 		float: left;
-		width: 353px;
+		//width: 353px;
+		width: 40%;
 		height: 728px;
 
 		.home-page-exp-messages {
@@ -280,7 +284,7 @@
 				position: absolute;
 				top: 0px;
 				transition: left .3s;
-				left: 280px;
+				left: calc(100% - 70px);
 				border-bottom: 1px solid #DF217F;
 				z-index: 100;
 
@@ -433,7 +437,7 @@
 
 
 				&.ng-hide {
-					left: 352px;
+					left: 100%;
 					transition: left .3s;
 				}
 

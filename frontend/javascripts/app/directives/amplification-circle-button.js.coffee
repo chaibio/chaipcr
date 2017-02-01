@@ -44,8 +44,8 @@ window.ChaiBioTech.ngApp
 
         $scope.style =
           #borderColor: $scope.color
-          paddingLeft: if (!ngModel.$modelValue.ct?[0] and !ngModel.$modelValue.ct?[1]) then '0px' else '10px'
-          paddingRight: if (!ngModel.$modelValue.ct?[0] and !ngModel.$modelValue.ct?[1]) then '0px' else '10px'
+          paddingLeft: if (!ngModel.$modelValue.ct?[0] and !ngModel.$modelValue.ct?[1]) then '10px' else '10px'
+          paddingRight: if (!ngModel.$modelValue.ct?[0] and !ngModel.$modelValue.ct?[1]) then '10px' else '10px'
 
 
       $scope.toggleState = ->

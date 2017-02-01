@@ -31,10 +31,10 @@
       <td colspan="8" rowspan="2" class="selectable-on-off-buttons">
         <div class="selectable-container">
           <ol id="selectableol">
-            <li class="ui-state-default" ng-repeat="i in loop">
+            <li  ng-repeat="i in loop">
               <amplification-circle-button ng-model="buttons['well_'+$index]"></amplification-circle-button>
             </li>
-            <li class="ui-state-default" ng-repeat="i in loop">
+            <li  ng-repeat="i in loop">
               <amplification-circle-button ng-model="buttons['well_'+($index+8)]"></amplification-circle-button>
             </li>
           </ol>

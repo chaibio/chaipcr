@@ -46,6 +46,25 @@ window.ChaiBioTech.ngApp
       if !$scope.enterHome
         @fetchExperiments()
 
+    $scope.$on '.home-page-exp-tile', =>
+      alert($(".home-page-exp-tile").width());
+
+    getWidth = ->
+      if($(".home-page-exp-tile").width())
+        alert($(".home-page-exp-tile").width())
+        width = $(".home-page-exp-tile").width()
+        $(".home-page-del").css({
+          'left': width - 72+'px',
+          'transition': 'left .3s'
+        })
+
+      else
+        $timeout ->
+          getWidth()
+        , 2000
+
+    #getWidth()
+
     @fetchExperiments = ->
       Experiment.query (experiments) ->
         $scope.experiments = experiments
