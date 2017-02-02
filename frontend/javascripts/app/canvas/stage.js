@@ -308,8 +308,6 @@ angular.module("canvasApp").factory('stage', [
             this.makeSureNextMovedRight(draggedStage);
           }
 
-          this.stageGroup.set({left: this.left + moveCount }).setCoords();
-
           if(spaceArrayRight && spaceArrayLeft) {
             if(direction === "right") {
               spaceArrayLeft[0] = this.left - 82;
@@ -326,22 +324,28 @@ angular.module("canvasApp").factory('stage', [
             }
           }
 
-          this.dots.set({left: (this.left + moveCount ) + 3}).setCoords();
-          this.stageHitPointLeft.set({left: (this.left + moveCount ) + 10}).setCoords();
-          this.stageHitPointRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
-          this.stageHitPointLowerLeft.set({left: (this.left + moveCount ) + 10}).setCoords();
-          this.stageHitPointLowerRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
-          this.left = this.left + moveCount;
-
-          this.childSteps.forEach(function(step, index) {
-            step.moveStep(1, true);
-            step.circle.moveCircleWithStep();
-          });
+          this.moveToSideStageComponents(moveCount);
 
           this.stageMovedDirection = direction; // !important
           return "Valid Move";
         }
         return null;
+      };
+
+      this.moveToSideStageComponents = function(moveCount) {
+
+        this.stageGroup.set({left: this.left + moveCount }).setCoords();
+        this.dots.set({left: (this.left + moveCount ) + 3}).setCoords();
+        this.stageHitPointLeft.set({left: (this.left + moveCount ) + 10}).setCoords();
+        this.stageHitPointRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
+        this.stageHitPointLowerLeft.set({left: (this.left + moveCount ) + 10}).setCoords();
+        this.stageHitPointLowerRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
+        this.left = this.left + moveCount;
+
+        this.childSteps.forEach(function(step, index) {
+          step.moveStep(1, true);
+          step.circle.moveCircleWithStep();
+        });
       };
 
       this.validMove = function(direction, draggedStage) {
@@ -363,7 +367,7 @@ angular.module("canvasApp").factory('stage', [
             this.stageMovedDirection = "left";
 
           } else if(direction === "right") {
-            
+
             if(this.nextStage === null) {
 
               if(draggedStage.index === this.parent.allStageViews.length) {
