@@ -206,56 +206,49 @@ angular.module("canvasApp").factory('moveStageRect', [
         this.indicator.manageVerticalLine = function(C) {
           // break this methid into two methods.
           if(this.direction === 'right') {
-            if(this.beacon.left > this.spaceArrayRight[0] && this.beacon.left < this.spaceArrayRight[1]) {
-              if(this.verticalLine.getVisible() === false) {
-                var verticalDropPositionRight = 0;
-                if(this.currentDrop) {
-                  verticalDropPositionRight = this.currentDrop.left + this.currentDrop.myWidth + 13;
-
-                } else {
-                  console.log("In here");
-                  if(this.draggedStage.index === 0) {
-                    verticalDropPositionRight = C.allStageViews[1].left - 20;
-                  } else {
-                    verticalDropPositionRight = C.allStageViews[0].left - 20;
-                  }
-                }
-                C.canvas.bringToFront(this.verticalLine);
-                this.verticalLine.setLeft(verticalDropPositionRight).setCoords();
-                this.verticalLine.setVisible(true);
-              }
-            } else if(this.verticalLine.getVisible() === true) {
-              this.verticalLine.setVisible(false);
-            }
+            this.manageVerticalLineRight(C);
           } else if(this.direction === 'left') {
-            if(this.beacon.left > this.spaceArrayLeft[0] && this.beacon.left < this.spaceArrayLeft[1]) {
-              if(this.verticalLine.getVisible() === false) {
-                var verticalDropPositionLeft = 0;
-                if(this.currentDrop) {
-                  console.log("bingo");
-                  verticalDropPositionLeft = this.currentDrop.left + this.currentDrop.myWidth + 13;
-                  C.canvas.bringToFront(this.verticalLine);
-                  this.verticalLine.setVisible(true);
-                  this.verticalLine.setLeft(verticalDropPositionLeft).setCoords();
-                } else {
-                  if(this.draggedStage.index === 0) {
-                    verticalDropPositionLeft = C.allStageViews[1].left - 20;
-                  } else {
-                    verticalDropPositionLeft = C.allStageViews[0].left - 20;
-                  }
-                  console.log("This possible");
-                  C.canvas.bringToFront(this.verticalLine);
-                  this.verticalLine.setVisible(true);
-                  this.verticalLine.setLeft(verticalDropPositionLeft).setCoords();
-                }
-              }
-            } else if(this.verticalLine.getVisible() === true) {
-              this.verticalLine.setVisible(false);
-            }
+            this.manageVerticalLineLeft(C);
           }
-
         };
 
+        this.indicator.manageVerticalLineRight = function(C) {
+
+          if(this.beacon.left > this.spaceArrayRight[0] && this.beacon.left < this.spaceArrayRight[1]) {
+            if(this.verticalLine.getVisible() === false) {
+              var verticalDropPositionRight = 0;
+              if(this.currentDrop) {
+                verticalDropPositionRight = this.currentDrop.left + this.currentDrop.myWidth + 13;
+              } else {
+                verticalDropPositionRight = C.allStageViews[0].left - 20;
+              }
+              C.canvas.bringToFront(this.verticalLine);
+              this.verticalLine.setLeft(verticalDropPositionRight).setCoords();
+              this.verticalLine.setVisible(true);
+            }
+          } else if(this.verticalLine.getVisible() === true) {
+            this.verticalLine.setVisible(false);
+          }
+        };
+
+        this.indicator.manageVerticalLineLeft = function(C) {
+
+          if(this.beacon.left > this.spaceArrayLeft[0] && this.beacon.left < this.spaceArrayLeft[1]) {
+            if(this.verticalLine.getVisible() === false) {
+              var verticalDropPositionLeft = 0;
+              if(this.currentDrop) {
+                verticalDropPositionLeft = this.currentDrop.left + this.currentDrop.myWidth + 13;
+              } else {
+                verticalDropPositionLeft = C.allStageViews[0].left - 20;
+              }
+              C.canvas.bringToFront(this.verticalLine);
+              this.verticalLine.setVisible(true);
+              this.verticalLine.setLeft(verticalDropPositionLeft).setCoords();
+            }
+          } else if(this.verticalLine.getVisible() === true) {
+            this.verticalLine.setVisible(false);
+          }
+        };
         this.indicator.processMovement = function(stage, C, circleManager) {
 
           if(this.verticalLine.getVisible() === false) {
