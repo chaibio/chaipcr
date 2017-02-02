@@ -57,13 +57,15 @@
 
         &.ct-1 {
           .dot {
-            background-color: $lightgray;
+            //background-color: $lightgray;
+						background-color: rgb(4, 160, 217);
           }
         }
 
         &.ct-2 {
           .dot {
-            background-color: gray;
+            //background-color: gray;
+						background-color: rgb(103, 188, 66);
           }
         }
 
