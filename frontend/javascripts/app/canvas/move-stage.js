@@ -252,7 +252,6 @@ angular.module("canvasApp").factory('moveStageRect', [
         this.indicator.processMovement = function(stage, C, circleManager) {
 
           if(this.verticalLine.getVisible() === false) {
-            console.log("This is invalid Move, Moving back.");
             this.backToOriginal(stage, C);
           } else {
             this.applyMovement(stage, C, circleManager, null);
@@ -281,7 +280,6 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         this.indicator.applyMovement = function(stage_, C, circleManager, callBack) {
 
-          console.log("Entering apply movement");
           var stage = this.draggedStage;
 
           var stageIndex = (this.currentDrop) ? this.currentDrop.index : 0;
