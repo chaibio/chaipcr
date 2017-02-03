@@ -125,11 +125,14 @@ angular.module("canvasApp").factory('events', [
         console.log("here");
       };
 
-      this.calculateMoveLimit = function(moveElement) {
+      this.calculateMoveLimit = function(moveElement, stage) {
 
         var lastStep = C.allStepViews[C.allStepViews.length - 1];
         var lastStage = C.allStageViews[C.allStageViews.length - 1];
-
+        if(stage.index === lastStage.index) {
+          C.moveLimit = stage.previousStage.left + stage.previousStage.myWidth;
+          return;
+        }
         if(lastStep.circle.holdTime.text === "∞") {
           if(moveElement === "step") {
             C.moveLimit = ((lastStep.left + 3) - 120);
