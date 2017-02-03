@@ -111,7 +111,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           this.setLeft(stage.left - 50).setCoords();
           C.canvas.bringToFront(this);
           this.setVisible(true);
-          
+
           this.currentLeft = movement.left;
           this.canvasContaining = $('.canvas-containing');
           this.currentDragPos = 0;
@@ -261,6 +261,13 @@ angular.module("canvasApp").factory('moveStageRect', [
           }
 
           console.log("Landed .... !: Dragged stage->", this.draggedStage.index);
+
+          var pre_id = (this.currentDrop) ? this.currentDrop.model.id : null;
+          ExperimentLoader.moveStage(stage.model.id, pre_id).then(function(dat) {
+          }, function(err) {
+            console.log(err);
+          });
+
           this.setVisible(false);
           this.direction = null;
           this.verticalLine.setVisible(false);
