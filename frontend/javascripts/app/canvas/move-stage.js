@@ -106,12 +106,13 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         this.indicator.verticalLine = vertical;
 
-        this.indicator.init = function(stage, C) {
+        this.indicator.init = function(stage, C, movement) {
           // rework on this part for smaller space...
           this.setLeft(stage.left - 50).setCoords();
           C.canvas.bringToFront(this);
           this.setVisible(true);
-
+          
+          this.currentLeft = movement.left;
           this.canvasContaining = $('.canvas-containing');
           this.currentDragPos = 0;
           this.spaceArrayRight = [stage.left + 30, stage.left + 90];
@@ -192,10 +193,12 @@ angular.module("canvasApp").factory('moveStageRect', [
         this.indicator.checkMovingOffScreen = function(C, movement, direction) {
 
           if(direction === "right") {
+
             if(movement.left - this.canvasContaining.scrollLeft() > 889) {
               this.canvasContaining.scrollLeft(movement.left - 889);
             }
           } else if (direction === "left") {
+
             var anchor = this.canvasContaining.scrollLeft();
             if(anchor > movement.left) {
               this.canvasContaining.scrollLeft((anchor - (anchor - movement.left)));
