@@ -56,7 +56,7 @@ angular.module("canvasApp").factory('mouseDown', [
             var removeIndex = items.length - 1; // We have a rectangle mask in stepDataGroup, which we dont want to add when
             // editmode is active. so delete it before we add , so we send removeIndex. In this case rectangle mask is the
             // last element in the array.
-            
+
             unHookGroup(group, items, removeIndex);
 
             if(getP.x > stepDataGroupLeft && getP.x < (stepDataGroupLeft + 45)) {
@@ -118,7 +118,7 @@ angular.module("canvasApp").factory('mouseDown', [
             that.moveStageActive = true;
             that.canvas.moveCursor = "move";
 
-            C.stageIndicator.init(evt.target.parent, C);
+            C.stageIndicator.init(evt.target.parent, C, evt.target);
             that.stageIndicatorPosition = C.stageIndicator.left;
             C.stageIndicator.changeText(evt.target.parent);
 
