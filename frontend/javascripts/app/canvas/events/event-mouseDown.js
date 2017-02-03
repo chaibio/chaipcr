@@ -126,7 +126,7 @@ angular.module("canvasApp").factory('mouseDown', [
 
             var stage = evt.target.parent;
             stage.collapseStage();
-            that.calculateMoveLimit("stage");
+            that.calculateMoveLimit("stage", stage);
             //C.canvas.bringToFront(C.stageIndicator);
             stage.wireStageNextAndPrevious();
             stage.removeFromStagesArray();
