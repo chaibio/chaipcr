@@ -512,9 +512,13 @@
         transform.y = -(Globals.height * transform.k - Globals.height);
       }
 
-      Globals.viewSVG.attr("transform", transform);
       Globals.gX.call(Globals.xAxis.scale(transform.rescaleX(Globals.xScale)));
-      Globals.gY.call(Globals.yAxis.scale(transform.rescaleY(Globals.yScale)));
+      // store the previous x scale
+      var oldScale = Globals.xScale;
+      Globals.xScale = transform.rescaleX(Globals.xScale);
+      drawLines();
+      // restore the previous x scale after redrawing the lines
+      Globals.xScale = oldScale;
       Globals.zoomTransform = transform;
 
       if (Globals.onZoomAndPan) {
