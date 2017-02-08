@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161220070207) do
+ActiveRecord::Schema.define(version: 20170207074051) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -235,5 +235,15 @@ ActiveRecord::Schema.define(version: 20161220070207) do
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
+
+  create_table "wells", force: true do |t|
+    t.integer "experiment_id",                  null: false
+    t.integer "well_num",                       null: false
+    t.string  "well_type",                      null: false, comment: "positive_control, no_template_control, standard, sample"
+    t.string  "sample_name"
+    t.text    "notes",         limit: 16777215
+    t.string  "target1"
+    t.string  "target2"
+  end
 
 end
