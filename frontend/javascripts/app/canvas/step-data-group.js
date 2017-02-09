@@ -23,7 +23,7 @@ angular.module("canvasApp").factory('stepDataGroup', [
       var rec = new fabric.Rect({
         width: 105,
         height: 20,
-        fill: 'green',
+        fill: '#FFB300',
         opacity: 0.1,
         top: parent.top + 22,
         left: parent.left + 35,
@@ -33,8 +33,8 @@ angular.module("canvasApp").factory('stepDataGroup', [
         hasControls: false,
       });
 
-      dataArray.push(rec);
-      
+      dataArray.unshift(rec);
+
       return new fabric.Group(dataArray, {
         top: parent.top + 48,
         left: parent.left + 60,
