@@ -54,6 +54,13 @@ bool watchProcess(const std::string &command, int eventFd, WatchProcessCallback 
 
 bool getFileChecksum(const std::string &filePath, int eventFd, std::string &checksum);
 
+struct NullMutex
+{
+     void lock() {}
+     void unlock() {}
+     bool try_lock() { return true; }
+};
+
 }
 
 #endif // UTIL_H

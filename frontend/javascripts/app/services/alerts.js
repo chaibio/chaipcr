@@ -31,7 +31,7 @@ window.ChaiBioTech.ngApp.service('alerts', [
       holdDurationWarning: "Please a enter a value in the range 00:00 - 05:00",
       internalServerError: "There is an internal server error pleas re-load the page",
       autoDeltaTemp: "Please enter a value in the range [-99 To 99]",
-      rampSpeedWarningLimitExceeded: "We support upto 5 decimal points, Please correct the number for upto 5 decimal points"
+      rampSpeedWarningLimitExceeded: "Minimum ramp speed is 0.00001"
     };
   }
 ]);

@@ -43,7 +43,7 @@ TemperatureController::TemperatureController(Settings settings)
     _targetTemperature = _minTargetTemp - 1;
     _firstErrorState = false;
 
-    _thermistor->temperatureChanged.connect(boost::bind(&TemperatureController::currentTemperatureChanged, this, _1));
+    _thermistor->setTemperatureChangeCallback(std::bind(&TemperatureController::currentTemperatureChanged, this, std::placeholders::_1));
 }
 
 TemperatureController::~TemperatureController()

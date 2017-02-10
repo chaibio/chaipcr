@@ -44,7 +44,7 @@ def _check_par(name, value, _type=int, _min=None, _max=None, _list=None):
     if _max != None and value > _max:
         raise Exception('Value of parameter %s is more than the max value %s.'%(name, _max))
 
-class ChaiDevice():
+class ChaiDevice(object):
     """Device class.
 
     Communicates with the device using the REST API and/or ssh
@@ -83,8 +83,9 @@ class ChaiDevice():
         self._ssh_session.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.connect_ssh()
 
-
         print("Connection successful")
+
+        self.data_logger_samplerate = 80 #Hz or samples/s
 
 
     def connect_rest(self):
@@ -242,7 +243,7 @@ class ChaiDevice():
             print("Starting loop %d with experiment id %d"%(loop, new_id))
 
             if data_log:
-                self.data_logger_start(int(1.2 * data_log_duration_s) * 80, 10)
+                self.data_logger_start(int(1.2 * data_log_duration_s) * self.data_logger_samplerate, 10)
 
             self.experiment_start(new_id)
             time.sleep(10)
@@ -402,11 +403,15 @@ class ChaiDevice():
         except Exception as e:
             raise Exception('Failed to access database')
 
-    def sql_get_data(self, table, experiment_id, channel, well=None):
+    def sql_get_data(self, table, experiment_id, channel=None, well=None):
         """Get data for a specific experiment."""
 
         _check_par('experiment id', experiment_id, _type=int, _min=0)
-        _check_par('channel', channel, _type=int, _min=1, _max=2)
+
+        channel_string = ''
+        if channel is not None:
+            _check_par('channel', channel, _type=int, _min=1, _max=2)
+            channel_string = 'and channel = %d'%(int(channel))
 
         well_string = ''
         if well is not None:
@@ -414,7 +419,7 @@ class ChaiDevice():
             well_string = 'and well_num = %d'%(int(well))
 
         data = self.sql_command(
-                "select * from %s where experiment_id = %d and channel = %d %s"%(table, experiment_id, channel, well_string)
+                "select * from %s where experiment_id = %d %s %s"%(table, experiment_id, channel_string, well_string)
                )
         return data
 

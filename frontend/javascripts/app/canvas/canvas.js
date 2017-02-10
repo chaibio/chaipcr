@@ -39,7 +39,7 @@ angular.module("canvasApp").factory('canvas', [
     moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageHitBlock, stageGraphics) {
 
     this.init = function(model) {
-      
+
       this.model = model.protocol;
       this.$scope = model;
       this.allStepViews = [];
@@ -137,6 +137,7 @@ angular.module("canvasApp").factory('canvas', [
 
         this.stepIndicator = moveStepRect.getMoveStepRect(this);
         this.stageIndicator = moveStageRect.getMoveStageRect(this);
+        this.stageVerticalLine = this.stageIndicator.verticalLine;
         this.beacon = this.stageIndicator.beacon;
         this.stepBeacon = this.stepIndicator.beacon;
         this.stepBrick = this.stepIndicator.brick;
@@ -144,6 +145,8 @@ angular.module("canvasApp").factory('canvas', [
 
         this.canvas.add(this.stepIndicator);
         this.canvas.add(this.stageIndicator);
+        this.canvas.add(this.stageVerticalLine);
+
         this.canvas.add(this.beacon);
         this.canvas.add(this.stepBeacon);
         this.canvas.add(this.stepBrick);

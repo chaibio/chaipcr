@@ -55,7 +55,7 @@ class ExperimentsController < ApplicationController
   api :GET, "/experiments", "List all the experiments"
   example "[{'experiment':{'id':1,'name':'test1','type':'user','started_at':null,'completed_at':null,'completed_status':null}},{'experiment':{'id':2,'name':'test2','type':'user','started_at':null,'completed_at':null,'completed_status':null}}]"
   def index
-    @experiments = Experiment.includes(:experiment_definition).where("experiment_definitions.experiment_type"=>"user").load
+    @experiments = Experiment.includes(:experiment_definition).where("experiment_definitions.experiment_type"=>[ExperimentDefinition::TYPE_USER_DEFINED, ExperimentDefinition::TYPE_TESTKIT]).load
     respond_to do |format|
       format.json { render "index", :status => :ok }
     end
@@ -577,14 +577,14 @@ class ExperimentsController < ApplicationController
     return nil if !FluorescenceDatum.new_data_generated?(experiment.id, stage_id)
     experiment.experiment_definition #load experiment_definition before go to background thread
     return background("amplification", experiment.id) do
-      amplification_data, cts = calculate_amplification_data(experiment.id, stage_id, experiment.calibration_id)
+      amplification_data, cts = calculate_amplification_data(experiment, stage_id, experiment.calibration_id)
       #update cache
       AmplificationDatum.import amplification_data, :on_duplicate_key_update => [:background_subtracted_value,:baseline_subtracted_value]
       AmplificationCurve.import cts, :on_duplicate_key_update => [:ct]
     end
   end
   
-  def calculate_amplification_data(experiment_id, stage_id, calibration_id)
+  def calculate_amplification_data(experiment, stage_id, calibration_id)
    # sleep(10)
   #  return  [AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>1, :well_num=>1, :cycle_num=>1, :background_subtracted_value=>1001, :baseline_subtracted_value=>102)], [AmplificationCurve.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>1, :well_num=>1, :ct=>10)]
     step = Step.collect_data(stage_id).first
@@ -605,7 +605,7 @@ class ExperimentsController < ApplicationController
     connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
     begin
-      results = connection.eval("tryCatchError(get_amplification_data, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, list(#{sub_type}_id=#{sub_id}), #{calibrate_info(calibration_id)})")
+      results = connection.eval("tryCatchError(get_amplification_data, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, list(#{sub_type}_id=#{sub_id}), #{calibrate_info(calibration_id)})")
     rescue  => e
       logger.error("Rserve error: #{e}")
       kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
@@ -634,12 +634,12 @@ class ExperimentsController < ApplicationController
            (0...num_cycles).each do |cycle_num|
              background_subtracted_value = (background_subtracted_results.is_a? Array)? background_subtracted_results[well_num+1] : background_subtracted_results[cycle_num, well_num+1]
              baseline_subtracted_value = (baseline_subtracted_results.is_a? Array)? baseline_subtracted_results[well_num] : baseline_subtracted_results[cycle_num, well_num]
-             amplification_data << AmplificationDatum.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :sub_type=>sub_type, :sub_id=>sub_id, :channel=>channel+1, :well_num=>well_num+1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_value, :baseline_subtracted_value=>baseline_subtracted_value)
+             amplification_data << AmplificationDatum.new(:experiment_id=>experiment.id, :stage_id=>stage_id, :sub_type=>sub_type, :sub_id=>sub_id, :channel=>channel+1, :well_num=>well_num+1, :cycle_num=>cycle_num+1, :background_subtracted_value=>background_subtracted_value, :baseline_subtracted_value=>baseline_subtracted_value)
            end
          end
          ct_results = results[2][channel]
          (0...ct_results.column_size).each do |well_num|
-           cts << AmplificationCurve.new(:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>channel+1, :well_num=>well_num+1, :ct=>ct_results[0,well_num])
+           cts << AmplificationCurve.new(:experiment_id=>experiment.id, :stage_id=>stage_id, :channel=>channel+1, :well_num=>well_num+1, :ct=>ct_results[0,well_num])
          end
       end
       #amplification_data.sort_by!{|x| [x.channel,x.well_num,x.cycle_num]}
@@ -652,7 +652,7 @@ class ExperimentsController < ApplicationController
     new_data = MeltCurveDatum.new_data_generated?(experiment, stage_id)
     return nil if new_data.nil?
     return background("meltcurve", experiment.id) do
-      melt_curve_data = calculate_melt_curve_data(experiment.id, stage_id, experiment.calibration_id)
+      melt_curve_data = calculate_melt_curve_data(experiment, stage_id, experiment.calibration_id)
       #update cache
       CachedMeltCurveDatum.import melt_curve_data, :on_duplicate_key_update => [:temperature_text, :normalized_data_text, :derivative_data_text, :tm_text, :area_text]
       #update cached_temperature
@@ -665,7 +665,7 @@ class ExperimentsController < ApplicationController
     end
   end
   
-  def calculate_melt_curve_data(experiment_id, stage_id, calibration_id)
+  def calculate_melt_curve_data(experiment, stage_id, calibration_id)
   #  sleep(10)
   #  return [CachedMeltCurveDatum.new({:experiment_id=>experiment_id, :stage_id=>stage_id, :channel=>1, :well_num=>1, :temperature=>[121,122], :fluorescence_data=>[1001, 1002], :derivative=>[3,4], :tm=>[1,2,3], :area=>[1,2,5]})]
     
@@ -673,7 +673,7 @@ class ExperimentsController < ApplicationController
     connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
     begin
-      results = connection.eval("tryCatchError(process_mc, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment_id}, #{stage_id}, #{calibrate_info(calibration_id)})")
+      results = connection.eval("tryCatchError(process_mc, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, #{stage_id}, #{calibrate_info(calibration_id)}, #{"qt_prob=0.1, max_normd_qtv=0.9" if experiment.experiment_definition.guid == "thermal_consistency"})")
     rescue  => e
       logger.error("Rserve error: #{e}")
       kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
@@ -691,7 +691,7 @@ class ExperimentsController < ApplicationController
       (0...results.length).each do |channel|
         results[channel].each_index do |i|
           results_per_well = results[channel][i]
-          hash = CachedMeltCurveDatum.new({:experiment_id=>experiment_id, :stage_id=>stage_id, :ramp_id=>(ramp)? ramp.id : nil, :channel=>channel+1, :well_num=>i+1, :temperature=>results_per_well[0][0], :normalized_data=>results_per_well[0][1], :derivative_data=>results_per_well[0][2], :tm=>(results_per_well[1][0].blank?)? [] : (results_per_well[1][0].is_a? Array)? results_per_well[1][0] : [results_per_well[1][0]], :area=>(results_per_well[1][1].blank?)? [] : (results_per_well[1][1].is_a? Array)? results_per_well[1][1] : [results_per_well[1][1]]})
+          hash = CachedMeltCurveDatum.new({:experiment_id=>experiment.id, :stage_id=>stage_id, :ramp_id=>(ramp)? ramp.id : nil, :channel=>channel+1, :well_num=>i+1, :temperature=>results_per_well[0][0], :normalized_data=>results_per_well[0][1], :derivative_data=>results_per_well[0][2], :tm=>(results_per_well[1][0].blank?)? [] : (results_per_well[1][0].is_a? Array)? results_per_well[1][0] : [results_per_well[1][0]], :area=>(results_per_well[1][1].blank?)? [] : (results_per_well[1][1].is_a? Array)? results_per_well[1][1] : [results_per_well[1][1]]})
           melt_curve_data << hash
         end
       end

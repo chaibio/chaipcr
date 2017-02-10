@@ -22,6 +22,7 @@ class ExperimentDefinition < ActiveRecord::Base
   TYPE_USER_DEFINED = "user"
   TYPE_DIAGNOSTIC  = "diagnostic"
   TYPE_CALIBRATION  = "calibration"
+  TYPE_TESTKIT = "test_kit"
   
   DIAGNOSTICS_SINGLE_CHANNEL = ["thermal_performance_diagnostic", "thermal_consistency", "optical_test_single_channel"]
   DIAGNOSTICS_DUAL_CHANNEL = ["thermal_performance_diagnostic", "thermal_consistency", "optical_test_dual_channel"]

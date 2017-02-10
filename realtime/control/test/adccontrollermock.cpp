@@ -27,8 +27,8 @@ ADCControllerMock::ADCControllerMock(ConsumersList &&consumers, unsigned int csP
 }
 
 void ADCControllerMock::process() {
-    for (ConsumersList::iterator it = _consumers.begin(); it != _consumers.end(); ++it)
-        it->second->setADCValueMock(30);
+    for (std::shared_ptr<ADCConsumer> &consumer: _consumers)
+        consumer->setADCValueMock(30);
 
     _workState = true;
     while (_workState) {

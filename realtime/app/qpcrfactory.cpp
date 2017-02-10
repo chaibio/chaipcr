@@ -89,7 +89,7 @@ shared_ptr<IControl> QPCRFactory::constructHeatBlock(ADCController::ConsumersLis
     return HeatBlockInstance::createInstance(zone1, zone2, kPCRBeginStepTemperatureThreshold, kMaxHeatBlockRampSpeed);
 }
 
-shared_ptr<IControl> QPCRFactory::constructLid(ADCController::ConsumersList &consumer) {
+shared_ptr<IControl> QPCRFactory::constructLid(ADCController::ConsumersList &consumers) {
     TemperatureController::Settings settings;
 
     settings.name = "lid";
@@ -100,7 +100,7 @@ shared_ptr<IControl> QPCRFactory::constructLid(ADCController::ConsumersList &con
     settings.maxTempThreshold = kLidHighTempShutdownThreshold;
     settings.pidController = new PIDController({{150, 0.35, 100, 0}}, kLidPIDMin, kLidPIDMax, SinglePoleRecursiveFilter(0.01));//was 150, 0.2, 100, 0 ///0.3 works for gain
 
-    consumer[ADCController::EReadLid] = settings.thermistor;
+    consumers[ADCController::EReadLid] = settings.thermistor;
 
     return LidInstance::createInstance(settings, kLidControlPWMPath, kLidPWMPeriodNs, kProgramStartLidTempThreshold);
 }
