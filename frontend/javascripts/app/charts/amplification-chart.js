@@ -518,12 +518,7 @@
       Globals.lastXScale = transform.rescaleX(Globals.xScale);
       Globals.gX.call(Globals.xAxis.scale(Globals.lastXScale));
       Globals.zoomTransform = transform;
-      // store the previous x scale
-      // var oldScale = Globals.xScale;
-      // Globals.lastXScale = Globals.xScale;
       drawLines();
-      // restore the previous x scale after redrawing the lines
-      // Globals.xScale = oldScale;
 
       if (Globals.onZoomAndPan) {
         Globals.onZoomAndPan(Globals.zoomTransform, Globals.width, Globals.height, getScaleExtent());
@@ -573,7 +568,7 @@
     }
 
     function getScaleExtent() {
-      return getMaxX();
+      return Globals.config.axes.x.max || getMaxX();
     }
 
     function getYLogticks() {
