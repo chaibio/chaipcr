@@ -49,10 +49,12 @@
     function makeCircleForLine(line_config) {
       var c = Globals.viewSVG.append('circle')
         .attr('opacity', 0)
-        .attr('r', Globals.circleRadius / Globals.zoomTransform.k)
+        // .attr('r', Globals.circleRadius / Globals.zoomTransform.k)
+        .attr('r', Globals.circleRadius)
         .attr('fill', line_config.color)
         .attr('stroke', '#fff')
-        .attr('stroke-width', Globals.circleStrokeWidth / Globals.zoomTransform.k)
+        // .attr('stroke-width', Globals.circleStrokeWidth / Globals.zoomTransform.k)
+        .attr('stroke-width', Globals.circleStrokeWidth)
         .attr('class', 'mouse-indicator-circle');
 
       Globals.circles.push(c);
@@ -62,7 +64,8 @@
       if (Globals.dashedLine) {
         Globals.dashedLine.remove();
       }
-      var dashStrokeWidth = Globals.dashedLineStrokeWidth / Globals.zoomTransform.k;
+      // var dashStrokeWidth = Globals.dashedLineStrokeWidth / Globals.zoomTransform.k;
+      var dashStrokeWidth = Globals.dashedLineStrokeWidth;
 
       return Globals.viewSVG
         .append("line")
@@ -70,16 +73,17 @@
         .attr("y1", 0)
         .attr("y2", Globals.height)
         .attr("stroke-dasharray", dashStrokeWidth + ',' + dashStrokeWidth)
-        .attr("stroke-width", Globals.dashedLineStrokeWidth / Globals.zoomTransform.k)
+        // .attr("stroke-width", Globals.dashedLineStrokeWidth / Globals.zoomTransform.k)
+        .attr("stroke-width", Globals.dashedLineStrokeWidth)
         .attr("stroke", "#333")
         .attr("fill", "none");
     }
 
-    function makeLine(line_config) {
+    function makeLine(xScale, line_config) {
       var line = d3.line()
         .curve(d3.curveCardinal)
         .x(function(d) {
-          return Globals.xScale(d[line_config.x]);
+          return xScale(d[line_config.x]);
         })
         .y(function(d) {
           return Globals.yScale(d[line_config.y]);
@@ -89,8 +93,8 @@
         .attr("class", "line")
         .attr("stroke", line_config.color)
         .attr('fill', 'none')
-        .attr('stroke-width', Globals.lineStrokeWidth / Globals.zoomTransform.k)
-        // .attr('stroke-width', Globals.lineStrokeWidth)
+        // .attr('stroke-width', Globals.lineStrokeWidth / Globals.zoomTransform.k)
+        .attr('stroke-width', Globals.lineStrokeWidth)
         .attr("d", line);
 
       Globals.lines.push(_path);
@@ -108,9 +112,10 @@
       });
       Globals.lines = [];
       Globals.lines = [];
+      var xScale = Globals.zoomTransform.k > 1? Globals.lastXScale : Globals.xScale;
 
       series.forEach(function(line_config, i) {
-        makeLine(line_config);
+        makeLine(xScale, line_config);
       });
 
       Globals.dashedLine = makeDashedLine();
@@ -145,22 +150,6 @@
       return total / Globals.config.series.length;
     }
 
-    function updateElementSizesOnZoom(transform) {
-      Globals.lines.forEach(function(l) {
-        l.attr('stroke-width', (Globals.lineStrokeWidth / transform.k) + 'px');
-      });
-
-      Globals.circles.forEach(function(circle) {
-        circle
-          .attr('stroke-width', Globals.circleStrokeWidth / transform.k + 'px')
-          .attr('r', Globals.circleRadius / transform.k + 'px');
-      });
-
-      Globals.dashedLine
-        .attr('stroke-dasharray', 5 / transform.k + "," + 5 / transform.k)
-        .attr('stroke-width', (Globals.dashedLineStrokeWidth / transform.k) + 'px');
-    }
-
     function zoomed() {
       var transform = d3.event.transform;
       transform.x = transform.x || 0;
@@ -183,12 +172,10 @@
         transform.y = -(Globals.height * transform.k - Globals.height);
       }
 
-      Globals.viewSVG.attr("transform", transform);
-      Globals.gX.call(Globals.xAxis.scale(transform.rescaleX(Globals.xScale)));
-      Globals.gY.call(Globals.yAxis.scale(transform.rescaleY(Globals.yScale)));
+      Globals.lastXScale = transform.rescaleX(Globals.xScale);
       Globals.zoomTransform = transform;
-
-      updateElementSizesOnZoom(transform);
+      Globals.gX.call(Globals.xAxis.scale(Globals.lastXScale));
+      drawLines();
 
       if (Globals.onZoomAndPan) {
         Globals.onZoomAndPan(Globals.zoomTransform, Globals.width, Globals.height, getScaleExtent());
