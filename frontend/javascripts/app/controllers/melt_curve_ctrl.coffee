@@ -111,7 +111,7 @@ App.controller 'MeltCurveChartCtrl', [
           x: 'temperature'
           dataset: "well_#{i}"
           color: buttons["well_#{i}"]?.color
-          ct: buttons["well_#{i}"].ct
+          ct: buttons["well_#{i}"]?.ct
           well: i
 
     getMeltCurveDataCallBack = (data) ->

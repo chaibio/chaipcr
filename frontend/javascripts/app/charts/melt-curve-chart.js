@@ -40,6 +40,7 @@
           x: 0,
           y: 0
         },
+        lastXScale: null,
         onZoomAndPan: null,
         normalPathStrokeWidth: 2,
         hoveredPathStrokeWidth: 3,
@@ -108,8 +109,9 @@
       Globals.activePathConfig = getPathConfig(path);
       var activePathConfig = Globals.activePathConfig.config;
       var activePathIndex = Globals.activePathConfig.index;
-      makeWhiteBorderLine(activePathConfig);
-      var newLine = makeColoredLine(activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth);
+      var xScale = Globals.zoomTransform.k > 1 ? Globals.lastXScale : Globals.xScale;
+      makeWhiteBorderLine(xScale, activePathConfig);
+      var newLine = makeColoredLine(xScale, activePathConfig).attr('stroke-width', Globals.activePathStrokeWidth);
       Globals.lines[activePathIndex] = newLine;
       Globals.activePath = newLine;
       makeCircle();
@@ -282,11 +284,11 @@
       }
     }
 
-    function makeGuidingLine(line_config) {
+    function makeGuidingLine(xScale, line_config) {
       var line = d3.line()
         .curve(d3.curveBasis)
         .x(function(d) {
-          return Globals.xScale(d[line_config.x]);
+          return xScale(d[line_config.x]);
         })
         .y(function(d) {
           return Globals.yScale(d[line_config.y]);
@@ -305,11 +307,11 @@
       return _path;
     }
 
-    function makeColoredLine(line_config) {
+    function makeColoredLine(xScale, line_config) {
       var line = d3.line()
         .curve(d3.curveBasis)
         .x(function(d) {
-          return Globals.xScale(d[line_config.x]);
+          return xScale(d[line_config.x]);
         })
         .y(function(d) {
           return Globals.yScale(d[line_config.y]);
@@ -351,14 +353,14 @@
       return _path;
     }
 
-    function makeWhiteBorderLine(line_config) {
+    function makeWhiteBorderLine(xScale, line_config) {
       if (Globals.whiteBorderLine) {
         Globals.whiteBorderLine.remove();
       }
       var line = d3.line()
         .curve(d3.curveBasis)
         .x(function(d) {
-          return Globals.xScale(d[line_config.x]);
+          return xScale(d[line_config.x]);
         })
         .y(function(d) {
           return Globals.yScale(d[line_config.y]);
@@ -382,8 +384,8 @@
 
     function drawLines() {
       var series = getSelectedSeries(),
-          i,
-          s;
+        i,
+        s;
       if (!series) {
         return;
       }
@@ -401,16 +403,16 @@
       Globals.lines = [];
       Globals.activePath = null;
 
-      // Globals.dashedLine = makeDashedLine();
+      var xScale = Globals.zoomTransform.k > 1 ? Globals.lastXScale : Globals.xScale;
 
       for (i = 0; i < series.length; i++) {
         s = series[i];
-        Globals.guidingLines.push(makeGuidingLine(s));
+        Globals.guidingLines.push(makeGuidingLine(xScale, s));
       }
 
       for (i = 0; i < series.length; i++) {
         s = series[i];
-        Globals.lines.push(makeColoredLine(s));
+        Globals.lines.push(makeColoredLine(xScale, s));
       }
 
 
@@ -497,10 +499,10 @@
         transform.y = -(Globals.height * transform.k - Globals.height);
       }
 
-      Globals.viewSVG.attr("transform", transform);
-      Globals.gX.call(Globals.xAxis.scale(transform.rescaleX(Globals.xScale)));
-      Globals.gY.call(Globals.yAxis.scale(transform.rescaleY(Globals.yScale)));
+      Globals.lastXScale = transform.rescaleX(Globals.xScale);
       Globals.zoomTransform = transform;
+      Globals.gX.call(Globals.xAxis.scale(Globals.lastXScale));
+      drawLines();
 
       if (Globals.onZoomAndPan) {
         Globals.onZoomAndPan(Globals.zoomTransform, Globals.width, Globals.height, getScaleExtent());
@@ -572,8 +574,8 @@
       return calibs;
     }
 
-    function getSelectedSeries () {
-      return _.filter(Globals.config.series, function (s) {
+    function getSelectedSeries() {
+      return _.filter(Globals.config.series, function(s) {
         return s.selected;
       });
     }
@@ -773,8 +775,13 @@
       if (x > max_x) {
         hideMouseIndicators();
       } else {
+        if (window.isFinite(x)) {
+          Globals.circle
+            .attr("cx", x);
+        } else {
+          hideMouseIndicators();
+        }
         Globals.circle
-          .attr("cx", x)
           .attr("cy", pos.y)
           .attr('transform', 'translate(0,0) scale(1)');
 
