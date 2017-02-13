@@ -56,7 +56,7 @@ angular.module("canvasApp").factory('stage', [
 
       this.shrinkStage = function() {
 
-        console.log("okay Shrinking");
+
         this.shrinked = true;
         this.myWidth = this.myWidth - 64;
         this.stageHitPointLowerRight.setLeft(this.stageHitPointLowerRight.left - 64).setCoords();
@@ -71,6 +71,7 @@ angular.module("canvasApp").factory('stage', [
 
       this.collapseStage = function() {
         // Remove all content in the stage first
+        console.log("okay Shrinking");
         this.childSteps.forEach(function(step, index) {
           this.deleteAllStepContents(step);
         }, this);
@@ -80,14 +81,13 @@ angular.module("canvasApp").factory('stage', [
         if(this.nextStage) {
           var width = this.myWidth;
           // This is a trick, when we moveAllStepsAndStages we calculate the placing with myWidth, please refer getLeft() method
-          this.myWidth = 30;
+          this.myWidth = 23;
           this.moveAllStepsAndStages(true);
           this.myWidth = width;
         }
       };
 
       this.expand = function() {
-
         this.myWidth = this.myWidth + 64;
       };
 
