@@ -1,0 +1,77 @@
+<!--
+Chai PCR - Software platform for Open qPCR and Chai's Real-Time PCR instruments.
+For more information visit http://www.chaibio.com
+
+Copyright 2016 Chai Biotechnologies Inc. <info@chaibio.com>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<div class="user-settings">
+	<div class="modal-add-user">
+		<p class="modal-title underlined">
+			Run a Test Kit
+			<a class="pull-right close" ng-click="$dismiss()">&times;</a>
+		</p>
+		<p>Please Choose the Manufacturer of your test kit</p>
+		<form role="form" class="form-horizontal" name="form" ng-submit="submit(newExperimentName)" novalidate>
+			<div class="underlined">
+				<div class="form-group">
+					<div class="col-md-12">
+						<div class="dropdown" ng-click="myFunction()">
+							<button class="dropbtn"><span style="float:left;">{{value}}</span> <img style="float:right" class="arrow-down" src="/images/arrow-down.png"></button>
+							<div id="myDropdown" class="dropdown-content">
+								<a href="" ng-click="value = 'PIKA'" value="abc">PIKA Weihenstephan</a>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12" style="margin-top:25px;">
+						<div class="col-md-6" ng-click="selectedKit=1" ng-class="{ 'selected': selectedKit == 1}">
+							Use One Kit
+						</div>
+						<div class="col-md-6" ng-class="{ 'selected': selectedKit == 2}">
+							Use Two Kits
+						</div>
+					</div>
+					<div class="col-md-12" style="margin-top:25px;">
+						<label>
+							<input type="radio" ng-model="kit.name" value="Lactobacillaceae Screening">
+							4e Kit B 2301-32: Lactobacillaceae Screening
+						</label><br/>
+						<label>
+							<input type="radio" ng-model="kit.name" value="Lactobacillus acetotolerans">
+							4e Kit B 2301-52: Lactobacillus acetotolerans
+						</label><br/>
+						<label>
+							<input type="radio" ng-model="kit.name" value="LP Screening (12 beer spoilers)">
+							4e Kit B 2301-38: LP Screening (12 beer spoilers)
+						</label><br/>
+						<label>
+							<input type="radio" ng-model="kit.name" value="Pectinatus sp. Screening">
+							4e Kit B 2301-44: Pectinatus sp. Screening
+						</label><br/>
+						<label>
+							<input type="radio" ng-model="kit.name" value="Dekkera (Brettanomyces) sp. Screening">
+							4e Kit H 2302-20: Dekkera (Brettanomyces) sp. Screening
+						</label><br/>
+						<label>
+							<input type="radio" ng-model="kit.name" value="Saccharomyces cerevisiae var. diastaticus">
+							4e Kit H 2302-49: Saccharomyces cerevisiae var. diastaticus
+						</label><br/>
+					</div>
+				</div>
+				<div class="text-center" style="margin-top:25px;">
+					<a href="" ng-click="create()" class="button">RUN NOW</a>
+				</div>
+			</form>
+		</div>
+	</div>

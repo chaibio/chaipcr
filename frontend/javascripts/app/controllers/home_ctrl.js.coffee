@@ -56,6 +56,13 @@ window.ChaiBioTech.ngApp
         $scope.enterHome = false
       , 1000
 
+    @newTestKit = ->
+      modalInstance = $uibModal.open
+        templateUrl: 'app/views/experiment/create-testkit-experiment.html'
+        controller: 'CreateTestKitCtrl'
+        openedClass: 'modal-open-testkit'
+        backdrop: false
+
     @newExperiment = ->
       modalInstance = $uibModal.open
         templateUrl: 'app/views/experiment/create-experiment-name-modal.html'

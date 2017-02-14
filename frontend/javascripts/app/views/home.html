@@ -24,6 +24,9 @@
      <div class="home-page-new-exp-container">
        <button class="home-page-new-exp-button H2" ng-click="HomeCtrl.newExperiment()">CREATE A NEW EXPERIMENT</button>
      </div>
+     <div class="home-page-new-exp-container">
+       <button class="home-page-new-exp-button H2" ng-click="HomeCtrl.newTestKit()">RUN A TEST KIT</button>
+     </div>
      <div class="home-page-go-settings-container">
        <button class="home-page-small-button SH" ui-sref="settings.root">SETTINGS</button>
      </div>
@@ -54,7 +57,7 @@
        <div  ng-repeat="exp in experiments | orderBy:'experiment.created_at':true" class="ovtrunc home-page-exp-tile">
          <div ng-mouseenter="mouseOver = true" class="home-page-tile-text ovtrunc" ng-mouseleave="mouseOver = false" ng-class="{'home-page-tile-text': true, 'home-page-tile-text-hover': mouseOver && !deleteMode}" ng-click="HomeCtrl.openExperiment(exp.experiment)">
 
-		  <!--<a ng-if="!exp.experiment.started_at" href="/#/experiments/{{exp.experiment.id}}/run-experiment?chart=amplification">-->
+    <!--<a ng-if="!exp.experiment.started_at" href="/#/experiments/{{exp.experiment.id}}/run-experiment?chart=amplification">-->
           <a class="experiment-links" ng-show="!exp.experiment.started_at" href="/#/edit-protocol/{{exp.experiment.id}}">
              <div class="home-page-exp-name B1B">
                {{exp.experiment.name}}
