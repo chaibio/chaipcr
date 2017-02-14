@@ -14,9 +14,11 @@ experiment_definition = ExperimentDefinition.seed(:guid) do |s|
       },
       {
         stage: {
-          stage_type:"cycling", steps: [
-            { step: { name:"Denaturing", temperature:95, hold_time:15 } },
-            { step: { name:"Annealing", temperature:60, hold_time:60, collect_data:true } }
+          stage_type:"cycling",
+          num_cycles: 40,
+          steps: [
+            { step: { name:"Denaturing", temperature:95, hold_time:15, ramp:{rate:2.0} } },
+            { step: { name:"Annealing", temperature:60, hold_time:60, collect_data:true, ramp:{rate:2.0} } }
           ]
         }
       }
