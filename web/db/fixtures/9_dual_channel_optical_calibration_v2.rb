@@ -1,5 +1,4 @@
 experiment_definition = ExperimentDefinition.seed(:guid) do |s|
-  s.name = "Dual Channel Optical Calibration"
   s.guid = "dual_channel_optical_cal_v2"
   s.experiment_type = ExperimentDefinition::TYPE_CALIBRATION
   s.protocol_params ={lid_temperature:110, stages:[

@@ -168,7 +168,7 @@ describe "Steps API" do
 
   describe "check editable" do
     it "- not editable if experiment definition is not editable" do
-      @experiment.experiment_definition = ExperimentDefinition.new(:name=>"diagnostic", :experiment_type=>ExperimentDefinition::TYPE_DIAGNOSTIC)
+      @experiment.experiment_definition = ExperimentDefinition.new(:experiment_type=>ExperimentDefinition::TYPE_DIAGNOSTIC)
       @experiment.save
       post "/stages/#{@stage.id}/steps", {}, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       response.response_code.should == 422

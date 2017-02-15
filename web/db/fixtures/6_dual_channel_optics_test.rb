@@ -1,5 +1,4 @@
-ExperimentDefinition.seed(:name) do |s|
-  s.name = "Dual Channel Optical Test"
+ExperimentDefinition.seed(:guid) do |s|
   s.guid = "optical_test_dual_channel"
   s.experiment_type = ExperimentDefinition::TYPE_DIAGNOSTIC
   s.protocol_params ={lid_temperature:10, stages:[

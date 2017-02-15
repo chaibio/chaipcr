@@ -12,8 +12,16 @@ describe "Wells API" do
     it 'bulk' do
       params = {wells:[{well_num: 1, well_type:"positive_control", sample_name:"test1", notes:"test1notes", targets:["test1_1", "test1_2"]}, 
                        {well_num: 2, well_type:"standard", sample_name:"test2", notes:"test2notes", targets:["test2_1"]}]}
+      
       put "/experiments/#{@experiment.id}/wells", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       expect(response).to be_success            # test for the 200 status-code
+      json = JSON.parse(response.body)
+      json[0]["well"]["well_num"].should == 1
+      json[1]["well"]["well_num"].should == 2
+      
+      #read all wells
+      get "/experiments/#{@experiment.id}/wells", {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+      expect(response).to be_success
       json = JSON.parse(response.body)
       json[0]["well"]["well_num"].should == 1
       json[1]["well"]["well_num"].should == 2
