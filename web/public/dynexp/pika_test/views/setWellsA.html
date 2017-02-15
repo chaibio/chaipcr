@@ -1,7 +1,6 @@
 		<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
 			<h4>Pippette Control & Samples into A Wells</h4>
 			<p>[Instruction and notes]</p>
-
 			<table>
 				<tr>
 					<td>Well Name</td>
@@ -24,18 +23,17 @@
 							A{{$index+1}} {{x}}
 						</span> -->
 						<span>A{{$index+3}}</span>
-						<input type="text" placeholder="Enter Name Here" class="exp-name H1" required ng-model="x"  ng-blur="saveExperiment($index,x)"
-						my-enter="saveExperiment($index,x)" focus-on="editExpNameMode">
+						<input type="text" placeholder="Enter Name Here" class="exp-name H1" required ng-model="x"  ng-blur="updateWellA($index+3,x)"
+						my-enter="updateWellA($index+3,x)" focus-on="editExpNameMode">
 					</td>
 					<td>S</td>
 					<td>note</td>
 				</tr>
 			</table>
 
-			<div class="text-center">
+		</div>
+		<div class="text-center">
 
-				<button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ng-click="createExperiment()">CONTINUE</button>
-
-			</div>
+			<button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ng-click="setB()">CONTINUE</button>
 
 		</div>
