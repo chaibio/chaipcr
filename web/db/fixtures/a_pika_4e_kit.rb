@@ -1,5 +1,4 @@
 experiment_definition = ExperimentDefinition.seed(:guid) do |s|
-  s.name = "Pika 4e Test Kit"
   s.guid = "pika_4e_kit"
   s.experiment_type = ExperimentDefinition::TYPE_TESTKIT
   s.protocol_params = {

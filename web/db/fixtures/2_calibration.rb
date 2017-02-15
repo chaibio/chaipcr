@@ -55,7 +55,6 @@ end
 
 ExperimentDefinition.seed(:guid) do |s|
   s.id = 1
-  s.name = "calibration"
   s.guid = "optical_cal"
   s.experiment_type = ExperimentDefinition::TYPE_CALIBRATION
   s.protocol = protocol.first
@@ -64,6 +63,7 @@ end
 #Default Experiment
 Experiment.seed do |s|
   s.id = 1
+  s.name = "calibration"
   s.experiment_definition_id = 1
   s.calibration_id = 1
 end

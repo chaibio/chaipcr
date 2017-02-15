@@ -67,12 +67,12 @@ class ExperimentsController < ApplicationController
   example "{'experiment':{'id':1,'name':'test','type':'user','started_at':null,'completed_at':null,'completed_status':null,'protocol':{'id':1,'lid_temperature':'110.0','stages':[{'stage':{'id':1,'stage_type':'holding','name':'Holding Stage','num_cycles':1,'steps':[{'step':{'id':1,'name':'Step 1','temperature':'95.0','hold_time':180,'ramp':{'id':1,'rate':'100.0','max':true}}}]}},{'stage':{'id':2,'stage_type':'cycling','name':'Cycling Stage','num_cycles':40,'steps':[{'step':{'id':2,'name':'Step 2','temperature':'95.0','hold_time':30,'ramp':{'id':2,'rate':'100.0','max':true}}},{'step':{'id':3,'name':'Step 2','temperature':'60.0','hold_time':30,'ramp':{'id':3,'rate':'100.0','max':true}}}]}},{'stage':{'id':3,'stage_type':'holding','name':'Holding Stage','num_cycles':1,'steps':[{'step':{'id':4,'name':'Step 1','temperature':'4.0','hold_time':0,'ramp':{'id':4,'rate':'100.0','max':true}}}]}}]}}}"
   def create
     if params[:experiment][:guid].nil?
-      experiment_definition = ExperimentDefinition.new(:name=>params[:experiment][:name], :experiment_type=>ExperimentDefinition::TYPE_USER_DEFINED)
+      experiment_definition = ExperimentDefinition.new(:experiment_type=>ExperimentDefinition::TYPE_USER_DEFINED)
       experiment_definition.protocol_params = params[:experiment][:protocol]
     else
       experiment_definition = ExperimentDefinition.where("guid=?", params[:experiment][:guid]).first
     end
-    @experiment = Experiment.new
+    @experiment = Experiment.new(:name=>params[:experiment][:name])
     @experiment.experiment_definition = experiment_definition
     ret = @experiment.save
     respond_to do |format|
@@ -84,11 +84,11 @@ class ExperimentsController < ApplicationController
   param_group :experiment
   example "{'experiment':{'id':1,'name':'test','type':'user','started_at':null,'completed_at':null,'completed_status':null}}"
   def update
-    if @experiment == nil || !@experiment.experiment_definition.editable? #if experiment has been run, the name is still editable
-      render json: {errors: "The experiment is not editable"}, status: :unprocessable_entity
+    if @experiment == nil
+      render json: {errors: "The experiment is not found"}, status: :not_found
       return
     end
-    ret = @experiment.experiment_definition.update_attributes(experiment_params)
+    ret = @experiment.update_attributes(experiment_params)
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok :  :unprocessable_entity}
     end
@@ -98,8 +98,8 @@ class ExperimentsController < ApplicationController
   see "experiments#create", "json response"
   def copy
     old_experiment = Experiment.includes(:experiment_definition).find_by_id(params[:id])
-    experiment_definition = old_experiment.experiment_definition.copy(params[:experiment]? experiment_params : nil)
-    @experiment = Experiment.new
+    experiment_definition = old_experiment.experiment_definition.copy
+    @experiment = Experiment.new({:name=>(!params[:experiment].blank?)? params[:experiment][:name] : "Copy of #{old_experiment.name}"})
     @experiment.experiment_definition = experiment_definition
     ret = @experiment.save
     respond_to do |format|

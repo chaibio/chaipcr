@@ -101,7 +101,7 @@ Qpcrctl::Application.routes.draw do
       get 'analyze'
     end
     
-    resources :wells, param: :well_num, only: [:update, :destroy] do
+    resources :wells, param: :well_num, only: [:index, :update, :destroy] do
       collection do
         put '', :action => 'bulk_update'
       end

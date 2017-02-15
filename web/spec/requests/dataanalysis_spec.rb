@@ -38,8 +38,8 @@ describe "DataAnalysis API" do
   
   it "amplification data with async calls" do
     create_fluorescence_data(@experiment, 10)
-    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |experiment_id, stage_id, calibration_id|
-      experiment_id.should == @experiment.id
+    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |experiment, stage_id, calibration_id|
+      experiment.id.should == @experiment.id
       calibration_id.should == @experiment.calibration_id
       sleep(1)
       [[], []]
@@ -74,8 +74,8 @@ describe "DataAnalysis API" do
   it "amplification data with more data" do
     create_fluorescence_data(@experiment, 10)
     
-    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |experiment_id, stage_id, calibration_id|
-      experiment_id.should == @experiment.id
+    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |experiment, stage_id, calibration_id|
+      experiment.id.should == @experiment.id
       calibration_id.should == @experiment.calibration_id
       sleep(1)
       [[], []]
@@ -142,7 +142,7 @@ describe "DataAnalysis API" do
   it "amplification data for error" do
     create_fluorescence_data(@experiment, 10)
     error = "test error"
-    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |experiment_id, stage_id, calibration_id|
+    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |experiment, stage_id, calibration_id|
       raise error
     end
     
@@ -176,8 +176,8 @@ describe "DataAnalysis API" do
   
   it "amplification data for two experiments" do
     create_fluorescence_data(@experiment, 10)
-    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |experiment_id, stage_id, calibration_id|
-      experiment_id.should == @experiment.id
+    expect_any_instance_of(ExperimentsController).to receive(:calculate_amplification_data) do |experiment, stage_id, calibration_id|
+      experiment.id.should == @experiment.id
       calibration_id.should == @experiment.calibration_id
       sleep(2)
       [[], []]

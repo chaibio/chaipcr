@@ -33,6 +33,14 @@ class WellsController < ApplicationController
     param :targets, Array, :desc => "['channel1 target', 'channel2 target']", :required => false
   end
   
+  api :GET, "/wells", "List all the wells"
+  def index
+    @wells = Well.all
+    respond_to do |format|
+      format.json { render "index", :status => :ok}
+    end
+  end
+  
   api :PUT, "/experiments/:experiment_id/wells", "Update wells in bulk"
   param_group :well
   example "{'wells':[{'well_num':1,'well_type':'positive_control','sample_name':'test1','notes':'test1notes', 'targets':['channel1_target', 'channel2_target']},

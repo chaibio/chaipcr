@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170207074051) do
+ActiveRecord::Schema.define(version: 20170215075706) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -60,7 +60,6 @@ ActiveRecord::Schema.define(version: 20170207074051) do
   add_index "cached_melt_curve_data", ["experiment_id", "stage_id", "channel", "well_num"], name: "index_meltcurvedata_by_exp_stage_chan_well", unique: true, using: :btree
 
   create_table "experiment_definitions", force: true do |t|
-    t.string "name",            null: false
     t.string "guid"
     t.string "experiment_type", null: false
   end
@@ -80,6 +79,7 @@ ActiveRecord::Schema.define(version: 20170207074051) do
     t.string   "analyze_status"
     t.decimal  "cached_temperature",       precision: 7, scale: 4
     t.integer  "power_cycles"
+    t.string   "name"
   end
 
   create_table "fluorescence_data", id: false, force: true do |t|
