@@ -35,7 +35,7 @@ class WellsController < ApplicationController
   
   api :GET, "/wells", "List all the wells"
   def index
-    @wells = Well.all
+    @wells = Well.where("experiment_id=?", params[:experiment_id]).order("well_num")
     respond_to do |format|
       format.json { render "index", :status => :ok}
     end
