@@ -63,11 +63,12 @@ gulp.task('dynamicexp:relink', ['dynamicexp:clean_old', 'dynamicexp:init_hashes'
 });
 
 gulp.task('dynamicexp:relink_thermal', ['concat-js'],  function () {
-  var stream = gulp.src('.tmp/js/*.js');
+  var stream = gulp.src('.tmp/js/application-tmp.js');
 
   for (var i=0; i < experiments.length; i++) {
-    var pattern = new RegExp('/dynexp/'+experiments[i]);
-    stream.pipe(replace(pattern, '/dynexp/outputs/'+hashes_cache[experiments[i]]));
+    var pattern = new RegExp('/dynexp/'+experiments[i], 'g');
+    var expDir = '/dynexp/outputs/'+hashes_cache[experiments[i]];
+    stream.pipe(replace(pattern, expDir));
   }
 
   return stream.pipe(gulp.dest('.tmp/js'));
