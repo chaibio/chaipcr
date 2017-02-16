@@ -38,8 +38,8 @@
 			//border: 1px solid grey;
 
       &.selected {
-        border-width: $border_width + 2px;
-        padding-top: $padding_top - 2px;
+        //border-width: $border_width + 2px;
+        //padding-top: $padding_top - 2px;
         opacity: 1;
         color: #000;
 				//border: 1px solid;
@@ -131,17 +131,17 @@
   }
 
   .borderRight {
-    border-right-color: #d2b07f !important;
+    border-right-color: #c5c5c5 !important;
   }
 
   .borderLeft {
-    border-left-color: #d2b07f !important;
+    border-left-color: #c5c5c5 !important;
   }
 
   .borderBottom {
-    border-bottom-color: #d2b07f !important;
+    border-bottom-color: #c5c5c5 !important;
   }
 
   .borderTop {
-    border-top-color: #d2b07f !important;
+    border-top-color: #c5c5c5 !important;
   }

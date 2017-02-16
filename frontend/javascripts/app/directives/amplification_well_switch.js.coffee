@@ -28,6 +28,8 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
     templateUrl: 'app/views/directives/amplification-well-switch.html'
     link: ($scope, elem, attrs, ngModel) ->
 
+      columnCount = 8
+      $scope.borders = {};
       $scope.labelUnit = $scope.labelUnit || 'Cq'
 
       COLORS = AmplificationChartHelper.COLORS
@@ -65,7 +67,88 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
       $('#selectableol').selectable(
         'filter': 'li'
         'selected': (evt, ui) ->
-          $(ui.selected).find('.circle').click()
+          assign($(ui.selected))
+          #$(ui.selected).find('.circle').click()
+
+        'unselected': (evt, ui) ->
+          unAssign($(ui.unselected))
+          #$(ui.unselected).find('.circle').click()
+
+        'start': (evt, ui) ->
+          if evt.metaKey is false
+            $scope.borders = {}
+
+        'stop': (evt, ui) ->
+          process();
+
       );
+
+
+      removeBorders = (removeIndex) ->
+
+        if $scope.borders[removeIndex + 1]
+          $('#box' + (removeIndex + 1)).removeClass('borderLeft')
+
+        if (removeIndex - 1) isnt columnCount and $scope.borders[removeIndex - 1]
+          $('#box' + (removeIndex - 1)).removeClass('borderRight')
+
+        if removeIndex <= columnCount and $scope.borders[removeIndex + columnCount]
+          $('#box' + (removeIndex + columnCount)).removeClass('borderTop')
+
+        if removeIndex > columnCount and $scope.borders[removeIndex - columnCount]
+          $('#box' + (removeIndex - columnCount)).removeClass('borderBottom')
+
+
+      assign = (node) ->
+        id = parseInt($(node).attr('id').replace('box', ''));
+        console.log id
+        if not $scope.borders[id]
+          $scope.borders[parseInt(id)] = true;
+        else
+          removeBorders(id);
+          $('#box' + id).removeClass('borderRight borderLeft borderBottom borderTop ui-selected');
+          delete $scope.borders[id];
+
+
+      unAssign = (node) ->
+        id = parseInt($(node).attr('id').replace('box', ''));
+        removeBorders(id);
+        $('#box' + id).removeClass('borderRight borderLeft borderBottom borderTop ui-selected');
+        delete $scope.borders[id];
+
+
+      process = () ->
+        for id of $scope.borders
+          checkRightBorder(parseInt(id));
+          checkLeftBorder(parseInt(id));
+          checkBottomBorder(parseInt(id));
+          checkTopBorder(parseInt(id));
+
+      checkRightBorder = (id) ->
+        console.log "1", id
+        if id % columnCount isnt 0 and $scope.borders[id + 1]
+          $("#box#{id}").addClass('borderRight')
+        else
+
+
+      checkLeftBorder = (id) ->
+        console.log "2", id
+        if id isnt columnCount + 1 and $scope.borders[id - 1]
+          $("#box#{id}").addClass('borderLeft')
+        else
+
+
+      checkBottomBorder = (id) ->
+        console.log "3", id
+        if id < (columnCount + 1) and $scope.borders[id + columnCount]
+          $("#box#{id}").addClass('borderBottom')
+        else
+
+      checkTopBorder = (id) ->
+        console.log "4", id
+        if id > columnCount and $scope.borders[id - columnCount]
+          $("#box#{id}").addClass('borderTop');
+        else
+
 
 ]
