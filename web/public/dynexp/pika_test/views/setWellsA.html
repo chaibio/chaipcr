@@ -1,20 +1,20 @@
-		<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
+		<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 setwells" style="min-height:calc(100vh - 300px)">
 			<h4>Pippette Control & Samples into A Wells</h4>
 			<p>[Instruction and notes]</p>
 			<table>
 				<tr>
-					<td>Well Name</td>
-					<td>Rec. Type</td>
-					<td>Notes</td>
+					<td class="well-name">Well Name</td>
+					<td class="rxn-type">Rec. Type</td>
+					<td class="notes">Notes</td>
 				</tr>
 				<tr>
 					<td>A1. Positive Control</td>
-					<td>+</td>
+					<td><img style="width:25px" src="./images/Plus-Pink.svg"></td>
 					<td>Note</td>
 				</tr>
 				<tr>
 					<td>A2. Negative Control</td>
-					<td>-</td>
+					<td><img style="width:25px" src="./images/Minus-Pink.svg"></td>
 					<td>Note</td>
 				</tr>
 				<tr ng-repeat="x in samples track by $index">
@@ -26,13 +26,13 @@
 						<input type="text" placeholder="Enter Name Here" class="exp-name H1" required ng-model="x"  ng-blur="updateWellA($index+3,x)"
 						my-enter="updateWellA($index+3,x)" focus-on="editExpNameMode">
 					</td>
-					<td>S</td>
+					<td><img style="width:25px" src="./images/Sample-Pink.svg"></td>
 					<td>note</td>
 				</tr>
 			</table>
 
 		</div>
-		<div class="text-center">
+		<div class="text-center col-lg-12 col-md-12 col-sm-12 col-xs-12">
 
 			<button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ng-click="setB()">CONTINUE</button>
 

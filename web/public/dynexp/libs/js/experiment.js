@@ -92,6 +92,11 @@
 					well:well_data
 				});
 			};
+			self.updateExperimentName = function(id,name){
+				return $http.put("/experiments/" + id,{
+					experiment:name
+				});
+			};
 
       self.getStepsData = function(exp_id, step_ids) {
         var q = '';

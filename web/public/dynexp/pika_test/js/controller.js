@@ -30,11 +30,12 @@
 				$scope.hexCq=[];
 				$scope.amount=[];
 				$scope.result=[];
+				$scope.editExpName = false;
 				$scope.amount[0]="-";
 				$scope.amount[1]="-";
 				$('.content').addClass('analyze');
 				$scope.editExpNameMode = [false,false,false,false,false,false];
-				$scope.cq = [["channel","well_num","cq"],[1,1,11],[1,2,null],[1,3,22],[1,4,40],[1,5,40],[1,6,null],[1,7,null],[1,8,null],[1,9,null],[1,10,null],[1,11,null],[1,12,null],[1,13,null],[1,14,null],[1,15,null],[1,16,null],[2,1,null],[2,2,"25.15"],[2,3,null],[2,4,"6.79"],[2,5,null],[2,6,null],[2,7,null],[2,8,null],[2,9,null],[2,10,null],[2,11,null],[2,12,null],[2,13,null],[2,14,null],[2,15,null],[2,16,null]];
+			//	$scope.cq = [["channel","well_num","cq"],[1,1,"39"],[1,2,2],[1,3,40],[1,4,9],[1,5,20],[1,6,"26"],[1,7,"33"],[1,8,"5"],[1,9,"34.5"],[1,10,"19"],[1,11,"12"],[1,12,"6"],[1,13,"24"],[1,14,"39"],[1,15,"32"],[1,16,"18"],[2,1,"11"],[2,2,"25.15"],[2,3,36],[2,4,"8"],[2,5,"34"],[2,6,"10"],[2,7,"15"],[2,8,"25"],[2,9,"35"],[2,10,"28"],[2,11,"2"],[2,12,"7"],[2,13,"0"],[2,14,"35"],[2,15,"28"],[2,16,"17"]];
 
 				function getId(){
 					if($stateParams.id){
@@ -60,11 +61,16 @@
 				}
 				getId();
 
-				console.log($scope.cq);
 
 				$scope.focusExpName = function(index){
-					$scope.editExpNameMode[index] = true;
-					focus('editExpNameMode');
+					$scope.editExpName = true;
+					focus('editExpName');
+				}
+
+				$scope.updateExperimentName = function(){
+					Experiment.updateExperimentName($scope.experimentId,{name:$scope.experiment.name}).then(function(resp){
+						$scope.editExpName = false;
+					});
 				}
 
 				$scope.updateWellA = function(index,x){
@@ -96,6 +102,12 @@
 					$scope.showSidebar = false;
 					$scope.getResults();
 					$state.go('results',{id: $scope.experimentId});
+				}
+
+				$scope.startExperiment = function(){
+					Experiment.startExperiment($scope.experimentId).then(function(resp){
+						$state.go('exp-running');
+					});
 				}
 
 				$scope.setProgress = function(value){
@@ -156,28 +168,33 @@
 							$scope.result[i]="";
 						}
 					}
+
+					getAmountArray();
 				}
 
 
 				$scope.getResults = function (){
-					for (var i = 1; i < 17; i++) {
-						//if($scope.cq[i][2]){
+					Experiment.getFluorescenceData($scope.experimentId).then(function(resp){
+
+						$scope.cq = resp.data.steps[0].cq;
+						for (var i = 1; i < 17; i++) {
 							$scope.famCq[i-1] = parseFloat($scope.cq[i][2]);
-						//}
-						//else{
-							//$scope.famCq[i-1] = "";
-						//}
+						}
+						for (var i = 17; i < 33; i++) {
+							$scope.hexCq[i-17] = parseFloat($scope.cq[i][2]);
+						}
+
+						getResultArray();
+
+					});
+				/*	for (var i = 1; i < 17; i++) {
+						$scope.famCq[i-1] = parseFloat($scope.cq[i][2]);
 					}
 					for (var i = 17; i < 33; i++) {
-						//if($scope.cq[i][2]){
-							$scope.hexCq[i-17] = parseFloat($scope.cq[i][2]);
-						//}
-						//else{
-							//$scope.hexCq[i-17] = "";
-						//}
+						$scope.hexCq[i-17] = parseFloat($scope.cq[i][2]);
 					}
 
-					getResultArray();
+					getResultArray(); */
 
 				}
 
@@ -226,7 +243,7 @@
 					Experiment.get($scope.experiment.id).then(function (resp) {
 						$scope.experiment = resp.data.experiment;
 						if($scope.experiment.completed_at){
-							$state.go('analyze', {id: $scope.experiment.id});
+							$scope.goToResults();
 						}
 						else{
 							$timeout(checkExperimentStatus, 1000);
@@ -277,74 +294,8 @@
 
 				$scope.checkMachineStatus();
 
-				$scope.analyzeExperiment = function () {
-					$scope.analyzing = true;
-					if (!$scope.analyzedExp) {
-						getExperiment($stateParams.id, function (exp) {
-							if (exp.completion_status === 'success') {
-								Experiment.analyze($stateParams.id)
-								.then(function (resp) {
-									console.log(resp);
-									if(resp.status == 200){
-										$scope.analyzedExp = resp.data;
-										$scope.tm_values = GlobalService.getTmValues(resp.data);
-										$scope.analyzing = false;
-									}
-									else if (resp.status == 202){
-										$timeout($scope.analyzeExperiment, 1000);
-									}
-								})
-								.catch(function (resp) {
-									console.log(resp);
-									if(resp.status == 500){
-										$scope.custom_error = resp.data.errors || "An error occured while trying to analyze the experiment results.";
-										$scope.analyzing = false;
-									}
-									else if(resp.status ==503){
-										$timeout($scope.analyzeExperiment, 1000);
-									}
-								});
-							}
-							else {
-								$scope.analyzing = false;
-							}
-						});
-					}
-				};
-
-				$scope.lidHeatPercentage = function () {
-					if (!$scope.experiment) return 0;
-					if (!$scope.data) return 0;
-					return ($scope.data.lid.temperature/$scope.experiment.protocol.lid_temperature);
-				};
-
-				$scope.blockHeatPercentage = function () {
-					var blockHeat = $scope.getBlockHeat();
-					if (!blockHeat) return 0;
-					if (!$scope.experiment) return 0;
-					return ($scope.data.heat_block.temperature/blockHeat);
-				};
-
-				$scope.getBlockHeat = function () {
-					if (!$scope.experiment) return;
-					if (!$scope.experiment.protocol.stages[0]) return;
-					if (!$scope.experiment.protocol.stages[0].stage.steps[0]) return;
-					if (!$scope.currentStep()) return;
-					return $scope.currentStep().temperature;
-				};
-
-				$scope.createExperiment = function () {
-					Experiment.create({guid: 'thermal_consistency'}).then(function (resp) {
-						$timeout.cancel($scope.timeout);
-						Experiment.startExperiment(resp.data.experiment.id).then(function () {
-							$scope.experiment = resp.data.experiment;
-							$state.go('exp-running');
-						});
-					});
-				};
-
 				$scope.cancelExperiment = function () {
-					Experiment.stopExperiment($scope.experiment_id).then(function () {
+					Experiment.stopExperiment($scope.experimentId).then(function () {
 						var redirect = '/#/settings/';
 						$window.location = redirect;
 					});

@@ -26,6 +26,7 @@ input{
 	border: none;
 	outline: none;
 	border-bottom: 1px solid black;
+	width: 300px;
 
 }
 .outer {
@@ -69,7 +70,32 @@ input{
 	margin: 0;
 }
 
+.page-padding{
+	padding-top: 50px;
+}
 
+.setwells h4{
+		font-family: 'Dinot';
+		font-weight: 700;
+}
+
+.setwells table{
+	padding-top: 30px;
+	display: inline-block;
+	font-family: 'Dinot';
+}
+
+.setwells table .well-name{
+	width: 350px;
+}
+
+.setwells table .rxn-type{
+	width: 100px;
+}
+
+.setwells table .notes{
+	width: 100px;
+}
 
 button,
 .button {
