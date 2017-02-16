@@ -129,6 +129,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         if id % columnCount isnt 0 and $scope.borders[id + 1]
           $("#box#{id}").addClass('borderRight')
         else
+          $("#box#{id}").removeClass('borderRight')
 
 
       checkLeftBorder = (id) ->
@@ -136,6 +137,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         if id isnt columnCount + 1 and $scope.borders[id - 1]
           $("#box#{id}").addClass('borderLeft')
         else
+          $("#box#{id}").removeClass('borderLeft')
 
 
       checkBottomBorder = (id) ->
@@ -143,12 +145,14 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         if id < (columnCount + 1) and $scope.borders[id + columnCount]
           $("#box#{id}").addClass('borderBottom')
         else
+          $("#box#{id}").removeClass('borderBottom')
 
       checkTopBorder = (id) ->
         console.log "4", id
         if id > columnCount and $scope.borders[id - columnCount]
           $("#box#{id}").addClass('borderTop');
         else
+          $("#box#{id}").removeClass('borderTop');
 
 
 ]
