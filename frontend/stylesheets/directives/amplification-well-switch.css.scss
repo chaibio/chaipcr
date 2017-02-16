@@ -35,14 +35,14 @@
       height: 80px;
       width: $size;
       opacity: 0.5;
-			border: 1px solid grey;
+			//border: 1px solid grey;
 
       &.selected {
         border-width: $border_width + 2px;
         padding-top: $padding_top - 2px;
         opacity: 1;
         color: #000;
-				border: 1px solid;
+				//border: 1px solid;
       }
 
       .ct {
