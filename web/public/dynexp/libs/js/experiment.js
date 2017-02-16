@@ -84,6 +84,9 @@
       self.analyze = function(id) {
         return $http.get("/experiments/" + id + "/analyze");
       };
+			self.getWells = function(id) {
+				return $http.get("/experiments/" + id + "/wells");
+			};
 			self.updateWell = function(id,well_num,well_data){
 				return $http.put("/experiments/" + id + "/wells/" + well_num,{
 					well:well_data

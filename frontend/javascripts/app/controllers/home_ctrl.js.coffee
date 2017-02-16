@@ -105,7 +105,7 @@ window.ChaiBioTech.ngApp
              $state.go 'edit-protocol', {id: exp.id}
          else
            if exp.started_at is null
-            window.location.assign('/dynexp/pika_test/index.html#/setWellsA/'+exp.id)
+            $window.location.href = "/dynexp/pika_test/index.html#/setWellsA/" + exp.id
 
 
     return

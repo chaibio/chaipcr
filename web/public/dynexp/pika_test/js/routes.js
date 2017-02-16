@@ -24,9 +24,13 @@
 				url: '/setWellsB',
 				templateUrl: './views/setWellsB.html'
 			})
-			.state('analyze', {
-				url: '/analyze/:id',
-				templateUrl: './views/analyze.html'
+			.state('review', {
+				url: '/review',
+				templateUrl: './views/review.html'
+			})
+			.state('results', {
+				url: '/results/:id',
+				templateUrl: './views/results.html'
 			});
 
 		}
