@@ -5,7 +5,7 @@
     margin-top: 5px;
     margin-bottom: 10px;
     width: 740px;
-    
+
     .choose-chart-heading {
       border-bottom: 2px solid black;
     }
@@ -115,4 +115,39 @@
     hr {
       border-top: 3px solid #eee;
     }
+  }
+
+
+  #selectableol .ui-selecting { background: #FECA40; }
+
+  #selectableol .ui-selected { background: #F39814; color: white; border: solid 1px #000}
+  #selectableol .ui-selecting {  border: solid 1px #000}
+
+  #selectable { list-style-type: none; margin: 0; padding: 0; width: 850px; }
+
+  #selectableol li {
+    padding: 1px;
+    float: left;
+    width: 100px;
+    height: 80px;
+    font-size: 4em;
+    text-align: center;
+    position: relative;
+    border: 1px solid #c5c5c5
+  }
+
+  .borderRight {
+    border-right-color: #d2b07f !important;
+  }
+
+  .borderLeft {
+    border-left-color: #d2b07f !important;
+  }
+
+  .borderBottom {
+    border-bottom-color: #d2b07f !important;
+  }
+
+  .borderTop {
+    border-top-color: #d2b07f !important;
   }

@@ -49,6 +49,7 @@ window.ChaiBioTech.ngApp
 
 
       $scope.toggleState = ->
+        console.log ngModel
         state =
           selected: !ngModel.$modelValue.selected || false
           color: ngModel.$modelValue.color || 'gray'
