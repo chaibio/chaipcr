@@ -126,12 +126,13 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
 
       toggle = (boxId) ->
-        if $scope.borders[boxId]
-          if $("#box#{boxId}").find('.circle').hasClass('selected')
-            $("#box#{boxId}").find('.circle').click()
-        else
-          if not $("#box#{boxId}").find('.circle').hasClass('selected')
-            $("#box#{boxId}").find('.circle').click()
+        tagId = "#box#{boxId}"
+        if $scope.borders[boxId] is true
+          if $(tagId).find('.circle').hasClass('selected')
+            $(tagId).find('.circle').click()
+        else if not $scope.borders[boxId]
+          if not $(tagId).find('.circle').hasClass('selected')
+            $(tagId).find('.circle').click()
 
       checkRightBorder = (id) ->
         if id % columnCount isnt 0 and $scope.borders[id + 1]
