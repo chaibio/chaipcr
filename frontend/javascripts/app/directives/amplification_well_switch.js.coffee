@@ -68,7 +68,6 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         'filter': 'li'
         'selected': (evt, ui) ->
           assign($(ui.selected))
-          #$(ui.selected).find('.circle').click()
 
         'unselected': (evt, ui) ->
           unAssign($(ui.unselected))
@@ -85,7 +84,6 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
 
       removeBorders = (removeIndex) ->
-
         if $scope.borders[removeIndex + 1]
           $('#box' + (removeIndex + 1)).removeClass('borderLeft')
 
@@ -100,9 +98,9 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
 
       assign = (node) ->
-        id = parseInt($(node).attr('id').replace('box', ''));
-        console.log id
+        id = parseInt $(node).attr('id').replace('box', '')
         if not $scope.borders[id]
+          #$(node).find('.circle').click()
           $scope.borders[parseInt(id)] = true;
         else
           removeBorders(id);
@@ -111,7 +109,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
 
       unAssign = (node) ->
-        id = parseInt($(node).attr('id').replace('box', ''));
+        id = parseInt $(node).attr('id').replace('box', '')
         removeBorders(id);
         $('#box' + id).removeClass('borderRight borderLeft borderBottom borderTop ui-selected');
         delete $scope.borders[id];
@@ -124,8 +122,18 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
           checkBottomBorder(parseInt(id));
           checkTopBorder(parseInt(id));
 
+        toggle(boxId) for boxId in [1..16]
+
+
+      toggle = (boxId) ->
+        if $scope.borders[boxId]
+          if $("#box#{boxId}").find('.circle').hasClass('selected')
+            $("#box#{boxId}").find('.circle').click()
+        else
+          if not $("#box#{boxId}").find('.circle').hasClass('selected')
+            $("#box#{boxId}").find('.circle').click()
+
       checkRightBorder = (id) ->
-        console.log "1", id
         if id % columnCount isnt 0 and $scope.borders[id + 1]
           $("#box#{id}").addClass('borderRight')
         else
@@ -133,7 +141,6 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
 
       checkLeftBorder = (id) ->
-        console.log "2", id
         if id isnt columnCount + 1 and $scope.borders[id - 1]
           $("#box#{id}").addClass('borderLeft')
         else
@@ -141,14 +148,12 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
 
       checkBottomBorder = (id) ->
-        console.log "3", id
         if id < (columnCount + 1) and $scope.borders[id + columnCount]
           $("#box#{id}").addClass('borderBottom')
         else
           $("#box#{id}").removeClass('borderBottom')
 
       checkTopBorder = (id) ->
-        console.log "4", id
         if id > columnCount and $scope.borders[id - columnCount]
           $("#box#{id}").addClass('borderTop');
         else
