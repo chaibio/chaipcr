@@ -280,10 +280,10 @@ void ExperimentController::stop()
     {
         Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
 
+        shutdown();
+
         if (_machineState == IdleMachineState)
             return;
-
-        shutdown();
 
         if (_machineState != CompleteMachineState)
         {
@@ -315,10 +315,10 @@ void ExperimentController::stop(const std::string &errorMessage)
     {
         Poco::RWLock::ScopedWriteLock lock(*_machineMutex);
 
+        shutdown();
+
         if (_machineState == IdleMachineState)
             return;
-
-        shutdown();
 
         _experiment.setCompletionStatus(Experiment::Failed);
         _experiment.setCompletionMessage(errorMessage);
