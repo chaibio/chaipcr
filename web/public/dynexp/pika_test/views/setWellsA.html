@@ -1,39 +1,41 @@
 		<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 setwells" style="min-height:calc(100vh - 300px)">
-			<h4>Pippette Control & Samples into A Wells</h4>
+			<h3>Pippette Control & Samples into A Wells</h3>
 			<p>[Instruction and notes]</p>
 			<table>
 				<tr>
 					<td class="well-name">Well Name</td>
-					<td class="rxn-type">Rec. Type</td>
-					<td class="notes">Notes</td>
+					<td class="rxn-type rxn-center">Rec. Type</td>
+					<td class="notes rxn-center">Notes</td>
 				</tr>
 				<tr>
-					<td>A1. Positive Control</td>
-					<td><img style="width:25px" src="./images/Plus-Pink.svg"></td>
-					<td>Note</td>
+					<td class="posneg">A1. Positive Control</td>
+					<td class="rxn-center"><img style="width:20px" src="./images/Plus-Pink.svg"></td>
+					<td class="rxn-center">Note</td>
 				</tr>
 				<tr>
-					<td>A2. Negative Control</td>
-					<td><img style="width:25px" src="./images/Minus-Pink.svg"></td>
-					<td>Note</td>
+					<td class="posneg">A2. Negative Control</td>
+					<td class="rxn-center"><img style="width:20px" src="./images/Minus-Pink.svg"></td>
+					<td class="rxn-center">Note</td>
 				</tr>
 				<tr ng-repeat="x in samples track by $index">
 					<td>
 				<!--		<span class="exp-name H1 truncate" ng-click="focusExpName($index)" ng-show="!editExpNameMode[$index]">
 							A{{$index+1}} {{x}}
 						</span> -->
-						<span>A{{$index+3}}</span>
-						<input type="text" placeholder="Enter Name Here" class="exp-name H1" required ng-model="x"  ng-blur="updateWellA($index+3,x)"
+						<span>A{{$index+3}}.</span>
+						<input type="text" ng-class="{'empty-input':!x}" placeholder="Enter Sample Name" class="exp-name H1" required ng-model="x"  ng-blur="updateWellA($index+3,x)"
 						my-enter="updateWellA($index+3,x)" focus-on="editExpNameMode">
 					</td>
-					<td><img style="width:25px" src="./images/Sample-Pink.svg"></td>
-					<td>note</td>
+					<td ng-show="x" class="rxn-center"><img style="width:20px" src="./images/Sample-Pink.svg"></td>
+					<td ng-show="!x" class="rxn-center"><img style="width:20px" src="./images/Sample.svg"></td>
+					<td class="rxn-center">note</td>
 				</tr>
 			</table>
 
 		</div>
 		<div class="text-center col-lg-12 col-md-12 col-sm-12 col-xs-12">
 
-			<button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ng-click="setB()">CONTINUE</button>
+			<button ng-click="goBackToHome()">Back</button>
+			<button ng-click="setB()">CONTINUE</button>
 
 		</div>

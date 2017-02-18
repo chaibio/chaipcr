@@ -31,11 +31,13 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 		$scope.is_dual_channel = false;
 		$scope.update_available = 'unavailable';
 		$scope.exporting = false;
-		$scope.value = "Select a value ";
+		$scope.value = "Choose Manufacturer ..";
 		$scope.selectedKit = "1";
 		$scope.kit = {
 				name: 'Lactobacillaceae Screening'
 			};
+
+		$scope.creating = false;
 
 
 		$scope.myFunction = function() {
@@ -47,6 +49,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 		};
 
 		$scope.create = function(){
+			$scope.creating = true;
 			$scope.wells = [
 				{'well_num':1,'well_type':'positive_control','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
 				{'well_num':2,'well_type':'no_template_control','sample_name':'','notes':'','targets':[$scope.kit.name,'']},

@@ -18,59 +18,61 @@ limitations under the License.
 -->
 <div class="user-settings">
 	<div class="modal-add-user">
-		<p class="modal-title underlined">
+		<h4 class="underlined">
 			Run a Test Kit
 			<a class="pull-right close" ng-click="$dismiss()">&times;</a>
-		</p>
+		</h4>
 		<p>Please Choose the Manufacturer of your test kit</p>
+		<p>Supported kits will appear below</p>
 		<form role="form" class="form-horizontal" name="form" ng-submit="submit(newExperimentName)" novalidate>
 			<div class="underlined">
 				<div class="form-group">
 					<div class="col-md-12">
 						<div class="dropdown" ng-click="myFunction()">
-							<button class="dropbtn"><span style="float:left;">{{value}}</span> <img style="float:right" class="arrow-down" src="/images/arrow-down.png"></button>
+							<button class="dropbtn"><span style="float:left;">{{value}}</span> <img ng-click="myFunction()" class="arrow-down" src="/images/arrow-down.png"></button>
 							<div id="myDropdown" class="dropdown-content">
 								<a href="" ng-click="value = 'PIKA'" value="abc">PIKA Weihenstephan</a>
 							</div>
 						</div>
 					</div>
-					<div class="col-md-12" style="margin-top:25px;">
-						<div class="col-md-6" ng-click="selectedKit=1" ng-class="{ 'selected': selectedKit == 1}">
+					<div ng-show="value == 'PIKA'" class="col-md-12" style="margin-top:25px;">
+						<div class="col-md-6 one-kit" ng-click="selectedKit=1" ng-class="{ 'selected': selectedKit == 1}">
 							Use One Kit
 						</div>
 						<div class="col-md-6" ng-class="{ 'selected': selectedKit == 2}">
 							Use Two Kits
 						</div>
 					</div>
-					<div class="col-md-12" style="margin-top:25px;">
+					<div ng-show="value == 'PIKA'" class="col-md-12" style="margin-top:25px;">
 						<label>
 							<input type="radio" ng-model="kit.name" value="Lactobacillaceae Screening">
-							<span>4e Kit B 2301-32: Lactobacillaceae Screening</span>
+								<span class="options-text">4e Kit B 2301-32: Lactobacillaceae Screening</span>
 						</label><br/>
 						<label>
 							<input type="radio" ng-model="kit.name" value="Lactobacillus acetotolerans">
-							4e Kit B 2301-52: Lactobacillus acetotolerans
+								<span class="options-text">4e Kit B 2301-52: Lactobacillus acetotolerans</span>
 						</label><br/>
 						<label>
 							<input type="radio" ng-model="kit.name" value="LP Screening (12 beer spoilers)">
-							4e Kit B 2301-38: LP Screening (12 beer spoilers)
+								<span class="options-text">4e Kit B 2301-38: LP Screening (12 beer spoilers)</span>
 						</label><br/>
 						<label>
 							<input type="radio" ng-model="kit.name" value="Pectinatus sp. Screening">
-							4e Kit B 2301-44: Pectinatus sp. Screening
+								<span class="options-text">4e Kit B 2301-44: Pectinatus sp. Screening</span>
 						</label><br/>
 						<label>
 							<input type="radio" ng-model="kit.name" value="Dekkera (Brettanomyces) sp. Screening">
-							4e Kit H 2302-20: Dekkera (Brettanomyces) sp. Screening
+								<span class="options-text">4e Kit H 2302-20: Dekkera (Brettanomyces) sp. Screening</span>
 						</label><br/>
 						<label>
 							<input type="radio" ng-model="kit.name" value="Saccharomyces cerevisiae var. diastaticus">
-							4e Kit H 2302-49: Saccharomyces cerevisiae var. diastaticus
+								<span class="options-text">4e Kit H 2302-49: Saccharomyces cerevisiae var. diastaticus</span>
 						</label><br/>
 					</div>
 				</div>
-				<div class="text-center" style="margin-top:25px;">
-					<a href="" ng-click="create()" class="button">RUN NOW</a>
+				<div ng-show="value == 'PIKA'" class="text-center">
+					<a ng-show="!creating" href="" ng-click="create()" class="button-continue">Continue</a>
+					<a href="" ng-show="creating" class="button-continue">Creating Experiment<ellipsis-animated><ellipsis-animated/></a>
 				</div>
 			</form>
 		</div>

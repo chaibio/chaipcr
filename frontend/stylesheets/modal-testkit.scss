@@ -2,9 +2,20 @@
 
 .modal-open-testkit {
 
+	h4{
+		font-family: 'dinot-bold';
+		font-size: 20px;
+	}
+
+	p{
+		font-family: 'dinot-regular';
+		//font-weight: 300;
+		font-size: 16px;
+	}
+
   .modal-dialog {
     margin-top: 100px;
-    width: 500px;
+    width: 550px;
   }
 
   .modal-experiment-name {
@@ -42,31 +53,73 @@
     }
   }
 
+	.button-continue {
+		background: #fff;
+		border: 1px solid #333;
+		color: #000;
+		display: inline-block;
+		font-weight: bold;
+		margin-top: 25px;
+		margin-bottom: 10px;
+		padding: 10px 50px;
+		width: 300px;
+		font-family: 'dinot-regular';
+		text-decoration: none;
+}
+
 	.col-md-6{
-		padding: 10px;
+		padding: 6px;
 		border: 1px solid black;
-		width: 200px;
+		width: 225px;
+		font-family: 'dinot-bold';
+		text-align: center;
+		font-size: 16px;
+
+	}
+
+	input[type="radio"]{
+		margin-top: 4px;
+		font-size: 13px;
+	}
+
+	.options-text{
+		padding-left: 10px;
+		font-size: 15px;
+		font-family: 'dinot-regular';
+	}
+
+	.one-kit{
+		border-right: 0px;
 	}
 
 	.selected{
-		background-color: red;
+		background-color: #d00b0b;
+		color: white;
 	}
 
 	/* Dropdown Button */
 .dropbtn {
     background-color: white;
     color: black;
-    padding: 10px;
+    padding: 6px;
     font-size: 16px;
+		font-family: 'dinot-regular';
+		//font-weight: 300;
     border: none;
     cursor: pointer;
-		width: 400px;
+		width: 450px;
 		border: 1px solid black;
+}
+
+.arrow-down{
+	float: right;
+	width: 15px;
+	padding-top: 5px;
 }
 
 /* Dropdown button on hover & focus */
 .dropbtn:hover, .dropbtn:focus {
-    background-color: #3e8e41;
+    //background-color: #3e8e41;
 		outline: none;
 }
 
@@ -81,7 +134,8 @@
     display: none;
     position: absolute;
     background-color: #f9f9f9;
-    min-width: 160px;
+    min-width: 450px;
+		font-family: 'dinot-regular';
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
 }

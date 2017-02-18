@@ -13,6 +13,7 @@
 		'experiment.service',
 		'wizard.header',
 		'focusOn',
+		'ellipsisAnimated',
 	]);
 
 	App.run([
