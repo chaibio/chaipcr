@@ -47,6 +47,7 @@
 <div class="text-center col-lg-12 col-md-12 col-sm-12 col-xs-12">
 
 	<button ng-click="goBackToB()">Back</button>
-	<button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ng-click="startExperiment()">Start Experiment</button>
+	<button ng-disabled="error" ng-class="{errorButton: error}" ng-click="startExperiment()">Start Experiment</button>
+	<span ng-show="error">{{lidMessage}}</span>
 
 </div>

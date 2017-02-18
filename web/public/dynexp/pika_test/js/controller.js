@@ -264,6 +264,11 @@
 			$scope.timeRemaining = GlobalService.timeRemaining(data);
 			$scope.stateName = $state.current.name;
 
+			if($scope.state !== 'idle' && (data.experiment_controller.experiment.id !== $scope.experimentId) ){
+				$scope.error = true;
+				$scope.lidMessage = "Another Experiment is Running"
+			}
+
 			if (data.experiment_controller.experiment && !$scope.experiment) {
 				getExperiment(data.experiment_controller.experiment.id);
 			}
@@ -341,7 +346,7 @@
 
 		$scope.cancelExperiment = function () {
 			Experiment.stopExperiment($scope.experimentId).then(function () {
-				var redirect = '/#/settings/';
+				var redirect = '/#/';
 				$window.location = redirect;
 			});
 		};

@@ -2,13 +2,20 @@
 	<p>Your experiment is running. Please do not open the</p>
 	<p>hardware unless instructed to here.</p>
 
+	<p class="heating" ng-show="state === 'lid_heating'">
+		The lid is heating to <b>{{experiment.protocol.lid_temperature | round: 1}}&deg;</b>C <br>
+	</p>
+	<p class="note" ng-show="state === 'lid_heating'">
+		This will take about one minute
+	</p>
+
 		<h3 ng-show="state === 'running'">Time Remaining:</h3>
 		<h1 ng-show="state === 'running'">{{ timeRemaining | secondsDisplay: 'display2'}}</h1>
 		<h3 ng-show="state === 'running'">Expected complete at roughly {{}}</h3>
 
 
 
-		<button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ng-click="setB()">Cancel Experiment</button>
+		<button ng-click="cancelExperiment()">Cancel Experiment</button>
 
 </div>
 
