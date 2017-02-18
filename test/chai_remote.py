@@ -11,7 +11,7 @@ import MySQLdb
 import pandas as pd
 import numpy as np
 from datetime import datetime
-
+import chai_util as util
 
 def _request2curl(req):
     """Convert python requests to curl syntax.
@@ -28,21 +28,6 @@ def _request2curl(req):
     headers = " -H ".join(headers)
     return command.format(method=method, headers=headers, data=data, uri=uri)
 
-
-def _check_par(name, value, _type=int, _min=None, _max=None, _list=None):
-    """Check parameters."""
-
-    if not isinstance(value, _type):
-        raise Exception('Value of parameter %s is not a valid %s.'%(name, _type))
-
-    if _list != None and value not in _list:
-        raise Exception('Value of parameter %s is not in the valid list %s.'%(name, _list))
-
-    if _min != None and value < _min:
-        raise Exception('Value of parameter %s is less than the min value %s.'%(name, _min))
-
-    if _max != None and value > _max:
-        raise Exception('Value of parameter %s is more than the max value %s.'%(name, _max))
 
 class ChaiDevice(object):
     """Device class.
@@ -119,7 +104,7 @@ class ChaiDevice(object):
 
     def experiment_start(self, experiment_id=None):
         
-        _check_par('experiment id', experiment_id, _type=int, _min=0)
+        util.check_par('experiment id', experiment_id, _type=int, _min=0)
 
         ret = self._rest_session.post(self._rest_prefix + ':8000/control/start', data='{"experiment_id":"%d"}'%experiment_id)
         status = True
@@ -147,7 +132,7 @@ class ChaiDevice(object):
 
     def experiment_delete(self, experiment_id=None):
 
-        _check_par('experiment id', experiment_id, _type=int, _min=0)
+        util.check_par('experiment id', experiment_id, _type=int, _min=0)
 
         ret = self._rest_session.delete(self._rest_prefix + '/experiments/%d'%experiment_id)
 
@@ -162,7 +147,7 @@ class ChaiDevice(object):
 
         Returns the id of the new experiment.
         """
-        _check_par('experiment id', experiment_id, _type=int, _min=0)
+        util.check_par('experiment id', experiment_id, _type=int, _min=0)
 
         ret = self._rest_session.post(self._rest_prefix + '/experiments/%d/copy'%experiment_id)
         new_experiment_id = -1
@@ -184,7 +169,7 @@ class ChaiDevice(object):
     def experiment_info(self, experiment_id=None):
         """Get status of an experiment."""
 
-        _check_par('experiment id', experiment_id, _type=int, _min=0)
+        util.check_par('experiment id', experiment_id, _type=int, _min=0)
 
         ret = self._rest_session.get(self._rest_prefix + '/experiments/%d'%experiment_id)
         try:
@@ -210,15 +195,15 @@ class ChaiDevice(object):
         if self.state() != 'idle':
             raise Exception('Device is running an experiment')
 
-        _check_par('experiment id', experiment_id, _type=int, _min=0)
-        _check_par('loop count', loop_cnt, _type=int, _min=1, _max=1000)
-        _check_par('poll seconds', poll_seconds, _type=int, _min=1, _max=3600)
-        _check_par('gap minutes', gap_minutes, _type=int, _min=0, _max=1440)
+        util.check_par('experiment id', experiment_id, _type=int, _min=0)
+        util.check_par('loop count', loop_cnt, _type=int, _min=1, _max=1000)
+        util.check_par('poll seconds', poll_seconds, _type=int, _min=1, _max=3600)
+        util.check_par('gap minutes', gap_minutes, _type=int, _min=0, _max=1440)
 
         exp_info = self.experiment_info(experiment_id)
         if data_log:
             if data_log_duration_s != None:
-                _check_par('data log duration (seconds)', data_log_duration_s, _type=int, _min=1)
+                util.check_par('data log duration (seconds)', data_log_duration_s, _type=int, _min=1)
             else:
                 if exp_info['experiment']['completion_status'] != 'success':
                     raise Exception("Template experiment did not complete successfully. Please specify the data_log_duration_s parameter")
@@ -287,7 +272,7 @@ class ChaiDevice(object):
         Can be used to duplicate the experiment on another machine.
         """
 
-        _check_par('experiment id', experiment_id, _type=int, _min=0)
+        util.check_par('experiment id', experiment_id, _type=int, _min=0)
 
         exp = self._rest_session.get(self._rest_prefix + '/experiments/%d'%experiment_id)
 
@@ -406,16 +391,16 @@ class ChaiDevice(object):
     def sql_get_data(self, table, experiment_id, channel=None, well=None):
         """Get data for a specific experiment."""
 
-        _check_par('experiment id', experiment_id, _type=int, _min=0)
+        util.check_par('experiment id', experiment_id, _type=int, _min=0)
 
         channel_string = ''
         if channel is not None:
-            _check_par('channel', channel, _type=int, _min=1, _max=2)
+            util.check_par('channel', channel, _type=int, _min=1, _max=2)
             channel_string = 'and channel = %d'%(int(channel))
 
         well_string = ''
         if well is not None:
-            _check_par('well number', well, _type=int, _min=0, _max=15)
+            util.check_par('well number', well, _type=int, _min=0, _max=15)
             well_string = 'and well_num = %d'%(int(well))
 
         data = self.sql_command(
@@ -445,8 +430,8 @@ class ChaiDevice(object):
 
     def set_heat_block_temp(self, temp, tol=0.5):
         
-        _check_par('temperature', temp, _type=float, _min=0, _max=100)
-        _check_par('tolerance', tol, _type=float, _min=0, _max=5)
+        util.check_par('temperature', temp, _type=float, _min=0, _max=100)
+        util.check_par('tolerance', tol, _type=float, _min=0, _max=5)
 
         self.test_control('heat_block_target_temp','%d'%temp)
 
@@ -460,10 +445,10 @@ class ChaiDevice(object):
         """Get optical readings from the status page or from the csv dump"""
 
         
-        _check_par('well', well, int, 0, 15)
-        _check_par('sample count', cnt, int, 0)
-        _check_par('mode', mode, str, _list=['status', 'dump'])
-        _check_par('source on', source_on, bool, _list=[True, False])
+        util.check_par('well', well, int, 0, 15)
+        util.check_par('sample count', cnt, int, 0)
+        util.check_par('mode', mode, str, _list=['status', 'dump'])
+        util.check_par('source on', source_on, bool, _list=[True, False])
 
         self.test_control("photodiode_mux_channel",'%d'%well)
 
@@ -500,8 +485,8 @@ class ChaiDevice(object):
     def data_logger_start(self, cnt_pre, cnt_post):
         """Setup and start the data logger"""
 
-        _check_par('pre-trigger sample count', cnt_pre, int, _min = 0)
-        _check_par('post-trigger sample count', cnt_post, int, _min = 0)
+        util.check_par('pre-trigger sample count', cnt_pre, int, _min = 0)
+        util.check_par('post-trigger sample count', cnt_post, int, _min = 0)
 
         ret = self._rest_session.post(
                 self._rest_prefix + ':8000/test/data_logger/start', 
@@ -539,7 +524,7 @@ class ChaiDevice(object):
         """Wait for logger data and retrieve it"""
 
         if timeout_s != None:
-            _check_par('timeout (seconds)', timeout_s, int, _min=1)
+            util.check_par('timeout (seconds)', timeout_s, int, _min=1)
 
         remote_output_file = '/tmp/data_logger.csv'
         local_output_file = 'data.csv.%s'%self._config['host']

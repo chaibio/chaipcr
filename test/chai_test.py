@@ -6,23 +6,8 @@ import sys
 import shutil
 import gzip
 
-from chai_remote import *
-
-from functools import wraps
-import inspect
-def initializer(init):
-    """Automatic member initialization for class __init__."""
-    names, varargs, keywords, defaults = inspect.getargspec(init)
-    @wraps(init)
-    def wrapper(self, *args, **kargs):
-        for name, arg in zip(names[1:], args) + kargs.items():
-            setattr(self, name, arg)
-        for i in range(len(defaults)):
-            index = -(i + 1)
-            if not hasattr(self, names[index]):
-                setattr(self, names[index], defaults[index])
-        init(self, *args, **kargs)
-    return wrapper
+import chai_util as util
+import chai_remote as remote
 
 class Status:
     PASS = 0
@@ -50,24 +35,6 @@ def check_result(result, thresholds):
     return status
 
 
-def _format(_string, format_s='{}', style = None):
-    """Add color formatting to string for printing in a terminal."""
-    styles = {
-            'green'   : '\033[37m\033[42m',
-            'yellow'  : '\033[37m\033[43m',
-            'red'     : '\033[37m\033[41m',
-            None      : ''
-            }
-
-    if not style in styles.keys():
-        raise Exception('Unknown style "%s"'%style)
-
-    if style:
-        return styles[style] + format_s.format(_string) + '\033[00m' 
-    else:
-        return format_s.format(_string)
-
-
 def status_string(status, format_s='{}', color=True):
     """Return the string reprsentation for the numeric status."""
     status_map ={
@@ -84,21 +51,7 @@ def status_string(status, format_s='{}', color=True):
     if color:
         style = status_map[status][1]
 
-    return _format(status_map[status][0], format_s, style)
-
-def pkl_gz_load(filename):
-    with gzip.open(filename,'rb') as f:
-        return pickle.load(f)
-
-def pkl_gz_dump(obj, filename):
-    with gzip.open(filename,'wb') as f:
-        pickle.dump(obj, f)
-
-def tee(_string, fileobj=None):
-    """Print both on stdout and in the file."""
-    sys.stdout.write(_string)
-    if fileobj:
-        fileobj.write(_string)
+    return util._format(status_map[status][0], format_s, style)
 
 
 class ChaiTest(object):
@@ -121,7 +74,7 @@ class ChaiTest(object):
             self.logfile = None
             self.device = None
             
-            pkl_gz_dump(self, os.path.join(self.logdir, self.label + '.pkl.gz'))
+            util.pkl_gz_dump(self, os.path.join(self.logdir, self.label + '.pkl.gz'))
 
             # restore member 
             self.logfile = tmp_logfile
@@ -142,7 +95,7 @@ class ChaiTest(object):
         output = ''        
         output += '----------------------------\n'        
         output += 'Running test "%s"\n'%self.label        
-        tee(output, self.logfile)
+        util.tee(output, self.logfile)
 
     def run_end(self):
         output = ''        
@@ -161,18 +114,28 @@ class ChaiTest(object):
             self.device.test_control('heat_sink_fan_drive', '0')
 
 
-
 class ChaiNoiseTest(ChaiTest):
     """Noise Test."""
-    @initializer
+    @util.initializer
     def __init__(
             self, 
             wells = range(16),
             temperatures_C = [10, 60, 80],
             loops = 300,
-            settle_s = 300
+            settle_s = 300,
+            leds_on = True,
+            lid_temp_C = None
             ):
+
         super(ChaiNoiseTest, self).__init__()
+        
+        [util.check_par('well', well, _type=int, _min=0, _max=15) for well in self.wells] 
+        [util.check_par('temperature (degC)', temp, _type=int, _min=0, _max=90) for temp in 
+                [temp_number for temp_number in self.temperatures_C if temp_number != None]
+                ] 
+        util.check_par('loops', self.loops, _type=int, _min=0) 
+        util.check_par('settle time (s)', self.settle_s, _type=int, _min=0, _max=3600) 
+
         self.logger_data = {}
         self.parsed_data = None
         self.results = None
@@ -204,16 +167,22 @@ class ChaiNoiseTest(ChaiTest):
 
         try:
 
-            super(ChaiNoiseTest, self).fan(True)
-            #self.device.test_control('lid_target_temp', 110)
+            self.device.experiment_stop()
+
 
             for temperature in self.temperatures_C:
+
+                super(ChaiNoiseTest, self).fan(True)
+
+                if self.lid_temp_C:
+                    self.device.test_control('lid_target_temp', lid_temp_C)
                 
                 if self.verbosity > 0:
                     print('Setting block temperature to %.2f degC'%temperature)
 
+                if temperature:
+                    self.device.test_control('heat_block_target_temp', temperature)
 
-                self.device.test_control('heat_block_target_temp', temperature)
                 self.device.test_control('photodiode_mux_channel', initial_well)
 
                 data_logger_buffer_size = int((1*self.loops*len(self.wells) + self.settle_s) * self.device.data_logger_samplerate)
@@ -230,18 +199,20 @@ class ChaiNoiseTest(ChaiTest):
                             sys.stdout.flush()
                     for well in self.wells:
 
-                        self.device.test_control('activate_led', '%d'%well)
+                        if self.leds_on:
+                            self.device.test_control('activate_led', '%d'%well)
                         self.device.test_control('photodiode_mux_channel', '%d'%well)
 
                         time.sleep(0.3)
 
-                self.device.test_control('photodiode_mux_channel', 0)
+                self.device.test_control('photodiode_mux_channel', initial_well)
 
                 self.logger_data[temperature] = self.device.data_logger_trigger()
                 
                 self.device.data_logger_stop()
 
-                
+                self.device.experiment_stop()
+
                 if self.verbosity > 1:
                     print('')
 
@@ -252,7 +223,12 @@ class ChaiNoiseTest(ChaiTest):
 
         finally:
             self.device.test_control('disable_leds', '')
+            
+            # remove this after the fix for the stop API is included in an official release
             self.device.test_control('heat_block_target_temp', '25')
+
+            self.device.experiment_stop()
+
             #super(ChaiNoiseTest, self).fan(False)
             #self.device.test_control('lid_target_temp', 25)
 
@@ -346,7 +322,7 @@ class ChaiNoiseTest(ChaiTest):
                         style = 'yellow'
                     if df['status'][meas] == Status.FAIL:
                         style = 'red'
-                tmp += _format(df['value'][meas], '{:8.0f}'%df['value'][meas], style)
+                tmp += util._format(df['value'][meas], '{:8.0f}'%df['value'][meas], style)
                 line.append( tmp )
                 line_status.append(df['status'][meas])  
             line.append(status_string(max(line_status), '{:>8s}', color))
@@ -381,9 +357,9 @@ def main():
     parser.add_argument('--ssh_password',
             help="ssh password")
     parser.add_argument('--verbosity', default = 2, choices = [0, 1, 2], type=int,
-            help="Log and display verbosity [default = 2]")
+            help="Log and display verbosity (default = %(default)d)")
     parser.add_argument('--testlist', default = 'testlist.py',
-            help="List of tests")
+            help="List of tests (default = %(default)s)")
     parser.add_argument('test', nargs='*', 
             help="Test name for running individual tests")
 
@@ -442,7 +418,7 @@ def main():
             active_tests = test_name_list
 
 
-        device = ChaiDevice(
+        device = remote.ChaiDevice(
                 host = args.device, 
                 email= args.email,
                 passwd = args.password,
@@ -466,18 +442,17 @@ def main():
             log.flush()
             os.fsync(log.fileno())
 
-        tee('----------------------------\n', log)
-        tee('Summary:\n', log)
+        util.tee('----------------------------\n', log)
+        util.tee('Summary:\n', log)
         for test_name, result in results:
             print('%-20s %20s'%(test_name, status_string(result, '{:^8}')))
             log.write('%-20s %8s\n'%(test_name, status_string(result, '{:^8}', color=False)))
         print('Global status: %s'%status_string(max([r[1] for r in results]), '{:^8}'))
         log.write('Global status: %s\n'%status_string(max([r[1] for r in results]), '{:^8}', color=False))
 
+        util.tee('----------------------------\n', log)
         print('Run details stored in directory "%s"'%logdir)
-
-        log.write('----------------------------\n')
-        log.write('Completed on ' + time.strftime('%c') + '\n')
+        util.tee('Completed on ' + time.strftime('%c') + '\n')
 
 
 if __name__=='__main__':
