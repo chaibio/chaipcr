@@ -264,7 +264,10 @@ angular.module("canvasApp").factory('step', [
       this.manageFooter = function(color) {
 
         this.dots.forEachObject(function(obj) {
+        if(obj.name !== "backgroundRect") {
           obj.setFill(color);
+        }
+
         });
       };
 

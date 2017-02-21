@@ -126,7 +126,7 @@ angular.module("canvasApp").factory('events', [
       };
 
       this.calculateMoveLimit = function(moveElement, stage) {
-        console.log(stage);
+
         var lastStep = C.allStepViews[C.allStepViews.length - 1];
         var lastStage = C.allStageViews[C.allStageViews.length - 1];
         if(stage.index === lastStage.index) {
