@@ -31,22 +31,26 @@
 				$scope.amount=[];
 				$scope.result=[];
 				$scope.editExpName = false;
-				$scope.amount[0]="-";
-				$scope.amount[1]="-";
+				$scope.amount[0]="\u2014";
+				$scope.amount[1]="\u2014";
 				$scope.assignA = true;
 				$scope.assignB = false;
 				$scope.assignReview = false;
 				$scope.experimentComplete = false;
 				$('.content').addClass('analyze');
 				$scope.editExpNameMode = [false,false,false,false,false,false];
+				var enterState = false;
+				var fromHome = true;
+				$scope.analyzing = true;
 				//	$scope.cq = [["channel","well_num","cq"],[1,1,"39"],[1,2,2],[1,3,40],[1,4,9],[1,5,20],[1,6,"26"],[1,7,"33"],[1,8,"5"],[1,9,"34.5"],[1,10,"19"],[1,11,"12"],[1,12,"6"],[1,13,"24"],[1,14,"39"],[1,15,"32"],[1,16,"18"],[2,1,"11"],[2,2,"25.15"],[2,3,36],[2,4,"8"],[2,5,"34"],[2,6,"10"],[2,7,"15"],[2,8,"25"],[2,9,"35"],[2,10,"28"],[2,11,"2"],[2,12,"7"],[2,13,"0"],[2,14,"35"],[2,15,"28"],[2,16,"17"]];
 
 				function getId(){
 					if($stateParams.id){
 						$scope.experimentId = $stateParams.id;
-						getExperiment($scope.experimentId)
+						getExperiment($scope.experimentId);
 						Experiment.getWells($scope.experimentId).then(function(resp){
 							console.log(resp);
+							$scope.target = resp.data[0].well.targets[0];
 							var j=0;
 							for (var i = 2; i < 8; i++) {
 								$scope.samples[j] = resp.data[i].well.sample_name;
@@ -106,13 +110,27 @@
 
 				$scope.goToResults = function (){
 					//$scope.showSidebar = false;
-					$scope.getResults();
+					if(fromHome){
+						$scope.showSidebar = false;
+					}
+					if (!enterState){
+						if($scope.experimentId){
+							$scope.getResults();
+							enterState = true;
+						}
+						else{
+							$timeout(function () {
+								$scope.goToResults();
+							}, 500);
+						}
+					}
+					//$scope.getResults();
 					//$state.go('results',{id: $scope.experimentId});
 				}
 
 				$scope.startExperiment = function(){
 					Experiment.startExperiment($scope.experimentId).then(function(resp){
-						$state.go('exp-running');
+						$state.go('exp-running',{id: $scope.experimentId});
 					});
 				}
 
@@ -138,6 +156,10 @@
 
 				$scope.goBackToHome = function(){
 					$window.location = '/#/'
+				}
+
+				$scope.goToAmplification = function(){
+					$window.location = '/#/experiments/' + $scope.experimentId + '/run-experiment?chart=amplification';
 				}
 
 				$scope.viewResults = function(){
@@ -226,10 +248,13 @@
 						if(resp.status == 500){
 							$scope.custom_error = resp.data.errors || "An error occured while trying to analyze the experiment results.";
 							$scope.analyzing = false;
-					 }
-					 else if(resp.status ==503){
-						 $timeout($scope.getResults, 1000);
-					 }
+							$state.go('results', {id: $scope.experiment.id});
+							fromHome = true;
+							enterState =true;
+						}
+						else if(resp.status ==503){
+							$timeout($scope.getResults, 1000);
+						}
 					});
 					/*	for (var i = 1; i < 17; i++) {
 					$scope.famCq[i-1] = parseFloat($scope.cq[i][2]);
@@ -264,94 +289,107 @@
 			$scope.timeRemaining = GlobalService.timeRemaining(data);
 			$scope.stateName = $state.current.name;
 
-			if($scope.state !== 'idle' && (data.experiment_controller.experiment.id !== $scope.experimentId) ){
-				$scope.error = true;
-				$scope.lidMessage = "Another Experiment is Running"
-			}
+			/*	if($scope.state !== 'idle' && (data.experiment_controller.experiment.id !== $scope.experimentId) ){
+			$scope.error = true;
+			$scope.lidMessage = "Another Experiment is Running"
+		}*/
 
-			if (data.experiment_controller.experiment && !$scope.experiment) {
-				getExperiment(data.experiment_controller.experiment.id);
-			}
-
-			if($scope.state === 'idle' && $scope.old_state !=='idle') {
-				// exp complete
-				checkExperimentStatus();
-			}
-
-			if($scope.state === 'idle' && $scope.old_state ==='idle' && $state.current.name === 'exp-running') {
-				getExperiment(data.experiment_controller.experiment.id);
-				if($scope.experiment.completion_status === 'failure') {
-					$state.go('analyze', {id: $scope.experiment.id});
-				}
-			}
-
-			if ($state.current.name === 'analyze') Status.stopSync();
-
-		}, true);
-
-		function checkExperimentStatus(){
-			Experiment.get($scope.experiment.id).then(function (resp) {
-				$scope.experiment = resp.data.experiment;
-				if($scope.experiment.completed_at){
-					$scope.goToResults();
-				}
-				else{
-					$timeout(checkExperimentStatus, 1000);
-				}
-			});
+		if (data.experiment_controller.experiment && !$scope.experiment) {
+			getExperiment(data.experiment_controller.experiment.id);
 		}
 
+		if($scope.state === 'idle' && $scope.old_state !=='idle') {
+			// exp complete
+			checkExperimentStatus();
+		}
 
-		$scope.checkMachineStatus = function() {
+		if($state.current.name === 'exp-running'){
+			$scope.hideAbondon = true;
+		}
 
-			DeviceInfo.getInfo($scope.check).then(function(deviceStatus) {
-				// Incase connected
-				if($scope.modal) {
-					$scope.modal.close();
-					$scope.modal = null;
+		if($scope.state === 'idle' && $scope.old_state ==='idle' && $state.current.name === 'exp-running') {
+			getExperiment($scope.experimentId);
+			if($scope.experiment.completion_status !== 'success') {
+				$state.go('results', {id: $scope.experiment.id});
+				fromHome = true;
+				enterState =true;
+			}
+		}
+
+		if ($state.current.name === 'analyze') Status.stopSync();
+
+	}, true);
+
+	function checkExperimentStatus(){
+		Experiment.get($scope.experiment.id).then(function (resp) {
+			$scope.experiment = resp.data.experiment;
+			if($scope.experiment.completed_at){
+				if($scope.experiment.completion_status === 'success'){
+					$scope.goToResults();
+					fromHome = false;
 				}
-
-				if(deviceStatus.data.optics.lid_open === "true" || deviceStatus.data.lid.open === true) { // lid is open
-					$scope.error = true;
-					$scope.lidMessage = "Close lid to begin.";
-				} else {
-					$scope.error = false;
-				}
-			}, function(err) {
-				// Error
-				$scope.error = true;
-				$scope.lidMessage = "Cant connect to machine.";
-
-				if(err.status === 500) {
-
-					if(! $scope.modal) {
-						var scope = $rootScope.$new();
-						scope.message = {
-							title: "Cant connect to machine.",
-							body: err.data.errors || "Error"
-						};
-
-						$scope.modal = $uibModal.open({
-							templateUrl: './views/modal-error.html',
-							scope: scope
-						});
-					}
-				}
-			});
-
-			$scope.timeout = $timeout($scope.checkMachineStatus, 1000);
-		};
-
-		$scope.checkMachineStatus();
-
-		$scope.cancelExperiment = function () {
-			Experiment.stopExperiment($scope.experimentId).then(function () {
-				var redirect = '/#/';
-				$window.location = redirect;
-			});
-		};
-
-
+			}
+			else{
+				$timeout(checkExperimentStatus, 1000);
+			}
+		});
 	}
+
+
+	$scope.checkMachineStatus = function() {
+
+		DeviceInfo.getInfo($scope.check).then(function(deviceStatus) {
+			// Incase connected
+			if($scope.modal) {
+				$scope.modal.close();
+				$scope.modal = null;
+			}
+
+			if(deviceStatus.data.optics.lid_open === "true" || deviceStatus.data.lid.open === true) { // lid is open
+				$scope.error = true;
+				$scope.lidMessage = "Close lid to begin.";
+			} else if((deviceStatus.data.experiment_controller.id !== $scope.experimentId) && (deviceStatus.data.experiment_controller.machine.state !== "idle")) {
+				$scope.error = true;
+				$scope.lidMessage = "Another experiment in Progress.";
+			}
+			else{
+				$scope.error = false;
+			}
+		}, function(err) {
+			// Error
+			$scope.error = true;
+			$scope.lidMessage = "Cant connect to machine.";
+
+			if(err.status === 500) {
+
+				if(! $scope.modal) {
+					var scope = $rootScope.$new();
+					scope.message = {
+						title: "Cant connect to machine.",
+						body: err.data.errors || "Error"
+					};
+
+					$scope.modal = $uibModal.open({
+						templateUrl: './views/modal-error.html',
+						scope: scope
+					});
+				}
+			}
+		});
+
+		$scope.timeout = $timeout($scope.checkMachineStatus, 1000);
+	};
+
+	$scope.checkMachineStatus();
+
+	$scope.cancelExperiment = function () {
+		Experiment.stopExperiment($scope.experimentId).then(function () {
+			var redirect = '/#/';
+			$window.location = redirect;
+		});
+	};
+
+
+}
 ]);
 })();

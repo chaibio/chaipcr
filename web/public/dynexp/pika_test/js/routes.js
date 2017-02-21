@@ -13,7 +13,7 @@
 				templateUrl: './views/intro.html'
 			})
 			.state('exp-running', {
-				url: '/exp-running',
+				url: '/exp-running/:id',
 				templateUrl: './views/exp-running.html'
 			})
 			.state('setWellsA', {

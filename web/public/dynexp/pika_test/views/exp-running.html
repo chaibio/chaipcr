@@ -1,17 +1,17 @@
-<div ng-show="!experimentComplete" class="text-center col-lg-6 col-md-6 col-sm-6 col-xs-6">
-	<p>Your experiment is running. Please do not open the</p>
-	<p>hardware unless instructed to here.</p>
+<div ng-show="!experimentComplete" class="text-center exp-running col-lg-6 col-md-6 col-sm-6 col-xs-6">
+	<h4>Your experiment is running. Please do not open the</h4>
+	<h4>hardware unless instructed to here.</h4>
 
-	<p class="heating" ng-show="state === 'lid_heating'">
+	<h4 class="heating" ng-show="state === 'lid_heating'">
 		The lid is heating to <b>{{experiment.protocol.lid_temperature | round: 1}}&deg;</b>C <br>
-	</p>
-	<p class="note" ng-show="state === 'lid_heating'">
+	</h4>
+	<h4 class="note" ng-show="state === 'lid_heating'">
 		This will take about one minute
-	</p>
+	</h4>
 
-		<h3 ng-show="state === 'running'">Time Remaining:</h3>
+		<h4 ng-show="state === 'running'">Time Remaining:</h4>
 		<h1 ng-show="state === 'running'">{{ timeRemaining | secondsDisplay: 'display2'}}</h1>
-		<h3 ng-show="state === 'running'">Expected complete at roughly {{}}</h3>
+		<!--<h4 ng-show="state === 'running'">Expected complete at roughly {{}}</h4> -->
 
 
 
@@ -21,35 +21,12 @@
 
 <div ng-show="experimentComplete" class="text-center col-lg-6 col-md-6 col-sm-6 col-xs-6">
 	<p>Your experiment is complete.</p>
-	<p ng-show="analyzing">Analyzing your results.<img src="/dynexp/libs/images/loading.gif"> </p>
 
 		<h3>Time Remaining:</h3>
 		<h1>0:00:00</h1>
 		<h3>Completed</h3>
 
-
-		<button ng-show="!analyzing" ng-disabled="error" ng-class="{errorButton: error}" ng-click="viewResults()">View Results</button>
+		<p ng-show="analyzing">Analyzing your results.<img src="/dynexp/libs/images/loading.gif"> </p>
+		<button ng-show="!analyzing" ng-click="viewResults()">View Results</button>
 
 </div>
-
-
-
-
-<!--  <div class="text-center">
-    <p class="wait">PLEASE WAIT:</p>
-    <p class="heating" ng-show="state === 'lid_heating'">
-      The lid is heating to <b>{{experiment.protocol.lid_temperature | round: 1}}&deg;</b>C <br>
-    </p>
-    <p class="note" ng-show="state === 'lid_heating'">
-      This will take about one minute
-    </p>
-    <p class="heating" ng-show="state === 'running'">
-      Warming the instrument at <b>{{getBlockHeat() | round: 1}}&deg;</b>C <br>
-    </p>
-
-    <p class="dont-open">
-      Please don't open the machine during this step.
-    </p>
-
-  </div>
-</div>-->

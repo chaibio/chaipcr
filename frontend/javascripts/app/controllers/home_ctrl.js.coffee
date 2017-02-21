@@ -106,6 +106,10 @@ window.ChaiBioTech.ngApp
          else
            if exp.started_at is null
             $window.location.href = "/dynexp/pika_test/index.html#/setWellsA/" + exp.id
+           else if exp.started_at isnt null && exp.completed_at isnt null
+             $window.location.href = "/dynexp/pika_test/index.html#/results/" + exp.id
+           else
+             $window.location.href = "/dynexp/pika_test/index.html#/exp-running/" + exp.id
 
 
     return

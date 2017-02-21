@@ -74,6 +74,10 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 
 				Testkit.createWells(resp.data.experiment.id,$scope.wells).then(function(response){
 					$window.location.href = "/dynexp/pika_test/index.html#/setWellsA/"+resp.data.experiment.id ;
+				})
+				.catch(function(response){
+					$scope.creating = false;
+					$scope.error = response.data.errors || "An error occured while trying to create the experiment.";
 				});
 
 			});
@@ -85,7 +89,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 
 		// Close the dropdown if the user clicks outside of it
 		window.onclick = function(event) {
-			if (!event.target.matches('.dropbtn')) {
+			if (!event.target.matches('.dropbtn') && !event.target.matches('.test') && !event.target.matches('.arrow-down') ) {
 
 				var dropdowns = document.getElementsByClassName("dropdown-content");
 				var i;

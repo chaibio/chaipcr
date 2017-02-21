@@ -1,12 +1,12 @@
 <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 setwells" >
-	<h3>Pippette Control & Samples into B Wells</h3>
-	<p>[Instruction and notes]</p>
+	<h3>Pippette Samples Into B Wells</h3>
+	<!--<p>[Instruction and notes]</p> -->
 
 	<table>
 		<tr>
 			<td class="well-name">Well Name</td>
-			<td class="rxn-type rxn-center">Rxn. Type</td>
-			<td class="notes rxn-center">Notes</td>
+			<td class="rxn-type rxn-center">Reaction Type</td>
+		<!--	<td class="notes rxn-center">Notes</td> -->
 		</tr>
 		<tr ng-repeat="x in samples_B track by $index">
 			<td>
@@ -17,9 +17,9 @@
 				<input type="text" ng-class="{'empty-input':!x}" placeholder="Enter Name Here" class="exp-name H1" required ng-model="x"  ng-blur="updateWellB($index+9,x)"
 				my-enter="updateWellB($index+9,x)" focus-on="editExpNameMode">
 			</td>
-			<td ng-show="x" class="rxn-center"><img style="width:20px" src="./images/Sample-Pink.svg"></td>
-			<td ng-show="!x" class="rxn-center"><img style="width:20px" src="./images/Sample.svg"></td>
-			<td class="rxn-center">note</td>
+			<td ng-show="x" class="rxn-center"><img style="width:20px" src="./images/Sample-Blue.svg"></td>
+			<td ng-show="!x" class="rxn-center"><img style="width:20px" src="./images/Sample-Blue-Empty.svg"></td>
+		<!--	<td class="rxn-center">note</td> -->
 		</tr>
 	</table>
 </div>
@@ -27,6 +27,7 @@
 	<div class="text-center col-lg-12 col-md-12 col-sm-12 col-xs-12">
 
 		<button ng-click="goBackToA()">Back</button>
-		<button ng-click="review()">CONTINUE</button>
+		<button ng-click="review()">Continue</button>
+		<img style="width:120px" src="./images/Pika-Weihenstephan-Logo.png">
 
 	</div>

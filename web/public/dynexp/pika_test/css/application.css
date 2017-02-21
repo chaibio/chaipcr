@@ -76,6 +76,7 @@ input{
 
 .sidebar input{
 	border: none;
+	max-width: 250px;
 }
 
 .step-B{
@@ -121,16 +122,16 @@ input{
 .inner {
 		/*border: 2px solid #999;*/
 		border-top-width: 0;
-		background-color: #252460;
+		background-color: #1D8CBA;
 
 		bottom: 0;
 		height: 0%;
 }
 
 .inner div {
-		border: 2px solid #1AA2D6;
+		border: 2px solid #EE9321;
 		border-bottom-width: 0;
-		background-color: #1AA2D6;
+		background-color: #EE9321;
 		top: 0;
 		width: 100%;
 		height: 15px;
@@ -249,6 +250,18 @@ input{
 
 /* Results Page End */
 
+/* Experiment Running */
+
+.exp-running h4{
+	font-family: 'Dinot';
+	font-weight: 700;
+	margin-top: 0;
+}
+
+/* Experiment Running End */
+
+
+
 button,
 .button {
 		background: #fff;
@@ -259,14 +272,15 @@ button,
 		margin-top: 70px;
 		margin-bottom: 50px;
 		padding: 10px 50px;
-		width: 220px;
+		width: 250px;
 		text-decoration: none;
 }
 
 button:hover,
 .button:hover {
 		text-decoration: none;
-		color: #000;
+		color: white;
+		background-color: #000;
 }
 
 button.red,

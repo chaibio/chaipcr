@@ -22,20 +22,20 @@ limitations under the License.
 			Run a Test Kit
 			<a class="pull-right close" ng-click="$dismiss()">&times;</a>
 		</h4>
-		<p>Please Choose the Manufacturer of your test kit</p>
+		<p>Please choose the manufacturer of your test kit</p>
 		<p>Supported kits will appear below</p>
 		<form role="form" class="form-horizontal" name="form" ng-submit="submit(newExperimentName)" novalidate>
 			<div class="underlined">
 				<div class="form-group">
 					<div class="col-md-12">
 						<div class="dropdown" ng-click="myFunction()">
-							<button class="dropbtn"><span style="float:left;">{{value}}</span> <img ng-click="myFunction()" class="arrow-down" src="/images/arrow-down.png"></button>
+							<button class="dropbtn"><span class="test" style="float:left;">{{value}}</span> <img class="arrow-down" src="/images/arrow-down.png"></button>
 							<div id="myDropdown" class="dropdown-content">
-								<a href="" ng-click="value = 'PIKA'" value="abc">PIKA Weihenstephan</a>
+								<a href="" ng-click="value = 'PIKA Weihenstephan'" value="abc">PIKA Weihenstephan</a>
 							</div>
 						</div>
 					</div>
-					<div ng-show="value == 'PIKA'" class="col-md-12" style="margin-top:25px;">
+					<div ng-show="value == 'PIKA Weihenstephan'" class="col-md-12" style="margin-top:25px;">
 						<div class="col-md-6 one-kit" ng-click="selectedKit=1" ng-class="{ 'selected': selectedKit == 1}">
 							Use One Kit
 						</div>
@@ -43,7 +43,7 @@ limitations under the License.
 							Use Two Kits
 						</div>
 					</div>
-					<div ng-show="value == 'PIKA'" class="col-md-12" style="margin-top:25px;">
+					<div ng-show="value == 'PIKA Weihenstephan'" class="col-md-12" style="margin-top:25px;">
 						<label>
 							<input type="radio" ng-model="kit.name" value="Lactobacillaceae Screening">
 								<span class="options-text">4e Kit B 2301-32: Lactobacillaceae Screening</span>
@@ -70,9 +70,10 @@ limitations under the License.
 						</label><br/>
 					</div>
 				</div>
-				<div ng-show="value == 'PIKA'" class="text-center">
+				<div ng-show="value == 'PIKA Weihenstephan'" class="text-center">
 					<a ng-show="!creating" href="" ng-click="create()" class="button-continue">Continue</a>
 					<a href="" ng-show="creating" class="button-continue">Creating Experiment<ellipsis-animated><ellipsis-animated/></a>
+					<p ng-show="error">{{error}}</p>
 				</div>
 			</form>
 		</div>
