@@ -14,7 +14,7 @@
 				<td style="width:300px">Well</td>
 				<td style="width:100px">Cq</td>
 				<td style="width:200px">Results</td>
-				<!--<td style="width:100px">Hex Cq</td> -->
+			<!--	<td style="width:100px">Hex Cq</td> -->
 				<td style="width:200px">Amount</td>
 			</tr>
 			<tr class="td-description">
@@ -22,7 +22,7 @@
 					<img ng-show="result[0] == 'Valid'" style="width:20px;float:right"  src="./images/res_valid.svg">
 					<img ng-show="result[0] == 'Invalid'" style="width:20px;float:right"  src="./images/res_invalid.svg">
 				</td>
-				<td>{{famCq[0]}}</td>
+				<td><span ng-show="famCq[0]">{{famCq[0]}}</span></td>
 				<td>{{result[0]}}</td>
 			<!--	<td>{{hexCq[0]}}</td> -->
 				<td>{{amount[0]}}</td>
@@ -32,9 +32,9 @@
 					<img ng-show="result[1] == 'Valid'" style="width:20px;float:right"  src="./images/res_valid.svg">
 					<img ng-show="result[1] == 'Invalid'" style="width:20px;float:right"  src="./images/res_invalid.svg">
 				</td>
-				<td>{{famCq[1]}}</td>
+				<td><span ng-show="famCq[1]">{{famCq[1]}}</span></td>
 				<td>{{result[1]}}</td>
-				<!--<td>{{hexCq[1]}}</td> -->
+			<!--	<td>{{hexCq[1]}}</td> -->
 				<td>{{amount[1]}}</td>
 			</tr>
 			<tr ng-show="x" class="td-description" ng-repeat="x in samples track by $index">
@@ -43,10 +43,11 @@
 					<img ng-show="result[$index+2] == 'Positive'" style="width:20px;float:right"  src="./images/res_pos.svg">
 					<img ng-show="result[$index+2] == 'Negative'" style="width:20px;float:right"  src="./images/res_neg.svg">
 					<img ng-show="result[$index+2] == 'Inhibited'" style="width:20px;float:right"  src="./images/res_inhib.svg">
+					<img ng-show="result[$index+2] == 'Unknown'" style="width:20px;float:right"  src="./images/res_inhib.svg">
 				</td>
 				<td><span ng-show="famCq[$index+2]">{{famCq[$index+2]}}</span></td>
 				<td>{{result[$index+2]}}</td>
-				<!--<td>{{hexCq[$index+2]}}</td> -->
+			<!--	<td>{{hexCq[$index+2]}}</td> -->
 				<td>{{amount[$index+2]}}</td>
 			</tr>
 			<tr ng-show="y" class="td-description" ng-repeat="y in samples_B track by $index">
@@ -55,6 +56,7 @@
 					<img ng-show="result[$index+8] == 'Positive'" style="width:20px;float:right"  src="./images/res_pos.svg">
 					<img ng-show="result[$index+8] == 'Negative'" style="width:20px;float:right"  src="./images/res_neg.svg">
 					<img ng-show="result[$index+8] == 'Inhibited'" style="width:20px;float:right"  src="./images/res_inhib.svg">
+					<img ng-show="result[$index+8] == 'Unknown'" style="width:20px;float:right"  src="./images/res_inhib.svg">
 				</td>
 				<td><span ng-show="famCq[$index+8]">{{famCq[$index+8]}}</span></td>
 				<td>{{result[$index+8]}}</td>

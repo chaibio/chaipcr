@@ -172,6 +172,9 @@
 						if($scope.result[i] == "Inhibited"){
 							$scope.amount[i] = "Invalid";
 						}
+						else if($scope.result[i] == "Unknown"){
+							$scope.amount[i] = "";
+						}
 						else if ($scope.famCq[i]>=10 && $scope.famCq[i]<= 24) {
 							$scope.amount[i] = "High";
 						}
@@ -203,18 +206,28 @@
 
 					for (var i = 2; i < 16; i++) {
 						if($scope.famCq[i]>=10 && $scope.famCq[i]<=38){
-							$scope.result[i]="Positive";
+							if($scope.result[1] == "Invalid"){
+								$scope.result[i]="Unknown";
+							}
+							else{
+								$scope.result[i]="Positive";
+							}
 						}
 
 						else if (($scope.famCq[i]>38 || !$scope.famCq[i]) && ($scope.hexCq[i]>0 && $scope.hexCq[i]<=36)) {
-							$scope.result[i]="Negative";
+							if($scope.result[0] == "Invalid"){
+								$scope.result[i]="Unknown";
+							}
+							else{
+								$scope.result[i]="Negative";
+							}
 						}
 
-						else if (($scope.famCq[i]>38 || $scope.famCq[i]<9.9) && ($scope.hexCq[i]>36 || !$scope.hexCq[i])) {
+						else if (($scope.famCq[i]>38 || $scope.famCq[i]<10) && ($scope.hexCq[i]>36 || !$scope.hexCq[i])) {
 							$scope.result[i]="Inhibited";
 						}
 
-						else{
+						else if($scope.famCq[i]<10){
 							$scope.result[i]="Inhibited";
 						}
 					}
@@ -231,10 +244,10 @@
 							$scope.analyzing = false;
 							$scope.cq = resp.data.steps[0].cq;
 							for (var i = 1; i < 17; i++) {
-								$scope.famCq[i-1] = parseFloat($scope.cq[i][2]) + Math.floor((Math.random() * 25) + 1);
+								$scope.famCq[i-1] = parseFloat($scope.cq[i][2]);
 							}
 							for (var i = 17; i < 33; i++) {
-								$scope.hexCq[i-17] = parseFloat($scope.cq[i][2]) + Math.floor((Math.random() * 15) + 1);
+								$scope.hexCq[i-17] = parseFloat($scope.cq[i][2]);
 							}
 							getResultArray();
 						}
