@@ -24,6 +24,9 @@
      <div class="home-page-new-exp-container">
        <button class="home-page-new-exp-button H2" ng-click="HomeCtrl.newExperiment()">CREATE A NEW EXPERIMENT</button>
      </div>
+     <div class="home-page-new-exp-container">
+       <button class="home-page-new-exp-button H2" ng-click="HomeCtrl.newTestKit()">RUN A TEST KIT</button>
+     </div>
      <div class="home-page-go-settings-container">
        <button class="home-page-small-button SH" ui-sref="settings.root">SETTINGS</button>
      </div>
@@ -54,8 +57,8 @@
        <div  ng-repeat="exp in experiments | orderBy:'experiment.created_at':true" class="ovtrunc home-page-exp-tile">
          <div ng-mouseenter="mouseOver = true" class="home-page-tile-text ovtrunc" ng-mouseleave="mouseOver = false" ng-class="{'home-page-tile-text': true, 'home-page-tile-text-hover': mouseOver && !deleteMode}" ng-click="HomeCtrl.openExperiment(exp.experiment)">
 
-		  <!--<a ng-if="!exp.experiment.started_at" href="/#/experiments/{{exp.experiment.id}}/run-experiment?chart=amplification">-->
-          <a class="experiment-links" ng-show="!exp.experiment.started_at" href="/#/edit-protocol/{{exp.experiment.id}}">
+    <!--<a ng-if="!exp.experiment.started_at" href="/#/experiments/{{exp.experiment.id}}/run-experiment?chart=amplification">-->
+          <a class="experiment-links" ng-if="!exp.experiment.started_at && exp.experiment.type !== 'test_kit'" href="/#/edit-protocol/{{exp.experiment.id}}">
              <div class="home-page-exp-name B1B">
                {{exp.experiment.name}}
              </div>
@@ -67,7 +70,19 @@
 
           </a>
 
-          <a class="experiment-links" ng-show="exp.experiment.started_at" href="/#/experiments/{{exp.experiment.id}}/run-experiment?chart=amplification">
+          <a class="experiment-links" ng-if="!exp.experiment.started_at && exp.experiment.type === 'test_kit'" href="/dynexp/pika_test/index.html#/setWellsA/{{exp.experiment.id}}">
+             <div class="home-page-exp-name B1B">
+               {{exp.experiment.name}}
+             </div>
+             <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at && exp.experiment.time_valid">Created {{exp.experiment.created_at | amCalendar}}, #{{exp.experiment.id}}</span>
+             <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at && !exp.experiment.time_valid">Created, #{{exp.experiment.id}}</span>
+             <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && exp.experiment.time_valid">Run {{exp.experiment.started_at | amCalendar}}, #{{exp.experiment.id}}</span>
+             <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && !exp.experiment.time_valid">Run previously, #{{exp.experiment.id}}</span>
+             <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && !exp.experiment.completed_at">IN PROGRESS&nbsp;<ellipsis-animated><ellipsis-animated/></span>
+
+          </a>
+
+          <a class="experiment-links" ng-if="exp.experiment.started_at && exp.experiment.type !== 'test_kit'" href="/#/experiments/{{exp.experiment.id}}/run-experiment?chart=amplification">
              <div class="home-page-exp-name B1B">
                {{exp.experiment.name}}
              </div>
@@ -77,6 +92,30 @@
              <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && !exp.experiment.time_valid">Run previously, #{{exp.experiment.id}}</span>
              <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && !exp.experiment.completed_at">IN PROGRESS&nbsp;<ellipsis-animated><ellipsis-animated/></span>
           </a>
+
+					<a class="experiment-links" ng-if="exp.experiment.started_at && exp.experiment.completed_at && exp.experiment.type === 'test_kit'" href="/dynexp/pika_test/index.html#/results/{{exp.experiment.id}}">
+						 <div class="home-page-exp-name B1B">
+							 {{exp.experiment.name}}
+						 </div>
+						 <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at && exp.experiment.time_valid">Created {{exp.experiment.created_at | amCalendar}}, #{{exp.experiment.id}}</span>
+						 <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at && !exp.experiment.time_valid">Created, #{{exp.experiment.id}}</span>
+						 <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && exp.experiment.time_valid">Run {{exp.experiment.started_at | amCalendar}}, #{{exp.experiment.id}}</span>
+						 <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && !exp.experiment.time_valid">Run previously, #{{exp.experiment.id}}</span>
+						 <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && !exp.experiment.completed_at">IN PROGRESS&nbsp;<ellipsis-animated><ellipsis-animated/></span>
+
+					</a>
+
+					<a class="experiment-links" ng-if="exp.experiment.started_at && !exp.experiment.completed_at && exp.experiment.type === 'test_kit'" href="/dynexp/pika_test/index.html#/exp-running/{{exp.experiment.id}}">
+						 <div class="home-page-exp-name B1B">
+							 {{exp.experiment.name}}
+						 </div>
+						 <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at && exp.experiment.time_valid">Created {{exp.experiment.created_at | amCalendar}}, #{{exp.experiment.id}}</span>
+						 <span class="home-page-exp-created-at B2" ng-show="!exp.experiment.started_at && !exp.experiment.time_valid">Created, #{{exp.experiment.id}}</span>
+						 <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && exp.experiment.time_valid">Run {{exp.experiment.started_at | amCalendar}}, #{{exp.experiment.id}}</span>
+						 <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && exp.experiment.completed_at && !exp.experiment.time_valid">Run previously, #{{exp.experiment.id}}</span>
+						 <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && !exp.experiment.completed_at">IN PROGRESS&nbsp;<ellipsis-animated><ellipsis-animated/></span>
+
+					</a>
 
          </div>
 

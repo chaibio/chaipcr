@@ -1,0 +1,99 @@
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-init="goToResults()">
+	<div ng-show="experiment.completion_status === 'success' && !analyzing && famCq" class="col-lg-10 col-md-10 col-sm-10 col-xs-10 left-padding">
+		<h6>Experiment: <span class="edit" ng-click="focusExpName()" ng-show="!editExpName">Edit</span> </h6>
+		<h3>
+			<span ng-show="!editExpName">A.{{experiment.name}}</span>
+			<input type="text" placeholder="Enter Experiment Name Here" ng-show="editExpName" class="exp-name H1" required ng-model="experiment.name"  ng-blur="updateExperimentName()"
+			my-enter="updateExperimentName()" focus-on="editExpName">
+		</h3>
+		<h4>{{target}}</h4>
+	</div>
+	<div ng-show="experiment.completion_status === 'success' && !analyzing && famCq" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 left-padding">
+		<table>
+			<tr class="td-heading">
+				<td style="width:300px">Well</td>
+				<td style="width:100px">Fam Cq</td>
+				<td style="width:100px">Hex Cq</td>
+				<td style="width:200px">Amount</td>
+				<td style="width:200px">Results</td>
+			</tr>
+			<tr class="td-description">
+				<td>A1. Positive Control</td>
+				<td>{{famCq[0]}}</td>
+				<td>{{hexCq[0]}}</td>
+				<td>{{amount[0]}}</td>
+				<td>{{result[0]}}</td>
+			</tr>
+			<tr class="td-description">
+				<td>A2. Negative Control</td>
+				<td>{{famCq[1]}}</td>
+				<td>{{hexCq[1]}}</td>
+				<td>{{amount[1]}}</td>
+				<td>{{result[1]}}</td>
+			</tr>
+			<tr ng-show="x" class="td-description" ng-repeat="x in samples track by $index">
+				<td>
+					<span>A{{$index+3}}. {{x}}</span>
+				</td>
+				<td><span ng-show="famCq[$index+2]">{{famCq[$index+2]}}</span></td>
+				<td>{{hexCq[$index+2]}}</td>
+				<td>{{amount[$index+2]}}</td>
+				<td>{{result[$index+2]}}</td>
+			</tr>
+		</table>
+	</div>
+	<div ng-show="experiment.completion_status === 'success' && !analyzing && famCq" style="padding-top:50px" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 left-padding">
+		<table>
+			<tr class="td-heading">
+				<td style="width:300px">Well</td>
+				<td style="width:100px">Fam Cq</td>
+				<td style="width:100px">Hex Cq</td>
+				<td style="width:200px">Amount</td>
+				<td style="width:200px">Results</td>
+			</tr>
+			<tr ng-show="x" class="td-description" ng-repeat="x in samples_B track by $index">
+				<td>
+					<span>B{{$index+1}}. {{x}}</span>
+					<img ng-show="result[$index+8] == 'Positive'"  src="./images/res_pos.svg">
+					<img ng-show="result[$index+8] == 'Negative'"  src="./images/res_neg.svg">
+					<img ng-show="result[$index+8] == 'Positive'"  src="./images/res_inhib.svg">
+				</td>
+				<td><span ng-show="famCq[$index+8]">{{famCq[$index+8]}}</span></td>
+				<td>{{hexCq[$index+8]}}</td>
+				<td>{{amount[$index+8]}}</td>
+				<td>{{result[$index+8]}}</td>
+			</tr>
+		</table>
+	</div>
+	<div ng-show="experiment.completion_status === 'success' && !analyzing && famCq" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
+
+		<button ng-click="goToAmplification()">View Full Results</button>
+		<button ng-click="goBackToHome()">Back to Home Screen</button>
+		<img style="width:120px" src="./images/Pika-Weihenstephan-Logo.png">
+
+	</div>
+	<div ng-show="experiment.completion_status !== 'success' && !analyzing" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center" ng-init="enterState=true">
+
+		<h3>Experiment Failed. </h3>
+		<h3>{{experiment.completion_message}}</h3>
+
+
+		<button ng-click="goBackToHome()">Back to Home Screen</button>
+		<img style="width:120px" src="./images/Pika-Weihenstephan-Logo.png">
+
+	</div>
+	<div ng-show="custom_error" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
+
+		<h3>Experiment Failed ! </h3>
+		<h3>{{custom_error}}</h3>
+
+
+		<button ng-click="goBackToHome()">Back to Home Screen</button>
+		<img style="width:120px" src="./images/Pika-Weihenstephan-Logo.png">
+
+	</div>
+</div>
+
+<div ng-show="analyzing" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
+	<h3 ng-show="analyzing">Analyzing your results.<img src="/dynexp/libs/images/loading.gif"> </h3>
+</div>

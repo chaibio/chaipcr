@@ -1,0 +1,157 @@
+@import "./colors.css.scss";
+
+.modal-open-testkit {
+
+	h4{
+		font-family: 'dinot-bold';
+		font-size: 20px;
+	}
+
+	p{
+		font-family: 'dinot-regular';
+		//font-weight: 300;
+		font-size: 16px;
+	}
+
+  .modal-dialog {
+    margin-top: 100px;
+    width: 550px;
+  }
+
+  .modal-experiment-name {
+    padding-bottom: 0px;
+
+    .input-wrapper {
+      margin-left: -50px;
+      margin-right: -30px;
+    }
+
+    input {
+      background: transparent;
+      color: $lightgray;
+      margin-top: 3px;
+      margin-bottom: -5px;
+      width: 272px;
+
+      &.focused {
+        color: $gray;
+      }
+    }
+
+    button {
+      background-color: $green;
+      border: none;
+      border-radius: 0px;
+      color: #fff;
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      margin: 30px auto;
+      padding: 10px 50px;
+
+      &:focus {outline:0;}
+    }
+  }
+
+	.button-continue {
+		background: #fff;
+		border: 1px solid #333;
+		color: #000;
+		display: inline-block;
+		font-weight: bold;
+		margin-top: 25px;
+		margin-bottom: 10px;
+		padding: 10px 50px;
+		width: 300px;
+		font-family: 'dinot-regular';
+		text-decoration: none;
+}
+
+	.col-md-6{
+		padding: 6px;
+		border: 1px solid black;
+		width: 225px;
+		font-family: 'dinot-bold';
+		text-align: center;
+		font-size: 16px;
+
+	}
+
+	input[type="radio"]{
+		margin-top: 4px;
+		font-size: 13px;
+	}
+
+	.options-text{
+		padding-left: 10px;
+		font-size: 15px;
+		font-family: 'dinot-regular';
+	}
+
+	.one-kit{
+		border-right: 0px;
+	}
+
+	.selected{
+		background-color: #d00b0b;
+		color: white;
+	}
+
+	/* Dropdown Button */
+.dropbtn {
+    background-color: white;
+    color: black;
+    padding: 6px;
+    font-size: 16px;
+		font-family: 'dinot-regular';
+		//font-weight: 300;
+    border: none;
+    cursor: pointer;
+		width: 450px;
+		border: 1px solid black;
+}
+
+.arrow-down{
+	float: right;
+	width: 15px;
+	padding-top: 5px;
+}
+
+/* Dropdown button on hover & focus */
+.dropbtn:hover, .dropbtn:focus {
+    //background-color: #3e8e41;
+		outline: none;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 450px;
+		font-family: 'dinot-regular';
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+		font-family: 'dinot-regular';
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #f1f1f1}
+
+/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+.show {display:block;}
+}
