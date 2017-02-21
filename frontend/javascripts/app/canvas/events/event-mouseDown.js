@@ -98,7 +98,7 @@ angular.module("canvasApp").factory('mouseDown', [
             that.canvas.moveCursor = "move";
             C.stepIndicator.changePlacing(evt.target);
             C.stepIndicator.changeText(evt.target.parent);
-            that.calculateMoveLimit("step");
+            that.calculateMoveLimit("step", evt.target.parent);
             circleManager.togglePaths(false); //put it back later
             C.moveDots.setLeft(evt.target.parent.left + 16);
             evt.target.parent.shrinkStep();
@@ -155,7 +155,7 @@ angular.module("canvasApp").factory('mouseDown', [
 
 
         C.canvas.remove(items[index_to_remove]);
-        
+
         items.splice(index_to_remove, 1);
 
         for(var i = 0; i < items.length; i++) {
