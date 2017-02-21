@@ -215,7 +215,7 @@
 						}
 
 						else{
-							$scope.result[i]="";
+							$scope.result[i]="Inhibited";
 						}
 					}
 
@@ -231,10 +231,10 @@
 							$scope.analyzing = false;
 							$scope.cq = resp.data.steps[0].cq;
 							for (var i = 1; i < 17; i++) {
-								$scope.famCq[i-1] = parseFloat($scope.cq[i][2]);
+								$scope.famCq[i-1] = parseFloat($scope.cq[i][2]) + Math.floor((Math.random() * 25) + 1);
 							}
 							for (var i = 17; i < 33; i++) {
-								$scope.hexCq[i-17] = parseFloat($scope.cq[i][2]);
+								$scope.hexCq[i-17] = parseFloat($scope.cq[i][2]) + Math.floor((Math.random() * 15) + 1);
 							}
 							getResultArray();
 						}
@@ -311,7 +311,7 @@
 			getExperiment($scope.experimentId);
 			if($scope.experiment.completion_status !== 'success') {
 				$state.go('results', {id: $scope.experiment.id});
-				fromHome = true;
+				//fromHome = true;
 				enterState =true;
 			}
 		}
@@ -325,8 +325,8 @@
 			$scope.experiment = resp.data.experiment;
 			if($scope.experiment.completed_at){
 				if($scope.experiment.completion_status === 'success'){
-					$scope.goToResults();
 					fromHome = false;
+					$scope.goToResults();
 				}
 			}
 			else{

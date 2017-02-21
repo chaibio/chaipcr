@@ -50,7 +50,7 @@ input{
 
 .edit{
 	float: right;
-	font-size: 13px;
+	font-size: 15px;
 	color: #49bde2;
 	cursor: pointer;
 }
@@ -185,7 +185,7 @@ input{
 }
 
 .setwells table .rxn-type{
-	width: 90px;
+	width: 150px;
 }
 
 .setwells table .notes{
@@ -201,6 +201,12 @@ input{
 	max-width: 800px;
 }
 
+.review h4{
+	font-family: 'Dinot';
+	font-weight: 700;
+	color: #656565;
+}
+
 .review td{
 	font-family: 'Dinot';
 	font-weight: 500;
@@ -213,6 +219,7 @@ input{
 
 .review .td-rxn{
 	text-align: center;
+	min-width: 120px;
 }
 
 
@@ -247,6 +254,11 @@ input{
 	padding-left: 100px;
 }
 
+.exp-heading{
+	font-size: 30px;
+	padding-bottom: 30px;
+}
+
 
 /* Results Page End */
 
@@ -256,6 +268,16 @@ input{
 	font-family: 'Dinot';
 	font-weight: 700;
 	margin-top: 0;
+	color: #656565;
+}
+
+.lid-heating{
+	padding-top: 100px;
+}
+
+.exp-running h1{
+	font-size: 100px;
+	color: #656565;
 }
 
 /* Experiment Running End */
@@ -293,13 +315,15 @@ button.red,
 		background: #fff;
 		border: 1px solid #999;
 		color: #999;
-		margin-top: 60px;
-		padding: 5px 50px;
+		margin-top: 70px;
+		padding: 10px 50px;
+		width: 250px;
 		text-decoration: none;
 }
 .errorButton:hover {
 	text-decoration: none;
 	color: #999;
+	background-color: #fff;
 }
 p.step{
 		text-align: left;

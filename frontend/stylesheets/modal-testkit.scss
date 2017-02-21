@@ -63,8 +63,27 @@
 		margin-bottom: 10px;
 		padding: 10px 50px;
 		width: 300px;
-		font-family: 'dinot-regular';
+		font-family: 'dinot';
 		text-decoration: none;
+}
+.button-continue:hover {
+		text-decoration: none;
+		color: white;
+		background-color: #000;
+}
+
+.button-creating {
+	background: #fff;
+	border: 1px solid #333;
+	color: #000;
+	display: inline-block;
+	font-weight: bold;
+	margin-top: 25px;
+	margin-bottom: 10px;
+	padding: 10px 50px;
+	width: 300px;
+	font-family: 'dinot';
+	text-decoration: none;
 }
 
 	.col-md-6{

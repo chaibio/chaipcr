@@ -2,6 +2,7 @@
 	<h3>Setup complete. Please review your targets and start your experiment when ready.</h3>
 
 	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding-top:15px;">
+		<h4>{{target}}</h4>
 		<table>
 			<tr>
 				<td class="td-well">Well Name</td>
@@ -28,6 +29,7 @@
 		</table>
 	</div>
 	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding-top:15px;">
+		<h4 style="visibility:hidden">{{target}}</h4>
 		<table>
 			<tr>
 				<td class="td-well">Well Name</td>
@@ -48,6 +50,7 @@
 
 	<button ng-click="goBackToB()">Back</button>
 	<button ng-disabled="error" ng-class="{errorButton: error}" ng-click="startExperiment()">Start Experiment</button>
+	<br>
 	<span ng-show="error">{{lidMessage}}</span>
 
 </div>
