@@ -173,7 +173,7 @@
 							$scope.amount[i] = "Invalid";
 						}
 						else if($scope.result[i] == "Unknown"){
-							$scope.amount[i] = "";
+							$scope.amount[i] = "Repeat";
 						}
 						else if ($scope.famCq[i]>=10 && $scope.famCq[i]<= 24) {
 							$scope.amount[i] = "High";
@@ -313,7 +313,7 @@
 
 		if($scope.state === 'idle' && $scope.old_state ==='idle' && $state.current.name === 'exp-running') {
 			getExperiment($scope.experimentId);
-			if($scope.experiment.completion_status === 'failed') {
+			if($scope.experiment.completion_status && $scope.experiment.completion_status !== 'success') {
 				$state.go('results', {id: $scope.experiment.id});
 				//fromHome = true;
 				enterState =true;
