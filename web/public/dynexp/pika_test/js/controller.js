@@ -302,15 +302,6 @@
 			$scope.timeRemaining = GlobalService.timeRemaining(data);
 			$scope.stateName = $state.current.name;
 
-			/*	if($scope.state !== 'idle' && (data.experiment_controller.experiment.id !== $scope.experimentId) ){
-			$scope.error = true;
-			$scope.lidMessage = "Another Experiment is Running"
-		}*/
-
-		if (data.experiment_controller.experiment && !$scope.experiment) {
-			getExperiment(data.experiment_controller.experiment.id);
-		}
-
 		if($scope.state === 'idle' && $scope.old_state !=='idle') {
 			// exp complete
 			checkExperimentStatus();
@@ -322,7 +313,7 @@
 
 		if($scope.state === 'idle' && $scope.old_state ==='idle' && $state.current.name === 'exp-running') {
 			getExperiment($scope.experimentId);
-			if($scope.experiment.completion_status !== 'success') {
+			if($scope.experiment.completion_status === 'failed') {
 				$state.go('results', {id: $scope.experiment.id});
 				//fromHome = true;
 				enterState =true;

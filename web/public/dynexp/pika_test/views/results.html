@@ -22,7 +22,7 @@
 					<img ng-show="result[0] == 'Valid'" style="width:20px;float:right"  src="./images/res_valid.svg">
 					<img ng-show="result[0] == 'Invalid'" style="width:20px;float:right"  src="./images/res_invalid.svg">
 				</td>
-				<td><span ng-show="famCq[0]">{{famCq[0]}}</span></td>
+				<td><span ng-show="famCq[0]">{{famCq[0] | round:2}}</span></td>
 				<td>{{result[0]}}</td>
 			<!--	<td>{{hexCq[0]}}</td> -->
 				<td>{{amount[0]}}</td>
@@ -32,7 +32,7 @@
 					<img ng-show="result[1] == 'Valid'" style="width:20px;float:right"  src="./images/res_valid.svg">
 					<img ng-show="result[1] == 'Invalid'" style="width:20px;float:right"  src="./images/res_invalid.svg">
 				</td>
-				<td><span ng-show="famCq[1]">{{famCq[1]}}</span></td>
+				<td><span ng-show="famCq[1]">{{famCq[1] | round:2}}</span></td>
 				<td>{{result[1]}}</td>
 			<!--	<td>{{hexCq[1]}}</td> -->
 				<td>{{amount[1]}}</td>
@@ -45,7 +45,7 @@
 					<img ng-show="result[$index+2] == 'Inhibited'" style="width:20px;float:right"  src="./images/res_inhib.svg">
 					<img ng-show="result[$index+2] == 'Unknown'" style="width:20px;float:right"  src="./images/res_inhib.svg">
 				</td>
-				<td><span ng-show="famCq[$index+2]">{{famCq[$index+2]}}</span></td>
+				<td><span ng-show="famCq[$index+2]">{{famCq[$index+2] | round:2}}</span></td>
 				<td>{{result[$index+2]}}</td>
 			<!--	<td>{{hexCq[$index+2]}}</td> -->
 				<td>{{amount[$index+2]}}</td>
@@ -58,7 +58,7 @@
 					<img ng-show="result[$index+8] == 'Inhibited'" style="width:20px;float:right"  src="./images/res_inhib.svg">
 					<img ng-show="result[$index+8] == 'Unknown'" style="width:20px;float:right"  src="./images/res_inhib.svg">
 				</td>
-				<td><span ng-show="famCq[$index+8]">{{famCq[$index+8]}}</span></td>
+				<td><span ng-show="famCq[$index+8]">{{famCq[$index+8] | round:2}}</span></td>
 				<td>{{result[$index+8]}}</td>
 			<!--	<td>{{hexCq[$index+8]}}</td> -->
 				<td>{{amount[$index+8]}}</td>
