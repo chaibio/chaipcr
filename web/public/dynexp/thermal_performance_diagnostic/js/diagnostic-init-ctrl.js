@@ -60,7 +60,7 @@
 
       $scope.proceed = function () {
 
-        Experiment.create({guid: 'thermal_performance_diagnostic'}).then(function(resp) {
+        Experiment.create({guid: 'thermal_performance_diagnostic',name:'thermal_performance_diagnostic'}).then(function(resp) {
           $timeout.cancel($scope.timeout);
           $scope.experiment = resp.data.experiment;
 
