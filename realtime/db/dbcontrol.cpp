@@ -418,7 +418,7 @@ void DBControl::completeExperiment(const Experiment &experiment)
         break;
 
     case Experiment::Failed:
-        stream << "failed";
+        stream << "failure";
         break;
 
     case Experiment::Aborted:
