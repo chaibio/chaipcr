@@ -140,6 +140,9 @@ Experiment DBControl::getExperiment(int id)
 
     Experiment experiment(id, result.get<int>("experiment_definition_id"));
 
+    if (result.get_indicator("name") != soci::i_null)
+        experiment.setName(result.get<std::string>("name"));
+
     if (getExperimentDefination(experiment))
     {
         experiment.setProtocol(getProtocol(experiment.definationId()));
@@ -172,9 +175,6 @@ bool DBControl::getExperimentDefination(Experiment &experiment)
 
             return false;
         }
-
-        if (result.get_indicator("name") != soci::i_null)
-            experiment.setName(result.get<std::string>("name"));
 
         if (result.get_indicator("experiment_type") != soci::i_null)
             experiment.setType(result.get<Experiment::Type>("experiment_type"));
@@ -418,7 +418,7 @@ void DBControl::completeExperiment(const Experiment &experiment)
         break;
 
     case Experiment::Failed:
-        stream << "failed";
+        stream << "failure";
         break;
 
     case Experiment::Aborted:

@@ -44,7 +44,6 @@ end
 
 ExperimentDefinition.seed(:guid) do |s|
   s.id = 2
-  s.name = "Thermal Performance Diagnostic"
   s.guid = "thermal_performance_diagnostic"
   s.experiment_type = ExperimentDefinition::TYPE_DIAGNOSTIC
   s.protocol = protocol.first

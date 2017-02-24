@@ -186,7 +186,7 @@
       };
 
       $scope.createExperiment = function () {
-        Experiment.create({guid: 'thermal_consistency'}).then(function (resp) {
+        Experiment.create({guid: 'thermal_consistency',name:'thermal_consistency'}).then(function (resp) {
           $timeout.cancel($scope.timeout);
           Experiment.startExperiment(resp.data.experiment.id).then(function () {
             $scope.experiment = resp.data.experiment;

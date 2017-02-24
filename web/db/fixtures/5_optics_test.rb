@@ -35,7 +35,6 @@ end
 
 ExperimentDefinition.seed(:id) do |s|
   s.id = 4
-  s.name = "Optical Test"
   s.guid = "optical_test_single_channel"
   s.experiment_type = ExperimentDefinition::TYPE_DIAGNOSTIC
   s.protocol = protocol.first

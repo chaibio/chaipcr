@@ -47,12 +47,22 @@ template <typename Iterator>
 inline double average(Iterator begin, Iterator end)
 { return std::accumulate(begin, end, 0) / static_cast<double>(std::distance(begin, end)); }
 
+template <class Container>
+inline double average(const Container &container) { return average(std::begin(container), std::end(container)); }
+
 boost::posix_time::ptime parseIsoTime(const std::string &str);
 
 void watchProcess(const std::string &command, WatchProcessCallback outCallback, WatchProcessCallback errorCallback = WatchProcessCallback());
 bool watchProcess(const std::string &command, int eventFd, WatchProcessCallback outCallback, WatchProcessCallback errorCallback = WatchProcessCallback());
 
 bool getFileChecksum(const std::string &filePath, int eventFd, std::string &checksum);
+
+struct NullMutex
+{
+     void lock() {}
+     void unlock() {}
+     bool try_lock() { return true; }
+};
 
 }
 

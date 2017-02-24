@@ -43,7 +43,7 @@ TemperatureController::TemperatureController(Settings settings)
     _targetTemperature = _minTargetTemp - 1;
     _firstErrorState = false;
 
-    _thermistor->temperatureChanged.connect(boost::bind(&TemperatureController::currentTemperatureChanged, this, _1));
+    _thermistor->setTemperatureChangeCallback(std::bind(&TemperatureController::currentTemperatureChanged, this, std::placeholders::_1));
 }
 
 TemperatureController::~TemperatureController()
@@ -53,27 +53,24 @@ TemperatureController::~TemperatureController()
 
 void TemperatureController::setEnableMode(bool enableMode, bool enablePid)
 {
-    if (_enableMode.exchange(enableMode) != enableMode)
+    if (_enableMode = enableMode)
     {
-        if (enableMode)
+        if (enablePid)
         {
-            if (enablePid)
-            {
-                _pidController->reset();
+            _pidController->reset();
 
-                std::lock_guard<std::mutex> lock(_pidMutex);
-                _pidState = true;
-            }
+            std::lock_guard<std::mutex> lock(_pidMutex);
+            _pidState = true;
         }
-        else
+    }
+    else
+    {
         {
-            {
-                std::lock_guard<std::mutex> lock(_pidMutex);
-                _pidState = false;
-            }
-
-            resetOutput();
+            std::lock_guard<std::mutex> lock(_pidMutex);
+            _pidState = false;
         }
+
+        resetOutput();
     }
 }
 

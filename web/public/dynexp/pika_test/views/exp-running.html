@@ -1,0 +1,32 @@
+<div ng-show="!experimentComplete" class="text-center exp-running col-lg-6 col-md-6 col-sm-6 col-xs-6">
+	<h4>Your experiment is running. Please do not open the</h4>
+	<h4>hardware unless instructed to here.</h4>
+
+	<h4 class="heating lid-heating" ng-show="state === 'lid_heating'">
+		The lid is heating to <b>{{experiment.protocol.lid_temperature | round: 1}} &deg;</b>C <br>
+	</h4>
+	<h4 class="note" ng-show="state === 'lid_heating'">
+		This will take about one minute
+	</h4>
+
+		<h4 ng-show="state === 'running'" class="lid-heating">Time Remaining:</h4>
+		<h1 ng-show="state === 'running'">{{ timeRemaining | secondsDisplay: 'display2'}}</h1>
+		<!--<h4 ng-show="state === 'running'">Expected complete at roughly {{}}</h4> -->
+
+
+
+		<button ng-click="cancelExperiment()">Cancel Experiment</button>
+
+</div>
+
+<div ng-show="experimentComplete" class="text-center col-lg-6 col-md-6 col-sm-6 col-xs-6">
+	<p>Your experiment is complete.</p>
+
+		<h3>Time Remaining:</h3>
+		<h1>0:00:00</h1>
+		<h3>Completed</h3>
+
+		<p ng-show="analyzing">Analyzing your results.<img src="/dynexp/libs/images/loading.gif"> </p>
+		<button ng-show="!analyzing" ng-click="viewResults()">View Results</button>
+
+</div>

@@ -24,6 +24,11 @@
   font-weight: 700;
   src: url("../../libs/fonts/DINOT-Bold.otf"); }
 
+@font-face {
+  font-family: "Dinot";
+  font-weight: 500;
+  src: url("../../libs/fonts/DINOT-Medium.otf"); }
+
 
 @font-face {
   font-family: "Open Sans";

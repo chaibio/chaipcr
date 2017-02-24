@@ -20,7 +20,7 @@ describe "Experiments API" do
   end
   
   it 'create experiment with guid' do
-    params = { experiment: {guid: "thermal_performance_diagnostic"} }
+    params = { experiment: {name: "Thermal Performance Diagnostic", guid: "thermal_performance_diagnostic"} }
     post "/experiments", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
     expect(response).to be_success            # test for the 200 status-code
     json = JSON.parse(response.body)
@@ -130,15 +130,6 @@ describe "Experiments API" do
       params = {experiment: {name: "test2"}}
       put "/experiments/#{experiment.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       expect(response).to be_success
-    end
-    
-    it "not editable if experiment definition is not editable" do
-      experiment = Experiment.new
-      experiment.experiment_definition = ExperimentDefinition.new(:name=>"diagnostic", :experiment_type=>ExperimentDefinition::TYPE_DIAGNOSTIC)
-      experiment.save
-      params = {experiment: {name: "test1"}}
-      put "/experiments/#{experiment.id}", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
-      response.response_code.should == 422
     end
   end
 end

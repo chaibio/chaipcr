@@ -191,7 +191,7 @@
       };
 
       $scope.createExperiment = function () {
-        Experiment.create({guid: 'optical_cal'}).then(function (resp) {
+        Experiment.create({guid: 'optical_cal',name:'optical_cal'}).then(function (resp) {
           Experiment.startExperiment(resp.data.experiment.id).then(function () {
             $scope.experiment = resp.data.experiment;
             $state.go('step-3');

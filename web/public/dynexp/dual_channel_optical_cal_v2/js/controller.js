@@ -217,7 +217,7 @@
 
       $scope.createExperiment = function() {
         if(!$scope.created) {
-          Experiment.create({ guid: 'dual_channel_optical_cal_v2' })
+          Experiment.create({ guid: 'dual_channel_optical_cal_v2',name:'dual_channel_optical_cal_v2' })
             .then(function(resp) {
               Experiment.startExperiment(resp.data.experiment.id)
                 .then(function() {

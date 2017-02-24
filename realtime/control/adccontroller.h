@@ -23,15 +23,15 @@
 #include "spi.h"
 #include "lockfreesignal.h"
 
+#include <array>
 #include <vector>
 #include <memory>
 #include <atomic>
 #include <map>
-#include <boost/unordered_map.hpp>
 
 class LTC2444;
 class ADCConsumer;
-class ADCDebugLogger;
+class BaseADCDebugLogger;
 
 // Class ADCController
 class ADCController : public IThreadControl
@@ -45,7 +45,7 @@ public:
         EFinal
     };
 
-    typedef std::map<ADCState, std::shared_ptr<ADCConsumer>> ConsumersList;
+    typedef std::array<std::shared_ptr<ADCConsumer>, EFinal> ConsumersList;
 
     ADCController(ConsumersList &&consumers, unsigned int csPinNumber, SPIPort &&spiPort, unsigned int busyPinNumber);
 	~ADCController();
@@ -53,7 +53,7 @@ public:
     void process();
     void stop();
 
-    void startDebugLogger(std::size_t preSamplesCount, std::size_t postSamplesCount);
+    bool startDebugLogger(std::size_t preSamplesCount, std::size_t postSamplesCount);
     void stopDebugLogger();
     void triggetDebugLogger();
 
@@ -73,12 +73,11 @@ protected:
 
     ConsumersList _consumers;
 
-    std::vector<std::shared_ptr<ADCConsumer>> _zoneConsumers;
     std::shared_ptr<ADCConsumer> _liaConsumer;
     std::shared_ptr<ADCConsumer> _lidConsumer;
 
 private:
-    ADCDebugLogger *_debugLogger;
+    BaseADCDebugLogger *_debugLogger;
 
     bool _ignoreReading;
 };

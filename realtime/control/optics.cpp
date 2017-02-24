@@ -34,22 +34,44 @@
 #include "util.h"
 #include "logger.h"
 
+std::vector<std::int32_t> removePeaks(std::vector<std::int32_t> data);
+
 ////////////////////////////////////////////////////////////////////////////////
 // Class FluorescenceRoughData
 struct Optics::FluorescenceRoughData
 {
-    inline int32_t accumulateBaselineData() const
+    FluorescenceRoughData(): baselineAccumulatedData(0), baselineValuesCount(0), fluorescenceAccumulatedData(0), fluorescenceValuesCount(0) {}
+
+    void addData(const std::vector<std::int32_t> &data)
     {
-        return !baselineData.empty() ? std::accumulate(baselineData.begin(), baselineData.end(), 0) / static_cast<int32_t>(baselineData.size()) : 0;
+        if (baselineValuesCount < (kADCReadsPerOpticalMeasurementFinal * kBaselineMeasurementsPerCycle))
+            addData(data, baselineAccumulatedData, baselineValuesCount, baselineData);
+        else
+            addData(data, fluorescenceAccumulatedData, fluorescenceValuesCount, fluorescenceData);
     }
 
-    inline int32_t accumulateFluorescenceData() const
-    {
-        return !fluorescenceData.empty() ? std::accumulate(fluorescenceData.begin(), fluorescenceData.end(), 0) / static_cast<int32_t>(fluorescenceData.size()) : 0;
-    }
+    inline std::int32_t averageBaselineValue() const noexcept { return baselineValuesCount > 0 ? baselineAccumulatedData / baselineValuesCount : 0; }
+    inline std::int32_t averageFluorescenceValue() const noexcept { return fluorescenceValuesCount > 0 ? fluorescenceAccumulatedData / fluorescenceValuesCount : 0; }
 
-    std::vector<int32_t> baselineData;
-    std::vector<int32_t> fluorescenceData;
+    std::int32_t baselineAccumulatedData;
+    std::int32_t baselineValuesCount;
+    std::vector<std::int32_t> baselineData;
+
+    std::int32_t fluorescenceAccumulatedData;
+    std::int32_t fluorescenceValuesCount;
+    std::vector<std::int32_t> fluorescenceData;
+
+private:
+    void addData(std::vector<std::int32_t> newData, std::int32_t &accumulatedData, std::int32_t &valuesCount, std::vector<std::int32_t> &data)
+    {
+        if (ExperimentController::getInstance()->debugMode())
+            data.insert(data.end(), newData.begin(), newData.end());
+
+        newData = removePeaks(newData);
+        accumulatedData = std::accumulate(newData.begin(), newData.end(), accumulatedData);
+
+        valuesCount += newData.size();
+    }
 };
 
 // Class Optics
@@ -63,7 +85,7 @@ Optics::Optics(unsigned int lidSensePin, std::shared_ptr<LEDController> ledContr
     _meltCurveCollection = false;
     _collectDataTimer = new Poco::Util::Timer();
     _wellNumber = 0;
-    _adcValue = {0, 0};
+    _adcState = false;
     _firstErrorState = false;
 }
 
@@ -106,15 +128,21 @@ void Optics::setADCValue(int32_t adcValue, std::size_t channel)
     }
 
     _firstErrorState = false;
+    _lastAdcValues[channel] = adcValue;
 
+    if (_adcState)
     {
-        std::lock_guard<std::mutex> lock(_adcMutex);
+        _adcValues.at(channel).emplace_back(adcValue);
 
-        _adcValue = {adcValue, channel};
+        for (const std::vector<std::int32_t> &adcChannel: _adcValues)
+        {
+            if (adcChannel.size() < kADCReadsPerOpticalMeasurement)
+                return;
+        }
+
+        _adcState = false;
         _adcCondition.notify_all();
     }
-
-    _lastAdcValues[channel] = adcValue;
 }
 
 void Optics::setCollectData(bool state, bool isMeltCurve)
@@ -163,11 +191,8 @@ void Optics::toggleCollectData(bool waitStop)
     {
         bool collect = _collectData.exchange(false);
 
-        {
-            std::unique_lock<std::mutex> lock(_adcMutex);
-            _adcCondition.notify_all();
-        }
-
+        _adcState = false;
+        _adcCondition.notify_all();
         _collectDataTimer->cancel(waitStop);
         _ledController->disableLEDs();
 
@@ -179,57 +204,29 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &/*task*/)
 {
     try
     {
-        std::vector<std::vector<int32_t>> adcValues;
-        adcValues.resize(qpcrApp.settings().device.opticsChannels);
+        Util::NullMutex mutex;
+        std::unique_lock<Util::NullMutex> lock(mutex);
 
-        {
-            std::size_t doneChannels = 0;
-            std::unique_lock<std::mutex> lock(_adcMutex);
+        _adcValues.clear();
+        _adcValues.resize(qpcrApp.settings().device.opticsChannels);
 
-            while (doneChannels < adcValues.size())
-            {
-                if (_collectData)
-                {
-                    _adcCondition.wait(lock);
+        for (std::vector<std::int32_t> &channel: _adcValues)
+            channel.reserve(kADCReadsPerOpticalMeasurement);
 
-                    std::vector<int32_t> &channel = adcValues.at(_adcValue.second);
-
-                    if (channel.size() < kADCReadsPerOpticalMeasurement)
-                    {
-                        channel.emplace_back(_adcValue.first);
-
-                        if (channel.size() == kADCReadsPerOpticalMeasurement)
-                            ++doneChannels;
-                    }
-
-                    if (!_collectData)
-                        break;
-                }
-                else
-                    break;
-            }
-        }
+        _adcState = true;
+        _adcCondition.wait(lock);
+        _adcState = false;
 
         if (!_collectData)
-            adcValues.clear();
+            _adcValues.clear();
 
-        if (!adcValues.empty())
+        if (!_adcValues.empty())
         {
             if (!_meltCurveCollection)
             {
                 std::size_t i = 0;
-                for (std::vector<int32_t> &channel: adcValues)
-                {
-                    for (int32_t value: channel)
-                    {
-                        if (_fluorescenceData[_wellNumber][i].baselineData.size() < (kBaselineMeasurementsPerCycle * kADCReadsPerOpticalMeasurement))
-                            _fluorescenceData[_wellNumber][i].baselineData.emplace_back(value);
-                        else
-                            _fluorescenceData[_wellNumber][i].fluorescenceData.emplace_back(value);
-                    }
-
-                    ++i;
-                }
+                for (const std::vector<int32_t> &channel: _adcValues)
+                    _fluorescenceData[_wellNumber][i++].addData(channel);
             }
             else
             {
@@ -237,9 +234,9 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &/*task*/)
                 bool debugMode = ExperimentController::getInstance()->debugMode();
 
                 std::size_t i = 0;
-                for (std::vector<int32_t> &channel: adcValues)
+                for (std::vector<int32_t> &channel: _adcValues)
                 {
-                    MeltCurveData data(std::round(Util::average(channel.begin(), channel.end())), temperature, _wellNumber, i++);
+                    MeltCurveData data(std::round(Util::average(removePeaks(channel))), temperature, _wellNumber, i++);
 
                     if (debugMode)
                         data.fluorescenceData = std::move(channel);
@@ -257,9 +254,9 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &/*task*/)
             _wellNumber = 0;
 
             //Assuming that other wells have the same amount of fluorescence data
-            if (!_meltCurveCollection && _fluorescenceData[0][0].fluorescenceData.size() ==
+            if (!_meltCurveCollection && _fluorescenceData[0][0].fluorescenceValuesCount ==
                     ((ExperimentController::getInstance()->experiment().type() != Experiment::CalibrationType ? kOpticalMeasurementsPerCycle : kOpticalMeasurementsPerCalibrationCycle) *
-                     kADCReadsPerOpticalMeasurement))
+                     kADCReadsPerOpticalMeasurementFinal))
             {
                 _collectData = false;
 
@@ -271,7 +268,7 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &/*task*/)
         }
 
         //Assuming that other wells have the same amount of baseline data
-        if (_meltCurveCollection || _fluorescenceData[_wellNumber][0].baselineData.size() == (kBaselineMeasurementsPerCycle * kADCReadsPerOpticalMeasurement))
+        if (_meltCurveCollection || _fluorescenceData[_wellNumber][0].baselineValuesCount == (kBaselineMeasurementsPerCycle * kADCReadsPerOpticalMeasurementFinal))
             _ledController->activateLED(kWellToLedMappingList.at(_wellNumber));
 
         _photodiodeMux.setChannel(_wellNumber);
@@ -299,7 +296,7 @@ std::vector<Optics::FluorescenceData> Optics::getFluorescenceData()
         {
             for (std::pair<const std::size_t, FluorescenceRoughData> &channelData: wellData.second)
             {
-                FluorescenceData data(channelData.second.accumulateBaselineData(), channelData.second.accumulateFluorescenceData(), wellData.first, channelData.first);
+                FluorescenceData data(channelData.second.averageBaselineValue(), channelData.second.averageFluorescenceValue(), wellData.first, channelData.first);
 
                 if (ExperimentController::getInstance()->debugMode())
                 {
@@ -337,4 +334,21 @@ std::vector<Optics::MeltCurveData> Optics::getMeltCurveData(bool stopDataCollect
     }
 
     return meltCurveData;
+}
+
+std::vector<std::int32_t> removePeaks(std::vector<std::int32_t> data)
+{
+    std::sort(data.begin(), data.end());
+
+    std::int32_t median = data.at(data.size() / 2);
+
+    for (int i = 0; i < kOpticalRejectedPeaksCount; ++i)
+    {
+        if ((median - data.front()) > (data.back() - median))
+            data.erase(data.begin());
+        else
+            data.pop_back();
+    }
+
+    return data;
 }

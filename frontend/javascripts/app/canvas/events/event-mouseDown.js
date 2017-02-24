@@ -53,7 +53,11 @@ angular.module("canvasApp").factory('mouseDown', [
 
             var group = target.parentCircle.stepDataGroup;
             var items = group._objects;
-            unHookGroup(group, items);
+            var removeIndex = 0; // We have a rectangle mask in stepDataGroup, which we dont want to add when
+            // editmode is active. so delete it before we add , so we send removeIndex. In this case rectangle mask is the
+            // first element in the array.
+
+            unHookGroup(group, items, removeIndex);
 
             if(getP.x > stepDataGroupLeft && getP.x < (stepDataGroupLeft + 45)) {
               editMode.tempActive = true;
@@ -94,7 +98,7 @@ angular.module("canvasApp").factory('mouseDown', [
             that.canvas.moveCursor = "move";
             C.stepIndicator.changePlacing(evt.target);
             C.stepIndicator.changeText(evt.target.parent);
-            that.calculateMoveLimit("step");
+            that.calculateMoveLimit("step", evt.target.parent);
             circleManager.togglePaths(false); //put it back later
             C.moveDots.setLeft(evt.target.parent.left + 16);
             evt.target.parent.shrinkStep();
@@ -114,7 +118,7 @@ angular.module("canvasApp").factory('mouseDown', [
             that.moveStageActive = true;
             that.canvas.moveCursor = "move";
 
-            C.stageIndicator.init(evt.target.parent);
+            C.stageIndicator.init(evt.target.parent, C, evt.target);
             that.stageIndicatorPosition = C.stageIndicator.left;
             C.stageIndicator.changeText(evt.target.parent);
 
@@ -122,9 +126,11 @@ angular.module("canvasApp").factory('mouseDown', [
 
             var stage = evt.target.parent;
             stage.collapseStage();
-            that.calculateMoveLimit("stage");
-            C.canvas.bringToFront(C.stageIndicator);
+            that.calculateMoveLimit("stage", stage);
+            //C.canvas.bringToFront(C.stageIndicator);
             stage.wireStageNextAndPrevious();
+            stage.removeFromStagesArray();
+            C.canvas.renderAll();
           break;
 
           case "deleteStepButton":
@@ -142,10 +148,16 @@ angular.module("canvasApp").factory('mouseDown', [
 
       });
 
-      unHookGroup = function(group, items) {
+      unHookGroup = function(group, items, index_to_remove) {
 
         group._restoreObjectsState();
         C.canvas.remove(group);
+
+
+        C.canvas.remove(items[index_to_remove]);
+
+        items.splice(index_to_remove, 1);
+
         for(var i = 0; i < items.length; i++) {
           C.canvas.add(items[i]);
         }

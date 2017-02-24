@@ -20,6 +20,21 @@
 angular.module("canvasApp").factory('stepDataGroup', [
   function() {
     return function(dataArray, parent) {
+      var rec = new fabric.Rect({
+        width: 105,
+        height: 20,
+        fill: '#FFB300',
+        opacity: 0.1,
+        top: parent.top + 22,
+        left: parent.left + 35,
+        originX: 'center',
+        originY: "center",
+        hasBorder: false,
+        hasControls: false,
+      });
+
+      dataArray.unshift(rec);
+
       return new fabric.Group(dataArray, {
         top: parent.top + 48,
         left: parent.left + 60,
@@ -29,6 +44,7 @@ angular.module("canvasApp").factory('stepDataGroup', [
         name: "stepDataGroup",
         evented: true,
         parentCircle: parent,
+        //backgroundColor: 'black'
       });
     };
   }

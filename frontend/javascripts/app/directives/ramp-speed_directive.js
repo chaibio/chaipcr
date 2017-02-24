@@ -92,7 +92,17 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
 
           scope.edit = false;
 
-          if(! isNaN(scope.shown) && Number(scope.shown) < 7 && Number(scope.shown) >= 0) {
+          var fractionLength  = (String(scope.shown).split('.')[1] || 0).length;
+
+          if(fractionLength > 5) {
+            console.log("Boom Limit exceeded", fractionLength);
+            scope.configureData();
+            var warningMessageLimitExceeded = alerts.rampSpeedWarningLimitExceeded;
+            scope.$parent.showMessage(warningMessageLimitExceeded);
+            return;
+
+          } else if(! isNaN(scope.shown) && Number(scope.shown) < 7 && Number(scope.shown) >= 0) {
+
             if(editValue != Number(scope.shown)) {
 
               scope.shown = scope.reading = (Number(scope.shown));

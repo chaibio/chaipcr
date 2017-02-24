@@ -75,6 +75,13 @@ window.ChaiBioTech.ngApp
         $scope.enterHome = false
       , 1000
 
+    @newTestKit = ->
+      modalInstance = $uibModal.open
+        templateUrl: 'app/views/experiment/create-testkit-experiment.html'
+        controller: 'CreateTestKitCtrl'
+        openedClass: 'modal-open-testkit'
+        backdrop: false
+
     @newExperiment = ->
       modalInstance = $uibModal.open
         templateUrl: 'app/views/experiment/create-experiment-name-modal.html'
@@ -110,10 +117,18 @@ window.ChaiBioTech.ngApp
         if state.experiment_controller.machine.state == 'running' and exp.id == state.experiment_controller.experiment.id
           $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
 
-        if exp.started_at isnt null
-          $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
-        else
-          $state.go 'edit-protocol', {id: exp.id}
+         if exp.type isnt 'test_kit'
+           if exp.started_at isnt null
+             $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
+           else
+             $state.go 'edit-protocol', {id: exp.id}
+         else
+           if exp.started_at is null
+            $window.location.href = "/dynexp/pika_test/index.html#/setWellsA/" + exp.id
+           else if exp.started_at isnt null && exp.completed_at isnt null
+             $window.location.href = "/dynexp/pika_test/index.html#/results/" + exp.id
+           else
+             $window.location.href = "/dynexp/pika_test/index.html#/exp-running/" + exp.id
 
 
     return

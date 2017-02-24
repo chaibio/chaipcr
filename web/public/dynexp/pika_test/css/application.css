@@ -1,0 +1,391 @@
+html, body {
+		font-family: 'Dinot';
+		color: #000;
+}
+
+body{
+	min-width: 1200px;
+}
+
+h1 {
+		font-size: 50px;
+}
+
+h2 {
+		margin-bottom: 10px;
+		margin-top: 0;
+		font-size: 40px;
+		font-weight: 700;
+}
+p {
+		color: #333;
+		font-size: 14px;
+}
+
+td{
+	padding: 15px;
+}
+
+input{
+	border: none;
+	outline: none;
+	border-bottom: 2px solid #656565;
+	width: 450px;
+
+}
+
+.assign{
+	color: black;
+	font-family: 'Dinot';
+	font-weight: 700;
+}
+
+.assignB{
+
+}
+
+.empty-input{
+	border-bottom: 2px solid lightgray;
+}
+
+.edit{
+	float: right;
+	font-size: 15px;
+	color: #49bde2;
+	cursor: pointer;
+}
+
+.sidebar h6{
+	font-size: 14px;
+	color:#7F7F7F;
+	padding-left: 30px;
+}
+
+.sidebar h4{
+	padding-left: 30px;
+	font-family: 'Dinot';
+	font-weight: 700;
+}
+
+.sidebar hr{
+	display: inline-block;
+	width: 200px;
+	margin-left: 60px;
+	border-top: 2px solid #eee;
+}
+
+.sidebar input{
+	border: none;
+	max-width: 250px;
+}
+
+.step-B{
+	padding-top: 25px;
+}
+
+.step-C{
+	padding-top: 30px;
+}
+
+.abondon-exp{
+	padding-top: 30px;
+	cursor: pointer;
+}
+
+.abondon-exp p{
+	padding-left: 15px;
+	font-family: 'Dinot';
+	font-weight: 500;
+	font-size: 12px;
+}
+
+.outer {
+		width: 8px;
+		height: 140px;
+		/*border: 2px solid #ccc;*/
+		background: #EEE;
+		overflow: hidden;
+		position: relative;
+		-moz-border-radius: 4px;
+		-webkit-border-radius: 4px;
+		border-radius: 4px;
+		transform: rotate(180deg);
+}
+
+.inner, .inner div {
+		width: 100%;
+		overflow: hidden;
+		/*left: -2px; */
+		position: absolute;
+}
+
+.inner {
+		/*border: 2px solid #999;*/
+		border-top-width: 0;
+		background-color: #1D8CBA;
+
+		bottom: 0;
+		height: 0%;
+}
+
+.inner div {
+		border: 2px solid #EE9321;
+		border-bottom-width: 0;
+		background-color: #EE9321;
+		top: 0;
+		width: 100%;
+		height: 15px;
+}
+
+.progress{
+	margin: 0;
+}
+
+.rxn-center{
+	text-align: center;
+}
+
+.page-padding{
+	padding-top: 50px;
+}
+
+.setwells h3{
+		font-family: 'Dinot';
+		font-weight: 700;
+		font-size: 27px;
+}
+
+.setwells p{
+	font-family: 'Dinot';
+	font-weight: 400;
+	font-size: 20px;
+	color: #656565;
+	padding-top: 10px;
+}
+
+.setwells table{
+	padding-top: 30px;
+	display: inline-block;
+	font-family: 'Dinot';
+	margin-left: -15px;
+}
+
+.setwells table td{
+	color: #656565;
+	font-family: 'Dinot';
+	font-weight: 500;
+}
+
+.setwells table .posneg{
+	font-weight: 700;
+}
+
+.setwells table .well-name{
+	width: 510px;
+}
+
+.setwells table .rxn-type{
+	width: 150px;
+}
+
+.setwells table .notes{
+	width: 100px;
+}
+
+/* Review Page Start */
+
+.review h3{
+	font-family: 'Dinot';
+	font-weight: 700;
+	color: #656565;
+	max-width: 800px;
+}
+
+.review h4{
+	font-family: 'Dinot';
+	font-weight: 700;
+	color: #656565;
+}
+
+.review td{
+	font-family: 'Dinot';
+	font-weight: 500;
+	color: #656565;
+}
+
+.review .td-well{
+	width: 200px;
+}
+
+.review .td-rxn{
+	text-align: center;
+	min-width: 120px;
+}
+
+
+/* Review Page End */
+
+
+/* Results Page */
+
+.td-heading{
+	border-bottom: 1px solid black;
+}
+
+.td-heading td{
+	font-family: 'Dinot';
+	font-weight: 700;
+	font-size: 16px;
+	padding-left: 0;
+}
+
+.td-description{
+	border-bottom: 1px solid lightgray;
+}
+
+.td-description td{
+	font-family: 'Dinot';
+	font-size: 16px;
+	padding-left: 0;
+	font-weight: 500;
+}
+
+.left-padding{
+	padding-left: 100px;
+}
+
+.exp-heading{
+	font-size: 30px;
+	padding-bottom: 30px;
+}
+
+
+/* Results Page End */
+
+/* Experiment Running */
+
+.exp-running h4{
+	font-family: 'Dinot';
+	font-weight: 700;
+	margin-top: 0;
+	color: #656565;
+}
+
+.lid-heating{
+	padding-top: 100px;
+}
+
+.exp-running h1{
+	font-size: 100px;
+	color: #656565;
+}
+
+/* Experiment Running End */
+
+
+
+button,
+.button {
+		background: #fff;
+		border: 1px solid #333;
+		color: #000;
+		display: inline-block;
+		font-weight: bold;
+		margin-top: 70px;
+		margin-bottom: 50px;
+		padding: 10px 50px;
+		width: 250px;
+		text-decoration: none;
+}
+
+button:hover,
+.button:hover {
+		text-decoration: none;
+		color: white;
+		background-color: #000;
+}
+
+button.red,
+.button.red {
+		background: #FF0000;
+		border-color: transparent;
+		color: #fff;
+}
+.errorButton {
+		background: #fff;
+		border: 1px solid #999;
+		color: #999;
+		margin-top: 70px;
+		padding: 10px 50px;
+		width: 250px;
+		text-decoration: none;
+}
+.errorButton:hover {
+	text-decoration: none;
+	color: #999;
+	background-color: #fff;
+}
+p.step{
+		text-align: left;
+		margin-bottom: 0px;
+}
+
+.errorMessage {
+	display: block;
+	width: 500px;
+	margin: 0 auto;
+	color: #999;
+	font-size: 17px;
+}
+
+.instruction {
+		margin-top: 50px;
+}
+
+.instruction .top-text {
+		color: #333;
+}
+
+
+/*intro page*/
+.intro h2 {
+		margin-top: 17px;
+}
+
+.intro p {
+		display: block;
+		font-size: 17px;
+		text-align: justify;
+}
+.intro .mini-description {
+		margin-top: 50px;
+}
+
+.intro .mini-description .section-title{
+		color: #333333;
+}
+
+.intro .mini-description table>tbody>tr>td{
+		padding-top: 5px;
+		padding-bottom: 5px;
+		padding-right: 10px;
+}
+.intro .mini-description .note{
+		color: #777;
+		font-size: 12px;
+}
+
+
+.page-layout .content.analyze {
+		width: 1024px;
+}
+.text-success{
+		color: #0CE433;
+}
+.text-danger {
+		color: #FF0000;
+}
+
+.padd-top-50 {
+		padding-top: 50px;
+}

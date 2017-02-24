@@ -30,7 +30,8 @@ window.ChaiBioTech.ngApp.service('alerts', [
       holdDurationZeroWarning: "Plese enter a non zero value, Only last step with collect_data turned off, can be assigned with infinite hold.",
       holdDurationWarning: "Please a enter a value in the range 00:00 - 05:00",
       internalServerError: "There is an internal server error pleas re-load the page",
-      autoDeltaTemp: "Please enter a value in the range [-99 To 99]"
+      autoDeltaTemp: "Please enter a value in the range [-99 To 99]",
+      rampSpeedWarningLimitExceeded: "Minimum ramp speed is 0.00001"
     };
   }
 ]);

@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 class Experiment < ActiveRecord::Base
+  validates :name, presence: true
+  
   belongs_to :experiment_definition
   
   has_many :fluorescence_data
@@ -94,10 +96,6 @@ class Experiment < ActiveRecord::Base
     diagnostic? && completion_status == "success" && analyze_status == "success"
   end
   
-  def name
-    experiment_definition.name
-  end
-
   def calibration_id
     if experiment_definition.guid == "thermal_consistency"
       return 1

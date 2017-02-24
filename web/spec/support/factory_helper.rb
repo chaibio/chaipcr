@@ -43,8 +43,8 @@ module FactoryHelper
   end
   
   def create_experiment(name)
-    experiment = Experiment.new
-    experiment.experiment_definition = ExperimentDefinition.new(:name=>name, :experiment_type=>ExperimentDefinition::TYPE_USER_DEFINED)
+    experiment = Experiment.new(:name=>name)
+    experiment.experiment_definition = ExperimentDefinition.new(:experiment_type=>ExperimentDefinition::TYPE_USER_DEFINED)
     experiment.save
     experiment
   end

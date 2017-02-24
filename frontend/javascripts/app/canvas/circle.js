@@ -199,7 +199,7 @@ angular.module("canvasApp").factory('circle', [
             this.canvas.renderAll();
           }
         } else {
-          if(oldHold !== null && oldHold === 0 && this.parent.parentStage.parent.editStageStatus === true) {
+          if(oldHold !== null && parseInt(oldHold) === 0 && this.parent.parentStage.parent.editStageStatus === true) {
             this.parent.parentStage.parent.editModeStageChanges(this.parent.parentStage, 25, true);
           }
         }

@@ -186,7 +186,7 @@
       };
 
       $scope.createExperiment = function () {
-        Experiment.create({guid: 'optical_test_single_channel'}).then(function (resp) {
+        Experiment.create({guid: 'optical_test_single_channel',name:'optical_test_single_channel'}).then(function (resp) {
           Experiment.startExperiment(resp.data.experiment.id).then(function () {
             $scope.experiment = resp.data.experiment;
             $state.go('exp-running');

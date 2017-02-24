@@ -100,6 +100,12 @@ Qpcrctl::Application.routes.draw do
       get 'export'
       get 'analyze'
     end
+    
+    resources :wells, param: :well_num, only: [:index, :update, :destroy] do
+      collection do
+        put '', :action => 'bulk_update'
+      end
+    end
   end
 
   resources :protocols, shallow: true, only: [:update] do

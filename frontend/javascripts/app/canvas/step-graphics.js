@@ -39,8 +39,12 @@ angular.module("canvasApp").factory('stepGraphics', [
     this.stepFooter = function() {
 
       var editStageStatus = this.parentStage.parent.editStageStatus;
-
-      this.dots = new fabric.Group(dots.stepDots(), {
+      var components = dots.stepDots();
+      components.unshift(new fabric.Rect({
+        width: 94, height: 14, fill: '#ffb400', selectable: false, name: "backgroundRect",
+        originX: 'left', originY: 'top',
+      }));
+      this.dots = new fabric.Group(components, {
         originX: "left", originY: "top", left: this.left + 16, top: 378, visible: editStageStatus, lockMovementY: true,
         hasBorders: false, hasControls: false, name: "moveStep", parent: this
       });
