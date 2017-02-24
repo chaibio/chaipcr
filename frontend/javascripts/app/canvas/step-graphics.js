@@ -17,25 +17,22 @@
  * limitations under the License.
  */
 
-angular.module("canvasApp").factory('stepGraphics', [
+angular.module("canvasApp").service('stepGraphics', [
   'dots',
   'Line',
   'Group',
   'Circle',
-  function(dots, Line, Group, Circle) {
+  'Text',
+  'Rectangle',
+  function(dots, Line, Group, Circle, Text, Rectangle) {
 
     this.addName = function() {
 
-      var stepName = "Step " +(this.index + 1);
-      if(this.model.name) {
-        stepName = (this.model.name).charAt(0).toUpperCase() + (this.model.name).slice(1).toLowerCase();
-      }
-
-      this.stepNameText = stepName;
-      this.stepName = new fabric.Text(stepName, {
+      var properties = {
         fill: 'white',  fontSize: 12,  top : 20,  left: -1,  fontFamily: "dinot-regular",  selectable: false,
         originX: 'left', originY: 'top',
-      });
+      };
+      this.stepName = Text.create(this.stepNameText, properties);
       return this;
     };
 
@@ -43,15 +40,19 @@ angular.module("canvasApp").factory('stepGraphics', [
 
       var editStageStatus = this.parentStage.parent.editStageStatus;
       var components = dots.stepDots();
-      components.unshift(new fabric.Rect({
+      var properties = {
         width: 94, height: 14, fill: '#ffb400', selectable: false, name: "backgroundRect",
         originX: 'left', originY: 'top',
-      }));
+      };
 
-      this.dots = new fabric.Group(components, {
+      components.unshift(Rectangle.create(properties));
+
+      properties =  {
         originX: "left", originY: "top", left: this.left + 16, top: 378, visible: editStageStatus, lockMovementY: true,
         hasBorders: false, hasControls: false, name: "moveStep", parent: this
-      });
+      };
+
+      this.dots = Group.create(components, properties);
       return this;
     };
 
@@ -130,67 +131,63 @@ angular.module("canvasApp").factory('stepGraphics', [
 
     this.initAutoDelta = function() {
 
-      this.deltaSymbol = this.autoDeltaStartCycle = new fabric.Text('Δ', {
+      var properties = {
           fill: 'white',  fontSize: 14,  top : 338,  left: 10,  fontFamily: "dinot",  selectable: false,
           originX: 'left', originY: 'top', fontWeight: 'bold', visible: false,
           shadow: 'rgba(0,0,0,0.4) 5px 5px 7px'
-        }
-      );
+        };
+      var groupMembers = [];
 
+      this.deltaSymbol = this.autoDeltaStartCycle = Text.create('Δ', properties);
 
-      this.autoDeltaTempTime = new fabric.Text('-0.15ºC, +5.0s', {
+      properties = {
           fill: 'white',  fontSize: 12,  top : 0, left: 0,  fontFamily: "dinot-regular",  selectable: false,
           originX: 'left', originY: 'top'
-        }
-      );
+        };
 
-      this.autoDeltaStartCycle = new fabric.Text('Start Cycle: 5', {
+      this.autoDeltaTempTime = Text.create('-0.15ºC, +5.0s', properties);
+
+      properties = {
           fill: 'white',  fontSize: 12,  top : 15,  left: 0,  fontFamily: "dinot-bold",  selectable: false,
           originX: 'left', originY: 'top',
-        }
-      );
+        };
 
-      this.deltaGroup = new fabric.Group([this.autoDeltaTempTime, this.autoDeltaStartCycle], {
+      this.autoDeltaStartCycle = Text.create('Start Cycle: 5', properties);
+
+      groupMembers = [this.autoDeltaTempTime, this.autoDeltaStartCycle];
+      properties = {
         originX: 'left', originY: 'top', top: 338, left: 24,  visible: false
-      });
-    };
-
-    this.numberingValue = function() {
-
-      var thisIndex = (this.index < 9) ? "0" + (this.index + 1) : (this.index + 1),
-      noofSteps = this.parentStage.model.steps.length;
-      thisLength = (noofSteps < 10) ? "0" + noofSteps : noofSteps;
-      text = thisIndex + "/" + thisLength;
-
-      this.numberingTextCurrent.setText(thisIndex);
-      this.numberingTextTotal.setText("/" + thisLength);
-      this.numberingTextTotal.setLeft(this.numberingTextCurrent.left + this.numberingTextCurrent.width);
-      return this;
+      };
+      this.deltaGroup = Group.create(groupMembers, properties);
     };
 
     this.initNumberText = function() {
 
-      this.numberingTextCurrent = new fabric.Text('wow', {
+      var properties = {
           fill: 'white',  fontSize: 12,  top : 7,  left: -1,  fontFamily: "dinot-bold",  selectable: false,
           originX: 'left', originY: 'top'
-        }
-      );
+        };
+      this.numberingTextCurrent = Text.create('wow', properties);
 
-      this.numberingTextTotal = new fabric.Text('wow', {
+      properties = {
           fill: 'white',  fontSize: 12,  top : 7,  fontFamily: "dinot",  selectable: false,
           originX: 'left', originY: 'top'
-        }
-      );
+        };
+
+      this.numberingTextTotal = Text.create('wow', properties);
 
     };
 
     this.addBorderRight = function() {
 
-      this.borderRight = new fabric.Line([-2, 42, -2, 362], {
+      var properties = {
           stroke: '#ff9f00',  left: (this.myWidth - 2), strokeWidth: 1, selectable: false,
           originX: 'left', originY: 'top'
-        }
-      );
+        };
+
+      var cordinates = [-2, 42, -2, 362];
+
+      this.borderRight = Line.create(cordinates, properties);
 
       return this;
     };
@@ -198,48 +195,56 @@ angular.module("canvasApp").factory('stepGraphics', [
     this.rampSpeed = function() {
 
       this.rampSpeedNumber = this.model.ramp.rate;
-
-      this.rampSpeedText = new fabric.Text(String(this.rampSpeedNumber)+ "º C/s", {
+      var properties = {
           fill: 'black',  fontSize: 12, fontFamily: "dinot",  originX: 'left',  originY: 'top'
-        }
-      );
+        };
 
-      this.underLine = new fabric.Line([0, 0, this.rampSpeedText.width, 0], {
+      var dataString = String(this.rampSpeedNumber)+ "º C/s";
+      var cordinates = [];
+      var groupMembers = [];
+      this.rampSpeedText = Text.create(dataString, properties);
+
+      properties = {
           stroke: "#ffde00",  strokeWidth: 2, originX: 'left',  originY: 'top', top: 13,  left: 0
-        }
-      );
+        };
 
-      this.rampSpeedGroup = new fabric.Group([
-            this.rampSpeedText, this.underLine
-          ], {
-              selectable: true, hasControls: true,  originX: 'left',  originY: 'top', top : 0,  left: this.left + 5, evented: false
-            }
-      );
+      cordinates = [0, 0, this.rampSpeedText.width, 0];
 
-      if(this.rampSpeedNumber <= 0) {
-        this.rampSpeedGroup.setVisible(false);
-      }
+      this.underLine = Line.create(cordinates, properties);
+
+      properties = {
+          selectable: true, hasControls: true,  originX: 'left',  originY: 'top',
+          top : 0,  left: this.left + 5, evented: false
+        };
+      groupMembers = [this.rampSpeedText, this.underLine];
+
+      this.rampSpeedGroup = Group.create(groupMembers, properties);
 
       return this;
     };
 
     this.stepComponents = function() {
 
-      this.hitPoint = new fabric.Rect({
+      var properties = {
         width: 10, height: 30, fill: '', left: this.left + 60, top: 335, selectable: false, name: "hitPoint",
         originX: 'left', originY: 'top',
-      });
+      };
+      var groupMembers = [];
+      this.hitPoint = Rectangle.create(properties);
 
-      this.stepRect = new fabric.Rect({
+      properties = {
           fill: '#FFB300',  width: this.myWidth,  height: 363,  selectable: false,  name: "step", me: this
-        }
-      );
+        };
+      this.stepRect = Rectangle.create(properties);
 
-      this.stepGroup = new fabric.Group([this.stepRect, this.numberingTextCurrent, this.numberingTextTotal, this.stepName, this.deltaSymbol,
-        this.deltaGroup, this.borderRight], {
-        left: this.left || 33,  top: 28,  selectable: false,  hasControls: false,
-        hasBoarders: false, name: "stepGroup",  me: this, originX: 'left', originY: 'top'
-      });
+      groupMembers = [this.stepRect, this.numberingTextCurrent, this.numberingTextTotal, this.stepName, this.deltaSymbol,
+        this.deltaGroup, this.borderRight];
+      properties = {
+          left: this.left || 33,  top: 28,  selectable: false,  hasControls: false,
+          hasBoarders: false, name: "stepGroup",  me: this, originX: 'left', originY: 'top'
+        };
+
+      this.stepGroup = Group.create(groupMembers, properties);
     };
 
     return this;

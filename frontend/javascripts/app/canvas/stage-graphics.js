@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-angular.module("canvasApp").factory('stageGraphics', [
+angular.module("canvasApp").service('stageGraphics', [
   'dots',
   function(dots) {
 

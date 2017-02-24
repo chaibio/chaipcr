@@ -217,17 +217,48 @@ angular.module("canvasApp").factory('step', [
         }
       };
 
+      this.addName = function() {
+
+        var stepName = "Step " +(this.index + 1);
+        if(this.model.name) {
+          stepName = (this.model.name).charAt(0).toUpperCase() + (this.model.name).slice(1).toLowerCase();
+        }
+
+        this.stepNameText = stepName;
+        stepGraphics.addName.call(this);
+      };
+
+      this.numberingValue = function() {
+
+        var thisIndex = (this.index < 9) ? "0" + (this.index + 1) : (this.index + 1),
+        noofSteps = this.parentStage.model.steps.length;
+        thisLength = (noofSteps < 10) ? "0" + noofSteps : noofSteps;
+        text = thisIndex + "/" + thisLength;
+
+        this.numberingTextCurrent.setText(thisIndex);
+        this.numberingTextTotal.setText("/" + thisLength);
+        this.numberingTextTotal.setLeft(this.numberingTextCurrent.left + this.numberingTextCurrent.width);
+        return this;
+      };
+
+      this.rampSpeedGraphics = function() {
+        stepGraphics.rampSpeed.call(this);
+        if(this.rampSpeedNumber <= 0) {
+          this.rampSpeedGroup.setVisible(false);
+        }
+      };
+
       this.render = function() {
 
         this.setLeft();
-        stepGraphics.addName.call(this);
+        this.addName();
         stepGraphics.addBorderRight.call(this);
         this.getUniqueName();
-        stepGraphics.rampSpeed.call(this);
+        this.rampSpeedGraphics();
         stepGraphics.initNumberText.call(this);
         stepGraphics.initAutoDelta.call(this);
         stepGraphics.autoDeltaDetails.call(this);
-        stepGraphics.numberingValue.call(this);
+        this.numberingValue();
         stepGraphics.deleteButton.call(this);
         stepGraphics.stepFooter.call(this);
         stepGraphics.stepComponents.call(this);
