@@ -252,6 +252,7 @@ angular.module("canvasApp").factory('moveStageRect', [
             this.verticalLine.setVisible(false);
           }
         };
+        
         this.indicator.processMovement = function(stage, C, circleManager) {
 
           if(this.verticalLine.getVisible() === false) {

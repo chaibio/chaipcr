@@ -19,7 +19,10 @@
 
 angular.module("canvasApp").factory('stepGraphics', [
   'dots',
-  function(dots) {
+  'Line',
+  'Group',
+  'Circle',
+  function(dots, Line, Group, Circle) {
 
     this.addName = function() {
 
@@ -44,6 +47,7 @@ angular.module("canvasApp").factory('stepGraphics', [
         width: 94, height: 14, fill: '#ffb400', selectable: false, name: "backgroundRect",
         originX: 'left', originY: 'top',
       }));
+
       this.dots = new fabric.Group(components, {
         originX: "left", originY: "top", left: this.left + 16, top: 378, visible: editStageStatus, lockMovementY: true,
         hasBorders: false, hasControls: false, name: "moveStep", parent: this
@@ -55,35 +59,42 @@ angular.module("canvasApp").factory('stepGraphics', [
 
       var editStageStatus = this.parentStage.parent.editStageStatus;
       var opacity = (editStageStatus) ? 1 : 0;
-      this.newCloseCircle = new fabric.Circle({
-        radius: 6,
-        stroke: 'rgb(166, 122, 40)',
-        originX: "center",
-        originY: "center",
-        fill: '#ffb400',
-        strokeWidth: 2,
-        selectable: false,
-        name: "newClose",
-      });
+      var properties = {};
+      var groupMembers = [];
+      var cordinates = [];
 
-      this.newCloseLine1 = new fabric.Line([-3, -3, 3, 3],{
-        stroke: 'rgb(166, 122, 40)',
+      properties = {
+        radius: 6, stroke: 'rgb(166, 122, 40)', originX: "center", originY: "center",
+        fill: '#ffb400', strokeWidth: 2, selectable: false, name: "newClose",
+      };
 
-      });
+      this.newCloseCircle = Circle.create(properties);
 
-      this.newCloseLine2 = new fabric.Line([-3, -3, 3, 3],{
-        stroke: 'rgb(166, 122, 40)',
-        angle: 90,
-        originX: 'center',
-        originY: 'center',
-      });
+      properties = {
+          stroke: 'rgb(166, 122, 40)',
+        };
 
-      this.closeImage = new fabric.Group([this.newCloseCircle, this.newCloseLine1, this.newCloseLine2], {
+      cordinates = [-3, -3, 3, 3];
+      this.newCloseLine1 = Line.create(cordinates, properties);
+
+      properties = {
+          stroke: 'rgb(166, 122, 40)',
+          angle: 90,
+          originX: 'center',
+          originY: 'center',
+        };
+      this.newCloseLine2 = Line.create(cordinates, properties);
+
+      properties = {
         originX: "center", originY: "center", left: this.left + 116, top: 86, hasBorders: false, hasControls: false,
         lockMovementY: true, lockMovementX: true, parent: this, opacity: opacity, name: 'deleteStepButton', me: this
-      });
+      };
 
+      groupMembers = [this.newCloseCircle, this.newCloseLine1, this.newCloseLine2];
+
+      this.closeImage = Group.create(groupMembers, properties);
       return this;
+
     };
 
     this.autoDeltaDetails = function() {

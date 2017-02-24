@@ -104,6 +104,7 @@ gulp.task('coffee', ['clean-js'], function() {
 });
 
 gulp.task('es6', ['clean-js'], function() {
+  console.log("Testing es6");
     return gulp.src(['frontend/javascripts/**/*.es6'])
         .pipe(babel({
             presets: ['es2015']
@@ -148,7 +149,7 @@ gulp.task('jslint', [], function() {
         .pipe(jshint.reporter('default'));
 });
 
-gulp.task('concat-js', ['jslint', 'clean-js', 'coffee', 'copy-js-to-tmp', 'templates', 'dynamicexp:relink'], function() {
+gulp.task('concat-js', ['jslint', 'clean-js', 'es6', 'coffee', 'copy-js-to-tmp', 'templates', 'dynamicexp:relink'], function() {
     var files = vendorFiles.concat(appFiles);
 
     for (var i = files.length - 1; i >= 0; i--) {
