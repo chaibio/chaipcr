@@ -222,7 +222,7 @@
         .attr('fill', "#000")
         .attr('x', 10 + boxBorderWidth)
         .attr('y', headerHeight + ctTextDims.height + 20 + boxBorderWidth)
-        .text('RFY');
+        .text('RFU');
 
       var rfyLabelDims = Globals.box.RFYTextLabel.node().getBBox();
 
