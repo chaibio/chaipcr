@@ -108,8 +108,8 @@ const int kBaselineMeasurementsPerCycle = 1;
 const int kOpticalMeasurementsBufferTimeMs = 250;
 const int kOpticalMeasurementDurationMs = kFluorescenceDataCollectionDelayTimeMs + 12 * kADCReadsPerOpticalMeasurement; //The magical number is X
 const int kOpticalFluorescenceMeasurmentPeriodMs = (kOpticalMeasurementsPerCycle + kBaselineMeasurementsPerCycle) * kOpticalMeasurementDurationMs * 16 + kOpticalMeasurementsBufferTimeMs;
-const int kOpticalRejectedPeaksCount = 3;
-const int kADCReadsPerOpticalMeasurementFinal = kADCReadsPerOpticalMeasurement - kOpticalRejectedPeaksCount;
+const int kOpticalRejectedOutlierMeasurements = 3;
+const int kADCReadsPerOpticalMeasurementFinal = kADCReadsPerOpticalMeasurement - kOpticalRejectedOutlierMeasurements;
 
 //Steps
 const double kPCRBeginStepTemperatureThreshold = 0.5;

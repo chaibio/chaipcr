@@ -340,9 +340,10 @@ std::vector<std::int32_t> removePeaks(std::vector<std::int32_t> data)
 {
     std::sort(data.begin(), data.end());
 
-    std::int32_t median = data.at(data.size() / 2);
+    std::vector<std::int32_t>::iterator medianIt = data.begin() + data.size() / 2;
+    double median = data.size() % 2 != 0 ? *medianIt : (*(medianIt - 1) + *medianIt) / 2;
 
-    for (int i = 0; i < kOpticalRejectedPeaksCount; ++i)
+    for (int i = 0; i < kOpticalRejectedOutlierMeasurements; ++i)
     {
         if ((median - data.front()) > (data.back() - median))
             data.erase(data.begin());
