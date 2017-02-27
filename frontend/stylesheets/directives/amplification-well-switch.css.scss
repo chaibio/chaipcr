@@ -4,7 +4,7 @@
 
     margin-top: 5px;
     margin-bottom: 10px;
-    width: 740px;
+    width: 100%;
 
     .choose-chart-heading {
       border-bottom: 2px solid black;
@@ -33,7 +33,7 @@
       //margin: 5px;
       padding-top: $padding_top;
       height: 80px;
-      width: $size;
+      //width: $size;
       opacity: 0.5;
 			//border: 1px solid grey;
 
@@ -101,7 +101,7 @@
       margin: 0px;
       //padding: 1px;
       float: left;
-      width: 90px;
+      width: 12%;
       //height: 80px;
       font-size: 4em;
       text-align: center;
