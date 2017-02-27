@@ -40,7 +40,9 @@
     </span>
     <span class="running-info" ng-show="state !== 'idle'">
       in progress:
-      <span class="experiment-name" ui-sref="run-experiment({id: footer_experiment.id, chart: 'amplification'})">{{truncate(footer_experiment.name, 50)}}</span>
+      <span ng-show="footer_experiment.type !== 'test_kit'" class="experiment-name" ui-sref="run-experiment({id: footer_experiment.id, chart: 'amplification'})">{{truncate(footer_experiment.name, 50)}}</span>
+			<span ng-show="footer_experiment.type === 'test_kit'" class="experiment-name" ng-click="goToTestKit()">{{truncate(footer_experiment.name, 50)}}</span>
+
 <!--       <span class="machine-state">
         <span class="holding">
           <span ng-show="state === 'lid_heating'">heating lid</span>
