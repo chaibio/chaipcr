@@ -50,7 +50,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
       id = $stateParams.id
       url = "/experiments/"+$stateParams.id+"/export"
       isChrome = !!window.chrome
-      if isChrome
+      if isChrome && !(/Edge/.test(navigator.userAgent))
         $http.get(url, responseType: 'arraybuffer')
         .success (resp,status) =>
           if status == 202
@@ -60,7 +60,7 @@ window.ChaiBioTech.ngApp.controller('ExperimentMenuOverlayCtrl', [
             blob = new Blob([resp], type: 'application/octet-stream')
             link = document.createElement('a')
             link.href = window.URL.createObjectURL(blob)
-            link.download = 'export.zip'
+            link.download = 'exportExperiment.zip'
             link.click()
             $scope.exporting = false
         .error (resp,status) =>

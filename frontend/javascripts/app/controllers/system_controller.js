@@ -73,9 +73,10 @@ window.ChaiBioTech.ngApp.controller('systemController', [
 		$scope.export = function() {
 			$scope.exporting = true;
 			var isChrome = !!window.chrome;
+			//alert(/Edge/.test(navigator.userAgent));
 			console.log(isChrome);
 			//debugger;
-			if (isChrome) {
+			if (isChrome && !(/Edge/.test(navigator.userAgent))) {
 				Device.exportDatabase().then(function(response) {
 					var blob = new Blob([response.data], {
 						type: 'application/octet-stream'
