@@ -38,7 +38,7 @@ angular.module("canvasApp").service('stageEvents',[
       $scope.$watch('stage.num_cycles', function(newVal, oldVal) {
 
         var stage = $scope.fabricStep.parentStage;
-        stageGraphics.stageHeader.call(stage);
+        stage.stageHeader();
         canvas.renderAll();
       });
 

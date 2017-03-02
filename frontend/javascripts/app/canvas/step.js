@@ -142,7 +142,7 @@ angular.module("canvasApp").factory('step', [
         } else {
           this.stepName.text = this.model.name;
         }
-        stepGraphics.numberingValue.call(this);
+        this.numberingValue();
       };
 
       this.addCircle = function() {

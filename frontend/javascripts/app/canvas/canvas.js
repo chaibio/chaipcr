@@ -251,7 +251,7 @@ angular.module("canvasApp").factory('canvas', [
           stage.stageNameGroup.set(leftVal).setCoords();
           stage.stageNameGroup.moved = false;
         }
-        stageGraphics.stageHeader.call(stage);
+        stage.stageHeader();
       }
     };
 
@@ -366,7 +366,7 @@ angular.module("canvasApp").factory('canvas', [
         //stageView.moveAllStepsAndStages(false);
       }
       circleManager.addRampLines();
-      stageGraphics.stageHeader.call(stageView);
+      stageView.stageHeader();
       this.$scope.applyValues(stageView.childSteps[0].circle);
       stageView.childSteps[0].circle.manageClick(true);
       this.setDefaultWidthHeight();

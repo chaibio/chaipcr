@@ -19,124 +19,115 @@
 
 angular.module("canvasApp").service('stageGraphics', [
   'dots',
-  function(dots) {
+  'Line',
+  'Group',
+  'Circle',
+  'Text',
+  'Rectangle',
+  function(dots, Line, Group, Circle, Text, Rectangle) {
 
     this.addRoof = function() {
 
-      this.roof = new fabric.Line([0, 24, (this.myWidth), 24], {
+      var properties = {
           stroke: 'white', strokeWidth: 2, selectable: false, left: 0
-        }
-      );
+        };
+      var cordinates = [0, 24, (this.myWidth), 24];
+
+      this.roof = Line.create(cordinates, properties);
       return this;
     };
 
     this.borderLeft = function() {
 
-      this.border =  new fabric.Line([0, 70, 0, 390], {
+      var properties = {
           stroke: '#ff9f00',  left: 0, strokeWidth: 2, selectable: false
-        }
-      );
+        };
+      var cordinates = [0, 70, 0, 390];
+
+      this.border =  new fabric.Line(cordinates, properties);
       return this;
     };
 
     this.dotsOnStage = function() {
 
       var editStageStatus = this.parent.editStageStatus;
-
-      /*var supportRect = new fabric.Rect({
-        left: -2,  top: -2, fill: '',  width: 20,  height: 20,
-      });*/
       var dotsArray = dots.stageDots();
-      //dotsArray.push(supportRect);
-
-      this.dotsBackground = new fabric.Rect({
+      var properties = {
         width: 15, height: 14, fill: '#FFB300', left: 0, top: -2, selectable: false,
         originX: 'left', originY: 'top', //fill: 'black'
-      });
+      };
 
+      this.dotsBackground = Rectangle.create(properties);
       dotsArray.unshift(this.dotsBackground);
 
-      this.dots = new fabric.Group(dotsArray, {
+      properties = {
         originX: "left", originY: "top", left: this.left, top: 6, hasControls: false, width: 22, height: 22, visible: editStageStatus,
         parent: this, name: "moveStage", lockMovementY: true, hasBorders: false, selectable: true, backgroundColor: ''
-      });
+      };
+
+      this.dots = Group.create(dotsArray, properties);
       return this;
-    };
-
-    this.stageHeader = function() {
-
-      if(this.stageName) {
-        var index = parseInt(this.index) + 1;
-        var stageName = (this.model.name).toUpperCase().replace("STAGE", "");
-        var text = (stageName).trim();
-        this.stageCaption.setText("STAGE " + index + ": " );
-
-        if(this.model.stage_type === "cycling") {
-          var noOfCycles = this.model.num_cycles;
-          noOfCycles = String(noOfCycles);
-          text = text + ", " + noOfCycles + "x";
-        }
-
-        this.stageName.setText(text);
-        this.stageName.setLeft(this.stageCaption.left + this.stageCaption.width);
-
-        if(this.parent.editStageStatus && this.childSteps.length === 1) {
-          this.shortenStageName();
-        } else {
-          this.shortStageName = false;
-        }
-      }
     };
 
     this.writeMyName = function() {
 
-      this.stageCaption = new fabric.Text("", {
+      var properties = {
           fill: 'white', fontWeight: "400",  fontSize: 12,   fontFamily: "dinot-bold",
           originX: "left", originY: "top", selectable: true, left: 0
-        }
-      );
+        };
 
-      this.stageName = new fabric.Text("", {
+      this.stageCaption = Text.create("", properties);
+
+      properties = {
           fill: 'white', fontWeight: "400",  fontSize: 12,   fontFamily: "dinot",
           originX: "left", originY: "top", selectable: true
-        }
-      );
+        };
+      this.stageName = new fabric.Text("", properties);
 
       var editStageStatus = this.parent.editStageStatus;
       var addUp = (editStageStatus === true) ? 26 : 1;
       var moved = (editStageStatus === true) ? "right": false;
-      this.stageNameGroup = new fabric.Group([this.stageCaption, this.stageName], {
+
+      properties = {
         originX: "left", originY: "top", selectable: true, top : 8, left: addUp, moved: moved
-      });
+      };
+
+      this.stageNameGroup = Group.create([this.stageCaption, this.stageName], properties);
       return this;
     };
 
-    this.createStageHitPoint = function() {
+    this.createStageHitPoints = function() {
 
-      this.stageHitPointLeft = new fabric.Rect({
+      var stageHitPointLeftProperties = {
         width: 10, height: 200, fill: '', left: this.left + 10, top: 10, selectable: false, name: "stageHitPointLeft",
         originX: 'left', originY: 'top', //fill: 'black'
-      });
+      };
 
-      this.stageHitPointRight = new fabric.Rect({
+      var stageHitPointRightProperties = {
         width: 10, height: 200, fill: '', left: (this.left + this.width) - 20, top: 10, selectable: false, name: "stageHitPointRight",
         originX: 'left', originY: 'top', //fill: 'black'
-      });
+      };
 
-      this.stageHitPointLowerLeft = new fabric.Rect({
+      var stageHitPointLowerLeftProperties = {
         width: 10, height: 10, fill: '', left: this.left + 10, top: 340, selectable: false, name: "stageHitPointLowerLeft",
         originX: 'left', originY: 'top', //fill: 'black'
-      });
+      };
 
-      this.stageHitPointLowerRight = new fabric.Rect({
+      var stageHitPointLowerRightProperties = {
         width: 10, height: 10, fill: '', left: (this.left + this.width) - 20, top: 340, selectable: false, name: "stageHitPointLowerRight",
         originX: 'left', originY: 'top', //fill: 'black'
-      });
+      };
 
-      this.moveStageRightPointerDetector = new fabric.Rect({
-        width: 30, height: 10, fill: '', left: (this.left + this.width) + 50, top: 10, selectable: false, name: "stageHitPointRight",
+      var rightPointerDetectorProperties = {
+        width: 30, height: 10, fill: '', left: (this.left + this.width) + 50, top: 10, selectable: false, name: "rightPointerDetector",
         originX: 'left', originY: 'top', //fill: 'black'
-      });
+      };
+
+      this.stageHitPointLeft = Rectangle.create(stageHitPointLeftProperties);
+      this.stageHitPointRight = Rectangle.create(stageHitPointRightProperties);
+      this.stageHitPointLowerLeft = Rectangle.create(stageHitPointLowerLeftProperties);
+      this.stageHitPointLowerRight = Rectangle.create(stageHitPointLowerRightProperties);
+      //this.moveStageRightPointerDetector = Rectangle.create(rightPointerDetectorProperties);
 
       return this;
     };

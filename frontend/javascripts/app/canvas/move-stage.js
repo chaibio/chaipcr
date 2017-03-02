@@ -252,7 +252,7 @@ angular.module("canvasApp").factory('moveStageRect', [
             this.verticalLine.setVisible(false);
           }
         };
-        
+
         this.indicator.processMovement = function(stage, C, circleManager) {
 
           if(this.verticalLine.getVisible() === false) {
@@ -318,7 +318,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           C.allStageViews[0].moveAllStepsAndStagesSpecial();
           circleManager.addRampLines();
           C.allStepViews[C.allStepViews.length - 1].circle.doThingsForLast(null, null);
-          stageGraphics.stageHeader.call(stageView);
+          stageView.stageHeader();
           C.$scope.applyValues(stageView.childSteps[0].circle);
           stageView.childSteps[0].circle.manageClick(true);
 
