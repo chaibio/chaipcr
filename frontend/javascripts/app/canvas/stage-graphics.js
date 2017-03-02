@@ -140,8 +140,6 @@ angular.module("canvasApp").service('stageGraphics', [
       this.stageHitPointLowerLeft.setLeft(this.left + 10).setCoords();
       this.stageHitPointLowerRight.setLeft((this.left + this.myWidth) - 20).setCoords();
 
-      //this.moveStageRightPointerDetector.setLeft(this.left + this.myWidth + 50).setCoords();
-
       this.canvas.bringToFront(this.stageHitPointLowerLeft);
       this.canvas.bringToFront(this.stageHitPointLowerRight);
       //this.canvas.bringToFront(this.moveStageRightPointerDetector);
@@ -149,19 +147,20 @@ angular.module("canvasApp").service('stageGraphics', [
 
     this.createStageRect = function() {
 
-      this.stageRect = new fabric.Rect({
+      var properties = {
           left: 0,  top: 0, fill: '#FFB300',  width: this.myWidth,  height: 400,  selectable: false
-        });
+        };
+      this.stageRect = Rectangle.create(properties);
 
       return this;
     };
 
     this.createStageGroup = function(stageContents) {
-
-      this.stageGroup = new fabric.Group(stageContents, {
+      var properties = {
             originX: "left", originY: "top", left: this.left,top: 0, selectable: false, hasControls: false
-          }
-      );
+          };
+
+      this.stageGroup = Group.create(stageContents, properties);
       return this;
     };
 
