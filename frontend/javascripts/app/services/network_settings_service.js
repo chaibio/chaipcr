@@ -132,7 +132,9 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       $http.get(host + ':8000/network/eth0')
       .then(function(ethernet) {
         that.connectedEthernet = ethernet.data;
-        $rootScope.$broadcast("ethernet_detected");
+        if(ethernet.data.state.address){
+          $rootScope.$broadcast("ethernet_detected");
+        }
       });
     };
 
