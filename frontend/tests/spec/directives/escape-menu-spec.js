@@ -8,8 +8,10 @@ describe("Here we check the hit escape button and left-menu disappear", function
     rootScope = $rootScope;
     httpMock = $httpBackend;
     compile = $compile;
+
     httpMock.expectGET("http://localhost:8000/status").respond("NOTHING");
-    httpMock.expectPOST("http://localhost:8000/control/start").respond({});
+    httpMock.expectGET("http://localhost:8000/network/wlan").respond("NOTHING");
+    //httpMock.expectPOST("http://localhost:8000/control/start").respond({});
   }));
 
   it("Should check the initial conf", function() {
