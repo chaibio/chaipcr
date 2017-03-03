@@ -6,7 +6,8 @@ describe("Specs for left menu directive", function() {
     scope = $rootScope.$new();
     compile = $compile;
     httpMock = $httpBackend;
-    httpMock.expectGET("http://localhost:8000/status").respond("NOTHING");
+    httpMock.whenGET("http://localhost:8000/status").respond("NOTHING");
+    httpMock.whenGET("http://localhost:8000/network/wlan").respond("NOTHING");
     $stateParams.id = 10;
 
     var data = {
@@ -18,7 +19,7 @@ describe("Specs for left menu directive", function() {
         }
       }
     };
-    httpMock.expectGET("/experiments/" + paramId).respond(data);
+    httpMock.whenGET("/experiments/" + paramId).respond(data);
   }));
 
   it("Should check the functionality of left-menu init, It should show SHOW", function() {

@@ -30,7 +30,6 @@ describe("Testing canvas.js", function() {
     expect(Canvas.images).toContain("gather-data-image.png");
     expect(Canvas.images).toContain("pause.png");
     expect(Canvas.images).toContain("pause-middle.png");
-    expect(Canvas.images).toContain("close.png");
     expect(Canvas.images).toContain("drag-footer-image.png");
     expect(Canvas.images).toContain("move-step-on.png");
 

@@ -13,7 +13,8 @@ describe("Test RUN/VIEW item directive, which shows up in left menu", function()
     Exp = Experiment;
     state = $state;
     state.go("edit-protocol");
-    httpMock.expectGET("http://localhost:8000/status").respond("NOTHING");
+    httpMock.whenGET("http://localhost:8000/status").respond("NOTHING");
+    httpMock.whenGET("http://localhost:8000/network/wlan").respond("NOTHING");
     httpMock.expectPOST("http://localhost:8000/control/start").respond({});
 
   }));
@@ -24,6 +25,7 @@ describe("Test RUN/VIEW item directive, which shows up in left menu", function()
     var compiled = compile(elem)(scope);
     scope.$digest();
     var compiledScope = compiled.isolateScope();
+    console.log(compiledScope, "compiledScope");
     expect(compiledScope.message).toEqual("RUN EXPERIMENT");
   });
 
