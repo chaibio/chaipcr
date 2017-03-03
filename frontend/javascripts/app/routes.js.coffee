@@ -99,7 +99,6 @@ window.ChaiBioTech.ngApp
       .state 'edit-protocol',
         url: '/edit-protocol/:id'
         templateUrl: 'app/views/edit-protocol.html'
-        #controller: 'ProtocolCtrl'
 
       .state 'run-experiment',
         url: '/experiments/:id/run-experiment?chart?max_cycle'
