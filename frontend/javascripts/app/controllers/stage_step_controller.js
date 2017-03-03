@@ -100,12 +100,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
               }
             }
           }*/
-
-
-
           //console.log("getData", Status.getData(), $stateParams);
-
-
           //console.log("BINGOOOOO", $rootScope);
           canvas.init($scope);
         });
@@ -164,11 +159,19 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
       if(durationArray.length > 1) {
         var tt = [0, 0, 0], len = durationArray.length, HH = 0, MM = 0, SS = 0;
 
+        if(durationArray[len - 1] === "") {
+          durationArray[len - 1] = "0";
+        }
         if(durationArray[len - 1] && Number(durationArray[len - 1]) < 60) {
           SS = Number(durationArray[len - 1]);
         } else {
           console.log("Plz verify seconds");
           return false;
+        }
+
+        if(durationArray[len - 2] === "") {
+            //Probably user input value in the format :60;
+            durationArray[len - 2] = "0";
         }
 
         if(durationArray[len - 2] && Number(durationArray[len - 2]) < 60) {
