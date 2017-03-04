@@ -8,7 +8,7 @@ describe("Specs for edit LID TEMP in the left menu", function() {
     compile = $compile;
     httpMock = $httpBackend;
     httpMock.whenGET("http://localhost:8000/status").respond("NOTHING");
-    httpMock.whenGET("/experiments/1").respond("NOTHING");
+    httpMock.whenGET("/experiments/").respond("NOTHING");
     httpMock.whenGET("http://localhost:8000/network/wlan").respond("NOTHING");
 
   }));

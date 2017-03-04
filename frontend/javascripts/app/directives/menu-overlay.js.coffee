@@ -25,7 +25,7 @@ window.ChaiBioTech.ngApp.directive 'menuOverlay', [
 
     restrict: 'EA'
     transclude: true
-    replace: true
+    #replace: true
     scope:
       sidemenuTemplate: '@'
 

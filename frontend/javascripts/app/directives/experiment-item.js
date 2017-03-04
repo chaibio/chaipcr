@@ -28,7 +28,7 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
   function($state, $stateParams, $rootScope, Status, Experiment, $timeout){
     return {
       restrict: 'EA',
-      replace: true,
+      //replace: true,
       scope: {
         state: '@stateVal',
         lidOpen: '=lidOpen',
@@ -76,7 +76,7 @@ window.ChaiBioTech.ngApp.directive('experimentItem', [
           scope.$apply(function() { // only reason we apply it here, so that speeds up the action.
             scope.runReady = false;
           });
-	  });
+	       });
 
 
         scope.manageAction = function() {
