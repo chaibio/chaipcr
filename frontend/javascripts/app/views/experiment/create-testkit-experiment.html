@@ -39,11 +39,11 @@ limitations under the License.
 						<div class="col-md-6 one-kit" ng-click="selectedKit=1" ng-class="{ 'selected': selectedKit == 1}">
 							Use One Kit
 						</div>
-						<div class="col-md-6" ng-class="{ 'selected': selectedKit == 2}">
+						<div class="col-md-6" ng-click="selectedKit=2" ng-class="{ 'selected': selectedKit == 2}">
 							Use Two Kits
 						</div>
 					</div>
-					<div ng-show="value == 'PIKA Weihenstephan'" class="col-md-12" style="margin-top:25px;">
+					<div ng-show="selectedKit==1 && value == 'PIKA Weihenstephan' " class="col-md-12" style="margin-top:25px;">
 						<label>
 							<input type="radio" ng-model="kit.name" value="Lactobacillaceae Screening">
 								<span class="options-text">4e Kit B 2301-32: Lactobacillaceae Screening</span>
@@ -66,6 +66,38 @@ limitations under the License.
 						</label><br/>
 						<label>
 							<input type="radio" ng-model="kit.name" value="Saccharomyces cerevisiae var. diastaticus">
+								<span class="options-text">4e Kit H 2302-49: Saccharomyces cerevisiae var. diastaticus</span>
+						</label><br/>
+					</div>
+					<div ng-show="selectedKit==2 && value == 'PIKA Weihenstephan' " class="col-md-12" style="margin-top:25px;">
+						<label>
+							<input ng-change="radioDisable()" type="radio" ng-model="kit1.name" value="Lactobacillaceae Screening">
+							<input type="radio" ng-model="kit2.name" value="Lactobacillaceae Screening">
+								<span class="options-text">4e Kit B 2301-32: Lactobacillaceae Screening</span>
+						</label><br/>
+						<label>
+							<input type="radio" ng-model="kit1.name" value="Lactobacillus acetotolerans">
+							<input type="radio" ng-model="kit2.name" value="Lactobacillus acetotolerans">
+								<span class="options-text">4e Kit B 2301-52: Lactobacillus acetotolerans</span>
+						</label><br/>
+						<label>
+							<input type="radio" ng-model="kit1.name" value="LP Screening (12 beer spoilers)">
+							<input type="radio" ng-model="kit2.name" value="LP Screening (12 beer spoilers)">
+								<span class="options-text">4e Kit B 2301-38: LP Screening (12 beer spoilers)</span>
+						</label><br/>
+						<label>
+							<input type="radio" ng-model="kit1.name" value="Pectinatus sp. Screening">
+							<input type="radio" ng-model="kit2.name" value="Pectinatus sp. Screening">
+								<span class="options-text">4e Kit B 2301-44: Pectinatus sp. Screening</span>
+						</label><br/>
+						<label>
+							<input type="radio" ng-model="kit1.name" value="Dekkera (Brettanomyces) sp. Screening">
+							<input type="radio" ng-model="kit2.name" value="Dekkera (Brettanomyces) sp. Screening">
+								<span class="options-text">4e Kit H 2302-20: Dekkera (Brettanomyces) sp. Screening</span>
+						</label><br/>
+						<label>
+							<input type="radio" ng-model="kit1.name" value="Saccharomyces cerevisiae var. diastaticus">
+							<input type="radio" ng-model="kit2.name" value="Saccharomyces cerevisiae var. diastaticus">
 								<span class="options-text">4e Kit H 2302-49: Saccharomyces cerevisiae var. diastaticus</span>
 						</label><br/>
 					</div>

@@ -32,13 +32,18 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 		$scope.update_available = 'unavailable';
 		$scope.exporting = false;
 		$scope.value = "Choose Manufacturer ..";
-		$scope.selectedKit = "1";
+		$scope.selectedKit = 1;
 		$scope.kit = {
-				name: 'Lactobacillaceae Screening'
-			};
+			name: 'Lactobacillaceae Screening'
+		};
+		$scope.kit1 = {
+			name: 'Lactobacillaceae Screening'
+		};
+		$scope.kit2 = {
+			name: 'Lactobacillaceae Screening'
+		};
 
 		$scope.creating = false;
-
 
 		$scope.myFunction = function() {
 			document.getElementById("myDropdown").classList.toggle("show");
@@ -50,47 +55,70 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 
 		$scope.create = function(){
 			$scope.creating = true;
-			$scope.wells = [
-				{'well_num':1,'well_type':'positive_control','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
-				{'well_num':2,'well_type':'no_template_control','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
-				{'well_num':3,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
-				{'well_num':4,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
-				{'well_num':5,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
-				{'well_num':6,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
-				{'well_num':7,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
-				{'well_num':8,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
-				{'well_num':9,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
-				{'well_num':10,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
-				{'well_num':11,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
-				{'well_num':12,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
-				{'well_num':13,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
-				{'well_num':14,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
-				{'well_num':15,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
-				{'well_num':16,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']}
-			];
-
-			Testkit.create({guid:'pika_4e_kit',name:$scope.kit.name}).then(function (resp){
-				//$window.location.href = "/dynexp/pika_test/index.html#/setWellsA/"+resp.data.experiment.id ;
-
-				Testkit.createWells(resp.data.experiment.id,$scope.wells).then(function(response){
-					$window.location.href = "/dynexp/pika_test/index.html#/setWellsA/"+resp.data.experiment.id ;
-				})
-				.catch(function(response){
-					$scope.creating = false;
-					$scope.error = response.data.errors || "An error occured while trying to create the experiment.";
+			if($scope.selectedKit == 1){
+				$scope.wells = [
+					{'well_num':1,'well_type':'positive_control','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
+					{'well_num':2,'well_type':'no_template_control','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
+					{'well_num':3,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
+					{'well_num':4,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
+					{'well_num':5,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
+					{'well_num':6,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
+					{'well_num':7,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
+					{'well_num':8,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
+					{'well_num':9,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
+					{'well_num':10,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
+					{'well_num':11,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
+					{'well_num':12,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
+					{'well_num':13,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
+					{'well_num':14,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
+					{'well_num':15,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
+					{'well_num':16,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']}
+				];
+				Testkit.create({guid:'pika_4e_kit',name:$scope.kit.name}).then(function (resp){
+					Testkit.createWells(resp.data.experiment.id,$scope.wells).then(function(response){
+						$window.location.href = "/dynexp/pika_test/index.html#/setWellsA/"+resp.data.experiment.id ;
+					})
+					.catch(function(response){
+						$scope.creating = false;
+						$scope.error = response.data.errors || "An error occured while trying to create the experiment.";
+					});
 				});
-
-			});
-
+			}
+			else if($scope.selectedKit == 2){
+				$scope.wells = [
+					{'well_num':1,'well_type':'positive_control','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
+					{'well_num':2,'well_type':'no_template_control','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
+					{'well_num':3,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
+					{'well_num':4,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
+					{'well_num':5,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
+					{'well_num':6,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
+					{'well_num':7,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
+					{'well_num':8,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
+					{'well_num':9,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']},
+					{'well_num':10,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']},
+					{'well_num':11,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']},
+					{'well_num':12,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']},
+					{'well_num':13,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']},
+					{'well_num':14,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']},
+					{'well_num':15,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']},
+					{'well_num':16,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']}
+				];
+				Testkit.create({guid:'pika_4e_kit',name:$scope.kit1.name + $scope.kit2.name }).then(function (resp){
+					Testkit.createWells(resp.data.experiment.id,$scope.wells).then(function(response){
+						$window.location.href = "/dynexp/pika_test/index.html#/setWellsA/"+resp.data.experiment.id ;
+					})
+					.catch(function(response){
+						$scope.creating = false;
+						$scope.error = response.data.errors || "An error occured while trying to create the experiment.";
+					});
+				});
+			}
 			//$window.location.href = "/dynexp/pika_test/index.html#/setWellsA/5" ;
-
 		};
-
 
 		// Close the dropdown if the user clicks outside of it
 		window.onclick = function(event) {
 			if (!event.target.matches('.dropbtn') && !event.target.matches('.test') && !event.target.matches('.arrow-down') ) {
-
 				var dropdowns = document.getElementsByClassName("dropdown-content");
 				var i;
 				for (i = 0; i < dropdowns.length; i++) {
@@ -101,8 +129,6 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 				}
 			}
 		};
-
-
 	}
 
 ]);

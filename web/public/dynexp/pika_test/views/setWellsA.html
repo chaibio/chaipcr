@@ -5,30 +5,30 @@
 				<tr>
 					<td class="well-name">Well Name</td>
 					<td class="rxn-type rxn-center">Reaction Type</td>
-					<!--<td class="notes rxn-center">Notes</td> -->
+					<td class="notes rxn-center">Notes</td>
 				</tr>
 				<tr>
 					<td class="posneg">A1. Positive Control</td>
 					<td class="rxn-center"><img style="width:20px" src="./images/Plus-Pink.svg"></td>
-				<!--	<td class="rxn-center">Note</td> -->
+					<td ng-show="notes_A[0]" ng-click="updateNotesA(0)" class="rxn-center"><img style="width:20px" src="./images/comment_on.svg"></td>
+					<td ng-show="!notes_A[0]" ng-click="updateNotesA(0)" class="rxn-center"><img style="width:20px" src="./images/comment_off.svg"></td>
 				</tr>
 				<tr>
 					<td class="posneg">A2. Negative Control</td>
 					<td class="rxn-center"><img style="width:20px" src="./images/Minus-Pink.svg"></td>
-					<!--<td class="rxn-center">Note</td> -->
+					<td ng-show="notes_A[1]" class="rxn-center"><img style="width:20px" src="./images/comment_on.svg"></td>
+					<td ng-show="!notes_A[1]" class="rxn-center"><img style="width:20px" src="./images/comment_off.svg"></td>
 				</tr>
 				<tr ng-repeat="x in samples track by $index">
 					<td>
-				<!--		<span class="exp-name H1 truncate" ng-click="focusExpName($index)" ng-show="!editExpNameMode[$index]">
-							A{{$index+1}} {{x}}
-						</span> -->
 						<span>A{{$index+3}}.</span>
 						<input type="text" ng-class="{'empty-input':!x}" placeholder="Enter Sample Name" class="exp-name H1" required ng-model="x"  ng-blur="updateWellA($index+3,x)"
 						my-enter="updateWellA($index+3,x)" focus-on="editExpNameMode">
 					</td>
 					<td ng-show="x" class="rxn-center"><img style="width:20px" src="./images/Sample-Pink.svg"></td>
 					<td ng-show="!x" class="rxn-center"><img style="width:20px" src="./images/Sample-Pink-Empty.svg"></td>
-				<!--	<td class="rxn-center">note</td> -->
+					<td ng-show="notes_A[$index+3]" class="rxn-center"><img style="width:20px" src="./images/comment_on.svg"></td>
+					<td ng-show="!notes_A[$index+3]" class="rxn-center"><img style="width:20px" src="./images/comment_off.svg"></td>
 				</tr>
 			</table>
 
