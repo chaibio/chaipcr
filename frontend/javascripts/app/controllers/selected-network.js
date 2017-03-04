@@ -192,6 +192,14 @@ window.ChaiBioTech.ngApp.controller('selectedNetwork', [
           };
           $scope.updateConnectedWifi('wireless_essid');
         }
+				else if($scope.selectedWifiNow.encryption === 'none') {
+          $scope.wifiNetworkType = 'none';
+          $scope.credentials = {
+            'wireless_essid': $scope.name,
+						'type': "dhcp"
+          };
+          $scope.updateConnectedWifi('wireless_essid');
+        }
 
       } else if($scope.selectedWifiNow === null && NetworkSettingsService.connectedEthernet.interface === 'eth0') { //If we selected an ethernet.
         // Configuring values if selected network is Ethernet.
