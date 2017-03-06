@@ -24,6 +24,7 @@ window.ChaiBioTech.ngApp
     require: 'ngModel'
     replace: true
     templateUrl: 'app/views/directives/amplification-circle-button.html'
+
     link: ($scope, elem, attrs, ngModel) ->
 
       Device.isDualChannel().then (is_dual_channel) ->

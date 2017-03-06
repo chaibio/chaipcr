@@ -17,8 +17,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ###
 window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
-  'AmplificationChartHelper'
-  (AmplificationChartHelper) ->
+  'AmplificationChartHelper',
+  '$timeout',
+  (AmplificationChartHelper, $timeout) ->
     restrict: 'EA'
     require: 'ngModel'
     scope:
@@ -160,5 +161,18 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         else
           $("#box#{id}").removeClass('borderTop');
 
+
+      $scope.borders[id] = true for id in [1..16]
+
+      $timeout(() ->
+          console.log "started"
+          #toggle(boxId) for boxId in [1..16]
+          for id of $scope.borders
+            $("#box#{id}").addClass('ui-selected')
+            checkRightBorder(parseInt(id));
+            checkLeftBorder(parseInt(id));
+            checkBottomBorder(parseInt(id));
+            checkTopBorder(parseInt(id));
+        )
 
 ]
