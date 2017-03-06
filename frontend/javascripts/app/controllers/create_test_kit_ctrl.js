@@ -55,7 +55,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 
 		$scope.create = function(){
 			$scope.creating = true;
-			if($scope.selectedKit == 1){
+			if($scope.selectedKit == 1 || ($scope.selectedKit == 2 && $scope.kit1.name == $scope.kit2.name )){
 				$scope.wells = [
 					{'well_num':1,'well_type':'positive_control','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
 					{'well_num':2,'well_type':'no_template_control','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
@@ -84,7 +84,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 					});
 				});
 			}
-			else if($scope.selectedKit == 2){
+			else if($scope.selectedKit == 2 && $scope.kit1.name != $scope.kit2.name){
 				$scope.wells = [
 					{'well_num':1,'well_type':'positive_control','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
 					{'well_num':2,'well_type':'no_template_control','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
@@ -103,7 +103,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 					{'well_num':15,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']},
 					{'well_num':16,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']}
 				];
-				Testkit.create({guid:'pika_4e_kit',name:$scope.kit1.name + $scope.kit2.name }).then(function (resp){
+				Testkit.create({guid:'pika_4e_kit',name:$scope.kit1.name + '&' + $scope.kit2.name }).then(function (resp){
 					Testkit.createWells(resp.data.experiment.id,$scope.wells).then(function(response){
 						$window.location.href = "/dynexp/pika_test/index.html#/setWellsA/"+resp.data.experiment.id ;
 					})
