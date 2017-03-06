@@ -8,7 +8,7 @@
 		</h2>
 		<h3>{{target}}</h3>
 	</div>
-	<div ng-show="experiment.completion_status === 'success' && !analyzing && famCq" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 left-padding">
+	<div ng-show="!twoKits" ng-show="experiment.completion_status === 'success' && !analyzing && famCq" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 left-padding">
 		<table ng-show="!twoKits">
 			<tr class="td-heading">
 				<td style="width:300px">Well</td>
@@ -16,6 +16,7 @@
 				<td style="width:200px">Results</td>
 			<!--	<td style="width:100px">Hex Cq</td> -->
 				<td style="width:200px">Amount</td>
+				<td style="width:200px">Notes</td>
 			</tr>
 			<tr class="td-description">
 				<td>A1. Positive Control
@@ -26,6 +27,8 @@
 				<td>{{result[0]}}</td>
 			<!--	<td>{{hexCq[0]}}</td> -->
 				<td>{{amount[0]}}</td>
+				<td ng-show="notes[0]" ng-click="openNotes(0)"><img style="width:20px" src="./images/comment_on.svg"></td>
+				<td ng-show="!notes[0]" ng-click="openNotes(0)"><img style="width:20px" src="./images/comment_off.svg"></td>
 			</tr>
 			<tr class="td-description">
 				<td>A2. Negative Control
@@ -36,6 +39,8 @@
 				<td>{{result[1]}}</td>
 			<!--	<td>{{hexCq[1]}}</td> -->
 				<td>{{amount[1]}}</td>
+				<td ng-show="notes[1]" ng-click="openNotes(1)"><img style="width:20px" src="./images/comment_on.svg"></td>
+				<td ng-show="!notes[1]" ng-click="openNotes(1)"><img style="width:20px" src="./images/comment_off.svg"></td>
 			</tr>
 			<tr ng-show="x" class="td-description" ng-repeat="x in samples track by $index">
 				<td>
@@ -49,6 +54,8 @@
 				<td>{{result[$index+2]}}</td>
 			<!--	<td>{{hexCq[$index+2]}}</td> -->
 				<td>{{amount[$index+2]}}</td>
+				<td ng-show="notes[$index+2]" ng-click="openNotes($index+2)"><img style="width:20px" src="./images/comment_on.svg"></td>
+				<td ng-show="!notes[$index+2]" ng-click="openNotes($index+2)"><img style="width:20px" src="./images/comment_off.svg"></td>
 			</tr>
 			<tr ng-show="y" class="td-description" ng-repeat="y in samples_B track by $index">
 				<td>
@@ -62,8 +69,12 @@
 				<td>{{result[$index+8]}}</td>
 			<!--	<td>{{hexCq[$index+8]}}</td> -->
 				<td>{{amount[$index+8]}}</td>
+				<td ng-show="notes[$index+8]" ng-click="openNotes($index+8)"><img style="width:20px" src="./images/comment_on.svg"></td>
+				<td ng-show="!notes[$index+8]" ng-click="openNotes($index+8)"><img style="width:20px" src="./images/comment_off.svg"></td>
 			</tr>
 		</table>
+	</div>
+	<div ng-show="twoKits" ng-show="experiment.completion_status === 'success' && !analyzing && famCq" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 left-padding">
 		<table ng-show="twoKits">
 			<tr class="td-heading">
 				<td style="width:300px">Well</td>
@@ -71,6 +82,7 @@
 				<td style="width:200px">Results</td>
 			<!--	<td style="width:100px">Hex Cq</td> -->
 				<td style="width:200px">Amount</td>
+				<td style="width:200px">Notes</td>
 			</tr>
 			<tr class="td-description">
 				<td>A1. Positive Control
@@ -81,6 +93,8 @@
 				<td>{{result[0]}}</td>
 			<!--	<td>{{hexCq[0]}}</td> -->
 				<td>{{amount[0]}}</td>
+				<td ng-show="notes[0]" ng-click="openNotes(0)" ><img style="width:20px" src="./images/comment_on.svg"></td>
+				<td ng-show="!notes[0]" ng-click="openNotes(0)" ><img style="width:20px" src="./images/comment_off.svg"></td>
 			</tr>
 			<tr class="td-description">
 				<td>A2. Negative Control
@@ -91,6 +105,8 @@
 				<td>{{result[1]}}</td>
 			<!--	<td>{{hexCq[1]}}</td> -->
 				<td>{{amount[1]}}</td>
+				<td ng-show="notes[1]" ng-click="openNotes(1)" ><img style="width:20px" src="./images/comment_on.svg"></td>
+				<td ng-show="!notes[1]" ng-click="openNotes(1)" ><img style="width:20px" src="./images/comment_off.svg"></td>
 			</tr>
 			<tr ng-show="x" class="td-description" ng-repeat="x in samples track by $index">
 				<td>
@@ -104,8 +120,12 @@
 				<td>{{result[$index+2]}}</td>
 			<!--	<td>{{hexCq[$index+2]}}</td> -->
 				<td>{{amount[$index+2]}}</td>
+				<td ng-show="notes[$index+2]" ng-click="openNotes($index+2)" ><img style="width:20px" src="./images/comment_on.svg"></td>
+				<td ng-show="!notes[$index+2]" ng-click="openNotes($index+2)" ><img style="width:20px" src="./images/comment_off.svg"></td>
 			</tr>
 		</table>
+	</div>
+	<div ng-show="twoKits" ng-show="experiment.completion_status === 'success' && !analyzing && famCq" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 left-padding">
 		<table ng-show="twoKits">
 			<tr class="td-heading">
 				<td style="width:300px">Well</td>
@@ -113,6 +133,7 @@
 				<td style="width:200px">Results</td>
 			<!--	<td style="width:100px">Hex Cq</td> -->
 				<td style="width:200px">Amount</td>
+				<td style="width:200px">Notes</td>
 			</tr>
 			<tr class="td-description">
 				<td>B1. Positive Control
@@ -123,6 +144,8 @@
 				<td>{{result[8]}}</td>
 			<!--	<td>{{hexCq[0]}}</td> -->
 				<td>{{amount[8]}}</td>
+				<td ng-show="notes[8]" ng-click="openNotes(8)"><img style="width:20px" src="./images/comment_on.svg"></td>
+				<td ng-show="!notes[8]" ng-click="openNotes(8)"><img style="width:20px" src="./images/comment_off.svg"></td>
 			</tr>
 			<tr class="td-description">
 				<td>B2. Negative Control
@@ -133,6 +156,8 @@
 				<td>{{result[9]}}</td>
 			<!--	<td>{{hexCq[1]}}</td> -->
 				<td>{{amount[9]}}</td>
+				<td ng-show="notes[9]" ng-click="openNotes(9)"><img style="width:20px" src="./images/comment_on.svg"></td>
+				<td ng-show="!notes[9]" ng-click="openNotes(9)"><img style="width:20px" src="./images/comment_off.svg"></td>
 			</tr>
 			<tr ng-show="y" class="td-description" ng-repeat="y in samples_B track by $index">
 				<td>
@@ -146,6 +171,8 @@
 				<td>{{result[$index+10]}}</td>
 			<!--	<td>{{hexCq[$index+8]}}</td> -->
 				<td>{{amount[$index+10]}}</td>
+				<td ng-show="notes[$index+10]" ng-click="openNotes($index+10)"><img style="width:20px" src="./images/comment_on.svg"></td>
+				<td ng-show="!notes[$index+10]" ng-click="openNotes($index+10)"><img style="width:20px" src="./images/comment_off.svg"></td>
 			</tr>
 		</table>
 	</div>

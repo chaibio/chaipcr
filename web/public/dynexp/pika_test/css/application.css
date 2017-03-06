@@ -44,6 +44,26 @@ input{
 
 }
 
+.modal-content{
+	box-shadow: none;
+	border: none;
+}
+
+.notes-button-div{
+	margin-top: 50px;
+	border-top: 1px solid;
+	border-bottom: 1px solid;
+}
+
+.notes-button{
+	border: none;
+	margin-top: 0;
+	margin-bottom: 0;
+	width: 200px;
+}
+
+
+
 .empty-input{
 	border-bottom: 2px solid lightgray;
 }
