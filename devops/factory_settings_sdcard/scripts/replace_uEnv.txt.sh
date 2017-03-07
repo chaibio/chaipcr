@@ -115,7 +115,7 @@ uEnvSDCard=$boot/uEnv.sdcard.txt
 uEnv72Check=$boot/uEnv.72check.txt
 NOW=$(date +"%m-%d-%Y %H:%M:%S")
 
-if cp --help | grep numbered
+if cp --help 2>&1 | grep numbered
 then
 	cp $uEnv ${uEnv}.org --backup=numbered
 else
@@ -276,7 +276,7 @@ then
 	rm $fstab_new
 fi
 
-if cp --help | grep numbered
+if cp --help 2>&1 | grep numbered
 then
         cp $fstab ${fstab}.org --backup=numbered
 else
