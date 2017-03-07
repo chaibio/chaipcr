@@ -30,14 +30,13 @@ window.ChaiBioTech.ngApp
       Device.isDualChannel().then (is_dual_channel) ->
         $scope.is_dual_channel = is_dual_channel
 
-      console.log ngModel
       $scope.$watchCollection ->
         ngModel.$modelValue
       , (newVal) ->
-        $scope.updateUI() if newVal
+        $scope.updateUI(newVal) if newVal
 
-      $scope.updateUI = ->
-        console.log "updating"
+      $scope.updateUI = (state)->
+        ngModel.$setViewValue state
         $scope.selected = ngModel.$modelValue.selected
         $scope.color = ngModel.$modelValue.color || 'gray'
         $scope.ct = ngModel.$modelValue.ct
@@ -57,13 +56,6 @@ window.ChaiBioTech.ngApp
           color: ngModel.$modelValue.color || 'gray'
           ct: $scope.ct
 
-      #$(".test1").click = ->
-      #  isMouseDown = true
-      #  console.log "testing"
-      #  $(this).toggleState
-      #  false
-
-        ngModel.$setViewValue state
-        $scope.updateUI()
+        $scope.updateUI(state)
 
 ]

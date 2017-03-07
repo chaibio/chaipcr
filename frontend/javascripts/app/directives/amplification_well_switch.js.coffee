@@ -29,7 +29,6 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
     templateUrl: 'app/views/directives/amplification-well-switch.html'
     link: ($scope, elem, attrs, ngModel) ->
 
-      console.log ngModel
       columnCount = 8
       $scope.borders = {};
       $scope.labelUnit = $scope.labelUnit || 'Cq'
@@ -45,7 +44,6 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
           color: if ($scope.colorBy is 'well') then COLORS[i] else '#75278E'
 
       watchButtons = (val) ->
-        console.log "I am here"
         ngModel.$setViewValue angular.copy val
 
       $scope.$watchCollection 'buttons', watchButtons
@@ -139,11 +137,14 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
       toggle = (boxId) ->
         tagId = "#box#{boxId}"
-        if not $scope.borders[boxId]
+        alreadySelected = $(tagId).find('.circle').hasClass('selected')
+        # At first every rectangle is selected. That means it has selected class.
+        # When we select few rectangles we want the rest of them to be unselected. 
+        if not $scope.borders[boxId] and alreadySelected
           $(tagId).find('.circle').click()
-          #console.log $scope.buttons
+        else if $scope.borders[boxId] and not alreadySelected
+          $(tagId).find('.circle').click()
 
-        #else if $scope.borders[boxId]
 
 
       checkRightBorder = (id) ->
@@ -176,8 +177,6 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
       $scope.borders[id] = true for id in [1..16]
 
       $timeout(() ->
-          console.log "started"
-          #toggle(boxId) for boxId in [1..16]
           for id of $scope.borders
             $("#box#{id}").addClass('ui-selected')
             checkRightBorder(parseInt(id));
