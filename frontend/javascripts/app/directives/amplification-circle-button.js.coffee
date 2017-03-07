@@ -30,12 +30,14 @@ window.ChaiBioTech.ngApp
       Device.isDualChannel().then (is_dual_channel) ->
         $scope.is_dual_channel = is_dual_channel
 
+      console.log ngModel
       $scope.$watchCollection ->
         ngModel.$modelValue
       , (newVal) ->
         $scope.updateUI() if newVal
 
       $scope.updateUI = ->
+        console.log "updating"
         $scope.selected = ngModel.$modelValue.selected
         $scope.color = ngModel.$modelValue.color || 'gray'
         $scope.ct = ngModel.$modelValue.ct

@@ -29,6 +29,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
     templateUrl: 'app/views/directives/amplification-well-switch.html'
     link: ($scope, elem, attrs, ngModel) ->
 
+      console.log ngModel
       columnCount = 8
       $scope.borders = {};
       $scope.labelUnit = $scope.labelUnit || 'Cq'
@@ -44,6 +45,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
           color: if ($scope.colorBy is 'well') then COLORS[i] else '#75278E'
 
       watchButtons = (val) ->
+        console.log "I am here"
         ngModel.$setViewValue angular.copy val
 
       $scope.$watchCollection 'buttons', watchButtons
@@ -126,14 +128,23 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         toggle(boxId) for boxId in [1..16]
 
 
-      toggle = (boxId) ->
+      '''toggle = (boxId) ->
         tagId = "#box#{boxId}"
         if $scope.borders[boxId] is true
           if $(tagId).find('.circle').hasClass('selected')
             $(tagId).find('.circle').click()
         else if not $scope.borders[boxId]
           if not $(tagId).find('.circle').hasClass('selected')
-            $(tagId).find('.circle').click()
+            $(tagId).find('.circle').click() '''
+
+      toggle = (boxId) ->
+        tagId = "#box#{boxId}"
+        if not $scope.borders[boxId]
+          #$(tagId).find('.circle').click()
+          console.log $scope.buttons
+
+        #else if $scope.borders[boxId]
+
 
       checkRightBorder = (id) ->
         if id % columnCount isnt 0 and $scope.borders[id + 1]
