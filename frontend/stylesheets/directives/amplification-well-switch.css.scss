@@ -102,6 +102,7 @@
       //padding: 1px;
       float: left;
       width: 12%;
+			height: 91px;
       //height: 80px;
       font-size: 4em;
       text-align: center;
@@ -114,7 +115,7 @@
 
   #selectableol .ui-selecting { background: #FECA40; }
 
-  #selectableol .ui-selected { color: white; border: solid 1px #000}
+  #selectableol .ui-selected { color: white; border: solid 3px #000}
   #selectableol .ui-selecting {  border: solid 1px #000}
 
   #selectable { list-style-type: none; margin: 0; padding: 0; width: 850px; }
@@ -131,17 +132,21 @@
   }
 
   .borderRight {
-    border-right-color: #c5c5c5 !important;
+    border-right-color: #000 !important;
+		border-right-width: 1px !important;
   }
 
   .borderLeft {
-    border-left-color: #c5c5c5 !important;
+    border-left-color: #000 !important;
+		border-left-width: 1px !important;
   }
 
   .borderBottom {
-    border-bottom-color: #c5c5c5 !important;
+    border-bottom-color: #000 !important;
+		border-bottom-width: 1px !important;
   }
 
   .borderTop {
-    border-top-color: #c5c5c5 !important;
+    border-top-color: #000 !important;
+		border-top-width: 1px !important;
   }
