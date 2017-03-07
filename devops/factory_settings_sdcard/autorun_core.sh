@@ -433,14 +433,13 @@ isValidPermGeometry () {
 	fi
 
 	echo partition starts at $start
-	if [ $start -eq 7649280 ]
+	if [ $start -eq 7649280 ] || [ $start -eq 7452672 ]
 	then
 		echo "Partition geometery is compatible."
 		result=0
 	else
 		echo "Partition geometery is not compatible."
 		return 1
-
 	fi
 
 	return $result
