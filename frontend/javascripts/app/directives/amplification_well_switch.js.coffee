@@ -140,8 +140,8 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
       toggle = (boxId) ->
         tagId = "#box#{boxId}"
         if not $scope.borders[boxId]
-          #$(tagId).find('.circle').click()
-          console.log $scope.buttons
+          $(tagId).find('.circle').click()
+          #console.log $scope.buttons
 
         #else if $scope.borders[boxId]
 
