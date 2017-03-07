@@ -24,27 +24,20 @@ angular.module("canvasApp").service('stageGraphics', [
   'Circle',
   'Text',
   'Rectangle',
-  function(dots, Line, Group, Circle, Text, Rectangle) {
+  'stageRoof',
+  'stageBorderLeft',
+  'stageDotsBackground',
+  'stageDots',
+  function(dots, Line, Group, Circle, Text, Rectangle, stageRoof, stageBorderLeft, stageDotsBackground, stageDots) {
 
     this.addRoof = function() {
 
-      var properties = {
-          stroke: 'white', strokeWidth: 2, selectable: false, left: 0
-        };
-      var cordinates = [0, 24, (this.myWidth), 24];
-
-      this.roof = Line.create(cordinates, properties);
+      this.roof = new stageRoof(this.myWidth);
       return this;
     };
 
     this.borderLeft = function() {
-
-      var properties = {
-          stroke: '#ff9f00',  left: 0, strokeWidth: 2, selectable: false
-        };
-      var cordinates = [0, 70, 0, 390];
-
-      this.border =  new fabric.Line(cordinates, properties);
+      this.border =  new stageBorderLeft();
       return this;
     };
 
@@ -52,20 +45,11 @@ angular.module("canvasApp").service('stageGraphics', [
 
       var editStageStatus = this.parent.editStageStatus;
       var dotsArray = dots.stageDots();
-      var properties = {
-        width: 15, height: 14, fill: '#FFB300', left: 0, top: -2, selectable: false,
-        originX: 'left', originY: 'top', //fill: 'black'
-      };
 
-      this.dotsBackground = Rectangle.create(properties);
+      this.dotsBackground = new stageDotsBackground(); // Background of move stage dots, for more accurate click.
       dotsArray.unshift(this.dotsBackground);
 
-      properties = {
-        originX: "left", originY: "top", left: this.left, top: 6, hasControls: false, width: 22, height: 22, visible: editStageStatus,
-        parent: this, name: "moveStage", lockMovementY: true, hasBorders: false, selectable: true, backgroundColor: ''
-      };
-
-      this.dots = Group.create(dotsArray, properties);
+      this.dots = new stageDots(this, dotsArray, editStageStatus);
       return this;
     };
 
