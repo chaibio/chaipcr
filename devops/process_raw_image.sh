@@ -155,7 +155,6 @@ image_filename_upgrade2="$sdcard/eMMC_part2.img"
 upgrade_scripts="scripts"
 factory_scripts="factory-scripts"
 
-
 echo "Packing eMMC image.."
 if [ -e  ${temp} ]
 then
@@ -248,22 +247,39 @@ else
 	error_exit "Not able to copy factory settings script"
 fi
 
-if [ ! -e $image_filename_upgrade1 ]
-then
-	error_exit "First image part not found: $image_filename_upgrade1"
-fi
+construct_image() {
 
-if [ ! -e $image_filename_upgrade2 ]
-then
-	error_exit "Second image part not found: $image_filename_upgrade2"
-fi
+	if [ ! -e $image_filename_upgrade1 ]
+	then
+		error_exit "First image part not found: $image_filename_upgrade1"
+	fi
 
-echo "Concatinating eMMC image parts"
-cat $image_filename_upgrade1 $image_filename_upgrade2 > $image_filename_upgrade
+	if [ ! -e $image_filename_upgrade2 ]
+	then
+		error_exit "Second image part not found: $image_filename_upgrade2"
+	fi
 
-if [ $? -gt 0 ]
+	echo "Concatinating eMMC image parts"
+	cat $image_filename_upgrade1 $image_filename_upgrade2 > $image_filename_upgrade
+
+	if [ $? -gt 0 ]
+	then
+		error_exit "Error concatinating image parts!"
+	fi
+}
+
+if [ -d ${sdcard} ] && [ -f ${image_filename_upgrade1} ] && [ -f ${image_filename_upgrade2} ]
 then
-	error_exit "Error concatinating image parts!"
+	echo sdcard directory found
+	construct_image
+else
+	filecheck=$1
+	if [ "${filecheck##*.}" = "img" ]; then
+		echo eMMC image file found $1
+		image_filename_upgrade=$1
+	else
+		error_exit Please supply path to sdcard dir or eMMC image as first paramter.
+   	fi
 fi
 
 echo Extracting partitions...
