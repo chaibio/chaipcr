@@ -5,6 +5,7 @@ import os
 import sys
 import shutil
 import gzip
+import json
 
 import chai_util as util
 import chai_remote as remote
@@ -338,10 +339,131 @@ class ChaiNoiseTest(ChaiTest):
             return output
 
 
+class ChaiThermalControlTest(ChaiTest):
+    """Thermal Control Test."""
+    #@util.initializer
+    def __init__(
+            self, 
+            ):
+
+        super(ChaiThermalControlTest, self).__init__()
+        
+        self.logger_data = {}
+        self.results = None
+	self.template = {
+		u'experiment': {u'name': u'Thermal Consistency',
+		    u'protocol': {u'lid_temperature': u'110.0',
+			u'stages': [{u'stage': {u'auto_delta': False,
+			    u'auto_delta_start_cycle': 1,
+			    u'name': u'Holding Stage',
+			    u'num_cycles': 1,
+			    u'order_number': 0,
+			    u'stage_type': u'holding',
+			    u'steps': [{u'step': {u'collect_data': False,
+				u'delta_duration_s': 0,
+				u'delta_temperature': u'0.0',
+				u'hold_time': 30,
+				u'name': u'Denature',
+				u'order_number': 0,
+				u'pause': False,
+				u'ramp': {u'collect_data': False,
+				    u'id': 8,
+				    u'rate': u'0.0'},
+				u'temperature': u'95.0'}},
+				{u'step': {u'collect_data': False,
+				    u'delta_duration_s': 0,
+				    u'delta_temperature': u'0.0',
+				    u'hold_time': 60,
+				    u'name': u'Anneal',
+				    u'order_number': 1,
+				    u'pause': False,
+				    u'ramp': {u'collect_data': False,
+					u'id': 9,
+					u'rate': u'3.0'},
+				    u'temperature': u'60.0'}}]}},
+				{u'stage': {u'auto_delta': False,
+				    u'auto_delta_start_cycle': 1,
+				    u'name': u'Melt Curve Stage',
+				    u'num_cycles': 1,
+				    u'order_number': 1,
+				    u'stage_type': u'meltcurve',
+				    u'steps': [{u'step': {u'collect_data': False,
+					u'delta_duration_s': 0,
+					u'delta_temperature': u'0.0',
+					u'hold_time': 15,
+					u'name': u'Prepare melt',
+					u'order_number': 0,
+					u'pause': False,
+					u'ramp': {u'collect_data': False,
+					    u'id': 10,
+					    u'rate': u'1.0'},
+					u'temperature': u'72.0'}},
+					{u'step': {u'collect_data': False,
+					    u'delta_duration_s': 0,
+					    u'delta_temperature': u'0.0',
+					    u'hold_time': 1,
+					    u'name': u'Melt',
+					    u'order_number': 1,
+					    u'pause': False,
+					    u'ramp': {u'collect_data': True,
+						u'id': 11,
+						u'rate': u'0.1'},
+					    u'temperature': u'85.0'}}]}}]}}}
+
+
+    def run(self):
+
+        super(ChaiThermalControlTest, self).run_start()
+
+        self.get_data()
+        self.analyze_data()
+        
+        super(ChaiThermalControlTest, self).run_end()
+        
+        return True
+
+
+    def get_data(self):
+        
+        try:
+
+            self.device.experiment_stop()
+
+            exp_id = self.device.experiment_load(self.template, 'ThermalControlTest')
+            self.device.experiment_start(exp_id)
+            self.device.data_logger_start(10, 30000-10)
+
+            self.logger_data = self.device.data_logger_trigger()
+            self.device.data_logger_stop()
+            
+            if self.verbosity > 1:
+                print("Finished collecting date while running experiment id %d"%exp_id)
+
+            self.dump_data()
+
+        finally:
+            self.device.experiment_stop()
+
+
+    def analyze_data(self):
+
+        self.status = Status.PASS
+
+
+    def result_table(self, _print=True):
+
+        output = ''
+
+        if _print:
+            print(output)
+        else:
+            return output
+
+
 import argparse
 import pprint
 
-tests_available = ['ChaiNoiseTest']
+tests_available = ['ChaiNoiseTest', 'ChaiThermalControlTest']
 log_filename = 'chai_test.log'
 
 def main():
