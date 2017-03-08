@@ -99,6 +99,8 @@ void QPCRApplication::initialize(Application&) {
             Logger::setup(kAppLogName);
 
             setLogger(Logger::get());
+            
+            APP_LOGGER << "--------------------------Realtime Application Started--------------------------" << std::endl;
         }
 
         readDeviceFile();
