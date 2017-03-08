@@ -187,12 +187,10 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         else
           $("#box#{id}").removeClass('borderTop');
           if id > columnCount
-            console.log 1
             $("#box#{id - columnCount}").addClass('specialBorderBottom')
           else if id <= columnCount
-            console.log 2
-            #$("#box#{id}").find('.circle').addClass('specialTopBorderDiv');
-            #$("#box#{id}").find('circle').css('border-top': "1px solid #000")
+            $("#box#{id}").addClass('firstBorderTop')
+
 
       $scope.borders[id] = true for id in [1..16]
 
