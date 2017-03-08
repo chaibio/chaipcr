@@ -1,4 +1,4 @@
-angular.module('canvasApp').service('stageRoof', [
+angular.module('canvasApp').factory('stageRoof', [
   'Line',
   function(Line) {
     return function(width) {

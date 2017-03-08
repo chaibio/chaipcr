@@ -1,4 +1,4 @@
-angular.module('canvasApp').service('stageDots', [
+angular.module('canvasApp').factory('stageDots', [
   'Group',
   function(Group) {
     return function(_this, dotsArray, editStageStatus) {

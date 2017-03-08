@@ -1,4 +1,4 @@
-angular.module('canvasApp').service('stageDotsBackground', [
+angular.module('canvasApp').factory('stageDotsBackground', [
   'Rectangle',
   function(Rectangle) {
     return function(width) {

@@ -1,4 +1,4 @@
-angular.module('canvasApp').service('stageBorderLeft', [
+angular.module('canvasApp').factory('stageBorderLeft', [
   'Line',
   function(Line) {
     return function(width) {
@@ -6,7 +6,7 @@ angular.module('canvasApp').service('stageBorderLeft', [
           stroke: '#ff9f00',  left: 0, strokeWidth: 2, selectable: false
         };
       var cordinates = [0, 70, 0, 390];
-      
+
       return Line.create(cordinates, properties);
     };
   }
