@@ -42,7 +42,7 @@
         //padding-top: $padding_top - 2px;
         opacity: 1;
         color: #000;
-				//border: 1px solid;
+				//border-top: 1px solid;
       }
 
       .ct {
@@ -102,7 +102,6 @@
       //padding: 1px;
       float: left;
       width: 12%;
-			height: 91px;
       //height: 80px;
       font-size: 4em;
       text-align: center;
@@ -115,7 +114,7 @@
 
   #selectableol .ui-selecting { background: #FECA40; }
 
-  #selectableol .ui-selected { color: white; border: solid 3px #000}
+  #selectableol .ui-selected { color: white; border: solid 1px #000}
   #selectableol .ui-selecting {  border: solid 1px #000}
 
   #selectable { list-style-type: none; margin: 0; padding: 0; width: 850px; }
@@ -128,25 +127,53 @@
     //font-size: 4em;
     //text-align: center;
     //position: relative;
+    //padding-top: 0px;
+    //padding-bottom: 2px;
     border: 1px solid #c5c5c5
   }
 
   .borderRight {
-    border-right-color: #000 !important;
-		border-right-width: 1px !important;
+    border-right-color: #c5c5c5 !important;
   }
 
   .borderLeft {
-    border-left-color: #000 !important;
-		border-left-width: 1px !important;
+    border-left-color: #c5c5c5 !important;
   }
 
   .borderBottom {
-    border-bottom-color: #000 !important;
-		border-bottom-width: 1px !important;
+    border-bottom-color: #c5c5c5 !important;
   }
 
   .borderTop {
-    border-top-color: #000 !important;
-		border-top-width: 1px !important;
+    border-top-color: #c5c5c5 !important;
+  }
+
+  .specialBorderLeft {
+    border-left: solid 1px !important;
+  }
+  .specialBorderRight {
+    border-right: solid 1px !important;
+  }
+  .specialBorderTop {
+    border-top: solid 1px !important;
+  }
+  .specialBorderBottom {
+    border-bottom: solid 1px !important;
+  }
+
+  .lastBorderRight {
+    border-right: solid 2px #000 !important;
+  }
+  .firstBorderLeft {
+    border-left: solid 2px #000 !important;
+  }
+  .firstBorderBottom {
+    border-bottom: solid 2px #000 !important;
+  }
+  .firstBorderTop {
+    border-top: solid 2px #000 !important;
+  }
+
+  .specialTopBorderDiv {
+    border-top: 1px solid #000;
   }

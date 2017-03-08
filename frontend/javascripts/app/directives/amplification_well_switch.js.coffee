@@ -117,13 +117,14 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
 
       process = () ->
+        toggle(boxId) for boxId in [1..16]
         for id of $scope.borders
           checkRightBorder(parseInt(id));
           checkLeftBorder(parseInt(id));
           checkBottomBorder(parseInt(id));
           checkTopBorder(parseInt(id));
 
-        toggle(boxId) for boxId in [1..16]
+
 
 
       '''toggle = (boxId) ->
@@ -136,10 +137,11 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
             $(tagId).find('.circle').click() '''
 
       toggle = (boxId) ->
+        $('#box' + boxId).removeClass('specialBorderLeft specialBorderRight lastBorderRight firstBorderLeft specialBorderTop firstBorderBottom firstBorderTop specialBorderBottom');
         tagId = "#box#{boxId}"
         alreadySelected = $(tagId).find('.circle').hasClass('selected')
         # At first every rectangle is selected. That means it has selected class.
-        # When we select few rectangles we want the rest of them to be unselected. 
+        # When we select few rectangles we want the rest of them to be unselected.
         if not $scope.borders[boxId] and alreadySelected
           $(tagId).find('.circle').click()
         else if $scope.borders[boxId] and not alreadySelected
@@ -152,6 +154,10 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
           $("#box#{id}").addClass('borderRight')
         else
           $("#box#{id}").removeClass('borderRight')
+          if id % columnCount isnt 0
+            $("#box#{id + 1}").addClass('specialBorderLeft')
+          else if id % columnCount is 0
+            $("#box#{id}").addClass('lastBorderRight')
 
 
       checkLeftBorder = (id) ->
@@ -159,6 +165,10 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
           $("#box#{id}").addClass('borderLeft')
         else
           $("#box#{id}").removeClass('borderLeft')
+          if id isnt columnCount + 1 and id isnt 1
+            $("#box#{id - 1}").addClass('specialBorderRight')
+          else if id is 1 or id is columnCount + 1 # if id 1 or 9
+            $("#box#{id}").addClass('firstBorderLeft')
 
 
       checkBottomBorder = (id) ->
@@ -166,13 +176,23 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
           $("#box#{id}").addClass('borderBottom')
         else
           $("#box#{id}").removeClass('borderBottom')
+          if id < (columnCount + 1)
+            $("#box#{id + columnCount}").addClass('specialBorderTop')
+          else if id > (columnCount)
+            $("#box#{id}").addClass('firstBorderBottom')
 
       checkTopBorder = (id) ->
         if id > columnCount and $scope.borders[id - columnCount]
           $("#box#{id}").addClass('borderTop');
         else
           $("#box#{id}").removeClass('borderTop');
-
+          if id > columnCount
+            console.log 1
+            $("#box#{id - columnCount}").addClass('specialBorderBottom')
+          else if id <= columnCount
+            console.log 2
+            #$("#box#{id}").find('.circle').addClass('specialTopBorderDiv');
+            #$("#box#{id}").find('circle').css('border-top': "1px solid #000")
 
       $scope.borders[id] = true for id in [1..16]
 
