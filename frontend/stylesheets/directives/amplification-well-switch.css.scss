@@ -122,23 +122,19 @@
   #selectableol li {
     padding: 1px;
     float: left;
-    //width: 100px;
-    //height: 80px;
-    //font-size: 4em;
-    //text-align: center;
-    //position: relative;
-    //padding-top: 0px;
-    //padding-bottom: 2px;
     border: 1px solid #c5c5c5;
+
     &.topEight {
       border-top: 2px solid #c5c5c5;
     }
     &.bottomEight {
       border-bottom: 2px solid #c5c5c5;
     }
-    &.first_left {
-      //background-color: green;
-      //border-left: 2px solid #c5c5c5;
+    &.special_left {
+      border-left: 2px solid #c5c5c5;
+    }
+    &.special_right {
+      border-right: 2px solid #c5c5c5;
     }
   }
 
