@@ -85,8 +85,8 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
 
       removeBorders = (removeIndex) ->
-        if $scope.borders[removeIndex + 1]
-          $('#box' + (removeIndex + 1)).removeClass('noBorderLeft')
+        #if $scope.borders[removeIndex + 1]
+          #$('#box' + (removeIndex + 1)).removeClass('noBorderLeft')
 
         if (removeIndex - 1) isnt columnCount and $scope.borders[removeIndex - 1]
           $('#box' + (removeIndex - 1)).removeClass('noBorderRight')
@@ -94,8 +94,8 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         if removeIndex <= columnCount and $scope.borders[removeIndex + columnCount]
           $('#box' + (removeIndex + columnCount)).removeClass('noBorderTop')
 
-        if removeIndex > columnCount and $scope.borders[removeIndex - columnCount]
-          $('#box' + (removeIndex - columnCount)).removeClass('noBorderBottom')
+        #if removeIndex > columnCount and $scope.borders[removeIndex - columnCount]
+          #$('#box' + (removeIndex - columnCount)).removeClass('noBorderBottom')
 
 
       assign = (node) ->
@@ -103,15 +103,15 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
         if not $scope.borders[id]
           $scope.borders[parseInt(id)] = true;
         else
-          removeBorders(id);
-          $('#box' + id).removeClass('borderRight borderLeft borderBottom borderTop ui-selected');
+          #removeBorders(id);
+          $('#box' + id).removeClass('noBorderRight noBorderLeft noBorderBottom noBorderTop ui-selected');
           delete $scope.borders[id];
 
 
       unAssign = (node) ->
         id = parseInt $(node).attr('id').replace('box', '')
-        removeBorders(id);
-        $('#box' + id).removeClass('borderRight borderLeft borderBottom borderTop ui-selected');
+        #removeBorders(id);
+        $('#box' + id).removeClass('noBorderRight noBorderLeft noBorderBottom noBorderTop ui-selected');
         delete $scope.borders[id];
 
 
