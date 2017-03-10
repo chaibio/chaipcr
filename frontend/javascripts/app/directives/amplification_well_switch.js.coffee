@@ -116,24 +116,17 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
 
       process = () ->
-        toggle(boxId) for boxId in [1..16]
+        for boxId in [1..16]
+          $('#box' + boxId).removeClass('specialBorderLeft specialBorderRight lastBorderRight firstBorderLeft specialBorderTop firstBorderBottom firstBorderTop specialBorderBottom');
+          toggle(boxId)
+
         for id of $scope.borders
           checkRightBorder(parseInt(id));
           checkLeftBorder(parseInt(id));
           checkBottomBorder(parseInt(id));
           checkTopBorder(parseInt(id));
 
-      '''toggle = (boxId) ->
-        tagId = "#box#{boxId}"
-        if $scope.borders[boxId] is true
-          if $(tagId).find('.circle').hasClass('selected')
-            $(tagId).find('.circle').click()
-        else if not $scope.borders[boxId]
-          if not $(tagId).find('.circle').hasClass('selected')
-            $(tagId).find('.circle').click() '''
-
       toggle = (boxId) ->
-        $('#box' + boxId).removeClass('specialBorderLeft specialBorderRight lastBorderRight firstBorderLeft specialBorderTop firstBorderBottom firstBorderTop specialBorderBottom');
         tagId = "#box#{boxId}"
         alreadySelected = $(tagId).find('.circle').hasClass('selected')
         # At first every rectangle is selected. That means it has 'selected' class.
