@@ -156,10 +156,12 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
 
       checkLeftBorder = (id) ->
-        if id isnt columnCount + 1 and $scope.borders[id - 1]
-          $("#box#{id}").addClass('noBorderLeft')
-        else
-          $("#box#{id}").removeClass('noBorderLeft')
+        #if id isnt columnCount + 1 and $scope.borders[id - 1]
+          #$("#box#{id}").addClass('noBorderLeft')
+        #else
+          #$("#box#{id}").removeClass('noBorderLeft')
+          # we need to show a 1px border between selected wells , so we omit noBorderLeft class for now
+          # Now we dont disable or change color back to #c5c5c5.
           if id isnt columnCount + 1 and id isnt 1
             $("#box#{id - 1}").addClass('specialBorderRight')
           else if id is 1 or id is columnCount + 1 # if id 1 or 9
@@ -167,10 +169,10 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
 
 
       checkBottomBorder = (id) ->
-        if id < (columnCount + 1) and $scope.borders[id + columnCount]
-          $("#box#{id}").addClass('noBorderBottom')
-        else
-          $("#box#{id}").removeClass('noBorderBottom')
+        #if id < (columnCount + 1) and $scope.borders[id + columnCount]
+          #$("#box#{id}").addClass('noBorderBottom')
+        #else
+          #$("#box#{id}").removeClass('noBorderBottom')
           if id < (columnCount + 1)
             $("#box#{id + columnCount}").addClass('specialBorderTop')
           else if id > (columnCount)
