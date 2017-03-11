@@ -72,6 +72,8 @@ mount_sdcard_partitions () {
 }
 
 rebootx () {
+	echo "reboot"
+
 	#try to call rebootx from the upgrade partition first.
 	if [ ! -e ${sdcard_p2}/scripts/rebootx.sh ]
         then
@@ -110,6 +112,18 @@ flush_cache_mounted () {
 }
 
 alldone () {
+	echo "Closing.. exit."
+   	if [ -e ${sdcard_p2}/backup_perm.gz ]
+    	then
+		rm ${sdcard_p2}/backup_perm.gz
+    	fi
+    	if [ -e ${sdcard_p2}/backup_data.gz ]
+    	then
+		rm ${sdcard_p2}/backup_data.gz
+    	fi
+	umount ${sdcard_p1} > /dev/null || true
+	umount ${sdcard_p2} > /dev/null || true
+
 	if [ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] ; then
 		echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 		echo default-on > /sys/class/leds/beaglebone\:green\:usr1/trigger
@@ -118,6 +132,7 @@ alldone () {
 	fi
 
 	echo "Done!"
+ 
 
 	echo "Rebooting..."
 	sync
@@ -249,7 +264,6 @@ reset_uenv () {
 	        mkdir -p /tmp/emmcboot
 	fi
 
-#        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
 	if mount | grep /tmp/emmcboot
 	then
 		echo /tmp/emmcboot already mounted!
@@ -361,8 +375,44 @@ incriment_restart_counter () {
 	echo "Restart counter: $counter"
 }
 
-mount_sdcard_partitions
 
+perform_data_restore () {
+	echo Checking for backuped partitions
+        if [ -e ${sdcard_p2}/backup_perm.gz ]
+        then
+        	echo Backup found from a previous run. Restoring...
+		mkdir -p /tmp/p4 || true
+                if mount ${eMMC}p4 /tmp/p4
+                then
+                	echo Restoring /perm partition contents.
+                        tar xfv ${sdcard_p2}/backup_perm.gz -C /tmp/p4/
+                        umount /tmp/p4
+                else
+               		echo Error mounting /perm partition to restore.
+                fi
+                sync
+	else
+        	echo No /perm contents backup found.
+	fi
+        if [ -e ${sdcard_p2}/backup_data.gz ]
+        then
+        	echo Backup found for /data partition. Restoring...
+		mkdir -p /tmp/p3 || true
+                if mount ${eMMC}p3 /tmp/p3
+                then
+                	echo Restoring /perm partition contents.
+                        tar xfv ${sdcard_p2}/backup_data.gz -C /tmp/p3/
+                        umount /tmp/p3
+		else
+                	echo Error mounting /data partition to restore.
+		fi
+                sync
+       	else
+       		echo No /data backup found.
+	fi
+}
+
+mount_sdcard_partitions
 cat /proc/cmdline | grep s2pressed=1 > /dev/null
 s2pressed=$?
 if [ $s2pressed -eq 0 ]
@@ -374,7 +424,50 @@ fi
 
 echo 1000 > /proc/sys/kernel/hung_task_timeout_secs
 
+backup_data () {
+    	if [ -e ${sdcard_p2}/backup_data.gz ]
+        then
+                echo Backup found from a previous run.
+        else
+                mkdir -p /tmp/p3 || true
+                if mount ${eMMC}p3 /tmp/p3
+                then
+                        echo Saving /data partition contents.
+                        cd /tmp/p3
+                        tar cfv ${sdcard_p2}/backup_data.gz *
+                        sync
+                        cd ~
+                        umount /tmp/p3 || true
+                else
+                        echo Error mounting /data parition.
+                fi
+	fi
+}
+
+backup_perm () {
+    	if [ -e ${sdcard_p2}/backup_perm.gz ]
+        then
+                echo /perm backup found from a previous run.
+        else
+                mkdir -p /tmp/p4 || true
+                if mount ${eMMC}p4 /tmp/p4
+                then
+                        echo Saving /perm partition contents.
+                        cd /tmp/p4
+                        tar cfv ${sdcard_p2}/backup_perm.gz *
+                        sync
+                        cd ~
+                        umount /tmp/p4 || true
+                else
+                        echo Error mounting /perm parition.
+
+                fi
+        fi
+}
+
 counter=2
+
+perform_upgrade () {
 if [ $s2pressed -ne 0 ] && ( [ -e ${sdcard_p1}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] )
 then
         echo "Resume eMMC unpacking flag found up"
@@ -406,15 +499,18 @@ then
                 rebootx
 		exit 0
         fi
+	perform_data_restore
 
-#        update_uenv 2
-reset_update_uenv_with_verification 2 
-       stop_packing_restarting
+	reset_update_uenv_with_verification 2 
+       	stop_packing_restarting
+   
         alldone
         exit
 else
 	echo "Performing factory settings recovery.."
 fi
+}
+
 
 isValidPermGeometry () {
 	echo "Testing ${eMMC}p4 validaty"
@@ -433,13 +529,15 @@ isValidPermGeometry () {
 	fi
 
 	echo partition starts at $start
+
 	if [ $start -eq 7452672 ]
 	then
 		echo "Partition geometery is compatible."
 		result=0
 	else
 		echo "Partition geometery is not compatible."
-		return 1
+		result=1
+
 	fi
 
 	return $result
@@ -478,6 +576,12 @@ isValidPermResult=$?
 echo "Validity test result: $isValidPermResult"
 if [ $isValidPermResult -eq 1 ]
 then
+	backup_perm
+	if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
+	then
+		backup_data
+	fi
+	
         echo "Partitioning $eMMC"
 	partition_drive
 	sync
@@ -500,6 +604,7 @@ then
 	if [ $isValidPermResult -eq 0 ]
 	then
 		echo "Done partitioning $eMMC!"
+		perform_data_restore
 	else
 		echo "Cannot update partition table at  $eMMC! restarting!"
 		echo "Write Perm Partition 2" > ${sdcard_p2}/write_perm_partition.flag
@@ -512,12 +617,14 @@ else
 	echo "Device is partitioned"
 fi
 
+perform_upgrade
+
 echo "Restoring system from sdcard at $sdcard_dev to eMMC at $eMMC!"
 sh ${sdcard_p1}/scripts/unpack_latest_version.sh factorysettings $counter || true
 
 if [ -e "${eMMC}p4" ]
 then
-        echo "Permanent data partition found! bypassing repartitioning!"
+        echo "Permanent data partition found! Bypassing repartitioning!"
 else
 	echo "Repartitioning needed!"
         alldone
@@ -533,7 +640,7 @@ then
 	echo "Done formatting /perm partition"
 fi
 
-#update_uenv 1
+perform_data_restore
 reset_update_uenv_with_verification 1
 
 stop_packing_restarting
@@ -542,11 +649,7 @@ sync
 
 sleep 5
 
-umount ${sdcard_p1} > /dev/null || true
-umount ${sdcard_p2} > /dev/null || true
-
 alldone
-
 rebootx
 
 exit 0
