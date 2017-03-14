@@ -382,8 +382,8 @@ stop_packing_restarting ()
 	fi
 }
 
-incriment_restart_counter () {
-	# Incriment and display restart counter
+increment_restart_counter () {
+	# Increment and display restart counter
 	counter_file=${sdcard_p2}/restart_counter.ini
 	counter_old=$(cat ${counter_file})
 	counter=$((counter_old+1))
@@ -491,7 +491,7 @@ perform_upgrade () {
 if [ $s2pressed -ne 0 ] && ( [ -e ${sdcard_p1}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] )
 then
         echo "Resume eMMC unpacking flag found up"
-        incriment_restart_counter
+        increment_restart_counter
 
 # was limited to 7 trails only.. if [ "$counter" -ge 7 ]
 	if false
