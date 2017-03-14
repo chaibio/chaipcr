@@ -20,7 +20,8 @@
 angular.module("canvasApp").service('stepEvents',[
   'stageGraphics',
   'stepGraphics',
-  function(stageGraphics, stepGraphics) {
+  'TimeService',
+  function(stageGraphics, stepGraphics, TimeService) {
 
     var that = this;
     this.changeDeltaText = function($scope) {
@@ -68,7 +69,7 @@ angular.module("canvasApp").service('stepEvents',[
 
         var circle = $scope.fabricStep.circle;
 
-        var val = $scope.newTimeFormatting(newVal);
+        var val = TimeService.newTimeFormatting(newVal);
         circle.changeHoldTime(val);
         //Check the last step. See if the last step has zero and put infinity in that case.
         //C.allCircles[C.allCircles.length - 1].doThingsForLast();

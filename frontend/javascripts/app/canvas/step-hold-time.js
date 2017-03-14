@@ -21,7 +21,8 @@ angular.module("canvasApp").factory('stepHoldTime', [
   'editMode',
   'ExperimentLoader',
   'alerts',
-  function(editMode, ExperimentLoader, alerts) {
+  'TimeService',
+  function(editMode, ExperimentLoader, alerts, TimeService) {
     return function(model, parent, $scope) {
 
       this.model = model;
@@ -36,7 +37,7 @@ angular.module("canvasApp").factory('stepHoldTime', [
 
         holdTimeMinute = (holdTimeMinute < 10) ? "0" + holdTimeMinute : holdTimeMinute;*/
 
-        return $scope.newTimeFormatting(this.model.hold_time);
+        return TimeService.newTimeFormatting(this.model.hold_time);
       };
 
       this.render = function() {
@@ -80,7 +81,7 @@ angular.module("canvasApp").factory('stepHoldTime', [
         editMode.holdActive = false;
         editMode.currentActiveHold = null;
 
-        $scope.step.hold_time = $scope.convertToSeconds(this.text.text) || $scope.step.hold_time;
+        $scope.step.hold_time = TimeService.convertToSeconds(this.text.text) || $scope.step.hold_time;
 
         if($scope.step.hold_time !== 0) { // If its zero server returns error , but make an exception for last step
           ExperimentLoader.changeHoldDuration($scope).then(function(data) {

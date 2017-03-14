@@ -20,7 +20,8 @@
 window.ChaiBioTech.ngApp.directive('time', [
   'ExperimentLoader',
   '$timeout',
-  function(ExperimentLoader, $timeout) {
+  'TimeService',
+  function(ExperimentLoader, $timeout, TimeService) {
     return {
       restric: 'EA',
       replace: true,
@@ -43,7 +44,7 @@ window.ChaiBioTech.ngApp.directive('time', [
         scope.$watch("reading", function(val) {
 
           if(angular.isDefined(scope.reading)) {
-            scope.shown = scope.$parent.newTimeFormatting(scope.reading);
+            scope.shown = TimeService.newTimeFormatting(scope.reading);
           }
         });
 

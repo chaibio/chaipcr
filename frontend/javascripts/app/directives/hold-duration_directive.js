@@ -22,7 +22,8 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
   '$timeout',
   'alerts',
   '$uibModal',
-  function(ExperimentLoader, $timeout, alerts, $uibModal) {
+  'TimeService',
+  function(ExperimentLoader, $timeout, alerts, $uibModal, TimeService) {
     return {
       restric: 'EA',
       replace: true,
@@ -44,7 +45,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
         scope.$watch("reading", function(val) {
 
           if(angular.isDefined(scope.reading)) {
-            scope.shown = scope.$parent.newTimeFormatting(scope.reading);
+            scope.shown = TimeService.newTimeFormatting(scope.reading);
           }
         });
 
@@ -94,7 +95,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
 
         scope.save = function() {
           scope.edit = false;
-          var newHoldTime = scope.$parent.convertToSeconds(scope.shown);
+          var newHoldTime = TimeService.convertToSeconds(scope.shown);
 
           //console.log(newHoldTime, editValue);
           /*if((newHoldTime || newHoldTime === 0) && editValue != newHoldTime) {*/
@@ -125,7 +126,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
 
             editValue = newHoldTime;
           }
-          scope.shown = scope.$parent.newTimeFormatting(scope.reading);
+          scope.shown = TimeService.newTimeFormatting(scope.reading);
         };
       }
     };
