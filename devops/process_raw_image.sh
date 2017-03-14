@@ -389,6 +389,7 @@ image_filename_rootfs="$image_filename_prfx-rootfs.img.gz"
 
 image_upgrade_filename_rootfs="$image_filename_prfx-rootfs2.img.gz"
 
+image_filename_format_data="format-data.img.gz"
 image_filename_data="$image_filename_prfx-data.img.gz"
 image_filename_boot="$image_filename_prfx-boot.img.gz"
 image_filename_perm="$image_filename_prfx-perm.img.gz"
@@ -634,8 +635,44 @@ else
 	error_exit "data partition checksum generation failed!"
 fi
 
+echo "Packing empty data partition to: $image_filename_format_data"
+$mkfsext4tooldir $data_partition -q -L data -F
+
+if mount $data_partition /tmp/emmc -t ext4
+then
+	echo $data_partition re mounted!
+else
+	error_exit "mounting $data_partition failed!"
+fi
+
+echo "Zeroing formatting data partition image"
+dd if=/dev/zero of=/tmp/emmc/big_zero_file.bin > /dev/null 2>&1
+sync &
+sleep 5
+sync
+echo "Removing zeros file"
+rm /tmp/emmc/big_zero_file.bin
+sync &
+sleep 10
+sync
+umount /tmp/emmc > /dev/null || true
+
+if dd  if=$data_partition bs=16777216 | gzip -c > $image_filename_format_data
+then
+	echo formatting data partitiong image extracted.
+else
+	error_exit "Cannot extract formatting data partition image!"
+fi
+
+if $mdsumtool $image_filename_format_data>>$checksums_filename
+then
+	echo data partition formatting image checksum generatted.
+else
+	error_exit "data partition formatting image checksum generation failed!"
+fi
+
 #tarring
-if	tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_data $image_filename_rootfs  $image_filename_perm $checksums_filename
+if tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_data $image_filename_rootfs  $image_filename_perm $checksums_filename
 then
 	echo $image_filename_upgrade_temp generatted.
 else
@@ -675,7 +712,7 @@ fi
 echo "packaging factory scripts in upgrade image."
 cp -r ${output_dir}/p1/* $temp/$factory_scripts
 
-if tar cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $image_filename_perm $checksums_filename $upgrade_scripts $factory_scripts --exclude=factory_settings.img.tar
+if tar cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $image_filename_perm $image_filename_format_data $checksums_filename $upgrade_scripts $factory_scripts --exclude=factory_settings.img.tar
 then
 	echo $image_filename_upgrade_temp generatted.
 else
