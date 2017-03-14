@@ -28,7 +28,7 @@ angular.module("canvasApp").factory('stepHoldTime', [
       this.parent = parent;
       this.canvas = parent.canvas;
       var that = this;
-      
+
       this.formatHoldTime = function() {
 
         /*var holdTimeHour = Math.floor(this.holdTime / 60);
@@ -80,7 +80,7 @@ angular.module("canvasApp").factory('stepHoldTime', [
         editMode.holdActive = false;
         editMode.currentActiveHold = null;
 
-        $scope.step.hold_time = $scope.convertToMinute(this.text.text) || $scope.step.hold_time;
+        $scope.step.hold_time = $scope.convertToSeconds(this.text.text) || $scope.step.hold_time;
 
         if($scope.step.hold_time !== 0) { // If its zero server returns error , but make an exception for last step
           ExperimentLoader.changeHoldDuration($scope).then(function(data) {

@@ -153,7 +153,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
     };
 
     $scope.convertToSeconds = function(durationString) {
-
+      console.log(durationString);
       var durationArray = durationString.split(":");
 
       if(durationArray.length > 1) {
@@ -162,7 +162,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
         if(durationArray[len - 1] === "") {
           durationArray[len - 1] = "0";
         }
-        if(durationArray[len - 1] && Number(durationArray[len - 1]) < 60) {
+        if(durationArray[len - 1] && Number(durationArray[len - 1]) <= 60) {
           SS = Number(durationArray[len - 1]);
         } else {
           console.log("Plz verify seconds");
@@ -218,7 +218,7 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
     };
 
     $scope.newTimeFormatting = function(reading) {
-
+      console.log("Visiting", reading);
       var negative = (reading < 0) ? "-" : "";
       reading = Math.abs(reading);
 

@@ -96,7 +96,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
           scope.edit = false;
           var newHoldTime = scope.$parent.convertToSeconds(scope.shown);
 
-          console.log(newHoldTime, editValue);
+          //console.log(newHoldTime, editValue);
           /*if((newHoldTime || newHoldTime === 0) && editValue != newHoldTime) {*/
           if(!isNaN(newHoldTime) && scope.reading != newHoldTime) {
 
@@ -111,7 +111,6 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
               } else {
                 //show message.
                 scope.showMessage(alerts.holdDurationZeroWarning);
-                console.log("show message");
               }
             } else {
               $timeout(function() {
