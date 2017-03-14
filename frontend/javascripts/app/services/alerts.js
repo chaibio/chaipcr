@@ -18,9 +18,23 @@
  */
 
 window.ChaiBioTech.ngApp.service('alerts', [
-  function() {
+  '$uibModal',
+  function($uibModal) {
 
     return {
+
+      showMessage: function(message, $scope, templateUrl) {
+
+        $scope.warningMessage = message;
+        $scope.modal = $uibModal.open({
+          scope: $scope,
+          templateUrl: templateUrl || 'app/views/modal-warning.html',
+          windowClass: 'small-modal'
+          // This is tricky , we used it here so that,
+          //Custom size of this modal doesn't change any other modal in use
+        });
+      },
+
       noOfCyclesWarning: "The value you have entered is less than AUTO DELTA START CYCLE. Please enter a value greater than AUTO DELTA START CYCLE or reduce AUTO DELTA START CYCLE and re-enter value.",
       nonDigit: "You have entered a wrong value. Please make sure you enter digits in the format HH:MM:SS.",
       autoDeltaOnWrongStage: "You can't turn on auto delta on this stage. Please select a CYCLING STAGE to enable auto delat.",

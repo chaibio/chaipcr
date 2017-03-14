@@ -23,7 +23,8 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
   'alerts',
   '$uibModal',
   'TimeService',
-  function(ExperimentLoader, $timeout, alerts, $uibModal, TimeService) {
+  '$rootScope',
+  function(ExperimentLoader, $timeout, alerts, $uibModal, TimeService, $rootScope) {
     return {
       restric: 'EA',
       replace: true,
@@ -78,7 +79,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
         scope.editAndFocus = function(className) {
 
           scope.edit = true;
-          editValue = scope.$parent.convertToSeconds(scope.shown);
+          editValue = TimeService.convertToSeconds(scope.shown);
         };
 
         scope.showMessage = function(message) {

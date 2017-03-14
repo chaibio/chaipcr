@@ -42,27 +42,12 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
     });
 
     $rootScope.$on('event:error-server', function() {
-      $scope.showMessageServerSide(alerts.internalServerError);
+      alerts.showMessage(alerts.internalServerError, $scope, 'app/views/modal-error-warning.html');
     });
 
     $rootScope.$on('alerts.nonDigit', function() {
-      var warningMessage1 = alerts.nonDigit;
-      $scope.showMessage(warningMessage1);
+      alerts.showMessage(alerts.nonDigit, $scope);
     });
-
-    $scope.showMessageServerSide = function(message) {
-
-      $scope.warningMessage = message;
-      $scope.modal = $uibModal.open({
-        scope: $scope,
-        templateUrl: 'app/views/modal-error-warning.html',
-        windowClass: 'small-modal',
-        //controller: this,
-        // This is tricky , we used it here so that,
-        //Custom size of this modal doesn't change any other modal in use
-      });
-
-    };
 
     $scope.reload = function() {
       $window.location.reload();
