@@ -95,6 +95,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
         };
 
         scope.save = function() {
+          console.log("beee");
           scope.edit = false;
           var newHoldTime = TimeService.convertToSeconds(scope.shown);
 
@@ -111,8 +112,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
                   });
                 });
               } else {
-                //show message.
-                scope.showMessage(alerts.holdDurationZeroWarning);
+                alerts.showMessage(alerts.holdDurationZeroWarning, scope);
               }
             } else {
               $timeout(function() {

@@ -86,7 +86,7 @@ window.ChaiBioTech.ngApp.service('TimeService', [
     };
 
     this.newTimeFormatting = function(reading) {
-      console.log("Visiting", reading);
+      
       var negative = (reading < 0) ? "-" : "";
       reading = Math.abs(reading);
 
