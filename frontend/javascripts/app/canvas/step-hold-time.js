@@ -20,9 +20,8 @@
 angular.module("canvasApp").factory('stepHoldTime', [
   'editMode',
   'ExperimentLoader',
-  'alerts',
   'TimeService',
-  function(editMode, ExperimentLoader, alerts, TimeService) {
+  function(editMode, ExperimentLoader, TimeService) {
     return function(model, parent, $scope) {
 
       this.model = model;

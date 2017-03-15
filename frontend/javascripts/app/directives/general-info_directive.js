@@ -34,7 +34,7 @@ window.ChaiBioTech.ngApp.directive('general', [
       templateUrl: 'app/views/directives/general-info.html',
 
       link: function(scope, elem, attr) {
-
+        console.log("ola");
 
         scope.stepNameShow = false;
         scope.stageNoCycleShow = false;
@@ -120,8 +120,8 @@ window.ChaiBioTech.ngApp.directive('general', [
               });
               scope.cycleNoBackup = scope.stage.num_cycles;
             } else {
-              var warningMessage = alerts.noOfCyclesWarning;
-              scope.showMessage(warningMessage);
+
+              alerts.showMessage(alerts.noOfCyclesWarning, scope);
               scope.stage.num_cycles = scope.cycleNoBackup;
             }
 
@@ -139,8 +139,8 @@ window.ChaiBioTech.ngApp.directive('general', [
               console.log("Happy happy ---- Just testing ____-------______");
             });
           } else {
-            var warningMessage = alerts.autoDeltaOnWrongStage;
-            scope.showMessage(warningMessage);
+            // This part is no longer used as we dont show change auto delta for non cyclic stages.
+            alerts.showMessage(alerts.autoDeltaOnWrongStage, scope);
           }
         };
 
