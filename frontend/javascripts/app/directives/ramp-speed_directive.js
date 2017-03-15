@@ -95,10 +95,10 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
           var fractionLength  = (String(scope.shown).split('.')[1] || 0).length;
 
           if(fractionLength > 5) {
-            console.log("Boom Limit exceeded", fractionLength);
+            console.log("Limit exceeded", fractionLength);
             scope.configureData();
             var warningMessageLimitExceeded = alerts.rampSpeedWarningLimitExceeded;
-            scope.$parent.showMessage(warningMessageLimitExceeded);
+            alerts.showMessage(warningMessageLimitExceeded, scope);
             return;
 
           } else if(! isNaN(scope.shown) && Number(scope.shown) < 7 && Number(scope.shown) >= 0) {
@@ -119,7 +119,7 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
 
           scope.configureData();
           var warningMessage = alerts.rampSpeedWarning;
-          scope.$parent.showMessage(warningMessage);
+          alerts.showMessage(warningMessage, scope);
         };
       }
     };

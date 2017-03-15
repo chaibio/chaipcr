@@ -82,20 +82,8 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
           editValue = TimeService.convertToSeconds(scope.shown);
         };
 
-        scope.showMessage = function(message) {
-
-          scope.warningMessage = message;
-          scope.modal = $uibModal.open({
-            scope: scope,
-            templateUrl: 'app/views/modal-warning.html',
-            windowClass: 'small-modal'
-            // This is tricky , we used it here so that,
-            //Custom size of this modal doesn't change any other modal in use
-          });
-        };
-
         scope.save = function() {
-          console.log("beee");
+          
           scope.edit = false;
           var newHoldTime = TimeService.convertToSeconds(scope.shown);
 
