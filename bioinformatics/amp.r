@@ -39,7 +39,7 @@ get_amplification_data <- function(
     # #                     single-       dual-
     # # before 128x    list(c(10, 1.25),  c(38.28, 2.73))
     
-    before_128x=TRUE,
+    before_128x=FALSE,
     
     extra_output=FALSE, 
     show_running_time=FALSE # option to show time cost to run this function
