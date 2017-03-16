@@ -34,7 +34,6 @@ window.ChaiBioTech.ngApp.directive('general', [
       templateUrl: 'app/views/directives/general-info.html',
 
       link: function(scope, elem, attr) {
-        console.log("ola");
 
         scope.stepNameShow = false;
         scope.stageNoCycleShow = false;

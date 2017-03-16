@@ -66,7 +66,7 @@ window.ChaiBioTech.ngApp.directive('startOnCycle', [
 
               scope.shown = 1;
               var warningMessage0 = alerts.startOnCycleMinimum;
-              scope.$parent.showMessage(warningMessage0);
+              alerts.showMessage(warningMessage0, scope);
 
             } else if(Number(scope.shown) <= Number(scope.$parent.stage.num_cycles)) {
 
@@ -84,7 +84,7 @@ window.ChaiBioTech.ngApp.directive('startOnCycle', [
 
               scope.shown = parseInt(editValue);
               var warningMessage1 = alerts.startOnCycleWarning;
-              scope.$parent.showMessage(warningMessage1);
+              alerts.showMessage(warningMessage1, scope);
             }
 
           } else {
