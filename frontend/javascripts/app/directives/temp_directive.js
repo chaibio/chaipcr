@@ -61,18 +61,6 @@ window.ChaiBioTech.ngApp.directive('temp', [
           }
         };
 
-        scope.showMessage = function(message) {
-
-          scope.warningMessage = message;
-          scope.modal = $uibModal.open({
-            scope: scope,
-            templateUrl: 'app/views/modal-warning.html',
-            windowClass: 'small-modal'
-            // This is tricky , we used it here so that,
-            //Custom size of this modal doesn't change any other modal in use
-          });
-        };
-
         scope.save = function() {
 
           scope.edit = false;
@@ -87,7 +75,7 @@ window.ChaiBioTech.ngApp.directive('temp', [
               return true;
             }
           } else {
-            scope.showMessage(alerts.autoDeltaTemp);
+            alerts.showMessage(alerts.autoDeltaTemp, scope);
           }
           scope.shown = Number(scope.reading).toFixed(1);
         };
