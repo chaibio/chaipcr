@@ -21,7 +21,8 @@ window.ChaiBioTech.ngApp.directive('time', [
   'ExperimentLoader',
   '$timeout',
   'TimeService',
-  function(ExperimentLoader, $timeout, TimeService) {
+  'alerts',
+  function(ExperimentLoader, $timeout, TimeService, alerts) {
     return {
       restric: 'EA',
       replace: true,
@@ -51,14 +52,14 @@ window.ChaiBioTech.ngApp.directive('time', [
         scope.editAndFocus = function(className) {
 
           if(scope.delta) {
-            editValue = scope.$parent.convertToSeconds(scope.shown);
+            editValue = TimeService.convertToSeconds(scope.shown);
           }
         };
 
         scope.save = function() {
 
-          var newHoldTime = scope.$parent.convertToSeconds(scope.shown);
-          console.log(newHoldTime);
+          var newHoldTime = TimeService.convertToSeconds(scope.shown);
+
           if((newHoldTime || newHoldTime === 0) && editValue != newHoldTime) {
             scope.reading = newHoldTime;
             $timeout(function() {
@@ -67,8 +68,10 @@ window.ChaiBioTech.ngApp.directive('time', [
               });
             });
             editValue = newHoldTime;
+          } else {
+            alerts.showMessage(alerts.nonDigit, scope);
           }
-          scope.shown = scope.$parent.newTimeFormatting(scope.reading);
+          scope.shown = TimeService.newTimeFormatting(scope.reading);
         };
       }
     };

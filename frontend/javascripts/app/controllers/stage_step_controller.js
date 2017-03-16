@@ -96,17 +96,5 @@ window.ChaiBioTech.ngApp.controller('StageStepCtrl', [
       $scope.stage = circle.parent.parentStage.model;
       $scope.fabricStep = circle.parent;
     };
-
-    $scope.showMessage = function(message) {
-
-      $scope.warningMessage = message;
-      $scope.modal = $uibModal.open({
-        scope: $scope,
-        templateUrl: 'app/views/modal-warning.html',
-        windowClass: 'small-modal'
-        // This is tricky , we used it here so that,
-        //Custom size of this modal doesn't change any other modal in use
-      });
-    };
   }
 ]);
