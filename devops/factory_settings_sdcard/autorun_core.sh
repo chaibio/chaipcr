@@ -132,8 +132,6 @@ alldone () {
 	fi
 
 	echo "Done!"
- 
-
 	echo "Rebooting..."
 	sync
 
@@ -493,18 +491,7 @@ then
         echo "Resume eMMC unpacking flag found up"
         increment_restart_counter
 
-# was limited to 7 trails only.. if [ "$counter" -ge 7 ]
-	if false
-        then
-                echo Restart counter exceeded 7.. quitting upgrade operation
-                stop_packing_restarting
-                echo Rebooting
-                rebootx
-		exit 0
-        fi
-
         echo "Resuming eMMC unpacking"
-
 	if [ -e ${sdcard_p2}/scripts/unpack_latest_version.sh ]
 	then
 		sh ${sdcard_p2}/scripts/unpack_latest_version.sh noreboot $counter || true
@@ -529,7 +516,6 @@ else
 	echo "Performing factory settings recovery.."
 fi
 }
-
 
 isValidPermGeometry () {
 	echo "Testing ${eMMC}p4 validaty"
@@ -590,6 +576,65 @@ isValidPermGeometry () {
 	return $result
 }
 
+isValidDataGeometry () {
+	echo "Testing ${eMMC}p3 validaty"
+	if [ ! -e ${eMMC}p3 ]
+	then
+		echo Device is not partitioned up to 4 partitions.
+		return 1
+	fi
+	result=1
+
+	start=$(hdparm -g ${eMMC}p3 | awk -F 'start =' '{print $2}')
+	if [ -z $start ]
+	then
+		echo No valid data partition geometry found.
+		return 1
+	fi
+
+        echo data partition starts at $start
+        # allowing old factory settings images partitioning with or without format
+        if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
+        then
+               echo Checking /data geometery for an upgrade case.
+        else
+               echo Checking /data geometery for a factory settings case.
+
+               fs_date=$( date +%Y%m%d -r ${sdcard_p1}/factory_settings.img.tar)
+               echo "Factory settings image date: $fs_date"
+               # factory settings file is older than 3-3-2017
+                if [ $fs_date -lt 20170303 ]
+                then
+                        echo Old factory settings image found.
+
+                        if [ $start -eq 6600704 ]
+                        then
+                                echo "Old partition geometery found with an old factory settings image"
+                                result=0
+
+                                return 0
+                        else
+                                echo Old factory settings image with incompatible geometery. Partitioning needed.
+                                result=1
+
+                                return 1
+                        fi
+                else
+                        echo New factory settings image found. Must burn to the small eMMC size only.
+                fi
+        fi
+
+        if [ $start -eq 6404096 ]
+        then
+                echo "Data partition geometery is compatible."
+                result=0
+        else
+                result=1
+        fi
+
+	return $result
+}
+
 isValidPermPartition () {
 	isValidPermGeometry
 	if [ $? -eq 1 ]
@@ -617,11 +662,47 @@ isValidPermPartition () {
 	return $result
 }
 
+isValidDataPartition () {
+	isValidDataGeometry
+	if [ $? -eq 1 ]
+	then
+		echo "Invalid data partition geometery"
+		return 1
+	fi
+
+	if [ -e /tmp/data/.tmp/shadow.backup ] || [ -e /tmp/data/.tmp/dhclient.*.leases ]
+	then
+		result=1
+	else
+		echo factory settings data partition copying should format the partition.
+	fi	
+
+	mkdir /tmp/datacheck -p || true
+	mount ${eMMC}p3 /tmp/datacheck
+	if [ $? -eq 0 ]
+	then
+		echo "${eMMC}p3 mounted!"
+		echo "Test Test" >> /tmp/datacheck/write_test_data_partition.flag
+		if [ -e /tmp/permcheck/write_test_data_partition.flag ]
+		then
+			rm /tmp/permcheck/write_test_data_partition.flag || true
+			result=0
+		fi
+		umount /tmp/datacheck || true
+	fi
+	rm -r /tmp/datacheck || true
+
+	return $result
+}
+
 isValidPermPartition
 isValidPermResult=$?
 
-echo "Validity test result: $isValidPermResult"
-if [ $isValidPermResult -eq 1 ]
+isValidDataPartition
+isValidDataResult=$?
+
+echo "Validity test for /perm and /data partitions: $isValidPermResult and $isValidDataResul"
+if [ $isValidPermResult -eq 1 ] || [ $isValidDataResult -eq 1 ]
 then
 	backup_perm
 	if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
@@ -648,6 +729,20 @@ then
 		echo geometery still not valid for /perm partition.
 	fi
 
+	isValidDataGeometry
+	isValidGeoResult=$?
+	if [ $isValidGeoResult -eq 0 ]
+	then
+		echo Data partition geometery is now valid.. checking for the upgrade case..
+	        if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p1}/unpack_resume_autorun.flag ] 
+        	then
+			echo upgrade case.. formating data partition.
+	               	format_data
+	        fi
+	else
+		echo geometery still not valid for /data partition.
+	fi
+
 	isValidPermPartition
 	isValidPermResult=$?
 
@@ -664,6 +759,24 @@ then
 		rebootx
 		exit 0
 	fi
+
+	isValidDataPartition
+	isValidDataResult=$?
+
+	echo "Validity second test result: $isValidDataResult"
+	if [ $isValidDataResult -eq 0 ]
+	then
+		echo "Done partitioning $eMMC!"
+		perform_data_restore
+	else
+		echo "Cannot update partition table at  $eMMC! restarting!"
+		echo "Write Data Partition 2" > ${sdcard_p2}/write_data_partition.flag
+
+		sync
+		rebootx
+		exit 0
+	fi
+
 else
 	echo "Device is partitioned"
 fi
@@ -689,6 +802,15 @@ then
 	rm ${sdcard_p1}/write_perm_partition.flag > /dev/null 2>&1 || true
 	rm ${sdcard_p2}/write_perm_partition.flag > /dev/null 2>&1 || true
 	echo "Done formatting /perm partition"
+fi
+
+if [ -e ${sdcard_p1}/write_data_partition.flag ] || [ -e ${sdcard_p2}/write_data_partition.flag ]
+then
+	echo "eMMC Flasher: writing to /data partition (to format)"
+	format_data
+	rm ${sdcard_p1}/write_data_partition.flag > /dev/null 2>&1 || true
+	rm ${sdcard_p2}/write_data_partition.flag > /dev/null 2>&1 || true
+	echo "Done formatting /data partition"
 fi
 
 perform_data_restore
