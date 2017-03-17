@@ -92,16 +92,18 @@ void QPCRApplication::initialize(Application&) {
     _workState = false;
 
     try {
-        waitFlag();
-
         if (!Logger::isSetup())
         {
             Logger::setup(kAppLogName);
 
             setLogger(Logger::get());
-            
-            APP_LOGGER << "--------------------------Realtime Application Started--------------------------" << std::endl;
         }
+
+        APP_LOGGER << "--------------------------Realtime Application Started. Waiting for the startup flag--------------------------" << std::endl;
+
+        waitFlag();
+
+        APP_LOGGER << "--------------------------The startup flag has been set--------------------------" << std::endl;
 
         readDeviceFile();
         readConfigurationFile();
