@@ -49,14 +49,8 @@ angular.module("canvasApp").service('stageGraphics', [
     };
 
     this.dotsOnStage = function() {
-
-      var editStageStatus = this.parent.editStageStatus;
-      var dotsArray = dots.stageDots();
-
-      this.dotsBackground = new stageDotsBackground(); // Background of move stage dots, for more accurate click.
-      dotsArray.unshift(this.dotsBackground);
-
-      this.dots = new stageDots(this, dotsArray, editStageStatus);
+      
+      this.dots = new stageDots(this);
       return this;
     };
 

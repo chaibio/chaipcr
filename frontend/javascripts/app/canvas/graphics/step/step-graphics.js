@@ -24,35 +24,19 @@ angular.module("canvasApp").service('stepGraphics', [
   'Circle',
   'Text',
   'Rectangle',
-  function(dots, Line, Group, Circle, Text, Rectangle) {
+  'stepName',
+  'stepFooter',
+  function(dots, Line, Group, Circle, Text, Rectangle, stepName, stepFooter) {
 
     this.addName = function() {
 
-      var properties = {
-        fill: 'white',  fontSize: 12,  top : 20,  left: -1,  fontFamily: "dinot-regular",  selectable: false,
-        originX: 'left', originY: 'top',
-      };
-      this.stepName = Text.create(this.stepNameText, properties);
+      this.stepName = new stepName(this.stepNameText);
       return this;
     };
 
     this.stepFooter = function() {
 
-      var editStageStatus = this.parentStage.parent.editStageStatus;
-      var components = dots.stepDots();
-      var properties = {
-        width: 94, height: 14, fill: '#ffb400', selectable: false, name: "backgroundRect",
-        originX: 'left', originY: 'top',
-      };
-
-      components.unshift(Rectangle.create(properties));
-
-      properties =  {
-        originX: "left", originY: "top", left: this.left + 16, top: 378, visible: editStageStatus, lockMovementY: true,
-        hasBorders: false, hasControls: false, name: "moveStep", parent: this
-      };
-
-      this.dots = Group.create(components, properties);
+      this.dots = new stepFooter(this);
       return this;
     };
 
