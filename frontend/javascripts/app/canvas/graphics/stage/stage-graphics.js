@@ -33,8 +33,9 @@ angular.module("canvasApp").service('stageGraphics', [
   'stageNameGroup',
   'stageRect',
   'stageGroup',
+  'hitPoints',
   function(dots, Line, Group, Circle, Text, Rectangle, stageRoof, stageBorderLeft, stageDotsBackground,
-    stageDots, stageCaption, stageName, stageNameGroup,stageRect, stageGroup) {
+    stageDots, stageCaption, stageName, stageNameGroup,stageRect, stageGroup, hitPoints) {
 
     this.addRoof = function() {
 
@@ -75,38 +76,12 @@ angular.module("canvasApp").service('stageGraphics', [
     };
 
     this.createStageHitPoints = function() {
-
-      var stageHitPointLeftProperties = {
-        width: 10, height: 200, fill: '', left: this.left + 10, top: 10, selectable: false, name: "stageHitPointLeft",
-        originX: 'left', originY: 'top', //fill: 'black'
-      };
-
-      var stageHitPointRightProperties = {
-        width: 10, height: 200, fill: '', left: (this.left + this.width) - 20, top: 10, selectable: false, name: "stageHitPointRight",
-        originX: 'left', originY: 'top', //fill: 'black'
-      };
-
-      var stageHitPointLowerLeftProperties = {
-        width: 10, height: 10, fill: '', left: this.left + 10, top: 340, selectable: false, name: "stageHitPointLowerLeft",
-        originX: 'left', originY: 'top', //fill: 'black'
-      };
-
-      var stageHitPointLowerRightProperties = {
-        width: 10, height: 10, fill: '', left: (this.left + this.width) - 20, top: 340, selectable: false, name: "stageHitPointLowerRight",
-        originX: 'left', originY: 'top', //fill: 'black'
-      };
-
-      var rightPointerDetectorProperties = {
-        width: 30, height: 10, fill: '', left: (this.left + this.width) + 50, top: 10, selectable: false, name: "rightPointerDetector",
-        originX: 'left', originY: 'top', //fill: 'black'
-      };
-
-      this.stageHitPointLeft = Rectangle.create(stageHitPointLeftProperties);
-      this.stageHitPointRight = Rectangle.create(stageHitPointRightProperties);
-      this.stageHitPointLowerLeft = Rectangle.create(stageHitPointLowerLeftProperties);
-      this.stageHitPointLowerRight = Rectangle.create(stageHitPointLowerRightProperties);
-      //this.moveStageRightPointerDetector = Rectangle.create(rightPointerDetectorProperties);
-
+      hitPoints.createAllHitPoints(this);
+      //stage.stageHitPointLeft = Rectangle.create(stageHitPointLeftProperties);
+      //stage.stageHitPointRight = Rectangle.create(stageHitPointRightProperties);
+      //stage.stageHitPointLowerLeft = Rectangle.create(stageHitPointLowerLeftProperties);
+      //stage.stageHitPointLowerRight = Rectangle.create(stageHitPointLowerRightProperties);
+      //stage.moveStageRightPointerDetector = Rectangle.create(rightPointerDetectorProperties);
       return this;
     };
 
