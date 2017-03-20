@@ -63,8 +63,6 @@ angular.module("canvasApp").service('stageGraphics', [
     this.writeMyName = function() {
 
       this.stageCaption = new stageCaption();
-
-
       this.stageName = new stageName();
 
       var editStageStatus = this.parent.editStageStatus;
@@ -76,12 +74,14 @@ angular.module("canvasApp").service('stageGraphics', [
     };
 
     this.createStageHitPoints = function() {
-      hitPoints.createAllHitPoints(this);
-      //stage.stageHitPointLeft = Rectangle.create(stageHitPointLeftProperties);
-      //stage.stageHitPointRight = Rectangle.create(stageHitPointRightProperties);
-      //stage.stageHitPointLowerLeft = Rectangle.create(stageHitPointLowerLeftProperties);
-      //stage.stageHitPointLowerRight = Rectangle.create(stageHitPointLowerRightProperties);
-      //stage.moveStageRightPointerDetector = Rectangle.create(rightPointerDetectorProperties);
+
+      var allHitPoints = hitPoints.createAllHitPoints(this);
+
+      this.stageHitPointLeft = allHitPoints.stageHitPointLeft;
+      this.stageHitPointRight = allHitPoints.stageHitPointRight;
+      this.stageHitPointLowerLeft = allHitPoints.stageHitPointLowerLeft;
+      this.stageHitPointLowerRight = allHitPoints.stageHitPointLowerRight;
+      //this.moveStageRightPointerDetector = Rectangle.create(rightPointerDetectorProperties);
       return this;
     };
 

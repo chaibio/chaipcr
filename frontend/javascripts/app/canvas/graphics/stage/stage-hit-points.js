@@ -3,7 +3,7 @@ angular.module('canvasApp').factory('hitPoints', [
   function(Rectangle) {
     return {
       createAllHitPoints: function(stage) {
-        console.log("I am called", stage);
+
         var stageHitPointLeftProperties = {
           width: 10, height: 200, fill: '', left: stage.left + 10, top: 10, selectable: false, name: "stageHitPointLeft",
           originX: 'left', originY: 'top', //fill: 'black'
@@ -29,13 +29,14 @@ angular.module('canvasApp').factory('hitPoints', [
           originX: 'left', originY: 'top', //fill: 'black'
         };
 
-        stage.stageHitPointLeft = Rectangle.create(stageHitPointLeftProperties);
-        stage.stageHitPointRight = Rectangle.create(stageHitPointRightProperties);
-        stage.stageHitPointLowerLeft = Rectangle.create(stageHitPointLowerLeftProperties);
-        stage.stageHitPointLowerRight = Rectangle.create(stageHitPointLowerRightProperties);
-        //stage.moveStageRightPointerDetector = Rectangle.create(rightPointerDetectorProperties);
+        return {
+          stageHitPointLeft: Rectangle.create(stageHitPointLeftProperties),
+          stageHitPointRight: Rectangle.create(stageHitPointRightProperties),
+          stageHitPointLowerLeft: Rectangle.create(stageHitPointLowerLeftProperties),
+          stageHitPointLowerRight: Rectangle.create(stageHitPointLowerRightProperties)
+        };
+      },
 
-      }
     };
   }
 ]);

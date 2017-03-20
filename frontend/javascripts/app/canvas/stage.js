@@ -551,8 +551,7 @@ angular.module("canvasApp").factory('stage', [
           stageGraphics.dotsOnStage.call(this);
           this.stageHeader();
           stageGraphics.createStageHitPoints.call(this);
-
-          stageGraphics.createStageGroup.apply(this);
+          stageGraphics.createStageGroup.call(this);
 
           this.visualComponents = {
             'stageGroup': this.stageGroup,
