@@ -28,7 +28,13 @@ angular.module("canvasApp").service('stageGraphics', [
   'stageBorderLeft',
   'stageDotsBackground',
   'stageDots',
-  function(dots, Line, Group, Circle, Text, Rectangle, stageRoof, stageBorderLeft, stageDotsBackground, stageDots) {
+  'stageCaption',
+  'stageName',
+  'stageNameGroup',
+  'stageRect',
+  'stageGroup',
+  function(dots, Line, Group, Circle, Text, Rectangle, stageRoof, stageBorderLeft, stageDotsBackground,
+    stageDots, stageCaption, stageName, stageNameGroup,stageRect, stageGroup) {
 
     this.addRoof = function() {
 
@@ -55,28 +61,16 @@ angular.module("canvasApp").service('stageGraphics', [
 
     this.writeMyName = function() {
 
-      var properties = {
-          fill: 'white', fontWeight: "400",  fontSize: 12,   fontFamily: "dinot-bold",
-          originX: "left", originY: "top", selectable: true, left: 0
-        };
+      this.stageCaption = new stageCaption();
 
-      this.stageCaption = Text.create("", properties);
 
-      properties = {
-          fill: 'white', fontWeight: "400",  fontSize: 12,   fontFamily: "dinot",
-          originX: "left", originY: "top", selectable: true
-        };
-      this.stageName = new fabric.Text("", properties);
+      this.stageName = new stageName();
 
       var editStageStatus = this.parent.editStageStatus;
       var addUp = (editStageStatus === true) ? 26 : 1;
       var moved = (editStageStatus === true) ? "right": false;
 
-      properties = {
-        originX: "left", originY: "top", selectable: true, top : 8, left: addUp, moved: moved
-      };
-
-      this.stageNameGroup = Group.create([this.stageCaption, this.stageName], properties);
+      this.stageNameGroup = new stageNameGroup([this.stageCaption, this.stageName], addUp, moved);
       return this;
     };
 
@@ -131,20 +125,14 @@ angular.module("canvasApp").service('stageGraphics', [
 
     this.createStageRect = function() {
 
-      var properties = {
-          left: 0,  top: 0, fill: '#FFB300',  width: this.myWidth,  height: 400,  selectable: false
-        };
-      this.stageRect = Rectangle.create(properties);
-
+      this.stageRect = new stageRect();
       return this;
     };
 
-    this.createStageGroup = function(stageContents) {
-      var properties = {
-            originX: "left", originY: "top", left: this.left,top: 0, selectable: false, hasControls: false
-          };
+    this.createStageGroup = function() {
 
-      this.stageGroup = Group.create(stageContents, properties);
+      var stageContents = [this.stageRect, this.stageNameGroup, this.roof, this.border]; //this.dots
+      this.stageGroup = new stageGroup(stageContents, this.left);
       return this;
     };
 

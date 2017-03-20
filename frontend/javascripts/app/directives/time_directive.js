@@ -28,7 +28,6 @@ window.ChaiBioTech.ngApp.directive('time', [
       replace: true,
       scope: {
         caption: "@",
-        //unit: "@",
         reading: '=',
         delta: '=',
         action: '&' // Learn how to pass value in this scenario
