@@ -16,26 +16,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 angular.module('canvasApp').factory('stageNameGroup', [
   'Group',
   'stageCaption',
   'stageName',
   function(Group, stageCaption, stageName) {
-    return function(step) {
+    return function(stage) {
 
-      var editStageStatus = step.parent.editStageStatus;
+      var editStageStatus = stage.parent.editStageStatus;
       var addUp = (editStageStatus === true) ? 26 : 1;
       var moved = (editStageStatus === true) ? "right": false;
 
-      step.stageCaption = new stageCaption();
-      step.stageName = new stageName();
+      stage.stageCaption = new stageCaption();
+      stage.stageName = new stageName();
 
       properties = {
         originX: "left", originY: "top", selectable: true, top : 8, left: addUp, moved: moved
       };
 
-      return new Group.create([step.stageCaption, step.stageName], properties);
+      return Group.create([stage.stageCaption, stage.stageName], properties);
     };
   }
 ]);
