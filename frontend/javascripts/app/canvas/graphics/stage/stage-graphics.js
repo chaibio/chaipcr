@@ -49,21 +49,14 @@ angular.module("canvasApp").service('stageGraphics', [
     };
 
     this.dotsOnStage = function() {
-      
+
       this.dots = new stageDots(this);
       return this;
     };
 
     this.writeMyName = function() {
-
-      this.stageCaption = new stageCaption();
-      this.stageName = new stageName();
-
-      var editStageStatus = this.parent.editStageStatus;
-      var addUp = (editStageStatus === true) ? 26 : 1;
-      var moved = (editStageStatus === true) ? "right": false;
-
-      this.stageNameGroup = new stageNameGroup([this.stageCaption, this.stageName], addUp, moved);
+      
+      this.stageNameGroup = new stageNameGroup(this);
       return this;
     };
 

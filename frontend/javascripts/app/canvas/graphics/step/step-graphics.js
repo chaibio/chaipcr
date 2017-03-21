@@ -26,7 +26,8 @@ angular.module("canvasApp").service('stepGraphics', [
   'Rectangle',
   'stepName',
   'stepFooter',
-  function(dots, Line, Group, Circle, Text, Rectangle, stepName, stepFooter) {
+  'closeGroup',
+  function(dots, Line, Group, Circle, Text, Rectangle, stepName, stepFooter, closeGroup) {
 
     this.addName = function() {
 
@@ -42,42 +43,7 @@ angular.module("canvasApp").service('stepGraphics', [
 
     this.deleteButton = function() {
 
-      var editStageStatus = this.parentStage.parent.editStageStatus;
-      var opacity = (editStageStatus) ? 1 : 0;
-      var properties = {};
-      var groupMembers = [];
-      var cordinates = [];
-
-      properties = {
-        radius: 6, stroke: 'rgb(166, 122, 40)', originX: "center", originY: "center",
-        fill: '#ffb400', strokeWidth: 2, selectable: false, name: "newClose",
-      };
-
-      this.newCloseCircle = Circle.create(properties);
-
-      properties = {
-          stroke: 'rgb(166, 122, 40)',
-        };
-
-      cordinates = [-3, -3, 3, 3];
-      this.newCloseLine1 = Line.create(cordinates, properties);
-
-      properties = {
-          stroke: 'rgb(166, 122, 40)',
-          angle: 90,
-          originX: 'center',
-          originY: 'center',
-        };
-      this.newCloseLine2 = Line.create(cordinates, properties);
-
-      properties = {
-        originX: "center", originY: "center", left: this.left + 116, top: 86, hasBorders: false, hasControls: false,
-        lockMovementY: true, lockMovementX: true, parent: this, opacity: opacity, name: 'deleteStepButton', me: this
-      };
-
-      groupMembers = [this.newCloseCircle, this.newCloseLine1, this.newCloseLine2];
-
-      this.closeImage = Group.create(groupMembers, properties);
+      this.closeImage = new closeGroup(this);
       return this;
 
     };
