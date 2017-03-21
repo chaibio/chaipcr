@@ -16,26 +16,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-angular.module('canvasApp').factory('stageNameGroup', [
-  'Group',
-  'stageCaption',
-  'stageName',
-  function(Group, stageCaption, stageName) {
-    return function(step) {
 
-      var editStageStatus = step.parent.editStageStatus;
-      var addUp = (editStageStatus === true) ? 26 : 1;
-      var moved = (editStageStatus === true) ? "right": false;
+ angular.module('canvasApp').factory('borderRight', [
+   'Line',
+   function(Line) {
+     return function(step) {
+       var properties = {
+           stroke: '#ff9f00',  left: (step.myWidth - 2), strokeWidth: 1, selectable: false,
+           originX: 'left', originY: 'top'
+         };
 
-      step.stageCaption = new stageCaption();
-      step.stageName = new stageName();
+       var cordinates = [-2, 42, -2, 362];
 
-      properties = {
-        originX: "left", originY: "top", selectable: true, top : 8, left: addUp, moved: moved
-      };
-
-      return new Group.create([step.stageCaption, step.stageName], properties);
-    };
-  }
-]);
+       return Line.create(cordinates, properties);
+     };
+   }
+ ]);

@@ -27,7 +27,12 @@ angular.module("canvasApp").service('stepGraphics', [
   'stepName',
   'stepFooter',
   'closeGroup',
-  function(dots, Line, Group, Circle, Text, Rectangle, stepName, stepFooter, closeGroup) {
+  'deltaSymbol',
+  'deltaGroup',
+  'numberingText',
+  'borderRight',
+  function(dots, Line, Group, Circle, Text, Rectangle, stepName, stepFooter, closeGroup, deltaSymbol,
+    deltaGroup, numberingText, borderRight) {
 
     this.addName = function() {
 
@@ -81,64 +86,19 @@ angular.module("canvasApp").service('stepGraphics', [
 
     this.initAutoDelta = function() {
 
-      var properties = {
-          fill: 'white',  fontSize: 14,  top : 338,  left: 10,  fontFamily: "dinot",  selectable: false,
-          originX: 'left', originY: 'top', fontWeight: 'bold', visible: false,
-          shadow: 'rgba(0,0,0,0.4) 5px 5px 7px'
-        };
-      var groupMembers = [];
-
-      this.deltaSymbol = this.autoDeltaStartCycle = Text.create('Δ', properties);
-
-      properties = {
-          fill: 'white',  fontSize: 12,  top : 0, left: 0,  fontFamily: "dinot-regular",  selectable: false,
-          originX: 'left', originY: 'top'
-        };
-
-      this.autoDeltaTempTime = Text.create('-0.15ºC, +5.0s', properties);
-
-      properties = {
-          fill: 'white',  fontSize: 12,  top : 15,  left: 0,  fontFamily: "dinot-bold",  selectable: false,
-          originX: 'left', originY: 'top',
-        };
-
-      this.autoDeltaStartCycle = Text.create('Start Cycle: 5', properties);
-
-      groupMembers = [this.autoDeltaTempTime, this.autoDeltaStartCycle];
-      properties = {
-        originX: 'left', originY: 'top', top: 338, left: 24,  visible: false
-      };
-      this.deltaGroup = Group.create(groupMembers, properties);
+      this.deltaSymbol = new deltaSymbol();
+      this.deltaGroup = new deltaGroup(this);
     };
 
     this.initNumberText = function() {
 
-      var properties = {
-          fill: 'white',  fontSize: 12,  top : 7,  left: -1,  fontFamily: "dinot-bold",  selectable: false,
-          originX: 'left', originY: 'top'
-        };
-      this.numberingTextCurrent = Text.create('wow', properties);
-
-      properties = {
-          fill: 'white',  fontSize: 12,  top : 7,  fontFamily: "dinot",  selectable: false,
-          originX: 'left', originY: 'top'
-        };
-
-      this.numberingTextTotal = Text.create('wow', properties);
-
+      this.numberingTextCurrent = new numberingText('current');
+      this.numberingTextTotal = new numberingText('Total'); // current/total
     };
 
     this.addBorderRight = function() {
 
-      var properties = {
-          stroke: '#ff9f00',  left: (this.myWidth - 2), strokeWidth: 1, selectable: false,
-          originX: 'left', originY: 'top'
-        };
-
-      var cordinates = [-2, 42, -2, 362];
-
-      this.borderRight = Line.create(cordinates, properties);
-
+      this.borderRight = new borderRight(this);
       return this;
     };
 

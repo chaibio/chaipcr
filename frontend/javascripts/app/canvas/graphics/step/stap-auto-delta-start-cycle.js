@@ -16,26 +16,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-angular.module('canvasApp').factory('stageNameGroup', [
-  'Group',
-  'stageCaption',
-  'stageName',
-  function(Group, stageCaption, stageName) {
-    return function(step) {
 
-      var editStageStatus = step.parent.editStageStatus;
-      var addUp = (editStageStatus === true) ? 26 : 1;
-      var moved = (editStageStatus === true) ? "right": false;
+angular.module('canvasApp').factory('autoDeltaStartCycle', [
+  'Text',
+  function(Text) {
+    return function() {
+      var properties = {
+          fill: 'white',  fontSize: 12,  top : 15,  left: 0,  fontFamily: "dinot-bold",  selectable: false,
+          originX: 'left', originY: 'top',
+        };
 
-      step.stageCaption = new stageCaption();
-      step.stageName = new stageName();
-
-      properties = {
-        originX: "left", originY: "top", selectable: true, top : 8, left: addUp, moved: moved
-      };
-
-      return new Group.create([step.stageCaption, step.stageName], properties);
+      return Text.create('Start Cycle: 5', properties);
     };
   }
 ]);

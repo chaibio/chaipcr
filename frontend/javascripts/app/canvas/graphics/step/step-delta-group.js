@@ -16,26 +16,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-angular.module('canvasApp').factory('stageNameGroup', [
-  'Group',
-  'stageCaption',
-  'stageName',
-  function(Group, stageCaption, stageName) {
-    return function(step) {
 
-      var editStageStatus = step.parent.editStageStatus;
-      var addUp = (editStageStatus === true) ? 26 : 1;
-      var moved = (editStageStatus === true) ? "right": false;
+ angular.module('canvasApp').factory('deltaGroup', [
+   'Group',
+   'autoDeltaTempTime',
+   'autoDeltaStartCycle',
+   function(Group, autoDeltaTempTime, autoDeltaStartCycle) {
+     return function(step) {
 
-      step.stageCaption = new stageCaption();
-      step.stageName = new stageName();
+       step.autoDeltaTempTime = new autoDeltaTempTime();
+       step.autoDeltaStartCycle = new autoDeltaStartCycle();
 
-      properties = {
-        originX: "left", originY: "top", selectable: true, top : 8, left: addUp, moved: moved
-      };
-
-      return new Group.create([step.stageCaption, step.stageName], properties);
-    };
-  }
-]);
+       var properties = {
+         originX: 'left', originY: 'top', top: 338, left: 24,  visible: false
+       };
+       var groupMembers = [step.autoDeltaTempTime, step.autoDeltaStartCycle];
+       return Group.create(groupMembers, properties);
+     };
+   }
+ ]);
