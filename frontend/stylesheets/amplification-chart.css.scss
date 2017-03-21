@@ -180,14 +180,15 @@ label{
 
   .chart-section {
     display: inline-block;
-    padding-right: 20px;
-    padding-left: 20px;
+    //padding-right: 20px;
+    //padding-left: 20px;
     width: 65%;
     vertical-align: top;
     $item_switch_gap: 70px;
     .subheader-switches {
       margin-top: 20px;
-      margin-left: -($item_switch_gap);
+      margin-left: -50px;
+			margin-right: 20px;
       .item-switch {
         display: inline-block;
         margin-left: $item_switch_gap;
@@ -295,6 +296,7 @@ label{
       width: 100%;
       padding-right: 20px;
       height: 300px;
+			margin-left: -20px;
 
     }
     .chart-legend {
