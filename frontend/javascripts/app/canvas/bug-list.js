@@ -17,4 +17,3 @@
  * limitations under the License.
  */
 // 1) Reload on error could be done with $state.reload , try it with writing a new controller.
-// 2) restriction on editing should be extended to failed and in progress experiments too.
