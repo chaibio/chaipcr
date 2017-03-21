@@ -31,8 +31,12 @@ angular.module("canvasApp").service('stepGraphics', [
   'deltaGroup',
   'numberingText',
   'borderRight',
+  'rampSpeedGroup',
+  'hitPoint',
+  'stepRect',
+  'stepGroup',
   function(dots, Line, Group, Circle, Text, Rectangle, stepName, stepFooter, closeGroup, deltaSymbol,
-    deltaGroup, numberingText, borderRight) {
+    deltaGroup, numberingText, borderRight, rampSpeedGroup, hitPoint, stepRect, stepGroup) {
 
     this.addName = function() {
 
@@ -104,57 +108,15 @@ angular.module("canvasApp").service('stepGraphics', [
 
     this.rampSpeed = function() {
 
-      this.rampSpeedNumber = this.model.ramp.rate;
-      var properties = {
-          fill: 'black',  fontSize: 12, fontFamily: "dinot",  originX: 'left',  originY: 'top'
-        };
-
-      var dataString = String(this.rampSpeedNumber)+ "º C/s";
-      var cordinates = [];
-      var groupMembers = [];
-      this.rampSpeedText = Text.create(dataString, properties);
-
-      properties = {
-          stroke: "#ffde00",  strokeWidth: 2, originX: 'left',  originY: 'top', top: 13,  left: 0
-        };
-
-      cordinates = [0, 0, this.rampSpeedText.width, 0];
-
-      this.underLine = Line.create(cordinates, properties);
-
-      properties = {
-          selectable: true, hasControls: true,  originX: 'left',  originY: 'top',
-          top : 0,  left: this.left + 5, evented: false
-        };
-      groupMembers = [this.rampSpeedText, this.underLine];
-
-      this.rampSpeedGroup = Group.create(groupMembers, properties);
-
+      this.rampSpeedGroup = new rampSpeedGroup(this);
       return this;
     };
 
     this.stepComponents = function() {
 
-      var properties = {
-        width: 10, height: 30, fill: '', left: this.left + 60, top: 335, selectable: false, name: "hitPoint",
-        originX: 'left', originY: 'top',
-      };
-      var groupMembers = [];
-      this.hitPoint = Rectangle.create(properties);
-
-      properties = {
-          fill: '#FFB300',  width: this.myWidth,  height: 363,  selectable: false,  name: "step", me: this
-        };
-      this.stepRect = Rectangle.create(properties);
-
-      groupMembers = [this.stepRect, this.numberingTextCurrent, this.numberingTextTotal, this.stepName, this.deltaSymbol,
-        this.deltaGroup, this.borderRight];
-      properties = {
-          left: this.left || 33,  top: 28,  selectable: false,  hasControls: false,
-          hasBoarders: false, name: "stepGroup",  me: this, originX: 'left', originY: 'top'
-        };
-
-      this.stepGroup = Group.create(groupMembers, properties);
+      this.hitPoint = new hitPoint(this);
+      this.stepRect = new stepRect(this);
+      this.stepGroup = new stepGroup(this);
     };
 
     return this;
