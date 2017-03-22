@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170215075706) do
+ActiveRecord::Schema.define(version: 20170322051101) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -36,6 +36,17 @@ ActiveRecord::Schema.define(version: 20170215075706) do
   end
 
   add_index "amplification_data", ["experiment_id", "stage_id", "cycle_num", "well_num", "channel"], name: "index_amplification_data_by_exp_chan_stage_cycle_well_channel", unique: true, using: :btree
+
+  create_table "amplification_options", force: true do |t|
+    t.integer "experiment_definition_id"
+    t.string  "cq_method"
+    t.integer "min_fluorescence"
+    t.integer "min_reliable_cycle"
+    t.integer "min_d1"
+    t.integer "min_d2"
+    t.integer "baseline_cycle_min"
+    t.integer "baseline_cycle_max"
+  end
 
   create_table "cached_analyze_data", force: true do |t|
     t.integer "experiment_id"

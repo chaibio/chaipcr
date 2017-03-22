@@ -18,7 +18,8 @@
 #
 class ExperimentDefinition < ActiveRecord::Base
   has_one :protocol, dependent: :destroy
-
+  has_one :amplification_option, dependent: :destroy
+  
   TYPE_USER_DEFINED = "user"
   TYPE_DIAGNOSTIC  = "diagnostic"
   TYPE_CALIBRATION  = "calibration"
