@@ -31,7 +31,8 @@ class AmplificationOption < ActiveRecord::Base
   end
   
   validate :validate
-  
+  before_save :before_save
+    
   def cq_method
     val = read_attribute(:cq_method)
     (val.blank?)? CQ_METHOD_CY0 : val
@@ -79,6 +80,10 @@ class AmplificationOption < ActiveRecord::Base
     "cp='#{cq_method}',min_fluomax=#{min_fluorescence},min_D1max=#{min_d1},min_D2max=#{min_d2},min_reliable_cyc=#{min_reliable_cycle}#{",baseline_cyc_bounds=c("+baseline_cycle_min.to_s+","+baseline_cycle_max.to_s+")" if !baseline_cycle_min.nil?}"
   end
   
+  def changed?
+    super || @save_changed
+  end
+  
   protected
   
   def validate
@@ -86,5 +91,9 @@ class AmplificationOption < ActiveRecord::Base
        (!baseline_cycle_min.blank? && baseline_cycle_max.blank?)
        errors.add(:baseline_cycle_bounds, "Both min and max cycles have to be defined")
     end
+  end
+  
+  def before_save
+    @save_changed = self.new_record? || self.changed?
   end
 end

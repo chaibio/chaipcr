@@ -45,15 +45,15 @@ describe "Amplification Option API" do
       json["amplification_option"]["min_fluorescence"].should == 123
       json["amplification_option"]["baseline_cycle_bounds"].should == [1,5]
       
-      params = {amplification_option: {baseline_cycle_bounds: nil}} 
-    
+      params = {amplification_option: {min_fluorescence: nil}}
       put "/experiments/#{@experiment.id}/amplification_option", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       expect(response).to be_success            # test for the 200 status-code
       json = JSON.parse(response.body)
-      json["amplification_option"]["min_fluorescence"].should == 123
-      json["amplification_option"]["baseline_cycle_bounds"].should be_nil
+      json["amplification_option"]["min_fluorescence"].should == AmplificationOption.new.min_fluorescence
+      json["amplification_option"]["baseline_cycle_bounds"].should == [1,5]
       
-      params = {amplification_option: {min_fluorescence: nil}}
+      params = {amplification_option: {baseline_cycle_bounds: nil}} 
+    
       put "/experiments/#{@experiment.id}/amplification_option", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
       expect(response).to be_success            # test for the 200 status-code
       json = JSON.parse(response.body)

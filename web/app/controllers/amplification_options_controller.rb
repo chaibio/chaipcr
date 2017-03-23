@@ -57,16 +57,16 @@ class AmplificationOptionsController < ApplicationController
   def update
     @amplification_option = @experiment.experiment_definition.amplification_option
     if @amplification_option
-      @amplification_option.baseline_cycle_bounds = params[:amplification_option][:baseline_cycle_bounds]
+      @amplification_option.baseline_cycle_bounds = params[:amplification_option][:baseline_cycle_bounds] if params[:amplification_option].key?("baseline_cycle_bounds")
       ret  = @amplification_option.update_attributes(amplification_option_params)
     else
       @amplification_option = AmplificationOption.new(amplification_option_params)
-      @amplification_option.baseline_cycle_bounds = params[:amplification_option][:baseline_cycle_bounds]
+      @amplification_option.baseline_cycle_bounds = params[:amplification_option][:baseline_cycle_bounds] if params[:amplification_option].key?("baseline_cycle_bounds")
       @amplification_option.experiment_definition_id = @experiment.experiment_definition.id
       ret = @amplification_option.save
     end
     
-    if ret
+    if ret && @amplification_option.changed?
       #clear cache
       AmplificationCurve.delete_all(:experiment_id => @experiment.id)
       AmplificationDatum.delete_all(:experiment_id => @experiment.id)
