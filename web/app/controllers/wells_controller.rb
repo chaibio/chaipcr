@@ -49,7 +49,7 @@ class WellsController < ApplicationController
     @wells = Array.new
     params[:wells].each do |params_per_well| 
       well = Well.create_or_update(well_params(params_per_well))
-      @wells << well if well
+      @wells << well if well && well.valid?
     end
     respond_to do |format|
       format.json { render "index", :status => (!@wells.blank?)? :ok :  :unprocessable_entity}
@@ -62,7 +62,7 @@ class WellsController < ApplicationController
   def update
     @well = Well.create_or_update(well_params(params[:well]))
     respond_to do |format|
-      format.json { render "show", :status => (!@well.nil?)? :ok :  :unprocessable_entity}
+      format.json { render "show", :status => (@well && @well.valid?)? :ok :  :unprocessable_entity}
     end
   end
   
