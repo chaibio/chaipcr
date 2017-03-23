@@ -673,7 +673,7 @@ class ExperimentsController < ApplicationController
     connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
     begin
-      results = connection.eval("tryCatchError(process_mc, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, #{stage_id}, #{calibrate_info(calibration_id)}, #{"qt_prob=0.1, max_normd_qtv=0.9" if experiment.experiment_definition.guid == "thermal_consistency"})")
+      results = connection.eval("tryCatchError(process_mc, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, #{stage_id}, #{calibrate_info(calibration_id)} #{", qt_prob=0.1, max_normd_qtv=0.9" if experiment.experiment_definition.guid == "thermal_consistency"})")
     rescue  => e
       logger.error("Rserve error: #{e}")
       kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
