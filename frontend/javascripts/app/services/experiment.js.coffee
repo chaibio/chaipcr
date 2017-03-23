@@ -66,6 +66,15 @@ window.ChaiBioTech.ngApp
     self.analyze = (id) ->
       $http.get("/experiments/#{id}/analyze")
 
+    self.getWells = (id) ->
+      $http.get("/experiments/" + id + "/wells")
+
+    self.updateWell = (id,well_num,well_data) ->
+      $http.put "/experiments/" + id + "/wells/" + well_num, well : well_data
+
+    self.getAmplificationOptions = (id) ->
+      $http.get("/experiments/" + id + "/amplification_option")
+
     tempLogsQues = []
     self.getTemperatureData = (expId, opts = {}) ->
 

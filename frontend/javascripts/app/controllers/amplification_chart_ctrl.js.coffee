@@ -50,14 +50,15 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.ampli_zoom = 0
       $scope.showOptions = true
       $scope.isError = false
-      $scope.method = {name: 'cy0'}
-      $scope.minFl = {name: 'Min. Flouresence', desciption:'This is a test description'}
-      $scope.minCq = {name: 'Min. Cq', desciption:'This is a test description'}
-      $scope.minDf = {name: 'Min. dF/dC', desciption:'This is a test description'}
-      $scope.minD2f = {name: 'Min. d2F/dC', desciption:'This is a test description'}
+      $scope.method = {name: 'Cy0'}
+      $scope.minFl = {name: 'Min. Flouresence', desciption:'This is a test description', value:10}
+      $scope.minCq = {name: 'Min. Cq', desciption:'This is a test description', value:10}
+      $scope.minDf = {name: 'Min. dF/dC', desciption:'This is a test description', value:10}
+      $scope.minD2f = {name: 'Min. d2F/dC', desciption:'This is a test description', value:10}
       $scope.baseline_sub = 'auto'
       $scope.hoverName = ''
       $scope.hoverDescription = ''
+      $scope.samples = []
 
       modal = document.getElementById('myModal')
       span = document.getElementsByClassName("close")[0]
@@ -86,6 +87,22 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         $scope.hoverName = ''
         $scope.hoverDescription = ''
 
+      Experiment.getAmplificationOptions($stateParams.id).then (resp) ->
+        console.log(resp.data)
+        $scope.method.name = resp.data.amplification_option.cq_method
+        $scope.minFl.value = resp.data.amplification_option.min_fluorescence
+        $scope.minCq.value = resp.data.amplification_option.min_reliable_cycle
+        $scope.minDf.value = resp.data.amplification_option.min_d1
+        $scope.minD2f.value = resp.data.amplification_option.min_d2
+
+      $scope.setOptions = ->
+
+      $scope.updateSampleName = (well_num, name) ->
+        Experiment.updateWell($stateParams.id, well_num + 1, {'sample_name':name})
+
+      Experiment.getWells($stateParams.id).then (resp) ->
+        for i in [0...16]
+          $scope.samples[i] = resp.data[i].well.sample_name
 
       Experiment.get(id: $stateParams.id).then (data) ->
         maxCycle = helper.getMaxExperimentCycle(data.experiment)

@@ -51,7 +51,18 @@
 		margin-right: 15px;
     margin-top: 10px;
     padding: 6px 0;
+		//position: absolute;
+		top: 530px;
   }
+
+	.button-cancel{
+		left: 650px;
+	}
+
+	.button-apply{
+		left: 850px;
+	}
+
 
 	.button:hover{
 		background: #8FC742;
@@ -296,7 +307,7 @@ label{
       width: 100%;
       padding-right: 20px;
       height: 300px;
-			margin-left: -20px;
+			margin-left: -13px;
 
     }
     .chart-legend {
@@ -354,6 +365,10 @@ label{
     margin-top: -20px;
     margin-bottom: -4px;
     width: 35%;
+		input{
+			outline: none;
+			border: none;
+		}
     table {
       width: 100%;
       // box-shadow: -1px 0px 1px $lightgray;

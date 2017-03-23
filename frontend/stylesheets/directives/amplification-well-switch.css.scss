@@ -22,7 +22,7 @@
     }
     .circle {
       $size: 90px;
-      $padding_top: 15px;
+      $padding_top: 10px;
       $border_width: 3px;
       border-width: $border_width;
       //border-radius: 100px;
@@ -32,7 +32,7 @@
       line-height: 1.5;
       //margin: 5px;
       padding-top: $padding_top;
-      height: 80px;
+      height: 70px;
       //width: $size;
       opacity: 0.5;
 			//border: 1px solid grey;
@@ -47,6 +47,7 @@
 
       .ct {
         position: relative;
+				font-size: 11px;
 
         .dot {
           $size: 5px;
