@@ -81,7 +81,7 @@
 								$scope.notes[i] = resp.data[i].well.notes;
 							}
 							//for(var i = 8; i<16; i++){
-								//$scope.notes_B[i-8] = resp.data[i].well.notes;
+							//$scope.notes_B[i-8] = resp.data[i].well.notes;
 							//}
 						});
 					}
@@ -116,6 +116,15 @@
 					});
 				}
 
+				$scope.cancel = function() {
+					$scope.modalInstance.close();
+					Experiment.getWells($scope.experimentId).then(function(resp){
+						for(var i = 0; i<16; i++){
+							$scope.notes[i] = resp.data[i].well.notes;
+						}
+					});
+				};
+
 				$scope.updateWellA = function(index,x){
 					document.activeElement.blur();
 					Experiment.updateWell($scope.experimentId,index,{'sample_name':x}).then(function(resp){
@@ -133,7 +142,7 @@
 				}
 
 				function openInstance(){
-					var modalInstance = $uibModal.open({
+					 $scope.modalInstance = $uibModal.open({
 						scope: $scope,
 						templateUrl: '/dynexp/pika_test/intro.html',
 						backdrop: false

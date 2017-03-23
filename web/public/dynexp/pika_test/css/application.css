@@ -62,7 +62,20 @@ input{
 	width: 200px;
 }
 
+.notes-box{
+	padding:15px 65px;
+	border:1px solid;
+	margin-top: 40%;
+}
 
+.notes-textarea{
+	resize: none;
+	width: 90%;
+	height: 60px;
+	outline: none;
+	font-family: 'Dinot';
+	font-weight: 500;
+}
 
 .empty-input{
 	border-bottom: 2px solid lightgray;
