@@ -75,6 +75,10 @@ class AmplificationOption < ActiveRecord::Base
     end
   end
   
+  def to_rserve_params
+    "cp='#{cq_method}',min_fluomax=#{min_fluorescence},min_D1max=#{min_d1},min_D2max=#{min_d2},min_reliable_cyc=#{min_reliable_cycle}#{",baseline_cyc_bounds=c("+baseline_cycle_min.to_s+","+baseline_cycle_max.to_s+")" if !baseline_cycle_min.nil?}"
+  end
+  
   protected
   
   def validate

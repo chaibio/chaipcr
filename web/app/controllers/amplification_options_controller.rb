@@ -65,6 +65,13 @@ class AmplificationOptionsController < ApplicationController
       @amplification_option.experiment_definition_id = @experiment.experiment_definition.id
       ret = @amplification_option.save
     end
+    
+    if ret
+      #clear cache
+      AmplificationCurve.delete_all(:experiment_id => @experiment.id)
+      AmplificationDatum.delete_all(:experiment_id => @experiment.id)
+    end
+      
     respond_to do |format|
       format.json { render "show", :status => (ret)? :ok : :unprocessable_entity}
     end

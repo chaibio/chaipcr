@@ -605,7 +605,7 @@ class ExperimentsController < ApplicationController
     connection = Rserve::Connection.new(:timeout=>RSERVE_TIMEOUT)
     start_time = Time.now
     begin
-      results = connection.eval("tryCatchError(get_amplification_data, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, list(#{sub_type}_id=#{sub_id}), #{calibrate_info(calibration_id)})")
+      results = connection.eval("tryCatchError(get_amplification_data, '#{config[Rails.env]["username"]}', '#{(config[Rails.env]["password"])? config[Rails.env]["password"] : ""}', '#{(config[Rails.env]["host"])? config[Rails.env]["host"] : "localhost"}', #{(config[Rails.env]["port"])? config[Rails.env]["port"] : 3306}, '#{config[Rails.env]["database"]}', #{experiment.id}, list(#{sub_type}_id=#{sub_id}), #{calibrate_info(calibration_id)} #{","+experiment.experiment_definition.amplification_option.to_rserve_params if !experiment.experiment_definition.amplification_option.nil?})")
     rescue  => e
       logger.error("Rserve error: #{e}")
       kill_process("Rserve") if e.is_a? Rserve::Talk::SocketTimeoutError
