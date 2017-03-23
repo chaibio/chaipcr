@@ -3,7 +3,7 @@
   .choose-chart {
 
     margin-top: 5px;
-    margin-bottom: 10px;
+    //margin-bottom: 10px;
     width: 100%;
 
     .choose-chart-heading {
@@ -17,7 +17,7 @@
     .number {
       text-align: center;
       vertical-align: middle;
-      padding: 5px;
+      padding: 10px;
       color: gray;
     }
     .circle {
@@ -32,7 +32,7 @@
       line-height: 1.5;
       //margin: 5px;
       padding-top: $padding_top;
-      height: 70px;
+      height: 80px;
       //width: $size;
       opacity: 0.5;
 			//border: 1px solid grey;
@@ -102,7 +102,7 @@
       margin: 0px;
       //padding: 1px;
       float: left;
-      width: 12%;
+      width: 12.5%;
       //height: 80px;
       font-size: 4em;
       text-align: center;

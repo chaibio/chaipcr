@@ -51,13 +51,13 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.showOptions = true
       $scope.isError = false
       $scope.method = {name: 'Cy0'}
-      $scope.minFl = {name: 'Min. Flouresence', desciption:'This is a test description', value:10}
-      $scope.minCq = {name: 'Min. Cq', desciption:'This is a test description', value:10}
-      $scope.minDf = {name: 'Min. dF/dC', desciption:'This is a test description', value:10}
-      $scope.minD2f = {name: 'Min. d2F/dC', desciption:'This is a test description', value:10}
+      $scope.minFl = {name: 'Min. Flouresence', desciption:'This is a test description', value:null}
+      $scope.minCq = {name: 'Min. Cq', desciption:'This is a test description', value:null}
+      $scope.minDf = {name: 'Min. dF/dC', desciption:'This is a test description', value:null}
+      $scope.minD2f = {name: 'Min. d2F/dC', desciption:'This is a test description', value:null}
       $scope.baseline_sub = 'auto'
-      $scope.hoverName = ''
-      $scope.hoverDescription = ''
+      $scope.hoverName = 'Min. Flouresence'
+      $scope.hoverDescription = 'This is a test description'
       $scope.samples = []
 
       modal = document.getElementById('myModal')
@@ -82,10 +82,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.hover = (model) ->
         $scope.hoverName = model.name
         $scope.hoverDescription = model.desciption
+        $scope.hoverOn = true
 
       $scope.hoverLeave = ->
-        $scope.hoverName = ''
-        $scope.hoverDescription = ''
+        $scope.hoverOn = false
 
       Experiment.getAmplificationOptions($stateParams.id).then (resp) ->
         console.log(resp.data)

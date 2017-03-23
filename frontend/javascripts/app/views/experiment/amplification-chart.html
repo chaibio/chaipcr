@@ -107,8 +107,8 @@ limitations under the License.
 								</label>
 							</div>
 							<br>
-							<h4>{{hoverName}}</h4>
-							<p>{{hoverDescription}}</p>
+							<h4 ng-class="{'hover-desc': !hoverOn}">{{hoverName}}</h4>
+							<p ng-class="{'hover-desc': !hoverOn}">{{hoverDescription}}</p>
 							<button class="button button-cancel" ng-click="close()">CANCEL</button>
 							<button class="button button-apply" ng-click="check()">APPLY</button>
 						</div>
