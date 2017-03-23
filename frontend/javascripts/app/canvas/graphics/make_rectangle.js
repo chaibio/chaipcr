@@ -17,11 +17,11 @@
  * limitations under the License.
  */
 
-angular.module('canvasApp').service('Group', [
+angular.module('canvasApp').service('Rectangle', [
   function() {
     return {
-      create: function(contentArray, properties) {
-        return new fabric.Group(contentArray, properties);
+      create: function(properties) {
+        return new fabric.Rect(properties);
       }
     };
   }
