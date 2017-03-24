@@ -253,7 +253,7 @@ InterfaceState getInterfaceState(const std::string &interfaceName)
     return state;
 }
 
-void removeLease(const std::string &interfaceName)
+void removeLeases(const std::string &interfaceName)
 {
     std::remove(("/var/lib/dhcp/dhclient." + interfaceName + ".leases").c_str());
 }
@@ -284,6 +284,31 @@ std::time_t dhcpTimeout()
     }
 
     return timeout;
+}
+
+std::string findWifiInterface()
+{
+    for (const std::string &interface: NetworkInterfaces::getAllInterfaces())
+    {
+        std::stringstream command, output;
+        command << "iwconfig " << interface;
+
+        try
+        {
+            Util::watchProcess(command.str(), [&output](const char *buffer, std::size_t size){ output.write(buffer, size); });
+        }
+        catch (...)
+        {
+            continue;
+        }
+
+        std::string str = output.str();
+
+        if (str.find("no wireless extensions") == std::string::npos)
+            return interface;
+    }
+
+    return std::string();
 }
 
 }
@@ -326,7 +351,8 @@ std::string getInterfaceGateway(const std::string &interface)
 {
     std::stringstream output;
 
-    try {
+    try
+    {
         Util::watchProcess("route -n | grep " + interface, [&output](const char *buffer, std::size_t size){ output.write(buffer, size); });
     }
     catch (const ProcessError &/*ex*/) { //Ignoring process errors because mostly they mean that the interface is not connected thus does not have a gateway address

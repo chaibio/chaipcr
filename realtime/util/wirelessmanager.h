@@ -74,7 +74,7 @@ public:
 
     std::string getCurrentSsid() const;
 
-    std::vector<ScanResult> scanResult() const;
+    std::vector<ScanResult> scanResult();
 
     inline ConnectionStatus connectionStatus() const noexcept { return _connectionStatus; }
 
@@ -88,9 +88,9 @@ private:
     void ifup();
     void ifdown();
 
-    void checkInterfaceStatus(); //perform scan and check if it is connected
-    void checkConnection();
-    bool scan(const std::string &interface);
+    void checkInterfaceStatus();
+    void scan(const std::string &interface);
+    void checkConnection(const std::string &interface);
 
 private:
     enum OperationState
@@ -118,6 +118,8 @@ private:
     std::atomic<std::time_t> _connectionTimeout;
 
     std::vector<ScanResult> _scanResult;
+    std::time_t _scanTime;
+    std::atomic<bool> _scanScheduleState;
     mutable Poco::RWLock _scanResultMutex;
 };
 

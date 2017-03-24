@@ -75,9 +75,11 @@ namespace NetworkInterfaces
 
     InterfaceState getInterfaceState(const std::string &interfaceName);
 
-    void removeLease(const std::string &interfaceName);
+    void removeLeases(const std::string &interfaceName);
 
     std::time_t dhcpTimeout();
+
+    std::string findWifiInterface();
 }
 
 #endif // NETWORKCONFIGURATOR_H
