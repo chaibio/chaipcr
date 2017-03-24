@@ -239,7 +239,7 @@ void WirelessManager::checkInterfaceStatus()
             checkConnection(interface);
         }
 
-        sleep(3);
+        sleep(!interface.empty() ? 3 : 10);
     }
 
     _interfaceStatusThreadStatus = Idle;
