@@ -62,7 +62,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
         if(that.userSettings.wifiSwitchOn /*&& that.wirelessError === false*/) {
           that.lanLookup();
         }
-      }, 3000);
+      }, 2000);
     };
 
     this.lanLookup = function() {
