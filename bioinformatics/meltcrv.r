@@ -172,7 +172,7 @@ get_mc_calib <- function(
 mc_tm_pw <- function(
     mt_pw, 
     qt_prob=0.64, # quantile probability point for normalized -df/dT (range 0-1)
-    max_normd_qtv=0.60, # maximum normalized -df/dT values (range 0-1) at the quantile probablity point
+    max_normd_qtv=0.601, # maximum normalized -df/dT values (range 0-1) at the quantile probablity point
     top_N=4, # top number of Tm peaks to report
     min_frac_report=0.1 # minimum area fraction of the Tm peak to be reported in regards to the largest real Tm peak
     ) { # per well
@@ -195,16 +195,11 @@ mc_tm_pw <- function(
     dfdT_normd <- (mc[,'-df/dT'] - range_dfdT[1]) / (range_dfdT[2] - range_dfdT[1])
     # range_dfdT[1] == min(mc[,'-df/dT']). range_dfdT[2] == max(mc[,'-df/dT']).
     
-    if (dim(raw_tm)[1] == 0) {
-        larger_normd_qtv_of_two_sides <- max_normd_qtv + 1 # dummy value simply to make TRUE `larger_normd_qtv_of_two_sides > max_normd_qtv`
-    } else {
-        larger_normd_qtv_of_two_sides <- max(sapply(
-            list(1:summit_pos, summit_pos:length(dfdT_normd)),
-            function(idc) quantile(dfdT_normd[idc], qt_prob)
-        ))
-    }
-    
-    if (larger_normd_qtv_of_two_sides > max_normd_qtv) {
+    larger_normd_qtv_of_two_sides <- max(sapply(
+        list(1:summit_pos, summit_pos:length(dfdT_normd)),
+        function(idc) quantile(dfdT_normd[idc], qt_prob)
+    ))
+    if (dim(raw_tm)[1] == 0 || larger_normd_qtv_of_two_sides > max_normd_qtv) {
         tm <- raw_tm[FALSE,]
         tm_reported_keywords <- c('No', '>')
     } else {
