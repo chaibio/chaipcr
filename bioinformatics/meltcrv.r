@@ -195,11 +195,16 @@ mc_tm_pw <- function(
     dfdT_normd <- (mc[,'-df/dT'] - range_dfdT[1]) / (range_dfdT[2] - range_dfdT[1])
     # range_dfdT[1] == min(mc[,'-df/dT']). range_dfdT[2] == max(mc[,'-df/dT']).
     
-    larger_normd_qtv_of_two_sides <- max(sapply(
-        list(1:summit_pos, summit_pos:length(dfdT_normd)),
-        function(idc) quantile(dfdT_normd[idc], qt_prob)
-    ))
-    if (dim(raw_tm)[1] == 0 || larger_normd_qtv_of_two_sides > max_normd_qtv) {
+    if (dim(raw_tm)[1] == 0) {
+        larger_normd_qtv_of_two_sides <- max_normd_qtv + 1 # dummy value simply to make TRUE `larger_normd_qtv_of_two_sides > max_normd_qtv`
+    } else {
+        larger_normd_qtv_of_two_sides <- max(sapply(
+            list(1:summit_pos, summit_pos:length(dfdT_normd)),
+            function(idc) quantile(dfdT_normd[idc], qt_prob)
+        ))
+    }
+    
+    if (larger_normd_qtv_of_two_sides > max_normd_qtv) {
         tm <- raw_tm[FALSE,]
         tm_reported_keywords <- c('No', '>')
     } else {
