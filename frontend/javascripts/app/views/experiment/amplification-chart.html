@@ -77,13 +77,13 @@ limitations under the License.
 								<label class="text-right params-label" ng-model="minFl" ng-mouseover="hover(minFl)" ng-mouseleave="hoverLeave()">
 									<span>Min. Flouresence</span> <input type="text" style="text-align:right" numbers-only ng-model="minFl.value"  placeholder="XX" /></label><br/>
 									<label class="text-right params-label" ng-mouseover="hover(minCq)" ng-mouseleave="hoverLeave()">
-										<span>Min Cq</span> <input style="text-align:right" type="text" ng-model="minCq.value" placeholder="XX" />
+										<span>Min Cq</span> <input style="text-align:right" type="text" numbers-only ng-model="minCq.value" placeholder="XX" />
 									</label><br/>
 									<label class="text-right params-label">
-										<span>Min dF/dc</span> <input style="text-align:right" type="text" ng-model="minDf.value" placeholder="XX" />
+										<span>Min dF/dc</span> <input style="text-align:right" type="text" numbers-only ng-model="minDf.value" placeholder="XX" />
 									</label><br/>
 									<label class="text-right params-label">
-										<span>Min d2F/dc</span> <input style="text-align:right" type="text" ng-model="minD2f.value" placeholder="XX" />
+										<span>Min d2F/dc</span> <input style="text-align:right" type="text" numbers-only ng-model="minD2f.value" placeholder="XX" />
 									</label>
 								</div>
 							</div>
@@ -99,11 +99,11 @@ limitations under the License.
 									<label class="radio-pcr" for="cycles"></label>
 									<span>By Cycles</span>
 								</label><br/>
-								<label class="text-right ct-label">
-									<input type="text" placeholder="XX" />
-								</label> <span> to </span>
-								<label class="text-right by-label">
-									<input type="text" placeholder="XX" />
+								<label ng-class="{'hover-desc': baseline_sub=='auto'}" class="text-right ct-label">
+									<input type="text" ng-class="{'hover-desc': baseline_sub=='auto'}" numbers-only ng-model="cyclesFrom" placeholder="XX" />
+								</label> <span ng-class="{'hover-desc': baseline_sub=='auto'}"> to </span>
+								<label ng-class="{'hover-desc': baseline_sub=='auto'}" class="text-right by-label">
+									<input type="text" ng-class="{'hover-desc': baseline_sub=='auto'}" numbers-only ng-model="cyclesTo" placeholder="XX" />
 								</label>
 							</div>
 							<br>
@@ -117,14 +117,17 @@ limitations under the License.
 						<div class="item-switch">
 							<switch ng-model="baseline_subtraction"></switch>
 							<label>BASELINE SUBTRACTION</label>
-							<label ng-click="openOptionsModal()">Test</label>
 						</div>
 						<div class="item-switch-channel" ng-show="is_dual_channel">
+							<label ng-click="openOptionsModal()">AMPLIFICATION SETTINGS</label>
 							<label>CHOOSE CHANNEL:</label> &nbsp;
 							<switch ng-model="channel_1"></switch>
 							<label>1</label>
 							<switch ng-model="channel_2"></switch>
 							<label style="padding-right:0px;">2</label>
+						</div>
+						<div class="item-switch-channel" ng-show="!is_dual_channel">
+							<label ng-click="openOptionsModal()">AMPLIFICATION SETTINGS</label>
 						</div>
 					</div>
 					<div style="margin-left:20px;">
@@ -169,7 +172,7 @@ limitations under the License.
 						<tbody>
 							<tr>
 								<th class="B1">Well</th>
-								<th class="B1">Name</th>
+								<th class="B1">Sample Name</th>
 								<th class="B1" ng-class="{'channel-1': color_by === 'channel'}">
 									<span ng-if="is_dual_channel">Cq Ch1</span>
 									<span ng-if="!is_dual_channel">Cq</span>
@@ -188,7 +191,7 @@ limitations under the License.
 										</span>
 									</span>
 								</td>
-								<td><input type="text" class="sample-input" placeholder="Enter Name Here" ng-blur="updateSampleName($index,samples[$index])" my-enter="updateSampleName($index,samples[$index])" ng-model="samples[$index]">
+								<td><input type="text" class="sample-input" ng-blur="updateSampleName($index,samples[$index])" my-enter="updateSampleName($index,samples[$index])" ng-model="samples[$index]">
 								</td>
 								<td class="B1">
 									<span ng-show="wellButtons['well_'+i].ct[0] > 0">

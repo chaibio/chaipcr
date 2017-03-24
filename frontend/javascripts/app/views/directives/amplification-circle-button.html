@@ -20,12 +20,12 @@
 	<hr ng-show="selected" ng-style="abc">
   <div class="ct ct-1" style="padding-top:10px;text-align:left">
     <span class="dot"></span>
-    <span class="text" ng-show="ct[0] > 0">{{labelUnit}}: <b>{{ ct[0] | round: 1}}</b></span>
+    <span class="text" ng-show="ct[0] > 0">{{labelUnit}}: <b style="font-family:dinot-Bold">{{ ct[0] | round: 1}}</b></span>
     <span class="text" ng-show="ct[0] === 0 || !(ct[0])">{{labelUnit}}</span>
   </div>
   <div class="ct ct-2" ng-show="is_dual_channel && buttonLabelsNum !== 1" style="text-align:left">
     <span class="dot"></span>
-    <span class="text" ng-show="ct[1] > 0">{{labelUnit}}: <b>{{ ct[1] | round: 1}}</b></span>
+    <span class="text" ng-show="ct[1] > 0">{{labelUnit}}: <b style="font-family:dinot-Bold">{{ ct[1] | round: 1}}</b></span>
     <span class="text" ng-show="ct[1] === 0 || !(ct[1])">{{labelUnit}}</span>
   </div>
   <br>

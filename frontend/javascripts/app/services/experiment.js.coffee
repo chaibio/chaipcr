@@ -75,6 +75,9 @@ window.ChaiBioTech.ngApp
     self.getAmplificationOptions = (id) ->
       $http.get("/experiments/" + id + "/amplification_option")
 
+    self.updateAmplificationOptions = (id,amplificationData) ->
+      $http.put "experiments/" + id + "/amplification_option/", amplification_option : amplificationData
+
     tempLogsQues = []
     self.getTemperatureData = (expId, opts = {}) ->
 
