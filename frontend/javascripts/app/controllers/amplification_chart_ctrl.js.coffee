@@ -51,11 +51,15 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.showOptions = true
       $scope.isError = false
       $scope.method = {name: 'Cy0'}
-      $scope.minFl = {name: 'Min. Flouresence', desciption:'This is a test description', value:null}
-      $scope.minCq = {name: 'Min. Cq', desciption:'This is a test description', value:null}
-      $scope.minDf = {name: 'Min. dF/dC', desciption:'This is a test description', value:null}
-      $scope.minD2f = {name: 'Min. d2F/dC', desciption:'This is a test description', value:null}
+      $scope.cy0 = {name:'Cy0', desciption:'A Cq calling method based on the max first derivative of the curve (recommended).'}
+      $scope.cpd2 = {name:'cpD2', desciption:'A Cq calling method based on the max second derivative of the curve.'}
+      $scope.minFl = {name: 'Min Flouresence', desciption:'The minimum fluorescence threshold for Cq calling. Cq values will not be called when the fluorescence is below this threshold.', value:null}
+      $scope.minCq = {name: 'Min Cycle', desciption:'The earliest cycle to use in Cq calling & baseline subtraction. Data for earlier cycles will be ignored.', value:null}
+      $scope.minDf = {name: 'Min 1st Derivative', desciption:'The threshold which the first derivative of the curve must exceed for a Cq to be called.', value:null}
+      $scope.minD2f = {name: 'Min 2nd Derivative', desciption:'The threshold which the second derivative of the curve must exceed for a Cq to be called.', value:null}
       $scope.baseline_sub = 'auto'
+      $scope.baseline_auto = {name:'Auto', desciption:'Automatically detect the baseline cycles.'}
+      $scope.baseline_manual = {name:'Manual', desciption:'Manually specify the baseline cycles.'}
       $scope.cyclesFrom = null
       $scope.cyclesTo = null
       $scope.hoverName = 'Min. Flouresence'
@@ -75,31 +79,57 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       $scope.close = ->
         modal.style.display = "none"
+        $scope.getAmplificationOptions()
 
       $scope.check = ->
-        if $scope.minCq.value
-          if $scope.minCq.value > 0
-            $scope.close()
-            if $scope.baseline_sub == 'auto'
-              $scope.baseline_cycle_bounds = null
-            else
-              $scope.baseline_cycle_bounds = [parseInt($scope.cyclesFrom), parseInt($scope.cyclesTo)]
-            Experiment.updateAmplificationOptions($stateParams.id,{'cq_method':$scope.method.name,'min_fluorescence': parseInt($scope.minFl.value), 'min_reliable_cycle': parseInt($scope.minCq.value), 'min_d1': parseInt($scope.minDf.value), 'min_d2': parseInt($scope.minD2f.value), 'baseline_cycle_bounds': $scope.baseline_cycle_bounds }).then (resp) ->
-              $scope.amplification_data = helper.paddData()
-              $scope.hasData = false
-              fetchFluorescenceData()
-          else
-            $scope.hoverName = 'Error'
-            $scope.hoverDescription = 'Min Cq should be greater than equal to 1'
-            $scope.hoverOn = true
-        else
+        $scope.errorCheck = false
+        if !$scope.minFl.value
+          $scope.hoverName = 'Error'
+          $scope.hoverDescription = 'Min Flourescence cannot be left empty'
+          $scope.hoverOn = true
+          $scope.errorCheck = true
+          $scope.errorFl = true
+        if !$scope.minCq.value
+          $scope.hoverName = 'Error'
+          $scope.hoverDescription = 'Min Cycles cannot be left empty'
+          $scope.hoverOn = true
+          $scope.errorCheck = true
+          $scope.errorCq = true
+        if $scope.minCq.value < 1 && $scope.minCq.value
+          $scope.hoverName = 'Error'
+          $scope.hoverDescription = 'Min Cycles should be greater than 0'
+          $scope.hoverOn = true
+          $scope.errorCheck = true
+          $scope.errorCq = true
+        if !$scope.minDf.value
+          $scope.hoverName = 'Error'
+          $scope.hoverDescription = 'Min 1st Derivative cannot be left empty'
+          $scope.hoverOn = true
+          $scope.errorCheck = true
+          $scope.errorDf = true
+        if !$scope.minD2f.value
+          $scope.hoverName = 'Error'
+          $scope.hoverDescription = 'Min 2nd Derivative cannot be left empty'
+          $scope.hoverOn = true
+          $scope.errorCheck = true
+          $scope.errorD2f = true
+        if $scope.baseline_sub != 'auto' && (!$scope.cyclesFrom || $scope.cyclesTo)
+          $scope.hoverName = 'Error'
+          $scope.hoverDescription = 'Range for baseline cycles cannot be left empty'
+          $scope.hoverOn = true
+          $scope.errorCheck = true
+
+        if !$scope.errorCheck
           if $scope.baseline_sub == 'auto'
             $scope.baseline_cycle_bounds = null
           else
-            $scope.baseline_cycle_bounds = [$scope.cyclesFrom, $scope.cyclesTo]
-          Experiment.updateAmplificationOptions($stateParams.id,{'amplification_option':{'cq_method':$scope.method.name,'min_fluorescence': $scope.minFl.value, 'min_reliable_cycle': $scope.minCq.value, 'min_d1': $scope.minDf.value, 'min_d2': $scope.minD2f.value, 'baseline_cycle_bounds': $scope.baseline_cycle_bounds }}).then (resp) ->
+            $scope.baseline_cycle_bounds = [parseInt($scope.cyclesFrom), parseInt($scope.cyclesTo)]
+          Experiment.updateAmplificationOptions($stateParams.id,{'cq_method':$scope.method.name,'min_fluorescence': parseInt($scope.minFl.value), 'min_reliable_cycle': parseInt($scope.minCq.value), 'min_d1': parseInt($scope.minDf.value), 'min_d2': parseInt($scope.minD2f.value), 'baseline_cycle_bounds': $scope.baseline_cycle_bounds }).then (resp) ->
             $scope.amplification_data = helper.paddData()
             $scope.hasData = false
+            for well_i in [0..15] by 1
+              $scope.wellButtons["well_#{well_i}"].ct = 0
+            $scope.close()
             fetchFluorescenceData()
 
       $scope.hover = (model) ->
@@ -110,26 +140,29 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.hoverLeave = ->
         $scope.hoverOn = false
 
-      Experiment.getAmplificationOptions($stateParams.id).then (resp) ->
-        console.log(resp.data)
-        $scope.method.name = resp.data.amplification_option.cq_method
-        $scope.minFl.value = resp.data.amplification_option.min_fluorescence
-        $scope.minCq.value = resp.data.amplification_option.min_reliable_cycle
-        $scope.minDf.value = resp.data.amplification_option.min_d1
-        $scope.minD2f.value = resp.data.amplification_option.min_d2
-        if resp.data.amplification_option.baseline_cycle_bounds is null
-          $scope.baseline_sub = 'auto'
-        else
-          $scope.baseline_sub = 'cycles'
+      $scope.getAmplificationOptions = ->
+        Experiment.getAmplificationOptions($stateParams.id).then (resp) ->
+          console.log(resp.data)
+          $scope.method.name = resp.data.amplification_option.cq_method
+          $scope.minFl.value = resp.data.amplification_option.min_fluorescence
+          $scope.minCq.value = resp.data.amplification_option.min_reliable_cycle
+          $scope.minDf.value = resp.data.amplification_option.min_d1
+          $scope.minD2f.value = resp.data.amplification_option.min_d2
+          if resp.data.amplification_option.baseline_cycle_bounds is null
+            $scope.baseline_sub = 'auto'
+          else
+            $scope.baseline_sub = 'cycles'
+            $scope.cyclesFrom = resp.data.amplification_option.baseline_cycle_bounds[0]
+            $scope.cyclesTo = resp.data.amplification_option.baseline_cycle_bounds[1]
 
-      $scope.setOptions = ->
+      $scope.getAmplificationOptions()
 
       $scope.updateSampleName = (well_num, name) ->
         Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','sample_name':name})
 
       Experiment.getWells($stateParams.id).then (resp) ->
         for i in [0...16]
-          $scope.samples[i] = resp.data[i].well.sample_name
+          $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name
 
       Experiment.get(id: $stateParams.id).then (data) ->
         maxCycle = helper.getMaxExperimentCycle(data.experiment)
