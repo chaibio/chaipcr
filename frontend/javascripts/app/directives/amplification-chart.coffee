@@ -73,7 +73,7 @@ window.App.directive 'amplificationChart', [
           if !$scope.data or !$scope.config or !$scope.show
             return $timeout(reinitChart, 500)
           dims = chart.getDimensions()
-          console.log dims
+          #console.log dims
           if dims.width <= 0 or dims.height <= 0 or !dims.width or !dims.height
             $timeout(reinitChart, 500)
 
