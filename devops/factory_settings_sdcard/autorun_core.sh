@@ -71,10 +71,55 @@ mount_sdcard_partitions () {
 	mount ${sdcard_dev}p2 ${sdcard_p2} -t ext4 || true
 }
 
+remove_upgrade_flags ()
+{
+	if [ -e ${sdcard_p1}/pack_resume_autorun.flag ]
+	then
+        	rm ${sdcard_p1}/pack_resume_autorun.flag || true
+	fi
+
+	if [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
+	then
+        	rm ${sdcard_p1}/unpack_resume_autorun.flag || true
+	fi
+
+	if [ -e ${sdcard_p2}/pack_resume_autorun.flag ]
+	then
+        	rm ${sdcard_p2}/pack_resume_autorun.flag || true
+	fi
+
+	if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ]
+	then
+        	rm ${sdcard_p2}/unpack_resume_autorun.flag || true
+	fi
+}
+
+counter=2
+echo 1000 > /proc/sys/kernel/hung_task_timeout_secs
+mount_sdcard_partitions
+cat /proc/cmdline | grep s2pressed=1 > /dev/null
+s2pressed=$?
+if [ $s2pressed -eq 0 ]
+then
+        echo "Boot button pressed"
+	remove_upgrade_flags
+else
+        echo "Boot button not pressed"
+fi
+
+isUpgrade () {
+	if [ $s2pressed -ne 0 ] && ( [ -e ${sdcard_p1}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] )
+	then
+		return 0
+	else
+		return 1
+	fi
+}
+
 rebootx () {
 	echo "reboot"
 
-	#try to call rebootx from the upgrade partition first.
+	# try to call rebootx from the upgrade partition first.
 	if [ ! -e ${sdcard_p2}/scripts/rebootx.sh ]
         then
                 mount ${sdcard_dev}p2 ${sdcard_p2} || true
@@ -153,7 +198,7 @@ write_pt_image () {
 	image_filename_pt="$image_filename_prfx-pt.img.gz"
 
 	image_filename_upgrade="${sdcard_p1}/factory_settings.img.tar"
-	if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
+	if isUpgrade
 	then
 		image_filename_upgrade="${sdcard_p2}/upgrade.img.tar"
 	fi
@@ -188,7 +233,7 @@ format_perm () {
         image_filename_pt="$image_filename_prfx-pt.img.gz"
 
         image_filename_upgrade="${sdcard_p1}/factory_settings.img.tar"
-	if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
+	if isUpgrade
 	then
 		image_filename_upgrade="${sdcard_p2}/upgrade.img.tar"
 	fi
@@ -225,7 +270,7 @@ partition_drive () {
 }
 
 update_uenv () {
-# first param =2 in case of upgrade.. =1 for factory settings.
+	# first param =2 in case of upgrade.. =1 for factory settings.
         echo resetting coupling uEng.txt
         if [ ! -e /tmp/emmcboot ]
         then
@@ -355,31 +400,6 @@ reset_update_uenv_with_verification () {
 	fi
 }
 
-stop_packing_restarting ()
-{
-	reset_uenv
-
-	if [ -e ${sdcard_p1}/pack_resume_autorun.flag ]
-	then
-        	rm ${sdcard_p1}/pack_resume_autorun.flag || true
-	fi
-
-	if [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
-	then
-        	rm ${sdcard_p1}/unpack_resume_autorun.flag || true
-	fi
-
-	if [ -e ${sdcard_p2}/pack_resume_autorun.flag ]
-	then
-        	rm ${sdcard_p2}/pack_resume_autorun.flag || true
-	fi
-
-	if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ]
-	then
-        	rm ${sdcard_p2}/unpack_resume_autorun.flag || true
-	fi
-}
-
 increment_restart_counter () {
 	# Increment and display restart counter
 	counter_file=${sdcard_p2}/restart_counter.ini
@@ -388,7 +408,6 @@ increment_restart_counter () {
 	echo $counter > $counter_file
 	echo "Restart counter: $counter"
 }
-
 
 perform_data_restore () {
 	echo Checking for backuped partitions
@@ -429,18 +448,6 @@ perform_data_restore () {
        		echo No /data backup found.
 	fi
 }
-
-mount_sdcard_partitions
-cat /proc/cmdline | grep s2pressed=1 > /dev/null
-s2pressed=$?
-if [ $s2pressed -eq 0 ]
-then
-        echo "Boot button pressed"
-else
-        echo "Boot button not pressed"
-fi
-
-echo 1000 > /proc/sys/kernel/hung_task_timeout_secs
 
 backup_data () {
     	if [ -e ${sdcard_p2}/backup_data.gz ]
@@ -483,11 +490,7 @@ backup_perm () {
         fi
 }
 
-counter=2
-
 perform_upgrade () {
-if [ $s2pressed -ne 0 ] && ( [ -e ${sdcard_p1}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] )
-then
         echo "Resume eMMC unpacking flag found up"
         increment_restart_counter
 
@@ -509,12 +512,10 @@ then
 	perform_data_restore
 
 	reset_update_uenv_with_verification 2
-       	stop_packing_restarting
+       	remove_upgrade_flags
+	reset_uenv
         alldone
-        exit
-else
-	echo "Performing factory settings recovery.."
-fi
+        exit 0
 }
 
 isValidPermGeometry () {
@@ -535,7 +536,7 @@ isValidPermGeometry () {
 
         echo partition starts at $start
         # allowing old factory settings images partitioning with or without format
-        if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
+        if isUpgrade
         then
                echo Checking geometery for an upgrade case.
         else
@@ -594,7 +595,7 @@ isValidDataGeometry () {
 
         echo data partition starts at $start
         # allowing old factory settings images partitioning with or without format
-        if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
+        if isUpgrade
         then
                echo Checking /data geometery for an upgrade case.
         else
@@ -669,10 +670,11 @@ isValidDataPartition () {
 		echo "Invalid data partition geometery"
 		return 1
 	fi
+        result=1
 
 	if [ -e /tmp/data/.tmp/shadow.backup ] || [ -e /tmp/data/.tmp/dhclient.*.leases ]
 	then
-		result=1
+		result=0
 	else
 		echo factory settings data partition copying should format the partition.
 	fi	
@@ -705,7 +707,7 @@ echo "Validity test for /perm and /data partitions: $isValidPermResult and $isVa
 if [ $isValidPermResult -eq 1 ] || [ $isValidDataResult -eq 1 ]
 then
 	backup_perm
-	if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
+	if isUpgrade
 	then
 		backup_data
 	fi
@@ -721,7 +723,7 @@ then
 	then
 		echo Partition geometery is now valid.. formatting...
 		format_perm
-	        if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p1}/unpack_resume_autorun.flag ] 
+	        if isUpgrade 
         	then
 	               format_data
 	        fi
@@ -734,7 +736,7 @@ then
 	if [ $isValidGeoResult -eq 0 ]
 	then
 		echo Data partition geometery is now valid.. checking for the upgrade case..
-	        if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p1}/unpack_resume_autorun.flag ] 
+	        if isUpgrade 
         	then
 			echo upgrade case.. formating data partition.
 	               	format_data
@@ -776,12 +778,16 @@ then
 		rebootx
 		exit 0
 	fi
-
 else
 	echo "Device is partitioned"
 fi
 
-perform_upgrade
+if isUpgrade
+then
+	perform_upgrade
+else
+	echo "Performing factory settings recovery.."
+fi
 
 echo "Restoring system from sdcard at $sdcard_dev to eMMC at $eMMC!"
 sh ${sdcard_p1}/scripts/unpack_latest_version.sh factorysettings $counter || true
@@ -816,7 +822,8 @@ fi
 perform_data_restore
 reset_update_uenv_with_verification 1
 
-stop_packing_restarting
+remove_upgrade_flags
+reset_uenv
 echo "eMMC Flasher: all done!"
 sync
 
