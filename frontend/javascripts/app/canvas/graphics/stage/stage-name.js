@@ -7,7 +7,7 @@ angular.module('canvasApp').factory('stageName', [
           originX: "left", originY: "top", selectable: true
         };
 
-        return Text.create("", properties);
+        return Text.create("text comes here", properties);
     };
   }
 ]);
