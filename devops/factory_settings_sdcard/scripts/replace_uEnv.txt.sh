@@ -36,7 +36,7 @@ then
 	if [ -e /dev/mmcblk0p4 ]
 	then
 		blockdev_boot=/dev/mmcblk0p1
-		blockdev_rootfs=/dev/mmcb0k1p2
+		blockdev_rootfs=/dev/mmcblk1p2
 		blockdev_data=/dev/mmcblk0p3
 		blockdev_perm=/dev/mmcblk0p4
 	else
@@ -53,7 +53,7 @@ then
         if [ -e /dev/mmcblk0p3 ]
         then
                 blockdev_boot=/dev/mmcblk0p1
-                blockdev_rootfs=/dev/mmcb0k1p1
+                blockdev_rootfs=/dev/mmcblk0p1
                 blockdev_data=/dev/mmcblk0p2
                 blockdev_perm=/dev/mmcblk0p3
         else
