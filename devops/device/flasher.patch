@@ -1,5 +1,6 @@
---- beaglebone-black-eMMC-flasher.sh	2017-03-28 10:12:43.306446300 +0200
-+++ newFlasher/beaglebone-black-eMMC-flasher.sh	2017-03-28 10:12:21.886713055 +0200
+diff -urN ./beaglebone-black-eMMC-flasher.sh ../tools_updated/beaglebone-black-eMMC-flasher.sh
+--- ./beaglebone-black-eMMC-flasher.sh	2015-11-26 05:59:16.344566584 +0200
++++ ../tools_updated/beaglebone-black-eMMC-flasher.sh	2015-11-26 06:07:22.700594069 +0200
 @@ -1,4 +1,6 @@
  #!/bin/bash -e
 +
@@ -343,7 +344,7 @@
  	if [ "${boot_uuid}" ] ; then
  		boot_uuid="UUID=${boot_uuid}"
  	else
-@@ -238,26 +373,113 @@
+@@ -238,26 +373,97 @@
  	flush_cache_mounted
  	umount_p2
  
@@ -353,18 +354,26 @@
 -		echo default-on > /sys/class/leds/beaglebone\:green\:usr2/trigger
 -		echo default-on > /sys/class/leds/beaglebone\:green\:usr3/trigger
 -	fi
-+#	alldone
-+}
- 
+-
 -	echo ""
 -	echo "This script has now completed it's task"
 -	echo "-----------------------------"
 -	echo "Note: Actually unpower the board, a reset [sudo reboot] is not enough."
 -	echo "-----------------------------"
-+echo "eMMC Flasher: Checking system"
-+check_running_system
- 
+-
 -	echo "Shutting Down..."
+-	sync
+-	halt
++#	alldone
+ }
+ 
++echo "eMMC Flasher: Checking system"
+ check_running_system
+-update_boot_files
+-partition_drive
+-copy_boot
+-copy_rootfs
++
 +#emmc_sectors=$( blockdev --getsize /dev/mmcblk0 )
 +
 +#echo "eMMC Sectors are: $emmc_sectors"
@@ -449,29 +458,800 @@
 +
 +alldone
 +
-+#shutdown -h now
-+#poweroff
++shutdown -h now
++poweroff
 +
-+rebootx () {
++
+diff -urN ./make_factory_settings_sdcard.sh ../tools_updated/make_factory_settings_sdcard.sh
+--- ./make_factory_settings_sdcard.sh	1970-01-01 02:00:00.000000000 +0200
++++ ../tools_updated/make_factory_settings_sdcard.sh	2015-11-26 05:58:17.820563277 +0200
+@@ -0,0 +1,172 @@
++#!/bin/sh
++
++#exit
++
++echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger 
++
++if [ -e /dev/mmcblk0p4 ]
++then
++        eMMC=/dev/mmcblk0
++	sdcard=/dev/mmcblk1
++elif [ -e /dev/mmcblk1p4 ]
++then
++       	eMMC=/dev/mmcblk1
++	sdcard=/dev/mmcblk0
++else
++       	echo "4 partitions eMMC not found!"
++	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger 
++	exit
++fi
++
++sync
++echo "Copying from eMMC at $eMMC to sdcard at $sdcard!"
++
++image_filename_prfx="/sdcard/temp_factory_settings"
++image_filename_rootfs="$image_filename_prfx-rootfs.img.gz"
++image_filename_data="$image_filename_prfx-data.img.gz"
++image_filename_boot="$image_filename_prfx-boot.img.gz"
++image_filename_pt="$image_filename_prfx-pt.img.gz"
++
++if [ ! -e /sdcard ]
++then
++	mkdir /sdcard
++fi
++
++if [ ! -e /emmc ]
++then
++	mkdir /emmc
++fi
++
++
++if [ ! -e /emmcboot ]
++then
++        mkdir /emmcboot
++fi
++
++umount /sdcard || true
++mount ${sdcard}p1 /sdcard
++
++retval=$?
++
++if [ $retval -ne 0 ]; then
++    echo "Chai Factory Settings: Error mounting SDCard! Error($retval)"
++#    exit
++fi
++
++echo "Removing previous images"
++
++if [ -e $image_filename_rootfs ]
++then
++	rm -f $image_filename_pt
++	rm -f $image_filename_rootfs
++	rm -f $image_filename_data
++	rm -f $image_filename_boot
++fi
++
++image_filename_prfx2="/sdcard/factory_settings"
++image_filename_rootfs2="$image_filename_prfx2-rootfs.img.gz"
++image_filename_data2="$image_filename_prfx2-data.img.gz"
++image_filename_boot2="$image_filename_prfx2-boot.img.gz"
++image_filename_pt2="$image_filename_prfx2-pt.img.gz"
++
++if [ -e $image_filename_rootfs2 ]
++then
++	rm -f $image_filename_pt2
++	rm -f $image_filename_rootfs2
++	rm -f $image_filename_data2
++	rm -f $image_filename_boot2
++fi
++
++#echo "Zeroing empty space of rootfs"
++rootfs_partition=${eMMC}p2
++#echo "Rootfs partition: $rootfs_partition"
++#mount $rootfs_partition /mnt
++#echo "Zeroing binaries partition"
++#dd if=/dev/zero of=/mnt/big_zero_file.bin
++
++#sync
++#sleep 5
++#sync
++#sleep 10
++#echo "Removing big zero file"
++#rm /mnt/big_zero_file.bin
++#sleep 5
++#sync
++#sleep 10
++#sync
++#sleep 5
++
++#umount /mnt
++
++data_partition=${eMMC}p3
++echo "Data partition: $data_partition"
++
++mount $data_partition /emmc
++
++retval=$?
++
++if [ $retval -ne 0 ]; then
++    echo "Error mounting data partition! Error($retval)"
++else
++	echo "Zeroing data partition"
++	dd if=/dev/zero of=/emmc/big_zero_file.bin
 +	sync
-+	mkdir -p /tmp/boot_disabler || true
-+	mount /dev/mmcblk0p1 /tmp/boot_disabler	|| true
-+	mkdir -p /tmp/boot_disabler/disabled || true
-+	mv /tmp/boot_disabler/* /tmp/boot_disabler/disabled
- 	sync
--	halt
-+	umount /tmp/boot_disabler
-+	echo "rebooting"
-+	sleep 10
-+	reboot
 +	sleep 5
-+	shutdown -r -t 5
++	sync
++	sleep 10
++
++	echo "Removing zeros file"
++	rm /emmc/big_zero_file.bin
++	sync
++	umount /emmc || true
++fi
++
++finish() {
++	sync
++	umount /sdcard || true
++	umount /emmc || true
++	echo "Finished.. byebye!"
++	sleep 15
++	echo heartbeat > /sys/class/leds/beaglebone\:green\:usr0/trigger
++	exit
++}
++
++mount ${sdcard}p1 /mnt || true
++
++echo "Backing up partition table to: $image_filename_pt"
++dd  if=$eMMC bs=16M count=1 | gzip -c > $image_filename_pt
++
++sleep 15
++sync
++
++echo "Backing up boot partition to: $image_filename_boot"
++dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
++
++sleep 15
++sync
++
++echo "Backing up data partition to: $image_filename_data"
++dd  if=${eMMC}p3 bs=16M | gzip -c > $image_filename_data
++
++sleep 15
++sync
++
++echo "Backing up binaries partition to: $image_filename_rootfs"
++dd  if=${eMMC}p2 bs=16M | gzip -c > $image_filename_rootfs
++
++sleep 15
++sync
++
++mv $image_filename_rootfs $image_filename_rootfs2
++mv $image_filename_data $image_filename_data2
++mv $image_filename_boot $image_filename_boot2
++mv $image_filename_pt $image_filename_pt2
++
++sync
++echo "creating factory settings images  done!!"
++
++sleep 5
++
++finish
++
++# reboot
+diff -urN ./pack_latest_version.sh ../tools_updated/pack_latest_version.sh
+--- ./pack_latest_version.sh	1970-01-01 02:00:00.000000000 +0200
++++ ../tools_updated/pack_latest_version.sh	2015-11-26 05:58:17.820563277 +0200
+@@ -0,0 +1,165 @@
++#!/bin/bash
++
++if ! id | grep -q root; then
++	echo "must be run as root"
 +	exit 0
- }
- 
--check_running_system
--update_boot_files
--partition_drive
--copy_boot
--copy_rootfs
-+rebootx
++fi
++
++check_running_system () {
++	if [ ! -f /boot/uboot/uEnv.txt ] ; then
++		echo "Error: script halting, system unrecognized..."
++		echo "unable to find: [/boot/uboot/uEnv.txt] is ${source}p1 mounted?"
++		exit 1
++	fi
++
++	echo "-----------------------------"
++	echo "debug copying: [${source}] -> [${eMMC}]"
++	lsblk
++	echo "-----------------------------"
++
++	if [ ! -b "${eMMC}" ] ; then
++		echo "Error: [${eMMC}] does not exist"
++		exit 1
++	fi
++}
++
++unset boot_drive
++boot_drive=$(LC_ALL=C lsblk -l | grep "/boot/uboot" | awk '{print $1}')
++
++if [ "x${boot_drive}" = "x" ] ; then
++	echo "Error: script halting, system unrecognized..."
++	exit 1
++fi
++
++if [ -e /dev/mmcblk1p4 ] ; then
++	source="/dev/mmcblk0"
++	eMMC="/dev/mmcblk1"
++fi
++
++if [ -e /dev/mmcblk0p4 ] ; then
++	source="/dev/mmcblk1"
++	eMMC="/dev/mmcblk0"
++fi
++
++if [ ! -e "${eMMC}p4" ]
++then
++        echo "Proper eMMC partitionining not found!"
++	exit 1
++fi
++
++check_running_system
++
++echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger 
++
++image_filename_prfx="/sdcard/tmp/upgrade"
++image_filename_rootfs="$image_filename_prfx-rootfs.img.gz" 
++image_filename_data="$image_filename_prfx-data.img.gz"
++image_filename_boot="$image_filename_prfx-boot.img.gz"
++image_filename_pt="$image_filename_prfx-pt.img.gz"
++image_filename_upgrade_tar_temp="/sdcard/tmp/temp.tar"
++image_filename_upgrade_temp="/sdcard/tmp/temp.tar.gz"
++image_filename_upgrade="/sdcard/upgrade.img.gz"
++
++echo "Packing eMMC image.."
++
++if [ -e  $image_filename_upgrade_tar_temp ]
++then
++	rm $image_filename_upgrade_tar_temp
++fi
++
++if [ -e $image_filename_upgrade_temp ]
++then
++	rm $image_filename_upgrade_temp
++fi
++
++if [ -e $image_filename_upgrade ]
++then
++	rm $image_filename_upgrade
++fi
++
++if [ ! -e /sdcard/tmp ]
++then
++        mkdir -p /sdcard/tmp/
++fi
++
++
++#initiat auto run on first run for the eMMC after the upgrade.
++echo mounting rootfs partition
++
++mount ${eMMC}p2 /mnt
++echo "#!/bin/bash" >  /mnt/opt/scripts/boot/autorun.upgrade.sh
++echo "cd /mnt/root/chaipcr/web" >> /mnt/opt/scripts/boot/autorun.upgrade.sh
++echo "bundle exec rake db:migrate" >> /mnt/opt/scripts/boot/autorun.upgrade.sh
++echo "bundle exec rake db:seed_fu" >> /mnt/opt/scripts/boot/autorun.upgrade.sh
++echo "cd" >> /mnt/opt/scripts/boot/autorun.upgrade.sh
++chmod +x /mnt/opt/scripts/boot/autorun.upgrade.sh
++sync
++umount /mnt
++
++#exit
++
++#copy eMMC contents
++echo "Copying eMMC partitions at $eMMC"
++sync
++echo "Backing up partition table to: $image_filename_pt"
++dd  if=${eMMC} bs=16M count=1 | gzip -c > $image_filename_pt
++
++sleep 5
++sync
++
++echo "Backing up binaries partition to: $image_filename_rootfs"
++dd  if=${eMMC}p2 bs=16M | gzip -c > $image_filename_rootfs
++
++sleep 5
++sync
++
++echo "Backing up boot partition to: $image_filename_boot"
++dd  if=${eMMC}p1 bs=16M | gzip -c > $image_filename_boot
++
++
++
++#compressing
++echo "tar -cvf $image_filename_upgrade_tar_temp $image_filename_pt $image_filename_boot $image_filename_rootfs"
++
++echo "compressing all images to $image_filename_upgrade_tar_temp"
++tar -cvf $image_filename_upgrade_tar_temp $image_filename_pt $image_filename_boot $image_filename_rootfs
++
++echo "Pack images tar to $image_filename_upgrade_temp"
++gzip $image_filename_upgrade_tar_temp
++
++echo "Finalizing: $image_filename_upgrade"
++mv $image_filename_upgrade_temp $image_filename_upgrade
++
++if [ -e $image_filename_boot ]
++then
++	rm $image_filename_boot
++else
++       	echo "Boot image not found: $image_filename_boot"
++fi
++
++if [ -e $image_filename_rootfs ]
++then
++	rm $image_filename_rootfs
++else
++        echo "Rootfs image not found: $image_filename_rootfs"
++fi
++
++if [ -e $image_filename_pt ]
++then
++	rm $image_filename_pt
++fi
++
++
++echo "Removing upgrade autorun script from eMMC!"
++
++mount ${eMMC}p2 /mnt
++rm /mnt/opt/scripts/boot/autorun.upgrade.sh
++sync
++umount /mnt
++
++
++echo "Finished.. byebye!"
++sync
++echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
++
++exit 0
+diff -urN ./restore_factory_settings.sh ../tools_updated/restore_factory_settings.sh
+--- ./restore_factory_settings.sh	1970-01-01 02:00:00.000000000 +0200
++++ ../tools_updated/restore_factory_settings.sh	2015-11-26 05:58:17.820563277 +0200
+@@ -0,0 +1,115 @@
++#!/bin/bash -e
++
++if ! id | grep -q root; then
++	echo "must be run as root"
++	exit
++fi
++
++unset boot_drive
++boot_drive=$(LC_ALL=C lsblk -l | grep "/boot/uboot" | awk '{print $1}')
++
++if [ "x${boot_drive}" = "x" ] ; then
++	echo "Error: script halting, system unrecognized..."
++	exit 1
++fi
++
++if [ "x${boot_drive}" = "xmmcblk0p1" ] ; then
++	source="/dev/mmcblk0"
++	destination="/dev/mmcblk1"
++fi
++
++if [ "x${boot_drive}" = "xmmcblk1p1" ] ; then
++	source="/dev/mmcblk1"
++	destination="/dev/mmcblk0"
++fi
++
++flush_cache () {
++	sync
++}
++
++flush_cache_mounted () {
++	sync
++	blockdev --flushbufs ${destination}
++}
++
++write_failure () {
++	echo "writing to [${destination}] failed..."
++
++	if [ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] ; then
++		echo heartbeat > /sys/class/leds/beaglebone\:green\:usr0/trigger
++		echo heartbeat > /sys/class/leds/beaglebone\:green\:usr1/trigger
++		echo heartbeat > /sys/class/leds/beaglebone\:green\:usr2/trigger
++		echo heartbeat > /sys/class/leds/beaglebone\:green\:usr3/trigger
++	fi
++	echo "-----------------------------"
++	flush_cache
++	umount ${destination}p1 || true
++	umount ${destination}p2 || true
++	exit
++}
++
++umount_p1 () {
++	umount ${destination}p1 || umount -l ${destination}p1 || write_failure
++}
++
++umount_p2 () {
++	umount ${destination}p2 || umount -l ${destination}p2 || write_failure
++}
++
++check_running_system () {
++	if [ ! -f /boot/uboot/uEnv.txt ] ; then
++		echo "Error: script halting, system unrecognized..."
++		echo "unable to find: [/boot/uboot/uEnv.txt] is ${source}p1 mounted?"
++		exit 1
++	fi
++
++	echo "-----------------------------"
++	echo "debug copying: [${source}] -> [${destination}]"
++	lsblk
++	echo "-----------------------------"
++
++	if [ ! -b "${destination}" ] ; then
++		echo "Error: [${destination}] does not exist"
++		write_failure
++	fi
++}
++
++lable_partitions () {
++	tune2fs -L data ${destination}p3
++	tune2fs -L perm ${destination}p4
++}
++
++write_rootfs_image () {
++	echo "Writing rootfs partition image!"
++	echo timer > /sys/class/leds/beaglebone\:green\:usr1/trigger
++        gunzip -c /opt/factory_settings-rootfs.img.gz | dd of=${destination}p2 bs=16M
++	echo cpu0 > /sys/class/leds/beaglebone\:green\:usr1/trigger
++	echo "Done writing rootfs partition image!"
++}
++
++write_data_image () {
++	echo "Writing data partition image!"
++	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
++	gunzip -c /opt/factory_settings-data.img.gz | dd of=${destination}p3 bs=16M
++	echo gpio > /sys/class/leds/beaglebone\:green\:usr0/trigger
++	echo "Done writing data partition image!"
++}
++
++check_running_system
++
++
++if [ -e /opt/factory_settings-data.img.gz ]
++then
++        write_data_image
++else
++        echo "Data factory settings image not found!"
++fi
++
++if [ -e /opt/factory_settings-rootfs.img.gz ]
++then
++	write_rootfs_image
++else
++        echo "Factory settings image not found!"
++fi
++
++lable_partitions
+diff -urN ./unpack_latest_version.sh ../tools_updated/unpack_latest_version.sh
+--- ./unpack_latest_version.sh	1970-01-01 02:00:00.000000000 +0200
++++ ../tools_updated/unpack_latest_version.sh	2015-11-26 05:58:17.820563277 +0200
+@@ -0,0 +1,325 @@
++#!/bin/bash
++
++if ! id | grep -q root; then
++	echo "must be run as root"
++	exit 0
++fi
++
++unset boot_drive
++boot_drive=$(LC_ALL=C lsblk -l | grep "/boot/uboot" | awk '{print $1}')
++
++if [ "x${boot_drive}" = "x" ] ; then
++	echo "Error: script halting, system unrecognized..."
++	exit 1
++fi
++
++if [ -e /dev/mmcblk1p4 ] ; then
++	source="/dev/mmcblk0"
++	eMMC="/dev/mmcblk1"
++fi
++
++if [ -e /dev/mmcblk0p4 ] ; then
++	source="/dev/mmcblk1"
++	eMMC="/dev/mmcblk0"
++fi
++
++if [ ! -e "${eMMC}p4" ]
++then
++        echo "Proper partitionining not found!"
++	exit 1
++fi
++
++
++flush_cache_mounted () {
++	sync
++	blockdev --flushbufs ${eMMC}
++}
++
++check_running_system () {
++	if [ ! -f /boot/uboot/uEnv.txt ] ; then
++		echo "Error: script halting, system unrecognized..."
++		echo "unable to find: [/boot/uboot/uEnv.txt] is ${source}p1 mounted?"
++		exit 1
++	fi
++
++	echo "-----------------------------"
++	echo "debug copying: [${source}] -> [${eMMC}]"
++	lsblk
++	echo "-----------------------------"
++
++	if [ ! -b "${eMMC}" ] ; then
++		echo "Error: [${eMMC}] does not exist"
++		exit 1
++	fi
++}
++
++write_pt_image () {
++	echo "Writing partition table image!"
++	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
++        gunzip -c $image_filename_pt | dd of=${eMMC} bs=16M
++	flush_cache_mounted
++	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
++	echo "Done writing partition table image!"
++}
++
++write_rootfs_image () {
++	echo "Writing rootfs partition image!"
++	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
++        gunzip -c $image_filename_rootfs | dd of=${eMMC}p2 bs=16M
++	flush_cache_mounted
++	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
++	echo "Done writing rootfs partition image!"
++}
++
++write_data_image () {
++        echo "Writing data partition image!"
++        echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
++        gunzip -c $image_filename_data | dd of=${eMMC}p3 bs=16M
++	flush_cache_mounted
++        echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
++        echo "Done writing data partition image!"
++}
++
++write_boot_image () {
++	echo "Writing boot partition image!"
++	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
++	gunzip -c $image_filename_boot | dd of=${eMMC}p1 bs=16M
++	flush_cache_mounted
++	echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
++	echo "Done writing boot partition image!"
++}
++
++extract_image_files () 
++{
++if [ -e  $image_filename_upgrade_tar_temp ]
++then
++	rm $image_filename_upgrade_tar_temp
++fi
++
++if [ -e $image_filename_upgrade_temp ]
++then
++	rm $image_filename_upgrade_temp
++fi
++
++mv $image_filename_upgrade $image_filename_upgrade_temp
++
++echo "Unpack upgrade tar from $image_filename_upgrade_tar_temp"
++gunzip $image_filename_upgrade_tar_temp
++
++echo "uncompressing tar ball from $image_filename_upgrade_tar_temp to $image_filename_upgrade_tar_temp_folder"
++tar -xvf $image_filename_upgrade_tar_temp --directory $image_filename_upgrade_tar_temp_folder
++
++rm $image_filename_upgrade_tar_temp
++
++echo "Writing images to eMMC!"
++}
++
++check_running_system
++
++echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger 
++
++#echo "Debug copy!"
++#cp ../../backup/upgrade.img.gz ../../
++
++image_filename_prfx="/sdcard/tmp/upgrade"
++image_filename_rootfs="$image_filename_prfx-rootfs.img.gz" 
++image_filename_data="$image_filename_prfx-data.img.gz"
++image_filename_boot="$image_filename_prfx-boot.img.gz"
++image_filename_pt="$image_filename_prfx-pt.img.gz"
++image_filename_upgrade_tar_temp="/sdcard/tmp/temp.tar"
++image_filename_upgrade_temp="/sdcard/tmp/temp.tar.gz"
++image_filename_upgrade_tar_temp_folder="/sdcard/tmp/"
++
++image_filename_upgrade="/sdcard/upgrade.img.gz"
++
++echo "Unpacking eMMC image.."
++
++if [ ! -e /sdcard/tmp/ ]
++then
++       mkdir /sdcard/tmp/
++fi
++
++extract_image_files
++
++if [ -e $image_filename_boot ]
++then
++        write_boot_image
++	rm $image_filename_boot
++else
++       	echo "Boot image not found: $image_filename_boot"
++fi
++
++if [ -e $image_filename_rootfs ]
++then
++	write_rootfs_image
++	rm $image_filename_rootfs
++else
++        echo "Rootfs image not found: $image_filename_rootfs"
++fi
++
++if [ -e $image_filename_pt ]
++then
++        write_pt_image
++	rm $image_filename_pt
++fi
++
++echo "Finished.. byebye!"
++sync
++echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
++
++exit 0
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++#!/bin/bash
++echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger 
++
++
++
++
++exit
++
++	rm $image_filename_bin
++	rm $image_filename_data
++	rm $image_filename_boot
++fi
++
++#echo "Backing up binaries partition to: $image_filename_bin"
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++if [ ! -e $image_filename_bin ]
++then
++        echo "Root file system image not found: $image_filename_bin"
++        echo existing!
++        exit
++fi
++
++
++if [ ! -e $image_filename_pt ]
++then
++        echo "Partition table record: $image_filename_pt"
++        echo existing!
++        exit
++fi
++
++
++if [ ! -e $image_filename_data ]
++then
++        echo "Data partition image not found: $image_filename_data"
++        echo existing!
++        exit
++fi
++
++
++if [ ! -e $image_filename_boot ]
++then
++        echo "Boot partition image not found: $image_filename_boot"
++        echo existing!
++        exit
++fi
++
++
++
++
++
++
++
++
++#exit 0
++
++echo "Zeroing binaries partition"
++#dd if=/dev/zero bs=16MB of=/big_zero_file.bin
++sync
++
++echo "Removing zeros file"
++rm /big_zero_file.bin
++sync
++
++#mount /dev/mmcblk1p3 /data
++
++echo "Zeroing data partition"
++#dd if=/dev/zero bs=16MB of=/data/big_zero_file.bin
++sync
++
++echo "Removing zeros file"
++rm /data/big_zero_file.bin
++sync
++
++echo "Init..."
++cp /bin/dd .
++cp /bin/gzip .
++
++sync
++sleep 5
++sync
++
++echo "Backing up partition table to: $image_filename_pt"
++dd  if=/dev/mmcblk1 bs=16M count=1 | gzip -c > $image_filename_pt
++sync
++
++echo "Backing up binaries partition to: $image_filename_bin"
++dd  if=/dev/mmcblk1p2 bs=16M | gzip -c > $image_filename_bin
++
++sync
++echo "Backing up data partition to: $image_filename_data"
++dd  if=/dev/mmcblk1p3 bs=16M | gzip -c > $image_filename_data
++
++sync
++echo "Backing up boot partition to: $image_filename_boot"
++dd  if=/dev/mmcblk1p1 bs=16M | gzip -c > $image_filename_boot
++
++echo "Finished.. restarting!"
++sync
++echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
++
++sleep 20
++
++reboot
++
++exit 0
