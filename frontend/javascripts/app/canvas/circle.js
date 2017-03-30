@@ -399,7 +399,7 @@ angular.module("canvasApp").factory('circle', [
           dynamicTemp = 100 - ((targetCircleGroup.top - this.scrollTop) / this.scrollRatio2);
         }
 
-        dynamicTemp = Math.abs(dynamicTemp).toFixed(1);
+        dynamicTemp = (Math.abs(dynamicTemp) >= 100) ?  100 : Math.abs(dynamicTemp).toFixed(1);
         this.temperature.text = String(dynamicTemp + "º");
         this.model.temperature = String(dynamicTemp);
       };
