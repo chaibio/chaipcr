@@ -52,7 +52,8 @@ angular.module("canvasApp").factory('stepHoldTime', [
           selectable: false,
           hasBorder: false,
           editingBorderColor: '#FFB300',
-          type: "holdTimeDisplay"
+          type: "holdTimeDisplay",
+          name: "holdTimeDisplayText"
         });
       };
 

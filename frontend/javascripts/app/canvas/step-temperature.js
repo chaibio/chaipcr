@@ -42,7 +42,8 @@ angular.module("canvasApp").factory('stepTemperature', [
           selectable: false,
           hasBorder: false,
           editingBorderColor: '#FFB300',
-          type: "temperatureDisplay"
+          type: "temperatureDisplay",
+          name: "temperatureDisplayText",
         });
 
       };
