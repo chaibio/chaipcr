@@ -51,6 +51,7 @@ angular.module("canvasApp").factory('stepHoldTime', [
           fontFamily: "dinot",
           selectable: false,
           hasBorder: false,
+          editingBorderColor: '#FFB300',
           type: "holdTimeDisplay"
         });
       };
