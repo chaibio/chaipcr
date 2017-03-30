@@ -24,7 +24,8 @@ angular.module("canvasApp").factory('mouseDown', [
   'scrollService',
   'circleManager',
   'editMode',
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager, editMode) {
+  '$timeout',
+  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager, editMode, $timeout) {
 
     /**************************************
         what happens when click is happening in canvas.
@@ -62,11 +63,11 @@ angular.module("canvasApp").factory('mouseDown', [
             if(getP.x > stepDataGroupLeft && getP.x < (stepDataGroupLeft + 45)) {
               editMode.tempActive = true;
               editMode.currentActiveTemp = target.parentCircle.temperature;
-              startEditing(target.parentCircle.temperature);
+              startEditing(target.parentCircle.temperature, evt);
             } else {
               editMode.holdActive = true;
               editMode.currentActiveHold = target.parentCircle.holdTime;
-              startEditing(target.parentCircle.holdTime);
+              startEditing(target.parentCircle.holdTime, evt);
             }
 
           break;
@@ -164,10 +165,16 @@ angular.module("canvasApp").factory('mouseDown', [
         C.canvas.renderAll();
       };
 
-      startEditing = function(textToBeEdited) {
+      startEditing = function(textToBeEdited, evt) {
+
         C.canvas.setActiveObject(textToBeEdited);
+        var clickedPlaceIndex = textToBeEdited.getSelectionStartFromPointer();
+
         textToBeEdited.enterEditing();
-        textToBeEdited.selectAll();
+        for(var i = 0; i < clickedPlaceIndex; i++) {
+          // Placing the cursor at the place where we clicked.
+          textToBeEdited.moveCursorRightWithoutShift(evt);
+        }
       };
 
     };
