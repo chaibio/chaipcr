@@ -48,7 +48,10 @@ angular.module("canvasApp").factory('mouseDown', [
 
           case "stepDataGroup":
 
-            var click = evt.e, target = evt.target, stepDataGroupLeft = target.left - 46,
+
+            var click = evt.e,
+            target = evt.target,
+            stepDataGroupLeft = target.left - 60,
             getP = that.canvas.getPointer(evt.e);
             that.selectStep(target.parentCircle);
 
@@ -59,8 +62,8 @@ angular.module("canvasApp").factory('mouseDown', [
             // first element in the array.
 
             unHookGroup(group, items, removeIndex);
-
-            if(getP.x > stepDataGroupLeft && getP.x < (stepDataGroupLeft + 45)) {
+            
+            if(getP.x > stepDataGroupLeft && getP.x < (stepDataGroupLeft + 55)) {
               editMode.tempActive = true;
               editMode.currentActiveTemp = target.parentCircle.temperature;
               startEditing(target.parentCircle.temperature, evt);
