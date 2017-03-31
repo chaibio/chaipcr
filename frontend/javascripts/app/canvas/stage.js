@@ -518,6 +518,7 @@ angular.module("canvasApp").factory('stage', [
       };
 
       this.stageHeader = function() {
+        
         if(this.stageName) {
           var index = parseInt(this.index) + 1;
           var stageName = (this.model.name).toUpperCase().replace("STAGE", "");
