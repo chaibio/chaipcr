@@ -46,8 +46,10 @@ angular.module("canvasApp").factory('stepHoldTime', [
         this.text = new fabric.IText(this.formatHoldTime(), {
           fill: 'black',
           fontSize: 20,
-          top : this.parent.top + 10,
-          left: this.parent.left + 40,
+          top : 0,
+          left: 60,
+          originX: "left",
+          originY: "top",
           fontFamily: "dinot",
           selectable: false,
           hasBorder: false,

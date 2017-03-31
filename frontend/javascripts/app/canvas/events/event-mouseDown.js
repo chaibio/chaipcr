@@ -154,7 +154,6 @@ angular.module("canvasApp").factory('mouseDown', [
         group._restoreObjectsState();
         C.canvas.remove(group);
 
-
         C.canvas.remove(items[index_to_remove]);
 
         items.splice(index_to_remove, 1);
