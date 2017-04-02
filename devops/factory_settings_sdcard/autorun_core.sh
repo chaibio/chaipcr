@@ -71,6 +71,15 @@ mount_sdcard_partitions () {
 	mount ${sdcard_dev}p2 ${sdcard_p2} -t ext4 || true
 }
 
+boot_from_sdcard () {
+        echo force booting from sdcard
+        if [ -e /mnt/uEnv.sdcard.txt ] && [ -e /mnt/uEnv.txt ]
+        then
+                cp /mnt/uEnv.sdcard.txt /mnt/uEnv.txt
+		sync
+        fi
+}
+
 remove_upgrade_flags ()
 {
 	if [ -e ${sdcard_p1}/pack_resume_autorun.flag ]
@@ -103,6 +112,7 @@ if [ $s2pressed -eq 0 ]
 then
         echo "Boot button pressed"
 	remove_upgrade_flags
+	boot_from_sdcard
 else
         echo "Boot button not pressed"
 fi
