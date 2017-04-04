@@ -57,8 +57,8 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 			$scope.creating = true;
 			if($scope.selectedKit == 1 || ($scope.selectedKit == 2 && $scope.kit1.name == $scope.kit2.name )){
 				$scope.wells = [
-					{'well_num':1,'well_type':'positive_control','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
-					{'well_num':2,'well_type':'no_template_control','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
+					{'well_num':1,'well_type':'positive_control','sample_name':'Positive Control','notes':'','targets':[$scope.kit.name,'']},
+					{'well_num':2,'well_type':'no_template_control','sample_name':'Negative Control','notes':'','targets':[$scope.kit.name,'']},
 					{'well_num':3,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
 					{'well_num':4,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
 					{'well_num':5,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit.name,'']},
@@ -86,16 +86,16 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 			}
 			else if($scope.selectedKit == 2 && $scope.kit1.name != $scope.kit2.name){
 				$scope.wells = [
-					{'well_num':1,'well_type':'positive_control','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
-					{'well_num':2,'well_type':'no_template_control','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
+					{'well_num':1,'well_type':'positive_control','sample_name':'Positive Control','notes':'','targets':[$scope.kit1.name,'']},
+					{'well_num':2,'well_type':'no_template_control','sample_name':'Negative Control','notes':'','targets':[$scope.kit1.name,'']},
 					{'well_num':3,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
 					{'well_num':4,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
 					{'well_num':5,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
 					{'well_num':6,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
 					{'well_num':7,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
 					{'well_num':8,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
-					{'well_num':9,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']},
-					{'well_num':10,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']},
+					{'well_num':9,'well_type':'sample','sample_name':'Positive Control','notes':'','targets':[$scope.kit2.name,'']},
+					{'well_num':10,'well_type':'sample','sample_name':'Negative Control','notes':'','targets':[$scope.kit2.name,'']},
 					{'well_num':11,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']},
 					{'well_num':12,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']},
 					{'well_num':13,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']},
