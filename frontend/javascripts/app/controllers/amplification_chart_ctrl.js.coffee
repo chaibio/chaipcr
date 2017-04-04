@@ -113,7 +113,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.hoverOn = true
           $scope.errorCheck = true
           $scope.errorD2f = true
-        if $scope.baseline_sub != 'auto' && (!$scope.cyclesFrom || $scope.cyclesTo)
+        if $scope.baseline_sub != 'auto' && (!$scope.cyclesFrom || !$scope.cyclesTo)
           $scope.hoverName = 'Error'
           $scope.hoverDescription = 'Range for baseline cycles cannot be left empty'
           $scope.hoverOn = true
@@ -131,6 +131,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
               $scope.wellButtons["well_#{well_i}"].ct = 0
             $scope.close()
             fetchFluorescenceData()
+          .catch (resp) ->
+            $scope.hoverName = 'Error'
+            $scope.hoverDescription = resp.data || 'Unknown error'
+            $scope.hoverOn = true
 
       $scope.hover = (model) ->
         $scope.hoverName = model.name
@@ -154,6 +158,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             $scope.baseline_sub = 'cycles'
             $scope.cyclesFrom = resp.data.amplification_option.baseline_cycle_bounds[0]
             $scope.cyclesTo = resp.data.amplification_option.baseline_cycle_bounds[1]
+        .catch (resp) ->
+          $scope.hoverName = 'Error'
+          $scope.hoverDescription = resp.data || 'Unknown error'
+          $scope.hoverOn = true
 
       $scope.getAmplificationOptions()
 
