@@ -86,7 +86,7 @@ angular.module("canvasApp").factory('circle', [
 
         this.getLeft();
         this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
-        //this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
+        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
         this.gatherDataDuringRampGroup.set({"left": this.left}).setCoords();
       };
 
@@ -133,7 +133,7 @@ angular.module("canvasApp").factory('circle', [
       ********************************************/
       this.getCircle = function() {
 
-        //this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
+        this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
         this.canvas.add(this.stepDataGroup);
 
         this.gatherDataCircleOnScroll = new gatherDataCircleOnScroll();
