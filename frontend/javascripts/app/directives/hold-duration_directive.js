@@ -83,7 +83,7 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
         };
 
         scope.save = function() {
-          
+
           scope.edit = false;
           var newHoldTime = TimeService.convertToSeconds(scope.shown);
 

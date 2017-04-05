@@ -39,7 +39,8 @@ window.ChaiBioTech.ngApp.directive('temperature', [
         scope.delta = true; // This is to prevent the directive become disabled, check delta in template, this is used for auto delta field
         scope.edit = false;
         scope.temp = true;
-        
+        scope.pause = true; // Not bothered about pause value;
+
         var editValue, help_part = angular.element(elem).find(".help-part");
 
         scope.$watch("reading", function(val) {

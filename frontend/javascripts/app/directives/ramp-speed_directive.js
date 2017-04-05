@@ -39,7 +39,7 @@ window.ChaiBioTech.ngApp.directive('rampSpeed', [
         scope.edit = false;
         scope.delta = true; // This is to prevent the directive become disabled, check delta in template, this is used for auto delta field
         scope.ramp = true;
-
+        scope.pause = true; // Not bothered about pause value; this need a change in the update, now I have a better picture.
         var editValue, help_part = angular.element(elem).find(".help-part");
 
         scope.$watch("reading", function(val) {
