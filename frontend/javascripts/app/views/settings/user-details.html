@@ -40,6 +40,7 @@
           <p ng-show="editUser.emailField.$error.required" class="error-text">Cannot be left blank</p>
           <p ng-show="editUser.emailField.$error.email" class="error-text">Invalid e-mail</p>
           <p ng-show="editUser.emailField.$error.emailAlreadtTaken" class="error-text">Email already taken</p>
+					<p ng-show="editUser.emailField.$error.emailInvalid" class="error-text">Invalid email</p>
       </div>
       </div>
       <div ng-if="allowEditPassword" class="email-field">

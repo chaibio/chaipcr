@@ -26,8 +26,12 @@ window.ChaiBioTech.ngApp.service('userFormErrors', [
 
       for(var errKey in problem.errors) {
         console.log(errKey);
-        if(errKey === 'email') {
+        if(errKey === 'email' && problem.errors.email[0] == 'is invalid') {
           //$scope.emailAlreadtTaken = true;
+          form.emailField.$setValidity('emailInvalid', false);
+          //form.emailField.$setValidity('emailAlreadtTaken', false);
+        }
+        else if (errKey === 'email' && problem.errors.email[0] != 'is invalid'){
           form.emailField.$setValidity('emailAlreadtTaken', false);
         }
         break;
