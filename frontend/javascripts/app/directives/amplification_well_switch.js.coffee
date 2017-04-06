@@ -78,7 +78,7 @@ window.ChaiBioTech.ngApp.directive 'amplificationWellSwitch', [
             #$(ui.unselected).find('.circle').click()
 
           'start': (evt, ui) ->
-            if evt.metaKey is false
+            if evt.metaKey is false and evt.ctrlKey is false
               $scope.borders = {}
 
           'stop': (evt, ui) ->
