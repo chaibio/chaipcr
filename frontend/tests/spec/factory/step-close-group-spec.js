@@ -6,6 +6,9 @@ describe("Testing closeGroup", function() {
   var _closeGroup, shadowCloseGroup;
   step = {
     left: 100,
+    $scope: {
+      exp_completed: false
+    },
     parentStage: {
       parent: {
         editStageStatus: false
@@ -46,6 +49,9 @@ describe("Testing closeGroup", function() {
     expect(_closeGroup.opacity).toEqual(0);
     step = {
       left: 100,
+      $scope: {
+        exp_completed: false
+      },
       parentStage: {
         parent: {
           editStageStatus: true
@@ -59,6 +65,24 @@ describe("Testing closeGroup", function() {
 
   it("It should check the name of the group", function() {
     expect(_closeGroup.name).toEqual('deleteStepButton');
+  });
+
+  it("It should check the evented value of the group", function() {
+
+    step = {
+      left: 100,
+      $scope: {
+        exp_completed: false
+      },
+      parentStage: {
+        parent: {
+          editStageStatus: true
+        }
+      }
+    };
+
+    _closeGroup = new shadowCloseGroup(step);
+    expect(_closeGroup.evented).toBeTruthy();
   });
 
 
