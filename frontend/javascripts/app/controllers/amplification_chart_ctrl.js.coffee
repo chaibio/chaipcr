@@ -124,7 +124,9 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             $scope.baseline_cycle_bounds = null
           else
             $scope.baseline_cycle_bounds = [parseInt($scope.cyclesFrom), parseInt($scope.cyclesTo)]
-          Experiment.updateAmplificationOptions($stateParams.id,{'cq_method':$scope.method.name,'min_fluorescence': parseInt($scope.minFl.value), 'min_reliable_cycle': parseInt($scope.minCq.value), 'min_d1': parseInt($scope.minDf.value), 'min_d2': parseInt($scope.minD2f.value), 'baseline_cycle_bounds': $scope.baseline_cycle_bounds }).then (resp) ->
+          Experiment
+          .updateAmplificationOptions($stateParams.id,{'cq_method':$scope.method.name,'min_fluorescence': parseInt($scope.minFl.value), 'min_reliable_cycle': parseInt($scope.minCq.value), 'min_d1': parseInt($scope.minDf.value), 'min_d2': parseInt($scope.minD2f.value), 'baseline_cycle_bounds': $scope.baseline_cycle_bounds })
+          .then (resp) ->
             $scope.amplification_data = helper.paddData()
             $scope.hasData = false
             for well_i in [0..15] by 1
@@ -132,9 +134,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             $scope.close()
             fetchFluorescenceData()
           .catch (resp) ->
-            $scope.hoverName = 'Error'
-            $scope.hoverDescription = resp.data || 'Unknown error'
-            $scope.hoverOn = true
+            if resp != 'canceled'
+              $scope.hoverName = 'Error'
+              $scope.hoverDescription = resp.data || 'Unknown error'
+              $scope.hoverOn = true
 
       $scope.hover = (model) ->
         $scope.hoverName = model.name

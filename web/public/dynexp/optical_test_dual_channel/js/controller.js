@@ -12,8 +12,9 @@
     '$interval',
     '$uibModal',
     '$rootScope',
+    '$timeout',
     function OpticalCalibrationCtrl($scope, $window, Experiment, $state, Status, GlobalService, Constants,
-      host, $http, $interval, $uibModal, $rootScope) {
+      host, $http, $interval, $uibModal, $rootScope, $timeout) {
 
       var checkMachineStatusInterval = null;
       var errorModal = null;
