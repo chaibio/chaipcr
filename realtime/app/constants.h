@@ -101,7 +101,7 @@ const int kLedBlankPwmDutyNs = 500000;
 //Optics
 const long kFluorescenceDataCollectionDelayTimeMs = 80;
 const int kADCReadsPerOpticalMeasurement = 10;
-const std::vector<int> kWellToLedMappingList = {4, 3, 2, 1, 16, 15, 14, 13, 5, 6, 7, 8, 9, 10, 11, 12};
+const int kWellCount = 16;
 const int kOpticalMeasurementsPerCycle = 1;
 const int kOpticalMeasurementsPerCalibrationCycle = 5;
 const int kBaselineMeasurementsPerCycle = 1;

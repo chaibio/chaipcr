@@ -35,16 +35,16 @@ public:
 	
     void setIntensity(double onCurrentMilliamps);
     inline double intensity() const { return _intensity; }
-    // ledNumber identifies LED's on the board and the number is 1-indexed. (kWellToLedMappingList is used for well mapping)
+    // ledNumber is 0-indexed and corresponds to well number
     void activateLED(unsigned int ledNumber);
     // Valid range for fine intensity is from 0x0 to 0x3F
-    void setIntensityFine(uint8_t ledIntensity, unsigned int ledNumber = 0);
+    void setIntensityFine(uint8_t ledIntensity, int ledNumber = -1);
     inline void disableLEDs() { disableLEDs(true); }
 
 private:
     void disableLEDs(bool clearLastLed);
 
-    void sendLEDGrayscaleValues(const uint8_t (&values)[24]);
+    void sendLEDGrayscaleValues(bool latch=true);
     void sendLEDIntensityFineValues();
 
 private:
@@ -52,7 +52,7 @@ private:
     double _intensity;
 
     unsigned _lastLedNumber;
-	
+
 	//components
     std::shared_ptr<SPIPort> _spiPort;
     GPIO _potCSPin;
