@@ -20,7 +20,7 @@
 angular.module("canvasApp").factory('stepDataGroup', [
   'constants',
   function(constants) {
-    return function(dataArray, parent) {
+    return function(dataArray, parent, $scope) {
       var rec = new fabric.Rect({
         width: 105,
         height: 20,
@@ -33,7 +33,7 @@ angular.module("canvasApp").factory('stepDataGroup', [
         hasBorder: false,
         hasControls: false,
       });
-      
+
       dataArray.unshift(rec);
 
       return new fabric.Group(dataArray, {
@@ -43,7 +43,7 @@ angular.module("canvasApp").factory('stepDataGroup', [
         originY: "center",
         selectable: false,
         name: "stepDataGroup",
-        evented: true,
+        evented: ! $scope.exp_completed,
         parentCircle: parent,
         //backgroundColor: 'green'
       });

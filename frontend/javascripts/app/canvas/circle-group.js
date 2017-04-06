@@ -21,7 +21,7 @@ angular.module("canvasApp").factory('circleGroup', [
   'constants',
   function(constants) {
     return function(circles, parent, $scope) {
-      
+
       return new fabric.Group(circles, {
         left: parent.left + (constants.stepWidth / 2),
         top: parent.top,
@@ -29,7 +29,7 @@ angular.module("canvasApp").factory('circleGroup', [
         selectable: true,
         name: "controlCircleGroup",
         lockMovementX: true,
-        lockMovementY: $scope.exp_completed,
+        evented: ! $scope.exp_completed,
         hasControls: false,
         hasBorders: false,
         originX: "center",

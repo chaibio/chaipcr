@@ -38,9 +38,10 @@
        var opacity = (step.parentStage.parent.editStageStatus) ? 1 : 0;
        var properties = {
          originX: "center", originY: "center", left: step.left + 116, top: 86, hasBorders: false, hasControls: false,
-         lockMovementY: true, lockMovementX: true, parent: step, opacity: opacity, name: 'deleteStepButton', me: step
+         lockMovementY: true, lockMovementX: true, parent: step, opacity: opacity, name: 'deleteStepButton', me: step,
+         evented: ! step.$scope.exp_completed
        };
-       
+
        return Group.create([step.newCloseCircle, step.newCloseLine1, step.newCloseLine2], properties);
      };
    }

@@ -236,7 +236,7 @@ angular.module("canvasApp").factory('circle', [
         this.stepDataGroup = new stepDataGroup([
             this.temperature = new stepTemperature(this.model, this, $scope),
             this.holdTime = new stepHoldTime(this.model, this, $scope)
-          ], this);
+          ], this, $scope);
 
       };
 
@@ -251,7 +251,7 @@ angular.module("canvasApp").factory('circle', [
         this.stepDataGroup = new stepDataGroup([
           this.temperature = new stepTemperature(this.model, this, $scope),
           this.holdTime = new stepHoldTime(this.model, this, $scope)
-        ], this);
+        ], this, $scope);
 
         this.canvas.add(this.stepDataGroup);
         this.canvas.renderAll();
