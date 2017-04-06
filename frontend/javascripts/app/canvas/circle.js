@@ -231,7 +231,7 @@ angular.module("canvasApp").factory('circle', [
                 this.littleCircle3 = new circleMaker(6)
               ]
             )
-          ], this);
+          ], this, $scope);
 
         this.stepDataGroup = new stepDataGroup([
             this.temperature = new stepTemperature(this.model, this, $scope),
