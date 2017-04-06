@@ -52,11 +52,11 @@ angular.module("canvasApp").factory('mouseOut', [
           break;
 
           case "temperatureDisplayText":
-            evt.target.trigger('editing:exited');
+            //evt.target.trigger('editing:exited');
           break;
-          
+
           case "holdTimeDisplayText":
-            evt.target.trigger('editing:exited');
+            //evt.target.trigger('editing:exited');
           break;
 
         }
