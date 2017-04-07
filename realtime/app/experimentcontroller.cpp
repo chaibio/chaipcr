@@ -168,7 +168,7 @@ void ExperimentController::shutdown()
     LidInstance::getInstance()->setEnableMode(false);
     HeatSinkInstance::getInstance()->setEnableMode(false);
     HeatBlockInstance::getInstance()->setEnableMode(false);
-    OpticsInstance::getInstance()->setCollectData(false);
+    OpticsInstance::getInstance()->stopCollectData();
 }
 
 void ExperimentController::run()
@@ -192,7 +192,7 @@ void ExperimentController::run()
         {
             if (_experiment.protocol()->currentStage()->type() == Stage::Meltcurve)
             {
-                OpticsInstance::getInstance()->setCollectData(true, true);
+                OpticsInstance::getInstance()->startCollectData(Optics::MeltCurveDataType);
 
                 _meltCurveTimer->setPeriodicInterval(STORE_MELT_CURVE_DATA_INTERVAL);
                 _meltCurveTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::meltCurveCallback));
@@ -213,13 +213,15 @@ void ExperimentController::run()
 
                 if (interval > 0)
                 {
+                    Optics::CollectionDataType collectionType = _experiment.type() != Experiment::CalibrationType ? Optics::FluorescenceDataType : Optics::FluorescenceCalibrationDataType;
+
                     _fluorescenceTimer->stop();
                     _fluorescenceTimer->setStartInterval(interval);
                     _fluorescenceTimer->setPeriodicInterval(0);
-                    _fluorescenceTimer->start(TimerCallback([](){ OpticsInstance::getInstance()->setCollectData(true); }));
+                    _fluorescenceTimer->start(TimerCallback([collectionType](){ OpticsInstance::getInstance()->startCollectData(collectionType); }));
                 }
                 else
-                    OpticsInstance::getInstance()->setCollectData(true);
+                    OpticsInstance::getInstance()->startCollectData(_experiment.type() != Experiment::CalibrationType ? Optics::FluorescenceDataType : Optics::FluorescenceCalibrationDataType);
             }
         }
 
@@ -262,7 +264,7 @@ void ExperimentController::complete()
         _thermalState = IdleThermalState;
 
         LidInstance::getInstance()->setEnableMode(false);
-        OpticsInstance::getInstance()->setCollectData(false);
+        OpticsInstance::getInstance()->stopCollectData();
 
         _experiment.setCompletionStatus(Experiment::Success);
         _experiment.setCompletedAt(boost::posix_time::microsec_clock::local_time());
@@ -393,7 +395,7 @@ void ExperimentController::rampFinished()
 
     if (_machineState == RunningMachineState)
     {
-        if (_experiment.protocol()->currentStage()->type() != Stage::Meltcurve && OpticsInstance::getInstance()->collectData())
+        if (_experiment.protocol()->currentStage()->type() != Stage::Meltcurve && OpticsInstance::getInstance()->collectDataType() != Optics::NoCollectionDataType)
         {
             APP_LOGGER << "ExperimentController::rampFinished - a ramp has finished before fluorescence data is collected. Extending the ramp" << std::endl;
 
@@ -427,7 +429,7 @@ void ExperimentController::stepBegun()
 
         Stage *stage = _experiment.protocol()->currentStage();
 
-        if (stage->type() != Stage::Meltcurve && OpticsInstance::getInstance()->collectData())
+        if (stage->type() != Stage::Meltcurve && OpticsInstance::getInstance()->collectDataType() != Optics::NoCollectionDataType)
         {
             APP_LOGGER << "ExperimentController::stepBegun - a step has begin before fluorescence data is collected. Waiting for an extended ramp to finish" << std::endl;
 
@@ -448,13 +450,15 @@ void ExperimentController::stepBegun()
 
                     if (interval > 0)
                     {
+                        Optics::CollectionDataType collectionType = _experiment.type() != Experiment::CalibrationType ? Optics::FluorescenceDataType : Optics::FluorescenceCalibrationDataType;
+
                         _fluorescenceTimer->stop();
                         _fluorescenceTimer->setStartInterval(interval);
                         _fluorescenceTimer->setPeriodicInterval(0);
-                        _fluorescenceTimer->start(TimerCallback([](){ OpticsInstance::getInstance()->setCollectData(true); }));
+                        _fluorescenceTimer->start(TimerCallback([collectionType](){ OpticsInstance::getInstance()->startCollectData(collectionType); }));
                     }
                     else
-                        OpticsInstance::getInstance()->setCollectData(true);
+                        OpticsInstance::getInstance()->startCollectData(_experiment.type() != Experiment::CalibrationType ? Optics::FluorescenceDataType : Optics::FluorescenceCalibrationDataType);
                 }
 
                 _holdStepTimer->setStartInterval(holdTime * 1000);
@@ -490,7 +494,7 @@ void ExperimentController::holdStepCallback(Poco::Timer &)
 
         if (_experiment.protocol()->currentStage()->type() != Stage::Meltcurve)
         {
-            if (!OpticsInstance::getInstance()->collectData())
+            if (OpticsInstance::getInstance()->collectDataType() == Optics::NoCollectionDataType)
                 _dbControl->addFluorescenceData(_experiment, OpticsInstance::getInstance()->getFluorescenceData());
             else
             {
@@ -513,7 +517,7 @@ void ExperimentController::holdStepCallback(Poco::Timer &)
             {
                 if (stage->type() == Stage::Meltcurve)
                 {
-                    OpticsInstance::getInstance()->setCollectData(true, true);
+                    OpticsInstance::getInstance()->startCollectData(Optics::MeltCurveDataType);
 
                     _meltCurveTimer->setPeriodicInterval(STORE_MELT_CURVE_DATA_INTERVAL);
                     _meltCurveTimer->start(Poco::TimerCallback<ExperimentController>(*this, &ExperimentController::meltCurveCallback));
@@ -534,13 +538,15 @@ void ExperimentController::holdStepCallback(Poco::Timer &)
 
                     if (interval > 0)
                     {
+                        Optics::CollectionDataType collectionType = _experiment.type() != Experiment::CalibrationType ? Optics::FluorescenceDataType : Optics::FluorescenceCalibrationDataType;
+
                         _fluorescenceTimer->stop();
                         _fluorescenceTimer->setStartInterval(interval);
                         _fluorescenceTimer->setPeriodicInterval(0);
-                        _fluorescenceTimer->start(TimerCallback([](){ OpticsInstance::getInstance()->setCollectData(true); }));
+                        _fluorescenceTimer->start(TimerCallback([collectionType](){ OpticsInstance::getInstance()->startCollectData(collectionType); }));
                     }
                     else
-                        OpticsInstance::getInstance()->setCollectData(true);
+                        OpticsInstance::getInstance()->startCollectData(_experiment.type() != Experiment::CalibrationType ? Optics::FluorescenceDataType : Optics::FluorescenceCalibrationDataType);
                 }
             }
 

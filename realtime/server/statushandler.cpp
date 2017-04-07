@@ -137,7 +137,7 @@ void StatusHandler::processData(const boost::property_tree::ptree &, boost::prop
 
         if (optics) {
             responsePt.put("optics.intensity", optics->getLedController()->intensity());
-            responsePt.put("optics.collect_data", optics->collectData());
+            responsePt.put("optics.collect_data", optics->collectDataType() != Optics::NoCollectionDataType);
             responsePt.put("optics.lid_open", optics->lidOpen());
             responsePt.put("optics.well_number", state == ExperimentController::RunningMachineState ? optics->wellNumber() : 0);
 
