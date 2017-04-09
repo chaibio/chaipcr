@@ -81,8 +81,7 @@ Optics::Optics(unsigned int lidSensePin, std::shared_ptr<LEDController> ledContr
      _photodiodeMux(std::move(photoDiodeMux))
 {
     _lidOpen = false;
-    _collectData = false;
-    _meltCurveCollection = false;
+    _collectDataType = NoCollectionDataType;
     _collectDataTimer = new Poco::Util::Timer();
     _wellNumber = 0;
     _adcState = false;
@@ -145,36 +144,43 @@ void Optics::setADCValue(int32_t adcValue, std::size_t channel)
     }
 }
 
-void Optics::setCollectData(bool state, bool isMeltCurve)
+void Optics::startCollectData(CollectionDataType type)
+{
+    if (type == NoCollectionDataType)
+        return;
+
+    std::lock_guard<std::recursive_mutex> lock(_collectDataMutex);
+
+    CollectionDataType expectedType = NoCollectionDataType;
+
+    if (_collectDataType.compare_exchange_strong(expectedType, type))
+    {
+        _wellNumber = 0;
+
+        _fluorescenceData.clear();
+        _meltCurveData.clear();
+
+        if (_collectDataType == MeltCurveDataType)
+            _ledController->activateLED(kWellToLedMappingList.at(_wellNumber));
+
+        _photodiodeMux.setChannel(_wellNumber);
+
+        toggleCollectData();
+    }
+}
+
+void Optics::stopCollectData()
 {
     std::lock_guard<std::recursive_mutex> lock(_collectDataMutex);
 
-    if (_collectData.exchange(state) != state)
+    if (_collectDataType.exchange(NoCollectionDataType) != NoCollectionDataType)
     {
-        if (_collectData)
-        {
-            _meltCurveCollection = isMeltCurve;
-            _wellNumber = 0;
-
-            _fluorescenceData.clear();
-            _meltCurveData.clear();
-
-            if (isMeltCurve)
-                _ledController->activateLED(kWellToLedMappingList.at(_wellNumber));
-
-            _photodiodeMux.setChannel(_wellNumber);
-        }
-
         toggleCollectData();
 
-        if (!_collectData)
-        {
-            _meltCurveCollection = false;
-            _wellNumber = 0;
+        _wellNumber = 0;
 
-            _fluorescenceData.clear();
-            _meltCurveData.clear();
-        }
+        _fluorescenceData.clear();
+        _meltCurveData.clear();
     }
 }
 
@@ -182,21 +188,21 @@ void Optics::toggleCollectData(bool waitStop)
 {
     std::lock_guard<std::recursive_mutex> lock(_collectDataMutex);
 
-    if (_collectData && !lidOpen())
+    if (_collectDataType != NoCollectionDataType && !lidOpen())
     {
         _collectDataTimer->schedule(Poco::Util::TimerTask::Ptr(new Poco::Util::TimerTaskAdapter<Optics>(*this, &Optics::collectDataCallback)),
                                     Poco::Timestamp() + (kFluorescenceDataCollectionDelayTimeMs * 1000));
     }
     else
     {
-        bool collect = _collectData.exchange(false);
+        CollectionDataType type = _collectDataType.exchange(NoCollectionDataType);
 
         _adcState = false;
         _adcCondition.notify_all();
         _collectDataTimer->cancel(waitStop);
         _ledController->disableLEDs();
 
-        _collectData = collect;
+        _collectDataType = type;
     }
 }
 
@@ -217,12 +223,12 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &/*task*/)
         _adcCondition.wait(lock);
         _adcState = false;
 
-        if (!_collectData)
+        if (_collectDataType == NoCollectionDataType)
             _adcValues.clear();
 
         if (!_adcValues.empty())
         {
-            if (!_meltCurveCollection)
+            if (_collectDataType != MeltCurveDataType)
             {
                 std::size_t i = 0;
                 for (const std::vector<int32_t> &channel: _adcValues)
@@ -254,26 +260,29 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &/*task*/)
             _wellNumber = 0;
 
             //Assuming that other wells have the same amount of fluorescence data
-            if (!_meltCurveCollection && _fluorescenceData[0][0].fluorescenceValuesCount ==
-                    ((ExperimentController::getInstance()->experiment().type() != Experiment::CalibrationType ? kOpticalMeasurementsPerCycle : kOpticalMeasurementsPerCalibrationCycle) *
-                     kADCReadsPerOpticalMeasurementFinal))
+            if (_collectDataType == FluorescenceDataType || _collectDataType == FluorescenceCalibrationDataType)
             {
-                _collectData = false;
+                int measurments = _collectDataType != FluorescenceCalibrationDataType ? kOpticalMeasurementsPerCycle : kOpticalMeasurementsPerCalibrationCycle;
 
-                toggleCollectData(false);
-                fluorescenceDataCollected();
+                if (_fluorescenceData[0][0].fluorescenceValuesCount == measurments * kADCReadsPerOpticalMeasurementFinal)
+                {
+                    _collectDataType = NoCollectionDataType;
 
-                return;
+                    toggleCollectData(false);
+                    fluorescenceDataCollected();
+
+                    return;
+                }
             }
         }
 
         //Assuming that other wells have the same amount of baseline data
-        if (_meltCurveCollection || _fluorescenceData[_wellNumber][0].baselineValuesCount == (kBaselineMeasurementsPerCycle * kADCReadsPerOpticalMeasurementFinal))
+        if (_collectDataType == MeltCurveDataType || _fluorescenceData[_wellNumber][0].baselineValuesCount == (kBaselineMeasurementsPerCycle * kADCReadsPerOpticalMeasurementFinal))
             _ledController->activateLED(kWellToLedMappingList.at(_wellNumber));
 
         _photodiodeMux.setChannel(_wellNumber);
 
-        if (_collectData)
+        if (_collectDataType != NoCollectionDataType)
         {
             _collectDataTimer->schedule(Poco::Util::TimerTask::Ptr(new Poco::Util::TimerTaskAdapter<Optics>(*this, &Optics::collectDataCallback)),
                                         Poco::Timestamp() + (kFluorescenceDataCollectionDelayTimeMs * 1000));
@@ -290,7 +299,7 @@ std::vector<Optics::FluorescenceData> Optics::getFluorescenceData()
     std::vector<Optics::FluorescenceData> dataList;
     std::lock_guard<std::recursive_mutex> lock(_collectDataMutex);
 
-    if (!_collectData)
+    if (_collectDataType == NoCollectionDataType)
     {
         for (std::pair<const unsigned int, std::map<std::size_t, FluorescenceRoughData>> &wellData: _fluorescenceData)
         {
@@ -320,11 +329,11 @@ std::vector<Optics::MeltCurveData> Optics::getMeltCurveData(bool stopDataCollect
     std::lock_guard<std::recursive_mutex> collectDataLock(_collectDataMutex);
     std::unique_lock<std::mutex> meltCurveDataLock(_meltCurveDataMutex, std::defer_lock);
 
-    if (_collectData && _meltCurveCollection)
+    if (_collectDataType == MeltCurveDataType)
     {
         if (stopDataCollect)
         {
-            _collectData = _meltCurveCollection = false;
+            _collectDataType = NoCollectionDataType;
             toggleCollectData();
         }
         else

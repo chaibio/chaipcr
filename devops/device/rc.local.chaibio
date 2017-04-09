@@ -78,6 +78,10 @@ run_migrate_on_upgrade () {
 			echo "mysql server not up yet.. code $sql_running. waiting 10 seconds."
 			echo "MySql status:"
 			mysqladmin status
+			
+			chown -R mysql /data/mysql
+			chgrp -R mysql /data/mysql
+			systemctl start realtime.service
 
 			sleep 10
 			mysqladmin status | grep Uptime

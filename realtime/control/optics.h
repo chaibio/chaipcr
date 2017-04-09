@@ -41,6 +41,14 @@ namespace Poco { namespace Util { class Timer; class TimerTask; } }
 class Optics : public IControl, public ADCConsumer
 {
 public:
+    enum CollectionDataType
+    {
+        NoCollectionDataType,
+        FluorescenceDataType,
+        FluorescenceCalibrationDataType,
+        MeltCurveDataType
+    };
+
     struct FluorescenceData
     {
         FluorescenceData(int32_t baselineValue, int32_t fluorescenceValue, unsigned int wellId, std::size_t channel):
@@ -89,9 +97,9 @@ public:
 	//accessors
     inline bool lidOpen() const noexcept { return _lidOpen; }
 
-    inline bool collectData() const noexcept { return _collectData; }
-    inline bool isMeltCurveCollection() const noexcept { return _meltCurveCollection; }
-    void setCollectData(bool state, bool isMeltCurve = false);
+    inline CollectionDataType collectDataType() const noexcept { return _collectDataType; }
+    void startCollectData(CollectionDataType type);
+    void stopCollectData();
 
     inline unsigned wellNumber() const noexcept { return _wellNumber; } //Yes, it's used in multithreading. Yes, it isn't thread safe here. It's just for testing
 
@@ -119,7 +127,7 @@ private:
     std::atomic<bool> _adcState;
     std::condition_variable_any _adcCondition;
 
-    std::atomic<bool> _collectData;
+    std::atomic<CollectionDataType> _collectDataType;
     Poco::Util::Timer *_collectDataTimer;
     mutable std::recursive_mutex _collectDataMutex;
 
@@ -127,7 +135,6 @@ private:
 
     std::map<unsigned int, std::map<std::size_t, FluorescenceRoughData>> _fluorescenceData;
 
-    std::atomic<bool> _meltCurveCollection;
     std::vector<MeltCurveData> _meltCurveData;
     std::mutex _meltCurveDataMutex;
 

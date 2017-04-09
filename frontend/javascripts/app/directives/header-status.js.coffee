@@ -25,7 +25,8 @@ window.App.directive 'headerStatus', [
   'expName'
   'ModalError'
   '$location'
-  (Experiment, $state, Status, TestInProgressHelper, $rootScope, expName, ModalError, $location) ->
+  '$timeout'
+  (Experiment, $state, Status, TestInProgressHelper, $rootScope, expName, ModalError, $location, $timeout) ->
 
     restrict: 'EA'
     replace: true
@@ -65,6 +66,15 @@ window.App.directive 'headerStatus', [
       $scope.enterState = false
       $scope.done = false
 
+      checkStatus = () ->
+        getExperiment (exp) ->
+          $scope.experiment = exp
+          if !$scope.experiment.completed_at
+            $timeout checkStatus, 1000
+
+      #checkStatus()
+
+
       $scope.$on 'status:data:updated', (e, data, oldData) ->
         return if !data
         return if !data.experiment_controller
@@ -83,8 +93,10 @@ window.App.directive 'headerStatus', [
             $scope.experiment = exp
             $scope.status = data
             $scope.is_holding = TestInProgressHelper.set_holding(data, exp)
-            if $scope.state is 'idle'
+            if $scope.state is 'idle' && $scope.experiment.completed_at
               $scope.done = true
+            else if $scope.state is 'idle' && !$scope.experiment.completed_at
+              checkStatus()
         else
           $scope.status = data
           $scope.is_holding = TestInProgressHelper.set_holding(data, $scope.experiment)
@@ -148,6 +160,8 @@ window.App.directive 'headerStatus', [
       $scope.$on 'complete', ->
         $scope.dataAnalysis = true
         console.log $scope.dataAnalysis
+        getExperiment (exp) ->
+          $scope.experiment = exp
 
       $scope.$watch 'experimentId', (id) ->
         return if !id

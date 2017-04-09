@@ -10,14 +10,14 @@
 				<tr>
 					<td class="posneg">A1. Positive Control</td>
 					<td class="rxn-center"><img style="width:20px" src="./images/Plus-Pink.svg"></td>
-					<td ng-show="notes[0]" ng-click="openNotes(0)" class="rxn-center"><img style="width:20px" src="./images/comment_on.svg"></td>
-					<td ng-show="!notes[0]" ng-click="openNotes(0)" class="rxn-center"><img style="width:20px" src="./images/comment_off.svg"></td>
+					<td ng-show="notes[0]" ng-click="openNotes(0)" class="rxn-center notes-cursor"><img style="width:20px" src="./images/comment_on.svg"></td>
+					<td ng-show="!notes[0]" ng-click="openNotes(0)" class="rxn-center notes-cursor"><img style="width:20px" src="./images/comment_off.svg"></td>
 				</tr>
 				<tr>
 					<td class="posneg">A2. Negative Control</td>
 					<td class="rxn-center"><img style="width:20px" src="./images/Minus-Pink.svg"></td>
-					<td ng-show="notes[1]" ng-click="openNotes(1)" class="rxn-center"><img style="width:20px" src="./images/comment_on.svg"></td>
-					<td ng-show="!notes[1]" ng-click="openNotes(1)" class="rxn-center"><img style="width:20px" src="./images/comment_off.svg"></td>
+					<td ng-show="notes[1]" ng-click="openNotes(1)" class="rxn-center notes-cursor"><img style="width:20px" src="./images/comment_on.svg"></td>
+					<td ng-show="!notes[1]" ng-click="openNotes(1)" class="rxn-center notes-cursor"><img style="width:20px" src="./images/comment_off.svg"></td>
 				</tr>
 				<tr ng-repeat="x in samples track by $index">
 					<td>
@@ -27,8 +27,8 @@
 					</td>
 					<td ng-show="x" class="rxn-center"><img style="width:20px" src="./images/Sample-Pink.svg"></td>
 					<td ng-show="!x" class="rxn-center"><img style="width:20px" src="./images/Sample-Pink-Empty.svg"></td>
-					<td ng-show="notes[$index+2]" ng-click="openNotes($index+2)" class="rxn-center"><img style="width:20px" src="./images/comment_on.svg"></td>
-					<td ng-show="!notes[$index+2]" ng-click="openNotes($index+2)" class="rxn-center"><img style="width:20px" src="./images/comment_off.svg"></td>
+					<td ng-show="notes[$index+2]" ng-click="openNotes($index+2)" class="rxn-center notes-cursor"><img style="width:20px" src="./images/comment_on.svg"></td>
+					<td ng-show="!notes[$index+2]" ng-click="openNotes($index+2)" class="rxn-center notes-cursor"><img style="width:20px" src="./images/comment_off.svg"></td>
 				</tr>
 			</table>
 

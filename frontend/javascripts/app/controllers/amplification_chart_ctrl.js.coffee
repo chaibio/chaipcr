@@ -113,7 +113,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.hoverOn = true
           $scope.errorCheck = true
           $scope.errorD2f = true
-        if $scope.baseline_sub != 'auto' && (!$scope.cyclesFrom || $scope.cyclesTo)
+        if $scope.baseline_sub != 'auto' && (!$scope.cyclesFrom || !$scope.cyclesTo)
           $scope.hoverName = 'Error'
           $scope.hoverDescription = 'Range for baseline cycles cannot be left empty'
           $scope.hoverOn = true
@@ -124,13 +124,20 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             $scope.baseline_cycle_bounds = null
           else
             $scope.baseline_cycle_bounds = [parseInt($scope.cyclesFrom), parseInt($scope.cyclesTo)]
-          Experiment.updateAmplificationOptions($stateParams.id,{'cq_method':$scope.method.name,'min_fluorescence': parseInt($scope.minFl.value), 'min_reliable_cycle': parseInt($scope.minCq.value), 'min_d1': parseInt($scope.minDf.value), 'min_d2': parseInt($scope.minD2f.value), 'baseline_cycle_bounds': $scope.baseline_cycle_bounds }).then (resp) ->
+          Experiment
+          .updateAmplificationOptions($stateParams.id,{'cq_method':$scope.method.name,'min_fluorescence': parseInt($scope.minFl.value), 'min_reliable_cycle': parseInt($scope.minCq.value), 'min_d1': parseInt($scope.minDf.value), 'min_d2': parseInt($scope.minD2f.value), 'baseline_cycle_bounds': $scope.baseline_cycle_bounds })
+          .then (resp) ->
             $scope.amplification_data = helper.paddData()
             $scope.hasData = false
             for well_i in [0..15] by 1
               $scope.wellButtons["well_#{well_i}"].ct = 0
             $scope.close()
             fetchFluorescenceData()
+          .catch (resp) ->
+            if resp != 'canceled'
+              $scope.hoverName = 'Error'
+              $scope.hoverDescription = resp.data || 'Unknown error'
+              $scope.hoverOn = true
 
       $scope.hover = (model) ->
         $scope.hoverName = model.name
@@ -154,6 +161,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             $scope.baseline_sub = 'cycles'
             $scope.cyclesFrom = resp.data.amplification_option.baseline_cycle_bounds[0]
             $scope.cyclesTo = resp.data.amplification_option.baseline_cycle_bounds[1]
+        .catch (resp) ->
+          $scope.hoverName = 'Error'
+          $scope.hoverDescription = resp.data || 'Unknown error'
+          $scope.hoverOn = true
 
       $scope.getAmplificationOptions()
 

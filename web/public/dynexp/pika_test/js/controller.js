@@ -107,6 +107,7 @@
 				$scope.updateNotes = function(index,x){
 					Experiment.updateWell($scope.experimentId,index+1,{'notes':x}).then(function(resp){
 						$scope.editNotes = false;
+						$scope.cancel();
 					});
 				}
 

@@ -71,6 +71,15 @@ mount_sdcard_partitions () {
 	mount ${sdcard_dev}p2 ${sdcard_p2} -t ext4 || true
 }
 
+boot_from_sdcard () {
+        echo force booting from sdcard
+        if [ -e /mnt/uEnv.sdcard.txt ] && [ -e /mnt/uEnv.txt ]
+        then
+                cp /mnt/uEnv.sdcard.txt /mnt/uEnv.txt
+		sync
+        fi
+}
+
 remove_upgrade_flags ()
 {
 	if [ -e ${sdcard_p1}/pack_resume_autorun.flag ]
@@ -103,6 +112,7 @@ if [ $s2pressed -eq 0 ]
 then
         echo "Boot button pressed"
 	remove_upgrade_flags
+	boot_from_sdcard
 else
         echo "Boot button not pressed"
 fi
@@ -249,10 +259,27 @@ format_perm () {
 format_data () {
         echo "Writing data partition formatting image!"
         echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
-        tar xOf $image_filename_upgrade format-data.img.gz | gunzip -c | dd of=${eMMC}p3 bs=16M
+        
+	tar xOf $image_filename_upgrade format-data.img.gz | gunzip -c | dd of=${eMMC}p3 bs=16M
         flush_cache_mounted
         echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
         echo "Done writing data partition formatting image!"
+}
+
+write_data_fs_image () {
+        echo "Writing data partition image!"
+	image_filename_prfx="upgrade"
+	image_filename_data="$image_filename_prfx-data.img.gz"
+	image_filename_fs="${sdcard_p1}/factory_settings.img.tar"
+
+        echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+        tar xOf $image_filename_fs $image_filename_data | gunzip -c | dd of=${eMMC}p3 bs=16M
+	flush_cache_mounted
+        echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+        echo "Done writing data partition image!"
+
+#3exit 0
+
 }
 
 partition_drive () {
@@ -685,9 +712,9 @@ isValidDataPartition () {
 	then
 		echo "${eMMC}p3 mounted!"
 		echo "Test Test" >> /tmp/datacheck/write_test_data_partition.flag
-		if [ -e /tmp/permcheck/write_test_data_partition.flag ]
+		if [ -e /tmp/datacheck/write_test_data_partition.flag ]
 		then
-			rm /tmp/permcheck/write_test_data_partition.flag || true
+			rm /tmp/datacheck/write_test_data_partition.flag || true
 			result=0
 		fi
 		umount /tmp/datacheck || true
@@ -726,6 +753,8 @@ then
 	        if isUpgrade 
         	then
 	               format_data
+		else
+			write_data_fs_image			
 	        fi
 	else
 		echo geometery still not valid for /perm partition.
@@ -740,7 +769,9 @@ then
         	then
 			echo upgrade case.. formating data partition.
 	               	format_data
-	        fi
+		else	
+			write_data_fs_image
+        	fi
 	else
 		echo geometery still not valid for /data partition.
 	fi
@@ -771,9 +802,15 @@ then
 		echo "Done partitioning $eMMC!"
 		perform_data_restore
 	else
-		echo "Cannot update partition table at  $eMMC! restarting!"
+		echo "Cannot update data partition table at  $eMMC! restarting!"
 		echo "Write Data Partition 2" > ${sdcard_p2}/write_data_partition.flag
+		if isUpgrade
+		then
+			echo data partition formatting needed.
+		else
 
+			write_data_fs_image
+		fi
 		sync
 		rebootx
 		exit 0

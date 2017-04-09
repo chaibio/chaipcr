@@ -36,8 +36,10 @@ angular.module("canvasApp").factory('stepTemperature', [
         this.text = new fabric.IText(temp +"º", {
           fill: 'black',
           fontSize: 20,
-          top : this.parent.top + 10,
-          left: this.parent.left - 15,
+          originX: "left",
+          originY: "top",
+          top : 0,
+          left: 0,
           fontFamily: "dinot-bold",
           selectable: false,
           hasBorder: false,

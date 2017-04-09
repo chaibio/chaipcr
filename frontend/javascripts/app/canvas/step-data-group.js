@@ -18,17 +18,18 @@
  */
 
 angular.module("canvasApp").factory('stepDataGroup', [
-  function() {
-    return function(dataArray, parent) {
+  'constants',
+  function(constants) {
+    return function(dataArray, parent, $scope) {
       var rec = new fabric.Rect({
         width: 105,
         height: 20,
         fill: '#FFB300',
         opacity: 0.1,
-        top: parent.top + 22,
-        left: parent.left + 35,
-        originX: 'center',
-        originY: "center",
+        top: 0,
+        left: 0,
+        originX: 'left',
+        originY: "top",
         hasBorder: false,
         hasControls: false,
       });
@@ -37,14 +38,14 @@ angular.module("canvasApp").factory('stepDataGroup', [
 
       return new fabric.Group(dataArray, {
         top: parent.top + 48,
-        left: parent.left + 60,
+        left: parent.left + (constants.stepWidth / 2),
         originX: "center",
         originY: "center",
         selectable: false,
         name: "stepDataGroup",
-        evented: true,
+        evented: ! $scope.exp_completed,
         parentCircle: parent,
-        //backgroundColor: 'black'
+        //backgroundColor: 'green'
       });
     };
   }

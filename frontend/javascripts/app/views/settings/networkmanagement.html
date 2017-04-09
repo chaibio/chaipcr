@@ -46,7 +46,8 @@
       <ul>
         <li ng-repeat="wifiNetwork in wifiNetworks">
           <check-mark current-network="currentWifiSettings" ssid="{{wifiNetwork.ssid}}"></check-mark>
-          <a ui-sref="settings.networkmanagement.wifi({name: '{{wifiNetwork.ssid | spaceToUnderscore}}'})" ui-sref-active="highlite">{{wifiNetwork.ssid}}
+          <a ui-sref="settings.networkmanagement.wifi({name: '{{wifiNetwork.ssid | spaceToUnderscore}}'})" ui-sref-active="highlite">
+						<span>{{wifiNetwork.ssid | truncate:20}}</span>
             <wifi-lock encryption="{{wifiNetwork.encryption}}" ssid="{{wifiNetwork.ssid | spaceToUnderscore}}"></wifi-lock>
             <wifi-signal ssid="{{wifiNetwork.ssid | spaceToUnderscore}}" quality="{{wifiNetwork.quality}}"></wifi-signal>
           </a>

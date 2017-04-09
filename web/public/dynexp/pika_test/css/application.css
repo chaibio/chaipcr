@@ -22,6 +22,10 @@ p {
 		font-size: 14px;
 }
 
+.notes-cursor{
+	cursor: pointer;
+}
+
 td{
 	padding: 15px;
 }

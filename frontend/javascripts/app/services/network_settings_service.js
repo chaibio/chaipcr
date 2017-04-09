@@ -53,7 +53,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     };
 
     this.getSettings = function() {
-
+      this.userSettings = $.jStorage.get('userNetworkSettings');
       if(that.userSettings.wifiSwitchOn /*&& that.wirelessError === false*/) {
         this.lanLookup();
       }

@@ -48,7 +48,9 @@ angular.module("canvasApp").factory('mouseDown', [
 
           case "stepDataGroup":
 
-            var click = evt.e, target = evt.target, stepDataGroupLeft = target.left - 46,
+            var click = evt.e,
+            target = evt.target,
+            stepDataGroupLeft = target.left - 60,
             getP = that.canvas.getPointer(evt.e);
             that.selectStep(target.parentCircle);
 
@@ -58,16 +60,20 @@ angular.module("canvasApp").factory('mouseDown', [
             // editmode is active. so delete it before we add , so we send removeIndex. In this case rectangle mask is the
             // first element in the array.
 
-            unHookGroup(group, items, removeIndex);
-
-            if(getP.x > stepDataGroupLeft && getP.x < (stepDataGroupLeft + 45)) {
+            if(getP.x > stepDataGroupLeft && getP.x < (stepDataGroupLeft + 55)) {
+              console.log("click on temp");
+              unHookGroup(group, items, removeIndex);
               editMode.tempActive = true;
               editMode.currentActiveTemp = target.parentCircle.temperature;
               startEditing(target.parentCircle.temperature, evt);
             } else {
-              editMode.holdActive = true;
-              editMode.currentActiveHold = target.parentCircle.holdTime;
-              startEditing(target.parentCircle.holdTime, evt);
+              console.log("click on time");
+              if(! target.parentCircle.model.pause) {
+                unHookGroup(group, items, removeIndex);
+                editMode.holdActive = true;
+                editMode.currentActiveHold = target.parentCircle.holdTime;
+                startEditing(target.parentCircle.holdTime, evt);
+              }
             }
 
           break;
@@ -153,7 +159,6 @@ angular.module("canvasApp").factory('mouseDown', [
 
         group._restoreObjectsState();
         C.canvas.remove(group);
-
 
         C.canvas.remove(items[index_to_remove]);
 
