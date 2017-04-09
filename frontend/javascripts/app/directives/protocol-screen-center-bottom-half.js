@@ -10,7 +10,7 @@
 
           function adjustWidth() {
             var padding = 50;
-            var numVisibleDataBoxes = 3
+            var numVisibleDataBoxes = 3;
             var mainWidth = elem.width();
             var prevWidth = elem.find('[action="previous"]').width();
             var nextWidth = elem.find('[action="next"]').width();
@@ -29,16 +29,16 @@
             var eachBoxesWidth = (middleGroundWidth - (padding * numPadding)) / numVisibleDataBoxes;
 
 
-            dataBoxesSummary.css({ width: (eachBoxesWidth * (numVisibleDataBoxes - 1) + padding) + 'px' })
+            dataBoxesSummary.css({ width: (eachBoxesWidth * (numVisibleDataBoxes - 1) + padding) + 'px' });
             for (var i = 0; i < dataBoxes.length; i++) {
               var box = dataBoxes[i];
               var left = i * (eachBoxesWidth + padding);
               $window.$(box).css({
                 width: eachBoxesWidth + 'px',
                 left: left + 'px'
-              })
+              });
 
-              console.log('left' + i + ': ' + left)
+              console.log('left' + i + ': ' + left);
             }
 
             elem.find('.bottom-common-item, .name-board').width(eachBoxesWidth + 'px');
@@ -54,8 +54,8 @@
             // resize big buttons
             dataBoxesEdit.find('button.big_button, button.big_button_disabled').css({ width: eachBoxesWidth + 'px' });
             // resize small buttons
-            var small_button_space = 17 + 4
-            var eachSmallButtonWidth = (eachBoxesWidth - small_button_space) / 2
+            var small_button_space = 17 + 4;
+            var eachSmallButtonWidth = (eachBoxesWidth - small_button_space) / 2;
             dataBoxesEdit.find('button.small_button, button.small_button_disabled').css({ width: eachSmallButtonWidth + 'px' });
 
           }
@@ -65,7 +65,7 @@
           $(window).resize(function() {
             console.log('protocol resizing ....');
             adjustWidth();
-          })
+          });
 
         }
       };
