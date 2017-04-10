@@ -55,6 +55,11 @@ public:
 };
 
 // Class QPCRApplication
+QPCRApplication::QPCRApplication(): Watchdog::Watchable("QPCRApplication")
+{
+
+}
+
 void QPCRApplication::stopExperiment(const string &message) {
     _experimentController->stop(message);
 }
@@ -154,13 +159,20 @@ int QPCRApplication::main(const vector<string>&) {
         HeatSinkInstance::getInstance()->startADCReading();
 
         _workState = true;
+
+        Watchdog::start(); //Must be called after _workState is set because watchdog tracks this state
+
         while (!waitSignal() && _workState) {
+            checkin();
+
             for (auto controlUnit: _controlUnits)
                 controlUnit->process();
 
             if (_exception)
                 rethrow_exception(_exception);
         }
+
+        _workState = false;
 
         params->setKeepAlive(false);
         server.stopAll(true);

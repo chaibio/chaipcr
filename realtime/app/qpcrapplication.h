@@ -19,6 +19,8 @@
 #ifndef _QPCRSERVER_H_
 #define _QPCRSERVER_H_
 
+#include "watchdog.h"
+
 #include <Poco/Util/ServerApplication.h>
 
 #include <signal.h>
@@ -35,7 +37,7 @@ class TimeChecker;
 class UpdateManager;
 
 // Class QPCRApplication
-class QPCRApplication: public Poco::Util::ServerApplication
+class QPCRApplication: public Poco::Util::ServerApplication, public Watchdog::Watchable
 {
 public:
     class MachineSettings
@@ -62,6 +64,8 @@ public:
             std::string platform;
         }configuration;
     };
+
+    QPCRApplication();
 
     inline static QPCRApplication& getInstance() { return static_cast<QPCRApplication&>(instance()); }
 
