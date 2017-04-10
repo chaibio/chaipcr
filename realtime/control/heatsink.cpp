@@ -27,7 +27,7 @@
 #include <Poco/Util/TimerTaskAdapter.h>
 
 HeatSink::HeatSink(Settings settings, const std::string &fanPWMPath, unsigned long fanPWMPeriod, const ADCPin &adcPin)
-    :TemperatureController(settings), Watchdog::Watchable("HeatSink", boost::chrono::seconds(30)), _adcPin(adcPin)
+    :TemperatureController(settings), Watchdog::Watchable("Heat sink", boost::chrono::seconds(30)), _adcPin(adcPin)
 {
     _fan = new PWMControl(fanPWMPath, fanPWMPeriod);
     _fanControlState = false;

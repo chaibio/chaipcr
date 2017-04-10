@@ -80,7 +80,7 @@ void watch()
                 watchable.second = boost::chrono::system_clock::now();
             else if ((boost::chrono::system_clock::now() - watchable.second) > watchable.first->watchInterval())
             {
-                APP_LOGGER << watchable.first->name() << " has frozen. Killing the app" << std::endl;
+                APP_LOGGER << watchable.first->name() << " thread has blocked for over " << watchable.first->watchInterval().count() << " seconds. Killing the app" << std::endl;
 
                 time.tv_sec = 0;
                 time.tv_nsec = 100 * 1000 * 1000;

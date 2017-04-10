@@ -55,7 +55,7 @@ public:
 };
 
 // Class QPCRApplication
-QPCRApplication::QPCRApplication(): Watchdog::Watchable("QPCRApplication")
+QPCRApplication::QPCRApplication(): Watchdog::Watchable("Main")
 {
 
 }
