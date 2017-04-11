@@ -161,7 +161,7 @@ void Optics::startCollectData(CollectionDataType type)
         _meltCurveData.clear();
 
         if (_collectDataType == MeltCurveDataType)
-            _ledController->activateLED(kWellToLedMappingList.at(_wellNumber));
+            _ledController->activateLED(_wellNumber);
 
         _photodiodeMux.setChannel(_wellNumber);
 
@@ -255,7 +255,7 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &/*task*/)
 
         ++_wellNumber;
 
-        if (_wellNumber >= kWellToLedMappingList.size())
+        if (_wellNumber >= kWellCount)
         {
             _wellNumber = 0;
 
@@ -278,7 +278,7 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &/*task*/)
 
         //Assuming that other wells have the same amount of baseline data
         if (_collectDataType == MeltCurveDataType || _fluorescenceData[_wellNumber][0].baselineValuesCount == (kBaselineMeasurementsPerCycle * kADCReadsPerOpticalMeasurementFinal))
-            _ledController->activateLED(kWellToLedMappingList.at(_wellNumber));
+            _ledController->activateLED(_wellNumber);
 
         _photodiodeMux.setChannel(_wellNumber);
 
