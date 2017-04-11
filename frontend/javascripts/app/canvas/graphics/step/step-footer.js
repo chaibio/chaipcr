@@ -17,16 +17,16 @@
  * limitations under the License.
  */
  angular.module('canvasApp').factory('stepFooter', [
-   'stepFooterBackbround',
+   'stepFooterBackground',
    'Group',
    'dots',
-   function(stepFooterBackbround, Group, dots) {
+   function(stepFooterBackground, Group, dots) {
      return function(step) {
 
        var components = dots.stepDots();
        var editStageStatus = step.parentStage.parent.editStageStatus;
 
-       components.unshift(new stepFooterBackbround());
+       components.unshift(new stepFooterBackground());
 
        var properties =  {
          originX: "left", originY: "top", left: step.left + 16, top: 378, visible: editStageStatus, lockMovementY: true,

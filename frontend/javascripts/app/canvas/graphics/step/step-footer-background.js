@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- angular.module('canvasApp').factory('stepFooterBackbround', [
+ angular.module('canvasApp').factory('stepFooterBackground', [
    'Rectangle',
    function(Rectangle) {
      return function() {
