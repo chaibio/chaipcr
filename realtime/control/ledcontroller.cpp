@@ -20,6 +20,7 @@
 #include "pcrincludes.h"
 #include "spi.h"
 #include "ledcontroller.h"
+#include "constants.h"
 
 #include <sstream>
 #include <limits>
@@ -55,13 +56,6 @@ LEDController::~LEDController() {
 	
 }
 
-//local constants
-const int kPotMinResistance = 75;
-const int kPotMaxResistance = 5000 + kPotMinResistance;
-const uint32_t kLEDSpiSpeed_Hz = 1000000;  //the actual freq is 750 KHz (possible bug in the kernel driver)
-const uint8_t kLEDFineIntensityMax = 0x3F; //6-bit value
-const std::vector<int> kWellToLedMappingList = {3, 2, 1, 0, 15, 14, 13, 12, 4, 5, 6, 7, 8, 9, 10, 11};
-
 void LEDController::setIntensity(double onCurrentMilliamps) {
     if (_intensity == onCurrentMilliamps)
         return;
@@ -96,14 +90,14 @@ void LEDController::setIntensity(double onCurrentMilliamps) {
 
         //calculate
         double rIref = 1.24 / (onCurrentMilliamps / 1000) * 31.5; //reference resistance for TLC5940
-        if (rIref > kPotMaxResistance || rIref < kPotMinResistance)
+        if (rIref > kLEDPotMaxResistance || rIref < kLEDPotMinResistance)
         {
             std::stringstream stream;
-            stream << "Requested LED intensity of " << onCurrentMilliamps << " requires a resistance outside the valid range of [ " << kPotMinResistance << ", " << kPotMaxResistance << " ]";
+            stream << "Requested LED intensity of " << onCurrentMilliamps << " requires a resistance outside the valid range of [ " << kLEDPotMinResistance << ", " << kLEDPotMaxResistance << " ]";
 
             throw InvalidArgument(stream.str().c_str());
         }
-        int rN = (rIref - kPotMinResistance) * 256 / (kPotMaxResistance - kPotMinResistance);
+        int rN = (rIref - kLEDPotMinResistance) * 256 / (kLEDPotMaxResistance - kLEDPotMinResistance);
         char txBuf[] = {0, static_cast<uint8_t>(rN)};
 
         //send resistance

@@ -111,6 +111,13 @@ const int kOpticalFluorescenceMeasurmentPeriodMs = (kOpticalMeasurementsPerCycle
 const int kOpticalRejectedOutlierMeasurements = 3;
 const int kADCReadsPerOpticalMeasurementFinal = kADCReadsPerOpticalMeasurement - kOpticalRejectedOutlierMeasurements;
 
+//LED
+const int kLEDPotMinResistance = 75;
+const int kLEDPotMaxResistance = 5000 + kLEDPotMinResistance;
+const uint32_t kLEDSpiSpeed_Hz = 1000000;  //the actual freq is 750 KHz (possible bug in the kernel driver)
+const uint8_t kLEDFineIntensityMax = 0x3F; //6-bit value
+const std::vector<int> kWellToLedMappingList = {3, 2, 1, 0, 15, 14, 13, 12, 4, 5, 6, 7, 8, 9, 10, 11};
+
 //Steps
 const double kPCRBeginStepTemperatureThreshold = 0.5;
 
