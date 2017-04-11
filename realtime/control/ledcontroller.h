@@ -37,7 +37,7 @@ public:
     inline double intensity() const { return _intensity; }
     // ledNumber is 0-indexed and corresponds to well number
     void activateLED(unsigned int ledNumber);
-    // Valid range for fine intensity is from 0x0 to 0x3F
+    // Valid range for fine intensity is from 0x0 to 0x3F. If ledNumber is negative the fine intensity for all LED's is set
     void setIntensityFine(uint8_t ledIntensity, int ledNumber = -1);
     inline void disableLEDs() { disableLEDs(true); }
 

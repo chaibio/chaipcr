@@ -35,16 +35,16 @@ LEDController::LEDController(shared_ptr<SPIPort> spiPort,unsigned int potCSPin,
     _ledXLATPin(ledXLATPin, GPIO::kOutput),
     _ledBlankPWM(ledBlankPWMPath),
     _ledGSPin(kLEDControlGSPinNumber, GPIO::kOutput),
-    _intensityFine(16, 0x3F){
+    _intensityFine(kWellCount, 0x3F){
 
     _intensity = 0;
     _lastLedNumber = std::numeric_limits<unsigned>::max();
 
     _dutyCyclePercentage.store(dutyCyclePercentage);
 
-    disableLEDs();
     _ledBlankPWM.setPWM(kLedBlankPwmDutyNs, kLedBlankPwmPeriodNs, 0);
     setIntensity(kDefaultLEDCurrent);
+    disableLEDs();
 
     _potCSPin.setValue(GPIO::kHigh);
     _ledXLATPin.setValue(GPIO::kLow);
@@ -59,6 +59,7 @@ LEDController::~LEDController() {
 const int kPotMinResistance = 75;
 const int kPotMaxResistance = 5000 + kPotMinResistance;
 const uint32_t kLEDSpiSpeed_Hz = 1000000;  //the actual freq is 750 KHz (possible bug in the kernel driver)
+const uint8_t kLEDFineIntensityMax = 0x3F; //6-bit value
 const std::vector<int> kWellToLedMappingList = {3, 2, 1, 0, 15, 14, 13, 12, 4, 5, 6, 7, 8, 9, 10, 11};
 
 void LEDController::setIntensity(double onCurrentMilliamps) {
@@ -111,12 +112,8 @@ void LEDController::setIntensity(double onCurrentMilliamps) {
         _spiPort->readBytes(NULL, txBuf, sizeof(txBuf), kLEDSpiSpeed_Hz);
         _potCSPin.setValue(GPIO::kHigh);
 
-        //The following is a workaround for TLC5940 internal register becoming corupted by ESD events
-        sendLEDGrayscaleValues();
-        //refresh intensity values
         sendLEDIntensityFineValues();
-        //refresh grayscale values in the shift register without latching them
-        sendLEDGrayscaleValues(false);
+        sendLEDGrayscaleValues();
     }
     else {
         disableLEDs(false);
@@ -131,26 +128,21 @@ void LEDController::activateLED(unsigned int ledNumber) {
 
     if (_intensity > 0)
     {
-        sendLEDGrayscaleValues();
-
-        //The following is a workaround for TLC5940 internal register becoming corupted by ESD events
-        //refresh intensity values
         sendLEDIntensityFineValues();
-        //refresh grayscale values in the shift register without latching them
-        sendLEDGrayscaleValues(false);
+        sendLEDGrayscaleValues();
     }
 }
 
 void LEDController::setIntensityFine(uint8_t ledIntensity, int ledNumber){
 
-    if(ledIntensity > 0x3F){
+    if(ledIntensity > kLEDFineIntensityMax){
         std::stringstream stream;
         stream << "Invalid intensity value: " << (int) ledIntensity;
 
         throw InvalidArgument(stream.str().c_str());
     }
 
-    if(ledNumber > 15){
+    if(ledNumber > kWellCount - 1){
         std::stringstream stream;
         stream << "Invalid LED number of " << ledNumber;
 
@@ -158,30 +150,29 @@ void LEDController::setIntensityFine(uint8_t ledIntensity, int ledNumber){
     }
 
     if(ledNumber < 0){
-        for(int i = 0; i < 16; i++){
-            _intensityFine[i] = ledIntensity;
-        }
+        std::fill(_intensityFine.begin(), _intensityFine.end(), ledIntensity);
     }
     else{
-        _intensityFine[ledNumber] = ledIntensity;
+        _intensityFine[kWellToLedMappingList.at(ledNumber)] = ledIntensity;
     }
 
     sendLEDIntensityFineValues();
-
-    //The following is a workaround for TLC5940 internal register becoming corupted by ESD events
-    //refresh grayscale values in the shift register without latching them
     sendLEDGrayscaleValues(false);
-
 }
 
 void LEDController::sendLEDIntensityFineValues(){
 
+    uint8_t fine_int_values[kWellCount] = {0};
+    if (_lastLedNumber != std::numeric_limits<unsigned>::max()){
+            fine_int_values[_lastLedNumber] = _intensityFine[_lastLedNumber] ;
+    }
+
     uint8_t packed_data[12] = {0};
     for (int i = 15; i > 0; i -= 4) {
         int pack_index = (15 - i) / 4 * 3;
-        packed_data[pack_index + 0] = ((_intensityFine[i-0] << 2 ) & 0xFC) | (( _intensityFine[i-1] >> 4) & 0x03 );
-        packed_data[pack_index + 1] = ((_intensityFine[i-1] << 4 ) & 0xF0) | (( _intensityFine[i-2] >> 2) & 0x0F );
-        packed_data[pack_index + 2] = ((_intensityFine[i-2] << 6 ) & 0xC0) | (( _intensityFine[i-3] >> 0) & 0x3F );
+        packed_data[pack_index + 0] = ((fine_int_values[i-0] << 2 ) & 0xFC) | (( fine_int_values[i-1] >> 4) & 0x03 );
+        packed_data[pack_index + 1] = ((fine_int_values[i-1] << 4 ) & 0xF0) | (( fine_int_values[i-2] >> 2) & 0x0F );
+        packed_data[pack_index + 2] = ((fine_int_values[i-2] << 6 ) & 0xC0) | (( fine_int_values[i-3] >> 0) & 0x3F );
     }
 
     _ledGSPin.setValue(GPIO::kHigh);
@@ -195,7 +186,7 @@ void LEDController::sendLEDIntensityFineValues(){
 
 void LEDController::sendLEDGrayscaleValues(bool latch){
 
-    uint16_t gs_values[16] = {0};
+    uint16_t gs_values[kWellCount] = {0};
     if (_lastLedNumber != std::numeric_limits<unsigned>::max()){
             gs_values[_lastLedNumber] = 0xFFF;
     }
@@ -222,13 +213,8 @@ void LEDController::disableLEDs(bool clearLastLed) {
     unsigned tmp = _lastLedNumber;
     _lastLedNumber = std::numeric_limits<unsigned>::max();
 
-    sendLEDGrayscaleValues();
-
-    //The following is a workaround for TLC5940 internal register becoming corupted by ESD events
-    //refresh intensity values
     sendLEDIntensityFineValues();
-    //refresh grayscale values in the shift register without latching them
-    sendLEDGrayscaleValues(false);
+    sendLEDGrayscaleValues();
 
     if (!clearLastLed){
         _lastLedNumber = tmp;
