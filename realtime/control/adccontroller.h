@@ -20,6 +20,7 @@
 #define _ADCCONTROLLER_H_
 
 #include "icontrol.h"
+#include "watchdog.h"
 #include "spi.h"
 #include "lockfreesignal.h"
 
@@ -34,7 +35,7 @@ class ADCConsumer;
 class BaseADCDebugLogger;
 
 // Class ADCController
-class ADCController : public IThreadControl
+class ADCController : public IThreadControl, public Watchdog::Watchable
 {
 public:
     enum ADCState {

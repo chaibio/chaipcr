@@ -20,6 +20,7 @@
 #define HEATSINK_H
 
 #include "temperaturecontroller.h"
+#include "watchdog.h"
 #include "adcpin.h"
 
 #include <atomic>
@@ -31,7 +32,7 @@
 
 class PWMControl;
 
-class HeatSink : public TemperatureController
+class HeatSink : public TemperatureController, public Watchdog::Watchable
 {
 public:
     HeatSink(Settings settings, const std::string &fanPWMPath, unsigned long fanPWMPeriod, const ADCPin &adcPin);

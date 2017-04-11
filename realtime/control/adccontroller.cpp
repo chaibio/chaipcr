@@ -38,7 +38,7 @@ const LTC2444::OversamplingRatio kLIAOversamplingRate = LTC2444::kOversamplingRa
 ////////////////////////////////////////////////////////////////////////////////
 // Class ADCController
 ADCController::ADCController(ConsumersList &&consumers, unsigned int csPinNumber, SPIPort &&spiPort, unsigned int busyPinNumber):
-    _consumers(std::move(consumers)) {
+    Watchdog::Watchable("ADCController"), _consumers(std::move(consumers)) {
     _currentConversionState = static_cast<ADCState>(0);
     _currentChannel = 0;
     _workState = false;
@@ -77,6 +77,8 @@ void ADCController::process() {
         _workState = true;
 
         while (_workState) {
+            checkin();
+
             if (_ltc2444->waitBusy())
                 continue;
 

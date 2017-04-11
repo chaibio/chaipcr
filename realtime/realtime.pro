@@ -147,7 +147,8 @@ HEADERS += \
     util/timercallback.h \
     server/changeexperimenthandler.h \
     util/adcdebuglogger.h \
-    util/adcdebuglogger.ipp
+    util/adcdebuglogger.ipp \
+    util/watchdog.h
 
 SOURCES += \
     app/pins.cpp \
@@ -203,4 +204,5 @@ SOURCES += \
     server/updateuploadhandler.cpp \
     util/logger.cpp \
     server/changeexperimenthandler.cpp \
-    util/adcdebuglogger.cpp
+    util/adcdebuglogger.cpp \
+    util/watchdog.cpp
