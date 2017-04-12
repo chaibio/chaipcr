@@ -89,9 +89,12 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
 
           //console.log(newHoldTime, editValue);
           /*if((newHoldTime || newHoldTime === 0) && editValue != newHoldTime) {*/
+          
           if(!isNaN(newHoldTime) && scope.reading != newHoldTime) {
 
-            if(Number(newHoldTime) === 0 ) {
+            if(Number(newHoldTime) < 0) {
+              alerts.showMessage(alerts.noNegativeHold, scope);
+            } else if(Number(newHoldTime) === 0 ) {
               if(scope.ifLastStep() && ! scope.$parent.step.collect_data) {
                 scope.reading = newHoldTime;
                 $timeout(function() {
