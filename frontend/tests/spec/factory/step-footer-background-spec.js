@@ -1,4 +1,4 @@
-/*describe("Testing stepFooterBackground", function() {
+describe("Testing stepFooterBackground", function() {
 
   beforeEach(module('ChaiBioTech'));
   beforeEach(module('canvasApp'));
@@ -13,4 +13,4 @@
     expect(_stepFooterBackground.width).toEqual(94);
   });
 
-});*/
+});
