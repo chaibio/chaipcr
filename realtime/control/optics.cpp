@@ -260,7 +260,7 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &/*task*/)
             _wellNumber = 0;
 
             //Assuming that other wells have the same amount of fluorescence data
-            if (_collectDataType == FluorescenceDataType || _collectDataType == FluorescenceCalibrationDataType)
+            if ((_collectDataType == FluorescenceDataType || _collectDataType == FluorescenceCalibrationDataType) && !_fluorescenceData.empty())
             {
                 int measurments = _collectDataType != FluorescenceCalibrationDataType ? kOpticalMeasurementsPerCycle : kOpticalMeasurementsPerCalibrationCycle;
 
@@ -277,7 +277,8 @@ void Optics::collectDataCallback(Poco::Util::TimerTask &/*task*/)
         }
 
         //Assuming that other wells have the same amount of baseline data
-        if (_collectDataType == MeltCurveDataType || _fluorescenceData[_wellNumber][0].baselineValuesCount == (kBaselineMeasurementsPerCycle * kADCReadsPerOpticalMeasurementFinal))
+        if (_collectDataType == MeltCurveDataType ||
+                (!_fluorescenceData.empty() && _fluorescenceData[_wellNumber][0].baselineValuesCount == (kBaselineMeasurementsPerCycle * kADCReadsPerOpticalMeasurementFinal)))
             _ledController->activateLED(_wellNumber);
 
         _photodiodeMux.setChannel(_wellNumber);

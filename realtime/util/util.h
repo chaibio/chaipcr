@@ -52,8 +52,8 @@ inline double average(const Container &container) { return average(std::begin(co
 
 boost::posix_time::ptime parseIsoTime(const std::string &str);
 
-void watchProcess(const std::string &command, WatchProcessCallback outCallback, WatchProcessCallback errorCallback = WatchProcessCallback());
-bool watchProcess(const std::string &command, int eventFd, WatchProcessCallback outCallback, WatchProcessCallback errorCallback = WatchProcessCallback());
+void watchProcess(const std::string &command, WatchProcessCallback outCallback, WatchProcessCallback errorCallback = WatchProcessCallback(), bool ignoreErrors = false);
+bool watchProcess(const std::string &command, int eventFd, WatchProcessCallback outCallback, WatchProcessCallback errorCallback = WatchProcessCallback(), bool ignoreErrors = false);
 
 bool getFileChecksum(const std::string &filePath, int eventFd, std::string &checksum);
 
