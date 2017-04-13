@@ -176,6 +176,13 @@ angular.module("canvasApp").factory('events', [
       this.canvas.on("imagesLoaded", function() {
         C.addStages().setDefaultWidthHeight();
         circleManager.addRampLinesAndCircles();
+        
+        if(!C.$scope.protocol.id && !C.$scope.fabricStep) {
+          // This is for test to work right, when working with fake data
+          C.$scope.$watch = function() {
+            return true;
+          };
+        }
         C.selectStep();
         C.canvas.renderAll();
       });
