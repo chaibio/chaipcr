@@ -44,8 +44,101 @@ describe("Testing stepGraphics", function() {
         exp_completed: true
       }
     };
-      var sg = _stepGraphics.deleteButton.call(step);
-      expect(sg.closeImage).toEqual(jasmine.any(Object));
+    var sg = _stepGraphics.deleteButton.call(step);
+    expect(sg.closeImage).toEqual(jasmine.any(Object));
   });
 
+  it("It should check the autoDeltaDetails method autoDeltaTempTime.setText to be called", function() {
+
+    var step = {
+      autoDeltaTempTime: {
+        setText: function() {
+
+        }
+      },
+      autoDeltaStartCycle: {
+        setText: function() {
+
+        }
+      },
+      deltaGroup: {
+        setVisible: function() {
+
+        }
+      },
+      deltaSymbol: {
+        setVisible: function() {
+
+        }
+      },
+      model: {
+        delta_temperature: 10,
+        delta_duration_s: 15,
+      },
+      parentStage: {
+        parent: {
+          editStageStatus: false
+        },
+        model: {
+          auto_delta: true,
+          stage_type: "cycling",
+          auto_delta_start_cycle: 20,
+        }
+      },
+      $scope: {
+        exp_completed: true
+      }
+    };
+
+    spyOn(step.autoDeltaTempTime, "setText");
+    var sg = _stepGraphics.autoDeltaDetails.call(step);
+    expect(sg.autoDeltaTempTime.setText).toHaveBeenCalled();
+  });
+
+  it("It should check the autoDeltaDetails method autoDeltaStartCycle.setText to be called with startCycle ", function() {
+
+    var step = {
+      autoDeltaTempTime: {
+        setText: function() {
+
+        }
+      },
+      autoDeltaStartCycle: {
+        setText: function() {
+
+        }
+      },
+      deltaGroup: {
+        setVisible: function() {
+
+        }
+      },
+      deltaSymbol: {
+        setVisible: function() {
+
+        }
+      },
+      model: {
+        delta_temperature: 10,
+        delta_duration_s: 15,
+      },
+      parentStage: {
+        parent: {
+          editStageStatus: false
+        },
+        model: {
+          auto_delta: true,
+          stage_type: "cycling",
+          auto_delta_start_cycle: 20,
+        }
+      },
+      $scope: {
+        exp_completed: true
+      }
+    };
+
+    spyOn(step.autoDeltaStartCycle, "setText");
+    var sg = _stepGraphics.autoDeltaDetails.call(step);
+    expect(sg.autoDeltaStartCycle.setText).toHaveBeenCalledWith("Start Cycle: " + step.parentStage.model.auto_delta_start_cycle);
+  });
 });

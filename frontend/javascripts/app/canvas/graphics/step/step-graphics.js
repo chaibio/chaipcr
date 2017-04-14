@@ -85,7 +85,7 @@ angular.module("canvasApp").service('stepGraphics', [
         this.deltaGroup.setVisible(false);
         this.deltaSymbol.setVisible(false);
       }
-
+      return this;
     };
 
     this.initAutoDelta = function() {
