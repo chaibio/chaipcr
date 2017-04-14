@@ -30,7 +30,7 @@ analyze_optical_test_single_channel <- function(
             ot_qry <- sprintf(
                 'SELECT fluorescence_value
                     FROM fluorescence_data
-                    WHERE experiment_id=%i AND step_id=%i AND cycle_num=1
+                    WHERE experiment_id=%i AND step_id=%i AND cycle_num=1 AND step_id is not NULL
                     ORDER BY well_num', 
                 exp_id, step_id)
             as.numeric(dbGetQuery(db_conn, ot_qry)[,1])
