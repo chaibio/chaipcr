@@ -36,7 +36,7 @@ ANALYZE_DICT["optical_test_dual_channel"] = function analyze_optical_test_dual_c
 
     fluo_qry_2b = "SELECT step_id, well_num, fluorescence_value, channel
         FROM fluorescence_data
-        WHERE experiment_id = $exp_id AND cycle_num = 1
+        WHERE experiment_id = $exp_id AND cycle_num = 1 AND step_id is not NULL
         well_constraint
         ORDER BY well_num, channel
     "

@@ -6,6 +6,12 @@ const MIN_FLUORESCENCE_VAL = 8e5
 const MIN_TM_VAL = 77
 const MAX_TM_VAL = 81
 const MAX_DELTA_TM_VAL = 2
+# used to be in `thermal_consistency`
+stage_id = 4
+# passed onto `mc_tm_pw`, different than default
+qt_prob_flTm = 0.1
+max_normd_qtv = 0.9
+
 
 
 ANALYZE_DICT["thermal_consistency"] = function thermal_consistency(
@@ -26,12 +32,6 @@ ANALYZE_DICT["thermal_consistency"] = function thermal_consistency(
     verbose::Bool=false,
     kwdict_mc_tm_pw::OrderedDict=OrderedDict() # keyword arguments passed onto `mc_tm_pw`
     )
-
-    # hard-coded arguments
-    stage_id = 4
-    # passed onto `mc_tm_pw`, different than default
-    qt_prob_flTm = 0.1
-    max_normd_qtv = 0.9
 
     mc_w72c = process_mc(
         db_conn,

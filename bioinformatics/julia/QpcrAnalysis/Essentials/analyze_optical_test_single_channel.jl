@@ -23,7 +23,8 @@ ANALYZE_DICT["optical_test_single_channel"] = function analyze_optical_test_sing
             WHERE
                 experiment_id = $exp_id AND
                 step_id = $step_id AND
-                cycle_num = 1
+                cycle_num = 1 AND
+                step_id is not NULL
                 well_constraint
             ORDER BY well_num
         "

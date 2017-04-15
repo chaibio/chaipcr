@@ -103,7 +103,8 @@ function get_wva_data(
                 WHERE
                     experiment_id = $calib_id AND
                     step_id = $step_id AND
-                    cycle_num = 1
+                    cycle_num = 1 AND
+                    step_id is not NULL
                     well_constraint
                 ORDER BY well_num, channel
         "
@@ -143,7 +144,8 @@ function get_wva_data(
                     experiment_id = $(calib_id_s[calib_id_key]) AND
                     step_id = $(step_id_s[calib_id_key]) AND
                     channel = $channel AND
-                    cycle_num = 1
+                    cycle_num = 1 AND
+                    step_id is not NULL
                     well_constraint
                 ORDER BY well_num
             "
