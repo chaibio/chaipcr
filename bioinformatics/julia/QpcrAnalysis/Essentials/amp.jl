@@ -84,7 +84,8 @@ function process_amp(
             WHERE
                 experiment_id = $exp_id AND
                 $(sr_latest[1])_id = $(sr_latest[2]) AND
-                cycle_num <= $max_cycle
+                cycle_num <= $max_cycle AND
+                step_id is not NULL
                 well_constraint
             ORDER BY cycle_num, well_num, channel
     "
@@ -141,11 +142,12 @@ function get_amp_data(
     fluo_qry = "SELECT $col_name
         FROM fluorescence_data
         WHERE
-            fluorescence_data.experiment_id= $exp_id AND
+            experiment_id= $exp_id AND
             $(sr_ele[1])_id = $(sr_ele[2]) AND
             cycle_num <= $(maximum(cycle_nums)) AND
             well_num in ($(join(fluo_well_nums, ","))) AND
-            channel in ($(join(channels, ",")))
+            channel in ($(join(channels, ","))) AND
+            step_id is not NULL
         ORDER BY channel, well_num, cycle_num
     "
     fluo_sel = mysql_execute(db_conn, fluo_qry)
@@ -166,10 +168,14 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
 
     min_reliable_cyc::Real=5, # >= 1
     baseline_cyc_bounds::AbstractVector=[],
-
-    sig_m_prebl::AbstractString="l4_enl",
     bl_fallback_func::Function=median,
-    sig_m_postbl::AbstractString="l4_enl",
+
+    mt_fc::AbstractString="sfc", # type of model: same (sfc) or different (dfc) formula for each cycle
+
+    dfc_key::AbstractString="MAK2", # type of Dfc model: MAK2 or MAKERGAUL
+
+    m_prebl::AbstractString="l4_enl",
+    m_postbl::AbstractString="l4_enl",
 
     denser_factor::Real=100,
 
@@ -179,7 +185,8 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
     verbose::Bool=false,
 
     kwargs_jmp_model::OrderedDict=OrderedDict(
-        :solver=>IpoptSolver(print_level=0, max_iter=35)
+        :solver=>IpoptSolver(print_level=0, max_iter=35) # `ReadOnlyMemoryError()` for v0.5.1
+        # :solver=>NLoptSolver(algorithm=:LN_COBYLA)
     )
     )
 
@@ -197,148 +204,171 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
     baseline = bl_fallback_func(fluos)
     bl_notes = ["last_cyc_wt0 <= 1 || num_cycles < min_reliable_cyc, fallback"]
 
-    if len_bcb == 0 && last_cyc_wt0 > 1 && num_cycles >= min_reliable_cyc
+    if mt_fc == "dfc"
 
-        wts = vcat(zeros(last_cyc_wt0), ones(num_cycles - last_cyc_wt0))
+        dfc_inst = dfc_dict[dfc_key]()
 
-        fitted_prebl = MDs[sig_m_prebl].func_fit(cycs, fluos, wts; kwargs_jmp_model...)
+        fitted_prebl = fit(dfc_inst, cycs, fluos, wts; kwargs_jmp_model...)
+        baseline = fitted_prebl["coefs"][1] # "fb"
 
-        prebl_status = string(fitted_prebl["status"])
-        bl_notes = ["prebl_status $prebl_status"]
+        fitted_postbl = fitted_prebl
+        coefs_pob = fitted_postbl["coefs"]
 
-        baseline_fitted = MDs[sig_m_prebl].funcs_pred["bl"](cycs, fitted_prebl["coefs"]...)
+        # for `Sfc`-style output
+        bl_notes = [mt_fc]
+        blsub_fluos = fluos .- baseline
+        blsub_fitted = pred_from_cycs(dfc_inst, cycs, coefs_pob...)
+        max_d1 = max_d2 = Inf
+        cyc_dict = eff_dict = OrderedDict()
+        eff = NaN
+        cq_raw = NaN
+        cq_fluo = NaN
 
-        if prebl_status in ["Optimal", "UserLimit"]
-            push!(bl_notes, "sig")
-            blsub_fluos_draft = fluos .- baseline_fitted
-            min_bfd, max_bfd = extrema(blsub_fluos_draft) # bfd = blsub_fluos_draft
-            if max_bfd - min_bfd <= abs(min_bfd)
-                bl_notes[2] = "fallback"
-                push!(bl_notes, "max_bfd ($max_bfd) - min_bfd ($min_bfd) == $(max_bfd - min_bfd) <= abs(min_bfd)")
-            end # if max_bfd
-        elseif prebl_status == "Error"
-            push!(bl_notes, "fallback")
-        end # if prebl_status
+    elseif mt_fc == "sfc"
 
-        # different baseline subtraction methods
-        if bl_notes[2] == "sig"
-            baseline = baseline_fitted
+        if len_bcb == 0 && last_cyc_wt0 > 1 && num_cycles >= min_reliable_cyc
 
-        elseif bl_notes[2] == "fallback"
+            wts = vcat(zeros(last_cyc_wt0), ones(num_cycles - last_cyc_wt0))
 
-            min_fluo, min_fluo_cyc = findmin(fluos)
-            d2_cfd = finite_diff(cycs, fluos; nu=2) # `Dierckx.Spline1D` resulted in all `NaN` in some cases
+            fitted_prebl = MDs[m_prebl].func_fit(cycs, fluos, wts; kwargs_jmp_model...)
 
-            d2_cfd_left = d2_cfd[1:min_fluo_cyc]
-            d2_cfd_right = d2_cfd[min_fluo_cyc:end]
-            max_d2_left_cyc, max_d2_right_cyc = map((d2_cfd_left, d2_cfd_right)) do d2_vec
-                findmax(d2_vec)[2]
-            end # do d2_vec
+            prebl_status = string(fitted_prebl["status"])
+            bl_notes = ["prebl_status $prebl_status"]
 
-            if max_d2_right_cyc <= last_cyc_wt0 # fluo on fitted spline may not be close to raw fluo at `cyc_m2l` and `cyc_m2r`
-                push!(bl_notes, "max_d2_right_cyc ($max_d2_right_cyc) <= last_cyc_wt0 ($last_cyc_wt0), bl_cycs = $(last_cyc_wt0+1):$num_cycles")
-                bl_cycs = last_cyc_wt0+1:num_cycles
-            else
-                bl_cyc_start = max(last_cyc_wt0+1, max_d2_left_cyc)
-                push!(bl_notes, "max_d2_right_cyc ($max_d2_right_cyc) > last_cyc_wt0 ($last_cyc_wt0), bl_cyc_start = $bl_cyc_start (max(last_cyc_wt0+1, max_d2_left_cyc), i.e. max($(last_cyc_wt0+1), $max_d2_left_cyc))")
+            baseline_fitted = MDs[m_prebl].funcs_pred["bl"](cycs, fitted_prebl["coefs"]...)
 
-                if max_d2_right_cyc - bl_cyc_start <= 1
-                    push!(bl_notes, "max_d2_right_cyc ($max_d2_right_cyc) - bl_cyc_start ($bl_cyc_start) <= 1")
-                    max_d2_right_2, max_d2_right_cyc_2_shifted = findmax(d2_cfd[max_d2_right_cyc+1:end])
-                    max_d2_right_cyc_2 = max_d2_right_cyc_2_shifted + max_d2_right_cyc
-                    if max_d2_right_cyc_2 - max_d2_right_cyc == 1
-                        bl_cyc_end = num_cycles
-                        push!(bl_notes, "max_d2_right_cyc_2 ($max_d2_right_cyc_2) - max_d2_right_cyc ($max_d2_right_cyc) == 1")
-                    else
-                        push!(bl_notes, "max_d2_right_cyc_2 ($max_d2_right_cyc_2) - max_d2_right_cyc ($max_d2_right_cyc) != 1")
-                        bl_cyc_end = max_d2_right_cyc_2
-                    end # if m2r2_idx
+            if prebl_status in ["Optimal", "UserLimit"]
+                push!(bl_notes, "sig")
+                blsub_fluos_draft = fluos .- baseline_fitted
+                min_bfd, max_bfd = extrema(blsub_fluos_draft) # bfd = blsub_fluos_draft
+                if max_bfd - min_bfd <= abs(min_bfd)
+                    bl_notes[2] = "fallback"
+                    push!(bl_notes, "max_bfd ($max_bfd) - min_bfd ($min_bfd) == $(max_bfd - min_bfd) <= abs(min_bfd)")
+                end # if max_bfd
+            elseif prebl_status == "Error"
+                push!(bl_notes, "fallback")
+            end # if prebl_status
+
+            # different baseline subtraction methods
+            if bl_notes[2] == "sig"
+                baseline = baseline_fitted
+
+            elseif bl_notes[2] == "fallback"
+
+                min_fluo, min_fluo_cyc = findmin(fluos)
+                d2_cfd = finite_diff(cycs, fluos; nu=2) # `Dierckx.Spline1D` resulted in all `NaN` in some cases
+
+                d2_cfd_left = d2_cfd[1:min_fluo_cyc]
+                d2_cfd_right = d2_cfd[min_fluo_cyc:end]
+                max_d2_left_cyc, max_d2_right_cyc = map((d2_cfd_left, d2_cfd_right)) do d2_vec
+                    findmax(d2_vec)[2]
+                end # do d2_vec
+
+                if max_d2_right_cyc <= last_cyc_wt0 # fluo on fitted spline may not be close to raw fluo at `cyc_m2l` and `cyc_m2r`
+                    push!(bl_notes, "max_d2_right_cyc ($max_d2_right_cyc) <= last_cyc_wt0 ($last_cyc_wt0), bl_cycs = $(last_cyc_wt0+1):$num_cycles")
+                    bl_cycs = last_cyc_wt0+1:num_cycles
                 else
-                    push!(bl_notes, "max_d2_right_cyc ($max_d2_right_cyc) - bl_cyc_start ($bl_cyc_start) > 1")
-                    bl_cyc_end = max_d2_right_cyc
-                end # if cyc_m2r - bl_cyc_start <= 1
-                push!(bl_notes, "bl_cyc_end = $bl_cyc_end")
+                    bl_cyc_start = max(last_cyc_wt0+1, max_d2_left_cyc)
+                    push!(bl_notes, "max_d2_right_cyc ($max_d2_right_cyc) > last_cyc_wt0 ($last_cyc_wt0), bl_cyc_start = $bl_cyc_start (max(last_cyc_wt0+1, max_d2_left_cyc), i.e. max($(last_cyc_wt0+1), $max_d2_left_cyc))")
 
-                bl_cycs = bl_cyc_start:bl_cyc_end
-                push!(bl_notes, "bl_cycs = $bl_cyc_start:$bl_cyc_end")
-            end # cyc_m2r <= last_cyc_wt0
+                    if max_d2_right_cyc - bl_cyc_start <= 1
+                        push!(bl_notes, "max_d2_right_cyc ($max_d2_right_cyc) - bl_cyc_start ($bl_cyc_start) <= 1")
+                        max_d2_right_2, max_d2_right_cyc_2_shifted = findmax(d2_cfd[max_d2_right_cyc+1:end])
+                        max_d2_right_cyc_2 = max_d2_right_cyc_2_shifted + max_d2_right_cyc
+                        if max_d2_right_cyc_2 - max_d2_right_cyc == 1
+                            bl_cyc_end = num_cycles
+                            push!(bl_notes, "max_d2_right_cyc_2 ($max_d2_right_cyc_2) - max_d2_right_cyc ($max_d2_right_cyc) == 1")
+                        else
+                            push!(bl_notes, "max_d2_right_cyc_2 ($max_d2_right_cyc_2) - max_d2_right_cyc ($max_d2_right_cyc) != 1")
+                            bl_cyc_end = max_d2_right_cyc_2
+                        end # if m2r2_idx
+                    else
+                        push!(bl_notes, "max_d2_right_cyc ($max_d2_right_cyc) - bl_cyc_start ($bl_cyc_start) > 1")
+                        bl_cyc_end = max_d2_right_cyc
+                    end # if cyc_m2r - bl_cyc_start <= 1
+                    push!(bl_notes, "bl_cyc_end = $bl_cyc_end")
 
-            baseline = bl_fallback_func(fluos[bl_cycs])
+                    bl_cycs = bl_cyc_start:bl_cyc_end
+                    push!(bl_notes, "bl_cycs = $bl_cyc_start:$bl_cyc_end")
+                end # cyc_m2r <= last_cyc_wt0
 
-        end # if bl_notes = ["sig"]
+                baseline = bl_fallback_func(fluos[bl_cycs])
 
-    elseif len_bcb == 2
-        baseline = bl_fallback_func(fluos[colon(baseline_cyc_bounds...)])
-        bl_notes = ["User-defined"]
+            end # if bl_notes = ["sig"]
 
-    elseif !(len_bcb in [0, 2])
-        error("Length of `baseline_cyc_bounds` must be 0 or 2.")
+        elseif len_bcb == 2
+            baseline = bl_fallback_func(fluos[colon(baseline_cyc_bounds...)])
+            bl_notes = ["User-defined"]
 
-    end # if len_bcb
+        elseif !(len_bcb in [0, 2])
+            error("Length of `baseline_cyc_bounds` must be 0 or 2.")
+
+        end # if len_bcb
 
 
-    blsub_fluos = fluos .- baseline
+        blsub_fluos = fluos .- baseline
 
-    fitted_postbl = MDs[sig_m_postbl].func_fit(
-        cycs, blsub_fluos, wts;
-        kwargs_jmp_model...
-    )
+        fitted_postbl = MDs[m_postbl].func_fit(
+            cycs, blsub_fluos, wts;
+            kwargs_jmp_model...
+        )
 
-    coefs_pb = fitted_postbl["coefs"]
+        coefs_pob = fitted_postbl["coefs"]
 
-    func_pred_f = MDs[sig_m_postbl].funcs_pred["f"]
-    blsub_fitted = func_pred_f(cycs, coefs_pb...)
+        func_pred_f = MDs[m_postbl].funcs_pred["f"]
+        blsub_fitted = func_pred_f(cycs, coefs_pob...)
 
-    len_denser = length(cycs_denser)
+        len_denser = length(cycs_denser)
 
-    d1_pred = MDs[sig_m_postbl].funcs_pred["d1"](cycs_denser, coefs_pb...)
-    max_d1, idx_max_d1 = findmax(d1_pred)
-    cyc_max_d1 = cycs_denser[idx_max_d1]
+        d1_pred = MDs[m_postbl].funcs_pred["d1"](cycs_denser, coefs_pob...)
+        max_d1, idx_max_d1 = findmax(d1_pred)
+        cyc_max_d1 = cycs_denser[idx_max_d1]
 
-    d2_pred = MDs[sig_m_postbl].funcs_pred["d2"](cycs_denser, coefs_pb...)
-    max_d2, idx_max_d2 = findmax(d2_pred)
-    cyc_max_d2 = cycs_denser[idx_max_d2]
+        d2_pred = MDs[m_postbl].funcs_pred["d2"](cycs_denser, coefs_pob...)
+        max_d2, idx_max_d2 = findmax(d2_pred)
+        cyc_max_d2 = cycs_denser[idx_max_d2]
 
-    Cy0 = cyc_max_d1 - func_pred_f(cyc_max_d1, coefs_pb...) / max_d1
+        Cy0 = cyc_max_d1 - func_pred_f(cyc_max_d1, coefs_pob...) / max_d1
 
-    ct = try
-        MDs[sig_m_postbl].funcs_pred["inv"](ct_fluo, coefs_pb...)
-    catch err
-        isa(err, DomainError) ? Ct_VAL_DomainError : "unhandled error"
-    end # try
-
-    cyc_dict = OrderedDict(
-        "cp_d1"=>cyc_max_d1,
-        "cp_d2"=>cyc_max_d2,
-        "Cy0"=>Cy0,
-        "ct"=>ct
-    )
-
-    func_pred_eff = function (cyc)
-        try
-            log(2, /(map([0.5, -0.5]) do epsilon
-                func_pred_f(cyc + epsilon, coefs_pb...)
-            end...))
+        ct = try
+            MDs[m_postbl].funcs_pred["inv"](ct_fluo, coefs_pob...)
         catch err
-            isa(err, DomainError) ? NaN : "unhandled error"
+            isa(err, DomainError) ? Ct_VAL_DomainError : "unhandled error"
         end # try
-    end # function. needed because `Cy0` may not be in `cycs_denser`
 
-    eff_dict = OrderedDict(map(keys(cyc_dict)) do key
-        key => func_pred_eff(cyc_dict[key])
-    end)
+        cyc_dict = OrderedDict(
+            "cp_d1"=>cyc_max_d1,
+            "cp_d2"=>cyc_max_d2,
+            "Cy0"=>Cy0,
+            "ct"=>ct
+        )
 
-    eff_pred = map(func_pred_eff, cycs_denser)
-    eff_dict["max_eff"], idx_max_eff = findmax(eff_pred)
-    cyc_dict["max_eff"] = cycs_denser[idx_max_eff]
+        func_pred_eff = function (cyc)
+            try
+                log(2, /(map([0.5, -0.5]) do epsilon
+                    func_pred_f(cyc + epsilon, coefs_pob...)
+                end...))
+            catch err
+                isa(err, DomainError) ? NaN : "unhandled error"
+            end # try
+        end # function. needed because `Cy0` may not be in `cycs_denser`
 
-    cq_raw = cyc_dict[cq_method]
-    eff = eff_dict[cq_method]
+        eff_dict = OrderedDict(map(keys(cyc_dict)) do key
+            key => func_pred_eff(cyc_dict[key])
+        end)
 
-    cq_fluo = MDs[sig_m_postbl].funcs_pred["f"](
-        cq_raw <= 0 ? NaN : cq_raw,
-        coefs_pb...
-    )
+        eff_pred = map(func_pred_eff, cycs_denser)
+        eff_dict["max_eff"], idx_max_eff = findmax(eff_pred)
+        cyc_dict["max_eff"] = cycs_denser[idx_max_eff]
+
+        cq_raw = cyc_dict[cq_method]
+        eff = eff_dict[cq_method]
+
+        cq_fluo = func_pred_f(cq_raw <= 0 ? NaN : cq_raw, coefs_pob...)
+
+
+    end # if mt_fc
+
 
     return OrderedDict(
         "fitted_prebl"=>fitted_prebl,
@@ -346,7 +376,7 @@ function mod_bl_q( # for amplification data per well per channel, fit sigmoid mo
         "blsub_fluos"=>blsub_fluos,
         "fitted_postbl"=>fitted_postbl,
         "postbl_status"=>fitted_postbl["status"],
-        "coefs"=>fitted_postbl["coefs"],
+        "coefs"=>coefs_pob,
         "blsub_fitted"=>blsub_fitted,
         "max_d1"=>max_d1,
         "max_d2"=>max_d2,
@@ -433,6 +463,7 @@ function report_cq!(
     return nothing
 
 end # report_cq!
+
 
 
 # process amplification per step
@@ -559,6 +590,7 @@ function process_amp_1sr(
         end
 
         for key in ["blsub_fluos", "blsub_fitted"]
+            # println(size(cat(2, full_dict[key]...))) # for testing
             full_dict[key] = reshape(
                 cat(2, full_dict[key]...), # 2-dim array of size (`num_cycles`, `num_wells * num_channels`)
                 size(fr_ary3)...

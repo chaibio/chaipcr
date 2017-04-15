@@ -1,8 +1,11 @@
 #
 
-type model_def # non-linear model, one feature (`x`)
+# models with same formula for each cycle (Sfc models)
 
-# included in MODEL_BASE
+
+type sfc_model_def # non-linear model, one feature (`x`)
+
+# included in SFC_MODEL_BASE
 
     name::AbstractString
     linear::Bool
@@ -51,7 +54,7 @@ const MD_EMPTY_vals = (
 const EMPTY_fitted = OrderedDict("coefs"=>zeros(0), "status"=>:NotFitted, "obj_val"=>0, "jmp_model"=>Model(), "init_coefs"=>zeros(0))
 
 
-const MODEL_BASES = [ # vector of tuples
+const SFC_MODEL_BASES = [ # vector of tuples
 
 # generic
 
@@ -437,7 +440,7 @@ const MODEL_BASES = [ # vector of tuples
 
 
 function add_funcs_pred!(
-    md::model_def,
+    md::sfc_model_def,
     verbose::Bool=false
     )
 
@@ -465,7 +468,7 @@ end
 
 
 function add_func_fit!( # vco = variable constraints objective
-    md::model_def;
+    md::sfc_model_def;
     Y_str::AbstractString="Y",
     obj_algrt::AbstractString="RSS",
     sense::AbstractString="Min", # "Min", "Max"
@@ -536,9 +539,10 @@ function add_func_fit!( # vco = variable constraints objective
     # return
     return_str = join([
         "status = solve(jmp_model)",
+        "coef_strs = [\"$(join(md.coef_strs, "\", \""))\"]",
         "coefs = map(getvalue, [$(join(md.coef_strs, ", "))])",
         "obj_val = getobjectivevalue(jmp_model)",
-        "return OrderedDict(\"coefs\"=>coefs, \"status\"=>status, \"obj_val\"=>obj_val, \"jmp_model\"=>jmp_model, \"init_coefs\"=>init_coefs); end"
+        "return OrderedDict(\"coef_strs\"=>coef_strs, \"coefs\"=>coefs, \"status\"=>status, \"obj_val\"=>obj_val, \"jmp_model\"=>jmp_model, \"init_coefs\"=>init_coefs); end"
     ], "; ")
 
 
@@ -559,12 +563,12 @@ end
 
 
 # generate generic md objects
-const MDs = OrderedDict(map(MODEL_BASES) do model_base
-    model_base[1] => model_def(
-        model_base...,
+const MDs = OrderedDict(map(SFC_MODEL_BASES) do sfc_model_base
+    sfc_model_base[1] => sfc_model_def(
+        sfc_model_base...,
         deepcopy(MD_EMPTY_vals)...
     )
-end) # do generic_model_base
+end) # do generic_sfc_model_base
 
 for md_ in collect(values(MDs))
     add_funcs_pred!(md_)
@@ -573,7 +577,7 @@ end
 
 
 # choose model for amplification curve fitting
-const AMP_MODEL_NAME = "l4"
+const AMP_MODEL_NAME = "l4_enl"
 const AMP_MD = MDs[AMP_MODEL_NAME]
 
 

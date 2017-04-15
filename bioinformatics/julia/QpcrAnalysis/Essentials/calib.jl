@@ -107,7 +107,8 @@ function get_full_calib_data(
                 WHERE
                     experiment_id = $exp_id AND
                     step_id = $step_id AND
-                    cycle_num = 1
+                    cycle_num = 1 AND
+                    step_id is not NULL
                     well_constraint
                 ORDER BY well_num, channel
         "
