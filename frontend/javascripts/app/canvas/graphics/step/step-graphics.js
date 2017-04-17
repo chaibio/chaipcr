@@ -92,12 +92,14 @@ angular.module("canvasApp").service('stepGraphics', [
 
       this.deltaSymbol = new deltaSymbol();
       this.deltaGroup = new deltaGroup(this);
+      return this;
     };
 
     this.initNumberText = function() {
 
       this.numberingTextCurrent = new numberingText('current');
       this.numberingTextTotal = new numberingText('Total'); // current/total
+      return this;
     };
 
     this.addBorderRight = function() {
@@ -117,6 +119,7 @@ angular.module("canvasApp").service('stepGraphics', [
       this.hitPoint = new hitPoint(this);
       this.stepRect = new stepRect(this);
       this.stepGroup = new stepGroup(this);
+      return this;
     };
 
     return this;

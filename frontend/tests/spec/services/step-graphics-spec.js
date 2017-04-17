@@ -141,4 +141,438 @@ describe("Testing stepGraphics", function() {
     var sg = _stepGraphics.autoDeltaDetails.call(step);
     expect(sg.autoDeltaStartCycle.setText).toHaveBeenCalledWith("Start Cycle: " + step.parentStage.model.auto_delta_start_cycle);
   });
+
+  it("It should check the autoDeltaDetails method autoDeltaStartCycle.setText to be called with startCycle ", function() {
+
+    var step = {
+      autoDeltaTempTime: {
+        setText: function() {
+
+        }
+      },
+      autoDeltaStartCycle: {
+        setText: function() {
+
+        }
+      },
+      deltaGroup: {
+        setVisible: function() {
+
+        }
+      },
+      deltaSymbol: {
+        setVisible: function() {
+
+        }
+      },
+      model: {
+        delta_temperature: 10,
+        delta_duration_s: 15,
+      },
+      parentStage: {
+        parent: {
+          editStageStatus: false
+        },
+        model: {
+          auto_delta: true,
+          stage_type: "cycling",
+          auto_delta_start_cycle: 20,
+        }
+      },
+      $scope: {
+        exp_completed: true
+      }
+    };
+
+    spyOn(step.autoDeltaStartCycle, "setText");
+    var sg = _stepGraphics.autoDeltaDetails.call(step);
+    expect(sg.autoDeltaStartCycle.setText).toHaveBeenCalledWith("Start Cycle: " + step.parentStage.model.auto_delta_start_cycle);
+  });
+
+  it("It should check the autoDeltaDetails method deltaGroup.setVisible to be called with true because editStageStatus = false ", function() {
+
+    var step = {
+      autoDeltaTempTime: {
+        setText: function() {
+
+        }
+      },
+      autoDeltaStartCycle: {
+        setText: function() {
+
+        }
+      },
+      deltaGroup: {
+        setVisible: function() {
+
+        }
+      },
+      deltaSymbol: {
+        setVisible: function() {
+
+        }
+      },
+      model: {
+        delta_temperature: 10,
+        delta_duration_s: 15,
+      },
+      parentStage: {
+        parent: {
+          editStageStatus: false
+        },
+        model: {
+          auto_delta: true,
+          stage_type: "cycling",
+          auto_delta_start_cycle: 20,
+        }
+      },
+      $scope: {
+        exp_completed: true
+      }
+    };
+
+    spyOn(step.deltaGroup, "setVisible");
+    var sg = _stepGraphics.autoDeltaDetails.call(step);
+    expect(sg.deltaGroup.setVisible).toHaveBeenCalledWith(true);
+  });
+
+  it("It should check the autoDeltaDetails method deltaSymbol.setVisible to be called with true id index = 0", function() {
+
+    var step = {
+      index: 0,
+      autoDeltaTempTime: {
+        setText: function() {
+
+        }
+      },
+      autoDeltaStartCycle: {
+        setText: function() {
+
+        }
+      },
+      deltaGroup: {
+        setVisible: function() {
+
+        }
+      },
+      deltaSymbol: {
+        setVisible: function() {
+
+        }
+      },
+      model: {
+        delta_temperature: 10,
+        delta_duration_s: 15,
+      },
+      parentStage: {
+        parent: {
+          editStageStatus: false
+        },
+        model: {
+          auto_delta: true,
+          stage_type: "cycling",
+          auto_delta_start_cycle: 20,
+        }
+      },
+      $scope: {
+        exp_completed: true
+      }
+    };
+
+    spyOn(step.deltaSymbol, "setVisible");
+    var sg = _stepGraphics.autoDeltaDetails.call(step);
+    expect(sg.deltaSymbol.setVisible).toHaveBeenCalledWith(true);
+  });
+
+  it("It should call deltaGroup and deltaSymbol setVisible methods with false, because auto_delta is false", function() {
+
+    var step = {
+      index: 0,
+      autoDeltaTempTime: {
+        setText: function() {
+
+        }
+      },
+      autoDeltaStartCycle: {
+        setText: function() {
+
+        }
+      },
+      deltaGroup: {
+        setVisible: function() {
+
+        }
+      },
+      deltaSymbol: {
+        setVisible: function() {
+
+        }
+      },
+      model: {
+        delta_temperature: 10,
+        delta_duration_s: 15,
+      },
+      parentStage: {
+        parent: {
+          editStageStatus: false
+        },
+        model: {
+          auto_delta: false,
+          stage_type: "cycling",
+          auto_delta_start_cycle: 20,
+        }
+      },
+      $scope: {
+        exp_completed: true
+      }
+    };
+
+    spyOn(step.deltaSymbol, "setVisible");
+    spyOn(step.deltaGroup, "setVisible");
+
+    var sg = _stepGraphics.autoDeltaDetails.call(step);
+    expect(sg.deltaSymbol.setVisible).toHaveBeenCalledWith(false);
+    expect(sg.deltaGroup.setVisible).toHaveBeenCalledWith(false);
+  });
+
+  it("It should check initAutoDelta method", function() {
+    var step = {
+      index: 0,
+      autoDeltaTempTime: {
+        setText: function() {
+
+        }
+      },
+      autoDeltaStartCycle: {
+        setText: function() {
+
+        }
+      },
+      deltaGroup: {
+        setVisible: function() {
+
+        }
+      },
+      deltaSymbol: {
+        setVisible: function() {
+
+        }
+      },
+      model: {
+        delta_temperature: 10,
+        delta_duration_s: 15,
+      },
+      parentStage: {
+        parent: {
+          editStageStatus: false
+        },
+        model: {
+          auto_delta: false,
+          stage_type: "cycling",
+          auto_delta_start_cycle: 20,
+        }
+      },
+      $scope: {
+        exp_completed: true
+      }
+    };
+
+    var sg = _stepGraphics.autoDeltaDetails.call(step);
+    expect(sg.deltaGroup).toEqual(jasmine.any(Object));
+    expect(sg.deltaSymbol).toEqual(jasmine.any(Object));
+  });
+
+  it("It should check initNumberText method", function() {
+    var step = {
+      index: 0,
+      autoDeltaTempTime: {
+        setText: function() {
+
+        }
+      },
+      autoDeltaStartCycle: {
+        setText: function() {
+
+        }
+      },
+      deltaGroup: {
+        setVisible: function() {
+
+        }
+      },
+      deltaSymbol: {
+        setVisible: function() {
+
+        }
+      },
+      model: {
+        delta_temperature: 10,
+        delta_duration_s: 15,
+      },
+      parentStage: {
+        parent: {
+          editStageStatus: false
+        },
+        model: {
+          auto_delta: false,
+          stage_type: "cycling",
+          auto_delta_start_cycle: 20,
+        }
+      },
+      $scope: {
+        exp_completed: true
+      }
+    };
+
+    var sg = _stepGraphics.initNumberText.call(step);
+    expect(sg.numberingTextCurrent).toEqual(jasmine.any(Object));
+    expect(sg.numberingTextTotal).toEqual(jasmine.any(Object));
+  });
+
+  it("It should check addBorderRight method", function() {
+    var step = {
+      index: 0,
+      autoDeltaTempTime: {
+        setText: function() {
+
+        }
+      },
+      autoDeltaStartCycle: {
+        setText: function() {
+
+        }
+      },
+      deltaGroup: {
+        setVisible: function() {
+
+        }
+      },
+      deltaSymbol: {
+        setVisible: function() {
+
+        }
+      },
+      model: {
+        delta_temperature: 10,
+        delta_duration_s: 15,
+      },
+      parentStage: {
+        parent: {
+          editStageStatus: false
+        },
+        model: {
+          auto_delta: false,
+          stage_type: "cycling",
+          auto_delta_start_cycle: 20,
+        }
+      },
+      $scope: {
+        exp_completed: true
+      }
+    };
+
+    var sg = _stepGraphics.addBorderRight.call(step);
+    expect(sg.borderRight).toEqual(jasmine.any(Object));
+  });
+
+  it("It should check rampSpeed method", function() {
+    var step = {
+      index: 0,
+      autoDeltaTempTime: {
+        setText: function() {
+
+        }
+      },
+      autoDeltaStartCycle: {
+        setText: function() {
+
+        }
+      },
+      deltaGroup: {
+        setVisible: function() {
+
+        }
+      },
+      deltaSymbol: {
+        setVisible: function() {
+
+        }
+      },
+      model: {
+        delta_temperature: 10,
+        delta_duration_s: 15,
+        ramp: {
+          rate: 4
+        }
+      },
+      parentStage: {
+        parent: {
+          editStageStatus: false
+        },
+        model: {
+          auto_delta: false,
+          stage_type: "cycling",
+          auto_delta_start_cycle: 20,
+        }
+      },
+      $scope: {
+        exp_completed: true
+      }
+    };
+
+    var sg = _stepGraphics.rampSpeed.call(step);
+    expect(sg.rampSpeedGroup).toEqual(jasmine.any(Object));
+  });
+
+  it("It should check stepComponents method", function() {
+    var step = {
+      index: 0,
+      autoDeltaTempTime: {
+        setText: function() {
+
+        }
+      },
+      autoDeltaStartCycle: {
+        setText: function() {
+
+        }
+      },
+      deltaGroup: {
+        setVisible: function() {
+
+        }
+      },
+      deltaSymbol: {
+        setVisible: function() {
+
+        }
+      },
+      model: {
+        delta_temperature: 10,
+        delta_duration_s: 15,
+        ramp: {
+          rate: 4
+        }
+      },
+      parentStage: {
+        parent: {
+          editStageStatus: false
+        },
+        model: {
+          auto_delta: false,
+          stage_type: "cycling",
+          auto_delta_start_cycle: 20,
+        }
+      },
+      $scope: {
+        exp_completed: true
+      }
+    };
+    // add objects to step then call with stepComponents
+    var sg = _stepGraphics.stepComponents.call(step);
+    expect(sg.hitPoint).toEqual(jasmine.any(Object));
+    expect(sg.stepRect).toEqual(jasmine.any(Object));
+    expect(sg.stepGroup).toEqual(jasmine.any(Object));
+  });
+
 });
