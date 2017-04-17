@@ -64,6 +64,9 @@ var appFiles = [
     'app/views/**/*.js',
     'app/canvas/**/*.js',
     'app/filters/**/*.js',
+    'dynexp/dynexp.module.js',
+    'dynexp/libs/**/*.js',
+    'dynexp/dual_channel_optical_cal_v2/**/*.js',
     'templates.js',
 ];
 
@@ -144,12 +147,15 @@ gulp.task('copy-js-to-tmp', ['clean-js', 'templates'], function() {
 // gulp.task('jslint', ['clean-js', 'coffee', 'es6', 'copy-js-to-tmp', 'templates'], function() {
 gulp.task('jslint', [], function() {
 
-    return gulp.src('./frontend/javascripts/app/**/*.js')
+    return gulp.src([
+      './frontend/javascripts/app/**/*.js',
+      './frontend/javascripts/dynexp/**/*.js',
+      ])
         .pipe(jshint())
         .pipe(jshint.reporter('default'));
 });
 
-gulp.task('concat-js', ['jslint', 'clean-js', 'es6', 'coffee', 'copy-js-to-tmp', 'templates', 'dynamicexp:relink'], function() {
+gulp.task('concat-js', ['jslint', 'clean-js', 'es6', 'coffee', 'copy-js-to-tmp', 'templates'], function() {
     var files = vendorFiles.concat(appFiles);
 
     for (var i = files.length - 1; i >= 0; i--) {
@@ -162,7 +168,7 @@ gulp.task('concat-js', ['jslint', 'clean-js', 'es6', 'coffee', 'copy-js-to-tmp',
 
 });
 
-gulp.task('hash-js', ['concat-js', 'dynamicexp:relink_thermal'], function() {
+gulp.task('hash-js', ['concat-js'], function() {
     var hash = process.env.jshash || _makeHash();
 
     return gulp.src('.tmp/js/' + applicationTmpJS + '.js')

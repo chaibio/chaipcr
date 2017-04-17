@@ -1,0 +1,75 @@
+.header-status {
+  height: 50px;
+  background: #333;
+  color: #fff;
+}
+
+.header-status-padding {
+  margin-left: 50px;
+  margin-right: 50px;
+}
+
+.header-status .row {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.header-status .stripes {
+  cursor: pointer;
+  margin-top: 18px;
+}
+
+.header-status .stripes .stripe {
+  height: 2px;
+  width: 16px;
+  margin-bottom: 2px;
+  background-color: #ccc;
+}
+
+.header-status .menu {
+  padding-right: 0;
+}
+
+.header-status .exp-name {
+  padding-left: 0;
+  padding-right: 0;
+  font-family: "Fun City";
+  font-size: 17px;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.header-status .message {
+  display: inline;
+  font-size: 15px;
+  font-weight: bold;
+  padding-right: 10px;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.header-status .button-header {
+  background-color: #000;
+  border: 1px solid #fff;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 15px;
+  font-family: 'Dinot';
+  font-weight: bold;
+  margin-top: 10px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  text-align: center;
+  text-transform: uppercase;
+  width: 200px;
+}
+
+.header-status .button-header.cancel {
+  background-color: #EE3017;
+  border: none;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+

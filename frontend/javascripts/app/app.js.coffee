@@ -36,5 +36,6 @@ window.App = window.ChaiBioTech.ngApp = angular.module 'ChaiBioTech', [
   'ngFileUpload'
   'canvasApp'
   'ngWebworker'
+  'dynexp'
 ]
 #Please make sure to add module files in karma-files.js, so that tests work.

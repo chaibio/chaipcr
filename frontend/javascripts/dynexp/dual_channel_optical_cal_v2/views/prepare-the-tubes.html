@@ -1,0 +1,38 @@
+<div class="step-1">
+  <p class="step"><b>STEP 1</b>/9</p>
+  <h2>Prepare the Tubes</h2>
+
+  <div class="row tubes-container">
+    <div class="col-md-4">
+      <div class="solution-label">
+        <img src="/images/dynexp/dual-channel-optical-cal/water-drop-blue.png">
+        <span><b>25</b>uL Water</span>
+      </div>
+      <img src="/images/dynexp/dual-channel-optical-cal/tubes-blue.png" class="tubes">
+    </div>
+    <div class="col-md-4">
+      <div class="solution-label">
+        <img src="/images/dynexp/dual-channel-optical-cal/water-drop-green.png">
+        <span><b>25</b>uL FAM</span>
+      </div>
+      <img src="/images/dynexp/dual-channel-optical-cal/tubes-green.png" class="tubes">
+    </div>
+    <div class="col-md-4">
+      <div class="solution-label">
+        <img src="/images/dynexp/dual-channel-optical-cal/water-drop-hex.png">
+        <span><b>25</b>uL HEX</span>
+      </div>
+      <img src="/images/dynexp/dual-channel-optical-cal/tubes-hex.png" class="tubes">
+    </div>
+  </div>
+
+  <div class="instruction">
+    <b class="top-text">TO BEGIN:</b> <BR>
+    Prepare <b>6, 8-well PCR strips</b>. In two of these strips, <b>pipette 25 uL of water</b> into each tube. In two other strips, pipette <b>25 uL of 500 nM FAM</b> into each tube. In the remaining two strips, pipette <b>25 uL of 1 uM HEX</b> into each tube.
+  </div>
+
+  <div class="text-center">
+    <button ng-show="!cancel" ng-disabled="getErrors().length > 0" ng-class="{errorButton: getErrors().length > 0}" ng-click="next()">NEXT</button>
+  </div>
+
+</div>

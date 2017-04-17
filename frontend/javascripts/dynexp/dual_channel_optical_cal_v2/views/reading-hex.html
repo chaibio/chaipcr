@@ -1,0 +1,46 @@
+<div class="step-5" ng-show="!isWarmingUp">
+  <p class="step"><b>STEP 8</b>/9</p>
+  <h2>Reading Fluorescence</h2>
+  <div class="machine-icon">
+    <img src="/images/dynexp/dual-channel-optical-cal/machine-idle.png">
+    <img src="/images/dynexp/dual-channel-optical-cal/spinner-green.png" class="image-rotate">
+  </div>
+
+  <div class="text-center">
+    <p class="wait">FLUORESCENCE MEASUREMENT IS NEARLY COMPLETE:</p>
+    <p class="heating">
+      <span>Less than {{ timeRemaining | secondsDisplay: 'display4' }} remaining</span>
+    </p>
+    <p class="dont-open">
+      Please don't open the machine during this step.
+    </p>
+
+  </div>
+</div>
+<div class="step-3" ng-show="isWarmingUp">
+  <p class="step"><b>STEP 8</b>/9</p>
+  <h2>Heating</h2>
+
+  <div class="machine-heating-icon">
+    <img src="/images/dynexp/dual-channel-optical-cal/machine-idle.png" class="machine-idle">
+    <img src="/images/dynexp/dual-channel-optical-cal/lid-heating.png" style=" opacity: {{ lidHeatPercentage() | round:3 }}" class="lid-heating">
+    <img src="/images/dynexp/dual-channel-optical-cal/block-heating.png" style="opacity: {{ blockHeatPercentage() | round:3 }}" class="block-heating">
+  </div>
+
+  <div class="text-center">
+    <p class="wait">PLEASE WAIT:</p>
+    <p class="heating" ng-show="getHeatBlockTemp().target === 0">
+      The lid is heating to <b>{{data.lid.target_temperature | round: 1}}&deg;</b>C <br>
+    </p>
+    <p class="heating" ng-show="getHeatBlockTemp().target > 0">
+      Warming heat block to <b>{{getHeatBlockTemp().target | round: 1}}&deg;</b>C <br>
+    </p>
+    <p class="note" ng-show="state === 'running'">
+      Estimated remaining time <b>{{ timeRemaining - Constants.HEATING_WATER_OFFSET | secondsDisplay: 'display2'}}</b>
+    </p>
+    <p class="dont-open">
+      Please don't open the machine during this step.
+    </p>
+
+  </div>
+</div>
