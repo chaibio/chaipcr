@@ -58,8 +58,8 @@
             var eachSmallButtonWidth = (eachBoxesWidth - small_button_space) / 2;
             dataBoxesEdit.find('button.small_button, button.small_button_disabled').css({ width: eachSmallButtonWidth + 'px' });
 
-            var lolPopUp = elem.find('.lol-pop')
-            lolPopUp.css({ left: ((eachBoxesWidth + padding) * (numVisibleDataBoxes - 1) + ((eachBoxesWidth - lolPopUp.width()) * 0.5)) + 'px' })
+            var lolPopUp = elem.find('.lol-pop');
+            lolPopUp.css({ left: ((eachBoxesWidth + padding) * (numVisibleDataBoxes - 1) + ((eachBoxesWidth - lolPopUp.width()) * 0.5)) + 'px' });
 
           }
 
