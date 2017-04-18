@@ -1,4 +1,20 @@
-.dual-channel-optical-cal {
+.dynexp {
+  * {
+    font-family: 'Dinot';
+  }
+  h1 {
+    font-size: 50px;
+  }
+  h2 {
+    margin-bottom: 10px;
+    margin-top: 0;
+    font-size: 40px;
+    font-weight: 700;
+  }
+  p {
+    color: #333;
+    font-size: 14px;
+  }
   #container {
     width: 1024px;
     margin: 0 auto;

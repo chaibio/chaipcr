@@ -1,4 +1,4 @@
-angular.module('dynexp.dual_channel_optical_cal_v2', [
+angular.module('dynexp.optical_cal', [
   'ui.router',
   'ngResource',
   'http-auth-interceptor',

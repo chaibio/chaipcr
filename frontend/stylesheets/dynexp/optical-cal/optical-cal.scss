@@ -1,4 +1,17 @@
-.dual-channel-optical-cal {
+.optical-calibration {
+  h1 {
+    font-size: 50px;
+  }
+  h2 {
+    margin-bottom: 10px;
+    margin-top: 0;
+    font-size: 40px;
+    font-weight: 700;
+  }
+  p {
+    color: #333;
+    font-size: 14px;
+  }
   button,
   .button {
     background: #fff;
@@ -47,7 +60,7 @@
   /*tubes container sulotion label*/
   .tubes-container .solution-label img {
     display: inline-block;
-    margin: 0;
+    margin: 0 5px;
     margin-right: 10px;
     vertical-align: middle;
     height: 20px;
@@ -58,7 +71,7 @@
   }
   .tubes-container img.tubes {
     margin-top: 10px;
-    width: 150px;
+    width: 225px;
   }
   /*intro page*/
   .intro h2 {
@@ -89,7 +102,7 @@
     margin: 0;
     margin-top: 30px;
   }
-  .tubes-container .col-md-4 {
+  .tubes-container .col-md-6 {
     padding-left: 0;
     padding-right: 0;
   }
@@ -176,22 +189,22 @@
     left: 90px;
     width: 20px;
   }
-  /*step 9*/
-  .step-9 .machine-icon img {
+  /*step 6*/
+  .step-6 .machine-icon img {
     width: 200px;
     display: block;
     margin: 0 auto;
     margin-top: 50px;
     margin-bottom: 30px;
   }
-  .step-9 p.heating {
+  .step-6 p.heating {
     margin-top: 20px;
   }
   .errorMessage {
     display: block;
     width: 500px;
     margin: 0 auto;
-    color: red;
+    color: #999;
     font-size: 17px;
   }
 }

@@ -65,7 +65,8 @@ var appFiles = [
     'app/canvas/**/*.js',
     'app/filters/**/*.js',
     'dynexp/dynexp.module.js',
-    'dynexp/libs/**/*.js',
+    'dynexp/_libs/**/*.js',
+    'dynexp/optical_cal/**/*.js',
     'dynexp/dual_channel_optical_cal_v2/**/*.js',
     'templates.js',
 ];
