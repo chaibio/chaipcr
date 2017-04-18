@@ -1,6 +1,6 @@
 (function() {
 
-  "use strict";
+  // "use strict";
 
   function ThermalProfileChart($scope, elem, data, config) {
 
@@ -573,4 +573,4 @@
   window.ChaiBioCharts = window.ChaiBioCharts || {};
   window.ChaiBioCharts.ThermalProfileChart = ThermalProfileChart;
 
-})();
+}).call(window);

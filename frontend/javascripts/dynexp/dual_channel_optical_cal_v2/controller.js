@@ -110,24 +110,24 @@
             var is_current_exp = (running_exp_id !== null) && parseInt(this_exp_id) === parseInt(running_exp_id);
 
             if (deviceStatus.experiment_controller.machine.state !== 'idle' && !is_current_exp) {
-              $scope.errors['ANOTHER_EXPERIMENT_RUNNING'] = "Another experiment is running.";
+              $scope.errors.ANOTHER_EXPERIMENT_RUNNING = "Another experiment is running.";
             } else {
-              delete $scope.errors['ANOTHER_EXPERIMENT_RUNNING'];
+              delete $scope.errors.ANOTHER_EXPERIMENT_RUNNING;
             }
 
-            if ($scope.errors['OFFLINE']) {
-              delete $scope.errors['OFFLINE'];
+            if ($scope.errors.OFFLINE) {
+              delete $scope.errors.OFFLINE;
             }
 
             if (deviceStatus.optics.lid_open === "true" || deviceStatus.optics.lid_open === true) { // lid is open
               $scope.errors.LID_OPEN = "Close lid to begin.";
             } else {
-              delete $scope.errors['LID_OPEN'];
+              delete $scope.errors.LID_OPEN;
             }
           })
           .catch(function(err) {
             // Error
-            $scope.errors['OFFLINE'] = "Can't connect to the machine.";
+            $scope.errors.OFFLINE = "Can't connect to the machine.";
 
             if (err.status === 500) {
 
@@ -177,7 +177,7 @@
             }
           });
 
-      }
+      };
 
       $scope.lidHeatPercentage = function() {
         if (!$scope.experiment) return 0;
