@@ -20,8 +20,8 @@
       var ERROR_TYPES = ['OFFLINE', 'CANT_CREATE_EXPERIMENT', 'CANT_START_EXPERIMENT', 'LID_OPEN', 'UNKNOWN_ERROR', 'ANOTHER_EXPERIMENT_RUNNING'];
       var checkMachineStatusInterval = null;
       var errorModal = null;
-      $scope.cancel = false
-      $scope.errors = {}
+      $scope.cancel = false;
+      $scope.errors = {};
 
       function checkMachineStatus() {
         Status
@@ -39,24 +39,24 @@
             var is_current_exp = (parseInt(this_exp_id) === parseInt(running_exp_id)) && (running_exp_id !== null);
 
             if (deviceStatus.experiment_controller.machine.state !== 'idle' && running_exp_id !== null && !is_current_exp ) {
-              $scope.errors['ANOTHER_EXPERIMENT_RUNNING'] = "Another experiment is running.";
+              $scope.errors.ANOTHER_EXPERIMENT_RUNNING = "Another experiment is running.";
             } else {
-              delete $scope.errors['ANOTHER_EXPERIMENT_RUNNING'];
+              delete $scope.errors.ANOTHER_EXPERIMENT_RUNNING;
             }
 
-            if ($scope.errors['OFFLINE']) {
-              delete $scope.errors['OFFLINE'];
+            if ($scope.errors.OFFLINE) {
+              delete $scope.errors.OFFLINE;
             }
 
             if (deviceStatus.optics.lid_open === "true" || deviceStatus.optics.lid_open === true) { // lid is open
               $scope.errors.LID_OPEN = "Close lid to begin.";
             } else {
-              delete $scope.errors['LID_OPEN'];
+              delete $scope.errors.LID_OPEN;
             }
           })
           .catch(function(err) {
             // Error
-            $scope.errors['OFFLINE'] = "Can't connect to the machine.";
+            $scope.errors.OFFLINE = "Can't connect to the machine.";
 
             if (err.status === 500) {
 
@@ -207,7 +207,7 @@
 
       $scope.cancelExperiment = function () {
         Experiment.stopExperiment($scope.experiment_id).then(function () {
-          $state.go('settings.root')
+          $state.go('settings.root');
         });
       };
 

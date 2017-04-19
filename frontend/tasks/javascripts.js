@@ -64,10 +64,11 @@ var appFiles = [
     'app/views/**/*.js',
     'app/canvas/**/*.js',
     'app/filters/**/*.js',
-    'dynexp/dynexp.module.js',
     'dynexp/_libs/**/*.js',
     'dynexp/optical_cal/**/*.js',
     'dynexp/dual_channel_optical_cal_v2/**/*.js',
+    'dynexp/optical_test_dual_channel/**/*.js',
+    'dynexp/dynexp.module.js',
     'templates.js',
 ];
 
@@ -108,7 +109,7 @@ gulp.task('coffee', ['clean-js'], function() {
 });
 
 gulp.task('es6', ['clean-js'], function() {
-  console.log("Testing es6");
+  // console.log("Testing es6");
     return gulp.src(['frontend/javascripts/**/*.es6'])
         .pipe(babel({
             presets: ['es2015']

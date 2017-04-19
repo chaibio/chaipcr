@@ -58,7 +58,7 @@ angular.module('dynexp.libs').service('TestInProgressService', [
         });
         fetchPromise["finally"](function() {
           isFetchingExp = false;
-          return experimentQues["exp_id_" + id] = [];
+          experimentQues["exp_id_" + id] = [];
         });
       }
       return deferred.promise;

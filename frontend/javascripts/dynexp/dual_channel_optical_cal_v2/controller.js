@@ -139,7 +139,7 @@
                 };
 
                 errorModal = $uibModal.open({
-                  templateUrl: './views/modal-error.html',
+                  templateUrl: 'dynexp/dual_channel_optical_cal_v2/views/modal-error.html',
                   scope: scope
                 });
               }
@@ -243,7 +243,7 @@
 
       $scope.cancelExperiment = function() {
         Experiment.stopExperiment($scope.experiment_id).then(function() {
-          $state.go('settings.root')
+          $state.go('settings.root');
         });
       };
 
