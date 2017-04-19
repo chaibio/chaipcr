@@ -1,0 +1,14 @@
+<div class="intro">
+  <h2>Optical Diagnostic</h2>
+
+  <p>
+    Ensure all wells are empty and the lid is closed, and press continue..
+  </p>
+
+  <div class="text-center">
+    <button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ng-click="createExperiment()">BEGIN</button>
+    <span ng-if="error" ng-class="{errorMessage: error}">{{lidMessage}}</span>
+
+  </div>
+
+</div>
