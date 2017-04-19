@@ -17,16 +17,21 @@
  * limitations under the License.
  */
 
-angular.module("canvasApp").factory('littleCircleGroup', [
-  function() {
-    return function(littleCircles, parent) {
-      return new fabric.Group(littleCircles, {
-        originX:'center',
-        originY: 'center',
-        top: 0,
-        visible: false,
-        selectable: false
-      });
+angular.module("canvasApp").factory('outerCircle', [
+  'Circle',
+  function(Circle) {
+    return function() {
+      var properties = {
+        radius: 18,
+        originX: "center",
+        originY: "center",
+        hasBorders: false,
+        fill: '#ffb400',
+        selectable: false,
+        name: "temperatureControllerOuterCircle"
+      };
+
+      return Circle.create(properties);
     };
   }
 ]);

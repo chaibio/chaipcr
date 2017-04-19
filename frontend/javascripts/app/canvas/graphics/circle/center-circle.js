@@ -17,16 +17,23 @@
  * limitations under the License.
  */
 
-angular.module("canvasApp").factory('circleMaker', [
-  function() {
-    return function(left) {
-      return new fabric.Circle({
-        radius: 2,
-        fill: 'white',
-        left: left,
+angular.module("canvasApp").factory('centerCircle', [
+  'Circle',
+  function(Circle) {
+    return function() {
+      
+      var properties = {
+        radius: 11,
+        stroke: 'white',
+        originX: "center",
+        originY: "center",
+        fill: '#ffb400',
+        strokeWidth: 8,
         selectable: false,
-        name: "temperatureControllerLittleDude"
-      });
+        name: "temperatureControllers"
+      };
+
+      return Circle.create(properties);
     };
   }
 ]);

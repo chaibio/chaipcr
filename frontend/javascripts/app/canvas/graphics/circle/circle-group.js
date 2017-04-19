@@ -17,19 +17,26 @@
  * limitations under the License.
  */
 
-angular.module("canvasApp").factory('centerCircle', [
-  function() {
-    return function() {
-      return new fabric.Circle({
-        radius: 11,
-        stroke: 'white',
+angular.module("canvasApp").factory('circleGroup', [
+  'constants',
+  'Group',
+  function(constants, Group) {
+    return function(circles, parent, $scope) {
+      var properties = {
+        left: parent.left + (constants.stepWidth / 2),
+        top: parent.top,
+        me: parent,
+        selectable: true,
+        name: "controlCircleGroup",
+        lockMovementX: true,
+        evented: ! $scope.exp_completed,
+        hasControls: false,
+        hasBorders: false,
         originX: "center",
         originY: "center",
-        fill: '#ffb400',
-        strokeWidth: 8,
-        selectable: false,
-        name: "temperatureControllers"
-      });
+      };
+      
+      return Group.create(circles, properties);
     };
   }
 ]);
