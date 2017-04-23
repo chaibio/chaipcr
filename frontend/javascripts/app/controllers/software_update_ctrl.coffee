@@ -51,7 +51,7 @@ window.App.controller 'SoftwareUpdateCtrl', [
     $scope.doUpdate = ->
       $scope.content = 'update_in_progress'
       Device.updateSoftware()
-      Status.startUpdateSync()
+      # Status.startUpdateSync()
       $timeout ->
         isUpInterval = $interval ->
           if Status.isUp()

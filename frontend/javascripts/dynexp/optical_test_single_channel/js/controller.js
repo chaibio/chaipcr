@@ -5,7 +5,7 @@
       'dynexpExperimentService',
       '$state',
       '$stateParams',
-      'dynexpStatusService',
+      'Status',
       'dynexpGlobalService',
       'OpticalTestSingleChannelConstants',
       'OpticalTestSingleChannelHelper',

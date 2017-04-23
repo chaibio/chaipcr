@@ -49,37 +49,39 @@ window.ChaiBioTech.ngApp
       deferred = $q.defer()
       ques.push deferred
 
-      return deferred.promise if fetching
-      fetching = true
+      if fetching
+        return deferred.promise
+      else
+        fetching = true
 
-      timeoutPromise = $timeout =>
-        timeoutPromise = null
-        fetching = false
-      , 10000
-      $http.get("#{host}\:8000/status")
-      .success (resp) =>
-        #console .log isUp
-        #isUp = true
-        oldData = angular.copy data
-        data = resp
-        for def in ques by 1
-          def.resolve data
+        timeoutPromise = $timeout =>
+          timeoutPromise = null
+          fetching = false
+        , 10000
+        $http.get("#{host}\:8000/status")
+        .success (resp) =>
+          #console .log isUp
+          #isUp = true
+          oldData = angular.copy data
+          data = resp
+          for def in ques by 1
+            def.resolve data
 
-        if data?.experiment_controller?.machine?.state is 'idle' and oldData?.experiment_controller?.machine?.state isnt 'idle'
-          $rootScope.$broadcast 'status:experiment:completed'
+          if data?.experiment_controller?.machine?.state is 'idle' and oldData?.experiment_controller?.machine?.state isnt 'idle'
+            $rootScope.$broadcast 'status:experiment:completed'
 
-        $rootScope.$broadcast 'status:data:updated', data, oldData
+          $rootScope.$broadcast 'status:data:updated', data, oldData
 
-      .error (resp) ->
-        #isUp = if resp is null then false else true
-        for def in ques by 1
-          def.reject(resp)
+        .error (resp) ->
+          #isUp = if resp is null then false else true
+          for def in ques by 1
+            def.reject(resp)
 
-      .finally =>
-        $timeout.cancel timeoutPromise
-        timeoutPromise = null
-        fetching = false
-        ques = []
+        .finally =>
+          $timeout.cancel timeoutPromise
+          timeoutPromise = null
+          fetching = false
+          ques = []
 
       deferred.promise
 
@@ -106,11 +108,8 @@ window.ChaiBioTech.ngApp
       if (fetchInterval)
         $interval.cancel(fetchInterval)
 
-
     @startUpdateSync = ->
-      #if !fetchingForUpdate then @fetchForUpdate()
-      #if !fetchForUpdateInterval
-        fetchForUpdateInterval = $interval @fetchForUpdate, 1000
+      fetchForUpdateInterval = $interval @fetchForUpdate, 1000
 
     return
 

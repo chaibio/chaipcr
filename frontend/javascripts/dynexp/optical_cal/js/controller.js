@@ -4,7 +4,7 @@
     '$window',
     'dynexpExperimentService',
     '$state',
-    'dynexpStatusService',
+    'Status',
     'dynexpGlobalService',
     'host',
     '$http',

@@ -104,8 +104,4 @@ window.ChaiBioTech.ngApp
         url: '/experiments/:id/run-experiment?chart?max_cycle'
         templateUrl: 'app/views/experiment/run-experiment.html'
 
-      # .state 'dynexp-dual-channel-optical-cal',
-      #   url: '/dynexp-dual-channel-optical-cal'
-      #   templateUrl: 'app/views/dynexp/dual-channel-optical-cal/index.html'
-
 ]

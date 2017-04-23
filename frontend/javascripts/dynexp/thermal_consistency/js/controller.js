@@ -6,7 +6,7 @@
     'dynexpExperimentService',
     '$state',
     '$stateParams',
-    'dynexpStatusService',
+    'Status',
     'dynexpGlobalService',
     'host',
     '$http',
@@ -198,7 +198,7 @@
 
       $scope.cancelExperiment = function () {
         Experiment.stopExperiment($scope.experiment_id).then(function () {
-          $state.go('settings.root')
+          $state.go('settings.root');
         });
       };
 

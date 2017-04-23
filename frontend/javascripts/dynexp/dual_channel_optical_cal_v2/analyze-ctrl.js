@@ -2,9 +2,9 @@
   window.App.controller('DualChannelOpticalCalAnalyzeCtrl', [
     '$scope',
     '$stateParams',
-    'Constants',
-    'Experiment',
-    'GlobalService',
+    'dualChannelOpticalCal2Constants',
+    'dynexpExperimentService',
+    'dynexpGlobalService',
     function($scope, $stateParams, Constants, Experiment, GlobalService) {
 
       $scope.loop = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
