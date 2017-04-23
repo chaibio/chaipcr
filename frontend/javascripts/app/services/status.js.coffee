@@ -102,6 +102,10 @@ window.ChaiBioTech.ngApp
       if !fetchInterval
         fetchInterval = $interval @fetch, 1000
 
+    @stopSync = ->
+      if (fetchInterval)
+        $interval.cancel(fetchInterval)
+
 
     @startUpdateSync = ->
       #if !fetchingForUpdate then @fetchForUpdate()

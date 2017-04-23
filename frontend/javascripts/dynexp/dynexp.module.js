@@ -4,6 +4,7 @@ angular.module('dynexp', [
   'dynexp.dual_channel_optical_cal_v2',
   'dynexp.optical_test_single_channel',
   'dynexp.optical_test_dual_channel',
+  'dynexp.thermal_consistency',
 ])
 .value('host', 'http://' + window.location.hostname)
 .run(['dynexpStatusService', function(Status) {

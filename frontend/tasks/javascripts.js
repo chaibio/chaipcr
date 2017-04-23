@@ -69,6 +69,7 @@ var appFiles = [
     'dynexp/dual_channel_optical_cal_v2/**/*.js',
     'dynexp/optical_test_single_channel/**/*.js',
     'dynexp/optical_test_dual_channel/**/*.js',
+    'dynexp/thermal_consistency/**/*.js',
     'dynexp/dynexp.module.js',
     'templates.js',
 ];

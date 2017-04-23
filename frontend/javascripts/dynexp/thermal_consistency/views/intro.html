@@ -1,0 +1,15 @@
+<div class="intro">
+  <h2>Thermal Uniformity Diagnostic</h2>
+
+  <p>
+    Place two thermal uniformity test strips into the machine and press continue.
+  </p>
+
+  <div class="text-center">
+
+    <button ng-show="!cancel" ng-disabled="error" ng-class="{errorButton: error}" ng-click="createExperiment()">CONTINUE</button>
+    <span ng-if="error" ng-class="{errorMessage: error}">{{lidMessage}}</span>
+
+  </div>
+
+</div>
