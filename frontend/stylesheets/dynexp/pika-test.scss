@@ -1,25 +1,25 @@
-.dynexp.pika-test {
-  color: #000;
-  //   html, body {
-  //     font-family: 'Dinot';
-  //     color: #000;
+.pika-test-active {
+  .pika-test {
+    color: #000;
+    .page-layout {
+      * {
+        font-family: 'dinot-medium';
+      }
+    }
+  }
+  // h1 {
+  //   font-size: 50px;
   // }
-  // body{
-  //   min-width: 1200px;
+  // h2 {
+  //   margin-bottom: 10px;
+  //   margin-top: 0;
+  //   font-size: 40px;
+  //   font-weight: 700;
   // }
-  h1 {
-    font-size: 50px;
-  }
-  h2 {
-    margin-bottom: 10px;
-    margin-top: 0;
-    font-size: 40px;
-    font-weight: 700;
-  }
-  p {
-    color: #333;
-    font-size: 14px;
-  }
+  // p {
+  //   color: #333;
+  //   font-size: 14px;
+  // }
   .notes-cursor {
     cursor: pointer;
   }
@@ -31,40 +31,17 @@
     outline: none;
     border-bottom: 2px solid #656565;
     width: 450px;
+    font-size: 13px;
   }
   .assign {
     color: black;
-    font-family: 'Dinot';
+    font-family: 'dinot-medium';
     font-weight: 700;
   }
   .assignB {}
   .modal-content {
     box-shadow: none;
     border: none;
-  }
-  .notes-button-div {
-    margin-top: 50px;
-    border-top: 1px solid;
-    border-bottom: 1px solid;
-  }
-  .notes-button {
-    border: none;
-    margin-top: 0;
-    margin-bottom: 0;
-    width: 200px;
-  }
-  .notes-box {
-    padding: 15px 65px;
-    border: 1px solid;
-    margin-top: 40%;
-  }
-  .notes-textarea {
-    resize: none;
-    width: 90%;
-    height: 60px;
-    outline: none;
-    font-family: 'Dinot';
-    font-weight: 500;
   }
   .empty-input {
     border-bottom: 2px solid lightgray;
@@ -82,7 +59,7 @@
   }
   .sidebar h4 {
     padding-left: 30px;
-    font-family: 'Dinot';
+    font-family: 'dinot-medium';
     font-weight: 700;
   }
   .sidebar hr {
@@ -94,6 +71,7 @@
   .sidebar input {
     border: none;
     max-width: 250px;
+    font-size: 18px;
   }
   .step-B {
     padding-top: 25px;
@@ -107,7 +85,7 @@
   }
   .abondon-exp p {
     padding-left: 15px;
-    font-family: 'Dinot';
+    font-family: 'dinot-medium';
     font-weight: 500;
     font-size: 12px;
   }
@@ -156,12 +134,12 @@
     padding-top: 50px;
   }
   .setwells h3 {
-    font-family: 'Dinot';
+    font-family: 'dinot-medium';
     font-weight: 700;
     font-size: 27px;
   }
   .setwells p {
-    font-family: 'Dinot';
+    font-family: 'dinot-medium';
     font-weight: 400;
     font-size: 20px;
     color: #656565;
@@ -170,12 +148,12 @@
   .setwells table {
     padding-top: 30px;
     display: inline-block;
-    font-family: 'Dinot';
+    font-family: 'dinot-medium';
     margin-left: -15px;
   }
   .setwells table td {
     color: #656565;
-    font-family: 'Dinot';
+    font-family: 'dinot-medium';
     font-weight: 500;
   }
   .setwells table .posneg {
@@ -192,18 +170,18 @@
   }
   /* Review Page Start */
   .review h3 {
-    font-family: 'Dinot';
+    font-family: 'dinot-medium';
     font-weight: 700;
     color: #656565;
     max-width: 800px;
   }
   .review h4 {
-    font-family: 'Dinot';
+    font-family: 'dinot-medium';
     font-weight: 700;
     color: #656565;
   }
   .review td {
-    font-family: 'Dinot';
+    font-family: 'dinot-medium';
     font-weight: 500;
     color: #656565;
   }
@@ -220,7 +198,7 @@
     border-bottom: 1px solid black;
   }
   .td-heading td {
-    font-family: 'Dinot';
+    font-family: 'dinot-medium';
     font-weight: 700;
     font-size: 16px;
     padding-left: 0;
@@ -229,7 +207,7 @@
     border-bottom: 1px solid lightgray;
   }
   .td-description td {
-    font-family: 'Dinot';
+    font-family: 'dinot-medium';
     font-size: 16px;
     padding-left: 0;
     font-weight: 500;
@@ -244,7 +222,7 @@
   /* Results Page End */
   /* Experiment Running */
   .exp-running h4 {
-    font-family: 'Dinot';
+    font-family: 'dinot-medium';
     font-weight: 700;
     margin-top: 0;
     color: #656565;
@@ -348,5 +326,34 @@
   }
   .padd-top-50 {
     padding-top: 50px;
+  }
+  .modal-dialog {
+    width: 600px;
+  }
+  .notes-button-div {
+    margin-top: 50px;
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+  }
+  .notes-button {
+    border: none;
+    margin-top: 0;
+    margin-bottom: 0;
+    width: 200px;
+  }
+  .notes-box {
+    padding: 15px 65px;
+    border: 1px solid;
+    margin-top: 40%;
+  }
+  .notes-textarea {
+    resize: none;
+    width: 90%;
+    height: 60px;
+    outline: none;
+    font-family: 'dinot-medium';
+    font-weight: 500;
+    font-size: 14px;
+    border-radius: 0;
   }
 }

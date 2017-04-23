@@ -19,6 +19,12 @@
       function PikaTestCtrl($scope, $window, Experiment, $state, $stateParams, Status, GlobalService,
         host, $http, CONSTANTS, DeviceInfo, $timeout, $rootScope, $uibModal, focus) {
 
+        $window.$('body').addClass('pika-test-active')
+
+        $scope.$on('$destroy', function() {
+          $window.$('body').removeClass('pika-test-active')
+        });
+
         $scope.error = true;
         $scope.cancel = false;
         $scope.loop = [];
@@ -143,7 +149,7 @@
         function openInstance() {
           $scope.modalInstance = $uibModal.open({
             scope: $scope,
-            templateUrl: '/dynexp/pika_test/intro.html',
+            templateUrl: 'dynexp/pika_test/intro.html',
             backdrop: false
           });
         }
