@@ -38,6 +38,15 @@
 }
 
 @font-face {
+  font-family: "dinot-medium";
+  font-weight: 500;
+  src: url("/fonts/dinot/DINOT-Medium.eot");
+  src: url("/fonts/dinot/DINOT-Medium.eot?#iefix") format("eot"),
+  url("/fonts/dinot/DINOT-Medium.woff") format("woff"),
+  url("/fonts/dinot/DINOT-Medium.otf") format("otf");
+}
+
+@font-face {
   font-family: "dinot-regular";
   font-weight: 300;
   src: url("/fonts/dinot/DINOT-Regular.eot");

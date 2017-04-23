@@ -1,5 +1,7 @@
 .dynexp {
-  font-family: 'Dinot';
+  * {
+    font-family: 'dinot-medium';
+  }
   h1 {
     font-size: 50px;
   }
@@ -61,8 +63,8 @@
   a {
     cursor: pointer;
   }
-
-  button, .button {
+  button,
+  .button {
     display: inline-block;
     border-radius: 0;
   }

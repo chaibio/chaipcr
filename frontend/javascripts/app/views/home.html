@@ -70,7 +70,7 @@
 
           </a>
 
-          <a class="experiment-links" ng-if="!exp.experiment.started_at && exp.experiment.type === 'test_kit'" href="/dynexp/pika_test/index.html#/setWellsA/{{exp.experiment.id}}">
+          <a class="experiment-links" ng-if="!exp.experiment.started_at && exp.experiment.type === 'test_kit'" ui-sref="pika_test.setWellsA({id: exp.experiment.id})">
              <div class="home-page-exp-name B1B">
                {{exp.experiment.name}}
              </div>
@@ -93,7 +93,7 @@
              <span class="home-page-exp-created-at B2" ng-show="exp.experiment.started_at && !exp.experiment.completed_at">IN PROGRESS&nbsp;<ellipsis-animated><ellipsis-animated/></span>
           </a>
 
-					<a class="experiment-links" ng-if="exp.experiment.started_at && exp.experiment.completed_at && exp.experiment.type === 'test_kit'" href="/dynexp/pika_test/index.html#/results/{{exp.experiment.id}}">
+					<a class="experiment-links" ng-if="exp.experiment.started_at && exp.experiment.completed_at && exp.experiment.type === 'test_kit'" ui-sref="pika_test.results({id: exp.experiment.id})">
 						 <div class="home-page-exp-name B1B">
 							 {{exp.experiment.name}}
 						 </div>
@@ -105,7 +105,7 @@
 
 					</a>
 
-					<a class="experiment-links" ng-if="exp.experiment.started_at && !exp.experiment.completed_at && exp.experiment.type === 'test_kit'" href="/dynexp/pika_test/index.html#/exp-running/{{exp.experiment.id}}">
+					<a class="experiment-links" ng-if="exp.experiment.started_at && !exp.experiment.completed_at && exp.experiment.type === 'test_kit'" ui-sref="pika_test.exp-running({id: exp.experiment.id})">
 						 <div class="home-page-exp-name B1B">
 							 {{exp.experiment.name}}
 						 </div>

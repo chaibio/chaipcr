@@ -25,8 +25,9 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 	'$window',
 	'$timeout',
 	'$location',
+	'$state',
 	'Testkit',
-	function(Device, $scope, Status, $http, $window, $timeout, $location, Testkit) {
+	function(Device, $scope, Status, $http, $window, $timeout, $location, $state, Testkit) {
 
 		$scope.is_dual_channel = false;
 		$scope.update_available = 'unavailable';
@@ -76,7 +77,9 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 				];
 				Testkit.create({guid:'pika_4e_kit',name:$scope.kit.name}).then(function (resp){
 					Testkit.createWells(resp.data.experiment.id,$scope.wells).then(function(response){
-						$window.location.href = "/dynexp/pika_test/index.html#/setWellsA/"+resp.data.experiment.id ;
+						$state.go('pika_test.setWellsA', {id: resp.data.experiment.id});
+						$scope.$close();
+						// $window.location.href = "/dynexp/pika_test/index.html#/setWellsA/"+resp.data.experiment.id ;
 					})
 					.catch(function(response){
 						$scope.creating = false;
@@ -105,7 +108,9 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitCtrl', [
 				];
 				Testkit.create({guid:'pika_4e_kit',name:$scope.kit1.name + '&' + $scope.kit2.name }).then(function (resp){
 					Testkit.createWells(resp.data.experiment.id,$scope.wells).then(function(response){
-						$window.location.href = "/dynexp/pika_test/index.html#/setWellsA/"+resp.data.experiment.id ;
+						$state.go('pika_test.setWellsA', {id: resp.data.experiment.id});
+						$scope.$close();
+						// $window.location.href = "/dynexp/pika_test/index.html#/setWellsA/"+resp.data.experiment.id ;
 					})
 					.catch(function(response){
 						$scope.creating = false;

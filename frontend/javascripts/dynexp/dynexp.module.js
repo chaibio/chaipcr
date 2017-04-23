@@ -6,4 +6,5 @@ angular.module('dynexp', [
   'dynexp.optical_test_dual_channel',
   'dynexp.thermal_consistency',
   'dynexp.thermal_performance_diagnostic',
+  'dynexp.pika_test',
 ]);
