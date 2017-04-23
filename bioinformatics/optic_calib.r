@@ -129,6 +129,7 @@ get_calib_data <- function(calib_id_s, step_id_s,
                                    WHERE     experiment_id=%d 
                                          AND step_id=%d 
                                          AND cycle_num=1
+                                         AND step_id is not NULL
                                    ORDER BY well_num', 
                                    calib_id, 
                                    step_id)
@@ -159,6 +160,7 @@ get_calib_data <- function(calib_id_s, step_id_s,
                                            AND step_id=%d 
                                            AND channel=%d 
                                            AND cycle_num=1
+                                           AND step_id is not NULL
                                      ORDER BY well_num', 
                                      calib_id_s[name_calib_id], 
                                      step_id_s[name_calib_id], 
@@ -309,7 +311,7 @@ get_full_calib_data <- function(db_conn, calib_info) {
         calib_qry <- sprintf('
             SELECT fluorescence_value, well_num, channel 
                 FROM fluorescence_data 
-                WHERE experiment_id=%d AND step_id=%d AND cycle_num=1 
+                WHERE experiment_id=%d AND step_id=%d AND cycle_num=1 AND step_id is not NULL
                 ORDER BY well_num, channel
             ', 
             calib_ele[['calibration_id']], 

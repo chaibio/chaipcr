@@ -63,7 +63,7 @@ boost::posix_time::ptime parseIsoTime(const std::string &str)
     return boost::posix_time::ptime(boost::gregorian::date(year, month, day), boost::posix_time::time_duration(hours, minutes, seconds));
 }
 
-void watchProcess(const std::string &command, WatchProcessCallback outCallback, WatchProcessCallback errorCallback)
+void watchProcess(const std::string &command, WatchProcessCallback outCallback, WatchProcessCallback errorCallback, bool ignoreErrors)
 {
     int outPipes[2] = {-1};
     int errorPipes[2] = {-1};
@@ -215,21 +215,22 @@ void watchProcess(const std::string &command, WatchProcessCallback outCallback, 
         {
             if (status == 0)
                 return;
-            else
+            else if (!ignoreErrors)
                 throw ProcessError(status, "Error in subprocess - " + command);
         }
-        else
+        else if (!ignoreErrors)
             throw std::system_error(errno, std::generic_category(), "Error with subprocess - " + command);
     }
     else
     {
         killpg(getpgid(pid), SIGTERM);
 
-        throw std::runtime_error("Unknown error with subprocess - " + command);
+        if (!ignoreErrors)
+            throw std::runtime_error("Unknown error with subprocess - " + command);
     }
 }
 
-bool watchProcess(const std::string &command, int eventFd, WatchProcessCallback outCallback, WatchProcessCallback errorCallback)
+bool watchProcess(const std::string &command, int eventFd, WatchProcessCallback outCallback, WatchProcessCallback errorCallback, bool ignoreErrors)
 {
     int outPipes[2] = {-1};
     int errorPipes[2] = {-1};
@@ -395,21 +396,21 @@ bool watchProcess(const std::string &command, int eventFd, WatchProcessCallback 
         {
             if (status == 0)
                 return true;
-            else
+            else if (!ignoreErrors)
                 throw ProcessError(status, "Error in subprocess - " + command);
         }
-        else
+        else if (!ignoreErrors)
             throw std::system_error(errno, std::generic_category(), "Error with subprocess - " + command);
     }
     else
     {
         killpg(getpgid(pid), SIGTERM);
 
-        if (fdArray[2].revents == 0)
+        if (fdArray[2].revents == 0 && !ignoreErrors)
             throw std::runtime_error("Unknown error with subprocess - " + command);
-        else
-            return false;
     }
+
+    return false;
 }
 
 bool getFileChecksum(const std::string &filePath, int eventFd, std::string &checksum)

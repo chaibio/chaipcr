@@ -37,7 +37,6 @@ angular.module("canvasApp").factory('circle', [
   'previouslySelected',
   'pauseStepOnScrollGroup',
   'pauseStepCircleOnScroll',
-
   function(ExperimentLoader, $rootScope, Constants, circleGroup, outerMostCircle, outerCircle,
     centerCircle, littleCircleGroup, circleMaker, stepDataGroup, stepTemperature, stepHoldTime,
     gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle, previouslySelected,
@@ -78,6 +77,7 @@ angular.module("canvasApp").factory('circle', [
       };
 
       this.moveCircle = function() {
+        
         this.getLeft();
         this.getTop();
       };

@@ -99,7 +99,7 @@ get_amplification_data <- function(
     
     wcc_qry <- sprintf(
         'SELECT well_num, cycle_num, channel FROM fluorescence_data
-        WHERE experiment_id = %i AND %s_id = %s AND cycle_num <= %i
+        WHERE experiment_id = %i AND %s_id = %s AND cycle_num <= %i AND step_id is not NULL
         ',
         exp_id, sr_latest[1], sr_latest[2], max_cycle
     )
@@ -344,7 +344,8 @@ get_amp_raw <- function(
                 experiment_id=%i AND 
                 %s_id=%s AND 
                 channel=%i AND
-                cycle_num <= %i
+                cycle_num <= %i AND
+                step_id is not NULL
             ORDER BY well_num, cycle_num',
         col_name, exp_id, sr, sr_id, as.numeric(channel), max(cycle_nums)
     )

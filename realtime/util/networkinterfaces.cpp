@@ -295,7 +295,7 @@ std::string findWifiInterface()
 
         try
         {
-            Util::watchProcess(command.str(), [&output](const char *buffer, std::size_t size){ output.write(buffer, size); });
+            Util::watchProcess(command.str(), [&output](const char *buffer, std::size_t size){ output.write(buffer, size); }, Util::WatchProcessCallback(), true);
         }
         catch (...)
         {
@@ -353,7 +353,7 @@ std::string getInterfaceGateway(const std::string &interface)
 
     try
     {
-        Util::watchProcess("route -n | grep " + interface, [&output](const char *buffer, std::size_t size){ output.write(buffer, size); });
+        Util::watchProcess("route -n | grep " + interface, [&output](const char *buffer, std::size_t size){ output.write(buffer, size); }, Util::WatchProcessCallback(), true);
     }
     catch (const ProcessError &/*ex*/) { //Ignoring process errors because mostly they mean that the interface is not connected thus does not have a gateway address
         return std::string();
