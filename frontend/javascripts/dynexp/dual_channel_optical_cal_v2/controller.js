@@ -17,6 +17,13 @@
       host, $http, $interval, $uibModal, $rootScope, $timeout) {
 
       var checkMachineStatusInterval = null;
+
+      $scope.$on('$destroy', function() {
+        if (checkMachineStatusInterval) {
+          $timeout.cancel(checkMachineStatusInterval);
+        }
+      });
+
       var errorModal = null;
       var pages = [
         '2_channel_optical_cal.intro',

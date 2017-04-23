@@ -23,6 +23,12 @@
         //$scope.custom_error = false;
         $('.content').addClass('analyze');
 
+        $scope.$on('$destroy', function () {
+          if ($scope.timeout) {
+            $timeout.cancel($scope.timeout);
+          }
+        });
+
         function getExperiment(exp_id, cb) {
           Experiment.get(exp_id).then(function(resp) {
             $scope.experiment = resp.data.experiment;

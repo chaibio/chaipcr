@@ -41,7 +41,7 @@
           onCancel: '&',
           cancelText: '@'
         },
-        templateUrl: '/dynexp/libs/views/wizard-header.html',
+        templateUrl: 'dynexp/_libs/views/wizard-header.html',
         link: linkFunc
       };
 
