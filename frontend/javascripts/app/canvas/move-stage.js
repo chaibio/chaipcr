@@ -106,6 +106,16 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         this.indicator.verticalLine = vertical;
 
+        // Rough Idea,
+        // When edit stages is clicked, make a map for all stage positions and its cordinates , like [left, middle], [middle, right]
+        // Split each stage into two equal areas on top
+        // there is no beacon, or testing hit
+        // Instead of hit, check if we are in either of these areas,
+        // If we are in the right side and moving right we need to make space and put the vertical line over there,
+        // If we are in the left side and moving left , we need to make stace before the stage and put the vertical line there,
+        // Take care of the boundary conditions.
+        // defrag the code , move graphics into other place.
+        
         this.indicator.init = function(stage, C, movement) {
           // rework on this part for smaller space...
           this.setLeft(stage.left - 50).setCoords();
@@ -138,7 +148,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           stageType.setText(stage.model.stage_type.toUpperCase());
         };
 
-        this.indicator.onTheMove = function(C, movement) {
+       /* this.indicator.onTheMove = function(C, movement) {
           // Here we hit test the movement of the MOVING STAGE
           this.setLeft(movement.left - 50).setCoords();
           this.beacon.setLeft(movement.left + this.beaconMove).setCoords();
@@ -188,7 +198,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           }, this);
           this.manageVerticalLine(C);
 
-        };
+        }; */
 
         this.indicator.checkMovingOffScreen = function(C, movement, direction) {
 

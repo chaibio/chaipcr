@@ -35,8 +35,10 @@ angular.module("canvasApp").factory('canvas', [
   'interceptorFactory',
   'stageHitBlock',
   'stageGraphics',
+  'StagePositionService',
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
-    moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageHitBlock, stageGraphics) {
+    moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageHitBlock, stageGraphics, 
+    StagePositionService) {
 
     this.init = function(model) {
 
@@ -197,7 +199,8 @@ angular.module("canvasApp").factory('canvas', [
     };
 
     this.editStageMode = function(status) {
-
+      StagePositionService.getPositionObject(this.allStageViews);
+      
       var add = (status) ? 25 : -25;
 
       if(status === true) {
