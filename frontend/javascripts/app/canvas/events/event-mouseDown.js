@@ -125,18 +125,19 @@ angular.module("canvasApp").factory('mouseDown', [
             that.moveStageActive = true;
             that.canvas.moveCursor = "move";
 
-            C.stageIndicator.init(evt.target.parent, C, evt.target);
-            that.stageIndicatorPosition = C.stageIndicator.left;
-            C.stageIndicator.changeText(evt.target.parent);
-
-            circleManager.togglePaths(false); //put it back later
-
             var stage = evt.target.parent;
             stage.collapseStage();
             that.calculateMoveLimit("stage", stage);
-            //C.canvas.bringToFront(C.stageIndicator);
             stage.wireStageNextAndPrevious();
             stage.removeFromStagesArray();
+            circleManager.togglePaths(false); //put it back later
+
+            C.stageIndicator.init(evt.target.parent, C, evt.target);
+            that.stageIndicatorPosition = C.stageIndicator.left;
+            C.stageIndicator.changeText(evt.target.parent);
+            
+            //C.canvas.bringToFront(C.stageIndicator);
+            
             C.canvas.renderAll();
           break;
 

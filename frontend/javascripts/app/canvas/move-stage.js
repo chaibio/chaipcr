@@ -21,8 +21,8 @@ angular.module("canvasApp").factory('moveStageRect', [
   'ExperimentLoader',
   'stage',
   'stageGraphics',
-
-  function(ExperimentLoader, stageDude, stageGraphics) {
+  'StagePositionService',
+  function(ExperimentLoader, stageDude, stageGraphics, StagePositionService) {
 
     return {
 
@@ -118,10 +118,12 @@ angular.module("canvasApp").factory('moveStageRect', [
         
         this.indicator.init = function(stage, C, movement) {
           // rework on this part for smaller space...
+          
           this.setLeft(stage.left - 50).setCoords();
           C.canvas.bringToFront(this);
           this.setVisible(true);
-
+          this.rightOffset = 85;
+          this.leftOffset = -60;
           this.currentLeft = movement.left;
           this.canvasContaining = $('.canvas-containing');
           this.currentDragPos = 0;
@@ -140,6 +142,8 @@ angular.module("canvasApp").factory('moveStageRect', [
           if(stage.previousStage) {
               this.currentDrop = stage.previousStage;
             }
+          StagePositionService.getPositionObject(C.allStageViews);
+          console.log(StagePositionService.allPositions);
         };
 
         this.indicator.changeText = function(stage) {
@@ -148,6 +152,39 @@ angular.module("canvasApp").factory('moveStageRect', [
           stageType.setText(stage.model.stage_type.toUpperCase());
         };
 
+        this.indicator.getDirection = function(movement) {
+
+          if(movement.left > this.currentLeft && this.direction !== "right") {
+            this.direction = "right";
+          } else if(movement.left < this.currentLeft && this.direction !== "left") {
+            this.direction = "left";    
+          }
+          return this.direction;
+        };
+        
+        this.indicator.onTheMove = function(C, movement) {
+          this.setLeft(movement.left - 50).setCoords();
+          var direction = this.getDirection(movement)
+          
+          this.currentLeft = movement.left;
+          
+          if(direction === 'right') {
+            StagePositionService.allPositions.some(function(points) {
+              if((movement.left + this.rightOffset) > points[1] && (movement.left + this.rightOffset) < points[2]) {
+                console.log("Wow found");
+                return true;
+              }
+            }, this);
+          } else if(direction === 'left') {
+            StagePositionService.allPositions.some(function(points) {
+              if((movement.left + this.leftOffset) > points[0] && (movement.left + this.leftOffset) < points[1]) {
+                console.log("W Found");
+                return true;
+              }
+            }, this);
+          }
+         
+        };
        /* this.indicator.onTheMove = function(C, movement) {
           // Here we hit test the movement of the MOVING STAGE
           this.setLeft(movement.left - 50).setCoords();

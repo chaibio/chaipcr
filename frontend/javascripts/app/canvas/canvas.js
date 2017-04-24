@@ -199,8 +199,8 @@ angular.module("canvasApp").factory('canvas', [
     };
 
     this.editStageMode = function(status) {
-      StagePositionService.getPositionObject(this.allStageViews);
-      
+      //StagePositionService.getPositionObject(this.allStageViews);
+      //console.log(StagePositionService.allPositions);
       var add = (status) ? 25 : -25;
 
       if(status === true) {
