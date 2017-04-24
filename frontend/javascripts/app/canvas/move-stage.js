@@ -162,26 +162,36 @@ angular.module("canvasApp").factory('moveStageRect', [
           return this.direction;
         };
         
+        this.indicator.ifOverRightSide = function(movement, C) {
+           StagePositionService.allPositions.some(function(points, index) {
+              if((movement.left + this.rightOffset) > points[1] && (movement.left + this.rightOffset) < points[2]) {
+                console.log("Wow found");
+                C.allStageViews[index].moveToSide("left", this.spaceArrayRight, this.spaceArrayLeft, this.draggedStage);
+                return true;
+              }
+            }, this);
+        };
+
+        this.indicator.ifOverLeftSide = function(movement, C) {
+          StagePositionService.allPositions.some(function(points, index) {
+              if((movement.left + this.leftOffset) > points[0] && (movement.left + this.leftOffset) < points[1]) {
+                console.log("W Found");
+                C.allStageViews[index].moveToSide("right", this.spaceArrayRight, this.spaceArrayLeft, this.draggedStage);
+                return true;
+              }
+            }, this);
+        };
+
         this.indicator.onTheMove = function(C, movement) {
           this.setLeft(movement.left - 50).setCoords();
-          var direction = this.getDirection(movement)
+          var direction = this.getDirection(movement);
           
           this.currentLeft = movement.left;
           
           if(direction === 'right') {
-            StagePositionService.allPositions.some(function(points) {
-              if((movement.left + this.rightOffset) > points[1] && (movement.left + this.rightOffset) < points[2]) {
-                console.log("Wow found");
-                return true;
-              }
-            }, this);
+           this.ifOverRightSide(movement, C);
           } else if(direction === 'left') {
-            StagePositionService.allPositions.some(function(points) {
-              if((movement.left + this.leftOffset) > points[0] && (movement.left + this.leftOffset) < points[1]) {
-                console.log("W Found");
-                return true;
-              }
-            }, this);
+            this.ifOverLeftSide(movement, C);
           }
          
         };
@@ -254,7 +264,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         };
 
         this.indicator.manageVerticalLine = function(C) {
-          // break this methid into two methods.
+          // break this method into two methods.
           if(this.direction === 'right') {
             this.manageVerticalLineRight(C);
           } else if(this.direction === 'left') {
