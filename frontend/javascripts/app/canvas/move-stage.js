@@ -22,10 +22,11 @@ angular.module("canvasApp").factory('moveStageRect', [
   'stage',
   'stageGraphics',
   'StagePositionService',
-  function(ExperimentLoader, stageDude, stageGraphics, StagePositionService) {
+  'verticalLine',
+  function(ExperimentLoader, stageDude, stageGraphics, StagePositionService, verticalLine) {
 
     return {
-
+      
       getMoveStageRect: function(me) {
 
         this.currentDrop = null;
@@ -47,26 +48,7 @@ angular.module("canvasApp").factory('moveStageRect', [
             top: 30, left: 35, fontFamily: "dinot-regular"
           }
         );
-        /*******************Vertical line*************************/
-        var smallCircle = new fabric.Circle({
-          radius: 6, fill: 'white', stroke: "black", strokeWidth: 2, selectable: false,
-          left: 69, top: 390, originX: 'center', originY: 'center',
-        });
-
-        var smallCircleTop = new fabric.Circle({
-          fill: '#FFB300', radius: 6, strokeWidth: 3, selectable: false, stroke: "black",
-          left: 69, top: 64, originX: 'center', originY: 'center'
-        });
-
-        var verticalLine = new fabric.Line([0, 0, 0, 336],{
-          left: 68, top: 58, stroke: 'black', strokeWidth: 2, originX: 'left', originY: 'top'
-        });
-
-        var vertical = new fabric.Group([verticalLine, smallCircleTop, smallCircle], {
-          originX: "left", originY: "top", left: 62, top: 56, selectable: true,
-          lockMovementY: true, hasControls: false, hasBorders: false, name: "vertica", visible: false
-        });
-        /********************************************/
+        
         var rect = new fabric.Rect({
           fill: 'white', width: 135, left: 0, height: 58, selectable: false, name: "step", me: this, rx: 1,
         });
@@ -74,7 +56,6 @@ angular.module("canvasApp").factory('moveStageRect', [
         var coverRect = new fabric.Rect({
           fill: null, width: 135, left: 0, top: 0, height: 372, selectable: false, me: this, rx: 1,
         });
-
 
         me.imageobjects["drag-stage-image.png"].originX = "left";
         me.imageobjects["drag-stage-image.png"].originY = "top";
@@ -96,7 +77,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           lockMovementY: true, hasControls: false, visible: false, hasBorders: false, name: "dragStageGroup"
         });
 
-        this.indicator.verticalLine = vertical;
+        this.indicator.verticalLine = new verticalLine();
 
         // Rough Idea,
         // When edit stages is clicked, make a map for all stage positions and its cordinates , like [left, middle], [middle, right]
@@ -110,7 +91,6 @@ angular.module("canvasApp").factory('moveStageRect', [
         
         this.indicator.init = function(stage, C, movement) {
           // rework on this part for smaller space...
-          
           this.setLeft(stage.left - 50).setCoords();
           C.canvas.bringToFront(this);
           this.setVisible(true);
@@ -131,8 +111,8 @@ angular.module("canvasApp").factory('moveStageRect', [
           this.draggedStage = stage;
 
           if(stage.previousStage) {
-              this.currentDrop = stage.previousStage;
-            }
+            this.currentDrop = stage.previousStage;
+          }
           StagePositionService.getPositionObject(C.allStageViews);
 
         };
