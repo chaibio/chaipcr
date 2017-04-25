@@ -54,8 +54,9 @@
             // resize big buttons
             dataBoxesEdit.find('button.big_button, button.big_button_disabled').css({ width: eachBoxesWidth + 'px' });
             // resize small buttons
-            var small_button_space = 17 + 4;
-            var eachSmallButtonWidth = (eachBoxesWidth - small_button_space) / 2;
+            var small_button_space = 18;
+            var small_button_border_size = 1;
+            var eachSmallButtonWidth = ((eachBoxesWidth - small_button_space) / 2) - (small_button_border_size * 2);
             dataBoxesEdit.find('button.small_button, button.small_button_disabled').css({ width: eachSmallButtonWidth + 'px' });
 
             var lolPopUp = elem.find('.lol-pop');
