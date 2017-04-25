@@ -33,7 +33,6 @@ angular.module("canvasApp").factory('moveStageRect', [
         this.endPosition = 0;
         this.currentLeft = 0;
         this.direction = null;
-        this.beaconMove = 0;
 
         var stageName = new fabric.Text(
           "STAGE 2", {
@@ -95,13 +94,6 @@ angular.module("canvasApp").factory('moveStageRect', [
         this.indicator = new fabric.Group([coverRect, indicatorRectangle], {
           originX: "left", originY: "top", left: 38, top: 0, height: 372, width: 135, selectable: true,
           lockMovementY: true, hasControls: false, visible: false, hasBorders: false, name: "dragStageGroup"
-        });
-
-        // We may need two beacon, so that we have better control over where we move
-
-        this.indicator.beacon = new fabric.Rect({
-          fill: '', width: 10, left: 0, top: 10, height: 200, selectable: false, me: this,
-          lockMovementY: true, hasControls: false, visible: true, //fill: 'black',
         });
 
         this.indicator.verticalLine = vertical;
