@@ -278,7 +278,7 @@ angular.module("canvasApp").factory('stage', [
         while(stage) {
           if(stage.stageMovedDirection !== "left") {
             console.log("Looking");
-            stage.moveToSide("left", null, null, draggedStage);
+            stage.moveToSide("left", draggedStage);
           }
           stage = stage.previousStage;
         }
@@ -288,7 +288,7 @@ angular.module("canvasApp").factory('stage', [
         var stage = this.nextStage;
         while(stage) {
           if(stage.stageMovedDirection !== "right") {
-            stage.moveToSide("right", null, null, draggedStage);
+            stage.moveToSide("right", draggedStage);
           }
           stage = stage.nextStage;
         }
@@ -307,9 +307,7 @@ angular.module("canvasApp").factory('stage', [
             moveCount = 30;
             this.makeSureNextMovedRight(draggedStage);
           }
-
           this.moveToSideStageComponents(moveCount);
-
           this.stageMovedDirection = direction; // !important
           return "Valid Move";
         }

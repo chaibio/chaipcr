@@ -167,7 +167,7 @@ angular.module("canvasApp").factory('moveStageRect', [
               if((movement.left + this.rightOffset) > points[1] && (movement.left + this.rightOffset) < points[2]) {
                 
                 if(index !== this.currentMoveRight) {
-                  C.allStageViews[index].moveToSide("left", null, null, this.draggedStage);
+                  C.allStageViews[index].moveToSide("left", this.draggedStage);
                   this.currentMoveRight = movedStageIndex = index;
                 }
                 return true;
@@ -182,7 +182,7 @@ angular.module("canvasApp").factory('moveStageRect', [
               if((movement.left + this.leftOffset) > points[0] && (movement.left + this.leftOffset) < points[1]) {
                 
                 if(this.currentMoveLeft !== index) {
-                  C.allStageViews[index].moveToSide("right", null, null, this.draggedStage);
+                  C.allStageViews[index].moveToSide("right", this.draggedStage);
                   this.currentMoveLeft = movedStageIndex = index;
                 }
                 return true;
