@@ -54,6 +54,15 @@ JS_APP_FILES = _file_path_prepend([
   'javascripts/app/filters/**/*',
   'javascripts/app/services/**/*',
   'javascripts/app/views/**/*',
+  'javascripts/dynexp/_libs/**/*.js',
+  'javascripts/dynexp/optical_cal/**/*.js',
+  'javascripts/dynexp/dual_channel_optical_cal_v2/**/*.js',
+  'javascripts/dynexp/optical_test_single_channel/**/*.js',
+  'javascripts/dynexp/optical_test_dual_channel/**/*.js',
+  'javascripts/dynexp/thermal_consistency/**/*.js',
+  'javascripts/dynexp/thermal_performance_diagnostic/**/*.js',
+  'javascripts/dynexp/pika_test/**/*.js',
+  'javascripts/dynexp/dynexp.module.js',
 ]);
 
 TEST_FILES = _file_path_prepend([
