@@ -126,7 +126,6 @@ angular.module("canvasApp").factory('moveStageRect', [
           this.leftOffset = -60;
           this.currentLeft = movement.left;
           this.canvasContaining = $('.canvas-containing');
-          this.currentDragPos = 0;
           this.currentMoveRight = null;
           this.currentMoveLeft = null;
           this.currentDrop = null;
@@ -143,7 +142,7 @@ angular.module("canvasApp").factory('moveStageRect', [
               this.currentDrop = stage.previousStage;
             }
           StagePositionService.getPositionObject(C.allStageViews);
-          console.log(StagePositionService.allPositions);
+
         };
 
         this.indicator.changeText = function(stage) {
@@ -174,7 +173,6 @@ angular.module("canvasApp").factory('moveStageRect', [
                 return true;
               }
             }, this);
-            console.log("Checking ", movedStageIndex);
             return movedStageIndex;
         };
 
@@ -182,7 +180,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           var movedStageIndex = null;
           StagePositionService.allPositions.some(function(points, index) {
               if((movement.left + this.leftOffset) > points[0] && (movement.left + this.leftOffset) < points[1]) {
-                console.log("W Found");
+                
                 if(this.currentMoveLeft !== index) {
                   C.allStageViews[index].moveToSide("right", null, null, this.draggedStage);
                   this.currentMoveLeft = movedStageIndex = index;
@@ -204,70 +202,21 @@ angular.module("canvasApp").factory('moveStageRect', [
            var stageMovedRightIndex = this.ifOverRightSide(movement, C);
            if(stageMovedRightIndex !== null) {
             this.currentMoveLeft = null; // Resetting
+            this.currentDrop = C.allStageViews[stageMovedRightIndex];
             this.manageVerticalLineRight(C, stageMovedRightIndex);
            }
            
           } else if(direction === 'left') {
             var stageMovedLeftIndex  = this.ifOverLeftSide(movement, C);
             if(stageMovedLeftIndex !== null) {
-              this.currentMoveRight = null;
+              this.currentMoveRight = null; // Resetting
+              this.currentDrop = C.allStageViews[stageMovedLeftIndex - 1];
               this.manageVerticalLineLeft(C, stageMovedLeftIndex);
            }
           }
-          //this.manageVerticalLine(C);
+          
         };
-       /* this.indicator.onTheMove = function(C, movement) {
-          // Here we hit test the movement of the MOVING STAGE
-          this.setLeft(movement.left - 50).setCoords();
-          this.beacon.setLeft(movement.left + this.beaconMove).setCoords();
-
-          if(movement.left > this.currentLeft && this.direction !== "right") {
-            this.direction = "right";
-            this.beaconMove = 85;
-          } else if(movement.left < this.currentLeft && this.direction !== "left") {
-            this.direction = "left";
-            this.beaconMove = -60;
-          }
-
-          this.currentLeft = movement.left;
-          this.checkMovingOffScreen(C, movement, this.direction);
-
-          C.allStageViews.some(function(stage, index) {
-
-            if(this.beacon.intersectsWithObject(stage.stageHitPointLeft)) {
-
-              this.currentDrop = stage;
-
-              if(this.direction === "left") {
-                console.log("moveToSide hittt Left");
-                stage.moveToSide("right", this.spaceArrayRight, this.spaceArrayLeft, this.draggedStage);
-
-                if(stage.previousStage) {
-                  this.currentDrop = stage.previousStage;
-                } else {
-                  this.currentDrop = null;
-                }
-              }
-              if(this.direction === "right") {
-                this.currentDrop = stage.previousStage;
-              }
-              return true;
-            } else if(this.beacon.intersectsWithObject(stage.stageHitPointRight)) {
-              this.currentDrop = stage;
-              console.log("hittt Right");
-              if(this.direction === "right") {
-                stage.moveToSide("left", this.spaceArrayRight, this.spaceArrayLeft, this.draggedStage);
-              }
-              return true;
-            }
-
-            return false;
-            // END OF SOME METHOD.
-          }, this);
-          this.manageVerticalLine(C);
-
-        }; */
-
+       
         this.indicator.checkMovingOffScreen = function(C, movement, direction) {
 
           if(direction === "right") {
@@ -284,18 +233,16 @@ angular.module("canvasApp").factory('moveStageRect', [
           }
         };
 
-        
-
         this.indicator.manageVerticalLineRight = function(C, index) {
-          console.log("This is the place", index);
-          var place = (C.allStageViews[index].left + C.allStageViews[index].myWidth + 15);
-          this.verticalLine.setLeft(place);
+
+          var place = (C.allStageViews[index].left + C.allStageViews[index].myWidth + 13);
+          this.verticalLine.setLeft(place).setCoords();
         };
 
         this.indicator.manageVerticalLineLeft = function(C, index) {
 
           var place = (C.allStageViews[index].left - 25);
-          this.verticalLine.setLeft(place);
+          this.verticalLine.setLeft(place).setCoords();
         };
 
         this.indicator.processMovement = function(stage, C, circleManager) {
@@ -320,7 +267,7 @@ angular.module("canvasApp").factory('moveStageRect', [
       };
 
       this.indicator.backToOriginal = function(stageToBeReplaced, C) {
-
+        
         var data;
         data = {
           stage: stageToBeReplaced.model
@@ -334,40 +281,40 @@ angular.module("canvasApp").factory('moveStageRect', [
         C.canvas.renderAll();
       };
 
-        this.indicator.applyMovement = function(stage_, C, circleManager, callBack) {
+      this.indicator.applyMovement = function(stage_, C, circleManager, callBack) {
 
-          var stage = this.draggedStage;
+        var stage = this.draggedStage;
 
-          var stageIndex = (this.currentDrop) ? this.currentDrop.index : 0;
-          var model = this.draggedStage.model;
-          var stageView = new stageDude(model, C.canvas, C.allStepViews, stageIndex, C, C.$scope, true);
+        var stageIndex = (this.currentDrop) ? this.currentDrop.index : 0;
+        var model = this.draggedStage.model;
+        var stageView = new stageDude(model, C.canvas, C.allStepViews, stageIndex, C, C.$scope, true);
 
-          C.addNextandPrevious(this.currentDrop, stageView);
+        C.addNextandPrevious(this.currentDrop, stageView);
 
-          if(stageIndex === 0 && !this.currentDrop) { //if we insert into the very first place.
-            C.allStageViews.splice(stageIndex, 0, stageView);
-          } else {
-            C.allStageViews.splice(stageIndex + 1, 0, stageView);
-          }
+        if(stageIndex === 0 && !this.currentDrop) { //if we insert into the very first place.
+          C.allStageViews.splice(stageIndex, 0, stageView);
+        } else {
+          C.allStageViews.splice(stageIndex + 1, 0, stageView);
+        }
 
-          this.moveStageGraphics(stageView, C, circleManager);
-          C.canvas.remove(stage_.dots);
-        };
+        this.moveStageGraphics(stageView, C, circleManager);
+        C.canvas.remove(stage_.dots);
+      };
 
-        this.indicator.moveStageGraphics = function(stageView, C, circleManager) {
+      this.indicator.moveStageGraphics = function(stageView, C, circleManager) {
 
-          stageView.updateStageData(1);
-          stageView.render();
-          C.configureStepsofNewStage(stageView, 0);
-          C.correctNumbering();
-          C.allStageViews[0].moveAllStepsAndStagesSpecial();
-          circleManager.addRampLines();
-          C.allStepViews[C.allStepViews.length - 1].circle.doThingsForLast(null, null);
-          stageView.stageHeader();
-          C.$scope.applyValues(stageView.childSteps[0].circle);
-          stageView.childSteps[0].circle.manageClick(true);
+        stageView.updateStageData(1);
+        stageView.render();
+        C.configureStepsofNewStage(stageView, 0);
+        C.correctNumbering();
+        C.allStageViews[0].moveAllStepsAndStagesSpecial();
+        circleManager.addRampLines();
+        C.allStepViews[C.allStepViews.length - 1].circle.doThingsForLast(null, null);
+        stageView.stageHeader();
+        C.$scope.applyValues(stageView.childSteps[0].circle);
+        stageView.childSteps[0].circle.manageClick(true);
 
-        };
+      };
 
         this.indicator.clickManager = function(stage_, C, circleManager) {
           var stage = this.draggedStage, stageIndex = 0, model, stageView;

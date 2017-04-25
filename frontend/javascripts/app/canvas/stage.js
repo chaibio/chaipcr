@@ -295,7 +295,7 @@ angular.module("canvasApp").factory('stage', [
       };
 
       //This method is used when move stage hits at the hitPoint at the side of the stage.
-      this.moveToSide = function(direction, spaceArrayRight, spaceArrayLeft, draggedStage) {
+      this.moveToSide = function(direction, draggedStage) {
 
         if(this.validMove(direction, draggedStage)) {
 
@@ -306,22 +306,6 @@ angular.module("canvasApp").factory('stage', [
           } else if("right") {
             moveCount = 30;
             this.makeSureNextMovedRight(draggedStage);
-          }
-
-          if(spaceArrayRight && spaceArrayLeft) {
-            if(direction === "right") {
-              spaceArrayLeft[0] = this.left - 82;
-              spaceArrayLeft[1] = this.left - 44;
-
-              spaceArrayRight[0] = this.left + 60;
-              spaceArrayRight[1] = this.left + 98;
-            } else if (direction === "left") {
-              spaceArrayRight[0] = (this.left + this.myWidth) + 40;
-              spaceArrayRight[1] = (this.left + this.myWidth) + 78;
-
-              spaceArrayLeft[0] = (spaceArrayRight[1] - 186);
-              spaceArrayLeft[1] = spaceArrayRight[0] - 104;
-            }
           }
 
           this.moveToSideStageComponents(moveCount);
