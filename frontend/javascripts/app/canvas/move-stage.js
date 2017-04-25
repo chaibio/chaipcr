@@ -127,8 +127,8 @@ angular.module("canvasApp").factory('moveStageRect', [
           this.currentLeft = movement.left;
           this.canvasContaining = $('.canvas-containing');
           this.currentDragPos = 0;
-          this.spaceArrayRight = [stage.left + 30, stage.left + 90];
-          this.spaceArrayLeft = [stage.left - 82, stage.left - 44];
+          this.currentMoveRight = null;
+          this.currentMoveLeft = null;
           this.currentDrop = null;
 
           C.canvas.bringToFront(this.verticalLine);
@@ -163,37 +163,58 @@ angular.module("canvasApp").factory('moveStageRect', [
         };
         
         this.indicator.ifOverRightSide = function(movement, C) {
+          var movedStageIndex = null;
            StagePositionService.allPositions.some(function(points, index) {
               if((movement.left + this.rightOffset) > points[1] && (movement.left + this.rightOffset) < points[2]) {
-                console.log("Wow found");
-                C.allStageViews[index].moveToSide("left", this.spaceArrayRight, this.spaceArrayLeft, this.draggedStage);
+                
+                if(index !== this.currentMoveRight) {
+                  C.allStageViews[index].moveToSide("left", null, null, this.draggedStage);
+                  this.currentMoveRight = movedStageIndex = index;
+                }
                 return true;
               }
             }, this);
+            console.log("Checking ", movedStageIndex);
+            return movedStageIndex;
         };
 
         this.indicator.ifOverLeftSide = function(movement, C) {
+          var movedStageIndex = null;
           StagePositionService.allPositions.some(function(points, index) {
               if((movement.left + this.leftOffset) > points[0] && (movement.left + this.leftOffset) < points[1]) {
                 console.log("W Found");
-                C.allStageViews[index].moveToSide("right", this.spaceArrayRight, this.spaceArrayLeft, this.draggedStage);
+                if(this.currentMoveLeft !== index) {
+                  C.allStageViews[index].moveToSide("right", null, null, this.draggedStage);
+                  this.currentMoveLeft = movedStageIndex = index;
+                }
                 return true;
               }
             }, this);
+            return movedStageIndex;
         };
 
         this.indicator.onTheMove = function(C, movement) {
+          
           this.setLeft(movement.left - 50).setCoords();
           var direction = this.getDirection(movement);
-          
           this.currentLeft = movement.left;
+          this.checkMovingOffScreen(C, movement, this.direction);
           
           if(direction === 'right') {
-           this.ifOverRightSide(movement, C);
+           var stageMovedRightIndex = this.ifOverRightSide(movement, C);
+           if(stageMovedRightIndex !== null) {
+            this.currentMoveLeft = null; // Resetting
+            this.manageVerticalLineRight(C, stageMovedRightIndex);
+           }
+           
           } else if(direction === 'left') {
-            this.ifOverLeftSide(movement, C);
+            var stageMovedLeftIndex  = this.ifOverLeftSide(movement, C);
+            if(stageMovedLeftIndex !== null) {
+              this.currentMoveRight = null;
+              this.manageVerticalLineLeft(C, stageMovedLeftIndex);
+           }
           }
-         
+          //this.manageVerticalLine(C);
         };
        /* this.indicator.onTheMove = function(C, movement) {
           // Here we hit test the movement of the MOVING STAGE
@@ -263,51 +284,18 @@ angular.module("canvasApp").factory('moveStageRect', [
           }
         };
 
-        this.indicator.manageVerticalLine = function(C) {
-          // break this method into two methods.
-          if(this.direction === 'right') {
-            this.manageVerticalLineRight(C);
-          } else if(this.direction === 'left') {
-            this.manageVerticalLineLeft(C);
-          }
+        
+
+        this.indicator.manageVerticalLineRight = function(C, index) {
+          console.log("This is the place", index);
+          var place = (C.allStageViews[index].left + C.allStageViews[index].myWidth + 15);
+          this.verticalLine.setLeft(place);
         };
 
-        this.indicator.manageVerticalLineRight = function(C) {
+        this.indicator.manageVerticalLineLeft = function(C, index) {
 
-          if(this.beacon.left > this.spaceArrayRight[0] && this.beacon.left < this.spaceArrayRight[1]) {
-            if(this.verticalLine.getVisible() === false) {
-              var verticalDropPositionRight = 0;
-              if(this.currentDrop) {
-                verticalDropPositionRight = this.currentDrop.left + this.currentDrop.myWidth + 13;
-              } else {
-                verticalDropPositionRight = C.allStageViews[0].left - 20;
-              }
-              C.canvas.bringToFront(this.verticalLine);
-              this.verticalLine.setLeft(verticalDropPositionRight).setCoords();
-              this.verticalLine.setVisible(true);
-            }
-          } else if(this.verticalLine.getVisible() === true) {
-            this.verticalLine.setVisible(false);
-          }
-        };
-
-        this.indicator.manageVerticalLineLeft = function(C) {
-
-          if(this.beacon.left > this.spaceArrayLeft[0] && this.beacon.left < this.spaceArrayLeft[1]) {
-            if(this.verticalLine.getVisible() === false) {
-              var verticalDropPositionLeft = 0;
-              if(this.currentDrop) {
-                verticalDropPositionLeft = this.currentDrop.left + this.currentDrop.myWidth + 13;
-              } else {
-                verticalDropPositionLeft = C.allStageViews[0].left - 20;
-              }
-              C.canvas.bringToFront(this.verticalLine);
-              this.verticalLine.setVisible(true);
-              this.verticalLine.setLeft(verticalDropPositionLeft).setCoords();
-            }
-          } else if(this.verticalLine.getVisible() === true) {
-            this.verticalLine.setVisible(false);
-          }
+          var place = (C.allStageViews[index].left - 25);
+          this.verticalLine.setLeft(place);
         };
 
         this.indicator.processMovement = function(stage, C, circleManager) {
