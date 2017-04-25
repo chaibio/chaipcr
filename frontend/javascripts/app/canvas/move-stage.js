@@ -23,60 +23,14 @@ angular.module("canvasApp").factory('moveStageRect', [
   'stageGraphics',
   'StagePositionService',
   'verticalLine',
-  function(ExperimentLoader, stageDude, stageGraphics, StagePositionService, verticalLine) {
+  'moveStepIndicator',
+  function(ExperimentLoader, stageDude, stageGraphics, StagePositionService, verticalLine, moveStepIndicator) {
 
     return {
       
       getMoveStageRect: function(me) {
 
-        this.currentDrop = null;
-        this.startPosition = 0;
-        this.endPosition = 0;
-        this.currentLeft = 0;
-        this.direction = null;
-
-        var stageName = new fabric.Text(
-          "STAGE 2", {
-            fill: 'black',  fontSize: 12, selectable: false, originX: 'left', originY: 'top',
-            top: 15, left: 35, fontFamily: "dinot-bold"
-          }
-        );
-
-        var stageType = new fabric.Text(
-          "HOLDING", {
-            fill: 'black',  fontSize: 12, selectable: false, originX: 'left', originY: 'top',
-            top: 30, left: 35, fontFamily: "dinot-regular"
-          }
-        );
-        
-        var rect = new fabric.Rect({
-          fill: 'white', width: 135, left: 0, height: 58, selectable: false, name: "step", me: this, rx: 1,
-        });
-
-        var coverRect = new fabric.Rect({
-          fill: null, width: 135, left: 0, top: 0, height: 372, selectable: false, me: this, rx: 1,
-        });
-
-        me.imageobjects["drag-stage-image.png"].originX = "left";
-        me.imageobjects["drag-stage-image.png"].originY = "top";
-        me.imageobjects["drag-stage-image.png"].top = 15;
-        me.imageobjects["drag-stage-image.png"].left = 14;
-
-        var indicatorRectangle = new fabric.Group([
-          rect, stageName, stageType,
-          me.imageobjects["drag-stage-image.png"],
-        ],
-          {
-            originX: "left", originY: "top", left: 0, top: 0, height: 72, selectable: true, lockMovementY: true, hasControls: false,
-            visible: true, hasBorders: false, name: "dragStageRect"
-          }
-        );
-
-        this.indicator = new fabric.Group([coverRect, indicatorRectangle], {
-          originX: "left", originY: "top", left: 38, top: 0, height: 372, width: 135, selectable: true,
-          lockMovementY: true, hasControls: false, visible: false, hasBorders: false, name: "dragStageGroup"
-        });
-
+        this.indicator = new moveStepIndicator(me);
         this.indicator.verticalLine = new verticalLine();
 
         // Rough Idea,
@@ -90,7 +44,7 @@ angular.module("canvasApp").factory('moveStageRect', [
         // defrag the code , move graphics into other place.
         
         this.indicator.init = function(stage, C, movement) {
-          // rework on this part for smaller space...
+          
           this.setLeft(stage.left - 50).setCoords();
           C.canvas.bringToFront(this);
           this.setVisible(true);
@@ -101,6 +55,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           this.currentMoveRight = null;
           this.currentMoveLeft = null;
           this.currentDrop = null;
+          this.direction = null;
 
           C.canvas.bringToFront(this.verticalLine);
           this.verticalLine.setLeft(stage.left + 5).setCoords();
@@ -118,9 +73,9 @@ angular.module("canvasApp").factory('moveStageRect', [
         };
 
         this.indicator.changeText = function(stage) {
-
-          stageName.setText(stage.stageCaption.text);
-          stageType.setText(stage.model.stage_type.toUpperCase());
+          
+          this.stageName.setText(stage.stageCaption.text);
+          this.stageType.setText(stage.model.stage_type.toUpperCase());
         };
 
         this.indicator.getDirection = function(movement) {
