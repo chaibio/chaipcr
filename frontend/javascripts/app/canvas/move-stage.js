@@ -32,7 +32,7 @@ angular.module("canvasApp").factory('moveStageRect', [
 
         this.indicator = new moveStepIndicator(me);
         this.indicator.verticalLine = new verticalLine();
-
+        this.indicator.canvasContaining = $('.canvas-containing');
         // Rough Idea,
         // When edit stages is clicked, make a map for all stage positions and its cordinates , like [left, middle], [middle, right]
         // Split each stage into two equal areas on top
@@ -45,31 +45,25 @@ angular.module("canvasApp").factory('moveStageRect', [
         
         this.indicator.init = function(stage, C, movement) {
           
-          this.setLeft(stage.left - 50).setCoords();
+          this.setLeft(stage.left - 50).setVisible(true).setCoords();
           C.canvas.bringToFront(this);
-          this.setVisible(true);
           this.rightOffset = 85;
           this.leftOffset = -55;
           this.currentLeft = movement.left;
-          this.canvasContaining = $('.canvas-containing');
           this.currentMoveRight = null;
           this.currentMoveLeft = null;
           this.currentDrop = null;
           this.direction = null;
-
-          C.canvas.bringToFront(this.verticalLine);
-          this.verticalLine.setLeft(stage.left + 5).setCoords();
-
-          this.verticalLine.setVisible(true);
-          C.canvas.bringToFront(this.verticalLine);
-
           this.draggedStage = stage;
+
+          C.canvas.bringToFront(this.verticalLine);
+          this.verticalLine.setLeft(stage.left + 5).setVisible(true).setCoords();
+          C.canvas.bringToFront(this.verticalLine);
 
           if(stage.previousStage) {
             this.currentDrop = stage.previousStage;
           }
           StagePositionService.getPositionObject(C.allStageViews);
-
         };
 
         this.indicator.changeText = function(stage) {
