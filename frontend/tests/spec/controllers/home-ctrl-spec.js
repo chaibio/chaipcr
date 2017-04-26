@@ -52,7 +52,6 @@
       })
 
       inject(function($injector) {
-        this.httpBackend = $injector.get('$httpBackend')
         this.controller = $injector.get('$controller')
         this.rootScope = $injector.get('$rootScope')
         this.scope = this.rootScope.$new()
@@ -63,8 +62,6 @@
     })
 
     it('should have current user', function() {
-      var wlanData = {}
-      var statusData = {}
       expect(this.scope.user).toEqual(userMock)
     })
 
