@@ -18,7 +18,6 @@
  */
 
 window.ChaiBioTech.ngApp.service('StagePositionService', [
-
   function() {
     return {
         getPositionObject: function(stages) {

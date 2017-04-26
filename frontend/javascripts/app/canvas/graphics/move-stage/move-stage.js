@@ -23,14 +23,14 @@ angular.module("canvasApp").factory('moveStageRect', [
   'stageGraphics',
   'StagePositionService',
   'verticalLine',
-  'moveStepIndicator',
-  function(ExperimentLoader, stageDude, stageGraphics, StagePositionService, verticalLine, moveStepIndicator) {
+  'moveStageIndicator',
+  function(ExperimentLoader, stageDude, stageGraphics, StagePositionService, verticalLine, moveStageIndicator) {
 
     return {
       
       getMoveStageRect: function(me) {
 
-        this.indicator = new moveStepIndicator(me);
+        this.indicator = new moveStageIndicator(me);
         this.indicator.verticalLine = new verticalLine();
         this.indicator.canvasContaining = $('.canvas-containing');
         // Rough Idea,

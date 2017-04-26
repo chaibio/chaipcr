@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-angular.module("canvasApp").factory('moveStepIndicator', [
+angular.module("canvasApp").factory('moveStageIndicator', [
     function() {
         return function(me) {
             
