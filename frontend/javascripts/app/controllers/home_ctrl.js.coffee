@@ -27,8 +27,7 @@ window.ChaiBioTech.ngApp
   '$state'
   'User'
   'Status'
-  'HomePageDelete',
-  ($scope, Experiment, $window, $uibModal, $timeout, $state, User, Status, HomePageDelete) ->
+  ($scope, Experiment, $window, $uibModal, $timeout, $state, User, Status) ->
 
     angular.element('body').addClass 'modal-form'
     $scope.$on '$destroy', ->
