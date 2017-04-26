@@ -23,16 +23,13 @@ window.ChaiBioTech.ngApp.service('StagePositionService', [
     return {
         getPositionObject: function(stages) {
             this.allPositions = [];
-
             stages.forEach(function(stage, index) {
-                var left = stage.left;
-                var right = left + stage.myWidth;
-                var middle = (left + right) / 2;
-                //console.log(this.getPositionObject);
-                this.allPositions[index] = [left, middle, right];
+                this.allPositions[index] = [
+                        stage.left, 
+                        (stage.left + (stage.myWidth) / 2),
+                        stage.left + stage.myWidth
+                    ];
             }, this);
-
-            //console.log(this.allPositions);
             return this.allPositions;
         },
     };
