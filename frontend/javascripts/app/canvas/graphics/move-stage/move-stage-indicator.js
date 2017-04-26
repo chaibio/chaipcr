@@ -18,51 +18,39 @@
  */
 
 angular.module("canvasApp").factory('moveStageIndicator', [
-    function() {
+    'moveStageName',
+    'moveStageType',
+    'moveStageRectangle',
+    'moveStageCoverRect',
+    'moveStageIndicatorRectangleGroup',
+    'moveStageIndicatorGroup',
+    function(moveStageName, moveStageType, moveStageRectangle, moveStageCoverRect, moveStageIndicatorRectangleGroup, moveStageIndicatorGroup) {
         return function(me) {
             
-            var stageName = new fabric.Text(
-                "STAGE 2", {
-                    fill: 'black',  fontSize: 12, selectable: false, originX: 'left', originY: 'top',
-                    top: 15, left: 35, fontFamily: "dinot-bold"
-                }
-                );
+            var stageName = new moveStageName();
 
-            var stageType = new fabric.Text(
-            "HOLDING", {
-                fill: 'black',  fontSize: 12, selectable: false, originX: 'left', originY: 'top',
-                top: 30, left: 35, fontFamily: "dinot-regular"
-            }
-            );
+            var stageType = new moveStageType();
         
-            var rect = new fabric.Rect({
-                fill: 'white', width: 135, left: 0, height: 58, selectable: false, name: "step", me: this, rx: 1,
-            });
+            var rect = new moveStageRectangle();
 
-            var coverRect = new fabric.Rect({
-                fill: null, width: 135, left: 0, top: 0, height: 372, selectable: false, me: this, rx: 1,
-            });
+            var coverRect = new moveStageCoverRect();
 
             me.imageobjects["drag-stage-image.png"].originX = "left";
             me.imageobjects["drag-stage-image.png"].originY = "top";
             me.imageobjects["drag-stage-image.png"].top = 15;
             me.imageobjects["drag-stage-image.png"].left = 14;
 
-            var indicatorRectangle = new fabric.Group([
-                rect, stageName, stageType,
-                me.imageobjects["drag-stage-image.png"],
-                ],
-                {
-                    originX: "left", originY: "top", left: 0, top: 0, height: 72, selectable: true, lockMovementY: true, hasControls: false,
-                    visible: true, hasBorders: false, name: "dragStageRect"
-                }
+            var indicatorRectangleGroup = new moveStageIndicatorRectangleGroup(
+                [
+                    rect, stageName, stageType,me.imageobjects["drag-stage-image.png"]
+                ]
             );
 
-            var indicator = new fabric.Group([coverRect, indicatorRectangle], {
-            originX: "left", originY: "top", left: 38, top: 0, height: 372, width: 135, selectable: true,
-            lockMovementY: true, hasControls: false, visible: false, hasBorders: false, name: "dragStageGroup"
-            });
-            indicator.stageName = stageName;
+            var indicator = new moveStageIndicatorGroup(
+                [coverRect, indicatorRectangleGroup])
+            ;
+
+            indicator.stageName = stageName; // For easy reference;
             indicator.stageType = stageType;
             return indicator;
         };
