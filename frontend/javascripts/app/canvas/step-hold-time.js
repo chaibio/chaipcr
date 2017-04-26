@@ -94,7 +94,9 @@ angular.module("canvasApp").factory('stepHoldTime', [
 
 
         if(! isNaN(newHoldTime) && (newHoldTime !== previousHoldTime)) { //Should unify this with step-hold-time-directives
-          if(newHoldTime === 0) {
+          if(newHoldTime < 0) {
+            alerts.showMessage(alerts.noNegativeHold, $scope);
+          } else if(newHoldTime === 0) {
             if(this.ifLastStep(parent.parent) && ! $scope.step.collect_data) {
               $scope.step.hold_time = newHoldTime;
               ExperimentLoader.changeHoldDuration($scope).then(function(data) {
