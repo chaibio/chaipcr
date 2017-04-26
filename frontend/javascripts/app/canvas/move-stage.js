@@ -49,7 +49,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           C.canvas.bringToFront(this);
           this.setVisible(true);
           this.rightOffset = 85;
-          this.leftOffset = -60;
+          this.leftOffset = -55;
           this.currentLeft = movement.left;
           this.canvasContaining = $('.canvas-containing');
           this.currentMoveRight = null;
@@ -96,6 +96,7 @@ angular.module("canvasApp").factory('moveStageRect', [
                 if(index !== this.currentMoveRight) {
                   C.allStageViews[index].moveToSide("left", this.draggedStage);
                   this.currentMoveRight = movedStageIndex = index;
+                  StagePositionService.getPositionObject(C.allStageViews);
                 }
                 return true;
               }
@@ -111,6 +112,7 @@ angular.module("canvasApp").factory('moveStageRect', [
                 if(this.currentMoveLeft !== index) {
                   C.allStageViews[index].moveToSide("right", this.draggedStage);
                   this.currentMoveLeft = movedStageIndex = index;
+                  StagePositionService.getPositionObject(C.allStageViews);
                 }
                 return true;
               }
