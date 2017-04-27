@@ -17,29 +17,14 @@
  * limitations under the License.
  */
 
-angular.module("canvasApp").factory('verticalLine', [
-    function() {
+angular.module("canvasApp").factory('verticalLineSmallCircle', [
+    'Circle',
+    function(Circle) {
         return function() {
-            var smallCircle = new fabric.Circle({
+            return Circle.create({
                 radius: 6, fill: 'white', stroke: "black", strokeWidth: 2, selectable: false,
                 left: 69, top: 390, originX: 'center', originY: 'center',
             });
-
-            var smallCircleTop = new fabric.Circle({
-                fill: '#FFB300', radius: 6, strokeWidth: 3, selectable: false, stroke: "black",
-                left: 69, top: 64, originX: 'center', originY: 'center'
-            });
-
-            var verticalLine = new fabric.Line([0, 0, 0, 336],{
-                left: 68, top: 58, stroke: 'black', strokeWidth: 2, originX: 'left', originY: 'top'
-            });
-
-            var vertical = new fabric.Group([verticalLine, smallCircleTop, smallCircle], {
-                originX: "left", originY: "top", left: 62, top: 56, selectable: true,
-                lockMovementY: true, hasControls: false, hasBorders: false, name: "vertica", visible: false
-            });
-            
-            return vertical;
         };
     }
 ]);
