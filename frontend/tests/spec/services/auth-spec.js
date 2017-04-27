@@ -1,7 +1,7 @@
 (function() {
   'use strict'
 
-  fdescribe('Testing Auth Service', function() {
+  describe('Testing Auth Service', function() {
 
     beforeEach(function() {
 
