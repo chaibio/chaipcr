@@ -15,6 +15,7 @@ JS_VENDOR_FILES = _file_path_prepend([
   'javascripts/libs/angular-mock.js',
   'javascripts/libs/angular-animate.js',
   'javascripts/libs/angular-resource.js',
+  'javascripts/libs/angular-cookies.min.js',
   'javascripts/libs/perfect-scrollbar.jquery.min.js',
   'javascripts/libs/angular-perfect-scrollbar.js',
   'javascripts/libs/slider.js',

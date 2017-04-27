@@ -26,6 +26,7 @@ var vendorFiles = [
   'libs/angular.js',
   'libs/angular-animate.js',
   'libs/angular-resource.js',
+  'libs/angular-cookies.min.js',
   'libs/perfect-scrollbar.jquery.min.js',
   'libs/angular-perfect-scrollbar.js',
   'libs/slider.js',

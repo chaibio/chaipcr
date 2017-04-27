@@ -26,6 +26,7 @@ window.App = window.ChaiBioTech.ngApp = angular.module 'ChaiBioTech', [
   'ui.router'
   'uiSwitch'
   'ngResource'
+  'ngCookies'
   'angularMoment'
   'focusOn'
   'http-auth-interceptor'
