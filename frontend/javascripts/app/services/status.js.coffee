@@ -91,11 +91,15 @@ window.ChaiBioTech.ngApp
       .success (resp) =>
         console .log isUp
         isUp = if isUpStart then true else false
+        if isUp
+          $interval.cancel fetchForUpdateInterval
 
       .error (resp, status) ->
         console.log status
         isUpStart = true
         isUp = if status == 401 then true else false
+        if isUp
+          $interval.cancel fetchForUpdateInterval
 
       true
 
