@@ -104,9 +104,10 @@ angular.module("canvasApp").factory('moveStageRect', [
           StagePositionService.allPositions.some(function(point, index) {
             if(C.allStageViews[index].childSteps.length === 1) {
               if((movement.left + this.rightOffset) > point[0] && (movement.left + this.rightOffset) < point[1]) {
-                console.log("INNN");
+                
                 if(index !== this.currentMoveLeft) {
-                  C.allStageViews[index].moveToSide("left", this.draggedStage);
+                  console.log("INNN");
+                  C.allStageViews[index].moveToSide("right", this.draggedStage);
                   this.currentMoveLeft = movedStageIndex = index;
                   StagePositionService.getPositionObject(C.allStageViews);
                 }
@@ -180,9 +181,9 @@ angular.module("canvasApp").factory('moveStageRect', [
               this.manageVerticalLineLeft(C, stageMovedLeftIndex);
            }
            if(stageMovedLeftIndexSpecial !== null) {
-            this.currentMoveLeft = null; // Resetting
-            this.currentDrop = C.allStageViews[stageMovedLeftIndexSpecial];
-            this.manageVerticalLineRight(C, stageMovedLeftIndexSpecial);
+            this.currentMoveRight = null; // Resetting
+            this.currentDrop = C.allStageViews[stageMovedLeftIndexSpecial - 1];
+            this.manageVerticalLineRight(C, stageMovedLeftIndexSpecial - 1);
            }
           }
           
