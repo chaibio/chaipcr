@@ -163,8 +163,8 @@ angular.module("canvasApp").factory('moveStageRect', [
           
           this.setLeft(movement.left - 50).setCoords();
           this.movement = movement;
-          var direction = this.getDirection(movement);
-          this.currentLeft = movement.left;
+          var direction = this.getDirection();
+          this.currentLeft = this.movement.left;
           this.checkMovingOffScreen(C, movement, this.direction);
           
           if(direction === 'right') {
@@ -199,18 +199,18 @@ angular.module("canvasApp").factory('moveStageRect', [
           
         };
        
-        this.indicator.checkMovingOffScreen = function(C, movement, direction) {
+        this.indicator.checkMovingOffScreen = function(C, direction) {
 
           if(direction === "right") {
 
-            if(movement.left - this.canvasContaining.scrollLeft() > 889) {
-              this.canvasContaining.scrollLeft(movement.left - 889);
+            if(this.movement.left - this.canvasContaining.scrollLeft() > 889) {
+              this.canvasContaining.scrollLeft(this.movement.left - 889);
             }
           } else if (direction === "left") {
 
             var anchor = this.canvasContaining.scrollLeft();
             if(anchor > movement.left) {
-              this.canvasContaining.scrollLeft((anchor - (anchor - movement.left)));
+              this.canvasContaining.scrollLeft((anchor - (anchor - this.movement.left)));
             }
           }
         };
