@@ -46,7 +46,10 @@ angular.module("canvasApp").factory('moveStageRect', [
         this.indicator.init = function(stage, C, movement) {
           
           this.setLeft(stage.left - 50).setVisible(true).setCoords();
-          C.canvas.bringToFront(this);
+          this.kanvas = C;
+          this.movement = movement;
+          this.movedStageIndex = null;
+          this.kanvas.canvas.bringToFront(this);
           this.rightOffset = 85;
           this.leftOffset = -55;
           this.currentLeft = movement.left;
@@ -56,14 +59,14 @@ angular.module("canvasApp").factory('moveStageRect', [
           this.direction = null;
           this.draggedStage = stage;
 
-          C.canvas.bringToFront(this.verticalLine);
+          this.kanvas.canvas.bringToFront(this.verticalLine);
           this.verticalLine.setLeft(stage.left + 5).setVisible(true).setCoords();
-          C.canvas.bringToFront(this.verticalLine);
+          this.kanvas.canvas.bringToFront(this.verticalLine);
 
           if(stage.previousStage) {
             this.currentDrop = stage.previousStage;
           }
-          StagePositionService.getPositionObject(C.allStageViews);
+          StagePositionService.getPositionObject();
         };
 
         this.indicator.changeText = function(stage) {
@@ -82,77 +85,84 @@ angular.module("canvasApp").factory('moveStageRect', [
           return this.direction;
         };
         
-        this.indicator.ifOverRightSideForOneStepStage = function(movement, C) {
-          var movedStageIndex = null;
-          StagePositionService.allPositions.some(function(point, index) {
-            if(C.allStageViews[index].childSteps.length === 1) {
-              if((movement.left + this.leftOffset) > point[1] && (movement.left + this.leftOffset) < point[2]) {
-                if(index !== this.currentMoveRight) {
-                  C.allStageViews[index].moveToSide("left", this.draggedStage);
-                  this.currentMoveRight = movedStageIndex = index;
-                  StagePositionService.getPositionObject();
-                }
+        this.indicator.ifOverRightSideForOneStepStage = function() {
+          this.movedStageIndex = null;
+          StagePositionService.allPositions.some(this.ifOverRightSideForOneStepStageCallback, this);
+          return this.movedStageIndex;
+        };
+
+        this.indicator.ifOverRightSideForOneStepStageCallback = function(point, index) {
+          if(this.kanvas.allStageViews[index].childSteps.length === 1) {
+            if((this.movement.left + this.leftOffset) > point[1] && (this.movement.left + this.leftOffset) < point[2]) {
+              if(index !== this.currentMoveRight) {
+                this.kanvas.allStageViews[index].moveToSide("left", this.draggedStage);
+                this.currentMoveRight = this.movedStageIndex = index;
+                StagePositionService.getPositionObject();
               }
-              return true;
             }
-          }, this);
-          return movedStageIndex;
+            return true;
+          }
         };
 
         this.indicator.ifOverLeftSideForOneStepStage = function(movement, C) {
-          var movedStageIndex = null;
-          StagePositionService.allPositions.some(function(point, index) {
-            if(C.allStageViews[index].childSteps.length === 1) {
-              if((movement.left + this.rightOffset) > point[0] && (movement.left + this.rightOffset) < point[1]) {
-                
-                if(index !== this.currentMoveLeft) {
-                  console.log("INNN");
-                  C.allStageViews[index].moveToSide("right", this.draggedStage);
-                  this.currentMoveLeft = movedStageIndex = index;
-                  StagePositionService.getPositionObject();
-                }
+          this.movedStageIndex = null;
+          StagePositionService.allPositions.some(this.ifOverLeftSideForOneStepStageCallback, this);
+          return this.movedStageIndex;
+        };
+
+        this.indicator.ifOverLeftSideForOneStepStageCallback = function(point, index) {
+          if(this.kanvas.allStageViews[index].childSteps.length === 1) {
+            if((this.movement.left + this.rightOffset) > point[0] && (this.movement.left + this.rightOffset) < point[1]) {
+              
+              if(index !== this.currentMoveLeft) {
+                this.kanvas.allStageViews[index].moveToSide("right", this.draggedStage);
+                this.currentMoveLeft = this.movedStageIndex = index;
+                StagePositionService.getPositionObject();
               }
-              return true;
             }
-          }, this);
-          return movedStageIndex;
+            return true;
+          }
         };
 
-        this.indicator.ifOverRightSide = function(movement, C) {
-          var movedStageIndex = null;
-           StagePositionService.allPositions.some(function(points, index) {
-              if((movement.left + this.rightOffset) > points[1] && (movement.left + this.rightOffset) < points[2]) {
-                
-                if(index !== this.currentMoveRight) {
-                  C.allStageViews[index].moveToSide("left", this.draggedStage);
-                  this.currentMoveRight = movedStageIndex = index;
-                  StagePositionService.getPositionObject();
-                }
-                return true;
-              }
-            }, this);
-            return movedStageIndex;
+        this.indicator.ifOverRightSide = function() {
+          this.movedStageIndex = null;
+          StagePositionService.allPositions.some(this.ifOverRightSideCallback, this);
+          return this.movedStageIndex;
         };
 
-        this.indicator.ifOverLeftSide = function(movement, C) {
-          var movedStageIndex = null;
-          StagePositionService.allPositions.some(function(points, index) {
-              if((movement.left + this.leftOffset) > points[0] && (movement.left + this.leftOffset) < points[1]) {
-                
-                if(this.currentMoveLeft !== index) {
-                  C.allStageViews[index].moveToSide("right", this.draggedStage);
-                  this.currentMoveLeft = movedStageIndex = index;
-                  StagePositionService.getPositionObject();
-                }
-                return true;
-              }
-            }, this);
-            return movedStageIndex;
+        this.indicator.ifOverRightSideCallback = function(points, index) {
+          if((this.movement.left + this.rightOffset) > points[1] && (this.movement.left + this.rightOffset) < points[2]) {
+            
+            if(index !== this.currentMoveRight) {
+              this.kanvas.allStageViews[index].moveToSide("left", this.draggedStage);
+              this.currentMoveRight = this.movedStageIndex = index;
+              StagePositionService.getPositionObject();
+            }
+            return true;
+          }
         };
 
+        this.indicator.ifOverLeftSide = function() {
+          this.movedStageIndex = null;
+          StagePositionService.allPositions.some(this.ifOverLeftSideCallback, this);
+          return this.movedStageIndex;
+        };
+
+        this.indicator.ifOverLeftSideCallback = function(points, index) {
+          if((this.movement.left + this.leftOffset) > points[0] && (this.movement.left + this.leftOffset) < points[1]) {
+            
+            if(this.currentMoveLeft !== index) {
+              this.kanvas.allStageViews[index].moveToSide("right", this.draggedStage);
+              this.currentMoveLeft = this.movedStageIndex = index;
+              StagePositionService.getPositionObject();
+            }
+            return true;
+          }
+        };
         this.indicator.onTheMove = function(C, movement) {
           
           this.setLeft(movement.left - 50).setCoords();
+          this.movement = movement;
           var direction = this.getDirection(movement);
           this.currentLeft = movement.left;
           this.checkMovingOffScreen(C, movement, this.direction);
