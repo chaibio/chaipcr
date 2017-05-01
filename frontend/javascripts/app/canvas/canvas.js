@@ -124,7 +124,7 @@ angular.module("canvasApp").factory('canvas', [
         stageView.render();
         return stageView;
       }, this);
-
+      StagePositionService.init(this.allStageViews);
       console.log("Stages added ... !");
       return this;
 

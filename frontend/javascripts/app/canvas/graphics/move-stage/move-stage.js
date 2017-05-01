@@ -90,7 +90,7 @@ angular.module("canvasApp").factory('moveStageRect', [
                 if(index !== this.currentMoveRight) {
                   C.allStageViews[index].moveToSide("left", this.draggedStage);
                   this.currentMoveRight = movedStageIndex = index;
-                  StagePositionService.getPositionObject(C.allStageViews);
+                  StagePositionService.getPositionObject();
                 }
               }
               return true;
@@ -109,7 +109,7 @@ angular.module("canvasApp").factory('moveStageRect', [
                   console.log("INNN");
                   C.allStageViews[index].moveToSide("right", this.draggedStage);
                   this.currentMoveLeft = movedStageIndex = index;
-                  StagePositionService.getPositionObject(C.allStageViews);
+                  StagePositionService.getPositionObject();
                 }
               }
               return true;
@@ -126,7 +126,7 @@ angular.module("canvasApp").factory('moveStageRect', [
                 if(index !== this.currentMoveRight) {
                   C.allStageViews[index].moveToSide("left", this.draggedStage);
                   this.currentMoveRight = movedStageIndex = index;
-                  StagePositionService.getPositionObject(C.allStageViews);
+                  StagePositionService.getPositionObject();
                 }
                 return true;
               }
@@ -142,7 +142,7 @@ angular.module("canvasApp").factory('moveStageRect', [
                 if(this.currentMoveLeft !== index) {
                   C.allStageViews[index].moveToSide("right", this.draggedStage);
                   this.currentMoveLeft = movedStageIndex = index;
-                  StagePositionService.getPositionObject(C.allStageViews);
+                  StagePositionService.getPositionObject();
                 }
                 return true;
               }

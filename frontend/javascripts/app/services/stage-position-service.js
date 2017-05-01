@@ -19,10 +19,14 @@
 
 window.ChaiBioTech.ngApp.service('StagePositionService', [
   function() {
+      var allStages = null;
     return {
+        init: function(stages) {
+            allStages = stages; // Setting the reference from canvas.js, just after all stages are created.
+        },
         getPositionObject: function(stages) {
             this.allPositions = [];
-            stages.forEach(function(stage, index) {
+            allStages.forEach(function(stage, index) {
                 this.allPositions[index] = [
                         stage.left, 
                         (stage.left + (stage.myWidth) / 2),
