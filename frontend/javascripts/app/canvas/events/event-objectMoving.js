@@ -63,7 +63,7 @@ angular.module("canvasApp").factory('objectMoving', [
           } else if(evt.target.left > C.moveLimit) {
             evt.target.setLeft(C.moveLimit);
           } else {
-            C.stageIndicator.onTheMove(C, evt.target);
+            C.stageIndicator.onTheMove(evt.target);
           }
           break;
         }

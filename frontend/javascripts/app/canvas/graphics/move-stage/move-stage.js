@@ -159,47 +159,49 @@ angular.module("canvasApp").factory('moveStageRect', [
             return true;
           }
         };
-        this.indicator.onTheMove = function(C, movement) {
+
+        this.indicator.onTheMove = function(movement) {
           
           this.setLeft(movement.left - 50).setCoords();
           this.movement = movement;
           var direction = this.getDirection();
           this.currentLeft = this.movement.left;
-          this.checkMovingOffScreen(C, movement, this.direction);
+          this.checkMovingOffScreen(direction);
           
           if(direction === 'right') {
-           var stageMovedRightIndex = this.ifOverRightSide(movement, C);
-           var stageMovedRightIndexSpecial = this.ifOverRightSideForOneStepStage(movement, C);
-
+           var stageMovedRightIndex = this.ifOverRightSide();// || this.ifOverRightSideForOneStepStage();
            if(stageMovedRightIndex !== null) {
             this.currentMoveLeft = null; // Resetting
-            this.currentDrop = C.allStageViews[stageMovedRightIndex];
-            this.manageVerticalLineRight(C, stageMovedRightIndex);
+            this.currentDrop = this.kanvas.allStageViews[stageMovedRightIndex];
+            this.manageVerticalLineRight(stageMovedRightIndex);
            }
+
+           var stageMovedRightIndexSpecial = this.ifOverRightSideForOneStepStage();
            if(stageMovedRightIndexSpecial !== null) {
             this.currentMoveLeft = null; // Resetting
-            this.currentDrop = C.allStageViews[stageMovedRightIndexSpecial];
-            this.manageVerticalLineRight(C, stageMovedRightIndexSpecial);
+            this.currentDrop = this.kanvas.allStageViews[stageMovedRightIndexSpecial];
+            this.manageVerticalLineRight(stageMovedRightIndexSpecial);
            }
            
           } else if(direction === 'left') {
-            var stageMovedLeftIndex  = this.ifOverLeftSide(movement, C);
-            var stageMovedLeftIndexSpecial = this.ifOverLeftSideForOneStepStage(movement, C);
+            var stageMovedLeftIndex  = this.ifOverLeftSide();
             if(stageMovedLeftIndex !== null) {
               this.currentMoveRight = null; // Resetting
-              this.currentDrop = C.allStageViews[stageMovedLeftIndex - 1];
-              this.manageVerticalLineLeft(C, stageMovedLeftIndex);
+              this.currentDrop = this.kanvas.allStageViews[stageMovedLeftIndex - 1];
+              this.manageVerticalLineLeft(stageMovedLeftIndex);
            }
+
+           var stageMovedLeftIndexSpecial = this.ifOverLeftSideForOneStepStage();
            if(stageMovedLeftIndexSpecial !== null) {
             this.currentMoveRight = null; // Resetting
-            this.currentDrop = C.allStageViews[stageMovedLeftIndexSpecial - 1];
-            this.manageVerticalLineRight(C, stageMovedLeftIndexSpecial - 1);
+            this.currentDrop = this.kanvas.allStageViews[stageMovedLeftIndexSpecial - 1];
+            this.manageVerticalLineRight(stageMovedLeftIndexSpecial - 1);
            }
           }
           
         };
        
-        this.indicator.checkMovingOffScreen = function(C, direction) {
+        this.indicator.checkMovingOffScreen = function(direction) {
 
           if(direction === "right") {
 
@@ -209,21 +211,21 @@ angular.module("canvasApp").factory('moveStageRect', [
           } else if (direction === "left") {
 
             var anchor = this.canvasContaining.scrollLeft();
-            if(anchor > movement.left) {
+            if(anchor > this.movement.left) {
               this.canvasContaining.scrollLeft((anchor - (anchor - this.movement.left)));
             }
           }
         };
 
-        this.indicator.manageVerticalLineRight = function(C, index) {
+        this.indicator.manageVerticalLineRight = function(index) {
 
-          var place = (C.allStageViews[index].left + C.allStageViews[index].myWidth + 13);
+          var place = (this.kanvas.allStageViews[index].left + this.kanvas.allStageViews[index].myWidth + 13);
           this.verticalLine.setLeft(place).setCoords();
         };
 
-        this.indicator.manageVerticalLineLeft = function(C, index) {
+        this.indicator.manageVerticalLineLeft = function(index) {
 
-          var place = (C.allStageViews[index].left - 25);
+          var place = (this.kanvas.allStageViews[index].left - 25);
           this.verticalLine.setLeft(place).setCoords();
         };
 
