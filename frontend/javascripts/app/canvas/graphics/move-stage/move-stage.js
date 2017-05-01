@@ -75,11 +75,11 @@ angular.module("canvasApp").factory('moveStageRect', [
           this.stageType.setText(stage.model.stage_type.toUpperCase());
         };
 
-        this.indicator.getDirection = function(movement) {
+        this.indicator.getDirection = function() {
 
-          if(movement.left > this.currentLeft && this.direction !== "right") {
+          if(this.movement.left > this.currentLeft && this.direction !== "right") {
             this.direction = "right";
-          } else if(movement.left < this.currentLeft && this.direction !== "left") {
+          } else if(this.movement.left < this.currentLeft && this.direction !== "left") {
             this.direction = "left";    
           }
           return this.direction;
