@@ -19,11 +19,10 @@ limitations under the License.
 window.App.directive 'statusBar', [
   'Experiment'
   '$state'
-  'Status'
   'TestInProgressHelper'
   '$timeout'
   '$window'
-  (Experiment, $state, Status, TestInProgressHelper, $timeout, $window) ->
+  (Experiment, $state, TestInProgressHelper, $timeout, $window) ->
 
     restrict: 'EA'
     replace: true
