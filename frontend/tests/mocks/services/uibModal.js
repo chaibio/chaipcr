@@ -1,0 +1,3 @@
+var uibModalMock = {
+  open: function () {}
+}

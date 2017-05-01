@@ -67,7 +67,8 @@ JS_APP_FILES = _file_path_prepend([
 ]);
 
 TEST_FILES = _file_path_prepend([
-  'tests/spec/**/*'
+  'tests/mocks/**/*',
+  'tests/spec/**/*',
 ]);
 
 
