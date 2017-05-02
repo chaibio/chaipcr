@@ -384,6 +384,7 @@
           $scope.analyzing = true;
           $scope.experimentComplete = true;
           Experiment.getFluorescenceData($scope.experimentId).then(function(resp) {
+            console.log(resp)
               if (resp.status == 200 && !resp.data.partial) {
 								$scope.testFl = true;
                 $scope.analyzing = false;

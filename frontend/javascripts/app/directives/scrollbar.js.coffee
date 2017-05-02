@@ -23,14 +23,14 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
     restrict: 'E'
     replace: true
     template: '<div class="scrollbar-directive"></div>'
-    scope:
-      state: '=' # [{0..1}, width]
+    # scope:
+    #   state: '=' # [{0..1}, width]
     require: 'ngModel'
     link: ($scope, elem, attr, ngModel) ->
 
       width = elem.width()
       height = 5
-
+      min_handle_width = 15
 
       held = false
       oldMargin = 0;
@@ -82,6 +82,8 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
       $scope.$watchCollection ->
         ngModel.$viewValue
       , (val, oldVal) ->
+        console.log('VAlue changed!!!')
+        console.log(val)
         if (val?.value isnt oldVal?.value or val?.width isnt oldVal?.width) and !held
           value = val.value*1 || ngModel.$viewValue.value || 0
           value = if (value > 1) then 1 else value
@@ -90,7 +92,7 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
           elem_width = getElemWidth()
           width_percent = val.width || ngModel.$viewValue.width || 1
           new_width = elem_width * width_percent
-          new_width = if new_width >= 15 then new_width else 15
+          new_width = if new_width >= min_handle_width then new_width else min_handle_width
           scrollbarHandle.attr('width', new_width)
           new_margin = (elem_width - new_width) * value
           updateMargin(new_margin)
