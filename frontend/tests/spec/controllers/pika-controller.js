@@ -1,7 +1,7 @@
 (function() {
   'use strict'
 
-  fdescribe("Testing PikaController", function() {
+  describe("Testing PikaController", function() {
 
     beforeEach(module('ChaiBioTech', function($provide) {
       // mockCommonServices($provide)
