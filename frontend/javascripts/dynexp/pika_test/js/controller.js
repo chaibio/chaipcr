@@ -435,9 +435,7 @@
 
 
 
-        $scope.$watch(function() {
-          return Status.getData();
-        }, function(data, oldData) {
+        $scope.$on('status:data:updated', function(e, data, oldData) {
           if (!data) return;
           if (!data.experiment_controller) return;
           if (!oldData) return;
@@ -450,7 +448,7 @@
           $scope.stateName = $state.current.name;
 
           if ($scope.state === 'idle' && $scope.old_state !== 'idle') {
-            // exp complete
+            console.log($scope.state);
             $scope.checkExperimentStatus();
           }
 
@@ -468,10 +466,9 @@
               $scope.analyzing = false;
             }
           }
-
           // if ($state.current.name === 'analyze') Status.stopSync();
 
-        }, true);
+        });
 
         $scope.checkExperimentStatus = function() {
           Experiment.get($scope.experimentId).then(function(resp) {
@@ -486,14 +483,6 @@
             }
           });
         };
-
-				$scope.testing = function(){
-					if ($scope.state == 'idle' && $scope.old_state != 'idle') {
-						// exp complete
-						$scope.checkExperimentStatus();
-					}
-				}
-
 
 
         $scope.checkMachineStatus = function() {

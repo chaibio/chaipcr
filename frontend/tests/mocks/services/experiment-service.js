@@ -8107,7 +8107,7 @@ ExperimentServiceMock.getFluorescenceData = function(id) {
               [
                 1,
                 1,
-                "18.42"
+                "39"
               ],
               [
                 1,
