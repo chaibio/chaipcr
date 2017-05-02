@@ -26,8 +26,7 @@ JS_VENDOR_FILES = _file_path_prepend([
   'javascripts/libs/angular-moment.min.js',
   'javascripts/libs/lodash.min.js',
   'javascripts/libs/fabric.js',
-  // 'javascripts/libs/d3.js',
-  // 'javascripts/libs/n3-line-chart-v2.js',
+  'javascripts/libs/d3.v4.min.js',
   'javascripts/libs/ng-focus-on.js.coffee',
   'javascripts/libs/http-auth-interceptor.js',
   'javascripts/libs/http-response-interceptor.js',
@@ -68,6 +67,7 @@ JS_APP_FILES = _file_path_prepend([
 
 TEST_FILES = _file_path_prepend([
   'tests/mocks/**/*',
+  'tests/helpers/**/*',
   'tests/spec/**/*',
 ]);
 
