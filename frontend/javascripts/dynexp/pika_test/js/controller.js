@@ -57,6 +57,8 @@
         //$scope.notes_B = [];
         $scope.indexA = "fdsfsfdsfdsf";
         $scope.editNotes = false;
+				$scope.state = '';
+				$scope.old_state = '';
         //  $scope.cq = [["channel","well_num","cq"],[1,1,"39"],[1,2,2],[1,3,40],[1,4,9],[1,5,20],[1,6,"26"],[1,7,"33"],[1,8,"5"],[1,9,"34.5"],[1,10,"19"],[1,11,"12"],[1,12,"6"],[1,13,"24"],[1,14,"39"],[1,15,"32"],[1,16,"18"],[2,1,"11"],[2,2,"25.15"],[2,3,36],[2,4,"8"],[2,5,"34"],[2,6,"10"],[2,7,"15"],[2,8,"25"],[2,9,"35"],[2,10,"28"],[2,11,"2"],[2,12,"7"],[2,13,"0"],[2,14,"35"],[2,15,"28"],[2,16,"17"]];
 
         function getId() {
@@ -383,6 +385,7 @@
           $scope.experimentComplete = true;
           Experiment.getFluorescenceData($scope.experimentId).then(function(resp) {
               if (resp.status == 200 && !resp.data.partial) {
+								$scope.testFl = true;
                 $scope.analyzing = false;
                 $scope.cq = resp.data.steps[0].cq;
                 //$scope.cq = [["channel","well_num","cq"],[1,1,"20.76"],[1,2,42.13],[1,3,40.89],[1,4,9.47],[1,5,20],[1,6,"26.33"],[1,7,"33.89"],[1,8,"5"],[1,9,"34.5"],[1,10,"19"],[1,11,"12"],[1,12,"6"],[1,13,"24"],[1,14,"39"],[1,15,"32"],[1,16,"18"],[2,1,"11"],[2,2,"25.15"],[2,3,36],[2,4,"8"],[2,5,"34"],[2,6,"10"],[2,7,"15"],[2,8,"25"],[2,9,"35"],[2,10,"28"],[2,11,"2"],[2,12,"7"],[2,13,"0"],[2,14,"35"],[2,15,"28"],[2,16,"17"]];
@@ -429,6 +432,8 @@
         }
 
 
+
+
         $scope.$watch(function() {
           return Status.getData();
         }, function(data, oldData) {
@@ -445,7 +450,7 @@
 
           if ($scope.state === 'idle' && $scope.old_state !== 'idle') {
             // exp complete
-            checkExperimentStatus();
+            $scope.checkExperimentStatus();
           }
 
           if ($state.current.name === 'pika_test.exp-running') {
@@ -467,8 +472,8 @@
 
         }, true);
 
-        function checkExperimentStatus() {
-          Experiment.get($scope.experiment.id).then(function(resp) {
+        $scope.checkExperimentStatus = function() {
+          Experiment.get($scope.experimentId).then(function(resp) {
             $scope.experiment = resp.data.experiment;
             if ($scope.experiment.completed_at) {
               if ($scope.experiment.completion_status === 'success') {
@@ -476,10 +481,18 @@
                 $scope.goToResults();
               }
             } else {
-              $timeout(checkExperimentStatus, 1000);
+              $timeout($scope.checkExperimentStatus, 1000);
             }
           });
-        }
+        };
+
+				$scope.testing = function(){
+					if ($scope.state == 'idle' && $scope.old_state != 'idle') {
+						// exp complete
+						$scope.checkExperimentStatus();
+					}
+				}
+
 
 
         $scope.checkMachineStatus = function() {
