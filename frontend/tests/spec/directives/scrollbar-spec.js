@@ -15,8 +15,8 @@
         this.$rootScope = $injector.get('$rootScope')
         this.scope = this.$rootScope.$new()
         this.scope.scrollbar = {
-          value: 1,
-          width: 100
+          value: null,
+          width: null
         }
       })
 
@@ -59,6 +59,10 @@
       this.scope.$digest()
       var handle = this.directive.find('rect').eq(1)
       expect(handle.attr('width')).toBe('15')
+    })
+
+    it('should move', function () {
+      
     })
 
   })

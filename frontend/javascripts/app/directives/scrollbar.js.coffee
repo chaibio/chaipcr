@@ -88,7 +88,7 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
           value = if (value < 0) then 0 else value
 
           elem_width = getElemWidth()
-          width_percent = val.width || ngModel.$viewValue.width || 1
+          width_percent = if angular.isNumber(val.width) then val.width else (if angular.isNumber(ngModel.$viewValue.width) then ngModel.$viewValue.width else 1)
           new_width = elem_width * width_percent
           new_width = if new_width >= 15 then new_width else 15
           scrollbarHandle.attr('width', new_width)
