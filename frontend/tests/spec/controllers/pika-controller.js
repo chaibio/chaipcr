@@ -4,7 +4,6 @@
   describe("Testing PikaController", function() {
 
     beforeEach(module('ChaiBioTech', function($provide) {
-      // mockCommonServices($provide)
       $provide.value('dynexpExperimentService', ExperimentServiceMock)
     }));
 
