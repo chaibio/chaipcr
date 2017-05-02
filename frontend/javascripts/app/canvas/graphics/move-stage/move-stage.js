@@ -229,12 +229,12 @@ angular.module("canvasApp").factory('moveStageRect', [
           this.verticalLine.setLeft(place).setCoords();
         };
 
-        this.indicator.processMovement = function(stage, C, circleManager) {
+        this.indicator.processMovement = function(stage, circleManager) {
 
           if(this.verticalLine.getVisible() === false) {
-            this.backToOriginal(stage, C);
+            this.backToOriginal(stage, this.kanvas);
           } else {
-            this.applyMovement(stage, C, circleManager, null);
+            this.applyMovement(stage, this.kanvas, circleManager, null);
           }
 
           console.log("Landed .... !: Dragged stage->", this.draggedStage.index);
