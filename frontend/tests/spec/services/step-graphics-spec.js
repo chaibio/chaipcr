@@ -527,6 +527,13 @@ describe("Testing stepGraphics", function() {
   it("It should check stepComponents method", function() {
     var step = {
       index: 0,
+      hitPoint: {
+
+      },
+      stepRect: {
+
+      },
+      
       autoDeltaTempTime: {
         setText: function() {
 
