@@ -9,8 +9,8 @@ describe("Test protocol item directive, which shows in left menu", function() {
     httpMock = $httpBackend;
     compile = $compile;
     templateCache = $templateCache;
-    httpMock.expectGET("http://localhost:8000/status").respond("NOTHING");
-    httpMock.whenGET("http://localhost:8000/network/wlan").respond("NOTHING");
+    httpMock.expectGET("http://localhost:8000/status?access_token=this_is_fake_token").respond("NOTHING");
+    httpMock.whenGET("http://localhost:8000/network/wlan?access_token=this_is_fake_token").respond("NOTHING");
   }));
 
   it("Passing NOT_STARTED should set the message to EDIT PROTOCOL ", function () {
