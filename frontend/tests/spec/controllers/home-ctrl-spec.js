@@ -1,7 +1,7 @@
 (function() {
   'use strict'
 
-  fdescribe('Testing HomeCtrl', function() {
+  describe('Testing HomeCtrl', function() {
 
     beforeEach(function() {
 
