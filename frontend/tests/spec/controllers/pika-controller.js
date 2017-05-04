@@ -1,7 +1,7 @@
 (function() {
   'use strict'
 
-  describe("Testing PikaController", function() {
+  fdescribe("Testing PikaController", function() {
 
     beforeEach(module('ChaiBioTech', function($provide) {
       $provide.value('dynexpExperimentService', ExperimentServiceMock);
