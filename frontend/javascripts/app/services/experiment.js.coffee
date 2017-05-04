@@ -57,6 +57,9 @@ window.ChaiBioTech.ngApp
 
         return deferred.promise
 
+    self.delete = (id) ->
+      return $http.delete('/experiments/id')
+
     self.setCurrentExperiment = (exp) ->
       currentExperiment = exp
 

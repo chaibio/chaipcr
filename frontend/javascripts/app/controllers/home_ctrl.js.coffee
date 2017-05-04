@@ -94,13 +94,13 @@ window.ChaiBioTech.ngApp
       if $scope.deleteMode
         exp.del = true
 
-    @deleteExperiment = (data) =>
+    @deleteExperiment = (data) ->
       experiment = data.experiment
-      exp = new Experiment id: experiment.id
-      exp.$remove =>
+      Experiment.delete(experiment.id)
+      .then ->
         $scope.experiments = _.reject $scope.experiments, (exp) ->
           exp.experiment.id is experiment.id
-      , (resp) ->
+      .catch (resp) ->
         $window.alert resp.data.experiment?.errors?.base || 'Unable to delete experiment.'
         data.del = false
 
