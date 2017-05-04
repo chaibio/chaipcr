@@ -6,8 +6,8 @@ describe("Specs for left menu directive", function() {
     scope = $rootScope.$new();
     compile = $compile;
     httpMock = $httpBackend;
-    httpMock.whenGET("http://localhost:8000/status").respond("NOTHING");
-    httpMock.whenGET("http://localhost:8000/network/wlan").respond("NOTHING");
+    httpMock.whenGET("http://localhost:8000/status?access_token=this_is_fake_token").respond("NOTHING");
+    httpMock.whenGET("http://localhost:8000/network/wlan?access_token=this_is_fake_token").respond("NOTHING");
     $stateParams.id = 10;
 
     var data = {

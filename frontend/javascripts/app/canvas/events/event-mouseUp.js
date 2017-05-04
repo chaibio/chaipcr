@@ -56,10 +56,10 @@ angular.module("canvasApp").factory('mouseUp', [
           console.log(that.stageIndicatorPosition, pos);
           if(that.stageIndicatorPosition === pos) {
             console.log("its just a click we conclude it as we want to switch places", stage);
-            C.stageIndicator.clickManager(stage, C, circleManager);
+            C.stageIndicator.backToOriginal(stage);
           } else {
             console.log("We changed places .. !", stage);
-            C.stageIndicator.processMovement(stage, C, circleManager);
+            C.stageIndicator.processMovement(stage, circleManager);
           }
           C.stageIndicator.setVisible(false);
           that.moveStageActive = false;

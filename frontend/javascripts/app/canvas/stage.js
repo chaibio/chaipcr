@@ -55,8 +55,7 @@ angular.module("canvasApp").factory('stage', [
       };
 
       this.shrinkStage = function() {
-
-
+        
         this.shrinked = true;
         this.myWidth = this.myWidth - 64;
         this.stageHitPointLowerRight.setLeft(this.stageHitPointLowerRight.left - 64).setCoords();
@@ -195,8 +194,8 @@ angular.module("canvasApp").factory('stage', [
 
       this.deleteStageContents = function() {
 
-        this.stageHitPointLeft.setVisible(false);
-        this.stageHitPointRight.setVisible(false);
+        //this.stageHitPointLeft.setVisible(false);
+        //this.stageHitPointRight.setVisible(false);
 
         for(var component in this.visualComponents) {
           if(component === "dots") {
@@ -228,8 +227,8 @@ angular.module("canvasApp").factory('stage', [
         stage.nextStage.getLeft();
         stage.nextStage.stageGroup.set({left: stage.nextStage.left }).setCoords();
         stage.nextStage.dots.set({left: stage.nextStage.left + 3}).setCoords();
-        stage.nextStage.stageHitPointLeft.set({left: stage.nextStage.left + 10}).setCoords();
-        stage.nextStage.stageHitPointRight.set({left: (stage.nextStage.left + stage.nextStage.myWidth) -  20}).setCoords();
+        //stage.nextStage.stageHitPointLeft.set({left: stage.nextStage.left + 10}).setCoords();
+        //stage.nextStage.stageHitPointRight.set({left: (stage.nextStage.left + stage.nextStage.myWidth) -  20}).setCoords();
         stage.nextStage.stageHitPointLowerLeft.set({left: stage.nextStage.left + 10}).setCoords();
         stage.nextStage.stageHitPointLowerRight.set({left: (stage.nextStage.left + stage.nextStage.myWidth) -  20}).setCoords();
 
@@ -253,8 +252,8 @@ angular.module("canvasApp").factory('stage', [
 
         stage.stageGroup.set({left: stage.left }).setCoords();
         stage.dots.set({left: stage.left + 3}).setCoords();
-        stage.stageHitPointLeft.set({left: stage.left + 10}).setCoords();
-        stage.stageHitPointRight.set({left: (stage.left + stage.myWidth) -  20}).setCoords();
+        //stage.stageHitPointLeft.set({left: stage.left + 10}).setCoords();
+        //stage.stageHitPointRight.set({left: (stage.left + stage.myWidth) -  20}).setCoords();
         stage.stageHitPointLowerLeft.set({left: stage.left + 10}).setCoords();
         stage.stageHitPointLowerRight.set({left: (stage.left + stage.myWidth) -  20}).setCoords();
 
@@ -278,7 +277,7 @@ angular.module("canvasApp").factory('stage', [
         while(stage) {
           if(stage.stageMovedDirection !== "left") {
             console.log("Looking");
-            stage.moveToSide("left", null, null, draggedStage);
+            stage.moveToSide("left", draggedStage);
           }
           stage = stage.previousStage;
         }
@@ -288,14 +287,14 @@ angular.module("canvasApp").factory('stage', [
         var stage = this.nextStage;
         while(stage) {
           if(stage.stageMovedDirection !== "right") {
-            stage.moveToSide("right", null, null, draggedStage);
+            stage.moveToSide("right", draggedStage);
           }
           stage = stage.nextStage;
         }
       };
 
       //This method is used when move stage hits at the hitPoint at the side of the stage.
-      this.moveToSide = function(direction, spaceArrayRight, spaceArrayLeft, draggedStage) {
+      this.moveToSide = function(direction, draggedStage) {
 
         if(this.validMove(direction, draggedStage)) {
 
@@ -307,25 +306,7 @@ angular.module("canvasApp").factory('stage', [
             moveCount = 30;
             this.makeSureNextMovedRight(draggedStage);
           }
-
-          if(spaceArrayRight && spaceArrayLeft) {
-            if(direction === "right") {
-              spaceArrayLeft[0] = this.left - 82;
-              spaceArrayLeft[1] = this.left - 44;
-
-              spaceArrayRight[0] = this.left + 60;
-              spaceArrayRight[1] = this.left + 98;
-            } else if (direction === "left") {
-              spaceArrayRight[0] = (this.left + this.myWidth) + 40;
-              spaceArrayRight[1] = (this.left + this.myWidth) + 78;
-
-              spaceArrayLeft[0] = (spaceArrayRight[1] - 186);
-              spaceArrayLeft[1] = spaceArrayRight[0] - 104;
-            }
-          }
-
           this.moveToSideStageComponents(moveCount);
-
           this.stageMovedDirection = direction; // !important
           return "Valid Move";
         }
@@ -336,8 +317,8 @@ angular.module("canvasApp").factory('stage', [
 
         this.stageGroup.set({left: this.left + moveCount }).setCoords();
         this.dots.set({left: (this.left + moveCount ) + 3}).setCoords();
-        this.stageHitPointLeft.set({left: (this.left + moveCount ) + 10}).setCoords();
-        this.stageHitPointRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
+        //this.stageHitPointLeft.set({left: (this.left + moveCount ) + 10}).setCoords();
+        //this.stageHitPointRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
         this.stageHitPointLowerLeft.set({left: (this.left + moveCount ) + 10}).setCoords();
         this.stageHitPointLowerRight.set({left: ((this.left + moveCount ) + this.myWidth) -  20}).setCoords();
         this.left = this.left + moveCount;
@@ -418,6 +399,7 @@ angular.module("canvasApp").factory('stage', [
           currentStage = currentStage.nextStage;
         }
       };
+
       this.updateStageData = function(action) {
 
           if(! this.previousStage && action === -1 && this.index === 1) {
@@ -557,8 +539,8 @@ angular.module("canvasApp").factory('stage', [
           this.visualComponents = {
             'stageGroup': this.stageGroup,
             'dots': this.dots,
-            'stageHitPointLeft': this.stageHitPointLeft,
-            'stageHitPointRight': this.stageHitPointRight,
+            //'stageHitPointLeft': this.stageHitPointLeft,
+            //'stageHitPointRight': this.stageHitPointRight,
             'stageHitPointLowerLeft': this.stageHitPointLowerLeft,
             'stageHitPointLowerRight': this.stageHitPointLowerRight,
             //'moveStageRightPointerDetector' : this.moveStageRightPointerDetector,
@@ -567,8 +549,8 @@ angular.module("canvasApp").factory('stage', [
 
           this.canvas.add(this.stageGroup);
           this.canvas.add(this.dots);
-          this.canvas.add(this.stageHitPointLeft);
-          this.canvas.add(this.stageHitPointRight);
+          //this.canvas.add(this.stageHitPointLeft);
+          //this.canvas.add(this.stageHitPointRight);
           this.canvas.add(this.stageHitPointLowerLeft);
           this.canvas.add(this.stageHitPointLowerRight);
           //this.canvas.add(this.moveStageRightPointerDetector);
@@ -624,7 +606,6 @@ angular.module("canvasApp").factory('stage', [
       };
 
       this.removeFromStagesArray = function() {
-
 
         this.parent.allStageViews.splice(this.index, 1);
 

@@ -10,8 +10,8 @@ describe("Checking the behaviour of menu overlay controller", function() {
       httpMock = $httpBackend;
       stateParams = $stateParams;
       stateParams.id = 1;
-      httpMock.expectGET("http://localhost:8000/status").respond("NOTHING");
-      httpMock.expectGET("http://localhost:8000/network/wlan").respond("NOTHING");
+      httpMock.expectGET("http://localhost:8000/status?access_token=this_is_fake_token").respond("NOTHING");
+      httpMock.expectGET("http://localhost:8000/network/wlan?access_token=this_is_fake_token").respond("NOTHING");
       data = {
         experiment: {
           "started_at": true,

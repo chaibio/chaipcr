@@ -9,8 +9,8 @@ describe("Here we check the hit escape button and left-menu disappear", function
     httpMock = $httpBackend;
     compile = $compile;
 
-    httpMock.whenGET("http://localhost:8000/status").respond("NOTHING");
-    httpMock.whenGET("http://localhost:8000/network/wlan").respond("NOTHING");
+    httpMock.whenGET("http://localhost:8000/status?access_token=this_is_fake_token").respond("NOTHING");
+    httpMock.whenGET("http://localhost:8000/network/wlan?access_token=this_is_fake_token").respond("NOTHING");
     //httpMock.expectPOST("http://localhost:8000/control/start").respond({});
   }));
 

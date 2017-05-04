@@ -45,10 +45,10 @@ describe("Testing delta symbol", function() {
   });
 
   it("It should check the shadow property", function() {
-
-    expect(_deltaSymbol.shadow).toEqual(jasmine.objectContaining({
-      color: 'rgba(0,0,0,0.4)', offsetX: 5, offsetY: 5, blur: 7, id: 9
-    }));
+    expect(_deltaSymbol.shadow.offsetX).toEqual(5);
+    expect(_deltaSymbol.shadow.offsetY).toEqual(5);
+    expect(_deltaSymbol.shadow.blur).toEqual(7);
+    expect(_deltaSymbol.shadow.color).toEqual('rgba(0,0,0,0.4)');
   });
 
 });

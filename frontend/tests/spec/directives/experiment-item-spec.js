@@ -13,9 +13,9 @@ describe("Test RUN/VIEW item directive, which shows up in left menu", function()
     Exp = Experiment;
     state = $state;
     state.go("edit-protocol");
-    httpMock.whenGET("http://localhost:8000/status").respond("NOTHING");
-    httpMock.whenGET("http://localhost:8000/network/wlan").respond("NOTHING");
-    httpMock.expectPOST("http://localhost:8000/control/start").respond({});
+    httpMock.whenGET("http://localhost:8000/status?access_token=this_is_fake_token").respond("NOTHING");
+    httpMock.whenGET("http://localhost:8000/network/wlan?access_token=this_is_fake_token").respond("NOTHING");
+    httpMock.expectPOST("http://localhost:8000/control/start?access_token=this_is_fake_token").respond({});
 
   }));
 

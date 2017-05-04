@@ -64,8 +64,8 @@ angular.module("canvasApp").service('stageGraphics', [
 
       var allHitPoints = hitPoints.createAllHitPoints(this);
 
-      this.stageHitPointLeft = allHitPoints.stageHitPointLeft;
-      this.stageHitPointRight = allHitPoints.stageHitPointRight;
+      //this.stageHitPointLeft = allHitPoints.stageHitPointLeft;
+      //this.stageHitPointRight = allHitPoints.stageHitPointRight;
       this.stageHitPointLowerLeft = allHitPoints.stageHitPointLowerLeft;
       this.stageHitPointLowerRight = allHitPoints.stageHitPointLowerRight;
       //this.moveStageRightPointerDetector = Rectangle.create(rightPointerDetectorProperties);
@@ -74,8 +74,8 @@ angular.module("canvasApp").service('stageGraphics', [
 
     this.recalculateStageHitPoint = function() {
 
-      this.stageHitPointLeft.setLeft(this.left + 10).setCoords();
-      this.stageHitPointRight.setLeft((this.left + this.myWidth) - 20).setCoords();
+      //this.stageHitPointLeft.setLeft(this.left + 10).setCoords();
+      //this.stageHitPointRight.setLeft((this.left + this.myWidth) - 20).setCoords();
 
       this.stageHitPointLowerLeft.setLeft(this.left + 10).setCoords();
       this.stageHitPointLowerRight.setLeft((this.left + this.myWidth) - 20).setCoords();
