@@ -1,7 +1,7 @@
 (function () {
   'use strict'
 
-  fdescribe('Testing Scrollbar Directive', function () {
+  describe('Testing Scrollbar Directive', function () {
 
     beforeEach(function () {
 
