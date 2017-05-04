@@ -487,7 +487,10 @@
 
         $scope.checkMachineStatus = function() {
 
+          console.log('calling checkMachineStatus')
+
           DeviceInfo.getInfo($scope.check).then(function(deviceStatus) {
+            console.log('deviceStatus')
             // Incase connected
             if ($scope.modal) {
               $scope.modal.close();

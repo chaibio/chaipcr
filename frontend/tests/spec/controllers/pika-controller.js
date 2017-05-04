@@ -7,7 +7,7 @@
       $provide.value('dynexpExperimentService', ExperimentServiceMock);
       $provide.value('Status', StatusServiceMock);
       $provide.value('NetworkSettingsService', NetworkSettingsServiceMock);
-      $provide.value('DeviceInfo', DeviceInfoMock);
+      $provide.value('dynexpDeviceInfo', DeviceInfoMock);
     }));
 
     beforeEach(inject(function(_$controller_, _$rootScope_, $httpBackend, $stateParams, $q) {
@@ -44,133 +44,133 @@
       expect(this.$scope.result[1]).toBe("Invalid");
     });
 
-  it("should call the broadcast listener", function() {
-  var newData = {
-      "experiment_controller": {
+    it("should call the broadcast listener", function() {
+      var newData = {
+        "experiment_controller": {
           "machine": {
-              "state": "idle",
-              "thermal_state": "idle"
+            "state": "idle",
+            "thermal_state": "idle"
           },
           "experiment": {
-              "run_duration": "5",
-              "id": "263",
-              "name": "Lactobacillaceae Screening",
-              "started_at": "2017-May-02 19:59:36.576900",
-              "stage": {
-                  "id": "405",
-                  "name": "Stage 1",
-                  "number": "1",
-                  "cycle": "1"
-              },
-              "step": {
-                  "id": "680",
-                  "name": "Initial Denaturing",
-                  "number": "1"
-              }
+            "run_duration": "5",
+            "id": "263",
+            "name": "Lactobacillaceae Screening",
+            "started_at": "2017-May-02 19:59:36.576900",
+            "stage": {
+              "id": "405",
+              "name": "Stage 1",
+              "number": "1",
+              "cycle": "1"
+            },
+            "step": {
+              "id": "680",
+              "name": "Initial Denaturing",
+              "number": "1"
+            }
           }
-      },
-      "heat_block": {
+        },
+        "heat_block": {
           "zone1": {
-              "temperature": "28.9580002",
-              "target_temperature": "0",
-              "drive": "-0"
+            "temperature": "28.9580002",
+            "target_temperature": "0",
+            "drive": "-0"
           },
           "zone2": {
-              "temperature": "29.0249996",
-              "target_temperature": "0",
-              "drive": "-0"
+            "temperature": "29.0249996",
+            "target_temperature": "0",
+            "drive": "-0"
           },
           "temperature": "28.9909992"
-      },
-      "lid": {
+        },
+        "lid": {
           "temperature": "33.7010002",
           "target_temperature": "110",
           "drive": "1"
-      },
-      "optics": {
+        },
+        "optics": {
           "intensity": "60",
           "collect_data": "false",
           "lid_open": "false",
           "well_number": "0",
           "photodiode_value": [
-              "1272",
-              "1518"
+            "1272",
+            "1518"
           ]
-      },
-      "heat_sink": {
+        },
+        "heat_sink": {
           "temperature": "29.1949997",
           "fan_drive": "0"
-      },
-      "device": {
+        },
+        "device": {
           "update_available": "available"
-      }
-  };
-  var oldData = {
-      "experiment_controller": {
+        }
+      };
+      var oldData = {
+        "experiment_controller": {
           "machine": {
-              "state": "lid_heating",
-              "thermal_state": "idle"
+            "state": "lid_heating",
+            "thermal_state": "idle"
           },
           "experiment": {
-              "run_duration": "5",
-              "id": "263",
-              "name": "Lactobacillaceae Screening",
-              "started_at": "2017-May-02 19:59:36.576900",
-              "stage": {
-                  "id": "405",
-                  "name": "Stage 1",
-                  "number": "1",
-                  "cycle": "1"
-              },
-              "step": {
-                  "id": "680",
-                  "name": "Initial Denaturing",
-                  "number": "1"
-              }
+            "run_duration": "5",
+            "id": "263",
+            "name": "Lactobacillaceae Screening",
+            "started_at": "2017-May-02 19:59:36.576900",
+            "stage": {
+              "id": "405",
+              "name": "Stage 1",
+              "number": "1",
+              "cycle": "1"
+            },
+            "step": {
+              "id": "680",
+              "name": "Initial Denaturing",
+              "number": "1"
+            }
           }
-      },
-      "heat_block": {
+        },
+        "heat_block": {
           "zone1": {
-              "temperature": "28.9580002",
-              "target_temperature": "0",
-              "drive": "-0"
+            "temperature": "28.9580002",
+            "target_temperature": "0",
+            "drive": "-0"
           },
           "zone2": {
-              "temperature": "29.0249996",
-              "target_temperature": "0",
-              "drive": "-0"
+            "temperature": "29.0249996",
+            "target_temperature": "0",
+            "drive": "-0"
           },
           "temperature": "28.9909992"
-      },
-      "lid": {
+        },
+        "lid": {
           "temperature": "33.7010002",
           "target_temperature": "110",
           "drive": "1"
-      },
-      "optics": {
+        },
+        "optics": {
           "intensity": "60",
           "collect_data": "false",
           "lid_open": "false",
           "well_number": "0",
           "photodiode_value": [
-              "1272",
-              "1518"
+            "1272",
+            "1518"
           ]
-      },
-      "heat_sink": {
+        },
+        "heat_sink": {
           "temperature": "29.1949997",
           "fan_drive": "0"
-      },
-      "device": {
+        },
+        "device": {
           "update_available": "available"
-      }
-  };
+        }
+      };
 
-  this.$rootScope.$broadcast('status:data:updated', newData, oldData);
-  //this.$scope.$apply();
-  expect(this.$scope.checkExperimentStatus).toHaveBeenCalled();
+      this.$rootScope.$broadcast('status:data:updated', newData, oldData);
+      //this.$scope.$apply();
+      expect(this.$scope.checkExperimentStatus).toHaveBeenCalled();
 
-  });
+    });
 
   });
 

@@ -5,7 +5,6 @@ function DeviceInfoMock() {
 }
 
 DeviceInfoMock.getInfo = function(no) {
-  console.log(no)
   return {
     then: function(fn) {
       fn({
