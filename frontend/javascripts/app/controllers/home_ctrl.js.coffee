@@ -104,30 +104,34 @@ window.ChaiBioTech.ngApp
         $window.alert resp.data.experiment?.errors?.base || 'Unable to delete experiment.'
         data.del = false
 
-    @expName = (exp_name, truncate_length) ->
-      NAME_LENGTH = parseInt(truncate_length)
-      return if !exp_name
-      return exp_name if exp_name.length <= NAME_LENGTH
-      return exp_name.substring(0, NAME_LENGTH-2)+'...'
+    # @expName = (exp_name, truncate_length) ->
+    #   NAME_LENGTH = parseInt(truncate_length)
+    #   return if !exp_name
+    #   return exp_name if exp_name.length <= NAME_LENGTH
+    #   return exp_name.substring(0, NAME_LENGTH-2)+'...'
 
     @openExperiment = (exp) ->
       if not $scope.deleteMode
         state = Status.getData();
         if state.experiment_controller.machine.state == 'running' and exp.id == state.experiment_controller.experiment.id
-          $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
+          if exp.type isnt 'test_kit'
+            $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
+          else
+            $state.go 'pika_test.exp-running', id: exp.id
 
-         if exp.type isnt 'test_kit'
-           if exp.started_at isnt null
-             $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
-           else
-             $state.go 'edit-protocol', {id: exp.id}
-         else
-           if exp.started_at is null
-            $window.location.href = "/dynexp/pika_test/index.html#/setWellsA/" + exp.id
-           else if exp.started_at isnt null && exp.completed_at isnt null
-             $window.location.href = "/dynexp/pika_test/index.html#/results/" + exp.id
-           else
-             $window.location.href = "/dynexp/pika_test/index.html#/exp-running/" + exp.id
+        else
+          if exp.type isnt 'test_kit'
+            if exp.started_at
+              $state.go 'run-experiment', {id: exp.id, chart: 'amplification'}
+            else
+              $state.go 'edit-protocol', {id: exp.id}
+          else
+            if not exp.started_at
+              $state.go('pika_test.setWellsA', id: exp.id)
+            else if exp.started_at isnt null && exp.completed_at isnt null
+              $state.go('pika_test.results', id: exp.id)
+            else
+              $state.go 'pika_test.exp-running', id: exp.id
 
 
     return
