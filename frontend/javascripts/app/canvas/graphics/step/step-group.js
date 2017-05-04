@@ -24,7 +24,7 @@ angular.module('canvasApp').factory('stepGroup', [
 
       var groupMembers = [step.stepRect, step.numberingTextCurrent, step.numberingTextTotal, step.stepName, step.deltaSymbol,
         step.deltaGroup, step.borderRight];
-        console.log(groupMembers);
+
       var properties = {
             left: step.left || 33,  top: 28,  selectable: false,  hasControls: false,
             hasBoarders: false, name: "stepGroup",  me: step, originX: 'left', originY: 'top'

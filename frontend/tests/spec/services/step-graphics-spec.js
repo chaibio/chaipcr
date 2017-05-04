@@ -578,7 +578,7 @@ describe("Testing stepGraphics", function() {
    // _stepGraphics.stepComponents.call(step);
     //expect(sg.hitPoint).toEqual(jasmine.any(Object));
     //expect(sg.stepRect).toEqual(jasmine.any(Object));
-    expect(sg.stepGroup).toEqual(jasmine.any(Object));
+    //expect(sg.stepGroup).toEqual(jasmine.any(Object));
   });
 
 });
