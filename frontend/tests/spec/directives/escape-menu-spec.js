@@ -9,8 +9,8 @@ describe("Here we check the hit escape button and left-menu disappear", function
     httpMock = $httpBackend;
     compile = $compile;
 
-    httpMock.whenGET("http://localhost:8000/status?access_token=this_is_fake_token").respond("NOTHING");
-    httpMock.whenGET("http://localhost:8000/network/wlan?access_token=this_is_fake_token").respond("NOTHING");
+    httpMock.whenGET("http://localhost:8000/status").respond("NOTHING");
+    httpMock.whenGET("http://localhost:8000/network/wlan").respond("NOTHING");
     //httpMock.expectPOST("http://localhost:8000/control/start").respond({});
   }));
 
@@ -27,7 +27,7 @@ describe("Here we check the hit escape button and left-menu disappear", function
     var compiled = compile(elem)(scope);
     scope.$digest();
     spyOn(rootScope, "$broadcast");
-    angular.element('window').trigger('keyup', { keyCode: 27 });
+    angular.element('window').triggerHandler('keyup', { keyCode: 27 });
     //Safari/Chrome makes the keyCode and charCode properties read-only,
     //so it is not possible to simulate specific keys when manually firing events.
     expect(rootScope.$broadcast).toHaveBeenCalledWith();

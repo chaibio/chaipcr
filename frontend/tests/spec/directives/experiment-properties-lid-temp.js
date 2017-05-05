@@ -7,9 +7,9 @@ describe("Specs for edit LID TEMP in the left menu", function() {
     scope = $rootScope.$new();
     compile = $compile;
     httpMock = $httpBackend;
-    httpMock.whenGET("http://localhost:8000/status?access_token=this_is_fake_token").respond("NOTHING");
+    httpMock.whenGET("http://localhost:8000/status").respond("NOTHING");
     httpMock.whenGET("/experiments/").respond("NOTHING");
-    httpMock.whenGET("http://localhost:8000/network/wlan?access_token=this_is_fake_token").respond("NOTHING");
+    httpMock.whenGET("http://localhost:8000/network/wlan").respond("NOTHING");
 
   }));
 
