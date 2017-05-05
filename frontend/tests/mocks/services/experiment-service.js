@@ -14,9 +14,12 @@ var experimentsMock = [{
 
 function ExperimentServiceMock() {
   this.$remove = function(fn) {
-    fn()
+    if (fn) fn()
   }
 }
+
 ExperimentServiceMock.query = function(fn) {
   fn(experimentsMock)
 }
+
+ExperimentServiceMock.delete = function() {}
