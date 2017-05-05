@@ -10,7 +10,6 @@ describe("Testing move-stage-indicator", function() {
         var me = {
         };
         _moveStageIndicator = new moveStageIndicator(me);
-        console.log(_moveStageIndicator);
     }));
 
     it("It should check if moveStageIndicator has stageName", function() {
@@ -20,6 +19,13 @@ describe("Testing move-stage-indicator", function() {
     it("It should check if moveStageIndicator has stageType", function() {
         expect(_moveStageIndicator.stageType).toEqual(jasmine.any(Object));
     });
+   
+    it("It should check if moveStageIndicator.stageType text property", function() {
+        expect(_moveStageIndicator.stageType.text).toEqual("HOLDING");
+    });
 
+    it("It should check if moveStageIndicator.stageName text property", function() {
+        expect(_moveStageIndicator.stageName.text).toEqual("STAGE 2");
+    });    
 
 });
