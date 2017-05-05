@@ -34,24 +34,35 @@ angular.module("canvasApp").factory('moveStageIndicator', [
             var rect = new moveStageRectangle();
 
             var coverRect = new moveStageCoverRect();
+            
+            var indicatorRectangleGroup;
+            if(me.imageobjects) {
+                me.imageobjects["drag-stage-image.png"].originX = "left";
+                me.imageobjects["drag-stage-image.png"].originY = "top";
+                me.imageobjects["drag-stage-image.png"].top = 15;
+                me.imageobjects["drag-stage-image.png"].left = 14;
 
-            me.imageobjects["drag-stage-image.png"].originX = "left";
-            me.imageobjects["drag-stage-image.png"].originY = "top";
-            me.imageobjects["drag-stage-image.png"].top = 15;
-            me.imageobjects["drag-stage-image.png"].left = 14;
-
-            var indicatorRectangleGroup = new moveStageIndicatorRectangleGroup(
-                [
-                    rect, stageName, stageType,me.imageobjects["drag-stage-image.png"]
-                ]
-            );
-
-            var indicator = new moveStageIndicatorGroup(
-                [coverRect, indicatorRectangleGroup])
-            ;
+                indicatorRectangleGroup = new moveStageIndicatorRectangleGroup(
+                    [
+                        rect, stageName, stageType, me.imageobjects["drag-stage-image.png"]
+                    ]
+                );
+            } else {
+                indicatorRectangleGroup = new moveStageIndicatorRectangleGroup(
+                    [
+                        rect, stageName, stageType
+                    ]
+                );
+            }
+            
+            var indicator = new moveStageIndicatorGroup([
+                coverRect,
+                indicatorRectangleGroup
+            ]);
 
             indicator.stageName = stageName; // For easy reference;
             indicator.stageType = stageType;
+            
             return indicator;
         };
     }
