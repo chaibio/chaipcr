@@ -29,12 +29,13 @@
             console.log('Readjusting protocol screen');
             var padding = 50;
             var numVisibleDataBoxes = 3;
-            var mainWidth = $($window).width();
+            var mainWidth = ($window.innerWidth > 0) ? $window.innerWidth : screen.width;
             var prevWidth = elem.find('[action="previous"]').width();
             var nextWidth = elem.find('[action="next"]').width();
             var middleGroundWidth = mainWidth - (prevWidth + nextWidth);
 
             elem.css({ width: mainWidth });
+
             middleGround.css({ width: middleGroundWidth + 'px' });
             generalInfo.css({ width: middleGroundWidth + 'px' });
             bottomGatherData.css({ left: (middleGroundWidth - bottomGatherDataWidth - 4) });
