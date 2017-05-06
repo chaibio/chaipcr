@@ -39,7 +39,7 @@
             middleGround.css({ width: middleGroundWidth + 'px' });
             generalInfo.css({ width: middleGroundWidth + 'px' });
             bottomGatherData.css({ left: (middleGroundWidth - bottomGatherDataWidth - 4) });
-            summaryMode.css({ left: middleGroundWidth });
+            summaryMode.css({ left: middleGroundWidth, width: middleGroundWidth });
             dataBoxesContainer.width(middleGroundWidth + 'px');
 
             var numPadding = numVisibleDataBoxes - 1;
