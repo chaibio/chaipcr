@@ -16,7 +16,12 @@
             var nextWidth = elem.find('[action="next"]').width();
             var middleGroundWidth = mainWidth - (prevWidth + nextWidth);
 
-            elem.find('.middle-ground').width(middleGroundWidth + 'px');
+            elem.find('.middle-ground, .general-info-container').width(middleGroundWidth + 'px');
+
+            var bottomGatherData = elem.find('.bottom-gather-data');
+            bottomGatherData.css({ left: (middleGroundWidth - bottomGatherData.width()) });
+            var summaryMode = elem.find('.summary-mode');
+            summaryMode.css({ left: middleGroundWidth });
 
             var dataBoxesContainer = elem.find('.data-boxes-container');
             dataBoxesContainer.width(middleGroundWidth + 'px');
