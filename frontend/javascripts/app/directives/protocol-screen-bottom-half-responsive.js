@@ -4,7 +4,8 @@
   App.directive('protocolScreenCenterBottomHalf', [
     '$window',
     '$timeout',
-    function($window, $timeout) {
+    'WindowWrapper',
+    function($window, $timeout, WindowWrapper) {
       return {
         restrict: 'AE',
         link: function($scope, elem, attrs) {
@@ -25,58 +26,73 @@
           var dataBoxesEdit = elem.find('.data-boxes.edit-stage-step');
           var lolPopUp = elem.find('.lol-pop');
 
-          function adjustWidth() {
-            console.log('Readjusting protocol screen');
+          $scope.adjust = function() {
+            console.log('adjusting...')
             var padding = 50;
             var numVisibleDataBoxes = 3;
-            var mainWidth = ($window.innerWidth > 0) ? $window.innerWidth : screen.width;
+            var mainWidth = WindowWrapper.width();
             var prevWidth = elem.find('[action="previous"]').width();
             var nextWidth = elem.find('[action="next"]').width();
             var middleGroundWidth = mainWidth - (prevWidth + nextWidth);
 
             elem.css({ width: mainWidth });
 
-            middleGround.css({ width: middleGroundWidth + 'px' });
-            generalInfo.css({ width: middleGroundWidth + 'px' });
+            middleGround.css({ width: middleGroundWidth });
+            generalInfo.css({ width: middleGroundWidth });
             bottomGatherData.css({ left: (middleGroundWidth - bottomGatherDataWidth - 4) });
             summaryMode.css({ left: middleGroundWidth, width: middleGroundWidth });
-            dataBoxesContainer.width(middleGroundWidth + 'px');
+            dataBoxesContainer.css({ width: middleGroundWidth });
 
             var numPadding = numVisibleDataBoxes - 1;
             var eachBoxesWidth = (middleGroundWidth - (padding * numPadding)) / numVisibleDataBoxes;
 
-            dataBoxesSummary.css({ width: (eachBoxesWidth * (numVisibleDataBoxes - 1) + padding) + 'px' });
+            dataBoxesSummary.css({ width: (eachBoxesWidth * (numVisibleDataBoxes - 1) + padding) });
             for (var i = 0; i < dataBoxes.length; i++) {
               var box = dataBoxes[i];
               var left = i * (eachBoxesWidth + padding);
               $window.$(box).css({
-                width: eachBoxesWidth + 'px',
-                left: left + 'px'
+                width: eachBoxesWidth,
+                left: left
               });
             }
 
-            bottomCommonItem.width(eachBoxesWidth + 'px');
-            dataBoxesEdit.width(eachBoxesWidth + 'px');
-            dataBoxesEdit.css({ left: (eachBoxesWidth + padding) * 2 + 'px' });
+            bottomCommonItem.width(eachBoxesWidth);
+            dataBoxesEdit.css({
+              left: (eachBoxesWidth + padding) * 2,
+              width: eachBoxesWidth
+            });
             // resize big buttons
-            dataBoxesEdit.find('button.big_button, button.big_button_disabled').css({ width: eachBoxesWidth + 'px' });
+            dataBoxesEdit.find('button.big_button, button.big_button_disabled').css({ width: eachBoxesWidth });
             // resize small buttons
             var small_button_space = 18;
             var small_button_border_size = 1;
             var eachSmallButtonWidth = ((eachBoxesWidth - small_button_space) / 2) - (small_button_border_size * 2);
-            dataBoxesEdit.find('button.small_button, button.small_button_disabled').css({ width: eachSmallButtonWidth + 'px' });
-            lolPopUp.css({ left: ((eachBoxesWidth + padding) * (numVisibleDataBoxes - 1) + ((eachBoxesWidth - lolPopUp.width()) * 0.5)) + 'px' });
+            dataBoxesEdit.find('button.small_button, button.small_button_disabled').css({ width: eachSmallButtonWidth });
+            lolPopUp.css({ left: ((eachBoxesWidth + padding) * (numVisibleDataBoxes - 1) + ((eachBoxesWidth - lolPopUp.width()) * 0.5)) });
+          };
+
+          timeout = $timeout(function() {
+            $scope.adjust();
+            timeout = null;
+          }, 100);
+
+          if (!WindowWrapper.events.resize) {
+            WindowWrapper.events.resize = {};
           }
 
-          timeout = $timeout(adjustWidth, 100);
-
-          $(window).resize(function() {
-            console.log('protocol resizing ....');
-            if (timeout) {
-              $timeout.cancel(timeout);
-            }
-            timeout = $timeout(adjustWidth, 100);
-          });
+          if (!WindowWrapper.events.resize['protocol-screen-center-bottom-half']) {
+            $window.$($window).resize(function() {
+              if (timeout) {
+                $timeout.cancel(timeout);
+                timeout = null;
+              }
+              timeout = $timeout(function() {
+                $scope.adjust();
+                timeout = null;
+              }, 100);
+            });
+            WindowWrapper.events.resize['protocol-screen-center-bottom-half'] = true;
+          }
 
         }
       };
