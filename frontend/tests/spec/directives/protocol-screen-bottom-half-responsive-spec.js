@@ -217,12 +217,14 @@
       it('should trigger adjust method only once during resizing', function() {
         spyOn(this.scope, 'adjust').and.callThrough()
         spyOn(this.$timeout, 'cancel').and.callThrough()
+        spyOn(this.WindowWrapper, 'width').and.returnValue(1234)
         $(this.$window).triggerHandler('resize')
         $(this.$window).triggerHandler('resize')
         $(this.$window).triggerHandler('resize')
         this.$timeout.flush()
         expect(this.$timeout.cancel).toHaveBeenCalledTimes(2)
         expect(this.scope.adjust).toHaveBeenCalledTimes(1)
+        expect(this.directive.width()).toBe(1234)
       })
 
       afterEach(function () {
