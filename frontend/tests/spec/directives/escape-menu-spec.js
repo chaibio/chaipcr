@@ -1,36 +1,46 @@
-describe("Here we check the hit escape button and left-menu disappear", function() {
+(function() {
+  'use strict'
 
-  beforeEach(module("ChaiBioTech"));
-  var scope, httpMock, compile, rootScope;
+  describe("Here we check the hit escape button and left-menu disappear", function() {
 
-  beforeEach(inject(function($rootScope, $httpBackend, $compile) {
-    scope = $rootScope.$new();
-    rootScope = $rootScope;
-    httpMock = $httpBackend;
-    compile = $compile;
+    beforeEach(module("ChaiBioTech", function($provide) {
+      mockCommonServices($provide)
+    }));
 
-    httpMock.whenGET("http://localhost:8000/status").respond("NOTHING");
-    httpMock.whenGET("http://localhost:8000/network/wlan").respond("NOTHING");
-    //httpMock.expectPOST("http://localhost:8000/control/start").respond({});
-  }));
+    beforeEach(function() {
+      inject(function($injector) {
+        this.$rootScope = $injector.get('$rootScope')
+        this.scope = this.$rootScope.$new()
+        this.$compile = $injector.get('$compile')
+        this.$window = $injector.get('$window')
+      })
 
-  it("Should check the initial conf", function() {
-    var elem = angular.element('<p escape-menu ></p>');
-    var compiled = compile(elem)(scope);
-    scope.registerEscape = false;
-    scope.$digest();
-    expect(scope.registerEscape).toBeFalsy();
+      var elem = angular.element('<p escape-menu ></p>');
+      this.directive = this.$compile(elem)(this.scope);
+      this.scope.$digest();
+    });
+
+    it("Should check the initial conf", function() {
+      this.scope.registerEscape = false;
+      this.scope.$digest();
+      expect(this.scope.registerEscape).toBeFalsy();
+    });
+
+    it("Should check if hitting escape key $broadcast", function() {
+      spyOn(this.$rootScope, "$broadcast");
+      spyOn(this.scope, '$apply')
+      this.scope.sideMenuOpen = true
+
+      angular.element(this.$window).triggerHandler({
+        type: 'keyup',
+        keyCode: 27,
+      });
+      //Safari/Chrome makes the keyCode and charCode properties read-only,
+      //so it is not possible to simulate specific keys when manually firing events.
+      expect(this.$rootScope.$broadcast).toHaveBeenCalledWith('sidemenu:toggle');
+      expect(this.scope.$apply).toHaveBeenCalled()
+    });
+
   });
 
-  it("Should check if hitting escape key $broadcast", function() {
-    var elem = angular.element('<p escape-menu ></p>');
-    var compiled = compile(elem)(scope);
-    scope.$digest();
-    spyOn(rootScope, "$broadcast");
-    angular.element('window').triggerHandler('keyup', { keyCode: 27 });
-    //Safari/Chrome makes the keyCode and charCode properties read-only,
-    //so it is not possible to simulate specific keys when manually firing events.
-    expect(rootScope.$broadcast).toHaveBeenCalledWith();
-  });
-
-});
+})();
