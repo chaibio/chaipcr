@@ -27,7 +27,6 @@
           var lolPopUp = elem.find('.lol-pop');
 
           $scope.adjust = function() {
-            console.log('adjusting...')
             var padding = 50;
             var numVisibleDataBoxes = 3;
             var mainWidth = WindowWrapper.width();
