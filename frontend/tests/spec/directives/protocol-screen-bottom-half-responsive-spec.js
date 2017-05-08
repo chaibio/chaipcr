@@ -84,8 +84,13 @@
         var elem = angular.element(template)
         var scope = this.$rootScope.$new()
         var d2 = this.$compile(elem)(scope)
+        this.$timeout.flush()
         scope.$digest()
         expect(this.$window.$.fn.resize).toHaveBeenCalledTimes(1)
+      })
+
+      afterEach(function () {
+        this.$timeout.verifyNoPendingTasks()
       })
 
     })
