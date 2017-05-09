@@ -47,206 +47,153 @@
     <div action="next"></div>\
   </div>'
 
-    describe('Resize handler', function() {
+    var windowWidth = 1024
 
-      beforeEach(function() {
-        // turn off previous window resize handlers
-        $(window).off('resize')
+    beforeEach(function() {
+      // turn off previous window resize handlers
+      $(window).off('resize')
 
-        module('ChaiBioTech', function($provide) {
-          mockCommonServices($provide)
-        })
-
-        inject(function($injector) {
-          this.$compile = $injector.get('$compile')
-          this.$timeout = $injector.get('$timeout')
-          this.$window = $injector.get('$window')
-          this.WindowWrapper = $injector.get('WindowWrapper')
-          this.$rootScope = $injector.get('$rootScope')
-          this.scope = this.$rootScope.$new()
-        })
-
-        spyOn(this.$window.$.fn, 'resize')
-
-        var elem = angular.element(template)
-        this.directive = this.$compile(elem)(this.scope)
-        this.scope.$digest()
-        this.$timeout.flush()
-
+      module('ChaiBioTech', function($provide) {
+        mockCommonServices($provide)
       })
 
-      it('should add flag for protocol-screen-center-bottom-half resize handler', function() {
-        expect(this.WindowWrapper.events.resize['protocol-screen-center-bottom-half']).toBe(true)
+      inject(function($injector) {
+        this.$compile = $injector.get('$compile')
+        this.$timeout = $injector.get('$timeout')
+        this.$window = $injector.get('$window')
+        this.WindowWrapper = $injector.get('WindowWrapper')
+        this.$rootScope = $injector.get('$rootScope')
+        this.scope = this.$rootScope.$new()
       })
 
-      it('should add resize listener only once', function() {
-        // create 2nd directive to trigger add listener
-        var elem = angular.element(template)
-        var scope = this.$rootScope.$new()
-        var d2 = this.$compile(elem)(scope)
-        this.$timeout.flush()
-        scope.$digest()
-        expect(this.$window.$.fn.resize).toHaveBeenCalledTimes(1)
+      spyOn(this.WindowWrapper, 'width').and.callFake(function() {
+        return windowWidth
       })
 
-      afterEach(function() {
-        this.$timeout.verifyNoPendingTasks()
-      })
+      var elem = angular.element(template)
+      this.directive = this.$compile(elem)(this.scope)
+      this.$timeout.flush()
+
+      this.prev = this.directive.find('[action="previous"]')
+      this.next = this.directive.find('[action="next"]')
+      this.middleGround = this.directive.find('.middle-ground')
+      this.generalInfo = this.directive.find('.general-info-container')
+      this.bottomGatherData = this.directive.find('.bottom-gather-data')
+      this.bottomGatherDataWidth = 243
+      this.summaryMode = this.directive.find('.summary-mode')
+      this.dataBoxesContainer = this.directive.find('.data-boxes-container')
+      this.dataBoxesSummary = this.directive.find('.data-box-container-summary')
+      this.dataBoxesSummaryScroll = this.directive.find('.data-box-container-summary-scroll')
+      this.bottomCommonItem = this.directive.find('.bottom-common-item, .name-board')
+      this.dataBoxes = this.dataBoxesSummaryScroll.find('.data-boxes')
+      this.dataBoxesEdit = this.directive.find('.data-boxes.edit-stage-step')
+      this.lolPopUp = this.directive.find('.lol-pop')
+
+      this.padding = 50;
+      this.numVisibleDataBoxes = 3;
+      this.numPadding = this.numVisibleDataBoxes - 1;
+      this.eachBoxesWidth = (this.middleGround.width() - (this.padding * this.numPadding)) / this.numVisibleDataBoxes;
 
     })
 
+    it('should set width of the directive root elem', function() {
+      expect(this.directive.css('width')).toEqual(this.WindowWrapper.width() + 'px')
+    })
 
-    describe('Adjust method', function() {
+    it('should set width of .middle-ground', function() {
+      expect(this.middleGround.css('width')).toEqual(this.WindowWrapper.width() - this.prev.width() - this.next.width() + 'px')
+    })
 
-      var windowWidth = 1024
+    it('should set width of .general-info-container', function() {
+      expect(this.middleGround.css('width')).toEqual(this.WindowWrapper.width() - this.prev.width() - this.next.width() + 'px')
+    })
 
-      beforeEach(function() {
-        // turn off previous window resize handlers
-        $(window).off('resize')
+    it('should set width of .bottom-gather-data', function() {
+      expect(this.bottomGatherData.css('left')).toEqual((this.middleGround.width() - this.bottomGatherDataWidth - 4) + 'px')
+    })
 
-        module('ChaiBioTech', function($provide) {
-          mockCommonServices($provide)
-        })
+    it('should set width of .summary-mode', function() {
+      expect(this.summaryMode.css('left')).toEqual(this.middleGround.width() + 'px')
+      expect(this.summaryMode.css('width')).toEqual(this.middleGround.width() + 'px')
+    })
 
-        inject(function($injector) {
-          this.$compile = $injector.get('$compile')
-          this.$timeout = $injector.get('$timeout')
-          this.$window = $injector.get('$window')
-          this.WindowWrapper = $injector.get('WindowWrapper')
-          this.$rootScope = $injector.get('$rootScope')
-          this.scope = this.$rootScope.$new()
-        })
+    it('should set width of .data-boxes-container', function() {
+      expect(this.dataBoxesContainer.css('width')).toEqual(this.middleGround.width() + 'px')
+    })
 
-        spyOn(this.WindowWrapper, 'width').and.callFake(function () {
-          return windowWidth
-        })
+    it('should set width of .data-box-container-summary', function() {
+      expect(this.dataBoxesSummary.css('width')).toEqual((this.eachBoxesWidth * (this.numVisibleDataBoxes - 1) + this.padding) + 'px')
+    })
 
-        var elem = angular.element(template)
-        this.directive = this.$compile(elem)(this.scope)
-        this.$timeout.flush()
+    it('should set width of .data-boxes', function() {
+      for (var i = 0; i < this.dataBoxes.length; i++) {
+        var box = this.dataBoxes[i];
+        var left = i * (this.eachBoxesWidth + this.padding);
+        expect($(box).width()).toEqual(this.eachBoxesWidth)
+        expect($(box).css('left')).toEqual(left + 'px')
+      }
+    })
 
-        this.prev = this.directive.find('[action="previous"]')
-        this.next = this.directive.find('[action="next"]')
-        this.middleGround = this.directive.find('.middle-ground')
-        this.generalInfo = this.directive.find('.general-info-container')
-        this.bottomGatherData = this.directive.find('.bottom-gather-data')
-        this.bottomGatherDataWidth = 243
-        this.summaryMode = this.directive.find('.summary-mode')
-        this.dataBoxesContainer = this.directive.find('.data-boxes-container')
-        this.dataBoxesSummary = this.directive.find('.data-box-container-summary')
-        this.dataBoxesSummaryScroll = this.directive.find('.data-box-container-summary-scroll')
-        this.bottomCommonItem = this.directive.find('.bottom-common-item, .name-board')
-        this.dataBoxes = this.dataBoxesSummaryScroll.find('.data-boxes')
-        this.dataBoxesEdit = this.directive.find('.data-boxes.edit-stage-step')
-        this.lolPopUp = this.directive.find('.lol-pop')
+    it('should set width of .bottom-common-item', function() {
+      for (var i = 0; i < this.bottomCommonItem.length; i++) {
+        var item = this.bottomCommonItem[i];
+        expect($(item).width()).toEqual(this.eachBoxesWidth)
+      }
+    })
 
-        this.padding = 50;
-        this.numVisibleDataBoxes = 3;
-        this.numPadding = this.numVisibleDataBoxes - 1;
-        this.eachBoxesWidth = (this.middleGround.width() - (this.padding * this.numPadding)) / this.numVisibleDataBoxes;
+    it('should set width of dataBoxesEdit', function() {
+      expect(this.dataBoxesEdit.width()).toEqual(this.eachBoxesWidth)
+      expect(this.dataBoxesEdit.css('left')).toEqual((this.eachBoxesWidth + this.padding) * 2 + 'px')
+    })
 
-      })
+    it('should set width of big buttons', function() {
+      var buttons = this.directive.find('.big_button, .big_button_disabled')
+      for (var i = buttons.length - 1; i >= 0; i--) {
+        var btn = $(buttons[i])
+        expect(btn.width()).toEqual(this.eachBoxesWidth)
+      }
+    })
 
-      it('should set width of the directive root elem', function() {
-        expect(this.directive.css('width')).toEqual(this.WindowWrapper.width() + 'px')
-      })
+    it('should set width of small buttons', function() {
+      var small_button_space = 18;
+      var small_button_border_size = 1;
+      var eachSmallButtonWidth = ((this.eachBoxesWidth - small_button_space) / 2) - (small_button_border_size * 2);
+      var buttons = this.directive.find('.small_button, .small_button_disabled')
+      for (var i = buttons.length - 1; i >= 0; i--) {
+        var btn = $(buttons[i])
+        expect(btn.width()).toEqual(eachSmallButtonWidth)
+      }
+    })
 
-      it('should set width of .middle-ground', function() {
-        expect(this.middleGround.css('width')).toEqual(this.WindowWrapper.width() - this.prev.width() - this.next.width() + 'px')
-      })
+    it('should set width of lol popup', function() {
+      expect(this.lolPopUp.css('left')).toEqual(((this.eachBoxesWidth + this.padding) * (this.numVisibleDataBoxes - 1) + ((this.eachBoxesWidth - this.lolPopUp.width()) * 0.5)) + 'px')
+    })
 
-      it('should set width of .general-info-container', function() {
-        expect(this.middleGround.css('width')).toEqual(this.WindowWrapper.width() - this.prev.width() - this.next.width() + 'px')
-      })
+    it('should trigger adjust method only once during resizing', function() {
+      spyOn(this.scope, 'adjust').and.callThrough()
+      spyOn(this.$timeout, 'cancel').and.callThrough()
+      windowWidth = 1234
+      $(this.$window).triggerHandler('resize')
+      $(this.$window).triggerHandler('resize')
+      $(this.$window).triggerHandler('resize')
+      this.$timeout.flush()
+      expect(this.$timeout.cancel).toHaveBeenCalledTimes(2)
+      expect(this.scope.adjust).toHaveBeenCalledTimes(1)
+      expect(this.directive.width()).toBe(1234)
+    })
 
-      it('should set width of .bottom-gather-data', function() {
-        expect(this.bottomGatherData.css('left')).toEqual((this.middleGround.width() - this.bottomGatherDataWidth - 4) + 'px')
-      })
+    it('should set minimum width 930px', function() {
+      spyOn(this.scope, 'adjust').and.callThrough()
+      spyOn(this.$timeout, 'cancel').and.callThrough()
+      windowWidth = 100
+      $(this.$window).triggerHandler('resize')
+      this.$timeout.flush()
+      expect(this.scope.adjust).toHaveBeenCalledTimes(1)
+      expect(this.directive.width()).toBe(930)
+    })
 
-      it('should set width of .summary-mode', function() {
-        expect(this.summaryMode.css('left')).toEqual(this.middleGround.width() + 'px')
-        expect(this.summaryMode.css('width')).toEqual(this.middleGround.width() + 'px')
-      })
-
-      it('should set width of .data-boxes-container', function() {
-        expect(this.dataBoxesContainer.css('width')).toEqual(this.middleGround.width() + 'px')
-      })
-
-      it('should set width of .data-box-container-summary', function() {
-        expect(this.dataBoxesSummary.css('width')).toEqual((this.eachBoxesWidth * (this.numVisibleDataBoxes - 1) + this.padding) + 'px')
-      })
-
-      it('should set width of .data-boxes', function() {
-        for (var i = 0; i < this.dataBoxes.length; i++) {
-          var box = this.dataBoxes[i];
-          var left = i * (this.eachBoxesWidth + this.padding);
-          expect($(box).width()).toEqual(this.eachBoxesWidth)
-          expect($(box).css('left')).toEqual(left + 'px')
-        }
-      })
-
-      it('should set width of .bottom-common-item', function() {
-        for (var i = 0; i < this.bottomCommonItem.length; i++) {
-          var item = this.bottomCommonItem[i];
-          expect($(item).width()).toEqual(this.eachBoxesWidth)
-        }
-      })
-
-      it('should set width of dataBoxesEdit', function() {
-        expect(this.dataBoxesEdit.width()).toEqual(this.eachBoxesWidth)
-        expect(this.dataBoxesEdit.css('left')).toEqual((this.eachBoxesWidth + this.padding) * 2 + 'px')
-      })
-
-      it('should set width of big buttons', function() {
-        var buttons = this.directive.find('.big_button, .big_button_disabled')
-        for (var i = buttons.length - 1; i >= 0; i--) {
-          var btn = $(buttons[i])
-          expect(btn.width()).toEqual(this.eachBoxesWidth)
-        }
-      })
-
-      it('should set width of small buttons', function() {
-        var small_button_space = 18;
-        var small_button_border_size = 1;
-        var eachSmallButtonWidth = ((this.eachBoxesWidth - small_button_space) / 2) - (small_button_border_size * 2);
-        var buttons = this.directive.find('.small_button, .small_button_disabled')
-        for (var i = buttons.length - 1; i >= 0; i--) {
-          var btn = $(buttons[i])
-          expect(btn.width()).toEqual(eachSmallButtonWidth)
-        }
-      })
-
-      it('should set width of lol popup', function() {
-        expect(this.lolPopUp.css('left')).toEqual(((this.eachBoxesWidth + this.padding) * (this.numVisibleDataBoxes - 1) + ((this.eachBoxesWidth - this.lolPopUp.width()) * 0.5)) + 'px')
-      })
-
-      it('should trigger adjust method only once during resizing', function() {
-        spyOn(this.scope, 'adjust').and.callThrough()
-        spyOn(this.$timeout, 'cancel').and.callThrough()
-        windowWidth = 1234
-        $(this.$window).triggerHandler('resize')
-        $(this.$window).triggerHandler('resize')
-        $(this.$window).triggerHandler('resize')
-        this.$timeout.flush()
-        expect(this.$timeout.cancel).toHaveBeenCalledTimes(2)
-        expect(this.scope.adjust).toHaveBeenCalledTimes(1)
-        expect(this.directive.width()).toBe(1234)
-      })
-
-      it('should set minimum width 930px', function() {
-        spyOn(this.scope, 'adjust').and.callThrough()
-        spyOn(this.$timeout, 'cancel').and.callThrough()
-        windowWidth = 100
-        $(this.$window).triggerHandler('resize')
-        this.$timeout.flush()
-        expect(this.scope.adjust).toHaveBeenCalledTimes(1)
-        expect(this.directive.width()).toBe(930)
-      })
-
-      afterEach(function() {
-        this.$timeout.verifyNoPendingTasks()
-      })
-
+    afterEach(function() {
+      this.$timeout.verifyNoPendingTasks()
     })
 
   })

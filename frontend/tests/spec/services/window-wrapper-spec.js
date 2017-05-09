@@ -49,10 +49,6 @@
         expect(this.WindowWrapper.width()).toEqual($(this.$window).width())
       })
 
-      it('should have events property', function () {
-        expect(this.WindowWrapper.events).toEqual({})
-      })
-
       it('should return window height', function () {
         expect(this.WindowWrapper.height()).toBe(angular.element(this.$window).height())
       })

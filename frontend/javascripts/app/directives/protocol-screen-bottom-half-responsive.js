@@ -32,7 +32,7 @@
             var numVisibleDataBoxes = 3;
             var prevWidth = prev.width();
             var nextWidth = next.width();
-            var mainWidth = WindowWrapper.width() > minWidth ? WindowWrapper.width() : minWidth ;
+            var mainWidth = WindowWrapper.width() > minWidth ? WindowWrapper.width() : minWidth;
             var middleGroundWidth = mainWidth - (prevWidth + nextWidth);
 
             elem.css({ width: mainWidth });
@@ -76,23 +76,16 @@
             timeout = null;
           }, 100);
 
-          if (!WindowWrapper.events.resize) {
-            WindowWrapper.events.resize = {};
-          }
-
-          if (!WindowWrapper.events.resize['protocol-screen-center-bottom-half']) {
-            $window.$($window).resize(function() {
-              if (timeout) {
-                $timeout.cancel(timeout);
-                timeout = null;
-              }
-              timeout = $timeout(function() {
-                $scope.adjust();
-                timeout = null;
-              }, 100);
-            });
-            WindowWrapper.events.resize['protocol-screen-center-bottom-half'] = true;
-          }
+          $scope.$on('window:resize', function() {
+            if (timeout) {
+              $timeout.cancel(timeout);
+              timeout = null;
+            }
+            timeout = $timeout(function() {
+              $scope.adjust();
+              timeout = null;
+            }, 100);
+          });
 
         }
       };
