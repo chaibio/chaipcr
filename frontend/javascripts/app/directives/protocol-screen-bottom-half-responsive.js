@@ -11,6 +11,7 @@
         link: function($scope, elem, attrs) {
 
           var timeout = null;
+          var minWidth = 930;
           var prev = elem.find('[action="previous"]');
           var next = elem.find('[action="next"]');
           var middleGround = elem.find('.middle-ground');
@@ -29,9 +30,9 @@
           $scope.adjust = function() {
             var padding = 50;
             var numVisibleDataBoxes = 3;
-            var mainWidth = WindowWrapper.width();
-            var prevWidth = elem.find('[action="previous"]').width();
-            var nextWidth = elem.find('[action="next"]').width();
+            var prevWidth = prev.width();
+            var nextWidth = next.width();
+            var mainWidth = WindowWrapper.width() > minWidth ? WindowWrapper.width() : minWidth ;
             var middleGroundWidth = mainWidth - (prevWidth + nextWidth);
 
             elem.css({ width: mainWidth });

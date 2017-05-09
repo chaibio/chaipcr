@@ -89,7 +89,7 @@
         expect(this.$window.$.fn.resize).toHaveBeenCalledTimes(1)
       })
 
-      afterEach(function () {
+      afterEach(function() {
         this.$timeout.verifyNoPendingTasks()
       })
 
@@ -97,6 +97,8 @@
 
 
     describe('Adjust method', function() {
+
+      var windowWidth = 1024
 
       beforeEach(function() {
         // turn off previous window resize handlers
@@ -113,6 +115,10 @@
           this.WindowWrapper = $injector.get('WindowWrapper')
           this.$rootScope = $injector.get('$rootScope')
           this.scope = this.$rootScope.$new()
+        })
+
+        spyOn(this.WindowWrapper, 'width').and.callFake(function () {
+          return windowWidth
         })
 
         var elem = angular.element(template)
@@ -217,7 +223,7 @@
       it('should trigger adjust method only once during resizing', function() {
         spyOn(this.scope, 'adjust').and.callThrough()
         spyOn(this.$timeout, 'cancel').and.callThrough()
-        spyOn(this.WindowWrapper, 'width').and.returnValue(1234)
+        windowWidth = 1234
         $(this.$window).triggerHandler('resize')
         $(this.$window).triggerHandler('resize')
         $(this.$window).triggerHandler('resize')
@@ -227,7 +233,17 @@
         expect(this.directive.width()).toBe(1234)
       })
 
-      afterEach(function () {
+      it('should set minimum width 930px', function() {
+        spyOn(this.scope, 'adjust').and.callThrough()
+        spyOn(this.$timeout, 'cancel').and.callThrough()
+        windowWidth = 100
+        $(this.$window).triggerHandler('resize')
+        this.$timeout.flush()
+        expect(this.scope.adjust).toHaveBeenCalledTimes(1)
+        expect(this.directive.width()).toBe(930)
+      })
+
+      afterEach(function() {
         this.$timeout.verifyNoPendingTasks()
       })
 
