@@ -39,6 +39,7 @@
         })
 
         inject(function($injector) {
+          this.$rootScope = $injector.get('$rootScope')
           this.$window = $injector.get('$window')
           this.WindowWrapper = $injector.get('WindowWrapper')
         })
@@ -59,6 +60,16 @@
       it('should return document height', function () {
         angular.element('body').css({margin: 0, padding: 0}).append('<div style="height: 1234px"></div>')
         expect(this.WindowWrapper.documentHeight()).toBe(1234)
+      })
+
+      it('should broadcast window:resize event', function () {
+        spyOn(this.$rootScope, '$apply').and.callFake(function (fn) {
+          fn()
+        })
+        spyOn(this.$rootScope, '$broadcast')
+        angular.element(this.$window).triggerHandler('resize')
+        expect(this.$rootScope.$broadcast).toHaveBeenCalledWith('window:resize')
+        expect(this.$rootScope.$broadcast).toHaveBeenCalledTimes(1)
       })
 
     })

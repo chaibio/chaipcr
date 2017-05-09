@@ -10,4 +10,8 @@ App.directive 'minHeight', [
       elem.css
         minHeight: WindowWrapper.height() - $scope.offset
 
+      $scope.$on 'window:resize', ->
+        elem.css
+          minHeight: WindowWrapper.height() - $scope.offset
+
 ]

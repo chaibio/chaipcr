@@ -3,8 +3,9 @@
 
   App.service('WindowWrapper', [
     '$window',
+    '$rootScope',
     'IsMobile',
-    function windowCommon($window, IsMobile) {
+    function windowCommon($window, $rootScope, IsMobile) {
 
       // this serves as indicator which event handlers are already attached by which component to prevent duplicate callbacks
       this.events = {};
@@ -31,6 +32,12 @@
 
         return height;
       };
+
+      angular.element($window).resize(function() {
+        $rootScope.$apply(function () {
+          $rootScope.$broadcast('window:resize');
+        });
+      });
 
     }
   ]);
