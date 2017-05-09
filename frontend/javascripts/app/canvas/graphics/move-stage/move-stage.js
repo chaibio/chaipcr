@@ -48,6 +48,7 @@ angular.module("canvasApp").factory('moveStageRect', [
             this.setLeft(stage.left - 50);
             this.setVisible(true);
             this.setCoords();
+            
             this.kanvas = C;
             this.movement = movement;
             this.movedStageIndex = null;

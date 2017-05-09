@@ -49,13 +49,20 @@ describe("Testing move-stage", function() {
     });
 
     it("it should check init method, function calls ", function() {
-        //spyOn(indicator, "setLeft");
+        spyOn(indicator, "setLeft");
         spyOn(indicator, "setVisible");
         spyOn(indicator, "setCoords");
-        spyOn(indicator.verticalLine, "setLeft");
+        //spyOn(indicator.verticalLine, "setLeft").and.callFake(function() {
+
+        //});
         //spyOn(indicator.kanvas.canvas, "bringToFront");
         indicator.init(stage, C, movement);
-        expect(indicator.verticalLine.setLeft).toHaveBeenCalled();
+        expect(indicator.setCoords).toHaveBeenCalled();
+        expect(indicator.setLeft).toHaveBeenCalled();
+        expect(indicator.setVisible).toHaveBeenCalled();
+        //console.log("stager", stage);
+        //expect(indicator.verticalLine.setLeft).toHaveBeenCalled();
+
     });
     
 });
