@@ -53,7 +53,7 @@
       })
 
       it('should return window height', function () {
-        expect(this.WindowWrapper.height()).toBe(this.$window.screen.height)
+        expect(this.WindowWrapper.height()).toBe(angular.element(this.$window).height())
       })
 
       it('should return document height', function () {

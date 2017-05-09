@@ -18,7 +18,7 @@
       };
 
       this.height = function() {
-        return $window.screen.height;
+        return angular.element($window).height();
       };
 
       this.documentHeight = function() {
