@@ -52,6 +52,15 @@
         expect(this.WindowWrapper.events).toEqual({})
       })
 
+      it('should return window height', function () {
+        expect(this.WindowWrapper.height()).toBe(this.$window.screen.height)
+      })
+
+      it('should return document height', function () {
+        angular.element('body').css({margin: 0, padding: 0}).append('<div style="height: 1234px"></div>')
+        expect(this.WindowWrapper.documentHeight()).toBe(1234)
+      })
+
     })
 
   })
