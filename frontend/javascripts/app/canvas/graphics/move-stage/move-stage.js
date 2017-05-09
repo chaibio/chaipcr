@@ -51,19 +51,25 @@ angular.module("canvasApp").factory('moveStageRect', [
             
             this.kanvas = C;
             this.movement = movement;
-            this.movedStageIndex = null;
+            
             this.kanvas.canvas.bringToFront(this);
+            
             this.rightOffset = 85;
             this.leftOffset = -55;
             this.currentLeft = movement.left;
+            this.draggedStage = stage;
+
+            this.movedStageIndex = null;
             this.currentMoveRight = null;
             this.currentMoveLeft = null;
             this.currentDrop = null;
             this.direction = null;
-            this.draggedStage = stage;
+            
 
-            this.kanvas.canvas.bringToFront(this.verticalLine);
-            this.verticalLine.setLeft(stage.left + 5).setVisible(true).setCoords();
+            this.verticalLine.setLeft(stage.left + 5)
+            this.verticalLine.setVisible(true);
+            this.verticalLine.setCoords();
+            
             this.kanvas.canvas.bringToFront(this.verticalLine);
 
             if(stage.previousStage) {

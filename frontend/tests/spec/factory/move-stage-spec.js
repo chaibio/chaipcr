@@ -3,7 +3,7 @@ describe("Testing move-stage", function() {
     beforeEach(module('ChaiBioTech'));
     beforeEach(module('canvasApp'));
     
-    var _moveStageRect, indicator, stage = {}, C, movement = {};
+    var _moveStageRect, indicator, stage = {}, C, movement = {}, _StagePositionService;
     C = {
         canvas: {
             bringToFront: function() {},
@@ -17,9 +17,11 @@ describe("Testing move-stage", function() {
     movement = {
         left: 100
     };
-    beforeEach(inject(function(moveStageRect) {
+
+    beforeEach(inject(function(moveStageRect, StagePositionService) {
         var me = {};
         indicator = moveStageRect.getMoveStageRect(me);
+        _StagePositionService = StagePositionService;
     }));
 
     it("It should check if indicator exists", function() {
@@ -52,17 +54,34 @@ describe("Testing move-stage", function() {
         spyOn(indicator, "setLeft");
         spyOn(indicator, "setVisible");
         spyOn(indicator, "setCoords");
-        //spyOn(indicator.verticalLine, "setLeft").and.callFake(function() {
+        
+        indicator.verticalLine = {
+            setVisible: function() {},
+            setLeft: function() {},
+            setCoords: function() {}
+        };
 
-        //});
-        //spyOn(indicator.kanvas.canvas, "bringToFront");
+        spyOn(indicator.verticalLine, "setLeft");
+        spyOn(indicator.verticalLine, "setVisible");
+        spyOn(indicator.verticalLine, "setCoords");
+        
+        spyOn(_StagePositionService, "getPositionObject");
         indicator.init(stage, C, movement);
+
         expect(indicator.setCoords).toHaveBeenCalled();
         expect(indicator.setLeft).toHaveBeenCalled();
         expect(indicator.setVisible).toHaveBeenCalled();
-        //console.log("stager", stage);
-        //expect(indicator.verticalLine.setLeft).toHaveBeenCalled();
+        
+        expect(indicator.verticalLine.setLeft).toHaveBeenCalled();
+        expect(indicator.verticalLine.setVisible).toHaveBeenCalled();
+        expect(indicator.verticalLine.setCoords).toHaveBeenCalled();
+        expect(_StagePositionService.getPositionObject).toHaveBeenCalled();
 
     });
     
+    it("It should check init when a passed stage has previousStage", function() {
+        stage.previousStage = "previousStage";
+        indicator.init(stage, C, movement);
+        expect(indicator.currentDrop).toEqual("previousStage");
+    });
 });
