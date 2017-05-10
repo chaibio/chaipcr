@@ -30,9 +30,8 @@
     })
 
     it('should reset on window.resize', function() {
-      // spyOn(this.WindowWrapper, 'height').and.returnValue(2000)
       windowHeight = 2000
-      angular.element(this.$window).triggerHandler('resize')
+      this.$rootScope.$broadcast('window:resize')
       this.scope.$digest()
       expect(this.directive.css('minHeight').replace('px', '') * 1).toBe(2000 - this.offset)
     })
