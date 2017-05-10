@@ -1,7 +1,7 @@
-function _file_path_prepend (paths) {
+function _file_path_prepend(paths) {
   new_paths = [];
 
-  paths.forEach(function (item) {
+  paths.forEach(function(item) {
     new_paths.push(__dirname + '/frontend/' + item);
   });
 
@@ -67,8 +67,13 @@ JS_APP_FILES = _file_path_prepend([
 
 TEST_FILES = _file_path_prepend([
   'tests/mocks/**/*',
+  'tests/helpers/**/*',
   'tests/spec/**/*',
 ]);
 
+IMG_FILES = [
+  { pattern: 'frontend/images/**/*', watched: false, included: false, served: true, nocache: false }
+]
 
-module.exports = JS_VENDOR_FILES.concat(JS_APP_FILES).concat(TEST_FILES);
+
+module.exports = JS_VENDOR_FILES.concat(JS_APP_FILES).concat(TEST_FILES).concat(IMG_FILES);

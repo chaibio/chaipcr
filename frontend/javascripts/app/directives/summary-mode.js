@@ -30,7 +30,7 @@ window.ChaiBioTech.ngApp.directive('summaryMode', [
 
         scope.$watch('summaryMode', function(summary) {
 
-          if(! summary) {
+          if (!summary) {
             $(".data-box-container-summary-scroll").animate({
               left: "0"
             }, 500);
@@ -46,12 +46,17 @@ window.ChaiBioTech.ngApp.directive('summaryMode', [
                 scope.protocol.protocol.estimate_duration = estimateTime;
               });
 
+            var width = $(".bottom-half .middle-ground").width();
+            var dataBox = $(".bottom-half .data-boxes").eq(1);
+            var dataBoxesWidth = (dataBox.css('left').replace('px', '') * 1);
+            console.log(dataBoxesWidth);
+
             $(".data-box-container-summary-scroll").animate({
-              left: "-=645"
+              left: ("-=" + dataBoxesWidth)
             }, 500);
 
             $(".first-data-row").animate({
-              left: "-=900"
+              left: ("-=" + width)
             }, 500);
 
           }

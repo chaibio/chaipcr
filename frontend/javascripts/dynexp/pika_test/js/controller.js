@@ -1,23 +1,23 @@
 (function() {
   angular.module('dynexp.pika_test')
-    .controller('PikaTestCtrl', [
-      '$scope',
-      '$window',
-      'dynexpExperimentService',
-      '$state',
-      '$stateParams',
-      'Status',
-      'dynexpGlobalService',
-      'host',
-      '$http',
-      'PikaTestConstants',
-      'dynexpDeviceInfo',
-      '$timeout',
-      '$rootScope',
-      '$uibModal',
-      'focus',
-      function PikaTestCtrl($scope, $window, Experiment, $state, $stateParams, Status, GlobalService,
-        host, $http, CONSTANTS, DeviceInfo, $timeout, $rootScope, $uibModal, focus) {
+  .controller('PikaTestCtrl', [
+    '$scope',
+    '$window',
+    'dynexpExperimentService',
+    '$state',
+    '$stateParams',
+    'Status',
+    'dynexpGlobalService',
+    'host',
+    '$http',
+    'PikaTestConstants',
+    'dynexpDeviceInfo',
+    '$timeout',
+    '$rootScope',
+    '$uibModal',
+    'focus',
+    function PikaTestCtrl($scope, $window, Experiment, $state, $stateParams, Status, GlobalService,
+      host, $http, CONSTANTS, DeviceInfo, $timeout, $rootScope, $uibModal, focus) {
 
         $window.$('body').addClass('pika-test-active');
 
@@ -74,7 +74,7 @@
               }
 
               var j = 0,
-                k, i;
+              k, i;
               for (i = 2; i < 8; i++) {
                 $scope.samples[j] = resp.data[i].well.sample_name;
                 j++;
@@ -243,136 +243,175 @@
 
         function getAmountArray() {
           for (var i = 2; i < 8; i++) {
-            if ($scope.result[i] == "Inhibited") {
-              $scope.amount[i] = "Invalid";
-            } else if ($scope.result[i] == "Unknown") {
-              $scope.amount[i] = "Repeat";
-            } else if ($scope.famCq[i] >= 10 && $scope.famCq[i] <= 24) {
-              $scope.amount[i] = "High";
-            } else if ($scope.famCq[i] > 24 && $scope.famCq[i] <= 30) {
-              $scope.amount[i] = "Medium";
-            } else if ($scope.famCq[i] > 30 && $scope.famCq[i] <= 38) {
-              $scope.amount[i] = "Low";
-            } else {
-              $scope.amount[i] = "Not Detectable";
+            if($scope.result[1] == "Invalid"){
+              $scope.amount[1] = "Repeat";
+              $scope.amount[i] = "Repeat PCR";
+            }
+            else{
+              if ($scope.result[0] == "Invalid"){
+                if (($scope.famCq[i] > 38 || !$scope.famCq[i]) && ($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 36)){
+                  $scope.amount[i] = "Repeat PCR";
+                }
+              } else if (($scope.famCq[i] >= 10 && $scope.famCq[i] <= 24) && (($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 40) || !$scope.hexCq[i])) {
+                $scope.amount[i] = "High";
+              }else if (($scope.famCq[i] > 24 && $scope.famCq[i] <= 30) && (($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 40) || !$scope.hexCq[i])) {
+                $scope.amount[i] = "Medium";
+              }else if (($scope.famCq[i] > 30 && $scope.famCq[i] <= 38) && (($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 40) || !$scope.hexCq[i])) {
+                $scope.amount[i] = "Low";
+              }else if ((($scope.famCq[i] > 38 && $scope.famCq[i] <= 40) || !$scope.famCq[i]) && ($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 36)) {
+                $scope.amount[i] = "Not Detectable";
+              }else if (($scope.famCq[i] >= 0 && $scope.famCq[i] < 10) && (($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 40) || !$scope.hexCq[i])) {
+                $scope.amount[i] = "Repeat PCR - Dilute DNA 1:1000";
+              }else if ($scope.result[i] == "Inhibited" || $scope.result[i] == "Invalid") {
+                $scope.amount[i] = "Repeat DNA Extraction";
+              }
             }
           }
           if (!$scope.twoKits) {
             for (i = 8; i < 16; i++) {
-              if ($scope.result[i] == "Inhibited") {
-                $scope.amount[i] = "Invalid";
-              } else if ($scope.result[i] == "Unknown") {
-                $scope.amount[i] = "Repeat";
-              } else if ($scope.famCq[i] >= 10 && $scope.famCq[i] <= 24) {
-                $scope.amount[i] = "High";
-              } else if ($scope.famCq[i] > 24 && $scope.famCq[i] <= 30) {
-                $scope.amount[i] = "Medium";
-              } else if ($scope.famCq[i] > 30 && $scope.famCq[i] <= 38) {
-                $scope.amount[i] = "Low";
-              } else {
-                $scope.amount[i] = "Not Detectable";
+              if($scope.result[1] == "Invalid"){
+                $scope.amount[1] = "Repeat";
+                $scope.amount[i] = "Repeat PCR";
+              }
+              else{
+                if ($scope.result[0] == "Invalid"){
+                  if (($scope.famCq[i] > 38 || !$scope.famCq[i]) && ($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 36)){
+                    $scope.amount[i] = "Repeat PCR";
+                  }
+                } else if (($scope.famCq[i] >= 10 && $scope.famCq[i] <= 24) && (($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 40) || !$scope.hexCq[i])) {
+                  $scope.amount[i] = "High";
+                }else if (($scope.famCq[i] > 24 && $scope.famCq[i] <= 30) && (($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 40) || !$scope.hexCq[i])) {
+                  $scope.amount[i] = "Medium";
+                }else if (($scope.famCq[i] > 30 && $scope.famCq[i] <= 38) && (($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 40) || !$scope.hexCq[i])) {
+                  $scope.amount[i] = "Low";
+                }else if ((($scope.famCq[i] > 38 && $scope.famCq[i] <= 40) || !$scope.famCq[i]) && ($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 36)) {
+                  $scope.amount[i] = "Not Detectable";
+                }else if (($scope.famCq[i] >= 0 && $scope.famCq[i] < 10) && (($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 40) || !$scope.hexCq[i])) {
+                  $scope.amount[i] = "Repeat PCR - Dilute DNA 1:1000";
+                }else if ($scope.result[i] == "Inhibited" || $scope.result[i] == "Invalid") {
+                  $scope.amount[i] = "Repeat DNA Extraction";
+                }
               }
             }
           } else {
             $scope.amount[8] = "\u2014";
             $scope.amount[9] = "\u2014";
             for (i = 10; i < 16; i++) {
-              if ($scope.result[i] == "Inhibited") {
-                $scope.amount[i] = "Invalid";
-              } else if ($scope.result[i] == "Unknown") {
-                $scope.amount[i] = "Repeat";
-              } else if ($scope.famCq[i] >= 10 && $scope.famCq[i] <= 24) {
-                $scope.amount[i] = "High";
-              } else if ($scope.famCq[i] > 24 && $scope.famCq[i] <= 30) {
-                $scope.amount[i] = "Medium";
-              } else if ($scope.famCq[i] > 30 && $scope.famCq[i] <= 38) {
-                $scope.amount[i] = "Low";
-              } else {
-                $scope.amount[i] = "Not Detectable";
+              if($scope.result[9] == "Invalid"){
+                $scope.amount[9] = "Repeat";
+                $scope.amount[i] = "Repeat PCR";
+              }
+              else{
+                if ($scope.result[8] == "Invalid"){
+                  if (($scope.famCq[i] > 38 || !$scope.famCq[i]) && ($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 36)){
+                    $scope.amount[i] = "Repeat PCR";
+                  }
+                } else if (($scope.famCq[i] >= 10 && $scope.famCq[i] <= 24) && (($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 40) || !$scope.hexCq[i])) {
+                  $scope.amount[i] = "High";
+                }else if (($scope.famCq[i] > 24 && $scope.famCq[i] <= 30) && (($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 40) || !$scope.hexCq[i])) {
+                  $scope.amount[i] = "Medium";
+                }else if (($scope.famCq[i] > 30 && $scope.famCq[i] <= 38) && (($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 40) || !$scope.hexCq[i])) {
+                  $scope.amount[i] = "Low";
+                }else if ((($scope.famCq[i] > 38 && $scope.famCq[i] <= 40) || !$scope.famCq[i]) && ($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 36)) {
+                  $scope.amount[i] = "Not Detectable";
+                }else if (($scope.famCq[i] >= 0 && $scope.famCq[i] < 10) && (($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 40) || !$scope.hexCq[i])) {
+                  $scope.amount[i] = "Repeat PCR - Dilute DNA 1:1000";
+                }else if ($scope.result[i] == "Inhibited" || $scope.result[i] == "Invalid") {
+                  $scope.amount[i] = "Repeat DNA Extraction";
+                }
               }
             }
           }
         }
 
         function getResultArray() {
-          if ($scope.famCq[0] > 0 && $scope.famCq[0] < 38) {
+          if ($scope.famCq[0] >= 20 && $scope.famCq[0] <= 34) {
             $scope.result[0] = "Valid";
           } else {
             $scope.result[0] = "Invalid";
           }
-          if (($scope.famCq[1] === 0 || $scope.famCq[1] > 39 || !$scope.famCq[1]) && ($scope.hexCq[1] >= 25 && $scope.hexCq[1] <= 36)) {
+          if ((($scope.famCq[1] > 38 && $scope.famCq[1] <= 40) || !$scope.famCq[1]) && ($scope.hexCq[1] >= 20 && $scope.hexCq[1] <= 36)) {
             $scope.result[1] = "Valid";
           } else {
             $scope.result[1] = "Invalid";
           }
 
           for (var i = 2; i < 8; i++) {
-            if ($scope.famCq[i] >= 10 && $scope.famCq[i] <= 38) {
-              if ($scope.result[1] == "Invalid") {
-                $scope.result[i] = "Unknown";
-              } else {
-                $scope.result[i] = "Positive";
-              }
-            } else if (($scope.famCq[i] > 38 || !$scope.famCq[i]) && ($scope.hexCq[i] > 0 && $scope.hexCq[i] <= 36)) {
-              if ($scope.result[0] == "Invalid") {
-                $scope.result[i] = "Unknown";
-              } else {
-                $scope.result[i] = "Negative";
-              }
-            } else if (($scope.famCq[i] > 38 || $scope.famCq[i] < 10) && ($scope.hexCq[i] > 36 || !$scope.hexCq[i])) {
-              $scope.result[i] = "Inhibited";
-            } else if ($scope.famCq[i] < 10) {
-              $scope.result[i] = "Inhibited";
+            if($scope.result[1] == "Invalid"){
+              $scope.result[i] = "Unknown";
             }
-          }
-          if (!$scope.twoKits) {
-            for (i = 8; i < 16; i++) {
-              if ($scope.famCq[i] >= 10 && $scope.famCq[i] <= 38) {
-                if ($scope.result[1] == "Invalid") {
-                  $scope.result[i] = "Unknown";
-                } else {
-                  $scope.result[i] = "Positive";
-                }
-              } else if (($scope.famCq[i] > 38 || !$scope.famCq[i]) && ($scope.hexCq[i] > 0 && $scope.hexCq[i] <= 36)) {
+            else{
+              if (($scope.famCq[i] >= 10 && $scope.famCq[i] <= 38) && (($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 40) || !$scope.hexCq[i])) {
+                $scope.result[i] = "Positive";
+              }else if (($scope.famCq[i] > 38 || !$scope.famCq[i]) && ($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 36)) {
                 if ($scope.result[0] == "Invalid") {
                   $scope.result[i] = "Unknown";
                 } else {
                   $scope.result[i] = "Negative";
                 }
-              } else if (($scope.famCq[i] > 38 || $scope.famCq[i] < 10) && ($scope.hexCq[i] > 36 || !$scope.hexCq[i])) {
+              }else if (($scope.hexCq[i] >= 0 && $scope.hexCq[i] < 20) ) {
+                $scope.result[i] = "Invalid";
+              }else if (($scope.famCq[i] > 38 || !$scope.famCq[i]) && ($scope.hexCq[i] > 36 || !$scope.hexCq[i])) {
                 $scope.result[i] = "Inhibited";
-              } else if ($scope.famCq[i] < 10) {
-                $scope.result[i] = "Inhibited";
+              }else if (($scope.famCq[i] >= 0 && $scope.famCq[i] < 10) && (!$scop.hexCq[i] || $scop.hexCq >= 20)) {
+                $scope.result[i] = "Unknown";
+              }
+            }
+          }
+          if (!$scope.twoKits) {
+            for (i = 8; i < 16; i++) {
+              if($scope.result[1] == "Invalid"){
+                $scope.result[i] = "Unknown";
+              }
+              else{
+                if (($scope.famCq[i] >= 10 && $scope.famCq[i] <= 38) && (($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 40) || !$scope.hexCq[i])) {
+                  $scope.result[i] = "Positive";
+                }else if (($scope.famCq[i] > 38 || !$scope.famCq[i]) && ($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 36)) {
+                  if ($scope.result[0] == "Invalid") {
+                    $scope.result[i] = "Unknown";
+                  } else {
+                    $scope.result[i] = "Negative";
+                  }
+                }else if (($scope.hexCq[i] >= 0 && $scope.hexCq[i] < 20) ) {
+                  $scope.result[i] = "Invalid";
+                }else if (($scope.famCq[i] > 38 || !$scope.famCq[i]) && ($scope.hexCq[i] > 36 || !$scope.hexCq[i])) {
+                  $scope.result[i] = "Inhibited";
+                }else if (($scope.famCq[i] >= 0 && $scope.famCq[i] < 10) && (!$scop.hexCq[i] || $scop.hexCq >= 20)) {
+                  $scope.result[i] = "Unknown";
+                }
               }
             }
           } else {
-            if ($scope.famCq[8] > 0 && $scope.famCq[8] < 38) {
+            if ($scope.famCq[8] >= 20 && $scope.famCq[8] <= 34) {
               $scope.result[8] = "Valid";
             } else {
               $scope.result[8] = "Invalid";
             }
-            if (($scope.famCq[9] === 0 || $scope.famCq[9] > 39 || !$scope.famCq[9]) && ($scope.hexCq[9] >= 25 && $scope.hexCq[9] <= 36)) {
+            if ((($scope.famCq[9] > 38 && $scope.famCq[9] <= 40) || !$scope.famCq[9]) && ($scope.hexCq[9] >= 20 && $scope.hexCq[9] <= 36)) {
               $scope.result[9] = "Valid";
             } else {
               $scope.result[9] = "Invalid";
             }
             for (i = 10; i < 16; i++) {
-              if ($scope.famCq[i] >= 10 && $scope.famCq[i] <= 38) {
-                if ($scope.result[9] == "Invalid") {
-                  $scope.result[i] = "Unknown";
-                } else {
+              if($scope.result[9] == "Invalid"){
+                $scope.result[i] = "Unknown";
+              }
+              else{
+                if (($scope.famCq[i] >= 10 && $scope.famCq[i] <= 38) && (($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 40) || !$scope.hexCq[i])) {
                   $scope.result[i] = "Positive";
-                }
-              } else if (($scope.famCq[i] > 38 || !$scope.famCq[i]) && ($scope.hexCq[i] > 0 && $scope.hexCq[i] <= 36)) {
-                if ($scope.result[8] == "Invalid") {
+                }else if (($scope.famCq[i] > 38 || !$scope.famCq[i]) && ($scope.hexCq[i] >= 20 && $scope.hexCq[i] <= 36)) {
+                  if ($scope.result[8] == "Invalid") {
+                    $scope.result[i] = "Unknown";
+                  } else {
+                    $scope.result[i] = "Negative";
+                  }
+                }else if (!$scope.famCq[i] && ($scope.hexCq[i] >= 0 && $scope.hexCq[i] < 20) ) {
+                  $scope.result[i] = "Invalid";
+                }else if (($scope.famCq[i] > 38 || !$scope.famCq[i]) && ($scope.hexCq[i] > 36 || !$scope.hexCq[i])) {
+                  $scope.result[i] = "Inhibited";
+                }else if (($scope.famCq[i] >= 0 && $scope.famCq[i] < 10) && (!$scop.hexCq[i] || $scop.hexCq >= 20)) {
                   $scope.result[i] = "Unknown";
-                } else {
-                  $scope.result[i] = "Negative";
                 }
-              } else if (($scope.famCq[i] > 38 || $scope.famCq[i] < 10) && ($scope.hexCq[i] > 36 || !$scope.hexCq[i])) {
-                $scope.result[i] = "Inhibited";
-              } else if ($scope.famCq[i] < 10) {
-                $scope.result[i] = "Inhibited";
               }
             }
           }
@@ -399,21 +438,33 @@
                 getResultArray();
               } else if (resp.data.partial || resp.status == 202) {
                 $timeout($scope.getResults, 1000);
+            if (resp.status == 200 && !resp.data.partial) {
+              $scope.analyzing = false;
+              $scope.cq = resp.data.steps[0].cq;
+              //$scope.cq = [["channel","well_num","cq"],[1,1,"20.76"],[1,2,42.13],[1,3,40.89],[1,4,9.47],[1,5,20],[1,6,"26.33"],[1,7,"33.89"],[1,8,"5"],[1,9,"34.5"],[1,10,"19"],[1,11,"12"],[1,12,"6"],[1,13,"24"],[1,14,"39"],[1,15,"32"],[1,16,"18"],[2,1,"11"],[2,2,"25.15"],[2,3,36],[2,4,"8"],[2,5,"34"],[2,6,"10"],[2,7,"15"],[2,8,"25"],[2,9,"35"],[2,10,"28"],[2,11,"2"],[2,12,"7"],[2,13,"0"],[2,14,"35"],[2,15,"28"],[2,16,"17"]];
+              for (i = 1; i < 17; i++) {
+                $scope.famCq[i - 1] = parseFloat($scope.cq[i][2]);
               }
-
-            })
-            .catch(function(resp) {
-              console.log(resp);
-              if (resp.status == 500) {
-                $scope.custom_error = resp.data.errors || "An error occured while trying to analyze the experiment results.";
-                $scope.analyzing = false;
-                $state.go('pika_test.results', { id: $scope.experiment.id });
-                fromHome = true;
-                enterState = true;
-              } else if (resp.status == 503) {
-                $timeout($scope.getResults, 1000);
+              for (i = 17; i < 33; i++) {
+                $scope.hexCq[i - 17] = parseFloat($scope.cq[i][2]);
               }
-            });
+              getResultArray();
+            } else if (resp.data.partial || resp.status == 202) {
+              $timeout($scope.getResults, 1000);
+            }
+          })
+          .catch(function(resp) {
+            console.log(resp);
+            if (resp.status == 500) {
+              $scope.custom_error = resp.data.errors || "An error occured while trying to analyze the experiment results.";
+              $scope.analyzing = false;
+              $state.go('pika_test.results', { id: $scope.experiment.id });
+              fromHome = true;
+              enterState = true;
+            } else if (resp.status == 503) {
+              $timeout($scope.getResults, 1000);
+            }
+          });
           /*  for (var i = 1; i < 17; i++) {
           $scope.famCq[i-1] = parseFloat($scope.cq[i][2]);
         }
@@ -423,15 +474,34 @@
 
       getResultArray(); */
 
-        };
+    };
 
-        function getExperiment(exp_id, cb) {
-          Experiment.get(exp_id).then(function(resp) {
-            $scope.experiment = resp.data.experiment;
-            if (cb) cb(resp.data.experiment);
-          });
-        }
+    function getExperiment(exp_id, cb) {
+      Experiment.get(exp_id).then(function(resp) {
+        $scope.experiment = resp.data.experiment;
+        if (cb) cb(resp.data.experiment);
+      });
+    }
 
+
+    $scope.$watch(function() {
+      return Status.getData();
+    }, function(data, oldData) {
+      if (!data) return;
+      if (!data.experiment_controller) return;
+      if (!oldData) return;
+      if (!oldData.experiment_controller) return;
+
+      $scope.data = data;
+      $scope.state = data.experiment_controller.machine.state;
+      $scope.old_state = oldData.experiment_controller.machine.state;
+      $scope.timeRemaining = GlobalService.timeRemaining(data);
+      $scope.stateName = $state.current.name;
+
+      if ($scope.state === 'idle' && $scope.old_state !== 'idle') {
+        // exp complete
+        checkExperimentStatus();
+      }
 
 
 
@@ -441,30 +511,38 @@
           if (!oldData) return;
           if (!oldData.experiment_controller) return;
 
-          $scope.data = data;
-          $scope.state = data.experiment_controller.machine.state;
-          $scope.old_state = oldData.experiment_controller.machine.state;
-          $scope.timeRemaining = GlobalService.timeRemaining(data);
-          $scope.stateName = $state.current.name;
+      if ($state.current.name === 'pika_test.exp-running') {
+        $scope.hideAbondon = true;
+        $scope.setProgress(160);
+      }
+
+      if ($scope.state === 'idle' && $scope.old_state === 'idle' && $state.current.name === 'pika_test.exp-running') {
+        getExperiment($scope.experimentId);
+        if ($scope.experiment.completion_status && $scope.experiment.completion_status !== 'success') {
+          $state.go('pika_test.results', { id: $scope.experiment.id });
+          //fromHome = true;
+          enterState = true;
+          $scope.analyzing = false;
+        }
+      }
 
           if ($scope.state === 'idle' && $scope.old_state !== 'idle') {
             console.log($scope.state);
             $scope.checkExperimentStatus();
           }
 
-          if ($state.current.name === 'pika_test.exp-running') {
-            $scope.hideAbondon = true;
-            $scope.setProgress(160);
-          }
+      // if ($state.current.name === 'analyze') Status.stopSync();
 
-          if ($scope.state === 'idle' && $scope.old_state === 'idle' && $state.current.name === 'pika_test.exp-running') {
-            getExperiment($scope.experimentId);
-            if ($scope.experiment.completion_status && $scope.experiment.completion_status !== 'success') {
-              $state.go('pika_test.results', { id: $scope.experiment.id });
-              //fromHome = true;
-              enterState = true;
-              $scope.analyzing = false;
-            }
+
+    }, true);
+
+    function checkExperimentStatus() {
+      Experiment.get($scope.experiment.id).then(function(resp) {
+        $scope.experiment = resp.data.experiment;
+        if ($scope.experiment.completed_at) {
+          if ($scope.experiment.completion_status === 'success') {
+            fromHome = false;
+            $scope.goToResults();
           }
           // if ($state.current.name === 'analyze') Status.stopSync();
 
@@ -483,9 +561,37 @@
             }
           });
         };
+        } else {
+          $timeout(checkExperimentStatus, 1000);
+        }
+      });
+    }
 
 
-        $scope.checkMachineStatus = function() {
+    $scope.checkMachineStatus = function() {
+
+      DeviceInfo.getInfo($scope.check).then(function(deviceStatus) {
+        // Incase connected
+        if ($scope.modal) {
+          $scope.modal.close();
+          $scope.modal = null;
+        }
+
+        if (deviceStatus.data.optics.lid_open === "true" || deviceStatus.data.lid.open === true) { // lid is open
+          $scope.error = true;
+          $scope.lidMessage = "Close lid to begin.";
+        } else if ((deviceStatus.data.experiment_controller.id !== $scope.experimentId) && (deviceStatus.data.experiment_controller.machine.state !== "idle")) {
+          $scope.error = true;
+          $scope.lidMessage = "Another experiment in Progress.";
+        } else {
+          $scope.error = false;
+        }
+      }, function(err) {
+        // Error
+        $scope.error = true;
+        $scope.lidMessage = "Cant connect to machine.";
+
+        if (err.status === 500) {
 
           console.log('calling checkMachineStatus')
 
@@ -496,52 +602,35 @@
               $scope.modal.close();
               $scope.modal = null;
             }
+          if (!$scope.modal) {
+            var scope = $rootScope.$new();
+            scope.message = {
+              title: "Cant connect to machine.",
+              body: err.data.errors || "Error"
+            };
 
-            if (deviceStatus.data.optics.lid_open === "true" || deviceStatus.data.lid.open === true) { // lid is open
-              $scope.error = true;
-              $scope.lidMessage = "Close lid to begin.";
-            } else if ((deviceStatus.data.experiment_controller.id !== $scope.experimentId) && (deviceStatus.data.experiment_controller.machine.state !== "idle")) {
-              $scope.error = true;
-              $scope.lidMessage = "Another experiment in Progress.";
-            } else {
-              $scope.error = false;
-            }
-          }, function(err) {
-            // Error
-            $scope.error = true;
-            $scope.lidMessage = "Cant connect to machine.";
+            $scope.modal = $uibModal.open({
+              templateUrl: 'dynexp/pika_test/views/modal-error.html',
+              scope: scope
+            });
+          }
+        }
+      });
 
-            if (err.status === 500) {
+      $scope.timeout = $timeout($scope.checkMachineStatus, 1000);
+    };
 
-              if (!$scope.modal) {
-                var scope = $rootScope.$new();
-                scope.message = {
-                  title: "Cant connect to machine.",
-                  body: err.data.errors || "Error"
-                };
+    $scope.checkMachineStatus();
 
-                $scope.modal = $uibModal.open({
-                  templateUrl: 'dynexp/pika_test/views/modal-error.html',
-                  scope: scope
-                });
-              }
-            }
-          });
-
-          $scope.timeout = $timeout($scope.checkMachineStatus, 1000);
-        };
-
-        $scope.checkMachineStatus();
-
-        $scope.cancelExperiment = function() {
-          Experiment.stopExperiment($scope.experimentId).then(function() {
-            $state.go('home');
-            // var redirect = '/#/';
-            // $window.location = redirect;
-          });
-        };
+    $scope.cancelExperiment = function() {
+      Experiment.stopExperiment($scope.experimentId).then(function() {
+        $state.go('home');
+        // var redirect = '/#/';
+        // $window.location = redirect;
+      });
+    };
 
 
-      }
-    ]);
+  }
+]);
 })();

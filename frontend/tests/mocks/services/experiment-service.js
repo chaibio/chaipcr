@@ -14,13 +14,15 @@ var experimentsMock = [{
 
 function ExperimentServiceMock() {
   this.$remove = function(fn) {
-    fn()
+    if (fn) fn()
   }
 }
+
 ExperimentServiceMock.query = function(fn) {
   fn(experimentsMock)
 }
 
+<<<<<<< HEAD
 ExperimentServiceMock.get = function(id) {
   return {
     then: function(fn) {
@@ -8275,3 +8277,6 @@ ExperimentServiceMock.getFluorescenceData = function(id) {
     }
   }
 }
+=======
+ExperimentServiceMock.delete = function() {}
+>>>>>>> master

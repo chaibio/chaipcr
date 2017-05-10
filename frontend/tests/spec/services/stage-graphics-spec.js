@@ -59,7 +59,7 @@ describe("Testing stage graphics, Which creates all the graphics for the stage",
       }
     };
     var sg = _stageGraphics.writeMyName.call(me);
-    expect(sg.stageNameGroup).toEqual(jasmine.any(Object));
+    expect(me.stageNameGroup).toEqual(jasmine.any(Object));
   });
 
   it("This should check createStageHitPoints method", function() {
@@ -73,9 +73,6 @@ describe("Testing stage graphics, Which creates all the graphics for the stage",
     };
 
     sg = _stageGraphics.createStageHitPoints.call(me);
-
-    expect(sg.stageHitPointLeft).toEqual(jasmine.any(Object));
-    expect(sg.stageHitPointRight).toEqual(jasmine.any(Object));
     expect(sg.stageHitPointLowerLeft).toEqual(jasmine.any(Object));
     expect(sg.stageHitPointLowerRight).toEqual(jasmine.any(Object));
   });
@@ -167,6 +164,6 @@ describe("Testing stage graphics, Which creates all the graphics for the stage",
     //spyOn(me.canvas, "bringToFront");
     _stageGraphics.createStageHitPoints.call(me);
     _stageGraphics.recalculateStageHitPoint.call(me);
-    expect(me.stageHitPointLeft.left).toEqual(20);
+    expect(me.stageHitPointLowerLeft.left).toEqual(me.left + 10);
   });
 });

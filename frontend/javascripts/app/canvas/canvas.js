@@ -35,8 +35,10 @@ angular.module("canvasApp").factory('canvas', [
   'interceptorFactory',
   'stageHitBlock',
   'stageGraphics',
+  'StagePositionService',
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
-    moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageHitBlock, stageGraphics) {
+    moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageHitBlock, stageGraphics, 
+    StagePositionService) {
 
     this.init = function(model) {
 
@@ -122,7 +124,7 @@ angular.module("canvasApp").factory('canvas', [
         stageView.render();
         return stageView;
       }, this);
-
+      StagePositionService.init(this.allStageViews);
       console.log("Stages added ... !");
       return this;
 
@@ -144,7 +146,6 @@ angular.module("canvasApp").factory('canvas', [
         this.stepIndicator = moveStepRect.getMoveStepRect(this);
         this.stageIndicator = moveStageRect.getMoveStageRect(this);
         this.stageVerticalLine = this.stageIndicator.verticalLine;
-        this.beacon = this.stageIndicator.beacon;
         this.stepBeacon = this.stepIndicator.beacon;
         this.stepBrick = this.stepIndicator.brick;
         this.hitBlock = stageHitBlock.getStageHitBlock(this);
@@ -153,7 +154,6 @@ angular.module("canvasApp").factory('canvas', [
         this.canvas.add(this.stageIndicator);
         this.canvas.add(this.stageVerticalLine);
 
-        this.canvas.add(this.beacon);
         this.canvas.add(this.stepBeacon);
         this.canvas.add(this.stepBrick);
         this.canvas.add(this.hitBlock);
@@ -197,7 +197,8 @@ angular.module("canvasApp").factory('canvas', [
     };
 
     this.editStageMode = function(status) {
-
+      //StagePositionService.getPositionObject(this.allStageViews);
+      //console.log(StagePositionService.allPositions);
       var add = (status) ? 25 : -25;
 
       if(status === true) {

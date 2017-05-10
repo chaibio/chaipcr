@@ -176,7 +176,7 @@ class ChaiNoiseTest(ChaiTest):
                 super(ChaiNoiseTest, self).fan(True)
 
                 if self.lid_temp_C:
-                    self.device.test_control('lid_target_temp', lid_temp_C)
+                    self.device.test_control('lid_target_temp', self.lid_temp_C)
                 
                 if self.verbosity > 0:
                     print('Setting block temperature to %.2f degC'%temperature)
