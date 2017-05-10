@@ -91,7 +91,7 @@
 
     .canvas-containing {
       height: 400px;
-      width: 1024px;
+      width: 100%;
       overflow-x: hidden;
       overflow-y: hidden;
       position: relative;
@@ -116,7 +116,7 @@
   // ===========================================================//
   .bottom-half {
     // width: 1024px;
-    height: 320px;
+    height: 290px;
     background-color: white;
     position: relative;
 
@@ -557,8 +557,8 @@
   width: 100%;
   height: 40px;
   background-color: #323232;
-  position: absolute;
-  top: 280px;
+  // position: absolute;
+  // top: 280px;
 }
 
 .lol-pop {
