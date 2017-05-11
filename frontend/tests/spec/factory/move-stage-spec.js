@@ -7,11 +7,24 @@ describe("Testing move-stage", function() {
     C = {
         canvas: {
             bringToFront: function() {},
+            allStageViews: [
+                {
+                    childSteps: [
+                        {
+                            step: "first"
+                        }
+                    ]
+                }
+
+            ]
         }
     };
 
     stage = {
-        left: 150
+        left: 150,
+        moveToSide: function() {
+
+        }
     };
 
     movement = {
@@ -84,4 +97,90 @@ describe("Testing move-stage", function() {
         indicator.init(stage, C, movement);
         expect(indicator.currentDrop).toEqual("previousStage");
     });
+
+    it("It should check changeText method", function() {
+        indicator.init(stage, C, movement);
+        stage.stageCaption = {
+            text: "stageCaption"
+        };
+        stage.model = {
+            stage_type: "Holding"
+        };
+
+        indicator.changeText(stage);
+
+        expect(indicator.stageName.text).toEqual("stageCaption");
+        expect(indicator.stageType.text).toEqual("HOLDING");
+
+    });
+
+    it("It should check getDirection method, when we move right", function() {
+        indicator.init(stage, C, movement);
+        movement.left = 110;
+        indicator.getDirection();
+        expect(indicator.direction).toEqual("right");
+
+    });
+
+    it("It should check getDirection method, when we move left", function() {
+        indicator.init(stage, C, movement);
+        movement.left = 90;
+        indicator.getDirection();
+        expect(indicator.direction).toEqual("left");
+
+    });
+
+    it("It should test ifOverRightSideForOneStepStage method, this is invoked when we user drag stage over a single step stage", function() {
+        movement = {
+            left: 250,
+        };
+        indicator.init(stage, C, movement);
+        _StagePositionService.allPositions = [
+            [33, 162, 291]
+        ];
+
+        indicator.kanvas.allStageViews = [
+                {
+                    moveToSide: function() {},
+                    childSteps: [
+                        {
+                            step: "first"
+                        }
+                    ]
+
+                },
+            ];
+        
+        indicator.ifOverRightSideForOneStepStage();
+        expect(indicator.movedStageIndex).toEqual(0);
+    });
+
+    it("It should test ifOverRightSideForOneStepStageCallback", function() {
+    
+        movement = {
+            left: 250,
+        };
+        indicator.init(stage, C, movement);
+        spyOn(_StagePositionService, "getPositionObject");
+
+        indicator.kanvas.allStageViews = [
+                {
+                    moveToSide: function() {},
+                    childSteps: [
+                        {
+                            step: "first"
+                        }
+                    ]
+
+                },
+            ];
+        spyOn(indicator.kanvas.allStageViews[0], "moveToSide");
+        indicator.ifOverRightSideForOneStepStageCallback([33, 162, 291], 0);
+        //expect(indicator.movedStageIndex).toEqual(0);
+        expect(_StagePositionService.getPositionObject).toHaveBeenCalled();
+        expect(indicator.kanvas.allStageViews[0].moveToSide).toHaveBeenCalled();
+        expect(indicator.currentMoveRight).toEqual(0);
+    });
+
 });
+

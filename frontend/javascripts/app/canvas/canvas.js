@@ -41,7 +41,7 @@ angular.module("canvasApp").factory('canvas', [
     StagePositionService) {
 
     this.init = function(model) {
-
+      
       this.model = model.protocol;
       this.$scope = model;
       this.allStepViews = [];
