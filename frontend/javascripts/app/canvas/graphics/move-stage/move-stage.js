@@ -120,7 +120,9 @@ angular.module("canvasApp").factory('moveStageRect', [
           };
 
           this.indicator.ifOverLeftSideForOneStepStageCallback = function(point, index) {
+            
             if(this.kanvas.allStageViews[index].childSteps.length === 1) {
+              
               if((this.movement.left + this.rightOffset) > point[0] && (this.movement.left + this.rightOffset) < point[1]) {
                 
                 if(index !== this.currentMoveLeft) {

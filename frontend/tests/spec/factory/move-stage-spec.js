@@ -150,9 +150,9 @@ describe("Testing move-stage", function() {
 
                 },
             ];
-        
+        spyOn(indicator, "ifOverRightSideForOneStepStageCallback");
         indicator.ifOverRightSideForOneStepStage();
-        expect(indicator.movedStageIndex).toEqual(0);
+        expect(indicator.ifOverRightSideForOneStepStageCallback).toHaveBeenCalled();
     });
 
     it("It should test ifOverRightSideForOneStepStageCallback", function() {
@@ -174,13 +174,71 @@ describe("Testing move-stage", function() {
 
                 },
             ];
+
         spyOn(indicator.kanvas.allStageViews[0], "moveToSide");
         indicator.ifOverRightSideForOneStepStageCallback([33, 162, 291], 0);
-        //expect(indicator.movedStageIndex).toEqual(0);
+
         expect(_StagePositionService.getPositionObject).toHaveBeenCalled();
         expect(indicator.kanvas.allStageViews[0].moveToSide).toHaveBeenCalled();
         expect(indicator.currentMoveRight).toEqual(0);
     });
 
+    it("It should test ifOverLeftSideForOneStepStage method", function() {
+
+        movement = {
+            left: 100,
+        };
+        indicator.init(stage, C, movement);
+        _StagePositionService.allPositions = [
+            [33, 200, 291]
+        ];
+
+        indicator.kanvas.allStageViews = [
+                {
+                    moveToSide: function() {},
+                    childSteps: [
+                        {
+                            step: "first"
+                        }
+                    ]
+
+                },
+            ];
+        
+        spyOn(indicator, "ifOverLeftSideForOneStepStageCallback");
+        indicator.ifOverLeftSideForOneStepStage();
+        expect(indicator.ifOverLeftSideForOneStepStageCallback).toHaveBeenCalled();
+    });
+
+    it("It should test ifOverLeftSideForOneStepStageCallback method", function() {
+
+        movement = {
+            left: 100,
+        };
+        
+        indicator.init(stage, C, movement);
+
+        spyOn(_StagePositionService, "getPositionObject");
+
+        indicator.kanvas.allStageViews = [
+                {
+                    moveToSide: function() {},
+                    childSteps: [
+                        {
+                            step: "first"
+                        }
+                    ]
+
+                },
+            ];
+
+        spyOn(indicator.kanvas.allStageViews[0], "moveToSide");
+        indicator.ifOverLeftSideForOneStepStageCallback([33, 200, 291], 0);
+
+        expect(_StagePositionService.getPositionObject).toHaveBeenCalled();
+        expect(indicator.kanvas.allStageViews[0].moveToSide).toHaveBeenCalled();
+        expect(indicator.movedStageIndex).toEqual(0);
+    });
+    
 });
 
