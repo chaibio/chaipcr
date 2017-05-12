@@ -3,7 +3,7 @@ describe("Testing move-stage", function() {
     beforeEach(module('ChaiBioTech'));
     beforeEach(module('canvasApp'));
     
-    var _moveStageRect, indicator, stage = {}, C, movement = {}, _StagePositionService;
+    var _moveStageRect, indicator, stage = {}, C, movement = {}, _StagePositionService, _ExperimentLoader;
     C = {
         canvas: {
             bringToFront: function() {},
@@ -31,10 +31,11 @@ describe("Testing move-stage", function() {
         left: 100
     };
 
-    beforeEach(inject(function(moveStageRect, StagePositionService) {
+    beforeEach(inject(function(moveStageRect, StagePositionService, ExperimentLoader) {
         var me = {};
         indicator = moveStageRect.getMoveStageRect(me);
         _StagePositionService = StagePositionService;
+        _ExperimentLoader = ExperimentLoader;
     }));
 
     it("It should check if indicator exists", function() {
@@ -372,5 +373,223 @@ describe("Testing move-stage", function() {
         expect(indicator.manageVerticalLineLeft).toHaveBeenCalled();
     });
 
+    it("It should test onTheMove method when moving direction is right ifOverRightSide() !== null", function() {
+        
+        indicator.init(stage, C, movement);
+        
+        spyOn(indicator, "checkMovingOffScreen");
+        spyOn(indicator, "getDirection").and.returnValue("right");
+        spyOn(indicator, "ifOverRightSide").and.returnValue(1);
+        spyOn(indicator, "movedRightAction");
+        indicator.onTheMove({left: 50});
+        
+        expect(indicator.checkMovingOffScreen).toHaveBeenCalled();
+        expect(indicator.ifOverRightSide).toHaveBeenCalled();
+        expect(indicator.movedRightAction).toHaveBeenCalled();
+    });
+
+    it("It should test onTheMove method when moving direction is right ifOverRightSide() === null", function() {
+        
+        indicator.init(stage, C, movement);
+        
+        spyOn(indicator, "checkMovingOffScreen");
+        spyOn(indicator, "getDirection").and.returnValue("right");
+        spyOn(indicator, "ifOverRightSide").and.returnValue(null);
+        spyOn(indicator, "ifOverRightSideForOneStepStage").and.returnValue(1);
+        spyOn(indicator, "movedRightAction");
+        indicator.onTheMove({left: 50});
+        
+        expect(indicator.checkMovingOffScreen).toHaveBeenCalled();
+        expect(indicator.ifOverRightSide).toHaveBeenCalled();
+        expect(indicator.movedRightAction).toHaveBeenCalled();
+    });
+
+    it("It should test onTheMove method when moving direction is left ifOverLeftSide() !== null", function() {
+        
+        indicator.init(stage, C, movement);
+        
+        spyOn(indicator, "checkMovingOffScreen");
+        spyOn(indicator, "getDirection").and.returnValue("left");
+        spyOn(indicator, "ifOverLeftSide").and.returnValue(1);
+        spyOn(indicator, "movedLeftAction");
+        indicator.onTheMove({left: 150});
+        
+        expect(indicator.checkMovingOffScreen).toHaveBeenCalled();
+        expect(indicator.ifOverLeftSide).toHaveBeenCalled();
+        expect(indicator.movedLeftAction).toHaveBeenCalled();
+    });
+
+    it("It should test onTheMove method when moving direction is left ifOverLeftSide() === null", function() {
+        
+        indicator.init(stage, C, movement);
+        
+        spyOn(indicator, "checkMovingOffScreen");
+        spyOn(indicator, "getDirection").and.returnValue("left");
+        spyOn(indicator, "ifOverLeftSide").and.returnValue(null);
+        spyOn(indicator, "ifOverLeftSideForOneStepStage").and.returnValue(1);
+        spyOn(indicator, "movedLeftAction");
+        indicator.onTheMove({left: 150});
+        
+        expect(indicator.checkMovingOffScreen).toHaveBeenCalled();
+        expect(indicator.ifOverLeftSide).toHaveBeenCalled();
+        expect(indicator.movedLeftAction).toHaveBeenCalled();
+    });
+
+    it("It should test checkMovingOffScreen method with right parameter passed", function() {
+
+        indicator.init(stage, C, movement);
+        spyOn(indicator.canvasContaining, "scrollLeft").and.returnValue(100);
+        indicator.movement.left = 1000;
+        indicator.checkMovingOffScreen("right");
+        expect(indicator.canvasContaining.scrollLeft).toHaveBeenCalledWith(indicator.movement.left - 889);
+    });
+
+    it("It should test checkMovingOffscreen method with left parameter passed", function() {
+        indicator.init(stage, C, movement);
+        spyOn(indicator.canvasContaining, "scrollLeft").and.returnValue(1800);
+        indicator.movement.left = 1000;
+        indicator.checkMovingOffScreen("left");
+        expect(indicator.canvasContaining.scrollLeft).toHaveBeenCalledWith(indicator.canvasContaining.scrollLeft() - (indicator.canvasContaining.scrollLeft() - indicator.movement.left));
+    });
+
+    it("It should test manageVerticalLineRight method", function() {
+
+        indicator.init(stage, C, movement);
+        indicator.kanvas.allStageViews = [
+                {
+                    moveToSide: function() {},
+                    left: 150,
+                    myWidth: 120,
+                    childSteps: [
+                        {
+                            step: "first"
+                        }
+                    ]
+
+                },
+            ];
+
+        
+        spyOn(indicator.verticalLine, "setLeft");
+        spyOn(indicator.verticalLine, "setCoords");
+        indicator.manageVerticalLineRight(0);
+        expect(indicator.verticalLine.setLeft).toHaveBeenCalledWith(283);
+        expect(indicator.verticalLine.setCoords).toHaveBeenCalled();
+    });
+
+    it("It should test manageVerticalLineLeft method", function() {
+
+        indicator.init(stage, C, movement);
+        indicator.kanvas.allStageViews = [
+                {
+                    moveToSide: function() {},
+                    left: 150,
+                    myWidth: 120,
+                    childSteps: [
+                        {
+                            step: "first"
+                        }
+                    ]
+
+                },
+            ];
+
+        
+        spyOn(indicator.verticalLine, "setLeft");
+        indicator.manageVerticalLineLeft(0);
+        expect(indicator.verticalLine.setLeft).toHaveBeenCalledWith(125);
+    });
+
+    it("It should test processMovement method getVisible() === false", function() {
+
+        indicator.init(stage, C, movement);
+        spyOn(indicator.verticalLine, "getVisible").and.returnValue(false);
+        spyOn(indicator, "backToOriginal");
+        spyOn(_ExperimentLoader, "moveStage").and.returnValue({
+            then: function() {
+
+            },
+        });
+        spyOn(indicator, "setVisible");
+        spyOn(indicator.verticalLine, "setVisible");
+        
+        indicator.currentDrop = {
+            model: {
+                id: 10
+            }
+        };
+        indicator.processMovement(stage, "circleManager");
+        expect(indicator.backToOriginal).toHaveBeenCalled();
+        expect(_ExperimentLoader.moveStage).toHaveBeenCalled();
+        expect(indicator.setVisible).toHaveBeenCalledWith(false);
+        expect(indicator.direction).toEqual(null);
+        expect(indicator.verticalLine.setVisible).toHaveBeenCalledWith(false);
+    });
+
+    it("It should test processMovement method with getVisible() === true", function() {
+
+        indicator.init(stage, C, movement);
+        spyOn(indicator.verticalLine, "getVisible").and.returnValue(true);
+        spyOn(indicator, "applyMovement");
+
+        indicator.currentDrop = {
+            model: {
+                id: 10
+            }
+        };
+
+        indicator.processMovement(stage, "circleManager");
+        expect(indicator.applyMovement).toHaveBeenCalled();
+    });
+
+    it("It should test backToOriginal method", function() {
+        
+        indicator.init(stage, C, movement);
+        indicator.kanvas = {
+            addNewStage: function() {},
+            addNewStageAtBeginning: function() {},
+            canvas: {
+                renderAll: function() {}
+            }
+        };
+
+        spyOn(indicator.kanvas, "addNewStage");
+        spyOn(indicator.kanvas, "addNewStageAtBeginning");
+        spyOn(indicator.kanvas.canvas, "renderAll");
+
+        indicator.backToOriginal({
+            model: {},
+            previousStage: "yes"
+        });
+        
+        expect(indicator.kanvas.addNewStage).toHaveBeenCalled();
+        expect(indicator.kanvas.addNewStageAtBeginning).not.toHaveBeenCalled();
+        expect(indicator.kanvas.canvas.renderAll).toHaveBeenCalled();
+    });
+
+    it("It should test backToOriginal method with previousStage === null", function() {
+        
+        indicator.init(stage, C, movement);
+        indicator.kanvas = {
+            addNewStage: function() {},
+            addNewStageAtBeginning: function() {},
+            canvas: {
+                renderAll: function() {}
+            }
+        };
+
+        spyOn(indicator.kanvas, "addNewStage");
+        spyOn(indicator.kanvas, "addNewStageAtBeginning");
+        
+
+        indicator.backToOriginal({
+            model: {},
+            previousStage: null
+        });
+        
+        expect(indicator.kanvas.addNewStage).not.toHaveBeenCalled();
+        expect(indicator.kanvas.addNewStageAtBeginning).toHaveBeenCalled();
+        
+    });
 });
 
