@@ -541,5 +541,55 @@ describe("Testing move-stage", function() {
         indicator.processMovement(stage, "circleManager");
         expect(indicator.applyMovement).toHaveBeenCalled();
     });
+
+    it("It should test backToOriginal method", function() {
+        
+        indicator.init(stage, C, movement);
+        indicator.kanvas = {
+            addNewStage: function() {},
+            addNewStageAtBeginning: function() {},
+            canvas: {
+                renderAll: function() {}
+            }
+        };
+
+        spyOn(indicator.kanvas, "addNewStage");
+        spyOn(indicator.kanvas, "addNewStageAtBeginning");
+        spyOn(indicator.kanvas.canvas, "renderAll");
+
+        indicator.backToOriginal({
+            model: {},
+            previousStage: "yes"
+        });
+        
+        expect(indicator.kanvas.addNewStage).toHaveBeenCalled();
+        expect(indicator.kanvas.addNewStageAtBeginning).not.toHaveBeenCalled();
+        expect(indicator.kanvas.canvas.renderAll).toHaveBeenCalled();
+    });
+
+    it("It should test backToOriginal method with previousStage === null", function() {
+        
+        indicator.init(stage, C, movement);
+        indicator.kanvas = {
+            addNewStage: function() {},
+            addNewStageAtBeginning: function() {},
+            canvas: {
+                renderAll: function() {}
+            }
+        };
+
+        spyOn(indicator.kanvas, "addNewStage");
+        spyOn(indicator.kanvas, "addNewStageAtBeginning");
+        
+
+        indicator.backToOriginal({
+            model: {},
+            previousStage: null
+        });
+        
+        expect(indicator.kanvas.addNewStage).not.toHaveBeenCalled();
+        expect(indicator.kanvas.addNewStageAtBeginning).toHaveBeenCalled();
+        
+    });
 });
 
