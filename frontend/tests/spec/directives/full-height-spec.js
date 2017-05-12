@@ -1,7 +1,7 @@
 (function() {
   'use strict'
 
-  fdescribe('Minimum Height directive', function() {
+  describe('Minimum Height directive', function() {
 
     var windowHeight = 1000
 
@@ -43,7 +43,7 @@
       expect(this.directive.height()).toBe(2000)
     })
 
-    fdescribe('When doc param is true', function() {
+    describe('When doc param is true', function() {
 
       beforeEach(function() {
         this.compiled = this.$compile(angular.element('<div style="height: 100%;"><div id="directive" full-height doc="true"></div></div>'))(this.$rootScope.$new())
