@@ -37,8 +37,13 @@
 
     it("Negative control should be invalid", function() {
       this.$scope.getResults();
-      expect(this.$scope.result[1]).toBe("Valid");
+      expect(this.$scope.result[1]).toBe("Invalid");
     });
+
+		it("Sample should be Unknown", function() {
+			this.$scope.getResults();
+			expect(this.$scope.result[2]).toBe("Unknown");
+		})
 
     it("should call the broadcast listener", function() {
       var newData = {

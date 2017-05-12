@@ -22,7 +22,6 @@ ExperimentServiceMock.query = function(fn) {
   fn(experimentsMock)
 }
 
-<<<<<<< HEAD
 ExperimentServiceMock.get = function(id) {
   return {
     then: function(fn) {
@@ -8114,7 +8113,7 @@ ExperimentServiceMock.getFluorescenceData = function(id) {
               [
                 1,
                 2,
-                "40"
+                null
               ],
               [
                 1,
@@ -8277,6 +8276,5 @@ ExperimentServiceMock.getFluorescenceData = function(id) {
     }
   }
 }
-=======
+
 ExperimentServiceMock.delete = function() {}
->>>>>>> master
