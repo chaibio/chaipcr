@@ -240,5 +240,137 @@ describe("Testing move-stage", function() {
         expect(indicator.movedStageIndex).toEqual(0);
     });
     
+    it("It should test ifOverRightSide method", function() {
+
+        movement = {
+            left: 250,
+        };
+        indicator.init(stage, C, movement);
+        _StagePositionService.allPositions = [
+            [33, 162, 291]
+        ];
+
+        indicator.kanvas.allStageViews = [
+                {
+                    moveToSide: function() {},
+                    childSteps: [
+                        {
+                            step: "first"
+                        }
+                    ]
+
+                },
+            ];
+        spyOn(indicator, "ifOverRightSideCallback");
+        indicator.ifOverRightSide();
+        expect(indicator.ifOverRightSideCallback).toHaveBeenCalled();
+        expect(indicator.movedStageIndex).toEqual(null);
+    });
+
+    it("It should test ifOverRightSideCallback method", function() {
+
+        movement = {
+            left: 200,
+        };
+        indicator.init(stage, C, movement);
+        spyOn(_StagePositionService, "getPositionObject");
+
+        indicator.kanvas.allStageViews = [
+                {
+                    moveToSide: function() {},
+                    childSteps: [
+                        {
+                            step: "first"
+                        }
+                    ]
+
+                },
+            ];
+
+        spyOn(indicator.kanvas.allStageViews[0], "moveToSide");
+        indicator.ifOverRightSideCallback([33, 100, 291], 0);
+
+        expect(_StagePositionService.getPositionObject).toHaveBeenCalled();
+        expect(indicator.kanvas.allStageViews[0].moveToSide).toHaveBeenCalled();
+        expect(indicator.currentMoveRight).toEqual(0);
+
+    });
+
+    it("It should test ifOverLeftSide method", function() {
+
+        movement = {
+            left: 250,
+        };
+        indicator.init(stage, C, movement);
+        _StagePositionService.allPositions = [
+            [33, 162, 291]
+        ];
+
+        indicator.kanvas.allStageViews = [
+                {
+                    moveToSide: function() {},
+                    childSteps: [
+                        {
+                            step: "first"
+                        }
+                    ]
+
+                },
+            ];
+        spyOn(indicator, "ifOverLeftSideCallback");
+        indicator.ifOverLeftSide();
+        expect(indicator.ifOverLeftSideCallback).toHaveBeenCalled();
+        expect(indicator.movedStageIndex).toEqual(null);
+    });
+
+    it("It should test ifOverLeftSideCallback method", function() {
+
+        movement = {
+            left: 100,
+        };
+        indicator.init(stage, C, movement);
+        spyOn(_StagePositionService, "getPositionObject");
+
+        indicator.kanvas.allStageViews = [
+                {
+                    moveToSide: function() {},
+                    childSteps: [
+                        {
+                            step: "first"
+                        }
+                    ]
+
+                },
+            ];
+
+        spyOn(indicator.kanvas.allStageViews[0], "moveToSide");
+        indicator.ifOverLeftSideCallback([33, 200, 291], 0);
+
+        expect(_StagePositionService.getPositionObject).toHaveBeenCalled();
+        expect(indicator.kanvas.allStageViews[0].moveToSide).toHaveBeenCalled();
+        expect(indicator.currentMoveLeft).toEqual(0);
+
+    });
+
+    it("It should test movedRightAction method", function() {
+
+        spyOn(indicator, "manageVerticalLineRight");
+        indicator.init(stage, C, movement);
+        this.movedStageIndex = 0;
+        indicator.movedRightAction();
+        //expect(indicator.currentMoveLeft).toEqual(null);
+        expect(indicator.manageVerticalLineRight).toHaveBeenCalled();
+    });
+
+    it("It should test movedLeftAction method", function() {
+
+        spyOn(indicator, "manageVerticalLineLeft");
+        indicator.init(stage, C, movement);
+        this.movedStageIndex = 1;
+        indicator.movedLeftAction();
+        //expect(indicator.currentMoveRight).toEqual(null);
+        expect(indicator.manageVerticalLineLeft).toHaveBeenCalled();
+    });
+
 });
 
