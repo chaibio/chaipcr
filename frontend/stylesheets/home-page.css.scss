@@ -1,418 +1,396 @@
 //Home page styles start here
 @import "./colors.css.scss";
-
 .home-page-wrapper {
-	// width: 1024px;
-	//height: 768px;
-	height: 100%;
-	position: relative;
-
-	.status-bar {
-		position: fixed;;
-		//top: 731px;
-		left: 0px;
-		height: 40px;
-		bottom: 0px;
-		//width: 1024px;
-		width: 100%;
-	}
-
-	.experiment-links {
-		text-decoration: none;
-		color: inherit;
-	}
-
-	.home-page-left-wing {
-		float: left;
-		width: 60%;
-		position: fixed;
-		//min-height: calc(100vh - 30px);
-		//width: 671px;
-		//height: 400px; //Just for now;
-
-		.left-wing-content {
-		}
-		.home-page-new-logo {
-			width: 292px;
-			height: 180px;
-			background-image: url("/images/new-logo.svg");
-			background-size: contain;
-			background-repeat: no-repeat;
-			margin: 60px auto 0 auto;
-		}
-		.home-page-welcome {
-			width: 100%;
-			text-align: center;
-			margin-top: 55px;
-		}
-		.home-page-new-exp-container {
-			width: 340px;
-			height: 50px;
-			margin: 30px auto 0 auto;
-		}
-		.home-page-new-exp-button {
-			width: 340px;
-			height: 50px;
-			border: 2px solid #8dc63f;
-			background-color: #8dc63f;
-			color: white;
-		}
-		.home-page-new-exp-button:hover {
-			background-color: white;
-			color: black;
-		}
-
-		.home-page-go-settings-container {
-			width: 170px;
-			height: 35px;
-			margin: 25px auto 0 auto;
-		}
-		.home-page-logout-container {
-			width: 170px;
-			height: 35px;
-			margin: 14px auto 0 auto;
-		}
-		.home-page-small-button {
-			width: 170px;
-			height: 35px;
-			border: 2px solid #555555;
-			background-color: white;
-		}
-		.home-page-small-button:hover {
-			color: white;
-			background-color: black;
-			border: none;
-		}
-		.home-page-link-container {
-			text-align: center;
-			margin-top: 60px;
-			img {
-				width: 90px;
-				height: 25px;
-			}
-			div {
-				margin-top: 10px;
-			}
-			a {
-				color: #00ADEE;
-			}
-
-		}
-
-	}
-	// Right Side of the home page
-	.home-page-right-wing {
-		float: right;;
-		//width: 353px;
-		width: 40%;
-		//height: 728px;
-
-		.home-page-exp-messages {
-			text-align: center;
-			padding-top: 10px;
-		}
-		.home-page-exp-header-container {
-			width: 100%;
-			height: 64px;
-			background-color: #333;
-		}
-		.home-page-recent-exp {
-			width: 60%;
-			height: 100%;
-			color: white;
-			text-align: center;
-			line-height: 64px;
-			float: left;
-		}
-		.home-page-edit-exp-container {
-			width: 40%;
-			height: 100%;
-			color: white;
-			text-align: center;
-			cursor: pointer;
-			float: left;
-
-			.home-page-edit-button {
-				width: 80px;
-				height: 30px;
-				background-color: black;
-				border: 2px solid grey;
-			}
-			.home-page-edit-button-active {
-				width: 80px;
-				height: 30px;
-				background-color: white;
-				color: black;
-				border: 2px solid white;
-			}
-			.space-edit-button {
-				margin: 16px 32px 0 0;
-				float: right;
-			}
-
-		}
-
-		.home-page-exp-container {
-			border-left: 1px solid #e6e6e6;
-			width: 100%;
-			//height: 804px;
-			height: calc(100vh - 104px);
-			overflow-y: scroll;
-			overflow-x: hidden;
-			position: relative;
-		}
-
-		.home-page-exp-tile {
-			width: 100%;
-			//height: 60px;
-			//width: 423px;
-			position: relative;
-			left: 0px;
-
-			.home-page-tile-text {
-				width: 100%;
-				height: 100%;
-				padding-top: 10px;
-				padding-bottom: 10px;
-				border-bottom: 1px solid #e6e6e6;
-				background-color: #fbfbfb;
-			}
-			.home-page-exp-name {
-				margin-left: 18px;
-				cursor: pointer;
-				//white-space: nowrap;
-				//width: 200px;
-				//height: 20px;
-				overflow: hidden;
-			}
-
-			.text-scroll {
-				position: absolute;
-				white-space: nowrap;
-				transform: translateX(0);
-				transition: 8.5s;
-			}
-			.text-scroll:hover {
-				transform: translateX(calc(300px - 100%));
-			}
-
-			.container {
-				overflow: hidden;
-
-				/* To make the width of the container exact. */
-				-webkit-box-sizing: border-box;
-				-moz-box-sizing: border-box;
-				box-sizing: border-box;
-			}
-
-			.content {
-				white-space: nowrap;
-				position: relative;
-				overflow: hidden;    /* Required to make ellipsis work */
-				text-overflow: ellipsis;
-
-				/* Starting transition */
-				left: 0%;
-				width: 100%;
-
-				/* Tweak 'till your heart's content */
-				-webkit-transition: left 3s, width 3s;
-				-moz-transition: left 3s, width 3s;
-				transition: left 3s, width 3s;
-			}
-
-			.container:hover .content {
-				/* This is not completely accurate. It resizes to 2x the current width. */
-				left: -100%;
-				width: 200%;
-			}
-
-			.ovtrunc {
-
-				//white-space: nowrap;
-				//overflow: hidden;
-				//text-overflow: ellipsis;
-				padding-right: 15px;
-				word-wrap: break-word;
-			}
-
-			.t {
-				white-space: nowrap;
-				position: relative;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				display: block;
-				width: 100%;
-			}
-			.s {
-				display: inline-block;
-				width: 100%;
-			}
-			.t:hover, .s:hover {
-				width: auto;
-			}
-			.s:hover .t {
-				animation: scroll 15s;
-			}
-			.f {
-				width: 100px;
-				background: red;
-				overflow: hidden;
-			}
-			@keyframes scroll {
-				0% {
-					left: 0px;
-				}
-				100% {
-					left: -100%;
-				}
-				/* Works in Chrome,Firefox, Opera and IE11 */
-			}
-
-
-			.home-page-exp-created-at {
-				color: #545454;
-				margin-left: 18px;
-			}
-
-
-			.home-page-tile-text-hover {
-				background-color: #cceffc;
-				border-bottom: 1px solid black;
-				cursor: pointer;
-			}
-
-
-			.home-page-del {
-				width: 144px;
-				height: 100%;
-				position: absolute;
-				top: 0px;
-				transition: left .3s;
-				left: calc(100% - 70px);
-				border-bottom: 1px solid #DF217F;
-				z-index: 100;
-
-				.home-page-bin {
-					width: 72px;
-					height: 100%;
-					background-color: #df2227;
-					cursor: pointer;
-					color: #df2227;
-					background-image: url("/images/trash.svg");
-					background-position: center;
-					background-size: 24px 26px;
-					background-repeat: no-repeat;
-					float: left;
-					text-align: center;
-					span {
-						color: white;
-						padding-left: 40px;
-						-webkit-user-select: none;
-						user-select: none;
-						display: inline-block;
-						vertical-align: middle;
-					}
-
-				}
-				.home-page-bin::before {
-					content: '\200B';
-					display: inline-block;
-					height: 100%;
-					vertical-align: middle;
-				}
-				.home-page-bin-not {
-					width: 72px;
-					height: 100%;
-					background-color: #df2227;
-					color: #df2227;
-					cursor: not-allowed;
-					background-image: url("/images/trash-disabled.svg");
-					background-position: center;
-					background-size: 24px 26px;
-					background-repeat: no-repeat;
-					float: left;
-					text-align: center;
-					span {
-						color: white;
-						padding-left: 40px;
-						-webkit-user-select: none;
-						user-select: none;
-						display: inline-block;
-						vertical-align: middle;
-					}
-
-				}
-
-
-				.home-page-del-okay {
-					width: 72px;
-					height: 100%;
-					cursor: pointer;
-					background-color: #c30506;
-					background-position: center;
-					background-image: url("/images/ok.svg");
-					background-size: 26px 28px;
-					background-repeat: no-repeat;
-					float: left;
-				}
-
-				$height_image: 100%;
-				.home-page-del-okay-noimage {
-					width: 72px;
-					height: 100%;
-					cursor: pointer;
-					text-align: center;
-					vertical-align: middle;
-					background-color: #c30506;
-					float: left;
-				}
-
-				.home-page-del-okay-noimage::before {
-					content: '\200B';
-					display: inline-block;
-					height: 100%;
-					vertical-align: middle;
-				}
-
-				.loader,
-				.loader:before,
-				.loader:after {
-					background: #ffffff;
-					//-webkit-animation: load1 1s infinite ease-in-out;
-					animation: load1 1s infinite ease-in-out;
-					width: 3px;
-					height: 12px;
-				}
-				.loader:before,
-				.loader:after {
-					position: absolute;
-					top: 0;
-					content: '';
-				}
-				.loader:before {
-					left: -5px;
-					-webkit-animation-delay: -0.32s;
-					animation-delay: -0.32s;
-				}
-				.loader {
-					color: #ffffff;
-					//text-indent: -9999em;
-					//vertical-align:top;
-					display: inline-block;
-					//margin: $height_image/2;
-					//position: center;
-					font-size: 5px;
-					//-webkit-transform: translateZ(0);
-					//-ms-transform: translateZ(0);
-					transform: translateZ(0);
-					//-webkit-animation-delay: -0.16s;
-					animation-delay: -0.16s;
-				}
-				.loader:after {
-					left: 5px;
-				}
-				/*@-webkit-keyframes load1 {
+  height: 100%;
+  min-height: 760px;
+  position: relative;
+  margin: 0 !important;
+  padding: 0 !important;
+  .status-bar {
+    position: fixed;
+    ;
+    //top: 731px;
+    left: 0px;
+    height: 40px;
+    bottom: 0px;
+    //width: 1024px;
+    width: 100%;
+  }
+  .experiment-links {
+    text-decoration: none;
+    color: inherit;
+  }
+  .home-page-left-wing {
+    // float: left;
+    width: 60%;
+    // position: fixed;
+    //min-height: calc(100vh - 30px);
+    //width: 671px;
+    //height: 400px; //Just for now;
+    margin: 0;
+    padding: 0;
+    .home-page-new-logo {
+      width: 292px;
+      height: 180px;
+      background-image: url("/images/new-logo.svg");
+      background-size: contain;
+      background-repeat: no-repeat;
+      margin: 60px auto 0 auto;
+    }
+    .home-page-welcome {
+      width: 100%;
+      text-align: center;
+      margin-top: 55px;
+    }
+    .home-page-new-exp-container {
+      width: 340px;
+      height: 50px;
+      margin: 30px auto 0 auto;
+    }
+    .home-page-new-exp-button {
+      width: 340px;
+      height: 50px;
+      border: 2px solid #8dc63f;
+      background-color: #8dc63f;
+      color: white;
+    }
+    .home-page-new-exp-button:hover {
+      background-color: white;
+      color: black;
+    }
+    .home-page-go-settings-container {
+      width: 100%;
+      text-align: center;
+      height: 35px;
+      margin: 25px auto 0 auto;
+      button {
+      	width: 171px;
+      }
+    }
+    .home-page-logout-container {
+      width: 100%;
+      text-align: center;
+      height: 35px;
+      margin: 14px auto 0 auto;
+      button {
+      	width: 171px;
+      }
+    }
+    .home-page-small-button {
+      width: 100%;
+      text-align: center;
+      height: 35px;
+      border: 2px solid #555555;
+      background-color: white;
+      button {
+      	width: 171px;
+      }
+    }
+    .home-page-small-button:hover {
+      color: white;
+      background-color: black;
+      border: none;
+    }
+    .home-page-link-container {
+      text-align: center;
+      margin-top: 60px;
+      img {
+        width: 90px;
+        height: 25px;
+      }
+      div {
+        margin-top: 10px;
+      }
+      a {
+        color: #00ADEE;
+      }
+    }
+  }
+  // Right Side of the home page
+  .home-page-right-wing {
+    // float: right;;
+    width: 40%;
+    margin: 0;
+    padding: 0;
+    .home-page-exp-messages {
+      text-align: center;
+      padding-top: 10px;
+    }
+    .home-page-exp-header-container {
+      width: 100%;
+      height: 64px;
+      background-color: #333;
+    }
+    .home-page-recent-exp {
+      width: 60%;
+      height: 100%;
+      color: white;
+      text-align: center;
+      line-height: 64px;
+      float: left;
+    }
+    .home-page-edit-exp-container {
+      width: 40%;
+      height: 100%;
+      color: white;
+      text-align: center;
+      cursor: pointer;
+      float: left;
+      .home-page-edit-button {
+        width: 80px;
+        height: 30px;
+        background-color: black;
+        border: 2px solid grey;
+      }
+      .home-page-edit-button-active {
+        width: 80px;
+        height: 30px;
+        background-color: white;
+        color: black;
+        border: 2px solid white;
+      }
+      .space-edit-button {
+        margin: 16px 32px 0 0;
+        float: right;
+      }
+    }
+    .home-page-exp-container {
+      border-left: 1px solid #e6e6e6;
+      width: 100%;
+      //height: 804px;
+      // height: calc(100vh - 104px);
+      overflow-y: scroll;
+      overflow-x: hidden;
+      position: relative;
+    }
+    .home-page-exp-tile {
+      width: 100%;
+      //height: 60px;
+      //width: 423px;
+      position: relative;
+      left: 0px;
+      .home-page-tile-text {
+        width: 100%;
+        height: 100%;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e6e6e6;
+        background-color: #fbfbfb;
+      }
+      .home-page-exp-name {
+        margin-left: 18px;
+        cursor: pointer;
+        //white-space: nowrap;
+        //width: 200px;
+        //height: 20px;
+        overflow: hidden;
+      }
+      .text-scroll {
+        position: absolute;
+        white-space: nowrap;
+        transform: translateX(0);
+        transition: 8.5s;
+      }
+      .text-scroll:hover {
+        transform: translateX(calc(300px - 100%));
+      }
+      .container {
+        overflow: hidden;
+        /* To make the width of the container exact. */
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+      .content {
+        white-space: nowrap;
+        position: relative;
+        overflow: hidden;
+        /* Required to make ellipsis work */
+        text-overflow: ellipsis;
+        /* Starting transition */
+        left: 0%;
+        width: 100%;
+        /* Tweak 'till your heart's content */
+        -webkit-transition: left 3s, width 3s;
+        -moz-transition: left 3s, width 3s;
+        transition: left 3s, width 3s;
+      }
+      .container:hover .content {
+        /* This is not completely accurate. It resizes to 2x the current width. */
+        left: -100%;
+        width: 200%;
+      }
+      .ovtrunc {
+        //white-space: nowrap;
+        //overflow: hidden;
+        //text-overflow: ellipsis;
+        padding-right: 15px;
+        word-wrap: break-word;
+      }
+      .t {
+        white-space: nowrap;
+        position: relative;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+        width: 100%;
+      }
+      .s {
+        display: inline-block;
+        width: 100%;
+      }
+      .t:hover,
+      .s:hover {
+        width: auto;
+      }
+      .s:hover .t {
+        animation: scroll 15s;
+      }
+      .f {
+        width: 100px;
+        background: red;
+        overflow: hidden;
+      }
+      @keyframes scroll {
+        0% {
+          left: 0px;
+        }
+        100% {
+          left: -100%;
+        }
+        /* Works in Chrome,Firefox, Opera and IE11 */
+      }
+      .home-page-exp-created-at {
+        color: #545454;
+        margin-left: 18px;
+      }
+      .home-page-tile-text-hover {
+        background-color: #cceffc;
+        border-bottom: 1px solid black;
+        cursor: pointer;
+      }
+      .home-page-del {
+        width: 144px;
+        height: 100%;
+        position: absolute;
+        top: 0px;
+        transition: left .3s;
+        left: calc(100% - 70px);
+        border-bottom: 1px solid #DF217F;
+        z-index: 100;
+        .home-page-bin {
+          width: 72px;
+          height: 100%;
+          background-color: #df2227;
+          cursor: pointer;
+          color: #df2227;
+          background-image: url("/images/trash.svg");
+          background-position: center;
+          background-size: 24px 26px;
+          background-repeat: no-repeat;
+          float: left;
+          text-align: center;
+          span {
+            color: white;
+            padding-left: 40px;
+            -webkit-user-select: none;
+            user-select: none;
+            display: inline-block;
+            vertical-align: middle;
+          }
+        }
+        .home-page-bin::before {
+          content: '\200B';
+          display: inline-block;
+          height: 100%;
+          vertical-align: middle;
+        }
+        .home-page-bin-not {
+          width: 72px;
+          height: 100%;
+          background-color: #df2227;
+          color: #df2227;
+          cursor: not-allowed;
+          background-image: url("/images/trash-disabled.svg");
+          background-position: center;
+          background-size: 24px 26px;
+          background-repeat: no-repeat;
+          float: left;
+          text-align: center;
+          span {
+            color: white;
+            padding-left: 40px;
+            -webkit-user-select: none;
+            user-select: none;
+            display: inline-block;
+            vertical-align: middle;
+          }
+        }
+        .home-page-del-okay {
+          width: 72px;
+          height: 100%;
+          cursor: pointer;
+          background-color: #c30506;
+          background-position: center;
+          background-image: url("/images/ok.svg");
+          background-size: 26px 28px;
+          background-repeat: no-repeat;
+          float: left;
+        }
+        $height_image: 100%;
+        .home-page-del-okay-noimage {
+          width: 72px;
+          height: 100%;
+          cursor: pointer;
+          text-align: center;
+          vertical-align: middle;
+          background-color: #c30506;
+          float: left;
+        }
+        .home-page-del-okay-noimage::before {
+          content: '\200B';
+          display: inline-block;
+          height: 100%;
+          vertical-align: middle;
+        }
+        .loader,
+        .loader:before,
+        .loader:after {
+          background: #ffffff;
+          //-webkit-animation: load1 1s infinite ease-in-out;
+          animation: load1 1s infinite ease-in-out;
+          width: 3px;
+          height: 12px;
+        }
+        .loader:before,
+        .loader:after {
+          position: absolute;
+          top: 0;
+          content: '';
+        }
+        .loader:before {
+          left: -5px;
+          -webkit-animation-delay: -0.32s;
+          animation-delay: -0.32s;
+        }
+        .loader {
+          color: #ffffff;
+          //text-indent: -9999em;
+          //vertical-align:top;
+          display: inline-block;
+          //margin: $height_image/2;
+          //position: center;
+          font-size: 5px;
+          //-webkit-transform: translateZ(0);
+          //-ms-transform: translateZ(0);
+          transform: translateZ(0);
+          //-webkit-animation-delay: -0.16s;
+          animation-delay: -0.16s;
+        }
+        .loader:after {
+          left: 5px;
+        }
+        /*@-webkit-keyframes load1 {
 				0%,
 				80%,
 				100% {
@@ -426,121 +404,108 @@
 
 				}
 				*/
-				@keyframes load1 {
-					0%,
-					80%,
-					100% {
-						box-shadow: 0 0;
-						height: 12px;
-					}
-					40% {
-						box-shadow: 0 -6px;
-						height: 18px;
-					}
-
-				}
-
-
-				&.ng-hide {
-					left: 100%;
-					transition: left .3s;
-				}
-
-			}
-
-			.trash-active {
-				background-image: url("/images/trash.svg");
-				cursor: pointer;
-			}
-			.trash-not-active {
-				background-image: url("/images/not-active-trash.png");
-			}
-
-		}
-
-		.home-page-exp-tile {
-			-webkit-transition: all linear 0.3s;
-			transition: all linear 0.3s;
-		}
-
-		@keyframes my_animation {
-			from {
-				left: 0px;
-			}
-			to {
-				left: -72px;
-			}
-
-		}
-		@-webkit-keyframes my_animation {
-			from {
-				left: 0px;
-			}
-			to {
-				left: -72px;
-			}
-
-		}
-
-		.home-page-active-del-identifier {
-			animation-name: my_animation;
-			animation-duration: 0.5s;
-			left: -72px;
-		}
-
-	}
-
+        @keyframes load1 {
+          0%,
+          80%,
+          100% {
+            box-shadow: 0 0;
+            height: 12px;
+          }
+          40% {
+            box-shadow: 0 -6px;
+            height: 18px;
+          }
+        }
+        &.ng-hide {
+          left: 100%;
+          transition: left .3s;
+        }
+      }
+      .trash-active {
+        background-image: url("/images/trash.svg");
+        cursor: pointer;
+      }
+      .trash-not-active {
+        background-image: url("/images/not-active-trash.png");
+      }
+    }
+    .home-page-exp-tile {
+      -webkit-transition: all linear 0.3s;
+      transition: all linear 0.3s;
+    }
+    @keyframes my_animation {
+      from {
+        left: 0px;
+      }
+      to {
+        left: -72px;
+      }
+    }
+    @-webkit-keyframes my_animation {
+      from {
+        left: 0px;
+      }
+      to {
+        left: -72px;
+      }
+    }
+    .home-page-active-del-identifier {
+      animation-name: my_animation;
+      animation-duration: 0.5s;
+      left: -72px;
+    }
+  }
 }
+
 .marquee-target {
-	margin-left: 18px;
+  margin-left: 18px;
 }
 
 .marquee {
-	height: 25px;
-	width: 300px;
-	overflow: hidden;
-	position: relative;
+  height: 25px;
+  width: 300px;
+  overflow: hidden;
+  position: relative;
 }
 
 .marquee div {
-	display: block;
-	position: absolute;
-	//overflow: hidden;
+  display: block;
+  position: absolute;
+  //overflow: hidden;
 }
+
 .marquee-add {
-	animation: marquee 4s linear infinite;
-	//animation-direction: alternate;
+  animation: marquee 4s linear infinite;
+  //animation-direction: alternate;
 }
 
 .marquee span {
-	float: left;
-	width: 50%;
+  float: left;
+  width: 50%;
 }
 
 @keyframes marquee {
-	0% {
-		left: 0;
-	}
-	25% {
-		left: -50%;
-	}
-	48% {
-		opacity: 1;
-	}
-	49% {
-		left: -100%;
-		opacity: 0;
-	}
-	50% {
-		left: 100%;
-		opacity: 0;
-	}
-	51% {
-		opacity: 1;
-	}
-
-	100% {
-		left: 0%;
-	}
-
+  0% {
+    left: 0;
+  }
+  25% {
+    left: -50%;
+  }
+  48% {
+    opacity: 1;
+  }
+  49% {
+    left: -100%;
+    opacity: 0;
+  }
+  50% {
+    left: 100%;
+    opacity: 0;
+  }
+  51% {
+    opacity: 1;
+  }
+  100% {
+    left: 0%;
+  }
 }
