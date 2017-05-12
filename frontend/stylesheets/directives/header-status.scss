@@ -1,26 +1,25 @@
 @import '../colors.css.scss';
-
 .header-status {
   height: 50px;
   background: $gray;
   color: #fff;
-  padding-left: 30px;
-  padding-right: 30px;
-
+  padding-left: 0;
+  padding-right: 0;
+  .full-width {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
   .loading {
     padding-top: 13px;
     margin-left: -50px;
   }
-
   .row {
     margin-top: 0;
     margin-bottom: 0;
   }
-
   .stripes {
     cursor: context-menu;
     margin-top: 19px;
-
     .stripe {
       height: 2px;
       width: 16px;
@@ -28,11 +27,9 @@
       background-color: #ccc;
     }
   }
-
   .menu {
     padding-right: 0;
   }
-
   .exp-name {
     padding-left: 0;
     padding-right: 0;
@@ -40,13 +37,11 @@
     margin-right: 30px;
     margin-top: 12px;
   }
-
   .message {
     display: inline;
     padding-right: 10px;
     color: #fff;
     text-transform: uppercase;
-
     * {
       color: #fff;
     }
@@ -58,7 +53,6 @@
       font-weight: bold;
     }
   }
-
   .button-header {
     cursor: pointer;
     display: inline-block;
@@ -67,13 +61,11 @@
     padding-bottom: 5px;
     width: 170px;
     text-align: center;
-
     &.begin {
       border: 1px solid #fff;
       background-color: $gray;
       color: #fff;
-	  font-weight: bold;
-
+      font-weight: bold;
       &.disabled {
         border: 1px solid #aaa;
         color: #aaa;
@@ -81,7 +73,6 @@
       }
     }
   }
-  
   .button-he {
     cursor: pointer;
     display: inline-block;
@@ -90,13 +81,11 @@
     padding-bottom: 5px;
     width: 170px;
     text-align: center;
-
     &.begin {
       border: 1px solid #fff;
       background-color: #8dc63f;
       color: #fff;
-	  font-weight: bold;
-
+      font-weight: bold;
       &.disabled {
         border: 1px solid #aaa;
         color: #aaa;
@@ -104,25 +93,23 @@
       }
     }
   }
-
   &.in-progress {
     // background-color: #5D8329;
     // background-image: url('/images/header-progress-bg.png');
     // background-repeat: no-repeat;
     // background-size: 0% 100%;
-
-/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#64b027+0,c6e35f+46,5d8329+46,5d8329+100 */
-background: -moz-linear-gradient(left,  #64b027 0%, #c6e35f 46%, #5d8329 46%, #5d8329 100%); /* FF3.6-15 */
-background: -webkit-linear-gradient(left,  #64b027 0%,#c6e35f 46%,#5d8329 46%,#5d8329 100%); /* Chrome10-25,Safari5.1-6 */
-background: linear-gradient(to right,  #64b027 0%,#c6e35f 46%,#5d8329 46%,#5d8329 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-
-
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#64b027+0,c6e35f+46,5d8329+46,5d8329+100 */
+    background: -moz-linear-gradient(left, #64b027 0%, #c6e35f 46%, #5d8329 46%, #5d8329 100%);
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(left, #64b027 0%, #c6e35f 46%, #5d8329 46%, #5d8329 100%);
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to right, #64b027 0%, #c6e35f 46%, #5d8329 46%, #5d8329 100%);
+    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
     .message {
       display: inline-block;
       margin-top: 16px;
     }
   }
-
   &.complete {
     background-image: url('/images/header-complete.png');
     background-size: auto 100%;
@@ -134,7 +121,7 @@ background: linear-gradient(to right,  #64b027 0%,#c6e35f 46%,#5d8329 46%,#5d832
       background-color: #000;
       border: 1px solid #fff;
     }
-    .button-he{
+    .button-he {
       background-color: #8dc63f;
       border: 1px solid #fff;
     }
