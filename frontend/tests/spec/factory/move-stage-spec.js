@@ -3,7 +3,7 @@ describe("Testing move-stage", function() {
     beforeEach(module('ChaiBioTech'));
     beforeEach(module('canvasApp'));
     
-    var _moveStageRect, indicator, stage = {}, C, movement = {}, _StagePositionService;
+    var _moveStageRect, indicator, stage = {}, C, movement = {}, _StagePositionService, _ExperimentLoader;
     C = {
         canvas: {
             bringToFront: function() {},
@@ -31,10 +31,11 @@ describe("Testing move-stage", function() {
         left: 100
     };
 
-    beforeEach(inject(function(moveStageRect, StagePositionService) {
+    beforeEach(inject(function(moveStageRect, StagePositionService, ExperimentLoader) {
         var me = {};
         indicator = moveStageRect.getMoveStageRect(me);
         _StagePositionService = StagePositionService;
+        _ExperimentLoader = ExperimentLoader;
     }));
 
     it("It should check if indicator exists", function() {
@@ -449,6 +450,96 @@ describe("Testing move-stage", function() {
         indicator.movement.left = 1000;
         indicator.checkMovingOffScreen("left");
         expect(indicator.canvasContaining.scrollLeft).toHaveBeenCalledWith(indicator.canvasContaining.scrollLeft() - (indicator.canvasContaining.scrollLeft() - indicator.movement.left));
+    });
+
+    it("It should test manageVerticalLineRight method", function() {
+
+        indicator.init(stage, C, movement);
+        indicator.kanvas.allStageViews = [
+                {
+                    moveToSide: function() {},
+                    left: 150,
+                    myWidth: 120,
+                    childSteps: [
+                        {
+                            step: "first"
+                        }
+                    ]
+
+                },
+            ];
+
+        
+        spyOn(indicator.verticalLine, "setLeft");
+        spyOn(indicator.verticalLine, "setCoords");
+        indicator.manageVerticalLineRight(0);
+        expect(indicator.verticalLine.setLeft).toHaveBeenCalledWith(283);
+        expect(indicator.verticalLine.setCoords).toHaveBeenCalled();
+    });
+
+    it("It should test manageVerticalLineLeft method", function() {
+
+        indicator.init(stage, C, movement);
+        indicator.kanvas.allStageViews = [
+                {
+                    moveToSide: function() {},
+                    left: 150,
+                    myWidth: 120,
+                    childSteps: [
+                        {
+                            step: "first"
+                        }
+                    ]
+
+                },
+            ];
+
+        
+        spyOn(indicator.verticalLine, "setLeft");
+        indicator.manageVerticalLineLeft(0);
+        expect(indicator.verticalLine.setLeft).toHaveBeenCalledWith(125);
+    });
+
+    it("It should test processMovement method getVisible() === false", function() {
+
+        indicator.init(stage, C, movement);
+        spyOn(indicator.verticalLine, "getVisible").and.returnValue(false);
+        spyOn(indicator, "backToOriginal");
+        spyOn(_ExperimentLoader, "moveStage").and.returnValue({
+            then: function() {
+
+            },
+        });
+        spyOn(indicator, "setVisible");
+        spyOn(indicator.verticalLine, "setVisible");
+        
+        indicator.currentDrop = {
+            model: {
+                id: 10
+            }
+        };
+        indicator.processMovement(stage, "circleManager");
+        expect(indicator.backToOriginal).toHaveBeenCalled();
+        expect(_ExperimentLoader.moveStage).toHaveBeenCalled();
+        expect(indicator.setVisible).toHaveBeenCalledWith(false);
+        expect(indicator.direction).toEqual(null);
+        expect(indicator.verticalLine.setVisible).toHaveBeenCalledWith(false);
+    });
+
+    it("It should test processMovement method with getVisible() === true", function() {
+
+        indicator.init(stage, C, movement);
+        spyOn(indicator.verticalLine, "getVisible").and.returnValue(true);
+        spyOn(indicator, "applyMovement");
+
+        indicator.currentDrop = {
+            model: {
+                id: 10
+            }
+        };
+
+        indicator.processMovement(stage, "circleManager");
+        expect(indicator.applyMovement).toHaveBeenCalled();
     });
 });
 

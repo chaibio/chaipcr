@@ -226,13 +226,15 @@ angular.module("canvasApp").factory('moveStageRect', [
           this.indicator.manageVerticalLineRight = function(index) {
             
             var place = (this.kanvas.allStageViews[index].left + this.kanvas.allStageViews[index].myWidth + 13);
-            this.verticalLine.setLeft(place).setCoords();
+            this.verticalLine.setLeft(place);
+            this.verticalLine.setCoords();
           };
 
           this.indicator.manageVerticalLineLeft = function(index) {
 
             var place = (this.kanvas.allStageViews[index].left - 25);
-            this.verticalLine.setLeft(place).setCoords();
+            this.verticalLine.setLeft(place);
+            this.verticalLine.setCoords();
           };
 
           this.indicator.processMovement = function(stage, circleManager) {
