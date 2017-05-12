@@ -23,7 +23,7 @@
         return windowHeight
       })
       this.directive = this.$compile(angular.element('<div full-height offset="' + this.offset + '"></div>'))(this.scope)
-
+      this.$timeout.flush()
     })
 
     it('should set minimum height to element', function() {
@@ -40,6 +40,7 @@
     it('should force height', function() {
       windowHeight = 2000
       this.directive = this.$compile(angular.element('<div full-height force="true"></div>'))(this.$rootScope.$new())
+      this.$timeout.flush()
       expect(this.directive.height()).toBe(2000)
     })
 
@@ -47,6 +48,7 @@
 
       beforeEach(function() {
         this.compiled = this.$compile(angular.element('<div style="height: 100%;"><div id="directive" full-height doc="true"></div></div>'))(this.$rootScope.$new())
+        this.$timeout.flush()
       })
 
       it('should use largest node height if doc param is true', function() {

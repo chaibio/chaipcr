@@ -22,6 +22,6 @@ App.directive 'fullHeight', [
         elem.removeAttr('style')
         $timeout(set, 100)
 
-      set()
+      $timeout(set, 100)
 
 ]
