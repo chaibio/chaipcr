@@ -19,16 +19,18 @@
 <div click-check>
   <!-- loading -->
   <div class="header-status" ng-if="loading">
-    <div class="row">
-      <div class="col-xs-1 menu" ng-transclude>
-      </div>
-      <div class="col-xs-11 loading B1">
-        <span class="message">Loading <ellipsis-animated></ellipsis-animated></span>
+    <div class="full-width" full-width force="true">
+      <div class="row">
+        <div class="col-xs-1 menu" ng-transclude>
+        </div>
+        <div class="col-xs-11 loading B1">
+          <span class="message">Loading <ellipsis-animated></ellipsis-animated></span>
+        </div>
       </div>
     </div>
   </div>
   <div ng-if="!loading" class="header-status" ng-class="{'in-progress': state && state !== 'idle' && isCurrentExp, 'complete': experiment && ((experiment.completed_at && !(state !== 'idle' && isCurrentExp)) || (experiment.started_at && state==='idle') )}" ng-style="backgroundStyle">
-    <div class="full-width" full-width force="true" >
+    <div class="full-width" full-width force="true">
       <!-- begin is valid -->
       <div class="row" ng-show="experiment.id && !experiment.started_at && !experiment.completed_at && !(statusData.optics.lid_open==='true')&& state==='idle'">
         <div class="col-xs-1 menu" ng-transclude>
