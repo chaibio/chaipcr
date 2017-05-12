@@ -372,5 +372,83 @@ describe("Testing move-stage", function() {
         expect(indicator.manageVerticalLineLeft).toHaveBeenCalled();
     });
 
+    it("It should test onTheMove method when moving direction is right ifOverRightSide() !== null", function() {
+        
+        indicator.init(stage, C, movement);
+        
+        spyOn(indicator, "checkMovingOffScreen");
+        spyOn(indicator, "getDirection").and.returnValue("right");
+        spyOn(indicator, "ifOverRightSide").and.returnValue(1);
+        spyOn(indicator, "movedRightAction");
+        indicator.onTheMove({left: 50});
+        
+        expect(indicator.checkMovingOffScreen).toHaveBeenCalled();
+        expect(indicator.ifOverRightSide).toHaveBeenCalled();
+        expect(indicator.movedRightAction).toHaveBeenCalled();
+    });
+
+    it("It should test onTheMove method when moving direction is right ifOverRightSide() === null", function() {
+        
+        indicator.init(stage, C, movement);
+        
+        spyOn(indicator, "checkMovingOffScreen");
+        spyOn(indicator, "getDirection").and.returnValue("right");
+        spyOn(indicator, "ifOverRightSide").and.returnValue(null);
+        spyOn(indicator, "ifOverRightSideForOneStepStage").and.returnValue(1);
+        spyOn(indicator, "movedRightAction");
+        indicator.onTheMove({left: 50});
+        
+        expect(indicator.checkMovingOffScreen).toHaveBeenCalled();
+        expect(indicator.ifOverRightSide).toHaveBeenCalled();
+        expect(indicator.movedRightAction).toHaveBeenCalled();
+    });
+
+    it("It should test onTheMove method when moving direction is left ifOverLeftSide() !== null", function() {
+        
+        indicator.init(stage, C, movement);
+        
+        spyOn(indicator, "checkMovingOffScreen");
+        spyOn(indicator, "getDirection").and.returnValue("left");
+        spyOn(indicator, "ifOverLeftSide").and.returnValue(1);
+        spyOn(indicator, "movedLeftAction");
+        indicator.onTheMove({left: 150});
+        
+        expect(indicator.checkMovingOffScreen).toHaveBeenCalled();
+        expect(indicator.ifOverLeftSide).toHaveBeenCalled();
+        expect(indicator.movedLeftAction).toHaveBeenCalled();
+    });
+
+    it("It should test onTheMove method when moving direction is left ifOverLeftSide() === null", function() {
+        
+        indicator.init(stage, C, movement);
+        
+        spyOn(indicator, "checkMovingOffScreen");
+        spyOn(indicator, "getDirection").and.returnValue("left");
+        spyOn(indicator, "ifOverLeftSide").and.returnValue(null);
+        spyOn(indicator, "ifOverLeftSideForOneStepStage").and.returnValue(1);
+        spyOn(indicator, "movedLeftAction");
+        indicator.onTheMove({left: 150});
+        
+        expect(indicator.checkMovingOffScreen).toHaveBeenCalled();
+        expect(indicator.ifOverLeftSide).toHaveBeenCalled();
+        expect(indicator.movedLeftAction).toHaveBeenCalled();
+    });
+
+    it("It should test checkMovingOffScreen method with right parameter passed", function() {
+
+        indicator.init(stage, C, movement);
+        spyOn(indicator.canvasContaining, "scrollLeft").and.returnValue(100);
+        indicator.movement.left = 1000;
+        indicator.checkMovingOffScreen("right");
+        expect(indicator.canvasContaining.scrollLeft).toHaveBeenCalledWith(indicator.movement.left - 889);
+    });
+
+    it("It should test checkMovingOffscreen method with left parameter passed", function() {
+        indicator.init(stage, C, movement);
+        spyOn(indicator.canvasContaining, "scrollLeft").and.returnValue(1800);
+        indicator.movement.left = 1000;
+        indicator.checkMovingOffScreen("left");
+        expect(indicator.canvasContaining.scrollLeft).toHaveBeenCalledWith(indicator.canvasContaining.scrollLeft() - (indicator.canvasContaining.scrollLeft() - indicator.movement.left));
+    });
 });
 
