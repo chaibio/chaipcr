@@ -1,7 +1,7 @@
 (function() {
   'use strict'
 
-  describe('Testing WindowWrapper Service', function() {
+  describe('WindowWrapper Service', function() {
 
     describe('On Mobile', function() {
 
@@ -49,22 +49,76 @@
         expect(this.WindowWrapper.width()).toEqual($(this.$window).width())
       })
 
-      it('should return window height', function () {
+      it('should return window height', function() {
         expect(this.WindowWrapper.height()).toBe(angular.element(this.$window).height())
       })
 
-      it('should return document height', function () {
-        angular.element('body').css({margin: 0, padding: 0}).append('<div style="height: 1234px"></div>')
+      it('should return document height', function() {
+        angular.element('body').css({ margin: 0, padding: 0 }).append('<div style="height: 1234px"></div>')
         expect(this.WindowWrapper.documentHeight()).toBe(1234)
       })
 
-      it('should broadcast window:resize event', function () {
-        spyOn(this.$rootScope, '$apply').and.callFake(function (fn) {
+      it('should broadcast window:resize event', function() {
+        spyOn(this.$rootScope, '$apply').and.callFake(function(fn) {
           fn()
         })
         spyOn(this.$rootScope, '$broadcast')
         angular.element(this.$window).triggerHandler('resize')
         expect(this.$rootScope.$broadcast).toHaveBeenCalledWith('window:resize')
+        expect(this.$rootScope.$broadcast).toHaveBeenCalledTimes(1)
+      })
+
+      it('should broadcast window:mousedown event', function() {
+        var e = {
+          type: 'mousedown',
+          clientX: 0,
+          clientY: 0
+        }
+        spyOn(this.$rootScope, '$apply').and.callFake(function(fn) {
+          fn()
+        })
+        spyOn(this.$rootScope, '$broadcast').and.callFake(function(event, data) {
+          expect(event).toBe('window:mousedown')
+          expect(data.clientX).toBe(e.clientX)
+          expect(data.clientY).toBe(e.clientY)
+        })
+        angular.element(this.$window).triggerHandler(e)
+        expect(this.$rootScope.$broadcast).toHaveBeenCalledTimes(1)
+      })
+
+      it('should broadcast window:mouseup event', function() {
+        var e = {
+          type: 'mouseup',
+          clientX: 0,
+          clientY: 0
+        }
+        spyOn(this.$rootScope, '$apply').and.callFake(function(fn) {
+          fn()
+        })
+        spyOn(this.$rootScope, '$broadcast').and.callFake(function(event, data) {
+          expect(event).toBe('window:mouseup')
+          expect(data.clientX).toBe(e.clientX)
+          expect(data.clientY).toBe(e.clientY)
+        })
+        angular.element(this.$window).triggerHandler(e)
+        expect(this.$rootScope.$broadcast).toHaveBeenCalledTimes(1)
+      })
+
+      it('should broadcast window:mousemove event', function() {
+        var e = {
+          type: 'mousemove',
+          clientX: 0,
+          clientY: 0
+        }
+        spyOn(this.$rootScope, '$apply').and.callFake(function(fn) {
+          fn()
+        })
+        spyOn(this.$rootScope, '$broadcast').and.callFake(function(event, data) {
+          expect(event).toBe('window:mousemove')
+          expect(data.clientX).toBe(e.clientX)
+          expect(data.clientY).toBe(e.clientY)
+        })
+        angular.element(this.$window).triggerHandler(e)
         expect(this.$rootScope.$broadcast).toHaveBeenCalledTimes(1)
       })
 

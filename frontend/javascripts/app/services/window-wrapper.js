@@ -36,6 +36,24 @@
         });
       });
 
+      angular.element($window).on('mousedown', function(e) {
+        $rootScope.$apply(function () {
+          $rootScope.$broadcast('window:mousedown', e);
+        });
+      });
+
+      angular.element($window).on('mouseup', function(e) {
+        $rootScope.$apply(function () {
+          $rootScope.$broadcast('window:mouseup', e);
+        });
+      });
+
+      angular.element($window).on('mousemove', function(e) {
+        $rootScope.$apply(function () {
+          $rootScope.$broadcast('window:mousemove', e);
+        });
+      });
+
     }
   ]);
 
