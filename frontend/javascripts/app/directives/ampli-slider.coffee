@@ -19,8 +19,9 @@ limitations under the License.
 window.App.directive('ampliSlider', [
   '$window'
   'TextSelection'
-  ($window, TextSelection) ->
-    restrict: 'E'
+  '$timeout'
+  ($window, TextSelection, $timeout) ->
+    restrict: 'AE'
     replace: true
     require: 'ngModel'
     template: '<div class="ampli-slider"></div>'
@@ -28,6 +29,7 @@ window.App.directive('ampliSlider', [
 
       width = elem.width()
       height = 20
+      elem.parent().height(height)
       barHeight = 5
       circleR = 7
       circleStroke = 4
@@ -47,29 +49,82 @@ window.App.directive('ampliSlider', [
       minCircleCX = circleShadowR
       maxCircleCX = width - (circleR + circleStroke/2) - 1
 
-      $scope.$watch ->
-        ngModel.$viewValue
-      , (val) ->
-        return if !angular.isNumber(val) or $window.isNaN(val) or held
-        width_percent = Math.sqrt(-Math.pow(-val+1, 2)+1)
-        newOffsetWidth = width_percent * (maxOffsetWidth - minOffsetWidth)
-        newOffsetWidth = newOffsetWidth + minOffsetWidth
-        # console.log "newOffsetWidth: #{newOffsetWidth}"
-        newHolderCX = newOffsetWidth + (circleR/2)
+      initDynamicVars = ->
+        width = elem.width()
+        maxOffsetWidth = width - circleR * 2
+        maxCircleCX = width - (circleR + circleStroke/2) - 1
 
-        if (newOffsetWidth > maxOffsetWidth)
-          newOffsetWidth = maxOffsetWidth
-        if (newHolderCX > maxCircleCX)
-          newHolderCX = maxCircleCX
-        if (newOffsetWidth < minOffsetWidth)
-          newOffsetWidth = minOffsetWidth
-        if (newHolderCX < minCircleCX)
-          newHolderCX = minCircleCX
+      initDynamicVars()
+
+      svg = d3.select(elem[0])
+                    .append('svg')
+                    .attr('width', width)
+                    .attr('height', height)
+                    .attr('alignment-baseline', 'middle')
 
 
-        sliderOffset.attr('width', newOffsetWidth)
-        circleHolderShadow.attr('cx', newHolderCX)
-        circleHolder.attr('cx', newHolderCX)
+      sliderBg = svg.append('rect')
+                      .attr('fill', '#ccc')
+                      .attr('width', width)
+                      .attr('height', barHeight)
+                      .attr('y', (height)/2 - 2)
+                      .attr('rx', 2)
+                      .attr('ry', 2)
+                      .on 'mousedown', ->
+                        bgClicked = true
+                        oldHolderCX = handle.attr('cx') * 1
+                        oldHolderShadowCX = handleShadow.attr('cx') * 1
+                        oldOffsetWidth = sliderOffset.attr('width') * 1
+                      .on 'mouseup', ->
+                        if bgClicked
+                          x = d3.mouse(this)[0] - circleR/2
+                          toadd = x - oldOffsetWidth
+                          console.log "toadd: #{toadd}"
+                          moveBy(toadd)
+                          bgClicked = false
+
+      sliderOffset = svg.append('rect')
+                      .attr('fill', 'gray')
+                      .attr('width', circleR - circleStroke/2)
+                      .attr('height', barHeight)
+                      .attr('y', (height)/2 - 2)
+                      .attr('rx', 2)
+                      .attr('ry', 2)
+                      .on 'mousedown', ->
+                        offsetClicked = true
+                        oldHolderCX = handle.attr('cx') * 1
+                        oldHolderShadowCX = handleShadow.attr('cx') * 1
+                        oldOffsetWidth = sliderOffset.attr('width') * 1
+                      .on 'mouseup', ->
+                        if offsetClicked
+                          x = d3.mouse(this)[0] - circleR/2
+                          toadd = x - oldOffsetWidth
+                          console.log "toadd: #{toadd}"
+                          moveBy(toadd)
+                          offsetClicked = false
+
+
+      handleShadow = svg.append('circle')
+                                .attr('fill', '#aaa')
+                                .attr('r', circleShadowR )
+                                .attr('cy', height/2)
+                                .attr('cx', circleShadowR)
+
+      handle = svg.append('circle')
+                                .attr('fill', '#8FC742')
+                                .attr('stroke', '#fff')
+                                .attr('stroke-width', circleStroke)
+                                .attr('r', circleR)
+                                .attr('cy', height/2)
+                                .attr('cx', circleShadowR)
+
+      angular.element(handle.node()).on 'mousedown', (e) ->
+        held = true
+        oldPageX = e.pageX
+        oldHolderCX = handle.attr('cx') * 1
+        oldHolderShadowCX = handleShadow.attr('cx') * 1
+        oldOffsetWidth = sliderOffset.attr('width') * 1
+        TextSelection.disable()
 
       updateModel = (val) ->
         ngModel.$setViewValue(val) if val isnt ngModel.$viewValue
@@ -90,8 +145,8 @@ window.App.directive('ampliSlider', [
           newHolderCX = minCircleCX
 
         sliderOffset.attr('width', newOffsetWidth)
-        circleHolderShadow.attr('cx', newHolderShadowCX)
-        circleHolder.attr('cx', newHolderCX)
+        handleShadow.attr('cx', newHolderShadowCX)
+        handle.attr('cx', newHolderCX)
 
         x = ((oldOffsetWidth + px) - minOffsetWidth)/(maxOffsetWidth - minOffsetWidth)
         if x < 0
@@ -100,87 +155,56 @@ window.App.directive('ampliSlider', [
           y = -Math.sqrt(1-Math.pow(x, 2)) + 1
           updateModel(y)
 
-      elem.parent().height(height)
+      updateViewByValue = (val) ->
+        return if !angular.isNumber(val) or $window.isNaN(val) or held
+        width_percent = Math.sqrt(-Math.pow(-val+1, 2)+1)
+        newOffsetWidth = width_percent * (maxOffsetWidth - minOffsetWidth)
+        newOffsetWidth = newOffsetWidth + minOffsetWidth
+        # console.log "newOffsetWidth: #{newOffsetWidth}"
+        newHolderCX = newOffsetWidth + (circleR/2)
 
-      svg = d3.select(elem[0])
-                    .append('svg')
-                    .style('width', width)
-                    .style('height', height)
-                    .attr('alignment-baseline', 'middle')
-
-
-      sliderBg = svg.append('rect')
-                      .attr('fill', '#ccc')
-                      .attr('width', width)
-                      .attr('height', barHeight)
-                      .attr('y', (height)/2 - 2)
-                      .attr('rx', 2)
-                      .attr('ry', 2)
-                      .on 'mousedown', ->
-                        bgClicked = true
-                        oldHolderCX = circleHolder.attr('cx') * 1
-                        oldHolderShadowCX = circleHolderShadow.attr('cx') * 1
-                        oldOffsetWidth = sliderOffset.attr('width') * 1
-                      .on 'mouseup', ->
-                        if bgClicked
-                          x = d3.mouse(this)[0] - circleR/2
-                          toadd = x - oldOffsetWidth
-                          console.log "toadd: #{toadd}"
-                          moveBy(toadd)
-                          bgClicked = false
-
-      sliderOffset = svg.append('rect')
-                      .attr('fill', 'gray')
-                      .attr('width', circleR - circleStroke/2)
-                      .attr('height', barHeight)
-                      .attr('y', (height)/2 - 2)
-                      .attr('rx', 2)
-                      .attr('ry', 2)
-                      .on 'mousedown', ->
-                        offsetClicked = true
-                        oldHolderCX = circleHolder.attr('cx') * 1
-                        oldHolderShadowCX = circleHolderShadow.attr('cx') * 1
-                        oldOffsetWidth = sliderOffset.attr('width') * 1
-                      .on 'mouseup', ->
-                        if offsetClicked
-                          x = d3.mouse(this)[0] - circleR/2
-                          toadd = x - oldOffsetWidth
-                          console.log "toadd: #{toadd}"
-                          moveBy(toadd)
-                          offsetClicked = false
+        if (newOffsetWidth > maxOffsetWidth)
+          newOffsetWidth = maxOffsetWidth
+        if (newHolderCX > maxCircleCX)
+          newHolderCX = maxCircleCX
+        if (newOffsetWidth < minOffsetWidth)
+          newOffsetWidth = minOffsetWidth
+        if (newHolderCX < minCircleCX)
+          newHolderCX = minCircleCX
 
 
-      circleHolderShadow = svg.append('circle')
-                                .attr('fill', '#aaa')
-                                .attr('r', circleShadowR )
-                                .attr('cy', height/2)
-                                .attr('cx', circleShadowR)
+        sliderOffset.attr('width', newOffsetWidth)
+        handleShadow.attr('cx', newHolderCX)
+        handle.attr('cx', newHolderCX)
 
-      circleHolder = svg.append('circle')
-                                .attr('fill', '#8FC742')
-                                .attr('stroke', '#fff')
-                                .attr('stroke-width', circleStroke)
-                                .attr('r', circleR)
-                                .attr('cy', height/2)
-                                .attr('cx', circleShadowR)
+      $scope.$watch ->
+        ngModel.$viewValue
+      , (val) ->
+        updateViewByValue(val)
 
-      $window.$(circleHolder.node()).on 'mousedown', (e) ->
-        held = true
-        oldPageX = e.pageX
-        oldHolderCX = circleHolder.attr('cx') * 1
-        oldHolderShadowCX = circleHolderShadow.attr('cx') * 1
-        oldOffsetWidth = sliderOffset.attr('width') * 1
-        TextSelection.disable()
-
-      $window.$(document).on 'mousemove', (e) ->
+      $scope.$on 'window:mousemove', (event, e) ->
         if held
           toadd = e.pageX - oldPageX
           moveBy(toadd)
 
-      $window.$(document).on 'mouseup', (e) ->
+      $scope.$on 'window:mouseup', (event, e) ->
         TextSelection.enable()
         if held
           held = false
           oldPageX = e.pageX
+
+      $scope.$on 'window:resize', ->
+        svg.attr('width', 0)
+        sliderBg.attr('width', 0)
+        sliderOffset.attr('width', 0)
+        handleShadow.attr('cx', 0)
+        handle.attr('cx', 0)
+
+        $timeout ->
+          initDynamicVars()
+          svg.attr('width', width)
+          sliderBg.attr('width', width)
+          updateViewByValue(ngModel.$viewValue)
+        , 500
 
 ]);
