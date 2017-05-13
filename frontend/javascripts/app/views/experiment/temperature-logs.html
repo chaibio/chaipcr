@@ -32,11 +32,11 @@
               <div class="col-sm-6">
                 <div class="zoom-container">
                   <div class="zoom-text">ZOOM</div>
-                  <ampli-slider ng-model="zoomState" ng-if="chart === 'temperature-logs'"></ampli-slider>
+                  <ampli-slider ng-model="$parent.zoomState" ng-if="chart === 'temperature-logs'"></ampli-slider>
                 </div>
               </div>
               <div class="col-sm-6 scroll-container">
-                <scrollbar ng-model="scrollState" ng-if="chart === 'temperature-logs'"></scrollbar>
+                <scrollbar ng-model="$parent.scrollState" ng-if="chart === 'temperature-logs'"></scrollbar>
               </div>
             </div>
           </div>

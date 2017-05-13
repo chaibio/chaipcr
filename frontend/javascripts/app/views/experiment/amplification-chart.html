@@ -170,11 +170,11 @@ limitations under the License.
                 <div class="zoom-text SH">
                   <b>ZOOM</b>
                 </div>
-                <ampli-slider ng-model="ampli_zoom" ng-if="chart === 'amplification'"></ampli-slider>
+                <ampli-slider ng-model="$parent.ampli_zoom" ng-if="chart === 'amplification'"></ampli-slider>
               </div>
             </div>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 ampli-scrollbar-container">
-              <scrollbar ng-model="ampli_scroll" ng-if="chart === 'amplification'"></scrollbar>
+              <scrollbar ng-model="$parent.ampli_scroll" ng-if="chart === 'amplification'"></scrollbar>
             </div>
           </div>
         </div>

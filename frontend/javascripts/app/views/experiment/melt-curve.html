@@ -81,12 +81,12 @@
                   <div class="zoom-text SH">
                     <b>ZOOM</b>
                   </div>
-                  <ampli-slider ng-model="mc_zoom" ng-if="$parent.chart === 'melt-curve'"></ampli-slider>
+                  <ampli-slider ng-model="$parent.mc_zoom" ng-if="chart === 'melt-curve'"></ampli-slider>
                   <!-- <scrollbar ng-model="mc_zoom"></scrollbar> -->
                 </div>
               </div>
               <div class="col-md-6 ampli-scrollbar-container">
-                <scrollbar ng-model="mc_scroll" ng-if="$parent.chart === 'melt-curve'"></scrollbar>
+                <scrollbar ng-model="$parent.mc_scroll" ng-if="chart === 'melt-curve'"></scrollbar>
               </div>
             </div>
 
