@@ -187,7 +187,7 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
         if newMargin < 0 then newMargin = 0
         scrollbarHandle.attr('x', newMargin)
 
-      $timeout(init, 1500)
+      $timeout(init, 3000)
 
 
 ]

@@ -16,14 +16,14 @@ describe 'Ampli Slider directive', ->
     template = "<div><ampli-slider ng-model=\"slider\" style=\"width:#{@width}px\"></ampli-slider></div>"
 
     @compiled = @compile(template)(@scope)
+    @scope.$digest()
+    @timeout.flush()
     @directive = @compiled.find('.ampli-slider')
     @svg = @directive.find('svg')
     @background = @directive.find('rect').eq(0)
     @offset = @directive.find('rect').eq(1)
     @handleShadow = @directive.find('circle').eq(0)
     @handle = @directive.find('circle').eq(1)
-    @scope.$digest()
-    @timeout.flush()
 
   it 'should have slider elements', ->
     expect(@svg.length).toBe(1)
