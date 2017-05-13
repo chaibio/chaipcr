@@ -130,7 +130,6 @@ window.App.directive('ampliSlider', [
 
         updateModel = (val) ->
           ngModel.$setViewValue(val) if val isnt ngModel.$viewValue
-          $scope.$apply()
 
         moveBy = (px) ->
           newHolderCX = oldHolderCX + px
