@@ -16,8 +16,8 @@
         this.$rootScope = $injector.get('$rootScope')
         this.scope = this.$rootScope.$new()
         this.scope.scrollbar = {
-          value: null,
-          width: null
+          value: 0.5,
+          width: 0.5
         }
       })
 
@@ -53,11 +53,12 @@
     it('should have rect element as handle', function() {
       var rect = this.directive.find('rect').eq(1)
       expect(rect).toBeDefined()
-      expect(rect.attr('width')).toBe('100')
+      expect(rect.attr('width')).toBe('50')
       expect(rect.attr('height')).toBe('5')
       expect(rect.attr('fill')).toBe('#555')
       expect(rect.attr('rx')).toBe('2')
       expect(rect.attr('ry')).toBe('2')
+      expect(rect.attr('x')).toBe('25')
     })
 
     it('should resize', function() {
@@ -96,18 +97,17 @@
           type: 'mousedown',
           pageX: 0
         }
-        this.handle.attr('width', 50)
         expect(this.TextSelection.disable).not.toHaveBeenCalled()
         this.handle.triggerHandler(e)
         expect(this.TextSelection.disable).toHaveBeenCalled()
         this.$rootScope.$broadcast('window:mousemove', {
           pageX: 25
         })
-        expect(this.handle.attr('x')).toEqual('25')
+        expect(this.handle.attr('x')).toEqual('50')
         expect(this.TextSelection.enable).not.toHaveBeenCalled()
         this.$rootScope.$broadcast('window:mouseup')
         expect(this.TextSelection.enable).toHaveBeenCalled()
-        expect(this.scope.scrollbar.value).toBe(0.5)
+        expect(this.scope.scrollbar.value).toBe(1)
         expect(this.scope.scrollbar.width).toBe(0.5)
       })
 
@@ -116,13 +116,12 @@
           type: 'mousedown',
           pageX: 0
         }
-        this.handle.attr('width', 50)
         this.handle.triggerHandler(e)
         this.$rootScope.$broadcast('window:mousemove', {
-          pageX: 100
+          pageX: 50
         })
         expect(this.handle.attr('x')).toEqual('50')
-        expect(this.scope.scrollbar.value).toBe(2)
+        expect(this.scope.scrollbar.value).toBe(1.5)
       })
 
       it('should not go beyond its width when moving left', function() {
@@ -133,12 +132,15 @@
         this.handle.attr('width', 50)
         this.handle.triggerHandler(e)
         this.$rootScope.$broadcast('window:mousemove', {
-          pageX: -100
+          pageX: -50
         })
         expect(this.handle.attr('x')).toEqual('0')
-        expect(this.scope.scrollbar.value).toBe(-2)
+        expect(this.scope.scrollbar.value).toBe(-0.5)
       })
 
+      it('should turn cursor to pointer', function() {
+        expect(this.directive.css('cursor')).toBe('pointer')
+      })
 
     })
 

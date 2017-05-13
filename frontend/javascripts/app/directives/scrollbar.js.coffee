@@ -28,7 +28,7 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
     require: 'ngModel'
     link: ($scope, elem, attr, ngModel) ->
 
-      elem.css(width: '100%')
+      elem.css(width: '100%', cursor: 'pointer')
       # width = elem.width()
       height = 5
 
@@ -48,17 +48,6 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
 
       init = ->
         width = elem.width()
-        height = 5
-
-        held = false
-        oldMargin = 0;
-        newMargin = 0;
-        pageX = 0
-        margin = 0
-        spaceWidth = 0
-        scrollbar_width = 0
-        xDiff = 0
-        scrollbarBGClicked = false
 
         svg = d3.select(elem[0]).append('svg')
                                   .attr('width', width)
@@ -90,12 +79,15 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
                                   width: scrollbar_width / getElemWidth()
                                 })
 
+        handleWidth = width * getModelWidth()
         scrollbarHandle = svg.append('rect')
                             .attr('fill', '#555')
-                            .attr('width', width)
+                            .attr('width', handleWidth)
                             .attr('height', height)
                             .attr('rx', 2)
                             .attr('ry', 2)
+
+        updateMargin(getModelValue() * (width - handleWidth))
 
         angular.element(scrollbarHandle.node()).on 'mousedown', (e) ->
           held = true
@@ -187,7 +179,7 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
         if newMargin < 0 then newMargin = 0
         scrollbarHandle.attr('x', newMargin)
 
-      $timeout(init, 3000)
+      $timeout(init, 1500)
 
 
 ]

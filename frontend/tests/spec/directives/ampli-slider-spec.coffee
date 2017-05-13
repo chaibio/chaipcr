@@ -32,6 +32,9 @@ describe 'Ampli Slider directive', ->
     expect(@handleShadow.length).toBe(1)
     expect(@handle.length).toBe(1)
 
+  it 'should turn cursor to pointer', ->
+    expect(@directive.css('cursor')).toBe('pointer')
+
   it 'should disable text selection on mousedown', ->
     spyOn(@TextSelection, 'disable')
     @handle.triggerHandler(type: 'mousedown')

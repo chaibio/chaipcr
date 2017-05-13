@@ -27,6 +27,8 @@ window.App.directive('ampliSlider', [
     template: '<div class="ampli-slider"></div>'
     link: ($scope, elem, attrs, ngModel) ->
 
+      elem.css(cursor: 'pointer')
+
       width = elem.width()
       height = 20
       elem.parent().height(height)
@@ -217,6 +219,6 @@ window.App.directive('ampliSlider', [
 
       $timeout ->
         init()
-      , 3000
+      , 1500
 
 ]);
