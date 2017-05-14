@@ -91,7 +91,7 @@ angular.module("canvasApp").factory('stage', [
       };
 
       this.addNewStep = function(data, currentStep) {
-
+        
         this.setNewWidth(constants.stepWidth);
         this.moveAllStepsAndStages();
         // Now insert new step;
@@ -479,7 +479,7 @@ angular.module("canvasApp").factory('stage', [
 
         // We use reduce here so that Linking is easy here, because reduce retain the previous value which we return.
         this.model.steps.reduce(function(tempStep, STEP, stepIndex) {
-
+          
           stepView = new step(STEP.step, that, stepIndex, $scope);
 
           if(tempStep) {

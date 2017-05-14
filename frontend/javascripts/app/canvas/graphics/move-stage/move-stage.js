@@ -66,7 +66,7 @@ angular.module("canvasApp").factory('moveStageRect', [
             this.direction = null;
             
 
-            this.verticalLine.setLeft(stage.left + 5)
+            this.verticalLine.setLeft(stage.left + 5);
             this.verticalLine.setVisible(true);
             this.verticalLine.setCoords();
             
@@ -278,8 +278,7 @@ angular.module("canvasApp").factory('moveStageRect', [
 
           var stageIndex = (this.currentDrop) ? this.currentDrop.index : 0;
           var model = this.draggedStage.model;
-          var stageView = new stageDude(model, this.kanvas.canvas, this.kanvas.allStepViews, stageIndex, this.kanvas, this.kanvas.$scope, true);
-
+          var stageView = this.getNewStage(model, stageIndex);
           this.kanvas.addNextandPrevious(this.currentDrop, stageView);
 
           if(stageIndex === 0 && !this.currentDrop) { //if we insert into the very first place.
@@ -290,6 +289,10 @@ angular.module("canvasApp").factory('moveStageRect', [
 
           this.moveStageGraphics(stageView, circleManager);
           this.kanvas.canvas.remove(stage_.dots);
+        };
+
+        this.indicator.getNewStage = function(model, stageIndex) {
+          return new stageDude(model, this.kanvas.canvas, this.kanvas.allStepViews, stageIndex, this.kanvas, this.kanvas.$scope, true);
         };
 
         this.indicator.moveStageGraphics = function(stageView, circleManager) {

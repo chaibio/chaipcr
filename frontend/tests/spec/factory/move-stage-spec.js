@@ -591,5 +591,99 @@ describe("Testing move-stage", function() {
         expect(indicator.kanvas.addNewStageAtBeginning).toHaveBeenCalled();
         
     });
+
+    it("It should check applyMovement method", function() {
+
+        indicator.init(stage, C, movement);
+
+        indicator.draggedStage = {
+            model: {
+                name: "Jossie",
+                steps: [
+                    {
+                    }
+                ],
+            }
+        };
+        indicator.currentDrop = {
+            index: 1
+        };
+
+        indicator.kanvas = {
+            addNextandPrevious: function() {},
+            canvas: {
+                remove: function() {},
+                add: function() {}
+            },
+            allStepViews: [],
+            allStageViews: [],
+            $scope: {}
+        };
+
+        var _stage = {
+            dots: []
+        };
+        spyOn(indicator.kanvas, "addNextandPrevious");
+        spyOn(indicator, "getNewStage").and.returnValue({
+
+        });
+        spyOn(indicator, "moveStageGraphics").and.callFake(function() {
+            return true;
+        });
+
+        spyOn(indicator.kanvas.canvas, "remove");
+        spyOn(indicator.kanvas.allStageViews, "splice");
+        indicator.applyMovement(_stage, {});
+        
+        expect(indicator.kanvas.allStageViews.splice).toHaveBeenCalled();
+        expect(indicator.kanvas.addNextandPrevious).toHaveBeenCalled();
+        expect(indicator.kanvas.canvas.remove).toHaveBeenCalled();
+
+    });
+
+    it("It should check applyMovement method", function() {
+
+        indicator.init(stage, C, movement);
+
+        indicator.draggedStage = {
+            model: {
+                name: "Jossie",
+                steps: [
+                    {
+                    }
+                ],
+            }
+        };
+        indicator.currentDrop = null;
+
+        indicator.kanvas = {
+            addNextandPrevious: function() {},
+            canvas: {
+                remove: function() {},
+                add: function() {}
+            },
+            allStepViews: [],
+            allStageViews: [],
+            $scope: {}
+        };
+
+        var _stage = {
+            dots: []
+        };
+        spyOn(indicator.kanvas, "addNextandPrevious");
+        spyOn(indicator, "getNewStage").and.returnValue({
+
+        });
+        spyOn(indicator, "moveStageGraphics").and.callFake(function() {
+            return true;
+        });
+
+        spyOn(indicator.kanvas.canvas, "remove");
+        spyOn(indicator.kanvas.allStageViews, "splice");
+        indicator.applyMovement(_stage, {});
+        
+        expect(indicator.kanvas.allStageViews.splice).toHaveBeenCalled();
+
+    });
 });
 
