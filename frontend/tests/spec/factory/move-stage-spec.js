@@ -641,7 +641,7 @@ describe("Testing move-stage", function() {
 
     });
 
-    it("It should check applyMovement method", function() {
+    it("It should check applyMovement method, with currentdrop === null", function() {
 
         indicator.init(stage, C, movement);
 
@@ -685,5 +685,86 @@ describe("Testing move-stage", function() {
         expect(indicator.kanvas.allStageViews.splice).toHaveBeenCalled();
 
     });
+
+
+    it("It should test moveStageGraphics", function() {
+        indicator.init(stage, C, movement);
+        var stageView = {
+            updateStageData: function() {
+
+            },
+            render: function() {
+
+            },
+            stageHeader: function() {},
+            childSteps: [
+                {
+                    circle: {
+                        manageClick: function() {}
+                    }
+                }
+            ]
+        };
+
+        var circleManager = {
+           addRampLines: function() {}
+       };
+
+        indicator.kanvas = {
+            configureStepsofNewStage: function() {},
+            correctNumbering: function() {},
+            allStageViews: [
+                {
+                    moveAllStepsAndStagesSpecial: function() {},
+                    circle: {
+                        doThingsForLast: function() {}
+                    }
+                }
+            ],
+            allStepViews: [
+                {
+                    circle: {
+                        doThingsForLast: function() {}
+                    }
+                }
+            ],
+            $scope: {
+                applyValues: function() {}
+            }
+        };
+
+       
+
+       spyOn(stageView, "updateStageData").and.returnValue(true);
+       spyOn(stageView, "render").and.returnValue(true);
+       spyOn(stageView, "stageHeader").and.returnValue(true);
+       spyOn(indicator.kanvas, "configureStepsofNewStage").and.returnValue(true);
+       spyOn(indicator.kanvas, "correctNumbering").and.returnValue(true);
+       spyOn(circleManager, "addRampLines").and.returnValue(null);
+
+       indicator.moveStageGraphics(stageView, circleManager);
+
+       expect(stageView.updateStageData).toHaveBeenCalled();
+       expect(stageView.render).toHaveBeenCalled();
+       expect(stageView.stageHeader).toHaveBeenCalled();
+       
+       expect(indicator.kanvas.configureStepsofNewStage).toHaveBeenCalled();
+       expect(indicator.kanvas.correctNumbering).toHaveBeenCalled();
+       expect(circleManager.addRampLines).toHaveBeenCalled();
+    });
+
+    it("It should test getNewStage method", function() {
+        
+        indicator.init(stage, C, movement);
+        model = {
+            steps: [
+                
+            ]
+        };
+
+        var st = indicator.getNewStage(model, 100);
+        expect(st.index).toEqual(100);
+    });
+
 });
 
