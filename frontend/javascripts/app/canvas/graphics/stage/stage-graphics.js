@@ -33,9 +33,8 @@ angular.module("canvasApp").service('stageGraphics', [
   'stageNameGroup',
   'stageRect',
   'stageGroup',
-  'hitPoints',
   function(dots, Line, Group, Circle, Text, Rectangle, stageRoof, stageBorderLeft, stageDotsBackground,
-    stageDots, stageCaption, stageName, stageNameGroup,stageRect, stageGroup, hitPoints) {
+    stageDots, stageCaption, stageName, stageNameGroup,stageRect, stageGroup) {
 
     this.addRoof = function() {
 
@@ -58,31 +57,6 @@ angular.module("canvasApp").service('stageGraphics', [
       
       this.stageNameGroup = new stageNameGroup(this);
       return this;
-    };
-
-    this.createStageHitPoints = function() {
-
-      var allHitPoints = hitPoints.createAllHitPoints(this);
-
-      //this.stageHitPointLeft = allHitPoints.stageHitPointLeft;
-      //this.stageHitPointRight = allHitPoints.stageHitPointRight;
-      //this.stageHitPointLowerLeft = allHitPoints.stageHitPointLowerLeft;
-      //this.stageHitPointLowerRight = allHitPoints.stageHitPointLowerRight;
-      //this.moveStageRightPointerDetector = Rectangle.create(rightPointerDetectorProperties);
-      return this;
-    };
-
-    this.recalculateStageHitPoint = function() {
-
-      //this.stageHitPointLeft.setLeft(this.left + 10).setCoords();
-      //this.stageHitPointRight.setLeft((this.left + this.myWidth) - 20).setCoords();
-
-      //this.stageHitPointLowerLeft.setLeft(this.left + 10).setCoords();
-      //this.stageHitPointLowerRight.setLeft((this.left + this.myWidth) - 20).setCoords();
-
-      //this.canvas.bringToFront(this.stageHitPointLowerLeft);
-      //this.canvas.bringToFront(this.stageHitPointLowerRight);
-      //this.canvas.bringToFront(this.moveStageRightPointerDetector);
     };
 
     this.createStageRect = function() {

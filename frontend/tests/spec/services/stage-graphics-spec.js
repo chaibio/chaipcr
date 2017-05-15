@@ -62,21 +62,6 @@ describe("Testing stage graphics, Which creates all the graphics for the stage",
     expect(me.stageNameGroup).toEqual(jasmine.any(Object));
   });
 
-  it("This should check createStageHitPoints method", function() {
-
-    var me = {
-      left: 10,
-      width: 100,
-      parent: {
-        editStageStatus: false
-      }
-    };
-
-    sg = _stageGraphics.createStageHitPoints.call(me);
-    expect(sg.stageHitPointLowerLeft).toEqual(jasmine.any(Object));
-    expect(sg.stageHitPointLowerRight).toEqual(jasmine.any(Object));
-  });
-
   it("This should check the createStageRect method", function() {
 
     sg = _stageGraphics.createStageRect();
@@ -125,45 +110,4 @@ describe("Testing stage graphics, Which creates all the graphics for the stage",
     expect(sg.stageRect).toEqual(jasmine.any(Object));
   });
 
-  it("This should check recalculateStageHitPoint method", function() {
-
-    var me = {
-      left: 10,
-      width: 100,
-      parent: {
-        editStageStatus: false
-      },
-      canvas: {
-        bringToFront: function() {
-
-        }
-      }
-    };
-
-    spyOn(me.canvas, "bringToFront");
-    _stageGraphics.createStageHitPoints.call(me);
-    _stageGraphics.recalculateStageHitPoint.call(me);
-    expect(me.canvas.bringToFront).toHaveBeenCalled();
-  });
-
-  it("This should check recalculateStageHitPoint method, and values of re-calculated objects", function() {
-
-    var me = {
-      left: 10,
-      width: 100,
-      parent: {
-        editStageStatus: false
-      },
-      canvas: {
-        bringToFront: function() {
-
-        }
-      }
-    };
-
-    //spyOn(me.canvas, "bringToFront");
-    _stageGraphics.createStageHitPoints.call(me);
-    _stageGraphics.recalculateStageHitPoint.call(me);
-    expect(me.stageHitPointLowerLeft.left).toEqual(me.left + 10);
-  });
 });
