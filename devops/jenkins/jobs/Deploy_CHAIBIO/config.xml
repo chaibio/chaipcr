@@ -1,0 +1,594 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Build Chaibio shoftware</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.24.0">
+      <projectUrl>https://github.com/chaibio/chaipcr.git/</projectUrl>
+      <displayName></displayName>
+    </com.coravy.hudson.plugins.github.GithubProjectProperty>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
+      <optOut>false</optOut>
+    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>build_machine</name>
+          <description>Building machine</description>
+          <defaultValue>192.168.1.55</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>check_badblocks</name>
+          <description>Check if there are any bad blocks on eMMC. Takes more than an hour.</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>download_prefex</name>
+          <description>Download folder URL</description>
+          <defaultValue>http://192.168.1.200/download</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>low_performance</name>
+          <description>Set cpu to lowest performance.</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.0.1">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/chaibio/chaipcr.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <authToken>123</authToken>
+  <triggers/>
+  <concurrentBuild>true</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+echo checking Jenkins server
+echo &quot;Bash version ${BASH_VERSION}...&quot;
+uname -a
+ls -ahl
+lsblk
+df -h
+echo user: $(whoami)
+
+echo Checking for nessasery packages:
+sudo apt-get -y -q install sshpass parted mdadm
+
+if grep $build_machine /var/lib/jenkins/.ssh/config
+then
+	echo /var/lib/jenkins/.ssh/config was patched already
+else
+	echo patching /var/lib/jenkins/.ssh/config
+	cat &lt;&lt;EOF &gt;&gt; /var/lib/jenkins/.ssh/config
+Host $build_machine
+		KexAlgorithms +diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+		Ciphers +3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+#		KexAlgorithms +diffie-hellman-group1-sha1
+#        KexAlgorithms +curve25519-sha256@libssh.org
+#        KexAlgorithms +ecdh-sha2-nistp256
+#        KexAlgorithms +ecdh-sha2-nistp384
+#        KexAlgorithms +ecdh-sha2-nistp521
+#        KexAlgorithms +diffie-hellman-group-exchange-sha256
+#        KexAlgorithms +diffie-hellman-group14-sha1
+EOF
+fi
+
+#if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
+#then
+#	echo sshd_config was patched already
+#else
+#	echo patching sshd_config
+#	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
+#KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+#Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+#EOF
+#	sudo service sshd restart
+#fi
+
+ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
+
+echo deleting root password in case of chaipcr
+sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;passwd -d -u root&quot;
+
+ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
+ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
+
+if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
+then
+	echo sshd_config on $build_machine was patched already
+else
+	echo patching sshd_config
+	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
+KexAlgorithms diffie-hellman-group1-sha1
+KexAlgorithms ecdh-sha2-nistp256
+KexAlgorithms ecdh-sha2-nistp384
+KexAlgorithms ecdh-sha2-nistp521
+KexAlgorithms diffie-hellman-group-exchange-sha256
+KexAlgorithms diffie-hellman-group14-sha1
+#Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+EOF
+	sudo service sshd restart
+    sudo service ssh restart
+    /etc/init.d/ssh restart
+	echo $build_machine patched
+    ifconfig
+fi
+
+exit 0
+ENDSSH
+
+echo returned to host. connection check:
+counter=0
+until ssh -t root@$build_machine &apos;exit 0&apos;
+do
+	counter=$(( $counter + 1 ))
+    if [ $counter -gt 10 ]
+    then
+    	echo Beaglebone is not available.
+    	exit 1
+    fi
+	echo waiting for beaglebone to become connectable.
+	sleep 10
+    
+done
+
+echo done connection check.
+</command>
+    </hudson.tasks.Shell>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
+echo &quot;Slave Beaglebone at ${build_machine}&quot;
+echo checking build device 
+echo &quot;Bash version ${BASH_VERSION}...&quot;
+uname -a
+ls -ahl
+lsblk
+df -h
+
+swapoff -a
+
+umount /dev/mmcblk0p*
+umount /sdcard/*
+
+lsblk
+if mount | grep mmcblk0
+then
+  echo &quot;Error: can&apos;t unmount sdcard!&quot;
+  exit 1
+fi
+dpkg --configure -a</command>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+# waiting 20min for the bulding device to flash
+echo &quot;Waiting for the build device ($build_machine) to flash and become ready!&quot;
+#sleep 1500
+
+for i in {0..1200..60}
+do
+	echo &quot;Waiting for the build device ($build_machine) to become ready! $i&quot;
+	sleep 10
+
+	if ping $build_machine -c 2
+    then
+    	echo device is finally up !!
+        sleep 10
+        
+		ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
+		ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
+		echo $build_machine device is connectable.. 
+		lsblk
+		exit 0
+ENDSSH
+
+		sleep 10
+		echo returned to host. connection check:
+		counter=0
+		until ssh -t root@$build_machine &apos;exit 0&apos;
+		do
+			counter=$(( $counter + 1 ))
+    		if [ $counter -gt 20 ]
+    		then
+    			echo Beaglebone is not available.
+    			exit 1
+		    fi
+			echo waiting for ssh on beaglebone to become connectable.
+			sleep 10
+		done
+		echo ssh is connectable.
+        sleep 10
+
+        cat deploy.sh
+        echo | ./deploy.sh $build_machine
+
+        exit 0
+    fi
+done
+
+echo timeout waiting for the device to become ready!
+exit 1</command>
+    </hudson.tasks.Shell>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo realtime compile
+
+cpufreq-info
+cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+if $low_performance
+then
+    cpufreq-set -f 300MHz 
+    cpufreq-set -g conservative --max 300MHz
+fi
+
+sync
+
+cd
+echo unmounting any sdcard folders
+umount /sdcard/*
+umount /dev/mmcblk0p*
+
+LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
+,,0xe,*
+__EOF__
+
+partprobe /dev/mmcblk0
+mkfs.ext4 /dev/mmcblk0p1 -F
+mkdir -p /sdcard/upgrade
+if mount /dev/mmcblk0p1 /sdcard/upgrade/
+then
+    echo &quot;temp sdcard folder mounted&quot;
+else
+   echo &quot;Error mounting temp sdcard folder&quot;
+   exit 1
+fi
+
+# creating a temporary swap file on sdcard
+if fallocate -l 1G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
+then
+    echo &quot;swap file created successfully&quot;
+else
+   echo &quot;failed creating swap file&quot;
+   exit 1
+fi
+sudo chmod 600 /sdcard/upgrade/swapfile
+sudo mkswap /sdcard/upgrade/swapfile
+sudo swapon /sdcard/upgrade/swapfile
+
+#verifying swap file is successfully added
+sudo swapon -s
+
+free -m
+
+sync
+
+
+mkdir -p /sdcard/upgrade/realtime-compile
+cd /sdcard/upgrade/realtime-compile
+git clone https://github.com/chaibio/chaipcr.git
+cd /sdcard/upgrade/realtime-compile/chaipcr/realtime
+
+qmake
+sed -i &quot;s/arm-unknown-linux-gnueabi-//&quot; Makefile
+make
+make install
+cp realtime ~/tmp
+cp libraries/lib/* /usr/lib/
+cd
+rm -r /sdcard/upgrade/realtime-compile
+
+swapoff /sdcard/upgrade/swapfile
+rm /sdcard/upgrade/swapfile
+
+echo  Deploy realtime to ~/tmp
+cp ~/chaipcr/deploy/device/realtime.service /lib/systemd/system/
+systemctl enable realtime.service
+exit 0
+
+
+
+
+</command>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo checking deployed web files
+
+ls -ahl
+
+if [ -e ~/chaipcr/deploy ]
+then
+	echo web files deploy done successfully
+else
+        echo error deploying ssh files
+        exit 1
+fi
+
+#Replace uEnv.txt
+echo Replacing uEnv.txt
+cd ~/chaipcr/deploy/
+./replace_uEnv.txt.sh
+#sed -i &quot;s/errors=remount-ro/errors=continue/&quot; /etc/fstab
+
+echo patching rc.local
+cd /etc        
+patch -i ~/chaipcr/deploy/device/rc.local.patch
+cd
+sync
+
+echo Disable Mass-storage mini-usb
+cd /opt/scripts/boot        
+patch -i ~/chaipcr/deploy/device/storage.disable.patch 
+cd ~
+sync
+
+echo Update Networking
+sed -i &apos;s/#auto eth0/auto eth0/&apos; /etc/network/interfaces
+sed -i &apos;s/#iface eth0/iface eth0/&apos; /etc/network/interfaces
+
+sed -i &apos;s/#timeout 60/timeout 20/&apos; /etc/dhcp/dhclient.conf
+sed -i &apos;s/#retry 60/retry 20/&apos; /etc/dhcp/dhclient.conf
+sed -i &apos;s/#reboot/reboot/&apos; /etc/dhcp/dhclient.conf
+
+</command>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo Configure Logrotate
+cp ~/chaipcr/deploy/device/logrotate/logrotate.conf /etc
+cp ~/chaipcr/deploy/device/logrotate/logrotate.d/* /etc/logrotate.d/
+mv /etc/cron.daily/logrotate /etc/cron.hourly/ 
+
+echo Build/update wifi drivers- ignored now.. lets see if the latest is making any issues
+
+echo Install browser
+# Deploy browser to ~/tmp
+cp -r ~/chaipcr/browser/resources ~/tmp/
+cp ~/chaipcr/browser/qpcrbrowser.service /lib/systemd/system/
+systemctl enable qpcrbrowser.service
+
+echo Install PRU libraries and Tools
+cd
+wget https://github.com/beagleboard/am335x_pru_package/archive/master.zip --no-check-certificate
+unzip -o master.zip
+mkdir /usr/include/pruss/
+cp ~/am335x_pru_package-master/pru_sw/app_loader/include/pruss* /usr/include/pruss/
+cd ~/am335x_pru_package-master/pru_sw/app_loader/interface
+CROSS_COMPILE= make  #note: there is space between = and make
+cp ~/am335x_pru_package-master/pru_sw/app_loader/lib/lib* /usr/lib/
+ldconfig
+cd ~/am335x_pru_package-master/pru_sw/utils/pasm_source
+source linuxbuild
+cd ..
+cp pasm /usr/bin/ 
+cd
+rm master.zip || true
+</command>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo Build/install LCD drivers
+cd ~/chaipcr/modules/LCDtouch_V3
+chmod 775 install_debian.sh
+mkdir -p /boot/uboot/dtbs/
+./install_debian.sh
+rm -rf /usr/src/linux*
+sync
+
+echo Setting up Rserve
+cp ~/chaipcr/deploy/device/Rserve/Rserv.conf /etc
+cp ~/chaipcr/deploy/device/Rserve/r.service /lib/systemd/system/
+
+sync
+sync
+ fsck /dev/mmcblk1p1 -y -f
+ fsck /dev/mmcblk0p1 -y -f
+
+systemctl enable r.service
+
+
+echo Setup Rails app
+
+mkdir -p ~/chaipcr/web/config/
+cat &lt;&lt;EOF &gt;&gt; ~/chaipcr/web/config/database.yml
+    production:
+      adapter: mysql2
+      database: chaipcr
+      pool: 5
+      timeout: 5000
+      username: root
+      password:
+EOF
+echo database.yml created
+
+cd /root/chaipcr/web
+chmod 755 /root
+
+echo rserve 
+echo \n | gem install rserve-client #otherwise bundle fails, don&apos;t know why
+
+echo bundle
+echo &quot;\n&quot; | bundle
+
+echo rake setup
+echo &quot;\n&quot; | RAILS_ENV=production bundle exec rake db:setup
+
+echo seed_fu
+echo &quot;\n&quot; | RAILS_ENV=production bundle exec rake db:seed_fu 
+
+echo done rserev</command>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo &quot;Install device tree overlay and PRU binary(do this every time it changes):&quot;
+cd ~/chaipcr/deploy/overlay
+bash ./build.sh
+sync
+cd</command>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo setting up website pn ngixn
+cp ~/chaipcr/web/config/etc/nginx/chaipcr /etc/nginx/sites-available/
+cd /etc/nginx/sites-enabled
+sudo ln -s ../sites-available/chaipcr
+rm default 
+
+cat &lt;&lt;EOF &gt;&gt; /etc/nginx/nginx.conf 
+#Add the following to /etc/nginx/nginx.conf under the http section:
+    # Unicorn
+     upstream unicorn {
+       server unix:/root/shared/sockets/unicorn.sock fail_timeout=0;
+    }
+EOF
+
+update-rc.d -f nginx defaults
+</command>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo Unicorn
+
+mkdir ~/shared
+mkdir ~/shared/pids
+mkdir ~/shared/log
+mkdir ~/shared/sockets 
+
+cp ~/chaipcr/web/config/etc/unicorn_init.d /etc/init.d/unicorn
+chmod +x /etc/init.d/unicorn
+mkdir /etc/unicorn
+cp ~/chaipcr/web/config/etc/unicorn/chaipcr.conf /etc/unicorn/
+</command>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo zeroing 2
+
+dd if=/dev/zero of=/zeros.bigfile bs=16M
+sync
+rm /zeros.bigfile
+sync
+mkdir -p /tmp/zeroer
+if mount /dev/mmcblk1p2 /tmp/zeroer
+then
+    dd if=/dev/zero of=/tmp/zeroer/zeros.bigfile bs=16M
+    sync
+    rm /tmp/zeroer/zeros.bigfile
+    sync
+    umount /tmp/zeroer
+fi
+
+if mount /dev/mmcblk1p3 /tmp/zeroer
+then
+    dd if=/dev/zero of=/tmp/zeroer/zeros.bigfile bs=16M
+    sync
+    rm /tmp/zeroer/zeros.bigfile
+    sync
+    umount /tmp/zeroer
+fi
+
+echo basic beaglebone setup done!</command>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo changing root password to chaipcr
+echo &quot;root:chaipcr&quot; | chpasswd
+sync
+echo rebooting
+shutdown -r 1
+echo a reboot is scheduled after a minute</command>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+sleep 60
+echo waiting for a restart
+for i in {0..300..60}
+do
+	echo &quot;Waiting for the build device to become ready! $i&quot;
+	sleep 60
+    if ping $build_machine -c 2
+    then
+    	echo device is finally up !!
+        sleep 30
+        exit 0
+    fi
+done
+
+echo timeout waiting for the device to become ready!
+exit 1
+</command>
+    </hudson.tasks.Shell>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo device is still connectable!
+
+cpufreq-info
+cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+if $low_performance
+then
+    cpufreq-set -f 300MHz 
+    cpufreq-set -g conservative --max 300MHz
+fi
+
+cd
+echo unmounting any sdcard folders
+umount /sdcard/*
+umount /dev/mmcblk0p*
+
+echo cleaning up sdcard
+LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
+,,0xe,*
+__EOF__
+
+partprobe /dev/mmcblk0
+mkfs.ext4 /dev/mmcblk0p1 -F
+
+sync
+sync
+ fsck /dev/mmcblk1p1 -y -f
+ fsck /dev/mmcblk0p1 -y -f
+
+mount /dev/mmcblk0p1 /sdcard/upgrade/
+
+exit 0</command>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo Maintenance
+
+cd /root/chaipcr/web
+bundle exec rake db:migrate # migrates database as needed
+
+exit 0</command>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <hudson.tasks.Shell>
+      <command>#build( &quot;create_factory_settings_sdcard&quot;, build_machine:&quot;$build_machine&quot;, output_sdcard:&quot;/dev/sdb&quot;)
+echo all done for $build_machine, you can call create_factory_settings_sdcard job to create a factory settings image. root password is chaipcr
+
+exit 0</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.7"/>
+  </buildWrappers>
+</project>
