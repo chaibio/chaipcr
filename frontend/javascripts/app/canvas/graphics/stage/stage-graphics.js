@@ -66,8 +66,8 @@ angular.module("canvasApp").service('stageGraphics', [
 
       //this.stageHitPointLeft = allHitPoints.stageHitPointLeft;
       //this.stageHitPointRight = allHitPoints.stageHitPointRight;
-      this.stageHitPointLowerLeft = allHitPoints.stageHitPointLowerLeft;
-      this.stageHitPointLowerRight = allHitPoints.stageHitPointLowerRight;
+      //this.stageHitPointLowerLeft = allHitPoints.stageHitPointLowerLeft;
+      //this.stageHitPointLowerRight = allHitPoints.stageHitPointLowerRight;
       //this.moveStageRightPointerDetector = Rectangle.create(rightPointerDetectorProperties);
       return this;
     };
@@ -77,11 +77,11 @@ angular.module("canvasApp").service('stageGraphics', [
       //this.stageHitPointLeft.setLeft(this.left + 10).setCoords();
       //this.stageHitPointRight.setLeft((this.left + this.myWidth) - 20).setCoords();
 
-      this.stageHitPointLowerLeft.setLeft(this.left + 10).setCoords();
-      this.stageHitPointLowerRight.setLeft((this.left + this.myWidth) - 20).setCoords();
+      //this.stageHitPointLowerLeft.setLeft(this.left + 10).setCoords();
+      //this.stageHitPointLowerRight.setLeft((this.left + this.myWidth) - 20).setCoords();
 
-      this.canvas.bringToFront(this.stageHitPointLowerLeft);
-      this.canvas.bringToFront(this.stageHitPointLowerRight);
+      //this.canvas.bringToFront(this.stageHitPointLowerLeft);
+      //this.canvas.bringToFront(this.stageHitPointLowerRight);
       //this.canvas.bringToFront(this.moveStageRightPointerDetector);
     };
 

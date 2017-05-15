@@ -23,7 +23,7 @@ angular.module('canvasApp').factory('hitPoint', [
     return function(step) {
 
       var properties = {
-        width: 10, height: 30, fill: '', left: step.left + 60, top: 335, selectable: false, name: "hitPoint",
+        width: 10, height: 30, fill: 'black', left: step.left + 60, top: 335, selectable: false, name: "hitPoint",
         originX: 'left', originY: 'top',
       };
 

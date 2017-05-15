@@ -223,18 +223,18 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         C.allStepViews.some(function(step, index) {
 
-          if(this.intersectsWithObject(step.hitPoint) && this.currentHit !== index) {
+          /*if(this.intersectsWithObject(step.hitPoint) && this.currentHit !== index) {
 
               this.currentDrop = step;
               this.currentHit = index;
               return true;
           }
-          return false;
+          return false;*/
 
         }, this);
 
         C.allStageViews.some(function(stage, index) {
-
+          /*
           if(this.beacon.intersectsWithObject(stage.stageHitPointLowerLeft)) {
             console.log("hit left");
             if(this.direction === "left") {
@@ -247,21 +247,8 @@ angular.module("canvasApp").factory('moveStepRect', [
             if(this.direction === "right") {
               //stage.moveToSide("left", this.verticalLine, this.spaceArray, "STEP");
             }
-          }
+          } */
         }, this);
-
-        /*if(this.beacon.left > this.spaceArray[0] && this.beacon.left < this.spaceArray[1]) {
-          if(this.verticalLine.getVisible() === false) {
-            this.verticalLine.setVisible(true);
-            this.smallCircleTop.setVisible(true);
-            this.smallCircle.setVisible(true);
-          }
-        } else if(this.verticalLine.getVisible() === true) {
-          this.verticalLine.setVisible(false);
-          this.smallCircleTop.setVisible(false);
-          this.smallCircle.setVisible(false);
-        }*/
-
       };
 
       return this.indicator;
