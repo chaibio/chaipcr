@@ -56,8 +56,6 @@ angular.module("canvasApp").factory('step', [
         this.stepRect.setWidth(45).setCoords();
         this.borderRight.setLeft(-20).setCoords();
         //leftVal = {left: this.left + (this.myWidth / 2)};
-        //this.hitPoint.set(leftVal).setCoords();
-        this.hitPoint.setVisible(false); // This is important. If we dont hide hitPoint it couses unwanted step to be selected.
         this.moveOtherStepsInStage();
         this.parentStage.shrinkStage();
         //this.parentStage.addHitBlock(); // We need this to add stage , by moving a step to empty place between stages.
@@ -98,7 +96,6 @@ angular.module("canvasApp").factory('step', [
         this.stepGroup.set(leftVal).setCoords();
 
         leftVal = {left: this.left + (this.myWidth / 2)};
-        this.hitPoint.set(leftVal).setCoords();
 
         leftVal = {left: this.left + 108};
         this.closeImage.set(leftVal).setCoords();
@@ -268,14 +265,12 @@ angular.module("canvasApp").factory('step', [
         this.visualComponents = {
           'stepGroup': this.stepGroup,
           'rampSpeedGroup': this.rampSpeedGroup,
-          'hitPoint': this.hitPoint,
           'closeImage': this.closeImage,
           'dots': this.dots
         };
 
         this.canvas.add(this.stepGroup);
         this.canvas.add(this.rampSpeedGroup);
-        this.canvas.add(this.hitPoint);
         this.canvas.add(this.closeImage);
         this.canvas.add(this.dots);
 
