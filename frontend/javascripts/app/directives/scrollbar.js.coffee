@@ -135,15 +135,18 @@ window.ChaiBioTech.ngApp.directive 'scrollbar', [
             updateMargin(new_margin)
 
         $scope.$on 'window:resize', ->
-          svg.attr('width', 0)
-          scrollbarBG.attr('width', 0)
-          scrollbarHandle.attr('width', 0)
+          width = elem.parent().width()
+          svg.attr('width', width)
+          scrollbarBG.attr('width', width)
+          scrollbarHandle.attr('width', width)
+          elem.parent().css(overflow: 'hidden')
 
           if (resizeTimeout)
             $timeout.cancel(resizeTimeout)
             resizeTimeout = null
 
           resizeTimeout = $timeout ->
+            elem.parent().css(overflow: '')
             width = getElemWidth()
             handleWidth = width * getModelWidth()
             svg.attr('width', width)

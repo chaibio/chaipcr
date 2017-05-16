@@ -75,12 +75,14 @@ describe 'Ampli Slider directive', ->
     @directive.css(width: @width)
     @scope.$broadcast 'window:resize'
     @scope.$broadcast 'window:resize'
-    expect(@svg.attr('width')).toBe('0')
-    expect(@background.attr('width')).toBe('0')
-    expect(@offset.attr('width')).toBe('0')
-    expect(@handleShadow.attr('cx')).toBe('0')
-    expect(@handle.attr('cx')).toBe('0')
+    expect(@directive.parent().css 'overflow').toBe 'hidden'
+    expect(@svg.attr('width')).toBe("#{@directive.parent().width()}")
+    expect(@background.attr('width')).toBe("#{@directive.parent().width()}")
+    # expect(@offset.attr('width')).toBe('0')
+    # expect(@handleShadow.attr('cx')).toBe('0')
+    # expect(@handle.attr('cx')).toBe('0')
     @timeout.flush()
+    expect(@directive.parent().css 'overflow').toBe ''
     expect(@svg.attr('width')).toBe("#{@width}")
     expect(@background.attr('width')).toBe("#{@width}")
     expect(@offset.attr('width')).not.toBe('0')

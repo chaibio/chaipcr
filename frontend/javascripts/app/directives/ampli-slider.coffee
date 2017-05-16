@@ -199,11 +199,9 @@ window.App.directive('ampliSlider', [
         resizeTimeout = null
 
         $scope.$on 'window:resize', ->
-          svg.attr('width', 0)
-          sliderBg.attr('width', 0)
-          sliderOffset.attr('width', 0)
-          handleShadow.attr('cx', 0)
-          handle.attr('cx', 0)
+          svg.attr('width', elem.parent().width())
+          sliderBg.attr('width', elem.parent().width())
+          elem.parent().css(overflow: 'hidden')
 
           if (resizeTimeout)
             $timeout.cancel resizeTimeout
@@ -211,6 +209,7 @@ window.App.directive('ampliSlider', [
 
           resizeTimeout = $timeout ->
             initDynamicVars()
+            elem.parent().css(overflow: '')
             svg.attr('width', width)
             sliderBg.attr('width', width)
             updateViewByValue(ngModel.$viewValue)
