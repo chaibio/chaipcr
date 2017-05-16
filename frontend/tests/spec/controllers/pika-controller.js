@@ -35,15 +35,35 @@
       expect(this.$scope.result[0]).toBe("Invalid");
     });
 
-    it("Negative control should be invalid", function() {
+    it("Negative control should be Valid", function() {
       this.$scope.getResults();
-      expect(this.$scope.result[1]).toBe("Invalid");
+      expect(this.$scope.result[1]).toBe("Valid");
     });
 
-		it("Sample should be Unknown", function() {
+		it("Sample Result should be Unknown", function() {
 			this.$scope.getResults();
 			expect(this.$scope.result[2]).toBe("Unknown");
-		})
+		});
+
+		it("Sample Result should be Invalid", function() {
+			this.$scope.getResults();
+			expect(this.$scope.result[3]).toBe("Invalid");
+		});
+
+		it("Sample Result should be Inhibited", function() {
+			this.$scope.getResults();
+			expect(this.$scope.result[4]).toBe("Inhibited");
+		});
+
+		it("Sample Result should be Positive", function() {
+			this.$scope.getResults();
+			expect(this.$scope.result[5]).toBe("Positive");
+		});
+
+		it("Sample Amount should be Repeat PCR", function() {
+			this.$scope.getResults();
+			expect(this.$scope.amount[2]).toBe("Repeat PCR");
+		});
 
     it("should call the broadcast listener", function() {
       var newData = {
