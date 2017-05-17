@@ -1,7 +1,7 @@
 (function() {
   'use strict'
 
-  fdescribe("Testing PikaController", function() {
+  describe("Testing PikaController", function() {
 
     beforeEach(module('ChaiBioTech', function($provide) {
       $provide.value('dynexpExperimentService', ExperimentServiceMock);
@@ -35,10 +35,20 @@
       expect(this.$scope.result[0]).toBe("Invalid");
     });
 
+		it("Positive control amount should be repeat", function() {
+			this.$scope.getResults();
+			expect(this.$scope.amount[0]).toBe("Repeat");
+		});
+
     it("Negative control should be Valid", function() {
       this.$scope.getResults();
       expect(this.$scope.result[1]).toBe("Valid");
     });
+
+		it("Negative control amount should be -", function() {
+			this.$scope.getResults();
+			expect(this.$scope.amount[1]).toBe("\u2014");
+		});
 
 		it("Sample Result should be Unknown", function() {
 			this.$scope.getResults();

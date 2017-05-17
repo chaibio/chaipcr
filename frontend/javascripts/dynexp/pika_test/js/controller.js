@@ -329,11 +329,13 @@
             $scope.result[0] = "Valid";
           } else {
             $scope.result[0] = "Invalid";
+            $scope.amount[0] = "Repeat";
           }
           if ((($scope.famCq[1] > 38 && $scope.famCq[1] <= 40) || !$scope.famCq[1]) && ($scope.hexCq[1] >= 20 && $scope.hexCq[1] <= 36)) {
             $scope.result[1] = "Valid";
           } else {
             $scope.result[1] = "Invalid";
+            $scope.amount[1] = "Repeat";
           }
 
           for (var i = 2; i < 8; i++) {
@@ -386,11 +388,13 @@
               $scope.result[8] = "Valid";
             } else {
               $scope.result[8] = "Invalid";
+              $scope.amount[8] = "Repeat";
             }
             if ((($scope.famCq[9] > 38 && $scope.famCq[9] <= 40) || !$scope.famCq[9]) && ($scope.hexCq[9] >= 20 && $scope.hexCq[9] <= 36)) {
               $scope.result[9] = "Valid";
             } else {
               $scope.result[9] = "Invalid";
+              $scope.amount[9] = "Repeat";
             }
             for (i = 10; i < 16; i++) {
               if($scope.result[9] == "Invalid"){
