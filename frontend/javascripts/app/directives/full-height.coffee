@@ -9,23 +9,29 @@ App.directive 'fullHeight', [
       force: '=?'
       doc: '=?'
       parent: '=?'
+      min: '=?'
     link: ($scope, elem) ->
 
-      $scope.offset = $scope.offset || 0
-      $scope.offset = $scope.offset * 1
+      $scope.offset = ($scope.offset || 0) * 1
+      $scope.min = ($scope.min || 0) * 1
+
       elem.addClass 'full-height'
 
       getHeight = ->
-        if $scope.doc
-          WindowWrapper.documentHeight() - $scope.offset
-        else if $scope.parent
-          elem.parent().height() - $scope.offset
-        else
-          WindowWrapper.height() - $scope.offset
+        height = if $scope.doc
+                  WindowWrapper.documentHeight() - $scope.offset
+                else if $scope.parent
+                  elem.parent().height() - $scope.offset
+                else
+                  WindowWrapper.height() - $scope.offset
+
+        height = if $scope.min > height then $scope.min else height
+        height
 
       set = ->
 
         height = getHeight()
+
         if ($scope.force)
           elem.css( 'height':  height )
         else

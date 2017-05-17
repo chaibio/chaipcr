@@ -218,6 +218,6 @@ window.App.directive('ampliSlider', [
 
       $timeout ->
         init()
-      , 1500
+      , 2000
 
 ]);

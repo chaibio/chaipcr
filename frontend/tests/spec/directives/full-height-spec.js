@@ -63,6 +63,13 @@
       expect(this.directive.height()).toBe(2000)
     })
 
+    it('should have min height', function() {
+      windowHeight = 2000
+      this.directive = this.$compile(angular.element('<div full-height min="5000"></div>'))(this.$rootScope.$new())
+      this.$timeout.flush()
+      expect(this.directive.css('min-height')).toBe('5000px')
+    })
+
     describe('When doc param is true', function() {
 
       beforeEach(function() {

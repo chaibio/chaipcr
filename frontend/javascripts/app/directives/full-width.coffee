@@ -4,13 +4,21 @@ App.directive 'fullWidth', [
 
     restrict: 'AE',
     scope:
-      force: '='
+      useMin: '=?'
+      useMax: '=?'
+      offset: '=?'
     link: ($scope, elem) ->
+
+      $scope.offset = ($scope.offset || 0) * 1
+
       set = ->
-        if $scope.force
-          elem.css(width: WindowWrapper.width())
-        else
-          elem.css('min-width': WindowWrapper.width())
+        width = WindowWrapper.width() - $scope.offset
+        if $scope.useMin is true
+          elem.css('min-width': width)
+        if $scope.useMax is true
+          elem.css('max-width': width)
+        if !$scope.useMin && !$scope.useMax
+          elem.css(width: width)
 
       set()
 
