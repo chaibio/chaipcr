@@ -66,6 +66,7 @@
     it('should have min height', function() {
       windowHeight = 2000
       this.directive = this.$compile(angular.element('<div full-height min="5000"></div>'))(this.$rootScope.$new())
+      expect(this.directive.css('min-height')).toBe('5000px')
       this.$timeout.flush()
       expect(this.directive.css('min-height')).toBe('5000px')
     })

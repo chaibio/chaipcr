@@ -68,6 +68,8 @@ window.App.directive 'thermalProfileChart', [
               chart.setXAxis()
               chart.drawLines()
 
+        $scope.$on 'window:resize', ->
+          initChart()
 
     }
 ]

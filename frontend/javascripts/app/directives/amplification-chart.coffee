@@ -35,7 +35,7 @@ window.App.directive 'amplificationChart', [
           d = chart.getDimensions()
           $scope.onZoom()(chart.getTransform(), d.width, d.height, chart.getScaleExtent())
 
-        $($window).resize ->
+        $scope.$on 'window:resize', ->
           initChart()
 
         $scope.$watchCollection ($scope) ->
