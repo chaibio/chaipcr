@@ -26,7 +26,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
   'Device'
   '$timeout'
   '$rootScope'
-  ($scope, $stateParams, Experiment, helper, expName, $interval, Device, $timeout, $rootScope ) ->
+  'focus'
+  ($scope, $stateParams, Experiment, helper, expName, $interval, Device, $timeout, $rootScope, focus ) ->
 
     Device.isDualChannel().then (is_dual_channel) ->
       $scope.is_dual_channel = is_dual_channel
@@ -65,6 +66,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       $scope.hoverName = 'Min. Flouresence'
       $scope.hoverDescription = 'This is a test description'
       $scope.samples = []
+      $scope.editExpNameMode = []
 
       modal = document.getElementById('myModal')
       span = document.getElementsByClassName("close")[0]
@@ -168,8 +170,13 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       $scope.getAmplificationOptions()
 
+      $scope.focusExpName = (index) ->
+        $scope.editExpNameMode[index] = true
+        focus('editExpNameMode')
+
       $scope.updateSampleName = (well_num, name) ->
         Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','sample_name':name})
+        $scope.editExpNameMode[well_num] = false
 
       Experiment.getWells($stateParams.id).then (resp) ->
         for i in [0...16]
