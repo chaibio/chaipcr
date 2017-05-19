@@ -96,6 +96,19 @@
       width: 100%;
       // box-shadow: -1px 0px 1px $lightgray;
 
+			input{
+			outline: none;
+			border: none;
+			font-family: 'dinot-Regular';
+			font-size: 16px;
+			//width: 140px;
+			}
+
+			.sample-span{
+				font-family: 'dinot-Regular';
+				font-size: 16px;
+			}
+
       th {
         background-color: lighten($gray, 15%);
         border-left: 1px solid lighten($lightgray, 15%);

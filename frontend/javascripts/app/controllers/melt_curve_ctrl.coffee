@@ -24,7 +24,8 @@ App.controller 'MeltCurveChartCtrl', [
   '$timeout'
   '$interval'
   '$rootScope'
-  ($scope, Experiment, $stateParams, MeltCurveService, $timeout, $interval, $rootScope) ->
+  'focus'
+  ($scope, Experiment, $stateParams, MeltCurveService, $timeout, $interval, $rootScope, focus) ->
 
     $scope.curve_type = 'derivative'
     $scope.color_by = 'well'
@@ -34,6 +35,20 @@ App.controller 'MeltCurveChartCtrl', [
     $scope.retrying = false
     $scope.retry = 0
     $scope.fetching = false
+    $scope.samples = []
+    $scope.editExpNameMode = []
+
+    $scope.focusExpName = (index) ->
+      $scope.editExpNameMode[index] = true
+      focus('editExpNameMode')
+
+    $scope.updateSampleName = (well_num, name) ->
+      Experiment.updateWell($stateParams.id, well_num + 1, {'well_type':'sample','sample_name':name})
+      $scope.editExpNameMode[well_num] = false
+
+    Experiment.getWells($stateParams.id).then (resp) ->
+      for i in [0...16]
+        $scope.samples[resp.data[i].well.well_num - 1] = resp.data[i].well.sample_name
 
     $scope.$on 'status:data:updated', (e, data, oldData) ->
       return if !data
