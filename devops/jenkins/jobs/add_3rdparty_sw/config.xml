@@ -16,7 +16,7 @@
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
           <description>Building machine</description>
-          <defaultValue>192.168.1.55</defaultValue>
+          <defaultValue>10.0.2.240</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>bypass_julia</name>
@@ -26,7 +26,7 @@
         <hudson.model.StringParameterDefinition>
           <name>download_prefex</name>
           <description>Download folder URL</description>
-          <defaultValue>http://192.168.1.200/download</defaultValue>
+          <defaultValue>http://10.0.1.20/download</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>low_performance</name>
@@ -445,8 +445,8 @@ dpkg --configure -a
 sync
 sleep 30
 
-apt-get -y -q install nginx-full 
-dpkg --configure -a
+DEBIAN_FRONTEND=noninteractive apt-get -y -q install nginx-full 
+DEBIAN_FRONTEND=noninteractive dpkg --configure -a
 sync
 sleep 30
 

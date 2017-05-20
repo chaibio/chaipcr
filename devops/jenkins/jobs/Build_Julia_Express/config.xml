@@ -12,18 +12,18 @@
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
           <description>Remote build beaglebone.</description>
-          <defaultValue>192.168.1.88</defaultValue>
+          <defaultValue>10.0.2.240</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>download_prefex</name>
           <description>Download server url</description>
-          <defaultValue>http://192.168.1.200/download</defaultValue>
+          <defaultValue>http://10.0.1.20/download</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>local_download_folder</name>
-          <description>The folder where to host download file. Could be /var/www/html/download or /usr/share/nginx/html/download
+          <description>The folder where to host download file. Could be /usr/share/nginx/html/download or /usr/share/nginx/html/download
 </description>
-          <defaultValue>/var/www/html/download</defaultValue>
+          <defaultValue>/usr/share/nginx/html/download</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>low_performance</name>

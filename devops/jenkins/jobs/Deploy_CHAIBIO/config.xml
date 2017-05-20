@@ -16,7 +16,7 @@
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
           <description>Building machine</description>
-          <defaultValue>192.168.1.55</defaultValue>
+          <defaultValue>10.0.2.240</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>check_badblocks</name>
@@ -26,7 +26,7 @@
         <hudson.model.StringParameterDefinition>
           <name>download_prefex</name>
           <description>Download folder URL</description>
-          <defaultValue>http://192.168.1.200/download</defaultValue>
+          <defaultValue>http://10.0.1.20/download</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>low_performance</name>
@@ -448,6 +448,14 @@ cd</command>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
       <siteName>root@$build_machine:22</siteName>
       <command>echo setting up website pn ngixn
+if [ -e /etc/nginx/sites-available ]
+then
+    echo Nginx is installed
+else
+   echo Nginx is not installed
+   exit 0
+fi
+
 cp ~/chaipcr/web/config/etc/nginx/chaipcr /etc/nginx/sites-available/
 cd /etc/nginx/sites-enabled
 sudo ln -s ../sites-available/chaipcr

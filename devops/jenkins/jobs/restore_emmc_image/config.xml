@@ -16,7 +16,7 @@
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
           <description></description>
-          <defaultValue>192.168.1.33</defaultValue>
+          <defaultValue>10.0.2.240</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>output_sdcard</name>
@@ -28,16 +28,16 @@ or /tmp/sdcard_image.img to export a factory settings sdcard image.</description
         <hudson.model.StringParameterDefinition>
           <name>local_download_folder</name>
           <description>The folder where to host download file. 
-Apache server: /var/www/html/download 
+Apache server: /usr/share/nginx/html/download 
 or 
 Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
 </description>
-          <defaultValue>/var/www/html/download</defaultValue>
+          <defaultValue>/usr/share/nginx/html/download</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>download_prefex</name>
           <description>Download server url. Example: http://10.0.1.20/download</description>
-          <defaultValue>http://192.168.1.200/download</defaultValue>
+          <defaultValue>http://10.0.1.20/download</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sdcard_filename</name>

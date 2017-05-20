@@ -4,15 +4,12 @@
   <description>Build basic debian image with kernel version 4.4</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
-      <optOut>false</optOut>
-    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
           <description>Building machine</description>
-          <defaultValue>192.168.1.55</defaultValue>
+          <defaultValue>10.0.2.240</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>check_badblocks</name>
@@ -22,7 +19,7 @@
         <hudson.model.StringParameterDefinition>
           <name>download_prefex</name>
           <description>Download folder URL</description>
-          <defaultValue>http://192.168.1.200/download</defaultValue>
+          <defaultValue>http://10.0.1.20/download</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>low_performance</name>
@@ -104,36 +101,22 @@ else
 Host $build_machine
 		KexAlgorithms +diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
 		Ciphers +3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
-#		KexAlgorithms +diffie-hellman-group1-sha1
-#        KexAlgorithms +curve25519-sha256@libssh.org
-#        KexAlgorithms +ecdh-sha2-nistp256
-#        KexAlgorithms +ecdh-sha2-nistp384
-#        KexAlgorithms +ecdh-sha2-nistp521
-#        KexAlgorithms +diffie-hellman-group-exchange-sha256
-#        KexAlgorithms +diffie-hellman-group14-sha1
 EOF
 fi
-
-#if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
-#then
-#	echo sshd_config was patched already
-#else
-#	echo patching sshd_config
-#	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
-#KexAlgorithms diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-#Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
-#EOF
-#	sudo service sshd restart
-#fi
 
 
 echo deleting root password in case of chaipcr
 sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;passwd -d -u root&quot;
 #echo done deleting root password
 
-ssh -tt -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
+ssh -t -oStrictHostKeyChecking=no root@$build_machine /bin/bash &lt;&lt;&apos;EOT&apos;
+echo trying to patch sshd_config
 
-if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
+grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
+result=$?
+echo patching checked 
+
+if [ $result -eq 0 ]
 then
 	echo sshd_config was patched already
 else
@@ -156,8 +139,46 @@ EOF
 fi
 
 exit 0
-ENDSSH
+EOT
 
+
+if [ $? -eq 0 ]
+then
+echo done first patching module.
+else
+
+ssh -tt -oStrictHostKeyChecking=no root@$build_machine /bin/bash &lt;&lt;&apos;EOT&apos;
+echo trying to patch sshd_config
+
+grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
+result=$?
+echo patching checked 
+
+if [ $result -eq 0 ]
+then
+	echo sshd_config was patched already
+else
+	echo patching sshd_config
+    
+	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
+KexAlgorithms diffie-hellman-group1-sha1
+KexAlgorithms ecdh-sha2-nistp256
+KexAlgorithms ecdh-sha2-nistp384
+KexAlgorithms ecdh-sha2-nistp521
+KexAlgorithms diffie-hellman-group-exchange-sha256
+KexAlgorithms diffie-hellman-group14-sha1
+#Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+EOF
+	sudo service sshd restart
+    sudo service ssh restart
+    /etc/init.d/ssh restart
+	echo device is patched
+    ifconfig
+fi
+
+exit 0
+EOT
+fi
 
 echo returned to host. connection check:
 ssh -oStrictHostKeyChecking=no -t root@$build_machine &apos;exit 0&apos;
@@ -264,6 +285,8 @@ else
    exit 1
 fi
 
+echo Writing image to sdcard.. this may take a few minutes.
+
 if xzcat $image_filename | dd of=/dev/mmcblk0
 then
     echo SDCard flashed successfully
@@ -325,6 +348,7 @@ umount /mnt || true
 echo disabling eMMC boot
 mount -o remount,rw /boot/uboot || true
 mv /boot /boot_disabled  --backup=numbered -f
+rm -r /boot/uboot/* || true
 rm -r /boot || true
 
 rm ~/$image_filename || true
@@ -495,6 +519,8 @@ exit 1</command>
       <siteName>root@$build_machine:22</siteName>
       <command>echo device is restarted.. 
 
+uname -a
+
 apt-key update
 apt-get update
 apt-get -q -y install cpufrequtils
@@ -587,6 +613,6 @@ exit 1</command>
   </builders>
   <publishers/>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.7"/>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
   </buildWrappers>
 </project>
