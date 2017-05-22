@@ -25,7 +25,9 @@ angular.module("canvasApp").factory('mouseDown', [
   'circleManager',
   'editMode',
   '$timeout',
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager, editMode, $timeout) {
+  'movingStepGraphics',
+  function(ExperimentLoader, previouslySelected, previouslyHoverd,
+   scrollService, circleManager, editMode, $timeout, movingStepGraphics) {
 
     /**************************************
         what happens when click is happening in canvas.
@@ -108,7 +110,8 @@ angular.module("canvasApp").factory('mouseDown', [
             that.calculateMoveLimit("step", evt.target.parent);
             circleManager.togglePaths(false); //put it back later
             C.moveDots.setLeft(evt.target.parent.left + 16);
-            evt.target.parent.shrinkStep();
+            movingStepGraphics.initiateMoveStepGraphics(evt.target);
+            //evt.target.parent.shrinkStep();
             evt.target.setVisible(false);
             C.moveDots.setVisible(true);
             C.moveDots.currentIndex = evt.target.parent.parentStage.index;
