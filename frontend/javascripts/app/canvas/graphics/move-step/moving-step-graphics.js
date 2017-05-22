@@ -21,15 +21,46 @@ angular.module("canvasApp").service('movingStepGraphics', [
     function() {
         
 
-        this.initiateMoveStepGraphics = function(step) {
-            //console.log("initiating", step);
-            this.arrangeStepsOfStage(step.parentStage)
+        this.initiateMoveStepGraphics = function(currentStep) {
+            
+            this.arrangeStepsOfStage(currentStep);
+            this.adjustStep(currentStep);
+            this.adjustStage(currentStep.parentStage);
         };
 
-        this.arrangeStepsOfStage = function(stage) {
-            //console.log("Reached here", stage.child);
+        this.arrangeStepsOfStage = function(step) {
+            
+            var startingStep = step;
+            
+            while(startingStep.previousStep) {
+                this.moveLittleRight(startingStep.previousStep);
+                startingStep = startingStep.previousStep;
+            }
+
+            startingStep = step;
+
+            while(startingStep.nextStep) {
+                this.moveLittleLeft(startingStep.nextStep);
+                startingStep = startingStep.nextStep;
+            }
         };
 
+        this.moveLittleRight = function(step) {
+            console.log("Right");
+        };
+
+        this.moveLittleLeft = function(step) {
+            console.log("Left");
+        };
+
+        this.adjustStep = function(step) {
+            // reduce the width of the step and adjust
+        };
+
+        this.adjustStage = function(stage) {
+
+        };
+        
         return this;
     }
 ]);
