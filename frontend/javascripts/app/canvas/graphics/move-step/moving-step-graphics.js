@@ -19,11 +19,17 @@
 
 angular.module("canvasApp").service('movingStepGraphics', [
     function() {
-        return {
+        
 
-            initiateMoveStepGraphics: function(step) {
-                console.log("initiating");
-            },
+        this.initiateMoveStepGraphics = function(step) {
+            //console.log("initiating", step);
+            this.arrangeStepsOfStage(step.parentStage)
         };
+
+        this.arrangeStepsOfStage = function(stage) {
+            //console.log("Reached here", stage.child);
+        };
+
+        return this;
     }
 ]);
