@@ -264,7 +264,7 @@ shutdown -r 1
     <hudson.tasks.Shell>
       <command>#!/bin/bash
 echo waiting for a restart
-sleep 120
+sleep 900
 for i in {0..1200..60}
 do
 	echo &quot;Waiting for the build device to become ready! $i&quot;
@@ -302,6 +302,7 @@ mkdir -p &quot;${grep_sdcard_dir}&quot;
 
 echo fetching image files from beaglebone.
 sshpass -p chaipcr scp -oStrictHostKeyChecking=no -r root@$build_machine:/tmp/grep_sdcard/* &quot;${grep_sdcard_dir}&quot;
+sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;umount /tmp/grep_sdcard &amp;&amp; exit 0&quot;
 
 ls -ahl &quot;${grep_sdcard_dir}&quot;
 ls
@@ -357,6 +358,10 @@ else
    echo raw image processing failed.
    exit 1
 fi
+
+rm -r $grep_sdcard_dir || :
+rm -r $tmp_sdcard_dir || :
+rm -r /tmp/image_creator/ || :
 
 echo All Done!
 

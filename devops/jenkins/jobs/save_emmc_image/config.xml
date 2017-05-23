@@ -49,10 +49,15 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>image_prefix</name>
-          <description>Class of the upgrade image generated during this process. Could be empty, kernel44, kernel 41, kernel 38, allthirdparty, or release.
+          <description>Class of the upgrade image generated during this process. Could be empty, kernel44, kernel49, kernel 41, kernel 38, allthirdparty, or release.
 </description>
-          <defaultValue>empty</defaultValue>
+          <defaultValue>fresh</defaultValue>
         </hudson.model.StringParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>no_factorysettings_sdcard</name>
+          <description>No factory settings sdcard image created if this paramter is checked.</description>
+          <defaultValue>true</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -200,7 +205,6 @@ then
   exit 1
 fi
 
-
 echo installing missing packages.
 apt-get update
 apt-get install parted -y -q
@@ -317,8 +321,23 @@ mkdir -p &quot;${grep_sdcard_dir}&quot;
 
 echo fetching image files from beaglebone.
 sshpass -p chaipcr scp -oStrictHostKeyChecking=no -r root@$build_machine:/tmp/grep_sdcard/* &quot;${grep_sdcard_dir}&quot;
+sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;umount /tmp/grep_sdcard &amp;&amp; exit 0&quot;
 
 ls -ahl &quot;${grep_sdcard_dir}&quot;
+
+emmc_image_latest_compressed=emmc_latest_$build_machine.img.tgz
+emmc_image_latest_compressed_full_local_path=${local_download_folder}/${emmc_image_latest_compressed}
+
+tar zfvc $emmc_image_latest_compressed_full_local_path ${grep_sdcard_dir}/eMMC_part*.img
+emmc_image_latest_url=${download_prefix}/${emmc_image_latest_compressed}
+
+if $no_factorysettings_sdcard
+then
+	echo latest eMMC for this build machine is downloadable from $emmc_image_latest_url
+	rm -r $grep_sdcard_dir || true
+	exit 0
+fi
+
 ls
 cd devops
 
@@ -351,8 +370,10 @@ then
     tar zfvc $full_emmc_image /tmp/image_creator/eMMC.img
     full_emmc_url=${download_prefix}/emmc_$BUILD_NUMBER.img.tgz
     sdcard_url=${download_prefix}/$sdcard_filename
-    
-    echo &quot;performing create_sdcard.sh $tmp_sdcard_dir $output_sdcard&quot;
+
+#	cp $full_emmc_image $emmc_image_latest_compressed_full_local_path
+
+	echo &quot;performing create_sdcard.sh $tmp_sdcard_dir $output_sdcard&quot;
 	if sudo ./create_sdcard.sh &quot;$tmp_sdcard_dir&quot; &quot;$output_sdcard&quot;
 	then
    		echo SDCard image is created at &quot;$output_sdcard&quot;
@@ -368,10 +389,15 @@ then
    		exit 1
 	fi
     echo eMMC image should be downloadable from $full_emmc_url
+
+    echo latest eMMC for this build machine is downloadable from $emmc_image_latest_url
 else
    echo raw image processing failed.
    exit 1
 fi
+
+rm -r $grep_sdcard_dir || true
+rm -r $tmp_sdcard_dir || true
 
 echo All Done!
 

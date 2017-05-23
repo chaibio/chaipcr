@@ -33,6 +33,11 @@
           <description>Set cpu to lowest performance.</description>
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>bypass_pru</name>
+          <description>Will not install PRU work</description>
+          <defaultValue>true</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -365,6 +370,12 @@ echo Install browser
 cp -r ~/chaipcr/browser/resources ~/tmp/
 cp ~/chaipcr/browser/qpcrbrowser.service /lib/systemd/system/
 systemctl enable qpcrbrowser.service
+
+if $bypass_pru
+then
+   echo bypassing PRU stub
+   exit 0
+fi
 
 echo Install PRU libraries and Tools
 cd
