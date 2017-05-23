@@ -110,7 +110,7 @@ angular.module("canvasApp").factory('mouseDown', [
             that.calculateMoveLimit("step", evt.target.parent.parentStage);
             circleManager.togglePaths(false); //put it back later
             C.moveDots.setLeft(evt.target.parent.left + 58);
-            movingStepGraphics.initiateMoveStepGraphics(evt.target.parent);
+            movingStepGraphics.initiateMoveStepGraphics(evt.target.parent, C);
             //evt.target.parent.shrinkStep();
             evt.target.setVisible(false);
             C.moveDots.setVisible(true);

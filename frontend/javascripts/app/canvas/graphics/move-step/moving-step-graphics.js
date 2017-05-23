@@ -20,37 +20,47 @@
 angular.module("canvasApp").service('movingStepGraphics', [
     function() {
         
-
-        this.initiateMoveStepGraphics = function(currentStep) {
+        this.initiateMoveStepGraphics = function(currentStep, C) {
             
-            this.arrangeStepsOfStage(currentStep);
+            this.arrangeStepsOfStage(currentStep, C);
             this.adjustStep(currentStep);
             this.adjustStage(currentStep.parentStage);
         };
 
-        this.arrangeStepsOfStage = function(step) {
+        this.arrangeStepsOfStage = function(step, C) {
             
-            var startingStep = step;
+            var startingStep = step.previousStep;
             
-            while(startingStep.previousStep) {
-                this.moveLittleRight(startingStep.previousStep);
+            while(startingStep) {
+                this.moveLittleRight(startingStep);
                 startingStep = startingStep.previousStep;
             }
 
-            startingStep = step;
+            startingStep = step.nextStep;
 
-            while(startingStep.nextStep) {
-                this.moveLittleLeft(startingStep.nextStep);
+            while(startingStep) {
+                this.moveLittleLeft(startingStep);
                 startingStep = startingStep.nextStep;
             }
+
+            //step.stepRect.setWidth(45).setCoords();
+            step.borderRight.setLeft(-10).setCoords();
+
+            C.canvas.renderAll();
         };
 
         this.moveLittleRight = function(step) {
             console.log("Right");
+            step.left = step.left + 10;
+            step.moveStep(0, false);
+            step.circle.moveCircleWithStep();
         };
 
         this.moveLittleLeft = function(step) {
             console.log("Left");
+            step.left = step.left - 10;
+            step.moveStep(0, false);
+            step.circle.moveCircleWithStep();
         };
 
         this.adjustStep = function(step) {
@@ -60,7 +70,7 @@ angular.module("canvasApp").service('movingStepGraphics', [
         this.adjustStage = function(stage) {
 
         };
-        
+
         return this;
     }
 ]);
