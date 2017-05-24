@@ -213,6 +213,18 @@ angular.module("canvasApp").factory('stage', [
         currentStep.circle.removeContents();
       };
 
+      this.moveStageForMoveStep = function() {
+
+        this.stageGroup.set({left: this.left }).setCoords();
+        this.dots.set({left: this.left + 3}).setCoords();
+        //stage.nextStage.moveStageRightPointerDetector.set({left: (stage.nextStage.left + stage.nextStage.myWidth) +  50}).setCoords();
+
+        this.childSteps.forEach(function(childStep, index) {
+          childStep.moveStep(0, true);
+          childStep.circle.moveCircleWithStep();
+        });
+      };
+
       this.moveIndividualStageAndContents = function(stage, del) {
         if(!stage.nextStage) {
           return false;

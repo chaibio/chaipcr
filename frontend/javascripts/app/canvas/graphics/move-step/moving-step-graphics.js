@@ -24,6 +24,7 @@ angular.module("canvasApp").service('movingStepGraphics', [
         this.initiateMoveStepGraphics = function(currentStep, C) {
             
             this.arrangeStepsOfStage(currentStep, C);
+            this.arrangeStages(currentStep.parentStage);
             this.adjustStep(currentStep);
             this.adjustStage(currentStep.parentStage);
         };
@@ -49,21 +50,30 @@ angular.module("canvasApp").service('movingStepGraphics', [
             C.canvas.renderAll();
         };
 
+        this.arrangeStages = function(baseStage) {
+
+            var stage = baseStage.previousStage;
+            var counter = 1;
+             while(stage) {
+                stage.left = stage.left - (20 * counter);
+                stage.moveStageForMoveStep();
+                counter = counter + 1;
+                stage = stage.previousStage;
+            }
+
+            stage = baseStage.nextStage;
+            counter = 1;
+            while(stage) {
+                stage.left = stage.left + (20 * counter);
+                stage.moveStageForMoveStep();
+                counter = counter + 1;
+                stage = stage.nextStage;
+            }
+        };
+
         this.squeezeStep = function(step, C) {
 
-            /*if(step.nextStep) {
-                var properties = {
-                    stroke: 'black', strokeWidth: 2, selectable: false,
-                    originX: 'left', originY: 'top'
-                    };
-
-                var cordinates = [0, 40, 0, 362];
-                
-                step.nextStep.temporaryBorderLeft = Line.create(cordinates, properties);
-                step.nextStep.stepGroup.addWithUpdate(step.nextStep.temporaryBorderLeft);
-            }*/
             step.parentStage.deleteAllStepContents(step);
-           // C.canvas.bringToFront(step.nextStep.dd);
         };
 
         this.moveLittleRight = function(step) {
