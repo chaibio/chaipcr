@@ -36,10 +36,11 @@ angular.module("canvasApp").factory('canvas', [
   'stageHitBlock',
   'stageGraphics',
   'StagePositionService',
+  'StepPositionService',
   'Line',
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
     moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageHitBlock, stageGraphics, 
-    StagePositionService, Line) {
+    StagePositionService, StepPositionService, Line) {
 
     this.init = function(model) {
       
@@ -126,6 +127,7 @@ angular.module("canvasApp").factory('canvas', [
         return stageView;
       }, this);
       StagePositionService.init(this.allStageViews);
+      StepPositionService.init(this.allStepViews);
       console.log("Stages added ... !");
       return this;
 
