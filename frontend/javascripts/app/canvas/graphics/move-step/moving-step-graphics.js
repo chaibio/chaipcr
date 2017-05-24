@@ -18,8 +18,9 @@
  */
 
 angular.module("canvasApp").service('movingStepGraphics', [
-    function() {
-        
+    'Line',
+    function(Line) {
+        this.offset = 41;
         this.initiateMoveStepGraphics = function(currentStep, C) {
             
             this.arrangeStepsOfStage(currentStep, C);
@@ -35,30 +36,46 @@ angular.module("canvasApp").service('movingStepGraphics', [
                 this.moveLittleRight(startingStep);
                 startingStep = startingStep.previousStep;
             }
+            step.parentStage.border.setLeft(step.parentStage.border.left + this.offset).setCoords();
+            
+            this.squeezeStep(step, C);
 
             startingStep = step.nextStep;
-
             while(startingStep) {
                 this.moveLittleLeft(startingStep);
                 startingStep = startingStep.nextStep;
             }
-
-            //step.stepRect.setWidth(45).setCoords();
-            step.borderRight.setLeft(-10).setCoords();
-
+            
             C.canvas.renderAll();
+        };
+
+        this.squeezeStep = function(step, C) {
+
+            /*if(step.nextStep) {
+                var properties = {
+                    stroke: 'black', strokeWidth: 2, selectable: false,
+                    originX: 'left', originY: 'top'
+                    };
+
+                var cordinates = [0, 40, 0, 362];
+                
+                step.nextStep.temporaryBorderLeft = Line.create(cordinates, properties);
+                step.nextStep.stepGroup.addWithUpdate(step.nextStep.temporaryBorderLeft);
+            }*/
+            step.parentStage.deleteAllStepContents(step);
+           // C.canvas.bringToFront(step.nextStep.dd);
         };
 
         this.moveLittleRight = function(step) {
             console.log("Right");
-            step.left = step.left + 10;
+            step.left = step.left + this.offset;
             step.moveStep(0, false);
             step.circle.moveCircleWithStep();
         };
 
         this.moveLittleLeft = function(step) {
             console.log("Left");
-            step.left = step.left - 10;
+            step.left = step.left - this.offset;
             step.moveStep(0, false);
             step.circle.moveCircleWithStep();
         };

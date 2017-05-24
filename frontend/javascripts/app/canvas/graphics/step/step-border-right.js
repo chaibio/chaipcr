@@ -22,12 +22,12 @@
    function(Line) {
      return function(step) {
        var properties = {
-           stroke: '#ff9f00',  left: (step.myWidth - 2), strokeWidth: 1, selectable: false,
+           stroke: '#ff9f00', strokeWidth: 1, selectable: false,
            originX: 'left', originY: 'top'
          };
 
-       var cordinates = [-2, 42, -2, 362];
-
+       var cordinates = [126, 40, 126, 362];
+       
        return Line.create(cordinates, properties);
      };
    }

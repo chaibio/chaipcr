@@ -36,9 +36,10 @@ angular.module("canvasApp").factory('canvas', [
   'stageHitBlock',
   'stageGraphics',
   'StagePositionService',
+  'Line',
   function(ExperimentLoader, $rootScope, stage, $timeout, events, path, stageEvents, stepEvents,
     moveStepRect, moveStageRect, previouslySelected, constants, circleManager, dots, interceptorFactory, stageHitBlock, stageGraphics, 
-    StagePositionService) {
+    StagePositionService, Line) {
 
     this.init = function(model) {
       
@@ -166,8 +167,17 @@ angular.module("canvasApp").factory('canvas', [
       this.imageobjects["move-step-on.png"].setTop(328);
       this.imageobjects["move-step-on.png"].setLeft(-2);
       arr.push(this.imageobjects["move-step-on.png"]);
+      
+      var properties = {
+                    stroke: 'black', strokeWidth: 2, selectable: false,
+                    originX: 'left', originY: 'top'
+                    };
+
+      var cordinates = [24, 32, 24, 353];
+      var lin = Line.create(cordinates, properties);
+      arr.push(lin);
       this.moveDots = new fabric.Group(arr, {
-        width: 13, left: 16, top: 35, backgroundColor: "white", visible: false
+        width: 40, left: 16, top: 35, backgroundColor: "white", visible: false
       });
       this.canvas.add(this.moveDots);
     };
