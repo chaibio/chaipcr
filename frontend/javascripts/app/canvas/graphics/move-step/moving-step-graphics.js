@@ -20,7 +20,7 @@
 angular.module("canvasApp").service('movingStepGraphics', [
     'Line',
     function(Line) {
-        this.offset = 41;
+        this.offset = 31;
         this.initiateMoveStepGraphics = function(currentStep, C) {
             
             this.arrangeStepsOfStage(currentStep, C);

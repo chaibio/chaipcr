@@ -99,15 +99,14 @@ angular.module("canvasApp").factory('mouseDown', [
             // the very thing we click. Not to the one we move. This applies to moveStage too.
             that.mouseDownPos = evt.e.clientX;
             console.log("step = " , evt.target.parent );
-            C.stepIndicator.init(evt.target.parent);
+            C.stepIndicator.init(evt.target.parent, evt.target);
             evt.target.parent.selectStep();
             evt.target.parent.toggleComponents(false);
             //evt.target.parent.parentStage.shrinkedStage = true;
             that.moveStepActive = true;
             that.canvas.moveCursor = "move";
-            C.stepIndicator.changePlacing(evt.target);
-            C.stepIndicator.changeText(evt.target.parent);
-            that.calculateMoveLimit("step", evt.target.parent.parentStage);
+            
+            //that.calculateMoveLimit("step", evt.target.parent.parentStage);
             circleManager.togglePaths(false); //put it back later
             C.moveDots.setLeft(evt.target.parent.left + 52).setCoords();
             movingStepGraphics.initiateMoveStepGraphics(evt.target.parent, C);

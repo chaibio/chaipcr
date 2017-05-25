@@ -117,9 +117,16 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.smallCircleTop = smallCircleTop;
       this.indicator.smallCircle = smallCircle;
 
-      this.indicator.init = function(step) {
+      this.indicator.init = function(step, footer) {
+
+        this.movement = null;
+        this.currentLeft = null;
 
         this.spaceArray = [step.parentStage.left - 20, step.parentStage.left + 30];
+        this.setVisible(true);
+        this.setLeft(footer.left);
+        this.startPosition = footer.left;
+        this.changeText(step);
         console.log(step, "stepping");
         if(step.nextStep) {
           this.currentDrop = step.nextStep;
@@ -139,19 +146,34 @@ angular.module("canvasApp").factory('moveStepRect', [
           }
       };
 
-      this.indicator.changePlacing = function(footer) {
-
-        this.setVisible(true);
-        this.setLeft(footer.left);
-        this.startPosition = footer.left;
-      };
-
       this.indicator.changeText = function(step) {
 
         temperatureText.setText(step.model.temperature + "º");
-        holdTimeText.setText(step.circle.holdTime.text);
+        //holdTimeText.setText(step.circle.holdTime.text);
         indexText.setText(step.numberingTextCurrent.text);
         placeText.setText(step.numberingTextCurrent.text + step.numberingTextTotal.text);
+      };
+
+      this.indicator.getDirection = function() {
+
+        if(this.movement.left > this.currentLeft && this.direction !== "right") {
+              this.direction = "right";
+            } else if(this.movement.left < this.currentLeft && this.direction !== "left") {
+              this.direction = "left";    
+            }
+            return this.direction;
+      };
+
+      this.indicator.onTheMove = function(C, movement) {
+
+        this.setLeft(movement.left).setCoords();
+        this.movement = movement;
+        var direction = this.getDirection();
+        console.log(direction);
+        this.currentLeft = movement.left;
+        //this.beacon.setLeft(movement.left + this.beaconMove).setCoords();
+
+        
       };
 
       this.indicator.processMovement = function(step, C) {
@@ -197,58 +219,6 @@ angular.module("canvasApp").factory('moveStepRect', [
             console.log("Moved", data);
           });
 
-      };
-
-      this.indicator.onTheMove = function(C, movement) {
-
-        this.setLeft(movement.left).setCoords();
-
-        this.beacon.setLeft(movement.left + this.beaconMove).setCoords();
-
-        if(this.verticalLine.getVisible() === false) {
-          this.verticalLine.setVisible(true);
-          this.smallCircleTop.setVisible(true);
-          this.smallCircle.setVisible(true);
-        }
-
-        if(movement.left > this.currentLeft && this.direction !== "right") {
-          this.direction = "right";
-          this.beaconMove = 96;
-        } else if(movement.left < this.currentLeft && this.direction !== "left") {
-          this.direction = "left";
-          this.beaconMove = -10;
-        }
-
-        this.currentLeft = movement.left;
-
-        C.allStepViews.some(function(step, index) {
-
-          /*if(this.intersectsWithObject(step.hitPoint) && this.currentHit !== index) {
-
-              this.currentDrop = step;
-              this.currentHit = index;
-              return true;
-          }
-          return false;*/
-
-        }, this);
-
-        C.allStageViews.some(function(stage, index) {
-          /*
-          if(this.beacon.intersectsWithObject(stage.stageHitPointLowerLeft)) {
-            console.log("hit left");
-            if(this.direction === "left") {
-              // Correct placing of lower left/right black dots
-              // make a mechanism to sense between two stages.
-              ///stage.moveToSide("right", this.verticalLine, this.spaceArray, "STEP");
-            }
-          } else if(this.beacon.intersectsWithObject(stage.stageHitPointLowerRight)) {
-            console.log("hit right");
-            if(this.direction === "right") {
-              //stage.moveToSide("left", this.verticalLine, this.spaceArray, "STEP");
-            }
-          } */
-        }, this);
       };
 
       return this.indicator;
