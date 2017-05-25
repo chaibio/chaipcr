@@ -39,7 +39,7 @@ angular.module("canvasApp").service('movingStepGraphics', [
             }
             step.parentStage.border.setLeft(step.parentStage.border.left + this.offset).setCoords();
             
-            this.squeezeStep(step, C);
+            //this.squeezeStep(step, C);
 
             startingStep = step.nextStep;
             while(startingStep) {
@@ -72,8 +72,13 @@ angular.module("canvasApp").service('movingStepGraphics', [
         };
 
         this.squeezeStep = function(step, C) {
-
-            step.parentStage.deleteAllStepContents(step);
+           
+            console.log(step.index);
+            //step.parentStage.deleteAllStepContents(step);
+            step.parentStage.deleteFromStage(step.index, step.ordealStatus);
+            //
+            //step.deleteFromAllStepViews();
+            
         };
 
         this.moveLittleRight = function(step) {

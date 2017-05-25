@@ -110,7 +110,8 @@ angular.module("canvasApp").factory('step', [
         this.circle.getUniqueId();
 
       };
-
+      
+      
       this.specialMoveStep = function() {
 
         if(this.previousStep) {

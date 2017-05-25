@@ -307,7 +307,7 @@ angular.module("canvasApp").factory('moveStageRect', [
           stageView.stageHeader();
           this.kanvas.$scope.applyValues(stageView.childSteps[0].circle);
           stageView.childSteps[0].circle.manageClick(true);
-
+          
         };
 
         return this.indicator;

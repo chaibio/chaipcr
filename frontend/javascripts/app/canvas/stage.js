@@ -71,6 +71,9 @@ angular.module("canvasApp").factory('stage', [
         console.log("okay Shrinking");
         this.childSteps.forEach(function(step, index) {
           this.deleteAllStepContents(step);
+          //this.parent.allStepViews.splice(step.ordealStatus - 1, 1);
+          //this.deleteFromStage(step.index, step.ordealStatus);
+
         }, this);
 
         this.deleteStageContents();
@@ -203,6 +206,19 @@ angular.module("canvasApp").factory('stage', [
           }
           this.canvas.remove(this.visualComponents[component]);
         }
+      };
+
+      this.deleteFromStage = function(index, ordealStatus) {
+        
+        console.log("From step", this.childSteps.length, this.childSteps[index]);
+        this.deleteAllStepContents(this.childSteps[index]);
+        this.wireNextAndPreviousStep(this.childSteps[index]);
+        this.childSteps.splice(index, 1);
+        this.model.steps.splice(index, 1);
+        this.parent.allStepViews.splice(ordealStatus - 1, 1);
+        
+        this.parent.correctNumbering();
+        console.log("From step", this.childSteps.length);
       };
 
       this.deleteAllStepContents = function(currentStep) {

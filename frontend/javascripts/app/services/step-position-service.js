@@ -19,7 +19,7 @@
 
 window.ChaiBioTech.ngApp.service('StepPositionService', [
   function() {
-      var allStages = null;
+      var sllSteps = null;
         return {
             init: function(steps) {
                 allSteps = steps; // Setting the reference from canvas.js, just after all stages are created.

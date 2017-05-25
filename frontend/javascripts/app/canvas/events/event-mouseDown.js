@@ -99,23 +99,26 @@ angular.module("canvasApp").factory('mouseDown', [
             // the very thing we click. Not to the one we move. This applies to moveStage too.
             that.mouseDownPos = evt.e.clientX;
             console.log("step = " , evt.target.parent );
-            C.stepIndicator.init(evt.target.parent, evt.target);
+            
+            movingStepGraphics.initiateMoveStepGraphics(evt.target.parent, C);
             evt.target.parent.selectStep();
-            evt.target.parent.toggleComponents(false);
+            
+
             //evt.target.parent.parentStage.shrinkedStage = true;
             that.moveStepActive = true;
             that.canvas.moveCursor = "move";
-            
-            //that.calculateMoveLimit("step", evt.target.parent.parentStage);
             circleManager.togglePaths(false); //put it back later
             C.moveDots.setLeft(evt.target.parent.left + 52).setCoords();
-            movingStepGraphics.initiateMoveStepGraphics(evt.target.parent, C);
+            
             //evt.target.parent.shrinkStep();
             evt.target.setVisible(false);
             C.moveDots.setVisible(true);
             C.moveDots.currentIndex = evt.target.parent.parentStage.index;
             C.canvas.bringToFront(C.moveDots);
             C.canvas.bringToFront(C.stepIndicator);
+            
+            movingStepGraphics.squeezeStep(evt.target.parent, C);
+            C.stepIndicator.init(evt.target.parent, evt.target);
             C.canvas.renderAll();
 
           break;
@@ -132,6 +135,7 @@ angular.module("canvasApp").factory('mouseDown', [
             that.calculateMoveLimit("stage", stage);
             stage.wireStageNextAndPrevious();
             stage.removeFromStagesArray();
+            C.correctNumbering();
             circleManager.togglePaths(false); //put it back later
 
             C.stageIndicator.init(evt.target.parent, C, evt.target);

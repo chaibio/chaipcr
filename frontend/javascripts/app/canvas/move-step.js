@@ -21,7 +21,8 @@ angular.module("canvasApp").factory('moveStepRect', [
   'ExperimentLoader',
   'previouslySelected',
   'circleManager',
-  function(ExperimentLoader, previouslySelected, circleManager) {
+  'StepPositionService',
+  function(ExperimentLoader, previouslySelected, circleManager, StepPositionService) {
 
     return {
 
@@ -121,6 +122,10 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         this.movement = null;
         this.currentLeft = null;
+        this.movedStepIndex = null;
+        this.currentMoveRight = null;
+        this.rightOffset = 96;
+        this.leftOffset = 0;
 
         this.spaceArray = [step.parentStage.left - 20, step.parentStage.left + 30];
         this.setVisible(true);
@@ -143,7 +148,9 @@ angular.module("canvasApp").factory('moveStepRect', [
             this.currentDrop = step.parentStage.previousStage.childSteps[step.parentStage.previousStage.childSteps.length - 1];
             this.currentHit = this.currentDrop.index;
           }
-          }
+        }
+        StepPositionService.getPositionObject();
+        console.log(StepPositionService.allPositions.length);
       };
 
       this.indicator.changeText = function(step) {
@@ -164,21 +171,65 @@ angular.module("canvasApp").factory('moveStepRect', [
             return this.direction;
       };
 
+      this.indicator.ifOverRightSide = function() {
+        this.movedStepIndex = null;
+
+        StepPositionService.allPositions.some(this.ifOverRightSideCallback, this);
+        return this.movedStepIndex;
+      };
+
+      this.indicator.ifOverRightSideCallback = function(points, index) {
+
+        if((this.movement.left + this.rightOffset) > points[1] && (this.movement.left + this.rightOffset) < points[2]) {
+              
+          if(index !== this.currentMoveRight) {
+            console.log("Found", index);
+            //this.kanvas.allStageViews[index].moveToSide("left", this.draggedStage);
+            this.currentMoveRight = this.movedStepIndex = index;
+            StepPositionService.getPositionObject();
+          }
+          return true;
+        }
+      };
+      this.indicator.ifOverLeftSide = function() {
+        this.movedStepIndex = null;
+
+      };
+
+      this.indicator.movedRightAction = function() {
+      
+      }; 
+
+      this.indicator.movedLeftAction = function() {
+      
+      }; 
       this.indicator.onTheMove = function(C, movement) {
 
         this.setLeft(movement.left).setCoords();
         this.movement = movement;
         var direction = this.getDirection();
-        console.log(direction);
         this.currentLeft = movement.left;
-        //this.beacon.setLeft(movement.left + this.beaconMove).setCoords();
-
+        
+        if(direction === 'right') {
+          if(this.ifOverRightSide() !== null) {
+            this.movedRightAction();
+          } //else if(this.ifOverRightSideForOneStepStage() !== null) {
+            //this.movedRightAction();
+          //}
+        
+        } else if(direction === 'left') {
+          if(this.ifOverLeftSide() !== null) {
+            this.movedLeftAction();
+          } //else if(this.ifOverLeftSideForOneStepStage() !== null) {
+            //this.movedLeftAction();
+         // }
+        } 
         
       };
 
       this.indicator.processMovement = function(step, C) {
 
-        if(this.verticalLine.getVisible() === true) {
+       /* if(this.verticalLine.getVisible() === true) {
           this.verticalLine.setVisible(false);
           this.smallCircleTop.setVisible(false);
           this.smallCircle.setVisible(false);
@@ -218,7 +269,7 @@ angular.module("canvasApp").factory('moveStepRect', [
           .then(function(data) {
             console.log("Moved", data);
           });
-
+          */
       };
 
       return this.indicator;
