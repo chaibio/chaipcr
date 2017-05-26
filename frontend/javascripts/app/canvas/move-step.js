@@ -38,11 +38,11 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         var smallCircle = new fabric.Circle({
           radius: 6, fill: '#FFB300', stroke: "black", strokeWidth: 3, selectable: false,
-          left: 48, top: 298, originX: 'center', originY: 'center', visible: false
+          left: 1, top: 269, originX: 'center', originY: 'center', visible: true
         });
 
         var smallCircleTop = new fabric.Circle({
-          radius: 5, fill: 'black', selectable: false, left: 48, top: 13, originX: 'center', originY: 'center', visible: false
+          radius: 5, fill: 'black', selectable: false, left: 1, top: 5, originX: 'center', originY: 'center', visible: true
         });
 
         var temperatureText = new fabric.Text(
@@ -73,8 +73,14 @@ angular.module("canvasApp").factory('moveStepRect', [
           }
         );
 
-        var verticalLine = new fabric.Line([0, 0, 0, 276],{
-          left: 47, top: 16, stroke: 'black', strokeWidth: 2, originX: 'left', originY: 'top', visible: false
+        var line = new fabric.Line([0, 0, 0, 269],{
+                stroke: 'black', strokeWidth: 2, originX: 'left', originY: 'top'
+            });
+          
+        var verticalLine = new fabric.Group([line, smallCircle, smallCircleTop], {
+           originX: "left", originY: "top", left: 62, top: 56, selectable: true,
+          lockMovementY: true, hasControls: false, hasBorders: false, name: "vertica", visible: false,
+         
         });
 
         var rect = new fabric.Rect({
@@ -85,12 +91,14 @@ angular.module("canvasApp").factory('moveStepRect', [
           fill: null, width: 96, left: 0, top: 0, height: 372, selectable: false, me: this, rx: 1,
         });
 
+        
+
         me.imageobjects["drag-footer-image.png"].originX = "left";
         me.imageobjects["drag-footer-image.png"].originY = "top";
         me.imageobjects["drag-footer-image.png"].top = 52;
         me.imageobjects["drag-footer-image.png"].left = 9;
 
-        indicatorRectangle = new fabric.Group([
+        var indicatorRectangle = new fabric.Group([
           rect, temperatureText, holdTimeText, indexText, placeText,
           me.imageobjects["drag-footer-image.png"],
         ],
@@ -100,7 +108,7 @@ angular.module("canvasApp").factory('moveStepRect', [
           }
         );
 
-        this.indicator = new fabric.Group([coverRect, indicatorRectangle, verticalLine, smallCircle, smallCircleTop], {
+        this.indicator = new fabric.Group([coverRect, indicatorRectangle], {
           originX: "left", originY: "top", left: 38, top: 28, height: 372, width: 96, selectable: true,
           lockMovementY: true, hasControls: false, visible: false, hasBorders: false, name: "dragStepGroup"
         });
@@ -115,8 +123,8 @@ angular.module("canvasApp").factory('moveStepRect', [
           lockMovementY: true, hasControls: false, visible: true, //fill: 'black',
         });
       this.indicator.verticalLine = verticalLine;
-      this.indicator.smallCircleTop = smallCircleTop;
-      this.indicator.smallCircle = smallCircle;
+      //this.indicator.smallCircleTop = smallCircleTop;
+      //this.indicator.smallCircle = smallCircle;
 
       this.indicator.init = function(step, footer, C) {
 
@@ -131,6 +139,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.spaceArray = [step.parentStage.left - 20, step.parentStage.left + 30];
         this.setVisible(true);
         this.verticalLine.setVisible(true);
+        C.canvas.bringToFront(this.verticalLine);
         this.setLeft(footer.left);
         this.startPosition = footer.left;
         this.changeText(step);
