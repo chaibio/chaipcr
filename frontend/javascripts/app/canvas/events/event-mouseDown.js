@@ -118,7 +118,7 @@ angular.module("canvasApp").factory('mouseDown', [
             C.canvas.bringToFront(C.stepIndicator);
             
             movingStepGraphics.squeezeStep(evt.target.parent, C);
-            C.stepIndicator.init(evt.target.parent, evt.target);
+            C.stepIndicator.init(evt.target.parent, evt.target, C);
             C.canvas.renderAll();
 
           break;

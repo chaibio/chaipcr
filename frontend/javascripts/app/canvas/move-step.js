@@ -118,7 +118,7 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.smallCircleTop = smallCircleTop;
       this.indicator.smallCircle = smallCircle;
 
-      this.indicator.init = function(step, footer) {
+      this.indicator.init = function(step, footer, C) {
 
         this.movement = null;
         this.currentLeft = null;
@@ -126,7 +126,8 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.currentMoveRight = null;
         this.rightOffset = 96;
         this.leftOffset = 0;
-
+        this.kanvas = C;
+        
         this.spaceArray = [step.parentStage.left - 20, step.parentStage.left + 30];
         this.setVisible(true);
         this.setLeft(footer.left);
@@ -184,7 +185,7 @@ angular.module("canvasApp").factory('moveStepRect', [
               
           if(index !== this.currentMoveRight) {
             console.log("Found", index);
-            //this.kanvas.allStageViews[index].moveToSide("left", this.draggedStage);
+            this.kanvas.allStepViews[index].moveToSide("left", this.draggedStage);
             this.currentMoveRight = this.movedStepIndex = index;
             StepPositionService.getPositionObject();
           }
