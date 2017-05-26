@@ -196,8 +196,10 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
     
       this.indicator.movedRightAction = function() {
+
         this.currentMoveLeft = null; // Resetting
         this.manageVerticalLineRight(this.movedStepIndex);
+        this.manageBorderLeftForRight(this.movedStepIndex);
       }; 
 
       this.indicator.ifOverLeftSide = function() {
@@ -207,6 +209,7 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
 
       this.indicator.ifOverLeftSideCallback = function(points, index) {
+
         if((this.movement.left + this.leftOffset) > points[0] && (this.movement.left + this.leftOffset) < points[1]) {
           
           if(this.currentMoveLeft !== index) {
@@ -221,6 +224,7 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.movedLeftAction = function() {
         this.currentMoveRight = null; // Resetting
         this.manageVerticalLineLeft(this.movedStepIndex);
+        this.manageBorderLeftForLeft(this.movedStepIndex);
       }; 
 
       this.indicator.onTheMove = function(C, movement) {
@@ -249,16 +253,31 @@ angular.module("canvasApp").factory('moveStepRect', [
 
       this.indicator.manageVerticalLineRight = function(index) {
 
-        var place = (this.kanvas.allStepViews[index].left + this.kanvas.allStepViews[index].myWidth + 5);
+        var place = (this.kanvas.allStepViews[index].left + this.kanvas.allStepViews[index].myWidth - 2);
         this.verticalLine.setLeft(place);
         this.verticalLine.setCoords();
       };
 
       this.indicator.manageVerticalLineLeft = function(index) {
 
-        var place = (this.kanvas.allStepViews[index].left - 5);
+        var place = (this.kanvas.allStepViews[index].left - 12);
         this.verticalLine.setLeft(place);
         this.verticalLine.setCoords();
+      };
+
+      this.indicator.manageBorderLeftForLeft = function(index) {
+        
+        if(this.kanvas.allStepViews[index + 1]) {
+          this.kanvas.allStepViews[index + 1].borderLeft.setVisible(false);
+        }
+        this.kanvas.allStepViews[index].borderLeft.setVisible(true);
+      };
+
+      this.indicator.manageBorderLeftForRight = function(index) {
+        if(this.kanvas.allStepViews[index].nextStep) {
+          this.kanvas.allStepViews[index + 1].borderLeft.setVisible(true);
+        }
+        this.kanvas.allStepViews[index].borderLeft.setVisible(false);
       };
 
       this.indicator.processMovement = function(step, C) {

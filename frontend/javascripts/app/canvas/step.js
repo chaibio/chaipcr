@@ -117,11 +117,22 @@ angular.module("canvasApp").factory('step', [
           this.left = this.left - 10;
           this.moveStep(0, false);
           this.circle.moveCircleWithStep();
+          
+          //if(this.nextStep) {
+         //   this.nextStep.borderLeft.setVisible(true);
+          //} 
+          
+          //this.borderLeft.setVisible(false);
+         
           this.stepMovedDirection = "left";
         } else if(direction === "right" && this.stepMovedDirection !== "right") {
           this.left = this.left + 10;
           this.moveStep(0, false);
           this.circle.moveCircleWithStep();
+          //if(this.nextStep) {
+            //this.nextStep.borderLeft.setVisible(false);
+          //}
+          //this.borderLeft.setVisible(true);
           this.stepMovedDirection = "right";
         }
       };
@@ -266,6 +277,7 @@ angular.module("canvasApp").factory('step', [
         this.setLeft();
         this.addName();
         stepGraphics.addBorderRight.call(this);
+        stepGraphics.addBorderLeft.call(this);
         this.getUniqueName();
         this.rampSpeedGraphics();
         stepGraphics.initNumberText.call(this);

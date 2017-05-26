@@ -16,21 +16,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// This one is used while moving step
+ angular.module('canvasApp').factory('borderLeft', [
+   'Line',
+   function(Line) {
+     return function(step) {
+       var properties = {
+           stroke: '#ff9f00', strokeWidth: 1, selectable: false,
+           originX: 'left', originY: 'top', visible: false
+         };
 
-angular.module('canvasApp').factory('stepGroup', [
-  'Group',
-  function(Group) {
-    return function(step) {
-
-      var groupMembers = [step.stepRect, step.numberingTextCurrent, step.numberingTextTotal, step.stepName, step.deltaSymbol,
-        step.deltaGroup, step.borderRight, step.borderLeft];
-
-      var properties = {
-            left: step.left || 33,  top: 28,  selectable: false,  hasControls: false,
-            hasBoarders: false, name: "stepGroup",  me: step, originX: 'left', originY: 'top'
-          };
-
-      return Group.create(groupMembers, properties);
-    };
-  }
-]);
+       var cordinates = [0, 40, 0, 362];
+       
+       return Line.create(cordinates, properties);
+     };
+   }
+ ]);
