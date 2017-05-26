@@ -127,14 +127,15 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.rightOffset = 96;
         this.leftOffset = 0;
         this.kanvas = C;
-        
+
         this.spaceArray = [step.parentStage.left - 20, step.parentStage.left + 30];
         this.setVisible(true);
+        this.verticalLine.setVisible(true);
         this.setLeft(footer.left);
         this.startPosition = footer.left;
         this.changeText(step);
         console.log(step, "stepping");
-        if(step.nextStep) {
+        /*if(step.nextStep) {
           this.currentDrop = step.nextStep;
           this.currentHit = step.nextStep.index;
         } else if(step.parentStage.nextStage) {
@@ -149,7 +150,7 @@ angular.module("canvasApp").factory('moveStepRect', [
             this.currentDrop = step.parentStage.previousStage.childSteps[step.parentStage.previousStage.childSteps.length - 1];
             this.currentHit = this.currentDrop.index;
           }
-        }
+        }*/
         StepPositionService.getPositionObject();
         console.log(StepPositionService.allPositions.length);
       };
@@ -198,7 +199,8 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
 
       this.indicator.movedRightAction = function() {
-      
+        this.currentMoveLeft = null; // Resetting
+        this.manageVerticalLineRight(this.movedStepIndex);
       }; 
 
       this.indicator.movedLeftAction = function() {
@@ -226,6 +228,13 @@ angular.module("canvasApp").factory('moveStepRect', [
          // }
         } 
         
+      };
+
+      this.indicator.manageVerticalLineRight = function(index) {
+
+        var place = (this.kanvas.allStepViews[index].left + this.kanvas.allStepViews[index].myWidth + 5);
+        this.verticalLine.setLeft(place);
+        this.verticalLine.setCoords();
       };
 
       this.indicator.processMovement = function(step, C) {

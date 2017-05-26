@@ -29,7 +29,7 @@ angular.module("canvasApp").factory('step', [
 
     return function(model, parentStage, index, $scope) {
 
-      this.moved = null;
+      this.stepMovedDirection = null;
       this.model = model;
       this.parentStage = parentStage;
       this.index = index;
@@ -113,12 +113,12 @@ angular.module("canvasApp").factory('step', [
       };
       
       this.moveToSide = function(direction) {
-        if(direction === "left" && this.moved !== "left") {
+        if(direction === "left" && this.stepMovedDirection !== "left") {
           this.left = this.left - 10;
           this.moveStep(0, false);
           this.circle.moveCircleWithStep();
           this.moved = "left";
-        } else if(direction === "right" && this.moved !== "right") {
+        } else if(direction === "right" && this.stepMovedDirection !== "right") {
           this.left = this.left + 10;
           this.moveStep(0, false);
           this.circle.moveCircleWithStep();

@@ -410,6 +410,7 @@ angular.module("canvasApp").factory('canvas', [
 
           tempCircle = step.circle;
           step.index = index;
+          step.stepMovedDirection = null;
           step.ordealStatus = oStatus;
           that.allStepViews.push(step);
           oStatus = oStatus + 1;
