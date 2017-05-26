@@ -150,18 +150,15 @@ angular.module("canvasApp").factory('canvas', [
         this.stageIndicator = moveStageRect.getMoveStageRect(this);
         this.stageVerticalLine = this.stageIndicator.verticalLine;
         this.stepVerticalLine = this.stepIndicator.verticalLine;
-        this.stepBeacon = this.stepIndicator.beacon;
-        this.stepBrick = this.stepIndicator.brick;
-        this.hitBlock = stageHitBlock.getStageHitBlock(this);
+        
+        //this.hitBlock = stageHitBlock.getStageHitBlock(this);
 
         this.canvas.add(this.stepIndicator);
         this.canvas.add(this.stageIndicator);
         this.canvas.add(this.stageVerticalLine);
         this.canvas.add(this.stepVerticalLine);
         
-        this.canvas.add(this.stepBeacon);
-        this.canvas.add(this.stepBrick);
-        this.canvas.add(this.hitBlock);
+        //this.canvas.add(this.hitBlock);
         this.addMoveDots(); // This is for movestep
     };
 

@@ -34,7 +34,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.endPosition = 0;
         this.currentLeft = 0;
         this.direction = null;
-        this.beaconMove = 0;
+       
 
         var smallCircle = new fabric.Circle({
           radius: 6, fill: '#FFB300', stroke: "black", strokeWidth: 3, selectable: false,
@@ -113,18 +113,9 @@ angular.module("canvasApp").factory('moveStepRect', [
           lockMovementY: true, hasControls: false, visible: false, hasBorders: false, name: "dragStepGroup"
         });
 
-        this.indicator.beacon = new fabric.Rect({
-          fill: '', width: 10, left: 0, top: 340, height: 10, selectable: false, me: this,
-          lockMovementY: true, hasControls: false, visible: true, //fill: 'black',
-        });
-        // We may not need brick.
-        this.indicator.brick = new fabric.Rect({
-          fill: '', width: 20, left: 0, top: 340, height: 10, selectable: false, me: this,
-          lockMovementY: true, hasControls: false, visible: true, //fill: 'black',
-        });
+       
       this.indicator.verticalLine = verticalLine;
-      //this.indicator.smallCircleTop = smallCircleTop;
-      //this.indicator.smallCircle = smallCircle;
+      
 
       this.indicator.init = function(step, footer, C) {
 
@@ -138,6 +129,7 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         this.spaceArray = [step.parentStage.left - 20, step.parentStage.left + 30];
         this.setVisible(true);
+        this.verticalLine.setLeft(footer.left + 41);
         this.verticalLine.setVisible(true);
         C.canvas.bringToFront(this.verticalLine);
         this.setLeft(footer.left);
@@ -195,26 +187,42 @@ angular.module("canvasApp").factory('moveStepRect', [
               
           if(index !== this.currentMoveRight) {
             console.log("Found", index);
-            this.kanvas.allStepViews[index].moveToSide("left", this.draggedStage);
+            this.kanvas.allStepViews[index].moveToSide("left");
             this.currentMoveRight = this.movedStepIndex = index;
             StepPositionService.getPositionObject();
           }
           return true;
         }
       };
-      this.indicator.ifOverLeftSide = function() {
-        this.movedStepIndex = null;
-
-      };
-
+    
       this.indicator.movedRightAction = function() {
         this.currentMoveLeft = null; // Resetting
         this.manageVerticalLineRight(this.movedStepIndex);
       }; 
 
+      this.indicator.ifOverLeftSide = function() {
+        this.movedStepIndex = null;
+        StepPositionService.allPositions.some(this.ifOverLeftSideCallback, this);
+        return this.movedStepIndex;
+      };
+
+      this.indicator.ifOverLeftSideCallback = function(points, index) {
+        if((this.movement.left + this.leftOffset) > points[0] && (this.movement.left + this.leftOffset) < points[1]) {
+          
+          if(this.currentMoveLeft !== index) {
+            this.kanvas.allStepViews[index].moveToSide("right");
+            this.currentMoveLeft = this.movedStepIndex = index;
+            StepPositionService.getPositionObject();
+          }
+          return true;
+        }
+      };
+
       this.indicator.movedLeftAction = function() {
-      
+        this.currentMoveRight = null; // Resetting
+        this.manageVerticalLineLeft(this.movedStepIndex);
       }; 
+
       this.indicator.onTheMove = function(C, movement) {
 
         this.setLeft(movement.left).setCoords();
@@ -246,8 +254,15 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.verticalLine.setCoords();
       };
 
-      this.indicator.processMovement = function(step, C) {
+      this.indicator.manageVerticalLineLeft = function(index) {
 
+        var place = (this.kanvas.allStepViews[index].left - 5);
+        this.verticalLine.setLeft(place);
+        this.verticalLine.setCoords();
+      };
+
+      this.indicator.processMovement = function(step, C) {
+        this.verticalLine.setVisible(false);
        /* if(this.verticalLine.getVisible() === true) {
           this.verticalLine.setVisible(false);
           this.smallCircleTop.setVisible(false);
