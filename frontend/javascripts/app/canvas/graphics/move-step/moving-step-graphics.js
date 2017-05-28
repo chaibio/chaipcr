@@ -21,12 +21,18 @@ angular.module("canvasApp").service('movingStepGraphics', [
     'Line',
     function(Line) {
         this.offset = 41;
+        
         this.initiateMoveStepGraphics = function(currentStep, C) {
             
             this.arrangeStepsOfStage(currentStep, C);
             this.arrangeStages(currentStep.parentStage);
+            this.setWidthOfStage(currentStep.parentStage);
             this.adjustStep(currentStep);
             this.adjustStage(currentStep.parentStage);
+        };
+
+        this.setWidthOfStage = function(baseStage) {
+            baseStage.setNewWidth(-60);
         };
 
         this.arrangeStepsOfStage = function(step, C) {
@@ -37,7 +43,9 @@ angular.module("canvasApp").service('movingStepGraphics', [
                 this.moveLittleRight(startingStep);
                 startingStep = startingStep.previousStep;
             }
-            step.parentStage.border.setLeft(step.parentStage.border.left + this.offset).setCoords();
+           // step.parentStage.border.setLeft(step.parentStage.border.left + this.offset).setCoords();
+           step.parentStage.stageGroup.setLeft(step.parentStage.stageGroup.left + 40).setCoords();
+           step.parentStage.dots.setLeft(step.parentStage.dots.left + 40).setCoords();
             
             //this.squeezeStep(step, C);
 
