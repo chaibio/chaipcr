@@ -35,6 +35,20 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.currentLeft = 0;
         this.direction = null;
        
+        // Things to do, Plan
+
+        // Reduce the size of the clicked stage,
+        // Control the movement of the stages in the left and right, according to the shrinke dstage.
+        // Control the bordr left of the stage , while step is moving.
+        // tag the empty space between stages, Use this space for move step to be a stage.
+        // Enable process movement for move-step.
+        // Check with move stage , make sure allStepViews are mapped correctly.
+
+        //[
+          // Make selected step a different type of step, 
+          // Make empty space array, which is to be used for move step to be new stage and move to before first step of the stage,
+          // and move after the last step of the stage.
+        //]
 
         var smallCircle = new fabric.Circle({
           radius: 6, fill: '#FFB300', stroke: "black", strokeWidth: 3, selectable: false,
@@ -274,6 +288,7 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
 
       this.indicator.manageBorderLeftForRight = function(index) {
+
         if(this.kanvas.allStepViews[index].nextStep) {
           this.kanvas.allStepViews[index + 1].borderLeft.setVisible(true);
         }
