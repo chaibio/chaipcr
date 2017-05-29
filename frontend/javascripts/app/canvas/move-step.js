@@ -241,6 +241,11 @@ angular.module("canvasApp").factory('moveStepRect', [
 
       this.indicator.movedLeftAction = function() {
         this.currentMoveRight = null; // Resetting
+        var step = this.kanvas.allStepViews[this.movedStepIndex];
+        if(step.previousStep) {
+          this.currentDrop = step.previousStep;
+        }
+        //this.currentDrop = (step.previousStep) ? step.previousStep
         this.manageVerticalLineLeft(this.movedStepIndex);
         this.manageBorderLeftForLeft(this.movedStepIndex);
       }; 
@@ -300,6 +305,7 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
 
       this.indicator.processMovement = function(step, C) {
+
         this.verticalLine.setVisible(false);
         console.log(this.currentDrop, step);
        /* if(this.verticalLine.getVisible() === true) {
