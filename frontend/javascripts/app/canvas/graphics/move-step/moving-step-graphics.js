@@ -21,18 +21,28 @@ angular.module("canvasApp").service('movingStepGraphics', [
     'Line',
     function(Line) {
         this.offset = 41;
-        
+        // Make steg looks good just after clicking move-step, steps well spaced , and other stages moved aways making space.
+
         this.initiateMoveStepGraphics = function(currentStep, C) {
             
             this.arrangeStepsOfStage(currentStep, C);
             this.arrangeStages(currentStep.parentStage);
             this.setWidthOfStage(currentStep.parentStage);
+            this.setLeftOfStage(currentStep.parentStage);
             this.adjustStep(currentStep);
             this.adjustStage(currentStep.parentStage);
         };
 
         this.setWidthOfStage = function(baseStage) {
-            baseStage.setNewWidth(-60);
+            //baseStage.setNewWidth(-60);
+            baseStage.myWidth = baseStage.myWidth - (this.offset * 2);
+            baseStage.roof.setWidth(baseStage.myWidth).setCoords();
+            baseStage.stageGroup.setLeft(baseStage.stageGroup.left + this.offset).setCoords();
+            baseStage.dots.setLeft(baseStage.dots.left + this.offset).setCoords();
+        };
+
+        this.setLeftOfStage = function(baseStage) {
+            baseStage.left = baseStage.left + this.offset;
         };
 
         this.arrangeStepsOfStage = function(step, C) {
@@ -44,9 +54,8 @@ angular.module("canvasApp").service('movingStepGraphics', [
                 startingStep = startingStep.previousStep;
             }
            // step.parentStage.border.setLeft(step.parentStage.border.left + this.offset).setCoords();
-           step.parentStage.stageGroup.setLeft(step.parentStage.stageGroup.left + 40).setCoords();
-           step.parentStage.dots.setLeft(step.parentStage.dots.left + 40).setCoords();
-            
+           
+        
             //this.squeezeStep(step, C);
 
             startingStep = step.nextStep;
