@@ -101,8 +101,8 @@ angular.module("canvasApp").factory('mouseDown', [
             console.log("step = " , evt.target.parent );
             
             movingStepGraphics.initiateMoveStepGraphics(evt.target.parent, C);
-            evt.target.parent.selectStep();
-            
+            //evt.target.parent.selectStep();
+            that.selectStep(evt.target.parent.circle);
 
             //evt.target.parent.parentStage.shrinkedStage = true;
             that.moveStepActive = true;

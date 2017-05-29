@@ -31,7 +31,7 @@ window.ChaiBioTech.ngApp.service('StepPositionService', [
                 }
                 
                 this.allPositions = [];
-                allSteps.forEach(function(step, index) {
+                steps.forEach(function(step, index) {
                     this.allPositions[index] = [
                             step.left, 
                             (step.left + (step.myWidth) / 2),

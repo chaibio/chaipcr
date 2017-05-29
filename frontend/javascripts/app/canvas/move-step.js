@@ -150,25 +150,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.setLeft(footer.left);
         this.startPosition = footer.left;
         this.changeText(step);
-        console.log(step, "stepping");
-        /*if(step.nextStep) {
-          this.currentDrop = step.nextStep;
-          this.currentHit = step.nextStep.index;
-        } else if(step.parentStage.nextStage) {
-          this.currentDrop = step.parentStage.nextStage.childSteps[0];
-          this.currentHit = step.index;
-        } else {
-          console.log("I am last -- >");
-          if(step.previousStep) {
-            this.currentDrop = step.previousStep;
-            this.currentHit = step.previousStep.index;
-          } else if(step.parentStage.previousStage) {
-            this.currentDrop = step.parentStage.previousStage.childSteps[step.parentStage.previousStage.childSteps.length - 1];
-            this.currentHit = this.currentDrop.index;
-          }
-        }*/
-        StepPositionService.getPositionObject();
-        console.log(StepPositionService.allPositions.length);
+        StepPositionService.getPositionObject(this.kanvas.allStepViews);
       };
 
       this.indicator.changeText = function(step) {
@@ -204,14 +186,12 @@ angular.module("canvasApp").factory('moveStepRect', [
             console.log("Found", index);
             this.kanvas.allStepViews[index].moveToSide("left");
             this.currentMoveRight = this.movedStepIndex = index;
-            StepPositionService.getPositionObject();
+            StepPositionService.getPositionObject(this.kanvas.allStepViews);
           }
           return true;
         }
       };
     
-      
-
       this.indicator.ifOverLeftSide = function() {
         this.movedStepIndex = null;
         StepPositionService.allPositions.some(this.ifOverLeftSideCallback, this);
@@ -225,7 +205,7 @@ angular.module("canvasApp").factory('moveStepRect', [
           if(this.currentMoveLeft !== index) {
             this.kanvas.allStepViews[index].moveToSide("right");
             this.currentMoveLeft = this.movedStepIndex = index;
-            StepPositionService.getPositionObject();
+            StepPositionService.getPositionObject(this.kanvas.allStepViews);
           }
           return true;
         }
@@ -307,37 +287,14 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.processMovement = function(step, C) {
 
         this.verticalLine.setVisible(false);
-        console.log(this.currentDrop, step);
-       /* if(this.verticalLine.getVisible() === true) {
-          this.verticalLine.setVisible(false);
-          this.smallCircleTop.setVisible(false);
-          this.smallCircle.setVisible(false);
-        }
-        // Make a clone of the step
-        //if(Math.abs(this.startPosition - this.endPosition) > 65)*/
+        
         var modelClone = $.extend({}, step.model);
-        // We had shrinked the stage, Now we undo it.
-        step.parentStage.expand(); 
-        // Find the place where you left the moved step
-        //var moveTarget = Math.floor((this.left + 60) / 120);
+        
         var targetStep = this.currentDrop;
 
-        /*if(targetStep.nextStep === null) {
-          if((this.left - (targetStep.stepGroup.left + 30)) > 25) {
-            console.log("Could be going for a new stage1");
-            // make a stage as next spage.
-          }
-        } else if (targetStep.previousStep === null) {
-          if((targetStep.stepGroup.left - this.left) > 25) {
-            console.log("Could be going for a new stage2");
-            // Make stage as previous stage.
-          }
-        } */
+        
         var targetStage = targetStep.parentStage;
 
-        // Delete the step, you moved
-        //step.parentStage.deleteStep({}, step);
-        // add clone at the place
         var data = {
           step: modelClone
         };
@@ -350,6 +307,7 @@ angular.module("canvasApp").factory('moveStepRect', [
             console.log("Moved", data);
           });
           
+          this.kanvas.correctNumbering();
       };
 
       return this.indicator;
