@@ -268,6 +268,7 @@ angular.module("canvasApp").factory('stage', [
 
         stage.stageGroup.set({left: stage.left }).setCoords();
         stage.dots.set({left: stage.left + 3}).setCoords();
+        stage.myWidth = (stage.model.steps.length * (constants.stepWidth)) + constants.additionalWidth;
         //stage.moveStageRightPointerDetector.set({left: (stage.left + stage.myWidth) +  50}).setCoords();
 
         stage.childSteps.forEach(function(childStep, index) {

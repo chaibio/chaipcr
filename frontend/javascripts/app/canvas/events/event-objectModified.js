@@ -45,11 +45,11 @@ angular.module("canvasApp").factory('objectModified', [
 
           case "moveStep":
 
-            var indicate = evt.target;
-            step = indicate.parent;
-            C.stepIndicator.endPosition = indicate.left;
-            C.stepIndicator.processMovement(step, C);
-            C.canvas.renderAll();
+            //var indicate = evt.target;
+            //step = indicate.parent;
+           // C.stepIndicator.endPosition = indicate.left;
+            //C.stepIndicator.processMovement(step, C);
+            //C.canvas.renderAll();
           break;
 
           case "moveStage":

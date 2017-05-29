@@ -23,7 +23,8 @@ angular.module("canvasApp").factory('mouseUp', [
   'previouslyHoverd',
   'scrollService',
   'circleManager',
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager) {
+  'movingStepGraphics',
+  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager, movingStepGraphics) {
 
     this.init = function(C, $scope, that) {
 
@@ -42,11 +43,16 @@ angular.module("canvasApp").factory('mouseUp', [
           if(that.mouseDownPos === evt.e.clientX) {
             console.log("its just a click ", evt.target);
           }
-          evt.target.parent.parentStage.shrinkedStage = false;
+          var indicate = evt.target;
+          step = indicate.parent;
+          
+          //evt.target.parent.parentStage.shrinkedStage = false;
           C.moveDots.setVisible(false);
           C.moveDots.currentIndex = null;
           C.stepIndicator.setVisible(false);
           that.moveStepActive = false;
+          movingStepGraphics.correctStageAfterDrop(step.parentStage);
+          C.stepIndicator.processMovement(step, C);
           C.canvas.renderAll();
         }
 

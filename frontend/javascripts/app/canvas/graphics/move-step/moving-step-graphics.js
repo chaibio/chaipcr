@@ -19,7 +19,8 @@
 
 angular.module("canvasApp").service('movingStepGraphics', [
     'Line',
-    function(Line) {
+    'constants',
+    function(Line, constants) {
         this.offset = 41;
         // Make steg looks good just after clicking move-step, steps well spaced , and other stages moved aways making space.
 
@@ -117,6 +118,18 @@ angular.module("canvasApp").service('movingStepGraphics', [
         };
 
         this.adjustStage = function(stage) {
+
+        };
+
+        this.correctStageAfterDrop = function(baseStage) {
+            console.log(baseStage);
+            baseStage.myWidth = (baseStage.model.steps.length * (constants.stepWidth)) + constants.additionalWidth;
+            baseStage.roof.setWidth(baseStage.myWidth).setCoords();
+            //baseStage.getLeft();
+            //baseStage.stageGroup.setLeft(baseStage.stageGroup.left + this.offset).setCoords();
+            //baseStage.dots.setLeft(baseStage.dots.left + this.offset).setCoords();
+            //baseStage.stageGroup.setLeft(baseStage.stageGroup.left + this.offset).setCoords();
+            //baseStage.dots.setLeft(baseStage.dots.left + this.offset).setCoords();
 
         };
 

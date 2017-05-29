@@ -140,6 +140,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.rightOffset = 96;
         this.leftOffset = 0;
         this.kanvas = C;
+        this.currentDrop = null;
 
         this.spaceArray = [step.parentStage.left - 20, step.parentStage.left + 30];
         this.setVisible(true);
@@ -209,12 +210,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         }
       };
     
-      this.indicator.movedRightAction = function() {
-
-        this.currentMoveLeft = null; // Resetting
-        this.manageVerticalLineRight(this.movedStepIndex);
-        this.manageBorderLeftForRight(this.movedStepIndex);
-      }; 
+      
 
       this.indicator.ifOverLeftSide = function() {
         this.movedStepIndex = null;
@@ -234,6 +230,14 @@ angular.module("canvasApp").factory('moveStepRect', [
           return true;
         }
       };
+
+      this.indicator.movedRightAction = function() {
+
+        this.currentMoveLeft = null; // Resetting
+        this.currentDrop = this.kanvas.allStepViews[this.movedStepIndex];
+        this.manageVerticalLineRight(this.movedStepIndex);
+        this.manageBorderLeftForRight(this.movedStepIndex);
+      }; 
 
       this.indicator.movedLeftAction = function() {
         this.currentMoveRight = null; // Resetting
@@ -297,21 +301,22 @@ angular.module("canvasApp").factory('moveStepRect', [
 
       this.indicator.processMovement = function(step, C) {
         this.verticalLine.setVisible(false);
+        console.log(this.currentDrop, step);
        /* if(this.verticalLine.getVisible() === true) {
           this.verticalLine.setVisible(false);
           this.smallCircleTop.setVisible(false);
           this.smallCircle.setVisible(false);
         }
         // Make a clone of the step
-        //if(Math.abs(this.startPosition - this.endPosition) > 65)
+        //if(Math.abs(this.startPosition - this.endPosition) > 65)*/
         var modelClone = $.extend({}, step.model);
         // We had shrinked the stage, Now we undo it.
-        step.parentStage.expand();
+        step.parentStage.expand(); 
         // Find the place where you left the moved step
         //var moveTarget = Math.floor((this.left + 60) / 120);
         var targetStep = this.currentDrop;
 
-        if(targetStep.nextStep === null) {
+        /*if(targetStep.nextStep === null) {
           if((this.left - (targetStep.stepGroup.left + 30)) > 25) {
             console.log("Could be going for a new stage1");
             // make a stage as next spage.
@@ -321,23 +326,24 @@ angular.module("canvasApp").factory('moveStepRect', [
             console.log("Could be going for a new stage2");
             // Make stage as previous stage.
           }
-        }
+        } */
         var targetStage = targetStep.parentStage;
 
         // Delete the step, you moved
-        step.parentStage.deleteStep({}, step);
+        //step.parentStage.deleteStep({}, step);
         // add clone at the place
         var data = {
           step: modelClone
         };
-
+        this.kanvas.allStageViews[0].moveAllStepsAndStagesSpecial();
         targetStage.addNewStep(data, targetStep);
+        
         // console.log(modelClone.id, targetStep.model.id, targetStage.model.id);
         ExperimentLoader.moveStep(modelClone.id, targetStep.model.id, targetStage.model.id)
           .then(function(data) {
             console.log("Moved", data);
           });
-          */
+          
       };
 
       return this.indicator;
