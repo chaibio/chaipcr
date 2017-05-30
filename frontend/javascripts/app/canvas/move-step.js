@@ -22,18 +22,12 @@ angular.module("canvasApp").factory('moveStepRect', [
   'previouslySelected',
   'circleManager',
   'StepPositionService',
-  function(ExperimentLoader, previouslySelected, circleManager, StepPositionService) {
+  'moveStepIndicator',
+  function(ExperimentLoader, previouslySelected, circleManager, StepPositionService, moveStepIndicator) {
 
     return {
 
       getMoveStepRect: function(me) {
-
-        this.currentHit = 0;
-        this.currentDrop = null;
-        this.startPosition = 0;
-        this.endPosition = 0;
-        this.currentLeft = 0;
-        this.direction = null;
        
         // Things to do, Plan
 
@@ -51,85 +45,11 @@ angular.module("canvasApp").factory('moveStepRect', [
         //]
 
         // See how a stage with one step works when we click move step
-        var smallCircle = new fabric.Circle({
-          radius: 6, fill: '#FFB300', stroke: "black", strokeWidth: 3, selectable: false,
-          left: 1, top: 269, originX: 'center', originY: 'center', visible: true
-        });
-
-        var smallCircleTop = new fabric.Circle({
-          radius: 5, fill: 'black', selectable: false, left: 1, top: 5, originX: 'center', originY: 'center', visible: true
-        });
-
-        var temperatureText = new fabric.Text(
-          "20º", {
-            fill: 'black',  fontSize: 20, selectable: false, originX: 'left', originY: 'top',
-            top: 9, left: 1, fontFamily: "dinot-bold"
-          }
-        );
-
-        var holdTimeText = new fabric.Text(
-          "0:05", {
-            fill: 'black',  fontSize: 20, selectable: false, originX: 'left', originY: 'top',
-            top: 9, left: 59, fontFamily: "dinot"
-          }
-        );
-
-        var indexText = new fabric.Text(
-          "02", {
-            fill: 'black',  fontSize: 16, selectable: false, originX: 'left', originY: 'top',
-            top: 30, left: 17, fontFamily: "dinot-bold"
-          }
-        );
-
-        var placeText= new fabric.Text(
-          "01/01", {
-            fill: 'black',  fontSize: 16, selectable: false, originX: 'left', originY: 'top',
-            top: 30, left: 42, fontFamily: "dinot"
-          }
-        );
-
-        var line = new fabric.Line([0, 0, 0, 269],{
-                stroke: 'black', strokeWidth: 2, originX: 'left', originY: 'top'
-            });
-          
-        var verticalLine = new fabric.Group([line, smallCircle, smallCircleTop], {
-           originX: "left", originY: "top", left: 62, top: 56, selectable: true,
-          lockMovementY: true, hasControls: false, hasBorders: false, name: "vertica", visible: false,
-         
-        });
-
-        var rect = new fabric.Rect({
-          fill: 'white', width: 96, left: 0, height: 72, selectable: false, name: "step", me: this, rx: 1,
-        });
-
-        var coverRect = new fabric.Rect({
-          fill: null, width: 96, left: 0, top: 0, height: 372, selectable: false, me: this, rx: 1,
-        });
-
+        // enforce move-step boundaries , take care of last stage with infinite hold
+        // defrag this file 
         
-
-        me.imageobjects["drag-footer-image.png"].originX = "left";
-        me.imageobjects["drag-footer-image.png"].originY = "top";
-        me.imageobjects["drag-footer-image.png"].top = 52;
-        me.imageobjects["drag-footer-image.png"].left = 9;
-
-        var indicatorRectangle = new fabric.Group([
-          rect, temperatureText, holdTimeText, indexText, placeText,
-          me.imageobjects["drag-footer-image.png"],
-        ],
-          {
-            originX: "left", originY: "top", left: 0, top: 298, height: 72, selectable: true, lockMovementY: true, hasControls: false,
-            visible: true, hasBorders: false, name: "dragStepGroup"
-          }
-        );
-
-        this.indicator = new fabric.Group([coverRect, indicatorRectangle], {
-          originX: "left", originY: "top", left: 38, top: 28, height: 372, width: 96, selectable: true,
-          lockMovementY: true, hasControls: false, visible: false, hasBorders: false, name: "dragStepGroup"
-        });
-
-       
-      this.indicator.verticalLine = verticalLine;
+      this.indicator = new moveStepIndicator(me);
+      //this.indicator.verticalLine = verticalLine;
       
 
       this.indicator.init = function(step, footer, C) {
@@ -157,10 +77,10 @@ angular.module("canvasApp").factory('moveStepRect', [
 
       this.indicator.changeText = function(step) {
 
-        temperatureText.setText(step.model.temperature + "º");
-        //holdTimeText.setText(step.circle.holdTime.text);
-        indexText.setText(step.numberingTextCurrent.text);
-        placeText.setText(step.numberingTextCurrent.text + step.numberingTextTotal.text);
+        this.temperatureText.setText(step.model.temperature + "º");
+        //this.holdTimeText.setText(step.circle.holdTime.text);
+        this.indexText.setText(step.numberingTextCurrent.text);
+        this.placeText.setText(step.numberingTextCurrent.text + step.numberingTextTotal.text);
       };
 
       this.indicator.getDirection = function() {
@@ -299,7 +219,6 @@ angular.module("canvasApp").factory('moveStepRect', [
         
         var targetStep = this.currentDrop;
 
-        
         var targetStage = this.currentDropStage;
 
         var data = {
@@ -317,14 +236,11 @@ angular.module("canvasApp").factory('moveStepRect', [
           targetStage.addNewStepAtTheBeginning(data);
         }
         
-        
-        // console.log(modelClone.id, targetStep.model.id, targetStage.model.id);
         ExperimentLoader.moveStep(modelClone.id, targetStep.model.id, targetStage.model.id)
           .then(function(data) {
             console.log("Moved", data);
           });
           
-          this.kanvas.correctNumbering();
       };
 
       return this.indicator;
