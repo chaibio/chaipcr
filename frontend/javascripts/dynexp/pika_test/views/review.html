@@ -21,7 +21,7 @@
 			</tr>
 			<tr ng-repeat="x in samples track by $index">
 				<td>
-					<span>A{{$index+3}}. {{x}}</span>
+					<span>A{{$index+3}}. {{x | truncate:20}}</span>
 				</td>
 				<td ng-show="x" class="td-rxn"><img style="width:20px" src="/images/dynexp/pika-test/Sample.svg"></td>
 				<td ng-show="x">30 &mu;L</td>
@@ -38,7 +38,7 @@
 			</tr>
 			<tr ng-repeat="x in samples_B track by $index">
 				<td>
-					<span>B{{$index+1}}. {{x}}</span>
+					<span>B{{$index+1}}. {{x | truncate:20}}</span>
 				</td>
 				<td ng-show="x" class="td-rxn"><img style="width:20px" src="/images/dynexp/pika-test/Sample.svg"></td>
 				<td ng-show="x">30 &mu;L</td>
@@ -65,7 +65,7 @@
 			</tr>
 			<tr ng-repeat="x in samples_B track by $index">
 				<td>
-					<span>B{{$index+3}}. {{x}}</span>
+					<span>B{{$index+3}}. {{x | truncate:20}}</span>
 				</td>
 				<td ng-show="x" class="td-rxn"><img style="width:20px" src="/images/dynexp/pika-test/Sample.svg"></td>
 				<td ng-show="x">30 &mu;L</td>
