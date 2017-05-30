@@ -50,6 +50,7 @@ angular.module("canvasApp").factory('moveStepRect', [
           // and move after the last step of the stage.
         //]
 
+        // See how a stage with one step works when we click move step
         var smallCircle = new fabric.Circle({
           radius: 6, fill: '#FFB300', stroke: "black", strokeWidth: 3, selectable: false,
           left: 1, top: 269, originX: 'center', originY: 'center', visible: true
@@ -140,7 +141,8 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.rightOffset = 96;
         this.leftOffset = 0;
         this.kanvas = C;
-        this.currentDrop = null;
+        this.currentDropStage = step.parentStage;
+        this.currentDrop = (step.previousStep) ? step.previousStep : null;
 
         this.spaceArray = [step.parentStage.left - 20, step.parentStage.left + 30];
         this.setVisible(true);
@@ -215,6 +217,7 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         this.currentMoveLeft = null; // Resetting
         this.currentDrop = this.kanvas.allStepViews[this.movedStepIndex];
+        this.currentDropStage = this.currentDrop.parentStage;
         this.manageVerticalLineRight(this.movedStepIndex);
         this.manageBorderLeftForRight(this.movedStepIndex);
       }; 
@@ -224,6 +227,10 @@ angular.module("canvasApp").factory('moveStepRect', [
         var step = this.kanvas.allStepViews[this.movedStepIndex];
         if(step.previousStep) {
           this.currentDrop = step.previousStep;
+          this.currentDropStage = this.currentDrop.parentStage;
+        } else {
+          this.currentDrop = null;
+          this.currentDropStage = step.parentStage;
         }
         //this.currentDrop = (step.previousStep) ? step.previousStep
         this.manageVerticalLineLeft(this.movedStepIndex);
@@ -293,13 +300,23 @@ angular.module("canvasApp").factory('moveStepRect', [
         var targetStep = this.currentDrop;
 
         
-        var targetStage = targetStep.parentStage;
+        var targetStage = this.currentDropStage;
 
         var data = {
           step: modelClone
         };
         this.kanvas.allStageViews[0].moveAllStepsAndStagesSpecial();
-        targetStage.addNewStep(data, targetStep);
+        if(targetStep) {
+          targetStage.addNewStep(data, targetStep);
+        } else {
+          targetStep = {
+            model: {
+              id: null
+            }
+          };
+          targetStage.addNewStepAtTheBeginning(data);
+        }
+        
         
         // console.log(modelClone.id, targetStep.model.id, targetStage.model.id);
         ExperimentLoader.moveStep(modelClone.id, targetStep.model.id, targetStage.model.id)

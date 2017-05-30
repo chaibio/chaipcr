@@ -120,6 +120,34 @@ angular.module("canvasApp").factory('stage', [
         this.parent.setDefaultWidthHeight();
       };
 
+      this.addNewStepAtTheBeginning = function(data) {
+        
+        this.setNewWidth(constants.stepWidth);
+        this.moveAllStepsAndStages();
+        var firstStepOrdealStatus = this.childSteps[0].ordealStatus;
+        var start = 0;
+        var newStep = new step(data.step, this, start, $scope);
+        newStep.name = "I am created";
+        newStep.render();
+        newStep.ordealStatus = firstStepOrdealStatus;
+
+        this.childSteps.splice(start, 0, newStep);
+        this.model.steps.splice(start, 0, data);
+        this.configureStep(newStep, start);
+        this.parent.allStepViews.splice(firstStepOrdealStatus, 0, newStep);
+
+        this.parent.correctNumbering();
+        
+        newStep.circle.moveCircle();
+        newStep.circle.getCircle();
+
+        circleManager.addRampLines();
+        this.stageHeader();
+        $scope.applyValues(newStep.circle);
+        newStep.circle.manageClick(true);
+        this.parent.setDefaultWidthHeight();
+      };
+
       this.deleteStep = function(data, currentStep) {
         // This methode says what happens in the canvas when a step is deleted
         var selected;
