@@ -27,60 +27,37 @@ angular.module("canvasApp").factory('moveStepIndicator', [
     'moveStepIndicatorRectangleGroup',
     'moveStepIndicatorGroup',
     function(moveStepTemperatureText, moveStepHoldTimeText, moveStepIndexText, moveStepPlaceText, moveStepRectangle, moveStepCoverRect,
-    moveStepIndicatorRectangleGroup, moveStepIndicatorGroup) {
+        moveStepIndicatorRectangleGroup, moveStepIndicatorGroup) {
         return function(me) {
             
-        var smallCircle = new fabric.Circle({
-          radius: 6, fill: '#FFB300', stroke: "black", strokeWidth: 3, selectable: false,
-          left: 1, top: 269, originX: 'center', originY: 'center', visible: true
-        });
+            me.imageobjects["drag-footer-image.png"].originX = "left";
+            me.imageobjects["drag-footer-image.png"].originY = "top";
+            me.imageobjects["drag-footer-image.png"].top = 52;
+            me.imageobjects["drag-footer-image.png"].left = 9;
 
-        var smallCircleTop = new fabric.Circle({
-            radius: 5, fill: 'black', selectable: false, left: 1, top: 5, originX: 'center', originY: 'center', visible: true
-        });
+            var componentsFirstSet = [
+                new moveStepRectangle(me), 
+                new moveStepTemperatureText(), 
+                new moveStepHoldTimeText(), 
+                new moveStepIndexText(), 
+                new moveStepPlaceText(),
+                me.imageobjects["drag-footer-image.png"],
+            ];
+            
+            var componentsSecondSet = [
+                new moveStepCoverRect(), 
+                new moveStepIndicatorRectangleGroup(componentsFirstSet)
+            ];
 
-        var temperatureText = new moveStepTemperatureText();
+            this.indicator = new moveStepIndicatorGroup(componentsSecondSet);
 
-        var holdTimeText = new moveStepHoldTimeText();
-        
-        var indexText = new moveStepIndexText();
+            this.indicator.temperatureText = componentsFirstSet[1];
+            this.indicator.holdTimeText = componentsFirstSet[2];
+            this.indicator.indexText = componentsFirstSet[3];
+            this.indicator.placeText = componentsFirstSet[4];
+            
 
-        var placeText= new moveStepPlaceText();
-
-        var line = new fabric.Line([0, 0, 0, 269],{
-            stroke: 'black', strokeWidth: 2, originX: 'left', originY: 'top'
-        });
-          
-        var verticalLine = new fabric.Group([line, smallCircle, smallCircleTop], {
-            originX: "left", originY: "top", left: 62, top: 56, selectable: true,
-            lockMovementY: true, hasControls: false, hasBorders: false, name: "vertica", visible: false,
-        });
-
-        var rect = new moveStepRectangle(me);
-
-        var coverRect = new moveStepCoverRect();
-
-        me.imageobjects["drag-footer-image.png"].originX = "left";
-        me.imageobjects["drag-footer-image.png"].originY = "top";
-        me.imageobjects["drag-footer-image.png"].top = 52;
-        me.imageobjects["drag-footer-image.png"].left = 9;
-
-        var components = [rect, temperatureText, holdTimeText, indexText, placeText,
-            me.imageobjects["drag-footer-image.png"],
-        ];
-        var indicatorRectangle = new moveStepIndicatorRectangleGroup(components);
-
-        components = [coverRect, indicatorRectangle];
-
-        this.indicator = new moveStepIndicatorGroup(components);
-
-        this.indicator.verticalLine = verticalLine;
-        this.indicator.temperatureText = temperatureText;
-        this.indicator.indexText = indexText;
-        this.indicator.placeText = placeText;
-        this.indicator.holdTimeText = holdTimeText;
-
-        return this.indicator;
+            return this.indicator;
         };
     }
 ]);

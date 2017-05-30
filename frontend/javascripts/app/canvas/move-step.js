@@ -23,7 +23,8 @@ angular.module("canvasApp").factory('moveStepRect', [
   'circleManager',
   'StepPositionService',
   'moveStepIndicator',
-  function(ExperimentLoader, previouslySelected, circleManager, StepPositionService, moveStepIndicator) {
+  'verticalLineStepGroup',
+  function(ExperimentLoader, previouslySelected, circleManager, StepPositionService, moveStepIndicator, verticalLineStepGroup) {
 
     return {
 
@@ -49,9 +50,8 @@ angular.module("canvasApp").factory('moveStepRect', [
         // defrag this file 
         
       this.indicator = new moveStepIndicator(me);
-      //this.indicator.verticalLine = verticalLine;
+      this.indicator.verticalLine = new verticalLineStepGroup();
       
-
       this.indicator.init = function(step, footer, C) {
 
         this.movement = null;
@@ -64,7 +64,6 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.currentDropStage = step.parentStage;
         this.currentDrop = (step.previousStep) ? step.previousStep : null;
 
-        this.spaceArray = [step.parentStage.left - 20, step.parentStage.left + 30];
         this.setVisible(true);
         this.verticalLine.setLeft(footer.left + 41);
         this.verticalLine.setVisible(true);
