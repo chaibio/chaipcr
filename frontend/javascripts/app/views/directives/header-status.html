@@ -153,7 +153,7 @@
       </div>
       <!-- experiment has been started and not completed -->
       <div class="row" ng-show="experiment && experiment.started_at && !experiment.completed_at && state==='idle' && (dataAnalysis || !enterState)">
-        <div class="col-md-1 menu" ng-transclude>
+        <div class="col-xs-1 menu" ng-transclude>
         </div>
         <div class="col-xs-4 exp-name x" title="{{experiment.name|uppercase}}">
           <div ng-show="experiment.id && experiment.name">{{expName(20)}}</div>

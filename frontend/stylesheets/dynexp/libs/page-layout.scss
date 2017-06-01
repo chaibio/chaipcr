@@ -16,7 +16,7 @@
     font-size: 14px;
   }
   #container {
-    width: 1024px;
+    // width: 1024px;
     margin: 0 auto;
   }
   .page-layout .row {
@@ -57,7 +57,8 @@
   }
   .page-layout .content {
     padding-top: 20px;
-    width: 550px;
+    width: 100%;
+    max-width: 550px;
     margin: 0 auto;
   }
   a {
