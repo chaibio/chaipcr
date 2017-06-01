@@ -463,7 +463,7 @@
 
       // get data point at point x
       var line_config = Globals.config.series[0];
-      var x0 = Globals.xScale.invert(x);
+      var x0 = Globals.zoomTransform.k > 1 ? Globals.zoomTransform.rescaleX(Globals.xScale).invert(x) : Globals.xScale.invert(x);
       var i = bisectX(line_config)(Globals.data[line_config.dataset], x0, 1);
       var d0 = Globals.data[line_config.dataset][i - 1];
 
