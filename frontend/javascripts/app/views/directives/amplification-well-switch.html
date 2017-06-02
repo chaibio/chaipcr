@@ -16,7 +16,6 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-
 <div class="amplification-well-switch">
   <table class="on-off-buttons">
     <tr style="border-bottom:2px solid black">
@@ -29,7 +28,7 @@
         <amplification-circle-button ng-model="buttons['well_'+$index]"></amplification-circle-button>
       </td> -->
       <td colspan="8" rowspan="2" class="selectable-on-off-buttons">
-        <div class="selectable-container">
+        <div class="selectable-container" ng-class="{'show-triangle': showTriangle()}">
           <ol id="selectableol" ng-class="{amplification: chartType === 'amplification', melt_curve: chartType === 'melt-curve'}">
             <li id="box{{$index + 1}}" ng-repeat="i in loop" class="topEight" ng-class="{special_left: $index == 0, special_right: $index == 7}">
               <amplification-circle-button ng-model="buttons['well_'+$index]"></amplification-circle-button>
@@ -52,7 +51,6 @@
           </tr>
         </table> !-->
       </td>
-
     </tr>
     <tr>
       <td class="number B2">B</td>

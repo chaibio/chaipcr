@@ -17,7 +17,7 @@
     limitations under the License.
 -->
 <div class="circle noselect B2 test1" ng-click="toggleState()" ng-style="style" ng-class="{selected: selected, 'text-center': !ct[0] && !ct[1], 'single-channel': !is_dual_channel || buttonLabelsNum === 1}">
-	<hr ng-show="selected" ng-style="abc">
+  <hr ng-show="selected" ng-style="abc">
   <div class="ct ct-1" style="padding-top:10px;text-align:left">
     <span class="dot"></span>
     <span class="text" ng-show="ct[0] > 0">{{labelUnit}}: <b style="font-family:dinot-Bold">{{ ct[0] | round: 1}}</b></span>
@@ -29,4 +29,5 @@
     <span class="text" ng-show="ct[1] === 0 || !(ct[1])">{{labelUnit}}:</span>
   </div>
   <br>
+  <img src="/images/selected-wheel-triangle.png" class="selected-wheel-triangle">
 </div>
