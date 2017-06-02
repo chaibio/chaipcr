@@ -70,7 +70,7 @@ angular.module("canvasApp").service('movingStepGraphics', [
 
         this.arrangeStages = function(baseStage) {
 
-            var stage = baseStage.previousStage;
+            /*var stage = baseStage.previousStage;
             var counter = 1;
              while(stage) {
                 stage.left = stage.left - (20 * counter);
@@ -86,7 +86,7 @@ angular.module("canvasApp").service('movingStepGraphics', [
                 stage.moveStageForMoveStep();
                 counter = counter + 1;
                 stage = stage.nextStage;
-            }
+            }*/
         };
 
         this.squeezeStep = function(step, C) {

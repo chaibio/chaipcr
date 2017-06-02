@@ -49,6 +49,11 @@ angular.module("canvasApp").factory('moveStepRect', [
         // enforce move-step boundaries , take care of last stage with infinite hold
         // defrag this file 
         
+        // NEW -:
+        // when click , dont have to move all stages , 
+        // Just create space both the sides
+        // when moving right as we approach the last step, move the stage left making space between stages in the right and show vertical line to drop
+        // When moving left as we approcah first step, move the stage right , show the vertical line.
       this.indicator = new moveStepIndicator(me);
       this.indicator.verticalLine = new verticalLineStepGroup();
       
