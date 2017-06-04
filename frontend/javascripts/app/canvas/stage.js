@@ -337,7 +337,7 @@ angular.module("canvasApp").factory('stage', [
       
       this.moveToSide = function(direction, draggedStage) {
 
-        if(this.validMove(direction, draggedStage)) {
+        if(this.validMove(direction, draggedStage) && this.sourceStage === false) {
 
           var moveCount;
           if(direction === "left") {

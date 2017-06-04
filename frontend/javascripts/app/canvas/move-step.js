@@ -24,7 +24,8 @@ angular.module("canvasApp").factory('moveStepRect', [
   'StepPositionService',
   'moveStepIndicator',
   'verticalLineStepGroup',
-  function(ExperimentLoader, previouslySelected, circleManager, StepPositionService, moveStepIndicator, verticalLineStepGroup) {
+  'StagePositionService',
+  function(ExperimentLoader, previouslySelected, circleManager, StepPositionService, moveStepIndicator, verticalLineStepGroup, StagePositionService) {
 
     return {
 
@@ -78,6 +79,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.startPosition = footer.left;
         this.changeText(step);
         StepPositionService.getPositionObject(this.kanvas.allStepViews);
+        StagePositionService.getPositionObject();
       };
 
       this.indicator.changeText = function(step) {
@@ -162,6 +164,37 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.manageBorderLeftForLeft(this.movedStepIndex);
       }; 
 
+      this.indicator.shouldStageMoveLeft = function() {
+        StagePositionService.allPositions.some(this.shouldStageMoveLeftCallback, this);
+        return true;
+      };
+
+      this.indicator.shouldStageMoveLeftCallback = function(point, index) {
+        if((this.movement.left + this.rightOffset) > point[2] && (this.movement.left + this.rightOffset) < point[2] + 150) {
+          if(index !== this.movedStageIndex) {
+            this.movedStageIndex = index;
+            this.kanvas.allStageViews[index].moveToSide("left", this.currentDropStage);
+            StagePositionService.getPositionObject();
+          }
+        }
+      };
+
+      this.indicator.shouldStageMoveRight = function() {
+        StagePositionService.allPositions.some(this.shouldStageMoveRightCallback, this);
+        return true;
+      };
+
+      this.indicator.shouldStageMoveRightCallback = function(point, index) {
+        if((this.movement.left) > point[0] - 150 && (this.movement.left) < point[0]) {
+          console.log("Founda");
+          if(index !== this.movedStageIndex) {
+            this.movedStageIndex = index;
+            this.kanvas.allStageViews[index].moveToSide("right", this.currentDropStage);
+            StagePositionService.getPositionObject();
+          }
+        }
+      };
+
       this.indicator.onTheMove = function(C, movement) {
 
         this.setLeft(movement.left).setCoords();
@@ -172,18 +205,19 @@ angular.module("canvasApp").factory('moveStepRect', [
         if(direction === 'right') {
           if(this.ifOverRightSide() !== null) {
             this.movedRightAction();
-          } //else if(this.ifOverRightSideForOneStepStage() !== null) {
-            //this.movedRightAction();
-          //}
+          }
+          if(this.shouldStageMoveLeft()) {
+
+          }
         
         } else if(direction === 'left') {
           if(this.ifOverLeftSide() !== null) {
             this.movedLeftAction();
-          } //else if(this.ifOverLeftSideForOneStepStage() !== null) {
-            //this.movedLeftAction();
-         // }
+          }
+          if(this.shouldStageMoveRight()) {
+
+          }
         } 
-        
       };
 
       this.indicator.manageVerticalLineRight = function(index) {
