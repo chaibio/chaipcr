@@ -45,6 +45,7 @@ angular.module("canvasApp").factory('stage', [
       this.stageMovedDirection = null;
       this.shortStageName = false;
       this.shrinkedStage = false;
+      this.sourceStage = false; // Says if we had clicked to move a step from this stage
 
       this.setNewWidth = function(add) {
 

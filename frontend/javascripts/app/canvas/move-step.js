@@ -59,6 +59,7 @@ angular.module("canvasApp").factory('moveStepRect', [
       
       this.indicator.init = function(step, footer, C) {
 
+        step.parentStage.sourceStage = true;
         this.movement = null;
         this.currentLeft = null;
         this.movedStepIndex = null;
@@ -217,6 +218,8 @@ angular.module("canvasApp").factory('moveStepRect', [
 
       this.indicator.processMovement = function(step, C) {
 
+        step.parentStage.sourceStage = false;
+
         this.verticalLine.setVisible(false);
         
         var modelClone = $.extend({}, step.model);
@@ -228,7 +231,9 @@ angular.module("canvasApp").factory('moveStepRect', [
         var data = {
           step: modelClone
         };
+
         this.kanvas.allStageViews[0].moveAllStepsAndStagesSpecial();
+        
         if(targetStep) {
           targetStage.addNewStep(data, targetStep);
         } else {
