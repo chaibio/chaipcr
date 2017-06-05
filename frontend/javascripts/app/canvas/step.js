@@ -36,6 +36,8 @@ angular.module("canvasApp").factory('step', [
       this.canvas = parentStage.canvas;
       this.myWidth = constants.stepWidth;
       this.$scope = $scope;
+      this.nextIsMoving = null;
+      this.previousIsMoving = null;
       this.nextStep = null;
       this.previousStep = null;
       this.gatherDataDuringStep = this.model.collect_data;

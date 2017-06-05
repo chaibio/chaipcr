@@ -59,8 +59,9 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.verticalLine = new verticalLineStepGroup();
       
       this.indicator.init = function(step, footer, C) {
-
+        this.tagSteps(step);
         step.parentStage.sourceStage = true;
+        step.parentStage.stageHeader();
         this.movement = null;
         this.currentLeft = null;
         this.movedStepIndex = null;
@@ -83,6 +84,15 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.changeText(step);
         StepPositionService.getPositionObject(this.kanvas.allStepViews);
         StagePositionService.getPositionObject();
+      };
+
+      this.indicator.tagSteps = function(step) {
+        if(step.previousStep) {
+          step.previousStep.nextIsMoving = true;
+        } 
+        if(step.nextStep) {
+          step.nextStep.previousIsMoving = true;
+        }
       };
 
       this.indicator.changeText = function(step) {
@@ -233,13 +243,19 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.manageVerticalLineRight = function(index) {
 
         var place = (this.kanvas.allStepViews[index].left + this.kanvas.allStepViews[index].myWidth - 2);
+        if(this.kanvas.allStepViews[index].nextIsMoving === true) {
+          place = place + 18;
+        }
         this.verticalLine.setLeft(place);
         this.verticalLine.setCoords();
       };
 
       this.indicator.manageVerticalLineLeft = function(index) {
-
+        
         var place = (this.kanvas.allStepViews[index].left - 12);
+        if(this.kanvas.allStepViews[index].previousIsMoving === true) {
+          place = place - 17;
+        }        
         this.verticalLine.setLeft(place);
         this.verticalLine.setCoords();
       };
