@@ -117,7 +117,8 @@ angular.module("canvasApp").factory('step', [
           this.left = this.left - 10;
           this.moveStep(0, false);
           this.circle.moveCircleWithStep();
-          
+         
+         
           //if(this.nextStep) {
          //   this.nextStep.borderLeft.setVisible(true);
           //} 

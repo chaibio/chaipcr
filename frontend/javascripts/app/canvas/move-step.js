@@ -70,6 +70,9 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.kanvas = C;
         this.currentDropStage = step.parentStage;
         this.currentDrop = (step.previousStep) ? step.previousStep : null;
+        this.movedStageIndex = null;
+        this.movedRightStageIndex = null;
+        this.movedRightStageIndex = null;
 
         this.setVisible(true);
         this.verticalLine.setLeft(footer.left + 41);
@@ -94,10 +97,10 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         if(this.movement.left > this.currentLeft && this.direction !== "right") {
               this.direction = "right";
-            } else if(this.movement.left < this.currentLeft && this.direction !== "left") {
-              this.direction = "left";    
-            }
-            return this.direction;
+        } else if(this.movement.left < this.currentLeft && this.direction !== "left") {
+          this.direction = "left";    
+        }
+        return this.direction;
       };
 
       this.indicator.ifOverRightSide = function() {
@@ -165,32 +168,35 @@ angular.module("canvasApp").factory('moveStepRect', [
       }; 
 
       this.indicator.shouldStageMoveLeft = function() {
+        this.movedStageIndex = null;
         StagePositionService.allPositions.some(this.shouldStageMoveLeftCallback, this);
-        return true;
+        return this.movedStageIndex;
       };
 
       this.indicator.shouldStageMoveLeftCallback = function(point, index) {
         if((this.movement.left + this.rightOffset) > point[2] && (this.movement.left + this.rightOffset) < point[2] + 150) {
-          if(index !== this.movedStageIndex) {
-            this.movedStageIndex = index;
+          if(index !== this.movedLeftStageIndex) {
+            this.movedStageIndex = this.movedLeftStageIndex = index;
             this.kanvas.allStageViews[index].moveToSide("left", this.currentDropStage);
             StagePositionService.getPositionObject();
+            StepPositionService.getPositionObject(this.kanvas.allStepViews);
           }
         }
       };
 
       this.indicator.shouldStageMoveRight = function() {
+        this.movedStageIndex = null;
         StagePositionService.allPositions.some(this.shouldStageMoveRightCallback, this);
-        return true;
+        return this.movedStageIndex;
       };
 
       this.indicator.shouldStageMoveRightCallback = function(point, index) {
         if((this.movement.left) > point[0] - 150 && (this.movement.left) < point[0]) {
-          console.log("Founda");
-          if(index !== this.movedStageIndex) {
-            this.movedStageIndex = index;
+          if(index !== this.movedRightStageIndex) {
+            this.movedStageIndex = this.movedRightStageIndex = index;
             this.kanvas.allStageViews[index].moveToSide("right", this.currentDropStage);
             StagePositionService.getPositionObject();
+            StepPositionService.getPositionObject(this.kanvas.allStepViews);
           }
         }
       };
@@ -206,18 +212,22 @@ angular.module("canvasApp").factory('moveStepRect', [
           if(this.ifOverRightSide() !== null) {
             this.movedRightAction();
           }
-          if(this.shouldStageMoveLeft()) {
-
+          if(this.shouldStageMoveLeft() !== null) {
+            this.hideFirstStepBorderLeft();
           }
-        
         } else if(direction === 'left') {
           if(this.ifOverLeftSide() !== null) {
             this.movedLeftAction();
           }
-          if(this.shouldStageMoveRight()) {
-
+          if(this.shouldStageMoveRight() !== null) {
+            this.hideFirstStepBorderLeft();
           }
         } 
+      };
+
+      this.indicator.hideFirstStepBorderLeft = function() {
+        console.log("Called", this.movedStageIndex);
+        this.kanvas.allStageViews[this.movedStageIndex].childSteps[0].borderLeft.setVisible(false);
       };
 
       this.indicator.manageVerticalLineRight = function(index) {
@@ -235,19 +245,26 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
 
       this.indicator.manageBorderLeftForLeft = function(index) {
-        
+        console.log("ittt");
         if(this.kanvas.allStepViews[index + 1]) {
           this.kanvas.allStepViews[index + 1].borderLeft.setVisible(false);
+         
         }
         this.kanvas.allStepViews[index].borderLeft.setVisible(true);
       };
 
       this.indicator.manageBorderLeftForRight = function(index) {
-
+        
         if(this.kanvas.allStepViews[index].nextStep) {
           this.kanvas.allStepViews[index + 1].borderLeft.setVisible(true);
+         
         }
-        this.kanvas.allStepViews[index].borderLeft.setVisible(false);
+        if(this.kanvas.allStepViews[index].index === 0) {
+          this.kanvas.allStepViews[index].borderLeft.setVisible(true);
+        } else {
+          this.kanvas.allStepViews[index].borderLeft.setVisible(false);
+        }     
+        
       };
 
       this.indicator.processMovement = function(step, C) {
