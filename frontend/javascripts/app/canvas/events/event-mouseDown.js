@@ -39,7 +39,7 @@ angular.module("canvasApp").factory('mouseDown', [
       // that originally points to event. Refer event.js
       var me;
       this.canvas.on("mouse:down", function(evt) {
-
+        console.log(evt);
         if(! evt.target) {
           that.setSummaryMode();
           return false;

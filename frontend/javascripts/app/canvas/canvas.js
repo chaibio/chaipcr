@@ -396,6 +396,7 @@ angular.module("canvasApp").factory('canvas', [
       this.allStepViews = [];
       this.allStageViews.forEach(function(stage, index) {
         stage.stageMovedDirection = null;
+        stage.sourceStage = false;
         stage.index = index;
         stage.stageCaption.setText("STAGE " + (index + 1) + ": " );
 
@@ -409,6 +410,8 @@ angular.module("canvasApp").factory('canvas', [
 
           tempCircle = step.circle;
           step.index = index;
+          // A quick fix, will be removed later
+          step.borderLeft.setVisible(false);
           step.stepMovedDirection = null;
           step.nextIsMoving = step.previousIsMoving = null;
           step.ordealStatus = oStatus;

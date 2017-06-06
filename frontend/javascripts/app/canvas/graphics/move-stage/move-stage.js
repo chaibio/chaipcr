@@ -253,8 +253,10 @@ angular.module("canvasApp").factory('moveStageRect', [
               console.log(err);
             });
 
-            this.setLeft(-9999);
-            this.verticalLine.setLeft(-9999);
+            //this.setLeft(-9999);
+            this.kanvas.canvas.sendToBack(this);
+            this.kanvas.canvas.sendToBack(this.verticalLine);
+            //this.verticalLine.setLeft(-9999);
             this.setVisible(false);
             this.direction = null;
             this.verticalLine.setVisible(false);
