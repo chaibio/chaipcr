@@ -561,12 +561,14 @@ angular.module("canvasApp").factory('stage', [
         }
       };
 
-      this.removeHeader = function() {
-        console.log("I ma here")
-        //this.canvas.remove(this.stageNameGroup);
+      this.adjustHeader = function() {
+        
         this.stageName.setVisible(false);
         this.dots.setVisible(false);
         this.stageCaption.setLeft(this.stageCaption.left - 24).setCoords();
+        this.canvas.sendToBack(this.stageGroup);
+        //this.canvas.sendToBack(this.dots);
+        //this.canvas.sendToBack(this.borderRight);
       };
 
       this.render = function() {

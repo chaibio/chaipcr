@@ -90,13 +90,14 @@ angular.module("canvasApp").service('movingStepGraphics', [
         };
 
         this.squeezeStep = function(step, C) {
-           //C.canvas.remove(step.parentStage.stageNameGroup);
-           step.parentStage.stageName.text = "";
+           C.canvas.remove(step.parentStage.stageNameGroup);
+           
             console.log(step.index);
             step.parentStage.deleteFromStage(step.index, step.ordealStatus);
             //step.parentStage.deleteAllStepContents(step);
             if(step.parentStage.childSteps.length === 0) {
                 step.parentStage.wireStageNextAndPrevious();
+
                 C.canvas.renderAll();
             }
             

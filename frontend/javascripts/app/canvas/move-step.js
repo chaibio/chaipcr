@@ -64,9 +64,9 @@ angular.module("canvasApp").factory('moveStepRect', [
         step.parentStage.stageHeader();
         
         if(step.parentStage.childSteps.length === 0) {
-          step.parentStage.removeHeader();
+          step.parentStage.adjustHeader();
         }
-        
+
         this.movement = null;
         this.currentLeft = null;
         this.movedStepIndex = null;
