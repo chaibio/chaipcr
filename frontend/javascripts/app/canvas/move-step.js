@@ -62,6 +62,11 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.tagSteps(step);
         step.parentStage.sourceStage = true;
         step.parentStage.stageHeader();
+        
+        if(step.parentStage.childSteps.length === 0) {
+          step.parentStage.removeHeader();
+        }
+        
         this.movement = null;
         this.currentLeft = null;
         this.movedStepIndex = null;
@@ -163,6 +168,7 @@ angular.module("canvasApp").factory('moveStepRect', [
       }; 
 
       this.indicator.movedLeftAction = function() {
+
         this.currentMoveRight = null; // Resetting
         var step = this.kanvas.allStepViews[this.movedStepIndex];
         if(step.previousStep) {
@@ -237,7 +243,9 @@ angular.module("canvasApp").factory('moveStepRect', [
 
       this.indicator.hideFirstStepBorderLeft = function() {
         console.log("Called", this.movedStageIndex);
-        this.kanvas.allStageViews[this.movedStageIndex].childSteps[0].borderLeft.setVisible(false);
+        if(this.kanvas.allStageViews[this.movedStageIndex].childSteps[0]) {
+          this.kanvas.allStageViews[this.movedStageIndex].childSteps[0].borderLeft.setVisible(false);
+        }
       };
 
       this.indicator.manageVerticalLineRight = function(index) {
@@ -286,7 +294,10 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.processMovement = function(step, C) {
 
         step.parentStage.sourceStage = false;
-
+        
+        if(step.parentStage.childSteps.length === 0) { // Incase we sourced from a one step stage
+          step.parentStage.deleteStageContents();
+        }
         this.verticalLine.setVisible(false);
         
         var modelClone = $.extend({}, step.model);
