@@ -25,7 +25,9 @@ angular.module("canvasApp").factory('moveStepRect', [
   'moveStepIndicator',
   'verticalLineStepGroup',
   'StagePositionService',
-  function(ExperimentLoader, previouslySelected, circleManager, StepPositionService, moveStepIndicator, verticalLineStepGroup, StagePositionService) {
+  'movingStepGraphics',
+  function(ExperimentLoader, previouslySelected, circleManager, StepPositionService, moveStepIndicator, verticalLineStepGroup, StagePositionService,
+  movingStepGraphics) {
 
     return {
 
@@ -294,11 +296,25 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.processMovement = function(step, C) {
 
         step.parentStage.sourceStage = false;
-        
+        this.verticalLine.setVisible(false);
+
         if(step.parentStage.childSteps.length === 0) { // Incase we sourced from a one step stage
           step.parentStage.deleteStageContents();
+          if(this.currentDrop === null) {
+            
+            var data = {
+              stage: movingStepGraphics.backupStageModel
+            };
+            if(step.parentStage.previousStage) {
+              this.kanvas.addNewStage(data, step.parentStage.previousStage, "move_stage_back_to_original");
+            } else {
+              this.kanvas.addNewStageAtBeginning({}, data);
+            }
+            
+            return;
+          }
         }
-        this.verticalLine.setVisible(false);
+        
         
         var modelClone = $.extend({}, step.model);
         

@@ -23,9 +23,12 @@ angular.module("canvasApp").service('movingStepGraphics', [
     function(Line, constants) {
         this.offset = 41;
         // Make steg looks good just after clicking move-step, steps well spaced , and other stages moved aways making space.
+        this.backupStageModel = null;
 
         this.initiateMoveStepGraphics = function(currentStep, C) {
-            
+            console.log("spot", currentStep.parentStage.model);
+            this.backupStageModel = angular.copy(currentStep.parentStage.model); 
+            console.log("spot", this.backupStageModel);
             this.arrangeStepsOfStage(currentStep, C);
             this.arrangeStages(currentStep.parentStage);
             this.setWidthOfStage(currentStep.parentStage);
@@ -90,22 +93,15 @@ angular.module("canvasApp").service('movingStepGraphics', [
         };
 
         this.squeezeStep = function(step, C) {
-           //C.canvas.remove(step.parentStage.stageNameGroup);
-           
-            console.log(step.index);
+            // Should be moved, because this is not about graphics
             step.parentStage.deleteFromStage(step.index, step.ordealStatus);
-            //step.parentStage.deleteAllStepContents(step);
             if(step.parentStage.childSteps.length === 0) {
                 step.parentStage.wireStageNextAndPrevious();
                 selected = (step.parentStage.previousStage) ? step.parentStage.previousStage.childSteps[step.parentStage.previousStage.childSteps.length - 1] : step.parentStage.nextStage.childSteps[0];
                 step.parentStage.parent.allStageViews.splice(step.parentStage.index, 1);
                 selected.parentStage.updateStageData(-1);
                 C.canvas.renderAll();
-            }
-            
-            //
-            //step.deleteFromAllStepViews();
-            
+            }    
         };
 
         this.moveLittleRight = function(step) {

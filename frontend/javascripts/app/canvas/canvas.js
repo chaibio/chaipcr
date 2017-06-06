@@ -396,7 +396,7 @@ angular.module("canvasApp").factory('canvas', [
       this.allStepViews = [];
       this.allStageViews.forEach(function(stage, index) {
         stage.stageMovedDirection = null;
-        stage.sourceStage = false;
+        //stage.sourceStage = false;
         stage.index = index;
         stage.stageCaption.setText("STAGE " + (index + 1) + ": " );
 
