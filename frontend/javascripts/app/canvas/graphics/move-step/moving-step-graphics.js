@@ -26,20 +26,18 @@ angular.module("canvasApp").service('movingStepGraphics', [
         this.backupStageModel = null;
 
         this.initiateMoveStepGraphics = function(currentStep, C) {
-            console.log("spot", currentStep.parentStage.model);
+            
             this.backupStageModel = angular.copy(currentStep.parentStage.model); 
-            console.log("spot", this.backupStageModel);
             this.arrangeStepsOfStage(currentStep, C);
-            this.arrangeStages(currentStep.parentStage);
             this.setWidthOfStage(currentStep.parentStage);
             this.setLeftOfStage(currentStep.parentStage);
-            this.adjustStep(currentStep);
-            this.adjustStage(currentStep.parentStage);
         };
 
         this.setWidthOfStage = function(baseStage) {
             //baseStage.setNewWidth(-60);
             baseStage.myWidth = baseStage.myWidth - (this.offset * 2);
+            baseStage.stageRect.setWidth(baseStage.myWidth);
+            baseStage.stageRect.setCoords();
             baseStage.roof.setWidth(baseStage.myWidth).setCoords();
             baseStage.stageGroup.setLeft(baseStage.stageGroup.left + this.offset).setCoords();
             baseStage.dots.setLeft(baseStage.dots.left + this.offset).setCoords();
@@ -57,11 +55,7 @@ angular.module("canvasApp").service('movingStepGraphics', [
                 this.moveLittleRight(startingStep);
                 startingStep = startingStep.previousStep;
             }
-           // step.parentStage.border.setLeft(step.parentStage.border.left + this.offset).setCoords();
            
-        
-            //this.squeezeStep(step, C);
-
             startingStep = step.nextStep;
             while(startingStep) {
                 this.moveLittleLeft(startingStep);
@@ -69,27 +63,6 @@ angular.module("canvasApp").service('movingStepGraphics', [
             }
             
             C.canvas.renderAll();
-        };
-
-        this.arrangeStages = function(baseStage) {
-
-            /*var stage = baseStage.previousStage;
-            var counter = 1;
-             while(stage) {
-                stage.left = stage.left - (20 * counter);
-                stage.moveStageForMoveStep();
-                counter = counter + 1;
-                stage = stage.previousStage;
-            }
-
-            stage = baseStage.nextStage;
-            counter = 1;
-            while(stage) {
-                stage.left = stage.left + (20 * counter);
-                stage.moveStageForMoveStep();
-                counter = counter + 1;
-                stage = stage.nextStage;
-            }*/
         };
 
         this.squeezeStep = function(step, C) {
@@ -105,37 +78,25 @@ angular.module("canvasApp").service('movingStepGraphics', [
         };
 
         this.moveLittleRight = function(step) {
-            console.log("Right");
+            
             step.left = step.left + this.offset;
             step.moveStep(0, false);
             step.circle.moveCircleWithStep();
         };
 
         this.moveLittleLeft = function(step) {
-            console.log("Left");
+            
             step.left = step.left - this.offset;
             step.moveStep(0, false);
             step.circle.moveCircleWithStep();
         };
 
-        this.adjustStep = function(step) {
-            // reduce the width of the step and adjust
-        };
-
-        this.adjustStage = function(stage) {
-
-        };
-
         this.correctStageAfterDrop = function(baseStage) {
-            console.log(baseStage);
+            
             baseStage.myWidth = (baseStage.model.steps.length * (constants.stepWidth)) + constants.additionalWidth;
             baseStage.roof.setWidth(baseStage.myWidth).setCoords();
-            //baseStage.getLeft();
-            //baseStage.stageGroup.setLeft(baseStage.stageGroup.left + this.offset).setCoords();
-            //baseStage.dots.setLeft(baseStage.dots.left + this.offset).setCoords();
-            //baseStage.stageGroup.setLeft(baseStage.stageGroup.left + this.offset).setCoords();
-            //baseStage.dots.setLeft(baseStage.dots.left + this.offset).setCoords();
-
+            baseStage.stageRect.setWidth(baseStage.myWidth);
+            baseStage.stageRect.setCoords();
         };
 
         return this;

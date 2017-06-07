@@ -50,6 +50,17 @@ angular.module("canvasApp").factory('stage', [
       this.setNewWidth = function(add) {
 
         this.myWidth = this.myWidth + add;
+        this.setWidth();
+      };
+
+      this.updateWidth = function() {
+        
+        this.myWidth = (this.model.steps.length * (constants.stepWidth)) + constants.additionalWidth;
+        this.setWidth();
+      };
+
+      this.setWidth = function() {
+
         this.stageRect.setWidth(this.myWidth);
         this.stageRect.setCoords();
         this.roof.setWidth(this.myWidth);
