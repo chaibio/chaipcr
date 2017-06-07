@@ -297,12 +297,12 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         step.parentStage.sourceStage = false;
         this.verticalLine.setVisible(false);
-
+        var data = {};
         if(step.parentStage.childSteps.length === 0) { // Incase we sourced from a one step stage
           step.parentStage.deleteStageContents();
           if(this.currentDrop === null) {
             
-            var data = {
+            data = {
               stage: movingStepGraphics.backupStageModel
             };
             if(step.parentStage.previousStage) {
@@ -322,7 +322,7 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         var targetStage = this.currentDropStage;
 
-        var data = {
+        data = {
           step: modelClone
         };
 

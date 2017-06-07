@@ -45,7 +45,7 @@ angular.module("canvasApp").factory('moveStepIndicator', [
             ];
             
             var componentsSecondSet = [
-                new moveStepCoverRect(), 
+                //new moveStepCoverRect(), 
                 new moveStepIndicatorRectangleGroup(componentsFirstSet)
             ];
 

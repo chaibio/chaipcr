@@ -22,7 +22,7 @@ angular.module("canvasApp").factory('moveStepIndicatorGroup', [
     function(Group) {
         return function(components) {
             return Group.create(components, {
-                originX: "left", originY: "top", left: 38, top: 28, height: 372, width: 96, selectable: true,
+                originX: "left", originY: "top", left: 38, top: 326, height: 72, width: 96, selectable: true,
                 lockMovementY: true, hasControls: false, visible: false, hasBorders: false, name: "dragStepGroup"
             });
         };
