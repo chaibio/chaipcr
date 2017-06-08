@@ -91,14 +91,6 @@ angular.module("canvasApp").service('movingStepGraphics', [
             step.circle.moveCircleWithStep();
         };
 
-        this.correctStageAfterDrop = function(baseStage) {
-            
-            baseStage.myWidth = (baseStage.model.steps.length * (constants.stepWidth)) + constants.additionalWidth;
-            baseStage.roof.setWidth(baseStage.myWidth).setCoords();
-            baseStage.stageRect.setWidth(baseStage.myWidth);
-            baseStage.stageRect.setCoords();
-        };
-
         return this;
     }
 ]);
