@@ -231,9 +231,9 @@ angular.module("canvasApp").factory('step', [
 
       this.numberingValue = function() {
 
-        var thisIndex = (this.index < 9) ? "0" + (this.index + 1) : (this.index + 1),
+        var thisIndex = (this.index < 9) ? "0" + (this.index + 1) : (this.index + 1).toString(),
         noofSteps = this.parentStage.model.steps.length;
-        thisLength = (noofSteps < 10) ? "0" + noofSteps : noofSteps;
+        thisLength = (noofSteps < 10) ? "0" + noofSteps : noofSteps.toString();
         text = thisIndex + "/" + thisLength;
 
         this.numberingTextCurrent.setText(thisIndex);
