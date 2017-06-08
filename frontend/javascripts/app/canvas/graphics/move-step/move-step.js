@@ -77,7 +77,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.leftOffset = 0;
         this.kanvas = C;
         this.currentDropStage = step.parentStage;
-        this.currentDrop = (step.previousStep) ? step.previousStep : null;
+        this.currentDrop = (step.previousStep) ? step.previousStep : "NOTHING";
         this.movedStageIndex = null;
         this.movedRightStageIndex = null;
         this.movedRightStageIndex = null;
@@ -173,6 +173,7 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         this.currentMoveRight = null; // Resetting
         var step = this.kanvas.allStepViews[this.movedStepIndex];
+        
         if(step.previousStep) {
           this.currentDrop = step.previousStep;
           this.currentDropStage = this.currentDrop.parentStage;
@@ -293,18 +294,20 @@ angular.module("canvasApp").factory('moveStepRect', [
         
       };
 
-      this.indicator.processMovement = function(step, C) {
-
-        step.parentStage.sourceStage = false;
-        this.verticalLine.setVisible(false);
+      this.indicator.manageSingleStage = function(step) {
+        
         var data = {};
+        
         if(step.parentStage.childSteps.length === 0) { // Incase we sourced from a one step stage
+          
           step.parentStage.deleteStageContents();
-          if(this.currentDrop === null) {
+          
+          if(this.currentDrop === "NOTHING") { // NOTHING imply that the we havent moved the step, its just a click an release;
             
             data = {
               stage: movingStepGraphics.backupStageModel
             };
+
             if(step.parentStage.previousStage) {
               this.kanvas.addNewStage(data, step.parentStage.previousStage, "move_stage_back_to_original");
             } else {
@@ -314,7 +317,14 @@ angular.module("canvasApp").factory('moveStepRect', [
             return;
           }
         }
-        
+      };
+
+      this.indicator.processMovement = function(step, C) {
+
+        step.parentStage.sourceStage = false;
+        this.verticalLine.setVisible(false);
+        var data = {};
+        this.manageSingleStage(step);
         
         var modelClone = $.extend({}, step.model);
         
