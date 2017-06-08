@@ -243,7 +243,7 @@ class ChaiDevice(object):
             if data_log:
                 data[new_id] = self.data_logger_trigger(timeout_s = 60)
                 self.data_logger_stop()
-                pickle.dump(data, open('data_%s'%self._config['host'], 'w'))
+                pickle.dump(data, open('data_%s'%self._config['host'], 'wb'))
             
             if stop_on_error and self.experiment_info(new_id)['experiment']['completion_status'] != 'success':
                 raise Exception('Loop %d for experiment id %d failed'%(loop, new_id))
