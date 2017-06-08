@@ -44,7 +44,7 @@ analyze_optical_test_dual_channel <- function(
     fluo_qry <- sprintf(
         'SELECT step_id, well_num, fluorescence_value, channel
             FROM fluorescence_data
-            WHERE experiment_id=%i AND cycle_num=1
+            WHERE experiment_id=%i AND cycle_num=1 AND step_id is not NULL
             ORDER BY well_num, channel
         ', 
         exp_id
@@ -133,6 +133,7 @@ analyze_optical_test_dual_channel <- function(
     names(ch12_ratios) <- c('FAM', 'HEX')
     
     
+    # return(list('optical_data'=results, 'Ch1:Ch2'=ch12_ratios))
     return(toJSON(list('optical_data'=results, 'Ch1:Ch2'=ch12_ratios)))
     
     }

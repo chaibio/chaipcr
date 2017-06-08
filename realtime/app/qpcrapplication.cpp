@@ -17,6 +17,7 @@
 // limitations under the License.
 //
 
+#include <Poco/File.h>
 #include <Poco/Net/HTTPServer.h>
 
 #include <unistd.h>
@@ -54,6 +55,11 @@ public:
 };
 
 // Class QPCRApplication
+QPCRApplication::QPCRApplication(): Watchdog::Watchable("Main")
+{
+
+}
+
 void QPCRApplication::stopExperiment(const string &message) {
     _experimentController->stop(message);
 }
@@ -98,6 +104,12 @@ void QPCRApplication::initialize(Application&) {
             setLogger(Logger::get());
         }
 
+        APP_LOGGER << "--------------------------Realtime Application Started. Waiting for the startup flag--------------------------" << std::endl;
+
+        waitFlag();
+
+        APP_LOGGER << "--------------------------The startup flag has been set--------------------------" << std::endl;
+
         readDeviceFile();
         readConfigurationFile();
 
@@ -132,7 +144,8 @@ void QPCRApplication::initialize(Application&) {
 int QPCRApplication::main(const vector<string>&) {
     HTTPServerParams *params = new HTTPServerParams;
     QPCRServerSocket socket(kHttpServerPort);
-    HTTPServer server(new QPCRRequestHandlerFactory, socket, params);
+    Poco::ThreadPool pool;
+    HTTPServer server(new QPCRRequestHandlerFactory, pool, socket, params);
     Poco::LogStream logStream(Logger::get());
 
     try
@@ -146,13 +159,20 @@ int QPCRApplication::main(const vector<string>&) {
         HeatSinkInstance::getInstance()->startADCReading();
 
         _workState = true;
+
+        Watchdog::start(); //Must be called after _workState is set because watchdog tracks this state
+
         while (!waitSignal() && _workState) {
+            checkin();
+
             for (auto controlUnit: _controlUnits)
                 controlUnit->process();
 
             if (_exception)
                 rethrow_exception(_exception);
         }
+
+        _workState = false;
 
         params->setKeepAlive(false);
         server.stopAll(true);
@@ -194,6 +214,12 @@ int QPCRApplication::main(const vector<string>&) {
     }
 }
 
+void QPCRApplication::waitFlag()
+{
+    while (!Poco::File(kStartupFlagFilePath).exists())
+        sleep(1);
+}
+
 void QPCRApplication::readDeviceFile()
 {
     Poco::Logger &logger = Poco::Logger::get(kAppLogName);
@@ -221,6 +247,21 @@ void QPCRApplication::readDeviceFile()
 
         if (it != ptree.not_found())
             _settings.device.modelNumber = it->second.get_value<std::string>();
+
+        it = ptree.find("hardware_definition");
+
+        if (it != ptree.not_found())
+        {
+            for (const std::pair<const std::string, boost::property_tree::ptree> &item: it->second)
+            {
+                if (item.first == "001084")
+                {
+                    _settings.device.fanChange = true;
+                    break;
+                }
+            }
+        }
+
     }
     else
         stream << "QPCRApplication::readDeviceFile - unable to read device file: " << std::strerror(errno) << std::endl;

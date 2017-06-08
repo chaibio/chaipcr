@@ -24,7 +24,8 @@ angular.module("canvasApp").factory('mouseDown', [
   'scrollService',
   'circleManager',
   'editMode',
-  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager, editMode) {
+  '$timeout',
+  function(ExperimentLoader, previouslySelected, previouslyHoverd, scrollService, circleManager, editMode, $timeout) {
 
     /**************************************
         what happens when click is happening in canvas.
@@ -47,22 +48,32 @@ angular.module("canvasApp").factory('mouseDown', [
 
           case "stepDataGroup":
 
-            var click = evt.e, target = evt.target, stepDataGroupLeft = target.left - 46,
+            var click = evt.e,
+            target = evt.target,
+            stepDataGroupLeft = target.left - 60,
             getP = that.canvas.getPointer(evt.e);
             that.selectStep(target.parentCircle);
 
             var group = target.parentCircle.stepDataGroup;
             var items = group._objects;
-            unHookGroup(group, items);
+            var removeIndex = 0; // We have a rectangle mask in stepDataGroup, which we dont want to add when
+            // editmode is active. so delete it before we add , so we send removeIndex. In this case rectangle mask is the
+            // first element in the array.
 
-            if(getP.x > stepDataGroupLeft && getP.x < (stepDataGroupLeft + 45)) {
+            if(getP.x > stepDataGroupLeft && getP.x < (stepDataGroupLeft + 55)) {
+              console.log("click on temp");
+              unHookGroup(group, items, removeIndex);
               editMode.tempActive = true;
               editMode.currentActiveTemp = target.parentCircle.temperature;
-              startEditing(target.parentCircle.temperature);
+              startEditing(target.parentCircle.temperature, evt);
             } else {
-              editMode.holdActive = true;
-              editMode.currentActiveHold = target.parentCircle.holdTime;
-              startEditing(target.parentCircle.holdTime);
+              console.log("click on time");
+              if(! target.parentCircle.model.pause) {
+                unHookGroup(group, items, removeIndex);
+                editMode.holdActive = true;
+                editMode.currentActiveHold = target.parentCircle.holdTime;
+                startEditing(target.parentCircle.holdTime, evt);
+              }
             }
 
           break;
@@ -89,16 +100,18 @@ angular.module("canvasApp").factory('mouseDown', [
             C.stepIndicator.init(evt.target.parent);
 
             evt.target.parent.toggleComponents(false);
+            //evt.target.parent.parentStage.shrinkedStage = true;
             that.moveStepActive = true;
             that.canvas.moveCursor = "move";
             C.stepIndicator.changePlacing(evt.target);
             C.stepIndicator.changeText(evt.target.parent);
-            that.calculateMoveLimit("step");
+            that.calculateMoveLimit("step", evt.target.parent);
             circleManager.togglePaths(false); //put it back later
             C.moveDots.setLeft(evt.target.parent.left + 16);
             evt.target.parent.shrinkStep();
             evt.target.setVisible(false);
             C.moveDots.setVisible(true);
+            C.moveDots.currentIndex = evt.target.parent.parentStage.index;
             C.canvas.bringToFront(C.moveDots);
             C.canvas.bringToFront(C.stepIndicator);
             C.canvas.renderAll();
@@ -108,21 +121,24 @@ angular.module("canvasApp").factory('mouseDown', [
           case "moveStage":
 
             that.mouseDownPos = evt.e.clientX;
+
             that.moveStageActive = true;
             that.canvas.moveCursor = "move";
-            that.calculateMoveLimit("stage");
+
+            var stage = evt.target.parent;
+            stage.collapseStage();
+            that.calculateMoveLimit("stage", stage);
+            stage.wireStageNextAndPrevious();
+            stage.removeFromStagesArray();
             circleManager.togglePaths(false); //put it back later
 
-            C.stageIndicator.init(evt.target.parent);
+            C.stageIndicator.init(evt.target.parent, C, evt.target);
+            that.stageIndicatorPosition = C.stageIndicator.left;
             C.stageIndicator.changeText(evt.target.parent);
-            C.canvas.bringToFront(C.stageIndicator);
-            C.stageIndicator.changePlacing(evt.target);
-            evt.target.parent.collapseStage();
-            evt.target.parent.wireStageNextAndPrevious();
+            
+            //C.canvas.bringToFront(C.stageIndicator);
+            
             C.canvas.renderAll();
-            // Move other stages
-            // Shrink this stage
-
           break;
 
           case "deleteStepButton":
@@ -140,20 +156,31 @@ angular.module("canvasApp").factory('mouseDown', [
 
       });
 
-      unHookGroup = function(group, items) {
+      unHookGroup = function(group, items, index_to_remove) {
 
         group._restoreObjectsState();
         C.canvas.remove(group);
+
+        C.canvas.remove(items[index_to_remove]);
+
+        items.splice(index_to_remove, 1);
+
         for(var i = 0; i < items.length; i++) {
           C.canvas.add(items[i]);
         }
         C.canvas.renderAll();
       };
 
-      startEditing = function(textToBeEdited) {
+      startEditing = function(textToBeEdited, evt) {
+
         C.canvas.setActiveObject(textToBeEdited);
+        var clickedPlaceIndex = textToBeEdited.getSelectionStartFromPointer();
+
         textToBeEdited.enterEditing();
-        textToBeEdited.selectAll();
+        for(var i = 0; i < clickedPlaceIndex; i++) {
+          // Placing the cursor at the place where we clicked.
+          textToBeEdited.moveCursorRightWithoutShift(evt);
+        }
       };
 
     };

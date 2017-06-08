@@ -49,6 +49,8 @@ window.ChaiBioTech.ngApp.directive('summaryModeItem', [
               scope.date = true;
               //timeFormat.getForSummaryMode(scope.reading);
               //scope.data = (scope.reading).replace("T", ",").slice(0, -8);
+            } else if(scope.caption === "Run on") {
+              scope.date = true;
             }
           }
 

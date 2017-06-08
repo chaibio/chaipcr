@@ -24,6 +24,8 @@
 #include "thermistor.h"
 #include "pid.h"
 #include "temperaturecontroller.h"
+#include "logger.h"
+#include "experimentcontroller.h"
 
 TemperatureController::TemperatureController(Settings settings)
 {
@@ -32,14 +34,16 @@ TemperatureController::TemperatureController(Settings settings)
     _name = settings.name;
     _thermistor = settings.thermistor;
     _pidController = settings.pidController;
+    _pidState = false;
     _pidResult = 0;
     _minTargetTemp = settings.minTargetTemp;
     _maxTargetTemp = settings.maxTargetTemp;
     _minTempThreshold = settings.minTempThreshold;
     _maxTempThreshold = settings.maxTempThreshold;
     _targetTemperature = _minTargetTemp - 1;
+    _firstErrorState = false;
 
-    _thermistor->temperatureChanged.connect(boost::bind(&TemperatureController::computePid, this, _1));
+    _thermistor->setTemperatureChangeCallback(std::bind(&TemperatureController::currentTemperatureChanged, this, std::placeholders::_1));
 }
 
 TemperatureController::~TemperatureController()
@@ -47,28 +51,26 @@ TemperatureController::~TemperatureController()
     delete _pidController;
 }
 
-void TemperatureController::setEnableMode(bool enableMode)
+void TemperatureController::setEnableMode(bool enableMode, bool enablePid)
 {
-    if (enableMode != _enableMode)
+    if (_enableMode = enableMode)
     {
-        _enableMode = enableMode;
-
-        if (_enableMode)
+        if (enablePid)
         {
             _pidController->reset();
 
-            _pidMutex.lock();
+            std::lock_guard<std::mutex> lock(_pidMutex);
             _pidState = true;
-            _pidMutex.unlock();
         }
-        else
+    }
+    else
+    {
         {
-            _pidMutex.lock();
+            std::lock_guard<std::mutex> lock(_pidMutex);
             _pidState = false;
-            _pidMutex.unlock();
-
-            resetOutput();
         }
+
+        resetOutput();
     }
 }
 
@@ -93,52 +95,91 @@ double TemperatureController::currentTemperature() const
 void TemperatureController::process()
 {
     if (_enableMode)
-    {
         processOutput();
-    }
 }
 
-void TemperatureController::computePid(double currentTemperature)
+void TemperatureController::currentTemperatureChanged(double temperature)
 {
-    if (currentTemperature < _minTempThreshold)
+    if (temperature < _minTempThreshold)
     {
-        std::string name = _name;
-        name.at(0) = std::toupper(name.at(0));
+        if (ExperimentController::getInstance()->shutdown(ExperimentController::IdleMachineState))
+            return;
+        else if (_firstErrorState)
+        {
+            std::string name = _name;
+            name.at(0) = std::toupper(name.at(0));
 
-        std::stringstream stream;
-        stream << name << " temperature of " << currentTemperature << " C below limit of " << _minTempThreshold << " C";
+            std::stringstream stream;
+            stream << name << " temperature of " << temperature << " C below limit of " << _minTempThreshold << " C";
 
-        throw TemperatureLimitError(stream.str());
+            throw TemperatureLimitError(stream.str());
+        }
+        else
+        {
+            _firstErrorState = true;
+
+            APP_LOGGER << "TemperatureController::currentTemperatureChanged - " << _name << " temperature of " << temperature << " C below limit of " << _minTempThreshold << " C. Skipping.";
+
+            return;
+        }
     }
-    else if (currentTemperature > _maxTempThreshold)
+    else if (temperature > _maxTempThreshold)
     {
-        std::string name = _name;
-        name.at(0) = std::toupper(name.at(0));
+        if (ExperimentController::getInstance()->shutdown(ExperimentController::IdleMachineState))
+            return;
+        else if (_firstErrorState)
+        {
+            std::string name = _name;
+            name.at(0) = std::toupper(name.at(0));
 
-        std::stringstream stream;
-        stream << name << " temperature of " << currentTemperature << " C above limit of " << _maxTempThreshold << " C";
+            std::stringstream stream;
+            stream << name << " temperature of " << temperature << " C above limit of " << _maxTempThreshold << " C";
 
-        throw TemperatureLimitError(stream.str());
+            throw TemperatureLimitError(stream.str());
+        }
+        else
+        {
+            _firstErrorState = true;
+
+            APP_LOGGER << "TemperatureController::currentTemperatureChanged - " << _name << " temperature of " << temperature << " C above limit of " << _maxTempThreshold << " C. Skipping.";
+
+            return;
+        }
     }
-    else if (std::isnan(currentTemperature))
+    else if (std::isnan(temperature))
     {
-        std::string name = _name;
-        name.at(0) = std::toupper(name.at(0));
+        if (ExperimentController::getInstance()->shutdown(ExperimentController::IdleMachineState))
+            return;
+        else if (_firstErrorState)
+        {
+            std::string name = _name;
+            name.at(0) = std::toupper(name.at(0));
 
-        std::stringstream stream;
-        stream << name << " temperature is NaN";
+            std::stringstream stream;
+            stream << name << " temperature is NaN";
 
-        throw TemperatureLimitError(stream.str());
+            throw TemperatureLimitError(stream.str());
+        }
+        else
+        {
+            _firstErrorState = true;
+
+            APP_LOGGER << "TemperatureController::currentTemperatureChanged - " << _name << " temperature is NaN. Skipping.";
+
+            return;
+        }
     }
+
+    _firstErrorState = false;
 
     if (_targetTemperature < _minTargetTemp)
-        _targetTemperature = currentTemperature;
+        _targetTemperature = temperature;
 
     std::lock_guard<std::mutex> lock(_pidMutex);
 
     if (_pidState)
     {
-        double result = _pidController->compute(targetTemperature(), currentTemperature);
+        double result = _pidController->compute(targetTemperature(), temperature);
 
         if (_enableMode && result != _pidResult)
         {

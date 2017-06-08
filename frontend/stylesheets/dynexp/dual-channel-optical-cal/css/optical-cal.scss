@@ -1,0 +1,197 @@
+.dual-channel-optical-cal {
+  button,
+  .button {
+    background: #fff;
+    border: 1px solid #333;
+    color: #000;
+    display: inline-block;
+    font-weight: bold;
+    margin-top: 70px;
+    margin-bottom: 50px;
+    padding: 5px 50px;
+    text-decoration: none;
+  }
+  button:hover,
+  .button:hover {
+    text-decoration: none;
+    color: #000;
+  }
+  button.red,
+  .button.red {
+    background: #E02127;
+    border-color: transparent;
+    color: #fff;
+  }
+  .errorButton {
+    background: #fff;
+    border: 1px solid #999;
+    color: #999;
+    margin-top: 60px;
+    padding: 5px 50px;
+    text-decoration: none;
+  }
+  .errorButton:hover {
+    color: #999;
+    text-decoration: none;
+  }
+  p.step {
+    text-align: left;
+    margin-bottom: 0px;
+  }
+  .instruction {
+    margin-top: 50px;
+  }
+  .instruction .top-text {
+    color: #333;
+  }
+  /*tubes container sulotion label*/
+  .tubes-container .solution-label img {
+    display: inline-block;
+    margin: 0;
+    margin-right: 10px;
+    vertical-align: middle;
+    height: 20px;
+  }
+  .tubes-container .solution-label span {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .tubes-container img.tubes {
+    margin-top: 10px;
+    width: 150px;
+  }
+  /*intro page*/
+  .intro h2 {
+    margin-top: 17px;
+  }
+  .intro p {
+    display: block;
+    font-size: 17px;
+    text-align: justify;
+  }
+  .intro .mini-description {
+    margin-top: 50px;
+  }
+  .intro .mini-description .section-title {
+    color: #333333;
+  }
+  .intro .mini-description table>tbody>tr>td {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-right: 10px;
+  }
+  .intro .mini-description .note {
+    color: #777;
+    font-size: 12px;
+  }
+  /*step 1*/
+  .row.tubes-container {
+    margin: 0;
+    margin-top: 30px;
+  }
+  .tubes-container .col-md-4 {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .step-1 .tubes-container .col-md-6:last-of-type {
+    padding-left: 50px;
+  }
+  /*step 2 & 4*/
+  .step-2 .machine-icon-container img,
+  .step-4 .machine-icon-container img {
+    width: 230px;
+    margin-left: 45px;
+    display: block;
+  }
+  /*step 3*/
+  .step-3 .machine-heating-icon {
+    margin: 0 auto;
+    margin-top: 50px;
+    margin-bottom: 30px;
+    position: relative;
+    width: 200px;
+    height: 166px;
+  }
+  .step-3 .machine-heating-icon img {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    -webkit-transition: opacity 2s;
+    /* Safari */
+    transition: opacity 2s;
+  }
+  .step-3 .machine-heating-icon img.machine-idle {
+    opacity: 1;
+    width: 100%;
+    height: 100%;
+  }
+  .step-3 .machine-heating-icon img.lid-heating {
+    margin-top: 10px;
+    margin-left: 51px;
+    width: 99px;
+  }
+  .step-3 .machine-heating-icon img.block-heating {
+    margin-top: 18px;
+    margin-left: 41px;
+    width: 118px;
+  }
+  .step-3 p.wait,
+  .step-5 p.wait,
+  .step-6 p.wait {
+    font-weight: bold;
+    margin-bottom: 0px;
+  }
+  .step-3 p.heating,
+  .step-5 p.heating,
+  .step-6 p.heating {
+    margin-bottom: 0px;
+  }
+  .step-3 p.note {
+    color: #777;
+    font-size: 10px;
+    margin-bottom: 0px;
+  }
+  .step-3 p.dont-open,
+  .step-5 p.dont-open,
+  .step-6 p.dont-open {
+    margin-top: 30px;
+    margin-bottom: 0px;
+  }
+  /*step 5*/
+  .step-5 .machine-icon {
+    margin: 0 auto;
+    margin-top: 50px;
+    margin-bottom: 30px;
+    position: relative;
+    width: 200px;
+  }
+  .step-5 .machine-icon img {
+    width: 100%;
+  }
+  .step-5 .machine-icon .image-rotate {
+    position: absolute;
+    top: 84px;
+    left: 90px;
+    width: 20px;
+  }
+  /*step 9*/
+  .step-9 .machine-icon img {
+    width: 200px;
+    display: block;
+    margin: 0 auto;
+    margin-top: 50px;
+    margin-bottom: 30px;
+  }
+  .step-9 p.heating {
+    margin-top: 20px;
+  }
+  .errorMessage {
+    display: block;
+    width: 500px;
+    margin: 0 auto;
+    color: red;
+    font-size: 17px;
+  }
+}

@@ -20,7 +20,11 @@
 window.ChaiBioTech.ngApp.directive('holdDuration', [
   'ExperimentLoader',
   '$timeout',
-  function(ExperimentLoader, $timeout) {
+  'alerts',
+  '$uibModal',
+  'TimeService',
+  '$rootScope',
+  function(ExperimentLoader, $timeout, alerts, $uibModal, TimeService, $rootScope) {
     return {
       restric: 'EA',
       replace: true,
@@ -28,7 +32,8 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
         caption: "@",
         unit: "@",
         reading: '=',
-        pause: '='
+        pause: '=',
+        helpText: "@"
       },
       templateUrl: 'app/views/directives/edit-value.html',
 
@@ -36,12 +41,12 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
 
         scope.edit = false;
         scope.delta = false; // This is to prevent the directive become disabled, check delta in template, this is used for auto delta field
-        var editValue;
+        var editValue = null, help_part = angular.element(elem).find(".help-part");
 
         scope.$watch("reading", function(val) {
 
           if(angular.isDefined(scope.reading)) {
-            scope.shown = scope.hidden = scope.$parent.timeFormating(scope.reading);
+            scope.shown = TimeService.newTimeFormatting(scope.reading);
           }
         });
 
@@ -51,34 +56,69 @@ window.ChaiBioTech.ngApp.directive('holdDuration', [
             scope.delta = scope.pause;
           }
         });
+
+        scope.$watch("edit", function(editStatus) {
+
+          if(editStatus === true) {
+            help_part.animate({
+              left: 100
+            }, 200);
+          } else if(editStatus === false) {
+            help_part.animate({
+              left: 0
+            }, 200);
+          }
+        });
+
+        scope.ifLastStep = function() {
+
+          var myCircle = scope.$parent.fabricStep.circle;
+          return myCircle.next === null;
+        };
+
         scope.editAndFocus = function(className) {
 
-          if(scope.pause) {
-            editValue = scope.hidden;
-            scope.edit = ! scope.edit;
-            $timeout(function() {
-              $('.' + className).focus();
-            });
-          }
+          scope.edit = true;
+          editValue = TimeService.convertToSeconds(scope.shown);
         };
 
         scope.save = function() {
 
           scope.edit = false;
-          var newHoldTime = scope.$parent.convertToMinute(scope.hidden);
-          editValue = scope.$parent.convertToMinute(editValue);
+          var newHoldTime = TimeService.convertToSeconds(scope.shown);
 
-          if((newHoldTime || newHoldTime === 0) && editValue !== newHoldTime) {
-            scope.reading = newHoldTime;
-            $timeout(function() {
-              ExperimentLoader.changeHoldDuration(scope.$parent).then(function(data) {
-                console.log(data);
+          //console.log(newHoldTime, editValue);
+          /*if((newHoldTime || newHoldTime === 0) && editValue != newHoldTime) {*/
+          
+          if(!isNaN(newHoldTime) && scope.reading != newHoldTime) {
+
+            if(Number(newHoldTime) < 0) {
+              alerts.showMessage(alerts.noNegativeHold, scope);
+            } else if(Number(newHoldTime) === 0 ) {
+              if(scope.ifLastStep() && ! scope.$parent.step.collect_data) {
+                scope.reading = newHoldTime;
+                $timeout(function() {
+                  ExperimentLoader.changeHoldDuration(scope.$parent).then(function(data) {
+                    console.log(data);
+                  });
+                });
+              } else {
+                alerts.showMessage(alerts.holdDurationZeroWarning, scope);
+              }
+            } else {
+              $timeout(function() {
+                scope.reading = newHoldTime;
+                $timeout(function() {
+                  ExperimentLoader.changeHoldDuration(scope.$parent).then(function(data) {
+                    console.log(data, scope);
+                  });
+                });
               });
-            });
+            }
 
-          } else {
-            scope.hidden = scope.shown;
+            editValue = newHoldTime;
           }
+          scope.shown = TimeService.newTimeFormatting(scope.reading);
         };
       }
     };

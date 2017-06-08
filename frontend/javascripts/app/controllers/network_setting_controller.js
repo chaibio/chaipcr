@@ -165,7 +165,7 @@ window.ChaiBioTech.ngApp.controller('NetworkSettingController', [
         $interval.cancel(stop);
         stop = null;
       }
-    }, 10000);
+    }, 5000);
 
     /**
       Initiate the primary things like ethernet status, wifiNetworkStatus and all the wifi networks around the room.

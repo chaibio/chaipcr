@@ -60,9 +60,12 @@ window.App.service 'PeriodicUpdate', [
         Status.fetch().then (resp) ->
           status = resp?.device?.update_available || 'unknown'
           if status is 'unknown'
-            Device.checkForUpdate().then (resp) ->
-              status = resp?.device?.update_available || 'unknown'
-              openUpdateModal(status) if status is 'available'
+            #if resp.device.update_error
+              #openUpdateModal(status)
+            #else
+              Device.checkForUpdate().then (resp) ->
+                status = resp
+                openUpdateModal(status) if status is 'available'
           else
             openUpdateModal(status) if status is 'available'
 

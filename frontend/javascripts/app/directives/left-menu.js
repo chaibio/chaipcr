@@ -24,7 +24,7 @@ window.ChaiBioTech.ngApp.directive('leftMenu', [
 
       restric: "E",
       bindToController: true,
-      replace: true,
+      //replace: true,
 
       templateUrl: "app/views/experiment/left-menu.html",
       controller: 'ExperimentMenuOverlayCtrl',

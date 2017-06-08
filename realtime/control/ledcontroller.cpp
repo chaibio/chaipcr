@@ -20,6 +20,7 @@
 #include "pcrincludes.h"
 #include "spi.h"
 #include "ledcontroller.h"
+#include "constants.h"
 
 #include <sstream>
 #include <limits>
@@ -33,17 +34,18 @@ LEDController::LEDController(shared_ptr<SPIPort> spiPort,unsigned int potCSPin,
     _spiPort(spiPort),
     _potCSPin(potCSPin, GPIO::kOutput),
     _ledXLATPin(ledXLATPin, GPIO::kOutput),
-    _ledGSPin(26, GPIO::kOutput),
-    _ledBlankPWM(ledBlankPWMPath) {
+    _ledBlankPWM(ledBlankPWMPath),
+    _ledGSPin(kLEDControlGSPinNumber, GPIO::kOutput),
+    _intensityFine(kWellCount, 0x3F){
 
     _intensity = 0;
     _lastLedNumber = std::numeric_limits<unsigned>::max();
 
     _dutyCyclePercentage.store(dutyCyclePercentage);
 
-    disableLEDs();
     _ledBlankPWM.setPWM(kLedBlankPwmDutyNs, kLedBlankPwmPeriodNs, 0);
     setIntensity(kDefaultLEDCurrent);
+    disableLEDs();
 
     _potCSPin.setValue(GPIO::kHigh);
     _ledXLATPin.setValue(GPIO::kLow);
@@ -68,9 +70,7 @@ void LEDController::setIntensity(double onCurrentMilliamps) {
             throw InvalidArgument(stream.str().c_str());
         }
 
-        double avgCurrentMilliamps = onCurrentMilliamps * _dutyCyclePercentage / 100;
-
-        if (avgCurrentMilliamps > kMaxAverageLEDCurrent || onCurrentMilliamps > kMaxInstantaneousLEDCurrent)
+        if (onCurrentMilliamps > kMaxInstantaneousLEDCurrent)
         {
             std::stringstream stream;
             stream << "Requested LED intensity of " << onCurrentMilliamps << " above limit of " << kMaxInstantaneousLEDCurrent;
@@ -78,61 +78,139 @@ void LEDController::setIntensity(double onCurrentMilliamps) {
             throw InvalidArgument(stream.str().c_str());
         }
 
+        double avgCurrentMilliamps = onCurrentMilliamps * _dutyCyclePercentage / 100;
+
+        if (avgCurrentMilliamps > kMaxAverageLEDCurrent)
+        {
+            std::stringstream stream;
+            stream << "Requested LED intensity of " << onCurrentMilliamps << " will exceed the max average current of " << kMaxAverageLEDCurrent;
+
+            throw InvalidArgument(stream.str().c_str());
+        }
+
         //calculate
         double rIref = 1.24 / (onCurrentMilliamps / 1000) * 31.5; //reference resistance for TLC5940
-        int rN = (rIref - 75) * 256 / 5000;
+        if (rIref > kLEDPotMaxResistance || rIref < kLEDPotMinResistance)
+        {
+            std::stringstream stream;
+            stream << "Requested LED intensity of " << onCurrentMilliamps << " requires a resistance outside the valid range of [ " << kLEDPotMinResistance << ", " << kLEDPotMaxResistance << " ]";
+
+            throw InvalidArgument(stream.str().c_str());
+        }
+        int rN = (rIref - kLEDPotMinResistance) * 256 / (kLEDPotMaxResistance - kLEDPotMinResistance);
         char txBuf[] = {0, static_cast<uint8_t>(rN)};
 
         //send resistance
         _potCSPin.setValue(GPIO::kLow);
         _spiPort->setMode(0);
-        _spiPort->readBytes(NULL, txBuf, sizeof(txBuf), 1000000);
+        _spiPort->readBytes(NULL, txBuf, sizeof(txBuf), kLEDSpiSpeed_Hz);
         _potCSPin.setValue(GPIO::kHigh);
 
-        if (_lastLedNumber != std::numeric_limits<unsigned>::max())
-            activateLED(_lastLedNumber);
+        sendLEDIntensityFineValues();
+        sendLEDGrayscaleValues();
     }
-    else
+    else {
         disableLEDs(false);
+    }
 
     _intensity = onCurrentMilliamps;
 }
 
 void LEDController::activateLED(unsigned int ledNumber) {
-    _lastLedNumber = ledNumber;
+
+    _lastLedNumber = kWellToLedMappingList.at(ledNumber);
 
     if (_intensity > 0)
     {
-        uint16_t intensities[16] = {0};
-        intensities[15 - (ledNumber - 1)] = 0xFFF;
+        sendLEDIntensityFineValues();
+        sendLEDGrayscaleValues();
+    }
+}
 
-        uint8_t packedIntensities[24];
+void LEDController::setIntensityFine(uint8_t ledIntensity, int ledNumber){
 
-        for (int i = 0; i < 16; i += 2) {
-            uint16_t val1 = intensities[i];
-            uint16_t val2 = intensities[i+1];
+    if(ledIntensity > kLEDFineIntensityMax){
+        std::stringstream stream;
+        stream << "Invalid intensity value: " << (int) ledIntensity;
 
-            int packIndex = i * 3 / 2;
-            packedIntensities[packIndex] = val1 >> 4;
-            packedIntensities[packIndex + 1] = (val1 & 0x000F) << 4 | (val2 & 0x0F00) >> 8;
-            packedIntensities[packIndex + 2] = val2 & 0x00FF;
-        }
-        sendLEDGrayscaleValues(packedIntensities);
+        throw InvalidArgument(stream.str().c_str());
+    }
+
+    if(ledNumber > kWellCount - 1){
+        std::stringstream stream;
+        stream << "Invalid LED number of " << ledNumber;
+
+        throw InvalidArgument(stream.str().c_str());
+    }
+
+    if(ledNumber < 0){
+        std::fill(_intensityFine.begin(), _intensityFine.end(), ledIntensity);
+    }
+    else{
+        _intensityFine[kWellToLedMappingList.at(ledNumber)] = ledIntensity;
+    }
+
+    sendLEDIntensityFineValues();
+    sendLEDGrayscaleValues(false);
+}
+
+void LEDController::sendLEDIntensityFineValues(){
+
+    uint8_t fine_int_values[kWellCount] = {0};
+    if (_lastLedNumber != std::numeric_limits<unsigned>::max()){
+            fine_int_values[_lastLedNumber] = _intensityFine[_lastLedNumber] ;
+    }
+
+    uint8_t packed_data[12] = {0};
+    for (int i = 15; i > 0; i -= 4) {
+        int pack_index = (15 - i) / 4 * 3;
+        packed_data[pack_index + 0] = ((fine_int_values[i-0] << 2 ) & 0xFC) | (( fine_int_values[i-1] >> 4) & 0x03 );
+        packed_data[pack_index + 1] = ((fine_int_values[i-1] << 4 ) & 0xF0) | (( fine_int_values[i-2] >> 2) & 0x0F );
+        packed_data[pack_index + 2] = ((fine_int_values[i-2] << 6 ) & 0xC0) | (( fine_int_values[i-3] >> 0) & 0x3F );
+    }
+
+    _ledGSPin.setValue(GPIO::kHigh);
+    _spiPort->setMode(0);
+    _spiPort->readBytes(NULL, (char*)packed_data, sizeof(packed_data), kLEDSpiSpeed_Hz);
+    _ledXLATPin.setValue(GPIO::kHigh);
+    _ledXLATPin.setValue(GPIO::kLow);
+    _ledGSPin.setValue(GPIO::kLow);
+
+}
+
+void LEDController::sendLEDGrayscaleValues(bool latch){
+
+    uint16_t gs_values[kWellCount] = {0};
+    if (_lastLedNumber != std::numeric_limits<unsigned>::max()){
+            gs_values[_lastLedNumber] = 0xFFF;
+    }
+
+    uint8_t packed_data[24] = {0};
+    for (int i = 15; i > 0; i -= 2) {
+        int pack_index = (15 - i) / 2 * 3;
+        packed_data[pack_index + 0] = ((gs_values[i]   >> 4 ) & 0x00FF);
+        packed_data[pack_index + 1] = ((gs_values[i]   << 4 ) & 0x00F0) | ((gs_values[i-1] >> 8 ) & 0x000F);
+        packed_data[pack_index + 2] =                                     ((gs_values[i-1] >> 0 ) & 0x00FF);
+    }
+
+    _spiPort->setMode(0);
+    _spiPort->readBytes(NULL, (char*)packed_data, sizeof(packed_data), kLEDSpiSpeed_Hz);
+
+    if(latch){
+        _ledXLATPin.setValue(GPIO::kHigh);
+        _ledXLATPin.setValue(GPIO::kLow);
     }
 }
 
 void LEDController::disableLEDs(bool clearLastLed) {
-    uint8_t packedIntensities[24] = {0};
-    sendLEDGrayscaleValues(packedIntensities);
 
-    if (clearLastLed)
-        _lastLedNumber = std::numeric_limits<unsigned>::max();
-}
-	
-// --- private member functions ------------------------------------------------
-void LEDController::sendLEDGrayscaleValues(const uint8_t (&values)[24]) {
-    _spiPort->setMode(0);
-    _spiPort->readBytes(NULL, (char*)values, sizeof(values), 1000000);
-    _ledXLATPin.setValue(GPIO::kHigh);
-    _ledXLATPin.setValue(GPIO::kLow);
+    unsigned tmp = _lastLedNumber;
+    _lastLedNumber = std::numeric_limits<unsigned>::max();
+
+    sendLEDIntensityFineValues();
+    sendLEDGrayscaleValues();
+
+    if (!clearLastLed){
+        _lastLedNumber = tmp;
+    }
 }

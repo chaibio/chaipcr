@@ -34,6 +34,7 @@ angular.module("canvasApp").factory('step', [
       this.index = index;
       this.canvas = parentStage.canvas;
       this.myWidth = constants.stepWidth;
+      this.$scope = $scope;
       this.nextStep = null;
       this.previousStep = null;
       this.gatherDataDuringStep = this.model.collect_data;
@@ -49,16 +50,17 @@ angular.module("canvasApp").factory('step', [
       };
 
       this.shrinkStep = function() {
+
         this.shrinked = true;
         this.myWidth = 45;
         this.stepRect.setWidth(45).setCoords();
-        this.borderRight.setLeft(-18).setCoords();
-        leftVal = {left: this.left + (this.myWidth / 2)};
+        this.borderRight.setLeft(-20).setCoords();
+        //leftVal = {left: this.left + (this.myWidth / 2)};
         //this.hitPoint.set(leftVal).setCoords();
         this.hitPoint.setVisible(false); // This is important. If we dont hide hitPoint it couses unwanted step to be selected.
         this.moveOtherStepsInStage();
         this.parentStage.shrinkStage();
-        this.parentStage.addHitBlock(); // We need this to add stage , by moving a step to empty place between stages.
+        //this.parentStage.addHitBlock(); // We need this to add stage , by moving a step to empty place between stages.
       };
 
       this.moveOtherStepsInStage = function() {
@@ -104,8 +106,32 @@ angular.module("canvasApp").factory('step', [
         leftVal = {left: this.left + 16};
         this.dots.set(leftVal).setCoords();
 
+        leftVal = {left: this.left + 5};
+        this.rampSpeedGroup.set(leftVal).setCoords();
+
         this.ordealStatus = this.ordealStatus + action;
         this.circle.getUniqueId();
+
+      };
+
+      this.specialMoveStep = function() {
+
+        if(this.previousStep) {
+          this.left = this.previousStep.left + this.previousStep.myWidth;
+          this.moveStep(1, false);
+          return;
+        }
+
+        this.moveStep(1, true);
+        /*if(this.shrinked === true) {
+          return;
+        }
+
+        if(this.previousStep && this.previousStep.shrinked === true) {
+          this.left = this.previousStep.left + 138;
+          //return;
+        }*/
+
 
       };
 
@@ -117,7 +143,7 @@ angular.module("canvasApp").factory('step', [
         } else {
           this.stepName.text = this.model.name;
         }
-        stepGraphics.numberingValue.call(this);
+        this.numberingValue();
       };
 
       this.addCircle = function() {
@@ -192,17 +218,48 @@ angular.module("canvasApp").factory('step', [
         }
       };
 
+      this.addName = function() {
+
+        var stepName = "Step " +(this.index + 1);
+        if(this.model.name) {
+          stepName = (this.model.name).charAt(0).toUpperCase() + (this.model.name).slice(1).toLowerCase();
+        }
+
+        this.stepNameText = stepName;
+        stepGraphics.addName.call(this);
+      };
+
+      this.numberingValue = function() {
+
+        var thisIndex = (this.index < 9) ? "0" + (this.index + 1) : (this.index + 1),
+        noofSteps = this.parentStage.model.steps.length;
+        thisLength = (noofSteps < 10) ? "0" + noofSteps : noofSteps;
+        text = thisIndex + "/" + thisLength;
+
+        this.numberingTextCurrent.setText(thisIndex);
+        this.numberingTextTotal.setText("/" + thisLength);
+        this.numberingTextTotal.setLeft(this.numberingTextCurrent.left + this.numberingTextCurrent.width);
+        return this;
+      };
+
+      this.rampSpeedGraphics = function() {
+        stepGraphics.rampSpeed.call(this);
+        if(this.rampSpeedNumber <= 0) {
+          this.rampSpeedGroup.setVisible(false);
+        }
+      };
+
       this.render = function() {
 
         this.setLeft();
-        stepGraphics.addName.call(this);
+        this.addName();
         stepGraphics.addBorderRight.call(this);
         this.getUniqueName();
-        stepGraphics.rampSpeed.call(this);
+        this.rampSpeedGraphics();
         stepGraphics.initNumberText.call(this);
         stepGraphics.initAutoDelta.call(this);
         stepGraphics.autoDeltaDetails.call(this);
-        stepGraphics.numberingValue.call(this);
+        this.numberingValue();
         stepGraphics.deleteButton.call(this);
         stepGraphics.stepFooter.call(this);
         stepGraphics.stepComponents.call(this);
@@ -214,7 +271,8 @@ angular.module("canvasApp").factory('step', [
           'hitPoint': this.hitPoint,
           'closeImage': this.closeImage,
           'dots': this.dots
-        }
+        };
+
         this.canvas.add(this.stepGroup);
         this.canvas.add(this.rampSpeedGroup);
         this.canvas.add(this.hitPoint);
@@ -222,7 +280,6 @@ angular.module("canvasApp").factory('step', [
         this.canvas.add(this.dots);
 
         this.setShadows();
-
         this.addCircle();
       };
 
@@ -239,7 +296,10 @@ angular.module("canvasApp").factory('step', [
       this.manageFooter = function(color) {
 
         this.dots.forEachObject(function(obj) {
+        if(obj.name !== "backgroundRect") {
           obj.setFill(color);
+        }
+
         });
       };
 

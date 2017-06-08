@@ -9,7 +9,8 @@ describe("Testing menu overlay [Shows up when we enable side menu]", function() 
       scope = $rootScope.$new();
       rootScope = $rootScope;
       httpMock = $httpBackend;
-      httpMock.expectGET("http://localhost:8000/status").respond("NOTHING");
+      httpMock.whenGET("http://localhost:8000/status").respond("NOTHING");
+      httpMock.whenGET("http://localhost:8000/network/wlan").respond("NOTHING");
       $stateParams.id = 10;
 
       var data = {
@@ -21,7 +22,7 @@ describe("Testing menu overlay [Shows up when we enable side menu]", function() 
           }
         }
       };
-      httpMock.expectGET("/experiments/" + $stateParams.id).respond(data);
+      httpMock.whenGET("/experiments/" + $stateParams.id).respond(data);
     })
   );
 

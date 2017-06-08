@@ -33,19 +33,19 @@ void Thermistor::setADCValue(int32_t adcValue) {
     double temp = temperatureForResistance((double)_voltageDividerResistance * adcValue / (_maxADCValue - adcValue));
 
     _temperature.store(temp);
-    temperatureChanged(temp);
+    _temperatureChangeCallback(temp);
 }
 
 void Thermistor::setADCValues(int32_t differentialADCValue, int32_t singularADCValue) {
     double temp = temperatureForResistance(2050 * (double)singularADCValue / differentialADCValue);
 
     _temperature.store(temp);
-    temperatureChanged(temp);
+    _temperatureChangeCallback(temp);
 }
 
 void Thermistor::setADCValueMock(double adcValue) {
     _temperature.store(adcValue);
-    temperatureChanged(adcValue);
+    _temperatureChangeCallback(adcValue);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -20,6 +20,7 @@
 #include "networkinterfaces.h"
 #include "util.h"
 #include "logger.h"
+#include "exceptions.h"
 
 #include <fstream>
 #include <sstream>
@@ -38,6 +39,8 @@
 #include <net/if.h>
 
 std::string getMacAddress(const std::string &interface);
+std::string getInterfaceGateway(const std::string &interface);
+std::vector<std::string> readDnsServers();
 
 namespace NetworkInterfaces
 {
@@ -45,6 +48,10 @@ namespace NetworkInterfaces
 std::string InterfaceSettings::toString() const
 {
     std::stringstream stream;
+
+    if (autoConnect)
+        stream << "auto " << interface << '\n';
+
     stream << "iface " << interface << " inet " << type << '\n';
 
     for (std::map<std::string, std::string>::const_iterator it = arguments.begin(); it != arguments.end(); ++it)
@@ -70,55 +77,6 @@ std::vector<std::string> getAllInterfaces()
     }
     else
         throw std::system_error(errno, std::generic_category(), "Network error: unable to read interfaces -");
-
-    return interfaces;
-}
-
-InterfaceSettingsMap readInterfaceSettings(const std::string &filePath)
-{
-    std::fstream file(filePath);
-
-    if (!file.is_open())
-        throw std::system_error(errno, std::generic_category(), "Network error: unable to read file " + filePath + " -");
-
-    std::map<std::string, InterfaceSettings> interfaces;
-    InterfaceSettings currentInterface;
-
-    while (file.good())
-    {
-        std::string line;
-        std::getline(file, line);
-
-        if (line.empty())
-            continue;
-
-        if (line.find("iface") == 0)
-        {
-            if (!currentInterface.interface.empty())
-            {
-                interfaces[currentInterface.interface] = currentInterface;
-                currentInterface = InterfaceSettings();
-            }
-
-            std::size_t pos = line.find(' ', 6);
-            currentInterface.interface = line.substr(6, pos - 6);
-
-            pos = line.find(' ', pos + 1) + 1;
-            currentInterface.type = line.substr(pos);
-        }
-        else if (!currentInterface.interface.empty() && (line.substr(0, 4) == std::string("    ") || line.at(0) == '\t'))
-        {
-            if (line.substr(0, 4) == std::string("    "))
-                line = line.substr(4);
-            else
-                line = line.substr(1);
-
-            currentInterface.arguments[line.substr(0, line.find(' '))] = line.substr(line.find(' ') + 1);
-        }
-    }
-
-    if (!currentInterface.interface.empty())
-        interfaces[currentInterface.interface] = currentInterface;
 
     return interfaces;
 }
@@ -157,6 +115,8 @@ InterfaceSettings readInterfaceSettings(const std::string &filePath, const std::
             pos = line.find(' ', pos + 1) + 1;
             interface.type = line.substr(pos);
         }
+        else if (line == "auto " + interfaceName)
+            interface.autoConnect = true;
         else if (!interface.interface.empty() && (line.substr(0, 4) == std::string("    ") || line.at(0) == '\t'))
         {
             while (line.front() == ' ')
@@ -165,6 +125,15 @@ InterfaceSettings readInterfaceSettings(const std::string &filePath, const std::
             interface.arguments[line.substr(0, line.find(' '))] = line.substr(line.find(' ') + 1);
         }
     }
+
+    for (const std::string &dns: readDnsServers())
+        interface.arguments["dns-nameservers"] += " " + dns;
+
+    if (interface.arguments.find("dns-nameservers") != interface.arguments.end() && interface.arguments["dns-nameservers"].at(0) == ' ')
+        interface.arguments["dns-nameservers"] = interface.arguments["dns-nameservers"].substr(1);
+
+    if (interface.arguments.find("gateway") == interface.arguments.end())
+        interface.arguments["gateway"] = getInterfaceGateway(interfaceName);
 
     return interface;
 }
@@ -194,6 +163,8 @@ void writeInterfaceSettings(const std::string &filePath, const InterfaceSettings
             else
                 skip = false;
         }
+        else if (line == "auto " + interface.interface)
+            continue;
         else if (skip && !line.empty() && (line.substr(0, 4) == std::string("    ") || line.at(0) == '\t'))
             continue;
 
@@ -282,9 +253,62 @@ InterfaceState getInterfaceState(const std::string &interfaceName)
     return state;
 }
 
-void removeLease(const std::string &interfaceName)
+void removeLeases(const std::string &interfaceName)
 {
     std::remove(("/var/lib/dhcp/dhclient." + interfaceName + ".leases").c_str());
+}
+
+std::time_t dhcpTimeout()
+{
+    std::time_t timeout = 60; //60s is a default timeout according to man dhclient.conf
+    std::ifstream file("/etc/dhcp/dhclient.conf");
+
+    if (file.is_open())
+    {
+        while (file.good())
+        {
+            std::string entry;
+            std::getline(file, entry);
+
+            if (entry.find("timeout ") == 0)
+            {
+                std::stringstream stream;
+                stream << entry;
+
+                stream >> entry;
+                stream >> timeout;
+
+                break;
+            }
+        }
+    }
+
+    return timeout;
+}
+
+std::string findWifiInterface()
+{
+    for (const std::string &interface: NetworkInterfaces::getAllInterfaces())
+    {
+        std::stringstream command, output;
+        command << "iwconfig " << interface;
+
+        try
+        {
+            Util::watchProcess(command.str(), [&output](const char *buffer, std::size_t size){ output.write(buffer, size); }, Util::WatchProcessCallback(), true);
+        }
+        catch (...)
+        {
+            continue;
+        }
+
+        std::string str = output.str();
+
+        if (str.find("no wireless extensions") == std::string::npos)
+            return interface;
+    }
+
+    return std::string();
 }
 
 }
@@ -321,4 +345,48 @@ std::string getMacAddress(const std::string &interface)
     }
 
     return stream.str();
+}
+
+std::string getInterfaceGateway(const std::string &interface)
+{
+    std::stringstream output;
+
+    try
+    {
+        Util::watchProcess("route -n | grep " + interface, [&output](const char *buffer, std::size_t size){ output.write(buffer, size); }, Util::WatchProcessCallback(), true);
+    }
+    catch (const ProcessError &/*ex*/) { //Ignoring process errors because mostly they mean that the interface is not connected thus does not have a gateway address
+        return std::string();
+    }
+
+    std::string entry;
+    std::getline(output, entry);
+
+    output.str(std::string(entry.begin(), std::unique(entry.begin(), entry.end(), [](char l, char r){ return std::isspace(l) && std::isspace(r) && l == r; })));
+    output.clear();
+
+    std::getline(output, entry, ' '); //Skip destination
+    std::getline(output, entry, ' ');
+
+    return entry;
+}
+
+std::vector<std::string> readDnsServers()
+{
+    std::vector<std::string> servers;
+    std::ifstream file("/etc/resolv.conf");
+
+    if (file.is_open())
+    {
+        while (file.good())
+        {
+            std::string entry;
+            std::getline(file, entry);
+
+            if (entry.find("nameserver") == 0)
+                servers.emplace_back(entry.substr(11)); //Skip 'nameserver '
+        }
+    }
+
+    return servers;
 }

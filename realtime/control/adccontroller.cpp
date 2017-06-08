@@ -18,6 +18,7 @@
 //
 
 #include <cassert>
+#include <cstdio>
 #include <boost/chrono.hpp>
 
 #include "pcrincludes.h"
@@ -27,6 +28,7 @@
 #include "qpcrapplication.h"
 #include "experimentcontroller.h"
 #include "logger.h"
+#include "adcdebuglogger.h"
 
 using namespace std;
 
@@ -36,10 +38,16 @@ const LTC2444::OversamplingRatio kLIAOversamplingRate = LTC2444::kOversamplingRa
 ////////////////////////////////////////////////////////////////////////////////
 // Class ADCController
 ADCController::ADCController(ConsumersList &&consumers, unsigned int csPinNumber, SPIPort &&spiPort, unsigned int busyPinNumber):
-    _consumers(std::move(consumers)) {
+    Watchdog::Watchable("ADCController"), _consumers(std::move(consumers)) {
     _currentConversionState = static_cast<ADCState>(0);
     _currentChannel = 0;
     _workState = false;
+    _ignoreReading = false;
+
+    if (qpcrApp.settings().device.opticsChannels == 1)
+        _debugLogger = new ADCDebugLogger<1>(kADCDebugReaderSamplesPath);
+    else
+        _debugLogger = new ADCDebugLogger<2>(kADCDebugReaderSamplesPath);
 
     _ltc2444 = new LTC2444(csPinNumber, std::move(spiPort), busyPinNumber);
 }
@@ -51,6 +59,7 @@ ADCController::~ADCController() {
         join();
 
     delete _ltc2444;
+    delete _debugLogger;
 }
 
 void ADCController::process() {
@@ -68,13 +77,15 @@ void ADCController::process() {
         _workState = true;
 
         while (_workState) {
+            checkin();
+
             if (_ltc2444->waitBusy())
                 continue;
 
             if (!_workState)
                 break;
 
-            if (ExperimentController::getInstance()->machineState() == ExperimentController::IdleMachineState) {
+            if (ExperimentController::getInstance()->machineState() == ExperimentController::IdleMachineState && _debugLogger->workState() != BaseADCDebugLogger::WorkingState) {
                 timespec time;
                 time.tv_sec = 0;
                 time.tv_nsec = 5 * 1000 * 1000;
@@ -119,32 +130,56 @@ void ADCController::process() {
             switch (nextState) {
             case EReadZone1Singular:
                 value = _ltc2444->readSingleEndedChannel(0, kThermistorOversamplingRate);
+                _debugLogger->store(_currentConversionState, value, _currentChannel);
                 break;
+
             case EReadZone2Singular:
                 value = _ltc2444->readSingleEndedChannel(1, kThermistorOversamplingRate);
+                _debugLogger->store(_currentConversionState, value, _currentChannel);
                 break;
+
             case EReadLIA:
-                value = _ltc2444->readSingleEndedChannel(kADCOpticsChannels.at(channel), kLIAOversamplingRate);
+                if (_currentConversionState == EReadZone2Singular && nextState == EReadLIA && !_ignoreReading)
+                    //sample unused ADC input before the optical channels
+                    value = _ltc2444->readSingleEndedChannel(3, kLIAOversamplingRate);
+                else
+                    value = _ltc2444->readSingleEndedChannel(kADCOpticsChannels.at(channel), kLIAOversamplingRate);
+
+                if (!_ignoreReading)
+                    _debugLogger->store(_currentConversionState, value, _currentChannel);
+
                 break;
+
             case EReadLid:
                 value = _ltc2444->readSingleEndedChannel(7, kThermistorOversamplingRate);
+                _debugLogger->store(_currentConversionState, value, _currentChannel);
                 break;
+
             default:
                 throw std::logic_error("Unexpected error: ADCController::process - unknown adc state");
             }
 
             try {
-                //process previous conversion value
-                if (_currentConversionState != EReadLIA)
-                    _consumers[_currentConversionState]->setADCValue(value);
-                else
-                    _consumers[_currentConversionState]->setADCValue(value, _currentChannel);
+                if (!_ignoreReading) {
+                    //process previous conversion value
+                    if (_currentConversionState != EReadLIA)
+                        _consumers[_currentConversionState]->setADCValue(value);
+                    else
+                        _consumers[_currentConversionState]->setADCValue(value, _currentChannel);
+                }
             }
             catch (const TemperatureLimitError &ex) {
                 logStream << "ADCController::process - consumer exception: " << ex.what() << std::endl;
 
                 qpcrApp.stopExperiment(ex.what());
             }
+
+            if (_currentConversionState == EReadZone2Singular && nextState == EReadLIA && !_ignoreReading) {
+                _ignoreReading = true;
+                continue;
+            }
+            else
+                _ignoreReading = false;
 
             _currentConversionState = nextState;
             _currentChannel = channel;
@@ -165,6 +200,18 @@ void ADCController::process() {
 void ADCController::stop() {
     _workState = false;
     _ltc2444->stopWaitinigBusy();
+}
+
+bool ADCController::startDebugLogger(std::size_t preSamplesCount, std::size_t postSamplesCount) {
+    return _debugLogger->start(preSamplesCount, postSamplesCount);
+}
+
+void ADCController::stopDebugLogger() {
+    _debugLogger->stop();
+}
+
+void ADCController::triggetDebugLogger() {
+    _debugLogger->trigger();
 }
 
 ADCController::ADCState ADCController::calcNextState(size_t &nextChannel) const {

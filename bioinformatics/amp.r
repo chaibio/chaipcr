@@ -8,6 +8,7 @@ get_amplification_data <- function(
     sr_named_list, # `list(step_id=xx)` or `list(ramp_id=xx)`
     calib_info, # for selecting data to analyze
     min_reliable_cyc=5, # needs to be an integer >= 1
+    baseline_cyc_bounds=c(), # lower and upper bounds of the cycles used as baseline
     dye_in='FAM', dyes_2bfild=NULL, # fill missing channels in calibration experiment(s) using preset calibration experiments
     dcv=TRUE, # logical, whether to perform multi-channel deconvolution
     # basecyc, cp, # extra parameters that are currently hard-coded but may become user-defined later
@@ -38,7 +39,7 @@ get_amplification_data <- function(
     # #                     single-       dual-
     # # before 128x    list(c(10, 1.25),  c(38.28, 2.73))
     
-    before_128x=TRUE,
+    before_128x=FALSE,
     
     extra_output=FALSE, 
     show_running_time=FALSE # option to show time cost to run this function
@@ -51,7 +52,6 @@ get_amplification_data <- function(
     db_conn <- db_etc_out[['db_conn']]
     calib_info <- db_etc_out[['calib_info']]
     
-    print(sr_named_list)
     message('max_cycle: ', max_cycle)
     
     
@@ -65,7 +65,7 @@ get_amplification_data <- function(
                 LEFT JOIN stages ON protocols.id = stages.protocol_id
                 LEFT JOIN steps ON stages.id = steps.stage_id
                 LEFT JOIN ramps ON steps.id = ramps.next_step_id
-            WHERE experiments.id = %i
+            WHERE experiments.id = %i AND stages.stage_type <> \'meltcurve\'
             ',
             exp_id
         )
@@ -99,7 +99,7 @@ get_amplification_data <- function(
     
     wcc_qry <- sprintf(
         'SELECT well_num, cycle_num, channel FROM fluorescence_data
-        WHERE experiment_id = %i AND %s_id = %s AND cycle_num <= %i
+        WHERE experiment_id = %i AND %s_id = %s AND cycle_num <= %i AND step_id is not NULL
         ',
         exp_id, sr_latest[1], sr_latest[2], max_cycle
     )
@@ -129,6 +129,7 @@ get_amplification_data <- function(
     
     result_sr <- list()
     
+    # print(sr_list)
     for (sr_ele in sr_list) {
         
         sr <- sr_ele[1]
@@ -138,6 +139,7 @@ get_amplification_data <- function(
             channels, 
             get_amp_raw, 
             db_conn, 
+            'fluorescence_value', # 'fluorescence_value' or 'baseline_value'
             exp_id, 
             sr_ele[1], sr_ele[2], 
             well_nums, cycle_nums, 
@@ -232,6 +234,11 @@ get_amplification_data <- function(
         
             if (min_reliable_cyc > num_cycles) mbf_cycles <- 1:num_cycles else mbf_cycles <- min_reliable_cyc:num_cycles # mbf = maxq_blsub_fluo
             
+            if (length(baseline_cyc_bounds) == 2) {
+                baselin <- fallback
+                basecyc <- baseline_cyc_bounds[1]:baseline_cyc_bounds[2]
+            }
+            
             blsub_mtch <- process_mtch(
                 rbbs, 
                 matrix2array=FALSE, 
@@ -315,6 +322,7 @@ get_amplification_data <- function(
 get_amp_raw <- function(
     channel, # as 1st argument for iteration by channel
     db_conn, 
+    col_name, # 'fluorescence_value' or 'baseline_value'
     exp_id, 
     sr, # 'step' or 'ramp'
     sr_id, 
@@ -330,20 +338,21 @@ get_amp_raw <- function(
     
     # get fluorescence data for amplification
     fluo_qry <- sprintf(
-        'SELECT fluorescence_value, well_num
+        'SELECT %s, well_num
             FROM fluorescence_data 
             WHERE 
                 experiment_id=%i AND 
                 %s_id=%s AND 
                 channel=%i AND
-                cycle_num <= %i
+                cycle_num <= %i AND
+                step_id is not NULL
             ORDER BY well_num, cycle_num',
-        exp_id, sr, sr_id, as.numeric(channel), max(cycle_nums)
+        col_name, exp_id, sr, sr_id, as.numeric(channel), max(cycle_nums)
     )
     
     fluo_sel <- dbGetQuery(db_conn, fluo_qry)
     
-    fluo_unstack <- unstack(fluo_sel, fluorescence_value ~ well_num)
+    fluo_unstack <- unstack(fluo_sel, formula(paste(col_name, '~ well_num')))
     if (length(cycle_nums) == 1) fluo_unstack <- t(fluo_unstack)
     fluo_us_wcn <- cbind(cycle_nums, fluo_unstack)
     dimnames(fluo_us_wcn) <- list(cycle_nums, c('cycle_num', well_nums))

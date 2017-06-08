@@ -45,7 +45,7 @@ const double kLidThermistorT0 = 298.15;             //kelvins
 const double kLidMinTargetTemp = 0;
 const double kLidMaxTargetTemp = 130;
 
-const double kLidLowTempShutdownThreshold = -20;
+const double kLidLowTempShutdownThreshold = -2;
 const double kLidHighTempShutdownThreshold = 140;
 
 const double kProgramStartLidTempThreshold = 2;
@@ -58,6 +58,8 @@ const int kADCRepeatFrequency = 80; // Hz
 const int kADCSPIFrequencyHz = 10000000; //10 MHz
 
 const std::vector<uint8_t> kADCOpticsChannels = { 6, 5 };
+
+const std::string kADCDebugReaderSamplesPath = "/tmp/data_logger.csv";
 
 //thermistor & ADC params
 const unsigned int kLidThermistorVoltageDividerResistanceOhms = 33000;
@@ -78,17 +80,17 @@ const unsigned long kHeatBlockZone2PWMPeriodNs = 50000;
 const double kHeatBlockZonesPIDMin = -1;
 const double kHeatBlockZonesPIDMax = 1;
 
-const double kHeatBlockZonesMinTargetTemp = -10;
+const double kHeatBlockZonesMinTargetTemp = 0;
 const double kHeatBlockZonesMaxTargetTemp = 105;
 
-const double kHeatBlockLowTempShutdownThreshold = -20;
+const double kHeatBlockLowTempShutdownThreshold = -5;
 const double kHeatBlockHighTempShutdownThreshold = 120;
 
 const double kMaxHeatBlockRampSpeed = 6.0;
 const double kDurationCalcHeatBlockRampSpeed = kMaxHeatBlockRampSpeed;
 
 //LED constants
-const int kMinLEDCurrent = 5; //mA
+const int kMinLEDCurrent = 8; //mA
 const int kDefaultLEDCurrent = 60; //mA
 const int kMaxInstantaneousLEDCurrent = 100;
 const int kMaxAverageLEDCurrent = 30;
@@ -97,14 +99,24 @@ const int kLedBlankPwmPeriodNs = 1000000;
 const int kLedBlankPwmDutyNs = 500000;
 
 //Optics
-const long kFluorescenceDataCollectionDelayTimeMs = 70;
-const int kADCReadsPerOpticalMeasurement = 5;
-const std::vector<int> kWellToLedMappingList = {4, 3, 2, 1, 16, 15, 14, 13, 5, 6, 7, 8, 9, 10, 11, 12};
-const int kOpticalMeasurementsPerCycle = 2;
+const long kFluorescenceDataCollectionDelayTimeMs = 80;
+const int kADCReadsPerOpticalMeasurement = 10;
+const int kWellCount = 16;
+const int kOpticalMeasurementsPerCycle = 1;
+const int kOpticalMeasurementsPerCalibrationCycle = 5;
 const int kBaselineMeasurementsPerCycle = 1;
 const int kOpticalMeasurementsBufferTimeMs = 250;
 const int kOpticalMeasurementDurationMs = kFluorescenceDataCollectionDelayTimeMs + 12 * kADCReadsPerOpticalMeasurement; //The magical number is X
 const int kOpticalFluorescenceMeasurmentPeriodMs = (kOpticalMeasurementsPerCycle + kBaselineMeasurementsPerCycle) * kOpticalMeasurementDurationMs * 16 + kOpticalMeasurementsBufferTimeMs;
+const int kOpticalRejectedOutlierMeasurements = 3;
+const int kADCReadsPerOpticalMeasurementFinal = kADCReadsPerOpticalMeasurement - kOpticalRejectedOutlierMeasurements;
+
+//LED
+const int kLEDPotMinResistance = 75;
+const int kLEDPotMaxResistance = 5000 + kLEDPotMinResistance;
+const uint32_t kLEDSpiSpeed_Hz = 1000000;  //the actual freq is 750 KHz (possible bug in the kernel driver)
+const uint8_t kLEDFineIntensityMax = 0x3F; //6-bit value
+const std::vector<int> kWellToLedMappingList = {3, 2, 1, 0, 15, 14, 13, 12, 4, 5, 6, 7, 8, 9, 10, 11};
 
 //Steps
 const double kPCRBeginStepTemperatureThreshold = 0.5;
@@ -130,6 +142,7 @@ const double kHeatSinkPIDMax = 0;
 const unsigned int kBeagleboneADCBits = 12;
 
 //App
+const std::string kStartupFlagFilePath = "/run/startup_complete.flag";
 const std::string kAppLogName = "QPCRApplication";
 
 const std::string kDeviceFilePath = "/perm/device.json";

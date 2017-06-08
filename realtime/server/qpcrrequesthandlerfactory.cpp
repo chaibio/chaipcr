@@ -92,7 +92,7 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
                 else if (request.getMethod() == "PUT")
                 {
                     if (requestPath.at(0) == "test_control")
-                        return new TestControlHandler();
+                        return new TestControlHandler(TestControlHandler::MachineSettings);
                     else if (requestPath.at(0) == "settings")
                         return new SettingsHandler();
                     else if (requestPath.at(0) == "stages")
@@ -124,6 +124,18 @@ HTTPRequestHandler* QPCRRequestHandlerFactory::createRequestHandler(const HTTPSe
                                 return new UpdateHandler(UpdateHandler::Update);
                             else if (requestPath.at(1) == "upload_software_update")
                                 return new UpdateUploadHandler();
+                        }
+                    }
+                    else if (requestPath.size() == 3)
+                    {
+                        if (requestPath.at(0) == "test" && requestPath.at(1) == "data_logger")
+                        {
+                            if (requestPath.at(2) == "start")
+                                return new TestControlHandler(TestControlHandler::StartADCLogger);
+                            else if (requestPath.at(2) == "stop")
+                                return new TestControlHandler(TestControlHandler::StopADCLogger);
+                            else if (requestPath.at(2) == "trigger")
+                                return new TestControlHandler(TestControlHandler::TriggerADCLogger);
                         }
                     }
                 }

@@ -51,7 +51,6 @@ window.ChaiBioTech.ngApp.service('ExperimentLoader', [
     };
 
     this.loadFirstStep = function() {
-      console.log(this.protocol.protocol.stages[0].stage);
       return this.protocol.protocol.stages[0].stage.steps[0].step;
     };
 

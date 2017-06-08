@@ -18,6 +18,7 @@
 //
 
 #include <iostream>
+#include <limits>
 
 #include "pcrincludes.h"
 #include "ltc2444.h"
@@ -69,21 +70,25 @@ int32_t LTC2444::readADC(uint8_t ch, bool SGL, bool lowerChannelPositive, Oversa
 
     spiPort_.readBytes(dataIn, dataOut, 4, kADCSPIFrequencyHz);
 
-    if (((dataIn[0] >> 5) & (dataIn[0] >> 4) & 1) || !((dataIn[0] >> 5) | (dataIn[0] >> 4) | 0) )
-    {
-        conversion = 0; //undervoltage or overvoltage
+    if ((dataIn[0] >> 5) & (dataIn[0] >> 4) & 1) {
+        //APP_LOGGER << "LTC2444::readADC - overvoltage occured" << std::endl;
 
-        APP_LOGGER << "LTC2444::readADC - undervoltage or overvoltage occured" << std::endl;
+        conversion = std::numeric_limits<int32_t>::max();
     }
-    else{
+    else if (!((dataIn[0] >> 5) | (dataIn[0] >> 4) | 0)) {
+        //APP_LOGGER << "LTC2444::readADC - undervoltage occured" << std::endl;
+
+        conversion = std::numeric_limits<int32_t>::min();
+    }
+    else {
         // convert to little endian and get only ADC result (bit28 down to bit 5)
         uint32_t sign_extend=0x00000000;
         if ((dataIn[0]>>4) & 1){ //if MSB of the LTC2444 data is 1, extend the sign
-        	sign_extend=0xFF000000;
+            sign_extend=0xFF000000;
         }
         conversion = sign_extend | (((((uint32_t)dataIn[0])<<24|((uint32_t)dataIn[1])<<16|((uint32_t)dataIn[2])<<8|dataIn[3])&0x1FFFFFE0)>>5);
-    	
     }
+
     return conversion;
 }
 

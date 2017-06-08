@@ -23,6 +23,10 @@ private
      params.require(:experiment).permit(:name)
   end
   
+  def amplification_option_params
+    params.require(:amplification_option).permit(*AmplificationOption::ACCESSIBLE_ATTRS)
+  end
+  
   def protocol_params
     params.require(:protocol).permit(*Protocol::ACCESSIBLE_ATTRS)
   end

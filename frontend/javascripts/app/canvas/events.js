@@ -70,9 +70,16 @@ angular.module("canvasApp").factory('events', [
       // Methods
       this.setSummaryMode = function() {
 
+        //if(C.editStageStatus === true) {
+          //angular.element('#edit-stage').click();
+        //}
+
         $scope.$apply(function() {
           $scope.summaryMode = true;
         });
+
+
+
         var circle = previouslySelected.circle;
         circle.parent.unSelectStep();
         circle.parent.parentStage.unSelectStage();
@@ -111,19 +118,32 @@ angular.module("canvasApp").factory('events', [
 
       };
 
-      this.calculateMoveLimit = function(moveElement) {
+      this.calculateMoveLimitforStage = function() {
+
+        var lastStage = C.allStageViews[C.allStageViews.length - 1];
+        var lastStep = C.allStepViews[C.allStepViews.length - 1];
+        console.log("here");
+      };
+
+      this.calculateMoveLimit = function(moveElement, stage) {
 
         var lastStep = C.allStepViews[C.allStepViews.length - 1];
-
+        var lastStage = C.allStageViews[C.allStageViews.length - 1];
+        if(stage.index === lastStage.index) {
+          C.moveLimit = stage.previousStage.left + stage.previousStage.myWidth;
+          return;
+        }
         if(lastStep.circle.holdTime.text === "∞") {
           if(moveElement === "step") {
             C.moveLimit = ((lastStep.left + 3) - 120);
+            return;
           } else if(moveElement === "stage") {
-            C.moveLimit = ((lastStep.parentStage.left + 3) - 120);
+            C.moveLimit = ((lastStage.left) - 40);
+            return;
           }
         }
 
-         C.moveLimit = lastStep.left + 3;
+         C.moveLimit = lastStep.left + 120;
       };
 
       this.footerMouseOver = function(indicate, me, moveElement) {
@@ -156,6 +176,13 @@ angular.module("canvasApp").factory('events', [
       this.canvas.on("imagesLoaded", function() {
         C.addStages().setDefaultWidthHeight();
         circleManager.addRampLinesAndCircles();
+        
+        if(!C.$scope.protocol.id && !C.$scope.fabricStep) {
+          // This is for test to work right, when working with fake data
+          C.$scope.$watch = function() {
+            return true;
+          };
+        }
         C.selectStep();
         C.canvas.renderAll();
       });

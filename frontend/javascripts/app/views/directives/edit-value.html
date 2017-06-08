@@ -17,8 +17,19 @@
     limitations under the License.
 -->
 <div class="bottom-common-item" ng-class="{disabled: !delta, notDisabled: !delta}">
-  <div class="caption-part B1">{{caption}}</div>
-  <div class="data-part H3"><span class="data-part-span" ng-show="!edit" ng-click="editAndFocus('data-part-edit-value')">{{shown}}&nbsp;{{unit}}</span>
-    <input on-enter="edit = false" ng-show="edit" ng-blur="save()" ng-model="hidden" class="data-part-edit-value" min="0" max="100"  type="text" value="{{hidden}}">
+  <div class="caption-part B1"><div class="lift-for-help">{{caption}}</div></div>
+  <div class="help-part">{{helpText}}</div>
+  <div class="data-part H3">
+    <input
+      class="input-data-part"
+      ng-show="pause"
+      ng-readonly="!delta"
+      on-enter="save()"
+      ng-blur="save()"
+      ng-click="editAndFocus()"
+      ng-model="shown"
+      ng-class="{'data-part-edit-value-ramp': ramp,'data-part-edit-value': unit&&!ramp, 'data-part-edit-value-no-unit': !unit}"
+      min="0" max="100"  type="text" value="{{shown}}">
+    <div ng-if="unit" ng-class="{'unit-display': temp, 'unit-display-ramp': ramp}">{{unit}}</div>
   </div>
 </div>

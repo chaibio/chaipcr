@@ -27,6 +27,10 @@ window.ChaiBioTech.ngApp.filter('truncate', [
         return '';
       }
 
+			if(value.length <= length){
+				return value;
+			}
+
       if(value.MAX_VALUE <= 32) {
         return value;
       }

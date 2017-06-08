@@ -20,7 +20,8 @@
 angular.module("canvasApp").service('stepEvents',[
   'stageGraphics',
   'stepGraphics',
-  function(stageGraphics, stepGraphics) {
+  'TimeService',
+  function(stageGraphics, stepGraphics, TimeService) {
 
     var that = this;
     this.changeDeltaText = function($scope) {
@@ -53,6 +54,7 @@ angular.module("canvasApp").service('stepEvents',[
       $scope.$watch('step.name', function(newVal, oldVal) {
 
         var step = $scope.fabricStep;
+
         if(step.model.name) {
           step.stepName.text = (step.model.name).charAt(0).toUpperCase() + (step.model.name).slice(1).toLowerCase();
         } else {
@@ -66,9 +68,15 @@ angular.module("canvasApp").service('stepEvents',[
       $scope.$watch('step.hold_time', function(newVal, oldVal) {
 
         var circle = $scope.fabricStep.circle;
-        circle.changeHoldTime();
+
+        var val = TimeService.newTimeFormatting(newVal);
+        circle.changeHoldTime(val);
         //Check the last step. See if the last step has zero and put infinity in that case.
-        C.allCircles[C.allCircles.length - 1].doThingsForLast();
+        //C.allCircles[C.allCircles.length - 1].doThingsForLast();
+        if($scope.fabricStep.index === C.allStepViews[C.allStepViews.length - 1].index) {
+          C.allStepViews[C.allStepViews.length - 1].circle.doThingsForLast(newVal, oldVal);
+        }
+
         canvas.renderAll();
       });
 
@@ -83,7 +91,7 @@ angular.module("canvasApp").service('stepEvents',[
 
       $scope.$watch('step.ramp.collect_data', function(newVal, oldVal) {
 
-        if( $scope.fabricStep.index !== 0 || $scope.fabricStep.parentStage.index !== 0) {
+        if($scope.fabricStep.index !== 0 || $scope.fabricStep.parentStage.index !== 0) {
           //if its not the very first step
           var circle = $scope.fabricStep.circle;
           circle.gatherDataDuringRampGroup.setVisible(newVal);

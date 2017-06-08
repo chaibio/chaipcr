@@ -20,8 +20,9 @@
 angular.module("canvasApp").factory('stepHoldTime', [
   'editMode',
   'ExperimentLoader',
+  'TimeService',
   'alerts',
-  function(editMode, ExperimentLoader, alerts) {
+  function(editMode, ExperimentLoader, TimeService, alerts) {
     return function(model, parent, $scope) {
 
       this.model = model;
@@ -31,12 +32,12 @@ angular.module("canvasApp").factory('stepHoldTime', [
 
       this.formatHoldTime = function() {
 
-        var holdTimeHour = Math.floor(this.holdTime / 60);
+        /*var holdTimeHour = Math.floor(this.holdTime / 60);
         var holdTimeMinute = (this.holdTime % 60);
 
-        holdTimeMinute = (holdTimeMinute < 10) ? "0" + holdTimeMinute : holdTimeMinute;
+        holdTimeMinute = (holdTimeMinute < 10) ? "0" + holdTimeMinute : holdTimeMinute;*/
 
-        return holdTimeHour + ":" + holdTimeMinute;
+        return TimeService.newTimeFormatting(this.model.hold_time);
       };
 
       this.render = function() {
@@ -46,12 +47,17 @@ angular.module("canvasApp").factory('stepHoldTime', [
         this.text = new fabric.IText(this.formatHoldTime(), {
           fill: 'black',
           fontSize: 20,
-          top : this.parent.top + 10,
-          left: this.parent.left + 40,
+          top : 0,
+          left: 60,
+          originX: "left",
+          originY: "top",
           fontFamily: "dinot",
           selectable: false,
           hasBorder: false,
-          type: "holdTimeDisplay"
+          editingBorderColor: '#FFB300',
+          type: "holdTimeDisplay",
+          name: "holdTimeDisplayText",
+          visible: ! this.model.pause
         });
       };
 
@@ -75,22 +81,51 @@ angular.module("canvasApp").factory('stepHoldTime', [
         }
       });
 
+      this.ifLastStep = function(step) {
+        return step.parentStage.nextStage === null && step.nextStep === null;
+      };
+
       this.postEdit = function() {
         // There is some issues for, saving new hold_time for infinite hold, make sure uts corrected when new design comes.
         editMode.holdActive = false;
         editMode.currentActiveHold = null;
-        
-        $scope.step.hold_time = $scope.convertToMinute(this.text.text) || $scope.step.hold_time;
+        var previousHoldTime = Number($scope.step.hold_time);
+        var newHoldTime = Number(TimeService.convertToSeconds(this.text.text));
 
-        if($scope.step.hold_time !== 0) { // If its zero server returns error , but make an exception for last step
+
+        if(! isNaN(newHoldTime) && (newHoldTime !== previousHoldTime)) { //Should unify this with step-hold-time-directives
+          if(newHoldTime < 0) {
+            alerts.showMessage(alerts.noNegativeHold, $scope);
+          } else if(newHoldTime === 0) {
+            if(this.ifLastStep(parent.parent) && ! $scope.step.collect_data) {
+              $scope.step.hold_time = newHoldTime;
+              ExperimentLoader.changeHoldDuration($scope).then(function(data) {
+                console.log("saved", data);
+              });
+            } else {
+              alerts.showMessage(alerts.holdDurationZeroWarning, $scope);
+            }
+          } else {
+            $scope.step.hold_time = newHoldTime;
+            ExperimentLoader.changeHoldDuration($scope).then(function(data) {
+              console.log("saved", data);
+            });
+          }
+        }
+
+        /*if($scope.step.hold_time !== 0) { // If its zero server returns error , but make an exception for last step
           ExperimentLoader.changeHoldDuration($scope).then(function(data) {
             console.log("saved", data);
           });
-        }
+        }*/
 
         parent.model.hold_time = $scope.step.hold_time;
         parent.createNewStepDataGroup();
+        if(this.ifLastStep(parent.parent)) {
+          parent.doThingsForLast(newHoldTime, previousHoldTime);
+        }
         parent.canvas.renderAll();
+
       };
 
       return this.text;

@@ -22,12 +22,15 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <ctime>
 
 namespace NetworkInterfaces
 {
     class InterfaceSettings
     {
     public:
+        InterfaceSettings(): autoConnect(true) {}
+
         inline bool isEmpty() const noexcept { return interface.empty(); }
 
         std::string toString() const;
@@ -35,6 +38,7 @@ namespace NetworkInterfaces
     public:
         std::string interface;
         std::string type;
+        bool autoConnect;
 
         std::map<std::string, std::string> arguments;
     };
@@ -60,11 +64,8 @@ namespace NetworkInterfaces
         bool addressState;
     };
 
-    typedef std::map<std::string, NetworkInterfaces::InterfaceSettings> InterfaceSettingsMap;
-
     std::vector<std::string> getAllInterfaces();
 
-    InterfaceSettingsMap readInterfaceSettings(const std::string &filePath);
     InterfaceSettings readInterfaceSettings(const std::string &filePath, const std::string &interfaceName);
 
     void writeInterfaceSettings(const std::string &filePath, const InterfaceSettings &interface);
@@ -74,7 +75,11 @@ namespace NetworkInterfaces
 
     InterfaceState getInterfaceState(const std::string &interfaceName);
 
-    void removeLease(const std::string &interfaceName);
+    void removeLeases(const std::string &interfaceName);
+
+    std::time_t dhcpTimeout();
+
+    std::string findWifiInterface();
 }
 
 #endif // NETWORKCONFIGURATOR_H

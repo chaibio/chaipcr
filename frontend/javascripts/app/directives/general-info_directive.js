@@ -35,7 +35,6 @@ window.ChaiBioTech.ngApp.directive('general', [
 
       link: function(scope, elem, attr) {
 
-
         scope.stepNameShow = false;
         scope.stageNoCycleShow = false;
         scope.popUp = false;
@@ -49,6 +48,20 @@ window.ChaiBioTech.ngApp.directive('general', [
           scope.delta_state = (scope.stage.auto_delta) ? "ON" : "OFF";
           scope.$watch('popUp', function(newVal) {
             popupStatus.popupStatusGatherData = scope.popUp;
+          });
+
+          scope.$watch('step.id', function(new_id) {
+
+            if(scope.fabricStep) {
+              $rootScope.$broadcast("event:step-selection-changed");
+              /*if(scope.fabricStep.previousStep === null && scope.fabricStep.parentStage.previousStage === null) {
+                $rootScope.$broadcast("event:first-step-selected");
+              }
+
+              if(scope.fabricStep.nextStep === null && scope.fabricStep.parentStage.nextStage === null) {
+                $rootScope.$broadcast("event:last-step-selected");
+              }*/
+            }
           });
 
           scope.$watch('stage.stage_type', function(newVal, oldVal) {
@@ -106,8 +119,8 @@ window.ChaiBioTech.ngApp.directive('general', [
               });
               scope.cycleNoBackup = scope.stage.num_cycles;
             } else {
-              var warningMessage = alerts.noOfCyclesWarning;
-              scope.showMessage(warningMessage);
+
+              alerts.showMessage(alerts.noOfCyclesWarning, scope);
               scope.stage.num_cycles = scope.cycleNoBackup;
             }
 
@@ -125,8 +138,8 @@ window.ChaiBioTech.ngApp.directive('general', [
               console.log("Happy happy ---- Just testing ____-------______");
             });
           } else {
-            var warningMessage = alerts.autoDeltaOnWrongStage;
-            scope.showMessage(warningMessage);
+            // This part is no longer used as we dont show change auto delta for non cyclic stages.
+            alerts.showMessage(alerts.autoDeltaOnWrongStage, scope);
           }
         };
 

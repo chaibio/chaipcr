@@ -1,4 +1,5 @@
 require 'rspec/expectations'
+require 'csv'
 
 RSpec::Matchers.define :be_same_step_as do |expected|
   match do |actual|
@@ -42,8 +43,8 @@ module FactoryHelper
   end
   
   def create_experiment(name)
-    experiment = Experiment.new
-    experiment.experiment_definition = ExperimentDefinition.new(:name=>name, :experiment_type=>ExperimentDefinition::TYPE_USER_DEFINED)
+    experiment = Experiment.new(:name=>name)
+    experiment.experiment_definition = ExperimentDefinition.new(:experiment_type=>ExperimentDefinition::TYPE_USER_DEFINED)
     experiment.save
     experiment
   end
@@ -51,6 +52,10 @@ module FactoryHelper
   def run_experiment(experiment)
     experiment.calibration_id = 1
     experiment.started_at = 10.seconds.ago
+    experiment.save
+  end
+  
+  def finish_experiment(experiment)
     experiment.completed_at = Time.new
     experiment.save
   end
@@ -77,15 +82,54 @@ module FactoryHelper
     User.create(:name=>"test2", :email=>"test2@test.com", :password=>"changeme", :password_confirmation=>"changeme")
   end
   
-  def create_fluorescence_data(experiment)
-    FluorescenceDatum.create(:step_id=>1, :well_num=>0, :cycle_num=>1, :experiment_id=>experiment.id, :fluorescence_value=>50)
-    FluorescenceDatum.create(:step_id=>2, :well_num=>0, :cycle_num=>1, :experiment_id=>experiment.id, :fluorescence_value=>100)
-    FluorescenceDatum.create(:step_id=>1, :well_num=>1, :cycle_num=>2, :experiment_id=>experiment.id, :fluorescence_value=>10)
-    FluorescenceDatum.create(:step_id=>2, :well_num=>1, :cycle_num=>2, :experiment_id=>experiment.id, :fluorescence_value=>20)
-    FluorescenceDatum.create(:step_id=>1, :well_num=>1, :cycle_num=>1, :experiment_id=>experiment.id, :fluorescence_value=>30)
-    FluorescenceDatum.create(:step_id=>1, :well_num=>0, :cycle_num=>2, :experiment_id=>experiment.id, :fluorescence_value=>20)
-    FluorescenceDatum.create(:step_id=>2, :well_num=>0, :cycle_num=>2, :experiment_id=>experiment.id, :fluorescence_value=>40)
-    FluorescenceDatum.create(:step_id=>2, :well_num=>1, :cycle_num=>1, :experiment_id=>experiment.id, :fluorescence_value=>70)
+  def create_experiment_for_data_analysis(name)
+    params = { experiment: {name: name, protocol: {lid_temperature:110, stages:[
+                      {stage:{stage_type:Stage::TYPE_HOLD,steps:[{step:{temperature:95,hold_time:120}}]}},
+                      {stage:{stage_type:Stage::TYPE_CYCLE,num_cycles:45,steps:[{step:{temperature:95,hold_time:15}},{step:{temperature:60,hold_time:60,collect_data:1}}]}},
+                      {stage:{stage_type:Stage::TYPE_MELTCURVE}}
+                      ]}} }
+    post "/experiments", params.to_json, {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }
+    expect(response).to be_success            # test for the 200 status-code
+    json = JSON.parse(response.body)
+    return Experiment.find_by_id(json["experiment"]["id"])
+  end
+  
+  def create_fluorescence_data(experiment, num_rows=0, start_row=0)
+    first_stage_collect_data = Stage.collect_data(experiment.experiment_definition_id).first
+    step = Step.collect_data(first_stage_collect_data.id).first
+    rows = 0
+    CSV.foreach("spec/fixtures/amplification.csv") do |row|
+      if rows > start_row
+        FluorescenceDatum.create(:channel=>row[3], :well_num=>row[4].to_i-1, :cycle_num=>row[5], :fluorescence_value=>row[2], :experiment_id=>experiment.id, :step_id=>step.id)
+      end
+      rows += 1
+      break if (num_rows > 0 && rows > num_rows+start_row)
+    end
+  end
+  
+  def create_amplification_and_cq_data(experiment, num_rows=0, start_row=0)
+    first_stage_collect_data = Stage.collect_data(experiment.experiment_definition_id).first
+    step = Step.collect_data(first_stage_collect_data.id).first
+    rows = 0
+    CSV.foreach("spec/fixtures/amplification.csv") do |row|
+      if rows > start_row
+        AmplificationDatum.create(:channel=>row[3], :well_num=>row[4], :cycle_num=>row[5], :baseline_subtracted_value=>row[0], :background_subtracted_value=>row[1], :experiment_id=>experiment.id, :sub_id=>step.id, :sub_type=>"step", :stage_id=>first_stage_collect_data.id)
+      end
+      rows += 1
+      break if (num_rows > 0 && rows > num_rows+start_row)
+    end
+    
+    if start_row == 0
+      rows = 0
+      CSV.foreach("spec/fixtures/cq.csv") do |row|
+        if rows > 0
+          AmplificationCurve.create(:channel=>row[0], :well_num=>row[1], :ct=>row[2], :experiment_id=>experiment.id, :stage_id=>first_stage_collect_data.id)
+        end
+        rows += 1
+      end
+    end
+    
+    [first_stage_collect_data, step]
   end
   
 end

@@ -71,8 +71,65 @@ mount_sdcard_partitions () {
 	mount ${sdcard_dev}p2 ${sdcard_p2} -t ext4 || true
 }
 
+boot_from_sdcard () {
+        echo force booting from sdcard
+        if [ -e /mnt/uEnv.sdcard.txt ] && [ -e /mnt/uEnv.txt ]
+        then
+                cp /mnt/uEnv.sdcard.txt /mnt/uEnv.txt
+		sync
+        fi
+}
+
+remove_upgrade_flags ()
+{
+	if [ -e ${sdcard_p1}/pack_resume_autorun.flag ]
+	then
+        	rm ${sdcard_p1}/pack_resume_autorun.flag || true
+	fi
+
+	if [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
+	then
+        	rm ${sdcard_p1}/unpack_resume_autorun.flag || true
+	fi
+
+	if [ -e ${sdcard_p2}/pack_resume_autorun.flag ]
+	then
+        	rm ${sdcard_p2}/pack_resume_autorun.flag || true
+	fi
+
+	if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ]
+	then
+        	rm ${sdcard_p2}/unpack_resume_autorun.flag || true
+	fi
+}
+
+counter=2
+echo 1000 > /proc/sys/kernel/hung_task_timeout_secs
+mount_sdcard_partitions
+cat /proc/cmdline | grep s2pressed=1 > /dev/null
+s2pressed=$?
+if [ $s2pressed -eq 0 ]
+then
+        echo "Boot button pressed"
+	remove_upgrade_flags
+	boot_from_sdcard
+else
+        echo "Boot button not pressed"
+fi
+
+isUpgrade () {
+	if [ $s2pressed -ne 0 ] && ( [ -e ${sdcard_p1}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] )
+	then
+		return 0
+	else
+		return 1
+	fi
+}
+
 rebootx () {
-	#try to call rebootx from the upgrade partition first.
+	echo "reboot"
+
+	# try to call rebootx from the upgrade partition first.
 	if [ ! -e ${sdcard_p2}/scripts/rebootx.sh ]
         then
                 mount ${sdcard_dev}p2 ${sdcard_p2} || true
@@ -110,6 +167,18 @@ flush_cache_mounted () {
 }
 
 alldone () {
+	echo "Closing.. exit."
+   	if [ -e ${sdcard_p2}/backup_perm.gz ]
+    	then
+		rm ${sdcard_p2}/backup_perm.gz
+    	fi
+    	if [ -e ${sdcard_p2}/backup_data.gz ]
+    	then
+		rm ${sdcard_p2}/backup_data.gz
+    	fi
+	umount ${sdcard_p1} > /dev/null || true
+	umount ${sdcard_p2} > /dev/null || true
+
 	if [ -e /sys/class/leds/beaglebone\:green\:usr0/trigger ] ; then
 		echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 		echo default-on > /sys/class/leds/beaglebone\:green\:usr1/trigger
@@ -118,7 +187,6 @@ alldone () {
 	fi
 
 	echo "Done!"
-
 	echo "Rebooting..."
 	sync
 
@@ -140,6 +208,10 @@ write_pt_image () {
 	image_filename_pt="$image_filename_prfx-pt.img.gz"
 
 	image_filename_upgrade="${sdcard_p1}/factory_settings.img.tar"
+	if isUpgrade
+	then
+		image_filename_upgrade="${sdcard_p2}/upgrade.img.tar"
+	fi
 
 	echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
         tar xOf $image_filename_upgrade $image_filename_pt | gunzip -c | dd of=${eMMC} bs=16M
@@ -171,6 +243,10 @@ format_perm () {
         image_filename_pt="$image_filename_prfx-pt.img.gz"
 
         image_filename_upgrade="${sdcard_p1}/factory_settings.img.tar"
+	if isUpgrade
+	then
+		image_filename_upgrade="${sdcard_p2}/upgrade.img.tar"
+	fi
 
         echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
         tar xOf $image_filename_upgrade $image_filename_perm | gunzip -c | dd of=${eMMC}p4 bs=16M
@@ -178,6 +254,32 @@ format_perm () {
         flush_cache_mounted
         echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
         echo "Done writing empty /perm partition!"
+}
+
+format_data () {
+        echo "Writing data partition formatting image!"
+        echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+        
+	tar xOf $image_filename_upgrade format-data.img.gz | gunzip -c | dd of=${eMMC}p3 bs=16M
+        flush_cache_mounted
+        echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+        echo "Done writing data partition formatting image!"
+}
+
+write_data_fs_image () {
+        echo "Writing data partition image!"
+	image_filename_prfx="upgrade"
+	image_filename_data="$image_filename_prfx-data.img.gz"
+	image_filename_fs="${sdcard_p1}/factory_settings.img.tar"
+
+        echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+        tar xOf $image_filename_fs $image_filename_data | gunzip -c | dd of=${eMMC}p3 bs=16M
+	flush_cache_mounted
+        echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
+        echo "Done writing data partition image!"
+
+#3exit 0
+
 }
 
 partition_drive () {
@@ -194,29 +296,29 @@ partition_drive () {
 	flush_cache
 }
 
-update_uenv () {                                                        
-# first param =2 in case of upgrade.. =1 for factory settings.                               
+update_uenv () {
+	# first param =2 in case of upgrade.. =1 for factory settings.
         echo resetting coupling uEng.txt
-        if [ ! -e /tmp/emmcboot ]                                                
-        then                                                                     
-              mkdir -p /tmp/emmcboot                                             
+        if [ ! -e /tmp/emmcboot ]
+        then
+              mkdir -p /tmp/emmcboot
         fi
 	sync
 	if mount | grep /tmp/emmcboot
 	then
 		echo /tmp/emmcboot already mounted!
 	else
-	        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true                            
+	        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
 	fi
-                           
-	echo resetting to boot switch dependant uEnv                       
-        cp /sdcard/p1/uEnv.txt /tmp/emmcboot/ || true                            
-        cp /mnt/uEnv.72check.txt /mnt/uEnv.txt || true                
-        cp /sdcard/p1/uEnv.72check.txt /sdcard/p1/uEnv.txt || true                
-        cp /tmp/emmcboot/uEnv.72check.txt /tmp/emmcboot/uEnv.txt || true                            
 
-        if [ $1 -eq 2 ]                                             
-        then                                                                                     
+	echo resetting to boot switch dependant uEnv
+        cp /sdcard/p1/uEnv.txt /tmp/emmcboot/ || true
+        cp /mnt/uEnv.72check.txt /mnt/uEnv.txt || true
+        cp /sdcard/p1/uEnv.72check.txt /sdcard/p1/uEnv.txt || true
+        cp /tmp/emmcboot/uEnv.72check.txt /tmp/emmcboot/uEnv.txt || true
+
+        if [ $1 -eq 2 ]
+        then
                 if [ -e /sdcard/p2/scripts/replace_uEnv.txt.sh ]
                 then
 			echo running upgrade version of replace_uEnv.txt.sh
@@ -224,20 +326,20 @@ update_uenv () {
                 else
 			echo running factory settings version of replace_uEnv.txt.sh while performing upgrade.
                         sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
-                fi                                                                     
-        else                                                                           
+                fi
+        else
 		echo running factory settings version of replace_uEnv.txt.sh
-                sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true        
-        fi                                                                             
+                sh /sdcard/p1/scripts/replace_uEnv.txt.sh /tmp/emmcboot || true
+        fi
 
-        sync                                                                                     
-        sleep 5                                                                                  
+        sync
+        sleep 5
 	if mount | grep /tmp/emmcboot
 	then
-	        umount /tmp/emmcboot || true                                                   
+	        umount /tmp/emmcboot || true
 		rm -r /tmp/emmcboot || true
 	fi
-}                                                                                      
+}
 
 reset_uenv () {
 	echo "resetting uEnv!"
@@ -249,12 +351,11 @@ reset_uenv () {
 	        mkdir -p /tmp/emmcboot
 	fi
 
-#        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
 	if mount | grep /tmp/emmcboot
 	then
 		echo /tmp/emmcboot already mounted!
 	else
-	        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true                            
+	        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
 	fi
 
 	cp /tmp/emmcboot/uEnv.72check.txt /tmp/emmcboot/uEnv.txt || true
@@ -263,7 +364,7 @@ reset_uenv () {
 
 	if mount | grep /tmp/emmcboot
 	then
-	        umount /tmp/emmcboot || true                                                   
+	        umount /tmp/emmcboot || true
 		rm -r /tmp/emmcboot || true
 	fi
 	echo "Done returning to gpio 72 check version"
@@ -281,7 +382,6 @@ files_verification () {
 			echo updating uEnv done.
 			break
 		fi
-	
 		sleep 10
 		umount ${sdcard_p1} > /dev/null || true
 		umount ${sdcard_p2} > /dev/null || true
@@ -305,9 +405,9 @@ reset_update_uenv_with_verification () {
         file1=/tmp/emmcboot/uEnv.txt
         file2=/tmp/emmcboot/uEnv.72check.txt
 
-        if [ ! -e /tmp/emmcboot ]                                                
-        then                                                                     
-              mkdir -p /tmp/emmcboot                                             
+        if [ ! -e /tmp/emmcboot ]
+        then
+              mkdir -p /tmp/emmcboot
         fi
 	sync
 
@@ -315,45 +415,20 @@ reset_update_uenv_with_verification () {
 	then
 		echo /tmp/emmcboot already mounted!
 	else
-	        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true                            
+	        mount ${eMMC}p1 /tmp/emmcboot -t vfat || true
 	fi
 
 	files_verification $1
 
 	if mount | grep /tmp/emmcboot
 	then
-	        umount /tmp/emmcboot || true                                                   
+	        umount /tmp/emmcboot || true
 		rm -r /tmp/emmcboot || true
 	fi
 }
 
-stop_packing_restarting ()
-{
-	reset_uenv
-
-	if [ -e ${sdcard_p1}/pack_resume_autorun.flag ]
-	then
-        	rm ${sdcard_p1}/pack_resume_autorun.flag || true
-	fi
-
-	if [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
-	then
-        	rm ${sdcard_p1}/unpack_resume_autorun.flag || true
-	fi
-
-	if [ -e ${sdcard_p2}/pack_resume_autorun.flag ]
-	then
-        	rm ${sdcard_p2}/pack_resume_autorun.flag || true
-	fi
-
-	if [ -e ${sdcard_p2}/unpack_resume_autorun.flag ]
-	then
-        	rm ${sdcard_p2}/unpack_resume_autorun.flag || true
-	fi
-}
-
-incriment_restart_counter () {
-	# Incriment and display restart counter
+increment_restart_counter () {
+	# Increment and display restart counter
 	counter_file=${sdcard_p2}/restart_counter.ini
 	counter_old=$(cat ${counter_file})
 	counter=$((counter_old+1))
@@ -361,35 +436,92 @@ incriment_restart_counter () {
 	echo "Restart counter: $counter"
 }
 
-mount_sdcard_partitions
-
-cat /proc/cmdline | grep s2pressed=1 > /dev/null
-s2pressed=$?
-if [ $s2pressed -eq 0 ]
-then
-        echo "Boot button pressed"
-else
-        echo "Boot button not pressed"
-fi
-
-counter=2
-if [ $s2pressed -ne 0 ] && ( [ -e ${sdcard_p1}/unpack_resume_autorun.flag ] || [ -e ${sdcard_p2}/unpack_resume_autorun.flag ] )
-then
-        echo "Resume eMMC unpacking flag found up"
-        incriment_restart_counter
-
-# was limited to 7 trails only.. if [ "$counter" -ge 7 ]
-	if false
+perform_data_restore () {
+	echo Checking for backuped partitions
+        if [ -e ${sdcard_p2}/backup_perm.gz ]
         then
-                echo Restart counter exceeded 7.. quitting upgrade operation
-                stop_packing_restarting
-                echo Rebooting
-                rebootx
-		exit 0
+        	echo Backup found from a previous run. Restoring...
+		mkdir -p /tmp/p4 || true
+                if mount ${eMMC}p4 /tmp/p4
+                then
+                	echo Restoring /perm partition contents.
+                        tar xfv ${sdcard_p2}/backup_perm.gz -C /tmp/p4/
+                        umount /tmp/p4
+                else
+               		echo Error mounting /perm partition to restore.
+                fi
+                sync
+	else
+        	echo No /perm contents backup found.
+	fi
+        if [ -e ${sdcard_p2}/backup_data.gz ]
+        then
+        	echo Backup found for /data partition. Restoring...
+		mkdir -p /tmp/p3 || true
+                if mount ${eMMC}p3 /tmp/p3
+                then
+                	echo Restoring /perm partition contents.
+			cd /tmp/p3
+			rm -r * || true
+			cd ~
+                        tar xfv ${sdcard_p2}/backup_data.gz -C /tmp/p3/
+			sync
+                        umount /tmp/p3
+		else
+                	echo Error mounting /data partition to restore.
+		fi
+                sync
+       	else
+       		echo No /data backup found.
+	fi
+}
+
+backup_data () {
+    	if [ -e ${sdcard_p2}/backup_data.gz ]
+        then
+                echo Backup found from a previous run.
+        else
+                mkdir -p /tmp/p3 || true
+                if mount ${eMMC}p3 /tmp/p3
+                then
+                        echo Saving /data partition contents.
+                        cd /tmp/p3
+                        tar cfv ${sdcard_p2}/backup_data.gz *
+                        sync
+                        cd ~
+                        umount /tmp/p3 || true
+                else
+                        echo Error mounting /data parition.
+                fi
+	fi
+}
+
+backup_perm () {
+    	if [ -e ${sdcard_p2}/backup_perm.gz ]
+        then
+                echo /perm backup found from a previous run.
+        else
+                mkdir -p /tmp/p4 || true
+                if mount ${eMMC}p4 /tmp/p4
+                then
+                        echo Saving /perm partition contents.
+                        cd /tmp/p4
+                        tar cfv ${sdcard_p2}/backup_perm.gz *
+                        sync
+                        cd ~
+                        umount /tmp/p4 || true
+                else
+                        echo Error mounting /perm parition.
+
+                fi
         fi
+}
+
+perform_upgrade () {
+        echo "Resume eMMC unpacking flag found up"
+        increment_restart_counter
 
         echo "Resuming eMMC unpacking"
-
 	if [ -e ${sdcard_p2}/scripts/unpack_latest_version.sh ]
 	then
 		sh ${sdcard_p2}/scripts/unpack_latest_version.sh noreboot $counter || true
@@ -404,15 +536,14 @@ then
                 rebootx
 		exit 0
         fi
+	perform_data_restore
 
-#        update_uenv 2
-reset_update_uenv_with_verification 2 
-       stop_packing_restarting
+	reset_update_uenv_with_verification 2
+       	remove_upgrade_flags
+	reset_uenv
         alldone
-        exit
-else
-	echo "Performing factory settings recovery.."
-fi
+        exit 0
+}
 
 isValidPermGeometry () {
 	echo "Testing ${eMMC}p4 validaty"
@@ -430,16 +561,104 @@ isValidPermGeometry () {
 		return 1
 	fi
 
-	echo partition starts at $start
-	if [ $start -eq 7649280 ]
-	then
-		echo "Partition geometery is compatible."
-		result=0
-	else
-		echo "Partition geometery is not compatible."
-		return 1
+        echo partition starts at $start
+        # allowing old factory settings images partitioning with or without format
+        if isUpgrade
+        then
+               echo Checking geometery for an upgrade case.
+        else
+               echo Checking geometery for a factory settings case.
 
+               fs_date=$( date +%Y%m%d -r ${sdcard_p1}/factory_settings.img.tar)
+               echo "Factory settings image date: $fs_date"
+               # factory settings file is older than 3-3-2017
+                if [ $fs_date -lt 20170303 ]
+                then
+                        echo Old factory settings image found.
+
+                        if [ $start -eq 7649280 ]
+                        then
+                                echo "Old partition geometery found with an old factory settings image"
+                                result=0
+
+                                return 0
+                        else
+                                echo Old factory settings image with incompatible geometery. Partitioning needed.
+                                result=1
+
+                                return 1
+                        fi
+                else
+                        echo New factory settings image found. Must burn to the small eMMC size only.
+                fi
+        fi
+
+        if [ $start -eq 7452672 ]
+        then
+                echo "Partition geometery is compatible."
+                result=0
+        else
+                result=1
+        fi
+
+	return $result
+}
+
+isValidDataGeometry () {
+	echo "Testing ${eMMC}p3 validaty"
+	if [ ! -e ${eMMC}p3 ]
+	then
+		echo Device is not partitioned up to 4 partitions.
+		return 1
 	fi
+	result=1
+
+	start=$(hdparm -g ${eMMC}p3 | awk -F 'start =' '{print $2}')
+	if [ -z $start ]
+	then
+		echo No valid data partition geometry found.
+		return 1
+	fi
+
+        echo data partition starts at $start
+        # allowing old factory settings images partitioning with or without format
+        if isUpgrade
+        then
+               echo Checking /data geometery for an upgrade case.
+        else
+               echo Checking /data geometery for a factory settings case.
+
+               fs_date=$( date +%Y%m%d -r ${sdcard_p1}/factory_settings.img.tar)
+               echo "Factory settings image date: $fs_date"
+               # factory settings file is older than 3-3-2017
+                if [ $fs_date -lt 20170303 ]
+                then
+                        echo Old factory settings image found.
+
+                        if [ $start -eq 6600704 ]
+                        then
+                                echo "Old partition geometery found with an old factory settings image"
+                                result=0
+
+                                return 0
+                        else
+                                echo Old factory settings image with incompatible geometery. Partitioning needed.
+                                result=1
+
+                                return 1
+                        fi
+                else
+                        echo New factory settings image found. Must burn to the small eMMC size only.
+                fi
+        fi
+
+        if [ $start -eq 6404096 ]
+        then
+                echo "Data partition geometery is compatible."
+                result=0
+        else
+                result=1
+        fi
 
 	return $result
 }
@@ -471,12 +690,55 @@ isValidPermPartition () {
 	return $result
 }
 
+isValidDataPartition () {
+	isValidDataGeometry
+	if [ $? -eq 1 ]
+	then
+		echo "Invalid data partition geometery"
+		return 1
+	fi
+        result=1
+
+	if [ -e /tmp/data/.tmp/shadow.backup ] || [ -e /tmp/data/.tmp/dhclient.*.leases ]
+	then
+		result=0
+	else
+		echo factory settings data partition copying should format the partition.
+	fi	
+
+	mkdir /tmp/datacheck -p || true
+	mount ${eMMC}p3 /tmp/datacheck
+	if [ $? -eq 0 ]
+	then
+		echo "${eMMC}p3 mounted!"
+		echo "Test Test" >> /tmp/datacheck/write_test_data_partition.flag
+		if [ -e /tmp/datacheck/write_test_data_partition.flag ]
+		then
+			rm /tmp/datacheck/write_test_data_partition.flag || true
+			result=0
+		fi
+		umount /tmp/datacheck || true
+	fi
+	rm -r /tmp/datacheck || true
+
+	return $result
+}
+
 isValidPermPartition
 isValidPermResult=$?
 
-echo "Validity test result: $isValidPermResult"
-if [ $isValidPermResult -eq 1 ]
+isValidDataPartition
+isValidDataResult=$?
+
+echo "Validity test for /perm and /data partitions: $isValidPermResult and $isValidDataResul"
+if [ $isValidPermResult -eq 1 ] || [ $isValidDataResult -eq 1 ]
 then
+	backup_perm
+	if isUpgrade
+	then
+		backup_data
+	fi
+
         echo "Partitioning $eMMC"
 	partition_drive
 	sync
@@ -488,8 +750,30 @@ then
 	then
 		echo Partition geometery is now valid.. formatting...
 		format_perm
+	        if isUpgrade 
+        	then
+	               format_data
+		else
+			write_data_fs_image			
+	        fi
 	else
 		echo geometery still not valid for /perm partition.
+	fi
+
+	isValidDataGeometry
+	isValidGeoResult=$?
+	if [ $isValidGeoResult -eq 0 ]
+	then
+		echo Data partition geometery is now valid.. checking for the upgrade case..
+	        if isUpgrade 
+        	then
+			echo upgrade case.. formating data partition.
+	               	format_data
+		else	
+			write_data_fs_image
+        	fi
+	else
+		echo geometery still not valid for /data partition.
 	fi
 
 	isValidPermPartition
@@ -499,6 +783,7 @@ then
 	if [ $isValidPermResult -eq 0 ]
 	then
 		echo "Done partitioning $eMMC!"
+		perform_data_restore
 	else
 		echo "Cannot update partition table at  $eMMC! restarting!"
 		echo "Write Perm Partition 2" > ${sdcard_p2}/write_perm_partition.flag
@@ -507,8 +792,38 @@ then
 		rebootx
 		exit 0
 	fi
+
+	isValidDataPartition
+	isValidDataResult=$?
+
+	echo "Validity second test result: $isValidDataResult"
+	if [ $isValidDataResult -eq 0 ]
+	then
+		echo "Done partitioning $eMMC!"
+		perform_data_restore
+	else
+		echo "Cannot update data partition table at  $eMMC! restarting!"
+		echo "Write Data Partition 2" > ${sdcard_p2}/write_data_partition.flag
+		if isUpgrade
+		then
+			echo data partition formatting needed.
+		else
+
+			write_data_fs_image
+		fi
+		sync
+		rebootx
+		exit 0
+	fi
 else
 	echo "Device is partitioned"
+fi
+
+if isUpgrade
+then
+	perform_upgrade
+else
+	echo "Performing factory settings recovery.."
 fi
 
 echo "Restoring system from sdcard at $sdcard_dev to eMMC at $eMMC!"
@@ -516,7 +831,7 @@ sh ${sdcard_p1}/scripts/unpack_latest_version.sh factorysettings $counter || tru
 
 if [ -e "${eMMC}p4" ]
 then
-        echo "Perminant data partition found! bypassing repartitioning!"
+        echo "Permanent data partition found! Bypassing repartitioning!"
 else
 	echo "Repartitioning needed!"
         alldone
@@ -532,20 +847,26 @@ then
 	echo "Done formatting /perm partition"
 fi
 
-#update_uenv 1
+if [ -e ${sdcard_p1}/write_data_partition.flag ] || [ -e ${sdcard_p2}/write_data_partition.flag ]
+then
+	echo "eMMC Flasher: writing to /data partition (to format)"
+	format_data
+	rm ${sdcard_p1}/write_data_partition.flag > /dev/null 2>&1 || true
+	rm ${sdcard_p2}/write_data_partition.flag > /dev/null 2>&1 || true
+	echo "Done formatting /data partition"
+fi
+
+perform_data_restore
 reset_update_uenv_with_verification 1
 
-stop_packing_restarting
+remove_upgrade_flags
+reset_uenv
 echo "eMMC Flasher: all done!"
 sync
 
 sleep 5
 
-umount ${sdcard_p1} > /dev/null || true
-umount ${sdcard_p2} > /dev/null || true
-
 alldone
-
 rebootx
 
 exit 0

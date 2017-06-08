@@ -37,7 +37,6 @@ angular.module("canvasApp").factory('circle', [
   'previouslySelected',
   'pauseStepOnScrollGroup',
   'pauseStepCircleOnScroll',
-
   function(ExperimentLoader, $rootScope, Constants, circleGroup, outerMostCircle, outerCircle,
     centerCircle, littleCircleGroup, circleMaker, stepDataGroup, stepTemperature, stepHoldTime,
     gatherDataGroupOnScroll, gatherDataCircleOnScroll, gatherDataGroup, gatherDataCircle, previouslySelected,
@@ -78,6 +77,7 @@ angular.module("canvasApp").factory('circle', [
       };
 
       this.moveCircle = function() {
+        
         this.getLeft();
         this.getTop();
       };
@@ -87,7 +87,7 @@ angular.module("canvasApp").factory('circle', [
         this.getLeft();
         this.circleGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
         this.stepDataGroup.set({"left": this.left + (Constants.stepWidth / 2)}).setCoords();
-        //this.gatherDataDuringRampGroup.set({"left": this.left}).setCoords();
+        this.gatherDataDuringRampGroup.set({"left": this.left}).setCoords();
       };
 
       this.setCenter = function(imgObj) {
@@ -185,26 +185,37 @@ angular.module("canvasApp").factory('circle', [
         return this;
       };
 
-      this.doThingsForLast = function() {
+      this.doThingsForLast = function(newHold, oldHold) {
 
         var holdTimeText = this.parent.holdDuration || this.model.hold_time;
 
         if(parseInt(holdTimeText) === 0) {
           this.holdTime.text = "∞";
+          if(this.parent.parentStage.parent.editStageStatus === true && oldHold !== null){
+            var lastStage = this.parent.parentStage;
+            lastStage.dots.setVisible(false);
+            this.canvas.bringToFront(lastStage.dots);
+            this.parent.parentStage.parent.editModeStageChanges(this.parent.parentStage, -25, false);
+            this.canvas.renderAll();
+          }
+        } else {
+          if(oldHold !== null && parseInt(oldHold) === 0 && this.parent.parentStage.parent.editStageStatus === true) {
+            this.parent.parentStage.parent.editModeStageChanges(this.parent.parentStage, 25, true);
+          }
         }
       };
 
-      this.changeHoldTime = function() {
+      this.changeHoldTime = function(new_hold) {
 
-        var duration = Number(this.model.hold_time);
+        /*var duration = Number(this.model.hold_time);
         var holdTimeHour = Math.floor(duration / 60);
         var holdTimeMinute = (duration % 60);
 
         if(holdTimeMinute < 10) {
           holdTimeMinute = "0" + holdTimeMinute;
-        }
+        }*/
 
-        this.holdTime.text = holdTimeHour + ":" + holdTimeMinute;
+        this.holdTime.text = new_hold;
       };
 
       this.render = function() {
@@ -220,12 +231,12 @@ angular.module("canvasApp").factory('circle', [
                 this.littleCircle3 = new circleMaker(6)
               ]
             )
-          ], this);
+          ], this, $scope);
 
         this.stepDataGroup = new stepDataGroup([
             this.temperature = new stepTemperature(this.model, this, $scope),
             this.holdTime = new stepHoldTime(this.model, this, $scope)
-          ], this);
+          ], this, $scope);
 
       };
 
@@ -240,7 +251,7 @@ angular.module("canvasApp").factory('circle', [
         this.stepDataGroup = new stepDataGroup([
           this.temperature = new stepTemperature(this.model, this, $scope),
           this.holdTime = new stepHoldTime(this.model, this, $scope)
-          ], this);
+        ], this, $scope);
 
         this.canvas.add(this.stepDataGroup);
         this.canvas.renderAll();
@@ -388,19 +399,19 @@ angular.module("canvasApp").factory('circle', [
           dynamicTemp = 100 - ((targetCircleGroup.top - this.scrollTop) / this.scrollRatio2);
         }
 
-        dynamicTemp = Math.abs(dynamicTemp).toFixed(1);
+        dynamicTemp = (Math.abs(dynamicTemp) >= 100) ?  100 : Math.abs(dynamicTemp).toFixed(1);
         this.temperature.text = String(dynamicTemp + "º");
         this.model.temperature = String(dynamicTemp);
       };
 
       this.manageClick = function() {
-
+        //debugger;
         if(! this.big) {
           this.makeItBig();
           this.parent.parentStage.selectStage();
           this.parent.selectStep();
 
-          if(previouslySelected.circle) {
+          if(previouslySelected.circle && (previouslySelected.circle.model.id !== this.model.id)) {
             previouslySelected.circle.makeItSmall();
           }
 

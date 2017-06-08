@@ -37,7 +37,7 @@ for (data_fn in data_fns) load(data_fn)
 # num_wells <- 16
 
 scaling_factor_optic_calib <- 3.7 # used: 9e5, 1e5, 1.2e6, 3
-scaling_factors_deconv <- c('1'=1, '2'=5.6) # used: c('1'=1, '2'=1, 2, 3.5, 8, 7, 5.6)
+scaling_factors_deconv <- c('1'=1, '2'=4.2) # used: c('1'=1, '2'=1, 2, 3.5, 8, 7, 5.6, 4.2)
 
 
 # function: check object to be returned

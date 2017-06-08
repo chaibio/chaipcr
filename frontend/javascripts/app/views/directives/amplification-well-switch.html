@@ -19,21 +19,46 @@
 
 <div class="amplification-well-switch">
   <table class="on-off-buttons">
-    <tr>
+    <tr style="border-bottom:2px solid black">
       <td></td>
-      <td ng-repeat="i in loop" class="number B2" ng-bind="i+1"></td>
+      <td style="width: 12.5%" ng-repeat="i in loop" class="number B2" ng-bind="i+1"></td>
     </tr>
     <tr>
       <td class="number B2">A</td>
-      <td ng-repeat="i in loop">
+      <!--<td ng-repeat="i in loop">
         <amplification-circle-button ng-model="buttons['well_'+$index]"></amplification-circle-button>
+      </td> -->
+      <td colspan="8" rowspan="2" class="selectable-on-off-buttons">
+        <div class="selectable-container">
+          <ol id="selectableol" ng-class="{amplification: chartType === 'amplification', melt_curve: chartType === 'melt-curve'}">
+            <li id="box{{$index + 1}}" ng-repeat="i in loop" class="topEight" ng-class="{special_left: $index == 0, special_right: $index == 7}">
+              <amplification-circle-button ng-model="buttons['well_'+$index]"></amplification-circle-button>
+            </li>
+            <li id="box{{$index + 9}}" ng-repeat="i in loop" class="bottomEight" ng-class="{special_left: $index == 0, special_right: $index == 7}">
+              <amplification-circle-button ng-model="buttons['well_'+($index+8)]"></amplification-circle-button>
+            </li>
+          </ol>
+        </div>
+        <!--<table >
+          <tr>
+            <td class="ui-widget-content" ng-repeat="i in loop">
+              <amplification-circle-button ng-model="buttons['well_'+$index]"></amplification-circle-button>
+            </td>
+          </tr>
+          <td class="ui-widget-content" ng-repeat="i in loop">
+            <amplification-circle-button ng-model="buttons['well_'+($index+8)]"></amplification-circle-button>
+          </td>
+          <tr>
+          </tr>
+        </table> !-->
       </td>
+
     </tr>
     <tr>
       <td class="number B2">B</td>
-      <td ng-repeat="i in loop">
+      <!--<td ng-repeat="i in loop">
         <amplification-circle-button ng-model="buttons['well_'+($index+8)]"></amplification-circle-button>
-      </td>
+      </td> -->
     </tr>
   </table>
 </div>

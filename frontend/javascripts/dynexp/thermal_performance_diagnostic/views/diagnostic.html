@@ -1,0 +1,54 @@
+<div ng-controller="DiagnosticWizardCtrl">
+
+  <dynexp-wizard-header experiment-id="experiment.id" on-cancel="stopExperiment()" cancel-text="cancel diagnostic">
+    THERMAL PERFORMANCE DIAGNOSTIC
+  </dynexp-wizard-header>
+
+  <div class="content text-center" ng-if="!experiment">
+    Loading ... <img src="/images/loading.gif">
+  </div>
+
+  <!-- running -->
+  <div class="content" ng-if="experiment && experiment.started_at && !experiment.completed_at">
+    <div class="text-center">
+      <h2>Diagnostic in Progress</h2>
+      <p>Please do not touch or open device.</p>
+      <h1 ng-if="status === 'idle'">idle</h1>
+      <h1 ng-if="status === 'lid_heating'">Heating Lid</h1>
+      <h1 ng-if="status === 'paused'">Paused</h1>
+      <h1 ng-if="status === 'heating'">Heating</h1>
+      <h1 ng-if="status === 'holding'">Holding</h1>
+      <h1 ng-if="status === 'cooling'">Cooling</h1>
+      <p>Time Elapsed: {{elapsedTime | secondsDisplay: 'display2'}}</p>
+    </div>
+    <div class="row">
+      <div class="col-md-3 col-md-offset-2">
+        <rainbow-line-chart data="lidTemps" width="200" height="100" max-x="max_x" min-x="min_x"></rainbow-line-chart>
+        <p class="text-center temp-label">
+          <b>LID TEMP.</b> {{lid_temp | round:1 | degreeCelcius}}
+        </p>
+      </div>
+      <div class="col-md-3 col-md-offset-3">
+        <rainbow-line-chart data="blockTemps" width="200" height="100" max-x="max_x" min-x="min_x"></rainbow-line-chart>
+        <p class="text-center temp-label">
+          <b>BLOCK TEMP.</b> {{heat_block_temp | round:1 | degreeCelcius}}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- experiment complete -->
+  <div class="content" ng-include="'dynexp/thermal_performance_diagnostic/views/analyze.html'" ng-if="experiment && experiment.completed_at && experiment.completion_status === 'success'"></div>
+
+  <!-- experiment failed -->
+  <div class="content text-center" ng-show="experiment.completed_at && experiment.completion_status !== 'success'">
+    <h2 class="text-danger">Diagnostic Failed</h2>
+    <div class="alert alert-danger">
+      {{experiment.completion_message}}
+    </div>
+  </div>
+  <!-- dismiss button -->
+  <div ng-show="!!experiment.completed_at" class="text-center" style="padding: 70px 0;">
+    <a href="/#/settings/" class="button">CLOSE</a>
+  </div>
+</div>

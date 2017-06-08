@@ -55,12 +55,24 @@
           if (!config.ignoreAuthModule) {
             switch (rejection.status) {
               case 401:
-                var deferred = $q.defer();
-                httpBuffer.append(config, deferred);
+                //if(!Status.isUpdating()){
+                //var deferred = $q.defer();
+                //httpBuffer.append(config, deferred);
                 $rootScope.$broadcast('event:auth-loginRequired', rejection);
-                return deferred.promise;
+                break;
+                //return deferred.promise;
+              //}
               case 403:
                 $rootScope.$broadcast('event:auth-forbidden', rejection);
+                break;
+
+              case 422:
+                console.log("Error happened");
+                $rootScope.$broadcast('event:error-server');
+                break;
+              case 500:
+                console.log("Internal server error");
+                $rootScope.$broadcast('event:error-server');
                 break;
             }
           }

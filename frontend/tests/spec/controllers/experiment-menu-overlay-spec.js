@@ -11,6 +11,7 @@ describe("Checking the behaviour of menu overlay controller", function() {
       stateParams = $stateParams;
       stateParams.id = 1;
       httpMock.expectGET("http://localhost:8000/status").respond("NOTHING");
+      httpMock.expectGET("http://localhost:8000/network/wlan").respond("NOTHING");
       data = {
         experiment: {
           "started_at": true,

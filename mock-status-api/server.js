@@ -156,6 +156,7 @@
       },
       "settings": {
           "type": "dhcp",
+          "dns-nameservers": "10.0.1.12 208.201.224.11 208.201.224.33",
           "wpa-psk": "\"polymerase\"",
           "wpa-ssid": "\"Chai Guest\""
       }

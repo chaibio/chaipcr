@@ -1,0 +1,15 @@
+<div class="dynexp dual-channel-optical-cal" ng-controller="DualChannelOpticalCalibrationCtrl">
+  <div id="container">
+    <div class="page-layout">
+      <dynexp-wizard-header experiment-id="experiment.id" on-cancel="cancelExperiment()" cancel-text="CANCEL CALIBRATION">OPTICAL CALIBRATION</dynexp-wizard-header>
+      <div class="content">
+        <div ui-view></div>
+        <div class="text-center errorMessage" ng-if="getErrors().length > 0">
+          <p ng-repeat="err in getErrors()">
+            {{err}}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

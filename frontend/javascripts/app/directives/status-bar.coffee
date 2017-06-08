@@ -19,10 +19,10 @@ limitations under the License.
 window.App.directive 'statusBar', [
   'Experiment'
   '$state'
-  'Status'
   'TestInProgressHelper'
   '$timeout'
-  (Experiment, $state, Status, TestInProgressHelper, $timeout) ->
+  '$window'
+  (Experiment, $state, TestInProgressHelper, $timeout, $window) ->
 
     restrict: 'EA'
     replace: true
@@ -50,6 +50,9 @@ window.App.directive 'statusBar', [
           $scope.footer_experiment = exp
 
       $scope.is_holding = false
+
+      $scope.goToTestKit = ->
+        $window.location.href = "/dynexp/pika_test/index.html#/exp-running/" + $scope.footer_experiment.id
 
       $scope.$on 'status:data:updated', (e, data, oldData) ->
         return if !data

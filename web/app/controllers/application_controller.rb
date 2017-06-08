@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 class ApplicationController < ActionController::Base
+  helper_method :authentication_token, :current_user
+ 
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :null_session
@@ -63,7 +65,7 @@ class ApplicationController < ActionController::Base
   # Returns the active user associated with the access token if available
   def current_user
     if @current_user == nil
-      user_token = UserToken.active.where(access_token: UserToken.digest(token)).first
+      user_token = UserToken.active.where(access_token: UserToken.digest(authentication_token)).first
       if user_token
         @current_user = user_token.user
         if user_token.about_to_expire
@@ -75,7 +77,7 @@ class ApplicationController < ActionController::Base
   end
 
   # Parses the access token from the header
-  def token
+  def authentication_token
     if cookies[:authentication_token] != nil
       cookies[:authentication_token]
     else

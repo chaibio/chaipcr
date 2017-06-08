@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 class Experiment < ActiveRecord::Base
+  validates :name, presence: true
+  
   belongs_to :experiment_definition
   
   has_many :fluorescence_data
@@ -63,6 +65,7 @@ class Experiment < ActiveRecord::Base
     TemperatureLog.delete_all(:experiment_id => experiment.id)
     TemperatureDebugLog.delete_all(:experiment_id => experiment.id)
     FluorescenceDatum.delete_all(:experiment_id => experiment.id)
+    FluorescenceDebugDatum.delete_all(:experiment_id => experiment.id)
     MeltCurveDatum.delete_all(:experiment_id => experiment.id)
     AmplificationCurve.delete_all(:experiment_id => experiment.id)
     AmplificationDatum.delete_all(:experiment_id => experiment.id)
@@ -93,10 +96,6 @@ class Experiment < ActiveRecord::Base
     diagnostic? && completion_status == "success" && analyze_status == "success"
   end
   
-  def name
-    experiment_definition.name
-  end
-
   def calibration_id
     if experiment_definition.guid == "thermal_consistency"
       return 1

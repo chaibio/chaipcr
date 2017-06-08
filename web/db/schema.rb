@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160830071040) do
+ActiveRecord::Schema.define(version: 20170322051101) do
 
   create_table "amplification_curves", force: true do |t|
     t.integer "experiment_id"
@@ -37,6 +37,17 @@ ActiveRecord::Schema.define(version: 20160830071040) do
 
   add_index "amplification_data", ["experiment_id", "stage_id", "cycle_num", "well_num", "channel"], name: "index_amplification_data_by_exp_chan_stage_cycle_well_channel", unique: true, using: :btree
 
+  create_table "amplification_options", force: true do |t|
+    t.integer "experiment_definition_id"
+    t.string  "cq_method"
+    t.integer "min_fluorescence"
+    t.integer "min_reliable_cycle"
+    t.integer "min_d1"
+    t.integer "min_d2"
+    t.integer "baseline_cycle_min"
+    t.integer "baseline_cycle_max"
+  end
+
   create_table "cached_analyze_data", force: true do |t|
     t.integer "experiment_id"
     t.text    "analyze_result", limit: 16777215
@@ -48,18 +59,18 @@ ActiveRecord::Schema.define(version: 20160830071040) do
     t.integer "experiment_id"
     t.integer "stage_id"
     t.integer "channel"
-    t.integer "well_num",                                comment: "1-16"
-    t.text    "temperature_text",       limit: 16777215
-    t.text    "fluorescence_data_text", limit: 16777215
-    t.text    "derivative_text",        limit: 16777215
+    t.integer "well_num",                              comment: "1-16"
+    t.text    "temperature_text",     limit: 16777215
+    t.text    "normalized_data_text", limit: 16777215
+    t.text    "derivative_data_text", limit: 16777215
     t.text    "tm_text"
     t.text    "area_text"
+    t.integer "ramp_id"
   end
 
   add_index "cached_melt_curve_data", ["experiment_id", "stage_id", "channel", "well_num"], name: "index_meltcurvedata_by_exp_stage_chan_well", unique: true, using: :btree
 
   create_table "experiment_definitions", force: true do |t|
-    t.string "name",            null: false
     t.string "guid"
     t.string "experiment_type", null: false
   end
@@ -79,6 +90,7 @@ ActiveRecord::Schema.define(version: 20160830071040) do
     t.string   "analyze_status"
     t.decimal  "cached_temperature",       precision: 7, scale: 4
     t.integer  "power_cycles"
+    t.string   "name"
   end
 
   create_table "fluorescence_data", id: false, force: true do |t|
@@ -95,6 +107,20 @@ ActiveRecord::Schema.define(version: 20160830071040) do
   add_index "fluorescence_data", ["experiment_id", "channel", "ramp_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_chan_ramp_cycle_well", unique: true, using: :btree
   add_index "fluorescence_data", ["experiment_id", "channel", "step_id", "cycle_num", "well_num"], name: "index_fluorescence_data_by_exp_chan_step_cycle_well", unique: true, using: :btree
 
+  create_table "fluorescence_debug_data", id: false, force: true do |t|
+    t.integer "step_id"
+    t.integer "well_num",                                           comment: "0-15"
+    t.integer "cycle_num"
+    t.integer "experiment_id"
+    t.integer "ramp_id"
+    t.integer "channel",         limit: 1, default: 1, null: false
+    t.string  "optical_values"
+    t.string  "baseline_values"
+  end
+
+  add_index "fluorescence_debug_data", ["experiment_id", "channel", "ramp_id", "cycle_num", "well_num"], name: "index_fluorescence_debug_data_by_exp_chan_ramp_cycle_well", unique: true, using: :btree
+  add_index "fluorescence_debug_data", ["experiment_id", "channel", "step_id", "cycle_num", "well_num"], name: "index_fluorescence_debug_data_by_exp_chan_step_cycle_well", unique: true, using: :btree
+
   create_table "melt_curve_data", force: true do |t|
     t.integer "stage_id",                                                         null: false
     t.integer "well_num",                                                         null: false, comment: "0-15"
@@ -102,6 +128,8 @@ ActiveRecord::Schema.define(version: 20160830071040) do
     t.integer "fluorescence_value"
     t.integer "experiment_id"
     t.integer "channel",            limit: 1,                         default: 1, null: false
+    t.integer "ramp_id"
+    t.string  "optical_values"
   end
 
   add_index "melt_curve_data", ["experiment_id", "stage_id", "well_num", "temperature"], name: "melt_curve_data_index", using: :btree
@@ -181,6 +209,10 @@ ActiveRecord::Schema.define(version: 20160830071040) do
     t.decimal "lid_temp",               precision: 5, scale: 2, comment: "degrees C"
     t.decimal "heat_block_zone_1_temp", precision: 5, scale: 2, comment: "degrees C"
     t.decimal "heat_block_zone_2_temp", precision: 5, scale: 2, comment: "degrees C"
+    t.integer "stage_id"
+    t.integer "cycle_num"
+    t.integer "step_id"
+    t.integer "ramp_id"
   end
 
   add_index "temperature_logs", ["experiment_id", "elapsed_time"], name: "index_temperature_logs_on_experiment_id_and_elapsed_time", unique: true, using: :btree
@@ -214,5 +246,15 @@ ActiveRecord::Schema.define(version: 20160830071040) do
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
+
+  create_table "wells", force: true do |t|
+    t.integer "experiment_id",                  null: false
+    t.integer "well_num",                       null: false
+    t.string  "well_type",                      null: false, comment: "positive_control, no_template_control, standard, sample"
+    t.string  "sample_name"
+    t.text    "notes",         limit: 16777215
+    t.string  "target1"
+    t.string  "target2"
+  end
 
 end

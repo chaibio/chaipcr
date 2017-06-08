@@ -1,4 +1,4 @@
-describe("Resting canvas.js", function() {
+describe("Testing canvas.js", function() {
 
   beforeEach(module("ChaiBioTech"));
 
@@ -6,7 +6,7 @@ describe("Resting canvas.js", function() {
 
   var Canvas;
 
-  // Here Canvas refer to the applications canvas area and canvas refers actuall fabricjs canvas.
+  // Here 'Canvas' refer to the applications canvas area and 'canvas' refers actuall fabricjs canvas.
   beforeEach(inject(function(_canvas_) {
     //console.log(_canvas_, "bimmmmmmm");
     Canvas = _canvas_;
@@ -30,7 +30,6 @@ describe("Resting canvas.js", function() {
     expect(Canvas.images).toContain("gather-data-image.png");
     expect(Canvas.images).toContain("pause.png");
     expect(Canvas.images).toContain("pause-middle.png");
-    expect(Canvas.images).toContain("close.png");
     expect(Canvas.images).toContain("drag-footer-image.png");
     expect(Canvas.images).toContain("move-step-on.png");
 

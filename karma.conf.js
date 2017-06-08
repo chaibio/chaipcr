@@ -1,7 +1,7 @@
 // Karma configuration
 // Generated on Tue Feb 23 2016 14:36:27 GMT+0530 (IST)
 
-FILES = require('./karma-files')
+FILES = require('./karma-files');
 
 module.exports = function(config) {
   config.set({
@@ -124,12 +124,12 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers: ['PhantomJS'],
 
     plugins : [
             'karma-ng-html2js-preprocessor',
             'karma-coffee-preprocessor',
-            'karma-chrome-launcher',
+            'karma-phantomjs-launcher',
             //'karma-firefox-launcher',
             'karma-jasmine',
             //'karma-junit-reporter',
@@ -141,6 +141,10 @@ module.exports = function(config) {
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
     singleRun: true,
+    // fix 404 warnings for images
+    proxies: {
+      '/images/' : '/base/frontend/images/'
+    },
 
     // Concurrency level
     // how many browser should be started simultaneous

@@ -35,26 +35,31 @@ public:
 	
     void setIntensity(double onCurrentMilliamps);
     inline double intensity() const { return _intensity; }
+    // ledNumber is 0-indexed and corresponds to well number
     void activateLED(unsigned int ledNumber);
+    // Valid range for fine intensity is from 0x0 to 0x3F. If ledNumber is negative the fine intensity for all LED's is set
+    void setIntensityFine(uint8_t ledIntensity, int ledNumber = -1);
     inline void disableLEDs() { disableLEDs(true); }
 
 private:
     void disableLEDs(bool clearLastLed);
 
-    void sendLEDGrayscaleValues(const uint8_t (&values)[24]);
-	
+    void sendLEDGrayscaleValues(bool latch=true);
+    void sendLEDIntensityFineValues();
+
 private:
     std::atomic<float> _dutyCyclePercentage;
     double _intensity;
 
     unsigned _lastLedNumber;
-	
+
 	//components
     std::shared_ptr<SPIPort> _spiPort;
     GPIO _potCSPin;
     GPIO _ledXLATPin;
-    GPIO _ledGSPin;
     PWMPin _ledBlankPWM;
+    GPIO _ledGSPin;
+    std::vector<uint8_t> _intensityFine;
 };
 
 #endif

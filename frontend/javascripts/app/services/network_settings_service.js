@@ -53,7 +53,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     };
 
     this.getSettings = function() {
-
+      this.userSettings = $.jStorage.get('userNetworkSettings');
       if(that.userSettings.wifiSwitchOn /*&& that.wirelessError === false*/) {
         this.lanLookup();
       }
@@ -62,7 +62,7 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
         if(that.userSettings.wifiSwitchOn /*&& that.wirelessError === false*/) {
           that.lanLookup();
         }
-      }, 3000);
+      }, 2000);
     };
 
     this.lanLookup = function() {
@@ -132,7 +132,9 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
       $http.get(host + ':8000/network/eth0')
       .then(function(ethernet) {
         that.connectedEthernet = ethernet.data;
-        $rootScope.$broadcast("ethernet_detected");
+        if(ethernet.data.state.address){
+          $rootScope.$broadcast("ethernet_detected");
+        }
       });
     };
 
@@ -156,13 +158,32 @@ window.ChaiBioTech.ngApp.service('NetworkSettingsService',[
     this.connectToEthernet = function(ethernetParams) {
 
       var delay = $q.defer();
+      ethernetParams.type = "static";
       $http.put(host + ':8000/network/eth0', ethernetParams)
       .then(function(result) {
+        console.log("New ethernet connection");
+        //result = ethernetParams;
+        console.log("data I need", result);
         delay.resolve(result);
       }, function(err) {
         delay.reject(err);
       });
 
+      return delay.promise;
+    };
+
+    this.changeToAutomatic = function(ethernet){
+      ethernet.type = "dhcp";
+      var delay = $q.defer();
+      $http.put(host + ':8000/network/eth0', ethernet)
+      .then(function(result) {
+        console.log("New ethernet connection");
+        //result = ethernetParams;
+        console.log("data I need", result);
+        delay.resolve(result);
+      }, function(err) {
+        delay.reject(err);
+      });
       return delay.promise;
     };
 

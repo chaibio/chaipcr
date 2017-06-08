@@ -23,14 +23,29 @@
 
 class TestControlHandler : public JsonHandler
 {
+public:
+    enum Operation
+    {
+        MachineSettings,
+        StartADCLogger,
+        StopADCLogger,
+        TriggerADCLogger
+    };
+
+    TestControlHandler(Operation operation);
+
 protected:
     void processData(const boost::property_tree::ptree &requestPt, boost::property_tree::ptree &responsePt);
 
 private:
+    //MachineSettings
     void processOptics(const boost::property_tree::ptree &requestPt);
     void processLid(const boost::property_tree::ptree &requestPt);
     void processHeatSink(const boost::property_tree::ptree &requestPt);
     void processHeatBlock(const boost::property_tree::ptree &requestPt);
+
+private:
+    Operation _operation;
 };
 
 #endif // TESTCONTROLHANDLER_H

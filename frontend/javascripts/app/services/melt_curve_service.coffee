@@ -28,19 +28,13 @@ App.service 'MeltCurveService', [
         datasets["well_#{i}"] = []
       return datasets
 
-    self.chartConfig = (type) ->
+    self.chartConfig = ->
       series = []
       # for i in [0..1] by 1
       for i in [0..15] by 1
         series.push
-          axis: 'y'
-          key: type
           dataset: "well_#{i}"
           color: AmplificationChartHelper.COLORS[i]
-          type: 'line'
-          id: "well_#{i}"
-          label: "well_#{i+1}: "
-          interpolation: {mode: 'cardinal', tension: 0.7}
 
       series: series
       axes:
@@ -48,6 +42,8 @@ App.service 'MeltCurveService', [
           key: 'temperature'
           ticks: 8
           tickFormat: (x) ->
+            x = x || 0
+            x = Math.round(x * 100) / 100
             return "#{x}°C"
         y:
           ticks: 10
@@ -55,12 +51,7 @@ App.service 'MeltCurveService', [
         left: 50
         right: 10
         top: 10
-      grid:
-        x: false
-        y: false
-
-      tooltipHook: (items) ->
-        return false
+        bottom: 20
     # end chartConfig
 
     self.parseData = (data, cb) ->
@@ -78,9 +69,9 @@ App.service 'MeltCurveService', [
               total_temp += data[t].temperature[ii]
 
             datasets["well_#{i}"].push
-              temperature: total_temp/16
-              derivative: data[i].derivative[ii]
-              normalized: data[i].fluorescence_data[ii]
+              temperature: Math.round((total_temp / 16) * 100) / 100
+              derivative: Math.round(data[i].derivative_data[ii] * 100) / 100
+              normalized: Math.round(data[i].normalized_data[ii] * 100) / 100
 
         complete(datasets)
 

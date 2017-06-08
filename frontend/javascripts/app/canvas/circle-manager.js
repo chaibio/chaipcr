@@ -33,14 +33,14 @@ angular.module("canvasApp").factory('circleManager', [
 
     this.togglePaths = function(toggle) {
 
-      this.allCircles.forEach(function(circle, index) {
-        if(circle.curve) {
-          circle.curve.setVisible(toggle);
+      this.originalCanvas.allStepViews.forEach(function(step, index) {
+        if(step.circle.curve) {
+          step.circle.curve.setVisible(toggle);
         }
-      }, this);
-
+      });
     };
 
+    // Instead of removing circle may be we should remove paths
     this.addRampLinesAndCircles = function(circles) {
 
       this.originalCanvas.allCircles = this.allCircles = circles || this.findAllCircles();
@@ -64,6 +64,37 @@ angular.module("canvasApp").factory('circleManager', [
       return this;
     };
 
+    this.addRampLines = function() {
+
+      var anchorCircle = this.originalCanvas.allStepViews[0].circle;
+
+      var limit = this.originalCanvas.allStepViews.length;
+
+      this.originalCanvas.allStepViews.forEach(function(step, index) {
+
+        if(index < (limit - 1)) {
+
+          if(! step.circle.curve) {
+            step.circle.curve = new path(step.circle);
+            this.canvas.add(step.circle.curve);
+          } else {
+            step.circle.curve.setVisible(true);
+            this.canvas.bringToFront(step.circle.curve);
+          }
+        }
+        step.circle.moveCircleWithStep();
+        step.circle.manageDrag(step.circle.circleGroup);
+        this.canvas.bringToFront(step.circle.circleGroup);
+
+        if(step.model.ramp.collect_data) {
+          step.circle.gatherDataDuringRampGroup.setVisible(true);
+        }
+        this.canvas.bringToFront(step.circle.gatherDataDuringRampGroup);
+
+      }, this);
+      this.canvas.renderAll();
+    };
+
     this.findAllCircles = function() {
 
       var tempCirc = null;
@@ -74,6 +105,7 @@ angular.module("canvasApp").factory('circleManager', [
           step.circle.previous = tempCirc;
           tempCirc.next = step.circle;
         }
+
         tempCirc = step.circle;
         return step.circle;
       });
@@ -82,7 +114,7 @@ angular.module("canvasApp").factory('circleManager', [
     };
 
     this.reDrawCircles = function() {
-
+      console.log("redraw circle starts here");
       var tempCirc = null;
       this.drawCirclesArray.length = 0;
 
@@ -100,7 +132,7 @@ angular.module("canvasApp").factory('circleManager', [
         tempCirc = step.circle;
         return step.circle;
       }, this);
-
+      console.log("reDrawCircles ends here");
       return this.drawCirclesArray;
     };
 

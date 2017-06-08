@@ -57,17 +57,17 @@ window.ChaiBioTech.ngApp
 
       .state 'settings.diagnostics',
         url: '/diagnostics'
-        templateUrl: 'app/views/settings/diagnostics.html'	
+        templateUrl: 'app/views/settings/diagnostics.html'
 
       .state 'settings.calibration',
         url: '/calibration'
         templateUrl: 'app/views/settings/calibration.html'
-		
+
       .state 'settings.thermal_consistency',
         url: '/diagnostics/thermal_uniformity'
         template: '<div>'
         controller: ->
-          window.location.assign('/dynexp/thermal_consistency/index.html')						  		
+          window.location.assign('/dynexp/thermal_consistency/index.html')
 
       .state 'settings.usermanagement',
         url: '/usermanagement'
@@ -99,7 +99,6 @@ window.ChaiBioTech.ngApp
       .state 'edit-protocol',
         url: '/edit-protocol/:id'
         templateUrl: 'app/views/edit-protocol.html'
-        controller: 'ProtocolCtrl'
 
       .state 'run-experiment',
         url: '/experiments/:id/run-experiment?chart?max_cycle'

@@ -10,6 +10,7 @@ describe("Test protocol item directive, which shows in left menu", function() {
     compile = $compile;
     templateCache = $templateCache;
     httpMock.expectGET("http://localhost:8000/status").respond("NOTHING");
+    httpMock.whenGET("http://localhost:8000/network/wlan").respond("NOTHING");
   }));
 
   it("Passing NOT_STARTED should set the message to EDIT PROTOCOL ", function () {

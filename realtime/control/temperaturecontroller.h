@@ -57,7 +57,9 @@ public:
     ~TemperatureController();
 
     inline bool enableMode() const { return _enableMode; }
-    void setEnableMode(bool enableMode);
+    inline bool pidState() const { return _pidState; }
+
+    void setEnableMode(bool enableMode, bool enablePid = true);
 
     inline double minTargetTemperature() const { return _minTargetTemp; }
     inline double maxTargetTemperature() const { return _maxTargetTemp; }
@@ -76,7 +78,7 @@ protected:
     virtual void processOutput() = 0;
 
 private:
-    void computePid(double currentTemperature);
+    void currentTemperatureChanged(double temperature);
 
 protected:
     std::shared_ptr<Thermistor> _thermistor;
@@ -97,6 +99,8 @@ private:
 
     double _minTempThreshold;
     double _maxTempThreshold;
+
+    bool _firstErrorState;
 };
 
 #endif // TEMPERATURECONTROLLER_H

@@ -42,6 +42,8 @@ LIBS += -lrt
 #Ignore Boost warnings
 QMAKE_CXXFLAGS += -Wno-unused-local-typedefs -Wno-unused-parameter -Wno-unused-but-set-parameter
 
+DEFINES += BOOST_CB_DISABLE_DEBUG
+
 QMAKE_CXXFLAGS += -std=c++11
 QMAKE_CXXFLAGS -= -m64
 QMAKE_LFLAGS += -rdynamic
@@ -143,7 +145,10 @@ HEADERS += \
     server/updateuploadhandler.h \
     util/logger.h \
     util/timercallback.h \
-    server/changeexperimenthandler.h
+    server/changeexperimenthandler.h \
+    util/adcdebuglogger.h \
+    util/adcdebuglogger.ipp \
+    util/watchdog.h
 
 SOURCES += \
     app/pins.cpp \
@@ -198,4 +203,6 @@ SOURCES += \
     server/datahandler.cpp \
     server/updateuploadhandler.cpp \
     util/logger.cpp \
-    server/changeexperimenthandler.cpp
+    server/changeexperimenthandler.cpp \
+    util/adcdebuglogger.cpp \
+    util/watchdog.cpp

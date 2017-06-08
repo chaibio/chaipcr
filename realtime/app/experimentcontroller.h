@@ -115,7 +115,11 @@ public:
     void stop();
     void stop(const std::string &errorMessage);
 
+    bool shutdown(MachineState checkState);
+
 private:
+    void shutdown();
+
     void run();
     void complete();
 

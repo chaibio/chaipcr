@@ -26,37 +26,27 @@ using namespace std;
 // Class MUX
 MUX::MUX(vector<GPIO> &&muxControlPins) :
     _muxControlPins(move(muxControlPins)) {
+
+    _channel = 0;
 }
 
 MUX::MUX(MUX &&other) {
     _muxControlPins = move(other._muxControlPins);
-    _channel = other._channel;
-
-    other._channel = 0;
-}
-
-MUX::~MUX() {
-
+    _channel = other._channel.exchange(0);
 }
 
 MUX& MUX::operator =(MUX &&other) {
     _muxControlPins = move(other._muxControlPins);
-    _channel = other._channel;
-
-    other._channel = 0;
+    _channel = other._channel.exchange(0);
 
     return *this;
 }
 
 void MUX::setChannel(int channel) {
+    _channel = channel;
+
     for(GPIO &muxControlPin : this->_muxControlPins) {
         muxControlPin.setValue(static_cast<GPIO::Value>(channel&0x1), false);
         channel>>=1;
     }
-    _channel=channel;
-
-}
-
-int MUX::getChannel() {
-    return _channel;
 }

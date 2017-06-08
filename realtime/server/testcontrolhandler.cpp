@@ -19,19 +19,49 @@
 
 #include "pcrincludes.h"
 #include "controlincludes.h"
-
+#include "experimentcontroller.h"
 #include "testcontrolhandler.h"
 
 using namespace std;
 using namespace boost::property_tree;
 using namespace Poco::Net;
 
-void TestControlHandler::processData(const ptree &requestPt, ptree &)
+TestControlHandler::TestControlHandler(Operation operation)
 {
-    processOptics(requestPt);
-    processLid(requestPt);
-    processHeatSink(requestPt);
-    processHeatBlock(requestPt);
+    _operation = operation;
+}
+
+void TestControlHandler::processData(const ptree &requestPt, ptree &responsePt)
+{
+    switch (_operation) {
+    case MachineSettings:
+        processOptics(requestPt);
+        processLid(requestPt);
+        processHeatSink(requestPt);
+        processHeatBlock(requestPt);
+        break;
+
+    case StartADCLogger:
+        if (!ADCControllerInstance::getInstance()->startDebugLogger(requestPt.get<std::size_t>("pre_samples"), requestPt.get<std::size_t>("post_samples")))
+            responsePt.put("status.message", "The debug logger is currently saving. The new settings will be applied on the next iteration");
+
+        break;
+
+    case StopADCLogger:
+        ADCControllerInstance::getInstance()->stopDebugLogger();
+        break;
+
+    case TriggerADCLogger:
+        ADCControllerInstance::getInstance()->triggetDebugLogger();
+        break;
+
+    default:
+        setStatus(Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
+        setErrorString("Unknown operation");
+        break;
+    }
+
+    JsonHandler::processData(requestPt, responsePt);
 }
 
 void TestControlHandler::processOptics(const ptree &requestPt)
@@ -44,18 +74,23 @@ void TestControlHandler::processOptics(const ptree &requestPt)
         ptree::const_assoc_iterator activateLED = requestPt.find("activate_led");
         ptree::const_assoc_iterator disableLEDs = requestPt.find("disable_leds");
         ptree::const_assoc_iterator photodiodeMuxChannel = requestPt.find("photodiode_mux_channel");
+        ptree::const_assoc_iterator ledIntensityFine = requestPt.find("led_intensity_fine");
 
         if (ledIntensity != requestPt.not_found())
             optics->getLedController()->setIntensity(ledIntensity->second.get_value<double>());
 
         if (activateLED != requestPt.not_found())
-            optics->getLedController()->activateLED(kWellToLedMappingList.at(activateLED->second.get_value<int>()));
+            optics->getLedController()->activateLED(activateLED->second.get_value<int>());
 
         if (disableLEDs != requestPt.not_found())
             optics->getLedController()->disableLEDs();
 
         if (photodiodeMuxChannel != requestPt.not_found())
             optics->getPhotodiodeMux().setChannel(photodiodeMuxChannel->second.get_value<int>());
+
+        if (ledIntensityFine != requestPt.not_found())
+            optics->getLedController()->setIntensityFine(ledIntensityFine->second.get_value<uint8_t>());
+
     }
 }
 
@@ -75,7 +110,7 @@ void TestControlHandler::processLid(const ptree &requestPt)
         }
 
         if (lidDrive != requestPt.not_found())
-            lid->setOutput(lidDrive->second.get_value<double>());
+            lid->setOutput(lidDrive->second.get_value<double>() * -1);
     }
 }
 
@@ -86,9 +121,18 @@ void TestControlHandler::processHeatSink(const ptree &requestPt)
     if (heatSink)
     {
         ptree::const_assoc_iterator heatSinkTargetTemp = requestPt.find("heat_sink_target_temp");
+        ptree::const_assoc_iterator heatSinkDrive = requestPt.find("heat_sink_fan_drive");
 
         if (heatSinkTargetTemp != requestPt.not_found())
             heatSink->setTargetTemperature(heatSinkTargetTemp->second.get_value<double>());
+
+        if (heatSinkDrive != requestPt.not_found())
+        {
+            if (ExperimentController::getInstance()->machineState() == ExperimentController::IdleMachineState)
+                heatSink->setEnableMode(false);
+
+            heatSink->setOutput(heatSinkDrive->second.get_value<double>() * -1);
+        }
     }
 }
 

@@ -1,0 +1,74 @@
+<div class="intro" ng-init="analyzeExperiment()">
+  <h2> Thermal Uniformity Diagnostic Results</h2>
+
+  <h4 class="text-center padd-top-50"
+      ng-show="!experiment.completion_status || analyzing || (experiment.completion_status === 'success'? !tm_values && analyzing : false)">
+    <img src="/images/loading.gif">
+    <b>Analyzing Results</b>
+  </h4>
+
+  <div class="text-center text-danger padd-top-50" ng-show="custom_error">
+    <h4>Experiment Failed.</h4>
+    {{custom_error}}
+  </div>
+
+  <div ng-show="experiment.completion_status !== 'success' && !analyzing">
+    <div class="alert alert-danger">
+      <strong>Experiment Failed!</strong> {{ experiment.completion_message }}
+    </div>
+  </div>
+
+  <div class="row" ng-show="experiment.completion_status === 'success' && !analyzing && !!tm_values">
+    <div class="col-md-6">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Well</th>
+            <th>Tm</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="i in loop">
+            <td>{{i+1}}</td>
+            <td ng-class="(tm_values[i][1] ? 'text-success': 'text-danger')">
+              {{ tm_values[i][0] | round:2 }}
+            </td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-6">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Well</th>
+            <th>Tm</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="i in loop">
+            <td>{{ (i+1+8) }}</td>
+            <td ng-class="(tm_values[i+8][1] ? 'text-success': 'text-danger')">
+              {{ tm_values[i+8][0] | round:2 }}
+            </td>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="text-center" ng-if="!analyzing">
+    <a target="_blank" href="/#/experiments/{{experiment.id}}/run-experiment?chart=melt-curve">View Melt Curve</a>
+  </div>
+
+  <h3 class="text-center" ng-show="tm_values" ng-class="(analyzedExp['delta_Tm'][1] ? 'text-success':'text-danger')">
+    Max ΔTm: {{analyzedExp['delta_Tm'][0] | round:2}} &deg;C
+  </h3>
+
+  <div class="text-center" ng-if="!analyzing">
+    <a href="/#/settings/" class="button">OKAY</a>
+  </div>
+
+</div>

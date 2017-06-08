@@ -20,7 +20,9 @@
 window.ChaiBioTech.ngApp.directive('temp', [
   'ExperimentLoader',
   '$timeout',
-  function(ExperimentLoader, $timeout) {
+  'alerts',
+  '$uibModal',
+  function(ExperimentLoader, $timeout, alerts, $uibModal) {
     return {
       restric: 'EA',
       replace: true,
@@ -37,46 +39,46 @@ window.ChaiBioTech.ngApp.directive('temp', [
       link: function(scope, elem, attr) {
 
         scope.edit = false;
-        var editValue;
+        scope.showCapsule = true;
+        var editValue,
+        input_data_part = angular.element(elem).find(".input-data-part");
 
         scope.$watch("reading", function(val) {
 
           if(angular.isDefined(scope.reading)) {
-
-            scope.shown = Number(scope.reading);
-            scope.hidden = Number(scope.reading);
+            editValue = Number(scope.reading);
+            scope.shown = Number(scope.reading).toFixed(1);
           }
         });
 
         scope.editAndFocus = function(className) {
 
           if(scope.delta) {
-            editValue = Number(scope.hidden);
-            scope.edit = ! scope.edit;
-            $timeout(function() {
-              $('.' + className).focus();
-            });
+            scope.shown = Number(scope.reading).toFixed(1);
+            editValue = Number(scope.shown);
+            scope.edit = true;
+            input_data_part.focus();
           }
         };
 
         scope.save = function() {
 
           scope.edit = false;
-          if(! isNaN(scope.hidden)) {
-            if(editValue !== Number(scope.hidden)) {
-              scope.reading = scope.hidden;
+          if(! isNaN(scope.shown) && Number(scope.shown) < 100 && Number(scope.shown) > -100) {
+            if(editValue !== Number(scope.shown)) {
+              scope.reading = scope.shown;
               $timeout(function() {
                 ExperimentLoader.changeDeltaTemperature(scope.$parent).then(function(data) {
                   console.log(data);
                 });
               });
+              return true;
             }
-
           } else {
-            scope.shown = scope.hidden = scope.reading;
+            alerts.showMessage(alerts.autoDeltaTemp, scope);
           }
+          scope.shown = Number(scope.reading).toFixed(1);
         };
-
       }
     };
   }

@@ -20,36 +20,53 @@
 #define HEATSINK_H
 
 #include "temperaturecontroller.h"
+#include "watchdog.h"
 #include "adcpin.h"
+
+#include <atomic>
+#include <deque>
+
+#include <Poco/Timer.h>
+#include <Poco/Util/Timer.h>
+#include <Poco/Util/TimerTask.h>
 
 class PWMControl;
 
-namespace Poco { class Timer; }
-
-class HeatSink : public TemperatureController
+class HeatSink : public TemperatureController, public Watchdog::Watchable
 {
 public:
     HeatSink(Settings settings, const std::string &fanPWMPath, unsigned long fanPWMPeriod, const ADCPin &adcPin);
     ~HeatSink();
 
     Direction outputDirection() const;
+    void setOutput(double value);
+
     double fanDrive() const;
 
     void startADCReading();
 
+    inline int32_t adcValue() const { return _adcValue; }
+
 protected:
-    void setOutput(double value);
     void resetOutput();
     void processOutput();
 
 private:
     void readADCPin(Poco::Timer &timer);
 
+    void nextFanStep(Poco::Util::TimerTask &/*task*/) { nextFanStep(); }
+    void nextFanStep();
+
 private:
     PWMControl *_fan;
 
     ADCPin _adcPin;
-    Poco::Timer *_adcTimer;
+    Poco::Timer _adcTimer;
+    std::atomic<uint32_t> _adcValue;
+
+    Poco::Util::Timer _fanControlTimer;
+    std::atomic<bool> _fanControlState;
+    std::deque<std::pair<long, double>> _fanTransitionSteps;
 };
 
 #endif // HEATSINK_H

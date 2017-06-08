@@ -1,0 +1,31 @@
+<div class="step-1">
+  <p class="step"><b>STEP 1</b>/6</p>
+  <h2>Prepare the Tubes</h2>
+
+  <div class="row tubes-container">
+    <div class="col-md-6">
+      <div class="solution-label">
+        <img src="/images/dynexp/water-drop-blue.png">
+        <span><b>25</b>uL Water</span>
+      </div>
+      <img src="/images/dynexp/tubes-blue.png" class="tubes">
+    </div>
+    <div class="col-md-6">
+      <div class="solution-label">
+        <img src="/images/dynexp/water-drop-green.png">
+        <span><b>25</b>uL Calibration Solution</span>
+      </div>
+      <img src="/images/dynexp/tubes-green.png" class="tubes">
+    </div>
+  </div>
+
+  <div class="instruction">
+    <b class="top-text">TO BEGIN:</b> <BR>
+    Prepare <b>4, 8-well PCR strips</b>. In two of these strips, pipette <b>25uL of water</b> into each tube. In the other two strips, pipette <b>25uL of Fluorescein Calibrator</b> into each tube. It is important to pipette the calibration solution from the same stock tube. If the solution is pipetted from different stock tubes, the stock solution should be first be mixed.
+  </div>
+
+  <div class="text-center">
+    <button ng-show="!cancel" ng-disabled="getErrors().length > 0" ng-class="{errorButton: (getErrors().length > 0) }" ui-sref="optical_cal.step-2">BEGIN</button>
+  </div>
+
+</div>

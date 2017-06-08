@@ -57,6 +57,9 @@ window.ChaiBioTech.ngApp
 
         return deferred.promise
 
+    self.delete = (id) ->
+      return $http.delete("/experiments/#{id}")
+
     self.setCurrentExperiment = (exp) ->
       currentExperiment = exp
 
@@ -65,6 +68,18 @@ window.ChaiBioTech.ngApp
 
     self.analyze = (id) ->
       $http.get("/experiments/#{id}/analyze")
+
+    self.getWells = (id) ->
+      $http.get("/experiments/" + id + "/wells")
+
+    self.updateWell = (id,well_num,well_data) ->
+      $http.put "/experiments/" + id + "/wells/" + well_num, well : well_data
+
+    self.getAmplificationOptions = (id) ->
+      $http.get("/experiments/" + id + "/amplification_option")
+
+    self.updateAmplificationOptions = (id,amplificationData) ->
+      $http.put "experiments/" + id + "/amplification_option/", amplification_option : amplificationData
 
     tempLogsQues = []
     self.getTemperatureData = (expId, opts = {}) ->
@@ -77,6 +92,7 @@ window.ChaiBioTech.ngApp
 
       fetchingTempLogs = true
       promise = $http.get "/experiments/#{expId}/temperature_data",
+      # promise = $http.get "/temperature_data.json",
         params:
           starttime: opts.starttime
           endtime: opts.endtime
@@ -117,6 +133,14 @@ window.ChaiBioTech.ngApp
       start = new Date(exp.started_at)
       end = new Date(exp.completed_at)
       (end.getTime() - start.getTime())/1000;
+
+    self.hasAmplificationCurve = (exp) ->
+      stages = exp.protocol.stages
+      return stages.some((val) => val.stage.name is "Cycling Stage")
+
+    self.hasMeltCurve = (exp) ->
+      stages = exp.protocol.stages
+      return stages.some((val) => val.stage.name is "Melt Curve Stage")
 
     self.truncateName = (name, truncate_length) ->
       NAME_LENGTH = parseInt(truncate_length)

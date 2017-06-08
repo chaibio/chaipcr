@@ -11,6 +11,7 @@
 #
 # By default this script does nothing.
 
+
 wait_for_migrate () {
         echo "Checking for migrate script completation"
         while [ -e ${sdcard}/factory/upgrade_autorun.flag ] || [ -e ${sdcard}/upgrade/upgrade_autorun.flag ]
@@ -19,6 +20,47 @@ wait_for_migrate () {
 		sleep 5
  	done
 	echo migrate task done
+}
+
+get_root_password () {
+	if [ -e /perm/device.json ]
+	then
+		serial_number=$(/usr/bin/ruby -rjson -e 'j = JSON.parse(File.read("/perm/device.json")); print j["serial_number"]')
+		if [ ! -z $serial_number ]
+		then
+#			echo $serial_number
+			hashed_password=$(echo -n $serial_number | /usr/bin/md5sum | awk '{print $1}')
+			if [ ! -z $hashed_password ]
+			then
+				echo $hashed_password
+				return
+			fi
+		fi
+	fi
+
+	echo chaipcr
+}
+
+change_root_password_on_factorysettings () {
+	echo "Checking for flag file: ${sdcard}/upgrade/change_root_password.flag"
+	if [ -e ${sdcard}/upgrade/change_root_password.flag ]
+	then
+       		echo "Change root password flag found up"
+
+		new_password=$(get_root_password)
+		#echo new_password: $new_password
+		echo "$new_password\n$new_password" | (/usr/bin/passwd root -q)
+		if [ $? -eq 0 ]
+		then
+			echo password changed successfully to: $new_password
+			rm ${sdcard}/upgrade/change_root_password.flag || :
+        		echo "Change root password flag down.."
+		else
+			echo password changed failed
+		fi
+	else
+		echo "No change root password flag found!"
+	fi
 }
 
 run_migrate_on_upgrade () {
@@ -36,6 +78,10 @@ run_migrate_on_upgrade () {
 			echo "mysql server not up yet.. code $sql_running. waiting 10 seconds."
 			echo "MySql status:"
 			mysqladmin status
+			
+			chown -R mysql /data/mysql
+			chgrp -R mysql /data/mysql
+			systemctl start realtime.service
 
 			sleep 10
 			mysqladmin status | grep Uptime
@@ -57,20 +103,9 @@ run_migrate_on_upgrade () {
 
 
 		rm ${sdcard}/upgrade/upgrade_autorun.flag || :
-        	echo "Upgrade autorun flag down.. setting up realtime service"
-		systemctl enable realtime.service
-		systemctl start realtime.service
+        	echo "Upgrade autorun flag down.."
 	else
 		echo "No autorun flag found!"
-		if systemctl status realtime.service | grep enable
-		then
-			systemctl enable realtime.service
-		fi
-		sleep 2
-                if systemctl status realtime.service | grep dead
-                then
-                        systemctl start realtime.service
-                fi
 	fi
 }
 
@@ -82,8 +117,14 @@ run_cleanup_user_tokens_every4hours () {
 		sleep 14400
 		echo cleaning task due.
 		cd /root/chaipcr/web || :
-		RAILS_ENV=production ruby scripts/clean.rb
+		RAILS_ENV=production /usr/bin/ruby scripts/clean.rb
 	done
+}
+
+start_unicorn () {
+	echo starting unicorn
+	cd /root/chaipcr/web
+	/usr/local/bin/bundle exec /usr/local/bin/unicorn -c /root/chaipcr/web/config/unicorn.rb -E production -D || true
 }
 
 run_clean_user_tokens () {
@@ -107,8 +148,23 @@ run_clean_user_tokens () {
         echo "changed folder to $(pwd)"
 	echo date  is $(date)
 
-	RAILS_ENV=production ruby scripts/startup.rb || :
-	echo "Execution result: $?"
+	RAILS_ENV=production /usr/bin/ruby scripts/startup.rb || :
+	echo "Startup script execution result: $?"
+
+	if [ -e /etc/rc1.d/K01unicorn ]
+	then
+		echo unicorn is set to start on startup.. removing autostart setup
+		/usr/sbin/update-rc.d unicorn remove || true
+	fi
+
+	if  ps aux | grep unicorn | grep -v grep
+        then
+		echo unicorn is running
+	else
+		echo starting unicorn
+		start_unicorn &
+	fi
+
 	run_cleanup_user_tokens_every4hours &
 }
 
@@ -137,10 +193,10 @@ run_migrate_on_upgrade_logged () {
 
 check_upgrade_autorun () {
 	sdcard_dev=""
-	if [ -e /dev/mmcblk0p4 ]
+	if [ -e /dev/mmcblk0p3 ]
 	then
         	sdcard_dev=/dev/mmcblk1
-	elif [ -e /dev/mmcblk1p4 ]
+	elif [ -e /dev/mmcblk1p3 ]
 	then
 		sdcard_dev=/dev/mmcblk0
 	else
@@ -172,10 +228,12 @@ check_upgrade_autorun () {
 			echo "Second SDCard partition not found.. old version? ${sdcard}p2"  >> $log_file
 		fi
 
+		change_root_password_on_factorysettings
 		run_migrate_on_upgrade_logged
 		return 0
 	fi
 
+	change_root_password_on_factorysettings
 	run_migrate_on_upgrade_logged
 	return 1
 }
@@ -192,6 +250,13 @@ network_watchdog_interface() {
 
         while [ 1 ]
         do
+	        if grep "$iface" /var/lib/chaibio/network_watchdog_ignored_interfaces
+        	then
+                	echo Temprary ignoring the interface  $iface
+			sleep 60
+	                continue
+	        fi
+
                 ip_address=$(ifconfig $iface | grep 'inet addr:') || :
                 if [ -z "$ip_address" ]
                 then
@@ -206,7 +271,7 @@ network_watchdog_interface() {
                                 echo no previous $iface connection found.
                         fi
 			lfile=/var/lib/dhcp/dhclient.$iface.leases
-			rm $lfile
+#			rm $lfile
 			extras=""
                         if echo "$iface" | grep -q "wlan"
 		        then
@@ -252,19 +317,15 @@ network_watchdog() {
         ls /sys/class/net/ | network_watchdog_interfaces
 }
 
-BASEDIR=$(dirname $0)
-
-network_watchdog >> /dev/null 2>&1
-
 NOW=$(date +"%m-%d-%Y %H:%M:%s")
 log_file="/var/log/life_age.log"
 
 echo Restarting! >> $log_file
 echo $NOW >>  $log_file
+
+BASEDIR=$(dirname $0)
+
 echo Mounting partitions! >> $log_file
-
-#check_upgrade_autorun &
-
 if [ -e /data ]
 then
         echo "/data folder found!"
@@ -279,31 +340,47 @@ else
 fi
 
 is_mounted=$(mount | grep /data)
-
+echo "Mounting check is $is_mounted"
+fat_partition_exits=$(mount | grep /boot/uboot)
 if [ -z "$is_mounted" ]
 then
-	if [ -e /dev/mmcblk0p3 ]
+	if [ -z "$fat_partition_exits" ]
 	then
-        	mount /dev/mmcblk0p3 /data
-	elif [ -e /dev/mmcblk1p3 ]
-	then
-        	mount /dev/mmcblk1p3 /data
+        	if [ -e /dev/mmcblk1p3 ]
+	        then
+			mount /dev/mmcblk1p3 /perm
+                	mount /dev/mmcblk1p2 /data
+	        elif [ -e /dev/mmcblk0p3 ]
+        	then
+			mount /dev/mmcblk0p3 /perm
+	                mount /dev/mmcblk0p2 /data
+        	else
+                	echo "Unknown condition"
+	        fi
 	else
-        	echo "Unknown condition"
-	fi
+		if [ -e /dev/mmcblk0p3 ]
+		then	
+        		mount /dev/mmcblk0p3 /data
+		elif [ -e /dev/mmcblk1p3 ]
+		then
+        		mount /dev/mmcblk1p3 /data
+		else
+        		echo "Unknown condition"
+		fi
 
-	if [ -e /dev/mmcblk0p4 ]
-	then
-        	mount /dev/mmcblk0p4 /perm
-	elif [ -e /dev/mmcblk1p4 ]
-	then
-	        mount /dev/mmcblk1p4 /perm
+		if [ -e /dev/mmcblk0p4 ]
+		then
+	        	mount /dev/mmcblk0p4 /perm
+		elif [ -e /dev/mmcblk1p4 ]
+		then
+		        mount /dev/mmcblk1p4 /perm
+		fi
 	fi
 fi
-
-check_corruption >> $log_file || true
-check_upgrade_autorun &
-run_clean_user_tokens &
+check_upgrade_autorun >> $log_file 2>&1 || true &
+network_watchdog >> /dev/null 2>&1 || true
+check_corruption >> $log_file 2>&1 || true
+run_clean_user_tokens >> $log_file 2>&1 || true &
 echo "Autorun script done!" >> $log_file
 
 exit 0

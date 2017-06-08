@@ -31,14 +31,17 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.currentDrop = null;
         this.startPosition = 0;
         this.endPosition = 0;
+        this.currentLeft = 0;
+        this.direction = null;
+        this.beaconMove = 0;
 
         var smallCircle = new fabric.Circle({
           radius: 6, fill: '#FFB300', stroke: "black", strokeWidth: 3, selectable: false,
-          left: 48, top: 298, originX: 'center', originY: 'center',
+          left: 48, top: 298, originX: 'center', originY: 'center', visible: false
         });
 
         var smallCircleTop = new fabric.Circle({
-          radius: 5, fill: 'black', selectable: false, left: 48, top: 13, originX: 'center', originY: 'center',
+          radius: 5, fill: 'black', selectable: false, left: 48, top: 13, originX: 'center', originY: 'center', visible: false
         });
 
         var temperatureText = new fabric.Text(
@@ -70,11 +73,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         );
 
         var verticalLine = new fabric.Line([0, 0, 0, 276],{
-          left: 47,
-          top: 16,
-          stroke: 'black',
-          strokeWidth: 2,
-          originX: 'left', originY: 'top',
+          left: 47, top: 16, stroke: 'black', strokeWidth: 2, originX: 'left', originY: 'top', visible: false
         });
 
         var rect = new fabric.Rect({
@@ -105,24 +104,38 @@ angular.module("canvasApp").factory('moveStepRect', [
           lockMovementY: true, hasControls: false, visible: false, hasBorders: false, name: "dragStepGroup"
         });
 
+        this.indicator.beacon = new fabric.Rect({
+          fill: '', width: 10, left: 0, top: 340, height: 10, selectable: false, me: this,
+          lockMovementY: true, hasControls: false, visible: true, //fill: 'black',
+        });
+        // We may not need brick.
+        this.indicator.brick = new fabric.Rect({
+          fill: '', width: 20, left: 0, top: 340, height: 10, selectable: false, me: this,
+          lockMovementY: true, hasControls: false, visible: true, //fill: 'black',
+        });
+      this.indicator.verticalLine = verticalLine;
+      this.indicator.smallCircleTop = smallCircleTop;
+      this.indicator.smallCircle = smallCircle;
+
       this.indicator.init = function(step) {
 
+        this.spaceArray = [step.parentStage.left - 20, step.parentStage.left + 30];
         console.log(step, "stepping");
-          if(step.nextStep) {
-            this.currentDrop = step.nextStep;
-            this.currentHit = step.nextStep.index;
-          } else if(step.parentStage.nextStage) {
-            this.currentDrop = step.parentStage.nextStage.childSteps[0];
-            this.currentHit = step.index;
-          } else {
-            console.log("I am last -- >");
-            if(step.previousStep) {
-              this.currentDrop = step.previousStep;
-              this.currentHit = step.previousStep.index;
-            } else if(step.parentStage.previousStage) {
-              this.currentDrop = step.parentStage.previousStage.childSteps[step.parentStage.previousStage.childSteps.length - 1];
-              this.currentHit = this.currentDrop.index;
-            }
+        if(step.nextStep) {
+          this.currentDrop = step.nextStep;
+          this.currentHit = step.nextStep.index;
+        } else if(step.parentStage.nextStage) {
+          this.currentDrop = step.parentStage.nextStage.childSteps[0];
+          this.currentHit = step.index;
+        } else {
+          console.log("I am last -- >");
+          if(step.previousStep) {
+            this.currentDrop = step.previousStep;
+            this.currentHit = step.previousStep.index;
+          } else if(step.parentStage.previousStage) {
+            this.currentDrop = step.parentStage.previousStage.childSteps[step.parentStage.previousStage.childSteps.length - 1];
+            this.currentHit = this.currentDrop.index;
+          }
           }
       };
 
@@ -142,49 +155,76 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
 
       this.indicator.processMovement = function(step, C) {
+
+        if(this.verticalLine.getVisible() === true) {
+          this.verticalLine.setVisible(false);
+          this.smallCircleTop.setVisible(false);
+          this.smallCircle.setVisible(false);
+        }
         // Make a clone of the step
         //if(Math.abs(this.startPosition - this.endPosition) > 65)
-          var modelClone = $.extend({}, step.model);
-          // We had shrinked the stage, Now we undo it.
-          step.parentStage.expand();
-          // Find the place where you left the moved step
-          //var moveTarget = Math.floor((this.left + 60) / 120);
-          var targetStep = this.currentDrop;
+        var modelClone = $.extend({}, step.model);
+        // We had shrinked the stage, Now we undo it.
+        step.parentStage.expand();
+        // Find the place where you left the moved step
+        //var moveTarget = Math.floor((this.left + 60) / 120);
+        var targetStep = this.currentDrop;
 
-            var targetStage = targetStep.parentStage;
+        if(targetStep.nextStep === null) {
+          if((this.left - (targetStep.stepGroup.left + 30)) > 25) {
+            console.log("Could be going for a new stage1");
+            // make a stage as next spage.
+          }
+        } else if (targetStep.previousStep === null) {
+          if((targetStep.stepGroup.left - this.left) > 25) {
+            console.log("Could be going for a new stage2");
+            // Make stage as previous stage.
+          }
+        }
+        var targetStage = targetStep.parentStage;
 
-            // Delete the step, you moved
-            step.parentStage.deleteStep({}, step);
-            // add clone at the place
-            var data = {
-              step: modelClone
-            };
+        // Delete the step, you moved
+        step.parentStage.deleteStep({}, step);
+        // add clone at the place
+        var data = {
+          step: modelClone
+        };
 
-            targetStage.addNewStep(data, targetStep);
-            // console.log(modelClone.id, targetStep.model.id, targetStage.model.id);
-            ExperimentLoader.moveStep(modelClone.id, targetStep.model.id, targetStage.model.id)
-              .then(function(data) {
-                console.log("Moved", data);
-              });
+        targetStage.addNewStep(data, targetStep);
+        // console.log(modelClone.id, targetStep.model.id, targetStage.model.id);
+        ExperimentLoader.moveStep(modelClone.id, targetStep.model.id, targetStage.model.id)
+          .then(function(data) {
+            console.log("Moved", data);
+          });
 
       };
 
-      this.indicator.onTheMoveDragGroup = function(dragging) {
+      this.indicator.onTheMove = function(C, movement) {
 
-        this.setLeft(dragging.left).setCoords();
-      };
+        this.setLeft(movement.left).setCoords();
 
-      this.indicator.onTheMove = function(C) {
+        this.beacon.setLeft(movement.left + this.beaconMove).setCoords();
 
-        /*if(this.intersectsWithObject(C.hitBlock)) {
-          console.log("oye hit");
-          return false;
-        }*/
-        //console.log(this);
+        if(this.verticalLine.getVisible() === false) {
+          this.verticalLine.setVisible(true);
+          this.smallCircleTop.setVisible(true);
+          this.smallCircle.setVisible(true);
+        }
+
+        if(movement.left > this.currentLeft && this.direction !== "right") {
+          this.direction = "right";
+          this.beaconMove = 96;
+        } else if(movement.left < this.currentLeft && this.direction !== "left") {
+          this.direction = "left";
+          this.beaconMove = -10;
+        }
+
+        this.currentLeft = movement.left;
+
         C.allStepViews.some(function(step, index) {
 
           if(this.intersectsWithObject(step.hitPoint) && this.currentHit !== index) {
-              //step.circle.manageClick();
+
               this.currentDrop = step;
               this.currentHit = index;
               return true;
@@ -192,6 +232,35 @@ angular.module("canvasApp").factory('moveStepRect', [
           return false;
 
         }, this);
+
+        C.allStageViews.some(function(stage, index) {
+
+          if(this.beacon.intersectsWithObject(stage.stageHitPointLowerLeft)) {
+            console.log("hit left");
+            if(this.direction === "left") {
+              // Correct placing of lower left/right black dots
+              // make a mechanism to sense between two stages.
+              ///stage.moveToSide("right", this.verticalLine, this.spaceArray, "STEP");
+            }
+          } else if(this.beacon.intersectsWithObject(stage.stageHitPointLowerRight)) {
+            console.log("hit right");
+            if(this.direction === "right") {
+              //stage.moveToSide("left", this.verticalLine, this.spaceArray, "STEP");
+            }
+          }
+        }, this);
+
+        /*if(this.beacon.left > this.spaceArray[0] && this.beacon.left < this.spaceArray[1]) {
+          if(this.verticalLine.getVisible() === false) {
+            this.verticalLine.setVisible(true);
+            this.smallCircleTop.setVisible(true);
+            this.smallCircle.setVisible(true);
+          }
+        } else if(this.verticalLine.getVisible() === true) {
+          this.verticalLine.setVisible(false);
+          this.smallCircleTop.setVisible(false);
+          this.smallCircle.setVisible(false);
+        }*/
 
       };
 

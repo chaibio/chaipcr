@@ -45,7 +45,6 @@ void Logger::setup(Poco::Channel *channel, const std::string &name)
     Poco::Logger::root().setChannel(new Poco::AsyncChannel(new Poco::FormattingChannel(formatter, channel)));
 
     _logger = &Poco::Logger::get(name);
-    _logger->information("--------------------------------- Session started ---------------------------------");
 }
 
 LoggerStreams::~LoggerStreams()

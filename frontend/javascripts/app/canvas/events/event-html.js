@@ -40,9 +40,8 @@ angular.module("canvasApp").factory('htmlEvents', [
 
         if (C.editStageStatus === false) {
             if (previouslyHoverd.step) {
-              previouslyHoverd.step.closeImage.setVisible(false);
+              previouslyHoverd.step.closeImage.setOpacity(false);
             }
-            previouslyHoverd.step = null;
             C.canvas.renderAll();
         }
 

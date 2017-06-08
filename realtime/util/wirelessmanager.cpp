@@ -37,6 +37,9 @@
 #include <net/if.h>
 #include <sys/eventfd.h>
 
+#define CONNECTION_TIMEOUT_INTERVAL 10
+#define SCAN_CACHE_INTERVAL 60
+
 WirelessManager::WirelessManager()
 {
     _connectionEventFd = eventfd(0, EFD_NONBLOCK);
@@ -46,6 +49,9 @@ WirelessManager::WirelessManager()
 
     _connectionThreadState = Idle;
     _connectionStatus = NotConnected;
+    _connectionTimeout = 0;
+    _scanTime = 0;
+    _scanScheduleState = false;
 
     _interfaceStatusThreadStatus = Working;
     _interfaceStatusThread = std::thread(&WirelessManager::checkInterfaceStatus, this);
@@ -107,9 +113,14 @@ std::string WirelessManager::getCurrentSsid() const
     return ssid;
 }
 
-std::vector<WirelessManager::ScanResult> WirelessManager::scanResult() const
+std::vector<WirelessManager::ScanResult> WirelessManager::scanResult()
 {
     Poco::RWLock::ScopedReadLock lock(_scanResultMutex);
+
+    if (_scanTime + SCAN_CACHE_INTERVAL < std::time(nullptr))
+        _scanResult.clear();
+
+    _scanScheduleState = true;
 
     return _scanResult;
 }
@@ -164,13 +175,13 @@ void WirelessManager::_connect()
             return;
         }
 
-        NetworkInterfaces::removeLease(interface);
+        NetworkInterfaces::removeLeases(interface);
 
         _connectionStatus = Connecting;
 
         ifup();
-        sleep(3);
 
+        _connectionTimeout = std::time(nullptr) + NetworkInterfaces::dhcpTimeout() + CONNECTION_TIMEOUT_INTERVAL;
         _connectionThreadState = Idle;
     }
     catch (const std::exception &ex)
@@ -213,112 +224,105 @@ void WirelessManager::checkInterfaceStatus()
         {
             setInterfaceName("");
 
-            for (const std::string &i: NetworkInterfaces::getAllInterfaces())
-            {
-                if (scan(i))
-                {
-                    setInterfaceName(i);
+            interface = NetworkInterfaces::findWifiInterface();
 
-                    break;
-                }
-            }
+            if (!interface.empty())
+                setInterfaceName(interface);
         }
-        else
-            scan(interface);
 
-        checkConnection();
 
-        sleep(1);
+        if (!interface.empty())
+        {
+            if (_scanScheduleState)
+                scan(interface);
+
+            checkConnection(interface);
+        }
+
+        sleep(!interface.empty() ? 3 : 10);
     }
 
     _interfaceStatusThreadStatus = Idle;
 }
 
-bool WirelessManager::scan(const std::string &interface)
+void WirelessManager::scan(const std::string &interface)
 {
-    try
+    std::stringstream stream;
+
+    Util::watchProcess("iwlist " + interface + " scan", [&stream](const char *buffer, std::size_t size){ stream.write(buffer, size); });
+
+    std::vector<ScanResult> resultList;
+    ScanResult result;
+
+    while (stream.good())
     {
-        std::stringstream stream;
+        std::string line;
+        std::getline(stream, line);
 
-        Util::watchProcess("iwlist " + interface + " scan", [&stream](const char *buffer, std::size_t size){ stream.write(buffer, size); });
-
-        std::vector<ScanResult> resultList;
-        ScanResult result;
-
-        while (stream.good())
+        if (line.find("Cell ") != std::string::npos)
         {
-            std::string line;
-            std::getline(stream, line);
+            if (!result.ssid.empty())
+                resultList.emplace_back(result);
 
-            if (line.find("Cell ") != std::string::npos)
-            {
-                if (!result.ssid.empty())
-                    resultList.emplace_back(result);
-
-                result = ScanResult();
-            }
-            else if (line.find("ESSID:") != std::string::npos)
-            {
-                result.ssid = line.substr(line.find("ESSID:") + 7); //Skip ESSID:"
-                result.ssid.resize(result.ssid.size() - 1); //Skil " at the end
-            }
-            else if (line.find("Encryption key:") != std::string::npos)
-            {
-                if (line.find(":on") != std::string::npos)
-                    result.encryption = ScanResult::WepEncryption; //Assume that encryption is wep for now
-            }
-            else if (line.find("IE: ") != std::string::npos)
-            {
-                if (line.find("WPA Version 1") != std::string::npos)
-                    result.encryption = ScanResult::Wpa1Ecryption;
-                else if (line.find("WPA2") != std::string::npos)
-                    result.encryption = ScanResult::Wpa2Ecryption;
-            }
-            else if (line.find("Quality=") != std::string::npos)
-            {
-                std::string str = line.substr(line.find("Quality=") + 8);
-                std::stringstream stream(str);
-
-                stream >> result.quality;
-
-                std::getline(stream, str, '='); //Skip "/100  Signal level="
-
-                stream >> result.siganlLevel;
-            }
+            result = ScanResult();
         }
-
-        if (!result.ssid.empty())
-            resultList.emplace_back(result);
-
+        else if (line.find("ESSID:") != std::string::npos)
         {
-            Poco::RWLock::ScopedWriteLock lock(_scanResultMutex);
-            _scanResult = std::move(resultList);
+            result.ssid = line.substr(line.find("ESSID:") + 7); //Skip ESSID:"
+            result.ssid.resize(result.ssid.size() - 1); //Skil " at the end
+        }
+        else if (line.find("Encryption key:") != std::string::npos)
+        {
+            if (line.find(":on") != std::string::npos)
+                result.encryption = ScanResult::WepEncryption; //Assume that encryption is wep for now
+        }
+        else if (line.find("IE: ") != std::string::npos)
+        {
+            if (line.find("WPA Version 1") != std::string::npos)
+                result.encryption = ScanResult::Wpa1Ecryption;
+            else if (line.find("WPA2") != std::string::npos)
+                result.encryption = ScanResult::Wpa2Ecryption;
+        }
+        else if (line.find("Quality=") != std::string::npos)
+        {
+            std::string str = line.substr(line.find("Quality=") + 8);
+            std::stringstream stream(str);
+
+            stream >> result.quality;
+
+            std::getline(stream, str, '='); //Skip "/100  Signal level="
+
+            stream >> result.siganlLevel;
         }
     }
-    catch (...)
-    {
-        return false;
-    }
 
-    return true;
+    if (!result.ssid.empty())
+        resultList.emplace_back(result);
+
+    {
+        Poco::RWLock::ScopedWriteLock lock(_scanResultMutex);
+        _scanResult = std::move(resultList);
+        _scanTime = std::time(nullptr);
+        _scanScheduleState = false;
+    }
 }
 
-void WirelessManager::checkConnection()
+void WirelessManager::checkConnection(const std::string &interface)
 {
-    NetworkInterfaces::InterfaceState state = NetworkInterfaces::getInterfaceState(interfaceName());
+    NetworkInterfaces::InterfaceState state = NetworkInterfaces::getInterfaceState(interface);
 
     if (!state.isEmpty())
     {
-        if (state.flags & IFF_UP)
+        if (state.flags & IFF_UP && state.addressState)
         {
-            if (state.addressState)
-                _connectionStatus = Connected;
-            else if (_connectionThreadState != Working)
-                _connectionStatus = AuthenticationError;
+            _connectionStatus = Connected;
+            _connectionTimeout = 0;
         }
-        else if (_connectionThreadState != Working)
+        else if (_connectionThreadState != Working && std::time(nullptr) > _connectionTimeout)
         {
-            if (_connectionStatus == Connecting)
+            if (state.flags & IFF_UP)
+                _connectionStatus = AuthenticationError;
+            else if (_connectionStatus == Connecting)
                 _connectionStatus = ConnectionError;
             else if (_connectionStatus != ConnectionError)
                 _connectionStatus = NotConnected;

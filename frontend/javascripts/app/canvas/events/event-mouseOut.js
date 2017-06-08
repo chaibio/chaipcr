@@ -50,6 +50,15 @@ angular.module("canvasApp").factory('mouseOut', [
           case "deleteStepButton":
             that.canvas.hoverCursor = "move";
           break;
+
+          case "temperatureDisplayText":
+            //evt.target.trigger('editing:exited');
+          break;
+
+          case "holdTimeDisplayText":
+            //evt.target.trigger('editing:exited');
+          break;
+
         }
       });
     };

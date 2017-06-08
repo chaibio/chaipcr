@@ -2568,7 +2568,7 @@
         nextDay : '[Tomorrow at] LT',
         nextWeek : 'dddd [at] LT',
         lastDay : '[Yesterday at] LT',
-        lastWeek : '[Last] dddd [at] LT',
+        lastWeek : 'dddd [at] LT',
         sameElse : 'L'
     };
 

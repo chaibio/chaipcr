@@ -1,0 +1,44 @@
+<div class="intro">
+  <h2>Open qPCR Optical Calibration</h2>
+
+  <p>
+    The optical calibration procedure corrects well-to-well differences in Open qPCR's optical path. The calibration should be performed whenever the lid height is adjusted, the make of PCR tubes is changed, or the Open qPCR is transported.
+  </p>
+
+  <div class="mini-description">
+    <div class="row text-left">
+      <div class="col-md-3">
+        <b class="section-title">DURATION</b>
+        <br>
+        ~5 minutes
+      </div>
+      <div class="col-md-9">
+        <b class="section-title">MATERIALS REQUIRED</b>
+        <table>
+          <tbody>
+            <tr>
+              <td>4x</td>
+              <td><b>8-well PCR strips</b></td>
+            </tr>
+            <tr>
+              <td>200uL</td>
+              <td><b>Water</b> [25uL/tube]</td>
+            </tr>
+            <tr>
+              <td>200uL</td>
+              <td><b>Open qPCR Fluorescein Calibration Solution</b> [25uL/tube]</td>
+            </tr>
+          </tbody>
+        </table>
+        <span class="note">
+          *It is important to pipette the caliration solution from the same stock tube. If the solution is pipetted from different stock tubes, the stock solution  should first be mixed.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center">
+    <button ng-show="!cancel" ng-disabled="getErrors().length > 0" ng-class="{errorButton: (getErrors().length > 0) }" ui-sref="optical_cal.step-1">BEGIN</button>
+  </div>
+
+</div>

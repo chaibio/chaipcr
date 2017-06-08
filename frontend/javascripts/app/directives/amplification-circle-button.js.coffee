@@ -24,6 +24,7 @@ window.ChaiBioTech.ngApp
     require: 'ngModel'
     replace: true
     templateUrl: 'app/views/directives/amplification-circle-button.html'
+
     link: ($scope, elem, attrs, ngModel) ->
 
       Device.isDualChannel().then (is_dual_channel) ->
@@ -32,16 +33,22 @@ window.ChaiBioTech.ngApp
       $scope.$watchCollection ->
         ngModel.$modelValue
       , (newVal) ->
-        $scope.updateUI() if newVal
+        $scope.updateUI(newVal) if newVal
 
-      $scope.updateUI = ->
+      $scope.updateUI = (state)->
+        ngModel.$setViewValue state
         $scope.selected = ngModel.$modelValue.selected
         $scope.color = ngModel.$modelValue.color || 'gray'
         $scope.ct = ngModel.$modelValue.ct
+        $scope.abc =
+          margin: '0px'
+          borderTopColor: $scope.color
 
         $scope.style =
-          borderColor: $scope.color
-          paddingLeft: if (!ngModel.$modelValue.ct?[0] and !ngModel.$modelValue.ct?[1]) then '0px' else '10px'
+          #borderColor: $scope.color
+          paddingLeft: if (!ngModel.$modelValue.ct?[0] and !ngModel.$modelValue.ct?[1]) then '20px' else '20px'
+          paddingRight: if (!ngModel.$modelValue.ct?[0] and !ngModel.$modelValue.ct?[1]) then '20px' else '20px'
+
 
       $scope.toggleState = ->
         state =
@@ -49,7 +56,6 @@ window.ChaiBioTech.ngApp
           color: ngModel.$modelValue.color || 'gray'
           ct: $scope.ct
 
-        ngModel.$setViewValue state
-        $scope.updateUI()
+        $scope.updateUI(state)
 
 ]

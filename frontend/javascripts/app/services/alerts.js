@@ -18,15 +18,35 @@
  */
 
 window.ChaiBioTech.ngApp.service('alerts', [
-  function() {
+  '$uibModal',
+  function($uibModal) {
 
     return {
+
+      showMessage: function(message, $scope, templateUrl) {
+
+        $scope.warningMessage = message;
+        $scope.modal = $uibModal.open({
+          scope: $scope,
+          templateUrl: templateUrl || 'app/views/modal-warning.html',
+          windowClass: 'small-modal'
+          // This is tricky , we used it here so that,
+          //Custom size of this modal doesn't change any other modal in use
+        });
+      },
+
       noOfCyclesWarning: "The value you have entered is less than AUTO DELTA START CYCLE. Please enter a value greater than AUTO DELTA START CYCLE or reduce AUTO DELTA START CYCLE and re-enter value.",
-      nonDigit: "You have entered a wrong value. Please make sure you enter digits.",
+      nonDigit: "You have entered a wrong value. Please make sure you enter digits in the format HH:MM:SS.",
       autoDeltaOnWrongStage: "You can't turn on auto delta on this stage. Please select a CYCLING STAGE to enable auto delat.",
-      startOnCycleWarning: "The value you have entered is greater than number of cycles set for this stage. Please enetr a value lower than number of cycles or Increase number of cycles for this stage.",
+      startOnCycleWarning: "The value you have entered is greater than the number of cycles set for this stage. Please enter a value lower than the number of cycles or increase the number of cycles for this stage.",
       startOnCycleMinimum: "The minimum value you can enter is 1 please input a value greater than zero.",
-      rampSpeedWarning: "Please Enter a valid integer value less than 1000."
+      rampSpeedWarning: "Please enter a valid integer value in the range 0 - 6 .",
+      holdDurationZeroWarning: "Plese enter a non zero value, Only last step with collect_data turned off, can be assigned with infinite hold.",
+      holdDurationWarning: "Please a enter a value in the range 00:00 - 05:00",
+      internalServerError: "There is an internal server error pleas re-load the page",
+      autoDeltaTemp: "Please enter a value in the range [-99 To 99]",
+      rampSpeedWarningLimitExceeded: "Minimum ramp speed is 0.00001",
+      noNegativeHold: "Negative values are not permitted for hold duration."
     };
   }
 ]);

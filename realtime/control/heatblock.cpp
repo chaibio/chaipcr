@@ -93,23 +93,33 @@ void HeatBlock::setTargetTemperature(double targetTemperature, double rampRate) 
     if (rampRate <= 0 || rampRate > _maxRampSpeed)
         rampRate = _maxRampSpeed;
 
-    _stepProcessingMutex.lock();
+    std::lock_guard<std::mutex> lock(_stepProcessingMutex);
     _ramp.set(targetTemperature, rampRate);
-    _stepProcessingMutex.unlock();
+}
+
+double HeatBlock::targetTemperature() const {
+    std::lock_guard<std::mutex> lock(_stepProcessingMutex);
+    return _ramp.targetTemperature();
 }
 
 void HeatBlock::calculateTemperature() {
-    std::lock_guard<std::mutex> lock(_stepProcessingMutex);
+    bool finished = false;
 
-    if (!_ramp.isEmpty()) {
-        double temp = _ramp.computeTemperature(_zones.first->targetTemperature());
+    {
+        std::lock_guard<std::mutex> lock(_stepProcessingMutex);
 
-        _zones.first->setTargetTemperature(temp);
-        _zones.second->setTargetTemperature(temp);
+        if (!_ramp.isEmpty()) {
+            double temp = _ramp.computeTemperature(_zones.first->targetTemperature());
 
-        if (_ramp.isEmpty())
-            rampFinished();
+            _zones.first->setTargetTemperature(temp);
+            _zones.second->setTargetTemperature(temp);
+
+            finished = _ramp.isEmpty();
+        }
     }
+
+    if (finished)
+        rampFinished();
 }
 
 double HeatBlock::zone1Temperature() const {

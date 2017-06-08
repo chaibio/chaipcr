@@ -41,6 +41,14 @@ namespace Poco { namespace Util { class Timer; class TimerTask; } }
 class Optics : public IControl, public ADCConsumer
 {
 public:
+    enum CollectionDataType
+    {
+        NoCollectionDataType,
+        FluorescenceDataType,
+        FluorescenceCalibrationDataType,
+        MeltCurveDataType
+    };
+
     struct FluorescenceData
     {
         FluorescenceData(int32_t baselineValue, int32_t fluorescenceValue, unsigned int wellId, std::size_t channel):
@@ -51,6 +59,9 @@ public:
 
         unsigned int wellId;
         std::size_t channel;
+
+        std::vector<int32_t> baselineData;
+        std::vector<int32_t> fluorescenceData;
     };
 
     struct MeltCurveData
@@ -58,10 +69,21 @@ public:
         MeltCurveData(int32_t fluorescenceValue, double temperature, unsigned int wellId, std::size_t channel):
             fluorescenceValue(fluorescenceValue), temperature(temperature), wellId(wellId), channel(channel) {}
 
+        MeltCurveData(MeltCurveData &&other)
+        {
+            fluorescenceValue = other.fluorescenceValue;
+            temperature = other.temperature;
+            wellId = other.wellId;
+            channel = other.channel;
+            fluorescenceData = std::move(other.fluorescenceData);
+        }
+
         int32_t fluorescenceValue;
         double temperature;
         unsigned int wellId;
         std::size_t channel;
+
+        std::vector<int32_t> fluorescenceData;
     };
 
     Optics(unsigned int lidSensePin, std::shared_ptr<LEDController> ledController, MUX &&photoDiodeMux);
@@ -75,16 +97,16 @@ public:
 	//accessors
     inline bool lidOpen() const noexcept { return _lidOpen; }
 
-    inline bool collectData() const noexcept { return _collectData; }
-    inline bool isMeltCurveCollection() const noexcept { return _meltCurveCollection; }
-    void setCollectData(bool state, bool isMeltCurve = false);
+    inline CollectionDataType collectDataType() const noexcept { return _collectDataType; }
+    void startCollectData(CollectionDataType type);
+    void stopCollectData();
 
     inline unsigned wellNumber() const noexcept { return _wellNumber; } //Yes, it's used in multithreading. Yes, it isn't thread safe here. It's just for testing
 
     inline std::shared_ptr<LEDController> getLedController() const noexcept { return _ledController; }
     inline MUX& getPhotodiodeMux() noexcept { return _photodiodeMux; }
 
-    std::vector<FluorescenceData> getFluorescenceData(bool clear = true);
+    std::vector<FluorescenceData> getFluorescenceData();
     std::vector<MeltCurveData> getMeltCurveData(bool stopDataCollect = true);
 
     boost::signals2::lockfree_signal<void()> fluorescenceDataCollected;
@@ -101,11 +123,11 @@ private:
     std::atomic<bool> _lidOpen;
     GPIO _lidSensePin;
 
-    std::pair<int32_t, std::size_t> _adcValue;
-    std::mutex _adcMutex;
-    std::condition_variable _adcCondition;
+    std::vector<std::vector<int32_t>> _adcValues;
+    std::atomic<bool> _adcState;
+    std::condition_variable_any _adcCondition;
 
-    std::atomic<bool> _collectData;
+    std::atomic<CollectionDataType> _collectDataType;
     Poco::Util::Timer *_collectDataTimer;
     mutable std::recursive_mutex _collectDataMutex;
 
@@ -113,11 +135,12 @@ private:
 
     std::map<unsigned int, std::map<std::size_t, FluorescenceRoughData>> _fluorescenceData;
 
-    std::atomic<bool> _meltCurveCollection;
     std::vector<MeltCurveData> _meltCurveData;
     std::mutex _meltCurveDataMutex;
 
     MUX _photodiodeMux;
+
+    bool _firstErrorState;
 
     //Hardcode for testing
     std::map<std::size_t, std::atomic<int32_t>> _lastAdcValues; //Not thread safe

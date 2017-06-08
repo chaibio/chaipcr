@@ -35,7 +35,7 @@ angular.module("canvasApp").directive('actions', [
         scope.infiniteHoldStep = false;
         scope.infiniteHoldStage = false;
         scope.editStageMode = false;
-        scope.editStageText = "EDIT STAGE";
+        scope.editStageText = "EDIT STAGES";
 
         scope.$on("dataLoaded", function() {
 
@@ -44,6 +44,7 @@ angular.module("canvasApp").directive('actions', [
           });
 
           scope.$watch('step.pause', function(pauseState) {
+
             if(pauseState) {
               scope.pauseAction = "REMOVE";
             } else {
@@ -69,8 +70,14 @@ angular.module("canvasApp").directive('actions', [
               scope.infiniteHoldStage = false;
             }
           });
-
         });
+
+        scope.addStage_ = function() {
+
+          if(!scope.summaryMode) {
+            scope.actionPopup = ! scope.actionPopup;
+          }
+        };
 
         scope.containInfiniteStep = function(stage) {
 
@@ -83,15 +90,13 @@ angular.module("canvasApp").directive('actions', [
 
         scope.addStep = function() {
 
-          if(! scope.infiniteHoldStep) {
+          if(! scope.infiniteHoldStep && ! scope.summaryMode) {
             ExperimentLoader.addStep(scope)
               .then(function(data) {
-                console.log(data);
                 //Now create a new step and insert it...!
                 scope.fabricStep.parentStage.addNewStep(data, scope.fabricStep);
               });
           }
-
         };
 
         scope.deleteStep = function() {
@@ -103,17 +108,17 @@ angular.module("canvasApp").directive('actions', [
             });
         };
 
-
         scope.editStage = function() {
 
           scope.editStageMode = ! scope.editStageMode;
-          scope.editStageText = (scope.editStageMode) ? "DONE" : "EDIT STAGE";
+          scope.editStageText = (scope.editStageMode) ? "DONE" : "EDIT STAGES";
           canvas.editStageMode(scope.editStageMode);
+
         };
 
         scope.addPause = function() {
-
-          if(! scope.infiniteHoldStep) {
+          
+          if(! scope.infiniteHoldStep && ! scope.summaryMode && ! scope.step.collect_data) {
             scope.step.pause = ! scope.step.pause;
             ExperimentLoader.changePause(scope)
             .then(function(data) {

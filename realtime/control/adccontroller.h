@@ -20,9 +20,11 @@
 #define _ADCCONTROLLER_H_
 
 #include "icontrol.h"
+#include "watchdog.h"
 #include "spi.h"
 #include "lockfreesignal.h"
 
+#include <array>
 #include <vector>
 #include <memory>
 #include <atomic>
@@ -30,9 +32,10 @@
 
 class LTC2444;
 class ADCConsumer;
+class BaseADCDebugLogger;
 
 // Class ADCController
-class ADCController : public IThreadControl
+class ADCController : public IThreadControl, public Watchdog::Watchable
 {
 public:
     enum ADCState {
@@ -43,13 +46,17 @@ public:
         EFinal
     };
 
-    typedef std::map<ADCState, std::shared_ptr<ADCConsumer>> ConsumersList;
+    typedef std::array<std::shared_ptr<ADCConsumer>, EFinal> ConsumersList;
 
     ADCController(ConsumersList &&consumers, unsigned int csPinNumber, SPIPort &&spiPort, unsigned int busyPinNumber);
 	~ADCController();
 	
     void process();
     void stop();
+
+    bool startDebugLogger(std::size_t preSamplesCount, std::size_t postSamplesCount);
+    void stopDebugLogger();
+    void triggetDebugLogger();
 
     boost::signals2::lockfree_signal<void()> loopStarted;
 
@@ -67,9 +74,13 @@ protected:
 
     ConsumersList _consumers;
 
-    std::vector<std::shared_ptr<ADCConsumer>> _zoneConsumers;
     std::shared_ptr<ADCConsumer> _liaConsumer;
     std::shared_ptr<ADCConsumer> _lidConsumer;
+
+private:
+    BaseADCDebugLogger *_debugLogger;
+
+    bool _ignoreReading;
 };
 
 #endif

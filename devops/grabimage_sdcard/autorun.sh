@@ -31,11 +31,11 @@ then
 	exit
 fi
 
-if [ -e /dev/mmcblk0p4 ]
+if [ -e /dev/mmcblk0p3 ]
 then
         eMMC=/dev/mmcblk0
 	sdcard_dev=/dev/mmcblk1p1
-elif [ -e /dev/mmcblk1p4 ]
+elif [ -e /dev/mmcblk1p3 ]
 then
        	eMMC=/dev/mmcblk1
 	sdcard_dev=/dev/mmcblk0p1

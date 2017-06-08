@@ -28,42 +28,55 @@ window.ChaiBioTech.ngApp.directive('temperature', [
         caption: "@",
         unit: "@",
         reading: '=',
-        action: '&' // Learn how to pass value in this scenario
+        action: '&', // Learn how to pass value in this scenario
+        helpText: "@"
       },
 
       templateUrl: 'app/views/directives/edit-value.html',
 
       link: function(scope, elem, attr) {
 
-        scope.edit = false;
         scope.delta = true; // This is to prevent the directive become disabled, check delta in template, this is used for auto delta field
-        var editValue;
+        scope.edit = false;
+        scope.temp = true;
+        scope.pause = true; // Not bothered about pause value;
+
+        var editValue, help_part = angular.element(elem).find(".help-part");
 
         scope.$watch("reading", function(val) {
 
           if(angular.isDefined(scope.reading)) {
+            scope.shown = Number(scope.reading).toFixed(1);
+          }
+        });
 
-            scope.shown = Number(scope.reading);
-            scope.hidden = Number(scope.reading);
+        scope.$watch("edit", function(editStatus) {
+
+          if(editStatus === true) {
+            help_part.animate({
+              left: 100
+            }, 200);
+          } else if(editStatus === false) {
+            help_part.animate({
+              left: 0
+            }, 200);
           }
         });
 
         scope.editAndFocus = function(className) {
+          if(scope.edit === false) {
+            scope.edit = true;
+            editValue = Number(scope.shown).toFixed(1);
+          }
 
-          scope.edit = ! scope.edit;
-          editValue = Number(scope.hidden);
-
-          $timeout(function() {
-            $('.' + className).focus();
-          });
         };
 
         scope.save = function() {
-          console.log("saving ...... !");
           scope.edit = false;
-          if(! isNaN(scope.hidden) && editValue !== Number(scope.hidden)) {
 
-            scope.reading = scope.hidden;
+          if(! isNaN(scope.shown) && editValue != Number(scope.shown)) {
+
+            scope.reading = Number(scope.shown).toFixed(1);
             $timeout(function() {
               ExperimentLoader.changeTemperature(scope.$parent).then(function(data) {
                 console.log(data);
@@ -71,7 +84,7 @@ window.ChaiBioTech.ngApp.directive('temperature', [
             });
 
           } else {
-            scope.shown = scope.hidden = scope.reading;
+            scope.shown = Number(scope.reading).toFixed(1);
           }
         };
       }

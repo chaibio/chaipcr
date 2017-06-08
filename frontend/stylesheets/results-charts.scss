@@ -1,0 +1,182 @@
+@import './colors.css.scss';
+.results-charts {
+  .curve-header {
+    border-bottom: 3px solid $gray;
+    padding-bottom: 3px;
+		margin-left: 20px;
+		margin-right: 20px;
+    .row {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+    .curve-title {
+      display: inline-block;
+      //width: 70%;
+      cursor: pointer;
+      img {
+        display: inline-block;
+        margin-top: -5px;
+        width: 20px;
+      }
+    }
+    .plot-type-checkboxes {
+      margin-bottom: -10px;
+      .checkbox-item {
+        cursor: pointer;
+        display: inline-block;
+        font-weight: bold;
+        text-align: right;
+        width: 14%;
+        .checkbox-icon {
+          border-radius: 100px;
+          border: 1px solid black;
+          display: inline-block;
+          width: 11px;
+          height: 11px;
+          padding: 0;
+          vertical-align: middle;
+        }
+        &.checked {
+          .checkbox-icon {
+            background-color: $green;
+            .inner {
+              width: 9px;
+              height: 9px;
+              border: 2px solid #fff;
+              border-radius: 100px;
+              display: block;
+              background: transparent;
+            }
+          }
+        }
+        &.unchecked {
+          opacity: 0.5;
+          .checkbox-icon {
+            background: #fff;
+            .inner {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+
+    .plot-type-buttons-col {
+      margin-top: -5px;
+    }
+
+    .plot-type-buttons {
+      // margin-top: -5px;
+      $plot_type_buttons_btn_width: 100px;
+      $plot_type_buttons_border_width: 1px;
+      float: right;
+      width: ($plot_type_buttons_btn_width*2);
+      .plot-type-text {
+        text-align: center;
+      }
+      .buttons-wrapper {
+        //border: $plot_type_buttons_border_width solid #000;
+        box-shadow: 0 0 0 1px;
+        text-align: right;
+      }
+      .button {
+        width: $plot_type_buttons_btn_width;
+        display: inline-block;
+        text-align: center;
+        border-radius: 0;
+        border: none;
+        padding: 0px;
+        padding-top: 2px;
+        padding-bottom: 3px;
+        &:hover {
+          background: none;
+        }
+        &.selected {
+          background-color: $green;
+          color: #fff;
+        }
+      }
+    }
+  }
+  $marginTop: 190px;
+  .vertical-text {
+    transform: rotate(-90deg);
+    transform-origin: 20% 40%;
+    float: left;
+    // font-size: 10px;
+    // font-weight: bold;
+    margin-left: -35px;
+    margin-top: $marginTop;
+    margin-bottom: -$marginTop;
+  }
+  .loading {
+    margin-top: 100px;
+    margin-bottom: 100px;
+  }
+  .chart-container {
+    margin-left: 15px;
+    margin-bottom: -35px;
+  }
+  .line-series {
+    path {
+      stroke-width: 1.7px !important;
+    }
+  }
+  .dot-series {
+    circle {
+      stroke-width: 3px !important;
+    }
+  }
+  .axis .tick text {
+    font-family: "dinot-regular";
+    font-size: 10px;
+  }
+  .x-axis-text {
+    // font-family: 'Open Sans';
+    // font-size: 10px;
+    // font-weight: bold;
+    // margin-bottom: -15px;
+  }
+  .abscissa-text {
+    margin-top: 60px;
+  }
+  .zoom-scroll-container {
+    margin-top: 50px;
+    padding-left: 50px;
+    padding-right: 50px;
+    .zoom-container {
+      cursor: pointer;
+      .zoom-text {
+        display: inline-block;
+        width: 20%;
+        vertical-align: middle;
+        font-weight: bold;
+      }
+      .ampli-slider {
+        display: inline-block;
+        width: 80%;
+        vertical-align: middle;
+        cursor: pointer;
+      }
+      .ampli-slider-thermal {
+        display: inline-block;
+        width: 50%;
+        vertical-align: middle;
+      }
+    }
+    .ampli-scrollbar-container {
+      .scrollbar-container {
+        height: 5px;
+        border-radius: 10px;
+        margin-top: -2px;
+        position: relative;
+        top: 11.5px;
+        background: #ccc;
+        cursor: pointer;
+        .scrollbar {
+          border-radius: 10px;
+        }
+      }
+    }
+  }
+}

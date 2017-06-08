@@ -183,8 +183,8 @@ fi
 stage=0
 counter_file=${sdcard_p2}/unpack_stage.ini
 
-incriment_stage_counter () {
-	# Incriment and display restart counter
+increment_stage_counter () {
+	# increment and display restart counter
 	counter_old=0
 	counter_old=$(cat ${counter_file})
 	if [ -z $counter_old ]
@@ -220,14 +220,14 @@ fi
 if [ $stage -lt 2 ]
 then
 	reset_stage_counter
-	incriment_stage_counter
+	increment_stage_counter
 fi
 
 write_pt_image
 if [ $stage -le 2 ]
 then
 	echo Partition table wrote.
-	incriment_stage_counter
+	increment_stage_counter
 	#reboot needs to set sdcard only
 fi
 
@@ -274,19 +274,19 @@ rm /tmp/emmcboot/* > /dev/null || true
 sync
 sleep 3
 umount /tmp/emmcboot || true
-incriment_stage_counter
+increment_stage_counter
 
 if [ "$1" = "factorysettings" ]
 then
        	write_data_image
-	incriment_stage_counter
+	increment_stage_counter
 fi
 
 write_rootfs_image
-incriment_stage_counter
+increment_stage_counter
 
 write_boot_image
-incriment_stage_counter
+increment_stage_counter
 
 if [ "$1" = "factorysettings" ]
 then
@@ -295,10 +295,7 @@ else
 	update_uenv 2
 fi
 
-incriment_stage_counter
-
-echo "Finished.. byebye!"
-echo "Upgrade resume flag down!"
+increment_stage_counter
 
 if [ -e ${sdcard_p1}/unpack_resume_autorun.flag ]
 then
@@ -310,12 +307,19 @@ then
 	rm ${sdcard_p2}/unpack_resume_autorun.flag || true
 fi
 
+echo "Finished.. byebye!"
+echo "Upgrade resume flag down!"
+
 sync
 
 echo default-on > /sys/class/leds/beaglebone\:green\:usr0/trigger
 
 upgrade_autorun_flag_up () {
 	echo "Autorun scripts after boot.. requested on $NOW" > ${sdcard_p2}/upgrade_autorun.flag
+}
+
+change_root_password_flag_up () {
+	echo "change root password after boot.. requested on $NOW" > ${sdcard_p2}/change_root_password.flag
 }
 
 upgrade_autorun_flag_down () {
@@ -331,7 +335,8 @@ upgrade_autorun_flag_down () {
 
 if [ "$1" = "factorysettings" ]
 then
-    	echo "No migrate autorun for factory settings!"
+    	echo "Changing root password on next boot!"
+	change_root_password_flag_up
 else
 	echo "Adding migrate autorun flag"
 	upgrade_autorun_flag_up
@@ -341,13 +346,17 @@ if [ "$1" != "factorysettings" ]
 then
 	mkdir -p /tmp/data
 	mount ${eMMC}p3 /tmp/data
-	if [ -e /tmp/data/.tmp/shadow.backup ]
+	if [ -e /tmp/data/.tmp/shadow.backup ] || [ -e /tmp/data/.tmp/dhclient.*.leases ]
 	then
 		mkdir -p /tmp/rootfs
 		mount ${eMMC}p2 /tmp/rootfs
-		mv /tmp/data/.tmp/shadow.backup /tmp/rootfs/etc/shadow
-		rm -r /tmp/data/.tmp
+		mv /tmp/data/.tmp/shadow.backup /tmp/rootfs/etc/shadow || true
+		mv /tmp/data/.tmp/dhclient.*.leases /tmp/rootfs/var/lib/dhcp/ || true
+		rm -r /tmp/data/.tmp || true
+		sync
+		umount /tmp/rootfs || true
 	fi
+	umount /tmp/data || true
 fi
 
 exit 0

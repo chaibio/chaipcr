@@ -1,20 +1,20 @@
 <!--
-    Chai PCR - Software platform for Open qPCR and Chai's Real-Time PCR instruments.
-    For more information visit http://www.chaibio.com
+Chai PCR - Software platform for Open qPCR and Chai's Real-Time PCR instruments.
+For more information visit http://www.chaibio.com
 
-    Copyright 2016 Chai Biotechnologies Inc. <info@chaibio.com>
+Copyright 2016 Chai Biotechnologies Inc. <info@chaibio.com>
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 -->
 <div class="melt-curve-chart-state-active results-charts">
   <div class="page-layout" ng-controller="MeltCurveChartCtrl" ng-show="experiment">
@@ -23,10 +23,10 @@
         <div class="curve-header">
           <div class="row">
             <div class="col-sm-6 curve-name">
-              <span class="curve-title H1" ng-click="RunExperimentCtrl.changeChartTypeModal()">
+              <chart-chooser class="curve-title H1" experiment="experiment" current-chart="$parent.chart">
                 Melt Curve
                 <img class="arrow-down" src="/images/arrow-down.png">
-              </span>
+              </chart-chooser>
             </div>
             <div class="col-sm-6 ampli-toggles">
               <div class="plot-type-buttons">
@@ -39,59 +39,44 @@
             </div>
           </div>
         </div>
-        <!-- <div class="subheader-switches SH">
-          <div class="item-switch">
-            <switch ng-model="baseline_subtraction"></switch>
-            <label>BASELINE SUBTRACTION</label>
-          </div>
-        </div> -->
         <div style="padding-top:70px;">
-          <div class="vertical-text SH">
-            <span ng-show="curve_type === 'derivative'">DERIVATIVE REPORTER</span>
-            <span ng-show="curve_type === 'normalized'">NORMALIZED REPORTER</span>
-          </div>
-          <div class="chart-container" id="ampli-drag-scroll" chart-drag-scroll ng-model="ampli_scroll">
-            <div class="chart-error B1"  ng-show="error">
-              <strong class="text-black">Unable to load chart data</strong>
-              <p ng-bind="error"></p>
-              Retrying in {{retry}} seconds<ellipsis-animated></ellipsis-animated>
+          <div full-height offset="210 + 50 + 37 + 20 + 122">
+            <div class="vertical-text SH">
+              <span ng-show="curve_type === 'derivative'">DERIVATIVE REPORTER</span>
+              <span ng-show="curve_type === 'normalized'">NORMALIZED REPORTER</span>
             </div>
-            <div class="loading-blue-container" ng-show="(fetching || retrying || !enterState) && !has_data && !error">
-              <div class="loading-blue"></div>
-              <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
-              <p class="B2">May take a minute</p>
+            <div class="chart-container" full-height offset="530" min="255">
+              <div class="chart-error B1" ng-show="error">
+                <strong class="text-black">Unable to load chart data</strong>
+                <p ng-bind="error"></p>
+                Retrying in {{retry}} seconds
+                <ellipsis-animated></ellipsis-animated>
+              </div>
+              <div class="loading-blue-container" ng-show="(fetching || retrying || !enterState) && !hasData && !error">
+                <div class="loading-blue"></div>
+                <h2 class="H2">Loading Data <ellipsis-animated></ellipsis-animated></h2>
+                <p class="B2">May take a minute</p>
+              </div>
+              <melt-curve-chart data="data" config="config" zoom="mc_zoom" on-zoom="onZoom" scroll="mc_scroll.value" show="showMeltCurveChart"></melt-curve-chart>
             </div>
-            <linechartv2 ng-if="curve_type==='derivative' && (RunExperimentCtrl.chart==='melt-curve' || has_data) && !error"
-             data-drag-scroll="meltcurve-drag-scroll" data="data" options="chartConfigDerivative" width="1024" height="400">
-            </linechartv2>
-            <linechartv2 ng-if="curve_type==='normalized' && (RunExperimentCtrl.chart==='melt-curve' || has_data) && !error" data="data" options="chartConfigNormalized" width="1024" height="400">
-            </linechartv2>
-          </div>
-          <!-- <div class="text-center num-cycle-text SH">CYCLES NUMBER</div> -->
-          <div class="ampli-zoom-scroll-container">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="zoom-container">
-                  <div class="zoom-text SH">
-                    <b>ZOOM</b>
+            <div class="ampli-zoom-scroll-container">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="zoom-container">
+                    <div class="zoom-text SH">
+                      <b>ZOOM</b>
+                    </div>
+                    <ampli-slider ng-model="$parent.mc_zoom" ng-if="chart === 'melt-curve'"></ampli-slider>
                   </div>
-                  <ampli-slider ng-model="mc_zoom" range="resolutionOptions.length - 1"></ampli-slider>
+                </div>
+                <div class="col-md-6 ampli-scrollbar-container">
+                  <scrollbar ng-model="$parent.mc_scroll" ng-if="chart === 'melt-curve'"></scrollbar>
                 </div>
               </div>
-              <div class="col-md-6 ampli-scrollbar-container">
-                <scrollbar ng-model="mc_scroll" id="melt-curve-scrollbar"></scrollbar>
-              </div>
             </div>
-
-            <!-- <div class="zoom-container">
-              <div class="zoom-text SH">
-                <b>ZOOM</b>
-              </div>
-              <ampli-slider ng-model="mc_zoom" range="resolutionOptions.length - 1"></ampli-slider>
-            </div> -->
           </div>
           <div class="choose-chart">
-            <amplification-well-switch ng-model="wellButtons" color-by="color_by" button-labels-num="1" label-unit="'Tm'"></amplification-well-switch>
+            <amplification-well-switch ng-model="wellButtons" color-by="color_by" button-labels-num="1" label-unit="'Tm'" chart-type="melt-curve"></amplification-well-switch>
           </div>
         </div>
       </div>
@@ -107,30 +92,25 @@
               <td class="B1" ng-class="{'text-center': color_by==='channel'}">
                 <span ng-if="color_by==='well'" class="dot" style="background-color: {{wellButtons['well_'+i].color}}"></span>
                 <span class="text">
-                  <span ng-show="i < 8">
-                    A{{i+1}}
-                  </span>
-                  <span ng-show="i > 7">
-                    B{{i-7}}
-                  </span>
+            <span ng-show="i < 8">
+              A{{i+1}}
+            </span>
+                <span ng-show="i > 7">
+              B{{i-7}}
+            </span>
                 </span>
               </td>
-              <td class="B1">Sample</td>
+              <td ng-click="focusExpName($index)">
+                <span class="sample-span" ng-click="focusExpName($index)" ng-show="!editExpNameMode[$index]">
+            {{samples[$index] | truncate:20}}
+          </span>
+                <input type="text" class="sample-input" ng-show="editExpNameMode[$index]" focus-on="editExpNameMode" ng-blur="updateSampleName($index,samples[$index])" on-key-enter="updateSampleName($index,samples[$index])" ng-model="samples[$index]">
+              </td>
               <td class="B1">
                 <span ng-show="wellButtons['well_'+i].ct[0] !== null && wellButtons['well_'+i].ct[0] ">
-                  {{wellButtons['well_'+i].ct[0] | round:2}}
-                </span>
+            {{wellButtons['well_'+i].ct[0] | round:2}}
+          </span>
               </td>
-              <!-- <td class="B1">
-                <span ng-show="wellButtons['well_'+i].ct[0] > 0">
-                  {{(wellButtons['well_'+i].ct[0]) | round:2}}
-                </span>
-              </td>
-              <td class="B1" ng-if="is_dual_channel">
-                <span ng-show="wellButtons['well_'+i].ct[1] > 0">
-                  {{(wellButtons['well_'+i].ct[1]) | round:2}}
-                </span>
-              </td> -->
             </tr>
           </tbody>
         </table>

@@ -1,0 +1,127 @@
+.thermal-performance-diagnostic {
+  .intro-text-container {
+    width: 700px;
+    margin: 0 auto;
+  }
+  .intro-text-container h2 {
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+  .intro-text-container img {
+    display: block;
+    margin: 10px 0;
+    width: 100%;
+  }
+  .intro-text-container p {
+    display: block;
+    width: 500px;
+    margin: 0 auto;
+    font-size: 17px;
+    margin-top: 30px;
+  }
+  .intro-text-container .button {
+    margin-top: 50px;
+    margin-bottom: 10px;
+  }
+  .content {
+    width: 100% !important;
+    padding-left: 35px;
+    padding-right: 35px;
+  }
+  h1,
+  h2 {
+    font-weight: 700;
+    margin-top: 70px;
+    margin-bottom: 10px;
+  }
+  h2 {
+    font-size: 40px;
+  }
+  h1 {
+    font-size: 50px;
+  }
+  p {
+    color: #333;
+    font-size: 14px;
+  }
+  .temp-label {
+    font-size: 17px;
+  }
+  .temp-label b {
+    font-weight: 800;
+  }
+  button,
+  .errorButton {
+    background: #fff;
+    border: 1px solid #999;
+    color: #999;
+    margin-top: 60px;
+    padding: 5px 50px;
+    text-decoration: none;
+  }
+  button,
+  .button {
+    background: #fff;
+    border: 1px solid #333;
+    color: #000;
+    margin-top: 60px;
+    padding: 5px 50px;
+    text-decoration: none;
+  }
+  button.green,
+  .button.green {
+    background: #6ACC0A;
+    border-color: transparent;
+    color: #fff;
+  }
+  .info-container {
+    margin-top: 100px;
+  }
+  .info-container .title {
+    font-size: 20px;
+    border-bottom: 2px solid #000;
+  }
+  .info-container .info {
+    margin-top: 20px;
+  }
+  .info-container .info .info-text {
+    font-size: 17px;
+  }
+  .info-container .info .info-text .info-title {
+    display: inline-block;
+    width: 45%;
+  }
+  .info-container .info .info-text .info-details {
+    display: inline-block;
+    width: 30%;
+  }
+  .info-container .info .info-text .img-button {
+    display: inline-block;
+    width: 20%;
+  }
+  .info-container .info img {
+    margin-top: -3px;
+    width: 30px;
+  }
+  .info-container .info .block-text {
+    color: gray;
+    font-size: 10px;
+    height: 20px;
+  }
+  .errorMessage {
+    display: block;
+    width: 500px;
+    margin: 0 auto;
+    color: #999;
+    font-size: 17px;
+    margin-top: 15px;
+  }
+  .rainbow-line-chart {
+    -moz-transform: rotateX(180deg);
+    -webkit-transform: rotateX(180deg);
+    -ms-transform: rotateX(180deg);
+    -o-transform: rotateX(180deg);
+    transform: rotateX(180deg);
+    width: 100%;
+  }
+}

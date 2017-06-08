@@ -84,7 +84,7 @@ class DevicesController < ApplicationController
   
   api :GET, "/device/status", "status of the machine"
   def status
-    url = URI.parse("http://localhost:8000/status?access_token=#{token}")
+    url = URI.parse("http://localhost:8000/status?access_token=#{authentication_token}")
     begin
       response = Net::HTTP.get_response(url)
       render :json=>response.body, :status=>response.code
@@ -159,6 +159,10 @@ class DevicesController < ApplicationController
       return
     end
     logger.info "device write: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
+    
+    start_time = Time.now
+    change_root_password
+    logger.info "change root password: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
     
     start_time = Time.now
     system("sync")
@@ -370,14 +374,15 @@ class DevicesController < ApplicationController
     Setting.update_all("calibration_id=1")
     logger.info "erase_data settings update: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
     start_time = Time.now
+    system("sync")
+    logger.info "erase_data sync: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
+  end
+  
+  def change_root_password
     if !Device.serial_number.blank?
       serialmd5 = Digest::MD5.hexdigest(Device.serial_number)
       system("printf '#{serialmd5}\n#{serialmd5}\n' | passwd")
     end
-    logger.info "erase_data update password: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
-    start_time = Time.now
-    system("sync")
-    logger.info "erase_data sync: Time elapsed #{(Time.now - start_time)*1000} milliseconds"
   end
   
   def retrieve_mac

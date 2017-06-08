@@ -20,7 +20,7 @@
 
   <h2 class="underlined">{{name}} Settings<span class="close" ui-sref="settings.networkmanagement">&times;</span></h2>
   <form ng-if="! IamConnected" name="connectWifiNetwork" nonvalidate ng-submit="connectWifi()">
-    <div class="pass-info">
+    <div ng-if="wifiNetworkType !='none'" class="pass-info">
       <div class="pass-heading">PASSWORD REQUIRED</div>
       <div class="pass-text">Please enter your password to connect</div>
     </div>
@@ -29,7 +29,7 @@
       <div class="ssid-text">SSID</div>
       <div class="ssid-val">{{name}}</div>
 
-      <div ng-if="wifiNetworkType" class="password-label">Password</div>
+      <div ng-if="wifiNetworkType != 'none'" class="password-label">Password</div>
       <div ng-if="wifiNetworkType=='wpa2'"class="password-input-container">
         <input type="password" autofocus="" name="wpa_key" class="text-class" required placeholder="{{name}} password" ng-model="credentials['wpa-psk']">
         <div ng-show="connectWifiNetwork.wpa_key.$touched">
@@ -54,11 +54,13 @@
       <button class="button second-button" ui-sref="settings.networkmanagement">CANCEL</button>
     </div>
   </form>
+
   <!-- Remember ng-if creates a new scope so we need to use parent-->
   <div class="set-mode" ng-if="IamConnected && name=='ethernet'">
     <div class="set-mode-toggle"><mode-toggle data="$parent.autoSetting"></mode-toggle></div><span>SET AUTOMATICALLY</span>
   </div>
-  <form ng-if="IamConnected" name="connectedWifiDetails" nonvalidate ng-submit="connectEthernet()">
+
+  <form ng-if="IamConnected && name=='ethernet'" name="connectedWifiDetails" nonvalidate ng-submit="connectEthernet()">
     <div class="settings-text-container">
       <span>CURRENT SETTINGS</span> <span ng-show="autoSetting=='auto'" class="locked">LOCKED</span>
     </div>
@@ -84,7 +86,7 @@
     <div class="network-parameter-container">
       <div class="network-parameter-text-container"><span>Gateway IP</span></div>
       <div class="network-parameter-data-container">
-        <span ng-show="autoSetting=='auto'">{{editEthernetData.gateway}}</span>
+       <span ng-show="autoSetting=='auto'">{{editEthernetData.gateway}}</span>
         <ip-address ng-show="autoSetting=='manual'" value="editEthernetData.gateway"></ip-address>
       </div>
     </div>
@@ -92,6 +94,50 @@
       <div class="network-parameter-text-container"><span>DNS Server</span></div>
       <div class="network-parameter-data-container">
         <span ng-show="autoSetting=='auto'">{{editEthernetData['dns-nameservers']}}</span>
+        <ip-address ng-show="autoSetting=='manual'" value="editEthernetData['dns-nameservers']"></ip-address>
+      </div>
+    </div>
+
+    <div class="connected-button-container button-container">
+      <!--<input ng-show="autoSetting=='manual'" type="submit" class="green-button" value="SAVE CHANGES"> -->
+      <button ng-if="autoSetting == 'manual'" type="submit" ng-class="{'green-button': buttonValue!=='CONNECTING', 'connecting-button': buttonValue==='CONNECTING'}">{{buttonValue}}<ellipsis-animated ng-if="buttonValue=='CONNECTING'"></ellipsis-animated></button>
+    </div>
+  </form>
+
+  <form ng-if="IamConnected && name!='ethernet'" name="connectedWifiDetails" nonvalidate ng-submit="connectEthernet()">
+    <div class="settings-text-container">
+      <span>CURRENT SETTINGS</span> <span ng-show="autoSetting=='auto'" class="locked">LOCKED</span>
+    </div>
+
+    <div class="network-parameter-container">
+      <div class="network-parameter-text-container"><span>IP Address</span></div>
+      <div class="network-parameter-data-container">
+        <span ng-show="autoSetting=='auto'">{{editEthernetData.address}}</span>
+        <ip-address ng-show="autoSetting=='manual'" value="editEthernetData.address"></ip-address>
+      </div>
+    </div>
+    <div class="network-parameter-container">
+      <div class="network-parameter-text-container"><span>Subnet Mask</span></div>
+      <div class="network-parameter-data-container">
+        <span ng-show="autoSetting=='auto'">{{editEthernetData.maskAddress}}</span>
+        <ip-address ng-show="autoSetting=='manual'" value="editEthernetData.maskAddress"></ip-address>
+      </div>
+    </div>
+    <!--<div class="network-parameter-container">
+      <div class="network-parameter-text-container"><span>Router</span></div>
+      <div class="network-parameter-data-container"></div>
+    </div> -->
+    <!--<div class="network-parameter-container">
+      <div class="network-parameter-text-container"><span>Gateway IP</span></div>
+      <div class="network-parameter-data-container">
+        <span ng-show="autoSetting=='auto'">{{editEthernetData.gateway}}</span>
+        <ip-address ng-show="autoSetting=='manual'" value="editEthernetData.gateway"></ip-address>
+      </div>
+    </div> -->
+    <div class="network-parameter-container">
+      <div class="network-parameter-text-container"><span>DNS Server</span></div>
+      <div class="network-parameter-data-container">
+        <span ng-show="autoSetting=='auto'">{{editEthernetData.dns_nameservers}}</span>
         <ip-address ng-show="autoSetting=='manual'" value="editEthernetData['dns-nameservers']"></ip-address>
       </div>
     </div>

@@ -107,7 +107,7 @@ process_mc <- function(
     check_obj2br(mc_out)
     
     return(mc_out)
-    }
+}
 
 
 # function: get melting curve data from MySQL database and perform water calibration
@@ -165,14 +165,14 @@ get_mc_calib <- function(
     if (show_running_time) message('`', func_name, '` took ', round(end_time - start_time, 2), ' seconds.')
     
     return(mc_calib)
-    }
+}
 
 
 # function: extract melting curve data and Tm for each well
 mc_tm_pw <- function(
     mt_pw, 
     qt_prob=0.64, # quantile probability point for normalized -df/dT (range 0-1)
-    max_normd_qtv=0.6, # maximum normalized -df/dT values (range 0-1) at the quantile probablity point
+    max_normd_qtv=0.601, # maximum normalized -df/dT values (range 0-1) at the quantile probablity point
     top_N=4, # top number of Tm peaks to report
     min_frac_report=0.1 # minimum area fraction of the Tm peak to be reported in regards to the largest real Tm peak
     ) { # per well
@@ -195,17 +195,30 @@ mc_tm_pw <- function(
     dfdT_normd <- (mc[,'-df/dT'] - range_dfdT[1]) / (range_dfdT[2] - range_dfdT[1])
     # range_dfdT[1] == min(mc[,'-df/dT']). range_dfdT[2] == max(mc[,'-df/dT']).
     
-    if (dim(raw_tm)[1] == 0 ||
-        (   quantile(dfdT_normd[1:summit_pos],                  qt_prob) > max_normd_qtv
-         || quantile(dfdT_normd[summit_pos:length(dfdT_normd)], qt_prob) > max_normd_qtv)) {
+    if (dim(raw_tm)[1] == 0) {
+        larger_normd_qtv_of_two_sides <- max_normd_qtv + 1 # dummy value simply to make TRUE `larger_normd_qtv_of_two_sides > max_normd_qtv`
+    } else {
+        larger_normd_qtv_of_two_sides <- max(sapply(
+            list(1:summit_pos, summit_pos:length(dfdT_normd)),
+            function(idc) quantile(dfdT_normd[idc], qt_prob)
+        ))
+    }
+    
+    if (larger_normd_qtv_of_two_sides > max_normd_qtv) {
         tm <- raw_tm[FALSE,]
+        tm_reported_keywords <- c('No', '>')
     } else {
         tm_sorted <- raw_tm[order(-raw_tm$Area),]
         tm_topN <- na.omit(tm_sorted[1:top_N,])
-        tm <- tm_topN[tm_topN$Area >= tm_topN[1, 'Area'] * min_frac_report,] }
-    
-    return(list('mc'=mc, 'tm'=tm, 'raw_tm'=raw_tm))
+        tm <- tm_topN[tm_topN$Area >= tm_topN[1, 'Area'] * min_frac_report,]
+        tm_reported_keywords <- c('Yes', '<=')
     }
+    
+    return(list(
+        'mc'=mc, 'tm'=tm, 'raw_tm'=raw_tm,
+        'tm_reported'=sprintf('%s. The larger normalized quantile value of the left and right sides of the summit on the negative derivative curve %f %s `max_normd_qtv` %f.', tm_reported_keywords[1], larger_normd_qtv_of_two_sides, tm_reported_keywords[2], max_normd_qtv)
+    ))
+}
 
 
 # function: output melting curve data and Tm for all the wells
@@ -240,7 +253,7 @@ mc_tm_all <- function(
     # Return a named list whose length is number of wells. 
     # The name of each element is in the format of `paste('fluo', well_name, sep='_')`
     return(mt_out)
-    }
+}
 
 
 

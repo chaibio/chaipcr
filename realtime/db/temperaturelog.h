@@ -22,9 +22,14 @@
 class TemperatureLog
 {
 public:
-    TemperatureLog(int experimentId = 0, bool temperatureInfo = true, bool debugInfo = false)
+    TemperatureLog(int experimentId = 0, int stageId = 0, bool temperatureInfo = true, bool debugInfo = false)
     {
         _experimentId = experimentId;
+        _stageId = stageId;
+        _stepId = -1;
+        _rampId = -1;
+
+        _cycleNum = 0;
         _elapsedTime = 0;
 
         _temperatureState = temperatureInfo;
@@ -39,6 +44,16 @@ public:
     }
 
     inline int experimentId() const { return _experimentId; }
+    inline int stageId() const { return _stageId; }
+
+    inline int stepId() const { return _stepId; }
+    inline void setStepId(int id) { _stepId = id; }
+
+    inline int rampId() const { return _rampId; }
+    inline void setRampId(int id) { _rampId = id; }
+
+    inline unsigned cycleNum() const { return _cycleNum; }
+    inline void setCycleNum(unsigned num) { _cycleNum = num; }
 
     inline long elapsedTime() const { return _elapsedTime; }
     inline void setElapsedTime(long time) { _elapsedTime = time; }
@@ -75,6 +90,11 @@ public:
 
 private:
     int _experimentId;
+    int _stageId;
+    int _stepId;
+    int _rampId;
+
+    unsigned _cycleNum;
     long _elapsedTime;
 
     bool _temperatureState;

@@ -18,10 +18,12 @@
 #
 class ExperimentDefinition < ActiveRecord::Base
   has_one :protocol, dependent: :destroy
-
+  has_one :amplification_option, dependent: :destroy
+  
   TYPE_USER_DEFINED = "user"
   TYPE_DIAGNOSTIC  = "diagnostic"
   TYPE_CALIBRATION  = "calibration"
+  TYPE_TESTKIT = "test_kit"
   
   DIAGNOSTICS_SINGLE_CHANNEL = ["thermal_performance_diagnostic", "thermal_consistency", "optical_test_single_channel"]
   DIAGNOSTICS_DUAL_CHANNEL = ["thermal_performance_diagnostic", "thermal_consistency", "optical_test_dual_channel"]
@@ -29,8 +31,6 @@ class ExperimentDefinition < ActiveRecord::Base
   DEFAULT_PROTOCOL = {lid_temperature:110, stages:[
                       {stage:{stage_type:"holding",steps:[{step:{name:"Initial Denaturing",temperature:95,hold_time:180}}]}},
                       {stage:{stage_type:"cycling",steps:[{step:{name:"Denature",temperature:95,hold_time:30}},{step:{name:"Anneal",temperature:60,hold_time:30,collect_data:true}}]}}]}
-                      
-  validates :name, presence: true
   
   before_create do |experiment_def|
     if experiment_def.protocol == nil
@@ -42,8 +42,8 @@ class ExperimentDefinition < ActiveRecord::Base
     (Device.dual_channel?)? DIAGNOSTICS_DUAL_CHANNEL : DIAGNOSTICS_SINGLE_CHANNEL
   end
       
-  def copy(params)
-    new_experiment_definition = ExperimentDefinition.new({:name=>(!params.blank?)? params[:name] : "Copy of #{name}", :experiment_type=>experiment_type})
+  def copy
+    new_experiment_definition = ExperimentDefinition.new({:experiment_type=>experiment_type})
     new_experiment_definition.protocol = protocol.copy
     return new_experiment_definition
   end
