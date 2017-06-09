@@ -17,12 +17,13 @@
  * limitations under the License.
  */
 
-angular.module("canvasApp").factory('verticalLineLine', [
-    'Line',
-    function(Line) {
+angular.module("canvasApp").factory('verticalLineStepSmallCircle', [
+    'Circle',
+    function(Circle) {
         return function() {
-            return Line.create([0, 0, 0, 269],{
-                stroke: 'black', strokeWidth: 2, originX: 'left', originY: 'top'
+            return Circle.create({
+                radius: 6, fill: '#FFB300', stroke: "black", strokeWidth: 3, selectable: false,
+                left: 1, top: 269, originX: 'center', originY: 'center', visible: true
             });
         };
     }

@@ -17,13 +17,23 @@
  * limitations under the License.
  */
 
-angular.module("canvasApp").factory('verticalLineSmallCircle', [
-    'Circle',
-    function(Circle) {
+angular.module("canvasApp").factory('verticalLineStepGroup', [
+    'Group',
+    'verticalLineStepLine',
+    'verticalLineStepSmallCircle',
+    'verticalLineStepSmallCircleTop',
+    function(Group, verticalLineStepLine, verticalLineStepSmallCircle, verticalLineStepSmallCircleTop) {
         return function() {
-            return Circle.create({
-                radius: 6, fill: '#FFB300', stroke: "black", strokeWidth: 3, selectable: false,
-                left: 1, top: 269, originX: 'center', originY: 'center', visible: true
+            
+            var smallCircle = new verticalLineStepSmallCircle();
+
+            var smallCircleTop = new verticalLineStepSmallCircleTop();
+
+            var line = new verticalLineStepLine();
+
+            return Group.create([line, smallCircle, smallCircleTop], {
+                originX: "left", originY: "top", left: 62, top: 56, selectable: true,
+                lockMovementY: true, hasControls: false, hasBorders: false, name: "vertica", visible: false,
             });
         };
     }
