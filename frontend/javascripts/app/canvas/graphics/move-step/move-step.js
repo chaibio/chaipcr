@@ -114,7 +114,7 @@ angular.module("canvasApp").factory('moveStepRect', [
               
           if(index !== this.currentMoveRight) {
             console.log("Found", index);
-            this.kanvas.allStepViews[index].moveToSide("left");
+            this.kanvas.allStepViews[index].moveToSide("left", this.currentDropStage);
             this.currentMoveRight = this.movedStepIndex = index;
             StepPositionService.getPositionObject(this.kanvas.allStepViews);
           }
@@ -177,7 +177,9 @@ angular.module("canvasApp").factory('moveStepRect', [
         if((this.movement.left + this.rightOffset) > point[2] && (this.movement.left + this.rightOffset) < point[2] + 150) {
           if(index !== this.movedLeftStageIndex) {
             this.movedStageIndex = this.movedLeftStageIndex = index;
-            this.kanvas.allStageViews[index].moveToSide("left", this.currentDropStage);
+            this.kanvas.allStageViews[index].moveToSide("left", {index: 10}); 
+            // {index: 10} is sent so that the very first stage doesnt move, refer stage.validMove()
+            // It dosnt have to be 10, can be any non zero val
             StagePositionService.getPositionObject();
             StepPositionService.getPositionObject(this.kanvas.allStepViews);
           }
@@ -265,12 +267,13 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
 
       this.indicator.manageBorderLeftForRight = function(index) {
-        
+        console.log(index);
         if(this.kanvas.allStepViews[index].nextStep) {
           this.kanvas.allStepViews[index + 1].borderLeft.setVisible(true);
-         
         }
+        
         if(this.kanvas.allStepViews[index].index === 0) {
+          
           this.kanvas.allStepViews[index].borderLeft.setVisible(true);
         } else {
           this.kanvas.allStepViews[index].borderLeft.setVisible(false);
