@@ -35,28 +35,9 @@ angular.module("canvasApp").factory('moveStepRect', [
        
         // Things to do, Plan
 
-        // Reduce the size of the clicked stage,
-        // Control the movement of the stages in the left and right, according to the shrinke dstage.
-        // Control the bordr left of the stage , while step is moving.
-        // tag the empty space between stages, Use this space for move step to be a stage.
-        // Enable process movement for move-step.
-        // Check with move stage , make sure allStepViews are mapped correctly.
-
-        //[
-          // Make selected step a different type of step, 
-          // Make empty space array, which is to be used for move step to be new stage and move to before first step of the stage,
-          // and move after the last step of the stage.
-        //]
-
-        // See how a stage with one step works when we click move step
-        // enforce move-step boundaries , take care of last stage with infinite hold
-        // defrag this file 
+        // more attention on showing right borders and hiding it.
+        // make sure stages spread away, as move-step moves ..
         
-        // NEW -:
-        // when click , dont have to move all stages , 
-        // Just create space both the sides
-        // when moving right as we approach the last step, move the stage left making space between stages in the right and show vertical line to drop
-        // When moving left as we approcah first step, move the stage right , show the vertical line.
       this.indicator = new moveStepIndicator(me);
       this.indicator.verticalLine = new verticalLineStepGroup();
       
@@ -210,8 +191,10 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
 
       this.indicator.shouldStageMoveRightCallback = function(point, index) {
+        
         if((this.movement.left) > point[0] - 150 && (this.movement.left) < point[0]) {
           if(index !== this.movedRightStageIndex) {
+            console.log("shouldStageMoveRightCallback");
             this.movedStageIndex = this.movedRightStageIndex = index;
             this.kanvas.allStageViews[index].moveToSide("right", this.currentDropStage);
             StagePositionService.getPositionObject();
@@ -232,6 +215,7 @@ angular.module("canvasApp").factory('moveStepRect', [
             this.movedRightAction();
           }
           if(this.shouldStageMoveLeft() !== null) {
+            this.movedLeftStageIndex = null;
             this.hideFirstStepBorderLeft();
           }
         } else if(direction === 'left') {
@@ -239,6 +223,7 @@ angular.module("canvasApp").factory('moveStepRect', [
             this.movedLeftAction();
           }
           if(this.shouldStageMoveRight() !== null) {
+            this.movedRightStageIndex = null;
             this.hideFirstStepBorderLeft();
           }
         } 
