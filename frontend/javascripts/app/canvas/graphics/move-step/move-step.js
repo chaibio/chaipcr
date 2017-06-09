@@ -194,7 +194,6 @@ angular.module("canvasApp").factory('moveStepRect', [
         
         if((this.movement.left) > point[0] - 150 && (this.movement.left) < point[0]) {
           if(index !== this.movedRightStageIndex) {
-            console.log("shouldStageMoveRightCallback");
             this.movedStageIndex = this.movedRightStageIndex = index;
             this.kanvas.allStageViews[index].moveToSide("right", this.currentDropStage);
             StagePositionService.getPositionObject();

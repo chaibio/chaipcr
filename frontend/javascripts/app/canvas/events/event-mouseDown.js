@@ -103,7 +103,7 @@ angular.module("canvasApp").factory('mouseDown', [
             movingStepGraphics.initiateMoveStepGraphics(evt.target.parent, C);
             //evt.target.parent.selectStep();
             that.selectStep(evt.target.parent.circle);
-
+            that.calculateMoveLimit("step", evt.target);
             //evt.target.parent.parentStage.shrinkedStage = true;
             that.moveStepActive = true;
             that.canvas.moveCursor = "move";

@@ -53,6 +53,7 @@ angular.module("canvasApp").factory('canvas', [
       this.drawCirclesArray = [];
       this.findAllCirclesArray = [];
       this.moveLimit = 0; // We set the limit for the movement of the step image to move steps
+      this.stepMoveLimit = 0; // Limit when we move a step
       this.editStageStatus = false;
       this.dotCordiantes = {};
 
