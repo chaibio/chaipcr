@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Building julia and upload it to download server without reformating</description>
+  <description>Building mariadb and upload it to download server</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
@@ -28,6 +28,11 @@
 </description>
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>mariadb_version</name>
+          <description>maria db version.. Examples: 10.3, 10.0</description>
+          <defaultValue>10.0</defaultValue>
+        </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -232,8 +237,13 @@ exit 1</command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
       <siteName>root@$build_machine:22</siteName>
-      <command>exit 0
-</command>
+      <command>echo Starting building Maria on $build_machine
+apt-get update
+apt-get -y -q upgrade
+
+apt-get -f -y -q install
+
+exit 0</command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>exit 0
@@ -241,21 +251,18 @@ exit 1</command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo Starting building Julia on $build_machine
-apt-get update
-apt-get -y -q upgrade
-
-apt-get -f -y -q install
-
-exit 0
-</command>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
-      <siteName>root@$build_machine:22</siteName>
-      <command>echo arranging to build julia
+      <command>echo arranging to build mariadb
 df -h
 
-if ! apt-get -q -y install gcc-4.8 g++-4.8 
+apt-get -q -y install gcc g++
+
+if g++ --version | grep &quot;4.9&quot;
+then
+echo new g++ version is installed
+
+else
+
+if ! apt-get -q -y install gcc g++
 then
     echo error downloading gcc 4.8.. trying 4.7
     apt-get -q -y install g++-4.7
@@ -271,7 +278,7 @@ then
 fi
 
 fi
-
+fi
 
 apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential
 dpkg --configure -a
@@ -301,9 +308,9 @@ fi
 
 echo arranging the sdcard
 
-swapoff -a
-umount /sdcard/*
-umount /dev/mmcblk0p*
+swapoff -a || :
+umount /sdcard/*  || :
+umount /dev/mmcblk0p*  || :
 
 ln -sf /usr/bin/ld /usr/bin/ld.gold
 echo 1500 &gt; /proc/sys/kernel/hung_task_timeout_secs
@@ -314,11 +321,11 @@ __EOF__
 
 partprobe /dev/mmcblk0
 mkfs.ext4 /dev/mmcblk0p1 -F
-mkdir -p /sdcard/upgrade
-mount /dev/mmcblk0p1 /sdcard/upgrade/
+mkdir -p /sdcard/upgrade  || :
+mount /dev/mmcblk0p1 /sdcard/upgrade/ 
 
 # creating a temporary swap file on sdcard
-sudo fallocate -l 2G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
+sudo fallocate -l 3G /sdcard/upgrade/swapfile #or dd if=/dev/zero of=/sdcard/upgrade/swapfile bs=10M count=300
 sudo chmod 600 /sdcard/upgrade/swapfile
 sudo mkswap /sdcard/upgrade/swapfile
 sudo swapon /sdcard/upgrade/swapfile
@@ -347,23 +354,18 @@ then
    rm -r cmake-3.6.1*
 fi 
 
-apt-get -y -q install lsb-release
+apt-get -y -q install lsb-release clang
+apt-get install bison -y
+apt-get install libcurl4-openssl-dev -y
+apt-get install libncurses5-dev -y
+
 sync
 sleep 30
 dpkg --configure -a
 
 apt-get autoremove -y -q
 
-apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git build-essential hdf5-tools curl python pkg-config libssl-dev ntp ntpdate git unzip automake sshpass linux-headers-`uname -r` libpoco-dev
-
-apt-get -f -y -q install
-
-apt-get install -q -y libarpack2 libblas3 libgfortran3 liblapack3 ntpdate cpufrequtils
-apt-get -f -y -q install
-
-apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3 
-apt-get -y -q install libblas3 libatlas3-base
-apt-get -y -q install libblas-common libfftw3-double3 libfftw3-single3 libllvm3.8 libmetis5 libopenblas-base libunwind8 
+apt-get -q -y install parted git build-essential curl python pkg-config libssl-dev ntp ntpdate git unzip automake sshpass linux-headers-`uname -r`
 
 apt-get -f -y -q install
 
@@ -381,114 +383,187 @@ exit 0</command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo building julia
+      <command>echo building mariadb
 
 # add gfortran link to search path. 
-ln -s /usr/lib/gcc/arm-linux-gnueabihf/4.9/libgfortran.so /usr/lib/libgfortran.so
 
-# compiling julia
-# compiling julia 0.5
-mkdir -p /sdcard/upgrade/julia-compile
-cd /sdcard/upgrade/julia-compile
-git clone git://github.com/JuliaLang/julia.git 
-cd julia
-git checkout release-0.5
-echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.bashrc
-source ~/.bashrc
-ntpdate -b -s -u pool.ntp.org
+# compiling maria
+# compiling madiadb 10
 
-cat &lt;&lt;EOF &gt;&gt; Make.user
-prefix=/usr/share/julia
-MARCH=armv7-a
-JULIA_CPU_TARGET=cortex-a8
+mkdir -p /sdcard/upgrade/maria
+cd /sdcard/upgrade/maria
 
-override USE_SYSTEM_BLAS=1
-override USE_SYSTEM_LAPACK=1
-override USE_SYSTEM_LIBM=1
-override USE_SYSTEM_FFTW=1
-override USE_SYSTEM_GMP=1
-override USE_SYSTEM_MPFR=1
-override USE_SYSTEM_ARPACK=1
-EOF
+apt-get install libncurses5-dev clang -q -y
 
+# remove mysql
+sudo apt-get -y -q remove --purge mysql-server mysql-client mysql-common
+sudo apt-get -y -q autoremove
+sudo apt-get -y -q autoclean
+
+wget https://codeload.github.com/MariaDB/server/zip/$mariadb_version  -O mariadb-$mariadb_version.zip
+unzip mariadb-*
+rm mariadb-*.zip
+cd server*
+
+mkdir -p /data/mysql  || :
+
+groupadd -g 40 mysql
+useradd -c &quot;MySQL Server&quot; -d /data/mysql -g mysql -s /bin/false -u 40 mysql
+
+cmake -DCMAKE_BUILD_TYPE=Release                       \
+      -DCMAKE_INSTALL_PREFIX=/usr                      \
+      -DINSTALL_MANDIR=share/man                       \
+      -DINSTALL_MYSQLSHAREDIR=share/mysql              \
+      -DINSTALL_MYSQLTESTDIR=share/mysql/test          \
+      -DINSTALL_PLUGINDIR=lib/mysql/plugin             \
+      -DINSTALL_SBINDIR=sbin                           \
+      -DINSTALL_SCRIPTDIR=bin                          \
+      -DINSTALL_SQLBENCHDIR=share/mysql/bench          \
+      -DINSTALL_SUPPORTFILESDIR=share/mysql            \
+      -DMYSQL_DATADIR=/data/mysql                      \
+      -DMYSQL_UNIX_ADDR=/run/mysqld/mysqld.sock        \
+      -DWITH_EXTRA_CHARSETS=complex                    \
+      -DWITH_EMBEDDED_SERVER=ON                        \
+      -DWITHOUT_MROONGA_STORAGE_ENGINE=1               \
+      -DTOKUDB_OK=0                                   \
+      -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+      .
+    
 make
-
 
 </command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo installing julia
-cd /sdcard/upgrade/julia-compile/julia
+      <command>cd /sdcard/upgrade/maria/server*
+make install
+</command>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+      <siteName>root@192.168.1.15:22</siteName>
+      <command>cd /sdcard/upgrade/maria/server*
 
-make install 
-ln -s /usr/share/julia/bin/julia /usr/bin/julia
+install -v -dm 755 /etc/mysql
+cat &gt; /etc/mysql/my.cnf &lt;&lt; &quot;EOF&quot;
+# Begin /etc/mysql/my.cnf
 
-echo precompiling mandatory packages.
-cat &lt;&lt;EOF &gt;&gt; chaibio_packages.jl
-Pkg.init()
-Pkg.update()
+# The following options will be passed to all MySQL clients
+[client]
+#password       = your_password
+port            = 3306
+socket          = /run/mysqld/mysqld.sock
 
-Pkg.add(&quot;Dierckx&quot;)
-Pkg.add(&quot;JSON&quot;)
-Pkg.add(&quot;MySQL&quot;)
-Pkg.add(&quot;JLD&quot;)
-Pkg.add(&quot;DataFrames&quot;)
-Pkg.add(&quot;Ipopt&quot;)
-Pkg.add(&quot;JuMP&quot;)
-Pkg.add(&quot;NLopt&quot;)
-Pkg.add(&quot;HttpServer&quot;)
+# The MySQL server
+[mysqld]
+port            = 3306
+socket          = /run/mysqld/mysqld.sock
+datadir         = /data/mysql
+skip-external-locking
+key_buffer_size = 16M
+max_allowed_packet = 1M
+sort_buffer_size = 512K
+net_buffer_length = 16K
+myisam_sort_buffer_size = 8M
 
-using DataFrames, DataStructures, Dierckx, Ipopt, JLD, JSON, JuMP, MySQL, NLopt, HttpServer
-quit()
+# Don&apos;t listen on a TCP/IP port at all.
+skip-networking
+
+# required unique id between 1 and 2^32 - 1
+server-id       = 1
+
+# Uncomment the following if you are using BDB tables
+#bdb_cache_size = 4M
+#bdb_max_lock = 10000
+
+# InnoDB tables are now used by default
+innodb_data_home_dir = /data/mysql
+innodb_data_file_path = ibdata1:10M:autoextend
+innodb_log_group_home_dir = /data/mysql
+# You can set .._buffer_pool_size up to 50 - 80 %
+# of RAM but beware of setting memory usage too high
+innodb_buffer_pool_size = 16M
+innodb_additional_mem_pool_size = 2M
+# Set .._log_file_size to 25 % of buffer pool size
+innodb_log_file_size = 5M
+innodb_log_buffer_size = 8M
+innodb_flush_log_at_trx_commit = 1
+innodb_lock_wait_timeout = 50
+
+[mysqldump]
+quick
+max_allowed_packet = 16M
+
+[mysql]
+no-auto-rehash
+# Remove the next comment character if you are not familiar with SQL
+#safe-updates
+
+[isamchk]
+key_buffer = 20M
+sort_buffer_size = 20M
+read_buffer = 2M
+write_buffer = 2M
+
+[myisamchk]
+key_buffer_size = 20M
+sort_buffer_size = 20M
+read_buffer = 2M
+write_buffer = 2M
+
+[mysqlhotcopy]
+interactive-timeout
+
+# End /etc/mysql/my.cnf
 EOF
 
-# test with no prebuilding
-#julia chaibio_packages.jl
-echo done testing! removing test script.
+mysql_install_db --basedir=/usr --datadir=/data/mysql --user=mysql
+chown -R mysql:mysql /data/mysql
 
-rm chaibio_packages.jl
+install -v -m755 -o mysql -g mysql -d /run/mysqld
+mysqld_safe --user=mysql 2&gt;&amp;1 &gt;/dev/null &amp;
 
-echo test finished. cleaning..
+cd /sdcard/upgrade/maria/
+tar fcz mariadb-10.0.16-build.tar.gz server*
+
+cd
+rm -r /sdcard/upgrade/maria/
+sync</command>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo test finished. cleaning..
 swapoff /sdcard/upgrade/swapfile
 rm /sdcard/upgrade/swapfile
 
 cd ..
-tar fcz julia05-44-$build_machine-$BUILD_NUMBER.tgz julia /root/.julia
-tar fcz julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz julia/usr /root/.julia
-
-sync
 </command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
-      <command>echo uploading julia file to server
+      <command>echo uploading mariadb file to server
                                                                                                                                  
-scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia05-44-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/
-chmod 777 $local_download_folder/julia05-44-$build_machine-$BUILD_NUMBER.tgz
-ln -sf $local_download_folder/julia05-44-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia05-44-default.tgz
+scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/maria/mariadb-10.0.16-build.tar.gz $local_download_folder/
+chmod 777 $local_download_folder/mariadb-10.0.16-build.tar.gz
+#ln -sf $local_download_folder/julia05-44-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia05-44-default.tgz
 
-scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/
-chmod 777 $local_download_folder/julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz
-ln -sf $local_download_folder/julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia05-44-slim-default.tgz
+#scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/
+#chmod 777 $local_download_folder/julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz
+#ln -sf $local_download_folder/julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia05-44-slim-default.tgz
 
-ls -ahl $local_download_folder/julia05-44-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia05-44-default.tgz
-ls -ahl $local_download_folder/julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia05-44-slim-default.tgz
+#ls -ahl $local_download_folder/julia05-44-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia05-44-default.tgz
+#ls -ahl $local_download_folder/julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia05-44-slim-default.tgz
 
 exit 0</command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
       <siteName>root@$build_machine:22</siteName>
       <command>echo cleaning up
-cd /sdcard/upgrade/julia-compile/
+cd /sdcard/upgrade/maria/
 
-rm julia05-44-$build_machine-$BUILD_NUMBER.tgz
-rm julia05-44-slim-$build_machine-$BUILD_NUMBER.tgz
 ls -ahl
 
 cd ..
 
-rm -r julia-compile
-rm -r /root/.julia
+rm -r maria
 sync
 ls -ahl
 

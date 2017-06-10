@@ -28,10 +28,10 @@
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
-          <name>kernel_49</name>
-          <description>Update to kernel TI LTS_4.9
+          <name>kernel_44</name>
+          <description>Update to kernel LTS_4.4
 </description>
-          <defaultValue>true</defaultValue>
+          <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -68,7 +68,6 @@ echo temppwd | sudo -S sed -i -e &apos;s:PermitEmptyPasswords no:PermitEmptyPass
 sudo sed -i -e &apos;s:UsePAM yes:UsePAM no:g&apos; /etc/ssh/sshd_config
 sudo sed -i -e &apos;s:PermitRootLogin without-password:PermitRootLogin yes:g&apos; /etc/ssh/sshd_config
 sudo passwd -d -u root
-sudo su
 
 echo patching sshd_config
     
@@ -128,37 +127,6 @@ echo deleting root password in case of chaipcr
 sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;passwd -d -u root&quot;
 #echo done deleting root password
 
-
-if ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
-
-if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
-then
-	echo sshd_config was patched already
-else
-	echo patching sshd_config
-    
-	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
-KexAlgorithms diffie-hellman-group1-sha1
-KexAlgorithms ecdh-sha2-nistp256
-KexAlgorithms ecdh-sha2-nistp384
-KexAlgorithms ecdh-sha2-nistp521
-KexAlgorithms diffie-hellman-group-exchange-sha256
-KexAlgorithms diffie-hellman-group14-sha1
-#Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
-EOF
-	sudo service sshd restart
-    sudo service ssh restart
-    /etc/init.d/ssh restart
-	echo device is patched
-    ifconfig
-fi
-
-exit 0
-ENDSSH
-then
-   echo &quot;-t worked&quot;
-else
-echo &quot; trying -tt&quot;
 ssh -tt -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
 
 if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
@@ -186,9 +154,8 @@ fi
 exit 0
 ENDSSH
 
-fi
 
-echo Returned to host. connection check:
+echo returned to host. connection check:
 ssh -oStrictHostKeyChecking=no -t root@$build_machine &apos;exit 0&apos;
 
 if ssh -oStrictHostKeyChecking=no -tt root@$build_machine &apos;exit 0&apos;
@@ -447,18 +414,16 @@ apt-get install -y -q -f
 apt-get install -y -q unzip parted
 apt-get install -y -q -f
 
+apt-get install -y -q autoremove
 dpkg --configure -a
 
 df -h
-echo update time
 ntpdate -b -s -u pool.ntp.org
 
-echo perform update-initramfs
 update-initramfs -u
 
 	cd /opt/scripts/tools/
         rm eMMC/init-eMMC-flasher-v3.sh
-        rm eMMC/functions.sh
 #	git stash save --keep-index
 	git pull
 
@@ -466,10 +431,10 @@ update-initramfs -u
 #        ./update_kernel.sh --kernel 4.4.24-ti-rt-r58
 #./update_kernel.sh --ti-rt-channel --lts-4_1
 
-#if $kernel_49
-#then
-#     ./update_kernel.sh --ti-channel --lts-4_9
-#fi
+if $kernel_44
+then
+     ./update_kernel.sh --ti-rt-channel --lts-4_4
+fi
 
 touch /forcefsck
 sync 
