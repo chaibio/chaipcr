@@ -301,7 +301,7 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
 
       this.indicator.hideFirstStepBorderLeft = function() {
-       // console.log("Called", this.movedStageIndex);
+        
         if(this.kanvas.allStageViews[this.movedStageIndex].childSteps[0]) {
           this.kanvas.allStageViews[this.movedStageIndex].childSteps[0].borderLeft.setVisible(false);
         }
@@ -328,22 +328,20 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
 
       this.indicator.manageBorderLeftForLeft = function(index) {
-        console.log("ittt");
+        
         if(this.kanvas.allStepViews[index + 1]) {
           this.kanvas.allStepViews[index + 1].borderLeft.setVisible(false);
-         
         }
         this.kanvas.allStepViews[index].borderLeft.setVisible(true);
       };
 
       this.indicator.manageBorderLeftForRight = function(index) {
-        console.log(index);
+        
         if(this.kanvas.allStepViews[index].nextStep) {
           this.kanvas.allStepViews[index + 1].borderLeft.setVisible(true);
         }
         
         if(this.kanvas.allStepViews[index].index === 0) {
-          
           this.kanvas.allStepViews[index].borderLeft.setVisible(true);
         } else {
           this.kanvas.allStepViews[index].borderLeft.setVisible(false);
@@ -359,7 +357,7 @@ angular.module("canvasApp").factory('moveStepRect', [
           
           step.parentStage.deleteStageContents();
           
-          if(this.currentDrop === "NOTHING") { // NOTHING imply that the we havent moved the step, its just a click an release;
+          if(this.currentDrop === "NOTHING") { // NOTHING imply that the we havent moved the step, its just a click and release;
             
             data = {
               stage: movingStepGraphics.backupStageModel
@@ -395,9 +393,9 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         this.kanvas.allStageViews[0].moveAllStepsAndStagesSpecial();
         
-        if(targetStep) {
+        if(targetStep && targetStep.left) {
           targetStage.addNewStep(data, targetStep);
-        } else {
+        } else { // If its null or NOTHING
           targetStep = {
             model: {
               id: null
@@ -405,7 +403,8 @@ angular.module("canvasApp").factory('moveStepRect', [
           };
           targetStage.addNewStepAtTheBeginning(data);
         }
-        
+        console.log(targetStep, "TargetStep");
+
         ExperimentLoader.moveStep(modelClone.id, targetStep.model.id, targetStage.model.id)
           .then(function(data) {
             console.log("Moved", data);
