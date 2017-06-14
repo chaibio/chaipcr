@@ -43,6 +43,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         // 2 make a list of void space , that is the space between spread out stages, and when we move half way across this
         // void space , shift the black line 
         // Make sure we can always reach source position. Implement leaving over it, even if its one step stage.
+
       this.indicator = new moveStepIndicator(me);
       this.indicator.verticalLine = new verticalLineStepGroup();
       
@@ -119,7 +120,6 @@ angular.module("canvasApp").factory('moveStepRect', [
         if((this.movement.left + this.rightOffset) > points[1] && (this.movement.left + this.rightOffset) < points[2]) {
               
           if(index !== this.currentMoveRight) {
-            console.log("Found", index);
             this.kanvas.allStepViews[index].moveToSide("left", this.currentDropStage);
             this.currentMoveRight = this.movedStepIndex = index;
             StepPositionService.getPositionObject(this.kanvas.allStepViews);
@@ -168,7 +168,7 @@ angular.module("canvasApp").factory('moveStepRect', [
           this.currentDrop = null;
           this.currentDropStage = step.parentStage;
         }
-        //this.currentDrop = (step.previousStep) ? step.previousStep
+        
         this.manageVerticalLineLeft(this.movedStepIndex);
         this.manageBorderLeftForLeft(this.movedStepIndex);
       }; 
@@ -185,7 +185,7 @@ angular.module("canvasApp").factory('moveStepRect', [
             this.movedStageIndex = this.movedLeftStageIndex = index;
             this.kanvas.allStageViews[index].moveToSide("left", {index: 10}); 
             // {index: 10} is sent so that the very first stage doesnt move, refer stage.validMove()
-            // It dosnt have to be 10, can be any non zero val
+            // It dosnt have to be 10, can be any non zero value
             StagePositionService.getPositionObject();
             StagePositionService.getAllVoidSpaces();
             StepPositionService.getPositionObject(this.kanvas.allStepViews);
@@ -301,7 +301,7 @@ angular.module("canvasApp").factory('moveStepRect', [
       };
 
       this.indicator.hideFirstStepBorderLeft = function() {
-        
+
         if(this.kanvas.allStageViews[this.movedStageIndex].childSteps[0]) {
           this.kanvas.allStageViews[this.movedStageIndex].childSteps[0].borderLeft.setVisible(false);
         }

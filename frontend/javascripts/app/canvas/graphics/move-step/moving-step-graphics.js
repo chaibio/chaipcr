@@ -34,7 +34,7 @@ angular.module("canvasApp").service('movingStepGraphics', [
         };
 
         this.setWidthOfStage = function(baseStage) {
-            //baseStage.setNewWidth(-60);
+            
             baseStage.myWidth = baseStage.myWidth - (this.offset * 2);
             baseStage.stageRect.setWidth(baseStage.myWidth);
             baseStage.stageRect.setCoords();
@@ -61,8 +61,6 @@ angular.module("canvasApp").service('movingStepGraphics', [
                 this.moveLittleLeft(startingStep);
                 startingStep = startingStep.nextStep;
             }
-            
-            C.canvas.renderAll();
         };
 
         this.squeezeStep = function(step, C) {
@@ -73,7 +71,6 @@ angular.module("canvasApp").service('movingStepGraphics', [
                 selected = (step.parentStage.previousStage) ? step.parentStage.previousStage.childSteps[step.parentStage.previousStage.childSteps.length - 1] : step.parentStage.nextStage.childSteps[0];
                 step.parentStage.parent.allStageViews.splice(step.parentStage.index, 1);
                 selected.parentStage.updateStageData(-1);
-                C.canvas.renderAll();
             }    
         };
 
