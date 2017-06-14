@@ -40,6 +40,29 @@ window.ChaiBioTech.ngApp.service('StagePositionService', [
                 }, this);
                 return this.allPositions;
             },
+
+            getAllVoidSpaces: function() {
+                if(!allStages) {
+                    return null;
+                }
+
+                this.allVoidSpaces = [];
+                
+                allStages.forEach(function(stage, index) {
+                    if(index === 0) {
+                        this.allVoidSpaces[0] = [
+                            33,
+                            stage.left
+                        ];
+                    }  else {
+                        this.allVoidSpaces[index] = [
+                            stage.previousStage.left + stage.previousStage.myWidth,
+                            stage.left
+                        ];
+                    }
+                }, this);
+                console.log(this.allVoidSpaces);
+            }
         };
     }
 ]);
