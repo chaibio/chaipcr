@@ -504,6 +504,17 @@ angular.module("canvasApp").factory('stage', [
         }
       };
 
+      this.squeezeStage = function(step) {
+          
+          this.deleteFromStage(step.index, step.ordealStatus);
+          if(this.childSteps.length === 0) {
+            this.wireStageNextAndPrevious();
+            selected = (this.previousStage) ? this.previousStage.childSteps[this.previousStage.childSteps.length - 1] : step.parentStage.nextStage.childSteps[0];
+            this.parent.allStageViews.splice(step.parentStage.index, 1);
+            selected.parentStage.updateStageData(-1);
+          }    
+        };
+      
       this.shortenStageName = function() {
         var text = this.stageName.text.substr(0, 8);
         this.stageName.setText(text);

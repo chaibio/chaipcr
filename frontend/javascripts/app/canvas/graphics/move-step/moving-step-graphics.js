@@ -63,17 +63,6 @@ angular.module("canvasApp").service('movingStepGraphics', [
             }
         };
 
-        this.squeezeStep = function(step, C) {
-            // Should be moved, because this is not about graphics
-            step.parentStage.deleteFromStage(step.index, step.ordealStatus);
-            if(step.parentStage.childSteps.length === 0) {
-                step.parentStage.wireStageNextAndPrevious();
-                selected = (step.parentStage.previousStage) ? step.parentStage.previousStage.childSteps[step.parentStage.previousStage.childSteps.length - 1] : step.parentStage.nextStage.childSteps[0];
-                step.parentStage.parent.allStageViews.splice(step.parentStage.index, 1);
-                selected.parentStage.updateStageData(-1);
-            }    
-        };
-
         this.moveLittleRight = function(step) {
             
             step.left = step.left + this.offset;
