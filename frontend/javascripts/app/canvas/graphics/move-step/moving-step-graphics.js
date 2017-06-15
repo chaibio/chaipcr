@@ -22,7 +22,7 @@ angular.module("canvasApp").service('movingStepGraphics', [
     'constants',
     function(Line, constants) {
         this.offset = 41;
-        // Make steg looks good just after clicking move-step, steps well spaced , and other stages moved aways making space.
+        
         this.backupStageModel = null;
 
         this.initiateMoveStepGraphics = function(currentStep, C) {

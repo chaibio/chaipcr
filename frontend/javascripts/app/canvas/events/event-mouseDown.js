@@ -97,28 +97,21 @@ angular.module("canvasApp").factory('mouseDown', [
           case "moveStep":
             // Remember what we click and what we move is two different objects, once we click, rest of the graphics come by, So original reference point to ,
             // the very thing we click. Not to the one we move. This applies to moveStage too.
-            that.mouseDownPos = evt.e.clientX;
-            console.log("step = " , evt.target.parent );
-            
-            movingStepGraphics.initiateMoveStepGraphics(evt.target.parent, C);
-            //evt.target.parent.selectStep();
-            that.selectStep(evt.target.parent.circle);
+            var step = evt.target.parent;
+            movingStepGraphics.initiateMoveStepGraphics(step, C);
+            that.selectStep(step.circle);
             that.calculateMoveLimit("step", evt.target);
-            //evt.target.parent.parentStage.shrinkedStage = true;
+            
             that.moveStepActive = true;
             that.canvas.moveCursor = "move";
             circleManager.togglePaths(false); //put it back later
-            C.moveDots.setLeft(evt.target.parent.left + 52).setCoords();
-            
-            //evt.target.parent.shrinkStep();
             evt.target.setVisible(false);
-            C.moveDots.setVisible(true);
-            C.moveDots.currentIndex = evt.target.parent.parentStage.index;
+            C.moveDots.setLeft(step.left + 52).setCoords().setVisible(true);
             C.canvas.bringToFront(C.moveDots);
             C.canvas.bringToFront(C.stepIndicator);
             
-            evt.target.parent.parentStage.squeezeStage(evt.target.parent);
-            C.stepIndicator.init(evt.target.parent, evt.target, C);
+            step.parentStage.squeezeStage(step);
+            C.stepIndicator.init(step, evt.target, C);
             C.canvas.renderAll();
 
           break;

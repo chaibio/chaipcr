@@ -44,6 +44,7 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.verticalLine = new verticalLineStepGroup();
       
       this.indicator.init = function(step, footer, C) {
+
         this.tagSteps(step);
         step.parentStage.sourceStage = true;
         step.parentStage.stageHeader();
@@ -62,17 +63,10 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.currentDropStage = step.parentStage;
         this.currentDrop = (step.previousStep) ? step.previousStep : "NOTHING";
         
-        
-        
-        this.verticalLine.setLeft(footer.left + 41);
-        this.verticalLine.setVisible(true).setCoords();
-        
+        this.verticalLine.setLeft(footer.left + 41).setVisible(true).setCoords();;  
         C.canvas.bringToFront(this.verticalLine);
-        
-        this.setLeft(footer.left);
-        this.setVisible(true);
+        this.setLeft(footer.left).setVisible(true);
         this.changeText(step);
-        
         StepPositionService.getPositionObject(this.kanvas.allStepViews);
         StagePositionService.getPositionObject();
         StagePositionService.getAllVoidSpaces();
@@ -114,24 +108,36 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.currentLeft = movement.left;
         
         if(direction === 'right') {
-          if(StepMovementRightService.ifOverRightSide(this) !== null) {
-            StepMovementRightService.movedRightAction(this);
-          }
-          if(StageMovementLeftService.shouldStageMoveLeft(this) !== null) {
-            StepMoveVoidSpaceLeftService.checkVoidSpaceLeft(this);
-            this.movedRightStageIndex = null; // Resetting
-            this.hideFirstStepBorderLeft();
-          }
+          this.manageMovingRight();
         } else if(direction === 'left') {
-          if(StepMovementLeftService.ifOverLeftSide(this) !== null) {
-            StepMovementLeftService.movedLeftAction(this);
-          }
-          if(StageMovementRightService.shouldStageMoveRight(this) !== null) {
-            StepMoveVoidSpaceRightService.checkVoidSpaceRight(this);
-            this.movedLeftStageIndex = null; // Resetting
-            this.hideFirstStepBorderLeft();
-          }
+          this.manageMovingLeft();
         } 
+      };
+
+      this.indicator.manageMovingRight = function() {
+
+        if(StepMovementRightService.ifOverRightSide(this) !== null) {
+          StepMovementRightService.movedRightAction(this);
+        }
+
+        if(StageMovementLeftService.shouldStageMoveLeft(this) !== null) {
+          StepMoveVoidSpaceLeftService.checkVoidSpaceLeft(this);
+          this.movedRightStageIndex = null; // Resetting
+          this.hideFirstStepBorderLeft();
+        }
+      };
+
+      this.indicator.manageMovingLeft = function() {
+
+        if(StepMovementLeftService.ifOverLeftSide(this) !== null) {
+            StepMovementLeftService.movedLeftAction(this);
+        }
+
+        if(StageMovementRightService.shouldStageMoveRight(this) !== null) {
+          StepMoveVoidSpaceRightService.checkVoidSpaceRight(this);
+          this.movedLeftStageIndex = null; // Resetting
+          this.hideFirstStepBorderLeft();
+        }
       };
 
       this.indicator.hideFirstStepBorderLeft = function() {
@@ -141,45 +147,41 @@ angular.module("canvasApp").factory('moveStepRect', [
         }
       };      
 
-      this.indicator.manageSingleStage = function(step) {
-        
-        var data = {};
+      this.indicator.manageSingleStepStage = function(step) {
         
         if(step.parentStage.childSteps.length === 0) { // Incase we sourced from a one step stage
-          
           step.parentStage.deleteStageContents();
           
           if(this.currentDrop === "NOTHING") { // NOTHING imply that the we havent moved the step, its just a click and release;
             
-            data = {
+            var data = {
               stage: movingStepGraphics.backupStageModel
             };
-
+            
             if(step.parentStage.previousStage) {
               this.kanvas.addNewStage(data, step.parentStage.previousStage, "move_stage_back_to_original");
             } else {
               this.kanvas.addNewStageAtBeginning({}, data);
             }
-            
-            return;
+            return true;
           }
         }
+        return false;
       };
 
       this.indicator.processMovement = function(step, C) {
+        
+        this.verticalLine.setVisible(false);
+        if(this.manageSingleStepStage(step) === true) {
+          return true;
+        }
 
         step.parentStage.sourceStage = false;
-        this.verticalLine.setVisible(false);
-        var data = {};
-        this.manageSingleStage(step);
-        
-        var modelClone = $.extend({}, step.model);
-        
-        var targetStep = this.currentDrop;
-
+        var modelClone = angular.copy(step.model);
+        var targetStep = this.currentDrop || { model: { id: null } };
         var targetStage = this.currentDropStage;
 
-        data = {
+        var data = {
           step: modelClone
         };
 
@@ -187,21 +189,14 @@ angular.module("canvasApp").factory('moveStepRect', [
         
         if(targetStep && targetStep.left) {
           targetStage.addNewStep(data, targetStep);
-        } else { // If its null or NOTHING
-          targetStep = {
-            model: {
-              id: null
-            }
-          };
+        } else  { 
           targetStage.addNewStepAtTheBeginning(data);
         }
-        console.log(targetStep, "TargetStep");
 
-        ExperimentLoader.moveStep(modelClone.id, targetStep.model.id, targetStage.model.id)
+        ExperimentLoader.moveStep(step.model.id, targetStep.model.id, targetStage.model.id)
           .then(function(data) {
             console.log("Moved", data);
           });
-          
       };
 
       return this.indicator;

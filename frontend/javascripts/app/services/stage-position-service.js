@@ -61,7 +61,6 @@ window.ChaiBioTech.ngApp.service('StagePositionService', [
                         ];
                     }
                 }, this);
-                console.log(this.allVoidSpaces);
             }
         };
     }
