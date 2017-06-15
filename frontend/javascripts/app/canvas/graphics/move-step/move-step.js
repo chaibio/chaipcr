@@ -28,24 +28,18 @@ angular.module("canvasApp").factory('moveStepRect', [
   'movingStepGraphics',
   'StepMovementRightService',
   'StepMovementLeftService',
+  'StageMovementRightService',
+  'StageMovementLeftService',
+  'StepMoveVoidSpaceRightService',
+  'StepMoveVoidSpaceLeftService',
   function(ExperimentLoader, previouslySelected, circleManager, StepPositionService, moveStepIndicator, verticalLineStepGroup, StagePositionService,
-  movingStepGraphics, StepMovementRightService, StepMovementLeftService) {
+  movingStepGraphics, StepMovementRightService, StepMovementLeftService, StageMovementRightService, StageMovementLeftService,
+  StepMoveVoidSpaceRightService, StepMoveVoidSpaceLeftService) {
 
     return {
 
       getMoveStepRect: function(me) {
        
-        // Things to do, Plan
-
-        // more attention on showing right borders and hiding it.
-        // make sure stages spread away, as move-step moves ..
-        // == new algo 
-        //1 When we move right, if we approch the black line by the half of the move-step-rect and if the step is last step of the stage
-        // we need to shift the blck line to, before the first step of the next stage.
-        // 2 make a list of void space , that is the space between spread out stages, and when we move half way across this
-        // void space , shift the black line 
-        // Make sure we can always reach source position. Implement leaving over it, even if its one step stage.
-
       this.indicator = new moveStepIndicator(me);
       this.indicator.verticalLine = new verticalLineStepGroup();
       
@@ -58,32 +52,34 @@ angular.module("canvasApp").factory('moveStepRect', [
           step.parentStage.adjustHeader();
         }
 
-        this.movement = null;
-        this.currentLeft = null;
-        this.movedStepIndex = null;
-        this.currentMoveRight = null;
+        this.movement = this.currentLeft = this.movedStepIndex = this.currentMoveRight = 
+        this.movedStageIndex = this.movedRightStageIndex = this.movedRightStageIndex = null;
+
+        
         this.rightOffset = 96;
         this.leftOffset = 0;
         this.kanvas = C;
         this.currentDropStage = step.parentStage;
         this.currentDrop = (step.previousStep) ? step.previousStep : "NOTHING";
-        this.movedStageIndex = null;
-        this.movedRightStageIndex = null;
-        this.movedRightStageIndex = null;
-
-        this.setVisible(true);
+        
+        
+        
         this.verticalLine.setLeft(footer.left + 41);
-        this.verticalLine.setVisible(true);
+        this.verticalLine.setVisible(true).setCoords();
+        
         C.canvas.bringToFront(this.verticalLine);
+        
         this.setLeft(footer.left);
-        this.startPosition = footer.left;
+        this.setVisible(true);
         this.changeText(step);
+        
         StepPositionService.getPositionObject(this.kanvas.allStepViews);
         StagePositionService.getPositionObject();
         StagePositionService.getAllVoidSpaces();
       };
 
       this.indicator.tagSteps = function(step) {
+
         if(step.previousStep) {
           step.previousStep.nextIsMoving = true;
         } 
@@ -110,77 +106,6 @@ angular.module("canvasApp").factory('moveStepRect', [
         return this.direction;
       };
 
-      
-    
-      
-
-      this.indicator.movedRightAction = function() {
-
-        this.currentMoveLeft = null; // Resetting
-        this.currentDrop = this.kanvas.allStepViews[this.movedStepIndex];
-        this.currentDropStage = this.currentDrop.parentStage;
-        this.manageVerticalLineRight(this.movedStepIndex);
-        this.manageBorderLeftForRight(this.movedStepIndex);
-      }; 
-
-      this.indicator.movedLeftAction = function() {
-
-        this.currentMoveRight = null; // Resetting
-        var step = this.kanvas.allStepViews[this.movedStepIndex];
-        
-        if(step.previousStep) {
-          this.currentDrop = step.previousStep;
-          this.currentDropStage = this.currentDrop.parentStage;
-        } else {
-          this.currentDrop = null;
-          this.currentDropStage = step.parentStage;
-        }
-        
-        this.manageVerticalLineLeft(this.movedStepIndex);
-        this.manageBorderLeftForLeft(this.movedStepIndex);
-      }; 
-
-      this.indicator.shouldStageMoveLeft = function() {
-        this.movedStageIndex = null;
-        StagePositionService.allPositions.some(this.shouldStageMoveLeftCallback, this);
-        return this.movedStageIndex;
-      };
-
-      this.indicator.shouldStageMoveLeftCallback = function(point, index) {
-        if((this.movement.left + this.rightOffset) > point[2] && (this.movement.left + this.rightOffset) < point[2] + 150) {
-          if(index !== this.movedLeftStageIndex) {
-            this.movedStageIndex = this.movedLeftStageIndex = index;
-            this.kanvas.allStageViews[index].moveToSide("left", {index: 10}); 
-            // {index: 10} is sent so that the very first stage doesnt move, refer stage.validMove()
-            // It dosnt have to be 10, can be any non zero value
-            StagePositionService.getPositionObject();
-            StagePositionService.getAllVoidSpaces();
-            StepPositionService.getPositionObject(this.kanvas.allStepViews);
-            return true;
-          }
-        }
-      };
-
-      this.indicator.shouldStageMoveRight = function() {
-        this.movedStageIndex = null;
-        StagePositionService.allPositions.some(this.shouldStageMoveRightCallback, this);
-        return this.movedStageIndex;
-      };
-
-      this.indicator.shouldStageMoveRightCallback = function(point, index) {
-        
-        if((this.movement.left) > point[0] - 150 && (this.movement.left) < point[0]) {
-          if(index !== this.movedRightStageIndex) {
-            this.movedStageIndex = this.movedRightStageIndex = index;
-            this.kanvas.allStageViews[index].moveToSide("right", this.currentDropStage);
-            StagePositionService.getPositionObject();
-            StagePositionService.getAllVoidSpaces();
-            StepPositionService.getPositionObject(this.kanvas.allStepViews);
-            return true;
-          }
-        }
-      };
-
       this.indicator.onTheMove = function(C, movement) {
 
         this.setLeft(movement.left).setCoords();
@@ -190,81 +115,23 @@ angular.module("canvasApp").factory('moveStepRect', [
         
         if(direction === 'right') {
           if(StepMovementRightService.ifOverRightSide(this) !== null) {
-            this.movedRightAction();
+            StepMovementRightService.movedRightAction(this);
           }
-          if(this.shouldStageMoveLeft() !== null) {
-            this.checkVoidSpaceLeft();
+          if(StageMovementLeftService.shouldStageMoveLeft(this) !== null) {
+            StepMoveVoidSpaceLeftService.checkVoidSpaceLeft(this);
             this.movedRightStageIndex = null; // Resetting
             this.hideFirstStepBorderLeft();
           }
         } else if(direction === 'left') {
           if(StepMovementLeftService.ifOverLeftSide(this) !== null) {
-            this.movedLeftAction();
+            StepMovementLeftService.movedLeftAction(this);
           }
-          if(this.shouldStageMoveRight() !== null) {
-            this.checkVoidSpaceRight();
+          if(StageMovementRightService.shouldStageMoveRight(this) !== null) {
+            StepMoveVoidSpaceRightService.checkVoidSpaceRight(this);
             this.movedLeftStageIndex = null; // Resetting
             this.hideFirstStepBorderLeft();
           }
         } 
-      };
-
-      this.indicator.checkVoidSpaceLeft = function() {
-        StagePositionService.allVoidSpaces.some(this.voidSpaceCallbackLeft, this);
-      };
-
-      this.indicator.voidSpaceCallbackLeft = function(point, index) {
-        var abPlace = this.movement.left + this.rightOffset;
-        if(abPlace > point[0] && abPlace < point[1]) {
-          this.verticalLineForVoidLeft(index);
-          return true;
-        }
-      };
-
-      this.indicator.verticalLineForVoidLeft = function(index) {
-
-        var tStep = this.kanvas.allStageViews[index].childSteps[0];
-        var place = this.kanvas.allStageViews[index].left - 5;
-        
-        if(tStep.previousIsMoving) {
-          place = this.kanvas.moveDots.left + 7;
-        }
-        
-        this.currentDrop = null;
-        this.currentDropStage = this.kanvas.allStageViews[index]; // We need to insert the step as the first.
-        this.verticalLine.setLeft(place);
-        this.verticalLine.setCoords();
-      };
-
-      this.indicator.checkVoidSpaceRight = function() {
-        StagePositionService.allVoidSpaces.some(this.voidSpaceCallbackRight, this);
-      };
-
-      this.indicator.voidSpaceCallbackRight = function(point, index) {
-        var abPlace = this.movement.left;
-        if(abPlace > point[0] && abPlace < point[1]) {
-          this.verticalLineForVoidRight(index);
-          return true;
-        }
-      };
-
-      this.indicator.verticalLineForVoidRight = function(index) {
-        
-        if(this.kanvas.allStageViews[index - 1]) {
-          var length = this.kanvas.allStageViews[index - 1].childSteps.length;
-          var tStep = this.kanvas.allStageViews[index - 1].childSteps[length - 1];
-          var place = this.kanvas.allStageViews[index - 1].left + this.kanvas.allStageViews[index - 1].myWidth - 5;
-          
-          if(tStep.nextIsMoving) {
-            place = this.kanvas.moveDots.left + 7;
-          }
-
-          this.currentDrop = this.kanvas.allStageViews[index - 1].childSteps[length - 1];
-          this.currentDropStage = this.kanvas.allStageViews[index - 1]; // We need to insert the step as the last.
-          this.verticalLine.setLeft(place);
-          this.verticalLine.setCoords();
-        }
-        
       };
 
       this.indicator.hideFirstStepBorderLeft = function() {
@@ -272,49 +139,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         if(this.kanvas.allStageViews[this.movedStageIndex].childSteps[0]) {
           this.kanvas.allStageViews[this.movedStageIndex].childSteps[0].borderLeft.setVisible(false);
         }
-      };
-
-      this.indicator.manageVerticalLineRight = function(index) {
-
-        var place = (this.kanvas.allStepViews[index].left + this.kanvas.allStepViews[index].myWidth - 2);
-        if(this.kanvas.allStepViews[index].nextIsMoving === true) {
-          place = this.kanvas.moveDots.left + 7;
-        }
-        this.verticalLine.setLeft(place);
-        this.verticalLine.setCoords();
-      };
-
-      this.indicator.manageVerticalLineLeft = function(index) {
-        
-        var place = (this.kanvas.allStepViews[index].left - 12);
-        if(this.kanvas.allStepViews[index].previousIsMoving === true) {
-          place = this.kanvas.moveDots.left + 7;
-        }        
-        this.verticalLine.setLeft(place);
-        this.verticalLine.setCoords();
-      };
-
-      this.indicator.manageBorderLeftForLeft = function(index) {
-        
-        if(this.kanvas.allStepViews[index + 1]) {
-          this.kanvas.allStepViews[index + 1].borderLeft.setVisible(false);
-        }
-        this.kanvas.allStepViews[index].borderLeft.setVisible(true);
-      };
-
-      this.indicator.manageBorderLeftForRight = function(index) {
-        
-        if(this.kanvas.allStepViews[index].nextStep) {
-          this.kanvas.allStepViews[index + 1].borderLeft.setVisible(true);
-        }
-        
-        if(this.kanvas.allStepViews[index].index === 0) {
-          this.kanvas.allStepViews[index].borderLeft.setVisible(true);
-        } else {
-          this.kanvas.allStepViews[index].borderLeft.setVisible(false);
-        }     
-        
-      };
+      };      
 
       this.indicator.manageSingleStage = function(step) {
         

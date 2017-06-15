@@ -17,28 +17,29 @@
  * limitations under the License.
  */
 
-window.ChaiBioTech.ngApp.service('StepMovementLeftService', [
+window.ChaiBioTech.ngApp.service('StageMovementRightService', [
     'StepPositionService',
-    function(StepPositionService) {
-        
+    'StagePositionService',
+    function(StepPositionService, StagePositionService) {
         return {
 
-            ifOverLeftSide: function(stepIndicator) {
-                stepIndicator.movedStepIndex = null;
-                StepPositionService.allPositions.some(this.ifOverLeftSideCallback, stepIndicator);
-                return stepIndicator.movedStepIndex;
+            shouldStageMoveRight: function(sI) {
+                sI.movedStageIndex = null;
+                StagePositionService.allPositions.some(this.shouldStageMoveRightCallback, sI);
+                return sI.movedStageIndex;
             },
 
-            ifOverLeftSideCallback: function(points, index) {
-
-                if((this.movement.left + this.leftOffset) > points[0] && (this.movement.left + this.leftOffset) < points[1]) {
+            shouldStageMoveRightCallback: function(point, index) {
                 
-                    if(this.currentMoveLeft !== index) {
-                        this.kanvas.allStepViews[index].moveToSide("right");
-                        this.currentMoveLeft = this.movedStepIndex = index;
+                if((this.movement.left) > point[0] - 150 && (this.movement.left) < point[0]) {
+                    if(index !== this.movedRightStageIndex) {
+                        this.movedStageIndex = this.movedRightStageIndex = index;
+                        this.kanvas.allStageViews[index].moveToSide("right", this.currentDropStage);
+                        StagePositionService.getPositionObject();
+                        StagePositionService.getAllVoidSpaces();
                         StepPositionService.getPositionObject(this.kanvas.allStepViews);
+                        return true;
                     }
-                return true;
                 }
             }
         };
