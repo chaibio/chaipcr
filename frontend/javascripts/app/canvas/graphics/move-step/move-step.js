@@ -43,7 +43,7 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator = new moveStepIndicator(me);
       this.indicator.verticalLine = new verticalLineStepGroup();
       
-      this.indicator.init = function(step, footer, C) {
+      this.indicator.init = function(step, footer, C, backupStageModel) {
 
         this.tagSteps(step);
         step.parentStage.sourceStage = true;
@@ -56,7 +56,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.movement = this.currentLeft = this.movedStepIndex = this.currentMoveRight = 
         this.movedStageIndex = this.movedRightStageIndex = this.movedRightStageIndex = null;
 
-        
+        this.backupStageModel = backupStageModel;        
         this.rightOffset = 96;
         this.leftOffset = 0;
         this.kanvas = C;
@@ -155,7 +155,7 @@ angular.module("canvasApp").factory('moveStepRect', [
           if(this.currentDrop === "NOTHING") { // NOTHING imply that the we havent moved the step, its just a click and release;
             
             var data = {
-              stage: movingStepGraphics.backupStageModel
+              stage: this.backupStageModel
             };
             
             if(step.parentStage.previousStage) {

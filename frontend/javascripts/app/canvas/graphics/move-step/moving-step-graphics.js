@@ -23,11 +23,8 @@ angular.module("canvasApp").service('movingStepGraphics', [
     function(Line, constants) {
         this.offset = 41;
         
-        this.backupStageModel = null;
-
         this.initiateMoveStepGraphics = function(currentStep, C) {
             
-            this.backupStageModel = angular.copy(currentStep.parentStage.model); 
             this.arrangeStepsOfStage(currentStep, C);
             this.setWidthOfStage(currentStep.parentStage);
             this.setLeftOfStage(currentStep.parentStage);
