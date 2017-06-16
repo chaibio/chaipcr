@@ -85,7 +85,7 @@ angular.module("canvasApp").factory('moveStepRect', [
       this.indicator.changeText = function(step) {
 
         this.temperatureText.setText(step.model.temperature + "º");
-        //this.holdTimeText.setText(step.circle.holdTime.text);
+        this.holdTimeText.setText(step.circle.holdTime.text);
         this.indexText.setText(step.numberingTextCurrent.text);
         this.placeText.setText(step.numberingTextCurrent.text + step.numberingTextTotal.text);
       };
@@ -114,6 +114,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         } 
       };
 
+      // Manage the movement of the indicator right side.
       this.indicator.manageMovingRight = function() {
 
         if(StepMovementRightService.ifOverRightSide(this) !== null) {
@@ -127,6 +128,7 @@ angular.module("canvasApp").factory('moveStepRect', [
         }
       };
 
+      // Manage the movement of the indicator left side.
       this.indicator.manageMovingLeft = function() {
 
         if(StepMovementLeftService.ifOverLeftSide(this) !== null) {
@@ -145,8 +147,11 @@ angular.module("canvasApp").factory('moveStepRect', [
         if(this.kanvas.allStageViews[this.movedStageIndex].childSteps[0]) {
           this.kanvas.allStageViews[this.movedStageIndex].childSteps[0].borderLeft.setVisible(false);
         }
-      };      
+      };
 
+      /*
+        if the parent stage has only one step and we haven't moved it [If its just a click] this method is invoked.
+      */
       this.indicator.manageSingleStepStage = function(step) {
         
         if(step.parentStage.childSteps.length === 0) { // Incase we sourced from a one step stage

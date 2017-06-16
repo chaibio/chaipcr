@@ -22,8 +22,8 @@ angular.module("canvasApp").factory('moveStepHoldTimeText', [
     function(Text) {
         return function() {
             return Text.create("0:05", {
-            fill: 'black',  fontSize: 20, selectable: false, originX: 'left', originY: 'top',
-            top: 9, left: 59, fontFamily: "dinot"
+            fill: 'black',  fontSize: 16, selectable: false, originX: 'left', originY: 'top',
+            top: 12, left: 52, fontFamily: "dinot"
           });
         };
     }
