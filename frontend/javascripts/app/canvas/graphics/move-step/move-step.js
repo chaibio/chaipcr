@@ -178,9 +178,9 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         step.parentStage.sourceStage = false;
         var modelClone = angular.copy(step.model);
-        var targetStep = this.currentDrop || { model: { id: null } };
+        var targetStep = (!this.currentDrop || this.currentDrop === "NOTHING") ? { model: { id: null } } : this.currentDrop;
         var targetStage = this.currentDropStage;
-
+        
         var data = {
           step: modelClone
         };
