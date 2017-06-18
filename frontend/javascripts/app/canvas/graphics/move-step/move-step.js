@@ -94,12 +94,29 @@ angular.module("canvasApp").factory('moveStepRect', [
 
         if(this.movement.left > this.currentLeft && this.direction !== "right") {
           this.direction = "right";
+          this.updateLocationOnMoveRight();
         } else if(this.movement.left < this.currentLeft && this.direction !== "left") {
-          this.direction = "left";    
+          this.direction = "left";
+          this.updateLocationOnMoveLeft();    
         }
         return this.direction;
       };
 
+      this.indicator.updateLocationOnMoveRight = function() {
+        //this.movedStepIndex = this.currentMoveLeft;
+        //StepMovementRightService.movedRightAction(this);
+        this.movement.left = this.movement.left - 30;
+        this.manageMovingRight();
+
+      };
+
+      this.indicator.updateLocationOnMoveLeft = function() {
+        //this.movedStepIndex = this.currentMoveRight;
+        //StepMovementLeftService.movedLeftAction(this);
+        this.movement.left = this.movement.left + 30;
+        this.manageMovingLeft();
+      };
+      
       this.indicator.onTheMove = function(C, movement) {
 
         this.setLeft(movement.left).setCoords();

@@ -44,7 +44,6 @@ window.ChaiBioTech.ngApp.service('StepMovementLeftService', [
 
             movedLeftAction: function(sI) {
 
-                sI.currentMoveRight = null; // Resetting
                 var step = sI.kanvas.allStepViews[sI.movedStepIndex];
                 
                 if(step.previousStep) {
@@ -57,6 +56,7 @@ window.ChaiBioTech.ngApp.service('StepMovementLeftService', [
                 
                 this.manageVerticalLineLeft(sI);
                 this.manageBorderLeftForLeft(sI);
+                sI.currentMoveRight = null; // Resetting
             },
 
             manageVerticalLineLeft: function(sI) {

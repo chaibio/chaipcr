@@ -43,12 +43,12 @@ window.ChaiBioTech.ngApp.service('StepMovementRightService', [
             },
 
             movedRightAction: function(stepIndicator) {
-
-                stepIndicator.currentMoveLeft = null; // Resetting
+                console.log("Log Log", stepIndicator, stepIndicator.currentMoveLeft);
                 stepIndicator.currentDrop = stepIndicator.kanvas.allStepViews[stepIndicator.movedStepIndex];
                 stepIndicator.currentDropStage = stepIndicator.currentDrop.parentStage;
                 this.manageVerticalLineRight(stepIndicator);
                 this.manageBorderLeftForRight(stepIndicator);
+                stepIndicator.currentMoveLeft = null; // Resetting
             },
 
             manageVerticalLineRight: function(si) {

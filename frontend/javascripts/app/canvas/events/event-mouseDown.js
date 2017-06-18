@@ -39,7 +39,7 @@ angular.module("canvasApp").factory('mouseDown', [
       // that originally points to event. Refer event.js
       var me;
       this.canvas.on("mouse:down", function(evt) {
-        console.log(evt);
+        
         if(! evt.target) {
           that.setSummaryMode();
           return false;
@@ -135,9 +135,6 @@ angular.module("canvasApp").factory('mouseDown', [
             C.stageIndicator.init(evt.target.parent, C, evt.target);
             that.stageIndicatorPosition = C.stageIndicator.left;
             C.stageIndicator.changeText(evt.target.parent);
-            
-            //C.canvas.bringToFront(C.stageIndicator);
-            
             C.canvas.renderAll();
           break;
 

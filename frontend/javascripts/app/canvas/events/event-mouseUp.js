@@ -42,8 +42,6 @@ angular.module("canvasApp").factory('mouseUp', [
         if(that.moveStepActive) {
           var indicate = evt.target;
           step = indicate.parent;
-          
-          //evt.target.parent.parentStage.shrinkedStage = false;
           C.moveDots.setVisible(false);
           C.stepIndicator.setVisible(false);
           that.moveStepActive = false;
