@@ -22,7 +22,7 @@ window.ChaiBioTech.ngApp.service('StepMoveVoidSpaceRightService', [
     function(StagePositionService) {
 
        this.verticalLineForVoidRight = function(sI, index) {
-        
+           
             if(sI.kanvas.allStageViews[index - 1]) {
             var length = sI.kanvas.allStageViews[index - 1].childSteps.length;
             var tStep = sI.kanvas.allStageViews[index - 1].childSteps[length - 1];

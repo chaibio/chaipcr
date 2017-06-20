@@ -53,8 +53,10 @@ angular.module("canvasApp").factory('moveStepRect', [
           step.parentStage.adjustHeader();
         }
 
-        this.movement = this.currentLeft = this.movedStepIndex = this.currentMoveRight = 
+        this.movement = this.movedStepIndex = this.currentMoveRight = this.currentMoveLeft =
         this.movedStageIndex = this.movedRightStageIndex = this.movedRightStageIndex = null;
+
+        this.currentLeft = footer.left;
 
         this.backupStageModel = backupStageModel;        
         this.rightOffset = 96;
@@ -133,7 +135,6 @@ angular.module("canvasApp").factory('moveStepRect', [
 
       // Manage the movement of the indicator right side.
       this.indicator.manageMovingRight = function() {
-
         if(StepMovementRightService.ifOverRightSide(this) !== null) {
           StepMovementRightService.movedRightAction(this);
         }
@@ -147,9 +148,9 @@ angular.module("canvasApp").factory('moveStepRect', [
 
       // Manage the movement of the indicator left side.
       this.indicator.manageMovingLeft = function() {
-
+        console.log("Moving left");
         if(StepMovementLeftService.ifOverLeftSide(this) !== null) {
-            StepMovementLeftService.movedLeftAction(this);
+          StepMovementLeftService.movedLeftAction(this);
         }
 
         if(StageMovementRightService.shouldStageMoveRight(this) !== null) {

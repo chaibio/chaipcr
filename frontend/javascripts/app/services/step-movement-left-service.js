@@ -30,9 +30,9 @@ window.ChaiBioTech.ngApp.service('StepMovementLeftService', [
             },
 
             ifOverLeftSideCallback: function(points, index) {
-
-                if((this.movement.left + this.leftOffset) > points[0] && (this.movement.left + this.leftOffset) < points[1]) {
                 
+                if((this.movement.left + this.leftOffset) > points[0] && (this.movement.left + this.leftOffset) < points[1]) {
+
                     if(this.currentMoveLeft !== index) {
                         this.kanvas.allStepViews[index].moveToSide("right");
                         this.currentMoveLeft = this.movedStepIndex = index;
