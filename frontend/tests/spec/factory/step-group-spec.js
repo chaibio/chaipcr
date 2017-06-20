@@ -11,10 +11,11 @@ describe("Testing step group", function() {
       stepName: {},
       deltaSymbol: {},
       deltaGroup: {},
-      borderRight: {}
+      borderRight: {},
+      borderLeft: {}
     }, shadowStepGroup;
 
-  beforeEach(inject(function(stepGroup, stepRect, numberingText, deltaSymbol, deltaGroup, stepName, borderRight) {
+  beforeEach(inject(function(stepGroup, stepRect, numberingText, deltaSymbol, deltaGroup, stepName, borderRight, borderLeft) {
 
     shadowStepGroup = stepGroup;
     step = {
@@ -25,7 +26,8 @@ describe("Testing step group", function() {
         stepName: {},
         deltaSymbol: {},
         deltaGroup: {},
-        borderRight: {}
+        borderRight: {},
+        borderLeft: {}
       };
 
     step.stepRect = new stepRect(step);
@@ -35,11 +37,12 @@ describe("Testing step group", function() {
     step.deltaGroup = new deltaGroup(step);
     step.stepName = new stepName("Jo");
     step.borderRight = new borderRight(step);
+    step.borderLeft = new borderLeft(step);
 
     _stepGroup = new stepGroup(step);
   }));
-  // [step.stepRect, step.numberingTextCurrent, step.numberingTextTotal, step.numberingTextTotal, step.deltaSymbol,
-  //  step.deltaGroup, step.borderRight]
+   //var groupMembers = [step.stepRect, step.numberingTextCurrent, step.numberingTextTotal, step.stepName, step.deltaSymbol,
+    // step.deltaGroup, step.borderRight, step.borderLeft];
   it("It should check the left property", function() {
     expect(_stepGroup.left).toEqual(step.left);
   });
