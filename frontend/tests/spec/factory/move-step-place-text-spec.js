@@ -37,7 +37,7 @@ describe("Testing moveStepPlaceText", function() {
         expect(_moveStepPlaceText.top).toEqual(30);
     });
 
-    it("It should test top property", function() {
+    it("It should test left property", function() {
         expect(_moveStepPlaceText.left).toEqual(42);
     });
 

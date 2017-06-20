@@ -20,9 +20,9 @@
 angular.module("canvasApp").factory('moveStepRectangle', [
     'Rectangle',
     function(Rectangle) {
-        return function(me) {
+        return function() {
             return Rectangle.create({
-                fill: 'white', width: 96, left: 0, height: 72, selectable: false, name: "step", me: this, rx: 1,
+                fill: 'white', width: 96, left: 0, height: 72, selectable: false, name: "MoveStepRectangle", rx: 1,
             });
         };
     }

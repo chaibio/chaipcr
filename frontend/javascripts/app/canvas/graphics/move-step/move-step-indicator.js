@@ -35,7 +35,7 @@ angular.module("canvasApp").factory('moveStepIndicator', [
             me.imageobjects["drag-footer-image.png"].left = 9;
 
             var componentsFirstSet = [
-                new moveStepRectangle(me), 
+                new moveStepRectangle(), 
                 new moveStepTemperatureText(), 
                 new moveStepHoldTimeText(), 
                 new moveStepIndexText(), 
