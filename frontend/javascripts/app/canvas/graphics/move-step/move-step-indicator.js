@@ -23,10 +23,9 @@ angular.module("canvasApp").factory('moveStepIndicator', [
     'moveStepIndexText',
     'moveStepPlaceText',
     'moveStepRectangle',
-    'moveStepCoverRect',
     'moveStepIndicatorRectangleGroup',
     'moveStepIndicatorGroup',
-    function(moveStepTemperatureText, moveStepHoldTimeText, moveStepIndexText, moveStepPlaceText, moveStepRectangle, moveStepCoverRect,
+    function(moveStepTemperatureText, moveStepHoldTimeText, moveStepIndexText, moveStepPlaceText, moveStepRectangle,
         moveStepIndicatorRectangleGroup, moveStepIndicatorGroup) {
         return function(me) {
             
@@ -45,7 +44,6 @@ angular.module("canvasApp").factory('moveStepIndicator', [
             ];
             
             var componentsSecondSet = [
-                //new moveStepCoverRect(), 
                 new moveStepIndicatorRectangleGroup(componentsFirstSet)
             ];
 
