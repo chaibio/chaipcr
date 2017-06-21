@@ -6,7 +6,7 @@ describe("Testing moveStepRectangle", function() {
     var _moveStepRectangle;
     
     beforeEach(inject(function(moveStepRectangle) {
-        _moveStepRectangle = new moveStepRectangle("ME");
+        _moveStepRectangle = new moveStepRectangle();
     }));
 
     it("It should test fill property", function() {
@@ -22,7 +22,7 @@ describe("Testing moveStepRectangle", function() {
     });
 
     it("It should test name property", function() {
-        expect(_moveStepRectangle.name).toEqual("step");
+        expect(_moveStepRectangle.name).toEqual("moveStepRectangle");
     });
 
     it("It should test height property", function() {
@@ -35,10 +35,6 @@ describe("Testing moveStepRectangle", function() {
 
     it("It should test rx property", function() {
         expect(_moveStepRectangle.rx).toEqual(1);
-    });
-
-    it("It should test me property", function() {
-        expect(_moveStepRectangle.me).toEqual("ME");
     });
 
 });

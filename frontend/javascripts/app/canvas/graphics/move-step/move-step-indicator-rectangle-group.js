@@ -23,7 +23,7 @@ angular.module("canvasApp").factory('moveStepIndicatorRectangleGroup', [
         return function(components) {
             return Group.create(components, {
                 originX: "left", originY: "top", left: 0, top: 298, height: 72, selectable: true, lockMovementY: true, hasControls: false,
-                visible: true, hasBorders: false, name: "dragStepGroup"
+                visible: true, hasBorders: false, name: "dragStepGroupRectangle"
             });
         };
     }

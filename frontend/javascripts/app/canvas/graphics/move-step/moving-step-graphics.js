@@ -25,7 +25,7 @@ angular.module("canvasApp").service('movingStepGraphics', [
         
         this.initiateMoveStepGraphics = function(currentStep, C) {
             
-            this.arrangeStepsOfStage(currentStep, C);
+            this.arrangeStepsOfStage(currentStep);
             this.setWidthOfStage(currentStep.parentStage);
             this.setLeftOfStage(currentStep.parentStage);
         };
@@ -33,18 +33,25 @@ angular.module("canvasApp").service('movingStepGraphics', [
         this.setWidthOfStage = function(baseStage) {
             
             baseStage.myWidth = baseStage.myWidth - (this.offset * 2);
+            
             baseStage.stageRect.setWidth(baseStage.myWidth);
             baseStage.stageRect.setCoords();
-            baseStage.roof.setWidth(baseStage.myWidth).setCoords();
-            baseStage.stageGroup.setLeft(baseStage.stageGroup.left + this.offset).setCoords();
-            baseStage.dots.setLeft(baseStage.dots.left + this.offset).setCoords();
+            
+            baseStage.roof.setWidth(baseStage.myWidth);
+            baseStage.roof.setCoords();
+            
+            baseStage.stageGroup.setLeft(baseStage.stageGroup.left + this.offset)
+            baseStage.stageGroup.setCoords();
+
+            baseStage.dots.setLeft(baseStage.dots.left + this.offset);
+            baseStage.dots.setCoords();
         };
 
         this.setLeftOfStage = function(baseStage) {
             baseStage.left = baseStage.left + this.offset;
         };
 
-        this.arrangeStepsOfStage = function(step, C) {
+        this.arrangeStepsOfStage = function(step) {
             
             var startingStep = step.previousStep;
             
