@@ -3,12 +3,22 @@ describe("Testing moveStepRect", function() {
     beforeEach(module('ChaiBioTech'));
     beforeEach(module('canvasApp'));
     
-    var indicator, step, backupStageModel = {}, C = {}, _StepPositionService, _StagePositionService, footer = {left: 10};
+    var indicator, step, backupStageModel = {}, C = {}, _StepPositionService, _StagePositionService, footer = {left: 10},
+    _StepMovementRightService, _StageMovementLeftService, _StepMoveVoidSpaceLeftService, _StepMovementLeftService,
+    _StageMovementRightService, _StepMoveVoidSpaceRightService;
     
-    beforeEach(inject(function(moveStepRect, Image, StepPositionService, StagePositionService) {
+    beforeEach(inject(function(moveStepRect, Image, StepPositionService, StagePositionService, StepMovementRightService, 
+    StageMovementLeftService, StepMoveVoidSpaceLeftService, StepMovementLeftService, StageMovementRightService,
+    StepMoveVoidSpaceRightService) {
         
         _StepPositionService = StepPositionService;
         _StagePositionService = StagePositionService;
+        _StepMovementRightService = StepMovementRightService;
+        _StageMovementLeftService = StageMovementLeftService;
+        _StepMoveVoidSpaceLeftService = StepMoveVoidSpaceLeftService;
+        _StepMovementLeftService = StepMovementLeftService;
+        _StageMovementRightService = StageMovementRightService;
+        _StepMoveVoidSpaceRightService = StepMoveVoidSpaceRightService;
 
         var obj = {
             imageobjects: {
@@ -17,19 +27,33 @@ describe("Testing moveStepRect", function() {
         };
 
         step = {
-           previousStep: {
-
-           },
-           nextStep: {
-
-           },
-           parentStage: {
+            model: {
+                temperature: 80,
+            },
+            circle: {
+                holdTime: {
+                    text: "1:30"
+                }
+            },
+            numberingTextCurrent: {
+                text: "numbering"
+            },
+            numberingTextTotal: {
+                text: "numbering total"
+            },
+            previousStep: {
+                
+            },
+             nextStep: {
+                
+            },
+            parentStage: {
                stageHeader: function() {},
                adjustHeader: function() {},
                childSteps: [
 
                ]
-           }
+            }
 
         };
 
@@ -51,7 +75,7 @@ describe("Testing moveStepRect", function() {
         expect(indicator.verticalLine).toEqual(jasmine.any(Object));
     });
 
-    it("It should test init method", function() {
+    it("It should test init method [test method calls]", function() {
 
         spyOn(_StagePositionService, "getPositionObject");
         spyOn(_StagePositionService, "getAllVoidSpaces");
@@ -59,9 +83,204 @@ describe("Testing moveStepRect", function() {
         spyOn(indicator, "changeText").and.callFake(function() {
             return true;
         });
+        spyOn(step.parentStage, "adjustHeader");
         indicator.init(step, footer, C, backupStageModel);
 
         expect(_StagePositionService.getPositionObject).toHaveBeenCalled();
+        expect(_StagePositionService.getAllVoidSpaces).toHaveBeenCalled();
+        expect(_StepPositionService.getPositionObject).toHaveBeenCalled();
+        expect(indicator.changeText).toHaveBeenCalled();
+        expect(step.parentStage.adjustHeader).toHaveBeenCalled();
     });
 
+    it("It should test init method [all setters]", function() {
+
+        spyOn(indicator, "changeText").and.callFake(function() {
+            return true;
+        });
+
+        indicator.init(step, footer, C, backupStageModel);
+        expect(step.parentStage.sourceStage).toEqual(true);
+        expect(indicator.movement).toEqual(null);
+        expect(indicator.movedStepIndex).toEqual(null);
+        expect(indicator.currentMoveRight).toEqual(null);
+        expect(indicator.currentMoveLeft).toEqual(null);
+        expect(indicator.movedStageIndex).toEqual(null);
+        expect(indicator.movedRightStageIndex).toEqual(null);
+        expect(indicator.movedLeftStageIndex).toEqual(null);
+        
+        expect(indicator.currentLeft).toEqual(footer.left);
+        expect(indicator.rightOffset).toEqual(96);
+        expect(indicator.leftOffset).toEqual(0);
+        
+    });
+
+    it("It should test tagSteps method", function() {
+        
+        indicator.tagSteps(step);
+        expect(step.previousStep.nextIsMoving).toEqual(true);
+        expect(step.nextStep.previousIsMoving).toEqual(true);
+    });
+
+    it("It should test changeText method", function() {
+
+        indicator.changeText(step);
+        expect(indicator.temperatureText.text).toEqual(step.model.temperature + "º");
+        expect(indicator.holdTimeText.text).toEqual(step.circle.holdTime.text);
+        expect(indicator.indexText.text).toEqual(step.numberingTextCurrent.text);
+        expect(indicator.placeText.text).toEqual(step.numberingTextCurrent.text + step.numberingTextTotal.text);
+    });
+
+    it("It should test getDirection method when moving right side", function() {
+
+        indicator.movement = {
+            left: 100
+        };
+        indicator.currentLeft = 99;
+        indicator.direction = null;
+        spyOn(indicator, "updateLocationOnMoveRight");
+        indicator.getDirection();
+        
+        expect(indicator.direction).toEqual("right");
+        expect(indicator.updateLocationOnMoveRight).toHaveBeenCalled();
+    });
+
+    it("It should test getDirection method when moving left side", function() {
+
+        indicator.movement = {
+            left: 100
+        };
+        indicator.currentLeft = 101;
+        indicator.direction = null;
+        spyOn(indicator, "updateLocationOnMoveLeft");
+        indicator.getDirection();
+        
+        expect(indicator.direction).toEqual("left");
+        expect(indicator.updateLocationOnMoveLeft).toHaveBeenCalled();
+    });
+
+    it("It should test updateLocationOnMoveRight method", function() {
+
+        indicator.movement = {
+            left: 100
+        };
+        var holdVal = indicator.movement.left;
+        spyOn(indicator, "manageMovingRight");
+
+        indicator.updateLocationOnMoveRight();
+
+        expect(indicator.movement.left).toEqual(holdVal - 30);
+        expect(indicator.manageMovingRight).toHaveBeenCalled();
+    });
+
+    it("It should test updateLocationOnMoveLeft method", function() {
+
+        indicator.movement = {
+            left: 100
+        };
+        var holdVal = indicator.movement.left;
+        spyOn(indicator, "manageMovingLeft");
+
+        indicator.updateLocationOnMoveLeft();
+
+        expect(indicator.movement.left).toEqual(holdVal + 30);
+        expect(indicator.manageMovingLeft).toHaveBeenCalled();
+    });
+
+    it("It should test manageMovingRight method", function() {
+
+        spyOn(_StepMovementRightService, "ifOverRightSide").and.callFake(function() {
+            return true;
+        });
+
+
+        spyOn(_StepMovementRightService, "movedRightAction");
+        spyOn(_StageMovementLeftService, "shouldStageMoveLeft").and.callFake(function() {
+            return true;
+        });
+        spyOn(_StepMoveVoidSpaceLeftService, "checkVoidSpaceLeft").and.returnValue("true");
+        spyOn(indicator, "hideFirstStepBorderLeft").and.returnValue(true);
+        indicator.manageMovingRight();
+
+        expect(_StepMovementRightService.ifOverRightSide).toHaveBeenCalled();
+        expect(_StepMovementRightService.movedRightAction).toHaveBeenCalled();
+        expect(_StepMoveVoidSpaceLeftService.checkVoidSpaceLeft).toHaveBeenCalled();
+        expect(indicator.hideFirstStepBorderLeft).toHaveBeenCalled();
+    });
+
+    it("It should test manageMovingRight method [ when the methods return null ]", function() {
+
+        spyOn(_StepMovementRightService, "ifOverRightSide").and.callFake(function() {
+            return null;
+        });
+
+
+        spyOn(_StepMovementRightService, "movedRightAction");
+        spyOn(_StageMovementLeftService, "shouldStageMoveLeft").and.callFake(function() {
+            return null;
+        });
+        spyOn(_StepMoveVoidSpaceLeftService, "checkVoidSpaceLeft").and.returnValue("true");
+        spyOn(indicator, "hideFirstStepBorderLeft").and.returnValue(true);
+        indicator.manageMovingRight();
+
+        expect(_StepMovementRightService.ifOverRightSide).toHaveBeenCalled();
+        expect(_StepMovementRightService.movedRightAction).not.toHaveBeenCalled();
+
+        expect(_StageMovementLeftService.shouldStageMoveLeft).toHaveBeenCalled();
+
+        expect(_StepMoveVoidSpaceLeftService.checkVoidSpaceLeft).not.toHaveBeenCalled();
+        expect(indicator.hideFirstStepBorderLeft).not.toHaveBeenCalled();
+    });
+
+    it("It should test manageMovingLeft method", function() {
+
+        spyOn(_StepMovementLeftService, "ifOverLeftSide").and.callFake(function() {
+            return true;
+        });
+
+        spyOn(_StepMovementLeftService, "movedLeftAction");
+
+        spyOn(_StageMovementRightService, "shouldStageMoveRight").and.callFake(function() {
+            return true;
+        });
+
+        spyOn(_StepMoveVoidSpaceRightService, "checkVoidSpaceRight").and.returnValue("true");
+
+        spyOn(indicator, "hideFirstStepBorderLeft").and.returnValue(true);
+        
+        indicator.manageMovingLeft();
+        
+        expect(_StepMovementLeftService.ifOverLeftSide).toHaveBeenCalled();
+        expect(_StepMovementLeftService.movedLeftAction).toHaveBeenCalled();
+
+        expect(_StageMovementRightService.shouldStageMoveRight).toHaveBeenCalled();
+        expect(_StepMoveVoidSpaceRightService.checkVoidSpaceRight).toHaveBeenCalled();
+        expect(indicator.hideFirstStepBorderLeft).toHaveBeenCalled();
+    });
+
+    it("It should test manageMovingLeft method [ when methods return null ]", function() {
+
+        spyOn(_StepMovementLeftService, "ifOverLeftSide").and.callFake(function() {
+            return null;
+        });
+
+        spyOn(_StepMovementLeftService, "movedLeftAction");
+
+        spyOn(_StageMovementRightService, "shouldStageMoveRight").and.callFake(function() {
+            return null;
+        });
+
+        spyOn(_StepMoveVoidSpaceRightService, "checkVoidSpaceRight").and.returnValue("true");
+
+        spyOn(indicator, "hideFirstStepBorderLeft").and.returnValue(true);
+        
+        indicator.manageMovingLeft();
+        
+        expect(_StepMovementLeftService.ifOverLeftSide).toHaveBeenCalled();
+        expect(_StepMovementLeftService.movedLeftAction).not.toHaveBeenCalled();
+
+        expect(_StageMovementRightService.shouldStageMoveRight).toHaveBeenCalled();
+        expect(_StepMoveVoidSpaceRightService.checkVoidSpaceRight).not.toHaveBeenCalled();
+        expect(indicator.hideFirstStepBorderLeft).not.toHaveBeenCalled();
+    });
 });

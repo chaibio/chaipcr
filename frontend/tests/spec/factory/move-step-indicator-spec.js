@@ -36,4 +36,5 @@ describe("Testing moveStepIndicator", function() {
         expect(_moveStepIndicator.placeText).toEqual(jasmine.any(Object));
     });
 
+    
 });
