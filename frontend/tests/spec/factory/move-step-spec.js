@@ -283,4 +283,96 @@ describe("Testing moveStepRect", function() {
         expect(_StepMoveVoidSpaceRightService.checkVoidSpaceRight).not.toHaveBeenCalled();
         expect(indicator.hideFirstStepBorderLeft).not.toHaveBeenCalled();
     });
+
+    it("It should test onTheMove method when moving RIGHT", function() {
+
+        spyOn(indicator, "setLeft");
+        spyOn(indicator, "getDirection").and.returnValue("right");
+        spyOn(indicator, "manageMovingRight");
+        spyOn(indicator, "manageMovingLeft");
+        var movement = {
+            left: 20
+        };
+
+        indicator.onTheMove(movement);
+
+        expect(indicator.setLeft).toHaveBeenCalled();
+        expect(indicator.getDirection).toHaveBeenCalled();
+        expect(indicator.manageMovingRight).toHaveBeenCalled();
+        expect(indicator.manageMovingLeft).not.toHaveBeenCalled();
+    });
+
+    it("It should test onTheMove method when moving LEFT", function() {
+
+        spyOn(indicator, "setLeft");
+        spyOn(indicator, "getDirection").and.returnValue("left");
+        spyOn(indicator, "manageMovingRight");
+        spyOn(indicator, "manageMovingLeft");
+        var movement = {
+            left: 20
+        };
+
+        indicator.onTheMove(movement);
+
+        expect(indicator.setLeft).toHaveBeenCalled();
+        expect(indicator.getDirection).toHaveBeenCalled();
+        expect(indicator.manageMovingRight).not.toHaveBeenCalled();
+        expect(indicator.manageMovingLeft).toHaveBeenCalled();
+        
+    });
+
+    it("It should test hideFirstStepBorderLeft method", function() {
+        indicator.movedStageIndex = 0;
+        indicator.kanvas = {
+            allStageViews: [
+                {
+                    childSteps: [
+                        {
+                            borderLeft: {
+                                setVisible: function() {}
+                            }
+                        }
+                    ]
+                },
+            ]
+        };
+        var bLeft = indicator.kanvas.allStageViews[0].childSteps[0].borderLeft;
+
+        spyOn(bLeft, "setVisible");
+        indicator.hideFirstStepBorderLeft();
+        expect(bLeft.setVisible).toHaveBeenCalled();
+
+    });
+
+    it("It should test manageSingleStepStage method , [when childStep length !== 0]", function() {
+
+        var step = {
+            parentStage: {
+                childSteps: [
+                    {},
+                    {}
+                ]
+            }
+        };
+
+        var manageSingleStepStageReturnVal = indicator.manageSingleStepStage(step);
+        expect(manageSingleStepStageReturnVal).toEqual(false); // Because length of childSteps !== 0 
+    });
+
+    it("It should test manageSingleStepStage method , [when childStep length === 0]", function() {
+
+        var step = {
+            parentStage: {
+                deleteStageContents: function() {},
+                childSteps: [
+                    
+                ]
+            }
+        };
+        spyOn(step.parentStage, "deleteStageContents");
+        var manageSingleStepStageReturnVal = indicator.manageSingleStepStage(step);
+        expect(step.parentStage.deleteStageContents).toHaveBeenCalled();
+        expect(manageSingleStepStageReturnVal).toEqual(false); // Because length of childSteps !== 0 
+    });
+
 });

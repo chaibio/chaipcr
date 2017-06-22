@@ -119,9 +119,10 @@ angular.module("canvasApp").factory('moveStepRect', [
         this.manageMovingLeft();
       };
       
-      this.indicator.onTheMove = function(C, movement) {
+      this.indicator.onTheMove = function(movement) {
 
-        this.setLeft(movement.left).setCoords();
+        this.setLeft(movement.left);
+        this.setCoords();
         this.movement = movement;
         var direction = this.getDirection();
         this.currentLeft = movement.left;
