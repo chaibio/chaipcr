@@ -228,7 +228,7 @@ describe("Testing moveStepRect", function() {
 
         expect(_StageMovementLeftService.shouldStageMoveLeft).toHaveBeenCalled();
 
-        expect(_StepMoveVoidSpaceLeftService.checkVoidSpaceLeft).not.toHaveBeenCalled();
+        expect(_StepMoveVoidSpaceLeftService.checkVoidSpaceLeft).toHaveBeenCalled();
         expect(indicator.hideFirstStepBorderLeft).not.toHaveBeenCalled();
     });
 
@@ -280,7 +280,7 @@ describe("Testing moveStepRect", function() {
         expect(_StepMovementLeftService.movedLeftAction).not.toHaveBeenCalled();
 
         expect(_StageMovementRightService.shouldStageMoveRight).toHaveBeenCalled();
-        expect(_StepMoveVoidSpaceRightService.checkVoidSpaceRight).not.toHaveBeenCalled();
+        expect(_StepMoveVoidSpaceRightService.checkVoidSpaceRight).toHaveBeenCalled();
         expect(indicator.hideFirstStepBorderLeft).not.toHaveBeenCalled();
     });
 

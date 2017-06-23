@@ -142,10 +142,11 @@ angular.module("canvasApp").factory('moveStepRect', [
         }
 
         if(StageMovementLeftService.shouldStageMoveLeft(this) !== null) {
-          StepMoveVoidSpaceLeftService.checkVoidSpaceLeft(this);
+          
           this.movedRightStageIndex = null; // Resetting
           this.hideFirstStepBorderLeft();
         }
+        StepMoveVoidSpaceLeftService.checkVoidSpaceLeft(this);
       };
 
       // Manage the movement of the indicator left side.
@@ -156,10 +157,10 @@ angular.module("canvasApp").factory('moveStepRect', [
         }
 
         if(StageMovementRightService.shouldStageMoveRight(this) !== null) {
-          StepMoveVoidSpaceRightService.checkVoidSpaceRight(this);
           this.movedLeftStageIndex = null; // Resetting
           this.hideFirstStepBorderLeft();
         }
+        StepMoveVoidSpaceRightService.checkVoidSpaceRight(this);
       };
 
       this.indicator.hideFirstStepBorderLeft = function() {
