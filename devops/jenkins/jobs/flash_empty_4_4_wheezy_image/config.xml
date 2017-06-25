@@ -31,10 +31,10 @@
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
-          <name>kernel_49</name>
-          <description>Update to kernel TI LTS_4.9
+          <name>kernel_44</name>
+          <description>Update to kernel LTS_4.4
 </description>
-          <defaultValue>true</defaultValue>
+          <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -59,41 +59,6 @@ echo user: $(whoami)
 
 echo Checking for nessasery packages:
 sudo apt-get -y -q install sshpass parted mdadm
-
-sudo chmod 777      /var/lib/jenkins/.ssh/known_hosts
-ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
-#ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
-
-sshpass -p temppwd ssh -t -oStrictHostKeyChecking=no debian@$build_machine &lt;&lt;&apos;ENDSSH&apos;
-echo enable root access with no password
-
-echo temppwd | sudo -S sed -i -e &apos;s:PermitEmptyPasswords no:PermitEmptyPasswords yes:g&apos; /etc/ssh/sshd_config
-sudo sed -i -e &apos;s:UsePAM yes:UsePAM no:g&apos; /etc/ssh/sshd_config
-sudo sed -i -e &apos;s:PermitRootLogin without-password:PermitRootLogin yes:g&apos; /etc/ssh/sshd_config
-sudo passwd -d -u root
-sudo su
-
-echo patching sshd_config
-    
-sudo cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
-KexAlgorithms diffie-hellman-group1-sha1
-KexAlgorithms ecdh-sha2-nistp256
-KexAlgorithms ecdh-sha2-nistp384
-KexAlgorithms ecdh-sha2-nistp521
-KexAlgorithms diffie-hellman-group-exchange-sha256
-KexAlgorithms diffie-hellman-group14-sha1
-#Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
-EOF
-
-sudo /etc/init.d/ssh restart
-
-echo ssh daemon is restarted
-
-
-ENDSSH
-
-echo root access patching returned
-
 
 if grep $build_machine /var/lib/jenkins/.ssh/config
 then
@@ -126,50 +91,20 @@ fi
 #	sudo service sshd restart
 #fi
 
+sudo chmod 777      /var/lib/jenkins/.ssh/known_hosts
+ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
 
 echo deleting root password in case of chaipcr
 sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;passwd -d -u root&quot;
-#echo done deleting root password
 
-
-if ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
-
-if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
-then
-	echo sshd_config was patched already
-else
-	echo patching sshd_config
-    
-	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
-KexAlgorithms diffie-hellman-group1-sha1
-KexAlgorithms ecdh-sha2-nistp256
-KexAlgorithms ecdh-sha2-nistp384
-KexAlgorithms ecdh-sha2-nistp521
-KexAlgorithms diffie-hellman-group-exchange-sha256
-KexAlgorithms diffie-hellman-group14-sha1
-#Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
-EOF
-	sudo service sshd restart
-    sudo service ssh restart
-    /etc/init.d/ssh restart
-	echo device is patched
-    ifconfig
-fi
-
-exit 0
-ENDSSH
-then
-   echo &quot;-t worked&quot;
-else
-echo &quot; trying -tt&quot;
-ssh -tt -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
+#ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
+ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
 
 if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
 then
 	echo sshd_config was patched already
 else
 	echo patching sshd_config
-    
 	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
 KexAlgorithms diffie-hellman-group1-sha1
 KexAlgorithms ecdh-sha2-nistp256
@@ -189,12 +124,8 @@ fi
 exit 0
 ENDSSH
 
-fi
-
-echo Returned to host. connection check:
-ssh -oStrictHostKeyChecking=no -t root@$build_machine &apos;exit 0&apos;
-
-if ssh -oStrictHostKeyChecking=no -tt root@$build_machine &apos;exit 0&apos;
+echo returned to host. connection check:
+if ssh -oStrictHostKeyChecking=no -t root@$build_machine &apos;exit 0&apos;
 then
     echo key is added ok
 else
@@ -204,7 +135,7 @@ else
 fi
 
 counter=0
-until ssh -tt root@$build_machine &apos;exit 0&apos;
+until ssh -t root@$build_machine &apos;exit 0&apos;
 do
 	counter=$(( $counter + 1 ))
     if [ $counter -gt 10 ]
@@ -212,13 +143,13 @@ do
     	echo Beaglebone is not available.
     	exit 1
     fi
-    
 	echo waiting for beaglebone to become connectable.
-	sleep 20
+	sleep 10
+    
 done
 
 echo done connection check.
-sleep 20</command>
+</command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
       <siteName>root@$build_machine:22</siteName>
@@ -251,20 +182,17 @@ fi
 
 swapoff -a
 mount -o remount,rw /
-echo 0 &gt; /proc/sys/kernel/hung_task_timeout_secs
-
-image_filename=bone-debian-8.8-console-armhf-2017-05-07-1gb.img.xz
-#bone-debian-7.11-console-armhf-2016-06-15-2gb.img.xz
+image_filename=bone-debian-7.11-console-armhf-2016-06-15-2gb.img.xz
 
 rm $image_filename || true
 wget $download_prefex/$image_filename
 
 #Verify Image with:
-if sha256sum $image_filename | grep 09783052e6da931c6e05a230c221fa88889af3036723fb22d85404fb057d1d2f
+if sha256sum $image_filename | grep cfceb64083cf63ed49ad75c3b5f5665cef65eaa67c86420a2c4d27bddc22d1ee
 then
 	echo Checksum OK..
 else
-	echo Checksum error $(sha256sum $image_filename)
+	echo Checksum error
 	exit 1
 fi
 
@@ -278,25 +206,15 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D284E608A4C46402
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CF979FFA3D3D3ACC
 
 apt-get update
-apt-get install -f -y -q
-
 apt-get install xz-utils parted  -y -q
-apt-get install -f -y -q
 
-echo wrting to sdcard
+#wrting to sdcard
+
 umount /dev/mmcblk0p* || true
 echo flashing SDCard
 
 echo Image filename: $image_filename
-if [ -e /dev/mmcblk0 ] &amp;&amp; [ -e /dev/mmcblk1 ] 
-then
-   echo &quot;eMMC and SDCard found&quot;
-else
-   echo &quot;SDCard is not mounted&quot;
-   exit 1
-fi
-
-if xzcat $image_filename | dd of=/dev/mmcblk0
+if xzcat $image_filename | sudo dd of=/dev/mmcblk0
 then
     echo SDCard flashed successfully
 else
@@ -311,62 +229,45 @@ echo patching sdcard
 mount /dev/mmcblk0p1 /mnt
 cd /mnt/opt/scripts/tools/eMMC/
 
-echo first patching sshd_config
+echo patching sshd_config
 cat &lt;&lt;EOF &gt;&gt; /mnt/etc/ssh/sshd_config
 KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
 Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 EOF
 
-if [ -e functions.patch ]
-then
-   echo sdcard got patched before
-else
-
-wget $download_prefex/functions.patch
-patch -i functions.patch
-rm functions.patch
+wget $download_prefex/3partitions_flasher_38.patch
+patch -i 3partitions_flasher_38.patch
+rm 3partitions_flasher_38.patch
 if $check_badblocks
 then
   echo badblocks check is active
 else
   echo disable badblocks check
-  sed &quot;s/badblocks/#badblocks/&quot; -i functions.sh
+  sed &quot;s/badblocks/#badblocks/&quot; -i  init-eMMC-flasher-v3.sh
 fi
-
-echo removing root password
-root_password=$(cat /mnt/etc/shadow | grep root | awk -F &apos;:&apos; &apos;{print $2}&apos;)
-sed -i -e &apos;s:&apos;$root_password&apos;::g&apos; /mnt/etc/shadow
-
-echo patching sshd_config
-sed -i -e &apos;s:PermitEmptyPasswords no:PermitEmptyPasswords yes:g&apos; /mnt/etc/ssh/sshd_config
-sed -i -e &apos;s:UsePAM yes:UsePAM no:g&apos; /mnt/etc/ssh/sshd_config
-sed -i -e &apos;s:PermitRootLogin without-password:PermitRootLogin yes:g&apos; /mnt/etc/ssh/sshd_config
-echo done patching sshd_config
 
 echo patching uEnv.txt
 echo cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh &gt;&gt; /mnt/boot/uEnv.txt
-
-fi
 
 touch /forcefsck
 touch /mnt/forcefsck
 sync
 cd
-umount /mnt || true
+umount /mnt
 
 echo disabling eMMC boot
-mount -o remount,rw /boot/uboot || true
-rm -r /boot || true
+mount -o remount,rw /boot/uboot
 mv /boot /boot_disabled  --backup=numbered -f
+rm -r /boot
 
-rm ~/$image_filename || true
+rm ~/$image_filename
 
 sync
 sync
 
 echo Restarting build device..
 shutdown -r 1
-echo &quot;Restart scheduled after a min&quot;
+echo &quot;Restart scheduled after a min -1&quot;
 
 #exit 0
 
@@ -376,7 +277,7 @@ echo &quot;Restart scheduled after a min&quot;
       <command>#!/bin/bash
 # waiting 20min for the bulding device to flash
 echo &quot;Waiting for the build device ($build_machine) to flash and become ready!&quot;
-sleep 500
+sleep 1500
 
 for i in {0..1200..60}
 do
@@ -441,22 +342,15 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CF979FFA3D3D3ACC
 
 apt-key update
 apt-get update 
-apt-get autoremove
-apt-get install -y -q -f
-
 apt-get install -y -q git ntpdate 
-apt-get install -y -q -f
-
 apt-get install -y -q unzip parted
-apt-get install -y -q -f
-
 apt-get install -y -q autoremove
 dpkg --configure -a
 
 df -h
 ntpdate -b -s -u pool.ntp.org
 
-#update-initramfs -u
+update-initramfs -u
 
 	cd /opt/scripts/tools/
         rm eMMC/init-eMMC-flasher-v3.sh
@@ -467,9 +361,9 @@ ntpdate -b -s -u pool.ntp.org
 #        ./update_kernel.sh --kernel 4.4.24-ti-rt-r58
 #./update_kernel.sh --ti-rt-channel --lts-4_1
 
-if $kernel_49
+if $kernel_44
 then
-     ./update_kernel.sh --ti-channel --lts-4_9
+     ./update_kernel.sh --ti-rt-channel --lts-4_4
 fi
 
 touch /forcefsck
@@ -491,31 +385,8 @@ do
 	sleep 60
     if ping $build_machine -c 1
     then
-    	echo device is finally up
-        sleep 120
-    	
-        
-        counter=0
-		until ssh -tt root@$build_machine &apos;exit 0&apos;
-		do
-			counter=$(( $counter + 1 ))
-    		if [ $counter -gt 10 ]
-    		then
-    			echo Beaglebone is not available.
-    			exit 1
-    		fi
-			echo waiting for beaglebone to become connectable $counter .
-			sleep 20
-	   
-		done
-
-
-        echo Moving to next task
-        
-        
-        
-        
-        
+    	echo device is finally up !!
+        sleep 30
         exit 0
     fi
 done
@@ -619,6 +490,6 @@ exit 1</command>
   </builders>
   <publishers/>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.7"/>
   </buildWrappers>
 </project>

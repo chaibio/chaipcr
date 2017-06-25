@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Building julia and upload it to download server without reformating</description>
+  <description>Building julia and upload it to download server</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.17.2">
@@ -14,6 +14,11 @@
           <description>Remote build beaglebone.</description>
           <defaultValue>10.0.2.240</defaultValue>
         </hudson.model.StringParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>check_badblocks</name>
+          <description>Check if there are any bad blocks on eMMC</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>download_prefex</name>
           <description>Download server url</description>
@@ -21,26 +26,10 @@
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>local_download_folder</name>
-          <description>The folder where to host download file. Could be /usr/share/nginx/html/download or /usr/share/nginx/html/download
+          <description>The folder where to host download file. Could be /var/www/html/download or /usr/share/nginx/html/download
 </description>
-          <defaultValue>/usr/share/nginx/html/download</defaultValue>
+          <defaultValue>/var/www/html/download</defaultValue>
         </hudson.model.StringParameterDefinition>
-        <hudson.model.BooleanParameterDefinition>
-          <name>low_performance</name>
-          <description>Reduce cpu performance for a better stability.
-</description>
-          <defaultValue>false</defaultValue>
-        </hudson.model.BooleanParameterDefinition>
-        <hudson.model.ChoiceParameterDefinition>
-          <name>building_version</name>
-          <description></description>
-          <choices class="java.util.Arrays$ArrayList">
-            <a class="string-array">
-              <string>release-0.5</string>
-              <string>release-0.6</string>
-            </a>
-          </choices>
-        </hudson.model.ChoiceParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -50,7 +39,7 @@
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers/>
-  <concurrentBuild>true</concurrentBuild>
+  <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -62,12 +51,13 @@ lsblk
 df -h
 echo user: $(whoami)
 
-if grep $build_machine ~/.ssh/config
+touch /var/lib/jenkins/.ssh/config
+if grep $build_machine /var/lib/jenkins/.ssh/config
 then
-	echo ~/.ssh/config was patched already
+	echo /var/lib/jenkins/.ssh/config was patched already
 else
-	echo patching ~/.ssh/config
-	cat &lt;&lt;EOF &gt;&gt; ~/.ssh/config
+	echo patching /var/lib/jenkins/.ssh/config
+	cat &lt;&lt;EOF &gt;&gt; /var/lib/jenkins/.ssh/config
 Host $build_machine
 		KexAlgorithms +diffie-hellman-group1-sha1,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
 		Ciphers +3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
@@ -172,6 +162,17 @@ fi
 
 swapoff -a
 mount -o remount,rw /
+rm BBB-blank-debian-8.6-console-armhf-2016-10-09-2gb.img.xz || true
+wget $download_prefex/BBB-blank-debian-8.6-console-armhf-2016-10-09-2gb.img.xz
+
+#Verify Image with:
+if sha256sum BBB-blank-debian-8.6-console-armhf-2016-10-09-2gb* | grep 04f227885ea1f186a770edf3347b25d7f48db6a0181c0ee6cc199189c5b4c80d
+then
+	echo Checksum OK..
+else
+	echo Checksum error
+	exit 1
+fi
 
 echo installing missing packages.
 
@@ -185,24 +186,96 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CF979FFA3D3D3ACC
 apt-get update
 apt-get install xz-utils parted cpufrequtils git -y -q
 
-#no reformating
 exit 0
-
 </command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
       <siteName>root@$build_machine:22</siteName>
-      <command>exit 0
+      <command>#wrting to sdcard
 
+swapoff -a
+umount /sdcard/upgrade
+umount /sdcard/*
+
+umount /dev/mmcblk0p* || true
+echo flashing SDCard
+xzcat BBB-blank-debian-8.6-console-armhf-2016-10-09-2gb.img.xz | sudo dd of=/dev/mmcblk0
+rm BBB-blank-debian-8.6-console-armhf-2016-10-09-2gb.img.xz
+sync
+partprobe /dev/mmcblk0
+mount /dev/mmcblk0p1 /mnt
+cd /mnt/opt/scripts/tools/eMMC/
+
+if [ -e /mnt/boot/uEnv.txt ]
+then
+echo patching sshd_config
+     cat &lt;&lt;EOF &gt;&gt; /mnt/etc/ssh/sshd_config
+KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+EOF
+fi
+
+wget $download_prefex/3partitions_flasher_44.patch
+patch -i 3partitions_flasher_44.patch
+rm 3partitions_flasher_44.patch
+
+if $check_badblocks
+then
+  echo badblocks check is active
+else
+  echo disable badblocks check
+  sed &quot;s/badblocks/#badblocks/&quot; -i  init-eMMC-flasher-v3.sh
+fi
+
+echo patching uEnv.txt
+echo cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh &gt;&gt; /mnt/boot/uEnv.txt
+
+sync
+cd
+umount /mnt
+
+echo disabling eMMC boot
+mount -o remount,rw /boot/uboot
+if mount | grep uboot
+then
+    mkdir /boot/uboot/disabled -p
+    mv /boot/uboot/* /boot/uboot/disabled
+fi
+mv /boot /boot_disabled  --backup=numbered -f
+rm -r /boot
+
+sync
+sync
+sleep 10
+
+echo Restarting build device..
+shutdown -r 1
+echo Restart scheduled after a min
+
+force_reboot_hanged_device ()
+{
+   sleep 90
+   reboot -f
+}
+
+#force_reboot_hanged_device &amp;
+
+exit 0
 </command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
-#echo Waiting for the device to come up again
-#sleep 90#
+echo Waiting for the device to come up again
+sleep 90
 
-#echo waiting 30min for the building device to flash
-#sleep 1800
+if $check_badblocks
+then
+	echo waiting 1hr for the badblocks check to finish
+	sleep 3600
+fi
+
+echo waiting 30min for the building device to flash
+sleep 1800
 
 for i in {0..1800..60}
 do
@@ -211,7 +284,7 @@ do
 
 	if ping $build_machine -c 2
     then
-    	echo device is  up !!
+    	echo device is finally up !!
         sleep 60
         
 		ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
@@ -245,22 +318,74 @@ exit 1</command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
       <siteName>root@$build_machine:22</siteName>
-      <command>exit 0
+      <command>if uname -a | grep 4.4
+then
+  echo system flashed successfully.
+else
+   echo error flashing beaglebone.
+   exit 1
+fi
+
+echo Updating kernel
+#
+#cat &lt;&lt;EOF &gt;&gt; /etc/apt/sources.list
+#deb [arch=armhf] http://repos.rcn-ee.com/debian/ jessie main
+#deb-src [arch=armhf] http://repos.rcn-ee.com/debian/ jessie main
+#EOF
+
+cd
+wget http://repos.rcn-ee.net/ubuntu/conf/repos.rcn-ee.net.gpg.key
+apt-key add repos.rcn-ee.net.gpg.key
+rm repos.rcn-ee.net.gpg.key
+
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 9D6D8F6BC857C906
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7638D0442B90D010
+
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1655A0AB68576280
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D284E608A4C46402
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CF979FFA3D3D3ACC
+
+	apt-get update 
+        apt-get install -y -q git  xz-utils parted cpufrequtils
+
+	cd /opt/scripts/tools/
+        rm eMMC/init-eMMC-flasher-v3.sh
+#	git stash save --keep-index
+	git pull
+
+#	./update_kernel.sh --ti-rt-channel --lts-4_4
+        ./update_kernel.sh --kernel 4.4.24-ti-rt-r58
+
+	sync
+	shutdown -r 1
+echo restart scheduled after a min
 </command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
-      <command>exit 0
-</command>
+      <command>#!/bin/bash
+echo waiting for a restart
+sleep 90
+
+for i in {0..300..60}
+do
+	echo &quot;Waiting for the build device to become ready! $i - $build_machine&quot;
+	sleep 60
+    if ping $build_machine -c 1
+    then
+    	echo device is finally up !!
+        sleep 30
+        exit 0
+    fi
+done
+
+echo timeout waiting for the device to become ready! - $build_machine
+exit 1</command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
       <siteName>root@$build_machine:22</siteName>
       <command>echo Starting building Julia on $build_machine
 apt-get update
 apt-get -y -q upgrade
-
-apt-get -f -y -q install
-
-exit 0
 </command>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
@@ -268,58 +393,30 @@ exit 0
       <command>echo arranging to build julia
 df -h
 
-if ! apt-get -q -y install gcc-4.8 g++-4.8 
-then
-    echo error downloading gcc 4.8.. trying 4.7
-    apt-get -q -y install g++-4.7
-if apt-get -q -y install gcc-4.7
-then
-  apt-get clean
-  apt-get autoclean
-  dpkg --configure -a
-  rm /usr/bin/gcc
-  rm /usr/bin/g++
-  ln -s /usr/bin/gcc-4.7 /usr/bin/gcc
-  ln -s /usr/bin/g++-4.7 /usr/bin/g++
-fi
+sudo apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev cmake gcc-4.8 g++-4.8 gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev g++ ntp ntpdate git unzip automake sshpass linux-headers-`uname -r` cmake libpoco-dev
+apt-get -f -y -q install
 
-fi
+apt-get install -q -y libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8 ntpdate cpufrequtils
+apt-get -f -y -q install
 
-
-apt-get -y -q install g++ ntp ntpdate git unzip automake sshpass build-essential
-dpkg --configure -a
-sync
-sleep 5
-
-if  g++ --version | grep 4.6
-then
-  apt-get update
-  apt-get -y upgrade
-  dpkg --configure -a
-  apt-get -y install g++-4.7
-  apt-get clean
-  apt-get autoclean
-  dpkg --configure -a
-  rm /usr/bin/gcc
-  rm /usr/bin/g++
-  ln -s /usr/bin/gcc-4.7 /usr/bin/gcc
-  ln -s /usr/bin/g++-4.7 /usr/bin/g++
-fi
-
-if  g++ --version | grep 4.6
-then
-   echo &quot;Can&apos;t update g++&quot;
-   exit 1
-fi
-
-echo arranging the sdcard
+sudo apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev cmake gcc-4.8 g++-4.8 gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas-common libblas3 libfftw3-double3 libfftw3-single3 libgfortran3 liblapack3 libllvm3.8 libmetis5 libopenblas-base libunwind8
+apt-get -f -y -q install
+</command>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo building julia
 
 swapoff -a
 umount /sdcard/*
 umount /dev/mmcblk0p*
 
+#cpufreq-set --governor performance
 ln -sf /usr/bin/ld /usr/bin/ld.gold
 echo 1500 &gt; /proc/sys/kernel/hung_task_timeout_secs
+
+# add gfortran link to search path. 
+ln -s /usr/lib/gcc/arm-linux-gnueabihf/4.9/libgfortran.so /usr/lib/libgfortran.so
 
 LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
 ,,0xe,*
@@ -340,65 +437,13 @@ sudo swapon -s
 
 free -m
 
-echo Building CMake
-   cd /sdcard/upgrade
-   wget https://cmake.org/files/v3.6/cmake-3.6.1.tar.gz
-   tar xfv cmake-3.6.1.tar.gz
-   cd cmake-3.6.1
-   ./bootstrap
-   make
-   make install
-   cd ..
-   rm -r cmake-3.6.1*
-
-apt-get -y -q install lsb-release
-sync
-sleep 30
-dpkg --configure -a
-
-apt-get autoremove -y -q
-
-apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git build-essential hdf5-tools curl python pkg-config libssl-dev ntp ntpdate git unzip automake sshpass linux-headers-`uname -r` libpoco-dev
-
-apt-get -f -y -q install
-
-apt-get install -q -y libarpack2 libblas3 libgfortran3 liblapack3 ntpdate cpufrequtils
-apt-get -f -y -q install
-
-apt-get -q -y install libblas3gf liblapack3gf libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3 
-apt-get -y -q install libblas3 libatlas3-base
-apt-get -y -q install libblas-common libfftw3-double3 libfftw3-single3 libllvm3.8 libmetis5 libopenblas-base libunwind8 
-
-apt-get -f -y -q install
-
-cpufreq-info
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-
-if $low_performance
-then
-   echo GOVERNOR=\&quot;conservative\&quot; &gt;&gt; /etc/default/cpufrequtils
-   cpufreq-set -f 300MHz -g conservative
-   cpufreq-set -g conservative --max 300MHz
-fi
-
-exit 0</command>
-    </org.jvnet.hudson.plugins.SSHBuilder>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
-      <siteName>root@$build_machine:22</siteName>
-      <command>echo building julia
-
-# add gfortran link to search path. 
-ln -s /usr/lib/gcc/arm-linux-gnueabihf/4.9/libgfortran.so /usr/lib/libgfortran.so
-
 # compiling julia
 # compiling julia 0.5
 mkdir -p /sdcard/upgrade/julia-compile
 cd /sdcard/upgrade/julia-compile
 git clone git://github.com/JuliaLang/julia.git 
 cd julia
-
-git checkout $building_version
-
+git checkout release-0.5
 echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.bashrc
 source ~/.bashrc
 ntpdate -b -s -u pool.ntp.org
@@ -415,11 +460,6 @@ override USE_SYSTEM_FFTW=1
 override USE_SYSTEM_GMP=1
 override USE_SYSTEM_MPFR=1
 override USE_SYSTEM_ARPACK=1
-
-override LLVM_ASSERTIONS=1
-LLVM_FLAGS+=&quot;--with-cpu=cortex-a8 --disable-compiler-version-checks --with-float=hard --with-abi=aapcs-vfp --with-fpu=neon --enable-targets=arm --enable-optimized --enable-assertions&quot;
-
-
 EOF
 
 make
@@ -502,9 +542,6 @@ rm -r julia-compile
 rm -r /root/.julia
 sync
 ls -ahl
-
-cpufreq-info
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 
 echo all done
 exit 0
