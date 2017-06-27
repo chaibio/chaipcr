@@ -169,7 +169,7 @@ describe("Testing moveStepRect", function() {
 
         indicator.updateLocationOnMoveRight();
 
-        expect(indicator.movement.left).toEqual(holdVal - 30);
+        expect(indicator.movement.left).toEqual(holdVal - 40);
         expect(indicator.manageMovingRight).toHaveBeenCalled();
     });
 
@@ -183,7 +183,7 @@ describe("Testing moveStepRect", function() {
 
         indicator.updateLocationOnMoveLeft();
 
-        expect(indicator.movement.left).toEqual(holdVal + 30);
+        expect(indicator.movement.left).toEqual(holdVal + 40);
         expect(indicator.manageMovingLeft).toHaveBeenCalled();
     });
 
@@ -373,6 +373,59 @@ describe("Testing moveStepRect", function() {
         var manageSingleStepStageReturnVal = indicator.manageSingleStepStage(step);
         expect(step.parentStage.deleteStageContents).toHaveBeenCalled();
         expect(manageSingleStepStageReturnVal).toEqual(false); // Because length of childSteps !== 0 
+    });
+
+    it("It should test processMovement method, [when manageSingleStepStage method returns true]", function() {
+
+        spyOn(indicator.verticalLine, "setVisible");
+        spyOn(indicator, "manageSingleStepStage").and.returnValue(true);
+        var step = {
+            parentStage: {
+                childSteps: [
+                    {},
+                    {},
+                ]
+            }
+        };
+
+        var p = indicator.processMovement(step, C);
+        expect(indicator.verticalLine.setVisible).toHaveBeenCalled();
+        expect(p).toEqual(true);
+    });
+
+    it("It should test processMovement method, [when manageSingleStepStage method returns false]", function() {
+
+        spyOn(indicator.verticalLine, "setVisible");
+        spyOn(indicator, "manageSingleStepStage").and.returnValue(false);
+        indicator.kanvas = {
+            allStageViews: [
+                {
+                    moveAllStepsAndStagesSpecial: function() {}
+                }
+            ]
+        };
+        var step = {
+            parentStage: {
+                childSteps: [
+                    {},
+                    {},
+                ],
+                addNewStep: function() {},
+                addNewStepAtTheBeginning: function() {},
+                model: {
+                    id: 10
+                },
+            }, 
+            model: {
+
+            }
+        };
+        indicator.currentDrop = step;
+        indicator.currentDropStage = step.parentStage;
+
+        indicator.processMovement(step, C);
+        expect(indicator.verticalLine.setVisible).toHaveBeenCalled();
+        expect(step.parentStage.sourceStage).toEqual(false);
     });
 
 });
