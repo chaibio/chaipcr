@@ -5,11 +5,11 @@ describe("Testing moveStepRect", function() {
     
     var indicator, step, backupStageModel = {}, C = {}, _StepPositionService, _StagePositionService, footer = {left: 10},
     _StepMovementRightService, _StageMovementLeftService, _StepMoveVoidSpaceLeftService, _StepMovementLeftService,
-    _StageMovementRightService, _StepMoveVoidSpaceRightService;
+    _StageMovementRightService, _StepMoveVoidSpaceRightService, _ExperimentLoader;
     
     beforeEach(inject(function(moveStepRect, Image, StepPositionService, StagePositionService, StepMovementRightService, 
     StageMovementLeftService, StepMoveVoidSpaceLeftService, StepMovementLeftService, StageMovementRightService,
-    StepMoveVoidSpaceRightService) {
+    StepMoveVoidSpaceRightService, ExperimentLoader) {
         
         _StepPositionService = StepPositionService;
         _StagePositionService = StagePositionService;
@@ -19,7 +19,7 @@ describe("Testing moveStepRect", function() {
         _StepMovementLeftService = StepMovementLeftService;
         _StageMovementRightService = StageMovementRightService;
         _StepMoveVoidSpaceRightService = StepMoveVoidSpaceRightService;
-
+        _ExperimentLoader = ExperimentLoader;
         var obj = {
             imageobjects: {
                 "drag-footer-image.png": Image.create()
@@ -384,8 +384,11 @@ describe("Testing moveStepRect", function() {
                 childSteps: [
                     {},
                     {},
-                ]
-            }
+                ],
+                addNewStage: function() {},
+                addNewStepAtTheBeginning: function() {}
+            },
+            
         };
 
         var p = indicator.processMovement(step, C);
@@ -393,10 +396,23 @@ describe("Testing moveStepRect", function() {
         expect(p).toEqual(true);
     });
 
-    it("It should test processMovement method, [when manageSingleStepStage method returns false]", function() {
+    it("It should test processMovement method, [when manageSingleStepStage method returns false and when targetStep is not null]", function() {
 
         spyOn(indicator.verticalLine, "setVisible");
         spyOn(indicator, "manageSingleStepStage").and.returnValue(false);
+        spyOn(_ExperimentLoader, "moveStep").and.callFake(function() {
+            return {
+                then: function(successCallback, failureCallback) {
+                    if(typeof(successCallback) === 'function') {
+                        successCallback();
+                    }
+                    if(typeof(failureCallback) === 'function') {
+                        failureCallback();
+                    }
+                    
+                }
+            };
+        });
         indicator.kanvas = {
             allStageViews: [
                 {
@@ -405,6 +421,7 @@ describe("Testing moveStepRect", function() {
             ]
         };
         var step = {
+            left: 10,
             parentStage: {
                 childSteps: [
                     {},
@@ -422,10 +439,115 @@ describe("Testing moveStepRect", function() {
         };
         indicator.currentDrop = step;
         indicator.currentDropStage = step.parentStage;
-
+        
         indicator.processMovement(step, C);
         expect(indicator.verticalLine.setVisible).toHaveBeenCalled();
         expect(step.parentStage.sourceStage).toEqual(false);
+        expect(_ExperimentLoader.moveStep).toHaveBeenCalled();
     });
 
+    it("It should test processMovement method, [when manageSingleStepStage method returns false and when targetStep is null]", function() {
+
+        spyOn(indicator.verticalLine, "setVisible");
+        spyOn(indicator, "manageSingleStepStage").and.returnValue(false);
+        spyOn(_ExperimentLoader, "moveStep").and.callFake(function() {
+            return {
+                then: function(successCallback, failureCallback) {
+                    if(typeof(successCallback) === 'function') {
+                        successCallback();
+                    }
+                    if(typeof(failureCallback) === 'function') {
+                        failureCallback();
+                    }
+                    
+                }
+            };
+        });
+        indicator.kanvas = {
+            allStageViews: [
+                {
+                    moveAllStepsAndStagesSpecial: function() {}
+                }
+            ]
+        };
+        var step = {
+            left: 10,
+            parentStage: {
+                childSteps: [
+                    {},
+                    {},
+                ],
+                addNewStep: function() {},
+                addNewStepAtTheBeginning: function() {},
+                model: {
+                    id: 10
+                },
+            }, 
+            model: {
+
+            }
+        };
+        
+        indicator.currentDrop = null;
+        indicator.currentDropStage = step.parentStage;
+        
+        indicator.processMovement(step, C);
+        expect(indicator.verticalLine.setVisible).toHaveBeenCalled();
+        expect(step.parentStage.sourceStage).toEqual(false);
+        expect(_ExperimentLoader.moveStep).toHaveBeenCalled();
+    });
+
+    it("It should test manageSingleStepStage method when currentDrop === NOTHING and has previousStage", function() {
+
+        var step = {
+            parentStage: {
+                deleteStageContents: function() {},
+                childSteps: [
+                    
+                ],
+                previousStage: {
+
+                }
+            }
+        };
+        indicator.kanvas = {
+            addNewStage: function() {},
+            addNewStageAtBeginning: function() {}
+        };
+        indicator.currentDrop = "NOTHING";
+        spyOn(indicator.kanvas, "addNewStage").and.returnValue(true);
+        spyOn(step.parentStage, "deleteStageContents");
+
+        indicator.manageSingleStepStage(step);
+
+        expect(step.parentStage.deleteStageContents).toHaveBeenCalled();
+        expect(indicator.kanvas.addNewStage).toHaveBeenCalled();
+
+    });
+
+    it("It should test manageSingleStepStage method when currentDrop === NOTHING and has no previousStage", function() {
+
+        var step = {
+            parentStage: {
+                deleteStageContents: function() {},
+                childSteps: [
+                    
+                ],
+                
+            }
+        };
+        indicator.kanvas = {
+            addNewStage: function() {},
+            addNewStageAtBeginning: function() {}
+        };
+        indicator.currentDrop = "NOTHING";
+        spyOn(indicator.kanvas, "addNewStageAtBeginning").and.returnValue(true);
+        spyOn(step.parentStage, "deleteStageContents");
+
+        indicator.manageSingleStepStage(step);
+
+        expect(step.parentStage.deleteStageContents).toHaveBeenCalled();
+        expect(indicator.kanvas.addNewStageAtBeginning).toHaveBeenCalled();
+
+    });
 });

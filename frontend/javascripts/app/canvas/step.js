@@ -149,16 +149,6 @@ angular.module("canvasApp").factory('step', [
         }
 
         this.moveStep(1, true);
-        /*if(this.shrinked === true) {
-          return;
-        }
-
-        if(this.previousStep && this.previousStep.shrinked === true) {
-          this.left = this.previousStep.left + 138;
-          //return;
-        }*/
-
-
       };
 
       this.configureStepName = function(thisStep) {

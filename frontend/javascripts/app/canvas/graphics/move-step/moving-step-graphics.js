@@ -40,7 +40,7 @@ angular.module("canvasApp").service('movingStepGraphics', [
             baseStage.roof.setWidth(baseStage.myWidth);
             baseStage.roof.setCoords();
             
-            baseStage.stageGroup.setLeft(baseStage.stageGroup.left + this.offset)
+            baseStage.stageGroup.setLeft(baseStage.stageGroup.left + this.offset);
             baseStage.stageGroup.setCoords();
 
             baseStage.dots.setLeft(baseStage.dots.left + this.offset);
