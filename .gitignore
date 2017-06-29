@@ -38,6 +38,7 @@ Debug
 /web/public/javascripts/**/*.js
 /web/public/stylesheets/**/*.css
 /web/public/experiments/
+/web/dist
 build/*
 /uploads/
 capabilities
