@@ -19,19 +19,19 @@
 
 window.ChaiBioTech.ngApp.service('StagePositionService', [
   function() {
-      var allStages = null;
+      this.allStages = null;
         return {
             init: function(stages) {
-                allStages = stages; // Setting the reference from canvas.js, just after all stages are created.
+                this.allStages = stages; // Setting the reference from canvas.js, just after all stages are created.
             },
             getPositionObject: function(stages) {
                 
-                if(!allStages) {
+                if(!this.allStages) {
                     return null;
                 }
                 
                 this.allPositions = [];
-                allStages.forEach(function(stage, index) {
+                this.allStages.forEach(function(stage, index) {
                     this.allPositions[index] = [
                             stage.left, 
                             (stage.left + (stage.myWidth) / 2),
@@ -42,13 +42,13 @@ window.ChaiBioTech.ngApp.service('StagePositionService', [
             },
 
             getAllVoidSpaces: function() {
-                if(!allStages) {
+                if(!this.allStages) {
                     return null;
                 }
 
                 this.allVoidSpaces = [];
                 
-                allStages.forEach(function(stage, index) {
+                this.allStages.forEach(function(stage, index) {
                     if(index === 0) {
                         this.allVoidSpaces[0] = [
                             33,
