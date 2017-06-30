@@ -33,16 +33,16 @@ window.ChaiBioTech.ngApp.service('StageMovementLeftService', [
             shouldStageMoveLeftCallback: function(point, index) {
                 // Note, the context of this method is sI [stepIndicator]
                 if((this.movement.left + this.rightOffset) > point[2] && (this.movement.left + this.rightOffset) < point[2] + 150) {
-                if(index !== this.movedLeftStageIndex) {
-                    this.movedStageIndex = this.movedLeftStageIndex = index;
-                    this.kanvas.allStageViews[index].moveToSide("left", {index: 10}); 
-                    // {index: 10} is sent so that the very first stage doesnt move, refer stage.validMove()
-                    // It dosnt have to be 10, can be any non zero value
-                    StagePositionService.getPositionObject();
-                    StagePositionService.getAllVoidSpaces();
-                    StepPositionService.getPositionObject(this.kanvas.allStepViews);
-                    return true;
-                }
+                    if(index !== this.movedLeftStageIndex) {
+                        this.movedStageIndex = this.movedLeftStageIndex = index;
+                        this.kanvas.allStageViews[index].moveToSide("left", {index: 10}); 
+                        // {index: 10} is sent so that the very first stage doesnt move, refer stage.validMove()
+                        // It dosnt have to be 10, can be any non zero value
+                        StagePositionService.getPositionObject();
+                        StagePositionService.getAllVoidSpaces();
+                        StepPositionService.getPositionObject(this.kanvas.allStepViews);
+                        return true;
+                    }
                 }
             }
         };
