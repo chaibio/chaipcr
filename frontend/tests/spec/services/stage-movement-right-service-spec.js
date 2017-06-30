@@ -34,6 +34,26 @@ describe("Testing StageMovementRightService", function() {
         expect(rVal).toEqual(5);
     });
 
-    
+    it("It should test shouldStageMoveLeft method, test shouldStageMoveRightCallback call from this method", function() {
+
+        sI = {
+            movedStageIndex: null
+        };
+
+        spyOn(_StageMovementRightService, "shouldStageMoveRightCallback").and.callFake(function(thisObjs) {
+            thisObjs.movedStageIndex = 5;
+            return true;
+        });
+
+        _StagePositionService.allPositions = {
+            
+            some: function(callback, thisObjs) {
+                callback(thisObjs);
+            }
+        };
+
+        _StageMovementRightService.shouldStageMoveRight(sI);
+         expect(_StageMovementRightService.shouldStageMoveRightCallback).toHaveBeenCalled();
+    });
 
 }); 
