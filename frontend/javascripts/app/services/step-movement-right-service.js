@@ -43,7 +43,7 @@ window.ChaiBioTech.ngApp.service('StepMovementRightService', [
             },
 
             movedRightAction: function(stepIndicator) {
-                console.log("Log Log", stepIndicator, stepIndicator.currentMoveLeft);
+                
                 stepIndicator.currentDrop = stepIndicator.kanvas.allStepViews[stepIndicator.movedStepIndex];
                 stepIndicator.currentDropStage = stepIndicator.currentDrop.parentStage;
                 this.manageVerticalLineRight(stepIndicator);
