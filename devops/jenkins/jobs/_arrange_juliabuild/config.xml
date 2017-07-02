@@ -398,6 +398,7 @@ git clone git://github.com/JuliaLang/julia.git
 cd julia
 
 git checkout $building_version
+exit 0
 
 echo &quot;export JULIA_PKGDIR=/root/.julia&quot;&gt;&gt;~/.bashrc
 source ~/.bashrc
@@ -422,6 +423,8 @@ LLVM_FLAGS+=&quot;--with-cpu=cortex-a8 --disable-compiler-version-checks --with-
 
 EOF
 
+exit 0
+
 make
 
 
@@ -430,48 +433,8 @@ make
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
       <siteName>root@$build_machine:22</siteName>
       <command>echo installing julia
+exit 0
 cd /sdcard/upgrade/julia-compile/julia
-
-cat &lt;&lt;EOF &gt;&gt; fp.jl
-
-__precompile__(true)
-println(&quot;starting FP test&quot;)
-
-x = 1.25f0
-
-sin(x)+log(x)
-
-start_time = now()
-time1 = @elapsed for i in 0:1:1000000
-        x = nextfloat(x)
-end
-loop_time = now()
-time2 = @elapsed for i in 0:1:1000000
-        y = sin(x)
-        y = log(y)
-        x = nextfloat(x)
-end
-loop_plus_FP_time = now()
-
-println( &quot;1M operations done!&quot;)
-
-println(&quot;test finished in: &quot;, time2 )
-println(&quot;looping time: &quot;, time1 )
-fp_time = time2-time1
-fp_time2 = loop_plus_FP_time - loop_time + start_time - loop_time
-
-println(&quot;FP Time1: &quot;, fp_time )
-println(&quot;FP Time2: &quot;, fp_time2 )
-
-@printf(&quot;FP Index: %.1f\n\n&quot;, 5.01/fp_time )
-
-
-EOF
-
-./julia fp.jl --compile=yes
-
-
-
 
 make install 
 ln -s /usr/share/julia/bin/julia /usr/bin/julia
@@ -514,7 +477,8 @@ sync
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
       <command>echo uploading julia file to server
-                                                                                                                                 
+exit 0
+
 scp -oStrictHostKeyChecking=no -r root@$build_machine:/sdcard/upgrade/julia-compile/julia05-44-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/
 chmod 777 $local_download_folder/julia05-44-$build_machine-$BUILD_NUMBER.tgz
 ln -sf $local_download_folder/julia05-44-$build_machine-$BUILD_NUMBER.tgz $local_download_folder/julia05-44-default.tgz
@@ -531,6 +495,7 @@ exit 0</command>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.4">
       <siteName>root@$build_machine:22</siteName>
       <command>echo cleaning up
+exit 0
 cd /sdcard/upgrade/julia-compile/
 
 rm julia05-44-$build_machine-$BUILD_NUMBER.tgz
@@ -548,46 +513,6 @@ cpufreq-info
 cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 
 echo all done
-
-cat &lt;&lt;EOF &gt;&gt; fp.jl
-
-__precompile__(true)
-println(&quot;starting FP test&quot;)
-
-x = 1.25f0
-
-sin(x)+log(x)
-
-start_time = now()
-time1 = @elapsed for i in 0:1:1000000
-        x = nextfloat(x)
-end
-loop_time = now()
-time2 = @elapsed for i in 0:1:1000000
-        y = sin(x)
-        y = log(y)
-        x = nextfloat(x)
-end
-loop_plus_FP_time = now()
-
-println( &quot;1M operations done!&quot;)
-
-println(&quot;test finished in: &quot;, time2 )
-println(&quot;looping time: &quot;, time1 )
-fp_time = time2-time1
-fp_time2 = loop_plus_FP_time - loop_time + start_time - loop_time
-
-println(&quot;FP Time1: &quot;, fp_time )
-println(&quot;FP Time2: &quot;, fp_time2 )
-
-@printf(&quot;FP Index: %.1f\n\n&quot;, 5.01/fp_time )
-
-
-EOF
-julia fp.jl --compile=yes
-
-
-
 exit 0
 </command>
     </org.jvnet.hudson.plugins.SSHBuilder>

@@ -230,7 +230,10 @@ uname -a
 ls -ahl
 lsblk
 df -h
-dpkg --configure -a
+
+rm /var/lib/dpkg/lock
+echo -e &quot;\n&quot; | dpkg --configure -a
+#dpkg --configure -a
 swapoff -a
 
 umount /dev/mmcblk0p*
