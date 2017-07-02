@@ -33,12 +33,12 @@ window.ChaiBioTech.ngApp.service('StepMovementRightService', [
                 // Note , this method works in the context of stepIndicator, dont confuse with this keyword.
                 if((this.movement.left + this.rightOffset) > points[1] && (this.movement.left + this.rightOffset) < points[2]) {
                     
-                if(index !== this.currentMoveRight) {
-                    this.kanvas.allStepViews[index].moveToSide("left", this.currentDropStage);
-                    this.currentMoveRight = this.movedStepIndex = index;
-                    StepPositionService.getPositionObject(this.kanvas.allStepViews);
-                }
-                return true;
+                    if(index !== this.currentMoveRight) {
+                        this.kanvas.allStepViews[index].moveToSide("left", this.currentDropStage);
+                        this.currentMoveRight = this.movedStepIndex = index;
+                        StepPositionService.getPositionObject(this.kanvas.allStepViews);
+                    }
+                    return true;
                 }
             },
 
